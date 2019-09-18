@@ -1,0 +1,9 @@
+# C/C++
+*.o
+*.d
+
+# Bazel
+bazel-*
+
+# Editors
+.vscode/
