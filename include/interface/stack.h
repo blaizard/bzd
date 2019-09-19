@@ -34,11 +34,11 @@ namespace async
 				/**
 				 * The stack grows from lower address to higher
 				 */
-				GROW_FORWARD = 0,
+				UPWARD = 0,
 				/**
 				 * The stack grows from higher address to lower
 				 */
-				GROW_BACKWARD = 1
+				DOWNWARD = 1
 			};
 
 			friend class Task;

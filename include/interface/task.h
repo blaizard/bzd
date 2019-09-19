@@ -8,7 +8,7 @@ namespace async
 	namespace impl
 	{
 		extern "C" void contextSwitch(void** stack1, void* stack2);
-		extern "C" void* contextGet();
+		extern "C" void* contextTask();
 	}
 
 	namespace interface
@@ -16,22 +16,24 @@ namespace async
 		class Task
 		{
 		public:
-			Task(interface::Stack& stack, this_ptr_type obj, const fct_ptr_type fct)
-				: stack_(stack)
+			Task(ctx_ptr_type context, const fct_ptr_type fct)
+				: context_(context), fct_(fct)
 			{
-				stack_.reset(fct, obj);
 			}
 
-			Task(interface::Stack& stack, const fct_ptr_type fct)
-				: stack_(stack)
+			/**
+			 * Bind a task to a stack
+			 */
+			void bind(interface::Stack& stack)
 			{
-				stack_.reset(fct, nullptr);
+				stack_ = &stack;
+				stack_->reset(fct_, context_);	
 			}
 
 			void start()
 			{
 				void* temp;
-				impl::contextSwitch(&temp, stack_.stack_);
+				impl::contextSwitch(&temp, stack_->stack_);
 			}
 
 			/**
@@ -39,11 +41,13 @@ namespace async
 			 */
 			void yield(Task& nextTask)
 			{
-				impl::contextSwitch(reinterpret_cast<void**>(&stack_.stack_), nextTask.stack_.stack_);
+				impl::contextSwitch(reinterpret_cast<void**>(&stack_->stack_), nextTask.stack_->stack_);
 			}
 
 		protected:
-			interface::Stack& stack_;
+			ctx_ptr_type const context_;
+			const fct_ptr_type fct_;
+			interface::Stack* stack_;
 		};
 	}
 }
