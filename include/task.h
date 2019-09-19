@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/interface/task.h"
-#include <iostream>
 
 namespace async
 {
