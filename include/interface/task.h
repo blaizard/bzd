@@ -30,10 +30,9 @@ namespace async
 				stack_->reset(fct_, context_);	
 			}
 
-			void start()
+			void start(void** pointer)
 			{
-				void* temp;
-				impl::contextSwitch(&temp, stack_->stack_);
+				impl::contextSwitch(pointer, stack_->stack_);
 			}
 
 			/**
