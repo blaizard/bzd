@@ -2,17 +2,16 @@
 
 #include "include/interface/task.h"
 
-namespace async
+namespace bzd
 {
 	template <class T>
 	struct resultOf;
 	
 	template <class T, class... Args>
-	struct resultOf<T(&)(Args...)>
+	struct resultOf<T(&)(Args&&...)>
 	{
 		typedef T type;
 	};
-	
 
 	template <class T, class... Args>
 	class Task : public interface::Task
@@ -25,7 +24,7 @@ namespace async
 
 	public:
 		Task(const T& callable)
-			: interface::Task(static_cast<ctx_ptr_type>(&context_), reinterpret_cast<fct_ptr_type>(wrapper<typename resultOf<decltype(callable)>::type>))
+			: interface::Task(static_cast<CtxPtrType>(&context_), reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>))
 			, context_{callable}
 		{
 		}
@@ -33,7 +32,7 @@ namespace async
 		template <class R>
 		static void wrapper()
 		{
-			Context* context = reinterpret_cast<Context*>(async::impl::contextTask());
+			Context* context = reinterpret_cast<Context*>(bzd::impl::contextTask());
 			context->callable_();
 		}
 

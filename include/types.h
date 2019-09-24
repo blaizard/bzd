@@ -1,9 +1,12 @@
 #pragma once
 
-namespace async
+namespace bzd
 {
-	using ctx_ptr_type = void*;
-	using fct_ptr_type = void*(*)();
-	using byte_type = unsigned char;
-	using size_type = unsigned int;
+	using PtrType = void*;
+	using PtrDiffType = PtrType;
+	using CtxPtrType = PtrType;
+	using IntPtrType = unsigned long long;
+	using FctPtrType = void*(*)();
+	using ByteType = unsigned char;
+	using SizeType = unsigned int;
 }
