@@ -2,17 +2,20 @@
 
 #include <list>
 
+#include "include/utils.h"
 #include "include/interface/task.h"
 
-namespace async
+namespace bzd
 {
-	class Scheduler
+	class Scheduler : public SingletonThreadLocalImpl<Scheduler>
 	{
 	public:
-		Scheduler() = default;
-
-		void addTask(async::interface::Task& task)
+		/**
+		 * Add a new task to the scheduler
+		 */
+		void addTask(bzd::interface::Task& task)
 		{
+			// Only add bounded tasks if (task.isBind())
 			queue_.push_back(&task);
 		}
 
@@ -25,7 +28,7 @@ namespace async
 
 		void yield()
 		{
-			// Push bash the task
+			// Push back the current task
 			queue_.push_back(task_);
 			auto* previousTask = task_;
 			task_ = *(queue_.begin());
@@ -34,8 +37,13 @@ namespace async
 		}
 
 	private:
-		std::list<async::interface::Task*> queue_;
-		async::interface::Task* task_;
+		std::list<bzd::interface::Task*> queue_;
+		bzd::interface::Task* task_;
 		void* mainStack_ = nullptr;
 	};
+
+	void yield()
+	{
+		Scheduler::getInstance().yield();
+	}
 }

@@ -2,7 +2,7 @@
 
 #include "include/types.h"
 
-namespace async
+namespace bzd
 {
 	namespace interface
 	{
@@ -12,10 +12,10 @@ namespace async
 		class Stack
 		{
 		public:
-			void reset(const fct_ptr_type fct, void* context);
+			void reset(const FctPtrType fct, void* context);
 
 		protected:
-			Stack(byte_type* stack, const size_type size)
+			Stack(ByteType* stack, const SizeType size)
 				: stackBase_(stack), size_(size)
 			{
 			}
@@ -29,7 +29,7 @@ namespace async
 				return reinterpret_cast<T*>(&stackBase_[((size_ - sizeof(T)) / Align) * Align]);
 			}
 
-			enum class Direction : byte_type
+			enum class Direction : ByteType
 			{
 				/**
 				 * The stack grows from lower address to higher
@@ -43,9 +43,9 @@ namespace async
 
 			friend class Task;
 
-			byte_type* const stackBase_;
-			const size_type size_;
-			byte_type* stack_;
+			ByteType* const stackBase_;
+			const SizeType size_;
+			ByteType* stack_;
 			static const Direction direction_;
 		};
 	}

@@ -3,9 +3,9 @@
 #include "include/interface/stack.h"
 #include "include/types.h"
 
-namespace async
+namespace bzd
 {
-	template <const size_type N>
+	template <const SizeType N>
 	class Stack : public interface::Stack
 	{
 	public:
@@ -15,6 +15,6 @@ namespace async
 		}
 
 	private:
-		byte_type data_[N];
+		ByteType data_[N];
 	};
 }

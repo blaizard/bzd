@@ -3,7 +3,7 @@
 #include "include/interface/stack.h"
 #include "include/types.h"
 
-namespace async
+namespace bzd
 {
 	namespace impl
 	{
@@ -16,7 +16,7 @@ namespace async
 		class Task
 		{
 		public:
-			Task(ctx_ptr_type context, const fct_ptr_type fct)
+			Task(CtxPtrType context, const FctPtrType fct)
 				: context_(context), fct_(fct)
 			{
 			}
@@ -44,8 +44,8 @@ namespace async
 			}
 
 		protected:
-			ctx_ptr_type const context_;
-			const fct_ptr_type fct_;
+			CtxPtrType const context_;
+			const FctPtrType fct_;
 			interface::Stack* stack_;
 		};
 	}
