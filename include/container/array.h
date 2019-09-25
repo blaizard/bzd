@@ -10,7 +10,7 @@ namespace bzd
 	{
 	public:
 		template <class... Args>
-		Array(Args&&... args) noexcept
+		explicit Array(Args&&... args) noexcept
 				: Span<T>(data_, N)
 				, data_{args...}
 		{

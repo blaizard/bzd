@@ -16,7 +16,7 @@ namespace bzd
 
 		public:
 			template <class... Args>
-			Vector(const SizeType capacity, Args&&... args)
+			explicit Vector(const SizeType capacity, Args&&... args)
 					: Impl(args...), capacity_(capacity)
 			{
 			}
@@ -53,7 +53,7 @@ namespace bzd
 	namespace interface
 	{
 		template <class T>
-		using Vector = impl::Vector<T, Span<T, /*IsSizeConst*/false>>;
+		using Vector = impl::Vector<T, Span<T>>;
 	}
 
 	template <class T, SizeType N>
@@ -61,7 +61,7 @@ namespace bzd
 	{
 	public:
 		template <class... Args>
-		Vector(Args&&... args)
+		explicit Vector(Args&&... args)
 				: interface::Vector<T>(N, data_, sizeof...(Args))
 				, data_{args...}
 		{

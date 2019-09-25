@@ -5,13 +5,12 @@
 
 namespace bzd
 {
-	template <class T, bool IsSizeConst = true, bool IsDataConst = true>
+	template <class T, bool IsDataConst = false>
 	class Span
 	{
 	protected:
 		using DataType = T;
-		using DataSizeType = typename typeTraits::conditional<IsSizeConst, const SizeType, SizeType>::type;
-		using DataPtrType = typename typeTraits::conditional<IsDataConst, T* const, T*>::type;
+		using DataPtrType = typename typeTraits::conditional<IsDataConst, const T*, T*>::type;
 
 	public:
 		class Iterator
@@ -84,17 +83,19 @@ namespace bzd
 
 	public:
 		template <class... Args>
-		Span(DataPtrType data, DataSizeType size) noexcept
+		Span(const DataPtrType data, const SizeType size) noexcept
 				: data_(data), size_(size)
 		{
 		}
 
-		Iterator begin() noexcept
+		template<class Q = Iterator>
+		typename bzd::typeTraits::enableIf<!IsDataConst, Q>::type begin() noexcept
 		{
 			return Iterator(*this, 0);
 		}
 
-		Iterator end() noexcept
+		template<class Q = Iterator>
+		typename bzd::typeTraits::enableIf<!IsDataConst, Q>::type end() noexcept
 		{
 			return Iterator(*this, size());
 		}
@@ -124,7 +125,8 @@ namespace bzd
 			return size_;
 		}
 
-		T& operator[](const SizeType index)
+		template<class Q = T>
+		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type operator[](const SizeType index)
 		{
 			return data_[index];
 		}
@@ -134,7 +136,8 @@ namespace bzd
 			return data_[index];
 		}
 
-		T* data() noexcept
+		template<class Q = T>
+		typename bzd::typeTraits::enableIf<!IsDataConst, Q*>::type data() noexcept
 		{
 			return data_;
 		}
@@ -151,6 +154,6 @@ namespace bzd
 
 	protected:
 		DataPtrType data_;
-		DataSizeType size_;
+		SizeType size_;
 	};
 }
