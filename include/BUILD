@@ -11,8 +11,8 @@ cc_test(
     srcs = glob([
 		"**/*.cpp"
 	]),
-    deps = [
-		":include",
-        "@googletest//:gtest_main",
-    ],
+  deps = [
+	  ":include",
+    "@googletest//:gtest_main",
+  ],
 )
