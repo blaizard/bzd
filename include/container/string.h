@@ -15,6 +15,7 @@ namespace bzd
 			using Impl::size_;
 			using Impl::data_;
 			using StringView = ::bzd::impl::StringView<T, Span<T, /*IsDataConst*/true>>;
+			using SpanType = Span<T>;
 
 		public:
 			template <class... Args>
@@ -50,6 +51,11 @@ namespace bzd
 			{
 				size_ = (n < capacity_ - 1) ? n : capacity_ - 1;
 				data_[size_] = '\0';
+			}
+
+			SpanType postSpan() const noexcept
+			{
+				return SpanType(&data_[size_], capacity_ - size_);
 			}
 
 			template <class U>
