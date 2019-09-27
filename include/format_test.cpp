@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "include/format.h"
 
-TEST(Format, Base)
+TEST(Format, Integer)
 {
 	bzd::String<10> str;
 
@@ -41,7 +41,23 @@ TEST(Format, Overflow)
 		EXPECT_EQ(str.size(), 1);
     	EXPECT_STREQ(str.data(), "2");
 	}
+}
 
-	bzd::format::format("Helllo {10} dfdsf");
-	EXPECT_EQ(false, true);
+TEST(Format, StringFormat)
+{
+	bzd::String<32> str;
+
+	bzd::format::toString(str, "Hello %i", 42);
+	EXPECT_STREQ(str.data(), "Hello 42");
+
+	bzd::format::toString(str, "Hello %%");
+	EXPECT_STREQ(str.data(), "Hello %");
+
+	bzd::format::toString(str, "%%");
+	EXPECT_STREQ(str.data(), "%");
+
+	bzd::format::toString(str, "Hello %% %i", 42);
+	EXPECT_STREQ(str.data(), "Hello % 42");
+
+	// to test overflows
 }

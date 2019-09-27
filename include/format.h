@@ -53,13 +53,13 @@ namespace bzd
 				++it;
 				if (ch != '{' && ch != '}') continue;
 				if (*it == ch) {
-				handler.on_text(start, it);
-				start = ++it;
-				continue;
+					handler.on_text(start, it);
+					start = ++it;
+					continue;
 				}
 				if (ch == '}') {
-				handler.on_error("unmatched '}' in format string");
-				return;
+					handler.on_error("unmatched '}' in format string");
+					return;
 				}
 				handler.on_text(start, it - 1);
 				// parse format specs
@@ -68,24 +68,55 @@ namespace bzd
 			handler.on_text(start, it);
 		}
 
-		void format(StringView fmt)
+		template <class Handler, class Arg, class... Args>
+		constexpr void processStringFormat(Handler&& callback, StringView& format, Arg&& arg, Args&&... args)
 		{
-			struct Temp
+			processStringFormat(callback, format);
+
+			switch (format.front())
 			{
-				std::function<void(StringView::ConstIterator, StringView::ConstIterator)> on_text;
-				std::function<void(const char*)> on_error;
-			};
-
-			const Temp temp{
-				[](StringView::ConstIterator start, StringView::ConstIterator it) {
-					std::cout << *start << "," << *it << std::endl;
-				},
-				[](StringView error) {
-					std::cout << error.data() << std::endl;
+			case 'i':
+			case 'd':
+				{
+					bzd::String<10> buffer;
+					toString(buffer, arg);
+					callback(buffer.data());
 				}
-			};
+				break;
+			}
+			format.removePrefix(1);
 
-			parse_format_string(fmt.begin(), temp);
+			processStringFormat(callback, format, args...);
+		}
+
+		template <class Handler>
+		constexpr void processStringFormat(Handler&& callback, StringView& format)
+		{
+			SizeType offset = 0;
+			do
+			{
+				const auto index = format.find('%', offset);
+				//offset = 0;
+				if (index == StringView::npos)
+				{
+					callback(format);
+					return;
+				}
+				
+				callback(format.substr(0, index));
+				format.removePrefix(index + 1);
+ 				offset = (format.front() == '%') ? 1 : 0;
+
+			} while (offset);
+		}
+
+		template <class... Args>
+		void toString(interface::String& dest, StringView format, Args&&... args)
+		{
+			dest.clear();
+			processStringFormat([&](StringView str) {
+				dest.append(str);
+			}, format, args...);
 		}
 	}
 }

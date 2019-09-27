@@ -14,6 +14,8 @@ namespace bzd
 		using DataPtrType = typename typeTraits::conditional<IsDataConst, const T*, T*>::type;
 
 	public:
+		static constexpr const SizeType npos = static_cast<SizeType>(-1);
+
 		class Iterator
 		{
 		public:
@@ -202,6 +204,19 @@ namespace bzd
 			return data_[index];
 		}
 
+		// at
+
+		template<class Q = T>
+		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type at(const SizeType index)
+		{
+			return data_[index];
+		}
+
+		const T& at(const SizeType index) const
+		{
+			return data_[index];
+		}
+
 		// front
 
 		template<class Q = T>
@@ -223,6 +238,18 @@ namespace bzd
 		const T* data() const noexcept
 		{
 			return data_;
+		}
+
+		SizeType find(const T& item, const SizeType start = 0) const noexcept
+		{
+			for (SizeType i = start; i < size_; ++i)
+			{
+				if (data_[i] == item)
+				{
+					return i;
+				}
+			}
+			return npos;
 		}
 
 		bool empty() const noexcept
