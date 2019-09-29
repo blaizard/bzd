@@ -3,9 +3,9 @@
 
 TEST(ContainerStringStream, Base)
 {
-    const bzd::StringStream<10> sstreamCstor;
+    bzd::StringStream<10> sstreamCstor;
     bzd::interface::StringStream sstream = sstreamCstor;
 
 	sstream.write("Hello");
-	//EXPECT_STREQ(str_v.data(), "xyzzy");
+	EXPECT_STREQ(sstream.str().data(), "Hello");
 }

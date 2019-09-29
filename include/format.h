@@ -1,6 +1,8 @@
 #pragma once
 
 #include "include/container/string.h"
+#include "include/container/iostream.h"
+#include "include/container/string_stream.h"
 #include "include/type_traits/fundamental.h"
 #include "include/utility.h"
 
@@ -90,12 +92,19 @@ namespace bzd
 		}
 
 		template <class... Args>
-		void toString(interface::String& dest, StringView format, Args&&... args)
+		void toString(bzd::OStream& dest, StringView format, Args&&... args)
+		{
+			processStringFormat([&](StringView str) {
+				dest.write(str);
+			}, format, bzd::forward<Args>(args)...);
+		}
+
+		template <class... Args>
+		void toString(bzd::interface::String& dest, StringView format, Args&&... args)
 		{
 			dest.clear();
-			processStringFormat([&](StringView str) {
-				dest.append(str);
-			}, format, bzd::forward<Args>(args)...);
+			bzd::interface::StringStream sstream(dest);
+			toString(sstream, format, bzd::forward<Args>(args)...);
 		}
 	}
 }

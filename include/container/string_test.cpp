@@ -1,8 +1,33 @@
 #include "gtest/gtest.h"
 #include "include/container/string.h"
 
+class A
+{
+public:
+    A() = default;
+    int& get()
+    {
+        return a;
+    }
+
+private:
+    int a = 2;
+};
+
+class B : public A
+{
+public:
+    B() = default;
+};
+
 TEST(ContainerString, Empty)
 {
+    const B var1;
+    A var = var1;
+
+    var.get() = 23;
+    EXPECT_EQ(var.get(), 23);
+
 	bzd::String<0> null;
 
     EXPECT_EQ(null.capacity(), 0);
