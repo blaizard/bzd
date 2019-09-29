@@ -47,6 +47,26 @@ namespace bzd
 			impl::integerToString(str, data);
 		}
 
+		template <class Handler>
+		constexpr void processStringFormat(Handler&& callback, StringView& format)
+		{
+			SizeType offset = 0;
+			do
+			{
+				const auto index = format.find('%', offset);
+				if (index == StringView::npos)
+				{
+					callback(format);
+					return;
+				}
+				
+				callback(format.substr(0, index));
+				format.removePrefix(index + 1);
+ 				offset = (format.front() == '%') ? 1 : 0;
+
+			} while (offset);
+		}
+
 		template <class Handler, class Arg, class... Args>
 		constexpr void processStringFormat(Handler&& callback, StringView& format, Arg&& arg, Args&&... args)
 		{
@@ -69,26 +89,6 @@ namespace bzd
 
 				processStringFormat(callback, format, bzd::forward<Args>(args)...);
 			}
-		}
-
-		template <class Handler>
-		constexpr void processStringFormat(Handler&& callback, StringView& format)
-		{
-			SizeType offset = 0;
-			do
-			{
-				const auto index = format.find('%', offset);
-				if (index == StringView::npos)
-				{
-					callback(format);
-					return;
-				}
-				
-				callback(format.substr(0, index));
-				format.removePrefix(index + 1);
- 				offset = (format.front() == '%') ? 1 : 0;
-
-			} while (offset);
 		}
 
 		template <class... Args>

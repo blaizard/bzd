@@ -20,15 +20,15 @@ namespace bzd
 
 		public:
 			template <class... Args>
-			explicit String(const SizeType capacity, Args&&... args)
+			constexpr explicit String(const SizeType capacity, Args&&... args)
 					: Impl(args...), capacity_(capacity)
 			{
 			}
 
 			// Converter
-			SizeType append(const StringView& str) noexcept { return append(str.data(), str.size()); }
-			SizeType append(const T c) noexcept { return append(&c, 1); }
-			SizeType append(const T* data, const SizeType n) noexcept
+			constexpr SizeType append(const StringView& str) noexcept { return append(str.data(), str.size()); }
+			constexpr SizeType append(const T c) noexcept { return append(&c, 1); }
+			constexpr SizeType append(const T* data, const SizeType n) noexcept
 			{
 				// Handles overflows
 				const SizeType sizeLeft = capacity_ - size_ - 1;
@@ -40,7 +40,7 @@ namespace bzd
 				return actualN;
 			}
 
-			SizeType capacity() const noexcept
+			constexpr SizeType capacity() const noexcept
 			{
 				return capacity_ - 1;
 			}
@@ -84,8 +84,8 @@ namespace bzd
 	class String : public interface::String
 	{
 	public:
-		String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
-		explicit String(const interface::String::StringView& str) : String() { append(str); }
+		constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
+		constexpr explicit String(const interface::String::StringView& str) : String() { append(str); }
 
 		template <class T>
 		interface::String& operator=(const T& data) noexcept
