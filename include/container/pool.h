@@ -22,7 +22,7 @@ namespace bzd
 		};
 
 	public:
-		Pool() noexcept
+		constexpr Pool() noexcept
 		{
 			// Build the free list
 			ItemType** curFree = &free_;
@@ -37,7 +37,7 @@ namespace bzd
 		/**
 		 * Release an element from the pool
 		 */
-		void release(T* container) noexcept
+		constexpr void release(T* container) noexcept
 		{
 			// assert(T >= &data_[0]);
 			// assert(T < &data_[N]);
@@ -50,7 +50,7 @@ namespace bzd
 		/**
 		 * Reserve an element from the free list (if any)
 		 */
-		T* reserve() noexcept
+		constexpr T* reserve() noexcept
 		{
 			if (free_)
 			{

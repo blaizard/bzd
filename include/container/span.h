@@ -17,60 +17,60 @@ namespace bzd
 		class ConstIterator
 		{
 		public:
-			ConstIterator(const ConstSpan<T>& span, const SizeType index)
+			constexpr ConstIterator(const ConstSpan<T>& span, const SizeType index)
 				: span_(&span), index_(index)
 			{
 			}
 
-			ConstIterator& operator++() noexcept
+			constexpr ConstIterator& operator++() noexcept
 			{
 				++index_;
 				return *this;
 			}
 
-			ConstIterator& operator--() noexcept
+			constexpr ConstIterator& operator--() noexcept
 			{
 				--index_;
 				return *this;
 			}
 
-			ConstIterator operator-(const int n) const noexcept
+			constexpr ConstIterator operator-(const int n) const noexcept
 			{
 				ConstIterator it(*this);
 				it.index_ -= n;
 				return it;
 			}
 
-			ConstIterator operator+(const int n) const noexcept
+			constexpr ConstIterator operator+(const int n) const noexcept
 			{
 				ConstIterator it(*this);
 				it.index_ += n;
 				return it;
 			}
 
-			ConstIterator& operator-=(const int n) noexcept
+			constexpr ConstIterator& operator-=(const int n) noexcept
 			{
 				index_ -= n;
 				return *this;
 			}
 
-			ConstIterator& operator+=(const int n) noexcept
+			constexpr ConstIterator& operator+=(const int n) noexcept
 			{
 				index_ += n;
 				return *this;
 			}
 
-			bool operator==(const ConstIterator& it) const noexcept
+			constexpr bool operator==(const ConstIterator& it) const noexcept
 			{
 				return it.index_ == index_;
 			}
 
-			bool operator!=(const ConstIterator& it) const noexcept
+			constexpr bool operator!=(const ConstIterator& it) const noexcept
 			{
 				return !(it == *this);
 			}
 
-			const T& operator*() const
+			constexpr const T& operator*() const
 			{
 				return (*span_)[index_];
 			}
@@ -151,7 +151,7 @@ namespace bzd
 			return npos;
 		}
 
-		bool empty() const noexcept
+		constexpr bool empty() const noexcept
 		{
 			return (size_ == 0);
 		}
@@ -173,60 +173,60 @@ namespace bzd
 		class Iterator
 		{
 		public:
-			Iterator(Span<T>& span, const SizeType index)
+			constexpr Iterator(Span<T>& span, const SizeType index)
 				: span_(&span), index_(index)
 			{
 			}
 
-			Iterator& operator++() noexcept
+			constexpr Iterator& operator++() noexcept
 			{
 				++index_;
 				return *this;
 			}
 
-			Iterator& operator--() noexcept
+			constexpr Iterator& operator--() noexcept
 			{
 				--index_;
 				return *this;
 			}
 
-			Iterator operator-(const int n) const noexcept
+			constexpr Iterator operator-(const int n) const noexcept
 			{
 				Iterator it(*this);
 				it.index_ -= n;
 				return it;
 			}
 
-			Iterator operator+(const int n) const noexcept
+			constexpr Iterator operator+(const int n) const noexcept
 			{
 				Iterator it(*this);
 				it.index_ += n;
 				return it;
 			}
 
-			Iterator& operator-=(const int n) noexcept
+			constexpr Iterator& operator-=(const int n) noexcept
 			{
 				index_ -= n;
 				return *this;
 			}
 
-			Iterator& operator+=(const int n) noexcept
+			constexpr Iterator& operator+=(const int n) noexcept
 			{
 				index_ += n;
 				return *this;
 			}
 
-			bool operator==(const Iterator& it) const noexcept
+			constexpr bool operator==(const Iterator& it) const noexcept
 			{
 				return it.index_ == index_;
 			}
 
-			bool operator!=(const Iterator& it) const noexcept
+			constexpr bool operator!=(const Iterator& it) const noexcept
 			{
 				return !(it == *this);
 			}
 
-			T& operator*()
+			constexpr T& operator*()
 			{
 				return (*span_)[index_];
 			}
@@ -243,19 +243,19 @@ namespace bzd
 		}
 
 		using Parent::begin;
-		Iterator begin() noexcept
+		constexpr Iterator begin() noexcept
 		{
 			return Iterator(*this, 0);
 		}
 
 		using Parent::end;
-		Iterator end() noexcept
+		constexpr Iterator end() noexcept
 		{
 			return Iterator(*this, Parent::size());
 		}
 
 		using Parent::operator[];
-		T& operator[](const SizeType index)
+		constexpr T& operator[](const SizeType index)
 		{
 			return const_cast<T&>(data_[index]);
 		}
@@ -263,7 +263,7 @@ namespace bzd
 		// at
 
 		using Parent::at;
-		T& at(const SizeType index)
+		constexpr T& at(const SizeType index)
 		{
 			return const_cast<T&>(data_[index]);
 		}
@@ -271,17 +271,17 @@ namespace bzd
 		// front
 
 		using Parent::front;
-		T& front() noexcept { return at(0); }
+		constexpr T& front() noexcept { return at(0); }
 
 		// back
 
 		using Parent::back;
-		T& back() noexcept { return at(size_ - 1); }
+		constexpr T& back() noexcept { return at(size_ - 1); }
 
 		// data
 
 		using Parent::data;
-		T* data() noexcept
+		constexpr T* data() noexcept
 		{
 			return const_cast<T*>(data_);
 		}

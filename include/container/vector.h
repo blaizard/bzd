@@ -17,12 +17,12 @@ namespace bzd
 
 		public:
 			template <class... Args>
-			explicit Vector(const SizeType capacity, Args&&... args)
+			constexpr explicit Vector(const SizeType capacity, Args&&... args)
 					: Impl(args...), capacity_(capacity)
 			{
 			}
 
-			void pushBack(const T& element) noexcept
+			constexpr void pushBack(const T& element) noexcept
 			{
 				if (size_ < capacity_)
 				{
@@ -31,17 +31,17 @@ namespace bzd
 				}
 			}
 
-			SizeType capacity() const noexcept
+			constexpr SizeType capacity() const noexcept
 			{
 				return capacity_;
 			}
 
-			void clear() noexcept
+			constexpr void clear() noexcept
 			{
 				resize(0);
 			}
 
-			void resize(const size_t n) noexcept
+			constexpr void resize(const size_t n) noexcept
 			{
 				size_ = (n < capacity_) ? n : capacity_;
 			}
@@ -62,7 +62,7 @@ namespace bzd
 	{
 	public:
 		template <class... Args>
-		explicit Vector(Args&&... args)
+		constexpr explicit Vector(Args&&... args)
 				: interface::Vector<T>(N, data_, sizeof...(Args))
 				, data_{args...}
 		{

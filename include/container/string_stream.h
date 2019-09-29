@@ -11,7 +11,7 @@ namespace bzd
 		class StringStream : public bzd::OStream
 		{
 		public:
-			StringStream(bzd::interface::String& str)
+			constexpr StringStream(bzd::interface::String& str)
 					: string_(str)
 			{
 			}
@@ -26,12 +26,12 @@ namespace bzd
 				return string_.append(data.data(), data.size());
 			}
 
-			const bzd::interface::String& str() const noexcept
+			constexpr const bzd::interface::String& str() const noexcept
 			{
 				return string_;
 			}
 
-			bzd::interface::String& str() noexcept
+			constexpr bzd::interface::String& str() noexcept
 			{
 				return string_;
 			}
@@ -50,7 +50,7 @@ namespace bzd
 	class StringStream : public bzd::interface::StringStream
 	{
 	public:
-		StringStream()
+		constexpr StringStream()
 				: bzd::interface::StringStream(container_)
 				, container_()
 		{

@@ -10,13 +10,13 @@ namespace bzd
 	{
 	public:
 		template <class... Args>
-		explicit Array(Args&&... args) noexcept
+		constexpr explicit Array(Args&&... args) noexcept
 				: Span<T>(data_, N)
 				, data_{args...}
 		{
 		}
 
-		SizeType capacity() const noexcept
+		constexpr SizeType capacity() const noexcept
 		{
 			return N;
 		}

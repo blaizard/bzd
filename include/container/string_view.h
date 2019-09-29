@@ -15,15 +15,15 @@ namespace bzd
 			using Impl::data_;
 
 		public:
-			StringView(const T* const str) : Impl(str, strlen(str)) {}
-			StringView(const T* const str, const SizeType size) : Impl(str, size) {}
+			constexpr StringView(const T* const str) : Impl(str, strlen(str)) {}
+			constexpr StringView(const T* const str, const SizeType size) : Impl(str, size) {}
 
-			StringView substr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
+			constexpr StringView substr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 			{
 				return StringView(&data_[pos], (count == StringView::npos) ? (size_ - pos) : count);
 			}
 
-			void removePrefix(const SizeType n) noexcept
+			constexpr void removePrefix(const SizeType n) noexcept
 			{
 				data_ += n;
 				size_ -= n;
