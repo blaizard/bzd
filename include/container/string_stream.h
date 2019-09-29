@@ -8,23 +8,32 @@ namespace bzd
 {
 	namespace impl
 	{
-		class StringStream : public bzd::OStream<char>
+		class StringStream : public bzd::OStream
 		{
-		protected:
+		public:
 			StringStream(bzd::interface::String& str)
 					: string_(str)
 			{
 			}
 
-		public:
-			SizeType write(const bzd::StringView data)
+			SizeType write(const bzd::StringView data) noexcept
 			{
 				return write(static_cast<const bzd::ConstSpan<char>>(data));
 			}
 
-			SizeType write(const bzd::ConstSpan<char> data) override
+			SizeType write(const bzd::ConstSpan<char>& data) noexcept override
 			{
 				return string_.append(data.data(), data.size());
+			}
+
+			const bzd::interface::String& str() const noexcept
+			{
+				return string_;
+			}
+
+			bzd::interface::String& str() noexcept
+			{
+				return string_;
 			}
 
 		protected:

@@ -132,6 +132,8 @@ namespace bzd
 
 		const T& back() const noexcept { return data_[size_ - 1]; }
 
+		// data
+
 		const T* data() const noexcept
 		{
 			return data_;
@@ -162,15 +164,6 @@ namespace bzd
 	template <class T>
 	class Span : public ConstSpan<T>
 	{
-	public:
-		using ConstSpan<T>::begin;
-		using ConstSpan<T>::end;
-		using ConstSpan<T>::data;
-		using ConstSpan<T>::operator[];
-		using ConstSpan<T>::at;
-		using ConstSpan<T>::front;
-		using ConstSpan<T>::back;
-
 	protected:
 		using Parent = ConstSpan<T>;
 		using ConstSpan<T>::data_;
@@ -249,16 +242,19 @@ namespace bzd
 		{
 		}
 
+		using Parent::begin;
 		Iterator begin() noexcept
 		{
 			return Iterator(*this, 0);
 		}
 
+		using Parent::end;
 		Iterator end() noexcept
 		{
 			return Iterator(*this, Parent::size());
 		}
 
+		using Parent::operator[];
 		T& operator[](const SizeType index)
 		{
 			return const_cast<T&>(data_[index]);
@@ -266,6 +262,7 @@ namespace bzd
 
 		// at
 
+		using Parent::at;
 		T& at(const SizeType index)
 		{
 			return const_cast<T&>(data_[index]);
@@ -273,12 +270,17 @@ namespace bzd
 
 		// front
 
+		using Parent::front;
 		T& front() noexcept { return at(0); }
 
 		// back
 
+		using Parent::back;
 		T& back() noexcept { return at(size_ - 1); }
 
+		// data
+
+		using Parent::data;
 		T* data() noexcept
 		{
 			return const_cast<T*>(data_);
