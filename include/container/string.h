@@ -45,26 +45,26 @@ namespace bzd
 				return capacity_ - 1;
 			}
 
-			void clear() noexcept
+			constexpr void clear() noexcept
 			{
 				resize(0);
 			}
 
-			void resize(const SizeType n) noexcept
+			constexpr void resize(const SizeType n) noexcept
 			{
 				size_ = (n < capacity_ - 1) ? n : capacity_ - 1;
 				Parent::at(size_) = '\0';
 			}
 
 			template <class U>
-			String<T, Impl>& operator+=(const U& data) noexcept
+			constexpr String<T, Impl>& operator+=(const U& data) noexcept
 			{
 				append(data);
 				return *this;
 			}
 
 			template <class U>
-			String<T, Impl>& operator=(const U& data) noexcept
+			constexpr String<T, Impl>& operator=(const U& data) noexcept
 			{
 				clear();
 				return operator+=(data);
@@ -88,7 +88,7 @@ namespace bzd
 		constexpr explicit String(const interface::String::StringView& str) : String() { append(str); }
 
 		template <class T>
-		interface::String& operator=(const T& data) noexcept
+		constexpr interface::String& operator=(const T& data) noexcept
 		{
 			return interface::String::operator=(data);
 		}

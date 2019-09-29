@@ -15,3 +15,9 @@ TEST(ContainerVector, Base)
     EXPECT_EQ(iTest.size(), 2);
     EXPECT_EQ(iTest[1], 2);
 }
+
+TEST(ContainerVector, Constexpr)
+{
+	//constexpr bzd::Vector<int, 5> test{1, 2, 5, 4, 6};
+	/*constexpr bzd::interface::Vector<int>& iTest = test;*/
+}
