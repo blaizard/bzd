@@ -22,19 +22,8 @@ public:
 
 TEST(ContainerString, Empty)
 {
-    const B var1;
-    A var = var1;
-
-    var.get() = 23;
-    EXPECT_EQ(var.get(), 23);
-
-	bzd::String<0> null;
-
-    EXPECT_EQ(null.capacity(), 0);
-    EXPECT_EQ(null.size(), 0);
-
 	bzd::String<10> test;
-	bzd::interface::String iTest = test;
+	bzd::interface::String& iTest = test;
 
     EXPECT_EQ(iTest.capacity(), 10);
     EXPECT_EQ(iTest.size(), 0);
@@ -43,7 +32,7 @@ TEST(ContainerString, Empty)
 TEST(ContainerString, Base)
 {
 	bzd::String<10> test("Hello");
-	bzd::interface::String iTest = test;
+	bzd::interface::String& iTest = test;
 
     EXPECT_EQ(iTest.capacity(), 10);
     EXPECT_EQ(iTest.size(), 5);

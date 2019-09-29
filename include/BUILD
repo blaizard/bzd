@@ -3,6 +3,7 @@ cc_library(
     hdrs = glob([
 		"**/*.h"
 	]),
+  copts = ["-std=c++14"],
 	visibility = ["//visibility:public"]
 )
 
@@ -11,6 +12,7 @@ cc_test(
     srcs = glob([
 		"**/*.cpp"
 	]),
+  copts = ["-std=c++14"],
   deps = [
 	  ":include",
     "@googletest//:gtest_main",

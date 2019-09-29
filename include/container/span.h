@@ -82,64 +82,64 @@ namespace bzd
 		};
 
 	public:
-		ConstSpan(const T* data, const SizeType size) noexcept
+		constexpr ConstSpan(const T* data, const SizeType size) noexcept
 				: data_(data), size_(size)
 		{
 		}
 
-		ConstIterator begin() const noexcept
+		constexpr ConstIterator begin() const noexcept
 		{
 			return ConstIterator(*this, 0);
 		}
 
-		ConstIterator cbegin() const noexcept
+		constexpr ConstIterator cbegin() const noexcept
 		{
 			return begin();
 		}
 
-		ConstIterator end() const noexcept
+		constexpr ConstIterator end() const noexcept
 		{
 			return ConstIterator(*this, size());
 		}
 
-		ConstIterator cend() const noexcept
+		constexpr ConstIterator cend() const noexcept
 		{
 			return end();
 		}
 
-		SizeType size() const noexcept
+		constexpr SizeType size() const noexcept
 		{
 			return size_;
 		}
 
-		const T& operator[](const SizeType index) const
+		constexpr const T& operator[](const SizeType index) const
 		{
 			return data_[index];
 		}
 
 		// at
 
-		const T& at(const SizeType index) const
+		constexpr const T& at(const SizeType index) const
 		{
 			return data_[index];
 		}
 
 		// front
 
-		const T& front() const noexcept { return data_[0]; }
+		constexpr const T& front() const noexcept { return data_[0]; }
 
 		// back
 
-		const T& back() const noexcept { return data_[size_ - 1]; }
+		constexpr const T& back() const noexcept { return data_[size_ - 1]; }
 
 		// data
 
-		const T* data() const noexcept
+		constexpr const T* data() const noexcept
 		{
 			return data_;
 		}
 
-		SizeType find(const T& item, const SizeType start = 0) const noexcept
+		constexpr SizeType find(const T& item, const SizeType start = 0) const noexcept
 		{
 			for (SizeType i = start; i < size_; ++i)
 			{
@@ -237,7 +237,7 @@ namespace bzd
 		};
 
 	public:
-		Span(const T* data, const SizeType size) noexcept
+		constexpr Span(const T* data, const SizeType size) noexcept
 				: ConstSpan<T>(data, size)
 		{
 		}
