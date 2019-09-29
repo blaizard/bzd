@@ -5,87 +5,19 @@
 
 namespace bzd
 {
-	template <class T, bool IsDataConst = false>
-	class Span
+	template <class T>
+	class ConstSpan
 	{
 	protected:
 		using DataType = T;
-		using SelfType = Span<T, IsDataConst>;
-		using DataPtrType = typename typeTraits::conditional<IsDataConst, const T*, T*>::type;
 
 	public:
 		static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
-		class Iterator
-		{
-		public:
-			Iterator(SelfType& span, const SizeType index)
-				: span_(&span), index_(index)
-			{
-			}
-
-			Iterator& operator++() noexcept
-			{
-				++index_;
-				return *this;
-			}
-
-			Iterator& operator--() noexcept
-			{
-				--index_;
-				return *this;
-			}
-
-			Iterator operator-(const int n) const noexcept
-			{
-				Iterator it(*this);
-				it.index_ -= n;
-				return it;
-			}
-
-			Iterator operator+(const int n) const noexcept
-			{
-				Iterator it(*this);
-				it.index_ += n;
-				return it;
-			}
-
-			Iterator& operator-=(const int n) noexcept
-			{
-				index_ -= n;
-				return *this;
-			}
-
-			Iterator& operator+=(const int n) noexcept
-			{
-				index_ += n;
-				return *this;
-			}
-
-			bool operator==(const Iterator& it) const noexcept
-			{
-				return it.index_ == index_;
-			}
-
-			bool operator!=(const Iterator& it) const noexcept
-			{
-				return !(it == *this);
-			}
-
-			T& operator*()
-			{
-				return (*span_)[index_];
-			}
-
-		private:
-			SelfType* span_;
-			SizeType index_;
-		};
-
 		class ConstIterator
 		{
 		public:
-			ConstIterator(const SelfType& span, const SizeType index)
+			ConstIterator(const ConstSpan<T>& span, const SizeType index)
 				: span_(&span), index_(index)
 			{
 			}
@@ -145,27 +77,14 @@ namespace bzd
 
 		private:
 			// A pointer is required here in order to enable copy (operator=)
-			const SelfType* span_;
+			const ConstSpan<T>* span_;
 			SizeType index_;
 		};
 
 	public:
-		template <class... Args>
-		Span(const DataPtrType data, const SizeType size) noexcept
+		ConstSpan(const T* data, const SizeType size) noexcept
 				: data_(data), size_(size)
 		{
-		}
-
-		template<class Q = Iterator>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q>::type begin() noexcept
-		{
-			return Iterator(*this, 0);
-		}
-
-		template<class Q = Iterator>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q>::type end() noexcept
-		{
-			return Iterator(*this, size());
 		}
 
 		ConstIterator begin() const noexcept
@@ -193,24 +112,12 @@ namespace bzd
 			return size_;
 		}
 
-		template<class Q = T>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type operator[](const SizeType index)
-		{
-			return data_[index];
-		}
-
 		const T& operator[](const SizeType index) const
 		{
 			return data_[index];
 		}
 
 		// at
-
-		template<class Q = T>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type at(const SizeType index)
-		{
-			return data_[index];
-		}
 
 		const T& at(const SizeType index) const
 		{
@@ -219,21 +126,11 @@ namespace bzd
 
 		// front
 
-		template<class Q = T>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type front() noexcept { return data_[0]; }
 		const T& front() const noexcept { return data_[0]; }
 
 		// back
 
-		template<class Q = T>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q&>::type back() noexcept { return data_[size_ - 1]; }
 		const T& back() const noexcept { return data_[size_ - 1]; }
-
-		template<class Q = T>
-		typename bzd::typeTraits::enableIf<!IsDataConst, Q*>::type data() noexcept
-		{
-			return data_;
-		}
 
 		const T* data() const noexcept
 		{
@@ -258,7 +155,133 @@ namespace bzd
 		}
 
 	protected:
-		DataPtrType data_;
+		const T* data_;
 		SizeType size_;
+	};
+
+	template <class T>
+	class Span : public ConstSpan<T>
+	{
+	public:
+		using ConstSpan<T>::begin;
+		using ConstSpan<T>::end;
+		using ConstSpan<T>::data;
+		using ConstSpan<T>::operator[];
+		using ConstSpan<T>::at;
+		using ConstSpan<T>::front;
+		using ConstSpan<T>::back;
+
+	protected:
+		using Parent = ConstSpan<T>;
+		using ConstSpan<T>::data_;
+		using ConstSpan<T>::size_;
+
+	public:
+		class Iterator
+		{
+		public:
+			Iterator(Span<T>& span, const SizeType index)
+				: span_(&span), index_(index)
+			{
+			}
+
+			Iterator& operator++() noexcept
+			{
+				++index_;
+				return *this;
+			}
+
+			Iterator& operator--() noexcept
+			{
+				--index_;
+				return *this;
+			}
+
+			Iterator operator-(const int n) const noexcept
+			{
+				Iterator it(*this);
+				it.index_ -= n;
+				return it;
+			}
+
+			Iterator operator+(const int n) const noexcept
+			{
+				Iterator it(*this);
+				it.index_ += n;
+				return it;
+			}
+
+			Iterator& operator-=(const int n) noexcept
+			{
+				index_ -= n;
+				return *this;
+			}
+
+			Iterator& operator+=(const int n) noexcept
+			{
+				index_ += n;
+				return *this;
+			}
+
+			bool operator==(const Iterator& it) const noexcept
+			{
+				return it.index_ == index_;
+			}
+
+			bool operator!=(const Iterator& it) const noexcept
+			{
+				return !(it == *this);
+			}
+
+			T& operator*()
+			{
+				return (*span_)[index_];
+			}
+
+		private:
+			Span<T>* span_;
+			SizeType index_;
+		};
+
+	public:
+		Span(const T* data, const SizeType size) noexcept
+				: ConstSpan<T>(data, size)
+		{
+		}
+
+		Iterator begin() noexcept
+		{
+			return Iterator(*this, 0);
+		}
+
+		Iterator end() noexcept
+		{
+			return Iterator(*this, Parent::size());
+		}
+
+		T& operator[](const SizeType index)
+		{
+			return const_cast<T&>(data_[index]);
+		}
+
+		// at
+
+		T& at(const SizeType index)
+		{
+			return const_cast<T&>(data_[index]);
+		}
+
+		// front
+
+		T& front() noexcept { return at(0); }
+
+		// back
+
+		T& back() noexcept { return at(size_ - 1); }
+
+		T* data() noexcept
+		{
+			return const_cast<T*>(data_);
+		}
 	};
 }

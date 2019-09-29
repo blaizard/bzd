@@ -31,5 +31,5 @@ namespace bzd
 		};
 	}
 
-	using StringView = impl::StringView<char, Span<char, /*IsDataConst*/true>>;
+	using StringView = impl::StringView<char, ConstSpan<char>>;
 }

@@ -2,6 +2,7 @@
 
 #include "include/container/string.h"
 #include "include/type_traits/fundamental.h"
+#include "include/utility.h"
 
 #include <functional>
 
@@ -12,7 +13,7 @@ namespace bzd
 		namespace impl
 		{
 			template <class T, SizeType Base = 10>
-			void integerToString(interface::String& str, const T n)
+			constexpr void integerToString(interface::String& str, const T n)
 			{
 				constexpr const char* const digits = "0123456789abcdef";
 				T number = (n < 0) ? -n : n;
@@ -39,54 +40,33 @@ namespace bzd
 		}
 
 		template <class T, class Q = void>
-		typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, Q>::type toString(interface::String& str, const T data)
+		constexpr typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, Q>::type toString(interface::String& str, const T data)
 		{
 			impl::integerToString(str, data);
-		}
-
-		template <typename Iterator, typename Handler>
-		constexpr void parse_format_string(Iterator it, Handler&& handler) {
-
-			auto start = it;
-			while (*it) {
-				char ch = *it;
-				++it;
-				if (ch != '{' && ch != '}') continue;
-				if (*it == ch) {
-					handler.on_text(start, it);
-					start = ++it;
-					continue;
-				}
-				if (ch == '}') {
-					handler.on_error("unmatched '}' in format string");
-					return;
-				}
-				handler.on_text(start, it - 1);
-				// parse format specs
-				start = ++it;
-			}
-			handler.on_text(start, it);
 		}
 
 		template <class Handler, class Arg, class... Args>
 		constexpr void processStringFormat(Handler&& callback, StringView& format, Arg&& arg, Args&&... args)
 		{
 			processStringFormat(callback, format);
-
-			switch (format.front())
+			if (format.size())
 			{
-			case 'i':
-			case 'd':
+				switch (format.front())
 				{
-					bzd::String<10> buffer;
-					toString(buffer, arg);
-					callback(buffer.data());
+				case 'i':
+				case 'd':
+					{
+						static_assert(typeTraits::isIntegral<Arg>::value, "Parameter is not an integral");
+						bzd::String<10> buffer;
+						toString(buffer, arg);
+						callback(buffer.data());
+					}
+					break;
 				}
-				break;
-			}
-			format.removePrefix(1);
+				format.removePrefix(1);
 
-			processStringFormat(callback, format, args...);
+				processStringFormat(callback, format, bzd::forward<Args>(args)...);
+			}
 		}
 
 		template <class Handler>
@@ -96,7 +76,6 @@ namespace bzd
 			do
 			{
 				const auto index = format.find('%', offset);
-				//offset = 0;
 				if (index == StringView::npos)
 				{
 					callback(format);
@@ -116,7 +95,7 @@ namespace bzd
 			dest.clear();
 			processStringFormat([&](StringView str) {
 				dest.append(str);
-			}, format, args...);
+			}, format, bzd::forward<Args>(args)...);
 		}
 	}
 }
