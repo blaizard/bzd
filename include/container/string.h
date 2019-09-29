@@ -12,10 +12,11 @@ namespace bzd
 		class String : public Impl
 		{
 		protected:
+			using Parent = Impl;
 			using Impl::size_;
 			using Impl::data_;
-			using StringView = ::bzd::impl::StringView<T, Span<T, /*IsDataConst*/true>>;
-			using SpanType = Span<T>;
+
+			using StringView = ::bzd::impl::StringView<T, ConstSpan<T>>;
 
 		public:
 			template <class... Args>
@@ -25,16 +26,18 @@ namespace bzd
 			}
 
 			// Converter
-			void append(const StringView& str) noexcept { append(str.data(), str.size()); }
-			void append(const T c) noexcept { append(&c, 1); }
-			void append(const T* data, const SizeType n) noexcept
+			SizeType append(const StringView& str) noexcept { return append(str.data(), str.size()); }
+			SizeType append(const T c) noexcept { return append(&c, 1); }
+			SizeType append(const T* data, const SizeType n) noexcept
 			{
 				// Handles overflows
 				const SizeType sizeLeft = capacity_ - size_ - 1;
 				const SizeType actualN = (sizeLeft < n) ? sizeLeft : n;
-				memcpy(&data_[size_], data, actualN);
+				memcpy(&Parent::at(size_), data, actualN);
 				size_ += actualN;
-				data_[size_] = '\0';
+				Parent::at(size_) = '\0';
+
+				return actualN;
 			}
 
 			SizeType capacity() const noexcept
@@ -50,12 +53,7 @@ namespace bzd
 			void resize(const SizeType n) noexcept
 			{
 				size_ = (n < capacity_ - 1) ? n : capacity_ - 1;
-				data_[size_] = '\0';
-			}
-
-			SpanType postSpan() const noexcept
-			{
-				return SpanType(&data_[size_], capacity_ - size_);
+				Parent::at(size_) = '\0';
 			}
 
 			template <class U>

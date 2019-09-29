@@ -47,6 +47,9 @@ TEST(Format, StringFormat)
 {
 	bzd::String<32> str;
 
+	bzd::format::toString(str, "Hello");
+	EXPECT_STREQ(str.data(), "Hello");
+
 	bzd::format::toString(str, "Hello %i", 42);
 	EXPECT_STREQ(str.data(), "Hello 42");
 

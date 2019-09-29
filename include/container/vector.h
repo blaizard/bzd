@@ -11,6 +11,7 @@ namespace bzd
 		class Vector : public Impl
 		{
 		protected:
+			using Parent = Impl;
 			using Impl::size_;
 			using Impl::data_;
 
@@ -25,7 +26,7 @@ namespace bzd
 			{
 				if (size_ < capacity_)
 				{
-					data_[size_] = element;
+					Parent::at(size_) = element;
 					++size_;
 				}
 			}

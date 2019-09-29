@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/types.h"
+#include "include/type_traits/reference.h"
 
 namespace bzd
 {
@@ -49,5 +50,19 @@ namespace bzd
 	static inline constexpr T* containerOf(M* ptr, const M T::*member)
 	{
 		return reinterpret_cast<T*>(reinterpret_cast<IntPtrType>(ptr) - offsetOf(member));
+	}
+
+	// forward
+
+	template <class T>
+	constexpr T&& forward(typename typeTraits::removeReference<T>::type& t) noexcept
+	{
+		return static_cast<T&&>(t);
+	}
+	template <class T>
+	constexpr T&& forward(typename typeTraits::removeReference<T>::type&& t) noexcept
+	{
+		static_assert(!bzd::typeTraits::isLValueReference<T>::value, "template argument substituting T is an lvalue reference type");
+		return static_cast<T&&>(t);
 	}
 }
