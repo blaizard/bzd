@@ -14,7 +14,7 @@ namespace bzd
 			OStream() = default;
 
 		public:
-			virtual SizeType write(const ConstSpan<T>& data) noexcept = 0;
+			virtual SizeType write(const Span<const T>& data) noexcept = 0;
 		};
 
 		template <class T>

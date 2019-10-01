@@ -18,10 +18,10 @@ namespace bzd
 
 			SizeType write(const bzd::StringView data) noexcept
 			{
-				return write(static_cast<const bzd::ConstSpan<char>>(data));
+				return write(static_cast<const bzd::Span<const char>>(data));
 			}
 
-			SizeType write(const bzd::ConstSpan<char>& data) noexcept override
+			SizeType write(const bzd::Span<const char>& data) noexcept override
 			{
 				return string_.append(data.data(), data.size());
 			}

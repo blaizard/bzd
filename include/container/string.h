@@ -3,6 +3,7 @@
 #include "include/types.h"
 #include "include/container/span.h"
 #include "include/container/string_view.h"
+#include "include/type_traits/const_volatile.h"
 
 namespace bzd
 {
@@ -16,7 +17,7 @@ namespace bzd
 			using Impl::size_;
 			using Impl::data_;
 
-			using StringView = ::bzd::impl::StringView<T, ConstSpan<T>>;
+			using StringView = bzd::impl::StringView<T, bzd::Span<typename bzd::typeTraits::addConst<T>::type>>;
 
 		public:
 			template <class... Args>
