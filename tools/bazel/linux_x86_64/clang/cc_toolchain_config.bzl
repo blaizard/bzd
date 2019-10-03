@@ -1,9 +1,11 @@
 load("@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl", "feature", "flag_group", "flag_set", "tool_path")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 
-sysroot = "/opt/toolchains/linux_x86_64"
-
 def _impl(ctx):
+
+    # exec_root, _, _ = str(ctx.path(".")).rpartition("/external/")
+    #ctx.expand_location("$(execpath @//tools/bazel:linux_x86_64/clang/cc_toolchain_config.bzl)")
+
     tool_paths = [
         tool_path(
             name = "as",
@@ -23,7 +25,7 @@ def _impl(ctx):
         ),
         tool_path(
             name = "gcc",
-            path = sysroot + "/clang-7.0.0/bin/clang",
+            path =  ctx.file._gcc.path,
         ),
         tool_path(
             name = "dwp",
@@ -110,10 +112,19 @@ def _impl(ctx):
                         iterate_over = "system_include_paths",
                         flags = [
                             "-isystem", "%{system_include_paths}",
-                            "-isystem", "/opt/toolchains/linux_x86_64/glibc-2.30",
-                            "-isystem", "/opt/toolchains/linux_x86_64/glibc-2.30/include",
-                            "-isystem", "/opt/toolchains/linux_x86_64/clang-7.0.0/include/c++/v1",
-                            "-isystem", "/opt/toolchains/linux_x86_64/clang-7.0.0/lib/clang/7.0.0/include",
+                            "-isystem", "external/linux_x86_64_clang_9.0.0/lib/clang/9.0.0/include",
+                            "-isystem", "/usr/include/x86_64-linux-gnu",
+                            "-isystem", "/usr/include",
+                            "-isystem", "/usr/include/c++/7",
+                            "-isystem", "/usr/include/x86_64-linux-gnu",
+                            "-isystem","/usr/include",
+                            "-isystem","/usr/include/c++/7",
+                            "-isystem","/usr/include/x86_64-linux-gnu/c++/7",
+                            "-isystem","/usr/include/c++/7/backward",
+                            "-isystem","/usr/lib/gcc/x86_64-linux-gnu/7/include",
+                            "-isystem","/usr/local/include",
+                            "-isystem","/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed",
+                            "-isystem","/usr/include/x86_64-linux-gnu",
                         ],
                     ),
                 ],
@@ -159,12 +170,25 @@ def _impl(ctx):
         abi_libc_version = "unknown",
         tool_paths = tool_paths,
         features = [feature_compile, feature_linker],
-        builtin_sysroot = "/opt/toolchains/linux_x86_64",
-        cxx_builtin_include_directories = ["/opt/toolchains/linux_x86_64"],
+        #builtin_sysroot = "external/linux_x86_64_clang_9.0.0", #"/opt/toolchains/linux_x86_64",
+        cxx_builtin_include_directories = [
+            "external/linux_x86_64_clang_9.0.0/lib/clang/9.0.0/include",
+            "/usr/include/x86_64-linux-gnu",
+            "/usr/include",
+            "/usr/include/c++/7",
+            "/usr/include/x86_64-linux-gnu/c++/7",
+            "/usr/include/c++/7/backward",
+            "/usr/lib/gcc/x86_64-linux-gnu/7/include",
+            "/usr/local/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed",
+            "/usr/include/x86_64-linux-gnu",
+        ],
     )
 
 cc_toolchain_config = rule(
     implementation = _impl,
-    attrs = {},
-    provides = [CcToolchainConfigInfo],
+    attrs = {
+        "_gcc" : attr.label(allow_single_file = True, default="@linux_x86_64_clang_9.0.0//:bin/clang"),
+    },
+    provides = [CcToolchainConfigInfo]
 )
