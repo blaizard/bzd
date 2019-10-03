@@ -2,11 +2,11 @@
 
 namespace bzd
 {
-	using PtrType = void*;
-	using PtrDiffType = PtrType;
-	using CtxPtrType = PtrType;
-	using IntPtrType = unsigned long long;
-	using FctPtrType = void*(*)();
-	using ByteType = unsigned char;
-	using SizeType = unsigned int;
+	typedef void* PtrType;
+	typedef PtrType PtrDiffType;
+	typedef PtrType CtxPtrType;
+	typedef unsigned long long IntPtrType;
+	typedef void(*FctPtrType)();
+	typedef unsigned char ByteType;
+	typedef unsigned long SizeType;
 }

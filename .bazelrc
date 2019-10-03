@@ -14,4 +14,4 @@ build:linux_x86_64/gcc --crosstool_top=//tools/bazel:cc_toolchain_suite
 # linux_x86_64/clang
 build:linux_x86_64/clang --cpu="linux_x86_64"
 build:linux_x86_64/clang --compiler="clang"
-build:linux_x86_64/clang --crosstool_top=//tools/bazel:cc_toolchain_suite
+build:linux_x86_64/clang --crosstool_top=//:cc_toolchain_suite
