@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/types.h"
+#include "include/utility.h"
 
 namespace bzd
 {
@@ -48,8 +49,8 @@ namespace bzd
 		private:
 			T elem;
 		public:
-			T& get() { return elem; }
-			const T& get() const { return elem; }
+			T& get() noexcept { return elem; }
+			const T& get() const noexcept { return elem; }
 		};
 
 		// tuple implementation
@@ -62,18 +63,37 @@ namespace bzd
 		private:
 			template <SizeType M> using pick = TupleChoose<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
+
+		private:
+			template <SizeType I, class Arg, class... Args>
+			constexpr void initialize(Arg&& arg, Args&&... args) noexcept
+			{
+				elem<I>::get() = static_cast<pick<I>>(arg);
+				initialize<I+1>(bzd::forward<Args>(args)...);
+			}
+
+			template <SizeType I>
+			constexpr void initialize() noexcept {}
+
 		public:
-			template <SizeType M>
-			pick<M>& get() { return elem<M>::get(); }
+			template <class... Args>
+			TupleImpl(Args&&... args) noexcept
+			{
+				initialize<0>(bzd::forward<Args>(args)...);
+			}
 
 			template <SizeType M>
-			const pick<M>& get() const { return elem<M>::get(); }
+			pick<M>& get() noexcept { return elem<M>::get(); }
+
+			template <SizeType M>
+			const pick<M>& get() const noexcept { return elem<M>::get(); }
 		};
 	}
 
 	template <class... T>
 	struct Tuple : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 	{
-		static constexpr std::size_t size() { return sizeof...(T); }
+		static constexpr SizeType size() noexcept { return sizeof...(T); }
+		using impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>::TupleImpl;
 	};
 }
