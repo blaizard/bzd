@@ -14,6 +14,17 @@ namespace bzd
 			using Impl::size_;
 			using Impl::data_;
 
+			// This function is not constepr, hence need to re-implement it
+			constexpr SizeType strlen(const T* const str) noexcept
+			{
+				SizeType length = 0;
+				while (str[length] != '\0')
+				{
+					++length;
+				}
+				return length;
+			}
+
 		public:
 			constexpr StringView(const T* const str) : Impl(str, strlen(str)) {}
 			constexpr StringView(const T* const str, const SizeType size) : Impl(str, size) {}
@@ -27,6 +38,11 @@ namespace bzd
 			{
 				data_ += n;
 				size_ -= n;
+			}
+
+			constexpr void clear() noexcept
+			{
+				removePrefix(size_);
 			}
 		};
 	}

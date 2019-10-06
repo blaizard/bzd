@@ -49,54 +49,82 @@ namespace bzd
 		}
 
 		template <class Stream>
-		constexpr void processStringFormat(Stream& dest, StringView& format)
+		constexpr void formatConsumeStaticString(Stream& dest, StringView& format)
 		{
 			SizeType offset = 0;
 			do
 			{
-				const auto index = format.find('%', offset);
+				const auto index = format.find('{', offset);
 				if (index == StringView::npos)
 				{
 					dest.write(format);
+					format.clear();
 					return;
 				}
-				
+
 				dest.write(format.substr(0, index));
 				format.removePrefix(index + 1);
- 				offset = (format.front() == '%') ? 1 : 0;
+ 				offset = (format.front() == '{') ? 1 : 0;
 
 			} while (offset);
 		}
 
-		template <class Stream, class Arg, class... Args>
-		constexpr void processStringFormat(Stream& dest, StringView& format, Arg&& arg, Args&&... args)
+		constexpr SizeType getFormatArgIndexAndConsume(StringView& format, const SizeType current = 0)
 		{
-			processStringFormat(dest, format);
-			if (format.size())
+			bool isDefined = false;
+			SizeType index = 0;
+			while (format.size() && format.front() >= '0' && format.front() <= '9')
 			{
-				switch (format.front())
-				{
-				case 'i':
-				case 'd':
-					{
-						static_assert(typeTraits::isIntegral<Arg>::value, "Parameter is not an integral");
-						bzd::String<10> buffer;
-						toString(buffer, arg);
-						dest.write(static_cast<bzd::StringView>(buffer.data()));
-					}
-					break;
-				}
+				index = index * 10 + (format.front() - '0');
+				isDefined = true;
 				format.removePrefix(1);
-
-				processStringFormat(dest, format, bzd::forward<Args>(args)...);
 			}
+
+			if (format.size() && format.front() == ':')
+			{
+				format.removePrefix(1);
+			}
+
+			return (isDefined) ? index : current;
+		}
+
+		template <class Stream, class Args>
+		constexpr void formatProcessString(Stream& dest, StringView& format, const Args& args)
+		{
+			do
+			{
+				formatConsumeStaticString(dest, format);
+				if (format.size())
+				{
+					switch (format.front())
+					{
+					case 'i':
+					case 'd':
+						{
+							//constexpr const auto index = getFormatArgIndexAndConsume(format);
+							const auto& arg = args.template get<0>();
+							static_assert(typeTraits::isIntegral<typename typeTraits::removeReference<decltype(arg)>::type>::value, "Parameter is not an integral");
+							bzd::String<10> buffer;
+							toString(buffer, arg);
+							dest.write(static_cast<bzd::StringView>(buffer.data()));
+						}
+						break;
+					}
+					format.removePrefix(1);
+					if (format.front() == '}')
+					{
+						format.removePrefix(1);
+					}
+				}
+			} while (format.size());
 		}
 
 		template <class... Args>
 		constexpr void toString(bzd::OStream& dest, StringView format, Args&&... args)
 		{
-			const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
-			processStringFormat(dest, format, bzd::forward<Args>(args)...);
+			//const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
+			const bzd::Tuple<int> tuple(42);
+			formatProcessString(dest, format, tuple);
 		}
 
 		template <class... Args>
