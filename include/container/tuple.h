@@ -2,6 +2,9 @@
 
 #include "include/types.h"
 #include "include/utility.h"
+#include "include/type_traits/utils.h"
+
+#include <utility>
 
 namespace bzd
 {
@@ -30,6 +33,7 @@ namespace bzd
 		using TupleChoose = TupleTypeOf<TupleChooseImpl<N, T...>>;
 
 		// given L>=0, generate sequence <0, ..., L-1>
+
 		template <SizeType L, SizeType I = 0, class S = TupleSizes<>>
 		struct TupleRangeImpl;
 
@@ -42,15 +46,45 @@ namespace bzd
 		template <SizeType L>
 		using TupleRange = TupleTypeOf<TupleRangeImpl<L>>;
 
+		// TupleChooseN
+
+		struct NoType {};
+
+		template<SizeType index>
+		constexpr NoType TupleChooseN() { return NoType{}; }
+
+		template<SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > sizeof...(Ts))>::type* = nullptr>
+		constexpr NoType TupleChooseN(T&& t, Ts&&... ts)
+		{
+			return NoType{};
+		}
+
+		template<SizeType index, class T, class... Ts, typename typeTraits::enableIf<index == 0>::type* = nullptr>
+		constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
+		{
+			return bzd::forward<T>(t); 
+		}
+
+		template<SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > 0 && index <= sizeof...(Ts))>::type* = nullptr>
+		constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
+		{
+			return TupleChooseN<index-1>(bzd::forward<Ts>(ts)...);
+		}
+
 		// single tuple element
 		template <SizeType N, class T>
 		class TupleElem
 		{
 		private:
-			T elem;
+			T elem_;
+
 		public:
-			T& get() noexcept { return elem; }
-			const T& get() const noexcept { return elem; }
+			constexpr TupleElem() noexcept = default;
+			constexpr TupleElem(const T& value) noexcept : elem_(value) {}
+			constexpr TupleElem(const NoType&) noexcept : elem_() {}
+
+			constexpr T& get() noexcept { return elem_; }
+			constexpr const T& get() const noexcept { return elem_; }
 		};
 
 		// tuple implementation
@@ -64,29 +98,18 @@ namespace bzd
 			template <SizeType M> using pick = TupleChoose<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
 
-		private:
-			template <SizeType I, class Arg, class... Args>
-			constexpr void initialize(Arg&& arg, Args&&... args) noexcept
-			{
-				elem<I>::get() = static_cast<pick<I>>(arg);
-				initialize<I+1>(bzd::forward<Args>(args)...);
-			}
-
-			template <SizeType I>
-			constexpr void initialize() noexcept {}
-
 		public:
-			template <class... Args>
-			TupleImpl(Args&&... args) noexcept
+			template <class... Args, typename Indices = std::make_index_sequence<sizeof...(Args)>>
+			constexpr TupleImpl(Args&&... args) noexcept
+					: TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
 			{
-				initialize<0>(bzd::forward<Args>(args)...);
 			}
 
 			template <SizeType M>
-			pick<M>& get() noexcept { return elem<M>::get(); }
+			constexpr pick<M>& get() noexcept { return elem<M>::get(); }
 
 			template <SizeType M>
-			const pick<M>& get() const noexcept { return elem<M>::get(); }
+			constexpr const pick<M>& get() const noexcept { return elem<M>::get(); }
 		};
 	}
 

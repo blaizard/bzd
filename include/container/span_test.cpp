@@ -60,3 +60,29 @@ TEST(ContainerSpan, ConstIterator)
 		EXPECT_EQ(++it, span.cend());
 	}
 }
+
+TEST(ContainerSpan, Constexpr)
+{
+	static constexpr int test[5] = {0, 1, 2, 3, 4};
+	constexpr bzd::Span<const int> span(test, 5);
+
+	{
+		auto it = span.begin();
+		EXPECT_EQ(*it, 0);
+		EXPECT_EQ(*++it, 1);
+		EXPECT_EQ(*++it, 2);
+		EXPECT_EQ(*++it, 3);
+		EXPECT_EQ(*++it, 4);
+		EXPECT_EQ(++it, span.end());
+	}
+
+	{
+		auto it = span.cbegin();
+		EXPECT_EQ(*it, 0);
+		EXPECT_EQ(*++it, 1);
+		EXPECT_EQ(*++it, 2);
+		EXPECT_EQ(*++it, 3);
+		EXPECT_EQ(*++it, 4);
+		EXPECT_EQ(++it, span.cend());
+	}
+}

@@ -50,17 +50,17 @@ TEST(Format, StringFormat)
 	bzd::format::toString(str, "Hello");
 	EXPECT_STREQ(str.data(), "Hello");
 
-	bzd::format::toString(str, "Hello %i", 42);
+	bzd::format::toString(str, "Hello {i}", 42);
 	EXPECT_STREQ(str.data(), "Hello 42");
 
-	bzd::format::toString(str, "Hello %%");
-	EXPECT_STREQ(str.data(), "Hello %");
+	bzd::format::toString(str, "Hello {{");
+	EXPECT_STREQ(str.data(), "Hello {");
 
-	bzd::format::toString(str, "%%");
-	EXPECT_STREQ(str.data(), "%");
+	bzd::format::toString(str, "{{");
+	EXPECT_STREQ(str.data(), "{");
 
-	bzd::format::toString(str, "Hello %% %i", 42);
-	EXPECT_STREQ(str.data(), "Hello % 42");
+	bzd::format::toString(str, "Hello {{ {i", 42);
+	EXPECT_STREQ(str.data(), "Hello { 42");
 
 	// to test overflows
 }
