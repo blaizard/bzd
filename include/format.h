@@ -7,6 +7,7 @@
 #include "include/type_traits/fundamental.h"
 #include "include/utility.h"
 
+#include <string.h>
 #include <functional>
 
 namespace bzd
@@ -101,9 +102,8 @@ namespace bzd
 					case 'i':
 					case 'd':
 						{
-							//constexpr const auto index = getFormatArgIndexAndConsume(format);
-							const auto& arg = args.template get<0>();
-							static_assert(typeTraits::isIntegral<typename typeTraits::removeReference<decltype(arg)>::type>::value, "Parameter is not an integral");
+							const auto index = getFormatArgIndexAndConsume(format);
+							const auto arg = args.template get<int>(index);
 							bzd::String<10> buffer;
 							toString(buffer, arg);
 							dest.write(static_cast<bzd::StringView>(buffer.data()));
@@ -122,8 +122,8 @@ namespace bzd
 		template <class... Args>
 		constexpr void toString(bzd::OStream& dest, StringView format, Args&&... args)
 		{
-			//const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
-			const bzd::Tuple<int> tuple(42);
+			//constexpr const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
+			constexpr const bzd::Tuple<int> tuple(42);
 			formatProcessString(dest, format, tuple);
 		}
 

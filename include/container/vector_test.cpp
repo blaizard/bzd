@@ -18,6 +18,9 @@ TEST(ContainerVector, Base)
 
 TEST(ContainerVector, Constexpr)
 {
-	//constexpr bzd::Vector<int, 5> test{1, 2, 5, 4, 6};
-	/*constexpr bzd::interface::Vector<int>& iTest = test;*/
+	static constexpr bzd::Vector<const int, 5> test{1, 2, 5, 4, 6};
+	constexpr const bzd::interface::Vector<const int>& iTest = test;
+
+    EXPECT_EQ(iTest.capacity(), 5);
+    EXPECT_EQ(iTest.size(), 5);
 }
