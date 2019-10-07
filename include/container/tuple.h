@@ -4,8 +4,6 @@
 #include "include/utility.h"
 #include "include/type_traits/utils.h"
 
-#include <utility>
-
 namespace bzd
 {
 	namespace impl
@@ -20,6 +18,7 @@ namespace bzd
 		struct TupleSizes : TupleId <TupleSizes<N...>>{};
 
 		// choose N-th element in list <T...>
+
 		template <SizeType N, class... T>
 		struct TupleChooseImpl;
 
@@ -72,6 +71,7 @@ namespace bzd
 		}
 
 		// single tuple element
+
 		template <SizeType N, class T>
 		class TupleElem
 		{
@@ -87,7 +87,8 @@ namespace bzd
 			constexpr const T& get() const noexcept { return elem_; }
 		};
 
-		// tuple implementation
+		// Tuple implementation
+
 		template <class N, class... T>
 		class TupleImpl;
 
@@ -98,12 +99,32 @@ namespace bzd
 			template <SizeType M> using pick = TupleChoose<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
 
+			template <SizeType Index, typename typeTraits::enableIf<Index != 0>::type* = nullptr>
+			constexpr auto getByIndex(const SizeType i) const
+			{
+				return (i == Index) ? get<Index>() : getByIndex<Index - 1>(i);
+			}
+
+			template <SizeType Index, typename typeTraits::enableIf<Index == 0>::type* = nullptr>
+			constexpr auto getByIndex(const SizeType i) const
+			{
+				return get<0>();
+			}
+
 		public:
-			template <class... Args, typename Indices = std::make_index_sequence<sizeof...(Args)>>
+			template <class... Args>
 			constexpr TupleImpl(Args&&... args) noexcept
 					: TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
 			{
 			}
+
+			template <class Type>
+			constexpr auto get(const SizeType i) const noexcept
+			{
+				return static_cast<Type>(getByIndex<sizeof...(N) - 1>(i));
+			}
+
+			// Access by index as template (type is automatically deducted)
 
 			template <SizeType M>
 			constexpr pick<M>& get() noexcept { return elem<M>::get(); }
@@ -117,6 +138,13 @@ namespace bzd
 	struct Tuple : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 	{
 		static constexpr SizeType size() noexcept { return sizeof...(T); }
-		using impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>::TupleImpl;
+
+		// Forward constructor as constexpr
+
+		template <class... Args>
+		constexpr Tuple(Args&&... args) noexcept
+				: impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>(bzd::forward<Args>(args)...)
+		{
+		}
 	};
 }
