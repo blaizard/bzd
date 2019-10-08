@@ -19,12 +19,12 @@ def load_linux_x86_64_clang_9_0_0(name):
         cpu = "linux_x86_64",
         compiler = "clang",
         exec_compatible_with = [
-            "@bazel_tools//platforms:linux",
-            "@bazel_tools//platforms:x86_64",
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
         ],
         target_compatible_with = [
-            "@bazel_tools//platforms:linux",
-            "@bazel_tools//platforms:x86_64",
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
         ],
         builtin_include_directories = [
             "/usr/include/x86_64-linux-gnu",

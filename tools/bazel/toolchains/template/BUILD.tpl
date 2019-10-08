@@ -105,6 +105,5 @@ cc_toolchain_suite(
     toolchains = {
         "%{cpu}": ":cc_toolchain",
         "%{cpu}|%{compiler}": ":cc_toolchain",
-        "k8": ":cc_toolchain",
     },
 )
