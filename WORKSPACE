@@ -22,9 +22,9 @@ register_toolchains(
 
 # Buildifier
 
-load("//tools/buildifier:dependencies.bzl", "load_dependencies")
+load("//tools/buildifier:dependencies.bzl", "load_buildifier_dependencies")
 
-load_dependencies()
+load_buildifier_dependencies()
 
 load("//tools/buildifier:buildifier.bzl", "load_buildifier")
 

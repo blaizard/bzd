@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def load_dependencies():
+def load_buildifier_dependencies():
     # buildifier is written in Go and hence needs rules_go to be built.
     # See https://github.com/bazelbuild/rules_go for the up to date setup instructions.
     http_archive(
