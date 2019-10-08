@@ -9,9 +9,9 @@ http_archive(
 	sha256 = "927827c183d01734cc5cfef85e0ff3f5a92ffe6188e0d18e909c5efebf28a0c7"
 )
 
-load("//tools/bazel:toolchains/linux_x86_64_clang_9_0_0.bzl", "load_linux_x86_64_clang_9_0_0")
+load("//tools/bazel:toolchains/linux_x86_64_clang.bzl", "load_linux_x86_64_clang_9_0_0")
 
-load_linux_x86_64_clang_9_0_0()
+load_linux_x86_64_clang_9_0_0(name = "linux_x86_64_clang")
 
 register_toolchains(
     "//tools/bazel/linux_x86_64/gcc",
