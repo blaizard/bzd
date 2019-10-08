@@ -4,7 +4,7 @@ filegroup(
     name = "includes",
     srcs = glob([
         "include/c++/v1/**/*",
-        "lib/clang/9.0.0/include/**/*"
+        "lib/clang/9.0.0/include/**/*",
     ]),
 )
 
@@ -18,13 +18,13 @@ filegroup(
 filegroup(
     name = "dynamic_libraries",
     srcs = glob([
-        "lib/*.so*"
+        "lib/*.so*",
     ]),
 )
 
 filegroup(
     name = "static_libraries",
     srcs = glob([
-        "lib/*.a"
+        "lib/*.a",
     ]),
 )

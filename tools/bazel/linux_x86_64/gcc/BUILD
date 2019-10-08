@@ -10,15 +10,15 @@ filegroup(
 )
 
 cc_toolchain(
-   name = "cc_toolchain",
-   toolchain_identifier = "local",
-   toolchain_config = ":cc_toolchain_config",
-   all_files = ":empty",
-   compiler_files = ":empty",
-   dwp_files = ":empty",
-   linker_files = ":empty",
-   objcopy_files = ":empty",
-   strip_files = ":empty",
+    name = "cc_toolchain",
+    all_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    toolchain_config = ":cc_toolchain_config",
+    toolchain_identifier = "local",
 )
 
 toolchain(
