@@ -25,12 +25,12 @@ def load_buildifier_dependencies():
         name = "com_google_protobuf",
         strip_prefix = "protobuf-3.10.0",
         urls = ["https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0/protobuf-all-3.10.0.zip"],
-		sha256 = "b5dea11d2e35382a1979d1e28a2ea40d06dcaecebc81f45294095429f9249122"
+        sha256 = "b5dea11d2e35382a1979d1e28a2ea40d06dcaecebc81f45294095429f9249122",
     )
 
     http_archive(
         name = "com_github_bazelbuild_buildtools",
         strip_prefix = "buildtools-5bcc31df55ec1de770cb52887f2e989e7068301f",
         url = "https://github.com/bazelbuild/buildtools/archive/5bcc31df55ec1de770cb52887f2e989e7068301f.zip",
-		sha256 = "875d0c49953e221cfc35d2a3846e502f366dfa4024b271fa266b186ca4664b37"
+        sha256 = "875d0c49953e221cfc35d2a3846e502f366dfa4024b271fa266b186ca4664b37",
     )

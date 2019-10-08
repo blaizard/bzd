@@ -2,7 +2,7 @@
 
 set -e
 
-bazel run //tools/buildifer
+bazel run //tools/buildifier
 
-bazel test ... --config=linux_x86_64/gcc
+bazel test ... --copt="-std=c++14"
 bazel test ... --config=linux_x86_64/clang
