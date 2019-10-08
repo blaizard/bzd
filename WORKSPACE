@@ -16,7 +16,6 @@ load("//tools/bazel:toolchains/linux_x86_64_clang.bzl", "load_linux_x86_64_clang
 load_linux_x86_64_clang_9_0_0(name = "linux_x86_64_clang")
 
 register_toolchains(
-    "//tools/bazel/linux_x86_64/gcc",
     "@linux_x86_64_clang//:toolchain",
 )
 
