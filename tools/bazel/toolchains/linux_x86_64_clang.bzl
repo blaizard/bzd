@@ -1,7 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel:toolchain.bzl", "toolchain_maker")
 
-def load_linux_x86_64_clang_9_0_0():
+def load_linux_x86_64_clang_9_0_0(name):
 
     # Load dependencies
     clang_package_name = "linux_x86_64_clang_9_0_0"
@@ -16,7 +16,7 @@ def load_linux_x86_64_clang_9_0_0():
     )
 
     toolchain_maker(
-        name = "linux_x86_64_clang",
+        name = name,
 
 		cpu = "linux_x86_64",
         compiler = "clang",
