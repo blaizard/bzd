@@ -48,11 +48,9 @@ def load_linux_x86_64_clang_9_0_0(name):
 
             # Do not link or re-order inclusion files
             "-nostdinc++",
-            "-nostdinc",
+            "--no-standard-includes",
 
             # Make the compilation deterministic
-            "-U_FORTIFY_SOURCE",
-            "-D_FORTIFY_SOURCE=1",
             "-fstack-protector",
             "-fPIE",
             "-no-canonical-prefixes",
@@ -61,6 +59,7 @@ def load_linux_x86_64_clang_9_0_0(name):
             "-Wall",
             "-Wno-missing-braces",
             "-Wno-builtin-macro-redefined",
+            "-Wno-unused-command-line-argument",
 
             # Keep stack frames for debugging
             "-fno-omit-frame-pointer",
@@ -83,10 +82,16 @@ def load_linux_x86_64_clang_9_0_0(name):
             "-Wl,--disable-new-dtags",
             "-Wl,--gc-sections",
             "-rdynamic",
+            "-stdlib=libc++",
             "-lm",
             "-lc++",
+            "-lc++abi",
+            "-lc",
+            "-lgcc_s",
+            "-lgcc",
             "-Wl,-z,relro,-z,now",
             "-no-canonical-prefixes",
+            "-Wl,-rpath=%{{absolute_external}}/{}/lib".format(clang_package_name),
 
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",

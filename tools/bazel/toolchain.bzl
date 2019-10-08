@@ -1,4 +1,7 @@
 def _impl(ctx):
+    # Absolute path of the external directory (used for linking librairies for example)
+    absolute_external = ctx.execute(["pwd"], working_directory = "..").stdout.rstrip()
+
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
@@ -23,6 +26,9 @@ def _impl(ctx):
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
     }
+
+    # Apply substitutions
+    build_substitutions = {k: v.replace("%{absolute_external}", absolute_external) for k, v in build_substitutions.items()}
 
     # Set the toolchain BUILD
     ctx.template("BUILD", Label("//tools/bazel:toolchains/template/BUILD.tpl"), build_substitutions)
