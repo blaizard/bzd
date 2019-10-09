@@ -125,10 +125,9 @@ namespace bzd
 			{
 			}
 
-			template <class Type>
 			constexpr auto get(const SizeType i) const noexcept
 			{
-				return static_cast<Type>(getByIndex<sizeof...(N) - 1>(i));
+				return getByIndex<sizeof...(N) - 1>(i);
 			}
 
 			// Access by index as template (type is automatically deducted)

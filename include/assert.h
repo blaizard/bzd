@@ -1,8 +1,7 @@
 #pragma once
 
-#include "include/container/string.h"
 #include "include/container/string_view.h"
-#include "include/format.h"
+#include "include/log.h"
 #include "include/system.h"
 
 namespace bzd
@@ -12,8 +11,7 @@ namespace bzd
 	{
 		if (!condition)
 		{
-			bzd::String<128> message;
-			bzd::format(message, fmt, bzd::forward<Args>(args)...);
+			bzd::log::print(fmt, bzd::forward<Args>(args)...);
 			bzd::panic();
 		}
 	}
