@@ -3,8 +3,27 @@ cc_library(
     hdrs = glob([
         "**/*.h",
     ]),
-    copts = ["-std=c++14"],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "panic_backend",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//src/panic/throw:backend": ["//src/panic/throw"],
+        "//src/panic/trap:backend": ["//src/panic/trap"],
+        "//src/panic/exit:backend": ["//src/panic/exit"],
+        "//conditions:default": ["//src/panic/exit"],
+    }),
+)
+
+cc_library(
+    name = "lib",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":include",
+        ":panic_backend",
+    ],
 )
 
 cc_test(
@@ -12,9 +31,8 @@ cc_test(
     srcs = glob([
         "**/*.cpp",
     ]),
-    copts = ["-std=c++14"],
     deps = [
-        ":include",
+        ":lib",
         "@googletest//:gtest_main",
     ],
 )

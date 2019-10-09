@@ -1,18 +1,20 @@
 #pragma once
 
+#include "include/container/string.h"
+#include "include/container/string_view.h"
 #include "include/format.h"
-#include "include/format.h"
+#include "include/system.h"
 
 namespace bzd
 {
 	template <class... Args>
-	static constexpr void assertTrue(const bool condition, Args&&... args) noexcept
+	constexpr void assertTrue(const bool condition, const bzd::StringView& fmt = "", Args&&... args)
 	{
 		if (!condition)
 		{
 			bzd::String<128> message;
-			bzd::format::toString(message, bzd::forward<Args>(args)...);
-			while (true) {};
+			bzd::format(message, fmt, bzd::forward<Args>(args)...);
+			bzd::panic();
 		}
 	}
 }
