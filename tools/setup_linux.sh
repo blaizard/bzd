@@ -1,6 +1,7 @@
 #!/bin/bash
 
-apt-get update
+sudo apt-get update
 
-apt-get install default-jdk
-apt-get install bazel
+sudo apt-get install -y g++
+sudo apt-get install -y default-jdk
+sudo apt-get install -y bazel

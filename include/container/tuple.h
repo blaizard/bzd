@@ -99,7 +99,7 @@ namespace bzd
 			template <SizeType M> using pick = TupleChoose<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
 
-			template <SizeType Index, typename typeTraits::enableIf<Index != 0>::type* = nullptr>
+			template <SizeType Index, typename typeTraits::enableIf<(Index > 0 && Index < sizeof...(N))>::type* = nullptr>
 			constexpr auto getByIndex(const SizeType i) const
 			{
 				return (i == Index) ? get<Index>() : getByIndex<Index - 1>(i);
@@ -109,6 +109,13 @@ namespace bzd
 			constexpr auto getByIndex(const SizeType i) const
 			{
 				return get<0>();
+			}
+
+			template <SizeType Index, typename typeTraits::enableIf<Index >= sizeof...(N)>::type* = nullptr>
+			constexpr auto getByIndex(const SizeType i) const
+			{
+				// Out of range error (assert)
+				return 0;
 			}
 
 		public:

@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include <functional>
+#include <iostream>
 
 namespace bzd
 {
@@ -122,8 +123,8 @@ namespace bzd
 		template <class... Args>
 		constexpr void toString(bzd::OStream& dest, StringView format, Args&&... args)
 		{
-			//constexpr const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
-			constexpr const bzd::Tuple<int> tuple(42);
+			const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
+			//constexpr const bzd::Tuple<int> tuple(42);
 			formatProcessString(dest, format, tuple);
 		}
 
