@@ -1,7 +1,12 @@
 #pragma once
 
 #include "include/types.h"
+#include "include/type_traits/array.h"
+#include "include/type_traits/function.h"
+#include "include/type_traits/pointer.h"
 #include "include/type_traits/reference.h"
+#include "include/type_traits/const_volatile.h"
+#include "include/type_traits/utils.h"
 
 namespace bzd
 {
@@ -65,4 +70,18 @@ namespace bzd
 		static_assert(!bzd::typeTraits::isLValueReference<T>::value, "template argument substituting T is an lvalue reference type");
 		return static_cast<T&&>(t);
 	}
+
+	// decay
+
+	template <class T>
+	struct decay
+	{
+	private:
+		typedef typename bzd::typeTraits::removeReference<T>::type U;
+	public:
+		typedef typename bzd::typeTraits::conditional<bzd::typeTraits::isArray<U>::value, typename bzd::typeTraits::removeExtent<U>::type*,
+			typename bzd::typeTraits::conditional<bzd::typeTraits::isFunction<U>::value, typename bzd::typeTraits::addPointer<U>::type, typename bzd::typeTraits::removeCV<U>::type
+        	>::type
+    	>::type type;
+	};
 }
