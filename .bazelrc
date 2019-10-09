@@ -29,3 +29,24 @@ build:linux_x86_64/clang --host_crosstool_top=@linux_x86_64_clang//:cc_toolchain
 # linux_x86_64/clang (can be used with suport of "C++ rules use platforms")
 #build:linux_x86_64/clang --platforms="//tools/bazel/targets:linux_x86_64"
 #build:linux_x86_64/clang --compiler="clang"
+
+# Sanitizers
+
+build:san-common --copt=-g
+build:san-common --copt=-O1
+build:san-common --copt=-fno-optimize-sibling-calls
+
+build:asan --config=san-common
+build:asan --copt=-fsanitize=address
+build:asan --copt=-fno-omit-frame-pointer
+build:asan --linkopt=-fsanitize=address
+
+build:ubsan --config=san-common
+build:ubsan --copt=-fsanitize=undefined
+build:ubsan --linkopt=-fsanitize=undefined
+
+build:msan --config=san-common
+build:msan --copt=-fsanitize=memory
+build:msan --copt=-fno-omit-frame-pointer
+build:msan --copt=-fsanitize-memory-track-origins
+build:msan --linkopt=-fsanitize=memory

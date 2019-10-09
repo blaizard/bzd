@@ -18,13 +18,13 @@ filegroup(
 filegroup(
     name = "dynamic_libraries",
     srcs = glob([
-        "lib/*.so*",
+        "lib/**/*.so*",
     ]),
 )
 
 filegroup(
     name = "static_libraries",
     srcs = glob([
-        "lib/*.a",
+        "lib/**/*.a",
     ]),
 )

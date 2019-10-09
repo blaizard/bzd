@@ -110,7 +110,8 @@ def load_linux_x86_64_clang_9_0_0(name):
         bin_ar = "external/{}/bin/llvm-ar".format(clang_package_name),
         bin_as = "external/{}/bin/llvm-as".format(clang_package_name),
         bin_cc = "external/{}/bin/clang".format(clang_package_name),
-        bin_cpp = "external/{}/bin/clang".format(clang_package_name),
+        bin_cpp = "external/{}/bin/clang++".format(clang_package_name),
         bin_gcov = "external/{}/bin/llvm-cov".format(clang_package_name),
         bin_objdump = "external/{}/bin/llvm-objdump".format(clang_package_name),
+        bin_ld = "external/{}/bin/clang++".format(clang_package_name),
     )
