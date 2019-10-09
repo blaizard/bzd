@@ -6,7 +6,7 @@ int main()
 {
 	static constexpr const int a = 42;
 	bzd::String<32> str;
-	bzd::format::toString(str, "Hello {i}", a);
+	bzd::format(str, "Hello {i}", a);
 
 	std::cout << str.data() << std::endl;
 
