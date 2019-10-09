@@ -28,6 +28,7 @@ namespace bzd
 		public:
 			constexpr StringView(const T* const str) : Impl(str, strlen(str)) {}
 			constexpr StringView(const T* const str, const SizeType size) : Impl(str, size) {}
+			constexpr StringView(const Span<char>& span) : Impl(span.data(), span.size()) {}
 
 			constexpr StringView substr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 			{

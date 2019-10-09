@@ -67,7 +67,7 @@ namespace bzd
 					if (format.size())
 					{
 						const auto index = getFormatArgIndexAndConsume(format, currentIndex++);
-						const auto arg = args.template get<int>(index);
+						const auto arg = args.get(index);
 						switch (format.front())
 						{
 						case 'i':
@@ -76,7 +76,7 @@ namespace bzd
 							format.removePrefix(1);
 							break;
 						case '}':
-							//toString(dest, arg);
+							bzd::toString(dest, arg);
 							break;
 						}
 						if (format.front() == '}')

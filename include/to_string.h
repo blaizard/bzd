@@ -4,6 +4,7 @@
 #include "include/container/iostream.h"
 #include "include/container/string_stream.h"
 #include "include/type_traits/fundamental.h"
+#include "include/utility.h"
 
 namespace bzd
 {

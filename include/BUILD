@@ -7,6 +7,15 @@ cc_library(
 )
 
 cc_library(
+    name = "log_backend",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//src/log/stdout:backend": ["//src/log/stdout"],
+        "//conditions:default": ["//src/log/stdout"],
+    }),
+)
+
+cc_library(
     name = "panic_backend",
     visibility = ["//visibility:public"],
     deps = select({
@@ -22,17 +31,20 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":include",
+        ":log_backend",
         ":panic_backend",
     ],
 )
 
-cc_test(
-    name = "tests",
-    srcs = glob([
-        "**/*.cpp",
-    ]),
+test_cpp_srcs = glob([
+    "**/*_test.cpp",
+])
+
+[cc_test(
+    name = "test_" + src.replace("_test.cpp", ""),
+    srcs = [src],
     deps = [
         ":lib",
         "@googletest//:gtest_main",
     ],
-)
+) for src in test_cpp_srcs]
