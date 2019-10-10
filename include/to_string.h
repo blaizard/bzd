@@ -45,7 +45,12 @@ namespace bzd
 	{
 		bzd::String<40> buffer; // 40 is a the length of the max value of an 128-bit in base 10
 		bzd::impl::to_string::integer(buffer, data);
-		stream.write(Span<const char>(buffer.data(), buffer.size()));
+		stream.write(buffer);
+	}
+
+	void toString(bzd::OStream& stream, const bzd::StringView& data)
+	{
+		stream.write(data);
 	}
 
 	template <class T>
