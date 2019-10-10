@@ -76,13 +76,16 @@ cc_toolchain_config(
 cc_toolchain(
     name = "cc_toolchain",
     all_files = ":all",
+    ar_files = ":all",
+    as_files = ":all",
     compiler_files = ":all",
-    dwp_files = ":empty",
-    dynamic_runtime_lib = ":dynamic_runtime_libs",
+    dwp_files = ":all",
     linker_files = ":all",
-    objcopy_files = ":empty",
+    objcopy_files = ":all",
+    strip_files = ":all",
+
+    dynamic_runtime_lib = ":dynamic_runtime_libs",
     static_runtime_lib = ":static_runtime_libs",
-    strip_files = ":empty",
 
     toolchain_config = ":cc-toolchain-config",
     toolchain_identifier = "cc-toolchain-identifier-%{cpu}",
