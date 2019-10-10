@@ -41,6 +41,19 @@ namespace bzd
 		{
 		}
 
+		// Move constructor
+		constexpr Expected(Expected<T, E>&& e) : isError_(e.isError_)
+		{
+			if (isError_) error_ = bzd::move(e.error_);
+			else value_ = bzd::move(e.value_);
+		}
+
+		~Expected()
+		{
+			if (isError_) error_.~E();
+			else value_.~T();
+		}
+
 		constexpr operator bool() const noexcept { return !isError_; }
 
 		constexpr const E& error() const
@@ -75,8 +88,11 @@ namespace bzd
 
 	protected:
 		const bool isError_;
-		T value_;
-		E error_;
+		union
+		{
+			T value_;
+			E error_;
+		};
 	};
 
 	template <class E>
