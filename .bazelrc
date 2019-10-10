@@ -6,48 +6,64 @@ try-import .bazelrc.local
 build --color=yes
 build --verbose_failures
 build --host_javabase=@local_jdk//:jdk
+build -c opt
 
 # Test specific options
 test --test_output=errors
 test --action_env="GTEST_COLOR=1"
 test --verbose_failures
 
-# linux_x86_64/gcc
-build:linux_x86_64/gcc --cpu="linux_x86_64"
-build:linux_x86_64/gcc --compiler="gcc"
-build:linux_x86_64/gcc --crosstool_top=//tools/bazel:cc_toolchain_suite
+# linux_x86_64_clang
+build:linux_x86_64_clang --cpu="linux_x86_64"
+build:linux_x86_64_clang --compiler="clang"
+build:linux_x86_64_clang --platforms="//tools/bazel/targets:linux_x86_64"
+build:linux_x86_64_clang --crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
+build:linux_x86_64_clang --host_cpu="linux_x86_64"
+build:linux_x86_64_clang --host_platform=//tools/bazel/targets:linux_x86_64
+build:linux_x86_64_clang --host_crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
 
-# linux_x86_64/clang
-build:linux_x86_64/clang --cpu="linux_x86_64"
-build:linux_x86_64/clang --compiler="clang"
-build:linux_x86_64/clang --platforms="//tools/bazel/targets:linux_x86_64"
-build:linux_x86_64/clang --crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
-build:linux_x86_64/clang --host_cpu="linux_x86_64"
-build:linux_x86_64/clang --host_platform=//tools/bazel/targets:linux_x86_64
-build:linux_x86_64/clang --host_crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
-
-# linux_x86_64/clang (can be used with suport of "C++ rules use platforms")
-#build:linux_x86_64/clang --platforms="//tools/bazel/targets:linux_x86_64"
-#build:linux_x86_64/clang --compiler="clang"
+# linux_x86_64_clang (can be used with suport of "C++ rules use platforms")
+#build:linux_x86_64_clang --platforms="//tools/bazel/targets:linux_x86_64"
+#build:linux_x86_64_clang --compiler="clang"
 
 # Sanitizers
 
-build:san-common --strip=never
-build:san-common --copt=-g
-build:san-common --copt=-O1
-build:san-common --copt=-fno-optimize-sibling-calls
+build:san_common --keep_going
+build:san_common --nocache_test_results
+build:san_common --copt -O1
+build:san-common --copt -g
+build:san_common --copt -fno-omit-frame-pointer
+build:san-common --copt -fno-optimize-sibling-calls
+build:san_common --strip never
 
-build:asan --config=san-common
-build:asan --copt=-fsanitize=address
-build:asan --copt=-fno-omit-frame-pointer
-build:asan --linkopt=-fsanitize=address
+# Address Sanitizer
+build:asan --config=san_common
+build:asan --copt -fsanitize=address
+build:asan --copt -fno-omit-frame-pointer
+build:asan --linkopt -fsanitize=address
 
-build:ubsan --config=san-common
-build:ubsan --copt=-fsanitize=undefined
-build:ubsan --linkopt=-fsanitize=undefined
+# Leak Sanitizer
+build:lsan --config=san_common
+build:lsan --copt -fsanitize=leak
+build:lsan --copt -DLEAK_SANITIZER
+build:lsan --linkopt -fsanitize=leak
 
-build:msan --config=san-common
-build:msan --copt=-fsanitize=memory
-build:msan --copt=-fno-omit-frame-pointer
-build:msan --copt=-fsanitize-memory-track-origins
-build:msan --linkopt=-fsanitize=memory
+# Undefined Behavior Sanitizer
+build:ubsan --config=san_common
+build:ubsan --copt -fsanitize=undefined
+build:ubsan --copt -DUNDEFINED_SANITIZER
+build:ubsan --linkopt -fsanitize=undefined
+build:ubsan --linkopt -lubsan
+
+# Memory Sanitizer
+build:msan --config=san_common
+build:msan --copt -fsanitize=memory
+build:msan --copt -fno-omit-frame-pointer
+build:msan --copt -fsanitize-memory-track-origins
+build:msan --linkopt -fsanitize=memory
+
+# Thread Sanitizer
+build:tsan --config=san_common
+build:tsan --copt -fsanitize=thread
+build:tsan --copt -DTHREAD_SANITIZER
+build:tsan --linkopt -fsanitize=thread

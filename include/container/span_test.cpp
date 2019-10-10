@@ -9,6 +9,27 @@ TEST(ContainerSpan, Base)
     EXPECT_EQ(span.size(), 5);
 }
 
+TEST(ContainerSpan, Constructor)
+{
+	int test[5];
+	bzd::Span<int> span(test, 5);
+
+	// Copy
+	bzd::Span<int> spanCopy(span);
+    EXPECT_EQ(spanCopy.size(), 5);
+
+	// Copy non-const to const
+	bzd::Span<const int> spanCopyConst(span);
+    EXPECT_EQ(spanCopyConst.size(), 5);
+
+	// Copy const to const
+	bzd::Span<const int> spanCopyConstSquare(spanCopyConst);
+    EXPECT_EQ(spanCopyConstSquare.size(), 5);
+
+	// Copy const to non-const (not allowed!)
+	// bzd::Span<int> spanCopyNonConst(spanCopyConst);
+}
+
 TEST(ContainerSpan, Iterator)
 {
 	int test[5] = {0, 1, 2, 3, 4};
