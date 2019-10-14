@@ -4,7 +4,7 @@ cc_binary(
         "main.cpp",
     ],
     deps = [
-        "//include",
+        "//include:lib",
         "//src/platforms/x86_64_cdecl",
     ],
 )

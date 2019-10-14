@@ -57,6 +57,16 @@ namespace bzd
 		return reinterpret_cast<T*>(reinterpret_cast<IntPtrType>(ptr) - offsetOf(member));
 	}
 
+	// memcpy
+
+	constexpr void memcpy(char* dest, const char* src, const SizeType size)
+	{
+		for (SizeType i = 0; i < size; ++i)
+		{
+			dest[i] = src[i];
+		}
+	}
+
 	// forward
 
 	template <class T>

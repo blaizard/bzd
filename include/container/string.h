@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "include/types.h"
+#include "include/utility.h"
 #include "include/container/span.h"
 #include "include/container/string_view.h"
 #include "include/type_traits/const_volatile.h"
@@ -36,11 +37,18 @@ namespace bzd
 				// Handles overflows
 				const SizeType sizeLeft = capacity_ - size_ - 1;
 				const SizeType actualN = (sizeLeft < n) ? sizeLeft : n;
-				memcpy(&Parent::at(size_), data, actualN);
+				bzd::memcpy(&Parent::at(size_), data, actualN);
 				size_ += actualN;
 				Parent::at(size_) = '\0';
 
 				return actualN;
+			}
+
+			template <class U>
+			constexpr SizeType assign(const U& data) noexcept
+			{
+				clear();
+				return append(data);
 			}
 
 			constexpr SizeType capacity() const noexcept
@@ -69,8 +77,8 @@ namespace bzd
 			template <class U>
 			constexpr String<T, Impl>& operator=(const U& data) noexcept
 			{
-				clear();
-				return operator+=(data);
+				assign(data);
+				return *this;
 			}
 
 		public:
@@ -88,15 +96,23 @@ namespace bzd
 	{
 	public:
 		constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
-		constexpr explicit String(const interface::String::StringView& str) : String() { append(str); }
+		constexpr String(const bzd::StringView& str) : String() { append(str); }
 
 		template <class T>
-		constexpr interface::String& operator=(const T& data) noexcept
+		constexpr String<N>& operator=(const T& data) noexcept
 		{
-			return interface::String::operator=(data);
+			assign(data);
+			return *this;
+		}
+
+		// Copy assignment, has to be non-templated
+		constexpr String<N>& operator=(const String<N>& data) noexcept
+		{
+			assign(data);
+			return *this;
 		}
 
 	protected:
-		interface::String::DataType data_[N + 1];
+		interface::String::DataType data_[N + 1] = {}; // needed for constexpr
 	};
 }

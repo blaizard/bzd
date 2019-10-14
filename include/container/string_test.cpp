@@ -111,9 +111,28 @@ TEST(ContainerString, OperatorsPlusEqual)
     EXPECT_STREQ(test.data(), "Hello Me!");
 }
 
+TEST(ContainerString, Constexpr)
+{
+    static constexpr bzd::String<6> test("Hello");
+    EXPECT_STREQ(test.data(), "Hello");
+}
+
 TEST(ContainerString, Construct)
 {
     bzd::StringView str = "xyzzy";
     bzd::String<6> test(str);
 	EXPECT_STREQ(test.data(), "xyzzy");
 }
+
+TEST(ContainerString, Copy)
+{
+    bzd::String<6> test("Hello");
+	EXPECT_STREQ(test.data(), "Hello");
+
+    bzd::String<6> copy(test);
+	EXPECT_STREQ(copy.data(), "Hello");
+
+    bzd::String<6> copy2 = test;
+	EXPECT_STREQ(copy2.data(), "Hello");
+}
+

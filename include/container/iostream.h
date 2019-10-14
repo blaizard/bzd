@@ -36,5 +36,4 @@ namespace bzd
 	using OStream = impl::OStream<char>;
 	using IStream = impl::IStream<char>;
 	using IOStream = impl::IOStream<char>;
-	
 }
