@@ -53,6 +53,11 @@ namespace bzd
 		stream.write(data);
 	}
 
+	void toString(bzd::OStream& stream, const char c)
+	{
+		stream.write(bzd::StringView(&c, 1));
+	}
+
 	template <class T>
 	constexpr void toString(bzd::interface::String& str, T&& data)
 	{

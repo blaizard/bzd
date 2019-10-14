@@ -6,6 +6,9 @@ try-import .bazelrc.local
 build --color=yes
 build --verbose_failures
 build --host_javabase=@local_jdk//:jdk
+
+# Set default options used by the default run
+build --copt "-std=c++14"
 build -c opt
 
 # Test specific options

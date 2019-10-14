@@ -267,7 +267,7 @@ namespace bzd
 		template <class Q>
 		friend class Span;
 
-		T* data_;
-		SizeType size_;
+		T* data_ = nullptr;
+		SizeType size_ = 0;
 	};
 }

@@ -6,6 +6,7 @@
 #include "include/container/tuple.h"
 #include "include/utility.h"
 #include "include/to_string.h"
+#include "include/assert_minimal.h"
 
 #include <string.h>
 #include <functional>
@@ -49,7 +50,9 @@ namespace bzd
 					format.removePrefix(1);
 				}
 
-				if (format.size() && format.front() == ':')
+				bzd::assertTrue(format.size(), "Format ended abruptly");
+				bzd::assertTrue(format.front() == ':' || format.front() == '}', "Missing ':' or '}'");
+				if (format.front() == ':')
 				{
 					format.removePrefix(1);
 				}
@@ -57,8 +60,8 @@ namespace bzd
 				return (isDefined) ? index : current;
 			}
 
-			template <class Stream, class Args>
-			constexpr void formatProcessString(Stream& dest, bzd::StringView& format, const Args& args)
+			template <class Args>
+			constexpr void formatProcessString(bzd::OStream& dest, bzd::StringView& format, const Args& args)
 			{
 				SizeType currentIndex = 0;
 				do

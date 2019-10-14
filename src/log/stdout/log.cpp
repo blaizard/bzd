@@ -2,7 +2,21 @@
 
 #include <iostream>
 
-void bzd::print(const bzd::StringView& message)
+namespace
 {
-	std::cout << message.data() << std::endl;
+	class StdoutStream : public bzd::OStream
+	{
+	public:
+		bzd::SizeType write(const bzd::Span<const char>& data) noexcept override
+		{
+			std::cout.write(data.data(), data.size());
+			return data.size();
+		}
+	};
+}
+
+bzd::OStream& bzd::getOut()
+{
+	static StdoutStream stdout;
+	return stdout;
 }

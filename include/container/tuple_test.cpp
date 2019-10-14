@@ -52,6 +52,6 @@ TEST(ContainerTuple, Const)
 
 TEST(ContainerTuple, Constexpr)
 {
-	constexpr const bzd::Tuple<const int> tuple(12);
+	constexpr const bzd::Tuple<int> tuple(12);
 	EXPECT_EQ(tuple.get<0>(), 12);
 }
