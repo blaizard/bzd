@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string.h>
+
 #include "include/container/string.h"
 #include "include/container/iostream.h"
 #include "include/container/string_stream.h"
@@ -12,7 +14,7 @@ namespace bzd
 	{
 		namespace to_string
 		{
-			template <class T, SizeType Base = 10>
+			template <class T, SizeType Base = 10, typename bzd::typeTraits::enableIf<(Base > 0 && Base <= 16), T>::type* = nullptr>
 			constexpr void integer(interface::String& str, const T n)
 			{
 				constexpr const char* const digits = "0123456789abcdef";

@@ -20,7 +20,7 @@ namespace bzd
 		namespace format
 		{
 			/**
-			 * Simple vector container
+			 * Simple vector container working with conxtexpr
 			 */
 			template <class T, SizeType N>
 			class ConstexprVector
@@ -32,13 +32,9 @@ namespace bzd
 				{
 				public:
 					constexpr Iterator(const SelfType& container, const SizeType index) : container_(&container), index_(index) {}
-
 					constexpr Iterator& operator++() noexcept { ++index_; return *this; }
-
 					constexpr bool operator==(const Iterator& it) const noexcept { return it.index_ == index_; }
-
 					constexpr bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
-
 					constexpr const DataType& operator*() const { return (*container_)[index_]; }
 
 				private:
@@ -48,19 +44,12 @@ namespace bzd
 
 			public:
 				constexpr ConstexprVector() noexcept {}
-
 				constexpr Iterator begin() const noexcept { return Iterator(*this, 0); }
-
 				constexpr Iterator end() const noexcept { return Iterator(*this, size()); }
-
 				constexpr SizeType size() const noexcept { return size_; }
-
 				constexpr SizeType capacity() const noexcept { return N; }
-
 				constexpr void push_back(const T& element) noexcept { data_[size_++] = element; }
-
 				constexpr DataType& operator[](const SizeType index) { return data_[index]; }
-
 				constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
 
 			private:
@@ -68,97 +57,250 @@ namespace bzd
 				SizeType size_ = 0;
 			};
 
-			struct RetIndex
-			{
-				bzd::SizeType index;
-				bzd::SizeType offset;
-			};
-
-			template <class Ctx>
-			constexpr RetIndex parseIndex(Ctx& context, const bzd::StringView& format, bzd::SizeType offset, const bzd::SizeType current)
-			{
-				bool isDefined = false;
-				bzd::SizeType index = 0;
-				for (; offset < format.size() && format[offset] >= '0' && format[offset] <= '9'; ++offset)
-				{
-					index = index * 10 + (format[offset] - '0');
-					isDefined = true;
-				}
-
-				if (offset >= format.size())
-					throw "Format ended abruptly";
-
-				if (format[offset] == ':')
-				{
-					++offset;
-					if (offset >= format.size())
-						throw "Format ended abruptly";
-				}
-				else if (format[offset] != '}')
-					throw "Missing ':' or '}'";
-
-				return RetIndex{(isDefined) ? index : current, offset};
-			}
-
-			enum class FormatType
-			{
-				AUTO, 
-				INTEGER,
-				STRING
-			};
-
-			template <class T>
-			struct formatter
-			{
-				void format(bzd::OStream& out, T temp)
-				{
-				}
-			};
-
-			template <>
-			struct formatter<int>
-			{
-				void format(bzd::OStream& out, int temp)
-				{
-				}
-			};
-
 			struct Metadata
 			{
-				bzd::SizeType index;
-				FormatType format;
-				bzd::SizeType offset;
+				enum class Align
+				{
+					AUTO,
+					LEFT,
+					RIGHT,
+					CENTER,
+					SIGN_PADDING
+				};
+
+				enum class Sign
+				{
+					AUTO,
+					ALWAYS,
+					ONLY_NEGATIVE,
+					LEADING_SPACE
+				};
+
+				enum class Format
+				{
+					AUTO,
+					BINARY_LOWER,
+					BINARY_UPPER,
+					DECIMAL,
+					OCTAL,
+					HEXADECIMAL_LOWER,
+					HEXADECIMAL_UPPER,
+					FIXED_POINT,
+					FIXED_POINT_PERCENT,
+					POINTER
+				};
+
+				bzd::SizeType index = 0;
+				Align align = Align::AUTO;
+				char alignChar = ' ';
+				Sign sign = Sign::AUTO;
+				bool alternate = false;
+				bool isWidth = false;
+				bzd::SizeType width = 0;
+				bool isPrecision = false;
+				bzd::SizeType precision = 0;
+				Format format = Format::AUTO;
 			};
 
-			template <class Ctx>
-			constexpr Metadata parseMetadata(Ctx& context, const bzd::StringView& format, bzd::SizeType offset, const bzd::SizeType current)
+			/**
+			 * Parse an unsigned integer
+			 */
+			constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer)
 			{
-				const auto ret = parseIndex(context, format, offset, current);
-				offset = ret.offset;
-				FormatType f = FormatType::AUTO;
-				if (format[offset] != '}')
+				bool isDefined = false;
+				integer = 0;
+				for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
 				{
-					switch (format[offset])
+					isDefined = true;
+					integer = integer * 10 + (format.front() - '0');
+					format.removePrefix(1);
+				}
+				return isDefined;
+			}
+
+			/**
+			 * Return the positional index
+			 */
+			template <class Ctx>
+			constexpr bzd::SizeType parseIndex(Ctx& context, bzd::StringView& format, const bzd::SizeType autoIndex)
+			{
+				bzd::SizeType index = 0;
+				const bool isDefined = parseUnsignedInteger(format, index);
+				if (format.front() == ':')
+				{
+					format.removePrefix(1);
+				}
+				else
+				{
+					context.assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
+				}
+				return (isDefined) ? index : autoIndex;
+			}
+
+			// Align
+
+			constexpr bool parseIsAlignSetter(const char c, Metadata& metadata)
+			{
+				switch (c)
+				{
+				case '<':
+					metadata.align = Metadata::Align::LEFT;
+					return true;
+				case '>':
+					metadata.align = Metadata::Align::RIGHT;
+					return true;
+				case '^':
+					metadata.align = Metadata::Align::CENTER;
+					return true;
+				case '=':
+					metadata.align = Metadata::Align::SIGN_PADDING;
+					return true;
+				}
+				return false;
+			}
+
+			template <class Ctx>
+			constexpr void parseAlign(Ctx& context, bzd::StringView& format, Metadata& metadata)
+			{
+				if (format.size() >= 2 && parseIsAlignSetter(format[1], metadata))
+				{
+					metadata.alignChar = format.front();
+					format.removePrefix(2);
+				}
+				else if (parseIsAlignSetter(format.front(), metadata))
+				{
+					format.removePrefix(1);
+				}
+			}
+
+			// Sign
+
+			template <class Ctx>
+			constexpr void parseSign(Ctx& context, bzd::StringView& format, Metadata& metadata)
+			{
+				switch (format.front())
+				{
+				case '+':
+					metadata.sign = Metadata::Sign::ALWAYS;
+					break;
+				case '-':
+					metadata.sign = Metadata::Sign::ONLY_NEGATIVE;
+					break;
+				case ' ':
+					metadata.sign = Metadata::Sign::LEADING_SPACE;
+					break;
+				}
+				if (metadata.sign != Metadata::Sign::AUTO)
+				{
+					format.removePrefix(1);
+				}
+			}
+
+			/**
+			 * \brief Parse a metadata conversion string.
+			 * 
+			 * Format compatible with python format:
+			 * 
+			 * format_spec ::=  [[fill]align][sign][#][0][width][.precision][type]
+			 * fill        ::=  <any character>
+			 * align       ::=  "<" | ">" | "=" | "^"
+			 * sign        ::=  "+" | "-" | " "
+			 * width       ::=  integer
+			 * precision   ::=  integer
+			 * type        ::=  "b" | "B" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+			 */
+			template <class Ctx>
+			constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bzd::SizeType current)
+			{
+				const auto endIndex = format.find('}');
+				context.assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
+				auto metadataStr = format.substr(0, endIndex + 1);
+
+				Metadata metadata;
+
+				// Look for the index
+				metadata.index = parseIndex(context, metadataStr, current);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
+
+				// Parse align: [[fill]align]
+				parseAlign(context, metadataStr, metadata);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseAlign)");
+
+				// Parse sign: [sign]
+				parseSign(context, metadataStr, metadata);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseSign)");
+
+				// Parse alternate form [#]
+				if (metadataStr.front() == '#')
+				{
+					metadata.alternate = true;
+					metadataStr.removePrefix(1);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
+				}
+
+				// Parse sign-aware zero padding [0]
+				if (metadataStr.front() == '0')
+				{
+					context.assertTrue(metadata.align == Metadata::Align::AUTO, "Mismatch between align format type");
+					metadata.alignChar = '0';
+					metadata.align = Metadata::Align::SIGN_PADDING;
+					metadataStr.removePrefix(1);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after '0')");
+				}
+
+				// Parse width [width]
+				metadata.isWidth = parseUnsignedInteger(metadataStr, metadata.width);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after width)");
+
+				// Parse precision [.precision]
+				if (metadataStr.front() == '.')
+				{
+					metadata.isPrecision = parseUnsignedInteger(metadataStr, metadata.precision);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
+				}
+
+				// Parse type [type]
+				if (metadataStr.front() != '}')
+				{
+					switch (metadataStr.front())
 					{
-					case 'd':
-					case 'i':
-						f = FormatType::INTEGER;
+					case 'b':
+						metadata.format = Metadata::Format::BINARY_LOWER;
 						break;
-					case 's':
-						f = FormatType::STRING;
+					case 'B':
+						metadata.format = Metadata::Format::BINARY_UPPER;
+						break;
+					case 'd':
+						metadata.format = Metadata::Format::DECIMAL;
+						break;
+					case 'o':
+						metadata.format = Metadata::Format::OCTAL;
+						break;
+					case 'x':
+						metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+						break;
+					case 'X':
+						metadata.format = Metadata::Format::HEXADECIMAL_UPPER;
+						break;
+					case 'f':
+						metadata.format = Metadata::Format::FIXED_POINT;
+						break;
+					case '%':
+						metadata.format = Metadata::Format::FIXED_POINT_PERCENT;
+						break;
+					case 'p':
+						metadata.format = Metadata::Format::POINTER;
 						break;
 					default:
-						throw "Unknown format";
+						context.onError("Unsupported conversion format");
 					}
-					++offset;
-					if (offset >= format.size())
-						throw "Format ended abruptly";
+					metadataStr.removePrefix(1);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
 				}
-				if (format[offset] != '}')
-					throw "Missing '}'";
-				++offset;
+				context.assertTrue(metadataStr.front() == '}', "Invalid format for replacement field, expecting '}'");
 
-				return Metadata{ret.index, f, offset};
+				format.removePrefix(endIndex + 1);
+				return metadata;
 			}
 
 			/**
@@ -190,10 +332,7 @@ namespace bzd
 						continue;
 					}
 
-					if (c != '{')
-					{
-						context.onError("'}' must be part of a pair '{...}' or doubled '}}'");
-					}
+					context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
 
 					--offset;
 					break;
@@ -211,52 +350,19 @@ namespace bzd
 			template <class Ctx, class T>
 			constexpr void parse(Ctx& context, bzd::StringView format, const T& tuple)
 			{
-				// Make a copy of the format string
-				if (parseStaticString(context, format))
+				bzd::SizeType autoIndex = 0;
+				do
 				{
-					if (format.front() != '{')
+					if (parseStaticString(context, format))
 					{
-						context.onError("Unexpected return state for parseStaticString");
+						context.assertTrue(format.front() == '{', "Unexpected return state for parseStaticString");
+						context.assertTrue(format.size() > 1, "Unexpected return state for parseStaticString");
+						format.removePrefix(1);
+						const auto metadata = parseMetadata(context, format, autoIndex++);
+						context.assertTrue(metadata.index < tuple.size(), "The index specified is greater than the number of arguments provided");
+						context.addMetadata(metadata);
 					}
-				}
-					bzd::SizeType index = 0;
-					bzd::SizeType offset = 0;
-
-				const auto newOffset = format.find('{', offset);
-				context.addSubstring(format.substr(offset, newOffset - offset));
-
-				offset = newOffset;
-
-				if (offset == bzd::StringView::npos)
-				{
-					// End
-					return;
-				}
-
-				// Point after the '{'
-				++offset;
-
-				// Parse the format
-				const auto ret = parseMetadata(context, format, offset, index);
-				if (ret.index >= tuple.size())
-				{
-					context.onError("The index specified is greater than the number of arguments.");
-				}
-				switch (ret.format)
-				{
-				case FormatType::AUTO:
-					break;
-				case FormatType::INTEGER:
-				//	if (!bzd::typeTraits::isIntegral<decltype(value)>::value)
-				//		throw "This is not a integral";
-					break;
-				case FormatType::STRING:
-					throw "This is not a string";
-				default:
-					throw "Unsupported type";
-				}
-
-				context.addMetadata(ret);
+				} while (format.size() > 0);
 			}
 
 			/**
@@ -329,14 +435,30 @@ namespace bzd
 					if (metadata.index == N - 1)
 					{
 						usedAtLeastOnce = true;
-						context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Not an integral");
+						switch (metadata.format)
+						{
+						case Metadata::Format::BINARY_LOWER:
+						case Metadata::Format::BINARY_UPPER:
+						case Metadata::Format::OCTAL:
+						case Metadata::Format::HEXADECIMAL_LOWER:
+						case Metadata::Format::HEXADECIMAL_UPPER:
+							context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Argument must an integral");
+							break;
+						case Metadata::Format::DECIMAL:
+						case Metadata::Format::FIXED_POINT:
+						case Metadata::Format::FIXED_POINT_PERCENT:
+							context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>::value, "Argument must arithmetic");
+							break;
+						case Metadata::Format::POINTER:
+							break;
+						case Metadata::Format::AUTO:
+							break;
+						}
 					}
 				}
 
 				context.assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
-
-				contextCheck<N-1>(context, tuple);
-				return true;
+				return contextCheck<N-1>(context, tuple);
 			}
 
 			template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N == 0), void>::type* = nullptr>
@@ -350,10 +472,12 @@ namespace bzd
 	template <class F, class... Args>
 	constexpr inline void format(bzd::OStream& out, const F& f, Args&&... args)
 	{
-		constexpr const bzd::Tuple<Args...> tuple;
+		// Compile-time format check
+		constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
 		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
 		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
+		// Run-time call
 		bzd::impl::format::print(out, f.str(), tuple);
 	}
 }

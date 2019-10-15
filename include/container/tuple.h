@@ -3,33 +3,17 @@
 #include "include/types.h"
 #include "include/utility.h"
 #include "include/type_traits/utils.h"
+#include "include/template_metaprogramming.h"
 
 namespace bzd
 {
 	namespace impl
 	{
 		template <class T>
-		struct TupleId { using type = T; };
-
-		template <class T>
 		using TupleTypeOf = typename T::type;
 
 		template <SizeType... N>
-		struct TupleSizes : TupleId <TupleSizes<N...>>{};
-
-		// choose N-th element in list <T...>
-
-		template <SizeType N, class... T>
-		struct TupleChooseImpl;
-
-		template <SizeType N, class H, class... T>
-		struct TupleChooseImpl<N, H, T...> : TupleChooseImpl<N-1, T...>{};
-
-		template <class H, class... T>
-		struct TupleChooseImpl<0, H, T...> : TupleId<H>{};
-
-		template <SizeType N, class... T>
-		using TupleChoose = TupleTypeOf<TupleChooseImpl<N, T...>>;
+		struct TupleSizes : bzd::tmp::Type<TupleSizes<N...>>{};
 
 		// given L>=0, generate sequence <0, ..., L-1>
 
@@ -76,7 +60,7 @@ namespace bzd
 		class TupleElem
 		{
 		private:
-			T elem_;
+			T elem_{};
 
 		public:
 			constexpr TupleElem() noexcept = default;
@@ -96,7 +80,7 @@ namespace bzd
 		class TupleImpl<TupleSizes<N...>, T...> : TupleElem<N, T>...
 		{
 		private:
-			template <SizeType M> using pick = TupleChoose<M, T...>;
+			template <SizeType M> using pick = bzd::tmp::ChooseNth<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
 
 			template <SizeType Index, typename typeTraits::enableIf<(Index > 0 && Index < sizeof...(N))>::type* = nullptr>
