@@ -84,10 +84,145 @@ TEST(Format_, ParseStaticString)
 	}
 }
 
+TEST(Format_, ParseMetadata)
+{
+	{
+		Context ctx;
+		bzd::StringView str("hello");
+		EXPECT_ANY_THROW(parseMetadata(ctx, str, 0));
+	}
+}
+
+TEST(Format_, ParseMetadataIndex)
+{
+	{
+		Context ctx;
+		bzd::StringView str("}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.index, 0);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str("}");
+		auto metadata = parseMetadata(ctx, str, 5);
+		EXPECT_EQ(metadata.index, 5);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":}");
+		auto metadata = parseMetadata(ctx, str, 2);
+		EXPECT_EQ(metadata.index, 2);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str("10}");
+		auto metadata = parseMetadata(ctx, str, 2);
+		EXPECT_EQ(metadata.index, 10);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str("7:}");
+		auto metadata = parseMetadata(ctx, str, 8);
+		EXPECT_EQ(metadata.index, 7);
+	}
+}
+
+TEST(Format_, ParseMetadataAlign)
+{
+	{
+		Context ctx;
+		bzd::StringView str("}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::AUTO);
+		EXPECT_EQ(metadata.alignChar, ' ');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":<}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::LEFT);
+		EXPECT_EQ(metadata.alignChar, ' ');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":>}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::RIGHT);
+		EXPECT_EQ(metadata.alignChar, ' ');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":^}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::CENTER);
+		EXPECT_EQ(metadata.alignChar, ' ');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":=}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::SIGN_PADDING);
+		EXPECT_EQ(metadata.alignChar, ' ');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":q=}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.align, bzd::impl::format::Metadata::Align::SIGN_PADDING);
+		EXPECT_EQ(metadata.alignChar, 'q');
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str("*>}");
+		EXPECT_ANY_THROW(parseMetadata(ctx, str, 0));
+	}
+}
+
+TEST(Format_, ParseMetadataSign)
+{
+	{
+		Context ctx;
+		bzd::StringView str("}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.sign, bzd::impl::format::Metadata::Sign::AUTO);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":-}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.sign, bzd::impl::format::Metadata::Sign::ONLY_NEGATIVE);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(":+}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.sign, bzd::impl::format::Metadata::Sign::ALWAYS);
+	}
+
+	{
+		Context ctx;
+		bzd::StringView str(": }");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_EQ(metadata.sign, bzd::impl::format::Metadata::Sign::LEADING_SPACE);
+	}
+}
+
 TEST(Format_, StringFormat)
 {
 	bzd::StringStream<256> stream;
-	bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:i}"), 12);
+	bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:d}"), 12);
 
 	//EXPECT_STREQ(stream.str().data(), "Hello 12");
 }

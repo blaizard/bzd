@@ -102,4 +102,15 @@ namespace bzd
         	>::type
     	>::type type;
 	};
+
+	// alignedStorage
+
+	template <std::size_t Len, std::size_t Align>
+	struct alignedStorage
+	{
+		struct type
+		{
+    		alignas(Align) unsigned char data[Len];
+    	};
+	};
 }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string.h>
-
 #include "include/types.h"
 #include "include/utility.h"
 #include "include/container/span.h"
