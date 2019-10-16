@@ -48,18 +48,39 @@ namespace bzd
 			template <class T, class U, class... Ts>
 			struct Contains
 			{
-				static const bool value = Contains<T, U>::value || Contains<T, Ts...>::value;
+				static constexpr const bool value = Contains<T, U>::value || Contains<T, Ts...>::value;
 			};
 
 			template <class T, class U>
 			struct Contains<T, U>
 			{
-				static const bool value = bzd::typeTraits::isSame<T, U>::value;
+				static constexpr const bool value = bzd::typeTraits::isSame<T, U>::value;
 			};
 		}
 
 		template <class T, class... Ts>
 		using Contains = typename impl::Contains<T, Ts...>;
+
+		// Find
+		// Return the index of the element or -1 if none
+
+		namespace impl
+		{
+			template <SizeType N, class T, class U, class... Ts>
+			struct Find
+			{
+				static constexpr const int value = (Find<N, T, U>::value >= 0) ? Find<N, T, U>::value : Find<N + 1, T, Ts...>::value;
+			};
+
+			template <SizeType N, class T, class U>
+			struct Find<N, T, U>
+			{
+				static constexpr const int value = (bzd::typeTraits::isSame<T, U>::value) ? static_cast<int>(N) : -1;
+			};
+		}
+
+		template <class T, class... Ts>
+		using Find = typename impl::Find<0, T, Ts...>;
 
 		// TypeList
 
@@ -74,6 +95,9 @@ namespace bzd
 
 			template <class T>
 			using Contains = typename impl::Contains<T, Ts...>;
+
+			template <class T>
+			using Find = typename impl::Find<0, T, Ts...>;
 		};
 	}
 /*
