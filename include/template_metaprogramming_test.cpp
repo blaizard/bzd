@@ -36,3 +36,14 @@ TEST(TMP, Contains)
 	EXPECT_FALSE(f);
 }
 
+TEST(TMP, Find)
+{
+	const int a = bzd::tmp::Find<int, int, double>::value;
+	EXPECT_EQ(a, 0);
+
+	const int b = bzd::tmp::Find<double, int, double>::value;
+	EXPECT_EQ(b, 1);
+
+	const int c = bzd::tmp::Find<bool, int, double>::value;
+	EXPECT_EQ(c, -1);
+}

@@ -5,6 +5,8 @@
 #include "include/container/string_view.h"
 #include "include/container/string.h"
 #include "include/container/tuple.h"
+#include "include/container/variant.h"
+#include "include/container/vector.h"
 #include "include/container/iostream.h"
 #include "include/to_string.h"
 #include "include/system.h"
@@ -101,6 +103,69 @@ namespace bzd
 				bzd::SizeType precision = 0;
 				Format format = Format::AUTO;
 			};
+
+			class Arg
+			{
+			public:
+				constexpr Arg(const int value = 0) : intValue(value) {}
+				constexpr Arg(const unsigned int value) : uIntValue(value) {}
+				constexpr Arg(const long long int value) : longLongValue(value) {}
+				constexpr Arg(const unsigned long long int value) : uLongLongValue(value) {}
+				constexpr Arg(const bool value) : boolValue(value) {}
+				constexpr Arg(const char value) : charValue(value) {}
+				constexpr Arg(const float value) : floatValue(value) {}
+				constexpr Arg(const double value) : doubleValue(value) {}
+				constexpr Arg(const long double value) : longDoubleValue(value) {}
+				constexpr Arg(const void* value) : pointer(value) {}
+				constexpr Arg(const char* value) : string(value) {}
+				constexpr Arg(const bzd::StringView value) : stringView({value.data(), value.size()}) {}
+
+			public:
+				union
+				{
+					int intValue;
+					unsigned int uIntValue;
+					long long int longLongValue;
+					unsigned long long int uLongLongValue;
+					bool boolValue;
+					char charValue;
+					float floatValue;
+					double doubleValue;
+					long double longDoubleValue;
+					const void* pointer;
+					const char* string;
+					struct { const char* data; SizeType size; } stringView;
+				};
+			};
+
+			using ArgList = bzd::interface::Vector<Arg>;
+/*
+  none_type,
+
+  cstring_type,
+  string_type,
+  pointer_type,
+  custom_type
+
+  ------
+
+    int int_value;
+    unsigned uint_value;
+    long long long_long_value;
+    unsigned long long ulong_long_value;
+    int128_t int128_value;
+    uint128_t uint128_value;
+    bool bool_value;
+    char_type char_value;
+    float float_value;
+    double double_value;
+    long double long_double_value;
+    const void* pointer;
+    string_value<char_type> string;
+    custom_value<Context> custom;
+    const named_arg_base<char_type>* named_arg;
+*/
+
 
 			/**
 			 * Parse an unsigned integer
@@ -476,6 +541,12 @@ namespace bzd
 		constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
 		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
 		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
+
+		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList;
+		for (SizeType i = 0; i < tuple.size(); ++i)
+		{
+
+		}
 
 		// Run-time call
 		bzd::impl::format::print(out, f.str(), tuple);
