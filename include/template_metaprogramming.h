@@ -7,17 +7,6 @@ namespace bzd
 {
 	namespace tmp
 	{
-		// Variadic Max
-	
-		template <class T>
-		constexpr T variadicMax(T&& a) { return bzd::forward<T>(a); }
-
-		template <class T, class... Args>
-		constexpr T variadicMax(T&& a, T&& b, Args&&... args)
-		{
-			return (a > b) ? variadicMax(bzd::forward<T>(a), bzd::forward<Args>(args)...) : variadicMax(bzd::forward<T>(b), bzd::forward<Args>(args)...);
-		}
-
 		// Type
 
 		template <class T>
@@ -180,7 +169,7 @@ namespace bzd
 
 			protected:
 				T value_;
-				char dummy_ = {};
+				struct {} dummy_;
 			};
 
 			template <class T>
@@ -201,7 +190,7 @@ namespace bzd
 
 			protected:
 				T value_;
-				char dummy_ = {};
+				struct {} dummy_;
 			};
 		}
 

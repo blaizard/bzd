@@ -27,8 +27,6 @@ namespace bzd
 			template <class T>
 			using Find = typename TypeList::template Find<T>;
 
-			//using StorageType = bzd::tmp::Union<Ts...>;
-
 			// Helper
 			template <SizeType N, SizeType Max, template<class> class F, class... Args>
 			struct HelperT
@@ -68,37 +66,34 @@ namespace bzd
 			 * Value constructor
 			 */
 			template <class T, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
-			constexpr Variant(T&& value)
-					: id_(Find<T>::value), data_(bzd::forward<T>(value))
-			{
-			}
+			constexpr Variant(T&& value) : id_(Find<T>::value), data_(bzd::forward<T>(value)) {}
 
 			template <class T>
 			constexpr bool is() const noexcept
 			{
 				return (id_ != -1 && id_ == Find<T>::value);
 			}
-/*
+
 			template <class T>
 			constexpr bzd::Expected<const T&, bool> get() const
 			{
-				if (!is<T>())
+				if (is<T>())
 				{
-					return bzd::makeUnexpected(false);
+					return data_.template get<T>();
 				}
-				return *reinterpret_cast<T*>(&data_);
+				return bzd::makeUnexpected(false);
 			}
 
 			template <class T>
 			constexpr bzd::Expected<T&, bool> get()
 			{
-				if (!is<T>())
+				if (is<T>())
 				{
-					return bzd::makeUnexpected(false);
+					return data_.template get<T>();
 				}
-				return *reinterpret_cast<T*>(&data_);
+				return bzd::makeUnexpected(false);
 			}
-*/
+
 		protected:
 			int id_ = -1;
 			StorageType data_ = {};
@@ -108,6 +103,13 @@ namespace bzd
 	template <class... Ts>
 	class VariantConstexpr : public bzd::impl::Variant<bzd::tmp::UnionConstexpr<Ts...>, Ts...>
 	{
+	protected:
+		using Self = VariantConstexpr<Ts...>;
+		using Parent = bzd::impl::Variant<bzd::tmp::UnionConstexpr<Ts...>, Ts...>;
+	public:
+		// Forward constructor to the main class
+		template <class... Args>
+		constexpr VariantConstexpr(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...) {}
 	};
 
 	template <class... Ts>
@@ -169,16 +171,8 @@ namespace bzd
 	public:
 		// Forward constructor to the main class
 		template <class... Args>
-		Variant(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...) {}
+		constexpr Variant(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...) {}
 
-	/*	constexpr Variant() = default;
-
-		template <class T, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
-		constexpr Variant(T&& value)
-		{
-			construct<T>(bzd::forward<T>(value));
-		}
-*/
 		template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
 		constexpr void emplace(Args&&... args)
 		{
