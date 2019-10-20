@@ -11,11 +11,6 @@ TEST(ContainerVariant, Constructor)
 	bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
 }
 
-TEST(ContainerVariant, Constexpr)
-{
-	constexpr bzd::VariantConstexpr<int, bool, double> variant;
-}
-
 TEST(ContainerVariant, Destructor)
 {
 	static int constructorA = 0;
@@ -69,23 +64,44 @@ TEST(ContainerVariant, Destructor)
 TEST(ContainerVariant, Is)
 {
 	bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
-	const bool isBool = variantBool.is<bool>();
-	EXPECT_TRUE(isBool);
-	const bool isInt = variantBool.is<int>();
-	EXPECT_FALSE(isInt);
-	const bool isDouble = variantBool.is<double>();
-	EXPECT_FALSE(isDouble);
-	const bool isChar = variantBool.is<char>();
-	EXPECT_FALSE(isChar);
+	EXPECT_TRUE(variantBool.is<bool>());
+	EXPECT_FALSE(variantBool.is<int>());
+	EXPECT_FALSE(variantBool.is<double>());
+	EXPECT_FALSE(variantBool.is<char>());
 
 	bzd::Variant<int, bool, double> variantEmpty;
-	const bool isEmptyBool = variantEmpty.is<bool>();
-	EXPECT_FALSE(isEmptyBool);
+	EXPECT_FALSE(variantEmpty.is<bool>());
 }
 
 TEST(ContainerVariant, Get)
 {
-	bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
+	bzd::Variant<bool, int, double> variantInt(static_cast<int>(-12));
 
-//	const auto a = variantBool.get<bool>();
+	auto retBool = variantInt.get<bool>();
+	EXPECT_FALSE(retBool);
+
+	auto retInt = variantInt.get<int>();
+	EXPECT_TRUE(retInt);
+	EXPECT_EQ(*retInt, -12);
+	*retInt = 42;
+	EXPECT_EQ(*(variantInt.get<int>()), 42);
+}
+
+TEST(ContainerVariant, Constexpr)
+{
+	constexpr bzd::VariantConstexpr<int, bool, double> variant;
+	EXPECT_FALSE(variant.is<int>());
+	EXPECT_FALSE(variant.is<bool>());
+	EXPECT_FALSE(variant.is<double>());
+
+	constexpr bzd::VariantConstexpr<int, bool, double> variantInt(static_cast<int>(45));
+	EXPECT_TRUE(variantInt.is<int>());
+	constexpr bzd::VariantConstexpr<int, bool, double> variantBool(static_cast<bool>(true));
+	EXPECT_TRUE(variantBool.is<bool>());
+	constexpr bzd::VariantConstexpr<int, bool, double> variantDouble(static_cast<double>(5.4));
+	EXPECT_TRUE(variantDouble.is<double>());
+
+	const auto ret = variantDouble.get<double>();
+	EXPECT_TRUE(ret);
+	EXPECT_NEAR(*ret, 5.4, 0.01);
 }

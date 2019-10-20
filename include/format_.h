@@ -15,6 +15,9 @@
 #include <iostream>
 #include <cstdarg>
 
+#include <vector>
+
+
 namespace bzd
 {
 	namespace impl
@@ -46,6 +49,8 @@ namespace bzd
 
 			public:
 				constexpr ConstexprVector() noexcept {}
+				template <class... Args>
+				constexpr ConstexprVector(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...} {}
 				constexpr Iterator begin() const noexcept { return Iterator(*this, 0); }
 				constexpr Iterator end() const noexcept { return Iterator(*this, size()); }
 				constexpr SizeType size() const noexcept { return size_; }
@@ -104,6 +109,9 @@ namespace bzd
 				Format format = Format::AUTO;
 			};
 
+			using Arg = bzd::VariantConstexpr<int, unsigned int, long long int, unsigned long long int,
+					bool, char, float, double, long double, const void*, const char*>;
+/*
 			class Arg
 			{
 			public:
@@ -137,7 +145,7 @@ namespace bzd
 					struct { const char* data; SizeType size; } stringView;
 				};
 			};
-
+*/
 			using ArgList = bzd::interface::Vector<Arg>;
 /*
   none_type,
@@ -413,7 +421,7 @@ namespace bzd
 			}
 
 			template <class Ctx, class T>
-			constexpr void parse(Ctx& context, bzd::StringView format, const T& tuple)
+			constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
 			{
 				bzd::SizeType autoIndex = 0;
 				do
@@ -424,7 +432,7 @@ namespace bzd
 						context.assertTrue(format.size() > 1, "Unexpected return state for parseStaticString");
 						format.removePrefix(1);
 						const auto metadata = parseMetadata(context, format, autoIndex++);
-						context.assertTrue(metadata.index < tuple.size(), "The index specified is greater than the number of arguments provided");
+						context.assertTrue(metadata.index < args.size(), "The index specified is greater than the number of arguments provided");
 						context.addMetadata(metadata);
 					}
 				} while (format.size() > 0);
@@ -477,11 +485,10 @@ namespace bzd
 				return ctx;
 			}
 
-			template <class T>
-			void print(bzd::OStream& stream, const bzd::StringView& format, const T& tuple)
+			void print(bzd::OStream& stream, const bzd::StringView& format, const bzd::interface::Vector<bzd::impl::format::Arg>& args)
 			{
 				Context<PrintContext> ctx(stream);
-				parse(ctx, format, tuple);
+				parse(ctx, format, args);
 			}
 
 			/**
@@ -542,13 +549,17 @@ namespace bzd
 		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
 		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
-		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList;
-		for (SizeType i = 0; i < tuple.size(); ++i)
+	/*	bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList;
+		for (SizeType i = 0; i < argList.size(); ++i)
 		{
-
+			*(argList[i].template get<int>()) = 45;
 		}
+*/
+		//bzd::impl::format::ConstexprVector<bzd::impl::format::Arg, 5> temp(5, 32, 22);
+
+		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<Args>(args)...);
 
 		// Run-time call
-		bzd::impl::format::print(out, f.str(), tuple);
+		bzd::impl::format::print(out, f.str(), argList);
 	}
 }

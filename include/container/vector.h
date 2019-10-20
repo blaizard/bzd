@@ -2,6 +2,7 @@
 
 #include "include/types.h"
 #include "include/container/span.h"
+#include "include/utility.h"
 
 namespace bzd
 {
@@ -64,7 +65,7 @@ namespace bzd
 		template <class... Args>
 		constexpr explicit Vector(Args&&... args)
 				: interface::Vector<T>(N, data_, sizeof...(Args))
-				, data_{args...}
+				, data_{bzd::forward<Args>(args)...}
 		{
 		}
 

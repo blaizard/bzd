@@ -73,4 +73,8 @@ TEST(TMP, Union)
 	constexpr auto constexprTest2(constexprTest);
 	constexpr auto constexprTest3 = constexprTest2;
 	EXPECT_NEAR(constexprTest3.get<float>(), 32.5, 0.001);
+
+	// Complex types
+	bzd::tmp::Union<bool, std::string> testComplex(std::string("Hello"));
+	EXPECT_STREQ(testComplex.get<std::string>().c_str(), "Hello");
 }
