@@ -11,6 +11,11 @@ TEST(ContainerVariant, Constructor)
 	bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
 }
 
+TEST(ContainerVariant, Constexpr)
+{
+	constexpr bzd::VariantConstexpr<int, bool, double> variant;
+}
+
 TEST(ContainerVariant, Destructor)
 {
 	static int constructorA = 0;
