@@ -77,8 +77,7 @@ namespace bzd
 				enum class Format
 				{
 					AUTO,
-					BINARY_LOWER,
-					BINARY_UPPER,
+					BINARY,
 					DECIMAL,
 					OCTAL,
 					HEXADECIMAL_LOWER,
@@ -98,41 +97,6 @@ namespace bzd
 
 			using Arg = bzd::VariantConstexpr<int, unsigned int, long long int, unsigned long long int,
 					bool, char, float, double, long double, const void*, const char*, bzd::StringView>;
-/*
-			class Arg
-			{
-			public:
-				constexpr Arg(const int value = 0) : intValue(value) {}
-				constexpr Arg(const unsigned int value) : uIntValue(value) {}
-				constexpr Arg(const long long int value) : longLongValue(value) {}
-				constexpr Arg(const unsigned long long int value) : uLongLongValue(value) {}
-				constexpr Arg(const bool value) : boolValue(value) {}
-				constexpr Arg(const char value) : charValue(value) {}
-				constexpr Arg(const float value) : floatValue(value) {}
-				constexpr Arg(const double value) : doubleValue(value) {}
-				constexpr Arg(const long double value) : longDoubleValue(value) {}
-				constexpr Arg(const void* value) : pointer(value) {}
-				constexpr Arg(const char* value) : string(value) {}
-				constexpr Arg(const bzd::StringView value) : stringView({value.data(), value.size()}) {}
-
-			public:
-				union
-				{
-					int intValue;
-					unsigned int uIntValue;
-					long long int longLongValue;
-					unsigned long long int uLongLongValue;
-					bool boolValue;
-					char charValue;
-					float floatValue;
-					double doubleValue;
-					long double longDoubleValue;
-					const void* pointer;
-					const char* string;
-					struct { const char* data; SizeType size; } stringView;
-				};
-			};
-*/
 			using ArgList = bzd::interface::Vector<Arg>;
 /*
   none_type,
@@ -225,7 +189,15 @@ namespace bzd
 			 * format_spec ::=  [sign][#][.precision][type]
 			 * sign        ::=  "+" | "-" | " "
 			 * precision   ::=  integer
-			 * type        ::=  "b" | "B" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+			 * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+			 * d	Decimal integer
+			 * b	Binary format
+			 * o	Octal format
+			 * x	Hexadecimal format (lower case)
+			 * X	Hexadecimal format (upper case)
+			 * f	Displays fixed point number (Default: 6)
+			 * p    Pointer
+			 * %	Percentage. Multiples by 100 and puts % at the end.
 			 */
 			template <class Ctx>
 			constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bzd::SizeType current)
@@ -266,10 +238,7 @@ namespace bzd
 					switch (metadataStr.front())
 					{
 					case 'b':
-						metadata.format = Metadata::Format::BINARY_LOWER;
-						break;
-					case 'B':
-						metadata.format = Metadata::Format::BINARY_UPPER;
+						metadata.format = Metadata::Format::BINARY;
 						break;
 					case 'd':
 						metadata.format = Metadata::Format::DECIMAL;
@@ -293,7 +262,7 @@ namespace bzd
 						metadata.format = Metadata::Format::POINTER;
 						break;
 					default:
-						context.onError("Unsupported conversion format, only the following is supported: [bBdoxXfp%]");
+						context.onError("Unsupported conversion format, only the following is supported: [bdoxXfp%]");
 					}
 					metadataStr.removePrefix(1);
 					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
@@ -403,8 +372,7 @@ namespace bzd
 				case Metadata::Format::DECIMAL:
 					toString(stream, value);
 					break;
-				case Metadata::Format::BINARY_LOWER:
-				case Metadata::Format::BINARY_UPPER:
+				case Metadata::Format::BINARY:
 					//bzd::impl::to_string::integer<2>(stream, bzd::forward<T>(value));
 					break;
 				case Metadata::Format::HEXADECIMAL_LOWER:
@@ -439,8 +407,27 @@ namespace bzd
 					toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 					stream.write(bzd::StringView("%"));
 					break;
-				case Metadata::Format::BINARY_LOWER:
-				case Metadata::Format::BINARY_UPPER:
+				case Metadata::Format::BINARY:
+				case Metadata::Format::HEXADECIMAL_LOWER:
+				case Metadata::Format::HEXADECIMAL_UPPER:
+				case Metadata::Format::OCTAL:
+				case Metadata::Format::POINTER:
+					break;
+				}
+			}
+
+			template <class T>
+			void printString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+			{
+				switch (metadata.format)
+				{
+				case Metadata::Format::AUTO:
+					stream.write(bzd::StringView(value));
+					break;
+				case Metadata::Format::FIXED_POINT:
+				case Metadata::Format::FIXED_POINT_PERCENT:
+				case Metadata::Format::DECIMAL:
+				case Metadata::Format::BINARY:
 				case Metadata::Format::HEXADECIMAL_LOWER:
 				case Metadata::Format::HEXADECIMAL_UPPER:
 				case Metadata::Format::OCTAL:
@@ -466,8 +453,8 @@ namespace bzd
 						[&](const double value) { printFixedPoint(stream_, value, metadata); },
 						[&](const long double value) { printFixedPoint(stream_, value, metadata); },
 						[&](const void* value) {},
-						[&](const char* value) {},
-						[](const bzd::StringView&) {}
+						[&](const char* value) { printString(stream_, value, metadata); },
+						[&](const bzd::StringView& value) { printString(stream_, value, metadata); }
 					);
 				}
 				void onError(const bzd::StringView& message) const {}
@@ -511,8 +498,7 @@ namespace bzd
 						usedAtLeastOnce = true;
 						switch (metadata.format)
 						{
-						case Metadata::Format::BINARY_LOWER:
-						case Metadata::Format::BINARY_UPPER:
+						case Metadata::Format::BINARY:
 						case Metadata::Format::OCTAL:
 						case Metadata::Format::HEXADECIMAL_LOWER:
 						case Metadata::Format::HEXADECIMAL_UPPER:
@@ -552,7 +538,7 @@ namespace bzd
 		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
 		// Run-time call
-		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<Args>(args)...);
+		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<typename bzd::decay<Args>::type>(args)...);
 		bzd::impl::format::print(out, f.str(), argList);
 	}
 }

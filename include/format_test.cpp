@@ -173,28 +173,29 @@ TEST(Format_, StringFormat)
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:d}"), 12);
 		EXPECT_STREQ(stream.str().data(), "Hello 12");
 	}
-
 	{
 		bzd::StringStream<256> stream;
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {1} {0:d}"), 12, -89);
 		EXPECT_STREQ(stream.str().data(), "Hello -89 12");
 	}
-
 	{
 		bzd::StringStream<256> stream;
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:f}"), 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
-
 	{
 		bzd::StringStream<256> stream;
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:.3f}"), 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
-
 	{
 		bzd::StringStream<256> stream;
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:%}"), 0.15);
 		EXPECT_STREQ(stream.str().data(), "Hello 15.%");
+	}
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {}"), "World");
+		EXPECT_STREQ(stream.str().data(), "Hello World");
 	}
 }
