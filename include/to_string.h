@@ -14,8 +14,8 @@ namespace bzd
 	{
 		namespace to_string
 		{
-			template <class T, SizeType Base = 10, typename bzd::typeTraits::enableIf<(Base > 0 && Base <= 16), T>::type* = nullptr>
-			constexpr void integer(interface::String& str, const T n)
+			template <SizeType Base = 10, class T, typename bzd::typeTraits::enableIf<(Base > 0 && Base <= 16), T>::type* = nullptr>
+			constexpr void integer(interface::String& str, const T& n)
 			{
 				constexpr const char* const digits = "0123456789abcdef";
 				T number = (n < 0) ? -n : n;
@@ -43,10 +43,26 @@ namespace bzd
 	}
 
 	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
-	constexpr void toString(bzd::OStream& stream, const T data)
+	constexpr void toString(bzd::OStream& stream, const T& data)
 	{
-		bzd::String<40> buffer; // 40 is a the length of the max value of an 128-bit in base 10
+		bzd::String<40> buffer; // 40 is a the length of a 64-bit data in binary
 		bzd::impl::to_string::integer(buffer, data);
+		stream.write(buffer);
+	}
+
+	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+	constexpr void toStringHex(bzd::OStream& stream, const T& data)
+	{
+		bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
+		bzd::impl::to_string::integer<16>(buffer, data);
+		stream.write(buffer);
+	}
+
+	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+	constexpr void toStringOct(bzd::OStream& stream, const T& data)
+	{
+		bzd::String<32> buffer;
+		bzd::impl::to_string::integer<8>(buffer, data);
 		stream.write(buffer);
 	}
 
@@ -60,6 +76,11 @@ namespace bzd
 		stream.write(bzd::StringView(&c, 1));
 	}
 
+/*	void toString(bzd::OStream& stream, const bool value)
+	{
+		stream.write((value) ? bzd::StringView("true") : bzd::StringView("false"));
+	}
+*/
 	template <class T>
 	constexpr void toString(bzd::interface::String& str, T&& data)
 	{

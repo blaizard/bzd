@@ -1,16 +1,23 @@
 #pragma once
 
+#include "include/type_traits/fundamental.h"
+#include "include/type_traits/constructible.h"
+#include "include/container/constexpr_string_view.h"
+#include "include/container/string_view.h"
 #include "include/container/string.h"
-#include "include/container/iostream.h"
-#include "include/container/string_stream.h"
 #include "include/container/tuple.h"
-#include "include/utility.h"
+#include "include/container/variant.h"
+#include "include/container/vector.h"
+#include "include/container/iostream.h"
 #include "include/to_string.h"
-#include "include/assert_minimal.h"
+#include "include/system.h"
 
-#include <string.h>
-#include <functional>
+#include <array>
 #include <iostream>
+#include <cstdarg>
+
+#include <vector>
+
 
 namespace bzd
 {
@@ -18,92 +25,521 @@ namespace bzd
 	{
 		namespace format
 		{
-			template <class Stream>
-			constexpr void formatConsumeStaticString(Stream& dest, bzd::StringView& format)
+			/**
+			 * Simple vector container working with conxtexpr
+			 */
+			template <class T, SizeType N>
+			class ConstexprVector
 			{
-				SizeType offset = 0;
-				do
+				using SelfType = ConstexprVector<T, N>;
+				using DataType = T;
+			public:
+				class Iterator
 				{
-					const auto index = format.find('{', offset);
-					if (index == bzd::StringView::npos)
-					{
-						dest.write(format);
-						format.clear();
-						return;
-					}
+				public:
+					constexpr Iterator(const SelfType& container, const SizeType index) : container_(&container), index_(index) {}
+					constexpr Iterator& operator++() noexcept { ++index_; return *this; }
+					constexpr bool operator==(const Iterator& it) const noexcept { return it.index_ == index_; }
+					constexpr bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
+					constexpr const DataType& operator*() const { return (*container_)[index_]; }
 
-					dest.write(format.substr(0, index));
-					format.removePrefix(index + 1);
-					offset = (format.front() == '{') ? 1 : 0;
+				private:
+					const SelfType* container_;
+					SizeType index_;
+				};
 
-				} while (offset);
-			}
+			public:
+				constexpr ConstexprVector() noexcept {}
+				template <class... Args>
+				constexpr ConstexprVector(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...} {}
+				constexpr Iterator begin() const noexcept { return Iterator(*this, 0); }
+				constexpr Iterator end() const noexcept { return Iterator(*this, size()); }
+				constexpr SizeType size() const noexcept { return size_; }
+				constexpr SizeType capacity() const noexcept { return N; }
+				constexpr void push_back(const T& element) noexcept { data_[size_++] = element; }
+				constexpr DataType& operator[](const SizeType index) { return data_[index]; }
+				constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
 
-			constexpr SizeType getFormatArgIndexAndConsume(bzd::StringView& format, const SizeType current = 0)
+			private:
+				T data_[N] = {};
+				SizeType size_ = 0;
+			};
+
+			struct Metadata
+			{
+				enum class Sign
+				{
+					AUTO,
+					ALWAYS,
+					ONLY_NEGATIVE
+				};
+
+				enum class Format
+				{
+					AUTO,
+					BINARY_LOWER,
+					BINARY_UPPER,
+					DECIMAL,
+					OCTAL,
+					HEXADECIMAL_LOWER,
+					HEXADECIMAL_UPPER,
+					FIXED_POINT,
+					FIXED_POINT_PERCENT,
+					POINTER
+				};
+
+				bzd::SizeType index = 0;
+				Sign sign = Sign::AUTO;
+				bool alternate = false;
+				bool isWidth = false;
+				bzd::SizeType width = 0;
+				bool isPrecision = false;
+				bzd::SizeType precision = 0;
+				Format format = Format::AUTO;
+			};
+
+			using Arg = bzd::VariantConstexpr<int, unsigned int, long long int, unsigned long long int,
+					bool, char, float, double, long double, const void*, const char*, bzd::StringView>;
+/*
+			class Arg
+			{
+			public:
+				constexpr Arg(const int value = 0) : intValue(value) {}
+				constexpr Arg(const unsigned int value) : uIntValue(value) {}
+				constexpr Arg(const long long int value) : longLongValue(value) {}
+				constexpr Arg(const unsigned long long int value) : uLongLongValue(value) {}
+				constexpr Arg(const bool value) : boolValue(value) {}
+				constexpr Arg(const char value) : charValue(value) {}
+				constexpr Arg(const float value) : floatValue(value) {}
+				constexpr Arg(const double value) : doubleValue(value) {}
+				constexpr Arg(const long double value) : longDoubleValue(value) {}
+				constexpr Arg(const void* value) : pointer(value) {}
+				constexpr Arg(const char* value) : string(value) {}
+				constexpr Arg(const bzd::StringView value) : stringView({value.data(), value.size()}) {}
+
+			public:
+				union
+				{
+					int intValue;
+					unsigned int uIntValue;
+					long long int longLongValue;
+					unsigned long long int uLongLongValue;
+					bool boolValue;
+					char charValue;
+					float floatValue;
+					double doubleValue;
+					long double longDoubleValue;
+					const void* pointer;
+					const char* string;
+					struct { const char* data; SizeType size; } stringView;
+				};
+			};
+*/
+			using ArgList = bzd::interface::Vector<Arg>;
+/*
+  none_type,
+
+  cstring_type,
+  string_type,
+  pointer_type,
+  custom_type
+
+  ------
+
+    int int_value;
+    unsigned uint_value;
+    long long long_long_value;
+    unsigned long long ulong_long_value;
+    int128_t int128_value;
+    uint128_t uint128_value;
+    bool bool_value;
+    char_type char_value;
+    float float_value;
+    double double_value;
+    long double long_double_value;
+    const void* pointer;
+    string_value<char_type> string;
+    custom_value<Context> custom;
+    const named_arg_base<char_type>* named_arg;
+*/
+
+
+			/**
+			 * Parse an unsigned integer
+			 */
+			constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer)
 			{
 				bool isDefined = false;
-				SizeType index = 0;
-				while (format.size() && format.front() >= '0' && format.front() <= '9')
+				integer = 0;
+				for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
 				{
-					index = index * 10 + (format.front() - '0');
 					isDefined = true;
+					integer = integer * 10 + (format.front() - '0');
 					format.removePrefix(1);
 				}
+				return isDefined;
+			}
 
-				bzd::assertTrue(format.size(), "Format ended abruptly");
-				bzd::assertTrue(format.front() == ':' || format.front() == '}', "Missing ':' or '}'");
+			/**
+			 * Return the positional index
+			 */
+			template <class Ctx>
+			constexpr bzd::SizeType parseIndex(Ctx& context, bzd::StringView& format, const bzd::SizeType autoIndex)
+			{
+				bzd::SizeType index = 0;
+				const bool isDefined = parseUnsignedInteger(format, index);
 				if (format.front() == ':')
 				{
 					format.removePrefix(1);
 				}
-
-				return (isDefined) ? index : current;
+				else
+				{
+					context.assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
+				}
+				return (isDefined) ? index : autoIndex;
 			}
 
-			template <class Args>
-			constexpr void formatProcessString(bzd::OStream& dest, bzd::StringView& format, const Args& args)
+			// Sign
+
+			template <class Ctx>
+			constexpr void parseSign(Ctx& context, bzd::StringView& format, Metadata& metadata)
 			{
-				SizeType currentIndex = 0;
+				switch (format.front())
+				{
+				case '+':
+					metadata.sign = Metadata::Sign::ALWAYS;
+					break;
+				case '-':
+					metadata.sign = Metadata::Sign::ONLY_NEGATIVE;
+					break;
+				}
+				if (metadata.sign != Metadata::Sign::AUTO)
+				{
+					format.removePrefix(1);
+				}
+			}
+
+			/**
+			 * \brief Parse a metadata conversion string.
+			 * 
+			 * Format compatible with python format (with some exceptions)
+			 * 
+			 * format_spec ::=  [sign][#][width][.precision][type]
+			 * sign        ::=  "+" | "-" | " "
+			 * width       ::=  integer
+			 * precision   ::=  integer
+			 * type        ::=  "b" | "B" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+			 */
+			template <class Ctx>
+			constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bzd::SizeType current)
+			{
+				const auto endIndex = format.find('}');
+				context.assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
+				auto metadataStr = format.substr(0, endIndex + 1);
+
+				Metadata metadata;
+
+				// Look for the index
+				metadata.index = parseIndex(context, metadataStr, current);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
+
+				// Parse sign: [sign]
+				parseSign(context, metadataStr, metadata);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseSign)");
+
+				// Parse alternate form [#]
+				if (metadataStr.front() == '#')
+				{
+					metadata.alternate = true;
+					metadataStr.removePrefix(1);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
+				}
+
+				// Parse width [width]
+				metadata.isWidth = parseUnsignedInteger(metadataStr, metadata.width);
+				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after width)");
+
+				// Parse precision [.precision]
+				if (metadataStr.front() == '.')
+				{
+					metadata.isPrecision = parseUnsignedInteger(metadataStr, metadata.precision);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
+				}
+
+				// Parse type [type]
+				if (metadataStr.front() != '}')
+				{
+					switch (metadataStr.front())
+					{
+					case 'b':
+						metadata.format = Metadata::Format::BINARY_LOWER;
+						break;
+					case 'B':
+						metadata.format = Metadata::Format::BINARY_UPPER;
+						break;
+					case 'd':
+						metadata.format = Metadata::Format::DECIMAL;
+						break;
+					case 'o':
+						metadata.format = Metadata::Format::OCTAL;
+						break;
+					case 'x':
+						metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+						break;
+					case 'X':
+						metadata.format = Metadata::Format::HEXADECIMAL_UPPER;
+						break;
+					case 'f':
+						metadata.format = Metadata::Format::FIXED_POINT;
+						break;
+					case '%':
+						metadata.format = Metadata::Format::FIXED_POINT_PERCENT;
+						break;
+					case 'p':
+						metadata.format = Metadata::Format::POINTER;
+						break;
+					default:
+						context.onError("Unsupported conversion format");
+					}
+					metadataStr.removePrefix(1);
+					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
+				}
+				context.assertTrue(metadataStr.front() == '}', "Invalid format for replacement field, expecting '}'");
+
+				format.removePrefix(endIndex + 1);
+				return metadata;
+			}
+
+			/**
+			 * Parse a static string and call addSubstring to the context information
+			 * when needed.
+			 * 
+			 * This function returns either when the string is consumed (return false)
+			 * or when a metadata has been identified.
+			 */
+			template <class Ctx>
+			constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
+			{
+				SizeType offset = 0;
+				while (offset < format.size())
+				{
+					const auto c = format[offset++];
+					if (c != '{' && c != '}')
+					{
+						continue;
+					}
+
+					context.assertTrue(offset < format.size(), "Unexpected static string termination");
+
+					if (format[offset] == c)
+					{
+						context.addSubstring(format.substr(0, offset));
+						format.removePrefix(offset + 1);
+						offset = 0;
+						continue;
+					}
+
+					context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
+
+					--offset;
+					break;
+				}
+
+				if (offset)
+				{
+					context.addSubstring(format.substr(0, offset));
+					format.removePrefix(offset);
+				}
+
+				return format.size();
+			}
+
+			template <class Ctx, class T>
+			constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
+			{
+				bzd::SizeType autoIndex = 0;
 				do
 				{
-					formatConsumeStaticString(dest, format);
-					if (format.size())
+					if (parseStaticString(context, format))
 					{
-						const auto index = getFormatArgIndexAndConsume(format, currentIndex++);
-						const auto arg = args.get(index);
-						switch (format.front())
+						context.assertTrue(format.front() == '{', "Unexpected return state for parseStaticString");
+						context.assertTrue(format.size() > 1, "Unexpected return state for parseStaticString");
+						format.removePrefix(1);
+						const auto metadata = parseMetadata(context, format, autoIndex++);
+						context.assertTrue(metadata.index < args.size(), "The index specified is greater than the number of arguments provided");
+						context.addMetadata(metadata);
+					}
+				} while (format.size() > 0);
+			}
+
+			/**
+			 * Context used for the current parsing operation.
+			 * Different context are used to check or print the formated string.
+			 */
+			template <class T>
+			class Context : public T
+			{
+			public:
+				using T::T;
+				constexpr inline void assertTrue(const bool condition, const bzd::StringView& message) const
+				{
+					if (!condition)
+					{
+						T::onError(message);
+					}
+				}
+			};
+
+			class CheckContext : public ConstexprVector<Metadata, 128>
+			{
+			public:
+				constexpr CheckContext() = default;
+				constexpr void addSubstring(const bzd::StringView&) {}
+				constexpr void addMetadata(const Metadata& metadata) { push_back(metadata); }
+				void onError(const bzd::StringView& message) const;
+			};
+
+
+			template <class T>
+			void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata)
+			{
+				switch (metadata.format)
+				{
+				case Metadata::Format::AUTO:
+				case Metadata::Format::DECIMAL:
+					toString(stream, value);
+					break;
+				case Metadata::Format::BINARY_LOWER:
+				case Metadata::Format::BINARY_UPPER:
+					//bzd::impl::to_string::integer<2>(stream, bzd::forward<T>(value));
+					break;
+				case Metadata::Format::HEXADECIMAL_LOWER:
+				case Metadata::Format::HEXADECIMAL_UPPER:
+					toStringHex(stream, value);
+					break;
+				case Metadata::Format::OCTAL:
+					toStringOct(stream, value);
+					break;
+				case Metadata::Format::FIXED_POINT:
+				case Metadata::Format::FIXED_POINT_PERCENT:
+				case Metadata::Format::POINTER:
+					break;
+				}
+			}
+
+			class PrintContext
+			{
+			public:
+				constexpr PrintContext(bzd::OStream& stream, const bzd::interface::Vector<bzd::impl::format::Arg>& args) : stream_(stream), args_(args) {}
+				void addSubstring(const bzd::StringView& str) { stream_.write(str); }
+				void addMetadata(const Metadata& metadata) {
+					args_[metadata.index].match(
+						[&](const int value) { printInteger(stream_, value, metadata); },
+						[&](const unsigned int value) { printInteger(stream_, value, metadata); },
+						[&](const long long int value) { printInteger(stream_, value, metadata); },
+						[&](const unsigned long long int value) { printInteger(stream_, value, metadata); },
+						[&](const bool value) {},
+						[&](const char value) {},
+						[&](const float value) {},
+						[&](const double value) {},
+						[&](const long double value) {},
+						[&](const void* value) {},
+						[&](const char* value) {},
+						[](const bzd::StringView&) {}
+					);
+				}
+				void onError(const bzd::StringView& message) const {}
+
+			private:
+				bzd::OStream& stream_;
+				const bzd::interface::Vector<bzd::impl::format::Arg>& args_;
+			};
+
+			template <class T>
+			constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, const T& tuple)
+			{
+				Context<CheckContext> ctx;
+				parse(ctx, format, tuple);
+				return ctx;
+			}
+
+			void print(bzd::OStream& stream, const bzd::StringView& format, const bzd::interface::Vector<bzd::impl::format::Arg>& args)
+			{
+				Context<PrintContext> ctx(stream, args);
+				parse(ctx, format, args);
+			}
+
+			/**
+			 * \brief Check the format context.
+			 * 
+			 * Check the format context with the argument type, this to ensure type safety.
+			 * This function should only be used at compile time.
+			 */
+			template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N > 0), void>::type* = nullptr>
+			constexpr bool contextCheck(const Ctx& context, const T& tuple)
+			{
+				auto value = tuple.template get<N-1>();
+				context.assertTrue(bzd::typeTraits::isConstructible<bzd::impl::format::Arg, decltype(value)>::value, "Argument type is not supported");
+
+				bool usedAtLeastOnce = false;
+				for (const auto& metadata : context)
+				{
+					if (metadata.index == N - 1)
+					{
+						usedAtLeastOnce = true;
+						switch (metadata.format)
 						{
-						case 'i':
-						case 'd':
-							bzd::toString(dest, arg);
-							format.removePrefix(1);
+						case Metadata::Format::BINARY_LOWER:
+						case Metadata::Format::BINARY_UPPER:
+						case Metadata::Format::OCTAL:
+						case Metadata::Format::HEXADECIMAL_LOWER:
+						case Metadata::Format::HEXADECIMAL_UPPER:
+							context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Argument must an integral");
 							break;
-						case '}':
-							bzd::toString(dest, arg);
+						case Metadata::Format::DECIMAL:
+						case Metadata::Format::FIXED_POINT:
+						case Metadata::Format::FIXED_POINT_PERCENT:
+							context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>::value, "Argument must arithmetic");
 							break;
-						}
-						if (format.front() == '}')
-						{
-							format.removePrefix(1);
+						case Metadata::Format::POINTER:
+							break;
+						case Metadata::Format::AUTO:
+							break;
 						}
 					}
-				} while (format.size());
+				}
+
+				context.assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
+				return contextCheck<N-1>(context, tuple);
+			}
+
+			template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N == 0), void>::type* = nullptr>
+			constexpr bool contextCheck(const Ctx&, const T&)
+			{
+				return true;
 			}
 		}
 	}
 
-	template <class... Args>
-	constexpr void format(bzd::OStream& dest, bzd::StringView fmt, Args&&... args)
+	template <class F, class... Args>
+	constexpr inline void format(bzd::OStream& out, const F& f, Args&&... args)
 	{
-		const bzd::Tuple<Args...> tuple(bzd::forward<Args>(args)...);
-		bzd::impl::format::formatProcessString(dest, fmt, tuple);
-	}
+		// Compile-time format check
+		constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
+		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
+		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
-	template <class... Args>
-	constexpr void format(bzd::interface::String& dest, bzd::StringView fmt, Args&&... args)
-	{
-		dest.clear();
-		bzd::interface::StringStream sstream(dest);
-		format(sstream, fmt, bzd::forward<Args>(args)...);
+	/*	bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList;
+		for (SizeType i = 0; i < argList.size(); ++i)
+		{
+			*(argList[i].template get<int>()) = 45;
+		}
+*/
+		//bzd::impl::format::ConstexprVector<bzd::impl::format::Arg, 5> temp(5, 32, 22);
+
+		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<Args>(args)...);
+
+		// Run-time call
+		bzd::impl::format::print(out, f.str(), argList);
 	}
 }
