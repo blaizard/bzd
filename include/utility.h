@@ -99,6 +99,22 @@ namespace bzd
 		t2 = bzd::move(temp);
 	}
 
+	// min
+
+	template <class T>
+	constexpr T min(const T& a, const T& b) noexcept
+	{
+		return (a < b) ? a : b;
+	}
+
+	// max
+
+	template <class T>
+	constexpr T max(const T& a, const T& b) noexcept
+	{
+		return (a > b) ? a : b;
+	}
+
 	// decay
 
 	template <class T>

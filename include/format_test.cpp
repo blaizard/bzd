@@ -198,4 +198,9 @@ TEST(Format_, StringFormat)
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {}"), "World");
 		EXPECT_STREQ(stream.str().data(), "Hello World");
 	}
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:.2}"), "World");
+		EXPECT_STREQ(stream.str().data(), "Hello Wo");
+	}
 }
