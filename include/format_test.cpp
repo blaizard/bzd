@@ -155,9 +155,46 @@ TEST(Format_, ParseMetadataSign)
 	}
 }
 
+TEST(Format_, ParseMetadataPrecision)
+{
+	{
+		Context ctx;
+		bzd::StringView str(":.3f}");
+		auto metadata = parseMetadata(ctx, str, 0);
+		EXPECT_TRUE(metadata.isPrecision);
+		EXPECT_EQ(metadata.precision, 3);
+	}
+}
+
 TEST(Format_, StringFormat)
 {
-	bzd::StringStream<256> stream;
-	bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:d}"), 12);
-	EXPECT_STREQ(stream.str().data(), "Hello 12");
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:d}"), 12);
+		EXPECT_STREQ(stream.str().data(), "Hello 12");
+	}
+
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {1} {0:d}"), 12, -89);
+		EXPECT_STREQ(stream.str().data(), "Hello -89 12");
+	}
+
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:f}"), 12.45);
+		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
+	}
+
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:.3f}"), 12.45);
+		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
+	}
+
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:%}"), 0.15);
+		EXPECT_STREQ(stream.str().data(), "Hello 15.%");
+	}
 }

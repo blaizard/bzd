@@ -91,8 +91,6 @@ namespace bzd
 				bzd::SizeType index = 0;
 				Sign sign = Sign::AUTO;
 				bool alternate = false;
-				bool isWidth = false;
-				bzd::SizeType width = 0;
 				bool isPrecision = false;
 				bzd::SizeType precision = 0;
 				Format format = Format::AUTO;
@@ -224,9 +222,8 @@ namespace bzd
 			 * 
 			 * Format compatible with python format (with some exceptions)
 			 * 
-			 * format_spec ::=  [sign][#][width][.precision][type]
+			 * format_spec ::=  [sign][#][.precision][type]
 			 * sign        ::=  "+" | "-" | " "
-			 * width       ::=  integer
 			 * precision   ::=  integer
 			 * type        ::=  "b" | "B" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
 			 */
@@ -255,13 +252,10 @@ namespace bzd
 					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
 				}
 
-				// Parse width [width]
-				metadata.isWidth = parseUnsignedInteger(metadataStr, metadata.width);
-				context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after width)");
-
 				// Parse precision [.precision]
 				if (metadataStr.front() == '.')
 				{
+					metadataStr.removePrefix(1);
 					metadata.isPrecision = parseUnsignedInteger(metadataStr, metadata.precision);
 					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
 				}
@@ -299,7 +293,7 @@ namespace bzd
 						metadata.format = Metadata::Format::POINTER;
 						break;
 					default:
-						context.onError("Unsupported conversion format");
+						context.onError("Unsupported conversion format, only the following is supported: [bBdoxXfp%]");
 					}
 					metadataStr.removePrefix(1);
 					context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
@@ -414,14 +408,42 @@ namespace bzd
 					//bzd::impl::to_string::integer<2>(stream, bzd::forward<T>(value));
 					break;
 				case Metadata::Format::HEXADECIMAL_LOWER:
-				case Metadata::Format::HEXADECIMAL_UPPER:
 					toStringHex(stream, value);
+					break;
+				case Metadata::Format::HEXADECIMAL_UPPER:
+					toStringHex(stream, value, "0123456789ABCDEF");
 					break;
 				case Metadata::Format::OCTAL:
 					toStringOct(stream, value);
 					break;
 				case Metadata::Format::FIXED_POINT:
 				case Metadata::Format::FIXED_POINT_PERCENT:
+				case Metadata::Format::POINTER:
+					break;
+				}
+			}
+
+			template <class T>
+			void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metadata)
+			{
+				switch (metadata.format)
+				{
+				case Metadata::Format::AUTO:
+				case Metadata::Format::DECIMAL:
+					toString(stream, value);
+					break;
+				case Metadata::Format::FIXED_POINT:
+					toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
+					break;
+				case Metadata::Format::FIXED_POINT_PERCENT:
+					toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+					stream.write(bzd::StringView("%"));
+					break;
+				case Metadata::Format::BINARY_LOWER:
+				case Metadata::Format::BINARY_UPPER:
+				case Metadata::Format::HEXADECIMAL_LOWER:
+				case Metadata::Format::HEXADECIMAL_UPPER:
+				case Metadata::Format::OCTAL:
 				case Metadata::Format::POINTER:
 					break;
 				}
@@ -440,9 +462,9 @@ namespace bzd
 						[&](const unsigned long long int value) { printInteger(stream_, value, metadata); },
 						[&](const bool value) {},
 						[&](const char value) {},
-						[&](const float value) {},
-						[&](const double value) {},
-						[&](const long double value) {},
+						[&](const float value) { printFixedPoint(stream_, value, metadata); },
+						[&](const double value) { printFixedPoint(stream_, value, metadata); },
+						[&](const long double value) { printFixedPoint(stream_, value, metadata); },
 						[&](const void* value) {},
 						[&](const char* value) {},
 						[](const bzd::StringView&) {}
@@ -529,17 +551,8 @@ namespace bzd
 		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
 		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
-	/*	bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList;
-		for (SizeType i = 0; i < argList.size(); ++i)
-		{
-			*(argList[i].template get<int>()) = 45;
-		}
-*/
-		//bzd::impl::format::ConstexprVector<bzd::impl::format::Arg, 5> temp(5, 32, 22);
-
-		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<Args>(args)...);
-
 		// Run-time call
+		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<Args>(args)...);
 		bzd::impl::format::print(out, f.str(), argList);
 	}
 }

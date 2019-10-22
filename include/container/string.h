@@ -6,6 +6,8 @@
 #include "include/container/string_view.h"
 #include "include/type_traits/const_volatile.h"
 
+#include <iostream>
+
 namespace bzd
 {
 	namespace impl
