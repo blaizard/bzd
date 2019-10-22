@@ -422,7 +422,16 @@ namespace bzd
 				switch (metadata.format)
 				{
 				case Metadata::Format::AUTO:
-					stream.write(bzd::StringView(value));
+					{
+						const bzd::StringView stringView(value);
+						if (metadata.isPrecision)
+						{
+							stream.write(stringView.substr(0, bzd::min(metadata.precision, stringView.size())));
+						}
+						else {
+							stream.write(stringView);
+						}
+					}
 					break;
 				case Metadata::Format::FIXED_POINT:
 				case Metadata::Format::FIXED_POINT_PERCENT:
