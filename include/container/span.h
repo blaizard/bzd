@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/types.h"
+#include "include/utility.h"
 #include "include/type_traits/utils.h"
 #include "include/type_traits/const_volatile.h"
 
@@ -31,10 +32,24 @@ namespace bzd
 				return *this;
 			}
 
+			constexpr Iterator operator++(int) noexcept
+			{
+				auto it = *this;
+				++index_;
+				return it;
+			}
+
 			constexpr Iterator& operator--() noexcept
 			{
 				--index_;
 				return *this;
+			}
+
+			constexpr Iterator operator--(int) noexcept
+			{
+				auto it = *this;
+				--index_;
+				return it;
 			}
 
 			constexpr Iterator operator-(const int n) const noexcept
@@ -97,10 +112,24 @@ namespace bzd
 				return *this;
 			}
 
+			constexpr ConstIterator operator++(int) noexcept
+			{
+				auto it = *this;
+				++index_;
+				return it;
+			}
+
 			constexpr ConstIterator& operator--() noexcept
 			{
 				--index_;
 				return *this;
+			}
+
+			constexpr ConstIterator operator--(int) noexcept
+			{
+				auto it = *this;
+				--index_;
+				return it;
 			}
 
 			constexpr ConstIterator operator-(const int n) const noexcept
@@ -136,7 +165,7 @@ namespace bzd
 
 			constexpr bool operator!=(const ConstIterator& it) const noexcept
 			{
-				return !(it == *this);
+				return it.index_ != index_;
 			}
 
 			constexpr const DataType& operator*() const
@@ -197,6 +226,15 @@ namespace bzd
 		constexpr SizeType size() const noexcept
 		{
 			return size_;
+		}
+
+		constexpr void reverse() noexcept
+		{
+			SizeType counter = size_ / 2;
+			while (counter--)
+			{
+				bzd::swap(data_[counter], data_[size_ - counter - 1]);
+			}
 		}
 
 		template<class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>

@@ -136,3 +136,26 @@ TEST(ContainerString, Copy)
 	EXPECT_STREQ(copy2.data(), "Hello");
 }
 
+TEST(ContainerString, Reverse)
+{
+    {
+        bzd::String<6> test("Hello");
+        test.reverse();
+        EXPECT_STREQ(test.data(), "olleH");
+    }
+    {
+        bzd::String<6> test("Hell");
+        test.reverse();
+        EXPECT_STREQ(test.data(), "lleH");
+    }
+    {
+        bzd::String<6> test("");
+        test.reverse();
+        EXPECT_STREQ(test.data(), "");
+    }
+    {
+        bzd::String<6> test("a");
+        test.reverse();
+        EXPECT_STREQ(test.data(), "a");
+    }
+}
