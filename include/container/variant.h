@@ -56,6 +56,38 @@ namespace bzd
 			template <template<class> class F, class... Args>
 			using Helper = HelperT<0, sizeof...(Ts) - 1, F, Args...>;
 
+			// Overload
+			template <class... Fs>
+			struct Overload;
+
+			template <class F0, class... Frest>
+			struct Overload<F0, Frest...> : F0, Overload<Frest...>
+			{
+    			Overload(F0&& f0, Frest&&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
+				using F0::operator();
+				using Overload<Frest...>::operator();
+			};
+
+			template <class F0>
+			struct Overload<F0> : F0
+			{
+				Overload(F0&& f0) : F0{bzd::forward<F0>(f0)} {}
+				using F0::operator();
+			};
+
+			// Match
+			template <class T>
+			struct VariantMatch
+			{
+				template <class V>
+				static void call(const Self& self, const V& visitor)
+				{
+					visitor(self.data_.template get<T>());
+				}
+			};
+			template <class V>
+			using Match = Helper<VariantMatch, const Self&, V&>;
+
 		public:
 			/**
 			 * Default constructor
@@ -92,6 +124,13 @@ namespace bzd
 					return data_.template get<T>();
 				}
 				return bzd::makeUnexpected(false);
+			}
+
+			template <class... Functors>
+			constexpr void match(Functors&&... funcs) const
+			{
+				const Overload<typename bzd::typeTraits::removeReference<Functors>::type...> visitor{bzd::forward<Functors>(funcs)...};
+				Match<decltype(visitor)>::call(id_, *this, visitor);
 			}
 
 		protected:
@@ -144,7 +183,7 @@ namespace bzd
 		{
 			static void call(Self* self)
 			{
-				reinterpret_cast<T*>(&(self->data_.template get<T>()))->~T();
+				self->data_.template get<T>().~T();
 			}
 		};
 		using Destructor = Helper<VariantDestructor, Self*>;
