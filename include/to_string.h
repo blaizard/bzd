@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "include/container/vector.h"
 #include "include/container/string.h"
 #include "include/container/iostream.h"
 #include "include/container/string_stream.h"
@@ -91,7 +92,7 @@ namespace bzd
 		bzd::impl::to_string::fixedPoint(stream, data, maxPrecision);
 	}
 
-	template <class T>
+	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
 	constexpr void toStringHex(bzd::OStream& stream, const T& data, const char* const digits = bzd::impl::to_string::digits)
 	{
 		bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
@@ -99,12 +100,38 @@ namespace bzd
 		stream.write(buffer);
 	}
 
-	template <class T>
+	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
 	constexpr void toStringOct(bzd::OStream& stream, const T& data)
 	{
 		bzd::String<32> buffer;
 		bzd::impl::to_string::integer<8>(buffer, data);
 		stream.write(buffer);
+	}
+
+	template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+	constexpr void toStringBin(bzd::OStream& stream, const T& data)
+	{
+		bzd::Vector<unsigned int, 4> shortList;
+		T number = data;
+		while (number)
+		{
+			shortList.pushBack(static_cast<unsigned int>(number & 0xffff));
+			number >>= 16;
+		}
+
+		bzd::String<16> buffer;
+		for (int i = static_cast<int>(shortList.size()) - 1; i >= 0; --i)
+		{
+			bzd::impl::to_string::integer<2>(buffer, shortList[i]);
+			if (i < static_cast<int>(shortList.size()) - 1)
+			{
+				// Fill the string with zeros
+				const auto n = 16 - buffer.size();
+				bzd::String<16> padding(n, '0');
+				stream.write(padding);
+			}
+			stream.write(buffer);
+		}
 	}
 
 	void toString(bzd::OStream& stream, const bzd::StringView& data)
