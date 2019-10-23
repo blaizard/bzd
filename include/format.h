@@ -98,33 +98,6 @@ namespace bzd
 			using Arg = bzd::VariantConstexpr<int, unsigned int, long long int, unsigned long long int,
 					bool, char, float, double, long double, const void*, const char*, bzd::StringView>;
 			using ArgList = bzd::interface::Vector<Arg>;
-/*
-  none_type,
-
-  cstring_type,
-  string_type,
-  pointer_type,
-  custom_type
-
-  ------
-
-    int int_value;
-    unsigned uint_value;
-    long long long_long_value;
-    unsigned long long ulong_long_value;
-    int128_t int128_value;
-    uint128_t uint128_value;
-    bool bool_value;
-    char_type char_value;
-    float float_value;
-    double double_value;
-    long double long_double_value;
-    const void* pointer;
-    string_value<char_type> string;
-    custom_value<Context> custom;
-    const named_arg_base<char_type>* named_arg;
-*/
-
 
 			/**
 			 * Parse an unsigned integer
@@ -204,7 +177,7 @@ namespace bzd
 			{
 				const auto endIndex = format.find('}');
 				context.assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
-				auto metadataStr = format.substr(0, endIndex + 1);
+				auto metadataStr = format.subStr(0, endIndex + 1);
 
 				Metadata metadata;
 
@@ -296,7 +269,7 @@ namespace bzd
 
 					if (format[offset] == c)
 					{
-						context.addSubstring(format.substr(0, offset));
+						context.addSubstring(format.subStr(0, offset));
 						format.removePrefix(offset + 1);
 						offset = 0;
 						continue;
@@ -310,7 +283,7 @@ namespace bzd
 
 				if (offset)
 				{
-					context.addSubstring(format.substr(0, offset));
+					context.addSubstring(format.subStr(0, offset));
 					format.removePrefix(offset);
 				}
 
@@ -362,7 +335,6 @@ namespace bzd
 				void onError(const bzd::StringView& message) const;
 			};
 
-
 			template <class T>
 			void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata)
 			{
@@ -373,7 +345,7 @@ namespace bzd
 					toString(stream, value);
 					break;
 				case Metadata::Format::BINARY:
-					//bzd::impl::to_string::integer<2>(stream, bzd::forward<T>(value));
+					toStringBin(stream, value);
 					break;
 				case Metadata::Format::HEXADECIMAL_LOWER:
 					toStringHex(stream, value);
@@ -426,7 +398,7 @@ namespace bzd
 						const bzd::StringView stringView(value);
 						if (metadata.isPrecision)
 						{
-							stream.write(stringView.substr(0, bzd::min(metadata.precision, stringView.size())));
+							stream.write(stringView.subStr(0, bzd::min(metadata.precision, stringView.size())));
 						}
 						else
 						{

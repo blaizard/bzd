@@ -36,8 +36,23 @@ namespace bzd
 			{
 				// Handles overflows
 				const SizeType sizeLeft = capacity_ - size_ - 1;
-				const SizeType actualN = (sizeLeft < n) ? sizeLeft : n;
+				const SizeType actualN = bzd::min(sizeLeft, n);
 				bzd::memcpy(&Parent::at(size_), data, actualN);
+				size_ += actualN;
+				Parent::at(size_) = '\0';
+
+				return actualN;
+			}
+
+			// Fill
+			constexpr SizeType append(const SizeType n, const T c) noexcept
+			{
+				const SizeType sizeLeft = capacity_ - size_ - 1;
+				const SizeType actualN = bzd::min(sizeLeft, n);
+				for (SizeType i = 0; i < actualN; ++i)
+				{
+					Parent::at(size_ + i) = c;
+				}
 				size_ += actualN;
 				Parent::at(size_) = '\0';
 
@@ -97,6 +112,7 @@ namespace bzd
 	public:
 		constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
 		constexpr String(const bzd::StringView& str) : String() { append(str); }
+		constexpr String(const SizeType n, const char c) : String() { append(n, c); }
 
 		template <class T>
 		constexpr String<N>& operator=(const T& data) noexcept

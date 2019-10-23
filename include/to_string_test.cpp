@@ -43,6 +43,23 @@ TEST(ToString, Float)
     EXPECT_STREQ(str.data(), "13.");
 }
 
+TEST(ToString, ToStringBin)
+{
+	bzd::StringStream<128> stream;
+
+	stream.str().clear();
+	bzd::toStringBin(stream, 16);
+    EXPECT_STREQ(stream.str().data(), "10000");
+
+	stream.str().clear();
+	bzd::toStringBin(stream, 0xffffff);
+    EXPECT_STREQ(stream.str().data(), "111111111111111111111111");
+
+	stream.str().clear();
+	bzd::toStringBin(stream, 0xff0001);
+    EXPECT_STREQ(stream.str().data(), "111111110000000000000001");
+}
+
 TEST(ToString, Overflow)
 {
 	{
