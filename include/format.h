@@ -428,7 +428,8 @@ namespace bzd
 						{
 							stream.write(stringView.substr(0, bzd::min(metadata.precision, stringView.size())));
 						}
-						else {
+						else
+						{
 							stream.write(stringView);
 						}
 					}

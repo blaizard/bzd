@@ -83,35 +83,11 @@ namespace bzd
 			template <SizeType M> using pick = bzd::tmp::ChooseNth<M, T...>;
 			template <SizeType M> using elem = TupleElem<M, pick<M>>;
 
-			template <SizeType Index, typename typeTraits::enableIf<(Index > 0 && Index < sizeof...(N))>::type* = nullptr>
-			constexpr auto getByIndex(const SizeType i) const
-			{
-				return (i == Index) ? get<Index>() : getByIndex<Index - 1>(i);
-			}
-
-			template <SizeType Index, typename typeTraits::enableIf<Index == 0>::type* = nullptr>
-			constexpr auto getByIndex(const SizeType i) const
-			{
-				return get<0>();
-			}
-
-			template <SizeType Index, typename typeTraits::enableIf<Index >= sizeof...(N)>::type* = nullptr>
-			constexpr auto getByIndex(const SizeType i) const
-			{
-				// Out of range error (assert)
-				return 0;
-			}
-
 		public:
 			template <class... Args>
 			constexpr TupleImpl(Args&&... args) noexcept
 					: TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
 			{
-			}
-
-			constexpr auto get(const SizeType i) const noexcept
-			{
-				return getByIndex<sizeof...(N) - 1>(i);
 			}
 
 			// Access by index as template (type is automatically deducted)
