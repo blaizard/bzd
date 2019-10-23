@@ -203,4 +203,14 @@ TEST(Format_, StringFormat)
 		bzd::format(stream, CONSTEXPR_STRING_VIEW("Hello {:.2}"), "World");
 		EXPECT_STREQ(stream.str().data(), "Hello Wo");
 	}
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("This {1} is {0:.1%}"), 0.0349, "milk");
+		EXPECT_STREQ(stream.str().data(), "This milk is 3.5%");
+	}
+	{
+		bzd::StringStream<256> stream;
+		bzd::format(stream, CONSTEXPR_STRING_VIEW("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
+		EXPECT_STREQ(stream.str().data(), "42 == 0b101010 == 0o52 == 0x2a == 0x2A");
+	}
 }

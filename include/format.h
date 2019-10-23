@@ -345,15 +345,31 @@ namespace bzd
 					toString(stream, value);
 					break;
 				case Metadata::Format::BINARY:
+					if (metadata.alternate)
+					{
+						stream.write({"0b", 2});
+					}
 					toStringBin(stream, value);
 					break;
 				case Metadata::Format::HEXADECIMAL_LOWER:
+					if (metadata.alternate)
+					{
+						stream.write({"0x", 2});
+					}
 					toStringHex(stream, value);
 					break;
 				case Metadata::Format::HEXADECIMAL_UPPER:
+					if (metadata.alternate)
+					{
+						stream.write({"0x", 2});
+					}
 					toStringHex(stream, value, "0123456789ABCDEF");
 					break;
 				case Metadata::Format::OCTAL:
+					if (metadata.alternate)
+					{
+						stream.write({"0o", 2});
+					}
 					toStringOct(stream, value);
 					break;
 				case Metadata::Format::FIXED_POINT:
@@ -396,14 +412,7 @@ namespace bzd
 				case Metadata::Format::AUTO:
 					{
 						const bzd::StringView stringView(value);
-						if (metadata.isPrecision)
-						{
-							stream.write(stringView.subStr(0, bzd::min(metadata.precision, stringView.size())));
-						}
-						else
-						{
-							stream.write(stringView);
-						}
+						stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
 					}
 					break;
 				case Metadata::Format::FIXED_POINT:
