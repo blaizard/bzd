@@ -4,7 +4,7 @@
 #include "include/utility.h"
 #include "include/type_traits/utils.h"
 #include "include/type_traits/const_volatile.h"
-#include "include/container/iterator/contiguous_iterator.h"
+#include "include/container/iterator/contiguous.h"
 
 namespace bzd
 {
@@ -17,8 +17,8 @@ namespace bzd
 		using IsConst = typename bzd::typeTraits::isConst<DataType>;
 
 	public:
-		using Iterator = IteratorContiguous<Span, DataType>;
-		using ConstIterator = IteratorContiguous<const Span, const DataType>;
+		using Iterator = bzd::iterator::Contiguous<DataType>;
+		using ConstIterator = bzd::iterator::Contiguous<const DataType>;
 
 		static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
@@ -37,18 +37,18 @@ namespace bzd
 		template<class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
 		constexpr Iterator begin() noexcept
 		{
-			return Iterator(*this, 0);
+			return Iterator(data_, 0);
 		}
 
 		template<class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
 		constexpr Iterator end() noexcept
 		{
-			return Iterator(*this, size());
+			return Iterator(data_, size());
 		}
 
 		constexpr ConstIterator begin() const noexcept
 		{
-			return ConstIterator(*this, 0);
+			return ConstIterator(data_, 0);
 		}
 
 		constexpr ConstIterator cbegin() const noexcept
@@ -58,7 +58,7 @@ namespace bzd
 
 		constexpr ConstIterator end() const noexcept
 		{
-			return ConstIterator(*this, size());
+			return ConstIterator(data_, size());
 		}
 
 		constexpr ConstIterator cend() const noexcept
