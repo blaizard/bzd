@@ -4,6 +4,7 @@
 #include "include/utility.h"
 #include "include/type_traits/utils.h"
 #include "include/type_traits/const_volatile.h"
+#include "include/container/iterator/contiguous_iterator.h"
 
 namespace bzd
 {
@@ -16,168 +17,10 @@ namespace bzd
 		using IsConst = typename bzd::typeTraits::isConst<DataType>;
 
 	public:
+		using Iterator = IteratorContiguous<Span, DataType>;
+		using ConstIterator = IteratorContiguous<const Span, const DataType>;
+
 		static constexpr const SizeType npos = static_cast<SizeType>(-1);
-
-		class Iterator
-		{
-		public:
-			constexpr Iterator(SelfType& span, const SizeType index)
-				: span_(&span), index_(index)
-			{
-			}
-
-			constexpr Iterator& operator++() noexcept
-			{
-				++index_;
-				return *this;
-			}
-
-			constexpr Iterator operator++(int) noexcept
-			{
-				auto it = *this;
-				++index_;
-				return it;
-			}
-
-			constexpr Iterator& operator--() noexcept
-			{
-				--index_;
-				return *this;
-			}
-
-			constexpr Iterator operator--(int) noexcept
-			{
-				auto it = *this;
-				--index_;
-				return it;
-			}
-
-			constexpr Iterator operator-(const int n) const noexcept
-			{
-				Iterator it(*this);
-				it.index_ -= n;
-				return it;
-			}
-
-			constexpr Iterator operator+(const int n) const noexcept
-			{
-				Iterator it(*this);
-				it.index_ += n;
-				return it;
-			}
-
-			constexpr Iterator& operator-=(const int n) noexcept
-			{
-				index_ -= n;
-				return *this;
-			}
-
-			constexpr Iterator& operator+=(const int n) noexcept
-			{
-				index_ += n;
-				return *this;
-			}
-
-			constexpr bool operator==(const Iterator& it) const noexcept
-			{
-				return it.index_ == index_;
-			}
-
-			constexpr bool operator!=(const Iterator& it) const noexcept
-			{
-				return !(it == *this);
-			}
-
-			constexpr DataType& operator*()
-			{
-				return (*span_)[index_];
-			}
-
-		private:
-			SelfType* span_;
-			SizeType index_;
-		};
-
-		class ConstIterator
-		{
-		public:
-			constexpr ConstIterator(const SelfType& span, const SizeType index)
-				: span_(&span), index_(index)
-			{
-			}
-
-			constexpr ConstIterator& operator++() noexcept
-			{
-				++index_;
-				return *this;
-			}
-
-			constexpr ConstIterator operator++(int) noexcept
-			{
-				auto it = *this;
-				++index_;
-				return it;
-			}
-
-			constexpr ConstIterator& operator--() noexcept
-			{
-				--index_;
-				return *this;
-			}
-
-			constexpr ConstIterator operator--(int) noexcept
-			{
-				auto it = *this;
-				--index_;
-				return it;
-			}
-
-			constexpr ConstIterator operator-(const int n) const noexcept
-			{
-				ConstIterator it(*this);
-				it.index_ -= n;
-				return it;
-			}
-
-			constexpr ConstIterator operator+(const int n) const noexcept
-			{
-				ConstIterator it(*this);
-				it.index_ += n;
-				return it;
-			}
-
-			constexpr ConstIterator& operator-=(const int n) noexcept
-			{
-				index_ -= n;
-				return *this;
-			}
-
-			constexpr ConstIterator& operator+=(const int n) noexcept
-			{
-				index_ += n;
-				return *this;
-			}
-
-			constexpr bool operator==(const ConstIterator& it) const noexcept
-			{
-				return it.index_ == index_;
-			}
-
-			constexpr bool operator!=(const ConstIterator& it) const noexcept
-			{
-				return it.index_ != index_;
-			}
-
-			constexpr const DataType& operator*() const
-			{
-				return (*span_)[index_];
-			}
-
-		private:
-			// A pointer is required here in order to enable copy (operator=)
-			const SelfType* span_;
-			SizeType index_;
-		};
 
 	public:
 		constexpr Span(DataType* const data, const SizeType size) noexcept
