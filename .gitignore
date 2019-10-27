@@ -2,6 +2,9 @@
 *.o
 *.d
 
+# Python
+__pycache__/
+
 # Bazel
 bazel-*
 
