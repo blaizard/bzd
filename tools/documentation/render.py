@@ -1,9 +1,12 @@
+#!/usr/bin/python3
+# -*- coding: iso-8859-1 -*-
+
 import re
 
 class Render:
 
 	def __init__(self):
-		pass
+		self.groups = {}
 
 	def printMemberDefinition(self, member):
 		formatStr = "{name}"
@@ -36,25 +39,25 @@ class Render:
 
 		return re.sub(' +', ' ', definition.strip())
 
-	def processMembers(self, members, namespaceList):
-		print("processMembers", namespaceList)
+	def processMembers(self, member, namespaceList):
+		namespace = "::".join(namespaceList[:-1])
+		self.groups[namespace] = self.groups[namespace] if namespace in self.groups else []
+		self.groups[namespace].append(member)
 
-		"::".join(namespaceList)
-		for identifier, member in members.items():
-			print(self.printMemberDefinition(member))
-			if "__members__" in member:
-				namespaceList.append(member["name"])
-				self.processMembers(member["__members__"], namespaceList)
-				namespaceList.pop()
-
-	def processNamespace(self, data, namespaceList):
+	def makeGroups(self, data, namespaceList = []):
 		for namespace, definition in data.items():
-			if namespace == "__members__":
+			if namespace == "__info__":
 				self.processMembers(definition, namespaceList)
 			else:
 				namespaceList.append(namespace)
-				self.processNamespace(definition, namespaceList)
+				self.makeGroups(definition, namespaceList)
 				namespaceList.pop()
 
 	def process(self, data):
-		self.processNamespace(data, [])
+		self.makeGroups(data)
+
+		for namespace, members in self.groups.items():
+			print(namespace)
+			for member in members:
+				print(" - %s" % (self.printMemberDefinition(member)))
+

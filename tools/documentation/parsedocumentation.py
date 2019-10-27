@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: iso-8859-1 -*-
+
 import os
 import re
 import xml.etree.ElementTree as ET
@@ -106,10 +109,20 @@ class DoxygenParser:
 		if value != None:
 			data["__info__"] = data["__info__"] if "__info__" in data else {}
 			if key in data["__info__"]:
-				self.assertTrue(data["__info__"][key] == value, "Overriding key '{}' with a different value '{}' vs '{}'", key, data["__info__"][key], value)
+				self.assertTrue(data["__info__"][key] == value, "Overriding key '{}' with a different value '{}' vs '{}': {}", key, data["__info__"][key], value, data)
 			data["__info__"][key] = value
 			return data["__info__"][key]
 		return None
+
+	"""
+	Add member list
+	"""
+	def addMemberList(self, data, key):
+		data["__info__"] = data["__info__"] if "__info__" in data else {}
+		if key not in data["__info__"]:
+			data["__info__"][key] = []
+		self.assertTrue(isinstance(data["__info__"][key], list), "The key '{}' must be a list", key)
+		return data["__info__"][key]
 
 	"""
 	Parse the attributes of the current element and return a dictionary
@@ -191,9 +204,9 @@ class DoxygenParser:
 						if "member" in definition["__type__"]:
 							current = {}
 						if "template" in definition["__type__"]:
-							current = self.addMemberInfo(current, "template", [])
+							current = self.addMemberList(current, "template")
 						if "args" in definition["__type__"]:
-							current = self.addMemberInfo(current, "args", [])
+							current = self.addMemberList(current, "args")
 						if "list" in definition["__type__"]:
 							self.assertTrue(isinstance(current, list), "Data must be a list '{}'", current)
 							current.append({})
@@ -222,8 +235,10 @@ root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected.xml').getroot()
 parser.parse(root, dictionary)
 root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1RefWrapper.xml').getroot()
 parser.parse(root, dictionary)
-#root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4.xml').getroot()
-#parser.parse(root, dictionary)
+root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4.xml').getroot()
+parser.parse(root, dictionary)
+root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1ValueWrapper.xml').getroot()
+parser.parse(root, dictionary)
 
 #root = ET.parse('docs/xml/namespacebzd.xml').getroot()
 #parser.parse(root, dictionary)
@@ -231,5 +246,5 @@ parser.parse(root, dictionary)
 pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(parser.data)
 
-#render = Render()
-#render.process(parser.data)
+render = Render()
+render.process(parser.data)
