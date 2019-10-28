@@ -5,9 +5,11 @@ import os
 import re
 import xml.etree.ElementTree as ET
 import pprint
+import glob
 from render import Render
 
 commonAttrs = {
+	"id": {},
 	"kind": {}, # "values": ["struct", "class", "variable", "function", "typedef", "dir", "file", "page", "namespace"] },
 	"prot": { "values": ["private", "public", "protected"], "key": "visibility" },
 	"static": { "values": {"no": False, "yes": True} },
@@ -40,12 +42,25 @@ templateparamlist = {
 	"param": param
 }
 
+node = {
+	"__type__": ["list"],
+	"label": { "__content__": { "key": "name" } },
+	"link": { "__attrs__": { "refid": { "key": "link" } } },
+	"childnode": { "__attrs__": { "relation": { "key": "visibility", "values": { "public-inheritance": "public", "private-inheritance": "private", "protected-inheritance": "protected" } } } }
+}
+
+inheritancegraph = {
+	"__type__": ["inheritance"],
+	"node": node
+}
+
 memberdef = {
 	"__type__": ["member"],
 	"__attrs__": commonAttrs,
 	"name": name,
 	"type": { "__content__": { "key": "type" } },
 	"templateparamlist": templateparamlist,
+	"inheritancegraph": inheritancegraph,
 	"param": args
 }
 
@@ -62,7 +77,8 @@ compounddef = {
 	"__attrs__": commonAttrs,
 	"compoundname": compoundname,
 	"sectiondef": sectiondef,
-	"templateparamlist": templateparamlist
+	"templateparamlist": templateparamlist,
+	"inheritancegraph": inheritancegraph,
 }
 
 dictionary = {
@@ -226,6 +242,8 @@ class DoxygenParser:
 							current = self.addMemberList(current, "template")
 						if "args" in definition["__type__"]:
 							current = self.addMemberList(current, "args")
+						if "inheritance" in definition["__type__"]:
+							current = self.addMemberList(current, "inheritance")
 						if "list" in definition["__type__"]:
 							self.assertTrue(isinstance(current, list), "Data must be a list '{}'", current)
 							current.append({})
@@ -244,23 +262,23 @@ class DoxygenParser:
 
 parser = DoxygenParser()
 
-#fileList = os.listdir("docs/xml")
-#for fileName in fileList:
-#	if fileName.lower().endswith(".xml"):
-#		root = ET.parse(os.path.join("docs/xml", fileName)).getroot()
-#		parser.parse(root, dictionary)
+fileList = glob.glob("docs/xml/*Expected*")
+for fileName in fileList:
+	if fileName.lower().endswith(".xml"):
+		root = ET.parse(fileName).getroot()
+		parser.parse(root, dictionary)
 
-root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected.xml').getroot()
-parser.parse(root, dictionary)
-root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1RefWrapper.xml').getroot()
-parser.parse(root, dictionary)
-root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4.xml').getroot()
-parser.parse(root, dictionary)
-root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1ValueWrapper.xml').getroot()
-parser.parse(root, dictionary)
+#root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected.xml').getroot()
+#parser.parse(root, dictionary)
+#root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1RefWrapper.xml').getroot()
+#parser.parse(root, dictionary)
+#root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4.xml').getroot()
+#parser.parse(root, dictionary)
+#root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1ValueWrapper.xml').getroot()
+#parser.parse(root, dictionary)
 
-root = ET.parse('docs/xml/namespacebzd.xml').getroot()
-parser.parse(root, dictionary)
+#root = ET.parse('docs/xml/namespacebzd.xml').getroot()
+#parser.parse(root, dictionary)
 
 pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(parser.data)
