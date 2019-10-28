@@ -89,14 +89,24 @@ class DoxygenParser:
 
 	def __init__(self):
 		self.data = {}
+		self.groups = {}
 
 	"""
 	Write a warning message
 	"""
 	def assertTrue(self, condition, message, *argv):
 		if not condition:
-			print("[warning] %s" % (message.format(*argv)))
+			print("[error] %s" % (message.format(*argv)))
 			raise Exception("Assert failed")
+
+	"""
+	Write a warning message
+	"""
+	def assertTrueWarning(self, condition, message, *argv):
+		if not condition:
+			print("[warning] %s" % (message.format(*argv)))
+			return True
+		return False
 
 	"""
 	Parse a value and returns a key value pair
@@ -223,10 +233,75 @@ class DoxygenParser:
 		return member1
 
 	"""
+	Merge links together
+	"""
+	def mergeLinks(self, data):
+		# Gather all links and their references
+		for namespace, definition in data.items():
+			pass
+
+	"""
+	Format the data into groups
+	"""
+	def makeGroups(self, data, namespaceList = []):
+		for namespace, definition in data.items():
+			if namespace == "__info__":
+				namespaceStr = "::".join(namespaceList[:-1])
+				self.groups[namespaceStr] = self.groups[namespaceStr] if namespaceStr in self.groups else []
+				self.groups[namespaceStr].append(definition)
+			else:
+				namespaceList.append(namespace)
+				self.makeGroups(definition, namespaceList)
+				namespaceList.pop()
+
+	"""
+	Resolve and set links
+	"""
+	def resolveLinks(self):
+		links = {}
+
+		# Collect the list of IDs that must be set togther
+		for namespace, members in self.groups.items():
+			for member in members:
+				if "inheritance" in member:
+					# Default visibility is public
+					visibility = "public"
+					inheritance = []
+					for parent in member["inheritance"]:
+						if self.assertTrueWarning("link" in parent["__info__"], "Inheritance item does not have a link: {}", parent):
+							continue
+						visibility = parent["__info__"].get("visibility", visibility)
+						link = parent["__info__"]["link"]
+						# Register the link
+						if link != member.get("id", None):
+							inheritance.append({ "visibility": visibility })
+							links[link] = links[link] if link in links else []
+							links[link].append(inheritance[len(inheritance) - 1])
+					member["inheritance"] = inheritance
+
+		# Resolve links
+		for namespace, members in self.groups.items():
+			for member in members:
+				if "id" in member:
+					link = member["id"]
+					del member["id"]
+					if link in links:
+						linkId = "::".join([namespace, member["name"]])
+						for target in links[link]:
+							target["id"] = linkId
+
+	"""
 	Parse a root XML element
 	"""
 	def parse(self, root, dictionary):
 		self.parseSubElements(root, dictionary, {})
+
+	"""
+	Build the database and group data together
+	"""
+	def build(self):
+		self.makeGroups(self.data)
+		self.resolveLinks()
 
 	def parseSubElements(self, root, dictionary, data):
 
@@ -262,7 +337,7 @@ class DoxygenParser:
 
 parser = DoxygenParser()
 
-fileList = glob.glob("docs/xml/*Expected*")
+fileList = glob.glob("docs/xml/*String*")
 for fileName in fileList:
 	if fileName.lower().endswith(".xml"):
 		root = ET.parse(fileName).getroot()
@@ -281,7 +356,9 @@ for fileName in fileList:
 #parser.parse(root, dictionary)
 
 pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(parser.data)
+parser.build()
+
+pp.pprint(parser.groups)
 
 render = Render()
-render.process(parser.data)
+render.process(parser.groups)
