@@ -184,8 +184,27 @@ class DoxygenParser:
 	"""
 	def addMember(self, data, member):
 		identification = self.makeMemberId(member)
-		self.assertTrue(identification not in data, "Identifier already exists: {}", identification)
-		data[identification] = member
+		data[identification] = data[identification] if identification in data else {}
+		data[identification] = self.mergeMember(data[identification], member)
+
+	"""
+	Merge member2 into member1 and return it
+	"""
+	def mergeMember(self, member1, member2):
+
+		self.assertTrue(type(member1) == type(member2), "Cannot merge different types {} vs {}", member1, member2)
+
+		if isinstance(member2, dict):
+			for key, value in member2.items():
+				if key in member1:
+					member1[key] = self.mergeMember(member1[key], value)
+				else:
+					member1[key] = value
+		else:
+			self.assertTrue(not isinstance(member2, list), "Member is a list")
+			self.assertTrue(member1 == member2, "Trying to merge different members {} vs {}", member1, member2)
+
+		return member1
 
 	"""
 	Parse a root XML element
@@ -240,8 +259,8 @@ parser.parse(root, dictionary)
 root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1ValueWrapper.xml').getroot()
 parser.parse(root, dictionary)
 
-#root = ET.parse('docs/xml/namespacebzd.xml').getroot()
-#parser.parse(root, dictionary)
+root = ET.parse('docs/xml/namespacebzd.xml').getroot()
+parser.parse(root, dictionary)
 
 pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(parser.data)
