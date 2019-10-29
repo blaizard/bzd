@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1format_1_1ConstexprVector" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::format::ConstexprVector</compoundname>
+    <includes refid="format_8h" local="no">format.h</includes>
+    <innerclass refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1_1Iterator" prot="public">bzd::impl::format::ConstexprVector::Iterator</innerclass>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>SizeType</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="private-type">
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a212828ff66deb900ec374e769002fd2f" prot="private" static="no">
+        <type><ref refid="classbzd_1_1impl_1_1format_1_1ConstexprVector" kindref="compound">ConstexprVector</ref>&lt; T, N &gt;</type>
+        <definition>using bzd::impl::format::ConstexprVector&lt; T, N &gt;::SelfType =  ConstexprVector&lt;T, N&gt;</definition>
+        <argsstring></argsstring>
+        <name>SelfType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="34" column="1" bodyfile="include/format.h" bodystart="34" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1aa31520daa53f1e1f1bf2c7086f13abc2" prot="private" static="no">
+        <type>T</type>
+        <definition>using bzd::impl::format::ConstexprVector&lt; T, N &gt;::DataType =  T</definition>
+        <argsstring></argsstring>
+        <name>DataType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="35" column="1" bodyfile="include/format.h" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ac248ba4c2f67de4de99b8f0d44766e1e" prot="private" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::impl::format::ConstexprVector&lt; T, N &gt;::data_[N]</definition>
+        <argsstring>[N]</argsstring>
+        <name>data_</name>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="64" column="1" bodyfile="include/format.h" bodystart="64" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a2bf36151683d2fb93545e7a0f53a3206" prot="private" static="no" mutable="no">
+        <type>SizeType</type>
+        <definition>SizeType bzd::impl::format::ConstexprVector&lt; T, N &gt;::size_</definition>
+        <argsstring></argsstring>
+        <name>size_</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="65" column="1" bodyfile="include/format.h" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a2224ec82203057dd6759da1d909c15a2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::format::ConstexprVector&lt; T, N &gt;::ConstexprVector</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>ConstexprVector</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="52" column="1" bodyfile="include/format.h" bodystart="52" bodyend="52"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a00b7cb3759c6ba0ae030247613883ca7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>Args</declname>
+            <defname>Args</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::format::ConstexprVector&lt; T, N &gt;::ConstexprVector</definition>
+        <argsstring>(Args &amp;&amp;... args) noexcept</argsstring>
+        <name>ConstexprVector</name>
+        <param>
+          <type>Args &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="54" column="1" bodyfile="include/format.h" bodystart="54" bodyend="54"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ac506e48d09557fcba03920b34ac3a897" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1_1Iterator" kindref="compound">Iterator</ref></type>
+        <definition>constexpr Iterator bzd::impl::format::ConstexprVector&lt; T, N &gt;::begin</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>begin</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="55" column="1" bodyfile="include/format.h" bodystart="55" bodyend="55"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af0d275e5ccfb3578a95c344c90da123e" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1_1Iterator" kindref="compound">Iterator</ref></type>
+        <definition>constexpr Iterator bzd::impl::format::ConstexprVector&lt; T, N &gt;::end</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>end</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="56" column="1" bodyfile="include/format.h" bodystart="56" bodyend="56"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a0eb00928c9be6aa5ea71d557e4788a70" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr SizeType</type>
+        <definition>constexpr SizeType bzd::impl::format::ConstexprVector&lt; T, N &gt;::size</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>size</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="57" column="1" bodyfile="include/format.h" bodystart="57" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a40d78c34df7a06ca80d75b85b8273784" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr SizeType</type>
+        <definition>constexpr SizeType bzd::impl::format::ConstexprVector&lt; T, N &gt;::capacity</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>capacity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="58" column="1" bodyfile="include/format.h" bodystart="58" bodyend="58"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af9974183d2f72974b7c249099acf3bbf" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::format::ConstexprVector&lt; T, N &gt;::push_back</definition>
+        <argsstring>(const T &amp;element) noexcept</argsstring>
+        <name>push_back</name>
+        <param>
+          <type>const T &amp;</type>
+          <declname>element</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="59" column="1" bodyfile="include/format.h" bodystart="59" bodyend="59"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ae2fe3f525dabc361403d8289c16516e2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr DataType &amp;</type>
+        <definition>constexpr DataType&amp; bzd::impl::format::ConstexprVector&lt; T, N &gt;::operator[]</definition>
+        <argsstring>(const SizeType index)</argsstring>
+        <name>operator[]</name>
+        <param>
+          <type>const SizeType</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="60" column="1" bodyfile="include/format.h" bodystart="60" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a60dc8c51ac6e2110a3dfbad663f7e823" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr const DataType &amp;</type>
+        <definition>constexpr const DataType&amp; bzd::impl::format::ConstexprVector&lt; T, N &gt;::operator[]</definition>
+        <argsstring>(const SizeType index) const</argsstring>
+        <name>operator[]</name>
+        <param>
+          <type>const SizeType</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="61" column="1" bodyfile="include/format.h" bodystart="61" bodyend="61"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Simple vector container working with conxtexpr </para>    </detaileddescription>
+    <location file="include/format.h" line="33" column="1" bodyfile="include/format.h" bodystart="32" bodyend="66"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ac506e48d09557fcba03920b34ac3a897" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>begin</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a40d78c34df7a06ca80d75b85b8273784" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>capacity</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a2224ec82203057dd6759da1d909c15a2" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>ConstexprVector</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a00b7cb3759c6ba0ae030247613883ca7" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>ConstexprVector</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ac248ba4c2f67de4de99b8f0d44766e1e" prot="private" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>data_</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1aa31520daa53f1e1f1bf2c7086f13abc2" prot="private" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>DataType</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af0d275e5ccfb3578a95c344c90da123e" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>end</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ae2fe3f525dabc361403d8289c16516e2" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a60dc8c51ac6e2110a3dfbad663f7e823" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af9974183d2f72974b7c249099acf3bbf" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>push_back</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a212828ff66deb900ec374e769002fd2f" prot="private" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>SelfType</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a0eb00928c9be6aa5ea71d557e4788a70" prot="public" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>size</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a2bf36151683d2fb93545e7a0f53a3206" prot="private" virt="non-virtual"><scope>bzd::impl::format::ConstexprVector</scope><name>size_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_d44c64559bbebec7f509842c48db8b23" kind="dir">
+    <compoundname>include</compoundname>
+    <innerdir refid="dir_e0f5f6345e438c73b9ae78ec2940718c">include/container</innerdir>
+    <innerdir refid="dir_fac9ef7fc20ac12aaae6ba4aa5a86afc">include/interface</innerdir>
+    <innerdir refid="dir_42761cbf96bc5660f72a2d1a926765c0">include/type_traits</innerdir>
+    <innerfile refid="assert_8h">assert.h</innerfile>
+    <innerfile refid="assert__minimal_8h">assert_minimal.h</innerfile>
+    <innerfile refid="assert__test_8cpp">assert_test.cpp</innerfile>
+    <innerfile refid="format_8h">format.h</innerfile>
+    <innerfile refid="format__test_8cpp">format_test.cpp</innerfile>
+    <innerfile refid="log_8h">log.h</innerfile>
+    <innerfile refid="scheduler_8h">scheduler.h</innerfile>
+    <innerfile refid="stack_8h">stack.h</innerfile>
+    <innerfile refid="system_8h">system.h</innerfile>
+    <innerfile refid="task_8h">task.h</innerfile>
+    <innerfile refid="template__metaprogramming_8h">template_metaprogramming.h</innerfile>
+    <innerfile refid="template__metaprogramming__test_8cpp">template_metaprogramming_test.cpp</innerfile>
+    <innerfile refid="to__string_8h">to_string.h</innerfile>
+    <innerfile refid="to__string__test_8cpp">to_string_test.cpp</innerfile>
+    <innerfile refid="types_8h">types.h</innerfile>
+    <innerfile refid="utility_8h">utility.h</innerfile>
+    <innerfile refid="utility__test_8cpp">utility_test.cpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/"/>
+  </compounddef>
+</doxygen>

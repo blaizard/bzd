@@ -1,0 +1,300 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1Variant" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::Variant</compoundname>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1HelperT" prot="protected">bzd::impl::Variant::HelperT</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1HelperT_3_01N_00_01N_00_01F_00_01Args_8_8_8_01_4" prot="protected">bzd::impl::Variant::HelperT&lt; N, N, F, Args... &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1Overload" prot="protected">bzd::impl::Variant::Overload</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4" prot="protected">bzd::impl::Variant::Overload&lt; F0 &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4" prot="protected">bzd::impl::Variant::Overload&lt; F0, Frest... &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1Variant_1_1VariantMatch" prot="protected">bzd::impl::Variant::VariantMatch</innerclass>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>StorageType</declname>
+        <defname>StorageType</defname>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Ts</declname>
+        <defname>Ts</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-type">
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1a00c41a0c69c297d1a080df68815b188e" prot="protected" static="no">
+        <type><ref refid="classbzd_1_1impl_1_1Variant" kindref="compound">Variant</ref>&lt; StorageType, Ts... &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::Self =  Variant&lt;StorageType, Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>Self</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="17" column="1" bodyfile="include/container/variant.h" bodystart="17" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1a9278f2fa989268e6009e5fa792a94afa" prot="protected" static="no">
+        <type><ref refid="structbzd_1_1tmp_1_1TypeList" kindref="compound">bzd::tmp::TypeList</ref>&lt; Ts... &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::TypeList =  bzd::tmp::TypeList&lt;Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>TypeList</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="19" column="1" bodyfile="include/container/variant.h" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1ae11d4179ac1a3026f4117b5e8addb91e" prot="protected" static="no">
+        <type>typename TypeList::template ChooseNth&lt; N &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::ChooseNth =  typename TypeList::template ChooseNth&lt;N&gt;</definition>
+        <argsstring></argsstring>
+        <name>ChooseNth</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="22" column="1" bodyfile="include/container/variant.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1a33736feeb662d022ff31ccc192770ba2" prot="protected" static="no">
+        <type>typename TypeList::template Contains&lt; T &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::Contains =  typename TypeList::template Contains&lt;T&gt;</definition>
+        <argsstring></argsstring>
+        <name>Contains</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="25" column="1" bodyfile="include/container/variant.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1a22c8cde3db48bc6bc17b9dfae7c00dfe" prot="protected" static="no">
+        <type>typename TypeList::template Find&lt; T &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::Find =  typename TypeList::template Find&lt;T&gt;</definition>
+        <argsstring></argsstring>
+        <name>Find</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="28" column="1" bodyfile="include/container/variant.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1aa7a2fc3a5d560c79c78e26fdf56a5996" prot="protected" static="no">
+        <type><ref refid="structbzd_1_1impl_1_1Variant_1_1HelperT" kindref="compound">HelperT</ref>&lt; 0, sizeof...(Ts) - 1, F, Args... &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::Helper =  HelperT&lt;0, sizeof...(Ts) - 1, F, Args...&gt;</definition>
+        <argsstring></argsstring>
+        <name>Helper</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="57" column="1" bodyfile="include/container/variant.h" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Variant_1a6076c32bbf520055a3a8922b1156800c" prot="protected" static="no">
+        <type><ref refid="structbzd_1_1impl_1_1Variant_1_1HelperT" kindref="compound">Helper</ref>&lt; <ref refid="structbzd_1_1impl_1_1Variant_1_1VariantMatch" kindref="compound">VariantMatch</ref>, const <ref refid="classbzd_1_1impl_1_1Variant" kindref="compound">Self</ref> &amp;, V &amp; &gt;</type>
+        <definition>using bzd::impl::Variant&lt; StorageType, Ts &gt;::Match =  Helper&lt;VariantMatch, const Self&amp;, V&amp;&gt;</definition>
+        <argsstring></argsstring>
+        <name>Match</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="89" column="1" bodyfile="include/container/variant.h" bodystart="89" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1Variant_1a4724248f12580869e0d80807fe68e8dd" prot="protected" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bzd::impl::Variant&lt; StorageType, Ts &gt;::id_</definition>
+        <argsstring></argsstring>
+        <name>id_</name>
+        <initializer>= -1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="137" column="1" bodyfile="include/container/variant.h" bodystart="137" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1Variant_1abf63d95fa214179c274de6c3ca2ecd48" prot="protected" static="no" mutable="no">
+        <type>StorageType</type>
+        <definition>StorageType bzd::impl::Variant&lt; StorageType, Ts &gt;::data_</definition>
+        <argsstring></argsstring>
+        <name>data_</name>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="138" column="1" bodyfile="include/container/variant.h" bodystart="138" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1a94b14a37ebd4899550f5ce6630715cdf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::Variant&lt; StorageType, Ts &gt;::Variant</definition>
+        <argsstring>()=default</argsstring>
+        <name>Variant</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Default constructor </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="95" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1a814875f9a6cfc7e22972466999a88d2f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">bzd::typeTraits::enableIf</ref>&lt; Contains&lt; T &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::Variant&lt; StorageType, Ts &gt;::Variant</definition>
+        <argsstring>(T &amp;&amp;value)</argsstring>
+        <name>Variant</name>
+        <param>
+          <type>T &amp;&amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Value constructor </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="101" column="1" bodyfile="include/container/variant.h" bodystart="101" bodyend="101"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1a562baf45680f0985c52c861f8dbd344d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr bool</type>
+        <definition>constexpr bool bzd::impl::Variant&lt; StorageType, Ts &gt;::is</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>is</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="104" column="1" bodyfile="include/container/variant.h" bodystart="104" bodyend="107"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1a2c79785352b6a118f05562d4df93727f" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1Expected" kindref="compound">bzd::Expected</ref>&lt; const T &amp;, bool &gt;</type>
+        <definition>constexpr bzd::Expected&lt;const T&amp;, bool&gt; bzd::impl::Variant&lt; StorageType, Ts &gt;::get</definition>
+        <argsstring>() const</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="110" column="1" bodyfile="include/container/variant.h" bodystart="110" bodyend="117"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1ab69a180ec931f4ab33c5891443811e36" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1Expected" kindref="compound">bzd::Expected</ref>&lt; T &amp;, bool &gt;</type>
+        <definition>constexpr bzd::Expected&lt;T&amp;, bool&gt; bzd::impl::Variant&lt; StorageType, Ts &gt;::get</definition>
+        <argsstring>()</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="120" column="1" bodyfile="include/container/variant.h" bodystart="120" bodyend="127"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Variant_1ab34de94c5bfac2ca8662e03757d0a309" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>Functors</declname>
+            <defname>Functors</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::Variant&lt; StorageType, Ts &gt;::match</definition>
+        <argsstring>(Functors &amp;&amp;... funcs) const</argsstring>
+        <name>match</name>
+        <param>
+          <type>Functors &amp;&amp;...</type>
+          <declname>funcs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="130" column="1" bodyfile="include/container/variant.h" bodystart="130" bodyend="134"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="592">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Variant"/>
+        <childnode refid="593" relation="usage">
+          <edgelabel>data_</edgelabel>
+        </childnode>
+      </node>
+      <node id="593">
+        <label>StorageType</label>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/variant.h" line="15" column="1" bodyfile="include/container/variant.h" bodystart="14" bodyend="139"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1Variant_1ae11d4179ac1a3026f4117b5e8addb91e" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>ChooseNth</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a33736feeb662d022ff31ccc192770ba2" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Contains</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1abf63d95fa214179c274de6c3ca2ecd48" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>data_</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a22c8cde3db48bc6bc17b9dfae7c00dfe" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Find</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a2c79785352b6a118f05562d4df93727f" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>get</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1ab69a180ec931f4ab33c5891443811e36" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>get</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1aa7a2fc3a5d560c79c78e26fdf56a5996" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Helper</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a4724248f12580869e0d80807fe68e8dd" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>id_</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a562baf45680f0985c52c861f8dbd344d" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>is</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1ab34de94c5bfac2ca8662e03757d0a309" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>match</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a6076c32bbf520055a3a8922b1156800c" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Match</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a00c41a0c69c297d1a080df68815b188e" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Self</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a9278f2fa989268e6009e5fa792a94afa" prot="protected" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>TypeList</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a94b14a37ebd4899550f5ce6630715cdf" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Variant</name></member>
+      <member refid="classbzd_1_1impl_1_1Variant_1a814875f9a6cfc7e22972466999a88d2f" prot="public" virt="non-virtual"><scope>bzd::impl::Variant</scope><name>Variant</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

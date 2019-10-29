@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1removeExtent_3_01T[N]_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::removeExtent&lt; T[N]&gt;</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+      <param>
+        <type>unsigned long int</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="structbzd_1_1typeTraits_1_1removeExtent_3_01T[N]_4_1a5550949a97e5570534d479543a790989" prot="public" static="no">
+        <type>T</type>
+        <definition>typedef T bzd::typeTraits::removeExtent&lt; T[N]&gt;::type</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/array.h" line="13" column="1" bodyfile="include/type_traits/array.h" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/array.h" line="13" column="1" bodyfile="include/type_traits/array.h" bodystart="13" bodyend="13"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1removeExtent_3_01T[N]_4_1a5550949a97e5570534d479543a790989" prot="public" virt="non-virtual"><scope>bzd::typeTraits::removeExtent&lt; T[N]&gt;</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

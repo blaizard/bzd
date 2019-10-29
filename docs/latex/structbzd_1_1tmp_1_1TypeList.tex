@@ -1,0 +1,28 @@
+\hypertarget{structbzd_1_1tmp_1_1TypeList}{}\section{bzd\+:\+:tmp\+:\+:Type\+List$<$ Ts $>$ Struct Template Reference}
+\label{structbzd_1_1tmp_1_1TypeList}\index{bzd\+::tmp\+::\+Type\+List$<$ Ts $>$@{bzd\+::tmp\+::\+Type\+List$<$ Ts $>$}}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structbzd_1_1tmp_1_1TypeList_a6de949a4fffe29b17f59207836461618}\label{structbzd_1_1tmp_1_1TypeList_a6de949a4fffe29b17f59207836461618}} 
+using {\bfseries type} = \hyperlink{structbzd_1_1tmp_1_1TypeList}{Type\+List}
+\item 
+\mbox{\Hypertarget{structbzd_1_1tmp_1_1TypeList_a07f099c58b5306cb19be4a522efb1308}\label{structbzd_1_1tmp_1_1TypeList_a07f099c58b5306cb19be4a522efb1308}} 
+{\footnotesize template$<$Size\+Type N$>$ }\\using {\bfseries Choose\+Nth} = typename \hyperlink{structbzd_1_1tmp_1_1impl_1_1ChooseNth}{impl\+::\+Choose\+Nth}$<$ N, Ts... $>$\+::\hyperlink{structbzd_1_1tmp_1_1TypeList}{type}
+\item 
+\mbox{\Hypertarget{structbzd_1_1tmp_1_1TypeList_aeee6b1e8ee14e2e43027dd85d5fb616e}\label{structbzd_1_1tmp_1_1TypeList_aeee6b1e8ee14e2e43027dd85d5fb616e}} 
+{\footnotesize template$<$class T $>$ }\\using {\bfseries Contains} = typename \hyperlink{structbzd_1_1tmp_1_1impl_1_1Contains}{impl\+::\+Contains}$<$ T, Ts... $>$
+\item 
+\mbox{\Hypertarget{structbzd_1_1tmp_1_1TypeList_a1e3dd84b5d90a1172fc2ea9fe552724f}\label{structbzd_1_1tmp_1_1TypeList_a1e3dd84b5d90a1172fc2ea9fe552724f}} 
+{\footnotesize template$<$class T $>$ }\\using {\bfseries Find} = typename \hyperlink{structbzd_1_1tmp_1_1impl_1_1Find}{impl\+::\+Find}$<$ 0, T, Ts... $>$
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structbzd_1_1tmp_1_1TypeList_a7e717e36a0a84c569b8ed75c426c6171}\label{structbzd_1_1tmp_1_1TypeList_a7e717e36a0a84c569b8ed75c426c6171}} 
+static constexpr const Size\+Type {\bfseries size} = sizeof...(Ts)
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/template\+\_\+metaprogramming.\+h\end{DoxyCompactItemize}

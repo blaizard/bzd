@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1format_1_1CheckContext" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::format::CheckContext</compoundname>
+    <basecompoundref refid="classbzd_1_1impl_1_1format_1_1ConstexprVector" prot="public" virt="non-virtual">bzd::impl::format::ConstexprVector&lt; Metadata, 128 &gt;</basecompoundref>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1CheckContext_1a9aff36b01588c85c75968c379eb1cf6c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::format::CheckContext::CheckContext</definition>
+        <argsstring>()=default</argsstring>
+        <name>CheckContext</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="332" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1CheckContext_1ad7d6065fd6ed9dbb89693b2c93963f61" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::format::CheckContext::addSubstring</definition>
+        <argsstring>(const bzd::StringView &amp;)</argsstring>
+        <name>addSubstring</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="333" column="1" bodyfile="include/format.h" bodystart="333" bodyend="333"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1CheckContext_1acc1926a0431a9387f4450be378092098" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::format::CheckContext::addMetadata</definition>
+        <argsstring>(const Metadata &amp;metadata)</argsstring>
+        <name>addMetadata</name>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="334" column="1" bodyfile="include/format.h" bodystart="334" bodyend="334"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1CheckContext_1a0035d9959b3d944c92a3ffff3c5f32a2" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::format::CheckContext::onError</definition>
+        <argsstring>(const bzd::StringView &amp;message) const</argsstring>
+        <name>onError</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="335" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="54">
+        <label>bzd::impl::format::CheckContext</label>
+        <link refid="classbzd_1_1impl_1_1format_1_1CheckContext"/>
+        <childnode refid="55" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="55">
+        <label>bzd::impl::format::ConstexprVector&lt; Metadata, 128 &gt;</label>
+        <link refid="classbzd_1_1impl_1_1format_1_1ConstexprVector"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="56">
+        <label>bzd::impl::format::CheckContext</label>
+        <link refid="classbzd_1_1impl_1_1format_1_1CheckContext"/>
+        <childnode refid="57" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="57">
+        <label>bzd::impl::format::ConstexprVector&lt; Metadata, 128 &gt;</label>
+        <link refid="classbzd_1_1impl_1_1format_1_1ConstexprVector"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/format.h" line="330" column="1" bodyfile="include/format.h" bodystart="329" bodyend="336"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1format_1_1CheckContext_1acc1926a0431a9387f4450be378092098" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>addMetadata</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1CheckContext_1ad7d6065fd6ed9dbb89693b2c93963f61" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>addSubstring</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ac506e48d09557fcba03920b34ac3a897" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>begin</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a40d78c34df7a06ca80d75b85b8273784" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>capacity</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1CheckContext_1a9aff36b01588c85c75968c379eb1cf6c" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>CheckContext</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a2224ec82203057dd6759da1d909c15a2" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>ConstexprVector</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a00b7cb3759c6ba0ae030247613883ca7" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>ConstexprVector</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af0d275e5ccfb3578a95c344c90da123e" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>end</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1CheckContext_1a0035d9959b3d944c92a3ffff3c5f32a2" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>onError</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1ae2fe3f525dabc361403d8289c16516e2" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a60dc8c51ac6e2110a3dfbad663f7e823" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1af9974183d2f72974b7c249099acf3bbf" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>push_back</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1ConstexprVector_1a0eb00928c9be6aa5ea71d557e4788a70" prot="public" virt="non-virtual"><scope>bzd::impl::format::CheckContext</scope><name>size</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

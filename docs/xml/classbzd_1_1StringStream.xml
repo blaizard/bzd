@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1StringStream" kind="class" language="C++" prot="public">
+    <compoundname>bzd::StringStream</compoundname>
+    <basecompoundref refid="classbzd_1_1impl_1_1StringStream" prot="public" virt="non-virtual">bzd::impl::StringStream</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>SizeType</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classbzd_1_1StringStream_1afd61c3d34382756f5b2f7cf27036f6e8" prot="private" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1String" kindref="compound">bzd::String</ref>&lt; N &gt;</type>
+        <definition>bzd::String&lt;N&gt; bzd::StringStream&lt; N &gt;::container_</definition>
+        <argsstring></argsstring>
+        <name>container_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="60" column="1" bodyfile="include/container/string_stream.h" bodystart="60" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1StringStream_1ad8b1501e21b70342d8a0af3207578030" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::StringStream&lt; N &gt;::StringStream</definition>
+        <argsstring>()</argsstring>
+        <name>StringStream</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="53" column="1" bodyfile="include/container/string_stream.h" bodystart="53" bodyend="57"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="515">
+        <label>bzd::OStream</label>
+        <link refid="classbzd_1_1impl_1_1OStream"/>
+      </node>
+      <node id="514">
+        <label>bzd::interface::StringStream</label>
+        <link refid="classbzd_1_1impl_1_1StringStream"/>
+        <childnode refid="515" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="513">
+        <label>bzd::StringStream&lt; N &gt;</label>
+        <link refid="classbzd_1_1StringStream"/>
+        <childnode refid="514" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="518">
+        <label>bzd::OStream</label>
+        <link refid="classbzd_1_1impl_1_1OStream"/>
+      </node>
+      <node id="517">
+        <label>bzd::interface::StringStream</label>
+        <link refid="classbzd_1_1impl_1_1StringStream"/>
+        <childnode refid="518" relation="public-inheritance">
+        </childnode>
+        <childnode refid="519" relation="usage">
+          <edgelabel>string_</edgelabel>
+        </childnode>
+      </node>
+      <node id="519">
+        <label>bzd::impl::String&lt; T, Impl &gt;</label>
+        <link refid="classbzd_1_1impl_1_1String"/>
+        <childnode refid="520" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="516">
+        <label>bzd::StringStream&lt; N &gt;</label>
+        <link refid="classbzd_1_1StringStream"/>
+        <childnode refid="517" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="520">
+        <label>Impl</label>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/string_stream.h" line="51" column="1" bodyfile="include/container/string_stream.h" bodystart="50" bodyend="61"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1StringStream_1afd61c3d34382756f5b2f7cf27036f6e8" prot="private" virt="non-virtual"><scope>bzd::StringStream</scope><name>container_</name></member>
+      <member refid="classbzd_1_1impl_1_1OStream_1ab91b3af754da6f6cc5a08e04760a5f56" prot="protected" virt="non-virtual"><scope>bzd::StringStream</scope><name>OStream</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a62f8401f8b7e9aa09667a1a9c72aba11" prot="public" virt="non-virtual"><scope>bzd::StringStream</scope><name>str</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a034aae75a0c5cbeb40f6110be19fe659" prot="public" virt="non-virtual"><scope>bzd::StringStream</scope><name>str</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a9ff78bc8c62001daf63a4f06c60cf7a7" prot="protected" virt="non-virtual"><scope>bzd::StringStream</scope><name>string_</name></member>
+      <member refid="classbzd_1_1StringStream_1ad8b1501e21b70342d8a0af3207578030" prot="public" virt="non-virtual"><scope>bzd::StringStream</scope><name>StringStream</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a3d157030df98671100a8471197139c4a" prot="public" virt="non-virtual" ambiguityscope="bzd::impl::StringStream::"><scope>bzd::StringStream</scope><name>StringStream</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1af56d18b5a5a3bf47f5f96c895a4a05d4" prot="public" virt="non-virtual"><scope>bzd::StringStream</scope><name>write</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a764ec9d25703589cc9086c5968b852d5" prot="public" virt="non-virtual"><scope>bzd::StringStream</scope><name>write</name></member>
+      <member refid="classbzd_1_1impl_1_1OStream_1aa9584f5a3833c56ba7deec2c55231b05" prot="public" virt="pure-virtual" ambiguityscope="bzd::impl::OStream::"><scope>bzd::StringStream</scope><name>write</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

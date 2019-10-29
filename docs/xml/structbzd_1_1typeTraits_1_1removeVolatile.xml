@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1removeVolatile" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::removeVolatile</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="structbzd_1_1typeTraits_1_1removeVolatile_1a64fe85b0c6fd7ed48b155cca7255f9fa" prot="public" static="no">
+        <type>T</type>
+        <definition>typedef T bzd::typeTraits::removeVolatile&lt; T &gt;::type</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/const_volatile.h" line="28" column="1" bodyfile="include/type_traits/const_volatile.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/const_volatile.h" line="28" column="1" bodyfile="include/type_traits/const_volatile.h" bodystart="28" bodyend="28"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1removeVolatile_1a64fe85b0c6fd7ed48b155cca7255f9fa" prot="public" virt="non-virtual"><scope>bzd::typeTraits::removeVolatile</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

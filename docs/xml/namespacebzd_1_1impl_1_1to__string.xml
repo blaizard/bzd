@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1impl_1_1to__string" kind="namespace" language="C++">
+    <compoundname>bzd::impl::to_string</compoundname>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="to__string_8h_1a1f6891c6e51d1112726b87b9dff5269f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>SizeType</type>
+            <declname>Base</declname>
+            <defname>Base</defname>
+            <defval>10</defval>
+          </param>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">bzd::typeTraits::enableIf</ref>&lt;(Base &gt; 1 &amp;&amp;Base&lt;=</type>
+            <declname>16</declname>
+            <defname>16</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::to_string::integer</definition>
+        <argsstring>(interface::String &amp;str, const T &amp;n, const char *const digits=bzd::impl::to_string::digits)</argsstring>
+        <name>integer</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1String" kindref="compound">interface::String</ref> &amp;</type>
+          <declname>str</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>const char *const</type>
+          <declname>digits</declname>
+          <defval>bzd::impl::to_string::digits</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/to_string.h" line="24" column="1" bodyfile="include/to_string.h" bodystart="24" bodyend="47"/>
+      </memberdef>
+      <memberdef kind="function" id="to__string_8h_1a0212fdc49d68bdd43f73f8a1e1f6d420" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::to_string::fixedPoint</definition>
+        <argsstring>(bzd::OStream &amp;stream, const T &amp;n, const SizeType maxPrecision) noexcept</argsstring>
+        <name>fixedPoint</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>const SizeType</type>
+          <declname>maxPrecision</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/to_string.h" line="50" column="1" bodyfile="include/to_string.h" bodystart="50" bodyend="77"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/to_string.h" line="17" column="1"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_5ff694d382d6c8cd0a56e1a7e15b7629" kind="dir">
+    <compoundname>src/log/stdout</compoundname>
+    <innerfile refid="log_8cpp">log.cpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/log/stdout/"/>
+  </compounddef>
+</doxygen>

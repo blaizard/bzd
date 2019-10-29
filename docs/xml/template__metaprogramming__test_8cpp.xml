@@ -1,0 +1,266 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="template__metaprogramming__test_8cpp" kind="file" language="C++">
+    <compoundname>template_metaprogramming_test.cpp</compoundname>
+    <includes local="yes">gtest/gtest.h</includes>
+    <includes refid="template__metaprogramming_8h" local="yes">include/template_metaprogramming.h</includes>
+    <incdepgraph>
+      <node id="768">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+        <childnode refid="765" relation="include">
+        </childnode>
+      </node>
+      <node id="763">
+        <label>include/type_traits/function.h</label>
+        <link refid="function_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+      </node>
+      <node id="759">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="761">
+        <label>include/type_traits/array.h</label>
+        <link refid="type__traits_2array_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+      </node>
+      <node id="766">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+      </node>
+      <node id="760">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="759" relation="include">
+        </childnode>
+        <childnode refid="761" relation="include">
+        </childnode>
+        <childnode refid="763" relation="include">
+        </childnode>
+        <childnode refid="764" relation="include">
+        </childnode>
+        <childnode refid="765" relation="include">
+        </childnode>
+        <childnode refid="767" relation="include">
+        </childnode>
+        <childnode refid="768" relation="include">
+        </childnode>
+      </node>
+      <node id="756">
+        <label>include/template_metaprogramming_test.cpp</label>
+        <link refid="template__metaprogramming__test_8cpp"/>
+        <childnode refid="757" relation="include">
+        </childnode>
+        <childnode refid="758" relation="include">
+        </childnode>
+      </node>
+      <node id="767">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+      </node>
+      <node id="757">
+        <label>gtest/gtest.h</label>
+      </node>
+      <node id="758">
+        <label>include/template_metaprogramming.h</label>
+        <link refid="template__metaprogramming_8h_source"/>
+        <childnode refid="759" relation="include">
+        </childnode>
+        <childnode refid="760" relation="include">
+        </childnode>
+      </node>
+      <node id="764">
+        <label>include/type_traits/pointer.h</label>
+        <link refid="pointer_8h_source"/>
+        <childnode refid="765" relation="include">
+        </childnode>
+      </node>
+      <node id="762">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="765">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h_source"/>
+        <childnode refid="762" relation="include">
+        </childnode>
+        <childnode refid="766" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="template__metaprogramming__test_8cpp_1a58f2bb7ff9598c8fec8a1af1f46b62e8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(TMP, ChooseNth)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>TMP</type>
+        </param>
+        <param>
+          <type>ChooseNth</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming_test.cpp" line="4" column="1" bodyfile="include/template_metaprogramming_test.cpp" bodystart="4" bodyend="17"/>
+      </memberdef>
+      <memberdef kind="function" id="template__metaprogramming__test_8cpp_1ad88e38d4abae2e0ecfe2af1e62284d56" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(TMP, Contains)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>TMP</type>
+        </param>
+        <param>
+          <type>Contains</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming_test.cpp" line="19" column="1" bodyfile="include/template_metaprogramming_test.cpp" bodystart="19" bodyend="37"/>
+      </memberdef>
+      <memberdef kind="function" id="template__metaprogramming__test_8cpp_1a22667ef8423e4923bdc872ae4cf800df" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(TMP, Find)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>TMP</type>
+        </param>
+        <param>
+          <type>Find</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming_test.cpp" line="39" column="1" bodyfile="include/template_metaprogramming_test.cpp" bodystart="39" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="template__metaprogramming__test_8cpp_1ab2352a7e465d4a54275e4d00b04c0822" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(TMP, Union)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>TMP</type>
+        </param>
+        <param>
+          <type>Union</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming_test.cpp" line="51" column="1" bodyfile="include/template_metaprogramming_test.cpp" bodystart="51" bodyend="80"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&quot;gtest/gtest.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/template_metaprogramming.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal">TEST(TMP,<sp/>ChooseNth)</highlight></codeline>
+<codeline lineno="5"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><sp/><sp/><sp/><sp/>bzd::tmp::ChooseNth&lt;0,<sp/>int,<sp/>double&gt;<sp/>a;</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(</highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(a),<sp/></highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/>bzd::tmp::ChooseNth&lt;1,<sp/>int,<sp/>double&gt;<sp/>b;</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(</highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(b),<sp/></highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>TypeList<sp/>=<sp/><ref refid="structbzd_1_1tmp_1_1TypeList" kindref="compound">bzd::tmp::TypeList&lt;int, double&gt;</ref>;</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/>TypeList::ChooseNth&lt;0&gt;<sp/>c;</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(</highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(c),<sp/></highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/>TypeList::ChooseNth&lt;1&gt;<sp/>d;</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(</highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(d),<sp/></highlight><highlight class="keyword">typeid</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="17"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal">TEST(TMP,<sp/>Contains)</highlight></codeline>
+<codeline lineno="20"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>a<sp/>=<sp/>bzd::tmp::Contains&lt;int,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(a);</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>b<sp/>=<sp/>bzd::tmp::Contains&lt;double,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(b);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>c<sp/>=<sp/>bzd::tmp::Contains&lt;bool,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_FALSE(c);</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>TypeList<sp/>=<sp/><ref refid="structbzd_1_1tmp_1_1TypeList" kindref="compound">bzd::tmp::TypeList&lt;int, double&gt;</ref>;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>d<sp/>=<sp/>TypeList::Contains&lt;int&gt;::value;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(d);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>e<sp/>=<sp/>TypeList::Contains&lt;double&gt;::value;</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(e);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>f<sp/>=<sp/>TypeList::Contains&lt;bool&gt;::value;</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_FALSE(f);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal">TEST(TMP,<sp/>Find)</highlight></codeline>
+<codeline lineno="40"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>a<sp/>=<sp/>bzd::tmp::Find&lt;int,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(a,<sp/>0);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>b<sp/>=<sp/>bzd::tmp::Find&lt;double,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(b,<sp/>1);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>c<sp/>=<sp/>bzd::tmp::Find&lt;bool,<sp/>int,<sp/>double&gt;::value;</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(c,<sp/>-1);</highlight></codeline>
+<codeline lineno="49"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal">TEST(TMP,<sp/>Union)</highlight></codeline>
+<codeline lineno="52"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">bzd::tmp::Union&lt;int, bool, float&gt;</ref><sp/>test;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/>test.get&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;()<sp/>=<sp/>21;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(test.get&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;(),<sp/>21);</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/>test.get&lt;</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&gt;()<sp/>=<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(test.get&lt;</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&gt;());</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/>test.get&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&gt;()<sp/>=<sp/>3.435;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_NEAR(test.get&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&gt;(),<sp/>3.435,<sp/>0.0001);</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Constructor</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">bzd::tmp::Union&lt;int, bool, float&gt;</ref><sp/>testInt(static_cast&lt;int&gt;(42));</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(testInt.get&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&gt;(),<sp/>42);</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">bzd::tmp::Union&lt;int, bool, float&gt;</ref><sp/>constTest(static_cast&lt;bool&gt;(</highlight><highlight class="keyword">true</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_TRUE(constTest.get&lt;</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&gt;());</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/>constexpr<sp/><ref refid="unionbzd_1_1tmp_1_1impl_1_1UnionConstexpr" kindref="compound">bzd::tmp::UnionConstexpr&lt;int, bool, float&gt;</ref><sp/>constexprTest(static_cast&lt;float&gt;(32.5));</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_NEAR(constexprTest.get&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&gt;(),<sp/>32.5,<sp/>0.001);</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Constexpr<sp/>Copy<sp/>Constructor</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/>constexpr<sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>constexprTest2(constexprTest);</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/>constexpr<sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>constexprTest3<sp/>=<sp/>constexprTest2;</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_NEAR(constexprTest3.get&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&gt;(),<sp/>32.5,<sp/>0.001);</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Complex<sp/>types</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">bzd::tmp::Union&lt;bool, std::string&gt;</ref><sp/>testComplex(std::string(</highlight><highlight class="stringliteral">&quot;Hello&quot;</highlight><highlight class="normal">));</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_STREQ(testComplex.get&lt;std::string&gt;().c_str(),<sp/></highlight><highlight class="stringliteral">&quot;Hello&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="80"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/template_metaprogramming_test.cpp"/>
+  </compounddef>
+</doxygen>

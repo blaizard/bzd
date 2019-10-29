@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classrender_1_1Render" kind="class" language="Python" prot="public">
+    <compoundname>render::Render</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classrender_1_1Render_1a78b431272b903560975d20eb3dd1ef82" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.__init__</definition>
+        <argsstring>(self)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="5" column="1" bodyfile="render.py" bodystart="5" bodyend="7"/>
+      </memberdef>
+      <memberdef kind="function" id="classrender_1_1Render_1a5b95bb89cf5b7588019241358ec16a8f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.printMemberNamespace</definition>
+        <argsstring>(self, member)</argsstring>
+        <name>printMemberNamespace</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>member</type>
+          <defname>member</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="8" column="1" bodyfile="render.py" bodystart="8" bodyend="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classrender_1_1Render_1ac46ecd0f59ee6021e7aaa0b6ca942845" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.printMemberDefinition</definition>
+        <argsstring>(self, member)</argsstring>
+        <name>printMemberDefinition</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>member</type>
+          <defname>member</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="18" column="1" bodyfile="render.py" bodystart="18" bodyend="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classrender_1_1Render_1a7dbaacfbdc2910be01c87b28f5ce74ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.processMembers</definition>
+        <argsstring>(self, members, namespaceList)</argsstring>
+        <name>processMembers</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>members</type>
+          <defname>members</defname>
+        </param>
+        <param>
+          <type>namespaceList</type>
+          <defname>namespaceList</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="49" column="1" bodyfile="render.py" bodystart="49" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="classrender_1_1Render_1abd6e148975e32c27d3c6910394cccf02" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.processNamespace</definition>
+        <argsstring>(self, data, namespaceList)</argsstring>
+        <name>processNamespace</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+        </param>
+        <param>
+          <type>namespaceList</type>
+          <defname>namespaceList</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="61" column="1" bodyfile="render.py" bodystart="61" bodyend="69"/>
+      </memberdef>
+      <memberdef kind="function" id="classrender_1_1Render_1a174a5878777413ccdc36a556cf36c437" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def render.Render.process</definition>
+        <argsstring>(self, data)</argsstring>
+        <name>process</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="render.py" line="70" column="1" bodyfile="render.py" bodystart="70" bodyend="72"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="render.py" line="3" column="1" bodyfile="render.py" bodystart="3" bodyend="72"/>
+    <listofallmembers>
+      <member refid="classrender_1_1Render_1a78b431272b903560975d20eb3dd1ef82" prot="public" virt="non-virtual"><scope>render::Render</scope><name>__init__</name></member>
+      <member refid="classrender_1_1Render_1ac46ecd0f59ee6021e7aaa0b6ca942845" prot="public" virt="non-virtual"><scope>render::Render</scope><name>printMemberDefinition</name></member>
+      <member refid="classrender_1_1Render_1a5b95bb89cf5b7588019241358ec16a8f" prot="public" virt="non-virtual"><scope>render::Render</scope><name>printMemberNamespace</name></member>
+      <member refid="classrender_1_1Render_1a174a5878777413ccdc36a556cf36c437" prot="public" virt="non-virtual"><scope>render::Render</scope><name>process</name></member>
+      <member refid="classrender_1_1Render_1a7dbaacfbdc2910be01c87b28f5ce74ce" prot="public" virt="non-virtual"><scope>render::Render</scope><name>processMembers</name></member>
+      <member refid="classrender_1_1Render_1abd6e148975e32c27d3c6910394cccf02" prot="public" virt="non-virtual"><scope>render::Render</scope><name>processNamespace</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

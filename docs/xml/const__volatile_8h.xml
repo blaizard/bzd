@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="const__volatile_8h" kind="file" language="C++">
+    <compoundname>const_volatile.h</compoundname>
+    <includes refid="integral__constant_8h" local="yes">include/type_traits/integral_constant.h</includes>
+    <includedby refid="fundamental_8h" local="yes">include/type_traits/fundamental.h</includedby>
+    <includedby refid="utility_8h" local="yes">include/utility.h</includedby>
+    <includedby refid="span_8h" local="yes">include/container/span.h</includedby>
+    <includedby refid="string_8h" local="yes">include/container/string.h</includedby>
+    <includedby refid="const__volatile__test_8cpp" local="yes">include/type_traits/const_volatile_test.cpp</includedby>
+    <incdepgraph>
+      <node id="817">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h"/>
+        <childnode refid="818" relation="include">
+        </childnode>
+      </node>
+      <node id="818">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="839">
+        <label>include/container/expected.h</label>
+        <link refid="expected_8h_source"/>
+        <childnode refid="831" relation="include">
+        </childnode>
+      </node>
+      <node id="836">
+        <label>include/container/pool.h</label>
+        <link refid="pool_8h_source"/>
+      </node>
+      <node id="833">
+        <label>include/system.h</label>
+        <link refid="system_8h_source"/>
+        <childnode refid="830" relation="include">
+        </childnode>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="823" relation="include">
+        </childnode>
+        <childnode refid="822" relation="include">
+        </childnode>
+      </node>
+      <node id="826">
+        <label>include/container/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="827" relation="include">
+        </childnode>
+        <childnode refid="828" relation="include">
+        </childnode>
+        <childnode refid="834" relation="include">
+        </childnode>
+        <childnode refid="835" relation="include">
+        </childnode>
+      </node>
+      <node id="831">
+        <label>include/container/variant.h</label>
+        <link refid="variant_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+      </node>
+      <node id="825">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="826" relation="include">
+        </childnode>
+        <childnode refid="828" relation="include">
+        </childnode>
+        <childnode refid="837" relation="include">
+        </childnode>
+        <childnode refid="838" relation="include">
+        </childnode>
+        <childnode refid="831" relation="include">
+        </childnode>
+        <childnode refid="839" relation="include">
+        </childnode>
+        <childnode refid="834" relation="include">
+        </childnode>
+        <childnode refid="824" relation="include">
+        </childnode>
+        <childnode refid="840" relation="include">
+        </childnode>
+        <childnode refid="823" relation="include">
+        </childnode>
+        <childnode refid="822" relation="include">
+        </childnode>
+        <childnode refid="836" relation="include">
+        </childnode>
+      </node>
+      <node id="837">
+        <label>include/container/tuple.h</label>
+        <link refid="tuple_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+      </node>
+      <node id="819">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h"/>
+        <childnode refid="820" relation="include">
+        </childnode>
+        <childnode refid="825" relation="include">
+        </childnode>
+        <childnode refid="826" relation="include">
+        </childnode>
+        <childnode refid="828" relation="include">
+        </childnode>
+      </node>
+      <node id="824">
+        <label>include/to_string.h</label>
+        <link refid="to__string_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+      </node>
+      <node id="840">
+        <label>include/scheduler.h</label>
+        <link refid="scheduler_8h_source"/>
+      </node>
+      <node id="827">
+        <label>include/container/string_view.h</label>
+        <link refid="string__view_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="828" relation="include">
+        </childnode>
+        <childnode refid="830" relation="include">
+        </childnode>
+        <childnode refid="832" relation="include">
+        </childnode>
+        <childnode refid="833" relation="include">
+        </childnode>
+        <childnode refid="829" relation="include">
+        </childnode>
+        <childnode refid="823" relation="include">
+        </childnode>
+        <childnode refid="822" relation="include">
+        </childnode>
+      </node>
+      <node id="832">
+        <label>include/container/iostream.h</label>
+        <link refid="iostream_8h_source"/>
+        <childnode refid="833" relation="include">
+        </childnode>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="824" relation="include">
+        </childnode>
+        <childnode refid="829" relation="include">
+        </childnode>
+      </node>
+      <node id="820">
+        <label>include/type_traits/fundamental.h</label>
+        <link refid="fundamental_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="824" relation="include">
+        </childnode>
+      </node>
+      <node id="838">
+        <label>include/template_metaprogramming.h</label>
+        <link refid="template__metaprogramming_8h_source"/>
+        <childnode refid="837" relation="include">
+        </childnode>
+        <childnode refid="831" relation="include">
+        </childnode>
+      </node>
+      <node id="822">
+        <label>include/log.h</label>
+        <link refid="log_8h_source"/>
+        <childnode refid="823" relation="include">
+        </childnode>
+      </node>
+      <node id="821">
+        <label>include/format.h</label>
+        <link refid="format_8h_source"/>
+        <childnode refid="822" relation="include">
+        </childnode>
+      </node>
+      <node id="828">
+        <label>include/container/string.h</label>
+        <link refid="string_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="824" relation="include">
+        </childnode>
+        <childnode refid="829" relation="include">
+        </childnode>
+        <childnode refid="822" relation="include">
+        </childnode>
+      </node>
+      <node id="834">
+        <label>include/container/vector.h</label>
+        <link refid="vector_8h_source"/>
+        <childnode refid="821" relation="include">
+        </childnode>
+        <childnode refid="824" relation="include">
+        </childnode>
+      </node>
+      <node id="835">
+        <label>include/container/array.h</label>
+        <link refid="container_2array_8h_source"/>
+        <childnode refid="836" relation="include">
+        </childnode>
+      </node>
+      <node id="830">
+        <label>include/assert_minimal.h</label>
+        <link refid="assert__minimal_8h_source"/>
+        <childnode refid="831" relation="include">
+        </childnode>
+        <childnode refid="823" relation="include">
+        </childnode>
+      </node>
+      <node id="823">
+        <label>include/assert.h</label>
+        <link refid="assert_8h_source"/>
+      </node>
+      <node id="829">
+        <label>include/container/string_stream.h</label>
+        <link refid="string__stream_8h_source"/>
+        <childnode refid="824" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addConst" prot="public">bzd::typeTraits::addConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addVolatile" prot="public">bzd::typeTraits::addVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addCV" prot="public">bzd::typeTraits::addCV</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeConst" prot="public">bzd::typeTraits::removeConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeConst_3_01const_01T_01_4" prot="public">bzd::typeTraits::removeConst&lt; const T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeVolatile" prot="public">bzd::typeTraits::removeVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeVolatile_3_01volatile_01T_01_4" prot="public">bzd::typeTraits::removeVolatile&lt; volatile T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeCV" prot="public">bzd::typeTraits::removeCV</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isConst" prot="public">bzd::typeTraits::isConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isConst_3_01const_01T_01_4" prot="public">bzd::typeTraits::isConst&lt; const T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVolatile" prot="public">bzd::typeTraits::isVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVolatile_3_01volatile_01T_01_4" prot="public">bzd::typeTraits::isVolatile&lt; volatile T &gt;</innerclass>
+    <innernamespace refid="namespacebzd">bzd</innernamespace>
+    <innernamespace refid="namespacebzd_1_1typeTraits">bzd::typeTraits</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/type_traits/integral_constant.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacebzd" kindref="compound">bzd</ref></highlight></codeline>
+<codeline lineno="6"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">typeTraits</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addConst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11" refid="structbzd_1_1typeTraits_1_1addConst" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addConst" kindref="compound">addConst</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addVolatile</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15" refid="structbzd_1_1typeTraits_1_1addVolatile" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addVolatile" kindref="compound">addVolatile</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">volatile</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addCV</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19" refid="structbzd_1_1typeTraits_1_1addCV" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addCV" kindref="compound">addCV</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">volatile</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>removeConst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23" refid="structbzd_1_1typeTraits_1_1removeConst" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeConst" kindref="compound">removeConst</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="24" refid="structbzd_1_1typeTraits_1_1removeConst_3_01const_01T_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeConst" kindref="compound">removeConst</ref>&lt;const<sp/>T&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>removeVolatile</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28" refid="structbzd_1_1typeTraits_1_1removeVolatile" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeVolatile" kindref="compound">removeVolatile</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="29" refid="structbzd_1_1typeTraits_1_1removeVolatile_3_01volatile_01T_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeVolatile" kindref="compound">removeVolatile</ref>&lt;volatile<sp/>T&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>removeCV</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="34" refid="structbzd_1_1typeTraits_1_1removeCV" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeCV" kindref="compound">removeCV</ref></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1removeVolatile" kindref="compound">removeVolatile&lt;typename removeConst&lt;T&gt;::type</ref>&gt;::type<sp/>type;</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>isConst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41" refid="structbzd_1_1typeTraits_1_1isConst" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isConst" kindref="compound">isConst</ref><sp/>:<sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">falseType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="42" refid="structbzd_1_1typeTraits_1_1isConst_3_01const_01T_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isConst" kindref="compound">isConst</ref>&lt;const<sp/>T&gt;<sp/>:<sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">trueType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>isVolatile</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46" refid="structbzd_1_1typeTraits_1_1isVolatile" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isVolatile" kindref="compound">isVolatile</ref><sp/>:<sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">falseType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="47" refid="structbzd_1_1typeTraits_1_1isVolatile_3_01volatile_01T_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isVolatile" kindref="compound">isVolatile</ref>&lt;volatile<sp/>T&gt;<sp/>:<sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">trueType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="49"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/type_traits/const_volatile.h"/>
+  </compounddef>
+</doxygen>

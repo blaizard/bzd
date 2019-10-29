@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1Pool_1_1ItemType" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::Pool::ItemType</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structbzd_1_1Pool_1_1ItemType_1a6088206aedd6badf5d99132279328831" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::Pool&lt; T, N &gt;::ItemType::container_</definition>
+        <argsstring></argsstring>
+        <name>container_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/pool.h" line="20" column="1" bodyfile="include/container/pool.h" bodystart="20" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structbzd_1_1Pool_1_1ItemType_1a4aacd8ae74173a26684b7cf2ebc24624" prot="public" static="no" mutable="no">
+        <type><ref refid="structbzd_1_1Pool_1_1ItemType" kindref="compound">ItemType</ref> *</type>
+        <definition>ItemType* bzd::Pool&lt; T, N &gt;::ItemType::next_</definition>
+        <argsstring></argsstring>
+        <name>next_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/pool.h" line="21" column="1" bodyfile="include/container/pool.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="414">
+        <label>T</label>
+      </node>
+      <node id="413">
+        <label>bzd::Pool&lt; T, N &gt;::ItemType</label>
+        <link refid="structbzd_1_1Pool_1_1ItemType"/>
+        <childnode refid="413" relation="usage">
+          <edgelabel>next_</edgelabel>
+        </childnode>
+        <childnode refid="414" relation="usage">
+          <edgelabel>container_</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/pool.h" line="19" column="1" bodyfile="include/container/pool.h" bodystart="18" bodyend="22"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1Pool_1_1ItemType_1a6088206aedd6badf5d99132279328831" prot="public" virt="non-virtual"><scope>bzd::Pool::ItemType</scope><name>container_</name></member>
+      <member refid="structbzd_1_1Pool_1_1ItemType_1a4aacd8ae74173a26684b7cf2ebc24624" prot="public" virt="non-virtual"><scope>bzd::Pool::ItemType</scope><name>next_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

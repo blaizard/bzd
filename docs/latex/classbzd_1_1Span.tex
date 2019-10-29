@@ -1,0 +1,122 @@
+\hypertarget{classbzd_1_1Span}{}\section{bzd\+:\+:Span$<$ T $>$ Class Template Reference}
+\label{classbzd_1_1Span}\index{bzd\+::\+Span$<$ T $>$@{bzd\+::\+Span$<$ T $>$}}
+
+
+Inheritance diagram for bzd\+:\+:Span$<$ T $>$\+:
+% FIG 0
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a05be10d237f4241e1301e0016cfe6bc5}\label{classbzd_1_1Span_a05be10d237f4241e1301e0016cfe6bc5}} 
+using {\bfseries Iterator} = \hyperlink{classbzd_1_1iterator_1_1Contiguous}{bzd\+::iterator\+::\+Contiguous}$<$ Data\+Type $>$
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a489018b7f666f0471892f002ac023418}\label{classbzd_1_1Span_a489018b7f666f0471892f002ac023418}} 
+using {\bfseries Const\+Iterator} = \hyperlink{classbzd_1_1iterator_1_1Contiguous}{bzd\+::iterator\+::\+Contiguous}$<$ const Data\+Type $>$
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a9b3fc1dc0e73b8a4afb332924feaa4ac}\label{classbzd_1_1Span_a9b3fc1dc0e73b8a4afb332924feaa4ac}} 
+constexpr {\bfseries Span} (Data\+Type $\ast$const data, const Size\+Type size) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ad82bd5d0d52656d5e09dff6933330418}\label{classbzd_1_1Span_ad82bd5d0d52656d5e09dff6933330418}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$ Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr {\bfseries Span} (const \hyperlink{classbzd_1_1Span}{Span}$<$ typename \hyperlink{structbzd_1_1typeTraits_1_1removeConst}{bzd\+::type\+Traits\+::remove\+Const}$<$ Data\+Type $>$\+::type $>$ \&span) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_af3494078a4f83986bfdd5bd128665c21}\label{classbzd_1_1Span_af3494078a4f83986bfdd5bd128665c21}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Iterator} {\bfseries begin} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ab70f070a578da94cda73b39309b89fae}\label{classbzd_1_1Span_ab70f070a578da94cda73b39309b89fae}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Iterator} {\bfseries end} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_afb9bab4ab658e534052d9e8023ab7c74}\label{classbzd_1_1Span_afb9bab4ab658e534052d9e8023ab7c74}} 
+constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Const\+Iterator} {\bfseries begin} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ac2dda401660081d46029f92e229ef09b}\label{classbzd_1_1Span_ac2dda401660081d46029f92e229ef09b}} 
+constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Const\+Iterator} {\bfseries cbegin} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a3da7f634c328cef8b88a092e23a71518}\label{classbzd_1_1Span_a3da7f634c328cef8b88a092e23a71518}} 
+constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Const\+Iterator} {\bfseries end} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a2baed781fe170f00e00b1e53907b2fb1}\label{classbzd_1_1Span_a2baed781fe170f00e00b1e53907b2fb1}} 
+constexpr \hyperlink{classbzd_1_1iterator_1_1Contiguous}{Const\+Iterator} {\bfseries cend} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_adf6b4d628d334aa39cef146885c7dfdd}\label{classbzd_1_1Span_adf6b4d628d334aa39cef146885c7dfdd}} 
+constexpr Size\+Type {\bfseries size} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a184448cd70596a0d1fbe20ac2652a5ea}\label{classbzd_1_1Span_a184448cd70596a0d1fbe20ac2652a5ea}} 
+constexpr void {\bfseries reverse} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_abab84fd06746b5a412fc19540a948014}\label{classbzd_1_1Span_abab84fd06746b5a412fc19540a948014}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr Data\+Type \& {\bfseries operator\mbox{[}$\,$\mbox{]}} (const Size\+Type index)
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ae97940edf6fee163354ff8b2157c96d6}\label{classbzd_1_1Span_ae97940edf6fee163354ff8b2157c96d6}} 
+constexpr const Data\+Type \& {\bfseries operator\mbox{[}$\,$\mbox{]}} (const Size\+Type index) const
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a78d866dc5a3c5801df5a6ee592d59028}\label{classbzd_1_1Span_a78d866dc5a3c5801df5a6ee592d59028}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr Data\+Type \& {\bfseries at} (const Size\+Type index)
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a3f77ad40ca29e06e8cc9e978c47ff709}\label{classbzd_1_1Span_a3f77ad40ca29e06e8cc9e978c47ff709}} 
+constexpr const T \& {\bfseries at} (const Size\+Type index) const
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_add1510b3f86751b94a2c5976cfceb1ed}\label{classbzd_1_1Span_add1510b3f86751b94a2c5976cfceb1ed}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr Data\+Type \& {\bfseries front} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a388f1b3918cd2885330566aa50f3d087}\label{classbzd_1_1Span_a388f1b3918cd2885330566aa50f3d087}} 
+constexpr const Data\+Type \& {\bfseries front} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ac89dff5757cbdeef6c6c900025775806}\label{classbzd_1_1Span_ac89dff5757cbdeef6c6c900025775806}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr Data\+Type \& {\bfseries back} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_abb8cd092fe87f6f5d3c0208687687be3}\label{classbzd_1_1Span_abb8cd092fe87f6f5d3c0208687687be3}} 
+constexpr const Data\+Type \& {\bfseries back} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ab053a80dcbce3fada31ef7928a543ace}\label{classbzd_1_1Span_ab053a80dcbce3fada31ef7928a543ace}} 
+{\footnotesize template$<$class Q  = Is\+Const, typename bzd\+::type\+Traits\+::enable\+If$<$!\+Q\+::value, void $>$\+::type $\ast$  = nullptr$>$ }\\constexpr Data\+Type $\ast$ {\bfseries data} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ad6fd0cbc46dd05bf28c0bdfc92bfd504}\label{classbzd_1_1Span_ad6fd0cbc46dd05bf28c0bdfc92bfd504}} 
+constexpr const Data\+Type $\ast$ {\bfseries data} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_aa024c6dcd31b0d85278d34101e15d828}\label{classbzd_1_1Span_aa024c6dcd31b0d85278d34101e15d828}} 
+constexpr Size\+Type {\bfseries find} (const Data\+Type \&item, const Size\+Type start=0) const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a1a73e8fc0549ac98ca7727860fa94cb5}\label{classbzd_1_1Span_a1a73e8fc0549ac98ca7727860fa94cb5}} 
+constexpr bool {\bfseries empty} () const noexcept
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a8b2929e3d864dfb438a5c0e4179c5589}\label{classbzd_1_1Span_a8b2929e3d864dfb438a5c0e4179c5589}} 
+static constexpr const Size\+Type {\bfseries npos} = static\+\_\+cast$<$Size\+Type$>$(-\/1)
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_ad6e7f896c2aa75a5c8d39ee1ac5f0fff}\label{classbzd_1_1Span_ad6e7f896c2aa75a5c8d39ee1ac5f0fff}} 
+using {\bfseries Data\+Type} = T
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a2f766718aa55276d578bdb80d2f7de99}\label{classbzd_1_1Span_a2f766718aa55276d578bdb80d2f7de99}} 
+using {\bfseries Self\+Type} = \hyperlink{classbzd_1_1Span}{Span}$<$ Data\+Type $>$
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a77d2842477c7adccf5834b6817e7dc9c}\label{classbzd_1_1Span_a77d2842477c7adccf5834b6817e7dc9c}} 
+using {\bfseries Is\+Const} = typename \hyperlink{structbzd_1_1typeTraits_1_1isConst}{bzd\+::type\+Traits\+::is\+Const}$<$ Data\+Type $>$
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a6de99ffc97b145bb8f4e336ffe5b1114}\label{classbzd_1_1Span_a6de99ffc97b145bb8f4e336ffe5b1114}} 
+T $\ast$ {\bfseries data\+\_\+} = nullptr
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a2bb038c31c95eace73b760b69da48cec}\label{classbzd_1_1Span_a2bb038c31c95eace73b760b69da48cec}} 
+Size\+Type {\bfseries size\+\_\+} = 0
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1Span_a366eba5cfa37dd3e2ca31cdf6ae5b799}\label{classbzd_1_1Span_a366eba5cfa37dd3e2ca31cdf6ae5b799}} 
+{\footnotesize template$<$class Q $>$ }\\class {\bfseries Span}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/container/span.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1Vector" kind="class" language="C++" prot="public">
+    <compoundname>bzd::Vector</compoundname>
+    <basecompoundref refid="classbzd_1_1impl_1_1Vector" prot="public" virt="non-virtual">bzd::impl::Vector&lt; T &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>SizeType</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classbzd_1_1Vector_1af94fee77ac84d9b8e849166c2fb03b95" prot="protected" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::Vector&lt; T, N &gt;::data_[N]</definition>
+        <argsstring>[N]</argsstring>
+        <name>data_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="73" column="1" bodyfile="include/container/vector.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1Vector_1af05b556b4e1bcb9fb6c0f51d915c6639" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>Args</declname>
+            <defname>Args</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::Vector&lt; T, N &gt;::Vector</definition>
+        <argsstring>(Args &amp;&amp;... args)</argsstring>
+        <name>Vector</name>
+        <param>
+          <type>Args &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="66" column="1" bodyfile="include/container/vector.h" bodystart="66" bodyend="70"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="616">
+        <label>bzd::Vector&lt; T, N &gt;</label>
+        <link refid="classbzd_1_1Vector"/>
+        <childnode refid="617" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="617">
+        <label>interface::Vector&lt; T &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Vector"/>
+        <childnode refid="618" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="618">
+        <label>Impl</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="619">
+        <label>bzd::Vector&lt; T, N &gt;</label>
+        <link refid="classbzd_1_1Vector"/>
+        <childnode refid="620" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="620">
+        <label>interface::Vector&lt; T &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Vector"/>
+        <childnode refid="621" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="621">
+        <label>Impl</label>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/vector.h" line="63" column="1" bodyfile="include/container/vector.h" bodystart="62" bodyend="74"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1Vector_1a4ada4048843724246d7cd7577e82f94d" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>capacity</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1aec6fa1477596bf8b0fd4d4db45a68585" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>capacity_</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1af91b3538f35c7723d2ace99e7aadb45b" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>clear</name></member>
+      <member refid="classbzd_1_1Vector_1af94fee77ac84d9b8e849166c2fb03b95" prot="protected" virt="non-virtual"><scope>bzd::Vector</scope><name>data_</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1af04f9b0096d49ebab090f1b12a6f2172" prot="protected" virt="non-virtual"><scope>bzd::Vector</scope><name>Parent</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1a4c250190d24f469139b8ab60dd8a4872" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>pushBack</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1aa5ec19442f1fb8be95b1f01d2d435a06" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>resize</name></member>
+      <member refid="classbzd_1_1Vector_1af05b556b4e1bcb9fb6c0f51d915c6639" prot="public" virt="non-virtual"><scope>bzd::Vector</scope><name>Vector</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1a555fb3184c63f405f1726cdabfb8b99b" prot="public" virt="non-virtual" ambiguityscope="bzd::impl::Vector::"><scope>bzd::Vector</scope><name>Vector</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

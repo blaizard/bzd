@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1format_1_1PrintContext" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::format::PrintContext</compoundname>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1format_1_1PrintContext_1a1681b28ee54d4b975580b9c9f5d16e43" prot="private" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+        <definition>bzd::OStream&amp; bzd::impl::format::PrintContext::stream_</definition>
+        <argsstring></argsstring>
+        <name>stream_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="454" column="1" bodyfile="include/format.h" bodystart="454" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1format_1_1PrintContext_1af2e0dcafb7929c79292f7d1193fc0a49" prot="private" static="no" mutable="no">
+        <type>const <ref refid="classbzd_1_1impl_1_1Vector" kindref="compound">bzd::interface::Vector</ref>&lt; <ref refid="classbzd_1_1VariantConstexpr" kindref="compound">bzd::impl::format::Arg</ref> &gt; &amp;</type>
+        <definition>const bzd::interface::Vector&lt;bzd::impl::format::Arg&gt;&amp; bzd::impl::format::PrintContext::args_</definition>
+        <argsstring></argsstring>
+        <name>args_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="455" column="1" bodyfile="include/format.h" bodystart="455" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1PrintContext_1a9920fc572a2c540c4de7f4bd979c264a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::format::PrintContext::PrintContext</definition>
+        <argsstring>(bzd::OStream &amp;stream, const bzd::interface::Vector&lt; bzd::impl::format::Arg &gt; &amp;args)</argsstring>
+        <name>PrintContext</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1Vector" kindref="compound">bzd::interface::Vector</ref>&lt; <ref refid="classbzd_1_1VariantConstexpr" kindref="compound">bzd::impl::format::Arg</ref> &gt; &amp;</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="433" column="1" bodyfile="include/format.h" bodystart="433" bodyend="433"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1PrintContext_1add45b012bad789e01bac4c64d37357a3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::format::PrintContext::addSubstring</definition>
+        <argsstring>(const bzd::StringView &amp;str)</argsstring>
+        <name>addSubstring</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="434" column="1" bodyfile="include/format.h" bodystart="434" bodyend="434"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1PrintContext_1a3e5b759de7473957356b72fd4163568f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::format::PrintContext::addMetadata</definition>
+        <argsstring>(const Metadata &amp;metadata)</argsstring>
+        <name>addMetadata</name>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="435" column="1" bodyfile="include/format.h" bodystart="435" bodyend="450"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1format_1_1PrintContext_1abe9eda86713670a5aa31eeec0e145adc" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::format::PrintContext::onError</definition>
+        <argsstring>(const bzd::StringView &amp;message) const</argsstring>
+        <name>onError</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="451" column="1" bodyfile="include/format.h" bodystart="451" bodyend="451"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/format.h" line="431" column="1" bodyfile="include/format.h" bodystart="430" bodyend="456"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1a3e5b759de7473957356b72fd4163568f" prot="public" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>addMetadata</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1add45b012bad789e01bac4c64d37357a3" prot="public" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>addSubstring</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1af2e0dcafb7929c79292f7d1193fc0a49" prot="private" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>args_</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1abe9eda86713670a5aa31eeec0e145adc" prot="public" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>onError</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1a9920fc572a2c540c4de7f4bd979c264a" prot="public" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>PrintContext</name></member>
+      <member refid="classbzd_1_1impl_1_1format_1_1PrintContext_1a1681b28ee54d4b975580b9c9f5d16e43" prot="private" virt="non-virtual"><scope>bzd::impl::format::PrintContext</scope><name>stream_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

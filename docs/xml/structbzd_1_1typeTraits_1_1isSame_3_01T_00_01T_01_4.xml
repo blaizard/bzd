@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1isSame_3_01T_00_01T_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::isSame&lt; T, T &gt;</compoundname>
+    <basecompoundref refid="structbzd_1_1typeTraits_1_1integralConstant" prot="public" virt="non-virtual">bzd::typeTraits::integralConstant&lt; bool, true &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="369">
+        <label>bzd::typeTraits::isSame&lt; T, T &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1isSame_3_01T_00_01T_01_4"/>
+        <childnode refid="370" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="370">
+        <label>trueType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="373">
+        <label>T</label>
+      </node>
+      <node id="371">
+        <label>bzd::typeTraits::isSame&lt; T, T &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1isSame_3_01T_00_01T_01_4"/>
+        <childnode refid="372" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="372">
+        <label>trueType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+        <childnode refid="373" relation="usage">
+          <edgelabel>value</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/type_traits/utils.h" line="37" column="1" bodyfile="include/type_traits/utils.h" bodystart="37" bodyend="37"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1afe505065d9034110fb3a385c0a81ea16" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isSame&lt; T, T &gt;</scope><name>operator valueType</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a7f97a49b251bab219b3552efbffbeab1" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isSame&lt; T, T &gt;</scope><name>operator()</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a9f27fd41bacb9695bdb0068eaeb13742" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isSame&lt; T, T &gt;</scope><name>type</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a614e5b5b8d73d1c5a5f63b5ad8fa5841" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isSame&lt; T, T &gt;</scope><name>value</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a25f8639da0d0702b714b2ae46e7b2831" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isSame&lt; T, T &gt;</scope><name>valueType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

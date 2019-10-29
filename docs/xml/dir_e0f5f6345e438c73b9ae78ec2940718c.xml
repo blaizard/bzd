@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_e0f5f6345e438c73b9ae78ec2940718c" kind="dir">
+    <compoundname>include/container</compoundname>
+    <innerdir refid="dir_434628b8aa44b4e82a4b66b645559df3">include/container/iterator</innerdir>
+    <innerfile refid="container_2array_8h">array.h</innerfile>
+    <innerfile refid="constexpr__string__view_8h">constexpr_string_view.h</innerfile>
+    <innerfile refid="constexpr__string__view__test_8cpp">constexpr_string_view_test.cpp</innerfile>
+    <innerfile refid="expected_8h">expected.h</innerfile>
+    <innerfile refid="expected__test_8cpp">expected_test.cpp</innerfile>
+    <innerfile refid="iostream_8h">iostream.h</innerfile>
+    <innerfile refid="pool_8cpp">pool.cpp</innerfile>
+    <innerfile refid="pool_8h">pool.h</innerfile>
+    <innerfile refid="pool__test_8cpp">pool_test.cpp</innerfile>
+    <innerfile refid="span_8h">span.h</innerfile>
+    <innerfile refid="span__test_8cpp">span_test.cpp</innerfile>
+    <innerfile refid="string_8h">string.h</innerfile>
+    <innerfile refid="string__stream_8h">string_stream.h</innerfile>
+    <innerfile refid="string__stream__test_8cpp">string_stream_test.cpp</innerfile>
+    <innerfile refid="string__test_8cpp">string_test.cpp</innerfile>
+    <innerfile refid="string__view_8h">string_view.h</innerfile>
+    <innerfile refid="string__view__test_8cpp">string_view_test.cpp</innerfile>
+    <innerfile refid="tuple_8h">tuple.h</innerfile>
+    <innerfile refid="tuple__test_8cpp">tuple_test.cpp</innerfile>
+    <innerfile refid="variant_8h">variant.h</innerfile>
+    <innerfile refid="variant__test_8cpp">variant_test.cpp</innerfile>
+    <innerfile refid="vector_8h">vector.h</innerfile>
+    <innerfile refid="vector__test_8cpp">vector_test.cpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/container/"/>
+  </compounddef>
+</doxygen>

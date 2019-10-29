@@ -1,0 +1,49 @@
+\hypertarget{classbzd_1_1Pool}{}\section{bzd\+:\+:Pool$<$ T, N $>$ Class Template Reference}
+\label{classbzd_1_1Pool}\index{bzd\+::\+Pool$<$ T, N $>$@{bzd\+::\+Pool$<$ T, N $>$}}
+
+
+{\ttfamily \#include $<$pool.\+h$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structbzd_1_1Pool_1_1ItemType}{Item\+Type}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr void \hyperlink{classbzd_1_1Pool_aa7b178465046c7b0506e74f778d741c2}{release} (T $\ast$container) noexcept
+\item 
+constexpr T $\ast$ \hyperlink{classbzd_1_1Pool_a7f29ee139282eda6d22e5b81beb185fb}{reserve} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1Pool_a462c4fb4f29840af32b2a2979bcd58dd}\label{classbzd_1_1Pool_a462c4fb4f29840af32b2a2979bcd58dd}} 
+void {\bfseries to\+Stream} (std\+::ostream \&os)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T, Size\+Type N$>$\newline
+class bzd\+::\+Pool$<$ T, N $>$}
+
+\hyperlink{classA}{A} \hyperlink{classbzd_1_1Pool}{Pool} is a fixed memory buffer containing fixed size elements that can be taken or released. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classbzd_1_1Pool_aa7b178465046c7b0506e74f778d741c2}\label{classbzd_1_1Pool_aa7b178465046c7b0506e74f778d741c2}} 
+\index{bzd\+::\+Pool@{bzd\+::\+Pool}!release@{release}}
+\index{release@{release}!bzd\+::\+Pool@{bzd\+::\+Pool}}
+\subsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily template$<$class T , Size\+Type N$>$ \\
+constexpr void \hyperlink{classbzd_1_1Pool}{bzd\+::\+Pool}$<$ T, N $>$\+::release (\begin{DoxyParamCaption}\item[{T $\ast$}]{container }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+Release an element from the pool \mbox{\Hypertarget{classbzd_1_1Pool_a7f29ee139282eda6d22e5b81beb185fb}\label{classbzd_1_1Pool_a7f29ee139282eda6d22e5b81beb185fb}} 
+\index{bzd\+::\+Pool@{bzd\+::\+Pool}!reserve@{reserve}}
+\index{reserve@{reserve}!bzd\+::\+Pool@{bzd\+::\+Pool}}
+\subsubsection{\texorpdfstring{reserve()}{reserve()}}
+{\footnotesize\ttfamily template$<$class T , Size\+Type N$>$ \\
+constexpr T$\ast$ \hyperlink{classbzd_1_1Pool}{bzd\+::\+Pool}$<$ T, N $>$\+::reserve (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+Reserve an element from the free list (if any) 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/container/pool.\+h\end{DoxyCompactItemize}

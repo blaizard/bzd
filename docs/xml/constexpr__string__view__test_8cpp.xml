@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="constexpr__string__view__test_8cpp" kind="file" language="C++">
+    <compoundname>constexpr_string_view_test.cpp</compoundname>
+    <includes local="yes">gtest/gtest.h</includes>
+    <includes refid="constexpr__string__view_8h" local="yes">include/container/constexpr_string_view.h</includes>
+    <incdepgraph>
+      <node id="193">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="190">
+        <label>include/container/constexpr_string_view_test.cpp</label>
+        <link refid="constexpr__string__view__test_8cpp"/>
+        <childnode refid="191" relation="include">
+        </childnode>
+        <childnode refid="192" relation="include">
+        </childnode>
+      </node>
+      <node id="192">
+        <label>include/container/constexpr_string_view.h</label>
+        <link refid="constexpr__string__view_8h_source"/>
+        <childnode refid="193" relation="include">
+        </childnode>
+      </node>
+      <node id="191">
+        <label>gtest/gtest.h</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="constexpr__string__view__test_8cpp_1a7b1b67535a6657eaa18e5c82fc936ddb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(ContainerConstexprStringView, base)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>ContainerConstexprStringView</type>
+        </param>
+        <param>
+          <type>base</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view_test.cpp" line="4" column="1" bodyfile="include/container/constexpr_string_view_test.cpp" bodystart="4" bodyend="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&quot;gtest/gtest.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/container/constexpr_string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal">TEST(ContainerConstexprStringView,<sp/>base)</highlight></codeline>
+<codeline lineno="5"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><sp/><sp/><sp/><sp/>constexpr<sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>strObj<sp/>=<sp/>CONSTEXPR_STRING_VIEW(</highlight><highlight class="stringliteral">&quot;Hello&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/>static_assert(strObj.data()[0]<sp/>==<sp/></highlight><highlight class="charliteral">&apos;H&apos;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;test&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="8"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/container/constexpr_string_view_test.cpp"/>
+  </compounddef>
+</doxygen>

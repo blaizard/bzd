@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classparsedocumentation_1_1DoxygenParser" kind="class" language="Python" prot="public">
+    <compoundname>parsedocumentation::DoxygenParser</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classparsedocumentation_1_1DoxygenParser_1afbd20fe668583aeb43b296e9140785c3" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.DoxygenParser::data</definition>
+        <argsstring></argsstring>
+        <name>data</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="72" column="1" bodyfile="parsedocumentation.py" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1aa358d8278c14fb9776a2d7369214b9c6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.__init__</definition>
+        <argsstring>(self)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="71" column="1" bodyfile="parsedocumentation.py" bodystart="71" bodyend="73"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1aa4ade0c665734267b4aaf5333193432f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.assertTrue</definition>
+        <argsstring>(self, condition, message, argv)</argsstring>
+        <name>assertTrue</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>condition</type>
+          <defname>condition</defname>
+        </param>
+        <param>
+          <type>message</type>
+          <defname>message</defname>
+        </param>
+        <param>
+          <type>argv</type>
+          <defname>argv</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="77" column="1" bodyfile="parsedocumentation.py" bodystart="77" bodyend="81"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1a5ccbd61554f7780e02703b4d776e07b3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.parseValue</definition>
+        <argsstring>(self, rules, value, key=None)</argsstring>
+        <name>parseValue</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>rules</type>
+          <defname>rules</defname>
+        </param>
+        <param>
+          <type>value</type>
+          <defname>value</defname>
+        </param>
+        <param>
+          <type>key</type>
+          <defname>key</defname>
+          <defval>None</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="85" column="1" bodyfile="parsedocumentation.py" bodystart="85" bodyend="101"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1ae151a99cc3eeb0ba1e869fdbe3154d16" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.parseElement</definition>
+        <argsstring>(self, element, definition, data={})</argsstring>
+        <name>parseElement</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>element</type>
+          <defname>element</defname>
+        </param>
+        <param>
+          <type>definition</type>
+          <defname>definition</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="105" column="1" bodyfile="parsedocumentation.py" bodystart="105" bodyend="120"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1ad4b62eb487d05a3f10f361620c063e27" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.normalizeName</definition>
+        <argsstring>(self, data)</argsstring>
+        <name>normalizeName</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="124" column="1" bodyfile="parsedocumentation.py" bodystart="124" bodyend="133"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1a9be52c68e0e4f9a93f59f60b4cc075be" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.addMember</definition>
+        <argsstring>(self, data, member)</argsstring>
+        <name>addMember</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+        </param>
+        <param>
+          <type>member</type>
+          <defname>member</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="137" column="1" bodyfile="parsedocumentation.py" bodystart="137" bodyend="143"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1ad272c1b47d8d18bbc7193d361737ee48" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.parse</definition>
+        <argsstring>(self, root, dictionary)</argsstring>
+        <name>parse</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>root</type>
+          <defname>root</defname>
+        </param>
+        <param>
+          <type>dictionary</type>
+          <defname>dictionary</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="147" column="1" bodyfile="parsedocumentation.py" bodystart="147" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="function" id="classparsedocumentation_1_1DoxygenParser_1ac96aa91f2652eb3eb1f5a54a6942c4dd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def parsedocumentation.DoxygenParser.parseSubElements</definition>
+        <argsstring>(self, root, dictionary, data)</argsstring>
+        <name>parseSubElements</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>root</type>
+          <defname>root</defname>
+        </param>
+        <param>
+          <type>dictionary</type>
+          <defname>dictionary</defname>
+        </param>
+        <param>
+          <type>data</type>
+          <defname>data</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="150" column="1" bodyfile="parsedocumentation.py" bodystart="150" bodyend="181"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="parsedocumentation.py" line="69" column="1" bodyfile="parsedocumentation.py" bodystart="69" bodyend="182"/>
+    <listofallmembers>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1aa358d8278c14fb9776a2d7369214b9c6" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>__init__</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1a9be52c68e0e4f9a93f59f60b4cc075be" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>addMember</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1aa4ade0c665734267b4aaf5333193432f" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>assertTrue</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1afbd20fe668583aeb43b296e9140785c3" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>data</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1ad4b62eb487d05a3f10f361620c063e27" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>normalizeName</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1ad272c1b47d8d18bbc7193d361737ee48" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>parse</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1ae151a99cc3eeb0ba1e869fdbe3154d16" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>parseElement</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1ac96aa91f2652eb3eb1f5a54a6942c4dd" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>parseSubElements</name></member>
+      <member refid="classparsedocumentation_1_1DoxygenParser_1a5ccbd61554f7780e02703b4d776e07b3" prot="public" virt="non-virtual"><scope>parsedocumentation::DoxygenParser</scope><name>parseValue</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1alignedStorage" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::alignedStorage</compoundname>
+    <innerclass refid="structbzd_1_1alignedStorage_1_1type" prot="public">bzd::alignedStorage::type</innerclass>
+    <templateparamlist>
+      <param>
+        <type>SizeType</type>
+        <declname>Len</declname>
+        <defname>Len</defname>
+      </param>
+      <param>
+        <type>SizeType</type>
+        <declname>Align</declname>
+        <defname>Align</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/utility.h" line="136" column="1" bodyfile="include/utility.h" bodystart="135" bodyend="141"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

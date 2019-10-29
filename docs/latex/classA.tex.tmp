@@ -1,0 +1,21 @@
+\hypertarget{classA}{}\section{A Struct Reference}
+\label{classA}\index{A@{A}}
+
+
+Inheritance diagram for A\+:
+% FIG 0
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classA_a2e7238b48af75b396996d5a4c8814c12}\label{classA_a2e7238b48af75b396996d5a4c8814c12}} 
+int \& {\bfseries get} ()
+\item 
+\mbox{\Hypertarget{classA_a5430e360bd957f67de0063e9a8b7a21d}\label{classA_a5430e360bd957f67de0063e9a8b7a21d}} 
+int {\bfseries fun} () const \&
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/container/string\+\_\+test.\+cpp\item 
+include/type\+\_\+traits/function\+\_\+test.\+cpp\end{DoxyCompactItemize}

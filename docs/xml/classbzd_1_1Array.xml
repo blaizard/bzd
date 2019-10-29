@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1Array" kind="class" language="C++" prot="public">
+    <compoundname>bzd::Array</compoundname>
+    <basecompoundref refid="classbzd_1_1Span" prot="public" virt="non-virtual">bzd::Span&lt; T &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>SizeType</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classbzd_1_1Array_1a6682dacef8fe044558806cf27fb1a088" prot="protected" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::Array&lt; T, N &gt;::data_[N]</definition>
+        <argsstring>[N]</argsstring>
+        <name>data_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/array.h" line="25" column="1" bodyfile="include/container/array.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1Array_1a7eb5aac408137a9f3d25ba988f2fd8a5" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>Args</declname>
+            <defname>Args</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::Array&lt; T, N &gt;::Array</definition>
+        <argsstring>(Args &amp;&amp;... args) noexcept</argsstring>
+        <name>Array</name>
+        <param>
+          <type>Args &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/array.h" line="13" column="1" bodyfile="include/container/array.h" bodystart="13" bodyend="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1Array_1aa35086abd2d2a74e932045d501624a53" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr SizeType</type>
+        <definition>constexpr SizeType bzd::Array&lt; T, N &gt;::capacity</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>capacity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/array.h" line="19" column="1" bodyfile="include/container/array.h" bodystart="19" bodyend="22"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="41">
+        <label>bzd::Array&lt; T, N &gt;</label>
+        <link refid="classbzd_1_1Array"/>
+        <childnode refid="42" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>bzd::Span&lt; T &gt;</label>
+        <link refid="classbzd_1_1Span"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="45">
+        <label>T</label>
+      </node>
+      <node id="43">
+        <label>bzd::Array&lt; T, N &gt;</label>
+        <link refid="classbzd_1_1Array"/>
+        <childnode refid="44" relation="public-inheritance">
+        </childnode>
+        <childnode refid="45" relation="usage">
+          <edgelabel>data_</edgelabel>
+        </childnode>
+      </node>
+      <node id="44">
+        <label>bzd::Span&lt; T &gt;</label>
+        <link refid="classbzd_1_1Span"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/array.h" line="10" column="1" bodyfile="include/container/array.h" bodystart="9" bodyend="26"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1Array_1a7eb5aac408137a9f3d25ba988f2fd8a5" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>Array</name></member>
+      <member refid="classbzd_1_1Span_1a78d866dc5a3c5801df5a6ee592d59028" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>at</name></member>
+      <member refid="classbzd_1_1Span_1a3f77ad40ca29e06e8cc9e978c47ff709" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>at</name></member>
+      <member refid="classbzd_1_1Span_1ac89dff5757cbdeef6c6c900025775806" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>back</name></member>
+      <member refid="classbzd_1_1Span_1abb8cd092fe87f6f5d3c0208687687be3" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>back</name></member>
+      <member refid="classbzd_1_1Span_1af3494078a4f83986bfdd5bd128665c21" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>begin</name></member>
+      <member refid="classbzd_1_1Span_1afb9bab4ab658e534052d9e8023ab7c74" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>begin</name></member>
+      <member refid="classbzd_1_1Array_1aa35086abd2d2a74e932045d501624a53" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>capacity</name></member>
+      <member refid="classbzd_1_1Span_1ac2dda401660081d46029f92e229ef09b" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>cbegin</name></member>
+      <member refid="classbzd_1_1Span_1a2baed781fe170f00e00b1e53907b2fb1" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>cend</name></member>
+      <member refid="classbzd_1_1Span_1a489018b7f666f0471892f002ac023418" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>ConstIterator</name></member>
+      <member refid="classbzd_1_1Span_1ab053a80dcbce3fada31ef7928a543ace" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>data</name></member>
+      <member refid="classbzd_1_1Span_1ad6fd0cbc46dd05bf28c0bdfc92bfd504" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>data</name></member>
+      <member refid="classbzd_1_1Array_1a6682dacef8fe044558806cf27fb1a088" prot="protected" virt="non-virtual"><scope>bzd::Array</scope><name>data_</name></member>
+      <member refid="classbzd_1_1Span_1ad6e7f896c2aa75a5c8d39ee1ac5f0fff" prot="protected" virt="non-virtual"><scope>bzd::Array</scope><name>DataType</name></member>
+      <member refid="classbzd_1_1Span_1a1a73e8fc0549ac98ca7727860fa94cb5" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>empty</name></member>
+      <member refid="classbzd_1_1Span_1ab70f070a578da94cda73b39309b89fae" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>end</name></member>
+      <member refid="classbzd_1_1Span_1a3da7f634c328cef8b88a092e23a71518" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>end</name></member>
+      <member refid="classbzd_1_1Span_1aa024c6dcd31b0d85278d34101e15d828" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>find</name></member>
+      <member refid="classbzd_1_1Span_1add1510b3f86751b94a2c5976cfceb1ed" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>front</name></member>
+      <member refid="classbzd_1_1Span_1a388f1b3918cd2885330566aa50f3d087" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>front</name></member>
+      <member refid="classbzd_1_1Span_1a77d2842477c7adccf5834b6817e7dc9c" prot="protected" virt="non-virtual"><scope>bzd::Array</scope><name>IsConst</name></member>
+      <member refid="classbzd_1_1Span_1a05be10d237f4241e1301e0016cfe6bc5" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>Iterator</name></member>
+      <member refid="classbzd_1_1Span_1a8b2929e3d864dfb438a5c0e4179c5589" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>npos</name></member>
+      <member refid="classbzd_1_1Span_1abab84fd06746b5a412fc19540a948014" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1Span_1ae97940edf6fee163354ff8b2157c96d6" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>operator[]</name></member>
+      <member refid="classbzd_1_1Span_1a184448cd70596a0d1fbe20ac2652a5ea" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>reverse</name></member>
+      <member refid="classbzd_1_1Span_1a2f766718aa55276d578bdb80d2f7de99" prot="protected" virt="non-virtual"><scope>bzd::Array</scope><name>SelfType</name></member>
+      <member refid="classbzd_1_1Span_1adf6b4d628d334aa39cef146885c7dfdd" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>size</name></member>
+      <member refid="classbzd_1_1Span_1a2bb038c31c95eace73b760b69da48cec" prot="protected" virt="non-virtual"><scope>bzd::Array</scope><name>size_</name></member>
+      <member refid="classbzd_1_1Span_1a9b3fc1dc0e73b8a4afb332924feaa4ac" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>Span</name></member>
+      <member refid="classbzd_1_1Span_1ad82bd5d0d52656d5e09dff6933330418" prot="public" virt="non-virtual"><scope>bzd::Array</scope><name>Span</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

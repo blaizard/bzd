@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_fac9ef7fc20ac12aaae6ba4aa5a86afc" kind="dir">
+    <compoundname>include/interface</compoundname>
+    <innerfile refid="interface_2stack_8h">stack.h</innerfile>
+    <innerfile refid="interface_2task_8h">task.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/interface/"/>
+  </compounddef>
+</doxygen>

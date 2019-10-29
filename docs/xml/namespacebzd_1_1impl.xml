@@ -1,0 +1,347 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1impl" kind="namespace" language="C++">
+    <compoundname>bzd::impl</compoundname>
+    <innerclass refid="classbzd_1_1impl_1_1ConstexprStringView" prot="public">bzd::impl::ConstexprStringView</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1Expected" prot="public">bzd::impl::Expected</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4" prot="public">bzd::impl::Expected&lt; void, E &gt;</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1IOStream" prot="public">bzd::impl::IOStream</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1IStream" prot="public">bzd::impl::IStream</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1NoType" prot="public">bzd::impl::NoType</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1OStream" prot="public">bzd::impl::OStream</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1String" prot="public">bzd::impl::String</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1StringStream" prot="public">bzd::impl::StringStream</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1StringView" prot="public">bzd::impl::StringView</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1TupleElem" prot="public">bzd::impl::TupleElem</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1TupleImpl" prot="public">bzd::impl::TupleImpl</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1TupleImpl_3_01TupleSizes_3_01N_8_8_8_01_4_00_01T_8_8_8_01_4" prot="public">bzd::impl::TupleImpl&lt; TupleSizes&lt; N... &gt;, T... &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1TupleRangeImpl" prot="public">bzd::impl::TupleRangeImpl</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1TupleRangeImpl_3_01L_00_01I_00_01TupleSizes_3_01N_8_8_8_01_4_01_4" prot="public">bzd::impl::TupleRangeImpl&lt; L, I, TupleSizes&lt; N... &gt; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1TupleRangeImpl_3_01L_00_01L_00_01TupleSizes_3_01N_8_8_8_01_4_01_4" prot="public">bzd::impl::TupleRangeImpl&lt; L, L, TupleSizes&lt; N... &gt; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1TupleSizes" prot="public">bzd::impl::TupleSizes</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1Unexpected" prot="public">bzd::impl::Unexpected</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1Variant" prot="public">bzd::impl::Variant</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1Vector" prot="public">bzd::impl::Vector</innerclass>
+    <innernamespace refid="namespacebzd_1_1impl_1_1format">bzd::impl::format</innernamespace>
+    <innernamespace refid="namespacebzd_1_1impl_1_1to__string">bzd::impl::to_string</innernamespace>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="tuple_8h_1ad6b58dddef25405a88cb5a7de9da6aa0" prot="public" static="no">
+        <type>typename T::type</type>
+        <definition>using bzd::impl::TupleTypeOf = typedef typename T::type</definition>
+        <argsstring></argsstring>
+        <name>TupleTypeOf</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="13" column="1" bodyfile="include/container/tuple.h" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="tuple_8h_1a9bfed8118c15bd1f67e162bda108d0a7" prot="public" static="no">
+        <type>TupleTypeOf&lt; <ref refid="structbzd_1_1impl_1_1TupleRangeImpl" kindref="compound">TupleRangeImpl</ref>&lt; L &gt; &gt;</type>
+        <definition>using bzd::impl::TupleRange = typedef TupleTypeOf&lt;TupleRangeImpl&lt;L&gt; &gt;</definition>
+        <argsstring></argsstring>
+        <name>TupleRange</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="30" column="1" bodyfile="include/container/tuple.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="constexpr__string__view_8h_1a83387cd95502f01a2cedd9e03c7fc5db" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>int</type>
+            <declname>N</declname>
+            <defname>N</defname>
+          </param>
+          <param>
+            <type>int</type>
+            <declname>M</declname>
+            <defname>M</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr char</type>
+        <definition>constexpr char bzd::impl::tygrab</definition>
+        <argsstring>(char const(&amp;c)[M]) noexcept</argsstring>
+        <name>tygrab</name>
+        <param>
+          <type>char const(&amp;)</type>
+          <declname>c</declname>
+          <array>[M]</array>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="32" column="1" bodyfile="include/container/constexpr_string_view.h" bodystart="32" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="constexpr__string__view_8h_1a3ba5b2af0ef2470482eb8491d95cac7b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>char...</type>
+            <declname>X</declname>
+            <defname>X</defname>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::impl::typoke</definition>
+        <argsstring>(ConstexprStringView&lt; X... &gt;) -&gt; ConstexprStringView&lt; X... &gt;</argsstring>
+        <name>typoke</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; X... &gt;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="36" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="constexpr__string__view_8h_1aca276884186e59324376c78c1078fbd6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>char...</type>
+            <declname>X</declname>
+            <defname>X</defname>
+          </param>
+          <param>
+            <type>char...</type>
+            <declname>Y</declname>
+            <defname>Y</defname>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::impl::typoke</definition>
+        <argsstring>(ConstexprStringView&lt; X... &gt;, ConstexprStringView&lt;&apos;\0&apos;&gt;, ConstexprStringView&lt; Y &gt;...) -&gt; ConstexprStringView&lt; X... &gt;</argsstring>
+        <name>typoke</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; X... &gt;</type>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt;&apos;\0&apos;&gt;</type>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; Y &gt;</type>
+          <declname>...</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="39" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="constexpr__string__view_8h_1a816dab0b29b12a46815c1bbbc077dd0c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>char</type>
+            <declname>A</declname>
+            <defname>A</defname>
+          </param>
+          <param>
+            <type>char...</type>
+            <declname>X</declname>
+            <defname>X</defname>
+          </param>
+          <param>
+            <type>char...</type>
+            <declname>Y</declname>
+            <defname>Y</defname>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::impl::typoke</definition>
+        <argsstring>(ConstexprStringView&lt; X... &gt;, ConstexprStringView&lt; A &gt;, ConstexprStringView&lt; Y &gt;...) -&gt; decltype(typoke(ConstexprStringView&lt; X..., A &gt;(), ConstexprStringView&lt; Y &gt;()...))</argsstring>
+        <name>typoke</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; X... &gt;</type>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; <ref refid="classA" kindref="compound">A</ref> &gt;</type>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; Y &gt;</type>
+          <declname>...</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="42" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="constexpr__string__view_8h_1a1e1422fead676f88dd5d4fbba39bf772" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>char...</type>
+            <declname>C</declname>
+            <defname>C</defname>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::impl::typeek</definition>
+        <argsstring>(ConstexprStringView&lt; C... &gt;) -&gt; decltype(typoke(ConstexprStringView&lt; C &gt;()...))</argsstring>
+        <name>typeek</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt; C... &gt;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="45" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="tuple_8h_1a0d6469b9f9475f8838499b7adeaa3970" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>SizeType</type>
+            <declname>index</declname>
+            <defname>index</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="structbzd_1_1impl_1_1NoType" kindref="compound">NoType</ref></type>
+        <definition>constexpr NoType bzd::impl::TupleChooseN</definition>
+        <argsstring>()</argsstring>
+        <name>TupleChooseN</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="37" column="1" bodyfile="include/container/tuple.h" bodystart="37" bodyend="37"/>
+      </memberdef>
+      <memberdef kind="function" id="tuple_8h_1af3c31aca7115a0917934258b0c184d61" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>SizeType</type>
+            <declname>index</declname>
+            <defname>index</defname>
+          </param>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>Ts</declname>
+            <defname>Ts</defname>
+          </param>
+          <param>
+            <type>typename typeTraits::enableIf&lt;</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="structbzd_1_1impl_1_1NoType" kindref="compound">NoType</ref></type>
+        <definition>constexpr NoType bzd::impl::TupleChooseN</definition>
+        <argsstring>(T &amp;&amp;t, Ts &amp;&amp;... ts)</argsstring>
+        <name>TupleChooseN</name>
+        <param>
+          <type>T &amp;&amp;</type>
+          <declname>t</declname>
+        </param>
+        <param>
+          <type>Ts &amp;&amp;...</type>
+          <declname>ts</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="40" column="1" bodyfile="include/container/tuple.h" bodystart="40" bodyend="43"/>
+      </memberdef>
+      <memberdef kind="function" id="tuple_8h_1afade4a36904c34c510ce62d7f744463c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>SizeType</type>
+            <declname>index</declname>
+            <defname>index</defname>
+          </param>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>class...</type>
+            <declname>Ts</declname>
+            <defname>Ts</defname>
+          </param>
+          <param>
+            <type>typename typeTraits::enableIf&lt; index==0 &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>decltype(auto) constexpr</type>
+        <definition>decltype(auto) constexpr bzd::impl::TupleChooseN</definition>
+        <argsstring>(T &amp;&amp;t, Ts &amp;&amp;... ts)</argsstring>
+        <name>TupleChooseN</name>
+        <param>
+          <type>T &amp;&amp;</type>
+          <declname>t</declname>
+        </param>
+        <param>
+          <type>Ts &amp;&amp;...</type>
+          <declname>ts</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="46" column="1" bodyfile="include/container/tuple.h" bodystart="46" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="interface_2task_8h_1a41324e5264d92d30a77f33646e7fc7d5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::contextSwitch</definition>
+        <argsstring>(void **stack1, void *stack2)</argsstring>
+        <name>contextSwitch</name>
+        <param>
+          <type>void **</type>
+          <declname>stack1</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>stack2</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="10" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="interface_2task_8h_1a1d85bba3e457e66555241a57b60f55f9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void *</type>
+        <definition>void* bzd::impl::contextTask</definition>
+        <argsstring>()</argsstring>
+        <name>contextTask</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="11" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/container/constexpr_string_view.h" line="10" column="1"/>
+  </compounddef>
+</doxygen>
