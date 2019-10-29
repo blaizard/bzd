@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classA" kind="struct" language="C++" prot="public">
+    <compoundname>A</compoundname>
+    <derivedcompoundref refid="classB" prot="public" virt="non-virtual">B</derivedcompoundref>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classA_1a49a53415abd8f1b26235579cc805a15f" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int A::a</definition>
+        <argsstring></argsstring>
+        <name>a</name>
+        <initializer>= 2</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_test.cpp" line="14" column="1" bodyfile="include/container/string_test.cpp" bodystart="14" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classA_1a6059eac51d49b3dd93e2d1d8468285a9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>A::A</definition>
+        <argsstring>()=default</argsstring>
+        <name>A</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_test.cpp" line="7" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classA_1a2e7238b48af75b396996d5a4c8814c12" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int &amp;</type>
+        <definition>int&amp; A::get</definition>
+        <argsstring>()</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_test.cpp" line="8" column="1" bodyfile="include/container/string_test.cpp" bodystart="8" bodyend="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classA_1a5430e360bd957f67de0063e9a8b7a21d" prot="public" static="no" const="yes" explicit="no" inline="no" refqual="lvalue" virt="non-virtual">
+        <type>int</type>
+        <definition>int A::fun</definition>
+        <argsstring>() const &amp;</argsstring>
+        <name>fun</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/function_test.cpp" line="8" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="0">
+        <label>A</label>
+        <link refid="classA"/>
+      </node>
+      <node id="1">
+        <label>B</label>
+        <link refid="classB"/>
+        <childnode refid="0" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="include/container/string_test.cpp" line="5" column="1" bodyfile="include/container/string_test.cpp" bodystart="4" bodyend="15"/>
+    <listofallmembers>
+      <member refid="classA_1a49a53415abd8f1b26235579cc805a15f" prot="private" virt="non-virtual"><scope>A</scope><name>a</name></member>
+      <member refid="classA_1a6059eac51d49b3dd93e2d1d8468285a9" prot="public" virt="non-virtual"><scope>A</scope><name>A</name></member>
+      <member refid="classA_1a5430e360bd957f67de0063e9a8b7a21d" prot="public" virt="non-virtual"><scope>A</scope><name>fun</name></member>
+      <member refid="classA_1a2e7238b48af75b396996d5a4c8814c12" prot="public" virt="non-virtual"><scope>A</scope><name>get</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

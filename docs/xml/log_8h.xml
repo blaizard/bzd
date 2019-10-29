@@ -1,0 +1,380 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="log_8h" kind="file" language="C++">
+    <compoundname>log.h</compoundname>
+    <includes refid="utility_8h" local="yes">include/utility.h</includes>
+    <includes refid="string_8h" local="yes">include/container/string.h</includes>
+    <includes refid="string__view_8h" local="yes">include/container/string_view.h</includes>
+    <includes refid="system_8h" local="yes">include/system.h</includes>
+    <includes refid="format_8h" local="yes">include/format.h</includes>
+    <includedby refid="assert_8h" local="yes">include/assert.h</includedby>
+    <incdepgraph>
+      <node id="678">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+        <childnode refid="675" relation="include">
+        </childnode>
+      </node>
+      <node id="673">
+        <label>include/type_traits/function.h</label>
+        <link refid="function_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+      </node>
+      <node id="670">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="671">
+        <label>include/type_traits/array.h</label>
+        <link refid="type__traits_2array_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+      </node>
+      <node id="694">
+        <label>include/container/expected.h</label>
+        <link refid="expected_8h_source"/>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="678" relation="include">
+        </childnode>
+      </node>
+      <node id="684">
+        <label>include/system.h</label>
+        <link refid="system_8h_source"/>
+        <childnode refid="685" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+      </node>
+      <node id="680">
+        <label>include/container/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="678" relation="include">
+        </childnode>
+        <childnode refid="677" relation="include">
+        </childnode>
+        <childnode refid="681" relation="include">
+        </childnode>
+      </node>
+      <node id="699">
+        <label>cstdarg</label>
+      </node>
+      <node id="692">
+        <label>include/container/variant.h</label>
+        <link refid="variant_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="691" relation="include">
+        </childnode>
+        <childnode refid="693" relation="include">
+        </childnode>
+        <childnode refid="694" relation="include">
+        </childnode>
+      </node>
+      <node id="681">
+        <label>include/container/iterator/contiguous.h</label>
+        <link refid="contiguous_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+      </node>
+      <node id="676">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+      </node>
+      <node id="669">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="671" relation="include">
+        </childnode>
+        <childnode refid="673" relation="include">
+        </childnode>
+        <childnode refid="674" relation="include">
+        </childnode>
+        <childnode refid="675" relation="include">
+        </childnode>
+        <childnode refid="677" relation="include">
+        </childnode>
+        <childnode refid="678" relation="include">
+        </childnode>
+      </node>
+      <node id="690">
+        <label>include/container/tuple.h</label>
+        <link refid="tuple_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="678" relation="include">
+        </childnode>
+        <childnode refid="691" relation="include">
+        </childnode>
+      </node>
+      <node id="689">
+        <label>include/container/constexpr_string_view.h</label>
+        <link refid="constexpr__string__view_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+      </node>
+      <node id="677">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+      </node>
+      <node id="696">
+        <label>include/to_string.h</label>
+        <link refid="to__string_8h_source"/>
+        <childnode refid="679" relation="include">
+        </childnode>
+        <childnode refid="695" relation="include">
+        </childnode>
+        <childnode refid="685" relation="include">
+        </childnode>
+        <childnode refid="697" relation="include">
+        </childnode>
+        <childnode refid="687" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+      </node>
+      <node id="688">
+        <label>include/type_traits/constructible.h</label>
+        <link refid="constructible_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+        <childnode refid="675" relation="include">
+        </childnode>
+        <childnode refid="676" relation="include">
+        </childnode>
+        <childnode refid="678" relation="include">
+        </childnode>
+      </node>
+      <node id="700">
+        <label>vector</label>
+      </node>
+      <node id="682">
+        <label>include/container/string_view.h</label>
+        <link refid="string__view_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="680" relation="include">
+        </childnode>
+      </node>
+      <node id="698">
+        <label>array</label>
+      </node>
+      <node id="685">
+        <label>include/container/iostream.h</label>
+        <link refid="iostream_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+      </node>
+      <node id="687">
+        <label>include/type_traits/fundamental.h</label>
+        <link refid="fundamental_8h_source"/>
+        <childnode refid="678" relation="include">
+        </childnode>
+        <childnode refid="677" relation="include">
+        </childnode>
+      </node>
+      <node id="683">
+        <label>iostream</label>
+      </node>
+      <node id="691">
+        <label>include/template_metaprogramming.h</label>
+        <link refid="template__metaprogramming_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+      </node>
+      <node id="668">
+        <label>include/log.h</label>
+        <link refid="log_8h"/>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="679" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+        <childnode refid="684" relation="include">
+        </childnode>
+        <childnode refid="686" relation="include">
+        </childnode>
+      </node>
+      <node id="686">
+        <label>include/format.h</label>
+        <link refid="format_8h_source"/>
+        <childnode refid="687" relation="include">
+        </childnode>
+        <childnode refid="688" relation="include">
+        </childnode>
+        <childnode refid="689" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+        <childnode refid="679" relation="include">
+        </childnode>
+        <childnode refid="690" relation="include">
+        </childnode>
+        <childnode refid="692" relation="include">
+        </childnode>
+        <childnode refid="695" relation="include">
+        </childnode>
+        <childnode refid="685" relation="include">
+        </childnode>
+        <childnode refid="696" relation="include">
+        </childnode>
+        <childnode refid="684" relation="include">
+        </childnode>
+        <childnode refid="698" relation="include">
+        </childnode>
+        <childnode refid="683" relation="include">
+        </childnode>
+        <childnode refid="699" relation="include">
+        </childnode>
+        <childnode refid="700" relation="include">
+        </childnode>
+      </node>
+      <node id="679">
+        <label>include/container/string.h</label>
+        <link refid="string_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+        <childnode refid="680" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+        <childnode refid="677" relation="include">
+        </childnode>
+        <childnode refid="683" relation="include">
+        </childnode>
+      </node>
+      <node id="695">
+        <label>include/container/vector.h</label>
+        <link refid="vector_8h_source"/>
+        <childnode refid="670" relation="include">
+        </childnode>
+        <childnode refid="680" relation="include">
+        </childnode>
+        <childnode refid="669" relation="include">
+        </childnode>
+      </node>
+      <node id="674">
+        <label>include/type_traits/pointer.h</label>
+        <link refid="pointer_8h_source"/>
+        <childnode refid="675" relation="include">
+        </childnode>
+      </node>
+      <node id="672">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="693">
+        <label>include/assert_minimal.h</label>
+        <link refid="assert__minimal_8h_source"/>
+        <childnode refid="682" relation="include">
+        </childnode>
+        <childnode refid="684" relation="include">
+        </childnode>
+      </node>
+      <node id="675">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h_source"/>
+        <childnode refid="672" relation="include">
+        </childnode>
+        <childnode refid="676" relation="include">
+        </childnode>
+      </node>
+      <node id="697">
+        <label>include/container/string_stream.h</label>
+        <link refid="string__stream_8h_source"/>
+        <childnode refid="685" relation="include">
+        </childnode>
+        <childnode refid="679" relation="include">
+        </childnode>
+        <childnode refid="682" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="701">
+        <label>include/log.h</label>
+        <link refid="log_8h"/>
+        <childnode refid="702" relation="include">
+        </childnode>
+      </node>
+      <node id="702">
+        <label>include/assert.h</label>
+        <link refid="assert_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classbzd_1_1log_1_1impl_1_1Buffer" prot="public">bzd::log::impl::Buffer</innerclass>
+    <innernamespace refid="namespacebzd">bzd</innernamespace>
+    <innernamespace refid="namespacebzd_1_1log">bzd::log</innernamespace>
+    <innernamespace refid="namespacebzd_1_1log_1_1impl">bzd::log::impl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/utility.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/container/string.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/container/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/system.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/format.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacebzd" kindref="compound">bzd</ref></highlight></codeline>
+<codeline lineno="10"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">log</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>Level</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CRITICAL<sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ERROR<sp/>=<sp/>1,</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>WARNING<sp/>=<sp/>2,</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>INFO<sp/>=<sp/>3,</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>DEBUG<sp/>=<sp/>4</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">impl</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="24" refid="classbzd_1_1log_1_1impl_1_1Buffer" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classbzd_1_1log_1_1impl_1_1Buffer" kindref="compound">Buffer</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="classbzd_1_1SingletonImpl" kindref="compound">SingletonImpl</ref>&lt;Buffer&gt;</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal">...<sp/>Args&gt;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>print(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref>&amp;<sp/>fmt,<sp/>Args&amp;&amp;...<sp/>args)<sp/>noexcept</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="classbzd_1_1String" kindref="compound">bzd::String&lt;128&gt;</ref><sp/>message;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::format(message,<sp/>fmt,<sp/>bzd::forward&lt;Args&gt;(args)...);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::getOut().write(message);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="39"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/log.h"/>
+  </compounddef>
+</doxygen>

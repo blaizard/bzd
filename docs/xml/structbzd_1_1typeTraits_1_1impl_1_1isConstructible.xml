@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1impl_1_1isConstructible" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::impl::isConstructible</compoundname>
+    <basecompoundref refid="structbzd_1_1typeTraits_1_1integralConstant" prot="public" virt="non-virtual">bzd::typeTraits::integralConstant&lt; bool, false &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+      </param>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Args</declname>
+        <defname>Args</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="204">
+        <label>falseType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+      </node>
+      <node id="203">
+        <label>bzd::typeTraits::impl::isConstructible&lt; class, T, Args &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1impl_1_1isConstructible"/>
+        <childnode refid="204" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="207">
+        <label>T</label>
+      </node>
+      <node id="206">
+        <label>falseType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+        <childnode refid="207" relation="usage">
+          <edgelabel>value</edgelabel>
+        </childnode>
+      </node>
+      <node id="205">
+        <label>bzd::typeTraits::impl::isConstructible&lt; class, T, Args &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1impl_1_1isConstructible"/>
+        <childnode refid="206" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/type_traits/constructible.h" line="15" column="1" bodyfile="include/type_traits/constructible.h" bodystart="15" bodyend="15"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1afe505065d9034110fb3a385c0a81ea16" prot="public" virt="non-virtual"><scope>bzd::typeTraits::impl::isConstructible</scope><name>operator valueType</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a7f97a49b251bab219b3552efbffbeab1" prot="public" virt="non-virtual"><scope>bzd::typeTraits::impl::isConstructible</scope><name>operator()</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a9f27fd41bacb9695bdb0068eaeb13742" prot="public" virt="non-virtual"><scope>bzd::typeTraits::impl::isConstructible</scope><name>type</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a614e5b5b8d73d1c5a5f63b5ad8fa5841" prot="public" virt="non-virtual"><scope>bzd::typeTraits::impl::isConstructible</scope><name>value</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a25f8639da0d0702b714b2ae46e7b2831" prot="public" virt="non-virtual"><scope>bzd::typeTraits::impl::isConstructible</scope><name>valueType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

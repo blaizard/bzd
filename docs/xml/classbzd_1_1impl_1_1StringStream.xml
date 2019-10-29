@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1StringStream" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::StringStream</compoundname>
+    <basecompoundref refid="classbzd_1_1impl_1_1OStream" prot="public" virt="non-virtual">bzd::impl::OStream&lt; char &gt;</basecompoundref>
+    <derivedcompoundref refid="classbzd_1_1StringStream" prot="public" virt="non-virtual">bzd::StringStream&lt; N &gt;</derivedcompoundref>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1StringStream_1a9ff78bc8c62001daf63a4f06c60cf7a7" prot="protected" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1impl_1_1String" kindref="compound">bzd::interface::String</ref> &amp;</type>
+        <definition>bzd::interface::String&amp; bzd::impl::StringStream::string_</definition>
+        <argsstring></argsstring>
+        <name>string_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="40" column="1" bodyfile="include/container/string_stream.h" bodystart="40" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1StringStream_1a3d157030df98671100a8471197139c4a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::StringStream::StringStream</definition>
+        <argsstring>(bzd::interface::String &amp;str)</argsstring>
+        <name>StringStream</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1String" kindref="compound">bzd::interface::String</ref> &amp;</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="14" column="1" bodyfile="include/container/string_stream.h" bodystart="14" bodyend="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1StringStream_1af56d18b5a5a3bf47f5f96c895a4a05d4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>SizeType</type>
+        <definition>SizeType bzd::impl::StringStream::write</definition>
+        <argsstring>(const bzd::StringView &amp;data) noexcept</argsstring>
+        <name>write</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="19" column="1" bodyfile="include/container/string_stream.h" bodystart="19" bodyend="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1StringStream_1a764ec9d25703589cc9086c5968b852d5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>SizeType</type>
+        <definition>SizeType bzd::impl::StringStream::write</definition>
+        <argsstring>(const bzd::Span&lt; const char &gt; &amp;data) noexcept override</argsstring>
+        <name>write</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1Span" kindref="compound">bzd::Span</ref>&lt; const char &gt; &amp;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="24" column="1" bodyfile="include/container/string_stream.h" bodystart="24" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1StringStream_1a62f8401f8b7e9aa09667a1a9c72aba11" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr const <ref refid="classbzd_1_1impl_1_1String" kindref="compound">bzd::interface::String</ref> &amp;</type>
+        <definition>constexpr const bzd::interface::String&amp; bzd::impl::StringStream::str</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>str</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="29" column="1" bodyfile="include/container/string_stream.h" bodystart="29" bodyend="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1StringStream_1a034aae75a0c5cbeb40f6110be19fe659" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1String" kindref="compound">bzd::interface::String</ref> &amp;</type>
+        <definition>constexpr bzd::interface::String&amp; bzd::impl::StringStream::str</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>str</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_stream.h" line="34" column="1" bodyfile="include/container/string_stream.h" bodystart="34" bodyend="37"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="507">
+        <label>bzd::OStream</label>
+        <link refid="classbzd_1_1impl_1_1OStream"/>
+      </node>
+      <node id="506">
+        <label>bzd::impl::StringStream</label>
+        <link refid="classbzd_1_1impl_1_1StringStream"/>
+        <childnode refid="507" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="508">
+        <label>bzd::StringStream&lt; N &gt;</label>
+        <link refid="classbzd_1_1StringStream"/>
+        <childnode refid="506" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="510">
+        <label>bzd::OStream</label>
+        <link refid="classbzd_1_1impl_1_1OStream"/>
+      </node>
+      <node id="509">
+        <label>bzd::impl::StringStream</label>
+        <link refid="classbzd_1_1impl_1_1StringStream"/>
+        <childnode refid="510" relation="public-inheritance">
+        </childnode>
+        <childnode refid="511" relation="usage">
+          <edgelabel>string_</edgelabel>
+        </childnode>
+      </node>
+      <node id="511">
+        <label>bzd::impl::String&lt; T, Impl &gt;</label>
+        <link refid="classbzd_1_1impl_1_1String"/>
+        <childnode refid="512" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="512">
+        <label>Impl</label>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/string_stream.h" line="12" column="1" bodyfile="include/container/string_stream.h" bodystart="11" bodyend="41"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1OStream_1ab91b3af754da6f6cc5a08e04760a5f56" prot="protected" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>OStream</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a62f8401f8b7e9aa09667a1a9c72aba11" prot="public" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>str</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a034aae75a0c5cbeb40f6110be19fe659" prot="public" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>str</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a9ff78bc8c62001daf63a4f06c60cf7a7" prot="protected" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>string_</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a3d157030df98671100a8471197139c4a" prot="public" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>StringStream</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1af56d18b5a5a3bf47f5f96c895a4a05d4" prot="public" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>write</name></member>
+      <member refid="classbzd_1_1impl_1_1StringStream_1a764ec9d25703589cc9086c5968b852d5" prot="public" virt="non-virtual"><scope>bzd::impl::StringStream</scope><name>write</name></member>
+      <member refid="classbzd_1_1impl_1_1OStream_1aa9584f5a3833c56ba7deec2c55231b05" prot="public" virt="pure-virtual" ambiguityscope="bzd::impl::OStream::"><scope>bzd::impl::StringStream</scope><name>write</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

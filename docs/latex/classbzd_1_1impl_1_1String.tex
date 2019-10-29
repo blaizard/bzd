@@ -1,0 +1,66 @@
+\hypertarget{classbzd_1_1impl_1_1String}{}\section{bzd\+:\+:impl\+:\+:String$<$ T, Impl $>$ Class Template Reference}
+\label{classbzd_1_1impl_1_1String}\index{bzd\+::impl\+::\+String$<$ T, Impl $>$@{bzd\+::impl\+::\+String$<$ T, Impl $>$}}
+
+
+Inheritance diagram for bzd\+:\+:impl\+:\+:String$<$ T, Impl $>$\+:
+% FIG 0
+
+
+Collaboration diagram for bzd\+:\+:impl\+:\+:String$<$ T, Impl $>$\+:
+% FIG 1
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_ac888bc340bae4e71c32be785a1261af5}\label{classbzd_1_1impl_1_1String_ac888bc340bae4e71c32be785a1261af5}} 
+{\footnotesize template$<$class... Args$>$ }\\constexpr {\bfseries String} (const Size\+Type capacity, Args \&\&... args)
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a909ef889552751fdfe3f206a300384bb}\label{classbzd_1_1impl_1_1String_a909ef889552751fdfe3f206a300384bb}} 
+constexpr Size\+Type {\bfseries append} (const \hyperlink{classbzd_1_1impl_1_1StringView}{String\+View} \&str) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_abe95ca366312a7eaf0da9a108238a0e2}\label{classbzd_1_1impl_1_1String_abe95ca366312a7eaf0da9a108238a0e2}} 
+constexpr Size\+Type {\bfseries append} (const T c) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a38b7732bec9f1acde5b3569a97ed0be6}\label{classbzd_1_1impl_1_1String_a38b7732bec9f1acde5b3569a97ed0be6}} 
+constexpr Size\+Type {\bfseries append} (const T $\ast$data, const Size\+Type n) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a2cad6ab90d2606586ce67716f8b9ff19}\label{classbzd_1_1impl_1_1String_a2cad6ab90d2606586ce67716f8b9ff19}} 
+constexpr Size\+Type {\bfseries append} (const Size\+Type n, const T c) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_ab3ac3e97f70561ddcb3760acf2625878}\label{classbzd_1_1impl_1_1String_ab3ac3e97f70561ddcb3760acf2625878}} 
+{\footnotesize template$<$class U $>$ }\\constexpr Size\+Type {\bfseries assign} (const U \&data) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_ae387833b6565022faa19c3cc3a4168ed}\label{classbzd_1_1impl_1_1String_ae387833b6565022faa19c3cc3a4168ed}} 
+constexpr Size\+Type {\bfseries capacity} () const noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a374161cce72004fd645df22cd84bd50b}\label{classbzd_1_1impl_1_1String_a374161cce72004fd645df22cd84bd50b}} 
+constexpr void {\bfseries clear} () noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a569774da00ee68fe18eebcd4e2e877c7}\label{classbzd_1_1impl_1_1String_a569774da00ee68fe18eebcd4e2e877c7}} 
+constexpr void {\bfseries resize} (const Size\+Type n) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a3c1152b72e84e60db2f74f519316e277}\label{classbzd_1_1impl_1_1String_a3c1152b72e84e60db2f74f519316e277}} 
+{\footnotesize template$<$class U $>$ }\\constexpr \hyperlink{classbzd_1_1impl_1_1String}{String}$<$ T, Impl $>$ \& {\bfseries operator+=} (const U \&data) noexcept
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a4fa1168443d81560da18876d2f18f713}\label{classbzd_1_1impl_1_1String_a4fa1168443d81560da18876d2f18f713}} 
+{\footnotesize template$<$class U $>$ }\\constexpr \hyperlink{classbzd_1_1impl_1_1String}{String}$<$ T, Impl $>$ \& {\bfseries operator=} (const U \&data) noexcept
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_a5a0745223c7a00f9578619da04877f0c}\label{classbzd_1_1impl_1_1String_a5a0745223c7a00f9578619da04877f0c}} 
+const Size\+Type {\bfseries capacity\+\_\+}
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_acfcfea3798d5426c5fd397af23f5937d}\label{classbzd_1_1impl_1_1String_acfcfea3798d5426c5fd397af23f5937d}} 
+using {\bfseries Parent} = Impl
+\item 
+\mbox{\Hypertarget{classbzd_1_1impl_1_1String_ae297aad5c516ea52e890864515af9dfa}\label{classbzd_1_1impl_1_1String_ae297aad5c516ea52e890864515af9dfa}} 
+using {\bfseries String\+View} = \hyperlink{classbzd_1_1impl_1_1StringView}{bzd\+::impl\+::\+String\+View}$<$ T, \hyperlink{classbzd_1_1Span}{bzd\+::\+Span}$<$ typename \hyperlink{structbzd_1_1typeTraits_1_1addConst}{bzd\+::type\+Traits\+::add\+Const}$<$ T $>$\+::type $>$ $>$
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/container/string.\+h\end{DoxyCompactItemize}

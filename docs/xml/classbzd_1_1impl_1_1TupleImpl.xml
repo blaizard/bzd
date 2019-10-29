@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1TupleImpl" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::TupleImpl</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class N</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/container/tuple.h" line="77" column="1" bodyfile="include/container/tuple.h" bodystart="77" bodyend="-1"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,393 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="reference_8h" kind="file" language="C++">
+    <compoundname>reference.h</compoundname>
+    <includes refid="integral__constant_8h" local="yes">include/type_traits/integral_constant.h</includes>
+    <includes refid="void_8h" local="yes">include/type_traits/void.h</includes>
+    <includedby refid="utils_8h" local="yes">include/type_traits/utils.h</includedby>
+    <includedby refid="constructible_8h" local="yes">include/type_traits/constructible.h</includedby>
+    <includedby refid="pointer_8h" local="yes">include/type_traits/pointer.h</includedby>
+    <includedby refid="utility_8h" local="yes">include/utility.h</includedby>
+    <includedby refid="destructible_8h" local="yes">include/type_traits/destructible.h</includedby>
+    <includedby refid="reference__test_8cpp" local="yes">include/type_traits/reference_test.cpp</includedby>
+    <incdepgraph>
+      <node id="987">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="986" relation="include">
+        </childnode>
+      </node>
+      <node id="986">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="985">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h"/>
+        <childnode refid="986" relation="include">
+        </childnode>
+        <childnode refid="987" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="989">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="990" relation="include">
+        </childnode>
+        <childnode refid="995" relation="include">
+        </childnode>
+        <childnode refid="996" relation="include">
+        </childnode>
+        <childnode refid="997" relation="include">
+        </childnode>
+        <childnode refid="1008" relation="include">
+        </childnode>
+        <childnode refid="1010" relation="include">
+        </childnode>
+        <childnode refid="1012" relation="include">
+        </childnode>
+      </node>
+      <node id="1012">
+        <label>include/type_traits/destructible.h</label>
+        <link refid="destructible_8h_source"/>
+      </node>
+      <node id="1010">
+        <label>include/container/expected.h</label>
+        <link refid="expected_8h_source"/>
+        <childnode refid="1002" relation="include">
+        </childnode>
+      </node>
+      <node id="1007">
+        <label>include/container/pool.h</label>
+        <link refid="pool_8h_source"/>
+      </node>
+      <node id="1004">
+        <label>include/system.h</label>
+        <link refid="system_8h_source"/>
+        <childnode refid="1001" relation="include">
+        </childnode>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="993" relation="include">
+        </childnode>
+        <childnode refid="992" relation="include">
+        </childnode>
+      </node>
+      <node id="997">
+        <label>include/container/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="998" relation="include">
+        </childnode>
+        <childnode refid="999" relation="include">
+        </childnode>
+        <childnode refid="1005" relation="include">
+        </childnode>
+        <childnode refid="1006" relation="include">
+        </childnode>
+      </node>
+      <node id="1002">
+        <label>include/container/variant.h</label>
+        <link refid="variant_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+      </node>
+      <node id="996">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="997" relation="include">
+        </childnode>
+        <childnode refid="999" relation="include">
+        </childnode>
+        <childnode refid="1008" relation="include">
+        </childnode>
+        <childnode refid="1009" relation="include">
+        </childnode>
+        <childnode refid="1002" relation="include">
+        </childnode>
+        <childnode refid="1010" relation="include">
+        </childnode>
+        <childnode refid="1005" relation="include">
+        </childnode>
+        <childnode refid="994" relation="include">
+        </childnode>
+        <childnode refid="1011" relation="include">
+        </childnode>
+        <childnode refid="993" relation="include">
+        </childnode>
+        <childnode refid="992" relation="include">
+        </childnode>
+        <childnode refid="1007" relation="include">
+        </childnode>
+      </node>
+      <node id="1008">
+        <label>include/container/tuple.h</label>
+        <link refid="tuple_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+      </node>
+      <node id="994">
+        <label>include/to_string.h</label>
+        <link refid="to__string_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+      </node>
+      <node id="1011">
+        <label>include/scheduler.h</label>
+        <link refid="scheduler_8h_source"/>
+      </node>
+      <node id="995">
+        <label>include/type_traits/constructible.h</label>
+        <link refid="constructible_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+      </node>
+      <node id="998">
+        <label>include/container/string_view.h</label>
+        <link refid="string__view_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="999" relation="include">
+        </childnode>
+        <childnode refid="1001" relation="include">
+        </childnode>
+        <childnode refid="1003" relation="include">
+        </childnode>
+        <childnode refid="1004" relation="include">
+        </childnode>
+        <childnode refid="1000" relation="include">
+        </childnode>
+        <childnode refid="993" relation="include">
+        </childnode>
+        <childnode refid="992" relation="include">
+        </childnode>
+      </node>
+      <node id="1003">
+        <label>include/container/iostream.h</label>
+        <link refid="iostream_8h_source"/>
+        <childnode refid="1004" relation="include">
+        </childnode>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="994" relation="include">
+        </childnode>
+        <childnode refid="1000" relation="include">
+        </childnode>
+      </node>
+      <node id="990">
+        <label>include/type_traits/fundamental.h</label>
+        <link refid="fundamental_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="994" relation="include">
+        </childnode>
+      </node>
+      <node id="1009">
+        <label>include/template_metaprogramming.h</label>
+        <link refid="template__metaprogramming_8h_source"/>
+        <childnode refid="1008" relation="include">
+        </childnode>
+        <childnode refid="1002" relation="include">
+        </childnode>
+      </node>
+      <node id="992">
+        <label>include/log.h</label>
+        <link refid="log_8h_source"/>
+        <childnode refid="993" relation="include">
+        </childnode>
+      </node>
+      <node id="991">
+        <label>include/format.h</label>
+        <link refid="format_8h_source"/>
+        <childnode refid="992" relation="include">
+        </childnode>
+      </node>
+      <node id="999">
+        <label>include/container/string.h</label>
+        <link refid="string_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="994" relation="include">
+        </childnode>
+        <childnode refid="1000" relation="include">
+        </childnode>
+        <childnode refid="992" relation="include">
+        </childnode>
+      </node>
+      <node id="1005">
+        <label>include/container/vector.h</label>
+        <link refid="vector_8h_source"/>
+        <childnode refid="991" relation="include">
+        </childnode>
+        <childnode refid="994" relation="include">
+        </childnode>
+      </node>
+      <node id="1013">
+        <label>include/type_traits/pointer.h</label>
+        <link refid="pointer_8h_source"/>
+        <childnode refid="996" relation="include">
+        </childnode>
+      </node>
+      <node id="1006">
+        <label>include/container/array.h</label>
+        <link refid="container_2array_8h_source"/>
+        <childnode refid="1007" relation="include">
+        </childnode>
+      </node>
+      <node id="1001">
+        <label>include/assert_minimal.h</label>
+        <link refid="assert__minimal_8h_source"/>
+        <childnode refid="1002" relation="include">
+        </childnode>
+        <childnode refid="993" relation="include">
+        </childnode>
+      </node>
+      <node id="993">
+        <label>include/assert.h</label>
+        <link refid="assert_8h_source"/>
+      </node>
+      <node id="988">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h"/>
+        <childnode refid="989" relation="include">
+        </childnode>
+        <childnode refid="995" relation="include">
+        </childnode>
+        <childnode refid="1013" relation="include">
+        </childnode>
+        <childnode refid="996" relation="include">
+        </childnode>
+        <childnode refid="1012" relation="include">
+        </childnode>
+      </node>
+      <node id="1000">
+        <label>include/container/string_stream.h</label>
+        <link refid="string__stream_8h_source"/>
+        <childnode refid="994" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isLValueReference" prot="public">bzd::typeTraits::isLValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isRValueReference" prot="public">bzd::typeTraits::isRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isRValueReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::isRValueReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isReference" prot="public">bzd::typeTraits::isReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference" prot="public">bzd::typeTraits::removeReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::removeReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::removeReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference" prot="public">bzd::typeTraits::addReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::addReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::addReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; const void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01volatile_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; const volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01volatile_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" prot="public">bzd::typeTraits::impl::addRValueReferenceHelper</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper_3_01T_00_01true_01_4" prot="public">bzd::typeTraits::impl::addRValueReferenceHelper&lt; T, true &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReference" prot="public">bzd::typeTraits::impl::addRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addRValueReference" prot="public">bzd::typeTraits::addRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addLValueReference" prot="public">bzd::typeTraits::addLValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addLValueReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::addLValueReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innernamespace refid="namespacebzd">bzd</innernamespace>
+    <innernamespace refid="namespacebzd_1_1typeTraits">bzd::typeTraits</innernamespace>
+    <innernamespace refid="namespacebzd_1_1typeTraits_1_1impl">bzd::typeTraits::impl</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/type_traits/integral_constant.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/type_traits/void.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacebzd" kindref="compound">bzd</ref></highlight></codeline>
+<codeline lineno="7"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">typeTraits</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>isLValueReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="13" refid="structbzd_1_1typeTraits_1_1isLValueReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isLValueReference" kindref="compound">isLValueReference</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">falseType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="16" refid="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isLValueReference" kindref="compound">isLValueReference</ref>&lt;T&amp;&gt;<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">trueType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>isRValueReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="21" refid="structbzd_1_1typeTraits_1_1isRValueReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isRValueReference" kindref="compound">isRValueReference</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">falseType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="24" refid="structbzd_1_1typeTraits_1_1isRValueReference_3_01T_01_6_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isRValueReference" kindref="compound">isRValueReference</ref>&lt;T&amp;&amp;&gt;<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">trueType</ref><sp/>{};</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>isReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="29" refid="structbzd_1_1typeTraits_1_1isReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1isReference" kindref="compound">isReference</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">integralConstant</ref>&lt;bool,<sp/>isLValueReference&lt;T&gt;::value<sp/>||<sp/>isRValueReference&lt;T&gt;::value&gt;<sp/>{};</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>removeReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="34" refid="structbzd_1_1typeTraits_1_1removeReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeReference" kindref="compound">removeReference</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="37" refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeReference" kindref="compound">removeReference</ref>&lt;T&amp;&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="40" refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1removeReference" kindref="compound">removeReference</ref>&lt;T&amp;&amp;&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="45" refid="structbzd_1_1typeTraits_1_1addReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T&amp;<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="48" refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;T&amp;&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T&amp;<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="51" refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;T&amp;&amp;&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T&amp;&amp;<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;&gt;</highlight></codeline>
+<codeline lineno="54" refid="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;void&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;&gt;</highlight></codeline>
+<codeline lineno="56" refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01void_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;const<sp/>void&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;&gt;</highlight></codeline>
+<codeline lineno="58" refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01volatile_01void_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;const<sp/>volatile<sp/>void&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">volatile</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;&gt;</highlight></codeline>
+<codeline lineno="60" refid="structbzd_1_1typeTraits_1_1addReference_3_01volatile_01void_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addReference" kindref="compound">addReference</ref>&lt;volatile<sp/>void&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">volatile</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addRValueReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">impl</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>b&gt;</highlight></codeline>
+<codeline lineno="67" refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" kindref="compound">addRValueReferenceHelper</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="70" refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper_3_01T_00_01true_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" kindref="compound">addRValueReferenceHelper</ref>&lt;T,<sp/>true&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T&amp;&amp;<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="73" refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReference" kindref="compound">addRValueReference</ref></highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/><ref refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" kindref="compound">addRValueReferenceHelper&lt;T, (isVoid&lt;T&gt;::value</ref><sp/>==<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal"><sp/>&amp;&amp;<sp/><ref refid="structbzd_1_1typeTraits_1_1isReference" kindref="compound">isReference&lt;T&gt;::value</ref><sp/>==<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">)<sp/>&gt;::type<sp/>type;</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="80" refid="structbzd_1_1typeTraits_1_1addRValueReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addRValueReference" kindref="compound">addRValueReference</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>impl::addRValueReference&lt;T&gt;::type<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"></highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>addLValueReference</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="85" refid="structbzd_1_1typeTraits_1_1addLValueReference" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addLValueReference" kindref="compound">addLValueReference</ref><sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>addReference&lt;T&gt;::type<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="88" refid="structbzd_1_1typeTraits_1_1addLValueReference_3_01T_01_6_6_01_4" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structbzd_1_1typeTraits_1_1addLValueReference" kindref="compound">addLValueReference</ref>&lt;T&amp;&amp;&gt;<sp/>{<sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>T&amp;<sp/>type;<sp/>};</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="90"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/type_traits/reference.h"/>
+  </compounddef>
+</doxygen>

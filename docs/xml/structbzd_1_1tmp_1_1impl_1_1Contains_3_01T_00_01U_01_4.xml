@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1tmp_1_1impl_1_1Contains_3_01T_00_01U_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::tmp::impl::Contains&lt; T, U &gt;</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+      <param>
+        <type>class U</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="structbzd_1_1tmp_1_1impl_1_1Contains_3_01T_00_01U_01_4_1a8764ac95288cbf57aefb4b40a901b75a" prot="public" static="yes" mutable="no">
+        <type>constexpr const bool</type>
+        <definition>constexpr const bool bzd::tmp::impl::Contains&lt; T, U &gt;::value</definition>
+        <argsstring></argsstring>
+        <name>value</name>
+        <initializer>= <ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt;T, U&gt;::value</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="46" column="1" bodyfile="include/template_metaprogramming.h" bodystart="46" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/template_metaprogramming.h" line="45" column="1" bodyfile="include/template_metaprogramming.h" bodystart="44" bodyend="47"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1tmp_1_1impl_1_1Contains_3_01T_00_01U_01_4_1a8764ac95288cbf57aefb4b40a901b75a" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Contains&lt; T, U &gt;</scope><name>value</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

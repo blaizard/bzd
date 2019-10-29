@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::addReference&lt; void &gt;</compoundname>
+    <templateparamlist>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4_1aa041d64e90d0f15edd716859e5fb8bb6" prot="public" static="no">
+        <type>void</type>
+        <definition>typedef void bzd::typeTraits::addReference&lt; void &gt;::type</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/reference.h" line="54" column="1" bodyfile="include/type_traits/reference.h" bodystart="54" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/reference.h" line="54" column="1" bodyfile="include/type_traits/reference.h" bodystart="54" bodyend="54"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4_1aa041d64e90d0f15edd716859e5fb8bb6" prot="public" virt="non-virtual"><scope>bzd::typeTraits::addReference&lt; void &gt;</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

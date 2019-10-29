@@ -1,0 +1,93 @@
+\hypertarget{classbzd_1_1interface_1_1Stack}{}\section{bzd\+:\+:interface\+:\+:Stack Class Reference}
+\label{classbzd_1_1interface_1_1Stack}\index{bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}}
+
+
+{\ttfamily \#include $<$stack.\+h$>$}
+
+
+
+Inheritance diagram for bzd\+:\+:interface\+:\+:Stack\+:
+% FIG 0
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_a5088183155c7e599606d80c1ab6623fb}\label{classbzd_1_1interface_1_1Stack_a5088183155c7e599606d80c1ab6623fb}} 
+void {\bfseries reset} (const Fct\+Ptr\+Type fct, void $\ast$context)
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034}{Direction} \+: Byte\+Type \{ \hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034afb48997617f324a0afeff3ad1d1d59ad}{Direction\+::\+U\+P\+W\+A\+RD} = 0, 
+\hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034acf045327606e788dbe14630a376af70e}{Direction\+::\+D\+O\+W\+N\+W\+A\+RD} = 1
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_a800684e7cd937ce9cf99cdd6bb3197aa}\label{classbzd_1_1interface_1_1Stack_a800684e7cd937ce9cf99cdd6bb3197aa}} 
+{\bfseries Stack} (Byte\+Type $\ast$stack, const Size\+Type size)
+\item 
+{\footnotesize template$<$class T , unsigned int Align = 1$>$ }\\T $\ast$ \hyperlink{classbzd_1_1interface_1_1Stack_a8319403ce82128a0805bd99de0b84893}{last} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_a39bfbc3280c697f9b8846dd522bcce9d}\label{classbzd_1_1interface_1_1Stack_a39bfbc3280c697f9b8846dd522bcce9d}} 
+Byte\+Type $\ast$const {\bfseries stack\+Base\+\_\+}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_addae6819511cffe6a35ed088bddacdbb}\label{classbzd_1_1interface_1_1Stack_addae6819511cffe6a35ed088bddacdbb}} 
+const Size\+Type {\bfseries size\+\_\+}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_aebc216cdd30a8fe34cc3f89035b5513a}\label{classbzd_1_1interface_1_1Stack_aebc216cdd30a8fe34cc3f89035b5513a}} 
+Byte\+Type $\ast$ {\bfseries stack\+\_\+}
+\end{DoxyCompactItemize}
+\subsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_a13f179374f33bd1885bd6735204c2c9a}\label{classbzd_1_1interface_1_1Stack_a13f179374f33bd1885bd6735204c2c9a}} 
+static const \hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034}{Direction} {\bfseries direction\+\_\+} = \hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034acf045327606e788dbe14630a376af70e}{bzd\+::interface\+::\+Stack\+::\+Direction\+::\+D\+O\+W\+N\+W\+A\+RD}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_aaa7728226b6ce66782e8816b1658dd9a}\label{classbzd_1_1interface_1_1Stack_aaa7728226b6ce66782e8816b1658dd9a}} 
+class {\bfseries Task}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Application stack definition 
+
+\subsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034}\label{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034}} 
+\index{bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}!Direction@{Direction}}
+\index{Direction@{Direction}!bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}}
+\subsubsection{\texorpdfstring{Direction}{Direction}}
+{\footnotesize\ttfamily enum \hyperlink{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034}{bzd\+::interface\+::\+Stack\+::\+Direction} \+: Byte\+Type\hspace{0.3cm}{\ttfamily [strong]}, {\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{U\+P\+W\+A\+RD@{U\+P\+W\+A\+RD}!bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}}\index{bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}!U\+P\+W\+A\+RD@{U\+P\+W\+A\+RD}}}\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034afb48997617f324a0afeff3ad1d1d59ad}\label{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034afb48997617f324a0afeff3ad1d1d59ad}} 
+U\+P\+W\+A\+RD&The stack grows from lower address to higher \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+O\+W\+N\+W\+A\+RD@{D\+O\+W\+N\+W\+A\+RD}!bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}}\index{bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}!D\+O\+W\+N\+W\+A\+RD@{D\+O\+W\+N\+W\+A\+RD}}}\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034acf045327606e788dbe14630a376af70e}\label{classbzd_1_1interface_1_1Stack_aee39c37ff1b2f48dcfd24a09c0999034acf045327606e788dbe14630a376af70e}} 
+D\+O\+W\+N\+W\+A\+RD&The stack grows from higher address to lower \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classbzd_1_1interface_1_1Stack_a8319403ce82128a0805bd99de0b84893}\label{classbzd_1_1interface_1_1Stack_a8319403ce82128a0805bd99de0b84893}} 
+\index{bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}!last@{last}}
+\index{last@{last}!bzd\+::interface\+::\+Stack@{bzd\+::interface\+::\+Stack}}
+\subsubsection{\texorpdfstring{last()}{last()}}
+{\footnotesize\ttfamily template$<$class T , unsigned int Align = 1$>$ \\
+T$\ast$ bzd\+::interface\+::\+Stack\+::last (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+Return the last element of the stack casted to a certain type 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/interface/stack.\+h\item 
+src/platforms/x86\+\_\+64\+\_\+cdecl/stack.\+cpp\end{DoxyCompactItemize}

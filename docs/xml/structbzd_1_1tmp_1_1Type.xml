@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1tmp_1_1Type" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::tmp::Type</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="structbzd_1_1tmp_1_1Type_1ada33b4b234ad9d069b6c9e2236f53f2a" prot="public" static="no">
+        <type>T</type>
+        <definition>using bzd::tmp::Type&lt; T &gt;::type =  T</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="13" column="1" bodyfile="include/template_metaprogramming.h" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/template_metaprogramming.h" line="13" column="1" bodyfile="include/template_metaprogramming.h" bodystart="13" bodyend="13"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1tmp_1_1Type_1ada33b4b234ad9d069b6c9e2236f53f2a" prot="public" virt="non-virtual"><scope>bzd::tmp::Type</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

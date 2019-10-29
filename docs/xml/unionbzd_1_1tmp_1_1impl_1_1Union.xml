@@ -1,0 +1,260 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="unionbzd_1_1tmp_1_1impl_1_1Union" kind="union" language="C++" prot="public">
+    <compoundname>bzd::tmp::impl::Union</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Ts</declname>
+        <defname>Ts</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="unionbzd_1_1tmp_1_1impl_1_1Union_1acbce1c71cd02c3e95300dce1c217f534" prot="protected" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::tmp::impl::Union&lt; T, Ts &gt;::value_</definition>
+        <argsstring></argsstring>
+        <name>value_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="151" column="1" bodyfile="include/template_metaprogramming.h" bodystart="151" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="unionbzd_1_1tmp_1_1impl_1_1Union_1a056247bb1e0f008072d6378dcb0f5c99" prot="protected" static="no" mutable="no">
+        <type><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">Union</ref>&lt; Ts... &gt;</type>
+        <definition>Union&lt;Ts...&gt; bzd::tmp::impl::Union&lt; T, Ts &gt;::next_</definition>
+        <argsstring></argsstring>
+        <name>next_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="152" column="1" bodyfile="include/template_metaprogramming.h" bodystart="152" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1a5cb32150541f72871000b0f5b0d388fc" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::tmp::impl::Union&lt; T, Ts &gt;::Union</definition>
+        <argsstring>()</argsstring>
+        <name>Union</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="130" column="1" bodyfile="include/template_metaprogramming.h" bodystart="130" bodyend="130"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1a813b058f92fabe899cec5713ed34ef67" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>bzd::tmp::impl::Union&lt; T, Ts &gt;::~Union</definition>
+        <argsstring>()</argsstring>
+        <name>~Union</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="131" column="1" bodyfile="include/template_metaprogramming.h" bodystart="131" bodyend="131"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1a2ee8c0b71a9b700db65c689878dad56e" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt;!<ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::tmp::impl::Union&lt; T, Ts &gt;::Union</definition>
+        <argsstring>(U &amp;&amp;value)</argsstring>
+        <name>Union</name>
+        <param>
+          <type>U &amp;&amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="134" column="1" bodyfile="include/template_metaprogramming.h" bodystart="134" bodyend="134"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1a2d69300bd33d0f491e5ee30d0891c571" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt; <ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::tmp::impl::Union&lt; T, Ts &gt;::Union</definition>
+        <argsstring>(const U &amp;value)</argsstring>
+        <name>Union</name>
+        <param>
+          <type>const U &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="136" column="1" bodyfile="include/template_metaprogramming.h" bodystart="136" bodyend="136"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1ac5126c79c6c06a28864d2c7d8bf111d8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt;!<ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr U &amp;</type>
+        <definition>constexpr U&amp; bzd::tmp::impl::Union&lt; T, Ts &gt;::get</definition>
+        <argsstring>()</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="139" column="1" bodyfile="include/template_metaprogramming.h" bodystart="139" bodyend="139"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1aef02b0d662b724f6a500c83b2683b33a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt;!<ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr const U &amp;</type>
+        <definition>constexpr const U&amp; bzd::tmp::impl::Union&lt; T, Ts &gt;::get</definition>
+        <argsstring>() const</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="142" column="1" bodyfile="include/template_metaprogramming.h" bodystart="142" bodyend="142"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1ac5126c79c6c06a28864d2c7d8bf111d8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt; <ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr U &amp;</type>
+        <definition>constexpr U&amp; bzd::tmp::impl::Union&lt; T, Ts &gt;::get</definition>
+        <argsstring>()</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="145" column="1" bodyfile="include/template_metaprogramming.h" bodystart="145" bodyend="145"/>
+      </memberdef>
+      <memberdef kind="function" id="unionbzd_1_1tmp_1_1impl_1_1Union_1aef02b0d662b724f6a500c83b2683b33a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">typeTraits::enableIf</ref>&lt; <ref refid="structbzd_1_1typeTraits_1_1isSame" kindref="compound">bzd::typeTraits::isSame</ref>&lt; T, U &gt;::value &gt;::type *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>constexpr const U &amp;</type>
+        <definition>constexpr const U&amp; bzd::tmp::impl::Union&lt; T, Ts &gt;::get</definition>
+        <argsstring>() const</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="148" column="1" bodyfile="include/template_metaprogramming.h" bodystart="148" bodyend="148"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="577">
+        <label>T</label>
+      </node>
+      <node id="574">
+        <label>bzd::tmp::impl::Union&lt; T, Ts &gt;</label>
+        <link refid="unionbzd_1_1tmp_1_1impl_1_1Union"/>
+        <childnode refid="575" relation="usage">
+          <edgelabel>next_</edgelabel>
+        </childnode>
+        <childnode refid="577" relation="usage">
+          <edgelabel>value_</edgelabel>
+        </childnode>
+      </node>
+      <node id="575">
+        <label>bzd::tmp::impl::Union&lt; Ts... &gt;</label>
+        <link refid="unionbzd_1_1tmp_1_1impl_1_1Union"/>
+        <childnode refid="575" relation="usage">
+          <edgelabel>next_</edgelabel>
+        </childnode>
+        <childnode refid="576" relation="usage">
+          <edgelabel>value_</edgelabel>
+        </childnode>
+      </node>
+      <node id="576">
+        <label>Ts</label>
+        <link refid="classTs"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/template_metaprogramming.h" line="127" column="1" bodyfile="include/template_metaprogramming.h" bodystart="126" bodyend="153"/>
+    <listofallmembers>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1ac5126c79c6c06a28864d2c7d8bf111d8" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>get</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1aef02b0d662b724f6a500c83b2683b33a" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>get</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1ac5126c79c6c06a28864d2c7d8bf111d8" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>get</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1aef02b0d662b724f6a500c83b2683b33a" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>get</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1a056247bb1e0f008072d6378dcb0f5c99" prot="protected" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>next_</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1a5cb32150541f72871000b0f5b0d388fc" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>Union</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1a2ee8c0b71a9b700db65c689878dad56e" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>Union</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1a2d69300bd33d0f491e5ee30d0891c571" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>Union</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1acbce1c71cd02c3e95300dce1c217f534" prot="protected" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>value_</name></member>
+      <member refid="unionbzd_1_1tmp_1_1impl_1_1Union_1a813b058f92fabe899cec5713ed34ef67" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::Union</scope><name>~Union</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

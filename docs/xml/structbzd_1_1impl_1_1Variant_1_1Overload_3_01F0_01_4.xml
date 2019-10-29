@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4" kind="struct" language="C++" prot="protected">
+    <compoundname>bzd::impl::Variant::Overload&lt; F0 &gt;</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">F0</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class F0</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4_1a7d7ecf40bb86cf99f9120ebc4146b1bf" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0 &gt;::Overload</definition>
+        <argsstring>(F0 &amp;&amp;f0)</argsstring>
+        <name>Overload</name>
+        <param>
+          <type>F0 &amp;&amp;</type>
+          <declname>f0</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="74" column="1" bodyfile="include/container/variant.h" bodystart="74" bodyend="74"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="429">
+        <label>F0</label>
+      </node>
+      <node id="428">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0 &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4"/>
+        <childnode refid="429" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="431">
+        <label>F0</label>
+      </node>
+      <node id="430">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0 &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4"/>
+        <childnode refid="431" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/variant.h" line="73" column="1" bodyfile="include/container/variant.h" bodystart="72" bodyend="76"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_01_4_1a7d7ecf40bb86cf99f9120ebc4146b1bf" prot="public" virt="non-virtual"><scope>bzd::impl::Variant::Overload&lt; F0 &gt;</scope><name>Overload</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

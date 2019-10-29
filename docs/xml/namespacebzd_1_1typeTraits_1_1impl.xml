@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1typeTraits_1_1impl" kind="namespace" language="C++">
+    <compoundname>bzd::typeTraits::impl</compoundname>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReference" prot="public">bzd::typeTraits::impl::addRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper" prot="public">bzd::typeTraits::impl::addRValueReferenceHelper</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1addRValueReferenceHelper_3_01T_00_01true_01_4" prot="public">bzd::typeTraits::impl::addRValueReferenceHelper&lt; T, true &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1isConstructible" prot="public">bzd::typeTraits::impl::isConstructible</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1isConstructible_3_01voidType_3_01decltype_07T_07declval_3_01Ab708546180c4980af3729b760eee75ea" prot="public">bzd::typeTraits::impl::isConstructible&lt; voidType&lt; decltype(T(declval&lt; Args &gt;()...))&gt;, T, Args... &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1isDestructible" prot="public">bzd::typeTraits::impl::isDestructible</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1impl_1_1TypeIdentity" prot="public">bzd::typeTraits::impl::TypeIdentity</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="pointer_8h_1ad7239a4f0586cb9777edd164ebc1a7c2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::typeTraits::impl::tryAddPointer</definition>
+        <argsstring>(int) -&gt; TypeIdentity&lt; typename bzd::typeTraits::removeReference&lt; T &gt;::type *&gt;</argsstring>
+        <name>tryAddPointer</name>
+        <param>
+          <type>int</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/pointer.h" line="12" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="pointer_8h_1abd8cf0fb887f6a128b933aabd4832fd5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>auto</type>
+        <definition>auto bzd::typeTraits::impl::tryAddPointer</definition>
+        <argsstring>(...) -&gt; TypeIdentity&lt; T &gt;</argsstring>
+        <name>tryAddPointer</name>
+        <param>
+          <type>...</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/pointer.h" line="13" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/constructible.h" line="13" column="1"/>
+  </compounddef>
+</doxygen>

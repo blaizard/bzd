@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1tmp" kind="namespace" language="C++">
+    <compoundname>bzd::tmp</compoundname>
+    <innerclass refid="structbzd_1_1tmp_1_1Type" prot="public">bzd::tmp::Type</innerclass>
+    <innerclass refid="structbzd_1_1tmp_1_1TypeList" prot="public">bzd::tmp::TypeList</innerclass>
+    <innernamespace refid="namespacebzd_1_1tmp_1_1impl">bzd::tmp::impl</innernamespace>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="template__metaprogramming_8h_1ab81b5ae4d503d6d7096133a8b04b5414" prot="public" static="no">
+        <type>typename <ref refid="structbzd_1_1tmp_1_1impl_1_1ChooseNth" kindref="compound">impl::ChooseNth</ref>&lt; N, Ts... &gt;::type</type>
+        <definition>using bzd::tmp::ChooseNth = typedef typename impl::ChooseNth&lt;N, Ts...&gt;::type</definition>
+        <argsstring></argsstring>
+        <name>ChooseNth</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="31" column="1" bodyfile="include/template_metaprogramming.h" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="template__metaprogramming_8h_1ac8249091cdd48c2f83ff8b0eef6158b8" prot="public" static="no">
+        <type>typename <ref refid="structbzd_1_1tmp_1_1impl_1_1Contains" kindref="compound">impl::Contains</ref>&lt; T, Ts... &gt;</type>
+        <definition>using bzd::tmp::Contains = typedef typename impl::Contains&lt;T, Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>Contains</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="51" column="1" bodyfile="include/template_metaprogramming.h" bodystart="51" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="template__metaprogramming_8h_1a7543487dae3c24ef89ae3a1e5b269f52" prot="public" static="no">
+        <type>typename <ref refid="structbzd_1_1tmp_1_1impl_1_1Find" kindref="compound">impl::Find</ref>&lt; 0, T, Ts... &gt;</type>
+        <definition>using bzd::tmp::Find = typedef typename impl::Find&lt;0, T, Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>Find</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="72" column="1" bodyfile="include/template_metaprogramming.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="template__metaprogramming_8h_1a42cd7c3843dda265e464d964b1377226" prot="public" static="no">
+        <type><ref refid="unionbzd_1_1tmp_1_1impl_1_1Union" kindref="compound">impl::Union</ref>&lt; Ts... &gt;</type>
+        <definition>using bzd::tmp::Union = typedef impl::Union&lt;Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>Union</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="198" column="1" bodyfile="include/template_metaprogramming.h" bodystart="198" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="template__metaprogramming_8h_1a125d7767f27aef0f695c0b3f67e343c5" prot="public" static="no">
+        <type><ref refid="unionbzd_1_1tmp_1_1impl_1_1UnionConstexpr" kindref="compound">impl::UnionConstexpr</ref>&lt; Ts... &gt;</type>
+        <definition>using bzd::tmp::UnionConstexpr = typedef impl::UnionConstexpr&lt;Ts...&gt;</definition>
+        <argsstring></argsstring>
+        <name>UnionConstexpr</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/template_metaprogramming.h" line="200" column="1" bodyfile="include/template_metaprogramming.h" bodystart="200" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/template_metaprogramming.h" line="9" column="1"/>
+  </compounddef>
+</doxygen>

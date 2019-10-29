@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</compoundname>
+    <basecompoundref refid="structbzd_1_1typeTraits_1_1integralConstant" prot="public" virt="non-virtual">bzd::typeTraits::integralConstant&lt; bool, true &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="346">
+        <label>trueType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+      </node>
+      <node id="345">
+        <label>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4"/>
+        <childnode refid="346" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="349">
+        <label>T</label>
+      </node>
+      <node id="348">
+        <label>trueType</label>
+        <link refid="structbzd_1_1typeTraits_1_1integralConstant"/>
+        <childnode refid="349" relation="usage">
+          <edgelabel>value</edgelabel>
+        </childnode>
+      </node>
+      <node id="347">
+        <label>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4"/>
+        <childnode refid="348" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/type_traits/reference.h" line="16" column="1" bodyfile="include/type_traits/reference.h" bodystart="16" bodyend="16"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1afe505065d9034110fb3a385c0a81ea16" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</scope><name>operator valueType</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a7f97a49b251bab219b3552efbffbeab1" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</scope><name>operator()</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a9f27fd41bacb9695bdb0068eaeb13742" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</scope><name>type</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a614e5b5b8d73d1c5a5f63b5ad8fa5841" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</scope><name>value</name></member>
+      <member refid="structbzd_1_1typeTraits_1_1integralConstant_1a25f8639da0d0702b714b2ae46e7b2831" prot="public" virt="non-virtual"><scope>bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</scope><name>valueType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

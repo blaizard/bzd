@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="main_8cpp" kind="file" language="C++">
+    <compoundname>main.cpp</compoundname>
+    <includes local="no">iostream</includes>
+    <includes refid="scheduler_8h" local="yes">include/scheduler.h</includes>
+    <includes refid="stack_8h" local="yes">include/stack.h</includes>
+    <includes refid="task_8h" local="yes">include/task.h</includes>
+    <incdepgraph>
+      <node id="37">
+        <label>list</label>
+      </node>
+      <node id="47">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>include/type_traits/function.h</label>
+        <link refid="function_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="40">
+        <label>include/type_traits/array.h</label>
+        <link refid="type__traits_2array_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="49">
+        <label>include/interface/stack.h</label>
+        <link refid="interface_2stack_8h_source"/>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="48">
+        <label>include/interface/task.h</label>
+        <link refid="interface_2task_8h_source"/>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>include/scheduler.h</label>
+        <link refid="scheduler_8h_source"/>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+      </node>
+      <node id="50">
+        <label>include/stack.h</label>
+        <link refid="stack_8h_source"/>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="51">
+        <label>include/task.h</label>
+        <link refid="task_8h_source"/>
+        <childnode refid="48" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>iostream</label>
+      </node>
+      <node id="34">
+        <label>example/main.cpp</label>
+        <link refid="main_8cpp"/>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="50" relation="include">
+        </childnode>
+        <childnode refid="51" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>include/type_traits/pointer.h</label>
+        <link refid="pointer_8h_source"/>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="44">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h_source"/>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="main_8cpp_1a32cf321773ea1273c0567f2f5a294926" prot="public" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1Stack" kindref="compound">bzd::Stack</ref>&lt; 2000 &gt;</type>
+        <definition>bzd::Stack&lt;2000&gt; stack1</definition>
+        <argsstring></argsstring>
+        <name>stack1</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="10" column="1" bodyfile="example/main.cpp" bodystart="10" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="main_8cpp_1ab3627d3f154ee48d01978e93090ac966" prot="public" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1Stack" kindref="compound">bzd::Stack</ref>&lt; 2000 &gt;</type>
+        <definition>bzd::Stack&lt;2000&gt; stack2</definition>
+        <argsstring></argsstring>
+        <name>stack2</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="11" column="1" bodyfile="example/main.cpp" bodystart="11" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="main_8cpp_1aec34efc19dc4dea673736a591fc630d4" prot="public" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1Task" kindref="compound">bzd::Task</ref>&lt; decltype(fct1)&gt;</type>
+        <definition>bzd::Task&lt;decltype(fct1)&gt; task1(fct1)</definition>
+        <argsstring>(fct1)</argsstring>
+        <name>task1</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="12" column="1"/>
+      </memberdef>
+      <memberdef kind="variable" id="main_8cpp_1ac5ada1047bff59d01a76f998ed39bcb7" prot="public" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1Task" kindref="compound">bzd::Task</ref>&lt; decltype(fct2)&gt;</type>
+        <definition>bzd::Task&lt;decltype(fct2)&gt; task2(fct2)</definition>
+        <argsstring>(fct2)</argsstring>
+        <name>task2</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="13" column="1"/>
+      </memberdef>
+      <memberdef kind="variable" id="main_8cpp_1acb559820d9ca11295b4500f179ef6392" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int i</definition>
+        <argsstring></argsstring>
+        <name>i</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="15" column="1" bodyfile="example/main.cpp" bodystart="15" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="main_8cpp_1af0ee53c5afa8a5a7102c26471e2bb725" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void fct1</definition>
+        <argsstring>()</argsstring>
+        <name>fct1</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="7" column="1" bodyfile="example/main.cpp" bodystart="17" bodyend="24"/>
+      </memberdef>
+      <memberdef kind="function" id="main_8cpp_1ab54704b8f52a6cca59e71a3b9d406045" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void fct2</definition>
+        <argsstring>()</argsstring>
+        <name>fct2</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="8" column="1" bodyfile="example/main.cpp" bodystart="27" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="main_8cpp_1ae66f6b31b5ad750f1fe042a706a4e3d4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int main</definition>
+        <argsstring>()</argsstring>
+        <name>main</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="example/main.cpp" line="36" column="1" bodyfile="example/main.cpp" bodystart="36" bodyend="47"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;iostream&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/scheduler.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/stack.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/task.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>fct1();</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>fct2();</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><ref refid="classbzd_1_1Stack" kindref="compound">bzd::Stack&lt;2000&gt;</ref><sp/>stack1;</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><ref refid="classbzd_1_1Stack" kindref="compound">bzd::Stack&lt;2000&gt;</ref><sp/>stack2;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><ref refid="classbzd_1_1Task" kindref="compound">bzd::Task&lt;decltype(fct1)&gt;</ref><sp/>task1(fct1);</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><ref refid="classbzd_1_1Task" kindref="compound">bzd::Task&lt;decltype(fct2)&gt;</ref><sp/>task2(fct2);</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>fct1()</highlight></codeline>
+<codeline lineno="18"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(i<sp/>&lt;<sp/>10)</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;Fct<sp/>1:<sp/>&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>i++<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::yield();</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="24"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>fct2()</highlight></codeline>
+<codeline lineno="28"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(i<sp/>&lt;<sp/>10)</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/></highlight><highlight class="stringliteral">&quot;Fct<sp/>2:<sp/>&quot;</highlight><highlight class="normal"><sp/>&lt;&lt;<sp/>i++<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::yield();</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="34"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>main()</highlight></codeline>
+<codeline lineno="37"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/>task1.bind(stack1);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/>task2.bind(stack2);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/>bzd::Scheduler::getInstance().<ref refid="classbzd_1_1Scheduler_1a976e50ed0d9504b9d83a238a0be894ff" kindref="member">addTask</ref>(task1);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/>bzd::Scheduler::getInstance().<ref refid="classbzd_1_1Scheduler_1a976e50ed0d9504b9d83a238a0be894ff" kindref="member">addTask</ref>(task2);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/>bzd::Scheduler::getInstance().start();</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="47"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="example/main.cpp"/>
+  </compounddef>
+</doxygen>

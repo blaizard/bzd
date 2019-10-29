@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1OStream" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>bzd::impl::OStream</compoundname>
+    <derivedcompoundref refid="classbzd_1_1impl_1_1IOStream" prot="public" virt="non-virtual">bzd::impl::IOStream&lt; T &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classbzd_1_1impl_1_1StringStream" prot="public" virt="non-virtual">bzd::impl::StringStream</derivedcompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1OStream_1ab91b3af754da6f6cc5a08e04760a5f56" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>bzd::impl::OStream&lt; T &gt;::OStream</definition>
+        <argsstring>()=default</argsstring>
+        <name>OStream</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/iostream.h" line="14" column="1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1OStream_1aa9584f5a3833c56ba7deec2c55231b05" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>SizeType</type>
+        <definition>virtual SizeType bzd::impl::OStream&lt; T &gt;::write</definition>
+        <argsstring>(const Span&lt; const T &gt; &amp;data) noexcept=0</argsstring>
+        <name>write</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1Span" kindref="compound">Span</ref>&lt; const T &gt; &amp;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/iostream.h" line="17" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="423">
+        <label>bzd::impl::StringStream&lt; char &gt;</label>
+        <link refid="classbzd_1_1impl_1_1StringStream"/>
+        <childnode refid="421" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="424">
+        <label>bzd::StringStream&lt; N &gt;</label>
+        <link refid="classbzd_1_1StringStream"/>
+        <childnode refid="423" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="422">
+        <label>bzd::impl::IOStream&lt; T &gt;</label>
+        <link refid="classbzd_1_1impl_1_1IOStream"/>
+        <childnode refid="421" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="421">
+        <label>bzd::impl::OStream&lt; T &gt;</label>
+        <link refid="classbzd_1_1impl_1_1OStream"/>
+      </node>
+    </inheritancegraph>
+    <location file="include/container/iostream.h" line="12" column="1" bodyfile="include/container/iostream.h" bodystart="11" bodyend="18"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1OStream_1ab91b3af754da6f6cc5a08e04760a5f56" prot="protected" virt="non-virtual"><scope>bzd::impl::OStream</scope><name>OStream</name></member>
+      <member refid="classbzd_1_1impl_1_1OStream_1aa9584f5a3833c56ba7deec2c55231b05" prot="public" virt="pure-virtual"><scope>bzd::impl::OStream</scope><name>write</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

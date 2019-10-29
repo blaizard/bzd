@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="fundamental__test_8cpp" kind="file" language="C++">
+    <compoundname>fundamental_test.cpp</compoundname>
+    <includes local="yes">gtest/gtest.h</includes>
+    <includes refid="fundamental_8h" local="yes">include/type_traits/fundamental.h</includes>
+    <includes refid="utils_8h" local="yes">include/type_traits/utils.h</includes>
+    <incdepgraph>
+      <node id="922">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="923" relation="include">
+        </childnode>
+        <childnode refid="924" relation="include">
+        </childnode>
+      </node>
+      <node id="925">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="923" relation="include">
+        </childnode>
+      </node>
+      <node id="926">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h_source"/>
+        <childnode refid="923" relation="include">
+        </childnode>
+      </node>
+      <node id="919">
+        <label>include/type_traits/fundamental_test.cpp</label>
+        <link refid="fundamental__test_8cpp"/>
+        <childnode refid="920" relation="include">
+        </childnode>
+        <childnode refid="921" relation="include">
+        </childnode>
+        <childnode refid="922" relation="include">
+        </childnode>
+      </node>
+      <node id="920">
+        <label>gtest/gtest.h</label>
+      </node>
+      <node id="921">
+        <label>include/type_traits/fundamental.h</label>
+        <link refid="fundamental_8h_source"/>
+        <childnode refid="922" relation="include">
+        </childnode>
+        <childnode refid="926" relation="include">
+        </childnode>
+      </node>
+      <node id="923">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="924">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h_source"/>
+        <childnode refid="923" relation="include">
+        </childnode>
+        <childnode refid="925" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="fundamental__test_8cpp_1aa6beb0c2ce61ae834da1169bc1bf615a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(TypeTraits, isIntegral)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>TypeTraits</type>
+        </param>
+        <param>
+          <type>isIntegral</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/fundamental_test.cpp" line="6" column="1" bodyfile="include/type_traits/fundamental_test.cpp" bodystart="6" bodyend="16"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&quot;gtest/gtest.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/type_traits/fundamental.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/type_traits/utils.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal">TEST(TypeTraits,<sp/>isIntegral)</highlight></codeline>
+<codeline lineno="7"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>result<sp/>=<sp/><ref refid="structbzd_1_1typeTraits_1_1isIntegral" kindref="compound">bzd::typeTraits::isIntegral&lt;int&gt;::value</ref>;</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>EXPECT_TRUE(result);</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>result<sp/>=<sp/><ref refid="structbzd_1_1typeTraits_1_1isIntegral" kindref="compound">bzd::typeTraits::isIntegral&lt;char*&gt;::value</ref>;</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>EXPECT_FALSE(result);</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="16"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/type_traits/fundamental_test.cpp"/>
+  </compounddef>
+</doxygen>

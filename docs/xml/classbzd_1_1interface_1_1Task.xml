@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1interface_1_1Task" kind="class" language="C++" prot="public">
+    <compoundname>bzd::interface::Task</compoundname>
+    <derivedcompoundref refid="classbzd_1_1Task" prot="public" virt="non-virtual">bzd::Task&lt; T, Args &gt;</derivedcompoundref>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classbzd_1_1interface_1_1Task_1a66f8e668724d55ce7a9a2f767af86cde" prot="protected" static="no" mutable="no">
+        <type>CtxPtrType const</type>
+        <definition>CtxPtrType const bzd::interface::Task::context_</definition>
+        <argsstring></argsstring>
+        <name>context_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="47" column="1" bodyfile="include/interface/task.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbzd_1_1interface_1_1Task_1aff1cdc3d37e73a2086cba1b346e13949" prot="protected" static="no" mutable="no">
+        <type>const FctPtrType</type>
+        <definition>const FctPtrType bzd::interface::Task::fct_</definition>
+        <argsstring></argsstring>
+        <name>fct_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="48" column="1" bodyfile="include/interface/task.h" bodystart="48" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbzd_1_1interface_1_1Task_1a3ad53a1a67d87815808dc2e535d44be3" prot="protected" static="no" mutable="no">
+        <type><ref refid="classbzd_1_1interface_1_1Stack" kindref="compound">interface::Stack</ref> *</type>
+        <definition>interface::Stack* bzd::interface::Task::stack_</definition>
+        <argsstring></argsstring>
+        <name>stack_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="49" column="1" bodyfile="include/interface/task.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1interface_1_1Task_1af888e2ae31e5a625b9b63d98be1638a0" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>bzd::interface::Task::Task</definition>
+        <argsstring>(CtxPtrType context, const FctPtrType fct)</argsstring>
+        <name>Task</name>
+        <param>
+          <type>CtxPtrType</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const FctPtrType</type>
+          <declname>fct</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="19" column="1" bodyfile="include/interface/task.h" bodystart="19" bodyend="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1interface_1_1Task_1a8a1ac60ed1c1a1c2db3e4e11035b5488" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::interface::Task::bind</definition>
+        <argsstring>(interface::Stack &amp;stack)</argsstring>
+        <name>bind</name>
+        <param>
+          <type><ref refid="classbzd_1_1interface_1_1Stack" kindref="compound">interface::Stack</ref> &amp;</type>
+          <declname>stack</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Bind a task to a stack </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="27" column="1" bodyfile="include/interface/task.h" bodystart="27" bodyend="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1interface_1_1Task_1a159eb6308c5e6ac3b890b386517c565d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::interface::Task::start</definition>
+        <argsstring>(void **pointer)</argsstring>
+        <name>start</name>
+        <param>
+          <type>void **</type>
+          <declname>pointer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="33" column="1" bodyfile="include/interface/task.h" bodystart="33" bodyend="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1interface_1_1Task_1a262c01237a7cb301d6c3b493474c44ea" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::interface::Task::yield</definition>
+        <argsstring>(Task &amp;nextTask)</argsstring>
+        <name>yield</name>
+        <param>
+          <type><ref refid="classbzd_1_1interface_1_1Task" kindref="compound">Task</ref> &amp;</type>
+          <declname>nextTask</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Switch context and run this new task </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/interface/task.h" line="41" column="1" bodyfile="include/interface/task.h" bodystart="41" bodyend="44"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="531">
+        <label>bzd::Task&lt; T, Args &gt;</label>
+        <link refid="classbzd_1_1Task"/>
+        <childnode refid="530" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="530">
+        <label>bzd::interface::Task</label>
+        <link refid="classbzd_1_1interface_1_1Task"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="532">
+        <label>bzd::interface::Task</label>
+        <link refid="classbzd_1_1interface_1_1Task"/>
+        <childnode refid="533" relation="usage">
+          <edgelabel>stack_</edgelabel>
+        </childnode>
+      </node>
+      <node id="533">
+        <label>bzd::interface::Stack</label>
+        <link refid="classbzd_1_1interface_1_1Stack"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/interface/task.h" line="17" column="1" bodyfile="include/interface/task.h" bodystart="16" bodyend="50"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1interface_1_1Task_1a8a1ac60ed1c1a1c2db3e4e11035b5488" prot="public" virt="non-virtual"><scope>bzd::interface::Task</scope><name>bind</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1a66f8e668724d55ce7a9a2f767af86cde" prot="protected" virt="non-virtual"><scope>bzd::interface::Task</scope><name>context_</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1aff1cdc3d37e73a2086cba1b346e13949" prot="protected" virt="non-virtual"><scope>bzd::interface::Task</scope><name>fct_</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1a3ad53a1a67d87815808dc2e535d44be3" prot="protected" virt="non-virtual"><scope>bzd::interface::Task</scope><name>stack_</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1a159eb6308c5e6ac3b890b386517c565d" prot="public" virt="non-virtual"><scope>bzd::interface::Task</scope><name>start</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1af888e2ae31e5a625b9b63d98be1638a0" prot="public" virt="non-virtual"><scope>bzd::interface::Task</scope><name>Task</name></member>
+      <member refid="classbzd_1_1interface_1_1Task_1a262c01237a7cb301d6c3b493474c44ea" prot="public" virt="non-virtual"><scope>bzd::interface::Task</scope><name>yield</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

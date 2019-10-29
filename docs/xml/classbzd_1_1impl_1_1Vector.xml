@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1Vector" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::Vector</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">Impl</basecompoundref>
+    <derivedcompoundref refid="classbzd_1_1Vector" prot="public" virt="non-virtual">bzd::Vector&lt; T, N &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classbzd_1_1Vector" prot="public" virt="non-virtual">bzd::Vector&lt; bzd::String&lt; 100 &gt;, 10 &gt;</derivedcompoundref>
+    <templateparamlist>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+      <param>
+        <type>class</type>
+        <declname>Impl</declname>
+        <defname>Impl</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="protected-type">
+      <memberdef kind="typedef" id="classbzd_1_1impl_1_1Vector_1af04f9b0096d49ebab090f1b12a6f2172" prot="protected" static="no">
+        <type>Impl</type>
+        <definition>using bzd::impl::Vector&lt; T, Impl &gt;::Parent =  Impl</definition>
+        <argsstring></argsstring>
+        <name>Parent</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="15" column="1" bodyfile="include/container/vector.h" bodystart="15" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1Vector_1aec6fa1477596bf8b0fd4d4db45a68585" prot="public" static="no" mutable="no">
+        <type>const SizeType</type>
+        <definition>const SizeType bzd::impl::Vector&lt; T, Impl &gt;::capacity_</definition>
+        <argsstring></argsstring>
+        <name>capacity_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="51" column="1" bodyfile="include/container/vector.h" bodystart="51" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Vector_1a555fb3184c63f405f1726cdabfb8b99b" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>Args</declname>
+            <defname>Args</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::Vector&lt; T, Impl &gt;::Vector</definition>
+        <argsstring>(const SizeType capacity, Args &amp;&amp;... args)</argsstring>
+        <name>Vector</name>
+        <param>
+          <type>const SizeType</type>
+          <declname>capacity</declname>
+        </param>
+        <param>
+          <type>Args &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="21" column="1" bodyfile="include/container/vector.h" bodystart="21" bodyend="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Vector_1a4c250190d24f469139b8ab60dd8a4872" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::Vector&lt; T, Impl &gt;::pushBack</definition>
+        <argsstring>(const T &amp;element) noexcept</argsstring>
+        <name>pushBack</name>
+        <param>
+          <type>const T &amp;</type>
+          <declname>element</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="26" column="1" bodyfile="include/container/vector.h" bodystart="26" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Vector_1a4ada4048843724246d7cd7577e82f94d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr SizeType</type>
+        <definition>constexpr SizeType bzd::impl::Vector&lt; T, Impl &gt;::capacity</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>capacity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="35" column="1" bodyfile="include/container/vector.h" bodystart="35" bodyend="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Vector_1af91b3538f35c7723d2ace99e7aadb45b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::Vector&lt; T, Impl &gt;::clear</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>clear</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="40" column="1" bodyfile="include/container/vector.h" bodystart="40" bodyend="43"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Vector_1aa5ec19442f1fb8be95b1f01d2d435a06" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::Vector&lt; T, Impl &gt;::resize</definition>
+        <argsstring>(const size_t n) noexcept</argsstring>
+        <name>resize</name>
+        <param>
+          <type>const size_t</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/vector.h" line="45" column="1" bodyfile="include/container/vector.h" bodystart="45" bodyend="48"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="613">
+        <label>Vector&lt; bzd::String&lt; 100 &gt;, 10 &gt;</label>
+        <link refid="classbzd_1_1Vector"/>
+        <childnode refid="610" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="612">
+        <label>bzd::Vector&lt; T &gt;</label>
+        <link refid="classbzd_1_1Vector"/>
+        <childnode refid="610" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="611">
+        <label>Impl</label>
+      </node>
+      <node id="610">
+        <label>bzd::impl::Vector&lt; T, Impl &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Vector"/>
+        <childnode refid="611" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="615">
+        <label>Impl</label>
+      </node>
+      <node id="614">
+        <label>bzd::impl::Vector&lt; T, Impl &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Vector"/>
+        <childnode refid="615" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/vector.h" line="13" column="1" bodyfile="include/container/vector.h" bodystart="12" bodyend="52"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1Vector_1a4ada4048843724246d7cd7577e82f94d" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>capacity</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1aec6fa1477596bf8b0fd4d4db45a68585" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>capacity_</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1af91b3538f35c7723d2ace99e7aadb45b" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>clear</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1af04f9b0096d49ebab090f1b12a6f2172" prot="protected" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>Parent</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1a4c250190d24f469139b8ab60dd8a4872" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>pushBack</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1aa5ec19442f1fb8be95b1f01d2d435a06" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>resize</name></member>
+      <member refid="classbzd_1_1impl_1_1Vector_1a555fb3184c63f405f1726cdabfb8b99b" prot="public" virt="non-virtual"><scope>bzd::impl::Vector</scope><name>Vector</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

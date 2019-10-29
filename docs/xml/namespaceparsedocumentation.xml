@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespaceparsedocumentation" kind="namespace" language="Python">
+    <compoundname>parsedocumentation</compoundname>
+    <innerclass refid="classparsedocumentation_1_1DoxygenParser" prot="public">parsedocumentation::DoxygenParser</innerclass>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="parsedocumentation_8py_1a77597c130c954b995974ea2fbdf658bf" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.commonAttrs</definition>
+        <argsstring></argsstring>
+        <name>commonAttrs</name>
+        <initializer>=  {
+	&quot;id&quot;: {},
+	&quot;kind&quot;: {}, # &quot;values&quot;: [&quot;struct&quot;, &quot;class&quot;, &quot;variable&quot;, &quot;function&quot;, &quot;typedef&quot;, &quot;dir&quot;, &quot;file&quot;, &quot;page&quot;, &quot;namespace&quot;] },</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="6" column="1" bodyfile="parsedocumentation.py" bodystart="6" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a98390e7d8218101e97598a8ff3871561" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.name</definition>
+        <argsstring></argsstring>
+        <name>name</name>
+        <initializer>=  {
+	&quot;__content__&quot;: { &quot;key&quot;: &quot;name&quot; }
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="19" column="1" bodyfile="parsedocumentation.py" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a610dcbd31e0c75d356564d936c790a6b" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.param</definition>
+        <argsstring></argsstring>
+        <name>param</name>
+        <initializer>=  {
+	&quot;__type__&quot;: [&quot;list&quot;],
+	&quot;type&quot;: { &quot;__content__&quot;: { &quot;key&quot;: &quot;type&quot; } },
+	&quot;declname&quot;: { &quot;__content__&quot;: { &quot;key&quot;: &quot;name&quot; } }
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="23" column="1" bodyfile="parsedocumentation.py" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a711a57bf75afbce867c8ecbe751ececa" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.args</definition>
+        <argsstring></argsstring>
+        <name>args</name>
+        <initializer>=  {
+	&quot;__type__&quot;: [&quot;args&quot;, &quot;list&quot;],
+	&quot;type&quot;: { &quot;__content__&quot;: { &quot;key&quot;: &quot;type&quot; } },
+	&quot;declname&quot;: { &quot;__content__&quot;: { &quot;key&quot;: &quot;name&quot; } }
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="29" column="1" bodyfile="parsedocumentation.py" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a1d11dc4d376477a343d7699ca76c9c44" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.templateparamlist</definition>
+        <argsstring></argsstring>
+        <name>templateparamlist</name>
+        <initializer>=  {
+	&quot;__type__&quot;: [&quot;template&quot;],
+	&quot;param&quot;: param
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="35" column="1" bodyfile="parsedocumentation.py" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a4dcf2e8d838deb615f593566b82c3945" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.memberdef</definition>
+        <argsstring></argsstring>
+        <name>memberdef</name>
+        <initializer>=  {
+	&quot;__type__&quot;: [&quot;member&quot;],
+	&quot;__attrs__&quot;: commonAttrs,
+	&quot;name&quot;: name,
+	&quot;type&quot;: { &quot;__content__&quot;: { &quot;key&quot;: &quot;type&quot; } },
+	&quot;templateparamlist&quot;: templateparamlist,
+	&quot;param&quot;: args
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="40" column="1" bodyfile="parsedocumentation.py" bodystart="40" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a303647523c7ac8e630f6948bb254dd99" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.sectiondef</definition>
+        <argsstring></argsstring>
+        <name>sectiondef</name>
+        <initializer>=  {
+	&quot;memberdef&quot;: memberdef
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="49" column="1" bodyfile="parsedocumentation.py" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a0f3b2820b12224f696c0c6aed474ac15" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.compoundname</definition>
+        <argsstring></argsstring>
+        <name>compoundname</name>
+        <initializer>=  {
+	&quot;__content__&quot;: { &quot;key&quot;: &quot;name&quot; }
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="53" column="1" bodyfile="parsedocumentation.py" bodystart="53" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1adf83d5687a24875d2c8cee6f8c55e20c" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.compounddef</definition>
+        <argsstring></argsstring>
+        <name>compounddef</name>
+        <initializer>=  {
+	&quot;__type__&quot;: [&quot;container&quot;],
+	&quot;__attrs__&quot;: commonAttrs,
+	&quot;compoundname&quot;: compoundname,
+	&quot;sectiondef&quot;: sectiondef,
+	&quot;templateparamlist&quot;: templateparamlist
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="57" column="1" bodyfile="parsedocumentation.py" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a878f6bc25a7f798b652bc23b38205a76" prot="public" static="no" mutable="no">
+        <type>dictionary</type>
+        <definition>dictionary parsedocumentation.dictionary</definition>
+        <argsstring></argsstring>
+        <name>dictionary</name>
+        <initializer>=  {
+	&quot;compounddef&quot;: compounddef
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="65" column="1" bodyfile="parsedocumentation.py" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a9646b6c4facceab36a44e80d2d528ec5" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.parser</definition>
+        <argsstring></argsstring>
+        <name>parser</name>
+        <initializer>=  <ref refid="classparsedocumentation_1_1DoxygenParser" kindref="compound">DoxygenParser</ref>()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="182" column="1" bodyfile="parsedocumentation.py" bodystart="182" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1ad457bbe15dc442b83c7a426ef3703e64" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.fileList</definition>
+        <argsstring></argsstring>
+        <name>fileList</name>
+        <initializer>=  os.listdir(&quot;docs/xml&quot;)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="184" column="1" bodyfile="parsedocumentation.py" bodystart="184" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a89f3e6ad469d073a94bf57d6e8486920" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.root</definition>
+        <argsstring></argsstring>
+        <name>root</name>
+        <initializer>=  ET.parse(&apos;docs/xml/classbzd_1_1impl_1_1Expected.xml&apos;).getroot()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="190" column="1" bodyfile="parsedocumentation.py" bodystart="190" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1a02da5d5b59b7c62422280415858ebcfd" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.pp</definition>
+        <argsstring></argsstring>
+        <name>pp</name>
+        <initializer>=  pprint.PrettyPrinter(indent=4)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="201" column="1" bodyfile="parsedocumentation.py" bodystart="201" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="parsedocumentation_8py_1af2022180360b72322791b82fe4b12c14" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>parsedocumentation.render</definition>
+        <argsstring></argsstring>
+        <name>render</name>
+        <initializer>=  <ref refid="classrender_1_1Render" kindref="compound">Render</ref>()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="parsedocumentation.py" line="204" column="1" bodyfile="parsedocumentation.py" bodystart="204" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="parsedocumentation.py" line="1" column="1"/>
+  </compounddef>
+</doxygen>

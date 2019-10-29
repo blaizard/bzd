@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::Expected&lt; void, E &gt;</compoundname>
+    <basecompoundref refid="classbzd_1_1impl_1_1Expected" prot="private" virt="non-virtual">bzd::impl::Expected&lt; void *, E &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class E</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4_1a6c063ef0574d074922dcc83767ece7fa" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::Expected&lt; void, E &gt;::Expected</definition>
+        <argsstring>()</argsstring>
+        <name>Expected</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/expected.h" line="123" column="1" bodyfile="include/container/expected.h" bodystart="123" bodyend="123"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="112">
+        <label>bzd::impl::Expected&lt; void, E &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4"/>
+        <childnode refid="113" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="113">
+        <label>bzd::impl::Expected&lt; void *, E &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Expected"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="117">
+        <label>bzd::typeTraits::conditional&lt; bzd::typeTraits::isReference&lt; void *&gt;::value, RefWrapper, ValueWrapper &gt;</label>
+        <link refid="structbzd_1_1typeTraits_1_1conditional"/>
+      </node>
+      <node id="116">
+        <label>E</label>
+      </node>
+      <node id="114">
+        <label>bzd::impl::Expected&lt; void, E &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4"/>
+        <childnode refid="115" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="115">
+        <label>bzd::impl::Expected&lt; void *, E &gt;</label>
+        <link refid="classbzd_1_1impl_1_1Expected"/>
+        <childnode refid="116" relation="usage">
+          <edgelabel>error_</edgelabel>
+        </childnode>
+        <childnode refid="117" relation="usage">
+          <edgelabel>value_</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/expected.h" line="117" column="1" bodyfile="include/container/expected.h" bodystart="116" bodyend="124"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1Expected_1a8b8dc54a832dbc0416bfd0c9db9400dc" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>error</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a2da057c67f7eedbbabefdbe5da519a7a" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>error_</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4_1a6c063ef0574d074922dcc83767ece7fa" prot="public" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>Expected</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a7b523a10f1852d5ec8a2972e23d03ba6" prot="private" virt="non-virtual" ambiguityscope="Expected&lt; void *, E &gt;::"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>Expected</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1ab94e6d143ab9a6c52de1f35a6985eda9" prot="private" virt="non-virtual" ambiguityscope="Expected&lt; void *, E &gt;::"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>Expected</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1ac566f5a9a3ea35d0d23f47a9488d291a" prot="private" virt="non-virtual" ambiguityscope="Expected&lt; void *, E &gt;::"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>Expected</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a72ea82e77d599d415899c549d4ff0a04" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>isError_</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a84c2762ce66b6a84846e33cae3f9ac42" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>operator bool</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a4daf3d7412d3b3cd9eb9caaa4813066d" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>operator*</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1aea545dc2d222c8e759256fa7734d17bc" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>operator*</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a2f8efa17c7b0b23cd0df19e322299493" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>operator-&gt;</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a77fe6c7a8204e0f3f9a765b81248f5c5" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>operator-&gt;</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1ad060579e51bea226a0e40343ee50ff3d" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>value_</name></member>
+      <member refid="classbzd_1_1impl_1_1Expected_1a34869f1a584a0deaae139b759d4045fa" prot="private" virt="non-virtual"><scope>bzd::impl::Expected&lt; void, E &gt;</scope><name>~Expected</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="types_8h" kind="file" language="C++">
+    <compoundname>types.h</compoundname>
+    <includedby refid="constexpr__string__view_8h" local="yes">include/container/constexpr_string_view.h</includedby>
+    <includedby refid="string__view_8h" local="yes">include/container/string_view.h</includedby>
+    <includedby refid="span_8h" local="yes">include/container/span.h</includedby>
+    <includedby refid="utility_8h" local="yes">include/utility.h</includedby>
+    <includedby refid="contiguous_8h" local="yes">include/container/iterator/contiguous.h</includedby>
+    <includedby refid="string_8h" local="yes">include/container/string.h</includedby>
+    <includedby refid="tuple_8h" local="yes">include/container/tuple.h</includedby>
+    <includedby refid="template__metaprogramming_8h" local="yes">include/template_metaprogramming.h</includedby>
+    <includedby refid="variant_8h" local="yes">include/container/variant.h</includedby>
+    <includedby refid="iostream_8h" local="yes">include/container/iostream.h</includedby>
+    <includedby refid="vector_8h" local="yes">include/container/vector.h</includedby>
+    <includedby refid="interface_2stack_8h" local="yes">include/interface/stack.h</includedby>
+    <includedby refid="interface_2task_8h" local="yes">include/interface/task.h</includedby>
+    <includedby refid="stack_8h" local="yes">include/stack.h</includedby>
+    <includedby refid="container_2array_8h" local="yes">include/container/array.h</includedby>
+    <includedby refid="pool_8h" local="yes">include/container/pool.h</includedby>
+    <invincdepgraph>
+      <node id="1078">
+        <label>include/types.h</label>
+        <link refid="types_8h"/>
+        <childnode refid="1079" relation="include">
+        </childnode>
+        <childnode refid="1083" relation="include">
+        </childnode>
+        <childnode refid="1091" relation="include">
+        </childnode>
+        <childnode refid="1095" relation="include">
+        </childnode>
+        <childnode refid="1100" relation="include">
+        </childnode>
+        <childnode refid="1084" relation="include">
+        </childnode>
+        <childnode refid="1096" relation="include">
+        </childnode>
+        <childnode refid="1097" relation="include">
+        </childnode>
+        <childnode refid="1088" relation="include">
+        </childnode>
+        <childnode refid="1089" relation="include">
+        </childnode>
+        <childnode refid="1092" relation="include">
+        </childnode>
+        <childnode refid="1101" relation="include">
+        </childnode>
+        <childnode refid="1102" relation="include">
+        </childnode>
+        <childnode refid="1104" relation="include">
+        </childnode>
+        <childnode refid="1093" relation="include">
+        </childnode>
+        <childnode refid="1094" relation="include">
+        </childnode>
+      </node>
+      <node id="1098">
+        <label>include/container/expected.h</label>
+        <link refid="expected_8h_source"/>
+        <childnode refid="1088" relation="include">
+        </childnode>
+      </node>
+      <node id="1094">
+        <label>include/container/pool.h</label>
+        <link refid="pool_8h_source"/>
+      </node>
+      <node id="1090">
+        <label>include/system.h</label>
+        <link refid="system_8h_source"/>
+        <childnode refid="1087" relation="include">
+        </childnode>
+        <childnode refid="1080" relation="include">
+        </childnode>
+        <childnode refid="1082" relation="include">
+        </childnode>
+        <childnode refid="1081" relation="include">
+        </childnode>
+      </node>
+      <node id="1091">
+        <label>include/container/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="1083" relation="include">
+        </childnode>
+        <childnode refid="1084" relation="include">
+        </childnode>
+        <childnode refid="1092" relation="include">
+        </childnode>
+        <childnode refid="1093" relation="include">
+        </childnode>
+      </node>
+      <node id="1101">
+        <label>include/interface/stack.h</label>
+        <link refid="interface_2stack_8h_source"/>
+        <childnode refid="1102" relation="include">
+        </childnode>
+        <childnode refid="1104" relation="include">
+        </childnode>
+      </node>
+      <node id="1088">
+        <label>include/container/variant.h</label>
+        <link refid="variant_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+      </node>
+      <node id="1100">
+        <label>include/container/iterator/contiguous.h</label>
+        <link refid="contiguous_8h_source"/>
+        <childnode refid="1091" relation="include">
+        </childnode>
+      </node>
+      <node id="1095">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="1091" relation="include">
+        </childnode>
+        <childnode refid="1084" relation="include">
+        </childnode>
+        <childnode refid="1096" relation="include">
+        </childnode>
+        <childnode refid="1097" relation="include">
+        </childnode>
+        <childnode refid="1088" relation="include">
+        </childnode>
+        <childnode refid="1098" relation="include">
+        </childnode>
+        <childnode refid="1092" relation="include">
+        </childnode>
+        <childnode refid="1085" relation="include">
+        </childnode>
+        <childnode refid="1099" relation="include">
+        </childnode>
+        <childnode refid="1082" relation="include">
+        </childnode>
+        <childnode refid="1081" relation="include">
+        </childnode>
+        <childnode refid="1094" relation="include">
+        </childnode>
+      </node>
+      <node id="1096">
+        <label>include/container/tuple.h</label>
+        <link refid="tuple_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+      </node>
+      <node id="1079">
+        <label>include/container/constexpr_string_view.h</label>
+        <link refid="constexpr__string__view_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+      </node>
+      <node id="1102">
+        <label>include/interface/task.h</label>
+        <link refid="interface_2task_8h_source"/>
+        <childnode refid="1099" relation="include">
+        </childnode>
+        <childnode refid="1103" relation="include">
+        </childnode>
+      </node>
+      <node id="1085">
+        <label>include/to_string.h</label>
+        <link refid="to__string_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+      </node>
+      <node id="1099">
+        <label>include/scheduler.h</label>
+        <link refid="scheduler_8h_source"/>
+      </node>
+      <node id="1104">
+        <label>include/stack.h</label>
+        <link refid="stack_8h_source"/>
+      </node>
+      <node id="1083">
+        <label>include/container/string_view.h</label>
+        <link refid="string__view_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+        <childnode refid="1084" relation="include">
+        </childnode>
+        <childnode refid="1087" relation="include">
+        </childnode>
+        <childnode refid="1089" relation="include">
+        </childnode>
+        <childnode refid="1090" relation="include">
+        </childnode>
+        <childnode refid="1086" relation="include">
+        </childnode>
+        <childnode refid="1082" relation="include">
+        </childnode>
+        <childnode refid="1081" relation="include">
+        </childnode>
+      </node>
+      <node id="1089">
+        <label>include/container/iostream.h</label>
+        <link refid="iostream_8h_source"/>
+        <childnode refid="1090" relation="include">
+        </childnode>
+        <childnode refid="1080" relation="include">
+        </childnode>
+        <childnode refid="1085" relation="include">
+        </childnode>
+        <childnode refid="1086" relation="include">
+        </childnode>
+      </node>
+      <node id="1103">
+        <label>include/task.h</label>
+        <link refid="task_8h_source"/>
+      </node>
+      <node id="1097">
+        <label>include/template_metaprogramming.h</label>
+        <link refid="template__metaprogramming_8h_source"/>
+        <childnode refid="1096" relation="include">
+        </childnode>
+        <childnode refid="1088" relation="include">
+        </childnode>
+      </node>
+      <node id="1081">
+        <label>include/log.h</label>
+        <link refid="log_8h_source"/>
+        <childnode refid="1082" relation="include">
+        </childnode>
+      </node>
+      <node id="1080">
+        <label>include/format.h</label>
+        <link refid="format_8h_source"/>
+        <childnode refid="1081" relation="include">
+        </childnode>
+      </node>
+      <node id="1084">
+        <label>include/container/string.h</label>
+        <link refid="string_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+        <childnode refid="1085" relation="include">
+        </childnode>
+        <childnode refid="1086" relation="include">
+        </childnode>
+        <childnode refid="1081" relation="include">
+        </childnode>
+      </node>
+      <node id="1092">
+        <label>include/container/vector.h</label>
+        <link refid="vector_8h_source"/>
+        <childnode refid="1080" relation="include">
+        </childnode>
+        <childnode refid="1085" relation="include">
+        </childnode>
+      </node>
+      <node id="1093">
+        <label>include/container/array.h</label>
+        <link refid="container_2array_8h_source"/>
+        <childnode refid="1094" relation="include">
+        </childnode>
+      </node>
+      <node id="1087">
+        <label>include/assert_minimal.h</label>
+        <link refid="assert__minimal_8h_source"/>
+        <childnode refid="1088" relation="include">
+        </childnode>
+        <childnode refid="1082" relation="include">
+        </childnode>
+      </node>
+      <node id="1082">
+        <label>include/assert.h</label>
+        <link refid="assert_8h_source"/>
+      </node>
+      <node id="1086">
+        <label>include/container/string_stream.h</label>
+        <link refid="string__stream_8h_source"/>
+        <childnode refid="1085" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacebzd">bzd</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacebzd" kindref="compound">bzd</ref></highlight></codeline>
+<codeline lineno="4"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="5"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal">*<sp/>PtrType;</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>PtrType<sp/>PtrDiffType;</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>PtrType<sp/>CtxPtrType;</highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>IntPtrType;</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>void(*FctPtrType)();</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>ByteType;</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>SizeType;</highlight></codeline>
+<codeline lineno="12"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/types.h"/>
+  </compounddef>
+</doxygen>

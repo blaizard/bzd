@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classbzd_1_1impl_1_1TupleElem" kind="class" language="C++" prot="public">
+    <compoundname>bzd::impl::TupleElem</compoundname>
+    <derivedcompoundref refid="classbzd_1_1impl_1_1TupleImpl_3_01TupleSizes_3_01N_8_8_8_01_4_00_01T_8_8_8_01_4" prot="private" virt="non-virtual">bzd::impl::TupleImpl&lt; TupleSizes&lt; N... &gt;, T... &gt;</derivedcompoundref>
+    <templateparamlist>
+      <param>
+        <type>SizeType</type>
+        <declname>N</declname>
+        <defname>N</defname>
+      </param>
+      <param>
+        <type>class</type>
+        <declname>T</declname>
+        <defname>T</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classbzd_1_1impl_1_1TupleElem_1ab1692b358218243f0296274c14ae5a35" prot="private" static="no" mutable="no">
+        <type>T</type>
+        <definition>T bzd::impl::TupleElem&lt; N, T &gt;::elem_</definition>
+        <argsstring></argsstring>
+        <name>elem_</name>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="63" column="1" bodyfile="include/container/tuple.h" bodystart="63" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classbzd_1_1impl_1_1TupleElem_1a234f682e8299018373c4587a8c83b13b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::TupleElem&lt; N, T &gt;::TupleElem</definition>
+        <argsstring>() noexcept=default</argsstring>
+        <name>TupleElem</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="66" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1TupleElem_1a92c5fd1f3bf8a6b84790bad16649d071" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::TupleElem&lt; N, T &gt;::TupleElem</definition>
+        <argsstring>(const T &amp;value) noexcept</argsstring>
+        <name>TupleElem</name>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="67" column="1" bodyfile="include/container/tuple.h" bodystart="67" bodyend="67"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1TupleElem_1ab5f2f01346dea8855b7397d00cf6b46c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr bzd::impl::TupleElem&lt; N, T &gt;::TupleElem</definition>
+        <argsstring>(const NoType &amp;) noexcept</argsstring>
+        <name>TupleElem</name>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1NoType" kindref="compound">NoType</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="68" column="1" bodyfile="include/container/tuple.h" bodystart="68" bodyend="68"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1TupleElem_1abb60dfbea755b5575ed04640127923bd" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr T &amp;</type>
+        <definition>constexpr T&amp; bzd::impl::TupleElem&lt; N, T &gt;::get</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="70" column="1" bodyfile="include/container/tuple.h" bodystart="70" bodyend="70"/>
+      </memberdef>
+      <memberdef kind="function" id="classbzd_1_1impl_1_1TupleElem_1ab4f6bbdecf911ca5de2122cd8a94d328" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr const T &amp;</type>
+        <definition>constexpr const T&amp; bzd::impl::TupleElem&lt; N, T &gt;::get</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>get</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/tuple.h" line="71" column="1" bodyfile="include/container/tuple.h" bodystart="71" bodyend="71"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="539">
+        <label>bzd::impl::TupleImpl&lt; TupleSizes&lt; N... &gt;, T... &gt;</label>
+        <link refid="classbzd_1_1impl_1_1TupleImpl_3_01TupleSizes_3_01N_8_8_8_01_4_00_01T_8_8_8_01_4"/>
+        <childnode refid="538" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="538">
+        <label>bzd::impl::TupleElem&lt; N, T &gt;</label>
+        <link refid="classbzd_1_1impl_1_1TupleElem"/>
+      </node>
+    </inheritancegraph>
+    <location file="include/container/tuple.h" line="61" column="1" bodyfile="include/container/tuple.h" bodystart="60" bodyend="72"/>
+    <listofallmembers>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1ab1692b358218243f0296274c14ae5a35" prot="private" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>elem_</name></member>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1abb60dfbea755b5575ed04640127923bd" prot="public" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>get</name></member>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1ab4f6bbdecf911ca5de2122cd8a94d328" prot="public" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>get</name></member>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1a234f682e8299018373c4587a8c83b13b" prot="public" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>TupleElem</name></member>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1a92c5fd1f3bf8a6b84790bad16649d071" prot="public" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>TupleElem</name></member>
+      <member refid="classbzd_1_1impl_1_1TupleElem_1ab5f2f01346dea8855b7397d00cf6b46c" prot="public" virt="non-virtual"><scope>bzd::impl::TupleElem</scope><name>TupleElem</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

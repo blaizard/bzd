@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="pool__test_8cpp" kind="file" language="C++">
+    <compoundname>pool_test.cpp</compoundname>
+    <includes local="yes">gtest/gtest.h</includes>
+    <includes refid="pool_8h" local="yes">include/container/pool.h</includes>
+    <incdepgraph>
+      <node id="296">
+        <label>include/type_traits/utils.h</label>
+        <link refid="utils_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+        <childnode refid="293" relation="include">
+        </childnode>
+      </node>
+      <node id="291">
+        <label>include/type_traits/function.h</label>
+        <link refid="function_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+      </node>
+      <node id="287">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="289">
+        <label>include/type_traits/array.h</label>
+        <link refid="type__traits_2array_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+      </node>
+      <node id="286">
+        <label>include/container/pool.h</label>
+        <link refid="pool_8h_source"/>
+        <childnode refid="287" relation="include">
+        </childnode>
+        <childnode refid="288" relation="include">
+        </childnode>
+        <childnode refid="297" relation="include">
+        </childnode>
+        <childnode refid="300" relation="include">
+        </childnode>
+      </node>
+      <node id="298">
+        <label>include/container/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="287" relation="include">
+        </childnode>
+        <childnode refid="288" relation="include">
+        </childnode>
+        <childnode refid="296" relation="include">
+        </childnode>
+        <childnode refid="295" relation="include">
+        </childnode>
+        <childnode refid="299" relation="include">
+        </childnode>
+      </node>
+      <node id="299">
+        <label>include/container/iterator/contiguous.h</label>
+        <link refid="contiguous_8h_source"/>
+        <childnode refid="287" relation="include">
+        </childnode>
+      </node>
+      <node id="294">
+        <label>include/type_traits/void.h</label>
+        <link refid="void_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+      </node>
+      <node id="288">
+        <label>include/utility.h</label>
+        <link refid="utility_8h_source"/>
+        <childnode refid="287" relation="include">
+        </childnode>
+        <childnode refid="289" relation="include">
+        </childnode>
+        <childnode refid="291" relation="include">
+        </childnode>
+        <childnode refid="292" relation="include">
+        </childnode>
+        <childnode refid="293" relation="include">
+        </childnode>
+        <childnode refid="295" relation="include">
+        </childnode>
+        <childnode refid="296" relation="include">
+        </childnode>
+      </node>
+      <node id="295">
+        <label>include/type_traits/const_volatile.h</label>
+        <link refid="const__volatile_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+      </node>
+      <node id="284">
+        <label>include/container/pool_test.cpp</label>
+        <link refid="pool__test_8cpp"/>
+        <childnode refid="285" relation="include">
+        </childnode>
+        <childnode refid="286" relation="include">
+        </childnode>
+      </node>
+      <node id="285">
+        <label>gtest/gtest.h</label>
+      </node>
+      <node id="300">
+        <label>iostream</label>
+      </node>
+      <node id="292">
+        <label>include/type_traits/pointer.h</label>
+        <link refid="pointer_8h_source"/>
+        <childnode refid="293" relation="include">
+        </childnode>
+      </node>
+      <node id="290">
+        <label>include/type_traits/integral_constant.h</label>
+        <link refid="integral__constant_8h_source"/>
+      </node>
+      <node id="297">
+        <label>include/container/array.h</label>
+        <link refid="container_2array_8h_source"/>
+        <childnode refid="287" relation="include">
+        </childnode>
+        <childnode refid="298" relation="include">
+        </childnode>
+      </node>
+      <node id="293">
+        <label>include/type_traits/reference.h</label>
+        <link refid="reference_8h_source"/>
+        <childnode refid="290" relation="include">
+        </childnode>
+        <childnode refid="294" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="pool__test_8cpp_1af7e6e202f14bde4b6fafcb753f882b8c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>TEST</definition>
+        <argsstring>(ContainerPool, base)</argsstring>
+        <name>TEST</name>
+        <param>
+          <type>ContainerPool</type>
+        </param>
+        <param>
+          <type>base</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/pool_test.cpp" line="4" column="1" bodyfile="include/container/pool_test.cpp" bodystart="4" bodyend="24"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&quot;gtest/gtest.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/container/pool.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal">TEST(ContainerPool,<sp/>base)</highlight></codeline>
+<codeline lineno="5"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classbzd_1_1Pool" kindref="compound">bzd::Pool&lt;int, 5&gt;</ref><sp/>pool;</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"><sp/><sp/><sp/><sp/>pool.toStream(std::cout);</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>item<sp/>=<sp/>pool.<ref refid="classbzd_1_1Pool_1a7f29ee139282eda6d22e5b81beb185fb" kindref="member">reserve</ref>();</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>item2<sp/>=<sp/>pool.<ref refid="classbzd_1_1Pool_1a7f29ee139282eda6d22e5b81beb185fb" kindref="member">reserve</ref>();</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>item3<sp/>=<sp/>pool.<ref refid="classbzd_1_1Pool_1a7f29ee139282eda6d22e5b81beb185fb" kindref="member">reserve</ref>();</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/>pool.toStream(std::cout);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/>pool.<ref refid="classbzd_1_1Pool_1aa7b178465046c7b0506e74f778d741c2" kindref="member">release</ref>(item2);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/>pool.toStream(std::cout);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/>std::cout<sp/>&lt;&lt;<sp/>std::endl;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/>EXPECT_EQ(</highlight><highlight class="keyword">true</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="include/container/pool_test.cpp"/>
+  </compounddef>
+</doxygen>

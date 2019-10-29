@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classB" kind="class" language="C++" prot="public">
+    <compoundname>B</compoundname>
+    <basecompoundref refid="classA" prot="public" virt="non-virtual">A</basecompoundref>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classB_1a20bf39d5fa0340c02db6e177e58c2680" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>B::B</definition>
+        <argsstring>()=default</argsstring>
+        <name>B</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/string_test.cpp" line="20" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="47">
+        <label>A</label>
+        <link refid="classA"/>
+      </node>
+      <node id="46">
+        <label>B</label>
+        <link refid="classB"/>
+        <childnode refid="47" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="49">
+        <label>A</label>
+        <link refid="classA"/>
+      </node>
+      <node id="48">
+        <label>B</label>
+        <link refid="classB"/>
+        <childnode refid="49" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/string_test.cpp" line="18" column="1" bodyfile="include/container/string_test.cpp" bodystart="17" bodyend="21"/>
+    <listofallmembers>
+      <member refid="classA_1a6059eac51d49b3dd93e2d1d8468285a9" prot="public" virt="non-virtual"><scope>B</scope><name>A</name></member>
+      <member refid="classB_1a20bf39d5fa0340c02db6e177e58c2680" prot="public" virt="non-virtual"><scope>B</scope><name>B</name></member>
+      <member refid="classA_1a5430e360bd957f67de0063e9a8b7a21d" prot="public" virt="non-virtual"><scope>B</scope><name>fun</name></member>
+      <member refid="classA_1a2e7238b48af75b396996d5a4c8814c12" prot="public" virt="non-virtual"><scope>B</scope><name>get</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

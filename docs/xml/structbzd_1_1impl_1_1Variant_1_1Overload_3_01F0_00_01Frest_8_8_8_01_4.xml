@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4" kind="struct" language="C++" prot="protected">
+    <compoundname>bzd::impl::Variant::Overload&lt; F0, Frest... &gt;</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">F0</basecompoundref>
+    <basecompoundref refid="structbzd_1_1impl_1_1Variant_1_1Overload" prot="public" virt="non-virtual">bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; Frest... &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class F0</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Frest</declname>
+        <defname>Frest</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4_1aa342e3bb3c6008462be2f746d1f4b564" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0, Frest... &gt;::Overload</definition>
+        <argsstring>(F0 &amp;&amp;f0, Frest &amp;&amp;... rest)</argsstring>
+        <name>Overload</name>
+        <param>
+          <type>F0 &amp;&amp;</type>
+          <declname>f0</declname>
+        </param>
+        <param>
+          <type>Frest &amp;&amp;...</type>
+          <declname>rest</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/variant.h" line="66" column="1" bodyfile="include/container/variant.h" bodystart="66" bodyend="66"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="433">
+        <label>F0</label>
+      </node>
+      <node id="432">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0, Frest... &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4"/>
+        <childnode refid="433" relation="public-inheritance">
+        </childnode>
+        <childnode refid="434" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="434">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; Frest... &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="436">
+        <label>F0</label>
+      </node>
+      <node id="435">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; F0, Frest... &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4"/>
+        <childnode refid="436" relation="public-inheritance">
+        </childnode>
+        <childnode refid="437" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="437">
+        <label>bzd::impl::Variant&lt; StorageType, Ts &gt;::Overload&lt; Frest... &gt;</label>
+        <link refid="structbzd_1_1impl_1_1Variant_1_1Overload"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/container/variant.h" line="65" column="1" bodyfile="include/container/variant.h" bodystart="64" bodyend="69"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1impl_1_1Variant_1_1Overload_3_01F0_00_01Frest_8_8_8_01_4_1aa342e3bb3c6008462be2f746d1f4b564" prot="public" virt="non-virtual"><scope>bzd::impl::Variant::Overload&lt; F0, Frest... &gt;</scope><name>Overload</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

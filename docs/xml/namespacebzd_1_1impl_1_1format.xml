@@ -1,0 +1,396 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1impl_1_1format" kind="namespace" language="C++">
+    <compoundname>bzd::impl::format</compoundname>
+    <innerclass refid="classbzd_1_1impl_1_1format_1_1CheckContext" prot="public">bzd::impl::format::CheckContext</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1format_1_1ConstexprVector" prot="public">bzd::impl::format::ConstexprVector</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1format_1_1Context" prot="public">bzd::impl::format::Context</innerclass>
+    <innerclass refid="structbzd_1_1impl_1_1format_1_1Metadata" prot="public">bzd::impl::format::Metadata</innerclass>
+    <innerclass refid="classbzd_1_1impl_1_1format_1_1PrintContext" prot="public">bzd::impl::format::PrintContext</innerclass>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="format_8h_1a49f8ffb09ab96774366838c273a1af78" prot="public" static="no">
+        <type><ref refid="classbzd_1_1VariantConstexpr" kindref="compound">bzd::VariantConstexpr</ref>&lt; int, unsigned int, long long int, unsigned long long int, bool, char, float, double, long double, const void *, const char *, <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &gt;</type>
+        <definition>using bzd::impl::format::Arg = typedef bzd::VariantConstexpr&lt;int, unsigned int, long long int, unsigned long long int, bool, char, float, double, long double, const void*, const char*, bzd::StringView&gt;</definition>
+        <argsstring></argsstring>
+        <name>Arg</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="98" column="1" bodyfile="include/format.h" bodystart="99" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="format_8h_1a5ff10f3e7039af4426c80dcb761a7416" prot="public" static="no">
+        <type><ref refid="classbzd_1_1impl_1_1Vector" kindref="compound">bzd::interface::Vector</ref>&lt; <ref refid="classbzd_1_1VariantConstexpr" kindref="compound">Arg</ref> &gt;</type>
+        <definition>using bzd::impl::format::ArgList = typedef bzd::interface::Vector&lt;Arg&gt;</definition>
+        <argsstring></argsstring>
+        <name>ArgList</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="100" column="1" bodyfile="include/format.h" bodystart="100" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="format_8h_1a4ca3afbe99c6ae0ef6a57f286e1ef5d6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>constexpr bool</type>
+        <definition>constexpr bool bzd::impl::format::parseUnsignedInteger</definition>
+        <argsstring>(bzd::StringView &amp;format, bzd::SizeType &amp;integer)</argsstring>
+        <name>parseUnsignedInteger</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>bzd::SizeType &amp;</type>
+          <declname>integer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Parse an unsigned integer </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="105" column="1" bodyfile="include/format.h" bodystart="105" bodyend="116"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1acb48a8ae8639913a107903667b037216" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Ctx</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr bzd::SizeType</type>
+        <definition>constexpr bzd::SizeType bzd::impl::format::parseIndex</definition>
+        <argsstring>(Ctx &amp;context, bzd::StringView &amp;format, const bzd::SizeType autoIndex)</argsstring>
+        <name>parseIndex</name>
+        <param>
+          <type>Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>const bzd::SizeType</type>
+          <declname>autoIndex</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Return the positional index </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="122" column="1" bodyfile="include/format.h" bodystart="122" bodyend="135"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1ace61a84822ac13295038ac41315314d2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Ctx</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::format::parseSign</definition>
+        <argsstring>(Ctx &amp;context, bzd::StringView &amp;format, Metadata &amp;metadata)</argsstring>
+        <name>parseSign</name>
+        <param>
+          <type>Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type><ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="140" column="1" bodyfile="include/format.h" bodystart="140" bodyend="155"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a6f668a1d5b43e23d0f6ccc6708633a3b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Ctx</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref></type>
+        <definition>constexpr Metadata bzd::impl::format::parseMetadata</definition>
+        <argsstring>(Ctx &amp;context, bzd::StringView &amp;format, const bzd::SizeType current)</argsstring>
+        <name>parseMetadata</name>
+        <param>
+          <type>Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>const bzd::SizeType</type>
+          <declname>current</declname>
+        </param>
+        <briefdescription>
+<para>Parse a metadata conversion string. </para>        </briefdescription>
+        <detaileddescription>
+<para>Format compatible with python format (with some exceptions)</para><para>format_spec ::= [sign][#][.precision][type] sign ::= &quot;+&quot; | &quot;-&quot; | &quot; &quot; precision ::= integer type ::= &quot;b&quot; | &quot;d&quot; | &quot;f&quot; | &quot;o&quot; | &quot;x&quot; | &quot;X&quot; | &quot;f&quot; | &quot;p&quot; | &quot;%&quot; d Decimal integer b Binary format o Octal format x Hexadecimal format (lower case) X Hexadecimal format (upper case) f Displays fixed point number (Default: 6) p Pointer % Percentage. Multiples by 100 and puts % at the end. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="176" column="1" bodyfile="include/format.h" bodystart="176" bodyend="247"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a92b7ccdf6c1988388371a370d06903a1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Ctx</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr bool</type>
+        <definition>constexpr bool bzd::impl::format::parseStaticString</definition>
+        <argsstring>(Ctx &amp;context, bzd::StringView &amp;format)</argsstring>
+        <name>parseStaticString</name>
+        <param>
+          <type>Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Parse a static string and call addSubstring to the context information when needed.</para><para>This function returns either when the string is consumed (return false) or when a metadata has been identified. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="257" column="1" bodyfile="include/format.h" bodystart="257" bodyend="291"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1af3971694174ac9a2ef7bd5cfca671b26" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Ctx</type>
+          </param>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr void</type>
+        <definition>constexpr void bzd::impl::format::parse</definition>
+        <argsstring>(Ctx &amp;context, bzd::StringView format, const T &amp;args)</argsstring>
+        <name>parse</name>
+        <param>
+          <type>Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref></type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="294" column="1" bodyfile="include/format.h" bodystart="294" bodyend="309"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a06552bdb164f072f4aeca5724dd101fa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void bzd::impl::format::printInteger</definition>
+        <argsstring>(bzd::OStream &amp;stream, const T &amp;value, const Metadata &amp;metadata)</argsstring>
+        <name>printInteger</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="339" column="1" bodyfile="include/format.h" bodystart="339" bodyend="380"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a830989bfdb0254ca0293bdb3eb990018" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void bzd::impl::format::printFixedPoint</definition>
+        <argsstring>(bzd::OStream &amp;stream, const T &amp;value, const Metadata &amp;metadata)</argsstring>
+        <name>printFixedPoint</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="383" column="1" bodyfile="include/format.h" bodystart="383" bodyend="405"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a2fbd07e4016f18ca78c9d3ed45afb169" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void bzd::impl::format::printString</definition>
+        <argsstring>(bzd::OStream &amp;stream, const T &amp;value, const Metadata &amp;metadata)</argsstring>
+        <name>printString</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structbzd_1_1impl_1_1format_1_1Metadata" kindref="compound">Metadata</ref> &amp;</type>
+          <declname>metadata</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="408" column="1" bodyfile="include/format.h" bodystart="408" bodyend="428"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a3a0938ad69dbf05d2882c94b54855e25" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>constexpr <ref refid="classbzd_1_1impl_1_1format_1_1Context" kindref="compound">Context</ref>&lt; <ref refid="classbzd_1_1impl_1_1format_1_1CheckContext" kindref="compound">CheckContext</ref> &gt;</type>
+        <definition>constexpr Context&lt;CheckContext&gt; bzd::impl::format::contextBuild</definition>
+        <argsstring>(const bzd::StringView &amp;format, const T &amp;tuple)</argsstring>
+        <name>contextBuild</name>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>tuple</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="459" column="1" bodyfile="include/format.h" bodystart="459" bodyend="464"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a9819f96084a75212d608db63ab4139d2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void bzd::impl::format::print</definition>
+        <argsstring>(bzd::OStream &amp;stream, const bzd::StringView &amp;format, const bzd::interface::Vector&lt; bzd::impl::format::Arg &gt; &amp;args)</argsstring>
+        <name>print</name>
+        <param>
+          <type><ref refid="classbzd_1_1impl_1_1OStream" kindref="compound">bzd::OStream</ref> &amp;</type>
+          <declname>stream</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1StringView" kindref="compound">bzd::StringView</ref> &amp;</type>
+          <declname>format</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classbzd_1_1impl_1_1Vector" kindref="compound">bzd::interface::Vector</ref>&lt; <ref refid="classbzd_1_1VariantConstexpr" kindref="compound">bzd::impl::format::Arg</ref> &gt; &amp;</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="466" column="1" bodyfile="include/format.h" bodystart="466" bodyend="470"/>
+      </memberdef>
+      <memberdef kind="function" id="format_8h_1a3e5dd17cba1fc469a6185dd44c5ed602" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>SizeType</type>
+            <declname>N</declname>
+            <defname>N</defname>
+          </param>
+          <param>
+            <type>class Ctx</type>
+          </param>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>typename <ref refid="structbzd_1_1typeTraits_1_1enableIf" kindref="compound">bzd::typeTraits::enableIf</ref>&lt;(N &gt;</type>
+            <declname>0</declname>
+            <defname>0</defname>
+          </param>
+        </templateparamlist>
+        <type>constexpr bool</type>
+        <definition>constexpr bool bzd::impl::format::contextCheck</definition>
+        <argsstring>(const Ctx &amp;context, const T &amp;tuple)</argsstring>
+        <name>contextCheck</name>
+        <param>
+          <type>const Ctx &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>tuple</declname>
+        </param>
+        <briefdescription>
+<para>Check the format context. </para>        </briefdescription>
+        <detaileddescription>
+<para>Check the format context with the argument type, this to ensure type safety. This function should only be used at compile time. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/format.h" line="479" column="1" bodyfile="include/format.h" bodystart="479" bodyend="513"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/format.h" line="27" column="1"/>
+  </compounddef>
+</doxygen>

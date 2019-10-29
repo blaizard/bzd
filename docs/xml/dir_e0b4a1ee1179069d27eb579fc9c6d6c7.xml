@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_e0b4a1ee1179069d27eb579fc9c6d6c7" kind="dir">
+    <compoundname>src/panic</compoundname>
+    <innerdir refid="dir_5993d2cdd5220eacf88f559fa380fb30">src/panic/exit</innerdir>
+    <innerdir refid="dir_7213320acfa21fc34028dca0b8197325">src/panic/throw</innerdir>
+    <innerdir refid="dir_c6d6097d3f943fcd37597e6213460e69">src/panic/trap</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/panic/"/>
+  </compounddef>
+</doxygen>

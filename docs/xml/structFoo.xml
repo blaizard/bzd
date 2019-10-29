@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structFoo" kind="struct" language="C++" prot="public">
+    <compoundname>Foo</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structFoo_1abb3c5d207b2219e5a57b4c49a0e48417" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>Foo::Foo</definition>
+        <argsstring>(int)</argsstring>
+        <name>Foo</name>
+        <param>
+          <type>int</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/constructible_test.cpp" line="7" column="1" bodyfile="include/type_traits/constructible_test.cpp" bodystart="7" bodyend="7"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/constructible_test.cpp" line="6" column="1" bodyfile="include/type_traits/constructible_test.cpp" bodystart="5" bodyend="8"/>
+    <listofallmembers>
+      <member refid="structFoo_1abb3c5d207b2219e5a57b4c49a0e48417" prot="public" virt="non-virtual"><scope>Foo</scope><name>Foo</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

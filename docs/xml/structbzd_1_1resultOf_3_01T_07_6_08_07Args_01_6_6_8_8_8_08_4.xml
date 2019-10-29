@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1resultOf_3_01T_07_6_08_07Args_01_6_6_8_8_8_08_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::resultOf&lt; T(&amp;)(Args &amp;&amp;...)&gt;</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Args</declname>
+        <defname>Args</defname>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="structbzd_1_1resultOf_3_01T_07_6_08_07Args_01_6_6_8_8_8_08_4_1a8934d2a37aa8c8df195926397884d75b" prot="public" static="no">
+        <type>T</type>
+        <definition>typedef T bzd::resultOf&lt; T(&amp;)(Args &amp;&amp;...)&gt;::type</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/task.h" line="13" column="1" bodyfile="include/task.h" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/task.h" line="12" column="1" bodyfile="include/task.h" bodystart="11" bodyend="14"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1resultOf_3_01T_07_6_08_07Args_01_6_6_8_8_8_08_4_1a8934d2a37aa8c8df195926397884d75b" prot="public" virt="non-virtual"><scope>bzd::resultOf&lt; T(&amp;)(Args &amp;&amp;...)&gt;</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

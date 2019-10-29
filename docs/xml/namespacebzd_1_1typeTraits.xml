@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacebzd_1_1typeTraits" kind="namespace" language="C++">
+    <compoundname>bzd::typeTraits</compoundname>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addConst" prot="public">bzd::typeTraits::addConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addCV" prot="public">bzd::typeTraits::addCV</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addLValueReference" prot="public">bzd::typeTraits::addLValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addLValueReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::addLValueReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addPointer" prot="public">bzd::typeTraits::addPointer</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference" prot="public">bzd::typeTraits::addReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; const void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01const_01volatile_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; const volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::addReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::addReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addReference_3_01volatile_01void_01_4" prot="public">bzd::typeTraits::addReference&lt; volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addRValueReference" prot="public">bzd::typeTraits::addRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1addVolatile" prot="public">bzd::typeTraits::addVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1conditional" prot="public">bzd::typeTraits::conditional</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1conditional_3_01false_00_01T_00_01F_01_4" prot="public">bzd::typeTraits::conditional&lt; false, T, F &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1enableIf" prot="public">bzd::typeTraits::enableIf</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1enableIf_3_01true_00_01T_01_4" prot="public">bzd::typeTraits::enableIf&lt; true, T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1integralConstant" prot="public">bzd::typeTraits::integralConstant</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isArithmetic" prot="public">bzd::typeTraits::isArithmetic</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isArray" prot="public">bzd::typeTraits::isArray</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isArray_3_01T[]_4" prot="public">bzd::typeTraits::isArray&lt; T[]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isArray_3_01T[N]_4" prot="public">bzd::typeTraits::isArray&lt; T[N]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isConst" prot="public">bzd::typeTraits::isConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isConst_3_01const_01T_01_4" prot="public">bzd::typeTraits::isConst&lt; const T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible" prot="public">bzd::typeTraits::isDestructible</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01T_01_6_01_4" prot="public">bzd::typeTraits::isDestructible&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::isDestructible&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01T[]_4" prot="public">bzd::typeTraits::isDestructible&lt; T[]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01T[N]_4" prot="public">bzd::typeTraits::isDestructible&lt; T[N]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01void_01_4" prot="public">bzd::typeTraits::isDestructible&lt; void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01void_01const_01_4" prot="public">bzd::typeTraits::isDestructible&lt; void const &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01void_01const_01volatile_01_4" prot="public">bzd::typeTraits::isDestructible&lt; void const volatile &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isDestructible_3_01void_01volatile_01_4" prot="public">bzd::typeTraits::isDestructible&lt; void volatile &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFloatingPoint" prot="public">bzd::typeTraits::isFloatingPoint</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction" prot="public">bzd::typeTraits::isFunction</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01_6_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01_6_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01volatile_01_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const volatile &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01volatile_01_6_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const volatile &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01const_01volatile_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) const volatile &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01volatile_01_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) volatile &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01volatile_01_6_6_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) volatile &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_01volatile_01_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...) volatile &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isFunction_3_01Ret_07Args_8_8_8_08_4" prot="public">bzd::typeTraits::isFunction&lt; Ret(Args...)&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isIntegral" prot="public">bzd::typeTraits::isIntegral</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isLValueReference" prot="public">bzd::typeTraits::isLValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isLValueReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::isLValueReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isReference" prot="public">bzd::typeTraits::isReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isRValueReference" prot="public">bzd::typeTraits::isRValueReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isRValueReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::isRValueReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isSame" prot="public">bzd::typeTraits::isSame</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isSame_3_01T_00_01T_01_4" prot="public">bzd::typeTraits::isSame&lt; T, T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVoid" prot="public">bzd::typeTraits::isVoid</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVoid_3_01const_01void_01_4" prot="public">bzd::typeTraits::isVoid&lt; const void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVoid_3_01const_01volatile_01void_01_4" prot="public">bzd::typeTraits::isVoid&lt; const volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVoid_3_01void_01_4" prot="public">bzd::typeTraits::isVoid&lt; void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVoid_3_01volatile_01void_01_4" prot="public">bzd::typeTraits::isVoid&lt; volatile void &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVolatile" prot="public">bzd::typeTraits::isVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1isVolatile_3_01volatile_01T_01_4" prot="public">bzd::typeTraits::isVolatile&lt; volatile T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeConst" prot="public">bzd::typeTraits::removeConst</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeConst_3_01const_01T_01_4" prot="public">bzd::typeTraits::removeConst&lt; const T &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeCV" prot="public">bzd::typeTraits::removeCV</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeExtent" prot="public">bzd::typeTraits::removeExtent</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeExtent_3_01T[]_4" prot="public">bzd::typeTraits::removeExtent&lt; T[]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeExtent_3_01T[N]_4" prot="public">bzd::typeTraits::removeExtent&lt; T[N]&gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference" prot="public">bzd::typeTraits::removeReference</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_01_4" prot="public">bzd::typeTraits::removeReference&lt; T &amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeReference_3_01T_01_6_6_01_4" prot="public">bzd::typeTraits::removeReference&lt; T &amp;&amp; &gt;</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeVolatile" prot="public">bzd::typeTraits::removeVolatile</innerclass>
+    <innerclass refid="structbzd_1_1typeTraits_1_1removeVolatile_3_01volatile_01T_01_4" prot="public">bzd::typeTraits::removeVolatile&lt; volatile T &gt;</innerclass>
+    <innernamespace refid="namespacebzd_1_1typeTraits_1_1impl">bzd::typeTraits::impl</innernamespace>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="constructible_8h_1ab93ba850fb6995b991a1f39c90c43d27" prot="public" static="no">
+        <type><ref refid="structbzd_1_1typeTraits_1_1impl_1_1isConstructible" kindref="compound">impl::isConstructible</ref>&lt; voidType&lt;&gt;, T, Args... &gt;</type>
+        <definition>using bzd::typeTraits::isConstructible = typedef impl::isConstructible&lt;voidType&lt;&gt;, T, Args...&gt;</definition>
+        <argsstring></argsstring>
+        <name>isConstructible</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/constructible.h" line="22" column="1" bodyfile="include/type_traits/constructible.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="integral__constant_8h_1a3fda6edcd37ceca3088aec1c7ca6ebd3" prot="public" static="no">
+        <type><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">integralConstant</ref>&lt; bool, true &gt;</type>
+        <definition>typedef integralConstant&lt;bool, true&gt; bzd::typeTraits::trueType</definition>
+        <argsstring></argsstring>
+        <name>trueType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/integral_constant.h" line="27" column="1" bodyfile="include/type_traits/integral_constant.h" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="integral__constant_8h_1a6b61d420a4761a77388eb3d86cbd0739" prot="public" static="no">
+        <type><ref refid="structbzd_1_1typeTraits_1_1integralConstant" kindref="compound">integralConstant</ref>&lt; bool, false &gt;</type>
+        <definition>typedef integralConstant&lt;bool, false&gt; bzd::typeTraits::falseType</definition>
+        <argsstring></argsstring>
+        <name>falseType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/integral_constant.h" line="31" column="1" bodyfile="include/type_traits/integral_constant.h" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="void_8h_1a2988f7f87ac2ebb94db96847e0d5ea55" prot="public" static="no">
+        <type>void</type>
+        <definition>using bzd::typeTraits::voidType = typedef void</definition>
+        <argsstring></argsstring>
+        <name>voidType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/void.h" line="29" column="1" bodyfile="include/type_traits/void.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="utils_8h_1a83425e337ae0ff92c9a2a8606deada21" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type><ref refid="structbzd_1_1typeTraits_1_1addRValueReference" kindref="compound">addRValueReference</ref>&lt; T &gt;::type</type>
+        <definition>addRValueReference&lt;T&gt;::type bzd::typeTraits::declval</definition>
+        <argsstring>()</argsstring>
+        <name>declval</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/type_traits/utils.h" line="13" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/type_traits/array.h" line="8" column="1"/>
+  </compounddef>
+</doxygen>

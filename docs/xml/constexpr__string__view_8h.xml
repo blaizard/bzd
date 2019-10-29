@@ -1,0 +1,307 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="constexpr__string__view_8h" kind="file" language="C++">
+    <compoundname>constexpr_string_view.h</compoundname>
+    <includes refid="types_8h" local="yes">include/types.h</includes>
+    <includedby refid="format_8h" local="yes">include/format.h</includedby>
+    <includedby refid="constexpr__string__view__test_8cpp" local="yes">include/container/constexpr_string_view_test.cpp</includedby>
+    <incdepgraph>
+      <node id="185">
+        <label>include/types.h</label>
+        <link refid="types_8h_source"/>
+      </node>
+      <node id="184">
+        <label>include/container/constexpr_string_view.h</label>
+        <link refid="constexpr__string__view_8h"/>
+        <childnode refid="185" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="186">
+        <label>include/container/constexpr_string_view.h</label>
+        <link refid="constexpr__string__view_8h"/>
+        <childnode refid="187" relation="include">
+        </childnode>
+      </node>
+      <node id="188">
+        <label>include/log.h</label>
+        <link refid="log_8h_source"/>
+        <childnode refid="189" relation="include">
+        </childnode>
+      </node>
+      <node id="187">
+        <label>include/format.h</label>
+        <link refid="format_8h_source"/>
+        <childnode refid="188" relation="include">
+        </childnode>
+      </node>
+      <node id="189">
+        <label>include/assert.h</label>
+        <link refid="assert_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classbzd_1_1impl_1_1ConstexprStringView" prot="public">bzd::impl::ConstexprStringView</innerclass>
+    <innernamespace refid="namespacebzd">bzd</innernamespace>
+    <innernamespace refid="namespacebzd_1_1impl">bzd::impl</innernamespace>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="constexpr__string__view_8h_1ada8446ae7fa2f8150bead11e488682a5" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_1</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>bzd::impl::tygrab&lt;0x##n##0&gt;(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="50" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="50" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a00f406804633fe6e8492a281cc680d45" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_2</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>bzd::impl::tygrab&lt;0x##n##0&gt;(x), bzd::impl::tygrab&lt;0x##n##1&gt;(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="53" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1aab8c6596bd3e32e3d5802f934abbc397" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_4</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>bzd::impl::tygrab&lt;0x##n##0&gt;(x), bzd::impl::tygrab&lt;0x##n##1&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##2&gt;(x), bzd::impl::tygrab&lt;0x##n##3&gt;(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="56" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a8129aaf50a25008faff30a42c3164e50" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_8</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>bzd::impl::tygrab&lt;0x##n##0&gt;(x), bzd::impl::tygrab&lt;0x##n##1&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##2&gt;(x), bzd::impl::tygrab&lt;0x##n##3&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##4&gt;(x), bzd::impl::tygrab&lt;0x##n##5&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##6&gt;(x), bzd::impl::tygrab&lt;0x##n##7&gt;(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="61" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="61" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a5bfbaaa30277c62c017b07e659999beb" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_16</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>bzd::impl::tygrab&lt;0x##n##0&gt;(x), bzd::impl::tygrab&lt;0x##n##1&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##2&gt;(x), bzd::impl::tygrab&lt;0x##n##3&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##4&gt;(x), bzd::impl::tygrab&lt;0x##n##5&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##6&gt;(x), bzd::impl::tygrab&lt;0x##n##7&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##8&gt;(x), bzd::impl::tygrab&lt;0x##n##9&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##A&gt;(x), bzd::impl::tygrab&lt;0x##n##B&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##C&gt;(x), bzd::impl::tygrab&lt;0x##n##D&gt;(x) \
+      , bzd::impl::tygrab&lt;0x##n##E&gt;(x), bzd::impl::tygrab&lt;0x##n##F&gt;(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="68" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a26a1a13eb8a4b6d6d5cd7d23d9f9fcb5" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_32</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>CONSTEXPR_STRING_VIEW_16(n##0,x),CONSTEXPR_STRING_VIEW_16(n##1,x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="79" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a551cdae5e74c49fb73111c3e34537c8d" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_64</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>CONSTEXPR_STRING_VIEW_16(n##0,x), CONSTEXPR_STRING_VIEW_16(n##1,x), CONSTEXPR_STRING_VIEW_16(n##2,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##3,x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="83" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="83" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1a875081b252b3222b7f2fffae69bcd17e" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_128</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>CONSTEXPR_STRING_VIEW_16(n##0,x), CONSTEXPR_STRING_VIEW_16(n##1,x), CONSTEXPR_STRING_VIEW_16(n##2,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##3,x), CONSTEXPR_STRING_VIEW_16(n##4,x), CONSTEXPR_STRING_VIEW_16(n##5,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##6,x), CONSTEXPR_STRING_VIEW_16(n##7,x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="88" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="88" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1af30e8eaefc7f94d28843676b99d9afa3" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW_256</name>
+        <param><defname>n</defname></param>
+        <param><defname>x</defname></param>
+        <initializer>CONSTEXPR_STRING_VIEW_16(n##0,x), CONSTEXPR_STRING_VIEW_16(n##1,x), CONSTEXPR_STRING_VIEW_16(n##2,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##3,x), CONSTEXPR_STRING_VIEW_16(n##4,x), CONSTEXPR_STRING_VIEW_16(n##5,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##6,x), CONSTEXPR_STRING_VIEW_16(n##7,x), CONSTEXPR_STRING_VIEW_16(n##8,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##9,x), CONSTEXPR_STRING_VIEW_16(n##<ref refid="classA" kindref="compound">A</ref>,x), CONSTEXPR_STRING_VIEW_16(n##<ref refid="classB" kindref="compound">B</ref>,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##C,x), CONSTEXPR_STRING_VIEW_16(n##D,x), CONSTEXPR_STRING_VIEW_16(n##E,x) \
+      , CONSTEXPR_STRING_VIEW_16(n##F,x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="94" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="94" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="constexpr__string__view_8h_1aa220c72b37ee65576f99357dbcb57f61" prot="public" static="no">
+        <name>CONSTEXPR_STRING_VIEW</name>
+        <param><defname>x</defname></param>
+        <initializer>decltype(bzd::impl::typeek(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">bzd::impl::ConstexprStringView</ref>&lt;CONSTEXPR_STRING_VIEW_256(,x)&gt;()))(x)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/container/constexpr_string_view.h" line="102" column="9" bodyfile="include/container/constexpr_string_view.h" bodystart="102" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;include/types.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Implementation<sp/>inspired<sp/>by<sp/>https://github.com/irrequietus/typestring</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal"><ref refid="namespacebzd" kindref="compound">bzd</ref></highlight></codeline>
+<codeline lineno="8"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="9"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">impl</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>C&gt;</highlight></codeline>
+<codeline lineno="12" refid="classbzd_1_1impl_1_1ConstexprStringView" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>DataType<sp/>=<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>char;</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using</highlight><highlight class="normal"><sp/>ConstIterator<sp/>=<sp/>DataType*;</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>constexpr<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>constexpr<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>str)<sp/>:<sp/>str_(str)<sp/>{}</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>constexpr<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>data()<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>data_;<sp/>}</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>constexpr<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>str()<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>str_;<sp/>}</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>constexpr<sp/>SizeType<sp/>size()<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">...(C);<sp/>}</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/>constexpr<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>data_[</highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">...(C)<sp/>+<sp/>1]<sp/>=<sp/>{C...,<sp/></highlight><highlight class="charliteral">&apos;\0&apos;</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>str_;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>N,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>M&gt;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>constexpr<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>tygrab(</highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">(&amp;c)[M])<sp/>noexcept</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>c[N<sp/>&lt;<sp/>M<sp/>?<sp/>N<sp/>:<sp/>M-1];<sp/>}</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>X&gt;</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>typoke(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;X...&gt;</ref>)<sp/>-&gt;<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt;X...&gt;;</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>X,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>Y&gt;</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>typoke(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;X...&gt;</ref>,<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;&apos;\0&apos;&gt;</ref>,<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;Y&gt;</ref>...)<sp/>-&gt;<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView</ref>&lt;X...&gt;;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/><ref refid="classA" kindref="compound">A</ref>,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>X,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>Y&gt;</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>typoke(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;X...&gt;</ref>,<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;A&gt;</ref>,<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;Y&gt;</ref>...)<sp/>-&gt;<sp/>decltype(typoke(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;X...,A&gt;</ref>(),<sp/><ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;Y&gt;</ref>()...));</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">...<sp/>C&gt;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">auto</highlight><highlight class="normal"><sp/>typeek(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;C...&gt;</ref>)<sp/>-&gt;<sp/>decltype(typoke(<ref refid="classbzd_1_1impl_1_1ConstexprStringView" kindref="compound">ConstexprStringView&lt;C&gt;</ref>()...));</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="47"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^0<sp/>=<sp/>1</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_1(n,x)<sp/>bzd::impl::tygrab&lt;0x##n##0&gt;(x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^1<sp/>=<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_2(n,x)<sp/>bzd::impl::tygrab&lt;0x##n##0&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##1&gt;(x)<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^2<sp/>=<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_4(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="57"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::impl::tygrab&lt;0x##n##0&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##1&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="58"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##2&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##3&gt;(x)<sp/><sp/><sp/><sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^3<sp/>=<sp/>8</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_8(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="62"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::impl::tygrab&lt;0x##n##0&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##1&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="63"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##2&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##3&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="64"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##4&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##5&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="65"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##6&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##7&gt;(x)<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^4<sp/>=<sp/>16</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_16(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="69"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bzd::impl::tygrab&lt;0x##n##0&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##1&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="70"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##2&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##3&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="71"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##4&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##5&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="72"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##6&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##7&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="73"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##8&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##9&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="74"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##A&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##B&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="75"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##C&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##D&gt;(x)<sp/>\</highlight></codeline>
+<codeline lineno="76"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>bzd::impl::tygrab&lt;0x##n##E&gt;(x),<sp/>bzd::impl::tygrab&lt;0x##n##F&gt;(x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^5<sp/>=<sp/>32</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_32(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="80"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CONSTEXPR_STRING_VIEW_16(n##0,x),CONSTEXPR_STRING_VIEW_16(n##1,x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="82"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^6<sp/>=<sp/>64</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_64(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="84"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CONSTEXPR_STRING_VIEW_16(n##0,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##1,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##2,x)<sp/>\</highlight></codeline>
+<codeline lineno="85"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##3,x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^7<sp/>=<sp/>128</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_128(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="89"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CONSTEXPR_STRING_VIEW_16(n##0,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##1,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##2,x)<sp/>\</highlight></codeline>
+<codeline lineno="90"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##3,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##4,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##5,x)<sp/>\</highlight></codeline>
+<codeline lineno="91"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##6,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##7,x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"></highlight><highlight class="comment">//<sp/>2^8<sp/>=<sp/>256</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW_256(n,x)<sp/>\</highlight></codeline>
+<codeline lineno="95"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CONSTEXPR_STRING_VIEW_16(n##0,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##1,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##2,x)<sp/>\</highlight></codeline>
+<codeline lineno="96"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##3,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##4,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##5,x)<sp/>\</highlight></codeline>
+<codeline lineno="97"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##6,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##7,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##8,x)<sp/>\</highlight></codeline>
+<codeline lineno="98"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##9,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##A,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##B,x)<sp/>\</highlight></codeline>
+<codeline lineno="99"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##C,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##D,x),<sp/>CONSTEXPR_STRING_VIEW_16(n##E,x)<sp/>\</highlight></codeline>
+<codeline lineno="100"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>,<sp/>CONSTEXPR_STRING_VIEW_16(n##F,x)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>CONSTEXPR_STRING_VIEW(x)<sp/>decltype(bzd::impl::typeek(bzd::impl::ConstexprStringView&lt;CONSTEXPR_STRING_VIEW_256(,x)&gt;()))(x)</highlight></codeline>
+    </programlisting>
+    <location file="include/container/constexpr_string_view.h"/>
+  </compounddef>
+</doxygen>

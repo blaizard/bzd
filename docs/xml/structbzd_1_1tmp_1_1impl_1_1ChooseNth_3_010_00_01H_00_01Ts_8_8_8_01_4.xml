@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="structbzd_1_1tmp_1_1impl_1_1ChooseNth_3_010_00_01H_00_01Ts_8_8_8_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>bzd::tmp::impl::ChooseNth&lt; 0, H, Ts... &gt;</compoundname>
+    <basecompoundref refid="structbzd_1_1tmp_1_1Type" prot="public" virt="non-virtual">bzd::tmp::Type&lt; H &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class H</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>Ts</declname>
+        <defname>Ts</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="60">
+        <label>bzd::tmp::impl::ChooseNth&lt; 0, H, Ts... &gt;</label>
+        <link refid="structbzd_1_1tmp_1_1impl_1_1ChooseNth_3_010_00_01H_00_01Ts_8_8_8_01_4"/>
+        <childnode refid="61" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="61">
+        <label>bzd::tmp::Type&lt; H &gt;</label>
+        <link refid="structbzd_1_1tmp_1_1Type"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="62">
+        <label>bzd::tmp::impl::ChooseNth&lt; 0, H, Ts... &gt;</label>
+        <link refid="structbzd_1_1tmp_1_1impl_1_1ChooseNth_3_010_00_01H_00_01Ts_8_8_8_01_4"/>
+        <childnode refid="63" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="63">
+        <label>bzd::tmp::Type&lt; H &gt;</label>
+        <link refid="structbzd_1_1tmp_1_1Type"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/template_metaprogramming.h" line="27" column="1" bodyfile="include/template_metaprogramming.h" bodystart="27" bodyend="27"/>
+    <listofallmembers>
+      <member refid="structbzd_1_1tmp_1_1Type_1ada33b4b234ad9d069b6c9e2236f53f2a" prot="public" virt="non-virtual"><scope>bzd::tmp::impl::ChooseNth&lt; 0, H, Ts... &gt;</scope><name>type</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
