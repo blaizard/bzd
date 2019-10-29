@@ -360,5 +360,5 @@ parser.build()
 
 pp.pprint(parser.groups)
 
-render = Render()
+render = Render("docs/md")
 render.process(parser.groups)
