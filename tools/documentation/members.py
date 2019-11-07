@@ -9,6 +9,7 @@ definition_ = {
 		"sort": 2,
 		"container": True,
 		"args": False,
+		"defaultVisibility": "public",
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -22,6 +23,7 @@ definition_ = {
 		"sort": 1,
 		"container": True,
 		"args": False,
+		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -35,6 +37,7 @@ definition_ = {
 		"sort": 4,
 		"container": False,
 		"args": False,
+		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -48,6 +51,7 @@ definition_ = {
 		"sort": 5,
 		"container": False,
 		"args": False,
+		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
 			"pre": "{static}",
@@ -61,6 +65,7 @@ definition_ = {
 		"sort": 3,
 		"container": False,
 		"args": True,
+		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
 			"pre": "{static} {virtual} {explicit}",
@@ -91,6 +96,15 @@ class Member:
 	def __init__(self, data):
 		self.data = data
 
+	def clone(self):
+		return Member(self.data.copy())
+
+	def setProvenance(self, provenance):
+		self.data["provenance"] = provenance
+
+	def getProvenance(self):
+		return self.data.get("provenance", None)
+
 	def getDefinition(self):
 		return getDefinition(self.data.get("kind", None))
 
@@ -118,6 +132,9 @@ class Member:
 	def getStatic(self):
 		return self.data.get("static", False)
 
+	def getVisibility(self):
+		return self.data.get("visibility", self.getDefinition()["defaultVisibility"])
+
 	def getTemplate(self):
 		return self.data.get("template", [])
 
@@ -128,10 +145,11 @@ class Member:
 		return self.data.get("inheritance", [])
 
 	def getDescriptionBrief(self):
-		return self.data.get("descriptionBrief", "").strip()
+		regex = re.compile(r'[\n\r\t]')
+		return regex.sub(" ", self.data.get("descriptionBrief", "").strip())
 
 	def getDescription(self):
-		return self.data.get("description", "").strip()
+		return "{}\n{}".format(self.getDescriptionBrief(), self.data.get("description", "")).strip()
 
 	def printDefinition(self, formatStr = "{template} {pre} {type} {name} {post}"):
 
@@ -165,26 +183,79 @@ class Member:
 		return re.sub(' +', ' ', definition.strip())
 
 class MemberGroup:
-	def __init__(self, memberList):
+	def __init__(self, memberList, identifier):
 		self.list = []
-		for member in memberList:
-			self.list.append(Member(member))
+		self.identifier = identifier
+		self.addMembers([Member(member) for member in memberList])
+
+	def addMembers(self, members, provenance = None):
+		name = self.getIdentifierName()
+		for member in members:
+			if member.getVisibility() == "public":
+				if provenance:
+					# If constructor or destructor, do not merge
+					if member.getName() in [name, "~" + name]:
+						continue
+					member.setProvenance(provenance)
+				self.list.append(member)
+		self.sort()
+
+	def merge(self, memberGroup, provenance):
+		self.addMembers([member.clone() for member in memberGroup.list], provenance)
+
+	def sort(self):
 		self.list = sorted(self.list, key=lambda k : k.getDefinition()["sort"])
 
 	def get(self):
 		return self.list
 
+	def getMember(self, name):
+		for member in self.list:
+			if member.getName() == name:
+				return member
+		return None
+
+	def getIdentifierName(self):
+		name = self.identifier.split("::")[-1]
+		return re.sub(r'<.*>', '', name).strip()
+
 class Members:
 	def __init__(self, data):
 		self.data = {}
 		for identifier, memberList in data.items():
-			self.data[identifier] = MemberGroup(memberList)
+			self.data[identifier] = MemberGroup(memberList, identifier)
 
 		# Set metadata of specific containers
 		for identifier, memberGroup in self.data.items():
 			for member in memberGroup.get():
 				if member.isContainer():
-					print(identifier, member.getName(), member.getInheritance())
+					containerMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]))
+					for inheritance in member.getInheritance():
+						if "id" in inheritance:
+							#tempMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]), createIfNotExists=True)
+							#print("Merge ", "::".join([identifier, member.getName()]), inheritance["id"])
+							childMemberGroup = self.getMemberGroup(inheritance["id"])
+							if containerMemberGroup and childMemberGroup:
+								containerMemberGroup.merge(childMemberGroup, inheritance["id"])
+							#print(memberGroup, self.getMember(inheritance["id"]))
+							#print("::".join([identifier, member.getName()]))
+				#print(identifier, member.getName())
+				#exit()
+
+			print(memberGroup.identifier, memberGroup.getIdentifierName())
+
+	def getMemberGroup(self, identifier, createIfNotExists = False):
+		if identifier in self.data:
+			return self.data[identifier]
+		return None
+
+	def getMember(self, namespace):
+		identifier = "::".join(namespace.split("::")[:-1])
+		memberGroup = self.getMemberGroup(identifier)
+		if memberGroup:
+			name = namespace.split("::")[-1]
+			return memberGroup.getMember(name)
+		return None
 
 	def items(self):
 		return self.data.items()
