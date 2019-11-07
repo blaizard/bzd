@@ -76,6 +76,16 @@ class DoxygenParser:
 		return data["__info__"][key]
 
 	"""
+	Add member dictionary
+	"""
+	def addMemberDict(self, data, key):
+		data["__info__"] = data["__info__"] if "__info__" in data else {}
+		if key not in data["__info__"]:
+			data["__info__"][key] = {}
+		self.assertTrue(isinstance(data["__info__"][key], dict), "The key '{}' must be a dictionary", key)
+		return data["__info__"][key]
+
+	"""
 	Parse the attributes of the current element and return a dictionary
 	"""
 	def parseElement(self, element, definition, data = {}):
@@ -154,6 +164,7 @@ class DoxygenParser:
 	def mergeMember(self, member1, member2):
 		self.assertTrue(type(member1) == type(member2), "Cannot merge different types {} vs {}", member1, member2)
 
+		# Merge dictionaries
 		if isinstance(member2, dict):
 			for key, value in member2.items():
 				if key in member1:
@@ -164,10 +175,10 @@ class DoxygenParser:
 		# Merge 2 list
 		elif isinstance(member2, list):
 			for i in range(len(member2)):
-				if i in member1:
+				if len(member1) > i:
 					member1[i] = self.mergeMember(member1[i], member2[i])
 				else:
-					member1[i] = member2[i]
+					member1.append(member2[i])
 
 		else:
 			self.assertTrue(member1 == member2, "Trying to merge different members {} vs {}", member1, member2)
@@ -209,24 +220,40 @@ class DoxygenParser:
 	def resolveLinks(self, groups):
 		links = {}
 
-		# Collect the list of IDs that must be set togther
+		# Collect the list of IDs that must be set together
 		for namespace, members in groups.items():
 			for member in members:
 				if "inheritance" in member:
+
 					# Default visibility is public
-					visibility = "public"
-					inheritance = []
-					for parent in member["inheritance"]:
-						if self.assertTrueWarning("link" in parent, "Inheritance item does not have a link: {}", parent):
-							continue
-						visibility = parent.get("visibility", visibility)
-						link = parent["link"]
-						# Register the link
-						if link != member.get("id", None):
-							inheritance.append({ "visibility": visibility })
+					inheritanceCurrent = None
+					for linkId, parent in member["inheritance"].items():
+						if "link" in parent:
+							if member.get("id", None) == parent["link"]:
+								inheritanceCurrent = parent
+
+					# Build the inheritance chain
+					def	getInheritance(inheritanceCurrent, inheritanceList, visibility = "public"):
+						if inheritanceCurrent:
+							for child in inheritanceCurrent.get("children", []):
+								inheritanceNext = child
+								visibility = inheritanceNext.get("visibility", visibility)
+								linkId = inheritanceNext.get("id", None)
+								self.assertTrue(linkId != None, "Missing link ID: {}", inheritanceCurrent)
+								inheritanceNext = member["inheritance"].get(linkId, None)
+								if inheritanceNext:
+									inheritanceList.append({ "visibility": visibility, "link": inheritanceNext.get("link", None), "id": inheritanceNext.get("name", None) })
+									getInheritance(inheritanceNext, inheritanceList, visibility)
+					inheritanceList = []
+					getInheritance(inheritanceCurrent, inheritanceList)
+					for inheritance in inheritanceList:
+						link = inheritance.get("link", None)
+						if link:
 							links[link] = links[link] if link in links else []
-							links[link].append(inheritance[len(inheritance) - 1])
-					member["inheritance"] = inheritance
+							links[link].append(inheritance)
+							del inheritance["link"]
+
+					member["inheritance"] = inheritanceList
 
 		# Resolve links
 		for namespace, members in groups.items():
@@ -285,11 +312,15 @@ class DoxygenParser:
 							if "args" in definition["__type__"]:
 								current = self.addMemberList(current, "args")
 							if "inheritance" in definition["__type__"]:
-								current = self.addMemberList(current, "inheritance")
+								current = self.addMemberDict(current, "inheritance")
+							if "children" in definition["__type__"]:
+								current = self.addMemberList(current, "children")
 							if "list" in definition["__type__"]:
 								self.assertTrue(isinstance(current, list), "Data must be a list '{}'", current)
 								current.append({})
 								current = current[len(current) - 1]
+							if "dict" in definition["__type__"]:
+								self.assertTrue(isinstance(current, dict), "Data must be a dictionary '{}'", current)
 
 						self.parseElement(element, definition, current)
 						self.parseSubElements(element, definition, current)
@@ -298,10 +329,15 @@ class DoxygenParser:
 						if "__type__" in definition and "member" in definition["__type__"]:
 							self.addMember(data, current)
 
+						elif "__type__" in definition and "dict" in definition["__type__"]:
+							self.assertTrue("__key__" in current["__info__"], "Data must have a key __key__: {}", current)
+							current[current["__info__"]["__key__"]] = current["__info__"]
+							del current["__info__"]["__key__"]
+							del current["__info__"]
+
 			# Check if there is a namespace
 			if "__type__" in definition and "container" in definition["__type__"]:
 				self.normalizeName(data)
-			#print(self.current)
 
 		except Exception as e:
 			print("current data: ", data, root)
@@ -366,10 +402,15 @@ templateparamlist = {
 }
 
 node = {
-	"__type__": ["list"],
+	"__type__": ["dict"],
+	"__attrs__": {"id": { "key": "__key__" }},
 	"label": { "__content__": { "key": "name" } },
 	"link": { "__attrs__": { "refid": { "key": "link" } } },
-	"childnode": { "__attrs__": { "relation": { "key": "visibility", "values": { "public-inheritance": "public", "private-inheritance": "private", "protected-inheritance": "protected" }, "others": "ignore" } } }
+	"childnode": { 
+		"__type__": ["children", "list"],
+		"__attrs__": {
+		"refid": { "key": "id" },
+		"relation": { "key": "visibility", "values": { "public-inheritance": "public", "private-inheritance": "private", "protected-inheritance": "protected" }, "others": "ignore" } } }
 }
 
 briefdescription = {
@@ -391,7 +432,7 @@ memberdef = {
 	"name": name,
 	"type": { "__content__": { "key": "type" } },
 	"templateparamlist": templateparamlist,
-	"collaborationgraph": inheritancegraph,
+	"inheritancegraph": inheritancegraph,
 	"briefdescription": briefdescription,
 	"detaileddescription": detaileddescription,
 	"param": args
@@ -411,7 +452,7 @@ compounddef = {
 	"compoundname": compoundname,
 	"sectiondef": sectiondef,
 	"templateparamlist": templateparamlist,
-	"collaborationgraph": inheritancegraph,
+	"inheritancegraph": inheritancegraph,
 	"briefdescription": briefdescription,
 	"detaileddescription": detaileddescription
 }
@@ -419,8 +460,6 @@ compounddef = {
 dictionary = {
 	"compounddef": compounddef
 }
-
-
 
 parser = DoxygenParser()
 
