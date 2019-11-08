@@ -327,6 +327,7 @@ def commentParser(element, data = {}):
 
 	for para in element.findall("para"):
 		parameterlistList = para.findall("parameterlist")
+		programlistingList = para.findall("programlisting")
 		if len(parameterlistList):
 			for parameterlist in parameterlistList:
 				kind = parameterlist.get("kind")
@@ -340,6 +341,13 @@ def commentParser(element, data = {}):
 					paramList.append(param)
 				data["__info__"] = data["__info__"] if "__info__" in data else {}
 				data["__info__"]["description.%s" % (kind)] = paramList
+		elif len(programlistingList):
+			for programlisting in programlistingList:
+				codeBlock = "<code>";
+				for codeline in programlisting.findall("codeline"):
+					codeBlock += " ".join(text for text in codeline.itertext() if text.strip()) + "\n"
+				codeBlock += "</code>"
+				textList.append(codeBlock)
 		else:
 			textList.append("".join(text for text in para.itertext() if text.strip()))
 

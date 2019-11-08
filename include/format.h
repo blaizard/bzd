@@ -520,6 +520,33 @@ namespace bzd
 		}
 	}
 
+	/**
+	 * \brief String formating.
+	 * 
+	 * Lightweight and compilation time checking string formating utility.
+	 * The syntax is compatible with Python format with some limitations.
+	 *
+	 * \code
+	 * format_spec ::=  [sign][#][.precision][type]
+	 * sign        ::=  "+" | "-" | " "
+	 * precision   ::=  integer
+	 * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+	 * d	Decimal integer
+	 * b	Binary format
+	 * o	Octal format
+	 * x	Hexadecimal format (lower case)
+	 * X	Hexadecimal format (upper case)
+	 * f	Displays fixed point number (Default: 6)
+	 * p    Pointer
+	 * %	Percentage. Multiples by 100 and puts % at the end.
+	 * \endcode
+	 * 
+	 * This is an after text
+	 * 
+	 * \param out Output stream where the formating string will be written to.
+	 * \param f Compile-time string containing the format.
+	 * \param args Arguments to be passed for the format.
+	 */
 	template <class F, class... Args>
 	constexpr inline void format(bzd::OStream& out, const F& f, Args&&... args)
 	{

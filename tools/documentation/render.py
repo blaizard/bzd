@@ -47,6 +47,43 @@ class Render:
 					member.getDescriptionBrief()))
 			prevKind = kind
 
+	def formatComment(self, comment):
+
+		pattern = re.compile("<([^>]{1,6})>")
+
+		index = 0
+		output = ""
+		currentStack = ["comment"]
+
+		def formatText(current, text):
+			if current == "comment":
+				return text.replace("\n", "\n\n")
+			return text
+
+		for match in pattern.finditer(comment):
+
+			# Format the text add it to the output
+			output += formatText(currentStack[-1], comment[index:match.start()])
+
+			index = match.end()
+
+			# Identify the command and set the current state
+			command = match.group(1).strip()
+			if command == "code":
+				currentStack.append("code")
+				output += "```"
+			elif command == "/code":
+				currentStack.pop()
+				output += "```"
+			# False positive, print all
+			else:
+				output += match.group(0)
+
+		# Format the trailing text
+		output += formatText(currentStack[-1], comment[index:])
+
+		return output
+
 	def createMember(self, namespace, member, preTitle):
 		self.fileHandle.write("{}`{} {}`\n".format(
 				preTitle,
@@ -56,7 +93,7 @@ class Render:
 		if member.getProvenance():
 			self.fileHandle.write("*From {}*\n\n".format(member.getProvenance()))
 
-		self.fileHandle.write("{}\n".format(member.getDescription()))
+		self.fileHandle.write("{}\n".format(self.formatComment(member.getDescription())))
 
 		definition = member.getDefinition()
 
