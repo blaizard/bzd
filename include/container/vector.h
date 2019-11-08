@@ -23,6 +23,13 @@ namespace bzd
 			{
 			}
 
+			/**
+			 * \brief Adds a new element at the end of the vector, after its current last element.
+			 * 
+			 * The content of val is copied (or moved) to the new element.
+			 * 
+			 * \param element Value to be copied (or moved) to the new element.
+			 */
 			constexpr void pushBack(const T& element) noexcept
 			{
 				if (size_ < capacity_)
@@ -47,7 +54,7 @@ namespace bzd
 				size_ = (n < capacity_) ? n : capacity_;
 			}
 
-		public:
+		protected:
 			const SizeType capacity_;
 		};
 	}

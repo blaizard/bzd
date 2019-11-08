@@ -3,6 +3,16 @@
 
 import re
 
+"""
+Identifer:
+Members are contained with identifiers. An identifier is the C++ namespace used to access the member.
+Note, part of the identifier can be the name of a member, if this latter is a container. For example,
+if Foo is a class present in the namespace bzd::impl, then members of Foo will have the identifer "bzd::impl::Foo"
+TODO: Include template also in the identifier
+
+
+"""
+
 definition_ = {
 	"struct": {
 		"name": "Struct",
@@ -16,7 +26,8 @@ definition_ = {
 			"post": "",
 			"type": "struct",
 			"name": "{name}"
-		}
+		},
+		"identifier": "{name}"
 	},
 	"class": {
 		"name": "Class",
@@ -30,7 +41,8 @@ definition_ = {
 			"post": "",
 			"type": "class",
 			"name": "{name}"
-		}
+		},
+		"identifier": "{name}"
 	},
 	"typedef": {
 		"name": "Typedef",
@@ -44,7 +56,8 @@ definition_ = {
 			"post": "",
 			"type": "typedef",
 			"name": "{name}"
-		}
+		},
+		"identifier": "{name}"
 	},
 	"variable": {
 		"name": "Variable",
@@ -58,7 +71,8 @@ definition_ = {
 			"post": "",
 			"type": "{const} {type}",
 			"name": "{name}"
-		}
+		},
+		"identifier": "{name}"
 	},
 	"function": {
 		"name": "Function",
@@ -72,7 +86,8 @@ definition_ = {
 			"post": "",
 			"type": "{type}",
 			"name": "{name}({args}) {const}"
-		}
+		},
+		"identifier": "{name}{template}"
 	},
 	"default": {
 		"name": "",
@@ -85,7 +100,8 @@ definition_ = {
 			"post": "",
 			"type": "",
 			"name": "{name}"
-		}
+		},
+		"identifier": "{name}"
 	}
 }
 
@@ -95,6 +111,12 @@ def getDefinition(kind):
 class Member:
 	def __init__(self, data):
 		self.data = data
+
+	"""
+	Generate a namespace identifier
+	"""
+	def makeIdentifier(self):
+		return self.printDefinition(formatStr = self.getDefinition()["identifier"])
 
 	def clone(self):
 		return Member(self.data.copy())
@@ -187,6 +209,22 @@ class MemberGroup:
 		self.list = []
 		self.identifier = identifier
 		self.addMembers([Member(member) for member in memberList])
+		self.parent = None
+
+	def getParentMember(self):
+		return self.parent
+
+	"""
+	Get constructor name if any
+	"""
+	def getConstructorName(self):
+		return self.parent.getName() if self.parent else None
+
+	"""
+	Get destructor name if any
+	"""
+	def getDestructorName(self):
+		return "~" + self.parent.getName() if self.parent else None
 
 	def addMembers(self, members, provenance = None):
 		name = self.getIdentifierName()
@@ -194,7 +232,7 @@ class MemberGroup:
 			if member.getVisibility() == "public":
 				if provenance:
 					# If constructor or destructor, do not merge
-					if member.getName() in [name, "~" + name]:
+					if self.parent and member.getName() in [self.getConstructorName(), self.getDestructorName()]:
 						continue
 					member.setProvenance(provenance)
 				self.list.append(member)
@@ -230,6 +268,10 @@ class Members:
 			for member in memberGroup.get():
 				if member.isContainer():
 					containerMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]))
+					# Set the parent member if any
+					if containerMemberGroup:
+						containerMemberGroup.parent = member
+
 					for inheritance in member.getInheritance():
 						if "id" in inheritance:
 							#tempMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]), createIfNotExists=True)

@@ -1,8 +1,0 @@
-digraph "bzd::typeTraits::integralConstant&lt; T, v &gt;"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node38 [label="bzd::typeTraits::integral\lConstant\< T, v \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node39 -> Node38 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" value" ,fontname="Helvetica"];
-  Node39 [label="T",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
-}
