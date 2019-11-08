@@ -208,11 +208,12 @@ class MemberGroup:
 	def __init__(self, memberList, identifier):
 		self.list = []
 		self.identifier = identifier
-		self.addMembers([Member(member) for member in memberList])
 		self.parent = None
+		self.addMembers([Member(member) for member in memberList])
 
-	def getParentMember(self):
-		return self.parent
+	def setParent(self, parent):
+		self.parent = parent
+		self.sort()
 
 	"""
 	Get constructor name if any
@@ -242,7 +243,13 @@ class MemberGroup:
 		self.addMembers([member.clone() for member in memberGroup.list], provenance)
 
 	def sort(self):
-		self.list = sorted(self.list, key=lambda k : k.getDefinition()["sort"])
+		def sortKey(k):
+			if k.getName() == self.getConstructorName():
+				return k.getDefinition()["sort"] - 0.2
+			elif k.getName() == self.getDestructorName():
+				return k.getDefinition()["sort"] - 0.1
+			return k.getDefinition()["sort"]
+		self.list = sorted(self.list, key=sortKey)
 
 	def get(self):
 		return self.list
@@ -270,7 +277,7 @@ class Members:
 					containerMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]))
 					# Set the parent member if any
 					if containerMemberGroup:
-						containerMemberGroup.parent = member
+						containerMemberGroup.setParent(member)
 
 					for inheritance in member.getInheritance():
 						if "id" in inheritance:
