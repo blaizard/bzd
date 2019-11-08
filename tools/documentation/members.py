@@ -19,6 +19,7 @@ definition_ = {
 		"sort": 2,
 		"container": True,
 		"args": False,
+		"constructor": True,
 		"defaultVisibility": "public",
 		"format": {
 			"template": "{template}",
@@ -34,6 +35,7 @@ definition_ = {
 		"sort": 1,
 		"container": True,
 		"args": False,
+		"constructor": True,
 		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
@@ -49,6 +51,7 @@ definition_ = {
 		"sort": 4,
 		"container": False,
 		"args": False,
+		"constructor": False,
 		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
@@ -64,6 +67,7 @@ definition_ = {
 		"sort": 5,
 		"container": False,
 		"args": False,
+		"constructor": False,
 		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
@@ -79,6 +83,7 @@ definition_ = {
 		"sort": 3,
 		"container": False,
 		"args": True,
+		"constructor": False,
 		"defaultVisibility": "private",
 		"format": {
 			"template": "{template}",
@@ -88,6 +93,22 @@ definition_ = {
 			"name": "{name}({args}) {const}"
 		},
 		"identifier": "{name}{template}"
+	},
+	"namespace": {
+		"name": "Namespace",
+		"sort": 0,
+		"container": True,
+		"args": False,
+		"constructor": False,
+		"defaultVisibility": "public",
+		"format": {
+			"template": "",
+			"pre": "",
+			"post": "",
+			"type": "",
+			"name": "{name}"
+		},
+		"identifier": "{name}"
 	},
 	"default": {
 		"name": "",
@@ -219,13 +240,13 @@ class MemberGroup:
 	Get constructor name if any
 	"""
 	def getConstructorName(self):
-		return self.parent.getName() if self.parent else None
+		return self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
 	"""
 	Get destructor name if any
 	"""
 	def getDestructorName(self):
-		return "~" + self.parent.getName() if self.parent else None
+		return "~" + self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
 	def addMembers(self, members, provenance = None):
 		name = self.getIdentifierName()
@@ -233,7 +254,7 @@ class MemberGroup:
 			if member.getVisibility() == "public":
 				if provenance:
 					# If constructor or destructor, do not merge
-					if self.parent and member.getName() in [self.getConstructorName(), self.getDestructorName()]:
+					if member.getName() in [self.getConstructorName(), self.getDestructorName()]:
 						continue
 					member.setProvenance(provenance)
 				self.list.append(member)

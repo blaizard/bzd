@@ -9,7 +9,7 @@ import glob
 from render import Render
 from members import Members, Member
 
-kindToKeep = ["struct", "class", "variable", "function", "typedef"]
+kindToKeep = ["struct", "class", "variable", "function", "typedef", "namespace"]
 
 class DoxygenParser:
 
@@ -347,7 +347,7 @@ def commentParser(element, data = {}):
 
 commonAttrs = {
 	"id": {},
-	"kind": {"values": ["struct", "class", "variable", "function", "typedef"], "others": "ignore"},
+	"kind": {"values": ["struct", "class", "variable", "function", "typedef", "namespace"], "others": "ignore"},
 	"prot": { "values": ["private", "public", "protected"], "key": "visibility" },
 	"static": { "values": {"no": False, "yes": True} },
 	"mutable": { "values": {"no": False, "yes": True} },
