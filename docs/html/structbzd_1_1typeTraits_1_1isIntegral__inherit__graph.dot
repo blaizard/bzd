@@ -1,9 +1,0 @@
-digraph "bzd::typeTraits::isIntegral&lt; T &gt;"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node0 [label="bzd::typeTraits::isIntegral\< T \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node1 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1 [label="bzd::typeTraits::integral\lConstant\< bool, isSame\l\< unsigned char, removeCV\l\< T \>::type \>::value\|\|isSame\l\< signed char, removeCV\< T \>\l::type \>::value\|\|isSame\< char,\l removeCV\< T \>::type \>::value\|\l\|isSame\< unsigned short, removeCV\l\< T \>::type \>::value\|\|isSame\< short,\l removeCV\< T \>::type \>::value\|\|isSame\l\< unsigned int, removeCV\< T \>::type \>\l::value\|\|isSame\< int, removeCV\< T \>::type\l \>::value\|\|isSame\< unsigned long, removeCV\l\< T \>::type \>::value\|\|isSame\< long, removeCV\l\< T \>::type \>::value\|\|isSame\< unsigned long long,\l removeCV\< T \>::type \>::value\|\|isSame\< long long,\l removeCV\< T \>::type \>::value\|\|isSame\< bool, removeCV\l\< T \>::type \>::value \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structbzd_1_1typeTraits_1_1integralConstant.html"];
-}

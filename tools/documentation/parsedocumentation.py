@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import pprint
 import glob
 from render import Render
-from members import Members
+from members import Members, Member
 
 kindToKeep = ["struct", "class", "variable", "function", "typedef"]
 
@@ -119,40 +119,15 @@ class DoxygenParser:
 		self.addMember(current, data)
 
 	"""
-	Generate an ID for a member relative to its namespace
-	"""
-	def makeMemberId(self, member):
-		info = member.get("__info__", {})
-		formatStr = "{name}"
-		if info.get("kind", None) == "function":
-			formatStr = "{template} {static} {virtual} {explicit} {type} {name}({args}) {const}"
-
-		def printTemplate(template):
-			formatArgs = ", ".join(["{type} {name}".format(type=v.get("__info__", {}).get("type"), name=v.get("__info__", {}).get("name", "")).strip() for v in template])
-			return "template<{}>".format(formatArgs)
-
-		def printArgs(args):
-			return ", ".join(["{type} {name}".format(type=v.get("__info__", {}).get("type"), name=v.get("__info__", {}).get("name", "")).strip() for v in args])
-
-		self.assertTrue(info.get("name", None) != None, "Missing 'name' entry for member: {}", member)
-
-		definition = formatStr.format(name = info["name"],
-				type=info.get("type") if info.get("type", None) else "",
-				virtual="virtual" if info.get("virtual", False) else "",
-				const="const" if info.get("const", False) else "",
-				explicit="explicit" if info.get("explicit", False) else "",
-				static="static" if info.get("static", False) else "",
-				template=printTemplate(info.get("template")) if info.get("template", False) else "",
-				args=printArgs(info.get("args")) if info.get("args", False) else "")
-
-		return re.sub(' +', ' ', definition.strip())
-
-	"""
 	Register a new member
 	"""
 	def addMember(self, data, member):
-		identification = self.makeMemberId(member)
 		if member["__info__"].get("kind", None) in kindToKeep:
+
+			# Generate the member identifier
+			memberData = self.removeNestedKeyword(member["__info__"], "__info__")
+			identification = Member(memberData).makeIdentifier()
+
 			data[identification] = data[identification] if identification in data else {}
 			data[identification] = self.mergeMember(data[identification], member)
 		else:
@@ -186,28 +161,31 @@ class DoxygenParser:
 		return member1
 
 	"""
+	Remove nested keyword
+	"""
+	def removeNestedKeyword(self, definition, keyword):
+		if isinstance(definition, dict):
+			if keyword in definition:
+				self.assertTrue(isinstance(definition[keyword], dict), "Sub definition under '{}' must be a dict", keyword)
+				return self.removeNestedKeyword(definition[keyword], keyword)
+			for key, value in definition.items():
+				definition[key] = self.removeNestedKeyword(value, keyword)
+		elif isinstance(definition, list):
+			for i in range(len(definition)):
+				definition[i] = self.removeNestedKeyword(definition[i], keyword)
+		return definition
+
+	"""
 	Format the data into groups
 	"""
 	def makeGroups(self, groups, data, namespaceList = []):
-
-		def removeNestedInfo(definition):
-			if isinstance(definition, dict):
-				if "__info__" in definition:
-					self.assertTrue(isinstance(definition["__info__"], dict), "Sub definition under '__info__' must be a dict")
-					return removeNestedInfo(definition["__info__"])
-				for key, value in definition.items():
-					definition[key] = removeNestedInfo(value)
-			elif isinstance(definition, list):
-				for i in range(len(definition)):
-					definition[i] = removeNestedInfo(definition[i])
-			return definition
 
 		for namespace, definition in data.items():
 			if namespace == "__info__":
 				namespaceStr = "::".join(namespaceList[:-1])
 				groups[namespaceStr] = groups[namespaceStr] if namespaceStr in groups else []
 				# Remove nested __info__
-				definition = removeNestedInfo(definition)
+				definition = self.removeNestedKeyword(definition, "__info__")
 				groups[namespaceStr].append(definition)
 			else:
 				namespaceList.append(namespace)
