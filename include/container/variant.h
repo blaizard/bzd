@@ -48,7 +48,7 @@ namespace bzd
 				static auto call(const SizeType index, Args&&... args)
 				{
 					using T = ChooseNth<N>;
-					bzd::assertTrue(index == N, "Inconsistent variant state, should never happen");
+					bzd::assert::isTrue(index == N, "Inconsistent variant state, should never happen");
 					return F<T>::call(bzd::forward<Args>(args)...);
 				}
 			};

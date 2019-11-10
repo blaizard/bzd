@@ -3,8 +3,8 @@
 
 TEST(Assert, Base)
 {
-//	bzd::assertTrue(true);
-//	EXPECT_ANY_THROW(bzd::assertTrue(false));
+	bzd::assert::isTrue(true);
+	EXPECT_ANY_THROW(bzd::assert::isTrue(false));
 
-//	bzd::assertTrue(true, "Hello {}", 545);
+//	bzd::assert::isTrue(true, "Hello {}", 545);
 }

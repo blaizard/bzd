@@ -5,20 +5,23 @@
 
 namespace bzd
 {
-	constexpr void assertTrue(const bool condition)
+	namespace assert
 	{
-		if (!condition)
+		constexpr void isTrue(const bool condition)
 		{
-			bzd::panic();
+			if (!condition)
+			{
+				bzd::panic();
+			}
 		}
-	}
 
-	constexpr void assertTrue(const bool condition, const bzd::StringView& message)
-	{
-		if (!condition)
+		constexpr void isTrue(const bool condition, const bzd::StringView& message)
 		{
-			getOut().write(message);
-			bzd::panic();
+			if (!condition)
+			{
+				getOut().write(message);
+				bzd::panic();
+			}
 		}
 	}
 }

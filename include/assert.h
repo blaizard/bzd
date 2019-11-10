@@ -9,13 +9,16 @@
 
 namespace bzd
 {
-	template <class... Args>
-	constexpr void assertTrue(const bool condition, const bzd::StringView& fmt, Args&&... args)
+	namespace assert
 	{
-		if (!condition)
+		template <class... Args>
+		constexpr void isTrue(const bool condition, const bzd::StringView& fmt, Args&&... args)
 		{
-			bzd::log::print(fmt, bzd::forward<Args>(args)...);
-			bzd::panic();
+			if (!condition)
+			{
+				bzd::log::print(fmt, bzd::forward<Args>(args)...);
+				bzd::panic();
+			}
 		}
 	}
 }

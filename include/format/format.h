@@ -12,13 +12,6 @@
 #include "include/format/integral.h"
 #include "include/system.h"
 
-#include <array>
-#include <iostream>
-#include <cstdarg>
-
-#include <vector>
-
-
 namespace bzd
 {
 	namespace format
