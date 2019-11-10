@@ -25,11 +25,16 @@ class Render:
 		return path
 
 	def createNamespace(self, namespace, members):
+		if namespace:
+			self.fileHandle.write("# ")
+			namespaceList = namespace.split("::")
+			for i in range(len(namespaceList)):
+				self.fileHandle.write("{}[`{}`]({})".format("::" if i else "", namespaceList[i], self.generateLink("::".join(namespaceList[0:i]))))
+			self.fileHandle.write("\n\n")
+
 		member = members.getMember(namespace)
 		if member:
-			self.createMember(namespace, member, "# ")
-		else:
-			self.fileHandle.write("# {}\n".format(namespace))
+			self.createMember(namespace, member, "## ")
 
 	def createListing(self, namespace, memberList):
 		prevKind = -1

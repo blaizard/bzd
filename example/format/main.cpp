@@ -1,18 +1,18 @@
 #include <iostream>
-#include "include/format.h"
+#include "include/format/format.h"
 #include "include/system.h"
 
 int main()
 {
-	bzd::format(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello {}"), 12);
+	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello {}"), 12);
 
-	bzd::format(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It'se I am here! {}"), 'a');
+	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It'se I am here! {}"), 'a');
 
-	bzd::format(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It's me I am h! {} {}"), 12, 3);
+	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It's me I am h! {} {}"), 12, 3);
 
-	bzd::format(bzd::getOut(), CONSTEXPR_STRING_VIEW("HelIt's me I am here! {} {} {}"), 12, 2, false);
+	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("HelIt's me I am here! {} {} {}"), 12, 2, false);
 
-	bzd::format(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It's  I am here! {} {} {} {}"), 12, 5.4454, -323, 32323);
+	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("Hello It's  I am here! {} {} {} {}"), 12, 5.4454, -323, 32323);
 
 	//formatMe(CONSTEXPR_STRING_VIEW("Hello {:s}"), 45);
 
