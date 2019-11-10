@@ -1,14 +1,13 @@
 #pragma once
 
-#include "include/type_traits/utils.h"
-#include "include/type_traits/const_volatile.h"
+#include "include/type_traits/is_same.h"
+#include "include/type_traits/integral_constant.h"
+#include "include/type_traits/remove_cv.h"
 
 namespace bzd
 {
 	namespace typeTraits
 	{
-		// isIntegral
-
 		template <class T>
 		struct isIntegral : integralConstant<bool,
 				isSame<unsigned char, typename removeCV<T>::type>::value ||
@@ -23,18 +22,5 @@ namespace bzd
                 isSame<unsigned long long, typename removeCV<T>::type>::value ||
                 isSame<long long, typename removeCV<T>::type>::value ||
                 isSame<bool, typename removeCV<T>::type>::value> {};
-
-		// isFloatingPoint
-
-		template <class T>
-		struct isFloatingPoint : integralConstant<bool,
-                isSame<float, typename removeCV<T>::type>::value ||
-                isSame<double, typename removeCV<T>::type>::value ||
-                isSame<long double, typename removeCV<T>::type>::value> {};
-
-		// isArithmetic
-
-		template <class T>
-		struct isArithmetic : integralConstant<bool, isIntegral<T>::value || isFloatingPoint<T>::value> {};
 	}
 }

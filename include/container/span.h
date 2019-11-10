@@ -2,8 +2,8 @@
 
 #include "include/types.h"
 #include "include/utility.h"
-#include "include/type_traits/utils.h"
-#include "include/type_traits/const_volatile.h"
+#include "include/type_traits/enable_if.h"
+#include "include/type_traits/is_const.h"
 #include "include/container/iterator/contiguous.h"
 
 namespace bzd

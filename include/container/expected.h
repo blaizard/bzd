@@ -1,7 +1,8 @@
 #pragma once
 
 #include "include/utility.h"
-#include "include/type_traits/utils.h"
+#include "include/type_traits/conditional.h"
+#include "include/type_traits/is_reference.h"
 
 namespace bzd
 {

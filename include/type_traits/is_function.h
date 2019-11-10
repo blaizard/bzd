@@ -1,13 +1,12 @@
 #pragma once
 
-#include "include/type_traits/integral_constant.h"
+#include "include/type_traits/true_type.h"
+#include "include/type_traits/false_type.h"
 
 namespace bzd
 {
 	namespace typeTraits
 	{
-		// isFunction
-
 		// Primary template
 		template <class> struct isFunction : falseType {};
  

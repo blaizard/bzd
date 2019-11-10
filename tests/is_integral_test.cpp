@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "include/type_traits/fundamental.h"
-#include "include/type_traits/utils.h"
+#include "include/type_traits/is_integral.h"
 
 TEST(TypeTraits, isIntegral)
 {

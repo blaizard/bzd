@@ -1,9 +1,8 @@
 #pragma once
 
 #include "include/type_traits/integral_constant.h"
-#include "include/type_traits/reference.h"
-#include "include/type_traits/void.h"
-#include "include/type_traits/utils.h"
+#include "include/type_traits/void_type.h"
+#include "include/type_traits/declval.h"
 
 namespace bzd
 {

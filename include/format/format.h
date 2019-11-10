@@ -1,7 +1,8 @@
 #pragma once
 
-#include "include/type_traits/fundamental.h"
-#include "include/type_traits/constructible.h"
+#include "include/type_traits/is_integral.h"
+#include "include/type_traits/is_arithmetic.h"
+#include "include/type_traits/is_constructible.h"
 #include "include/container/constexpr_string_view.h"
 #include "include/container/string_view.h"
 #include "include/container/string.h"
