@@ -101,10 +101,9 @@ namespace bzd
 	}
 
 	template <class... T>
-	struct Tuple : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
+	class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 	{
-		static constexpr SizeType size() noexcept { return sizeof...(T); }
-
+	public:
 		// Forward constructor as constexpr
 
 		template <class... Args>
@@ -112,5 +111,7 @@ namespace bzd
 				: impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>(bzd::forward<Args>(args)...)
 		{
 		}
+
+		static constexpr SizeType size() noexcept { return sizeof...(T); }
 	};
 }
