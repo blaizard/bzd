@@ -19,15 +19,6 @@ namespace bzd
 			DEBUG = 4
 		};
 
-		namespace impl
-		{
-			class Buffer : public SingletonImpl<Buffer>
-			{
-			public:
-
-			};
-		}
-
 		template <class... Args>
 		void print(const bzd::StringView& fmt, Args&&... args) noexcept
 		{
