@@ -1,7 +1,15 @@
 # cpp-bzd
 
 Lightweight and flexible framework for cooperative and event-base programming.
-This framework aims at safety and prevents any dynamically allocation and exception to ensure full control the memory management.
+
+This framework is developped to run on all kind of embedded platforms, from 8-bit bare bones MCU to high performance compute unit.
+
+It features the followings:
+- No dynamic allocations.
+- No exceptions ensure.
+- Compile-time string formting tool.
+- Lightweight.
+- Usefull set of containers.
 
 It requires C++14.
 

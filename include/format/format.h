@@ -9,7 +9,7 @@
 #include "include/container/variant.h"
 #include "include/container/vector.h"
 #include "include/container/iostream.h"
-#include "include/to_string.h"
+#include "include/format/integral.h"
 #include "include/system.h"
 
 #include <array>
@@ -21,9 +21,9 @@
 
 namespace bzd
 {
-	namespace impl
+	namespace format
 	{
-		namespace format
+		namespace impl
 		{
 			/**
 			 * Simple vector container working with conxtexpr
@@ -430,7 +430,7 @@ namespace bzd
 			class PrintContext
 			{
 			public:
-				constexpr PrintContext(bzd::OStream& stream, const bzd::interface::Vector<bzd::impl::format::Arg>& args) : stream_(stream), args_(args) {}
+				constexpr PrintContext(bzd::OStream& stream, const bzd::interface::Vector<bzd::format::impl::Arg>& args) : stream_(stream), args_(args) {}
 				void addSubstring(const bzd::StringView& str) { stream_.write(str); }
 				void addMetadata(const Metadata& metadata) {
 					args_[metadata.index].match(
@@ -452,7 +452,7 @@ namespace bzd
 
 			private:
 				bzd::OStream& stream_;
-				const bzd::interface::Vector<bzd::impl::format::Arg>& args_;
+				const bzd::interface::Vector<bzd::format::impl::Arg>& args_;
 			};
 
 			template <class T>
@@ -463,7 +463,7 @@ namespace bzd
 				return ctx;
 			}
 
-			void print(bzd::OStream& stream, const bzd::StringView& format, const bzd::interface::Vector<bzd::impl::format::Arg>& args)
+			void print(bzd::OStream& stream, const bzd::StringView& format, const bzd::interface::Vector<bzd::format::impl::Arg>& args)
 			{
 				Context<PrintContext> ctx(stream, args);
 				parse(ctx, format, args);
@@ -479,7 +479,7 @@ namespace bzd
 			constexpr bool contextCheck(const Ctx& context, const T& tuple)
 			{
 				auto value = tuple.template get<N-1>();
-				context.assertTrue(bzd::typeTraits::isConstructible<bzd::impl::format::Arg, decltype(value)>::value, "Argument type is not supported");
+				context.assertTrue(bzd::typeTraits::isConstructible<bzd::format::impl::Arg, decltype(value)>::value, "Argument type is not supported");
 
 				bool usedAtLeastOnce = false;
 				for (const auto& metadata : context)
@@ -518,45 +518,45 @@ namespace bzd
 				return true;
 			}
 		}
-	}
 
-	/**
-	 * \brief String formating.
-	 * 
-	 * Lightweight and compilation time checking string formating utility.
-	 * The syntax is compatible with Python format with some limitations.
-	 *
-	 * \code
-	 * format_spec ::=  [sign][#][.precision][type]
-	 * sign        ::=  "+" | "-" | " "
-	 * precision   ::=  integer
-	 * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
-	 * d	Decimal integer
-	 * b	Binary format
-	 * o	Octal format
-	 * x	Hexadecimal format (lower case)
-	 * X	Hexadecimal format (upper case)
-	 * f	Displays fixed point number (Default: 6)
-	 * p    Pointer
-	 * %	Percentage. Multiples by 100 and puts % at the end.
-	 * \endcode
-	 * 
-	 * This is an after text
-	 * 
-	 * \param out Output stream where the formating string will be written to.
-	 * \param f Compile-time string containing the format.
-	 * \param args Arguments to be passed for the format.
-	 */
-	template <class F, class... Args>
-	constexpr inline void format(bzd::OStream& out, const F& f, Args&&... args)
-	{
-		// Compile-time format check
-		constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
-		constexpr const auto context = bzd::impl::format::contextBuild(F::data(), tuple);
-		static_assert(bzd::impl::format::contextCheck<tuple.size()>(context, tuple), "String format check failed");
+		/**
+		 * \brief String formating.
+		 * 
+		 * Lightweight and compilation time checking string formating utility.
+		 * The syntax is compatible with Python format with some limitations.
+		 *
+		 * \code
+		 * format_spec ::=  [sign][#][.precision][type]
+		 * sign        ::=  "+" | "-" | " "
+		 * precision   ::=  integer
+		 * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+		 * d	Decimal integer
+		 * b	Binary format
+		 * o	Octal format
+		 * x	Hexadecimal format (lower case)
+		 * X	Hexadecimal format (upper case)
+		 * f	Displays fixed point number (Default: 6)
+		 * p    Pointer
+		 * %	Percentage. Multiples by 100 and puts % at the end.
+		 * \endcode
+		 * 
+		 * This is an after text
+		 * 
+		 * \param out Output stream where the formating string will be written to.
+		 * \param f Compile-time string containing the format.
+		 * \param args Arguments to be passed for the format.
+		 */
+		template <class F, class... Args>
+		constexpr inline void toString(bzd::OStream& out, const F& f, Args&&... args)
+		{
+			// Compile-time format check
+			constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
+			constexpr const auto context = bzd::format::impl::contextBuild(F::data(), tuple);
+			static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
-		// Run-time call
-		bzd::Vector<bzd::impl::format::Arg, tuple.size()> argList(bzd::forward<typename bzd::decay<Args>::type>(args)...);
-		bzd::impl::format::print(out, f.str(), argList);
+			// Run-time call
+			bzd::Vector<bzd::format::impl::Arg, tuple.size()> argList(bzd::forward<typename bzd::decay<Args>::type>(args)...);
+			bzd::format::impl::print(out, f.str(), argList);
+		}
 	}
 }
