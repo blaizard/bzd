@@ -1,13 +1,12 @@
 #pragma once
 
-#include "include/type_traits/integral_constant.h"
+#include "include/type_traits/true_type.h"
+#include "include/type_traits/false_type.h"
 
 namespace bzd
 {
 	namespace typeTraits
 	{
-		// isVoid
-
 		template <class T>
 		struct isVoid : public falseType {};
 
@@ -22,10 +21,5 @@ namespace bzd
 
 		template<>
 		struct isVoid<volatile void> : public trueType {};
-
-		// voidType
-
-		template <class...>
-		using voidType = void;
 	}
 }

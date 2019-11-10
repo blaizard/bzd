@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "include/utility.h"
+#include "include/type_traits/is_same.h"
 
 template <typename T, typename U>
 struct decayEquiv : bzd::typeTraits::isSame<typename bzd::decay<T>::type, U>::type {};

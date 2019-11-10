@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "include/type_traits/const_volatile.h"
-#include "include/type_traits/utils.h"
+#include "include/type_traits/remove_cv.h"
+#include "include/type_traits/is_same.h"
 
 TEST(TypeTraits, removeCV)
 {

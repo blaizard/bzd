@@ -1,12 +1,15 @@
 #pragma once
 
 #include "include/types.h"
-#include "include/type_traits/array.h"
-#include "include/type_traits/function.h"
-#include "include/type_traits/pointer.h"
-#include "include/type_traits/reference.h"
-#include "include/type_traits/const_volatile.h"
-#include "include/type_traits/utils.h"
+#include "include/type_traits/is_array.h"
+#include "include/type_traits/is_function.h"
+#include "include/type_traits/is_lvalue_reference.h"
+#include "include/type_traits/add_pointer.h"
+#include "include/type_traits/remove_extent.h"
+#include "include/type_traits/remove_reference.h"
+#include "include/type_traits/remove_cv.h"
+#include "include/type_traits/enable_if.h"
+#include "include/type_traits/conditional.h"
 
 namespace bzd
 {

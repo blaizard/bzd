@@ -2,6 +2,8 @@
 
 #include "include/types.h"
 #include "include/utility.h"
+#include "include/type_traits/enable_if.h"
+#include "include/type_traits/is_same.h"
 
 namespace bzd
 {

@@ -6,7 +6,8 @@
 #include "include/container/string.h"
 #include "include/container/iostream.h"
 #include "include/container/string_stream.h"
-#include "include/type_traits/fundamental.h"
+#include "include/type_traits/is_integral.h"
+#include "include/type_traits/is_floating_point.h"
 #include "include/utility.h"
 
 namespace bzd

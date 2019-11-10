@@ -4,8 +4,6 @@ namespace bzd
 {
 	namespace typeTraits
 	{
-		// integralConstant
-
 		template <class T, T v>
 		struct integralConstant
 		{
@@ -21,13 +19,5 @@ namespace bzd
 				return value;
 			}
 		};
-
-		// trueType
-
-		typedef integralConstant<bool, true> trueType;
-
-		// falseType
-
-		typedef integralConstant<bool, false> falseType;
 	}
 }

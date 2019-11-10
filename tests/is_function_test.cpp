@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "include/type_traits/function.h"
+#include "include/type_traits/is_function.h"
 
 int f();
 

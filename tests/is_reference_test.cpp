@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "include/type_traits/reference.h"
+#include "include/type_traits/is_reference.h"
 
 TEST(TypeTraits, isReference)
 {
