@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
-#include "include/template_metaprogramming.h"
+#include "include/tmp/choose_nth.h"
+#include "include/tmp/contains.h"
+#include "include/tmp/find.h"
+#include "include/tmp/union.h"
+#include "include/tmp/type_list.h"
 
 TEST(TMP, ChooseNth)
 {
