@@ -1,6 +1,6 @@
 #include <iostream>
-#include "include/format/format.h"
-#include "include/system.h"
+#include "bzd/format/format.h"
+#include "bzd/system.h"
 
 int main()
 {

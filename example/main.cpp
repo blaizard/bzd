@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "include/scheduler.h"
-#include "include/stack.h"
-#include "include/task.h"
+#include "bzd/scheduler.h"
+#include "bzd/stack.h"
+#include "bzd/task.h"
 
 void fct1();
 void fct2();
