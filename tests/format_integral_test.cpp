@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "include/format/integral.h"
+#include "bzd/format/integral.h"
 
 TEST(ToString, Integer)
 {

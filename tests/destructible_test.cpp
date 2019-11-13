@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "include/type_traits/is_destructible.h"
+#include "bzd/type_traits/is_destructible.h"
 
 TEST(TypeTraits, isDestructible)
 {

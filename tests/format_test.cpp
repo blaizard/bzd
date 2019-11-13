@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "include/format/format.h"
-#include "include/container/string_stream.h"
-#include "include/container/string_view.h"
-#include "include/container/vector.h"
+#include "bzd/format/format.h"
+#include "bzd/container/string_stream.h"
+#include "bzd/container/string_view.h"
+#include "bzd/container/vector.h"
 
 class ContextTest
 {

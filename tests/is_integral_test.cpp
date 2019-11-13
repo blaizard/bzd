@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "include/type_traits/is_integral.h"
+#include "bzd/type_traits/is_integral.h"
 
 TEST(TypeTraits, isIntegral)
 {

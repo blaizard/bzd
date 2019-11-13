@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "include/assert.h"
+#include "bzd/assert.h"
 
 TEST(Assert, Base)
 {

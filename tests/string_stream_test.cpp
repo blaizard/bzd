@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "include/container/string_stream.h"
+#include "bzd/container/string_stream.h"
 
 TEST(ContainerStringStream, Base)
 {
