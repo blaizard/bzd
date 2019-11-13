@@ -6,6 +6,6 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//include/bzd:include",
+        "//include:bzd",
     ],
 )

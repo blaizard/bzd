@@ -4,6 +4,6 @@ cc_binary(
         "main.cpp",
     ],
     deps = [
-        "//include/bzd",
+        "//src:bzd",
     ],
 )

@@ -4,7 +4,7 @@ cc_binary(
         "main.cpp",
     ],
     deps = [
-        "//include/bzd",
-        "//src/platforms/x86_64_cdecl",
+        "//src:bzd",
+        "//src/bzd/platforms/x86_64_cdecl",
     ],
 )
