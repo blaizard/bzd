@@ -39,16 +39,29 @@ namespace bzd
 				}
 			}
 
+			/**
+			 * \brief Returns the maximum number of elements the vector can hold.
+			 * 
+			 * \return Maximum number of element this vector can hold.
+			 */
 			constexpr SizeType capacity() const noexcept
 			{
 				return capacity_;
 			}
 
+			/**
+			 * \brief Removes all elements.
+			 */
 			constexpr void clear() noexcept
 			{
 				resize(0);
 			}
 
+			/**
+			 * \brief Change the size of the vector.
+			 * 
+			 * \param n The new size. Note, it must a be lower or equal to the capacity.
+			 */
 			constexpr void resize(const size_t n) noexcept
 			{
 				size_ = (n < capacity_) ? n : capacity_;

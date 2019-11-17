@@ -6,6 +6,8 @@ import re
 import xml.etree.ElementTree as ET
 import pprint
 import glob
+import argparse
+
 from render import Render
 from members import Members, Member
 
@@ -447,34 +449,35 @@ dictionary = {
 	"compounddef": compounddef
 }
 
-parser = DoxygenParser()
 
-fileList = glob.glob("docs/xml/*")
-for fileName in fileList:
-	if fileName.lower().endswith(".xml"):
-		try:
-			root = ET.parse(fileName).getroot()
-			parser.parse(root, dictionary)
-		except Exception as e:
-			print("file: %s" % (fileName))
-			raise e
+def process(args):
 
-#root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected.xml').getroot()
-#parser.parse(root, dictionary)
-#root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1RefWrapper.xml').getroot()
-#parser.parse(root, dictionary)
-#root = ET.parse('docs/xml/classbzd_1_1impl_1_1Expected_3_01void_00_01E_01_4.xml').getroot()
-#parser.parse(root, dictionary)
-#root = ET.parse('docs/xml/structbzd_1_1impl_1_1Expected_1_1ValueWrapper.xml').getroot()
-#parser.parse(root, dictionary)
+	parser = DoxygenParser()
 
-#root = ET.parse('docs/xml/namespacebzd.xml').getroot()
-#parser.parse(root, dictionary)
+	fileList = glob.glob("{}/**/*".format(args.doxygen))
+	for fileName in fileList:
+		if fileName.lower().endswith(".xml"):
+			try:
+				root = ET.parse(fileName).getroot()
+				parser.parse(root, dictionary)
+			except Exception as e:
+				print("file: %s" % (fileName))
+				raise e
 
-pp = pprint.PrettyPrinter(indent=4)
-members = parser.getMembers()
+	pp = pprint.PrettyPrinter(indent=4)
+	members = parser.getMembers()
 
-pp.pprint(members)
+	pp.pprint(members)
 
-render = Render("docs/md")
-render.process(members)
+	render = Render(args.output)
+	render.process(members)
+
+if __name__== "__main__":
+
+	parser = argparse.ArgumentParser(description="Generate documentation from Doxygen XML output")
+	parser.add_argument('--doxygen', dest="doxygen", default="docs/xml", help="Doxygen XML output directory")
+	parser.add_argument("-o", "--output", dest="output", default="docs/md", help="Output of the generate documentation")
+
+	args = parser.parse_args()
+
+	process(args)

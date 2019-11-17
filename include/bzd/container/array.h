@@ -16,6 +16,11 @@ namespace bzd
 		{
 		}
 
+		/**
+		 * \brief Returns the number of elements that the array can hold.
+		 * 
+		 * \return Maximum number of element this array can hold.
+		 */
 		constexpr SizeType capacity() const noexcept
 		{
 			return N;

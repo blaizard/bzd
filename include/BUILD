@@ -1,8 +1,16 @@
-cc_library(
-    name = "bzd",
-    hdrs = glob([
+filegroup(
+    name = "bzd_files",
+    srcs = glob([
         "bzd/**/*.h",
     ]),
     visibility = ["//visibility:public"],
-    includes = ["."]
+)
+
+cc_library(
+    name = "bzd",
+    hdrs = [
+        ":bzd_files"
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
 )
