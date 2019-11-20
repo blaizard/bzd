@@ -1,10 +1,15 @@
-load("//tools/documentation:defs.bzl", "doc_binary")
+load("//tools/documentation:defs.bzl", "cc_documentation")
 
-doc_binary(
+cc_documentation(
     name = "documentation",
     srcs = [
         "//include:bzd_files",
-    ]
+    ],
+    tags = ["manual"],
+    output = "dsd",
+    data = glob([
+        "*.py",
+    ]),
 )
 
 py_binary(

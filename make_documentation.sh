@@ -2,6 +2,5 @@
 
 set -e
 
-rm -rfd ./docs/xml
-doxygen
-./tools/documentation/parsedocumentation.py
+rm -rfd "$(pwd)/docs/api"
+bazel run //tools/documentation -- --output "$(pwd)/docs/api"

@@ -1,8 +1,14 @@
+_script_template = """
+#!/bin/bash
+
+python3 "{script}" --doxygen {doxygen} $@
+"""
+
 def _impl(ctx):
 
     # Generate the doxyfile
-    doxyfile = ctx.actions.declare_file(ctx.attr.name + ".doxyfile")
-    doxygen_output = ctx.actions.declare_directory(ctx.attr.name + ".doxygen")
+    doxyfile = ctx.actions.declare_file(ctx.label.name + ".doxyfile")
+    doxygen_output = ctx.actions.declare_directory(ctx.label.name + ".doxygen")
 
     ctx.actions.expand_template(
         template = ctx.file._doxyfile_template,
@@ -27,31 +33,35 @@ def _impl(ctx):
     )
 
     # Generate the documentation from the XML output
-    output = ctx.actions.declare_directory(ctx.attr.name + ".documentation")
+    #output = ctx.actions.declare_directory(ctx.attr.name + ".documentation")
 
-    args = ctx.actions.args()
-    args.add("--doxygen")
-    args.add(doxygen_output.path)
-    args.add("--output")
-    args.add(output.path)
-
-    ctx.actions.run(
-        outputs = [ output ],
-        inputs = [ doxygen_output ],
-        arguments = [ args ],
-        progress_message = "Generating documentation into '%s'" % output.path,
-        executable = ctx.executable._generator,
+    script = ctx.actions.declare_file("documentation-%s-generator" % ctx.label.name)
+    script_content = _script_template.format(
+        script = "tools/documentation/parsedocumentation.py", #ctx.executable._generator.short_path,
+        doxygen = doxygen_output.short_path,
     )
+    print(script_content)
+    ctx.actions.write(script, script_content, is_executable = True)
 
-    return [DefaultInfo(files = depset([output]))]
+    runfiles = ctx.runfiles(files = [doxygen_output], collect_data = True)
 
-doc_binary = rule(
+    return [DefaultInfo(executable = script, runfiles = runfiles)]
+
+cc_documentation = rule(
     implementation = _impl,
     attrs = {
         "srcs": attr.label_list(
             allow_files = True,
             mandatory = True,
             doc = "Input C++ source/header files.",
+        ),
+        "output": attr.string(
+            mandatory = True,
+            doc = "Output directory where the documentation will be generated.",
+        ),
+        "data": attr.label_list(
+            allow_files = True,
+            doc = "Data files available to binaries using this library",
         ),
         "_generator": attr.label(
             default = Label("//tools/documentation:generator"),
@@ -70,5 +80,5 @@ doc_binary = rule(
             allow_single_file = True,
         ),
     },
-    #executable = True
+    executable = True
 )
