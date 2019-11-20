@@ -5,6 +5,14 @@
 
 namespace bzd
 {
+	/**
+	 * \brief A container that encapsulates fixed size arrays.
+	 * 
+	 * The container combines the performance and accessibility of a C-style array
+	 * with the benefits of a standard container, such as knowing its own size, supporting
+	 * assignment, random access iterators, etc.
+	 * Unlike a C-style array, it doesn't decay to T* automatically.
+	 */
 	template <class T, SizeType N>
 	class Array : public Span<T>
 	{
