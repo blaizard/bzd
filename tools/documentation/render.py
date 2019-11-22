@@ -45,11 +45,18 @@ class Render:
 				self.fileHandle.write("||||\n")
 				self.fileHandle.write("|---:|:---|:---|\n")
 
+			# Generate the description brief
+			descriptionBrief = member.getDescriptionBrief()
+			aliasList = member.getAlias()
+			if len(aliasList):
+				aliasStr = ", ".join(["[`{}`]({})".format(alias, self.generateLink(alias)) for alias in aliasList])
+				descriptionBrief += "{}alias of {}".format("; " if descriptionBrief else "", aliasStr)
+
 			self.fileHandle.write("|{}|[`{}`]({})|{}|\n".format(
 					member.printDefinition("{type}"),
 					member.printDefinition("{name}"),
 					self.generateLink(namespace, member),
-					member.getDescriptionBrief()))
+					descriptionBrief))
 			prevKind = kind
 
 	def formatComment(self, comment):
@@ -143,9 +150,10 @@ class Render:
 
 			self.createListing(namespace, memberList)
 			for member in memberList:
-				self.fileHandle.write("------\n")
-				self.createMember(namespace, member, "### ")
-				#print(" - %s" % (member.printDefinition()))
-				#print(" - %s" % (member.getInheritance()))
+				if member.getDefinition()["printDetails"]:
+					self.fileHandle.write("------\n")
+					self.createMember(namespace, member, "### ")
+					#print(" - %s" % (member.printDefinition()))
+					#print(" - %s" % (member.getInheritance()))
 
 			self.closeFile()

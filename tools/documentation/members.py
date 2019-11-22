@@ -9,8 +9,6 @@ Members are contained with identifiers. An identifier is the C++ namespace used 
 Note, part of the identifier can be the name of a member, if this latter is a container. For example,
 if Foo is a class present in the namespace bzd::impl, then members of Foo will have the identifer "bzd::impl::Foo"
 TODO: Include template also in the identifier
-
-
 """
 
 definition_ = {
@@ -21,6 +19,7 @@ definition_ = {
 		"args": False,
 		"constructor": True,
 		"defaultVisibility": "public",
+		"aliasType": False,
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -28,7 +27,8 @@ definition_ = {
 			"type": "struct",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": True
 	},
 	"class": {
 		"name": "Class",
@@ -37,6 +37,7 @@ definition_ = {
 		"args": False,
 		"constructor": True,
 		"defaultVisibility": "private",
+		"aliasType": False,
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -44,7 +45,8 @@ definition_ = {
 			"type": "class",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": True
 	},
 	"typedef": {
 		"name": "Typedef",
@@ -53,6 +55,7 @@ definition_ = {
 		"args": False,
 		"constructor": False,
 		"defaultVisibility": "private",
+		"aliasType": True,
 		"format": {
 			"template": "{template}",
 			"pre": "",
@@ -60,7 +63,8 @@ definition_ = {
 			"type": "typedef",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": True
 	},
 	"variable": {
 		"name": "Variable",
@@ -69,6 +73,7 @@ definition_ = {
 		"args": False,
 		"constructor": False,
 		"defaultVisibility": "private",
+		"aliasType": False,
 		"format": {
 			"template": "{template}",
 			"pre": "{static}",
@@ -76,7 +81,8 @@ definition_ = {
 			"type": "{const} {type}",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": True
 	},
 	"function": {
 		"name": "Function",
@@ -85,6 +91,7 @@ definition_ = {
 		"args": True,
 		"constructor": False,
 		"defaultVisibility": "private",
+		"aliasType": False,
 		"format": {
 			"template": "{template}",
 			"pre": "{static} {virtual} {explicit}",
@@ -92,7 +99,8 @@ definition_ = {
 			"type": "{type}",
 			"name": "{name}({args}) {const}"
 		},
-		"identifier": "{name}{template}"
+		"identifier": "{name}{template}",
+		"printDetails": True
 	},
 	"namespace": {
 		"name": "Namespace",
@@ -101,6 +109,7 @@ definition_ = {
 		"args": False,
 		"constructor": False,
 		"defaultVisibility": "public",
+		"aliasType": False,
 		"format": {
 			"template": "",
 			"pre": "",
@@ -108,13 +117,17 @@ definition_ = {
 			"type": "",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": False
 	},
 	"default": {
 		"name": "",
 		"sort": 6,
 		"container": False,
 		"args": False,
+		"constructor": False,
+		"defaultVisibility": "public",
+		"aliasType": False,
 		"format": {
 			"template": "",
 			"pre": "",
@@ -122,7 +135,8 @@ definition_ = {
 			"type": "",
 			"name": "{name}"
 		},
-		"identifier": "{name}"
+		"identifier": "{name}",
+		"printDetails": True
 	}
 }
 
@@ -148,6 +162,13 @@ class Member:
 	def getProvenance(self):
 		return self.data.get("provenance", None)
 
+	def setAlias(self, identifier):
+		self.data["alias"] = self.getAlias()
+		self.data["alias"].append(identifier)
+
+	def getAlias(self):
+		return self.data.get("alias", [])
+
 	def getDefinition(self):
 		return getDefinition(self.data.get("kind", None))
 
@@ -159,6 +180,9 @@ class Member:
 
 	def getType(self):
 		return self.data.get("type", "")
+
+	def getTypeRef(self):
+		return self.data.get("typeref", [])
 
 	def getKind(self):
 		return self.data.get("kind", "")
@@ -291,11 +315,38 @@ class Members:
 		for identifier, memberList in data.items():
 			self.data[identifier] = MemberGroup(memberList, identifier)
 
+		additionalContainerMemberGroupList = []
+
 		# Set metadata of specific containers
 		for identifier, memberGroup in self.data.items():
 			for member in memberGroup.get():
+				# List all container to create empty containers if they do not exists
 				if member.isContainer():
-					containerMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]))
+					identiferGroup = self.makeNamespace(identifier, member.getName())
+					if not self.getMemberGroup(identiferGroup):
+						additionalContainerMemberGroupList.append(identiferGroup)
+
+		# Add empty containers
+		for identiferGroup in additionalContainerMemberGroupList:
+			self.data[identiferGroup] = MemberGroup([], identiferGroup)
+
+		# Set metadata of specific containers
+		for identifier, memberGroup in self.data.items():
+			for member in memberGroup.get():
+
+				# Identify and set alias if any. For now an alias type is a type
+				# with more than one typeRef. Then its alias is the first one.
+				if member.getDefinition()["aliasType"] and len(member.getTypeRef()):
+					firstAlias = member.getTypeRef()[0]
+					aliasIdentifier = firstAlias.get("id", None)
+					# Only if a group exists
+					if self.getMemberGroup(aliasIdentifier):
+						member.setAlias(aliasIdentifier)
+
+				if member.isContainer():
+					identiferGroup = self.makeNamespace(identifier, member.getName())
+					containerMemberGroup = self.getMemberGroup(identiferGroup)
+
 					# Set the parent member if any
 					if containerMemberGroup:
 						containerMemberGroup.setParent(member)
@@ -312,9 +363,10 @@ class Members:
 				#print(identifier, member.getName())
 				#exit()
 
-			print(memberGroup.identifier, memberGroup.getIdentifierName())
+	def makeNamespace(self, *argv):
+		return "::".join([n for n in argv if n.strip()])
 
-	def getMemberGroup(self, identifier, createIfNotExists = False):
+	def getMemberGroup(self, identifier):
 		if identifier in self.data:
 			return self.data[identifier]
 		return None

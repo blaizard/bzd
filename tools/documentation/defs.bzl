@@ -33,14 +33,11 @@ def _impl(ctx):
     )
 
     # Generate the documentation from the XML output
-    #output = ctx.actions.declare_directory(ctx.attr.name + ".documentation")
-
     script = ctx.actions.declare_file("documentation-%s-generator" % ctx.label.name)
     script_content = _script_template.format(
         script = "tools/documentation/parsedocumentation.py", #ctx.executable._generator.short_path,
         doxygen = doxygen_output.short_path,
     )
-    print(script_content)
     ctx.actions.write(script, script_content, is_executable = True)
 
     runfiles = ctx.runfiles(files = [doxygen_output], collect_data = True)
@@ -54,10 +51,6 @@ cc_documentation = rule(
             allow_files = True,
             mandatory = True,
             doc = "Input C++ source/header files.",
-        ),
-        "output": attr.string(
-            mandatory = True,
-            doc = "Output directory where the documentation will be generated.",
         ),
         "data": attr.label_list(
             allow_files = True,

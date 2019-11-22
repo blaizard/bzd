@@ -6,7 +6,6 @@ cc_documentation(
         "//include:bzd_files",
     ],
     tags = ["manual"],
-    output = "dsd",
     data = glob([
         "*.py",
     ]),
