@@ -9,9 +9,9 @@
 ### Function
 ||||
 |---:|:---|:---|
-||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](.)||
-|T &|[`getInstance()`](.)||
-|void|[`operator=(SingletonThreadLocalImpl const &)`](.)||
+||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
+|T &|[`getInstance()`](./index.md)||
+|void|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
 ------
 ### ` SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`
 

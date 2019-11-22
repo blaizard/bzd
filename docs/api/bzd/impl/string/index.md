@@ -10,21 +10,21 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`String(const SizeType capacity, Args &&... args)`](.)||
-|constexpr SizeType|[`append(const StringView & str)`](.)||
-|constexpr SizeType|[`append(const T c)`](.)||
-|constexpr SizeType|[`append(const T * data, const SizeType n)`](.)||
-|constexpr SizeType|[`append(const SizeType n, const T c)`](.)||
-|constexpr SizeType|[`assign(const U & data)`](.)||
-|constexpr SizeType|[`capacity() const`](.)||
-|constexpr void|[`clear()`](.)||
-|constexpr void|[`resize(const SizeType n)`](.)||
-|constexpr String< T, Impl > &|[`operator+=(const U & data)`](.)||
-|constexpr String< T, Impl > &|[`operator=(const U & data)`](.)||
+|constexpr|[`String(const SizeType capacity, Args &&... args)`](./index.md)||
+|constexpr SizeType|[`append(const StringView & str)`](./index.md)||
+|constexpr SizeType|[`append(const T c)`](./index.md)||
+|constexpr SizeType|[`append(const T * data, const SizeType n)`](./index.md)||
+|constexpr SizeType|[`append(const SizeType n, const T c)`](./index.md)||
+|constexpr SizeType|[`assign(const U & data)`](./index.md)||
+|constexpr SizeType|[`capacity() const`](./index.md)||
+|constexpr void|[`clear()`](./index.md)||
+|constexpr void|[`resize(const SizeType n)`](./index.md)||
+|constexpr String< T, Impl > &|[`operator+=(const U & data)`](./index.md)||
+|constexpr String< T, Impl > &|[`operator=(const U & data)`](./index.md)||
 ### Variable
 ||||
 |---:|:---|:---|
-|const SizeType|[`capacity_`](.)||
+|const SizeType|[`capacity_`](./index.md)||
 ------
 ### `template<class... Args> explicit constexpr String(const SizeType capacity, Args &&... args)`
 

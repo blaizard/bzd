@@ -5,10 +5,10 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](.)||
-|void|[`addSubstring(const bzd::StringView & str)`](.)||
-|void|[`addMetadata(const Metadata & metadata)`](.)||
-|void|[`onError(const bzd::StringView & message) const`](.)||
+|constexpr|[`PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
+|void|[`addSubstring(const bzd::StringView & str)`](./index.md)||
+|void|[`addMetadata(const Metadata & metadata)`](./index.md)||
+|void|[`onError(const bzd::StringView & message) const`](./index.md)||
 ------
 ### `constexpr PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
 

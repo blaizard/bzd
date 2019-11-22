@@ -3,7 +3,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-||[`Overload(F0 && f0, Frest &&... rest)`](.)||
+||[`Overload(F0 && f0, Frest &&... rest)`](./index.md)||
 ------
 ### ` Overload(F0 && f0, Frest &&... rest)`
 

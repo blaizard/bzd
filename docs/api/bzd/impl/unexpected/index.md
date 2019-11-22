@@ -9,7 +9,7 @@ Internal class used to create an unexpected object type.
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`Unexpected(const E & error)`](.)||
+|constexpr|[`Unexpected(const E & error)`](./index.md)||
 ------
 ### `constexpr Unexpected(const E & error)`
 

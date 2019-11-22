@@ -5,12 +5,12 @@
 ### Function
 ||||
 |---:|:---|:---|
-|void|[`addTask(bzd::interface::Task & task)`](.)||
-|void|[`start()`](.)||
-|void|[`yield()`](.)||
-||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](.)||
-|T &|[`getInstance()`](.)||
-|void|[`operator=(SingletonThreadLocalImpl const &)`](.)||
+|void|[`addTask(bzd::interface::Task & task)`](./index.md)||
+|void|[`start()`](./index.md)||
+|void|[`yield()`](./index.md)||
+||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
+|T &|[`getInstance()`](./index.md)||
+|void|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
 ------
 ### `void addTask(bzd::interface::Task & task)`
 Add a new task to the scheduler

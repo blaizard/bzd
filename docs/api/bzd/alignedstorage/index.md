@@ -10,7 +10,7 @@
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`type`](./type/index.md)||
+|struct|[`type`](type/index.md)||
 ------
 ### `struct type`
 

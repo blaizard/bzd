@@ -9,7 +9,7 @@
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`type`](.)|alias of [`bzd::typeTraits::removeVolatile`](../removevolatile/index.md)|
+|typedef|[`type`](./index.md)|alias of [`bzd::typeTraits::removeVolatile`](../removevolatile/index.md)|
 ------
 ### `typedef type`
 

@@ -5,20 +5,20 @@
 ### Namespace
 ||||
 |---:|:---|:---|
-||[`impl`](./impl/index.md)||
+||[`impl`](impl/index.md)||
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`TypeList`](./typelist/index.md)||
-|struct|[`Type`](./type/index.md)||
+|struct|[`TypeList`](typelist/index.md)||
+|struct|[`Type`](type/index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`ChooseNth`](.)|alias of [`bzd::meta::impl::ChooseNth`](impl/choosenth/index.md)|
-|typedef|[`Contains`](.)|alias of [`bzd::meta::impl::Contains`](impl/contains/index.md)|
-|typedef|[`Find`](.)|alias of [`bzd::meta::impl::Find`](impl/find/index.md)|
-|typedef|[`Union`](.)||
-|typedef|[`UnionConstexpr`](.)||
+|typedef|[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](impl/choosenth/index.md)|
+|typedef|[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](impl/contains/index.md)|
+|typedef|[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](impl/find/index.md)|
+|typedef|[`Union`](./index.md)||
+|typedef|[`UnionConstexpr`](./index.md)||
 ------
 ### `template<class... Ts> struct TypeList`
 

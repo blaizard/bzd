@@ -9,7 +9,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-|SizeType|[`read(Span< T > & data)`](.)||
+|SizeType|[`read(Span< T > & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 

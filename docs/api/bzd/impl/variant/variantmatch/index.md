@@ -3,7 +3,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-|void|[`call(const Self & self, const V & visitor)`](.)||
+|void|[`call(const Self & self, const V & visitor)`](./index.md)||
 ------
 ### `template<class V> static void call(const Self & self, const V & visitor)`
 

@@ -322,7 +322,7 @@ class Members:
 			for member in memberGroup.get():
 				# List all container to create empty containers if they do not exists
 				if member.isContainer():
-					identiferGroup = self.makeNamespace(identifier, member.getName())
+					identiferGroup = self.makeIdentifier(identifier, member.getName())
 					if not self.getMemberGroup(identiferGroup):
 						additionalContainerMemberGroupList.append(identiferGroup)
 
@@ -344,7 +344,7 @@ class Members:
 						member.setAlias(aliasIdentifier)
 
 				if member.isContainer():
-					identiferGroup = self.makeNamespace(identifier, member.getName())
+					identiferGroup = self.makeIdentifier(identifier, member.getName())
 					containerMemberGroup = self.getMemberGroup(identiferGroup)
 
 					# Set the parent member if any
@@ -363,7 +363,8 @@ class Members:
 				#print(identifier, member.getName())
 				#exit()
 
-	def makeNamespace(self, *argv):
+	@staticmethod
+	def makeIdentifier(*argv):
 		return "::".join([n for n in argv if n.strip()])
 
 	def getMemberGroup(self, identifier):

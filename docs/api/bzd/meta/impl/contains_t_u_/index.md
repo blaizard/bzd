@@ -10,7 +10,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|constexpr const bool|[`value`](.)||
+|constexpr const bool|[`value`](./index.md)||
 ------
 ### `static constexpr const bool value`
 

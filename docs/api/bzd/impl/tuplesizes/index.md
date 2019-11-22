@@ -9,7 +9,7 @@
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`type`](.)||
+|typedef|[`type`](./index.md)||
 ------
 ### `typedef type`
 *From bzd::meta::Type*

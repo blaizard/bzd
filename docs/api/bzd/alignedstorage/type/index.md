@@ -5,7 +5,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|unsigned char|[`data`](.)||
+|unsigned char|[`data`](./index.md)||
 ------
 ### `unsigned char data`
 

@@ -9,8 +9,8 @@
 ### Function
 ||||
 |---:|:---|:---|
-|SizeType|[`read(Span< T > & data)`](.)||
-|SizeType|[`write(const Span< const T > & data)`](.)||
+|SizeType|[`read(Span< T > & data)`](./index.md)||
+|SizeType|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 *From bzd::impl::IStream*

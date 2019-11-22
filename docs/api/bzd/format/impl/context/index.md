@@ -9,7 +9,7 @@ Context used for the current parsing operation. Different context are used to ch
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr void|[`assertTrue(const bool condition, const bzd::StringView & message) const`](.)||
+|constexpr void|[`assertTrue(const bool condition, const bzd::StringView & message) const`](./index.md)||
 ------
 ### `constexpr void assertTrue(const bool condition, const bzd::StringView & message) const`
 

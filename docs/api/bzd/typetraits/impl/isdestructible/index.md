@@ -5,8 +5,8 @@
 ### Function
 ||||
 |---:|:---|:---|
-|char|[`test(int)`](.)||
-|long int|[`test(...)`](.)||
+|char|[`test(int)`](./index.md)||
+|long int|[`test(...)`](./index.md)||
 ------
 ### `template<class T, class> static char test(int)`
 

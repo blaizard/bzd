@@ -10,8 +10,8 @@
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`type`](.)||
-|typedef|[`type`](.)||
+|typedef|[`type`](./index.md)||
+|typedef|[`type`](./index.md)||
 ------
 ### `typedef type`
 *From bzd::impl::TupleSizes*

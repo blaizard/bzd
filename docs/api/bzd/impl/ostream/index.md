@@ -9,7 +9,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-|SizeType|[`write(const Span< const T > & data)`](.)||
+|SizeType|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `virtual SizeType write(const Span< const T > & data)`
 

@@ -1,4 +1,4 @@
 ### Namespace
 ||||
 |---:|:---|:---|
-||[`bzd`](./bzd/index.md)||
+||[`bzd`](bzd/index.md)||

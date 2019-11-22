@@ -5,13 +5,13 @@
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`ChooseNth< 0, H, Ts... >`](./choosenth_0_h_ts_/index.md)||
-|struct|[`ChooseNth`](./choosenth/index.md)||
-|struct|[`Find`](./find/index.md)||
-|struct|[`ChooseNth< N, H, Ts... >`](./choosenth_n_h_ts_/index.md)||
-|struct|[`Find< N, T, U >`](./find_n_t_u_/index.md)||
-|struct|[`Contains< T, U >`](./contains_t_u_/index.md)||
-|struct|[`Contains`](./contains/index.md)||
+|struct|[`ChooseNth< 0, H, Ts... >`](choosenth_0_h_ts_/index.md)||
+|struct|[`ChooseNth`](choosenth/index.md)||
+|struct|[`Find`](find/index.md)||
+|struct|[`ChooseNth< N, H, Ts... >`](choosenth_n_h_ts_/index.md)||
+|struct|[`Find< N, T, U >`](find_n_t_u_/index.md)||
+|struct|[`Contains< T, U >`](contains_t_u_/index.md)||
+|struct|[`Contains`](contains/index.md)||
 ------
 ### `template<class H, class... Ts> struct ChooseNth< 0, H, Ts... >`
 

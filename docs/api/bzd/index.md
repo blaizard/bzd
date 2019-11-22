@@ -5,69 +5,69 @@
 ### Namespace
 ||||
 |---:|:---|:---|
-||[`format`](./format/index.md)||
-||[`impl`](./impl/index.md)||
-||[`typeTraits`](./typetraits/index.md)||
-||[`meta`](./meta/index.md)||
-||[`iterator`](./iterator/index.md)||
-||[`interface`](./interface/index.md)||
-||[`log`](./log/index.md)||
-||[`assert`](./assert/index.md)||
+||[`format`](format/index.md)||
+||[`impl`](impl/index.md)||
+||[`typeTraits`](typetraits/index.md)||
+||[`meta`](meta/index.md)||
+||[`iterator`](iterator/index.md)||
+||[`interface`](interface/index.md)||
+||[`log`](log/index.md)||
+||[`assert`](assert/index.md)||
 ### Class
 ||||
 |---:|:---|:---|
-|class|[`Task`](./task/index.md)||
-|class|[`SingletonThreadLocalImpl`](./singletonthreadlocalimpl/index.md)||
-|class|[`Scheduler`](./scheduler/index.md)||
-|class|[`Variant`](./variant/index.md)||
-|class|[`Array`](./array/index.md)|A container that encapsulates fixed size arrays.|
-|class|[`StringStream`](./stringstream/index.md)||
-|class|[`Tuple`](./tuple/index.md)||
-|class|[`Pool`](./pool/index.md)||
-|class|[`Span`](./span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
-|class|[`SingletonImpl`](./singletonimpl/index.md)||
-|class|[`String`](./string/index.md)||
-|class|[`VariantConstexpr`](./variantconstexpr/index.md)||
-|class|[`Stack`](./stack/index.md)||
-|class|[`Vector`](./vector/index.md)||
+|class|[`Task`](task/index.md)||
+|class|[`SingletonThreadLocalImpl`](singletonthreadlocalimpl/index.md)||
+|class|[`Scheduler`](scheduler/index.md)||
+|class|[`Variant`](variant/index.md)||
+|class|[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
+|class|[`StringStream`](stringstream/index.md)||
+|class|[`Tuple`](tuple/index.md)||
+|class|[`Pool`](pool/index.md)||
+|class|[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
+|class|[`SingletonImpl`](singletonimpl/index.md)||
+|class|[`String`](string/index.md)||
+|class|[`VariantConstexpr`](variantconstexpr/index.md)||
+|class|[`Stack`](stack/index.md)||
+|class|[`Vector`](vector/index.md)||
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`resultOf< T(&)(Args &&...)>`](./resultof_t_args_/index.md)||
-|struct|[`resultOf`](./resultof/index.md)||
-|struct|[`decay`](./decay/index.md)||
-|struct|[`alignedStorage`](./alignedstorage/index.md)||
+|struct|[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
+|struct|[`resultOf`](resultof/index.md)||
+|struct|[`decay`](decay/index.md)||
+|struct|[`alignedStorage`](alignedstorage/index.md)||
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr impl::Unexpected< typename bzd::decay< E >::type >|[`makeUnexpected(E && e)`](.)||
-|void|[`yield()`](.)||
-|void|[`panic()`](.)||
-|bzd::OStream &|[`getOut()`](.)||
-|constexpr IntPtrType|[`offsetOf(const M T::* member)`](.)||
-|constexpr T *|[`containerOf(M * ptr, const M T::* member)`](.)||
-|constexpr void|[`memcpy(char * dest, const char * src, const SizeType size)`](.)||
-|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type & t)`](.)||
-|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type && t)`](.)||
-|bzd::typeTraits::removeReference< T >::type &&|[`move(T && arg)`](.)||
-|constexpr void|[`swap(T & t1, T & t2)`](.)||
-|constexpr T|[`min(const T & a, const T & b)`](.)||
-|constexpr T|[`max(const T & a, const T & b)`](.)||
+|constexpr impl::Unexpected< typename bzd::decay< E >::type >|[`makeUnexpected(E && e)`](./index.md)||
+|void|[`yield()`](./index.md)||
+|void|[`panic()`](./index.md)||
+|bzd::OStream &|[`getOut()`](./index.md)||
+|constexpr IntPtrType|[`offsetOf(const M T::* member)`](./index.md)||
+|constexpr T *|[`containerOf(M * ptr, const M T::* member)`](./index.md)||
+|constexpr void|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
+|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
+|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
+|bzd::typeTraits::removeReference< T >::type &&|[`move(T && arg)`](./index.md)||
+|constexpr void|[`swap(T & t1, T & t2)`](./index.md)||
+|constexpr T|[`min(const T & a, const T & b)`](./index.md)||
+|constexpr T|[`max(const T & a, const T & b)`](./index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`Expected`](.)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
-|typedef|[`OStream`](.)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
-|typedef|[`IStream`](.)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
-|typedef|[`IOStream`](.)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
-|typedef|[`StringView`](.)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
-|typedef|[`PtrType`](.)||
-|typedef|[`PtrDiffType`](.)||
-|typedef|[`CtxPtrType`](.)||
-|typedef|[`IntPtrType`](.)||
-|typedef|[`FctPtrType`](.)||
-|typedef|[`ByteType`](.)||
-|typedef|[`SizeType`](.)||
+|typedef|[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
+|typedef|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
+|typedef|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
+|typedef|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
+|typedef|[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
+|typedef|[`PtrType`](./index.md)||
+|typedef|[`PtrDiffType`](./index.md)||
+|typedef|[`CtxPtrType`](./index.md)||
+|typedef|[`IntPtrType`](./index.md)||
+|typedef|[`FctPtrType`](./index.md)||
+|typedef|[`ByteType`](./index.md)||
+|typedef|[`SizeType`](./index.md)||
 ------
 ### `template<class T, class... Args> class Task`
 

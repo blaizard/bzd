@@ -3,13 +3,13 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`ValueWrapper(Value && value)`](.)||
-|constexpr Value &|[`get()`](.)||
-|constexpr const Value &|[`get() const`](.)||
+|constexpr|[`ValueWrapper(Value && value)`](./index.md)||
+|constexpr Value &|[`get()`](./index.md)||
+|constexpr const Value &|[`get() const`](./index.md)||
 ### Variable
 ||||
 |---:|:---|:---|
-|Value|[`value_`](.)||
+|Value|[`value_`](./index.md)||
 ------
 ### `constexpr ValueWrapper(Value && value)`
 

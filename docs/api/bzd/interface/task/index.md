@@ -5,10 +5,10 @@
 ### Function
 ||||
 |---:|:---|:---|
-||[`Task(CtxPtrType context, const FctPtrType fct)`](.)||
-|void|[`bind(interface::Stack & stack)`](.)||
-|void|[`start(void ** pointer)`](.)||
-|void|[`yield(Task & nextTask)`](.)||
+||[`Task(CtxPtrType context, const FctPtrType fct)`](./index.md)||
+|void|[`bind(interface::Stack & stack)`](./index.md)||
+|void|[`start(void ** pointer)`](./index.md)||
+|void|[`yield(Task & nextTask)`](./index.md)||
 ------
 ### ` Task(CtxPtrType context, const FctPtrType fct)`
 
