@@ -8,10 +8,144 @@ import pprint
 import glob
 import argparse
 
-from render import Render
 from members import Members, Member
 
 kindToKeep = ["struct", "class", "variable", "function", "typedef", "namespace"]
+
+
+def commentParser(element, data = {}):
+
+	textList = []
+
+	for para in element.findall("para"):
+		parameterlistList = para.findall("parameterlist")
+		programlistingList = para.findall("programlisting")
+		if len(parameterlistList):
+			for parameterlist in parameterlistList:
+				kind = parameterlist.get("kind")
+				paramList = []
+				for parameteritem in parameterlist.findall("parameteritem"):
+					param = {}
+					if parameteritem.find("parameternamelist") is not None:
+						param["name"] = ", ".join(text for text in parameteritem.find("parameternamelist").itertext() if text.strip())
+					if parameteritem.find("parameterdescription") is not None:
+						param["description"] = commentParser(parameteritem.find("parameterdescription"))
+					paramList.append(param)
+				data["__info__"] = data["__info__"] if "__info__" in data else {}
+				data["__info__"]["description.%s" % (kind)] = paramList
+		elif len(programlistingList):
+			for programlisting in programlistingList:
+				codeBlock = "<code>";
+				for codeline in programlisting.findall("codeline"):
+					codeBlock += " ".join(text for text in codeline.itertext() if text.strip()) + "\n"
+				codeBlock += "</code>"
+				textList.append(codeBlock)
+		else:
+			textList.append("".join(text for text in para.itertext() if text.strip()))
+
+	return "\n".join(text for text in textList if text.strip())
+
+commonAttrs = {
+	"id": {},
+	"kind": {"values": ["struct", "class", "variable", "function", "typedef", "namespace"], "others": "ignore"},
+	"prot": { "values": ["private", "public", "protected"], "key": "visibility" },
+	"static": { "values": {"no": False, "yes": True} },
+	"mutable": { "values": {"no": False, "yes": True} },
+	"const": { "values": {"no": False, "yes": True} },
+	"explicit": { "values": {"no": False, "yes": True} },
+	# Seems to be wrong most of the time
+	#"inline": { "values": {"no": False, "yes": True} },
+	"virt": { "key": "virtual", "values": {"non-virtual": False, "virtual": True, "pure-virtual": True} }
+}
+
+name = {
+	"__content__": { "key": "name" }
+}
+
+param = {
+	"__type__": ["list"],
+	"type": { "__content__": { "key": "type" } },
+	"declname": { "__content__": { "key": "name" } }
+}
+
+args = {
+	"__type__": ["args", "list"],
+	"type": { "__content__": { "key": "type" } },
+	"declname": { "__content__": { "key": "name" } }
+}
+
+templateparamlist = {
+	"__type__": ["template"],
+	"param": param
+}
+
+node = {
+	"__type__": ["dict"],
+	"__attrs__": {"id": { "key": "__key__" }},
+	"label": { "__content__": { "key": "name" } },
+	"link": { "__attrs__": { "refid": { "key": "link" } } },
+	"childnode": { 
+		"__type__": ["children", "list"],
+		"__attrs__": {
+		"refid": { "key": "id" },
+		"relation": { "key": "visibility", "values": { "public-inheritance": "public", "private-inheritance": "private", "protected-inheritance": "protected" }, "others": "ignore" } } }
+}
+
+briefdescription = {
+	"__content__": { "key": "descriptionBrief" }
+}
+
+detaileddescription = {
+	"__content__": { "key": "description", "parser": commentParser }
+}
+
+inheritancegraph = {
+	"__type__": ["inheritance"],
+	"node": node
+}
+
+memberdef = {
+	"__type__": ["member"],
+	"__attrs__": commonAttrs,
+	"name": name,
+	"type": {
+		"__content__": { "key": "type" },
+		"ref": {
+			"__type__": ["typeref", "list"],
+			"__attrs__": {
+				"refid": { "key": "link" }
+			},
+		}
+	},
+	"templateparamlist": templateparamlist,
+	"inheritancegraph": inheritancegraph,
+	"briefdescription": briefdescription,
+	"detaileddescription": detaileddescription,
+	"param": args
+}
+
+sectiondef = {
+	"memberdef": memberdef
+}
+
+compoundname = {
+	"__content__": { "key": "name" }
+}
+
+compounddef = {
+	"__type__": ["container"],
+	"__attrs__": commonAttrs,
+	"compoundname": compoundname,
+	"sectiondef": sectiondef,
+	"templateparamlist": templateparamlist,
+	"inheritancegraph": inheritancegraph,
+	"briefdescription": briefdescription,
+	"detaileddescription": detaileddescription
+}
+
+dictionaryRoot = {
+	"compounddef": compounddef
+}
 
 class DoxygenParser:
 
@@ -264,18 +398,18 @@ class DoxygenParser:
 	"""
 	Parse a root XML element
 	"""
-	def parse(self, root, dictionary):
+	def parse(self, root, dictionary = dictionaryRoot):
 		self.parseSubElements(root, dictionary, {})
 
 	"""
 	Build the database and group data together
 	"""
-	def getMembers(self):
+	def getMembersData(self):
 		groups = {}
 		self.makeGroups(groups, self.data)
 		self.mergeDescription(groups)
 		self.resolveLinks(groups)
-		return Members(groups)
+		return groups
 
 	def parseSubElements(self, root, dictionary, data):
 
@@ -326,182 +460,3 @@ class DoxygenParser:
 		except Exception as e:
 			print("current data: ", data, root)
 			raise e
-
-def commentParser(element, data = {}):
-
-	textList = []
-
-	for para in element.findall("para"):
-		parameterlistList = para.findall("parameterlist")
-		programlistingList = para.findall("programlisting")
-		if len(parameterlistList):
-			for parameterlist in parameterlistList:
-				kind = parameterlist.get("kind")
-				paramList = []
-				for parameteritem in parameterlist.findall("parameteritem"):
-					param = {}
-					if parameteritem.find("parameternamelist") is not None:
-						param["name"] = ", ".join(text for text in parameteritem.find("parameternamelist").itertext() if text.strip())
-					if parameteritem.find("parameterdescription") is not None:
-						param["description"] = commentParser(parameteritem.find("parameterdescription"))
-					paramList.append(param)
-				data["__info__"] = data["__info__"] if "__info__" in data else {}
-				data["__info__"]["description.%s" % (kind)] = paramList
-		elif len(programlistingList):
-			for programlisting in programlistingList:
-				codeBlock = "<code>";
-				for codeline in programlisting.findall("codeline"):
-					codeBlock += " ".join(text for text in codeline.itertext() if text.strip()) + "\n"
-				codeBlock += "</code>"
-				textList.append(codeBlock)
-		else:
-			textList.append("".join(text for text in para.itertext() if text.strip()))
-
-	return "\n".join(text for text in textList if text.strip())
-
-commonAttrs = {
-	"id": {},
-	"kind": {"values": ["struct", "class", "variable", "function", "typedef", "namespace"], "others": "ignore"},
-	"prot": { "values": ["private", "public", "protected"], "key": "visibility" },
-	"static": { "values": {"no": False, "yes": True} },
-	"mutable": { "values": {"no": False, "yes": True} },
-	"const": { "values": {"no": False, "yes": True} },
-	"explicit": { "values": {"no": False, "yes": True} },
-	# Seems to be wrong most of the time
-	#"inline": { "values": {"no": False, "yes": True} },
-	"virt": { "key": "virtual", "values": {"non-virtual": False, "virtual": True, "pure-virtual": True} }
-}
-
-name = {
-	"__content__": { "key": "name" }
-}
-
-param = {
-	"__type__": ["list"],
-	"type": { "__content__": { "key": "type" } },
-	"declname": { "__content__": { "key": "name" } }
-}
-
-args = {
-	"__type__": ["args", "list"],
-	"type": { "__content__": { "key": "type" } },
-	"declname": { "__content__": { "key": "name" } }
-}
-
-templateparamlist = {
-	"__type__": ["template"],
-	"param": param
-}
-
-node = {
-	"__type__": ["dict"],
-	"__attrs__": {"id": { "key": "__key__" }},
-	"label": { "__content__": { "key": "name" } },
-	"link": { "__attrs__": { "refid": { "key": "link" } } },
-	"childnode": { 
-		"__type__": ["children", "list"],
-		"__attrs__": {
-		"refid": { "key": "id" },
-		"relation": { "key": "visibility", "values": { "public-inheritance": "public", "private-inheritance": "private", "protected-inheritance": "protected" }, "others": "ignore" } } }
-}
-
-briefdescription = {
-	"__content__": { "key": "descriptionBrief" }
-}
-
-detaileddescription = {
-	"__content__": { "key": "description", "parser": commentParser }
-}
-
-inheritancegraph = {
-	"__type__": ["inheritance"],
-	"node": node
-}
-
-memberdef = {
-	"__type__": ["member"],
-	"__attrs__": commonAttrs,
-	"name": name,
-	"type": {
-		"__content__": { "key": "type" },
-		"ref": {
-			"__type__": ["typeref", "list"],
-			"__attrs__": {
-				"refid": { "key": "link" }
-			},
-		}
-	},
-	"templateparamlist": templateparamlist,
-	"inheritancegraph": inheritancegraph,
-	"briefdescription": briefdescription,
-	"detaileddescription": detaileddescription,
-	"param": args
-}
-
-sectiondef = {
-	"memberdef": memberdef
-}
-
-compoundname = {
-	"__content__": { "key": "name" }
-}
-
-compounddef = {
-	"__type__": ["container"],
-	"__attrs__": commonAttrs,
-	"compoundname": compoundname,
-	"sectiondef": sectiondef,
-	"templateparamlist": templateparamlist,
-	"inheritancegraph": inheritancegraph,
-	"briefdescription": briefdescription,
-	"detaileddescription": detaileddescription
-}
-
-dictionary = {
-	"compounddef": compounddef
-}
-
-
-def process(args):
-
-	parser = DoxygenParser()
-
-	fileList = glob.glob("{}/**/*".format(args.doxygen))
-	for fileName in fileList:
-		if fileName.lower().endswith(".xml"):
-			try:
-				root = ET.parse(fileName).getroot()
-				parser.parse(root, dictionary)
-			except Exception as e:
-				print("file: %s" % (fileName))
-				raise e
-
-	members = parser.getMembers()
-
-	render = Render(args.output)
-	render.process(members)
-
-if __name__== "__main__":
-
-	"""
-		<memberdef kind="typedef" id="expected_8h_1a33b49c1f07517abe781b0f3db7c6730b" prot="public" static="no">
-			<templateparamlist>
-			<param>
-				<type>class T</type>
-			</param>
-			<param>
-				<type>class E</type>
-			</param>
-			</templateparamlist>
-			<type><ref refid="classbzd_1_1impl_1_1Expected" kindref="compound">impl::Expected</ref>&lt; T, E &gt;</type>
-			<definition>using bzd::Expected = typedef impl::Expected&lt;T, E&gt;</definition>
-			<argsstring></argsstring>
-			<name>Expected</name>
-	"""
-	parser = argparse.ArgumentParser(description="Generate documentation from Doxygen XML output")
-	parser.add_argument('--doxygen', dest="doxygen", default="docs/xml", help="Doxygen XML output directory")
-	parser.add_argument("-o", "--output", dest="output", default="docs/md", help="Output of the generate documentation")
-
-	args = parser.parse_args()
-
-	process(args)

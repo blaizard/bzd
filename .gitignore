@@ -11,5 +11,3 @@ bazel-*
 
 # Editors
 .vscode/
-
-docs/

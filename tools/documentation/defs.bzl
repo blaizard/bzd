@@ -35,7 +35,7 @@ def _impl(ctx):
     # Generate the documentation from the XML output
     script = ctx.actions.declare_file("documentation-%s-generator" % ctx.label.name)
     script_content = _script_template.format(
-        script = "tools/documentation/parsedocumentation.py", #ctx.executable._generator.short_path,
+        script = "tools/documentation/documentation.py", #ctx.executable._generator.short_path,
         doxygen = doxygen_output.short_path,
     )
     ctx.actions.write(script, script_content, is_executable = True)

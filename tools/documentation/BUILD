@@ -7,14 +7,14 @@ cc_documentation(
     ],
     tags = ["manual"],
     data = glob([
-        "*.py",
+        "**/*.py",
     ]),
 )
 
 py_binary(
     name = "generator",
-    main = "parsedocumentation.py",
+    main = "documentation.py",
     srcs = glob([
-        "*.py",
+        "**/*.py",
     ]),
 )
