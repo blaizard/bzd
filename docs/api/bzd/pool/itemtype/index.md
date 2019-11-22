@@ -5,8 +5,8 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|T|[`container_`](.)||
-|ItemType *|[`next_`](.)||
+|T|[`container_`](./index.md)||
+|ItemType *|[`next_`](./index.md)||
 ------
 ### `T container_`
 

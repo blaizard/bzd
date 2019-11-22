@@ -9,9 +9,9 @@ Singleton class pattern
 ### Function
 ||||
 |---:|:---|:---|
-||[`SingletonImpl(SingletonImpl const &)`](.)||
-|T &|[`getInstance()`](.)||
-|void|[`operator=(SingletonImpl const &)`](.)||
+||[`SingletonImpl(SingletonImpl const &)`](./index.md)||
+|T &|[`getInstance()`](./index.md)||
+|void|[`operator=(SingletonImpl const &)`](./index.md)||
 ------
 ### ` SingletonImpl(SingletonImpl const &)`
 

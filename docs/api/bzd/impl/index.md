@@ -5,47 +5,47 @@
 ### Class
 ||||
 |---:|:---|:---|
-|class|[`IOStream`](./iostream/index.md)||
-|class|[`Variant`](./variant/index.md)||
-|class|[`ConstexprStringView`](./constexprstringview/index.md)||
-|class|[`Vector`](./vector/index.md)||
-|class|[`Expected`](./expected/index.md)||
-|class|[`IStream`](./istream/index.md)||
-|class|[`Expected< void, E >`](./expected_void_e_/index.md)||
-|class|[`TupleImpl`](./tupleimpl/index.md)||
-|class|[`StringView`](./stringview/index.md)||
-|class|[`Unexpected`](./unexpected/index.md)||
-|class|[`String`](./string/index.md)||
-|class|[`TupleElem`](./tupleelem/index.md)||
-|class|[`OStream`](./ostream/index.md)||
-|class|[`TupleImpl< TupleSizes< N... >, T... >`](./tupleimpl_tuplesizes_n_t_/index.md)||
-|class|[`StringStream`](./stringstream/index.md)||
+|class|[`IOStream`](iostream/index.md)||
+|class|[`Variant`](variant/index.md)||
+|class|[`ConstexprStringView`](constexprstringview/index.md)||
+|class|[`Vector`](vector/index.md)||
+|class|[`Expected`](expected/index.md)||
+|class|[`IStream`](istream/index.md)||
+|class|[`Expected< void, E >`](expected_void_e_/index.md)||
+|class|[`TupleImpl`](tupleimpl/index.md)||
+|class|[`StringView`](stringview/index.md)||
+|class|[`Unexpected`](unexpected/index.md)||
+|class|[`String`](string/index.md)||
+|class|[`TupleElem`](tupleelem/index.md)||
+|class|[`OStream`](ostream/index.md)||
+|class|[`TupleImpl< TupleSizes< N... >, T... >`](tupleimpl_tuplesizes_n_t_/index.md)||
+|class|[`StringStream`](stringstream/index.md)||
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`TupleRangeImpl`](./tuplerangeimpl/index.md)||
-|struct|[`NoType`](./notype/index.md)||
-|struct|[`TupleSizes`](./tuplesizes/index.md)||
-|struct|[`TupleRangeImpl< L, L, TupleSizes< N... > >`](./tuplerangeimpl_l_l_tuplesizes_n_/index.md)||
-|struct|[`TupleRangeImpl< L, I, TupleSizes< N... > >`](./tuplerangeimpl_l_i_tuplesizes_n_/index.md)||
+|struct|[`TupleRangeImpl`](tuplerangeimpl/index.md)||
+|struct|[`NoType`](notype/index.md)||
+|struct|[`TupleSizes`](tuplesizes/index.md)||
+|struct|[`TupleRangeImpl< L, L, TupleSizes< N... > >`](tuplerangeimpl_l_l_tuplesizes_n_/index.md)||
+|struct|[`TupleRangeImpl< L, I, TupleSizes< N... > >`](tuplerangeimpl_l_i_tuplesizes_n_/index.md)||
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr char|[`tygrab(char const(&) c)`](.)||
-|auto|[`typoke(ConstexprStringView< X... >)`](.)||
-|auto|[`typoke(ConstexprStringView< X... >, ConstexprStringView<'\0'>, ConstexprStringView< Y > ...)`](.)||
-|auto|[`typoke(ConstexprStringView< X... >, ConstexprStringView< A >, ConstexprStringView< Y > ...)`](.)||
-|auto|[`typeek(ConstexprStringView< C... >)`](.)||
-|constexpr NoType|[`TupleChooseN()`](.)||
-|constexpr NoType|[`TupleChooseN(T && t, Ts &&... ts)`](.)||
-|constexpr decltype(auto)|[`TupleChooseN(T && t, Ts &&... ts)`](.)||
-|void|[`contextSwitch(void ** stack1, void * stack2)`](.)||
-|void *|[`contextTask()`](.)||
+|constexpr char|[`tygrab(char const(&) c)`](./index.md)||
+|auto|[`typoke(ConstexprStringView< X... >)`](./index.md)||
+|auto|[`typoke(ConstexprStringView< X... >, ConstexprStringView<'\0'>, ConstexprStringView< Y > ...)`](./index.md)||
+|auto|[`typoke(ConstexprStringView< X... >, ConstexprStringView< A >, ConstexprStringView< Y > ...)`](./index.md)||
+|auto|[`typeek(ConstexprStringView< C... >)`](./index.md)||
+|constexpr NoType|[`TupleChooseN()`](./index.md)||
+|constexpr NoType|[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
+|constexpr decltype(auto)|[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
+|void|[`contextSwitch(void ** stack1, void * stack2)`](./index.md)||
+|void *|[`contextTask()`](./index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`TupleTypeOf`](.)||
-|typedef|[`TupleRange`](.)|alias of [`bzd::impl::TupleRangeImpl`](tuplerangeimpl/index.md)|
+|typedef|[`TupleTypeOf`](./index.md)||
+|typedef|[`TupleRange`](./index.md)|alias of [`bzd::impl::TupleRangeImpl`](tuplerangeimpl/index.md)|
 ------
 ### `template<class T> class IOStream`
 

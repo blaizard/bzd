@@ -9,8 +9,8 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`Tuple(Args &&... args)`](.)||
-|constexpr SizeType|[`size()`](.)||
+|constexpr|[`Tuple(Args &&... args)`](./index.md)||
+|constexpr SizeType|[`size()`](./index.md)||
 ------
 ### `template<class... Args> constexpr Tuple(Args &&... args)`
 

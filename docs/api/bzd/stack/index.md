@@ -9,8 +9,8 @@
 ### Function
 ||||
 |---:|:---|:---|
-||[`Stack()`](.)||
-|void|[`reset(const FctPtrType fct, void * context)`](.)||
+||[`Stack()`](./index.md)||
+|void|[`reset(const FctPtrType fct, void * context)`](./index.md)||
 ------
 ### ` Stack()`
 

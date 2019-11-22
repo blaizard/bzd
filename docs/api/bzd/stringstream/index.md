@@ -9,12 +9,12 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`StringStream()`](.)||
-|SizeType|[`write(const bzd::StringView & data)`](.)||
-|SizeType|[`write(const bzd::Span< const char > & data)`](.)||
-|constexpr const bzd::interface::String &|[`str() const`](.)||
-|constexpr bzd::interface::String &|[`str()`](.)||
-|SizeType|[`write(const Span< const T > & data)`](.)||
+|constexpr|[`StringStream()`](./index.md)||
+|SizeType|[`write(const bzd::StringView & data)`](./index.md)||
+|SizeType|[`write(const bzd::Span< const char > & data)`](./index.md)||
+|constexpr const bzd::interface::String &|[`str() const`](./index.md)||
+|constexpr bzd::interface::String &|[`str()`](./index.md)||
+|SizeType|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `constexpr StringStream()`
 

@@ -10,17 +10,17 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`operator valueType() const`](.)||
-|constexpr valueType|[`operator()() const`](.)||
+|constexpr|[`operator valueType() const`](./index.md)||
+|constexpr valueType|[`operator()() const`](./index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`valueType`](.)||
-|typedef|[`type`](.)|alias of [`bzd::typeTraits::integralConstant`](./index.md)|
+|typedef|[`valueType`](./index.md)||
+|typedef|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](./index.md)|
 ### Variable
 ||||
 |---:|:---|:---|
-|constexpr T|[`value`](.)||
+|constexpr T|[`value`](./index.md)||
 ------
 ### `constexpr operator valueType() const`
 

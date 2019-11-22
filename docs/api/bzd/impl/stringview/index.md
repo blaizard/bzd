@@ -10,12 +10,12 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`StringView(const T *const str)`](.)||
-|constexpr|[`StringView(const T *const str, const SizeType size)`](.)||
-|constexpr|[`StringView(const Span< char > & span)`](.)||
-|constexpr StringView|[`subStr(const SizeType pos, const SizeType count) const`](.)||
-|constexpr void|[`removePrefix(const SizeType n)`](.)||
-|constexpr void|[`clear()`](.)||
+|constexpr|[`StringView(const T *const str)`](./index.md)||
+|constexpr|[`StringView(const T *const str, const SizeType size)`](./index.md)||
+|constexpr|[`StringView(const Span< char > & span)`](./index.md)||
+|constexpr StringView|[`subStr(const SizeType pos, const SizeType count) const`](./index.md)||
+|constexpr void|[`removePrefix(const SizeType n)`](./index.md)||
+|constexpr void|[`clear()`](./index.md)||
 ------
 ### `constexpr StringView(const T *const str)`
 

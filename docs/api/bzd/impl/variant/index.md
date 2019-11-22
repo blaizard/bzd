@@ -10,12 +10,12 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`Variant()`](.)||
-|constexpr|[`Variant(T && value)`](.)||
-|constexpr bool|[`is() const`](.)||
-|constexpr bzd::Expected< const T &, bool >|[`get() const`](.)||
-|constexpr bzd::Expected< T &, bool >|[`get()`](.)||
-|constexpr void|[`match(Functors &&... funcs) const`](.)||
+|constexpr|[`Variant()`](./index.md)||
+|constexpr|[`Variant(T && value)`](./index.md)||
+|constexpr bool|[`is() const`](./index.md)||
+|constexpr bzd::Expected< const T &, bool >|[`get() const`](./index.md)||
+|constexpr bzd::Expected< T &, bool >|[`get()`](./index.md)||
+|constexpr void|[`match(Functors &&... funcs) const`](./index.md)||
 ------
 ### `constexpr Variant()`
 Default constructor

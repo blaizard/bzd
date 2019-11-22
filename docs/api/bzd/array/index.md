@@ -12,39 +12,39 @@ The container combines the performance and accessibility of a C-style array with
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`Array(Args &&... args)`](.)||
-|constexpr SizeType|[`capacity() const`](.)|Returns the number of elements that the array can hold.|
-|constexpr|[`Span(DataType *const data, const SizeType size)`](.)||
-|constexpr|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](.)||
-|constexpr Iterator|[`begin()`](.)||
-|constexpr Iterator|[`end()`](.)||
-|constexpr ConstIterator|[`begin() const`](.)||
-|constexpr ConstIterator|[`cbegin() const`](.)||
-|constexpr ConstIterator|[`end() const`](.)||
-|constexpr ConstIterator|[`cend() const`](.)||
-|constexpr SizeType|[`size() const`](.)||
-|constexpr void|[`reverse()`](.)||
-|constexpr DataType &|[`operator[](const SizeType index)`](.)||
-|constexpr const DataType &|[`operator[](const SizeType index) const`](.)||
-|constexpr DataType &|[`at(const SizeType index)`](.)||
-|constexpr const T &|[`at(const SizeType index) const`](.)||
-|constexpr DataType &|[`front()`](.)||
-|constexpr const DataType &|[`front() const`](.)||
-|constexpr DataType &|[`back()`](.)||
-|constexpr const DataType &|[`back() const`](.)||
-|constexpr DataType *|[`data()`](.)||
-|constexpr const DataType *|[`data() const`](.)||
-|constexpr SizeType|[`find(const DataType & item, const SizeType start) const`](.)||
-|constexpr bool|[`empty() const`](.)||
+|constexpr|[`Array(Args &&... args)`](./index.md)||
+|constexpr SizeType|[`capacity() const`](./index.md)|Returns the number of elements that the array can hold.|
+|constexpr|[`Span(DataType *const data, const SizeType size)`](./index.md)||
+|constexpr|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
+|constexpr Iterator|[`begin()`](./index.md)||
+|constexpr Iterator|[`end()`](./index.md)||
+|constexpr ConstIterator|[`begin() const`](./index.md)||
+|constexpr ConstIterator|[`cbegin() const`](./index.md)||
+|constexpr ConstIterator|[`end() const`](./index.md)||
+|constexpr ConstIterator|[`cend() const`](./index.md)||
+|constexpr SizeType|[`size() const`](./index.md)||
+|constexpr void|[`reverse()`](./index.md)||
+|constexpr DataType &|[`operator[](const SizeType index)`](./index.md)||
+|constexpr const DataType &|[`operator[](const SizeType index) const`](./index.md)||
+|constexpr DataType &|[`at(const SizeType index)`](./index.md)||
+|constexpr const T &|[`at(const SizeType index) const`](./index.md)||
+|constexpr DataType &|[`front()`](./index.md)||
+|constexpr const DataType &|[`front() const`](./index.md)||
+|constexpr DataType &|[`back()`](./index.md)||
+|constexpr const DataType &|[`back() const`](./index.md)||
+|constexpr DataType *|[`data()`](./index.md)||
+|constexpr const DataType *|[`data() const`](./index.md)||
+|constexpr SizeType|[`find(const DataType & item, const SizeType start) const`](./index.md)||
+|constexpr bool|[`empty() const`](./index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`Iterator`](.)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
-|typedef|[`ConstIterator`](.)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|typedef|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|typedef|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
 ### Variable
 ||||
 |---:|:---|:---|
-|constexpr const SizeType|[`npos`](.)||
+|constexpr const SizeType|[`npos`](./index.md)||
 ------
 ### `template<class... Args> explicit constexpr Array(Args &&... args)`
 

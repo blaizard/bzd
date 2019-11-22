@@ -9,7 +9,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|const typedef T|[`type`](.)||
+|const typedef T|[`type`](./index.md)||
 ------
 ### `const typedef T type`
 

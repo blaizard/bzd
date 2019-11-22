@@ -5,95 +5,95 @@
 ### Namespace
 ||||
 |---:|:---|:---|
-||[`impl`](./impl/index.md)||
+||[`impl`](impl/index.md)||
 ### Struct
 ||||
 |---:|:---|:---|
-|struct|[`addReference< T & >`](./addreference_t_/index.md)||
-|struct|[`addReference< void >`](./addreference_void_/index.md)||
-|struct|[`isArithmetic`](./isarithmetic/index.md)||
-|struct|[`isIntegral`](./isintegral/index.md)||
-|struct|[`isDestructible< T[N]>`](./isdestructible_t_n_/index.md)||
-|struct|[`isDestructible< void const >`](./isdestructible_void_const_/index.md)||
-|struct|[`isArray< T[N]>`](./isarray_t_n_/index.md)||
-|struct|[`isConst`](./isconst/index.md)||
-|struct|[`isDestructible< T & >`](./isdestructible_t_/index.md)||
-|struct|[`isFunction< Ret(Args...) const & >`](./isfunction_ret_args_const_/index.md)||
-|struct|[`removeExtent< T[]>`](./removeextent_t_/index.md)||
-|struct|[`isFunction< Ret(Args...) volatile & >`](./isfunction_ret_args_volatile_/index.md)||
-|struct|[`isFunction< Ret(Args...) volatile >`](./isfunction_ret_args_volatile_/index.md)||
-|struct|[`isReference`](./isreference/index.md)||
-|struct|[`isDestructible< void const volatile >`](./isdestructible_void_const_volatile_/index.md)||
-|struct|[`isSame`](./issame/index.md)||
-|struct|[`removeConst`](./removeconst/index.md)||
-|struct|[`addLValueReference`](./addlvaluereference/index.md)||
-|struct|[`isFunction< Ret(Args...)>`](./isfunction_ret_args_/index.md)||
-|struct|[`addConst`](./addconst/index.md)||
-|struct|[`addReference`](./addreference/index.md)||
-|struct|[`removeVolatile`](./removevolatile/index.md)||
-|struct|[`isDestructible`](./isdestructible/index.md)||
-|struct|[`isFunction< Ret(Args...) && >`](./isfunction_ret_args_/index.md)||
-|struct|[`removeExtent< T[N]>`](./removeextent_t_n_/index.md)||
-|struct|[`isLValueReference< T & >`](./islvaluereference_t_/index.md)||
-|struct|[`isConst< const T >`](./isconst_const_t_/index.md)||
-|struct|[`enableIf< true, T >`](./enableif_true_t_/index.md)||
-|struct|[`isFunction< Ret(Args...) const volatile >`](./isfunction_ret_args_const_volatile_/index.md)||
-|struct|[`isRValueReference`](./isrvaluereference/index.md)||
-|struct|[`addVolatile`](./addvolatile/index.md)||
-|struct|[`isVoid< const volatile void >`](./isvoid_const_volatile_void_/index.md)||
-|struct|[`conditional`](./conditional/index.md)||
-|struct|[`isLValueReference`](./islvaluereference/index.md)||
-|struct|[`removeReference< T & >`](./removereference_t_/index.md)||
-|struct|[`removeConst< const T >`](./removeconst_const_t_/index.md)||
-|struct|[`removeExtent`](./removeextent/index.md)||
-|struct|[`isVoid`](./isvoid/index.md)||
-|struct|[`isDestructible< void volatile >`](./isdestructible_void_volatile_/index.md)||
-|struct|[`isFunction< Ret(Args...) const >`](./isfunction_ret_args_const_/index.md)||
-|struct|[`removeReference< T && >`](./removereference_t_/index.md)||
-|struct|[`isDestructible< void >`](./isdestructible_void_/index.md)||
-|struct|[`isArray`](./isarray/index.md)||
-|struct|[`addReference< T && >`](./addreference_t_/index.md)||
-|struct|[`enableIf`](./enableif/index.md)||
-|struct|[`isFunction< Ret(Args...) volatile && >`](./isfunction_ret_args_volatile_/index.md)||
-|struct|[`isFunction< Ret(Args...) const && >`](./isfunction_ret_args_const_/index.md)||
-|struct|[`isDestructible< T && >`](./isdestructible_t_/index.md)||
-|struct|[`isArray< T[]>`](./isarray_t_/index.md)||
-|struct|[`addReference< const volatile void >`](./addreference_const_volatile_void_/index.md)||
-|struct|[`addReference< volatile void >`](./addreference_volatile_void_/index.md)||
-|struct|[`isVoid< void >`](./isvoid_void_/index.md)||
-|struct|[`isDestructible< T[]>`](./isdestructible_t_/index.md)||
-|struct|[`isVolatile`](./isvolatile/index.md)||
-|struct|[`addPointer`](./addpointer/index.md)||
-|struct|[`isFloatingPoint`](./isfloatingpoint/index.md)||
-|struct|[`conditional< false, T, F >`](./conditional_false_t_f_/index.md)||
-|struct|[`removeCV`](./removecv/index.md)||
-|struct|[`isFunction< Ret(Args...) & >`](./isfunction_ret_args_/index.md)||
-|struct|[`isVoid< const void >`](./isvoid_const_void_/index.md)||
-|struct|[`isVoid< volatile void >`](./isvoid_volatile_void_/index.md)||
-|struct|[`isFunction< Ret(Args...) const volatile & >`](./isfunction_ret_args_const_volatile_/index.md)||
-|struct|[`isRValueReference< T && >`](./isrvaluereference_t_/index.md)||
-|struct|[`isSame< T, T >`](./issame_t_t_/index.md)||
-|struct|[`integralConstant`](./integralconstant/index.md)||
-|struct|[`removeReference`](./removereference/index.md)||
-|struct|[`isFunction`](./isfunction/index.md)||
-|struct|[`isFunction< Ret(Args...) const volatile && >`](./isfunction_ret_args_const_volatile_/index.md)||
-|struct|[`isVolatile< volatile T >`](./isvolatile_volatile_t_/index.md)||
-|struct|[`addReference< const void >`](./addreference_const_void_/index.md)||
-|struct|[`addLValueReference< T && >`](./addlvaluereference_t_/index.md)||
-|struct|[`addRValueReference`](./addrvaluereference/index.md)||
-|struct|[`removeVolatile< volatile T >`](./removevolatile_volatile_t_/index.md)||
-|struct|[`addCV`](./addcv/index.md)||
+|struct|[`addReference< T & >`](addreference_t_/index.md)||
+|struct|[`addReference< void >`](addreference_void_/index.md)||
+|struct|[`isArithmetic`](isarithmetic/index.md)||
+|struct|[`isIntegral`](isintegral/index.md)||
+|struct|[`isDestructible< T[N]>`](isdestructible_t_n_/index.md)||
+|struct|[`isDestructible< void const >`](isdestructible_void_const_/index.md)||
+|struct|[`isArray< T[N]>`](isarray_t_n_/index.md)||
+|struct|[`isConst`](isconst/index.md)||
+|struct|[`isDestructible< T & >`](isdestructible_t_/index.md)||
+|struct|[`isFunction< Ret(Args...) const & >`](isfunction_ret_args_const_/index.md)||
+|struct|[`removeExtent< T[]>`](removeextent_t_/index.md)||
+|struct|[`isFunction< Ret(Args...) volatile & >`](isfunction_ret_args_volatile_/index.md)||
+|struct|[`isFunction< Ret(Args...) volatile >`](isfunction_ret_args_volatile_/index.md)||
+|struct|[`isReference`](isreference/index.md)||
+|struct|[`isDestructible< void const volatile >`](isdestructible_void_const_volatile_/index.md)||
+|struct|[`isSame`](issame/index.md)||
+|struct|[`removeConst`](removeconst/index.md)||
+|struct|[`addLValueReference`](addlvaluereference/index.md)||
+|struct|[`isFunction< Ret(Args...)>`](isfunction_ret_args_/index.md)||
+|struct|[`addConst`](addconst/index.md)||
+|struct|[`addReference`](addreference/index.md)||
+|struct|[`removeVolatile`](removevolatile/index.md)||
+|struct|[`isDestructible`](isdestructible/index.md)||
+|struct|[`isFunction< Ret(Args...) && >`](isfunction_ret_args_/index.md)||
+|struct|[`removeExtent< T[N]>`](removeextent_t_n_/index.md)||
+|struct|[`isLValueReference< T & >`](islvaluereference_t_/index.md)||
+|struct|[`isConst< const T >`](isconst_const_t_/index.md)||
+|struct|[`enableIf< true, T >`](enableif_true_t_/index.md)||
+|struct|[`isFunction< Ret(Args...) const volatile >`](isfunction_ret_args_const_volatile_/index.md)||
+|struct|[`isRValueReference`](isrvaluereference/index.md)||
+|struct|[`addVolatile`](addvolatile/index.md)||
+|struct|[`isVoid< const volatile void >`](isvoid_const_volatile_void_/index.md)||
+|struct|[`conditional`](conditional/index.md)||
+|struct|[`isLValueReference`](islvaluereference/index.md)||
+|struct|[`removeReference< T & >`](removereference_t_/index.md)||
+|struct|[`removeConst< const T >`](removeconst_const_t_/index.md)||
+|struct|[`removeExtent`](removeextent/index.md)||
+|struct|[`isVoid`](isvoid/index.md)||
+|struct|[`isDestructible< void volatile >`](isdestructible_void_volatile_/index.md)||
+|struct|[`isFunction< Ret(Args...) const >`](isfunction_ret_args_const_/index.md)||
+|struct|[`removeReference< T && >`](removereference_t_/index.md)||
+|struct|[`isDestructible< void >`](isdestructible_void_/index.md)||
+|struct|[`isArray`](isarray/index.md)||
+|struct|[`addReference< T && >`](addreference_t_/index.md)||
+|struct|[`enableIf`](enableif/index.md)||
+|struct|[`isFunction< Ret(Args...) volatile && >`](isfunction_ret_args_volatile_/index.md)||
+|struct|[`isFunction< Ret(Args...) const && >`](isfunction_ret_args_const_/index.md)||
+|struct|[`isDestructible< T && >`](isdestructible_t_/index.md)||
+|struct|[`isArray< T[]>`](isarray_t_/index.md)||
+|struct|[`addReference< const volatile void >`](addreference_const_volatile_void_/index.md)||
+|struct|[`addReference< volatile void >`](addreference_volatile_void_/index.md)||
+|struct|[`isVoid< void >`](isvoid_void_/index.md)||
+|struct|[`isDestructible< T[]>`](isdestructible_t_/index.md)||
+|struct|[`isVolatile`](isvolatile/index.md)||
+|struct|[`addPointer`](addpointer/index.md)||
+|struct|[`isFloatingPoint`](isfloatingpoint/index.md)||
+|struct|[`conditional< false, T, F >`](conditional_false_t_f_/index.md)||
+|struct|[`removeCV`](removecv/index.md)||
+|struct|[`isFunction< Ret(Args...) & >`](isfunction_ret_args_/index.md)||
+|struct|[`isVoid< const void >`](isvoid_const_void_/index.md)||
+|struct|[`isVoid< volatile void >`](isvoid_volatile_void_/index.md)||
+|struct|[`isFunction< Ret(Args...) const volatile & >`](isfunction_ret_args_const_volatile_/index.md)||
+|struct|[`isRValueReference< T && >`](isrvaluereference_t_/index.md)||
+|struct|[`isSame< T, T >`](issame_t_t_/index.md)||
+|struct|[`integralConstant`](integralconstant/index.md)||
+|struct|[`removeReference`](removereference/index.md)||
+|struct|[`isFunction`](isfunction/index.md)||
+|struct|[`isFunction< Ret(Args...) const volatile && >`](isfunction_ret_args_const_volatile_/index.md)||
+|struct|[`isVolatile< volatile T >`](isvolatile_volatile_t_/index.md)||
+|struct|[`addReference< const void >`](addreference_const_void_/index.md)||
+|struct|[`addLValueReference< T && >`](addlvaluereference_t_/index.md)||
+|struct|[`addRValueReference`](addrvaluereference/index.md)||
+|struct|[`removeVolatile< volatile T >`](removevolatile_volatile_t_/index.md)||
+|struct|[`addCV`](addcv/index.md)||
 ### Function
 ||||
 |---:|:---|:---|
-|addRValueReference< T >::type|[`declval()`](.)||
+|addRValueReference< T >::type|[`declval()`](./index.md)||
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`falseType`](.)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
-|typedef|[`isConstructible`](.)|alias of [`bzd::typeTraits::impl::isConstructible`](impl/isconstructible/index.md)|
-|typedef|[`trueType`](.)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
-|typedef|[`voidType`](.)||
+|typedef|[`falseType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
+|typedef|[`isConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::isConstructible`](impl/isconstructible/index.md)|
+|typedef|[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
+|typedef|[`voidType`](./index.md)||
 ------
 ### `template<class T> struct addReference< T & >`
 

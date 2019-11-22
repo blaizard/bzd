@@ -3,7 +3,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-|auto|[`call(const SizeType index, Args &&... args)`](.)||
+|auto|[`call(const SizeType index, Args &&... args)`](./index.md)||
 ------
 ### `static auto call(const SizeType index, Args &&... args)`
 

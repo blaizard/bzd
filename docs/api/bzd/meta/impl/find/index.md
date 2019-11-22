@@ -12,7 +12,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|constexpr const int|[`value`](.)||
+|constexpr const int|[`value`](./index.md)||
 ------
 ### `static constexpr const int value`
 

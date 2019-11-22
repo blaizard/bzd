@@ -9,7 +9,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|const typedef volatile T|[`type`](.)||
+|const typedef volatile T|[`type`](./index.md)||
 ------
 ### `const typedef volatile T type`
 

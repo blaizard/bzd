@@ -10,7 +10,7 @@
 ### Typedef
 ||||
 |---:|:---|:---|
-|typedef|[`type`](.)||
+|typedef|[`type`](./index.md)||
 ------
 ### `typedef type`
 

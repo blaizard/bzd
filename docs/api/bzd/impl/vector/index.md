@@ -10,11 +10,11 @@
 ### Function
 ||||
 |---:|:---|:---|
-|constexpr|[`Vector(const SizeType capacity, Args &&... args)`](.)||
-|constexpr void|[`pushBack(const T & element)`](.)|Adds a new element at the end of the vector, after its current last element.|
-|constexpr SizeType|[`capacity() const`](.)|Returns the maximum number of elements the vector can hold.|
-|constexpr void|[`clear()`](.)|Removes all elements.|
-|constexpr void|[`resize(const size_t n)`](.)|Change the size of the vector.|
+|constexpr|[`Vector(const SizeType capacity, Args &&... args)`](./index.md)||
+|constexpr void|[`pushBack(const T & element)`](./index.md)|Adds a new element at the end of the vector, after its current last element.|
+|constexpr SizeType|[`capacity() const`](./index.md)|Returns the maximum number of elements the vector can hold.|
+|constexpr void|[`clear()`](./index.md)|Removes all elements.|
+|constexpr void|[`resize(const size_t n)`](./index.md)|Change the size of the vector.|
 ------
 ### `template<class... Args> explicit constexpr Vector(const SizeType capacity, Args &&... args)`
 

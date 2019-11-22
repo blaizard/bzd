@@ -3,7 +3,7 @@
 ### Function
 ||||
 |---:|:---|:---|
-|void|[`call(Self * self)`](.)||
+|void|[`call(Self * self)`](./index.md)||
 ------
 ### `static void call(Self * self)`
 

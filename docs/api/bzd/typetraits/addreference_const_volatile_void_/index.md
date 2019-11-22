@@ -5,7 +5,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|const typedef volatile void|[`type`](.)||
+|const typedef volatile void|[`type`](./index.md)||
 ------
 ### `const typedef volatile void type`
 

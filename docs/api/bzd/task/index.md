@@ -10,11 +10,11 @@
 ### Function
 ||||
 |---:|:---|:---|
-||[`Task(const T & callable)`](.)||
-|void|[`wrapper()`](.)||
-|void|[`bind(interface::Stack & stack)`](.)||
-|void|[`start(void ** pointer)`](.)||
-|void|[`yield(Task & nextTask)`](.)||
+||[`Task(const T & callable)`](./index.md)||
+|void|[`wrapper()`](./index.md)||
+|void|[`bind(interface::Stack & stack)`](./index.md)||
+|void|[`start(void ** pointer)`](./index.md)||
+|void|[`yield(Task & nextTask)`](./index.md)||
 ------
 ### ` Task(const T & callable)`
 

@@ -5,7 +5,7 @@
 ### Class
 ||||
 |---:|:---|:---|
-|class|[`Contiguous`](./contiguous/index.md)||
+|class|[`Contiguous`](contiguous/index.md)||
 ------
 ### `template<class DataType> class Contiguous`
 

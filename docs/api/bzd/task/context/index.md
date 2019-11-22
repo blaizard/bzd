@@ -3,7 +3,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|const T &|[`callable_`](.)||
+|const T &|[`callable_`](./index.md)||
 ------
 ### `const T & callable_`
 

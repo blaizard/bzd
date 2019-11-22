@@ -5,7 +5,7 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|const typedef void|[`type`](.)||
+|const typedef void|[`type`](./index.md)||
 ------
 ### `const typedef void type`
 

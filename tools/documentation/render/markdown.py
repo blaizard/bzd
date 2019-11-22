@@ -4,6 +4,8 @@
 import re
 import os
 
+from members import Members
+
 class MarkdownRender:
 
 	def __init__(self, path, members):
@@ -13,17 +15,21 @@ class MarkdownRender:
 		self.fileHandle = None
 
 	def generateLink(self, namespace, member = None):
-		namespaceList = namespace.split("::")
-		path = os.path.join(self.path, os.path.join(*[self.toFileName(name) for name in namespaceList]))
-		# Generate a raltive link
-		if self.curDir:
-			path = os.path.relpath(path, self.curDir)
-		if member:
-			if member.isContainer():
-				path = os.path.join(path, self.toFileName(member.getName()), "index.md")
-		else:
-			path = os.path.join(path, "index.md")
-		return path
+
+		def identifierToPath(identifierList):
+			path = os.path.join(self.path, os.path.join(*[self.toFileName(name) for name in identifierList]))
+			if self.curDir:
+				path = os.path.relpath(path, self.curDir)
+			return path
+
+		# Create the identifier
+		identifier = Members.makeIdentifier(namespace, member.getName() if member else "")
+		identifierList = identifier.split("::")
+
+		if self.members.getMemberGroup(identifier):
+			return os.path.join(identifierToPath(identifierList), "index.md")
+		name = identifierList.pop()
+		return os.path.join(identifierToPath(identifierList), "index.md")
 
 	def createNamespace(self, namespace):
 		if namespace:
@@ -154,7 +160,5 @@ class MarkdownRender:
 				if member.getDefinition()["printDetails"]:
 					self.fileHandle.write("------\n")
 					self.createMember(namespace, member, "### ")
-					#print(" - %s" % (member.printDefinition()))
-					#print(" - %s" % (member.getInheritance()))
 
 			self.closeFile()

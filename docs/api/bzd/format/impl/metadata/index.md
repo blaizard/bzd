@@ -5,12 +5,12 @@
 ### Variable
 ||||
 |---:|:---|:---|
-|bzd::SizeType|[`index`](.)||
-|Sign|[`sign`](.)||
-|bool|[`alternate`](.)||
-|bool|[`isPrecision`](.)||
-|bzd::SizeType|[`precision`](.)||
-|Format|[`format`](.)||
+|bzd::SizeType|[`index`](./index.md)||
+|Sign|[`sign`](./index.md)||
+|bool|[`alternate`](./index.md)||
+|bool|[`isPrecision`](./index.md)||
+|bzd::SizeType|[`precision`](./index.md)||
+|Format|[`format`](./index.md)||
 ------
 ### `bzd::SizeType index`
 
