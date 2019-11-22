@@ -1,0 +1,40 @@
+# [`bzd`](../../../../index.md)::[`format`](../../../index.md)::[`impl`](../../index.md)::[`PrintContext`](../index.md)
+
+## `class PrintContext`
+
+### Function
+||||
+|---:|:---|:---|
+|constexpr|[`PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](.)||
+|void|[`addSubstring(const bzd::StringView & str)`](.)||
+|void|[`addMetadata(const Metadata & metadata)`](.)||
+|void|[`onError(const bzd::StringView & message) const`](.)||
+------
+### `constexpr PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|bzd::OStream &|stream||
+|const bzd::interface::Vector< bzd::format::impl::Arg > &|args||
+------
+### `void addSubstring(const bzd::StringView & str)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const bzd::StringView &|str||
+------
+### `void addMetadata(const Metadata & metadata)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const Metadata &|metadata||
+------
+### `void onError(const bzd::StringView & message) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const bzd::StringView &|message||
