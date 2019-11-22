@@ -132,8 +132,6 @@ class DoxygenParser:
 
 			data[identification] = data[identification] if identification in data else {}
 			data[identification] = self.mergeMember(data[identification], member)
-		else:
-			print("DROP ", member)
 
 	"""
 	Merge member2 into member1 and return it
@@ -200,6 +198,14 @@ class DoxygenParser:
 	def resolveLinks(self, groups):
 		links = {}
 
+		def addLink(dataList):
+			for data in dataList:
+				link = data.get("link", None)
+				if link:
+					links[link] = links[link] if link in links else []
+					links[link].append(data)
+					del data["link"]
+
 		# Collect the list of IDs that must be set together
 		for namespace, members in groups.items():
 			for member in members:
@@ -226,14 +232,10 @@ class DoxygenParser:
 									getInheritance(inheritanceNext, inheritanceList, visibility)
 					inheritanceList = []
 					getInheritance(inheritanceCurrent, inheritanceList)
-					for inheritance in inheritanceList:
-						link = inheritance.get("link", None)
-						if link:
-							links[link] = links[link] if link in links else []
-							links[link].append(inheritance)
-							del inheritance["link"]
-
+					addLink(inheritanceList)
 					member["inheritance"] = inheritanceList
+
+				addLink(member.get("typeref", []))
 
 		# Resolve links
 		for namespace, members in groups.items():
@@ -295,6 +297,8 @@ class DoxygenParser:
 								current = self.addMemberDict(current, "inheritance")
 							if "children" in definition["__type__"]:
 								current = self.addMemberList(current, "children")
+							if "typeref" in definition["__type__"]:
+								current = self.addMemberList(current, "typeref")
 							if "list" in definition["__type__"]:
 								self.assertTrue(isinstance(current, list), "Data must be a list '{}'", current)
 								current.append({})
@@ -418,7 +422,15 @@ memberdef = {
 	"__type__": ["member"],
 	"__attrs__": commonAttrs,
 	"name": name,
-	"type": { "__content__": { "key": "type" } },
+	"type": {
+		"__content__": { "key": "type" },
+		"ref": {
+			"__type__": ["typeref", "list"],
+			"__attrs__": {
+				"refid": { "key": "link" }
+			},
+		}
+	},
 	"templateparamlist": templateparamlist,
 	"inheritancegraph": inheritancegraph,
 	"briefdescription": briefdescription,
@@ -464,16 +476,28 @@ def process(args):
 				print("file: %s" % (fileName))
 				raise e
 
-	pp = pprint.PrettyPrinter(indent=4)
 	members = parser.getMembers()
-
-	pp.pprint(members)
 
 	render = Render(args.output)
 	render.process(members)
 
 if __name__== "__main__":
 
+	"""
+		<memberdef kind="typedef" id="expected_8h_1a33b49c1f07517abe781b0f3db7c6730b" prot="public" static="no">
+			<templateparamlist>
+			<param>
+				<type>class T</type>
+			</param>
+			<param>
+				<type>class E</type>
+			</param>
+			</templateparamlist>
+			<type><ref refid="classbzd_1_1impl_1_1Expected" kindref="compound">impl::Expected</ref>&lt; T, E &gt;</type>
+			<definition>using bzd::Expected = typedef impl::Expected&lt;T, E&gt;</definition>
+			<argsstring></argsstring>
+			<name>Expected</name>
+	"""
 	parser = argparse.ArgumentParser(description="Generate documentation from Doxygen XML output")
 	parser.add_argument('--doxygen', dest="doxygen", default="docs/xml", help="Doxygen XML output directory")
 	parser.add_argument("-o", "--output", dest="output", default="docs/md", help="Output of the generate documentation")
