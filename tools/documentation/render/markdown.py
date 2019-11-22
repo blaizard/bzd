@@ -4,10 +4,11 @@
 import re
 import os
 
-class Render:
+class MarkdownRender:
 
-	def __init__(self, path):
+	def __init__(self, path, members):
 		self.path = path
+		self.members = members
 		self.curDir = None
 		self.fileHandle = None
 
@@ -24,7 +25,7 @@ class Render:
 			path = os.path.join(path, "index.md")
 		return path
 
-	def createNamespace(self, namespace, members):
+	def createNamespace(self, namespace):
 		if namespace:
 			self.fileHandle.write("# ")
 			namespaceList = namespace.split("::")
@@ -32,7 +33,7 @@ class Render:
 				self.fileHandle.write("{}[`{}`]({})".format("::" if i else "", namespaceList[i], self.generateLink("::".join(namespaceList[0:i]))))
 			self.fileHandle.write("\n\n")
 
-		member = members.getMember(namespace)
+		member = self.members.getMember(namespace)
 		if member:
 			self.createMember(namespace, member, "## ")
 
@@ -140,13 +141,13 @@ class Render:
 		self.fileHandle = None
 		self.curDir = None
 
-	def process(self, members):
-		for namespace, memberGroup in members.items():
+	def process(self):
+		for namespace, memberGroup in self.members.items():
 			memberList = memberGroup.get()
 
 			self.useFile(namespace)
 
-			self.createNamespace(namespace, members)
+			self.createNamespace(namespace)
 
 			self.createListing(namespace, memberList)
 			for member in memberList:

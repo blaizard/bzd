@@ -5,8 +5,8 @@ import xml.etree.ElementTree as ET
 import glob
 import argparse
 
-from render import Render
 from members import Members
+from render.markdown import MarkdownRender
 from parser.doxygen import DoxygenParser
 
 if __name__== "__main__":
@@ -33,5 +33,5 @@ if __name__== "__main__":
 	members = Members(parser.getMembersData())
 
 	# Render to markdown
-	render = Render(args.output)
-	render.process(members)
+	render = MarkdownRender(args.output, members)
+	render.process()
