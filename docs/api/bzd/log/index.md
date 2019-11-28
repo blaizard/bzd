@@ -2,10 +2,10 @@
 
 ## ` log`
 
-### Function
-||||
-|---:|:---|:---|
-|void|[`print(const bzd::StringView & fmt, Args &&... args)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`print(const bzd::StringView & fmt, Args &&... args)`](./index.md)||
 ------
 ### `template<class... Args> void print(const bzd::StringView & fmt, Args &&... args)`
 

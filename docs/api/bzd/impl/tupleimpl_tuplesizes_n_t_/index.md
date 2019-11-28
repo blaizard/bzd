@@ -7,17 +7,17 @@
 |---:|:---|:---|
 |SizeType...|N||
 |class...|T||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`TupleImpl(Args &&... args)`](./index.md)||
-|constexpr pick< M > &|[`get()`](./index.md)||
-|constexpr const pick< M > &|[`get() const`](./index.md)||
-|constexpr|[`TupleElem()`](./index.md)||
-|constexpr|[`TupleElem(const T & value)`](./index.md)||
-|constexpr|[`TupleElem(const NoType &)`](./index.md)||
-|constexpr T &|[`get()`](./index.md)||
-|constexpr const T &|[`get() const`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`TupleImpl(Args &&... args)`](./index.md)||
+|[`get()`](./index.md)||
+|[`get() const`](./index.md)||
+|[`TupleElem()`](./index.md)||
+|[`TupleElem(const T & value)`](./index.md)||
+|[`TupleElem(const NoType &)`](./index.md)||
+|[`get()`](./index.md)||
+|[`get() const`](./index.md)||
 ------
 ### `template<class... Args> constexpr TupleImpl(Args &&... args)`
 

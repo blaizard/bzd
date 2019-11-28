@@ -8,10 +8,10 @@
 |bool|B||
 |class|T||
 |class|F||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 

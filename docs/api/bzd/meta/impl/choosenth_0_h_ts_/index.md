@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |class H|None||
 |class...|Ts||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 *From bzd::meta::Type*

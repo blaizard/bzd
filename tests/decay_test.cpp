@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "bzd/utility.h"
+#include "bzd/utility/decay.h"
 #include "bzd/type_traits/is_same.h"
 
 template <typename T, typename U>

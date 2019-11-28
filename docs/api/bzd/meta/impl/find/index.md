@@ -9,10 +9,10 @@
 |class T|None||
 |class U|None||
 |class...|Ts||
-### Variable
-||||
-|---:|:---|:---|
-|constexpr const int|[`value`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`value`](./index.md)||
 ------
 ### `static constexpr const int value`
 

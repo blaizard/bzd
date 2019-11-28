@@ -3,7 +3,6 @@
 #include "bzd/assert_minimal.h"
 
 #include "bzd/container/string_view.h"
-#include "bzd/utility.h"
 #include "bzd/system.h"
 #include "bzd/log.h"
 

@@ -6,12 +6,12 @@ Singleton class pattern
 ||||
 |---:|:---|:---|
 |class T|None||
-### Function
-||||
-|---:|:---|:---|
-||[`SingletonImpl(SingletonImpl const &)`](./index.md)||
-|T &|[`getInstance()`](./index.md)||
-|void|[`operator=(SingletonImpl const &)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`SingletonImpl(SingletonImpl const &)`](./index.md)||
+|[`getInstance()`](./index.md)||
+|[`operator=(SingletonImpl const &)`](./index.md)||
 ------
 ### ` SingletonImpl(SingletonImpl const &)`
 

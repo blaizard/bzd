@@ -2,10 +2,10 @@
 
 ## `struct type`
 
-### Variable
-||||
-|---:|:---|:---|
-|unsigned char|[`data`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`data`](./index.md)||
 ------
 ### `unsigned char data`
 

@@ -2,7 +2,7 @@
 
 #include "bzd/types.h"
 #include "bzd/container/span.h"
-#include "bzd/utility.h"
+#include "bzd/utility/forward.h"
 
 namespace bzd
 {

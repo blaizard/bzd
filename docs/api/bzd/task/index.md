@@ -7,14 +7,14 @@
 |---:|:---|:---|
 |class T|None||
 |class...|Args||
-### Function
-||||
-|---:|:---|:---|
-||[`Task(const T & callable)`](./index.md)||
-|void|[`wrapper()`](./index.md)||
-|void|[`bind(interface::Stack & stack)`](./index.md)||
-|void|[`start(void ** pointer)`](./index.md)||
-|void|[`yield(Task & nextTask)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Task(const T & callable)`](./index.md)||
+|[`wrapper()`](./index.md)||
+|[`bind(interface::Stack & stack)`](./index.md)||
+|[`start(void ** pointer)`](./index.md)||
+|[`yield(Task & nextTask)`](./index.md)||
 ------
 ### ` Task(const T & callable)`
 

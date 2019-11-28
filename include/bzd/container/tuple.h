@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/types.h"
-#include "bzd/utility.h"
+#include "bzd/utility/forward.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/meta/choose_nth.h"
 

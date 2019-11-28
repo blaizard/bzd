@@ -2,11 +2,11 @@
 
 ## `struct isDestructible`
 
-### Function
-||||
-|---:|:---|:---|
-|char|[`test(int)`](./index.md)||
-|long int|[`test(...)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`test(int)`](./index.md)||
+|[`test(...)`](./index.md)||
 ------
 ### `template<class T, class> static char test(int)`
 

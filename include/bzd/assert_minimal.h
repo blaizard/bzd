@@ -19,7 +19,7 @@ namespace bzd
 		{
 			if (!condition)
 			{
-				getOut().write(message);
+				bzd::getOut().write(message);
 				bzd::panic();
 			}
 		}

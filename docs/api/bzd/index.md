@@ -2,72 +2,72 @@
 
 ## ` bzd`
 
-### Namespace
-||||
-|---:|:---|:---|
-||[`format`](format/index.md)||
-||[`impl`](impl/index.md)||
-||[`typeTraits`](typetraits/index.md)||
-||[`meta`](meta/index.md)||
-||[`iterator`](iterator/index.md)||
-||[`interface`](interface/index.md)||
-||[`log`](log/index.md)||
-||[`assert`](assert/index.md)||
-### Class
-||||
-|---:|:---|:---|
-|class|[`Task`](task/index.md)||
-|class|[`SingletonThreadLocalImpl`](singletonthreadlocalimpl/index.md)||
-|class|[`Scheduler`](scheduler/index.md)||
-|class|[`Variant`](variant/index.md)||
-|class|[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
-|class|[`StringStream`](stringstream/index.md)||
-|class|[`Tuple`](tuple/index.md)||
-|class|[`Pool`](pool/index.md)||
-|class|[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
-|class|[`SingletonImpl`](singletonimpl/index.md)||
-|class|[`String`](string/index.md)||
-|class|[`VariantConstexpr`](variantconstexpr/index.md)||
-|class|[`Stack`](stack/index.md)||
-|class|[`Vector`](vector/index.md)||
-### Struct
-||||
-|---:|:---|:---|
-|struct|[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
-|struct|[`resultOf`](resultof/index.md)||
-|struct|[`decay`](decay/index.md)||
-|struct|[`alignedStorage`](alignedstorage/index.md)||
-### Function
-||||
-|---:|:---|:---|
-|constexpr impl::Unexpected< typename bzd::decay< E >::type >|[`makeUnexpected(E && e)`](./index.md)||
-|void|[`yield()`](./index.md)||
-|void|[`panic()`](./index.md)||
-|bzd::OStream &|[`getOut()`](./index.md)||
-|constexpr IntPtrType|[`offsetOf(const M T::* member)`](./index.md)||
-|constexpr T *|[`containerOf(M * ptr, const M T::* member)`](./index.md)||
-|constexpr void|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
-|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
-|constexpr T &&|[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
-|bzd::typeTraits::removeReference< T >::type &&|[`move(T && arg)`](./index.md)||
-|constexpr void|[`swap(T & t1, T & t2)`](./index.md)||
-|constexpr T|[`min(const T & a, const T & b)`](./index.md)||
-|constexpr T|[`max(const T & a, const T & b)`](./index.md)||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
-|typedef|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
-|typedef|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
-|typedef|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
-|typedef|[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
-|typedef|[`PtrType`](./index.md)||
-|typedef|[`PtrDiffType`](./index.md)||
-|typedef|[`CtxPtrType`](./index.md)||
-|typedef|[`IntPtrType`](./index.md)||
-|typedef|[`FctPtrType`](./index.md)||
-|typedef|[`ByteType`](./index.md)||
-|typedef|[`SizeType`](./index.md)||
+
+|Namespace||
+|:---|:---|
+|[`format`](format/index.md)||
+|[`impl`](impl/index.md)||
+|[`typeTraits`](typetraits/index.md)||
+|[`meta`](meta/index.md)||
+|[`iterator`](iterator/index.md)||
+|[`interface`](interface/index.md)||
+|[`log`](log/index.md)||
+|[`assert`](assert/index.md)||
+
+|Class||
+|:---|:---|
+|[`Task`](task/index.md)||
+|[`SingletonThreadLocalImpl`](singletonthreadlocalimpl/index.md)||
+|[`Scheduler`](scheduler/index.md)||
+|[`Variant`](variant/index.md)||
+|[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
+|[`StringStream`](stringstream/index.md)||
+|[`Tuple`](tuple/index.md)||
+|[`Pool`](pool/index.md)||
+|[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
+|[`SingletonImpl`](singletonimpl/index.md)||
+|[`String`](string/index.md)||
+|[`VariantConstexpr`](variantconstexpr/index.md)||
+|[`Stack`](stack/index.md)||
+|[`Vector`](vector/index.md)||
+
+|Struct||
+|:---|:---|
+|[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
+|[`resultOf`](resultof/index.md)||
+|[`decay`](decay/index.md)||
+|[`alignedStorage`](alignedstorage/index.md)||
+
+|Function||
+|:---|:---|
+|[`makeUnexpected(E && e)`](./index.md)||
+|[`yield()`](./index.md)||
+|[`panic()`](./index.md)||
+|[`getOut()`](./index.md)||
+|[`offsetOf(const M T::* member)`](./index.md)||
+|[`containerOf(M * ptr, const M T::* member)`](./index.md)||
+|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
+|[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
+|[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
+|[`move(T && arg)`](./index.md)||
+|[`swap(T & t1, T & t2)`](./index.md)||
+|[`min(const T & a, const T & b)`](./index.md)||
+|[`max(const T & a, const T & b)`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
+|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
+|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
+|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
+|[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
+|[`PtrType`](./index.md)||
+|[`PtrDiffType`](./index.md)||
+|[`CtxPtrType`](./index.md)||
+|[`IntPtrType`](./index.md)||
+|[`FctPtrType`](./index.md)||
+|[`ByteType`](./index.md)||
+|[`SizeType`](./index.md)||
 ------
 ### `template<class T, class... Args> class Task`
 

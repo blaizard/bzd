@@ -1,7 +1,8 @@
 #pragma once
 
 #include "bzd/types.h"
-#include "bzd/utility.h"
+#include "bzd/utility/memcpy.h"
+#include "bzd/utility/min.h"
 #include "bzd/container/span.h"
 #include "bzd/container/string_view.h"
 #include "bzd/type_traits/add_const.h"

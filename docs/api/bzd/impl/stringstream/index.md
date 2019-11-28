@@ -2,15 +2,15 @@
 
 ## `class StringStream`
 
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`StringStream(bzd::interface::String & str)`](./index.md)||
-|SizeType|[`write(const bzd::StringView & data)`](./index.md)||
-|SizeType|[`write(const bzd::Span< const char > & data)`](./index.md)||
-|constexpr const bzd::interface::String &|[`str() const`](./index.md)||
-|constexpr bzd::interface::String &|[`str()`](./index.md)||
-|SizeType|[`write(const Span< const T > & data)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`StringStream(bzd::interface::String & str)`](./index.md)||
+|[`write(const bzd::StringView & data)`](./index.md)||
+|[`write(const bzd::Span< const char > & data)`](./index.md)||
+|[`str() const`](./index.md)||
+|[`str()`](./index.md)||
+|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `constexpr StringStream(bzd::interface::String & str)`
 

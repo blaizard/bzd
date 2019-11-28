@@ -6,40 +6,40 @@ The class template span describes an object that can refer to a contiguous seque
 ||||
 |---:|:---|:---|
 |class|T|Element type, must be a complete type that is not an abstract class type. |
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Span(DataType *const data, const SizeType size)`](./index.md)||
-|constexpr|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
-|constexpr Iterator|[`begin()`](./index.md)||
-|constexpr Iterator|[`end()`](./index.md)||
-|constexpr ConstIterator|[`begin() const`](./index.md)||
-|constexpr ConstIterator|[`cbegin() const`](./index.md)||
-|constexpr ConstIterator|[`end() const`](./index.md)||
-|constexpr ConstIterator|[`cend() const`](./index.md)||
-|constexpr SizeType|[`size() const`](./index.md)||
-|constexpr void|[`reverse()`](./index.md)||
-|constexpr DataType &|[`operator[](const SizeType index)`](./index.md)||
-|constexpr const DataType &|[`operator[](const SizeType index) const`](./index.md)||
-|constexpr DataType &|[`at(const SizeType index)`](./index.md)||
-|constexpr const T &|[`at(const SizeType index) const`](./index.md)||
-|constexpr DataType &|[`front()`](./index.md)||
-|constexpr const DataType &|[`front() const`](./index.md)||
-|constexpr DataType &|[`back()`](./index.md)||
-|constexpr const DataType &|[`back() const`](./index.md)||
-|constexpr DataType *|[`data()`](./index.md)||
-|constexpr const DataType *|[`data() const`](./index.md)||
-|constexpr SizeType|[`find(const DataType & item, const SizeType start) const`](./index.md)||
-|constexpr bool|[`empty() const`](./index.md)||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
-|typedef|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
-### Variable
-||||
-|---:|:---|:---|
-|constexpr const SizeType|[`npos`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Span(DataType *const data, const SizeType size)`](./index.md)||
+|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
+|[`begin()`](./index.md)||
+|[`end()`](./index.md)||
+|[`begin() const`](./index.md)||
+|[`cbegin() const`](./index.md)||
+|[`end() const`](./index.md)||
+|[`cend() const`](./index.md)||
+|[`size() const`](./index.md)||
+|[`reverse()`](./index.md)||
+|[`operator[](const SizeType index)`](./index.md)||
+|[`operator[](const SizeType index) const`](./index.md)||
+|[`at(const SizeType index)`](./index.md)||
+|[`at(const SizeType index) const`](./index.md)||
+|[`front()`](./index.md)||
+|[`front() const`](./index.md)||
+|[`back()`](./index.md)||
+|[`back() const`](./index.md)||
+|[`data()`](./index.md)||
+|[`data() const`](./index.md)||
+|[`find(const DataType & item, const SizeType start) const`](./index.md)||
+|[`empty() const`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+
+|Variable||
+|:---|:---|
+|[`npos`](./index.md)||
 ------
 ### `constexpr Span(DataType *const data, const SizeType size)`
 

@@ -6,10 +6,10 @@ Internal class used to create an unexpected object type.
 ||||
 |---:|:---|:---|
 |class E|None||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Unexpected(const E & error)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Unexpected(const E & error)`](./index.md)||
 ------
 ### `constexpr Unexpected(const E & error)`
 

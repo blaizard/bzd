@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |SizeType|Len||
 |SizeType|Align||
-### Struct
-||||
-|---:|:---|:---|
-|struct|[`type`](type/index.md)||
+
+|Struct||
+|:---|:---|
+|[`type`](type/index.md)||
 ------
 ### `struct type`
 

@@ -2,22 +2,22 @@
 
 ## ` format`
 
-### Namespace
-||||
-|---:|:---|:---|
-||[`impl`](impl/index.md)||
-### Function
-||||
-|---:|:---|:---|
-|constexpr void|[`toString(bzd::OStream & out, const F & f, Args &&... args)`](./index.md)|String formating.|
-|constexpr void|[`toString(bzd::OStream & stream, const T & data)`](./index.md)||
-|constexpr void|[`toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
-|constexpr void|[`toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`](./index.md)||
-|constexpr void|[`toStringOct(bzd::OStream & stream, const T & data)`](./index.md)||
-|constexpr void|[`toStringBin(bzd::OStream & stream, const T & data)`](./index.md)||
-|void|[`toString(bzd::OStream & stream, const bzd::StringView & data)`](./index.md)||
-|void|[`toString(bzd::OStream & stream, const char c)`](./index.md)||
-|constexpr void|[`toString(bzd::interface::String & str, Args &&... args)`](./index.md)||
+
+|Namespace||
+|:---|:---|
+|[`impl`](impl/index.md)||
+
+|Function||
+|:---|:---|
+|[`toString(bzd::OStream & out, const F & f, Args &&... args)`](./index.md)|String formating.|
+|[`toString(bzd::OStream & stream, const T & data)`](./index.md)||
+|[`toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
+|[`toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`](./index.md)||
+|[`toStringOct(bzd::OStream & stream, const T & data)`](./index.md)||
+|[`toStringBin(bzd::OStream & stream, const T & data)`](./index.md)||
+|[`toString(bzd::OStream & stream, const bzd::StringView & data)`](./index.md)||
+|[`toString(bzd::OStream & stream, const char c)`](./index.md)||
+|[`toString(bzd::interface::String & str, Args &&... args)`](./index.md)||
 ------
 ### `template<class F, class... Args> constexpr void toString(bzd::OStream & out, const F & f, Args &&... args)`
 String formating.

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/utility.h"
+#include "bzd/utility/forward.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/system.h"

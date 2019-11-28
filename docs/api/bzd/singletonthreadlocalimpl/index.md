@@ -6,12 +6,12 @@
 ||||
 |---:|:---|:---|
 |class|T||
-### Function
-||||
-|---:|:---|:---|
-||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
-|T &|[`getInstance()`](./index.md)||
-|void|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
+|[`getInstance()`](./index.md)||
+|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
 ------
 ### ` SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`
 

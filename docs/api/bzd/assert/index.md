@@ -2,12 +2,12 @@
 
 ## ` assert`
 
-### Function
-||||
-|---:|:---|:---|
-|constexpr void|[`isTrue(const bool condition, const bzd::StringView & fmt, Args &&... args)`](./index.md)||
-|constexpr void|[`isTrue(const bool condition)`](./index.md)||
-|constexpr void|[`isTrue(const bool condition, const bzd::StringView & message)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`isTrue(const bool condition, const bzd::StringView & fmt, Args &&... args)`](./index.md)||
+|[`isTrue(const bool condition)`](./index.md)||
+|[`isTrue(const bool condition, const bzd::StringView & message)`](./index.md)||
 ------
 ### `template<class... Args> constexpr void isTrue(const bool condition, const bzd::StringView & fmt, Args &&... args)`
 

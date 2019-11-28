@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |class T|None||
 |class F|None||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 

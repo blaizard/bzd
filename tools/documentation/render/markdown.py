@@ -48,9 +48,8 @@ class MarkdownRender:
 		for member in memberList:
 			kind = member.getKind()
 			if kind != prevKind:
-				self.fileHandle.write("### {}\n".format(member.getDefinition()["name"]))
-				self.fileHandle.write("||||\n")
-				self.fileHandle.write("|---:|:---|:---|\n")
+				self.fileHandle.write("\n|{}||\n".format(member.getDefinition()["name"]))
+				self.fileHandle.write("|:---|:---|\n")
 
 			# Generate the description brief
 			descriptionBrief = member.getDescriptionBrief()
@@ -59,8 +58,7 @@ class MarkdownRender:
 				aliasStr = ", ".join(["[`{}`]({})".format(alias, self.generateLink(alias)) for alias in aliasList])
 				descriptionBrief += "{}alias of {}".format("; " if descriptionBrief else "", aliasStr)
 
-			self.fileHandle.write("|{}|[`{}`]({})|{}|\n".format(
-					member.printDefinition("{type}"),
+			self.fileHandle.write("|[`{}`]({})|{}|\n".format(
 					member.printDefinition("{name}"),
 					self.generateLink(namespace, member),
 					descriptionBrief))

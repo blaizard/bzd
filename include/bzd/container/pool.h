@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/types.h"
-#include "bzd/utility.h"
+#include "bzd/utility/container_of.h"
 #include "bzd/container/array.h"
 
 #include <iostream>

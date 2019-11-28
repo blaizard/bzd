@@ -6,25 +6,25 @@
 ||||
 |---:|:---|:---|
 |class E|None||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Expected()`](./index.md)||
-|constexpr|[`Expected(U && value)`](./index.md)||
-|constexpr|[`Expected(impl::Unexpected< U > && u)`](./index.md)||
-|constexpr|[`Expected(Expected< T, E > && e)`](./index.md)||
-||[`~Expected()`](./index.md)||
-|constexpr|[`operator bool() const`](./index.md)||
-|constexpr const E &|[`error() const`](./index.md)||
-|constexpr const Value &|[`operator*() const`](./index.md)||
-|constexpr Value &|[`operator*()`](./index.md)||
-|constexpr const Value *|[`operator->() const`](./index.md)||
-|constexpr Value *|[`operator->()`](./index.md)||
-### Variable
-||||
-|---:|:---|:---|
-|ValueContainer|[`value_`](./index.md)||
-|E|[`error_`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Expected()`](./index.md)||
+|[`Expected(U && value)`](./index.md)||
+|[`Expected(impl::Unexpected< U > && u)`](./index.md)||
+|[`Expected(Expected< T, E > && e)`](./index.md)||
+|[`~Expected()`](./index.md)||
+|[`operator bool() const`](./index.md)||
+|[`error() const`](./index.md)||
+|[`operator*() const`](./index.md)||
+|[`operator*()`](./index.md)||
+|[`operator->() const`](./index.md)||
+|[`operator->()`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`value_`](./index.md)||
+|[`error_`](./index.md)||
 ------
 ### `constexpr Expected()`
 

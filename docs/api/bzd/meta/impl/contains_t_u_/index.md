@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |class T|None||
 |class U|None||
-### Variable
-||||
-|---:|:---|:---|
-|constexpr const bool|[`value`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`value`](./index.md)||
 ------
 ### `static constexpr const bool value`
 

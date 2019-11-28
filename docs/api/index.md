@@ -1,4 +1,4 @@
-### Namespace
-||||
-|---:|:---|:---|
-||[`bzd`](bzd/index.md)||
+
+|Namespace||
+|:---|:---|
+|[`bzd`](bzd/index.md)||

@@ -7,17 +7,17 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |---:|:---|:---|
 |class T|None||
 |SizeType|N||
-### Struct
-||||
-|---:|:---|:---|
-|struct|[`ItemType`](itemtype/index.md)||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Pool()`](./index.md)||
-|constexpr void|[`release(T * container)`](./index.md)||
-|constexpr T *|[`reserve()`](./index.md)||
-|void|[`toStream(std::ostream & os)`](./index.md)||
+
+|Struct||
+|:---|:---|
+|[`ItemType`](itemtype/index.md)||
+
+|Function||
+|:---|:---|
+|[`Pool()`](./index.md)||
+|[`release(T * container)`](./index.md)||
+|[`reserve()`](./index.md)||
+|[`toStream(std::ostream & os)`](./index.md)||
 ------
 ### `struct ItemType`
 

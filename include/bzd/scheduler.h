@@ -2,12 +2,12 @@
 
 #include <list>
 
-#include "bzd/utility.h"
 #include "bzd/interface/task.h"
+#include "bzd/utility/singleton.h"
 
 namespace bzd
 {
-	class Scheduler : public SingletonThreadLocalImpl<Scheduler>
+	class Scheduler : public SingletonThreadLocal<Scheduler>
 	{
 	public:
 		/**

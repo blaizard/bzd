@@ -6,25 +6,25 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`operator valueType() const`](./index.md)||
-|constexpr valueType|[`operator()() const`](./index.md)||
-|constexpr|[`operator valueType() const`](./index.md)||
-|constexpr valueType|[`operator()() const`](./index.md)||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`valueType`](./index.md)||
-|typedef|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../integralconstant/index.md)|
-|typedef|[`valueType`](./index.md)||
-|typedef|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../integralconstant/index.md)|
-### Variable
-||||
-|---:|:---|:---|
-|constexpr T|[`value`](./index.md)||
-|constexpr T|[`value`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`operator valueType() const`](./index.md)||
+|[`operator()() const`](./index.md)||
+|[`operator valueType() const`](./index.md)||
+|[`operator()() const`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`valueType`](./index.md)||
+|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../integralconstant/index.md)|
+|[`valueType`](./index.md)||
+|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../integralconstant/index.md)|
+
+|Variable||
+|:---|:---|
+|[`value`](./index.md)||
+|[`value`](./index.md)||
 ------
 ### `constexpr operator valueType() const`
 *From bzd::typeTraits::isDestructible*

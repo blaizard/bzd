@@ -6,11 +6,11 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Function
-||||
-|---:|:---|:---|
-|SizeType|[`read(Span< T > & data)`](./index.md)||
-|SizeType|[`write(const Span< const T > & data)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`read(Span< T > & data)`](./index.md)||
+|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 *From bzd::impl::IStream*

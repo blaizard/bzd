@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/utility.h"
+#include "bzd/utility/forward.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_same.h"
 

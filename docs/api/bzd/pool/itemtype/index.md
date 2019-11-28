@@ -2,11 +2,11 @@
 
 ## `struct ItemType`
 
-### Variable
-||||
-|---:|:---|:---|
-|T|[`container_`](./index.md)||
-|ItemType *|[`next_`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`container_`](./index.md)||
+|[`next_`](./index.md)||
 ------
 ### `T container_`
 
