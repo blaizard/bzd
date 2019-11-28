@@ -6,17 +6,17 @@
 ||||
 |---:|:---|:---|
 |class...|Ts||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)|alias of [`bzd::meta::TypeList`](./index.md)|
-|typedef|[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](../impl/choosenth/index.md)|
-|typedef|[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](../impl/contains/index.md)|
-|typedef|[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](../impl/find/index.md)|
-### Variable
-||||
-|---:|:---|:---|
-|constexpr const SizeType|[`size`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)|alias of [`bzd::meta::TypeList`](./index.md)|
+|[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](../impl/choosenth/index.md)|
+|[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](../impl/contains/index.md)|
+|[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](../impl/find/index.md)|
+
+|Variable||
+|:---|:---|
+|[`size`](./index.md)||
 ------
 ### `typedef type`
 

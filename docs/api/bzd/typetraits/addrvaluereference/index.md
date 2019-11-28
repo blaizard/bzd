@@ -6,10 +6,10 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::addRValueReference`](../impl/addrvaluereference/index.md)|
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::addRValueReference`](../impl/addrvaluereference/index.md)|
 ------
 ### `typedef type`
 

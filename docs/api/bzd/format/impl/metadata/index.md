@@ -2,15 +2,15 @@
 
 ## `struct Metadata`
 
-### Variable
-||||
-|---:|:---|:---|
-|bzd::SizeType|[`index`](./index.md)||
-|Sign|[`sign`](./index.md)||
-|bool|[`alternate`](./index.md)||
-|bool|[`isPrecision`](./index.md)||
-|bzd::SizeType|[`precision`](./index.md)||
-|Format|[`format`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`index`](./index.md)||
+|[`sign`](./index.md)||
+|[`alternate`](./index.md)||
+|[`isPrecision`](./index.md)||
+|[`precision`](./index.md)||
+|[`format`](./index.md)||
 ------
 ### `bzd::SizeType index`
 

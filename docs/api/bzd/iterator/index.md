@@ -2,10 +2,10 @@
 
 ## ` iterator`
 
-### Class
-||||
-|---:|:---|:---|
-|class|[`Contiguous`](contiguous/index.md)||
+
+|Class||
+|:---|:---|
+|[`Contiguous`](contiguous/index.md)||
 ------
 ### `template<class DataType> class Contiguous`
 

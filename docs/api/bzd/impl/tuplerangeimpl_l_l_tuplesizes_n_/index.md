@@ -7,11 +7,11 @@
 |---:|:---|:---|
 |SizeType|L||
 |SizeType...|N||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 *From bzd::impl::TupleSizes*

@@ -2,43 +2,43 @@
 
 ## ` impl`
 
-### Namespace
-||||
-|---:|:---|:---|
-||[`@16`](_16/index.md)||
-### Class
-||||
-|---:|:---|:---|
-|class|[`ConstexprVector`](constexprvector/index.md)||
-|class|[`PrintContext`](printcontext/index.md)||
-|class|[`CheckContext`](checkcontext/index.md)||
-|class|[`Context`](context/index.md)||
-### Struct
-||||
-|---:|:---|:---|
-|struct|[`Metadata`](metadata/index.md)||
-### Function
-||||
-|---:|:---|:---|
-|constexpr bool|[`parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`](./index.md)||
-|constexpr bzd::SizeType|[`parseIndex(Ctx & context, bzd::StringView & format, const bzd::SizeType autoIndex)`](./index.md)||
-|constexpr void|[`parseSign(Ctx & context, bzd::StringView & format, Metadata & metadata)`](./index.md)||
-|constexpr Metadata|[`parseMetadata(Ctx & context, bzd::StringView & format, const bzd::SizeType current)`](./index.md)|Parse a metadata conversion string.|
-|constexpr bool|[`parseStaticString(Ctx & context, bzd::StringView & format)`](./index.md)||
-|constexpr void|[`parse(Ctx & context, bzd::StringView format, const T & args)`](./index.md)||
-|void|[`printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|void|[`printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|void|[`printString(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|constexpr Context< CheckContext >|[`contextBuild(const bzd::StringView & format, const T & tuple)`](./index.md)||
-|void|[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
-|constexpr bool|[`contextCheck(const Ctx & context, const T & tuple)`](./index.md)|Check the format context.|
-|constexpr void|[`integer(interface::String & str, const T & n, const char *const digits)`](./index.md)||
-|constexpr void|[`fixedPoint(bzd::OStream & stream, const T & n, const SizeType maxPrecision)`](./index.md)||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`Arg`](./index.md)|alias of [`bzd::VariantConstexpr`](../../variantconstexpr/index.md)|
-|typedef|[`ArgList`](./index.md)|alias of [`bzd::impl::Vector`](../../impl/vector/index.md)|
+
+|Namespace||
+|:---|:---|
+|[`@16`](_16/index.md)||
+
+|Class||
+|:---|:---|
+|[`ConstexprVector`](constexprvector/index.md)||
+|[`PrintContext`](printcontext/index.md)||
+|[`CheckContext`](checkcontext/index.md)||
+|[`Context`](context/index.md)||
+
+|Struct||
+|:---|:---|
+|[`Metadata`](metadata/index.md)||
+
+|Function||
+|:---|:---|
+|[`parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`](./index.md)||
+|[`parseIndex(Ctx & context, bzd::StringView & format, const bzd::SizeType autoIndex)`](./index.md)||
+|[`parseSign(Ctx & context, bzd::StringView & format, Metadata & metadata)`](./index.md)||
+|[`parseMetadata(Ctx & context, bzd::StringView & format, const bzd::SizeType current)`](./index.md)|Parse a metadata conversion string.|
+|[`parseStaticString(Ctx & context, bzd::StringView & format)`](./index.md)||
+|[`parse(Ctx & context, bzd::StringView format, const T & args)`](./index.md)||
+|[`printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`printString(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`contextBuild(const bzd::StringView & format, const T & tuple)`](./index.md)||
+|[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
+|[`contextCheck(const Ctx & context, const T & tuple)`](./index.md)|Check the format context.|
+|[`integer(interface::String & str, const T & n, const char *const digits)`](./index.md)||
+|[`fixedPoint(bzd::OStream & stream, const T & n, const SizeType maxPrecision)`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`Arg`](./index.md)|alias of [`bzd::VariantConstexpr`](../../variantconstexpr/index.md)|
+|[`ArgList`](./index.md)|alias of [`bzd::impl::Vector`](../../impl/vector/index.md)|
 ------
 ### `template<class T, SizeType N> class ConstexprVector`
 Simple vector container working with conxtexpr

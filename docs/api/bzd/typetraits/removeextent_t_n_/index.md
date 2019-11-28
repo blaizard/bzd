@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |class T|None||
 |unsigned long int|N||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 

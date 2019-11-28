@@ -1,9 +1,10 @@
 #pragma once
 
 #include "bzd/types.h"
-#include "bzd/utility.h"
+#include "bzd/utility/swap.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_const.h"
+#include "bzd/type_traits/remove_const.h"
 #include "bzd/container/iterator/contiguous.h"
 
 namespace bzd

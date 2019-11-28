@@ -1,15 +1,15 @@
 # [`bzd`](../../../../index.md)::[`impl`](../../../index.md)::[`Expected`](../../index.md)::[`RefWrapper`](../index.md)
 
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`RefWrapper(Value && value)`](./index.md)||
-|constexpr Value &|[`get()`](./index.md)||
-|constexpr const Value &|[`get() const`](./index.md)||
-### Variable
-||||
-|---:|:---|:---|
-|Value *|[`value_`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`RefWrapper(Value && value)`](./index.md)||
+|[`get()`](./index.md)||
+|[`get() const`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`value_`](./index.md)||
 ------
 ### `constexpr RefWrapper(Value && value)`
 

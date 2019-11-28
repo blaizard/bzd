@@ -2,26 +2,26 @@
 
 ## `class CheckContext`
 
-### Class
-||||
-|---:|:---|:---|
-|class|[`Iterator`](./index.md)||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`CheckContext()`](./index.md)||
-|constexpr void|[`addSubstring(const bzd::StringView &)`](./index.md)||
-|constexpr void|[`addMetadata(const Metadata & metadata)`](./index.md)||
-|void|[`onError(const bzd::StringView & message) const`](./index.md)||
-|constexpr|[`ConstexprVector()`](./index.md)||
-|constexpr|[`ConstexprVector(Args &&... args)`](./index.md)||
-|constexpr Iterator|[`begin() const`](./index.md)||
-|constexpr Iterator|[`end() const`](./index.md)||
-|constexpr SizeType|[`size() const`](./index.md)||
-|constexpr SizeType|[`capacity() const`](./index.md)||
-|constexpr void|[`push_back(const T & element)`](./index.md)||
-|constexpr DataType &|[`operator[](const SizeType index)`](./index.md)||
-|constexpr const DataType &|[`operator[](const SizeType index) const`](./index.md)||
+
+|Class||
+|:---|:---|
+|[`Iterator`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`CheckContext()`](./index.md)||
+|[`addSubstring(const bzd::StringView &)`](./index.md)||
+|[`addMetadata(const Metadata & metadata)`](./index.md)||
+|[`onError(const bzd::StringView & message) const`](./index.md)||
+|[`ConstexprVector()`](./index.md)||
+|[`ConstexprVector(Args &&... args)`](./index.md)||
+|[`begin() const`](./index.md)||
+|[`end() const`](./index.md)||
+|[`size() const`](./index.md)||
+|[`capacity() const`](./index.md)||
+|[`push_back(const T & element)`](./index.md)||
+|[`operator[](const SizeType index)`](./index.md)||
+|[`operator[](const SizeType index) const`](./index.md)||
 ------
 ### `class Iterator`
 *From bzd::format::impl::ConstexprVector*

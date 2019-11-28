@@ -1,9 +1,9 @@
 # [`bzd`](../../../../index.md)::[`impl`](../../../index.md)::[`Variant`](../../index.md)::[`HelperT`](../index.md)
 
-### Function
-||||
-|---:|:---|:---|
-|auto|[`call(const SizeType index, Args &&... args)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`call(const SizeType index, Args &&... args)`](./index.md)||
 ------
 ### `static auto call(const SizeType index, Args &&... args)`
 

@@ -2,10 +2,10 @@
 
 ## `struct addReference< const volatile void >`
 
-### Variable
-||||
-|---:|:---|:---|
-|const typedef volatile void|[`type`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `const typedef volatile void type`
 

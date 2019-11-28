@@ -2,15 +2,15 @@
 
 ## `class Scheduler`
 
-### Function
-||||
-|---:|:---|:---|
-|void|[`addTask(bzd::interface::Task & task)`](./index.md)||
-|void|[`start()`](./index.md)||
-|void|[`yield()`](./index.md)||
-||[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
-|T &|[`getInstance()`](./index.md)||
-|void|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`addTask(bzd::interface::Task & task)`](./index.md)||
+|[`start()`](./index.md)||
+|[`yield()`](./index.md)||
+|[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
+|[`getInstance()`](./index.md)||
+|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
 ------
 ### `void addTask(bzd::interface::Task & task)`
 Add a new task to the scheduler

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "bzd/types.h"
-#include "bzd/utility.h"
 #include "bzd/meta/find.h"
 #include "bzd/meta/contains.h"
 #include "bzd/meta/choose_nth.h"

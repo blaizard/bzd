@@ -6,16 +6,16 @@
 ||||
 |---:|:---|:---|
 |class...|Ts||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Variant(Args &&... args)`](./index.md)||
-||[`~Variant()`](./index.md)||
-|constexpr void|[`emplace(Args &&... args)`](./index.md)||
-|constexpr bool|[`is() const`](./index.md)||
-|constexpr bzd::Expected< const T &, bool >|[`get() const`](./index.md)||
-|constexpr bzd::Expected< T &, bool >|[`get()`](./index.md)||
-|constexpr void|[`match(Functors &&... funcs) const`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Variant(Args &&... args)`](./index.md)||
+|[`~Variant()`](./index.md)||
+|[`emplace(Args &&... args)`](./index.md)||
+|[`is() const`](./index.md)||
+|[`get() const`](./index.md)||
+|[`get()`](./index.md)||
+|[`match(Functors &&... funcs) const`](./index.md)||
 ------
 ### `template<class... Args> constexpr Variant(Args &&... args)`
 

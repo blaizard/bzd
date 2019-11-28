@@ -6,11 +6,11 @@
 ||||
 |---:|:---|:---|
 |class...|T||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Tuple(Args &&... args)`](./index.md)||
-|constexpr SizeType|[`size()`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Tuple(Args &&... args)`](./index.md)||
+|[`size()`](./index.md)||
 ------
 ### `template<class... Args> constexpr Tuple(Args &&... args)`
 

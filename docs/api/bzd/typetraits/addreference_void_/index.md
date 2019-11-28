@@ -2,10 +2,10 @@
 
 ## `struct addReference< void >`
 
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 

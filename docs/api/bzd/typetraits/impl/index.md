@@ -2,21 +2,21 @@
 
 ## ` impl`
 
-### Struct
-||||
-|---:|:---|:---|
-|struct|[`isConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`](isconstructible_voidtype_decltype_t_declval_args_t_args_/index.md)||
-|struct|[`isConstructible`](isconstructible/index.md)||
-|struct|[`TypeIdentity`](typeidentity/index.md)||
-|struct|[`isDestructible`](isdestructible/index.md)||
-|struct|[`addRValueReferenceHelper`](addrvaluereferencehelper/index.md)||
-|struct|[`addRValueReference`](addrvaluereference/index.md)||
-|struct|[`addRValueReferenceHelper< T, true >`](addrvaluereferencehelper_t_true_/index.md)||
-### Function
-||||
-|---:|:---|:---|
-|auto|[`tryAddPointer(int)`](./index.md)||
-|auto|[`tryAddPointer(...)`](./index.md)||
+
+|Struct||
+|:---|:---|
+|[`isConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`](isconstructible_voidtype_decltype_t_declval_args_t_args_/index.md)||
+|[`isConstructible`](isconstructible/index.md)||
+|[`TypeIdentity`](typeidentity/index.md)||
+|[`isDestructible`](isdestructible/index.md)||
+|[`addRValueReferenceHelper`](addrvaluereferencehelper/index.md)||
+|[`addRValueReference`](addrvaluereference/index.md)||
+|[`addRValueReferenceHelper< T, true >`](addrvaluereferencehelper_t_true_/index.md)||
+
+|Function||
+|:---|:---|
+|[`tryAddPointer(int)`](./index.md)||
+|[`tryAddPointer(...)`](./index.md)||
 ------
 ### `template<class T, class... Args> struct isConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`
 

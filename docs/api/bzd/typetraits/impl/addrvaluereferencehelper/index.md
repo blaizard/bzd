@@ -7,10 +7,10 @@
 |---:|:---|:---|
 |typename T|None||
 |bool|b||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`type`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `typedef type`
 

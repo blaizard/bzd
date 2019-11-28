@@ -2,10 +2,10 @@
 
 ## `class Stack`
 Application stack definition
-### Function
-||||
-|---:|:---|:---|
-|void|[`reset(const FctPtrType fct, void * context)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`reset(const FctPtrType fct, void * context)`](./index.md)||
 ------
 ### `void reset(const FctPtrType fct, void * context)`
 

@@ -6,10 +6,10 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Function
-||||
-|---:|:---|:---|
-|SizeType|[`read(Span< T > & data)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`read(Span< T > & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 

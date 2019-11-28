@@ -2,14 +2,14 @@
 
 ## `class Iterator`
 
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Iterator(const SelfType & container, const SizeType index)`](./index.md)||
-|constexpr Iterator &|[`operator++()`](./index.md)||
-|constexpr bool|[`operator==(const Iterator & it) const`](./index.md)||
-|constexpr bool|[`operator!=(const Iterator & it) const`](./index.md)||
-|constexpr const DataType &|[`operator*() const`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Iterator(const SelfType & container, const SizeType index)`](./index.md)||
+|[`operator++()`](./index.md)||
+|[`operator==(const Iterator & it) const`](./index.md)||
+|[`operator!=(const Iterator & it) const`](./index.md)||
+|[`operator*() const`](./index.md)||
 ------
 ### `constexpr Iterator(const SelfType & container, const SizeType index)`
 

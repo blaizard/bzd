@@ -2,10 +2,10 @@
 
 ## `struct addReference< const void >`
 
-### Variable
-||||
-|---:|:---|:---|
-|const typedef void|[`type`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `const typedef void type`
 

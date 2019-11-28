@@ -2,13 +2,13 @@
 
 ## `class Task`
 
-### Function
-||||
-|---:|:---|:---|
-||[`Task(CtxPtrType context, const FctPtrType fct)`](./index.md)||
-|void|[`bind(interface::Stack & stack)`](./index.md)||
-|void|[`start(void ** pointer)`](./index.md)||
-|void|[`yield(Task & nextTask)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Task(CtxPtrType context, const FctPtrType fct)`](./index.md)||
+|[`bind(interface::Stack & stack)`](./index.md)||
+|[`start(void ** pointer)`](./index.md)||
+|[`yield(Task & nextTask)`](./index.md)||
 ------
 ### ` Task(CtxPtrType context, const FctPtrType fct)`
 

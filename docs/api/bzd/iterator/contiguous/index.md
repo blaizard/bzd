@@ -6,25 +6,25 @@
 ||||
 |---:|:---|:---|
 |class DataType|None||
-### Function
-||||
-|---:|:---|:---|
-|constexpr|[`Contiguous(DataType * data, const SizeType index)`](./index.md)||
-|constexpr SelfType &|[`operator++()`](./index.md)||
-|constexpr SelfType|[`operator++(int)`](./index.md)||
-|constexpr SelfType &|[`operator--()`](./index.md)||
-|constexpr SelfType|[`operator--(int)`](./index.md)||
-|constexpr SelfType|[`operator-(const int n) const`](./index.md)||
-|constexpr SelfType|[`operator+(const int n) const`](./index.md)||
-|constexpr SelfType &|[`operator-=(const int n)`](./index.md)||
-|constexpr SelfType &|[`operator+=(const int n)`](./index.md)||
-|constexpr bool|[`operator==(const SelfType & it) const`](./index.md)||
-|constexpr bool|[`operator!=(const SelfType & it) const`](./index.md)||
-|constexpr DataType &|[`operator*()`](./index.md)||
-### Typedef
-||||
-|---:|:---|:---|
-|typedef|[`SelfType`](./index.md)|alias of [`bzd::iterator::Contiguous`](./index.md)|
+
+|Function||
+|:---|:---|
+|[`Contiguous(DataType * data, const SizeType index)`](./index.md)||
+|[`operator++()`](./index.md)||
+|[`operator++(int)`](./index.md)||
+|[`operator--()`](./index.md)||
+|[`operator--(int)`](./index.md)||
+|[`operator-(const int n) const`](./index.md)||
+|[`operator+(const int n) const`](./index.md)||
+|[`operator-=(const int n)`](./index.md)||
+|[`operator+=(const int n)`](./index.md)||
+|[`operator==(const SelfType & it) const`](./index.md)||
+|[`operator!=(const SelfType & it) const`](./index.md)||
+|[`operator*()`](./index.md)||
+
+|Typedef||
+|:---|:---|
+|[`SelfType`](./index.md)|alias of [`bzd::iterator::Contiguous`](./index.md)|
 ------
 ### `constexpr Contiguous(DataType * data, const SizeType index)`
 

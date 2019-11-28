@@ -6,11 +6,11 @@
 ||||
 |---:|:---|:---|
 |const SizeType|N||
-### Function
-||||
-|---:|:---|:---|
-||[`Stack()`](./index.md)||
-|void|[`reset(const FctPtrType fct, void * context)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`Stack()`](./index.md)||
+|[`reset(const FctPtrType fct, void * context)`](./index.md)||
 ------
 ### ` Stack()`
 

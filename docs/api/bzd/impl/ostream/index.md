@@ -6,10 +6,10 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Function
-||||
-|---:|:---|:---|
-|SizeType|[`write(const Span< const T > & data)`](./index.md)||
+
+|Function||
+|:---|:---|
+|[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `virtual SizeType write(const Span< const T > & data)`
 

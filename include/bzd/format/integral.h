@@ -6,7 +6,6 @@
 #include "bzd/container/string_stream.h"
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_floating_point.h"
-#include "bzd/utility.h"
 
 namespace bzd
 {

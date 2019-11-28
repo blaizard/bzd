@@ -6,10 +6,10 @@
 ||||
 |---:|:---|:---|
 |class T|None||
-### Variable
-||||
-|---:|:---|:---|
-|const typedef T|[`type`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`type`](./index.md)||
 ------
 ### `const typedef T type`
 
