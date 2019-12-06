@@ -3,7 +3,7 @@ test_cpp_srcs = glob([
 ])
 
 [cc_test(
-    name = "test_" + src.replace("_test.cpp", ""),
+    name = src.replace(".cpp", ""),
     srcs = [src],
     deps = [
         "//src:bzd",

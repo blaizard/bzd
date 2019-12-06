@@ -8,5 +8,7 @@ gdb -tui -iex "layout asm" -iex "layout regs" -ex "b main" -ex "r" "$1"
 #x/10xg $sp
 #x/10xg $rbp
 
+# Disassemble
+# objdump -drwCS -Mintel
 
 # 0x555555557828 <temp1> 

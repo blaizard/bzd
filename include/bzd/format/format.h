@@ -398,16 +398,12 @@ namespace bzd
 				}
 			}
 
-			template <class T>
-			void printString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+			void printString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 			{
 				switch (metadata.format)
 				{
 				case Metadata::Format::AUTO:
-					{
-						const bzd::StringView stringView(value);
-						stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
-					}
+					stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
 					break;
 				case Metadata::Format::FIXED_POINT:
 				case Metadata::Format::FIXED_POINT_PERCENT:
@@ -429,14 +425,14 @@ namespace bzd
 				void addMetadata(const Metadata& metadata) {
 					args_[metadata.index].match(
 						[&](const int value) { printInteger(stream_, value, metadata); },
-						[&](const unsigned int value) { printInteger(stream_, value, metadata); },
-						[&](const long long int value) { printInteger(stream_, value, metadata); },
-						[&](const unsigned long long int value) { printInteger(stream_, value, metadata); },
+						[&](const unsigned int value) { printInteger(stream_, static_cast<int>(value), metadata); },
+						[&](const long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
+						[&](const unsigned long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
 						[&](const bool value) {},
 						[&](const char value) {},
 						[&](const float value) { printFixedPoint(stream_, value, metadata); },
-						[&](const double value) { printFixedPoint(stream_, value, metadata); },
-						[&](const long double value) { printFixedPoint(stream_, value, metadata); },
+						[&](const double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
+						[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
 						[&](const void* value) {},
 						[&](const char* value) { printString(stream_, value, metadata); },
 						[&](const bzd::StringView& value) { printString(stream_, value, metadata); }
@@ -546,10 +542,11 @@ namespace bzd
 			// Compile-time format check
 			constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
 			constexpr const auto context = bzd::format::impl::contextBuild(F::data(), tuple);
+			// This line enforces compilation time evaluation
 			static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
 			// Run-time call
-			bzd::Vector<bzd::format::impl::Arg, tuple.size()> argList(bzd::forward<typename bzd::decay<Args>::type>(args)...);
+			bzd::Vector<bzd::format::impl::Arg, tuple.size()> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
 			bzd::format::impl::print(out, f.str(), argList);
 		}
 	}

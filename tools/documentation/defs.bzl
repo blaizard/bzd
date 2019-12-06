@@ -5,7 +5,6 @@ python3 "{script}" --doxygen {doxygen} $@
 """
 
 def _impl(ctx):
-
     # Generate the doxyfile
     doxyfile = ctx.actions.declare_file(ctx.label.name + ".doxyfile")
     doxygen_output = ctx.actions.declare_directory(ctx.label.name + ".doxygen")
@@ -15,7 +14,7 @@ def _impl(ctx):
         output = doxyfile,
         substitutions = {
             "{input}": " \\\n".join(['"{}"'.format(t.path) for t in ctx.files.srcs]),
-            "{output}": doxygen_output.path
+            "{output}": doxygen_output.path,
         },
     )
     print("Idenfitied {} source(s) files".format(len(ctx.files.srcs)))
@@ -25,9 +24,9 @@ def _impl(ctx):
     args.add(doxyfile.path)
 
     ctx.actions.run(
-        outputs = [ doxygen_output ],
-        inputs = ctx.files.srcs + [ doxyfile ],
-        arguments = [ args ],
+        outputs = [doxygen_output],
+        inputs = ctx.files.srcs + [doxyfile],
+        arguments = [args],
         progress_message = "Generating doxygen XML into '%s'" % doxyfile.path,
         executable = ctx.executable._doxygen,
     )
@@ -35,7 +34,7 @@ def _impl(ctx):
     # Generate the documentation from the XML output
     script = ctx.actions.declare_file("documentation-%s-generator" % ctx.label.name)
     script_content = _script_template.format(
-        script = "tools/documentation/documentation.py", #ctx.executable._generator.short_path,
+        script = "tools/documentation/documentation.py",  #ctx.executable._generator.short_path,
         doxygen = doxygen_output.short_path,
     )
     ctx.actions.write(script, script_content, is_executable = True)
@@ -73,5 +72,5 @@ cc_documentation = rule(
             allow_single_file = True,
         ),
     },
-    executable = True
+    executable = True,
 )

@@ -9,7 +9,7 @@ filegroup(
 cc_library(
     name = "bzd",
     hdrs = [
-        ":bzd_files"
+        ":bzd_files",
     ],
     includes = ["."],
     visibility = ["//visibility:public"],

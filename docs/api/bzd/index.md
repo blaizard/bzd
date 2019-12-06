@@ -17,17 +17,18 @@
 |Class||
 |:---|:---|
 |[`Task`](task/index.md)||
-|[`SingletonThreadLocalImpl`](singletonthreadlocalimpl/index.md)||
 |[`Scheduler`](scheduler/index.md)||
 |[`Variant`](variant/index.md)||
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
+|[`BTree`](btree/index.md)||
 |[`StringStream`](stringstream/index.md)||
 |[`Tuple`](tuple/index.md)||
-|[`Pool`](pool/index.md)||
 |[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
-|[`SingletonImpl`](singletonimpl/index.md)||
+|[`SingletonThreadLocal`](singletonthreadlocal/index.md)||
 |[`String`](string/index.md)||
+|[`Pool`](pool/index.md)||
 |[`VariantConstexpr`](variantconstexpr/index.md)||
+|[`Singleton`](singleton/index.md)||
 |[`Stack`](stack/index.md)||
 |[`Vector`](vector/index.md)||
 
@@ -44,15 +45,17 @@
 |[`yield()`](./index.md)||
 |[`panic()`](./index.md)||
 |[`getOut()`](./index.md)||
-|[`offsetOf(const M T::* member)`](./index.md)||
 |[`containerOf(M * ptr, const M T::* member)`](./index.md)||
-|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
+|[`max(const T & a)`](./index.md)||
+|[`max(const T & a, const T & b, const Ts &... n)`](./index.md)||
+|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
+|[`min(const T & a)`](./index.md)||
+|[`min(const T & a, const T & b, const Ts &... n)`](./index.md)||
 |[`move(T && arg)`](./index.md)||
+|[`offsetOf(const M T::* member)`](./index.md)||
 |[`swap(T & t1, T & t2)`](./index.md)||
-|[`min(const T & a, const T & b)`](./index.md)||
-|[`max(const T & a, const T & b)`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -77,13 +80,6 @@
 |class T|None||
 |class...|Args||
 ------
-### `template<class T> class SingletonThreadLocalImpl`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
 ### `class Scheduler`
 
 ------
@@ -101,8 +97,18 @@ The container combines the performance and accessibility of a C-style array with
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
+------
+### `template<class K, class V, SizeType N, SizeType Order> class BTree`
+
+#### Template
+||||
+|---:|:---|:---|
+|class K|None||
+|class V|None||
+|SizeType|N||
+|SizeType|Order||
 ------
 ### `template<SizeType N> class StringStream`
 
@@ -118,14 +124,6 @@ The container combines the performance and accessibility of a C-style array with
 |---:|:---|:---|
 |class...|T||
 ------
-### `template<class T, SizeType N> class Pool`
-A Pool is a fixed memory buffer containing fixed size elements that can be taken or released.
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|SizeType|N||
-------
 ### `template<class T> class Span`
 The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.
 #### Template
@@ -133,12 +131,12 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |class|T|Element type, must be a complete type that is not an abstract class type. |
 ------
-### `template<class T> class SingletonImpl`
-Singleton class pattern
+### `template<class T> class SingletonThreadLocal`
+
 #### Template
 ||||
 |---:|:---|:---|
-|class T|None||
+|class|T||
 ------
 ### `template<SizeType N> class String`
 
@@ -147,12 +145,27 @@ Singleton class pattern
 |---:|:---|:---|
 |SizeType|N||
 ------
+### `template<class T, SizeType N> class Pool`
+A Pool is a fixed memory buffer containing fixed size elements that can be taken or released.
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|SizeType|N||
+------
 ### `template<class... Ts> class VariantConstexpr`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class...|Ts||
+------
+### `template<class T> class Singleton`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<const SizeType N> class Stack`
 
@@ -219,18 +232,6 @@ Singleton class pattern
 ### `bzd::OStream & getOut()`
 
 ------
-### `template<class T, class M> static constexpr IntPtrType offsetOf(const M T::* member)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|class M|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|const M T::*|member||
-------
 ### `template<class T, class M> static constexpr T * containerOf(M * ptr, const M T::* member)`
 
 #### Template
@@ -243,15 +244,6 @@ Singleton class pattern
 |---:|:---|:---|
 |M *|ptr||
 |const M T::*|member||
-------
-### `constexpr void memcpy(char * dest, const char * src, const SizeType size)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|char *|dest||
-|const char *|src||
-|const SizeType|size||
 ------
 ### `template<class T> constexpr T && forward(typename typeTraits::removeReference< T >::type & t)`
 
@@ -275,6 +267,65 @@ Singleton class pattern
 |---:|:---|:---|
 |typename typeTraits::removeReference< T >::type &&|t||
 ------
+### `template<class T> constexpr T max(const T & a)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|a||
+------
+### `template<class T, class... Ts> constexpr T max(const T & a, const T & b, const Ts &... n)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class...|Ts||
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|a||
+|const T &|b||
+|const Ts &...|n||
+------
+### `constexpr void memcpy(char * dest, const char * src, const SizeType size)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|char *|dest||
+|const char *|src||
+|const SizeType|size||
+------
+### `template<class T> constexpr T min(const T & a)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|a||
+------
+### `template<class T, class... Ts> constexpr T min(const T & a, const T & b, const Ts &... n)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class...|Ts||
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|a||
+|const T &|b||
+|const Ts &...|n||
+------
 ### `template<class T> bzd::typeTraits::removeReference< T >::type && move(T && arg)`
 
 #### Template
@@ -285,6 +336,18 @@ Singleton class pattern
 ||||
 |---:|:---|:---|
 |T &&|arg||
+------
+### `template<class T, class M> static constexpr IntPtrType offsetOf(const M T::* member)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class M|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const M T::*|member||
 ------
 ### `template<class T> constexpr void swap(T & t1, T & t2)`
 
@@ -297,30 +360,6 @@ Singleton class pattern
 |---:|:---|:---|
 |T &|t1||
 |T &|t2||
-------
-### `template<class T> constexpr T min(const T & a, const T & b)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|const T &|a||
-|const T &|b||
-------
-### `template<class T> constexpr T max(const T & a, const T & b)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|const T &|a||
-|const T &|b||
 ------
 ### `template<class T, class E> typedef Expected`
 This is the type used for returning and propagating errors.

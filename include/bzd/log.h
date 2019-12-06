@@ -20,11 +20,9 @@ namespace bzd
 		};
 
 		template <class... Args>
-		void print(const bzd::StringView& fmt, Args&&... args) noexcept
+		void print(Args&&... args) noexcept
 		{
-			bzd::String<128> message;
-			bzd::format::toString(message, fmt, bzd::forward<Args>(args)...);
-			bzd::getOut().write(message);
+			bzd::format::toString(bzd::getOut(), bzd::forward<Args>(args)...);
 		}
 	}
 }

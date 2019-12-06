@@ -24,6 +24,11 @@ namespace bzd
 		{
 		}
 
+		constexpr Array() noexcept
+				: Span<T>(data_, N)
+		{
+		}
+
 		/**
 		 * \brief Returns the number of elements that the array can hold.
 		 * 

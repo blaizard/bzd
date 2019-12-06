@@ -5,16 +5,16 @@ cc_documentation(
     srcs = [
         "//include:bzd_files",
     ],
-    tags = ["manual"],
     data = glob([
         "**/*.py",
     ]),
+    tags = ["manual"],
 )
 
 py_binary(
     name = "generator",
-    main = "documentation.py",
     srcs = glob([
         "**/*.py",
     ]),
+    main = "documentation.py",
 )

@@ -8,9 +8,9 @@
 |[`addTask(bzd::interface::Task & task)`](./index.md)||
 |[`start()`](./index.md)||
 |[`yield()`](./index.md)||
-|[`SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`](./index.md)||
 |[`getInstance()`](./index.md)||
-|[`operator=(SingletonThreadLocalImpl const &)`](./index.md)||
+|[`SingletonThreadLocal(SingletonThreadLocal const &)`](./index.md)||
+|[`operator=(SingletonThreadLocal const &)`](./index.md)||
 ------
 ### `void addTask(bzd::interface::Task & task)`
 Add a new task to the scheduler
@@ -25,25 +25,25 @@ Add a new task to the scheduler
 ### `void yield()`
 
 ------
-### ` SingletonThreadLocalImpl(SingletonThreadLocalImpl const &)`
-*From bzd::SingletonThreadLocalImpl*
-
-
-#### Parameters
-||||
-|---:|:---|:---|
-|SingletonThreadLocalImpl const &|None||
-------
 ### `static T & getInstance()`
-*From bzd::SingletonThreadLocalImpl*
+*From bzd::SingletonThreadLocal*
 
 
 ------
-### `void operator=(SingletonThreadLocalImpl const &)`
-*From bzd::SingletonThreadLocalImpl*
+### ` SingletonThreadLocal(SingletonThreadLocal const &)`
+*From bzd::SingletonThreadLocal*
 
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|SingletonThreadLocalImpl const &|None||
+|SingletonThreadLocal const &|None||
+------
+### `void operator=(SingletonThreadLocal const &)`
+*From bzd::SingletonThreadLocal*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|SingletonThreadLocal const &|None||
