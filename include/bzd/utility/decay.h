@@ -17,7 +17,8 @@ namespace bzd
 		typedef typename bzd::typeTraits::removeReference<T>::type U;
 	public:
 		typedef typename bzd::typeTraits::conditional<bzd::typeTraits::isArray<U>::value, typename bzd::typeTraits::removeExtent<U>::type*,
-			typename bzd::typeTraits::conditional<bzd::typeTraits::isFunction<U>::value, typename bzd::typeTraits::addPointer<U>::type, typename bzd::typeTraits::removeCV<U>::type
+			typename bzd::typeTraits::conditional<bzd::typeTraits::isFunction<U>::value, typename bzd::typeTraits::addPointer<U>::type,
+			typename bzd::typeTraits::removeCV<U>::type
         	>::type
     	>::type type;
 	};

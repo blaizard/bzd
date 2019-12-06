@@ -2,9 +2,15 @@
 
 namespace bzd
 {
-	template <class T>
-	constexpr T max(const T& a, const T& b) noexcept
+    template <class T>
+    constexpr T max(const T& a) noexcept
+    {
+        return a;
+    }
+
+	template <class T, class... Ts>
+	constexpr T max(const T& a, const T& b, const Ts&... n) noexcept
 	{
-		return (a > b) ? a : b;
+		return bzd::max((a > b) ? a : b, n...);
 	}
 }

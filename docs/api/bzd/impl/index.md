@@ -13,7 +13,9 @@
 |[`IStream`](istream/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`TupleImpl`](tupleimpl/index.md)||
+|[`Pool`](pool/index.md)||
 |[`StringView`](stringview/index.md)||
+|[`BTree`](btree/index.md)||
 |[`Unexpected`](unexpected/index.md)||
 |[`String`](string/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
@@ -107,6 +109,13 @@
 |class N|None||
 |class...|T||
 ------
+### `template<class T> class Pool`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+------
 ### `template<class T, class Impl> class StringView`
 
 #### Template
@@ -114,6 +123,19 @@
 |---:|:---|:---|
 |class T|None||
 |class Impl|None||
+------
+### `template<class K, class V, SizeType Order> class BTree`
+Implementation of a B-tree.
+
+A B-Tree of order M has the following properties:Every nodes has at most M children.A non-leaf node with k children contains k-1 keys.The root has at least 2 children if it is not a leaf node.Every non-leaf node (except root) has at least M / 2 children.All leaves appear in the same level.
+
+Non-leaf nodes are implemented as non-sorted arrays.
+#### Template
+||||
+|---:|:---|:---|
+|class K|None||
+|class V|None||
+|SizeType|Order||
 ------
 ### `template<class E> class Unexpected`
 Internal class used to create an unexpected object type.

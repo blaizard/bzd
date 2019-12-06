@@ -7,12 +7,13 @@ The container combines the performance and accessibility of a C-style array with
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
 
 |Function||
 |:---|:---|
 |[`Array(Args &&... args)`](./index.md)||
+|[`Array()`](./index.md)||
 |[`capacity() const`](./index.md)|Returns the number of elements that the array can hold.|
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
 |[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
@@ -56,6 +57,9 @@ The container combines the performance and accessibility of a C-style array with
 ||||
 |---:|:---|:---|
 |Args &&...|args||
+------
+### `constexpr Array()`
+
 ------
 ### `constexpr SizeType capacity() const`
 Returns the number of elements that the array can hold.

@@ -3,7 +3,11 @@
 
 TEST(ContainerPool, base)
 {
+	std::cout << "sasd" << std::endl;
+
 	bzd::Pool<int, 5> pool;
+
+	std::cout << "sasd" << std::endl;
 
 	pool.toStream(std::cout);
 	std::cout << std::endl;

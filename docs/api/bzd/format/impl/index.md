@@ -5,7 +5,7 @@
 
 |Namespace||
 |:---|:---|
-|[`@16`](_16/index.md)||
+|[`@17`](_17/index.md)||
 
 |Class||
 |:---|:---|
@@ -28,7 +28,7 @@
 |[`parse(Ctx & context, bzd::StringView format, const T & args)`](./index.md)||
 |[`printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
 |[`printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|[`printString(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`](./index.md)||
 |[`contextBuild(const bzd::StringView & format, const T & tuple)`](./index.md)||
 |[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
 |[`contextCheck(const Ctx & context, const T & tuple)`](./index.md)|Check the format context.|
@@ -169,17 +169,13 @@ This function returns either when the string is consumed (return false) or when 
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `template<class T> void printString(bzd::OStream & stream, const T & value, const Metadata & metadata)`
+### `void printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
 
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|stream||
-|const T &|value||
+|const bzd::StringView|stringView||
 |const Metadata &|metadata||
 ------
 ### `template<class T> constexpr Context< CheckContext > contextBuild(const bzd::StringView & format, const T & tuple)`

@@ -1,26 +1,27 @@
-# [`bzd`](../../index.md)::[`Pool`](../index.md)
+# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`Pool`](../index.md)
 
-## `template<class T, SizeType N> class Pool`
-A Pool is a fixed memory buffer containing fixed size elements that can be taken or released.
+## `template<class T> class Pool`
+
 #### Template
 ||||
 |---:|:---|:---|
 |class|T||
-|SizeType|N||
 
 |Function||
 |:---|:---|
-|[`Pool()`](./index.md)||
+|[`Pool(const bzd::Span< Element > & data)`](./index.md)||
 |[`release(T * container)`](./index.md)||
 |[`reserve()`](./index.md)||
 |[`toStream(std::ostream & os)`](./index.md)||
 ------
-### `constexpr Pool()`
+### `constexpr Pool(const bzd::Span< Element > & data)`
 
+#### Parameters
+||||
+|---:|:---|:---|
+|const bzd::Span< Element > &|data||
 ------
 ### `constexpr void release(T * container)`
-*From bzd::impl::Pool*
-
 Release an element from the pool
 #### Parameters
 ||||
@@ -28,13 +29,9 @@ Release an element from the pool
 |T *|container||
 ------
 ### `constexpr T * reserve()`
-*From bzd::impl::Pool*
-
 Reserve an element from the free list (if any)
 ------
 ### `void toStream(std::ostream & os)`
-*From bzd::impl::Pool*
-
 
 #### Parameters
 ||||

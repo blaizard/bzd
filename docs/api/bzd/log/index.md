@@ -5,9 +5,9 @@
 
 |Function||
 |:---|:---|
-|[`print(const bzd::StringView & fmt, Args &&... args)`](./index.md)||
+|[`print(Args &&... args)`](./index.md)||
 ------
-### `template<class... Args> void print(const bzd::StringView & fmt, Args &&... args)`
+### `template<class... Args> void print(Args &&... args)`
 
 #### Template
 ||||
@@ -16,5 +16,4 @@
 #### Parameters
 ||||
 |---:|:---|:---|
-|const bzd::StringView &|fmt||
 |Args &&...|args||
