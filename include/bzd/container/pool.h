@@ -3,6 +3,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/container_of.h"
 #include "bzd/container/span.h"
+#include "bzd/assert.h"
 
 #include <iostream>
 
@@ -14,68 +15,74 @@ namespace bzd
 		class Pool
 		{
 		protected:
+			static constexpr const SizeType npos = static_cast<SizeType>(-1);
 			struct Element
 			{
 				T container_;
-				Element* next_;
+				SizeType next_;
 			};
 
 		public:
 			constexpr Pool(const bzd::Span<Element>& data) noexcept
-					: data_(data)
+					: data_(data), free_(0)
 			{
 				// Build the free list
-				Element** curFree = &free_;
-				for (auto& item : data_)
+				for (SizeType i = 0; i < data_.size() - 1; ++i)
 				{
-					*curFree = &item;
-					curFree = &((*curFree)->next_);
+					data_[i].next_ = i + 1;
 				}
-				*curFree = nullptr;
+				data_.back().next_ = npos;
+			}
+
+			constexpr SizeType capacity() const noexcept
+			{
+				return data_.size();
+			}
+
+			constexpr bool empty() const noexcept
+			{
+				return (free_ == npos);
 			}
 
 			/**
 			 * Release an element from the pool
 			 */
-			constexpr void release(T* container) noexcept
+			constexpr void release(T& container) noexcept
 			{
-				// assert(T >= &data_[0]);
-				// assert(T < &data_[N]);
+				bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&container) >= reinterpret_cast<bzd::IntPtrType>(data_.data()));
+				bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&container) < reinterpret_cast<bzd::IntPtrType>(data_.data() + data_.size()));
 
-				Element* item = containerOf(container, &Element::container_);
+				Element* item = containerOf(&container, &Element::container_);
 				item->next_ = free_;
-				free_ = item;
+				free_ = (item - data_.data());
 			}
 
 			/**
 			 * Reserve an element from the free list (if any)
 			 */
-			constexpr T* reserve() noexcept
+			constexpr T& reserve() noexcept
 			{
-				if (free_)
-				{
-					Element* item = free_;
-					free_ = free_->next_;
-					return &item->container_;
-				}
+				bzd::assert::isTrue(!empty()); //CONSTEXPR_STRING_VIEW("Pool empty, capacity: {}"), data_.size());
 
-				return nullptr;
+				Element& item = data_[free_];
+				free_ = item.next_;
+				return item.container_;
 			}
 
 			void toStream(std::ostream& os)
 			{
 				os << "free=";
-				Element* curFree = free_;
-				while (curFree)
+				SizeType current = free_;
+				while (current != npos)
 				{
-					os << (curFree - &data_[0]) << ",";
-					curFree = curFree->next_;
+					os << current << ",";
+					current = data_[current].next_;
 				}
 			}
 
 		private:
 			bzd::Span<Element> data_;
-			Element* free_ = nullptr;
+			SizeType free_;
 		};
 	}
 
