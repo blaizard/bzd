@@ -24,7 +24,7 @@ namespace bzd
 
 	public:
 		Task(const T& callable)
-			: interface::Task(static_cast<CtxPtrType>(&context_), reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>))
+			: interface::Task(static_cast<PtrType>(&context_), reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>))
 			, context_{callable}
 		{
 		}

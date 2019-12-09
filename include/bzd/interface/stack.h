@@ -15,7 +15,7 @@ namespace bzd
 			void reset(const FctPtrType fct, void* context);
 
 		protected:
-			Stack(ByteType* stack, const SizeType size)
+			Stack(UInt8Type* stack, const SizeType size)
 				: stackBase_(stack), size_(size)
 			{
 			}
@@ -29,7 +29,7 @@ namespace bzd
 				return reinterpret_cast<T*>(&stackBase_[((size_ - sizeof(T)) / Align) * Align]);
 			}
 
-			enum class Direction : ByteType
+			enum class Direction : UInt8Type
 			{
 				/**
 				 * The stack grows from lower address to higher
@@ -43,9 +43,9 @@ namespace bzd
 
 			friend class Task;
 
-			ByteType* const stackBase_;
+			UInt8Type* const stackBase_;
 			const SizeType size_;
-			ByteType* stack_;
+			UInt8Type* stack_;
 			static const Direction direction_;
 		};
 	}

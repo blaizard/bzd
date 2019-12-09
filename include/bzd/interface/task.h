@@ -16,7 +16,7 @@ namespace bzd
 		class Task
 		{
 		public:
-			Task(CtxPtrType context, const FctPtrType fct)
+			Task(PtrType context, const FctPtrType fct)
 				: context_(context), fct_(fct)
 			{
 			}
@@ -44,7 +44,7 @@ namespace bzd
 			}
 
 		protected:
-			CtxPtrType const context_;
+			PtrType const context_;
 			const FctPtrType fct_;
 			interface::Stack* stack_;
 		};
