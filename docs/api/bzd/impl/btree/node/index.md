@@ -4,10 +4,10 @@
 |Variable||
 |:---|:---|
 |[`keys_`](./index.md)||
-|[`next_`](./index.md)||
+|[`last_`](./index.md)||
 ------
-### `bzd::Vector< K, Order - 1 > keys_`
+### `bzd::Vector< bzd::Tuple< K, Node * >, Order - 1 > keys_`
 
 ------
-### `bzd::Vector< Node *, Order > next_`
+### `Node * last_`
 

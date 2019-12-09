@@ -9,5 +9,5 @@
 ### `T container_`
 
 ------
-### `Element * next_`
+### `SizeType next_`
 

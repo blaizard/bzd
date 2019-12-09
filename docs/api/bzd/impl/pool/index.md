@@ -10,7 +10,9 @@
 |Function||
 |:---|:---|
 |[`Pool(const bzd::Span< Element > & data)`](./index.md)||
-|[`release(T * container)`](./index.md)||
+|[`capacity() const`](./index.md)||
+|[`empty() const`](./index.md)||
+|[`release(T & container)`](./index.md)||
 |[`reserve()`](./index.md)||
 |[`toStream(std::ostream & os)`](./index.md)||
 ------
@@ -21,14 +23,20 @@
 |---:|:---|:---|
 |const bzd::Span< Element > &|data||
 ------
-### `constexpr void release(T * container)`
+### `constexpr SizeType capacity() const`
+
+------
+### `constexpr bool empty() const`
+
+------
+### `constexpr void release(T & container)`
 Release an element from the pool
 #### Parameters
 ||||
 |---:|:---|:---|
-|T *|container||
+|T &|container||
 ------
-### `constexpr T * reserve()`
+### `constexpr T & reserve()`
 Reserve an element from the free list (if any)
 ------
 ### `void toStream(std::ostream & os)`

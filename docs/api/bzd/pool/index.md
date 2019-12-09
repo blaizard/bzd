@@ -11,23 +11,35 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |Function||
 |:---|:---|
 |[`Pool()`](./index.md)||
-|[`release(T * container)`](./index.md)||
+|[`capacity() const`](./index.md)||
+|[`empty() const`](./index.md)||
+|[`release(T & container)`](./index.md)||
 |[`reserve()`](./index.md)||
 |[`toStream(std::ostream & os)`](./index.md)||
 ------
 ### `constexpr Pool()`
 
 ------
-### `constexpr void release(T * container)`
+### `constexpr SizeType capacity() const`
+*From bzd::impl::Pool*
+
+
+------
+### `constexpr bool empty() const`
+*From bzd::impl::Pool*
+
+
+------
+### `constexpr void release(T & container)`
 *From bzd::impl::Pool*
 
 Release an element from the pool
 #### Parameters
 ||||
 |---:|:---|:---|
-|T *|container||
+|T &|container||
 ------
-### `constexpr T * reserve()`
+### `constexpr T & reserve()`
 *From bzd::impl::Pool*
 
 Reserve an element from the free list (if any)

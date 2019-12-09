@@ -5,11 +5,11 @@
 
 |Function||
 |:---|:---|
-|[`isTrue(const bool condition, const bzd::StringView & fmt, Args &&... args)`](./index.md)||
+|[`isTrue(const bool condition, Args &&... args)`](./index.md)||
 |[`isTrue(const bool condition)`](./index.md)||
 |[`isTrue(const bool condition, const bzd::StringView & message)`](./index.md)||
 ------
-### `template<class... Args> constexpr void isTrue(const bool condition, const bzd::StringView & fmt, Args &&... args)`
+### `template<class... Args> constexpr void isTrue(const bool condition, Args &&... args)`
 
 #### Template
 ||||
@@ -19,7 +19,6 @@
 ||||
 |---:|:---|:---|
 |const bool|condition||
-|const bzd::StringView &|fmt||
 |Args &&...|args||
 ------
 ### `constexpr void isTrue(const bool condition)`
