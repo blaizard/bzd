@@ -3,6 +3,7 @@
 #include "bzd/types.h"
 #include "bzd/container/vector.h"
 #include "bzd/container/pool.h"
+#include "bzd/container/tuple.h"
 
 namespace bzd
 {
@@ -26,8 +27,9 @@ namespace bzd
 		protected:
 			struct Node
 			{
-				bzd::Vector<K, Order - 1> keys_;
-				bzd::Vector<Node*, Order> next_;
+				bzd::Vector<bzd::Tuple<K, Node*>, Order - 1> keys_;
+				Node* next_;
+				//bzd::Vector<Node*, Order> next_;
 			};
 
 		public:
@@ -50,12 +52,35 @@ namespace bzd
 			void insert(const K& key, const V& /*value*/)
 			{
 				Node* node = *root_;
-				if (!root_)
+
+				// If there is no node yet, create one
+				if (!*root_)
 				{
-					*root_ = nodes_.reserve();
+					*root_ = &nodes_.reserve();
+					node = *root_;
 				}
-				//std::cout << node->keys_.capacity() << std::endl;
-				//node->keys_.pushBack(key);
+
+				// Look for the right node
+				Node* subNode = nullptr;
+				for (const auto& nodeKey : node->keys_)
+				{
+					if (key >= nodeKey.template get<0>())
+					{
+						subNode = nodeKey.template get<1>();
+					}
+				}
+				if (!subNode)
+				{
+					subNode = node->next_;
+				}
+
+				// If the current node is full, create a new one
+				if (node->keys_.size() == node->keys_.capacity())
+				{
+					
+				}
+
+				node->keys_.pushBack(key);
 			}
 
 		protected:

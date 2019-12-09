@@ -89,7 +89,7 @@ namespace bzd
 				Format format = Format::AUTO;
 			};
 
-			using Arg = bzd::VariantConstexpr<int, unsigned int, long long int, unsigned long long int,
+			using Arg = bzd::VariantConstexpr<int, unsigned int, long int, unsigned long int, long long int, unsigned long long int,
 					bool, char, float, double, long double, const void*, const char*, bzd::StringView>;
 			using ArgList = bzd::interface::Vector<Arg>;
 
@@ -426,6 +426,8 @@ namespace bzd
 					args_[metadata.index].match(
 						[&](const int value) { printInteger(stream_, value, metadata); },
 						[&](const unsigned int value) { printInteger(stream_, static_cast<int>(value), metadata); },
+						[&](const long int value) { printInteger(stream_, value, metadata); },
+						[&](const unsigned long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
 						[&](const long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
 						[&](const unsigned long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
 						[&](const bool value) {},
