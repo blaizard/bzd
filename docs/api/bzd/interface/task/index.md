@@ -5,17 +5,17 @@
 
 |Function||
 |:---|:---|
-|[`Task(CtxPtrType context, const FctPtrType fct)`](./index.md)||
+|[`Task(PtrType context, const FctPtrType fct)`](./index.md)||
 |[`bind(interface::Stack & stack)`](./index.md)||
 |[`start(void ** pointer)`](./index.md)||
 |[`yield(Task & nextTask)`](./index.md)||
 ------
-### ` Task(CtxPtrType context, const FctPtrType fct)`
+### ` Task(PtrType context, const FctPtrType fct)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|CtxPtrType|context||
+|PtrType|context||
 |const FctPtrType|fct||
 ------
 ### `void bind(interface::Stack & stack)`

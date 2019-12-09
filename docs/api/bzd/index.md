@@ -64,13 +64,18 @@
 |[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
 |[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
 |[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
-|[`PtrType`](./index.md)||
-|[`PtrDiffType`](./index.md)||
-|[`CtxPtrType`](./index.md)||
-|[`IntPtrType`](./index.md)||
-|[`FctPtrType`](./index.md)||
-|[`ByteType`](./index.md)||
-|[`SizeType`](./index.md)||
+|[`PtrType`](./index.md)|Memory pointer type.|
+|[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
+|[`FctPtrType`](./index.md)|Function pointer type.|
+|[`SizeType`](./index.md)|Unsigned integer that can store the maximum size of a theoretically possible object of any type.|
+|[`Int8Type`](./index.md)|Signed integer type with a fixed width of 8-bit.|
+|[`Int16Type`](./index.md)|Signed integer type with a fixed width of 16-bit.|
+|[`Int32Type`](./index.md)|Signed integer type with a fixed width of 32-bit.|
+|[`Int64Type`](./index.md)|Signed integer type with a fixed width of 64-bit.|
+|[`UInt8Type`](./index.md)|Unsigned integer type with a fixed width of 8-bit.|
+|[`UInt16Type`](./index.md)|Unsigned integer type with a fixed width of 16-bit.|
+|[`UInt32Type`](./index.md)|Unsigned integer type with a fixed width of 32-bit.|
+|[`UInt64Type`](./index.md)|Unsigned integer type with a fixed width of 64-bit.|
 ------
 ### `template<class T, class... Args> class Task`
 
@@ -384,22 +389,37 @@ It is a variants with 2 states, valid, representing success and containing a val
 
 ------
 ### `typedef PtrType`
-
-------
-### `typedef PtrDiffType`
-
-------
-### `typedef CtxPtrType`
-
+Memory pointer type.
 ------
 ### `typedef IntPtrType`
-
+Integer type capable of holding a memory pointer.
 ------
 ### `typedef FctPtrType`
-
-------
-### `typedef ByteType`
-
+Function pointer type.
 ------
 ### `typedef SizeType`
-
+Unsigned integer that can store the maximum size of a theoretically possible object of any type.
+------
+### `typedef Int8Type`
+Signed integer type with a fixed width of 8-bit.
+------
+### `typedef Int16Type`
+Signed integer type with a fixed width of 16-bit.
+------
+### `typedef Int32Type`
+Signed integer type with a fixed width of 32-bit.
+------
+### `typedef Int64Type`
+Signed integer type with a fixed width of 64-bit.
+------
+### `typedef UInt8Type`
+Unsigned integer type with a fixed width of 8-bit.
+------
+### `typedef UInt16Type`
+Unsigned integer type with a fixed width of 16-bit.
+------
+### `typedef UInt32Type`
+Unsigned integer type with a fixed width of 32-bit.
+------
+### `typedef UInt64Type`
+Unsigned integer type with a fixed width of 64-bit.

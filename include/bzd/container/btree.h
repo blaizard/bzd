@@ -28,7 +28,7 @@ namespace bzd
 			struct Node
 			{
 				bzd::Vector<bzd::Tuple<K, Node*>, Order - 1> keys_;
-				Node* next_;
+				Node* last_;
 				//bzd::Vector<Node*, Order> next_;
 			};
 
@@ -45,7 +45,7 @@ namespace bzd
 			 * 1. Find the leaf node where the item should be inserted.
 			 * 2. If the leaf node can accomodate another item (it has no more than M - 1 items),
 			 * insert the itme into the correct location in the node.
-			 * 3. If the leaf node is full, split the node in 2, with the smaller hald of the items
+			 * 3. If the leaf node is full, split the node in 2, with the smaller half of the items
 			 * in one node and the larger half in the other. "Promote" the median item to the parent
 			 * node. If the parent node is full, split and repeat...
 			 */
@@ -71,7 +71,7 @@ namespace bzd
 				}
 				if (!subNode)
 				{
-					subNode = node->next_;
+					subNode = node->last_;
 				}
 
 				// If the current node is full, create a new one
