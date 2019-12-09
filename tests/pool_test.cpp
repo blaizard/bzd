@@ -45,4 +45,9 @@ TEST(ContainerPool, multi)
 
 	auto& item4 = pool.reserve();
 	EXPECT_TRUE(pool.empty());
+
+	pool.release(item2);
+	pool.release(item3);
+	pool.release(item4);
+	EXPECT_FALSE(pool.empty());
 }

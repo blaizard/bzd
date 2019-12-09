@@ -15,6 +15,6 @@ namespace bzd
 		}
 
 	private:
-		ByteType data_[N];
+		UInt8Type data_[N];
 	};
 }

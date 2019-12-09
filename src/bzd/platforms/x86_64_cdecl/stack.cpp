@@ -11,5 +11,5 @@ void bzd::interface::Stack::reset(const FctPtrType fct, void* context)
 	// check why we cannot use -1 or 0
 	pStack[-2] = context;
 	pStack[-3] = reinterpret_cast<void*>(fct);
-	stack_ = reinterpret_cast<ByteType*>(pStack - 10);
+	stack_ = reinterpret_cast<UInt8Type*>(pStack - 10);
 }
