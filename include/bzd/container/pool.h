@@ -23,7 +23,7 @@ namespace bzd
 			};
 
 		public:
-			constexpr Pool(const bzd::Span<Element>& data) noexcept
+			constexpr explicit Pool(const bzd::Span<Element>& data) noexcept
 					: data_(data), free_(0)
 			{
 				// Build the free list

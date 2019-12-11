@@ -1,8 +1,10 @@
 #pragma once
 
+#include "bzd/assert_minimal.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/decay.h"
+#include "bzd/utility/reference_wrapper.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/is_reference.h"
 
@@ -34,25 +36,10 @@ namespace bzd
 		{
 		private:
 			using Value = typename bzd::typeTraits::removeReference<T>::type;
-			struct RefWrapper
-			{
-				constexpr RefWrapper(Value&& value) : value_(&value) {}
-				constexpr Value& get() { return *value_; }
-				constexpr const Value& get() const { return *value_; }
-				Value* value_;
-			};
-			struct ValueWrapper
-			{
-				constexpr ValueWrapper(Value&& value) : value_(value) {}
-				constexpr Value& get() { return value_; }
-				constexpr const Value& get() const { return value_; }
-				Value value_;
-			};
-			using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, RefWrapper, ValueWrapper>::type;
+			using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
 
 		public:
-			template <class U>
-			constexpr Expected(U&& value) : isError_(false), value_(bzd::forward<Value>(value))
+			constexpr Expected(T&& value) : isError_(false), value_(bzd::forward<T>(value))
 			{
 			}
 
@@ -78,32 +65,32 @@ namespace bzd
 
 			constexpr const E& error() const
 			{
-				// assert
+				bzd::assert::isTrue(isError_);
 				return error_;
 			}
 
 			constexpr const Value& operator*() const
 			{
-				// assert
-				return value_.get();
+				bzd::assert::isTrue(!isError_);
+				return value_;
 			}
 
 			constexpr Value& operator*()
 			{
-				// assert
-				return value_.get();
+				bzd::assert::isTrue(!isError_);
+				return value_;
 			}
 
 			constexpr const Value* operator->() const
 			{
-				// assert
-				return &value_.get();
+				bzd::assert::isTrue(!isError_);
+				return &value_;
 			}
 
 			constexpr Value* operator->()
 			{
-				// assert
-				return &value_.get();
+				bzd::assert::isTrue(!isError_);
+				return &value_;
 			}
 
 		protected:
@@ -132,8 +119,6 @@ namespace bzd
 	 * 
 	 * It is a variants with 2 states, valid, representing success and containing a value, and error,
 	 * representing error and containing an error value.
-	 * 
-	 * \extends impl::Expected
 	 */
 	template <class T, class E>
 	using Expected = impl::Expected<T, E>;
