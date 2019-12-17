@@ -6,7 +6,7 @@
 #include "bzd/meta/choose_nth.h"
 #include "bzd/meta/union.h"
 #include "bzd/meta/type_list.h"
-#include "bzd/assert_minimal.h"
+#include "bzd/core/assert.h"
 #include "bzd/container/expected.h"
 
 namespace bzd

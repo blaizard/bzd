@@ -20,7 +20,8 @@
 |[`operator+=(const int n)`](./index.md)||
 |[`operator==(const SelfType & it) const`](./index.md)||
 |[`operator!=(const SelfType & it) const`](./index.md)||
-|[`operator*()`](./index.md)||
+|[`operator*() const`](./index.md)||
+|[`operator->() const`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -96,7 +97,10 @@
 |---:|:---|:---|
 |const SelfType &|it||
 ------
-### `constexpr DataType & operator*()`
+### `constexpr DataType & operator*() const`
+
+------
+### `constexpr DataType * operator->() const`
 
 ------
 ### `typedef SelfType`

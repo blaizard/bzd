@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/assert_minimal.h"
+#include "bzd/core/assert.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/decay.h"

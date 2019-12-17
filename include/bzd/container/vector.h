@@ -28,13 +28,13 @@ namespace bzd
 			 * 
 			 * The content of val is copied (or moved) to the new element.
 			 * 
-			 * \param element Value to be copied (or moved) to the new element.
+			 * \param value Value to be copied (or moved) to the new element.
 			 */
-			constexpr void pushBack(const T& element) noexcept
+			constexpr void pushBack(const T& value) noexcept
 			{
 				if (size_ < capacity_)
 				{
-					Parent::at(size_) = element;
+					Parent::at(size_) = value;
 					++size_;
 				}
 			}

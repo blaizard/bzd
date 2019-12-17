@@ -1,4 +1,4 @@
-#include "bzd/system.h"
+#include "bzd/core/system.h"
 
 void bzd::panic()
 {

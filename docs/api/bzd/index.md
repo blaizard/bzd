@@ -25,11 +25,14 @@
 |[`Tuple`](tuple/index.md)||
 |[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
 |[`SingletonThreadLocal`](singletonthreadlocal/index.md)||
+|[`ReferenceWrapper`](referencewrapper/index.md)||
 |[`String`](string/index.md)||
 |[`Pool`](pool/index.md)||
 |[`VariantConstexpr`](variantconstexpr/index.md)||
 |[`Singleton`](singleton/index.md)||
 |[`Stack`](stack/index.md)||
+|[`Queue`](queue/index.md)||
+|[`Map`](map/index.md)||
 |[`Vector`](vector/index.md)||
 
 |Struct||
@@ -42,9 +45,9 @@
 |Function||
 |:---|:---|
 |[`makeUnexpected(E && e)`](./index.md)||
-|[`yield()`](./index.md)||
 |[`panic()`](./index.md)||
 |[`getOut()`](./index.md)||
+|[`yield()`](./index.md)||
 |[`containerOf(M * ptr, const M T::* member)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
@@ -63,6 +66,7 @@
 |[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
 |[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
 |[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
+|[`Optional`](./index.md)|Type managing an optional contained value, i.e. a value that may or may not be present.; alias of [`bzd::impl::Optional`](impl/optional/index.md)|
 |[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
 |[`PtrType`](./index.md)|Memory pointer type.|
 |[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
@@ -143,6 +147,13 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |class|T||
 ------
+### `template<class T> class ReferenceWrapper`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
 ### `template<SizeType N> class String`
 
 #### Template
@@ -150,13 +161,14 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |SizeType|N||
 ------
-### `template<class T, SizeType N> class Pool`
+### `template<class T, SizeType N, class CapacityType> class Pool`
 A Pool is a fixed memory buffer containing fixed size elements that can be taken or released.
 #### Template
 ||||
 |---:|:---|:---|
 |class|T||
 |SizeType|N||
+|class|CapacityType||
 ------
 ### `template<class... Ts> class VariantConstexpr`
 
@@ -178,6 +190,24 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 ||||
 |---:|:---|:---|
 |const SizeType|N||
+------
+### `template<class T, SizeType N, class CapacityType> class Queue`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|SizeType|N||
+|class|CapacityType||
+------
+### `template<class K, class V, SizeType N> class Map`
+
+#### Template
+||||
+|---:|:---|:---|
+|class K|None||
+|class V|None||
+|SizeType|N||
 ------
 ### `template<class T, SizeType N> class Vector`
 
@@ -228,13 +258,13 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |---:|:---|:---|
 |E &&|e||
 ------
-### `void yield()`
-
-------
 ### `void panic()`
 
 ------
 ### `bzd::OStream & getOut()`
+
+------
+### `void yield()`
 
 ------
 ### `template<class T, class M> static constexpr T * containerOf(M * ptr, const M T::* member)`
@@ -384,6 +414,13 @@ It is a variants with 2 states, valid, representing success and containing a val
 ------
 ### `typedef IOStream`
 
+------
+### `template<class T> typedef Optional`
+Type managing an optional contained value, i.e. a value that may or may not be present.
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `typedef StringView`
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <list>
-
 #include "bzd/interface/task.h"
 #include "bzd/utility/singleton.h"
+#include "bzd/container/queue.h"
+#include "bzd/utility/move.h"
 
 namespace bzd
 {
@@ -16,28 +16,28 @@ namespace bzd
 		void addTask(bzd::interface::Task& task)
 		{
 			// Only add bounded tasks if (task.isBind())
-			queue_.push_back(&task);
+			queue_.push(&task);
 		}
 
 		void start()
 		{
-			task_ = *(queue_.begin());
-			queue_.pop_front();
+			task_ = queue_.front();
+			queue_.pop();
 			task_->start(&mainStack_);
 		}
 
 		void yield()
 		{
 			// Push back the current task
-			queue_.push_back(task_);
 			auto* previousTask = task_;
-			task_ = *(queue_.begin());
-			queue_.pop_front();
+			queue_.push(bzd::move(task_));
+			task_ = queue_.front();
+			queue_.pop();
 			previousTask->yield(*task_);
 		}
 
 	private:
-		std::list<bzd::interface::Task*> queue_;
+		bzd::Queue<bzd::interface::Task*, 10> queue_;
 		bzd::interface::Task* task_;
 		void* mainStack_ = nullptr;
 	};

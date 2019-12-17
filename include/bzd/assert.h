@@ -1,9 +1,8 @@
 #pragma once
 
-#include "bzd/assert_minimal.h"
-
+#include "bzd/core/assert.h"
 #include "bzd/container/constexpr_string_view.h"
-#include "bzd/system.h"
+#include "bzd/core/system.h"
 #include "bzd/log.h"
 
 namespace bzd

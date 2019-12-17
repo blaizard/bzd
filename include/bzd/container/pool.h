@@ -3,7 +3,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/container_of.h"
 #include "bzd/container/span.h"
-#include "bzd/assert.h"
+#include "bzd/container/impl/single_linked_pool.h"
 
 #include <iostream>
 
@@ -11,37 +11,16 @@ namespace bzd
 {
 	namespace impl
 	{
-		template <class T>
-		class Pool
+		template <class T, class CapacityType = SizeType>
+		class Pool : public SingleLinkedPool<T, CapacityType>
 		{
 		protected:
-			static constexpr const SizeType npos = static_cast<SizeType>(-1);
-			struct Element
-			{
-				T container_;
-				SizeType next_;
-			};
+			using typename SingleLinkedPool<T, CapacityType>::Element;
 
 		public:
-			constexpr explicit Pool(const bzd::Span<Element>& data) noexcept
-					: data_(data), free_(0)
+			constexpr explicit Pool(const bzd::Span<Element> data) noexcept
+					: SingleLinkedPool<T, CapacityType>(data)
 			{
-				// Build the free list
-				for (SizeType i = 0; i < data_.size() - 1; ++i)
-				{
-					data_[i].next_ = i + 1;
-				}
-				data_.back().next_ = npos;
-			}
-
-			constexpr SizeType capacity() const noexcept
-			{
-				return data_.size();
-			}
-
-			constexpr bool empty() const noexcept
-			{
-				return (free_ == npos);
 			}
 
 			/**
@@ -49,12 +28,8 @@ namespace bzd
 			 */
 			constexpr void release(T& container) noexcept
 			{
-				bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&container) >= reinterpret_cast<bzd::IntPtrType>(data_.data()));
-				bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&container) < reinterpret_cast<bzd::IntPtrType>(data_.data() + data_.size()));
-
-				Element* item = containerOf(&container, &Element::container_);
-				item->next_ = free_;
-				free_ = (item - data_.data());
+				auto* item = containerOf(&container, &Element::container_);
+				SingleLinkedPool<T, CapacityType>::release(*item);
 			}
 
 			/**
@@ -62,48 +37,29 @@ namespace bzd
 			 */
 			constexpr T& reserve() noexcept
 			{
-				bzd::assert::isTrue(!empty()); //CONSTEXPR_STRING_VIEW("Pool empty, capacity: {}"), data_.size());
-
-				Element& item = data_[free_];
-				free_ = item.next_;
-				return item.container_;
+				return SingleLinkedPool<T, CapacityType>::reserve().container_;
 			}
-
-			void toStream(std::ostream& os)
-			{
-				os << "free=";
-				SizeType current = free_;
-				while (current != npos)
-				{
-					os << current << ",";
-					current = data_[current].next_;
-				}
-			}
-
-		private:
-			bzd::Span<Element> data_;
-			SizeType free_;
 		};
 	}
 
 	namespace interface
 	{
-		template <class T>
-		using Pool = impl::Pool<T>;
+		template <class T, class CapacityType = SizeType>
+		using Pool = impl::Pool<T, CapacityType>;
 	}
 
 	/**
 	 * A Pool is a fixed memory buffer containing fixed size elements that can be taken or released.
 	 */
-	template <class T, SizeType N>
-	class Pool : public interface::Pool<T>
+	template <class T, SizeType N, class CapacityType = SizeType>
+	class Pool : public interface::Pool<T, CapacityType>
 	{
 	private:
-		using typename interface::Pool<T>::Element;
+		using typename interface::Pool<T, CapacityType>::Element;
 
 	public:
 		constexpr Pool()
-				: interface::Pool<T>(bzd::Span<Element>(data_, N))
+				: interface::Pool<T, CapacityType>({data_, N})
 		{
 		}
 
