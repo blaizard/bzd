@@ -11,7 +11,9 @@
 |Typedef||
 |:---|:---|
 |[`BTree`](./index.md)|alias of [`bzd::impl::BTree`](../impl/btree/index.md)|
+|[`Map`](./index.md)|alias of [`bzd::impl::Map`](../impl/map/index.md)|
 |[`Pool`](./index.md)|alias of [`bzd::impl::Pool`](../impl/pool/index.md)|
+|[`Queue`](./index.md)|alias of [`bzd::impl::Queue`](../impl/queue/index.md)|
 |[`String`](./index.md)|alias of [`bzd::impl::String`](../impl/string/index.md)|
 |[`StringStream`](./index.md)|alias of [`bzd::impl::StringStream`](../impl/stringstream/index.md)|
 |[`Vector`](./index.md)|alias of [`bzd::impl::Vector`](../impl/vector/index.md)|
@@ -31,12 +33,29 @@ Application stack definition
 |class V|None||
 |SizeType|Order||
 ------
-### `template<class T> typedef Pool`
+### `template<class K, class V> typedef Map`
+
+#### Template
+||||
+|---:|:---|:---|
+|class K|None||
+|class V|None||
+------
+### `template<class T, class CapacityType> typedef Pool`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
+|class CapacityType|None||
+------
+### `template<class T, class CapacityType> typedef Queue`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class CapacityType|None||
 ------
 ### `typedef String`
 

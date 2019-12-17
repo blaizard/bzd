@@ -10,7 +10,7 @@
 
 |Function||
 |:---|:---|
-|[`Expected(U && value)`](./index.md)||
+|[`Expected(T && value)`](./index.md)||
 |[`Expected(impl::Unexpected< U > && u)`](./index.md)||
 |[`Expected(Expected< T, E > && e)`](./index.md)||
 |[`~Expected()`](./index.md)||
@@ -26,16 +26,12 @@
 |[`value_`](./index.md)||
 |[`error_`](./index.md)||
 ------
-### `template<class U> constexpr Expected(U && value)`
+### `constexpr Expected(T && value)`
 
-#### Template
-||||
-|---:|:---|:---|
-|class U|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|U &&|value||
+|T &&|value||
 ------
 ### `template<class U> constexpr Expected(impl::Unexpected< U > && u)`
 

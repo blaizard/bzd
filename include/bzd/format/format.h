@@ -11,7 +11,7 @@
 #include "bzd/container/vector.h"
 #include "bzd/container/iostream.h"
 #include "bzd/format/integral.h"
-#include "bzd/system.h"
+#include "bzd/core/system.h"
 
 namespace bzd
 {

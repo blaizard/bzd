@@ -5,19 +5,23 @@
 
 |Class||
 |:---|:---|
+|[`Map`](map/index.md)|Flat map implementation.|
 |[`IOStream`](iostream/index.md)||
+|[`Optional`](optional/index.md)||
 |[`Variant`](variant/index.md)||
 |[`ConstexprStringView`](constexprstringview/index.md)||
 |[`Vector`](vector/index.md)||
+|[`SingleLinkedPool`](singlelinkedpool/index.md)||
 |[`Expected`](expected/index.md)||
 |[`IStream`](istream/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`TupleImpl`](tupleimpl/index.md)||
-|[`Pool`](pool/index.md)||
+|[`Queue`](queue/index.md)||
 |[`StringView`](stringview/index.md)||
 |[`BTree`](btree/index.md)||
 |[`Unexpected`](unexpected/index.md)||
 |[`String`](string/index.md)||
+|[`Pool`](pool/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
 |[`OStream`](ostream/index.md)||
 |[`TupleImpl< TupleSizes< N... >, T... >`](tupleimpl_tuplesizes_n_t_/index.md)||
@@ -27,6 +31,7 @@
 |:---|:---|
 |[`TupleRangeImpl`](tuplerangeimpl/index.md)||
 |[`NoType`](notype/index.md)||
+|[`SingleLinkedPoolElement`](singlelinkedpoolelement/index.md)||
 |[`TupleSizes`](tuplesizes/index.md)||
 |[`TupleRangeImpl< L, L, TupleSizes< N... > >`](tuplerangeimpl_l_l_tuplesizes_n_/index.md)||
 |[`TupleRangeImpl< L, I, TupleSizes< N... > >`](tuplerangeimpl_l_i_tuplesizes_n_/index.md)||
@@ -49,7 +54,22 @@
 |[`TupleTypeOf`](./index.md)||
 |[`TupleRange`](./index.md)|alias of [`bzd::impl::TupleRangeImpl`](tuplerangeimpl/index.md)|
 ------
+### `template<class K, class V> class Map`
+Flat map implementation.
+#### Template
+||||
+|---:|:---|:---|
+|class K|None||
+|class V|None||
+------
 ### `template<class T> class IOStream`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> class Optional`
 
 #### Template
 ||||
@@ -78,6 +98,14 @@
 |---:|:---|:---|
 |class|T||
 |class|Impl||
+------
+### `template<class T, class CapacityType> class SingleLinkedPool`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|class|CapacityType||
 ------
 ### `template<class T, class E> class Expected`
 
@@ -109,12 +137,13 @@
 |class N|None||
 |class...|T||
 ------
-### `template<class T> class Pool`
+### `template<class T, class CapacityType> class Queue`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class|T||
+|class|CapacityType||
 ------
 ### `template<class T, class Impl> class StringView`
 
@@ -151,6 +180,14 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |class T|None||
 |class Impl|None||
+------
+### `template<class T, class CapacityType> class Pool`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|class|CapacityType||
 ------
 ### `template<SizeType N, class T> class TupleElem`
 
@@ -189,6 +226,14 @@ Internal class used to create an unexpected object type.
 ------
 ### `struct NoType`
 
+------
+### `template<class T, class CapacityType> struct SingleLinkedPoolElement`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|class|CapacityType||
 ------
 ### `template<SizeType... N> struct TupleSizes`
 

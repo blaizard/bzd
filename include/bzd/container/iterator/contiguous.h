@@ -80,9 +80,14 @@ namespace bzd
 				return !(it == *this);
 			}
 
-			constexpr DataType& operator*()
+			constexpr DataType& operator*() const
 			{
 				return data_[index_];
+			}
+
+			constexpr DataType* operator->() const
+			{
+				return &data_[index_];
 			}
 
 		private:

@@ -2,7 +2,7 @@
 
 #include "bzd/types.h"
 #include "bzd/container/vector.h"
-#include "bzd/container/expected.h"
+#include "bzd/container/optional.h"
 
 namespace bzd
 {
@@ -14,21 +14,61 @@ namespace bzd
 		template <class K, class V>
 		class Map
 		{
-		protected:
+		public:
 			struct Element
 			{
-				K key_;
-				V value_;
+				K first;
+				V second;
 			};
+			using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
-		public:
+		public:	
 			constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept
 					: data_(data)
 			{
 			}
 
-			void insert(const K& key, const V& /*value*/)
+			/**
+			 * Search for a specific element in the map.
+			 */
+			constexpr bzd::Optional<Iterator> find(const K& key) const
 			{
+				for (auto it = data_.begin(); it != data_.end(); ++it)
+				{
+					if (it->first == key)
+					{
+						return it;
+					}
+				}
+				return {};
+			}
+
+			constexpr V& operator[](const K& key) const
+			{
+				auto result = find(key);
+				bzd::assert::isTrue(result);
+				return (*result)->second;
+			}
+
+			/**
+			 * Insert a new element or 
+			 */
+			constexpr void insert(const K& key, V&& value)
+			{
+				auto result = find(key);
+				if (result)
+				{
+					insert(*result, bzd::forward<V>(value));
+				}
+				else
+				{
+					data_.pushBack({key, bzd::forward<V>(value)});
+				}
+			}
+
+			constexpr void insert(const Iterator& it, V&& value)
+			{
+				it->second = bzd::forward<V>(value);
 			}
 
 		protected:

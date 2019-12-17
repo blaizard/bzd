@@ -5,7 +5,7 @@
 #include "bzd/utility/reference_wrapper.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/is_reference.h"
-#include "bzd/assert_minimal.h"
+#include "bzd/core/assert.h"
 
 namespace bzd
 {
@@ -23,7 +23,7 @@ namespace bzd
 			{
 			}
 
-			constexpr Optional() : isValue_(false)
+			constexpr Optional() : isValue_(false), empty_{}
 			{
 			}
 
@@ -60,7 +60,11 @@ namespace bzd
 
 		protected:
 			const bool isValue_;
-			ValueContainer value_;
+			union
+			{
+				UInt8Type empty_;
+				ValueContainer value_;
+			};
 		};
 	}
 

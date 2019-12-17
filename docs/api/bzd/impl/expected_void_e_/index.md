@@ -10,7 +10,7 @@
 |Function||
 |:---|:---|
 |[`Expected()`](./index.md)||
-|[`Expected(U && value)`](./index.md)||
+|[`Expected(T && value)`](./index.md)||
 |[`Expected(impl::Unexpected< U > && u)`](./index.md)||
 |[`Expected(Expected< T, E > && e)`](./index.md)||
 |[`~Expected()`](./index.md)||
@@ -29,18 +29,14 @@
 ### `constexpr Expected()`
 
 ------
-### `template<class U> constexpr Expected(U && value)`
+### `constexpr Expected(T && value)`
 *From bzd::impl::Expected*
 
 
-#### Template
-||||
-|---:|:---|:---|
-|class U|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|U &&|value||
+|T &&|value||
 ------
 ### `template<class U> constexpr Expected(impl::Unexpected< U > && u)`
 *From bzd::impl::Expected*

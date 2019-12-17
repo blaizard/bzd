@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/string_view.h"
-#include "bzd/system.h"
+#include "bzd/core/system.h"
 
 namespace bzd
 {
