@@ -19,14 +19,14 @@ test --verbose_failures
 # linux_x86_64_clang
 build:linux_x86_64_clang --cpu="linux_x86_64"
 build:linux_x86_64_clang --compiler="clang"
-build:linux_x86_64_clang --platforms="//tools/bazel/targets:linux_x86_64"
+build:linux_x86_64_clang --platforms="//tools/bazel.build/targets:linux_x86_64"
 build:linux_x86_64_clang --crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
 build:linux_x86_64_clang --host_cpu="linux_x86_64"
-build:linux_x86_64_clang --host_platform=//tools/bazel/targets:linux_x86_64
+build:linux_x86_64_clang --host_platform=//tools/bazel.build/targets:linux_x86_64
 build:linux_x86_64_clang --host_crosstool_top=@linux_x86_64_clang//:cc_toolchain_suite
 
 # linux_x86_64_clang (can be used with suport of "C++ rules use platforms")
-#build:linux_x86_64_clang --platforms="//tools/bazel/targets:linux_x86_64"
+#build:linux_x86_64_clang --platforms="//tools/bazel.build/targets:linux_x86_64"
 #build:linux_x86_64_clang --compiler="clang"
 
 # Sanitizers
