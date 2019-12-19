@@ -11,7 +11,7 @@ http_archive(
 
 # Toolchains
 
-load("//tools/bazel:toolchains/linux_x86_64_clang.bzl", "load_linux_x86_64_clang_9_0_0")
+load("//tools/bazel.build:toolchains/linux_x86_64_clang.bzl", "load_linux_x86_64_clang_9_0_0")
 
 load_linux_x86_64_clang_9_0_0(name = "linux_x86_64_clang")
 
