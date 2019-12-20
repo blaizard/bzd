@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@//tools/bazel.build/bzd:defs.bzl", "bzd_manifest", "bzd_cc_binary")
+load("@//tools/bazel.build/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
 
 filegroup(
     name = "bzd_files",
@@ -12,17 +12,17 @@ filegroup(
 bzd_manifest(
     name = "config_manifest",
     manifest = glob([
-       "config.json",
+        "config.json",
     ]),
-    deps = []
+    deps = [],
 )
 
 bzd_manifest(
     name = "config_manifest_temp",
     manifest = glob([
-       "*.json",
+        "*.json",
     ]),
-    deps = []
+    deps = [],
 )
 
 cc_library(
@@ -31,7 +31,7 @@ cc_library(
         "bzd/*.h",
     ]),
     deps = [
-        ":config_manifest_temp"
+        ":config_manifest_temp",
     ],
 )
 
@@ -40,17 +40,17 @@ cc_library(
     hdrs = [
         ":bzd_files",
     ],
-    deps = [
-        ":config_manifest",
-        ":temp"
-    ],
     includes = ["."],
     visibility = ["//visibility:public"],
+    deps = [
+        ":config_manifest",
+        ":temp",
+    ],
 )
 
 bzd_cc_binary(
     name = "hello",
     deps = [
-        ":bzd"
-    ]
+        ":bzd",
+    ],
 )

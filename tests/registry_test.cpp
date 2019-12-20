@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
-#include "bzd/core/registry.h"
+//#include "bzd/core/registry.h"
 
 TEST(Registry, Base)
 {
-	bzd::Registry<int, 3> reg_;
+	//bzd::Registry<int, 3> reg_;
 
 	//Registry<double>::get("hello")
 

@@ -3,7 +3,7 @@ py_library(
     srcs = glob([
         "json5/*.py",
     ]),
-    visibility = ["//visibility:private"]
+    visibility = ["//visibility:private"],
 )
 
 py_library(
@@ -11,7 +11,7 @@ py_library(
     srcs = glob([
         "formats/*.py",
     ]),
-    visibility = ["//visibility:private"]
+    visibility = ["//visibility:private"],
 )
 
 py_binary(
@@ -20,9 +20,9 @@ py_binary(
         "*.py",
     ]),
     main = "generator.py",
+    visibility = ["//visibility:public"],
     deps = [
+        ":formats",
         ":json5",
-		":formats"
     ],
-    visibility = ["//visibility:public"]
 )

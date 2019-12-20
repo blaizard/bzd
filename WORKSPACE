@@ -13,9 +13,9 @@ http_archive(
 
 http_archive(
     name = "rules_cc",
-    urls = ["https://github.com/bazelbuild/rules_cc/archive/cd7e8a690caf526e0634e3ca55b10308ee23182d.zip"],
-    strip_prefix = "rules_cc-cd7e8a690caf526e0634e3ca55b10308ee23182d",
     sha256 = "7e5fd5d3b54217ee40d8488bbd70840456baafb3896782942ae4db1400a77657",
+    strip_prefix = "rules_cc-cd7e8a690caf526e0634e3ca55b10308ee23182d",
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/cd7e8a690caf526e0634e3ca55b10308ee23182d.zip"],
 )
 
 # Toolchains
