@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@//tools/bazel.build/bzd:defs.bzl", "bzd_manifest", "bzd_cc_binary")
 
 filegroup(
@@ -49,7 +50,6 @@ cc_library(
 
 bzd_cc_binary(
     name = "hello",
-    srcs = ["main.cpp"],
     deps = [
         ":bzd"
     ]
