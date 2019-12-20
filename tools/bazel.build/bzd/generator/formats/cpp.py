@@ -5,4 +5,4 @@ import json
 
 def cpp(data, output):
 	with open(output, "w") as f:
-		f.write(json.dumps(data))
+		f.write("#include <iostream>\nint main() { std::cout << \"Hello Wolrd!\" << std::endl; }")

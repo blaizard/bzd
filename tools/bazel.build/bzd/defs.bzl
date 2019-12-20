@@ -1,3 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test", "cc_binary")
+
+# Custom provider for a manifest
 BzdManifestInfo = provider(fields=["manifest"])
 
 def _bzd_manifest_impl(ctx):
@@ -113,14 +116,14 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
 
     # Generates a library from the auto-generated files
     library_rule_name = "{}_library".format(name)
-    native.cc_library(
+    cc_library(
         name = library_rule_name,
         srcs = [output_cc],
         deps = [manifest_rule_name],
     )
 
     # Call the binary/test rule
-    rule_to_use = getattr(native, "cc_test" if is_test else "cc_binary")
+    rule_to_use = cc_test if is_test else cc_binary
     rule_to_use(
         name = name,
         deps = deps + [library_rule_name],
