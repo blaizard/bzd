@@ -3,26 +3,12 @@
 	 * This will enable at run-time 2 registries
 	 * bzd::core::Registry<bzd::Log>::get("default")
 	 */
-	types: {
-		"bzd::log": {
+	interfaces: {
+		"bzd::Hellloooo": {
 			"include": "bzd/log.h"
-		},
-		"bzd::ComChannel": {},
-		"bzd::Vector": {}
+		}
 	},
 	objects: {
-		"bzd::log.default": {
-			level: "bzd::log::Level::INFO"
-		},
-		"bzd::log.rs232": {
-			level: "bzd::log::Level::DEBUG"
-		},
-		"bzd::ComChannel.default": {
-			class: "bzd::com_channel::RS232"
-		},
-		"bzd::interface::Vector<int>.sensorData": {
-			class: "bzd::Vector<int, 12>"
-		},
 	},
 /*	registry: {
 

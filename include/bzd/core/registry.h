@@ -13,20 +13,28 @@ namespace bzd
 		template <class T>
 		class Registry
 		{
-		protected:
-			static bzd::interface::Map<int, T>& get(bzd::interface::Map<int, T>* registry = nullptr)
-			{
-				static bool isInitialized = false;
-				static bzd::interface::Map<int, T>* instance = registry;
-				bzd::assert::isTrue(instance != nullptr);
-				bzd::assert::isTrue(!isInitialized || registry == nullptr, "Registry has already been declared!");
-				isInitialized = true;
-				return *instance;
-			}
+		public:
+			using KeyType = bzd::StringView;
+			using MapType = bzd::interface::Map<KeyType, T>;
 
-			constexpr Registry(bzd::interface::Map<int, T>& registry)
+		protected:
+			constexpr Registry(MapType& registry)
 			{
 				get(&registry);
+			}
+
+		public:
+			static constexpr MapType& get()
+			{
+				return get(nullptr);
+			}
+
+		private:
+			static MapType& get(MapType* registry)
+			{
+				static MapType* instance = registry;
+				bzd::assert::isTrue(instance != nullptr, "Registry was not initialized");
+				return *instance;
 			}
 		};
 	}
@@ -37,41 +45,38 @@ namespace bzd
 		using Registry = impl::Registry<T>;
 	}
 
-	template <class T, SizeType Capacity>
-	class Registry : public interface::Registry<T>
-	{
-	public:
-		constexpr Registry()
-				: interface::Registry<T>(registry_)
-		{
-		}
-
-	protected:
-		bzd::Map<int, T, Capacity> registry_;
-	};
-
 	template <class T>
 	class Registry
 	{
-	public:
-		constexpr Registry(const bzd::StringView str)
-		{
-			interface::Registry<T>::get().insert(45, 12);
-		}
-	};
+	protected:
+		using KeyType = typename interface::Registry<T>::KeyType;
 
-/*
-	template <class T, class Derived>
-	class Registry : public Registry<T>
-	{
 	public:
-		Registry(const bzd::StringView& name)
+		template <class... Args>
+		constexpr Registry(const bzd::StringView& str, Args&&... args)
 		{
-			auto& registry = getInstance().registry_;
-			const auto result = registry.find(name);
-			bzd::assert::isTrue(!result);
-			registry.insert(name, 12);
+			interface::Registry<T>::get().insert(str, T{bzd::forward<Args>(args)...});
 		}
+
+		static constexpr T& get(const KeyType& key)
+		{
+			return interface::Registry<T>::get()[key];
+		}
+	
+		/**
+		 * \brief Fixed-size object registry.
+		 */
+		template <SizeType Capacity>
+		class Declare : public interface::Registry<T>
+		{
+		public:
+			constexpr Declare()
+					: interface::Registry<T>(registry_)
+			{
+			}
+
+		protected:
+			bzd::Map<KeyType, T, Capacity> registry_;
+		};
 	};
-*/
 }

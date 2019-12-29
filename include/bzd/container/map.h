@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/types.h"
+#include "bzd/core/assert.h"
 #include "bzd/container/vector.h"
 #include "bzd/container/optional.h"
 
@@ -46,12 +47,12 @@ namespace bzd
 			constexpr V& operator[](const K& key) const
 			{
 				auto result = find(key);
-				bzd::assert::isTrue(result);
+				bzd::assert::isTrue(result, "Key does not exists");
 				return (*result)->second;
 			}
 
 			/**
-			 * Insert a new element or 
+			 * Insert a new element or replace the existing one
 			 */
 			constexpr void insert(const K& key, V&& value)
 			{

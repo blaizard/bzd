@@ -19,6 +19,8 @@ The class template span describes an object that can refer to a contiguous seque
 |[`cend() const`](./index.md)||
 |[`size() const`](./index.md)||
 |[`reverse()`](./index.md)||
+|[`operator==(const SelfType & rhs) const`](./index.md)||
+|[`operator!=(const SelfType & rhs) const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
@@ -94,6 +96,20 @@ The class template span describes an object that can refer to a contiguous seque
 ------
 ### `constexpr void reverse()`
 
+------
+### `constexpr bool operator==(const SelfType & rhs) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SelfType &|rhs||
+------
+### `constexpr bool operator!=(const SelfType & rhs) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SelfType &|rhs||
 ------
 ### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & operator[](const SizeType index)`
 

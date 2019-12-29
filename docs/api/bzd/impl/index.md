@@ -23,6 +23,7 @@
 |[`String`](string/index.md)||
 |[`Pool`](pool/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
+|[`Registry`](registry/index.md)||
 |[`OStream`](ostream/index.md)||
 |[`TupleImpl< TupleSizes< N... >, T... >`](tupleimpl_tuplesizes_n_t_/index.md)||
 |[`StringStream`](stringstream/index.md)||
@@ -195,6 +196,13 @@ Internal class used to create an unexpected object type.
 ||||
 |---:|:---|:---|
 |SizeType|N||
+|class T|None||
+------
+### `template<class T> class Registry`
+
+#### Template
+||||
+|---:|:---|:---|
 |class T|None||
 ------
 ### `template<class T> class OStream`

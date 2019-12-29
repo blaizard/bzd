@@ -62,7 +62,7 @@ namespace bzd
 			 * 
 			 * \param n The new size. Note, it must a be lower or equal to the capacity.
 			 */
-			constexpr void resize(const size_t n) noexcept
+			constexpr void resize(const bzd::SizeType n) noexcept
 			{
 				size_ = (n < capacity_) ? n : capacity_;
 			}

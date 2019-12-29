@@ -3,7 +3,22 @@
 	 * This will enable at run-time 2 registries
 	 * bzd::core::Registry<bzd::Log>::get("default")
 	 */
-	types: {
+	interfaces: {
+	/*	"fooType": {
+			"definition": {
+				"foo": {
+				}
+			}
+		},
+		"bzd::log::share": {
+			"definition": {
+				"hello": {
+					type: "fooType",
+					default: 1
+				},
+				"me": {type: "uint8"}
+			}
+		},*/
 		"bzd::log": {
 			"include": "bzd/log.h"
 		},
@@ -11,6 +26,7 @@
 		"bzd::Vector": {}
 	},
 	objects: {
+		// Fully qualified object name: <interface class>.<name>
 		"bzd::log.default": {
 			level: "bzd::log::Level::INFO"
 		},

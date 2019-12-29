@@ -5,8 +5,8 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class K|None||
-|class V|None||
+|class|K||
+|class|V||
 |SizeType|N||
 
 |Struct||
@@ -54,7 +54,7 @@ Search for a specific element in the map.
 ### `constexpr void insert(const K & key, V && value)`
 *From bzd::impl::Map*
 
-Insert a new element or
+Insert a new element or replace the existing one
 #### Parameters
 ||||
 |---:|:---|:---|

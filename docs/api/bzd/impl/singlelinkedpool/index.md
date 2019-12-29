@@ -27,6 +27,8 @@
 |[`cend() const`](./index.md)||
 |[`size() const`](./index.md)||
 |[`reverse()`](./index.md)||
+|[`operator==(const SelfType & rhs) const`](./index.md)||
+|[`operator!=(const SelfType & rhs) const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
@@ -162,6 +164,24 @@ Reserve an element from the free list (if any)
 *From bzd::Span*
 
 
+------
+### `constexpr bool operator==(const SelfType & rhs) const`
+*From bzd::Span*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SelfType &|rhs||
+------
+### `constexpr bool operator!=(const SelfType & rhs) const`
+*From bzd::Span*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SelfType &|rhs||
 ------
 ### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & operator[](const SizeType index)`
 *From bzd::Span*

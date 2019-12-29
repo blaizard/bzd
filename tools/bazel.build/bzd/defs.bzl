@@ -119,7 +119,7 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
     cc_library(
         name = library_rule_name,
         srcs = [output_cc],
-        deps = [manifest_rule_name],
+        deps = [manifest_rule_name] + deps,
     )
 
     # Call the binary/test rule

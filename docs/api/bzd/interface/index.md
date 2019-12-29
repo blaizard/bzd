@@ -17,6 +17,7 @@
 |[`String`](./index.md)|alias of [`bzd::impl::String`](../impl/string/index.md)|
 |[`StringStream`](./index.md)|alias of [`bzd::impl::StringStream`](../impl/stringstream/index.md)|
 |[`Vector`](./index.md)|alias of [`bzd::impl::Vector`](../impl/vector/index.md)|
+|[`Registry`](./index.md)|alias of [`bzd::impl::Registry`](../impl/registry/index.md)|
 ------
 ### `class Stack`
 Application stack definition
@@ -64,6 +65,13 @@ Application stack definition
 
 ------
 ### `template<class T> typedef Vector`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef Registry`
 
 #### Template
 ||||

@@ -49,7 +49,7 @@ Search for a specific element in the map.
 |const K &|key||
 ------
 ### `constexpr void insert(const K & key, V && value)`
-Insert a new element or
+Insert a new element or replace the existing one
 #### Parameters
 ||||
 |---:|:---|:---|
