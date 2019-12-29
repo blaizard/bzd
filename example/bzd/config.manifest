@@ -1,0 +1,11 @@
+{
+	interfaces: {
+		"bzd::StringView": {
+			include: "bzd/container/string_view.h"
+		}
+	},
+	objects: {
+		"bzd::StringView.message": {
+		}
+	}
+}

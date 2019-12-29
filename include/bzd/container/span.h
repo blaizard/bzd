@@ -87,6 +87,33 @@ namespace bzd
 			}
 		}
 
+		// Equality operator
+
+		constexpr bool operator==(const SelfType& rhs) const
+		{
+			if (size() != rhs.size())
+			{
+				return false;
+			}
+
+			for (bzd::SizeType index = 0; index < size(); ++index)
+			{
+				if (at(index) != rhs.at(index))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		// Inequality operator
+
+		constexpr bool operator!=(const SelfType& rhs) const
+		{
+			return !(*this == rhs);
+		}
+
 		template<class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
 		constexpr DataType& operator[](const SizeType index)
 		{

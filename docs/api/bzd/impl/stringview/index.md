@@ -10,12 +10,16 @@
 
 |Function||
 |:---|:---|
+|[`StringView()`](./index.md)||
 |[`StringView(const T *const str)`](./index.md)||
 |[`StringView(const T *const str, const SizeType size)`](./index.md)||
 |[`StringView(const Span< char > & span)`](./index.md)||
 |[`subStr(const SizeType pos, const SizeType count) const`](./index.md)||
 |[`removePrefix(const SizeType n)`](./index.md)||
 |[`clear()`](./index.md)||
+------
+### `constexpr StringView()`
+
 ------
 ### `constexpr StringView(const T *const str)`
 

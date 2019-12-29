@@ -29,10 +29,12 @@
 |[`String`](string/index.md)||
 |[`Pool`](pool/index.md)||
 |[`VariantConstexpr`](variantconstexpr/index.md)||
+|[`Registry`](registry/index.md)||
 |[`Singleton`](singleton/index.md)||
 |[`Stack`](stack/index.md)||
 |[`Queue`](queue/index.md)||
 |[`Map`](map/index.md)||
+|[`Registry< T, static_cast< SizeType >(-1)>`](registry_t_static_cast_sizetype_1_/index.md)||
 |[`Vector`](vector/index.md)||
 
 |Struct||
@@ -177,6 +179,14 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |---:|:---|:---|
 |class...|Ts||
 ------
+### `template<class T, SizeType Capacity> class Registry`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|SizeType|Capacity||
+------
 ### `template<class T> class Singleton`
 
 #### Template
@@ -205,9 +215,16 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 #### Template
 ||||
 |---:|:---|:---|
-|class K|None||
-|class V|None||
+|class|K||
+|class|V||
 |SizeType|N||
+------
+### `template<class T> class Registry< T, static_cast< SizeType >(-1)>`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<class T, SizeType N> class Vector`
 

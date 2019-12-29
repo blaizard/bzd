@@ -34,4 +34,4 @@ if __name__== "__main__":
 			f.write(json5.dumps(manifest.getData(), sort_keys=True, indent=4, separators=(',', ': ')))
 
 	formatter = getattr(formats, config.format)
-	formatter(manifest.getData(), config.output)
+	formatter(manifest, config.output)

@@ -31,25 +31,78 @@ class Keys():
 	def __str__(self):
 		return " > ".join(self.keys)
 
+"""
+Represents an interface
+"""
+class Interface():
+
+	def __init__(self, manifest, definition):
+		self.manifest = manifest
+		self.definition = definition
+
+	def getInclude(self):
+		include = self.definition.get("include", [])
+		return include if isinstance(include, list) else [include]
+
+"""
+Represents an object
+"""
+class Object():
+
+	def __init__(self, manifest, identifier):
+		self.manifest = manifest
+		self.identifier = identifier
+
+	"""
+	Return the interface of the object
+	"""
+	def getInterface(self):
+		return self.manifest.getInterface(self.getInterfaceName())
+
+	"""
+	Return the interface of the object
+	"""
+	def getInterfaceName(self):
+		return self.identifier.split(".")[0]
+
+	"""
+	Return the name of the object
+	"""
+	def getName(self):
+		return self.identifier.split(".")[1]
+
 class Manifest():
 
 	def __init__(self):
 		self.data = {}
 		self.format = {
-			"types": {
-				"*": {
+			"interfaces": {
+				"_default": {
 					"_key": FormatValidator("class"),
 					"include": FormatValidator("path")
 				}
 			},
 			"objects": {
-				"*": {
+				"_default": {
 					"_key": FormatValidator("class"),
-					"class": FormatValidator("class"),
-					"*": FormatValidator("any")
+					"_default": FormatValidator("any"),
+					"class": FormatValidator("class")
 				}
 			}
 		}
+
+	"""
+	List all objects
+	"""
+	def getObjects(self):
+		for identifier in self.data.get("objects", {}).keys():
+			yield Object(self, identifier)
+
+	"""
+	Get a specific inteface
+	"""
+	def getInterface(self, name):
+		return Interface(self, self.data.get("interfaces", {}).get(name, {}))
 
 	"""
 	Return the raw data of this manifest
@@ -77,7 +130,7 @@ class Manifest():
 			context["key"].push(key)
 
 			# Look for the validation data associated with this key
-			vData = validation[key] if key in validation else (validation["*"] if "*" in validation else None)
+			vData = validation[key] if key in validation else (validation["_default"] if "_default" in validation else None)
 			assert vData != None, "Invalid key '{}'.".format(key)
 
 			# Validate the data
