@@ -15,7 +15,7 @@ namespace bzd
 		{
 		public:
 			using KeyType = bzd::StringView;
-			using MapType = bzd::interface::Map<KeyType, T>;
+			using MapType = bzd::interface::Map<KeyType, T*>;
 
 		protected:
 			constexpr Registry(MapType& registry)
@@ -45,38 +45,67 @@ namespace bzd
 		using Registry = impl::Registry<T>;
 	}
 
-	template <class T>
-	class Registry
+	namespace declare
 	{
-	protected:
-		using KeyType = typename interface::Registry<T>::KeyType;
-
-	public:
-		template <class... Args>
-		constexpr Registry(const bzd::StringView& str, Args&&... args)
-		{
-			interface::Registry<T>::get().insert(str, T{bzd::forward<Args>(args)...});
-		}
-
-		static constexpr T& get(const KeyType& key)
-		{
-			return interface::Registry<T>::get()[key];
-		}
-	
 		/**
-		 * \brief Fixed-size object registry.
+		 * \brief Declaration object for a fixed-size registry object.
 		 */
-		template <SizeType Capacity>
-		class Declare : public interface::Registry<T>
+		template <class T, SizeType Capacity>
+		class Registry : public interface::Registry<T>
 		{
+		protected:
+			using typename interface::Registry<T>::KeyType;
+
 		public:
-			constexpr Declare()
+			constexpr Registry()
 					: interface::Registry<T>(registry_)
 			{
 			}
 
 		protected:
-			bzd::Map<KeyType, T, Capacity> registry_;
+			bzd::Map<KeyType, T*, Capacity> registry_;
 		};
+	}
+
+	/**
+	 * \brief Fixed-size registry object.
+	 * 
+	 * A registry is a singleton object acting as a key-value store for object instances.
+	 * The size of the registry must be defined before populating the object, to do so,
+	 * it is preferable to do it at startup during dynamic variable initialization.
+	 *
+	 * \code
+	 * // Declares a registry which can contain up to 3 doubles
+	 * bzd::declare::Registry<double, 3> registry_;
+	 * \endcode
+	 * 
+	 * Note, this initialization scheme can be imediatly followed by object registrations, as order
+	 * of global variables in a single translation unit (source file) are initialized in the order
+	 * in which they are defined.
+	 */
+	template <class Interface, class T = Interface>
+	class Registry
+	{
+	protected:
+		using KeyType = typename interface::Registry<Interface>::KeyType;
+
+	public:
+		template <class... Args>
+		constexpr Registry(const KeyType& str, Args&&... args)
+				: object_{bzd::forward<Args>(args)...}
+		{
+			interface::Registry<Interface>::get().insert(str, &object_);
+		}
+
+		/**
+		 * \brief Registry accessor.
+		 */
+		static constexpr Interface& get(const KeyType& key)
+		{
+			return *interface::Registry<Interface>::get()[key];
+		}
+
+	private:
+		T object_;
 	};
 }

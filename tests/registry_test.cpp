@@ -3,7 +3,7 @@
 
 TEST(Registry, Base)
 {
-	bzd::Registry<double>::Declare<3> reg_;
+	bzd::declare::Registry<double, 3> reg_;
 	bzd::Registry<double> hello("hello", 12);
 
     EXPECT_EQ(bzd::Registry<double>::get("hello"), 12);

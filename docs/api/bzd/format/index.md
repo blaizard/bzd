@@ -24,7 +24,8 @@ String formating.
 
 Lightweight and compilation time checking string formating utility. The syntax is compatible with Python format with some limitations.
 
-```format_spec ::= [sign][#][.precision][type]
+```c++
+format_spec ::= [sign][#][.precision][type]
 sign ::= "+" | "-" | " "
 precision ::= integer
 type ::= "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
