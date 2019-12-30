@@ -59,10 +59,12 @@ namespace bzd
 				auto result = find(key);
 				if (result)
 				{
+					std::cout << "yes" << std::endl;
 					insert(*result, bzd::forward<V>(value));
 				}
 				else
 				{
+					std::cout << "no" << std::endl;
 					data_.pushBack({key, bzd::forward<V>(value)});
 				}
 			}
