@@ -11,6 +11,7 @@ namespace bzd
 		{
 			if (!condition)
 			{
+				bzd::getOut().write(bzd::StringView{"Assertion failed.\n"});
 				bzd::panic();
 			}
 		}
@@ -19,6 +20,7 @@ namespace bzd
 		{
 			if (!condition)
 			{
+				bzd::getOut().write(bzd::StringView{"Assertion failed with message: "});
 				bzd::getOut().write(message);
 				bzd::panic();
 			}

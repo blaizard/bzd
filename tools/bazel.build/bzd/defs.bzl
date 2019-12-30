@@ -120,6 +120,7 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
         name = library_rule_name,
         srcs = [output_cc],
         deps = [manifest_rule_name] + deps,
+        alwayslink = True,
     )
 
     # Call the binary/test rule

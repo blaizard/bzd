@@ -42,8 +42,3 @@ TEST(Registry, NotDeclared)
 {
 	EXPECT_ANY_THROW(bzd::Registry<double> m1("1", -1));
 }
-
-
-// Registry are used to store logger, communication channels
-// Data transfer are used by loggers
-// static constexpr const registryNbLog
