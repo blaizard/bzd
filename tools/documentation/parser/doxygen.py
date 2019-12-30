@@ -4,14 +4,10 @@
 import os
 import re
 import xml.etree.ElementTree as ET
-import pprint
-import glob
-import argparse
 
 from members import Members, Member
 
 kindToKeep = ["struct", "class", "variable", "function", "typedef", "namespace"]
-
 
 def commentParser(element, data = {}):
 

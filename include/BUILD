@@ -52,5 +52,6 @@ bzd_cc_binary(
     name = "hello",
     deps = [
         ":bzd",
+        "//src:bzd",
     ],
 )

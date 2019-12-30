@@ -88,7 +88,7 @@ class MarkdownRender:
 			command = match.group(1).strip()
 			if command == "code":
 				currentStack.append("code")
-				output += "```"
+				output += "```c++\n"
 			elif command == "/code":
 				currentStack.pop()
 				output += "```"

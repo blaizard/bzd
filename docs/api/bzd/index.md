@@ -9,6 +9,7 @@
 |[`impl`](impl/index.md)||
 |[`typeTraits`](typetraits/index.md)||
 |[`meta`](meta/index.md)||
+|[`declare`](declare/index.md)||
 |[`iterator`](iterator/index.md)||
 |[`interface`](interface/index.md)||
 |[`log`](log/index.md)||
@@ -29,12 +30,11 @@
 |[`String`](string/index.md)||
 |[`Pool`](pool/index.md)||
 |[`VariantConstexpr`](variantconstexpr/index.md)||
-|[`Registry`](registry/index.md)||
+|[`Registry`](registry/index.md)|Fixed-size registry object.|
 |[`Singleton`](singleton/index.md)||
 |[`Stack`](stack/index.md)||
 |[`Queue`](queue/index.md)||
 |[`Map`](map/index.md)||
-|[`Registry< T, static_cast< SizeType >(-1)>`](registry_t_static_cast_sizetype_1_/index.md)||
 |[`Vector`](vector/index.md)||
 
 |Struct||
@@ -179,13 +179,22 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |---:|:---|:---|
 |class...|Ts||
 ------
-### `template<class T, SizeType Capacity> class Registry`
+### `template<class Interface, class T> class Registry`
+Fixed-size registry object.
 
+A registry is a singleton object acting as a key-value store for object instances. The size of the registry must be defined before populating the object, to do so, it is preferable to do it at startup during dynamic variable initialization.
+
+```c++
+// Declares a registry which can contain up to 3 doubles
+bzd::declare::Registry<double, 3> registry_;
+```
+
+Note, this initialization scheme can be imediatly followed by object registrations, as order of global variables in a single translation unit (source file) are initialized in the order in which they are defined.
 #### Template
 ||||
 |---:|:---|:---|
+|class Interface|None||
 |class T|None||
-|SizeType|Capacity||
 ------
 ### `template<class T> class Singleton`
 
@@ -218,13 +227,6 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |class|K||
 |class|V||
 |SizeType|N||
-------
-### `template<class T> class Registry< T, static_cast< SizeType >(-1)>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 ------
 ### `template<class T, SizeType N> class Vector`
 
