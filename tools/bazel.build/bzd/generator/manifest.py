@@ -36,9 +36,16 @@ Represents an interface
 """
 class Interface():
 
-	def __init__(self, manifest, definition):
+	def __init__(self, manifest, identifier):
 		self.manifest = manifest
-		self.definition = definition
+		self.identifier = identifier
+		self.definition = manifest.getData().get("interfaces", {}).get(identifier, {})
+
+	def isValid(self):
+		return self.identifier != None
+
+	def getName(self):
+		return self.identifier
 
 	def getInclude(self):
 		include = self.definition.get("include", [])
@@ -52,6 +59,7 @@ class Object():
 	def __init__(self, manifest, identifier):
 		self.manifest = manifest
 		self.identifier = identifier
+		self.definition = manifest.getData().get("objects", {}).get(identifier, {})
 
 	"""
 	Return the interface of the object
@@ -71,10 +79,24 @@ class Object():
 	def getName(self):
 		return self.identifier.split(".")[1]
 
+	"""
+	Get the constructor class
+	"""
+	def getClass(self):
+		return self.definition.get("class", self.getInterfaceName())
+
+	"""
+	Get parameters
+	"""
+	def getParams(self):
+		return self.definition.get("params", [])
+
 class Manifest():
 
 	def __init__(self):
 		self.data = {}
+		self.objects = {}
+		self.interfaces = {}
 		self.format = {
 			"interfaces": {
 				"_default": {
@@ -86,7 +108,8 @@ class Manifest():
 				"_default": {
 					"_key": FormatValidator("class"),
 					"_default": FormatValidator("any"),
-					"class": FormatValidator("class")
+					"class": FormatValidator("class"),
+					"params": FormatValidator("list", "string", "number")
 				}
 			}
 		}
@@ -94,15 +117,21 @@ class Manifest():
 	"""
 	List all objects
 	"""
-	def getObjects(self):
-		for identifier in self.data.get("objects", {}).keys():
-			yield Object(self, identifier)
+	def getObjects(self, filt = {}):
+		config = {
+			"interface": None
+		}
+		config.update(filt)
+		for identifier, obj in self.objects.items():
+			if config["interface"] == None or config["interface"] == obj.getInterfaceName():
+				yield obj
 
 	"""
 	Get a specific inteface
 	"""
 	def getInterface(self, name):
-		return Interface(self, self.data.get("interfaces", {}).get(name, {}))
+		assert name in self.interfaces, "The interface name '{}' was not discovered or is not valid.".format(str(name))
+		return self.interfaces[name]
 
 	"""
 	Return the raw data of this manifest
@@ -119,6 +148,14 @@ class Manifest():
 			self._mergeAndValidate(self.data, data, self.format, context)
 		except Exception as e:
 			Log.fatal("Error while merging ({})".format("; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text])), e)
+
+	"""
+	Process the current data of the manifest in order to speed-up later accesses
+	"""
+	def process(self):
+		self.objects = {identifier: Object(self, identifier) for identifier in self.data.get("objects", {}).keys()}
+		self.interfaces = {identifier: Interface(self, identifier) for identifier in self.data.get("interfaces", {}).keys()}
+		self.interfaces.update({obj.getInterfaceName(): Interface(self, obj.getInterfaceName()) for obj in self.objects.values()})
 
 	"""
 	Merge the data

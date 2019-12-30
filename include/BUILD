@@ -9,31 +9,31 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-bzd_manifest(
-    name = "config_manifest",
-    manifest = glob([
-        "config.json",
-    ]),
-    deps = [],
-)
+#bzd_manifest(
+#    name = "config_manifest",
+#    manifest = glob([
+#        "config.json",
+#    ]),
+#    deps = [],
+#)
 
-bzd_manifest(
-    name = "config_manifest_temp",
-    manifest = glob([
-        "*.json",
-    ]),
-    deps = [],
-)
+#bzd_manifest(
+#    name = "config_manifest_temp",
+#    manifest = glob([
+#        "*.json",
+#    ]),
+#    deps = [],
+#)
 
-cc_library(
-    name = "temp",
-    hdrs = glob([
-        "bzd/*.h",
-    ]),
-    deps = [
-        ":config_manifest_temp",
-    ],
-)
+#cc_library(
+#    name = "temp",
+#    hdrs = glob([
+#        "bzd/*.h",
+#    ]),
+#    deps = [
+#        ":config_manifest_temp",
+#    ],
+#)
 
 cc_library(
     name = "bzd",
@@ -42,16 +42,12 @@ cc_library(
     ],
     includes = ["."],
     visibility = ["//visibility:public"],
-    deps = [
-        ":config_manifest",
-        ":temp",
-    ],
 )
 
-bzd_cc_binary(
-    name = "hello",
-    deps = [
-        ":bzd",
-        "//src:bzd",
-    ],
-)
+#bzd_cc_binary(
+#    name = "hello",
+#    deps = [
+#        ":bzd",
+#        "//src:bzd",
+#    ],
+#)

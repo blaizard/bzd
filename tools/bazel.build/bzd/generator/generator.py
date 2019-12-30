@@ -23,15 +23,20 @@ if __name__== "__main__":
 	for path in config.inputs:
 		data = manifestToDict(path)
 		manifest.merge(data, {"manifest file": "{}".format(path)})
+	manifest.process()
+
+	# Generate the header comments
+	comments = ["This file has been auto-generated and is the result of the following manifest(s):"] + ["- {}".format(path) for path in config.inputs]
 
 	# Generate the output manifest
 	if config.manifest:
 		with open(config.manifest, "w") as f:
 			f.write("/**\n")
-			f.write(" * This file has been auto-generated and is the result of the following manifest(s):\n")
-			[f.write(" * - {}\n".format(path)) for path in config.inputs]
+			[f.write(" * {}\n".format(comment)) for comment in comments]
 			f.write(" */\n")
 			f.write(json5.dumps(manifest.getData(), sort_keys=True, indent=4, separators=(',', ': ')))
 
 	formatter = getattr(formats, config.format)
-	formatter(manifest, config.output)
+	formatter(manifest, config.output, {
+		"comments": comments
+	})
