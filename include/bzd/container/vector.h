@@ -3,6 +3,9 @@
 #include "bzd/types.h"
 #include "bzd/container/span.h"
 #include "bzd/utility/forward.h"
+#include "bzd/core/assert.h"
+
+#include <iostream>
 
 namespace bzd
 {
@@ -30,13 +33,11 @@ namespace bzd
 			 * 
 			 * \param value Value to be copied (or moved) to the new element.
 			 */
-			constexpr void pushBack(const T& value) noexcept
+			constexpr void pushBack(T&& value)
 			{
-				if (size_ < capacity_)
-				{
-					Parent::at(size_) = value;
-					++size_;
-				}
+				bzd::assert::isTrue(size_ < capacity_, "Out of bound");
+				Parent::at(size_) = bzd::forward<T>(value);
+				++size_;
 			}
 
 			/**
