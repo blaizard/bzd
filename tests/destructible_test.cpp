@@ -1,12 +1,19 @@
-#include "gtest/gtest.h"
-
 #include "bzd/type_traits/is_destructible.h"
+
+#include "gtest/gtest.h"
 
 TEST(TypeTraits, isDestructible)
 {
-	struct A { };
-	struct B { ~B() = delete; };
-	struct C : B {};
+	struct A
+	{
+	};
+	struct B
+	{
+		~B() = delete;
+	};
+	struct C : B
+	{
+	};
 
 	{
 		auto result = bzd::typeTraits::isDestructible<int>::value;

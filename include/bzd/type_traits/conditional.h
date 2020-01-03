@@ -1,13 +1,15 @@
 #pragma once
 
-namespace bzd
+namespace bzd { namespace typeTraits {
+template <bool B, class T, class F>
+struct conditional
 {
-	namespace typeTraits
-	{
-		template<bool B, class T, class F>
-		struct conditional { typedef T type; };
+	typedef T type;
+};
 
-		template<class T, class F>
-		struct conditional<false, T, F> { typedef F type; };
-	}
-}
+template <class T, class F>
+struct conditional<false, T, F>
+{
+	typedef F type;
+};
+}}	// namespace bzd::typeTraits

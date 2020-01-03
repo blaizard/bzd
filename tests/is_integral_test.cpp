@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "bzd/type_traits/is_integral.h"
+
+#include "gtest/gtest.h"
 
 TEST(TypeTraits, isIntegral)
 {
@@ -9,7 +9,7 @@ TEST(TypeTraits, isIntegral)
 		EXPECT_TRUE(result);
 	}
 	{
-		const bool result = bzd::typeTraits::isIntegral<char*>::value;
+		const bool result = bzd::typeTraits::isIntegral<char *>::value;
 		EXPECT_FALSE(result);
 	}
 }

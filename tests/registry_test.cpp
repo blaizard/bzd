@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/core/registry.h"
+
+#include "gtest/gtest.h"
 
 TEST(Registry, Base)
 {
@@ -8,9 +9,9 @@ TEST(Registry, Base)
 	bzd::Registry<int> yes("yes", -1);
 	bzd::Registry<int> me("me", 986);
 
-    EXPECT_EQ(bzd::Registry<int>::get("hello"), 12);
-    EXPECT_EQ(bzd::Registry<int>::get("me"), 986);
-    EXPECT_EQ(bzd::Registry<int>::get("yes"), -1);
+	EXPECT_EQ(bzd::Registry<int>::get("hello"), 12);
+	EXPECT_EQ(bzd::Registry<int>::get("me"), 986);
+	EXPECT_EQ(bzd::Registry<int>::get("yes"), -1);
 }
 
 TEST(Registry, Inheritance)
@@ -28,7 +29,7 @@ TEST(Registry, Inheritance)
 	bzd::declare::Registry<Foo, 1> reg_;
 	bzd::Registry<Foo, Bar> hello("hello", 12);
 
-    EXPECT_EQ(bzd::Registry<Foo>::get("hello").a, 12);
+	EXPECT_EQ(bzd::Registry<Foo>::get("hello").a, 12);
 }
 
 TEST(Registry, Overflow)

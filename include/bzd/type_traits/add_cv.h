@@ -1,9 +1,9 @@
 #pragma once
 
-namespace bzd
+namespace bzd { namespace typeTraits {
+template <class T>
+struct addCV
 {
-	namespace typeTraits
-	{
-		template <class T> struct addCV { typedef const volatile T type; };
-	}
-}
+	typedef const volatile T type;
+};
+}}	// namespace bzd::typeTraits

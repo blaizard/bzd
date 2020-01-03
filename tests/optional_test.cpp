@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/container/optional.h"
+
+#include "gtest/gtest.h"
 
 TEST(ContainerOptional, simpleData)
 {
@@ -37,7 +38,7 @@ TEST(ContainerOptional, complexData)
 TEST(ContainerOptional, reference)
 {
 	int a = 42;
-	bzd::Optional<int&> v(a);
+	bzd::Optional<int &> v(a);
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(*v, 42);
@@ -48,7 +49,7 @@ TEST(ContainerOptional, reference)
 TEST(ContainerOptional, pointer)
 {
 	int a = 42;
-	bzd::Optional<int*> v(&a);
+	bzd::Optional<int *> v(&a);
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(*(*v), 42);

@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/utility/reference_wrapper.h"
+
+#include "gtest/gtest.h"
 
 TEST(ReferenceWrapper, simple)
 {
