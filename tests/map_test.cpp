@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/container/map.h"
+
+#include "gtest/gtest.h"
 
 TEST(ContainerMap, single)
 {

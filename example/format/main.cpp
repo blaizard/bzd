@@ -1,5 +1,5 @@
-#include "bzd/format/format.h"
 #include "bzd/core/system.h"
+#include "bzd/format/format.h"
 
 int main()
 {

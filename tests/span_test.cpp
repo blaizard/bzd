@@ -1,12 +1,13 @@
-#include "gtest/gtest.h"
 #include "bzd/container/span.h"
+
+#include "gtest/gtest.h"
 
 TEST(ContainerSpan, Base)
 {
 	int test[5];
 	bzd::Span<int> span(test, 5);
 
-    EXPECT_EQ(span.size(), 5);
+	EXPECT_EQ(span.size(), 5);
 }
 
 TEST(ContainerSpan, Constructor)
@@ -16,15 +17,15 @@ TEST(ContainerSpan, Constructor)
 
 	// Copy
 	bzd::Span<int> spanCopy(span);
-    EXPECT_EQ(spanCopy.size(), 5);
+	EXPECT_EQ(spanCopy.size(), 5);
 
 	// Copy non-const to const
 	bzd::Span<const int> spanCopyConst(span);
-    EXPECT_EQ(spanCopyConst.size(), 5);
+	EXPECT_EQ(spanCopyConst.size(), 5);
 
 	// Copy const to const
 	bzd::Span<const int> spanCopyConstSquare(spanCopyConst);
-    EXPECT_EQ(spanCopyConstSquare.size(), 5);
+	EXPECT_EQ(spanCopyConstSquare.size(), 5);
 
 	// Copy const to non-const (not allowed!)
 	// bzd::Span<int> spanCopyNonConst(spanCopyConst);
@@ -45,7 +46,7 @@ TEST(ContainerSpan, Iterator)
 		EXPECT_EQ(++it, span.end());
 	}
 
-	for (auto& c : span)
+	for (auto &c : span)
 	{
 		c = 'A';
 	}

@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/container/variant.h"
 
+#include "gtest/gtest.h"
 #include <iostream>
 
 TEST(ContainerVariant, Constructor)
@@ -20,18 +20,18 @@ TEST(ContainerVariant, Destructor)
 
 	class TypeA
 	{
-	public:
-		TypeA() {++constructorA;}
-		TypeA(const TypeA&) {++constructorA;}
-		~TypeA() {++destructorA;}
+	  public:
+		TypeA() { ++constructorA; }
+		TypeA(const TypeA &) { ++constructorA; }
+		~TypeA() { ++destructorA; }
 	};
 
 	class TypeB
 	{
-	public:
-		TypeB() {++constructorB;}
-		TypeB(const TypeB&) {++constructorB;}
-		~TypeB() {++destructorB;}
+	  public:
+		TypeB() { ++constructorB; }
+		TypeB(const TypeB &) { ++constructorB; }
+		~TypeB() { ++destructorB; }
 	};
 
 	bzd::Variant<TypeA, TypeB> variant1;
@@ -92,23 +92,19 @@ TEST(ContainerVariant, Match)
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;
-		variant.match([](const int a) {},
-			[](const bool a) {},
-			[&](const double a) { b = a; });
+		variant.match([](const int a) {}, [](const bool a) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);
 	}
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<int>(5));
 		int b = 0;
-		variant.match([&](const int a) { b = a; },
-			[](const bool a) {},
-			[](const double a) {});
+		variant.match([&](const int a) { b = a; }, [](const bool a) {}, [](const double a) {});
 		EXPECT_EQ(b, 5);
 	}
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<int>(5));
 		bool isHandled = false;
-		variant.match([&](auto&&) { isHandled = true; });
+		variant.match([&](auto &&) { isHandled = true; });
 		EXPECT_TRUE(isHandled);
 	}
 }
@@ -134,9 +130,7 @@ TEST(ContainerVariant, Constexpr)
 	{
 		constexpr bzd::VariantConstexpr<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;
-		variant.match([](const int a) {},
-			[](const bool a) {},
-			[&](const double a) { b = a; });
+		variant.match([](const int a) {}, [](const bool a) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);
 	}
 }

@@ -1,14 +1,15 @@
-#include "gtest/gtest.h"
-#include "bzd/format/format.h"
 #include "bzd/container/string_stream.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/vector.h"
+#include "bzd/format/format.h"
+
+#include "gtest/gtest.h"
 
 class ContextTest
 {
-public:
-	void addSubstring(const bzd::StringView& str) { substrings_.pushBack(str); }
-	void onError(const bzd::StringView& message) const { throw std::runtime_error(message.data()); }
+  public:
+	void addSubstring(const bzd::StringView &str) { substrings_.pushBack(str); }
+	void onError(const bzd::StringView &message) const { throw std::runtime_error(message.data()); }
 
 	bzd::Vector<bzd::String<100>, 10> substrings_;
 };

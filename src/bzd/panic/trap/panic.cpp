@@ -2,5 +2,7 @@
 
 void bzd::panic()
 {
-	while (1) {};
+	while (1)
+	{
+	};
 }

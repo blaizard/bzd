@@ -1,5 +1,5 @@
-#include "bzd/core/system.h"
 #include "bzd/core/registry.h"
+#include "bzd/core/system.h"
 
 int main()
 {

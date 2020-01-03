@@ -1,28 +1,29 @@
-#include "gtest/gtest.h"
 #include "bzd/container/expected.h"
+
+#include "gtest/gtest.h"
 
 TEST(ContainerExpected, returnVoid)
 {
 	auto fct = [](const bool makeError) -> bzd::Expected<void, std::string> {
 		if (makeError) return bzd::makeUnexpected("KO");
-    	return {};
+		return {};
 	};
 
-	const auto ret = fct(/*makeError*/true);
-    EXPECT_FALSE(ret);
-    EXPECT_STREQ(ret.error().c_str(), "KO");
+	const auto ret = fct(/*makeError*/ true);
+	EXPECT_FALSE(ret);
+	EXPECT_STREQ(ret.error().c_str(), "KO");
 }
 
 TEST(ContainerExpected, returnReference)
 {
 	int data = 0;
-	auto fct = [&](const bool makeError) -> bzd::Expected<int&, std::string> {
+	auto fct = [&](const bool makeError) -> bzd::Expected<int &, std::string> {
 		if (makeError) return bzd::makeUnexpected("KO");
 		data = 42;
-    	return data;
+		return data;
 	};
-	const auto ret = fct(/*makeError*/false);
-    EXPECT_EQ(*ret, 42);
+	const auto ret = fct(/*makeError*/ false);
+	EXPECT_EQ(*ret, 42);
 	data = 37;
 	EXPECT_EQ(*ret, 37);
 }
@@ -30,13 +31,13 @@ TEST(ContainerExpected, returnReference)
 TEST(ContainerExpected, returnPointer)
 {
 	int data = 0;
-	auto fct = [&](const bool makeError) -> bzd::Expected<int*, std::string> {
+	auto fct = [&](const bool makeError) -> bzd::Expected<int *, std::string> {
 		if (makeError) return bzd::makeUnexpected("KO");
 		data = 42;
-    	return &data;
+		return &data;
 	};
-	const auto ret = fct(/*makeError*/false);
-    EXPECT_EQ(*(*ret), 42);
+	const auto ret = fct(/*makeError*/ false);
+	EXPECT_EQ(*(*ret), 42);
 	data = 37;
-    EXPECT_EQ(*(*ret), 37);
+	EXPECT_EQ(*(*ret), 37);
 }

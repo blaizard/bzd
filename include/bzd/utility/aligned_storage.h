@@ -2,14 +2,13 @@
 
 #include "bzd/types.h"
 
-namespace bzd
+namespace bzd {
+template <SizeType Len, SizeType Align>
+struct alignedStorage
 {
-	template <SizeType Len, SizeType Align>
-	struct alignedStorage
+	struct type
 	{
-		struct type
-		{
-    		alignas(Align) unsigned char data[Len];
-    	};
+		alignas(Align) unsigned char data[Len];
 	};
-}
+};
+}  // namespace bzd

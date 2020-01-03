@@ -1,5 +1,6 @@
-#include "gtest/gtest.h"
 #include "bzd/container/btree.h"
+
+#include "gtest/gtest.h"
 
 TEST(ContainerBTree, base)
 {
@@ -7,5 +8,5 @@ TEST(ContainerBTree, base)
 
 	tree.insert(12, 42);
 
-    EXPECT_EQ(true, true);
+	EXPECT_EQ(true, true);
 }

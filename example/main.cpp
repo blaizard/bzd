@@ -1,8 +1,8 @@
-#include <iostream>
-
 #include "bzd/scheduler.h"
 #include "bzd/stack.h"
 #include "bzd/task.h"
+
+#include <iostream>
 
 void fct1();
 void fct2();
@@ -22,7 +22,6 @@ void fct1()
 		bzd::yield();
 	}
 }
-
 
 void fct2()
 {
