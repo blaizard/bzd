@@ -94,7 +94,7 @@ bzd_generate_rule = rule(
             doc = "Define the merged manifest output for this file.",
         ),
         "_generator": attr.label(
-            default = Label("//tools/bazel.build/bzd/generator"),
+            default = Label("//tools/bzd/generator"),
             cfg = "host",
             executable = True,
         ),
