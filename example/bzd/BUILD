@@ -1,4 +1,4 @@
-load("@//tools/bazel.build/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
+load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
 
 bzd_manifest(
     name = "config_manifest",
@@ -17,4 +17,5 @@ bzd_cc_binary(
         ":config_manifest",
         "//src:bzd",
     ],
+    visibility = ["//visibility:public"]
 )

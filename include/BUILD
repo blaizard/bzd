@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@//tools/bazel.build/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
+load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
 
 filegroup(
     name = "bzd_files",

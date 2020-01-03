@@ -43,3 +43,9 @@ load_buildifier()
 load("//tools/documentation:dependencies.bzl", "load_documentation_dependencies")
 
 load_documentation_dependencies()
+
+# Sanitizer
+
+load("//tools/sanitizer:dependencies.bzl", "load_sanitizer_dependencies")
+
+load_sanitizer_dependencies()
