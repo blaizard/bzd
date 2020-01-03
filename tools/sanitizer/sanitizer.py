@@ -14,13 +14,16 @@ if __name__ == "__main__":
     parser.add_argument("--workspace", "-w", dest="workspace", type=str, required=True, help="Full path of the workspace to be sanitized.")
     parser.add_argument("--output", "-o", dest="output", type=str, default="compile_commands.json")
     parser.add_argument("--config", "-c", dest="config", type=str, default=None, help="Bazel configuration.")
+    parser.add_argument("--clang-format", dest="clang_format", default="clang-format")
     parser.add_argument("--action", "-a", dest="actions", action="append", choices=actionsList.keys(), default=[], help="Action(s) to be performed, valid actions are: {}".format(", ".join(actionsList.keys())))
     parser.add_argument(dest="target", nargs="?", type=str, default="//...", help="Target to be used to generate the compilation database.")
 
     args = parser.parse_args()
 
     # Generate the configuration object
-    config = Configuration(args.workspace, args.config)
+    config = Configuration(args.workspace, args.config, {
+        "clang-format": args.clang_format
+    })
 
     # Build the compilation DB
     compilationDB = CompilationDB(config, args.target, args.output)
