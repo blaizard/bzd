@@ -7,12 +7,12 @@ from lib.utility import assertCommand, executeMultiCommand
 
 def clangFormat(config, compilationDB):
 
-    assertCommand(["clang-format-6.0", "--version"])
+    assertCommand([config.getTool("clang-format"), "--version"])
 
     configs = []
     for command in compilationDB.getData():
         configs.append({
-            "cmd": ["clang-format-6.0", "-i", "-sort-includes", os.path.relpath(command["file"], config["execRoot"])],
-            "cwd": config["workspace"]
+            "cmd": [config.getTool("clang-format"), "-i", "-sort-includes", os.path.relpath(command["file"], config.getExecRoot())],
+            "cwd": config.getWorkspace()
         })
     executeMultiCommand(configs)

@@ -9,6 +9,11 @@ filegroup(
 )
 
 filegroup(
+    name = "clang_format",
+    srcs = ["bin/clang-format"],
+)
+
+filegroup(
     name = "bin",
     srcs = glob([
         "bin/*",
