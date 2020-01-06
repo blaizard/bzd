@@ -9,6 +9,7 @@ def _bzd_manifest_impl(ctx):
 """
 Rule for bzd manifests.
 """
+
 bzd_manifest = rule(
     implementation = _bzd_manifest_impl,
     attrs = {
