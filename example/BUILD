@@ -5,6 +5,5 @@ cc_binary(
     ],
     deps = [
         "//src:bzd",
-        "//src/bzd/platforms/x86_64_cdecl",
     ],
 )

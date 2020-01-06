@@ -6,7 +6,7 @@ set -e
 expectedGitDiff=$(git diff --shortstat)
 ./sanitize.sh
 if [ "$expectedGitDiff" != "$(git diff --shortstat)" ]; then
-	echo "Some files have been sanitized, please check and re-run."
+	echo "ERROR: Some files have been sanitized, please check and re-run."
 	exit 1
 fi
 

@@ -1,7 +1,4 @@
-#include "bzd/container/tuple.h"
-#include "bzd/format/format.h"
-#include "bzd/utility/max.h"
-#include "bzd/utility/min.h"
+#include "bzd.h"
 
 auto minmax(int i1, int i2, int i3, int i4) noexcept -> bzd::Tuple<int, int>
 {

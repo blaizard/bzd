@@ -8,4 +8,5 @@ cc_library(
     deps = [
         "//include:bzd",
     ],
+    alwayslink = True,
 )
