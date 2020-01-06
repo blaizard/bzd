@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: cpp
 compiler:
   - gcc
@@ -9,6 +9,6 @@ addons:
     packages:
     - g++-7
 install:
-  - "./tools/bazel.build/setup_bazel.sh"
+  - "sudo ./tools/bazel.build/setup_bazel.sh"
 script:
   - "./quality_gate.sh"
