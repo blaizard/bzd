@@ -33,13 +33,3 @@ constraint_value(
     name = "clang",
     constraint_setting = ":compiler",
 )
-
-platform(
-    name = "linux_x86_64",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-        ":linux",
-        ":x86_64",
-    ],
-)
