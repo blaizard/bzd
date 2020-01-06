@@ -12,14 +12,24 @@ class Configuration():
 		self.config = config
 		self.execRoot = executeCommand(["bazel", "info", "execution_root"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
 		self.bazelBin = executeCommand(["bazel", "info", "bazel-bin"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
-		self.tools = {name: tool.replace("%EXEC_ROOT%", self.execRoot) for name, tool in tools.items()}
 		self.ignoreList = [
 			re.compile(r"^external/"),
 			re.compile(r"^bazel-out/"),
 			re.compile(r".*\.S$")
 		]
+		# Set the tools
+		self.tools = {}
+		for name, tool in tools.items():
+			assert isinstance(tool, dict), "Tools must contains only dictionary entries."
+			assert "cmd" in tool, "Tool is missing 'cmd' key"
+			assert "cmdAssert" in tool, "Tool is missing 'cmdAssert' key"
+			assertCommand(self.sanitizeCmd(tool["cmdAssert"]))
+			self.tools[name] = self.sanitizeCmd(tool["cmd"])
 
-	def getTool(self, name):
+	def sanitizeCmd(self, cmd):
+		return [path.replace("%EXEC_ROOT%", self.execRoot) for path in cmd]
+
+	def getToolCmd(self, name):
 		assert name in self.tools, "This tool is not registered"
 		return self.tools[name]
 

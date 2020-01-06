@@ -3,16 +3,14 @@
 
 import os
 
-from lib.utility import assertCommand, executeMultiCommand, executeCommand
+from lib.utility import assertCommand, executeMultiCommand
 
 def clangFormat(config, compilationDB):
-
-    assertCommand([config.getTool("clang-format"), "--version"])
 
     configs = []
     for command in compilationDB.getData():
         configs.append({
-            "cmd": [config.getTool("clang-format"), "-style=file", "-i", "-sort-includes", os.path.relpath(command["file"], config.getExecRoot())],
+            "cmd": config.getToolCmd("clang-format") + ["-style=file", "-i", "-sort-includes", os.path.relpath(command["file"], config.getExecRoot())],
             "cwd": config.getWorkspace()
         })
     executeMultiCommand(configs)
