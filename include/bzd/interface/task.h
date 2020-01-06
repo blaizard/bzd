@@ -29,7 +29,10 @@ class Task
 	/**
 	 * Switch context and run this new task
 	 */
-	void yield(Task &nextTask) { impl::contextSwitch(reinterpret_cast<void **>(&stack_->stack_), nextTask.stack_->stack_); }
+	void yield(Task &nextTask)
+	{
+		impl::contextSwitch(reinterpret_cast<void **>(&stack_->stack_), reinterpret_cast<void *>(nextTask.stack_->stack_));
+	}
 
   protected:
 	PtrType const context_;

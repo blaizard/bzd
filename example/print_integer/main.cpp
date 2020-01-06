@@ -1,8 +1,4 @@
-#include "bzd/container/tuple.h"
-#include "bzd/format/format.h"
-#include "bzd/format/integral.h"
-#include "bzd/utility/max.h"
-#include "bzd/utility/min.h"
+#include "bzd.h"
 
 int main()
 {

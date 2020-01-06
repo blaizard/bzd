@@ -1,6 +1,4 @@
-#include "bzd/scheduler.h"
-#include "bzd/stack.h"
-#include "bzd/task.h"
+#include "bzd.h"
 
 #include <iostream>
 

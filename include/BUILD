@@ -5,6 +5,7 @@ filegroup(
     name = "bzd_files",
     srcs = glob([
         "bzd/**/*.h",
+        "bzd.h",
     ]),
     visibility = ["//visibility:public"],
 )
