@@ -22,42 +22,37 @@ build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
 
 # Sanitizers
 
-build:san_common --keep_going
-build:san_common --nocache_test_results
-build:san_common --copt -O1
-build:san_common --copt -g
-build:san_common --copt -fno-omit-frame-pointer
-build:san_common --copt -fno-optimize-sibling-calls
-build:san_common --strip never
+build:sanitizer --keep_going
+build:sanitizer --nocache_test_results
+build:sanitizer --copt -O1
+build:sanitizer --copt -g
+build:sanitizer --copt -fno-omit-frame-pointer
+build:sanitizer --copt -fno-optimize-sibling-calls
+build:sanitizer --strip never
 
 # Address Sanitizer
-build:asan --config=san_common
 build:asan --copt -fsanitize=address
 build:asan --copt -fno-omit-frame-pointer
 build:asan --linkopt -fsanitize=address
 
 # Leak Sanitizer
-build:lsan --config=san_common
 build:lsan --copt -fsanitize=leak
 build:lsan --copt -DLEAK_SANITIZER
 build:lsan --linkopt -fsanitize=leak
 
 # Undefined Behavior Sanitizer
-build:ubsan --config=san_common
 build:ubsan --copt -fsanitize=undefined
 build:ubsan --copt -DUNDEFINED_SANITIZER
 build:ubsan --linkopt -fsanitize=undefined
 build:ubsan --linkopt -lubsan
 
 # Memory Sanitizer
-build:msan --config=san_common
 build:msan --copt -fsanitize=memory
 build:msan --copt -fno-omit-frame-pointer
 build:msan --copt -fsanitize-memory-track-origins
 build:msan --linkopt -fsanitize=memory
 
 # Thread Sanitizer
-build:tsan --config=san_common
 build:tsan --copt -fsanitize=thread
 build:tsan --copt -DTHREAD_SANITIZER
 build:tsan --linkopt -fsanitize=thread
