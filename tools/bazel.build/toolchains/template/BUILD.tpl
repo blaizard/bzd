@@ -102,11 +102,3 @@ toolchain(
     toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
-
-cc_toolchain_suite(
-    name = "cc_toolchain_suite",
-    toolchains = {
-        "%{cpu}": ":cc_toolchain",
-        "%{cpu}|%{compiler}": ":cc_toolchain",
-    },
-)

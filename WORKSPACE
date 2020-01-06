@@ -28,6 +28,10 @@ register_toolchains(
     "@linux_x86_64_clang//:toolchain",
 )
 
+register_execution_platforms(
+    "//tools/bazel.build/platform:host_linux_x86_64_clang",
+)
+
 # Buildifier
 
 load("//tools/buildifier:dependencies.bzl", "load_buildifier_dependencies")
