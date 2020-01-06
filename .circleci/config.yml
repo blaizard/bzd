@@ -5,6 +5,7 @@ jobs:
       - image: gcc:latest
     steps:
       - checkout
+      - run: apt-get install libtinfo5
       - run: ./tools/bazel.build/setup_bazel.sh 
       - run: ./quality_gate.sh
 
