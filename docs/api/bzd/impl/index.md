@@ -39,7 +39,7 @@
 
 |Function||
 |:---|:---|
-|[`tygrab(char const(&) c)`](./index.md)||
+|[`tygrab(char const (&) c)`](./index.md)||
 |[`typoke(ConstexprStringView< X... >)`](./index.md)||
 |[`typoke(ConstexprStringView< X... >, ConstexprStringView<'\0'>, ConstexprStringView< Y > ...)`](./index.md)||
 |[`typoke(ConstexprStringView< X... >, ConstexprStringView< A >, ConstexprStringView< Y > ...)`](./index.md)||
@@ -267,7 +267,7 @@ Internal class used to create an unexpected object type.
 |SizeType|I||
 |SizeType...|N||
 ------
-### `template<int N, int M> constexpr char tygrab(char const(&) c)`
+### `template<int N, int M> constexpr char tygrab(char const (&) c)`
 
 #### Template
 ||||
@@ -277,7 +277,7 @@ Internal class used to create an unexpected object type.
 #### Parameters
 ||||
 |---:|:---|:---|
-|char const(&)|c||
+|char const (&)|c||
 ------
 ### `template<char... X> auto typoke(ConstexprStringView< X... >)`
 

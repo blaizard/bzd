@@ -12,7 +12,6 @@ class Configuration():
 		self.config = config
 		self.execRoot = executeCommand(["bazel", "info", "execution_root"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
 		self.bazelBin = executeCommand(["bazel", "info", "bazel-bin"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
-		self.outputBase = executeCommand(["bazel", "info", "output_base"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
 		self.tools = {name: tool.replace("%EXEC_ROOT%", self.execRoot) for name, tool in tools.items()}
 		self.ignoreList = [
 			re.compile(r"^external/"),
@@ -32,9 +31,6 @@ class Configuration():
 
 	def getBazelBin(self):
 		return self.bazelBin
-
-	def getOutputBase(self):
-		return self.outputBase
 
 	def getWorkspace(self):
 		return self.workspace
