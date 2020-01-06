@@ -8,7 +8,10 @@ cc_library(
         "//src/bzd/log",
         "//src/bzd/panic",
     ] + selects.with_or({
-        #("//tools/bazel.build/target:x86_64"): ["//src/bzd/platforms/x86_64_cdecl"],
-        "//conditions:default": ["//src/bzd/platforms/x86_64_cdecl"],
+        (
+            "//tools/bazel.build/config:x86_64",
+            "//tools/bazel.build/config/auto:x86_64",
+        ): ["//src/bzd/platforms/x86_64_cdecl"],
+        "//conditions:default": [],
     }),
 )

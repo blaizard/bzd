@@ -107,7 +107,7 @@ toolchain(
 
 constraint_value(
     name = "compiler",
-    constraint_setting = "@//tools/bazel.build/target/compiler:compiler",
+    constraint_setting = "@//tools/bazel.build/platforms/compiler:compiler",
 )
 
 platform(
