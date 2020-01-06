@@ -1,13 +1,14 @@
-matrix:
-  include:
-   - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-            - bazel
-
-before_install:
-  - ./quality_gate.sh
+sudo: false
+language: cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-7
+install:
+  - "./tools/bazel.build/setup_bazel.sh"
+script:
+  - "./quality_gate.sh"
