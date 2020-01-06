@@ -5,7 +5,7 @@ jobs:
       - image: gcc:latest
     steps:
       - checkout
-      - run: sudo ./tools/bazel.build/setup_bazel.sh 
+      - run: ./tools/bazel.build/setup_bazel.sh 
       - run: ./quality_gate.sh
 
 workflows:
