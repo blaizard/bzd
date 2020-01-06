@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # Generate the configuration object
     config = Configuration(args.workspace, args.config, {
-        "clang-format": args.clang_format
+        "clang-format": {"cmd": [args.clang_format], "cmdAssert": [args.clang_format, "--version"]}
     })
 
     # Build the compilation DB
