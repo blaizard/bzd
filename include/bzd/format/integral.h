@@ -149,10 +149,10 @@ void toString(bzd::OStream &stream, const char c)
 }
 
 /*	void toString(bzd::OStream& stream, const bool value)
-		{
-				stream.write((value) ? bzd::StringView("true") :
+				{
+								stream.write((value) ? bzd::StringView("true") :
    bzd::StringView("false"));
-		}
+				}
 */
 template <class... Args>
 constexpr void toString(bzd::interface::String &str, Args &&... args)
