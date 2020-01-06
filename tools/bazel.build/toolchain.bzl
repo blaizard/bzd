@@ -5,6 +5,7 @@ def _impl(ctx):
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
+        "%{platforms}": "\n".join(['"{}",'.format(t) for t in ctx.attr.platforms]),
         "%{filegroup_dependencies}": "\n".join(
             ['"{}",'.format(t) for t in ctx.attr.filegroup_dependencies] +
             ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_libs] +
@@ -45,11 +46,21 @@ def _impl(ctx):
     ctx.template("bin/wrapper-objcopy", Label("//tools/bazel.build:toolchains/template/bin/wrapper-objcopy"), {"%{objcopy}": ctx.attr.bin_objcopy})
     ctx.template("bin/wrapper-strip", Label("//tools/bazel.build:toolchains/template/bin/wrapper-strip"), {"%{strip}": ctx.attr.bin_strip})
 
+"""
+Creates a toolchain to be used with bazel.
+
+This rule also creates few important assets:
+ - A toolchain: "@<cpu>_<compiler>//:toolchain"
+ - A compiler target: "@<cpu>_<compiler>//:compiler"
+ - A platform: "@<cpu>_<compiler>//:platform"
+ - A host platform: "@<cpu>_<compiler>//:host_platform"
+"""
 toolchain_maker = repository_rule(
     implementation = _impl,
     attrs = {
         "cpu": attr.string(),
         "compiler": attr.string(),
+        "platforms": attr.string_list(),
         # Compatibility
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),
