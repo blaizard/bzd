@@ -2,6 +2,14 @@
 
 set -e
 
+# Run sanitizer and check if any file changed, if so report an error
+expectedGitDiff=$(git diff --shortstat)
+./sanitize.sh
+if [ "$expectedGitDiff" != "$(git diff --shortstat)" ]; then
+	echo "Some files have been sanitized, please check and re-run."
+	exit 1
+fi
+
 # Compile and test the different configurations
 bazel test ... --define=panic=throw
 bazel test ... --define=panic=throw --config=linux_x86_64_clang --platform_suffix=_clang
