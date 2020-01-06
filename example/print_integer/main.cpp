@@ -13,12 +13,12 @@ int main()
 	bzd::getOut().write(str);
 
 	/*	str.clear();
-			bzd::format::toStringBin(sstream, 12);
-			bzd::getOut().write(str);
+		bzd::format::toStringBin(sstream, 12);
+		bzd::getOut().write(str);
 
-			str.clear();
-			bzd::format::toStringHex(sstream, 748787);
-			bzd::getOut().write(str);
+		str.clear();
+		bzd::format::toStringHex(sstream, 748787);
+		bzd::getOut().write(str);
 	*/
 	return 0;
 }
