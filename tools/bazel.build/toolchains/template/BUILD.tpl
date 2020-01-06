@@ -94,11 +94,34 @@ cc_toolchain(
 toolchain(
     name = "toolchain",
     exec_compatible_with = [
+        ":compiler",
         %{exec_compatible_with}
     ],
     target_compatible_with = [
+        ":compiler",
         %{target_compatible_with}
     ],
     toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+constraint_value(
+    name = "compiler",
+    constraint_setting = "@//tools/bazel.build/target/compiler:compiler",
+)
+
+platform(
+    name = "platform",
+    constraint_values = [
+        ":compiler",
+    ],
+    parents = [
+        %{platforms}
+    ],
+)
+
+platform(
+    name = "host_platform",
+    host_platform = True,
+    parents = [":platform"],
 )

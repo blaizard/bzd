@@ -16,8 +16,8 @@ test --action_env="GTEST_COLOR=1"
 test --verbose_failures
 
 # linux_x86_64_clang
-build:linux_x86_64_clang --platforms="//tools/bazel.build/platform:linux_x86_64_clang"
-build:linux_x86_64_clang --host_platform="//tools/bazel.build/platform:host_linux_x86_64_clang"
+build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
+build:linux_x86_64_clang --host_platform="@linux_x86_64_clang//:host_platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
 
 # Sanitizers

@@ -29,7 +29,7 @@ register_toolchains(
 )
 
 register_execution_platforms(
-    "//tools/bazel.build/platform:host_linux_x86_64_clang",
+    "@linux_x86_64_clang//:host_platform",
 )
 
 # Buildifier
