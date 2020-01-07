@@ -1,0 +1,14 @@
+sudo: true
+language: cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-7
+install:
+  - "sudo ./tools/bazel.build/setup_bazel.sh"
+script:
+  - "./quality_gate.sh"
