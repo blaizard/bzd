@@ -20,9 +20,9 @@ http_archive(
 
 # Toolchains
 
-load("//tools/bazel.build:toolchains/linux_x86_64_clang/defs.bzl", "load_linux_x86_64_clang_9_0_0")
+load("//tools/bazel.build/toolchains/linux_x86_64_clang:defs.bzl", "load_linux_x86_64_clang")
 
-load_linux_x86_64_clang_9_0_0(name = "linux_x86_64_clang")
+load_linux_x86_64_clang()
 
 # Buildifier
 

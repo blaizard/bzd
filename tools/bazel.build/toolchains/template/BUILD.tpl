@@ -125,3 +125,10 @@ platform(
     host_platform = True,
     parents = [":platform"],
 )
+
+config_setting(
+    name = "target",
+    constraint_values = [
+        ":compiler",
+    ],
+)
