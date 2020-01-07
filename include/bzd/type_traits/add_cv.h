@@ -6,4 +6,4 @@ struct addCV
 {
 	typedef const volatile T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

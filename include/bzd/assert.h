@@ -15,4 +15,4 @@ constexpr void isTrue(const bool condition, Args &&... args)
 		bzd::panic();
 	}
 }
-}}	// namespace bzd::assert
+}} // namespace bzd::assert

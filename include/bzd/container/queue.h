@@ -11,11 +11,11 @@ namespace impl {
 template <class T, class CapacityType = SizeType>
 class Queue
 {
-  protected:
+protected:
 	using PoolType = SingleLinkedPool<T, CapacityType>;
 	using Element = typename PoolType::Element;
 
-  public:
+public:
 	constexpr explicit Queue(const bzd::Span<Element> data) noexcept : pool_(data), first_(PoolType::npos), last_(PoolType::npos) {}
 
 	constexpr CapacityType capacity() const noexcept { return pool_.capacity(); }
@@ -71,12 +71,12 @@ class Queue
 		pool_.release(item);
 	}
 
-  private:
+private:
 	SingleLinkedPool<T, CapacityType> pool_;
 	CapacityType first_;
 	CapacityType last_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class T, class CapacityType = SizeType>
@@ -88,13 +88,13 @@ using Queue = impl::Queue<T, CapacityType>;
 template <class T, SizeType N, class CapacityType = SizeType>
 class Queue : public interface::Queue<T, CapacityType>
 {
-  private:
+private:
 	using typename interface::Queue<T, CapacityType>::Element;
 
-  public:
+public:
 	constexpr Queue() : interface::Queue<T, CapacityType>({data_, N}) {}
 
-  private:
+private:
 	Element data_[N];
 };
-}  // namespace bzd
+} // namespace bzd

@@ -16,4 +16,4 @@ template <class T, unsigned long int N>
 struct isArray<T[N]> : bzd::typeTraits::trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

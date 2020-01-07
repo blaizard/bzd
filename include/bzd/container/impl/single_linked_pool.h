@@ -17,12 +17,12 @@ struct SingleLinkedPoolElement
 template <class T, class CapacityType = SizeType>
 class SingleLinkedPool : public bzd::Span<SingleLinkedPoolElement<T, CapacityType>>
 {
-  public:
+public:
 	using Element = SingleLinkedPoolElement<T, CapacityType>;
 	using Parent = bzd::Span<Element>;
 	static constexpr const CapacityType npos = static_cast<CapacityType>(-1);
 
-  public:
+public:
 	constexpr explicit SingleLinkedPool(const bzd::Span<Element> data) noexcept : Parent(data), free_(0)
 	{
 		bzd::assert::isTrue(Parent::size() > 0);
@@ -80,7 +80,7 @@ class SingleLinkedPool : public bzd::Span<SingleLinkedPoolElement<T, CapacityTyp
 		}
 	}
 
-  private:
+private:
 	CapacityType free_;
 };
-}}	// namespace bzd::impl
+}} // namespace bzd::impl

@@ -8,7 +8,7 @@ namespace impl {
 template <class T, class Impl>
 class StringView : public Impl
 {
-  protected:
+protected:
 	using Impl::data_;
 	using Impl::size_;
 
@@ -23,7 +23,7 @@ class StringView : public Impl
 		return length;
 	}
 
-  public:
+public:
 	constexpr StringView() : Impl(nullptr, 0) {}
 	constexpr StringView(const T *const str) : Impl(str, strlen(str)) {}
 	constexpr StringView(const T *const str, const SizeType size) : Impl(str, size) {}
@@ -42,7 +42,7 @@ class StringView : public Impl
 
 	constexpr void clear() noexcept { removePrefix(size_); }
 };
-}  // namespace impl
+} // namespace impl
 
 using StringView = impl::StringView<char, bzd::Span<const char>>;
-}  // namespace bzd
+} // namespace bzd

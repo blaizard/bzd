@@ -12,4 +12,4 @@ template <class T>
 struct isConst<const T> : trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

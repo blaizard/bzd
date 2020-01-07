@@ -10,4 +10,4 @@ constexpr void memcpy(char *dest, const char *src, const SizeType size)
 		dest[i] = src[i];
 	}
 }
-}  // namespace bzd
+} // namespace bzd

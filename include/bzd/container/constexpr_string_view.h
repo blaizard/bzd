@@ -8,7 +8,7 @@ namespace bzd { namespace impl {
 template <char... C>
 class ConstexprStringView
 {
-  public:
+public:
 	using DataType = const char;
 	using ConstIterator = DataType *;
 
@@ -20,7 +20,7 @@ class ConstexprStringView
 
 	static constexpr SizeType size() noexcept { return sizeof...(C); }
 
-  private:
+private:
 	static constexpr char const data_[sizeof...(C) + 1] = {C..., '\0'};
 	const char *str_;
 };
@@ -43,7 +43,7 @@ auto typoke(ConstexprStringView<X...>, ConstexprStringView<A>, ConstexprStringVi
 
 template <char... C>
 auto typeek(ConstexprStringView<C...>) -> decltype(typoke(ConstexprStringView<C>()...));
-}}	// namespace bzd::impl
+}} // namespace bzd::impl
 
 // 2^0 = 1
 #define CONSTEXPR_STRING_VIEW_1(n, x) bzd::impl::tygrab<0x##n##0>(x)

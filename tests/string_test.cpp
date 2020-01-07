@@ -4,17 +4,17 @@
 
 class A
 {
-  public:
+public:
 	A() = default;
 	int &get() { return a; }
 
-  private:
+private:
 	int a = 2;
 };
 
 class B : public A
 {
-  public:
+public:
 	B() = default;
 };
 

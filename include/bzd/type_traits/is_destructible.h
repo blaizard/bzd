@@ -14,7 +14,7 @@ struct isDestructible
 	template <class>
 	static long int test(...);
 };
-}  // namespace impl
+} // namespace impl
 
 template <class T>
 struct isDestructible : public bzd::typeTraits::integralConstant<bool, (sizeof(impl::isDestructible::test<T>(0)) == sizeof(char))>
@@ -53,4 +53,4 @@ template <class T>
 struct isDestructible<T[]> : public isDestructible<T>
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

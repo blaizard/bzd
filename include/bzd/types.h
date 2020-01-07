@@ -63,4 +63,4 @@ typedef uint32_t UInt32Type;
  * \brief Unsigned integer type with a fixed width of 64-bit.
  */
 typedef uint64_t UInt64Type;
-}  // namespace bzd
+} // namespace bzd

@@ -8,7 +8,7 @@
 namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
 {
-  public:
+public:
 	/**
 	 * Add a new task to the scheduler
 	 */
@@ -35,7 +35,7 @@ class Scheduler : public SingletonThreadLocal<Scheduler>
 		previousTask->yield(*task_);
 	}
 
-  private:
+private:
 	bzd::Queue<bzd::interface::Task *, 10> queue_;
 	bzd::interface::Task *task_;
 	void *mainStack_ = nullptr;
@@ -45,4 +45,4 @@ void yield()
 {
 	Scheduler::getInstance().yield();
 }
-}  // namespace bzd
+} // namespace bzd

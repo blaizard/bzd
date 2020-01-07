@@ -11,6 +11,7 @@
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`IOStream`](iostream/index.md)||
 |[`IStream`](istream/index.md)||
+|[`Log`](log/index.md)||
 |[`Map`](map/index.md)|Flat map implementation.|
 |[`Optional`](optional/index.md)||
 |[`OStream`](ostream/index.md)||
@@ -103,6 +104,9 @@ Non-leaf nodes are implemented as non-sorted arrays.
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `class Log`
+
 ------
 ### `template<class K, class V> class Map`
 Flat map implementation.

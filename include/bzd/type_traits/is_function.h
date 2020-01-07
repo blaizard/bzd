@@ -63,4 +63,4 @@ template <class Ret, class... Args>
 struct isFunction<Ret(Args...) const volatile &&> : trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

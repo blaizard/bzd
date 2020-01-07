@@ -13,9 +13,9 @@ template <class T>
 auto tryAddPointer(int) -> TypeIdentity<typename bzd::typeTraits::removeReference<T>::type *>;
 template <class T>
 auto tryAddPointer(...) -> TypeIdentity<T>;
-}  // namespace impl
+} // namespace impl
 template <class T>
 struct addPointer : decltype(impl::tryAddPointer<T>(0))
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

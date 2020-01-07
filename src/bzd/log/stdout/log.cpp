@@ -5,14 +5,14 @@
 namespace {
 class StdoutStream : public bzd::OStream
 {
-  public:
+public:
 	bzd::SizeType write(const bzd::Span<const char> &data) noexcept override
 	{
 		std::cout.write(data.data(), data.size());
 		return data.size();
 	}
 };
-}  // namespace
+} // namespace
 
 bzd::OStream &bzd::getOut()
 {

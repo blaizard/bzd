@@ -7,7 +7,7 @@
 
 class ContextTest
 {
-  public:
+public:
 	void addSubstring(const bzd::StringView &str) { substrings_.pushBack(str); }
 	void onError(const bzd::StringView &message) const { throw std::runtime_error(message.data()); }
 

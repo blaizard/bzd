@@ -5,17 +5,15 @@
 #include "bzd/types.h"
 #include "bzd/utility/container_of.h"
 
-#include <iostream>
-
 namespace bzd {
 namespace impl {
 template <class T, class CapacityType = SizeType>
 class Pool : public SingleLinkedPool<T, CapacityType>
 {
-  protected:
+protected:
 	using typename SingleLinkedPool<T, CapacityType>::Element;
 
-  public:
+public:
 	constexpr explicit Pool(const bzd::Span<Element> data) noexcept : SingleLinkedPool<T, CapacityType>(data) {}
 
 	/**
@@ -32,7 +30,7 @@ class Pool : public SingleLinkedPool<T, CapacityType>
 	 */
 	constexpr T &reserve() noexcept { return SingleLinkedPool<T, CapacityType>::reserve().container_; }
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class T, class CapacityType = SizeType>
@@ -46,13 +44,13 @@ using Pool = impl::Pool<T, CapacityType>;
 template <class T, SizeType N, class CapacityType = SizeType>
 class Pool : public interface::Pool<T, CapacityType>
 {
-  private:
+private:
 	using typename interface::Pool<T, CapacityType>::Element;
 
-  public:
+public:
 	constexpr Pool() : interface::Pool<T, CapacityType>({data_, N}) {}
 
-  private:
+private:
 	Element data_[N];
 };
-}  // namespace bzd
+} // namespace bzd

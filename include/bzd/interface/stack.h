@@ -8,10 +8,10 @@ namespace bzd { namespace interface {
  */
 class Stack
 {
-  public:
+public:
 	void reset(const FctPtrType fct, void *context);
 
-  protected:
+protected:
 	Stack(UInt8Type *stack, const SizeType size) : stackBase_(stack), size_(size) {}
 
 	/**
@@ -42,4 +42,4 @@ class Stack
 	UInt8Type *stack_;
 	static const Direction direction_;
 };
-}}	// namespace bzd::interface
+}} // namespace bzd::interface

@@ -15,8 +15,8 @@ template <class T, class... Args>
 struct isConstructible<voidType<decltype(T(declval<Args>()...))>, T, Args...> : public trueType
 {
 };
-}  // namespace impl
+} // namespace impl
 
 template <class T, class... Args>
 using isConstructible = impl::isConstructible<voidType<>, T, Args...>;
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

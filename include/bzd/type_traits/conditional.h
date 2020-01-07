@@ -12,4 +12,4 @@ struct conditional<false, T, F>
 {
 	typedef F type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

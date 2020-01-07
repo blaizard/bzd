@@ -13,4 +13,4 @@ template <class T>
 struct isSame<T, T> : trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

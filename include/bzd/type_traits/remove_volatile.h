@@ -14,4 +14,4 @@ struct removeVolatile<volatile T>
 {
 	typedef T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

@@ -8,7 +8,7 @@ namespace bzd {
 namespace impl {
 class StringStream : public bzd::OStream
 {
-  public:
+public:
 	constexpr StringStream(bzd::interface::String &str) : string_(str) {}
 
 	SizeType write(const bzd::StringView &data) noexcept { return write(static_cast<const bzd::Span<const char>>(data)); }
@@ -19,10 +19,10 @@ class StringStream : public bzd::OStream
 
 	constexpr bzd::interface::String &str() noexcept { return string_; }
 
-  protected:
+protected:
 	bzd::interface::String &string_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 using StringStream = bzd::impl::StringStream;
@@ -31,10 +31,10 @@ using StringStream = bzd::impl::StringStream;
 template <SizeType N>
 class StringStream : public bzd::interface::StringStream
 {
-  public:
+public:
 	constexpr StringStream() : bzd::interface::StringStream(container_), container_() {}
 
-  private:
+private:
 	bzd::String<N> container_;
 };
-}  // namespace bzd
+} // namespace bzd

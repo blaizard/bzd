@@ -43,7 +43,7 @@ TEST(TypeTraits, isFunction)
 	}
 
 	{
-		using T = PM_traits<decltype(&A::fun)>::member_type;  // T is int() const&
+		using T = PM_traits<decltype(&A::fun)>::member_type; // T is int() const&
 		const auto isFunction = bzd::typeTraits::isFunction<T>::value;
 		EXPECT_TRUE(isFunction);
 	}

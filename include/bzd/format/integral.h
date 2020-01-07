@@ -80,12 +80,12 @@ constexpr void fixedPoint(bzd::OStream &stream, const T &n, const SizeType maxPr
 	}
 	stream.write(buffer);
 }
-}  // namespace impl
+} // namespace impl
 
 template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
 constexpr void toString(bzd::OStream &stream, const T &data)
 {
-	bzd::String<40> buffer;	 // 40 is a the length
+	bzd::String<40> buffer; // 40 is a the length
 	bzd::format::impl::integer(buffer, data);
 	stream.write(buffer);
 }
@@ -99,7 +99,7 @@ constexpr void toString(bzd::OStream &stream, const T &data, const SizeType maxP
 template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
 constexpr void toStringHex(bzd::OStream &stream, const T &data, const char *const digits = bzd::format::impl::digits)
 {
-	bzd::String<16> buffer;	 // 16 is a the length of a 128-bit data in binary
+	bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
 	bzd::format::impl::integer<16>(buffer, data, digits);
 	stream.write(buffer);
 }
@@ -161,4 +161,4 @@ constexpr void toString(bzd::interface::String &str, Args &&... args)
 	bzd::interface::StringStream sstream(str);
 	toString(static_cast<bzd::OStream &>(sstream), bzd::forward<Args>(args)...);
 }
-}}	// namespace bzd::format
+}} // namespace bzd::format

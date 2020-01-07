@@ -15,8 +15,8 @@ struct Contains<T, U>
 {
 	static constexpr const bool value = bzd::typeTraits::isSame<T, U>::value;
 };
-}  // namespace impl
+} // namespace impl
 
 template <class T, class... Ts>
 using Contains = typename impl::Contains<T, Ts...>;
-}}	// namespace bzd::meta
+}} // namespace bzd::meta

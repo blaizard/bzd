@@ -22,7 +22,7 @@ namespace impl {
 template <class K, class V, SizeType Order>
 class BTree
 {
-  protected:
+protected:
 	struct Node
 	{
 		bzd::Vector<bzd::Tuple<K, Node *>, Order - 1> keys_;
@@ -30,7 +30,7 @@ class BTree
 		// bzd::Vector<Node*, Order> next_;
 	};
 
-  public:
+public:
 	constexpr explicit BTree(const SizeType capacity, Node **root, bzd::interface::Pool<Node> &nodes) :
 		capacity_(capacity), root_(root), nodes_(nodes)
 	{
@@ -81,12 +81,12 @@ class BTree
 		node->keys_.pushBack(key);
 	}
 
-  protected:
+protected:
 	const SizeType capacity_;
 	Node **root_;
 	bzd::interface::Pool<Node> &nodes_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class K, class V, SizeType Order>
@@ -96,18 +96,18 @@ using BTree = impl::BTree<K, V, Order>;
 template <class K, class V, SizeType N, SizeType Order>
 class BTree : public interface::BTree<K, V, Order>
 {
-  private:
+private:
 	using typename interface::BTree<K, V, Order>::Node;
 
-  public:
+public:
 	constexpr BTree() : interface::BTree<K, V, Order>(N, &root_, nodes_) {}
 
-  protected:
+protected:
 	bzd::Pool<Node, 10> nodes_;
 	Node *root_ = nullptr;
 	V data_[N];
 };
-}  // namespace bzd
+} // namespace bzd
 
 /*              14546
 		45454      5444     5545

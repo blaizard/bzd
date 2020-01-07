@@ -25,4 +25,4 @@ struct isTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, 
 #else
 static_assert(false, "Unsupported compiler");
 #endif
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

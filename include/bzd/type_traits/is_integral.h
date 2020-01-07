@@ -17,4 +17,4 @@ struct isIntegral
 						   isSame<long long, typename removeCV<T>::type>::value || isSame<bool, typename removeCV<T>::type>::value>
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

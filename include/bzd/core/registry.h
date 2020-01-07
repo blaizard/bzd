@@ -11,17 +11,17 @@ namespace impl {
 template <class T>
 class Registry
 {
-  public:
+public:
 	using KeyType = bzd::StringView;
 	using MapType = bzd::interface::Map<KeyType, T *>;
 
-  protected:
+protected:
 	constexpr Registry(MapType &registry) { get(&registry); }
 
-  public:
+public:
 	static constexpr MapType &get() { return get(nullptr); }
 
-  private:
+private:
 	static MapType &get(MapType *registry)
 	{
 		static MapType *instance = registry;
@@ -29,7 +29,7 @@ class Registry
 		return *instance;
 	}
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class T>
@@ -43,16 +43,16 @@ namespace declare {
 template <class T, SizeType Capacity>
 class Registry : public interface::Registry<T>
 {
-  protected:
+protected:
 	using typename interface::Registry<T>::KeyType;
 
-  public:
+public:
 	constexpr Registry() : interface::Registry<T>(registry_) {}
 
-  protected:
+protected:
 	bzd::Map<KeyType, T *, Capacity> registry_;
 };
-}  // namespace declare
+} // namespace declare
 
 /**
  * \brief Fixed-size registry object.
@@ -74,10 +74,10 @@ class Registry : public interface::Registry<T>
 template <class Interface, class T = Interface>
 class Registry
 {
-  protected:
+protected:
 	using KeyType = typename interface::Registry<Interface>::KeyType;
 
-  public:
+public:
 	template <class... Args>
 	constexpr Registry(const KeyType &str, Args &&... args) : object_{bzd::forward<Args>(args)...}
 	{
@@ -89,7 +89,7 @@ class Registry
 	 */
 	static constexpr Interface &get(const KeyType &key) { return *interface::Registry<Interface>::get()[key]; }
 
-  private:
+private:
 	T object_;
 };
-}  // namespace bzd
+} // namespace bzd

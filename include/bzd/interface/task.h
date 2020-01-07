@@ -7,12 +7,12 @@ namespace bzd {
 namespace impl {
 extern "C" void contextSwitch(void **stack1, void *stack2);
 extern "C" void *contextTask();
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 class Task
 {
-  public:
+public:
 	Task(PtrType context, const FctPtrType fct) : context_(context), fct_(fct) {}
 
 	/**
@@ -34,10 +34,10 @@ class Task
 		impl::contextSwitch(reinterpret_cast<void **>(&stack_->stack_), reinterpret_cast<void *>(nextTask.stack_->stack_));
 	}
 
-  protected:
+protected:
 	PtrType const context_;
 	const FctPtrType fct_;
 	interface::Stack *stack_;
 };
-}  // namespace interface
-}  // namespace bzd
+} // namespace interface
+} // namespace bzd

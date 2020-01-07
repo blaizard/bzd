@@ -8,20 +8,20 @@ namespace impl {
 template <class T>
 class OStream
 {
-  protected:
+protected:
 	OStream() = default;
 
-  public:
+public:
 	virtual SizeType write(const Span<const T> &data) noexcept = 0;
 };
 
 template <class T>
 class IStream
 {
-  protected:
+protected:
 	IStream() = default;
 
-  public:
+public:
 	virtual SizeType read(Span<T> &data) noexcept = 0;
 };
 
@@ -31,9 +31,9 @@ class IOStream
 	, public OStream<T>
 {
 };
-}  // namespace impl
+} // namespace impl
 
 using OStream = impl::OStream<char>;
 using IStream = impl::IStream<char>;
 using IOStream = impl::IOStream<char>;
-}  // namespace bzd
+} // namespace bzd

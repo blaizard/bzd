@@ -13,4 +13,4 @@ template <class T>
 struct isRValueReference<T &&> : public trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

@@ -12,12 +12,12 @@ namespace impl {
 template <class T, class Impl>
 class Vector : public Impl
 {
-  protected:
+protected:
 	using Parent = Impl;
 	using Impl::data_;
 	using Impl::size_;
 
-  public:
+public:
 	template <class... Args>
 	constexpr explicit Vector(const SizeType capacity, Args &&... args) : Impl(args...), capacity_(capacity)
 	{
@@ -57,10 +57,10 @@ class Vector : public Impl
 	 */
 	constexpr void resize(const bzd::SizeType n) noexcept { size_ = (n < capacity_) ? n : capacity_; }
 
-  protected:
+protected:
 	const SizeType capacity_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class T>
@@ -70,13 +70,13 @@ using Vector = impl::Vector<T, Span<T>>;
 template <class T, SizeType N>
 class Vector : public interface::Vector<T>
 {
-  public:
+public:
 	template <class... Args>
 	constexpr explicit Vector(Args &&... args) : interface::Vector<T>(N, data_, sizeof...(Args)), data_{bzd::forward<Args>(args)...}
 	{
 	}
 
-  protected:
+protected:
 	T data_[N];
 };
-}  // namespace bzd
+} // namespace bzd

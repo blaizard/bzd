@@ -11,4 +11,4 @@ struct alignedStorage
 		alignas(Align) unsigned char data[Len];
 	};
 };
-}  // namespace bzd
+} // namespace bzd

@@ -68,10 +68,10 @@ constexpr decltype(auto) TupleChooseN(T &&t, Ts &&... ts)
 template <SizeType N, class T>
 class TupleElem
 {
-  private:
+private:
 	T elem_{};
 
-  public:
+public:
 	constexpr TupleElem() noexcept = default;
 	constexpr TupleElem(const T &value) noexcept : elem_(value) {}
 	constexpr TupleElem(const NoType &) noexcept : elem_() {}
@@ -88,13 +88,13 @@ class TupleImpl;
 template <SizeType... N, class... T>
 class TupleImpl<TupleSizes<N...>, T...> : TupleElem<N, T>...
 {
-  private:
+private:
 	template <SizeType M>
 	using pick = bzd::meta::ChooseNth<M, T...>;
 	template <SizeType M>
 	using elem = TupleElem<M, pick<M>>;
 
-  public:
+public:
 	template <class... Args>
 	constexpr TupleImpl(Args &&... args) noexcept : TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
 	{
@@ -114,12 +114,12 @@ class TupleImpl<TupleSizes<N...>, T...> : TupleElem<N, T>...
 		return elem<M>::get();
 	}
 };
-}  // namespace impl
+} // namespace impl
 
 template <class... T>
 class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 {
-  public:
+public:
 	// Forward constructor as constexpr
 
 	template <class... Args>
@@ -129,4 +129,4 @@ class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 
 	static constexpr SizeType size() noexcept { return sizeof...(T); }
 };
-}  // namespace bzd
+} // namespace bzd
