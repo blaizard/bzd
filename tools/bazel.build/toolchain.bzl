@@ -54,6 +54,7 @@ This rule also creates few important assets:
  - A compiler target: "@<id>//:compiler"
  - A platform: "@<id>//:platform"
  - A host platform: "@<id>//:host_platform"
+ - A config setting: "@<id>//:target"
 """
 toolchain_maker = repository_rule(
     implementation = _impl,
