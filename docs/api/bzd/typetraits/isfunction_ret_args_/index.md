@@ -1,6 +1,6 @@
-# [`bzd`](../../../index.md)::[`typeTraits`](../../index.md)::[`isFunction< Ret(Args...) & >`](../index.md)
+# [`bzd`](../../../index.md)::[`typeTraits`](../../index.md)::[`isFunction< Ret(Args...)>`](../index.md)
 
-## `template<class Ret, class... Args> struct isFunction< Ret(Args...) & >`
+## `template<class Ret, class... Args> struct isFunction< Ret(Args...)>`
 
 #### Template
 ||||
