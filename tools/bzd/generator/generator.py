@@ -2,10 +2,10 @@
 # -*- coding: iso-8859-1 -*-
 
 import argparse
-import json5
+#import json5
 import formats
 import os
-from parser import manifestToDict
+from parser import manifestToDict, dictToManifest
 from manifest import Manifest
 
 if __name__== "__main__":
@@ -31,10 +31,8 @@ if __name__== "__main__":
 	# Generate the output manifest
 	if config.manifest:
 		with open(config.manifest, "w") as f:
-			f.write("/**\n")
-			[f.write(" * {}\n".format(comment)) for comment in comments]
-			f.write(" */\n")
-			f.write(json5.dumps(manifest.getData(), sort_keys=True, indent=4, separators=(',', ': ')))
+			[f.write("# {}\n".format(comment)) for comment in comments]
+			f.write(dictToManifest(manifest.getData()))
 
 	formatter = getattr(formats, config.format)
 	formatter(manifest, config.output, {

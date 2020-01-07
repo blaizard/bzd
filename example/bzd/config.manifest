@@ -1,23 +1,8 @@
-{
-	interfaces: {
-		"bzd::StringView": {
-			include: "bzd/container/string_view.h"
-		}
-	},
-	objects: {
-		"bzd::StringView.message": {
-			"params": ["Hello World !!!"]
-		}
-	}
-}
-
-/*
 interfaces:
-	"bzd::StringView":
-		include: "bzd/container/string_view.h"
+    "bzd::StringView":
+        include: "bzd/container/string_view.h"
 objects:
-	"bzd::StringView.message":
-		params:
-			- "Hello World !!!"
-			- !obj bzd::Hello
-*/
+    "bzd::StringView.message":
+        params:
+            - "Hello World !!!"
+            #- !ref "dsd"
