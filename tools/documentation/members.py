@@ -381,4 +381,6 @@ class Members:
 		return None
 
 	def items(self):
-		return self.data.items()
+		sortedNamespaceList = sorted(self.data.keys())
+		for namespace in sortedNamespaceList:
+			yield (namespace, self.data[namespace])

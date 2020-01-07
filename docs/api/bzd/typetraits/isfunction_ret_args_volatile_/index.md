@@ -1,6 +1,6 @@
-# [`bzd`](../../../index.md)::[`typeTraits`](../../index.md)::[`isFunction< Ret(Args...) volatile && >`](../index.md)
+# [`bzd`](../../../index.md)::[`typeTraits`](../../index.md)::[`isFunction< Ret(Args...) volatile >`](../index.md)
 
-## `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile && >`
+## `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile >`
 
 #### Template
 ||||
