@@ -6,7 +6,7 @@ def load_linux_x86_64_clang_9_0_0(name):
     clang_package_name = "linux_x86_64_clang_9_0_0"
     http_archive(
         name = clang_package_name,
-        build_file = "//tools/bazel.build:toolchains/{}.BUILD".format(clang_package_name),
+        build_file = "//tools/bazel.build:toolchains/linux_x86_64_clang/{}.BUILD".format(clang_package_name),
         urls = [
             "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
         ],
@@ -117,4 +117,12 @@ def load_linux_x86_64_clang_9_0_0(name):
         bin_gcov = "external/{}/bin/llvm-cov".format(clang_package_name),
         bin_objdump = "external/{}/bin/llvm-objdump".format(clang_package_name),
         bin_ld = "external/{}/bin/clang++".format(clang_package_name),
+    )
+
+    native.register_toolchains(
+        "@{}//:toolchain".format(name),
+    )
+
+    native.register_execution_platforms(
+        "@{}//:host_platform".format(name),
     )

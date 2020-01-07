@@ -10,3 +10,14 @@
 		}
 	}
 }
+
+/*
+interfaces:
+	"bzd::StringView":
+		include: "bzd/container/string_view.h"
+objects:
+	"bzd::StringView.message":
+		params:
+			- "Hello World !!!"
+			- !obj bzd::Hello
+*/
