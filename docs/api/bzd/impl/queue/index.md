@@ -11,14 +11,14 @@
 |Function||
 |:---|:---|
 |[`Queue(const bzd::Span< Element > data)`](./index.md)||
+|[`back()`](./index.md)||
+|[`back() const`](./index.md)||
 |[`capacity() const`](./index.md)||
 |[`empty() const`](./index.md)||
 |[`front()`](./index.md)||
 |[`front() const`](./index.md)||
-|[`back()`](./index.md)||
-|[`back() const`](./index.md)||
-|[`push(T && value)`](./index.md)||
 |[`pop()`](./index.md)||
+|[`push(T && value)`](./index.md)||
 ------
 ### `explicit constexpr Queue(const bzd::Span< Element > data)`
 
@@ -26,6 +26,12 @@
 ||||
 |---:|:---|:---|
 |const bzd::Span< Element >|data||
+------
+### `constexpr T & back()`
+
+------
+### `constexpr const T & back() const`
+
 ------
 ### `constexpr CapacityType capacity() const`
 
@@ -39,10 +45,7 @@
 ### `constexpr const T & front() const`
 
 ------
-### `constexpr T & back()`
-
-------
-### `constexpr const T & back() const`
+### `constexpr void pop()`
 
 ------
 ### `constexpr void push(T && value)`
@@ -51,6 +54,3 @@
 ||||
 |---:|:---|:---|
 |T &&|value||
-------
-### `constexpr void pop()`
-

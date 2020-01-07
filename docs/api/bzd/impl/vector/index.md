@@ -11,9 +11,9 @@
 |Function||
 |:---|:---|
 |[`Vector(const SizeType capacity, Args &&... args)`](./index.md)||
-|[`pushBack(T && value)`](./index.md)|Adds a new element at the end of the vector, after its current last element.|
 |[`capacity() const`](./index.md)|Returns the maximum number of elements the vector can hold.|
 |[`clear()`](./index.md)|Removes all elements.|
+|[`pushBack(T && value)`](./index.md)|Adds a new element at the end of the vector, after its current last element.|
 |[`resize(const bzd::SizeType n)`](./index.md)|Change the size of the vector.|
 ------
 ### `template<class... Args> explicit constexpr Vector(const SizeType capacity, Args &&... args)`
@@ -28,6 +28,14 @@
 |const SizeType|capacity||
 |Args &&...|args||
 ------
+### `constexpr SizeType capacity() const`
+Returns the maximum number of elements the vector can hold.
+
+Maximum number of element this vector can hold.
+------
+### `constexpr void clear()`
+Removes all elements.
+------
 ### `constexpr void pushBack(T && value)`
 Adds a new element at the end of the vector, after its current last element.
 
@@ -36,14 +44,6 @@ The content of val is copied (or moved) to the new element.
 ||||
 |---:|:---|:---|
 |T &&|value|Value to be copied (or moved) to the new element. |
-------
-### `constexpr SizeType capacity() const`
-Returns the maximum number of elements the vector can hold.
-
-Maximum number of element this vector can hold.
-------
-### `constexpr void clear()`
-Removes all elements.
 ------
 ### `constexpr void resize(const bzd::SizeType n)`
 Change the size of the vector.

@@ -5,20 +5,20 @@
 
 |Variable||
 |:---|:---|
-|[`index`](./index.md)||
-|[`sign`](./index.md)||
 |[`alternate`](./index.md)||
+|[`format`](./index.md)||
+|[`index`](./index.md)||
 |[`isPrecision`](./index.md)||
 |[`precision`](./index.md)||
-|[`format`](./index.md)||
-------
-### `bzd::SizeType index`
-
-------
-### `Sign sign`
-
+|[`sign`](./index.md)||
 ------
 ### `bool alternate`
+
+------
+### `Format format`
+
+------
+### `bzd::SizeType index`
 
 ------
 ### `bool isPrecision`
@@ -27,5 +27,5 @@
 ### `bzd::SizeType precision`
 
 ------
-### `Format format`
+### `Sign sign`
 

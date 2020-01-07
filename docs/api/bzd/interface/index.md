@@ -14,10 +14,10 @@
 |[`Map`](./index.md)|alias of [`bzd::impl::Map`](../impl/map/index.md)|
 |[`Pool`](./index.md)|alias of [`bzd::impl::Pool`](../impl/pool/index.md)|
 |[`Queue`](./index.md)|alias of [`bzd::impl::Queue`](../impl/queue/index.md)|
+|[`Registry`](./index.md)|alias of [`bzd::impl::Registry`](../impl/registry/index.md)|
 |[`String`](./index.md)|alias of [`bzd::impl::String`](../impl/string/index.md)|
 |[`StringStream`](./index.md)|alias of [`bzd::impl::StringStream`](../impl/stringstream/index.md)|
 |[`Vector`](./index.md)|alias of [`bzd::impl::Vector`](../impl/vector/index.md)|
-|[`Registry`](./index.md)|alias of [`bzd::impl::Registry`](../impl/registry/index.md)|
 ------
 ### `class Stack`
 Application stack definition
@@ -58,6 +58,13 @@ Application stack definition
 |class T|None||
 |class CapacityType|None||
 ------
+### `template<class T> typedef Registry`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
 ### `typedef String`
 
 ------
@@ -65,13 +72,6 @@ Application stack definition
 
 ------
 ### `template<class T> typedef Vector`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> typedef Registry`
 
 #### Template
 ||||

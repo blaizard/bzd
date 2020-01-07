@@ -9,8 +9,8 @@
 
 |Struct||
 |:---|:---|
-|[`TypeList`](typelist/index.md)||
 |[`Type`](type/index.md)||
+|[`TypeList`](typelist/index.md)||
 
 |Typedef||
 |:---|:---|
@@ -20,19 +20,19 @@
 |[`Union`](./index.md)||
 |[`UnionConstexpr`](./index.md)||
 ------
-### `template<class... Ts> struct TypeList`
-
-#### Template
-||||
-|---:|:---|:---|
-|class...|Ts||
-------
 ### `template<class T> struct Type`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class|T||
+------
+### `template<class... Ts> struct TypeList`
+
+#### Template
+||||
+|---:|:---|:---|
+|class...|Ts||
 ------
 ### `template<SizeType N, class... Ts> typedef ChooseNth`
 

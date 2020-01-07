@@ -6,8 +6,8 @@
 |Function||
 |:---|:---|
 |[`PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
-|[`addSubstring(const bzd::StringView & str)`](./index.md)||
 |[`addMetadata(const Metadata & metadata)`](./index.md)||
+|[`addSubstring(const bzd::StringView & str)`](./index.md)||
 |[`onError(const bzd::StringView & message) const`](./index.md)||
 ------
 ### `constexpr PrintContext(bzd::OStream & stream, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
@@ -18,19 +18,19 @@
 |bzd::OStream &|stream||
 |const bzd::interface::Vector< bzd::format::impl::Arg > &|args||
 ------
-### `void addSubstring(const bzd::StringView & str)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const bzd::StringView &|str||
-------
 ### `void addMetadata(const Metadata & metadata)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |const Metadata &|metadata||
+------
+### `void addSubstring(const bzd::StringView & str)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const bzd::StringView &|str||
 ------
 ### `void onError(const bzd::StringView & message) const`
 

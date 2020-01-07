@@ -10,13 +10,23 @@
 |Function||
 |:---|:---|
 |[`StringStream()`](./index.md)||
-|[`write(const bzd::StringView & data)`](./index.md)||
-|[`write(const bzd::Span< const char > & data)`](./index.md)||
 |[`str() const`](./index.md)||
 |[`str()`](./index.md)||
+|[`write(const bzd::StringView & data)`](./index.md)||
+|[`write(const bzd::Span< const char > & data)`](./index.md)||
 |[`write(const Span< const T > & data)`](./index.md)||
 ------
 ### `constexpr StringStream()`
+
+------
+### `constexpr const bzd::interface::String & str() const`
+*From bzd::impl::StringStream*
+
+
+------
+### `constexpr bzd::interface::String & str()`
+*From bzd::impl::StringStream*
+
 
 ------
 ### `SizeType write(const bzd::StringView & data)`
@@ -36,16 +46,6 @@
 ||||
 |---:|:---|:---|
 |const bzd::Span< const char > &|data||
-------
-### `constexpr const bzd::interface::String & str() const`
-*From bzd::impl::StringStream*
-
-
-------
-### `constexpr bzd::interface::String & str()`
-*From bzd::impl::StringStream*
-
-
 ------
 ### `virtual SizeType write(const Span< const T > & data)`
 *From bzd::impl::OStream*

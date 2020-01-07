@@ -289,11 +289,12 @@ class MemberGroup:
 
 	def sort(self):
 		def sortKey(k):
+			weight = k.getDefinition()["sort"]
 			if k.getName() == self.getConstructorName():
-				return k.getDefinition()["sort"] - 0.2
+				weight -= 0.2
 			elif k.getName() == self.getDestructorName():
-				return k.getDefinition()["sort"] - 0.1
-			return k.getDefinition()["sort"]
+				weight -= 0.1
+			return "{:.1f}{}".format(weight, k.getName().lower())
 		self.list = sorted(self.list, key=sortKey)
 
 	def get(self):

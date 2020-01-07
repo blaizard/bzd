@@ -16,8 +16,8 @@
 
 |Typedef||
 |:---|:---|
-|[`valueType`](./index.md)||
 |[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../../integralconstant/index.md)|
+|[`valueType`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -33,12 +33,12 @@
 
 
 ------
-### `typedef valueType`
+### `typedef type`
 *From bzd::typeTraits::integralConstant*
 
 
 ------
-### `typedef type`
+### `typedef valueType`
 *From bzd::typeTraits::integralConstant*
 
 

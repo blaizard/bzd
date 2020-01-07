@@ -12,9 +12,9 @@
 |:---|:---|
 |[`Variant()`](./index.md)||
 |[`Variant(T && value)`](./index.md)||
-|[`is() const`](./index.md)||
 |[`get() const`](./index.md)||
 |[`get()`](./index.md)||
+|[`is() const`](./index.md)||
 |[`match(Functors &&... funcs) const`](./index.md)||
 ------
 ### `constexpr Variant()`
@@ -32,13 +32,6 @@ Value constructor
 |---:|:---|:---|
 |T &&|value||
 ------
-### `template<class T> constexpr bool is() const`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
 ### `template<class T> constexpr bzd::Expected< const T &, bool > get() const`
 
 #### Template
@@ -47,6 +40,13 @@ Value constructor
 |class T|None||
 ------
 ### `template<class T> constexpr bzd::Expected< T &, bool > get()`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool is() const`
 
 #### Template
 ||||

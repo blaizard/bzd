@@ -14,36 +14,36 @@ The container combines the performance and accessibility of a C-style array with
 |:---|:---|
 |[`Array(Args &&... args)`](./index.md)||
 |[`Array()`](./index.md)||
-|[`capacity() const`](./index.md)|Returns the number of elements that the array can hold.|
-|[`Span(DataType *const data, const SizeType size)`](./index.md)||
-|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
-|[`begin()`](./index.md)||
-|[`end()`](./index.md)||
-|[`begin() const`](./index.md)||
-|[`cbegin() const`](./index.md)||
-|[`end() const`](./index.md)||
-|[`cend() const`](./index.md)||
-|[`size() const`](./index.md)||
-|[`reverse()`](./index.md)||
-|[`operator==(const SelfType & rhs) const`](./index.md)||
-|[`operator!=(const SelfType & rhs) const`](./index.md)||
-|[`operator[](const SizeType index)`](./index.md)||
-|[`operator[](const SizeType index) const`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
 |[`at(const SizeType index) const`](./index.md)||
-|[`front()`](./index.md)||
-|[`front() const`](./index.md)||
 |[`back()`](./index.md)||
 |[`back() const`](./index.md)||
+|[`begin()`](./index.md)||
+|[`begin() const`](./index.md)||
+|[`capacity() const`](./index.md)|Returns the number of elements that the array can hold.|
+|[`cbegin() const`](./index.md)||
+|[`cend() const`](./index.md)||
 |[`data()`](./index.md)||
 |[`data() const`](./index.md)||
-|[`find(const DataType & item, const SizeType start) const`](./index.md)||
 |[`empty() const`](./index.md)||
+|[`end()`](./index.md)||
+|[`end() const`](./index.md)||
+|[`find(const DataType & item, const SizeType start) const`](./index.md)||
+|[`front()`](./index.md)||
+|[`front() const`](./index.md)||
+|[`operator!=(const SelfType & rhs) const`](./index.md)||
+|[`operator==(const SelfType & rhs) const`](./index.md)||
+|[`operator[](const SizeType index)`](./index.md)||
+|[`operator[](const SizeType index) const`](./index.md)||
+|[`reverse()`](./index.md)||
+|[`size() const`](./index.md)||
+|[`Span(DataType *const data, const SizeType size)`](./index.md)||
+|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
 
 |Typedef||
 |:---|:---|
-|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
 |[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
 
 |Variable||
 |:---|:---|
@@ -63,22 +63,7 @@ The container combines the performance and accessibility of a C-style array with
 ### `constexpr Array()`
 
 ------
-### `constexpr SizeType capacity() const`
-Returns the number of elements that the array can hold.
-
-Maximum number of element this array can hold.
-------
-### `constexpr Span(DataType *const data, const SizeType size)`
-*From bzd::Span*
-
-
-#### Parameters
-||||
-|---:|:---|:---|
-|DataType *const|data||
-|const SizeType|size||
-------
-### `template<class Q, typename bzd::typeTraits::enableIf< Q::value, void >::type *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & at(const SizeType index)`
 *From bzd::Span*
 
 
@@ -86,13 +71,22 @@ Maximum number of element this array can hold.
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf< Q::value, void >::type *|None||
+|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
+|const SizeType|index||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator begin()`
+### `constexpr const T & at(const SizeType index) const`
+*From bzd::Span*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SizeType|index||
+------
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & back()`
 *From bzd::Span*
 
 
@@ -102,7 +96,12 @@ Maximum number of element this array can hold.
 |class Q|None||
 |typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator end()`
+### `constexpr const DataType & back() const`
+*From bzd::Span*
+
+
+------
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator begin()`
 *From bzd::Span*
 
 
@@ -117,12 +116,12 @@ Maximum number of element this array can hold.
 
 
 ------
-### `constexpr ConstIterator cbegin() const`
-*From bzd::Span*
+### `constexpr SizeType capacity() const`
+Returns the number of elements that the array can hold.
 
-
+Maximum number of element this array can hold.
 ------
-### `constexpr ConstIterator end() const`
+### `constexpr ConstIterator cbegin() const`
 *From bzd::Span*
 
 
@@ -132,17 +131,67 @@ Maximum number of element this array can hold.
 
 
 ------
-### `constexpr SizeType size() const`
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType * data()`
+*From bzd::Span*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class Q|None||
+|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+------
+### `constexpr const DataType * data() const`
 *From bzd::Span*
 
 
 ------
-### `constexpr void reverse()`
+### `constexpr bool empty() const`
 *From bzd::Span*
 
 
 ------
-### `constexpr bool operator==(const SelfType & rhs) const`
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator end()`
+*From bzd::Span*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class Q|None||
+|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+------
+### `constexpr ConstIterator end() const`
+*From bzd::Span*
+
+
+------
+### `constexpr SizeType find(const DataType & item, const SizeType start) const`
+*From bzd::Span*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const DataType &|item||
+|const SizeType|start||
+------
+### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & front()`
+*From bzd::Span*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class Q|None||
+|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+------
+### `constexpr const DataType & front() const`
+*From bzd::Span*
+
+
+------
+### `constexpr bool operator!=(const SelfType & rhs) const`
 *From bzd::Span*
 
 
@@ -151,7 +200,7 @@ Maximum number of element this array can hold.
 |---:|:---|:---|
 |const SelfType &|rhs||
 ------
-### `constexpr bool operator!=(const SelfType & rhs) const`
+### `constexpr bool operator==(const SelfType & rhs) const`
 *From bzd::Span*
 
 
@@ -183,30 +232,27 @@ Maximum number of element this array can hold.
 |---:|:---|:---|
 |const SizeType|index||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & at(const SizeType index)`
+### `constexpr void reverse()`
 *From bzd::Span*
 
 
-#### Template
-||||
-|---:|:---|:---|
-|class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|const SizeType|index||
 ------
-### `constexpr const T & at(const SizeType index) const`
+### `constexpr SizeType size() const`
+*From bzd::Span*
+
+
+------
+### `constexpr Span(DataType *const data, const SizeType size)`
 *From bzd::Span*
 
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|const SizeType|index||
+|DataType *const|data||
+|const SizeType|size||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & front()`
+### `template<class Q, typename bzd::typeTraits::enableIf< Q::value, void >::type *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
 *From bzd::Span*
 
 
@@ -214,64 +260,18 @@ Maximum number of element this array can hold.
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
-------
-### `constexpr const DataType & front() const`
-*From bzd::Span*
-
-
-------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & back()`
-*From bzd::Span*
-
-
-#### Template
-||||
-|---:|:---|:---|
-|class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
-------
-### `constexpr const DataType & back() const`
-*From bzd::Span*
-
-
-------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType * data()`
-*From bzd::Span*
-
-
-#### Template
-||||
-|---:|:---|:---|
-|class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
-------
-### `constexpr const DataType * data() const`
-*From bzd::Span*
-
-
-------
-### `constexpr SizeType find(const DataType & item, const SizeType start) const`
-*From bzd::Span*
-
-
+|typename bzd::typeTraits::enableIf< Q::value, void >::type *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const DataType &|item||
-|const SizeType|start||
+|const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
 ------
-### `constexpr bool empty() const`
+### `typedef ConstIterator`
 *From bzd::Span*
 
 
 ------
 ### `typedef Iterator`
-*From bzd::Span*
-
-
-------
-### `typedef ConstIterator`
 *From bzd::Span*
 
 

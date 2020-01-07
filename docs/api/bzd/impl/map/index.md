@@ -16,9 +16,9 @@ Flat map implementation.
 |:---|:---|
 |[`Map(bzd::interface::Vector< Element > & data)`](./index.md)||
 |[`find(const K & key) const`](./index.md)||
-|[`operator[](const K & key) const`](./index.md)||
 |[`insert(const K & key, V && value)`](./index.md)||
 |[`insert(const Iterator & it, V && value)`](./index.md)||
+|[`operator[](const K & key) const`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -41,13 +41,6 @@ Search for a specific element in the map.
 |---:|:---|:---|
 |const K &|key||
 ------
-### `constexpr V & operator[](const K & key) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const K &|key||
-------
 ### `constexpr void insert(const K & key, V && value)`
 Insert a new element or replace the existing one
 #### Parameters
@@ -63,6 +56,13 @@ Insert a new element or replace the existing one
 |---:|:---|:---|
 |const Iterator &|it||
 |V &&|value||
+------
+### `constexpr V & operator[](const K & key) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const K &|key||
 ------
 ### `typedef Iterator`
 

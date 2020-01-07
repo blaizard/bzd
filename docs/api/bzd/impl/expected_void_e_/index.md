@@ -9,22 +9,27 @@
 
 |Function||
 |:---|:---|
+|[`error() const`](./index.md)||
 |[`Expected()`](./index.md)||
 |[`Expected(T && value)`](./index.md)||
 |[`Expected(impl::Unexpected< U > && u)`](./index.md)||
 |[`Expected(Expected< T, E > && e)`](./index.md)||
-|[`~Expected()`](./index.md)||
 |[`operator bool() const`](./index.md)||
-|[`error() const`](./index.md)||
 |[`operator*() const`](./index.md)||
 |[`operator*()`](./index.md)||
 |[`operator->() const`](./index.md)||
 |[`operator->()`](./index.md)||
+|[`~Expected()`](./index.md)||
 
 |Variable||
 |:---|:---|
-|[`value_`](./index.md)||
 |[`error_`](./index.md)||
+|[`value_`](./index.md)||
+------
+### `constexpr const E & error() const`
+*From bzd::impl::Expected*
+
+
 ------
 ### `constexpr Expected()`
 
@@ -60,17 +65,7 @@
 |---:|:---|:---|
 |Expected< T, E > &&|e||
 ------
-### ` ~Expected()`
-*From bzd::impl::Expected*
-
-
-------
 ### `constexpr operator bool() const`
-*From bzd::impl::Expected*
-
-
-------
-### `constexpr const E & error() const`
 *From bzd::impl::Expected*
 
 
@@ -95,12 +90,17 @@
 
 
 ------
-### `ValueContainer value_`
+### ` ~Expected()`
 *From bzd::impl::Expected*
 
 
 ------
 ### `E error_`
+*From bzd::impl::Expected*
+
+
+------
+### `ValueContainer value_`
 *From bzd::impl::Expected*
 
 

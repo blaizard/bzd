@@ -5,54 +5,52 @@
 
 |Namespace||
 |:---|:---|
+|[`assert`](assert/index.md)||
+|[`declare`](declare/index.md)||
 |[`format`](format/index.md)||
 |[`impl`](impl/index.md)||
-|[`typeTraits`](typetraits/index.md)||
-|[`meta`](meta/index.md)||
-|[`declare`](declare/index.md)||
-|[`iterator`](iterator/index.md)||
 |[`interface`](interface/index.md)||
+|[`iterator`](iterator/index.md)||
 |[`log`](log/index.md)||
-|[`assert`](assert/index.md)||
+|[`meta`](meta/index.md)||
+|[`typeTraits`](typetraits/index.md)||
 
 |Class||
 |:---|:---|
-|[`Task`](task/index.md)||
-|[`Scheduler`](scheduler/index.md)||
-|[`Variant`](variant/index.md)||
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
 |[`BTree`](btree/index.md)||
-|[`StringStream`](stringstream/index.md)||
-|[`Tuple`](tuple/index.md)||
-|[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
-|[`SingletonThreadLocal`](singletonthreadlocal/index.md)||
-|[`ReferenceWrapper`](referencewrapper/index.md)||
-|[`String`](string/index.md)||
-|[`Pool`](pool/index.md)||
-|[`VariantConstexpr`](variantconstexpr/index.md)||
-|[`Registry`](registry/index.md)|Fixed-size registry object.|
-|[`Singleton`](singleton/index.md)||
-|[`Stack`](stack/index.md)||
-|[`Queue`](queue/index.md)||
 |[`Map`](map/index.md)||
+|[`Pool`](pool/index.md)||
+|[`Queue`](queue/index.md)||
+|[`ReferenceWrapper`](referencewrapper/index.md)||
+|[`Registry`](registry/index.md)|Fixed-size registry object.|
+|[`Scheduler`](scheduler/index.md)||
+|[`Singleton`](singleton/index.md)||
+|[`SingletonThreadLocal`](singletonthreadlocal/index.md)||
+|[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
+|[`Stack`](stack/index.md)||
+|[`String`](string/index.md)||
+|[`StringStream`](stringstream/index.md)||
+|[`Task`](task/index.md)||
+|[`Tuple`](tuple/index.md)||
+|[`Variant`](variant/index.md)||
+|[`VariantConstexpr`](variantconstexpr/index.md)||
 |[`Vector`](vector/index.md)||
 
 |Struct||
 |:---|:---|
-|[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
-|[`resultOf`](resultof/index.md)||
-|[`decay`](decay/index.md)||
 |[`alignedStorage`](alignedstorage/index.md)||
+|[`decay`](decay/index.md)||
+|[`resultOf`](resultof/index.md)||
+|[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
 
 |Function||
 |:---|:---|
-|[`makeUnexpected(E && e)`](./index.md)||
-|[`panic()`](./index.md)||
-|[`getOut()`](./index.md)||
-|[`yield()`](./index.md)||
 |[`containerOf(M * ptr, const M T::* member)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
 |[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
+|[`getOut()`](./index.md)||
+|[`makeUnexpected(E && e)`](./index.md)||
 |[`max(const T & a)`](./index.md)||
 |[`max(const T & a, const T & b, const Ts &... n)`](./index.md)||
 |[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
@@ -60,46 +58,30 @@
 |[`min(const T & a, const T & b, const Ts &... n)`](./index.md)||
 |[`move(T && arg)`](./index.md)||
 |[`offsetOf(const M T::* member)`](./index.md)||
+|[`panic()`](./index.md)||
 |[`swap(T & t1, T & t2)`](./index.md)||
+|[`yield()`](./index.md)||
 
 |Typedef||
 |:---|:---|
 |[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
-|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
-|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
-|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
-|[`Optional`](./index.md)|Type managing an optional contained value, i.e. a value that may or may not be present.; alias of [`bzd::impl::Optional`](impl/optional/index.md)|
-|[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
-|[`PtrType`](./index.md)|Memory pointer type.|
-|[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
 |[`FctPtrType`](./index.md)|Function pointer type.|
-|[`SizeType`](./index.md)|Unsigned integer that can store the maximum size of a theoretically possible object of any type.|
-|[`Int8Type`](./index.md)|Signed integer type with a fixed width of 8-bit.|
 |[`Int16Type`](./index.md)|Signed integer type with a fixed width of 16-bit.|
 |[`Int32Type`](./index.md)|Signed integer type with a fixed width of 32-bit.|
 |[`Int64Type`](./index.md)|Signed integer type with a fixed width of 64-bit.|
-|[`UInt8Type`](./index.md)|Unsigned integer type with a fixed width of 8-bit.|
+|[`Int8Type`](./index.md)|Signed integer type with a fixed width of 8-bit.|
+|[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
+|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
+|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
+|[`Optional`](./index.md)|Type managing an optional contained value, i.e. a value that may or may not be present.; alias of [`bzd::impl::Optional`](impl/optional/index.md)|
+|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
+|[`PtrType`](./index.md)|Memory pointer type.|
+|[`SizeType`](./index.md)|Unsigned integer that can store the maximum size of a theoretically possible object of any type.|
+|[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
 |[`UInt16Type`](./index.md)|Unsigned integer type with a fixed width of 16-bit.|
 |[`UInt32Type`](./index.md)|Unsigned integer type with a fixed width of 32-bit.|
 |[`UInt64Type`](./index.md)|Unsigned integer type with a fixed width of 64-bit.|
-------
-### `template<class T, class... Args> class Task`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|class...|Args||
-------
-### `class Scheduler`
-
-------
-### `template<class... Ts> class Variant`
-
-#### Template
-||||
-|---:|:---|:---|
-|class...|Ts||
+|[`UInt8Type`](./index.md)|Unsigned integer type with a fixed width of 8-bit.|
 ------
 ### `template<class T, SizeType N> class Array`
 A container that encapsulates fixed size arrays.
@@ -121,46 +103,13 @@ The container combines the performance and accessibility of a C-style array with
 |SizeType|N||
 |SizeType|Order||
 ------
-### `template<SizeType N> class StringStream`
+### `template<class K, class V, SizeType N> class Map`
 
 #### Template
 ||||
 |---:|:---|:---|
-|SizeType|N||
-------
-### `template<class... T> class Tuple`
-
-#### Template
-||||
-|---:|:---|:---|
-|class...|T||
-------
-### `template<class T> class Span`
-The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.
-#### Template
-||||
-|---:|:---|:---|
-|class|T|Element type, must be a complete type that is not an abstract class type. |
-------
-### `template<class T> class SingletonThreadLocal`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
-### `template<class T> class ReferenceWrapper`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<SizeType N> class String`
-
-#### Template
-||||
-|---:|:---|:---|
+|class|K||
+|class|V||
 |SizeType|N||
 ------
 ### `template<class T, SizeType N, class CapacityType> class Pool`
@@ -172,12 +121,21 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |SizeType|N||
 |class|CapacityType||
 ------
-### `template<class... Ts> class VariantConstexpr`
+### `template<class T, SizeType N, class CapacityType> class Queue`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class...|Ts||
+|class|T||
+|SizeType|N||
+|class|CapacityType||
+------
+### `template<class T> class ReferenceWrapper`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<class Interface, class T> class Registry`
 Fixed-size registry object.
@@ -196,12 +154,29 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |class Interface|None||
 |class T|None||
 ------
+### `class Scheduler`
+
+------
 ### `template<class T> class Singleton`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `template<class T> class SingletonThreadLocal`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+------
+### `template<class T> class Span`
+The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.
+#### Template
+||||
+|---:|:---|:---|
+|class|T|Element type, must be a complete type that is not an abstract class type. |
 ------
 ### `template<const SizeType N> class Stack`
 
@@ -210,23 +185,48 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |---:|:---|:---|
 |const SizeType|N||
 ------
-### `template<class T, SizeType N, class CapacityType> class Queue`
+### `template<SizeType N> class String`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
 |SizeType|N||
-|class|CapacityType||
 ------
-### `template<class K, class V, SizeType N> class Map`
+### `template<SizeType N> class StringStream`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class|K||
-|class|V||
 |SizeType|N||
+------
+### `template<class T, class... Args> class Task`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class...|Args||
+------
+### `template<class... T> class Tuple`
+
+#### Template
+||||
+|---:|:---|:---|
+|class...|T||
+------
+### `template<class... Ts> class Variant`
+
+#### Template
+||||
+|---:|:---|:---|
+|class...|Ts||
+------
+### `template<class... Ts> class VariantConstexpr`
+
+#### Template
+||||
+|---:|:---|:---|
+|class...|Ts||
 ------
 ### `template<class T, SizeType N> class Vector`
 
@@ -236,28 +236,6 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |class|T||
 |SizeType|N||
 ------
-### `template<class T, class... Args> struct resultOf< T(&)(Args &&...)>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|class...|Args||
-------
-### `template<class T> struct resultOf`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct decay`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
 ### `template<SizeType Len, SizeType Align> struct alignedStorage`
 
 #### Template
@@ -266,25 +244,27 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |SizeType|Len||
 |SizeType|Align||
 ------
-### `template<class E> constexpr impl::Unexpected< typename bzd::decay< E >::type > makeUnexpected(E && e)`
+### `template<class T> struct decay`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class E|None||
-#### Parameters
+|class|T||
+------
+### `template<class T> struct resultOf`
+
+#### Template
 ||||
 |---:|:---|:---|
-|E &&|e||
+|class T|None||
 ------
-### `void panic()`
+### `template<class T, class... Args> struct resultOf< T(&)(Args &&...)>`
 
-------
-### `bzd::OStream & getOut()`
-
-------
-### `void yield()`
-
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class...|Args||
 ------
 ### `template<class T, class M> static constexpr T * containerOf(M * ptr, const M T::* member)`
 
@@ -320,6 +300,20 @@ Note, this initialization scheme can be imediatly followed by object registratio
 ||||
 |---:|:---|:---|
 |typename typeTraits::removeReference< T >::type &&|t||
+------
+### `bzd::OStream & getOut()`
+
+------
+### `template<class E> constexpr impl::Unexpected< typename bzd::decay< E >::type > makeUnexpected(E && e)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class E|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|E &&|e||
 ------
 ### `template<class T> constexpr T max(const T & a)`
 
@@ -403,6 +397,9 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |---:|:---|:---|
 |const M T::*|member||
 ------
+### `void panic()`
+
+------
 ### `template<class T> constexpr void swap(T & t1, T & t2)`
 
 #### Template
@@ -415,6 +412,9 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |T &|t1||
 |T &|t2||
 ------
+### `void yield()`
+
+------
 ### `template<class T, class E> typedef Expected`
 This is the type used for returning and propagating errors.
 
@@ -425,39 +425,8 @@ It is a variants with 2 states, valid, representing success and containing a val
 |class T|None||
 |class E|None||
 ------
-### `typedef OStream`
-
-------
-### `typedef IStream`
-
-------
-### `typedef IOStream`
-
-------
-### `template<class T> typedef Optional`
-Type managing an optional contained value, i.e. a value that may or may not be present.
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `typedef StringView`
-
-------
-### `typedef PtrType`
-Memory pointer type.
-------
-### `typedef IntPtrType`
-Integer type capable of holding a memory pointer.
-------
 ### `typedef FctPtrType`
 Function pointer type.
-------
-### `typedef SizeType`
-Unsigned integer that can store the maximum size of a theoretically possible object of any type.
-------
-### `typedef Int8Type`
-Signed integer type with a fixed width of 8-bit.
 ------
 ### `typedef Int16Type`
 Signed integer type with a fixed width of 16-bit.
@@ -468,8 +437,36 @@ Signed integer type with a fixed width of 32-bit.
 ### `typedef Int64Type`
 Signed integer type with a fixed width of 64-bit.
 ------
-### `typedef UInt8Type`
-Unsigned integer type with a fixed width of 8-bit.
+### `typedef Int8Type`
+Signed integer type with a fixed width of 8-bit.
+------
+### `typedef IntPtrType`
+Integer type capable of holding a memory pointer.
+------
+### `typedef IOStream`
+
+------
+### `typedef IStream`
+
+------
+### `template<class T> typedef Optional`
+Type managing an optional contained value, i.e. a value that may or may not be present.
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `typedef OStream`
+
+------
+### `typedef PtrType`
+Memory pointer type.
+------
+### `typedef SizeType`
+Unsigned integer that can store the maximum size of a theoretically possible object of any type.
+------
+### `typedef StringView`
+
 ------
 ### `typedef UInt16Type`
 Unsigned integer type with a fixed width of 16-bit.
@@ -479,3 +476,6 @@ Unsigned integer type with a fixed width of 32-bit.
 ------
 ### `typedef UInt64Type`
 Unsigned integer type with a fixed width of 64-bit.
+------
+### `typedef UInt8Type`
+Unsigned integer type with a fixed width of 8-bit.

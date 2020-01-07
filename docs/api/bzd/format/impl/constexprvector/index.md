@@ -17,12 +17,12 @@ Simple vector container working with conxtexpr
 |[`ConstexprVector()`](./index.md)||
 |[`ConstexprVector(Args &&... args)`](./index.md)||
 |[`begin() const`](./index.md)||
-|[`end() const`](./index.md)||
-|[`size() const`](./index.md)||
 |[`capacity() const`](./index.md)||
-|[`push_back(const T & element)`](./index.md)||
+|[`end() const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
+|[`push_back(const T & element)`](./index.md)||
+|[`size() const`](./index.md)||
 ------
 ### `class Iterator`
 
@@ -44,21 +44,11 @@ Simple vector container working with conxtexpr
 ### `constexpr Iterator begin() const`
 
 ------
-### `constexpr Iterator end() const`
-
-------
-### `constexpr SizeType size() const`
-
-------
 ### `constexpr SizeType capacity() const`
 
 ------
-### `constexpr void push_back(const T & element)`
+### `constexpr Iterator end() const`
 
-#### Parameters
-||||
-|---:|:---|:---|
-|const T &|element||
 ------
 ### `constexpr DataType & operator[](const SizeType index)`
 
@@ -73,3 +63,13 @@ Simple vector container working with conxtexpr
 ||||
 |---:|:---|:---|
 |const SizeType|index||
+------
+### `constexpr void push_back(const T & element)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|element||
+------
+### `constexpr SizeType size() const`
+

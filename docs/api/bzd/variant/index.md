@@ -12,9 +12,9 @@
 |[`Variant(Args &&... args)`](./index.md)||
 |[`~Variant()`](./index.md)||
 |[`emplace(Args &&... args)`](./index.md)||
-|[`is() const`](./index.md)||
 |[`get() const`](./index.md)||
 |[`get()`](./index.md)||
+|[`is() const`](./index.md)||
 |[`match(Functors &&... funcs) const`](./index.md)||
 ------
 ### `template<class... Args> constexpr Variant(Args &&... args)`
@@ -44,15 +44,6 @@
 |---:|:---|:---|
 |Args &&...|args||
 ------
-### `template<class T> constexpr bool is() const`
-*From bzd::impl::Variant*
-
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
 ### `template<class T> constexpr bzd::Expected< const T &, bool > get() const`
 *From bzd::impl::Variant*
 
@@ -63,6 +54,15 @@
 |class T|None||
 ------
 ### `template<class T> constexpr bzd::Expected< T &, bool > get()`
+*From bzd::impl::Variant*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool is() const`
 *From bzd::impl::Variant*
 
 

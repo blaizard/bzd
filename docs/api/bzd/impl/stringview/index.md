@@ -14,9 +14,9 @@
 |[`StringView(const T *const str)`](./index.md)||
 |[`StringView(const T *const str, const SizeType size)`](./index.md)||
 |[`StringView(const Span< char > & span)`](./index.md)||
-|[`subStr(const SizeType pos, const SizeType count) const`](./index.md)||
-|[`removePrefix(const SizeType n)`](./index.md)||
 |[`clear()`](./index.md)||
+|[`removePrefix(const SizeType n)`](./index.md)||
+|[`subStr(const SizeType pos, const SizeType count) const`](./index.md)||
 ------
 ### `constexpr StringView()`
 
@@ -43,13 +43,8 @@
 |---:|:---|:---|
 |const Span< char > &|span||
 ------
-### `constexpr StringView subStr(const SizeType pos, const SizeType count) const`
+### `constexpr void clear()`
 
-#### Parameters
-||||
-|---:|:---|:---|
-|const SizeType|pos||
-|const SizeType|count||
 ------
 ### `constexpr void removePrefix(const SizeType n)`
 
@@ -58,5 +53,10 @@
 |---:|:---|:---|
 |const SizeType|n||
 ------
-### `constexpr void clear()`
+### `constexpr StringView subStr(const SizeType pos, const SizeType count) const`
 
+#### Parameters
+||||
+|---:|:---|:---|
+|const SizeType|pos||
+|const SizeType|count||

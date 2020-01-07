@@ -12,11 +12,11 @@
 |[`Optional(T && value)`](./index.md)||
 |[`Optional()`](./index.md)||
 |[`operator bool() const`](./index.md)||
-|[`valueOr(const Value & defaultValue) const`](./index.md)||
 |[`operator*() const`](./index.md)||
 |[`operator*()`](./index.md)||
 |[`operator->() const`](./index.md)||
 |[`operator->()`](./index.md)||
+|[`valueOr(const Value & defaultValue) const`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -36,13 +36,6 @@
 ### `constexpr operator bool() const`
 
 ------
-### `constexpr const Value & valueOr(const Value & defaultValue) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const Value &|defaultValue||
-------
 ### `constexpr const Value & operator*() const`
 
 ------
@@ -54,6 +47,13 @@
 ------
 ### `constexpr Value * operator->()`
 
+------
+### `constexpr const Value & valueOr(const Value & defaultValue) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const Value &|defaultValue||
 ------
 ### `UInt8Type empty_`
 

@@ -9,17 +9,14 @@
 
 |Typedef||
 |:---|:---|
-|[`type`](./index.md)|alias of [`bzd::meta::TypeList`](./index.md)|
 |[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](../impl/choosenth/index.md)|
 |[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](../impl/contains/index.md)|
 |[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](../impl/find/index.md)|
+|[`type`](./index.md)|alias of [`bzd::meta::TypeList`](./index.md)|
 
 |Variable||
 |:---|:---|
 |[`size`](./index.md)||
-------
-### `typedef type`
-
 ------
 ### `template<SizeType N> typedef ChooseNth`
 
@@ -41,6 +38,9 @@
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `typedef type`
+
 ------
 ### `static constexpr const SizeType size`
 

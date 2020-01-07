@@ -10,18 +10,18 @@
 |Function||
 |:---|:---|
 |[`Contiguous(DataType * data, const SizeType index)`](./index.md)||
-|[`operator++()`](./index.md)||
-|[`operator++(int)`](./index.md)||
-|[`operator--()`](./index.md)||
-|[`operator--(int)`](./index.md)||
-|[`operator-(const int n) const`](./index.md)||
-|[`operator+(const int n) const`](./index.md)||
-|[`operator-=(const int n)`](./index.md)||
-|[`operator+=(const int n)`](./index.md)||
-|[`operator==(const SelfType & it) const`](./index.md)||
 |[`operator!=(const SelfType & it) const`](./index.md)||
 |[`operator*() const`](./index.md)||
+|[`operator+(const int n) const`](./index.md)||
+|[`operator++()`](./index.md)||
+|[`operator++(int)`](./index.md)||
+|[`operator+=(const int n)`](./index.md)||
+|[`operator-(const int n) const`](./index.md)||
+|[`operator--()`](./index.md)||
+|[`operator--(int)`](./index.md)||
+|[`operator-=(const int n)`](./index.md)||
 |[`operator->() const`](./index.md)||
+|[`operator==(const SelfType & it) const`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -35,6 +35,23 @@
 |DataType *|data||
 |const SizeType|index||
 ------
+### `constexpr bool operator!=(const SelfType & it) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SelfType &|it||
+------
+### `constexpr DataType & operator*() const`
+
+------
+### `constexpr SelfType operator+(const int n) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const int|n||
+------
 ### `constexpr SelfType & operator++()`
 
 ------
@@ -44,6 +61,20 @@
 ||||
 |---:|:---|:---|
 |int|None||
+------
+### `constexpr SelfType & operator+=(const int n)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const int|n||
+------
+### `constexpr SelfType operator-(const int n) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const int|n||
 ------
 ### `constexpr SelfType & operator--()`
 
@@ -55,20 +86,6 @@
 |---:|:---|:---|
 |int|None||
 ------
-### `constexpr SelfType operator-(const int n) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const int|n||
-------
-### `constexpr SelfType operator+(const int n) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const int|n||
-------
 ### `constexpr SelfType & operator-=(const int n)`
 
 #### Parameters
@@ -76,12 +93,8 @@
 |---:|:---|:---|
 |const int|n||
 ------
-### `constexpr SelfType & operator+=(const int n)`
+### `constexpr DataType * operator->() const`
 
-#### Parameters
-||||
-|---:|:---|:---|
-|const int|n||
 ------
 ### `constexpr bool operator==(const SelfType & it) const`
 
@@ -89,19 +102,6 @@
 ||||
 |---:|:---|:---|
 |const SelfType &|it||
-------
-### `constexpr bool operator!=(const SelfType & it) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const SelfType &|it||
-------
-### `constexpr DataType & operator*() const`
-
-------
-### `constexpr DataType * operator->() const`
-
 ------
 ### `typedef SelfType`
 

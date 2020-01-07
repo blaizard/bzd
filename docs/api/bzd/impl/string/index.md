@@ -18,9 +18,9 @@
 |[`assign(const U & data)`](./index.md)||
 |[`capacity() const`](./index.md)||
 |[`clear()`](./index.md)||
-|[`resize(const SizeType n)`](./index.md)||
 |[`operator+=(const U & data)`](./index.md)||
 |[`operator=(const U & data)`](./index.md)||
+|[`resize(const SizeType n)`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -85,13 +85,6 @@
 ### `constexpr void clear()`
 
 ------
-### `constexpr void resize(const SizeType n)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const SizeType|n||
-------
 ### `template<class U> constexpr String< T, Impl > & operator+=(const U & data)`
 
 #### Template
@@ -113,6 +106,13 @@
 ||||
 |---:|:---|:---|
 |const U &|data||
+------
+### `constexpr void resize(const SizeType n)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SizeType|n||
 ------
 ### `const SizeType capacity_`
 
