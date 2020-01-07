@@ -4,4 +4,4 @@
 
 namespace bzd { namespace typeTraits {
 typedef integralConstant<bool, true> trueType;
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

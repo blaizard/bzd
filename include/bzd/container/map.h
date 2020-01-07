@@ -13,7 +13,7 @@ namespace impl {
 template <class K, class V>
 class Map
 {
-  public:
+public:
 	struct Element
 	{
 		K first;
@@ -21,7 +21,7 @@ class Map
 	};
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
-  public:
+public:
 	constexpr explicit Map(bzd::interface::Vector<Element> &data) noexcept : data_(data) {}
 
 	/**
@@ -64,10 +64,10 @@ class Map
 
 	constexpr void insert(const Iterator &it, V &&value) { it->second = bzd::forward<V>(value); }
 
-  protected:
+protected:
 	bzd::interface::Vector<Element> &data_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 template <class K, class V>
@@ -77,13 +77,13 @@ using Map = impl::Map<K, V>;
 template <class K, class V, SizeType N>
 class Map : public interface::Map<K, V>
 {
-  private:
+private:
 	using typename interface::Map<K, V>::Element;
 
-  public:
+public:
 	constexpr Map() : interface::Map<K, V>(data_) {}
 
-  protected:
+protected:
 	bzd::Vector<Element, N> data_;
 };
-}  // namespace bzd
+} // namespace bzd

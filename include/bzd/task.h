@@ -15,13 +15,13 @@ struct resultOf<T (&)(Args &&...)>
 template <class T, class... Args>
 class Task : public interface::Task
 {
-  private:
+private:
 	struct Context
 	{
 		const T &callable_;
 	};
 
-  public:
+public:
 	Task(const T &callable) :
 		interface::Task(static_cast<PtrType>(&context_),
 						reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>)),
@@ -36,7 +36,7 @@ class Task : public interface::Task
 		context->callable_();
 	}
 
-  private:
+private:
 	Context context_;
 };
-}  // namespace bzd
+} // namespace bzd

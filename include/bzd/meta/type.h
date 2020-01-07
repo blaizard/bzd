@@ -6,4 +6,4 @@ struct Type
 {
 	using type = T;
 };
-}}	// namespace bzd::meta
+}} // namespace bzd::meta

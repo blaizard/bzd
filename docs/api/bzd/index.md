@@ -19,6 +19,7 @@
 |:---|:---|
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
 |[`BTree`](btree/index.md)||
+|[`Log`](log/index.md)||
 |[`Map`](map/index.md)||
 |[`Pool`](pool/index.md)||
 |[`Queue`](queue/index.md)||
@@ -102,6 +103,9 @@ The container combines the performance and accessibility of a C-style array with
 |class V|None||
 |SizeType|N||
 |SizeType|Order||
+------
+### `class Log`
+
 ------
 ### `template<class K, class V, SizeType N> class Map`
 

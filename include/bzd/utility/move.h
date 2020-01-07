@@ -8,4 +8,4 @@ typename bzd::typeTraits::removeReference<T>::type &&move(T &&arg)
 {
 	return static_cast<typename bzd::typeTraits::removeReference<T>::type &&>(arg);
 }
-}  // namespace bzd
+} // namespace bzd

@@ -6,10 +6,10 @@ namespace bzd { namespace iterator {
 template <class DataType>
 class Contiguous
 {
-  public:
+public:
 	using SelfType = Contiguous<DataType>;
 
-  public:
+public:
 	constexpr Contiguous(DataType *data, const SizeType index) : data_(data), index_(index) {}
 
 	constexpr SelfType &operator++() noexcept
@@ -72,8 +72,8 @@ class Contiguous
 
 	constexpr DataType *operator->() const { return &data_[index_]; }
 
-  private:
+private:
 	DataType *data_;
 	SizeType index_;
 };
-}}	// namespace bzd::iterator
+}} // namespace bzd::iterator

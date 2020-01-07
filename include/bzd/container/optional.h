@@ -12,11 +12,11 @@ namespace impl {
 template <class T>
 class Optional
 {
-  private:
+private:
 	using Value = typename bzd::typeTraits::removeReference<T>::type;
 	using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
 
-  public:
+public:
 	constexpr Optional(T &&value) : isValue_(true), value_(bzd::forward<T>(value)) {}
 
 	constexpr Optional() : isValue_(false), empty_{} {}
@@ -49,14 +49,14 @@ class Optional
 		return &value_;
 	}
 
-  protected:
+protected:
 	const bool isValue_;
 	union {
 		UInt8Type empty_;
 		ValueContainer value_;
 	};
 };
-}  // namespace impl
+} // namespace impl
 
 /**
  * \brief Type managing an optional contained value, i.e. a value that may or
@@ -64,4 +64,4 @@ class Optional
  */
 template <class T>
 using Optional = impl::Optional<T>;
-}  // namespace bzd
+} // namespace bzd

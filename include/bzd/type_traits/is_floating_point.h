@@ -12,4 +12,4 @@ struct isFloatingPoint
 						   isSame<long double, typename removeCV<T>::type>::value>
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

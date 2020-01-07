@@ -7,10 +7,10 @@ namespace bzd {
 template <const SizeType N>
 class Stack : public interface::Stack
 {
-  public:
+public:
 	Stack() : interface::Stack(data_, N) {}
 
-  private:
+private:
 	UInt8Type data_[N];
 };
-}  // namespace bzd
+} // namespace bzd

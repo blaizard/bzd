@@ -28,4 +28,4 @@ template <>
 struct isVoid<volatile void> : public trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

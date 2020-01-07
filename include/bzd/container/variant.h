@@ -14,7 +14,7 @@ namespace impl {
 template <class StorageType, class... Ts>
 class Variant
 {
-  protected:
+protected:
 	using Self = Variant<StorageType, Ts...>;
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
@@ -91,7 +91,7 @@ class Variant
 	template <class V>
 	using Match = Helper<VariantMatch, const Self &, V &>;
 
-  public:
+public:
 	/**
 	 * Default constructor
 	 */
@@ -138,20 +138,20 @@ class Variant
 		Match<decltype(visitor)>::call(id_, *this, visitor);
 	}
 
-  protected:
+protected:
 	int id_ = -1;
 	StorageType data_ = {};
 };
-}  // namespace impl
+} // namespace impl
 
 template <class... Ts>
 class VariantConstexpr : public bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts...>, Ts...>
 {
-  protected:
+protected:
 	using Self = VariantConstexpr<Ts...>;
 	using Parent = bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts...>, Ts...>;
 
-  public:
+public:
 	// Forward constructor to the main class
 	template <class... Args>
 	constexpr VariantConstexpr(Args &&... args) : Parent::Variant(bzd::forward<Args>(args)...)
@@ -162,7 +162,7 @@ class VariantConstexpr : public bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts.
 template <class... Ts>
 class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
 {
-  protected:
+protected:
 	using Self = Variant<Ts...>;
 	using Parent = bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>;
 
@@ -183,7 +183,7 @@ class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
 	using Parent::data_;
 	using Parent::id_;
 
-  protected:
+protected:
 	// Destructor
 	template <class T>
 	struct VariantDestructor
@@ -192,7 +192,7 @@ class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
 	};
 	using Destructor = Helper<VariantDestructor, Self *>;
 
-  private:
+private:
 	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type * = nullptr>
 	constexpr void construct(Args &&... args)
 	{
@@ -211,7 +211,7 @@ class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
 		}
 	}
 
-  public:
+public:
 	// Forward constructor to the main class
 	template <class... Args>
 	constexpr Variant(Args &&... args) : Parent::Variant(bzd::forward<Args>(args)...)
@@ -227,4 +227,4 @@ class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
 
 	~Variant() { destructIfNeeded(); }
 };
-}  // namespace bzd
+} // namespace bzd

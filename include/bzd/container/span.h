@@ -19,18 +19,18 @@ namespace bzd {
 template <class T>
 class Span
 {
-  protected:
+protected:
 	using DataType = T;
 	using SelfType = Span<DataType>;
 	using IsConst = typename bzd::typeTraits::isConst<DataType>;
 
-  public:
+public:
 	using Iterator = bzd::iterator::Contiguous<DataType>;
 	using ConstIterator = bzd::iterator::Contiguous<const DataType>;
 
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
-  public:
+public:
 	constexpr Span(DataType *const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
 	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type * = nullptr>
@@ -151,11 +151,11 @@ class Span
 
 	constexpr bool empty() const noexcept { return (size_ == 0); }
 
-  protected:
+protected:
 	template <class Q>
 	friend class Span;
 
 	T *data_ = nullptr;
 	SizeType size_ = 0;
 };
-}  // namespace bzd
+} // namespace bzd

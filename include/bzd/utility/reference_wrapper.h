@@ -6,17 +6,17 @@ namespace bzd {
 template <class T>
 class ReferenceWrapper
 {
-  private:
+private:
 	using Value = typename bzd::typeTraits::removeReference<T>::type;
 
-  public:
+public:
 	constexpr ReferenceWrapper(Value &value) noexcept : value_(&value) {}
 
 	constexpr operator Value &() const noexcept { return *value_; }
 
 	constexpr Value &get() const noexcept { return *value_; }
 
-  private:
+private:
 	Value *value_;
 };
-}  // namespace bzd
+} // namespace bzd

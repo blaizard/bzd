@@ -6,4 +6,4 @@
 namespace bzd {
 void panic();
 bzd::OStream &getOut();
-}  // namespace bzd
+} // namespace bzd

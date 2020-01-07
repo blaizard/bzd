@@ -17,8 +17,8 @@ template <class H, class... Ts>
 struct ChooseNth<0, H, Ts...> : Type<H>
 {
 };
-}  // namespace impl
+} // namespace impl
 
 template <SizeType N, class... Ts>
 using ChooseNth = typename impl::ChooseNth<N, Ts...>::type;
-}}	// namespace bzd::meta
+}} // namespace bzd::meta

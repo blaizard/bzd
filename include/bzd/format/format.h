@@ -24,10 +24,10 @@ class ConstexprVector
 	using SelfType = ConstexprVector<T, N>;
 	using DataType = T;
 
-  public:
+public:
 	class Iterator
 	{
-	  public:
+	public:
 		constexpr Iterator(const SelfType &container, const SizeType index) : container_(&container), index_(index) {}
 		constexpr Iterator &operator++() noexcept
 		{
@@ -38,12 +38,12 @@ class ConstexprVector
 		constexpr bool operator!=(const Iterator &it) const noexcept { return !(it == *this); }
 		constexpr const DataType &operator*() const { return (*container_)[index_]; }
 
-	  private:
+	private:
 		const SelfType *container_;
 		SizeType index_;
 	};
 
-  public:
+public:
 	constexpr ConstexprVector() noexcept {}
 	template <class... Args>
 	constexpr ConstexprVector(Args &&... args) noexcept : data_{bzd::forward<Args>(args)...}
@@ -57,7 +57,7 @@ class ConstexprVector
 	constexpr DataType &operator[](const SizeType index) { return data_[index]; }
 	constexpr const DataType &operator[](const SizeType index) const { return data_[index]; }
 
-  private:
+private:
 	T data_[N] = {};
 	SizeType size_ = 0;
 };
@@ -328,7 +328,7 @@ constexpr void parse(Ctx &context, bzd::StringView format, const T &args)
 template <class T>
 class Context : public T
 {
-  public:
+public:
 	using T::T;
 	constexpr inline void assertTrue(const bool condition, const bzd::StringView &message) const
 	{
@@ -341,7 +341,7 @@ class Context : public T
 
 class CheckContext : public ConstexprVector<Metadata, 128>
 {
-  public:
+public:
 	constexpr CheckContext() = default;
 	constexpr void addSubstring(const bzd::StringView &) {}
 	constexpr void addMetadata(const Metadata &metadata) { push_back(metadata); }
@@ -438,7 +438,7 @@ void printString(bzd::OStream &stream, const bzd::StringView stringView, const M
 
 class PrintContext
 {
-  public:
+public:
 	constexpr PrintContext(bzd::OStream &stream, const bzd::interface::Vector<bzd::format::impl::Arg> &args) : stream_(stream), args_(args)
 	{
 	}
@@ -462,7 +462,7 @@ class PrintContext
 	}
 	void onError(const bzd::StringView &message) const {}
 
-  private:
+private:
 	bzd::OStream &stream_;
 	const bzd::interface::Vector<bzd::format::impl::Arg> &args_;
 };
@@ -529,7 +529,7 @@ constexpr bool contextCheck(const Ctx &, const T &)
 {
 	return true;
 }
-}  // namespace impl
+} // namespace impl
 
 /**
  * \brief String formating.
@@ -571,4 +571,4 @@ constexpr inline void toString(bzd::OStream &out, const F &f, Args &&... args)
 	bzd::Vector<bzd::format::impl::Arg, tuple.size()> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
 	bzd::format::impl::print(out, f.str(), argList);
 }
-}}	// namespace bzd::format
+}} // namespace bzd::format

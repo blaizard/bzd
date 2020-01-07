@@ -12,4 +12,4 @@ template <class T>
 struct isVolatile<volatile T> : trueType
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

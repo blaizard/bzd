@@ -11,6 +11,7 @@
 |Typedef||
 |:---|:---|
 |[`BTree`](./index.md)|alias of [`bzd::impl::BTree`](../impl/btree/index.md)|
+|[`Log`](./index.md)|alias of [`bzd::impl::Log`](../impl/log/index.md)|
 |[`Map`](./index.md)|alias of [`bzd::impl::Map`](../impl/map/index.md)|
 |[`Pool`](./index.md)|alias of [`bzd::impl::Pool`](../impl/pool/index.md)|
 |[`Queue`](./index.md)|alias of [`bzd::impl::Queue`](../impl/queue/index.md)|
@@ -33,6 +34,9 @@ Application stack definition
 |class K|None||
 |class V|None||
 |SizeType|Order||
+------
+### `typedef Log`
+
 ------
 ### `template<class K, class V> typedef Map`
 

@@ -9,4 +9,4 @@ template <class T>
 struct isArithmetic : integralConstant<bool, isIntegral<T>::value || isFloatingPoint<T>::value>
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

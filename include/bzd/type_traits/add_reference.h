@@ -39,4 +39,4 @@ struct addReference<volatile void>
 {
 	typedef volatile void type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

@@ -11,4 +11,4 @@ struct removeConst<const T>
 {
 	typedef T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

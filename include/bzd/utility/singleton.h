@@ -4,7 +4,7 @@ namespace bzd {
 template <class T>
 class Singleton
 {
-  public:
+public:
 	static T &getInstance()
 	{
 		static T instance;
@@ -13,14 +13,14 @@ class Singleton
 	Singleton(Singleton const &) = delete;
 	void operator=(Singleton const &) = delete;
 
-  protected:
+protected:
 	Singleton() = default;
 };
 
 template <class T>
 class SingletonThreadLocal
 {
-  public:
+public:
 	static T &getInstance()
 	{
 		static thread_local T instance;
@@ -29,7 +29,7 @@ class SingletonThreadLocal
 	SingletonThreadLocal(SingletonThreadLocal const &) = delete;
 	void operator=(SingletonThreadLocal const &) = delete;
 
-  protected:
+protected:
 	SingletonThreadLocal() = default;
 };
-}  // namespace bzd
+} // namespace bzd

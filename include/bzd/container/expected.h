@@ -20,10 +20,10 @@ class Expected;
 template <class E>
 class Unexpected
 {
-  public:
+public:
 	constexpr Unexpected(const E &error) : error_(error) {}
 
-  private:
+private:
 	template <class A, class B>
 	friend class bzd::impl::Expected;
 	E error_;
@@ -32,11 +32,11 @@ class Unexpected
 template <class T, class E>
 class Expected
 {
-  private:
+private:
 	using Value = typename bzd::typeTraits::removeReference<T>::type;
 	using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
 
-  public:
+public:
 	constexpr Expected(T &&value) : isError_(false), value_(bzd::forward<T>(value)) {}
 
 	template <class U>
@@ -93,7 +93,7 @@ class Expected
 		return &value_;
 	}
 
-  protected:
+protected:
 	const bool isError_;
 	union {
 		ValueContainer value_;
@@ -104,14 +104,14 @@ class Expected
 template <class E>
 class Expected<void, E> : private Expected<void *, E>
 {
-  public:
+public:
 	using Expected<void *, E>::Expected;
 	using Expected<void *, E>::operator bool;
 	using Expected<void *, E>::error;
 
 	constexpr Expected() : Expected<void *, E>(nullptr) {}
 };
-}  // namespace impl
+} // namespace impl
 
 /**
  * \brief This is the type used for returning and propagating errors.
@@ -127,4 +127,4 @@ constexpr impl::Unexpected<typename bzd::decay<E>::type> makeUnexpected(E &&e)
 {
 	return impl::Unexpected<typename bzd::decay<E>::type>(bzd::forward<E>(e));
 }
-}  // namespace bzd
+} // namespace bzd

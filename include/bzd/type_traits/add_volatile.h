@@ -6,4 +6,4 @@ struct addVolatile
 {
 	typedef volatile T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

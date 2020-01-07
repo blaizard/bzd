@@ -21,4 +21,4 @@ struct TypeList
 	template <class T>
 	using Find = typename impl::Find<0, T, Ts...>;
 };
-}}	// namespace bzd::meta
+}} // namespace bzd::meta

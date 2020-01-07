@@ -9,4 +9,4 @@ struct removeCV
 {
 	typedef typename removeVolatile<typename removeConst<T>::type>::type type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

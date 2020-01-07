@@ -22,11 +22,11 @@ struct addRValueReference
 {
 	typedef typename addRValueReferenceHelper<T, (isVoid<T>::value == false && isReference<T>::value == false)>::type type;
 };
-}  // namespace impl
+} // namespace impl
 
 template <class T>
 struct addRValueReference
 {
 	typedef typename impl::addRValueReference<T>::type type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

@@ -12,4 +12,4 @@ constexpr T max(const T &a, const T &b, const Ts &... n) noexcept
 {
 	return bzd::max((a > b) ? a : b, n...);
 }
-}  // namespace bzd
+} // namespace bzd

@@ -15,7 +15,7 @@ namespace bzd {
 template <class T, SizeType N>
 class Array : public Span<T>
 {
-  public:
+public:
 	template <class... Args>
 	constexpr explicit Array(Args &&... args) noexcept : Span<T>(data_, N), data_{args...}
 	{
@@ -30,7 +30,7 @@ class Array : public Span<T>
 	 */
 	constexpr SizeType capacity() const noexcept { return N; }
 
-  protected:
+protected:
 	T data_[N];
 };
-}  // namespace bzd
+} // namespace bzd

@@ -22,4 +22,4 @@ constexpr void isTrue(const bool condition, const bzd::StringView &message)
 		bzd::panic();
 	}
 }
-}}	// namespace bzd::assert
+}} // namespace bzd::assert

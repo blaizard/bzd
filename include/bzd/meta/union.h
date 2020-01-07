@@ -8,7 +8,7 @@ namespace bzd { namespace meta {
 namespace impl {
 template <class T, class... Ts>
 union UnionConstexpr {
-  public:
+public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
 	constexpr UnionConstexpr() : next_{} {}
@@ -46,18 +46,18 @@ union UnionConstexpr {
 		return value_;
 	}
 
-  protected:
+protected:
 	T value_;
 	UnionConstexpr<Ts...> next_;
 };
 
 template <class T, class... Ts>
 union Union {
-  public:
+public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
 	constexpr Union() : next_{} {}
-	~Union(){};	 // This is the only difference with a constexpr Union
+	~Union(){}; // This is the only difference with a constexpr Union
 
 	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type * = nullptr>
 	constexpr Union(U &&value) : next_{bzd::forward<U>(value)}
@@ -92,14 +92,14 @@ union Union {
 		return value_;
 	}
 
-  protected:
+protected:
 	T value_;
 	Union<Ts...> next_;
 };
 
 template <class T>
 union UnionConstexpr<T> {
-  public:
+public:
 	constexpr UnionConstexpr() : dummy_{} {}
 
 	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type * = nullptr>
@@ -119,7 +119,7 @@ union UnionConstexpr<T> {
 		return value_;
 	}
 
-  protected:
+protected:
 	T value_;
 	struct
 	{
@@ -128,7 +128,7 @@ union UnionConstexpr<T> {
 
 template <class T>
 union Union<T> {
-  public:
+public:
 	constexpr Union() : dummy_{} {}
 	~Union() {}
 
@@ -149,16 +149,16 @@ union Union<T> {
 		return value_;
 	}
 
-  protected:
+protected:
 	T value_;
 	struct
 	{
 	} dummy_;
 };
-}  // namespace impl
+} // namespace impl
 
 template <class... Ts>
 using Union = impl::Union<Ts...>;
 template <class... Ts>
 using UnionConstexpr = impl::UnionConstexpr<Ts...>;
-}}	// namespace bzd::meta
+}} // namespace bzd::meta

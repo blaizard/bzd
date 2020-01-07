@@ -9,4 +9,4 @@ template <class T>
 struct isReference : public integralConstant<bool, isLValueReference<T>::value || isRValueReference<T>::value>
 {
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

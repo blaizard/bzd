@@ -14,14 +14,14 @@ namespace impl {
 template <class T, class Impl>
 class String : public Impl
 {
-  protected:
+protected:
 	using Parent = Impl;
 	using Impl::data_;
 	using Impl::size_;
 
 	using StringView = bzd::impl::StringView<T, bzd::Span<typename bzd::typeTraits::addConst<T>::type>>;
 
-  public:
+public:
 	template <class... Args>
 	constexpr explicit String(const SizeType capacity, Args &&... args) : Impl(args...), capacity_(capacity)
 	{
@@ -88,10 +88,10 @@ class String : public Impl
 		return *this;
 	}
 
-  public:
+public:
 	const SizeType capacity_;
 };
-}  // namespace impl
+} // namespace impl
 
 namespace interface {
 using String = impl::String<char, Span<char>>;
@@ -100,7 +100,7 @@ using String = impl::String<char, Span<char>>;
 template <SizeType N>
 class String : public interface::String
 {
-  public:
+public:
 	constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
 	constexpr String(const bzd::StringView &str) : String() { append(str); }
 	constexpr String(const SizeType n, const char c) : String() { append(n, c); }
@@ -119,7 +119,7 @@ class String : public interface::String
 		return *this;
 	}
 
-  protected:
-	interface::String::DataType data_[N + 1] = {};	// needed for constexpr
+protected:
+	interface::String::DataType data_[N + 1] = {}; // needed for constexpr
 };
-}  // namespace bzd
+} // namespace bzd

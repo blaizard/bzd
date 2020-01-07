@@ -6,4 +6,4 @@ struct addConst
 {
 	typedef const T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

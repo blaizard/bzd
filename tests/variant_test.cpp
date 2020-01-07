@@ -20,7 +20,7 @@ TEST(ContainerVariant, Destructor)
 
 	class TypeA
 	{
-	  public:
+	public:
 		TypeA() { ++constructorA; }
 		TypeA(const TypeA &) { ++constructorA; }
 		~TypeA() { ++destructorA; }
@@ -28,7 +28,7 @@ TEST(ContainerVariant, Destructor)
 
 	class TypeB
 	{
-	  public:
+	public:
 		TypeB() { ++constructorB; }
 		TypeB(const TypeB &) { ++constructorB; }
 		~TypeB() { ++destructorB; }

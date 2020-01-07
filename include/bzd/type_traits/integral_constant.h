@@ -10,4 +10,4 @@ struct integralConstant
 	constexpr operator valueType() const noexcept { return value; }
 	constexpr valueType operator()() const noexcept { return value; }
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

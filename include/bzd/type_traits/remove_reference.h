@@ -18,4 +18,4 @@ struct removeReference<T &&>
 {
 	typedef T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

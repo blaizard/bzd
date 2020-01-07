@@ -16,4 +16,4 @@ struct removeExtent<T[N]>
 {
 	typedef T type;
 };
-}}	// namespace bzd::typeTraits
+}} // namespace bzd::typeTraits

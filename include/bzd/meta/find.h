@@ -16,8 +16,8 @@ struct Find<N, T, U>
 {
 	static constexpr const int value = (bzd::typeTraits::isSame<T, U>::value) ? static_cast<int>(N) : -1;
 };
-}  // namespace impl
+} // namespace impl
 
 template <class T, class... Ts>
 using Find = typename impl::Find<0, T, Ts...>;
-}}	// namespace bzd::meta
+}} // namespace bzd::meta
