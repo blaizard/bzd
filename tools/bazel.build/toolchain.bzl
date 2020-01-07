@@ -50,10 +50,10 @@ def _impl(ctx):
 Creates a toolchain to be used with bazel.
 
 This rule also creates few important assets:
- - A toolchain: "@<cpu>_<compiler>//:toolchain"
- - A compiler target: "@<cpu>_<compiler>//:compiler"
- - A platform: "@<cpu>_<compiler>//:platform"
- - A host platform: "@<cpu>_<compiler>//:host_platform"
+ - A toolchain: "@<id>//:toolchain"
+ - A compiler target: "@<id>//:compiler"
+ - A platform: "@<id>//:platform"
+ - A host platform: "@<id>//:host_platform"
 """
 toolchain_maker = repository_rule(
     implementation = _impl,
