@@ -11,12 +11,6 @@
 |Typedef||
 |:---|:---|
 |[`type`](./index.md)||
-|[`type`](./index.md)||
-------
-### `typedef type`
-*From bzd::impl::TupleSizes*
-
-
 ------
 ### `typedef type`
 *From bzd::meta::Type*

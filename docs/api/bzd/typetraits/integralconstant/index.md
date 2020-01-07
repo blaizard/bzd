@@ -15,8 +15,8 @@
 
 |Typedef||
 |:---|:---|
-|[`valueType`](./index.md)||
 |[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](./index.md)|
+|[`valueType`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -28,10 +28,10 @@
 ### `constexpr valueType operator()() const`
 
 ------
-### `typedef valueType`
+### `typedef type`
 
 ------
-### `typedef type`
+### `typedef valueType`
 
 ------
 ### `static constexpr T value`

@@ -10,8 +10,8 @@
 |Function||
 |:---|:---|
 |[`ReferenceWrapper(Value & value)`](./index.md)||
-|[`operator Value &() const`](./index.md)||
 |[`get() const`](./index.md)||
+|[`operator Value &() const`](./index.md)||
 ------
 ### `constexpr ReferenceWrapper(Value & value)`
 
@@ -20,8 +20,8 @@
 |---:|:---|:---|
 |Value &|value||
 ------
-### `constexpr operator Value &() const`
+### `constexpr Value & get() const`
 
 ------
-### `constexpr Value & get() const`
+### `constexpr operator Value &() const`
 

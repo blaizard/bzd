@@ -10,25 +10,14 @@
 
 |Function||
 |:---|:---|
-|[`TupleImpl(Args &&... args)`](./index.md)||
+|[`get()`](./index.md)||
+|[`get() const`](./index.md)||
 |[`get()`](./index.md)||
 |[`get() const`](./index.md)||
 |[`TupleElem()`](./index.md)||
 |[`TupleElem(const T & value)`](./index.md)||
 |[`TupleElem(const NoType &)`](./index.md)||
-|[`get()`](./index.md)||
-|[`get() const`](./index.md)||
-------
-### `template<class... Args> constexpr TupleImpl(Args &&... args)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class...|Args||
-#### Parameters
-||||
-|---:|:---|:---|
-|Args &&...|args||
+|[`TupleImpl(Args &&... args)`](./index.md)||
 ------
 ### `template<SizeType M> constexpr pick< M > & get()`
 
@@ -43,6 +32,16 @@
 ||||
 |---:|:---|:---|
 |SizeType|M||
+------
+### `constexpr T & get()`
+*From bzd::impl::TupleElem*
+
+
+------
+### `constexpr const T & get() const`
+*From bzd::impl::TupleElem*
+
+
 ------
 ### `constexpr TupleElem()`
 *From bzd::impl::TupleElem*
@@ -67,12 +66,13 @@
 |---:|:---|:---|
 |const NoType &|None||
 ------
-### `constexpr T & get()`
-*From bzd::impl::TupleElem*
+### `template<class... Args> constexpr TupleImpl(Args &&... args)`
 
-
-------
-### `constexpr const T & get() const`
-*From bzd::impl::TupleElem*
-
-
+#### Template
+||||
+|---:|:---|:---|
+|class...|Args||
+#### Parameters
+||||
+|---:|:---|:---|
+|Args &&...|args||

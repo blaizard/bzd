@@ -11,9 +11,9 @@
 |Function||
 |:---|:---|
 |[`Task(const T & callable)`](./index.md)||
-|[`wrapper()`](./index.md)||
 |[`bind(interface::Stack & stack)`](./index.md)||
 |[`start(void ** pointer)`](./index.md)||
+|[`wrapper()`](./index.md)||
 |[`yield(Task & nextTask)`](./index.md)||
 ------
 ### ` Task(const T & callable)`
@@ -22,13 +22,6 @@
 ||||
 |---:|:---|:---|
 |const T &|callable||
-------
-### `template<class R> static void wrapper()`
-
-#### Template
-||||
-|---:|:---|:---|
-|class R|None||
 ------
 ### `void bind(interface::Stack & stack)`
 *From bzd::interface::Task*
@@ -47,6 +40,13 @@ Bind a task to a stack
 ||||
 |---:|:---|:---|
 |void **|pointer||
+------
+### `template<class R> static void wrapper()`
+
+#### Template
+||||
+|---:|:---|:---|
+|class R|None||
 ------
 ### `void yield(Task & nextTask)`
 *From bzd::interface::Task*

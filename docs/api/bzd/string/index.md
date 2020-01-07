@@ -12,8 +12,6 @@
 |[`String()`](./index.md)||
 |[`String(const bzd::StringView & str)`](./index.md)||
 |[`String(const SizeType n, const char c)`](./index.md)||
-|[`operator=(const T & data)`](./index.md)||
-|[`operator=(const String< N > & data)`](./index.md)||
 |[`append(const StringView & str)`](./index.md)||
 |[`append(const T c)`](./index.md)||
 |[`append(const T * data, const SizeType n)`](./index.md)||
@@ -21,9 +19,11 @@
 |[`assign(const U & data)`](./index.md)||
 |[`capacity() const`](./index.md)||
 |[`clear()`](./index.md)||
-|[`resize(const SizeType n)`](./index.md)||
 |[`operator+=(const U & data)`](./index.md)||
+|[`operator=(const T & data)`](./index.md)||
+|[`operator=(const String< N > & data)`](./index.md)||
 |[`operator=(const U & data)`](./index.md)||
+|[`resize(const SizeType n)`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -46,24 +46,6 @@
 |---:|:---|:---|
 |const SizeType|n||
 |const char|c||
-------
-### `template<class T> constexpr String< N > & operator=(const T & data)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|const T &|data||
-------
-### `constexpr String< N > & operator=(const String< N > & data)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const String< N > &|data||
 ------
 ### `constexpr SizeType append(const StringView & str)`
 *From bzd::impl::String*
@@ -126,15 +108,6 @@
 
 
 ------
-### `constexpr void resize(const SizeType n)`
-*From bzd::impl::String*
-
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const SizeType|n||
-------
 ### `template<class U> constexpr String< T, Impl > & operator+=(const U & data)`
 *From bzd::impl::String*
 
@@ -148,6 +121,24 @@
 |---:|:---|:---|
 |const U &|data||
 ------
+### `template<class T> constexpr String< N > & operator=(const T & data)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|data||
+------
+### `constexpr String< N > & operator=(const String< N > & data)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const String< N > &|data||
+------
 ### `template<class U> constexpr String< T, Impl > & operator=(const U & data)`
 *From bzd::impl::String*
 
@@ -160,6 +151,15 @@
 ||||
 |---:|:---|:---|
 |const U &|data||
+------
+### `constexpr void resize(const SizeType n)`
+*From bzd::impl::String*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const SizeType|n||
 ------
 ### `const SizeType capacity_`
 *From bzd::impl::String*

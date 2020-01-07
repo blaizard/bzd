@@ -12,16 +12,26 @@
 |Function||
 |:---|:---|
 |[`Queue()`](./index.md)||
+|[`back()`](./index.md)||
+|[`back() const`](./index.md)||
 |[`capacity() const`](./index.md)||
 |[`empty() const`](./index.md)||
 |[`front()`](./index.md)||
 |[`front() const`](./index.md)||
-|[`back()`](./index.md)||
-|[`back() const`](./index.md)||
-|[`push(T && value)`](./index.md)||
 |[`pop()`](./index.md)||
+|[`push(T && value)`](./index.md)||
 ------
 ### `constexpr Queue()`
+
+------
+### `constexpr T & back()`
+*From bzd::impl::Queue*
+
+
+------
+### `constexpr const T & back() const`
+*From bzd::impl::Queue*
+
 
 ------
 ### `constexpr CapacityType capacity() const`
@@ -44,12 +54,7 @@
 
 
 ------
-### `constexpr T & back()`
-*From bzd::impl::Queue*
-
-
-------
-### `constexpr const T & back() const`
+### `constexpr void pop()`
 *From bzd::impl::Queue*
 
 
@@ -62,8 +67,3 @@
 ||||
 |---:|:---|:---|
 |T &&|value||
-------
-### `constexpr void pop()`
-*From bzd::impl::Queue*
-
-

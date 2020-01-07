@@ -6,10 +6,10 @@
 |Function||
 |:---|:---|
 |[`Iterator(const SelfType & container, const SizeType index)`](./index.md)||
-|[`operator++()`](./index.md)||
-|[`operator==(const Iterator & it) const`](./index.md)||
 |[`operator!=(const Iterator & it) const`](./index.md)||
 |[`operator*() const`](./index.md)||
+|[`operator++()`](./index.md)||
+|[`operator==(const Iterator & it) const`](./index.md)||
 ------
 ### `constexpr Iterator(const SelfType & container, const SizeType index)`
 
@@ -18,16 +18,6 @@
 |---:|:---|:---|
 |const SelfType &|container||
 |const SizeType|index||
-------
-### `constexpr Iterator & operator++()`
-
-------
-### `constexpr bool operator==(const Iterator & it) const`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|const Iterator &|it||
 ------
 ### `constexpr bool operator!=(const Iterator & it) const`
 
@@ -38,3 +28,13 @@
 ------
 ### `constexpr const DataType & operator*() const`
 
+------
+### `constexpr Iterator & operator++()`
+
+------
+### `constexpr bool operator==(const Iterator & it) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const Iterator &|it||
