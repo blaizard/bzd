@@ -78,6 +78,7 @@
 |[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
 |[`PtrType`](./index.md)|Memory pointer type.|
 |[`SizeType`](./index.md)|Unsigned integer that can store the maximum size of a theoretically possible object of any type.|
+|[`StringConstexpr`](./index.md)|alias of [`bzd::impl::StringConstexpr`](impl/stringconstexpr/index.md)|
 |[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
 |[`UInt16Type`](./index.md)|Unsigned integer type with a fixed width of 16-bit.|
 |[`UInt32Type`](./index.md)|Unsigned integer type with a fixed width of 32-bit.|
@@ -468,6 +469,13 @@ Memory pointer type.
 ------
 ### `typedef SizeType`
 Unsigned integer that can store the maximum size of a theoretically possible object of any type.
+------
+### `template<char... C> typedef StringConstexpr`
+
+#### Template
+||||
+|---:|:---|:---|
+|char...|C||
 ------
 ### `typedef StringView`
 

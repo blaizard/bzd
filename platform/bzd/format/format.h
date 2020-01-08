@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/constexpr_string_view.h"
 #include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
+#include "bzd/container/string_constexpr.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/variant.h"
@@ -445,20 +445,21 @@ public:
 	void addSubstring(const bzd::StringView &str) { stream_.write(str); }
 	void addMetadata(const Metadata &metadata)
 	{
-		args_[metadata.index].match([&](const int value) { printInteger(stream_, value, metadata); },
-									[&](const unsigned int value) { printInteger(stream_, static_cast<int>(value), metadata); },
-									[&](const long int value) { printInteger(stream_, value, metadata); },
-									[&](const unsigned long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
-									[&](const long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
-									[&](const unsigned long long int value) { printInteger(stream_, static_cast<int>(value), metadata); },
-									[&](const bool value) {},
-									[&](const char value) {},
-									[&](const float value) { printFixedPoint(stream_, value, metadata); },
-									[&](const double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
-									[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
-									[&](const void *value) {},
-									[&](const char *value) { printString(stream_, value, metadata); },
-									[&](const bzd::StringView &value) { printString(stream_, value, metadata); });
+		args_[metadata.index].match(
+			[&](const int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const unsigned int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const unsigned long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const long long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const unsigned long long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+			[&](const bool value) {},
+			[&](const char value) {},
+			[&](const float value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
+			[&](const double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
+			[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
+			[&](const void *value) {},
+			[&](const char *value) { printString(stream_, value, metadata); },
+			[&](const bzd::StringView &value) { printString(stream_, value, metadata); });
 	}
 	void onError(const bzd::StringView &message) const {}
 
@@ -555,20 +556,28 @@ constexpr bool contextCheck(const Ctx &, const T &)
  * This is an after text
  *
  * \param out Output stream where the formating string will be written to.
- * \param f Compile-time string containing the format.
+ * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
-template <class F, class... Args>
-constexpr inline void toString(bzd::OStream &out, const F &f, Args &&... args)
+template <class... Args>
+constexpr void toString(bzd::OStream &out, const bzd::StringView &str, Args &&... args)
+{
+	// Run-time call
+	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
+	bzd::format::impl::print(out, str, argList);
+}
+
+template <char... C, class... Args>
+constexpr void toString(bzd::OStream &out, const bzd::StringConstexpr<C...> &str, Args &&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
-	constexpr const auto context = bzd::format::impl::contextBuild(F::data(), tuple);
+	constexpr const auto context = bzd::format::impl::contextBuild(bzd::StringConstexpr<C...>::data(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
 	// Run-time call
-	bzd::Vector<bzd::format::impl::Arg, tuple.size()> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
-	bzd::format::impl::print(out, f.str(), argList);
+	toString(out, str.str(), bzd::forward<Args>(args)...);
 }
+
 }} // namespace bzd::format

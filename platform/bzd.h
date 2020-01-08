@@ -3,7 +3,6 @@
 // Container
 #include "bzd/container/array.h"
 #include "bzd/container/btree.h"
-#include "bzd/container/constexpr_string_view.h"
 #include "bzd/container/expected.h"
 #include "bzd/container/iostream.h"
 #include "bzd/container/map.h"
@@ -12,6 +11,7 @@
 #include "bzd/container/queue.h"
 #include "bzd/container/span.h"
 #include "bzd/container/string.h"
+#include "bzd/container/string_constexpr.h"
 #include "bzd/container/string_stream.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"

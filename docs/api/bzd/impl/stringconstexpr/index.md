@@ -1,6 +1,6 @@
-# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`ConstexprStringView`](../index.md)
+# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`StringConstexpr`](../index.md)
 
-## `template<char... C> class ConstexprStringView`
+## `template<char... C> class StringConstexpr`
 
 #### Template
 ||||
@@ -9,8 +9,8 @@
 
 |Function||
 |:---|:---|
-|[`ConstexprStringView()`](./index.md)||
-|[`ConstexprStringView(const char * str)`](./index.md)||
+|[`StringConstexpr()`](./index.md)||
+|[`StringConstexpr(const char * str)`](./index.md)||
 |[`data()`](./index.md)||
 |[`size()`](./index.md)||
 |[`str() const`](./index.md)||
@@ -20,10 +20,10 @@
 |[`ConstIterator`](./index.md)||
 |[`DataType`](./index.md)||
 ------
-### `constexpr ConstexprStringView()`
+### `constexpr StringConstexpr()`
 
 ------
-### `constexpr ConstexprStringView(const char * str)`
+### `constexpr StringConstexpr(const char * str)`
 
 #### Parameters
 ||||

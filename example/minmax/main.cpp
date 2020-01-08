@@ -11,7 +11,7 @@ auto minmax(int i1, int i2, int i3, int i4) noexcept -> bzd::Tuple<int, int>
 int main()
 {
 	const auto result = minmax(4, -8, 6, 10);
-	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("min: {}, max: {}\n"), result.get<0>(), result.get<1>());
+	bzd::format::toString(bzd::getOut(), CSTR("min: {}, max: {}\n"), result.get<0>(), result.get<1>());
 
 	return 0;
 }
