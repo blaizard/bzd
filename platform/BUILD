@@ -1,6 +1,5 @@
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
 
 filegroup(
     name = "documentation",
