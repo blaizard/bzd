@@ -16,6 +16,6 @@ bzd_cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":config_manifest",
-        "//src:bzd",
+        "//platform:bzd",
     ],
 )

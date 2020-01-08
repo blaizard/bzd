@@ -3,7 +3,7 @@ load("//tools/documentation:defs.bzl", "cc_documentation")
 cc_documentation(
     name = "documentation",
     srcs = [
-        "//src/bzd:headers",
+        "//platform:documentation",
     ],
     data = glob([
         "**/*.py",
