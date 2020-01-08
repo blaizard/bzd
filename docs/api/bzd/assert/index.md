@@ -8,6 +8,7 @@
 |[`isTrue(const bool condition, Args &&... args)`](./index.md)||
 |[`isTrue(const bool condition)`](./index.md)||
 |[`isTrue(const bool condition, const bzd::StringView & message)`](./index.md)||
+|[`unreachable()`](./index.md)||
 ------
 ### `template<class... Args> constexpr void isTrue(const bool condition, Args &&... args)`
 
@@ -35,3 +36,6 @@
 |---:|:---|:---|
 |const bool|condition||
 |const bzd::StringView &|message||
+------
+### `void unreachable()`
+

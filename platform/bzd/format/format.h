@@ -150,12 +150,12 @@ constexpr void parseSign(Ctx &context, bzd::StringView &format, Metadata &metada
 {
 	switch (format.front())
 	{
-		case '+':
-			metadata.sign = Metadata::Sign::ALWAYS;
-			break;
-		case '-':
-			metadata.sign = Metadata::Sign::ONLY_NEGATIVE;
-			break;
+	case '+':
+		metadata.sign = Metadata::Sign::ALWAYS;
+		break;
+	case '-':
+		metadata.sign = Metadata::Sign::ONLY_NEGATIVE;
+		break;
 	}
 	if (metadata.sign != Metadata::Sign::AUTO)
 	{
@@ -219,34 +219,34 @@ constexpr Metadata parseMetadata(Ctx &context, bzd::StringView &format, const bz
 	{
 		switch (metadataStr.front())
 		{
-			case 'b':
-				metadata.format = Metadata::Format::BINARY;
-				break;
-			case 'd':
-				metadata.format = Metadata::Format::DECIMAL;
-				break;
-			case 'o':
-				metadata.format = Metadata::Format::OCTAL;
-				break;
-			case 'x':
-				metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
-				break;
-			case 'X':
-				metadata.format = Metadata::Format::HEXADECIMAL_UPPER;
-				break;
-			case 'f':
-				metadata.format = Metadata::Format::FIXED_POINT;
-				break;
-			case '%':
-				metadata.format = Metadata::Format::FIXED_POINT_PERCENT;
-				break;
-			case 'p':
-				metadata.format = Metadata::Format::POINTER;
-				break;
-			default:
-				context.onError(
-					"Unsupported conversion format, only the following is "
-					"supported: [bdoxXfp%]");
+		case 'b':
+			metadata.format = Metadata::Format::BINARY;
+			break;
+		case 'd':
+			metadata.format = Metadata::Format::DECIMAL;
+			break;
+		case 'o':
+			metadata.format = Metadata::Format::OCTAL;
+			break;
+		case 'x':
+			metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+			break;
+		case 'X':
+			metadata.format = Metadata::Format::HEXADECIMAL_UPPER;
+			break;
+		case 'f':
+			metadata.format = Metadata::Format::FIXED_POINT;
+			break;
+		case '%':
+			metadata.format = Metadata::Format::FIXED_POINT_PERCENT;
+			break;
+		case 'p':
+			metadata.format = Metadata::Format::POINTER;
+			break;
+		default:
+			context.onError(
+				"Unsupported conversion format, only the following is "
+				"supported: [bdoxXfp%]");
 		}
 		metadataStr.removePrefix(1);
 		context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
@@ -353,42 +353,42 @@ void printInteger(bzd::OStream &stream, const T &value, const Metadata &metadata
 {
 	switch (metadata.format)
 	{
-		case Metadata::Format::AUTO:
-		case Metadata::Format::DECIMAL:
-			toString(stream, value);
-			break;
-		case Metadata::Format::BINARY:
-			if (metadata.alternate)
-			{
-				stream.write({"0b", 2});
-			}
-			toStringBin(stream, value);
-			break;
-		case Metadata::Format::HEXADECIMAL_LOWER:
-			if (metadata.alternate)
-			{
-				stream.write({"0x", 2});
-			}
-			toStringHex(stream, value);
-			break;
-		case Metadata::Format::HEXADECIMAL_UPPER:
-			if (metadata.alternate)
-			{
-				stream.write({"0x", 2});
-			}
-			toStringHex(stream, value, "0123456789ABCDEF");
-			break;
-		case Metadata::Format::OCTAL:
-			if (metadata.alternate)
-			{
-				stream.write({"0o", 2});
-			}
-			toStringOct(stream, value);
-			break;
-		case Metadata::Format::FIXED_POINT:
-		case Metadata::Format::FIXED_POINT_PERCENT:
-		case Metadata::Format::POINTER:
-			break;
+	case Metadata::Format::AUTO:
+	case Metadata::Format::DECIMAL:
+		toString(stream, value);
+		break;
+	case Metadata::Format::BINARY:
+		if (metadata.alternate)
+		{
+			stream.write({"0b", 2});
+		}
+		toStringBin(stream, value);
+		break;
+	case Metadata::Format::HEXADECIMAL_LOWER:
+		if (metadata.alternate)
+		{
+			stream.write({"0x", 2});
+		}
+		toStringHex(stream, value);
+		break;
+	case Metadata::Format::HEXADECIMAL_UPPER:
+		if (metadata.alternate)
+		{
+			stream.write({"0x", 2});
+		}
+		toStringHex(stream, value, "0123456789ABCDEF");
+		break;
+	case Metadata::Format::OCTAL:
+		if (metadata.alternate)
+		{
+			stream.write({"0o", 2});
+		}
+		toStringOct(stream, value);
+		break;
+	case Metadata::Format::FIXED_POINT:
+	case Metadata::Format::FIXED_POINT_PERCENT:
+	case Metadata::Format::POINTER:
+		break;
 	}
 }
 
@@ -397,23 +397,23 @@ void printFixedPoint(bzd::OStream &stream, const T &value, const Metadata &metad
 {
 	switch (metadata.format)
 	{
-		case Metadata::Format::AUTO:
-		case Metadata::Format::DECIMAL:
-			toString(stream, value);
-			break;
-		case Metadata::Format::FIXED_POINT:
-			toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
-			break;
-		case Metadata::Format::FIXED_POINT_PERCENT:
-			toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
-			stream.write(bzd::StringView("%"));
-			break;
-		case Metadata::Format::BINARY:
-		case Metadata::Format::HEXADECIMAL_LOWER:
-		case Metadata::Format::HEXADECIMAL_UPPER:
-		case Metadata::Format::OCTAL:
-		case Metadata::Format::POINTER:
-			break;
+	case Metadata::Format::AUTO:
+	case Metadata::Format::DECIMAL:
+		toString(stream, value);
+		break;
+	case Metadata::Format::FIXED_POINT:
+		toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
+		break;
+	case Metadata::Format::FIXED_POINT_PERCENT:
+		toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		stream.write(bzd::StringView("%"));
+		break;
+	case Metadata::Format::BINARY:
+	case Metadata::Format::HEXADECIMAL_LOWER:
+	case Metadata::Format::HEXADECIMAL_UPPER:
+	case Metadata::Format::OCTAL:
+	case Metadata::Format::POINTER:
+		break;
 	}
 }
 
@@ -421,18 +421,18 @@ static void printString(bzd::OStream &stream, const bzd::StringView stringView, 
 {
 	switch (metadata.format)
 	{
-		case Metadata::Format::AUTO:
-			stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
-			break;
-		case Metadata::Format::FIXED_POINT:
-		case Metadata::Format::FIXED_POINT_PERCENT:
-		case Metadata::Format::DECIMAL:
-		case Metadata::Format::BINARY:
-		case Metadata::Format::HEXADECIMAL_LOWER:
-		case Metadata::Format::HEXADECIMAL_UPPER:
-		case Metadata::Format::OCTAL:
-		case Metadata::Format::POINTER:
-			break;
+	case Metadata::Format::AUTO:
+		stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
+		break;
+	case Metadata::Format::FIXED_POINT:
+	case Metadata::Format::FIXED_POINT_PERCENT:
+	case Metadata::Format::DECIMAL:
+	case Metadata::Format::BINARY:
+	case Metadata::Format::HEXADECIMAL_LOWER:
+	case Metadata::Format::HEXADECIMAL_UPPER:
+	case Metadata::Format::OCTAL:
+	case Metadata::Format::POINTER:
+		break;
 	}
 }
 
@@ -502,21 +502,21 @@ constexpr bool contextCheck(const Ctx &context, const T &tuple)
 			usedAtLeastOnce = true;
 			switch (metadata.format)
 			{
-				case Metadata::Format::BINARY:
-				case Metadata::Format::OCTAL:
-				case Metadata::Format::HEXADECIMAL_LOWER:
-				case Metadata::Format::HEXADECIMAL_UPPER:
-					context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Argument must an integral");
-					break;
-				case Metadata::Format::DECIMAL:
-				case Metadata::Format::FIXED_POINT:
-				case Metadata::Format::FIXED_POINT_PERCENT:
-					context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>::value, "Argument must arithmetic");
-					break;
-				case Metadata::Format::POINTER:
-					break;
-				case Metadata::Format::AUTO:
-					break;
+			case Metadata::Format::BINARY:
+			case Metadata::Format::OCTAL:
+			case Metadata::Format::HEXADECIMAL_LOWER:
+			case Metadata::Format::HEXADECIMAL_UPPER:
+				context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Argument must an integral");
+				break;
+			case Metadata::Format::DECIMAL:
+			case Metadata::Format::FIXED_POINT:
+			case Metadata::Format::FIXED_POINT_PERCENT:
+				context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>::value, "Argument must arithmetic");
+				break;
+			case Metadata::Format::POINTER:
+				break;
+			case Metadata::Format::AUTO:
+				break;
 			}
 		}
 	}
