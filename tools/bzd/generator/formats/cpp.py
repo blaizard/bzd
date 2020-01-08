@@ -16,8 +16,8 @@ def registryBuild(manifest):
 
 	content = ""
 
-	# Include the registry
-	content += "#include \"bzd/core/registry.h\"\n\n"
+	# Include bzd dependencies
+	content += "#include \"bzd.h\"\n\n"
 
 	# Include object dependencies
 	interfaces = set([obj.getInterface() for obj in manifest.getObjects()])
