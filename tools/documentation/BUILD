@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//tools/documentation:defs.bzl", "cc_documentation")
 
 cc_documentation(

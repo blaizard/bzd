@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
 test_cpp_srcs = glob([
     "**/*_test.cpp",
 ])
