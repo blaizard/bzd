@@ -12,3 +12,6 @@ gdb -tui -iex "layout asm" -iex "layout regs" -ex "b main" -ex "r" "$1"
 # objdump -drwCS -Mintel
 
 # 0x555555557828 <temp1> 
+
+# Profile size of binary (function sizes)
+# nm --demangle --print-size --size-sort --reverse-sort bazel-bin/example/bzd/bzd

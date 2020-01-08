@@ -22,4 +22,7 @@ constexpr void isTrue(const bool condition, const bzd::StringView &message)
 		bzd::panic();
 	}
 }
+
+void unreachable();
+
 }} // namespace bzd::assert

@@ -38,9 +38,36 @@ public:
 	}
 
 private:
-	template <class... Args>
-	constexpr void print(const bzd::log::Level /*level*/, Args&&... args) noexcept
+	void printHeader(const bzd::log::Level level)
 	{
+		bzd::StringView str;
+		switch (level)
+		{
+		case bzd::log::Level::CRITICAL:
+			str = "[critical] ";
+			break;
+		case bzd::log::Level::ERROR:
+			str = "[error] ";
+			break;
+		case bzd::log::Level::WARNING:
+			str = "[warning] ";
+			break;
+		case bzd::log::Level::INFO:
+			str = "[info] ";
+			break;
+		case bzd::log::Level::DEBUG:
+			str = "[debug] ";
+			break;
+		default:
+			bzd::assert::unreachable();
+		}
+		out_.write(str);
+	}
+
+	template <class... Args>
+	constexpr void print(const bzd::log::Level level, Args&&... args) noexcept
+	{
+		printHeader(level);
 		bzd::format::toString(out_, bzd::forward<Args>(args)...);
 	}
 
