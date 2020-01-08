@@ -2,7 +2,11 @@
 
 int main()
 {
-	bzd::format::toString(bzd::getOut(), CONSTEXPR_STRING_VIEW("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
+	// bzd::Log log(bzd::getOut());
+
+	auto& log = bzd::Registry<bzd::Log>::get("default");
+
+	log.info(CONSTEXPR_STRING_VIEW("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
 	return 0;
 }

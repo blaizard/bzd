@@ -1,8 +1,12 @@
 interfaces:
     "bzd::StringView":
         include: "bzd/container/string_view.h"
+    "bzd::Log":
+        include: "bzd/log.h"
 objects:
+    "bzd::Log.default":
+        params:
+            - !ref bzd::getOut()
     "bzd::StringView.message":
         params:
             - "Hello World !!!"
-            #- !ref "dsd"

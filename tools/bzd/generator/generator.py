@@ -38,3 +38,4 @@ if __name__== "__main__":
 	formatter(manifest, config.output, {
 		"comments": comments
 	})
+	print(config.output)

@@ -41,8 +41,6 @@ private:
 	void *mainStack_ = nullptr;
 };
 
-void yield()
-{
-	Scheduler::getInstance().yield();
-}
+void yield();
+
 } // namespace bzd

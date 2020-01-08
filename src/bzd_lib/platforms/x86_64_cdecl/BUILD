@@ -6,7 +6,7 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//include:bzd",
+        "//src:bzd_core",
     ],
     alwayslink = True,
 )
