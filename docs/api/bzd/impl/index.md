@@ -6,7 +6,6 @@
 |Class||
 |:---|:---|
 |[`BTree`](btree/index.md)||
-|[`ConstexprStringView`](constexprstringview/index.md)||
 |[`Expected`](expected/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`IOStream`](iostream/index.md)||
@@ -20,6 +19,7 @@
 |[`Registry`](registry/index.md)||
 |[`SingleLinkedPool`](singlelinkedpool/index.md)||
 |[`String`](string/index.md)||
+|[`StringConstexpr`](stringconstexpr/index.md)||
 |[`StringStream`](stringstream/index.md)||
 |[`StringView`](stringview/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
@@ -46,10 +46,10 @@
 |[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
 |[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
 |[`tygrab(char const (&) c)`](./index.md)||
-|[`typeek(ConstexprStringView< C... >)`](./index.md)||
-|[`typoke(ConstexprStringView< X... >)`](./index.md)||
-|[`typoke(ConstexprStringView< X... >, ConstexprStringView<'\0'>, ConstexprStringView< Y > ...)`](./index.md)||
-|[`typoke(ConstexprStringView< X... >, ConstexprStringView< A >, ConstexprStringView< Y > ...)`](./index.md)||
+|[`typeek(StringConstexpr< C... >)`](./index.md)||
+|[`typoke(StringConstexpr< X... >)`](./index.md)||
+|[`typoke(StringConstexpr< X... >, StringConstexpr<'\0'>, StringConstexpr< Y > ...)`](./index.md)||
+|[`typoke(StringConstexpr< X... >, StringConstexpr< A >, StringConstexpr< Y > ...)`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -68,13 +68,6 @@ Non-leaf nodes are implemented as non-sorted arrays.
 |class K|None||
 |class V|None||
 |SizeType|Order||
-------
-### `template<char... C> class ConstexprStringView`
-
-#### Template
-||||
-|---:|:---|:---|
-|char...|C||
 ------
 ### `template<class T, class E> class Expected`
 
@@ -168,6 +161,13 @@ Flat map implementation.
 |---:|:---|:---|
 |class T|None||
 |class Impl|None||
+------
+### `template<char... C> class StringConstexpr`
+
+#### Template
+||||
+|---:|:---|:---|
+|char...|C||
 ------
 ### `class StringStream`
 
@@ -331,7 +331,7 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |char const (&)|c||
 ------
-### `template<char... C> auto typeek(ConstexprStringView< C... >)`
+### `template<char... C> auto typeek(StringConstexpr< C... >)`
 
 #### Template
 ||||
@@ -340,9 +340,9 @@ Internal class used to create an unexpected object type.
 #### Parameters
 ||||
 |---:|:---|:---|
-|ConstexprStringView< C... >|None||
+|StringConstexpr< C... >|None||
 ------
-### `template<char... X> auto typoke(ConstexprStringView< X... >)`
+### `template<char... X> auto typoke(StringConstexpr< X... >)`
 
 #### Template
 ||||
@@ -351,9 +351,9 @@ Internal class used to create an unexpected object type.
 #### Parameters
 ||||
 |---:|:---|:---|
-|ConstexprStringView< X... >|None||
+|StringConstexpr< X... >|None||
 ------
-### `template<char... X, char... Y> auto typoke(ConstexprStringView< X... >, ConstexprStringView<'\0'>, ConstexprStringView< Y > ...)`
+### `template<char... X, char... Y> auto typoke(StringConstexpr< X... >, StringConstexpr<'\0'>, StringConstexpr< Y > ...)`
 
 #### Template
 ||||
@@ -363,11 +363,11 @@ Internal class used to create an unexpected object type.
 #### Parameters
 ||||
 |---:|:---|:---|
-|ConstexprStringView< X... >|None||
-|ConstexprStringView<'\0'>|None||
-|ConstexprStringView< Y >|...||
+|StringConstexpr< X... >|None||
+|StringConstexpr<'\0'>|None||
+|StringConstexpr< Y >|...||
 ------
-### `template<char A, char... X, char... Y> auto typoke(ConstexprStringView< X... >, ConstexprStringView< A >, ConstexprStringView< Y > ...)`
+### `template<char A, char... X, char... Y> auto typoke(StringConstexpr< X... >, StringConstexpr< A >, StringConstexpr< Y > ...)`
 
 #### Template
 ||||
@@ -378,9 +378,9 @@ Internal class used to create an unexpected object type.
 #### Parameters
 ||||
 |---:|:---|:---|
-|ConstexprStringView< X... >|None||
-|ConstexprStringView< A >|None||
-|ConstexprStringView< Y >|...||
+|StringConstexpr< X... >|None||
+|StringConstexpr< A >|None||
+|StringConstexpr< Y >|...||
 ------
 ### `template<SizeType L> typedef TupleRange`
 

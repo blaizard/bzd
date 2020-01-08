@@ -9,7 +9,8 @@
 
 |Function||
 |:---|:---|
-|[`toString(bzd::OStream & out, const F & f, Args &&... args)`](./index.md)|String formating.|
+|[`toString(bzd::OStream & out, const bzd::StringView & str, Args &&... args)`](./index.md)|String formating.|
+|[`toString(bzd::OStream & out, const bzd::StringConstexpr< C... > & str, Args &&... args)`](./index.md)||
 |[`toString(bzd::OStream & stream, const T & data)`](./index.md)||
 |[`toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
 |[`toString(bzd::OStream & stream, const bzd::StringView & data)`](./index.md)||
@@ -19,7 +20,7 @@
 |[`toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`](./index.md)||
 |[`toStringOct(bzd::OStream & stream, const T & data)`](./index.md)||
 ------
-### `template<class F, class... Args> constexpr void toString(bzd::OStream & out, const F & f, Args &&... args)`
+### `template<class... Args> constexpr void toString(bzd::OStream & out, const bzd::StringView & str, Args &&... args)`
 String formating.
 
 Lightweight and compilation time checking string formating utility. The syntax is compatible with Python format with some limitations.
@@ -43,14 +44,27 @@ This is an after text
 #### Template
 ||||
 |---:|:---|:---|
-|class F|None||
 |class...|Args||
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|out|Output stream where the formating string will be written to. |
-|const F &|f|Compile-time string containing the format. |
+|const bzd::StringView &|str|run-time or compile-time string containing the format. |
 |Args &&...|args|Arguments to be passed for the format. |
+------
+### `template<char... C, class... Args> constexpr void toString(bzd::OStream & out, const bzd::StringConstexpr< C... > & str, Args &&... args)`
+
+#### Template
+||||
+|---:|:---|:---|
+|char...|C||
+|class...|Args||
+#### Parameters
+||||
+|---:|:---|:---|
+|bzd::OStream &|out||
+|const bzd::StringConstexpr< C... > &|str||
+|Args &&...|args||
 ------
 ### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *> constexpr void toString(bzd::OStream & stream, const T & data)`
 

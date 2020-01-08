@@ -171,47 +171,47 @@ TEST(Format_, StringFormat)
 {
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {:d}"), 12);
+		bzd::format::toString(stream, CSTR("Hello {:d}"), 12);
 		EXPECT_STREQ(stream.str().data(), "Hello 12");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {1} {0:d}"), 12, -89);
+		bzd::format::toString(stream, CSTR("Hello {1} {0:d}"), 12, -89);
 		EXPECT_STREQ(stream.str().data(), "Hello -89 12");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {:f}"), 12.45);
+		bzd::format::toString(stream, CSTR("Hello {:f}"), 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {:.3f}"), 12.45);
+		bzd::format::toString(stream, CSTR("Hello {:.3f}"), 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {:%}"), 0.15);
+		bzd::format::toString(stream, CSTR("Hello {:%}"), 0.15);
 		EXPECT_STREQ(stream.str().data(), "Hello 15.%");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {}"), "World");
+		bzd::format::toString(stream, CSTR("Hello {}"), "World");
 		EXPECT_STREQ(stream.str().data(), "Hello World");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("Hello {:.2}"), "World");
+		bzd::format::toString(stream, CSTR("Hello {:.2}"), "World");
 		EXPECT_STREQ(stream.str().data(), "Hello Wo");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("This {1} is {0:.1%}"), 0.0349, "milk");
+		bzd::format::toString(stream, CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
 		EXPECT_STREQ(stream.str().data(), "This milk is 3.5%");
 	}
 	{
 		bzd::StringStream<256> stream;
-		bzd::format::toString(stream, CONSTEXPR_STRING_VIEW("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
+		bzd::format::toString(stream, CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
 		EXPECT_STREQ(stream.str().data(), "42 == 0b101010 == 0o52 == 0x2a == 0x2A");
 	}
 }
