@@ -115,11 +115,11 @@ constexpr void toStringOct(bzd::OStream &stream, const T &data)
 template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
 constexpr void toStringBin(bzd::OStream &stream, const T &data)
 {
-	bzd::Vector<unsigned int, 4> shortList;
+	bzd::Vector<bzd::UInt16Type, 4> shortList;
 	T number = data;
 	while (number)
 	{
-		shortList.pushBack(static_cast<unsigned int>(number & 0xffff));
+		shortList.pushBack(static_cast<bzd::UInt16Type>(number & 0xffff));
 		number >>= 16;
 	}
 
