@@ -8,6 +8,7 @@ build --verbose_failures
 
 # Set default options used by the default run
 build --copt "-std=c++14"
+build --copt "-Os"
 build -c opt
 
 # Test specific options
