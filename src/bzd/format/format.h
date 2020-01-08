@@ -111,7 +111,7 @@ using ArgList = bzd::interface::Vector<Arg>;
 /**
  * Parse an unsigned integer
  */
-constexpr bool parseUnsignedInteger(bzd::StringView &format, bzd::SizeType &integer)
+static constexpr bool parseUnsignedInteger(bzd::StringView &format, bzd::SizeType &integer)
 {
 	bool isDefined = false;
 	integer = 0;
@@ -417,7 +417,7 @@ void printFixedPoint(bzd::OStream &stream, const T &value, const Metadata &metad
 	}
 }
 
-void printString(bzd::OStream &stream, const bzd::StringView stringView, const Metadata &metadata)
+static void printString(bzd::OStream &stream, const bzd::StringView stringView, const Metadata &metadata)
 {
 	switch (metadata.format)
 	{
@@ -475,7 +475,7 @@ constexpr Context<CheckContext> contextBuild(const bzd::StringView &format, cons
 	return ctx;
 }
 
-void print(bzd::OStream &stream, const bzd::StringView &format, const bzd::interface::Vector<bzd::format::impl::Arg> &args)
+static void print(bzd::OStream &stream, const bzd::StringView &format, const bzd::interface::Vector<bzd::format::impl::Arg> &args)
 {
 	Context<PrintContext> ctx(stream, args);
 	parse(ctx, format, args);

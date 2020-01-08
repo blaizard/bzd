@@ -7,8 +7,6 @@
 #include "bzd/utility/memcpy.h"
 #include "bzd/utility/min.h"
 
-#include <iostream>
-
 namespace bzd {
 namespace impl {
 template <class T, class Impl>

@@ -5,7 +5,7 @@
 
 |Namespace||
 |:---|:---|
-|[`@24`](_24/index.md)||
+|[`@23`](_23/index.md)||
 
 |Class||
 |:---|:---|
@@ -192,7 +192,7 @@ This function returns either when the string is consumed (return false) or when 
 |Ctx &|context||
 |bzd::StringView &|format||
 ------
-### `constexpr bool parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`
+### `static constexpr bool parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`
 Parse an unsigned integer
 #### Parameters
 ||||
@@ -200,7 +200,7 @@ Parse an unsigned integer
 |bzd::StringView &|format||
 |bzd::SizeType &|integer||
 ------
-### `void print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
+### `static void print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
 
 #### Parameters
 ||||
@@ -235,7 +235,7 @@ Parse an unsigned integer
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `void printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
+### `static void printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
 
 #### Parameters
 ||||

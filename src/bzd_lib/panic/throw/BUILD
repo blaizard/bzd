@@ -1,18 +1,18 @@
 config_setting(
     name = "backend",
     define_values = {
-        "log": "stdout",
+        "panic": "throw",
     },
     visibility = ["//visibility:public"],
 )
 
 cc_library(
-    name = "stdout",
+    name = "throw",
     srcs = glob([
         "*.cpp",
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//include:bzd",
+        "//src:bzd_core",
     ],
 )
