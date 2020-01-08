@@ -92,13 +92,13 @@ TEST(ContainerVariant, Match)
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;
-		variant.match([](const int a) {}, [](const bool a) {}, [&](const double a) { b = a; });
+		variant.match([](const int) {}, [](const bool) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);
 	}
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<int>(5));
 		int b = 0;
-		variant.match([&](const int a) { b = a; }, [](const bool a) {}, [](const double a) {});
+		variant.match([&](const int a) { b = a; }, [](const bool) {}, [](const double) {});
 		EXPECT_EQ(b, 5);
 	}
 	{
@@ -130,7 +130,7 @@ TEST(ContainerVariant, Constexpr)
 	{
 		constexpr bzd::VariantConstexpr<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;
-		variant.match([](const int a) {}, [](const bool a) {}, [&](const double a) { b = a; });
+		variant.match([](const int) {}, [](const bool) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);
 	}
 }
