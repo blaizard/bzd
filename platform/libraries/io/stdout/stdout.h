@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace bzd { namespace io_channel {
+namespace bzd { namespace io {
 class Stdout : public bzd::OChannel
 {
 public:
@@ -14,4 +14,4 @@ public:
 		return data.size();
 	}
 };
-}} // namespace bzd::io_channel
+}} // namespace bzd::io
