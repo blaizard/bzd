@@ -7,7 +7,7 @@ def _bzd_manifest_impl(ctx):
     return [DefaultInfo(), CcInfo(), BzdManifestInfo(manifest = depset(transitive = [f.files for f in ctx.attr.manifest]))]
 
 """
-Rule for bzd manifests.
+Rule to declare a bzd manifests.
 """
 
 bzd_manifest = rule(
@@ -145,3 +145,70 @@ Rule to define a bzd test.
 
 def bzd_cc_test(name, deps, **kwargs):
     return _bzd_cc_macro_impl(True, name, deps, **kwargs)
+
+def _bzd_genmanifest_impl(ctx):
+    # Create the manifest content
+    content = "interfaces:\n"
+    for interface in ctx.attr.interfaces:
+        content += "  \"{}\":\n".format(interface)
+        content += "    includes: [{}]\n".format(", ".join(["\"{}\"".format(include) for include in ctx.attr.includes]))
+
+    # Create the file
+    ctx.actions.write(
+        output = ctx.outputs.output,
+        content = content,
+    )
+
+    return [DefaultInfo(files = depset([ctx.outputs.output]))]
+
+"""
+Rule to generate a manifest
+"""
+_bzd_genmanifest = rule(
+    implementation = _bzd_genmanifest_impl,
+    attrs = {
+        "interfaces": attr.string_list(
+            mandatory = True,
+            doc = "List of interfaces availaable through this library.",
+        ),
+        "includes": attr.string_list(
+            doc = "List of includes associated with this library.",
+        ),
+        "output": attr.output(
+            mandatory = True,
+            doc = "Define the output manifest path.",
+        ),
+    },
+)
+
+def _bzd_cc_library_impl(name, interfaces, includes, deps, **kwargs):
+    # Create the manifest file
+    genmanifest_name = "genmanifest_{}".format(name)
+    output_genmanifest = ".bzd/genmanifest_{}.manifest".format(name)
+    _bzd_genmanifest(
+        name = genmanifest_name,
+        includes = includes,
+        interfaces = interfaces,
+        output = output_genmanifest,
+    )
+
+    # Declare the manifest
+    manifest_name = "manifest_{}".format(name)
+    bzd_manifest(
+        name = manifest_name,
+        manifest = [output_genmanifest],
+    )
+
+    # Associate the manifest with the library
+    cc_library(
+        name = name,
+        deps = deps + [manifest_name],
+        **kwargs
+    )
+
+"""
+Rule to define a bzd library.
+"""
+
+def bzd_cc_library(name, interfaces, includes, deps, **kwargs):
+    return _bzd_cc_library_impl(name, interfaces, includes, deps, **kwargs)

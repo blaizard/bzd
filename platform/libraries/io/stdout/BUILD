@@ -9,45 +9,21 @@ It should also generate the C++ library
 
 """
 
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@//tools/bzd:defs.bzl", "bzd_manifest")
+load("@//tools/bzd:defs.bzl", "bzd_cc_library")
 
-bzd_manifest(
-    name = "config_manifest",
-    manifest = glob([
-        "config.manifest",
-    ]),
-    deps = [],
-)
-
-cc_library(
+bzd_cc_library(
     name = "stdout",
     hdrs = [
         "stdout.h",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":config_manifest",
+    includes = [
+        "libraries/io/stdout/stdout.h",
     ],
-)
-
-"""
-bzd_cc_library(
-    name = "stdout",
-	# Interfaces that are available from this library
-	interfaces = [
-		"bzd::io_channel::Stdout"
-	],
-	# Includes are automatically added to hdrs
-	includes = [
-		"libraries/stdout.h",
-	],
-	hdrs = [
-		"stdout.h"
-	],
+    interfaces = [
+        "bzd::io::Stdout",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//platform:bzd_core",
     ],
 )
-"""
