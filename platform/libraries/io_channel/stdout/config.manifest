@@ -1,3 +1,0 @@
-interfaces:
-    "bzd::io_channel::Stdout":
-        includes: "libraries/io_channel/stdout/stdout.h"

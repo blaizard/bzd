@@ -1,0 +1,3 @@
+interfaces:
+    "bzd::io::Stdout":
+        includes: "libraries/io/stdout/stdout.h"
