@@ -81,7 +81,7 @@ public:
 	template <class... Args>
 	constexpr Registry(const KeyType &str, Args &&... args) : object_{bzd::forward<Args>(args)...}
 	{
-		interface::Registry<Interface>::get().insert(str, static_cast<Interface*>(&object_));
+		interface::Registry<Interface>::get().insert(str, static_cast<Interface *>(&object_));
 	}
 
 	/**

@@ -8,7 +8,9 @@ interfaces:
 It should also generate the C++ library
 
 """
-load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
+
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@//tools/bzd:defs.bzl", "bzd_manifest")
 
 bzd_manifest(
     name = "config_manifest",
@@ -19,14 +21,14 @@ bzd_manifest(
 )
 
 cc_library(
-	name = "stdout",
-	hdrs = [
-		"stdout.h"
-	],
-	deps = [
-		":config_manifest"
-	],
+    name = "stdout",
+    hdrs = [
+        "stdout.h",
+    ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":config_manifest",
+    ],
 )
 
 """

@@ -19,9 +19,9 @@
 
 // Core
 #include "bzd/core/assert.h"
+#include "bzd/core/io_channel.h"
 #include "bzd/core/registry.h"
 #include "bzd/core/system.h"
-#include "bzd/core/io_channel.h"
 
 // Format
 #include "bzd/format/format.h"
