@@ -8,10 +8,13 @@
 |[`BTree`](btree/index.md)||
 |[`Expected`](expected/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
+|[`IChannel`](ichannel/index.md)||
+|[`IOChannel`](iochannel/index.md)||
 |[`IOStream`](iostream/index.md)||
 |[`IStream`](istream/index.md)||
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)|Flat map implementation.|
+|[`OChannel`](ochannel/index.md)||
 |[`Optional`](optional/index.md)||
 |[`OStream`](ostream/index.md)||
 |[`Pool`](pool/index.md)||
@@ -84,6 +87,20 @@ Non-leaf nodes are implemented as non-sorted arrays.
 |---:|:---|:---|
 |class E|None||
 ------
+### `template<class T> class IChannel`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> class IOChannel`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
 ### `template<class T> class IOStream`
 
 #### Template
@@ -108,6 +125,13 @@ Flat map implementation.
 |---:|:---|:---|
 |class K|None||
 |class V|None||
+------
+### `template<class T> class OChannel`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<class T> class Optional`
 
