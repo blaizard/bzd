@@ -20,15 +20,15 @@ def registryBuild(manifest):
 	content += "#include \"bzd.h\"\n\n"
 
 	# Include object dependencies
-	interfaces = set([obj.getInterface() for obj in manifest.getObjects()])
 	includes = set()
-	for interface in interfaces:
-		includes.update(interface.getInclude())
+	for interface in manifest.getDependencies():
+		includes.update(interface.getIncludes())
 	for include in sorted(list(includes)):
 		content += "#include \"{}\"\n".format(include)
 	content += "\n"
 
 	# Add objects to the registry
+	interfaces = set([obj.getInterface() for obj in manifest.getObjects()])
 	for interface in interfaces:
 		objects = list(manifest.getObjects({"interface": interface.getName()}))
 		nbObjects = len(objects)

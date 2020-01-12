@@ -2,6 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from log import Log
+from parser import Ref
 
 """
 Validate a string
@@ -47,9 +48,9 @@ class Interface():
 	def getName(self):
 		return self.identifier
 
-	def getInclude(self):
-		include = self.definition.get("include", [])
-		return include if isinstance(include, list) else [include]
+	def getIncludes(self):
+		includes = self.definition.get("includes", [])
+		return includes if isinstance(includes, list) else [includes]
 
 """
 Represents an object
@@ -72,6 +73,37 @@ class Object():
 	"""
 	def getInterfaceName(self):
 		return self.identifier.split(".")[0]
+
+	"""
+	Walk through all values of a dictionary and call a callback
+	"""
+	@staticmethod
+	def _walk(obj, callback):
+		for value in (obj.values() if isinstance(obj, dict) else obj):
+			if isinstance(value, dict):
+				Object._walk(value, callback)
+			elif isinstance(value, list):
+				Object._walk(value, callback)
+			else:
+				callback(value)
+
+	"""
+	Get all dependencies associated with this object
+	"""
+	def getDependencies(self):
+
+		dependencies = set()
+
+		# Look for any references in the object data
+		def visit(value):
+			if isinstance(value, Ref) and self.manifest.isInterface(value):
+				dependencies.add(self.manifest.getInterface(value))
+		self._walk(self.definition, visit)
+
+		# Depend on the object interface itself
+		dependencies.add(self.getInterface())
+
+		return dependencies
 
 	"""
 	Return the name of the object
@@ -101,7 +133,7 @@ class Manifest():
 			"interfaces": {
 				"_default": {
 					"_key": FormatValidator("class"),
-					"include": FormatValidator("path")
+					"includes": FormatValidator("path")
 				}
 			},
 			"objects": {
@@ -127,11 +159,17 @@ class Manifest():
 				yield obj
 
 	"""
+	Return true if this is a known interface, false otherwise
+	"""
+	def isInterface(self, name):
+		return str(name) in self.interfaces
+
+	"""
 	Get a specific inteface
 	"""
 	def getInterface(self, name):
-		assert name in self.interfaces, "The interface name '{}' was not discovered or is not valid.".format(str(name))
-		return self.interfaces[name]
+		assert self.isInterface(name), "The interface name '{}' was not discovered or is not valid.".format(str(name))
+		return self.interfaces[str(name)]
 
 	"""
 	Return the raw data of this manifest
@@ -139,6 +177,18 @@ class Manifest():
 	def getData(self):
 		return self.data
 
+	"""
+	List all depending interfaces
+	"""
+	def getDependencies(self):
+
+		# Gather all object dependencies
+		dependencies = set()
+		for obj in self.getObjects():
+			dependencies.update(obj.getDependencies())
+
+		return dependencies
+			
 	"""
 	Merge data into the current manifest.
 	"""

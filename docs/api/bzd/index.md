@@ -67,13 +67,16 @@
 |:---|:---|
 |[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
 |[`FctPtrType`](./index.md)|Function pointer type.|
+|[`IChannel`](./index.md)|alias of [`bzd::impl::IChannel`](impl/ichannel/index.md)|
 |[`Int16Type`](./index.md)|Signed integer type with a fixed width of 16-bit.|
 |[`Int32Type`](./index.md)|Signed integer type with a fixed width of 32-bit.|
 |[`Int64Type`](./index.md)|Signed integer type with a fixed width of 64-bit.|
 |[`Int8Type`](./index.md)|Signed integer type with a fixed width of 8-bit.|
 |[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
+|[`IOChannel`](./index.md)|alias of [`bzd::impl::IOChannel`](impl/iochannel/index.md)|
 |[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
 |[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
+|[`OChannel`](./index.md)|alias of [`bzd::impl::OChannel`](impl/ochannel/index.md)|
 |[`Optional`](./index.md)|Type managing an optional contained value, i.e. a value that may or may not be present.; alias of [`bzd::impl::Optional`](impl/optional/index.md)|
 |[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
 |[`PtrType`](./index.md)|Memory pointer type.|
@@ -433,6 +436,9 @@ It is a variants with 2 states, valid, representing success and containing a val
 ### `typedef FctPtrType`
 Function pointer type.
 ------
+### `typedef IChannel`
+
+------
 ### `typedef Int16Type`
 Signed integer type with a fixed width of 16-bit.
 ------
@@ -448,10 +454,16 @@ Signed integer type with a fixed width of 8-bit.
 ### `typedef IntPtrType`
 Integer type capable of holding a memory pointer.
 ------
+### `typedef IOChannel`
+
+------
 ### `typedef IOStream`
 
 ------
 ### `typedef IStream`
+
+------
+### `typedef OChannel`
 
 ------
 ### `template<class T> typedef Optional`
