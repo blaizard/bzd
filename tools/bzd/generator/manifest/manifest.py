@@ -2,23 +2,14 @@
 # -*- coding: iso-8859-1 -*-
 
 from log import Log
-from parser import Ref
-
-"""
-Validate a string
-"""
-class FormatValidator():
-	
-	def __init__(self, *formats):
-		self.formats = list(formats)
-
-	def validate(self, string):
-		return True
+from .object import Object
+from .interface import Interface
+from .validator import Validator
 
 """
 Represent a key, used together with the context for messaging
 """
-class Keys():
+class _Keys():
 
 	def __init__(self):
 		self.keys = []
@@ -32,97 +23,6 @@ class Keys():
 	def __str__(self):
 		return " > ".join(self.keys)
 
-"""
-Represents an interface
-"""
-class Interface():
-
-	def __init__(self, manifest, identifier):
-		self.manifest = manifest
-		self.identifier = identifier
-		self.definition = manifest.getData().get("interfaces", {}).get(identifier, {})
-
-	def isValid(self):
-		return self.identifier != None
-
-	def getName(self):
-		return self.identifier
-
-	def getIncludes(self):
-		includes = self.definition.get("includes", [])
-		return includes if isinstance(includes, list) else [includes]
-
-"""
-Represents an object
-"""
-class Object():
-
-	def __init__(self, manifest, identifier):
-		self.manifest = manifest
-		self.identifier = identifier
-		self.definition = manifest.getData().get("objects", {}).get(identifier, {})
-
-	"""
-	Return the interface of the object
-	"""
-	def getInterface(self):
-		return self.manifest.getInterface(self.getInterfaceName())
-
-	"""
-	Return the interface of the object
-	"""
-	def getInterfaceName(self):
-		return self.identifier.split(".")[0]
-
-	"""
-	Walk through all values of a dictionary and call a callback
-	"""
-	@staticmethod
-	def _walk(obj, callback):
-		for value in (obj.values() if isinstance(obj, dict) else obj):
-			if isinstance(value, dict):
-				Object._walk(value, callback)
-			elif isinstance(value, list):
-				Object._walk(value, callback)
-			else:
-				callback(value)
-
-	"""
-	Get all dependencies associated with this object
-	"""
-	def getDependencies(self):
-
-		dependencies = set()
-
-		# Look for any references in the object data
-		def visit(value):
-			if isinstance(value, Ref) and self.manifest.isInterface(value):
-				dependencies.add(self.manifest.getInterface(value))
-		self._walk(self.definition, visit)
-
-		# Depend on the object interface itself
-		dependencies.add(self.getInterface())
-
-		return dependencies
-
-	"""
-	Return the name of the object
-	"""
-	def getName(self):
-		return self.identifier.split(".")[1]
-
-	"""
-	Get the constructor class
-	"""
-	def getClass(self):
-		return self.definition.get("class", self.getInterfaceName())
-
-	"""
-	Get parameters
-	"""
-	def getParams(self):
-		return self.definition.get("params", [])
-
 class Manifest():
 
 	def __init__(self):
@@ -132,16 +32,16 @@ class Manifest():
 		self.format = {
 			"interfaces": {
 				"_default": {
-					"_key": FormatValidator("class"),
-					"includes": FormatValidator("path")
+					"_key": Validator("class"),
+					"includes": Validator("path")
 				}
 			},
 			"objects": {
 				"_default": {
-					"_key": FormatValidator("class"),
-					"_default": FormatValidator("any"),
-					"class": FormatValidator("class"),
-					"params": FormatValidator("list", "string", "number")
+					"_key": Validator("class"),
+					"_default": Validator("any"),
+					"class": Validator("class"),
+					"params": Validator("list", "string", "number")
 				}
 			}
 		}
@@ -194,7 +94,7 @@ class Manifest():
 	"""
 	def merge(self, data, context):
 		try:
-			context["key"] = Keys()
+			context["key"] = _Keys()
 			self._mergeAndValidate(self.data, data, self.format, context)
 		except Exception as e:
 			Log.fatal("Error while merging ({})".format("; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text])), e)
