@@ -1,7 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-from log import Log
 from .object import Object
 from .interface import Interface
 from .validator import Validator
@@ -92,12 +91,12 @@ class Manifest():
 	"""
 	Merge data into the current manifest.
 	"""
-	def merge(self, data, context):
+	def merge(self, data):
+		context = {"key": _Keys()}
 		try:
-			context["key"] = _Keys()
 			self._mergeAndValidate(self.data, data, self.format, context)
 		except Exception as e:
-			Log.fatal("Error while merging ({})".format("; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text])), e)
+			raise Exception("Error while merging ({}): {}".format("; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text]), e))
 
 	"""
 	Process the current data of the manifest in order to speed-up later accesses

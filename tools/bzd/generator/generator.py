@@ -1,10 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
 import argparse
-#import json5
 import formats
 import os
+from log import Log
 from parser import manifestToDict, dictToManifest
 from manifest import Manifest
 
@@ -21,8 +21,11 @@ if __name__== "__main__":
 
 	manifest = Manifest()
 	for path in config.inputs:
-		data = manifestToDict(path)
-		manifest.merge(data, {"manifest file": "{}".format(path)})
+		try:
+			data = manifestToDict(path)
+			manifest.merge(data)
+		except Exception as e:
+			Log.fatal("In manifest {}".format(path), e)
 	manifest.process()
 
 	# Generate the header comments

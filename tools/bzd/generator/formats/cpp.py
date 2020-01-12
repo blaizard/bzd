@@ -1,7 +1,5 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
-
-import json
 
 def getUID():
 	getUID.uid = getUID.uid if hasattr(getUID, "uid") else -1
