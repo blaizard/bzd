@@ -27,6 +27,9 @@ def registryBuild(manifest):
 		content += "#include \"{}\"\n".format(include)
 	content += "\n"
 
+	# Create an empty namespace to ensure that the symbols are not exported
+	content += "namespace {\n"
+
 	# Add objects to the registry
 	interfaces = set([obj.getInterface() for obj in manifest.getObjects()])
 	for interface in interfaces:
@@ -40,6 +43,9 @@ def registryBuild(manifest):
 			params = paramsToString(obj)
 			content += "bzd::Registry<{}, {}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getClass(), getUID(), obj.getName(), params)
 		content += "\n"
+
+	# Close the empty namespace
+	content += "} // namespace"
 
 	return content
 
