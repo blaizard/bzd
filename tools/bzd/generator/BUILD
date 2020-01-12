@@ -6,5 +6,6 @@ py_binary(
         "**/*.py",
     ]),
     main = "generator.py",
+    python_version = "PY3",
     visibility = ["//visibility:public"],
 )

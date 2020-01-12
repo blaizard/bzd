@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
 from .cpp import cpp
