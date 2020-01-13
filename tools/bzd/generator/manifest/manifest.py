@@ -31,16 +31,16 @@ class Manifest():
 		self.format = {
 			"interfaces": {
 				"_default": {
-					"_key": Validator("class"),
-					"includes": Validator("path")
+					"_key": Validator("interface"),
+					"includes": Validator("any")
 				}
 			},
 			"objects": {
 				"_default": {
-					"_key": Validator("class"),
+					"_key": Validator("object"),
 					"_default": Validator("any"),
-					"class": Validator("class"),
-					"params": Validator("list", "string", "number")
+					"class": Validator("interface"),
+					"params": Validator("any")
 				}
 			}
 		}

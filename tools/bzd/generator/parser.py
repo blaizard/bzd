@@ -3,16 +3,17 @@
 
 import yaml
 from log import Log
+from manifest import Reference
 
 """
 Add support for !ref tag
 """
-class Ref():
+class Ref(Reference):
 	tag = u'!ref'
 	def __init__(self, loader, node):
 		self.value = node.value
 	def __repr__(self):
-		return str(self.value)
+		return self.getRepr()
 	@staticmethod
 	def representer(dumper, data):
 		return dumper.represent_scalar(Ref.tag, str(data))

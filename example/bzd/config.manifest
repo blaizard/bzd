@@ -9,6 +9,7 @@ objects:
     "bzd::Log.default":
         params:
             - !ref bzd::getOut()
+            - !ref bzd::OChannel.stdout
     "bzd::StringView.message":
         params:
             - "Hello World !!!"

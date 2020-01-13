@@ -25,7 +25,7 @@ if __name__== "__main__":
 			data = manifestToDict(path)
 			manifest.merge(data)
 		except Exception as e:
-			Log.fatal("In manifest {}".format(path), e)
+			Log.fatal("{}".format(path), e)
 	manifest.process()
 
 	# Generate the header comments
