@@ -7,5 +7,5 @@ class Log():
 
 	@staticmethod
 	def fatal(message, e):
-		sys.stderr.write("{}: {}".format(str(message), str(e)))
+		sys.stderr.write("[ERROR] {}: {}\n".format(str(message), str(e)))
 		sys.exit(1)

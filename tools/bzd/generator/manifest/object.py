@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-from parser import Ref
+from .validator import ValidatorReference
 
 """
 Represents an object
@@ -47,7 +47,7 @@ class Object():
 
 		# Look for any references in the object data
 		def visit(value):
-			if isinstance(value, Ref) and self.manifest.isInterface(value):
+			if ValidatorReference.isMatch(value) and self.manifest.isInterface(value):
 				dependencies.add(self.manifest.getInterface(value))
 		self._walk(self.definition, visit)
 
