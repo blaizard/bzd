@@ -4,7 +4,7 @@
 """
 Represents an interface
 """
-class Interface():
+class Interface(object):
 
 	def __init__(self, manifest, identifier):
 		self.manifest = manifest
@@ -20,3 +20,12 @@ class Interface():
 	def getIncludes(self):
 		includes = self.definition.get("includes", [])
 		return includes if isinstance(includes, list) else [includes]
+
+"""
+Helper to ceate an empty interface
+"""
+class EmptyInterface(Interface):
+	def __init__(self, identifier):
+		self.manifest = None
+		self.identifier = identifier
+		self.definition = {}

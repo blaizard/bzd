@@ -7,10 +7,14 @@ def getUID():
 	return getUID.uid
 
 def paramsToString(obj):
-	params = ["\"{}\"".format(param) if isinstance(param, str) else str(param) for param in obj.getParams()]
+	params = ["\"{}\"".format(param) if isinstance(param, str) else repr(param) for param in obj.getParams()]
 	return (", " + ", ".join(params)) if len(params) else ""
 
 def registryBuild(manifest):
+
+	manifest.setRenderer({
+		"object": "bzd::Registry<{interface}>::get(\"{name}\")"
+	})
 
 	content = ""
 
@@ -19,24 +23,27 @@ def registryBuild(manifest):
 
 	# Include object dependencies
 	includes = set()
-	for interface in manifest.getDependencies():
+	for interface in manifest.getDependentInterfaces():
 		includes.update(interface.getIncludes())
 	for include in sorted(list(includes)):
 		content += "#include \"{}\"\n".format(include)
 	content += "\n"
 
+	for obj in manifest.getObjects():
+		print(obj.getInterfaceName(), obj.deps)
+
 	# Create an empty namespace to ensure that the symbols are not exported
-	content += "namespace {\n"
+	content += "namespace {\n\n"
 
 	# Add objects to the registry
-	interfaces = set([obj.getInterface() for obj in manifest.getObjects()])
-	for interface in interfaces:
-		objects = list(manifest.getObjects({"interface": interface.getName()}))
-		nbObjects = len(objects)
-		content += "// Definition for registry of type '{}'\n".format(interface.getName())
-		content += "bzd::declare::Registry<{}, {}> registry{}_;\n".format(interface.getName(), nbObjects, getUID())
+	registryList = manifest.getRegistry()
+
+	# Print the registry
+	for registry in registryList:
+		content += "// Definition for registry of type '{}'\n".format(registry["interface"])
+		content += "bzd::declare::Registry<{}, {}> registry{}_;\n".format(registry["interface"], len(registry["objects"]), getUID())
 		# Add the objects
-		for obj in objects:
+		for obj in registry["objects"]:
 			# Build the parameters
 			params = paramsToString(obj)
 			content += "bzd::Registry<{}, {}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getClass(), getUID(), obj.getName(), params)
@@ -44,6 +51,8 @@ def registryBuild(manifest):
 
 	# Close the empty namespace
 	content += "} // namespace"
+
+	print(registry)
 
 	return content
 

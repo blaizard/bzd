@@ -28,6 +28,7 @@ class Manifest():
 		self.data = {}
 		self.objects = {}
 		self.interfaces = {}
+		self.setRenderer()
 		self.format = {
 			"interfaces": {
 				"_default": {
@@ -44,6 +45,15 @@ class Manifest():
 				}
 			}
 		}
+
+	"""
+	Set a new renderer for reference objects
+	"""
+	def setRenderer(self, renderer = {}):
+		self.renderer = {
+			"default": "{}"
+		}
+		self.renderer.update(renderer)
 
 	"""
 	List all objects
@@ -79,15 +89,30 @@ class Manifest():
 	"""
 	List all depending interfaces
 	"""
-	def getDependencies(self):
+	def getDependentInterfaces(self):
 
 		# Gather all object dependencies
 		dependencies = set()
 		for obj in self.getObjects():
-			dependencies.update(obj.getDependencies())
+			dependencies.update(obj.getDependentInterfaces())
 
 		return dependencies
-			
+
+	"""
+	Return the registry sorted by dependency resolution
+	"""
+	def getRegistry(self):
+		registryList = []
+		interfaces = set([obj.getInterface() for obj in self.getObjects()])
+		for interface in interfaces:
+			objects = list(self.getObjects({"interface": interface.getName()}))
+			registryList.append({
+				"interface": interface.getName(),
+				"objects": objects,
+				"deps": [obj.getDependentObjects() for obj in objects]
+			})
+		return registryList
+
 	"""
 	Merge data into the current manifest.
 	"""
@@ -104,7 +129,6 @@ class Manifest():
 	def process(self):
 		self.objects = {identifier: Object(self, identifier) for identifier in self.data.get("objects", {}).keys()}
 		self.interfaces = {identifier: Interface(self, identifier) for identifier in self.data.get("interfaces", {}).keys()}
-		self.interfaces.update({obj.getInterfaceName(): Interface(self, obj.getInterfaceName()) for obj in self.objects.values()})
 
 	"""
 	Merge the data
