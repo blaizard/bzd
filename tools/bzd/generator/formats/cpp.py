@@ -29,9 +29,6 @@ def registryBuild(manifest):
 		content += "#include \"{}\"\n".format(include)
 	content += "\n"
 
-	for obj in manifest.getObjects():
-		print(obj.getInterfaceName(), obj.deps)
-
 	# Create an empty namespace to ensure that the symbols are not exported
 	content += "namespace {\n\n"
 
@@ -51,8 +48,6 @@ def registryBuild(manifest):
 
 	# Close the empty namespace
 	content += "} // namespace"
-
-	print(registry)
 
 	return content
 

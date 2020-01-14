@@ -37,8 +37,14 @@ if __name__== "__main__":
 			[f.write("# {}\n".format(comment)) for comment in comments]
 			f.write(dictToManifest(manifest.getData()))
 
-	formatter = getattr(formats, config.format)
-	formatter(manifest, config.output, {
-		"comments": comments
-	})
-	print(config.output)
+	print("Cpp", config.output)
+	print("Manifest", config.manifest)
+
+	try:
+		formatter = getattr(formats, config.format)
+		formatter(manifest, config.output, {
+			"comments": comments
+		})
+	except Exception as e:
+		Log.fatal("Cannot generate '{}' output".format(config.format), e)
+

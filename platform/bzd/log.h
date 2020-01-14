@@ -4,6 +4,7 @@
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/core/system.h"
+#include "bzd/core/io_channel.h"
 #include "bzd/format/format.h"
 #include "bzd/utility/forward.h"
 
@@ -83,5 +84,6 @@ class Log : public interface::Log
 {
 public:
 	constexpr Log(bzd::OStream& out) : interface::Log(out) {}
+	Log(bzd::OChannel&) : interface::Log(bzd::getOut()) {}
 };
 } // namespace bzd
