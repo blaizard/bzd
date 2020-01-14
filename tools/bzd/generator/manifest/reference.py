@@ -10,7 +10,7 @@ class Reference(object):
 		self.reprCallback = None
 		self.manifest = None
 	def getRepr(self):
-		return self.reprCallback(self.manifest.renderer) if self.reprCallback else str(self.value)
+		return self.reprCallback(self.manifest.renderer) if self.reprCallback and self.manifest.renderer else str(self.value)
 	def setReprCallback(self, manifest, callback):
 		assert self.reprCallback == None, "Repr callback has already been set for this value: {}.".format(str(self.value))
 		self.reprCallback = callback

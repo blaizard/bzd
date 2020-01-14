@@ -8,7 +8,7 @@ objects:
         class: !ref bzd::io::Stdout
     "bzd::Log.default":
         params:
-            - !ref bzd::getOut()
+            #- !ref bzd::getOut()
             - !ref bzd::OChannel.stdout
     "bzd::StringView.message":
         params:

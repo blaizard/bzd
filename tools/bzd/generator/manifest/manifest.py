@@ -49,11 +49,8 @@ class Manifest():
 	"""
 	Set a new renderer for reference objects
 	"""
-	def setRenderer(self, renderer = {}):
-		self.renderer = {
-			"default": "{}"
-		}
-		self.renderer.update(renderer)
+	def setRenderer(self, renderer = None):
+		self.renderer = renderer
 
 	"""
 	List all objects
@@ -102,15 +99,39 @@ class Manifest():
 	Return the registry sorted by dependency resolution
 	"""
 	def getRegistry(self):
-		registryList = []
+		registryEntries = {}
 		interfaces = set([obj.getInterface() for obj in self.getObjects()])
 		for interface in interfaces:
 			objects = list(self.getObjects({"interface": interface.getName()}))
-			registryList.append({
-				"interface": interface.getName(),
+			# Generate dictionary of depending objects
+			deps = {}
+			[deps.update(obj.getDependentObjects()) for obj in objects]
+			registryEntries[interface.getName()] = {
 				"objects": objects,
-				"deps": [obj.getDependentObjects() for obj in objects]
-			})
+				"deps": deps
+			}
+
+		# Create a dependency graph
+		dependencyGraph = {interface: set() for interface in registryEntries.keys()}
+		for interface, data in registryEntries.items():
+			for dependency in data["deps"].keys():
+				dependencyGraph[interface].add(dependency)
+
+		# Sort the registry
+		# Todo, can be optimized/simplified
+		registryList = []
+		while dependencyGraph:
+			newDependencyGraph = {}
+			registryListInitialLen = len(registryList)
+			for interface, data in dependencyGraph.items():
+				if all([dep not in dependencyGraph for dep in data]):
+					registryList.append({"interface": interface, "objects": registryEntries[interface]["objects"]})
+				else:
+					newDependencyGraph[interface] = data
+			if registryListInitialLen == len(registryList):
+				raise Exception("Circular depedency detected between interfaces: {}.".format(", ".join(dependencyGraph.keys())))
+			dependencyGraph = newDependencyGraph
+
 		return registryList
 
 	"""
