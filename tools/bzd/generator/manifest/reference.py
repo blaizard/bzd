@@ -1,16 +1,17 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-from .validator import ValidatorObject
-
 """
 Represents a reference value
 """
-class Reference():
+class Reference(object):
 	__bzd_reference__ = True
-	def isObject(self):
-		return ValidatorObject.isMatch(self)
+	def __init__(self):
+		self.reprCallback = None
+		self.manifest = None
 	def getRepr(self):
-		#if self.isObject():
-		#	pass
-		return str(self.value)
+		return self.reprCallback(self.manifest.renderer) if self.reprCallback else str(self.value)
+	def setReprCallback(self, manifest, callback):
+		assert self.reprCallback == None, "Repr callback has already been set for this value: {}.".format(str(self.value))
+		self.reprCallback = callback
+		self.manifest = manifest

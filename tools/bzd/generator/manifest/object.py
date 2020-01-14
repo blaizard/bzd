@@ -2,6 +2,9 @@
 # -*- coding: iso-8859-1 -*-
 
 from .validator import ValidatorReference
+from .validator import ValidatorObject
+from .validator import ValidatorInterface
+from .interface import EmptyInterface
 
 """
 Represents an object
@@ -12,12 +15,33 @@ class Object():
 		self.manifest = manifest
 		self.identifier = identifier
 		self.definition = manifest.getData().get("objects", {}).get(identifier, {})
+		self.deps = {
+			"interface": set([self.getInterfaceName()]),
+			"object": {}
+		}
+
+		# Process the definitions
+		def visit(value):
+			if ValidatorReference.isMatch(value):
+				valueStr = value.getRepr()
+				# If this represents an object
+				if ValidatorObject.isMatch(valueStr):
+					result = ValidatorObject.parse(valueStr)
+					self.deps["interface"].add(result["interface"])
+					self.deps["object"][result["interface"]] = self.deps["object"].get(result["interface"], set())
+					self.deps["object"][result["interface"]].add(result["name"])
+					value.setReprCallback(self.manifest, lambda renderer : renderer.get("object", "").format(interface = result["interface"], name = result["name"]))
+				# If this represents an interface
+				elif ValidatorInterface.isMatch(valueStr):
+					self.deps["interface"].add(valueStr)
+		self._walk(self.definition, visit)
 
 	"""
 	Return the interface of the object
 	"""
 	def getInterface(self):
-		return self.manifest.getInterface(self.getInterfaceName())
+		name = self.getInterfaceName()
+		return self.manifest.getInterface(name) if self.manifest.isInterface(name) else EmptyInterface(name)
 
 	"""
 	Return the interface of the object
@@ -39,22 +63,16 @@ class Object():
 				callback(value)
 
 	"""
-	Get all dependencies associated with this object
+	Get all dependent interfaces
 	"""
-	def getDependencies(self):
+	def getDependentInterfaces(self):
+		return [self.manifest.getInterface(dependency) for dependency in self.deps["interface"] if self.manifest.isInterface(dependency)]
 
-		dependencies = set()
-
-		# Look for any references in the object data
-		def visit(value):
-			if ValidatorReference.isMatch(value) and self.manifest.isInterface(value):
-				dependencies.add(self.manifest.getInterface(value))
-		self._walk(self.definition, visit)
-
-		# Depend on the object interface itself
-		dependencies.add(self.getInterface())
-
-		return dependencies
+	"""
+	Get all dependent objects
+	"""
+	def getDependentObjects(self):
+		return self.deps["object"]
 
 	"""
 	Return the name of the object
