@@ -14,7 +14,7 @@ struct addRValueReferenceHelper
 template <typename T>
 struct addRValueReferenceHelper<T, true>
 {
-	typedef T &&type;
+	typedef T&& type;
 };
 
 template <typename T>

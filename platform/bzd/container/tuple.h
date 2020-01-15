@@ -45,20 +45,20 @@ constexpr NoType TupleChooseN()
 	return NoType{};
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > sizeof...(Ts))>::type * = nullptr>
-constexpr NoType TupleChooseN(T &&t, Ts &&... ts)
+template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > sizeof...(Ts))>::type* = nullptr>
+constexpr NoType TupleChooseN(T&& t, Ts&&... ts)
 {
 	return NoType{};
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<index == 0>::type * = nullptr>
-constexpr decltype(auto) TupleChooseN(T &&t, Ts &&... ts)
+template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<index == 0>::type* = nullptr>
+constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
 {
 	return bzd::forward<T>(t);
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > 0 && index <= sizeof...(Ts))>::type * = nullptr>
-constexpr decltype(auto) TupleChooseN(T &&t, Ts &&... ts)
+template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > 0 && index <= sizeof...(Ts))>::type* = nullptr>
+constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
 {
 	return TupleChooseN<index - 1>(bzd::forward<Ts>(ts)...);
 }
@@ -73,11 +73,11 @@ private:
 
 public:
 	constexpr TupleElem() noexcept = default;
-	constexpr TupleElem(const T &value) noexcept : elem_(value) {}
-	constexpr TupleElem(const NoType &) noexcept : elem_() {}
+	constexpr TupleElem(const T& value) noexcept : elem_(value) {}
+	constexpr TupleElem(const NoType&) noexcept : elem_() {}
 
-	constexpr T &get() noexcept { return elem_; }
-	constexpr const T &get() const noexcept { return elem_; }
+	constexpr T& get() noexcept { return elem_; }
+	constexpr const T& get() const noexcept { return elem_; }
 };
 
 // Tuple implementation
@@ -96,20 +96,20 @@ private:
 
 public:
 	template <class... Args>
-	constexpr TupleImpl(Args &&... args) noexcept : TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
+	constexpr TupleImpl(Args&&... args) noexcept : TupleElem<N, T>(TupleChooseN<N, Args...>(bzd::forward<Args>(args)...))...
 	{
 	}
 
 	// Access by index as template (type is automatically deducted)
 
 	template <SizeType M>
-	constexpr pick<M> &get() noexcept
+	constexpr pick<M>& get() noexcept
 	{
 		return elem<M>::get();
 	}
 
 	template <SizeType M>
-	constexpr const pick<M> &get() const noexcept
+	constexpr const pick<M>& get() const noexcept
 	{
 		return elem<M>::get();
 	}
@@ -123,7 +123,7 @@ public:
 	// Forward constructor as constexpr
 
 	template <class... Args>
-	constexpr Tuple(Args &&... args) noexcept : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>(bzd::forward<Args>(args)...)
+	constexpr Tuple(Args&&... args) noexcept : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>(bzd::forward<Args>(args)...)
 	{
 	}
 

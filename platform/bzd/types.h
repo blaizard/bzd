@@ -6,7 +6,7 @@ namespace bzd {
 /**
  * \brief Memory pointer type.
  */
-typedef void *PtrType;
+typedef void* PtrType;
 
 /**
  * \brief Integer type capable of holding a memory pointer

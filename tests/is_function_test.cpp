@@ -6,7 +6,7 @@ int f();
 
 struct A
 {
-	int fun() const &;
+	int fun() const&;
 };
 
 template <typename>

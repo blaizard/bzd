@@ -45,7 +45,6 @@
 |[`isDestructible< void volatile >`](isdestructible_void_volatile_/index.md)||
 |[`isFloatingPoint`](isfloatingpoint/index.md)||
 |[`isFunction`](isfunction/index.md)||
-|[`isFunction< Ret(Args...) & >`](isfunction_ret_args_/index.md)||
 |[`isFunction< Ret(Args...) && >`](isfunction_ret_args_/index.md)||
 |[`isFunction< Ret(Args...) const & >`](isfunction_ret_args_const_/index.md)||
 |[`isFunction< Ret(Args...) const && >`](isfunction_ret_args_const_/index.md)||
@@ -56,6 +55,7 @@
 |[`isFunction< Ret(Args...) volatile & >`](isfunction_ret_args_volatile_/index.md)||
 |[`isFunction< Ret(Args...) volatile && >`](isfunction_ret_args_volatile_/index.md)||
 |[`isFunction< Ret(Args...) volatile >`](isfunction_ret_args_volatile_/index.md)||
+|[`isFunction< Ret(Args...)& >`](isfunction_ret_args_/index.md)||
 |[`isFunction< Ret(Args...)>`](isfunction_ret_args_/index.md)||
 |[`isIntegral`](isintegral/index.md)||
 |[`isLValueReference`](islvaluereference/index.md)||
@@ -322,14 +322,6 @@
 |---:|:---|:---|
 |class|None||
 ------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
 ### `template<class Ret, class... Args> struct isFunction< Ret(Args...) && >`
 
 #### Template
@@ -403,6 +395,14 @@
 |class...|Args||
 ------
 ### `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile >`
+
+#### Template
+||||
+|---:|:---|:---|
+|class Ret|None||
+|class...|Args||
+------
+### `template<class Ret, class... Args> struct isFunction< Ret(Args...)& >`
 
 #### Template
 ||||

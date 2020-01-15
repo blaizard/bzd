@@ -12,19 +12,19 @@ class StringConstexpr
 {
 public:
 	using DataType = const char;
-	using ConstIterator = DataType *;
+	using ConstIterator = DataType*;
 
 	constexpr StringConstexpr() = default;
-	constexpr StringConstexpr(const char *str) : str_(str) {}
+	constexpr StringConstexpr(const char* str) : str_(str) {}
 
-	static constexpr const char *data() noexcept { return data_; }
-	constexpr const char *str() const noexcept { return str_; }
+	static constexpr const char* data() noexcept { return data_; }
+	constexpr const char* str() const noexcept { return str_; }
 
 	static constexpr SizeType size() noexcept { return sizeof...(C); }
 
 private:
 	static constexpr char const data_[sizeof...(C) + 1] = {C..., '\0'};
-	const char *str_;
+	const char* str_;
 };
 
 template <int N, int M>

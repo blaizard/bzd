@@ -10,8 +10,8 @@ struct addLValueReference
 };
 
 template <class T>
-struct addLValueReference<T &&>
+struct addLValueReference<T&&>
 {
-	typedef T &type;
+	typedef T& type;
 };
 }} // namespace bzd::typeTraits

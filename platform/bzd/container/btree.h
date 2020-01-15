@@ -25,13 +25,13 @@ class BTree
 protected:
 	struct Node
 	{
-		bzd::Vector<bzd::Tuple<K, Node *>, Order - 1> keys_;
-		Node *last_;
+		bzd::Vector<bzd::Tuple<K, Node*>, Order - 1> keys_;
+		Node* last_;
 		// bzd::Vector<Node*, Order> next_;
 	};
 
 public:
-	constexpr explicit BTree(const SizeType capacity, Node **root, bzd::interface::Pool<Node> &nodes) :
+	constexpr explicit BTree(const SizeType capacity, Node** root, bzd::interface::Pool<Node>& nodes) :
 		capacity_(capacity), root_(root), nodes_(nodes)
 	{
 	}
@@ -48,9 +48,9 @@ public:
 	 * median item to the parent node. If the parent node is full, split and
 	 * repeat...
 	 */
-	void insert(const K &key, const V & /*value*/)
+	void insert(const K& key, const V& /*value*/)
 	{
-		Node *node = *root_;
+		Node* node = *root_;
 
 		// If there is no node yet, create one
 		if (!*root_)
@@ -60,8 +60,8 @@ public:
 		}
 
 		// Look for the right node
-		Node *subNode = nullptr;
-		for (const auto &nodeKey : node->keys_)
+		Node* subNode = nullptr;
+		for (const auto& nodeKey : node->keys_)
 		{
 			if (key >= nodeKey.template get<0>())
 			{
@@ -83,8 +83,8 @@ public:
 
 protected:
 	const SizeType capacity_;
-	Node **root_;
-	bzd::interface::Pool<Node> &nodes_;
+	Node** root_;
+	bzd::interface::Pool<Node>& nodes_;
 };
 } // namespace impl
 
@@ -104,7 +104,7 @@ public:
 
 protected:
 	bzd::Pool<Node, 10> nodes_;
-	Node *root_ = nullptr;
+	Node* root_ = nullptr;
 	V data_[N];
 };
 } // namespace bzd

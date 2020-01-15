@@ -4,19 +4,19 @@ namespace bzd { namespace typeTraits {
 template <class T>
 struct addReference
 {
-	typedef T &type;
+	typedef T& type;
 };
 
 template <class T>
-struct addReference<T &>
+struct addReference<T&>
 {
-	typedef T &type;
+	typedef T& type;
 };
 
 template <class T>
-struct addReference<T &&>
+struct addReference<T&&>
 {
-	typedef T &&type;
+	typedef T&& type;
 };
 
 template <>

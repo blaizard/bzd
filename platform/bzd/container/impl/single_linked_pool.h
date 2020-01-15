@@ -42,7 +42,7 @@ public:
 	/**
 	 * Release an element from the pool
 	 */
-	constexpr void release(Element &element) noexcept
+	constexpr void release(Element& element) noexcept
 	{
 		const auto index = getIndex(element);
 		element.next_ = free_;
@@ -52,16 +52,16 @@ public:
 	/**
 	 * Reserve an element from the free list (if any)
 	 */
-	constexpr Element &reserve() noexcept
+	constexpr Element& reserve() noexcept
 	{
 		bzd::assert::isTrue(!empty());
 
-		Element &item = Parent::at(free_);
+		Element& item = Parent::at(free_);
 		free_ = item.next_;
 		return item;
 	}
 
-	constexpr CapacityType getIndex(const Element &element) const noexcept
+	constexpr CapacityType getIndex(const Element& element) const noexcept
 	{
 		bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&element) >= reinterpret_cast<bzd::IntPtrType>(Parent::data()));
 		bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&element) <
@@ -69,7 +69,7 @@ public:
 		return (&element - Parent::data());
 	}
 
-	void toStream(std::ostream &os)
+	void toStream(std::ostream& os)
 	{
 		os << "free=";
 		auto current = free_;

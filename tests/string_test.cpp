@@ -6,7 +6,7 @@ class A
 {
 public:
 	A() = default;
-	int &get() { return a; }
+	int& get() { return a; }
 
 private:
 	int a = 2;
@@ -21,7 +21,7 @@ public:
 TEST(ContainerString, Empty)
 {
 	bzd::String<10> test;
-	bzd::interface::String &iTest = test;
+	bzd::interface::String& iTest = test;
 
 	EXPECT_EQ(iTest.capacity(), 10);
 	EXPECT_EQ(iTest.size(), 0);
@@ -30,7 +30,7 @@ TEST(ContainerString, Empty)
 TEST(ContainerString, Base)
 {
 	bzd::String<10> test("Hello");
-	bzd::interface::String &iTest = test;
+	bzd::interface::String& iTest = test;
 
 	EXPECT_EQ(iTest.capacity(), 10);
 	EXPECT_EQ(iTest.size(), 5);

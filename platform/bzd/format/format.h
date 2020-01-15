@@ -28,34 +28,34 @@ public:
 	class Iterator
 	{
 	public:
-		constexpr Iterator(const SelfType &container, const SizeType index) : container_(&container), index_(index) {}
-		constexpr Iterator &operator++() noexcept
+		constexpr Iterator(const SelfType& container, const SizeType index) : container_(&container), index_(index) {}
+		constexpr Iterator& operator++() noexcept
 		{
 			++index_;
 			return *this;
 		}
-		constexpr bool operator==(const Iterator &it) const noexcept { return it.index_ == index_; }
-		constexpr bool operator!=(const Iterator &it) const noexcept { return !(it == *this); }
-		constexpr const DataType &operator*() const { return (*container_)[index_]; }
+		constexpr bool operator==(const Iterator& it) const noexcept { return it.index_ == index_; }
+		constexpr bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
+		constexpr const DataType& operator*() const { return (*container_)[index_]; }
 
 	private:
-		const SelfType *container_;
+		const SelfType* container_;
 		SizeType index_;
 	};
 
 public:
 	constexpr ConstexprVector() noexcept {}
 	template <class... Args>
-	constexpr ConstexprVector(Args &&... args) noexcept : data_{bzd::forward<Args>(args)...}
+	constexpr ConstexprVector(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...}
 	{
 	}
 	constexpr Iterator begin() const noexcept { return Iterator(*this, 0); }
 	constexpr Iterator end() const noexcept { return Iterator(*this, size()); }
 	constexpr SizeType size() const noexcept { return size_; }
 	constexpr SizeType capacity() const noexcept { return N; }
-	constexpr void push_back(const T &element) noexcept { data_[size_++] = element; }
-	constexpr DataType &operator[](const SizeType index) { return data_[index]; }
-	constexpr const DataType &operator[](const SizeType index) const { return data_[index]; }
+	constexpr void push_back(const T& element) noexcept { data_[size_++] = element; }
+	constexpr DataType& operator[](const SizeType index) { return data_[index]; }
+	constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
 
 private:
 	T data_[N] = {};
@@ -103,15 +103,15 @@ using Arg = bzd::VariantConstexpr<int,
 								  float,
 								  double,
 								  long double,
-								  const void *,
-								  const char *,
+								  const void*,
+								  const char*,
 								  bzd::StringView>;
 using ArgList = bzd::interface::Vector<Arg>;
 
 /**
  * Parse an unsigned integer
  */
-static constexpr bool parseUnsignedInteger(bzd::StringView &format, bzd::SizeType &integer)
+static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer)
 {
 	bool isDefined = false;
 	integer = 0;
@@ -128,7 +128,7 @@ static constexpr bool parseUnsignedInteger(bzd::StringView &format, bzd::SizeTyp
  * Return the positional index
  */
 template <class Ctx>
-constexpr bzd::SizeType parseIndex(Ctx &context, bzd::StringView &format, const bzd::SizeType autoIndex)
+constexpr bzd::SizeType parseIndex(Ctx& context, bzd::StringView& format, const bzd::SizeType autoIndex)
 {
 	bzd::SizeType index = 0;
 	const bool isDefined = parseUnsignedInteger(format, index);
@@ -146,7 +146,7 @@ constexpr bzd::SizeType parseIndex(Ctx &context, bzd::StringView &format, const 
 // Sign
 
 template <class Ctx>
-constexpr void parseSign(Ctx &context, bzd::StringView &format, Metadata &metadata)
+constexpr void parseSign(Ctx& context, bzd::StringView& format, Metadata& metadata)
 {
 	switch (format.front())
 	{
@@ -182,7 +182,7 @@ constexpr void parseSign(Ctx &context, bzd::StringView &format, Metadata &metada
  * %	Percentage. Multiples by 100 and puts % at the end.
  */
 template <class Ctx>
-constexpr Metadata parseMetadata(Ctx &context, bzd::StringView &format, const bzd::SizeType current)
+constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bzd::SizeType current)
 {
 	const auto endIndex = format.find('}');
 	context.assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
@@ -265,7 +265,7 @@ constexpr Metadata parseMetadata(Ctx &context, bzd::StringView &format, const bz
  * or when a metadata has been identified.
  */
 template <class Ctx>
-constexpr bool parseStaticString(Ctx &context, bzd::StringView &format)
+constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 {
 	SizeType offset = 0;
 	while (offset < format.size())
@@ -302,7 +302,7 @@ constexpr bool parseStaticString(Ctx &context, bzd::StringView &format)
 }
 
 template <class Ctx, class T>
-constexpr void parse(Ctx &context, bzd::StringView format, const T &args)
+constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
 {
 	bzd::SizeType autoIndex = 0;
 	do
@@ -330,7 +330,7 @@ class Context : public T
 {
 public:
 	using T::T;
-	constexpr inline void assertTrue(const bool condition, const bzd::StringView &message) const
+	constexpr inline void assertTrue(const bool condition, const bzd::StringView& message) const
 	{
 		if (!condition)
 		{
@@ -343,13 +343,13 @@ class CheckContext : public ConstexprVector<Metadata, 128>
 {
 public:
 	constexpr CheckContext() = default;
-	constexpr void addSubstring(const bzd::StringView &) {}
-	constexpr void addMetadata(const Metadata &metadata) { push_back(metadata); }
-	void onError(const bzd::StringView &message) const;
+	constexpr void addSubstring(const bzd::StringView&) {}
+	constexpr void addMetadata(const Metadata& metadata) { push_back(metadata); }
+	void onError(const bzd::StringView& message) const;
 };
 
 template <class T>
-void printInteger(bzd::OStream &stream, const T &value, const Metadata &metadata)
+void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -393,7 +393,7 @@ void printInteger(bzd::OStream &stream, const T &value, const Metadata &metadata
 }
 
 template <class T>
-void printFixedPoint(bzd::OStream &stream, const T &value, const Metadata &metadata)
+void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -417,7 +417,7 @@ void printFixedPoint(bzd::OStream &stream, const T &value, const Metadata &metad
 	}
 }
 
-static void printString(bzd::OStream &stream, const bzd::StringView stringView, const Metadata &metadata)
+static void printString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -439,11 +439,11 @@ static void printString(bzd::OStream &stream, const bzd::StringView stringView, 
 class PrintContext
 {
 public:
-	constexpr PrintContext(bzd::OStream &stream, const bzd::interface::Vector<bzd::format::impl::Arg> &args) : stream_(stream), args_(args)
+	constexpr PrintContext(bzd::OStream& stream, const bzd::interface::Vector<bzd::format::impl::Arg>& args) : stream_(stream), args_(args)
 	{
 	}
-	void addSubstring(const bzd::StringView &str) { stream_.write(str); }
-	void addMetadata(const Metadata &metadata)
+	void addSubstring(const bzd::StringView& str) { stream_.write(str); }
+	void addMetadata(const Metadata& metadata)
 	{
 		args_[metadata.index].match(
 			[&](const int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
@@ -457,26 +457,26 @@ public:
 			[&](const float value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
 			[&](const double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
 			[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
-			[&](const void *value) {},
-			[&](const char *value) { printString(stream_, value, metadata); },
-			[&](const bzd::StringView &value) { printString(stream_, value, metadata); });
+			[&](const void* value) {},
+			[&](const char* value) { printString(stream_, value, metadata); },
+			[&](const bzd::StringView& value) { printString(stream_, value, metadata); });
 	}
-	void onError(const bzd::StringView &message) const {}
+	void onError(const bzd::StringView& message) const {}
 
 private:
-	bzd::OStream &stream_;
-	const bzd::interface::Vector<bzd::format::impl::Arg> &args_;
+	bzd::OStream& stream_;
+	const bzd::interface::Vector<bzd::format::impl::Arg>& args_;
 };
 
 template <class T>
-constexpr Context<CheckContext> contextBuild(const bzd::StringView &format, const T &tuple)
+constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, const T& tuple)
 {
 	Context<CheckContext> ctx;
 	parse(ctx, format, tuple);
 	return ctx;
 }
 
-static void print(bzd::OStream &stream, const bzd::StringView &format, const bzd::interface::Vector<bzd::format::impl::Arg> &args)
+static void print(bzd::OStream& stream, const bzd::StringView& format, const bzd::interface::Vector<bzd::format::impl::Arg>& args)
 {
 	Context<PrintContext> ctx(stream, args);
 	parse(ctx, format, args);
@@ -488,14 +488,14 @@ static void print(bzd::OStream &stream, const bzd::StringView &format, const bzd
  * Check the format context with the argument type, this to ensure type safety.
  * This function should only be used at compile time.
  */
-template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N > 0), void>::type * = nullptr>
-constexpr bool contextCheck(const Ctx &context, const T &tuple)
+template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N > 0), void>::type* = nullptr>
+constexpr bool contextCheck(const Ctx& context, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
 	context.assertTrue(bzd::typeTraits::isConstructible<bzd::format::impl::Arg, decltype(value)>::value, "Argument type is not supported");
 
 	bool usedAtLeastOnce = false;
-	for (const auto &metadata : context)
+	for (const auto& metadata : context)
 	{
 		if (metadata.index == N - 1)
 		{
@@ -525,8 +525,8 @@ constexpr bool contextCheck(const Ctx &context, const T &tuple)
 	return contextCheck<N - 1>(context, tuple);
 }
 
-template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N == 0), void>::type * = nullptr>
-constexpr bool contextCheck(const Ctx &, const T &)
+template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N == 0), void>::type* = nullptr>
+constexpr bool contextCheck(const Ctx&, const T&)
 {
 	return true;
 }
@@ -560,7 +560,7 @@ constexpr bool contextCheck(const Ctx &, const T &)
  * \param args Arguments to be passed for the format.
  */
 template <class... Args>
-constexpr void toString(bzd::OStream &out, const bzd::StringView &str, Args &&... args)
+constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
 	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
@@ -568,7 +568,7 @@ constexpr void toString(bzd::OStream &out, const bzd::StringView &str, Args &&..
 }
 
 template <char... C, class... Args>
-constexpr void toString(bzd::OStream &out, const bzd::StringConstexpr<C...> &str, Args &&... args)
+constexpr void toString(bzd::OStream& out, const bzd::StringConstexpr<C...>& str, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;

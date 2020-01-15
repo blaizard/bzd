@@ -4,7 +4,7 @@
 
 namespace bzd {
 template <class T>
-constexpr void swap(T &t1, T &t2)
+constexpr void swap(T& t1, T& t2)
 {
 	T temp{bzd::move(t1)};
 	t1 = bzd::move(t2);

@@ -8,8 +8,8 @@
 class ContextTest
 {
 public:
-	void addSubstring(const bzd::StringView &str) { substrings_.pushBack(str); }
-	void onError(const bzd::StringView &message) const { throw std::runtime_error(message.data()); }
+	void addSubstring(const bzd::StringView& str) { substrings_.pushBack(str); }
+	void onError(const bzd::StringView& message) const { throw std::runtime_error(message.data()); }
 
 	bzd::Vector<bzd::String<100>, 10> substrings_;
 };

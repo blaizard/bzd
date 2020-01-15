@@ -46,7 +46,7 @@ TEST(ContainerSpan, Iterator)
 		EXPECT_EQ(++it, span.end());
 	}
 
-	for (auto &c : span)
+	for (auto& c : span)
 	{
 		c = 'A';
 	}

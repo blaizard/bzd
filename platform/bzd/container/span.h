@@ -31,20 +31,20 @@ public:
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
 public:
-	constexpr Span(DataType *const data, const SizeType size) noexcept : data_(data), size_(size) {}
+	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type * = nullptr>
-	constexpr Span(const Span<typename bzd::typeTraits::removeConst<DataType>::type> &span) noexcept : data_(span.data_), size_(span.size_)
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type* = nullptr>
+	constexpr Span(const Span<typename bzd::typeTraits::removeConst<DataType>::type>& span) noexcept : data_(span.data_), size_(span.size_)
 	{
 	}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
 	constexpr Iterator begin() noexcept
 	{
 		return Iterator(data_, 0);
 	}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
 	constexpr Iterator end() noexcept
 	{
 		return Iterator(data_, size());
@@ -71,7 +71,7 @@ public:
 
 	// Equality operator
 
-	constexpr bool operator==(const SelfType &rhs) const
+	constexpr bool operator==(const SelfType& rhs) const
 	{
 		if (size() != rhs.size())
 		{
@@ -91,53 +91,53 @@ public:
 
 	// Inequality operator
 
-	constexpr bool operator!=(const SelfType &rhs) const { return !(*this == rhs); }
+	constexpr bool operator!=(const SelfType& rhs) const { return !(*this == rhs); }
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
-	constexpr DataType &operator[](const SizeType index)
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	constexpr DataType& operator[](const SizeType index)
 	{
 		return data_[index];
 	}
 
-	constexpr const DataType &operator[](const SizeType index) const { return data_[index]; }
+	constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
 
 	// at
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
-	constexpr DataType &at(const SizeType index)
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	constexpr DataType& at(const SizeType index)
 	{
 		return data_[index];
 	}
 
-	constexpr const T &at(const SizeType index) const { return data_[index]; }
+	constexpr const T& at(const SizeType index) const { return data_[index]; }
 
 	// front
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
-	constexpr DataType &front() noexcept
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	constexpr DataType& front() noexcept
 	{
 		return data_[0];
 	}
-	constexpr const DataType &front() const noexcept { return data_[0]; }
+	constexpr const DataType& front() const noexcept { return data_[0]; }
 
 	// back
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
-	constexpr DataType &back() noexcept
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	constexpr DataType& back() noexcept
 	{
 		return data_[size_ - 1];
 	}
-	constexpr const DataType &back() const noexcept { return data_[size_ - 1]; }
+	constexpr const DataType& back() const noexcept { return data_[size_ - 1]; }
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type * = nullptr>
-	constexpr DataType *data() noexcept
+	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	constexpr DataType* data() noexcept
 	{
 		return data_;
 	}
 
-	constexpr const DataType *data() const noexcept { return data_; }
+	constexpr const DataType* data() const noexcept { return data_; }
 
-	constexpr SizeType find(const DataType &item, const SizeType start = 0) const noexcept
+	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
 	{
 		for (SizeType i = start; i < size_; ++i)
 		{
@@ -155,7 +155,7 @@ protected:
 	template <class Q>
 	friend class Span;
 
-	T *data_ = nullptr;
+	T* data_ = nullptr;
 	SizeType size_ = 0;
 };
 } // namespace bzd

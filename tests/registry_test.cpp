@@ -32,6 +32,24 @@ TEST(Registry, Inheritance)
 	EXPECT_EQ(bzd::Registry<Foo>::get("hello").a, 12);
 }
 
+TEST(Registry, PureVirtual)
+{
+	struct PureVirtualBase
+	{
+		virtual int print() = 0;
+	};
+
+	struct PureVirtualSpecialization : PureVirtualBase
+	{
+		int print() override { return 42; };
+	};
+
+	bzd::declare::Registry<PureVirtualBase, 1> reg_;
+	bzd::Registry<PureVirtualBase, PureVirtualSpecialization> hello("hello");
+
+	EXPECT_EQ(bzd::Registry<PureVirtualBase>::get("hello").print(), 12);
+}
+
 TEST(Registry, Overflow)
 {
 	bzd::declare::Registry<float, 1> reg_;

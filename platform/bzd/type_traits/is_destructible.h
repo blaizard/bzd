@@ -9,7 +9,7 @@ namespace bzd { namespace typeTraits {
 namespace impl {
 struct isDestructible
 {
-	template <class T, class = decltype(bzd::typeTraits::declval<T &>().~T())>
+	template <class T, class = decltype(bzd::typeTraits::declval<T&>().~T())>
 	static char test(int);
 	template <class>
 	static long int test(...);
@@ -38,11 +38,11 @@ struct isDestructible<void const volatile> : public falseType
 {
 };
 template <class T>
-struct isDestructible<T &> : public isDestructible<T>
+struct isDestructible<T&> : public isDestructible<T>
 {
 };
 template <class T>
-struct isDestructible<T &&> : public isDestructible<T>
+struct isDestructible<T&&> : public isDestructible<T>
 {
 };
 template <class T, unsigned long int N>

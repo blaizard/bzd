@@ -9,11 +9,11 @@ TEST(TypeTraits, isReference)
 		EXPECT_EQ(result, false);
 	}
 	{
-		auto result = bzd::typeTraits::isReference<int &>::value;
+		auto result = bzd::typeTraits::isReference<int&>::value;
 		EXPECT_EQ(result, true);
 	}
 	{
-		auto result = bzd::typeTraits::isReference<int &&>::value;
+		auto result = bzd::typeTraits::isReference<int&&>::value;
 		EXPECT_EQ(result, true);
 	}
 }

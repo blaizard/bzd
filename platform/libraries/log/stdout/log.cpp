@@ -6,7 +6,7 @@ namespace {
 class StdoutStream : public bzd::OStream
 {
 public:
-	bzd::SizeType write(const bzd::Span<const char> &data) noexcept override
+	bzd::SizeType write(const bzd::Span<const char>& data) noexcept override
 	{
 		std::cout.write(data.data(), data.size());
 		return data.size();
@@ -14,7 +14,7 @@ public:
 };
 } // namespace
 
-bzd::OStream &bzd::getOut()
+bzd::OStream& bzd::getOut()
 {
 	static StdoutStream stdout;
 	return stdout;
