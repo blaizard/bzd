@@ -18,6 +18,7 @@ build -c opt
 test --test_output=errors
 test --action_env="GTEST_COLOR=1"
 test --verbose_failures
+test --define=panic=throw
 
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
