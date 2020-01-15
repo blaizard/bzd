@@ -9,7 +9,7 @@ TEST(TypeTraits, isIntegral)
 		EXPECT_TRUE(result);
 	}
 	{
-		const bool result = bzd::typeTraits::isIntegral<char *>::value;
+		const bool result = bzd::typeTraits::isIntegral<char*>::value;
 		EXPECT_FALSE(result);
 	}
 }

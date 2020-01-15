@@ -10,7 +10,7 @@ struct isLValueReference : public falseType
 };
 
 template <class T>
-struct isLValueReference<T &> : public trueType
+struct isLValueReference<T&> : public trueType
 {
 };
 }} // namespace bzd::typeTraits

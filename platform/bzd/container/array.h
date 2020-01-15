@@ -17,7 +17,7 @@ class Array : public Span<T>
 {
 public:
 	template <class... Args>
-	constexpr explicit Array(Args &&... args) noexcept : Span<T>(data_, N), data_{args...}
+	constexpr explicit Array(Args&&... args) noexcept : Span<T>(data_, N), data_{args...}
 	{
 	}
 

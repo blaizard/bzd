@@ -18,22 +18,22 @@ TEST(Utility, decay)
 	}
 
 	{
-		const auto ret = decayEquiv<int &, int>::value;
+		const auto ret = decayEquiv<int&, int>::value;
 		EXPECT_TRUE(ret);
 	}
 
 	{
-		const auto ret = decayEquiv<int &&, int>::value;
+		const auto ret = decayEquiv<int&&, int>::value;
 		EXPECT_TRUE(ret);
 	}
 
 	{
-		const auto ret = decayEquiv<const int &, int>::value;
+		const auto ret = decayEquiv<const int&, int>::value;
 		EXPECT_TRUE(ret);
 	}
 
 	{
-		const auto ret = decayEquiv<int[2], int *>::value;
+		const auto ret = decayEquiv<int[2], int*>::value;
 		EXPECT_TRUE(ret);
 	}
 

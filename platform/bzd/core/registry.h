@@ -13,18 +13,18 @@ class Registry
 {
 public:
 	using KeyType = bzd::StringView;
-	using MapType = bzd::interface::Map<KeyType, T *>;
+	using MapType = bzd::interface::Map<KeyType, T*>;
 
 protected:
-	constexpr Registry(MapType &registry) { get(&registry); }
+	constexpr Registry(MapType& registry) { get(&registry); }
 
 public:
-	static constexpr MapType &get() { return get(nullptr); }
+	static constexpr MapType& get() { return get(nullptr); }
 
 private:
-	static MapType &get(MapType *registry)
+	static MapType& get(MapType* registry)
 	{
-		static MapType *instance = registry;
+		static MapType* instance = registry;
 		bzd::assert::isTrue(instance != nullptr, "Registry was not initialized");
 		return *instance;
 	}
@@ -50,7 +50,7 @@ public:
 	constexpr Registry() : interface::Registry<T>(registry_) {}
 
 protected:
-	bzd::Map<KeyType, T *, Capacity> registry_;
+	bzd::Map<KeyType, T*, Capacity> registry_;
 };
 } // namespace declare
 
@@ -79,15 +79,15 @@ protected:
 
 public:
 	template <class... Args>
-	constexpr Registry(const KeyType &str, Args &&... args) : object_{bzd::forward<Args>(args)...}
+	constexpr Registry(const KeyType& str, Args&&... args) : object_{bzd::forward<Args>(args)...}
 	{
-		interface::Registry<Interface>::get().insert(str, static_cast<Interface *>(&object_));
+		interface::Registry<Interface>::get().insert(str, static_cast<Interface*>(&object_));
 	}
 
 	/**
 	 * \brief Registry accessor.
 	 */
-	static constexpr Interface &get(const KeyType &key) { return *interface::Registry<Interface>::get()[key]; }
+	static constexpr Interface& get(const KeyType& key) { return *interface::Registry<Interface>::get()[key]; }
 
 private:
 	T object_;

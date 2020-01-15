@@ -19,7 +19,7 @@ struct isTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, 
 };
 #elif __has_feature(has_trivial_destructor) || defined(__GNUC__)
 template <class T>
-struct isTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, isDestructible<T>::value &&__has_trivial_destructor(T)>
+struct isTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, isDestructible<T>::value&& __has_trivial_destructor(T)>
 {
 };
 #else

@@ -19,7 +19,7 @@ protected:
 
 public:
 	template <class... Args>
-	constexpr explicit Vector(const SizeType capacity, Args &&... args) : Impl(args...), capacity_(capacity)
+	constexpr explicit Vector(const SizeType capacity, Args&&... args) : Impl(args...), capacity_(capacity)
 	{
 	}
 
@@ -31,7 +31,7 @@ public:
 	 *
 	 * \param value Value to be copied (or moved) to the new element.
 	 */
-	constexpr void pushBack(T &&value)
+	constexpr void pushBack(T&& value)
 	{
 		bzd::assert::isTrue(size_ < capacity_, "Out of bound");
 		Parent::at(size_) = bzd::forward<T>(value);
@@ -72,7 +72,7 @@ class Vector : public interface::Vector<T>
 {
 public:
 	template <class... Args>
-	constexpr explicit Vector(Args &&... args) : interface::Vector<T>(N, data_, sizeof...(Args)), data_{bzd::forward<Args>(args)...}
+	constexpr explicit Vector(Args&&... args) : interface::Vector<T>(N, data_, sizeof...(Args)), data_{bzd::forward<Args>(args)...}
 	{
 	}
 

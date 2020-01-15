@@ -32,7 +32,7 @@ protected:
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
 	struct HelperT
 	{
-		static auto call(const SizeType index, Args &&... args)
+		static auto call(const SizeType index, Args&&... args)
 		{
 			using T = ChooseNth<N>;
 			if (index == N)
@@ -46,7 +46,7 @@ protected:
 	template <SizeType N, template <class> class F, class... Args>
 	struct HelperT<N, N, F, Args...>
 	{
-		static auto call(const SizeType index, Args &&... args)
+		static auto call(const SizeType index, Args&&... args)
 		{
 			using T = ChooseNth<N>;
 			bzd::assert::isTrue(index == N, "Inconsistent variant state, should never happen");
@@ -66,7 +66,7 @@ protected:
 		: F0
 		, Overload<Frest...>
 	{
-		Overload(F0 &&f0, Frest &&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
+		Overload(F0&& f0, Frest&&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
 		using F0::operator();
 		using Overload<Frest...>::operator();
 	};
@@ -74,7 +74,7 @@ protected:
 	template <class F0>
 	struct Overload<F0> : F0
 	{
-		Overload(F0 &&f0) : F0{bzd::forward<F0>(f0)} {}
+		Overload(F0&& f0) : F0{bzd::forward<F0>(f0)} {}
 		using F0::operator();
 	};
 
@@ -83,13 +83,13 @@ protected:
 	struct VariantMatch
 	{
 		template <class V>
-		static void call(const Self &self, const V &visitor)
+		static void call(const Self& self, const V& visitor)
 		{
 			visitor(self.data_.template get<T>());
 		}
 	};
 	template <class V>
-	using Match = Helper<VariantMatch, const Self &, V &>;
+	using Match = Helper<VariantMatch, const Self&, V&>;
 
 public:
 	/**
@@ -100,8 +100,8 @@ public:
 	/**
 	 * Value constructor
 	 */
-	template <class T, typename bzd::typeTraits::enableIf<Contains<T>::value>::type * = nullptr>
-	constexpr Variant(T &&value) : id_(Find<T>::value), data_(bzd::forward<T>(value))
+	template <class T, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	constexpr Variant(T&& value) : id_(Find<T>::value), data_(bzd::forward<T>(value))
 	{
 	}
 
@@ -112,7 +112,7 @@ public:
 	}
 
 	template <class T>
-	constexpr bzd::Expected<const T &, bool> get() const
+	constexpr bzd::Expected<const T&, bool> get() const
 	{
 		if (is<T>())
 		{
@@ -122,7 +122,7 @@ public:
 	}
 
 	template <class T>
-	constexpr bzd::Expected<T &, bool> get()
+	constexpr bzd::Expected<T&, bool> get()
 	{
 		if (is<T>())
 		{
@@ -132,7 +132,7 @@ public:
 	}
 
 	template <class... Functors>
-	constexpr void match(Functors &&... funcs) const
+	constexpr void match(Functors&&... funcs) const
 	{
 		const Overload<typename bzd::typeTraits::removeReference<Functors>::type...> visitor{bzd::forward<Functors>(funcs)...};
 		Match<decltype(visitor)>::call(id_, *this, visitor);
@@ -154,7 +154,7 @@ protected:
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr VariantConstexpr(Args &&... args) : Parent::Variant(bzd::forward<Args>(args)...)
+	constexpr VariantConstexpr(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...)
 	{
 	}
 };
@@ -188,13 +188,13 @@ protected:
 	template <class T>
 	struct VariantDestructor
 	{
-		static void call(Self *self) { self->data_.template get<T>().~T(); }
+		static void call(Self* self) { self->data_.template get<T>().~T(); }
 	};
-	using Destructor = Helper<VariantDestructor, Self *>;
+	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type * = nullptr>
-	constexpr void construct(Args &&... args)
+	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	constexpr void construct(Args&&... args)
 	{
 		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
 		// Using inplace operator new
@@ -214,12 +214,12 @@ private:
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr Variant(Args &&... args) : Parent::Variant(bzd::forward<Args>(args)...)
+	constexpr Variant(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...)
 	{
 	}
 
-	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type * = nullptr>
-	constexpr void emplace(Args &&... args)
+	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	constexpr void emplace(Args&&... args)
 	{
 		destructIfNeeded();
 		construct<T>(bzd::forward<Args>(args)...);

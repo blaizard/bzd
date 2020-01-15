@@ -22,31 +22,31 @@ public:
 
 	constexpr bool empty() const noexcept { return (first_ == PoolType::npos); }
 
-	constexpr T &front() noexcept
+	constexpr T& front() noexcept
 	{
 		bzd::assert::isTrue(!empty());
 		return pool_[first_].container_;
 	}
-	constexpr const T &front() const noexcept
+	constexpr const T& front() const noexcept
 	{
 		bzd::assert::isTrue(!empty());
 		return pool_[first_].container_;
 	}
 
-	constexpr T &back() noexcept
+	constexpr T& back() noexcept
 	{
 		bzd::assert::isTrue(!empty());
 		return pool_[last_].container_;
 	}
-	constexpr const T &back() const noexcept
+	constexpr const T& back() const noexcept
 	{
 		bzd::assert::isTrue(!empty());
 		return pool_[last_].container_;
 	}
 
-	constexpr void push(T &&value) noexcept
+	constexpr void push(T&& value) noexcept
 	{
-		auto &item = pool_.reserve();
+		auto& item = pool_.reserve();
 		const auto index = pool_.getIndex(item);
 		if (first_ == PoolType::npos)
 		{
@@ -66,7 +66,7 @@ public:
 	{
 		bzd::assert::isTrue(!empty());
 
-		auto &item = pool_[first_];
+		auto& item = pool_[first_];
 		first_ = (first_ == last_) ? PoolType::npos : item.next_;
 		pool_.release(item);
 	}

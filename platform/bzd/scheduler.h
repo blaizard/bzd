@@ -12,7 +12,7 @@ public:
 	/**
 	 * Add a new task to the scheduler
 	 */
-	void addTask(bzd::interface::Task &task)
+	void addTask(bzd::interface::Task& task)
 	{
 		// Only add bounded tasks if (task.isBind())
 		queue_.push(&task);
@@ -28,7 +28,7 @@ public:
 	void yield()
 	{
 		// Push back the current task
-		auto *previousTask = task_;
+		auto* previousTask = task_;
 		queue_.push(bzd::move(task_));
 		task_ = queue_.front();
 		queue_.pop();
@@ -36,9 +36,9 @@ public:
 	}
 
 private:
-	bzd::Queue<bzd::interface::Task *, 10> queue_;
-	bzd::interface::Task *task_;
-	void *mainStack_ = nullptr;
+	bzd::Queue<bzd::interface::Task*, 10> queue_;
+	bzd::interface::Task* task_;
+	void* mainStack_ = nullptr;
 };
 
 void yield();

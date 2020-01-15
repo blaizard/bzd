@@ -22,12 +22,12 @@ public:
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
 public:
-	constexpr explicit Map(bzd::interface::Vector<Element> &data) noexcept : data_(data) {}
+	constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept : data_(data) {}
 
 	/**
 	 * Search for a specific element in the map.
 	 */
-	constexpr bzd::Optional<Iterator> find(const K &key) const
+	constexpr bzd::Optional<Iterator> find(const K& key) const
 	{
 		for (auto it = data_.begin(); it != data_.end(); ++it)
 		{
@@ -39,7 +39,7 @@ public:
 		return {};
 	}
 
-	constexpr V &operator[](const K &key) const
+	constexpr V& operator[](const K& key) const
 	{
 		auto result = find(key);
 		bzd::assert::isTrue(result, "Key does not exists");
@@ -49,7 +49,7 @@ public:
 	/**
 	 * Insert a new element or replace the existing one
 	 */
-	constexpr void insert(const K &key, V &&value)
+	constexpr void insert(const K& key, V&& value)
 	{
 		auto result = find(key);
 		if (result)
@@ -62,10 +62,10 @@ public:
 		}
 	}
 
-	constexpr void insert(const Iterator &it, V &&value) { it->second = bzd::forward<V>(value); }
+	constexpr void insert(const Iterator& it, V&& value) { it->second = bzd::forward<V>(value); }
 
 protected:
-	bzd::interface::Vector<Element> &data_;
+	bzd::interface::Vector<Element>& data_;
 };
 } // namespace impl
 

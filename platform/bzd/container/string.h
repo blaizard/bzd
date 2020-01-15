@@ -21,14 +21,14 @@ protected:
 
 public:
 	template <class... Args>
-	constexpr explicit String(const SizeType capacity, Args &&... args) : Impl(args...), capacity_(capacity)
+	constexpr explicit String(const SizeType capacity, Args&&... args) : Impl(args...), capacity_(capacity)
 	{
 	}
 
 	// Converter
-	constexpr SizeType append(const StringView &str) noexcept { return append(str.data(), str.size()); }
+	constexpr SizeType append(const StringView& str) noexcept { return append(str.data(), str.size()); }
 	constexpr SizeType append(const T c) noexcept { return append(&c, 1); }
-	constexpr SizeType append(const T *data, const SizeType n) noexcept
+	constexpr SizeType append(const T* data, const SizeType n) noexcept
 	{
 		// Handles overflows
 		const SizeType sizeLeft = capacity_ - size_ - 1;
@@ -56,7 +56,7 @@ public:
 	}
 
 	template <class U>
-	constexpr SizeType assign(const U &data) noexcept
+	constexpr SizeType assign(const U& data) noexcept
 	{
 		clear();
 		return append(data);
@@ -73,14 +73,14 @@ public:
 	}
 
 	template <class U>
-	constexpr String<T, Impl> &operator+=(const U &data) noexcept
+	constexpr String<T, Impl>& operator+=(const U& data) noexcept
 	{
 		append(data);
 		return *this;
 	}
 
 	template <class U>
-	constexpr String<T, Impl> &operator=(const U &data) noexcept
+	constexpr String<T, Impl>& operator=(const U& data) noexcept
 	{
 		assign(data);
 		return *this;
@@ -100,18 +100,18 @@ class String : public interface::String
 {
 public:
 	constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
-	constexpr String(const bzd::StringView &str) : String() { append(str); }
+	constexpr String(const bzd::StringView& str) : String() { append(str); }
 	constexpr String(const SizeType n, const char c) : String() { append(n, c); }
 
 	template <class T>
-	constexpr String<N> &operator=(const T &data) noexcept
+	constexpr String<N>& operator=(const T& data) noexcept
 	{
 		assign(data);
 		return *this;
 	}
 
 	// Copy assignment, has to be non-templated
-	constexpr String<N> &operator=(const String<N> &data) noexcept
+	constexpr String<N>& operator=(const String<N>& data) noexcept
 	{
 		assign(data);
 		return *this;

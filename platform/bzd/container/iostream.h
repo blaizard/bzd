@@ -12,7 +12,7 @@ protected:
 	OStream() = default;
 
 public:
-	virtual SizeType write(const Span<const T> &data) noexcept = 0;
+	virtual SizeType write(const Span<const T>& data) noexcept = 0;
 };
 
 template <class T>
@@ -22,7 +22,7 @@ protected:
 	IStream() = default;
 
 public:
-	virtual SizeType read(Span<T> &data) noexcept = 0;
+	virtual SizeType read(Span<T>& data) noexcept = 0;
 };
 
 template <class T>

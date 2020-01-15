@@ -17,7 +17,7 @@ TEST(ContainerExpected, returnVoid)
 TEST(ContainerExpected, returnReference)
 {
 	int data = 0;
-	auto fct = [&](const bool makeError) -> bzd::Expected<int &, std::string> {
+	auto fct = [&](const bool makeError) -> bzd::Expected<int&, std::string> {
 		if (makeError) return bzd::makeUnexpected("KO");
 		data = 42;
 		return data;
@@ -31,7 +31,7 @@ TEST(ContainerExpected, returnReference)
 TEST(ContainerExpected, returnPointer)
 {
 	int data = 0;
-	auto fct = [&](const bool makeError) -> bzd::Expected<int *, std::string> {
+	auto fct = [&](const bool makeError) -> bzd::Expected<int*, std::string> {
 		if (makeError) return bzd::makeUnexpected("KO");
 		data = 42;
 		return &data;

@@ -13,7 +13,7 @@ protected:
 	using Impl::size_;
 
 	// This function is not constepr, hence need to re-implement it
-	constexpr SizeType strlen(const T *const str) noexcept
+	constexpr SizeType strlen(const T* const str) noexcept
 	{
 		SizeType length = 0;
 		while (str[length] != '\0')
@@ -25,9 +25,9 @@ protected:
 
 public:
 	constexpr StringView() : Impl(nullptr, 0) {}
-	constexpr StringView(const T *const str) : Impl(str, strlen(str)) {}
-	constexpr StringView(const T *const str, const SizeType size) : Impl(str, size) {}
-	constexpr StringView(const Span<char> &span) : Impl(span.data(), span.size()) {}
+	constexpr StringView(const T* const str) : Impl(str, strlen(str)) {}
+	constexpr StringView(const T* const str, const SizeType size) : Impl(str, size) {}
+	constexpr StringView(const Span<char>& span) : Impl(span.data(), span.size()) {}
 
 	constexpr StringView subStr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 	{

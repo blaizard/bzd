@@ -19,16 +19,16 @@ public:
 	/**
 	 * Release an element from the pool
 	 */
-	constexpr void release(T &container) noexcept
+	constexpr void release(T& container) noexcept
 	{
-		auto *item = containerOf(&container, &Element::container_);
+		auto* item = containerOf(&container, &Element::container_);
 		SingleLinkedPool<T, CapacityType>::release(*item);
 	}
 
 	/**
 	 * Reserve an element from the free list (if any)
 	 */
-	constexpr T &reserve() noexcept { return SingleLinkedPool<T, CapacityType>::reserve().container_; }
+	constexpr T& reserve() noexcept { return SingleLinkedPool<T, CapacityType>::reserve().container_; }
 };
 } // namespace impl
 

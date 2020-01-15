@@ -13,7 +13,7 @@ constexpr void isTrue(const bool condition)
 	}
 }
 
-constexpr void isTrue(const bool condition, const bzd::StringView &message)
+constexpr void isTrue(const bool condition, const bzd::StringView& message)
 {
 	if (!condition)
 	{

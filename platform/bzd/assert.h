@@ -6,7 +6,7 @@
 
 namespace bzd { namespace assert {
 template <class... Args>
-constexpr void isTrue(const bool condition, Args &&... args)
+constexpr void isTrue(const bool condition, Args&&... args)
 {
 	if (!condition)
 	{

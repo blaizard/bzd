@@ -22,7 +22,7 @@ TEST(ContainerVariant, Destructor)
 	{
 	public:
 		TypeA() { ++constructorA; }
-		TypeA(const TypeA &) { ++constructorA; }
+		TypeA(const TypeA&) { ++constructorA; }
 		~TypeA() { ++destructorA; }
 	};
 
@@ -30,7 +30,7 @@ TEST(ContainerVariant, Destructor)
 	{
 	public:
 		TypeB() { ++constructorB; }
-		TypeB(const TypeB &) { ++constructorB; }
+		TypeB(const TypeB&) { ++constructorB; }
 		~TypeB() { ++destructorB; }
 	};
 
@@ -104,7 +104,7 @@ TEST(ContainerVariant, Match)
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<int>(5));
 		bool isHandled = false;
-		variant.match([&](auto &&) { isHandled = true; });
+		variant.match([&](auto&&) { isHandled = true; });
 		EXPECT_TRUE(isHandled);
 	}
 }

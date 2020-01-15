@@ -21,7 +21,7 @@ template <class E>
 class Unexpected
 {
 public:
-	constexpr Unexpected(const E &error) : error_(error) {}
+	constexpr Unexpected(const E& error) : error_(error) {}
 
 private:
 	template <class A, class B>
@@ -37,15 +37,15 @@ private:
 	using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
 
 public:
-	constexpr Expected(T &&value) : isError_(false), value_(bzd::forward<T>(value)) {}
+	constexpr Expected(T&& value) : isError_(false), value_(bzd::forward<T>(value)) {}
 
 	template <class U>
-	constexpr Expected(impl::Unexpected<U> &&u) : isError_(true), error_(u.error_)
+	constexpr Expected(impl::Unexpected<U>&& u) : isError_(true), error_(u.error_)
 	{
 	}
 
 	// Move constructor
-	constexpr Expected(Expected<T, E> &&e) : isError_(e.isError_)
+	constexpr Expected(Expected<T, E>&& e) : isError_(e.isError_)
 	{
 		if (isError_)
 			error_ = bzd::move(e.error_);
@@ -63,31 +63,31 @@ public:
 
 	constexpr operator bool() const noexcept { return !isError_; }
 
-	constexpr const E &error() const
+	constexpr const E& error() const
 	{
 		bzd::assert::isTrue(isError_);
 		return error_;
 	}
 
-	constexpr const Value &operator*() const
+	constexpr const Value& operator*() const
 	{
 		bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 
-	constexpr Value &operator*()
+	constexpr Value& operator*()
 	{
 		bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 
-	constexpr const Value *operator->() const
+	constexpr const Value* operator->() const
 	{
 		bzd::assert::isTrue(!isError_);
 		return &value_;
 	}
 
-	constexpr Value *operator->()
+	constexpr Value* operator->()
 	{
 		bzd::assert::isTrue(!isError_);
 		return &value_;
@@ -102,14 +102,14 @@ protected:
 };
 
 template <class E>
-class Expected<void, E> : private Expected<void *, E>
+class Expected<void, E> : private Expected<void*, E>
 {
 public:
-	using Expected<void *, E>::Expected;
-	using Expected<void *, E>::operator bool;
-	using Expected<void *, E>::error;
+	using Expected<void*, E>::Expected;
+	using Expected<void*, E>::operator bool;
+	using Expected<void*, E>::error;
 
-	constexpr Expected() : Expected<void *, E>(nullptr) {}
+	constexpr Expected() : Expected<void*, E>(nullptr) {}
 };
 } // namespace impl
 
@@ -123,7 +123,7 @@ template <class T, class E>
 using Expected = impl::Expected<T, E>;
 
 template <class E>
-constexpr impl::Unexpected<typename bzd::decay<E>::type> makeUnexpected(E &&e)
+constexpr impl::Unexpected<typename bzd::decay<E>::type> makeUnexpected(E&& e)
 {
 	return impl::Unexpected<typename bzd::decay<E>::type>(bzd::forward<E>(e));
 }

@@ -47,8 +47,8 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
-DerivePointerAlignment: true
-DisableFormat:   false
+DerivePointerAlignment: false
+DisableFormat: false
 ForEachMacros:
   - foreach
   - Q_FOREACH

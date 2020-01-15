@@ -10,11 +10,11 @@
 namespace bzd { namespace format {
 namespace impl {
 namespace {
-static constexpr const char *const digits = "0123456789abcdef";
+static constexpr const char* const digits = "0123456789abcdef";
 }
 
-template <SizeType Base = 10, class T, typename bzd::typeTraits::enableIf<(Base > 1 && Base <= 16), T>::type * = nullptr>
-constexpr void integer(interface::String &str, const T &n, const char *const digits = bzd::format::impl::digits)
+template <SizeType Base = 10, class T, typename bzd::typeTraits::enableIf<(Base > 1 && Base <= 16), T>::type* = nullptr>
+constexpr void integer(interface::String& str, const T& n, const char* const digits = bzd::format::impl::digits)
 {
 	auto data = str.data();
 	SizeType index = 0;
@@ -40,7 +40,7 @@ constexpr void integer(interface::String &str, const T &n, const char *const dig
 }
 
 template <class T>
-constexpr void fixedPoint(bzd::OStream &stream, const T &n, const SizeType maxPrecision) noexcept
+constexpr void fixedPoint(bzd::OStream& stream, const T& n, const SizeType maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
 											0.1,
@@ -82,38 +82,38 @@ constexpr void fixedPoint(bzd::OStream &stream, const T &n, const SizeType maxPr
 }
 } // namespace impl
 
-template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
-constexpr void toString(bzd::OStream &stream, const T &data)
+template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+constexpr void toString(bzd::OStream& stream, const T& data)
 {
 	bzd::String<40> buffer; // 40 is a the length
 	bzd::format::impl::integer(buffer, data);
 	stream.write(buffer);
 }
 
-template <class T, typename bzd::typeTraits::enableIf<typeTraits::isFloatingPoint<T>::value, T>::type * = nullptr>
-constexpr void toString(bzd::OStream &stream, const T &data, const SizeType maxPrecision = 6)
+template <class T, typename bzd::typeTraits::enableIf<typeTraits::isFloatingPoint<T>::value, T>::type* = nullptr>
+constexpr void toString(bzd::OStream& stream, const T& data, const SizeType maxPrecision = 6)
 {
 	bzd::format::impl::fixedPoint(stream, data, maxPrecision);
 }
 
-template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
-constexpr void toStringHex(bzd::OStream &stream, const T &data, const char *const digits = bzd::format::impl::digits)
+template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+constexpr void toStringHex(bzd::OStream& stream, const T& data, const char* const digits = bzd::format::impl::digits)
 {
 	bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
 	bzd::format::impl::integer<16>(buffer, data, digits);
 	stream.write(buffer);
 }
 
-template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
-constexpr void toStringOct(bzd::OStream &stream, const T &data)
+template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+constexpr void toStringOct(bzd::OStream& stream, const T& data)
 {
 	bzd::String<32> buffer;
 	bzd::format::impl::integer<8>(buffer, data);
 	stream.write(buffer);
 }
 
-template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type * = nullptr>
-constexpr void toStringBin(bzd::OStream &stream, const T &data)
+template <class T, typename bzd::typeTraits::enableIf<typeTraits::isIntegral<T>::value, T>::type* = nullptr>
+constexpr void toStringBin(bzd::OStream& stream, const T& data)
 {
 	bzd::Vector<bzd::UInt16Type, 4> shortList;
 	T number = data;
@@ -138,9 +138,9 @@ constexpr void toStringBin(bzd::OStream &stream, const T &data)
 	}
 }
 
-void toString(bzd::OStream &stream, const bzd::StringView &data);
+void toString(bzd::OStream& stream, const bzd::StringView& data);
 
-void toString(bzd::OStream &stream, const char c);
+void toString(bzd::OStream& stream, const char c);
 
 /*	void toString(bzd::OStream& stream, const bool value)
 				{
@@ -149,10 +149,10 @@ void toString(bzd::OStream &stream, const char c);
 				}
 */
 template <class... Args>
-constexpr void toString(bzd::interface::String &str, Args &&... args)
+constexpr void toString(bzd::interface::String& str, Args&&... args)
 {
 	str.clear();
 	bzd::interface::StringStream sstream(str);
-	toString(static_cast<bzd::OStream &>(sstream), bzd::forward<Args>(args)...);
+	toString(static_cast<bzd::OStream&>(sstream), bzd::forward<Args>(args)...);
 }
 }} // namespace bzd::format
