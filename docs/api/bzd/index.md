@@ -154,6 +154,15 @@ A registry is a singleton object acting as a key-value store for object instance
 bzd::Registry<double>::Declare<3> registry_;
 ```
 
+The following snipet shows how to register objects within this registry. Note that no more of N objects (number specified during registry declaration) can be added.
+
+```c++
+// Creates and insert 3 objects within the registry
+bzd::Registry<double>::Register<> registry_{"A", 42};
+bzd::Registry<double>::Register<> registry_{"B", -1};
+bzd::Registry<double>::Register<> registry_{"C", 3.14};
+```
+
 Note, this initialization scheme can be imediatly followed by object registrations, as order of global variables in a single translation unit (source file) are initialized in the order in which they are defined.
 #### Template
 ||||
