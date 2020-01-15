@@ -1,12 +1,10 @@
 """
-Such rule should generate a config.manifest with the following content:
+Such rule should generate a config.manifest with the following content
+and will generate a generate the C++ library
 
 interfaces:
     "bzd::io_channel::Stdout":
-        deps: //platform/libraries/io_channel/stdout
-
-It should also generate the C++ library
-
+        includes: libraries/io/stdout/stdout.h
 """
 
 load("@//tools/bzd:defs.bzl", "bzd_cc_library")

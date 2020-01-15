@@ -1,14 +1,8 @@
-interfaces:
-    "bzd::StringView":
-        includes: "bzd/container/string_view.h"
-    "bzd::Log":
-        includes: "bzd/log.h"
 objects:
     "bzd::OChannel.stdout":
         class: !ref bzd::io::Stdout
     "bzd::Log.default":
         params:
-            #- !ref bzd::getOut()
             - !ref bzd::OChannel.stdout
     "bzd::StringView.message":
         params:

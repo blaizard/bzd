@@ -45,19 +45,19 @@ private:
 		switch (level)
 		{
 		case bzd::log::Level::CRITICAL:
-			str = "[critical] ";
+			str = "[c] ";
 			break;
 		case bzd::log::Level::ERROR:
-			str = "[error] ";
+			str = "[e] ";
 			break;
 		case bzd::log::Level::WARNING:
-			str = "[warning] ";
+			str = "[w] ";
 			break;
 		case bzd::log::Level::INFO:
-			str = "[info] ";
+			str = "[i] ";
 			break;
 		case bzd::log::Level::DEBUG:
-			str = "[debug] ";
+			str = "[d] ";
 			break;
 		default:
 			bzd::assert::unreachable();
