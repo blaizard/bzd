@@ -4,10 +4,10 @@
 
 TEST(Registry, Base)
 {
-	bzd::declare::Registry<int, 3> reg_;
-	bzd::Registry<int> hello("hello", 12);
-	bzd::Registry<int> yes("yes", -1);
-	bzd::Registry<int> me("me", 986);
+	bzd::Registry<int>::Declare<3> reg_;
+	bzd::Registry<int>::Register<> hello("hello", 12);
+	bzd::Registry<int>::Register<> yes("yes", -1);
+	bzd::Registry<int>::Register<> me("me", 986);
 
 	EXPECT_EQ(bzd::Registry<int>::get("hello"), 12);
 	EXPECT_EQ(bzd::Registry<int>::get("me"), 986);
@@ -26,8 +26,8 @@ TEST(Registry, Inheritance)
 		Bar(int a_) : Foo{a_} {}
 	};
 
-	bzd::declare::Registry<Foo, 1> reg_;
-	bzd::Registry<Foo, Bar> hello("hello", 12);
+	bzd::Registry<Foo>::Declare<1> reg_;
+	bzd::Registry<Foo>::Register<Bar> hello("hello", 12);
 
 	EXPECT_EQ(bzd::Registry<Foo>::get("hello").a, 12);
 }
@@ -44,20 +44,20 @@ TEST(Registry, PureVirtual)
 		int print() override { return 42; };
 	};
 
-	bzd::declare::Registry<PureVirtualBase, 1> reg_;
-	bzd::Registry<PureVirtualBase, PureVirtualSpecialization> hello("hello");
+	bzd::Registry<PureVirtualBase>::Declare<1> reg_;
+	bzd::Registry<PureVirtualBase>::Register<PureVirtualSpecialization> hello("hello");
 
-	EXPECT_EQ(bzd::Registry<PureVirtualBase>::get("hello").print(), 12);
+	EXPECT_EQ(bzd::Registry<PureVirtualBase>::get("hello").print(), 42);
 }
 
 TEST(Registry, Overflow)
 {
-	bzd::declare::Registry<float, 1> reg_;
-	bzd::Registry<float> m0("0", 12);
-	EXPECT_ANY_THROW(bzd::Registry<float> m1("1", -1));
+	bzd::Registry<float>::Declare<1> reg_;
+	bzd::Registry<float>::Register<> m0("0", 12);
+	EXPECT_ANY_THROW(bzd::Registry<float>::Register<> m1("1", -1));
 }
 
 TEST(Registry, NotDeclared)
 {
-	EXPECT_ANY_THROW(bzd::Registry<double> m1("1", -1));
+	EXPECT_ANY_THROW(bzd::Registry<double>::Register<> m1("1", -1));
 }

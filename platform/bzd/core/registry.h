@@ -36,24 +36,6 @@ template <class T>
 using Registry = impl::Registry<T>;
 }
 
-namespace declare {
-/**
- * \brief Declaration object for a fixed-size registry object.
- */
-template <class T, SizeType Capacity>
-class Registry : public interface::Registry<T>
-{
-protected:
-	using typename interface::Registry<T>::KeyType;
-
-public:
-	constexpr Registry() : interface::Registry<T>(registry_) {}
-
-protected:
-	bzd::Map<KeyType, T*, Capacity> registry_;
-};
-} // namespace declare
-
 /**
  * \brief Fixed-size registry object.
  *
@@ -64,32 +46,53 @@ protected:
  *
  * \code
  * // Declares a registry which can contain up to 3 doubles
- * bzd::declare::Registry<double, 3> registry_;
+ * bzd::Registry<double>::Declare<3> registry_;
  * \endcode
  *
  * Note, this initialization scheme can be imediatly followed by object
  * registrations, as order of global variables in a single translation unit
  * (source file) are initialized in the order in which they are defined.
  */
-template <class Interface, class T = Interface>
+template <class Interface>
 class Registry
 {
 protected:
 	using KeyType = typename interface::Registry<Interface>::KeyType;
 
 public:
-	template <class... Args>
-	constexpr Registry(const KeyType& str, Args&&... args) : object_{bzd::forward<Args>(args)...}
+	/**
+	 * \brief Declaration object for a fixed-size registry object.
+	 */
+	template <SizeType Capacity>
+	class Declare : public interface::Registry<Interface>
 	{
-		interface::Registry<Interface>::get().insert(str, static_cast<Interface*>(&object_));
-	}
+	public:
+		constexpr Declare() : interface::Registry<Interface>(registry_) {}
+
+	protected:
+		bzd::Map<KeyType, Interface*, Capacity> registry_;
+	};
+
+	/**
+	 *  \brief Register a new object to its registery previously delcared.
+	 */
+	template <class T = Interface>
+	class Register
+	{
+	public:
+		template <class... Args>
+		constexpr Register(const KeyType& str, Args&&... args) : object_{bzd::forward<Args>(args)...}
+		{
+			interface::Registry<Interface>::get().insert(str, static_cast<Interface*>(&object_));
+		}
+
+	private:
+		T object_;
+	};
 
 	/**
 	 * \brief Registry accessor.
 	 */
 	static constexpr Interface& get(const KeyType& key) { return *interface::Registry<Interface>::get()[key]; }
-
-private:
-	T object_;
 };
 } // namespace bzd
