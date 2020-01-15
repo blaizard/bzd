@@ -1,7 +1,14 @@
-# bzd
+# bzd Framework
 
 Lightweight and flexible framework for cooperative and event-base programming.
 Requires any compiler with support for C++14 (at least).
+
+## Menu
+
+- [Bazel Rules](./docs/bazel_rules.md)
+- [API](./docs/api/index.md)
+
+## Overview
 
 This framework is developped to run on all sort of embedded platforms, from 8-bit bare bones MCU to high performance compute unit.
 It is made to remove any dependencies from STL, but provide similar set of containers and utilities to develop applications in an
