@@ -38,12 +38,12 @@ def registryBuild(manifest):
 	# Print the registry
 	for registry in registryList:
 		content += "// Definition for registry of type '{}'\n".format(registry["interface"])
-		content += "bzd::declare::Registry<{}, {}> registry{}_;\n".format(registry["interface"], len(registry["objects"]), getUID())
+		content += "bzd::Registry<{}>::Declare<{}> registry{}_;\n".format(registry["interface"], len(registry["objects"]), getUID())
 		# Add the objects
 		for obj in registry["objects"]:
 			# Build the parameters
 			params = paramsToString(obj)
-			content += "bzd::Registry<{}, {}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getClass(), getUID(), obj.getName(), params)
+			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getClass(), getUID(), obj.getName(), params)
 		content += "\n"
 
 	# Close the empty namespace

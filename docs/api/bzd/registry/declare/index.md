@@ -1,16 +1,15 @@
-# [`bzd`](../../../index.md)::[`declare`](../../index.md)::[`Registry`](../index.md)
+# [`bzd`](../../../index.md)::[`Registry`](../../index.md)::[`Declare`](../index.md)
 
-## `template<class T, SizeType Capacity> class Registry`
+## `template<SizeType Capacity> class Declare`
 Declaration object for a fixed-size registry object.
 #### Template
 ||||
 |---:|:---|:---|
-|class T|None||
 |SizeType|Capacity||
 
 |Function||
 |:---|:---|
-|[`Registry()`](./index.md)||
+|[`Declare()`](./index.md)||
 |[`get()`](./index.md)||
 
 |Typedef||
@@ -18,7 +17,7 @@ Declaration object for a fixed-size registry object.
 |[`KeyType`](./index.md)|alias of [`bzd::impl::StringView`](../../impl/stringview/index.md), [`bzd::impl::StringView`](../../impl/stringview/index.md)|
 |[`MapType`](./index.md)|alias of [`bzd::impl::Map`](../../impl/map/index.md), [`bzd::impl::Map`](../../impl/map/index.md)|
 ------
-### `constexpr Registry()`
+### `constexpr Declare()`
 
 ------
 ### `static constexpr MapType & get()`
