@@ -78,7 +78,7 @@
 
 
 ------
-### `void onError(const bzd::StringView & message) const`
+### `constexpr void onError(const bzd::StringView & message) const`
 
 #### Parameters
 ||||

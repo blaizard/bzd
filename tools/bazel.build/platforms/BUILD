@@ -7,3 +7,11 @@ platform(
         "//tools/bazel.build/platforms/isa:x86_64",
     ],
 )
+
+platform(
+    name = "esp32_xtensa",
+    constraint_values = [
+        "//tools/bazel.build/platforms/al:linux",
+        "//tools/bazel.build/platforms/isa:xtensa",
+    ],
+)

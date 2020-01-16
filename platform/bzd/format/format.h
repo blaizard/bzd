@@ -7,6 +7,7 @@
 #include "bzd/container/tuple.h"
 #include "bzd/container/variant.h"
 #include "bzd/container/vector.h"
+#include "bzd/core/assert.h"
 #include "bzd/core/system.h"
 #include "bzd/format/integral.h"
 #include "bzd/type_traits/is_arithmetic.h"
@@ -345,7 +346,7 @@ public:
 	constexpr CheckContext() = default;
 	constexpr void addSubstring(const bzd::StringView&) {}
 	constexpr void addMetadata(const Metadata& metadata) { push_back(metadata); }
-	void onError(const bzd::StringView& message) const;
+	constexpr void onError(const bzd::StringView& message) const { bzd::assert::isTrueConstexpr(false); }
 };
 
 template <class T>
@@ -461,7 +462,7 @@ public:
 			[&](const char* value) { printString(stream_, value, metadata); },
 			[&](const bzd::StringView& value) { printString(stream_, value, metadata); });
 	}
-	void onError(const bzd::StringView& message) const {}
+	constexpr void onError(const bzd::StringView& message) const {}
 
 private:
 	bzd::OStream& stream_;

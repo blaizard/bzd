@@ -20,6 +20,16 @@ filegroup(
 )
 
 filegroup(
+    name = "header_system",
+    srcs = glob([
+        "bzd/core/system.h",
+    ]),
+    visibility = [
+        "//platform/libraries:__subpackages__",
+    ],
+)
+
+filegroup(
     name = "sources",
     srcs = glob([
         "bzd/**/*.cpp",
