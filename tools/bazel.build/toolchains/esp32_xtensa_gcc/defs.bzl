@@ -1,17 +1,17 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel.build:toolchain.bzl", "toolchain_maker")
 
-def _load_esp32_xtensa_gcc_5_2_0(name):
+def _load_esp32_xtensa_gcc_8_2_0(name):
     # Load dependencies
-    clang_package_name = "esp32_xtensa_gcc_5_2_0"
+    clang_package_name = "esp32_xtensa_gcc_8_2_0"
     http_archive(
         name = clang_package_name,
         build_file = "//tools/bazel.build:toolchains/esp32_xtensa_gcc/{}.BUILD".format(clang_package_name),
         urls = [
-            "https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz",
+            "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz"
         ],
         strip_prefix = "xtensa-esp32-elf",
-        sha256 = "3fe96c151d46c1d4e5edc6ed690851b8e53634041114bad04729bc16b0445156",
+        sha256 = "e6d47c1dbd8c8cbfe37271e5e2aac53ee88c9e347ae937e22bf0c73f530efbdf",
     )
 
     toolchain_maker(
@@ -30,17 +30,17 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
             "@//tools/bazel.build/platforms/isa:xtensa",
         ],
         builtin_include_directories = [
-            "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/5.2.0/include".format(clang_package_name),
-            "%package(@{}//)%/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf".format(clang_package_name),
-            "%package(@{}//)%/xtensa-esp32-elf/include/c++/5.2.0".format(clang_package_name),
+            "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
+            "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
+            "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
             "%package(@{}//)%/xtensa-esp32-elf/include".format(clang_package_name),
             #"/usr/local/include",
             #"/usr/include",
         ],
         system_directories = [
-            "external/{}/lib/gcc/xtensa-esp32-elf/5.2.0/include".format(clang_package_name),
-            "external/{}/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf".format(clang_package_name),
-            "external/{}/xtensa-esp32-elf/include/c++/5.2.0".format(clang_package_name),
+            "external/{}/lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
             "external/{}/xtensa-esp32-elf/include".format(clang_package_name),
             #"/usr/local/include",
             #"/usr/include",
@@ -50,7 +50,7 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
         ],
         compile_flags = [
             "-std=c++14",
-            #"--sysroot=external/esp32_xtensa_gcc_5_2_0/xtensa-esp32-elf/sysroot",
+            #"--sysroot=external/esp32_xtensa_gcc_8_2_0/xtensa-esp32-elf/sysroot",
 
             # Do not link or re-order inclusion files
             "-nostdinc",
@@ -127,4 +127,4 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
     )
 
 def load_esp32_xtensa_gcc():
-    _load_esp32_xtensa_gcc_5_2_0(name = "esp32_xtensa_gcc")
+    _load_esp32_xtensa_gcc_8_2_0(name = "esp32_xtensa_gcc")
