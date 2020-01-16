@@ -1,5 +1,7 @@
 #include "bzd/core/assert.h"
 
+#include "bzd/core/system.h"
+
 namespace bzd { namespace assert {
 
 void unreachable()

@@ -17,4 +17,5 @@ cc_library(
     deps = [
         "//platform:bzd_core",
     ],
+    alwayslink = True,
 )

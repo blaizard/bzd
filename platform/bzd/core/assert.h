@@ -3,8 +3,23 @@
 #include "bzd/container/string_view.h"
 #include "bzd/core/system.h"
 
+#include <assert.h>
+
 namespace bzd { namespace assert {
-constexpr void isTrue(const bool condition)
+
+namespace impl {
+inline void assertHelper(bool test)
+{
+	assert(test);
+}
+} // namespace impl
+
+constexpr bool isTrueConstexpr(const bool condition)
+{
+	return condition ? true : (impl::assertHelper(condition), false);
+}
+
+inline void isTrue(const bool condition)
 {
 	if (!condition)
 	{
@@ -13,7 +28,7 @@ constexpr void isTrue(const bool condition)
 	}
 }
 
-constexpr void isTrue(const bool condition, const bzd::StringView& message)
+inline void isTrue(const bool condition, const bzd::StringView& message)
 {
 	if (!condition)
 	{

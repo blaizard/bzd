@@ -12,3 +12,8 @@ constraint_value(
     name = "x86_64",
     constraint_setting = ":isa",
 )
+
+constraint_value(
+    name = "xtensa",
+    constraint_setting = ":isa",
+)

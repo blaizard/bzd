@@ -49,6 +49,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
 
             # Do not link or re-order inclusion files
             "-nostdinc++",
+            #"-nostdinc",
             "--no-standard-includes",
 
             # Make the compilation deterministic

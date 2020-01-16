@@ -11,7 +11,7 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
             "https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz",
         ],
         strip_prefix = "xtensa-esp32-elf",
-        sha256 = "",
+        sha256 = "3fe96c151d46c1d4e5edc6ed690851b8e53634041114bad04729bc16b0445156",
     )
 
     toolchain_maker(
@@ -19,39 +19,44 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
         cpu = "esp32_xtensa",
         compiler = "gcc",
         platforms = [
-            "@//tools/bazel.build/platforms:linux_x86_64",
+            "@//tools/bazel.build/platforms:esp32_xtensa",
         ],
         exec_compatible_with = [
             "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:x86_64",
+            "@//tools/bazel.build/platforms/isa:xtensa",
         ],
         target_compatible_with = [
             "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:x86_64",
+            "@//tools/bazel.build/platforms/isa:xtensa",
         ],
         builtin_include_directories = [
-            "/usr/include/x86_64-linux-gnu",
-            "/usr/local/include",
-            "/usr/include",
-            "%package(@{}//)%/include/c++/v1".format(clang_package_name),
-            "%package(@{}//)%/lib/clang/9.0.0/include".format(clang_package_name),
+            "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/5.2.0/include".format(clang_package_name),
+            "%package(@{}//)%/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf".format(clang_package_name),
+            "%package(@{}//)%/xtensa-esp32-elf/include/c++/5.2.0".format(clang_package_name),
+            "%package(@{}//)%/xtensa-esp32-elf/include".format(clang_package_name),
+            #"/usr/local/include",
+            #"/usr/include",
         ],
         system_directories = [
-            "/usr/include/x86_64-linux-gnu",
-            "/usr/local/include",
-            "/usr/include",
-            "external/{}/include/c++/v1".format(clang_package_name),
-            "external/{}/lib/clang/9.0.0/include".format(clang_package_name),
+            "external/{}/lib/gcc/xtensa-esp32-elf/5.2.0/include".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/include/c++/5.2.0".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/include".format(clang_package_name),
+            #"/usr/local/include",
+            #"/usr/include",
         ],
         linker_dirs = [
-            "external/{}/lib".format(clang_package_name),
+            "external/{}/xtensa-esp32-elf/lib".format(clang_package_name),
         ],
         compile_flags = [
             "-std=c++14",
+            #"--sysroot=external/esp32_xtensa_gcc_5_2_0/xtensa-esp32-elf/sysroot",
 
             # Do not link or re-order inclusion files
+            "-nostdinc",
             "-nostdinc++",
             "--no-standard-includes",
+            "-nostdlib",
 
             # Make the compilation deterministic
             "-fstack-protector",
@@ -62,7 +67,6 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
             "-Wall",
             "-Wno-missing-braces",
             "-Wno-builtin-macro-redefined",
-            "-Wno-unused-command-line-argument",
 
             # Keep stack frames for debugging
             "-fno-omit-frame-pointer",
@@ -81,20 +85,15 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
         ],
         link_flags = [
             "-Wl,-as-needed",
-            "-fuse-ld=gold",
             "-Wl,--disable-new-dtags",
             "-Wl,--gc-sections",
+            "-nostdlib",
             "-rdynamic",
-            "-stdlib=libc++",
             "-lm",
-            "-lc++",
-            "-lc++abi",
+            "-lstdc++",
             "-lc",
-            "-lgcc_s",
-            "-lgcc",
             "-Wl,-z,relro,-z,now",
             "-no-canonical-prefixes",
-            "-Wl,-rpath=%{{absolute_external}}/{}/lib".format(clang_package_name),
 
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",
@@ -110,13 +109,13 @@ def _load_esp32_xtensa_gcc_5_2_0(name):
             "@{}//:includes".format(clang_package_name),
             "@{}//:bin".format(clang_package_name),
         ],
-        bin_ar = "external/{}/bin/llvm-ar".format(clang_package_name),
-        bin_as = "external/{}/bin/llvm-as".format(clang_package_name),
-        bin_cc = "external/{}/bin/clang".format(clang_package_name),
-        bin_cpp = "external/{}/bin/clang++".format(clang_package_name),
-        bin_gcov = "external/{}/bin/llvm-cov".format(clang_package_name),
-        bin_objdump = "external/{}/bin/llvm-objdump".format(clang_package_name),
-        bin_ld = "external/{}/bin/clang++".format(clang_package_name),
+        bin_ar = "external/{}/bin/xtensa-esp32-elf-ar".format(clang_package_name),
+        bin_as = "external/{}/bin/xtensa-esp32-elf-as".format(clang_package_name),
+        bin_cc = "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
+        bin_cpp = "external/{}/bin/xtensa-esp32-elf-g++".format(clang_package_name),
+        bin_gcov = "external/{}/bin/xtensa-esp32-elf-gcov".format(clang_package_name),
+        bin_objdump = "external/{}/bin/xtensa-esp32-elf-objdump".format(clang_package_name),
+        bin_ld = "external/{}/bin/xtensa-esp32-elf-ld".format(clang_package_name),
     )
 
     native.register_toolchains(

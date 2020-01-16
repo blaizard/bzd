@@ -21,8 +21,11 @@ http_archive(
 # Toolchains
 
 load("//tools/bazel.build/toolchains/linux_x86_64_clang:defs.bzl", "load_linux_x86_64_clang")
+load("//tools/bazel.build/toolchains/esp32_xtensa_gcc:defs.bzl", "load_esp32_xtensa_gcc")
 
 load_linux_x86_64_clang()
+
+load_esp32_xtensa_gcc()
 
 # Buildifier
 
