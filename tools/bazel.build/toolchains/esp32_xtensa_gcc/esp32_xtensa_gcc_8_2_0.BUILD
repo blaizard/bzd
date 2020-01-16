@@ -4,7 +4,7 @@ filegroup(
     name = "includes",
     srcs = glob([
         "include/**",
-        "lib/gcc/xtensa-esp32-elf/5.2.0/include/**",
+        "lib/gcc/xtensa-esp32-elf/8.2.0/include/**",
         "xtensa-esp32-elf/include/**",
         "**/*",
     ]),

@@ -16,6 +16,6 @@ public:
 
 bzd::OStream& bzd::getOut()
 {
-	static StdoutStream stdout;
-	return stdout;
+	static StdoutStream stdout_;
+	return stdout_;
 }
