@@ -6,6 +6,7 @@ Requires any compiler with support for C++14 (at least).
 ## Menu
 
 - [Bazel Rules](./docs/bazel_rules.md)
+- [Manifest](./docs/manifest.md)
 - [API](./docs/api/index.md)
 
 ## Overview
