@@ -8,7 +8,7 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
         name = clang_package_name,
         build_file = "//tools/bazel.build:toolchains/esp32_xtensa_gcc/{}.BUILD".format(clang_package_name),
         urls = [
-            "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz"
+            "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz",
         ],
         strip_prefix = "xtensa-esp32-elf",
         sha256 = "e6d47c1dbd8c8cbfe37271e5e2aac53ee88c9e347ae937e22bf0c73f530efbdf",
@@ -82,6 +82,26 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
             "-D__DATE__=\"redacted\"",
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
+
+            # From ESP-IDF
+            "-mlongcalls",
+            "-Wno-frame-address",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-fstrict-volatile-bitfields",
+            # warning-related flags
+            "-Wall",
+            "-Werror=all",
+            "-Wno-error=unused-function",
+            "-Wno-error=unused-but-set-variable",
+            "-Wno-error=unused-variable",
+            "-Wno-error=deprecated-declarations",
+            "-Wextra",
+            "-Wno-unused-parameter",
+            "-Wno-sign-compare",
+            # always generate debug symbols (even in release mode, these don't
+            # go into the final binary so have no impact on size
+            "-ggdb",
         ],
         link_flags = [
             "-Wl,-as-needed",
@@ -98,6 +118,8 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
+
+            # From ESP-IDF
         ],
         dynamic_runtime_libs = [
             "@{}//:dynamic_libraries".format(clang_package_name),

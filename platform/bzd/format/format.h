@@ -472,7 +472,7 @@ private:
 template <class T>
 constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, const T& tuple)
 {
-	Context<CheckContext> ctx;
+	Context<CheckContext> ctx{};
 	parse(ctx, format, tuple);
 	return ctx;
 }

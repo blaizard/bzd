@@ -5,7 +5,7 @@ Context used for the current parsing operation. Different context are used to ch
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 
 |Function||
 |:---|:---|
