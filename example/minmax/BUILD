@@ -7,5 +7,6 @@ cc_binary(
     ],
     deps = [
         "//platform:bzd",
+        "//platform:sdk",
     ],
 )

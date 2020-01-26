@@ -2,6 +2,8 @@ def _impl(ctx):
     # Absolute path of the external directory (used for linking librairies for example)
     absolute_external = ctx.execute(["pwd"], working_directory = "..").stdout.rstrip()
 
+    alias_template = "alias(name = \"{}\", actual = \"{}\")"
+
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
@@ -26,6 +28,7 @@ def _impl(ctx):
         ),
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
+        "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()])
     }
 
     # Apply substitutions
@@ -76,6 +79,8 @@ toolchain_maker = repository_rule(
         # Flags
         "link_flags": attr.string_list(),
         "compile_flags": attr.string_list(),
+        # Alias
+        "alias": attr.string_dict(),
         # Tools
         "bin_ar": attr.string(default = "/usr/bin/ar"),
         "bin_as": attr.string(),
