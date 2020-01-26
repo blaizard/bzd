@@ -143,6 +143,9 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
             "@{}//:bin".format(clang_package_name),
             "@{}//:files".format(sdk_package_name),
         ],
+        alias = {
+            "sdk": "@{}//:sdk".format(sdk_package_name),
+        },
         bin_ar = "external/{}/bin/xtensa-esp32-elf-ar".format(clang_package_name),
         bin_as = "external/{}/bin/xtensa-esp32-elf-as".format(clang_package_name),
         bin_cc = "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),

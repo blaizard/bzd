@@ -134,3 +134,5 @@ config_setting(
         ":compiler",
     ],
 )
+
+%{alias}

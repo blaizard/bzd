@@ -25,6 +25,11 @@ typedef void (*FctPtrType)();
 typedef unsigned long SizeType;
 
 /**
+ * \brief Boolean type.
+ */
+typedef bool BoolType;
+
+/**
  * \brief Signed integer type with a fixed width of 8-bit.
  */
 typedef int8_t Int8Type;

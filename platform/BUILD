@@ -38,6 +38,19 @@ filegroup(
 )
 
 cc_library(
+    name = "empty_sdk",
+)
+
+alias(
+    name = "sdk",
+    actual = select({
+        "@esp32_xtensa_gcc//:target": "@esp32_xtensa_gcc//:sdk",
+        "//conditions:default": ":empty_sdk",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "bzd",
     hdrs = [
         "bzd.h",

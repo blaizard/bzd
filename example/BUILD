@@ -5,7 +5,9 @@ cc_binary(
     srcs = [
         "main.cpp",
     ],
+    tags = ["manual"],
     deps = [
         "//platform:bzd",
+        "//platform:sdk",
     ],
 )
