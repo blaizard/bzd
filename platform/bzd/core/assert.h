@@ -3,14 +3,12 @@
 #include "bzd/container/string_view.h"
 #include "bzd/core/system.h"
 
-#include <assert.h>
-
 namespace bzd { namespace assert {
 
 namespace impl {
 inline void assertHelper(bool test)
 {
-	assert(test);
+	throw "Assert error";
 }
 } // namespace impl
 
