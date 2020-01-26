@@ -7,5 +7,6 @@ cc_binary(
     ],
     deps = [
         "//platform:bzd",
+        "@esp32_xtensa_sdk_2020.01.14//:sdk"
     ],
 )
