@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools/bazel.build:toolchain.bzl", "toolchain_maker")
+load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
 
 def _load_esp32_xtensa_gcc_8_2_0(name):
 
@@ -7,7 +7,7 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
     clang_package_name = "esp32_xtensa_gcc_8_2_0"
     http_archive(
         name = clang_package_name,
-        build_file = "//tools/bazel.build:toolchains/esp32_xtensa_gcc/{}.BUILD".format(clang_package_name),
+        build_file = "//toolchains/esp32_xtensa_gcc:{}.BUILD".format(clang_package_name),
         urls = [
             "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz",
         ],
@@ -19,7 +19,7 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
     sdk_package_name = "esp32_xtensa_sdk_2020.01.14"
     http_archive(
         name = sdk_package_name,
-        build_file = "//tools/bazel.build:toolchains/esp32_xtensa_gcc/{}.BUILD".format(sdk_package_name),
+        build_file = "//toolchains/esp32_xtensa_gcc:{}.BUILD".format(sdk_package_name),
         urls = [
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/master.zip",
         ],

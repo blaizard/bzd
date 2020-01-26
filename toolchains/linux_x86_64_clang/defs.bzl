@@ -1,12 +1,12 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools/bazel.build:toolchain.bzl", "toolchain_maker")
+load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
 
 def _load_linux_x86_64_clang_9_0_0(name):
     # Load dependencies
     clang_package_name = "linux_x86_64_clang_9_0_0"
     http_archive(
         name = clang_package_name,
-        build_file = "//tools/bazel.build:toolchains/linux_x86_64_clang/{}.BUILD".format(clang_package_name),
+        build_file = "//toolchains/linux_x86_64_clang:{}.BUILD".format(clang_package_name),
         urls = [
             "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
         ],
