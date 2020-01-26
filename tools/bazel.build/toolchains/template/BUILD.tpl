@@ -89,6 +89,8 @@ cc_toolchain(
 
     toolchain_config = ":cc-toolchain-config",
     toolchain_identifier = "cc-toolchain-identifier-%{cpu}",
+
+    supports_param_files = True,
 )
 
 toolchain(
