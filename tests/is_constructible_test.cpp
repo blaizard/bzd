@@ -1,6 +1,6 @@
 #include "bzd/type_traits/is_constructible.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 struct Foo
 {

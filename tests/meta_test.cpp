@@ -1,10 +1,13 @@
+#include <typeinfo>
+#include <string>
+
 #include "bzd/meta/choose_nth.h"
 #include "bzd/meta/contains.h"
 #include "bzd/meta/find.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(Meta, ChooseNth)
 {

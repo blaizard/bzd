@@ -1,6 +1,6 @@
 #include "bzd/container/optional.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ContainerOptional, simpleData)
 {

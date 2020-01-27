@@ -1,7 +1,7 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/remove_cv.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(TypeTraits, removeCV)
 {

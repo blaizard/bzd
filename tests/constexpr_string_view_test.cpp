@@ -1,6 +1,6 @@
 #include "bzd/container/string_constexpr.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ContainerConstexprStringView, base)
 {

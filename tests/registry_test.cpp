@@ -1,6 +1,6 @@
 #include "bzd/core/registry.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(Registry, Base)
 {

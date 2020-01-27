@@ -1,6 +1,6 @@
 #include "bzd/format/integral.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ToString, Integer)
 {

@@ -1,6 +1,6 @@
 #include "bzd/container/vector.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ContainerVector, Base)
 {

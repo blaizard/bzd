@@ -9,6 +9,6 @@ test_cpp_srcs = glob([
     srcs = [src],
     deps = [
         "//platform:bzd",
-        "@googletest//:gtest_main",
+        "//tools/cc_test",
     ],
 ) for src in test_cpp_srcs]

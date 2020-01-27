@@ -1,6 +1,6 @@
 #include "bzd/container/queue.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ContainerForwardList, simple)
 {
