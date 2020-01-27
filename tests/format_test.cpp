@@ -3,7 +3,7 @@
 #include "bzd/container/vector.h"
 #include "bzd/format/format.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 class ContextTest
 {

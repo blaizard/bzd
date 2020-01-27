@@ -1,6 +1,6 @@
 #include "bzd/container/map.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ContainerMap, single)
 {

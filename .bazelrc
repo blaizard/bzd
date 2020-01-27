@@ -16,7 +16,6 @@ build -c opt
 
 # Test specific options
 test --test_output=errors
-test --action_env="GTEST_COLOR=1"
 test --verbose_failures
 test --define=panic=throw
 

@@ -7,6 +7,6 @@ cc_test(
         "//conditions:default": [],
     }),
     deps = [
-        "@googletest//:gtest_main",
+        "//tools/cc_test",
     ],
 )

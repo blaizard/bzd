@@ -1,6 +1,6 @@
 #include "bzd/utility/reference_wrapper.h"
 
-#include "gtest/gtest.h"
+#include "cc_test/test.h"
 
 TEST(ReferenceWrapper, simple)
 {
