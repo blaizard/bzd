@@ -6,6 +6,7 @@ cc_library(
         "*.S",
         "*.cpp",
     ]),
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//platform:bzd_core",

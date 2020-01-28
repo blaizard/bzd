@@ -16,7 +16,7 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
     )
 
     # SDK
-    sdk_package_name = "esp32_xtensa_sdk_2020.01.14"
+    sdk_package_name = "esp32_xtensa_sdk_v4.1_dev_1935_g647cb628a_dirty"
     http_archive(
         name = sdk_package_name,
         build_file = "//toolchains/esp32_xtensa_gcc:{}.BUILD".format(sdk_package_name),
@@ -63,6 +63,7 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
         ],
         compile_flags = [
             "-std=c++14",
+            "-static",
 
             # Do not link or re-order inclusion files
             "-nostdinc",
@@ -71,9 +72,9 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
             "-nostdlib",
 
             # Make the compilation deterministic
-            #"-fstack-protector",
-            #"-fPIE",
-            #"-no-canonical-prefixes",
+            "-fstack-protector",
+            "-fPIE",
+            "-no-canonical-prefixes",
 
             # Warnings
             "-Wall",
@@ -89,51 +90,22 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
             # Removal of unused code and data at link time
             "-ffunction-sections",
             "-fdata-sections",
+            "-mlongcalls",
 
             # Use linkstamping instead of these
             "-D__DATE__=\"redacted\"",
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
-
-            "-ffunction-sections",
-            "-fdata-sections",
-            "-fstrict-volatile-bitfields",
-            "-mlongcalls",
-            "-nostdlib",
-
-            # From ESP-IDF
-            "-mlongcalls",
-            "-Wno-frame-address",
-            "-ffunction-sections",
-            "-fdata-sections",
-            "-fstrict-volatile-bitfields",
-            # warning-related flags
-            "-Wall",
-            "-Werror=all",
-            "-Wno-error=unused-function",
-            "-Wno-error=unused-but-set-variable",
-            "-Wno-error=unused-variable",
-            "-Wno-error=deprecated-declarations",
-            "-Wextra",
-            "-Wno-unused-parameter",
-            "-Wno-sign-compare",
-            # always generate debug symbols (even in release mode, these don't
-            # go into the final binary so have no impact on size
-            "-ggdb",
-            "-fno-rtti",
         ],
         link_flags = [
+            # Do not link with shared libraries
+            "-Wl,-static",
+
             # Link little-endian objects
             "-Wl,-EL",
 
             # Garbage collection
             "-Wl,--gc-sections",
-
-            # Do not link with shared libraries
-            "-Wl,-static",
-        ],
-        dynamic_runtime_libs = [
-            "@{}//:dynamic_libraries".format(clang_package_name),
         ],
         static_runtime_libs = [
             "@{}//:static_libraries".format(clang_package_name),
