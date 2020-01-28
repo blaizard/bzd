@@ -18,13 +18,6 @@ filegroup(
 )
 
 filegroup(
-    name = "dynamic_libraries",
-    srcs = glob([
-        "libexec/**",
-    ]),
-)
-
-filegroup(
     name = "static_libraries",
     srcs = glob([
         "xtensa-esp32-elf/lib/**",

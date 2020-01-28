@@ -7,7 +7,11 @@ cc_library(
     srcs = [
         "test.cpp",
     ],
+    alwayslink = True,
     includes = ["."],
 	include_prefix = "cc_test",
     visibility = ["//visibility:public"],
+    deps = [
+        "//platform:sdk"
+    ]
 )

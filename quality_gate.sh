@@ -26,7 +26,7 @@ fi
 # Compile and test the different configurations
 bazel test ...
 bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
-bazel build //example/... --config=esp32_xtensa_gcc --platform_suffix=_esp32_xtensa_gcc
+bazel build ... --config=esp32_xtensa_gcc --platform_suffix=_esp32_xtensa_gcc
 
 # Use static analyzers
 bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
