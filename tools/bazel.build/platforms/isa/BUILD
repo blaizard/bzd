@@ -14,6 +14,6 @@ constraint_value(
 )
 
 constraint_value(
-    name = "xtensa",
+    name = "xtensa_lx6",
     constraint_setting = ":isa",
 )
