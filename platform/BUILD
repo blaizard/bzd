@@ -44,7 +44,7 @@ cc_library(
 alias(
     name = "sdk",
     actual = select({
-        "@esp32_xtensa_gcc//:target": "@esp32_xtensa_gcc//:sdk",
+        "@esp32_xtensa_lx6_gcc//:target": "@esp32_xtensa_lx6_gcc//:sdk",
         "//conditions:default": ":empty_sdk",
     }),
     visibility = ["//visibility:public"],

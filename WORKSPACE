@@ -12,11 +12,11 @@ http_archive(
 # Toolchains
 
 load("//toolchains/linux_x86_64_clang:defs.bzl", "load_linux_x86_64_clang")
-load("//toolchains/esp32_xtensa_gcc:defs.bzl", "load_esp32_xtensa_gcc")
+load("//toolchains/esp32_xtensa_lx6_gcc:defs.bzl", "load_esp32_xtensa_lx6_gcc")
 
 load_linux_x86_64_clang()
 
-load_esp32_xtensa_gcc()
+load_esp32_xtensa_lx6_gcc()
 
 # Buildifier
 

@@ -9,9 +9,9 @@ platform(
 )
 
 platform(
-    name = "esp32_xtensa",
+    name = "esp32_xtensa_lx6",
     constraint_values = [
         "//tools/bazel.build/platforms/al:linux",
-        "//tools/bazel.build/platforms/isa:xtensa",
+        "//tools/bazel.build/platforms/isa:xtensa_lx6",
     ],
 )

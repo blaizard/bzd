@@ -1,13 +1,13 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
 
-def _load_esp32_xtensa_gcc_8_2_0(name):
+def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
 
     # Compiler
-    clang_package_name = "esp32_xtensa_gcc_8_2_0"
+    clang_package_name = "esp32_xtensa_lx6_gcc_8_2_0"
     http_archive(
         name = clang_package_name,
-        build_file = "//toolchains/esp32_xtensa_gcc:{}.BUILD".format(clang_package_name),
+        build_file = "//toolchains/esp32_xtensa_lx6_gcc:{}.BUILD".format(clang_package_name),
         urls = [
             "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz",
         ],
@@ -16,10 +16,10 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
     )
 
     # SDK
-    sdk_package_name = "esp32_xtensa_sdk_v4.1_dev_1935_g647cb628a_dirty"
+    sdk_package_name = "esp32_xtensa_lx6_sdk_v4.1_dev_1935_g647cb628a_dirty"
     http_archive(
         name = sdk_package_name,
-        build_file = "//toolchains/esp32_xtensa_gcc:{}.BUILD".format(sdk_package_name),
+        build_file = "//toolchains/esp32_xtensa_lx6_gcc:{}.BUILD".format(sdk_package_name),
         urls = [
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/master.zip",
         ],
@@ -29,18 +29,18 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
 
     toolchain_maker(
         name = name,
-        cpu = "esp32_xtensa",
+        cpu = "esp32_xtensa_lx6",
         compiler = "gcc",
         platforms = [
-            "@//tools/bazel.build/platforms:esp32_xtensa",
+            "@//tools/bazel.build/platforms:esp32_xtensa_lx6",
         ],
         exec_compatible_with = [
             "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:xtensa",
+            "@//tools/bazel.build/platforms/isa:xtensa_lx6",
         ],
         target_compatible_with = [
             "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:xtensa",
+            "@//tools/bazel.build/platforms/isa:xtensa_lx6",
         ],
         builtin_include_directories = [
             "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
@@ -135,5 +135,5 @@ def _load_esp32_xtensa_gcc_8_2_0(name):
         "@{}//:host_platform".format(name),
     )
 
-def load_esp32_xtensa_gcc():
-    _load_esp32_xtensa_gcc_8_2_0(name = "esp32_xtensa_gcc")
+def load_esp32_xtensa_lx6_gcc():
+    _load_esp32_xtensa_lx6_gcc_8_2_0(name = "esp32_xtensa_lx6_gcc")

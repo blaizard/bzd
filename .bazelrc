@@ -24,11 +24,11 @@ build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
 build:linux_x86_64_clang --host_platform="@linux_x86_64_clang//:host_platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
 
-# esp32_xtensa_gcc
-build:esp32_xtensa_gcc --platforms="@esp32_xtensa_gcc//:platform"
-build:esp32_xtensa_gcc --host_platform="@esp32_xtensa_gcc//:host_platform"
-build:esp32_xtensa_gcc --incompatible_enable_cc_toolchain_resolution
-build:esp32_xtensa_gcc --features=-supports_dynamic_linker
+# esp32_xtensa_lx6_gcc
+build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
+build:esp32_xtensa_lx6_gcc --host_platform="@esp32_xtensa_lx6_gcc//:host_platform"
+build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
+build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
 
 # Sanitizers
 
