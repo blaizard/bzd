@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
+load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker", "toolchain_merge")
+load("//toolchains/fragments/esptool:defs.bzl", "toolchain_fragment_esptool")
 
 def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
 
@@ -27,41 +28,40 @@ def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
         sha256 = "fd5f17a1fbf6891a3e48d85a4acf170044c9c4931e5184a7661611f80ae13cb6",
     )
 
-    toolchain_maker(
-        name = name,
-        cpu = "esp32_xtensa_lx6",
-        compiler = "gcc",
-        platforms = [
+    toolchain_definition = {
+        "cpu": "esp32_xtensa_lx6",
+        "compiler": "gcc",
+        "platforms": [
             "@//tools/bazel.build/platforms:esp32_xtensa_lx6",
         ],
-        exec_compatible_with = [
+        "exec_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
             "@//tools/bazel.build/platforms/isa:xtensa_lx6",
         ],
-        target_compatible_with = [
+        "target_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
             "@//tools/bazel.build/platforms/isa:xtensa_lx6",
         ],
-        builtin_include_directories = [
+        "builtin_include_directories": [
             "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
             "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
             "%package(@{}//)%/xtensa-esp32-elf/include".format(clang_package_name),
             "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
             "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/8.2.0/include-fixed".format(clang_package_name),
         ],
-        system_directories = [
+        "system_directories": [
             "external/{}/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
             "external/{}/xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
             "external/{}/xtensa-esp32-elf/sys-include".format(clang_package_name),
             "external/{}/lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
             "external/{}/lib/gcc/xtensa-esp32-elf/8.2.0/include-fixed".format(clang_package_name),
         ],
-        linker_dirs = [
+        "linker_dirs": [
             "external/{}/xtensa-esp32-elf/lib".format(clang_package_name),
             "external/{}/ld".format(sdk_package_name),
             "external/{}/lib".format(sdk_package_name),
         ],
-        compile_flags = [
+        "compile_flags": [
             "-std=c++14",
             "-static",
 
@@ -97,7 +97,7 @@ def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
         ],
-        link_flags = [
+        "link_flags": [
             # Do not link with shared libraries
             "-Wl,-static",
 
@@ -107,28 +107,37 @@ def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
             # Garbage collection
             "-Wl,--gc-sections",
         ],
-        static_runtime_libs = [
+        "static_runtime_libs": [
             "@{}//:static_libraries".format(clang_package_name),
         ],
-        filegroup_dependencies = [
+        "filegroup_dependencies": [
             "@{}//:includes".format(clang_package_name),
             "@{}//:bin".format(clang_package_name),
             "@{}//:files".format(sdk_package_name),
         ],
-        alias = {
+        "alias": {
             "sdk": "@{}//:sdk".format(sdk_package_name),
         },
-        bin_ar = "external/{}/bin/xtensa-esp32-elf-ar".format(clang_package_name),
-        bin_as = "external/{}/bin/xtensa-esp32-elf-as".format(clang_package_name),
-        bin_cc = "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
-        bin_cpp = "external/{}/bin/xtensa-esp32-elf-g++".format(clang_package_name),
-        bin_gcov = "external/{}/bin/xtensa-esp32-elf-gcov".format(clang_package_name),
-        bin_objdump = "external/{}/bin/xtensa-esp32-elf-objdump".format(clang_package_name),
-        bin_ld = "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
+        "bin_ar": "external/{}/bin/xtensa-esp32-elf-ar".format(clang_package_name),
+        "bin_as": "external/{}/bin/xtensa-esp32-elf-as".format(clang_package_name),
+        "bin_cc": "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
+        "bin_cpp": "external/{}/bin/xtensa-esp32-elf-g++".format(clang_package_name),
+        "bin_cov": "external/{}/bin/xtensa-esp32-elf-gcov".format(clang_package_name),
+        "bin_objdump": "external/{}/bin/xtensa-esp32-elf-objdump".format(clang_package_name),
+        "bin_ld": "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
+    }
+
+    toolchain_definition = toolchain_merge(toolchain_definition, toolchain_fragment_esptool())
+
+    toolchain_maker(
+        name = name,
+        implementation = "linux",
+        definition = toolchain_definition
     )
 
     native.register_toolchains(
         "@{}//:toolchain".format(name),
+        "@{}//:app_toolchain".format(name),
     )
 
     native.register_execution_platforms(

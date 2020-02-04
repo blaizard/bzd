@@ -14,37 +14,36 @@ def _load_linux_x86_64_clang_9_0_0(name):
         sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
     )
 
-    toolchain_maker(
-        name = name,
-        cpu = "linux_x86_64",
-        compiler = "clang",
-        platforms = [
+    toolchain_definition = {
+        "cpu": "linux_x86_64",
+        "compiler": "clang",
+        "platforms": [
             "@//tools/bazel.build/platforms:linux_x86_64",
         ],
-        exec_compatible_with = [
+        "exec_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
             "@//tools/bazel.build/platforms/isa:x86_64",
         ],
-        target_compatible_with = [
+        "target_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
             "@//tools/bazel.build/platforms/isa:x86_64",
         ],
-        builtin_include_directories = [
+        "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
             "%package(@{}//)%/include/c++/v1".format(clang_package_name),
             "%package(@{}//)%/lib/clang/9.0.0/include".format(clang_package_name),
         ],
-        system_directories = [
+        "system_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
             "external/{}/include/c++/v1".format(clang_package_name),
             "external/{}/lib/clang/9.0.0/include".format(clang_package_name),
         ],
-        linker_dirs = [
+        "linker_dirs": [
             "external/{}/lib".format(clang_package_name),
         ],
-        compile_flags = [
+        "compile_flags": [
             "-std=c++14",
 
             # Do not link or re-order inclusion files
@@ -78,7 +77,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
         ],
-        link_flags = [
+        "link_flags": [
             "-Wl,-as-needed",
             "-fuse-ld=gold",
             "-Wl,--disable-new-dtags",
@@ -99,27 +98,34 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
         ],
-        dynamic_runtime_libs = [
+        "dynamic_runtime_libs": [
             "@{}//:dynamic_libraries".format(clang_package_name),
         ],
-        static_runtime_libs = [
+        "static_runtime_libs": [
             "@{}//:static_libraries".format(clang_package_name),
         ],
-        filegroup_dependencies = [
+        "filegroup_dependencies": [
             "@{}//:includes".format(clang_package_name),
             "@{}//:bin".format(clang_package_name),
         ],
-        bin_ar = "external/{}/bin/llvm-ar".format(clang_package_name),
-        bin_as = "external/{}/bin/llvm-as".format(clang_package_name),
-        bin_cc = "external/{}/bin/clang".format(clang_package_name),
-        bin_cpp = "external/{}/bin/clang++".format(clang_package_name),
-        bin_gcov = "external/{}/bin/llvm-cov".format(clang_package_name),
-        bin_objdump = "external/{}/bin/llvm-objdump".format(clang_package_name),
-        bin_ld = "external/{}/bin/clang++".format(clang_package_name),
+        "bin_ar": "external/{}/bin/llvm-ar".format(clang_package_name),
+        "bin_as": "external/{}/bin/llvm-as".format(clang_package_name),
+        "bin_cc": "external/{}/bin/clang".format(clang_package_name),
+        "bin_cpp": "external/{}/bin/clang".format(clang_package_name),
+        "bin_cov": "external/{}/bin/llvm-cov".format(clang_package_name),
+        "bin_objdump": "external/{}/bin/llvm-objdump".format(clang_package_name),
+        "bin_ld": "external/{}/bin/clang++".format(clang_package_name),
+    }
+
+    toolchain_maker(
+        name = name,
+        implementation = "linux",
+        definition = toolchain_definition,
     )
 
     native.register_toolchains(
         "@{}//:toolchain".format(name),
+        "@{}//:app_toolchain".format(name),
     )
 
     native.register_execution_platforms(

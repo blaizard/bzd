@@ -1,8 +1,46 @@
+AppInfo = provider(
+    doc = "blah blah.",
+    fields = ["prepare", "info", "deploy"],
+)
+
+def _app_toolchain_impl(ctx):
+    toolchain_info = platform_common.ToolchainInfo(
+        app = AppInfo(
+            prepare = ctx.attr.prepare,
+            info = ctx.attr.info,
+            deploy = ctx.attr.deploy,
+        )
+    )
+    return [toolchain_info]
+
+"""
+Defines an application toolchain.
+An application toolchain extends a compiler toolchain but added functionalities
+like deploy, profile...
+"""
+app_toolchain = rule(
+    implementation = _app_toolchain_impl,
+    attrs = {
+        "prepare": attr.label(default = "@//tools/bazel.build/toolchains:prepare"),
+        "info": attr.string(),
+        "deploy": attr.label(default = "@//tools/bazel.build/toolchains:deploy"),
+    }
+)
+
 def _impl(ctx):
     # Absolute path of the external directory (used for linking librairies for example)
     absolute_external = ctx.execute(["pwd"], working_directory = "..").stdout.rstrip()
 
     alias_template = "alias(name = \"{}\", actual = \"{}\")"
+
+    # Build the application toolchain arguments
+    app_kwargs = []
+    if ctx.attr.app_prepare:
+        app_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
+    if ctx.attr.app_info:
+        app_kwargs.append("info = \"{}\",".format(ctx.attr.app_info))
+    if ctx.attr.app_deploy:
+        app_kwargs.append("deploy = \"{}\",".format(ctx.attr.app_deploy))
 
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
@@ -28,7 +66,8 @@ def _impl(ctx):
         ),
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
-        "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()])
+        "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
+        "%{app_kwargs}": "\n".join(app_kwargs),
     }
 
     # Apply substitutions
@@ -43,23 +82,16 @@ def _impl(ctx):
     ctx.template("bin/wrapper-cc", Label("//tools/bazel.build/toolchains:template/bin/wrapper-cc"), {"%{cc}": ctx.attr.bin_cc})
     ctx.template("bin/wrapper-cpp", Label("//tools/bazel.build/toolchains:template/bin/wrapper-cpp"), {"%{cpp}": ctx.attr.bin_cpp})
     ctx.template("bin/wrapper-ld", Label("//tools/bazel.build/toolchains:template/bin/wrapper-ld"), {"%{ld}": ctx.attr.bin_ld})
-    ctx.template("bin/wrapper-gcov", Label("//tools/bazel.build/toolchains:template/bin/wrapper-gcov"), {"%{gcov}": ctx.attr.bin_gcov})
+    ctx.template("bin/wrapper-cov", Label("//tools/bazel.build/toolchains:template/bin/wrapper-cov"), {"%{cov}": ctx.attr.bin_cov})
     ctx.template("bin/wrapper-nm", Label("//tools/bazel.build/toolchains:template/bin/wrapper-nm"), {"%{nm}": ctx.attr.bin_nm})
     ctx.template("bin/wrapper-objdump", Label("//tools/bazel.build/toolchains:template/bin/wrapper-objdump"), {"%{objdump}": ctx.attr.bin_objdump})
     ctx.template("bin/wrapper-objcopy", Label("//tools/bazel.build/toolchains:template/bin/wrapper-objcopy"), {"%{objcopy}": ctx.attr.bin_objcopy})
     ctx.template("bin/wrapper-strip", Label("//tools/bazel.build/toolchains:template/bin/wrapper-strip"), {"%{strip}": ctx.attr.bin_strip})
 
 """
-Creates a toolchain to be used with bazel.
-
-This rule also creates few important assets:
- - A toolchain: "@<id>//:toolchain"
- - A compiler target: "@<id>//:compiler"
- - A platform: "@<id>//:platform"
- - A host platform: "@<id>//:host_platform"
- - A config setting: "@<id>//:target"
+Linux specific implementation of the toolchain
 """
-toolchain_maker = repository_rule(
+_toolchain_maker_linux = repository_rule(
     implementation = _impl,
     attrs = {
         "cpu": attr.string(),
@@ -87,10 +119,52 @@ toolchain_maker = repository_rule(
         "bin_cc": attr.string(),
         "bin_cpp": attr.string(),
         "bin_ld": attr.string(default = "/usr/bin/ld"),
-        "bin_gcov": attr.string(default = "/usr/bin/gcov"),
+        "bin_cov": attr.string(default = "/usr/bin/gcov"),
         "bin_nm": attr.string(default = "/usr/bin/nm"),
         "bin_objdump": attr.string(default = "/usr/bin/objdump"),
         "bin_objcopy": attr.string(default = "/usr/bin/objcopy"),
         "bin_strip": attr.string(default = "/usr/bin/strip"),
+        # Deployment
+        "app_prepare": attr.string(),
+        "app_info": attr.string(),
+        "app_deploy": attr.string(),
     },
 )
+
+"""
+Creates a toolchain to be used with bazel.
+
+This rule also creates few important assets:
+ - A toolchain: "@<id>//:toolchain"
+ - A compiler target: "@<id>//:compiler"
+ - A platform: "@<id>//:platform"
+ - A host platform: "@<id>//:host_platform"
+ - A config setting: "@<id>//:target"
+"""
+def toolchain_maker(name, implementation, definition):
+
+    if implementation == "linux":
+        _toolchain_maker_linux(
+            name = name,
+            **definition,
+        )
+    else:
+        fail("Unsupported toolchain type '{}'".format(implementation))
+
+"""
+Merge 2 toolchain data entries.
+"""
+def toolchain_merge(data1, data2):
+
+    for key2, value2 in data2.items():
+        if key2 in data1:
+            if type(data1[key2]) != type(value2):
+                fail("Trying to merge conflicting types for key '{}'.".format(key2))
+            if type(value2) == "list":
+                data1[key2] += value2
+            elif data1[key2] != value2:
+                fail("Trying to merge different values for key '{}'.".format(key2))
+        else:
+            data1[key2] = value2
+
+    return data1

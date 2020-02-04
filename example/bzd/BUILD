@@ -1,4 +1,4 @@
-load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest")
+load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest", "bzd_pack")
 
 bzd_manifest(
     name = "config_manifest",
@@ -20,4 +20,9 @@ bzd_cc_binary(
         "//platform:sdk",
         "//platform/libraries/io/stdout",
     ],
+)
+
+bzd_pack(
+    name = "deploy",
+    binary = ":bzd"
 )
