@@ -1,3 +1,3 @@
 #!/bin/bash --norc
 
-exec %{gcov} "$@"
+exec "$1"

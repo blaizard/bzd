@@ -132,6 +132,77 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
         **kwargs
     )
 
+def _bzd_pack_impl(ctx):
+    binary = ctx.attr.binary
+    executable = binary.files_to_run.executable.path
+
+    # Gather toolchain information
+    info = ctx.toolchains["//tools/bazel.build/toolchains:toolchain_type"].app
+
+    # Prepare application binary
+    prepare_output = ctx.actions.declare_file(".bzd/{}.app".format(ctx.attr.name))
+    prepare = info.prepare
+
+    # Run the prepare step
+    ctx.actions.run(
+        inputs = [binary.files_to_run.executable],
+        outputs = [prepare_output],
+        tools = prepare.data_runfiles.files,
+        use_default_shell_env = True,
+        arguments = [executable, prepare_output.path],
+        executable = prepare.files_to_run,
+    )
+
+    # Generate the info report
+    info_report = ctx.actions.declare_file(".bzd/{}.json".format(ctx.attr.name))
+    args = [info_report.path]
+    ctx.actions.run(
+        inputs = [binary.files_to_run.executable, prepare_output],
+        outputs = [info_report],
+        progress_message = "information report for application {}".format(ctx),
+        arguments = args,
+        executable = ctx.executable._info_script
+    )
+
+    deploy = info.deploy
+
+    ctx.actions.write(
+        output = ctx.outputs.executable,
+        is_executable = True,
+        content = "{} \"{}\" $@".format(deploy.files_to_run.executable.short_path, prepare_output.short_path)
+    )
+
+    runfiles = ctx.runfiles(
+        files = [prepare_output]
+    )
+    runfiles = runfiles.merge(binary.default_runfiles)
+    runfiles = runfiles.merge(deploy.data_runfiles)
+
+    return DefaultInfo(
+        files = depset([info_report]),
+        executable = ctx.outputs.executable,
+        runfiles = runfiles
+    )
+
+bzd_pack = rule(
+    implementation = _bzd_pack_impl,
+    attrs = {
+        "binary": attr.label(
+            allow_files = False,
+            mandatory = True,
+            doc = "Label of the binary to be packed",
+        ),
+        "_info_script": attr.label(
+            executable = True,
+            cfg = "host",
+            allow_files = True,
+            default = Label("//tools/bzd:info_script"),
+        )
+    },
+    executable = True,
+    toolchains = ["//tools/bazel.build/toolchains:toolchain_type"]
+)
+
 """
 Rule to define a bzd binary.
 """

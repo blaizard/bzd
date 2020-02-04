@@ -1,6 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
+load("@//tools/bazel.build/toolchains:defs.bzl", "app_toolchain")
+
+# C++ toolchain
 
 filegroup(
     name = "wrappers",
@@ -54,7 +57,7 @@ cc_toolchain_config(
         "ld": "bin/wrapper-ld",
         "as": "bin/wrapper-as",
         "objcopy": "bin/wrapper-objcopy",
-        "gcov": "bin/wrapper-gcov",
+        "gcov": "bin/wrapper-cov",
         "objdump": "bin/wrapper-objdump",
         "strip": "bin/wrapper-strip",
     },
@@ -105,6 +108,27 @@ toolchain(
     ],
     toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+# Application toolchain
+
+app_toolchain(
+    name = "app",
+    %{app_kwargs}
+)
+
+toolchain(
+    name = "app_toolchain",
+    exec_compatible_with = [
+        ":compiler",
+        %{exec_compatible_with}
+    ],
+    target_compatible_with = [
+        ":compiler",
+        %{target_compatible_with}
+    ],
+    toolchain = ":app",
+    toolchain_type = "@//tools/bazel.build/toolchains:toolchain_type",
 )
 
 constraint_value(

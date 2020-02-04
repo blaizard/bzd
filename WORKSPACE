@@ -18,6 +18,10 @@ load_linux_x86_64_clang()
 
 load_esp32_xtensa_lx6_gcc()
 
+register_toolchains(
+    "//tools/bazel.build/toolchains:app_toolchain",
+)
+
 # Buildifier
 
 load("//tools/buildifier:dependencies.bzl", "load_buildifier_dependencies")
