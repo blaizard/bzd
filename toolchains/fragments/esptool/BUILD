@@ -1,5 +1,3 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-
 filegroup(
     name = "esp32_bin",
     srcs = glob([
@@ -12,10 +10,10 @@ sh_binary(
     srcs = [
         "esp32_prepare.sh",
     ],
-	data = [
-		"@esptool//:tools",
-	],
-	visibility = ["//visibility:public"],
+    data = [
+        "@esptool//:tools",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 sh_binary(
@@ -23,9 +21,9 @@ sh_binary(
     srcs = [
         "esp32_exec.sh",
     ],
-	data = [
-		"@esptool//:tools",
-		":esp32_bin",
-	],
-	visibility = ["//visibility:public"],
+    data = [
+        ":esp32_bin",
+        "@esptool//:tools",
+    ],
+    visibility = ["//visibility:public"],
 )

@@ -1,5 +1,4 @@
 #include "bzd/format/integral.h"
-
 #include "cc_test/test.h"
 
 TEST(ToString, Integer)

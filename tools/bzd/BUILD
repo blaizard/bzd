@@ -6,5 +6,5 @@ py_binary(
         "*.py",
     ]),
     main = "info_script.py",
-	visibility = ["//visibility:public"],
+    visibility = ["//visibility:public"],
 )

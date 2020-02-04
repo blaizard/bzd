@@ -1,5 +1,4 @@
 #include "bzd/container/pool.h"
-
 #include "cc_test/test.h"
 
 TEST(ContainerPool, single)

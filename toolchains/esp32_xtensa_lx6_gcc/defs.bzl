@@ -3,7 +3,6 @@ load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker", "toolchain_me
 load("//toolchains/fragments/esptool:defs.bzl", "toolchain_fragment_esptool")
 
 def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
-
     # Compiler
     clang_package_name = "esp32_xtensa_lx6_gcc_8_2_0"
     http_archive(
@@ -132,16 +131,7 @@ def _load_esp32_xtensa_lx6_gcc_8_2_0(name):
     toolchain_maker(
         name = name,
         implementation = "linux",
-        definition = toolchain_definition
-    )
-
-    native.register_toolchains(
-        "@{}//:toolchain".format(name),
-        "@{}//:app_toolchain".format(name),
-    )
-
-    native.register_execution_platforms(
-        "@{}//:host_platform".format(name),
+        definition = toolchain_definition,
     )
 
 def load_esp32_xtensa_lx6_gcc():

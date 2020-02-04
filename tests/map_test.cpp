@@ -1,5 +1,4 @@
 #include "bzd/container/map.h"
-
 #include "cc_test/test.h"
 
 TEST(ContainerMap, single)

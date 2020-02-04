@@ -18,6 +18,7 @@
 |:---|:---|
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
 |[`BTree`](btree/index.md)||
+|[`IOPort`](ioport/index.md)||
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)||
 |[`Pool`](pool/index.md)||
@@ -64,6 +65,7 @@
 
 |Typedef||
 |:---|:---|
+|[`BoolType`](./index.md)|Boolean type.|
 |[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
 |[`FctPtrType`](./index.md)|Function pointer type.|
 |[`IChannel`](./index.md)|alias of [`bzd::impl::IChannel`](impl/ichannel/index.md)|
@@ -106,6 +108,9 @@ The container combines the performance and accessibility of a C-style array with
 |class V|None||
 |SizeType|N||
 |SizeType|Order||
+------
+### `class IOPort`
+
 ------
 ### `class Log`
 
@@ -429,6 +434,9 @@ The class template span describes an object that can refer to a contiguous seque
 ------
 ### `void yield()`
 
+------
+### `typedef BoolType`
+Boolean type.
 ------
 ### `template<class T, class E> typedef Expected`
 This is the type used for returning and propagating errors.

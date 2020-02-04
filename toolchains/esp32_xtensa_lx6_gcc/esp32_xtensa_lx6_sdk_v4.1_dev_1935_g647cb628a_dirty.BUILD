@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
@@ -11,6 +13,9 @@ filegroup(
 
 cc_library(
     name = "sdk",
+    srcs = [
+        "bzd/main.cpp",
+    ],
     hdrs = glob([
         "include/**/*",
     ]),
@@ -18,19 +23,13 @@ cc_library(
         "include",
         "include/app_trace",
         "include/app_update",
-        "include/freertos",
-        "include/esp32",
-        "include/soc",
-        "include/heap",
         "include/driver",
+        "include/esp32",
+        "include/freertos",
+        "include/heap",
+        "include/soc",
     ],
-    srcs = [
-        "bzd/main.cpp",
-    ],
-    alwayslink = True,
-    visibility = ["//visibility:public"],
     linkopts = [
-
         "-nostdlib",
         "-Wl,--start-group",
 
@@ -124,8 +123,9 @@ cc_library(
         "-lgcc",
         "-lstdc++",
         "-lgcov",
-
         "-Wl,--end-group",
         "-fno-rtti",
-    ]
+    ],
+    visibility = ["//visibility:public"],
+    alwayslink = True,
 )

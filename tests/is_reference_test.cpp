@@ -1,5 +1,4 @@
 #include "bzd/type_traits/is_reference.h"
-
 #include "cc_test/test.h"
 
 TEST(TypeTraits, isReference)

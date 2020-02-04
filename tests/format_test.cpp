@@ -2,7 +2,6 @@
 #include "bzd/container/string_view.h"
 #include "bzd/container/vector.h"
 #include "bzd/format/format.h"
-
 #include "cc_test/test.h"
 
 class ContextTest

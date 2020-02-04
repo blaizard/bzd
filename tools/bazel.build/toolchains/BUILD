@@ -1,16 +1,8 @@
 load("//tools/bazel.build/toolchains:defs.bzl", "app_toolchain")
 
 toolchain_type(
-	name = "toolchain_type",
-	visibility = ["//visibility:public"],
-)
-
-sh_binary(
-    name = "execute",
-    srcs = [
-		"execute.sh"
-	],
-	visibility = ["//visibility:public"],
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
 )
 
 # Default app toolchain

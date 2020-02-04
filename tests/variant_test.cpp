@@ -1,6 +1,6 @@
 #include "bzd/container/variant.h"
-
 #include "cc_test/test.h"
+
 #include <iostream>
 
 TEST(ContainerVariant, Constructor)

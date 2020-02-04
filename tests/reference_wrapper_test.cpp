@@ -1,5 +1,4 @@
 #include "bzd/utility/reference_wrapper.h"
-
 #include "cc_test/test.h"
 
 TEST(ReferenceWrapper, simple)

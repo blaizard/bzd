@@ -1,5 +1,4 @@
 #include "bzd/container/string_view.h"
-
 #include "cc_test/test.h"
 
 /*

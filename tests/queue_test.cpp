@@ -1,5 +1,4 @@
 #include "bzd/container/queue.h"
-
 #include "cc_test/test.h"
 
 TEST(ContainerForwardList, simple)

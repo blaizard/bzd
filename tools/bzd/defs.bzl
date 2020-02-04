@@ -139,7 +139,8 @@ def _bzd_pack_impl(ctx):
     # Gather toolchain information
     info = ctx.toolchains["//tools/bazel.build/toolchains:toolchain_type"].app
 
-    # Prepare phase
+    # --- Prepare phase
+
     prepare = info.prepare
     if prepare:
         # Run the prepare step only if it is present
@@ -155,7 +156,8 @@ def _bzd_pack_impl(ctx):
     else:
         prepare_output = binary.files_to_run.executable
 
-    # Info phase
+    # --- Info phase
+
     info_report = ctx.actions.declare_file(".bzd/{}.json".format(ctx.attr.name))
     args = [info_report.path]
     ctx.actions.run(
@@ -163,28 +165,35 @@ def _bzd_pack_impl(ctx):
         outputs = [info_report],
         progress_message = "information report for application {}".format(ctx),
         arguments = args,
-        executable = ctx.executable._info_script
+        executable = ctx.executable._info_script,
     )
 
-    # Execution phase
+    # --- Execution phase
+
     execute = info.execute
-    ctx.actions.write(
-        output = ctx.outputs.executable,
-        is_executable = True,
-        content = "{} \"{}\" $@".format(execute.files_to_run.executable.short_path, prepare_output.short_path)
-    )
 
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
-        files = [prepare_output]
+        files = [prepare_output],
     )
     runfiles = runfiles.merge(binary.default_runfiles)
-    runfiles = runfiles.merge(execute.data_runfiles)
+
+    # Generate the execution script
+    if execute:
+        runfiles = runfiles.merge(execute.data_runfiles)
+        content = "{} \"{}\" $@".format(execute.files_to_run.executable.short_path, prepare_output.short_path)
+    else:
+        content = "{} $@".format(prepare_output.short_path)
+    ctx.actions.write(
+        output = ctx.outputs.executable,
+        is_executable = True,
+        content = content,
+    )
 
     return DefaultInfo(
         files = depset([info_report]),
         executable = ctx.outputs.executable,
-        runfiles = runfiles
+        runfiles = runfiles,
     )
 
 bzd_pack = rule(
@@ -200,10 +209,10 @@ bzd_pack = rule(
             cfg = "host",
             allow_files = True,
             default = Label("//tools/bzd:info_script"),
-        )
+        ),
     },
     executable = True,
-    toolchains = ["//tools/bazel.build/toolchains:toolchain_type"]
+    toolchains = ["//tools/bazel.build/toolchains:toolchain_type"],
 )
 
 """

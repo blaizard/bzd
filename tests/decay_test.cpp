@@ -1,6 +1,5 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/utility/decay.h"
-
 #include "cc_test/test.h"
 
 template <typename T, typename U>

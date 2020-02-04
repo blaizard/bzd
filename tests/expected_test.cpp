@@ -1,7 +1,7 @@
-#include <string>
-
 #include "bzd/container/expected.h"
 #include "cc_test/test.h"
+
+#include <string>
 
 TEST(ContainerExpected, returnVoid)
 {
