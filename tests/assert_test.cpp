@@ -1,5 +1,4 @@
 #include "bzd/assert.h"
-
 #include "cc_test/test.h"
 
 TEST(Assert, Base)

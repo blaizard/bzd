@@ -1,5 +1,4 @@
 #include "bzd/core/registry.h"
-
 #include "cc_test/test.h"
 
 TEST(Registry, Base)

@@ -1,5 +1,4 @@
 #include "bzd/container/btree.h"
-
 #include "cc_test/test.h"
 
 TEST(ContainerBTree, base)

@@ -123,14 +123,5 @@ def _load_linux_x86_64_clang_9_0_0(name):
         definition = toolchain_definition,
     )
 
-    native.register_toolchains(
-        "@{}//:toolchain".format(name),
-        "@{}//:app_toolchain".format(name),
-    )
-
-    native.register_execution_platforms(
-        "@{}//:host_platform".format(name),
-    )
-
 def load_linux_x86_64_clang():
     _load_linux_x86_64_clang_9_0_0(name = "linux_x86_64_clang")

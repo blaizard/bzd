@@ -1,17 +1,19 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "cc_test",
-    hdrs = [
-        "test_internal.h",
-        "test.h",
-    ],
     srcs = [
         "test.cpp",
     ],
-    alwayslink = True,
+    hdrs = [
+        "test.h",
+        "test_internal.h",
+    ],
+    include_prefix = "cc_test",
     includes = ["."],
-	include_prefix = "cc_test",
     visibility = ["//visibility:public"],
     deps = [
-        "//platform:sdk"
-    ]
+        "//platform:sdk",
+    ],
+    alwayslink = True,
 )

@@ -1,5 +1,4 @@
 #include "bzd/container/span.h"
-
 #include "cc_test/test.h"
 
 TEST(ContainerSpan, Base)

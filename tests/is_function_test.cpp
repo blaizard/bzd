@@ -1,5 +1,4 @@
 #include "bzd/type_traits/is_function.h"
-
 #include "cc_test/test.h"
 
 int f();

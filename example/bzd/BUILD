@@ -24,5 +24,5 @@ bzd_cc_binary(
 
 bzd_pack(
     name = "deploy",
-    binary = ":bzd"
+    binary = ":bzd",
 )

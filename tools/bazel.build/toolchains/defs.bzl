@@ -9,7 +9,7 @@ def _app_toolchain_impl(ctx):
             prepare = ctx.attr.prepare,
             info = ctx.attr.info,
             execute = ctx.attr.execute,
-        )
+        ),
     )
     return [toolchain_info]
 
@@ -21,10 +21,10 @@ like execute, profile...
 app_toolchain = rule(
     implementation = _app_toolchain_impl,
     attrs = {
-        "prepare": attr.label(), #default = "@//tools/bazel.build/toolchains:prepare"),
+        "prepare": attr.label(),
         "info": attr.string(),
-        "execute": attr.label(default = "@//tools/bazel.build/toolchains:execute"),
-    }
+        "execute": attr.label(),
+    },
 )
 
 def _impl(ctx):
@@ -141,21 +141,31 @@ This rule also creates few important assets:
  - A host platform: "@<id>//:host_platform"
  - A config setting: "@<id>//:target"
 """
-def toolchain_maker(name, implementation, definition):
 
+def toolchain_maker(name, implementation, definition):
     if implementation == "linux":
         _toolchain_maker_linux(
             name = name,
-            **definition,
+            **definition
         )
+
+        native.register_toolchains(
+            "@{}//:toolchain".format(name),
+            "@{}//:app_toolchain".format(name),
+        )
+
+        native.register_execution_platforms(
+            "@{}//:host_platform".format(name),
+        )
+
     else:
         fail("Unsupported toolchain type '{}'".format(implementation))
 
 """
 Merge 2 toolchain data entries.
 """
-def toolchain_merge(data1, data2):
 
+def toolchain_merge(data1, data2):
     for key2, value2 in data2.items():
         if key2 in data1:
             if type(data1[key2]) != type(value2):

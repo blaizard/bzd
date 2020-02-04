@@ -1,5 +1,4 @@
 #include "bzd/container/string.h"
-
 #include "cc_test/test.h"
 
 class A

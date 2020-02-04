@@ -2,17 +2,13 @@
 
 namespace bzd {
 
-IOPort::IOPort(const bzd::UInt8Type /*port*/)
-{
-}
+IOPort::IOPort(const bzd::UInt8Type /*port*/) {}
 
-void IOPort::write(const bzd::BoolType /*data*/) noexcept
-{
-}
+void IOPort::write(const bzd::BoolType /*data*/) noexcept {}
 
 bzd::BoolType IOPort::read() noexcept
 {
 	return true;
 }
 
-} // namespace bzd::io
+} // namespace bzd
