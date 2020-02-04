@@ -6,17 +6,9 @@ toolchain_type(
 )
 
 sh_binary(
-    name = "prepare",
+    name = "execute",
     srcs = [
-		"bin/prepare.sh"
-	],
-	visibility = ["//visibility:public"],
-)
-
-sh_binary(
-    name = "deploy",
-    srcs = [
-		"bin/deploy.sh"
+		"execute.sh"
 	],
 	visibility = ["//visibility:public"],
 )

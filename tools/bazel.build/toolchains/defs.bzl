@@ -1,6 +1,6 @@
 AppInfo = provider(
     doc = "blah blah.",
-    fields = ["prepare", "info", "deploy"],
+    fields = ["prepare", "info", "execute"],
 )
 
 def _app_toolchain_impl(ctx):
@@ -8,7 +8,7 @@ def _app_toolchain_impl(ctx):
         app = AppInfo(
             prepare = ctx.attr.prepare,
             info = ctx.attr.info,
-            deploy = ctx.attr.deploy,
+            execute = ctx.attr.execute,
         )
     )
     return [toolchain_info]
@@ -16,14 +16,14 @@ def _app_toolchain_impl(ctx):
 """
 Defines an application toolchain.
 An application toolchain extends a compiler toolchain but added functionalities
-like deploy, profile...
+like execute, profile...
 """
 app_toolchain = rule(
     implementation = _app_toolchain_impl,
     attrs = {
-        "prepare": attr.label(default = "@//tools/bazel.build/toolchains:prepare"),
+        "prepare": attr.label(), #default = "@//tools/bazel.build/toolchains:prepare"),
         "info": attr.string(),
-        "deploy": attr.label(default = "@//tools/bazel.build/toolchains:deploy"),
+        "execute": attr.label(default = "@//tools/bazel.build/toolchains:execute"),
     }
 )
 
@@ -39,8 +39,8 @@ def _impl(ctx):
         app_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
     if ctx.attr.app_info:
         app_kwargs.append("info = \"{}\",".format(ctx.attr.app_info))
-    if ctx.attr.app_deploy:
-        app_kwargs.append("deploy = \"{}\",".format(ctx.attr.app_deploy))
+    if ctx.attr.app_execute:
+        app_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
 
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
@@ -124,10 +124,10 @@ _toolchain_maker_linux = repository_rule(
         "bin_objdump": attr.string(default = "/usr/bin/objdump"),
         "bin_objcopy": attr.string(default = "/usr/bin/objcopy"),
         "bin_strip": attr.string(default = "/usr/bin/strip"),
-        # Deployment
+        # Execution
         "app_prepare": attr.string(),
         "app_info": attr.string(),
-        "app_deploy": attr.string(),
+        "app_execute": attr.string(),
     },
 )
 
