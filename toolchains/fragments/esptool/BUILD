@@ -19,9 +19,9 @@ sh_binary(
 )
 
 sh_binary(
-    name = "esp32_deploy",
+    name = "esp32_exec",
     srcs = [
-        "esp32_deploy.sh",
+        "esp32_exec.sh",
     ],
 	data = [
 		"@esptool//:tools",

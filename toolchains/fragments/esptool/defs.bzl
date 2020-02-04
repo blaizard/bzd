@@ -15,5 +15,5 @@ def toolchain_fragment_esptool():
 
     return {
         "app_prepare": "@//toolchains/fragments/esptool:esp32_prepare",
-        "app_deploy": "@//toolchains/fragments/esptool:esp32_deploy",
+        "app_execute": "@//toolchains/fragments/esptool:esp32_exec",
     }
