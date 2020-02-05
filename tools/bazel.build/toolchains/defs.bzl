@@ -56,8 +56,7 @@ def _impl(ctx):
         "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in ctx.attr.builtin_include_directories]),
         "%{system_directories}": "\n".join(["'{}',".format(t) for t in ctx.attr.builtin_include_directories]),
         "%{compile_flags}": "\n".join(
-            ["'-idirafter', '{}',".format(t) for t in ctx.attr.system_directories] +
-            ["'-I', '{}',".format(t) for t in ctx.attr.system_directories] +
+            ["'-isystem', '{}',".format(t) for t in ctx.attr.system_directories] +
             ["'{}',".format(t) for t in ctx.attr.compile_flags],
         ),
         "%{link_flags}": "\n".join(

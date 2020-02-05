@@ -5,7 +5,7 @@ def toolchain_fragment_esptool():
 
     http_archive(
         name = tools_package_name,
-        build_file = "//toolchains/fragments/esptool:{}.BUILD".format(tools_package_name),
+        build_file = "//toolchains/cc/fragments/esptool:{}.BUILD".format(tools_package_name),
         urls = [
             "https://github.com/espressif/esptool/archive/v2.8.zip",
         ],
@@ -14,6 +14,6 @@ def toolchain_fragment_esptool():
     )
 
     return {
-        "app_prepare": "@//toolchains/fragments/esptool:esp32_prepare",
-        "app_execute": "@//toolchains/fragments/esptool:esp32_exec",
+        "app_prepare": "@//toolchains/cc/fragments/esptool:esp32_prepare",
+        "app_execute": "@//toolchains/cc/fragments/esptool:esp32_exec",
     }
