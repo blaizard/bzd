@@ -6,7 +6,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
     clang_package_name = "linux_x86_64_clang_9_0_0"
     http_archive(
         name = clang_package_name,
-        build_file = "//toolchains/linux_x86_64_clang:{}.BUILD".format(clang_package_name),
+        build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(clang_package_name),
         urls = [
             "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
         ],
