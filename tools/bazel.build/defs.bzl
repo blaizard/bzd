@@ -1,32 +1,37 @@
-def _sh_binary_wrapper_impl(ctx):
-    binary = ctx.attr.binary
+def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], files = None, command = "{binary}"):
     executable = binary.files_to_run.executable
 
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
-		files = [executable] + ctx.files.data
+		files = [executable] + extra_runfiles
 	)
     runfiles = runfiles.merge(binary.default_runfiles)
 
     runfiles_relative_tool_path = ctx.workspace_name + "/" + executable.short_path
-    command_pre = "#!/bin/bash\nexport RUNFILES_DIR=\"$0.runfiles\"\n"
+    command_pre = "#!/bin/bash\nif [ -z \"${RUNFILES_DIR}\" ]; then\nexport RUNFILES_DIR=\"$0.runfiles\"\nfi\n"
     binary_path = "${{RUNFILES_DIR}}/{}".format(runfiles_relative_tool_path)
     # Create the wrapping script
-    command_format = ctx.attr.command
     ctx.actions.write(
-        output = ctx.outputs.executable,
+        output = output,
         is_executable = True,
-		content = command_pre + command_format.format(
+		content = command_pre + command.format(
             binary = binary_path,
-			# to be fixed
-            binary2 =  executable.short_path,
         ),
     )
 
     return DefaultInfo(
-        executable = ctx.outputs.executable,
+        executable = output,
         runfiles = runfiles,
+        files = files,
     )
+
+def _sh_binary_wrapper_impl(ctx):
+    return sh_binary_wrapper_impl(
+        ctx = ctx,
+        binary = ctx.attr.binary,
+        output = ctx.outputs.executable,
+        extra_runfiles = ctx.files.data,
+        command = ctx.attr.command)
 
 """
 Binary wrapper rule. Wraps a bazel executable into this rule

@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/bazel.build:defs.bzl", "sh_binary_wrapper_impl")
 
 # Custom provider for a manifest
 BzdManifestInfo = provider(fields = ["manifest"])
@@ -170,31 +171,13 @@ def _bzd_pack_impl(ctx):
 
     # --- Execution phase
 
-    execute = info.execute
-
-    # Prepare the runfiles for the execution
-    runfiles = ctx.runfiles(
-        files = [prepare_output],
-    )
-    runfiles = runfiles.merge(binary.default_runfiles)
-
-    # Generate the execution script
-    if execute:
-        runfiles = runfiles.merge(execute.data_runfiles)
-        content = "{} \"{}\" $@".format(execute.files_to_run.executable.short_path, prepare_output.short_path)
-    else:
-        content = "{} $@".format(prepare_output.short_path)
-    ctx.actions.write(
+    return sh_binary_wrapper_impl(
+        ctx = ctx,
+        binary = info.execute,
         output = ctx.outputs.executable,
-        is_executable = True,
-        content = content,
-    )
-
-    return DefaultInfo(
+        extra_runfiles = [prepare_output],
         files = depset([info_report]),
-        executable = ctx.outputs.executable,
-        runfiles = runfiles,
-    )
+        command = "{{binary}} \"{}\" $@".format(prepare_output.short_path))
 
 bzd_pack = rule(
     implementation = _bzd_pack_impl,

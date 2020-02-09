@@ -8,6 +8,16 @@ filegroup(
 )
 
 sh_binary_wrapper(
-    name = "wrapper_echo",
+    name = "wrapper_echo1",
     binary = ":echo",
+)
+
+sh_binary_wrapper(
+    name = "wrapper_echo2",
+    binary = ":wrapper_echo1",
+)
+
+sh_binary_wrapper(
+    name = "wrapper_echo3",
+    binary = ":wrapper_echo2",
 )
