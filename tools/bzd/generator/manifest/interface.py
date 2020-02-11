@@ -21,6 +21,9 @@ class Interface(object):
 		includes = self.definition.get("includes", [])
 		return includes if isinstance(includes, list) else [includes]
 
+	def getClass(self):
+		return self.definition.get("class", None)
+
 """
 Helper to ceate an empty interface
 """

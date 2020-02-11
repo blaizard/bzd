@@ -19,6 +19,7 @@ bzd_cc_binary(
         "//platform:bzd",
         "//platform:sdk",
         "//platform/libraries/io/stdout",
+        "//platform/libraries/io/port",
     ],
 )
 

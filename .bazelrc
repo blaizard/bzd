@@ -3,7 +3,6 @@ common --announce_rc
 try-import .bazelrc.local
 
 # Build specific options
-build --color=yes
 build --verbose_failures
 
 # Set default options used by the default run

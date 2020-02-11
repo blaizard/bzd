@@ -3,7 +3,7 @@
 #include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
-#include "bzd/core/io_channel.h"
+#include "bzd/core/channel.h"
 #include "bzd/core/system.h"
 #include "bzd/format/format.h"
 #include "bzd/utility/forward.h"

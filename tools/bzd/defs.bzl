@@ -171,13 +171,28 @@ def _bzd_pack_impl(ctx):
 
     # --- Execution phase
 
-    return sh_binary_wrapper_impl(
-        ctx = ctx,
-        binary = info.execute,
+    if info.execute:
+        return sh_binary_wrapper_impl(
+            ctx = ctx,
+            binary = info.execute,
+            output = ctx.outputs.executable,
+            extra_runfiles = [prepare_output],
+            files = depset([info_report]),
+            command = "{{binary}} \"{}\" $@".format(prepare_output.short_path))
+
+    # If no executable are set, execute as a normal shell command
+
+    ctx.actions.write(
         output = ctx.outputs.executable,
-        extra_runfiles = [prepare_output],
+        is_executable = True,
+		content = "exec {} $@".format(prepare_output.short_path),
+    )
+
+    return DefaultInfo(
+        executable = ctx.outputs.executable,
+        runfiles = ctx.runfiles(files = [prepare_output]),
         files = depset([info_report]),
-        command = "{{binary}} \"{}\" $@".format(prepare_output.short_path))
+    )
 
 bzd_pack = rule(
     implementation = _bzd_pack_impl,
@@ -213,11 +228,14 @@ def bzd_cc_test(name, deps, **kwargs):
     return _bzd_cc_macro_impl(True, name, deps, **kwargs)
 
 def _bzd_genmanifest_impl(ctx):
+
     # Create the manifest content
     content = "interfaces:\n"
-    for interface in ctx.attr.interfaces:
+    for interface, className in ctx.attr.interfaces.items():
         content += "  \"{}\":\n".format(interface)
         content += "    includes: [{}]\n".format(", ".join(["\"{}\"".format(include) for include in ctx.attr.includes]))
+        if className != "*":
+            content += "    class: !ref {}\n".format(className)
 
     # Create the file
     ctx.actions.write(
@@ -233,7 +251,7 @@ Rule to generate a manifest
 _bzd_genmanifest = rule(
     implementation = _bzd_genmanifest_impl,
     attrs = {
-        "interfaces": attr.string_list(
+        "interfaces": attr.string_dict(
             mandatory = True,
             doc = "List of interfaces availaable through this library.",
         ),

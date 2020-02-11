@@ -2,10 +2,8 @@
 
 #include "bzd/core/channel.h"
 
-#include <iostream>
-
 namespace bzd { namespace io {
-class Stdout : public bzd::OChannel
+class DigitalOutput : public bzd::OChannel
 {
 public:
 	bzd::SizeType write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override

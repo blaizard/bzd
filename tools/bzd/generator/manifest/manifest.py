@@ -33,7 +33,8 @@ class Manifest():
 			"interfaces": {
 				"_default": {
 					"_key": Validator("interface"),
-					"includes": Validator("any")
+					"includes": Validator("any"),
+					"class": Validator("interface")
 				}
 			},
 			"objects": {
