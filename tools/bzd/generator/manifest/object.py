@@ -84,7 +84,10 @@ class Object():
 	Get the constructor class
 	"""
 	def getClass(self):
-		return self.definition.get("class", self.getInterfaceName())
+		classInterface = self.getInterface().getClass()
+		classObjecy = self.definition.get("class", None)
+		assert classInterface == None or classObjecy == None, "Both interface class '{}' and object class '{}' cannot be set at the same time for object identifier '{}'.".format(classInterface, classObjecy, self.identifier)
+		return classInterface if classInterface else self.definition.get("class", self.getInterfaceName())
 
 	"""
 	Get parameters

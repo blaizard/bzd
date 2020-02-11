@@ -8,6 +8,19 @@ int main()
 	// Log a new message
 	log.info(CSTR("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
+	// LED blinking
+	auto& port = bzd::Registry<bzd::Port>::get("led");
+	while (true)
+	{
+		(void) port;
+	}
+/*
+	bzd::io::Digital port(bzd::io::Port);
+	bzd::io::DigitalInput port(bzd::io::Port);
+
+	port.write(1);
+	port.read();
+*/
 	return 0;
 }
 
@@ -15,7 +28,6 @@ int main()
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 
 #define BLINK_GPIO GPIO_NUM_2 //CONFIG_BLINK_GPIO
 

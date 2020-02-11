@@ -17,9 +17,9 @@ bzd_cc_library(
     includes = [
         "libraries/io/stdout/stdout.h",
     ],
-    interfaces = [
-        "bzd::io::Stdout",
-    ],
+    interfaces = {
+        "bzd::io::Stdout": "*"
+    },
     visibility = ["//visibility:public"],
     deps = [
         "//platform:bzd_core",
