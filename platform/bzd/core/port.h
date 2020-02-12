@@ -12,10 +12,7 @@ class Port
 public:
 	constexpr Port(const bzd::UInt8Type port) : port_(port) {}
 
-	constexpr bzd::UInt8Type get() const noexcept
-	{
-		return port_;
-	}
+	constexpr bzd::UInt8Type get() const noexcept { return port_; }
 
 private:
 	const bzd::UInt8Type port_;

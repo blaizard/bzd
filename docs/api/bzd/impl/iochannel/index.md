@@ -10,7 +10,9 @@
 |Function||
 |:---|:---|
 |[`read(Span< T > & data)`](./index.md)||
+|[`read(T & data)`](./index.md)||
 |[`write(const Span< const T > & data)`](./index.md)||
+|[`write(const T & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 *From bzd::impl::IChannel*
@@ -21,6 +23,15 @@
 |---:|:---|:---|
 |Span< T > &|data||
 ------
+### `virtual SizeType read(T & data)`
+*From bzd::impl::IChannel*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|T &|data||
+------
 ### `virtual SizeType write(const Span< const T > & data)`
 *From bzd::impl::OChannel*
 
@@ -29,3 +40,12 @@
 ||||
 |---:|:---|:---|
 |const Span< const T > &|data||
+------
+### `virtual SizeType write(const T & data)`
+*From bzd::impl::OChannel*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|data||

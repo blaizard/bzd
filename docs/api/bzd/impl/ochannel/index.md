@@ -10,6 +10,7 @@
 |Function||
 |:---|:---|
 |[`write(const Span< const T > & data)`](./index.md)||
+|[`write(const T & data)`](./index.md)||
 ------
 ### `virtual SizeType write(const Span< const T > & data)`
 
@@ -17,3 +18,10 @@
 ||||
 |---:|:---|:---|
 |const Span< const T > &|data||
+------
+### `virtual SizeType write(const T & data)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const T &|data||

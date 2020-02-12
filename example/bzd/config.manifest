@@ -10,3 +10,12 @@ objects:
     "bzd::Port.led":
         params:
             - 2
+    "bzd::OChannel.led":
+        class: !ref bzd::io::DigitalOutput
+        params:
+            - !ref bzd::Port.led
+#    "bzd::OChannel.servo":
+#        class: !ref bzd::io::I2C
+#        params:
+#            - !ref bzd::Port.led
+#            - !ref bzd::Port.led

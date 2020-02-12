@@ -10,6 +10,7 @@
 |Function||
 |:---|:---|
 |[`read(Span< T > & data)`](./index.md)||
+|[`read(T & data)`](./index.md)||
 ------
 ### `virtual SizeType read(Span< T > & data)`
 
@@ -17,3 +18,10 @@
 ||||
 |---:|:---|:---|
 |Span< T > &|data||
+------
+### `virtual SizeType read(T & data)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|T &|data||

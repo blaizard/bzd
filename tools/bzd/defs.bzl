@@ -150,7 +150,6 @@ def _bzd_pack_impl(ctx):
             inputs = [binary.files_to_run.executable],
             outputs = [prepare_output],
             tools = prepare.data_runfiles.files,
-            use_default_shell_env = True,
             arguments = [executable, prepare_output.path],
             executable = prepare.files_to_run,
         )
@@ -178,14 +177,15 @@ def _bzd_pack_impl(ctx):
             output = ctx.outputs.executable,
             extra_runfiles = [prepare_output],
             files = depset([info_report]),
-            command = "{{binary}} \"{}\" $@".format(prepare_output.short_path))
+            command = "{{binary}} \"{}\" $@".format(prepare_output.short_path),
+        )
 
     # If no executable are set, execute as a normal shell command
 
     ctx.actions.write(
         output = ctx.outputs.executable,
         is_executable = True,
-		content = "exec {} $@".format(prepare_output.short_path),
+        content = "exec {} $@".format(prepare_output.short_path),
     )
 
     return DefaultInfo(
@@ -228,7 +228,6 @@ def bzd_cc_test(name, deps, **kwargs):
     return _bzd_cc_macro_impl(True, name, deps, **kwargs)
 
 def _bzd_genmanifest_impl(ctx):
-
     # Create the manifest content
     content = "interfaces:\n"
     for interface, className in ctx.attr.interfaces.items():

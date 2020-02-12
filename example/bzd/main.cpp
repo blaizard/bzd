@@ -1,4 +1,6 @@
 #include "bzd.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 int main()
 {
@@ -9,18 +11,21 @@ int main()
 	log.info(CSTR("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
 	// LED blinking
-	auto& port = bzd::Registry<bzd::Port>::get("led");
+	auto& port = bzd::Registry<bzd::OChannel>::get("led");
 	while (true)
 	{
-		(void) port;
+		port.write(1);
+		// vTaskDelay(500 / portTICK_PERIOD_MS);
+		// port.write(0);
+		// vTaskDelay(500 / portTICK_PERIOD_MS);
 	}
-/*
-	bzd::io::Digital port(bzd::io::Port);
-	bzd::io::DigitalInput port(bzd::io::Port);
+	/*
+		bzd::io::Digital port(bzd::io::Port);
+		bzd::io::DigitalInput port(bzd::io::Port);
 
-	port.write(1);
-	port.read();
-*/
+		port.write(1);
+		port.read();
+	*/
 	return 0;
 }
 

@@ -13,10 +13,7 @@ protected:
 
 public:
 	virtual SizeType write(const Span<const T>& data) noexcept = 0;
-	virtual SizeType write(const T& data) noexcept
-	{
-		write(Span<const T>(&data, 1));
-	}
+	virtual SizeType write(const T& data) noexcept { return write(Span<const T>(&data, 1)); }
 };
 
 template <class T>
@@ -27,10 +24,7 @@ protected:
 
 public:
 	virtual SizeType read(Span<T>& data) noexcept = 0;
-	virtual SizeType read(T& data) noexcept
-	{
-		return read(Span<const T>(&data, 1));
-	}
+	virtual SizeType read(T& data) noexcept { return read(Span<const T>(&data, 1)); }
 };
 
 template <class T>
