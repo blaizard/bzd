@@ -1,4 +1,3 @@
-load("@bazel_tools//tools/python:toolchain.bzl", "py_runtime_pair")
 load("@debian_repository_rules//:debian.bzl", "debian_archive")
 
 def load_linux_x86_64_python():

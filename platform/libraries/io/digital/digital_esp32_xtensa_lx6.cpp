@@ -1,38 +1,34 @@
-#include "bzd/io/port.h"
 #include "driver/gpio.h"
 
-#pragma once
-
-#include "bzd/core/channel.h"
-
-#include <iostream>
-
-namespace bzd { namespace io {
-class Stdout : public bzd::OChannel
-{
-public:
-	bzd::SizeType write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override
-	{
-		std::cout.write(reinterpret_cast<const char*>(data.data()), data.size());
-		return data.size();
-	}
-};
-}} // namespace bzd::io
+#include "libraries/io/digital/digital.h"
+#include "libraries/io/port/port_esp32_xtensa_lx6.h"
 
 namespace bzd { namespace io {
 
-Port::Port(const bzd::UInt8Type port, const Port::Mode mode) : impl::Port(port)
+DigitalOutput::DigitalOutput(const bzd::Port& port) : bzd::OChannel(), port_(port)
 {
-	gpio_pad_select_gpio(port);
-	switch (mode)
-	{
-	case Mode::INPUT:
-		gpio_set_direction(static_cast<gpio_num_t>(port), GPIO_MODE_INPUT);
-		break;
-	case Mode::OUTPUT:
-		gpio_set_direction(static_cast<gpio_num_t>(port), GPIO_MODE_OUTPUT);
-		break;
-	}
+	gpio_pad_select_gpio(port.get());
+	gpio_set_direction(static_cast<gpio_num_t>(port.get()), GPIO_MODE_OUTPUT);
 }
 
-}}
+bzd::SizeType DigitalOutput::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
+{
+	const auto& targetPort = reinterpret_cast<const bzd::io::PortEsp32XtensaLx6&>(port_);
+
+	if (data[0])
+	{
+		gpio_set_level(targetPort.getGpio(), 1);
+	}
+	else
+	{
+		gpio_set_level(targetPort.getGpio(), 0);
+	}
+	return 1;
+}
+/*
+bzd::SizeType DigitalOutput::write(const bzd::UInt8Type& data) noexcept
+{
+}*/
+
+
+}} // namespace bzd::io

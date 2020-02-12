@@ -18,10 +18,10 @@
 |:---|:---|
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
 |[`BTree`](btree/index.md)||
-|[`IOPort`](ioport/index.md)||
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)||
 |[`Pool`](pool/index.md)||
+|[`Port`](port/index.md)||
 |[`Queue`](queue/index.md)||
 |[`ReferenceWrapper`](referencewrapper/index.md)||
 |[`Registry`](registry/index.md)|Fixed-size registry object.|
@@ -109,9 +109,6 @@ The container combines the performance and accessibility of a C-style array with
 |SizeType|N||
 |SizeType|Order||
 ------
-### `class IOPort`
-
-------
 ### `class Log`
 
 ------
@@ -132,6 +129,9 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |class|T||
 |SizeType|N||
 |class|CapacityType||
+------
+### `class Port`
+A port is the end of a channel. It must have a direction or function (for special ports).
 ------
 ### `template<class T, SizeType N, class CapacityType> class Queue`
 
