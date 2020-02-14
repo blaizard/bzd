@@ -4,7 +4,6 @@
 from .validator import ValidatorReference
 from .validator import ValidatorObject
 from .validator import ValidatorInterface
-from .interface import EmptyInterface
 
 """
 Represents an object
@@ -41,7 +40,7 @@ class Object():
 	"""
 	def getInterface(self):
 		name = self.getInterfaceName()
-		return self.manifest.getInterface(name) if self.manifest.isInterface(name) else EmptyInterface(name)
+		return self.manifest.getInterface(name, mustExists = False)
 
 	"""
 	Return the interface of the object
@@ -80,14 +79,24 @@ class Object():
 	def getName(self):
 		return self.identifier.split(".")[1]
 
+	def _getDerivedImplementation(self, name, interfaces):
+		if self.manifest.isInterface(name):
+			interface = self.manifest.getInterface(name)
+			derivedImplementation = interface.getImplementation()
+			if derivedImplementation:
+				assert derivedImplementation not in interfaces, "There is a loop in the derived implementation list for this object: {}".format(", ".join(list(interfaces)))
+				interfaces.add(derivedImplementation)
+				return self._getDerivedImplementation(derivedImplementation, interfaces)
+		return name
+
 	"""
-	Get the constructor class
+	Get the imlpementation class
 	"""
-	def getClass(self):
-		classInterface = self.getInterface().getClass()
-		classObjecy = self.definition.get("class", None)
-		assert classInterface == None or classObjecy == None, "Both interface class '{}' and object class '{}' cannot be set at the same time for object identifier '{}'.".format(classInterface, classObjecy, self.identifier)
-		return classInterface if classInterface else self.definition.get("class", self.getInterfaceName())
+	def getImplementation(self):
+		implementationInterface = self.getInterface().getImplementation()
+		implementationObjecy = self.definition.get("implementation", None)
+		assert implementationInterface == None or implementationObjecy == None, "Both interface implementation '{}' and object implementation '{}' cannot be set at the same time for object identifier '{}'.".format(implementationInterface, implementationObjecy, self.identifier)
+		return self._getDerivedImplementation(implementationInterface if implementationInterface else self.definition.get("implementation", self.getInterfaceName()), set())
 
 	"""
 	Get parameters

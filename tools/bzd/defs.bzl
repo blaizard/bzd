@@ -230,11 +230,11 @@ def bzd_cc_test(name, deps, **kwargs):
 def _bzd_genmanifest_impl(ctx):
     # Create the manifest content
     content = "interfaces:\n"
-    for interface, className in ctx.attr.interfaces.items():
+    for interface, implementationName in ctx.attr.interfaces.items():
         content += "  \"{}\":\n".format(interface)
         content += "    includes: [{}]\n".format(", ".join(["\"{}\"".format(include) for include in ctx.attr.includes]))
-        if className != "*":
-            content += "    class: !ref {}\n".format(className)
+        if implementationName != "*":
+            content += "    implementation: !ref {}\n".format(implementationName)
 
     # Create the file
     ctx.actions.write(

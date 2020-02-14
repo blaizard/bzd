@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from .object import Object
-from .interface import Interface
+from .interface import Interface, EmptyInterface
 from .validator import Validator
 
 """
@@ -34,14 +34,14 @@ class Manifest():
 				"_default": {
 					"_key": Validator("interface"),
 					"includes": Validator("any"),
-					"class": Validator("interface")
+					"implementation": Validator("interface")
 				}
 			},
 			"objects": {
 				"_default": {
 					"_key": Validator("object"),
 					"_default": Validator("any"),
-					"class": Validator("interface"),
+					"implementation": Validator("interface"),
 					"params": Validator("any")
 				}
 			}
@@ -74,9 +74,10 @@ class Manifest():
 	"""
 	Get a specific inteface
 	"""
-	def getInterface(self, name):
-		assert self.isInterface(name), "The interface name '{}' was not discovered or is not valid.".format(str(name))
-		return self.interfaces[str(name)]
+	def getInterface(self, name, mustExists = True):
+		exists = self.isInterface(name)
+		assert not mustExists or exists, "The interface name '{}' was not discovered or is not valid.".format(str(name))
+		return self.interfaces[str(name)] if exists else EmptyInterface(name)
 
 	"""
 	Return the raw data of this manifest
