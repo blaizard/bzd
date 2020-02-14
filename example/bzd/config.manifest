@@ -7,13 +7,6 @@ objects:
     "bzd::StringView.message":
         params:
             - "Hello World !!!"
-    "bzd::Port.led":
-        params:
-            - 2
-    "bzd::OChannel.led":
-        implementation: !ref bzd::io::DigitalOutput
-        params:
-            - 2
 #    "bzd::OChannel.servo":
 #        class: !ref bzd::io::I2C
 #        params:

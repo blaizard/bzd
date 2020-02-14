@@ -1,0 +1,3 @@
+objects:
+    "bzd::OChannel.led":
+        implementation: !ref bzd::io::Stdout
