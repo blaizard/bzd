@@ -79,24 +79,15 @@ class Object():
 	def getName(self):
 		return self.identifier.split(".")[1]
 
-	def _getDerivedImplementation(self, name, interfaces):
-		if self.manifest.isInterface(name):
-			interface = self.manifest.getInterface(name)
-			derivedImplementation = interface.getImplementation()
-			if derivedImplementation:
-				assert derivedImplementation not in interfaces, "There is a loop in the derived implementation list for this object: {}".format(", ".join(list(interfaces)))
-				interfaces.add(derivedImplementation)
-				return self._getDerivedImplementation(derivedImplementation, interfaces)
-		return name
-
 	"""
-	Get the imlpementation class
+	Get the implementation class for this object. Go as deep as the inheritance goes.
 	"""
 	def getImplementation(self):
 		implementationInterface = self.getInterface().getImplementation()
 		implementationObjecy = self.definition.get("implementation", None)
 		assert implementationInterface == None or implementationObjecy == None, "Both interface implementation '{}' and object implementation '{}' cannot be set at the same time for object identifier '{}'.".format(implementationInterface, implementationObjecy, self.identifier)
-		return self._getDerivedImplementation(implementationInterface if implementationInterface else self.definition.get("implementation", self.getInterfaceName()), set())
+		implementation = implementationInterface if implementationInterface else self.definition.get("implementation", self.getInterfaceName())
+		return self.manifest.getInterface(implementation, mustExists = False).getImplementationOrInterface()
 
 	"""
 	Get parameters
