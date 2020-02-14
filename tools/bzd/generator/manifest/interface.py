@@ -21,8 +21,23 @@ class Interface(object):
 		includes = self.definition.get("includes", [])
 		return includes if isinstance(includes, list) else [includes]
 
+	def _getDerivedImplementation(self, name, interfaces):
+		if self.manifest.isInterface(name):
+			interface = self.manifest.getInterface(name)
+			derivedImplementation = interface.getImplementation()
+			if derivedImplementation:
+				assert derivedImplementation not in interfaces, "There is a loop in the implementation inheritance for this interface: {}".format(", ".join(list(interfaces)))
+				interfaces.add(derivedImplementation)
+				return self._getDerivedImplementation(derivedImplementation, interfaces)
+		return name
+
 	def getImplementation(self):
-		return self.definition.get("implementation", None)
+		implementation = self.definition.get("implementation", None)
+		return self._getDerivedImplementation(implementation, set()) if implementation else None
+
+	def getImplementationOrInterface(self):
+		implementation = self.getImplementation()
+		return implementation if implementation else self.getName()
 
 """
 Helper to ceate an empty interface
