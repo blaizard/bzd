@@ -1,6 +1,6 @@
 objects:
     "bzd::OChannel.stdout":
-        class: !ref bzd::io::Stdout
+        implementation: !ref bzd::io::Stdout
     "bzd::Log.default":
         params:
             - !ref bzd::OChannel.stdout
@@ -11,9 +11,9 @@ objects:
         params:
             - 2
     "bzd::OChannel.led":
-        class: !ref bzd::io::DigitalOutput
+        implementation: !ref bzd::io::DigitalOutput
         params:
-            - !ref bzd::Port.led
+            - 2
 #    "bzd::OChannel.servo":
 #        class: !ref bzd::io::I2C
 #        params:

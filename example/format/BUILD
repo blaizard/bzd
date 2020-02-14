@@ -8,6 +8,5 @@ cc_binary(
     deps = [
         "//platform:bzd",
         "//platform:sdk",
-        "//platform/libraries/io/port",
     ],
 )

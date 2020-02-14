@@ -43,7 +43,7 @@ def registryBuild(manifest):
 		for obj in registry["objects"]:
 			# Build the parameters
 			params = paramsToString(obj)
-			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getClass(), getUID(), obj.getName(), params)
+			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getImplementation(), getUID(), obj.getName(), params)
 		content += "\n"
 
 	# Close the empty namespace
