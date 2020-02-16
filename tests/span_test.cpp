@@ -107,3 +107,35 @@ TEST(ContainerSpan, Constexpr)
 		EXPECT_EQ(++it, span.cend());
 	}
 }
+
+TEST(ContainerSpan, Copy)
+{
+	int test[5] = {0, 1, 2, 3, 4};
+	bzd::Span<int> span(test, 5);
+
+	// Copy constructor
+	bzd::Span<int> copySpan(span);
+	EXPECT_EQ(copySpan[0], 0);
+	EXPECT_EQ(copySpan[4], 4);
+	EXPECT_EQ(copySpan.size(), 5);
+
+	// Assignment
+	bzd::Span<int> copySpanAssign;
+	copySpanAssign = span;
+	EXPECT_EQ(copySpanAssign[0], 0);
+	EXPECT_EQ(copySpanAssign[4], 4);
+	EXPECT_EQ(copySpanAssign.size(), 5);
+
+	// From non-const to const constructor
+	bzd::Span<const int> copyConstSpan(span);
+	EXPECT_EQ(copyConstSpan[0], 0);
+	EXPECT_EQ(copyConstSpan[4], 4);
+	EXPECT_EQ(copyConstSpan.size(), 5);
+
+	// From non-const to const Assignment
+	bzd::Span<const int> copyConstSpanAssign;
+	copyConstSpanAssign = span;
+	EXPECT_EQ(copyConstSpanAssign[0], 0);
+	EXPECT_EQ(copyConstSpanAssign[4], 4);
+	EXPECT_EQ(copyConstSpanAssign.size(), 5);
+}

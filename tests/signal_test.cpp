@@ -3,5 +3,5 @@
 
 TEST(Signal, Base)
 {
-	bzd::Buffer buffer = "HelloWorld";
+	//bzd::Buffer buffer = "HelloWorld";
 }
