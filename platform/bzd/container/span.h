@@ -31,6 +31,7 @@ public:
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
 public:
+	constexpr Span() noexcept = default;
 	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
 	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type* = nullptr>
