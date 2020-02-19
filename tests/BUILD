@@ -9,7 +9,6 @@ test_cpp_srcs = glob([
     srcs = [src],
     deps = [
         "//platform:bzd",
-        "//platform:sdk",
         "//tools/cc_test",
     ],
 ) for src in test_cpp_srcs]
