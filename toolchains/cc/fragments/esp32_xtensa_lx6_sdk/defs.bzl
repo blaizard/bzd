@@ -10,7 +10,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/4.0.zip",
         ],
         strip_prefix = "bzd-esp32-xtensa-sdk-4.0",
-        sha256 = "a1e3bd2f7acdd874d97bc43282f227fac829f09ba16846bf8697633c18216cb5",
+        sha256 = "8e9d811df47f1182c672e5e5c88bf2b93ee6df83fee296a601234ff65fb89f2b",
     )
 
     return {
