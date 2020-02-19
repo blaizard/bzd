@@ -20,7 +20,6 @@ bzd_cc_binary(
     deps = [
         ":config_manifest",
         "//platform:bzd",
-        "//platform:sdk",
         "//platform/libraries/io/digital",
         "//platform/libraries/io/stdout",
     ],

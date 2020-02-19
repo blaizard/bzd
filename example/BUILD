@@ -8,6 +8,5 @@ cc_binary(
     tags = ["manual"],
     deps = [
         "//platform:bzd",
-        "//platform:sdk",
     ],
 )

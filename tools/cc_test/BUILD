@@ -12,8 +12,5 @@ cc_library(
     include_prefix = "cc_test",
     includes = ["."],
     visibility = ["//visibility:public"],
-    deps = [
-        "//platform:sdk",
-    ],
     alwayslink = True,
 )
