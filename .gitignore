@@ -8,6 +8,7 @@ __pycache__/
 
 # Bazel
 bazel-*
+.bazelrc.local
 
 # Editors
 .vscode/
