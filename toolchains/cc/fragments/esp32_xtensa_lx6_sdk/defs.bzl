@@ -10,7 +10,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/4.0.zip",
         ],
         strip_prefix = "bzd-esp32-xtensa-sdk-4.0",
-        sha256 = "8e9d811df47f1182c672e5e5c88bf2b93ee6df83fee296a601234ff65fb89f2b",
+        sha256 = "13410f159c3a0285ecf8ba700a12ed807cdcf51de428bffb0c923b92a2a69a46",
     )
 
     return {
@@ -49,7 +49,6 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lasio",
             "-lbootloader_support",
             "-lbt",
-            "-lcbor",
             "-lcoap",
             "-lconsole",
             "-lcxx",
@@ -66,10 +65,8 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lesp_http_server",
             "-lesp_https_ota",
             "-lesp_local_ctrl",
-            "-lesp_netif",
             "-lesp_ringbuf",
             "-lesp_rom",
-            "-lesp_serial_slave_link",
             "-lesp_websocket_client",
             "-lesp_wifi",
             "-lcore",
@@ -103,7 +100,6 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lnghttp",
             "-lnvs_flash",
             "-lopenssl",
-            "-lperfmon",
             "-lprotobuf-c",
             "-lprotocomm",
             "-lpthread",

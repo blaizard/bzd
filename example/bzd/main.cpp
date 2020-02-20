@@ -4,10 +4,7 @@
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 
-#define I2C_MASTER_SCL_IO GPIO_NUM_22
-#define I2C_MASTER_SDA_IO GPIO_NUM_21
 #define I2C_MASTER_NUM I2C_NUM_0
-#define I2C_MASTER_FREQ_HZ 100000
 #define I2C_MASTER_TX_BUF_DISABLE 0
 #define I2C_MASTER_RX_BUF_DISABLE 0
 #define I2C_PULLUP GPIO_PULLUP_ENABLE
@@ -15,30 +12,14 @@
 #define ESP_SLAVE_ADDR 0x40
 #define ACK_CHECK_EN 1
 
-/*
-static esp_err_t i2c_master_init()
-{
-    const auto i2c_master_port = I2C_MASTER_NUM;
-    i2c_config_t conf;
-    conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = I2C_MASTER_SDA_IO;
-    conf.sda_pullup_en = I2C_PULLUP;
-    conf.scl_io_num = I2C_MASTER_SCL_IO;
-    conf.scl_pullup_en = I2C_PULLUP;
-    conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
-    i2c_param_config(i2c_master_port, &conf);
-    auto ret = i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
-	return ret;
-}
-*/
 #define CONFIG_I2C_MASTER_SCL 22
 #define CONFIG_I2C_MASTER_SDA 21
-#define CONFIG_I2C_MASTER_PORT_NUM I2C_NUM_1
 #define CONFIG_I2C_MASTER_FREQUENCY 100000
+#define NACK_VAL (i2c_ack_type_t)0x1
 
 static esp_err_t i2c_master_init(void)
 {
-    i2c_port_t i2c_master_port = CONFIG_I2C_MASTER_PORT_NUM;
+    i2c_port_t i2c_master_port = I2C_MASTER_NUM;
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
     conf.sda_io_num = static_cast<gpio_num_t>(CONFIG_I2C_MASTER_SDA);
@@ -50,16 +31,141 @@ static esp_err_t i2c_master_init(void)
     return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }
 
-static esp_err_t i2c_master_write_slave()
+/*
+static uint8_t i2c_master_read_slave(const bzd::UInt8Type reg)
+{
+  {
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
+    i2c_master_stop(cmd);
+    esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK)
+    {
+		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
+			port.write(1);
+			vTaskDelay(500 / portTICK_PERIOD_MS);
+			port.write(0);
+    }
+  }
+
+  uint8_t data;
+  {
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_READ, ACK_CHECK_EN);
+    i2c_master_read_byte(cmd, &data, NACK_VAL);
+    i2c_master_stop(cmd);
+    esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK)
+    {
+		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
+			port.write(1);
+			vTaskDelay(500 / portTICK_PERIOD_MS);
+			port.write(0);
+    }
+  }
+
+  return data;
+}
+*/
+
+static esp_err_t i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, 0xaa, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, value, ACK_CHECK_EN);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK)
+    {
+		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
+			port.write(1);
+			vTaskDelay(500 / portTICK_PERIOD_MS);
+			port.write(0);
+    }
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+
     return ret;
+}
+
+#define PCA9685_MODE1 0x00
+#define PCA9685_MODE2 0x01
+#define PCA9685_PRESCALE 0xFE
+#define PCA9685_PRESCALE_MIN 3   /**< minimum prescale value */
+#define PCA9685_PRESCALE_MAX 255 /**< maximum prescale value */
+#define FREQUENCY_OSCILLATOR 25000000
+#define MODE1_RESTART 0x80 /**< Restart enabled */
+#define MODE1_SLEEP 0x10   /**< Low power mode. Oscillator off */
+#define MODE1_AI 0x20      /**< Auto-Increment enabled */
+#define PCA9685_LED0_ON_L 0x06
+
+void setPWM(uint8_t num, uint16_t on, uint16_t off)
+{
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, PCA9685_LED0_ON_L + 4 * num, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, on, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, on >> 8, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, off, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, off >> 8, ACK_CHECK_EN);
+    i2c_master_stop(cmd);
+    i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+}
+
+#define PCA9685_MODE1_ALLCALL 1
+#define PCA9685_MODE1_SUB3 0b10
+#define PCA9685_MODE1_SUB2 0b100
+#define PCA9685_MODE1_SUB1 0b1000
+#define PCA9685_MODE1_SLEEP 0b10000
+#define PCA9685_MODE1_AI 0b100000
+#define PCA9685_MODE1_EXTCLK 0b1000000
+#define PCA9685_MODE1_RESTART 0b10000000
+
+#define PCA9685_MODE2_OUTDRV 0b100
+#define PCA9685_MODE2_OCH 0b1000
+#define PCA9685_MODE2_INVRT 0b10000
+
+#define PCA9685_OSCILLATOR 25000000
+
+#define PCA9685_PRESCALE_MIN 3
+#define PCA9685_PRESCALE_MAX 255
+
+#define PCA9685_UPDATE_RATE_HZ 50
+
+void startSequence2()
+{
+	i2c_master_write_slave(PCA9685_MODE1, PCA9685_MODE1_SLEEP | PCA9685_MODE1_AI); // Setting mode to sleep so we can change the default PWM frequency
+
+  constexpr bzd::SizeType updateRateHz = PCA9685_UPDATE_RATE_HZ;
+  auto prescale = PCA9685_OSCILLATOR / (4096 * updateRateHz) - 1;
+  if (prescale < PCA9685_PRESCALE_MIN) {
+    prescale = PCA9685_PRESCALE_MIN;
+  }
+  else if (prescale > PCA9685_PRESCALE_MAX) {
+    prescale = PCA9685_PRESCALE_MAX;
+  }
+	i2c_master_write_slave(PCA9685_PRESCALE, prescale); // osc_clk/(4096*update_rate) - 1
+
+	i2c_master_write_slave(PCA9685_MODE1, PCA9685_MODE1_AI | PCA9685_MODE1_RESTART); // Set to our preferred mode
+	i2c_master_write_slave(PCA9685_MODE2, PCA9685_MODE2_OUTDRV); // Set to our preferred mode[Output logic state not inverted, Outputs change on STOP,
+                                                     // totem pole structure, When OE = 1 (output drivers not enabled), LEDn = 0]
+}
+
+#define USMIN  600 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
+#define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
+
+void setUs(uint8_t num, bzd::SizeType timeUs)
+{
+  setPWM(num, 0, timeUs * 4096 * PCA9685_UPDATE_RATE_HZ / 1000000);
 }
 
 int main()
@@ -71,33 +177,40 @@ int main()
 	log.info(CSTR("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
 	i2c_master_init();
-	//i2c_master_write_slave();
 
 	// LED blinking
 	auto& port = bzd::Registry<bzd::OChannel>::get("led");
 	port.write(1);
 	vTaskDelay(500 / portTICK_PERIOD_MS);
 	port.write(0);
-	vTaskDelay(500 / portTICK_PERIOD_MS);
+
+	startSequence2();
 
 	while (true)
 	{
-		/*port.write(1);
-		vTaskDelay(500 / portTICK_PERIOD_MS);
-		port.write(0);*/
-		vTaskDelay(500 / portTICK_PERIOD_MS);
-		const auto ret = i2c_master_write_slave();
+    // timeMs
+    setUs(0, USMIN);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    setUs(0, (USMIN + USMAX) / 2);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    setUs(0, USMAX);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+/*
+		writeMicroseconds(0, 600);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		writeMicroseconds(1, 2200);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+*/
+
+		/*const auto ret = i2c_master_write_slave();
 		if (ret == ESP_OK)
 		{
 			port.write(1);
 			vTaskDelay(500 / portTICK_PERIOD_MS);
 			port.write(0);
 			vTaskDelay(500 / portTICK_PERIOD_MS);
-		}
-
-		port.write(1);
-		vTaskDelay(100 / portTICK_PERIOD_MS);
-		port.write(0);
+		}*/
 	}
 
 	return 0;
