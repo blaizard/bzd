@@ -153,8 +153,22 @@ class Manifest():
 	Process the current data of the manifest in order to speed-up later accesses
 	"""
 	def process(self):
-		self.objects = {identifier: Object(self, identifier) for identifier in self.data.get("objects", {}).keys()}
-		self.interfaces = {identifier: Interface(self, identifier) for identifier in self.data.get("interfaces", {}).keys()}
+
+		# Objects
+		self.objects = {}
+		for identifier in self.data.get("objects", {}).keys():
+			try:
+				self.objects[identifier] = Object(self, identifier)
+			except Exception as e:
+				raise Exception("Error while processing object {}: {}".format(identifier, e))
+
+		# Interfaces
+		self.interfaces = {}
+		for identifier in self.data.get("interfaces", {}).keys():
+			try:
+				self.interfaces[identifier] = Interface(self, identifier)
+			except Exception as e:
+				raise Exception("Error while processing interface {}: {}".format(identifier, e))
 
 	"""
 	Merge the data

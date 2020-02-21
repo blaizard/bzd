@@ -36,7 +36,7 @@ class Object():
 		self._walk(self.definition, visit)
 
 		# Sanity check
-		assert ((self.definition.get("config", None) != None) and (self.definition.get("params", None) != None)) == False, "Object cannot have a configuration and parameters at the same time."
+		assert ((self.definition.get("config", None) != None) and (self.definition.get("params", None) != None)) == False, "Object cannot have a configuration (config) and parameters (params) at the same time."
 
 	"""
 	Return the interface of the object

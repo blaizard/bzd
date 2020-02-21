@@ -26,7 +26,11 @@ if __name__== "__main__":
 			manifest.merge(data)
 		except Exception as e:
 			Log.fatal("{}".format(path), e)
-	manifest.process()
+
+	try:
+		manifest.process()
+	except Exception as e:
+		Log.fatal("Oups! Something went wrong.", e)
 
 	# Generate the header comments
 	comments = ["This file has been auto-generated and is the result of the following manifest(s):"] + ["- {}".format(path) for path in config.inputs]
