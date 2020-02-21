@@ -1,13 +1,10 @@
+#include <unistd.h>
+
 #include "bzd.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "driver/gpio.h"
-#include "driver/i2c.h"
 
 #define I2C_MASTER_NUM I2C_NUM_0
 #define I2C_MASTER_TX_BUF_DISABLE 0
 #define I2C_MASTER_RX_BUF_DISABLE 0
-#define I2C_PULLUP GPIO_PULLUP_ENABLE
 
 #define ESP_SLAVE_ADDR 0x40
 #define ACK_CHECK_EN 1
@@ -15,9 +12,8 @@
 #define CONFIG_I2C_MASTER_SCL 22
 #define CONFIG_I2C_MASTER_SDA 21
 #define CONFIG_I2C_MASTER_FREQUENCY 100000
-#define NACK_VAL (i2c_ack_type_t)0x1
 
-static esp_err_t i2c_master_init(void)
+/*static esp_err_t i2c_master_init(void)
 {
     i2c_port_t i2c_master_port = I2C_MASTER_NUM;
     i2c_config_t conf;
@@ -29,70 +25,13 @@ static esp_err_t i2c_master_init(void)
     conf.master.clk_speed = CONFIG_I2C_MASTER_FREQUENCY;
     i2c_param_config(i2c_master_port, &conf);
     return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
-}
+}*/
 
-/*
-static uint8_t i2c_master_read_slave(const bzd::UInt8Type reg)
+static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
 {
-  {
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
-    i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-    if (ret != ESP_OK)
-    {
-		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
-			port.write(1);
-			vTaskDelay(500 / portTICK_PERIOD_MS);
-			port.write(0);
-    }
-  }
-
-  uint8_t data;
-  {
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_READ, ACK_CHECK_EN);
-    i2c_master_read_byte(cmd, &data, NACK_VAL);
-    i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-    if (ret != ESP_OK)
-    {
-		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
-			port.write(1);
-			vTaskDelay(500 / portTICK_PERIOD_MS);
-			port.write(0);
-    }
-  }
-
-  return data;
-}
-*/
-
-static esp_err_t i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
-{
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, value, ACK_CHECK_EN);
-    i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
-    if (ret != ESP_OK)
-    {
-		  auto& port = bzd::Registry<bzd::OChannel>::get("led");
-			port.write(1);
-			vTaskDelay(500 / portTICK_PERIOD_MS);
-			port.write(0);
-    }
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-
-    return ret;
+  auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
+  bzd::Array<bzd::UInt8Type, 3> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/0, reg, value};
+  i2c.write(data);
 }
 
 #define PCA9685_MODE1 0x00
@@ -108,17 +47,11 @@ static esp_err_t i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UIn
 
 void setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | I2C_MASTER_WRITE, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, PCA9685_LED0_ON_L + 4 * num, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, on, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, on >> 8, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, off, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, off >> 8, ACK_CHECK_EN);
-    i2c_master_stop(cmd);
-    i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
-    i2c_cmd_link_delete(cmd);
+  auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
+  bzd::Array<bzd::UInt8Type, 6> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/0,
+      PCA9685_LED0_ON_L + 4 * num,
+      on, on >> 8, off, off >> 8};
+  i2c.write(data);
 }
 
 #define PCA9685_MODE1_ALLCALL 1
@@ -176,12 +109,13 @@ int main()
 	// Log a new message
 	log.info(CSTR("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
-	i2c_master_init();
+	//i2c_master_init();
 
 	// LED blinking
 	auto& port = bzd::Registry<bzd::OChannel>::get("led");
 	port.write(1);
-	vTaskDelay(500 / portTICK_PERIOD_MS);
+  sleep(1);
+	//vTaskDelay(500 / portTICK_PERIOD_MS);
 	port.write(0);
 
 	startSequence2();
@@ -190,27 +124,11 @@ int main()
 	{
     // timeMs
     setUs(0, USMIN);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    sleep(2);
     setUs(0, (USMIN + USMAX) / 2);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    sleep(2);
     setUs(0, USMAX);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-/*
-		writeMicroseconds(0, 600);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-		writeMicroseconds(1, 2200);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-*/
-
-		/*const auto ret = i2c_master_write_slave();
-		if (ret == ESP_OK)
-		{
-			port.write(1);
-			vTaskDelay(500 / portTICK_PERIOD_MS);
-			port.write(0);
-			vTaskDelay(500 / portTICK_PERIOD_MS);
-		}*/
+    sleep(2);
 	}
 
 	return 0;

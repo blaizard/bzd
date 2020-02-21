@@ -53,16 +53,17 @@ def registryBuild(manifest):
 				configName = "config{}_".format(getUID())
 
 
-
-				content += "inline constexpr {}::Configuration {}() {{\n".format(implementation, configName)
-				content += "\tusing {}::Configuration;\n".format(implementation)
-				content += "\t{}::Configuration config{{}};\n".format(implementation)
+				content += "struct {} : public {}::Configuration {{\n".format(configName, implementation)
+				#content += "\tusing {}::Configuration;\n".format(implementation)
+				content += "\tstatic inline Configuration get() {\n"
+				content += "\t\tConfiguration config{};\n"
 				# Set the various values
 				for key, value in config.items():
-					content += "\tconfig.{} = {};\n".format(key, valueToString(value))
-				content += "\treturn config;\n"
-				content += "}\n"
-				params = ", {}()".format(configName)
+					content += "\t\tconfig.{} = {};\n".format(key, valueToString(value))
+				content += "\t\treturn config;\n"
+				content += "\t}\n"
+				content += "};\n"
+				params = ", {}::get()".format(configName)
 				print(config)
 			# Build the parameters
 			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), implementation, getUID(), obj.getName(), params)

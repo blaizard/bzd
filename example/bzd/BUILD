@@ -21,7 +21,9 @@ bzd_cc_binary(
         ":config_manifest",
         "//platform:bzd",
         "//platform/libraries/io/digital",
+        "//platform/libraries/io/i2c",
         "//platform/libraries/io/stdout",
+        "//platform/libraries/io/stub",
     ],
 )
 

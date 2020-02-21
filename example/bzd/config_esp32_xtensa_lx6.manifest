@@ -3,3 +3,11 @@ objects:
         implementation: !ref bzd::io::DigitalOutput
         params:
             - 2
+    "bzd::OChannel.i2c":
+        implementation: !ref bzd::io::I2C
+        config:
+            sda: 21
+            scl: 22
+            mode: !ref Mode::MASTER
+            interface: 0
+            frequency: 100000
