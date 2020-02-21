@@ -40,9 +40,12 @@ class Manifest():
 			"objects": {
 				"_default": {
 					"_key": Validator("object"),
-					"_default": Validator("any"),
 					"implementation": Validator("interface"),
-					"params": Validator("any")
+					"params": Validator("any"),
+					"config": {
+						"_key": Validator("any"),
+						"_default": Validator("any")
+					}
 				}
 			}
 		}
