@@ -6,8 +6,11 @@ def getUID():
 	getUID.uid += 1
 	return getUID.uid
 
+def valueToString(value):
+	return "\"{}\"".format(value) if isinstance(value, str) else repr(value)
+
 def paramsToString(obj):
-	params = ["\"{}\"".format(param) if isinstance(param, str) else repr(param) for param in obj.getParams()]
+	params = [valueToString(param) for param in obj.getParams()]
 	return (", " + ", ".join(params)) if len(params) else ""
 
 def registryBuild(manifest):
@@ -41,9 +44,28 @@ def registryBuild(manifest):
 		content += "bzd::Registry<{}>::Declare<{}> registry{}_;\n".format(registry["interface"], len(registry["objects"]), getUID())
 		# Add the objects
 		for obj in registry["objects"]:
-			# Build the parameters
+			implementation = obj.getImplementation()
 			params = paramsToString(obj)
-			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), obj.getImplementation(), getUID(), obj.getName(), params)
+			# Check if the object has a configuration
+			config = obj.getConfig()
+			if config != None:
+				# Create a configuration object from the implementation class
+				configName = "config{}_".format(getUID())
+
+
+
+				content += "inline constexpr {}::Configuration {}() {{\n".format(implementation, configName)
+				content += "\tusing {}::Configuration;\n".format(implementation)
+				content += "\t{}::Configuration config{{}};\n".format(implementation)
+				# Set the various values
+				for key, value in config.items():
+					content += "\tconfig.{} = {};\n".format(key, valueToString(value))
+				content += "\treturn config;\n"
+				content += "}\n"
+				params = ", {}()".format(configName)
+				print(config)
+			# Build the parameters
+			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), implementation, getUID(), obj.getName(), params)
 		content += "\n"
 
 	# Close the empty namespace

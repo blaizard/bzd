@@ -35,6 +35,9 @@ class Object():
 					self.deps["interface"].add(valueStr)
 		self._walk(self.definition, visit)
 
+		# Sanity check
+		assert ((self.definition.get("config", None) != None) and (self.definition.get("params", None) != None)) == False, "Object cannot have a configuration and parameters at the same time."
+
 	"""
 	Return the interface of the object
 	"""
@@ -78,6 +81,12 @@ class Object():
 	"""
 	def getName(self):
 		return self.identifier.split(".")[1]
+
+	"""
+	Return the object config if any, or None otherwise.
+	"""
+	def getConfig(self):
+		return self.definition.get("config", None)
 
 	"""
 	Get the implementation class for this object. Go as deep as the inheritance goes.
