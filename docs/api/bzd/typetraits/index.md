@@ -21,6 +21,7 @@
 |[`AddRValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::AddRValueReference`](impl/addrvaluereference/index.md)|
 |[`AddVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::AddVolatile`](impl/addvolatile/index.md)|
 |[`Conditional`](./index.md)|alias of [`bzd::typeTraits::impl::Conditional`](impl/conditional/index.md)|
+|[`Decay`](./index.md)|alias of [`bzd::typeTraits::impl::Decay`](impl/decay/index.md)|
 |[`EnableIf`](./index.md)|alias of [`bzd::typeTraits::impl::EnableIf`](impl/enableif/index.md)|
 |[`FalseType`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](impl/integralconstant/index.md)|
 |[`IntegralConstant`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](impl/integralconstant/index.md)|
@@ -129,6 +130,13 @@
 |bool|Condition||
 |class T|None||
 |class F|None||
+------
+### `template<class T> typedef Decay`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<bool Condition, class T> typedef EnableIf`
 

@@ -2,8 +2,8 @@
 
 #include "bzd/core/assert.h"
 #include "bzd/type_traits/conditional.h"
+#include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_reference.h"
-#include "bzd/utility/decay.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/reference_wrapper.h"
@@ -123,8 +123,8 @@ template <class T, class E>
 using Expected = impl::Expected<T, E>;
 
 template <class E>
-constexpr impl::Unexpected<typename bzd::decay<E>::type> makeUnexpected(E&& e)
+constexpr impl::Unexpected<bzd::typeTraits::Decay<E>> makeUnexpected(E&& e)
 {
-	return impl::Unexpected<typename bzd::decay<E>::type>(bzd::forward<E>(e));
+	return impl::Unexpected<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
 }
 } // namespace bzd

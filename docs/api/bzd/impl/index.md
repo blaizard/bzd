@@ -36,6 +36,7 @@
 
 |Struct||
 |:---|:---|
+|[`AlignedStorage`](alignedstorage/index.md)||
 |[`NoType`](notype/index.md)||
 |[`SignalInternals`](signalinternals/index.md)||
 |[`SignalInternals< 1 >`](signalinternals_1_/index.md)||
@@ -270,6 +271,14 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |class|T||
 |class|Impl||
+------
+### `template<SizeType Len, SizeType Align> struct AlignedStorage`
+
+#### Template
+||||
+|---:|:---|:---|
+|SizeType|Len||
+|SizeType|Align||
 ------
 ### `struct NoType`
 

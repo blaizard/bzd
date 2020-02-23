@@ -23,6 +23,7 @@
 |[`AddVolatile`](addvolatile/index.md)||
 |[`Conditional`](conditional/index.md)||
 |[`Conditional< false, T, F >`](conditional_false_t_f_/index.md)||
+|[`Decay`](decay/index.md)||
 |[`EnableIf`](enableif/index.md)||
 |[`EnableIf< true, T >`](enableif_true_t_/index.md)||
 |[`IntegralConstant`](integralconstant/index.md)||
@@ -203,6 +204,13 @@
 |---:|:---|:---|
 |class T|None||
 |class F|None||
+------
+### `template<class T> struct Decay`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<bool Condition, class T> struct EnableIf`
 

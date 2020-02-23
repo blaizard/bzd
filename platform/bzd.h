@@ -48,6 +48,7 @@
 #include "bzd/type_traits/add_rvalue_reference.h"
 #include "bzd/type_traits/add_volatile.h"
 #include "bzd/type_traits/conditional.h"
+#include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/declval.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/false_type.h"
@@ -78,7 +79,6 @@
 // Utility
 #include "bzd/utility/aligned_storage.h"
 #include "bzd/utility/container_of.h"
-#include "bzd/utility/decay.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/max.h"
 #include "bzd/utility/memcpy.h"

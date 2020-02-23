@@ -40,8 +40,6 @@
 
 |Struct||
 |:---|:---|
-|[`alignedStorage`](alignedstorage/index.md)||
-|[`decay`](decay/index.md)||
 |[`resultOf`](resultof/index.md)||
 |[`resultOf< T(&)(Args &&...)>`](resultof_t_args_/index.md)||
 
@@ -66,6 +64,7 @@
 
 |Typedef||
 |:---|:---|
+|[`AlignedStorage`](./index.md)|alias of [`bzd::impl::AlignedStorage`](impl/alignedstorage/index.md)|
 |[`BoolType`](./index.md)|Boolean type.|
 |[`Buffer`](./index.md)|alias of [`bzd::impl::Buffer`](impl/buffer/index.md)|
 |[`ConstBuffer`](./index.md)|alias of [`bzd::impl::Buffer`](impl/buffer/index.md)|
@@ -266,21 +265,6 @@ The class template span describes an object that can refer to a contiguous seque
 |class|T||
 |SizeType|N||
 ------
-### `template<SizeType Len, SizeType Align> struct alignedStorage`
-
-#### Template
-||||
-|---:|:---|:---|
-|SizeType|Len||
-|SizeType|Align||
-------
-### `template<class T> struct decay`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
 ### `template<class T> struct resultOf`
 
 #### Template
@@ -334,7 +318,7 @@ The class template span describes an object that can refer to a contiguous seque
 ### `bzd::OStream & getOut()`
 
 ------
-### `template<class E> constexpr impl::Unexpected< typename bzd::decay< E >::type > makeUnexpected(E && e)`
+### `template<class E> constexpr impl::Unexpected< bzd::typeTraits::Decay< E > > makeUnexpected(E && e)`
 
 #### Template
 ||||
@@ -453,6 +437,14 @@ The class template span describes an object that can refer to a contiguous seque
 ------
 ### `void yield()`
 
+------
+### `template<SizeType Len, SizeType Align> typedef AlignedStorage`
+
+#### Template
+||||
+|---:|:---|:---|
+|SizeType|Len||
+|SizeType|Align||
 ------
 ### `typedef BoolType`
 Boolean type.
