@@ -4,11 +4,11 @@
 TEST(TypeTraits, isIntegral)
 {
 	{
-		const bool result = bzd::typeTraits::isIntegral<int>::value;
+		const bool result = bzd::typeTraits::isIntegral<int>;
 		EXPECT_TRUE(result);
 	}
 	{
-		const bool result = bzd::typeTraits::isIntegral<char*>::value;
+		const bool result = bzd::typeTraits::isIntegral<char*>;
 		EXPECT_FALSE(result);
 	}
 }

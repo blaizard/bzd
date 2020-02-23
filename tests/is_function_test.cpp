@@ -22,28 +22,28 @@ struct PM_traits<U T::*>
 TEST(TypeTraits, isFunction)
 {
 	{
-		const auto isFunction = bzd::typeTraits::isFunction<A>::value;
+		const auto isFunction = bzd::typeTraits::isFunction<A>;
 		EXPECT_FALSE(isFunction);
 	}
 
 	{
-		const auto isFunction = bzd::typeTraits::isFunction<int(int)>::value;
+		const auto isFunction = bzd::typeTraits::isFunction<int(int)>;
 		EXPECT_TRUE(isFunction);
 	}
 
 	{
-		const auto isFunction = bzd::typeTraits::isFunction<decltype(f)>::value;
+		const auto isFunction = bzd::typeTraits::isFunction<decltype(f)>;
 		EXPECT_TRUE(isFunction);
 	}
 
 	{
-		const auto isFunction = bzd::typeTraits::isFunction<int>::value;
+		const auto isFunction = bzd::typeTraits::isFunction<int>;
 		EXPECT_FALSE(isFunction);
 	}
 
 	{
 		using T = PM_traits<decltype(&A::fun)>::member_type; // T is int() const&
-		const auto isFunction = bzd::typeTraits::isFunction<T>::value;
+		const auto isFunction = bzd::typeTraits::isFunction<T>;
 		EXPECT_TRUE(isFunction);
 	}
 }

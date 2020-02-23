@@ -16,9 +16,9 @@ private:
 	typedef typename bzd::typeTraits::removeReference<T>::type U;
 
 public:
-	typedef bzd::typeTraits::Conditional<bzd::typeTraits::isArray<U>::value,
+	typedef bzd::typeTraits::Conditional<bzd::typeTraits::isArray<U>,
 										 typename bzd::typeTraits::removeExtent<U>::type*,
-										 bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>::value,
+										 bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>,
 																	  bzd::typeTraits::AddPointer<U>,
 																	  typename bzd::typeTraits::removeCV<U>::type>>
 		type;

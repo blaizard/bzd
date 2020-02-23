@@ -493,7 +493,7 @@ template <SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N > 0)>* = 
 constexpr bool contextCheck(const Ctx& context, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
-	context.assertTrue(bzd::typeTraits::isConstructible<bzd::format::impl::Arg, decltype(value)>::value, "Argument type is not supported");
+	context.assertTrue(bzd::typeTraits::isConstructible<bzd::format::impl::Arg, decltype(value)>, "Argument type is not supported");
 
 	bool usedAtLeastOnce = false;
 	for (const auto& metadata : context)
@@ -507,12 +507,12 @@ constexpr bool contextCheck(const Ctx& context, const T& tuple)
 			case Metadata::Format::OCTAL:
 			case Metadata::Format::HEXADECIMAL_LOWER:
 			case Metadata::Format::HEXADECIMAL_UPPER:
-				context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>::value, "Argument must an integral");
+				context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>, "Argument must an integral");
 				break;
 			case Metadata::Format::DECIMAL:
 			case Metadata::Format::FIXED_POINT:
 			case Metadata::Format::FIXED_POINT_PERCENT:
-				context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>::value, "Argument must arithmetic");
+				context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>, "Argument must arithmetic");
 				break;
 			case Metadata::Format::POINTER:
 				break;

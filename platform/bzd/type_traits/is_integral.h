@@ -4,17 +4,25 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/remove_cv.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct isIntegral
+struct IsIntegral
 	: integralConstant<bool,
-					   isSame<unsigned char, typename removeCV<T>::type>::value || isSame<signed char, typename removeCV<T>::type>::value ||
-						   isSame<char, typename removeCV<T>::type>::value || isSame<unsigned short, typename removeCV<T>::type>::value ||
-						   isSame<short, typename removeCV<T>::type>::value || isSame<unsigned int, typename removeCV<T>::type>::value ||
-						   isSame<int, typename removeCV<T>::type>::value || isSame<unsigned long, typename removeCV<T>::type>::value ||
-						   isSame<long, typename removeCV<T>::type>::value ||
-						   isSame<unsigned long long, typename removeCV<T>::type>::value ||
-						   isSame<long long, typename removeCV<T>::type>::value || isSame<bool, typename removeCV<T>::type>::value>
+					   isSame<unsigned char, typename removeCV<T>::type> || isSame<signed char, typename removeCV<T>::type> ||
+						   isSame<char, typename removeCV<T>::type> || isSame<unsigned short, typename removeCV<T>::type> ||
+						   isSame<short, typename removeCV<T>::type> || isSame<unsigned int, typename removeCV<T>::type> ||
+						   isSame<int, typename removeCV<T>::type> || isSame<unsigned long, typename removeCV<T>::type> ||
+						   isSame<long, typename removeCV<T>::type> ||
+						   isSame<unsigned long long, typename removeCV<T>::type> ||
+						   isSame<long long, typename removeCV<T>::type> || isSame<bool, typename removeCV<T>::type>>
 {
 };
+}
+
+template <class T>
+using IsIntegral = typename impl::IsIntegral<T>;
+
+template <class T>
+constexpr bool isIntegral = IsIntegral<T>::value;
+
 }} // namespace bzd::typeTraits

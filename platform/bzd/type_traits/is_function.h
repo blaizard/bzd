@@ -3,64 +3,72 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 // Primary template
 template <class>
-struct isFunction : falseType
+struct IsFunction : falseType
 {
 };
 
 // Specialization for regular functions
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...)> : trueType
+struct IsFunction<Ret(Args...)> : trueType
 {
 };
 
 // Specialization for function types that have cv-qualifiers
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const> : trueType
+struct IsFunction<Ret(Args...) const> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) volatile> : trueType
+struct IsFunction<Ret(Args...) volatile> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const volatile> : trueType
+struct IsFunction<Ret(Args...) const volatile> : trueType
 {
 };
 
 // Specialization for function types that have ref-qualifiers
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...)&> : trueType
+struct IsFunction<Ret(Args...)&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const&> : trueType
+struct IsFunction<Ret(Args...) const&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) volatile&> : trueType
+struct IsFunction<Ret(Args...) volatile&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const volatile&> : trueType
+struct IsFunction<Ret(Args...) const volatile&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) &&> : trueType
+struct IsFunction<Ret(Args...) &&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const&&> : trueType
+struct IsFunction<Ret(Args...) const&&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) volatile&&> : trueType
+struct IsFunction<Ret(Args...) volatile&&> : trueType
 {
 };
 template <class Ret, class... Args>
-struct isFunction<Ret(Args...) const volatile&&> : trueType
+struct IsFunction<Ret(Args...) const volatile&&> : trueType
 {
 };
+}
+
+template <class T>
+using IsFunction = typename impl::IsFunction<T>;
+
+template <class T>
+constexpr bool isFunction = IsFunction<T>::value;
+
 }} // namespace bzd::typeTraits

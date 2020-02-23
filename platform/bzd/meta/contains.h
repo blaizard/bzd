@@ -13,7 +13,7 @@ struct Contains
 template <class T, class U>
 struct Contains<T, U>
 {
-	static constexpr const bool value = bzd::typeTraits::isSame<T, U>::value;
+	static constexpr const bool value = bzd::typeTraits::isSame<T, U>;
 };
 } // namespace impl
 

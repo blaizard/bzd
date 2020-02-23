@@ -3,14 +3,22 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T, class U>
-struct isSame : falseType
+struct IsSame : falseType
 {
 };
 
 template <class T>
-struct isSame<T, T> : trueType
+struct IsSame<T, T> : trueType
 {
 };
+}
+
+template <class T, class U>
+using IsSame = typename impl::IsSame<T, U>;
+
+template <class T, class U>
+constexpr bool isSame = IsSame<T, U>::value;
+
 }} // namespace bzd::typeTraits
