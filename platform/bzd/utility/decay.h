@@ -13,12 +13,12 @@ template <class T>
 struct decay
 {
 private:
-	typedef typename bzd::typeTraits::removeReference<T>::type U;
+	typedef bzd::typeTraits::RemoveReference<T> U;
 
 public:
 	typedef bzd::typeTraits::Conditional<
 		bzd::typeTraits::isArray<U>,
-		typename bzd::typeTraits::removeExtent<U>::type*,
+		bzd::typeTraits::RemoveExtent<U>*,
 		bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>, bzd::typeTraits::AddPointer<U>, bzd::typeTraits::RemoveCV<U>>>
 		type;
 };

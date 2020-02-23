@@ -4,8 +4,8 @@
 
 namespace bzd {
 template <class T>
-typename bzd::typeTraits::removeReference<T>::type&& move(T&& arg)
+bzd::typeTraits::RemoveReference<T>&& move(T&& arg)
 {
-	return static_cast<typename bzd::typeTraits::removeReference<T>::type&&>(arg);
+	return static_cast<bzd::typeTraits::RemoveReference<T>&&>(arg);
 }
 } // namespace bzd

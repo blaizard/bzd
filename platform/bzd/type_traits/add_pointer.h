@@ -10,7 +10,7 @@ struct TypeIdentity
 	using type = T;
 };
 template <class T>
-auto tryAddPointer(int) -> TypeIdentity<typename bzd::typeTraits::removeReference<T>::type*>;
+auto tryAddPointer(int) -> TypeIdentity<bzd::typeTraits::RemoveReference<T>*>;
 template <class T>
 auto tryAddPointer(...) -> TypeIdentity<T>;
 template <class T>

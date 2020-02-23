@@ -1,21 +1,27 @@
 #pragma once
 
 namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
-struct removeReference
+struct RemoveReference
 {
 	typedef T type;
 };
 
 template <class T>
-struct removeReference<T&>
+struct RemoveReference<T&>
 {
 	typedef T type;
 };
 
 template <class T>
-struct removeReference<T&&>
+struct RemoveReference<T&&>
 {
 	typedef T type;
 };
+} // namespace impl
+
+template <class T>
+using RemoveReference = typename impl::RemoveReference<T>::type;
+
 }} // namespace bzd::typeTraits

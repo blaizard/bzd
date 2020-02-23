@@ -13,7 +13,7 @@ template <class T>
 class Optional
 {
 private:
-	using Value = typename bzd::typeTraits::removeReference<T>::type;
+	using Value = bzd::typeTraits::RemoveReference<T>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 public:
