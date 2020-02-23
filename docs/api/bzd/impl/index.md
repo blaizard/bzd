@@ -6,6 +6,8 @@
 |Class||
 |:---|:---|
 |[`BTree`](btree/index.md)||
+|[`Buffer`](buffer/index.md)||
+|[`CompuMethodIdentical`](compumethodidentical/index.md)||
 |[`Expected`](expected/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`IChannel`](ichannel/index.md)||
@@ -35,6 +37,14 @@
 |Struct||
 |:---|:---|
 |[`NoType`](notype/index.md)||
+|[`SignalInternals`](signalinternals/index.md)||
+|[`SignalInternals< 1 >`](signalinternals_1_/index.md)||
+|[`SignalInternals< 2 >`](signalinternals_2_/index.md)||
+|[`SignalInternals< 3 >`](signalinternals_3_/index.md)||
+|[`SignalInternals< 4 >`](signalinternals_4_/index.md)||
+|[`SignalInternals< 5 >`](signalinternals_5_/index.md)||
+|[`SignalInternals< 6 >`](signalinternals_6_/index.md)||
+|[`SignalInternals< 7 >`](signalinternals_7_/index.md)||
 |[`SingleLinkedPoolElement`](singlelinkedpoolelement/index.md)||
 |[`TupleRangeImpl`](tuplerangeimpl/index.md)||
 |[`TupleRangeImpl< L, I, TupleSizes< N... > >`](tuplerangeimpl_l_i_tuplesizes_n_/index.md)||
@@ -71,6 +81,16 @@ Non-leaf nodes are implemented as non-sorted arrays.
 |class K|None||
 |class V|None||
 |SizeType|Order||
+------
+### `template<class T> class Buffer`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `class CompuMethodIdentical`
+
 ------
 ### `template<class T, class E> class Expected`
 
@@ -254,6 +274,34 @@ Internal class used to create an unexpected object type.
 ### `struct NoType`
 
 ------
+### `template<bzd::SizeType SizeBytes> struct SignalInternals`
+
+#### Template
+||||
+|---:|:---|:---|
+|bzd::SizeType|SizeBytes||
+------
+### `struct SignalInternals< 1 >`
+
+------
+### `struct SignalInternals< 2 >`
+
+------
+### `struct SignalInternals< 3 >`
+
+------
+### `struct SignalInternals< 4 >`
+
+------
+### `struct SignalInternals< 5 >`
+
+------
+### `struct SignalInternals< 6 >`
+
+------
+### `struct SignalInternals< 7 >`
+
+------
 ### `template<class T, class CapacityType> struct SingleLinkedPoolElement`
 
 #### Template
@@ -313,7 +361,7 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |SizeType|index||
 ------
-### `template<SizeType index, class T, class... Ts, typename typeTraits::enableIf<> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
+### `template<SizeType index, class T, class... Ts, typeTraits::EnableIf<> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
 
 #### Template
 ||||
@@ -321,14 +369,14 @@ Internal class used to create an unexpected object type.
 |SizeType|index||
 |class T|None||
 |class...|Ts||
-|typename typeTraits::enableIf<|None||
+|typeTraits::EnableIf<|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |T &&|t||
 |Ts &&...|ts||
 ------
-### `template<SizeType index, class T, class... Ts, typename typeTraits::enableIf< index==0 >::type *> constexpr decltype(auto) TupleChooseN(T && t, Ts &&... ts)`
+### `template<SizeType index, class T, class... Ts, typeTraits::EnableIf< index==0 > *> constexpr decltype(auto) TupleChooseN(T && t, Ts &&... ts)`
 
 #### Template
 ||||
@@ -336,7 +384,7 @@ Internal class used to create an unexpected object type.
 |SizeType|index||
 |class T|None||
 |class...|Ts||
-|typename typeTraits::enableIf< index==0 >::type *|None||
+|typeTraits::EnableIf< index==0 > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

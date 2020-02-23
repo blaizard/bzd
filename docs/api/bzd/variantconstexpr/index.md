@@ -73,7 +73,7 @@
 
 Default constructor
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< Contains< T >::value >::type *> constexpr Variant(T && value)`
+### `template<class T, bzd::typeTraits::EnableIf< Contains< T >::value > *> constexpr Variant(T && value)`
 *From bzd::impl::Variant*
 
 Value constructor
@@ -81,7 +81,7 @@ Value constructor
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< Contains< T >::value >::type *|None||
+|bzd::typeTraits::EnableIf< Contains< T >::value > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

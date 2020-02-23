@@ -21,11 +21,11 @@
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)||
 |[`Pool`](pool/index.md)||
-|[`Port`](port/index.md)||
 |[`Queue`](queue/index.md)||
 |[`ReferenceWrapper`](referencewrapper/index.md)||
 |[`Registry`](registry/index.md)|Fixed-size registry object.|
 |[`Scheduler`](scheduler/index.md)||
+|[`Signal`](signal/index.md)||
 |[`Singleton`](singleton/index.md)||
 |[`SingletonThreadLocal`](singletonthreadlocal/index.md)||
 |[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
@@ -54,6 +54,7 @@
 |[`makeUnexpected(E && e)`](./index.md)||
 |[`max(const T & a)`](./index.md)||
 |[`max(const T & a, const T & b, const Ts &... n)`](./index.md)||
+|[`memcpy(void * dest, const void * src, const SizeType size)`](./index.md)||
 |[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
 |[`min(const T & a)`](./index.md)||
 |[`min(const T & a, const T & b, const Ts &... n)`](./index.md)||
@@ -66,6 +67,8 @@
 |Typedef||
 |:---|:---|
 |[`BoolType`](./index.md)|Boolean type.|
+|[`Buffer`](./index.md)|alias of [`bzd::impl::Buffer`](impl/buffer/index.md)|
+|[`ConstBuffer`](./index.md)|alias of [`bzd::impl::Buffer`](impl/buffer/index.md)|
 |[`Expected`](./index.md)|This is the type used for returning and propagating errors.; alias of [`bzd::impl::Expected`](impl/expected/index.md)|
 |[`FctPtrType`](./index.md)|Function pointer type.|
 |[`IChannel`](./index.md)|alias of [`bzd::impl::IChannel`](impl/ichannel/index.md)|
@@ -130,9 +133,6 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |SizeType|N||
 |class|CapacityType||
 ------
-### `class Port`
-A port is the end of a channel. It must have a direction or function (for special ports).
-------
 ### `template<class T, SizeType N, class CapacityType> class Queue`
 
 #### Template
@@ -176,6 +176,16 @@ Note, this initialization scheme can be imediatly followed by object registratio
 ------
 ### `class Scheduler`
 
+------
+### `template<class Type, bzd::SizeType OffsetBits, bzd::SizeType SizeBits, class CompuMethod> class Signal`
+
+#### Template
+||||
+|---:|:---|:---|
+|class Type|None||
+|bzd::SizeType|OffsetBits||
+|bzd::SizeType|SizeBits||
+|class CompuMethod|None||
 ------
 ### `template<class T> class Singleton`
 
@@ -360,6 +370,15 @@ The class template span describes an object that can refer to a contiguous seque
 |const T &|b||
 |const Ts &...|n||
 ------
+### `constexpr void memcpy(void * dest, const void * src, const SizeType size)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|void *|dest||
+|const void *|src||
+|const SizeType|size||
+------
 ### `constexpr void memcpy(char * dest, const char * src, const SizeType size)`
 
 #### Parameters
@@ -437,6 +456,12 @@ The class template span describes an object that can refer to a contiguous seque
 ------
 ### `typedef BoolType`
 Boolean type.
+------
+### `typedef Buffer`
+
+------
+### `typedef ConstBuffer`
+
 ------
 ### `template<class T, class E> typedef Expected`
 This is the type used for returning and propagating errors.

@@ -11,6 +11,6 @@ TEST(Signal, Base)
 	bzd::Signal<char, 40, 8> charSignal5;
 	EXPECT_EQ(charSignal5.get(buffer), 'W');
 
-	//bzd::Signal<char, 4, 8> charSignalShift;
-	//EXPECT_EQ(charSignalShift.get(buffer), 0x00);
+	// bzd::Signal<char, 4, 8> charSignalShift;
+	// EXPECT_EQ(charSignalShift.get(buffer), 0x00);
 }

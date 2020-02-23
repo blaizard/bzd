@@ -9,6 +9,7 @@ The class template span describes an object that can refer to a contiguous seque
 
 |Function||
 |:---|:---|
+|[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
 |[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
@@ -43,6 +44,9 @@ The class template span describes an object that can refer to a contiguous seque
 |:---|:---|
 |[`npos`](./index.md)||
 ------
+### `constexpr Span()`
+
+------
 ### `constexpr Span(DataType *const data, const SizeType size)`
 
 #### Parameters
@@ -51,25 +55,25 @@ The class template span describes an object that can refer to a contiguous seque
 |DataType *const|data||
 |const SizeType|size||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf< Q::value, void >::type *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf< Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf< Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & at(const SizeType index)`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & at(const SizeType index)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -82,24 +86,24 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |const SizeType|index||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & back()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & back()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType & back() const`
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator begin()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr Iterator begin()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr ConstIterator begin() const`
 
@@ -110,13 +114,13 @@ The class template span describes an object that can refer to a contiguous seque
 ### `constexpr ConstIterator cend() const`
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType * data()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType * data()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType * data() const`
 
@@ -124,13 +128,13 @@ The class template span describes an object that can refer to a contiguous seque
 ### `constexpr bool empty() const`
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator end()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr Iterator end()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr ConstIterator end() const`
 
@@ -143,13 +147,13 @@ The class template span describes an object that can refer to a contiguous seque
 |const DataType &|item||
 |const SizeType|start||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & front()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & front()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType & front() const`
 
@@ -168,13 +172,13 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |const SelfType &|rhs||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & operator[](const SizeType index)`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & operator[](const SizeType index)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

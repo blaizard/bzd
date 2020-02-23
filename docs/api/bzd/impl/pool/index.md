@@ -41,6 +41,7 @@
 |[`reverse()`](./index.md)||
 |[`SingleLinkedPool(const bzd::Span< Element > data)`](./index.md)||
 |[`size() const`](./index.md)||
+|[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
 |[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
 |[`toStream(std::ostream & os)`](./index.md)||
@@ -64,7 +65,7 @@
 |---:|:---|:---|
 |const bzd::Span< Element >|data||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & at(const SizeType index)`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & at(const SizeType index)`
 *From bzd::Span*
 
 
@@ -72,7 +73,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -87,7 +88,7 @@
 |---:|:---|:---|
 |const SizeType|index||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & back()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & back()`
 *From bzd::Span*
 
 
@@ -95,14 +96,14 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType & back() const`
 *From bzd::Span*
 
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator begin()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr Iterator begin()`
 *From bzd::Span*
 
 
@@ -110,7 +111,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr ConstIterator begin() const`
 *From bzd::Span*
@@ -132,7 +133,7 @@
 
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType * data()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType * data()`
 *From bzd::Span*
 
 
@@ -140,7 +141,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType * data() const`
 *From bzd::Span*
@@ -157,7 +158,7 @@
 
 
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr Iterator end()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr Iterator end()`
 *From bzd::Span*
 
 
@@ -165,7 +166,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr ConstIterator end() const`
 *From bzd::Span*
@@ -182,7 +183,7 @@
 |const DataType &|item||
 |const SizeType|start||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & front()`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & front()`
 *From bzd::Span*
 
 
@@ -190,7 +191,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 ------
 ### `constexpr const DataType & front() const`
 *From bzd::Span*
@@ -224,7 +225,7 @@
 |---:|:---|:---|
 |const SelfType &|rhs||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf<!Q::value, void >::type *> constexpr DataType & operator[](const SizeType index)`
+### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & operator[](const SizeType index)`
 *From bzd::Span*
 
 
@@ -232,7 +233,7 @@
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf<!Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf<!Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -290,6 +291,11 @@ Reserve an element from the free list (if any)
 
 
 ------
+### `constexpr Span()`
+*From bzd::Span*
+
+
+------
 ### `constexpr Span(DataType *const data, const SizeType size)`
 *From bzd::Span*
 
@@ -300,7 +306,7 @@ Reserve an element from the free list (if any)
 |DataType *const|data||
 |const SizeType|size||
 ------
-### `template<class Q, typename bzd::typeTraits::enableIf< Q::value, void >::type *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
 *From bzd::Span*
 
 
@@ -308,7 +314,7 @@ Reserve an element from the free list (if any)
 ||||
 |---:|:---|:---|
 |class Q|None||
-|typename bzd::typeTraits::enableIf< Q::value, void >::type *|None||
+|bzd::typeTraits::EnableIf< Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

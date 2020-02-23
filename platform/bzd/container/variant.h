@@ -100,7 +100,7 @@ public:
 	/**
 	 * Value constructor
 	 */
-	template <class T, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	template <class T, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr Variant(T&& value) : id_(Find<T>::value), data_(bzd::forward<T>(value))
 	{
 	}
@@ -193,7 +193,7 @@ protected:
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void construct(Args&&... args)
 	{
 		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
@@ -218,7 +218,7 @@ public:
 	{
 	}
 
-	template <class T, class... Args, typename bzd::typeTraits::enableIf<Contains<T>::value>::type* = nullptr>
+	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args)
 	{
 		destructIfNeeded();

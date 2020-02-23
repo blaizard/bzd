@@ -1,26 +1,21 @@
-# [`bzd`](../../index.md)::[`Array`](../index.md)
+# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`Buffer`](../index.md)
 
-## `template<class T, SizeType N> class Array`
-A container that encapsulates fixed size arrays.
+## `template<class T> class Buffer`
 
-The container combines the performance and accessibility of a C-style array with the benefits of a standard container, such as knowing its own size, supporting assignment, random access iterators, etc. Unlike a C-style array, it doesn't decay to T* automatically.
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|SizeType|N||
 
 |Function||
 |:---|:---|
-|[`Array(Args &&... args)`](./index.md)||
-|[`Array()`](./index.md)||
+|[`Buffer(const bzd::StringView & str)`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
 |[`at(const SizeType index) const`](./index.md)||
 |[`back()`](./index.md)||
 |[`back() const`](./index.md)||
 |[`begin()`](./index.md)||
 |[`begin() const`](./index.md)||
-|[`capacity() const`](./index.md)|Returns the number of elements that the array can hold.|
 |[`cbegin() const`](./index.md)||
 |[`cend() const`](./index.md)||
 |[`data()`](./index.md)||
@@ -43,26 +38,24 @@ The container combines the performance and accessibility of a C-style array with
 
 |Typedef||
 |:---|:---|
-|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
-|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../../iterator/contiguous/index.md)|
+|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../../iterator/contiguous/index.md)|
 
 |Variable||
 |:---|:---|
 |[`npos`](./index.md)||
 ------
-### `template<class... Args> explicit constexpr Array(Args &&... args)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Buffer(const bzd::StringView & str)`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class...|Args||
+|class Q|None||
+|bzd::typeTraits::EnableIf< Q::value, void > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|Args &&...|args||
-------
-### `constexpr Array()`
-
+|const bzd::StringView &|str||
 ------
 ### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & at(const SizeType index)`
 *From bzd::Span*
@@ -116,11 +109,6 @@ The container combines the performance and accessibility of a C-style array with
 *From bzd::Span*
 
 
-------
-### `constexpr SizeType capacity() const`
-Returns the number of elements that the array can hold.
-
-Maximum number of element this array can hold.
 ------
 ### `constexpr ConstIterator cbegin() const`
 *From bzd::Span*

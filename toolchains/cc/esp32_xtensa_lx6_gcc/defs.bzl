@@ -1,4 +1,3 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker", "toolchain_merge")
 load("//toolchains/cc/fragments/esptool:defs.bzl", "toolchain_fragment_esptool")
 load("//toolchains/cc/fragments/esp32_xtensa_lx6_sdk:defs.bzl", "toolchain_fragment_esp32_xtensa_lx6_sdk")

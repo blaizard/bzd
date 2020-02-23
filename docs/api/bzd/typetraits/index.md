@@ -25,8 +25,6 @@
 |[`addVolatile`](addvolatile/index.md)||
 |[`conditional`](conditional/index.md)||
 |[`conditional< false, T, F >`](conditional_false_t_f_/index.md)||
-|[`enableIf`](enableif/index.md)||
-|[`enableIf< true, T >`](enableif_true_t_/index.md)||
 |[`integralConstant`](integralconstant/index.md)||
 |[`isArithmetic`](isarithmetic/index.md)||
 |[`isArray`](isarray/index.md)||
@@ -90,6 +88,7 @@
 
 |Typedef||
 |:---|:---|
+|[`EnableIf`](./index.md)|alias of [`bzd::typeTraits::impl::EnableIf`](impl/enableif/index.md)|
 |[`falseType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
 |[`isConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::isConstructible`](impl/isconstructible/index.md)|
 |[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
@@ -193,21 +192,6 @@
 |---:|:---|:---|
 |class T|None||
 |class F|None||
-------
-### `template<bool B, class T> struct enableIf`
-
-#### Template
-||||
-|---:|:---|:---|
-|bool|B||
-|class T|None||
-------
-### `template<class T> struct enableIf< true, T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 ------
 ### `template<class T, T v> struct integralConstant`
 
@@ -591,6 +575,14 @@
 #### Template
 ||||
 |---:|:---|:---|
+|class T|None||
+------
+### `template<bool Condition, class T> typedef EnableIf`
+
+#### Template
+||||
+|---:|:---|:---|
+|bool|Condition||
 |class T|None||
 ------
 ### `typedef falseType`
