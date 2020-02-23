@@ -1,14 +1,20 @@
 #pragma once
 
 namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
-struct removeConst
+struct RemoveConst
 {
 	typedef T type;
 };
 template <class T>
-struct removeConst<const T>
+struct RemoveConst<const T>
 {
 	typedef T type;
 };
+} // namespace impl
+
+template <class T>
+using RemoveConst = typename impl::RemoveConst<T>::type;
+
 }} // namespace bzd::typeTraits

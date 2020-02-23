@@ -1,6 +1,6 @@
-# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`isConstructible`](../index.md)
+# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`IsConstructible`](../index.md)
 
-## `template<class, class T, class... Args> struct isConstructible`
+## `template<class, class T, class... Args> struct IsConstructible`
 
 #### Template
 ||||

@@ -35,7 +35,7 @@ public:
 	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
 	template <class Q = IsConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr Span(const Span<typename bzd::typeTraits::removeConst<DataType>::type>& span) noexcept : data_(span.data_), size_(span.size_)
+	constexpr Span(const Span<bzd::typeTraits::RemoveConst<DataType>>& span) noexcept : data_(span.data_), size_(span.size_)
 	{
 	}
 

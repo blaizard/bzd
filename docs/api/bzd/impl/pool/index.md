@@ -43,7 +43,7 @@
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
-|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
+|[`Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`](./index.md)||
 |[`toStream(std::ostream & os)`](./index.md)||
 
 |Typedef||
@@ -306,7 +306,7 @@ Reserve an element from the free list (if any)
 |DataType *const|data||
 |const SizeType|size||
 ------
-### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`
 *From bzd::Span*
 
 
@@ -318,7 +318,7 @@ Reserve an element from the free list (if any)
 #### Parameters
 ||||
 |---:|:---|:---|
-|const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
+|const Span< bzd::typeTraits::RemoveConst< DataType >> &|span||
 ------
 ### `void toStream(std::ostream & os)`
 *From bzd::impl::SingleLinkedPool*
