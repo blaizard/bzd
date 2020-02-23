@@ -14,7 +14,7 @@ class Optional
 {
 private:
 	using Value = typename bzd::typeTraits::removeReference<T>::type;
-	using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>;
 
 public:
 	constexpr Optional(T&& value) : isValue_(true), value_(bzd::forward<T>(value)) {}

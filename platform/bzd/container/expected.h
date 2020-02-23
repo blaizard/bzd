@@ -34,7 +34,7 @@ class Expected
 {
 private:
 	using Value = typename bzd::typeTraits::removeReference<T>::type;
-	using ValueContainer = typename bzd::typeTraits::conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>::type;
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>::value, bzd::ReferenceWrapper<T>, T>;
 
 public:
 	constexpr Expected(T&& value) : isError_(false), value_(bzd::forward<T>(value)) {}

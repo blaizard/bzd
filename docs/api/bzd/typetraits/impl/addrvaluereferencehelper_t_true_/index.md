@@ -1,6 +1,6 @@
-# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`addRValueReferenceHelper< T, true >`](../index.md)
+# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`AddRValueReferenceHelper< T, true >`](../index.md)
 
-## `template<typename T> struct addRValueReferenceHelper< T, true >`
+## `template<typename T> struct AddRValueReferenceHelper< T, true >`
 
 #### Template
 ||||

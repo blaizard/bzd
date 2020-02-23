@@ -1,6 +1,6 @@
-# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`addRValueReference`](../index.md)
+# [`bzd`](../../../../index.md)::[`typeTraits`](../../../index.md)::[`impl`](../../index.md)::[`AddRValueReference`](../index.md)
 
-## `template<typename T> struct addRValueReference`
+## `template<typename T> struct AddRValueReference`
 
 #### Template
 ||||
@@ -9,7 +9,7 @@
 
 |Typedef||
 |:---|:---|
-|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::addRValueReferenceHelper`](../addrvaluereferencehelper/index.md)|
+|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::AddRValueReferenceHelper`](../addrvaluereferencehelper/index.md)|
 ------
 ### `typedef type`
 
