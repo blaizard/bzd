@@ -20,7 +20,7 @@ public:
 		bzd::typeTraits::isArray<U>::value,
 		typename bzd::typeTraits::removeExtent<U>::type*,
 		typename bzd::typeTraits::conditional<bzd::typeTraits::isFunction<U>::value,
-											  typename bzd::typeTraits::addPointer<U>::type,
+											  bzd::typeTraits::AddPointer<U>,
 											  typename bzd::typeTraits::removeCV<U>::type>::type>::type type;
 };
 } // namespace bzd

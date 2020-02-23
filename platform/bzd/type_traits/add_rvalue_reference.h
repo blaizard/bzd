@@ -6,27 +6,25 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <typename T, bool b>
-struct addRValueReferenceHelper
+struct AddRValueReferenceHelper
 {
 	typedef T type;
 };
 
 template <typename T>
-struct addRValueReferenceHelper<T, true>
+struct AddRValueReferenceHelper<T, true>
 {
 	typedef T&& type;
 };
 
 template <typename T>
-struct addRValueReference
+struct AddRValueReference
 {
-	typedef typename addRValueReferenceHelper<T, (isVoid<T>::value == false && isReference<T>::value == false)>::type type;
+	typedef typename AddRValueReferenceHelper<T, (isVoid<T>::value == false && isReference<T>::value == false)>::type type;
 };
 } // namespace impl
 
 template <class T>
-struct addRValueReference
-{
-	typedef typename impl::addRValueReference<T>::type type;
-};
+using AddRValueReference = typename impl::AddRValueReference<T>::type;
+
 }} // namespace bzd::typeTraits

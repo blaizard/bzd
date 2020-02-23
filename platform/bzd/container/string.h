@@ -17,7 +17,7 @@ protected:
 	using Impl::data_;
 	using Impl::size_;
 
-	using StringView = bzd::impl::StringView<T, bzd::Span<typename bzd::typeTraits::addConst<T>::type>>;
+	using StringView = bzd::impl::StringView<T, bzd::Span<bzd::typeTraits::AddConst<T>>>;
 
 public:
 	template <class... Args>
