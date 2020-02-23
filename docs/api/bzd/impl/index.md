@@ -24,7 +24,6 @@
 |[`Registry`](registry/index.md)||
 |[`SingleLinkedPool`](singlelinkedpool/index.md)||
 |[`String`](string/index.md)||
-|[`StringConstexpr`](stringconstexpr/index.md)||
 |[`StringStream`](stringstream/index.md)||
 |[`StringView`](stringview/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
@@ -59,11 +58,6 @@
 |[`TupleChooseN()`](./index.md)||
 |[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
 |[`TupleChooseN(T && t, Ts &&... ts)`](./index.md)||
-|[`tygrab(char const (&) c)`](./index.md)||
-|[`typeek(StringConstexpr< C... >)`](./index.md)||
-|[`typoke(StringConstexpr< X... >)`](./index.md)||
-|[`typoke(StringConstexpr< X... >, StringConstexpr<'\0'>, StringConstexpr< Y > ...)`](./index.md)||
-|[`typoke(StringConstexpr< X... >, StringConstexpr< A >, StringConstexpr< Y > ...)`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -206,13 +200,6 @@ Flat map implementation.
 |---:|:---|:---|
 |class T|None||
 |class Impl|None||
-------
-### `template<char... C> class StringConstexpr`
-
-#### Template
-||||
-|---:|:---|:---|
-|char...|C||
 ------
 ### `class StringStream`
 
@@ -399,69 +386,6 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |T &&|t||
 |Ts &&...|ts||
-------
-### `template<int N, int M> constexpr char tygrab(char const (&) c)`
-
-#### Template
-||||
-|---:|:---|:---|
-|int|N||
-|int|M||
-#### Parameters
-||||
-|---:|:---|:---|
-|char const (&)|c||
-------
-### `template<char... C> auto typeek(StringConstexpr< C... >)`
-
-#### Template
-||||
-|---:|:---|:---|
-|char...|C||
-#### Parameters
-||||
-|---:|:---|:---|
-|StringConstexpr< C... >|None||
-------
-### `template<char... X> auto typoke(StringConstexpr< X... >)`
-
-#### Template
-||||
-|---:|:---|:---|
-|char...|X||
-#### Parameters
-||||
-|---:|:---|:---|
-|StringConstexpr< X... >|None||
-------
-### `template<char... X, char... Y> auto typoke(StringConstexpr< X... >, StringConstexpr<'\0'>, StringConstexpr< Y > ...)`
-
-#### Template
-||||
-|---:|:---|:---|
-|char...|X||
-|char...|Y||
-#### Parameters
-||||
-|---:|:---|:---|
-|StringConstexpr< X... >|None||
-|StringConstexpr<'\0'>|None||
-|StringConstexpr< Y >|...||
-------
-### `template<char A, char... X, char... Y> auto typoke(StringConstexpr< X... >, StringConstexpr< A >, StringConstexpr< Y > ...)`
-
-#### Template
-||||
-|---:|:---|:---|
-|char|A||
-|char...|X||
-|char...|Y||
-#### Parameters
-||||
-|---:|:---|:---|
-|StringConstexpr< X... >|None||
-|StringConstexpr< A >|None||
-|StringConstexpr< Y >|...||
 ------
 ### `template<SizeType L> typedef TupleRange`
 

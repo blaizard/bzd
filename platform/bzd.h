@@ -12,7 +12,6 @@
 #include "bzd/container/queue.h"
 #include "bzd/container/span.h"
 #include "bzd/container/string.h"
-#include "bzd/container/string_constexpr.h"
 #include "bzd/container/string_stream.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"

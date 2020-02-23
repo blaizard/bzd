@@ -10,7 +10,7 @@
 |Function||
 |:---|:---|
 |[`toString(bzd::OStream & out, const bzd::StringView & str, Args &&... args)`](./index.md)|String formating.|
-|[`toString(bzd::OStream & out, const bzd::StringConstexpr< C... > & str, Args &&... args)`](./index.md)||
+|[`toString(bzd::OStream & out, const ConstexprStringView & str, Args &&... args)`](./index.md)||
 |[`toString(bzd::OStream & stream, const T & data)`](./index.md)||
 |[`toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
 |[`toString(bzd::OStream & stream, const bzd::StringView & data)`](./index.md)||
@@ -52,18 +52,18 @@ This is an after text
 |const bzd::StringView &|str|run-time or compile-time string containing the format. |
 |Args &&...|args|Arguments to be passed for the format. |
 ------
-### `template<char... C, class... Args> constexpr void toString(bzd::OStream & out, const bzd::StringConstexpr< C... > & str, Args &&... args)`
+### `template<class ConstexprStringView, class... Args> constexpr void toString(bzd::OStream & out, const ConstexprStringView & str, Args &&... args)`
 
 #### Template
 ||||
 |---:|:---|:---|
-|char...|C||
+|class ConstexprStringView|None||
 |class...|Args||
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|out||
-|const bzd::StringConstexpr< C... > &|str||
+|const ConstexprStringView &|str||
 |Args &&...|args||
 ------
 ### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toString(bzd::OStream & stream, const T & data)`
