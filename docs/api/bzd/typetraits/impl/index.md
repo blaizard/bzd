@@ -25,6 +25,7 @@
 |[`Conditional< false, T, F >`](conditional_false_t_f_/index.md)||
 |[`EnableIf`](enableif/index.md)||
 |[`EnableIf< true, T >`](enableif_true_t_/index.md)||
+|[`IntegralConstant`](integralconstant/index.md)||
 |[`IsArithmetic`](isarithmetic/index.md)||
 |[`IsArray`](isarray/index.md)||
 |[`IsArray< T[]>`](isarray_t_/index.md)||
@@ -32,7 +33,7 @@
 |[`IsConst`](isconst/index.md)||
 |[`IsConst< const T >`](isconst_const_t_/index.md)||
 |[`IsConstructible`](isconstructible/index.md)||
-|[`IsConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`](isconstructible_voidtype_decltype_t_declval_args_t_args_/index.md)||
+|[`IsConstructible< VoidType< decltype(T(declval< Args >()...))>, T, Args... >`](isconstructible_voidtype_decltype_t_declval_args_t_args_/index.md)||
 |[`IsDestructible`](isdestructible/index.md)||
 |[`IsDestructible< T & >`](isdestructible_t_/index.md)||
 |[`IsDestructible< T && >`](isdestructible_t_/index.md)||
@@ -218,6 +219,14 @@
 |---:|:---|:---|
 |class T|None||
 ------
+### `template<class T, T v> struct IntegralConstant`
+
+#### Template
+||||
+|---:|:---|:---|
+|class|T||
+|T|v||
+------
 ### `template<class T> struct IsArithmetic`
 
 #### Template
@@ -270,7 +279,7 @@
 |class|T||
 |class...|Args||
 ------
-### `template<class T, class... Args> struct IsConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`
+### `template<class T, class... Args> struct IsConstructible< VoidType< decltype(T(declval< Args >()...))>, T, Args... >`
 
 #### Template
 ||||

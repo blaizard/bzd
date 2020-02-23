@@ -6,11 +6,11 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsVolatile : falseType
+struct IsVolatile : FalseType
 {
 };
 template <class T>
-struct IsVolatile<volatile T> : trueType
+struct IsVolatile<volatile T> : TrueType
 {
 };
 } // namespace impl

@@ -6,11 +6,11 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsConst : falseType
+struct IsConst : FalseType
 {
 };
 template <class T>
-struct IsConst<const T> : trueType
+struct IsConst<const T> : TrueType
 {
 };
 } // namespace impl

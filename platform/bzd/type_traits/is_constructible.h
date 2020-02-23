@@ -7,18 +7,18 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class, class T, class... Args>
-struct IsConstructible : public falseType
+struct IsConstructible : public FalseType
 {
 };
 
 template <class T, class... Args>
-struct IsConstructible<voidType<decltype(T(declval<Args>()...))>, T, Args...> : public trueType
+struct IsConstructible<VoidType<decltype(T(declval<Args>()...))>, T, Args...> : public TrueType
 {
 };
 } // namespace impl
 
 template <class T, class... Args>
-using IsConstructible = typename impl::IsConstructible<voidType<>, T, Args...>;
+using IsConstructible = typename impl::IsConstructible<VoidType<>, T, Args...>;
 
 template <class T, class... Args>
 constexpr bool isConstructible = IsConstructible<T, Args...>::value;

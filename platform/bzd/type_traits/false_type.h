@@ -3,5 +3,5 @@
 #include "bzd/type_traits/integral_constant.h"
 
 namespace bzd { namespace typeTraits {
-typedef integralConstant<bool, false> falseType;
+using FalseType = IntegralConstant<bool, false>;
 }} // namespace bzd::typeTraits

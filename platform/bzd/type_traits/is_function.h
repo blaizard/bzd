@@ -7,61 +7,61 @@ namespace bzd { namespace typeTraits {
 namespace impl {
 // Primary template
 template <class>
-struct IsFunction : falseType
+struct IsFunction : FalseType
 {
 };
 
 // Specialization for regular functions
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...)> : trueType
+struct IsFunction<Ret(Args...)> : TrueType
 {
 };
 
 // Specialization for function types that have cv-qualifiers
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const> : trueType
+struct IsFunction<Ret(Args...) const> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) volatile> : trueType
+struct IsFunction<Ret(Args...) volatile> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const volatile> : trueType
+struct IsFunction<Ret(Args...) const volatile> : TrueType
 {
 };
 
 // Specialization for function types that have ref-qualifiers
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...)&> : trueType
+struct IsFunction<Ret(Args...)&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const&> : trueType
+struct IsFunction<Ret(Args...) const&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) volatile&> : trueType
+struct IsFunction<Ret(Args...) volatile&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const volatile&> : trueType
+struct IsFunction<Ret(Args...) const volatile&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) &&> : trueType
+struct IsFunction<Ret(Args...) &&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const&&> : trueType
+struct IsFunction<Ret(Args...) const&&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) volatile&&> : trueType
+struct IsFunction<Ret(Args...) volatile&&> : TrueType
 {
 };
 template <class Ret, class... Args>
-struct IsFunction<Ret(Args...) const volatile&&> : trueType
+struct IsFunction<Ret(Args...) const volatile&&> : TrueType
 {
 };
 } // namespace impl

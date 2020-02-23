@@ -7,7 +7,7 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsReference : public integralConstant<bool, isLValueReference<T> || isRValueReference<T>>
+struct IsReference : public IntegralConstant<bool, isLValueReference<T> || isRValueReference<T>>
 {
 };
 } // namespace impl

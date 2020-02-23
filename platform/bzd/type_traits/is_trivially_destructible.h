@@ -15,12 +15,12 @@ namespace bzd { namespace typeTraits {
 namespace impl {
 #if __has_keyword(__is_trivially_destructible)
 template <class T>
-struct IsTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, __is_trivially_destructible(T)>
+struct IsTriviallyDestructible : public bzd::typeTraits::IntegralConstant<bool, __is_trivially_destructible(T)>
 {
 };
 #elif __has_feature(has_trivial_destructor) || defined(__GNUC__)
 template <class T>
-struct IsTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, isDestructible<T>&& __has_trivial_destructor(T)>
+struct IsTriviallyDestructible : public bzd::typeTraits::IntegralConstant<bool, isDestructible<T>&& __has_trivial_destructor(T)>
 {
 };
 #else

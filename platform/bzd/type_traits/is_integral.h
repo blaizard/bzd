@@ -8,7 +8,7 @@ namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
 struct IsIntegral
-	: integralConstant<bool,
+	: IntegralConstant<bool,
 					   isSame<unsigned char, RemoveCV<T>> || isSame<signed char, RemoveCV<T>> || isSame<char, RemoveCV<T>> ||
 						   isSame<unsigned short, RemoveCV<T>> || isSame<short, RemoveCV<T>> || isSame<unsigned int, RemoveCV<T>> ||
 						   isSame<int, RemoveCV<T>> || isSame<unsigned long, RemoveCV<T>> || isSame<long, RemoveCV<T>> ||

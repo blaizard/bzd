@@ -9,40 +9,40 @@
 
 |Function||
 |:---|:---|
-|[`operator valueType() const`](./index.md)||
-|[`operator valueType() const`](./index.md)||
+|[`operator ValueType() const`](./index.md)||
+|[`operator ValueType() const`](./index.md)||
 |[`operator()() const`](./index.md)||
 |[`operator()() const`](./index.md)||
 
 |Typedef||
 |:---|:---|
-|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../../integralconstant/index.md)|
-|[`type`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](../../integralconstant/index.md)|
-|[`valueType`](./index.md)||
-|[`valueType`](./index.md)||
+|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](../integralconstant/index.md)|
+|[`type`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](../integralconstant/index.md)|
+|[`ValueType`](./index.md)||
+|[`ValueType`](./index.md)||
 
 |Variable||
 |:---|:---|
 |[`value`](./index.md)||
 |[`value`](./index.md)||
 ------
-### `constexpr operator valueType() const`
+### `constexpr operator ValueType() const`
 *From bzd::typeTraits::impl::IsDestructible*
 
 
 ------
-### `constexpr operator valueType() const`
-*From bzd::typeTraits::integralConstant*
+### `constexpr operator ValueType() const`
+*From bzd::typeTraits::impl::IntegralConstant*
 
 
 ------
-### `constexpr valueType operator()() const`
+### `constexpr ValueType operator()() const`
 *From bzd::typeTraits::impl::IsDestructible*
 
 
 ------
-### `constexpr valueType operator()() const`
-*From bzd::typeTraits::integralConstant*
+### `constexpr ValueType operator()() const`
+*From bzd::typeTraits::impl::IntegralConstant*
 
 
 ------
@@ -52,17 +52,17 @@
 
 ------
 ### `typedef type`
-*From bzd::typeTraits::integralConstant*
+*From bzd::typeTraits::impl::IntegralConstant*
 
 
 ------
-### `typedef valueType`
+### `typedef ValueType`
 *From bzd::typeTraits::impl::IsDestructible*
 
 
 ------
-### `typedef valueType`
-*From bzd::typeTraits::integralConstant*
+### `typedef ValueType`
+*From bzd::typeTraits::impl::IntegralConstant*
 
 
 ------
@@ -72,6 +72,6 @@
 
 ------
 ### `static constexpr T value`
-*From bzd::typeTraits::integralConstant*
+*From bzd::typeTraits::impl::IntegralConstant*
 
 

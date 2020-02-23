@@ -16,24 +16,24 @@ struct IsDestructibleHelper
 };
 
 template <class T>
-struct IsDestructible : public bzd::typeTraits::integralConstant<bool, (sizeof(impl::IsDestructibleHelper::test<T>(0)) == sizeof(char))>
+struct IsDestructible : public bzd::typeTraits::IntegralConstant<bool, (sizeof(impl::IsDestructibleHelper::test<T>(0)) == sizeof(char))>
 {
 };
 
 template <>
-struct IsDestructible<void> : public falseType
+struct IsDestructible<void> : public FalseType
 {
 };
 template <>
-struct IsDestructible<void const> : public falseType
+struct IsDestructible<void const> : public FalseType
 {
 };
 template <>
-struct IsDestructible<void volatile> : public falseType
+struct IsDestructible<void volatile> : public FalseType
 {
 };
 template <>
-struct IsDestructible<void const volatile> : public falseType
+struct IsDestructible<void const volatile> : public FalseType
 {
 };
 template <class T>

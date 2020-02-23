@@ -6,27 +6,27 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsVoid : public falseType
+struct IsVoid : public FalseType
 {
 };
 
 template <>
-struct IsVoid<void> : public trueType
+struct IsVoid<void> : public TrueType
 {
 };
 
 template <>
-struct IsVoid<const void> : public trueType
+struct IsVoid<const void> : public TrueType
 {
 };
 
 template <>
-struct IsVoid<const volatile void> : public trueType
+struct IsVoid<const volatile void> : public TrueType
 {
 };
 
 template <>
-struct IsVoid<volatile void> : public trueType
+struct IsVoid<volatile void> : public TrueType
 {
 };
 } // namespace impl

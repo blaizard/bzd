@@ -2,5 +2,5 @@
 
 namespace bzd { namespace typeTraits {
 template <class...>
-using voidType = void;
+using VoidType = void;
 }} // namespace bzd::typeTraits

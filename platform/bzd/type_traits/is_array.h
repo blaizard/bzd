@@ -6,15 +6,15 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsArray : bzd::typeTraits::falseType
+struct IsArray : bzd::typeTraits::FalseType
 {
 };
 template <class T>
-struct IsArray<T[]> : bzd::typeTraits::trueType
+struct IsArray<T[]> : bzd::typeTraits::TrueType
 {
 };
 template <class T, unsigned long int N>
-struct IsArray<T[N]> : bzd::typeTraits::trueType
+struct IsArray<T[N]> : bzd::typeTraits::TrueType
 {
 };
 } // namespace impl
