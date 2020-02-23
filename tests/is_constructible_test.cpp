@@ -9,15 +9,15 @@ struct Foo
 TEST(TypeTraits, isConstructible)
 {
 	{
-		auto result = bzd::typeTraits::isConstructible<Foo, int>::value;
+		auto result = bzd::typeTraits::isConstructible<Foo, int>;
 		EXPECT_EQ(result, true);
 	}
 	{
-		auto result = bzd::typeTraits::isConstructible<Foo>::value;
+		auto result = bzd::typeTraits::isConstructible<Foo>;
 		EXPECT_EQ(result, false);
 	}
 	{
-		auto result = bzd::typeTraits::isConstructible<Foo, int, int>::value;
+		auto result = bzd::typeTraits::isConstructible<Foo, int, int>;
 		EXPECT_EQ(result, false);
 	}
 }

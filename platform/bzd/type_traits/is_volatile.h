@@ -3,13 +3,21 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct isVolatile : falseType
+struct IsVolatile : falseType
 {
 };
 template <class T>
-struct isVolatile<volatile T> : trueType
+struct IsVolatile<volatile T> : trueType
 {
 };
+}
+
+template <class T>
+using IsVolatile = typename impl::IsVolatile<T>;
+
+template <class T>
+constexpr bool isVolatile = IsVolatile<T>::value;
+
 }} // namespace bzd::typeTraits

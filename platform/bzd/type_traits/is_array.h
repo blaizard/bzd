@@ -3,17 +3,25 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct isArray : bzd::typeTraits::falseType
+struct IsArray : bzd::typeTraits::falseType
 {
 };
 template <class T>
-struct isArray<T[]> : bzd::typeTraits::trueType
+struct IsArray<T[]> : bzd::typeTraits::trueType
 {
 };
 template <class T, unsigned long int N>
-struct isArray<T[N]> : bzd::typeTraits::trueType
+struct IsArray<T[N]> : bzd::typeTraits::trueType
 {
 };
+}
+
+template <class T>
+using IsArray = typename impl::IsArray<T>;
+
+template <class T>
+constexpr bool isArray = IsArray<T>::value;
+
 }} // namespace bzd::typeTraits

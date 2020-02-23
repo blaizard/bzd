@@ -3,7 +3,7 @@
 #include "cc_test/test.h"
 
 template <typename T, typename U>
-struct decayEquiv : bzd::typeTraits::isSame<typename bzd::decay<T>::type, U>::type
+struct decayEquiv : bzd::typeTraits::IsSame<typename bzd::decay<T>::type, U>
 {
 };
 

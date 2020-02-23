@@ -13,7 +13,7 @@ constexpr T&& forward(typename typeTraits::removeReference<T>::type& t) noexcept
 template <class T>
 constexpr T&& forward(typename typeTraits::removeReference<T>::type&& t) noexcept
 {
-	static_assert(!bzd::typeTraits::isLValueReference<T>::value, "template argument substituting T is an lvalue reference type");
+	static_assert(!bzd::typeTraits::isLValueReference<T>, "template argument substituting T is an lvalue reference type");
 	return static_cast<T&&>(t);
 }
 } // namespace bzd

@@ -15,19 +15,19 @@ TEST(TypeTraits, isDestructible)
 	};
 
 	{
-		auto result = bzd::typeTraits::isDestructible<int>::value;
+		auto result = bzd::typeTraits::isDestructible<int>;
 		EXPECT_TRUE(result);
 	}
 	{
-		auto result = bzd::typeTraits::isDestructible<A>::value;
+		auto result = bzd::typeTraits::isDestructible<A>;
 		EXPECT_TRUE(result);
 	}
 	{
-		auto result = bzd::typeTraits::isDestructible<B>::value;
+		auto result = bzd::typeTraits::isDestructible<B>;
 		EXPECT_FALSE(result);
 	}
 	{
-		auto result = bzd::typeTraits::isDestructible<C>::value;
+		auto result = bzd::typeTraits::isDestructible<C>;
 		EXPECT_FALSE(result);
 	}
 }

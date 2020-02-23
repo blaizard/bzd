@@ -14,7 +14,7 @@ struct Find
 template <SizeType N, class T, class U>
 struct Find<N, T, U>
 {
-	static constexpr const int value = (bzd::typeTraits::isSame<T, U>::value) ? static_cast<int>(N) : -1;
+	static constexpr const int value = (bzd::typeTraits::isSame<T, U>) ? static_cast<int>(N) : -1;
 };
 } // namespace impl
 

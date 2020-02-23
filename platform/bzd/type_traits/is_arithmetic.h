@@ -4,9 +4,17 @@
 #include "bzd/type_traits/is_floating_point.h"
 #include "bzd/type_traits/is_integral.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct isArithmetic : integralConstant<bool, isIntegral<T>::value || isFloatingPoint<T>::value>
+struct IsArithmetic : integralConstant<bool, isIntegral<T> || isFloatingPoint<T>>
 {
 };
+}
+
+template <class T>
+using IsArithmetic = typename impl::IsArithmetic<T>;
+
+template <class T>
+constexpr bool isArithmetic = IsArithmetic<T>::value;
+
 }} // namespace bzd::typeTraits

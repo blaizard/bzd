@@ -22,7 +22,7 @@ class Span
 protected:
 	using DataType = T;
 	using SelfType = Span<DataType>;
-	using IsConst = typename bzd::typeTraits::isConst<DataType>;
+	using IsConst = bzd::typeTraits::IsConst<DataType>;
 
 public:
 	using Iterator = bzd::iterator::Contiguous<DataType>;

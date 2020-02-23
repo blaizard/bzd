@@ -20,7 +20,7 @@ struct AddRValueReferenceHelper<T, true>
 template <typename T>
 struct AddRValueReference
 {
-	typedef typename AddRValueReferenceHelper<T, (isVoid<T>::value == false && isReference<T>::value == false)>::type type;
+	typedef typename AddRValueReferenceHelper<T, (isVoid<T> == false && isReference<T> == false)>::type type;
 };
 } // namespace impl
 

@@ -7,50 +7,57 @@
 
 namespace bzd { namespace typeTraits {
 namespace impl {
-struct isDestructible
+struct IsDestructibleHelper
 {
 	template <class T, class = decltype(bzd::typeTraits::declval<T&>().~T())>
 	static char test(int);
 	template <class>
 	static long int test(...);
 };
-} // namespace impl
 
 template <class T>
-struct isDestructible : public bzd::typeTraits::integralConstant<bool, (sizeof(impl::isDestructible::test<T>(0)) == sizeof(char))>
+struct IsDestructible : public bzd::typeTraits::integralConstant<bool, (sizeof(impl::IsDestructibleHelper::test<T>(0)) == sizeof(char))>
 {
 };
 
 template <>
-struct isDestructible<void> : public falseType
+struct IsDestructible<void> : public falseType
 {
 };
 template <>
-struct isDestructible<void const> : public falseType
+struct IsDestructible<void const> : public falseType
 {
 };
 template <>
-struct isDestructible<void volatile> : public falseType
+struct IsDestructible<void volatile> : public falseType
 {
 };
 template <>
-struct isDestructible<void const volatile> : public falseType
+struct IsDestructible<void const volatile> : public falseType
 {
 };
 template <class T>
-struct isDestructible<T&> : public isDestructible<T>
+struct IsDestructible<T&> : public IsDestructible<T>
 {
 };
 template <class T>
-struct isDestructible<T&&> : public isDestructible<T>
+struct IsDestructible<T&&> : public IsDestructible<T>
 {
 };
 template <class T, unsigned long int N>
-struct isDestructible<T[N]> : public isDestructible<T>
+struct IsDestructible<T[N]> : public IsDestructible<T>
 {
 };
 template <class T>
-struct isDestructible<T[]> : public isDestructible<T>
+struct IsDestructible<T[]> : public IsDestructible<T>
 {
 };
+} // namespace impl
+
+template <class T>
+using IsDestructible = typename impl::IsDestructible<T>;
+
+template <class T>
+constexpr bool isDestructible = IsDestructible<T>::value;
+
 }} // namespace bzd::typeTraits

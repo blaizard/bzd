@@ -10,4 +10,8 @@ struct integralConstant
 	constexpr operator valueType() const noexcept { return value; }
 	constexpr valueType operator()() const noexcept { return value; }
 };
+
+template <class T, T v>
+using IntegralConstant = typename integralConstant<T, v>::type;
+
 }} // namespace bzd::typeTraits

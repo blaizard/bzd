@@ -3,29 +3,37 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct isVoid : public falseType
+struct IsVoid : public falseType
 {
 };
 
 template <>
-struct isVoid<void> : public trueType
+struct IsVoid<void> : public trueType
 {
 };
 
 template <>
-struct isVoid<const void> : public trueType
+struct IsVoid<const void> : public trueType
 {
 };
 
 template <>
-struct isVoid<const volatile void> : public trueType
+struct IsVoid<const volatile void> : public trueType
 {
 };
 
 template <>
-struct isVoid<volatile void> : public trueType
+struct IsVoid<volatile void> : public trueType
 {
 };
+}
+
+template <class T>
+using IsVoid = typename impl::IsVoid<T>;
+
+template <class T>
+constexpr bool isVoid = IsVoid<T>::value;
+
 }} // namespace bzd::typeTraits
