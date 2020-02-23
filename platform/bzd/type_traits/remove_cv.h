@@ -6,6 +6,6 @@
 namespace bzd { namespace typeTraits {
 
 template <class T>
-using RemoveCV = typename removeVolatile<RemoveConst<T>>::type;
+using RemoveCV = RemoveVolatile<RemoveConst<T>>;
 
 }} // namespace bzd::typeTraits

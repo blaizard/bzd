@@ -7,7 +7,7 @@ template <class T>
 class ReferenceWrapper
 {
 private:
-	using Value = typename bzd::typeTraits::removeReference<T>::type;
+	using Value = bzd::typeTraits::RemoveReference<T>;
 
 public:
 	constexpr ReferenceWrapper(Value& value) noexcept : value_(&value) {}

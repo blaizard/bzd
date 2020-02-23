@@ -48,8 +48,8 @@
 |Function||
 |:---|:---|
 |[`containerOf(M * ptr, const M T::* member)`](./index.md)||
-|[`forward(typename typeTraits::removeReference< T >::type & t)`](./index.md)||
-|[`forward(typename typeTraits::removeReference< T >::type && t)`](./index.md)||
+|[`forward(typeTraits::RemoveReference< T > & t)`](./index.md)||
+|[`forward(typeTraits::RemoveReference< T > && t)`](./index.md)||
 |[`getOut()`](./index.md)||
 |[`makeUnexpected(E && e)`](./index.md)||
 |[`max(const T & a)`](./index.md)||
@@ -309,7 +309,7 @@ The class template span describes an object that can refer to a contiguous seque
 |M *|ptr||
 |const M T::*|member||
 ------
-### `template<class T> constexpr T && forward(typename typeTraits::removeReference< T >::type & t)`
+### `template<class T> constexpr T && forward(typeTraits::RemoveReference< T > & t)`
 
 #### Template
 ||||
@@ -318,9 +318,9 @@ The class template span describes an object that can refer to a contiguous seque
 #### Parameters
 ||||
 |---:|:---|:---|
-|typename typeTraits::removeReference< T >::type &|t||
+|typeTraits::RemoveReference< T > &|t||
 ------
-### `template<class T> constexpr T && forward(typename typeTraits::removeReference< T >::type && t)`
+### `template<class T> constexpr T && forward(typeTraits::RemoveReference< T > && t)`
 
 #### Template
 ||||
@@ -329,7 +329,7 @@ The class template span describes an object that can refer to a contiguous seque
 #### Parameters
 ||||
 |---:|:---|:---|
-|typename typeTraits::removeReference< T >::type &&|t||
+|typeTraits::RemoveReference< T > &&|t||
 ------
 ### `bzd::OStream & getOut()`
 
@@ -413,7 +413,7 @@ The class template span describes an object that can refer to a contiguous seque
 |const T &|b||
 |const Ts &...|n||
 ------
-### `template<class T> bzd::typeTraits::removeReference< T >::type && move(T && arg)`
+### `template<class T> bzd::typeTraits::RemoveReference< T > && move(T && arg)`
 
 #### Template
 ||||

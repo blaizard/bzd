@@ -10,14 +10,6 @@
 |Struct||
 |:---|:---|
 |[`integralConstant`](integralconstant/index.md)||
-|[`removeExtent`](removeextent/index.md)||
-|[`removeExtent< T[]>`](removeextent_t_/index.md)||
-|[`removeExtent< T[N]>`](removeextent_t_n_/index.md)||
-|[`removeReference`](removereference/index.md)||
-|[`removeReference< T & >`](removereference_t_/index.md)||
-|[`removeReference< T && >`](removereference_t_/index.md)||
-|[`removeVolatile`](removevolatile/index.md)||
-|[`removeVolatile< volatile T >`](removevolatile_volatile_t_/index.md)||
 
 |Function||
 |:---|:---|
@@ -52,7 +44,10 @@
 |[`IsVoid`](./index.md)|alias of [`bzd::typeTraits::impl::IsVoid`](impl/isvoid/index.md)|
 |[`IsVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::IsVolatile`](impl/isvolatile/index.md)|
 |[`RemoveConst`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveConst`](impl/removeconst/index.md)|
-|[`RemoveCV`](./index.md)|alias of [`bzd::typeTraits::removeVolatile`](removevolatile/index.md)|
+|[`RemoveCV`](./index.md)||
+|[`RemoveExtent`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveExtent`](impl/removeextent/index.md)|
+|[`RemoveReference`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveReference`](impl/removereference/index.md)|
+|[`RemoveVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveVolatile`](impl/removevolatile/index.md)|
 |[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
 |[`voidType`](./index.md)||
 
@@ -81,63 +76,6 @@
 |---:|:---|:---|
 |class|T||
 |T|v||
-------
-### `template<class T> struct removeExtent`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeExtent< T[]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T, unsigned long int N> struct removeExtent< T[N]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|unsigned long int|N||
-------
-### `template<class T> struct removeReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
-### `template<class T> struct removeReference< T & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeReference< T && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeVolatile`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeVolatile< volatile T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 ------
 ### `template<class T> AddRValueReference< T > declval()`
 
@@ -338,6 +276,27 @@
 |class T|None||
 ------
 ### `template<class T> typedef RemoveCV`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef RemoveExtent`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef RemoveReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef RemoveVolatile`
 
 #### Template
 ||||

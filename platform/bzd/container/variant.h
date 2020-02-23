@@ -134,7 +134,7 @@ public:
 	template <class... Functors>
 	constexpr void match(Functors&&... funcs) const
 	{
-		const Overload<typename bzd::typeTraits::removeReference<Functors>::type...> visitor{bzd::forward<Functors>(funcs)...};
+		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
 		Match<decltype(visitor)>::call(id_, *this, visitor);
 	}
 

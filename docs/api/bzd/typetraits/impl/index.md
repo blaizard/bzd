@@ -74,6 +74,14 @@
 |[`IsVolatile< volatile T >`](isvolatile_volatile_t_/index.md)||
 |[`RemoveConst`](removeconst/index.md)||
 |[`RemoveConst< const T >`](removeconst_const_t_/index.md)||
+|[`RemoveExtent`](removeextent/index.md)||
+|[`RemoveExtent< T[]>`](removeextent_t_/index.md)||
+|[`RemoveExtent< T[N]>`](removeextent_t_n_/index.md)||
+|[`RemoveReference`](removereference/index.md)||
+|[`RemoveReference< T & >`](removereference_t_/index.md)||
+|[`RemoveReference< T && >`](removereference_t_/index.md)||
+|[`RemoveVolatile`](removevolatile/index.md)||
+|[`RemoveVolatile< volatile T >`](removevolatile_volatile_t_/index.md)||
 |[`TypeIdentity`](typeidentity/index.md)||
 
 |Function||
@@ -529,6 +537,63 @@
 |class T|None||
 ------
 ### `template<class T> struct RemoveConst< const T >`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveExtent`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveExtent< T[]>`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T, unsigned long int N> struct RemoveExtent< T[N]>`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|unsigned long int|N||
+------
+### `template<class T> struct RemoveReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveReference< T & >`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveReference< T && >`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveVolatile`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> struct RemoveVolatile< volatile T >`
 
 #### Template
 ||||
