@@ -8,9 +8,10 @@
 #include "bzd/type_traits/remove_extent.h"
 #include "bzd/type_traits/remove_reference.h"
 
-namespace bzd {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
-struct decay
+struct Decay
 {
 private:
 	typedef bzd::typeTraits::RemoveReference<T> U;
@@ -22,4 +23,9 @@ public:
 		bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>, bzd::typeTraits::AddPointer<U>, bzd::typeTraits::RemoveCV<U>>>
 		type;
 };
-} // namespace bzd
+} // namespace impl
+
+template <class T>
+using Decay = typename impl::Decay<T>::type;
+
+}} // namespace bzd::typeTraits

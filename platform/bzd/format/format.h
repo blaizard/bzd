@@ -564,7 +564,7 @@ template <class... Args>
 constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
-	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<typename bzd::decay<Args>::type>(args)...);
+	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<bzd::typeTraits::Decay<Args>>(args)...);
 	bzd::format::impl::print(out, str, argList);
 }
 
@@ -572,7 +572,7 @@ template <char... C, class... Args>
 constexpr void toString(bzd::OStream& out, const bzd::StringConstexpr<C...>& str, Args&&... args)
 {
 	// Compile-time format check
-	constexpr const bzd::Tuple<typename bzd::decay<Args>::type...> tuple;
+	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple;
 	constexpr const auto context = bzd::format::impl::contextBuild(bzd::StringConstexpr<C...>::data(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
