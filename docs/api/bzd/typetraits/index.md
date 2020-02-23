@@ -10,53 +10,6 @@
 |Struct||
 |:---|:---|
 |[`integralConstant`](integralconstant/index.md)||
-|[`isArithmetic`](isarithmetic/index.md)||
-|[`isArray`](isarray/index.md)||
-|[`isArray< T[]>`](isarray_t_/index.md)||
-|[`isArray< T[N]>`](isarray_t_n_/index.md)||
-|[`isConst`](isconst/index.md)||
-|[`isConst< const T >`](isconst_const_t_/index.md)||
-|[`isDestructible`](isdestructible/index.md)||
-|[`isDestructible< T & >`](isdestructible_t_/index.md)||
-|[`isDestructible< T && >`](isdestructible_t_/index.md)||
-|[`isDestructible< T[]>`](isdestructible_t_/index.md)||
-|[`isDestructible< T[N]>`](isdestructible_t_n_/index.md)||
-|[`isDestructible< void >`](isdestructible_void_/index.md)||
-|[`isDestructible< void const >`](isdestructible_void_const_/index.md)||
-|[`isDestructible< void const volatile >`](isdestructible_void_const_volatile_/index.md)||
-|[`isDestructible< void volatile >`](isdestructible_void_volatile_/index.md)||
-|[`isFloatingPoint`](isfloatingpoint/index.md)||
-|[`isFunction`](isfunction/index.md)||
-|[`isFunction< Ret(Args...) && >`](isfunction_ret_args_/index.md)||
-|[`isFunction< Ret(Args...) const & >`](isfunction_ret_args_const_/index.md)||
-|[`isFunction< Ret(Args...) const && >`](isfunction_ret_args_const_/index.md)||
-|[`isFunction< Ret(Args...) const >`](isfunction_ret_args_const_/index.md)||
-|[`isFunction< Ret(Args...) const volatile & >`](isfunction_ret_args_const_volatile_/index.md)||
-|[`isFunction< Ret(Args...) const volatile && >`](isfunction_ret_args_const_volatile_/index.md)||
-|[`isFunction< Ret(Args...) const volatile >`](isfunction_ret_args_const_volatile_/index.md)||
-|[`isFunction< Ret(Args...) volatile & >`](isfunction_ret_args_volatile_/index.md)||
-|[`isFunction< Ret(Args...) volatile && >`](isfunction_ret_args_volatile_/index.md)||
-|[`isFunction< Ret(Args...) volatile >`](isfunction_ret_args_volatile_/index.md)||
-|[`isFunction< Ret(Args...)& >`](isfunction_ret_args_/index.md)||
-|[`isFunction< Ret(Args...)>`](isfunction_ret_args_/index.md)||
-|[`isIntegral`](isintegral/index.md)||
-|[`isLValueReference`](islvaluereference/index.md)||
-|[`isLValueReference< T & >`](islvaluereference_t_/index.md)||
-|[`isReference`](isreference/index.md)||
-|[`isRValueReference`](isrvaluereference/index.md)||
-|[`isRValueReference< T && >`](isrvaluereference_t_/index.md)||
-|[`isSame`](issame/index.md)||
-|[`isSame< T, T >`](issame_t_t_/index.md)||
-|[`isVoid`](isvoid/index.md)||
-|[`isVoid< const void >`](isvoid_const_void_/index.md)||
-|[`isVoid< const volatile void >`](isvoid_const_volatile_void_/index.md)||
-|[`isVoid< void >`](isvoid_void_/index.md)||
-|[`isVoid< volatile void >`](isvoid_volatile_void_/index.md)||
-|[`isVolatile`](isvolatile/index.md)||
-|[`isVolatile< volatile T >`](isvolatile_volatile_t_/index.md)||
-|[`removeConst`](removeconst/index.md)||
-|[`removeConst< const T >`](removeconst_const_t_/index.md)||
-|[`removeCV`](removecv/index.md)||
 |[`removeExtent`](removeextent/index.md)||
 |[`removeExtent< T[]>`](removeextent_t_/index.md)||
 |[`removeExtent< T[N]>`](removeextent_t_n_/index.md)||
@@ -82,9 +35,44 @@
 |[`Conditional`](./index.md)|alias of [`bzd::typeTraits::impl::Conditional`](impl/conditional/index.md)|
 |[`EnableIf`](./index.md)|alias of [`bzd::typeTraits::impl::EnableIf`](impl/enableif/index.md)|
 |[`falseType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
-|[`isConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::isConstructible`](impl/isconstructible/index.md)|
+|[`IntegralConstant`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
+|[`IsArithmetic`](./index.md)|alias of [`bzd::typeTraits::impl::IsArithmetic`](impl/isarithmetic/index.md)|
+|[`IsArray`](./index.md)|alias of [`bzd::typeTraits::impl::IsArray`](impl/isarray/index.md)|
+|[`IsConst`](./index.md)|alias of [`bzd::typeTraits::impl::IsConst`](impl/isconst/index.md)|
+|[`IsConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::IsConstructible`](impl/isconstructible/index.md)|
+|[`IsDestructible`](./index.md)|alias of [`bzd::typeTraits::impl::IsDestructible`](impl/isdestructible/index.md)|
+|[`IsFloatingPoint`](./index.md)|alias of [`bzd::typeTraits::impl::IsFloatingPoint`](impl/isfloatingpoint/index.md)|
+|[`IsFunction`](./index.md)|alias of [`bzd::typeTraits::impl::IsFunction`](impl/isfunction/index.md)|
+|[`IsIntegral`](./index.md)|alias of [`bzd::typeTraits::impl::IsIntegral`](impl/isintegral/index.md)|
+|[`IsLValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsLValueReference`](impl/islvaluereference/index.md)|
+|[`IsReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsReference`](impl/isreference/index.md)|
+|[`IsRValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsRValueReference`](impl/isrvaluereference/index.md)|
+|[`IsSame`](./index.md)|alias of [`bzd::typeTraits::impl::IsSame`](impl/issame/index.md)|
+|[`IsTriviallyDestructible`](./index.md)||
+|[`IsVoid`](./index.md)|alias of [`bzd::typeTraits::impl::IsVoid`](impl/isvoid/index.md)|
+|[`IsVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::IsVolatile`](impl/isvolatile/index.md)|
+|[`RemoveConst`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveConst`](impl/removeconst/index.md)|
+|[`RemoveCV`](./index.md)|alias of [`bzd::typeTraits::removeVolatile`](removevolatile/index.md)|
 |[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
 |[`voidType`](./index.md)||
+
+|Variable||
+|:---|:---|
+|[`isArithmetic`](./index.md)||
+|[`isArray`](./index.md)||
+|[`isConst`](./index.md)||
+|[`isConstructible`](./index.md)||
+|[`isDestructible`](./index.md)||
+|[`isFloatingPoint`](./index.md)||
+|[`isFunction`](./index.md)||
+|[`isIntegral`](./index.md)||
+|[`isLValueReference`](./index.md)||
+|[`isReference`](./index.md)||
+|[`isRValueReference`](./index.md)||
+|[`isSame`](./index.md)||
+|[`isTriviallyDestructible`](./index.md)||
+|[`isVoid`](./index.md)||
+|[`isVolatile`](./index.md)||
 ------
 ### `template<class T, T v> struct integralConstant`
 
@@ -93,318 +81,6 @@
 |---:|:---|:---|
 |class|T||
 |T|v||
-------
-### `template<class T> struct isArithmetic`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isArray`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isArray< T[]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T, unsigned long int N> struct isArray< T[N]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|unsigned long int|N||
-------
-### `template<class T> struct isConst`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isConst< const T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isDestructible`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isDestructible< T & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isDestructible< T && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isDestructible< T[]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T, unsigned long int N> struct isDestructible< T[N]>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|unsigned long int|N||
-------
-### `struct isDestructible< void >`
-
-------
-### `struct isDestructible< void const >`
-
-------
-### `struct isDestructible< void const volatile >`
-
-------
-### `struct isDestructible< void volatile >`
-
-------
-### `template<class T> struct isFloatingPoint`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class> struct isFunction`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|None||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const volatile & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const volatile && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) const volatile >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...) volatile >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...)& >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class Ret, class... Args> struct isFunction< Ret(Args...)>`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Ret|None||
-|class...|Args||
-------
-### `template<class T> struct isIntegral`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isLValueReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isLValueReference< T & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isRValueReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isRValueReference< T && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T, class U> struct isSame`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|class U|None||
-------
-### `template<class T> struct isSame< T, T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isVoid`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `struct isVoid< const void >`
-
-------
-### `struct isVoid< const volatile void >`
-
-------
-### `struct isVoid< void >`
-
-------
-### `struct isVoid< volatile void >`
-
-------
-### `template<class T> struct isVolatile`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct isVolatile< volatile T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeConst`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
-### `template<class T> struct removeConst< const T >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct removeCV`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 ------
 ### `template<class T> struct removeExtent`
 
@@ -454,7 +130,7 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 ------
 ### `template<class T> struct removeVolatile< volatile T >`
 
@@ -539,13 +215,134 @@
 ### `typedef falseType`
 
 ------
-### `template<class T, class... Args> typedef isConstructible`
+### `template<class T, T v> typedef IntegralConstant`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|T|v||
+------
+### `template<class T> typedef IsArithmetic`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsArray`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsConst`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T, class... Args> typedef IsConstructible`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
 |class...|Args||
+------
+### `template<class T> typedef IsDestructible`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsFloatingPoint`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsFunction`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsIntegral`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsLValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsRValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T, class U> typedef IsSame`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class U|None||
+------
+### `template<class T> typedef IsTriviallyDestructible`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsVoid`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef IsVolatile`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef RemoveConst`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef RemoveCV`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `typedef trueType`
 
@@ -556,3 +353,110 @@
 ||||
 |---:|:---|:---|
 |class...|None||
+------
+### `template<class T> constexpr bool isArithmetic`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isArray`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isConst`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T, class... Args> constexpr bool isConstructible`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class...|Args||
+------
+### `template<class T> constexpr bool isDestructible`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isFloatingPoint`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isFunction`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isIntegral`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isLValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isRValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T, class U> constexpr bool isSame`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class U|None||
+------
+### `template<class T> constexpr bool isTriviallyDestructible`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isVoid`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isVolatile`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||

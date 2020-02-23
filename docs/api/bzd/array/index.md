@@ -39,7 +39,7 @@ The container combines the performance and accessibility of a C-style array with
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
-|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
+|[`Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`](./index.md)||
 
 |Typedef||
 |:---|:---|
@@ -258,7 +258,7 @@ Maximum number of element this array can hold.
 |DataType *const|data||
 |const SizeType|size||
 ------
-### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`
 *From bzd::Span*
 
 
@@ -270,7 +270,7 @@ Maximum number of element this array can hold.
 #### Parameters
 ||||
 |---:|:---|:---|
-|const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
+|const Span< bzd::typeTraits::RemoveConst< DataType >> &|span||
 ------
 ### `typedef ConstIterator`
 *From bzd::Span*

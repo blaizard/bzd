@@ -3,7 +3,8 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T, class U>
 struct IsSame : falseType
 {
@@ -13,7 +14,7 @@ template <class T>
 struct IsSame<T, T> : trueType
 {
 };
-}
+} // namespace impl
 
 template <class T, class U>
 using IsSame = typename impl::IsSame<T, U>;

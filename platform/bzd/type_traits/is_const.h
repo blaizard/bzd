@@ -3,7 +3,8 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
 struct IsConst : falseType
 {
@@ -12,7 +13,7 @@ template <class T>
 struct IsConst<const T> : trueType
 {
 };
-}
+} // namespace impl
 
 template <class T>
 using IsConst = typename impl::IsConst<T>;

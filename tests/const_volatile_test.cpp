@@ -5,31 +5,31 @@
 TEST(TypeTraits, removeCV)
 {
 	{
-		typedef bzd::typeTraits::removeCV<const int>::type type;
+		typedef bzd::typeTraits::RemoveCV<const int> type;
 		const bool result = bzd::typeTraits::isSame<int, type>;
 		EXPECT_TRUE(result);
 	}
 
 	{
-		typedef bzd::typeTraits::removeCV<volatile int>::type type;
+		typedef bzd::typeTraits::RemoveCV<volatile int> type;
 		const bool result = bzd::typeTraits::isSame<int, type>;
 		EXPECT_TRUE(result);
 	}
 
 	{
-		typedef bzd::typeTraits::removeCV<const volatile int>::type type;
+		typedef bzd::typeTraits::RemoveCV<const volatile int> type;
 		const bool result = bzd::typeTraits::isSame<int, type>;
 		EXPECT_TRUE(result);
 	}
 
 	{
-		typedef bzd::typeTraits::removeCV<const volatile int*>::type type;
+		typedef bzd::typeTraits::RemoveCV<const volatile int*> type;
 		const bool result = bzd::typeTraits::isSame<const volatile int*, type>;
 		EXPECT_TRUE(result);
 	}
 
 	{
-		typedef bzd::typeTraits::removeCV<int* const volatile>::type type;
+		typedef bzd::typeTraits::RemoveCV<int* const volatile> type;
 		const bool result = bzd::typeTraits::isSame<int*, type>;
 		EXPECT_TRUE(result);
 	}

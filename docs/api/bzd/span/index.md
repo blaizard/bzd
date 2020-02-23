@@ -11,7 +11,7 @@ The class template span describes an object that can refer to a contiguous seque
 |:---|:---|
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
-|[`Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`](./index.md)||
+|[`Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
 |[`at(const SizeType index) const`](./index.md)||
 |[`back()`](./index.md)||
@@ -55,7 +55,7 @@ The class template span describes an object that can refer to a contiguous seque
 |DataType *const|data||
 |const SizeType|size||
 ------
-### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< typename bzd::typeTraits::removeConst< DataType >::type > & span)`
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Span(const Span< bzd::typeTraits::RemoveConst< DataType >> & span)`
 
 #### Template
 ||||
@@ -65,7 +65,7 @@ The class template span describes an object that can refer to a contiguous seque
 #### Parameters
 ||||
 |---:|:---|:---|
-|const Span< typename bzd::typeTraits::removeConst< DataType >::type > &|span||
+|const Span< bzd::typeTraits::RemoveConst< DataType >> &|span||
 ------
 ### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & at(const SizeType index)`
 

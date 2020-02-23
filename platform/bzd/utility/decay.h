@@ -16,11 +16,10 @@ private:
 	typedef typename bzd::typeTraits::removeReference<T>::type U;
 
 public:
-	typedef bzd::typeTraits::Conditional<bzd::typeTraits::isArray<U>,
-										 typename bzd::typeTraits::removeExtent<U>::type*,
-										 bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>,
-																	  bzd::typeTraits::AddPointer<U>,
-																	  typename bzd::typeTraits::removeCV<U>::type>>
+	typedef bzd::typeTraits::Conditional<
+		bzd::typeTraits::isArray<U>,
+		typename bzd::typeTraits::removeExtent<U>::type*,
+		bzd::typeTraits::Conditional<bzd::typeTraits::isFunction<U>, bzd::typeTraits::AddPointer<U>, bzd::typeTraits::RemoveCV<U>>>
 		type;
 };
 } // namespace bzd

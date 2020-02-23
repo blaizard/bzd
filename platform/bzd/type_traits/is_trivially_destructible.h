@@ -11,7 +11,8 @@
 #define __has_feature(__x) 0
 #endif
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 #if __has_keyword(__is_trivially_destructible)
 template <class T>
 struct IsTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, __is_trivially_destructible(T)>
@@ -25,7 +26,7 @@ struct IsTriviallyDestructible : public bzd::typeTraits::integralConstant<bool, 
 #else
 static_assert(false, "Unsupported compiler");
 #endif
-}
+} // namespace impl
 
 template <class T>
 using IsTriviallyDestructible = typename impl::IsTriviallyDestructible<T>;

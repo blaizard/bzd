@@ -4,15 +4,14 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/remove_cv.h"
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
 struct IsFloatingPoint
-	: integralConstant<bool,
-					   isSame<float, typename removeCV<T>::type> || isSame<double, typename removeCV<T>::type> ||
-						   isSame<long double, typename removeCV<T>::type>>
+	: integralConstant<bool, isSame<float, RemoveCV<T>> || isSame<double, RemoveCV<T>> || isSame<long double, RemoveCV<T>>>
 {
 };
-}
+} // namespace impl
 
 template <class T>
 using IsFloatingPoint = typename impl::IsFloatingPoint<T>;
