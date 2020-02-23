@@ -4,5 +4,5 @@
 
 namespace bzd { namespace typeTraits {
 template <class T>
-typename addRValueReference<T>::type declval();
+AddRValueReference<T> declval();
 }} // namespace bzd::typeTraits

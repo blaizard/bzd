@@ -2,16 +2,21 @@
 
 #include "bzd/type_traits/add_reference.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd { namespace typeTraits { namespace impl {
 template <class T>
-struct addLValueReference
+struct AddLValueReference
 {
-	typedef typename addReference<T>::type type;
+	typedef AddReference<T> type;
 };
 
 template <class T>
-struct addLValueReference<T&&>
+struct AddLValueReference<T&&>
 {
 	typedef T& type;
 };
+}
+
+template <class T>
+using AddLValueReference = typename impl::AddLValueReference<T>::type;
+
 }} // namespace bzd::typeTraits
