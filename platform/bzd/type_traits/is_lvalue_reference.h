@@ -6,12 +6,12 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsLValueReference : public falseType
+struct IsLValueReference : public FalseType
 {
 };
 
 template <class T>
-struct IsLValueReference<T&> : public trueType
+struct IsLValueReference<T&> : public TrueType
 {
 };
 } // namespace impl

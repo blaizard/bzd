@@ -1,17 +1,19 @@
 #pragma once
 
 namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T, T v>
-struct integralConstant
+struct IntegralConstant
 {
 	static constexpr T value = v;
-	typedef T valueType;
-	typedef integralConstant type;
-	constexpr operator valueType() const noexcept { return value; }
-	constexpr valueType operator()() const noexcept { return value; }
+	typedef T ValueType;
+	typedef IntegralConstant type;
+	constexpr operator ValueType() const noexcept { return value; }
+	constexpr ValueType operator()() const noexcept { return value; }
 };
+} // namespace impl
 
 template <class T, T v>
-using IntegralConstant = typename integralConstant<T, v>::type;
+using IntegralConstant = impl::IntegralConstant<T, v>;
 
 }} // namespace bzd::typeTraits

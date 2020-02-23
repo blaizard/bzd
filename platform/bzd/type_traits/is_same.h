@@ -6,12 +6,12 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T, class U>
-struct IsSame : falseType
+struct IsSame : FalseType
 {
 };
 
 template <class T>
-struct IsSame<T, T> : trueType
+struct IsSame<T, T> : TrueType
 {
 };
 } // namespace impl

@@ -8,7 +8,7 @@ namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
 struct IsFloatingPoint
-	: integralConstant<bool, isSame<float, RemoveCV<T>> || isSame<double, RemoveCV<T>> || isSame<long double, RemoveCV<T>>>
+	: IntegralConstant<bool, isSame<float, RemoveCV<T>> || isSame<double, RemoveCV<T>> || isSame<long double, RemoveCV<T>>>
 {
 };
 } // namespace impl

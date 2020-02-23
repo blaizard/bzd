@@ -7,10 +7,6 @@
 |:---|:---|
 |[`impl`](impl/index.md)||
 
-|Struct||
-|:---|:---|
-|[`integralConstant`](integralconstant/index.md)||
-
 |Function||
 |:---|:---|
 |[`declval()`](./index.md)||
@@ -26,8 +22,8 @@
 |[`AddVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::AddVolatile`](impl/addvolatile/index.md)|
 |[`Conditional`](./index.md)|alias of [`bzd::typeTraits::impl::Conditional`](impl/conditional/index.md)|
 |[`EnableIf`](./index.md)|alias of [`bzd::typeTraits::impl::EnableIf`](impl/enableif/index.md)|
-|[`falseType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
-|[`IntegralConstant`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
+|[`FalseType`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](impl/integralconstant/index.md)|
+|[`IntegralConstant`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](impl/integralconstant/index.md)|
 |[`IsArithmetic`](./index.md)|alias of [`bzd::typeTraits::impl::IsArithmetic`](impl/isarithmetic/index.md)|
 |[`IsArray`](./index.md)|alias of [`bzd::typeTraits::impl::IsArray`](impl/isarray/index.md)|
 |[`IsConst`](./index.md)|alias of [`bzd::typeTraits::impl::IsConst`](impl/isconst/index.md)|
@@ -48,8 +44,8 @@
 |[`RemoveExtent`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveExtent`](impl/removeextent/index.md)|
 |[`RemoveReference`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveReference`](impl/removereference/index.md)|
 |[`RemoveVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::RemoveVolatile`](impl/removevolatile/index.md)|
-|[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
-|[`voidType`](./index.md)||
+|[`TrueType`](./index.md)|alias of [`bzd::typeTraits::impl::IntegralConstant`](impl/integralconstant/index.md)|
+|[`VoidType`](./index.md)||
 
 |Variable||
 |:---|:---|
@@ -68,14 +64,6 @@
 |[`isTriviallyDestructible`](./index.md)||
 |[`isVoid`](./index.md)||
 |[`isVolatile`](./index.md)||
-------
-### `template<class T, T v> struct integralConstant`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-|T|v||
 ------
 ### `template<class T> AddRValueReference< T > declval()`
 
@@ -150,7 +138,7 @@
 |bool|Condition||
 |class T|None||
 ------
-### `typedef falseType`
+### `typedef FalseType`
 
 ------
 ### `template<class T, T v> typedef IntegralConstant`
@@ -303,10 +291,10 @@
 |---:|:---|:---|
 |class T|None||
 ------
-### `typedef trueType`
+### `typedef TrueType`
 
 ------
-### `template<class...> typedef voidType`
+### `template<class...> typedef VoidType`
 
 #### Template
 ||||

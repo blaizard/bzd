@@ -7,7 +7,7 @@
 namespace bzd { namespace typeTraits {
 namespace impl {
 template <class T>
-struct IsArithmetic : integralConstant<bool, isIntegral<T> || isFloatingPoint<T>>
+struct IsArithmetic : IntegralConstant<bool, isIntegral<T> || isFloatingPoint<T>>
 {
 };
 } // namespace impl
