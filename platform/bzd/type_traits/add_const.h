@@ -1,12 +1,13 @@
 #pragma once
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
 struct AddConst
 {
 	typedef const T type;
 };
-}
+} // namespace impl
 
 template <class T>
 using AddConst = typename impl::AddConst<T>::type;

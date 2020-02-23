@@ -1,6 +1,7 @@
 #pragma once
 
-namespace bzd { namespace typeTraits { namespace impl {
+namespace bzd { namespace typeTraits {
+namespace impl {
 template <class T>
 struct AddReference
 {
@@ -39,7 +40,7 @@ struct AddReference<volatile void>
 {
 	typedef volatile void type;
 };
-}
+} // namespace impl
 
 template <class T>
 using AddReference = typename impl::AddReference<T>::type;

@@ -9,22 +9,6 @@
 
 |Struct||
 |:---|:---|
-|[`addConst`](addconst/index.md)||
-|[`addCV`](addcv/index.md)||
-|[`addLValueReference`](addlvaluereference/index.md)||
-|[`addLValueReference< T && >`](addlvaluereference_t_/index.md)||
-|[`addPointer`](addpointer/index.md)||
-|[`addReference`](addreference/index.md)||
-|[`addReference< const void >`](addreference_const_void_/index.md)||
-|[`addReference< const volatile void >`](addreference_const_volatile_void_/index.md)||
-|[`addReference< T & >`](addreference_t_/index.md)||
-|[`addReference< T && >`](addreference_t_/index.md)||
-|[`addReference< void >`](addreference_void_/index.md)||
-|[`addReference< volatile void >`](addreference_volatile_void_/index.md)||
-|[`addRValueReference`](addrvaluereference/index.md)||
-|[`addVolatile`](addvolatile/index.md)||
-|[`conditional`](conditional/index.md)||
-|[`conditional< false, T, F >`](conditional_false_t_f_/index.md)||
 |[`integralConstant`](integralconstant/index.md)||
 |[`isArithmetic`](isarithmetic/index.md)||
 |[`isArray`](isarray/index.md)||
@@ -88,110 +72,19 @@
 
 |Typedef||
 |:---|:---|
+|[`AddConst`](./index.md)|alias of [`bzd::typeTraits::impl::AddConst`](impl/addconst/index.md)|
+|[`AddCV`](./index.md)|alias of [`bzd::typeTraits::impl::AddCV`](impl/addcv/index.md)|
+|[`AddLValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::AddLValueReference`](impl/addlvaluereference/index.md)|
+|[`AddPointer`](./index.md)|alias of [`bzd::typeTraits::impl::AddPointer`](impl/addpointer/index.md)|
+|[`AddReference`](./index.md)|alias of [`bzd::typeTraits::impl::AddReference`](impl/addreference/index.md)|
+|[`AddRValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::AddRValueReference`](impl/addrvaluereference/index.md)|
+|[`AddVolatile`](./index.md)|alias of [`bzd::typeTraits::impl::AddVolatile`](impl/addvolatile/index.md)|
+|[`Conditional`](./index.md)|alias of [`bzd::typeTraits::impl::Conditional`](impl/conditional/index.md)|
 |[`EnableIf`](./index.md)|alias of [`bzd::typeTraits::impl::EnableIf`](impl/enableif/index.md)|
 |[`falseType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
 |[`isConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::isConstructible`](impl/isconstructible/index.md)|
 |[`trueType`](./index.md)|alias of [`bzd::typeTraits::integralConstant`](integralconstant/index.md)|
 |[`voidType`](./index.md)||
-------
-### `template<class T> struct addConst`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addCV`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addLValueReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addLValueReference< T && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addPointer`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class|T||
-------
-### `struct addReference< const void >`
-
-------
-### `struct addReference< const volatile void >`
-
-------
-### `template<class T> struct addReference< T & >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addReference< T && >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `struct addReference< void >`
-
-------
-### `struct addReference< volatile void >`
-
-------
-### `template<class T> struct addRValueReference`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> struct addVolatile`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<bool B, class T, class F> struct conditional`
-
-#### Template
-||||
-|---:|:---|:---|
-|bool|B||
-|class|T||
-|class|F||
-------
-### `template<class T, class F> struct conditional< false, T, F >`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-|class F|None||
 ------
 ### `template<class T, T v> struct integralConstant`
 
@@ -570,12 +463,70 @@
 |---:|:---|:---|
 |class T|None||
 ------
-### `template<class T> addRValueReference< T >::type declval()`
+### `template<class T> AddRValueReference< T > declval()`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `template<class T> typedef AddConst`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddCV`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddLValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddPointer`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddRValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> typedef AddVolatile`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<bool Condition, class T, class F> typedef Conditional`
+
+#### Template
+||||
+|---:|:---|:---|
+|bool|Condition||
+|class T|None||
+|class F|None||
 ------
 ### `template<bool Condition, class T> typedef EnableIf`
 
