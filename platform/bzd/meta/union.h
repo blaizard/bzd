@@ -13,34 +13,34 @@ public:
 	// initialize something
 	constexpr UnionConstexpr() : next_{} {}
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr UnionConstexpr(U&& value) : next_{bzd::forward<U>(value)}
 	{
 	}
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr UnionConstexpr(const U& value) : value_{value}
 	{
 	}
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return next_.template get<U>();
 	}
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return next_.template get<U>();
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return value_;
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return value_;
@@ -59,34 +59,34 @@ public:
 	constexpr Union() : next_{} {}
 	~Union(){}; // This is the only difference with a constexpr Union
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr Union(U&& value) : next_{bzd::forward<U>(value)}
 	{
 	}
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr Union(const U& value) : value_{value}
 	{
 	}
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return next_.template get<U>();
 	}
 
-	template <class U, typename typeTraits::enableIf<!bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return next_.template get<U>();
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return value_;
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return value_;
@@ -102,18 +102,18 @@ union UnionConstexpr<T> {
 public:
 	constexpr UnionConstexpr() : dummy_{} {}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr UnionConstexpr(const U& value) : value_{value}
 	{
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return value_;
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return value_;
@@ -132,18 +132,18 @@ public:
 	constexpr Union() : dummy_{} {}
 	~Union() {}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr Union(const U& value) : value_{value}
 	{
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline U& get()
 	{
 		return value_;
 	}
 
-	template <class U, typename typeTraits::enableIf<bzd::typeTraits::isSame<T, U>::value>::type* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>::value>* = nullptr>
 	constexpr inline const U& get() const
 	{
 		return value_;

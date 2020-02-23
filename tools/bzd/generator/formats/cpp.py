@@ -51,11 +51,9 @@ def registryBuild(manifest):
 			if config != None:
 				# Create a configuration object from the implementation class
 				configName = "config{}_".format(getUID())
-
-
 				content += "struct {} : public {}::Configuration {{\n".format(configName, implementation)
 				#content += "\tusing {}::Configuration;\n".format(implementation)
-				content += "\tstatic inline Configuration get() {\n"
+				content += "\tstatic constexpr Configuration get() {\n"
 				content += "\t\tConfiguration config{};\n"
 				# Set the various values
 				for key, value in config.items():

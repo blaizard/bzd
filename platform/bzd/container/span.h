@@ -34,18 +34,18 @@ public:
 	constexpr Span() noexcept = default;
 	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
 	constexpr Span(const Span<typename bzd::typeTraits::removeConst<DataType>::type>& span) noexcept : data_(span.data_), size_(span.size_)
 	{
 	}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr Iterator begin() noexcept
 	{
 		return Iterator(data_, 0);
 	}
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr Iterator end() noexcept
 	{
 		return Iterator(data_, size());
@@ -94,7 +94,7 @@ public:
 
 	constexpr bool operator!=(const SelfType& rhs) const { return !(*this == rhs); }
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr DataType& operator[](const SizeType index)
 	{
 		return data_[index];
@@ -104,7 +104,7 @@ public:
 
 	// at
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr DataType& at(const SizeType index)
 	{
 		return data_[index];
@@ -114,7 +114,7 @@ public:
 
 	// front
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr DataType& front() noexcept
 	{
 		return data_[0];
@@ -123,14 +123,14 @@ public:
 
 	// back
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr DataType& back() noexcept
 	{
 		return data_[size_ - 1];
 	}
 	constexpr const DataType& back() const noexcept { return data_[size_ - 1]; }
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<!Q::value, void>::type* = nullptr>
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
 	constexpr DataType* data() noexcept
 	{
 		return data_;

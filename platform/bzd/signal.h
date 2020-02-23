@@ -1,8 +1,8 @@
 #pragma once
 
 #include "bzd/container/buffer.h"
-#include "bzd/utility/memcpy.h"
 #include "bzd/types.h"
+#include "bzd/utility/memcpy.h"
 
 #include <iostream>
 
@@ -28,58 +28,58 @@ public:
 template <bzd::SizeType SizeBytes>
 struct SignalInternals
 {
-    static_assert(SizeBytes> 0 && SizeBytes <= 8, "Singal size must be within 0 and 8 bytes.");
+	static_assert(SizeBytes > 0 && SizeBytes <= 8, "Singal size must be within 0 and 8 bytes.");
 };
 
-template<>
+template <>
 struct SignalInternals<1>
 {
 	using Type = UInt8Type;
 	using ExtractedType = UInt16Type;
 };
 
-template<>
+template <>
 struct SignalInternals<2>
 {
 	using Type = UInt16Type;
 	using ExtractedType = UInt32Type;
 };
 
-template<>
+template <>
 struct SignalInternals<3>
 {
 	using Type = UInt32Type;
 	using ExtractedType = UInt32Type;
 };
 
-template<>
+template <>
 struct SignalInternals<4>
 {
 	using Type = UInt32Type;
 	using ExtractedType = UInt64Type;
 };
 
-template<>
+template <>
 struct SignalInternals<5>
 {
 	using Type = UInt64Type;
 	using ExtractedType = UInt64Type;
 };
 
-template<>
+template <>
 struct SignalInternals<6>
 {
 	using Type = UInt64Type;
 	using ExtractedType = UInt64Type;
 };
 
-template<>
+template <>
 struct SignalInternals<7>
 {
 	using Type = UInt64Type;
 	using ExtractedType = UInt64Type;
 };
-}
+} // namespace impl
 
 template <class Type, bzd::SizeType OffsetBits, bzd::SizeType SizeBits, class CompuMethod = impl::CompuMethodIdentical>
 class Signal
@@ -105,9 +105,7 @@ public:
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}
 
-	static constexpr void set(bzd::Buffer& /*data*/, const Type& /*value*/)
-	{
-	}
+	static constexpr void set(bzd::Buffer& /*data*/, const Type& /*value*/) {}
 };
 
-}
+} // namespace bzd

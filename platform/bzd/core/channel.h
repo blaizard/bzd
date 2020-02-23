@@ -24,7 +24,11 @@ protected:
 
 public:
 	virtual SizeType read(Span<T>& data) noexcept = 0;
-	virtual SizeType read(T& data) noexcept { auto temp = Span<T>(&data, 1); return read(temp); }
+	virtual SizeType read(T& data) noexcept
+	{
+		auto temp = Span<T>(&data, 1);
+		return read(temp);
+	}
 };
 
 template <class T>

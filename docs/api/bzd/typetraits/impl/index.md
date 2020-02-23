@@ -8,6 +8,8 @@
 |[`addRValueReference`](addrvaluereference/index.md)||
 |[`addRValueReferenceHelper`](addrvaluereferencehelper/index.md)||
 |[`addRValueReferenceHelper< T, true >`](addrvaluereferencehelper_t_true_/index.md)||
+|[`EnableIf`](enableif/index.md)||
+|[`EnableIf< true, T >`](enableif_true_t_/index.md)||
 |[`isConstructible`](isconstructible/index.md)||
 |[`isConstructible< voidType< decltype(T(declval< Args >()...))>, T, Args... >`](isconstructible_voidtype_decltype_t_declval_args_t_args_/index.md)||
 |[`isDestructible`](isdestructible/index.md)||
@@ -39,6 +41,21 @@
 ||||
 |---:|:---|:---|
 |typename T|None||
+------
+### `template<bool Condition, class T> struct EnableIf`
+
+#### Template
+||||
+|---:|:---|:---|
+|bool|Condition||
+|class T|None||
+------
+### `template<class T> struct EnableIf< true, T >`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 ------
 ### `template<class, class T, class... Args> struct isConstructible`
 

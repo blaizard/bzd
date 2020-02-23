@@ -489,7 +489,7 @@ static void print(bzd::OStream& stream, const bzd::StringView& format, const bzd
  * Check the format context with the argument type, this to ensure type safety.
  * This function should only be used at compile time.
  */
-template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N > 0), void>::type* = nullptr>
+template <SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
 constexpr bool contextCheck(const Ctx& context, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
@@ -526,7 +526,7 @@ constexpr bool contextCheck(const Ctx& context, const T& tuple)
 	return contextCheck<N - 1>(context, tuple);
 }
 
-template <SizeType N, class Ctx, class T, typename bzd::typeTraits::enableIf<(N == 0), void>::type* = nullptr>
+template <SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
 constexpr bool contextCheck(const Ctx&, const T&)
 {
 	return true;

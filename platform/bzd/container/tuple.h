@@ -45,19 +45,19 @@ constexpr NoType TupleChooseN()
 	return NoType{};
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > sizeof...(Ts))>::type* = nullptr>
+template <SizeType index, class T, class... Ts, typeTraits::EnableIf<(index > sizeof...(Ts))>* = nullptr>
 constexpr NoType TupleChooseN(T&& t, Ts&&... ts)
 {
 	return NoType{};
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<index == 0>::type* = nullptr>
+template <SizeType index, class T, class... Ts, typeTraits::EnableIf<index == 0>* = nullptr>
 constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
 {
 	return bzd::forward<T>(t);
 }
 
-template <SizeType index, class T, class... Ts, typename typeTraits::enableIf<(index > 0 && index <= sizeof...(Ts))>::type* = nullptr>
+template <SizeType index, class T, class... Ts, typeTraits::EnableIf<(index > 0 && index <= sizeof...(Ts))>* = nullptr>
 constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
 {
 	return TupleChooseN<index - 1>(bzd::forward<Ts>(ts)...);

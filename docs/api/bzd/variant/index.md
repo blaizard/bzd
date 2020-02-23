@@ -31,14 +31,14 @@
 ### ` ~Variant()`
 
 ------
-### `template<class T, class... Args, typename bzd::typeTraits::enableIf< Contains< T >::value >::type *> constexpr void emplace(Args &&... args)`
+### `template<class T, class... Args, bzd::typeTraits::EnableIf< Contains< T >::value > *> constexpr void emplace(Args &&... args)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
 |class...|Args||
-|typename bzd::typeTraits::enableIf< Contains< T >::value >::type *|None||
+|bzd::typeTraits::EnableIf< Contains< T >::value > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

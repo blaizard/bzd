@@ -66,26 +66,26 @@ This is an after text
 |const bzd::StringConstexpr< C... > &|str||
 |Args &&...|args||
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *> constexpr void toString(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *> constexpr void toString(bzd::OStream & stream, const T & data)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *|None||
+|bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|stream||
 |const T &|data||
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isFloatingPoint< T >::value, T >::type *> constexpr void toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isFloatingPoint< T >::value, T > *> constexpr void toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< typeTraits::isFloatingPoint< T >::value, T >::type *|None||
+|bzd::typeTraits::EnableIf< typeTraits::isFloatingPoint< T >::value, T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -121,26 +121,26 @@ This is an after text
 |bzd::interface::String &|str||
 |Args &&...|args||
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *> constexpr void toStringBin(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *> constexpr void toStringBin(bzd::OStream & stream, const T & data)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *|None||
+|bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|stream||
 |const T &|data||
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *> constexpr void toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *> constexpr void toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *|None||
+|bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -148,13 +148,13 @@ This is an after text
 |const T &|data||
 |const char *const|digits||
 ------
-### `template<class T, typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *> constexpr void toStringOct(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *> constexpr void toStringOct(bzd::OStream & stream, const T & data)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|typename bzd::typeTraits::enableIf< typeTraits::isIntegral< T >::value, T >::type *|None||
+|bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >::value, T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

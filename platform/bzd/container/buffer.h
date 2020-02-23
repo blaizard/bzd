@@ -14,10 +14,12 @@ protected:
 public:
 	using bzd::Span<T>::Span;
 
-	template <class Q = IsConst, typename bzd::typeTraits::enableIf<Q::value, void>::type* = nullptr>
-	constexpr Buffer(const bzd::StringView& str) : bzd::Span<T>(reinterpret_cast<T*>(str.data()), str.size()) {}
+	template <class Q = IsConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
+	constexpr Buffer(const bzd::StringView& str) : bzd::Span<T>(reinterpret_cast<T*>(str.data()), str.size())
+	{
+	}
 };
-}
+} // namespace impl
 
 using Buffer = impl::Buffer<bzd::UInt8Type>;
 using ConstBuffer = impl::Buffer<const bzd::UInt8Type>;

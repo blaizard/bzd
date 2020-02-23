@@ -1,4 +1,3 @@
-
 load("@//tools/bzd:defs.bzl", "bzd_cc_library")
 
 bzd_cc_library(
