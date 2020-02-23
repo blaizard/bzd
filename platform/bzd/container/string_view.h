@@ -46,3 +46,15 @@ public:
 
 using StringView = impl::StringView<char, bzd::Span<const char>>;
 } // namespace bzd
+
+// Creates a compilation time stringview object
+#define CSTR(strLiteral)                                                                                  \
+	[] {                                                                                                  \
+		constexpr char s[] = #strLiteral;                                                                 \
+		static_assert(s[0] == '"' && s[sizeof(s) - 2] == '"', "Argument must be a string literal.");      \
+		using StrView = struct                                                                            \
+		{                                                                                                 \
+			static constexpr auto value() { return bzd::StringView(strLiteral, sizeof(strLiteral) - 1); } \
+		};                                                                                                \
+		return StrView{};                                                                                 \
+	}()

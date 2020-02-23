@@ -2,7 +2,6 @@
 
 #include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
-#include "bzd/container/string_constexpr.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/variant.h"
@@ -568,17 +567,17 @@ constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&...
 	bzd::format::impl::print(out, str, argList);
 }
 
-template <char... C, class... Args>
-constexpr void toString(bzd::OStream& out, const bzd::StringConstexpr<C...>& str, Args&&... args)
+template <class ConstexprStringView, class... Args>
+constexpr void toString(bzd::OStream& out, const ConstexprStringView& str, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple;
-	constexpr const auto context = bzd::format::impl::contextBuild(bzd::StringConstexpr<C...>::data(), tuple);
+	constexpr const auto context = bzd::format::impl::contextBuild(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
 	// Run-time call
-	toString(out, str.str(), bzd::forward<Args>(args)...);
+	toString(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 }
 
 }} // namespace bzd::format
