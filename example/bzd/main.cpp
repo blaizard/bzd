@@ -105,6 +105,10 @@ void setUs(uint8_t num, bzd::SizeType timeUs)
 
 int main()
 {
+	// Connect the various channels
+	bzd::Registry<bzd::OChannel>::get("led").connect();
+	bzd::Registry<bzd::OChannel>::get("i2c").connect();
+
 	// Get the default logger
 	auto& log = bzd::Registry<bzd::Log>::get("default");
 

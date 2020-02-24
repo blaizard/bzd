@@ -1,6 +1,32 @@
-#include "libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
+#include "driver/i2c.h"
 
+#include "libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
 namespace bzd { namespace io { namespace impl {
+
+void I2CEsp32XtensaLx6::connect()
+{
+	i2c_port_t i2c_master_port = static_cast<i2c_port_t>(config_.interface);
+	i2c_config_t conf{};
+	if (config_.mode == Configuration::Mode::MASTER)
+	{
+		conf.mode = I2C_MODE_MASTER;
+	}
+	else
+	{
+		conf.mode = I2C_MODE_SLAVE;
+	}
+
+	conf.sda_io_num = static_cast<gpio_num_t>(config_.sda);
+	conf.sda_pullup_en = (config_.sdaPullup) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
+
+	conf.scl_io_num = static_cast<gpio_num_t>(config_.scl);
+	conf.scl_pullup_en = (config_.sclPullup) ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
+
+	conf.master.clk_speed = config_.frequency;
+
+	i2c_param_config(i2c_master_port, &conf);
+	i2c_driver_install(i2c_master_port, conf.mode, 0, 0, 0);
+}
 
 bzd::SizeType I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
 {

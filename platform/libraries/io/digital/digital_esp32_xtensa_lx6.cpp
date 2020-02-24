@@ -2,6 +2,12 @@
 
 namespace bzd { namespace io { namespace impl {
 
+void DigitalOutputEsp32XtensaLx6::connect()
+{
+	gpio_pad_select_gpio(pin_);
+	gpio_set_direction(pin_, GPIO_MODE_OUTPUT);
+}
+
 bzd::SizeType DigitalOutputEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
 {
 	if (data[0])

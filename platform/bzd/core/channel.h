@@ -5,8 +5,16 @@
 
 namespace bzd {
 namespace impl {
+
+class IOChannelCommon
+{
+public:
+	virtual void connect() {};
+	virtual void disconnect() {};
+};
+
 template <class T>
-class OChannel
+class OChannel : public IOChannelCommon
 {
 protected:
 	OChannel() = default;
@@ -17,7 +25,7 @@ public:
 };
 
 template <class T>
-class IChannel
+class IChannel : public IOChannelCommon
 {
 protected:
 	IChannel() = default;
