@@ -92,6 +92,24 @@ struct Metadata
 	Format format = Format::AUTO;
 };
 
+template <class T>
+auto serialize_imp(bzd::OStream& out, T const& obj) -> decltype(out << obj)
+{
+  out << obj;
+}
+
+class Custom
+{
+public:
+	template <class T, class U = decltype(T::Format())> //bzd::OStream << bzd::typeTraits::declval<T>())>
+	Custom(T&&)
+	{
+	}
+
+private:
+	bzd::FctPtrType ptr_;
+};
+
 using Arg = bzd::VariantConstexpr<int,
 								  unsigned int,
 								  long int,
@@ -105,7 +123,8 @@ using Arg = bzd::VariantConstexpr<int,
 								  long double,
 								  const void*,
 								  const char*,
-								  bzd::StringView>;
+								  bzd::StringView,
+								  Custom>;
 using ArgList = bzd::interface::Vector<Arg>;
 
 /**
@@ -459,7 +478,8 @@ public:
 			[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
 			[&](const void* value) {},
 			[&](const char* value) { printString(stream_, value, metadata); },
-			[&](const bzd::StringView& value) { printString(stream_, value, metadata); });
+			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },
+			[&](const Custom& value) {});
 	}
 	constexpr void onError(const bzd::StringView& message) const {}
 
@@ -532,6 +552,20 @@ constexpr bool contextCheck(const Ctx&, const T&)
 }
 } // namespace impl
 
+
+namespace impl {
+template <class T>
+struct ToCustom
+{
+public:
+	typedef bzd::typeTraits::Conditional<bzd::typeTraits::isConstructible<Custom, T>, Custom, T> type;
+};
+} // namespace impl
+
+template <class T>
+using ToCustom = typename impl::ToCustom<T>::type;
+
+
 /**
  * \brief String formating.
  *
@@ -563,7 +597,7 @@ template <class... Args>
 constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
-	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<bzd::typeTraits::Decay<Args>>(args)...);
+	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<ToCustom<bzd::typeTraits::Decay<Args>>>(args)...);
 	bzd::format::impl::print(out, str, argList);
 }
 

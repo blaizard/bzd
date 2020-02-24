@@ -2,33 +2,24 @@
 
 int main()
 {
+	
+	/*class Date
+	{
+	public:
+		Date() = default;
+
+		constexpr Date(bzd::UInt16Type y, bzd::UInt16Type m, bzd::UInt16Type d) : y_{y}, m_{m}, d_{d} {}
+
+	private:
+		bzd::UInt16Type y_;
+		bzd::UInt16Type m_;
+		bzd::UInt16Type d_;
+	};*/
+
 	bzd::format::toString(bzd::getOut(), CSTR("The answer is {}.\n"), 42);
+	
+	//Date date{2020, 8, 4};
+	//bzd::format::toString(bzd::getOut(), CSTR("The answer is {}.\n"), date);
 
 	return 0;
 }
-/*
-#include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-
-#define BLINK_GPIO GPIO_NUM_2 //CONFIG_BLINK_GPIO
-
-
-	bzd::Pin p(12, bzd::Pin::OUTPUT);
-
-	bzd::IOPort p(12);
-	p.write(true);
-
-
-	gpio_pad_select_gpio(BLINK_GPIO);
-	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-	while(1) {
-		gpio_set_level(BLINK_GPIO, 0);
-		vTaskDelay(500 / portTICK_PERIOD_MS);
-		gpio_set_level(BLINK_GPIO, 1);
-		vTaskDelay(500 / portTICK_PERIOD_MS);
-	}
-
-}
-*/
