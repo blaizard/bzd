@@ -3,6 +3,7 @@
 #include "bzd/meta/choose_nth.h"
 #include "bzd/meta/contains.h"
 #include "bzd/meta/find.h"
+#include "bzd/meta/find_constructible.h"
 #include "bzd/types.h"
 
 namespace bzd { namespace meta {
@@ -20,5 +21,8 @@ struct TypeList
 
 	template <class T>
 	using Find = typename impl::Find<0, T, Ts...>;
+
+	template <class T>
+	using FindConstructible = typename impl::FindConstructible<0, T, Ts...>;
 };
 }} // namespace bzd::meta

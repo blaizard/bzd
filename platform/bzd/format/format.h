@@ -14,6 +14,7 @@
 #include "bzd/type_traits/is_integral.h"
 
 namespace bzd { namespace format {
+
 namespace impl {
 /**
  * Simple vector container working with conxtexpr
@@ -92,22 +93,46 @@ struct Metadata
 	Format format = Format::AUTO;
 };
 
-template <class T>
-auto serialize_imp(bzd::OStream& out, T const& obj) -> decltype(out << obj)
+template <typename T>
+class has_helloworld
 {
-  out << obj;
-}
+    template <typename C, typename = decltype(toStringCustom(std::declval<bzd::OStream&>(), std::declval<C>()))>
+    static std::true_type test(int);
+    template <typename C>
+    static std::false_type test(...);
+
+public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+};
+
+template <class T>
+class FormatterWrapper
+{
+public:
+	static void toString(bzd::OStream& os, const T& value)
+	{
+		toStringCustom(os, value);
+	}
+};
 
 class Custom
 {
 public:
-	template <class T, class U = decltype(T::Format())> //bzd::OStream << bzd::typeTraits::declval<T>())>
-	Custom(T&&)
+	typedef void (*FctType)(bzd::OStream&, void*);
+
+	template <class T, bzd::typeTraits::EnableIf<has_helloworld<T>::value, void>* = nullptr>
+	constexpr Custom(T&& v) : ptr_(reinterpret_cast<FctType>(&FormatterWrapper<T>::toString)), value_(&v)
 	{
 	}
 
+	constexpr void print(bzd::OStream& os) const
+	{
+		ptr_(os, value_);
+	}
+
 private:
-	bzd::FctPtrType ptr_;
+	FctType ptr_;
+	void* value_;
 };
 
 using Arg = bzd::VariantConstexpr<int,
@@ -479,7 +504,7 @@ public:
 			[&](const void* value) {},
 			[&](const char* value) { printString(stream_, value, metadata); },
 			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },
-			[&](const Custom& value) {});
+			[&](const Custom& value) { value.print(stream_); });
 	}
 	constexpr void onError(const bzd::StringView& message) const {}
 
