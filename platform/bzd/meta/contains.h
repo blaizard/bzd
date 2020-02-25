@@ -19,4 +19,5 @@ struct Contains<T, U>
 
 template <class T, class... Ts>
 using Contains = typename impl::Contains<T, Ts...>;
+
 }} // namespace bzd::meta

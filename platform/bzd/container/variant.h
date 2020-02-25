@@ -27,6 +27,9 @@ protected:
 	// Search for T in the list
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
+	// Search for constructible element from T
+	template <class T>
+	using FindConstructible = typename TypeList::template FindConstructible<T>;
 
 	// Helper
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
@@ -98,11 +101,24 @@ public:
 	constexpr Variant() = default;
 
 	/**
-	 * Value constructor
+	 * Value constructor (exact type match)
 	 */
-	template <class T, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr Variant(T&& value) : id_(Find<T>::value), data_(bzd::forward<T>(value))
+	template <class T, int Index = Find<T>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
+	constexpr Variant(T&& value) : id_{Index}, data_{bzd::forward<T>(value)}
 	{
+	}
+
+	/**
+	 * Value constructor (lazy, if constructible)
+	 */
+	template <class T, int Index = FindConstructible<T>::value, bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr>
+	constexpr Variant(T&& value) : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
+	{
+	}
+
+	constexpr bzd::SizeType index() const noexcept
+	{
+		return id_;
 	}
 
 	template <class T>

@@ -11,6 +11,14 @@ TEST(ContainerVariant, Constructor)
 	bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
 }
 
+TEST(ContainerVariant, ImplicitConstructor)
+{
+	bzd::Variant<void*, bool, double> variantExplicit(static_cast<double>(45.2));
+	EXPECT_EQ(variantExplicit.index(), 2);
+	bzd::Variant<void*, bool, double> variantImplicit(static_cast<float>(45.2));
+	EXPECT_EQ(variantImplicit.index(), 1);
+}
+
 TEST(ContainerVariant, Destructor)
 {
 	static int constructorA = 0;

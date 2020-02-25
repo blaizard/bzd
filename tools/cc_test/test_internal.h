@@ -3,17 +3,17 @@
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 
-#define BZDTEST_(testCaseName, testName)                                                                           \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                   \
-	{                                                                                                              \
-	public:                                                                                                        \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() {}                                                           \
-		void test() const override;                                                                                \
-	};                                                                                                             \
-	namespace {                                                                                                    \
+#define BZDTEST_(testCaseName, testName) \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test \
+	{ \
+	public: \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() {} \
+		void test() const override; \
+	}; \
+	namespace { \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
-		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
-	}                                                                                                              \
+		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)}); \
+	} \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test() const
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
@@ -23,27 +23,26 @@
 	if (!static_cast<bool>(condition)) failFct("Failure\nValue of: " #actual, static_cast<bool>(actual), static_cast<bool>(expected))
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct) \
-	if (!((expression1) == (expression2)))                  \
+	if (!((expression1) == (expression2))) \
 	failFct("Failure\nExpected: " #expression1 "\nTo be equal to: " #expression2 "\nAssertion failed.")
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct) \
-	if (!bzd::test::impl::near(number1, number2, absError))     \
-	failFct("Failure\nExpected: " #number1 "\nTo be equal to: " #number2 "\nAssertion failed.")
+	if (!bzd::test::impl::near(number1, number2, absError)) \
+	failFct("Failure\nExpected: " #number1 "\nTo be near to: " #number2 "\nAssertion failed.")
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct) \
 	if (!bzd::test::impl::strcmp(str1, str2)) failFct("Failure\nExpected: " #str1 "\nTo be equal to: " #str2 "\nAssertion failed.")
 
-#define BZDTEST_TEST_ANY_THROW_(expression, failFct)                                                     \
-	{                                                                                                    \
-		bool bzdTestIsThrow_ = false;                                                                    \
-		try                                                                                              \
-		{                                                                                                \
-			expression;                                                                                  \
-		}                                                                                                \
-		catch (...)                                                                                      \
-		{                                                                                                \
-			bzdTestIsThrow_ = true;                                                                      \
-		}                                                                                                \
+#define BZDTEST_TEST_ANY_THROW_(expression, failFct)  { \
+		bool bzdTestIsThrow_ = false; \
+		try \
+		{ \
+			expression; \
+		} \
+		catch (...) \
+		{ \
+			bzdTestIsThrow_ = true; \
+		} \
 		if (!bzdTestIsThrow_) failFct("Failure\nExpected: " #expression " to throw but did not throw."); \
 	}
 
