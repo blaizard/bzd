@@ -35,7 +35,7 @@ protected:
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
 	struct HelperT
 	{
-		static auto call(const SizeType index, Args&&... args)
+		static constexpr auto call(const SizeType index, Args&&... args)
 		{
 			using T = ChooseNth<N>;
 			if (index == N)
@@ -49,7 +49,7 @@ protected:
 	template <SizeType N, template <class> class F, class... Args>
 	struct HelperT<N, N, F, Args...>
 	{
-		static auto call(const SizeType index, Args&&... args)
+		static constexpr auto call(const SizeType index, Args&&... args)
 		{
 			using T = ChooseNth<N>;
 			bzd::assert::isTrue(index == N, "Inconsistent variant state, should never happen");
@@ -69,7 +69,7 @@ protected:
 		: F0
 		, Overload<Frest...>
 	{
-		Overload(F0&& f0, Frest&&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
+		constexpr Overload(F0&& f0, Frest&&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
 		using F0::operator();
 		using Overload<Frest...>::operator();
 	};
@@ -77,7 +77,7 @@ protected:
 	template <class F0>
 	struct Overload<F0> : F0
 	{
-		Overload(F0&& f0) : F0{bzd::forward<F0>(f0)} {}
+		constexpr Overload(F0&& f0) : F0{bzd::forward<F0>(f0)} {}
 		using F0::operator();
 	};
 
@@ -85,14 +85,28 @@ protected:
 	template <class T>
 	struct VariantMatch
 	{
-		template <class V>
-		static void call(const Self& self, const V& visitor)
+		template <class SelfType, class V>
+		static constexpr void call(SelfType& self, V& visitor)
 		{
 			visitor(self.data_.template get<T>());
 		}
 	};
-	template <class V>
-	using Match = Helper<VariantMatch, const Self&, V&>;
+	template <class V, class SelfType>
+	using Match = Helper<VariantMatch, SelfType&, V&>;
+
+	// Copy visitor
+	struct CopyVisitor
+	{
+		constexpr CopyVisitor(const Variant<StorageType, Ts...>& variant) : variant_{variant} {}
+		template <class T>
+		constexpr void operator()(T& value)
+		{
+			value = *variant_.get<T>();
+		}
+
+	private:
+		const Variant<StorageType, Ts...>& variant_;
+	};
 
 public:
 	/**
@@ -114,6 +128,15 @@ public:
 	template <class T, int Index = FindConstructible<T>::value, bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr>
 	constexpr Variant(T&& value) : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
 	{
+	}
+
+	/**
+	 * Copy constructor
+	 */
+	constexpr Variant(const Variant<StorageType, Ts...>& variant) : id_{variant.id_}
+	{
+		CopyVisitor visitor{variant};
+		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
 	}
 
 	constexpr bzd::SizeType index() const noexcept
@@ -151,7 +174,7 @@ public:
 	constexpr void match(Functors&&... funcs) const
 	{
 		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-		Match<decltype(visitor)>::call(id_, *this, visitor);
+		Match<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 protected:
@@ -170,7 +193,7 @@ protected:
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr VariantConstexpr(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...)
+	constexpr VariantConstexpr(Args&&... args) : Parent::Variant{bzd::forward<Args>(args)...}
 	{
 	}
 };
@@ -230,7 +253,7 @@ private:
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr Variant(Args&&... args) : Parent::Variant(bzd::forward<Args>(args)...)
+	constexpr Variant(Args&&... args) : Parent::Variant{bzd::forward<Args>(args)...}
 	{
 	}
 

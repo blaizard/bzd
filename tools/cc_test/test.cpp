@@ -36,7 +36,7 @@ void Manager::fail(const char* const file, const int line, const char* const mes
 	fail(file, line, stream.str().c_str());
 }
 
-void Manager::fail(const char* const file, const int line, const char* const message)
+void Manager::fail(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {
 	currentTestFailed_ = true;
 	::std::cout << file;
@@ -44,7 +44,18 @@ void Manager::fail(const char* const file, const int line, const char* const mes
 	{
 		::std::cout << ":" << line;
 	}
-	::std::cout << ": " << message << ::std::endl;
+
+	::std::cout << ": " << message << "\n";
+	if (actual)
+	{
+		::std::cout << "Actual: " << actual << "\n";
+	}
+	if (expected)
+	{
+		::std::cout << "Expected: " << expected << "\n";
+	}
+
+	::std::cout << "Assertion failed." << ::std::endl;
 }
 
 bool Manager::registerTest(Manager::TestInfo&& info)

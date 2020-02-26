@@ -23,12 +23,18 @@
 	if (!static_cast<bool>(condition)) failFct("Failure\nValue of: " #actual, static_cast<bool>(actual), static_cast<bool>(expected))
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct) \
-	if (!((expression1) == (expression2))) \
-	failFct("Failure\nExpected: " #expression1 "\nTo be equal to: " #expression2 "\nAssertion failed.")
+	if (!((expression1) == (expression2))) { \
+		bzd::test::impl::Value<decltype(expression1)> testValueTempStr1{expression1}; \
+		bzd::test::impl::Value<decltype(expression2)> testValueTempStr2{expression2}; \
+		failFct("Failure\nTest: " #expression1 " == " #expression2, testValueTempStr1.valueToString(), testValueTempStr2.valueToString()); \
+	}
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct) \
-	if (!bzd::test::impl::near(number1, number2, absError)) \
-	failFct("Failure\nExpected: " #number1 "\nTo be near to: " #number2 "\nAssertion failed.")
+	if (!bzd::test::impl::near(number1, number2, absError)) { \
+		bzd::test::impl::Value<decltype(number1)> testValueTempStr1{number1}; \
+		bzd::test::impl::Value<decltype(number2)> testValueTempStr2{number2}; \
+		failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", testValueTempStr1.valueToString(), testValueTempStr2.valueToString()); \
+	}
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct) \
 	if (!bzd::test::impl::strcmp(str1, str2)) failFct("Failure\nExpected: " #str1 "\nTo be equal to: " #str2 "\nAssertion failed.")
@@ -51,6 +57,116 @@ namespace bzd { namespace test {
 namespace impl {
 bool strcmp(const char* str1, const char* str2);
 bool near(const double number1, const double number2, const double absError);
+
+template <class T>
+class Value
+{
+public:
+	template <class U>
+	Value(U&& value) : buffer_{}
+	{
+		valueToString(buffer_, value);
+	}
+
+	const char* valueToString() const
+	{
+		return buffer_;
+	}
+
+private:
+	char* valueToString(char* pBuffer, short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, unsigned short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, unsigned int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, unsigned long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, unsigned long long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
+	char* valueToString(char* pBuffer, long long int value, const int base = 10)
+	{
+		constexpr char digitToChar[] = "0123456789abcdef";
+		char* ptr = pBuffer + 16;
+		*ptr = 0;
+		do
+		{
+			*--ptr = digitToChar[static_cast<int>(value % base)];
+			value = static_cast<long long int>(value / base);
+		} while (value);
+
+		// Move toward the begining
+		const int diff = ptr - pBuffer;
+		while (*ptr)
+		{
+			ptr[-diff] = ptr[0];
+			++ptr;
+		}
+
+		return &ptr[-diff];
+	}
+
+	char* valueToString(char* pBuffer, float value) { return valueToString(pBuffer, static_cast<double>(value)); }
+	char* valueToString(char* pBuffer, double value)
+	{
+		const long long int valueInteger = static_cast<long long int>(value);
+		pBuffer = valueToString(pBuffer, valueInteger);
+		*pBuffer++ = '.';
+
+		value -= valueInteger;
+		for (int i = 0; i<10; ++i)
+		{
+			value *= 10;
+			*pBuffer++ = static_cast<char>(static_cast<int>(value) % 10) + '0';
+		}
+
+		*pBuffer++ = '\0';
+		return pBuffer;
+	}
+
+	char* valueToString(char* pBuffer, unsigned char value) { return valueToString(pBuffer, static_cast<char>(value)); }
+	char* valueToString(char* pBuffer, char value)
+	{
+		*pBuffer++ = value;
+		*pBuffer++ = '\0';
+		return pBuffer;
+	}
+
+	char* valueToString(char* pBuffer, bool value)
+	{
+		if (value)
+		{
+			pBuffer[0] = 't';
+			pBuffer[1] = 'r';
+			pBuffer[2] = 'u';
+			pBuffer[3] = 'e';
+			pBuffer[4] = '\0';
+			return &pBuffer[4];
+		}
+		pBuffer[0] = 'f';
+		pBuffer[1] = 'a';
+		pBuffer[2] = 'l';
+		pBuffer[3] = 's';
+		pBuffer[4] = 'e';
+		pBuffer[5] = '\0';
+		return &pBuffer[5];
+	}
+
+	template <class U>
+	char* valueToString(char* pBuffer, U* value)
+	{
+		*pBuffer++ = '0';
+		*pBuffer++ = 'x';
+		return valueToString(pBuffer, reinterpret_cast<long long int>(value), 16);
+	}
+
+	template <class U>
+	char* valueToString(char* pBuffer, U&&)
+	{
+		return pBuffer;
+	}
+
+private:
+	char buffer_[100];
+};
+
 } // namespace impl
 
 class Test
@@ -105,8 +221,9 @@ public:
 
 	bool registerTest(TestInfo&& test);
 	bool run();
-	void fail(const char* const file, const int line, const char* const message);
+	//void fail(const char* const file, const int line, const char* const message);
 	void fail(const char* const file, const int line, const char* const message, const bool actual, const bool expected);
+	void fail(const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
 
 private:
 	Manager() = default;
