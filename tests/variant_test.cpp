@@ -6,9 +6,9 @@
 TEST(ContainerVariant, Constructor)
 {
 	bzd::Variant<int, bool, double> variant;
-	bzd::Variant<int, bool, double> variantInt(static_cast<int>(45));
-	bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
-	bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
+	bzd::Variant<int, bool, double> variantInt{static_cast<int>(45)};
+	bzd::Variant<int, bool, double> variantBool{static_cast<bool>(true)};
+	bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
 }
 
 TEST(ContainerVariant, ImplicitConstructor)
@@ -17,6 +17,14 @@ TEST(ContainerVariant, ImplicitConstructor)
 	EXPECT_EQ(variantExplicit.index(), 2);
 	bzd::Variant<void*, bool, double> variantImplicit(static_cast<float>(45.2));
 	EXPECT_EQ(variantImplicit.index(), 1);
+}
+
+TEST(ContainerVariant, CopyConstructor)
+{
+	bzd::Variant<int, bool, double> variant1{static_cast<double>(3.1415)};
+	EXPECT_NEAR(*variant1.get<double>(), 3.1415, 0.0001);
+	bzd::Variant<int, bool, double> variant2{variant1};
+	EXPECT_NEAR(*variant2.get<double>(), 3.1415, 0.0001);
 }
 
 TEST(ContainerVariant, Destructor)

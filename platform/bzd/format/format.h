@@ -106,34 +106,40 @@ public:
 };
 
 template <class T>
-class FormatterWrapper
-{
-public:
-	static void toString(bzd::OStream& os, const T& value)
-	{
-		toStringCustom(os, value);
-	}
-};
+class CustomSpecialize;
 
 class Custom
 {
 public:
-	typedef void (*FctType)(bzd::OStream&, void*);
+	Custom() = default;
+	Custom(const Custom&) = default;
 
-	template <class T, bzd::typeTraits::EnableIf<has_helloworld<T>::value, void>* = nullptr>
-	constexpr Custom(T&& v) : ptr_(reinterpret_cast<FctType>(&FormatterWrapper<T>::toString)), value_(&v)
+	/*
+	template <class T>
+	constexpr Custom(CustomSpecialize<T>&)
+	{
+	}*/
+
+	virtual void print(bzd::OStream& os) const {};
+};
+/*
+template <class T>
+class CustomSpecialize : public Custom
+{
+public:
+	template <class U = T, bzd::typeTraits::EnableIf<has_helloworld<U>::value, void>* = nullptr>
+	explicit constexpr CustomSpecialize(U&& v) : value_(v)
 	{
 	}
 
-	constexpr void print(bzd::OStream& os) const
+	void print(bzd::OStream& os) const override
 	{
-		ptr_(os, value_);
+		toStringCustom(os, value_);
 	}
 
 private:
-	FctType ptr_;
-	void* value_;
-};
+	const T& value_;
+};*/
 
 using Arg = bzd::VariantConstexpr<int,
 								  unsigned int,
@@ -583,7 +589,8 @@ template <class T>
 struct ToCustom
 {
 public:
-	typedef bzd::typeTraits::Conditional<bzd::typeTraits::isConstructible<Custom, T>, Custom, T> type;
+	//typedef bzd::typeTraits::Conditional<bzd::typeTraits::isConstructible<CustomSpecialize<T>, T>, CustomSpecialize<T>, T> type;
+	typedef bzd::typeTraits::Conditional<false, CustomSpecialize<T>, T> type;
 };
 } // namespace impl
 
