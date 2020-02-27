@@ -13,6 +13,18 @@
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_integral.h"
 
+class Date
+{
+public:
+	Date() = default;
+
+	constexpr Date(bzd::UInt16Type y, bzd::UInt16Type m, bzd::UInt16Type d) : y_{y}, m_{m}, d_{d} {}
+
+	bzd::UInt16Type y_;
+	bzd::UInt16Type m_;
+	bzd::UInt16Type d_;
+};
+
 namespace bzd { namespace format {
 
 namespace impl {
@@ -96,7 +108,7 @@ struct Metadata
 template <typename T>
 class has_helloworld
 {
-    template <typename C, typename = decltype(toStringCustom(std::declval<bzd::OStream&>(), std::declval<C>()))>
+    template <typename C, typename = decltype(toString(std::declval<bzd::OStream&>(), std::declval<C>()))>
     static std::true_type test(int);
     template <typename C>
     static std::false_type test(...);
@@ -112,50 +124,38 @@ class Custom
 {
 public:
 	Custom() = default;
-	Custom(const Custom&) = default;
 
-	/*
-	template <class T>
+/*	template <class T>
 	constexpr Custom(CustomSpecialize<T>&)
 	{
-	}*/
-
+	}
+*/
 	virtual void print(bzd::OStream& os) const {};
 };
-/*
+
 template <class T>
 class CustomSpecialize : public Custom
 {
 public:
 	template <class U = T, bzd::typeTraits::EnableIf<has_helloworld<U>::value, void>* = nullptr>
-	explicit constexpr CustomSpecialize(U&& v) : value_(v)
+	explicit constexpr CustomSpecialize(U&& v) : Custom{}, value_{v}
+	{
+	}
+
+	CustomSpecialize(const CustomSpecialize<T>& v) : Custom{}, value_{v.value_}
 	{
 	}
 
 	void print(bzd::OStream& os) const override
 	{
-		toStringCustom(os, value_);
+		toString(os, value_);
 	}
 
 private:
 	const T& value_;
-};*/
+};
 
-using Arg = bzd::VariantConstexpr<int,
-								  unsigned int,
-								  long int,
-								  unsigned long int,
-								  long long int,
-								  unsigned long long int,
-								  bool,
-								  char,
-								  float,
-								  double,
-								  long double,
-								  const void*,
-								  const char*,
-								  bzd::StringView,
-								  Custom>;
+using Arg = bzd::VariantConstexpr<const Custom*>;
 using ArgList = bzd::interface::Vector<Arg>;
 
 /**
@@ -510,7 +510,7 @@ public:
 			[&](const void* value) {},
 			[&](const char* value) { printString(stream_, value, metadata); },
 			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },
-			[&](const Custom& value) { value.print(stream_); });
+			[&](const Custom* value) { value->print(stream_); });
 	}
 	constexpr void onError(const bzd::StringView& message) const {}
 
@@ -590,13 +590,41 @@ struct ToCustom
 {
 public:
 	//typedef bzd::typeTraits::Conditional<bzd::typeTraits::isConstructible<CustomSpecialize<T>, T>, CustomSpecialize<T>, T> type;
-	typedef bzd::typeTraits::Conditional<false, CustomSpecialize<T>, T> type;
+	typedef CustomSpecialize<T> type;
+	//typedef bzd::typeTraits::Conditional<false, CustomSpecialize<T>, T> type;
 };
-} // namespace impl
+
+template<SizeType... N>
+struct Sizes
+{
+    typedef Sizes<N...>       type;
+};
+
+template<SizeType C, SizeType P, SizeType... N>
+struct GetRange: GetRange<C-1, P+1, N..., P>
+{};
+template<SizeType P, SizeType... N>
+struct GetRange<0, P, N...>: Sizes<N...>
+{};
+
+template<SizeType S, SizeType E>
+struct Range: GetRange<E-S, S>
+{};
 
 template <class T>
-using ToCustom = typename impl::ToCustom<T>::type;
+using ToCustomType = typename impl::ToCustom<T>::type;
 
+template <SizeType... I, class... Args>
+constexpr void toStringRuntime(bzd::OStream& out, const bzd::StringView& str, Sizes<I...>, Args&&... args)
+{
+	// Run-time call
+	const bzd::Tuple<ToCustomType<bzd::typeTraits::Decay<Args>>...> tuple{ToCustomType<bzd::typeTraits::Decay<Args>>(args)...};
+	const bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList{(&tuple.template get<I>())...};
+
+	bzd::format::impl::print(out, str, argList);
+}
+
+} // namespace impl
 
 /**
  * \brief String formating.
@@ -625,12 +653,12 @@ using ToCustom = typename impl::ToCustom<T>::type;
  * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
+
 template <class... Args>
 constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
-	bzd::Vector<bzd::format::impl::Arg, sizeof...(args)> argList(static_cast<ToCustom<bzd::typeTraits::Decay<Args>>>(args)...);
-	bzd::format::impl::print(out, str, argList);
+	impl::toStringRuntime(out, str, typename impl::Range<0, sizeof...(Args)>::type{}, bzd::forward<Args>(args)...);
 }
 
 template <class ConstexprStringView, class... Args>
