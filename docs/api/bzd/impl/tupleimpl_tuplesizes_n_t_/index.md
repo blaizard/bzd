@@ -15,7 +15,7 @@
 |[`get()`](./index.md)||
 |[`get() const`](./index.md)||
 |[`TupleElem()`](./index.md)||
-|[`TupleElem(const T & value)`](./index.md)||
+|[`TupleElem(Value && value)`](./index.md)||
 |[`TupleElem(const NoType &)`](./index.md)||
 |[`TupleImpl(Args &&... args)`](./index.md)||
 ------
@@ -48,14 +48,19 @@
 
 
 ------
-### `constexpr TupleElem(const T & value)`
+### `template<class Value, typeTraits::EnableIf<!typeTraits::isSame< Value, NoType >> *> constexpr TupleElem(Value && value)`
 *From bzd::impl::TupleElem*
 
 
+#### Template
+||||
+|---:|:---|:---|
+|class Value|None||
+|typeTraits::EnableIf<!typeTraits::isSame< Value, NoType >> *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const T &|value||
+|Value &&|value||
 ------
 ### `constexpr TupleElem(const NoType &)`
 *From bzd::impl::TupleElem*

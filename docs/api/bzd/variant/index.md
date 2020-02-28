@@ -14,6 +14,7 @@
 |[`emplace(Args &&... args)`](./index.md)||
 |[`get() const`](./index.md)||
 |[`get()`](./index.md)||
+|[`index() const`](./index.md)||
 |[`is() const`](./index.md)||
 |[`match(Functors &&... funcs) const`](./index.md)||
 ------
@@ -61,6 +62,11 @@
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `constexpr bzd::SizeType index() const`
+*From bzd::impl::Variant*
+
+
 ------
 ### `template<class T> constexpr bool is() const`
 *From bzd::impl::Variant*

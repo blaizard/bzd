@@ -5,7 +5,7 @@
 |:---|:---|
 |[`Overload(F0 && f0)`](./index.md)||
 ------
-### ` Overload(F0 && f0)`
+### `constexpr Overload(F0 && f0)`
 
 #### Parameters
 ||||

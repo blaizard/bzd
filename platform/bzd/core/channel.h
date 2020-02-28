@@ -9,8 +9,8 @@ namespace impl {
 class IOChannelCommon
 {
 public:
-	virtual void connect() {};
-	virtual void disconnect() {};
+	virtual void connect(){};
+	virtual void disconnect(){};
 };
 
 template <class T>

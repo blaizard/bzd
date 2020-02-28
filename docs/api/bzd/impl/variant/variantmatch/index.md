@@ -3,16 +3,17 @@
 
 |Function||
 |:---|:---|
-|[`call(const Self & self, const V & visitor)`](./index.md)||
+|[`call(SelfType & self, V & visitor)`](./index.md)||
 ------
-### `template<class V> static void call(const Self & self, const V & visitor)`
+### `template<class SelfType, class V> static constexpr void call(SelfType & self, V & visitor)`
 
 #### Template
 ||||
 |---:|:---|:---|
+|class SelfType|None||
 |class V|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const Self &|self||
-|const V &|visitor||
+|SelfType &|self||
+|V &|visitor||

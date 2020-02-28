@@ -4,8 +4,8 @@
 #include "bzd/core/assert.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
-#include "bzd/types.h"
 #include "bzd/type_traits/is_constructible.h"
+#include "bzd/types.h"
 
 namespace bzd {
 namespace impl {
@@ -137,10 +137,7 @@ public:
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
 	}
 
-	constexpr bzd::SizeType index() const noexcept
-	{
-		return id_;
-	}
+	constexpr bzd::SizeType index() const noexcept { return id_; }
 
 	template <class T>
 	constexpr bool is() const noexcept

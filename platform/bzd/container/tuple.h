@@ -71,9 +71,11 @@ class TupleElem
 {
 public:
 	constexpr TupleElem() noexcept = default;
-	//constexpr TupleElem(const T& value) noexcept : elem_(value) {}
+	// constexpr TupleElem(const T& value) noexcept : elem_(value) {}
 	template <class Value, typeTraits::EnableIf<!typeTraits::isSame<Value, NoType>>* = nullptr>
-	constexpr TupleElem(Value&& value) noexcept : elem_{bzd::forward<Value>(value)} {}
+	constexpr TupleElem(Value&& value) noexcept : elem_{bzd::forward<Value>(value)}
+	{
+	}
 	constexpr TupleElem(const NoType&) noexcept : elem_{} {}
 
 	constexpr T& get() noexcept { return elem_; }

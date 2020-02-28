@@ -128,20 +128,19 @@ int main()
 
 	// Set all the servos in the middle position
 
-	for (int i=0; i<16; ++i)
-		setUs(i, (USMIN + USMAX) / 2);
-/*
-	while (true)
-	{
-		// timeMs
-		setUs(0, USMIN);
-		sleep(2);
-		setUs(0, (USMIN + USMAX) / 2);
-		sleep(2);
-		setUs(0, USMAX);
-		sleep(2);
-	}
-*/
+	for (int i = 0; i < 16; ++i) setUs(i, (USMIN + USMAX) / 2);
+	/*
+		while (true)
+		{
+			// timeMs
+			setUs(0, USMIN);
+			sleep(2);
+			setUs(0, (USMIN + USMAX) / 2);
+			sleep(2);
+			setUs(0, USMAX);
+			sleep(2);
+		}
+	*/
 	return 0;
 }
 

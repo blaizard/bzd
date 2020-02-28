@@ -11,7 +11,7 @@
 |Function||
 |:---|:---|
 |[`TupleElem()`](./index.md)||
-|[`TupleElem(const T & value)`](./index.md)||
+|[`TupleElem(Value && value)`](./index.md)||
 |[`TupleElem(const NoType &)`](./index.md)||
 |[`get()`](./index.md)||
 |[`get() const`](./index.md)||
@@ -19,12 +19,17 @@
 ### `constexpr TupleElem()`
 
 ------
-### `constexpr TupleElem(const T & value)`
+### `template<class Value, typeTraits::EnableIf<!typeTraits::isSame< Value, NoType >> *> constexpr TupleElem(Value && value)`
 
+#### Template
+||||
+|---:|:---|:---|
+|class Value|None||
+|typeTraits::EnableIf<!typeTraits::isSame< Value, NoType >> *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const T &|value||
+|Value &&|value||
 ------
 ### `constexpr TupleElem(const NoType &)`
 

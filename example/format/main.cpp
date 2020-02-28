@@ -21,8 +21,8 @@ int main()
 {
 	bzd::format::toString(bzd::getOut(), CSTR("The answer is {}.\n"), 42);
 
-	Date date{2020, 8, 4};
-	bzd::format::toString(bzd::getOut(), CSTR("The answer is {}.\n"), date);
+	const Date date{2020, 8, 4};
+	bzd::format::toString(bzd::getOut(), CSTR("This date {} is {:.2%} true!\n"), date, 0.85);
 
 	return 0;
 }

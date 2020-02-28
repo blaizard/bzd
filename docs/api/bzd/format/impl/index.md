@@ -12,6 +12,10 @@
 |[`CheckContext`](checkcontext/index.md)||
 |[`ConstexprVector`](constexprvector/index.md)||
 |[`Context`](context/index.md)||
+|[`Formatter`](formatter/index.md)||
+|[`FormatterSpecialized`](formatterspecialized/index.md)||
+|[`HasFormatter`](hasformatter/index.md)||
+|[`HasFormatterWithMetadata`](hasformatterwithmetadata/index.md)||
 |[`PrintContext`](printcontext/index.md)||
 
 |Struct||
@@ -30,15 +34,12 @@
 |[`parseSign(Ctx & context, bzd::StringView & format, Metadata & metadata)`](./index.md)||
 |[`parseStaticString(Ctx & context, bzd::StringView & format)`](./index.md)||
 |[`parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`](./index.md)||
-|[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`](./index.md)||
+|[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`](./index.md)||
 |[`printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
 |[`printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|[`printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`](./index.md)||
-
-|Typedef||
-|:---|:---|
-|[`Arg`](./index.md)|alias of [`bzd::VariantConstexpr`](../../variantconstexpr/index.md)|
-|[`ArgList`](./index.md)|alias of [`bzd::impl::Vector`](../../impl/vector/index.md)|
+|[`toString(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`toString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`](./index.md)||
+|[`toStringRuntime(bzd::OStream & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`](./index.md)||
 ------
 ### `class CheckContext`
 
@@ -53,6 +54,30 @@ Simple vector container working with conxtexpr
 ------
 ### `template<class T> class Context`
 Context used for the current parsing operation. Different context are used to check or print the formated string.
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `class Formatter`
+Type removal of the type-specific formatter.
+------
+### `template<class T> class FormatterSpecialized`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> class HasFormatter`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> class HasFormatterWithMetadata`
+
 #### Template
 ||||
 |---:|:---|:---|
@@ -200,14 +225,14 @@ Parse an unsigned integer
 |bzd::StringView &|format||
 |bzd::SizeType &|integer||
 ------
-### `static void print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< bzd::format::impl::Arg > & args)`
+### `static void print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |bzd::OStream &|stream||
 |const bzd::StringView &|format||
-|const bzd::interface::Vector< bzd::format::impl::Arg > &|args||
+|const bzd::interface::Vector< const bzd::format::impl::Formatter * > &|args||
 ------
 ### `template<class T> void printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`
 
@@ -235,7 +260,21 @@ Parse an unsigned integer
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `static void printString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
+### `template<class T, bzd::typeTraits::EnableIf< bzd::typeTraits::isIntegral< T >, void > *> void toString(bzd::OStream & stream, const T & value, const Metadata & metadata)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|bzd::typeTraits::EnableIf< bzd::typeTraits::isIntegral< T >, void > *|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|bzd::OStream &|stream||
+|const T &|value||
+|const Metadata &|metadata||
+------
+### `static void toString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
 
 #### Parameters
 ||||
@@ -244,8 +283,17 @@ Parse an unsigned integer
 |const bzd::StringView|stringView||
 |const Metadata &|metadata||
 ------
-### `typedef Arg`
+### `template<SizeType... I, class... Args> constexpr void toStringRuntime(bzd::OStream & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`
 
-------
-### `typedef ArgList`
-
+#### Template
+||||
+|---:|:---|:---|
+|SizeType...|I||
+|class...|Args||
+#### Parameters
+||||
+|---:|:---|:---|
+|bzd::OStream &|out||
+|const bzd::StringView &|str||
+|bzd::meta::range::Type< I... >|None||
+|Args &&...|args||

@@ -9,8 +9,20 @@
 
 |Function||
 |:---|:---|
+|[`connect()`](./index.md)||
+|[`disconnect()`](./index.md)||
 |[`read(Span< T > & data)`](./index.md)||
 |[`read(T & data)`](./index.md)||
+------
+### `virtual void connect()`
+*From bzd::impl::IOChannelCommon*
+
+
+------
+### `virtual void disconnect()`
+*From bzd::impl::IOChannelCommon*
+
+
 ------
 ### `virtual SizeType read(Span< T > & data)`
 
