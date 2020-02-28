@@ -13,18 +13,6 @@
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_integral.h"
 
-class Date
-{
-public:
-	Date() = default;
-
-	constexpr Date(bzd::UInt16Type y, bzd::UInt16Type m, bzd::UInt16Type d) : y_{y}, m_{m}, d_{d} {}
-
-	bzd::UInt16Type y_;
-	bzd::UInt16Type m_;
-	bzd::UInt16Type d_;
-};
-
 namespace bzd { namespace format {
 
 namespace impl {
@@ -106,7 +94,7 @@ struct Metadata
 };
 
 template <typename T>
-class has_helloworld
+class hasFormatter
 {
     template <typename C, typename = decltype(toString(std::declval<bzd::OStream&>(), std::declval<C>()))>
     static std::true_type test(int);
@@ -117,19 +105,9 @@ public:
     static constexpr bool value = decltype(test<T>(0))::value;
 };
 
-template <class T>
-class CustomSpecialize;
-
 class Custom
 {
 public:
-	Custom() = default;
-
-/*	template <class T>
-	constexpr Custom(CustomSpecialize<T>&)
-	{
-	}
-*/
 	virtual void print(bzd::OStream& os) const {};
 };
 
@@ -137,12 +115,8 @@ template <class T>
 class CustomSpecialize : public Custom
 {
 public:
-	template <class U = T, bzd::typeTraits::EnableIf<has_helloworld<U>::value, void>* = nullptr>
+	template <class U = T, bzd::typeTraits::EnableIf<hasFormatter<U>::value, void>* = nullptr>
 	explicit constexpr CustomSpecialize(U&& v) : Custom{}, value_{v}
-	{
-	}
-
-	CustomSpecialize(const CustomSpecialize<T>& v) : Custom{}, value_{v.value_}
 	{
 	}
 
@@ -152,7 +126,8 @@ public:
 	}
 
 private:
-	const T& value_;
+	// Can be optimized to avoid copy if non-temporary
+	const T value_;
 };
 
 using Arg = bzd::VariantConstexpr<const Custom*>;
@@ -496,7 +471,7 @@ public:
 	void addMetadata(const Metadata& metadata)
 	{
 		args_[metadata.index].match(
-			[&](const int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
+		/*	[&](const int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
 			[&](const unsigned int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
 			[&](const long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
 			[&](const unsigned long int value) { printInteger(stream_, static_cast<long int>(value), metadata); },
@@ -509,7 +484,7 @@ public:
 			[&](const long double value) { printFixedPoint(stream_, static_cast<float>(value), metadata); },
 			[&](const void* value) {},
 			[&](const char* value) { printString(stream_, value, metadata); },
-			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },
+			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },*/
 			[&](const Custom* value) { value->print(stream_); });
 	}
 	constexpr void onError(const bzd::StringView& message) const {}
@@ -589,6 +564,8 @@ template <class T>
 struct ToCustom
 {
 public:
+	static_assert(hasFormatter<T>::value, "One of the type used does not have a valid formatter, aka toString(bzd::OStream&, ...)");
+
 	//typedef bzd::typeTraits::Conditional<bzd::typeTraits::isConstructible<CustomSpecialize<T>, T>, CustomSpecialize<T>, T> type;
 	typedef CustomSpecialize<T> type;
 	//typedef bzd::typeTraits::Conditional<false, CustomSpecialize<T>, T> type;

@@ -1,6 +1,16 @@
 #include "bzd.h"
 
+class Date
+{
+public:
+	Date() = default;
 
+	constexpr Date(bzd::UInt16Type y, bzd::UInt16Type m, bzd::UInt16Type d) : y_{y}, m_{m}, d_{d} {}
+
+	bzd::UInt16Type y_;
+	bzd::UInt16Type m_;
+	bzd::UInt16Type d_;
+};
 
 void toString(bzd::OStream& os, const Date& d)
 {

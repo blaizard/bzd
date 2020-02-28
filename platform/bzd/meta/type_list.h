@@ -3,7 +3,7 @@
 #include "bzd/meta/choose_nth.h"
 #include "bzd/meta/contains.h"
 #include "bzd/meta/find.h"
-#include "bzd/meta/find_constructible.h"
+#include "bzd/meta/find_conditional.h"
 #include "bzd/types.h"
 
 namespace bzd { namespace meta {
@@ -14,15 +14,15 @@ struct TypeList
 	static constexpr const SizeType size = sizeof...(Ts);
 
 	template <SizeType N>
-	using ChooseNth = typename impl::ChooseNth<N, Ts...>::type;
+	using ChooseNth = ChooseNth<N, Ts...>;
 
 	template <class T>
-	using Contains = typename impl::Contains<T, Ts...>;
+	using Contains = Contains<T, Ts...>;
 
 	template <class T>
-	using Find = typename impl::Find<0, T, Ts...>;
+	using Find = Find<T, Ts...>;
 
-	template <class T>
-	using FindConstructible = typename impl::FindConstructible<0, T, Ts...>;
+	template <class T, template <class, class> class Condition>
+	using FindConditional = FindConditional<Condition, T, Ts...>;
 };
 }} // namespace bzd::meta

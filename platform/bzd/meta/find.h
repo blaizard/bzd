@@ -1,23 +1,10 @@
 #pragma once
 
 #include "bzd/type_traits/is_same.h"
+#include "bzd/meta/find_conditional.h"
 #include "bzd/types.h"
 
 namespace bzd { namespace meta {
-namespace impl {
-template <SizeType N, class T, class U, class... Ts>
-struct Find
-{
-	static constexpr const int value = (Find<N, T, U>::value >= 0) ? Find<N, T, U>::value : Find<N + 1, T, Ts...>::value;
-};
-
-template <SizeType N, class T, class U>
-struct Find<N, T, U>
-{
-	static constexpr const int value = (bzd::typeTraits::isSame<T, U>) ? static_cast<int>(N) : -1;
-};
-} // namespace impl
-
 template <class T, class... Ts>
-using Find = typename impl::Find<0, T, Ts...>;
+using Find = FindConditional<bzd::typeTraits::IsSame, T, Ts...>;
 }} // namespace bzd::meta

@@ -20,6 +20,9 @@ struct IsConstructible<VoidType<decltype(T(declval<Args>()...))>, T, Args...> : 
 template <class T, class... Args>
 using IsConstructible = typename impl::IsConstructible<VoidType<>, T, Args...>;
 
+template <class T, class U>
+using IsConstructible1 = typename impl::IsConstructible<VoidType<>, T, U>;
+
 template <class T, class... Args>
 constexpr bool isConstructible = IsConstructible<T, Args...>::value;
 

@@ -26,17 +26,7 @@ bool near(const double number1, const double number2, const double absError)
 }
 } // namespace impl
 
-void Manager::fail(const char* const file, const int line, const char* const message, const bool actual, const bool expected)
-{
-	::std::stringstream stream;
-	stream << message << "\n"
-		   << "Actual: " << ((actual) ? "true" : "false") << "\n"
-		   << "Expected: " << ((expected) ? "true" : "false") << "\n"
-		   << "Assertion failed.";
-	fail(file, line, stream.str().c_str());
-}
-
-void Manager::fail(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
+void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {
 	currentTestFailed_ = true;
 	::std::cout << file;
@@ -55,7 +45,7 @@ void Manager::fail(const char* const file, const int line, const char* const mes
 		::std::cout << "Expected: " << expected << "\n";
 	}
 
-	::std::cout << "Assertion failed." << ::std::endl;
+	::std::cout << "Assertion failed.\n" << ::std::endl;
 }
 
 bool Manager::registerTest(Manager::TestInfo&& info)
