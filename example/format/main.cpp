@@ -14,7 +14,7 @@ public:
 
 void toString(bzd::OStream& os, const Date& d)
 {
-	bzd::format::toString(os, CSTR("{}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
+	bzd::format::toString(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
 }
 
 int main()

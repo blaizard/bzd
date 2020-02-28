@@ -4,7 +4,6 @@
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
-#include "bzd/container/variant.h"
 #include "bzd/container/vector.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/system.h"
@@ -14,6 +13,8 @@
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_floating_point.h"
 #include "bzd/type_traits/is_integral.h"
+#include "bzd/type_traits/is_pointer.h"
+#include "bzd/type_traits/decay.h"
 
 namespace bzd { namespace format {
 
@@ -476,6 +477,15 @@ void toString(bzd::OStream& stream, const T& value, const Metadata& metadata)
 	printFixedPoint(stream, value, metadata);
 }
 
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
+void toString(bzd::OStream& stream, const T& value, const Metadata&)
+{
+	Metadata metadata{};
+	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+	metadata.alternate = true;
+	printInteger(stream, reinterpret_cast<SizeType>(value), metadata);
+}
+
 static void toString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
@@ -538,7 +548,7 @@ constexpr bool contextCheck(const Ctx& context, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
 	context.assertTrue(HasFormatter<decltype(value)>::value || HasFormatterWithMetadata<decltype(value)>::value,
-					   "Argument type is not supported");
+					   "Argument type is not supported, it must contain a valid formatter.");
 
 	bool usedAtLeastOnce = false;
 	for (const auto& metadata : context)

@@ -63,6 +63,7 @@
 #include "bzd/type_traits/is_function.h"
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_lvalue_reference.h"
+#include "bzd/type_traits/is_pointer.h"
 #include "bzd/type_traits/is_reference.h"
 #include "bzd/type_traits/is_rvalue_reference.h"
 #include "bzd/type_traits/is_same.h"
