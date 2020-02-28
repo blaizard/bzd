@@ -12,6 +12,7 @@
 #include "bzd/type_traits/is_arithmetic.h"
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_integral.h"
+#include "bzd/type_traits/is_floating_point.h"
 
 namespace bzd { namespace format {
 
@@ -105,24 +106,47 @@ public:
     static constexpr bool value = decltype(test<T>(0))::value;
 };
 
+template <typename T>
+class hasFormatterWithMetadata
+{
+    template <typename C, typename = decltype(toString(std::declval<bzd::OStream&>(), std::declval<C>(), std::declval<const Metadata>()))>
+    static std::true_type test(int);
+    template <typename C>
+    static std::false_type test(...);
+
+public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+};
+
 class Custom
 {
 public:
-	virtual void print(bzd::OStream& os) const {};
+	virtual void print(bzd::OStream& os, const Metadata& metadata) const {};
 };
 
 template <class T>
 class CustomSpecialize : public Custom
 {
 public:
-	template <class U = T, bzd::typeTraits::EnableIf<hasFormatter<U>::value, void>* = nullptr>
-	explicit constexpr CustomSpecialize(U&& v) : Custom{}, value_{v}
+	explicit constexpr CustomSpecialize(const T& v) : Custom{}, value_{v}
 	{
 	}
 
-	void print(bzd::OStream& os) const override
+	template <class U = T, bzd::typeTraits::EnableIf<!hasFormatterWithMetadata<U>::value, void>* = nullptr>
+	void printDoWork(bzd::OStream& os, const Metadata& /*metadata*/) const
 	{
 		toString(os, value_);
+	}
+
+	template <class U = T, bzd::typeTraits::EnableIf<hasFormatterWithMetadata<U>::value, void>* = nullptr>
+	void printDoWork(bzd::OStream& os, const Metadata& metadata) const
+	{
+		toString(os, value_, metadata);
+	}
+
+	void print(bzd::OStream& os, const Metadata& metadata) const override
+	{
+		printDoWork(os, metadata);
 	}
 
 private:
@@ -380,41 +404,47 @@ void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		toString(stream, value);
+		bzd::format::toString(stream, value);
 		break;
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
 		{
 			stream.write({"0b", 2});
 		}
-		toStringBin(stream, value);
+		bzd::format::toStringBin(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_LOWER:
 		if (metadata.alternate)
 		{
 			stream.write({"0x", 2});
 		}
-		toStringHex(stream, value);
+		bzd::format::toStringHex(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_UPPER:
 		if (metadata.alternate)
 		{
 			stream.write({"0x", 2});
 		}
-		toStringHex(stream, value, "0123456789ABCDEF");
+		bzd::format::toStringHex(stream, value, "0123456789ABCDEF");
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
 		{
 			stream.write({"0o", 2});
 		}
-		toStringOct(stream, value);
+		bzd::format::toStringOct(stream, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
 	case Metadata::Format::FIXED_POINT_PERCENT:
 	case Metadata::Format::POINTER:
 		break;
 	}
+}
+
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
+void toString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+{
+	printInteger(stream, value, metadata);
 }
 
 template <class T>
@@ -424,13 +454,13 @@ void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metad
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		toString(stream, value);
+		bzd::format::toString(stream, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
-		toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
+		bzd::format::toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
 		break;
 	case Metadata::Format::FIXED_POINT_PERCENT:
-		toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		bzd::format::toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 		stream.write(bzd::StringView("%"));
 		break;
 	case Metadata::Format::BINARY:
@@ -442,7 +472,13 @@ void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metad
 	}
 }
 
-static void printString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
+void toString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+{
+	printFixedPoint(stream, value, metadata);
+}
+
+static void toString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -485,7 +521,7 @@ public:
 			[&](const void* value) {},
 			[&](const char* value) { printString(stream_, value, metadata); },
 			[&](const bzd::StringView& value) { printString(stream_, value, metadata); },*/
-			[&](const Custom* value) { value->print(stream_); });
+			[&](const Custom* value) { value->print(stream_, metadata); });
 	}
 	constexpr void onError(const bzd::StringView& message) const {}
 
@@ -648,7 +684,7 @@ constexpr void toString(bzd::OStream& out, const ConstexprStringView& str, Args&
 	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
 
 	// Run-time call
-	toString(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
+	bzd::format::toString(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 }
 
 }} // namespace bzd::format

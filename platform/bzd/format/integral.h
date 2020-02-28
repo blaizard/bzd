@@ -90,13 +90,13 @@ constexpr void toString(bzd::OStream& stream, const T& data)
 	stream.write(buffer);
 }
 
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, T>* = nullptr>
+template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, void>* = nullptr>
 constexpr void toString(bzd::OStream& stream, const T& data, const SizeType maxPrecision = 6)
 {
 	bzd::format::impl::fixedPoint(stream, data, maxPrecision);
 }
 
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
+template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, void>* = nullptr>
 constexpr void toStringHex(bzd::OStream& stream, const T& data, const char* const digits = bzd::format::impl::digits)
 {
 	bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
