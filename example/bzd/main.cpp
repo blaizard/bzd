@@ -126,6 +126,11 @@ int main()
 
 	startSequence2();
 
+	// Set all the servos in the middle position
+
+	for (int i=0; i<16; ++i)
+		setUs(i, (USMIN + USMAX) / 2);
+/*
 	while (true)
 	{
 		// timeMs
@@ -136,7 +141,7 @@ int main()
 		setUs(0, USMAX);
 		sleep(2);
 	}
-
+*/
 	return 0;
 }
 

@@ -2,12 +2,10 @@
 
 #include "bzd/container/expected.h"
 #include "bzd/core/assert.h"
-#include "bzd/meta/choose_nth.h"
-#include "bzd/meta/contains.h"
-#include "bzd/meta/find.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
 #include "bzd/types.h"
+#include "bzd/type_traits/is_constructible.h"
 
 namespace bzd {
 namespace impl {
@@ -29,7 +27,7 @@ protected:
 	using Find = typename TypeList::template Find<T>;
 	// Search for constructible element from T
 	template <class T>
-	using FindConstructible = typename TypeList::template FindConstructible<T>;
+	using FindConstructible = typename TypeList::template FindConditional<T, bzd::typeTraits::IsConstructible1>;
 
 	// Helper
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>

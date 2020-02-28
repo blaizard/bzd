@@ -20,24 +20,24 @@
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
 #define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct) \
-	if (!static_cast<bool>(condition)) failFct("Failure\nValue of: " #actual, static_cast<bool>(actual), static_cast<bool>(expected))
+	if (!static_cast<bool>(condition)) { \
+		failFct("Failure\nTest [bool]: " #actual " == " #expected, actual, expected); \
+	}
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct) \
 	if (!((expression1) == (expression2))) { \
-		bzd::test::impl::Value<decltype(expression1)> testValueTempStr1{expression1}; \
-		bzd::test::impl::Value<decltype(expression2)> testValueTempStr2{expression2}; \
-		failFct("Failure\nTest: " #expression1 " == " #expression2, testValueTempStr1.valueToString(), testValueTempStr2.valueToString()); \
+		failFct("Failure\nTest: " #expression1 " == " #expression2, expression1, expression2); \
 	}
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct) \
 	if (!bzd::test::impl::near(number1, number2, absError)) { \
-		bzd::test::impl::Value<decltype(number1)> testValueTempStr1{number1}; \
-		bzd::test::impl::Value<decltype(number2)> testValueTempStr2{number2}; \
-		failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", testValueTempStr1.valueToString(), testValueTempStr2.valueToString()); \
+		failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", number1, number2); \
 	}
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct) \
-	if (!bzd::test::impl::strcmp(str1, str2)) failFct("Failure\nExpected: " #str1 "\nTo be equal to: " #str2 "\nAssertion failed.")
+	if (!bzd::test::impl::strcmp(str1, str2)) { \
+		failFct("Failure\nTest [string]: " #str1 " == " #str2, str1, str2); \
+	}
 
 #define BZDTEST_TEST_ANY_THROW_(expression, failFct)  { \
 		bool bzdTestIsThrow_ = false; \
@@ -49,7 +49,9 @@
 		{ \
 			bzdTestIsThrow_ = true; \
 		} \
-		if (!bzdTestIsThrow_) failFct("Failure\nExpected: " #expression " to throw but did not throw."); \
+		if (!bzdTestIsThrow_) { \
+			failFct("Failure\nTest: must throw " #expression); \
+		} \
 	}
 
 namespace bzd { namespace test {
@@ -157,6 +159,29 @@ private:
 		return valueToString(pBuffer, reinterpret_cast<long long int>(value), 16);
 	}
 
+	char* valueToString(char* pBuffer, const unsigned char* value) { return valueToString(pBuffer, reinterpret_cast<const char*>(value)); }
+	char* valueToString(char* pBuffer, unsigned char* value) { return valueToString(pBuffer, reinterpret_cast<const char*>(value)); }
+	char* valueToString(char* pBuffer, char* value) { return valueToString(pBuffer, static_cast<const char*>(value)); }
+	char* valueToString(char* pBuffer, const char* value)
+	{
+		*pBuffer++ = '"';
+		for (int maxChar = 0; maxChar < 64 && *value; ++maxChar)
+		{
+			const char c = *value++;
+			*pBuffer++ = (c >= 32 && c < 127) ? c : '?';
+		}
+		if (*value)
+		{
+			*pBuffer++ = '[';
+			*pBuffer++ = '.';
+			*pBuffer++ = '.';
+			*pBuffer++ = '.';
+			*pBuffer++ = ']';
+		}
+		*pBuffer++ = '"';
+		return pBuffer;
+	}
+
 	template <class U>
 	char* valueToString(char* pBuffer, U&&)
 	{
@@ -221,9 +246,29 @@ public:
 
 	bool registerTest(TestInfo&& test);
 	bool run();
-	//void fail(const char* const file, const int line, const char* const message);
-	void fail(const char* const file, const int line, const char* const message, const bool actual, const bool expected);
-	void fail(const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
+
+	template <class Value1, class Value2>
+	void fail(const char* const file, const int line, const char* const message, Value1&& value1, Value2&& value2)
+	{
+		bzd::test::impl::Value<Value1> valueStr1{value1};
+		bzd::test::impl::Value<Value2> valueStr2{value2};
+		failInternals(file, line, message, valueStr1.valueToString(), valueStr2.valueToString());
+	}
+
+	template <class Value>
+	void fail(const char* const file, const int line, const char* const message, Value&& value)
+	{
+		bzd::test::impl::Value<Value> valueStr{value};
+		failInternals(file, line, message, valueStr.valueToString());
+	}
+
+	void fail(const char* const file, const int line, const char* const message)
+	{
+		failInternals(file, line, message);
+	}
+
+private:
+	void failInternals(const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
 
 private:
 	Manager() = default;
