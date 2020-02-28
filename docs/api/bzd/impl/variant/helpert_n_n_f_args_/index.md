@@ -5,7 +5,7 @@
 |:---|:---|
 |[`call(const SizeType index, Args &&... args)`](./index.md)||
 ------
-### `static auto call(const SizeType index, Args &&... args)`
+### `static constexpr auto call(const SizeType index, Args &&... args)`
 
 #### Parameters
 ||||

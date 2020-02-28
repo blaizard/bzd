@@ -9,8 +9,20 @@
 
 |Function||
 |:---|:---|
+|[`connect()`](./index.md)||
+|[`disconnect()`](./index.md)||
 |[`write(const Span< const T > & data)`](./index.md)||
 |[`write(const T & data)`](./index.md)||
+------
+### `virtual void connect()`
+*From bzd::impl::IOChannelCommon*
+
+
+------
+### `virtual void disconnect()`
+*From bzd::impl::IOChannelCommon*
+
+
 ------
 ### `virtual SizeType write(const Span< const T > & data)`
 

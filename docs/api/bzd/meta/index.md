@@ -6,6 +6,7 @@
 |Namespace||
 |:---|:---|
 |[`impl`](impl/index.md)||
+|[`range`](range/index.md)||
 
 |Struct||
 |:---|:---|
@@ -16,7 +17,9 @@
 |:---|:---|
 |[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](impl/choosenth/index.md)|
 |[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](impl/contains/index.md)|
-|[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](impl/find/index.md)|
+|[`Find`](./index.md)||
+|[`FindConditional`](./index.md)|alias of [`bzd::meta::impl::FindConditional`](impl/findconditional/index.md)|
+|[`Range`](./index.md)|alias of [`bzd::meta::impl::Range`](impl/range/index.md)|
 |[`Union`](./index.md)||
 |[`UnionConstexpr`](./index.md)||
 ------
@@ -57,6 +60,23 @@
 |---:|:---|:---|
 |class T|None||
 |class...|Ts||
+------
+### `template<template< class, class > class Condition, class T, class... Ts> typedef FindConditional`
+
+#### Template
+||||
+|---:|:---|:---|
+|template< class, class > class|Condition||
+|class T|None||
+|class...|Ts||
+------
+### `template<SizeType Start, SizeType End> typedef Range`
+
+#### Template
+||||
+|---:|:---|:---|
+|SizeType|Start||
+|SizeType|End||
 ------
 ### `template<class... Ts> typedef Union`
 

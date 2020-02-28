@@ -29,6 +29,7 @@
 |[`IsArray`](./index.md)|alias of [`bzd::typeTraits::impl::IsArray`](impl/isarray/index.md)|
 |[`IsConst`](./index.md)|alias of [`bzd::typeTraits::impl::IsConst`](impl/isconst/index.md)|
 |[`IsConstructible`](./index.md)|alias of [`bzd::typeTraits::impl::IsConstructible`](impl/isconstructible/index.md)|
+|[`IsConstructible1`](./index.md)|alias of [`bzd::typeTraits::impl::IsConstructible`](impl/isconstructible/index.md)|
 |[`IsDestructible`](./index.md)|alias of [`bzd::typeTraits::impl::IsDestructible`](impl/isdestructible/index.md)|
 |[`IsFloatingPoint`](./index.md)|alias of [`bzd::typeTraits::impl::IsFloatingPoint`](impl/isfloatingpoint/index.md)|
 |[`IsFunction`](./index.md)|alias of [`bzd::typeTraits::impl::IsFunction`](impl/isfunction/index.md)|
@@ -185,6 +186,14 @@
 |---:|:---|:---|
 |class T|None||
 |class...|Args||
+------
+### `template<class T, class U> typedef IsConstructible1`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class U|None||
 ------
 ### `template<class T> typedef IsDestructible`
 

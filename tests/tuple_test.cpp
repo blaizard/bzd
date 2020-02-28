@@ -27,7 +27,6 @@ TEST(ContainerTuple, Constructor)
 	EXPECT_NEAR(tuple.get<2>(), 5.32, 0.0001);
 	EXPECT_EQ(tuple.get<3>(), -21);
 	EXPECT_STREQ(tuple.get<4>(), "Hello");
-
 }
 
 TEST(ContainerTuple, ConstructorPartial)

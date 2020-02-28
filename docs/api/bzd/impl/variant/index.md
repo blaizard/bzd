@@ -12,25 +12,49 @@
 |:---|:---|
 |[`Variant()`](./index.md)||
 |[`Variant(T && value)`](./index.md)||
+|[`Variant(T && value)`](./index.md)||
+|[`Variant(const Variant< StorageType, Ts... > & variant)`](./index.md)||
 |[`get() const`](./index.md)||
 |[`get()`](./index.md)||
+|[`index() const`](./index.md)||
 |[`is() const`](./index.md)||
 |[`match(Functors &&... funcs) const`](./index.md)||
 ------
 ### `constexpr Variant()`
 Default constructor
 ------
-### `template<class T, bzd::typeTraits::EnableIf< Contains< T >::value > *> constexpr Variant(T && value)`
-Value constructor
+### `template<class T, int Index, bzd::typeTraits::EnableIf< Index !=-1 > *> constexpr Variant(T && value)`
+Value constructor (exact type match)
 #### Template
 ||||
 |---:|:---|:---|
 |class T|None||
-|bzd::typeTraits::EnableIf< Contains< T >::value > *|None||
+|int|Index||
+|bzd::typeTraits::EnableIf< Index !=-1 > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
 |T &&|value||
+------
+### `template<class T, int Index, bzd::typeTraits::EnableIf< Find< T >::value==-1 &&Index !=-1 > *> constexpr Variant(T && value)`
+Value constructor (lazy, if constructible)
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|int|Index||
+|bzd::typeTraits::EnableIf< Find< T >::value==-1 &&Index !=-1 > *|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|T &&|value||
+------
+### `constexpr Variant(const Variant< StorageType, Ts... > & variant)`
+Copy constructor
+#### Parameters
+||||
+|---:|:---|:---|
+|const Variant< StorageType, Ts... > &|variant||
 ------
 ### `template<class T> constexpr bzd::Expected< const T &, bool > get() const`
 
@@ -45,6 +69,9 @@ Value constructor
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `constexpr bzd::SizeType index() const`
+
 ------
 ### `template<class T> constexpr bool is() const`
 

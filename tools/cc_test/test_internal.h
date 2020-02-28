@@ -3,55 +3,61 @@
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 
-#define BZDTEST_(testCaseName, testName) \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test \
-	{ \
-	public: \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() {} \
-		void test() const override; \
-	}; \
-	namespace { \
+#define BZDTEST_(testCaseName, testName)                                                                           \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                   \
+	{                                                                                                              \
+	public:                                                                                                        \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() {}                                                           \
+		void test() const override;                                                                                \
+	};                                                                                                             \
+	namespace {                                                                                                    \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
-		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)}); \
-	} \
+		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
+	}                                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test() const
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
-#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct) \
-	if (!static_cast<bool>(condition)) { \
+#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                   \
+	if (!static_cast<bool>(condition))                                                \
+	{                                                                                 \
 		failFct("Failure\nTest [bool]: " #actual " == " #expected, actual, expected); \
 	}
 
-#define BZDTEST_TEST_EQ_(expression1, expression2, failFct) \
-	if (!((expression1) == (expression2))) { \
+#define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                    \
+	if (!((expression1) == (expression2)))                                                     \
+	{                                                                                          \
 		failFct("Failure\nTest: " #expression1 " == " #expression2, expression1, expression2); \
 	}
 
-#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct) \
-	if (!bzd::test::impl::near(number1, number2, absError)) { \
+#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                        \
+	if (!bzd::test::impl::near(number1, number2, absError))                                            \
+	{                                                                                                  \
 		failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", number1, number2); \
 	}
 
-#define BZDTEST_TEST_STREQ_(str1, str2, failFct) \
-	if (!bzd::test::impl::strcmp(str1, str2)) { \
+#define BZDTEST_TEST_STREQ_(str1, str2, failFct)                            \
+	if (!bzd::test::impl::strcmp(str1, str2))                               \
+	{                                                                       \
 		failFct("Failure\nTest [string]: " #str1 " == " #str2, str1, str2); \
 	}
 
-#define BZDTEST_TEST_ANY_THROW_(expression, failFct)  { \
-		bool bzdTestIsThrow_ = false; \
-		try \
-		{ \
-			expression; \
-		} \
-		catch (...) \
-		{ \
-			bzdTestIsThrow_ = true; \
-		} \
-		if (!bzdTestIsThrow_) { \
+#define BZDTEST_TEST_ANY_THROW_(expression, failFct)           \
+	{                                                          \
+		bool bzdTestIsThrow_ = false;                          \
+		try                                                    \
+		{                                                      \
+			expression;                                        \
+		}                                                      \
+		catch (...)                                            \
+		{                                                      \
+			bzdTestIsThrow_ = true;                            \
+		}                                                      \
+		if (!bzdTestIsThrow_)                                  \
+		{                                                      \
 			failFct("Failure\nTest: must throw " #expression); \
-		} \
+		}                                                      \
 	}
 
 namespace bzd { namespace test {
@@ -70,10 +76,7 @@ public:
 		valueToString(buffer_, value);
 	}
 
-	const char* valueToString() const
-	{
-		return buffer_;
-	}
+	const char* valueToString() const { return buffer_; }
 
 private:
 	char* valueToString(char* pBuffer, short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
@@ -113,7 +116,7 @@ private:
 		*pBuffer++ = '.';
 
 		value -= valueInteger;
-		for (int i = 0; i<10; ++i)
+		for (int i = 0; i < 10; ++i)
 		{
 			value *= 10;
 			*pBuffer++ = static_cast<char>(static_cast<int>(value) % 10) + '0';
@@ -262,13 +265,11 @@ public:
 		failInternals(file, line, message, valueStr.valueToString());
 	}
 
-	void fail(const char* const file, const int line, const char* const message)
-	{
-		failInternals(file, line, message);
-	}
+	void fail(const char* const file, const int line, const char* const message) { failInternals(file, line, message); }
 
 private:
-	void failInternals(const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
+	void failInternals(
+		const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
 
 private:
 	Manager() = default;

@@ -34,6 +34,8 @@
 // Meta
 #include "bzd/meta/choose_nth.h"
 #include "bzd/meta/find.h"
+#include "bzd/meta/find_conditional.h"
+#include "bzd/meta/range.h"
 #include "bzd/meta/type.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"

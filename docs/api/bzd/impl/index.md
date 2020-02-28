@@ -12,6 +12,7 @@
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`IChannel`](ichannel/index.md)||
 |[`IOChannel`](iochannel/index.md)||
+|[`IOChannelCommon`](iochannelcommon/index.md)||
 |[`IOStream`](iostream/index.md)||
 |[`IStream`](istream/index.md)||
 |[`Log`](log/index.md)||
@@ -115,6 +116,9 @@ Non-leaf nodes are implemented as non-sorted arrays.
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `class IOChannelCommon`
+
 ------
 ### `template<class T> class IOStream`
 
@@ -350,19 +354,19 @@ Internal class used to create an unexpected object type.
 ### `void * contextTask()`
 
 ------
-### `template<SizeType index> constexpr NoType TupleChooseN()`
+### `template<SizeType Index> constexpr NoType TupleChooseN()`
 
 #### Template
 ||||
 |---:|:---|:---|
-|SizeType|index||
+|SizeType|Index||
 ------
-### `template<SizeType index, class T, class... Ts, typeTraits::EnableIf<> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
+### `template<SizeType Index, class T, class... Ts, typeTraits::EnableIf<> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
 
 #### Template
 ||||
 |---:|:---|:---|
-|SizeType|index||
+|SizeType|Index||
 |class T|None||
 |class...|Ts||
 |typeTraits::EnableIf<|None||
@@ -372,15 +376,15 @@ Internal class used to create an unexpected object type.
 |T &&|t||
 |Ts &&...|ts||
 ------
-### `template<SizeType index, class T, class... Ts, typeTraits::EnableIf< index==0 > *> constexpr decltype(auto) TupleChooseN(T && t, Ts &&... ts)`
+### `template<SizeType Index, class T, class... Ts, typeTraits::EnableIf< Index==0 > *> constexpr decltype(auto) TupleChooseN(T && t, Ts &&... ts)`
 
 #### Template
 ||||
 |---:|:---|:---|
-|SizeType|index||
+|SizeType|Index||
 |class T|None||
 |class...|Ts||
-|typeTraits::EnableIf< index==0 > *|None||
+|typeTraits::EnableIf< Index==0 > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

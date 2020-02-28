@@ -9,9 +9,10 @@
 
 |Typedef||
 |:---|:---|
-|[`ChooseNth`](./index.md)|alias of [`bzd::meta::impl::ChooseNth`](../impl/choosenth/index.md)|
-|[`Contains`](./index.md)|alias of [`bzd::meta::impl::Contains`](../impl/contains/index.md)|
-|[`Find`](./index.md)|alias of [`bzd::meta::impl::Find`](../impl/find/index.md)|
+|[`ChooseNth`](./index.md)||
+|[`Contains`](./index.md)||
+|[`Find`](./index.md)||
+|[`FindConditional`](./index.md)||
 |[`type`](./index.md)|alias of [`bzd::meta::TypeList`](./index.md)|
 
 |Variable||
@@ -38,6 +39,14 @@
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `template<class T, template< class, class > class Condition> typedef FindConditional`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|template< class, class > class|Condition||
 ------
 ### `typedef type`
 
