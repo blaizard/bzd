@@ -11,7 +11,7 @@ from manifest import Manifest
 if __name__== "__main__":
 
 	parser = argparse.ArgumentParser(description="Architect configuration file parser.")
-	parser.add_argument("inputs", nargs="+", help="Input files to be passed to the parser.")
+	parser.add_argument("inputs", nargs="*", help="Input files to be passed to the parser.")
 	parser.add_argument("-o", "--output", default="./out", type=str, help="Output path of generated file.")
 	parser.add_argument("-f", "--format", default="cpp", help="Output format to be used.")
 	parser.add_argument("-m", "--manifest", default=None, help="Generate the resulting manifest.")
@@ -51,4 +51,3 @@ if __name__== "__main__":
 		})
 	except Exception as e:
 		Log.fatal("Cannot generate '{}' output".format(config.format), e)
-

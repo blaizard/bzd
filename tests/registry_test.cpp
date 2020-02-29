@@ -40,7 +40,7 @@ TEST(Registry, PureVirtual)
 
 	struct PureVirtualSpecialization : PureVirtualBase
 	{
-		int print() override { return 42; };
+		int print() override { return 42; }
 	};
 
 	bzd::Registry<PureVirtualBase>::Declare<1> reg_;

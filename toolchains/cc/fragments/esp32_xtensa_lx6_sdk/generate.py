@@ -40,7 +40,7 @@ if __name__== "__main__":
 
 	# Create the output directory
 	output = os.path.abspath(os.path.expanduser(args.output))
-	if input("Do you to create and/or clean '{}'? ".format(output)).lower().strip() == "y":
+	if input("Do you want to create and clean '{}'? ".format(output)).lower().strip() == "y":
 		if os.path.isdir(output):
 			shutil.rmtree(output)
 		os.makedirs(output)

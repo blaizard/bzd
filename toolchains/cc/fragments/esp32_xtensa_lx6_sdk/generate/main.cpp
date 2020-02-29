@@ -4,5 +4,6 @@ extern int main();
 void app_main()
 {
 	main();
-	while (1) {};
+	// No need for a while (1) loop here, it will be caught be the under layer.
+	// Also a while (1) here will trigger the watchdog.
 }
