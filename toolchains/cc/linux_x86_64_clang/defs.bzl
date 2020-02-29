@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
+load("//toolchains/cc:defs.bzl", "COPTS_CLANG")
 
 def _load_linux_x86_64_clang_9_0_0(name):
     # Load dependencies
@@ -76,7 +77,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-D__DATE__=\"redacted\"",
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
-        ],
+        ] + COPTS_CLANG,
         "link_flags": [
             "-Wl,-as-needed",
             "-fuse-ld=gold",

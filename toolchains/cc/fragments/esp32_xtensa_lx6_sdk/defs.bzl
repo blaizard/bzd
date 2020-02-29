@@ -31,10 +31,16 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
         ],
         "link_flags": [
             "-nostdlib",
+            "-u", "call_user_start_cpu0",
             "-Wl,--start-group",
 
             # Linker scripts
             "-Tesp32_out.ld",
+            # Important, from https://github.com/espressif/esp-idf/blob/master/components/esp32/component.mk
+            # ld_include_panic_highint_hdl is added as an undefined symbol because otherwise the
+            # linker will ignore panic_highint_hdl.S as it has no other files depending on any
+            # symbols in it.
+            "-u", "ld_include_panic_highint_hdl",
             "-Tesp32.project.ld",
             "-Tesp32.peripherals.ld",
             "-Tesp32.rom.ld",
@@ -46,12 +52,15 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             # Libraries
             "-lapp_trace",
             "-lapp_update",
+            "-u", "esp_app_desc",
             "-lasio",
             "-lbootloader_support",
             "-lbt",
             "-lcoap",
             "-lconsole",
             "-lcxx",
+            "-u", "__cxa_guard_dummy",
+            "-u", "__cxx_fatal_exception",
             "-ldriver",
             "-lefuse",
             "-lesp-tls",
@@ -83,6 +92,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lfatfs",
             "-lfreemodbus",
             "-lfreertos",
+            "-Wl,--undefined=uxTopUsedPriority",
             "-lheap",
             "-lidf_test",
             "-ljsmn",
@@ -97,12 +107,18 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lnewlib",
             "-lc",
             "-lm",
+            "-u", "newlib_include_locks_impl",
+            "-u", "newlib_include_heap_impl",
+            "-u", "newlib_include_syscalls_impl",
             "-lnghttp",
             "-lnvs_flash",
             "-lopenssl",
             "-lprotobuf-c",
             "-lprotocomm",
             "-lpthread",
+            "-u", "pthread_include_pthread_impl",
+            "-u", "pthread_include_pthread_cond_impl",
+            "-u", "pthread_include_pthread_local_storage_impl",
             "-lsdmmc",
             "-lsoc",
             "-lspi_flash",
