@@ -27,7 +27,7 @@ public:
 	/**
 	 * Search for a specific element in the map.
 	 */
-	constexpr bzd::Optional<Iterator> find(const K& key) const
+	constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
 	{
 		for (auto it = data_.begin(); it != data_.end(); ++it)
 		{
@@ -44,6 +44,11 @@ public:
 		auto result = find(key);
 		bzd::assert::isTrue(result, "Key does not exists");
 		return (*result)->second;
+	}
+
+	constexpr bool contains(const K& key) const noexcept
+	{
+		return find(key);
 	}
 
 	/**

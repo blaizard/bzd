@@ -119,7 +119,7 @@ public:
  * It is a variants with 2 states, valid, representing success and containing a
  * value, and error, representing error and containing an error value.
  */
-template <class T, class E>
+template <class T, class E = bool>
 using Expected = impl::Expected<T, E>;
 
 template <class E>
@@ -127,4 +127,5 @@ constexpr impl::Unexpected<bzd::typeTraits::Decay<E>> makeUnexpected(E&& e)
 {
 	return impl::Unexpected<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
 }
+
 } // namespace bzd

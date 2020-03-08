@@ -60,3 +60,10 @@ TEST(Registry, NotDeclared)
 {
 	EXPECT_ANY_THROW(bzd::Registry<double>::Register<> m1("1", -1));
 }
+
+TEST(Registry, GetOrCreate)
+{
+	bzd::Registry<long>::Declare<1> reg_;
+	bzd::Registry<long>::Register<> m0("0", 12);
+	EXPECT_EQ(bzd::Registry<long>::getOrCreate("hello"), 0);
+}

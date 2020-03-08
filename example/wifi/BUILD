@@ -6,9 +6,9 @@ cc_binary(
         "main.cpp",
     ],
     visibility = ["//visibility:public"],
-    #deps = [
-    #    "//platform:bzd",
-    #],
+    deps = [
+        "//platform:bzd",
+    ],
 )
 
 bzd_pack(

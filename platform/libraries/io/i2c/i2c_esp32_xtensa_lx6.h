@@ -16,10 +16,10 @@ public:
 	{
 	}
 
-	void connect() override;
+	bzd::Expected<void> connect() override;
 
-	bzd::SizeType write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
-	bzd::SizeType read(bzd::Span<bzd::UInt8Type>& data) noexcept override;
+	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
+	bzd::Expected<SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override;
 
 private:
 	Configuration config_;

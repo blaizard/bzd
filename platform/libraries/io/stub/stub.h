@@ -6,6 +6,6 @@ namespace bzd { namespace io {
 class Stub : public bzd::OChannel
 {
 public:
-	bzd::SizeType write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override { return data.size(); }
+	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override { return data.size(); }
 };
 }} // namespace bzd::io

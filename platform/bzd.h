@@ -1,5 +1,8 @@
 #pragma once
 
+// Algorithm
+#include "bzd/algorithm/copy.h"
+
 // Container
 #include "bzd/container/array.h"
 #include "bzd/container/btree.h"
@@ -83,7 +86,6 @@
 #include "bzd/utility/container_of.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/max.h"
-#include "bzd/utility/memcpy.h"
 #include "bzd/utility/min.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/offset_of.h"
