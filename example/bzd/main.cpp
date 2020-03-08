@@ -103,11 +103,22 @@ void setUs(uint8_t num, bzd::SizeType timeUs)
 	setPWM(num, 0, timeUs * 4096 * PCA9685_UPDATE_RATE_HZ / 1000000);
 }
 
+namespace bzd {
+// Add isExpected assert
+namespace assert {
+template <class T, class E>
+constexpr void isExpected(const Expected<T, E>& expected)
+{
+	bzd::assert::isTrue(expected, CSTR("Expected failed"));
+}
+} // namespace assert
+}
+
 int main()
 {
 	// Connect the various channels
-	bzd::Registry<bzd::OChannel>::get("led").connect();
-	bzd::Registry<bzd::OChannel>::get("i2c").connect();
+	bzd::assert::isExpected(bzd::Registry<bzd::OChannel>::get("led").connect());
+	bzd::assert::isExpected(bzd::Registry<bzd::OChannel>::get("i2c").connect());
 
 	// Get the default logger
 	auto& log = bzd::Registry<bzd::Log>::get("default");

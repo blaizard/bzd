@@ -2,6 +2,7 @@
 
 #include "bzd/container/map.h"
 #include "bzd/container/string_stream.h"
+#include "bzd/container/expected.h"
 #include "bzd/core/assert.h"
 #include "bzd/types.h"
 #include "bzd/utility/singleton.h"
@@ -19,13 +20,16 @@ protected:
 	constexpr Registry(MapType& registry) { get(&registry); }
 
 public:
-	static constexpr MapType& get() { return get(nullptr); }
+	static constexpr bzd::Expected<MapType&, const char*> get() { return get(nullptr); }
 
 private:
-	static MapType& get(MapType* registry)
+	static bzd::Expected<MapType&, const char*> get(MapType* registry)
 	{
 		static MapType* instance = registry;
-		bzd::assert::isTrue(instance != nullptr, "Registry was not initialized");
+		if (instance == nullptr)
+		{
+			return bzd::makeUnexpected("Registry was not initialized");
+		}
 		return *instance;
 	}
 };
@@ -94,7 +98,9 @@ public:
 		template <class... Args>
 		constexpr Register(const KeyType& str, Args&&... args) : object_{bzd::forward<Args>(args)...}
 		{
-			interface::Registry<Interface>::get().insert(str, static_cast<Interface*>(&object_));
+			auto result = interface::Registry<Interface>::get();
+			bzd::assert::isTrue(result);
+			(*result).insert(str, static_cast<Interface*>(&object_));
 		}
 
 	private:
@@ -104,6 +110,29 @@ public:
 	/**
 	 * \brief Registry accessor.
 	 */
-	static constexpr Interface& get(const KeyType& key) { return *interface::Registry<Interface>::get()[key]; }
+	static constexpr Interface& get(const KeyType& key)
+	{
+		auto result = interface::Registry<Interface>::get();
+		bzd::assert::isTrue(result);
+		return *(*result)[key];
+	}
+
+	/**
+	 * \brief Get a ressource or create one if it does not exists.
+	 * In order to be created, the ressource must have a default constructor. This is a limitation
+	 * to ensure reproductability.
+	 */
+	template <class T = Interface>
+	static Interface& getOrCreate(const KeyType& key)
+	{
+		auto result = interface::Registry<Interface>::get();
+		if (!result || !(*result).contains(key))
+		{
+			static T defaultObject{};
+			return static_cast<Interface&>(defaultObject);
+		}
+
+		return *(*result)[key];
+	}
 };
 } // namespace bzd

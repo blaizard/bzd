@@ -3,7 +3,7 @@
 #include "libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
 namespace bzd { namespace io { namespace impl {
 
-void I2CEsp32XtensaLx6::connect()
+bzd::Expected<void> I2CEsp32XtensaLx6::connect()
 {
 	i2c_port_t i2c_master_port = static_cast<i2c_port_t>(config_.interface);
 	i2c_config_t conf{};
@@ -26,9 +26,11 @@ void I2CEsp32XtensaLx6::connect()
 
 	i2c_param_config(i2c_master_port, &conf);
 	i2c_driver_install(i2c_master_port, conf.mode, 0, 0, 0);
+
+	return {};
 }
 
-bzd::SizeType I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
+bzd::Expected<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
@@ -42,7 +44,7 @@ bzd::SizeType I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& da
 	return data.size();
 }
 
-bzd::SizeType I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) noexcept
+bzd::Expected<SizeType> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) noexcept
 {
 	data[0] = 1;
 	return 1;

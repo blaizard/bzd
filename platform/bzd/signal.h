@@ -1,8 +1,8 @@
 #pragma once
 
+#include "bzd/algorithm/copy.h"
 #include "bzd/container/buffer.h"
 #include "bzd/types.h"
-#include "bzd/utility/memcpy.h"
 
 #include <iostream>
 
@@ -100,7 +100,7 @@ public:
 	static constexpr const Type get(const bzd::ConstBuffer& data)
 	{
 		typename SignalInternals::ExtractedType extracted;
-		bzd::memcpy(&extracted, &data.at(startByte_), sizeof(extracted));
+		bzd::algorithm::copy(&data.at(startByte_), &data.at(startByte_) + sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
 		const typename SignalInternals::Type type = (extracted >> shiftBits_) & mask_;
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}

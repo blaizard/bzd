@@ -11,8 +11,8 @@ public:
 	{
 	}
 
-	void connect() override;
-	bzd::SizeType write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
+	bzd::Expected<void> connect() override;
+	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
 
 private:
 	const gpio_num_t pin_;

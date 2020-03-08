@@ -4,7 +4,7 @@
 #include "bzd/container/string_view.h"
 #include "bzd/type_traits/add_const.h"
 #include "bzd/types.h"
-#include "bzd/utility/memcpy.h"
+#include "bzd/algorithm/copy.h"
 #include "bzd/utility/min.h"
 
 namespace bzd {
@@ -33,7 +33,7 @@ public:
 		// Handles overflows
 		const SizeType sizeLeft = capacity_ - size_ - 1;
 		const SizeType actualN = bzd::min(sizeLeft, n);
-		bzd::memcpy(&Parent::at(size_), data, actualN);
+		bzd::algorithm::copy(data, data + actualN, &Parent::at(size_));
 		size_ += actualN;
 		Parent::at(size_) = '\0';
 
