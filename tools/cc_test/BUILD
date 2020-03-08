@@ -9,6 +9,9 @@ cc_library(
         "test.h",
         "test_internal.h",
     ],
+    deps = [
+        "//platform/libraries/bootstrap"
+    ],
     include_prefix = "cc_test",
     includes = ["."],
     visibility = ["//visibility:public"],
