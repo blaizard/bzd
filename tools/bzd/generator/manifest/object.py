@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-from .validator import ValidatorReference
-from .validator import ValidatorObject
-from .validator import ValidatorInterface
+from .validator import ValidatorReference, ValidatorCustom, ValidatorObject, ValidatorInterface
 
 """
 Represents an object
@@ -23,6 +21,7 @@ class Object():
 		def visit(value):
 			if ValidatorReference.isMatch(value):
 				valueStr = value.getRepr()
+
 				# If this represents an object
 				if ValidatorObject.isMatch(valueStr):
 					result = ValidatorObject.parse(valueStr)
@@ -30,9 +29,15 @@ class Object():
 					self.deps["object"][result["interface"]] = self.deps["object"].get(result["interface"], set())
 					self.deps["object"][result["interface"]].add(result["name"])
 					value.setReprCallback(self.manifest, lambda renderer : renderer.get("object", "").format(interface = result["interface"], name = result["name"]))
+
 				# If this represents an interface
 				elif ValidatorInterface.isMatch(valueStr):
 					self.deps["interface"].add(valueStr)
+
+			elif ValidatorCustom.isMatch(value):
+				print("Custom!!!")
+				value.setReprCallback(self.manifest, lambda renderer : renderer.get(value.type))
+
 		self._walk(self.definition, visit)
 
 		# Sanity check
