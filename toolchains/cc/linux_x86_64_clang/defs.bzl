@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel.build/toolchains:defs.bzl", "toolchain_maker")
-load("//toolchains/cc:defs.bzl", "COPTS_CLANG")
+load("//toolchains/cc:defs.bzl", "COPTS_CLANG", "LINKOPTS_CLANG")
 
 def _load_linux_x86_64_clang_9_0_0(name):
     # Load dependencies
@@ -78,9 +78,11 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-D__TIMESTAMP__=\"redacted\"",
             "-D__TIME__=\"redacted\"",
         ] + COPTS_CLANG,
-        "link_flags": [
+        "link_flags": LINKOPTS_CLANG + [
             "-Wl,-as-needed",
-            "-fuse-ld=gold",
+            "-Wl,-no-undefined",
+
+            "-fuse-ld=lld",
             "-Wl,--disable-new-dtags",
             "-Wl,--gc-sections",
             "-rdynamic",

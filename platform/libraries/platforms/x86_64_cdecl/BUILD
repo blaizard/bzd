@@ -9,7 +9,7 @@ cc_library(
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
-        "//platform:bzd_core",
+        "//platform:header_system",
     ],
     alwayslink = True,
 )

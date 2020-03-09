@@ -35,7 +35,6 @@ class Object():
 					self.deps["interface"].add(valueStr)
 
 			elif ValidatorCustom.isMatch(value):
-				print("Custom!!!")
 				value.setReprCallback(self.manifest, lambda renderer : renderer.get(value.type))
 
 		self._walk(self.definition, visit)

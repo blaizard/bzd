@@ -5,7 +5,7 @@ cc_library(
     name = "bootstrap",
     visibility = ["//visibility:public"],
     alwayslink = True,
-    deps = selects.with_or({
+    srcs = selects.with_or({
         (
             "//tools/bazel.build/config:x86_64",
             "//tools/bazel.build/config/auto:x86_64",
