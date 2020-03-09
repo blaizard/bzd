@@ -2,6 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import re
+from .custom import Custom
 
 class ValidatorType:
 	@classmethod
@@ -23,6 +24,14 @@ class ValidatorReference:
 	@classmethod
 	def isMatch(cls, value):
 		return hasattr(value, "__bzd_reference__") and value.__bzd_reference__ == True
+
+"""
+Determine wether this is a custome type
+"""
+class ValidatorCustom:
+	@classmethod
+	def isMatch(cls, value):
+		return hasattr(value, "__bzd_custom__") and value.__bzd_custom__ == True
 
 """
 Matches everything!
