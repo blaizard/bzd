@@ -19,11 +19,12 @@ filegroup(
     ],
 )
 
-filegroup(
+cc_library(
     name = "header_system",
-    srcs = glob([
-        "bzd/core/system.h",
-    ]),
+    hdrs = [
+        "//platform:headers",
+    ],
+    includes = ["."],
     visibility = [
         "//platform/libraries:__subpackages__",
     ],
@@ -59,6 +60,16 @@ cc_library(
     hdrs = [
         "//platform:headers",
     ],
+    linkstatic = True,
+    deps = [
+        "//platform/libraries/panic",
+    ] + selects.with_or({
+        (
+            "//tools/bazel.build/config:x86_64",
+            "//tools/bazel.build/config/auto:x86_64",
+        ): ["//platform/libraries/platforms/x86_64_cdecl"],
+        "//conditions:default": [],
+    }),
     includes = ["."],
     visibility = [
         "//platform/libraries:__subpackages__",
@@ -71,12 +82,5 @@ cc_library(
     deps = [
         ":bzd_core",
         "//platform/libraries/log",
-        "//platform/libraries/panic",
-    ] + selects.with_or({
-        (
-            "//tools/bazel.build/config:x86_64",
-            "//tools/bazel.build/config/auto:x86_64",
-        ): ["//platform/libraries/platforms/x86_64_cdecl"],
-        "//conditions:default": [],
-    }),
+    ],
 )

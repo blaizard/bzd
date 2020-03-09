@@ -15,7 +15,7 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//platform:bzd_core",
+        "//platform:header_system",
     ],
     alwayslink = True,
 )
