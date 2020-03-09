@@ -5,6 +5,7 @@
 
 // Container
 #include "bzd/container/array.h"
+#include "bzd/container/artifact.h"
 #include "bzd/container/btree.h"
 #include "bzd/container/buffer.h"
 #include "bzd/container/expected.h"

@@ -8,6 +8,9 @@ bzd_manifest(
         "@esp32_xtensa_lx6_gcc//:target": ["config_esp32_xtensa_lx6.manifest"],
         "//conditions:default": ["config_others.manifest"],
     }),
+    artifacts = {
+        "message.txt": "test"
+    },
     deps = [],
 )
 

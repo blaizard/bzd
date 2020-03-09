@@ -18,6 +18,11 @@ public:
 	constexpr Buffer(const bzd::StringView& str) : bzd::Span<T>(reinterpret_cast<T*>(str.data()), str.size())
 	{
 	}
+
+	template <class Q, bzd::typeTraits::EnableIf<sizeof(Q) == 1, void>* = nullptr>
+	constexpr Buffer(const Q* data, const SizeType size) : bzd::Span<T>(reinterpret_cast<const T*>(data), size)
+	{
+	}
 };
 } // namespace impl
 

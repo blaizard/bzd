@@ -13,6 +13,14 @@ def paramsToString(obj):
 	params = [valueToString(param) for param in obj.getParams()]
 	return (", " + ", ".join(params)) if len(params) else ""
 
+def fileToString(readGenerator):
+	nbBytes = 0
+	content = ""
+	for byte in readGenerator():
+		nbBytes += 1
+		content += "\\x{:x}".format(ord(byte[0]))
+	return content, nbBytes
+
 def registryBuild(manifest):
 
 	manifest.setRenderer({
@@ -34,6 +42,16 @@ def registryBuild(manifest):
 
 	# Create an empty namespace to ensure that the symbols are not exported
 	content += "namespace {\n\n"
+
+	# Add files
+	for artifact in manifest.getArtifacts():
+		fileContent, nbBytes = fileToString(artifact.read)
+		content += "// Content of file '{}'\n".format(artifact.getPath())
+		content += "const bzd::ConstBuffer artifact{}_{{\"".format(artifact.getUid())
+		content += fileContent
+		content += "\", {}}};\n".format(nbBytes)
+	if len(manifest.getArtifacts()):
+		content += "\n"
 
 	# Add objects to the registry
 	registryList = manifest.getRegistry()
@@ -62,7 +80,6 @@ def registryBuild(manifest):
 				content += "\t}\n"
 				content += "};\n"
 				params = ", {}::get()".format(configName)
-				print(config)
 			# Build the parameters
 			content += "bzd::Registry<{}>::Register<{}> object{}_{{\"{}\"{}}};\n".format(obj.getInterface().getName(), implementation, getUID(), obj.getName(), params)
 		content += "\n"
