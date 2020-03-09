@@ -3,6 +3,7 @@
 
 import argparse
 import formats
+import re
 import os
 from log import Log
 from parser import manifestToDict, dictToManifest
@@ -15,6 +16,7 @@ if __name__== "__main__":
 	parser.add_argument("-o", "--output", default="./out", type=str, help="Output path of generated file.")
 	parser.add_argument("-f", "--format", default="cpp", help="Output format to be used.")
 	parser.add_argument("-m", "--manifest", default=None, help="Generate the resulting manifest.")
+	parser.add_argument("-a", "--artifact", action="append", help="Artifacts to be added to the generated code.")
 
 	config = parser.parse_args()
 	assert hasattr(formats, config.format), "Unsupported output format '{}'".format(str(config.format))
@@ -23,9 +25,15 @@ if __name__== "__main__":
 	for path in config.inputs:
 		try:
 			data = manifestToDict(path)
-			manifest.merge(data)
+			manifest.merge(data, path)
 		except Exception as e:
 			Log.fatal("{}".format(path), e)
+
+	# Add artifacts if any
+	for artifact in config.artifact:
+		index = artifact.find(":")
+		assert index != -1, "Artifact is malformed: '{}'.".format(artifact)
+		manifest.addArtifact(artifact[index+1:], artifact[0:index])
 
 	try:
 		manifest.process()

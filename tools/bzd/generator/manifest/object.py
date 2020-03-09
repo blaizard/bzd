@@ -10,10 +10,10 @@ Represents an object
 """
 class Object():
 
-	def __init__(self, manifest, identifier):
+	def __init__(self, manifest, identifier, definition = None):
 		self.manifest = manifest
 		self.identifier = identifier
-		self.definition = manifest.getData().get("objects", {}).get(identifier, {})
+		self.definition = definition if definition else manifest.getData().get("objects", {}).get(identifier, {})
 		self.deps = {
 			"interface": set([self.getInterfaceName()]),
 			"object": {}

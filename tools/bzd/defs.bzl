@@ -2,10 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/bazel.build:defs.bzl", "sh_binary_wrapper_impl")
 
 # Custom provider for a manifest
-BzdManifestInfo = provider(fields = ["manifest"])
+BzdManifestInfo = provider(fields = ["manifest", "artifacts"])
 
 def _bzd_manifest_impl(ctx):
-    return [DefaultInfo(), CcInfo(), BzdManifestInfo(manifest = depset(transitive = [f.files for f in ctx.attr.manifest]))]
+    return [DefaultInfo(), CcInfo(), BzdManifestInfo(
+        manifest = depset(transitive = [f.files for f in ctx.attr.manifest]),
+        artifacts = depset([(f.files.to_list()[0], key) for f, key in ctx.attr.artifacts.items()])
+    )]
 
 """
 Rule to declare a bzd manifests.
@@ -19,6 +22,11 @@ bzd_manifest = rule(
             mandatory = True,
             doc = "Input manifest files.",
         ),
+        "artifacts": attr.label_keyed_string_dict(
+            allow_files = True,
+            allow_empty = True,
+            doc = "Artifacts to be added to the app.",
+        ),
         "deps": attr.label_list(
             allow_files = True,
         ),
@@ -29,7 +37,10 @@ def _bzd_deps_aspect_impl(target, ctx):
     if ctx.rule.kind == "bzd_manifest":
         return []
     return [
-        BzdManifestInfo(manifest = depset(transitive = [dep[BzdManifestInfo].manifest for dep in ctx.rule.attr.deps])),
+        BzdManifestInfo(
+            manifest = depset(transitive = [dep[BzdManifestInfo].manifest for dep in ctx.rule.attr.deps]),
+            artifacts = depset(transitive = [dep[BzdManifestInfo].artifacts for dep in ctx.rule.attr.deps])
+        ),
     ]
 
 """
@@ -42,6 +53,7 @@ bzd_deps_aspect = aspect(
 
 def _bzd_generate_rule_impl(ctx):
     manifests = depset(transitive = [dep[BzdManifestInfo].manifest for dep in ctx.attr.deps]).to_list()
+    artifacts = depset(transitive = [dep[BzdManifestInfo].artifacts for dep in ctx.attr.deps]).to_list()
 
     # Build the argument list
     args = ctx.actions.args()
@@ -50,11 +62,18 @@ def _bzd_generate_rule_impl(ctx):
     args.add("--output")
     args.add(ctx.outputs.output.path)
     outputs = [ctx.outputs.output]
+    inputs = list(manifests)
 
     if ctx.outputs.output_manifest:
         args.add("--manifest")
         args.add(ctx.outputs.output_manifest.path)
         outputs += [ctx.outputs.output_manifest]
+
+    # Add artifacts
+    for artifact in artifacts:
+        args.add("--artifact")
+        args.add("{}:{}".format(artifact[1], artifact[0].path))
+        inputs.append(artifact[0])
 
     # Add the manifest list
     [args.add(f.path) for f in manifests]
@@ -62,7 +81,7 @@ def _bzd_generate_rule_impl(ctx):
     # Generate the files
     ctx.actions.run(
         outputs = outputs,
-        inputs = manifests,
+        inputs = inputs,
         arguments = [args],
         progress_message = "Generating bzd files...",
         executable = ctx.executable._generator,

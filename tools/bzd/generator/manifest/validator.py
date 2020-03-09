@@ -41,6 +41,14 @@ class ValidatorInterface(ValidatorType):
 	valueTypes = [str]
 
 """
+Matches on a relative path
+"""
+class ValidatorPath(ValidatorType):
+	regexprClass = r"(?P<path>(?:(?:[^/]+/)*[^/]+))"
+	regexpr = re.compile(r"^" + regexprClass + "$", re.IGNORECASE)
+	valueTypes = [str]
+
+"""
 Determine the object type
 """
 class ValidatorObject(ValidatorType):
@@ -66,6 +74,7 @@ class Validator():
 	validators = {
 		"interface": ValidatorInterface,
 		"object": ValidatorObject,
+		"path": ValidatorPath,
 		"any": ValidatorAny
 	}
 

@@ -3,6 +3,7 @@
 
 from .object import Object
 from .interface import Interface, EmptyInterface
+from .artifact import Artifact
 from .validator import Validator
 
 """
@@ -19,6 +20,9 @@ class _Keys():
 	def pop(self):
 		self.keys.pop()
 
+	def toKey(self):
+		return "/".join(self.keys)
+
 	def __str__(self):
 		return " > ".join(self.keys)
 
@@ -28,8 +32,16 @@ class Manifest():
 		self.data = {}
 		self.objects = {}
 		self.interfaces = {}
+		self.artifacts = {}
+		self.sources = {}
 		self.setRenderer()
 		self.format = {
+			"artifacts": {
+				"_default": {
+					"_key": Validator("any"),
+					"path": Validator("path")
+				}
+			},
 			"interfaces": {
 				"_default": {
 					"_key": Validator("interface"),
@@ -89,6 +101,12 @@ class Manifest():
 		return self.data
 
 	"""
+	Return the list of artifact objects
+	"""
+	def getArtifacts(self):
+		return self.artifacts.values()
+
+	"""
 	List all depending interfaces
 	"""
 	def getDependentInterfaces(self):
@@ -115,7 +133,6 @@ class Manifest():
 				"objects": objects,
 				"deps": deps
 			}
-
 		# Create a dependency graph
 		dependencyGraph = {interface: set() for interface in registryEntries.keys()}
 		for interface, data in registryEntries.items():
@@ -142,12 +159,23 @@ class Manifest():
 	"""
 	Merge data into the current manifest.
 	"""
-	def merge(self, data):
+	def merge(self, data, path):
 		context = {"key": _Keys()}
 		try:
-			self._mergeAndValidate(self.data, data, self.format, context)
+			self._mergeAndValidate(self.data, data, self.format, context, path)
 		except Exception as e:
 			raise Exception("Error while merging ({}): {}".format("; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text]), e))
+
+	"""
+	Add artifacts to the generated code.
+	"""
+	def addArtifact(self, path, identifier):
+		if "artifacts" not in self.data:
+			self.data["artifacts"] = {}
+		assert identifier not in self.data["artifacts"], "Identifier '{}' is already used for artifact.".format(identifier)
+		self.data["artifacts"][identifier] = {
+			"path": path
+		}
 
 	"""
 	Process the current data of the manifest in order to speed-up later accesses
@@ -169,12 +197,21 @@ class Manifest():
 				self.interfaces[identifier] = Interface(self, identifier)
 			except Exception as e:
 				raise Exception("Error while processing interface {}: {}".format(identifier, e))
+	
+		# Artifacts
+		self.artifacts = {}
+		for identifier in self.data.get("artifacts", {}).keys():
+			try:
+				self.artifacts[identifier] = Artifact(self, identifier)
+				self.artifacts[identifier].registerObject(self.objects)
+			except Exception as e:
+				raise Exception("Error while processing artifact {}: {}".format(identifier, e))
 
 	"""
 	Merge the data
 	"""
 	@staticmethod
-	def _mergeAndValidate(dst, src, validation, context):
+	def _mergeAndValidate(dst, src, validation, context, path):
 
 		for key, value in src.items():
 			context["key"].push(key)
@@ -195,7 +232,7 @@ class Manifest():
 					dst[key] = {}
 
 				# Go further
-				Manifest._mergeAndValidate(dst[key], value, vData, context)
+				Manifest._mergeAndValidate(dst[key], value, vData, context, path)
 
 			else:
 				vData.validate(value)
