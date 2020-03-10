@@ -9,7 +9,7 @@
 namespace bzd {
 namespace impl {
 
-class CompuMethodIdentical
+class ComputeMethodIdentical
 {
 public:
 	template <class Type, class BufferType>
@@ -81,7 +81,7 @@ struct SignalInternals<7>
 };
 } // namespace impl
 
-template <class Type, bzd::SizeType OffsetBits, bzd::SizeType SizeBits, class CompuMethod = impl::CompuMethodIdentical>
+template <class Type, bzd::SizeType OffsetBits, bzd::SizeType SizeBits, class CompuMethod = impl::ComputeMethodIdentical>
 class Signal
 {
 private:

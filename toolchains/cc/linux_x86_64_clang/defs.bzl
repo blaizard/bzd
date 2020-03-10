@@ -79,8 +79,6 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-D__TIME__=\"redacted\"",
         ] + COPTS_CLANG,
         "link_flags": LINKOPTS_CLANG + [
-            "-Wl,-as-needed",
-            "-Wl,-no-undefined",
 
             "-fuse-ld=lld",
             "-Wl,--disable-new-dtags",

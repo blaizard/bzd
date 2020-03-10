@@ -9,9 +9,10 @@ cc_binary(
     deps = [
         "//platform:bzd",
     ],
+    tags = ["manual"]
 )
 
-bzd_pack(
-    name = "deploy",
-    binary = ":wifi",
-)
+#bzd_pack(
+#    name = "deploy",
+#    binary = ":wifi",
+#)

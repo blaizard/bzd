@@ -15,8 +15,11 @@ COPTS_GCC = COPTS_COMMON
 COPTS_CLANG = COPTS_COMMON
 
 LINKOPTS_COMMON = [
-	"-Wl,-as-needed",
-    "-Wl,-no-undefined",
+	# Removes unused shared libraries
+	#"-Wl,-as-needed",
+	# Raise a compilation error if a symbol is undefined during linking
+    #"-Wl,-no-undefined",
+	"-Wl,-no-as-needed",
 ]
 
 LINKOPTS_GCC = LINKOPTS_COMMON
