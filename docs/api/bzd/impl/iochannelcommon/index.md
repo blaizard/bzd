@@ -8,8 +8,8 @@
 |[`connect()`](./index.md)||
 |[`disconnect()`](./index.md)||
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 

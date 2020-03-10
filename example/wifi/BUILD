@@ -1,15 +1,15 @@
-load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest", "bzd_pack")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "wifi",
     srcs = [
         "main.cpp",
     ],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//platform:bzd",
     ],
-    tags = ["manual"]
 )
 
 #bzd_pack(

@@ -7,7 +7,7 @@ BzdManifestInfo = provider(fields = ["manifest", "artifacts"])
 def _bzd_manifest_impl(ctx):
     return [DefaultInfo(), CcInfo(), BzdManifestInfo(
         manifest = depset(transitive = [f.files for f in ctx.attr.manifest]),
-        artifacts = depset([(f.files.to_list()[0], key) for f, key in ctx.attr.artifacts.items()])
+        artifacts = depset([(f.files.to_list()[0], key) for f, key in ctx.attr.artifacts.items()]),
     )]
 
 """
@@ -39,7 +39,7 @@ def _bzd_deps_aspect_impl(target, ctx):
     return [
         BzdManifestInfo(
             manifest = depset(transitive = [dep[BzdManifestInfo].manifest for dep in ctx.rule.attr.deps]),
-            artifacts = depset(transitive = [dep[BzdManifestInfo].artifacts for dep in ctx.rule.attr.deps])
+            artifacts = depset(transitive = [dep[BzdManifestInfo].artifacts for dep in ctx.rule.attr.deps]),
         ),
     ]
 

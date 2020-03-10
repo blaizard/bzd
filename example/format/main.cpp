@@ -12,7 +12,7 @@ public:
 	bzd::UInt16Type d_;
 };
 
-void toString(bzd::OStream& os, const Date& d)
+void toString(bzd::OChannel& os, const Date& d)
 {
 	bzd::format::toString(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
 }

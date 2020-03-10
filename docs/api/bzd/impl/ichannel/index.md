@@ -14,24 +14,24 @@
 |[`read(Span< T > & data)`](./index.md)||
 |[`read(T & data)`](./index.md)||
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual SizeType read(Span< T > & data)`
+### `virtual bzd::Expected< SizeType > read(Span< T > & data)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |Span< T > &|data||
 ------
-### `virtual SizeType read(T & data)`
+### `virtual bzd::Expected< SizeType > read(T & data)`
 
 #### Parameters
 ||||

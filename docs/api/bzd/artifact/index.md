@@ -1,22 +1,19 @@
-# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`Buffer`](../index.md)
+# [`bzd`](../../index.md)::[`Artifact`](../index.md)
 
-## `template<class T> class Buffer`
+## `class Artifact`
 
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
 
 |Function||
 |:---|:---|
-|[`Buffer(const bzd::StringView & str)`](./index.md)||
-|[`Buffer(Q * data, const SizeType size)`](./index.md)||
+|[`Artifact(Data && data, const SizeType size)`](./index.md)||
 |[`at(const SizeType index)`](./index.md)||
 |[`at(const SizeType index) const`](./index.md)||
 |[`back()`](./index.md)||
 |[`back() const`](./index.md)||
 |[`begin()`](./index.md)||
 |[`begin() const`](./index.md)||
+|[`Buffer(const bzd::StringView & str)`](./index.md)||
+|[`Buffer(Q * data, const SizeType size)`](./index.md)||
 |[`cbegin() const`](./index.md)||
 |[`cend() const`](./index.md)||
 |[`data()`](./index.md)||
@@ -39,36 +36,23 @@
 
 |Typedef||
 |:---|:---|
-|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../../iterator/contiguous/index.md)|
-|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../../iterator/contiguous/index.md)|
+|[`ConstIterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
+|[`Iterator`](./index.md)|alias of [`bzd::iterator::Contiguous`](../iterator/contiguous/index.md)|
 
 |Variable||
 |:---|:---|
 |[`npos`](./index.md)||
 ------
-### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Buffer(const bzd::StringView & str)`
+### `template<class Data> Artifact(Data && data, const SizeType size)`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class Q|None||
-|bzd::typeTraits::EnableIf< Q::value, void > *|None||
+|class Data|None||
 #### Parameters
 ||||
 |---:|:---|:---|
-|const bzd::StringView &|str||
-------
-### `template<class Q, bzd::typeTraits::EnableIf< sizeof(Q)==1, void > *> constexpr Buffer(Q * data, const SizeType size)`
-
-#### Template
-||||
-|---:|:---|:---|
-|class Q|None||
-|bzd::typeTraits::EnableIf< sizeof(Q)==1, void > *|None||
-#### Parameters
-||||
-|---:|:---|:---|
-|Q *|data||
+|Data &&|data||
 |const SizeType|size||
 ------
 ### `template<class Q, bzd::typeTraits::EnableIf<!Q::value, void > *> constexpr DataType & at(const SizeType index)`
@@ -123,6 +107,35 @@
 *From bzd::Span*
 
 
+------
+### `template<class Q, bzd::typeTraits::EnableIf< Q::value, void > *> constexpr Buffer(const bzd::StringView & str)`
+*From bzd::impl::Buffer*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class Q|None||
+|bzd::typeTraits::EnableIf< Q::value, void > *|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const bzd::StringView &|str||
+------
+### `template<class Q, bzd::typeTraits::EnableIf< sizeof(Q)==1, void > *> constexpr Buffer(Q * data, const SizeType size)`
+*From bzd::impl::Buffer*
+
+
+#### Template
+||||
+|---:|:---|:---|
+|class Q|None||
+|bzd::typeTraits::EnableIf< sizeof(Q)==1, void > *|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|Q *|data||
+|const SizeType|size||
 ------
 ### `constexpr ConstIterator cbegin() const`
 *From bzd::Span*

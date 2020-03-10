@@ -1,9 +1,9 @@
 #pragma once
 
+#include "bzd/container/expected.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/system.h"
 #include "bzd/log.h"
-#include "bzd/container/expected.h"
 
 namespace bzd { namespace assert {
 template <class... Args>

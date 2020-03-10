@@ -1,6 +1,5 @@
 #pragma once
 
-#include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
@@ -30,7 +29,7 @@ namespace impl {
 class Log
 {
 public:
-	constexpr explicit Log(bzd::OStream& out) noexcept : out_(out) {}
+	constexpr explicit Log(bzd::OChannel& out) noexcept : out_(out) {}
 
 	template <class... Args>
 	constexpr void info(Args&&... args) noexcept
@@ -72,7 +71,7 @@ private:
 		bzd::format::toString(out_, bzd::forward<Args>(args)...);
 	}
 
-	bzd::OStream& out_;
+	bzd::OChannel& out_;
 };
 } // namespace impl
 
@@ -83,7 +82,6 @@ using Log = impl::Log;
 class Log : public interface::Log
 {
 public:
-	constexpr Log(bzd::OStream& out) : interface::Log(out) {}
-	Log(bzd::OChannel&) : interface::Log(bzd::getOut()) {}
+	constexpr Log(bzd::OChannel& out) : interface::Log(out) {}
 };
 } // namespace bzd

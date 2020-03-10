@@ -3,6 +3,7 @@
 #include "bzd/core/assert.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/is_reference.h"
+#include "bzd/types.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/reference_wrapper.h"
@@ -52,7 +53,7 @@ public:
 protected:
 	const bool isValue_;
 	union {
-		UInt8Type empty_;
+		bzd::UInt8Type empty_;
 		ValueContainer value_;
 	};
 };

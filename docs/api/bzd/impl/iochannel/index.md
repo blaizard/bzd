@@ -17,40 +17,41 @@
 |[`disconnect()`](./index.md)||
 |[`read(Span< T > & data)`](./index.md)||
 |[`read(T & data)`](./index.md)||
+|[`write(const Span< const char > & data)`](./index.md)||
 |[`write(const Span< const T > & data)`](./index.md)||
 |[`write(const T & data)`](./index.md)||
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 *From bzd::impl::IChannel*
 
 
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 *From bzd::impl::IChannel*
 
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual SizeType read(Span< T > & data)`
+### `virtual bzd::Expected< SizeType > read(Span< T > & data)`
 *From bzd::impl::IChannel*
 
 
@@ -59,7 +60,7 @@
 |---:|:---|:---|
 |Span< T > &|data||
 ------
-### `virtual SizeType read(T & data)`
+### `virtual bzd::Expected< SizeType > read(T & data)`
 *From bzd::impl::IChannel*
 
 
@@ -68,7 +69,16 @@
 |---:|:---|:---|
 |T &|data||
 ------
-### `virtual SizeType write(const Span< const T > & data)`
+### `bzd::Expected< SizeType > write(const Span< const char > & data)`
+*From bzd::impl::OChannel*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const Span< const char > &|data||
+------
+### `virtual bzd::Expected< SizeType > write(const Span< const T > & data)`
 *From bzd::impl::OChannel*
 
 
@@ -77,7 +87,7 @@
 |---:|:---|:---|
 |const Span< const T > &|data||
 ------
-### `virtual SizeType write(const T & data)`
+### `virtual bzd::Expected< SizeType > write(const T & data)`
 *From bzd::impl::OChannel*
 
 

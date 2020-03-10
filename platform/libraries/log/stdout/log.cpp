@@ -3,19 +3,19 @@
 #include <iostream>
 
 namespace {
-class StdoutStream : public bzd::OStream
+class StdoutChannel : public bzd::OChannel
 {
 public:
-	bzd::SizeType write(const bzd::Span<const char>& data) noexcept override
+	bzd::Expected<bzd::SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override
 	{
-		std::cout.write(data.data(), data.size());
+		std::cout.write(reinterpret_cast<const char*>(data.data()), data.size());
 		return data.size();
 	}
 };
 } // namespace
 
-bzd::OStream& bzd::getOut()
+bzd::OChannel& bzd::getOut()
 {
-	static StdoutStream stdout_;
+	static StdoutChannel stdout_;
 	return stdout_;
 }

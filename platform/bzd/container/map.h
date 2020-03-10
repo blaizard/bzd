@@ -46,10 +46,7 @@ public:
 		return (*result)->second;
 	}
 
-	constexpr bool contains(const K& key) const noexcept
-	{
-		return find(key);
-	}
+	constexpr bool contains(const K& key) const noexcept { return find(key); }
 
 	/**
 	 * Insert a new element or replace the existing one

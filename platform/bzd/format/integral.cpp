@@ -2,12 +2,12 @@
 
 namespace bzd { namespace format {
 
-void toString(bzd::OStream& stream, const bzd::StringView& data)
+void toString(bzd::OChannel& stream, const bzd::StringView& data)
 {
 	stream.write(data);
 }
 
-void toString(bzd::OStream& stream, const char c)
+void toString(bzd::OChannel& stream, const char c)
 {
 	stream.write(bzd::StringView(&c, 1));
 }

@@ -60,7 +60,11 @@ cc_library(
     hdrs = [
         "//platform:headers",
     ],
+    includes = ["."],
     linkstatic = True,
+    visibility = [
+        "//platform/libraries:__subpackages__",
+    ],
     deps = [
         "//platform/libraries/panic",
     ] + selects.with_or({
@@ -70,10 +74,6 @@ cc_library(
         ): ["//platform/libraries/platforms/x86_64_cdecl"],
         "//conditions:default": [],
     }),
-    includes = ["."],
-    visibility = [
-        "//platform/libraries:__subpackages__",
-    ],
 )
 
 cc_library(

@@ -62,6 +62,8 @@
 |[`IsIntegral`](isintegral/index.md)||
 |[`IsLValueReference`](islvaluereference/index.md)||
 |[`IsLValueReference< T & >`](islvaluereference_t_/index.md)||
+|[`IsPointer`](ispointer/index.md)||
+|[`IsPointer< T * >`](ispointer_t_/index.md)||
 |[`IsReference`](isreference/index.md)||
 |[`IsRValueReference`](isrvaluereference/index.md)||
 |[`IsRValueReference< T && >`](isrvaluereference_t_/index.md)||
@@ -476,6 +478,20 @@
 ||||
 |---:|:---|:---|
 |class T|None||
+------
+### `template<typename T> struct IsPointer`
+
+#### Template
+||||
+|---:|:---|:---|
+|typename T|None||
+------
+### `template<typename T> struct IsPointer< T * >`
+
+#### Template
+||||
+|---:|:---|:---|
+|typename T|None||
 ------
 ### `template<class T> struct IsReference`
 

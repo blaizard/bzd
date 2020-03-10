@@ -1,19 +1,25 @@
 #pragma once
 
-#include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
+#include "bzd/core/channel.h"
 
 namespace bzd {
 namespace impl {
-class StringStream : public bzd::OStream
+class StringStream : public bzd::OChannel
 {
 public:
 	constexpr StringStream(bzd::interface::String& str) : string_(str) {}
 
-	SizeType write(const bzd::StringView& data) noexcept { return write(static_cast<const bzd::Span<const char>>(data)); }
+	bzd::Expected<SizeType> write(const bzd::StringView& data) noexcept
+	{
+		return write({reinterpret_cast<const UInt8Type*>(data.data()), data.size()});
+	}
 
-	SizeType write(const bzd::Span<const char>& data) noexcept override { return string_.append(data.data(), data.size()); }
+	bzd::Expected<SizeType> write(const bzd::Span<const UInt8Type>& data) noexcept override
+	{
+		return string_.append(reinterpret_cast<const char*>(data.data()), data.size());
+	}
 
 	constexpr const bzd::interface::String& str() const noexcept { return string_; }
 

@@ -5,15 +5,15 @@
 
 |Function||
 |:---|:---|
-|[`Log(bzd::OStream & out)`](./index.md)||
+|[`Log(bzd::OChannel & out)`](./index.md)||
 |[`info(Args &&... args)`](./index.md)||
 ------
-### `explicit constexpr Log(bzd::OStream & out)`
+### `explicit constexpr Log(bzd::OChannel & out)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|out||
+|bzd::OChannel &|out||
 ------
 ### `template<class... Args> constexpr void info(Args &&... args)`
 

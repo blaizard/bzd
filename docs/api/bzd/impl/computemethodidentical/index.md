@@ -1,6 +1,6 @@
-# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`CompuMethodIdentical`](../index.md)
+# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`ComputeMethodIdentical`](../index.md)
 
-## `class CompuMethodIdentical`
+## `class ComputeMethodIdentical`
 
 
 |Function||

@@ -16,7 +16,7 @@
 |[`KeyType`](./index.md)|alias of [`bzd::impl::StringView`](../stringview/index.md), [`bzd::impl::StringView`](../stringview/index.md)|
 |[`MapType`](./index.md)|alias of [`bzd::impl::Map`](../map/index.md), [`bzd::impl::Map`](../map/index.md)|
 ------
-### `static constexpr MapType & get()`
+### `static constexpr bzd::Expected< MapType &, const char * > get()`
 
 ------
 ### `typedef KeyType`

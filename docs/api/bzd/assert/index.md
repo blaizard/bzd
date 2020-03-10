@@ -9,11 +9,24 @@
 
 |Function||
 |:---|:---|
+|[`isExpected(const Expected< T, E > & expected)`](./index.md)||
 |[`isTrue(const bool condition, Args &&... args)`](./index.md)||
 |[`isTrue(const bool condition)`](./index.md)||
-|[`isTrue(const bool condition, const bzd::StringView & message)`](./index.md)||
+|[`isTrue(const bool condition, const char * message)`](./index.md)||
 |[`isTrueConstexpr(const bool condition)`](./index.md)||
 |[`unreachable()`](./index.md)||
+------
+### `template<class T, class E> constexpr void isExpected(const Expected< T, E > & expected)`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+|class E|None||
+#### Parameters
+||||
+|---:|:---|:---|
+|const Expected< T, E > &|expected||
 ------
 ### `template<class... Args> constexpr void isTrue(const bool condition, Args &&... args)`
 
@@ -27,20 +40,20 @@
 |const bool|condition||
 |Args &&...|args||
 ------
-### `void isTrue(const bool condition)`
+### `constexpr void isTrue(const bool condition)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |const bool|condition||
 ------
-### `void isTrue(const bool condition, const bzd::StringView & message)`
+### `constexpr void isTrue(const bool condition, const char * message)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |const bool|condition||
-|const bzd::StringView &|message||
+|const char *|message||
 ------
 ### `constexpr bool isTrueConstexpr(const bool condition)`
 

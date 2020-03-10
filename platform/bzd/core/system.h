@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/iostream.h"
+#include "bzd/core/channel.h"
 
 namespace bzd {
 void panic();
-bzd::OStream& getOut();
+bzd::OChannel& getOut();
 } // namespace bzd

@@ -35,6 +35,7 @@
 |[`IsFunction`](./index.md)|alias of [`bzd::typeTraits::impl::IsFunction`](impl/isfunction/index.md)|
 |[`IsIntegral`](./index.md)|alias of [`bzd::typeTraits::impl::IsIntegral`](impl/isintegral/index.md)|
 |[`IsLValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsLValueReference`](impl/islvaluereference/index.md)|
+|[`IsPointer`](./index.md)|alias of [`bzd::typeTraits::impl::IsPointer`](impl/ispointer/index.md)|
 |[`IsReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsReference`](impl/isreference/index.md)|
 |[`IsRValueReference`](./index.md)|alias of [`bzd::typeTraits::impl::IsRValueReference`](impl/isrvaluereference/index.md)|
 |[`IsSame`](./index.md)|alias of [`bzd::typeTraits::impl::IsSame`](impl/issame/index.md)|
@@ -60,6 +61,7 @@
 |[`isFunction`](./index.md)||
 |[`isIntegral`](./index.md)||
 |[`isLValueReference`](./index.md)||
+|[`isPointer`](./index.md)||
 |[`isReference`](./index.md)||
 |[`isRValueReference`](./index.md)||
 |[`isSame`](./index.md)||
@@ -230,6 +232,13 @@
 |---:|:---|:---|
 |class T|None||
 ------
+### `template<class T> typedef IsPointer`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
 ### `template<class T> typedef IsReference`
 
 #### Template
@@ -376,6 +385,13 @@
 |class T|None||
 ------
 ### `template<class T> constexpr bool isLValueReference`
+
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
+------
+### `template<class T> constexpr bool isPointer`
 
 #### Template
 ||||

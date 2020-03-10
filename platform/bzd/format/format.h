@@ -1,20 +1,20 @@
 #pragma once
 
-#include "bzd/container/iostream.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/vector.h"
 #include "bzd/core/assert.h"
+#include "bzd/core/channel.h"
 #include "bzd/core/system.h"
 #include "bzd/format/integral.h"
 #include "bzd/meta/range.h"
+#include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_arithmetic.h"
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_floating_point.h"
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_pointer.h"
-#include "bzd/type_traits/decay.h"
 
 namespace bzd { namespace format {
 
@@ -99,7 +99,7 @@ struct Metadata
 template <class T>
 class HasFormatter
 {
-	template <class C, class = decltype(toString(std::declval<bzd::OStream&>(), std::declval<C>()))>
+	template <class C, class = decltype(toString(std::declval<bzd::OChannel&>(), std::declval<C>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -111,7 +111,7 @@ public:
 template <class T>
 class HasFormatterWithMetadata
 {
-	template <class C, class = decltype(toString(std::declval<bzd::OStream&>(), std::declval<C>(), std::declval<const Metadata>()))>
+	template <class C, class = decltype(toString(std::declval<bzd::OChannel&>(), std::declval<C>(), std::declval<const Metadata>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -126,7 +126,7 @@ public:
 class Formatter
 {
 public:
-	virtual void print(bzd::OStream& os, const Metadata& metadata) const {};
+	virtual void print(bzd::OChannel& os, const Metadata& metadata) const {};
 };
 
 template <class T>
@@ -136,18 +136,18 @@ public:
 	explicit constexpr FormatterSpecialized(const T& v) : Formatter{}, value_{v} {}
 
 	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<U>::value, void>* = nullptr>
-	void printToString(bzd::OStream& os, const Metadata& /*metadata*/) const
+	void printToString(bzd::OChannel& os, const Metadata& /*metadata*/) const
 	{
 		toString(os, value_);
 	}
 
 	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<U>::value, void>* = nullptr>
-	void printToString(bzd::OStream& os, const Metadata& metadata) const
+	void printToString(bzd::OChannel& os, const Metadata& metadata) const
 	{
 		toString(os, value_, metadata);
 	}
 
-	void print(bzd::OStream& os, const Metadata& metadata) const override { printToString(os, metadata); }
+	void print(bzd::OChannel& os, const Metadata& metadata) const override { printToString(os, metadata); }
 
 private:
 	// Can be optimized to avoid copy if non-temporary
@@ -395,7 +395,7 @@ public:
 };
 
 template <class T>
-void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata)
+void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -439,7 +439,7 @@ void printInteger(bzd::OStream& stream, const T& value, const Metadata& metadata
 }
 
 template <class T>
-void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metadata)
+void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -466,19 +466,21 @@ void printFixedPoint(bzd::OStream& stream, const T& value, const Metadata& metad
 // Specialization of toString for the native types
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-void toString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+void toString(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	printInteger(stream, value, metadata);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-void toString(bzd::OStream& stream, const T& value, const Metadata& metadata)
+void toString(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	printFixedPoint(stream, value, metadata);
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-void toString(bzd::OStream& stream, const T& value, const Metadata&)
+template <
+	class T,
+	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
+void toString(bzd::OChannel& stream, const T& value, const Metadata&)
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
@@ -486,7 +488,7 @@ void toString(bzd::OStream& stream, const T& value, const Metadata&)
 	printInteger(stream, reinterpret_cast<SizeType>(value), metadata);
 }
 
-static void toString(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
+static void toString(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -508,7 +510,7 @@ static void toString(bzd::OStream& stream, const bzd::StringView stringView, con
 class PrintContext
 {
 public:
-	constexpr PrintContext(bzd::OStream& stream, const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args) :
+	constexpr PrintContext(bzd::OChannel& stream, const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args) :
 		stream_(stream), args_(args)
 	{
 	}
@@ -517,7 +519,7 @@ public:
 	constexpr void onError(const bzd::StringView& message) const {}
 
 private:
-	bzd::OStream& stream_;
+	bzd::OChannel& stream_;
 	const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args_;
 };
 
@@ -529,7 +531,7 @@ constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, cons
 	return ctx;
 }
 
-static void print(bzd::OStream& stream,
+static void print(bzd::OChannel& stream,
 				  const bzd::StringView& format,
 				  const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args)
 {
@@ -588,7 +590,7 @@ constexpr bool contextCheck(const Ctx&, const T&)
 }
 
 template <SizeType... I, class... Args>
-constexpr void toStringRuntime(bzd::OStream& out, const bzd::StringView& str, bzd::meta::range::Type<I...>, Args&&... args)
+constexpr void toStringRuntime(bzd::OChannel& out, const bzd::StringView& str, bzd::meta::range::Type<I...>, Args&&... args)
 {
 	using bzd::format::impl::FormatterSpecialized;
 
@@ -630,14 +632,14 @@ constexpr void toStringRuntime(bzd::OStream& out, const bzd::StringView& str, bz
  */
 
 template <class... Args>
-constexpr void toString(bzd::OStream& out, const bzd::StringView& str, Args&&... args)
+constexpr void toString(bzd::OChannel& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
 	impl::toStringRuntime(out, str, bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
 }
 
 template <class ConstexprStringView, class... Args>
-constexpr void toString(bzd::OStream& out, const ConstexprStringView& str, Args&&... args)
+constexpr void toString(bzd::OChannel& out, const ConstexprStringView& str, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple;
