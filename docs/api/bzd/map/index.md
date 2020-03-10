@@ -16,6 +16,7 @@
 |Function||
 |:---|:---|
 |[`Map()`](./index.md)||
+|[`contains(const K & key) const`](./index.md)||
 |[`find(const K & key) const`](./index.md)||
 |[`insert(const K & key, V && value)`](./index.md)||
 |[`insert(const Iterator & it, V && value)`](./index.md)||
@@ -32,6 +33,15 @@
 ------
 ### `constexpr Map()`
 
+------
+### `constexpr bool contains(const K & key) const`
+*From bzd::impl::Map*
+
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const K &|key||
 ------
 ### `constexpr bzd::Optional< Iterator > find(const K & key) const`
 *From bzd::impl::Map*

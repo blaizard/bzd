@@ -1,10 +1,10 @@
-#include <signal.h>
-#include <execinfo.h>
-#include <iostream>
-#include <iomanip>
-#include <memory>
-#include <cxxabi.h>
 #include <cstring>
+#include <cxxabi.h>
+#include <execinfo.h>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <signal.h>
 
 namespace {
 bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexcept
@@ -31,7 +31,7 @@ void callStack(std::ostream& out) noexcept
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
 	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
 
-	for(int level = 0; level < nbLevels; ++level)
+	for (int level = 0; level < nbLevels; ++level)
 	{
 		char* pSymbol = symbols.get()[level];
 		const char* pSourcePath = nullptr;
@@ -74,10 +74,8 @@ void callStack(std::ostream& out) noexcept
 		}
 
 		// Print stack trace number and memory address
-		out << "#" << std::dec << std::left << std::setfill(' ')
-				<< std::setw(3) << level
-				<< "0x" << std::setfill('0') << std::hex << std::right
-				<< std::setw(16) << reinterpret_cast<uint64_t>(addresses[level]);
+		out << "#" << std::dec << std::left << std::setfill(' ') << std::setw(3) << level << "0x" << std::setfill('0') << std::hex
+			<< std::right << std::setw(16) << reinterpret_cast<uint64_t>(addresses[level]);
 
 		char pBuffer[1024];
 		if (pFunction)
@@ -101,18 +99,19 @@ void sigHandler(const int /*sig*/, siginfo_t* /*info*/, void* /*secret*/)
 {
 	callStack(std::cout);
 }
-}
+} // namespace
 
 bool installBootstrap()
 {
-	struct sigaction sa{};
+	struct sigaction sa
+	{
+	};
 	sa.sa_sigaction = static_cast<void (*)(int, siginfo_t*, void*)>(sigHandler);
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART | SA_SIGINFO;
-	for (const auto& signal : {SIGABRT, SIGALRM, SIGBUS, SIGCHLD, SIGCONT, SIGFPE, SIGHUP, SIGILL,
-			SIGINT, SIGKILL, SIGPIPE, SIGQUIT, SIGSEGV, SIGSTOP, SIGTERM, SIGTSTP,
-			SIGTTIN, SIGTTOU, SIGUSR1, SIGUSR2, SIGPOLL, SIGPROF, SIGSYS, SIGTRAP,
-			SIGURG, SIGVTALRM, SIGXCPU, SIGXFSZ})
+	for (const auto& signal :
+		 {SIGABRT, SIGALRM, SIGBUS,	 SIGCHLD, SIGCONT, SIGFPE,	SIGHUP,	 SIGILL,  SIGINT, SIGKILL, SIGPIPE, SIGQUIT,   SIGSEGV, SIGSTOP,
+		  SIGTERM, SIGTSTP, SIGTTIN, SIGTTOU, SIGUSR1, SIGUSR2, SIGPOLL, SIGPROF, SIGSYS, SIGTRAP, SIGURG,	SIGVTALRM, SIGXCPU, SIGXFSZ})
 	{
 		sigaction(signal, &sa, nullptr);
 	}

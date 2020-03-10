@@ -7,19 +7,16 @@
 |:---|:---|
 |[`BTree`](btree/index.md)||
 |[`Buffer`](buffer/index.md)||
-|[`CompuMethodIdentical`](compumethodidentical/index.md)||
+|[`ComputeMethodIdentical`](computemethodidentical/index.md)||
 |[`Expected`](expected/index.md)||
 |[`Expected< void, E >`](expected_void_e_/index.md)||
 |[`IChannel`](ichannel/index.md)||
 |[`IOChannel`](iochannel/index.md)||
 |[`IOChannelCommon`](iochannelcommon/index.md)||
-|[`IOStream`](iostream/index.md)||
-|[`IStream`](istream/index.md)||
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)|Flat map implementation.|
 |[`OChannel`](ochannel/index.md)||
 |[`Optional`](optional/index.md)||
-|[`OStream`](ostream/index.md)||
 |[`Pool`](pool/index.md)||
 |[`Queue`](queue/index.md)||
 |[`Registry`](registry/index.md)||
@@ -85,7 +82,7 @@ Non-leaf nodes are implemented as non-sorted arrays.
 |---:|:---|:---|
 |class T|None||
 ------
-### `class CompuMethodIdentical`
+### `class ComputeMethodIdentical`
 
 ------
 ### `template<class T, class E> class Expected`
@@ -120,20 +117,6 @@ Non-leaf nodes are implemented as non-sorted arrays.
 ### `class IOChannelCommon`
 
 ------
-### `template<class T> class IOStream`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> class IStream`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
 ### `class Log`
 
 ------
@@ -153,13 +136,6 @@ Flat map implementation.
 |class T|None||
 ------
 ### `template<class T> class Optional`
-
-#### Template
-||||
-|---:|:---|:---|
-|class T|None||
-------
-### `template<class T> class OStream`
 
 #### Template
 ||||

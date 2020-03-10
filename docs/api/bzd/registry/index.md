@@ -33,6 +33,7 @@ Note, this initialization scheme can be imediatly followed by object registratio
 |Function||
 |:---|:---|
 |[`get(const KeyType & key)`](./index.md)|Registry accessor.|
+|[`getOrCreate(const KeyType & key)`](./index.md)|Get a ressource or create one if it does not exists. In order to be created, the ressource must have a default constructor. This is a limitation to ensure reproductability.|
 ------
 ### `template<SizeType Capacity> class Declare`
 Declaration object for a fixed-size registry object.
@@ -50,6 +51,17 @@ Register a new object to its registery previously delcared.
 ------
 ### `static constexpr Interface & get(const KeyType & key)`
 Registry accessor.
+#### Parameters
+||||
+|---:|:---|:---|
+|const KeyType &|key||
+------
+### `template<class T> static Interface & getOrCreate(const KeyType & key)`
+Get a ressource or create one if it does not exists. In order to be created, the ressource must have a default constructor. This is a limitation to ensure reproductability.
+#### Template
+||||
+|---:|:---|:---|
+|class T|None||
 #### Parameters
 ||||
 |---:|:---|:---|

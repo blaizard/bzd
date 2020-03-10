@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/container/span.h"
 #include "bzd/container/expected.h"
+#include "bzd/container/span.h"
 #include "bzd/types.h"
 
 namespace bzd {
@@ -11,7 +11,7 @@ class IOChannelCommon
 {
 public:
 	virtual bzd::Expected<void> connect() { return {}; }
-	virtual bzd::Expected<void> disconnect(){ return {}; }
+	virtual bzd::Expected<void> disconnect() { return {}; }
 };
 
 template <class T>
@@ -21,6 +21,10 @@ protected:
 	OChannel() = default;
 
 public:
+	bzd::Expected<SizeType> write(const Span<const char>& data)
+	{
+		return write(Span<const T>(reinterpret_cast<const T*>(data.data()), data.size()));
+	}
 	virtual bzd::Expected<SizeType> write(const Span<const T>& data) noexcept = 0;
 	virtual bzd::Expected<SizeType> write(const T& data) noexcept { return write(Span<const T>(&data, 1)); }
 };
@@ -51,4 +55,5 @@ class IOChannel
 using OChannel = impl::OChannel<bzd::UInt8Type>;
 using IChannel = impl::IChannel<bzd::UInt8Type>;
 using IOChannel = impl::IOChannel<bzd::UInt8Type>;
+
 } // namespace bzd

@@ -15,6 +15,7 @@ Flat map implementation.
 |Function||
 |:---|:---|
 |[`Map(bzd::interface::Vector< Element > & data)`](./index.md)||
+|[`contains(const K & key) const`](./index.md)||
 |[`find(const K & key) const`](./index.md)||
 |[`insert(const K & key, V && value)`](./index.md)||
 |[`insert(const Iterator & it, V && value)`](./index.md)||
@@ -33,6 +34,13 @@ Flat map implementation.
 ||||
 |---:|:---|:---|
 |bzd::interface::Vector< Element > &|data||
+------
+### `constexpr bool contains(const K & key) const`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const K &|key||
 ------
 ### `constexpr bzd::Optional< Iterator > find(const K & key) const`
 Search for a specific element in the map.

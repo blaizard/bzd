@@ -5,6 +5,7 @@
 
 |Namespace||
 |:---|:---|
+|[`algorithm`](algorithm/index.md)||
 |[`assert`](assert/index.md)||
 |[`format`](format/index.md)||
 |[`impl`](impl/index.md)||
@@ -17,6 +18,7 @@
 |Class||
 |:---|:---|
 |[`Array`](array/index.md)|A container that encapsulates fixed size arrays.|
+|[`Artifact`](artifact/index.md)||
 |[`BTree`](btree/index.md)||
 |[`Log`](log/index.md)||
 |[`Map`](map/index.md)||
@@ -52,8 +54,6 @@
 |[`makeUnexpected(E && e)`](./index.md)||
 |[`max(const T & a)`](./index.md)||
 |[`max(const T & a, const T & b, const Ts &... n)`](./index.md)||
-|[`memcpy(void * dest, const void * src, const SizeType size)`](./index.md)||
-|[`memcpy(char * dest, const char * src, const SizeType size)`](./index.md)||
 |[`min(const T & a)`](./index.md)||
 |[`min(const T & a, const T & b, const Ts &... n)`](./index.md)||
 |[`move(T && arg)`](./index.md)||
@@ -77,11 +77,8 @@
 |[`Int8Type`](./index.md)|Signed integer type with a fixed width of 8-bit.|
 |[`IntPtrType`](./index.md)|Integer type capable of holding a memory pointer.|
 |[`IOChannel`](./index.md)|alias of [`bzd::impl::IOChannel`](impl/iochannel/index.md)|
-|[`IOStream`](./index.md)|alias of [`bzd::impl::IOStream`](impl/iostream/index.md)|
-|[`IStream`](./index.md)|alias of [`bzd::impl::IStream`](impl/istream/index.md)|
 |[`OChannel`](./index.md)|alias of [`bzd::impl::OChannel`](impl/ochannel/index.md)|
 |[`Optional`](./index.md)|Type managing an optional contained value, i.e. a value that may or may not be present.; alias of [`bzd::impl::Optional`](impl/optional/index.md)|
-|[`OStream`](./index.md)|alias of [`bzd::impl::OStream`](impl/ostream/index.md)|
 |[`PtrType`](./index.md)|Memory pointer type.|
 |[`SizeType`](./index.md)|Unsigned integer that can store the maximum size of a theoretically possible object of any type.|
 |[`StringView`](./index.md)|alias of [`bzd::impl::StringView`](impl/stringview/index.md)|
@@ -99,6 +96,9 @@ The container combines the performance and accessibility of a C-style array with
 |---:|:---|:---|
 |class T|None||
 |SizeType|N||
+------
+### `class Artifact`
+
 ------
 ### `template<class K, class V, SizeType N, SizeType Order> class BTree`
 
@@ -314,7 +314,7 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |typeTraits::RemoveReference< T > &&|t||
 ------
-### `bzd::OStream & getOut()`
+### `bzd::OChannel & getOut()`
 
 ------
 ### `template<class E> constexpr impl::Unexpected< bzd::typeTraits::Decay< E > > makeUnexpected(E && e)`
@@ -352,24 +352,6 @@ The class template span describes an object that can refer to a contiguous seque
 |const T &|a||
 |const T &|b||
 |const Ts &...|n||
-------
-### `constexpr void memcpy(void * dest, const void * src, const SizeType size)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|void *|dest||
-|const void *|src||
-|const SizeType|size||
-------
-### `constexpr void memcpy(char * dest, const char * src, const SizeType size)`
-
-#### Parameters
-||||
-|---:|:---|:---|
-|char *|dest||
-|const char *|src||
-|const SizeType|size||
 ------
 ### `template<class T> constexpr T min(const T & a)`
 
@@ -488,12 +470,6 @@ Integer type capable of holding a memory pointer.
 ### `typedef IOChannel`
 
 ------
-### `typedef IOStream`
-
-------
-### `typedef IStream`
-
-------
 ### `typedef OChannel`
 
 ------
@@ -503,9 +479,6 @@ Type managing an optional contained value, i.e. a value that may or may not be p
 ||||
 |---:|:---|:---|
 |class T|None||
-------
-### `typedef OStream`
-
 ------
 ### `typedef PtrType`
 Memory pointer type.

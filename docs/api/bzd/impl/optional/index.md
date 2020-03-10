@@ -55,7 +55,7 @@
 |---:|:---|:---|
 |const Value &|defaultValue||
 ------
-### `UInt8Type empty_`
+### `bzd::UInt8Type empty_`
 
 ------
 ### `ValueContainer value_`

@@ -1,7 +1,9 @@
 #include "bzd/core/assert.h"
-#include "bzd/core/system.h"
-#include "bzd/core/registry.h"
+
+#include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
+#include "bzd/core/registry.h"
+#include "bzd/core/system.h"
 
 namespace bzd { namespace assert {
 namespace impl {
@@ -17,17 +19,17 @@ bzd::OChannel& getOChannel()
 	return bzd::Registry<bzd::OChannel>::getOrCreate<Stub>("stdout");
 }
 
-void backend(const bzd::StringView& message1, const bzd::StringView& message2)
+void backend(const char* message1, const char* message2)
 {
 	auto& out = getOChannel();
-	out.write(bzd::Span<const UInt8Type>(reinterpret_cast<const unsigned char*>(message1.data()), message1.size()));
-	if (message2.size())
+	out.write(bzd::StringView{message1});
+	if (message2)
 	{
-		out.write(bzd::Span<const UInt8Type>(reinterpret_cast<const unsigned char*>(message2.data()), message2.size()));
+		out.write(bzd::StringView{message2});
 	}
 	bzd::panic();
 }
-}
+} // namespace impl
 
 void unreachable()
 {

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "bzd/algorithm/copy.h"
 #include "bzd/container/span.h"
 #include "bzd/container/string_view.h"
 #include "bzd/type_traits/add_const.h"
 #include "bzd/types.h"
-#include "bzd/algorithm/copy.h"
 #include "bzd/utility/min.h"
 
 namespace bzd {

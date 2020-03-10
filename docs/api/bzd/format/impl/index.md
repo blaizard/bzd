@@ -5,7 +5,7 @@
 
 |Namespace||
 |:---|:---|
-|[`@24`](_24/index.md)||
+|[`@25`](_25/index.md)||
 
 |Class||
 |:---|:---|
@@ -26,7 +26,7 @@
 |:---|:---|
 |[`contextBuild(const bzd::StringView & format, const T & tuple)`](./index.md)||
 |[`contextCheck(const Ctx & context, const T & tuple)`](./index.md)|Check the format context.|
-|[`fixedPoint(bzd::OStream & stream, const T & n, const SizeType maxPrecision)`](./index.md)||
+|[`fixedPoint(bzd::OChannel & stream, const T & n, const SizeType maxPrecision)`](./index.md)||
 |[`integer(interface::String & str, const T & n, const char *const digits)`](./index.md)||
 |[`parse(Ctx & context, bzd::StringView format, const T & args)`](./index.md)||
 |[`parseIndex(Ctx & context, bzd::StringView & format, const bzd::SizeType autoIndex)`](./index.md)||
@@ -34,12 +34,12 @@
 |[`parseSign(Ctx & context, bzd::StringView & format, Metadata & metadata)`](./index.md)||
 |[`parseStaticString(Ctx & context, bzd::StringView & format)`](./index.md)||
 |[`parseUnsignedInteger(bzd::StringView & format, bzd::SizeType & integer)`](./index.md)||
-|[`print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`](./index.md)||
-|[`printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|[`printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|[`toString(bzd::OStream & stream, const T & value, const Metadata & metadata)`](./index.md)||
-|[`toString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`](./index.md)||
-|[`toStringRuntime(bzd::OStream & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`](./index.md)||
+|[`print(bzd::OChannel & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`](./index.md)||
+|[`printFixedPoint(bzd::OChannel & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`printInteger(bzd::OChannel & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const T & value, const Metadata & metadata)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const bzd::StringView stringView, const Metadata & metadata)`](./index.md)||
+|[`toStringRuntime(bzd::OChannel & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`](./index.md)||
 ------
 ### `class CheckContext`
 
@@ -118,7 +118,7 @@ Check the format context with the argument type, this to ensure type safety. Thi
 |const Ctx &|context||
 |const T &|tuple||
 ------
-### `template<class T> constexpr void fixedPoint(bzd::OStream & stream, const T & n, const SizeType maxPrecision)`
+### `template<class T> constexpr void fixedPoint(bzd::OChannel & stream, const T & n, const SizeType maxPrecision)`
 
 #### Template
 ||||
@@ -127,7 +127,7 @@ Check the format context with the argument type, this to ensure type safety. Thi
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|n||
 |const SizeType|maxPrecision||
 ------
@@ -225,16 +225,16 @@ Parse an unsigned integer
 |bzd::StringView &|format||
 |bzd::SizeType &|integer||
 ------
-### `static void print(bzd::OStream & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`
+### `static void print(bzd::OChannel & stream, const bzd::StringView & format, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const bzd::StringView &|format||
 |const bzd::interface::Vector< const bzd::format::impl::Formatter * > &|args||
 ------
-### `template<class T> void printFixedPoint(bzd::OStream & stream, const T & value, const Metadata & metadata)`
+### `template<class T> void printFixedPoint(bzd::OChannel & stream, const T & value, const Metadata & metadata)`
 
 #### Template
 ||||
@@ -243,11 +243,11 @@ Parse an unsigned integer
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `template<class T> void printInteger(bzd::OStream & stream, const T & value, const Metadata & metadata)`
+### `template<class T> void printInteger(bzd::OChannel & stream, const T & value, const Metadata & metadata)`
 
 #### Template
 ||||
@@ -256,11 +256,11 @@ Parse an unsigned integer
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< bzd::typeTraits::isIntegral< T >, void > *> void toString(bzd::OStream & stream, const T & value, const Metadata & metadata)`
+### `template<class T, bzd::typeTraits::EnableIf< bzd::typeTraits::isIntegral< T >, void > *> void toString(bzd::OChannel & stream, const T & value, const Metadata & metadata)`
 
 #### Template
 ||||
@@ -270,20 +270,20 @@ Parse an unsigned integer
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|value||
 |const Metadata &|metadata||
 ------
-### `static void toString(bzd::OStream & stream, const bzd::StringView stringView, const Metadata & metadata)`
+### `static void toString(bzd::OChannel & stream, const bzd::StringView stringView, const Metadata & metadata)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const bzd::StringView|stringView||
 |const Metadata &|metadata||
 ------
-### `template<SizeType... I, class... Args> constexpr void toStringRuntime(bzd::OStream & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`
+### `template<SizeType... I, class... Args> constexpr void toStringRuntime(bzd::OChannel & out, const bzd::StringView & str, bzd::meta::range::Type< I... >, Args &&... args)`
 
 #### Template
 ||||
@@ -293,7 +293,7 @@ Parse an unsigned integer
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|out||
+|bzd::OChannel &|out||
 |const bzd::StringView &|str||
 |bzd::meta::range::Type< I... >|None||
 |Args &&...|args||

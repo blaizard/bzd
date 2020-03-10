@@ -11,27 +11,35 @@
 |:---|:---|
 |[`connect()`](./index.md)||
 |[`disconnect()`](./index.md)||
+|[`write(const Span< const char > & data)`](./index.md)||
 |[`write(const Span< const T > & data)`](./index.md)||
 |[`write(const T & data)`](./index.md)||
 ------
-### `virtual void connect()`
+### `virtual bzd::Expected< void > connect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual void disconnect()`
+### `virtual bzd::Expected< void > disconnect()`
 *From bzd::impl::IOChannelCommon*
 
 
 ------
-### `virtual SizeType write(const Span< const T > & data)`
+### `bzd::Expected< SizeType > write(const Span< const char > & data)`
+
+#### Parameters
+||||
+|---:|:---|:---|
+|const Span< const char > &|data||
+------
+### `virtual bzd::Expected< SizeType > write(const Span< const T > & data)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
 |const Span< const T > &|data||
 ------
-### `virtual SizeType write(const T & data)`
+### `virtual bzd::Expected< SizeType > write(const T & data)`
 
 #### Parameters
 ||||

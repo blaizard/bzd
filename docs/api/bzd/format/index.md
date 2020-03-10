@@ -9,18 +9,18 @@
 
 |Function||
 |:---|:---|
-|[`toString(bzd::OStream & out, const bzd::StringView & str, Args &&... args)`](./index.md)|String formating.|
-|[`toString(bzd::OStream & out, const ConstexprStringView & str, Args &&... args)`](./index.md)||
-|[`toString(bzd::OStream & stream, const T & data)`](./index.md)||
-|[`toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
-|[`toString(bzd::OStream & stream, const bzd::StringView & data)`](./index.md)||
-|[`toString(bzd::OStream & stream, const char c)`](./index.md)||
+|[`toString(bzd::OChannel & out, const bzd::StringView & str, Args &&... args)`](./index.md)|String formating.|
+|[`toString(bzd::OChannel & out, const ConstexprStringView & str, Args &&... args)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const T & data)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const T & data, const SizeType maxPrecision)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const bzd::StringView & data)`](./index.md)||
+|[`toString(bzd::OChannel & stream, const char c)`](./index.md)||
 |[`toString(bzd::interface::String & str, Args &&... args)`](./index.md)||
-|[`toStringBin(bzd::OStream & stream, const T & data)`](./index.md)||
-|[`toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`](./index.md)||
-|[`toStringOct(bzd::OStream & stream, const T & data)`](./index.md)||
+|[`toStringBin(bzd::OChannel & stream, const T & data)`](./index.md)||
+|[`toStringHex(bzd::OChannel & stream, const T & data, const char *const digits)`](./index.md)||
+|[`toStringOct(bzd::OChannel & stream, const T & data)`](./index.md)||
 ------
-### `template<class... Args> constexpr void toString(bzd::OStream & out, const bzd::StringView & str, Args &&... args)`
+### `template<class... Args> constexpr void toString(bzd::OChannel & out, const bzd::StringView & str, Args &&... args)`
 String formating.
 
 Lightweight and compilation time checking string formating utility. The syntax is compatible with Python format with some limitations.
@@ -48,11 +48,11 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|out|Output stream where the formating string will be written to. |
+|bzd::OChannel &|out|Output stream where the formating string will be written to. |
 |const bzd::StringView &|str|run-time or compile-time string containing the format. |
 |Args &&...|args|Arguments to be passed for the format. |
 ------
-### `template<class ConstexprStringView, class... Args> constexpr void toString(bzd::OStream & out, const ConstexprStringView & str, Args &&... args)`
+### `template<class ConstexprStringView, class... Args> constexpr void toString(bzd::OChannel & out, const ConstexprStringView & str, Args &&... args)`
 
 #### Template
 ||||
@@ -62,11 +62,11 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|out||
+|bzd::OChannel &|out||
 |const ConstexprStringView &|str||
 |Args &&...|args||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toString(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toString(bzd::OChannel & stream, const T & data)`
 
 #### Template
 ||||
@@ -76,10 +76,10 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|data||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isFloatingPoint< T >, void > *> constexpr void toString(bzd::OStream & stream, const T & data, const SizeType maxPrecision)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isFloatingPoint< T >, void > *> constexpr void toString(bzd::OChannel & stream, const T & data, const SizeType maxPrecision)`
 
 #### Template
 ||||
@@ -89,24 +89,24 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|data||
 |const SizeType|maxPrecision||
 ------
-### `void toString(bzd::OStream & stream, const bzd::StringView & data)`
+### `void toString(bzd::OChannel & stream, const bzd::StringView & data)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const bzd::StringView &|data||
 ------
-### `void toString(bzd::OStream & stream, const char c)`
+### `void toString(bzd::OChannel & stream, const char c)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const char|c||
 ------
 ### `template<class... Args> constexpr void toString(bzd::interface::String & str, Args &&... args)`
@@ -121,7 +121,7 @@ This is an after text
 |bzd::interface::String &|str||
 |Args &&...|args||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toStringBin(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toStringBin(bzd::OChannel & stream, const T & data)`
 
 #### Template
 ||||
@@ -131,10 +131,10 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|data||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, void > *> constexpr void toStringHex(bzd::OStream & stream, const T & data, const char *const digits)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, void > *> constexpr void toStringHex(bzd::OChannel & stream, const T & data, const char *const digits)`
 
 #### Template
 ||||
@@ -144,11 +144,11 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|data||
 |const char *const|digits||
 ------
-### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toStringOct(bzd::OStream & stream, const T & data)`
+### `template<class T, bzd::typeTraits::EnableIf< typeTraits::isIntegral< T >, T > *> constexpr void toStringOct(bzd::OChannel & stream, const T & data)`
 
 #### Template
 ||||
@@ -158,5 +158,5 @@ This is an after text
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const T &|data||

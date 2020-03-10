@@ -20,7 +20,7 @@ Declaration object for a fixed-size registry object.
 ### `constexpr Declare()`
 
 ------
-### `static constexpr MapType & get()`
+### `static constexpr bzd::Expected< MapType &, const char * > get()`
 *From bzd::impl::Registry*
 
 

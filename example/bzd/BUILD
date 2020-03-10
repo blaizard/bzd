@@ -2,15 +2,15 @@ load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest", "bzd_pack")
 
 bzd_manifest(
     name = "config_manifest",
+    artifacts = {
+        "message.txt": "test",
+    },
     manifest = glob([
         "config.manifest",
     ]) + select({
         "@esp32_xtensa_lx6_gcc//:target": ["config_esp32_xtensa_lx6.manifest"],
         "//conditions:default": ["config_others.manifest"],
     }),
-    artifacts = {
-        "message.txt": "test"
-    },
     deps = [],
 )
 

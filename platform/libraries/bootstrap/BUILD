@@ -3,8 +3,6 @@ load("@bazel_skylib//lib:selects.bzl", "selects")
 
 cc_library(
     name = "bootstrap",
-    visibility = ["//visibility:public"],
-    alwayslink = True,
     srcs = selects.with_or({
         (
             "//tools/bazel.build/config:x86_64",
@@ -12,4 +10,6 @@ cc_library(
         ): ["bootstrap_x86_64.cpp"],
         "//conditions:default": [],
     }),
+    visibility = ["//visibility:public"],
+    alwayslink = True,
 )

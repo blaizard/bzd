@@ -5,17 +5,17 @@
 
 |Function||
 |:---|:---|
-|[`PrintContext(bzd::OStream & stream, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`](./index.md)||
+|[`PrintContext(bzd::OChannel & stream, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`](./index.md)||
 |[`addMetadata(const Metadata & metadata)`](./index.md)||
 |[`addSubstring(const bzd::StringView & str)`](./index.md)||
 |[`onError(const bzd::StringView & message) const`](./index.md)||
 ------
-### `constexpr PrintContext(bzd::OStream & stream, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`
+### `constexpr PrintContext(bzd::OChannel & stream, const bzd::interface::Vector< const bzd::format::impl::Formatter * > & args)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|stream||
+|bzd::OChannel &|stream||
 |const bzd::interface::Vector< const bzd::format::impl::Formatter * > &|args||
 ------
 ### `void addMetadata(const Metadata & metadata)`

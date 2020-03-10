@@ -1,8 +1,5 @@
 #pragma once
 
-#include "bzd/container/string_view.h"
-#include "bzd/core/system.h"
-
 namespace bzd { namespace assert {
 namespace impl {
 inline void assertHelper(bool test)
@@ -10,7 +7,7 @@ inline void assertHelper(bool test)
 	throw "Assert error";
 }
 
-void backend(const bzd::StringView& message1, const bzd::StringView& message2 = {});
+void backend(const char* message1, const char* message2 = nullptr);
 
 } // namespace impl
 
@@ -27,7 +24,7 @@ constexpr void isTrue(const bool condition)
 	}
 }
 
-constexpr void isTrue(const bool condition, const bzd::StringView& message)
+constexpr void isTrue(const bool condition, const char* message)
 {
 	if (!condition)
 	{

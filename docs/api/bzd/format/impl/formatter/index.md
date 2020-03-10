@@ -5,12 +5,12 @@ Type removal of the type-specific formatter.
 
 |Function||
 |:---|:---|
-|[`print(bzd::OStream & os, const Metadata & metadata) const`](./index.md)||
+|[`print(bzd::OChannel & os, const Metadata & metadata) const`](./index.md)||
 ------
-### `virtual void print(bzd::OStream & os, const Metadata & metadata) const`
+### `virtual void print(bzd::OChannel & os, const Metadata & metadata) const`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::OStream &|os||
+|bzd::OChannel &|os||
 |const Metadata &|metadata||
