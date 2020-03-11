@@ -2,6 +2,8 @@
 
 // Algorithm
 #include "bzd/algorithm/copy.h"
+#include "bzd/algorithm/copy_n.h"
+#include "bzd/algorithm/reverse.h"
 
 // Container
 #include "bzd/container/array.h"
@@ -15,7 +17,7 @@
 #include "bzd/container/queue.h"
 #include "bzd/container/span.h"
 #include "bzd/container/string.h"
-#include "bzd/container/string_stream.h"
+#include "bzd/container/string_channel.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/variant.h"
@@ -84,6 +86,7 @@
 // Utility
 #include "bzd/utility/aligned_storage.h"
 #include "bzd/utility/container_of.h"
+#include "bzd/utility/bit.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/max.h"
 #include "bzd/utility/min.h"

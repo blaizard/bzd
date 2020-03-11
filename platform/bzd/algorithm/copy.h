@@ -2,12 +2,12 @@
 
 namespace bzd { namespace algorithm {
 template <class InputIt, class OutputIt>
-constexpr OutputIt copy(InputIt first, InputIt last, OutputIt dFirst)
+constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result)
 {
 	while (first != last)
 	{
-		*dFirst++ = *first++;
+		*result++ = *first++;
 	}
-	return dFirst;
+	return result;
 }
 }} // namespace bzd::algorithm

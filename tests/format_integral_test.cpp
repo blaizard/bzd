@@ -45,7 +45,7 @@ TEST(ToString, Float)
 
 TEST(ToString, ToStringBin)
 {
-	bzd::StringStream<128> stream;
+	bzd::StringChannel<128> stream;
 
 	stream.str().clear();
 	bzd::format::toStringBin(stream, 16);

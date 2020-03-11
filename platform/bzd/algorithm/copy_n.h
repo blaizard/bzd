@@ -1,0 +1,19 @@
+#pragma once
+
+#include "bzd/types.h"
+
+namespace bzd { namespace algorithm {
+template <class InputIt, class OutputIt>
+constexpr OutputIt copyN(InputIt first, const SizeType size, OutputIt result)
+{
+	if (size > 0)
+	{
+		*result++ = *first;
+		for (SizeType i = 1; i < size; ++i)
+		{
+			*result++ = *++first;
+		}
+	}
+	return result;
+}
+}} // namespace bzd::algorithm

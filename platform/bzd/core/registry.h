@@ -2,7 +2,7 @@
 
 #include "bzd/container/expected.h"
 #include "bzd/container/map.h"
-#include "bzd/container/string_stream.h"
+#include "bzd/container/string_view.h"
 #include "bzd/core/assert.h"
 #include "bzd/types.h"
 #include "bzd/utility/singleton.h"

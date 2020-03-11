@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/algorithm/copy.h"
+#include "bzd/algorithm/copy_n.h"
 #include "bzd/container/buffer.h"
 #include "bzd/types.h"
 
@@ -100,12 +100,21 @@ public:
 	static constexpr const Type get(const bzd::ConstBuffer& data)
 	{
 		typename SignalInternals::ExtractedType extracted;
-		bzd::algorithm::copy(&data.at(startByte_), &data.at(startByte_) + sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
+		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
 		const typename SignalInternals::Type type = (extracted >> shiftBits_) & mask_;
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}
 
-	static constexpr void set(bzd::Buffer& /*data*/, const Type& /*value*/) {}
+	static constexpr void set(bzd::Buffer& data, const Type& value)
+	{
+		typename SignalInternals::ExtractedType extracted;
+		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
+		extracted &= ~(mask_ << shiftBits_);
+
+		const typename SignalInternals::Type valueTyped = CompuMethod::template toBuffer<Type, decltype(valueTyped)>(value);		
+		extracted |= ((static_cast<decltype(extracted)>(valueTyped) & mask_) << shiftBits_);
+		bzd::algorithm::copyN(reinterpret_cast<bzd::UInt8Type*>(&extracted), sizeof(extracted), &data.at(startByte_));
+	}
 };
 
 } // namespace bzd
