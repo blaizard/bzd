@@ -1,10 +1,9 @@
 #pragma once
 
 #include "bzd/algorithm/copy_n.h"
+#include "bzd/algorithm/reverse.h"
 #include "bzd/container/buffer.h"
 #include "bzd/types.h"
-
-#include <iostream>
 
 namespace bzd {
 namespace impl {
@@ -94,6 +93,11 @@ private:
 	static constexpr typename SignalInternals::ExtractedType mask_ = 0xffffffffffffffff >> (64 - SizeBits);
 
 	static_assert(sizeof(Type) >= sizeByte_, "Type container is smaller than the requested signal size.");
+
+	constexpr void adjustEndianess(typename SignalInternals::Type& value)
+	{
+		bzd::algorithm::reverse(reinterpret_cast<bzd::UInt8Type*>(&value), reinterpret_cast<bzd::UInt8Type*>(&value) + sizeof(typename SignalInternals::Type));
+	}
 
 public:
 	// Need to handle different endianess
