@@ -79,6 +79,11 @@ public:
 	const char* valueToString() const { return buffer_; }
 
 private:
+	constexpr char charToString(const char c)
+	{
+		return (c >= 32 && c < 127) ? c : '?';
+	}
+
 	char* valueToString(char* pBuffer, short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
 	char* valueToString(char* pBuffer, int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
 	char* valueToString(char* pBuffer, long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
@@ -129,7 +134,13 @@ private:
 	char* valueToString(char* pBuffer, unsigned char value) { return valueToString(pBuffer, static_cast<char>(value)); }
 	char* valueToString(char* pBuffer, char value)
 	{
-		*pBuffer++ = value;
+		*pBuffer++ = charToString(value);
+		*pBuffer++ = ' ';
+		*pBuffer++ = '(';
+		*pBuffer++ = '0';
+		*pBuffer++ = 'x';
+		pBuffer = valueToString(pBuffer, static_cast<int>(value), 16);
+		*pBuffer++ = ')';
 		*pBuffer++ = '\0';
 		return pBuffer;
 	}
@@ -171,7 +182,7 @@ private:
 		for (int maxChar = 0; maxChar < 64 && *value; ++maxChar)
 		{
 			const char c = *value++;
-			*pBuffer++ = (c >= 32 && c < 127) ? c : '?';
+			*pBuffer++ = charToString(c);
 		}
 		if (*value)
 		{

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "bzd/algorithm/reverse.h"
 #include "bzd/container/string.h"
-#include "bzd/container/string_stream.h"
+#include "bzd/container/string_channel.h"
 #include "bzd/container/vector.h"
 #include "bzd/core/channel.h"
 #include "bzd/type_traits/is_floating_point.h"
@@ -36,7 +37,7 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 		}
 	}
 	str.resize(index);
-	str.reverse();
+	bzd::algorithm::reverse(str.begin(), str.end());
 }
 
 template <class T>
@@ -146,7 +147,7 @@ template <class... Args>
 constexpr void toString(bzd::interface::String& str, Args&&... args)
 {
 	str.clear();
-	bzd::interface::StringStream sstream(str);
-	toString(static_cast<bzd::OChannel&>(sstream), bzd::forward<Args>(args)...);
+	bzd::interface::StringChannel stream(str);
+	toString(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
 }
 }} // namespace bzd::format

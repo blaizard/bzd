@@ -6,10 +6,10 @@
 
 namespace bzd {
 namespace impl {
-class StringStream : public bzd::OChannel
+class StringChannel : public bzd::OChannel
 {
 public:
-	constexpr StringStream(bzd::interface::String& str) : string_(str) {}
+	constexpr StringChannel(bzd::interface::String& str) : string_(str) {}
 
 	bzd::Expected<SizeType> write(const bzd::StringView& data) noexcept
 	{
@@ -31,14 +31,14 @@ protected:
 } // namespace impl
 
 namespace interface {
-using StringStream = bzd::impl::StringStream;
+using StringChannel = bzd::impl::StringChannel;
 }
 
 template <SizeType N>
-class StringStream : public bzd::interface::StringStream
+class StringChannel : public bzd::interface::StringChannel
 {
 public:
-	constexpr StringStream() : bzd::interface::StringStream(container_), container_() {}
+	constexpr StringChannel() : bzd::interface::StringChannel(container_), container_() {}
 
 private:
 	bzd::String<N> container_;

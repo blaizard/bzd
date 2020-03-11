@@ -32,7 +32,7 @@ void Manager::failInternals(const char* const file, const int line, const char* 
 	::std::cout << file;
 	if (line > -1)
 	{
-		::std::cout << ":" << line;
+		::std::cout << ":" << std::dec << line;
 	}
 
 	::std::cout << ": " << message << "\n";
@@ -72,7 +72,7 @@ bool bzd::test::Manager::run()
 {
 	::std::vector<const TestInfo*> failedTests;
 
-	::std::cout << "[==========] Running test(s) from " << tests_.size() << " test case(s)" << ::std::endl;
+	::std::cout << "[==========] Running test(s) from " << std::dec << tests_.size() << " test case(s)" << ::std::endl;
 
 	for (const auto& it1 : tests_)
 	{

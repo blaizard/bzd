@@ -3,7 +3,7 @@
 int main()
 {
 	bzd::String<32> str;
-	bzd::interface::StringStream sstream(str);
+	bzd::interface::StringChannel sstream(str);
 
 	bzd::format::toString(str, 12);
 	bzd::getOut().write(str);

@@ -20,7 +20,7 @@ public:
 	}
 
 	template <class Q, bzd::typeTraits::EnableIf<sizeof(Q) == 1, void>* = nullptr>
-	constexpr Buffer(Q* data, const SizeType size) : bzd::Span<T>(reinterpret_cast<const T*>(data), size)
+	constexpr Buffer(Q* data, const SizeType size) : bzd::Span<T>(reinterpret_cast<T*>(data), size)
 	{
 	}
 };

@@ -61,15 +61,6 @@ public:
 
 	constexpr SizeType size() const noexcept { return size_; }
 
-	constexpr void reverse() noexcept
-	{
-		SizeType counter = size_ / 2;
-		while (counter--)
-		{
-			bzd::swap(data_[counter], data_[size_ - counter - 1]);
-		}
-	}
-
 	// Equality operator
 
 	constexpr bool operator==(const SelfType& rhs) const
