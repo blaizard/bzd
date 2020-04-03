@@ -1,9 +1,11 @@
-def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], files = None, command = "{binary}"):
+def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
     executable = binary.files_to_run.executable
 
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
         files = [executable] + extra_runfiles,
+        symlinks = symlinks,
+        root_symlinks = root_symlinks,
     )
     runfiles = runfiles.merge(binary.default_runfiles)
 
@@ -17,6 +19,8 @@ def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], files = Non
         is_executable = True,
         content = command_pre + command.format(
             binary = binary_path,
+            root = "${{RUNFILES_DIR}}",
+            workspace = "${{RUNFILES_DIR}}/{}".format(ctx.workspace_name),
         ),
     )
 
@@ -32,6 +36,8 @@ def _sh_binary_wrapper_impl(ctx):
         binary = ctx.attr.binary,
         output = ctx.outputs.executable,
         extra_runfiles = ctx.files.data,
+        symlinks = ctx.attr.symlinks,
+        root_symlinks = ctx.attr.root_symlinks,
         command = ctx.attr.command,
     )
 
@@ -56,6 +62,8 @@ sh_binary_wrapper = rule(
         "data": attr.label_list(
             allow_files = True,
         ),
+        "symlinks": attr.label_keyed_string_dict(),
+        "root_symlinks": attr.label_keyed_string_dict(),
     },
     executable = True,
 )

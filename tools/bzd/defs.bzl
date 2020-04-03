@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/bazel.build:defs.bzl", "sh_binary_wrapper_impl")
+load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 # Custom provider for a manifest
 BzdManifestInfo = provider(fields = ["manifest", "artifacts"])
