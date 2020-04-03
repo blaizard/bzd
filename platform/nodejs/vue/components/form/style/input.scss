@@ -1,0 +1,89 @@
+.irform-input {
+	display: flex;
+	overflow: hidden;
+
+	.irform-input-pre,
+	.irform-input-post,
+	.irform-input-data,
+	.irform-input-multi,
+	.irform-input-body {
+		@extend %field-reset;
+		width: auto;
+	}
+
+	.irform-input-pre {
+		padding-right: 0;
+	}
+	.irform-input-post {
+		padding-left: 0;
+	}
+	.irform-input-multi,
+	.irform-input-body {
+		padding: 0;
+		background-color: transparent;
+	}
+
+	.irform-input-data {
+		flex: 1;
+		width: 100%;
+		overflow: hidden;
+		display: flex;
+		flex-flow: row wrap;
+
+		.irform-input-multi {
+			user-select: none;
+			margin-right: 4px;
+			position: relative;
+
+			.irform-input-multi-item {
+				padding: 2px 5px 2px 5px;
+				background-color: $fieldSpecialBgColor;
+				color: $fieldSpecialTextColor;
+				border-radius: 3px;
+				white-space: nowrap;
+				@extend %clickable;
+
+				.irform-input-multi-delete {
+					@include buttonClose($fieldTextHeight / 1.5, $fieldSpecialTextColor);
+				}
+			}
+		}
+
+		.irform-input-body {
+			flex: 1;
+			white-space: nowrap;
+			@extend %placeholder;
+		}
+	}
+
+
+	padding: 0;
+	@extend %field-reset;
+	@extend %border;
+}
+
+// Error
+.irform-error .irform-input,
+.irform-input.irform-error {
+	@extend %error;
+	@extend %error-border;
+}
+
+
+// Success
+.irform-success .irform-input,
+.irform-input.irform-success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.irform-disable .irform-input,
+.irform-input.irform-disable,
+.irform-input:disabled,
+.irform-disable .irform-input > *,
+.irform-input.irform-disable > *,
+.irform-input:disabled > * {
+	@extend %disable;
+	@extend %disable-border;
+}

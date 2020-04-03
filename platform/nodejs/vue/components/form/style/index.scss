@@ -1,0 +1,396 @@
+/**
+ * This file is the entry point of the style directory.
+ * All form inputs responds to the following class and must therefore be implemented.
+ * The class can also be inherited from one of their parents.
+ * - irform-success: when the form field successfully validate
+ * - irform-error: when it become an error
+ * - irform-disable: when the field is disabled
+ */
+
+// ---- Configuration ----
+
+$font: "Helvetica";
+
+$captionTextColor: #111;
+
+$fieldPaddingX: 6 !default;
+$fieldPaddingY: 0 !default;
+$fieldHeight: 32 !default;
+$fieldTextHeight: 16 !default;
+$fieldTextColor: #777 !default;
+$fieldPlaceholderColor: #ccc !default;
+$fieldSpecialTextColor: #fff !default;
+$fieldSpecialBgColor: #75b9e7 !default;
+$fieldBgColor: #fff !default;
+$fieldBorderThickness: 1 !default;
+$fieldBorderColor: #ddd !default;
+$fieldBorderRadius: 2 !default;
+$fieldBorderMultiColor: #eee !default;
+$fieldBgColor: #fff !default;
+$tableBorderColor: #ddd !default;
+$toolbarHeight: 40 !default;
+
+$actionerTextColor: #333 !default;
+$actionerBgColor: #eee !default;
+
+$focusColor: #ccc !default;
+
+$errorColor: #dc143c !default;
+$successColor: #3cb371 !default;
+$disableColor: #ddd !default;
+$disableTextColor: #999 !default;
+$disableBgColor: #eee !default;
+
+@mixin irform-border {
+	border: #{$fieldBorderThickness}px solid $fieldBorderColor;
+	border-radius: #{$fieldBorderRadius}px;	
+}
+
+@mixin irform-focus {
+	border-color: transparent;
+	outline: 1px dashed $focusColor !important;
+}
+
+// ---- Functions ----
+
+/**
+ * Reset attribute of a component
+ */
+.irform {
+	@extend %reset;
+}
+
+%reset {
+	font-family: $font;
+	font-size: #{$fieldTextHeight}px;
+	min-height: #{$fieldHeight}px;
+	line-height: #{$fieldHeight}px;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	outline: none;
+	border: none;
+	vertical-align: middle;
+	display: inline-block;
+	width: auto;
+	appearance: none;
+	background-clip: padding-box;
+}
+
+%field-reset {
+	@extend %reset;
+	color: $fieldTextColor;
+	background-color: $fieldBgColor;
+	width: 100%;
+	padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
+}
+
+%actioner-reset {
+	@extend %reset;
+	color: $actionerTextColor;
+	background-color: $actionerBgColor;
+	padding: 0 6px;
+}
+
+/**
+ * Set this attribute if the element is intended to be multiline
+ */
+%multi-line {
+	overflow: hidden;
+	height: auto;
+	line-height: #{$fieldTextHeight * 1.1}px;
+	padding-top: #{($fieldHeight - $fieldTextHeight * 1.1) / 2}px;
+}
+
+/**
+ * Generate the field borders
+ */
+%border {
+	box-shadow: none;
+	outline: none;
+	@include irform-border;
+	overflow: hidden;
+
+	&:focus,
+	&:focus-within {
+		@extend %focus;
+	}
+}
+
+%border-multi-line {
+	@extend %border;
+	@include irform-border;
+}
+
+%border-clickable {
+	@extend %border;
+	@extend %clickable;
+
+	box-shadow: 0 3px 5px 0 #888;
+	border-bottom: 2px solid #aaa;
+	border-radius: 2px;
+	margin-bottom: 2px;
+
+	&:active {
+		margin-bottom: 0;
+		margin-top: 2px;
+		border-bottom: none;
+		box-shadow: none;
+	}
+}
+
+/**
+ * If applied, this rule will cancel the border rules previously set
+ */
+%border-reset {
+	border: 1px solid transparent !important;
+	box-shadow: none !important;
+	&:hover {
+		box-shadow: 0 0 0 0 $fieldBorderColor !important;
+	}
+	&:focus,
+	&:focus-within {
+		box-shadow: 0 0 0 0 $fieldBorderColor !important;
+		@extend %focus-reset;
+	}
+	&:active {
+		margin-top: 0 !important;
+	}
+}
+
+/**
+ * For fields that are intended to be clickable
+ * \note The effect should only affect the background-image to avoid any
+ * conflicts with the elements.
+ */
+%clickable {
+	cursor: pointer;
+
+	transition: background-size .2s ease-out;
+
+	background-position: center; 
+	background-size: 100% 100%;
+
+	user-select: none; 
+
+	@keyframes clickableAnimation {
+		0% {
+			background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.16) 9%, transparent 10%, transparent 11%);
+		}
+
+		@for $i from 1 through 10 {
+			#{$i * 10}% {
+				background-image: radial-gradient(circle at center, rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%, transparent 10%, transparent 11%);
+				background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
+			}
+		}
+	}
+
+	@keyframes clickableClickAnimation {
+		0% {
+			background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.16) 9%, transparent 10%, transparent 11%);
+		}
+
+		@for $i from 1 through 10 {
+			#{$i * 10}% {
+				background-image: radial-gradient(circle at center, rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%, transparent 10%, transparent 11%);
+				background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
+			}
+		}
+	}
+
+	&:hover,
+	&:focus {
+		animation: clickableAnimation .25s 1;
+		animation-fill-mode: forwards;
+		opacity: 1;
+	}
+
+	&:active {
+		animation: clickableClickAnimation .25s 1;
+		animation-delay: 1s;
+		animation-fill-mode: forwards;
+		opacity: 1;
+	}
+
+	&:active {
+		background-image: none;
+	}
+}
+
+/**
+ * For draggable elements
+ */
+%draggable {
+	cursor: move;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-drag: none;
+	user-drag: none;
+	-webkit-touch-callout: none;
+}
+
+/**
+ * For an element that supports placeholder through the attribute data-placeholder
+ */
+%placeholder {
+	// :not(:focus)is a hack for Firefox, as the caret position on an empty element
+	// have some issues otherwise, see https://bugzilla.mozilla.org/show_bug.cgi?id=904846
+	&:not(:focus):empty:before,
+	&::placeholder {
+		content: attr(data-placeholder);
+		color: $fieldPlaceholderColor;
+		white-space: nowrap;
+	}
+}
+
+/**
+ * For element that have a scrollbar
+ */
+%scrollbar {
+	&::-webkit-scrollbar {
+		width: #{$fieldTextHeight / 2}px;
+		background-color: $disableBgColor;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $disableColor;
+	}
+}
+
+/**
+ * Button template
+ */
+@mixin button($width, $color, $bgColor: transparent) {
+	position: relative;
+	width: #{$width}px;
+	height: #{$width}px;
+	cursor: pointer;
+	color: $color;
+	user-select: none;
+	opacity: 0.5;
+	display: inline-block;
+	vertical-align: middle;
+
+	// Background
+	border-radius: #{$width}px;
+	background-color: $bgColor;
+
+	@extend %clickable;
+}
+
+/**
+ * Close button
+ */
+@mixin buttonClose($width, $color, $crossWidth: $width, $bgColor: transparent, $crossThickness: 2) {
+	@include button($width, transparent, $bgColor)
+	&:before,
+	&:after {
+		position: absolute;
+		top: #{($width - $crossWidth) / 2}px;
+		left: #{($width - $crossThickness) / 2}px;
+		content: ' ';
+		height: #{$crossWidth}px;
+		width: #{$crossThickness}px;
+		background-color: $color;
+	}
+	&:before {
+		transform: rotate(45deg);
+	}
+	&:after {
+		transform: rotate(-45deg);
+	}
+}
+
+/**
+ * Arrow button
+ */
+@mixin buttonArrow($direction, $width, $color, $eltWidth, $bgColor: transparent, $eltThickness: 2) {
+	@include button($width, transparent, $bgColor)
+	&:before {
+		box-sizing: border-box;
+		position: absolute;
+		top: #{($width - $eltWidth) / 2}px;
+		left: #{($width - $eltWidth) / 2}px;
+		content: ' ';
+		height: #{$eltWidth}px;
+		width: #{$eltWidth}px;
+		border-top: #{$eltThickness}px solid $color;
+		border-right: #{$eltThickness}px solid $color;
+		@if $direction == left {
+			transform: rotate(-135deg);
+		} @else if $direction == right {
+			transform: rotate(45deg);
+		}
+	}
+}
+
+/**
+ * Error
+ */
+%error {
+	color: $errorColor;
+}
+%error-border {
+	border-color: $errorColor;
+}
+
+/**
+ * Success
+ */
+%success {
+	color: $successColor;
+}
+%success-border {
+	border-color: $successColor;
+}
+
+/**
+ * Disable
+ */
+%disable {
+	color: $disableTextColor;
+	cursor: not-allowed !important;
+}
+%disable-border {
+	border-color: $disableColor;
+	background-color: $disableBgColor;
+	box-shadow: none;
+	outline: none;
+	&:hover,
+	&:focus,
+	&:active {
+		box-shadow: none !important;
+		outline: none !important;
+		background-image: none !important;
+	}
+}
+
+/**
+ * Class to set when an element hass the focus
+ */
+%focus {
+	@include irform-focus;
+}
+
+%focus-reset {
+	outline: none !important;
+}
+
+/**
+ * Import the various supported fields
+ */
+@import "layout.scss";
+@import "icon.scss";
+@import "input.scss";
+@import "button.scss";
+@import "checkbox.scss";
+@import "textarea.scss";
+@import "dropdown.scss";
+@import "autocomplete.scss";
+@import "array.scss";
+@import "table.scss";
+@import "file.scss";
+@import "carousel.scss";
+@import "editor.scss";

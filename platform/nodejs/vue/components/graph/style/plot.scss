@@ -1,0 +1,46 @@
+.irgraph-plot {
+	.irgraph-plot-content {
+
+		svg {
+			.irgraph-plot-grid-x,
+			.irgraph-plot-grid-y,
+			.irgraph-plot-labels-x,
+			.irgraph-plot-labels-y {
+				stroke: #aaa;
+				stroke-dasharray: 0;
+				stroke-width: 1;
+				font-size: 12px;
+			}
+
+			.irgraph-plot-cursor {
+				stroke: #222;
+				stroke-dasharray: 1 1;
+				stroke-width: 1;
+			}
+
+			.irgraph-plot-items {
+				.irgraph-plot-item {
+					@each $color in $irgraphColors {
+						$i: index($irgraphColors, $color);
+						&:nth-child(#{$i}) {
+							.circle {
+								stroke: $color;
+								stroke-width: 8px;
+								stroke-linecap: round;
+								cursor: pointer;
+
+								&:hover {
+									stroke-width: 12px;
+								}
+							}
+							.path {
+								stroke: $color;
+								stroke-width: 2px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,60 @@
+.irform-editor {
+	width: 100%;
+
+	.irform-editor-toolbar {
+		background-color: $fieldBgColor;
+
+		.irform-carousel-slides {
+			// ---- Toolbar elements ------------------------------------------
+
+			.irform-editor-toolbar-separator {
+				background-color: $fieldTextColor;
+				opacity: 0.5;
+				width: 1px;
+				height: #{$fieldHeight * 0.8}px;
+			}
+
+			.irform-editor-toolbar-element {
+				@extend %field-reset;
+				@extend %clickable;
+				background-color: transparent !important;
+				line-height: #{$toolbarHeight}px;
+				min-width: #{$toolbarHeight}px;
+				height: #{$toolbarHeight}px;
+				text-align: center;
+				color: $fieldTextColor;
+			}
+		}
+
+		.irform-carousel-container {
+			border: none !important;
+			outline: none !important;
+			background-color: transparent !important;
+
+			.irform-carousel-slide {
+				opacity: 1;
+			}
+		}
+	}
+
+	.irform-editor-content {
+	}
+}
+
+// Disable
+.irform-disable .irform-editor-toolbar {
+	background-color: $disableBgColor !important;
+	@extend %disable;
+
+	.irform-carousel-slides {	
+		.irform-editor-toolbar-separator {
+			background-color: $disableColor !important;
+		}
+
+		.irform-editor-toolbar-element {
+			color: $disableColor !important;
+			@extend %disable;
+			@extend %disable-border;
+		}
+	}
+}

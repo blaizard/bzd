@@ -1,0 +1,17 @@
+const Path = require("path");
+const Webpack = require("./platform/nodejs/webpack.js");
+
+const config = {
+	entries: {
+		{entries}
+	},
+	publicPath: "{public_path}",
+	alias: {
+		{aliases}
+	},
+	templates: {
+		{templates}
+	}
+};
+
+module.exports = Webpack.generate(config);

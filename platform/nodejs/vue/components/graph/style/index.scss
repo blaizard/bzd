@@ -1,0 +1,109 @@
+$irgraphBgColor: transparent;
+$irgraphColors: #ff6347, #3498db, #f39c12, #2ecc71, #f4d03f, #707b7c, #3498db, #ba55d3;
+$irgraphDefaultColor: #ff6347;
+
+%selected {
+	opacity: 0.5;
+}
+
+/**
+ * Layout
+ */
+
+$font-size: 16;
+
+.irgraph {
+	display: flex;
+	flex-flow: row nowrap;
+	font-size: #{$font-size}px;
+	line-height: 1.5em;
+	width: 100%;
+	height: 100%;
+
+	/**
+	 * Style & layout for the content and legend
+	 */
+	> * {
+
+		padding: 0;
+		margin: 0;
+		height: 100%;
+		white-space: nowrap;
+	}
+
+	/**
+	 * Hise an element, used to measure some text dimensions
+	 */
+	.irgraph-hide {
+		display: inline-block;
+		padding: 0;
+		margin: 0;
+		opacity: 0;
+	}
+
+	.irgraph-legend {
+		.irgraph-legend-items {
+			display: inline-block;
+			padding-left: 20px;
+			vertical-align: middle;
+			line-height: 1.5em;
+
+			.irgraph-legend-item {
+				white-space: nowrap;
+				cursor: pointer;
+
+				&.irgraph-selected {
+					@extend %selected;
+				}
+
+				.irgraph-legend-item-color {
+					display: inline-block;
+					width: 1em;
+					height: 1em;
+					vertical-align: text-bottom;
+					background-color: $irgraphDefaultColor;
+				}
+
+				overflow: hidden;
+
+				@each $color in $irgraphColors {
+					$i: index($irgraphColors, $color);
+					&:nth-child(#{$i}) {
+						.irgraph-legend-item-color {
+							background-color: $color;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Layouts
+
+	/**
+	 * legend-right
+	 */
+	&.irgraph-layout-legend-right {
+		.irgraph-content {
+			flex: 1;
+			overflow: hidden;
+		}
+	}
+
+	/**
+	 * legend-left
+	 */
+	 &.irgraph-layout-legend-left {
+		flex-direction: row-reverse;
+		.irgraph-content {
+			flex: 1;
+			overflow: hidden;
+		}
+	}
+}
+
+/**
+ * Import the various supported graph types
+ */
+ @import "donut.scss";
+ @import "plot.scss";

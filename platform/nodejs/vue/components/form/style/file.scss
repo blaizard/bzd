@@ -1,0 +1,98 @@
+$borderWidth: 5;
+$height: 150;
+
+body.irform-file-drag .irform-array-file {
+	* {
+		opacity: 0;
+	}
+	border: #{$fieldBorderThickness}px dashed $fieldBorderColor;
+	position: relative;
+	&:before {
+		color: $fieldBorderColor;
+		content: "Drag & drop here";
+		position: absolute;
+		width: 100%;
+		text-align: center;
+	}
+}
+
+.irform-array-item-draggable {
+	.irform-file {
+		@extend %draggable;
+	}
+}
+
+.irform-file {
+	@extend %field-reset;
+
+	border: 1px solid $fieldBorderMultiColor;
+
+	min-width: #{$height}px;
+	height: #{$height}px;
+	position: relative;
+	padding: #{$borderWidth}px;
+	margin: 2px;
+	width: auto;
+
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	justify-content: center;
+
+	&.irform-file-image {
+		img {
+			max-height: 100%;
+			max-width: 100%;
+		}
+	}
+
+	&.irform-file-file,
+	&.irform-file-upload {
+		max-width: #{$height * 2}px;
+		svg {
+			height: #{$height - $borderWidth * 2 - $fieldHeight * 2}px;
+			color: $disableBgColor;
+			stroke: currentColor;
+			fill: currentColor;
+		}
+	}
+
+	&.irform-file-upload {
+		.irform-file-progress {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: #{$fieldBorderThickness}px;
+
+			.irform-file-progress-bar {
+				height: 100%;
+				background-color: $fieldBorderColor;
+			}
+		}
+	}
+
+	.irform-file-name,
+	.irform-file-error {
+		width: 100%;
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: .8em;
+	}
+
+	.irform-file-delete {
+		@include buttonClose($fieldHeight / 1.5, $actionerTextColor, $fieldHeight / 2.5, $actionerBgColor);
+
+		position: absolute;
+		top: #{$borderWidth + 2}px;
+		right: #{$borderWidth + 2}px;
+	}
+}
+
+// Error
+.irform-file.irform-error {
+	@extend %error;
+	@extend %error-border;
+}

@@ -1,0 +1,107 @@
+$triangleHeight: $fieldHeight / 5;
+
+.irform-dropdown {
+	@extend %reset;
+	width: 100%;
+	position: relative;
+
+	.irform-dropdown-select {
+		cursor: pointer;
+
+		position: relative;
+
+		.irform-dropdown-arrow {
+			width: #{$fieldHeight / 1.5}px;
+			display: inline-block;
+
+			&:after {
+				position: absolute;
+				content: "";
+				top: #{($fieldHeight - $triangleHeight) / 2}px;
+				right: #{$fieldHeight / 3}px;
+				width: 0;
+				height: 0;
+				border: #{$triangleHeight}px solid transparent;
+				border-color: $fieldSpecialBgColor transparent transparent transparent;
+				transition: all .3s;
+			}
+		}
+	}
+
+	.irform-dropdown-menu {
+		position: absolute;
+		z-index: 10;
+		width: 100%;
+		display: none;
+		box-shadow: 0 3px 5px 0 #888;
+		background-color: $fieldBgColor;
+		max-height: #{$fieldHeight * 5}px;
+		overflow-y: auto;
+
+		@extend %scrollbar;
+
+		.irform-dropdown-item {
+			@extend %field-reset;
+			padding: 0px 6px;
+			overflow: hidden;
+			white-space: nowrap;
+			display: block;
+
+			&:not(.irform-dropdown-item-selected):hover,
+			&.irform-dropdown-item-selected {
+				background-color: $fieldSpecialBgColor;
+				color: $fieldSpecialTextColor;
+				cursor: pointer;
+			}
+		}
+
+		&.irform-dropdown-menu-loading {
+			.irform-dropdown-item {
+				opacity: 0.5;
+			}
+		}
+	}
+
+	.irform-dropdown-select.active  {
+		.irform-dropdown-arrow:after {
+			transform: rotate(180deg);
+			margin-top: -#{$triangleHeight}px;
+		}
+		+ .irform-dropdown-menu {
+			display: block;
+		}
+	}
+}
+
+// Error
+.irform-error .irform-dropdown-select,
+.irform-dropdown-select.irform-error {
+	@extend %error;
+	@extend %error-border;
+
+	&:after {
+		border-color: $errorColor transparent transparent transparent;
+	}
+}
+
+// Success
+.irform-success .irform-dropdown-select,
+.irform-dropdown-select.irform-success {
+	@extend %success;
+	@extend %success-border;
+
+	&:after {
+		border-color: $successColor transparent transparent transparent;
+	}
+}
+
+// Disable
+.irform-disable .irform-dropdown-select,
+.irform-dropdown-select.irform-disable {
+	@extend %disable;
+	@extend %disable-border;
+
+	&:after {
+		border-color: $disableColor transparent transparent transparent;
+	}
+}

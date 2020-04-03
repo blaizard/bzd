@@ -1,0 +1,175 @@
+.irform-table {
+
+	// Note, this does not work and I have no idea how to fix it.
+	// More detaisl abotu this issue here: https://stackoverflow.com/questions/18135204/setting-overflow-y-causes-overflow-x-to-change-as-well
+	// There is no working workaround
+	overflow-x: auto;
+	overflow-y: visible;
+	width: 100%;
+
+	// Reset any unwanted style
+	thead,
+	tbody {
+		tr, td, th {
+			border: none;
+			outline: none;
+			padding: 0;
+			&:hover {
+				background-color: transparent;
+			}
+		}
+	}
+
+	.irform-table-container {
+		display: table;
+		width: calc(100% - 2px);
+		margin-left: 1px;
+		border-collapse: separate;
+		border-spacing: 0;
+		background-color: $fieldBgColor;
+
+		// Bottom border must be set as well
+		border-bottom: 1px solid $tableBorderColor;
+
+		.irform-table-headers {
+			.irform-table-header {
+				background-color: $fieldSpecialBgColor;
+				color: $fieldSpecialTextColor;
+				padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
+				position: relative;
+				@extend %clickable;
+
+				&.irform-table-header-order-ascending {
+					padding-right: #{$fieldHeight}px;
+					&:after {
+						position: absolute;
+						content: "";
+						top: #{($fieldHeight - $triangleHeight) / 2}px;
+						right: #{$fieldHeight / 3}px;
+						width: 0;
+						height: 0;
+						border: #{$triangleHeight}px solid transparent;
+						border-color: $fieldSpecialTextColor transparent transparent transparent;
+						transition: all .3s;
+					}
+				}
+
+				&.irform-table-header-order-descending {
+					padding-right: #{$fieldHeight}px;
+					&:after {
+						position: absolute;
+						content: "";
+						top: #{($fieldHeight + $triangleHeight) / 2 - $triangleHeight * 2}px;
+						right: #{$fieldHeight / 3}px;
+						width: 0;
+						height: 0;
+						border: #{$triangleHeight}px solid transparent;
+						border-color: transparent transparent $fieldSpecialTextColor transparent;
+						transition: all .3s;
+					}
+				}
+			}
+		}
+
+		.irform-table-row {
+			display: table-row;
+
+			.irform-table-cell {
+				display: table-cell;
+				white-space: nowrap;
+				box-sizing: border-box;
+
+				// Disable the whole row
+				&.irform-disable {
+					@extend %disable;
+					background-color: $disableBgColor !important;
+					opacity: 0.5;
+				}
+
+				// Set the borders
+				border-top: 1px solid $tableBorderColor;
+				border-right: 1px solid $tableBorderColor;
+				border-bottom: 1px solid transparent;
+				border-left: 1px solid $tableBorderColor;
+				+ .irform-table-cell {
+					border-left: 1px solid transparent;
+				}
+
+				// Set the active borders
+				&.irform-active {
+					border: 1px dashed $focusColor;
+				}
+
+				// Set the active borders
+				&.irform-error {
+					border: 1px solid $errorColor;
+				}
+
+				// Overwrite sub types style
+
+				// Input, Combobox, Autocomplete
+				.irform-input {
+					@extend %border-reset;
+					.irform-input-data {
+						flex-flow: row nowrap !important;
+					}
+				}
+
+				// Textarea
+				.irform-textarea {
+					@extend %border-reset;
+				}
+
+				// Checkbox
+				.irform-checkbox {
+					input[type=checkbox] {
+						&:focus + label:before {
+							@extend %focus-reset;
+						}
+					}
+				}
+
+				// Button
+				.irform-button {
+					@extend %border-reset;
+				}
+
+				// Carousel
+				.irform-carousel {
+					padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
+					.irform-carousel-container {
+						@extend %border-reset;
+					}
+				}
+
+				// Array
+				.irform-array {
+					padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
+				}
+
+				// File
+				.irform-array-file {
+					display: flex;
+					flex-flow: row nowrap;
+
+					.irform-array-items {
+						flex-flow: row nowrap !important;
+						margin-right: 3px;
+
+						.irform-file {
+							max-width: #{$fieldHeight}px !important;
+							min-width: #{$fieldHeight}px !important;
+							height: #{$fieldHeight}px !important;
+							padding: 0 !important;
+
+							.irform-file-delete {
+								top: auto !important;
+								right: auto !important;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

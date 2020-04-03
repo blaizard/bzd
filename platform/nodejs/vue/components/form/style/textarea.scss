@@ -1,0 +1,33 @@
+.irform-textarea {
+	@extend %field-reset;
+	@extend %multi-line;
+	@extend %border-multi-line;
+	@extend %placeholder;
+	@extend %scrollbar;
+	height: 75px;
+	min-height: 75px;
+	resize: vertical;
+	white-space: normal;
+}
+
+// Error
+.irform-error .irform-textarea,
+.irform-textarea.irform-error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.irform-success .irform-textarea,
+.irform-textarea.irform-success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.irform-disable .irform-textarea,
+.irform-textarea.irform-disable,
+.irform-textarea:disabled {
+	@extend %disable;
+	@extend %disable-border;
+}

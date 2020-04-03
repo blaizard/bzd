@@ -1,0 +1,28 @@
+.irform-button {
+	@extend %actioner-reset;
+	@extend %border-clickable;
+	text-align: center;
+	white-space: nowrap;
+}
+
+// Error
+.irform-error .irform-button,
+.irform-button.irform-error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.irform-success .irform-button,
+.irform-button.irform-success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.irform-disable .irform-button,
+.irform-button.irform-disable,
+.irform-button:disabled {
+	@extend %disable;
+	@extend %disable-border;
+}

@@ -1,0 +1,79 @@
+/**
+ * Defines the layout of a form. The following format should be used around elements
+ * <div class="irform-item">
+ *     <div class="irform-caption">Normal</div>
+ *     <div class="irform-elements"><input /></div>
+ * </div>
+ */
+
+.irform {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+.irform-linebreak {
+	width: 100%;
+}
+
+.irform-item {
+	max-width: 100%;
+	flex-grow: 1;
+	margin: 5px 0;
+	padding: 0;
+	padding-right: 12px;
+	display: flex;
+	flex-flow: column nowrap;
+
+	.irform-caption {
+		@extend %reset;
+		width: 100%;
+		text-align: left;
+		white-space: nowrap;
+		font-weight: bold;
+		padding-top: 8px;
+		flex-shrink: 0;
+		font-size: .9em;
+		color: $captionTextColor;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.irform-elements {
+		flex: 1;
+		min-width: 0;
+		padding-left: 0;
+
+		display: flex;
+		flex-flow: row wrap;
+
+		> * {
+			margin-bottom: auto;
+			margin-right: auto;
+		}
+
+		&.irform-align-bottom > * {
+			margin-top: auto;
+			margin-bottom: 0;
+		}
+		&.irform-align-right > * {
+			margin-left: auto;
+			margin-right: 0;
+		}
+	}
+}
+
+.irform-item.irform-error,
+.irform-error .irform-item {
+	@extend %error;
+
+	.irform-error-message {
+		margin-top: 2px;
+		font-size: 0.8em;
+		line-height: 1.2em;
+	}
+}
+
+.irform-item.irform-success,
+.irform-success .irform-item {
+	@extend %success;
+}

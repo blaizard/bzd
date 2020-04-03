@@ -1,0 +1,81 @@
+.irform-carousel {
+	padding: 0;
+	width: 100%;
+	outline: none;
+
+	display: flex;
+	flew-flow: row nowrap;
+	align-items: center;
+	justify-content: center;
+
+	.irform-carousel-container {
+		@extend %field-reset;
+		@extend %border-multi-line;
+		padding: 0;
+		margin: 0;
+
+		flex: 1;
+		overflow: hidden;
+
+		.irform-carousel-slides {
+			// A must to be able to use maxVisible
+			width: 100%;
+			display: inline-block;
+			white-space: nowrap;
+			transition: transform 2s cubic-bezier(0, 0, 0.1, 1);
+			position: relative;
+
+			.irform-carousel-slide {
+				display: inline-block;
+				vertical-align: middle;
+				opacity: 0.5;
+
+				&.irform-carousel-slide-selected {
+					opacity: 1;
+				}
+
+				.irform-carousel-slide-container {
+					display: flex;
+					flex-flow: row nowrap;
+					align-items: center;
+					justify-content: center;
+				}
+			}
+		}
+	}
+
+	.irform-carousel-prev {
+		@include buttonArrow(left, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+		margin-left: 4px;
+	}
+	.irform-carousel-next {
+		@include buttonArrow(right, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+		margin-right: 4px;
+	}
+
+}
+
+// Error
+.irform-error .irform-carousel,
+.irform-carousel.irform-error {
+	@extend %error;
+	@extend %error-border;
+}
+
+// Success
+.irform-success .irform-carousel,
+.irform-carousel.irform-success {
+	@extend %success;
+	@extend %success-border;
+}
+
+// Disable
+.irform-disable .irform-carousel,
+.irform-carousel.irform-disable {
+	@extend %disable;
+	@extend %disable-border;
+
+	.irform-carousel-slides {
+		opacity: 0.5;
+	}
+}
