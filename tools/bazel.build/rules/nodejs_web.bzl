@@ -48,10 +48,13 @@ def _bzd_nodejs_web_build_impl(ctx):
         },
     )
 
+    # Gather toolchain manager
+    manager = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].manager
+
     # Create a wrapped binary to have a self contained execution environment
     return sh_binary_wrapper_impl(
         ctx = ctx,
-        binary = ctx.attr._yarn,
+        binary = manager.binary,
         output = ctx.outputs.executable,
         command = """
         {binary} --cwd "{workspace}" run build --output-path ".bzd/output"
@@ -81,13 +84,7 @@ _bzd_nodejs_web_build = rule(
         ),
         "internal_install": attr.label(
             mandatory = True,
-            cfg = "host",
-        ),
-        "_yarn": attr.label(
-            executable = True,
-            cfg = "host",
-            allow_files = True,
-            default = Label("//toolchains/nodejs/linux_x86_64_yarn:yarn"),
+            cfg = "target",
         ),
         "_webpack_config_template": attr.label(
             default = Label("//tools/bazel.build/rules/assets/nodejs:webpack_config_template"),
@@ -95,6 +92,7 @@ _bzd_nodejs_web_build = rule(
         ),
     },
     executable = True,
+    toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
 """
@@ -127,11 +125,11 @@ _bzd_nodejs_web_exec = rule(
     attrs = {
         "build": attr.label(
             executable = True,
-            cfg = "host",
+            cfg = "target",
         ),
         "_web_server": attr.label(
             executable = True,
-            cfg = "host",
+            cfg = "target",
             allow_files = True,
             default = Label("//tools/scripts:web_server"),
         )

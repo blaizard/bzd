@@ -16,6 +16,10 @@ Defines a NodeJs toolchain.
 nodejs_toolchain = rule(
     implementation = _nodejs_toolchain_impl,
     attrs = {
-        "binary": attr.label(),
+        "binary": attr.label(
+            mandatory = True,
+            executable = True,
+            cfg = "host",
+        ),
     },
 )
