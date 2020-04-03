@@ -21,9 +21,15 @@ like execute, profile...
 app_toolchain = rule(
     implementation = _app_toolchain_impl,
     attrs = {
-        "prepare": attr.label(),
+        "prepare": attr.label(
+            executable = True,
+            cfg = "host",
+        ),
         "info": attr.string(),
-        "execute": attr.label(),
+        "execute": attr.label(
+            executable = True,
+            cfg = "host",
+        ),
     },
 )
 

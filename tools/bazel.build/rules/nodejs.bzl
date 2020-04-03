@@ -80,6 +80,9 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Fetch and install the packages
 
+    # Gather toolchain manager
+    manager = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].manager
+
     # This will create and populate the node_modules directly in the output directory
     node_modules = ctx.actions.declare_directory("node_modules")
     ctx.actions.run(
@@ -87,7 +90,7 @@ def _bzd_nodejs_install_impl(ctx):
         outputs = [node_modules],
         progress_message = "Updating package(s) for {}".format(ctx.label),
         arguments = ["--cwd", package_json.dirname, "install"],
-        executable = ctx.executable._yarn,
+        executable = manager.binary.files_to_run,
     )
 
     # Return the provides (including outputs and dependencies)
@@ -108,15 +111,10 @@ bzd_nodejs_install = rule(
             allow_files = True,
             doc = "Dependencies",
         ),
-        "_yarn": attr.label(
-            executable = True,
-            cfg = "host",
-            allow_files = True,
-            default = Label("//toolchains/nodejs/linux_x86_64_yarn:yarn"),
-        ),
         "_package_json_template": attr.label(
             default = Label("//tools/bazel.build/rules/assets/nodejs:package_json_template"),
             allow_single_file = True,
         ),
     },
+    toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )

@@ -21,3 +21,5 @@ def load_linux_x86_64_yarn():
         strip_prefix = "node-v12.16.1-linux-x64",
         sha256 = "b826753f14df9771609ffb8e7d2cc4cb395247cb704cf0cea0f04132d9cf3505",
     )
+
+    native.register_toolchains("//toolchains/nodejs/linux_x86_64_yarn:toolchain")

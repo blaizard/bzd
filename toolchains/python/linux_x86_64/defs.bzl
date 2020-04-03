@@ -3,13 +3,7 @@ load("@debian_repository_rules//:debian.bzl", "debian_archive")
 def load_linux_x86_64_python():
     debian_archive(
         name = "python3_linux_x86_64",
-        build_file_content = """py_runtime(
-        name = "runtime",
-        files = glob(["usr/lib/**/*"]),
-        interpreter = "usr/bin/python3.6",
-        python_version = "PY3",
-        visibility = ["//visibility:public"],
-    )""",
+        build_file = "//toolchains/python/linux_x86_64:python.BUILD",
         urls = {
             "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/python3.6-minimal_3.6.8-1~18.04.3_amd64.deb": "5f1ce00fab73a47dd1144c7979a71a8b87ec51a6fe227933a2a4d11f81889d2b",
             "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/libpython3.6-minimal_3.6.8-1~18.04.3_amd64.deb": "b678aa92ba35b26e1ead5a59a29b7f7dc9da9063f4216b3d40990417659ce50d",

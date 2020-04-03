@@ -12,18 +12,20 @@ sh_binary_wrapper(
 )
 
 nodejs_toolchain(
-    name = "nodejs",
+    name = "nodejs_toolchain",
 	binary = ":yarn",
 )
 
 toolchain(
-    name = "nodejs_toolchain",
+    name = "toolchain",
     exec_compatible_with = [
         "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
     ],
     target_compatible_with = [
         "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
     ],
-    toolchain = ":nodejs",
+    toolchain = ":nodejs_toolchain",
     toolchain_type = "//tools/bazel.build/toolchains/nodejs:toolchain_type",
 )
