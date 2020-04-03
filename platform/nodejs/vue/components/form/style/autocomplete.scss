@@ -1,0 +1,7 @@
+.irform-autocomplete {
+	@extend .irform-dropdown;
+
+	.irform-dropdown-select {
+		cursor: initial;
+	}
+}

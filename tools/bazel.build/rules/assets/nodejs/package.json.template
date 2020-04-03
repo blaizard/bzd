@@ -1,0 +1,12 @@
+{
+	"name": "{name}",
+	"version": "1.0.0",
+	"license": "UNLICENSED",
+	"private": true,
+	"dependencies": {
+		{dependencies}
+	},
+	"scripts": {
+		"build": "node --preserve-symlinks ./node_modules/webpack/bin/webpack.js --mode=production --config webpack.config.js"
+	}
+}

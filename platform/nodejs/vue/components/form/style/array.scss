@@ -1,0 +1,91 @@
+.irform-array {
+	.irform-array-items {
+		display: flex;
+		flex-flow: row wrap;
+
+		.irform-drag-placeholder {
+			opacity: 0.3;
+		}
+
+		.irform-array-item {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+
+			&.irform-array-item-inline {
+				width: auto;
+				max-width: 100%;
+			}
+
+			> .irform-array-item-body {
+				flex: 1;
+			}
+
+			&.irform-array-item-draggable {
+				.irform-array-item-draghandle {
+					@extend %draggable;
+				}
+			}
+
+			.irform-array-item-draghandle {
+				position: relative;
+				padding: 0;
+				width: 20px;
+				align-self: stretch;
+				display: inline-block;
+				overflow: hidden;
+				line-height: 5px;
+				vertical-align: middle;
+				font-size: 12px;
+				font-family: sans-serif;
+				letter-spacing: 2px;
+				color: #eee;
+				text-shadow: 1px 0 1px black;
+				margin: 5px 5px 5px 0;
+				&:after {
+					position: absolute;
+					overflow: hidden;
+					white-space: normal;
+					content: "..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..";
+				}
+			}
+
+			.irform-array-item-delete {
+				@include buttonClose($fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 3);
+			}
+		}
+	}
+
+	width: 100%;
+	padding: 0;
+}
+
+// Disable
+.irform-disable .irform-array,
+.irform-array.irform-disable {
+	@extend %disable;
+
+	.irform-array-item-delete {
+		cursor: inherit !important;
+
+		&:before,
+		&:after {
+			background-color: $disableColor !important;
+		}
+	}
+
+	&:after {
+		border-color: $disableColor transparent transparent transparent;
+	}
+}
+
+/**
+ * If drag is active, change the cursor
+ */
+body.irform-drag-active {
+	* {
+		cursor: move !important;
+	}
+}

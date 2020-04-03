@@ -11,3 +11,9 @@ py_binary(
     srcs = ["terminal.py"],
     visibility = ["//visibility:public"],
 )
+
+py_binary(
+    name = "web_server",
+    srcs = ["web_server.py"],
+    visibility = ["//visibility:public"],
+)

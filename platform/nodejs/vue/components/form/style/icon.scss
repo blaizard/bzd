@@ -1,0 +1,110 @@
+*[class^="irform-icon-"] {
+	min-width: 1em;
+	min-height: 1em;
+
+	display: inline-block;
+	vertical-align: text-top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	-webkit-mask-size: contain;
+	-webkit-mask-position: center;
+	-webkit-mask-repeat: no-repeat;
+	mask-size: contain;
+	mask-position: center;
+	mask-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/**
+ * Helper to create and define icons
+ */
+@mixin defineIcon($imageUrl) {
+	background-image: url($imageUrl);
+	@supports (-webkit-mask-repeat: no-repeat) or (mask-repeat: no-repeat) {
+		background-color: currentColor;
+		background-image: none !important;
+		-webkit-mask-image: url($imageUrl);
+		mask-image: url($imageUrl);
+	}
+}
+
+// ---- Icon definitions ------------------------------------------------------
+
+.irform-icon-file {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/file.svg");
+}
+
+.irform-icon-folder {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/folder.svg");
+}
+
+.irform-icon-upload {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/upload.svg");
+}
+
+.irform-icon-undo {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/undo.svg");
+}
+
+.irform-icon-warning {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/warning.svg");
+}
+
+.irform-icon-bold {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/bold.svg");
+}
+
+.irform-icon-italic {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/italic.svg");
+}
+
+.irform-icon-underline {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/underline.svg");
+}
+
+.irform-icon-strike {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/strike-through.svg");
+}
+
+.irform-icon-justifyleft {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/justify-left.svg");
+}
+
+.irform-icon-justifycenter {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/justify-center.svg");
+}
+
+.irform-icon-justifyright {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/justify-right.svg");
+}
+
+.irform-icon-justify {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/justify.svg");
+}
+
+.irform-icon-indent {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/indent.svg");
+}
+
+.irform-icon-unindent {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/unindent.svg");
+}
+
+.irform-icon-orderedlist {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/ordered-list.svg");
+}
+
+.irform-icon-unorderedlist {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/unordered-list.svg");
+}
+
+.irform-icon-quote {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/quote.svg");
+}
+
+.irform-icon-clearformat {
+	@include defineIcon("~[lib]/vue/components/form/style/svg/clear-format.svg");
+}
