@@ -157,7 +157,7 @@ def _bzd_pack_impl(ctx):
     executable = binary.files_to_run.executable.path
 
     # Gather toolchain information
-    info = ctx.toolchains["//tools/bazel.build/toolchains:toolchain_type"].app
+    info = ctx.toolchains["//tools/bazel.build/toolchains/cc:toolchain_type"].app
 
     # --- Prepare phase
 
@@ -229,7 +229,7 @@ bzd_pack = rule(
         ),
     },
     executable = True,
-    toolchains = ["//tools/bazel.build/toolchains:toolchain_type"],
+    toolchains = ["//tools/bazel.build/toolchains/cc:toolchain_type"],
 )
 
 """

@@ -1,4 +1,4 @@
-load("//tools/bazel.build/toolchains:defs.bzl", "app_toolchain")
+load("//tools/bazel.build/toolchains/cc:defs.bzl", "app_toolchain")
 
 app_toolchain(
     name = "app",
@@ -13,5 +13,5 @@ toolchain(
         "@platforms//os:linux",
     ],
     toolchain = ":app",
-    toolchain_type = "//tools/bazel.build/toolchains:toolchain_type",
+    toolchain_type = "//tools/bazel.build/toolchains/cc:toolchain_type",
 )

@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
-load("@//tools/bazel.build/toolchains:defs.bzl", "app_toolchain")
+load("@//tools/bazel.build/toolchains/cc:defs.bzl", "app_toolchain")
 
 # C++ toolchain
 
@@ -128,7 +128,7 @@ toolchain(
         %{target_compatible_with}
     ],
     toolchain = ":app",
-    toolchain_type = "@//tools/bazel.build/toolchains:toolchain_type",
+    toolchain_type = "@//tools/bazel.build/toolchains/cc:toolchain_type",
 )
 
 constraint_value(
