@@ -146,6 +146,7 @@ def bzd_nodejs_web(name, srcs = [], packages = {}, deps = [], **kwargs):
         name = name + ".library",
         srcs = srcs,
         packages = packages,
+        tags = ["nodejs"],
     )
 
     # Gather dependencies and install the packages
@@ -155,12 +156,14 @@ def bzd_nodejs_web(name, srcs = [], packages = {}, deps = [], **kwargs):
             name + ".library",
             "//platform/nodejs:webpack",
         ],
+        tags = ["nodejs"],
     )
 
     # Build the web application and packs it
     _bzd_nodejs_web_build(
         name = name + ".build",
         install = name + ".install",
+        tags = ["nodejs"],
         **kwargs
     )
 
@@ -168,4 +171,5 @@ def bzd_nodejs_web(name, srcs = [], packages = {}, deps = [], **kwargs):
     _bzd_nodejs_web_exec(
         name = name,
         build = name + ".build",
+        tags = ["nodejs"],
     )

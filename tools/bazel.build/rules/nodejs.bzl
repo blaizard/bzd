@@ -171,16 +171,19 @@ def bzd_nodejs_binary(name, main, srcs = [], deps = [], packages = {}, **kwargs)
         name = name + ".library",
         srcs = srcs,
         packages = packages,
+        tags = ["nodejs"],
     )
 
     # Gather dependencies and install the packages
     bzd_nodejs_install(
         name = name + ".install",
         deps = deps + [name + ".library"],
+        tags = ["nodejs"],
     )
 
     _bzd_nodejs_exec(
         name = name,
         main = main,
         install = name + ".install",
+        tags = ["nodejs"],
     )

@@ -25,8 +25,8 @@ fi
 
 # Compile and test the different configurations
 bazel test ...
-bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
-bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
+bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang --build_tag_filters="-nodejs"
+bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs"
 
 # Use static analyzers
-bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
+bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan --build_tag_filters="-nodejs"
