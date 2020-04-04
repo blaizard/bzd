@@ -1,17 +1,12 @@
-load("//tools/bazel.build/rules:nodejs_web.bzl", "bzd_nodejs_web")
+load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_binary")
 
-bzd_nodejs_web(
+bzd_nodejs_binary(
     name = "nodejs",
     srcs = glob([
-        "app.vue",
         "app.js",
     ]),
-    alias = "frontend",
-    entries = {
-        "app.js": "index"
-    },
+    main = "app.js",
     packages = {
-        "vue": "latest",
-		"@vue/composition-api": "latest",
+        "mustache": "latest",
     },
 )

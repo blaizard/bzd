@@ -39,7 +39,6 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 |[`release(Element & element)`](./index.md)||
 |[`reserve()`](./index.md)||
 |[`reserve()`](./index.md)||
-|[`reverse()`](./index.md)||
 |[`SingleLinkedPool(const bzd::Span< Element > data)`](./index.md)||
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
@@ -272,11 +271,6 @@ Reserve an element from the free list (if any)
 *From bzd::impl::SingleLinkedPool*
 
 Reserve an element from the free list (if any)
-------
-### `constexpr void reverse()`
-*From bzd::Span*
-
-
 ------
 ### `explicit constexpr SingleLinkedPool(const bzd::Span< Element > data)`
 *From bzd::impl::SingleLinkedPool*

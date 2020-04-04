@@ -13,7 +13,7 @@
 |Function||
 |:---|:---|
 |[`get(const bzd::ConstBuffer & data)`](./index.md)||
-|[`set(bzd::Buffer &, const Type &)`](./index.md)||
+|[`set(bzd::Buffer & data, const Type & value)`](./index.md)||
 ------
 ### `static constexpr const Type get(const bzd::ConstBuffer & data)`
 
@@ -22,10 +22,10 @@
 |---:|:---|:---|
 |const bzd::ConstBuffer &|data||
 ------
-### `static constexpr void set(bzd::Buffer &, const Type &)`
+### `static constexpr void set(bzd::Buffer & data, const Type & value)`
 
 #### Parameters
 ||||
 |---:|:---|:---|
-|bzd::Buffer &|None||
-|const Type &|None||
+|bzd::Buffer &|data||
+|const Type &|value||

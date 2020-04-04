@@ -79,10 +79,7 @@ public:
 	const char* valueToString() const { return buffer_; }
 
 private:
-	constexpr char charToString(const char c)
-	{
-		return (c >= 32 && c < 127) ? c : '?';
-	}
+	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
 
 	char* valueToString(char* pBuffer, short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
 	char* valueToString(char* pBuffer, int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
