@@ -35,7 +35,6 @@ The container combines the performance and accessibility of a C-style array with
 |[`operator==(const SelfType & rhs) const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
-|[`reverse()`](./index.md)||
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
@@ -232,11 +231,6 @@ Maximum number of element this array can hold.
 ||||
 |---:|:---|:---|
 |const SizeType|index||
-------
-### `constexpr void reverse()`
-*From bzd::Span*
-
-
 ------
 ### `constexpr SizeType size() const`
 *From bzd::Span*

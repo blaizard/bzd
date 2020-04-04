@@ -1,12 +1,12 @@
-"use strict"
+Mustache = require("mustache");
 
-import Vue from "vue"
-import VueCompositionApi from "@vue/composition-api";
-import App from "[frontend]/app.vue"
+var view = {
+	title: "Joe",
+	calc: function () {
+		return 2 + 4;
+	}
+};
+   
+var output = Mustache.render("{{title}} spends {{calc}}", view);
 
-Vue.use(VueCompositionApi);
-
-new Vue({
-	el: '#app',
-	render: (h) => h(App)
-});
+console.log(output);

@@ -1,11 +1,11 @@
-# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`StringStream`](../index.md)
+# [`bzd`](../../../index.md)::[`impl`](../../index.md)::[`StringChannel`](../index.md)
 
-## `class StringStream`
+## `class StringChannel`
 
 
 |Function||
 |:---|:---|
-|[`StringStream(bzd::interface::String & str)`](./index.md)||
+|[`StringChannel(bzd::interface::String & str)`](./index.md)||
 |[`connect()`](./index.md)||
 |[`connect()`](./index.md)||
 |[`disconnect()`](./index.md)||
@@ -18,7 +18,7 @@
 |[`write(const Span< const T > & data)`](./index.md)||
 |[`write(const T & data)`](./index.md)||
 ------
-### `constexpr StringStream(bzd::interface::String & str)`
+### `constexpr StringChannel(bzd::interface::String & str)`
 
 #### Parameters
 ||||

@@ -22,7 +22,7 @@
 |[`Registry`](registry/index.md)||
 |[`SingleLinkedPool`](singlelinkedpool/index.md)||
 |[`String`](string/index.md)||
-|[`StringStream`](stringstream/index.md)||
+|[`StringChannel`](stringchannel/index.md)||
 |[`StringView`](stringview/index.md)||
 |[`TupleElem`](tupleelem/index.md)||
 |[`TupleImpl`](tupleimpl/index.md)||
@@ -181,7 +181,7 @@ Flat map implementation.
 |class T|None||
 |class Impl|None||
 ------
-### `class StringStream`
+### `class StringChannel`
 
 ------
 ### `template<class T, class Impl> class StringView`

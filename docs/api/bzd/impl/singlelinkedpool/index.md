@@ -36,7 +36,6 @@
 |[`operator[](const SizeType index) const`](./index.md)||
 |[`release(Element & element)`](./index.md)||
 |[`reserve()`](./index.md)||
-|[`reverse()`](./index.md)||
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
@@ -248,11 +247,6 @@ Release an element from the pool
 ------
 ### `constexpr Element & reserve()`
 Reserve an element from the free list (if any)
-------
-### `constexpr void reverse()`
-*From bzd::Span*
-
-
 ------
 ### `constexpr SizeType size() const`
 *From bzd::Span*

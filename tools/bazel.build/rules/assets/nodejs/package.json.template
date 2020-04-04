@@ -7,6 +7,6 @@
 		{dependencies}
 	},
 	"scripts": {
-		"build": "node --preserve-symlinks ./node_modules/webpack/bin/webpack.js --mode=production --config webpack.config.js"
+		"webpack": "node --preserve-symlinks --preserve-symlinks-main ./node_modules/webpack/bin/webpack.js --mode=production --config webpack.config.js"
 	}
 }

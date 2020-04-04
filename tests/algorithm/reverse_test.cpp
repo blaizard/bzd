@@ -1,5 +1,5 @@
-#include "bzd/container/string.h"
 #include "bzd/algorithm/reverse.h"
+#include "bzd/container/string.h"
 #include "cc_test/test.h"
 
 TEST(Reverse, Base)

@@ -32,7 +32,6 @@ The class template span describes an object that can refer to a contiguous seque
 |[`operator==(const SelfType & rhs) const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
-|[`reverse()`](./index.md)||
 |[`size() const`](./index.md)||
 
 |Typedef||
@@ -190,9 +189,6 @@ The class template span describes an object that can refer to a contiguous seque
 ||||
 |---:|:---|:---|
 |const SizeType|index||
-------
-### `constexpr void reverse()`
-
 ------
 ### `constexpr SizeType size() const`
 

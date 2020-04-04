@@ -85,8 +85,8 @@
 
 // Utility
 #include "bzd/utility/aligned_storage.h"
-#include "bzd/utility/container_of.h"
 #include "bzd/utility/bit.h"
+#include "bzd/utility/container_of.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/max.h"
 #include "bzd/utility/min.h"

@@ -31,7 +31,6 @@
 |[`operator==(const SelfType & rhs) const`](./index.md)||
 |[`operator[](const SizeType index)`](./index.md)||
 |[`operator[](const SizeType index) const`](./index.md)||
-|[`reverse()`](./index.md)||
 |[`size() const`](./index.md)||
 |[`Span()`](./index.md)||
 |[`Span(DataType *const data, const SizeType size)`](./index.md)||
@@ -234,11 +233,6 @@
 ||||
 |---:|:---|:---|
 |const SizeType|index||
-------
-### `constexpr void reverse()`
-*From bzd::Span*
-
-
 ------
 ### `constexpr SizeType size() const`
 *From bzd::Span*

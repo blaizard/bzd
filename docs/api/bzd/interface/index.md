@@ -17,7 +17,7 @@
 |[`Queue`](./index.md)|alias of [`bzd::impl::Queue`](../impl/queue/index.md)|
 |[`Registry`](./index.md)|alias of [`bzd::impl::Registry`](../impl/registry/index.md)|
 |[`String`](./index.md)|alias of [`bzd::impl::String`](../impl/string/index.md)|
-|[`StringStream`](./index.md)|alias of [`bzd::impl::StringStream`](../impl/stringstream/index.md)|
+|[`StringChannel`](./index.md)|alias of [`bzd::impl::StringChannel`](../impl/stringchannel/index.md)|
 |[`Vector`](./index.md)|alias of [`bzd::impl::Vector`](../impl/vector/index.md)|
 ------
 ### `class Stack`
@@ -72,7 +72,7 @@ Application stack definition
 ### `typedef String`
 
 ------
-### `typedef StringStream`
+### `typedef StringChannel`
 
 ------
 ### `template<class T> typedef Vector`

@@ -33,7 +33,7 @@
 |[`Span`](span/index.md)|The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.|
 |[`Stack`](stack/index.md)||
 |[`String`](string/index.md)||
-|[`StringStream`](stringstream/index.md)||
+|[`StringChannel`](stringchannel/index.md)||
 |[`Task`](task/index.md)||
 |[`Tuple`](tuple/index.md)||
 |[`Variant`](variant/index.md)||
@@ -220,7 +220,7 @@ The class template span describes an object that can refer to a contiguous seque
 |---:|:---|:---|
 |SizeType|N||
 ------
-### `template<SizeType N> class StringStream`
+### `template<SizeType N> class StringChannel`
 
 #### Template
 ||||

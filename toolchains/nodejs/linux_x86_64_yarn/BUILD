@@ -6,14 +6,15 @@ sh_binary_wrapper(
     binary = "@yarn//:yarn",
     command = "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always $@",
     data = [
-        "@node//:node",
+        "@node",
     ],
     visibility = ["//visibility:public"],
 )
 
 nodejs_toolchain(
     name = "nodejs_toolchain",
-	binary = ":yarn",
+    manager = ":yarn",
+    node = "@node//:node",
 )
 
 toolchain(

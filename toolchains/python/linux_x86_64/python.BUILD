@@ -1,3 +1,5 @@
+load("@rules_python//python:defs.bzl", "py_runtime")
+
 py_runtime(
     name = "runtime",
     files = glob(["usr/lib/**/*"]),

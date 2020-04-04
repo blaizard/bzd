@@ -96,7 +96,8 @@ private:
 
 	constexpr void adjustEndianess(typename SignalInternals::Type& value)
 	{
-		bzd::algorithm::reverse(reinterpret_cast<bzd::UInt8Type*>(&value), reinterpret_cast<bzd::UInt8Type*>(&value) + sizeof(typename SignalInternals::Type));
+		bzd::algorithm::reverse(reinterpret_cast<bzd::UInt8Type*>(&value),
+								reinterpret_cast<bzd::UInt8Type*>(&value) + sizeof(typename SignalInternals::Type));
 	}
 
 public:
@@ -115,7 +116,7 @@ public:
 		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
 		extracted &= ~(mask_ << shiftBits_);
 
-		const typename SignalInternals::Type valueTyped = CompuMethod::template toBuffer<Type, decltype(valueTyped)>(value);		
+		const typename SignalInternals::Type valueTyped = CompuMethod::template toBuffer<Type, decltype(valueTyped)>(value);
 		extracted |= ((static_cast<decltype(extracted)>(valueTyped) & mask_) << shiftBits_);
 		bzd::algorithm::copyN(reinterpret_cast<bzd::UInt8Type*>(&extracted), sizeof(extracted), &data.at(startByte_));
 	}

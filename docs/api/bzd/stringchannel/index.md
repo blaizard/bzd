@@ -1,6 +1,6 @@
-# [`bzd`](../../index.md)::[`StringStream`](../index.md)
+# [`bzd`](../../index.md)::[`StringChannel`](../index.md)
 
-## `template<SizeType N> class StringStream`
+## `template<SizeType N> class StringChannel`
 
 #### Template
 ||||
@@ -9,7 +9,7 @@
 
 |Function||
 |:---|:---|
-|[`StringStream()`](./index.md)||
+|[`StringChannel()`](./index.md)||
 |[`connect()`](./index.md)||
 |[`disconnect()`](./index.md)||
 |[`str() const`](./index.md)||
@@ -20,7 +20,7 @@
 |[`write(const Span< const T > & data)`](./index.md)||
 |[`write(const T & data)`](./index.md)||
 ------
-### `constexpr StringStream()`
+### `constexpr StringChannel()`
 
 ------
 ### `virtual bzd::Expected< void > connect()`
@@ -34,17 +34,17 @@
 
 ------
 ### `constexpr const bzd::interface::String & str() const`
-*From bzd::impl::StringStream*
+*From bzd::impl::StringChannel*
 
 
 ------
 ### `constexpr bzd::interface::String & str()`
-*From bzd::impl::StringStream*
+*From bzd::impl::StringChannel*
 
 
 ------
 ### `bzd::Expected< SizeType > write(const bzd::StringView & data)`
-*From bzd::impl::StringStream*
+*From bzd::impl::StringChannel*
 
 
 #### Parameters
@@ -53,7 +53,7 @@
 |const bzd::StringView &|data||
 ------
 ### `bzd::Expected< SizeType > write(const bzd::Span< const UInt8Type > & data)`
-*From bzd::impl::StringStream*
+*From bzd::impl::StringChannel*
 
 
 #### Parameters
