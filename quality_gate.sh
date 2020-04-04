@@ -24,7 +24,7 @@ if [ "$sanitizer" ]; then
 fi
 
 # Compile and test the different configurations
-bazel test ...
+bazel test ... --sandbox_writable_path=~/.cache/yarn
 bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang --build_tag_filters="-nodejs"
 bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs"
 
