@@ -2,7 +2,7 @@
 FROM debian:latest
 
 # Load dependencies
-RUN apt-get update && apt-get install -y git sudo g++ curl
+RUN apt-get update && apt-get install -y git sudo g++ curl gnupg2
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
