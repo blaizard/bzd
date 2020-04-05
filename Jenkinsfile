@@ -31,7 +31,7 @@ pipeline
 				{
 					steps
 					{
-						sh "bazel --output_user_root=/cache/output --disk_cache=/cache/bazel test ..." 
+						sh "bazel --output_user_root=/cache/output test ... --disk_cache=/cache/bazel" 
 					}
 				}
 			}
