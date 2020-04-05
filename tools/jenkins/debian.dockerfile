@@ -1,5 +1,5 @@
  
-FROM debian:latest
+FROM ubuntu:latest
 
 # Load dependencies
 # Note:
@@ -8,7 +8,7 @@ FROM debian:latest
 #            to be executed to discover binaries.
 # - gnupg2 - needed add the key to apt.
 # - libc6 - needed for compatibility with the python version installed.
-RUN apt-get update && apt-get install -y git sudo g++ curl gnupg2 python libc6
+RUN apt-get update && apt-get install -y git sudo g++ curl gnupg2 python
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
