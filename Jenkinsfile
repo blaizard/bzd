@@ -1,10 +1,5 @@
 #!/usr/bin/env groovy
-/**
- * It requires the following Jenkins plugins to work:
- * - Warnings Next Generation
- * - JUnit Plugin
- * - valgrind
- */
+
 pipeline
 {
 	agent
@@ -12,6 +7,7 @@ pipeline
 		dockerfile
 		{
 			filename "tools/jenkins/debian.dockerfile"
+			args "-v /cache:/cache"
 		}
 	}
 	stages
@@ -25,7 +21,7 @@ pipeline
 			}
 		}
 		/**
-		 * The actual tests are done here
+		 * Parallelized tests are done here
 		 */
 		stage("Tests")
 		{
@@ -35,7 +31,7 @@ pipeline
 				{
 					steps
 					{
-						sh "bazel test ..." 
+						sh "bazel test ... --disk_cache=/cache/bazel --output_user_root=/cache/output" 
 					}
 				}
 			}
