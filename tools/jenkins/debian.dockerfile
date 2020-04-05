@@ -2,7 +2,12 @@
 FROM debian:latest
 
 # Load dependencies
-RUN apt-get update && apt-get install -y git sudo g++ curl gnupg2 python python3
+# Note:
+# - python - required to run python files, eventhough a python toolchain is installed,
+#            to run a script using this python toolchain, a startup python script needs
+#            to be executed to discover binaries.
+# - gnupg2 - needed add the key to apt
+RUN apt-get update && apt-get install -y git sudo g++ curl gnupg2 python
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
