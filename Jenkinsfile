@@ -7,7 +7,7 @@ pipeline
 		dockerfile
 		{
 			filename "tools/jenkins/debian.dockerfile"
-			args "-v /cache:/cache"
+			args "-v /volume1/docker/jenkins/cache:/cache"
 		}
 	}
 	stages
