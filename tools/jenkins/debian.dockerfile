@@ -12,3 +12,5 @@ RUN apt-get update && apt-get install -y bazel
 # Add Jenkins user
 RUN sudo groupadd -g 1000 1000
 RUN sudo useradd -u 1000 -s /bin/sh -g 1000 1000
+RUN sudo mkdir -p /home/1000
+RUN sudo chown -R 1000:1000 /home/1000
