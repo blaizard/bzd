@@ -33,7 +33,7 @@ pipeline
 				{
 					steps
 					{
-						sh "bazel --output_user_root=/cache/output test ... --disk_cache=/cache/bazel" 
+						sh "bazel --output_user_root=/cache/output test ... --disk_cache=/cache/bazel -s" 
 					}
 				}
 			}
