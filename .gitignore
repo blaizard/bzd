@@ -12,3 +12,6 @@ bazel-*
 
 # Editors
 .vscode/
+
+# Backup/temporary files
+*~

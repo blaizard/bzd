@@ -35,21 +35,21 @@ pipeline
 		{
 			parallel
 			{
-				stage("Toolchain local")
+				stage("local")
 				{
 					steps
 					{
 						sh "bazel test ..." 
 					}
 				}
-				stage("Toolchain linux_x86_64_clang")
+				stage("linux_x86_64_clang")
 				{
 					steps
 					{
 						sh "bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
 					}
 				}
-				stage("Toolchain esp32_xtensa_lx6_gcc")
+				stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
