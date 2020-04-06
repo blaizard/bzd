@@ -48,7 +48,7 @@ pipeline
 				{
 					steps
 					{
-						sh "bazel test ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+						sh "bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
 				stage("Static analyzers")
