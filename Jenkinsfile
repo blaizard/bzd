@@ -2,6 +2,11 @@
 
 pipeline
 {
+	triggers
+	{
+		cron("@daily")
+		pollSCM("@hourly")
+	}
 	agent
 	{
 		dockerfile
