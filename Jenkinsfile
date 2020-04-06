@@ -13,10 +13,11 @@ pipeline
 	}
 	stages
 	{
-		stage("Info")
+		stage("Environment")
 		{
 			steps
 			{
+				sh "cp tools/jenkins/.bazelrc.ci .bazelrc.ci"
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
@@ -29,11 +30,32 @@ pipeline
 		{
 			parallel
 			{
-				stage("bazel test ...")
+				stage("Toolchain local")
 				{
 					steps
 					{
-						sh "bazel --output_user_root=/cache/output test ... --disk_cache=/cache/bazel -s" 
+						sh "bazel test ..." 
+					}
+				}
+				stage("Toolchain linux_x86_64_clang")
+				{
+					steps
+					{
+						sh "bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
+					}
+				}
+				stage("Toolchain esp32_xtensa_lx6_gcc")
+				{
+					steps
+					{
+						sh "bazel test ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+					}
+				}
+				stage("Static analyzers")
+				{
+					steps
+					{
+						sh "bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
 				}
 			}

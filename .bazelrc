@@ -1,6 +1,7 @@
 common --announce_rc
 
 try-import .bazelrc.local
+try-import .bazelrc.ci
 
 # Build specific options
 build --verbose_failures
@@ -21,12 +22,14 @@ test --define=panic=throw
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
 build:linux_x86_64_clang --host_platform="@linux_x86_64_clang//:host_platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
+build:linux_x86_64_clang --build_tag_filters="-nodejs"
 
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --host_platform="@esp32_xtensa_lx6_gcc//:host_platform"
 build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
+build:esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs"
 
 # Sanitizers
 
