@@ -7,7 +7,8 @@ FROM ubuntu:latest
 #            to run a script using this python toolchain, a startup python script needs
 #            to be executed to discover binaries.
 # - gnupg2 - needed add the key to apt.
-RUN apt-get update && apt-get install -y git sudo build-essential g++ libc6-dev curl gnupg2 python
+# - libxml2-dev - needed for LLVM (need to be removed).
+RUN apt-get update && apt-get install -y git sudo build-essential g++ libc6-dev curl gnupg2 python libxml2-dev
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
