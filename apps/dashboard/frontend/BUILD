@@ -3,14 +3,18 @@ load("//tools/bazel.build/rules:nodejs_web.bzl", "bzd_nodejs_web")
 bzd_nodejs_web(
     name = "frontend",
     srcs = glob([
-        "app.vue",
-        "app.js",
+        "**/*.vue",
+        "**/*.js",
     ]),
     alias = "frontend",
     entries = {
         "app.js": "index",
     },
     packages = {
-        "vue": "latest",
+        "vue": "",
     },
+    deps = [
+        "//platform/nodejs:icons",
+        "//platform/nodejs:styles",
+    ],
 )

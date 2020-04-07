@@ -1,6 +1,24 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "icons",
+    srcs = glob([
+        "assets/svg/*.svg",
+    ]) + ["icons.scss"],
+    alias = "bzd",
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
+    name = "styles",
+    srcs = glob([
+        "assets/style/*",
+    ]),
+    alias = "bzd",
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "webpack",
     srcs = [
         "require/exception.js",
@@ -8,26 +26,28 @@ bzd_nodejs_library(
         "require/template.js",
         "webpack.js",
     ],
+    alias = "bzd",
     packages = {
         # Babel
-        "@babel/core": "latest",
-        "@babel/plugin-transform-runtime": "latest",
-        "babel-loader": "latest",
-        "babel-plugin-syntax-dynamic-import": "latest",
+        "@babel/core": "",
+        "@babel/plugin-transform-runtime": "",
+        "babel-loader": "",
+        "babel-plugin-syntax-dynamic-import": "",
         # Webpack
-        "webpack": "latest",
-        "webpack-cli": "latest",
-        "webpack-assets-manifest": "latest",
-        "webpack-bundle-analyzer": "latest",
+        "webpack": "",
+        "webpack-cli": "",
+        "webpack-assets-manifest": "",
+        "webpack-bundle-analyzer": "",
         # Vue
-        "vue-loader": "latest",
-        "vue-template-compiler": "latest",
-        "vue-style-loader": "latest",
+        "vue-loader": "",
+        "vue-template-compiler": "",
+        "vue-style-loader": "",
         # CSS/SASS
-        "mini-css-extract-plugin": "latest",
-        "css-loader": "latest",
-        "sass-loader": "latest",
-        "file-loader": "latest",
+        "mini-css-extract-plugin": "0.8.0",  # Seems that 0.9.0 has some issue: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/493
+        "css-loader": "",
+        "node-sass": "",
+        "sass-loader": "",
+        "file-loader": "",
     },
     visibility = ["//visibility:public"],
 )
