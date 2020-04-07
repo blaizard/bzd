@@ -1,0 +1,67 @@
+/**
+ * For fields that are intended to be clickable
+ * \note The effect should only affect the background-image to avoid any conflicts with the elements.
+ */
+%bzd-clickable {
+
+    // Configuration
+    $bzdColor: #000 !default;
+    $bzdOpacity: 0.32 !default;
+
+    $bzdColorRed: red($bzdColor);
+    $bzdColorGreen: green($bzdColor);
+    $bzdColorBlue: blue($bzdColor);
+
+    cursor: pointer;
+
+    transition: background-size .2s ease-out;
+
+    background-position: center; 
+    background-size: 100% 100%;
+
+    user-select: none; 
+
+    @keyframes clickableAnimation {
+        0% {
+            background-image: radial-gradient(circle at center, rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, $bzdOpacity) 9%, transparent 10%, transparent 11%);
+        }
+
+        @for $i from 1 through 10 {
+            #{$i * 10}% {
+                background-image: radial-gradient(circle at center, rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min($bzdOpacity / ($i / 2.5), $bzdOpacity)) 9%, transparent 10%, transparent 11%);
+                background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
+            }
+        }
+    }
+
+    @keyframes clickableClickAnimation {
+        0% {
+            background-image: radial-gradient(circle at center, rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, $bzdOpacity) 9%, transparent 10%, transparent 11%);
+        }
+
+        @for $i from 1 through 10 {
+            #{$i * 10}% {
+                background-image: radial-gradient(circle at center, rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min($bzdOpacity / ($i / 2.5), $bzdOpacity)) 9%, transparent 10%, transparent 11%);
+                background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
+            }
+        }
+    }
+
+    &:hover,
+    &:focus {
+        animation: clickableAnimation .25s 1;
+        animation-fill-mode: forwards;
+        opacity: 1;
+    }
+
+    &:active {
+        animation: clickableClickAnimation .25s 1;
+        animation-delay: 1s;
+        animation-fill-mode: forwards;
+        opacity: 1;
+    }
+
+    &:active {
+        background-image: none;
+    }
+}

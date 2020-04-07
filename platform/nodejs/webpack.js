@@ -309,6 +309,7 @@ function getWebpackConfigDefault(isDev, config)
 		// Reduce verbosity
 		stats: verboseStats,
 		target: "web",
+		bail: true,
 		output: {
 			filename: "[name].js",
 			chunkFilename: "[chunkhash].js"
@@ -479,7 +480,7 @@ function getWebpackConfigDefault(isDev, config)
 						}
 						catch (e) {
 							Log.error(e);
-							break;
+							process.exit(1);
 						}
 					}
 

@@ -11,6 +11,8 @@ import signal
 
 class WebServer(socketserver.TCPServer):
 
+    allow_reuse_address = True
+
     def run(self):
         try:
             self.serve_forever()

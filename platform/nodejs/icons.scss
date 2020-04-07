@@ -1,0 +1,56 @@
+*[class^="bzd-icon-"] {
+	min-width: 1em;
+	min-height: 1em;
+
+	display: inline-block;
+	vertical-align: text-bottom;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: auto;
+	font-style: normal;
+	font-variant: normal;
+
+	-webkit-mask-size: contain;
+	-webkit-mask-position: center;
+	-webkit-mask-repeat: no-repeat;
+	mask-size: contain;
+	mask-position: center;
+	mask-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+
+	// Make it spin
+	&.bzd-icon-spin {
+		@keyframes anim-rotate {
+			0% {
+				transform: rotate(0);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+		animation: anim-rotate 2s infinite linear;
+	}
+}
+
+/**
+ * Helper to create and define icons
+ */
+@mixin defineIcon($imageUrl) {
+	background-image: url($imageUrl);
+	@supports (-webkit-mask-repeat: no-repeat) or (mask-repeat: no-repeat) {
+		background-color: currentColor;
+		background-image: none !important;
+		-webkit-mask-image: url($imageUrl);
+		mask-image: url($imageUrl);
+	}
+}
+
+// ---- Icon definitions ------------------------------------------------------
+
+@each $name in $bzdIconNames {
+	.bzd-icon-#{$name} {
+		@include defineIcon("~[bzd]/assets/svg/#{$name}.svg");
+	}
+}

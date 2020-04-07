@@ -10,7 +10,7 @@ def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], symlinks = 
     runfiles = runfiles.merge(binary.default_runfiles)
 
     runfiles_relative_tool_path = ctx.workspace_name + "/" + executable.short_path
-    command_pre = "#!/bin/bash\nif [ -z \"${RUNFILES_DIR}\" ]; then\nexport RUNFILES_DIR=\"$0.runfiles\"\nfi\n"
+    command_pre = "#!/bin/bash\nset -e\nif [ -z \"${RUNFILES_DIR}\" ]; then\nexport RUNFILES_DIR=\"$0.runfiles\"\nfi\n"
     binary_path = "${{RUNFILES_DIR}}/{}".format(runfiles_relative_tool_path)
 
     # Create the wrapping script

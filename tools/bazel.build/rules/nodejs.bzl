@@ -1,7 +1,7 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
-BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules"])
-BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs"])
+BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
+BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
 
 """
 A library contains all depdencies used for this target.
@@ -11,11 +11,15 @@ def _bzd_nodejs_library_impl(ctx):
     return [DefaultInfo(), BzdNodeJsDepsProvider(
         srcs = depset(transitive = [f.files for f in ctx.attr.srcs]),
         packages = dict(ctx.attr.packages),
+        aliases = {ctx.attr.alias: ctx.label.package} if ctx.attr.alias else {},
     )]
 
 bzd_nodejs_library = rule(
     implementation = _bzd_nodejs_library_impl,
     attrs = {
+        "alias": attr.string(
+            doc = "Name of the alias, available in the form [name], for the current directory.",
+        ),
         "srcs": attr.label_list(
             allow_files = True,
             mandatory = True,
@@ -36,14 +40,23 @@ def _bzd_nodejs_deps_provider_merge(iterable):
     provider = BzdNodeJsDepsProvider(
         srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in iterable]),
         packages = {},
+        aliases = {},
     )
 
-    # Merge packages
     for it in iterable:
+        # Merge packages
         for name, version in it[BzdNodeJsDepsProvider].packages.items():
-            if name in provider.packages and provider.packages[name] != version:
+            # If the version already stored is different
+            if name in provider.packages and provider.packages[name] and version and provider.packages[name] != version:
                 fail("Version conflict for package '{}': '{}' vs '{}'".format(name, version, provider.packages[name]))
             provider.packages[name] = version
+
+        # Merge aliases
+        for name, path in it[BzdNodeJsDepsProvider].aliases.items():
+            # If the alias already stored is different
+            if name in provider.aliases and provider.aliases[name] != path:
+                fail("Path conflict for alias '{}': '{}' vs '{}'".format(name, path, provider.aliases[name]))
+            provider.aliases[name] = path
 
     return provider
 
@@ -72,7 +85,7 @@ def _bzd_nodejs_install_impl(ctx):
     package_json = ctx.actions.declare_file("package.json")
 
     # Build the dependencies template replacement string
-    dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version) for name, version in depsProvider.packages.items()])
+    dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version if version else "latest") for name, version in depsProvider.packages.items()])
 
     ctx.actions.expand_template(
         template = ctx.file._package_json_template,
@@ -101,7 +114,7 @@ def _bzd_nodejs_install_impl(ctx):
     # Return the provides (including outputs and dependencies)
     return [
         DefaultInfo(files = depset([package_json, node_modules])),
-        BzdNodeJsInstallProvider(package_json = package_json, node_modules = node_modules),
+        BzdNodeJsInstallProvider(package_json = package_json, node_modules = node_modules, aliases = depsProvider.aliases),
         depsProvider,
     ]
 
@@ -165,10 +178,11 @@ _bzd_nodejs_exec = rule(
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_binary(name, main, srcs = [], deps = [], packages = {}, **kwargs):
+def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], packages = {}):
     # Create a library with the sources and packages
     bzd_nodejs_library(
         name = name + ".library",
+        alias = alias,
         srcs = srcs,
         packages = packages,
         tags = ["nodejs"],
