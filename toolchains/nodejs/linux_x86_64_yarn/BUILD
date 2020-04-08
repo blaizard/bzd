@@ -4,7 +4,7 @@ load("//tools/bazel.build/toolchains/nodejs:defs.bzl", "nodejs_toolchain")
 sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
-    command = "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --cache-folder \"$(pwd)\" $@",
+    command = "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --cache-folder \"$(pwd)/cache\" $@",
     data = [
         "@node",
     ],
