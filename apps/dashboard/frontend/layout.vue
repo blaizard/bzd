@@ -135,9 +135,6 @@
             font-size: $headerFontSize;
             line-height: $headerHeight;
 
-            padding-left: $headerPadding;
-            padding-right: $headerPadding;
-
             > * {
                 padding-left: $headerPadding / 2;
                 padding-right: $headerPadding / 2;
