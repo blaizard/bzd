@@ -10,6 +10,9 @@
 				<slot name="header"></slot>
 			</div>
 
+            <div class="layout-header-actions">
+                <slot name="actions"></slot>
+            </div>
 		</div>
 
 		<div class="layout-menu">
@@ -128,8 +131,12 @@
 
             background-color: $headerBgColor;
             color: $headerColor;
+
             font-size: $headerFontSize;
-            padding: $headerPadding;
+            line-height: $headerHeight;
+
+            padding-left: $headerPadding;
+            padding-right: $headerPadding;
 
             > * {
                 padding-left: $headerPadding / 2;
@@ -138,6 +145,26 @@
 
             .layout-header-menu-trigger {
                 @extend %bzd-clickable;
+
+                min-width: $headerHeight;
+                text-align: center;
+            }
+
+            .layout-header-actions {
+                ul {
+                    padding: 0;
+                    margin: 0;
+                    li {
+                        font-size: 0;
+                        line-height: 0;
+                        padding: $headerPadding;
+                        i {
+                            font-size: $headerFontSize;
+                        }
+                        list-style: none;
+                        @extend %bzd-clickable;
+                    }
+                }
             }
         }
 

@@ -1,15 +1,14 @@
 <template>
   <Layout>
     <template v-slot:header>Dashboard</template>
-    <!--<template v-slot:quick>
+    <template v-slot:actions>
       <ul>
-        <li><i></i></li>
-        <li>
+        <li><i class="bzd-icon-menu"></i> Hello</li>
       </ul>
-    </template>//-->
+    </template>
     <template v-slot:menu>
       <ul>
-        <li>About</li>
+        <li><span><i class="bzd-icon-menu"></i> About</span></li>
       </ul>
     </template>
     <template v-slot:content>
@@ -35,4 +34,7 @@
 
 <style lang="scss">
 	@import "~[bzd]/assets/style/base.scss";
+
+  $bzdIconNames: menu;
+  @import "~[bzd]/icons.scss";
 </style>
