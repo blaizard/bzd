@@ -1,10 +1,8 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_library")
+load("//tools/bazel.build/rules:package.bzl", "bzd_package_fragment")
 
-BzdNodeJsWebProvider = provider(fields = ["tar", "root"])
-
-def _bzd_nodejs_web_get_root(ctx, target_name):
-    return "{}/{}".format(ctx.label.package, ctx.attr.target_name)
+BzdNodeJsWebProvider = provider(fields = ["tar"])
 
 """
 Build and package a web application with webpack
@@ -58,11 +56,9 @@ def _bzd_nodejs_web_build_impl(ctx):
         binary = toolchain_executable.manager,
         output = ctx.outputs.executable,
         command = """
-        {{binary}} --cwd "{{workspace}}" run webpack --output-path ".bzd/output"
-        tar --transform 's,^,{root_prefix}/,' -h -cf "$1" -C "{{workspace}}/.bzd/output" .
-        """.format(
-            root_prefix = _bzd_nodejs_web_get_root(ctx, ctx.attr.target_name)
-        ),
+        {binary} --cwd "{workspace}" run webpack --output-path ".bzd/output"
+        tar -h -cf "$1" -C "{workspace}/.bzd/output" --transform 's,^./,,' .
+        """,
         extra_runfiles = [webpack_config, package_json, node_modules] + srcs,
         symlinks = {
             "node_modules": node_modules,
@@ -118,7 +114,7 @@ def _bzd_nodejs_web_package_impl(ctx):
     )
     return [
         DefaultInfo(files = depset([package])),
-        BzdNodeJsWebProvider(tar = package, root = _bzd_nodejs_web_get_root(ctx, ctx.attr.target_name)),
+        BzdNodeJsWebProvider(tar = package),
     ]
 
 _bzd_nodejs_web_package = rule(
@@ -142,16 +138,23 @@ NodeJs web application executor
 def _bzd_nodejs_web_exec_impl(ctx):
 
     package = ctx.attr.package[BzdNodeJsWebProvider].tar
-    root = ctx.attr.package[BzdNodeJsWebProvider].root
 
     # Run the application
-    return sh_binary_wrapper_impl(
-        ctx = ctx,
-        binary = ctx.attr._web_server,
-        output = ctx.outputs.executable,
-        command = "{{binary}} $@ --root \"{}\" \"{}\"".format(root, package.short_path),
-        extra_runfiles = [package],
-    )
+    return [
+        sh_binary_wrapper_impl(
+            ctx = ctx,
+            binary = ctx.attr._web_server,
+            output = ctx.outputs.executable,
+            command = "{{binary}} $@ \"{}\"".format(package.short_path),
+            extra_runfiles = [package],
+        ),
+        bzd_package_fragment(
+            ctx = ctx,
+            tars = [
+                package
+            ]
+        ),
+    ]
 
 _bzd_nodejs_web_exec = rule(
     implementation = _bzd_nodejs_web_exec_impl,
