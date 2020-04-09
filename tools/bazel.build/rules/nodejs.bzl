@@ -223,5 +223,6 @@ def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], visibility =
         deps = [
             name
         ],
+        tags = ["nodejs"],
         visibility = visibility,
     )
