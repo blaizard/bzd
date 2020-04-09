@@ -1,6 +1,18 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "vue",
+    srcs = glob([
+        "vue/**/*",
+    ]),
+    alias = "bzd",
+    packages = {
+        "vue": ""
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "icons",
     srcs = glob([
         "assets/svg/*.svg",

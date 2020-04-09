@@ -10,6 +10,9 @@
 				<slot name="header"></slot>
 			</div>
 
+            <div class="layout-header-padding">
+            </div>
+
             <div class="layout-header-actions">
                 <slot name="actions"></slot>
             </div>
@@ -125,7 +128,7 @@
             display: flex;
 			flex-flow: row nowrap;
 			align-items: center;
-			justify-content: self-start;
+            justify-content: space-between;
 
             box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 3px -2px rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
 
@@ -135,16 +138,20 @@
             font-size: $headerFontSize;
             line-height: $headerHeight;
 
-            > * {
-                padding-left: $headerPadding / 2;
-                padding-right: $headerPadding / 2;
-            }
-
             .layout-header-menu-trigger {
                 @extend %bzd-clickable;
 
                 min-width: $headerHeight;
                 text-align: center;
+            }
+
+            .layout-header-content {
+                padding-left: $headerPadding / 2;
+                padding-right: $headerPadding / 2;
+            }
+
+            .layout-header-padding {
+                width: 100%;
             }
 
             .layout-header-actions {

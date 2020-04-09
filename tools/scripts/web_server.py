@@ -7,33 +7,25 @@ import os
 import socketserver
 import tarfile
 import tempfile
-import signal
 
 class WebServer(socketserver.TCPServer):
-
     allow_reuse_address = True
-
     def run(self):
         try:
             self.serve_forever()
         except KeyboardInterrupt:
-            pass
+            print("\r<Keyboard interrupt>")
         finally:
             self.server_close()
-
-def keyboardInterruptHandler(signal, frame):
-    # Todo, cleanup (sometimes port is not freed up)
-    exit(0)
 
 if __name__== "__main__":
 
     parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
     parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to be used.")
+    parser.add_argument("-r", "--root", dest="root", default=None, type=str, help="Prefix path where the files to serve are located.")
     parser.add_argument("path", default=".", nargs='?', help="Serve files from this specific directory or archive, by default the current directory will be used.")
 
     args = parser.parse_args()
-
-    signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
     tempPath = None
     try:
@@ -48,6 +40,14 @@ if __name__== "__main__":
             finally:
                 package.close()
             os.chdir(tempPath.name)
+
+        # If special path, serve it
+        elif os.path.isdir(args.path):
+            os.chdir(args.path)
+
+        # If the root is somewhere else
+        if args.root:
+            os.chdir(args.root)
 
         handler = http.server.SimpleHTTPRequestHandler
         server = WebServer(("", args.port), handler)

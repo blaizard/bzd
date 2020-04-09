@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 let watcherInstance = null;
 const watcherPollingPeriodMs = 500;

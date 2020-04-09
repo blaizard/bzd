@@ -1,0 +1,66 @@
+.irtooltip {
+	z-index: 99999;
+
+	.irtooltip-text {
+		position: relative;
+
+		background-color: #444;
+		color: #fff;
+		font-weight: bold;
+		padding: 5px 10px;
+		border: 1px solid #fff;
+
+		&:after {
+			position: absolute;
+			content: " ";
+			width: 0; 
+			height: 0;
+			border-width: 10px;
+			border-style: solid;
+		}
+	}
+}
+
+.irtooltip-e {
+	.irtooltip-text {
+		margin-left: 12px;
+		&:after {
+			top: calc(50% - 10px);
+			left: -21px;
+			border-color: transparent #444 transparent transparent;
+		}
+	}
+}
+
+.irtooltip-s {
+	.irtooltip-text {
+		margin-top: 12px;
+		&:after {
+			top: -21px;
+			left: calc(50% - 10px);
+			border-color: transparent transparent #444 transparent;
+		}
+	}
+}
+
+.irtooltip-w {
+	.irtooltip-text {
+		margin-left: -12px;
+		&:after {
+			top: calc(50% - 10px);
+			right: -21px;
+			border-color: transparent transparent transparent #444;
+		}
+	}
+}
+
+.irtooltip-n {
+	.irtooltip-text {
+		margin-top: -12px;
+		&:after {
+			bottom: -21px;
+			left: calc(50% - 10px);
+			border-color: #444 transparent transparent transparent;
+		}
+	}
+}
