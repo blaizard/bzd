@@ -1,4 +1,13 @@
-BzdPackageProvider = provider(fields = ["files", "files_remap"])
+_BzdPackageFragment = provider(fields = ["root", "files", "files_remap"])
+
+"""
+Generate a package provider
+"""
+def bzd_package_fragment(ctx = None, **kwargs):
+    return _BzdPackageFragment(
+        root = "{}/{}".format(ctx.label.package, ctx.label.name),
+        **kwargs
+    )
 
 def _bzd_package_impl(ctx):
 
@@ -10,19 +19,19 @@ def _bzd_package_impl(ctx):
     tar_cmd = "tar -h --hard-dereference -rf \"{}\"".format(package.path)
     inputs = []
     for target in ctx.attr.deps:
-        if BzdPackageProvider in target:
+        if _BzdPackageFragment in target:
 
             # Add single files or symlinks
-            for f in target[BzdPackageProvider].files:
+            for f in target[_BzdPackageFragment].files:
                 inputs.append(f)
                 package_creation_commands.append("{} \"{}\"".format(tar_cmd, f.path))
 
             # Remap single files or symlinks
-            for path, f in target[BzdPackageProvider].files_remap.items():
+            for path, f in target[_BzdPackageFragment].files_remap.items():
                 inputs.append(f)
                 package_creation_commands.append("{} \"{}\" --transform 's,^{},{},'".format(tar_cmd, f.path, f.path, path))
         else:
-            fail("Dependencies for this rule requires BzdPackageProvider provider.")
+            fail("Dependencies for this rule requires _BzdPackageFragment provider.")
 
     ctx.actions.run_shell(
         inputs = inputs,

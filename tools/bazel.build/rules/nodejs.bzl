@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:package.bzl", "BzdPackageProvider", "bzd_package")
+load("//tools/bazel.build/rules:package.bzl", "bzd_package_fragment", "bzd_package")
 
 BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
 BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
@@ -120,19 +120,15 @@ def _bzd_nodejs_install_impl(ctx):
             node_modules = node_modules,
             aliases = depsProvider.aliases
         ),
-        BzdPackageProvider(
-            files = depsProvider.srcs.to_list(),
-            files_remap = {
-                "node_modules": node_modules,
-                "package.json": package_json,
-            },
-        ),
         depsProvider,
     ]
 
 bzd_nodejs_install = rule(
     implementation = _bzd_nodejs_install_impl,
     attrs = {
+        "target_name": attr.label(
+            doc = "The name of target to which this rule is associated.",
+        ),
         "deps": attr.label_list(
             aspects = [bzd_nodejs_deps_aspect],
             allow_files = True,
@@ -173,7 +169,14 @@ def _bzd_nodejs_exec_impl(ctx):
                 "package.json": package_json,
             },
         ),
-        ctx.attr.install[BzdPackageProvider]
+        bzd_package_fragment(
+            ctx = ctx,
+            files = srcs,
+            files_remap = {
+                "node_modules": node_modules,
+                "package.json": package_json,
+            },
+        ),
     ]
 
 _bzd_nodejs_exec = rule(
