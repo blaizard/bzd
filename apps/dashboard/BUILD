@@ -17,6 +17,6 @@ container_image(
     tars = [
         ":package"
     ],
-    cmd = ["/usr/bin/node /data/apps.dashboard.backend.backend/apps/dashboard/backend/app.js"],
+    cmd = ["node", "/data/apps.dashboard.backend.backend/apps/dashboard/backend/app.js"],
     tags = ["nodejs"],
 )
