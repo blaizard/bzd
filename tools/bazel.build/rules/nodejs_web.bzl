@@ -1,7 +1,10 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_library")
 
-BzdNodeJsWebProvider = provider(fields = ["tar"])
+BzdNodeJsWebProvider = provider(fields = ["tar", "root"])
+
+def _bzd_nodejs_web_get_root(ctx, target_name):
+    return "{}/{}".format(ctx.label.package, ctx.attr.target_name)
 
 """
 Build and package a web application with webpack
@@ -55,9 +58,11 @@ def _bzd_nodejs_web_build_impl(ctx):
         binary = toolchain_executable.manager,
         output = ctx.outputs.executable,
         command = """
-        {binary} --cwd "{workspace}" run webpack --output-path ".bzd/output"
-        tar -cf "$1" -C "{workspace}/.bzd/output" .
-        """,
+        {{binary}} --cwd "{{workspace}}" run webpack --output-path ".bzd/output"
+        tar --transform 's,^,{root_prefix}/,' -h -cf "$1" -C "{{workspace}}/.bzd/output" .
+        """.format(
+            root_prefix = _bzd_nodejs_web_get_root(ctx, ctx.attr.target_name)
+        ),
         extra_runfiles = [webpack_config, package_json, node_modules] + srcs,
         symlinks = {
             "node_modules": node_modules,
@@ -69,6 +74,10 @@ def _bzd_nodejs_web_build_impl(ctx):
 _bzd_nodejs_web_build = rule(
     implementation = _bzd_nodejs_web_build_impl,
     attrs = {
+        "target_name": attr.string(
+            mandatory = True,
+            doc = "Name of actual target.",
+        ),
         "alias": attr.string(
             doc = "Name of the alias, available in the form [name], for the current directory.",
         ),
@@ -94,10 +103,10 @@ _bzd_nodejs_web_build = rule(
 )
 
 """
-NodeJs web application executor
+NodeJs web application packaging
 """
 
-def _bzd_nodejs_web_exec_impl(ctx):
+def _bzd_nodejs_web_package_impl(ctx):
     # Build the application
     package = ctx.actions.declare_file(".bzd/nodejs_web_{}.tar".format(ctx.label.name))
     ctx.actions.run(
@@ -107,22 +116,47 @@ def _bzd_nodejs_web_exec_impl(ctx):
         progress_message = "Building {}".format(ctx.label),
         executable = ctx.executable.build,
     )
+    return [
+        DefaultInfo(files = depset([package])),
+        BzdNodeJsWebProvider(tar = package, root = _bzd_nodejs_web_get_root(ctx, ctx.attr.target_name)),
+    ]
 
-    runfile = sh_binary_wrapper_impl(
+_bzd_nodejs_web_package = rule(
+    implementation = _bzd_nodejs_web_package_impl,
+    attrs = {
+        "target_name": attr.string(
+            mandatory = True,
+            doc = "Name of actual target.",
+        ),
+        "build": attr.label(
+            executable = True,
+            cfg = "target",
+        ),
+    },
+)
+
+"""
+NodeJs web application executor
+"""
+
+def _bzd_nodejs_web_exec_impl(ctx):
+
+    package = ctx.attr.package[BzdNodeJsWebProvider].tar
+    root = ctx.attr.package[BzdNodeJsWebProvider].root
+
+    # Run the application
+    return sh_binary_wrapper_impl(
         ctx = ctx,
         binary = ctx.attr._web_server,
         output = ctx.outputs.executable,
-        command = "{{binary}} $@ \"{}\"".format(package.short_path),
+        command = "{{binary}} $@ --root \"{}\" \"{}\"".format(root, package.short_path),
         extra_runfiles = [package],
     )
-
-    return [runfile, BzdNodeJsWebProvider(tar = package)]
 
 _bzd_nodejs_web_exec = rule(
     implementation = _bzd_nodejs_web_exec_impl,
     attrs = {
-        "build": attr.label(
-            executable = True,
+        "package": attr.label(
             cfg = "target",
         ),
         "_web_server": attr.label(
@@ -139,7 +173,7 @@ _bzd_nodejs_web_exec = rule(
 Public macro to create a web application with NodeJs
 """
 
-def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], **kwargs):
+def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], visibility = [], **kwargs):
     # Create a library with the sources and packages
     bzd_nodejs_library(
         name = name + ".library",
@@ -162,14 +196,25 @@ def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], **kwar
     # Build the web application and packs it
     _bzd_nodejs_web_build(
         name = name + ".build",
+        target_name = name,
         install = name + ".install",
         tags = ["nodejs"],
         **kwargs
     )
 
+    # Generate the package
+    _bzd_nodejs_web_package(
+        name = name + ".package",
+        build = name + ".build",
+        target_name = name,
+        tags = ["nodejs"],
+        visibility = visibility,
+    )
+
     # Generate the executable
     _bzd_nodejs_web_exec(
         name = name,
-        build = name + ".build",
+        package = name + ".package",
         tags = ["nodejs"],
+        visibility = visibility,
     )

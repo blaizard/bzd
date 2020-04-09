@@ -1,4 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("//tools/bazel.build/rules:package.bzl", "BzdPackageProvider", "bzd_package")
 
 BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
 BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
@@ -107,14 +108,25 @@ def _bzd_nodejs_install_impl(ctx):
         inputs = [package_json],
         outputs = [node_modules],
         progress_message = "Updating package(s) for {}".format(ctx.label),
-        arguments = ["--cwd", package_json.dirname, "install"],
+        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive"],
         executable = toolchain_executable.manager.files_to_run,
     )
 
     # Return the provides (including outputs and dependencies)
     return [
         DefaultInfo(files = depset([package_json, node_modules])),
-        BzdNodeJsInstallProvider(package_json = package_json, node_modules = node_modules, aliases = depsProvider.aliases),
+        BzdNodeJsInstallProvider(
+            package_json = package_json,
+            node_modules = node_modules,
+            aliases = depsProvider.aliases
+        ),
+        BzdPackageProvider(
+            files = depsProvider.srcs.to_list(),
+            files_remap = {
+                "node_modules": node_modules,
+                "package.json": package_json,
+            },
+        ),
         depsProvider,
     ]
 
@@ -149,17 +161,20 @@ def _bzd_nodejs_exec_impl(ctx):
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
-    return sh_binary_wrapper_impl(
-        ctx = ctx,
-        binary = toolchain_executable.node,
-        output = ctx.outputs.executable,
-        command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\"".format(ctx.file.main.path),
-        extra_runfiles = [node_modules, package_json] + srcs,
-        symlinks = {
-            "node_modules": node_modules,
-            "package.json": package_json,
-        },
-    )
+    return [
+        sh_binary_wrapper_impl(
+            ctx = ctx,
+            binary = toolchain_executable.node,
+            output = ctx.outputs.executable,
+            command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\"".format(ctx.file.main.path),
+            extra_runfiles = [node_modules, package_json] + srcs,
+            symlinks = {
+                "node_modules": node_modules,
+                "package.json": package_json,
+            },
+        ),
+        ctx.attr.install[BzdPackageProvider]
+    ]
 
 _bzd_nodejs_exec = rule(
     implementation = _bzd_nodejs_exec_impl,
@@ -178,7 +193,7 @@ _bzd_nodejs_exec = rule(
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], packages = {}):
+def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], visibility = [], packages = {}):
     # Create a library with the sources and packages
     bzd_nodejs_library(
         name = name + ".library",
@@ -200,4 +215,13 @@ def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], packages = {
         main = main,
         install = name + ".install",
         tags = ["nodejs"],
+        visibility = visibility,
+    )
+
+    bzd_package(
+        name = name + ".package",
+        deps = [
+            name
+        ],
+        visibility = visibility,
     )
