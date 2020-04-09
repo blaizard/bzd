@@ -3,7 +3,7 @@ _BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"]
 """
 Generate a package provider
 """
-def bzd_package_fragment(ctx = None, **kwargs):
+def bzd_package_fragment(ctx, **kwargs):
     return _BzdPackageFragment(
         root = "{}.{}".format(ctx.label.package.replace("/", "."), ctx.label.name),
         **kwargs
