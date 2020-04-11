@@ -1,47 +1,29 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:package.bzl", "bzd_package_fragment", "bzd_package")
+load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
 BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
 
 """
-A library contains all depdencies used for this target.
-"""
-
-def _bzd_nodejs_library_impl(ctx):
-    return [DefaultInfo(), BzdNodeJsDepsProvider(
-        srcs = depset(transitive = [f.files for f in ctx.attr.srcs]),
-        packages = dict(ctx.attr.packages),
-        aliases = {ctx.attr.alias: ctx.label.package} if ctx.attr.alias else {},
-    )]
-
-bzd_nodejs_library = rule(
-    implementation = _bzd_nodejs_library_impl,
-    attrs = {
-        "alias": attr.string(
-            doc = "Name of the alias, available in the form [name], for the current directory.",
-        ),
-        "srcs": attr.label_list(
-            allow_files = True,
-            mandatory = True,
-            doc = "Source files",
-        ),
-        "packages": attr.string_dict(
-            allow_empty = True,
-            doc = "Package dependencies",
-        ),
-    },
-)
-
-"""
 Merge providers of types BzdNodeJsDepsProvider together
 """
 
-def _bzd_nodejs_deps_provider_merge(iterable):
+def _bzd_nodejs_deps_provider_merge(iterable, ctx = None):
+
+    srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in iterable])
+    packages = {}
+    aliases = {}
+
+    # Merge context information first
+    if ctx:
+        srcs = depset(srcs.to_list(), transitive = [f.files for f in ctx.attr.srcs])
+        packages = dict(ctx.attr.packages)
+        aliases = {ctx.attr.alias: ctx.label.package} if ctx.attr.alias else {}
+
     provider = BzdNodeJsDepsProvider(
-        srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in iterable]),
-        packages = {},
-        aliases = {},
+        srcs = srcs,
+        packages = packages,
+        aliases = aliases,
     )
 
     for it in iterable:
@@ -72,6 +54,36 @@ Aspects to gather data from bzd depedencies.
 bzd_nodejs_deps_aspect = aspect(
     implementation = _bzd_nodejs_deps_aspect_impl,
     attr_aspects = ["deps"],
+)
+
+"""
+A library contains all depdencies used for this target.
+"""
+
+def _bzd_nodejs_library_impl(ctx):
+    return [DefaultInfo(), _bzd_nodejs_deps_provider_merge(ctx.attr.deps, ctx = ctx)]
+
+bzd_nodejs_library = rule(
+    implementation = _bzd_nodejs_library_impl,
+    attrs = {
+        "alias": attr.string(
+            doc = "Name of the alias, available in the form [name], for the current directory.",
+        ),
+        "srcs": attr.label_list(
+            allow_files = True,
+            mandatory = True,
+            doc = "Source files",
+        ),
+        "packages": attr.string_dict(
+            allow_empty = True,
+            doc = "Package dependencies",
+        ),
+        "deps": attr.label_list(
+            aspects = [bzd_nodejs_deps_aspect],
+            allow_files = True,
+            doc = "Dependencies",
+        ),
+    },
 )
 
 """
@@ -169,8 +181,7 @@ def _bzd_nodejs_exec_impl(ctx):
                 "package.json": package_json,
             },
         ),
-        bzd_package_fragment(
-            ctx = ctx,
+        BzdPackageFragment(
             files = srcs,
             files_remap = {
                 "node_modules": node_modules,
@@ -217,15 +228,6 @@ def bzd_nodejs_binary(name, main, alias = "", srcs = [], deps = [], visibility =
         name = name,
         main = main,
         install = name + ".install",
-        tags = ["nodejs"],
-        visibility = visibility,
-    )
-
-    bzd_package(
-        name = name + ".package",
-        deps = [
-            name
-        ],
         tags = ["nodejs"],
         visibility = visibility,
     )

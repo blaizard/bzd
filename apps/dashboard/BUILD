@@ -3,10 +3,10 @@ load("//tools/bazel.build/rules:package.bzl", "bzd_package")
 
 bzd_package(
     name = "package",
-    deps = [
-        "//apps/dashboard/frontend",
-        "//apps/dashboard/backend",
-    ],
+    deps = {
+        "//apps/dashboard/frontend": "frontend",
+        "//apps/dashboard/backend": "backend",
+    },
     tags = ["nodejs"],
 )
 
@@ -17,6 +17,6 @@ container_image(
     tars = [
         ":package"
     ],
-    cmd = ["node", "/data/apps.dashboard.backend.backend/apps/dashboard/backend/app.js"],
+    cmd = ["node", "/data/backend/apps/dashboard/backend/app.js"],
     tags = ["nodejs"],
 )

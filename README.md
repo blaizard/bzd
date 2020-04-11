@@ -1,10 +1,10 @@
 # bzd Monorepo
 
-Fullstack, Lightweight and flexible framework for embedded IoT applications.
+Fullstack, Lightweight and flexible framework for IoT applications.
 This monorepo enables the following technologies:
-C++14                         |Python                           |Vue                           |Bazel
-:----------------------------:|:-------------------------------:|:----------------------------:|:------------------------------:
-![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)
+|C++14                         |Python                           |NodeJs + Vue                  |Bazel                           |
+|:----------------------------:|:-------------------------------:|:----------------------------:|:------------------------------:|
+|![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)|
 
 ## Menu
 
