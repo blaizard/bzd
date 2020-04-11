@@ -1,6 +1,6 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_library")
-load("//tools/bazel.build/rules:package.bzl", "bzd_package_fragment")
+load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsWebProvider = provider(fields = ["tar"])
 
@@ -148,8 +148,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
             command = "{{binary}} $@ \"{}\"".format(package.short_path),
             extra_runfiles = [package],
         ),
-        bzd_package_fragment(
-            ctx = ctx,
+        BzdPackageFragment(
             tars = [
                 package
             ]

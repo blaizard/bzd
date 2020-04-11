@@ -1,13 +1,4 @@
-_BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
-
-"""
-Generate a package provider
-"""
-def bzd_package_fragment(ctx, **kwargs):
-    return _BzdPackageFragment(
-        root = "{}.{}".format(ctx.label.package.replace("/", "."), ctx.label.name),
-        **kwargs
-    )
+BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
 
 def _bzd_package_impl(ctx):
 
@@ -18,13 +9,12 @@ def _bzd_package_impl(ctx):
 
     tar_cmd = "tar -h --hard-dereference -f \"{}\"".format(package.path)
     inputs = []
-    for target in ctx.attr.deps:
-        if _BzdPackageFragment in target:
-            fragment = target[_BzdPackageFragment]
+    for target, root in ctx.attr.deps.items():
+        if BzdPackageFragment in target:
+            fragment = target[BzdPackageFragment]
 
-            root = target[_BzdPackageFragment].root
             if not root:
-                fail("Value 'root' for a package fragment cannot be empty.")
+                fail("Each package fragment must have a valid root.")
 
             # Add single files or symlinks
             if hasattr(fragment, "files"):
@@ -51,7 +41,7 @@ def _bzd_package_impl(ctx):
                     ]
 
         else:
-            fail("Dependencies for this rule requires _BzdPackageFragment provider.")
+            fail("Dependencies for this rule requires BzdPackageFragment provider.")
 
     ctx.actions.run_shell(
         inputs = inputs,
@@ -69,7 +59,7 @@ def _bzd_package_impl(ctx):
 bzd_package = rule(
     implementation = _bzd_package_impl,
     attrs = {
-        "deps": attr.label_list(
+        "deps": attr.label_keyed_string_dict(
             doc = "Target or files dependencies to be added to the package.",
         ),
     },

@@ -1,6 +1,16 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "require_core",
+    srcs = glob([
+        "require/log.js",
+        "require/exception.js",
+    ]),
+    alias = "bzd",
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "vue",
     srcs = glob([
         "vue/**/*",
@@ -33,10 +43,11 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webpack",
     srcs = [
-        "require/exception.js",
-        "require/log.js",
-        "require/template.js",
         "webpack.js",
+        "require/template.js",
+    ],
+    deps = [
+        ":require_core",
     ],
     alias = "bzd",
     packages = {
