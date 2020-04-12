@@ -11,6 +11,27 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "web",
+    srcs = glob([
+        "require/web.js",
+    ]),
+    deps = [
+        ":require_core",
+    ],
+    packages = {
+        "express": "",
+        "express-minify": "",
+        "helmet": "",
+        "body-parser": "",
+        "http": "",
+        "compression": "",
+        "multer": "",
+    },
+    alias = "bzd",
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "vue",
     srcs = glob([
         "vue/**/*",

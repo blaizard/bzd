@@ -174,7 +174,7 @@ def _bzd_nodejs_exec_impl(ctx):
             ctx = ctx,
             binary = toolchain_executable.node,
             output = ctx.outputs.executable,
-            command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\"".format(ctx.file.main.path),
+            command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@".format(ctx.file.main.path),
             extra_runfiles = [node_modules, package_json] + srcs,
             symlinks = {
                 "node_modules": node_modules,
