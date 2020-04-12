@@ -1,10 +1,21 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper")
 load("//tools/bazel.build/toolchains/nodejs:defs.bzl", "nodejs_toolchain")
 
+config_setting(
+    name = "cache",
+    define_values = {
+        "nodejs_cache": "yes",
+    },
+    visibility = ["//visibility:public"],
+)
+
 sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
-    command = "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --cache-folder \"$(pwd)/cache\" $@",
+    command = select({
+        ":cache": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --cache-folder \"/cache/yarn\" --mutex file:\"/cache/.yarn_mutex\" $@",
+        "//conditions:default": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always $@",
+    }),
     data = [
         "@node",
     ],
