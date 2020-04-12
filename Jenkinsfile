@@ -26,6 +26,7 @@ pipeline
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
+				sh "printenv"
 			}
 		}
 		/**
