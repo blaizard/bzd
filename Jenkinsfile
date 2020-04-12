@@ -22,7 +22,7 @@ pipeline
 		{
 			steps
 			{
-				sh "cp tools/jenkins/.bazelrc.ci .bazelrc.ci"
+				sh "cp tools/jenkins/.bazelrc.local .bazelrc.local"
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
