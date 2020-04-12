@@ -1,7 +1,6 @@
 common --announce_rc
 
 try-import .bazelrc.local
-try-import .bazelrc.ci
 
 # Build specific options
 build --verbose_failures

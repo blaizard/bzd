@@ -6,7 +6,6 @@ config_setting(
     define_values = {
         "nodejs_cache": "yes",
     },
-    visibility = ["//visibility:public"],
 )
 
 sh_binary_wrapper(
