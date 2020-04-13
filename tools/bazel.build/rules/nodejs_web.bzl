@@ -136,7 +136,6 @@ NodeJs web application executor
 """
 
 def _bzd_nodejs_web_exec_impl(ctx):
-
     package = ctx.attr.package[BzdNodeJsWebProvider].tar
 
     # Run the application
@@ -150,8 +149,8 @@ def _bzd_nodejs_web_exec_impl(ctx):
         ),
         BzdPackageFragment(
             tars = [
-                package
-            ]
+                package,
+            ],
         ),
     ]
 

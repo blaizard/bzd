@@ -9,7 +9,6 @@ Merge providers of types BzdNodeJsDepsProvider together
 """
 
 def _bzd_nodejs_deps_provider_merge(iterable, ctx = None):
-
     srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in iterable])
     packages = {}
     aliases = {}
@@ -130,7 +129,7 @@ def _bzd_nodejs_install_impl(ctx):
         BzdNodeJsInstallProvider(
             package_json = package_json,
             node_modules = node_modules,
-            aliases = depsProvider.aliases
+            aliases = depsProvider.aliases,
         ),
         depsProvider,
     ]
