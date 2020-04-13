@@ -59,7 +59,7 @@ module.exports = class Web {
 		if (this.config.useCompression) {
 			this.app.use(Compression());
 			this.app.use(Minify({
-				cache: true
+				cache: false // use memory cache
 			}));
 		}
 
@@ -138,7 +138,7 @@ module.exports = class Web {
 
 			this.server.listen(this.port, undefined, undefined, () => {
 				resetErrorHandler.call(this, reject);
-				Log.info("Web server started on port " + this.port
+				Log.info("Web server serving at http://localhost:" + this.port
 						+ ((configStrList.length) ? (" (" + configStrList.join(" and ") + ")") : ""));
 				resolve();
 			});

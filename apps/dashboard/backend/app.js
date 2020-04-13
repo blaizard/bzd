@@ -5,7 +5,7 @@ const Commander = require("commander");
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option("-p, --port <number>", "Port to be used to serve the application.", 8080, parseInt)
-	.option("-s, --static <path>", "Directory to static serve.", "frontend")
+	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.parse(process.argv);
 
 Exception.assert(Commander.port && parseInt(Commander.port) > 0, "Missing --port argument or it is not valid.");
@@ -16,5 +16,3 @@ let web = new Web(Commander.port, {
 	rootDir: Commander.static
 });
 web.start();
-
-console.log("Started");
