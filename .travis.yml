@@ -6,7 +6,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - wget
-	  - pkg-config
+      - pkg-config
       - g++
 
 before_install:
