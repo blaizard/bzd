@@ -1,10 +1,9 @@
 BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
 
 def _bzd_package_impl(ctx):
-
     package = ctx.actions.declare_file("package.tar")
     package_creation_commands = [
-        "tar -h -cf \"{}\" -T /dev/null".format(package.path)
+        "tar -h -cf \"{}\" -T /dev/null".format(package.path),
     ]
 
     tar_cmd = "tar -h --hard-dereference -f \"{}\"".format(package.path)
@@ -27,7 +26,7 @@ def _bzd_package_impl(ctx):
                 for path, f in fragment.files_remap.items():
                     inputs.append(f)
                     package_creation_commands.append("{} --append \"{}\" --transform 's,^{},{}/{},'".format(tar_cmd, f.path, f.path, root, path))
-            
+
             # Add tar archive
             if hasattr(fragment, "tars"):
                 for f in fragment.tars:
@@ -37,7 +36,7 @@ def _bzd_package_impl(ctx):
                         "tar -xf \"{}\" -C \"./temp\"".format(f.path),
                         "tar -cf \"temp.tar\" --transform 's,^temp/,{}/,' --remove-files temp/".format(root),
                         "tar -f \"temp.tar\" --delete temp/",
-                        "{} --concatenate \"temp.tar\"".format(tar_cmd)
+                        "{} --concatenate \"temp.tar\"".format(tar_cmd),
                     ]
 
         else:
@@ -47,12 +46,12 @@ def _bzd_package_impl(ctx):
         inputs = inputs,
         outputs = [package],
         progress_message = "Generating package for {}".format(ctx.label),
-        command = "\n".join(package_creation_commands)
+        command = "\n".join(package_creation_commands),
     )
 
     return [
         DefaultInfo(
-            files = depset([package])
+            files = depset([package]),
         ),
     ]
 

@@ -11,14 +11,14 @@ bzd_nodejs_web(
         "app.js": "index",
     },
     packages = {
-        "vue-router": ""
+        "vue-router": "",
     },
-    deps = [
-        "//platform/nodejs:vue",
-        "//platform/nodejs:icons",
-        "//platform/nodejs:styles",
-    ],
     visibility = [
         "//apps/dashboard:__pkg__",
+    ],
+    deps = [
+        "//platform/nodejs:icons",
+        "//platform/nodejs:styles",
+        "//platform/nodejs:vue",
     ],
 )

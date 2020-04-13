@@ -15,9 +15,7 @@ bzd_nodejs_library(
     srcs = glob([
         "require/web.js",
     ]),
-    deps = [
-        ":require_core",
-    ],
+    alias = "bzd",
     packages = {
         "express": "",
         "express-minify": "",
@@ -27,8 +25,10 @@ bzd_nodejs_library(
         "compression": "",
         "multer": "",
     },
-    alias = "bzd",
     visibility = ["//visibility:public"],
+    deps = [
+        ":require_core",
+    ],
 )
 
 bzd_nodejs_library(
@@ -38,7 +38,7 @@ bzd_nodejs_library(
     ]),
     alias = "bzd",
     packages = {
-        "vue": ""
+        "vue": "",
     },
     visibility = ["//visibility:public"],
 )
@@ -64,11 +64,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webpack",
     srcs = [
-        "webpack.js",
         "require/template.js",
-    ],
-    deps = [
-        ":require_core",
+        "webpack.js",
     ],
     alias = "bzd",
     packages = {
@@ -94,4 +91,7 @@ bzd_nodejs_library(
         "file-loader": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        ":require_core",
+    ],
 )
