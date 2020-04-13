@@ -1,0 +1,11 @@
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - bazel
+
+script:
+  - bazel test ...
