@@ -2,6 +2,7 @@
 
 Fullstack, Lightweight and flexible framework for IoT applications.
 This monorepo enables the following technologies:
+
 |C++14                         |Python                           |Node + Vue                    |Bazel                           |
 |:----------------------------:|:-------------------------------:|:----------------------------:|:------------------------------:|
 |![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)|
@@ -10,7 +11,7 @@ This monorepo enables the following technologies:
 
 - [Bazel Rules](./docs/bazel_rules.md)
 - [Manifest](./docs/manifest.md)
-- [API](./docs/api/index.md)
+- [API](./docs/api/cc/index.md)
 
 ## Overview
 
@@ -25,7 +26,7 @@ It features the followings:
 - Compile-time string formting tool.
 - Lightweight.
 - Usefull set of containers.
-- API documentation ([see here](./docs/api/index.md))
+- API documentation ([see here](./docs/api/cc/index.md))
 
 ## Memory footprint
 

@@ -1,6 +1,6 @@
 "use strict";
 
-const PersistenceDisk = require("../../../platform/nodejs/require/persistence/disk.js");
+const PersistenceDisk = require("../../../nodejs/require/persistence/disk.js");
 
 /**
  * Store all configuration for the dashboard

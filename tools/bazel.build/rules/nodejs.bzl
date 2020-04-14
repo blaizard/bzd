@@ -1,15 +1,19 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
+# ---- Providers
+
 BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
 BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
+
+# ---- Utils
 
 """
 Merge providers of types BzdNodeJsDepsProvider together
 """
 
-def _bzd_nodejs_deps_provider_merge(iterable, ctx = None):
-    srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in iterable])
+def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
+    srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in deps])
     packages = {}
     aliases = {}
 
@@ -25,7 +29,7 @@ def _bzd_nodejs_deps_provider_merge(iterable, ctx = None):
         aliases = aliases,
     )
 
-    for it in iterable:
+    for it in deps:
         # Merge packages
         for name, version in it[BzdNodeJsDepsProvider].packages.items():
             # If the version already stored is different
@@ -42,10 +46,12 @@ def _bzd_nodejs_deps_provider_merge(iterable, ctx = None):
 
     return provider
 
+# ---- Aspect
+
 def _bzd_nodejs_deps_aspect_impl(target, ctx):
     if ctx.rule.kind == "bzd_nodejs_library":
         return []
-    return [_bzd_nodejs_deps_provider_merge(ctx.rule.attr.deps)]
+    return [_bzd_nodejs_deps_provider_merge(deps = ctx.rule.attr.deps)]
 
 """
 Aspects to gather data from bzd depedencies.
@@ -55,35 +61,40 @@ bzd_nodejs_deps_aspect = aspect(
     attr_aspects = ["deps"],
 )
 
+# ---- bzd_nodejs_library
+
 """
 A library contains all depdencies used for this target.
 """
 
+_COMMON_ATTRS = {
+    "alias": attr.string(
+        doc = "Name of the alias, available in the form [name], for the current directory.",
+    ),
+    "srcs": attr.label_list(
+        allow_files = True,
+        doc = "Source files",
+    ),
+    "packages": attr.string_dict(
+        allow_empty = True,
+        doc = "Package dependencies",
+    ),
+    "deps": attr.label_list(
+        aspects = [bzd_nodejs_deps_aspect],
+        allow_files = True,
+        doc = "Dependencies",
+    ),
+}
+
 def _bzd_nodejs_library_impl(ctx):
-    return [DefaultInfo(), _bzd_nodejs_deps_provider_merge(ctx.attr.deps, ctx = ctx)]
+    return [DefaultInfo(), _bzd_nodejs_deps_provider_merge(deps = ctx.attr.deps, ctx = ctx)]
 
 bzd_nodejs_library = rule(
     implementation = _bzd_nodejs_library_impl,
-    attrs = {
-        "alias": attr.string(
-            doc = "Name of the alias, available in the form [name], for the current directory.",
-        ),
-        "srcs": attr.label_list(
-            allow_files = True,
-            mandatory = True,
-            doc = "Source files",
-        ),
-        "packages": attr.string_dict(
-            allow_empty = True,
-            doc = "Package dependencies",
-        ),
-        "deps": attr.label_list(
-            aspects = [bzd_nodejs_deps_aspect],
-            allow_files = True,
-            doc = "Dependencies",
-        ),
-    },
+    attrs = _COMMON_ATTRS,
 )
+
+# ---- bzd_nodejs_install
 
 """
 Install a NodeJs environment, dealing with the creation of the package.json
@@ -91,10 +102,10 @@ and the installation of the actual packages.
 """
 
 def _bzd_nodejs_install_impl(ctx):
-    depsProvider = _bzd_nodejs_deps_provider_merge(ctx.attr.deps)
+    depsProvider = _bzd_nodejs_deps_provider_merge(deps = ctx.attr.deps, ctx = ctx)
 
     # --- Generate the package.json file
-    package_json = ctx.actions.declare_file("package.json")
+    package_json = ctx.actions.declare_file("{}.nodejs_install/package.json".format(ctx.label.name))
 
     # Build the dependencies template replacement string
     dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version if version else "latest") for name, version in depsProvider.packages.items()])
@@ -114,7 +125,7 @@ def _bzd_nodejs_install_impl(ctx):
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
     # This will create and populate the node_modules directly in the output directory
-    node_modules = ctx.actions.declare_directory("node_modules")
+    node_modules = ctx.actions.declare_directory("{}.nodejs_install/node_modules".format(ctx.label.name))
     ctx.actions.run(
         inputs = [package_json],
         outputs = [node_modules],
@@ -134,28 +145,38 @@ def _bzd_nodejs_install_impl(ctx):
         depsProvider,
     ]
 
+_INSTALL_ATTRS = dict(_COMMON_ATTRS)
+_INSTALL_ATTRS.update({
+    "_package_json_template": attr.label(
+        default = Label("//tools/bazel.build/rules/assets/nodejs:package_json_template"),
+        allow_single_file = True,
+    ),
+})
+
 bzd_nodejs_install = rule(
     implementation = _bzd_nodejs_install_impl,
-    attrs = {
-        "target_name": attr.label(
-            doc = "The name of target to which this rule is associated.",
-        ),
-        "deps": attr.label_list(
-            aspects = [bzd_nodejs_deps_aspect],
-            allow_files = True,
-            doc = "Dependencies",
-        ),
-        "_package_json_template": attr.label(
-            default = Label("//tools/bazel.build/rules/assets/nodejs:package_json_template"),
-            allow_single_file = True,
-        ),
-    },
+    attrs = _INSTALL_ATTRS,
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
+
+# ---- _bzd_nodejs_exec
+
+COMMON_EXEC_ATTRS = {
+    "main": attr.label(
+        mandatory = True,
+        allow_single_file = True,
+        cfg = "target",
+    ),
+    "install": attr.label(
+        mandatory = True,
+        cfg = "target",
+    ),
+}
 
 """
 Implementation of the executor
 """
+
 def _bzd_nodejs_exec_impl(ctx, is_test):
     # Retrieve install artefacts generated by ctx.attr.install
     node_modules = ctx.attr.install[BzdNodeJsInstallProvider].node_modules
@@ -167,18 +188,20 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
+    command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"node_modules/mocha/bin/mocha\" \"{}\"" if is_test else "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@"
+
     result = [
         sh_binary_wrapper_impl(
             ctx = ctx,
             binary = toolchain_executable.node,
             output = ctx.outputs.executable,
-            command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@".format(ctx.file.main.path),
+            command = command.format(ctx.file.main.path),
             extra_runfiles = [node_modules, package_json] + srcs,
             symlinks = {
                 "node_modules": node_modules,
                 "package.json": package_json,
             },
-        )
+        ),
     ]
 
     if not is_test:
@@ -192,6 +215,8 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
 
     return result
 
+# ---- _bzd_nodejs_binary
+
 """
 NodeJs web application executor
 """
@@ -201,20 +226,27 @@ def _bzd_nodejs_binary_impl(ctx):
 
 _bzd_nodejs_binary = rule(
     implementation = _bzd_nodejs_binary_impl,
-    attrs = {
-        "main": attr.label(
-            mandatory = True,
-            allow_single_file = True,
-            cfg = "target",
-        ),
-        "install": attr.label(
-            mandatory = True,
-            cfg = "target",
-        ),
-    },
+    attrs = COMMON_EXEC_ATTRS,
     executable = True,
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
+
+def bzd_nodejs_binary(name, main, visibility = [], tags = [], **kwargs):
+    bzd_nodejs_install(
+        name = name + ".install",
+        tags = ["nodejs"] + tags,
+        **kwargs
+    )
+
+    _bzd_nodejs_binary(
+        name = name,
+        main = main,
+        install = name + ".install",
+        tags = ["nodejs"] + tags,
+        visibility = visibility,
+    )
+
+# ---- _bzd_nodejs_test
 
 """
 NodeJs web application tester
@@ -225,37 +257,22 @@ def _bzd_nodejs_test_impl(ctx):
 
 _bzd_nodejs_test = rule(
     implementation = _bzd_nodejs_test_impl,
-    attrs = {
-        "main": attr.label(
-            mandatory = True,
-            allow_single_file = True,
-            cfg = "target",
-        ),
-        "install": attr.label(
-            mandatory = True,
-            cfg = "target",
-        ),
-    },
+    attrs = COMMON_EXEC_ATTRS,
     test = True,
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_binary(name, main, deps = [], visibility = [], tags = [], **kwargs):
-    # Create a library with the sources and packages
-    bzd_nodejs_library(
-        name = name + ".library",
+def bzd_nodejs_test(name, main, deps = [], visibility = [], tags = [], **kwargs):
+    bzd_nodejs_install(
+        name = name + ".install",
         tags = ["nodejs"] + tags,
+        deps = deps + [
+            "//tools/bazel.build/rules:mocha",
+        ],
         **kwargs
     )
 
-    # Gather dependencies and install the packages
-    bzd_nodejs_install(
-        name = name + ".install",
-        deps = deps + [name + ".library"],
-        tags = ["nodejs"] + tags,
-    )
-
-    _bzd_nodejs_binary(
+    _bzd_nodejs_test(
         name = name,
         main = main,
         install = name + ".install",

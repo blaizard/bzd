@@ -1,7 +1,7 @@
 "use strict";
 
-const Web = require("../../../platform/nodejs/require/web.js");
-const Exception = require("../../../platform/nodejs/require/exception.js")("backend");
+const Web = require("../../../nodejs/require/web.js");
+const Exception = require("../../../nodejs/require/exception.js")("backend");
 const Commander = require("commander");
 
 const Config = require("./config.js");

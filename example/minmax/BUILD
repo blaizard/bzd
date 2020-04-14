@@ -6,6 +6,6 @@ cc_binary(
         "main.cpp",
     ],
     deps = [
-        "//platform:bzd",
+        "//cc:bzd",
     ],
 )
