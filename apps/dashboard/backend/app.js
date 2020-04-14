@@ -1,6 +1,10 @@
+"use strict";
+
 const Web = require("../../../platform/nodejs/require/web.js");
 const Exception = require("../../../platform/nodejs/require/exception.js")("backend");
 const Commander = require("commander");
+
+const Config = require("./config.js");
 
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
@@ -8,11 +12,15 @@ Commander.version("1.0.0", "-v, --version")
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.parse(process.argv);
 
-Exception.assert(Commander.port && parseInt(Commander.port) > 0, "Missing --port argument or it is not valid.");
-Exception.assert(Commander.static, "Missing --static argument or it is not valid.");
+(async () => {
 
-// Set-up the web server
-let web = new Web(Commander.port, {
-	rootDir: Commander.static
-});
-web.start();
+	// Set-up the web server
+	let web = new Web(Commander.port, {
+		rootDir: Commander.static
+	});
+
+	let config = new Config();
+	await config.waitReady();
+
+	web.start();
+})();
