@@ -1,37 +1,6 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "require_core",
-    srcs = glob([
-        "require/log.js",
-        "require/exception.js",
-    ]),
-    alias = "bzd",
-    visibility = ["//visibility:public"],
-)
-
-bzd_nodejs_library(
-    name = "web",
-    srcs = glob([
-        "require/web.js",
-    ]),
-    alias = "bzd",
-    packages = {
-        "express": "",
-        "express-minify": "",
-        "helmet": "",
-        "body-parser": "",
-        "http": "",
-        "compression": "",
-        "multer": "",
-    },
-    visibility = ["//visibility:public"],
-    deps = [
-        ":require_core",
-    ],
-)
-
-bzd_nodejs_library(
     name = "vue",
     srcs = glob([
         "vue/**/*",
@@ -64,7 +33,6 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webpack",
     srcs = [
-        "require/template.js",
         "webpack.js",
     ],
     alias = "bzd",
@@ -92,6 +60,7 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        ":require_core",
+        "//platform/nodejs/require:core",
+        "//platform/nodejs/require:template",
     ],
 )
