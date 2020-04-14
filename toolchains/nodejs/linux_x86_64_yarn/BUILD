@@ -12,8 +12,8 @@ sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
     command = select({
-        ":cache": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --cache-folder \"/cache/yarn\" --mutex file:\"/cache/.yarn_mutex\" $@",
-        "//conditions:default": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always $@",
+        ":cache": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" --cache-folder \"/cache/yarn\" $@",
+        "//conditions:default": "export PATH=$(pwd)/${{RUNFILES_DIR}}/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@",
     }),
     data = [
         "@node",
