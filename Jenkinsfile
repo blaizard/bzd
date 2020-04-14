@@ -1,5 +1,14 @@
 #!/usr/bin/env groovy
 
+// Seems to be the only way to conditionaly set a param for the dockerfile, see https://issues.jenkins-ci.org/browse/JENKINS-43911
+node("master")
+{
+	stage("Choose Label")
+	{
+		CACHE_PATH = "${env.CACHE_PATH}" 
+	}
+}
+
 pipeline
 {
 	triggers
