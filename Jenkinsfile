@@ -12,8 +12,7 @@ pipeline
 		dockerfile
 		{
 			filename "tools/jenkins/debian.dockerfile"
-			// The source path should be replaced by an environment variable
-			args "-v /volume1/docker/jenkins/cache:/cache"
+			args "-v $CACHE_PATH:/cache"
 		}
 	}
 	stages
@@ -26,7 +25,6 @@ pipeline
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
-				sh "printenv"
 			}
 		}
 		/**

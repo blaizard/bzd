@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_library")
+load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install")
 load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsWebProvider = provider(fields = ["tar"])
@@ -175,21 +175,14 @@ Public macro to create a web application with NodeJs
 """
 
 def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], visibility = [], **kwargs):
-    # Create a library with the sources and packages
-    bzd_nodejs_library(
-        name = name + ".library",
-        alias = alias,
-        srcs = srcs,
-        packages = packages,
-        tags = ["nodejs"],
-    )
-
     # Gather dependencies and install the packages
     bzd_nodejs_install(
         name = name + ".install",
+        alias = alias,
+        srcs = srcs,
+        packages = packages,
         deps = deps + [
-            name + ".library",
-            "//platform/nodejs:webpack",
+            "//nodejs:webpack",
         ],
         tags = ["nodejs"],
     )

@@ -22,11 +22,11 @@ bzd_cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":config_manifest",
-        "//platform:bzd",
-        "//platform/libraries/io/digital",
-        "//platform/libraries/io/i2c",
-        "//platform/libraries/io/stdout",
-        "//platform/libraries/io/stub",
+        "//cc:bzd",
+        "//cc/libraries/io/digital",
+        "//cc/libraries/io/i2c",
+        "//cc/libraries/io/stdout",
+        "//cc/libraries/io/stub",
     ],
 )
 

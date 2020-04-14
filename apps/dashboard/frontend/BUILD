@@ -17,8 +17,8 @@ bzd_nodejs_web(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
-        "//platform/nodejs:icons",
-        "//platform/nodejs:styles",
-        "//platform/nodejs:vue",
+        "//nodejs:icons",
+        "//nodejs:styles",
+        "//nodejs:vue",
     ],
 )

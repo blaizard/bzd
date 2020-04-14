@@ -10,7 +10,7 @@ bzd_nodejs_binary(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
-        "//platform/nodejs/require:web",
-        "//platform/nodejs/require:persistence",
+        "//nodejs/require:persistence",
+        "//nodejs/require:web",
     ],
 )
