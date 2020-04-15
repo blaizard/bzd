@@ -6,6 +6,9 @@ bzd_nodejs_binary(
         "*.js",
     ]),
     main = "app.js",
+    args = [
+        "--static", "/tmp/frontend",
+    ],
     visibility = [
         "//apps/dashboard:__pkg__",
     ],

@@ -62,7 +62,7 @@ class Cache
 	//		data._timeout = Cache.getTimestampMs() - 1;
 	//	}
 
-		Log.info("Register collection \"" + collection + "\" to cache: {" + this.toString(collection) + "}");
+		Log.info("Register collection \"" + collection + "\"");
 	}
 
 	/**

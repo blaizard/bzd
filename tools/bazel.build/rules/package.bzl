@@ -1,7 +1,7 @@
 BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
 
 def _bzd_package_impl(ctx):
-    package = ctx.actions.declare_file("package.tar")
+    package = ctx.actions.declare_file("{}.package.tar".format(ctx.label.name))
     package_creation_commands = [
         "tar -h -cf \"{}\" -T /dev/null".format(package.path),
     ]
@@ -49,8 +49,21 @@ def _bzd_package_impl(ctx):
         command = "\n".join(package_creation_commands),
     )
 
+    # In addition create a executable rule to manipulate the package
+    ctx.actions.write(
+        output = ctx.outputs.executable,
+        content = """#!/bin/bash
+        mkdir -p "$1"
+        tar -xf "{}" -C "$1"
+        """.format(package.short_path),
+        is_executable = True,
+    )
+
+    runfiles = ctx.runfiles(files = [package])
     return [
         DefaultInfo(
+            executable = ctx.outputs.executable,
+            runfiles = runfiles,
             files = depset([package]),
         ),
     ]
@@ -62,4 +75,6 @@ bzd_package = rule(
             doc = "Target or files dependencies to be added to the package.",
         ),
     },
+    executable = True,
 )
+

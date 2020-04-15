@@ -10,7 +10,7 @@
       <ul>
         <li><span><i class="bzd-icon-menu"></i> About</span></li>
       </ul>
-      <router-link to="/add">Go to Foo</router-link>
+      <router-link to="/add">Go to Frr</router-link>
       <router-link to="/dashboard">Go to Bar</router-link>
     </template>
     <template v-slot:content>

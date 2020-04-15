@@ -15,11 +15,11 @@ container_image(
     base = "@apline_node//image",
     cmd = [
         "node",
-        "/data/backend/apps/dashboard/backend/app.js",
+        "/bzd/bin/backend/apps/dashboard/backend/app.js",
         "--static",
-        "/data/frontend",
+        "/bzd/bin/frontend",
     ],
-    directory = "/data",
+    directory = "/bzd/bin",
     tags = ["nodejs"],
     tars = [
         ":package",
