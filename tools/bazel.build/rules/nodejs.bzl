@@ -231,7 +231,7 @@ _bzd_nodejs_binary = rule(
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_binary(name, main, visibility = [], tags = [], **kwargs):
+def bzd_nodejs_binary(name, main, args = [], visibility = [], tags = [], **kwargs):
     bzd_nodejs_install(
         name = name + ".install",
         tags = ["nodejs"] + tags,
@@ -241,6 +241,7 @@ def bzd_nodejs_binary(name, main, visibility = [], tags = [], **kwargs):
     _bzd_nodejs_binary(
         name = name,
         main = main,
+        args = args,
         install = name + ".install",
         tags = ["nodejs"] + tags,
         visibility = visibility,
