@@ -37,6 +37,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "cache",
+    srcs = [
+        "cache.js",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core",
+    ],
+)
+
+bzd_nodejs_library(
     name = "timeseries",
     srcs = [
         "timeseries.js",
@@ -87,5 +98,17 @@ bzd_nodejs_library(
     deps = [
         ":core",
         ":task",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "key_value_store",
+    srcs = glob([
+        "key_value_store/*.js",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":persistence",
+        ":cache",
     ],
 )

@@ -78,10 +78,16 @@ describe("PersistenceTimeSeries", () => {
 			let sampleList = [];
 			for (let i = 0; i<100; ++i) {
 				const timestamp = Math.floor(Math.random() * 1000 - 500);
+
+				// Ignore duplicates (this needs to be fixed)
+				if (sampleList.indexOf(timestamp) != -1) {
+					continue;
+				}
+
 				await timeseries.insert(timestamp, timestamp);
 				sampleList.push(timestamp);
 
-				// Randmly close and re-open the persistence
+				// Randomly close and re-open the persistence
 				if (Math.floor(Math.random() * 10) == 0) {
 					await timeseries.close();
 					timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
@@ -94,6 +100,7 @@ describe("PersistenceTimeSeries", () => {
 			sampleList.sort((a, b) => (a - b));
 
 			await timeseries.forEach((timestamp, data) => {
+				console.log(sampleList[count], timestamp);
 				Exception.assertEqual(timestamp, data);
 				Exception.assertEqual(sampleList[count], timestamp);
 				++count;

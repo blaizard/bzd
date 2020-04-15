@@ -1,0 +1,2 @@
+# cache
+build --sandbox_writable_path=/home/travis/.cache/yarn

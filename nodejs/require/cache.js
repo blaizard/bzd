@@ -66,6 +66,13 @@ class Cache
 	}
 
 	/**
+	 * Return true if a collection is registered, false otherwise.
+	 */
+	isCollection(collection) {
+		return collection in this.data;
+	}
+
+	/**
 	 * Current timestamp
 	 */
 	static getTimestampMs() {
@@ -86,7 +93,7 @@ class Cache
 
 	/**
 	 * \brief Get the data requested.
-	 * Return the old dat if available while trigger the update of the new.
+	 * Return the old data if available while trigger the update of the new.
 	 *
 	 * \param collection The collection to get data from
 	 * \param ids The identifier of the data
@@ -364,7 +371,7 @@ async function triggerUpdate(collection, id, ...ids)
 	let dataId = dataCollection[id];
 	// Save the previous size
 	const previousSize = dataId._size || 0;
-	const previousNbEntries = (dataId.hasOwnProperty("_data")) ? 1 : 0;
+	const previousNbEntries = ("_data" in dataId) ? 1 : 0;
 	// Mark as fetching to prevent any concurrent fetching
 	dataId._fetching = true;
 
@@ -372,7 +379,7 @@ async function triggerUpdate(collection, id, ...ids)
 		Exception.assert(typeof dataCollection._trigger === "function", "No trigger function associated with collection \"" + collection + "\"");
 
 		// Close the previous data if a close function is available
-		if (dataId.hasOwnProperty("_data") && typeof dataId._data.close === "function") {
+		if ("_data" in dataId && typeof dataId._data.close === "function") {
 			await dataId._data.close();
 		}
 
@@ -415,6 +422,8 @@ function yieldThread()
 
 async function garbageCollector()
 {
+	// Log.info("GARBAGE COLLECTION size=" + this.data._size + ", nbEntries=" + this.data._nbEntries);
+
 	// If a cleanup is required
 	try {
 		while (this.data._size > this.config.maxSize || (this.config.maxEntries && this.data._nbEntries > this.config.maxEntries)) {

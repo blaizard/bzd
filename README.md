@@ -1,5 +1,7 @@
 # bzd Monorepo
 
+[![Build Status](https://travis-ci.org/blaizard/cpp-async.svg?branch=master)](https://travis-ci.org/blaizard/cpp-async)
+
 Fullstack, Lightweight and flexible framework for IoT applications.
 This monorepo enables the following technologies:
 
@@ -16,7 +18,7 @@ This monorepo enables the following technologies:
 ## Overview
 
 This framework is developped to run on all sort of embedded platforms, from 8-bit bare bones MCU to high performance compute unit.
-It is made to remove any dependencies from STL, but provide similar set of containers and utilities to develop applications in an
+It is made to remove any dependencies from STL, but prtempDirPathovide similar set of containers and utilities to develop applications in an
 efficient and safe manner.
 
 It features the followings:

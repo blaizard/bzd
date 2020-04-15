@@ -21,7 +21,7 @@ pipeline
 	{
 		dockerfile
 		{
-			filename "tools/jenkins/debian.dockerfile"
+			filename "tools/ci/jenkins/debian.dockerfile"
 			args "-v $CACHE_PATH:/cache"
 		}
 	}
@@ -31,7 +31,7 @@ pipeline
 		{
 			steps
 			{
-				sh "cp tools/jenkins/.bazelrc.local .bazelrc.local"
+				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
