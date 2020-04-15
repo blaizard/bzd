@@ -10,11 +10,16 @@ addons:
       - g++
       - python
 
+cache:
+  directories:
+    - $HOME/.cache/yarn
+
 before_install:
   - wget https://github.com/bazelbuild/bazel/releases/download/3.0.0/bazel_3.0.0-linux-x86_64.deb
   - sudo dpkg -i bazel_3.0.0-linux-x86_64.deb
 
 script:
+  - cp tools/ci/travis/.bazelrc.local .bazelrc.local
   - bazel test ... --runs_per_test=10
   - bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
   - bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc

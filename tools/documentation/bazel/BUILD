@@ -1,5 +1,5 @@
 load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
-load("//tools/documentation:defs.bzl", "copy_outputs")
+load("//tools/bazel.build:copy_outputs.bzl", "copy_outputs")
 
 rule_names = [
     "nodejs",

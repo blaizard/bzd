@@ -2,9 +2,8 @@
 
 const Web = require("../../../nodejs/require/web.js");
 const Exception = require("../../../nodejs/require/exception.js")("backend");
+const KeyValueStoreDisk = require("../../../nodejs/require/key_value_store/disk.js");
 const Commander = require("commander");
-
-const Config = require("./config.js");
 
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
@@ -19,8 +18,11 @@ Commander.version("1.0.0", "-v, --version")
 		rootDir: Commander.static
 	});
 
-	let config = new Config();
-	await config.waitReady();
+	let keyValueStore = new KeyValueStoreDisk("/tmp/test/db");
+	await keyValueStore.waitReady();
+	await keyValueStore.set("bucket1", "key1", "Hello!");
+	await keyValueStore.set("bucket1", "key2", "World!");
+	await keyValueStore.delete("bucket2", "sds");
 
 	web.start();
 })();
