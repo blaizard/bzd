@@ -1,2 +1,6 @@
+# Remove output
+build --noshow_progress
+build --noshow_loading_progress
+
 # cache
 build --sandbox_writable_path=/home/travis/.cache/yarn
