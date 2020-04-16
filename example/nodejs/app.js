@@ -1,4 +1,4 @@
-Mustache = require("mustache");
+from Mustache import "mustache";
 
 var view = {
 	title: "Joe",

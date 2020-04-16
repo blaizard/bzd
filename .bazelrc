@@ -17,34 +17,31 @@ test --test_output=errors
 test --verbose_failures
 test --define=panic=throw
 
+# Prevent building twice tools used for host and target, for nodejs rules for example.
+build --nodistinct_host_configuration
+
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
-build:linux_x86_64_clang --host_platform="@linux_x86_64_clang//:host_platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
-build:linux_x86_64_clang --build_tag_filters="-nodejs"
-build:linux_x86_64_clang --test_tag_filters="-nodejs"
+build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
-build:esp32_xtensa_lx6_gcc --host_platform="@esp32_xtensa_lx6_gcc//:host_platform"
 build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
 build:esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs"
-build:esp32_xtensa_lx6_gcc --test_tag_filters="-nodejs"
+build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
 # Sanitizers
 
 build:sanitizer --keep_going
-build:sanitizer --nocache_test_results
 build:sanitizer --copt -O1
 build:sanitizer --copt -g
-build:sanitizer --copt -fno-omit-frame-pointer
 build:sanitizer --copt -fno-optimize-sibling-calls
 build:sanitizer --strip never
 
 # Address Sanitizer
 build:asan --copt -fsanitize=address
-build:asan --copt -fno-omit-frame-pointer
 build:asan --linkopt -fsanitize=address
 
 # Leak Sanitizer
@@ -60,7 +57,6 @@ build:ubsan --linkopt -lubsan
 
 # Memory Sanitizer
 build:msan --copt -fsanitize=memory
-build:msan --copt -fno-omit-frame-pointer
 build:msan --copt -fsanitize-memory-track-origins
 build:msan --linkopt -fsanitize=memory
 

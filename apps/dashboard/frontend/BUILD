@@ -21,6 +21,7 @@ bzd_nodejs_web(
         "//nodejs:icons",
         "//nodejs:styles",
         "//nodejs:vue",
+        "//nodejs/core:fetch",
     ],
 )
 

@@ -3,10 +3,11 @@
 	"version": "1.0.0",
 	"license": "UNLICENSED",
 	"private": true,
+	"type": "module",
 	"dependencies": {
 		{dependencies}
 	},
 	"scripts": {
-		"webpack": "node --preserve-symlinks --preserve-symlinks-main ./node_modules/.bin/webpack --mode=production --config webpack.config.js"
+		"webpack": "node --preserve-symlinks --preserve-symlinks-main ./node_modules/.bin/webpack --mode=production --config webpack.config.cjs"
 	}
 }

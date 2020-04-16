@@ -149,7 +149,12 @@ platform(
 platform(
     name = "host_platform",
     host_platform = True,
-    parents = [":platform"],
+    constraint_values = [
+        ":compiler",
+    ],
+    parents = [
+        %{host_platforms}
+    ],
 )
 
 config_setting(

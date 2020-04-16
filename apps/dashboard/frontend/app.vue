@@ -18,7 +18,7 @@
       <router-view></router-view>
     </template>
     <template v-slot:footer>
-      Footer
+      Footer <button @click="test">Test</button>
     </template>
   </Layout>
 </template>
@@ -28,6 +28,7 @@
 
 	import Layout from "[frontend]/layout.vue";
   import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
+  import Fetch from "[bzd]/core/fetch.js"
 
   export default {
 		components: {
@@ -35,6 +36,11 @@
 		},
     directives: {
       "tooltip": DirectiveTooltip
+    },
+    methods: {
+      async test() {
+        console.log(await Fetch.get("https://fetch.com/"));
+      }
     }
   }
 </script>

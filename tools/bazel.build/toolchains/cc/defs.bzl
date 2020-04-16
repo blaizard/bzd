@@ -52,6 +52,7 @@ def _impl(ctx):
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
         "%{platforms}": "\n".join(['"{}",'.format(t) for t in ctx.attr.platforms]),
+        "%{host_platforms}": "\n".join(['"{}",'.format(t) for t in ctx.attr.host_platforms]),
         "%{filegroup_dependencies}": "\n".join(
             ['"{}",'.format(t) for t in ctx.attr.filegroup_dependencies] +
             ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_libs] +
@@ -102,6 +103,7 @@ _toolchain_maker_linux = repository_rule(
         "cpu": attr.string(),
         "compiler": attr.string(),
         "platforms": attr.string_list(),
+        "host_platforms": attr.string_list(),
         # Compatibility
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),

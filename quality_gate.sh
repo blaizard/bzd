@@ -23,10 +23,12 @@ if [ "$sanitizer" ]; then
 	fi
 fi
 
+EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$HOME/.yarn"
+
 # Compile and test the different configurations
-bazel test ... #--sandbox_writable_path=~/.cache/yarn
-bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
-bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
+bazel test ... $EXTRA_FLAGS
+bazel test ... --config=linux_x86_64_clang $EXTRA_FLAGS
+bazel build ... --config=esp32_xtensa_lx6_gcc $EXTRA_FLAGS
 
 # Use static analyzers
-bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
+bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan $EXTRA_FLAGS

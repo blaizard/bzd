@@ -6,7 +6,6 @@ cc_library(
     srcs = selects.with_or({
         (
             "//tools/bazel.build/config:x86_64",
-            "//tools/bazel.build/config/auto:x86_64",
         ): ["bootstrap_x86_64.cpp"],
         "//conditions:default": [],
     }),

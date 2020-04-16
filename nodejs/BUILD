@@ -33,7 +33,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webpack",
     srcs = [
-        "webpack.js",
+        "webpack.cjs",
+        "template.cjs",
     ],
     alias = "bzd",
     packages = {
@@ -59,8 +60,4 @@ bzd_nodejs_library(
         "file-loader": "",
     },
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs/require:core",
-        "//nodejs/require:template",
-    ],
 )

@@ -130,7 +130,7 @@ def _bzd_nodejs_install_impl(ctx):
         inputs = [package_json],
         outputs = [node_modules],
         progress_message = "Updating package(s) for {}".format(ctx.label),
-        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive"],
+        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--no-lockfile", "--non-interactive"],
         executable = toolchain_executable.manager.files_to_run,
     )
 
@@ -165,11 +165,9 @@ COMMON_EXEC_ATTRS = {
     "main": attr.label(
         mandatory = True,
         allow_single_file = True,
-        cfg = "target",
     ),
     "install": attr.label(
         mandatory = True,
-        cfg = "target",
     ),
 }
 
