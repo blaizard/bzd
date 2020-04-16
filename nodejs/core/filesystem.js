@@ -34,29 +34,9 @@ export default class FileSystem {
 	 * Create a directory recursively, if it already exists, do nothing
 	 */
 	static async mkdir(path) {
-		let curPath = Path.resolve(path);
-		let dirList = [];
-
-		// Identify the directories that do not exists
-		while (!(await FileSystem.exists(curPath))) {
-			dirList.unshift(Path.basename(curPath));
-			curPath = Path.dirname(curPath);
-		}
-
-		// Create them
-		while (dirList.length) {
-			curPath = Path.join(curPath, dirList.shift());
-			try {
-				await mkdir(curPath);
-			}
-			catch (e) {
-				// If the directory has been created in parallel, ignore this error
-				if (e.code == "EEXIST") {
-					continue;
-				}
-				throw e;
-			}
-		}
+		await Fs.promises.mkdir(path, {
+			recursive: true
+		});
 	}
 
 	/**
@@ -93,21 +73,18 @@ export default class FileSystem {
 	 * Read the content of a file
 	 */
 	static async readFile(path, options = "utf8") {
-		return new Promise((resolve, reject) => {
-			Fs.readFile(path, options, (e, data) => {
-				return (e) ? reject(e) : resolve(data.toString());
-			});
+		const data = await Fs.promises.readFile(path, {
+			encoding: options
 		});
+		return data.toString();
 	}
 
 	/**
 	 * Write the content of a file
 	 */
 	static async writeFile(path, data, options = "utf8") {
-		return new Promise((resolve, reject) => {
-			Fs.writeFile(path, data, options, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
+		await Fs.promises.writeFile(path, data, {
+			encoding: options
 		});
 	}
 
@@ -115,11 +92,7 @@ export default class FileSystem {
 	 * Read the content of a directory
 	 */
 	static async readdir(path) {
-		return new Promise((resolve, reject) => {
-			Fs.readdir(path, (e, dataList) => {
-				return (e) ? reject(e) : resolve(dataList);
-			});
-		});
+		return await Fs.promises.readdir(path);
 	}
 
 	/**
@@ -127,11 +100,7 @@ export default class FileSystem {
 	 * are the full path of the file including the file name.
 	 */
 	static async move(pathFrom, pathTo) {
-		return new Promise((resolve, reject) => {
-			Fs.rename(pathFrom, pathTo, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.rename(pathFrom, pathTo);
 	}
 
 	/**
@@ -140,44 +109,28 @@ export default class FileSystem {
 	 * If the destination file already exists, it will fail.
 	 */
 	static async copy(pathFrom, pathTo) {
-		return new Promise((resolve, reject) => {
-			Fs.copyFile(pathFrom, pathTo, Fs.constants.COPYFILE_EXCL, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.copyFile(pathFrom, pathTo, Fs.constants.COPYFILE_EXCL);
 	}
 
 	/**
 	 * Delete a file
 	 */
 	static async unlink(path) {
-		return new Promise((resolve, reject) => {
-			Fs.unlink(path, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.unlink(path);
 	}
 
 	/**
 	 * Append data to a file
 	 */
 	static async appendFile(path, data) {
-		return new Promise((resolve, reject) => {
-			Fs.appendFile(path, data, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.appendFile(path, data);
 	}
 
 	/**
 	 * Truncate a file to a specific size
 	 */
 	static async truncate(path, fileSize) {
-		return new Promise((resolve, reject) => {
-			Fs.truncate(path, fileSize, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.truncate(path, fileSize);
 	}
 
 	/**
@@ -185,48 +138,21 @@ export default class FileSystem {
 	 * updates its last modification date.
 	 */
 	static async touch(path) {
-		return new Promise(async (resolve, reject) => {
-			try {
-				const fd = await FileSystem.open(path, "a");
-				await FileSystem.close(fd);
-				resolve();
-			}
-			catch (e) {
-				reject(e);
-			}
-		});
+		const fd = await FileSystem.open(path, "a");
+		await FileSystem.close(fd);
 	}
 
 	/**
 	 * Open a file asynchronously
 	 */
 	static async open(path, options) {
-		return new Promise((resolve, reject) => {
-			Fs.open(path, options, (e, fd) => {
-				return (e) ? reject(e) : resolve(fd);
-			});
-		});
+		return await Fs.promises.open(path, options);
 	}
 
 	/**
 	 * Close a file asynchronously, previously open with "open"
 	 */
-	static async close(fd) {
-		return new Promise((resolve, reject) => {
-			Fs.close(fd, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+	static async close(fileHandle) {
+		await fileHandle.close();
 	}
 };
-
-// ---- Helper ----------------------------------------------------------------
-
-function mkdir(path)
-{
-	new Promise((resolve, reject) => {
-		Fs.mkdir(path, (e) => {
-			(e) ? reject(e) : resolve();
-		});
-	});
-}

@@ -12,7 +12,7 @@ import ExceptionFactory from "../exception.js";
 const Log = LogFactory("test", "persistence-timestamp");
 const Exception = ExceptionFactory("test", "persistence-timestamp");
 
-Log.mute();
+//Log.mute();
 
 const tempDirPath = Fs.mkdtempSync(Path.join(Os.tmpdir(), "persistence-timeseries-"));
 const persistenceOptions = {
@@ -26,16 +26,9 @@ after(async () => {
 });
 
 async function environmentCleanup() {
-	const fileNameList = await FileSystem.readdir(Path.dirname(persistenceOptions.path));
-	for (const i in fileNameList) {
-		const filePath = Path.join(Path.dirname(persistenceOptions.path), fileNameList[i]);
-		if ((await FileSystem.stat(filePath)).isDirectory()) {
-			await FileSystem.rmdir(filePath);
-		}
-		else {
-			await FileSystem.unlink(filePath);
-		}
-	}
+	const path = Path.dirname(persistenceOptions.path);
+	await FileSystem.rmdir(path);
+	await FileSystem.mkdir(path);
 }
 
 describe("PersistenceTimeSeries", () => {
@@ -80,7 +73,7 @@ describe("PersistenceTimeSeries", () => {
 			// Build a list of random points to be added
 			let sampleList = [];
 			for (let i = 0; i<100; ++i) {
-				const timestamp = Math.floor(Math.random() * 1000 - 500);
+				const timestamp = Math.floor(Math.random() * 1000); // - 500);
 
 				// Ignore duplicates (this needs to be fixed)
 				if (sampleList.indexOf(timestamp) != -1) {
