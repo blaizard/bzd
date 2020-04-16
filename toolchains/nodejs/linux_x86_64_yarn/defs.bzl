@@ -15,10 +15,10 @@ def load_linux_x86_64_yarn():
         name = "node",
         build_file = "//toolchains/nodejs/linux_x86_64_yarn:node.BUILD",
         urls = [
-            "https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz",
+            "http://nodejs.org/dist/v13.9.0/node-v13.9.0-linux-x64.tar.xz",
         ],
-        strip_prefix = "node-v12.16.1-linux-x64",
-        sha256 = "b826753f14df9771609ffb8e7d2cc4cb395247cb704cf0cea0f04132d9cf3505",
+        strip_prefix = "node-v13.9.0-linux-x64",
+        sha256 = "f1e093303468032a1ecb0e290e19b43bf7771d4efbf589560df0060149614272",
     )
 
     native.register_toolchains("//toolchains/nodejs/linux_x86_64_yarn:toolchain")

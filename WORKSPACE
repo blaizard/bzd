@@ -20,10 +20,10 @@ load("@io_bazel_rules_docker//container:container.bzl", "container_pull")
 
 container_pull(
     name = "apline_node",
-    digest = "sha256:cf8ed910652a097ee152880b7c9988aaad439af91a256a51139938b686b1418d",
+    digest = "sha256:4df7b8ea856a4b272d5682390f0910fe463b51080d0399302753a83cead49760",
     registry = "index.docker.io",
     repository = "mhart/alpine-node",
-    tag = "slim-12",
+    tag = "slim-13",
 )
 
 # CC rules

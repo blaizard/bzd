@@ -18,12 +18,15 @@ def _load_linux_x86_64_clang_9_0_0(name):
     toolchain_definition = {
         "cpu": "linux_x86_64",
         "compiler": "clang",
-        "platforms": [
+        "host_platforms": [
             "@//tools/bazel.build/platforms:linux_x86_64",
         ],
         "exec_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
             "@//tools/bazel.build/platforms/isa:x86_64",
+        ],
+        "platforms": [
+            "@//tools/bazel.build/platforms:linux_x86_64",
         ],
         "target_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",

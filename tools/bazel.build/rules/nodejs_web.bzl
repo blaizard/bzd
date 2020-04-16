@@ -63,7 +63,7 @@ def _bzd_nodejs_web_build_impl(ctx):
         symlinks = {
             "node_modules": node_modules,
             "package.json": package_json,
-            "webpack.config.js": webpack_config,
+            "webpack.config.cjs": webpack_config,
         },
     )
 
@@ -87,7 +87,6 @@ _bzd_nodejs_web_build = rule(
         ),
         "install": attr.label(
             mandatory = True,
-            cfg = "target",
         ),
         "_webpack_config_template": attr.label(
             default = Label("//tools/bazel.build/rules/assets/nodejs:webpack_config_template"),
@@ -126,7 +125,7 @@ _bzd_nodejs_web_package = rule(
         ),
         "build": attr.label(
             executable = True,
-            cfg = "target",
+            cfg = "host",
         ),
     },
 )
@@ -158,7 +157,6 @@ _bzd_nodejs_web_exec = rule(
     implementation = _bzd_nodejs_web_exec_impl,
     attrs = {
         "package": attr.label(
-            cfg = "target",
         ),
         "_web_server": attr.label(
             executable = True,

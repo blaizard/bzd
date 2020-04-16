@@ -1,9 +1,9 @@
 "use strict";
 
-const Web = require("../../../nodejs/require/web.js");
-const Exception = require("../../../nodejs/require/exception.js")("backend");
-const KeyValueStoreDisk = require("../../../nodejs/require/key_value_store/disk.js");
-const Commander = require("commander");
+import Commander from "commander";
+
+import Web from "../../../nodejs/core/web.js";
+import KeyValueStoreDisk from "../../../nodejs/core/key_value_store/disk.js";
 
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")

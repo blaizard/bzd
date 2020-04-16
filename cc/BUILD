@@ -70,7 +70,6 @@ cc_library(
     ] + selects.with_or({
         (
             "//tools/bazel.build/config:x86_64",
-            "//tools/bazel.build/config/auto:x86_64",
         ): ["//cc/libraries/platforms/x86_64_cdecl"],
         "//conditions:default": [],
     }),

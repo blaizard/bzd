@@ -5,12 +5,15 @@ load("//toolchains/cc/fragments/esp32_xtensa_lx6_gcc:defs.bzl", "toolchain_fragm
 
 def load_esp32_xtensa_lx6_gcc():
     toolchain_definition = {
-        "platforms": [
-            "@//tools/bazel.build/platforms:esp32_xtensa_lx6",
+        "host_platforms": [
+            "@//tools/bazel.build/platforms:linux_x86_64",
         ],
         "exec_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:xtensa_lx6",
+            "@//tools/bazel.build/platforms/isa:x86_64",
+        ],
+        "platforms": [
+            "@//tools/bazel.build/platforms:esp32_xtensa_lx6",
         ],
         "target_compatible_with": [
             "@//tools/bazel.build/platforms/al:linux",
