@@ -2,7 +2,7 @@
 
 import Path from "path";
 
-import Persistence from "./disk.js";
+import PersistenceDisk from "./disk.js";
 import TimeSeries from "../timeseries.js";
 import Event from "../event.js";
 import FileSystem from "../filesystem.js";
@@ -76,7 +76,7 @@ export default class PersistenceTimeSeries {
 	async initialize(path) {
 
 		// Load the index
-		this.persistenceIndex = new Persistence(path, this.optionsIndex);
+		this.persistenceIndex = new PersistenceDisk(path, this.optionsIndex);
 		await this.persistenceIndex.waitReady();
 		// Quick check to see if the index need to be rebuilt
 		// There seems to be an issue if it is not rebuilt (test fails sporadically)
@@ -215,7 +215,7 @@ export default class PersistenceTimeSeries {
 				let persistence = null;
 				try {
 					// Open the persistence
-					persistence = await new Persistence(fullPath, this.optionsDataReadOnly);
+					persistence = new PersistenceDisk(fullPath, this.optionsDataReadOnly);
 					await persistence.waitReady();
 					// Read some metadata
 					await this.timeSeriesData.wrap((await persistence.get()).list, (timeSeriesData) => {
@@ -317,19 +317,19 @@ export default class PersistenceTimeSeries {
 		Exception.assert(metadata, "Metadata returned for " + timestamp + " is evaluating to false");
 
 		// Load the persistence if not alreay loaded
-		if (!this.persistenceCache.hasOwnProperty(metadata.path)) {
-			Log.info("Loading time series from " + metadata.path);
+		if (!(metadata.path in this.persistenceCache)) {
+			Log.info("Loading time series from " + metadata.path + " " + this.options.dataDir);
 
 			await FileSystem.mkdir(this.options.dataDir);
 			const fullPath = Path.join(this.options.dataDir, metadata.path);
-			let persistence = new Persistence(fullPath, this.optionsData);
+			let persistence = new PersistenceDisk(fullPath, this.optionsData);
 			await persistence.waitReady();
 
 			this.persistenceCache[metadata.path] = persistence;
 		}
 
-		Exception.assert(this.persistenceCache.hasOwnProperty(metadata.path), "Persistence " + metadata.path + " does not exists");
-		Exception.assert(this.persistenceCache[metadata.path] instanceof Persistence, "Persistence " + metadata.path + " is not of Persistence type");
+		Exception.assert(metadata.path in this.persistenceCache, "Persistence " + metadata.path + " does not exists");
+		Exception.assert(this.persistenceCache[metadata.path] instanceof PersistenceDisk, "Persistence " + metadata.path + " is not of Persistence type");
 		Exception.assert(this.persistenceCache[metadata.path].isReady(), "Persistence " + metadata.path + " is not ready");
 
 		return Object.assign({

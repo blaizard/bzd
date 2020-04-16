@@ -177,16 +177,16 @@ export default class PersistenceDisk {
 		};
 
 		// If there is no directories for delta, create it.
-		await this.fileSystemExec("mkdir", delta.dir);
+		await FileSystem.mkdir(delta.dir);
 
 		// List all existing delta files if any
-		const fileList = (await this.fileSystemExec("readdir", delta.dir)).filter((file) => file.match(/^[0-9]+\.log$/));
+		const fileList = (await FileSystem.readdir(delta.dir)).filter((file) => file.match(/^[0-9]+\.log$/));
 
 		// Check if dirty, i.e. if a savepoint can be made
 		delta.dirty = (fileList.length > 1);
 		if (!delta.dirty) {
 			for (const i in fileList) {
-				if ((await this.fileSystemExec("stat", delta.dir + fileList[i])).size > 0) {
+				if ((await FileSystem.stat(delta.dir + fileList[i])).size > 0) {
 					delta.dirty = true;
 					break;
 				}
@@ -209,8 +209,8 @@ export default class PersistenceDisk {
 	async initializeData() {
 
 		// Read the data file if any
-		if (await this.fileSystemExec("exists", this.path)) {
-			const content = await this.fileSystemExec("readFile", this.path);
+		if (await FileSystem.exists(this.path)) {
+			const content = await FileSystem.readFile(this.path);
 			this.data = await this.options.read(content);
 		}
 		// Initialize the data with the initial ones
@@ -264,7 +264,7 @@ export default class PersistenceDisk {
 		try {
 			// Create a temporary file
 			const tempPath = this.delta.dir + ".data.reset.temp";
-			await this.fileSystemExec("writeFile", tempPath, this.options.write(setData));
+			await FileSystem.writeFile(tempPath, this.options.write(setData));
 
 			// Replace old data with the new one
 			await this.replaceDataNoLock(tempPath);
@@ -324,7 +324,7 @@ export default class PersistenceDisk {
 		{
 			this.delta.list.push(newId);
 			const path = this.getPathFromId(newId);
-			await this.fileSystemExec("close", await this.fileSystemExec("open", path, "wx"));
+			await FileSystem.touch(path);
 		}
 
 		Log.debug("Using delta \"" + newId + "\"");
@@ -375,7 +375,7 @@ export default class PersistenceDisk {
 
 			// Get the size of the file before appending the data,
 			// this is used to recover the file if an error occured.
-			const stats = await this.fileSystemExec("stat", deltaPath);
+			const stats = await FileSystem.stat(deltaPath);
 			let fileSize = stats.size;
 
 			// If the size exceed the maxium size, create a new delta file,
@@ -392,7 +392,7 @@ export default class PersistenceDisk {
 
 			// Add the action to the delta file, make sure it fits on a single line
 			data = JSON.stringify(args).replace(/(?:\r\n|\r|\n)/g, " ");
-			await this.fileSystemExec("appendFile", deltaPath, type + " " + data + "\n");
+			await FileSystem.appendFile(deltaPath, type + " " + data + "\n");
 
 			// Update the current object
 			try {
@@ -403,7 +403,7 @@ export default class PersistenceDisk {
 			}
 			catch (e) {
 				// Delete the delta previously added
-				await this.fileSystemExec("truncate", deltaPath, fileSize);
+				await FileSystem.truncate(deltaPath, fileSize);
 				throw Exception.fromError(e);
 			}
 		}
@@ -421,10 +421,10 @@ export default class PersistenceDisk {
 
 		const path = this.getPathFromId(id);
 
-		Exception.assert(await this.fileSystemExec("exists", path), "File \"" + path + "\" does not exists.");
+		Exception.assert(await FileSystem.exists(path), "File \"" + path + "\" does not exists.");
 
 		// Read the file asynchronously
-		const content = await this.fileSystemExec("readFile", path);
+		const content = await FileSystem.readFile(path);
 		const lineList = content.split("\n").filter((line) => line);
 
 		for (const i in lineList) {
@@ -498,7 +498,7 @@ export default class PersistenceDisk {
 			await this.get();
 
 			// Write the data to a file
-			promiseWrite = this.fileSystemExec("writeFile", tempPath, this.options.write(this.data));
+			promiseWrite = FileSystem.writeFile(tempPath, this.options.write(this.data));
 
 			// It will save everything from here. So at this point, if nothing modified
 			// the deltas, it will be cleaned.
@@ -556,32 +556,6 @@ export default class PersistenceDisk {
 	}
 
 	/**
-	 * Execute an ansynchronous file system operation with a retry
-	 */
-	async fileSystemExec(command, ...args) {
-		const wait = () => {
-			return new Promise((resolve) => {
-				setTimeout(() => { resolve(); }, /*ms*/10);
-			});
-		};
-
-		let retryCounter = 5;
-
-		while (true) {
-			try {
-				return await FileSystem[command](...args);
-			}
-			catch (e) {
-				if (--retryCounter) {
-					await wait();
-					continue;
-				}
-				throw e;
-			}
-		}
-	}
-
-	/**
 	 * \brief Replace temporary data with the actual ones
 	 *
 	 * \note The write lock must be set.
@@ -592,7 +566,7 @@ export default class PersistenceDisk {
 
 		return new Promise(async (resolve, reject) => {
 
-			await this.fileSystemExec("move", tempPath, this.path);
+			await FileSystem.move(tempPath, this.path);
 
 			// Delete other files and update the delta list
 			while (this.delta.list.length
@@ -602,7 +576,7 @@ export default class PersistenceDisk {
 				const curId = this.delta.list.shift();
 				const path = this.getPathFromId(curId);
 				try {
-					await this.fileSystemExec("unlink", path);
+					await FileSystem.unlink(path);
 				}
 				catch (e) {
 					return reject(new Exception(e));
