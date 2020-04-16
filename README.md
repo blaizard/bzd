@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/blaizard/cpp-async.svg?branch=master)](https://travis-ci.org/blaizard/cpp-async)
 
-Fullstack, Lightweight and flexible framework for IoT applications.
-This monorepo enables the following technologies:
+Fullstack, lightweight and flexible framework for IoT applications.
+This mono repository enables the following technologies:
 
-|C++14                         |Python                           |Node13+ + Vue                 |Bazel                           |
-|:----------------------------:|:-------------------------------:|:----------------------------:|:------------------------------:|
-|![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)|
+|C++14                         |Python3                          |Node (v13+)                    | Vue                          |Bazel                           |
+|:----------------------------:|:-------------------------------:|:-----------------------------:|:----------------------------:|:------------------------------:|
+|![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/node.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)|
 
 ## Menu
 
