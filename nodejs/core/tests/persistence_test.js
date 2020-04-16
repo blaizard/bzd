@@ -181,7 +181,7 @@ describe('Persistence', function() {
 				}
 			}
 
-		}).timeout(10000);
+		}).timeout(30000);
 	});
 
 	describe('stress asynchronous', function() {
@@ -240,6 +240,6 @@ describe('Persistence', function() {
 			// Close the persistence
 			persistence.close();
 
-		}).timeout(10000);
+		}).timeout(30000);
 	});
 });

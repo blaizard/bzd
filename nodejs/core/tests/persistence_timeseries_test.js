@@ -61,7 +61,7 @@ describe("PersistenceTimeSeries", () => {
 			Exception.assertEqual(count, sampleList.length);
 
 			await timeseries.close();
-		});
+		}).timeout(30000);
 
 		it("random timestamp", async () => {
 
@@ -104,6 +104,6 @@ describe("PersistenceTimeSeries", () => {
 			Exception.assertEqual(count, sampleList.length);
 
 			await timeseries.close();
-		});
+		}).timeout(30000);
 	});
 });
