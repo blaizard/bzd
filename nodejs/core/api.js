@@ -13,6 +13,10 @@ export default class API {
         this.endpointPre = "/api/v1";
     }
 
+    static _makeLogPrepend(method, endpoint) {
+        return "For API " + method.toUpperCase() + " " + endpoint + ", ";
+    }
+
     _makePath(endpoint) {
         return this.endpointPre + endpoint;
     }
@@ -47,6 +51,7 @@ export default class API {
     handle(web, method, endpoint, callback, options = {}) {
         this._sanityCheck(method, endpoint);
         const requestOptions = this.definition[endpoint][method].request || {};
+        const responseOptions = this.definition[endpoint][method].response || {};
 
         // Build the web options
         let webOptions = {};
@@ -54,6 +59,23 @@ export default class API {
             webOptions.type = [requestOptions.type];
         }
 
-        web.addRoute(method, this._makePath(endpoint), callback, webOptions);
+        // Create a wrapper to the callback
+        const callbackWrapper = async function(request, response) {
+            try {
+                const result = await callback.call(this, request, response);
+                switch (responseOptions.type) {
+                case "json":
+                    Exception.assert(typeof result == "object", () => {return API._makeLogPrepend(method, endpoint) + "callback result must be a json object."});
+                    response.json(result);
+                    break;
+                }
+            }
+            catch (e) {
+                Exception.print("Exception Guard", Exception.fromError(e));
+                response.status(500).send(e.message);
+            }
+        };
+
+        web.addRoute(method, this._makePath(endpoint), callbackWrapper, webOptions);
     }
 };
