@@ -15,5 +15,7 @@ bzd_nodejs_binary(
     deps = [
         "//nodejs/core/key_value_store:disk",
         "//nodejs/core:web",
+        "//nodejs/core:api",
+        "//apps/dashboard:api",
     ],
 )

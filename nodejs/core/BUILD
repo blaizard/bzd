@@ -1,6 +1,19 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "api",
+    srcs = [
+        "api.js",
+    ],
+    deps = [
+        ":log",
+        ":exception",
+        ":fetch",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "log",
     srcs = [
         "log.js"
@@ -44,6 +57,9 @@ bzd_nodejs_library(
     name = "fetch",
     srcs = [
         "fetch.js"
+    ],
+    deps = [
+        ":exception",
     ],
     visibility = ["//visibility:public"],
 )

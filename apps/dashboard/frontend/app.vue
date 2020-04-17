@@ -29,6 +29,12 @@
 	import Layout from "[frontend]/layout.vue";
   import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
   import Fetch from "[bzd]/core/fetch.js"
+  import API from "[bzd]/core/api.js";
+  import APIv1 from "[dashboard]/api.v1.json";
+
+  console.log("api v1", APIv1);
+
+  const api = new API(APIv1);
 
   export default {
 		components: {
@@ -39,7 +45,9 @@
     },
     methods: {
       async test() {
-        console.log(await Fetch.get("https://fetch.com/"));
+
+        const response = await api.request("get", "/configuration");
+        console.log(response);
       }
     }
   }

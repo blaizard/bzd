@@ -18,10 +18,12 @@ bzd_nodejs_web(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
+        "//apps/dashboard:api",
         "//nodejs:icons",
         "//nodejs:styles",
         "//nodejs:vue",
         "//nodejs/core:fetch",
+        "//nodejs/core:api",
     ],
 )
 

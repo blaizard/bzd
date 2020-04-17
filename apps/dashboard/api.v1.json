@@ -1,0 +1,10 @@
+{
+    "/configuration": {
+        "get": {
+            "documentation": "Get the current configuration",
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}

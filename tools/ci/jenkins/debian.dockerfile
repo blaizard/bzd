@@ -8,7 +8,8 @@ FROM ubuntu:latest
 #            to be executed to discover binaries.
 # - gnupg2 - needed add the key to apt.
 # - libxml2-dev - needed for LLVM (need to be removed).
-RUN apt-get update && apt-get install -y git sudo build-essential g++ libc6-dev curl gnupg2 python libxml2-dev
+# - openjdk-11-jdk, unzip, zip are used by bazel
+RUN apt-get update && apt-get install -y git sudo build-essential g++ unzip zip libc6-dev curl gnupg2 python libxml2-dev openjdk-11-jdk
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \

@@ -1,10 +1,14 @@
 "use strict";
 
+import ExceptionFactory from "./exception.js";
+
+const Exception = ExceptionFactory("fetch");
+
 /**
  * Fetch data from HTTP endpoint.
  */
 export default class Fetch {
-    static async _process(url, options = {}) {
+    static async request(url, options = {}) {
 
         // Handle queries
         if ("query" in options) {
@@ -24,9 +28,14 @@ export default class Fetch {
             headers["Content-Type"] = "application/json";
             body = JSON.stringify(options.data);
         }
-        else {
+        else if (typeof options.data != "undefined") {
             body = options.data;
         }
+
+        // Sanity checks
+        const method = String(options.method).toLowerCase();
+        Exception.assert(method in {"get":1, "post":1, "head":1, "put":1, "delete":1, "connect":1, "options":1, "trace":1, "patch":1}, "Method '" + method + "' is not supported");
+        Exception.assert(!(body && (method in {"get":1})), "Body cannot be set with method '" + method + "'");
 
         // Handle expected type
         switch (options.expect) {
@@ -36,14 +45,12 @@ export default class Fetch {
         }
 
         const response = await window.fetch(url, {
-            method: options.method || "get",
+            method: method,
             body: body,
             headers: headers
         });
 
-        if (!response.ok) {
-            throw Error((await response.text()) || response.statusText);
-        }
+        Exception.assert(response.ok, async () => { return (await response.text()) || response.statusText; });
 
         switch (options.expect) {
         case "json":
@@ -55,6 +62,11 @@ export default class Fetch {
 
     static async get(url, options = {}) {
         options["method"] = "get";
-        return await this._process(url, options);
+        return await this.request(url, options);
+    }
+
+    static async post(url, options = {}) {
+        options["method"] = "post";
+        return await this.request(url, options);
     }
 };
