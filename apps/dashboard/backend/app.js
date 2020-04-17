@@ -3,6 +3,7 @@
 import Commander from "commander";
 
 import API from "../../../nodejs/core/api.js";
+import FileSystem from "../../../nodejs/core/filesystem.js";
 import Web from "../../../nodejs/core/web.js";
 import KeyValueStoreDisk from "../../../nodejs/core/key_value_store/disk.js";
 
@@ -19,7 +20,8 @@ Commander.version("1.0.0", "-v, --version")
 		rootDir: Commander.static
 	});
 
-	let api = new API();
+	const apiV1 = JSON.parse(await FileSystem.readFile("./apps/dashboard/api.v1.json"));
+	let api = new API(apiV1);
 
 	let keyValueStore = new KeyValueStoreDisk("/tmp/test/db");
 	await keyValueStore.waitReady();
@@ -27,14 +29,9 @@ Commander.version("1.0.0", "-v, --version")
 	await keyValueStore.set("bucket1", "key2", "World!");
 	await keyValueStore.delete("bucket2", "sds");
 
-	web.addRoute("post", "/api/v1/sample", async (request, response) => {
-		console.log("Received query: " + JSON.stringify(request.query));
-		console.log("Received body: " + JSON.stringify(request.body));
-
-		response.json({
-			hello: "World"
-		});
-	}, Web.JSON);
+	api.handle(web, "get", "/configuration", async (inputs) => {
+		return {};
+	});
 
 	web.start();
 
