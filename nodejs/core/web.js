@@ -200,18 +200,16 @@ export default class Web {
 	 * \param uri The uri to which the request should match.
 	 * \param callback A callback that will be called if the uri and type matches
 	 *                 the request.
-	 * \param dataType (optional) The type of data to be recieved, can be Web.JSON,
-	 *                 Web.RAW or Web.UPLOAD.
 	 * \param options (optional) Extra options to be passed to the handler.
 	 */
-	addRoute(type, uri, callback, dataType, options) {
-
-		if (typeof dataType === "undefined") {
-			dataType = Web.NORMAL;
-		}
+	addRoute(type, uri, callback, options) {
 
 		// Update the options
 		options = Object.assign({
+			/**
+			 * Data type expected
+			 */
+			type: [],
 			limit: this.config.limit,
 			path: null,
 			/**
@@ -237,16 +235,16 @@ export default class Web {
 			callbackList.unshift(callback);
 		}
 
-		if (dataType & Web.JSON) {
+		if (options.type.indexOf("json") != -1) {
 			callbackList.unshift(BodyParser.urlencoded({ limit: options.limit, extended: true }));
 			callbackList.unshift(BodyParser.json({ limit: options.limit }));
 		}
 
-		if (dataType & Web.RAW) {
+		if (options.type.indexOf("raw") != -1) {
 			callbackList.unshift(BodyParser.raw({ limit: options.limit, type: () => true }));
 		}
 
-		if (dataType & Web.UPLOAD) {
+		if (options.type.indexOf("upload") != -1) {
 			let upload = Multer({ storage: this.storage, limits: { fileSize: options.limit } });
 			callbackList.unshift(upload.any());
 		}

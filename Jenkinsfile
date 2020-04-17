@@ -3,7 +3,7 @@
 // Seems to be the only way to conditionaly set a param for the dockerfile, see https://issues.jenkins-ci.org/browse/JENKINS-43911
 node("master")
 {
-	stage("Read CACHE_PATH")
+	stage("CACHE_PATH")
 	{
 		CACHE_PATH = "${env.CACHE_PATH}" 
 		echo "CACHE_PATH = $CACHE_PATH"
