@@ -16,3 +16,9 @@ toolchain(
     toolchain = ":py_runtime_pair",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
+
+py_test(
+    name = "test",
+    main = "python_test.py",
+    srcs = ["python_test.py"],
+)
