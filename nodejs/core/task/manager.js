@@ -62,7 +62,7 @@ export default class Manager {
 		}
 
 		// Register
-		Log.info("Registering task " + task + " with priority " + task.priority);
+		Log.info("Registering task '{}' with priority {}", task, task.priority);
 		this.tasks[task.id.namespace] = this.tasks[task.id.namespace] || {
 			size: 0
 		};
@@ -85,7 +85,7 @@ export default class Manager {
 		Exception.assert(this.isRegistered(taskId), "The task " + taskId + " is not registered");
 
 		const task = this.tasks[taskId.namespace][taskId.name];
-		Log.info("Unregistering task " + task);
+		Log.info("Unregistering task '{}'", task);
 
 		// If the task is pending (it is in the queue but not executed yet),
 		// remove it from the list.

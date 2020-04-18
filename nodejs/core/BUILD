@@ -18,6 +18,9 @@ bzd_nodejs_library(
     srcs = [
         "log.js"
     ],
+    deps = [
+        ":format",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -27,6 +30,7 @@ bzd_nodejs_library(
         "exception.js"
     ],
     deps = [
+        ":format",
         ":log",
     ],
     visibility = ["//visibility:public"],

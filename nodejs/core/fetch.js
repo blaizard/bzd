@@ -34,8 +34,8 @@ export default class Fetch {
 
         // Sanity checks
         const method = String(options.method).toLowerCase();
-        Exception.assert(method in {"get":1, "post":1, "head":1, "put":1, "delete":1, "connect":1, "options":1, "trace":1, "patch":1}, "Method '" + method + "' is not supported");
-        Exception.assert(!(body && (method in {"get":1})), "Body cannot be set with method '" + method + "'");
+        Exception.assert(method in {"get":1, "post":1, "head":1, "put":1, "delete":1, "connect":1, "options":1, "trace":1, "patch":1}, "Method '{}' is not supported", method);
+        Exception.assert(!(body && (method in {"get":1})), "Body cannot be set with method '{}'", method);
 
         // Handle expected type
         switch (options.expect) {

@@ -51,8 +51,8 @@ export default class Template {
 					curKey += key[index];
 				}
 
-				Exception.assert(typeof curArgs === "object", () => ("The key \"" + key + "\" is invalid (error with \"" + curKey + "\")."));
-				Exception.assert(curArgs.hasOwnProperty(curKey), () => ("The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"));
+				Exception.assert(typeof curArgs === "object", "The key '{}' is invalid (error with '{}').", key, curKey);
+				Exception.assert(curArgs.hasOwnProperty(curKey), "The key '{}' in '{:j}' is not available", curKey, curArgs);
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {

@@ -141,8 +141,7 @@ export default class Web {
 
 			this.server.listen(this.port, undefined, undefined, () => {
 				resetErrorHandler.call(this, reject);
-				Log.info("Web server serving at http://localhost:" + this.port
-						+ ((configStrList.length) ? (" (" + configStrList.join(" and ") + ")") : ""));
+				Log.info("Web server serving at http://localhost:{}{}", this.port, (configStrList.length) ? (" (" + configStrList.join(" and ") + ")") : "");
 				resolve();
 			});
 			this.server.on("error", (e) => {
@@ -183,7 +182,7 @@ export default class Web {
 
 		const absolutePath = Path.resolve(path);
 		if (!absolutePath || !Fs.existsSync(absolutePath)) {
-			throw new Exception("The root directory '" + path + "' -> '" + absolutePath + "' does not exist.");
+			throw new Exception("The root directory '{}' (absolute: '{}') does not exist.", path, absolutePath);
 		}
 		if (uri) {
 			this.app.use(uri, Express.static(absolutePath, this.config.staticOptions));
@@ -226,7 +225,7 @@ export default class Web {
 					await callback.call(this, request, response);
 				}
 				catch (e) {
-					Exception.print("Exception Guard", Exception.fromError(e));
+					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);
 				}
 			});
@@ -266,7 +265,7 @@ export default class Web {
 			this.app.patch(uri, ...callbackList);
 			break;
 		default:
-			throw new Exception("Unknown HTTP type '" + type + "'.");
+			throw new Exception("Unknown HTTP type '{}'.", type);
 		}
 	}
 };
@@ -286,6 +285,6 @@ function resetErrorHandler(reject)
 // eslint-disable-next-line no-unused-vars
 function middlewareErrorHandler(e, req, res, next)
 {
-	Exception.print("Receive error.", e);
+	Exception.print("Receive error; {}", e);
 	res.status(500).send(e.message);
 }

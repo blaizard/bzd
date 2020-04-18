@@ -13,10 +13,6 @@ export default class API {
         this.endpointPre = "/api/v1";
     }
 
-    static _makeLogPrepend(method, endpoint) {
-        return "For API " + method.toUpperCase() + " " + endpoint + ", ";
-    }
-
     _makePath(endpoint) {
         return this.endpointPre + endpoint;
     }
@@ -25,8 +21,8 @@ export default class API {
      * Ensure the requestis valid according to the API definition.
      */
     _sanityCheck(method, endpoint) {
-        Exception.assert(endpoint in this.definition, "This endpoint is not defined: " + endpoint);
-        Exception.assert(method in this.definition[endpoint], "The method '" + method + "' is not valid for this endpoint: " + endpoint);
+        Exception.assert(endpoint in this.definition, "This endpoint is not defined: {}", endpoint);
+        Exception.assert(method in this.definition[endpoint], "The method '{}' is not valid for endpoint '{}'", method, endpoint);
     }
 
     async request(method, endpoint, options = {}) {
@@ -65,7 +61,7 @@ export default class API {
                 const result = await callback.call(this, request, response);
                 switch (responseOptions.type) {
                 case "json":
-                    Exception.assert(typeof result == "object", () => {return API._makeLogPrepend(method, endpoint) + "callback result must be a json object."});
+                    Exception.assert(typeof result == "object", "{} {}: callback result must be a json object.", method, endpoint);
                     response.json(result);
                     break;
                 }

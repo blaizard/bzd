@@ -43,8 +43,8 @@ class Cache
 
 		Exception.assert(typeof collection === "string", "register(...) must take a string as first argument.");
 		Exception.assert(typeof trigger === "function", "register(...) must take a function as second argument.");
-		Exception.assert(collection.match(/^[a-z0-9\.-]+$/i), "Invalid collection name \"" + collection + "\", it must contain only the following characters [a-z0-9.-].");
-		Exception.assert(!this.data.hasOwnProperty(collection), "The collection \"" + collection + "\" has already been registered.");
+		Exception.assert(collection.match(/^[a-z0-9\.-]+$/i), "Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].", collection);
+		Exception.assert(!this.data.hasOwnProperty(collection), "The collection '{}' has already been registered.", collection);
 
 		this.data[collection] = {
 			_trigger: trigger,
@@ -65,7 +65,7 @@ class Cache
 	//		data._timeout = Cache.getTimestampMs() - 1;
 	//	}
 
-		Log.info("Register collection \"" + collection + "\"");
+		Log.info("Register collection '{}'", collection);
 	}
 
 	/**
@@ -129,7 +129,7 @@ class Cache
 	 */
 	async delete(collection, ...ids) {
 		const id = idsToId.call(this, collection, ...ids);
-		Log.debug("DELETE " + collection + "::" + id);
+		Log.debug("DELETE {}::{}", collection, id);
 
 		if (this.data[collection].hasOwnProperty(id)) {
 
@@ -163,7 +163,7 @@ class Cache
 	 */
 	setDirty(collection, ...ids) {
 		const id = idsToId.call(this, collection, ...ids);
-		Log.debug("DIRTY " + collection + "::" + id);
+		Log.debug("DIRTY {}::{}", collection, id);
 
 		if (this.data[collection].hasOwnProperty(id)) {
 			// Invalidate the data by setting its timeout in the past
@@ -257,8 +257,8 @@ export default Cache;
 function idsToId(collection, ...ids)
 {
 	const id = (ids.length) ? ids.reduce((id, currentId) => (id + currentId), "") : "default";
-	Exception.assert(id[0] != "_", "Cache::get(" + collection + ", " + id + "), ids starting with \"_\" are protected.");
-	Exception.assert(typeof this.data[collection] === "object", "Cache::get(" + collection + ") does not exist or is not of type object.");
+	Exception.assert(id[0] != "_", "Cache::get({}, {}), ids starting with '_' are protected.", collection, id);
+	Exception.assert(typeof this.data[collection] === "object", "Cache::get({}) does not exist or is not of type object.", collection);
 
 	return id;
 }
@@ -304,7 +304,7 @@ async function get(instant, collection, ...ids)
 		if (typeof dataId === "object" && dataId.hasOwnProperty("_fetching")) {
 			// If instant and there are previous data, return it
 			if (instant && dataId.hasOwnProperty("_data")) {
-				Log.debug("GET " + collection + "::" + id + " (" + ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache") + ", instant)");
+				Log.debug("GET {}::{} ({}, instant)", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
 				return dataId._data;
 			}
 			await waitForNextUpdate.call(this);
@@ -316,16 +316,16 @@ async function get(instant, collection, ...ids)
 		}
 		// isError
 		else if (dataId.hasOwnProperty("_error")) {
-			Log.error("GET ERROR " + collection + "::" + id + ": " + dataId._error);
+			Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
 			throw new Exception(dataId._error);
 		}
 		// isData
 		else if (dataId.hasOwnProperty("_data")) {
-			Log.debug("GET " + collection + "::" + id + " (" + ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache") + ")");
+			Log.debug("GET {}::{} ({})", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
 			return dataId._data;
 		}
 		else {
-			throw new Exception("Invalid state " +  collection + "::" + id + ", it should never happen.");
+			throw new Exception("Invalid state {}::{}, it should never happen.", collection, id);
 		}
 	} while (true);
 }
@@ -341,7 +341,7 @@ function touchResource(collection, id)
 function deleteResourceById(resourceId)
 {
 	const n = resourceId.indexOf("/");
-	Exception.assert(n !== -1, "Invalid resourceId '" + resourceId + "'.");
+	Exception.assert(n !== -1, "Invalid resourceId '{}'.", resourceId);
 
 	const collection = resourceId.substring(0, n);
 	const id = resourceId.substring(n + 1);
@@ -379,7 +379,7 @@ async function triggerUpdate(collection, id, ...ids)
 	dataId._fetching = true;
 
 	try {
-		Exception.assert(typeof dataCollection._trigger === "function", "No trigger function associated with collection \"" + collection + "\"");
+		Exception.assert(typeof dataCollection._trigger === "function", "No trigger function associated with collection '{}'", collection);
 
 		// Close the previous data if a close function is available
 		if ("_data" in dataId && typeof dataId._data.close === "function") {
@@ -436,7 +436,7 @@ async function garbageCollector()
 			}, null);
 			Exception.assert(entry, "Could not find entry to remove");
 
-			Log.info("GARBAGE COLLECTION size=" + this.data._size + ", nbEntries=" + this.data._nbEntries + ": removing entry \"" + entry[0] + "\"");
+			Log.info("GARBAGE COLLECTION size={}, nbEntries={}: removing entry '{}'", this.data._size, this.data._nbEntries, entry[0]);
 
 			// Delete the resource
 			deleteResourceById.call(this, entry[0]);

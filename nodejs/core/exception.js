@@ -1,12 +1,28 @@
 "use strict";
 
+import Format from "./format.js";
 import LogFactory from "./log.js";
 const Log = LogFactory("exception");
+
+/**
+ * Private class to combine exception elements
+ */
+class ExceptionCombine {
+	constructor(...args) {
+		this.list = [args];
+	}
+	add(...args) {
+		this.list.push(args);
+	}
+	[Symbol.iterator]() {
+		return this.list.values();
+	}
+}
 
 const ExceptionFactory = (...topics) => {
 	return class Exception extends Error {
 
-		constructor(...args) {
+		constructor(str = "", ...args) {
 
 			// This should capture a callstack
 			super();
@@ -15,16 +31,33 @@ const ExceptionFactory = (...topics) => {
 			this.nestedErrorList = [];
 			// Topics associated with this object
 			this.topics = topics;
-			args.forEach((arg) => {
-				// Merge nested exceptions
-				if (arg instanceof Error) {
-					this.nestedErrorList.push((arg instanceof Exception) ? arg : Exception.fromError(arg));
-					this.nestedErrorList = this.nestedErrorList.concat(arg.nestedErrorList || []);
+
+			// Set the message
+			if (str instanceof ExceptionCombine) {
+				let messageList = [];
+				for (const a of str) {
+					messageList.push(this._init(a[0], ...a.slice(1)));
 				}
-				else {
-					this.message += ((this.message) ? "; " : "") + String(arg);
-				}
-			});
+				this.message = messageList.filter(item => item).join("; ");
+			}
+			else {
+				this.message = this._init(str, ...args);
+			}
+		}
+
+		_init(str, ...args) {
+			if (typeof str == "string") {
+				return Format(str, ...args);
+			}
+			if (typeof str == "function") {
+				return str();
+			}
+			if (str instanceof Error) {
+				this.nestedErrorList.push((str instanceof Exception) ? str : Exception.fromError(str));
+				this.nestedErrorList = this.nestedErrorList.concat(str.nestedErrorList || []);
+				return "";
+			}
+			return String(str);
 		}
 
 		/**
@@ -48,12 +81,14 @@ const ExceptionFactory = (...topics) => {
 		 * \brief Assert that expression evaluates to true.
 		 *
 		 * \param expression The expression to evaluate.
-		 * \param ...args (optional) The message to display if the assertion fails.
+		 * \param str (optional) The message to display if the assertion fails.
+		 * \param ...args (optional) Arguments to add to the message.
 		 */
-		static assert(expression, ...args) {
+		static assert(expression, str = "", ...args) {
 			if (!expression) {
-				args.unshift("Assertion failed");
-				throw new Exception(...args.map((arg) => ((typeof arg === "function") ? arg() : arg)));
+				let value = new ExceptionCombine("Assertion failed");
+				value.add(str, ...args);
+				throw new Exception(value);
 			}
 		}
 
@@ -63,33 +98,36 @@ const ExceptionFactory = (...topics) => {
 		 *
 		 * \param value1 The first value.
 		 * \param value2 The second value.
-		 * \param ...args (optional) The message to display if the assertion fails.
+		 * \param str (optional) The message to display if the assertion fails.
+		 * \param ...args (optional) Arguments to add to the message.
 		 */
-		static assertEqual(value1, value2, ...args) {
+		static assertEqual(value1, value2, str = "", ...args) {
 
-			const assertEqualInternal = (value1, value2, ...args) => {
+			const assertEqualInternal = (value1, value2, ...rest) => {
 				if (typeof value1 === "object" && value1 !== null && typeof value2 === "object" && value2 !== null) {
 					if (value1 instanceof Array && value2 instanceof Array) {
-						Exception.assert(value1.length === value2.length, ...args);
-						value1.forEach((subValue1, index) => { assertEqualInternal(subValue1, value2[index], ...args); });
+						Exception.assert(value1.length === value2.length, ...rest);
+						value1.forEach((subValue1, index) => { assertEqualInternal(subValue1, value2[index], ...rest); });
 					}
 					else {
 						assertEqualInternal(Object.keys(value1), Object.keys(value2), ...args);
-						Object.keys(value1).forEach((key) => { assertEqualInternal(value1[key], value2[key], ...args); });
+						Object.keys(value1).forEach((key) => { assertEqualInternal(value1[key], value2[key], ...rest); });
 					}
 				}
 				else {
-					Exception.assert(value1 == value2, ...args);
+					Exception.assert(value1 == value2, ...rest);
 				}
 			}
 
-			assertEqualInternal(value1, value2, () => ("Values are not equal, value1=" + JSON.stringify(value1) + ", value2=" + JSON.stringify(value2)), ...args);
+			let combine = new ExceptionCombine("Values are not equal, value1={:j}, value2={:j}", value1, value2);
+			combine.add(str, ...args);
+			assertEqualInternal(value1, value2, combine);
 		}
 
 		/**
 		 * Ensures that a specific block of code throws an exception
 		 */
-		static async assertThrows(block, ...args) {
+		static async assertThrows(block, str = "", ...args) {
 			let hasThrown = false;
 
 			try {
@@ -99,15 +137,19 @@ const ExceptionFactory = (...topics) => {
 				hasThrown = true;
 			}
 			finally {
-				Exception.assert(hasThrown, "Code block did not throw", ...args);
+				let combine = new ExceptionCombine("Code block did not throw");
+				combine.add(str, ...args);
+				Exception.assert(hasThrown, combine);
 			}
 		}
 
 		/**
 		 * Flag a line of code unreachable
 		 */
-		static unreachable(...args) {
-			throw new Exception("Code unreachable", ...args);
+		static unreachable(str = "", ...args) {
+			let combine = new ExceptionCombine("Code unreachable");
+			combine.add(str, ...args);
+			throw new Exception(combine);
 		}
 
 		/**
@@ -134,7 +176,6 @@ const ExceptionFactory = (...topics) => {
 		 * \brief Print the current exception object
 		 */
 		toString() {
-
 			let message = "[" + this.topics.join("::") + "] " + this.name
 					+ ((this.message) ? (" with message: " + String(this.message)) : "")
 					// Remove the first line of the stack to avoid poluting the output
