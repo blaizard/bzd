@@ -8,6 +8,7 @@ py_runtime_pair(
 
 toolchain(
     name = "toolchain",
+    # Only exec is needed as this is not a cross platform compilation toolchain
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",

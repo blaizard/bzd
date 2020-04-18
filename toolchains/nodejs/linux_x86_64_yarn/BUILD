@@ -29,11 +29,8 @@ nodejs_toolchain(
 
 toolchain(
     name = "toolchain",
+    # Only exec is needed as this is not a cross platform compilation toolchain
     exec_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-    ],
-    target_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],

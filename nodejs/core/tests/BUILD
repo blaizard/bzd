@@ -13,5 +13,6 @@ test_srcs = glob([
         "//nodejs/core/persistence:timeseries",
         "//nodejs/core:template",
         "//nodejs/core:timeseries",
+        "//nodejs/core:format",
     ],
 ) for src in test_srcs]
