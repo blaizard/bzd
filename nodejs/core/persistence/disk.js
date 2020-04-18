@@ -227,7 +227,7 @@ export default class PersistenceDisk {
 		// Merge the non-persisted data
 		Object.assign(this.data, this.options.initialNotPersisted);
 
-		Log.info("Restored data, replayed " + this.delta.list.length + " log(s)");
+		Log.info("Restored data, replayed {} log(s)", this.delta.list.length);
 	}
 
 	/**
@@ -272,7 +272,7 @@ export default class PersistenceDisk {
 			// Assign the data and the non persisted data
 			this.data = Object.assign({}, setData, this.options.initialNotPersisted);
 
-			Log.debug("Data successfully " + ((typeof data === "undefined") ? "reset" : "set"));
+			Log.debug("Data successfully {}", (typeof data === "undefined") ? "reset" : "set");
 
 			// Increase the savepoitn version at the end to ensure that if a savepoint
 			// is currently running with the old data, it will be discarded.
@@ -327,7 +327,7 @@ export default class PersistenceDisk {
 			await FileSystem.touch(path);
 		}
 
-		Log.debug("Using delta \"" + newId + "\"");
+		Log.debug("Using delta '{}'", newId);
 
 		return newId;
 	}
@@ -411,7 +411,7 @@ export default class PersistenceDisk {
 			this.mutex.release();
 		}
 
-		Log.debug("Successfully wrote " + type + ": " + data);
+		Log.debug("Successfully wrote {}: {}", type, data);
 	}
 
 	/**
@@ -456,7 +456,7 @@ export default class PersistenceDisk {
 	 */
 	async taskSavepoint() {
 		if (this.isDirty()) {
-			Log.info("Persistence \"" + this.path + "\" is dirty, running savepoint");
+			Log.info("Persistence '{}' is dirty, running savepoint", this.path);
 			try {
 				await this.savepoint();
 			}

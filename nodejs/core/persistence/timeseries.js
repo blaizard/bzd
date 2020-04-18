@@ -82,7 +82,7 @@ export default class PersistenceTimeSeries {
 		// There seems to be an issue if it is not rebuilt (test fails sporadically)
 		if ((await this.persistenceIndex.get()).version != VERSION || true) {
 			await this.rebuildIndex();
-			Log.info("Successfully rebuilt index of timeseries " + path);
+			Log.info("Successfully rebuilt index of timeseries {}", path);
 		}
 		this.event.trigger("ready");
 	}
@@ -204,7 +204,7 @@ export default class PersistenceTimeSeries {
 		}
 		dataFileList = Array.from(dataFileList);
 
-		Log.info("Identified " + dataFileList.length + " data file(s)");
+		Log.info("Identified {} data file(s)", dataFileList.length);
 
 		// Get the metadata out of them
 		let timeseriesData = [];
@@ -235,7 +235,7 @@ export default class PersistenceTimeSeries {
 					});
 				}
 				catch (e) {
-					Log.error("Ignoring data file '" + fullPath + "' seems to be corrupted: " + e);
+					Log.error("Ignoring data file '{}' seems to be corrupted: {}", fullPath, e);
 				}
 				finally {
 					// Close the persistence
@@ -318,7 +318,7 @@ export default class PersistenceTimeSeries {
 
 		// Load the persistence if not alreay loaded
 		if (!(metadata.path in this.persistenceCache)) {
-			Log.info("Loading time series from " + metadata.path + " " + this.options.dataDir);
+			Log.info("Loading time series from {}", metadata.path);
 
 			await FileSystem.mkdir(this.options.dataDir);
 			const fullPath = Path.join(this.options.dataDir, metadata.path);

@@ -22,7 +22,15 @@ export default function (str, ...args) {
 		// Handle the operation if any match
 		if (m) {
 			const format = _parseFormat(m[1], m[2], substitutionIndex);
-			output += args[format.index];
+			const value = args[format.index];
+
+			switch (format.type) {
+			case "j":
+				output += JSON.stringify(value);
+				break;
+			default:
+				output += String(value);
+			}			
 
 			++substitutionIndex;
 		}
@@ -33,6 +41,7 @@ export default function (str, ...args) {
 
 function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
 	return {
-		index: (substitutionIndex) ? parseInt(substitutionIndex) : currentSubstitutionIndex
+		index: (substitutionIndex) ? parseInt(substitutionIndex) : currentSubstitutionIndex,
+		type: options
 	}
 }

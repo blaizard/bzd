@@ -1,5 +1,7 @@
 "use strict";
 
+import Format from "./format.js";
+
 class Performance {
 	constructor() {
 		this.timeStart = Date.now();
@@ -37,14 +39,16 @@ class Logger {
 	}
 
 	// Support traces
-	print(level, topics, ...msgs) {
+	print(level, topics, str = "", ...args) {
 		const log = Logger.levels[level];
 		if (log.level <= this.config.level) {
 			const date = new Date().toISOString();
-			const header = "[" + date.replace("Z", "").replace("T", " ") + "] [" + log.text + "] " + ((topics) ? ("[" + topics.join("::") + "] ") : "");
-			msgs.forEach((msg) => {
-				log.fct(header + String((typeof msg === "function") ? msg() : msg).split("\n").map((line, index) => ((index) ? (" ".repeat(header.length) + line) : line)).join("\n"));
-			});
+			let message = Format("[{}] [{}] ", date.replace("Z", "").replace("T", " "), log.text);
+			if (topics) {
+				message += Format("[{}] ", topics.join("::"));
+			}
+			message += Format(String(str), ...args);
+			log.fct(message);
 		}
 	}
 };

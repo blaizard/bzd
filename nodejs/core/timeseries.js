@@ -99,7 +99,7 @@ export default class TimeSeries {
 		case TimeSeries.FIND_IMMEDIATELY_AFTER:
 			return index;
 		default:
-			Exception.unreachable("Unsupported find mode: " + mode);
+			Exception.unreachable("Unsupported find mode: '{}'", mode);
 		}
 	}
 
