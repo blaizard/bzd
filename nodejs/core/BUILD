@@ -41,6 +41,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "format",
+    srcs = [
+        "format.js"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "cache",
     srcs = [
         "cache.js",
