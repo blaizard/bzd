@@ -101,6 +101,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "router",
+    srcs = [
+        "router.js"
+    ],
+    deps = [
+        ":exception",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "template",
     srcs = [
         "template.js"
