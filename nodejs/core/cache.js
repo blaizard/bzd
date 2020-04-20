@@ -2,7 +2,7 @@
 
 import Event from "./event.js";
 import LogFactory from "./log.js";
-import ExceptionFactory from "./exception.js"
+import ExceptionFactory from "./exception.js";
 
 const Log = LogFactory("cache");
 const Exception = ExceptionFactory("cache");
@@ -43,27 +43,27 @@ class Cache
 
 		Exception.assert(typeof collection === "string", "register(...) must take a string as first argument.");
 		Exception.assert(typeof trigger === "function", "register(...) must take a function as second argument.");
-		Exception.assert(collection.match(/^[a-z0-9\.-]+$/i), "Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].", collection);
-		Exception.assert(!this.data.hasOwnProperty(collection), "The collection '{}' has already been registered.", collection);
+		Exception.assert(collection.match(/^[a-z0-9.-]+$/i), "Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].", collection);
+		Exception.assert(!(collection in this.data), "The collection '{}' has already been registered.", collection);
 
 		this.data[collection] = {
 			_trigger: trigger,
 			_size: 0,
-			_defaultSize: ((options && options.hasOwnProperty("size")) ? options.size : 0),
+			_defaultSize: ((options && ("size" in options)) ? options.size : 0),
 			_nbEntries: 0
 		};
 
 		// Build the value object;
-		if (options && options.hasOwnProperty("timeout")) {
+		if (options && ("timeout" in options)) {
 			this.data[collection]._timeoutMs = options.timeout;
 		}
 
 		// Set initial value if any defined and set its timeout to
 		// the past to ensure that a new value will be fetched.
-	//	if (options && typeof options.default !== "undefined") {
-	//		data._data = options.default;
-	//		data._timeout = Cache.getTimestampMs() - 1;
-	//	}
+		//	if (options && typeof options.default !== "undefined") {
+		//		data._data = options.default;
+		//		data._timeout = Cache.getTimestampMs() - 1;
+		//	}
 
 		Log.info("Register collection '{}'", collection);
 	}
@@ -131,7 +131,7 @@ class Cache
 		const id = idsToId.call(this, collection, ...ids);
 		Log.debug("DELETE {}::{}", collection, id);
 
-		if (this.data[collection].hasOwnProperty(id)) {
+		if (id in this.data[collection]) {
 
 			// Update the size
 			const size = this.data[collection][id]._size || 0;
@@ -139,7 +139,7 @@ class Cache
 			this.data._size -= size;
 
 			// Update the nb elements
-			if (this.data[collection][id].hasOwnProperty("_data")) {
+			if ("_data" in this.data[collection][id]) {
 				this.data[collection]._nbEntries--;
 				this.data._nbEntries--;
 
@@ -165,7 +165,7 @@ class Cache
 		const id = idsToId.call(this, collection, ...ids);
 		Log.debug("DIRTY {}::{}", collection, id);
 
-		if (this.data[collection].hasOwnProperty(id)) {
+		if (id in this.data[collection]) {
 			// Invalidate the data by setting its timeout in the past
 			let dataId = this.data[collection][id];
 			dataId._timeout = Cache.getTimestampMs() - 1;
@@ -187,7 +187,7 @@ class Cache
 		}
 		else {
 			const dataCollection = this.data[collection];
-			if (dataCollection.hasOwnProperty("_timeoutMs")) {
+			if ("_timeoutMs" in dataCollection) {
 				str += "timeout=" + dataCollection._timeoutMs + "ms, ";
 			}
 			str += "size=" + dataCollection._size + ", entries=[";
@@ -195,13 +195,13 @@ class Cache
 			for (const key in dataCollection) {
 				if (["_timeoutMs", "_trigger", "_size", "_nbEntries", "_defaultSize"].indexOf(key) == -1) {
 					let keyInfoList = [];
-					if (dataCollection[key].hasOwnProperty("_error")) {
+					if ("_error" in dataCollection[key]) {
 						keyInfoList.push("error");
 					}
-					if (dataCollection[key].hasOwnProperty("_timeout") && dataCollection[key]._timeout < Cache.getTimestampMs()) {
+					if ("_timeout" in dataCollection[key] && dataCollection[key]._timeout < Cache.getTimestampMs()) {
 						keyInfoList.push("timeout");
 					}
-					if (dataCollection[key].hasOwnProperty("_size")) {
+					if ("_size" in dataCollection[key]) {
 						keyInfoList.push("size=" + dataCollection[key]._size);
 					}
 					entryList.push(key + ((keyInfoList.length) ? " (" + keyInfoList.join(", ") + ")" : ""));
@@ -245,7 +245,7 @@ class Cache
 		let data = getOrCreatePath(this.data, ...path);
 		delete data._data;
 	}*/
-};
+}
 
 export default Cache;
 
@@ -290,7 +290,6 @@ function getObject(collection, ...ids)
  */
 async function get(instant, collection, ...ids)
 {
-	let status = null;
 	let timestampFetch = false;
 	const id = idsToId.call(this, collection, ...ids);
 
@@ -301,26 +300,26 @@ async function get(instant, collection, ...ids)
 		const dataId = this.data[collection][id];
 
 		// isFetching
-		if (typeof dataId === "object" && dataId.hasOwnProperty("_fetching")) {
+		if (typeof dataId === "object" && "_fetching" in dataId) {
 			// If instant and there are previous data, return it
-			if (instant && dataId.hasOwnProperty("_data")) {
+			if (instant && "_data" in dataId) {
 				Log.debug("GET {}::{} ({}, instant)", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
 				return dataId._data;
 			}
 			await waitForNextUpdate.call(this);
 		}
 		// isDirty
-		else if ((typeof dataId !== "object") || (dataId.hasOwnProperty("_timeout") && dataId._timeout < Cache.getTimestampMs())) {
+		else if ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs())) {
 			timestampFetch = Cache.getTimestampMs();
 			triggerUpdate.call(this, collection, id, ...ids);
 		}
 		// isError
-		else if (dataId.hasOwnProperty("_error")) {
+		else if ("_error" in dataId) {
 			Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
 			throw new Exception(dataId._error);
 		}
 		// isData
-		else if (dataId.hasOwnProperty("_data")) {
+		else if ("_data" in dataId) {
 			Log.debug("GET {}::{} ({})", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
 			return dataId._data;
 		}
@@ -368,7 +367,7 @@ async function triggerUpdate(collection, id, ...ids)
 {
 	// Create the data if it does not exists
 	let dataCollection = this.data[collection];
-	if (!dataCollection.hasOwnProperty(id)) {
+	if (!(id in dataCollection)) {
 		dataCollection[id] = {};
 	}
 	let dataId = dataCollection[id];
@@ -408,7 +407,7 @@ async function triggerUpdate(collection, id, ...ids)
 	this.data._size += (dataId._size - previousSize);
 
 	// Update the number of entries
-	const nbEntriesDelta = ((dataId.hasOwnProperty("_data")) ? 1 : 0) - previousNbEntries;
+	const nbEntriesDelta = (("_data" in dataId) ? 1 : 0) - previousNbEntries;
 	dataCollection._nbEntries += nbEntriesDelta;
 	this.data._nbEntries += nbEntriesDelta;
 

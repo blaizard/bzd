@@ -11,7 +11,7 @@ class Performance {
 		const timeMs = (Date.now() - this.timeStart);
 		return ((timeMs > 1000) ? (timeMs / 1000 + "s") : (timeMs + "ms"));
 	}
-};
+}
 
 class Logger {
 	constructor(config) {
@@ -51,7 +51,7 @@ class Logger {
 			log.fct(message);
 		}
 	}
-};
+}
 
 // Singleton
 let logger = new Logger({

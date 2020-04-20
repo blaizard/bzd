@@ -38,7 +38,7 @@ export default class Event {
 		}
 
 		if (addToList) {
-			this.list.hasOwnProperty(id) || (this.list[id] = []);
+			(id in this.list) || (this.list[id] = []);
 			this.list[id].push([callback, once]);
 		}
 		return this;
@@ -108,4 +108,4 @@ export default class Event {
 			}, /*once*/true);
 		});
 	}
-};
+}

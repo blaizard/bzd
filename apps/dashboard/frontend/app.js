@@ -14,6 +14,26 @@ const router = new VueRouter({
 	]
 });
 
+/*
+See https://stackoverflow.com/questions/50020026/what-is-the-best-vue-router-practice-for-very-large-webapplications
+
+const route: RouteConfig = {
+    path: '/some-path',
+    component: AppComponent,
+    children: [
+        getWelcomeRoute(),
+        getDashboardRoute()
+    ]
+};
+
+function getWelcomeRoute(): RouteConfig {
+    return {
+        name: ROUTE_WELCOME,
+        path: '',
+        component: WelcomeComponent
+    };
+}
+*/
 Vue.use(VueRouter);
 
 new Vue({

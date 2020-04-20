@@ -52,17 +52,20 @@ export default class Template {
 				}
 
 				Exception.assert(typeof curArgs === "object", "The key '{}' is invalid (error with '{}').", key, curKey);
-				Exception.assert(curArgs.hasOwnProperty(curKey), "The key '{}' in '{:j}' is not available", curKey, curArgs);
+				Exception.assert(curKey in curArgs, "The key '{}' in '{:j}' is not available", curKey, curArgs);
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {
 				case "[":
+				{
 					const curKey = getNextValueInternal();
 					curArgs = curArgs[curKey];
+					break;
+				}
 				}
 			}
 			return curArgs;
-		}
+		};
 
 		return getNextValueInternal();
 	}
@@ -87,4 +90,4 @@ export default class Template {
 
 		return output;
 	}
-};
+}

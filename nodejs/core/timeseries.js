@@ -1,9 +1,7 @@
 "use strict";
 
-import LogFactory from "./log.js";
 import ExceptionFactory from "./exception.js";
 
-const Log = LogFactory("test", "timeseries");
 const Exception = ExceptionFactory("test", "timeseries");
 
 /**

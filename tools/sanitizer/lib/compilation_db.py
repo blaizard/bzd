@@ -19,15 +19,14 @@ class CompilationDB():
             "kind(\"cc_(library|binary|test|inc_library|proto_library)\", %s)" % (target)
         ], config.getWorkspace()).splitlines()
 
+        # Generate the associated compilation database for each individual target
+        print("Generating C++ compilation database for %i target(s), this may take a while..." % (len(queries)))
+
         # Remove all previous *compile_commands.json if any
-        print("Removing previous artifacts if any...")
         for root, dirs, files in os.walk(config.getBazelBin(), topdown=True):
             for fileName in files:
                 if fileName.endswith("compile_commands.json"):
                     os.remove(os.path.join(root, fileName))
-
-        # Generate the associated compilation database for each individual target
-        print("Creating compilation database for %i target(s), this may take a while" % (len(queries)))
 
         executeCommand(["bazel",
             "build",
@@ -37,8 +36,6 @@ class CompilationDB():
             "--noshow_loading_progress",
             "--output_groups=compdb_files"
         ] + config.getBazelExtraArgs() + queries, config.getWorkspace())
-
-        print("Combining, filtering and sanitizing...")
 
         # Combine all json files together
         compileCommands = []
