@@ -6,6 +6,7 @@ WORKSPACE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd 
 
 # Sanitize
 bazel run //tools/sanitizer -- --workspace "$WORKSPACE_PATH" --action clang-format
+bazel run //tools/sanitizer/eslint -- "$WORKSPACE_PATH/nodejs/**/*.{js,vue}"
 bazel run //tools/buildifier
 
 # Generate documentation

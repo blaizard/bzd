@@ -12,7 +12,7 @@ bzd_nodejs_web(
         "app.js": "index",
     },
     packages = {
-        "vue-router": "",
+     "vue-router": "",
     },
     visibility = [
         "//apps/dashboard:__pkg__",

@@ -4,7 +4,7 @@ load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 # ---- Providers
 
 BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
-BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases"])
+BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases", "data"])
 
 # ---- Utils
 
@@ -14,17 +14,20 @@ Merge providers of types BzdNodeJsDepsProvider together
 
 def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
     srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in deps])
+    data = depset(transitive = [it[BzdNodeJsDepsProvider].data for it in deps])
     packages = {}
     aliases = {}
 
     # Merge context information first
     if ctx:
         srcs = depset(srcs.to_list(), transitive = [f.files for f in ctx.attr.srcs])
+        data = depset(data.to_list(), transitive = [f.files for f in ctx.attr.data])
         packages = dict(ctx.attr.packages)
         aliases = {ctx.attr.alias: ctx.label.package} if ctx.attr.alias else {}
 
     provider = BzdNodeJsDepsProvider(
         srcs = srcs,
+        data = data,
         packages = packages,
         aliases = aliases,
     )
@@ -74,6 +77,10 @@ _COMMON_ATTRS = {
     "srcs": attr.label_list(
         allow_files = True,
         doc = "Source files",
+    ),
+    "data": attr.label_list(
+        allow_files = True,
+        doc = "Data to be added to the runfile list",
     ),
     "packages": attr.string_dict(
         allow_empty = True,
@@ -180,8 +187,9 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     node_modules = ctx.attr.install[BzdNodeJsInstallProvider].node_modules
     package_json = ctx.attr.install[BzdNodeJsInstallProvider].package_json
 
-    # Retrieve source files
+    # Retrieve source files and data
     srcs = ctx.attr.install[BzdNodeJsDepsProvider].srcs.to_list()
+    data = ctx.attr.install[BzdNodeJsDepsProvider].data.to_list()
 
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
@@ -194,7 +202,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
             binary = toolchain_executable.node,
             output = ctx.outputs.executable,
             command = command.format(ctx.file.main.path),
-            extra_runfiles = [node_modules, package_json] + srcs,
+            extra_runfiles = [node_modules, package_json] + srcs + data,
             symlinks = {
                 "node_modules": node_modules,
                 "package.json": package_json,

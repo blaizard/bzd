@@ -3,7 +3,7 @@
 
 import os
 
-from lib.utility import assertCommand, executeMultiCommand
+from lib.utility import executeMultiCommand
 
 def clangFormat(config, compilationDB):
 

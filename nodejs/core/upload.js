@@ -43,7 +43,7 @@ export default class Upload {
 		}
 		input.style.display = "none";
 		input.addEventListener("change", () => {
-			handleUpload(input.files);
+			this.handleUpload(input.files);
 		}, false);
 
 		// Open the file explorer to select the file
@@ -62,7 +62,7 @@ export default class Upload {
 
 			// Upload the file and track its progress
 			const xhr = new XMLHttpRequest();
- 			xhr.upload.addEventListener("progress", (e) => {
+			xhr.upload.addEventListener("progress", (e) => {
 				if (e.lengthComputable) {
 					this.config.onProgress(uploadId, e.loaded, e.total);
 				}
@@ -83,10 +83,10 @@ export default class Upload {
 						this.config.onError(uploadId, xhr.response || xhr.statusText);
 					}
 				}
-			}
+			};
 
 			xhr.open("post", this.url);
 			xhr.send(data);
 		}
 	}
-};
+}

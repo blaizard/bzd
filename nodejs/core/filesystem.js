@@ -155,4 +155,4 @@ export default class FileSystem {
 	static async close(fileHandle) {
 		await fileHandle.close();
 	}
-};
+}

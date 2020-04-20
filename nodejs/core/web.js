@@ -268,7 +268,7 @@ export default class Web {
 			throw new Exception("Unknown HTTP type '{}'.", type);
 		}
 	}
-};
+}
 
 // ---- Private members ----
 

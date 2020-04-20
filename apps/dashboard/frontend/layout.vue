@@ -1,40 +1,40 @@
 <template>
-	<div class="layout">
-		<div class="layout-header" @click.stop="hideMenu">
+	<div class="bzd-layout">
+		<div class="bzd-layout-header" @click.stop="hideMenu">
 
-			<div class="layout-header-menu-trigger" @click.stop="toggleMenu">
+			<div class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
                 <i class="bzd-icon-menu"></i>
             </div>
 
-			<div class="layout-header-content">
+			<div class="bzd-layout-header-content">
 				<slot name="header"></slot>
 			</div>
 
-            <div class="layout-header-padding">
+            <div class="bzd-layout-header-padding">
             </div>
 
-            <div class="layout-header-actions">
+            <div class="bzd-layout-header-actions">
                 <slot name="actions"></slot>
             </div>
 		</div>
 
-		<div class="layout-menu">
-            <transition name="fade">
-                <div class="layout-menu-background" @click.stop="hideMenu" v-show="isMenuVisible">
+		<div class="bzd-layout-menu">
+            <transition name="bzd-fade">
+                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="isMenuVisible">
                 </div>
             </transition>
-            <transition name="translate">
-                <div class="layout-menu-content" @click.stop="" v-show="isMenuVisible">
+            <transition name="bzd-translate">
+                <div class="bzd-layout-menu-content" @click.stop="" v-show="isMenuVisible">
                     <slot name="menu"></slot>
                 </div>
             </transition>
 		</div>
 
-		<div class="layout-content">
+		<div class="bzd-layout-content">
 			<slot name="content"></slot>
 		</div>
 
-		<div class="layout-footer">
+		<div class="bzd-layout-footer">
 			<slot name="footer"></slot>
 		</div>
 	</div>
@@ -74,15 +74,6 @@
 </script>
 
 <style lang="scss">
-    html,
-    body {
-        padding: 0;
-		margin: 0;
-    }
-</style>
-
-<style lang="scss" scoped>
-
     // ---- Configuration
 
     // Global
@@ -114,11 +105,17 @@
     $bzdOpacity: 0.5;
     @import "~[bzd]/assets/style/clickable.scss";
 
-    .layout {
+    html,
+    body {
+        padding: 0;
+		margin: 0;
+    }
+
+    .bzd-layout {
         padding: 0;
 		margin: 0;
 
-        .layout-header {
+        .bzd-layout-header {
             position: sticky;
 			top: 0;
 			left: 0;
@@ -138,60 +135,59 @@
             font-size: $headerFontSize;
             line-height: $headerHeight;
 
-            .layout-header-menu-trigger {
+            .bzd-layout-header-menu-trigger {
                 @extend %bzd-clickable;
 
                 min-width: $headerHeight;
                 text-align: center;
             }
 
-            .layout-header-content {
+            .bzd-layout-header-content {
                 padding-left: $headerPadding / 2;
                 padding-right: $headerPadding / 2;
             }
 
-            .layout-header-padding {
+            .bzd-layout-header-padding {
                 width: 100%;
             }
 
-            .layout-header-actions {
-                ul {
-                    padding: 0;
-                    margin: 0;
-                    li {
-                        font-size: 0;
-                        line-height: 0;
-                        padding: $headerPadding;
-                        i {
-                            font-size: $headerFontSize;
-                        }
-                        list-style: none;
-                        @extend %bzd-clickable;
-                    }
+            .bzd-layout-header-actions {
+
+                > * {
+                    min-width: $headerHeight;
+                    text-align: center;
+                }
+
+                .bzd-menu-nested,
+                .bzd-menu-entry-text {
+                    display: none;
+                }
+                .bzd-menu-entry-wrapper {
+                    @extend %bzd-clickable;
                 }
             }
         }
 
-        .layout-menu {
+        .bzd-layout-menu {
             // --- Transitions
 
             // Fade
-            .fade-enter-active,
-            .fade-leave-active {
+            .bzd-fade-enter-active,
+            .bzd-fade-leave-active {
                 transition: opacity 0.5s;
             }
-            .fade-enter,
-            .fade-leave-to {
+            .bzd-fade-enter,
+            .bzd-fade-leave-to {
                 opacity: 0;
             }
 
             // Translate
-            .translate-enter-active,
-            .translate-leave-active {
+            .bzd-translate-enter-active,
+            .bzd-translate-leave-active {
                 transition: transform 0.3s;
             }
-            .translate-enter,
-            .translate-leave-to {
+            .bzd-translate-enter,
+            .bzd-translate-leave-to {
                 transform: translateX(-300px);
             }
 
@@ -200,7 +196,7 @@
             position: fixed;
             z-index: $menuZIndex;
 
-            .layout-menu-background {
+            .bzd-layout-menu-background {
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -210,7 +206,7 @@
                 background-color: rgba(0, 0, 0, 0.4);
             }
 
-            .layout-menu-content {
+            .bzd-layout-menu-content {
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -224,7 +220,7 @@
             }
         }
 
-        .layout-content {
+        .bzd-layout-content {
             padding: $contentPadding;
         }
     }

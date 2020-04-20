@@ -68,10 +68,10 @@ const ExceptionFactory = (...topics) => {
 			let exception = new Exception();
 			exception.message = e.message;
 			exception.stack = e.stack;
-			if (e.hasOwnProperty("topics")) {
+			if ("topics" in e) {
 				exception.topics = e.topics;
 			}
-			if (e.hasOwnProperty("nestedErrorList")) {
+			if ("nestedErrorList" in e) {
 				exception.nestedErrorList = e.nestedErrorList;
 			}
 			return exception;
@@ -117,7 +117,7 @@ const ExceptionFactory = (...topics) => {
 				else {
 					Exception.assert(value1 == value2, ...rest);
 				}
-			}
+			};
 
 			let combine = new ExceptionCombine("Values are not equal, value1={:j}, value2={:j}", value1, value2);
 			combine.add(str, ...args);

@@ -43,5 +43,5 @@ function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
 	return {
 		index: (substitutionIndex) ? parseInt(substitutionIndex) : currentSubstitutionIndex,
 		type: options
-	}
+	};
 }
