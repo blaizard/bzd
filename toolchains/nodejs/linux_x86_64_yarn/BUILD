@@ -1,5 +1,6 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper")
 load("//tools/bazel.build/toolchains/nodejs:defs.bzl", "nodejs_toolchain")
+load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_test")
 
 config_setting(
     name = "cache",
@@ -36,4 +37,10 @@ toolchain(
     ],
     toolchain = ":nodejs_toolchain",
     toolchain_type = "//tools/bazel.build/toolchains/nodejs:toolchain_type",
+)
+
+bzd_nodejs_test(
+    name = "nodejs",
+    srcs = ["nodejs_test.js"],
+    main = "nodejs_test.js",
 )

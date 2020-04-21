@@ -1,18 +1,8 @@
 "use strict"
 
 import Vue from "vue"
-import VueRouter from "vue-router"
 import App from "[frontend]/app.vue"
-
-import AddTile from "[frontend]/add_tile.vue"
-import Dashboard from "[frontend]/dashboard.vue"
-
-const router = new VueRouter({
-	routes: [
-		{ path: '/add', component: AddTile },
-		{ path: '/dashboard', component: Dashboard }
-	]
-});
+import Router from "[bzd]/vue/router/router.js"
 
 /*
 See https://stackoverflow.com/questions/50020026/what-is-the-best-vue-router-practice-for-very-large-webapplications
@@ -34,10 +24,10 @@ function getWelcomeRoute(): RouteConfig {
     };
 }
 */
-Vue.use(VueRouter);
+
+Vue.use(Router);
 
 new Vue({
 	el: '#app',
 	render: (h) => h(App),
-	router: router
 });
