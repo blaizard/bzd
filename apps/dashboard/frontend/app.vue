@@ -2,7 +2,7 @@
 	<Layout>
 		<template #header>Dashboard</template>
 		<template #actions>
-			<MenuEntry text="Edit" icon="bzd-icon-edit"></MenuEntry>
+			<MenuEntry text="Edit" icon="bzd-icon-edit" @click=""></MenuEntry>
 		</template>
 		<template #menu>
 			<MenuEntry text="About" icon="bzd-icon-edit">
@@ -10,12 +10,13 @@
 				<MenuEntry text="Two" icon="bzd-icon-edit"></MenuEntry>
 				<MenuEntry text="Three" icon="bzd-icon-edit"></MenuEntry>
 			</MenuEntry>
-			<router-link to="/add">Go to Frr</router-link>
-			<router-link to="/dashboard">Go to Bar</router-link>
 		</template>
 		<template #content>
 			<span v-tooltip="{'text': 'Hello world'}">Content</span>
-			<router-view></router-view>
+			<RouterComponent ref="foo"></RouterComponent>
+			<RouterLink link="/add">/add</RouterLink>
+			<RouterLink link="/dashboard">/dashboard</RouterLink>
+			<RouterLink link="/dashboard/edit">/dashboard/edit</RouterLink>
 		</template>
 		<template #footer>
 			Footer <button @click="test">Test</button>
@@ -37,11 +38,6 @@
 
 	const api = new API(APIv1);
 
-	const routesEntryPoint = {
-		dashboard: () => import("[frontend]/dashboard.vue"),
-		entry: () => import("[frontend]/add_tile.vue"),
-	};
-
 	export default {
 		components: {
 			Layout, MenuEntry
@@ -49,8 +45,27 @@
 		directives: {
 			"tooltip": DirectiveTooltip
 		},
+		data: function () {
+			return {
+			/*	router: this.$bzdRouter({
+					ref: "foo",
+					routes: [
+						{ path: "/dashboard", nested: true, component: () => import("[frontend]/dashboard.vue") },
+						{ path: "/add", component: () => import("[frontend]/add_tile.vue") }
+					],
+					fallback: { component: () => import("[frontend]/404.vue") }
+				})*/
+			}
+		},
 		mounted() {
-			
+			this.$registerRouter({
+				ref: "foo",
+				routes: [
+					{ path: "/dashboard", nested: true, component: () => import("[frontend]/dashboard.vue") },
+					{ path: "/add", component: () => import("[frontend]/add_tile.vue") }
+				],
+				fallback: { component: () => import("[frontend]/404.vue") }
+			});
 		},
 		methods: {
 			async test() {

@@ -1,12 +1,21 @@
 <template>
-    <div>Dasboard</div>
+	<div>Dashboard</div>
 </template>
 
 <script>
-    "use strict"
+	"use strict"
 
-    import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
-
-    export default {
-    };
+	export default {
+		data: function () {
+			return {
+			}
+		},
+		mounted() {
+			this.$registerRouter({
+				routes: [
+                    { path: '/edit', handler: () => { console.log("What!!!"); alert("What!!!"); } },
+				],
+			});
+		},
+	}
 </script>

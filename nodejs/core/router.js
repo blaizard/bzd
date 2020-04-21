@@ -4,7 +4,7 @@ import ExceptionFactory from "./exception.js";
 
 const Exception = ExceptionFactory("router");
 
-module.exports = class Router {
+export default class Router {
 	constructor(config) {
 		this.config = Object.assign({
 			/**
@@ -15,10 +15,10 @@ module.exports = class Router {
 			 * \brief Callback if no routes are matching.
 			 */
 			fallback: (path) => {
-				throw new Error("Route not found for '" + path + "'");
+				throw new Exception("Route not found for '{}'.", path);
 			}
 		}, config);
-		this.routeList = [];
+		this.routes = new Map();
 		this.dirty = true;
 		this.data = null;
 	}
@@ -30,11 +30,10 @@ module.exports = class Router {
 	 *	/api/robots/search/{name}
 	 *	/api/robots/{id:[0-9]+}
 	 */
-	add(path, handler, args) {
+	add(path, handler, args = {}) {
 		Exception.assert(handler !== undefined, "You must define a handler for the route '{}'.", path);
 
-		this.routeList.push({
-			path: path,
+		this.routes.set(path, {
 			handler: handler,
 			args: args
 		});
@@ -47,7 +46,7 @@ module.exports = class Router {
 	match(path) {
 		// Compile the routes once
 		if (this.dirty) {
-			this.data = compileRoutes(this.routeList, this.config);
+			this.data = compileRoutes(this.routes, this.config);
 			this.dirty = false;
 		}
 
@@ -84,21 +83,25 @@ module.exports = class Router {
 	/**
 	 * \brief Handle the current request, with routes previously added.
 	 */
-	dispatch(path) {
-
-		let args = [].slice.call(arguments);
-		args.shift();
+	dispatch(path, ...args) {
 
 		const match = this.match(path);
 		if (match)
 		{
-			// Call the function with the arguments
-			args.unshift(match.vars);
-			return match.route.handler.apply(this, args);
+			match.route.handler(match.vars, ...args);
+			return {
+				matched: true,
+				path: path,
+				vars: match.vars
+			}
 		}
 
-		args.unshift(path);
-		return this.config.fallback.apply(this, args);
+		this.config.fallback(path, ...args);
+		return {
+			matched: false,
+			path: path,
+			vars: {}
+		}
     }
 };
 
@@ -113,7 +116,7 @@ function escapeRegexp(str)
 /**
  * \brief Pre-process routes before being used.
  */
-function compileRoutes(routeList, config)
+function compileRoutes(routes, config)
 {
 	// Create the master regexpr, to optimize the search speed
 	let routeData = [];
@@ -122,12 +125,12 @@ function compileRoutes(routeList, config)
 	// Regular expression used to extract variables
 	const regexp = /{([^}:]+):?([^}]*)}/g;
 
-	routeList.forEach((route) => {
+	for (const [path, config] of routes.entries()) {
 
 		let varList = [];
 
 		// Build the regular expression out of the path
-		const pathList = route.path.split(regexp);
+		const pathList = path.split(regexp);
 		let pathRegexpr = escapeRegexp(pathList[0]);
 
 		for (let i = 1; i < pathList.length; i += 3) {
@@ -148,23 +151,24 @@ function compileRoutes(routeList, config)
 
 		// Update the root data
 		routeData.push({
-			args: route.args,
-			handler: route.handler,
+			args: config.args,
+			handler: config.handler,
 			varList: varList,
 			pathRegexpr: pathRegexpr
 		});
-	});
+	}
 
 	// Collapse the number of regular expression to be able to identify the regexpr
 	let regexprList = [];
 	routeData.forEach((route, index) => {
-		const pathRegexpr = route.pathRegexpr + "()".repeat(maxVars - route.varList.length);
+		// +1 to support cases where there are no variables
+		const pathRegexpr = route.pathRegexpr + "()".repeat(maxVars - route.varList.length + 1);
 		regexprList.push(pathRegexpr);
 	});
 
 	return {
 		regexpr: new RegExp("^(?:|" + regexprList.join("|") + ")$", ((config.caseSensitive) ? undefined : "i")),
 		routes: routeData,
-		maxVars: maxVars
+		maxVars: maxVars + 1
 	};
 }
