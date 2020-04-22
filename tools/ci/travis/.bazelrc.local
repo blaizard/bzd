@@ -3,4 +3,6 @@ build --noshow_progress
 build --noshow_loading_progress
 
 # cache
+startup --output_user_root=/home/travis/cache/output
+build --disk_cache=/home/travis/cache/bazel
 build --sandbox_writable_path=/home/travis/.cache/yarn
