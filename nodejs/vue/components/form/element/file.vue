@@ -1,7 +1,7 @@
 <script>
 	"use strict";
 
-	import Upload from "../lib/upload.js"
+	import Upload from "../../../../core/upload.js"
 	import Array from "./array.vue"
 	import fileItem from "./file-item.vue"
 

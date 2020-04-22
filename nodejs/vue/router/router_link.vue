@@ -13,7 +13,7 @@
         },
         methods: {
             handleClick() {
-                this.$bzdRouterLink(this.link);
+                this.$routerDispatch(this.link);
             }
         }
 	}

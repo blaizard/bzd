@@ -89,6 +89,10 @@ export default class KeyValueStoreDisk {
         return persistence;
     }
 
+    generateUID() {
+        return "UID-" + (Date.now()) + "-" + (Math.floor(Math.random() * 0xffffffff));
+    }
+
 	/**
 	 * This function waits until the key value store database is ready
 	 */
@@ -98,13 +102,19 @@ export default class KeyValueStoreDisk {
 
     async set(bucket, key, value) {
         let persistence = await this._getPersistence(bucket);
-        await persistence.write("set", key, value);
+        await persistence.write("set", (key === null) ? this.generateUID() : key, value);
     }
 
     async get(bucket, key, defaultValue = undefined) {
         let persistence = await this._getPersistence(bucket);
         const data = await persistence.get();
         return (key in data) ? data[key] : defaultValue;
+    }
+
+    async list(bucket) {
+        let persistence = await this._getPersistence(bucket);
+        const data = await persistence.get();
+        return data;
     }
 
     async delete(bucket, key) {

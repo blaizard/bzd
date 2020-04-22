@@ -1,19 +1,15 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "router",
+    name = "api",
     srcs = [
-        "router.js",
-        "router_component.vue",
-        "router_link.vue",
+        "api.js",
     ],
     packages = {
         "vue": "",
     },
     deps = [
-        "//nodejs/core:router",
-        "//nodejs/core:log",
-        "//nodejs/core:exception",
+        "//nodejs/core:api",
     ],
     visibility = ["//visibility:public"],
 )

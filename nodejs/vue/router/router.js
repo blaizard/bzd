@@ -1,190 +1,212 @@
+import RouterComponent from "./router_component.vue";
+import RouterLink from "./router_link.vue";
 import Router from "../../core/router.js"
-import Vue from "vue"
+import LogFactory from "../../core/log.js";
+import ExceptionFactory from "../../core/exception.js";
 
-const regexMatchPath = new RegExp('^[^#]+(?:#([^?]+))?(?:\\?.*)?$'); 
+const Log = LogFactory("router");
+const Exception = ExceptionFactory("router");
 
-class BzdRouter {
+Log.setMinLevel("debug");
 
-	constructor(options, path = null) {
-		// Set default options
-		this.options = Object.assign({
-			routes: [],
-			// Fallback content
-			fallback: {},
-			componentSet: () => {}
-		}, options);
+class RouterManager {
 
-		// The router object
-		this.router = new Router({
+	constructor() {
+		this.routers = new Map();
+		this.path = "/";
+		this.regexMatchPath = new RegExp('^[^#]+(?:#([^?]+))?(?:\\?.*)?$'); 
+	}
+
+	_getUid(vueElt) {
+		return String(vueElt._uid);
+	}
+
+	/**
+	 * Create a new router
+	 */
+	_makeRouter(vueElt, options) {
+		let router = new Router({
 			fallback: (path) => {
-				console.log("ooops not found");
+				Log.error("Route '{}' not found", path);
 			}
 		});
 
-		// Setup the routes
-		this.options.routes.forEach((route) => {
+		options.routes.forEach((route) => {
 
-			const handler = (route, path) => {
+			const handler = (path) => {
 				if (route.component) {
-					this.options.componentSet(route.component, path);
+					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt));
 				}
 				if (route.handler) {
 					route.handler(path);
 				}
 			};
 
-			this.router.add(route.path, (args) => {
+			router.add(route.path, (args) => {
 				handler(route, "/");
 			});
+
 			// To handle nested components
 			if (route.nested) {
-				this.router.add(route.path + "/{bzd.core.router.rest:.*}", (args) => {
+				router.add(route.path + "/{bzd.core.router.rest:.*}", (args) => {
 					handler(route, "/" + args["bzd.core.router.rest"]);
 				});
 			}
-
 		});
-/*
-		setTimeout(() => {
-		console.log("path", path);
-		this.dispatch(path);
-		}, 500);*/
+
+		return router;
 	}
 
+	/**
+	 * Register a new router
+	 */
+	registerRouter(vueElt, options) {
+
+		const uid = this._getUid(vueElt);
+
+		Exception.assert(!this.routers.has(uid), "A router '{}' is already registered for this element", uid);
+
+		this.routers.set(uid, {
+			router: this._makeRouter(vueElt, options),
+			children: new Set(),
+			parent: null,
+			path: null,
+			pathPropagate: null
+		});
+
+		// Build component hierarchy
+		const parent = vueElt.$el.closest("*[data-bzd-router-id]");
+		if (parent) {
+			const parentId = parent.getAttribute("data-bzd-router-id");
+			this.routers.get(parentId).children.add(uid);
+			this.routers.get(uid).parent = parentId;
+		}
+
+		Log.debug("Registered router '{}' with parent '{}' (nb routers: {})", uid, this.routers.get(uid).parent, this.routers.size);
+
+		this._propagate(uid);
+	}
+
+	/**
+	 * Unregister a previously registered router
+	 */
+	unregisterRouter(uid) {
+
+		// Unregister all the children (note, the list must be copied as elements will be deleted)
+		const children = new Set(this.routers.get(uid).children);
+		children.forEach((childUid) => {
+			this.unregisterRouter(childUid);
+		});
+		if (this.routers.get(uid).parent) {
+			let parent = this.routers.get(this.routers.get(uid).parent);
+			Exception.assert(parent.children.delete(uid), "Child '{}' was not registered in parent '{}'", uid, this.routers.get(uid).parent);
+		}
+		this.routers.delete(uid);
+
+		Log.debug("Unregistered router '{}'", uid);
+	}
+
+	/**
+	 * Dispatch a new path to the routers
+	 */
 	dispatch(path = null) {
 
 		// Read the path from the url
 		if (path === null) {
-			const match = window.location.href.match(regexMatchPath);
+			const match = window.location.href.match(this.regexMatchPath);
 			if (match) {
 				path = match[1];
 			}
 		}
 
 		// Cleanup the path
-		path = "/" + (path || "").split("/").filter(item => item).join("/");
+		this.path = "/" + (path || "").split("/").filter(item => item).join("/");
 
 		// Update the url
-		//history.pushState(null, null, "#" + path);
+		history.pushState(null, null, "#" + this.path);		
 
-		// Do the actual dispatching
-		return this.router.dispatch(path);
+		// Clear all previously processed path
+		for (const [uid, config] of this.routers.entries()) {
+			config.path = null;
+			config.pathPropagate = null;
+		}
+
+		Log.debug("Dispatching path '{}'", this.path);
+
+		// Propagate dispatched request to all top level routers
+		for (const [uid, config] of this.routers.entries()) {
+			if (config.parent == null) {
+				this._propagate(uid);
+			}
+		}
+	}
+
+	/**
+	 * Propagate a dispatch request to the routers
+	 */
+	_propagate(uid) {
+		let router = this.routers.get(uid);
+
+		// If this router is already processed, do nothing
+		if (router.path !== null) {
+			return;
+		}
+
+		let data = null;
+		// If this is a top level router
+		if (router.parent === null) {
+			data = router.router.dispatch(this.path);
+		}
+		// Otherwise it must be a nested router
+		else {
+			const parent = this.routers.get(router.parent);
+			Exception.assert(parent, "Router '{}' is set as nested but has an invalid parent '{}'", uid, router.parent);
+			Exception.assert(parent.pathPropagate !== null, "Propagated path from parent '{}' is null", router.parent);
+			data = router.router.dispatch(parent.pathPropagate);
+		}
+
+		Exception.assert(data !== null, "Dispacthed information is empty.");
+
+		// Update the path of the router
+		router.pathPropagate = "/" + (data.vars["bzd.core.router.rest"] || "");
+		router.path = data.path.substr(0, data.path.length - router.pathPropagate.length + ((router.pathPropagate == "/") ? 1 : 0));
+
+		Log.debug("Router '{}' processed path '{}' and propagate path '{}'", uid, router.path, router.pathPropagate);
+
+		// Propagate to nested routers.
+		// Timeout is to ensure routers are unregisters in the mean time.
+		setTimeout(() => {
+			router.children.forEach((childUid) => {
+				this._propagate(childUid);
+			});
+		}, 1);
 	}
 };
-
-import RouterComponent from "./router_component.vue";
-import RouterLink from "./router_link.vue";
 
 export default class {
 	static install(Vue, options) {
 
-		Vue.component("RouterComponent", Vue.extend({
-			mixins: [RouterComponent],
-			methods: {
-				componentSet(component, routerId) {
-					this.component = component;
-					this.routerId = routerId;
-				}
-			}
-		}));
-
+		Vue.component("RouterComponent", RouterComponent);
 		Vue.component("RouterLink", RouterLink);
 
-		let currentRouters = [];
+		let routers = new RouterManager();
 
-		Vue.prototype.$bzdRouter = function (options) {
-			const nestedPath = this.$el.getAttribute("bzd-router-nested-path") || null;
-			const router = new BzdRouter(Object.assign(options, {
-				componentSet: (component, subNestedPath) => {
-					this.$refs[options.ref].componentSet(component, subNestedPath);
-				}
-			}), nestedPath);
-
-			// Keep track of main routers only
-			if (!nestedPath) {
-				currentRouters.push({
-					object: this,
-					router: router
-				});
-			}
-
-			return router;
-		};
-
-		let active = new Map();
-		let routers = new Map();
-
-		Vue.prototype.$registerRouter = function (options) {
+		Vue.prototype.$routerSet = function (options) {
 
 			// Register hook
-			// beforeDestroy
 			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
 			this.$once('hook:beforeDestroy', function() {
-				this.$unregisterRouter();
+				const uid = routers._getUid(this);
+				routers.unregisterRouter(uid);
 			});
 
-			// Add this element
-			routers[this._uid] = {
-				router: new BzdRouter(Object.assign(options, {
-					componentSet: (component) => {
-						this.$refs[options.ref].componentSet(component, this._uid);
-					}
-				})),
-				children: new Set(),
-				parent: null,
-				path: null,
-				nestedPath: null
-			};
-
-			// Build component hierarchy
-			let element = this;
-			const parent = this.$el.closest("*[data-bzd-router-id]");
-			if (parent) {
-				const parentId = parseInt(parent.getAttribute("data-bzd-router-id"));
-				routers[parentId].children.add(this._uid);
-				routers[this._uid].parent = parentId;
-			}
-
-			console.log("registerRouter", this._uid, routers);
-
-			// Execute active path
-
-			let data = null;
-			// If no parent, then use the path
-			if (routers[this._uid].parent === null) {
-				data = routers[this._uid].router.dispatch();
-			}
-			else {
-				// Check if parent is already computed, then pass the rest
-				const nestedPath = routers[routers[this._uid].parent].nestedPath;
-				console.log("Execute", nestedPath, "from parent", routers[this._uid].parent);
-				data = routers[this._uid].router.dispatch(nestedPath);
-			}
-
-			const rest = data.vars["bzd.core.router.rest"] || "";
-			routers[this._uid].path = data.path.substr(0, data.path.length - rest.length);
-			routers[this._uid].nestedPath = "/" + rest;
+			routers.registerRouter(this, options);
 		};
 
-		Vue.prototype.$unregisterRouter = function () {
-			console.log("unregisterRouter", this._uid, routers);
-
-			delete routers[this._uid];
+		Vue.prototype.$routerDispatch = function (path) {
+			routers.dispatch(path);
 		};
 
-		/*{
-			"/dashboard/dsad": {
-				"/edit"
-			}
-		}*/
-
-		Vue.prototype.$bzdRouterLink = function (path) {
-			console.log("path", path);
-
-			console.log(currentRouters);
-			currentRouters.forEach((item) => {
-				item.router.dispatch(path);
-			});
-		};
+		routers.dispatch();
 	}
 };

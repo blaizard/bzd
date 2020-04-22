@@ -1,4 +1,20 @@
 {
+    "/tile": {
+        "post": {
+            "documentation": "Create a new tile",
+            "request": {
+                "type": "json"
+            }
+        }
+    },
+    "/tiles": {
+        "get": {
+            "documentation": "List all tiles and their configuration",
+            "response": {
+                "type": "json"
+            }
+        }
+    },
     "/configuration": {
         "get": {
             "documentation": "Get the current configuration",

@@ -25,12 +25,13 @@ Commander.version("1.0.0", "-v, --version")
 
 	let keyValueStore = new KeyValueStoreDisk("/tmp/test/db");
 	await keyValueStore.waitReady();
-	await keyValueStore.set("bucket1", "key1", "Hello!");
-	await keyValueStore.set("bucket1", "key2", "World!");
-	await keyValueStore.delete("bucket2", "sds");
 
-	api.handle(web, "get", "/configuration", async (inputs) => {
-		return {};
+	api.handle(web, "get", "/tiles", async () => {
+		return await keyValueStore.list("tiles");
+	});
+
+	api.handle(web, "post", "/tile", async (inputs) => {
+		await keyValueStore.set("tiles", null, inputs);
 	});
 
 	web.start();

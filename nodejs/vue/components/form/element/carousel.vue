@@ -29,7 +29,7 @@
 	"use strict";
 
 	import Element from "./element.vue"
-	import Touch from "[lib]/vue/directives/touch.js"
+	import Touch from "../../../directives/touch.js"
 
 	export default {
 		mixins: [Element],

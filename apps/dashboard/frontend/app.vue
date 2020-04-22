@@ -2,7 +2,8 @@
 	<Layout>
 		<template #header>Dashboard</template>
 		<template #actions>
-			<MenuEntry text="Edit" icon="bzd-icon-edit" @click=""></MenuEntry>
+			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/dashboard/new"></MenuEntry>
+			<MenuEntry text="Edit" icon="bzd-icon-edit" link="/dashboard/edit"></MenuEntry>
 		</template>
 		<template #menu>
 			<MenuEntry text="About" icon="bzd-icon-edit">
@@ -16,7 +17,6 @@
 			<RouterComponent ref="foo"></RouterComponent>
 			<RouterLink link="/add">/add</RouterLink>
 			<RouterLink link="/dashboard">/dashboard</RouterLink>
-			<RouterLink link="/dashboard/edit">/dashboard/edit</RouterLink>
 		</template>
 		<template #footer>
 			Footer <button @click="test">Test</button>
@@ -31,12 +31,6 @@
 	import MenuEntry from "[frontend]/menu_entry.vue";
 	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
 	import Fetch from "[bzd]/core/fetch.js"
-	import API from "[bzd]/core/api.js";
-	import APIv1 from "[dashboard]/api.v1.json";
-
-	console.log("api v1", APIv1);
-
-	const api = new API(APIv1);
 
 	export default {
 		components: {
@@ -47,29 +41,21 @@
 		},
 		data: function () {
 			return {
-			/*	router: this.$bzdRouter({
-					ref: "foo",
-					routes: [
-						{ path: "/dashboard", nested: true, component: () => import("[frontend]/dashboard.vue") },
-						{ path: "/add", component: () => import("[frontend]/add_tile.vue") }
-					],
-					fallback: { component: () => import("[frontend]/404.vue") }
-				})*/
 			}
 		},
 		mounted() {
-			this.$registerRouter({
+			this.$routerSet({
 				ref: "foo",
 				routes: [
 					{ path: "/dashboard", nested: true, component: () => import("[frontend]/dashboard.vue") },
-					{ path: "/add", component: () => import("[frontend]/add_tile.vue") }
+					{ path: "/add", component: () => import("[frontend]/config.vue") }
 				],
 				fallback: { component: () => import("[frontend]/404.vue") }
 			});
 		},
 		methods: {
 			async test() {
-				const response = await api.request("get", "/configuration");
+				const response = await this.$api.request("get", "/configuration");
 				console.log(response);
 			}
 		}
@@ -80,6 +66,6 @@
 	@import "~[bzd]/assets/style/base.scss";
 	@import "~[bzd]/assets/style/tooltip.scss";
 
-	$bzdIconNames: edit;
+	$bzdIconNames: edit, add;
 	@import "~[bzd]/icons.scss";
 </style>
