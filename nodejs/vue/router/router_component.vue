@@ -1,8 +1,5 @@
 <template>
-    <div>
-        Left over path = {{ nestedPath }}
-        <component :is="component" :bzd-router-prefix="nestedPath" :bzd-router-path="nestedPath" :data-bzd-router-id="routerId"></component>
-    </div>
+    <component :is="component" :data-bzd-router-id="routerId"></component>
 </template>
 
 <script>
@@ -14,9 +11,14 @@
 		data: function () {
 			return {
 				component: null,
-				nestedPath: null,
 				routerId: null
 			}
 		},
+		methods: {
+			componentSet(component, routerId) {
+				this.component = component;
+				this.routerId = routerId;
+			}
+		}
 	}
 </script>

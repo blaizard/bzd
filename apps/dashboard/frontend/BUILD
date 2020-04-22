@@ -6,13 +6,11 @@ bzd_nodejs_web(
     srcs = glob([
         "**/*.vue",
         "**/*.js",
+        "**/*.svg",
     ]),
     alias = "frontend",
     entries = {
         "app.js": "index",
-    },
-    packages = {
-     "vue-router": "",
     },
     visibility = [
         "//apps/dashboard:__pkg__",
@@ -25,6 +23,9 @@ bzd_nodejs_web(
         "//nodejs/vue/router",
         "//nodejs/core:fetch",
         "//nodejs/core:api",
+        "//nodejs/vue:api",
+        "//nodejs/vue/components:form",
+        "//nodejs/vue/directives:tooltip",
     ],
 )
 

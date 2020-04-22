@@ -20,6 +20,7 @@
 			text: { type: String, required: true },
 			icon: { type: String, required: false, default: null },
 			tooltip: { type: Object, required: false, default: null },
+            link: { type: String, required: false, default: null },
         },
 		directives: {
 			"tooltip": DirectiveTooltip
@@ -36,6 +37,9 @@
         methods: {
             handleClick() {
                 this.$emit("click");
+                if (this.link) {
+                    this.$routerDispatch(this.link);
+                }
             }
         }
     };

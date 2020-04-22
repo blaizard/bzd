@@ -3,29 +3,11 @@
 import Vue from "vue"
 import App from "[frontend]/app.vue"
 import Router from "[bzd]/vue/router/router.js"
-
-/*
-See https://stackoverflow.com/questions/50020026/what-is-the-best-vue-router-practice-for-very-large-webapplications
-
-const route: RouteConfig = {
-    path: '/some-path',
-    component: AppComponent,
-    children: [
-        getWelcomeRoute(),
-        getDashboardRoute()
-    ]
-};
-
-function getWelcomeRoute(): RouteConfig {
-    return {
-        name: ROUTE_WELCOME,
-        path: '',
-        component: WelcomeComponent
-    };
-}
-*/
+import API from "[bzd]/vue/api.js";
+import APIv1 from "[dashboard]/api.v1.json";
 
 Vue.use(Router);
+Vue.use(API, APIv1);
 
 new Vue({
 	el: '#app',

@@ -80,7 +80,7 @@
 
     // Header
     $headerColor: #fff;
-    $headerBgColor: #4682bf;
+    $headerBgColor: #75b9e7;
     $headerFontSize: 20px;
     $headerHeight: 44px;
     $headerPadding: ($headerHeight - $headerFontSize) / 2;
@@ -152,6 +152,9 @@
             }
 
             .bzd-layout-header-actions {
+
+                display: flex;
+			    flex-flow: row nowrap;
 
                 > * {
                     min-width: $headerHeight;

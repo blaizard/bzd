@@ -23,8 +23,9 @@ export default class API {
 		Exception.assert(method in this.definition[endpoint], "The method '{}' is not valid for endpoint '{}'", method, endpoint);
 	}
 
-	async request(method, endpoint, /*options = {}*/) {
+	async request(method, endpoint, data) {
 		this._sanityCheck(method, endpoint);
+		const requestOptions = this.definition[endpoint][method].request || {};
 		const responseOptions = this.definition[endpoint][method].response || {};
 
 		// Build the options
@@ -33,6 +34,13 @@ export default class API {
 		};
 		if ("type" in responseOptions) {
 			fetchOptions.expect = responseOptions.type;
+		}
+
+		switch (requestOptions.type) {
+		case "json":
+			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+			fetchOptions.data = data;
+			break;
 		}
 
 		return await Fetch.request(this._makePath(endpoint), fetchOptions);
@@ -55,16 +63,24 @@ export default class API {
 		// Create a wrapper to the callback
 		const callbackWrapper = async function(request, response) {
 			try {
-				const result = await callback.call(this, request, response);
+				let data = null;
+				if (requestOptions.type == "json") {
+					data = request.body.data;
+				}
+
+				const result = await callback.call(this, data);
 				switch (responseOptions.type) {
 				case "json":
 					Exception.assert(typeof result == "object", "{} {}: callback result must be a json object.", method, endpoint);
 					response.json(result);
 					break;
+				default:
+					response.sendStatus(200);
 				}
 			}
 			catch (e) {
-				Exception.print("Exception Guard", Exception.fromError(e));
+				Exception.print("Exception Guard");
+				Exception.print(Exception.fromError(e));
 				response.status(500).send(e.message);
 			}
 		};
