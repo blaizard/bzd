@@ -1,6 +1,7 @@
 <template>
 	<div class="bzd-dashboard-tiles">
         <Tile v-for="description, uid in tiles"
+				:key="uid"
 				:description="description">
 		</Tile>
 	</div>
