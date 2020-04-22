@@ -5,9 +5,9 @@ def load_linux_x86_64_python():
         name = "python3_linux_x86_64",
         build_file = "//toolchains/python/linux_x86_64:python.BUILD",
         urls = {
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/python3.6-minimal_3.6.8-1~18.04.3_amd64.deb": "5f1ce00fab73a47dd1144c7979a71a8b87ec51a6fe227933a2a4d11f81889d2b",
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/libpython3.6-minimal_3.6.8-1~18.04.3_amd64.deb": "b678aa92ba35b26e1ead5a59a29b7f7dc9da9063f4216b3d40990417659ce50d",
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/libpython3.6-stdlib_3.6.8-1~18.04.3_amd64.deb": "5acb9bfd339329d15f2b6cd6436742c914c1e8aee0d7359bbf2c1dc3c4de5c04",
+            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/python3.6-minimal_3.6.9-1~18.04ubuntu1_amd64.deb": "6ea7828a83de9ee539b491527045d2a0a66d4e105528325bbe43917fb635da14",
+            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/libpython3.6-minimal_3.6.9-1~18.04ubuntu1_amd64.deb": "d12e9823bfc6fd96d9545b13950837ad7fd58bc07919b4d28d9a481f0d51c930",
+            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.6/libpython3.6-stdlib_3.6.9-1~18.04ubuntu1_amd64.deb": "18dc6c871a8e9cd3dcca9aaade7d1874f73180ace561a47542cf3cbc3afa882f",
             "http://de.archive.ubuntu.com/ubuntu/pool/main/p/pyserial/python3-serial_3.4-2_all.deb": "3b16e77d7347717505b65bdd9dfb1d9ce71711494edf4fcbf46b62c7b075d137",
         },
     )
