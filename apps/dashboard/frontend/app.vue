@@ -2,8 +2,8 @@
 	<Layout>
 		<template #header>Dashboard</template>
 		<template #actions>
-			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/dashboard/new"></MenuEntry>
-			<MenuEntry text="Edit" icon="bzd-icon-edit" link="/dashboard/edit"></MenuEntry>
+			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
+			<MenuEntry text="Edit" icon="bzd-icon-edit" link="/edit"></MenuEntry>
 		</template>
 		<template #menu>
 			<MenuEntry text="About" icon="bzd-icon-edit">
@@ -15,8 +15,7 @@
 		<template #content>
 			<span v-tooltip="{'text': 'Hello world'}">Content</span>
 			<RouterComponent ref="foo"></RouterComponent>
-			<RouterLink link="/add">/add</RouterLink>
-			<RouterLink link="/dashboard">/dashboard</RouterLink>
+			<RouterLink link="/">dashboard</RouterLink>
 		</template>
 		<template #footer>
 			Footer <button @click="test">Test</button>
@@ -41,14 +40,16 @@
 		},
 		data: function () {
 			return {
+				edit: false
 			}
 		},
 		mounted() {
 			this.$routerSet({
 				ref: "foo",
 				routes: [
-					{ path: "/dashboard", nested: true, component: () => import("[frontend]/dashboard.vue") },
-					{ path: "/add", component: () => import("[frontend]/config.vue") }
+                    { path: '/', component: () => import("[frontend]/tiles.vue") },
+                    { path: '/new', component: () => import("[frontend]/config.vue") },
+                    { path: '/edit', handler: () => { this.edit = true; } },
 				],
 				fallback: { component: () => import("[frontend]/404.vue") }
 			});
@@ -63,8 +64,8 @@
 </script>
 
 <style lang="scss">
-	@import "~[bzd]/assets/style/base.scss";
-	@import "~[bzd]/assets/style/tooltip.scss";
+	@import "~[bzd-style]/css/base.scss";
+	@import "~[bzd-style]/css/tooltip.scss";
 
 	$bzdIconNames: edit, add;
 	@import "~[bzd]/icons.scss";

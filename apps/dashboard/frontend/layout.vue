@@ -103,7 +103,7 @@
 
     $bzdColor: #000;
     $bzdOpacity: 0.5;
-    @import "~[bzd]/assets/style/clickable.scss";
+    @import "~[bzd-style]/css/clickable.scss";
 
     html,
     body {
