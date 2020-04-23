@@ -52,6 +52,6 @@
 $bzdIconNames: [] !default;
 @each $name in $bzdIconNames {
 	.bzd-icon-#{$name} {
-		@include defineIcon("~[bzd]/assets/svg/#{$name}.svg");
+		@include defineIcon("~[bzd-style]/svg/#{$name}.svg");
 	}
 }

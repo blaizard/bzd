@@ -140,5 +140,5 @@
 </script>
 
 <style lang="scss">
-	@import "style/index.scss";
+	@import "~[bzd-style]/css/form/index.scss";
 </style>

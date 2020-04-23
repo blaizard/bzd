@@ -17,8 +17,8 @@ bzd_nodejs_web(
     ],
     deps = [
         "//apps/dashboard:api",
+        "//nodejs/styles/default",
         "//nodejs:icons",
-        "//nodejs:styles",
         "//nodejs:vue",
         "//nodejs/vue/router",
         "//nodejs/core:fetch",

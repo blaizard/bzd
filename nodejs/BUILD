@@ -11,18 +11,9 @@ bzd_nodejs_library(
 
 bzd_nodejs_library(
     name = "icons",
-    srcs = glob([
-        "assets/svg/*.svg",
-    ]) + ["icons.scss"],
-    alias = "bzd",
-    visibility = ["//visibility:public"],
-)
-
-bzd_nodejs_library(
-    name = "styles",
-    srcs = glob([
-        "assets/style/*",
-    ]),
+    srcs = [
+        "icons.scss"
+    ],
     alias = "bzd",
     visibility = ["//visibility:public"],
 )
