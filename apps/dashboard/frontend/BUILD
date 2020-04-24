@@ -6,7 +6,6 @@ bzd_nodejs_web(
     srcs = glob([
         "**/*.vue",
         "**/*.js",
-        "**/*.svg",
     ]),
     alias = "frontend",
     entries = {
@@ -16,6 +15,7 @@ bzd_nodejs_web(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
+        "//apps/dashboard:plugins",
         "//apps/dashboard:api",
         "//nodejs/styles/default",
         "//nodejs:icons",

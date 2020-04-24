@@ -20,23 +20,23 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import Element from "./element.vue"
+import Element from "./element.vue";
 
-	export default {
-		mixins: [Element],
-		data: function() {
-			return {
-				/**
+export default {
+	mixins: [Element],
+	data: function() {
+		return {
+			/**
 				 * Defines a callback to be triggered the submit button is called
 				 */
-				click: this.getOption("click", this.submit),
-				/**
+			click: this.getOption("click", this.submit),
+			/**
 				 * The content of the button
 				 */
-				content: this.getOption("content", "Submit")
-			}
-		}
+			content: this.getOption("content", "Submit")
+		};
 	}
+};
 </script>

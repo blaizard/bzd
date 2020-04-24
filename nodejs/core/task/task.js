@@ -19,7 +19,7 @@ class TaskId {
 	toString() {
 		return this.namespace + "::" + this.name;
 	}
-};
+}
 
 export default class Task {
 	constructor(namespace, name, action, config) {
@@ -114,4 +114,4 @@ export default class Task {
 	/**
 	 * \}
 	 */
-};
+}

@@ -1,15 +1,14 @@
 <template>
 	<div class="bzd-dashboard-tile">
-        <div>{{ name }}</div>
-        <div>{{ type }}</div>
         <component :is="component"></component>
+        <div class="name">{{ name }}</div>
 	</div>
 </template>
 
 <script>
 	"use strict"
 
-    import Plugins from "[frontend]/plugins.js";
+    import { Frontend } from "[dashboard]/plugins/plugins.js";
 
 	export default {
         props: {
@@ -27,19 +26,23 @@
                 return (this.description.type || "").toLowerCase();
             },
             component() {
-                return Plugins.all[this.type];
+                return Frontend[this.type];
             }
         }
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .bzd-dashboard-tile {
-        width: 200px;
+        width: 300px;
         height: 150px;
         margin: 10px;
         padding: 10px;
 
-        border: 1px solid #aaa;
+        border: 1px solid #ddd;
+
+        .name {
+
+        }
     }
 </style>

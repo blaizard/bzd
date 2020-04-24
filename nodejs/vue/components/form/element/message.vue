@@ -3,11 +3,11 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import Element from "./element.vue"
+import Element from "./element.vue";
 
-	export default {
-		mixins: [Element]
-	}
+export default {
+	mixins: [Element]
+};
 </script>

@@ -35,11 +35,21 @@ def _bzd_nodejs_web_build_impl(ctx):
         # For HTML templates
         templates += "\"{}\": {{ entryId: \"{}\" }},".format(name, name)
 
+    # Identify the build mode
+    mode = None
+    if ctx.attr.build_type == "prod":
+        mode = "production"
+    elif ctx.attr.build_type == "dev":
+        mode = "development"
+    else:
+        fail("Invalid build type, only values 'prod' or 'dev' are supported.")
+
     # Generate the template file
     ctx.actions.expand_template(
         template = ctx.file._webpack_config_template,
         output = webpack_config,
         substitutions = {
+            "{mode}": mode,
             "{public_path}": ctx.attr.public_path,
             "{aliases}": ",\n".join(aliases),
             "{entries}": entries,
@@ -87,6 +97,10 @@ _bzd_nodejs_web_build = rule(
         ),
         "install": attr.label(
             mandatory = True,
+        ),
+        "build_type": attr.string(
+            mandatory = True,
+            doc = "Build type eth for production or development.",
         ),
         "_webpack_config_template": attr.label(
             default = Label("//tools/bazel.build/rules/assets/nodejs:webpack_config_template"),
@@ -191,6 +205,10 @@ def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], visibi
         target_name = name,
         install = name + ".install",
         tags = ["nodejs"],
+        build_type = select({
+            "//tools/bazel.build/config:prod": "prod",
+            "//tools/bazel.build/config:dev": "dev",
+        }),
         **kwargs
     )
 

@@ -13,20 +13,20 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import Element from "./element.vue"
+import Element from "./element.vue";
 
-	export default {
-		mixins: [Element],
-		props: {
-			value: {type: Boolean, required: false, default: false}
-		},
-		methods: {
-			handleClick() {
-				this.$el.firstChild.focus();
-				this.set(!this.get());
-			}
+export default {
+	mixins: [Element],
+	props: {
+		value: {type: Boolean, required: false, default: false}
+	},
+	methods: {
+		handleClick() {
+			this.$el.firstChild.focus();
+			this.set(!this.get());
 		}
 	}
+};
 </script>

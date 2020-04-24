@@ -52,167 +52,167 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import Element from "./element.vue"
-	export default {
-		mixins: [Element],
-		props: {
-			value: {type: String | Array, required: false, default: ""}
-		},
-		data: function() {
-			return {
-				/**
+import Element from "./element.vue";
+export default {
+	mixins: [Element],
+	props: {
+		value: {type: String | Array, required: false, default: ""}
+	},
+	data: function() {
+		return {
+			/**
 				 * If the displayed values should be interpreted as HTML or not
 				 */
-				html: this.getOption("html", false),
-				/**
+			html: this.getOption("html", false),
+			/**
 				 * Make the content editable
 				 */
-				editable: this.getOption("editable", true),
-				/**
+			editable: this.getOption("editable", true),
+			/**
 				 * This option will allow any value. If set to false, it will allow
 				 * only the preset values.
 				 */
-				any: this.getOption("any", true),
-				/**
+			any: this.getOption("any", true),
+			/**
 				 * Placeholder if no value is input
 				 */
-				placeholder: this.getOption("placeholder", ""),
-				/**
+			placeholder: this.getOption("placeholder", ""),
+			/**
 				 * Incorporate a non-editable text preceding the input field
 				 */
-				pre: this.getOption("pre", false),
-				/**
+			pre: this.getOption("pre", false),
+			/**
 				 * Incorporate a non-editable text after the input field
 				 */
-				post: this.getOption("post", false),
-				/**
+			post: this.getOption("post", false),
+			/**
 				 * Multivalue, this will return an array and not a string
 				 */
-				multi: this.getOption("multi", false),
-				/**
+			multi: this.getOption("multi", false),
+			/**
 				 * Multivalue separators regular expression
 				 */
-				multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
-				/**
+			multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
+			/**
 				 * Values will try to match presets. If any match occurs, It will show
 				 * the displayed value.
 				 * Presets should follow this format: {value: {display: "Fancy Value"}}.
 				 * \note This value is dynamic, hence cannot be from data but from a computed.
 				 */
-				// presets: {}
-				// ---- Internal ----
-				hasChanged: false
+			// presets: {}
+			// ---- Internal ----
+			hasChanged: false
+		};
+	},
+	computed: {
+		valueList() {
+			if (this.multi) {
+				return (this.get() instanceof Array) ? this.get() : [];
 			}
+			return [];
 		},
-		computed: {
-			valueList() {
-				if (this.multi) {
-					return (this.get() instanceof Array) ? this.get() : [];
-				}
-				return [];
-			},
-			valueStr() {
-				if (this.multi) {
-					return "";
-				}
-				return (this.isActive && this.editable) ? this.get() : this.getDisplayValue(this.get());
-			},
-			presets() {
-				return (this.description.hasOwnProperty("presets")) ? this.description["presets"] : {};
+		valueStr() {
+			if (this.multi) {
+				return "";
 			}
+			return (this.isActive && this.editable) ? this.get() : this.getDisplayValue(this.get());
 		},
-		methods: {
-			handleClick() {
-				this.$refs.input.focus();
-			},
-			isPreset(value) {
-				return this.presets.hasOwnProperty(value);
-			},
-			isValueAcceptable(value) {
-				return this.any || this.isPreset(value);
-			},
-			getDisplayValue(value) {
-				return (this.isPreset(value)) ? this.presets[value] : value;
-			},
-			valueListAdd(text) {
-				const regexpr =  "^" + this.multiSeparators + "+|" + this.multiSeparators + "+$";
-				const cleanedValue = text.replace(new RegExp(regexpr, "g"), "");
-				if (cleanedValue && this.isValueAcceptable(cleanedValue)) {
-					this.set(this.valueList.concat(cleanedValue));
-				}
+		presets() {
+			return (this.description.hasOwnProperty("presets")) ? this.description["presets"] : {};
+		}
+	},
+	methods: {
+		handleClick() {
+			this.$refs.input.focus();
+		},
+		isPreset(value) {
+			return this.presets.hasOwnProperty(value);
+		},
+		isValueAcceptable(value) {
+			return this.any || this.isPreset(value);
+		},
+		getDisplayValue(value) {
+			return (this.isPreset(value)) ? this.presets[value] : value;
+		},
+		valueListAdd(text) {
+			const regexpr =  "^" + this.multiSeparators + "+|" + this.multiSeparators + "+$";
+			const cleanedValue = text.replace(new RegExp(regexpr, "g"), "");
+			if (cleanedValue && this.isValueAcceptable(cleanedValue)) {
+				this.set(this.valueList.concat(cleanedValue));
+			}
+			this.$refs.input.innerHTML = "";
+			this.$emit("directInput", "");
+		},
+		valueSet(text) {
+			if (this.isValueAcceptable(text)) {
+				this.set(text);
+			}
+			else {
 				this.$refs.input.innerHTML = "";
 				this.$emit("directInput", "");
-			},
-			valueSet(text) {
-				if (this.isValueAcceptable(text)) {
-					this.set(text);
+				this.set("");
+			}
+		},
+		valueListRemoveLast() {
+			let valueList = this.valueList.slice(0);
+			valueList.pop();
+			this.set(valueList);
+		},
+		valueListRemove(index) {
+			let valueList = this.valueList.slice(0);
+			valueList.splice(index, 1);
+			this.set(valueList);
+		},
+		handleKeyDown(e, text) {
+			// If press ENTER
+			if (e.keyCode == 13) {
+				e.preventDefault();
+				if (this.multi) {
+					this.valueListAdd(text);
 				}
 				else {
-					this.$refs.input.innerHTML = "";
-					this.$emit("directInput", "");
-					this.set("");
+					this.submit();
+					this.valueSet(text);
+					this.$refs.input.blur();
 				}
-			},
-			valueListRemoveLast() {
-				let valueList = this.valueList.slice(0);
-				valueList.pop();
-				this.set(valueList);
-			},
-			valueListRemove(index) {
-				let valueList = this.valueList.slice(0);
-				valueList.splice(index, 1);
-				this.set(valueList);
-			},
-			handleKeyDown(e, text) {
-				// If press ENTER
-				if (e.keyCode == 13) {
-					e.preventDefault();
-					if (this.multi) {
-						this.valueListAdd(text);
-					}
-					else {
-						this.submit();
-						this.valueSet(text);
-						this.$refs.input.blur();
-					}
-				}
-				// If press Backspace
-				else if (e.keyCode == 8) {
-					if (this.multi && text === "") {
-						this.valueListRemoveLast();
-					}
-				}
-				// Emit special keys
-				else if (e.keyCode < 46 && [/*tab*/9, 32, /*arrow left*/37, /*arrow right*/39].indexOf(e.keyCode) === -1) {
-					e.preventDefault();
-					this.$emit("key", e.keyCode);
-				}
-			},
-			handleInput(text) {
-				this.hasChanged = true;
-				this.$emit("directInput", text);
-
-				if (this.multi) {
-					const lastChar = text[text.length - 1] || "";
-					if (lastChar.match(new RegExp(this.multiSeparators, "g"))) {
-						this.valueListAdd(text);
-					}
-				}
-			},
-			handleBlur(e, text) {
-				if (this.hasChanged) {
-					if (this.multi) {
-						this.valueListAdd(text);
-					}
-					else {
-						this.valueSet(text);
-					}
-					this.hasChanged = false;
-				}
-				this.setInactive();
 			}
+			// If press Backspace
+			else if (e.keyCode == 8) {
+				if (this.multi && text === "") {
+					this.valueListRemoveLast();
+				}
+			}
+			// Emit special keys
+			else if (e.keyCode < 46 && [/*tab*/9, 32, /*arrow left*/37, /*arrow right*/39].indexOf(e.keyCode) === -1) {
+				e.preventDefault();
+				this.$emit("key", e.keyCode);
+			}
+		},
+		handleInput(text) {
+			this.hasChanged = true;
+			this.$emit("directInput", text);
+
+			if (this.multi) {
+				const lastChar = text[text.length - 1] || "";
+				if (lastChar.match(new RegExp(this.multiSeparators, "g"))) {
+					this.valueListAdd(text);
+				}
+			}
+		},
+		handleBlur(e, text) {
+			if (this.hasChanged) {
+				if (this.multi) {
+					this.valueListAdd(text);
+				}
+				else {
+					this.valueSet(text);
+				}
+				this.hasChanged = false;
+			}
+			this.setInactive();
 		}
 	}
+};
 </script>

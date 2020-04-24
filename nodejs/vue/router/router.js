@@ -1,6 +1,6 @@
 import RouterComponent from "./router_component.vue";
 import RouterLink from "./router_link.vue";
-import Router from "../../core/router.js"
+import Router from "../../core/router.js";
 import LogFactory from "../../core/log.js";
 import ExceptionFactory from "../../core/exception.js";
 
@@ -14,7 +14,7 @@ class RouterManager {
 	constructor() {
 		this.routers = new Map();
 		this.path = "/";
-		this.regexMatchPath = new RegExp('^[^#]+(?:#([^?]+))?(?:\\?.*)?$'); 
+		this.regexMatchPath = new RegExp("^[^#]+(?:#([^?]+))?(?:\\?.*)?$"); 
 	}
 
 	_getUid(vueElt) {
@@ -42,7 +42,7 @@ class RouterManager {
 				}
 			};
 
-			router.add(route.path, (args) => {
+			router.add(route.path, () => {
 				handler(route, "/");
 			});
 
@@ -126,7 +126,7 @@ class RouterManager {
 		history.pushState(null, null, "#" + this.path);		
 
 		// Clear all previously processed path
-		for (const [uid, config] of this.routers.entries()) {
+		for (const [/*uid*/, config] of this.routers.entries()) {
 			config.path = null;
 			config.pathPropagate = null;
 		}
@@ -181,10 +181,10 @@ class RouterManager {
 			});
 		}, 1);
 	}
-};
+}
 
 export default class {
-	static install(Vue, options) {
+	static install(Vue, /*options*/) {
 
 		Vue.component("RouterComponent", RouterComponent);
 		Vue.component("RouterLink", RouterLink);
@@ -195,7 +195,7 @@ export default class {
 
 			// Register hook
 			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
-			this.$once('hook:beforeDestroy', function() {
+			this.$once("hook:beforeDestroy", function() {
 				const uid = routers._getUid(this);
 				routers.unregisterRouter(uid);
 			});
@@ -209,4 +209,4 @@ export default class {
 
 		routers.dispatch();
 	}
-};
+}

@@ -48,7 +48,7 @@ export default class PersistenceTimeSeries {
 		});
 
 		const filePath = Path.basename(path);
-		const dirPath = Path.dirname(path)
+		const dirPath = Path.dirname(path);
 
 		// Create the dataDir
 		this.options.dataDir = Path.join(dirPath, this.options.dataDir.replace("%s", filePath));
@@ -356,7 +356,7 @@ export default class PersistenceTimeSeries {
 						return {
 							timestamp: entry[0],
 							index: indexLeft
-						}
+						};
 					}
 					indexLeft -= entry[1].length;
 				}
@@ -372,7 +372,7 @@ export default class PersistenceTimeSeries {
 						return {
 							timestamp: entry[0],
 							index: -indexLeft - 1
-						}
+						};
 					}
 					indexLeft -= entry[1].length;
 				}
@@ -442,7 +442,7 @@ export default class PersistenceTimeSeries {
 				timestamp: timestamp,
 				// The path of the data file
 				path: metadata.path
-			}
+			};
 		});
 	}
 }

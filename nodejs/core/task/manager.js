@@ -211,7 +211,7 @@ export default class Manager {
 
 			// Task scheduler is not running, start it
 			if (!this.schedulerInstance) {
-				this.schedulerInstance = setTimeout(() => { this.taskScheduler() }, (nextTimestamp > timestamp) ? nextTimestamp - timestamp : 1);
+				this.schedulerInstance = setTimeout(() => { this.taskScheduler(); }, (nextTimestamp > timestamp) ? nextTimestamp - timestamp : 1);
 				this.schedulerTimestamp = nextTimestamp;
 			}
 		}
@@ -241,7 +241,7 @@ export default class Manager {
 					Exception.fromError(e).print("Task " + task + " execution error");
 				}
 				finally {
-					task.status = Task.STATUS_IDLE
+					task.status = Task.STATUS_IDLE;
 				}
 
 				// Re-insert the task if valid. Note, if the task is invalid
@@ -271,7 +271,7 @@ export default class Manager {
 				status: task.status,
 				priority: task.priority,
 				timestampDelta: Math.max(0, task.timestamp - timestamp)
-			}
+			};
 		});
 	}
 

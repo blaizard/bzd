@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function update(el, config) {
 
@@ -55,8 +55,6 @@ function update(el, config) {
 
 	// Update the position
 	{
-		let left = 0;
-		let top = 0;
 		const parentWidth = el.parentNode.offsetWidth;
 		const parentHeight = el.parentNode.offsetHeight;
 		const eltWidth = el.offsetWidth;
@@ -185,4 +183,4 @@ export default {
 	update(el, binding) {
 		update(el, binding.value);
 	}
-}
+};

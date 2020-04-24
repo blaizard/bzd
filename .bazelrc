@@ -6,8 +6,7 @@ try-import .bazelrc.local
 build --verbose_failures
 
 # Set default options used by the default run
-build --copt "-std=c++14"
-build --copt "-Os"
+build --cxxopt "-std=c++14"
 build --copt "-Wall"
 build --copt "-Wextra"
 build --copt "-Werror"
@@ -19,6 +18,16 @@ test --define=panic=throw
 
 # Prevent building twice tools used for host and target, for nodejs rules for example.
 build --nodistinct_host_configuration
+
+# Development and production configuration
+build:dev --copt "-O0"
+build:dev --define=build=dev
+build:prod --copt "-Os"
+build:prod --define=build=prod
+
+# By default use production build
+build --config prod
+test --config prod
 
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"

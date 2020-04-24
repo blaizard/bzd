@@ -7,6 +7,9 @@ import FileSystem from "../../../nodejs/core/filesystem.js";
 import Web from "../../../nodejs/core/web.js";
 import KeyValueStoreDisk from "../../../nodejs/core/key_value_store/disk.js";
 
+import { Backend } from "../plugins/plugins.js";
+
+
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option("-p, --port <number>", "Port to be used to serve the application.", 8080, parseInt)
@@ -14,6 +17,9 @@ Commander.version("1.0.0", "-v, --version")
 	.parse(process.argv);
 
 (async () => {
+
+	let temp = (await Backend.jenkins()).default;
+	console.log(temp);
 
 	// Set-up the web server
 	let web = new Web(Commander.port, {

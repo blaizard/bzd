@@ -14,6 +14,17 @@ bzd_nodejs_library(
     ],
 )
 
+bzd_nodejs_library(
+    name = "plugins",
+    srcs = glob([
+        "plugins/**/*",
+    ]),
+    alias = "dashboard",
+    visibility = [
+        "//apps/dashboard:__subpackages__",
+    ],
+)
+
 bzd_package(
     name = "package",
     tags = ["nodejs"],

@@ -2,6 +2,7 @@ const Path = require("path");
 const Webpack = require("./nodejs/webpack.cjs");
 
 const config = {
+	mode: "{mode}",
 	entries: {
 		{entries}
 	},

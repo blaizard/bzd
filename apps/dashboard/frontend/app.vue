@@ -3,7 +3,8 @@
 		<template #header>Dashboard</template>
 		<template #actions>
 			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
-			<MenuEntry text="Edit" icon="bzd-icon-edit" link="/edit"></MenuEntry>
+			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
+			<MenuEntry v-else text="OK" icon="bzd-icon-check" @click="handleEdit"></MenuEntry>
 		</template>
 		<template #menu>
 			<MenuEntry text="About" icon="bzd-icon-edit">
@@ -14,11 +15,11 @@
 		</template>
 		<template #content>
 			<span v-tooltip="{'text': 'Hello world'}">Content</span>
-			<RouterComponent ref="foo"></RouterComponent>
+			<RouterComponent ref="view" :edit="edit" another="yes"></RouterComponent>
 			<RouterLink link="/">dashboard</RouterLink>
 		</template>
 		<template #footer>
-			Footer <button @click="test">Test</button>
+			Footer <button>Test</button>
 		</template>
 	</Layout>
 </template>
@@ -45,20 +46,18 @@
 		},
 		mounted() {
 			this.$routerSet({
-				ref: "foo",
+				ref: "view",
 				routes: [
                     { path: '/', component: () => import("[frontend]/tiles.vue") },
                     { path: '/new', component: () => import("[frontend]/config.vue") },
-                    { path: '/edit', handler: () => { this.edit = true; } },
 				],
 				fallback: { component: () => import("[frontend]/404.vue") }
 			});
 		},
 		methods: {
-			async test() {
-				const response = await this.$api.request("get", "/configuration");
-				console.log(response);
-			}
+			handleEdit() {
+				this.edit = true;
+			},
 		}
 	}
 </script>
@@ -67,6 +66,6 @@
 	@import "~[bzd-style]/css/base.scss";
 	@import "~[bzd-style]/css/tooltip.scss";
 
-	$bzdIconNames: edit, add;
+	$bzdIconNames: edit, add, check;
 	@import "~[bzd]/icons.scss";
 </style>

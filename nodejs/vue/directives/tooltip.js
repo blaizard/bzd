@@ -21,7 +21,7 @@ function getOrCreateTooltip() {
 		container.classList.add("irtooltip");
 		Object.assign(container.style, {
 			position: "fixed",
-			'pointer-events': "none"
+			"pointer-events": "none"
 		});
 
 		// The text container
@@ -29,7 +29,7 @@ function getOrCreateTooltip() {
 		text.classList.add("irtooltip-text");
 		container.appendChild(text);
 
-		window.addEventListener('scroll', tooltipHide, false);
+		window.addEventListener("scroll", tooltipHide, false);
 		document.getElementsByTagName("body")[0].appendChild(container);
 		return container;
 	}

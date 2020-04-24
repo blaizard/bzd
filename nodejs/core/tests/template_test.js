@@ -9,33 +9,33 @@ const Exception = ExceptionFactory("test", "template");
 
 Log.mute();
 
-describe('Template', () => {
-	describe('Simple', () => {
-		it('constructor (good)', async () => {
+describe("Template", () => {
+	describe("Simple", () => {
+		it("constructor (good)", async () => {
 			new Template("This is a test");
 		});
-		it('constructor (wrong arg)', async () => {
+		it("constructor (wrong arg)", async () => {
 			Exception.assertThrows(() => {
 				new Template(4554);
 			});
 		});
-		it('nop', async () => {
+		it("nop", async () => {
 			let t = new Template("This is a test");
 			Exception.assert(t.process() == "This is a test");
 		});
-		it('update (one)', async () => {
+		it("update (one)", async () => {
 			let t = new Template("<%hello%>");
 			Exception.assert(t.process({hello: "world"}) == "world");
 		});
-		it('update (one and spaces)', async () => {
+		it("update (one and spaces)", async () => {
 			let t = new Template("<%    hello     %>");
 			Exception.assert(t.process({hello: "world"}) == "world");
 		});
-		it('update', async () => {
+		it("update", async () => {
 			let t = new Template("hello <% hello %>");
 			Exception.assert(t.process({hello: "world"}) == "hello world");
 		});
-		it('update (multi)', async () => {
+		it("update (multi)", async () => {
 			let t = new Template("<%a%> <%b%>");
 			Exception.assert(t.process({a: "hello", b: "world"}) == "hello world");
 		});

@@ -13,6 +13,7 @@ bzd_nodejs_binary(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
+        "//apps/dashboard:plugins",
         "//nodejs/core/key_value_store:disk",
         "//nodejs/core:web",
         "//nodejs/core:api",
