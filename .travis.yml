@@ -19,12 +19,12 @@ jobs:
     - name: Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=prod --runs_per_test=10
+      - bazel test ... --config=prod
 
     - name: Development
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=dev --runs_per_test=10
+      - bazel test ... --config=dev
 
     - name: linux_x86_64_clang
       script:
