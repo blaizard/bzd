@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 export default function (el, binding) {
 	// Delete the first child if it is aready a mask

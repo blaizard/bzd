@@ -77,7 +77,7 @@ export default class Router {
 			route: route,
 			args: route.args,
 			vars: vars
-		}
+		};
 	}
 
 	/**
@@ -93,7 +93,7 @@ export default class Router {
 				matched: true,
 				path: path,
 				vars: match.vars
-			}
+			};
 		}
 
 		this.config.fallback(path, ...args);
@@ -101,9 +101,9 @@ export default class Router {
 			matched: false,
 			path: path,
 			vars: {}
-		}
-    }
-};
+		};
+	}
+}
 
 /**
  * \brief Escape a string to be used inside a regular expression.

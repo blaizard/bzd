@@ -146,7 +146,7 @@ export default class PersistenceDisk {
 					 * Task interval in Ms
 					 */
 					intervalMs: 0,
-					isValid: (iteration) => { return this.isReady() }
+					isValid: (/*iteration*/) => { return this.isReady(); }
 				}, this.options.savepointTask);
 
 				this.savepointTaskId = TaskManager.register(taskConfig.namespace, taskConfig.name, () => this.taskSavepoint(), taskConfig);
@@ -361,7 +361,7 @@ export default class PersistenceDisk {
 	 * \param type The type of operation.
 	 */
 	async write(type, ...args) {
-		Exception.assert(this.options.operations.hasOwnProperty(type), () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
+		Exception.assert(type in this.options.operations, () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
 
 		// This part has to be protected by a mutex in order to make this action atomical
 		await this.mutex.lock();
@@ -436,7 +436,7 @@ export default class PersistenceDisk {
 			// Parse the data and apply it
 			const args = JSON.parse(argsStr);
 			Exception.assert(args instanceof Array, "The data must be an array");
-			Exception.assert(this.options.operations.hasOwnProperty(type), () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
+			Exception.assert(type in this.options.operations, () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
 
 			// Apply the change
 			await this.options.operations[type](data, ...args);
@@ -560,36 +560,26 @@ export default class PersistenceDisk {
 	 *
 	 * \note The write lock must be set.
 	 */
-	replaceDataNoLock(tempPath, lastId) {
+	async replaceDataNoLock(tempPath, lastId) {
 
 		Exception.assert(this.isReady(), "Persistence is not ready yet.");
 
-		return new Promise(async (resolve, reject) => {
+		await FileSystem.move(tempPath, this.path);
 
-			await FileSystem.move(tempPath, this.path);
+		// Delete other files and update the delta list
+		while (this.delta.list.length
+				// Make sure the id is not the last ID (if defined)
+				&& ((typeof lastId === "undefined") || this.delta.list[0] != lastId)) {
 
-			// Delete other files and update the delta list
-			while (this.delta.list.length
-					// Make sure the id is not the last ID (if defined)
-					&& ((typeof lastId === "undefined") || this.delta.list[0] != lastId)) {
+			const curId = this.delta.list.shift();
+			const path = this.getPathFromId(curId);
+			await FileSystem.unlink(path);
+		}
 
-				const curId = this.delta.list.shift();
-				const path = this.getPathFromId(curId);
-				try {
-					await FileSystem.unlink(path);
-				}
-				catch (e) {
-					return reject(new Exception(e));
-				}
-			}
-
-			// If the list is empty, mark the dirty flag as false
-			if (!this.delta.list.length) {
-				this.delta.dirty = false;
-			}
-
-			resolve();
-		});
+		// If the list is empty, mark the dirty flag as false
+		if (!this.delta.list.length) {
+			this.delta.dirty = false;
+		}
 	}
 
 	/**
@@ -652,4 +642,4 @@ export default class PersistenceDisk {
 
 		return true;
 	}
-};
+}

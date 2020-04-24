@@ -27,4 +27,4 @@ export default {
 		el.removeEventListener("mouseenter", el.dataHoverChildren.handleSelect, true);
 		el.removeEventListener("click", el.dataHoverChildren.handleSelect, true);
 	}
-}
+};

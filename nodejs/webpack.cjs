@@ -88,6 +88,11 @@ class Webpack {
 			 */
 			publicPath: "",
 			/**
+			 * Build mode: development or production.
+			 * If unset, this option must be defined with the CLI via --mode
+			 */
+			mode: null,
+			/**
 			 * Directory path where to store temporary files
 			 */
 			tempPath: Path.join(__dirname, ".temp"),
@@ -232,7 +237,7 @@ class Webpack {
 			config["hmrCounter"] = 0;
 
 			// Select dev or prod mode
-			const isDev = (argv.mode != "production");
+			const isDev = (((config.mode) ? config.mode : argv.mode) != "production");
 			console.log("Building with webpack for " + ((isDev) ? "development" : "production") + ((config.hmr) ? " with hmr enabled" : "") + ": " + config.output);
 
 			// Setup the webpack config increment

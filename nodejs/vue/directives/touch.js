@@ -1,10 +1,9 @@
-'use strict';
+"use strict";
 
 const DRAG_ELEMENT = "drag-element";
 const DRAG_PLACEHOLDER = "drag-placeholder";
 const DRAG_RECEIVER_ACTIVE = "drag-receiver-active";
 const DRAG_OVER_ACTIVE = "drag-over-active";
-const DRAG_ACTIVE = "drag-active";
 const DRAG_RECEIVER_CONFIG = "data-drag-config";
 
 let originalElt = null;
@@ -76,8 +75,8 @@ function isPrimaryButtonOrTouch(e) {
 
 function getCoordinates(e) {
 	return (e.touches && e.touches.length) 
-			? {x: e.touches[0].pageX, y: e.touches[0].pageY}
-			: {x: e.pageX, y: e.pageY};
+		? {x: e.touches[0].pageX, y: e.touches[0].pageY}
+		: {x: e.pageX, y: e.pageY};
 }
 
 function getCurrentDistance() {
@@ -98,7 +97,7 @@ function getEltCoordinates(elt) {
 	return {
 		x: relativePos.left + scrollOffsetX(),
 		y: relativePos.top + scrollOffsetY()
-	}
+	};
 }
 
 function removeAllClass(className) {
@@ -162,7 +161,7 @@ async function dragStart(e) {
 			if (curConfig.selectorIFrame) {
 				let iframe = document.querySelector(curConfig.selectorIFrame);
 				// Disable any pointer event to all drag over
-				iframe.style['pointer-events'] = "none";
+				iframe.style["pointer-events"] = "none";
 				// Calculate the receiver coordinates offset from the iframe
 				const coordIFrameViewPort = iframe.getBoundingClientRect();
 				receiverCoordOffset = {
@@ -229,10 +228,10 @@ async function dragStart(e) {
 			// Add some style
 			Object.assign(dragElt.style, {
 				position: "fixed",
-				'pointer-events': "none",
-				'z-index': 99999999,
-				'margin-left': 0,
-				'margin-top': 0
+				"pointer-events": "none",
+				"z-index": 99999999,
+				"margin-left": 0,
+				"margin-top": 0
 			}, curConfig.dragEltCss);
 
 			// Add the class
@@ -252,13 +251,13 @@ async function dragStart(e) {
 				coordOffset = {
 					x: coord.x - pos.x,
 					y: coord.y - pos.y
-				}
+				};
 			}
 			else {
 				coordOffset = {
 					x: dragElt.offsetWidth / 2,
 					y: dragElt.offsetHeight / 2
-				}
+				};
 			}
 		}
 
@@ -608,7 +607,7 @@ function reset() {
 		// Reset the iframe state if there was any
 		if (curConfig.selectorIFrame) {
 			let iframe = document.querySelector(curConfig.selectorIFrame);
-			iframe.style['pointer-events'] = "auto";
+			iframe.style["pointer-events"] = "auto";
 		}
 	}
 
@@ -734,7 +733,7 @@ Touch.prototype.setConfig = function (config) {
 		/**
 		 * Keep the last drop location even if it is out of a drop zone.
 		 */
-		keepLastDrop: !Boolean(config.selectorReceiver),
+		keepLastDrop: !config.selectorReceiver,
 		/**
 		 * Tolerance to be allowed on the receiver to be active.
 		 * It will define an invisible margin around the receivers that will
@@ -772,11 +771,11 @@ Touch.prototype.setConfig = function (config) {
 		 */
 		onstopdrag: null
 	}, config);
-}
+};
 
 Touch.prototype.handleEvent = function (e) {
 	activateTouch(e, this.el, this.config);
-}
+};
 
 export default function (el, binding) {
 

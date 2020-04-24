@@ -80,12 +80,12 @@ function registerObserver(el) {
 
 	if (typeof ResizeObserver !== "undefined") {
 		observers[uid] = {
-			obj: new ResizeObserver((entries) => {
+			obj: new ResizeObserver((/*entries*/) => {
 				autoResize(el);
 			}),
 			hash: -1,
 			instance: null
-		}
+		};
 		observers[uid].obj.observe(el);
 		observers[uid].obj.observe(el.parentElement);
 	}
@@ -96,7 +96,7 @@ function registerObserver(el) {
 			}, 1000),
 			hash: -1,
 			instance: null
-		}
+		};
 	}
 
 	return uid;
@@ -140,4 +140,4 @@ export default {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
 	}
-}
+};

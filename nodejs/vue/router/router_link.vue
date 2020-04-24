@@ -5,16 +5,16 @@
 </template>
 
 <script>
-	"use strict"
+"use strict";
 
-	export default {
-        props: {
-            link: {type: String, mandatory: true}
-        },
-        methods: {
-            handleClick() {
-                this.$routerDispatch(this.link);
-            }
-        }
+export default {
+	props: {
+		link: {type: String, mandatory: true}
+	},
+	methods: {
+		handleClick() {
+			this.$routerDispatch(this.link);
+		}
 	}
+};
 </script>

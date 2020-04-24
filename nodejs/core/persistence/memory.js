@@ -146,4 +146,4 @@ export default class PersistenceMemory {
 	async consistencyCheck() {
 		return true;
 	}
-};
+}

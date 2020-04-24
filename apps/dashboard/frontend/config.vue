@@ -12,7 +12,7 @@
 	"use strict"
 
     import Form from "[bzd]/vue/components/form/form.vue";
-    import Plugins from "[frontend]/plugins.js";
+    import { Frontend } from "[dashboard]/plugins/plugins.js";
 
 	export default {
         components: {
@@ -20,24 +20,18 @@
         },
 		data: function () {
 			return {
-                value: {}
+                value: {},
+                plugins: {}
 			}
 		},
+        mounted() {
+            this.fetchPlugins();
+        },
         computed: {
-            typeDropdownList() {
-                const list = Object.keys(Plugins.all).map((type) => {
-                    const metadata = this.getMetadata(type);
-                    return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(type)};
-                });
-                return list.reduce((result, data) => {
-                    result[data.key] = data.html;
-                    return result;
-                }, {});
-            },
             formDescription() {
                 return [
 					{ type: "Input", name: "name", caption: "Name", placeholder: "Enter a name...", width: 0.5 },
-					{ type: "Dropdown", name: "type", caption: "Type", width: 0.5, list: this.typeDropdownList, html: true },
+					{ type: "Dropdown", name: "type", caption: "Type", width: 0.5, list: this.fetchPlugins, html: true },
 				]
             },
             metadata() {
@@ -49,10 +43,26 @@
         },
         methods: {
             getMetadata(type) {
-                return (type in Plugins.all) ? Plugins.all[type].methods.getMetadata() : {};
+                return (type in this.plugins) ? this.plugins[type].methods.getMetadata() : {};
             },
             async handleCreate() {
                 await this.$api.request("post", "/tile", { data: this.value });
+            },
+            async fetchPlugins() {
+                let plugins = {};
+                for (const [name, loader] of Object.entries(Frontend)) {
+                    this.$set(this.plugins, name, (await loader()).default);
+                }
+
+                const list = Object.keys(this.plugins).map((type) => {
+                    const metadata = this.getMetadata(type);
+                    return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(type)};
+                });
+
+                return list.reduce((result, data) => {
+                    result[data.key] = data.html;
+                    return result;
+                }, {});
             }
         }
 	}

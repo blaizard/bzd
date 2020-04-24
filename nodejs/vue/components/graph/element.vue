@@ -16,55 +16,55 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import HoverChildren from "./directive/hover-children.js"
+import HoverChildren from "./directive/hover-children.js";
 
-	export default {
-		props: {
-			name: {type: String, required: true},
-			value: {type: Array, required: false, default: () => []},
-			config: {type: Object, required: false, default: () => ({})},
-			selected: {type: Number, required: false, default: -1}
+export default {
+	props: {
+		name: {type: String, required: true},
+		value: {type: Array, required: false, default: () => []},
+		config: {type: Object, required: false, default: () => ({})},
+		selected: {type: Number, required: false, default: -1}
+	},
+	directives: {
+		"hover-children": HoverChildren
+	},
+	data() {
+		return {
+			selectedLegend: -1
+		};
+	},
+	computed: {
+		configProcessed() {
+			return Object.assign({
+				layout: "legend-right" // legend-left
+			}, this.config);
 		},
-		directives: {
-			"hover-children": HoverChildren
-		},
-		data() {
+		elementClass() {
 			return {
-				selectedLegend: -1
+				"irgraph": true,
+				[this.name]: true,
+				["irgraph-layout-" + this.configProcessed.layout]: true
 			};
 		},
-		computed: {
-			configProcessed() {
-				return Object.assign({
-					layout: "legend-right" // legend-left
-				}, this.config);
-			},
-			elementClass() {
-				return {
-					"irgraph": true,
-					[this.name]: true,
-					["irgraph-layout-" + this.configProcessed.layout]: true
-				};
-			},
-			legendClass() {
-				return {
-					"irgraph-legend": true,
-					[this.name + "-legend"]: true
-				};
-			},
-			indexSelected() {
-				return (this.selected === -1) ? this.selectedLegend : this.selected;
-			}
+		legendClass() {
+			return {
+				"irgraph-legend": true,
+				[this.name + "-legend"]: true
+			};
 		},
-		methods: {
-			getLegendItemClass(index) {
-				return {
-					"irgraph-legend-item": true,
-					"irgraph-selected": (this.indexSelected === index)
-				}
-			}
+		indexSelected() {
+			return (this.selected === -1) ? this.selectedLegend : this.selected;
+		}
+	},
+	methods: {
+		getLegendItemClass(index) {
+			return {
+				"irgraph-legend-item": true,
+				"irgraph-selected": (this.indexSelected === index)
+			};
 		}
 	}
+};
 </script>

@@ -26,7 +26,7 @@ class UploadItem {
 	cancel() {
 		this.xhr.abort();
 	}
-};
+}
 
 export default class Upload {
 
@@ -206,7 +206,7 @@ export default class Upload {
 							handleError();
 						}
 					}
-				}
+				};
 
 				// Before starting, call the init
 				this.config.onInit(item);
@@ -227,4 +227,4 @@ export default class Upload {
 			}
 		});
 	}
-};
+}

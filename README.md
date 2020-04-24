@@ -1,9 +1,9 @@
-# bzd Monorepo
+# ::bzd
 
 [![Build Status](https://travis-ci.org/blaizard/cpp-async.svg?branch=master)](https://travis-ci.org/blaizard/cpp-async)
 
 Fullstack, lightweight and flexible framework for IoT applications.
-This mono repository enables the following technologies:
+This mono-repository enables the following technologies:
 
 |C++14                         |Python3                          |Node (v13+)                    |Vue                           |Bazel                           |
 |:----------------------------:|:-------------------------------:|:-----------------------------:|:----------------------------:|:------------------------------:|

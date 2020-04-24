@@ -52,13 +52,13 @@ function registerObserver(el, callback) {
 
 	if (typeof ResizeObserver !== "undefined") {
 		observers[uid] = {
-			obj: new ResizeObserver((entries) => {
+			obj: new ResizeObserver((/*entries*/) => {
 				onResizeProcess(el);
 			}),
 			callback: callback,
 			hash: -1,
 			instance: null
-		}
+		};
 		observers[uid].obj.observe(el);
 	}
 	else {
@@ -69,7 +69,7 @@ function registerObserver(el, callback) {
 			callback: callback,
 			hash: -1,
 			instance: null
-		}
+		};
 	}
 
 	return uid;
@@ -109,4 +109,4 @@ export default {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
 	}
-}
+};

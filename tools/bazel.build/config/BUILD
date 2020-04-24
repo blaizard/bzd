@@ -28,3 +28,19 @@ config_setting(
         "@platforms//cpu:x86_64",
     ],
 )
+
+config_setting(
+    name = "dev",
+    define_values = {
+        "build": "dev",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "prod",
+    define_values = {
+        "build": "prod",
+    },
+    visibility = ["//visibility:public"],
+)
