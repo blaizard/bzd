@@ -22,5 +22,16 @@
                 "type": "json"
             }
         }
+    },
+    "/data": {
+        "get": {
+            "documentation": "Get data from a tile",
+            "request": {
+                "type": "query"
+            },
+            "response": {
+                "type": "json"
+            }
+        }
     }
 }

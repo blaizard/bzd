@@ -13,11 +13,18 @@
 	export default {
         props: {
             description: {type: Object, mandatory: true},
+            uid: {type: String, mandatory: true}
         },
 		data: function () {
 			return {
 			}
 		},
+        mounted() {
+            this.$api.request("get", "/data", {
+                type: this.type,
+                uid: this.uid
+            });
+        },
         computed: {
             name() {
                 return this.description.name || "<no name>";

@@ -208,6 +208,7 @@ def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], visibi
         build_type = select({
             "//tools/bazel.build/config:prod": "prod",
             "//tools/bazel.build/config:dev": "dev",
+            "//conditions:default": "prod",
         }),
         **kwargs
     )

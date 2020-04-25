@@ -390,6 +390,7 @@ async function triggerUpdate(collection, id, ...ids)
 		if ("_timeoutMs" in dataCollection) {
 			dataId._timeout = Cache.getTimestampMs() + Math.max(1, dataCollection._timeoutMs);
 		}
+		Exception.assert(typeof dataId._data !== "undefined", "Trigger function returned undefined data type for collection '{}'", collection);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize;
 		delete dataId._error;
 	}
