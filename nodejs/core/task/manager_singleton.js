@@ -4,9 +4,6 @@ import Manager from "./manager.js";
 import LogFactory from "../log.js";
 import ExceptionFactory from "../exception.js";
 
-const Log = LogFactory("task", "manager", "singleton");
-const Exception = ExceptionFactory("task", "manager", "singleton");
-
 // Create a unique, global symbol name
 const _TaskManager = Symbol.for("bzd.core.task.manager");
 

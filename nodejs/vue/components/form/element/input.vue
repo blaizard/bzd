@@ -120,7 +120,7 @@ export default {
 			return (this.isActive && this.editable) ? this.get() : this.getDisplayValue(this.get());
 		},
 		presets() {
-			return (this.description.hasOwnProperty("presets")) ? this.description["presets"] : {};
+			return ("presets" in this.description) ? this.description["presets"] : {};
 		}
 	},
 	methods: {
@@ -128,7 +128,7 @@ export default {
 			this.$refs.input.focus();
 		},
 		isPreset(value) {
-			return this.presets.hasOwnProperty(value);
+			return (value in this.presets);
 		},
 		isValueAcceptable(value) {
 			return this.any || this.isPreset(value);

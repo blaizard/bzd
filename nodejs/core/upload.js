@@ -51,27 +51,27 @@ export default class Upload {
 			/**
 			 * To be called to monitor the upload progress
 			 */
-			onInit: (item) => {},
+			onInit: (/*item*/) => {},
 
 			/**
 			 * To be called if the upload was manually canceled
 			 */
-			onCancel: (item) => {},
+			onCancel: (/*item*/) => {},
 
 			/**
 			 * To be called to monitor the upload progress
 			 */
-			onProgress: (item) => {},
+			onProgress: (/*item*/) => {},
 
 			/**
 			 * To be called upon error
 			 */
-			onError: (item, message) => {},
+			onError: (/*item, message*/) => {},
 
 			/**
 			 * To be called once the upload successfully completes
 			 */
-			onComplete: (item, response) => {}
+			onComplete: (/*item, response*/) => {}
 		}, config);
 	}
 
@@ -178,7 +178,7 @@ export default class Upload {
 					}
 				};
 
-		 		xhr.upload.addEventListener("progress", (e) => {
+				xhr.upload.addEventListener("progress", (e) => {
 					if (e.lengthComputable) {
 						item.currentBytes = e.loaded;
 						this.config.onProgress(item);

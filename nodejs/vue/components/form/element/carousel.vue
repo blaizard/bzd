@@ -46,7 +46,7 @@ export default {
 		// its alignement will be different. This can happen while loading images
 		// or other asynchronous operations.
 		if (typeof ResizeObserver !== "undefined") {
-			const myObserver = new ResizeObserver((entries) => {
+			const myObserver = new ResizeObserver((/*entries*/) => {
 				this.computeSlidePosition();
 			});
 			myObserver.observe(this.$refs.slides);
@@ -85,7 +85,7 @@ export default {
 			/**
 				 * Callback when an element is clicked
 				 */
-			click: this.getOption("click", (index) => {}),
+			click: this.getOption("click", (/*index*/) => {}),
 			// ---- Internal ----
 			// Current slide selected
 			index: 0,
@@ -165,7 +165,6 @@ export default {
 
 			case "left":
 				// Identify the slide currently selected
-				const rect = this.$refs.slides.children[this.index].getBoundingClientRect();
 				for (let totalSlideWidth = 0; this.index < this.list.length - 1 && totalSlideWidth + curSlideWidth / 2 < -this.offsetX; this.index++) {
 					const rect = this.$refs.slides.children[this.index + 1].getBoundingClientRect();
 					curSlideWidth = rect.width;
@@ -175,7 +174,7 @@ export default {
 				break;
 			}
 		},
-		onDrag(x, y) {
+		onDrag(x, /*y*/) {
 			this.isDrag = true;
 			this.offsetX = x;
 		},
@@ -245,6 +244,7 @@ export default {
 					this.slidePosition = Math.round(rectBase.left - rect.left);
 					break;
 				default:
+				{
 					const rectContainer = this.$refs.container.getBoundingClientRect();
 					// if the selection is too much on the left (not visible)
 					if (rect.left - rectContainer.left < 0) {
@@ -262,6 +262,7 @@ export default {
 					}
 					// Do not let the slides too much on the right (useless)
 					this.slidePosition = Math.min(0, this.slidePosition);
+				}
 				}
 			}
 			else {

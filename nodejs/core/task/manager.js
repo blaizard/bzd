@@ -109,7 +109,7 @@ export default class Manager {
 	 * \return true if registered, false otherwise.
 	 */
 	isRegistered(taskId) {
-		return this.tasks.hasOwnProperty(taskId.namespace) && this.tasks[taskId.namespace].hasOwnProperty(taskId.name);
+		return (taskId.namespace in this.tasks) && (taskId.name in this.tasks[taskId.namespace]);
 	}
 
 	/**

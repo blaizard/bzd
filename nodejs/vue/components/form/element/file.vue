@@ -52,7 +52,7 @@ export default {
 			/**
 				 * Convert the image path to an accessible image url
 				 */
-			imageToUrl: this.getOption("imageToUrl", (path) => null),
+			imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
 
 			// ---- Override data from Array ----
 			template: fileItem,

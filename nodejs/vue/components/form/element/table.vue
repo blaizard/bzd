@@ -51,11 +51,11 @@ export default {
 			/**
 				 * Return the class associated with a specific row
 				 */
-			rowClass: this.getOption("rowClass", (value, index) => ""),
+			rowClass: this.getOption("rowClass", (/*value, index*/) => ""),
 			/**
 				 * Return whether or not a row should be disabled
 				 */
-			rowDisable: this.getOption("rowDisable", (value) => false),
+			rowDisable: this.getOption("rowDisable", (/*value*/) => false),
 			/**
 				 * The columns to be displayed
 				 */
@@ -72,7 +72,7 @@ export default {
 		template() {
 			return this.getOption("template", []).map((item, index) => {
 				// If there is no name associated with the column, create one
-				if (!item.hasOwnProperty("name")) {
+				if (!("name" in item)) {
 					item.name = "col-" + index;
 				}
 				return item;
@@ -80,7 +80,7 @@ export default {
 		},
 		templateObj() {
 			return this.template.reduce((obj, template) => {
-				if (template.hasOwnProperty("name")) {
+				if ("name" in template) {
 					obj[template.name] = template;
 				}
 				return obj;
@@ -112,10 +112,12 @@ export default {
 							switch ((this.templateObj[key] || {}).valueType) {
 
 							case "number":
+							{
 								const numberA = parseFloat(valueA);
 								const numberB = parseFloat(valueB);
 								result = ((isNaN(numberA)) ? Number.NEGATIVE_INFINITY : numberA) - ((isNaN(numberB)) ? Number.NEGATIVE_INFINITY : numberB);
 								break;
+							}
 
 							default:
 								result = (String(valueA || "")).localeCompare(String(valueB || ""));
@@ -170,7 +172,7 @@ export default {
 		},
 		handleHeaderClick(description) {
 			let direction = true;
-			if (this.sortingObj.hasOwnProperty(description.name)) {
+			if (description.name in this.sortingObj) {
 				direction = (this.sortingObj[description.name].order !== "descending");
 			}
 			this.sort = [[description.name, direction]];

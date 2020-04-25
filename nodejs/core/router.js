@@ -110,7 +110,7 @@ export default class Router {
  */
 function escapeRegexp(str)
 {
-	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+	return str.replace(/[-[\]/{}()*+?.\\^$|]/g, "\\$&");
 }
 
 /**
@@ -160,7 +160,7 @@ function compileRoutes(routes, config)
 
 	// Collapse the number of regular expression to be able to identify the regexpr
 	let regexprList = [];
-	routeData.forEach((route, index) => {
+	routeData.forEach((route, /*index*/) => {
 		// +1 to support cases where there are no variables
 		const pathRegexpr = route.pathRegexpr + "()".repeat(maxVars - route.varList.length + 1);
 		regexprList.push(pathRegexpr);
