@@ -5,7 +5,7 @@
 ## bzd_nodejs_install
 
 <pre>
-bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-alias">alias</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>)
+bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-alias">alias</a>, <a href="#bzd_nodejs_install-data">data</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>)
 </pre>
 
 
@@ -17,6 +17,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
 | name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
 | alias |  Name of the alias, available in the form [name], for the current directory.   | String | optional | "" |
+| data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
@@ -27,7 +28,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 ## bzd_nodejs_library
 
 <pre>
-bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-alias">alias</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>)
+bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-alias">alias</a>, <a href="#bzd_nodejs_library-data">data</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>)
 </pre>
 
 
@@ -39,6 +40,7 @@ bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_no
 | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
 | name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
 | alias |  Name of the alias, available in the form [name], for the current directory.   | String | optional | "" |
+| data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
@@ -49,7 +51,7 @@ bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_no
 ## BzdNodeJsDepsProvider
 
 <pre>
-BzdNodeJsDepsProvider(<a href="#BzdNodeJsDepsProvider-packages">packages</a>, <a href="#BzdNodeJsDepsProvider-srcs">srcs</a>, <a href="#BzdNodeJsDepsProvider-aliases">aliases</a>)
+BzdNodeJsDepsProvider(<a href="#BzdNodeJsDepsProvider-packages">packages</a>, <a href="#BzdNodeJsDepsProvider-srcs">srcs</a>, <a href="#BzdNodeJsDepsProvider-aliases">aliases</a>, <a href="#BzdNodeJsDepsProvider-data">data</a>)
 </pre>
 
 
@@ -62,6 +64,7 @@ BzdNodeJsDepsProvider(<a href="#BzdNodeJsDepsProvider-packages">packages</a>, <a
 | packages |  (Undocumented)    |
 | srcs |  (Undocumented)    |
 | aliases |  (Undocumented)    |
+| data |  (Undocumented)    |
 
 
 <a name="#BzdNodeJsInstallProvider"></a>
@@ -89,7 +92,7 @@ BzdNodeJsInstallProvider(<a href="#BzdNodeJsInstallProvider-package_json">packag
 ## bzd_nodejs_binary
 
 <pre>
-bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_nodejs_binary-main">main</a>, <a href="#bzd_nodejs_binary-visibility">visibility</a>, <a href="#bzd_nodejs_binary-tags">tags</a>, <a href="#bzd_nodejs_binary-kwargs">kwargs</a>)
+bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_nodejs_binary-main">main</a>, <a href="#bzd_nodejs_binary-args">args</a>, <a href="#bzd_nodejs_binary-visibility">visibility</a>, <a href="#bzd_nodejs_binary-tags">tags</a>, <a href="#bzd_nodejs_binary-kwargs">kwargs</a>)
 </pre>
 
 
@@ -101,6 +104,7 @@ bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_node
 | :-------------: | :-------------: | :-------------: |
 | name |  <p align="center"> - </p>   |  none |
 | main |  <p align="center"> - </p>   |  none |
+| args |  <p align="center"> - </p>   |  <code>[]</code> |
 | visibility |  <p align="center"> - </p>   |  <code>[]</code> |
 | tags |  <p align="center"> - </p>   |  <code>[]</code> |
 | kwargs |  <p align="center"> - </p>   |  none |
