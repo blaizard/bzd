@@ -296,6 +296,9 @@ async function get(instant, collection, ...ids)
 	// Register the access of this ressource
 	touchResource.call(this, collection, id);
 
+	// Time base for the timeout
+	const timeStartMs = Date.now().getTime();
+
 	do {
 		const dataId = this.data[collection][id];
 
@@ -326,7 +329,10 @@ async function get(instant, collection, ...ids)
 		else {
 			throw new Exception("Invalid state {}::{}, it should never happen.", collection, id);
 		}
-	} while (true);
+	// Timeout after 30s
+	} while (Date.now().getTime() - timeStartMs < 30 * 1000);
+
+	throw new Exception("Get {}::{} timeout (30s).", collection, id);
 }
 
 /**

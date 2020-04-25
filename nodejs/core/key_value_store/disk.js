@@ -6,8 +6,6 @@ import PersistenceDisk from "../persistence/disk.js";
 import Cache from "../cache.js";
 import Event from "../event.js";
 import FileSystem from "../filesystem.js";
-import LogFactory from "../log.js";
-import ExceptionFactory from "../exception.js";
 
 /**
  * Key value store for low demanding application, that presists on the local disk.

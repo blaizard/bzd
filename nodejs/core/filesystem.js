@@ -44,29 +44,19 @@ export default class FileSystem {
 	 */
 	static async rmdir(path) {
 
-		return new Promise(async (resolve, reject) => {
-
-			try {
-				const fileList = await FileSystem.readdir(path);
-				for (const i in fileList) {
-					const curPath = Path.resolve(path, fileList[i]);
-					const stat = await FileSystem.stat(curPath);
-					if (stat.isDirectory()) {
-						await FileSystem.rmdir(curPath);
-					}
-					else {
-						await FileSystem.unlink(curPath);
-					}
-				}
+		const fileList = await FileSystem.readdir(path);
+		for (const i in fileList) {
+			const curPath = Path.resolve(path, fileList[i]);
+			const stat = await FileSystem.stat(curPath);
+			if (stat.isDirectory()) {
+				await FileSystem.rmdir(curPath);
 			}
-			catch (e) {
-				return reject(e);
+			else {
+				await FileSystem.unlink(curPath);
 			}
+		}
 
-			Fs.rmdir(path, (e) => {
-				return (e) ? reject(e) : resolve();
-			});
-		});
+		await Fs.promises.rmdir(path);
 	}
 
 	/**
