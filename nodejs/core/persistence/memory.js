@@ -1,10 +1,8 @@
 "use strict";
 
 import Event from "../event.js";
-import LogFactory from "../log.js";
 import ExceptionFactory from "../exception.js";
 
-const Log = LogFactory("persistence", "memory");
 const Exception = ExceptionFactory("persistence", "memory");
 
 /**
@@ -118,7 +116,7 @@ export default class PersistenceMemory {
 	 */
 	async write(type, ...args) {
 		Exception.assert(this.isReady, "Persistence is not ready yet.");
-		Exception.assert(this.options.operations.hasOwnProperty(type), "The operation \"" + type + "\" is not supported.");
+		Exception.assert(type in this.options.operations, "The operation \"" + type + "\" is not supported.");
 
 		// Update the current object
 		await this.options.operations[type].call(this.options.operations, this.data, ...args);

@@ -229,7 +229,7 @@ export default class Manager {
 		try {
 			// Execute the next tasks if any
 			let task = null;
-			while (task = this.popNextTask()) {
+			while ((task = this.popNextTask())) {
 
 				try {
 					if (task.isValid) {

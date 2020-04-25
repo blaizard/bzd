@@ -269,11 +269,11 @@ export default class PersistenceTimeSeries {
 
 						// Increase the length
 						Exception.assert(typeof t.data[index] == "object", () => ("Cannot find timestamp " + timestamp + " in index, returned index: " + index + " " + JSON.stringify(t.data)));
-						Exception.assert(t.data[index][1].hasOwnProperty("length"), "No length property for index entry " + index);
+						Exception.assert("length" in t.data[index][1], "No length property for index entry " + index);
 						++(t.data[index][1].length);
 
 						// Update the timestampEnd field
-						Exception.assert(t.data[index][1].hasOwnProperty("timestampEnd"), () => ("No timestampEnd property for index entry " + index + "  " + JSON.stringify(t.data[index])));
+						Exception.assert("timestampEnd" in t.data[index][1], () => ("No timestampEnd property for index entry " + index + "  " + JSON.stringify(t.data[index])));
 						t.data[index][1].timestampEnd = Math.max(t.data[index][1].timestampEnd, timestamp);
 					});
 				}
