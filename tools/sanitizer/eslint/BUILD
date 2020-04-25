@@ -5,18 +5,19 @@ bzd_nodejs_binary(
     srcs = glob([
         "*.js",
     ]),
-    main = "app.js",
     args = [
-        "--config", "tools/sanitizer/eslint/.eslintrc.json",
+        "--config",
+        "tools/sanitizer/eslint/.eslintrc.json",
     ],
     data = [
         ".eslintrc.json",
     ],
-    visibility = [
-        "//tools/sanitizer:__pkg__",
-    ],
+    main = "app.js",
     packages = {
         "eslint": "",
         "eslint-plugin-vue": "",
-    }
+    },
+    visibility = [
+        "//tools/sanitizer:__pkg__",
+    ],
 )

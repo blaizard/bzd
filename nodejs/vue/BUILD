@@ -8,8 +8,8 @@ bzd_nodejs_library(
     packages = {
         "vue": "",
     },
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:api",
     ],
-    visibility = ["//visibility:public"],
 )

@@ -5,41 +5,41 @@ bzd_nodejs_library(
     srcs = [
         "api.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-        ":log",
         ":exception",
         ":fetch",
+        ":log",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
     name = "log",
     srcs = [
-        "log.js"
+        "log.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":format",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
     name = "exception",
     srcs = [
-        "exception.js"
+        "exception.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":format",
         ":log",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
     name = "event",
     srcs = [
-        "event.js"
+        "event.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -47,7 +47,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "format",
     srcs = [
-        "format.js"
+        "format.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -60,26 +60,26 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":event",
-        ":log",
         ":exception",
+        ":log",
     ],
 )
 
 bzd_nodejs_library(
     name = "fetch",
     srcs = [
-        "fetch.js"
+        "fetch.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":exception",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
     name = "filesystem",
     srcs = [
-        "filesystem.js"
+        "filesystem.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -87,7 +87,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "localstorage",
     srcs = [
-        "localstorage.js"
+        "localstorage.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -95,7 +95,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mutex",
     srcs = [
-        "mutex.js"
+        "mutex.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -103,23 +103,23 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "router",
     srcs = [
-        "router.js"
+        "router.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":exception",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
     name = "template",
     srcs = [
-        "template.js"
+        "template.js",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":exception",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -129,15 +129,15 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":log",
         ":exception",
+        ":log",
     ],
 )
 
 bzd_nodejs_library(
     name = "upload",
     srcs = [
-        "upload.js"
+        "upload.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -158,7 +158,7 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        ":log",
         ":exception",
+        ":log",
     ],
 )

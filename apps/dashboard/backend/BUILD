@@ -5,20 +5,21 @@ bzd_nodejs_binary(
     srcs = glob([
         "*.js",
     ]),
-    main = "app.js",
     args = [
-        "--static", "/tmp/frontend",
+        "--static",
+        "/tmp/frontend",
     ],
+    main = "app.js",
     visibility = [
         "//apps/dashboard:__pkg__",
     ],
     deps = [
-        "//apps/dashboard:plugins",
-        "//nodejs/core/key_value_store:disk",
-        "//nodejs/core:web",
-        "//nodejs/core:cache",
-        "//nodejs/core:api",
-        "//nodejs/core:filesystem",
         "//apps/dashboard:api",
+        "//apps/dashboard:plugins",
+        "//nodejs/core:api",
+        "//nodejs/core:cache",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:web",
+        "//nodejs/core/key_value_store:disk",
     ],
 )

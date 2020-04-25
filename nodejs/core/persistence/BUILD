@@ -7,12 +7,12 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core/task:manager_singleton",
         "//nodejs/core:event",
-        "//nodejs/core:filesystem",
-        "//nodejs/core:mutex",
-        "//nodejs/core:log",
         "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+        "//nodejs/core:mutex",
+        "//nodejs/core/task:manager_singleton",
     ],
 )
 
@@ -24,8 +24,8 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:event",
-        "//nodejs/core:log",
         "//nodejs/core:exception",
+        "//nodejs/core:log",
     ],
 )
 
@@ -38,9 +38,9 @@ bzd_nodejs_library(
     deps = [
         ":disk",
         "//nodejs/core:event",
-        "//nodejs/core:timeseries",
+        "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
-        "//nodejs/core:exception",
+        "//nodejs/core:timeseries",
     ],
 )

@@ -12,7 +12,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "icons",
     srcs = [
-        "icons.scss"
+        "icons.scss",
     ],
     alias = "bzd",
     visibility = ["//visibility:public"],
@@ -21,8 +21,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webpack",
     srcs = [
-        "webpack.cjs",
         "template.cjs",
+        "webpack.cjs",
     ],
     alias = "bzd",
     packages = {

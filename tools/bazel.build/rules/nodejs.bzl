@@ -211,13 +211,13 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     ]
 
     if not is_test:
-        result += [BzdPackageFragment(
+        result.append(BzdPackageFragment(
             files = srcs,
             files_remap = {
                 "node_modules": node_modules,
                 "package.json": package_json,
             },
-        )]
+        ))
 
     return result
 

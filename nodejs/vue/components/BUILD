@@ -7,10 +7,10 @@ bzd_nodejs_library(
         "form/**/*.scss",
         "form/**/*.svg",
     ]),
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:vue",
         "//nodejs/core:upload",
         "//nodejs/vue/directives:touch",
     ],
-    visibility = ["//visibility:public"],
 )

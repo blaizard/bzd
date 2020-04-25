@@ -58,10 +58,6 @@ load("//tools/buildifier:dependencies.bzl", "load_buildifier_dependencies")
 
 load_buildifier_dependencies()
 
-load("//tools/buildifier:buildifier.bzl", "load_buildifier")
-
-load_buildifier()
-
 # Documentation
 
 load("//tools/documentation:dependencies.bzl", "load_documentation_dependencies")

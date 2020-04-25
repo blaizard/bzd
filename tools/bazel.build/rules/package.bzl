@@ -77,4 +77,3 @@ bzd_package = rule(
     },
     executable = True,
 )
-

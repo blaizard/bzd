@@ -15,8 +15,8 @@ py_binary(
         "%EXEC_ROOT%/$(execpath //tools/sanitizer/eslint)",
     ],
     data = [
-        "@linux_x86_64_clang_9_0_0//:clang_format",
         "//tools/sanitizer/eslint",
+        "@linux_x86_64_clang_9_0_0//:clang_format",
     ],
     main = "sanitizer.py",
 )
