@@ -67,7 +67,7 @@ def _bzd_generate_rule_impl(ctx):
     if ctx.outputs.output_manifest:
         args.add("--manifest")
         args.add(ctx.outputs.output_manifest.path)
-        outputs += [ctx.outputs.output_manifest]
+        outputs.append(ctx.outputs.output_manifest)
 
     # Add artifacts
     for artifact in artifacts:

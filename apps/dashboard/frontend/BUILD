@@ -15,24 +15,24 @@ bzd_nodejs_web(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
-        "//apps/dashboard:plugins",
         "//apps/dashboard:api",
-        "//nodejs/styles/default",
+        "//apps/dashboard:plugins",
         "//nodejs:icons",
         "//nodejs:vue",
-        "//nodejs/vue/router",
-        "//nodejs/core:fetch",
         "//nodejs/core:api",
+        "//nodejs/core:fetch",
+        "//nodejs/styles/default",
         "//nodejs/vue:api",
         "//nodejs/vue/components:form",
         "//nodejs/vue/directives:tooltip",
+        "//nodejs/vue/router",
     ],
 )
 
 bzd_package(
     name = "dev",
-    tags = ["nodejs"],
     args = ["/tmp"],
+    tags = ["nodejs"],
     deps = {
         ":frontend": "frontend",
     },

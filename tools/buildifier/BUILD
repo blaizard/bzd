@@ -1,6 +1,4 @@
-load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
-
-buildifier(
+sh_binary(
     name = "buildifier",
-    lint_mode = "fix",
+    srcs = ["@buildifier//file"],
 )

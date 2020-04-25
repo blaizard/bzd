@@ -9,10 +9,10 @@ test_srcs = glob([
     srcs = [src],
     main = src,
     deps = [
-        "//nodejs/core/persistence:disk",
-        "//nodejs/core/persistence:timeseries",
+        "//nodejs/core:format",
         "//nodejs/core:template",
         "//nodejs/core:timeseries",
-        "//nodejs/core:format",
+        "//nodejs/core/persistence:disk",
+        "//nodejs/core/persistence:timeseries",
     ],
 ) for src in test_srcs]

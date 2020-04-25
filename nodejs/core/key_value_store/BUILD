@@ -7,11 +7,11 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core/persistence:disk",
         "//nodejs/core:cache",
         "//nodejs/core:event",
+        "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
-        "//nodejs/core:exception",
+        "//nodejs/core/persistence:disk",
     ],
 )

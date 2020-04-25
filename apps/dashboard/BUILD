@@ -5,12 +5,12 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "api",
     srcs = [
-        "api.v1.json"
+        "api.v1.json",
     ],
     alias = "dashboard",
     visibility = [
-        "//apps/dashboard/frontend:__pkg__",
         "//apps/dashboard/backend:__pkg__",
+        "//apps/dashboard/frontend:__pkg__",
     ],
 )
 

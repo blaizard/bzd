@@ -10,10 +10,10 @@ bzd_nodejs_library(
     packages = {
         "vue": "",
     },
-    deps = [
-        "//nodejs/core:router",
-        "//nodejs/core:log",
-        "//nodejs/core:exception",
-    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/core:router",
+    ],
 )

@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_test")
 load("@bazel_tools//tools/python:toolchain.bzl", "py_runtime_pair")
 
 py_runtime_pair(
@@ -19,6 +20,6 @@ toolchain(
 
 py_test(
     name = "test",
-    main = "python_test.py",
     srcs = ["python_test.py"],
+    main = "python_test.py",
 )
