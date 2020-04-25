@@ -41,6 +41,10 @@ export default class API {
 			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
 			fetchOptions.data = data;
 			break;
+		case "query":
+			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+			fetchOptions.query = data;
+			break;
 		}
 
 		return await Fetch.request(this._makePath(endpoint), fetchOptions);
@@ -64,8 +68,13 @@ export default class API {
 		const callbackWrapper = async function(request, response) {
 			try {
 				let data = null;
-				if (requestOptions.type == "json") {
+				switch (requestOptions.type) {
+				case "json":
 					data = request.body.data;
+					break;
+				case "query":
+					data = request.query;
+					break;
 				}
 
 				const result = await callback.call(this, data);

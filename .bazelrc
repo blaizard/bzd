@@ -25,10 +25,6 @@ build:dev --define=build=dev
 build:prod --copt "-Os"
 build:prod --define=build=prod
 
-# By default use production build
-build --config prod
-test --config prod
-
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
