@@ -76,7 +76,7 @@ export default {
 			return Math.min(this.value.currentBytes / this.value.totalBytes, 1);
 		},
 		currentSizeStr() {
-			if (!this.value.hasOwnProperty("currentBytes") || !this.value.currentBytes) {
+			if (!("currentBytes" in this.value) || !this.value.currentBytes) {
 				return "-";
 			}
 			let size = this.value.currentBytes;

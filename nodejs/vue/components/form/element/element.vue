@@ -34,15 +34,14 @@ export default {
 		externalValue() {
 			switch (this.valueType) {
 			case "list":
-				{
-					let list = this.value || [];
-					if (!(list instanceof Array)) {
-						this.setError("The value must be an Array");
-						list = [];
-					}
-					return list;
+			{
+				let list = this.value || [];
+				if (!(list instanceof Array)) {
+					this.setError("The value must be an Array");
+					list = [];
 				}
-				break;
+				return list;
+			}
 			case "number":
 			case "any":
 				break;
@@ -98,7 +97,7 @@ export default {
 				case "positive":
 					return (value) => ((parseFloat(value) || 0) >= 0) ? true : "Must be positive";
 				case "email":
-					return (value) => (value.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i)) ? true : "Wrong email format";
+					return (value) => (value.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i)) ? true : "Wrong email format";
 				default:
 					console.error("Unknown validate value \"" + validate + "\"");
 				}
@@ -175,7 +174,7 @@ export default {
 			 * Get an attribute from the description
 			 */
 		getOption(name, defaultValue) {
-			if (this.description.hasOwnProperty(name)) {
+			if (name in this.description) {
 				return this.description[name];
 			}
 			return defaultValue;

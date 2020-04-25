@@ -3,7 +3,6 @@
 import LogFactory from "../log.js";
 import ExceptionFactory from "../exception.js";
 
-const Log = LogFactory("task");
 const Exception = ExceptionFactory("task");
 
 class TaskId {
