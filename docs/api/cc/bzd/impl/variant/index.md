@@ -5,7 +5,7 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|StorageType||
+|class StorageType|None||
 |class...|Ts||
 
 |Function||

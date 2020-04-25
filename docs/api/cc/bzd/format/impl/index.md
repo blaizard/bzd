@@ -49,7 +49,7 @@ Simple vector container working with conxtexpr
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
 ------
 ### `template<class T> class Context`
@@ -101,7 +101,7 @@ Type removal of the type-specific formatter.
 |const bzd::StringView &|format||
 |const T &|tuple||
 ------
-### `template<SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N > 0> constexpr bool contextCheck(const Ctx & context, const T & tuple)`
+### `template<SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N > 0)> *> constexpr bool contextCheck(const Ctx & context, const T & tuple)`
 Check the format context.
 
 Check the format context with the argument type, this to ensure type safety. This function should only be used at compile time.
@@ -111,7 +111,7 @@ Check the format context with the argument type, this to ensure type safety. Thi
 |SizeType|N||
 |class Ctx|None||
 |class T|None||
-|bzd::typeTraits::EnableIf<(N >|0||
+|bzd::typeTraits::EnableIf<(N > 0)> *|None||
 #### Parameters
 ||||
 |---:|:---|:---|
@@ -131,14 +131,14 @@ Check the format context with the argument type, this to ensure type safety. Thi
 |const T &|n||
 |const SizeType|maxPrecision||
 ------
-### `template<SizeType Base, class T, bzd::typeTraits::EnableIf<(Base > 1 &&Base<= 16> constexpr void integer(interface::String & str, const T & n, const char *const digits)`
+### `template<SizeType Base, class T, bzd::typeTraits::EnableIf<(Base > 1 &&Base<=16), T > *> constexpr void integer(interface::String & str, const T & n, const char *const digits)`
 
 #### Template
 ||||
 |---:|:---|:---|
 |SizeType|Base||
 |class T|None||
-|bzd::typeTraits::EnableIf<(Base > 1 &&Base<=|16||
+|bzd::typeTraits::EnableIf<(Base > 1 &&Base<=16), T > *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

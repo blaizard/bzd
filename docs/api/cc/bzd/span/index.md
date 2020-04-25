@@ -1,11 +1,11 @@
 # [`bzd`](../../index.md)::[`Span`](../index.md)
 
-## `template<class T> class Span`
+## `template<class T T> class Span`
 The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T|Element type, must be a complete type that is not an abstract class type. |
+|class T|T|Element type, must be a complete type that is not an abstract class type. |
 
 |Function||
 |:---|:---|

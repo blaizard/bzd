@@ -28,7 +28,7 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 ------
 ### `template<class... Ts> struct TypeList`
 

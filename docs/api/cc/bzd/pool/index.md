@@ -5,9 +5,9 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
-|class|CapacityType||
+|class CapacityType|None||
 
 |Function||
 |:---|:---|

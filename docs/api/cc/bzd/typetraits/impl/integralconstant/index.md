@@ -5,7 +5,7 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |T|v||
 
 |Function||
