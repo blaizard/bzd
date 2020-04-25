@@ -7,9 +7,9 @@
 |---:|:---|:---|
 |class T|None||
 
-|Variable||
+|Typedef||
 |:---|:---|
 |[`type`](./index.md)||
 ------
-### `const typedef volatile T type`
+### `typedef type`
 

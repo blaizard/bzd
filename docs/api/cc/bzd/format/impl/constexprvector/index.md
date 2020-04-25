@@ -5,7 +5,7 @@ Simple vector container working with conxtexpr
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
 
 |Class||

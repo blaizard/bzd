@@ -90,8 +90,8 @@ Non-leaf nodes are implemented as non-sorted arrays.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|E||
+|class T|None||
+|class E|None||
 ------
 ### `template<class E> class Expected< void, E >`
 
@@ -147,16 +147,16 @@ Flat map implementation.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|CapacityType||
+|class T|None||
+|class CapacityType|None||
 ------
 ### `template<class T, class CapacityType> class Queue`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|CapacityType||
+|class T|None||
+|class CapacityType|None||
 ------
 ### `template<class T> class Registry`
 
@@ -170,8 +170,8 @@ Flat map implementation.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|CapacityType||
+|class T|None||
+|class CapacityType|None||
 ------
 ### `template<class T, class Impl> class String`
 
@@ -228,7 +228,7 @@ Internal class used to create an unexpected object type.
 #### Template
 ||||
 |---:|:---|:---|
-|class|StorageType||
+|class StorageType|None||
 |class...|Ts||
 ------
 ### `template<class T, class Impl> class Vector`
@@ -236,8 +236,8 @@ Internal class used to create an unexpected object type.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|Impl||
+|class T|None||
+|class Impl|None||
 ------
 ### `template<SizeType Len, SizeType Align> struct AlignedStorage`
 
@@ -283,8 +283,8 @@ Internal class used to create an unexpected object type.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|CapacityType||
+|class T|None||
+|class CapacityType|None||
 ------
 ### `template<SizeType L, SizeType I, class S> struct TupleRangeImpl`
 
@@ -337,7 +337,7 @@ Internal class used to create an unexpected object type.
 |---:|:---|:---|
 |SizeType|Index||
 ------
-### `template<SizeType Index, class T, class... Ts, typeTraits::EnableIf<> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
+### `template<SizeType Index, class T, class... Ts, typeTraits::EnableIf<(Index > sizeof...(Ts))> *> constexpr NoType TupleChooseN(T && t, Ts &&... ts)`
 
 #### Template
 ||||
@@ -345,7 +345,7 @@ Internal class used to create an unexpected object type.
 |SizeType|Index||
 |class T|None||
 |class...|Ts||
-|typeTraits::EnableIf<|None||
+|typeTraits::EnableIf<(Index > sizeof...(Ts))> *|None||
 #### Parameters
 ||||
 |---:|:---|:---|

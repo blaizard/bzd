@@ -80,7 +80,7 @@ export default class PersistenceTimeSeries {
 		await this.persistenceIndex.waitReady();
 		// Quick check to see if the index need to be rebuilt
 		// There seems to be an issue if it is not rebuilt (test fails sporadically)
-		if ((await this.persistenceIndex.get()).version != VERSION || true) {
+		if ((await this.persistenceIndex.get()).version != VERSION) {
 			await this.rebuildIndex();
 			Log.info("Successfully rebuilt index of timeseries {}", path);
 		}

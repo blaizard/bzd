@@ -5,8 +5,8 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|K||
-|class|V||
+|class K|None||
+|class V|None||
 |SizeType|N||
 
 |Struct||

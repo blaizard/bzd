@@ -5,8 +5,8 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|Impl||
+|class T|None||
+|class Impl|None||
 
 |Function||
 |:---|:---|

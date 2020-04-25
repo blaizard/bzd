@@ -1,6 +1,5 @@
 "use strict";
 
-import LogFactory from "../log.js";
 import ExceptionFactory from "../exception.js";
 
 const Exception = ExceptionFactory("task");

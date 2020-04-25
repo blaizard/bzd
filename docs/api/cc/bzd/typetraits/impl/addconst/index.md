@@ -7,9 +7,9 @@
 |---:|:---|:---|
 |class T|None||
 
-|Variable||
+|Typedef||
 |:---|:---|
 |[`type`](./index.md)||
 ------
-### `const typedef T type`
+### `typedef type`
 

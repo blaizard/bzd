@@ -234,7 +234,7 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |T|v||
 ------
 ### `template<class T> struct IsArithmetic`
@@ -286,7 +286,7 @@
 ||||
 |---:|:---|:---|
 |class|None||
-|class|T||
+|class T|None||
 |class...|Args||
 ------
 ### `template<class T, class... Args> struct IsConstructible< VoidType< decltype(T(declval< Args >()...))>, T, Args... >`

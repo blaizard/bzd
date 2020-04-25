@@ -6,10 +6,8 @@ import Os from "os";
 
 import PersistenceTimeSeries from "../persistence/timeseries.js";
 import FileSystem from "../filesystem.js";
-import LogFactory from "../log.js";
 import ExceptionFactory from "../exception.js";
 
-const Log = LogFactory("test", "persistence-timestamp");
 const Exception = ExceptionFactory("test", "persistence-timestamp");
 
 //Log.mute();

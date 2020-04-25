@@ -118,8 +118,8 @@ The container combines the performance and accessibility of a C-style array with
 #### Template
 ||||
 |---:|:---|:---|
-|class|K||
-|class|V||
+|class K|None||
+|class V|None||
 |SizeType|N||
 ------
 ### `template<class T, SizeType N, class CapacityType> class Pool`
@@ -127,18 +127,18 @@ A Pool is a fixed memory buffer containing fixed size elements that can be taken
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
-|class|CapacityType||
+|class CapacityType|None||
 ------
 ### `template<class T, SizeType N, class CapacityType> class Queue`
 
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
-|class|CapacityType||
+|class CapacityType|None||
 ------
 ### `template<class T> class ReferenceWrapper`
 
@@ -197,14 +197,14 @@ Note, this initialization scheme can be imediatly followed by object registratio
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 ------
-### `template<class T> class Span`
+### `template<class T T> class Span`
 The class template span describes an object that can refer to a contiguous sequence of objects with the first element of the sequence at position zero.
 #### Template
 ||||
 |---:|:---|:---|
-|class|T|Element type, must be a complete type that is not an abstract class type. |
+|class T|T|Element type, must be a complete type that is not an abstract class type. |
 ------
 ### `template<const SizeType N> class Stack`
 
@@ -261,7 +261,7 @@ The class template span describes an object that can refer to a contiguous seque
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
+|class T|None||
 |SizeType|N||
 ------
 ### `template<class T> struct resultOf`

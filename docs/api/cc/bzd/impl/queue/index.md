@@ -5,8 +5,8 @@
 #### Template
 ||||
 |---:|:---|:---|
-|class|T||
-|class|CapacityType||
+|class T|None||
+|class CapacityType|None||
 
 |Function||
 |:---|:---|

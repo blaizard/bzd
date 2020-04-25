@@ -6,7 +6,7 @@
 ||||
 |---:|:---|:---|
 |class|None||
-|class|T||
+|class T|None||
 |class...|Args||
 
 |Function||
