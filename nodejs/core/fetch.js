@@ -1,6 +1,7 @@
 "use strict";
 
-import ExceptionFactory from "../exception.js";
+import { base64Encode } from "./crypto.js";
+import ExceptionFactory from "./exception.js";
 
 const Exception = ExceptionFactory("fetch");
 
@@ -28,6 +29,21 @@ export default class Fetch {
 			body = options.data;
 		}
 
+		// Update headers with authentication information
+		if ("authentication" in options) {
+			const auth = options.authentication;
+			switch (auth.type) {
+			case "basic":
+				{
+					const base64 = await base64Encode(auth.username + ":" + auth.password);
+					headers["Authorization"] = "Basic " + base64;
+				}
+				break;
+			default:
+				Exception.unreachable("Unsupported authentication type '{}'", auth.type);
+			}
+		}
+
 		// Sanity checks
 		const method = String(options.method).toLowerCase();
 		Exception.assert(method in {"get":1, "post":1, "head":1, "put":1, "delete":1, "connect":1, "options":1, "trace":1, "patch":1}, "Method '{}' is not supported", method);
@@ -42,16 +58,28 @@ export default class Fetch {
 
 		let request = null;
 		if (process.env.BZD_RULE === "nodejs") {
-			request = (await import(/* webpackMode: "eager" */"./adapter/node.http.js")).default;
+			request = (await import(/* webpackMode: "eager" */"./impl/fetch/node.http.js")).default;
 		}
 		else if (process.env.BZD_RULE === "nodejs_web") {
-			request = (await import(/* webpackMode: "eager" */"./adapter/window.fetch.js")).default;
+			request = (await import(/* webpackMode: "eager" */"./impl/fetch/window.fetch.js")).default;
 		}
 		else {
 			Exception.unreachable("Unsupported environment: '{}'", process.env.BZD_RULE);
 		}
 
-		return await request(url, method, headers, body, options);
+		const data = await request(url, {
+			method: method,
+			headers: headers,
+			body: body,
+			expect: options.expect
+		});
+
+		switch (options.expect) {
+		case "json":
+			return JSON.parse(data);
+		default:
+			return data;
+		}
 	}
 
 	static async get(url, options = {}) {

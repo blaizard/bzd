@@ -1,6 +1,7 @@
 <template>
 	<div>
 		jenkins component!
+        {{ JSON.stringify(metadata) }}
 	</div>
 </template>
 
@@ -8,6 +9,9 @@
     "use strict";
 
     export default {
+        props: {
+            metadata: {type: Object, mandatory: true}
+        },
         methods: {
             getMetadata() {
                 return {

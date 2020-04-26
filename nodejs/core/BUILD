@@ -66,12 +66,26 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "fetch",
+    name = "crypto",
     srcs = glob([
-        "fetch/**/*",
+        "crypto.js",
+        "impl/crypto/*",
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        ":exception",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "fetch",
+    srcs = glob([
+        "fetch.js",
+        "impl/fetch/*",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":crypto",
         ":exception",
     ],
 )

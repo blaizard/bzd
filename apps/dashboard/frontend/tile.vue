@@ -1,6 +1,6 @@
 <template>
 	<div class="bzd-dashboard-tile">
-        <component :is="component"></component>
+        <component :is="component" :metadata="metadata"></component>
         <div class="name">{{ name }}</div>
 	</div>
 </template>
@@ -17,13 +17,11 @@
         },
 		data: function () {
 			return {
+                metadata: {}
 			}
 		},
         mounted() {
-            this.$api.request("get", "/data", {
-                type: this.type,
-                uid: this.uid
-            });
+            this.fetch();
         },
         computed: {
             name() {
@@ -34,6 +32,15 @@
             },
             component() {
                 return Frontend[this.type];
+            }
+        },
+        methods: {
+            async fetch() {
+                this.metadata = await this.$api.request("get", "/data", {
+                    type: this.type,
+                    uid: this.uid
+                });
+                console.log(this.metadata);
             }
         }
 	}

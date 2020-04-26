@@ -401,7 +401,6 @@ async function triggerUpdate(collection, id, ...ids)
 		delete dataId._error;
 	}
 	catch (e) {
-
 		// Register the error and delete the previous data if any
 		dataId._error = e.message;
 		dataId._timeout = Cache.getTimestampMs() + 100; // Invalid the error after 100ms

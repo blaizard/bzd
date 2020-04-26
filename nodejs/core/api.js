@@ -1,6 +1,6 @@
 "use strict";
 
-import Fetch from "./fetch/fetch.js";
+import Fetch from "./fetch.js";
 import ExceptionFactory from "./exception.js";
 
 const Exception = ExceptionFactory("api");
