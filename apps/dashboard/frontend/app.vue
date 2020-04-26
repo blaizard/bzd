@@ -30,7 +30,6 @@
 	import Layout from "[frontend]/layout.vue";
 	import MenuEntry from "[frontend]/menu_entry.vue";
 	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
-	import Fetch from "[bzd]/core/fetch.js"
 
 	export default {
 		components: {

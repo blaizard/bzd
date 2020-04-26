@@ -1,7 +1,16 @@
 "use strict";
 
+import Fetch from "../../../../nodejs/core/fetch/fetch.js";
+
 export default {
     fetch: async (data) => {
-        return {};
+
+        await Fetch.get("/configuration");
+
+        return {
+
+            
+
+        };
     }
 }

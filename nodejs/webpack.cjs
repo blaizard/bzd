@@ -3,6 +3,7 @@
 const Fs = require("fs");
 const Path = require("path");
 const Assert = require("assert");
+const webpack = require("webpack");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
@@ -340,7 +341,8 @@ function getWebpackConfigDefault(isDev, config)
 				{
 					test: /\.js$/,
 					exclude: /node_modules/,
-					use: "babel-loader"
+					use: "babel-loader",
+					sideEffects: false,
 				},
 				{
 					test: /\.(sa|sc|c)ss$/,
@@ -381,6 +383,7 @@ function getWebpackConfigDefault(isDev, config)
 			hotOnly: config["hmr"]
 		},
 		plugins: [
+			new webpack.EnvironmentPlugin(["BZD_RULE"]),
 			new BundleAnalyzerPlugin({
 				analyzerMode: "static",
 				reportFilename: "./reports/webpack.html",

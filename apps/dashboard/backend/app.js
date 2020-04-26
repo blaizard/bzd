@@ -14,6 +14,9 @@ import { Backend } from "../plugins/plugins.js";
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
 
+console.log(process.env);
+
+
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option("-p, --port <number>", "Port to be used to serve the application.", 8080, parseInt)

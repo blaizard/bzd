@@ -67,9 +67,9 @@ bzd_nodejs_library(
 
 bzd_nodejs_library(
     name = "fetch",
-    srcs = [
-        "fetch.js",
-    ],
+    srcs = glob([
+        "fetch/**/*",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
         ":exception",
