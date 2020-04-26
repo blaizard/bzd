@@ -122,6 +122,9 @@ def _bzd_nodejs_web_package_impl(ctx):
         inputs = [],
         outputs = [package],
         arguments = [package.path],
+        env = {
+            "BZD_RULE": "nodejs_web"
+        },
         progress_message = "Building {}".format(ctx.label),
         executable = ctx.executable.build,
     )

@@ -194,7 +194,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
-    command = "{{binary}} --preserve-symlinks --preserve-symlinks-main \"node_modules/mocha/bin/mocha\" \"{}\"" if is_test else "{{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@"
+    command = "export BZD_RULE=nodejs && {{binary}} --preserve-symlinks --preserve-symlinks-main \"node_modules/mocha/bin/mocha\" \"{}\"" if is_test else "export BZD_RULE=nodejs && {{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@"
 
     result = [
         sh_binary_wrapper_impl(

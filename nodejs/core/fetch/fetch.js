@@ -1,6 +1,6 @@
 "use strict";
 
-import ExceptionFactory from "./exception.js";
+import ExceptionFactory from "../exception.js";
 
 const Exception = ExceptionFactory("fetch");
 
@@ -20,11 +20,7 @@ export default class Fetch {
 		let body = undefined;
 
 		// Generate body
-		if (options.data instanceof FormData) {
-			headers["Content-Type"] = "application/x-www-form-urlencoded";
-			body = JSON.stringify(options.data);
-		}
-		else if (typeof options.data == "object") {
+		if (typeof options.data == "object") {
 			headers["Content-Type"] = "application/json";
 			body = JSON.stringify(options.data);
 		}
@@ -44,20 +40,18 @@ export default class Fetch {
 			break;
 		}
 
-		const response = await window.fetch(url, {
-			method: method,
-			body: body,
-			headers: headers
-		});
-
-		Exception.assert(response.ok, async () => { return (await response.text()) || response.statusText; });
-
-		switch (options.expect) {
-		case "json":
-			return await response.json();
-		default:
-			return await response.text();
+		let request = null;
+		if (process.env.BZD_RULE === "nodejs") {
+			request = (await import(/* webpackMode: "eager" */"./adapter/node.http.js")).default;
 		}
+		else if (process.env.BZD_RULE === "nodejs_web") {
+			request = (await import(/* webpackMode: "eager" */"./adapter/window.fetch.js")).default;
+		}
+		else {
+			Exception.unreachable("Unsupported environment: '{}'", process.env.BZD_RULE);
+		}
+
+		return await request(url, method, headers, body, options);
 	}
 
 	static async get(url, options = {}) {
