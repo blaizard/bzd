@@ -8,7 +8,7 @@ export default async function request(url, options) {
 
 	// Add support for FormData
 	if (options.body instanceof FormData) {
-		headers["Content-Type"] = "application/x-www-form-urlencoded";
+		options.headers["Content-Type"] = "application/x-www-form-urlencoded";
 		options.body = JSON.stringify(options.body);
 	}
 
