@@ -39,7 +39,7 @@ bzd_package(
 
 container_image(
     name = "dashboard",
-    base = "@apline_node//image",
+    base = "@docker_nodejs//image",
     cmd = [
         "node",
         "/bzd/bin/backend/apps/dashboard/backend/app.js",

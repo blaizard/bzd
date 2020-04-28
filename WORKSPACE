@@ -1,56 +1,26 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Download the rules_docker repository at release v0.14.1
-http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "dc97fccceacd4c6be14e800b2a00693d5e8d07f69ee187babfd04a80a9f8e250",
-    strip_prefix = "rules_docker-0.14.1",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.14.1/rules_docker-v0.14.1.tar.gz"],
-)
+# Bazel 3rd party rules
 
-load("@io_bazel_rules_docker//repositories:repositories.bzl", container_repositories = "repositories")
+load("//tools/bazel.build/rules/third_party:dependencies.bzl", "bazel_rules_load")
 
-container_repositories()
+bazel_rules_load()
 
-load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+load("//tools/bazel.build/rules/third_party:register.bzl", "bazel_rules_register")
 
-container_deps()
+bazel_rules_register()
 
-load("@io_bazel_rules_docker//container:container.bzl", "container_pull")
+# Docker
 
-container_pull(
-    name = "apline_node",
-    digest = "sha256:4df7b8ea856a4b272d5682390f0910fe463b51080d0399302753a83cead49760",
-    registry = "index.docker.io",
-    repository = "mhart/alpine-node",
-    tag = "slim-13",
-)
+load("//tools/docker:register.bzl", "docker_images_register")
 
-# CC rules
-
-http_archive(
-    name = "rules_cc",
-    sha256 = "7e5fd5d3b54217ee40d8488bbd70840456baafb3896782942ae4db1400a77657",
-    strip_prefix = "rules_cc-cd7e8a690caf526e0634e3ca55b10308ee23182d",
-    type = "zip",
-    urls = ["https://github.com/bazelbuild/rules_cc/archive/cd7e8a690caf526e0634e3ca55b10308ee23182d.zip"],
-)
-
-# Debian rules
-
-http_archive(
-    name = "debian_repository_rules",
-    sha256 = "fc24e3018aa6e331cfa568b6ad28bb2f6851f985270cff2a7364fb4c082cfcda",
-    strip_prefix = "debian_repository_rules-3f80031c3ccee36931400323f452f569b8046966",
-    type = "zip",
-    url = "https://github.com/FaBrand/debian_repository_rules/archive/3f80031c3ccee36931400323f452f569b8046966.zip",
-)
+docker_images_register()
 
 # Toolchains
 
-load("//toolchains:workspace.bzl", "load_toolchains")
+load("//toolchains:register.bzl", "toolchains_register")
 
-load_toolchains()
+toolchains_register()
 
 # Buildifier
 
