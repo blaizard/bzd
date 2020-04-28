@@ -3,7 +3,7 @@
 		<div :class="name + '-content irgraph-content'">
 			<slot v-bind:selected="selectedLegend"></slot>
 		</div>
-		<div :class="legendClass" ref="legend">
+		<div :class="legendClass" ref="legend" v-if="configProcessed.showLegend">
 			<div class="irgraph-legend-items" v-hover-children="selectedLegend">
 				<div v-for="item, index in value"
 						:key="index"
@@ -38,14 +38,21 @@ export default {
 	computed: {
 		configProcessed() {
 			return Object.assign({
-				layout: "legend-right" // legend-left
+				/**
+				 * Show the legend
+				 */
+				showLegend: true,
+				/**
+				 * Position of the legend
+				 */
+				legendPosition: "legend-right" // legend-left
 			}, this.config);
 		},
 		elementClass() {
 			return {
 				"irgraph": true,
 				[this.name]: true,
-				["irgraph-layout-" + this.configProcessed.layout]: true
+				["irgraph-layout-" + this.configProcessed.legendPosition]: true
 			};
 		},
 		legendClass() {

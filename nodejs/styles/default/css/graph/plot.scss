@@ -16,6 +16,7 @@
 				stroke: #222;
 				stroke-dasharray: 1 1;
 				stroke-width: 1;
+				pointer-events: none;
 			}
 
 			.irgraph-plot-items {
@@ -36,6 +37,11 @@
 							.path {
 								stroke: $color;
 								stroke-width: 2px;
+							}
+							.rectangle {
+								stroke-width: 0;
+								stroke: $color;
+								fill: $color;
 							}
 						}
 					}

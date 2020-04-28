@@ -1,53 +1,55 @@
 <template>
 	<Element name="irgraph-plot" :value="series" :config="config" :selected="selected" v-slot:default="slotProps" v-resize="handleResize">
 		<svg ref="canvas" :viewBox="svgViewBox" :style="svgStyle" @mousemove.stop="handleMouseMove">
-			<g class="irgraph-plot-labels-x">
-				<text class="irgraph-hide" ref="labelXReferenceChar">M</text>
-				<template v-for="item, x in labelXMap">
-					<text v-if="item.show"
-							:x="x"
-							:y="height - plotOffsetBottom + tickSize / 2 + labelXCharSize.height"
-							text-anchor="middle"
-							alignment-baseline="bottom">
-						{{ item.value }}
-					</text>
-					<line v-if="item.show" :x1="x" :x2="x" :y1="height - plotOffsetBottom - tickSize / 2" :y2="height - plotOffsetBottom + tickSize / 2"></line>
-				</template>
-			</g>
-			<g class="irgraph-plot-labels-y">
-				<text class="irgraph-hide" ref="labelYReferenceChar">M</text>
+			<g class="irgraph-plot-labels-y" v-show="configProcessed.showAxisY">
+				<text class="irgraph-hide" ref="labelYReferenceChar">0</text>
 				<template v-for="item, y in labelYMap">
-					<text v-if="item.show"
+					<PlotText v-if="item.show"
 							:x="plotOffsetLeft - tickSize / 2"
-							:y="y"
-							text-anchor="end"
-							alignment-baseline="middle">
+							:y="y - labelYCharSize.height / 2"
+							h-align="right">
 						{{ item.value }}
-					</text>
+					</PlotText>
 					<line v-if="item.show" :x1="plotOffsetLeft - tickSize / 2" :x2="width - plotOffsetRight" :y1="y" :y2="y"></line>
 				</template>
 			</g>
+			<g class="irgraph-plot-labels-x" v-show="configProcessed.showAxisX">
+				<text class="irgraph-hide" ref="labelXReferenceChar">0</text>
+				<template v-for="item, x in labelXMap">
+					<PlotText v-if="item.show"
+							:x="x"
+							:y="height - plotOffsetBottom + tickSize / 2"
+							h-align="middle">
+						{{ item.value }}
+					</PlotText>
+					<line v-if="item.show" :x1="x" :x2="x" :y1="height - plotOffsetBottom - tickSize / 2" :y2="height - plotOffsetBottom + tickSize / 2"></line>
+				</template>
+				<line class="irgraph-plot-axis-x"
+						:x1="plotOffsetLeft"
+						:x2="width - plotOffsetRight"
+						:y1="height - plotOffsetBottom"
+						:y2="height - plotOffsetBottom">
+				</line>
+			</g>
 			<!-- Print the points //-->
 			<g class="irgraph-plot-items" v-hover-children="selected">
-				<g v-for="item in series" class="irgraph-plot-item">
-					<path :d="item.path" class="path" fill="transparent" />
-					<line v-for="data in item.coords"
-							:x1="data[0]"
-							:y1="data[1]"
-							:x2="data[0]"
-							:y2="data[1]"
-							class="circle" />
-				</g>
+				<component v-for="serie in series"
+						class="irgraph-plot-item"
+						:is="getSerieComponent(serie)"
+						:serie="serie"
+						:bounding-box="plotBoundingBox">
+				</component>
 			</g>
 			<!-- Cursor //-->
-			<g class="irgraph-plot-cursor">
+			<g class="irgraph-plot-cursor" v-show="configProcessed.showCursor">
 				<line :x1="valueXToCoord(cursorXValue)" :x2="valueXToCoord(cursorXValue)" :y1="plotOffsetTop" :y2="plotOffsetTop + plotHeight"></line>
-				<text class="irgraph-hide" ref="labelCursorXReferenceChar">M</text>
-				<text :x="valueXToCoord(cursorXValue)"
-						:y="plotOffsetTop + plotHeight + tickSize / 2 + labelCursorXCharSize.height"
-						text-anchor="middle">
+				<text class="irgraph-hide" ref="labelCursorXReferenceChar">0</text>
+				<PlotText
+						:x="valueXToCoord(cursorXValue)"
+						:y="plotOffsetTop + plotHeight + tickSize / 2"
+						h-align="middle">
 					{{ configProcessed.formatX(cursorXValue) }}
-				</text>
+				</PlotText>
 			</g>
 		</svg>
 	</Element>
@@ -57,14 +59,17 @@
 "use strict";
 
 import Element from "./element.vue";
+import PlotText from "./utils/text.vue";
 import HoverChildren from "./directive/hover-children.js";
-import Resize from "[lib]/vue/directives/resize.js";
+import Resize from "../../directives/resize.js";
+import RenderLine from "./render/line.vue";
+import RenderBar from "./render/bar.vue";
 
 const DEBUG = true;
 
 export default {
 	components: {
-		Element
+		Element, PlotText, RenderLine
 	},
 	props: {
 		value: {type: Array, required: false, default: () => ([])},
@@ -83,12 +88,7 @@ export default {
 			valuesMinY: 0,
 			valuesMaxX: 0,
 			valuesMaxY: 0,
-			plotOffsetTop: 10,
-			plotOffsetRight: 10,
-			//plotOffsetBottom: 20,
 			tickSize: 5,
-			labelXMaxNbChars: 6,
-			labelYMaxNbChars: 6,
 			tickYMinOffset: 50,
 			maxPointsPerPlot: 20,
 			cursorXValue: 0,
@@ -141,47 +141,51 @@ export default {
 	watch: {
 		value: {
 			immediate: true,
-			handler(/*value*/) {
+			handler(value) {
 
 				if (DEBUG) console.time("plot render");
 
-				this.valuesMinY = Number.MAX_SAFE_INTEGER;
-				this.valuesMaxY = -Number.MAX_SAFE_INTEGER;
+				let valuesMinY = Number.MAX_SAFE_INTEGER;
+				let valuesMaxY = -Number.MAX_SAFE_INTEGER;
+				let valuesMinX = Number.MAX_SAFE_INTEGER;
+				let valuesMaxX = -Number.MAX_SAFE_INTEGER;
 
 				// Calculate the [valuesMinY; valuesMaxY]
-				this.sortedValues.forEach((array) => {
-					array.forEach((point) => {
-						this.valuesMinY = Math.min(this.valuesMinY, point[1]);
-						this.valuesMaxY = Math.max(this.valuesMaxY, point[1]);
+				this.valueSorted.forEach((array) => {
+					array.values.forEach((point) => {
+						valuesMinY = Math.min(valuesMinY, point[1]);
+						valuesMaxY = Math.max(valuesMaxY, point[1]);
 					});
 				});
 
 				// Calculate the [valuesMinX; valuesMaxX]
-				if (this.sortedValues.length && this.sortedValues[0].length)
+				if (this.valueSorted.length && this.valueSorted[0].values.length)
 				{
-					this.valuesMinX = Number.MAX_SAFE_INTEGER;
-					this.valuesMaxX = -Number.MAX_SAFE_INTEGER;
-
-					this.sortedValues.forEach((array) => {
-						this.valuesMinX = Math.min(this.valuesMinX, array[0][0]);
-						this.valuesMaxX = Math.max(this.valuesMaxX, array[array.length - 1][0]);
+					this.valueSorted.forEach((array) => {
+						valuesMinX = Math.min(valuesMinX, array.values[0][0]);
+						valuesMaxX = Math.max(valuesMaxX, array.values[array.values.length - 1][0]);
 					});
-
-					// Roughtly calculat the maximum numbers of characters for the labels
-					this.labelXMaxNbChars = Math.max(this.configProcessed.formatX(this.valuesMinX).length,
-						this.configProcessed.formatX(this.valuesMaxX).length);
-					this.labelYMaxNbChars = Math.max(this.configProcessed.formatY(this.valuesMinY).length,
-						this.configProcessed.formatY(this.valuesMaxY).length);
 				}
 				else {
-					this.valuesMinX = 0;
-					this.valuesMaxX = 1;
-					this.labelXMaxNbChars = 6;
+					valuesMinX = 0;
+					valuesMaxX = 1;
 				}
+
+				// Assign the values
+				this.valuesMinY = valuesMinY;
+				this.valuesMaxY = valuesMaxY;
+				this.valuesMinX = valuesMinX;
+				this.valuesMaxX = valuesMaxX;
 			}
 		}
 	},
 	computed: {
+		labelXMaxNbChars() {
+			return Math.max(this.configProcessed.formatX(this.valuesMinX).length, this.configProcessed.formatX(this.valuesMaxX).length);
+		},
+		labelYMaxNbChars() {
+			return Math.max(this.configProcessed.formatY(this.valuesMinY).length, this.configProcessed.formatY(this.valuesMaxY).length);
+		},
 		/**
 			 * SVG viewbox
 			 */
@@ -204,19 +208,39 @@ export default {
 				/**
 					 * Format the X labels
 					 */
-				formatX: (x) => Number(x).toFixed(this.labelXResolution),
+				formatX: (x) => Number(x).toFixed(this.labelXMaxResolution),
 				/**
 					 * Format the Y labels
 					 */
-				formatY: (y) => Number(y).toFixed(this.labelYResolution),
+				formatY: (y) => Number(y).toFixed(this.labelYMaxResolution),
 				/**
-					 * Overwrite the plotOffsetLeft value
-					 */
-				offsetLeft: null,
+				 * Add extra offset to the left
+				 */
+				paddingLeft: 0,
 				/**
-					 * Overwrite the plotOffsetBottom value
-					 */
-				offsetBottom: null
+				 * Add extra offset to the top
+				 */
+				paddingTop: 0,
+				/**
+				 * Add extra offset to the right
+				 */
+				paddingRight: 0,
+				/**
+				 * Add extra offset to the bottom
+				 */
+				paddingBottom: 0,
+				/**
+				 * Show X axis
+				 */
+				showAxisX: true,
+				/**
+				 * Show Y axis
+				 */
+				showAxisY: true,
+				/**
+				 * Show the cursor
+				 */
+				showCursor: true
 			}, this.config);
 		},
 		/**
@@ -232,18 +256,48 @@ export default {
 			return this.height - this.plotOffsetBottom - this.plotOffsetTop;
 		},
 		/**
+			 * Space between the plot and the right
+			 */
+		plotOffsetRight() {
+			return this.configProcessed.paddingRight;
+		},
+		/**
+			 * Space between the plot and the top
+			 */
+		plotOffsetTop() {
+			let value = this.configProcessed.paddingTop;
+			if (this.configProcessed.showAxisY) {
+				value = Math.max(value, this.labelXCharSize.height / 2);
+			}
+			return value;
+		},
+		/**
 			 * Space between the plot and the left
 			 */
 		plotOffsetLeft() {
-			console.log(this.labelYMaxNbChars, this.labelYCharSize.width);
-			return (this.configProcessed.offsetLeft === null) ? this.labelYMaxNbChars * this.labelYCharSize.width + this.tickSize / 2 : this.configProcessed.offsetLeft;
+			let value = 0;
+			if (this.configProcessed.showAxisY) {
+				value = this.labelYMaxNbChars * this.labelYCharSize.width + this.tickSize / 2;
+			}
+			value += this.configProcessed.paddingLeft;
+			return value;
 		},
 		/**
 			 * Space between the plot and the bottom
 			 */
 		plotOffsetBottom() {
-			console.log(this.labelXCharSize, this.labelXCharSize.height + this.tickSize / 2);
-			return (this.configProcessed.offsetBottom === null) ? this.labelXCharSize.height + this.tickSize / 2 : this.configProcessed.offsetBottom;
+			let value = 0;
+			if (this.configProcessed.showAxisY) {
+				value = this.labelXCharSize.height / 2;
+			}
+			if (this.configProcessed.showAxisX) {
+				value = Math.max(value, this.labelXCharSize.height + this.tickSize / 2);
+			}
+			if (this.configProcessed.showCursor) {
+				value = Math.max(value, this.labelCursorXCharSize.height + this.tickSize / 2);
+			}
+			value += this.configProcessed.paddingBottom;
+			return value;
 		},
 		/**
 			 * Minimum Y value to be displayed on the plot
@@ -274,6 +328,17 @@ export default {
 			return (this.configProcessed.maxX === null) ? this.valuesMaxX : this.configProcessed.maxX;
 		},
 		/**
+		 * Return the coordinates (top, left, bottom, right) of the plot bounding box
+		 */
+		plotBoundingBox() {
+			return {
+				top: this.plotOffsetTop,
+				left: this.plotOffsetLeft,
+				bottom: this.height - this.plotOffsetBottom,
+				right: this.width - this.plotOffsetRight
+			}
+		},
+		/**
 			 * Pre-calculate ratio and offsets for x and y.
 			 */
 		valuesXRatio() {
@@ -294,22 +359,26 @@ export default {
 		/**
 			 * Values sorted by X. It should not give a high overhead on already sorted arrays.
 			 */
-		sortedValues() {
+		valueSorted() {
 			return this.value.map((item) => {
-				return item.values.sort((a, b) => {
+				let copyItem = {...item};
+				copyItem.values = [...copyItem.values];
+				copyItem.values.sort((a, b) => {
 					return a[0] - b[0];
 				});
+				return copyItem;
 			});
 		},
 		/**
 			 * The points to be processed
 			 */
 		series() {
-			const series = this.value.map((item) => {
+			const series = this.valueSorted.map((item) => {
 
 				let serie = {
 					caption: item.caption || "",
 					color: item.color || "red",
+					type: item.type || "line",
 					coords: [],
 					path: ""
 				};
@@ -328,17 +397,6 @@ export default {
 					const x = this.valuesXOffset + item.values[~~(i + .5)][0] * this.valuesXRatio;
 					const y = this.valuesYOffset + item.values[~~(i + .5)][1] * this.valuesYRatio;
 					serie.coords.push([x, y]);
-
-					// Calculate the path
-					if (i == 0)
-					{
-						serie.path = "M " + x + " " + y;
-					}
-					else
-					{
-						serie.path += " L " + x + " " + y;
-						//item.path += " C " + x + " " + y + ", " + x + " " + y + ", " + x + " " + y;
-					}
 				}
 				return serie;
 			});
@@ -358,8 +416,9 @@ export default {
 			}
 			return list;
 		},
-		labelXResolution() {
-			const incrementX = (this.plotMaxX - this.plotMinX) / this.labelX.length;
+		labelXMaxResolution() {
+			// We don't want to depend on this.labelX.length here, otherwise we end up in a loop
+			const incrementX = (this.plotMaxX - this.plotMinX) / 100;
 			let decimal = 0;
 			for (let i = 1; i >= 0.00001; i /= 10, ++decimal) {
 				if (incrementX >= i * 5) {
@@ -398,7 +457,7 @@ export default {
 			}
 			return list;
 		},
-		labelYResolution() {
+		labelYMaxResolution() {
 			const incrementY = (this.plotMaxY - this.plotMinY) / this.labelY.length;
 			let decimal = 0;
 			for (let i = 1; i >= 0.00001; i /= 10, ++decimal) {
@@ -411,16 +470,29 @@ export default {
 		labelYMap() {
 			let map = {};
 			const lastIndex = this.labelY.length - 1;
-			this.labelY.reverse().forEach((n, index) => {
-				map[this.plotOffsetTop + this.plotHeight * index / lastIndex] = {
-					value: this.configProcessed.formatY(n),
-					show: true
-				};
-			});
+			if (lastIndex) {
+				[...this.labelY].reverse().forEach((n, index) => {
+					map[this.plotOffsetTop + this.plotHeight * index / lastIndex] = {
+						value: this.configProcessed.formatY(n),
+						show: true
+					};
+				});
+			}
 			return map;
 		}
 	},
 	methods: {
+		/**
+		 * Get the component associated with a serie, based on its type
+		 */
+		getSerieComponent(serie) {
+			switch (serie.type) {
+			case "line":
+				return RenderLine;
+			case "bar":
+				return RenderBar;
+			}
+		},
 		handleResize(/*width, height*/) {
 			const rect = this.$refs.canvas.parentElement.getBoundingClientRect();
 			this.width = rect.width;
@@ -460,18 +532,21 @@ export default {
 			return x * this.valuesXRatio + this.valuesXOffset;
 		},
 		handleMouseMove(e) {
-
 			const rect = this.$refs.canvas.getBoundingClientRect();
 			const coords = (e.touches && e.touches.length) ? {x: e.touches[0].pageX - rect.left, y: e.touches[0].pageY - rect.top} : {x: e.pageX - rect.left, y: e.pageY - rect.top};
 			const valueX = this.coordXToValue(coords.x);
 
 			// Look for the closest match
-			const positions = this.sortedValues.map((array) => this.findClosestX(array, valueX));
-			const distances = positions.map((pos, index) => Math.abs(this.sortedValues[index][pos][0] - valueX));
+			const positions = this.valueSorted.map((array) => this.findClosestX(array.values, valueX));
+			const distances = positions.map((pos, index) => Math.abs(this.valueSorted[index].values[pos][0] - valueX));
 			const index = distances.reduce((iMin, x, i, arr) => ((x < arr[iMin]) ? i : iMin), 0);
 
-			this.cursorXValue = this.sortedValues[index][positions[index]][0];
+			this.cursorXValue = this.valueSorted[index].values[positions[index]][0];
 		}
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/graph/index.scss";
+</style>
