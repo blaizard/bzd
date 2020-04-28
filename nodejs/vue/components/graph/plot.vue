@@ -33,8 +33,9 @@
 			</g>
 			<!-- Print the points //-->
 			<g class="irgraph-plot-items" v-hover-children="selected">
-				<component v-for="serie in series"
+				<component v-for="serie, key in series"
 						class="irgraph-plot-item"
+						:key="key"
 						:is="getSerieComponent(serie)"
 						:serie="serie"
 						:bounding-box="plotBoundingBox">
