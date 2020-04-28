@@ -23,6 +23,9 @@ bzd_nodejs_library(
     visibility = [
         "//apps/dashboard:__subpackages__",
     ],
+    deps = [
+        "//nodejs/vue/components:graph",
+    ]
 )
 
 bzd_package(

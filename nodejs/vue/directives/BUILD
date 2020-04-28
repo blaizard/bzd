@@ -21,3 +21,14 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
 )
+
+bzd_nodejs_library(
+    name = "resize",
+    srcs = [
+        "resize.js",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)

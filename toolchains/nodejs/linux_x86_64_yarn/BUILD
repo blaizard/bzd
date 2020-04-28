@@ -13,8 +13,8 @@ sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
     command = select({
-        ":cache": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" --cache-folder \"/cache/yarn\" $@ |& grep -v \"Waiting for the other yarn instance to finish\" || true",
-        "//conditions:default": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@ |& grep -v \"Waiting for the other yarn instance to finish\" || true",
+        ":cache": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" --cache-folder \"/cache/yarn\" $@",
+        "//conditions:default": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@",
     }),
     data = [
         "@node",

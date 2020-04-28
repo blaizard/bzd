@@ -1,6 +1,6 @@
 <template>
 	<div class="bzd-dashboard-tile">
-        <component :is="component" :metadata="metadata"></component>
+        <component class="content" :is="component" :metadata="metadata"></component>
         <div class="name">{{ name }}</div>
 	</div>
 </template>
@@ -47,16 +47,32 @@
 </script>
 
 <style lang="scss" scoped>
+    $bzdPadding: 10px;
+
     .bzd-dashboard-tile {
         width: 300px;
-        height: 150px;
+        height: 300px;
         margin: 10px;
-        padding: 10px;
 
         border: 1px solid #ddd;
+        position: relative;
 
         .name {
+            position: absolute;
+            bottom: $bzdPadding;
+            left: $bzdPadding;
+            right: $bzdPadding;
+            overflow: hidden;
+            line-height: 2em;
+        }
 
+        .content {
+            position: absolute;
+            top: $bzdPadding;
+            bottom: calc(#{$bzdPadding * 2} + 2em);
+            left: $bzdPadding;
+            right: $bzdPadding;
+            overflow: hidden;
         }
     }
 </style>
