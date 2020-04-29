@@ -2,7 +2,11 @@
 	<div>
         <h2>Config</h2>
         <Form :description="formDescription" v-model="value"></Form>
-        <Form :description="formPluginDescription" v-model="value"></Form>
+        <Form :description="formPluginSourceDescription" v-model="value"></Form>
+        <h3>Visualization</h3>
+        <Form :description="formVisualizationDescription" v-model="value"></Form>
+        <Form :description="formPluginVisualizationDescription" v-model="value"></Form>
+        <h3>Mapping</h3>
         {{ value }}
         <button @click="handleCreate">Create</button>
     </div>
@@ -12,7 +16,7 @@
 	"use strict"
 
     import Form from "[bzd]/vue/components/form/form.vue";
-    import { Frontend } from "[dashboard]/plugins/plugins.js";
+    import { Source, Visualization } from "[dashboard]/plugins/plugins.js";
 
 	export default {
         components: {
@@ -21,49 +25,74 @@
 		data: function () {
 			return {
                 value: {},
-                plugins: {}
+                pluginsSource: {},
+                pluginsVisualization: {}
 			}
 		},
         mounted() {
-            this.fetchPlugins();
+            this.fetchPlugins(Source).then((plugins) => { this.pluginsSource = plugins; }).catch(console.error);
+            this.fetchPlugins(Visualization).then((plugins) => { this.pluginsVisualization = plugins; }).catch(console.error);
         },
         computed: {
             formDescription() {
                 return [
 					{ type: "Input", name: "name", caption: "Name", placeholder: "Enter a name...", width: 0.5 },
-					{ type: "Dropdown", name: "type", caption: "Type", width: 0.5, list: this.fetchPlugins, html: true },
+					{ type: "Dropdown", name: "source.type", caption: "Type", width: 0.5, list: this.dropdownSourceList, html: true, onchange: (type) => {
+                        for (const [key, value] of Object.entries(this.metadataSource.defaultValue)) {
+                            this.$set(this.value, key, value);
+                        }
+                    }},
 				]
             },
-            metadata() {
-                return this.getMetadata(this.value.type);
+            formVisualizationDescription() {
+                return [
+					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownVisualizationList, html: true },
+				]
             },
-            formPluginDescription() {
-                return this.metadata["form"] || [];
+            metadataSource() {
+                return this.getMetadata(this.pluginsSource, this.value["source.type"]);
+            },
+            formPluginSourceDescription() {
+                return this.metadataSource["form"] || [];
+            },
+            metadataVisualization() {
+                return this.getMetadata(this.pluginsVisualization, this.value["visualization.type"]);
+            },
+            formPluginVisualizationDescription() {
+                return this.metadataVisualization["form"] || [];
+            },
+            dropdownSourceList() {
+                return this.dropdownPluginList(this.pluginsSource);
+            },
+            dropdownVisualizationList() {
+                return this.dropdownPluginList(this.pluginsVisualization);
             }
         },
         methods: {
-            getMetadata(type) {
-                return (type in this.plugins) ? this.plugins[type].methods.getMetadata() : {};
+            getMetadata(plugins, type) {
+                return (type in plugins) ? plugins[type].methods.getMetadata() : {};
             },
             async handleCreate() {
                 await this.$api.request("post", "/tile", { data: this.value });
             },
-            async fetchPlugins() {
+            async fetchPlugins(source) {
                 let plugins = {};
-                for (const [name, loader] of Object.entries(Frontend)) {
-                    this.$set(this.plugins, name, (await loader()).default);
+                for (const [name, description] of Object.entries(source)) {
+                    plugins[name] = (await description.frontend()).default;
                 }
-
-                const list = Object.keys(this.plugins).map((type) => {
-                    const metadata = this.getMetadata(type);
-                    return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(type)};
+                return plugins;
+            },
+            dropdownPluginList(plugins) {
+                const list = Object.keys(plugins).map((type) => {
+                    const metadata = this.getMetadata(plugins, type);
+                    return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(metadata.name || type)};
                 });
 
                 return list.reduce((result, data) => {
                     result[data.key] = data.html;
                     return result;
                 }, {});
-            }
+            } 
         }
 	}
 </script>

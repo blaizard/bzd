@@ -41,6 +41,7 @@
 		methods: {
 			async getTiles() {
 				this.tiles = await this.$api.request("get", "/tiles");
+				console.log(this.tiles);
 			}
 		}
 	}

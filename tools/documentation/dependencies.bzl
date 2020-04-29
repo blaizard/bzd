@@ -1,6 +1,6 @@
-load("//tools/documentation/bazel:dependencies.bzl", "load_documentation_bazel_dependencies")
-load("//tools/documentation/cc:dependencies.bzl", "load_documentation_cc_dependencies")
+load("//tools/documentation/bazel:dependencies.bzl", "documentation_bazel_load")
+load("//tools/documentation/cc:dependencies.bzl", "documentation_cc_load")
 
-def load_documentation_dependencies():
-    load_documentation_bazel_dependencies()
-    load_documentation_cc_dependencies()
+def documentation_load():
+    documentation_bazel_load()
+    documentation_cc_load()

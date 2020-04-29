@@ -25,7 +25,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//nodejs/vue/components:graph",
-    ]
+    ],
 )
 
 bzd_package(
@@ -52,3 +52,16 @@ container_image(
         ":package",
     ],
 )
+
+#container_push(
+#    name = "push",
+#    format = "Docker",
+#    image = ":dashboard",
+#    registry = "docker.blaizard.com:20000",
+#    repository = "/apps/dashboard",
+#    tag = "latest",
+#    tags = [
+#        "auto-publish",
+#        "docker",
+#    ],
+#)

@@ -21,6 +21,12 @@
 
 			.irgraph-plot-items {
 				.irgraph-plot-item {
+
+					opacity: 0.5;
+					&.irgraph-plot-item-selected {
+						opacity: 1;
+					}
+
 					@each $color in $irgraphColors {
 						$i: index($irgraphColors, $color);
 						&:nth-child(#{$i}) {

@@ -1,5 +1,8 @@
 <template>
 	<div>
+        <div v-if="isValid">Last build: {{ lastBuildDate }}</div>
+        <div v-if="isValid">Buid: {{ buildPerWeek }}/week</div>
+        <div v-if="isValid">Reliability: {{ buildReliability }}%</div>
         <Plot :config="plotConfig" :value="plotValue"></Plot>
         {{ JSON.stringify(metadata) }}
 	</div>
@@ -41,19 +44,35 @@
                         values: buildsReverse.map((build, index) => [index, (build.status == status) ? build.duration : 0])
                     };
                 });
+            },
+            lastBuildDate() {
+                const date = new Date(this.builds[0].timestamp);
+                return date;
+            },
+            isValid() {
+                return (this.builds.length > 0);
+            },
+            periodDurationMs() {
+                return this.builds[0].timestamp - this.builds[this.builds.length - 1].timestamp;
+            },
+            buildPerWeek() {
+                const nbWeeks = this.periodDurationMs / (7 * 24 * 60 * 60 * 1000);
+                return Math.round(this.builds.length / nbWeeks);
+            },
+            buildReliability() {
+                this.builds.filter(() => {});
+                const nbSuccessfullBuilds = this.builds.reduce((total, build) => {
+                    return total + ((build.status == "success") ? 1 : 0);
+                }, 0);
+                return nbSuccessfullBuilds / this.builds;
             }
         },
         methods: {
             getMetadata() {
                 return {
-                    name: "Jenkins",
-                    icon: "bzd-icon-jenkins",
+                    name: "Continuous Integration",
+                    icon: "bzd-icon-continuous-integration",
                     form: [
-                        { type: "Input", name: "jenkins.url", caption: "Jenkins URL", placeholder: "http://localhost:8080", width: 1 },
-                        { type: "Input", name: "jenkins.user", caption: "User", width: 0.5 },
-                        { type: "Input", name: "jenkins.token", caption: "Token", width: 0.5 },
-                        { type: "Input", name: "jenkins.build", caption: "Build name", width: 0.5 },
-                        { type: "Dropdown", name: "jenkins.branch", caption: "Branch", placeholder: "master", list: ["master"], edit: true, width: 0.5 },
                     ]
                 }
             }
@@ -64,7 +83,7 @@
 <style lang="scss">
 	@import "~[bzd]/icons.scss";
 
-    .bzd-icon-jenkins {
-		@include defineIcon("jenkins.svg");
+    .bzd-icon-continuous-integration {
+		@include defineIcon("continuous-integration.svg");
 	}
 </style>
