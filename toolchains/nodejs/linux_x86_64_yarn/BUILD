@@ -40,7 +40,7 @@ toolchain(
 )
 
 bzd_nodejs_test(
-    name = "nodejs",
+    name = "test",
     srcs = ["nodejs_test.js"],
     main = "nodejs_test.js",
 )
