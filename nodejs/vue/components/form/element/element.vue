@@ -201,8 +201,10 @@ export default {
 
 				if (!errorList.length) {
 					this.clearError();
-					(this.getOption("onchange", () => {}))(value);
 					this.$emit("input", value);
+					// Keep it at the end, it must be called once all the propagation of the value is done.
+					// This to give the opportunity to safely update the global value in this callback.
+					(this.getOption("onchange", () => {}))(value);
 				}
 				else {
 					this.setError(errorList);

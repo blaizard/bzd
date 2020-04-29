@@ -1,6 +1,6 @@
 <template>
 	<Element name="irgraph-plot" :value="series" :config="config" :selected="selected" v-slot:default="slotProps" v-resize="handleResize">
-		<svg ref="canvas" :viewBox="svgViewBox" :style="svgStyle" @mousemove.stop="handleMouseMove">
+		<svg ref="canvas" :viewBox="svgViewBox" :style="svgStyle" @mousemove.stop="handleMouseMove" @mouseleave.stop="handleMouseLeave">
 			<g class="irgraph-plot-labels-y" v-show="configProcessed.showAxisY">
 				<text class="irgraph-hide" ref="labelYReferenceChar">0</text>
 				<template v-for="item, y in labelYMap">
@@ -32,11 +32,12 @@
 				</line>
 			</g>
 			<!-- Print the points //-->
-			<g class="irgraph-plot-items" v-hover-children="selected">
-				<component v-for="serie, key in series"
-						class="irgraph-plot-item"
-						:key="key"
+			<g class="irgraph-plot-items"> <!-- v-hover-children="selected"> //-->
+				<component v-for="serie, index in series"
+						:class="getItemClass(index)"
+						:key="index"
 						:is="getSerieComponent(serie)"
+						:selected="(index == selected) ? selectedPoint : -1"
 						:serie="serie"
 						:bounding-box="plotBoundingBox">
 				</component>
@@ -83,6 +84,7 @@ export default {
 	data: function() {
 		return {
 			selected: -1,
+			selectedPoint: -1,
 			width: 0,
 			height: 0,
 			valuesMinX: 0,
@@ -142,7 +144,7 @@ export default {
 	watch: {
 		value: {
 			immediate: true,
-			handler(value) {
+			handler(/*value*/) {
 
 				if (DEBUG) console.time("plot render");
 
@@ -206,6 +208,10 @@ export default {
 				maxX: null,
 				minY: null,
 				maxY: null,
+				/**
+				 * Max entries to be displayed at a time per series
+				 */
+				maxEntries: 100,
 				/**
 					 * Format the X labels
 					 */
@@ -337,7 +343,7 @@ export default {
 				left: this.plotOffsetLeft,
 				bottom: this.height - this.plotOffsetBottom,
 				right: this.width - this.plotOffsetRight
-			}
+			};
 		},
 		/**
 			 * Pre-calculate ratio and offsets for x and y.
@@ -389,9 +395,8 @@ export default {
 					return serie;
 				}
 
-				// Display only a maximum number of entries to imprve performance
-				const maxEntries = 100;
-				const inc = Math.max(1, item.values.length / maxEntries);
+				// Display only a maximum number of entries to improve performance
+				const inc = Math.max(1, item.values.length / this.configProcessed.maxEntries);
 
 				// Re-sample and calculate the series
 				for (let i=0; i<item.values.length; i += inc) {
@@ -483,6 +488,12 @@ export default {
 		}
 	},
 	methods: {
+		getItemClass(index) {
+			return {
+				"irgraph-plot-item": true,
+				"irgraph-plot-item-selected": (this.selected == -1) ? true : (this.selected == index)
+			};
+		},
 		/**
 		 * Get the component associated with a serie, based on its type
 		 */
@@ -529,6 +540,9 @@ export default {
 		coordXToValue(x) {
 			return (x - this.valuesXOffset) / this.valuesXRatio;
 		},
+		coordYToValue(y) {
+			return (y - this.valuesYOffset) / this.valuesYRatio;
+		},
 		valueXToCoord(x) {
 			return x * this.valuesXRatio + this.valuesXOffset;
 		},
@@ -536,13 +550,25 @@ export default {
 			const rect = this.$refs.canvas.getBoundingClientRect();
 			const coords = (e.touches && e.touches.length) ? {x: e.touches[0].pageX - rect.left, y: e.touches[0].pageY - rect.top} : {x: e.pageX - rect.left, y: e.pageY - rect.top};
 			const valueX = this.coordXToValue(coords.x);
+			const valueY = this.coordYToValue(coords.y);
 
 			// Look for the closest match
 			const positions = this.valueSorted.map((array) => this.findClosestX(array.values, valueX));
-			const distances = positions.map((pos, index) => Math.abs(this.valueSorted[index].values[pos][0] - valueX));
+			const distances = positions.map((pos, index) => {
+				const distX = this.valueSorted[index].values[pos][0] - valueX;
+				const distY = this.valueSorted[index].values[pos][1] - valueY;
+				return distX * distX + distY * distY;
+			});
 			const index = distances.reduce((iMin, x, i, arr) => ((x < arr[iMin]) ? i : iMin), 0);
 
 			this.cursorXValue = this.valueSorted[index].values[positions[index]][0];
+
+			this.selected = index;
+			this.selectedPoint = positions[index];
+		},
+		handleMouseLeave() {
+			this.selected = -1;
+			this.selectedPoint = -1;
 		}
 	}
 };

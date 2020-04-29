@@ -8,7 +8,7 @@
 <script>
 	"use strict"
 
-    import { Frontend } from "[dashboard]/plugins/plugins.js";
+    import { Visualization, Source } from "[dashboard]/plugins/plugins.js";
 
 	export default {
         props: {
@@ -17,30 +17,43 @@
         },
 		data: function () {
 			return {
-                metadata: {}
+                metadata: {},
+                handleTimeout: null
 			}
 		},
         mounted() {
             this.fetch();
         },
+        beforeDestroy() {
+            if (this.handleTimeout) {
+                clearTimeout(this.handleTimeout);
+            }
+        },
         computed: {
             name() {
                 return this.description.name || "<no name>";
             },
-            type() {
-                return (this.description.type || "").toLowerCase();
+            visualizationType() {
+                return (this.description["visualization.type"] || "").toLowerCase();
+            },
+            sourceType() {
+                return (this.description["source.type"] || "").toLowerCase();
+            },
+            timeout() {
+                return Source[this.sourceType].timeout || 0;
             },
             component() {
-                return Frontend[this.type];
+                return (Visualization[this.visualizationType] || {}).frontend;
             }
         },
         methods: {
             async fetch() {
+                this.handleTimeout = null;
                 this.metadata = await this.$api.request("get", "/data", {
-                    type: this.type,
-                    uid: this.uid
+                    uid: this.uid,
+                    type: this.sourceType
                 });
-                console.log(this.metadata);
+                this.handleTimeout = setTimeout(this.fetch, this.timeout);
             }
         }
 	}

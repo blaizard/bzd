@@ -11,23 +11,24 @@
 </template>
 
 <script>
-    "use strict";
+"use strict";
 
-    export default {
-        props: {
-            serie: {type: Object, required: true},
-        },
-        computed: {
-            path() {
-                let path = "";
-				for (let i=0; i<this.serie.coords.length; ++i) {
-					const x = this.serie.coords[i];
-					const y = this.serie.coords[i];
+export default {
+	props: {
+		serie: {type: Object, required: true},
+		selected: {type: Number, required: true},
+	},
+	computed: {
+		path() {
+			let path = "";
+			for (let i=0; i<this.serie.coords.length; ++i) {
+				const x = this.serie.coords[i];
+				const y = this.serie.coords[i];
 
-					path += (i == 0) ? ("M " + x + " " + y) : (" L " + x + " " + y);
-				}
-                return path;
-            }
-        }
-    }
+				path += (i == 0) ? ("M " + x + " " + y) : (" L " + x + " " + y);
+			}
+			return path;
+		}
+	}
+};
 </script>

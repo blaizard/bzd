@@ -10,22 +10,22 @@
 </template>
 
 <script>
-    "use strict";
+"use strict";
 
-    export default {
-        props: {
-            serie: {type: Object, required: true},
-			boundingBox: {type: Object, required: true}
-        },
-        computed: {
-			barWidth() {
-				let minDiffX = this.boundingBox.right - this.boundingBox.left;
-				let prevX = this.serie.coords[0][0];
-				for (let i = 1; i<this.serie.coords.length; ++i) {
-					minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
-				}
-				return Math.max(minDiffX - 2, 1);
+export default {
+	props: {
+		serie: {type: Object, required: true},
+		boundingBox: {type: Object, required: true}
+	},
+	computed: {
+		barWidth() {
+			let minDiffX = this.boundingBox.right - this.boundingBox.left;
+			let prevX = this.serie.coords[0][0];
+			for (let i = 1; i<this.serie.coords.length; ++i) {
+				minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
 			}
-        }
-    }
+			return Math.max(minDiffX - 2, 1);
+		}
+	}
+};
 </script>

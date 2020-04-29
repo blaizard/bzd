@@ -9,7 +9,7 @@ import Web from "../../../nodejs/core/web.js";
 import KeyValueStoreDisk from "../../../nodejs/core/key_value_store/disk.js";
 import ExceptionFactory from "../../../nodejs/core/exception.js";
 import LogFactory from "../../../nodejs/core/log.js";
-import { Backend } from "../plugins/plugins.js";
+import { Source } from "../plugins/plugins.js";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -34,20 +34,24 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Register plugins
 
-	for (const type in Backend) {
+	for (const type in Source) {
 		Log.info("Register plugin '{}'", type);
-		const plugin = (await Backend[type]()).default;
+		const plugin = (await Source[type].backend()).default;
+		let options = {};
+		if ("timeout" in Source[type]) {
+			options.timeout = Source[type].timeout;
+		}
 		cache.register(type, async (uid) => {
 		
 			// Check that the UID exists and is of type jenkins
 			const data = await keyValueStore.get("tiles", uid, null);
 			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-			Exception.assert(data.type == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
+			Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
 	
 			Log.info("Plugin '{}' fetching for '{}'", type, uid);
 			return await plugin.fetch(data);
 
-		}, {});
+		}, options);
 	}
 
 	// Install the APIs

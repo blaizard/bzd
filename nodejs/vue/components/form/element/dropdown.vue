@@ -77,8 +77,6 @@ export default {
 			directValue: "",
 			// The list of values as they should be printed
 			list: [],
-			// List to be displayed, after the filter passed on it
-			filteredList: [],
 			// Flag set when the item is loading
 			loading: false,
 			// Timeout when the processList is called
@@ -104,14 +102,20 @@ export default {
 			}
 			return String(this.get() || "");
 		},
+		rawList() {
+			return this.getOption("list", []);
+		},
+		filteredList() {
+			return (this.filter) ? this.processFilter(this.directValue) : this.list;
+		},
 		displayList() {
 			return (this.max) ? this.filteredList.slice(0, this.max) : this.filteredList;
 		},
 		isListFct() {
-			return (typeof this.getOption("list", []) === "function");
+			return (typeof this.rawList === "function");
 		},
 		isListFctWithArg() {
-			return this.isFctWithArg(this.getOption("list"));
+			return this.isFctWithArg(this.rawList);
 		},
 		inputDescription() {
 			return {
@@ -140,7 +144,12 @@ export default {
 					this.processTimeout = setTimeout(() => this.processList(value), this.delay);
 				}
 			}
-		}
+		},
+		rawList: {
+			handler: async function() {
+				this.list = await this.fetchList(this.directValue);
+			}
+		},
 	},
 	methods: {
 
@@ -154,8 +163,9 @@ export default {
 		async processList(text) {
 			try {
 				this.processTimeout = null;
-				await this.fetchList(text);
-				this.filteredList = (this.filter) ? await this.processFilter(text) : this.list;
+				if (this.list.length == 0 || this.isListFctWithArg) {
+					this.list = await this.fetchList(text);
+				}
 			}
 			finally {
 				this.loading = false;
@@ -206,19 +216,14 @@ export default {
 		},
 
 		async fetchList(value) {
-			const listOrFct = this.getOption("list", []);
-
-			// Fetch multilpe times if the function takes at least 1 argument
-			if (this.list.length == 0 || this.isListFctWithArg) {
-				try {
-					const list = (this.isListFct) ? await listOrFct(value) : listOrFct;
-					this.list = this.createMultiValueList(list, this.html);
-				}
-				catch (e) {
-					console.error("Error while fetching data: " + e);
-					this.list = [];
-				}
+			try {
+				const list = (this.isListFct) ? await this.rawList(value) : this.rawList;
+				return this.createMultiValueList(list, this.html);
 			}
+			catch (e) {
+				console.error("Error while fetching data: " + e);
+			}
+			return [];
 		},
 
 		/**

@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
-def load_buildifier_dependencies():
+def buildifier_load():
     http_file(
         name = "buildifier",
         urls = ["https://github.com/bazelbuild/buildtools/releases/download/2.2.1/buildifier"],

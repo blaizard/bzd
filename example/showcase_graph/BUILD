@@ -13,7 +13,7 @@ bzd_nodejs_web(
         "vue": "",
     },
     deps = [
-        "//nodejs/vue/components:graph",
         "//nodejs/styles/default",
-    ]
+        "//nodejs/vue/components:graph",
+    ],
 )

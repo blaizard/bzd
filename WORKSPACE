@@ -1,5 +1,3 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 # Bazel 3rd party rules
 
 load("//tools/bazel.build/rules/third_party:dependencies.bzl", "bazel_rules_load")
@@ -24,18 +22,18 @@ toolchains_register()
 
 # Buildifier
 
-load("//tools/buildifier:dependencies.bzl", "load_buildifier_dependencies")
+load("//tools/buildifier:dependencies.bzl", "buildifier_load")
 
-load_buildifier_dependencies()
+buildifier_load()
 
 # Documentation
 
-load("//tools/documentation:dependencies.bzl", "load_documentation_dependencies")
+load("//tools/documentation:dependencies.bzl", "documentation_load")
 
-load_documentation_dependencies()
+documentation_load()
 
 # Sanitizer
 
-load("//tools/sanitizer:dependencies.bzl", "load_sanitizer_dependencies")
+load("//tools/sanitizer:dependencies.bzl", "sanitizer_load")
 
-load_sanitizer_dependencies()
+sanitizer_load()

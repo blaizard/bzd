@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def load_sanitizer_dependencies():
+def sanitizer_load():
     http_archive(
         name = "bazel-compilation-database",
         strip_prefix = "bazel-compilation-database-0.4.0",

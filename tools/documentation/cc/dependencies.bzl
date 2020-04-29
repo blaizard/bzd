@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def load_documentation_cc_dependencies():
+def documentation_cc_load():
     http_archive(
         name = "doxygen",
         build_file = "//tools/documentation/cc:doxygen.BUILD",
