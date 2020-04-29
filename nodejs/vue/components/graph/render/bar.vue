@@ -1,7 +1,7 @@
 <template>
 	<g>
-		<rect v-for="data in serie.coords"
-				class="rectangle"
+		<rect v-for="data, key in serie.coords"
+				:class="getPointClass(key)"
 				:x="data[0] - barWidth / 2"
 				:y="data[1]"
 				:width="barWidth"
@@ -15,7 +15,8 @@
 export default {
 	props: {
 		serie: {type: Object, required: true},
-		boundingBox: {type: Object, required: true}
+		boundingBox: {type: Object, required: true},
+		selected: {type: Number, required: true}
 	},
 	computed: {
 		barWidth() {
@@ -25,6 +26,14 @@ export default {
 				minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
 			}
 			return Math.max(minDiffX - 2, 1);
+		}
+	},
+	methods: {
+		getPointClass(index) {
+			return {
+				"rectangle": true,
+				"selected": (index == this.selected)
+			}
 		}
 	}
 };

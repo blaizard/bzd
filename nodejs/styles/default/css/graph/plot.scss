@@ -36,7 +36,7 @@
 								stroke-linecap: round;
 								cursor: pointer;
 
-								&:hover {
+								&.selected {
 									stroke-width: 12px;
 								}
 							}
@@ -48,6 +48,10 @@
 								stroke-width: 0;
 								stroke: $color;
 								fill: $color;
+
+								&.selected {
+									stroke-width: 2px;
+								}
 							}
 						}
 					}

@@ -1,12 +1,12 @@
 <template>
 	<g>
 		<path :d="path" class="path" fill="transparent" />
-		<line v-for="data in serie.coords"
+		<line v-for="data, index in serie.coords"
 				:x1="data[0]"
 				:y1="data[1]"
 				:x2="data[0]"
 				:y2="data[1]"
-				class="circle" />
+				:class="getPointClass(index)" />
 	</g>
 </template>
 
@@ -28,6 +28,14 @@ export default {
 				path += (i == 0) ? ("M " + x + " " + y) : (" L " + x + " " + y);
 			}
 			return path;
+		}
+	},
+	methods: {
+		getPointClass(index) {
+			return {
+				"circle": true,
+				"selected": (index == this.selected)
+			}
 		}
 	}
 };
