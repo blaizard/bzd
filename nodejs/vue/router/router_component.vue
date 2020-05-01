@@ -13,9 +13,10 @@ export default {
 		};
 	},
 	methods: {
-		componentSet(component, routerId) {
+		componentSet(component, routerId, props) {
 			this.component = component;
 			this.routerId = routerId;
+			Object.assign(this.$attrs, props);
 		}
 	}
 };

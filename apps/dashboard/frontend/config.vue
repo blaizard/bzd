@@ -1,5 +1,6 @@
 <template>
 	<div>
+        uid: {{ uid }}
         <h2>Config</h2>
         <Form :description="formDescription" v-model="value"></Form>
         <Form :description="formPluginSourceDescription" v-model="value"></Form>
@@ -8,7 +9,8 @@
         <Form :description="formPluginVisualizationDescription" v-model="value"></Form>
         <h3>Mapping</h3>
         {{ value }}
-        <button @click="handleCreate">Create</button>
+        <button v-if="isUpdate" @click="handleUpdate">Update</button>
+        <button v-else @click="handleCreate">Create</button>
     </div>
 </template>
 
@@ -22,6 +24,9 @@
         components: {
             Form
         },
+        props: {
+            uid: {type: String, mandatory: false, default: null}
+        },
 		data: function () {
 			return {
                 value: {},
@@ -32,8 +37,16 @@
         mounted() {
             this.fetchPlugins(Source).then((plugins) => { this.pluginsSource = plugins; }).catch(console.error);
             this.fetchPlugins(Visualization).then((plugins) => { this.pluginsVisualization = plugins; }).catch(console.error);
+
+            // Update specific uid if needed
+            if (this.isUpdate) {
+                this.fetchValue();
+            }
         },
         computed: {
+            isUpdate() {
+                return (this.uid != null);
+            },
             formDescription() {
                 return [
 					{ type: "Input", name: "name", caption: "Name", placeholder: "Enter a name...", width: 0.5 },
@@ -47,6 +60,7 @@
             formVisualizationDescription() {
                 return [
 					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownVisualizationList, html: true },
+					{ type: "Dropdown", name: "visualization.color", caption: "Color", width: 0.5, list: this.dropdownColorList, html: true },
 				]
             },
             metadataSource() {
@@ -66,14 +80,29 @@
             },
             dropdownVisualizationList() {
                 return this.dropdownPluginList(this.pluginsVisualization);
+            },
+            dropdownColorList() {
+                return {
+                    red: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-red\"></span> Red",
+                    blue: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-blue\"></span> Blue",
+                    orange: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-orange\"></span> Orange",
+                    yellow: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-yellow\"></span> Yellow",
+                    green: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-green\"></span> Green",
+                }
             }
         },
         methods: {
             getMetadata(plugins, type) {
                 return (type in plugins) ? plugins[type].methods.getMetadata() : {};
             },
+            async fetchValue() {
+                this.value = await this.$api.request("get", "/tile", { uid: this.uid });
+            },
             async handleCreate() {
                 await this.$api.request("post", "/tile", { data: this.value });
+            },
+            async handleUpdate() {
+                await this.$api.request("put", "/tile", { data: { uid: this.uid, value: this.value }});
             },
             async fetchPlugins(source) {
                 let plugins = {};
@@ -92,7 +121,16 @@
                     result[data.key] = data.html;
                     return result;
                 }, {});
-            } 
+            }
         }
 	}
 </script>
+
+<style lang="scss">
+    .bzd-dashboard-color-picker {
+        display: inline-block;
+        height: 1em;
+        width: 1em;
+        vertical-align: middle;
+    }
+</style>

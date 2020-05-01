@@ -33,23 +33,25 @@ class RouterManager {
 
 		options.routes.forEach((route) => {
 
-			const handler = (path) => {
+			const handler = (route, args, path) => {
 				if (route.component) {
-					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt));
+					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt), args);
 				}
 				if (route.handler) {
 					route.handler(path);
 				}
 			};
 
-			router.add(route.path, () => {
-				handler(route, "/");
+			router.add(route.path, (args) => {
+				handler(route, args, "/");
 			});
 
 			// To handle nested components
 			if (route.nested) {
 				router.add(route.path + "/{bzd.core.router.rest:.*}", (args) => {
-					handler(route, "/" + args["bzd.core.router.rest"]);
+					const rest = args["bzd.core.router.rest"];
+					delete args["bzd.core.router.rest"];
+					handler(route, args, "/" + rest);
 				});
 			}
 		});

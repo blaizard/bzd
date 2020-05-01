@@ -35,7 +35,7 @@ export default {
 			return {
 				"circle": true,
 				"selected": (index == this.selected)
-			}
+			};
 		}
 	}
 };

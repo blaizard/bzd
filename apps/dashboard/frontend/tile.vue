@@ -1,5 +1,5 @@
 <template>
-	<div class="bzd-dashboard-tile">
+	<div :class="tileClass" @click="handleClick">
         <component class="content" :is="component" :metadata="metadata"></component>
         <div class="name">{{ name }}</div>
 	</div>
@@ -44,6 +44,12 @@
             },
             component() {
                 return (Visualization[this.visualizationType] || {}).frontend;
+            },
+            tileClass() {
+                return {
+                    "bzd-dashboard-tile": true,
+                    ["bzd-dashboard-color-" + this.description["visualization.color"]]: true
+                }
             }
         },
         methods: {
@@ -54,7 +60,10 @@
                     type: this.sourceType
                 });
                 this.handleTimeout = setTimeout(this.fetch, this.timeout);
-            }
+            },
+			handleClick() {
+				this.$routerDispatch("/update/" + this.uid);
+			}
         }
 	}
 </script>

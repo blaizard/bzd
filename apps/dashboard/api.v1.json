@@ -1,5 +1,20 @@
 {
     "/tile": {
+        "get": {
+            "documentation": "Get a specific tile configuration",
+            "request": {
+                "type": "query"
+            },
+            "response": {
+                "type": "json"
+            }
+        },
+        "put": {
+            "documentation": "Update an existing tile",
+            "request": {
+                "type": "json"
+            }
+        },
         "post": {
             "documentation": "Create a new tile",
             "request": {

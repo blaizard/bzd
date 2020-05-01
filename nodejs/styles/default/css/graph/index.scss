@@ -1,6 +1,8 @@
+@import "../colors.scss";
+
 $irgraphBgColor: transparent;
-$irgraphColors: #ff6347, #3498db, #f39c12, #2ecc71, #f4d03f, #707b7c, #3498db, #ba55d3;
-$irgraphDefaultColor: #ff6347;
+$irgraphColors: $bzdGraphColorRed, $bzdGraphColorBlue, $bzdGraphColorOrange, $bzdGraphColorGreen, $bzdGraphColorYellow, $bzdGraphColorGray, $bzdGraphColorViolet, $bzdGraphColorPink, $bzdGraphColorCyan, $bzdGraphColorBrown, $bzdGraphColorBlack, $bzdGraphColorWhite;
+$irgraphDefaultColor: $bzdGraphColorRed;
 
 %selected {
 	opacity: 0.5;
