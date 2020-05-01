@@ -74,5 +74,15 @@ pipeline
 				}
 			}
 		}
+		/**
+		 * Auto publish some artifacts
+		 */
+		stage("Publish")
+		{
+			steps
+			{
+				sh "bazel run apps/dashboard:push"
+			}
+		}
 	}
 }

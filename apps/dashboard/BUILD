@@ -61,7 +61,6 @@ container_push(
     repository = "apps/dashboard",
     tag = "latest",
     tags = [
-        "auto-publish",
         "docker",
     ],
 )
