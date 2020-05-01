@@ -12,7 +12,7 @@
                         { type: "Input", name: "jenkins.user", caption: "User", width: 0.5 },
                         { type: "Input", name: "jenkins.token", caption: "Token", width: 0.5 },
                         { type: "Input", name: "jenkins.build", caption: "Build name", width: 0.5 },
-                        { type: "Dropdown", name: "jenkins.branch", caption: "Branch", placeholder: "master", list: ["master"], edit: true, width: 0.5 },
+                        { type: "Dropdown", name: "jenkins.branch", caption: "Branch", placeholder: "master", list: ["master"], editable: true, width: 0.5 },
                     ],
                     defaultValue: {
                         "visualization.type": "continuous-integration",

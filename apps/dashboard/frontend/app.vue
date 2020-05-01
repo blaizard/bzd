@@ -49,6 +49,7 @@
 				routes: [
                     { path: '/', component: () => import("[frontend]/tiles.vue") },
                     { path: '/new', component: () => import("[frontend]/config.vue") },
+                    { path: '/update/{uid}', component: () => import("[frontend]/config.vue") },
 				],
 				fallback: { component: () => import("[frontend]/404.vue") }
 			});
@@ -67,4 +68,26 @@
 
 	$bzdIconNames: edit, add, check;
 	@import "~[bzd]/icons.scss";
+
+    @import "~[bzd-style]/css/colors.scss";
+    .bzd-dashboard-color-red {
+        background-color: $bzdGraphColorRed;
+        color: $bzdGraphColorWhite;
+    }
+    .bzd-dashboard-color-blue {
+        background-color: $bzdGraphColorBlue;
+        color: $bzdGraphColorWhite;
+    }
+    .bzd-dashboard-color-orange {
+        background-color: $bzdGraphColorOrange;
+        color: $bzdGraphColorWhite;
+    }
+    .bzd-dashboard-color-yellow {
+        background-color: $bzdGraphColorYellow;
+        color: $bzdGraphColorBlack;
+    }
+    .bzd-dashboard-color-green {
+        background-color: $bzdGraphColorGreen;
+        color: $bzdGraphColorWhite;
+    }
 </style>

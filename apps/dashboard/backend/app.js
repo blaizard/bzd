@@ -37,6 +37,19 @@ Commander.version("1.0.0", "-v, --version")
 	for (const type in Source) {
 		Log.info("Register plugin '{}'", type);
 		const plugin = (await Source[type].backend()).default;
+
+		// Install plugin specific cache entries
+		(plugin.cache || []).forEach((entry) => {
+			Exception.assert(entry.collection, "Cache collection must be set.");
+			Exception.assert(typeof entry.fetch === "function", "Cache fetch must be a function.");
+			let options = {};
+			if ("timeout" in entry) {
+				options.timeout = entry.timeout;
+			}
+			cache.register(entry.collection, entry.fetch, options);
+		});
+
+		// Install plugin
 		let options = {};
 		if ("timeout" in Source[type]) {
 			options.timeout = Source[type].timeout;
@@ -49,7 +62,7 @@ Commander.version("1.0.0", "-v, --version")
 			Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
 	
 			Log.info("Plugin '{}' fetching for '{}'", type, uid);
-			return await plugin.fetch(data);
+			return await plugin.fetch(data, cache);
 
 		}, options);
 	}
@@ -61,8 +74,14 @@ Commander.version("1.0.0", "-v, --version")
 	api.handle(web, "get", "/tiles", async () => {
 		return await keyValueStore.list("tiles");
 	});
+	api.handle(web, "get", "/tile", async (inputs) => {
+		return await keyValueStore.get("tiles", inputs.uid);
+	});
 	api.handle(web, "post", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", null, inputs);
+	});
+	api.handle(web, "put", "/tile", async (inputs) => {
+		await keyValueStore.set("tiles", inputs.uid, inputs.value);
 	});
 	api.handle(web, "get", "/data", async (inputs) => {
 		return await cache.get(inputs.type, inputs.uid);

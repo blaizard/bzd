@@ -33,7 +33,7 @@ export default {
 			return {
 				"rectangle": true,
 				"selected": (index == this.selected)
-			}
+			};
 		}
 	}
 };
