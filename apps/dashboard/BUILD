@@ -57,7 +57,7 @@ container_push(
     name = "push",
     format = "Docker",
     image = ":dashboard",
-    registry = "docker.blaizard.com:20000",
+    registry = "docker.blaizard.com",
     repository = "apps/dashboard",
     tag = "latest",
     tags = [
