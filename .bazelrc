@@ -34,7 +34,7 @@ build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
-build:esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs"
+build:esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs,-docker"
 build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
 # Sanitizers

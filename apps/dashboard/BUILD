@@ -1,4 +1,4 @@
-load("@io_bazel_rules_docker//container:container.bzl", "container_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
 load("//tools/bazel.build/rules:package.bzl", "bzd_package")
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
@@ -53,15 +53,15 @@ container_image(
     ],
 )
 
-#container_push(
-#    name = "push",
-#    format = "Docker",
-#    image = ":dashboard",
-#    registry = "docker.blaizard.com:20000",
-#    repository = "/apps/dashboard",
-#    tag = "latest",
-#    tags = [
-#        "auto-publish",
-#        "docker",
-#    ],
-#)
+container_push(
+    name = "push",
+    format = "Docker",
+    image = ":dashboard",
+    registry = "docker.blaizard.com:20000",
+    repository = "apps/dashboard",
+    tag = "latest",
+    tags = [
+        "auto-publish",
+        "docker",
+    ],
+)
