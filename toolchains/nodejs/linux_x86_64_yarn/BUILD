@@ -10,6 +10,13 @@ config_setting(
 )
 
 sh_binary_wrapper(
+    name = "node",
+    binary = "@node//:node",
+    command = "{binary} --experimental-json-modules $@",
+    visibility = ["//visibility:public"],
+)
+
+sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
     command = select({
@@ -17,7 +24,7 @@ sh_binary_wrapper(
         "//conditions:default": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@",
     }),
     data = [
-        "@node",
+        ":node",
     ],
     visibility = ["//visibility:public"],
 )
@@ -25,7 +32,7 @@ sh_binary_wrapper(
 nodejs_toolchain(
     name = "nodejs_toolchain",
     manager = ":yarn",
-    node = "@node//:node",
+    node = ":node",
 )
 
 toolchain(
