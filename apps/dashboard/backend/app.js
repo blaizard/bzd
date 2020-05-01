@@ -3,6 +3,7 @@
 import Commander from "commander";
 
 import API from "../../../nodejs/core/api.js";
+import APIv1 from "../api.v1.json";
 import Cache from "../../../nodejs/core/cache.js";
 import FileSystem from "../../../nodejs/core/filesystem.js";
 import Web from "../../../nodejs/core/web.js";
@@ -69,8 +70,7 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Install the APIs
 
-	const apiV1Description = JSON.parse(await FileSystem.readFile("./apps/dashboard/api.v1.json"));
-	let api = new API(apiV1Description);
+	let api = new API(APIv1);
 	api.handle(web, "get", "/tiles", async () => {
 		return await keyValueStore.list("tiles");
 	});
