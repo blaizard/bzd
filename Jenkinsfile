@@ -36,8 +36,6 @@ pipeline
 				sh "bazel --version"
 				sh "g++ --version"
 				sh "python --version"
-				sh "ping 192.168.1.200"
-				sh "ping docker.blaizard.com"
 			}
 		}
 		/**
