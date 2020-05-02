@@ -35,7 +35,6 @@ pipeline
 			{
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "bazel --version"
-				sh "g++ --version"
 				sh "python --version"
 			}
 		}
@@ -46,13 +45,6 @@ pipeline
 		{
 			parallel
 			{
-				stage("local")
-				{
-					steps
-					{
-						sh "bazel test ..." 
-					}
-				}
 				stage("linux_x86_64_clang")
 				{
 					steps
