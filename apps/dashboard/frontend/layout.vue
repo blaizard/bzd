@@ -75,12 +75,13 @@
 
 <style lang="scss">
     // ---- Configuration
+    @import "~[bzd-style]/css/colors.scss";
 
     // Global
 
     // Header
     $headerColor: #fff;
-    $headerBgColor: #75b9e7;
+    $headerBgColor: $bzdGraphColorBlue;
     $headerFontSize: 20px;
     $headerHeight: 44px;
     $headerPadding: ($headerHeight - $headerFontSize) / 2;
