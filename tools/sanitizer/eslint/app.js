@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 
-let ls = spawn("./node_modules/.bin/eslint", process.argv.slice(2));
+let ls = spawn(process.execPath, ["./node_modules/.bin/eslint", ...process.argv.slice(2)]);
 
 ls.stdout.on("data", (data) => {
     process.stdout.write(data.toString());
