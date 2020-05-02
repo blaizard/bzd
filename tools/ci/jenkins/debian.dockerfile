@@ -1,5 +1,8 @@
 FROM ubuntu:latest
 
+# Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Load dependencies
 # Note:
 # - python - required to run python files, eventhough a python toolchain is installed,
