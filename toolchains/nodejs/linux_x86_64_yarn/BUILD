@@ -24,7 +24,7 @@ sh_binary_wrapper(
         "//conditions:default": "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@",
     }),
     data = [
-        "@node//:node",
+        "@node",
     ],
     visibility = ["//visibility:public"],
 )
