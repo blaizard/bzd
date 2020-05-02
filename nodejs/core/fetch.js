@@ -57,14 +57,11 @@ export default class Fetch {
 		}
 
 		let request = null;
-		if (process.env.BZD_RULE === "nodejs") {
-			request = (await import(/* webpackMode: "eager" */"./impl/fetch/node.http.js")).default;
-		}
-		else if (process.env.BZD_RULE === "nodejs_web") {
+		if (process.env.BZD_RULE === "nodejs_web") {
 			request = (await import(/* webpackMode: "eager" */"./impl/fetch/window.fetch.js")).default;
 		}
 		else {
-			Exception.unreachable("Unsupported environment: '{}'", process.env.BZD_RULE);
+			request = (await import(/* webpackMode: "eager" */"./impl/fetch/node.http.js")).default;
 		}
 
 		const data = await request(url, {
