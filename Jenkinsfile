@@ -21,7 +21,7 @@ pipeline
 	{
 		dockerfile
 		{
-			additionalBuildArgs "--pull" // --no-cache
+			additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
 			args "-v $CACHE_PATH:/cache"
 			args "--network host"

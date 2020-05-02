@@ -5,10 +5,10 @@ FROM ubuntu:latest
 # - python - required to run python files, eventhough a python toolchain is installed,
 #            to run a script using this python toolchain, a startup python script needs
 #            to be executed to discover binaries.
-# - gnupg2 - needed add the key to apt.
+# - gpgv - needed add the key to apt.
 # - libxml2-dev - needed for LLVM (need to be removed).
 # - openjdk-11-jdk, unzip, zip are used by bazel
-RUN apt-get update && apt-get install -y git sudo build-essential g++ unzip zip libc6-dev curl gnupg2 python libxml2-dev openjdk-11-jdk
+RUN apt-get update && apt-get install -y git sudo build-essential g++ unzip zip libc6-dev curl gpgv python libxml2-dev openjdk-11-jdk
 
 # Install Bazel
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
