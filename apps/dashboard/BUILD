@@ -42,6 +42,7 @@ container_image(
     base = "@docker_nodejs//image",
     cmd = [
         "node",
+        "--experimental-json-modules",
         "/bzd/bin/backend/apps/dashboard/backend/app.js",
         "--static",
         "/bzd/bin/frontend",
