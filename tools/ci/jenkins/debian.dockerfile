@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:bionic
 
 # Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
 ENV DEBIAN_FRONTEND=noninteractive
