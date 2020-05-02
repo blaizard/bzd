@@ -8,6 +8,8 @@ bzd_nodejs_binary(
     args = [
         "--static",
         "/tmp/frontend",
+        "--data",
+        "/tmp/db",
     ],
     main = "app.js",
     visibility = [

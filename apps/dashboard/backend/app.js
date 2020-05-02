@@ -1,6 +1,7 @@
 "use strict";
 
 import Commander from "commander";
+import Path from "path";
 
 import API from "../../../nodejs/core/api.js";
 import APIv1 from "../api.v1.json";
@@ -17,18 +18,24 @@ const Log = LogFactory("backend");
 
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
-	.option("-p, --port <number>", "Port to be used to serve the application.", 8080, parseInt)
+	.option("-p, --port <number>", "Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.", 8080, parseInt)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
+	.option("-d, --data <path>", "Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.", "/bzd/data")
 	.parse(process.argv);
 
 (async () => {
 
+	// Read arguments
+	const PORT = process.env.BZD_PORT || Commander.port;
+	const PATH_STATIC = Commander.static;
+	const PATH_DATA = process.env.BZD_PATH_DATA || Commander.data;
+
 	// Set-up the web server
-	let web = new Web(Commander.port, {
-		rootDir: Commander.static
+	let web = new Web(PORT, {
+		rootDir: PATH_STATIC
 	});
 
-	let keyValueStore = new KeyValueStoreDisk("/tmp/test/db");
+	let keyValueStore = new KeyValueStoreDisk(Path.join(PATH_DATA, "db"));
 	await keyValueStore.waitReady();
 
 	let cache = new Cache();
