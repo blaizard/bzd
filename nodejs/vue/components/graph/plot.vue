@@ -192,9 +192,6 @@ export default {
 		colorsList() {
 			return Object.values(this.presetColors);
 		},
-		labelXMaxNbChars() {
-			return Math.max(this.configProcessed.formatX(this.valuesMinX).length, this.configProcessed.formatX(this.valuesMaxX).length);
-		},
 		labelYMaxNbChars() {
 			return Math.max(this.configProcessed.formatY(this.valuesMinY).length, this.configProcessed.formatY(this.valuesMaxY).length);
 		},
@@ -208,7 +205,6 @@ export default {
 			 * SVG style
 			 */
 		svgStyle() {
-			//	return { width: "100%", height: "100%", overflow: "hidden" }
 			return { width: this.width + "px", height: this.height + "px" };
 		},
 		configProcessed() {
@@ -224,7 +220,7 @@ export default {
 				/**
 					 * Format the X labels
 					 */
-				formatX: (x) => Number(x).toFixed(this.labelXMaxResolution),
+				formatX: (x) => String(Number(x)),
 				/**
 					 * Format the Y labels
 					 */
@@ -399,8 +395,6 @@ export default {
 					path: ""
 				};
 
-				console.log(index, item.color, this.selectColorValue(index, item.color));
-
 				// Prevent non-sense
 				if (!this.valuesValid) {
 					return serie;
@@ -422,14 +416,11 @@ export default {
 		},
 		// X Label
 		labelX() {
-			let maxNbTicks = Math.floor(this.plotWidth / this.labelXSpacing);
-			const tickValueOffset = (this.plotMaxX - this.plotMinX) / maxNbTicks;
 			let list = [];
 			let value = this.plotMinX;
-			while (maxNbTicks >= 0) {
+			while (value < this.plotMaxX) {
 				list.push(value);
-				value += tickValueOffset;
-				--maxNbTicks;
+				value += this.labelXSpacingValue;
 			}
 			return list;
 		},
@@ -456,10 +447,15 @@ export default {
 			return map;
 		},
 		/**
-			 * Spacing beteen X labels
+			 * Spacing between X labels
 			 */
-		labelXSpacing() {
-			return this.labelXMaxNbChars * this.labelXCharSize.width;
+		labelXSpacingValue() {
+			const defaultSpacingValue = 5 * this.labelXCharSize.width / this.valuesXRatio;
+			const log = Math.log10(defaultSpacingValue)
+			const minValue = Math.pow(10, Math.floor(log)) * 5;
+
+			// Ensure that the labelXMaxResolution
+			return (defaultSpacingValue > minValue) ? minValue * 2 : minValue;
 		},
 		// Y Label
 		labelY() {

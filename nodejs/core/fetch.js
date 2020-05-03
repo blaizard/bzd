@@ -39,6 +39,9 @@ export default class Fetch {
 					headers["Authorization"] = "Basic " + base64;
 				}
 				break;
+			case "token":
+				headers["Authorization"] = "token " + auth.token;
+				break;
 			default:
 				Exception.unreachable("Unsupported authentication type '{}'", auth.type);
 			}
