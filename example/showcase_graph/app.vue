@@ -1,6 +1,9 @@
 <template>
 	<div>
 		<button @click="updateValues">New values</button>
+        <input type="checkbox" id="animate" v-model="animate">
+        <label for="animate">animate</label>
+
 		<h1>Simple</h1>
 		<Plot class="showcase-plot" :value="values"></Plot>
 
@@ -29,14 +32,21 @@
 		data: function () {
 			return {
                 values: [],
+                counter: 0,
                 showAxisX: false,
                 showAxisY: false,
                 showCursor: false,
-                showLegend: false
+                showLegend: false,
+                animate: false
 			}
 		},
 		mounted() {
 			this.updateValues();
+            setInterval(() => {
+                if (this.animate) {
+                    this.updateValues();
+                }
+            }, 50);
 		},
         computed: {
             plotConfigNoAxis() {
@@ -48,20 +58,27 @@
                     paddingLeft: 5,
                     paddingRight: 5,
                     paddingTop: 5,
-                    paddingBottom: 5                    
+                    paddingBottom: 5
                 }
             },
         },
 		methods: {
+            generateSin() {
+                return [...Array(100).keys()].map((index) => [index + this.counter, Math.sin((index + this.counter) / 10)]);
+            },
+            generateRandom() {
+                return [...Array(100).keys()].map((index) => [index + this.counter, Math.random() * 2 - 1]);
+            },
 			updateValues() {
+                ++this.counter;
 				this.values = [
                     {
                         caption: "Serie 1",
-                        values: [...Array(100).keys()].map((index) => [index, Math.sin(index / 10)]) //[...Array(100).keys()].map((index) => [index, Math.random()])
+                        values: this.generateSin()
                     },
                     {
                         caption: "Serie 2",
-                        values: [...Array(100).keys()].map((index) => [index, Math.random() * 2 - 1])
+                        values: this.generateRandom()
                     }
                 ];
 			}

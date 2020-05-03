@@ -20,7 +20,6 @@ $font-size: 16;
 	 * Style & layout for the content and legend
 	 */
 	> * {
-
 		padding: 0;
 		margin: 0;
 		height: 100%;
@@ -55,8 +54,8 @@ $font-size: 16;
 				.irgraph-legend-item-color {
 					display: inline-block;
 					width: 1em;
-					height: 1em;
-					vertical-align: text-bottom;
+					height: 3px;
+					vertical-align: middle;
 					background-color: var(--bzd-graph-color);
 				}
 
