@@ -41,7 +41,8 @@ export default {
                 return (result.builds || []).map((item) => {
                     const status = _getStatus(item);
                     return {
-                        duration: item.duration * 1000,
+                        // Duration is not correct as it includes accumulated duration from teh jobs eventhough they run in parallel
+                        duration: (Date.parse(item.finished_at) - Date.parse(item.started_at)) || item.duration * 1000,
                         timestamp: Date.parse(item.started_at) || Date.now(),
                         status: status,
                         //link: baseUrl + "/" + item.id
