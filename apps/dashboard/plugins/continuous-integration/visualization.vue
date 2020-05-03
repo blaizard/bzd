@@ -6,16 +6,27 @@
                 <span v-else-if="lastBuildStatus == 'failure'" class="bzd-icon-status-failure"></span>
                 <span v-else-if="lastBuildStatus == 'in-progress'" class="bzd-icon-status-in-progress bzd-icon-spin"></span>
                 <span v-else-if="lastBuildStatus == 'abort'" class="bzd-icon-status-abort"></span>
-                {{ lastBuildStatus }}
+                {{ lastBuildStatusDisplay }}
             </div>
             <div v-if="isValid">
                 <i class="bzd-icon-clock"></i>
                 <span>{{ lastBuildDate[0] }}<small>{{ lastBuildDate[1] }} ago</small></span>
             </div>
         </div>
-        <div v-if="isValid">Buids: {{ buildPerWeek }}<small>/week</small></div>
-        <div v-if="isValid">Reliability: {{ buildReliability }}<small>%</small></div>
-        <div v-if="isValid">Speed: {{ lastBuildDuration[0] }}<small>{{ lastBuildDuration[1] }}</small></div>
+        <div class="metrics">
+            <div v-if="isValid">
+                <div class="name">Buids</div>
+                <div class="value">{{ buildPerWeek }}<small>/week</small></div>
+            </div>
+            <div v-if="isValid">
+                <div class="name">Reliability</div>
+                <div class="value">{{ buildReliability }}<small>%</small></div>
+            </div>
+            <div v-if="isValid">
+                <div class="name">Speed</div>
+                <div class="value">{{ lastBuildDuration[0] }}<small>{{ lastBuildDuration[1] }}</small></div>
+            </div>
+        </div>
         <Plot class="builds" :config="plotConfig" :value="plotValue"></Plot>
 	</div>
 </template>
@@ -76,6 +87,18 @@
             },
             lastBuildStatus() {
                 return this.builds[0].status;
+            },
+            lastBuildStatusDisplay() {
+                switch (this.lastBuildStatus) {
+                case "success":
+                    return "Success";
+                case "failure":
+                    return "Failure";
+                case "in-progress":
+                    return "In Progress";
+                case "abort":
+                    return "Aborted";
+                }
             },
             isValid() {
                 return (this.builds.length > 0);
@@ -140,9 +163,25 @@
 
 <style lang="scss" scoped>
     .status-header {
+        height: 20%;
+
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
+    }
+
+    .metrics {
+        height: 50%;
+
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-around;
+        align-items: center;
+        text-align: center;
+
+        .name {
+            font-weight: bold;
+        }
     }
 
     .builds {
