@@ -64,6 +64,7 @@
                 return [{
                     caption: "builds",
                     type: "bar",
+                    color: "white",
                     values: last30Builds.reverse().map((build, index) => [index, build.duration])
                 }];
             },

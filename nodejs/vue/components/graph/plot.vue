@@ -35,6 +35,7 @@
 			<g class="irgraph-plot-items"> <!-- v-hover-children="selected"> //-->
 				<component v-for="serie, index in series"
 						:class="getItemClass(index)"
+						:style="getItemStyle(index, serie)"
 						:key="index"
 						:is="getSerieComponent(serie)"
 						:selected="(index == selected) ? selectedPoint : -1"
@@ -66,6 +67,8 @@ import HoverChildren from "./directive/hover-children.js";
 import Resize from "../../directives/resize.js";
 import RenderLine from "./render/line.vue";
 import RenderBar from "./render/bar.vue";
+
+import Colors from "[bzd-style]/css/colors.scss";
 
 const DEBUG = true;
 
@@ -183,6 +186,12 @@ export default {
 		}
 	},
 	computed: {
+		presetColors() {
+			return Colors;
+		},
+		colorsList() {
+			return Object.values(this.presetColors);
+		},
 		labelXMaxNbChars() {
 			return Math.max(this.configProcessed.formatX(this.valuesMinX).length, this.configProcessed.formatX(this.valuesMaxX).length);
 		},
@@ -380,15 +389,17 @@ export default {
 			 * The points to be processed
 			 */
 		series() {
-			const series = this.valueSorted.map((item) => {
+			const series = this.valueSorted.map((item, index) => {
 
 				let serie = {
 					caption: item.caption || "",
-					color: item.color || "red",
+					color: this.selectColorValue(index, item.color),
 					type: item.type || "line",
 					coords: [],
 					path: ""
 				};
+
+				console.log(index, item.color, this.selectColorValue(index, item.color));
 
 				// Prevent non-sense
 				if (!this.valuesValid) {
@@ -488,11 +499,23 @@ export default {
 		}
 	},
 	methods: {
+		selectColorValue(index, color) {
+			if (color in this.presetColors) {
+				return this.presetColors[color];
+			}
+			if (color) {
+				return color;
+			}
+			return this.colorsList[index % this.colorsList.length];
+		},
 		getItemClass(index) {
 			return {
 				"irgraph-plot-item": true,
 				"irgraph-plot-item-selected": (this.selected == -1) ? true : (this.selected == index)
 			};
+		},
+		getItemStyle(index, serie) {
+			return "--bzd-graph-color: " + serie.color + ";";
 		},
 		/**
 		 * Get the component associated with a serie, based on its type
