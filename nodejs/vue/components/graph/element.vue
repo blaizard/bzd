@@ -7,7 +7,8 @@
 			<div class="irgraph-legend-items" v-hover-children="selectedLegend">
 				<div v-for="item, index in value"
 						:key="index"
-						:class="getLegendItemClass(index)">
+						:class="getLegendItemClass(index)"
+						:style="getLegendItemStyle(index, item)">
 					<span class="irgraph-legend-item-color">&nbsp;</span> {{ item.caption }}
 				</div>
 			</div>
@@ -71,6 +72,9 @@ export default {
 				"irgraph-legend-item": true,
 				"irgraph-selected": (this.indexSelected === index)
 			};
+		},
+		getLegendItemStyle(index, item) {
+			return "--bzd-graph-color: " + item.color + ";";
 		}
 	}
 };

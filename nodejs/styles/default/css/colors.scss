@@ -11,3 +11,19 @@ $bzdGraphColorCyan: #009696;
 $bzdGraphColorBrown: #7a5c58;
 $bzdGraphColorBlack: #333333;
 $bzdGraphColorWhite: #ffffff;
+
+// For webpack
+:export {
+    red: $bzdGraphColorRed;
+    blue: $bzdGraphColorBlue;
+    orange: $bzdGraphColorOrange;
+    green: $bzdGraphColorGreen;
+    yellow: $bzdGraphColorYellow;
+    gray: $bzdGraphColorGray;
+    violet: $bzdGraphColorViolet;
+    pink: $bzdGraphColorPink;
+    cyan: $bzdGraphColorCyan;
+    brown: $bzdGraphColorBrown;
+    black: $bzdGraphColorBlack;
+    white: $bzdGraphColorWhite;
+}

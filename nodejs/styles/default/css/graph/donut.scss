@@ -6,23 +6,16 @@
 			height: 100%;
 
 			border-radius: 50%;
-			background-color: $irgraphBgColor;
+			background-color: transparent;
 			overflow: hidden;
 
 			transform: scale(1.5);
 
 			circle {
 				fill: none;
+				stroke: var(--bzd-graph-color);
 				stroke-width: 15%;
-				stroke: $irgraphDefaultColor;
 				stroke-linecap: butt;
-
-				@each $color in $irgraphColors {
-					$i: index($irgraphColors, $color);
-					&:nth-child(#{$i}) {
-						stroke: $color;
-					}
-				}
 
 				&:hover,
 				&.irgraph-selected {

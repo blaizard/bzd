@@ -27,32 +27,27 @@
 						opacity: 1;
 					}
 
-					@each $color in $irgraphColors {
-						$i: index($irgraphColors, $color);
-						&:nth-child(#{$i}) {
-							.circle {
-								stroke: $color;
-								stroke-width: 8px;
-								stroke-linecap: round;
-								cursor: pointer;
+					.circle {
+						stroke: var(--bzd-graph-color);
+						stroke-width: 8px;
+						stroke-linecap: round;
+						cursor: pointer;
 
-								&.selected {
-									stroke-width: 12px;
-								}
-							}
-							.path {
-								stroke: $color;
-								stroke-width: 2px;
-							}
-							.rectangle {
-								stroke-width: 0;
-								stroke: $color;
-								fill: $color;
+						&.selected {
+							stroke-width: 12px;
+						}
+					}
+					.path {
+						stroke: var(--bzd-graph-color);
+						stroke-width: 2px;
+					}
+					.rectangle {
+						stroke: var(--bzd-graph-color);
+						fill: var(--bzd-graph-color);
+						stroke-width: 0;
 
-								&.selected {
-									stroke-width: 2px;
-								}
-							}
+						&.selected {
+							stroke-width: 2px;
 						}
 					}
 				}
