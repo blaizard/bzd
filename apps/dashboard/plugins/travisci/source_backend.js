@@ -9,10 +9,7 @@ function _getStatus(item) {
     if (item.state == "failed" || item.state == "errored") {
         return "failure";
     }
-    if (item.state == "ABORTED") {
-        return "abort";
-    }
-    if (item.state == null) {
+    if (item.state == "created" || item.state == "started") {
         return "in-progress";
     }
     return "unknown";
@@ -25,7 +22,7 @@ export default {
             fetch: async (repositorySlug, token) => {
 
                 // Build the URL
-                const url = "https://api.travis-ci.com/repo/" + encodeURIComponent(repositorySlug) + "/builds";
+                const url = "https://api.travis-ci.com/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
                 let options = {
                     expect: "json",
                     headers: {
@@ -45,7 +42,7 @@ export default {
                     const status = _getStatus(item);
                     return {
                         duration: item.duration * 1000,
-                        timestamp: Date.parse(item.started_at),
+                        timestamp: Date.parse(item.started_at) || Date.now(),
                         status: status,
                         //link: baseUrl + "/" + item.id
                     }

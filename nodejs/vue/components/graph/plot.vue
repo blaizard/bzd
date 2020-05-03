@@ -451,7 +451,7 @@ export default {
 			 */
 		labelXSpacingValue() {
 			const defaultSpacingValue = 5 * this.labelXCharSize.width / this.valuesXRatio;
-			const log = Math.log10(defaultSpacingValue)
+			const log = Math.log10(defaultSpacingValue);
 			const minValue = Math.pow(10, Math.floor(log)) * 5;
 
 			// Ensure that the labelXMaxResolution

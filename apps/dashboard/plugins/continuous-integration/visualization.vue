@@ -83,7 +83,15 @@
                 return this.getDuration(this.timestamp - this.builds[0].timestamp);
             },
             lastBuildDuration() {
-                return this.getDuration(this.builds[0].duration);
+                // Look for the last completed build
+                let index = 0;
+                for (const i in this.builds) {
+                    if (this.builds[i].status == "success" || this.builds[i].status == "failure") {
+                        index = i;
+                        break;
+                    }
+                }
+                return this.getDuration(this.builds[index].duration);
             },
             lastBuildStatus() {
                 return this.builds[0].status;
