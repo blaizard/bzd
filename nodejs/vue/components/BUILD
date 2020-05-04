@@ -22,5 +22,6 @@ bzd_nodejs_library(
     deps = [
         "//nodejs:vue",
         "//nodejs/vue/directives:resize",
+        "//nodejs/vue/directives:tooltip",
     ],
 )
