@@ -106,7 +106,7 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 				height: 0
 			};
 		},
-		getAttribute(name) {
+		getAttribute(/*name*/) {
 			return null;
 		}
 	};
