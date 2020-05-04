@@ -40,7 +40,7 @@ function getOrCreateTooltip() {
 /**
  * Hide the curren tooltip
  */
-function tooltipHide() {
+export function tooltipHide() {
 	let tooltipElt = getOrCreateTooltip();
 	tooltipElt.style.display = "none";
 
@@ -66,11 +66,16 @@ function setWatcher(elt) {
 	// Clear current watcher first
 	clearWatcher();
 
-	watcherInstance = setInterval(() => {
-		if (elt.offsetParent === null) {
+	const hideFct = () => {
+		if (!window.getComputedStyle(elt).display) {
 			tooltipHide();
 		}
-	}, watcherPollingPeriodMs);
+		watcherInstance = setTimeout(() => {
+			hideFct();
+		}, watcherPollingPeriodMs);
+	};
+
+	hideFct();
 }
 
 /**
@@ -86,18 +91,37 @@ function clearWatcher() {
 /**
  * Create and show the tooltip
  */
-function tooltip(e) {
+function tooltipFromEvent(e) {
 	e.stopPropagation();
+	tooltip(e.target);
+}
 
-	const elt = e.target;
-	const message = elt.getAttribute("data-irtooltip");
+export function tooltipFromCoords(x, y, message, initialPosition = null) {
+	const eltMock = {
+		getBoundingClientRect() {
+			return {
+				top: y,
+				left: x,
+				width: 0,
+				height: 0
+			};
+		},
+		getAttribute(name) {
+			return null;
+		}
+	};
+	tooltip(eltMock, message, initialPosition);
+}
+
+export function tooltip(elt, message = null, initialPosition = null) {
+	message = message || elt.getAttribute("data-irtooltip");
 	if (!message) return;
 
-	const initalPosition = elt.getAttribute("data-irtooltip-position") || defaultPosition;
+	const initalPosition = initialPosition || elt.getAttribute("data-irtooltip-position") || defaultPosition;
 
 	// Get the tooltip and set the message
 	let tooltipElt = getOrCreateTooltip();
-	tooltipElt.firstChild.innerText = message;
+	tooltipElt.firstChild.innerHTML = message;
 
 	// Get element coordinates and update the coordinates
 	const coordElt = elt.getBoundingClientRect();
@@ -165,7 +189,7 @@ export default function (el, binding) {
 		position: defaultPosition
 	}, binding.value);
 
-	el.addEventListener("mouseenter", tooltip, false);
+	el.addEventListener("mouseenter", tooltipFromEvent, false);
 	el.addEventListener("mouseleave", tooltipHide, false);
 
 	// Set the attributes

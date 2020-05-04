@@ -2,10 +2,7 @@
 	<div>
         <div class="status-header">
             <div v-if="isValid">
-                <span v-if="lastBuildStatus == 'success'" class="bzd-icon-status-success"></span>
-                <span v-else-if="lastBuildStatus == 'failure'" class="bzd-icon-status-failure"></span>
-                <span v-else-if="lastBuildStatus == 'in-progress'" class="bzd-icon-status-in-progress bzd-icon-spin"></span>
-                <span v-else-if="lastBuildStatus == 'abort'" class="bzd-icon-status-abort"></span>
+                <i :class="statusMap[lastBuildStatus].icon"></i>
                 {{ lastBuildStatusDisplay }}
             </div>
             <div v-if="isValid">
@@ -27,7 +24,7 @@
                 <div class="value">{{ lastBuildDuration[0] }}<small>{{ lastBuildDuration[1] }}</small></div>
             </div>
         </div>
-        <Plot class="builds" :config="plotConfig" :value="plotValue"></Plot>
+        <Plot v-if="isValid" class="builds" :config="plotConfig" :value="plotValue"></Plot>
 	</div>
 </template>
 
@@ -41,7 +38,8 @@
             Plot
         },
         props: {
-            metadata: {type: Object, mandatory: true}
+            metadata: {type: Object, mandatory: true},
+            color: {type: String, mandatory: true},
         },
         mounted() {
             this.instanceInterval = setInterval(() => { this.timestamp = Date.now(); }, 1000);
@@ -55,7 +53,41 @@
                 instanceInterval: null
 			}
 		},
+        watch: {
+            lastBuildStatus: {
+                immediate: true,
+                handler(value) {
+                    if (this.isValid) {
+                        this.$emit("color", this.statusMap[value].color);
+                    }
+                }
+            },
+        },
         computed: {
+            statusMap() {
+                return {
+                    "success": {
+                        color: "green",
+                        display: "Success",
+                        icon: "bzd-icon-status-success"
+                    },
+                    "failure": {
+                        color: "red",
+                        display: "Failure",
+                        icon: "bzd-icon-status-failure"
+                    },
+                    "in-progress": {
+                        color: "orange",
+                        display: "In Progress",
+                        icon: "bzd-icon-status-in-progress bzd-icon-spin"
+                    },
+                    "abort": {
+                        color: "gray",
+                        display: "Aborted",
+                        icon: "bzd-icon-status-abort"
+                    }
+                };
+            },
             plotConfig() {
                 return {
                     showLegend: false,
@@ -71,12 +103,20 @@
                 return this.metadata.builds || [];
             },
             plotValue() {
-                let last30Builds = this.builds.slice(0, 30);
+                let last30Builds = this.builds.slice(0, 30).reverse();
                 return [{
                     caption: "builds",
                     type: "bar",
-                    color: "white",
-                    values: last30Builds.reverse().map((build, index) => [index, build.duration])
+                    color: this.color,
+                    values: last30Builds.map((build, index) => [index, build.duration]),
+                    tooltip: (x, y) => {
+                        const duration = this.getDuration(y);
+                        const build = last30Builds[x];
+                        const date = this.getDuration(this.timestamp - build.timestamp);
+                        return this.statusMap[build.status].display + "<br/>"
+                                + date[0] + "<small>" + date[1] + " ago</small><br/>"
+                                + "Speed: " + duration[0] + "<small>" + duration[1] + "</small>";
+                    }
                 }];
             },
             lastBuildDate() {
@@ -94,19 +134,10 @@
                 return this.getDuration(this.builds[index].duration);
             },
             lastBuildStatus() {
-                return this.builds[0].status;
+                return (this.isValid) ? this.builds[0].status : null;
             },
             lastBuildStatusDisplay() {
-                switch (this.lastBuildStatus) {
-                case "success":
-                    return "Success";
-                case "failure":
-                    return "Failure";
-                case "in-progress":
-                    return "In Progress";
-                case "abort":
-                    return "Aborted";
-                }
+                return this.statusMap[this.lastBuildStatus].display;
             },
             isValid() {
                 return (this.builds.length > 0);

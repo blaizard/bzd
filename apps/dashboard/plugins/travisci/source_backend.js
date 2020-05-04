@@ -36,8 +36,6 @@ export default {
 
                 const result = await Fetch.get(url, options);
 
-                console.log(result);
-
                 return (result.builds || []).map((item) => {
                     const status = _getStatus(item);
                     return {

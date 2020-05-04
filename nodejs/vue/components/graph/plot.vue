@@ -65,6 +65,7 @@ import Element from "./element.vue";
 import PlotText from "./utils/text.vue";
 import HoverChildren from "./directive/hover-children.js";
 import Resize from "../../directives/resize.js";
+import { tooltip } from "../../directives/tooltip.js";
 import RenderLine from "./render/line.vue";
 import RenderBar from "./render/bar.vue";
 
@@ -387,12 +388,21 @@ export default {
 		series() {
 			const series = this.valueSorted.map((item, index) => {
 
+				const tooltipFormater = item.tooltip || ((x, y) => ("Value: " + y));
+
 				let serie = {
 					caption: item.caption || "",
 					color: this.selectColorValue(index, item.color),
 					type: item.type || "line",
 					coords: [],
-					path: ""
+					values: [],
+					path: "",
+					tooltip: (elt) => {
+						if (index == this.selected) {
+							const value = serie.values[this.selectedPoint];
+							tooltip(elt, tooltipFormater(value[0], value[1]));
+						}
+					}
 				};
 
 				// Prevent non-sense
@@ -405,9 +415,12 @@ export default {
 
 				// Re-sample and calculate the series
 				for (let i=0; i<item.values.length; i += inc) {
-					const x = this.valuesXOffset + item.values[~~(i + .5)][0] * this.valuesXRatio;
-					const y = this.valuesYOffset + item.values[~~(i + .5)][1] * this.valuesYRatio;
+					const valueX = item.values[~~(i + .5)][0];
+					const valueY = item.values[~~(i + .5)][1];
+					const x = this.valuesXOffset + valueX * this.valuesXRatio;
+					const y = this.valuesYOffset + valueY * this.valuesYRatio;
 					serie.coords.push([x, y]);
+					serie.values.push([valueX, valueY]);
 				}
 				return serie;
 			});

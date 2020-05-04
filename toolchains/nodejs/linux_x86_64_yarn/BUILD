@@ -12,7 +12,10 @@ config_setting(
 sh_binary_wrapper(
     name = "node",
     binary = "@node//:node",
-    command = "{binary} --experimental-json-modules $@",
+    command = select({
+        "//tools/bazel.build/config:dev": "export NODE_ENV=development && {binary} --experimental-json-modules $@",
+        "//conditions:default": "export NODE_ENV=production && {binary} --experimental-json-modules $@"
+    }),
     visibility = ["//visibility:public"],
 )
 

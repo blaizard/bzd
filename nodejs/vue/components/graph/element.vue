@@ -1,5 +1,5 @@
 <template>
-	<div :class="elementClass">
+	<div :class="elementClass" @mouseleave="tooltipHide">
 		<div :class="name + '-content irgraph-content'">
 			<slot v-bind:selected="selectedLegend"></slot>
 		</div>
@@ -20,6 +20,7 @@
 "use strict";
 
 import HoverChildren from "./directive/hover-children.js";
+import { tooltipHide } from "../../directives/tooltip.js";
 
 export default {
 	props: {
@@ -75,6 +76,9 @@ export default {
 		},
 		getLegendItemStyle(index, item) {
 			return "--bzd-graph-color: " + item.color + ";";
+		},
+		tooltipHide() {
+			tooltipHide();
 		}
 	}
 };
