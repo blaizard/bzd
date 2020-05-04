@@ -74,7 +74,7 @@
                 return (Visualization[this.visualizationType] || {}).frontend;
             },
             tileStyle() {
-                return "background-color: " + Colors[this.colorBackground] + "; color: " + Colors[this.colorForeground] + ";";
+                return "background-color: " + Colors[this.colorBackground] + "; color: " + Colors[this.colorForeground] + "; border-color: " + Colors[this.colorForeground] + ";";
             }
         },
         methods: {
@@ -108,7 +108,8 @@
         height: 300px;
         margin: 10px;
 
-        border: 1px solid #ddd;
+        border-width: 1px;
+        border-style: solid;
         position: relative;
 
         .name {

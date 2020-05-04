@@ -14,7 +14,7 @@ sh_binary_wrapper(
     binary = "@node//:node",
     command = select({
         "//tools/bazel.build/config:dev": "export NODE_ENV=development && {binary} --experimental-json-modules $@",
-        "//conditions:default": "export NODE_ENV=production && {binary} --experimental-json-modules $@"
+        "//conditions:default": "export NODE_ENV=production && {binary} --experimental-json-modules $@",
     }),
     visibility = ["//visibility:public"],
 )

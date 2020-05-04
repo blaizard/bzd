@@ -90,6 +90,7 @@
             },
             plotConfig() {
                 return {
+                    minY: 0,
                     showLegend: false,
                     showAxisX: false,
                     showAxisY: false,

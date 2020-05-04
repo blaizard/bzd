@@ -47,10 +47,10 @@ container_image(
         "--static",
         "/bzd/bin/frontend",
     ],
-    env = {
-        "NODE_ENV": "production", 
-    },
     directory = "/bzd/bin",
+    env = {
+        "NODE_ENV": "production",
+    },
     tags = ["nodejs"],
     tars = [
         ":package",
