@@ -1,7 +1,13 @@
 <template>
-	<div :class="tileClass" @click="handleClick">
-        <component class="content" :is="component" :metadata="metadata"></component>
-        <div class="name">{{ name }}</div>
+	<div class="bzd-dashboard-tile" :style="tileStyle" @click="handleClick">
+        <component class="content"
+                :is="component"
+                :metadata="metadata"
+                :color="colorForeground"
+                :background-color="colorBackground"
+                @color="handleColor">
+        </component>
+        <div class="name"><i :class="icon"></i> {{ name }}</div>
 	</div>
 </template>
 
@@ -9,6 +15,7 @@
 	"use strict"
 
     import { Visualization, Source } from "[dashboard]/plugins/plugins.js";
+    import Colors from "[bzd-style]/css/colors.scss";
 
 	export default {
         props: {
@@ -18,11 +25,14 @@
 		data: function () {
 			return {
                 metadata: {},
-                handleTimeout: null
+                handleTimeout: null,
+                color: null,
+                icon: null
 			}
 		},
         mounted() {
             this.fetch();
+            this.fetchIcon();
         },
         beforeDestroy() {
             if (this.handleTimeout) {
@@ -30,14 +40,32 @@
             }
         },
         computed: {
+            colorAuto() {
+                const index = Array.from(this.uid).reduce((acc, c) => acc + c.charCodeAt(0));
+                const colorList = Object.keys(Colors);
+                return colorList[index % colorList.length];
+            },
+            colorBackground() {
+                if (this.description["visualization.color"] == "auto") {
+                    return this.color || this.colorAuto;
+                }
+                return this.description["visualization.color"];
+            },
+            colorForeground() {
+                return {
+                    yellow: "black",
+                    white: "black",
+                    pink: "black"
+                }[this.colorBackground] || "white";
+            },
             name() {
                 return this.description.name || "<no name>";
             },
             visualizationType() {
-                return (this.description["visualization.type"] || "").toLowerCase();
+                return (this.description["visualization.type"] || "");
             },
             sourceType() {
-                return (this.description["source.type"] || "").toLowerCase();
+                return (this.description["source.type"] || "");
             },
             timeout() {
                 return Source[this.sourceType].timeout || 0;
@@ -45,11 +73,8 @@
             component() {
                 return (Visualization[this.visualizationType] || {}).frontend;
             },
-            tileClass() {
-                return {
-                    "bzd-dashboard-tile": true,
-                    ["bzd-dashboard-color-" + this.description["visualization.color"]]: true
-                }
+            tileStyle() {
+                return "background-color: " + Colors[this.colorBackground] + "; color: " + Colors[this.colorForeground] + ";";
             }
         },
         methods: {
@@ -61,9 +86,16 @@
                 });
                 this.handleTimeout = setTimeout(this.fetch, this.timeout);
             },
+            async fetchIcon() {
+                const frontend = (await Source[this.sourceType].frontend()).default;
+                this.icon = frontend.methods.getMetadata().icon;
+            },
 			handleClick() {
 				this.$routerDispatch("/update/" + this.uid);
-			}
+			},
+            handleColor(color) {
+                this.color = color;
+            }
         }
 	}
 </script>

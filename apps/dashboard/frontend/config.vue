@@ -19,6 +19,7 @@
 
     import Form from "[bzd]/vue/components/form/form.vue";
     import { Source, Visualization } from "[dashboard]/plugins/plugins.js";
+    import Colors from "[bzd-style]/css/colors.scss";
 
 	export default {
         components: {
@@ -82,13 +83,14 @@
                 return this.dropdownPluginList(this.pluginsVisualization);
             },
             dropdownColorList() {
-                return {
-                    red: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-red\"></span> Red",
-                    blue: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-blue\"></span> Blue",
-                    orange: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-orange\"></span> Orange",
-                    yellow: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-yellow\"></span> Yellow",
-                    green: "<span class=\"bzd-dashboard-color-picker bzd-dashboard-color-green\"></span> Green",
-                }
+                return Object.keys(Colors).map((name) => {
+                    return [name, "<span class=\"bzd-dashboard-color-picker\" style=\"background-color: " + Colors[name] + "; border-color: " + Colors.black + ";\"></span> " + name];
+                }).reduce((acc, value) => {
+                    acc[value[0]] = value[1];
+                    return acc;
+                }, {
+                    auto: "Auto"
+                });
             }
         },
         methods: {
@@ -132,5 +134,7 @@
         height: 1em;
         width: 1em;
         vertical-align: middle;
+        border-width: 1px;
+        border-style: solid;
     }
 </style>

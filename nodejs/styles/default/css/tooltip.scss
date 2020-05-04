@@ -1,14 +1,15 @@
+@import "~[bzd-style]/css/colors.scss";
+
 .irtooltip {
 	z-index: 99999;
 
 	.irtooltip-text {
 		position: relative;
 
-		background-color: #444;
-		color: #fff;
+		background-color: $bzdGraphColorBlack;
+		color: $bzdGraphColorWhite;
 		font-weight: bold;
 		padding: 5px 10px;
-		border: 1px solid #fff;
 
 		&:after {
 			position: absolute;
@@ -26,8 +27,8 @@
 		margin-left: 12px;
 		&:after {
 			top: calc(50% - 10px);
-			left: -21px;
-			border-color: transparent #444 transparent transparent;
+			left: -20px;
+			border-color: transparent $bzdGraphColorBlack transparent transparent;
 		}
 	}
 }
@@ -36,9 +37,9 @@
 	.irtooltip-text {
 		margin-top: 12px;
 		&:after {
-			top: -21px;
+			top: -20px;
 			left: calc(50% - 10px);
-			border-color: transparent transparent #444 transparent;
+			border-color: transparent transparent $bzdGraphColorBlack transparent;
 		}
 	}
 }
@@ -48,8 +49,8 @@
 		margin-left: -12px;
 		&:after {
 			top: calc(50% - 10px);
-			right: -21px;
-			border-color: transparent transparent transparent #444;
+			right: -20px;
+			border-color: transparent transparent transparent $bzdGraphColorBlack;
 		}
 	}
 }
@@ -58,9 +59,9 @@
 	.irtooltip-text {
 		margin-top: -12px;
 		&:after {
-			bottom: -21px;
+			bottom: -20px;
 			left: calc(50% - 10px);
-			border-color: #444 transparent transparent transparent;
+			border-color: $bzdGraphColorBlack transparent transparent transparent;
 		}
 	}
 }
