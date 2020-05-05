@@ -69,7 +69,7 @@
             formSourceDescription() {
                 return [
 					{ type: "Dropdown", name: "source.type", caption: "Type", width: 0.5, list: this.dropdownSourceList, html: true, onchange: (type) => {
-                        for (const [key, value] of Object.entries(this.metadataSource.defaultValue)) {
+                        for (const [key, value] of Object.entries(this.metadataSource.defaultValue || {})) {
                             this.$set(this.value, key, value);
                         }
                     }},
