@@ -54,11 +54,14 @@
 			}
 		},
         watch: {
-            lastBuildStatus: {
+            lastBuild: {
                 immediate: true,
-                handler(value) {
+                handler() {
                     if (this.isValid) {
-                        this.$emit("color", this.statusMap[value].color);
+                        this.$emit("color", this.statusMap[this.lastBuildStatus].color);
+                        if (this.lastBuild.link) {
+                            this.$emit("link", this.lastBuild.link);
+                        }
                     }
                 }
             },
@@ -134,8 +137,11 @@
                 }
                 return this.getDuration(this.builds[index].duration);
             },
+            lastBuild() {
+                return (this.isValid) ? this.builds[0] : null;
+            },
             lastBuildStatus() {
-                return (this.isValid) ? this.builds[0].status : null;
+                return (this.isValid) ? this.lastBuild.status : null;
             },
             lastBuildStatusDisplay() {
                 return this.statusMap[this.lastBuildStatus].display;
@@ -144,8 +150,10 @@
                 return (this.builds.length > 0);
             },
             buildPerWeek() {
-                const buildsLastWeek = this.getLastBuilds(7);
-                return buildsLastWeek.length;
+                const buildsLast2Weeks = this.getLastBuilds(14);
+                const nbBuilds = buildsLast2Weeks.length;
+                const duration = buildsLast2Weeks[0].timestamp - buildsLast2Weeks[nbBuilds - 1].timestamp;
+                return Math.round(buildsLast2Weeks.length / (duration / (7 * 24 * 60 * 60 * 1000)));
             },
             /**
              * Look at the success rate over the last 30 days.

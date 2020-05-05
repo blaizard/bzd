@@ -1,11 +1,13 @@
 <template>
-	<div class="bzd-dashboard-tile" :style="tileStyle" @click="handleClick">
+	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!ready">
         <component class="content"
                 :is="component"
+                :description="description"
                 :metadata="metadata"
                 :color="colorForeground"
                 :background-color="colorBackground"
-                @color="handleColor">
+                @color="handleColor"
+                @link="handleLink">
         </component>
         <div class="name"><i :class="icon"></i> {{ name }}</div>
 	</div>
@@ -16,22 +18,32 @@
 
     import { Visualization, Source } from "[dashboard]/plugins/plugins.js";
     import Colors from "[bzd-style]/css/colors.scss";
+	import DirectiveLoading from "[bzd]/vue/directives/loading.js"
 
 	export default {
         props: {
             description: {type: Object, mandatory: true},
-            uid: {type: String, mandatory: true}
+            uid: {type: String, mandatory: true},
+			edit: {type: Boolean, mandatory: false, default: false},
+        },
+        directives: {
+            "loading": DirectiveLoading
         },
 		data: function () {
 			return {
                 metadata: {},
                 handleTimeout: null,
+                ready: true,
                 color: null,
-                icon: null
+                icon: null,
+                link: null
 			}
 		},
         mounted() {
-            this.fetch();
+            if (this.sourceType) {
+                this.ready = false;
+                this.fetch();
+            }
             this.fetchIcon();
         },
         beforeDestroy() {
@@ -41,15 +53,15 @@
         },
         computed: {
             colorAuto() {
-                const index = Array.from(this.uid).reduce((acc, c) => acc + c.charCodeAt(0));
+                const index = Array.from(this.uid).reduce((acc, c) => acc + parseInt(c.charCodeAt(0)), 0);
                 const colorList = Object.keys(Colors);
                 return colorList[index % colorList.length];
             },
             colorBackground() {
-                if (this.description["visualization.color"] == "auto") {
+                if (this.visualizationColor == "auto") {
                     return this.color || this.colorAuto;
                 }
-                return this.description["visualization.color"];
+                return this.visualizationColor;
             },
             colorForeground() {
                 return {
@@ -59,13 +71,16 @@
                 }[this.colorBackground] || "white";
             },
             name() {
-                return this.description.name || "<no name>";
+                return this.description.name || this.sourceType || this.visualizationType;
+            },
+            visualizationColor() {
+                return this.description["visualization.color"] || "auto";
             },
             visualizationType() {
-                return (this.description["visualization.type"] || "");
+                return this.description["visualization.type"] || null;
             },
             sourceType() {
-                return (this.description["source.type"] || "");
+                return this.description["source.type"] || null;
             },
             timeout() {
                 return Source[this.sourceType].timeout || 0;
@@ -73,8 +88,18 @@
             component() {
                 return (Visualization[this.visualizationType] || {}).frontend;
             },
+            tileClass() {
+                return {
+                    "bzd-dashboard-tile": true,
+                    "edit": this.edit,
+                    "clickable": Boolean(this.link) || this.edit
+                }
+            },
             tileStyle() {
-                return "background-color: " + Colors[this.colorBackground] + "; color: " + Colors[this.colorForeground] + "; border-color: " + Colors[this.colorForeground] + ";";
+                return "background-color: " + Colors[this.colorBackground]
+                        + "; color: " + Colors[this.colorForeground]
+                        + "; border-color: " + Colors[this.colorForeground]
+                        + "; --bzd-loading-color:" + Colors[this.colorForeground] + ";";
             }
         },
         methods: {
@@ -84,26 +109,43 @@
                     uid: this.uid,
                     type: this.sourceType
                 });
+                this.ready = true;
                 this.handleTimeout = setTimeout(this.fetch, this.timeout);
             },
             async fetchIcon() {
-                const frontend = (await Source[this.sourceType].frontend()).default;
+                const plugin = (this.sourceType) ? Source[this.sourceType] : Visualization[this.visualizationType];
+                const frontend = (await plugin.frontend()).default;
                 this.icon = frontend.methods.getMetadata().icon;
             },
 			handleClick() {
-				this.$routerDispatch("/update/" + this.uid);
+                if (this.edit) {
+				    this.$routerDispatch("/update/" + this.uid);
+                }
+                else if (this.link) {
+                    window.open(this.link);
+                }
 			},
             handleColor(color) {
                 this.color = color;
+            },
+            handleLink(link) {
+                this.link = link;
             }
         }
 	}
 </script>
 
 <style lang="scss" scoped>
+    @import "~[bzd-style]/css/clickable.scss";
+
     $bzdPadding: 10px;
 
     .bzd-dashboard-tile {
+
+        &.clickable {
+            @extend %bzd-clickable;
+        }
+
         width: 300px;
         height: 300px;
         margin: 10px;
@@ -111,6 +153,11 @@
         border-width: 1px;
         border-style: solid;
         position: relative;
+
+		&.edit {
+			border-style: dashed;
+			border-width: 2px;
+		}
 
         .name {
             position: absolute;

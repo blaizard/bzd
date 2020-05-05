@@ -3,6 +3,7 @@
 import Jenkins from "./jenkins/plugins.js"
 import TravisCI from "./travisci/plugins.js"
 import ContinuousIntegration from "./continuous-integration/plugins.js"
+import Link from "./link/plugins.js"
 
 export const Source = {
     "jenkins": Jenkins.source,
@@ -10,5 +11,6 @@ export const Source = {
 }
 
 export const Visualization = {
-    "continuous-integration": ContinuousIntegration.visualization
+    "continuous-integration": ContinuousIntegration.visualization,
+    "link": Link.visualization
 }

@@ -95,6 +95,11 @@ export default class Web {
 		if (this.config.rootDir) {
 			this.addStaticRoute(this.config.rootDir);
 			this.addRoute("get", "/", (req, res) => {
+				// Do not cache the index.html
+				// this is usefull when the application updates.
+				res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+				res.header("Expires", "-1");
+				res.header("Pragma", "no-cache");
 				res.sendFile(Path.resolve(this.config.rootDir, "index.html"));
 			});
 		}

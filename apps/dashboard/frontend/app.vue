@@ -1,6 +1,6 @@
 <template>
 	<Layout>
-		<template #header>Dashboard</template>
+		<template #header><RouterLink link="/">Dashboard</RouterLink></template>
 		<template #actions>
 			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
 			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
@@ -14,12 +14,7 @@
 			</MenuEntry>
 		</template>
 		<template #content>
-			<span v-tooltip="{'text': 'Hello world'}">Content</span>
-			<RouterComponent ref="view" :edit="edit" another="yes"></RouterComponent>
-			<RouterLink link="/">dashboard</RouterLink>
-		</template>
-		<template #footer>
-			Footer <button>Test</button>
+			<RouterComponent ref="view" :edit="edit"></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -56,7 +51,7 @@
 		},
 		methods: {
 			handleEdit() {
-				this.edit = true;
+				this.edit = !this.edit;
 			},
 		}
 	}
@@ -65,6 +60,7 @@
 <style lang="scss">
 	@import "~[bzd-style]/css/base.scss";
 	@import "~[bzd-style]/css/tooltip.scss";
+	@import "~[bzd-style]/css/loading.scss";
 
 	$bzdIconNames: edit, add, check;
 	@import "~[bzd]/icons.scss";

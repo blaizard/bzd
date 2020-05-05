@@ -134,6 +134,10 @@
             font-size: $headerFontSize;
             line-height: $headerHeight;
 
+            a {
+                color: $headerColor !important;
+            }
+
             .bzd-layout-header-menu-trigger {
                 @extend %bzd-clickable;
 
