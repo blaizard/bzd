@@ -25,6 +25,7 @@ bzd_nodejs_web(
         "//nodejs/vue:api",
         "//nodejs/vue/components:form",
         "//nodejs/vue/directives:tooltip",
+        "//nodejs/vue/directives:loading",
         "//nodejs/vue/router",
     ],
 )

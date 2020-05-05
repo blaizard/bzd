@@ -32,3 +32,28 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
 )
+
+bzd_nodejs_library(
+    name = "mask",
+    srcs = [
+        "mask.js",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
+    name = "loading",
+    srcs = [
+        "loading.js",
+    ],
+    deps = [
+        ":mask",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)

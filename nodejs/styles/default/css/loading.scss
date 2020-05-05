@@ -1,0 +1,30 @@
+@import "~[bzd-style]/css/colors.scss";
+
+.bzd-loading {
+    background-color: rgba($bzdGraphColorWhite, 0.5);
+    z-index: 999;
+    overflow: hidden;
+
+    @keyframes bzd-loading-animation {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 100%;
+        }
+    }
+
+    &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        background-color: var(--bzd-loading-color, $bzdGraphColorBlack);
+        animation-name: bzd-loading-animation;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        content: ' ';
+    }
+}

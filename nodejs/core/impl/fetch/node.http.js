@@ -44,8 +44,6 @@ export default async function request(url, options) {
 				return reject(new Exception("Request to '{}' responded with: {} {}", url, response.statusCode, response.statusMessage));
 			}
 
-			console.log("HELLO");
-
 			response.setEncoding("utf8");
 			let body = "";
 			response.on("data", (chunk) => {

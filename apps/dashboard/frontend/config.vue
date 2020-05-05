@@ -1,14 +1,16 @@
 <template>
-	<div>
-        uid: {{ uid }}
+	<div v-loading="!ready">
         <h2>Config</h2>
         <Form :description="formDescription" v-model="value"></Form>
-        <Form :description="formPluginSourceDescription" v-model="value"></Form>
-        <h3>Visualization</h3>
+
         <Form :description="formVisualizationDescription" v-model="value"></Form>
-        <Form :description="formPluginVisualizationDescription" v-model="value"></Form>
-        <h3>Mapping</h3>
-        {{ value }}
+
+        <template v-if="isSources">
+            <h3>Source(s)</h3>
+            <Form :description="formSourceDescription" v-model="value"></Form>
+            <Form :description="formPluginSourceDescription" v-model="value"></Form>
+        </template>
+
         <button v-if="isUpdate" @click="handleUpdate">Update</button>
         <button v-else @click="handleCreate">Create</button>
     </div>
@@ -20,19 +22,24 @@
     import Form from "[bzd]/vue/components/form/form.vue";
     import { Source, Visualization } from "[dashboard]/plugins/plugins.js";
     import Colors from "[bzd-style]/css/colors.scss";
+	import DirectiveLoading from "[bzd]/vue/directives/loading.js"
 
 	export default {
         components: {
             Form
+        },
+        directives: {
+            "loading": DirectiveLoading
         },
         props: {
             uid: {type: String, mandatory: false, default: null}
         },
 		data: function () {
 			return {
+                ready: true,
                 value: {},
-                pluginsSource: {},
-                pluginsVisualization: {}
+                pluginsVisualization: {},
+                pluginsSource: {}
 			}
 		},
         mounted() {
@@ -41,6 +48,7 @@
 
             // Update specific uid if needed
             if (this.isUpdate) {
+                this.ready = false;
                 this.fetchValue();
             }
         },
@@ -48,9 +56,18 @@
             isUpdate() {
                 return (this.uid != null);
             },
+            isSources() {
+                return Object.keys(this.dropdownSourceList).length > 0;
+            },
             formDescription() {
                 return [
 					{ type: "Input", name: "name", caption: "Name", placeholder: "Enter a name...", width: 0.5 },
+                    { type: "Dropdown", name: "visualization.color", caption: "Color", width: 0.5, list: this.dropdownColorList, html: true },
+
+				]
+            },
+            formSourceDescription() {
+                return [
 					{ type: "Dropdown", name: "source.type", caption: "Type", width: 0.5, list: this.dropdownSourceList, html: true, onchange: (type) => {
                         for (const [key, value] of Object.entries(this.metadataSource.defaultValue)) {
                             this.$set(this.value, key, value);
@@ -60,9 +77,8 @@
             },
             formVisualizationDescription() {
                 return [
-					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownVisualizationList, html: true },
-					{ type: "Dropdown", name: "visualization.color", caption: "Color", width: 0.5, list: this.dropdownColorList, html: true },
-				]
+					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownPluginList(this.pluginsVisualization), html: true }
+                ].concat(...(this.metadataVisualization["form"] || []));
             },
             metadataSource() {
                 return this.getMetadata(this.pluginsSource, this.value["source.type"]);
@@ -73,14 +89,8 @@
             metadataVisualization() {
                 return this.getMetadata(this.pluginsVisualization, this.value["visualization.type"]);
             },
-            formPluginVisualizationDescription() {
-                return this.metadataVisualization["form"] || [];
-            },
             dropdownSourceList() {
-                return this.dropdownPluginList(this.pluginsSource);
-            },
-            dropdownVisualizationList() {
-                return this.dropdownPluginList(this.pluginsVisualization);
+                return this.dropdownPluginList(this.pluginsSource, this.value["visualization.type"]);
             },
             dropdownColorList() {
                 return Object.keys(Colors).map((name) => {
@@ -99,6 +109,7 @@
             },
             async fetchValue() {
                 this.value = await this.$api.request("get", "/tile", { uid: this.uid });
+                this.ready = true;
             },
             async handleCreate() {
                 await this.$api.request("post", "/tile", { data: this.value });
@@ -113,8 +124,12 @@
                 }
                 return plugins;
             },
-            dropdownPluginList(plugins) {
-                const list = Object.keys(plugins).map((type) => {
+            dropdownPluginList(plugins, filter = null) {
+                const list = Object.keys(plugins).filter((type) => {
+                    if (!filter) return true;
+                    const metadata = this.getMetadata(plugins, type);
+                    return (metadata.visualization || []).includes(filter);
+                }).map((type) => {
                     const metadata = this.getMetadata(plugins, type);
                     return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(metadata.name || type)};
                 });
