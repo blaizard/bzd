@@ -41,36 +41,36 @@
 </template>
 
 <script>
-	export default {
-		props: {
+export default {
+	props: {
+	},
+	components: {
+	},
+	data: function() {
+		return {
+			isMenuVisible: false
+		};
+	},
+	mounted() {
+		window.addEventListener("resize", this.handleResize, false);
+		this.handleResize();
+	},
+	beforeDestroy() {
+		window.removeEventListener("resize", this.handleResize, false);
+	},
+	computed: {
+	},
+	methods: {
+		handleResize() {
 		},
-		components: {
+		toggleMenu() {
+			this.isMenuVisible = !this.isMenuVisible;
 		},
-		data: function() {
-			return {
-                isMenuVisible: false
-			}
-		},
-		mounted() {
-			window.addEventListener("resize", this.handleResize, false);
-			this.handleResize();
-		},
-		beforeDestroy() {
-			window.removeEventListener("resize", this.handleResize, false);
-		},
-		computed: {
-		},
-		methods: {
-			handleResize() {
-			},
-            toggleMenu() {
-                this.isMenuVisible = !this.isMenuVisible;
-            },
-            hideMenu() {
-                this.isMenuVisible = false;
-            }
+		hideMenu() {
+			this.isMenuVisible = false;
 		}
 	}
+};
 </script>
 
 <style lang="scss">
@@ -157,7 +157,7 @@
             .bzd-layout-header-actions {
 
                 display: flex;
-			    flex-flow: row nowrap;
+                flex-flow: row nowrap;
 
                 > * {
                     min-width: $headerHeight;
@@ -206,7 +206,7 @@
                 position: fixed;
                 top: 0;
                 left: 0;
-			    width: 100vw;
+                width: 100vw;
                 height: 100vh;
 
                 background-color: rgba(0, 0, 0, 0.4);
@@ -216,7 +216,7 @@
                 position: fixed;
                 top: 0;
                 left: 0;
-			    width: $menuWidth;
+                width: $menuWidth;
                 height: 100vh;
 
                 background-color: $menuBgColor;

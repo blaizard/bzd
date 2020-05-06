@@ -188,14 +188,6 @@
                 const timestamp = this.timestamp - days * 24 * 60 * 60 * 1000;
                 return this.builds.filter((build) => (build.timestamp > timestamp));
             },
-            getMetadata() {
-                return {
-                    name: "Continuous Integration",
-                    icon: "bzd-icon-continuous-integration",
-                    form: [
-                    ]
-                }
-            }
         }
     }
 </script>

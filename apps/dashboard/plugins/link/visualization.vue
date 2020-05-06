@@ -16,18 +16,7 @@
 		data: function() {
 			return {
 			}
-		},
-        methods: {
-            getMetadata() {
-                return {
-                    name: "Link",
-                    icon: "bzd-icon-link",
-                    form: [
-                        { type: "Input", name: "link.url", caption: "URL", placeholder: "https://www.google.com" },
-                    ]
-                }
-            }
-        }
+		}
     }
 </script>
 

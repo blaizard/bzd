@@ -75,6 +75,11 @@ export default class API {
 				case "query":
 					data = request.query;
 					break;
+				case "upload":
+					data = Object.assign({}, request.query || {}, {
+						files: Object.keys(request.files || {}).map((key) => request.files[key].path)
+					});
+					break;
 				}
 
 				const result = await callback.call(this, data);
@@ -82,6 +87,13 @@ export default class API {
 				case "json":
 					Exception.assert(typeof result == "object", "{} {}: callback result must be a json object.", method, endpoint);
 					response.json(result);
+					break;
+				case "file":
+					Exception.assert(typeof result == "string", "{} {}: callback result must be a string.", method, endpoint);
+					response.sendFile(result);
+					break;
+				case "raw":
+					response.status(200).send(result);
 					break;
 				default:
 					response.sendStatus(200);

@@ -3,7 +3,7 @@
 ## Test Locally
 
 ```bash
-bazel run apps/dashboard/frontend:dev # Generate the frontend
+bazel run apps/dashboard/frontend:local # Generate the frontend
 bazel run apps/dashboard/backend # Run the backend
 ```
 
