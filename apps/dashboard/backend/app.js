@@ -6,7 +6,6 @@ import Path from "path";
 import API from "../../../nodejs/core/api.js";
 import APIv1 from "../api.v1.json";
 import Cache from "../../../nodejs/core/cache.js";
-import FileSystem from "../../../nodejs/core/filesystem.js";
 import Web from "../../../nodejs/core/web.js";
 import KeyValueStoreDisk from "../../../nodejs/core/key_value_store/disk.js";
 import ExceptionFactory from "../../../nodejs/core/exception.js";
@@ -69,7 +68,7 @@ Commander.version("1.0.0", "-v, --version")
 			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
 			Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
 	
-			Log.info("Plugin '{}' fetching for '{}'", type, uid);
+			Log.debug("Plugin '{}' fetching for '{}'", type, uid);
 			return await plugin.fetch(data, cache);
 
 		}, options);

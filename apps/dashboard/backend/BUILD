@@ -17,7 +17,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/dashboard:api",
-        "//apps/dashboard:plugins",
+        "//apps/dashboard/plugins",
         "//nodejs/core:api",
         "//nodejs/core:cache",
         "//nodejs/core:filesystem",

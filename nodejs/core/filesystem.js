@@ -93,6 +93,15 @@ export default class FileSystem {
 		await Fs.promises.rename(pathFrom, pathTo);
 	}
 
+
+	/**
+	 * Rename a file.
+	 */
+	static async rename(pathFrom, name) {
+		const pathTo = Path.join(Path.dirname(pathFrom), name);
+		await Fs.promises.rename(pathFrom, pathTo);
+	}
+
 	/**
 	 * Copy a file from a location to another. Note pathFrom and pathTo
 	 * are the full path of the file including the file name.

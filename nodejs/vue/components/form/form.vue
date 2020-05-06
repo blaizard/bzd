@@ -14,7 +14,7 @@
 				<component slot-scope="item"
 						:is="getType(current)"
 						v-model="currentValue[getName(current, index)]"
-						@error="item.setError($event)"
+						@error="handleError(index, item, $event)"
 						@active="handleActive(index, $event)"
 						@submit="handleSubmit(current)"
 						@input="handleInput(getName(current, index), $event)"
@@ -77,12 +77,16 @@ export default {
 			// back to the input event
 			currentValue: Object.assign({}, this.value),
 			updatedValue: {},
-			active: -1
+			active: -1,
+			errors: {}
 		};
 	},
 	computed: {
 		returnedValue() {
 			return (this.diff) ? this.updatedValue : this.currentValue;
+		},
+		isError() {
+			return Object.keys(this.errors).length > 0;
 		}
 	},
 	watch: {
@@ -96,11 +100,22 @@ export default {
 			this.$emit("input", this.returnedValue);
 		},
 		handleSubmit(/*description*/) {
-			this.$emit("submit", this.returnedValue);
+			if (!this.isError) {
+				this.$emit("submit", this.returnedValue);
+			}
 		},
 		handleActive(index, data) {
 			this.active = (typeof data === "object" && "id" in data) ? index : -1;
 			this.$emit("active", data);
+		},
+		handleError(index, item, message) {
+			if (message) {
+				this.$set(this.errors, index,  message);
+			}
+			else {
+				this.$delete(this.errors, index);
+			}
+			item.setError(message);
 		},
 		isLineBreakNeeded(description, index) {
 			if ((description.width || 1) === 1) {

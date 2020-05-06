@@ -49,11 +49,11 @@ bzd_nodejs_library(
     srcs = [
         "loading.js",
     ],
-    deps = [
-        ":mask",
-    ],
     packages = {
         "vue": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        ":mask",
+    ],
 )

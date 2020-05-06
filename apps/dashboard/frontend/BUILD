@@ -16,22 +16,24 @@ bzd_nodejs_web(
     ],
     deps = [
         "//apps/dashboard:api",
-        "//apps/dashboard:plugins",
+        "//apps/dashboard/plugins",
         "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/core:api",
         "//nodejs/core:fetch",
         "//nodejs/styles/default",
         "//nodejs/vue:api",
-        "//nodejs/vue/components:form",
-        "//nodejs/vue/directives:tooltip",
+        "//nodejs/vue/components/form",
+        "//nodejs/vue/components/layout",
+        "//nodejs/vue/components/menu:entry",
         "//nodejs/vue/directives:loading",
+        "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/router",
     ],
 )
 
 bzd_package(
-    name = "dev",
+    name = "local",
     args = ["/tmp"],
     tags = ["nodejs"],
     deps = {

@@ -58,7 +58,7 @@ export default {
 			return this.value.error || this.error;
 		},
 		isImage() {
-			return this.isAvailable && /\.(jpg|bmp|gif|tif|tiff|png|jpeg|webp|svg)$/i.test(this.value) && this.imageUrl;
+			return this.isAvailable && this.imageUrl;
 		},
 		isFile() {
 			return this.isAvailable && !this.isImage;
@@ -69,6 +69,9 @@ export default {
 		imageUrl() {
 			if (typeof this.config["imageToUrl"] === "function") {
 				return this.config.imageToUrl(this.value);
+			}
+			else if (typeof this.config["imageToUrl"] === "string") {
+				return this.config.imageToUrl;
 			}
 			return false;
 		},

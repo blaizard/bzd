@@ -37,7 +37,9 @@
 		data: function () {
 			return {
                 ready: true,
-                value: {},
+                value: {
+                    "visualization.color": "auto"
+                },
                 pluginsVisualization: {},
                 pluginsSource: {}
 			}
@@ -69,25 +71,23 @@
             formSourceDescription() {
                 return [
 					{ type: "Dropdown", name: "source.type", caption: "Type", width: 0.5, list: this.dropdownSourceList, html: true, onchange: (type) => {
-                        for (const [key, value] of Object.entries(this.metadataSource.defaultValue || {})) {
-                            this.$set(this.value, key, value);
-                        }
+                        this.value = Object.assign({}, this.value, this.metadataSource.defaultValue);
                     }},
 				]
             },
             formVisualizationDescription() {
                 return [
-					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownPluginList(this.pluginsVisualization), html: true }
+					{ type: "Dropdown", name: "visualization.type", caption: "Type", width: 0.5, list: this.dropdownPluginList(this.pluginsVisualization, "*"), html: true }
                 ].concat(...(this.metadataVisualization["form"] || []));
             },
             metadataSource() {
-                return this.getMetadata(this.pluginsSource, this.value["source.type"]);
+                return this.pluginsSource[this.value["source.type"]] || {};
             },
             formPluginSourceDescription() {
-                return this.metadataSource["form"] || [];
+                return this.metadataSource.form || [];
             },
             metadataVisualization() {
-                return this.getMetadata(this.pluginsVisualization, this.value["visualization.type"]);
+                return this.pluginsVisualization[this.value["visualization.type"]] || {};
             },
             dropdownSourceList() {
                 return this.dropdownPluginList(this.pluginsSource, this.value["visualization.type"]);
@@ -104,11 +104,8 @@
             }
         },
         methods: {
-            getMetadata(plugins, type) {
-                return (type in plugins) ? plugins[type].methods.getMetadata() : {};
-            },
             async fetchValue() {
-                this.value = await this.$api.request("get", "/tile", { uid: this.uid });
+                this.value = Object.assign({}, this.value, await this.$api.request("get", "/tile", { uid: this.uid }));
                 this.ready = true;
             },
             async handleCreate() {
@@ -120,18 +117,17 @@
             async fetchPlugins(source) {
                 let plugins = {};
                 for (const [name, description] of Object.entries(source)) {
-                    plugins[name] = (await description.frontend()).default;
+                    await description.frontend(); // Load the frontend plugin to load the icon
+                    plugins[name] = Object.assign({}, description);
                 }
                 return plugins;
             },
-            dropdownPluginList(plugins, filter = null) {
+            dropdownPluginList(plugins, filter) {
                 const list = Object.keys(plugins).filter((type) => {
-                    if (!filter) return true;
-                    const metadata = this.getMetadata(plugins, type);
-                    return (metadata.visualization || []).includes(filter);
+                    if (filter == "*") return true;
+                    return (plugins[type].visualization || []).includes(filter);
                 }).map((type) => {
-                    const metadata = this.getMetadata(plugins, type);
-                    return {key: type, html: "<i class=\"" + metadata.icon + "\"></i> " + decodeURIComponent(metadata.name || type)};
+                    return {key: type, html: "<i class=\"" + plugins[type].icon + "\"></i> " + decodeURIComponent(plugins[type].name || type)};
                 });
 
                 return list.reduce((result, data) => {

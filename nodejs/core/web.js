@@ -272,6 +272,8 @@ export default class Web {
 		default:
 			throw new Exception("Unknown HTTP type '{}'.", type);
 		}
+
+		Log.debug("Added route: {} {} with options {:j}", type, uri, options);
 	}
 }
 

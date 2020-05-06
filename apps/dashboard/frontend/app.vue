@@ -22,9 +22,9 @@
 <script>
 	"use strict"
 
-	import Layout from "[frontend]/layout.vue";
-	import MenuEntry from "[frontend]/menu_entry.vue";
 	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
+	import Layout from "[bzd]/vue/components/layout/layout.vue";
+	import MenuEntry from "[bzd]/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
