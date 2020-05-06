@@ -6,11 +6,12 @@ import Path from "path";
 import BodyParser from "body-parser";
 import Http from "http";
 import Https from "https";
-import Fs from "fs";
 import Compression from "compression";
 import Minify from "express-minify";
 import Multer from "multer";
 
+import Event from "./event.js";
+import FileSystem from "./filesystem.js";
 import LogFactory from "./log.js";
 import ExceptionFactory from "./exception.js";
 
@@ -56,8 +57,25 @@ export default class Web {
 			}
 		}, config);
 
+		this.event = new Event({
+			ready: {proactive: true},
+			error: {proactive: true}
+		});
+
+		this._initialize(port).catch((e) => {
+			Exception.fromError(e).print("Error while initializing data");
+			this.event.trigger("error", e);
+		});
+	}
+
+	/**
+	 * Initialize the web module
+	 */
+	async _initialize(port) {
+
 		this.app = Express();
 		this.app.use(Helmet());
+
 		// Enable compression
 		if (this.config.useCompression) {
 			this.app.use(Compression());
@@ -75,9 +93,8 @@ export default class Web {
 			};
 			if (this.config.uploadDir) {
 				// Create the directory if it does not exists
-				if (!Fs.existsSync(this.config.uploadDir)){
-					Fs.mkdirSync(this.config.uploadDir);
-				}
+				await FileSystem.mkdir(this.config.uploadDir);
+
 				diskStorageConfig.destination = (req, file, cb) => {
 					cb(null, this.config.uploadDir);
 				};
@@ -93,7 +110,7 @@ export default class Web {
 
 		// Web content
 		if (this.config.rootDir) {
-			this.addStaticRoute(this.config.rootDir);
+			await this.addStaticRoute(this.config.rootDir);
 			this.addRoute("get", "/", (req, res) => {
 				// Do not cache the index.html
 				// this is usefull when the application updates.
@@ -103,47 +120,45 @@ export default class Web {
 				res.sendFile(Path.resolve(this.config.rootDir, "index.html"));
 			});
 		}
-	}
 
-	/**
-	 * \brief Type of data
-	 * \{
-	 */
-	static get NORMAL() { return 0x00; }
-	static get JSON() { return 0x01; }
-	static get RAW() { return 0x02; }
-	static get UPLOAD() { return 0x04; }
-	/**
-	 * \}
-	 */
+		this.event.trigger("ready");
+	}
 
 	/**
 	 * Start the web server
 	 */
-	start() {
+	async start() {
+
+		await this.event.waitUntil("ready");
+
+		// If any of the certificate file is set, assume SSL is to be used
+		const useSSL = this.config.key || this.config.cert || this.config.ca;
+		let configStrList = [];
+
+		// Create the server
+		if (useSSL) {
+			let options = {};
+			if (this.config.key) {
+				options.key = await FileSystem.readFile(this.config.key);
+			}
+			if (this.config.cert) {
+				options.cert = await FileSystem.readFile(this.config.cert);
+			}
+			if (this.config.ca) {
+				options.ca = await FileSystem.readFile(this.config.ca);
+			}
+			this.server = Https.createServer(options, this.app);
+			configStrList.push("SSL");
+		}
+		else {
+			this.server = Http.createServer(this.app);
+		}
+
+		if (this.config.useCompression) {
+			configStrList.push("compression");
+		}
+
 		return new Promise((resolve, reject) => {
-
-			// If any of the certificate file is set, assume SSL is to be used
-			const useSSL = this.config.key || this.config.cert || this.config.ca;
-			let configStrList = [];
-
-			// Create the server
-			if (useSSL) {
-				let options = {};
-				if (this.config.key) options.key = Fs.readFileSync(this.config.key);
-				if (this.config.cert) options.cert = Fs.readFileSync(this.config.cert);
-				if (this.config.ca) options.ca = Fs.readFileSync(this.config.ca);
-				this.server = Https.createServer(options, this.app);
-				configStrList.push("SSL");
-			}
-			else {
-				this.server = Http.createServer(this.app);
-			}
-
-			if (this.config.useCompression) {
-				configStrList.push("compression");
-			}
-
 			this.server.listen(this.port, undefined, undefined, () => {
 				resetErrorHandler.call(this, reject);
 				Log.info("Web server serving at http://localhost:{}{}", this.port, (configStrList.length) ? (" (" + configStrList.join(" and ") + ")") : "");
@@ -178,7 +193,7 @@ export default class Web {
 	 * \param uri (optional) The uri to which the request should match.
 	 * \param path The path to which the static files will be served.
 	 */
-	addStaticRoute(uri, path) {
+	async addStaticRoute(uri, path) {
 		// Make uri optional
 		if (typeof path === "undefined") {
 			path = uri;
@@ -186,9 +201,9 @@ export default class Web {
 		}
 
 		const absolutePath = Path.resolve(path);
-		if (!absolutePath || !Fs.existsSync(absolutePath)) {
-			throw new Exception("The root directory '{}' (absolute: '{}') does not exist.", path, absolutePath);
-		}
+		Exception.assert(absolutePath, "Absolute pat for path '{}' is empty.", path);
+		Exception.assert(await FileSystem.exists(absolutePath), "No file are present at path '{}'.", absolutePath);
+
 		if (uri) {
 			this.app.use(uri, Express.static(absolutePath, this.config.staticOptions));
 		}

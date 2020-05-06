@@ -172,7 +172,9 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
+        ":event",
         ":exception",
+        ":filesystem",
         ":log",
     ],
 )
