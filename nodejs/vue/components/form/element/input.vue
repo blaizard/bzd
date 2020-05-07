@@ -58,7 +58,7 @@ import Element from "./element.vue";
 export default {
 	mixins: [Element],
 	props: {
-		value: {type: String | Array, required: false, default: ""}
+		value: {type: String | Array, required: false, default: ""},
 	},
 	data: function() {
 		return {
@@ -191,6 +191,7 @@ export default {
 			}
 		},
 		handleInput(text) {
+
 			this.hasChanged = true;
 			this.$emit("directInput", text);
 
@@ -216,3 +217,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/input.scss";
+</style>

@@ -48,6 +48,7 @@ export default {
 			default:
 				this.setError("Unknown value type \"" + this.valueType + "\"");
 			}
+
 			return this.value;
 		},
 		internalValue() {
@@ -182,7 +183,7 @@ export default {
 		/**
 			 * Return the value
 			 */
-		get(freezeOnEdit) {
+		get(freezeOnEdit = false) {
 			return (freezeOnEdit) ? this.internalValue : this.externalValue;
 		},
 		set(value) {

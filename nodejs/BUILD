@@ -37,7 +37,7 @@ bzd_nodejs_library(
         "webpack-assets-manifest": "",
         "webpack-bundle-analyzer": "",
         # Vue
-        "vue-loader": "",
+        "vue-loader": "^15",
         "vue-template-compiler": "",
         "vue-style-loader": "",
         # CSS/SASS

@@ -1,0 +1,58 @@
+@import "index.scss";
+@import "input.scss";
+
+.irform-date {
+    display: flex;
+    flex-flow: column;
+    user-select: none;
+
+    .irform-date-header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+
+        .irform-date-month {
+            flex: 1;
+            text-align: center;
+        }
+
+        .irform-date-previous {
+            @include buttonArrow(left, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+        }
+        .irform-date-next {
+            @include buttonArrow(right, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+        }
+    }
+
+    .irform-date-row {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+
+        .irform-date-item {
+            text-align: center;
+            color: $disableTextColor;
+            background-color: $disableBgColor;
+            flex: 1 1 0;
+
+            &.irform-date-item-current {
+                color: $fieldTextColor;
+                background-color: $fieldBgColor;
+
+                @extend %clickable;
+            }
+
+            &.irform-date-item-header {
+                color: $actionerTextColor;
+                background-color: $actionerBgColor;
+            }
+
+            &.irform-date-item-selected {
+                color: $fieldSpecialTextColor;
+                background-color: $fieldSpecialBgColor;
+            }
+        }
+    }
+}

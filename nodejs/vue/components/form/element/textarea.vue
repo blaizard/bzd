@@ -1,7 +1,6 @@
 <template>
 	<component class="irform-textarea"
 			:is="tag"
-			:value="get()"
 			@input="handleInput"
 			@focus="setActive()"
 			@blur="setInactive()"
@@ -9,10 +8,10 @@
 			@cut="resize"
 			@paste="resize"
 			@drop="resize"
+			v-text="get(/*freezeOnEdit*/true)"
 			:disabled="disable"
 			:placeholder="placeholder"
 			:style="{resize: (autoResize) ? 'none' : 'vertical'}">
-		<slot></slot>
 	</component>
 </template>
 
@@ -54,3 +53,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/textarea.scss";
+</style>

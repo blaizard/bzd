@@ -12,11 +12,8 @@ export default {
 		};
 	},
 	computed: {
-		containerClass() {
-			return {
-				"irform-autocomplete": true,
-				"irform-loading": this.loading
-			};
+		className() {
+			return "irform-autocomplete";
 		}
 	},
 	methods: {
@@ -32,3 +29,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/autocomplete.scss";
+</style>

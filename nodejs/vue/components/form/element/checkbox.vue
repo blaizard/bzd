@@ -8,7 +8,7 @@
 				@focus="setActive"
 				@blur="setInactive"
 		/>
-		<label :for="'id-checkbox-' + uid">{{ getOption("text", "") }}</label>
+		<label :for="'id-checkbox-' + uid"><slot v-if="text.length == 0"></slot>{{ text }}</label>
 	</span>
 </template>
 
@@ -22,6 +22,11 @@ export default {
 	props: {
 		value: {type: Boolean, required: false, default: false}
 	},
+	computed: {
+		text() {
+			return this.getOption("text", "");
+		}
+	},
 	methods: {
 		handleClick() {
 			this.$el.firstChild.focus();
@@ -30,3 +35,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/checkbox.scss";
+</style>

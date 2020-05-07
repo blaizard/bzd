@@ -1,9 +1,20 @@
+@import "index.scss";
+@import "input.scss";
+
 $triangleHeight: $fieldHeight / 5;
 
 .irform-dropdown {
 	@extend %reset;
 	width: 100%;
 	position: relative;
+
+	&.irform-empty {
+		.irform-dropdown-arrow {
+			&:after {
+				display: none;
+			}
+		}
+	}
 
 	.irform-dropdown-select {
 		cursor: pointer;
