@@ -53,13 +53,6 @@ $disableBgColor: #eee !default;
 
 // ---- Functions ----
 
-/**
- * Reset attribute of a component
- */
-.irform {
-	@extend %reset;
-}
-
 %reset {
 	font-family: $font;
 	font-size: #{$fieldTextHeight}px;
