@@ -3,8 +3,8 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "disk",
     srcs = [
-        "storage.js",
         "disk.js",
+        "storage.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

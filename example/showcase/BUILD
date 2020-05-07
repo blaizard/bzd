@@ -5,17 +5,17 @@ bzd_nodejs_web(
     srcs = glob([
         "**/*",
     ]),
+    alias = "showcase",
     entries = {
         "app.js": "index",
     },
-    alias = "showcase",
     packages = {
         "vue": "",
     },
     deps = [
         "//nodejs/styles/default",
-        "//nodejs/vue/components/graph",
         "//nodejs/vue/components/form",
+        "//nodejs/vue/components/graph",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/components/menu:entry",
         "//nodejs/vue/directives:loading",

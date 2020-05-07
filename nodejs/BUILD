@@ -45,6 +45,7 @@ bzd_nodejs_library(
         "css-loader": "",
         "node-sass": "",
         "sass-loader": "",
+        "sass": "",
         "file-loader": "",
     },
     visibility = ["//visibility:public"],
