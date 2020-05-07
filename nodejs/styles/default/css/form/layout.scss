@@ -8,7 +8,11 @@
  * </div>
  */
 
+/**
+ * Reset attribute of a component
+ */
 .irform {
+	@extend %reset;
 	display: flex;
 	flex-flow: row wrap;
 }
