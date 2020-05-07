@@ -63,8 +63,8 @@ export default class Web {
 		});
 
 		this._initialize(port).catch((e) => {
-			Exception.fromError(e).print("Error while initializing data");
 			this.event.trigger("error", e);
+			throw e;
 		});
 	}
 

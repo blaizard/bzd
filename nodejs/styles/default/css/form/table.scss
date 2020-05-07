@@ -1,3 +1,7 @@
+@import "index.scss";
+
+$triangleHeight: $fieldHeight / 5;
+
 .irform-table {
 
 	// Note, this does not work and I have no idea how to fix it.
@@ -33,8 +37,8 @@
 
 		.irform-table-headers {
 			.irform-table-header {
-				background-color: $fieldSpecialBgColor;
-				color: $fieldSpecialTextColor;
+				background-color: $actionerBgColor;
+				color: $actionerTextColor;
 				padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
 				position: relative;
 				@extend %clickable;
@@ -49,7 +53,7 @@
 						width: 0;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
-						border-color: $fieldSpecialTextColor transparent transparent transparent;
+						border-color: $actionerTextColor transparent transparent transparent;
 						transition: all .3s;
 					}
 				}
@@ -64,7 +68,7 @@
 						width: 0;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
-						border-color: transparent transparent $fieldSpecialTextColor transparent;
+						border-color: transparent transparent $actionerTextColor transparent;
 						transition: all .3s;
 					}
 				}

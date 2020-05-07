@@ -84,10 +84,14 @@ export default {
 		};
 	},
 	computed: {
+		className() {
+			return "irform-dropdown";
+		},
 		containerClass() {
 			return {
-				"irform-dropdown": true,
-				"irform-loading": this.loading
+				[this.className]: true,
+				"irform-loading": this.loading,
+				"irform-empty": (this.displayList.length == 0)
 			};
 		},
 		presets() {
@@ -315,3 +319,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/dropdown.scss";
+</style>

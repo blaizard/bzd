@@ -185,3 +185,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/table.scss";
+</style>

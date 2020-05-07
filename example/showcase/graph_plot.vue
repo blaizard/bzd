@@ -86,12 +86,6 @@
 	}
 </script>
 
-<style lang="scss">
-    body {
-        background-color: #eee;
-    }
-</style>
-
 <style lang="scss" scoped>
 	.showcase-plot {
 		width: 100%;

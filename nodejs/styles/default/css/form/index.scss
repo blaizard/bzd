@@ -9,6 +9,8 @@
 
 // ---- Configuration ----
 
+@import "~[bzd-style]/css/colors.scss";
+
 $font: "Helvetica";
 
 $captionTextColor: #111;
@@ -17,17 +19,15 @@ $fieldPaddingX: 6 !default;
 $fieldPaddingY: 0 !default;
 $fieldHeight: 32 !default;
 $fieldTextHeight: 16 !default;
-$fieldTextColor: #777 !default;
-$fieldPlaceholderColor: #ccc !default;
-$fieldSpecialTextColor: #fff !default;
-$fieldSpecialBgColor: #75b9e7 !default;
-$fieldBgColor: #fff !default;
+$fieldTextColor: $bzdGraphColorBlack !default;
+$fieldPlaceholderColor: $bzdGraphColorGray !default;
+$fieldSpecialTextColor: $bzdGraphColorWhite !default;
+$fieldSpecialBgColor: $bzdGraphColorBlue !default;
+$fieldBgColor: $bzdGraphColorWhite !default;
 $fieldBorderThickness: 1 !default;
-$fieldBorderColor: #ddd !default;
+$fieldBorderColor: darken($bzdGraphColorWhite, 20%) !default;
 $fieldBorderRadius: 2 !default;
-$fieldBorderMultiColor: #eee !default;
-$fieldBgColor: #fff !default;
-$tableBorderColor: #ddd !default;
+$tableBorderColor: darken($bzdGraphColorWhite, 10%) !default;
 $toolbarHeight: 40 !default;
 
 $actionerTextColor: #333 !default;
@@ -35,8 +35,8 @@ $actionerBgColor: #eee !default;
 
 $focusColor: #ccc !default;
 
-$errorColor: #dc143c !default;
-$successColor: #3cb371 !default;
+$errorColor: $bzdGraphColorRed !default;
+$successColor: $bzdGraphColorGreen !default;
 $disableColor: #ddd !default;
 $disableTextColor: #999 !default;
 $disableBgColor: #eee !default;
@@ -377,20 +377,3 @@ $disableBgColor: #eee !default;
 %focus-reset {
 	outline: none !important;
 }
-
-/**
- * Import the various supported fields
- */
-@import "layout.scss";
-@import "icon.scss";
-@import "input.scss";
-@import "button.scss";
-@import "checkbox.scss";
-@import "textarea.scss";
-@import "dropdown.scss";
-@import "autocomplete.scss";
-@import "array.scss";
-@import "table.scss";
-@import "file.scss";
-@import "carousel.scss";
-@import "editor.scss";

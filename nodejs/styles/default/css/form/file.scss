@@ -1,3 +1,5 @@
+@import "index.scss";
+
 $borderWidth: 5;
 $height: 150;
 
@@ -25,7 +27,7 @@ body.irform-file-drag .irform-array-file {
 .irform-file {
 	@extend %field-reset;
 
-	border: 1px solid $fieldBorderMultiColor;
+	border: 1px solid $fieldBorderColor;
 
 	min-width: #{$height}px;
 	height: #{$height}px;

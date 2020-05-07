@@ -46,9 +46,10 @@ import Table from "./element/table.vue";
 import File from "./element/file.vue";
 import Carousel from "./element/carousel.vue";
 import Editor from "./element/editor.vue";
+import Date from "./element/date.vue";
 import Message from "./element/message.vue";
 import Unknown from "./element/unknown.vue";
-const elements = {Input, Checkbox, Textarea, Dropdown, Autocomplete, Submit, Array, Table, File, Carousel, Editor, Message};
+const elements = {Input, Checkbox, Textarea, Dropdown, Autocomplete, Submit, Array, Table, File, Carousel, Editor, Message, Date};
 
 export default {
 	/**
@@ -155,5 +156,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/form/index.scss";
+	@import "~[bzd-style]/css/form/layout.scss";
 </style>

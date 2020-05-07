@@ -80,7 +80,7 @@ export default {
     // Global
 
     // Header
-    $headerColor: #fff;
+    $headerColor: $bzdGraphColorWhite;
     $headerBgColor: $bzdGraphColorBlue;
     $headerFontSize: 20px;
     $headerHeight: 44px;
@@ -88,8 +88,8 @@ export default {
     $headerZIndex: 10;
 
     // Menu
-    $menuColor: #000;
-    $menuBgColor: #fff;
+    $menuColor: $bzdGraphColorBlack;
+    $menuBgColor: $bzdGraphColorWhite;
     $menuWidth: 300px;
     $menuPadding: 20px;
     $menuZIndex: 9;
@@ -168,7 +168,7 @@ export default {
                 .bzd-menu-entry-text {
                     display: none;
                 }
-                .bzd-menu-entry-wrapper {
+                .bzd-menu-entry {
                     @extend %bzd-clickable;
                 }
             }
@@ -223,6 +223,22 @@ export default {
                 color: $menuColor;
                 padding: $menuPadding;
                 padding-top: $headerHeight + $menuPadding;
+
+                .bzd-menu-entry-wrapper {
+                    display: flex;
+                    flex-flow: column;
+
+                    .bzd-menu-entry {
+                        cursor: pointer;
+                        &:hover {
+                            background-color: #eee;
+                        }
+                    }
+
+                    .bzd-menu-nested {
+                        padding-left: 10px;
+                    }
+                }
             }
         }
 

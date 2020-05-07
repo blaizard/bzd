@@ -209,3 +209,7 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	@import "~[bzd-style]/css/form/editor.scss";
+</style>
