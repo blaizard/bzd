@@ -12,37 +12,37 @@ import FileSystem from "../../core/filesystem.js";
 export default class StorageDisk extends Storage {
 
 	constructor(path, options) {
-        super();
+		super();
 
 		this.options = Object.assign({
 		}, options);
-        this.path = path;
+		this.path = path;
 
-        this._initialize();
-    }
+		this._initialize();
+	}
 
-    /**
+	/**
      * Initialize the storage module
      */
-    async _initializeImpl() {
-        await FileSystem.mkdir(this.path);
-    }
+	async _initializeImpl() {
+		await FileSystem.mkdir(this.path);
+	}
 
-    async is(bucket, key) {
-        return await FileSystem.exists(Path.join(this.path, bucket, key));
-    }
+	async is(bucket, key) {
+		return await FileSystem.exists(Path.join(this.path, bucket, key));
+	}
 
-    async read(bucket, key) {
-        return Fs.createReadStream(Path.join(this.path, bucket, key));
-    }
+	async read(bucket, key) {
+		return Fs.createReadStream(Path.join(this.path, bucket, key));
+	}
 
-    async write(bucket, key, readStream) {
-        let writeStream = Fs.createWriteStream(Path.join(this.path, bucket, key));
+	async write(bucket, key, readStream) {
+		let writeStream = Fs.createWriteStream(Path.join(this.path, bucket, key));
 
-        return new Promise((resolve, reject) => {
-            readStream.pipe(writeStream)
-                .on("error", reject)
-                .on("end", resolve);
-        });
-    }
+		return new Promise((resolve, reject) => {
+			readStream.pipe(writeStream)
+				.on("error", reject)
+				.on("end", resolve);
+		});
+	}
 }

@@ -277,7 +277,7 @@ $disableBgColor: #eee !default;
  * Close button
  */
 @mixin buttonClose($width, $color, $crossWidth: $width, $bgColor: transparent, $crossThickness: 2) {
-	@include button($width, transparent, $bgColor)
+	@include button($width, transparent, $bgColor);
 	&:before,
 	&:after {
 		position: absolute;
@@ -300,7 +300,7 @@ $disableBgColor: #eee !default;
  * Arrow button
  */
 @mixin buttonArrow($direction, $width, $color, $eltWidth, $bgColor: transparent, $eltThickness: 2) {
-	@include button($width, transparent, $bgColor)
+	@include button($width, transparent, $bgColor);
 	&:before {
 		box-sizing: border-box;
 		position: absolute;
