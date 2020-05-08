@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install")
+load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_node_modules_symlinks")
 load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsWebProvider = provider(fields = ["tar"])
@@ -60,6 +60,11 @@ def _bzd_nodejs_web_build_impl(ctx):
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
+    symlinks = bzd_nodejs_node_modules_symlinks(files = srcs, aliases = {
+        "nodejs": "bzd"
+    })
+    print(symlinks)
+
     # Create a wrapped binary to have a self contained execution environment
     return sh_binary_wrapper_impl(
         ctx = ctx,
@@ -71,6 +76,9 @@ def _bzd_nodejs_web_build_impl(ctx):
         tar -h -cf "$1" -C "{workspace}/.bzd/output" --transform 's,^./,,' .
         """,
         extra_runfiles = [webpack_config, package_json, node_modules] + srcs,
+        root_symlinks = {
+            "node_modules": node_modules,
+        },
         symlinks = {
             "node_modules": node_modules,
             "package.json": package_json,

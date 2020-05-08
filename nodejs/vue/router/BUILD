@@ -3,7 +3,7 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "router",
     srcs = [
-        "router.js",
+        "router.mjs",
         "router_component.vue",
         "router_link.vue",
     ],

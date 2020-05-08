@@ -5,11 +5,11 @@ bzd_nodejs_web(
     name = "frontend",
     srcs = glob([
         "**/*.vue",
-        "**/*.js",
+        "**/*.mjs",
     ]),
     alias = "frontend",
     entries = {
-        "app.js": "index",
+        "app.mjs": "index",
     },
     visibility = [
         "//apps/dashboard:__pkg__",

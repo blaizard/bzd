@@ -166,6 +166,20 @@ bzd_nodejs_install = rule(
     toolchains = ["//tools/bazel.build/toolchains/nodejs:toolchain_type"],
 )
 
+# ---- bzd_nodejs_node_modules_symlinks
+
+"""
+Generate the symlinks dictionary to be passed to root_symlinks or symlinks
+"""
+def bzd_nodejs_node_modules_symlinks(files, aliases):
+    symlinks = {}
+    for directory, name in aliases.items():
+        for f in files:
+            if f.path.startswith(directory + "/"):
+                path = "node_modules/{}/{}".format(name, f.path[len(directory) + 1:])
+                symlinks[path] = f
+    return symlinks
+
 # ---- _bzd_nodejs_exec
 
 COMMON_EXEC_ATTRS = {
@@ -194,7 +208,18 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
-    command = "export BZD_RULE=nodejs && {{binary}} --preserve-symlinks --preserve-symlinks-main \"node_modules/mocha/bin/mocha\" \"{}\"" if is_test else "export BZD_RULE=nodejs && {{binary}} --preserve-symlinks --preserve-symlinks-main \"{}\" $@"
+    # Attempt but faced yet another issue: SyntaxError: Cannot use import statement outside a module
+    command = """
+    export BZD_RULE=nodejs
+    {{binary}} --preserve-symlinks --preserve-symlinks-main"""
+    if is_test:
+        command += " \"../node_modules/mocha/bin/mocha\" \"{}\""
+    else:
+        command += " \"{}\" $@"
+
+    symlinks = bzd_nodejs_node_modules_symlinks(files = srcs, aliases = {
+        "nodejs": "bzd"
+    })
 
     result = [
         sh_binary_wrapper_impl(
@@ -203,20 +228,25 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
             output = ctx.outputs.executable,
             command = command.format(ctx.file.main.path),
             extra_runfiles = [node_modules, package_json] + srcs + data,
-            symlinks = {
+            root_symlinks = {
                 "node_modules": node_modules,
                 "package.json": package_json,
             },
+            symlinks = symlinks
         ),
     ]
 
     if not is_test:
+
+        files_remap = {
+            "node_modules": node_modules,
+            "package.json": package_json,
+        }
+        files_remap.update(symlinks)
+
         result.append(BzdPackageFragment(
             files = srcs,
-            files_remap = {
-                "node_modules": node_modules,
-                "package.json": package_json,
-            },
+            files_remap = files_remap
         ))
 
     return result

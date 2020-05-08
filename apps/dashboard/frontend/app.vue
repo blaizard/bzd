@@ -22,7 +22,7 @@
 <script>
 	"use strict"
 
-	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js"
+	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.mjs"
 	import Layout from "[bzd]/vue/components/layout/layout.vue";
 	import MenuEntry from "[bzd]/vue/components/menu/entry.vue";
 

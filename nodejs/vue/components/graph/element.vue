@@ -19,8 +19,8 @@
 <script>
 "use strict";
 
-import HoverChildren from "./directive/hover-children.js";
-import { tooltipHide } from "../../directives/tooltip.js";
+import HoverChildren from "./directive/hover-children.mjs";
+import { tooltipHide } from "../../directives/tooltip.mjs";
 
 export default {
 	props: {

@@ -7,7 +7,7 @@ bzd_nodejs_web(
     ]),
     alias = "showcase",
     entries = {
-        "app.js": "index",
+        "app.mjs": "index",
     },
     packages = {
         "vue": "",

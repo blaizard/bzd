@@ -4,11 +4,11 @@ bzd_nodejs_web(
     name = "nodejs_web",
     srcs = glob([
         "app.vue",
-        "app.js",
+        "app.mjs",
     ]),
     alias = "frontend",
     entries = {
-        "app.js": "index",
+        "app.mjs": "index",
     },
     packages = {
         "vue": "latest",
