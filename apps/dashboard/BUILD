@@ -29,7 +29,7 @@ container_image(
     cmd = [
         "node",
         "--experimental-json-modules",
-        "/bzd/bin/backend/apps/dashboard/backend/app.js",
+        "/bzd/bin/backend/apps/dashboard/backend/app.mjs",
         "--static",
         "/bzd/bin/frontend",
     ],

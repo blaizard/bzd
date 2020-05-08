@@ -3,7 +3,7 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "api",
     srcs = [
-        "api.js",
+        "api.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -16,7 +16,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "log",
     srcs = [
-        "log.js",
+        "log.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -27,7 +27,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "exception",
     srcs = [
-        "exception.js",
+        "exception.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -39,7 +39,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "event",
     srcs = [
-        "event.js",
+        "event.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -47,7 +47,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "format",
     srcs = [
-        "format.js",
+        "format.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -55,7 +55,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "cache",
     srcs = [
-        "cache.js",
+        "cache.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -68,7 +68,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "crypto",
     srcs = glob([
-        "crypto.js",
+        "crypto.mjs",
         "impl/crypto/*",
     ]),
     visibility = ["//visibility:public"],
@@ -80,7 +80,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "fetch",
     srcs = glob([
-        "fetch.js",
+        "fetch.mjs",
         "impl/fetch/*",
     ]),
     visibility = ["//visibility:public"],
@@ -93,7 +93,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "filesystem",
     srcs = [
-        "filesystem.js",
+        "filesystem.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -101,7 +101,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "localstorage",
     srcs = [
-        "localstorage.js",
+        "localstorage.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -109,7 +109,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mutex",
     srcs = [
-        "mutex.js",
+        "mutex.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -117,7 +117,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "router",
     srcs = [
-        "router.js",
+        "router.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -128,7 +128,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "template",
     srcs = [
-        "template.js",
+        "template.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -139,7 +139,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "timeseries",
     srcs = [
-        "timeseries.js",
+        "timeseries.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -151,7 +151,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "upload",
     srcs = [
-        "upload.js",
+        "upload.mjs",
     ],
     visibility = ["//visibility:public"],
 )
@@ -159,7 +159,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "web",
     srcs = glob([
-        "web.js",
+        "web.mjs",
     ]),
     packages = {
         "express": "",

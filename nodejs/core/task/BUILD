@@ -3,8 +3,8 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "manager",
     srcs = [
-        "manager.js",
-        "task.js",
+        "manager.mjs",
+        "task.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -16,7 +16,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "manager_singleton",
     srcs = [
-        "manager_singleton.js",
+        "manager_singleton.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [

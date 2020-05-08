@@ -3,9 +3,9 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_binary")
 bzd_nodejs_binary(
     name = "nodejs",
     srcs = glob([
-        "app.js",
+        "app.mjs",
     ]),
-    main = "app.js",
+    main = "app.mjs",
     packages = {
         "mustache": "latest",
     },

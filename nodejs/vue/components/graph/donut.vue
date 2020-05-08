@@ -18,7 +18,7 @@
 "use strict";
 
 import Element from "./element.vue";
-import HoverChildren from "./directive/hover-children.js";
+import HoverChildren from "./directive/hover-children.mjs";
 
 export default {
 	components: {

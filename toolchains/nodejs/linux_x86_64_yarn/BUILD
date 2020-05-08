@@ -51,6 +51,6 @@ toolchain(
 
 bzd_nodejs_test(
     name = "test",
-    srcs = ["nodejs_test.js"],
-    main = "nodejs_test.js",
+    srcs = ["nodejs_test.mjs"],
+    main = "nodejs_test.mjs",
 )

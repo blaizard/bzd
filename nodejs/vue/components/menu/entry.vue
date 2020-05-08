@@ -13,7 +13,7 @@
 <script>
 "use strict";
 
-import DirectiveTooltip from "[bzd]/vue/directives/tooltip.js";
+import DirectiveTooltip from "[bzd]/vue/directives/tooltip.mjs";
 
 export default {
 	props: {

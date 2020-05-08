@@ -63,9 +63,9 @@
 
 import Element from "./element.vue";
 import PlotText from "./utils/text.vue";
-import HoverChildren from "./directive/hover-children.js";
-import Resize from "../../directives/resize.js";
-import { tooltip } from "../../directives/tooltip.js";
+import HoverChildren from "./directive/hover-children.mjs";
+import Resize from "../../directives/resize.mjs";
+import { tooltip } from "../../directives/tooltip.mjs";
 import RenderLine from "./render/line.vue";
 import RenderBar from "./render/bar.vue";
 

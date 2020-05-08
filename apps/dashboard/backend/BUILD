@@ -3,7 +3,7 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_binary")
 bzd_nodejs_binary(
     name = "backend",
     srcs = glob([
-        "*.js",
+        "*.mjs",
     ]),
     args = [
         "--static",
@@ -11,7 +11,7 @@ bzd_nodejs_binary(
         "--data",
         "/tmp/db",
     ],
-    main = "app.js",
+    main = "app.mjs",
     visibility = [
         "//apps/dashboard:__pkg__",
     ],

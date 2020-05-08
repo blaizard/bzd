@@ -3,7 +3,7 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "touch",
     srcs = [
-        "touch.js",
+        "touch.mjs",
     ],
     packages = {
         "vue": "",
@@ -14,7 +14,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "tooltip",
     srcs = [
-        "tooltip.js",
+        "tooltip.mjs",
     ],
     packages = {
         "vue": "",
@@ -25,7 +25,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "resize",
     srcs = [
-        "resize.js",
+        "resize.mjs",
     ],
     packages = {
         "vue": "",
@@ -36,7 +36,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mask",
     srcs = [
-        "mask.js",
+        "mask.mjs",
     ],
     packages = {
         "vue": "",
@@ -47,7 +47,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "loading",
     srcs = [
-        "loading.js",
+        "loading.mjs",
     ],
     packages = {
         "vue": "",

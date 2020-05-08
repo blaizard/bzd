@@ -1,11 +1,11 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_test")
 
 test_srcs = glob([
-    "*_test.js",
+    "*_test.mjs",
 ])
 
 [bzd_nodejs_test(
-    name = src.replace("_test.js", ""),
+    name = src.replace("_test.mjs", ""),
     srcs = [src],
     main = src,
     deps = [

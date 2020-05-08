@@ -20,9 +20,9 @@
 	"use strict"
 
     import Form from "[bzd]/vue/components/form/form.vue";
-    import { Source, Visualization } from "[dashboard]/plugins/plugins.js";
+    import { Source, Visualization } from "[dashboard]/plugins/plugins.mjs";
     import Colors from "[bzd-style]/css/colors.scss";
-	import DirectiveLoading from "[bzd]/vue/directives/loading.js"
+	import DirectiveLoading from "[bzd]/vue/directives/loading.mjs"
 
 	export default {
         components: {
