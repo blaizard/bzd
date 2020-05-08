@@ -332,7 +332,7 @@ function getWebpackConfigDefault(isDev, config)
 			rules: customRules.concat([
 				{
 					test: /\.vue$/,
-					exclude: /node_modules/,
+					//exclude: /node_modules/,
 					loader: "vue-loader",
 					options: {
 						hotReload: isDev
@@ -340,7 +340,7 @@ function getWebpackConfigDefault(isDev, config)
 				},
 				{
 					test: /\.js$/,
-					exclude: /node_modules/,
+					//exclude: /node_modules/,
 					use: "babel-loader",
 					sideEffects: false,
 				},

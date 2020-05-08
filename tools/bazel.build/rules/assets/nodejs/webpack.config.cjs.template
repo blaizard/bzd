@@ -1,3 +1,5 @@
+process.chdir(__dirname);
+
 const Path = require("path");
 const Webpack = require("./nodejs/webpack.cjs");
 

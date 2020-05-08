@@ -18,7 +18,7 @@
 
     import { Visualization, Source } from "[dashboard]/plugins/plugins.mjs";
     import Colors from "[bzd-style]/css/colors.scss";
-	import DirectiveLoading from "[bzd]/vue/directives/loading.mjs"
+	import DirectiveLoading from "bzd/vue/directives/loading.mjs"
 
 	export default {
         props: {
