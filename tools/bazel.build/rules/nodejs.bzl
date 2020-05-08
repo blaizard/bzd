@@ -171,6 +171,7 @@ bzd_nodejs_install = rule(
 """
 Generate the symlinks dictionary to be passed to root_symlinks or symlinks
 """
+
 def bzd_nodejs_node_modules_symlinks(files, aliases):
     symlinks = {}
     for directory, name in aliases.items():
@@ -218,7 +219,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
         command += " \"{}\" $@"
 
     symlinks = bzd_nodejs_node_modules_symlinks(files = srcs, aliases = {
-        "nodejs": "bzd"
+        "nodejs": "bzd",
     })
 
     result = [
@@ -232,12 +233,11 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
                 "node_modules": node_modules,
                 "package.json": package_json,
             },
-            symlinks = symlinks
+            symlinks = symlinks,
         ),
     ]
 
     if not is_test:
-
         files_remap = {
             "node_modules": node_modules,
             "package.json": package_json,
@@ -246,7 +246,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
 
         result.append(BzdPackageFragment(
             files = srcs,
-            files_remap = files_remap
+            files_remap = files_remap,
         ))
 
     return result

@@ -110,6 +110,25 @@ bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_node
 | kwargs |  <p align="center"> - </p>   |  none |
 
 
+<a name="#bzd_nodejs_node_modules_symlinks"></a>
+
+## bzd_nodejs_node_modules_symlinks
+
+<pre>
+bzd_nodejs_node_modules_symlinks(<a href="#bzd_nodejs_node_modules_symlinks-files">files</a>, <a href="#bzd_nodejs_node_modules_symlinks-aliases">aliases</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :-------------: | :-------------: | :-------------: |
+| files |  <p align="center"> - </p>   |  none |
+| aliases |  <p align="center"> - </p>   |  none |
+
+
 <a name="#bzd_nodejs_test"></a>
 
 ## bzd_nodejs_test

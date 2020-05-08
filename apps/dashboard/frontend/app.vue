@@ -22,9 +22,9 @@
 <script>
 	"use strict"
 
-	import DirectiveTooltip from "[bzd]/vue/directives/tooltip.mjs"
-	import Layout from "[bzd]/vue/components/layout/layout.vue";
-	import MenuEntry from "[bzd]/vue/components/menu/entry.vue";
+	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs"
+	import Layout from "bzd/vue/components/layout/layout.vue";
+	import MenuEntry from "bzd/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
@@ -63,5 +63,5 @@
 	@import "~[bzd-style]/css/loading.scss";
 
 	$bzdIconNames: edit, add, check;
-	@import "~[bzd]/icons.scss";
+	@import "bzd/icons.scss";
 </style>
