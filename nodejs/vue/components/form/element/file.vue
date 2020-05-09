@@ -12,7 +12,7 @@ export default {
 		const isUpload = (this.getOption("upload", false) !== false);
 		let templateAdd = [];
 		if (isUpload) {
-			templateAdd.push({ type: "Submit", content: {html: "<i class=\"irform-icon-upload\"></i> Upload"}, click: this.triggerUpload });
+			templateAdd.push({ type: "Submit", content: {html: "<i class=\"bzd-icon-upload\"></i> Upload"}, click: this.triggerUpload });
 		}
 
 		return {
@@ -155,5 +155,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/form/file.scss";
+	@use "bzd-style/css/form/file.scss";
 </style>

@@ -1,7 +1,7 @@
-@import "index.scss";
-@import "input.scss";
+@use "index.scss" as base;
+@use "input.scss";
 
-$triangleHeight: $fieldHeight / 5;
+$triangleHeight: base.$fieldHeight / 5;
 
 .irform-dropdown {
 	@extend %reset;
@@ -22,18 +22,18 @@ $triangleHeight: $fieldHeight / 5;
 		position: relative;
 
 		.irform-dropdown-arrow {
-			width: #{$fieldHeight / 1.5}px;
+			width: #{base.$fieldHeight / 1.5}px;
 			display: inline-block;
 
 			&:after {
 				position: absolute;
 				content: "";
-				top: #{($fieldHeight - $triangleHeight) / 2}px;
-				right: #{$fieldHeight / 3}px;
+				top: #{(base.$fieldHeight - $triangleHeight) / 2}px;
+				right: #{base.$fieldHeight / 3}px;
 				width: 0;
 				height: 0;
 				border: #{$triangleHeight}px solid transparent;
-				border-color: $fieldSpecialBgColor transparent transparent transparent;
+				border-color: base.$fieldSpecialBgColor transparent transparent transparent;
 				transition: all .3s;
 			}
 		}
@@ -45,8 +45,8 @@ $triangleHeight: $fieldHeight / 5;
 		width: 100%;
 		display: none;
 		box-shadow: 0 3px 5px 0 #888;
-		background-color: $fieldBgColor;
-		max-height: #{$fieldHeight * 5}px;
+		background-color: base.$fieldBgColor;
+		max-height: #{base.$fieldHeight * 5}px;
 		overflow-y: auto;
 
 		@extend %scrollbar;
@@ -60,8 +60,8 @@ $triangleHeight: $fieldHeight / 5;
 
 			&:not(.irform-dropdown-item-selected):hover,
 			&.irform-dropdown-item-selected {
-				background-color: $fieldSpecialBgColor;
-				color: $fieldSpecialTextColor;
+				background-color: base.$fieldSpecialBgColor;
+				color: base.$fieldSpecialTextColor;
 				cursor: pointer;
 			}
 		}
@@ -91,7 +91,7 @@ $triangleHeight: $fieldHeight / 5;
 	@extend %error-border;
 
 	&:after {
-		border-color: $errorColor transparent transparent transparent;
+		border-color: base.$errorColor transparent transparent transparent;
 	}
 }
 
@@ -102,7 +102,7 @@ $triangleHeight: $fieldHeight / 5;
 	@extend %success-border;
 
 	&:after {
-		border-color: $successColor transparent transparent transparent;
+		border-color: base.$successColor transparent transparent transparent;
 	}
 }
 
@@ -113,6 +113,6 @@ $triangleHeight: $fieldHeight / 5;
 	@extend %disable-border;
 
 	&:after {
-		border-color: $disableColor transparent transparent transparent;
+		border-color: base.$disableColor transparent transparent transparent;
 	}
 }

@@ -1,4 +1,4 @@
-@import "index.scss";
+@use "index.scss" as base;
 
 .irform-input {
 	display: flex;
@@ -39,14 +39,14 @@
 
 			.irform-input-multi-item {
 				padding: 2px 5px 2px 5px;
-				background-color: $fieldSpecialBgColor;
-				color: $fieldSpecialTextColor;
+				background-color: base.$fieldSpecialBgColor;
+				color: base.$fieldSpecialTextColor;
 				border-radius: 3px;
 				white-space: nowrap;
 				@extend %clickable;
 
 				.irform-input-multi-delete {
-					@include buttonClose($fieldTextHeight / 1.5, $fieldSpecialTextColor);
+					@include base.buttonClose(base.$fieldTextHeight / 1.5, base.$fieldSpecialTextColor);
 				}
 			}
 		}

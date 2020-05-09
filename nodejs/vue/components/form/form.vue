@@ -156,5 +156,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/form/layout.scss";
+	@use "bzd-style/css/form/layout.scss";
 </style>

@@ -31,5 +31,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/form/autocomplete.scss";
+	@use "bzd-style/css/form/autocomplete.scss";
 </style>

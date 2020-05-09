@@ -1,33 +1,33 @@
-@import "index.scss";
-
-$bzdIconNames: bold italic underline strike-through undo justify-left justify-center justify-right justify indent unindent ordered-list unordered-list quote clear-format;
-@import "bzd/icons.scss";
+@use "index.scss" as base;
+@use "bzd/icons.scss" with (
+	$bzdIconNames: bold italic underline strike-through undo justify-left justify-center justify-right justify indent unindent ordered-list unordered-list quote clear-format
+);
 
 .irform-editor {
 	width: 100%;
 
 	.irform-editor-toolbar {
-		background-color: $fieldBgColor;
+		background-color: base.$fieldBgColor;
 
 		.irform-carousel-slides {
 			// ---- Toolbar elements ------------------------------------------
 
 			.irform-editor-toolbar-separator {
-				background-color: $fieldTextColor;
+				background-color: base.$fieldTextColor;
 				opacity: 0.5;
 				width: 1px;
-				height: #{$fieldHeight * 0.8}px;
+				height: #{base.$fieldHeight * 0.8}px;
 			}
 
 			.irform-editor-toolbar-element {
 				@extend %field-reset;
 				@extend %clickable;
 				background-color: transparent !important;
-				line-height: #{$toolbarHeight}px;
-				min-width: #{$toolbarHeight}px;
-				height: #{$toolbarHeight}px;
+				line-height: #{base.$toolbarHeight}px;
+				min-width: #{base.$toolbarHeight}px;
+				height: #{base.$toolbarHeight}px;
 				text-align: center;
-				color: $fieldTextColor;
+				color: base.$fieldTextColor;
 			}
 		}
 
@@ -41,23 +41,20 @@ $bzdIconNames: bold italic underline strike-through undo justify-left justify-ce
 			}
 		}
 	}
-
-	.irform-editor-content {
-	}
 }
 
 // Disable
 .irform-disable .irform-editor-toolbar {
-	background-color: $disableBgColor !important;
+	background-color: base.$disableBgColor !important;
 	@extend %disable;
 
 	.irform-carousel-slides {	
 		.irform-editor-toolbar-separator {
-			background-color: $disableColor !important;
+			background-color: base.$disableColor !important;
 		}
 
 		.irform-editor-toolbar-element {
-			color: $disableColor !important;
+			color: base.$disableColor !important;
 			@extend %disable;
 			@extend %disable-border;
 		}

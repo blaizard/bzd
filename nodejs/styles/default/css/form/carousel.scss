@@ -1,4 +1,4 @@
-@import "index.scss";
+@use "index.scss" as base;
 
 .irform-carousel {
 	padding: 0;
@@ -6,7 +6,7 @@
 	outline: none;
 
 	display: flex;
-	flew-flow: row nowrap;
+	flex-flow: row nowrap;
 	align-items: center;
 	justify-content: center;
 
@@ -47,11 +47,11 @@
 	}
 
 	.irform-carousel-prev {
-		@include buttonArrow(left, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+		@include base.buttonArrow(left, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
 		margin-left: 4px;
 	}
 	.irform-carousel-next {
-		@include buttonArrow(right, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+		@include base.buttonArrow(right, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
 		margin-right: 4px;
 	}
 

@@ -1,5 +1,5 @@
-@import "index.scss";
-@import "input.scss";
+@use "index.scss" as base;
+@use "input.scss";
 
 .irform-date {
     display: flex;
@@ -18,10 +18,10 @@
         }
 
         .irform-date-previous {
-            @include buttonArrow(left, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+            @include base.buttonArrow(left, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
         }
         .irform-date-next {
-            @include buttonArrow(right, $fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 4);
+            @include base.buttonArrow(right, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
         }
     }
 
@@ -33,25 +33,25 @@
 
         .irform-date-item {
             text-align: center;
-            color: $disableTextColor;
-            background-color: $disableBgColor;
+            color: base.$disableTextColor;
+            background-color: base.$disableBgColor;
             flex: 1 1 0;
 
             &.irform-date-item-current {
-                color: $fieldTextColor;
-                background-color: $fieldBgColor;
+                color: base.$fieldTextColor;
+                background-color: base.$fieldBgColor;
 
                 @extend %clickable;
             }
 
             &.irform-date-item-header {
-                color: $actionerTextColor;
-                background-color: $actionerBgColor;
+                color: base.$actionerTextColor;
+                background-color: base.$actionerBgColor;
             }
 
             &.irform-date-item-selected {
-                color: $fieldSpecialTextColor;
-                background-color: $fieldSpecialBgColor;
+                color: base.$fieldSpecialTextColor;
+                background-color: base.$fieldSpecialBgColor;
             }
         }
     }

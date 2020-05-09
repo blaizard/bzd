@@ -1,10 +1,8 @@
-@import "index.scss";
+@use "index.scss" as base;
 
-$switchSize: $fieldHeight * 0.6875; //22
+$switchSize: base.$fieldHeight * 0.6875; //22
 
 .irform-checkbox {
-	@extends %irform-inline;
-
 	input[type=checkbox] {
 		opacity: 0;
 		width: 0;
@@ -12,15 +10,15 @@ $switchSize: $fieldHeight * 0.6875; //22
 
 		+ label {
 			@extend %reset;
-			color: $fieldTextColor;
+			color: base.$fieldTextColor;
 			position: relative;
 			cursor: pointer;
 
 			&:before {
 				content: '';
-				@include button($fieldHeight, $actionerTextColor, $actionerBgColor);
+				@include base.button(base.$fieldHeight, base.$actionerTextColor, base.$actionerBgColor);
 				@extend %clickable;
-				margin-right: #{$fieldPaddingX}px;
+				margin-right: #{base.$fieldPaddingX}px;
 			}
 
 			&:hover {
@@ -31,10 +29,10 @@ $switchSize: $fieldHeight * 0.6875; //22
 		}
 		&:checked + label:before {
 			content: "\2713";
-			font-size: #{$fieldTextHeight * 1.2}px;
+			font-size: #{base.$fieldTextHeight * 1.2}px;
 			font-weight: bold;
 			text-align: center;
-			line-height: #{$fieldHeight}px;
+			line-height: #{base.$fieldHeight}px;
 		}
 		&:focus + label:before {
 			@extend %focus;

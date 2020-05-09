@@ -1,10 +1,10 @@
-@import "bzd-style/css/normalize.scss";
-@import "bzd-style/css/clickable.scss";
-@import "bzd-style/css/colors.scss";
+@use "bzd-style/css/normalize.scss";
+@use "bzd-style/css/clickable.scss";
+@use "bzd-style/css/colors.scss" as colors;
 
 body {
-	background-color: $bzdGraphColorWhite;
-	color: $bzdGraphColorBlack;
+	background-color: colors.$bzdGraphColorWhite;
+	color: colors.$bzdGraphColorBlack;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	word-wrap: break-word;
 	line-height: 1.5;
@@ -16,8 +16,8 @@ body {
 }
 
 *::selection {
-	background-color: rgba($bzdGraphColorBlack, 70%);
-	color: $bzdGraphColorWhite;
+	background-color: rgba(colors.$bzdGraphColorBlack, 70%);
+	color: colors.$bzdGraphColorWhite;
 }
 
 /* Paragraph */
@@ -63,7 +63,7 @@ h3 {
 blockquote {
 	margin-left: 0px;
 	padding-left: 10px;
-	border-left: 2px solid lighten($bzdGraphColorBlack, 50%);
+	border-left: 2px solid lighten(colors.$bzdGraphColorBlack, 50%);
 }
 
 /* Tables */
@@ -76,13 +76,13 @@ table {
 }
 
 table tbody tr:hover {
-	background-color: darken($bzdGraphColorWhite, 50%);
+	background-color: darken(colors.$bzdGraphColorWhite, 50%);
 }
 
 th,
 td {
 	text-align: left;
-	border-bottom: 1px solid darken($bzdGraphColorWhite, 50%);
+	border-bottom: 1px solid darken(colors.$bzdGraphColorWhite, 50%);
 	white-space: nowrap;
 	padding-right: 10px;
 }
@@ -114,13 +114,13 @@ ul li li {
 /* Links */
 
 a {
-	color: $bzdGraphColorBlue;
+	color: colors.$bzdGraphColorBlue;
 	text-decoration: none;
 	cursor: pointer;
 }
 
 a:hover {
-	color: $bzdGraphColorBlack;
+	color: colors.$bzdGraphColorBlack;
 	text-decoration: none;
 }
 
@@ -128,8 +128,8 @@ a:hover {
 
 code {
 	white-space: nowrap;
-	background: darken($bzdGraphColorWhite, 20%);
-	border: solid 1px darken($bzdGraphColorWhite, 10%);
+	background: darken(colors.$bzdGraphColorWhite, 20%);
+	border: solid 1px darken(colors.$bzdGraphColorWhite, 10%);
 	border-radius: 6px;
 	font-size: 80%;
 	padding: 2px 5px;
@@ -150,9 +150,9 @@ pre {
 	color: rgb(64, 64, 64);
 	margin: 0px;
 	overflow: auto;
-	background: $bzdGraphColorWhite;
+	background: colors.$bzdGraphColorWhite;
 	margin: 1px 0px 24px;
-	border: 1px solid darken($bzdGraphColorWhite, 10%);
+	border: 1px solid darken(colors.$bzdGraphColorWhite, 10%);
 }
 
 /* Code blocks */
@@ -165,7 +165,7 @@ pre > code {
 	margin: 0;
 	padding: 0;
 	font-family: "Inconsolata", "Consolata", "Monaco", monospace;
-	color: lighten($bzdGraphColorBlack, 20%);
+	color: lighten(colors.$bzdGraphColorBlack, 20%);
 	overflow-x: auto;
 }
 
@@ -173,7 +173,7 @@ pre > code {
 
 hr {
 	border: none;
-	border-bottom: 1px solid lighten($bzdGraphColorBlack, 50%);
+	border-bottom: 1px solid lighten(colors.$bzdGraphColorBlack, 50%);
 	margin: 20px 0px;
 	padding: 0;
 }
@@ -186,11 +186,11 @@ input[type="reset"],
 button {
 	display: inline-block;
 	margin: 5px;
-	background-color: darken($bzdGraphColorWhite, 10%);
+	background-color: darken(colors.$bzdGraphColorWhite, 10%);
 	padding: 7px 20px;
 	min-width: 50px;
 	border: none;
-	color: $bzdGraphColorBlack;
+	color: colors.$bzdGraphColorBlack;
 	cursor: pointer;
 	font: inherit;
 	transition: all .2s;
@@ -198,8 +198,8 @@ button {
 	@extend %bzd-clickable;
 
 	&:active {
-		background-color: $bzdGraphColorWhite;
-		color: $bzdGraphColorBlack;
+		background-color: colors.$bzdGraphColorWhite;
+		color: colors.$bzdGraphColorBlack;
 	}
 
 	&:focus {

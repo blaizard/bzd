@@ -9,7 +9,7 @@
 
 // ---- Configuration ----
 
-@import "bzd-style/css/colors.scss";
+@use "bzd-style/css/colors.scss" as colors;
 
 $font: "Helvetica";
 
@@ -19,15 +19,15 @@ $fieldPaddingX: 6 !default;
 $fieldPaddingY: 0 !default;
 $fieldHeight: 32 !default;
 $fieldTextHeight: 16 !default;
-$fieldTextColor: $bzdGraphColorBlack !default;
-$fieldPlaceholderColor: $bzdGraphColorGray !default;
-$fieldSpecialTextColor: $bzdGraphColorWhite !default;
-$fieldSpecialBgColor: $bzdGraphColorBlue !default;
-$fieldBgColor: $bzdGraphColorWhite !default;
+$fieldTextColor: colors.$bzdGraphColorBlack !default;
+$fieldPlaceholderColor: colors.$bzdGraphColorGray !default;
+$fieldSpecialTextColor: colors.$bzdGraphColorWhite !default;
+$fieldSpecialBgColor: colors.$bzdGraphColorBlue !default;
+$fieldBgColor: colors.$bzdGraphColorWhite !default;
 $fieldBorderThickness: 1 !default;
-$fieldBorderColor: darken($bzdGraphColorWhite, 20%) !default;
+$fieldBorderColor: darken(colors.$bzdGraphColorWhite, 20%) !default;
 $fieldBorderRadius: 2 !default;
-$tableBorderColor: darken($bzdGraphColorWhite, 10%) !default;
+$tableBorderColor: darken(colors.$bzdGraphColorWhite, 10%) !default;
 $toolbarHeight: 40 !default;
 
 $actionerTextColor: #333 !default;
@@ -35,8 +35,8 @@ $actionerBgColor: #eee !default;
 
 $focusColor: #ccc !default;
 
-$errorColor: $bzdGraphColorRed !default;
-$successColor: $bzdGraphColorGreen !default;
+$errorColor: colors.$bzdGraphColorRed !default;
+$successColor: colors.$bzdGraphColorGreen !default;
 $disableColor: #ddd !default;
 $disableTextColor: #999 !default;
 $disableBgColor: #eee !default;

@@ -55,5 +55,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/form/textarea.scss";
+	@use "bzd-style/css/form/textarea.scss";
 </style>

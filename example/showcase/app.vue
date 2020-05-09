@@ -43,7 +43,7 @@
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/base.scss";
-	@import "bzd-style/css/tooltip.scss";
-	@import "bzd-style/css/loading.scss";
+	@use "bzd-style/css/base.scss";
+	@use "bzd-style/css/tooltip.scss";
+	@use "bzd-style/css/loading.scss";
 </style>
