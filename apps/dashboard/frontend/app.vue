@@ -58,10 +58,11 @@
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/base.scss";
-	@import "bzd-style/css/tooltip.scss";
-	@import "bzd-style/css/loading.scss";
+	@use "bzd-style/css/base.scss";
+	@use "bzd-style/css/tooltip.scss";
+	@use "bzd-style/css/loading.scss";
 
-	$bzdIconNames: edit, add, check;
-	@import "bzd/icons.scss";
+	@use "bzd/icons.scss" with (
+		$bzdIconNames: edit add check
+	);
 </style>

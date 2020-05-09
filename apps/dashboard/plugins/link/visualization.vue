@@ -21,6 +21,7 @@
 </script>
 
 <style lang="scss">
-	$bzdIconNames: link;
-	@import "bzd/icons.scss";
+	@use "bzd/icons.scss" with (
+        $bzdIconNames: link
+    );
 </style>

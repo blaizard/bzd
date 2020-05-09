@@ -193,11 +193,12 @@
 </script>
 
 <style lang="scss">
-	$bzdIconNames: status-success, status-failure, status-in-progress, status-abort, clock;
-	@import "bzd/icons.scss";
+	@use "bzd/icons.scss" as icons with (
+        $bzdIconNames: status-success status-failure status-in-progress status-abort clock
+    );
 
     .bzd-icon-continuous-integration {
-		@include defineIcon("continuous-integration.svg");
+		@include icons.defineIcon("continuous-integration.svg");
 	}
 </style>
 
