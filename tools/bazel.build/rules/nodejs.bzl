@@ -220,7 +220,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
 
     symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
         "nodejs": "bzd",
-        "nodejs/styles/default": "bzd-style"
+        "nodejs/styles/default": "bzd-style",
     })
 
     result = [
