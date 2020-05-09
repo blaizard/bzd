@@ -607,5 +607,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/graph/index.scss";
+	@use "bzd-style/css/graph/plot.scss";
 </style>

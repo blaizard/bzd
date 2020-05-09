@@ -219,5 +219,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "bzd-style/css/form/input.scss";
+	@use "bzd-style/css/form/input.scss";
 </style>

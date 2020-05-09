@@ -1,4 +1,4 @@
-@import "index.scss";
+@use "index.scss" as base;
 
 .irform-array {
 	.irform-array-items {
@@ -55,7 +55,7 @@
 			}
 
 			.irform-array-item-delete {
-				@include buttonClose($fieldHeight, $actionerTextColor, $fieldHeight / 2, $actionerBgColor, 3);
+				@include base.buttonClose(base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 3);
 			}
 		}
 	}
@@ -74,12 +74,12 @@
 
 		&:before,
 		&:after {
-			background-color: $disableColor !important;
+			background-color: base.$disableColor !important;
 		}
 	}
 
 	&:after {
-		border-color: $disableColor transparent transparent transparent;
+		border-color: base.$disableColor transparent transparent transparent;
 	}
 }
 

@@ -1,4 +1,7 @@
-@import "index.scss";
+@use "index.scss" as base;
+@use "bzd/icons.scss" with (
+	$bzdIconNames: upload
+);
 
 $borderWidth: 5;
 $height: 150;
@@ -7,10 +10,10 @@ body.irform-file-drag .irform-array-file {
 	* {
 		opacity: 0;
 	}
-	border: #{$fieldBorderThickness}px dashed $fieldBorderColor;
+	border: #{base.$fieldBorderThickness}px dashed base.$fieldBorderColor;
 	position: relative;
 	&:before {
-		color: $fieldBorderColor;
+		color: base.$fieldBorderColor;
 		content: "Drag & drop here";
 		position: absolute;
 		width: 100%;
@@ -27,7 +30,7 @@ body.irform-file-drag .irform-array-file {
 .irform-file {
 	@extend %field-reset;
 
-	border: 1px solid $fieldBorderColor;
+	border: 1px solid base.$fieldBorderColor;
 
 	min-width: #{$height}px;
 	height: #{$height}px;
@@ -52,8 +55,8 @@ body.irform-file-drag .irform-array-file {
 	&.irform-file-upload {
 		max-width: #{$height * 2}px;
 		svg {
-			height: #{$height - $borderWidth * 2 - $fieldHeight * 2}px;
-			color: $disableBgColor;
+			height: #{$height - $borderWidth * 2 - base.$fieldHeight * 2}px;
+			color: base.$disableBgColor;
 			stroke: currentColor;
 			fill: currentColor;
 		}
@@ -65,11 +68,11 @@ body.irform-file-drag .irform-array-file {
 			bottom: 0;
 			left: 0;
 			width: 100%;
-			height: #{$fieldBorderThickness}px;
+			height: #{base.$fieldBorderThickness}px;
 
 			.irform-file-progress-bar {
 				height: 100%;
-				background-color: $fieldBorderColor;
+				background-color: base.$fieldBorderColor;
 			}
 		}
 	}
@@ -85,7 +88,7 @@ body.irform-file-drag .irform-array-file {
 	}
 
 	.irform-file-delete {
-		@include buttonClose($fieldHeight / 1.5, $actionerTextColor, $fieldHeight / 2.5, $actionerBgColor);
+		@include base.buttonClose(base.$fieldHeight / 1.5, base.$actionerTextColor, base.$fieldHeight / 2.5, base.$actionerBgColor);
 
 		position: absolute;
 		top: #{$borderWidth + 2}px;

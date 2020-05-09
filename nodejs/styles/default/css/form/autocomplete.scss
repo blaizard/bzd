@@ -1,4 +1,4 @@
-@import "dropdown.scss";
+@use "dropdown.scss";
 
 .irform-autocomplete {
 	@extend .irform-dropdown;
