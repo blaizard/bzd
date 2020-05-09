@@ -18,7 +18,10 @@ export default async function request(url, options) {
 		headers: options.headers
 	});
 
-	Exception.assert(response.ok, async () => { return (await response.text()) || response.statusText; });
+	if (!response.ok) {
+		const message = await response.text();
+		throw new Exception(message || response.statusText);
+	}
 
 	return await response.text();
 }
