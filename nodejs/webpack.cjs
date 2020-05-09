@@ -249,7 +249,7 @@ class Webpack {
 				},
 				resolve: {
 					alias: config.alias,
-					symlinks: false
+					symlinks: false,
 				}
 			});
 
@@ -357,20 +357,19 @@ function getWebpackConfigDefault(isDev, config)
 							loader: "sass-loader",
 							options: {
 								// Need to use dart-sass as this is the only implementation that supports @use
-								implementation: require("sass"),
+								implementation: require("sass")
 							},
 						}
 					]
 				},
 				{
-					test: /\.svg/,
+					test: /\.svg$/,
 					use: {
-						loader: "svg-url-loader",
-						options: {}
+						loader: "url-loader",
 					}
 				},
 				{
-					test: /\.(png|gif|jpe|jpg|woff|woff2|eot|ttf)$/,
+					test: /\.(png|gif|jpg|woff|woff2|eot|ttf)$/,
 					loader: "file-loader",
 					options: {
 						name: "[hash].[ext]",
