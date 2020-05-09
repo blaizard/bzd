@@ -172,7 +172,7 @@ bzd_nodejs_install = rule(
 Generate the symlinks dictionary to be passed to root_symlinks or symlinks
 """
 
-def bzd_nodejs_node_modules_symlinks(files, aliases):
+def bzd_nodejs_aliases_symlinks(files, aliases):
     symlinks = {}
     for directory, name in aliases.items():
         for f in files:
@@ -212,13 +212,13 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Attempt but faced yet another issue: SyntaxError: Cannot use import statement outside a module
     command = """
     export BZD_RULE=nodejs
-    {{binary}} --preserve-symlinks --preserve-symlinks-main"""
+    {{binary}}"""
     if is_test:
-        command += " \"../node_modules/mocha/bin/mocha\" \"{}\""
+        command += " \"{{root}}/node_modules/mocha/bin/mocha\" \"{}\""
     else:
         command += " \"{}\" $@"
 
-    symlinks = bzd_nodejs_node_modules_symlinks(files = srcs, aliases = {
+    symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
         "nodejs": "bzd",
     })
 

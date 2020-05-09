@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_node_modules_symlinks")
+load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_aliases_symlinks")
 load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsWebProvider = provider(fields = ["tar"])
@@ -60,11 +60,10 @@ def _bzd_nodejs_web_build_impl(ctx):
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
-    symlinks = bzd_nodejs_node_modules_symlinks(files = srcs, aliases = {
+    # Create the symlinks for the aliases
+    symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
         "nodejs": "bzd",
     })
-    #print(symlinks)
-
     symlinks.update({
         "webpack.config.cjs": webpack_config,
     })
@@ -76,7 +75,7 @@ def _bzd_nodejs_web_build_impl(ctx):
         output = ctx.outputs.executable,
         command = """
         export BZD_RULE=nodejs_web
-        {binary} --preserve-symlinks --preserve-symlinks-main "{root}/node_modules/.bin/webpack" --config "{workspace}/webpack.config.cjs" --output-path ".bzd/output"
+        {binary} "{root}/node_modules/.bin/webpack" --config "{workspace}/webpack.config.cjs" --output-path ".bzd/output"
         tar -h -cf "$1" -C "{workspace}/.bzd/output" --transform 's,^./,,' .
         """,
         extra_runfiles = [webpack_config, package_json, node_modules] + srcs,
