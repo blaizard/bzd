@@ -75,7 +75,7 @@ export default {
 
 <style lang="scss">
     // ---- Configuration
-    @import "~[bzd-style]/css/colors.scss";
+    @import "bzd-style/css/colors.scss";
 
     // Global
 
@@ -100,11 +100,11 @@ export default {
     // ----
 
     $bzdIconNames: menu;
-	@import "~[bzd]/icons.scss";
+	@import "bzd/icons.scss";
 
     $bzdColor: #000;
     $bzdOpacity: 0.5;
-    @import "~[bzd-style]/css/clickable.scss";
+    @import "bzd-style/css/clickable.scss";
 
     html,
     body {

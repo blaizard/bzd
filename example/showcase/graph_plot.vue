@@ -23,7 +23,7 @@
 </template>
 
 <script>
-    import Plot from "[bzd]/vue/components/graph/plot.vue"; 
+    import Plot from "bzd/vue/components/graph/plot.vue"; 
 
 	export default {
         components: {

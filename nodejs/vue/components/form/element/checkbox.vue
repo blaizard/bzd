@@ -37,5 +37,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/form/checkbox.scss";
+	@import "bzd-style/css/form/checkbox.scss";
 </style>

@@ -115,5 +115,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/form/date.scss";
+	@import "bzd-style/css/form/date.scss";
 </style>

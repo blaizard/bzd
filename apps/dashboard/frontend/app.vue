@@ -42,11 +42,11 @@
 			this.$routerSet({
 				ref: "view",
 				routes: [
-                    { path: '/', component: () => import("[frontend]/tiles.vue") },
-                    { path: '/new', component: () => import("[frontend]/config.vue") },
-                    { path: '/update/{uid}', component: () => import("[frontend]/config.vue") },
+                    { path: '/', component: () => import("./tiles.vue") },
+                    { path: '/new', component: () => import("./config.vue") },
+                    { path: '/update/{uid}', component: () => import("./config.vue") },
 				],
-				fallback: { component: () => import("[frontend]/404.vue") }
+				fallback: { component: () => import("./404.vue") }
 			});
 		},
 		methods: {
@@ -58,9 +58,9 @@
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/base.scss";
-	@import "~[bzd-style]/css/tooltip.scss";
-	@import "~[bzd-style]/css/loading.scss";
+	@import "bzd-style/css/base.scss";
+	@import "bzd-style/css/tooltip.scss";
+	@import "bzd-style/css/loading.scss";
 
 	$bzdIconNames: edit, add, check;
 	@import "bzd/icons.scss";

@@ -89,5 +89,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/graph/index.scss";
+	@import "bzd-style/css/graph/index.scss";
 </style>
