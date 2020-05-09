@@ -1,6 +1,8 @@
 <template>
 	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!ready">
-        <component class="content"
+        <div v-if="error" class="error">{{ error }}</div>
+        <component v-else
+                class="content"
                 :is="component"
                 :description="description"
                 :metadata="metadata"
@@ -34,6 +36,7 @@
                 metadata: {},
                 handleTimeout: null,
                 ready: true,
+                error: false,
                 color: null,
                 icon: null,
                 link: null
@@ -105,12 +108,19 @@
         methods: {
             async fetch() {
                 this.handleTimeout = null;
-                this.metadata = await this.$api.request("get", "/data", {
-                    uid: this.uid,
-                    type: this.sourceType
-                });
-                this.ready = true;
-                this.handleTimeout = setTimeout(this.fetch, this.timeout);
+                try {
+                    this.metadata = await this.$api.request("get", "/data", {
+                        uid: this.uid,
+                        type: this.sourceType
+                    });
+                    this.ready = true;
+                    this.handleTimeout = setTimeout(this.fetch, this.timeout);
+                }
+                catch (e) {
+                    this.ready = true;
+                    this.error = e;
+                    this.handleColor("red");
+                }
             },
             async fetchIcon() {
                 const plugin = (this.sourceType) ? Source[this.sourceType] : Visualization[this.visualizationType];
@@ -168,7 +178,8 @@
             line-height: 2em;
         }
 
-        .content {
+        .content,
+        .error {
             position: absolute;
             top: $bzdPadding;
             bottom: calc(#{$bzdPadding * 2} + 2em);
