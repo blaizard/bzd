@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_install", "bzd_nodejs_aliases_symlinks")
+load("//tools/bazel.build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_aliases_symlinks", "bzd_nodejs_install")
 load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
 
 BzdNodeJsWebProvider = provider(fields = ["tar"])
@@ -63,7 +63,7 @@ def _bzd_nodejs_web_build_impl(ctx):
     # Create the symlinks for the aliases
     symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
         "nodejs": "bzd",
-        "nodejs/styles/default": "bzd-style"
+        "nodejs/styles/default": "bzd-style",
     })
     symlinks.update({
         "webpack.config.cjs": webpack_config,

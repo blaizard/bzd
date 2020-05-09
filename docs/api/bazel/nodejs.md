@@ -87,6 +87,25 @@ BzdNodeJsInstallProvider(<a href="#BzdNodeJsInstallProvider-package_json">packag
 | aliases |  (Undocumented)    |
 
 
+<a name="#bzd_nodejs_aliases_symlinks"></a>
+
+## bzd_nodejs_aliases_symlinks
+
+<pre>
+bzd_nodejs_aliases_symlinks(<a href="#bzd_nodejs_aliases_symlinks-files">files</a>, <a href="#bzd_nodejs_aliases_symlinks-aliases">aliases</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :-------------: | :-------------: | :-------------: |
+| files |  <p align="center"> - </p>   |  none |
+| aliases |  <p align="center"> - </p>   |  none |
+
+
 <a name="#bzd_nodejs_binary"></a>
 
 ## bzd_nodejs_binary
@@ -108,25 +127,6 @@ bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_node
 | visibility |  <p align="center"> - </p>   |  <code>[]</code> |
 | tags |  <p align="center"> - </p>   |  <code>[]</code> |
 | kwargs |  <p align="center"> - </p>   |  none |
-
-
-<a name="#bzd_nodejs_node_modules_symlinks"></a>
-
-## bzd_nodejs_node_modules_symlinks
-
-<pre>
-bzd_nodejs_node_modules_symlinks(<a href="#bzd_nodejs_node_modules_symlinks-files">files</a>, <a href="#bzd_nodejs_node_modules_symlinks-aliases">aliases</a>)
-</pre>
-
-
-
-**PARAMETERS**
-
-
-| Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| files |  <p align="center"> - </p>   |  none |
-| aliases |  <p align="center"> - </p>   |  none |
 
 
 <a name="#bzd_nodejs_test"></a>
