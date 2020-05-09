@@ -7,7 +7,6 @@ bzd_nodejs_library(
     srcs = [
         "api.v1.json",
     ],
-    alias = "dashboard",
     visibility = [
         "//apps/dashboard/backend:__pkg__",
         "//apps/dashboard/frontend:__pkg__",

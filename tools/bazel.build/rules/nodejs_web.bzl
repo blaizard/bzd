@@ -20,9 +20,6 @@ def _bzd_nodejs_web_build_impl(ctx):
     # --- Generate the webpack.config.json file
     webpack_config = ctx.actions.declare_file("webpack.config.js")
 
-    # aliases
-    aliases = ["\"[{}]\": Path.join(Path.resolve(__dirname), \"{}\")".format(name, path) for name, path in aliases.items()]
-
     # entries and templates
     entries = ""
     templates = ""
@@ -51,7 +48,6 @@ def _bzd_nodejs_web_build_impl(ctx):
         substitutions = {
             "{mode}": mode,
             "{public_path}": ctx.attr.public_path,
-            "{aliases}": ",\n".join(aliases),
             "{entries}": entries,
             "{templates}": templates,
         },
@@ -61,10 +57,7 @@ def _bzd_nodejs_web_build_impl(ctx):
     toolchain_executable = ctx.toolchains["//tools/bazel.build/toolchains/nodejs:toolchain_type"].executable
 
     # Create the symlinks for the aliases
-    symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
-        "nodejs": "bzd",
-        "nodejs/styles/default": "bzd-style",
-    })
+    symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = aliases)
     symlinks.update({
         "webpack.config.cjs": webpack_config,
     })
@@ -196,11 +189,11 @@ _bzd_nodejs_web_exec = rule(
 Public macro to create a web application with NodeJs
 """
 
-def bzd_nodejs_web(name, alias = "", srcs = [], packages = {}, deps = [], visibility = [], **kwargs):
+def bzd_nodejs_web(name, aliases = {}, srcs = [], packages = {}, deps = [], visibility = [], **kwargs):
     # Gather dependencies and install the packages
     bzd_nodejs_install(
         name = name + ".install",
-        alias = alias,
+        aliases = aliases,
         srcs = srcs,
         packages = packages,
         deps = deps + [

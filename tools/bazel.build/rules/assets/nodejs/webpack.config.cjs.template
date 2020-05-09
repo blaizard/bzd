@@ -9,9 +9,6 @@ const config = {
 		{entries}
 	},
 	publicPath: "{public_path}",
-	alias: {
-		{aliases}
-	},
 	templates: {
 		{templates}
 	}
