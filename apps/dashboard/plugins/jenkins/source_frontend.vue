@@ -6,9 +6,9 @@
 </script>
 
 <style lang="scss">
-	@import "bzd/icons.scss";
+	@use "bzd/icons.scss" as icons;
 
     .bzd-icon-jenkins {
-		@include defineIcon("jenkins.svg");
+		@include icons.defineIcon("jenkins.svg");
 	}
 </style>

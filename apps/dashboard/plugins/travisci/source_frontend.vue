@@ -6,9 +6,9 @@
 </script>
 
 <style lang="scss">
-	@import "bzd/icons.scss";
+	@use "bzd/icons.scss" as icons;
 
     .bzd-icon-travisci {
-		@include defineIcon("travisci.svg");
+		@include icons.defineIcon("travisci.svg");
 	}
 </style>

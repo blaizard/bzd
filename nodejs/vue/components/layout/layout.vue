@@ -75,21 +75,21 @@ export default {
 
 <style lang="scss">
     // ---- Configuration
-    @import "bzd-style/css/colors.scss";
+    @use "bzd-style/css/colors.scss" as colors;
 
     // Global
 
     // Header
-    $headerColor: $bzdGraphColorWhite;
-    $headerBgColor: $bzdGraphColorBlue;
+    $headerColor: colors.$bzdGraphColorWhite;
+    $headerBgColor: colors.$bzdGraphColorBlue;
     $headerFontSize: 20px;
     $headerHeight: 44px;
     $headerPadding: ($headerHeight - $headerFontSize) / 2;
     $headerZIndex: 10;
 
     // Menu
-    $menuColor: $bzdGraphColorBlack;
-    $menuBgColor: $bzdGraphColorWhite;
+    $menuColor: colors.$bzdGraphColorBlack;
+    $menuBgColor: colors.$bzdGraphColorWhite;
     $menuWidth: 300px;
     $menuPadding: 20px;
     $menuZIndex: 9;
@@ -99,12 +99,10 @@ export default {
 
     // ----
 
-    $bzdIconNames: menu;
-	@import "bzd/icons.scss";
-
-    $bzdColor: #000;
-    $bzdOpacity: 0.5;
-    @import "bzd-style/css/clickable.scss";
+    @use "bzd-style/css/clickable.scss";
+	@use "bzd/icons.scss" with (
+        $bzdIconNames: menu
+    );
 
     html,
     body {

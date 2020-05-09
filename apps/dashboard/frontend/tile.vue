@@ -146,7 +146,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import "bzd-style/css/clickable.scss";
+    @use "bzd-style/css/clickable.scss";
 
     $bzdPadding: 10px;
 
