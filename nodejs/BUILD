@@ -1,8 +1,18 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "bzd",
+    aliases = {
+        "bzd": "nodejs",
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "vue",
-    alias = "bzd",
+    deps = [
+        ":bzd",
+    ],
     packages = {
         "vue": "",
     },
@@ -14,7 +24,9 @@ bzd_nodejs_library(
     srcs = [
         "icons.scss",
     ],
-    alias = "bzd",
+    deps = [
+        ":bzd",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -24,7 +36,6 @@ bzd_nodejs_library(
         "template.cjs",
         "webpack.cjs",
     ],
-    alias = "bzd",
     packages = {
         # Babel
         "@babel/core": "",

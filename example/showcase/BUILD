@@ -5,7 +5,6 @@ bzd_nodejs_web(
     srcs = glob([
         "**/*",
     ]),
-    alias = "showcase",
     entries = {
         "app.mjs": "index",
     },

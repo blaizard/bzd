@@ -7,7 +7,6 @@ bzd_nodejs_web(
         "**/*.vue",
         "**/*.mjs",
     ]),
-    alias = "frontend",
     entries = {
         "app.mjs": "index",
     },

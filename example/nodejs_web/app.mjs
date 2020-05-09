@@ -2,7 +2,7 @@
 
 import Vue from "vue"
 import VueCompositionApi from "@vue/composition-api";
-import App from "[frontend]/app.vue"
+import App from "./app.vue"
 
 Vue.use(VueCompositionApi);
 
