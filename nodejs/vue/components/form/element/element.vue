@@ -16,7 +16,7 @@
 	 */
 export default {
 	props: {
-		description: {type: Object, required: true, default: {}},
+		description: {type: Object, required: false, default: () => ({})},
 		disable: {type: Boolean, default: false, required: false}
 	},
 	data: function() {
