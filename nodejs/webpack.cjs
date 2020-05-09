@@ -363,7 +363,14 @@ function getWebpackConfigDefault(isDev, config)
 					]
 				},
 				{
-					test: /\.(png|gif|jpe|jpg|svg|woff|woff2|eot|ttf)$/,
+					test: /\.svg/,
+					use: {
+						loader: "svg-url-loader",
+						options: {}
+					}
+				},
+				{
+					test: /\.(png|gif|jpe|jpg|woff|woff2|eot|ttf)$/,
 					loader: "file-loader",
 					options: {
 						name: "[hash].[ext]",
