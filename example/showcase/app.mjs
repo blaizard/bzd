@@ -2,7 +2,7 @@
 
 import Vue from "vue"
 import App from "./app.vue"
-import Router from "[bzd]/vue/router/router.mjs"
+import Router from "bzd/vue/router/router.mjs"
 
 Vue.use(Router);
 

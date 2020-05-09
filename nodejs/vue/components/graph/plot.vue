@@ -69,7 +69,7 @@ import { tooltip } from "../../directives/tooltip.mjs";
 import RenderLine from "./render/line.vue";
 import RenderBar from "./render/bar.vue";
 
-import Colors from "[bzd-style]/css/colors.scss";
+import Colors from "bzd-style/css/colors.scss";
 
 const DEBUG = true;
 
@@ -607,5 +607,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/graph/index.scss";
+	@import "bzd-style/css/graph/index.scss";
 </style>

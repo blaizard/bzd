@@ -16,9 +16,9 @@
 <script>
 	"use strict"
 
-    import { Visualization, Source } from "[dashboard]/plugins/plugins.mjs";
-    import Colors from "[bzd-style]/css/colors.scss";
+    import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs"
+    import { Visualization, Source } from "../plugins/plugins.mjs";
 
 	export default {
         props: {
@@ -136,7 +136,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import "~[bzd-style]/css/clickable.scss";
+    @import "bzd-style/css/clickable.scss";
 
     $bzdPadding: 10px;
 

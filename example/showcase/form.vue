@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import Form from "[bzd]/vue/components/form/form.vue"; 
+    import Form from "bzd/vue/components/form/form.vue"; 
 
 	export default {
         components: {

@@ -50,27 +50,27 @@ export default {
 					html: "<div class=\"irform-editor-toolbar-separator\"></div>"
 				},
 				bold: {
-					html: "<i class=\"irform-icon-bold\"></i>",
+					html: "<i class=\"bzd-icon-bold\"></i>",
 					type: "button",
 					click: () => this.actionOnSelection("bold")
 				},
 				italic: {
-					html: "<i class=\"irform-icon-italic\"></i>",
+					html: "<i class=\"bzd-icon-italic\"></i>",
 					type: "button",
 					click: () => this.actionOnSelection("italic")
 				},
 				underline: {
-					html: "<i class=\"irform-icon-underline\"></i>",
+					html: "<i class=\"bzd-icon-underline\"></i>",
 					type: "button",
 					click: () => this.actionOnSelection("underline")
 				},
 				strike: {
-					html: "<i class=\"irform-icon-strike\"></i>",
+					html: "<i class=\"bzd-icon-strike-through\"></i>",
 					type: "button",
 					click: () => this.actionOnSelection("strikeThrough")
 				},
 				undo: {
-					html: "<i class=\"irform-icon-undo\"></i>",
+					html: "<i class=\"bzd-icon-undo\"></i>",
 					type: "button",
 					click: () => {
 						if (this.history.length) {
@@ -79,52 +79,52 @@ export default {
 					}
 				},
 				justifyLeft: {
-					html: "<i class=\"irform-icon-justifyleft\"></i>",
+					html: "<i class=\"bzd-icon-justify-left\"></i>",
 					type: "button",
 					click: () => this.action("justifyLeft")
 				},
 				justifyCenter: {
-					html: "<i class=\"irform-icon-justifycenter\"></i>",
+					html: "<i class=\"bzd-icon-justify-center\"></i>",
 					type: "button",
 					click: () => this.action("justifyCenter")
 				},
 				justifyRight: {
-					html: "<i class=\"irform-icon-justifyright\"></i>",
+					html: "<i class=\"bzd-icon-justify-right\"></i>",
 					type: "button",
 					click: () => this.action("justifyRight")
 				},
 				justify: {
-					html: "<i class=\"irform-icon-justify\"></i>",
+					html: "<i class=\"bzd-icon-justify\"></i>",
 					type: "button",
 					click: () => this.action("justifyFull")
 				},
 				indent: {
-					html: "<i class=\"irform-icon-indent\"></i>",
+					html: "<i class=\"bzd-icon-indent\"></i>",
 					type: "button",
 					click: () => this.action("indent")
 				},
 				unindent: {
-					html: "<i class=\"irform-icon-unindent\"></i>",
+					html: "<i class=\"bzd-icon-unindent\"></i>",
 					type: "button",
 					click: () => this.action("outdent")
 				},
 				orderedList: {
-					html: "<i class=\"irform-icon-orderedlist\"></i>",
+					html: "<i class=\"bzd-icon-ordered-list\"></i>",
 					type: "button",
 					click: () => this.action("insertOrderedList")
 				},
 				unorderedList: {
-					html: "<i class=\"irform-icon-unorderedlist\"></i>",
+					html: "<i class=\"bzd-icon-unordered-list\"></i>",
 					type: "button",
 					click: () => this.action("insertUnorderedList")
 				},
 				quote: {
-					html: "<i class=\"irform-icon-quote\"></i>",
+					html: "<i class=\"bzd-icon-quote\"></i>",
 					type: "button",
 					click: () => this.action("formatBlock", "blockquote")
 				},
 				clearFormat: {
-					html: "<i class=\"irform-icon-clearformat\"></i>",
+					html: "<i class=\"bzd-icon-clear-format\"></i>",
 					type: "button",
 					click: () => this.actionRemoveFormat()
 				}
@@ -211,5 +211,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/form/editor.scss";
+	@import "bzd-style/css/form/editor.scss";
 </style>

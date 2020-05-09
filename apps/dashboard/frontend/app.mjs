@@ -1,10 +1,11 @@
 "use strict"
 
 import Vue from "vue"
-import App from "[frontend]/app.vue"
 import Router from "bzd/vue/router/router.mjs"
 import API from "bzd/vue/api.mjs";
-import APIv1 from "[dashboard]/api.v1.json";
+
+import App from "./app.vue"
+import APIv1 from "../api.v1.json";
 
 Vue.use(Router);
 Vue.use(API, APIv1);

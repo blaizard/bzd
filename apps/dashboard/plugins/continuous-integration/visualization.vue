@@ -31,7 +31,7 @@
 <script>
     "use strict";
 
-    import Plot from "[bzd]/vue/components/graph/plot.vue"; 
+    import Plot from "bzd/vue/components/graph/plot.vue"; 
 
     export default {
         components: {
@@ -194,7 +194,7 @@
 
 <style lang="scss">
 	$bzdIconNames: status-success, status-failure, status-in-progress, status-abort, clock;
-	@import "~[bzd]/icons.scss";
+	@import "bzd/icons.scss";
 
     .bzd-icon-continuous-integration {
 		@include defineIcon("continuous-integration.svg");

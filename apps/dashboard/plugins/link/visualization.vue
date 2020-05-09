@@ -22,5 +22,5 @@
 
 <style lang="scss">
 	$bzdIconNames: link;
-	@import "~[bzd]/icons.scss";
+	@import "bzd/icons.scss";
 </style>

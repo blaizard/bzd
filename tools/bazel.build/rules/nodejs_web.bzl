@@ -63,6 +63,7 @@ def _bzd_nodejs_web_build_impl(ctx):
     # Create the symlinks for the aliases
     symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = {
         "nodejs": "bzd",
+        "nodejs/styles/default": "bzd-style"
     })
     symlinks.update({
         "webpack.config.cjs": webpack_config,

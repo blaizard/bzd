@@ -332,7 +332,6 @@ function getWebpackConfigDefault(isDev, config)
 			rules: customRules.concat([
 				{
 					test: /\.vue$/,
-					//exclude: /node_modules/,
 					loader: "vue-loader",
 					options: {
 						hotReload: isDev
@@ -340,7 +339,6 @@ function getWebpackConfigDefault(isDev, config)
 				},
 				{
 					test: /\.js$/,
-					//exclude: /node_modules/,
 					use: "babel-loader",
 					sideEffects: false,
 				},
@@ -358,6 +356,7 @@ function getWebpackConfigDefault(isDev, config)
 						{
 							loader: "sass-loader",
 							options: {
+								// Need to use dart-sass as this is the only implementation that supports @use
 								implementation: require("sass"),
 							},
 						}

@@ -321,5 +321,5 @@ export default {
 </script>
 
 <style lang="scss">
-	@import "~[bzd-style]/css/form/dropdown.scss";
+	@import "bzd-style/css/form/dropdown.scss";
 </style>

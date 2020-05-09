@@ -6,7 +6,7 @@
 </script>
 
 <style lang="scss">
-	@import "~[bzd]/icons.scss";
+	@import "bzd/icons.scss";
 
     .bzd-icon-travisci {
 		@include defineIcon("travisci.svg");
