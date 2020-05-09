@@ -38,14 +38,10 @@
  * Helper to create and define icons
  */
 @mixin defineIcon($imageUrl) {
-	//$imageUrl: "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPgogICAgPHRpdGxlPmNsb2NrPC90aXRsZT4KICAgIDxwYXRoIGQ9Ik0yMyAxMmMwLTMuMDM3LTEuMjMyLTUuNzg5LTMuMjIyLTcuNzc4cy00Ljc0MS0zLjIyMi03Ljc3OC0zLjIyMi01Ljc4OSAxLjIzMi03Ljc3OCAzLjIyMi0zLjIyMiA0Ljc0MS0zLjIyMiA3Ljc3OCAxLjIzMiA1Ljc4OSAzLjIyMiA3Ljc3OCA0Ljc0MSAzLjIyMiA3Ljc3OCAzLjIyMiA1Ljc4OS0xLjIzMiA3Ljc3OC0zLjIyMiAzLjIyMi00Ljc0MSAzLjIyMi03Ljc3OHpNMjEgMTJjMCAyLjQ4Ni0xLjAwNiA0LjczNC0yLjYzNiA2LjM2NHMtMy44NzggMi42MzYtNi4zNjQgMi42MzYtNC43MzQtMS4wMDYtNi4zNjQtMi42MzYtMi42MzYtMy44NzgtMi42MzYtNi4zNjQgMS4wMDYtNC43MzQgMi42MzYtNi4zNjQgMy44NzgtMi42MzYgNi4zNjQtMi42MzYgNC43MzQgMS4wMDYgNi4zNjQgMi42MzYgMi42MzYgMy44NzggMi42MzYgNi4zNjR6TTExIDZ2NmMwIDAuMzg5IDAuMjIyIDAuNzI3IDAuNTUzIDAuODk0bDQgMmMwLjQ5NCAwLjI0NyAxLjA5NSAwLjA0NyAxLjM0Mi0wLjQ0N3MwLjA0Ny0xLjA5NS0wLjQ0Ny0xLjM0MmwtMy40NDgtMS43MjN2LTUuMzgyYzAtMC41NTItMC40NDgtMS0xLTFzLTEgMC40NDgtMSAxeiI+PC9wYXRoPgo8L3N2Zz4=";
-	background-image: url($imageUrl);
-	@supports (-webkit-mask-repeat: no-repeat) or (mask-repeat: no-repeat) {
-		background-color: currentColor;
-		background-image: none !important;
-		-webkit-mask-image: url($imageUrl);
-		mask-image: url($imageUrl);
-	}
+	--bzd-icon-data: url(#{$imageUrl});
+	background-color: currentColor;
+	-webkit-mask-image: var(--bzd-icon-data);
+	mask-image: var(--bzd-icon-data);
 }
 
 // ---- Icon definitions ------------------------------------------------------
