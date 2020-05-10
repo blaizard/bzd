@@ -10,13 +10,13 @@ bzd_nodejs_library(
 
 bzd_nodejs_library(
     name = "vue",
-    deps = [
-        ":bzd",
-    ],
     packages = {
         "vue": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        ":bzd",
+    ],
 )
 
 bzd_nodejs_library(
@@ -24,10 +24,10 @@ bzd_nodejs_library(
     srcs = [
         "icons.scss",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
