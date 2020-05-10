@@ -7,10 +7,10 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":exception",
         ":fetch",
         ":log",
+        "//nodejs:bzd",
     ],
 )
 
@@ -21,8 +21,8 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":format",
+        "//nodejs:bzd",
     ],
 )
 
@@ -33,9 +33,9 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":format",
         ":log",
+        "//nodejs:bzd",
     ],
 )
 
@@ -52,10 +52,10 @@ bzd_nodejs_library(
     srcs = [
         "format.mjs",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -65,10 +65,10 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":event",
         ":exception",
         ":log",
+        "//nodejs:bzd",
     ],
 )
 
@@ -80,8 +80,8 @@ bzd_nodejs_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":exception",
+        "//nodejs:bzd",
     ],
 )
 
@@ -93,9 +93,9 @@ bzd_nodejs_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":crypto",
         ":exception",
+        "//nodejs:bzd",
     ],
 )
 
@@ -104,10 +104,10 @@ bzd_nodejs_library(
     srcs = [
         "filesystem.mjs",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -115,10 +115,10 @@ bzd_nodejs_library(
     srcs = [
         "localstorage.mjs",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -126,10 +126,10 @@ bzd_nodejs_library(
     srcs = [
         "mutex.mjs",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -163,9 +163,9 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":exception",
         ":log",
+        "//nodejs:bzd",
     ],
 )
 
@@ -174,10 +174,10 @@ bzd_nodejs_library(
     srcs = [
         "upload.mjs",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -196,10 +196,10 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         ":event",
         ":exception",
         ":filesystem",
         ":log",
+        "//nodejs:bzd",
     ],
 )

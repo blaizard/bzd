@@ -5,6 +5,10 @@
             <pre>{{ JSON.stringify(input) }}</pre>
         </div>
         <div class="element">
+            <Password v-model="password"></Password>
+            <pre>{{ JSON.stringify(password) }}</pre>
+        </div>
+        <div class="element">
             <Checkbox v-model="checkbox">My Text</Checkbox>
             <pre>{{ JSON.stringify(checkbox) }}</pre>
         </div>
@@ -49,6 +53,7 @@
 
 <script>
     import Input from "bzd/vue/components/form/element/input.vue"; 
+    import Password from "bzd/vue/components/form/element/password.vue"; 
     import Checkbox from "bzd/vue/components/form/element/checkbox.vue"; 
     import Textarea from "bzd/vue/components/form/element/textarea.vue"; 
     import Dropdown from "bzd/vue/components/form/element/dropdown.vue"; 
@@ -62,11 +67,12 @@
 
 	export default {
         components: {
-            Input, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, DateElement
+            Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, DateElement
         },
 		data: function () {
 			return {
                 input: "hello",
+                password: "world",
                 textarea: "hello\nworld!",
                 dropdown: "yes",
                 autocomplete: "",

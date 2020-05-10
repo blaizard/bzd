@@ -36,6 +36,7 @@ import Item from "./item.vue";
 
 // Include all the supported elements
 import Input from "./element/input.vue";
+import Password from "./element/password.vue";
 import Checkbox from "./element/checkbox.vue";
 import Textarea from "./element/textarea.vue";
 import Dropdown from "./element/dropdown.vue";
@@ -49,7 +50,7 @@ import Editor from "./element/editor.vue";
 import Date from "./element/date.vue";
 import Message from "./element/message.vue";
 import Unknown from "./element/unknown.vue";
-const elements = {Input, Checkbox, Textarea, Dropdown, Autocomplete, Submit, Array, Table, File, Carousel, Editor, Message, Date};
+const elements = {Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Submit, Array, Table, File, Carousel, Editor, Message, Date};
 
 export default {
 	/**

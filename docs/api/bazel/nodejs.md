@@ -5,7 +5,7 @@
 ## bzd_nodejs_install
 
 <pre>
-bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-alias">alias</a>, <a href="#bzd_nodejs_install-data">data</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>)
+bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-aliases">aliases</a>, <a href="#bzd_nodejs_install-data">data</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>)
 </pre>
 
 
@@ -16,7 +16,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 | Name  | Description | Type | Mandatory | Default |
 | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
 | name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| alias |  Name of the alias, available in the form [name], for the current directory.   | String | optional | "" |
+| aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
@@ -28,7 +28,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 ## bzd_nodejs_library
 
 <pre>
-bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-alias">alias</a>, <a href="#bzd_nodejs_library-data">data</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>)
+bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-aliases">aliases</a>, <a href="#bzd_nodejs_library-data">data</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>)
 </pre>
 
 
@@ -39,7 +39,7 @@ bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_no
 | Name  | Description | Type | Mandatory | Default |
 | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
 | name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| alias |  Name of the alias, available in the form [name], for the current directory.   | String | optional | "" |
+| aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |

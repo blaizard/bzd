@@ -18,7 +18,7 @@
 					:data-placeholder="placeholder"
 					v-html="valueStr"
 					@input="handleInput($event.target.innerText)"
-					@focus="setActive()"
+					@focus="handleFocus($event)"
 					@blur="handleBlur($event, $event.target.innerText)"
 					@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
@@ -39,11 +39,21 @@
 					:data-placeholder="placeholder"
 					v-text="valueStr"
 					@input="handleInput($event.target.innerText)"
-					@focus="setActive()"
+					@focus="handleFocus($event)"
 					@blur="handleBlur($event, $event.target.innerText)"
 					@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
 
+		</span>
+
+		<span v-if="mask"
+				ref="maskInput"
+				type="text"
+				style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
+				v-text="get()"
+				contenteditable="true"
+				@input="handleInputMask()"
+				@blur="handleBlur($event, $event.target.innerText)">
 		</span>
 
 		<span class="irform-input-post" v-if="post && getContentType(post) == 'text'" v-text="getContentData(post)"></span>
@@ -75,6 +85,10 @@ export default {
 				 * only the preset values.
 				 */
 			any: this.getOption("any", true),
+			/**
+			 * Input masking
+			 */
+			mask: this.getOption("mask", false),
 			/**
 				 * Placeholder if no value is input
 				 */
@@ -134,6 +148,23 @@ export default {
 			return this.any || this.isPreset(value);
 		},
 		getDisplayValue(value) {
+			if (this.mask) {
+				if (typeof this.mask == "function") {
+					return this.mask(value);
+				}
+				let index = 0;
+				const displayValue = [...this.mask].reduce((maskedText, c) => {
+					switch (c) {
+					case "*":
+						maskedText += value[index++] || "_";
+						break;
+					default:
+						maskedText += c;
+					}
+					return maskedText;
+				}, "");				
+				return displayValue;
+			}
 			return (this.isPreset(value)) ? this.presets[value] : value;
 		},
 		valueListAdd(text) {
@@ -190,16 +221,59 @@ export default {
 				this.$emit("key", e.keyCode);
 			}
 		},
+		/*getCaretPosition(element) {
+			const sel = window.getSelection();
+			let offset = 0;
+			if (sel.rangeCount) {
+				const range = sel.getRangeAt(0);
+				const origOffset = offset = range.startOffset;
+				let parent = range.commonAncestorContainer.parentNode;
+				while (parent && parent.parentNode && parent != element) {
+					offset = Array.prototype.indexOf.call(parent.parentNode.children, parent) + origOffset;
+					parent = parent.parentNode;
+				}
+			}
+			return offset;
+		},*/
+		setCaretPosition(element, position) {
+			if (!element.childNodes[0]) {
+				return;
+			}
+			let range = document.createRange();
+			let sel = window.getSelection();
+			const length = element.innerText.length;
+			const start = Math.min(position, length);
+			range.setStart(element.childNodes[0], start);
+			range.collapse(true);
+			sel.removeAllRanges();
+			sel.addRange(range);
+		},
 		handleInput(text) {
 
 			this.hasChanged = true;
 			this.$emit("directInput", text);
+
+			if (this.mask) {
+				const maskedText = this.getDisplayValue(text);
+				this.$refs.input.innerHTML = maskedText;
+			}
 
 			if (this.multi) {
 				const lastChar = text[text.length - 1] || "";
 				if (lastChar.match(new RegExp(this.multiSeparators, "g"))) {
 					this.valueListAdd(text);
 				}
+			}
+		},
+		handleInputMask() {
+			const text = this.$refs.maskInput.innerText;
+			this.handleInput(text);
+		},
+		handleFocus() {
+			this.setActive();
+			if (this.mask) {
+				this.$refs.maskInput.focus();
+				this.setCaretPosition(this.$refs.maskInput, 10000);
 			}
 		},
 		handleBlur(e, text) {

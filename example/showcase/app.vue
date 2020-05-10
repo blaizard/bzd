@@ -7,6 +7,8 @@
 			</MenuEntry>
 			<MenuEntry text="Form" link="/form">
 				<MenuEntry text="Standalone" link="/form/standalone"></MenuEntry>
+				<MenuEntry text="Input" link="/form/input"></MenuEntry>
+				<MenuEntry text="Password" link="/form/password"></MenuEntry>
 			</MenuEntry>
 		</template>
 		<template #content>
@@ -34,8 +36,10 @@
 				ref: "view",
 				routes: [
                     { path: '/graph/plot', component: () => import("./graph_plot.vue") },
-                    { path: '/form', component: () => import("./form.vue") },
-                    { path: '/form/standalone', component: () => import("./form_standalone.vue") },
+                    { path: '/form', component: () => import("./form/form.vue") },
+                    { path: '/form/standalone', component: () => import("./form/standalone.vue") },
+                    { path: '/form/input', component: () => import("./form/input.vue") },
+                    { path: '/form/password', component: () => import("./form/password.vue") },
 				],
 			});
 		},

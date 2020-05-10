@@ -1,19 +1,8 @@
-<template>
-	<div>
-        <h1>Form</h1>
-        <Form v-model="value" :description="formDescription"></Form>
-        <h1>Values</h1>
-        <pre>{{ JSON.stringify(value, null, 4) }}</pre>
-	</div>
-</template>
-
 <script>
-    import Form from "bzd/vue/components/form/form.vue"; 
+    import Template from "./template.vue"; 
 
 	export default {
-        components: {
-            Form
-        },
+        mixins: [Template],
 		data: function () {
 			return {
                 value: {
@@ -29,6 +18,7 @@
             formDescription() {
                 return [
                     { type: "Input", name: "input", caption: "Input" },
+                    { type: "Password", name: "password", caption: "Password" },
                     { type: "Checkbox", name: "checkbox", caption: "Checkbox", text: "My Text" },
                     { type: "Textarea", name: "textarea", caption: "Textarea" },
                     { type: "Dropdown", name: "dropdown", caption: "Dropdown", list: ["Hello", "World"] },
