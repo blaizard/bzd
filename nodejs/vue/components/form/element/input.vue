@@ -51,7 +51,7 @@
 				type="text"
 				style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
 				v-text="get()"
-				contenteditable="true"
+				:contenteditable="editable"
 				@input="handleInputMask()"
 				@blur="handleBlur($event, $event.target.innerText)">
 		</span>

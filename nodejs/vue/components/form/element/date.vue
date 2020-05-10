@@ -10,7 +10,7 @@
                         class="irform-date-previous"
                         @click="set(Number(get()) - nbDaysPrevMonth * 24 * 60 * 60 * 1000)">
                 </div>
-                <div class="irform-date-month">{{ this.months[date.getMonth()] }} {{ date.getFullYear() }}</div>
+                <div class="irform-date-month">{{ this.currentMonthStr }}</div>
                 <div class="irform-date-next"
                         @click="set(Number(get()) + nbDaysCurMonth * 24 * 60 * 60 * 1000)">
                 </div>
@@ -56,19 +56,32 @@ export default {
 			/**
                  * Months.
                  */
-			months: this.getOption("months", ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]),
+			months: this.getOption("months", false),
 		};
 	},
 	computed: {
 		date() {
 			const date = new Date(this.get());
-			return (date instanceof Date && !isNaN(date)) ? date : new Date();
+			return (this.isValidDate(date)) ? date : new Date();
+		},
+		currentMonthStr() {
+			const year = new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(this.date);
+			const month = (this.months) ? this.months[this.date.getMonth()] : new Intl.DateTimeFormat(undefined, { month: "short" }).format(this.date);
+			return month + " " + year;
 		},
 		inputDescription() {
 			return Object.assign({}, this.description, {
-				presets: {
-					//     [this.value]: String(this.date) 
-				}
+				mask: (value) => {
+					const date = new Date(value);
+					if (!this.isValidDate(date)) {
+						return "";
+					}
+					const dtf = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }) 
+					const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date);
+
+					return ye + " " + mo + " " + da;
+				},
+				editable: false
 			});
 		},
 		nbDaysCurMonth() {
@@ -104,6 +117,9 @@ export default {
 		}
 	},
 	methods: {
+		isValidDate(date) {
+			return (date instanceof Date && !isNaN(date));
+		},
 		selectDate(date) {
 			if (date === null) {
 				return;
