@@ -76,7 +76,7 @@ export default {
 					if (!this.isValidDate(date)) {
 						return "";
 					}
-					const dtf = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }) 
+					const dtf = new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "2-digit" }); 
 					const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date);
 
 					return ye + " " + mo + " " + da;
