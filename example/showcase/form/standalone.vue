@@ -21,7 +21,7 @@
             <pre>{{ JSON.stringify(dropdown) }}</pre>
         </div>
         <div class="element">
-            <Autocomplete v-model="autocomplete"></Autocomplete>
+            <Autocomplete v-model="autocomplete" :description="{list: (text) => text}"></Autocomplete>
             <pre>{{ JSON.stringify(autocomplete) }}</pre>
         </div>
         <div class="element">
@@ -77,7 +77,7 @@
                 dropdown: "yes",
                 autocomplete: "",
                 date: Date.now(),
-                file: "",
+                file: [],
                 editor: "Hello, I am <b>bold!</b>",
                 carousel: 0,
                 array: [],

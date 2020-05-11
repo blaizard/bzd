@@ -3,41 +3,21 @@
 		<span class="irform-input-pre" v-if="pre && getContentType(pre) == 'text'" v-text="getContentData(pre)"></span>
 		<span class="irform-input-pre" v-if="pre && getContentType(pre) == 'html'" v-html="getContentData(pre)"></span>
 
-		<span v-if="html" class="irform-input-data">
+		<span class="irform-input-data">
 
 			<span class="irform-input-multi" v-for="(value, index) in valueList" :key="index">
 				<span class="irform-input-multi-item">
-					<span v-html="getDisplayValue(value)"></span>
+					<span v-html="getDisplayValue(value, /*editable*/false)"></span>
 					<span v-if="editable" class="irform-input-multi-delete" @click.stop="valueListRemove(index)">x</span>
 				</span>
 			</span>
+
 			<span class="irform-input-body"
 					ref="input"
 					:contenteditable="!disable && editable"
 					:tabindex="(disable) ? undefined : 0"
 					:data-placeholder="placeholder"
 					v-html="valueStr"
-					@input="handleInput($event.target.innerText)"
-					@focus="handleFocus($event)"
-					@blur="handleBlur($event, $event.target.innerText)"
-					@keydown="handleKeyDown($event, $event.target.innerText)">
-			</span>
-
-		</span>
-		<span v-else class="irform-input-data">
-
-			<span class="irform-input-multi" v-for="(value, index) in valueList" :key="index">
-				<span class="irform-input-multi-item">
-					<span v-text="getDisplayValue(value)"></span>
-					<span v-if="editable" class="irform-input-multi-delete" @click.stop="valueListRemove(index)">x</span>
-				</span>
-			</span>
-			<span class="irform-input-body"
-					ref="input"
-					:contenteditable="!disable && editable"
-					:tabindex="(disable) ? undefined : 0"
-					:data-placeholder="placeholder"
-					v-text="valueStr"
 					@input="handleInput($event.target.innerText)"
 					@focus="handleFocus($event)"
 					@blur="handleBlur($event, $event.target.innerText)"
@@ -86,7 +66,15 @@ export default {
 				 */
 			any: this.getOption("any", true),
 			/**
-			 * Input masking
+			 * Format the displayed value.
+			 * The formatting can be:
+			 * - A string -> mask: ***-***
+			 * - A Function -> format (value) => (...)
+			 * - A Dictionaty -> presets: { "hello" => "<i>hello</i>" }
+			 */
+			//format: this.getOption("format", false),
+			/**
+			 * Set if the real value should be masked
 			 */
 			mask: this.getOption("mask", false),
 			/**
@@ -109,13 +97,6 @@ export default {
 				 * Multivalue separators regular expression
 				 */
 			multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
-			/**
-				 * Values will try to match presets. If any match occurs, It will show
-				 * the displayed value.
-				 * Presets should follow this format: {value: {display: "Fancy Value"}}.
-				 * \note This value is dynamic, hence cannot be from data but from a computed.
-				 */
-			// presets: {}
 			// ---- Internal ----
 			hasChanged: false
 		};
@@ -131,41 +112,48 @@ export default {
 			if (this.multi) {
 				return "";
 			}
-			return (this.isActive && this.editable) ? this.get() : this.getDisplayValue(this.get());
+			return this.getDisplayValue(this.get(), /*editable*/true);
 		},
-		presets() {
-			return ("presets" in this.description) ? this.description["presets"] : {};
+		format() {
+			return this.getOption("format", false);
 		}
 	},
 	methods: {
 		handleClick() {
 			this.$refs.input.focus();
 		},
-		isPreset(value) {
-			return (value in this.presets);
-		},
 		isValueAcceptable(value) {
-			return this.any || this.isPreset(value);
+			return this.any;
 		},
-		getDisplayValue(value) {
-			if (this.mask) {
-				if (typeof this.mask == "function") {
-					return this.mask(value);
+		formatValue(value) {
+			if (this.format !== false) {
+				if (typeof this.format == "function") {
+					return this.format(value);
 				}
-				let index = 0;
-				const displayValue = [...this.mask].reduce((maskedText, c) => {
-					switch (c) {
-					case "*":
-						maskedText += value[index++] || "_";
-						break;
-					default:
-						maskedText += c;
+				else if (typeof this.format == "string") {
+					let index = 0;
+					return [...this.format].reduce((formatted, c) => {
+						switch (c) {
+						case "*":
+							formatted += value[index++] || "_";
+							break;
+						default:
+							formatted += c;
+						}
+						return formatted;
+					}, "");	
+				}
+				else if (typeof this.format == "object") {
+					if (value in this.format) {
+						return this.format[value];
 					}
-					return maskedText;
-				}, "");				
-				return displayValue;
+				}
 			}
-			return (this.isPreset(value)) ? this.presets[value] : value;
+			return value;
+		},
+		getDisplayValue(value, editable) {
+			const formattedValue = (!this.mask && this.isActive && this.editable && editable) ? value : this.formatValue(value);
+			return (this.html) ? formattedValue : this.toHtmlEntities(formattedValue);
 		},
 		valueListAdd(text) {
 			const regexpr =  "^" + this.multiSeparators + "+|" + this.multiSeparators + "+$";
@@ -216,8 +204,10 @@ export default {
 				}
 			}
 			// Emit special keys
-			else if (e.keyCode < 46 && [/*tab*/9, 32, /*arrow left*/37, /*arrow right*/39].indexOf(e.keyCode) === -1) {
-				e.preventDefault();
+			else if (e.keyCode < 46 && [/*tab*/9, 32].indexOf(e.keyCode) == -1) {
+				if ([/*arrow left*/37, /*arrow right*/39].indexOf(e.keyCode) == -1) {
+					e.preventDefault();
+				}
 				this.$emit("key", e.keyCode);
 			}
 		},
@@ -254,7 +244,7 @@ export default {
 			this.$emit("directInput", text);
 
 			if (this.mask) {
-				const maskedText = this.getDisplayValue(text);
+				const maskedText = this.getDisplayValue(text, /*editable*/true);
 				this.$refs.input.innerHTML = maskedText;
 			}
 

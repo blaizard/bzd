@@ -1,133 +1,146 @@
 <template>
-	<div class="irform-date">
-		<ElementInput
-				:description="inputDescription"
-				:value="value">
-		</ElementInput>
-		<div>
-            <div class="irform-date-header">
-                <div v-show="Number(get()) >= nbDaysPrevMonth * 24 * 60 * 60 * 1000"
-                        class="irform-date-previous"
-                        @click="set(Number(get()) - nbDaysPrevMonth * 24 * 60 * 60 * 1000)">
-                </div>
-                <div class="irform-date-month">{{ this.currentMonthStr }}</div>
-                <div class="irform-date-next"
-                        @click="set(Number(get()) + nbDaysCurMonth * 24 * 60 * 60 * 1000)">
-                </div>
+	<DropdownTemplate
+			class="irform-date"
+			ref="dropdown"
+			:value="get()"
+			@input="set"
+			@key="handleKey"
+			:disable="disable"
+			:description="descriptionDropdown">
+
+		<div class="irform-date-header">
+            <div v-show="Number(get()) >= nbDaysPrevMonth * 24 * 60 * 60 * 1000"
+                    class="irform-date-previous"
+					@mousedown.stop.prevent=""
+					@mouseup.stop.prevent=""
+                    @click.stop="set(Number(get()) - nbDaysPrevMonth * 24 * 60 * 60 * 1000)">
             </div>
-            <div class="irform-date-row">
-                <div v-for="text in days" :class="{'irform-date-item': true, 'irform-date-item-header': true}">{{ text }}</div>
+            <div class="irform-date-month">{{ this.currentMonthStr }}</div>
+            <div class="irform-date-next"
+					@mousedown.stop.prevent=""
+					@mouseup.stop.prevent=""
+                    @click.stop.prevent="set(Number(get()) + nbDaysCurMonth * 24 * 60 * 60 * 1000)">
             </div>
-            <div v-for="row in daysMatrix" class="irform-date-row">
-                <div v-for="day in row"
-                        :class="{'irform-date-item': true, 'irform-date-item-current': day.current, 'irform-date-item-selected': day.selected}"
-                        @click="selectDate(day.date || null)">
-                    {{ day.number }}
-                </div>
+        </div>
+        <div class="irform-date-row">
+            <div v-for="text in days" :class="{'irform-date-item': true, 'irform-date-item-header': true}">{{ text }}</div>
+        </div>
+        <div v-for="row in daysMatrix" class="irform-date-row">
+            <div v-for="day in row"
+                    :class="{'irform-date-item': true, 'irform-date-item-current': day.current, 'irform-date-item-selected': day.selected}"
+					@mousedown.stop.prevent=""
+					@mouseup.stop.prevent=""
+					@click.stop.prevent="selectDate(day.date || null)">
+                {{ day.number }}
             </div>
-		</div>
-	</div>
+        </div>
+
+	</DropdownTemplate>
+
 </template>
 
 <script>
-"use strict";
+	"use strict";
 
-import Element from "./element.vue";
-import ElementInput from "./input.vue";
+	import Element from "./element.vue";
+	import DropdownTemplate from "./dropdown-template.vue";
 
-export default {
-	mixins: [Element],
-	components: {
-		ElementInput
-	},
-	props: {
-		value: {type: Number, required: false, default: 0}
-	},
-	data: function() {
-		return {
-			/**
-                    * If the displayed values should be interpreted as HTML or not
-                    */
-			format: this.getOption("format", "{year}/{month}/{day}"),
-			/**
-                 * Week days, first day is sunday.
-                 */
-			days: this.getOption("days", ["S", "M", "T", "W", "T", "F", "S"]),
-			/**
-                 * Months.
-                 */
-			months: this.getOption("months", false),
-		};
-	},
-	computed: {
-		date() {
-			const date = new Date(this.get());
-			return (this.isValidDate(date)) ? date : new Date();
+	export default {
+		mixins: [Element],
+		components: {
+			DropdownTemplate
 		},
-		currentMonthStr() {
-			const year = new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(this.date);
-			const month = (this.months) ? this.months[this.date.getMonth()] : new Intl.DateTimeFormat(undefined, { month: "short" }).format(this.date);
-			return month + " " + year;
+		props: {
+			value: {type: Number, required: false, default: 0}
 		},
-		inputDescription() {
-			return Object.assign({}, this.description, {
-				mask: (value) => {
-					const date = new Date(value);
-					if (!this.isValidDate(date)) {
-						return "";
+		data: function() {
+			return {
+				/**
+						* If the displayed values should be interpreted as HTML or not
+						*/
+				format: this.getOption("format", "{year}/{month}/{day}"),
+				/**
+					* Week days, first day is sunday.
+					*/
+				days: this.getOption("days", ["S", "M", "T", "W", "T", "F", "S"]),
+				/**
+					* Months.
+					*/
+				months: this.getOption("months", false),
+			};
+		},
+		computed: {
+			date() {
+				const date = new Date(this.get());
+				return (this.isValidDate(date)) ? date : new Date();
+			},
+			currentMonthStr() {
+				const year = new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(this.date);
+				const month = (this.months) ? this.months[this.date.getMonth()] : new Intl.DateTimeFormat(undefined, { month: "short" }).format(this.date);
+				return month + " " + year;
+			},
+			descriptionDropdown() {
+				return Object.assign({}, this.description, {
+					format: (value) => {
+						const date = new Date(value);
+						if (!this.isValidDate(date)) {
+							return "";
+						}
+						const dtf = new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "2-digit" }); 
+						const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date);
+
+						return ye + " " + mo + " " + da;
+					},
+					editable: false
+				});
+			},
+			nbDaysCurMonth() {
+				return new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate();
+			},
+			nbDaysPrevMonth() {
+				return new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate();
+			},
+			daysMatrix() {
+				const firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
+
+				let matrix = [];
+				let rowIndex = -1;
+				let day = 0;
+				let index = firstDay;
+				while (day < this.nbDaysCurMonth) {
+					matrix[++rowIndex] = [];
+					for (; index<7 && day < this.nbDaysCurMonth; ++index) {
+						++day;
+						matrix[rowIndex].push({current: true, selected: (day == this.date.getDate()), number: day, date: new Date(this.date.getFullYear(), this.date.getMonth(), day)});
 					}
-					const dtf = new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "2-digit" }); 
-					const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date);
-
-					return ye + " " + mo + " " + da;
-				},
-				editable: false
-			});
-		},
-		nbDaysCurMonth() {
-			return new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate();
-		},
-		nbDaysPrevMonth() {
-			return new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate();
-		},
-		daysMatrix() {
-			const firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
-
-			let matrix = [];
-			let rowIndex = -1;
-			let day = 0;
-			let index = firstDay;
-			while (day < this.nbDaysCurMonth) {
-				matrix[++rowIndex] = [];
-				for (; index<7 && day < this.nbDaysCurMonth; ++index) {
-					++day;
-					matrix[rowIndex].push({current: true, selected: (day == this.date.getDate()), number: day, date: new Date(this.date.getFullYear(), this.date.getMonth(), day)});
+					index = 0;
 				}
-				index = 0;
-			}
 
-			for (let i = 0; i<firstDay; ++i) {
-				matrix[0].unshift({current: false, selected: false, number: this.nbDaysPrevMonth - i});
-			}
-			for (let i = 1; matrix[rowIndex].length < 7; ++i) {
-				matrix[rowIndex].push({current: false, selected: false, number: i});
-			}
+				for (let i = 0; i<firstDay; ++i) {
+					matrix[0].unshift({current: false, selected: false, number: this.nbDaysPrevMonth - i});
+				}
+				for (let i = 1; matrix[rowIndex].length < 7; ++i) {
+					matrix[rowIndex].push({current: false, selected: false, number: i});
+				}
 
-			return matrix;
-		}
-	},
-	methods: {
-		isValidDate(date) {
-			return (date instanceof Date && !isNaN(date));
+				return matrix;
+			}
 		},
-		selectDate(date) {
-			if (date === null) {
-				return;
+		methods: {
+			isValidDate(date) {
+				return (date instanceof Date && !isNaN(date));
+			},
+			selectDate(date) {
+				if (date === null) {
+					return;
+				}
+				this.set(date.getTime());
+			},
+			handleKey(keyCode) {
+				console.log(keyCode);
 			}
-			this.set(date.getTime());
 		}
-	}
-};
+	};
 </script>
 
 <style lang="scss">
