@@ -1,7 +1,7 @@
 # ::bzd
 
 [![Build Status](https://travis-ci.org/blaizard/cpp-async.svg?branch=master)](https://travis-ci.org/blaizard/cpp-async)
-![CI](https://github.com/blaizard/cpp-async/workflows/CI/badge.svg)
+[![CI](https://github.com/blaizard/cpp-async/workflows/CI/badge.svg)](https://github.com/blaizard/cpp-async/actions)
 
 Fullstack, lightweight and flexible framework for IoT applications.
 This mono-repository enables the following technologies:
