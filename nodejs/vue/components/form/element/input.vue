@@ -122,7 +122,7 @@ export default {
 		handleClick() {
 			this.$refs.input.focus();
 		},
-		isValueAcceptable(value) {
+		isValueAcceptable(/*value*/) {
 			return this.any;
 		},
 		formatValue(value) {

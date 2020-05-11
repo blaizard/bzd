@@ -62,151 +62,151 @@
 </template>
 
 <script>
-	"use strict";
+"use strict";
 
-	import Element from "./element.vue";
-	import DropdownTemplate from "./dropdown-template.vue";
+import Element from "./element.vue";
+import DropdownTemplate from "./dropdown-template.vue";
 
-	export default {
-		mixins: [Element],
-		components: {
-			DropdownTemplate
-		},
-		props: {
-			value: {type: Number, required: false, default: 0}
-		},
-		data: function() {
-			return {
-				select: "day"
-			};
-		},
-		computed: {
-			incrementStep() {
-				switch (this.select) {
-				case "day":
-					return this.nbDaysCurMonth * 24 * 60 * 60 * 1000;
-				case "month":
-					return 365.25 * 24 * 60 * 60 * 1000;
-				case "year":
-					return 9 * 365.25 * 24 * 60 * 60 * 1000;
-				}
-				return null;
-			},
-			decrementStep() {
-				switch (this.select) {
-				case "day":
-					return this.nbDaysPrevMonth * 24 * 60 * 60 * 1000;
-				}
-				return this.incrementStep;
-			},
-			weekdays() {
-				const sunday = new Date(1985, 3, 7);
-				const formatter = new Intl.DateTimeFormat(undefined, { weekday: "narrow" });
-				return [...Array(7).keys()].map((index) => formatter.format((new Date(sunday.getTime())).setDate(sunday.getDate() + index)));
-			},
-			months() {
-				const formatter = new Intl.DateTimeFormat(undefined, { month: "long" });
-				return [...Array(12).keys()].map((index) => formatter.format((new Date()).setMonth(index)));
-			},
-			date() {
-				const date = new Date(this.get());
-				return (this.isValidDate(date)) ? date : new Date();
-			},
-			currentMonthStr() {
-				return new Intl.DateTimeFormat(undefined, { month: "long" }).format(this.date);
-			},
-			currentYearStr() {
-				return new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(this.date);
-			},
-			descriptionDropdown() {
-				return Object.assign({}, this.description, {
-					format: (value) => {
-						const date = new Date(parseInt(value));
-						if (!this.isValidDate(date)) {
-							return "";
-						}
-
-						const options = { year: "numeric", month: "long", day: "numeric" };
-						return date.toLocaleDateString(undefined, options);
-					},
-					editable: false
-				});
-			},
-			nbDaysCurMonth() {
-				return new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate();
-			},
-			nbDaysPrevMonth() {
-				return new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate();
-			},
-			yearsMatrix() {
-				let matrix = [];
-				let index = this.date.getFullYear() - 4;
-				for (let rows = 0; rows < 3; ++rows) {
-					matrix[rows] = [];
-					for (let columns = 0; columns < 3; ++columns, ++index) {
-						const date = new Date((new Date(this.date.getTime())).setFullYear(index));
-						matrix[rows].push({current: true, selected: (this.date.getFullYear() == index), text: index, date: date});
-					}
-				}
-				return matrix;
-			},
-			monthsMatrix() {
-				let matrix = [];
-				let index = 0;
-				for (let rows = 0; rows < 6; ++rows) {
-					matrix[rows] = [];
-					for (let columns = 0; columns < 2; ++columns, ++index) {
-						const date = new Date((new Date(this.date.getTime())).setMonth(index));
-						matrix[rows].push({current: true, selected: (this.date.getMonth() == index), text: this.months[index], date: date});
-					}
-				}
-				return matrix;
-			},
-			daysMatrix() {
-				const firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
-
-				let matrix = [];
-				let rowIndex = -1;
-				let day = 0;
-				let index = firstDay;
-				while (day < this.nbDaysCurMonth) {
-					matrix[++rowIndex] = [];
-					for (; index<7 && day < this.nbDaysCurMonth; ++index) {
-						++day;
-						matrix[rowIndex].push({current: true, selected: (day == this.date.getDate()), text: day, date: new Date(this.date.getFullYear(), this.date.getMonth(), day)});
-					}
-					index = 0;
-				}
-
-				for (let i = 0; i<firstDay; ++i) {
-					matrix[0].unshift({current: false, selected: false, text: this.nbDaysPrevMonth - i});
-				}
-				for (let i = 1; matrix[rowIndex].length < 7; ++i) {
-					matrix[rowIndex].push({current: false, selected: false, text: i});
-				}
-
-				return matrix;
+export default {
+	mixins: [Element],
+	components: {
+		DropdownTemplate
+	},
+	props: {
+		value: {type: Number, required: false, default: 0}
+	},
+	data: function() {
+		return {
+			select: "day"
+		};
+	},
+	computed: {
+		incrementStep() {
+			switch (this.select) {
+			case "day":
+				return this.nbDaysCurMonth * 24 * 60 * 60 * 1000;
+			case "month":
+				return 365.25 * 24 * 60 * 60 * 1000;
+			case "year":
+				return 9 * 365.25 * 24 * 60 * 60 * 1000;
 			}
+			return null;
 		},
-		methods: {
-			isValidDate(date) {
-				return (date instanceof Date && !isNaN(date));
-			},
-			selectDate(e, date, nextSelect = null) {
-				if (nextSelect) {
-					e.preventDefault();
-					this.select = nextSelect;
-				}
-				if (date === null) {
-					return;
-				}
-				this.set(date.getTime());
-			},
-			handleKey(keyCode) {
-				console.log(keyCode);
+		decrementStep() {
+			switch (this.select) {
+			case "day":
+				return this.nbDaysPrevMonth * 24 * 60 * 60 * 1000;
 			}
+			return this.incrementStep;
+		},
+		weekdays() {
+			const sunday = new Date(1985, 3, 7);
+			const formatter = new Intl.DateTimeFormat(undefined, { weekday: "narrow" });
+			return [...Array(7).keys()].map((index) => formatter.format((new Date(sunday.getTime())).setDate(sunday.getDate() + index)));
+		},
+		months() {
+			const formatter = new Intl.DateTimeFormat(undefined, { month: "long" });
+			return [...Array(12).keys()].map((index) => formatter.format((new Date()).setMonth(index)));
+		},
+		date() {
+			const date = new Date(this.get());
+			return (this.isValidDate(date)) ? date : new Date();
+		},
+		currentMonthStr() {
+			return new Intl.DateTimeFormat(undefined, { month: "long" }).format(this.date);
+		},
+		currentYearStr() {
+			return new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(this.date);
+		},
+		descriptionDropdown() {
+			return Object.assign({}, this.description, {
+				format: (value) => {
+					const date = new Date(parseInt(value));
+					if (!this.isValidDate(date)) {
+						return "";
+					}
+
+					const options = { year: "numeric", month: "long", day: "numeric" };
+					return date.toLocaleDateString(undefined, options);
+				},
+				editable: false
+			});
+		},
+		nbDaysCurMonth() {
+			return new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate();
+		},
+		nbDaysPrevMonth() {
+			return new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate();
+		},
+		yearsMatrix() {
+			let matrix = [];
+			let index = this.date.getFullYear() - 4;
+			for (let rows = 0; rows < 3; ++rows) {
+				matrix[rows] = [];
+				for (let columns = 0; columns < 3; ++columns, ++index) {
+					const date = new Date((new Date(this.date.getTime())).setFullYear(index));
+					matrix[rows].push({current: true, selected: (this.date.getFullYear() == index), text: index, date: date});
+				}
+			}
+			return matrix;
+		},
+		monthsMatrix() {
+			let matrix = [];
+			let index = 0;
+			for (let rows = 0; rows < 6; ++rows) {
+				matrix[rows] = [];
+				for (let columns = 0; columns < 2; ++columns, ++index) {
+					const date = new Date((new Date(this.date.getTime())).setMonth(index));
+					matrix[rows].push({current: true, selected: (this.date.getMonth() == index), text: this.months[index], date: date});
+				}
+			}
+			return matrix;
+		},
+		daysMatrix() {
+			const firstDay = new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
+
+			let matrix = [];
+			let rowIndex = -1;
+			let day = 0;
+			let index = firstDay;
+			while (day < this.nbDaysCurMonth) {
+				matrix[++rowIndex] = [];
+				for (; index<7 && day < this.nbDaysCurMonth; ++index) {
+					++day;
+					matrix[rowIndex].push({current: true, selected: (day == this.date.getDate()), text: day, date: new Date(this.date.getFullYear(), this.date.getMonth(), day)});
+				}
+				index = 0;
+			}
+
+			for (let i = 0; i<firstDay; ++i) {
+				matrix[0].unshift({current: false, selected: false, text: this.nbDaysPrevMonth - i});
+			}
+			for (let i = 1; matrix[rowIndex].length < 7; ++i) {
+				matrix[rowIndex].push({current: false, selected: false, text: i});
+			}
+
+			return matrix;
 		}
-	};
+	},
+	methods: {
+		isValidDate(date) {
+			return (date instanceof Date && !isNaN(date));
+		},
+		selectDate(e, date, nextSelect = null) {
+			if (nextSelect) {
+				e.preventDefault();
+				this.select = nextSelect;
+			}
+			if (date === null) {
+				return;
+			}
+			this.set(date.getTime());
+		},
+		handleKey(keyCode) {
+			console.log(keyCode);
+		}
+	}
+};
 </script>
 
 <style lang="scss">
