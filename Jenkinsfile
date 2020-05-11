@@ -36,6 +36,7 @@ pipeline
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "bazel --version"
 				sh "python --version"
+				sh "java --version"
 			}
 		}
 		/**
