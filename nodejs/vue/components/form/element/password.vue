@@ -7,9 +7,14 @@ export default {
 	mixins: [Input],
 	data: function() {
 		return {
-			mask: (value) => [...value].reduce((str) => str + "<i class=\"bzd-icon-password\"></i>", ""),
-			html: true
+			mask: true,
+			html: true,
 		};
+	},
+	computed: {
+		format() {
+			return (value) => [...value].reduce((str) => str + "<i class=\"bzd-icon-password\"></i>", "");
+		}
 	},
 };
 </script>

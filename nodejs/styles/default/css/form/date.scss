@@ -1,5 +1,5 @@
 @use "index.scss" as base;
-@use "input.scss";
+@use "dropdown.scss";
 
 .irform-date {
     display: flex;
@@ -55,4 +55,8 @@
             }
         }
     }
+
+    .irform-dropdown-menu {
+        max-height: none !important;
+    }    
 }

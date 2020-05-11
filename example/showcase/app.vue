@@ -10,6 +10,8 @@
 				<MenuEntry text="Standalone" link="/form/standalone"></MenuEntry>
 				<MenuEntry text="Input" link="/form/input"></MenuEntry>
 				<MenuEntry text="Password" link="/form/password"></MenuEntry>
+				<MenuEntry text="Dropdown" link="/form/dropdown"></MenuEntry>
+				<MenuEntry text="Autocomplete" link="/form/autocomplete"></MenuEntry>
 			</MenuEntry>
 		</template>
 		<template #content>
@@ -42,6 +44,8 @@
                     { path: '/form/standalone', component: () => import("./form/standalone.vue") },
                     { path: '/form/input', component: () => import("./form/input.vue") },
                     { path: '/form/password', component: () => import("./form/password.vue") },
+                    { path: '/form/dropdown', component: () => import("./form/dropdown.vue") },
+                    { path: '/form/autocomplete', component: () => import("./form/autocomplete.vue") },
 				],
 			});
 		},

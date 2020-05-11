@@ -90,8 +90,10 @@ $triangleHeight: base.$fieldHeight / 5;
 	@extend %error;
 	@extend %error-border;
 
-	&:after {
-		border-color: base.$errorColor transparent transparent transparent;
+	.irform-dropdown-arrow {
+		&:after {
+			border-color: base.$errorColor transparent transparent transparent;
+		}
 	}
 }
 
@@ -101,8 +103,10 @@ $triangleHeight: base.$fieldHeight / 5;
 	@extend %success;
 	@extend %success-border;
 
-	&:after {
-		border-color: base.$successColor transparent transparent transparent;
+	.irform-dropdown-arrow {
+		&:after {
+			border-color: base.$successColor transparent transparent transparent;
+		}
 	}
 }
 
@@ -112,7 +116,9 @@ $triangleHeight: base.$fieldHeight / 5;
 	@extend %disable;
 	@extend %disable-border;
 
-	&:after {
-		border-color: base.$disableColor transparent transparent transparent;
+	.irform-dropdown-arrow {
+		&:after {
+			border-color: base.$disableColor transparent transparent transparent;
+		}
 	}
 }
