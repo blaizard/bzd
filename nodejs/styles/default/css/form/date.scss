@@ -12,9 +12,19 @@
         align-items: center;
         justify-content: center;
 
-        .irform-date-month {
+        .irform-date-select {
             flex: 1;
             text-align: center;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+
+            .irform-date-select-month,
+            .irform-date-select-year {
+                padding: 0 .5em;
+                font-weight: bold;
+                @extend %clickable;
+            }
         }
 
         .irform-date-previous {
