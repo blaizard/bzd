@@ -110,7 +110,7 @@ export default {
 		 * This is similar to the PHP function htmlentities.
 		 */
 		toHtmlEntities(str) {
-			return String(str).replace(/[\u00A0-\u9999<>\&]/gim, (i) => '&#' + i.charCodeAt(0) + ';');
+			return String(str).replace(/[\u00A0-\u9999<>&]/gim, (i) => "&#" + i.charCodeAt(0) + ";");
 		},
 		/**
 			 * Extract the type of a content element. Valid types are:
