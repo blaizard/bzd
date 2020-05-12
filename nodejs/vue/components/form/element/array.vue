@@ -66,7 +66,7 @@ export default {
 			/**
 				 * Form description of the template of one single item
 				 */
-			templateAdd: this.getOption("templateAdd", [{ type: "Submit", content: "Add", click: this.itemAdd }]),
+			templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", click: this.itemAdd }]),
 			/**
 				 * Force the value to have at least one entry
 				 */

@@ -12,7 +12,7 @@ export default {
 		const isUpload = (this.getOption("upload", false) !== false);
 		let templateAdd = [];
 		if (isUpload) {
-			templateAdd.push({ type: "Submit", content: {html: "<i class=\"bzd-icon-upload\"></i> Upload"}, click: this.triggerUpload });
+			templateAdd.push({ type: "Button", content: {html: "<i class=\"bzd-icon-upload\"></i> Upload"}, click: this.triggerUpload });
 		}
 
 		return {

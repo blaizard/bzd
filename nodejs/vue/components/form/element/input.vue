@@ -16,7 +16,7 @@
 					ref="input"
 					:contenteditable="!disable && editable"
 					:tabindex="(disable) ? undefined : 0"
-					:data-placeholder="placeholder"
+					:data-placeholder="(isActive) ? '' : placeholder"
 					v-html="valueStr"
 					@input="handleInput($event.target.innerText)"
 					@focus="handleFocus($event)"
@@ -24,16 +24,17 @@
 					@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
 
-		</span>
+			<span v-if="mask"
+					ref="maskInput"
+					type="text"
+					style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
+					v-text="get()"
+					:contenteditable="editable"
+					@focus="handleFocus($event)"
+					@input="handleInputMask()"
+					@blur="handleBlur($event, $event.target.innerText)">
+			</span>
 
-		<span v-if="mask"
-				ref="maskInput"
-				type="text"
-				style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
-				v-text="get()"
-				:contenteditable="editable"
-				@input="handleInputMask()"
-				@blur="handleBlur($event, $event.target.innerText)">
 		</span>
 
 		<span class="irform-input-post" v-if="post && getContentType(post) == 'text'" v-text="getContentData(post)"></span>

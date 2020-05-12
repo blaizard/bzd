@@ -35,6 +35,13 @@ $actionerBgColor: #eee !default;
 
 $focusColor: #ccc !default;
 
+$buttonApproveTextColor: colors.$bzdGraphColorWhite !default;
+$buttonApproveBgColor: colors.$bzdGraphColorOrange !default;
+$buttonCancelTextColor: $actionerTextColor !default;
+$buttonCancelBgColor: $actionerBgColor !default;
+$buttonDangerTextColor: colors.$bzdGraphColorWhite !default;
+$buttonDangerBgColor: colors.$bzdGraphColorRed !default;
+
 $errorColor: colors.$bzdGraphColorRed !default;
 $successColor: colors.$bzdGraphColorGreen !default;
 $disableColor: #ddd !default;
@@ -113,23 +120,6 @@ $disableBgColor: #eee !default;
 %border-multi-line {
 	@extend %border;
 	@include irform-border;
-}
-
-%border-clickable {
-	@extend %border;
-	@extend %clickable;
-
-	box-shadow: 0 3px 5px 0 #888;
-	border-bottom: 2px solid #aaa;
-	border-radius: 2px;
-	margin-bottom: 2px;
-
-	&:active {
-		margin-bottom: 0;
-		margin-top: 2px;
-		border-bottom: none;
-		box-shadow: none;
-	}
 }
 
 /**
@@ -229,7 +219,7 @@ $disableBgColor: #eee !default;
  * For an element that supports placeholder through the attribute data-placeholder
  */
 %placeholder {
-	// :not(:focus)is a hack for Firefox, as the caret position on an empty element
+	// :not(:focus) is a hack for Firefox, as the caret position on an empty element
 	// have some issues otherwise, see https://bugzilla.mozilla.org/show_bug.cgi?id=904846
 	&:not(:focus):empty:before,
 	&::placeholder {

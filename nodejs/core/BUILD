@@ -95,6 +95,7 @@ bzd_nodejs_library(
     deps = [
         ":crypto",
         ":exception",
+        ":log",
         "//nodejs:bzd",
     ],
 )

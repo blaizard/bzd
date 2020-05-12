@@ -36,13 +36,19 @@ export default class StorageDisk extends Storage {
 		return Fs.createReadStream(Path.join(this.path, bucket, key));
 	}
 
-	async write(bucket, key, readStream) {
+	async write(bucket, key, data) {
 		let writeStream = Fs.createWriteStream(Path.join(this.path, bucket, key));
+
+		let readStream = data;
+		if (typeof data == "string") {
+			readStream = Fs.createReadStream(data);
+		}
 
 		return new Promise((resolve, reject) => {
 			readStream.pipe(writeStream)
 				.on("error", reject)
-				.on("end", resolve);
+				.on("end", resolve)
+				.on("finish", resolve);
 		});
 	}
 }

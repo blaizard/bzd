@@ -7,14 +7,21 @@
 			return {
                 value: {
 					dropdown: "Hello"
-				}
+				},
+				dropdownList: []
 			}
+		},
+		mounted() {
+			setTimeout(() => {
+				this.dropdownList = [ "I", "am", "a", "lazy", "son", "of", "a", "b***h!"];
+			}, 100);
 		},
         computed: {
             formDescription() {
                 return [
 					{ type: "Dropdown", caption: "Dropdown", list: ["Hello", "World"] },
 					{ type: "Dropdown", caption: "Dropdown (value)", name: "dropdown", list: ["Hello", "World"] },
+					{ type: "Dropdown", caption: "Dropdown (lazy content)", list: this.dropdownList },
 					{ type: "Dropdown", caption: "Dropdown (long)", list: Array.from(Array(100).keys()) },
 					{ type: "Dropdown", caption: "Dropdown (placeholder)",  list: ["Hello", "World"], placeholder: "Enter text..." },
 					{ type: "Dropdown", caption: "Dropdown (disabled)", disable: true, list: ["Hello", "World"] },

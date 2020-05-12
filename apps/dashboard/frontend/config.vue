@@ -2,7 +2,6 @@
 	<div v-loading="!ready">
         <h2>Config</h2>
         <Form :description="formDescription" v-model="value"></Form>
-
         <Form :description="formVisualizationDescription" v-model="value"></Form>
 
         <template v-if="isSources">
