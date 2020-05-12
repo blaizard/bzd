@@ -48,6 +48,14 @@
             <Editor v-model="editor"></Editor>
             <pre>{{ JSON.stringify(editor) }}</pre>
         </div>
+        <div class="element">
+            <div>
+                <Button content="No action"></Button>
+                <Button action="approve" content="Approve"></Button>
+                <Button action="cancel" content="Cancel"></Button>
+                <Button action="danger" content="Danger"></Button>
+            </div>
+        </div>
 	</div>
 </template>
 
@@ -63,11 +71,12 @@
     import File from "bzd/vue/components/form/element/file.vue"; 
     import Carousel from "bzd/vue/components/form/element/carousel.vue"; 
     import Editor from "bzd/vue/components/form/element/editor.vue"; 
+    import Button from "bzd/vue/components/form/element/button.vue"; 
     import DateElement from "bzd/vue/components/form/element/date.vue"; 
 
 	export default {
         components: {
-            Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, DateElement
+            Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, Button, DateElement
         },
 		data: function () {
 			return {

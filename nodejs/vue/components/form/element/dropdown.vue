@@ -92,7 +92,8 @@ export default {
 	watch: {
 		rawList: {
 			handler: async function() {
-				this.list = await this.fetchList(this.directValue);
+				this.list = [];
+				await this.process(this.directValue);
 			}
 		},
 	},
@@ -106,7 +107,7 @@ export default {
 			return (typeof arg === "function") && (arg.length > 0);
 		},
 
-		async process(value){
+		async process(value) {
 			if (this.list.length == 0 || this.isListFctWithArg) {
 				this.list = await this.fetchList(value);
 			}

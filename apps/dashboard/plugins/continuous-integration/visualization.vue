@@ -94,6 +94,8 @@
             plotConfig() {
                 return {
                     minY: 0,
+                    minX: 0,
+                    maxX: 30,
                     showLegend: false,
                     showAxisX: false,
                     showAxisY: false,
@@ -104,7 +106,9 @@
                 }
             },
             builds() {
-                return this.metadata.builds || [];
+                let copy = [...(this.metadata.builds || [])];
+                copy.sort((a, b) => (b.timestamp  - a.timestamp));
+                return copy;
             },
             plotValue() {
                 let last30Builds = this.builds.slice(0, 30).reverse();

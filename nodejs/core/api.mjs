@@ -89,8 +89,15 @@ export default class API {
 					response.json(result);
 					break;
 				case "file":
-					Exception.assert(typeof result == "string", "{} {}: callback result must be a string.", method, endpoint);
-					response.sendFile(result);
+					if (typeof result == "string") {
+						response.sendFile(result);
+					}
+					else if ("pipe" in result) {
+						result.pipe(response);
+					}
+					else {
+						Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
+					}
 					break;
 				case "raw":
 					response.status(200).send(result);

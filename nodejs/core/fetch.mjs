@@ -2,8 +2,10 @@
 
 import { base64Encode } from "./crypto.mjs";
 import ExceptionFactory from "./exception.mjs";
+import LogFactory from "./log.mjs";
 
 const Exception = ExceptionFactory("fetch");
+const Log = LogFactory("fetch");
 
 /**
  * Fetch data from HTTP endpoint.
@@ -17,7 +19,7 @@ export default class Fetch {
 			url += ((query) ? ("?" + query) : "");
 		}
 
-		let headers = options.headers || {};
+		let headers = {};
 		let body = undefined;
 
 		// Generate body
@@ -67,9 +69,11 @@ export default class Fetch {
 			request = (await import(/* webpackMode: "eager" */"./impl/fetch/node.http.mjs")).default;
 		}
 
+		Log.debug("{} {} (headers: {:j}) (body: {:j})", method, url, Object.assign(headers, options.headers), body);
+
 		const data = await request(url, {
 			method: method,
-			headers: headers,
+			headers: Object.assign(headers, options.headers),
 			body: body,
 			expect: options.expect
 		});
