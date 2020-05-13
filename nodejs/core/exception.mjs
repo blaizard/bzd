@@ -11,8 +11,13 @@ class ExceptionCombine {
 	constructor(...args) {
 		this.list = [args];
 	}
-	add(...args) {
-		this.list.push(args);
+	add(str, ...args) {
+		if (str instanceof ExceptionCombine) {
+			this.list = this.list.concat(str.list);
+		}
+		else {
+			this.list.push([str, ...args]);
+		}
 	}
 	[Symbol.iterator]() {
 		return this.list.values();
@@ -103,19 +108,19 @@ const ExceptionFactory = (...topics) => {
 		 */
 		static assertEqual(value1, value2, str = "", ...args) {
 
-			const assertEqualInternal = (value1, value2, ...rest) => {
+			const assertEqualInternal = (value1, value2, combine) => {
 				if (typeof value1 === "object" && value1 !== null && typeof value2 === "object" && value2 !== null) {
 					if (value1 instanceof Array && value2 instanceof Array) {
-						Exception.assert(value1.length === value2.length, ...rest);
-						value1.forEach((subValue1, index) => { assertEqualInternal(subValue1, value2[index], ...rest); });
+						Exception.assert(value1.length === value2.length, combine);
+						value1.forEach((subValue1, index) => { assertEqualInternal(subValue1, value2[index], combine); });
 					}
 					else {
-						assertEqualInternal(Object.keys(value1), Object.keys(value2), ...args);
-						Object.keys(value1).forEach((key) => { assertEqualInternal(value1[key], value2[key], ...rest); });
+						assertEqualInternal(Object.keys(value1), Object.keys(value2), combine);
+						Object.keys(value1).forEach((key) => { assertEqualInternal(value1[key], value2[key], combine); });
 					}
 				}
 				else {
-					Exception.assert(value1 == value2, ...rest);
+					Exception.assert(value1 == value2, combine);
 				}
 			};
 
