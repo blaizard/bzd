@@ -23,6 +23,7 @@ jobs:
 
     - name: Environment
       run: |
+        cp tools/ci/github/.bazelrc.local .bazelrc.local
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         bazel --version
         python --version
@@ -34,4 +35,4 @@ jobs:
 
     - name: Sanitize
       run: |
-        sanitize.sh
+        ./sanitize.sh
