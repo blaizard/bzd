@@ -29,6 +29,37 @@ describe("Cache", () => {
             await Exception.assertThrows(async () => { await cache.get("test"); });
             await Exception.assertThrows(async () => { await cache.get("tedst"); });
             await Exception.assertThrows(async () => { await cache.get(); });
-		});
-	});
+        });
+    });
+    
+	it("Stress", async () => {
+
+        let cache = new Cache({
+            garbageCollector: false
+        });
+
+        let sum = 0;
+        let expected = 0;
+        cache.register("test", (arg) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(parseInt(arg));
+                }, Math.random() * 100);
+            });
+        });
+
+        let promises = [];
+        for (const i in [...Array(10000).keys()]) {
+            const n = Math.floor(Math.random() * 10);
+            expected += parseInt(n);
+            promises.push((async () => {
+                const result = await cache.get("test", n);
+                sum += result;
+            })());
+        }
+
+        await Promise.all(promises);
+
+        Exception.assertEqual(sum, expected);
+    });
 });
