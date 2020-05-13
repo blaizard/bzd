@@ -28,16 +28,22 @@ export default class StorageDisk extends Storage {
 		await FileSystem.mkdir(this.path);
 	}
 
+	_getPath(bucket, key) {
+		return Path.join(this.path, bucket, key);
+	}
+
 	async is(bucket, key) {
-		return await FileSystem.exists(Path.join(this.path, bucket, key));
+		return await FileSystem.exists(this._getPath(bucket, key));
 	}
 
 	async read(bucket, key) {
-		return Fs.createReadStream(Path.join(this.path, bucket, key));
+		return Fs.createReadStream(this._getPath(bucket, key));
 	}
 
 	async write(bucket, key, data) {
-		let writeStream = Fs.createWriteStream(Path.join(this.path, bucket, key));
+		const path = this._getPath(bucket, key);
+		await FileSystem.mkdir(Path.dirname(path));
+		let writeStream = Fs.createWriteStream(path);
 
 		let readStream = data;
 		if (typeof data == "string") {
@@ -45,10 +51,15 @@ export default class StorageDisk extends Storage {
 		}
 
 		return new Promise((resolve, reject) => {
-			readStream.pipe(writeStream)
+			readStream
 				.on("error", reject)
 				.on("end", resolve)
-				.on("finish", resolve);
+				.on("finish", resolve)
+				.pipe(writeStream);
 		});
+	}
+
+	async delete(bucket, key) {
+		await FileSystem.unlink(this._getPath(bucket, key));
 	}
 }

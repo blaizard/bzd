@@ -30,9 +30,8 @@ Commander.version("1.0.0", "-v, --version")
 	const PATH_DATA = process.env.BZD_PATH_DATA || Commander.data;
 
 	// Set-up the web server
-	let web = new Web(PORT, {
-		rootDir: PATH_STATIC
-	});
+	let web = new Web(PORT);
+	web.addStaticRoute("/", PATH_STATIC, "index.html");
 
 	let keyValueStore = new KeyValueStoreDisk(Path.join(PATH_DATA, "db"));
 	await keyValueStore.waitReady();

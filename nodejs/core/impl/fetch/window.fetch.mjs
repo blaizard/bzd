@@ -1,8 +1,6 @@
 "use strict";
 
-import ExceptionFactory from "../../exception.mjs";
-
-const Exception = ExceptionFactory("fetch", "window.fetch");
+import ExceptionFetch from "./exception.mjs";
 
 export default async function request(url, options) {
 
@@ -20,7 +18,7 @@ export default async function request(url, options) {
 
 	if (!response.ok) {
 		const message = await response.text();
-		throw new Exception(message || response.statusText);
+		throw new ExceptionFetch(response.status, message || response.statusText);
 	}
 
 	return await response.text();

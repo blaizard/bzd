@@ -10,8 +10,8 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/dashboard/plugins/continuous-integration",
-        "//apps/dashboard/plugins/jenkins",
         "//apps/dashboard/plugins/github",
+        "//apps/dashboard/plugins/jenkins",
         "//apps/dashboard/plugins/link",
         "//apps/dashboard/plugins/travisci",
     ],

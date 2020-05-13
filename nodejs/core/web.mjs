@@ -22,10 +22,6 @@ export default class Web {
 	constructor(port, config) {
 		this.config = Object.assign({
 			/**
-			 * \brief Root directory of the static data to provide.
-			 */
-			rootDir: false,
-			/**
 			 * \brief Set the upload directory.
 			 */
 			uploadDir: false,
@@ -53,7 +49,16 @@ export default class Web {
 			 * Options to be used while serving static files
 			 */
 			staticOptions: {
-				extensions: ["html", "htm"]
+				extensions: ["html"],
+				setHeaders: (res, path) => {
+					// Do not cache the index.html
+					// this is usefull when the application updates.
+					if (path.endsWith("index.html")) {
+						res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+						res.header("Expires", "-1");
+						res.header("Pragma", "no-cache");
+					}
+				}
 			}
 		}, config);
 
@@ -75,6 +80,9 @@ export default class Web {
 
 		this.app = Express();
 		this.app.use(Helmet());
+
+		// Error handler
+		this.app.use(middlewareErrorHandler);
 
 		// Enable compression
 		if (this.config.useCompression) {
@@ -102,24 +110,8 @@ export default class Web {
 			this.storage = Multer.diskStorage(diskStorageConfig);
 		}
 
-		// Error handler
-		this.app.use(middlewareErrorHandler);
-
 		// Save the port number for connection
 		this.port = port;
-
-		// Web content
-		if (this.config.rootDir) {
-			await this.addStaticRoute(this.config.rootDir);
-			this.addRoute("get", "/", (req, res) => {
-				// Do not cache the index.html
-				// this is usefull when the application updates.
-				res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-				res.header("Expires", "-1");
-				res.header("Pragma", "no-cache");
-				res.sendFile(Path.resolve(this.config.rootDir, "index.html"));
-			});
-		}
 
 		this.event.trigger("ready");
 	}
@@ -190,25 +182,28 @@ export default class Web {
 	/**
 	 * \brief Add a custom route to serve static files with the web server.
 	 *
-	 * \param uri (optional) The uri to which the request should match.
+	 * \param uri The uri to which the request should match.
 	 * \param path The path to which the static files will be served.
+	 * \param fallback (optional) Serve a specific file if nothing else can be served.
 	 */
-	async addStaticRoute(uri, path) {
-		// Make uri optional
-		if (typeof path === "undefined") {
-			path = uri;
-			uri = undefined;
-		}
+	async addStaticRoute(uri, path, fallback) {
 
 		const absolutePath = Path.resolve(path);
 		Exception.assert(absolutePath, "Absolute pat for path '{}' is empty.", path);
 		Exception.assert(await FileSystem.exists(absolutePath), "No file are present at path '{}'.", absolutePath);
 
-		if (uri) {
-			this.app.use(uri, Express.static(absolutePath, this.config.staticOptions));
-		}
-		else {
-			this.app.use(Express.static(absolutePath, this.config.staticOptions));
+		this.app.use(uri, Express.static(absolutePath, this.config.staticOptions));
+
+		// If there is a fallback file
+		if (fallback) {
+			this.app.use(uri, ((...args) => (req, res, next) => {
+				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+					(res.sendFile || res.sendfile).call(res, ...args, err => err && next())
+				}
+				else {
+					next();
+				}
+			})(fallback, { root: absolutePath }));
 		}
 	}
 

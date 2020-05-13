@@ -23,10 +23,11 @@ jobs:
 
     - name: Environment
       run: |
+        export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         bazel --version
         python --version
         java --version
 
     - name: Test
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" test //...
+        bazel test //...

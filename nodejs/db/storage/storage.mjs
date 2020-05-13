@@ -71,4 +71,11 @@ export default class Storage {
 	async write(/*bucket, key, data*/) {
 		Exception.unreachable("'write' must be implemented.");
 	}
+
+	/**
+     * Delete a file from a bucket
+     */
+	async delete(/*bucket, key*/) {
+		Exception.unreachable("'delete' must be implemented.");
+	}
 }
