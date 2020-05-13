@@ -18,6 +18,7 @@ class Cache
 		this.config = Object.assign({
 			maxSize: 1000000, // 1MB
 			maxEntries: 100,
+			garbageCollector: true,
 			garbageCollectorPeriodMs: 10000 // Every 10s
 		}, config);
 
@@ -33,7 +34,9 @@ class Cache
 		});
 
 		// Run the garbage collector asynchrounsly
-		garbageCollector.call(this);
+		if (this.config.garbageCollector) {
+			garbageCollector.call(this);
+		}
 	}
 
 	/**
