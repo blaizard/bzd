@@ -31,3 +31,7 @@ jobs:
     - name: Test
       run: |
         bazel test //...
+
+    - name: Sanitize
+      run: |
+        sanitize.sh
