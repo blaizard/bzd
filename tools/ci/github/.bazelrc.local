@@ -1,0 +1,3 @@
+# Remove output
+build --noshow_progress
+build --noshow_loading_progress
