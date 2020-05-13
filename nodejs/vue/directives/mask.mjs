@@ -6,7 +6,7 @@ function maskEvent(e) {
 
 export function maskRemove(el) {
 	// Delete the first child if it is aready a mask
-	if (el.firstChild.classList && el.firstChild.classList.contains("bzd-mask")) {
+	if (el.firstChild && el.firstChild.classList && el.firstChild.classList.contains("bzd-mask")) {
 		el.firstChild.remove();
 	}
 }

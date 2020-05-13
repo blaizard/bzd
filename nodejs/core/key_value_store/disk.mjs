@@ -97,7 +97,9 @@ export default class KeyValueStoreDisk {
 
 	async set(bucket, key, value) {
 		let persistence = await this._getPersistence(bucket);
-		await persistence.write("set", (key === null) ? this.generateUID() : key, value);
+		const uid = (key === null) ? this.generateUID() : key;
+		await persistence.write("set", uid, value);
+		return uid;
 	}
 
 	async get(bucket, key, defaultValue = undefined) {

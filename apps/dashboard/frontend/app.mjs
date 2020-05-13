@@ -7,8 +7,12 @@ import API from "bzd/vue/api.mjs";
 import App from "./app.vue"
 import APIv1 from "../api.v1.json";
 
-Vue.use(Router);
-Vue.use(API, APIv1);
+Vue.use(Router, {
+	hash: false
+});
+Vue.use(API, {
+	schema: APIv1
+});
 
 new Vue({
 	el: '#app',

@@ -11,10 +11,17 @@ Log.setMinLevel("debug");
 
 class RouterManager {
 
-	constructor() {
+	constructor(options) {
+		this.options = Object.assign({
+			/**
+			 * Hash mode
+			 */
+			hash: true
+		}, options);
+
 		this.routers = new Map();
 		this.path = "/";
-		this.regexMatchPath = new RegExp("^[^#]+(?:#([^?]+))?(?:\\?.*)?$"); 
+		this.regexMatchPath = new RegExp((this.options.hash) ? "^[^#]+(?:#([^?]+))?(?:\\?.*)?$" : "^.*://[^/]+/([^?#]*)(?:[?#].*)?$"); 
 	}
 
 	_getUid(vueElt) {
@@ -125,7 +132,7 @@ class RouterManager {
 		this.path = "/" + (path || "").split("/").filter(item => item).join("/");
 
 		// Update the url
-		history.pushState(null, null, "#" + this.path);		
+		history.pushState(null, null, (this.options.hash) ? ("#" + this.path) : this.path);		
 
 		// Clear all previously processed path
 		for (const [/*uid*/, config] of this.routers.entries()) {
@@ -186,14 +193,14 @@ class RouterManager {
 }
 
 export default class {
-	static install(Vue, /*options*/) {
+	static install(Vue, options) {
 
 		Vue.component("RouterComponent", RouterComponent);
 		Vue.component("RouterLink", RouterLink);
 
-		let routers = new RouterManager();
+		let routers = new RouterManager(options);
 
-		Vue.prototype.$routerSet = function (options) {
+		Vue.prototype.$routerSet = function (routeOptions) {
 
 			// Register hook
 			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
@@ -202,7 +209,7 @@ export default class {
 				routers.unregisterRouter(uid);
 			});
 
-			routers.registerRouter(this, options);
+			routers.registerRouter(this, routeOptions);
 		};
 
 		Vue.prototype.$routerDispatch = function (path) {

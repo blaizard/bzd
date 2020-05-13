@@ -2,13 +2,16 @@
 
 import Fetch from "./fetch.mjs";
 import ExceptionFactory from "./exception.mjs";
+import ExceptionFetch from "./impl/fetch/exception.mjs";
 
 const Exception = ExceptionFactory("api");
 
 export default class API {
-	constructor(definition, /*version = 1*/) {
-		this.definition = definition;
+	constructor(schema, unauthorizedCallback = null, /*version = 1*/) {
+		this.schema = schema;
 		this.endpointPre = "/api/v1";
+		this.token = null;
+		this.unauthorizedCallback = unauthorizedCallback;
 	}
 
 	_makePath(endpoint) {
@@ -16,17 +19,31 @@ export default class API {
 	}
 
 	/**
-     * Ensure the requestis valid according to the API definition.
+     * Ensure the requestis valid according to the API schema.
      */
 	_sanityCheck(method, endpoint) {
-		Exception.assert(endpoint in this.definition, "This endpoint is not defined: {}", endpoint);
-		Exception.assert(method in this.definition[endpoint], "The method '{}' is not valid for endpoint '{}'", method, endpoint);
+		Exception.assert(endpoint in this.schema, "This endpoint is not defined: {}", endpoint);
+		Exception.assert(method in this.schema[endpoint], "The method '{}' is not valid for endpoint '{}'", method, endpoint);
+	}
+
+	/**
+	 * Register a token with this API
+	 */
+	setToken(token) {
+		this.token = token;
 	}
 
 	async request(method, endpoint, data) {
 		this._sanityCheck(method, endpoint);
-		const requestOptions = this.definition[endpoint][method].request || {};
-		const responseOptions = this.definition[endpoint][method].response || {};
+		const requestOptions = this.schema[endpoint][method].request || {};
+		const responseOptions = this.schema[endpoint][method].response || {};
+
+		// Check if this is a request that needs authentication
+		if (this.schema[endpoint][method].authentication && !this.token) {
+			if (this.unauthorizedCallback) {
+				return this.unauthorizedCallback();
+			}
+		}
 
 		// Build the options
 		let fetchOptions = {
@@ -47,7 +64,27 @@ export default class API {
 			break;
 		}
 
-		return await Fetch.request(this._makePath(endpoint), fetchOptions);
+		// Automatically add authentication information to the request
+		if (this.token) {
+			fetchOptions.authentication = {
+				type: "token",
+				token: this.token
+			}
+		}
+
+		try {
+			return await Fetch.request(this._makePath(endpoint), fetchOptions);
+		}
+		catch (e) {
+			if (e instanceof ExceptionFetch) {
+				if (e.code == 401/*Unauthorized*/ || e.code == 403/*Forbidden*/) {
+					if (this.unauthorizedCallback) {
+						return this.unauthorizedCallback();
+					}
+				}
+			}
+			throw e;
+		}
 	}
 
 	/**
@@ -55,8 +92,8 @@ export default class API {
      */
 	handle(web, method, endpoint, callback, /*options = {}*/) {
 		this._sanityCheck(method, endpoint);
-		const requestOptions = this.definition[endpoint][method].request || {};
-		const responseOptions = this.definition[endpoint][method].response || {};
+		const requestOptions = this.schema[endpoint][method].request || {};
+		const responseOptions = this.schema[endpoint][method].response || {};
 
 		// Build the web options
 		let webOptions = {};
@@ -93,7 +130,13 @@ export default class API {
 						response.sendFile(result);
 					}
 					else if ("pipe" in result) {
-						result.pipe(response);
+						await (new Promise((resolve, reject) => {
+							result.on("error", reject)
+								.on("end", resolve)
+								.on("finish", resolve)
+								.pipe(response);
+						}));
+						response.end();
 					}
 					else {
 						Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
