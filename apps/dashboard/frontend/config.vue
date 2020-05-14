@@ -10,8 +10,8 @@
             <Form :description="formPluginSourceDescription" v-model="value"></Form>
         </template>
 
-        <button v-if="isUpdate" @click="handleUpdate">Update</button>
-        <button v-else @click="handleCreate">Create</button>
+        <Button v-if="isUpdate" @click="handleUpdate" action="approve" content="Update"></Button>
+        <Button v-else @click="handleCreate" action="approve" content="Create"></Button>
     </div>
 </template>
 
@@ -19,13 +19,14 @@
 	"use strict"
 
     import Form from "bzd/vue/components/form/form.vue";
+    import Button from "bzd/vue/components/form/element/button.vue";
     import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs"
     import { Source, Visualization } from "../plugins/plugins.mjs";
 
 	export default {
         components: {
-            Form
+            Form, Button
         },
         directives: {
             "loading": DirectiveLoading

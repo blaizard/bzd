@@ -2,7 +2,7 @@
 	<button :class="buttonClass"
 			@focus="setActive()"
 			@blur="setInactive()"
-			@click="click()"
+			@click="handleClick()"
 			:disabled="disable"
 			:tabindex="(disable) ? undefined : 0"
 			v-html="contentHtml">
@@ -23,8 +23,8 @@ export default {
 	data: function() {
 		return {
 			/**
-					* Defines a callback to be triggered the submit button is called
-					*/
+						* Defines a callback to be triggered the submit button is called
+						*/
 			click: this.getOption("click", this.submit),
 		};
 	},
@@ -46,8 +46,8 @@ export default {
 			return actionToClass[this.action || this.getOption("action")] || {};
 		},
 		/**
-				* The content of the button
-				*/
+					* The content of the button
+					*/
 		buttonClass() {
 			return {
 				"irform-button": true,
@@ -55,8 +55,8 @@ export default {
 			};
 		},
 		/**
-				* The content of the button
-				*/
+					* The content of the button
+					*/
 		attrContent() {
 			return this.content || this.getOption("content", "Submit");
 		},
@@ -66,6 +66,12 @@ export default {
 		contentHtml() {
 			const data = this.getContentData(this.attrContent);
 			return (this.html) ? data : this.toHtmlEntities(data);
+		}
+	},
+	methods: {
+		async handleClick() {
+			this.$emit("click");
+			await (this.attrAction.defaultClick || (() => {}))();
 		}
 	}
 };

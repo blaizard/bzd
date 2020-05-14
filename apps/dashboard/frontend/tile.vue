@@ -124,8 +124,10 @@
             },
             async fetchIcon() {
                 const plugin = (this.sourceType) ? Source[this.sourceType] : Visualization[this.visualizationType];
-                await plugin.frontend(); // Load the frontend plugin to load the icon
-                this.icon = plugin.icon;
+                if (plugin) {
+                    await plugin.frontend(); // Load the frontend plugin to load the icon
+                    this.icon = plugin.icon;
+                }
             },
 			handleClick() {
                 if (this.edit) {

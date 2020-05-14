@@ -1,29 +1,28 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "api",
+    name = "client",
     srcs = [
-        "api.mjs",
+        "base.mjs",
+        "client.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core/api:client",
+        "//nodejs:bzd",
+        "//nodejs/core:exception",
+        "//nodejs/core:fetch",
     ],
 )
 
 bzd_nodejs_library(
-    name = "authentication",
+    name = "server",
     srcs = [
-        "authentication.mjs",
+        "base.mjs",
+        "server.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:bzd",
         "//nodejs/core:exception",
     ],
 )
