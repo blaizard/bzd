@@ -83,12 +83,12 @@ export default class Router {
 	/**
 	 * \brief Handle the current request, with routes previously added.
 	 */
-	dispatch(path, ...args) {
+	async dispatch(path, ...args) {
 
 		const match = this.match(path);
 		if (match)
 		{
-			match.route.handler(match.vars, ...args);
+			await match.route.handler(match.vars, ...args);
 			return {
 				matched: true,
 				path: path,
@@ -96,7 +96,7 @@ export default class Router {
 			};
 		}
 
-		this.config.fallback(path, ...args);
+		await this.config.fallback(path, ...args);
 		return {
 			matched: false,
 			path: path,

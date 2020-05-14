@@ -9,6 +9,14 @@ const Exception = ExceptionFactory("router");
 
 Log.setMinLevel("debug");
 
+async function delayMs(time) {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve();
+		}, time);
+	});
+}
+
 class RouterManager {
 
 	constructor(options) {
@@ -16,7 +24,11 @@ class RouterManager {
 			/**
 			 * Hash mode
 			 */
-			hash: true
+			hash: true,
+            /**
+             * Authentication object to be used with this router.
+             */
+            authentication: null,
 		}, options);
 
 		this.routers = new Map();
@@ -40,7 +52,14 @@ class RouterManager {
 
 		options.routes.forEach((route) => {
 
-			const handler = (route, args, path) => {
+			const handler = async (route, args, path) => {
+				// Check if the route requires authentication,
+				// if so ensure that we are authenticated
+				if (route.authentication) {
+					Exception.assert(this.options.authentication, "This route has authentication requirement but no authentication object was specified.");
+					await this.options.authentication.assertAuthentication();
+				}
+
 				if (route.component) {
 					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt), args);
 				}
@@ -69,7 +88,7 @@ class RouterManager {
 	/**
 	 * Register a new router
 	 */
-	registerRouter(vueElt, options) {
+	async registerRouter(vueElt, options) {
 
 		const uid = this._getUid(vueElt);
 
@@ -93,7 +112,7 @@ class RouterManager {
 
 		Log.debug("Registered router '{}' with parent '{}' (nb routers: {})", uid, this.routers.get(uid).parent, this.routers.size);
 
-		this._propagate(uid);
+		await this._propagate(uid);
 	}
 
 	/**
@@ -118,7 +137,7 @@ class RouterManager {
 	/**
 	 * Dispatch a new path to the routers
 	 */
-	dispatch(path = null) {
+	async dispatch(path = null) {
 
 		// Read the path from the url
 		if (path === null) {
@@ -143,17 +162,19 @@ class RouterManager {
 		Log.debug("Dispatching path '{}'", this.path);
 
 		// Propagate dispatched request to all top level routers
+		let promiseList = [];
 		for (const [uid, config] of this.routers.entries()) {
 			if (config.parent == null) {
-				this._propagate(uid);
+				promiseList.push(this._propagate(uid));
 			}
 		}
+		await Promise.all(promiseList);
 	}
 
 	/**
 	 * Propagate a dispatch request to the routers
 	 */
-	_propagate(uid) {
+	async _propagate(uid) {
 		let router = this.routers.get(uid);
 
 		// If this router is already processed, do nothing
@@ -164,14 +185,14 @@ class RouterManager {
 		let data = null;
 		// If this is a top level router
 		if (router.parent === null) {
-			data = router.router.dispatch(this.path);
+			data = await router.router.dispatch(this.path);
 		}
 		// Otherwise it must be a nested router
 		else {
 			const parent = this.routers.get(router.parent);
 			Exception.assert(parent, "Router '{}' is set as nested but has an invalid parent '{}'", uid, router.parent);
 			Exception.assert(parent.pathPropagate !== null, "Propagated path from parent '{}' is null", router.parent);
-			data = router.router.dispatch(parent.pathPropagate);
+			data = await router.router.dispatch(parent.pathPropagate);
 		}
 
 		Exception.assert(data !== null, "Dispacthed information is empty.");
@@ -184,11 +205,10 @@ class RouterManager {
 
 		// Propagate to nested routers.
 		// Timeout is to ensure routers are unregisters in the mean time.
-		setTimeout(() => {
-			router.children.forEach((childUid) => {
-				this._propagate(childUid);
-			});
-		}, 1);
+		await delayMs(1);
+
+		let promiseList = Array.from(router.children).map(async (childUid) => { await this._propagate(childUid); });
+		await Promise.all(promiseList);
 	}
 }
 
@@ -200,7 +220,7 @@ export default class {
 
 		let routers = new RouterManager(options);
 
-		Vue.prototype.$routerSet = function (routeOptions) {
+		Vue.prototype.$routerSet = async function (routeOptions) {
 
 			// Register hook
 			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
@@ -209,11 +229,11 @@ export default class {
 				routers.unregisterRouter(uid);
 			});
 
-			routers.registerRouter(this, routeOptions);
+			await routers.registerRouter(this, routeOptions);
 		};
 
-		Vue.prototype.$routerDispatch = function (path) {
-			routers.dispatch(path);
+		Vue.prototype.$routerDispatch = async function (path) {
+			await routers.dispatch(path);
 		};
 
 		routers.dispatch();

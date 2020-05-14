@@ -3,7 +3,7 @@
 import Commander from "commander";
 import Path from "path";
 
-import API from "bzd/core/api.mjs";
+import API from "bzd/core/api/server.mjs";
 import APIv1 from "../api.v1.json";
 import Cache from "bzd/core/cache.mjs";
 import Web from "bzd/core/web.mjs";

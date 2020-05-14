@@ -18,7 +18,6 @@ bzd_nodejs_web(
         "//apps/dashboard/plugins",
         "//nodejs:icons",
         "//nodejs:vue",
-        "//nodejs/core:api",
         "//nodejs/core:fetch",
         "//nodejs/styles/default",
         "//nodejs/vue:api",

@@ -61,5 +61,5 @@ describe("Cache", () => {
         await Promise.all(promises);
 
         Exception.assertEqual(sum, expected);
-    });
+    }).timeout(10000);
 });

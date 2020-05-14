@@ -1,15 +1,13 @@
 load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "api",
+    name = "authentication",
     srcs = [
-        "api.mjs",
+        "authentication.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":exception",
-        ":fetch",
-        ":log",
         "//nodejs:bzd",
     ],
 )

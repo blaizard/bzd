@@ -49,7 +49,8 @@ export default class Web {
 			 * Options to be used while serving static files
 			 */
 			staticOptions: {
-				extensions: ["html"],
+				maxAge: 60 * 60 * 1000, // 1h
+				index: "index.html",
 				setHeaders: (res, path) => {
 					// Do not cache the index.html
 					// this is usefull when the application updates.

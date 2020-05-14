@@ -403,7 +403,8 @@ function getWebpackConfigDefault(isDev, config)
 			new VueLoaderPlugin(),
 			new MiniCssExtractPlugin({
 				filename: "[name].css",
-				chunkFilename: "[id].css"
+				chunkFilename: "[contenthash].css",
+				ignoreOrder: true
 			}),
 			new WebpackAssetsManifest({
 				entrypoints: true,
