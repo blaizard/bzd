@@ -9,6 +9,25 @@ const Exception = ExceptionFactory("api", "client");
 
 export default class APIClient extends Base {
 
+	constructor(schema, options) {
+        super(schema, options);
+
+        // Install authentication
+        if (this.isAuthentication()) {
+            this.options.authentication.installAPI(this);
+        }
+	}
+
+    async login(uid, password) {
+        Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
+        return await this.options.authentication.login(this, uid, password);
+    }
+
+    async logout(uid, password) {
+        Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
+        return await this.options.authentication.logout(this);
+    }
+
 	async request(method, endpoint, data) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
@@ -41,14 +60,8 @@ export default class APIClient extends Base {
     
             // Check if this is a request that needs authentication
             if (this.schema[endpoint][method].authentication) {
-                Exception.assert(this.options.authentication, "This route has authentication requirement but no authentication object was specified.");
-                await this.options.authentication.assertAuthentication();
-
-                // Automatically add authentication information to the request
-                fetchOptions.authentication = {
-                    type: "token",
-                    token: this.options.authentication.getToken()
-                }
+                Exception.assert(this.isAuthentication(), "This route has authentication requirement but no authentication object was specified.");
+                await this.options.authentication.setAuthentication(fetchOptions);
             }
 
             try {
@@ -57,17 +70,16 @@ export default class APIClient extends Base {
             catch (e) {
                 if (e instanceof ExceptionFetch) {
                     if (e.code == 401/*Unauthorized*/) {
-                        if (this.options.authentication) {
-                            if (await this.options.authentication.tryRefreshToken()) {
-                                retry = true;
-                                continue;
-                            }
+                        if (this.schema[endpoint][method].authentication) {
+                            await this.options.authentication.refreshAuthentication();
+                            retry = true;
+                            continue;
                         }
                     }
                 }
                 throw e;
             }
         
-        } while (retry && retryCounter < 3);
+        } while (retry && retryCounter <= 1);
 	}
 }
