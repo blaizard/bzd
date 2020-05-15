@@ -19,12 +19,18 @@ class Context {
 		options = Object.assign({
 			maxAge: 7 * 24 * 60 * 60 * 1000, // in ms
 			httpOnly: false
-		});
+		}, options);
 		this.response.cookie(name, value, options);
 	}
 
 	getCookie(name, defaultValue) {
 		return (name in this.request.cookies) ? this.request.cookies[name] : defaultValue;
+	}
+
+	deleteCookie(name) {
+		this.response.cookie(name, undefined, {
+			maxAge: 0
+		});
 	}
 
 	setStatus(code, message = null) {
@@ -40,6 +46,15 @@ class Context {
 };
 
 export default class APIServer extends Base {
+
+	constructor(schema, options) {
+		super(schema, options);
+	}
+
+	handleAuthentication(web) {
+		Exception.assert(this.options.authentication, "Authentication must be set.");
+		this.options.authentication.installAPI(this, web);
+	}
 
     /**
      * Register a callback to handle a request
@@ -70,18 +85,8 @@ export default class APIServer extends Base {
 
 				// Check if this is a request that needs authentication
 				if (authentication) {
-					let authenticated = false;
-					console.log(request.headers);
-					if ("authorization" in request.headers) {
-						const data = request.headers["authorization"].split(" ");
-						if (data.length == 2 && data[0] == "token") {
-							authenticated = authentication.verifyToken(data[1], (data) => {
-								return true;
-							});
-						}
-					}
-					if (!authenticated) {
-						return context.setStatus(401);
+					if (!authentication.verify(request)) {
+						return context.setStatus(401, "Unauthorized");
 					}
 				}
 
@@ -140,57 +145,5 @@ export default class APIServer extends Base {
 		};
 
 		web.addRoute(method, this._makePath(endpoint), callbackWrapper, webOptions);
-	}
-
-	/**
-	 * Setup endpoints for authentication
-	 */
-	handleAuthentication(web, endpointLogin, endpointRefresh) {
-
-		Exception.assert(this.isAuthentication(), "Authentication is not supported on this server");
-		const authentication = this.options.authentication;
-
-		const generateTokens = async function (uid) {
-
-			// Generates the refresh tocken and set it to a cookie
-			const refreshToken = await authentication.generateRefreshToken({ uid: uid });
-			this.setCookie("refresh_token", refreshToken.token, {
-				httpOnly: true,
-				maxAge: refreshToken.expiresIn * 1000
-			});
-	
-			// Generate the access token
-			return await authentication.generateAccessToken({ uid: uid });
-		};
-
-		this.handle(web, "post", endpointLogin, async function (inputs) {
-			Exception.assert("uid" in inputs, "Missing uid: {:j}", inputs);
-			Exception.assert("password" in inputs, "Missing password: {:j}", inputs);
-
-			// Verify uid/password pair
-			if (await authentication.verifyIdentity(inputs.uid, inputs.password)) {
-				return generateTokens.call(this, inputs.uid);
-			}
-			return this.setStatus(403, "Forbidden");
-		});
-	
-		this.handle(web, "post", endpointRefresh, async function () {
-
-			const refreshToken = this.getCookie("refresh_token", null);
-
-			let data = null;
-			try {
-				Exception.assert(refreshToken !== null, "No refresh token available");
-				data = await authentication.readToken(refreshToken);
-			}
-			catch (e) {
-				Log.error(e);
-				return this.setStatus(403, "Forbidden");
-			}
-
-			// Check access here
-			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
-			return generateTokens.call(this, data.uid);
-		});
 	}
 }

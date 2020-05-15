@@ -20,6 +20,14 @@ export default class API {
 	}
 
     /**
+     * Add a schema to the existing schema.
+     * Note this only update high level routes and do not deep merge.
+     */
+    addSchema(schema) {
+        Object.assign(this.schema, schema);
+    }
+
+    /**
      * If authentication is supported
      */
     isAuthentication() {
