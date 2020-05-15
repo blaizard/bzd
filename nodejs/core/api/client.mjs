@@ -34,7 +34,9 @@ export default class APIClient extends Base {
 		}
 
         let retry;
+        let retryCounter = 0;
         do {
+            ++retryCounter;
             retry = false;
     
             // Check if this is a request that needs authentication
@@ -54,17 +56,18 @@ export default class APIClient extends Base {
             }
             catch (e) {
                 if (e instanceof ExceptionFetch) {
-                    if (e.code == 401/*Unauthorized*/ || e.code == 403/*Forbidden*/) {
+                    if (e.code == 401/*Unauthorized*/) {
                         if (this.options.authentication) {
-                            await this.options.authentication.tryRefreshToken();
-                            retry = true;
-                            continue;
+                            if (await this.options.authentication.tryRefreshToken()) {
+                                retry = true;
+                                continue;
+                            }
                         }
                     }
                 }
                 throw e;
             }
         
-        } while (retry);
+        } while (retry && retryCounter < 3);
 	}
 }

@@ -8,4 +8,7 @@ bzd_nodejs_library(
     visibility = [
         "//apps/dashboard/plugins:__pkg__",
     ],
+    deps = [
+        "//nodejs/core:fetch",
+    ],
 )

@@ -1,10 +1,11 @@
 "use strict";
 
-import ExceptionFactory from "bzd/core/exception.mjs";
+import ExceptionFactory from "../exception.mjs";
+import ExceptionFetch from "../impl/fetch/exception.mjs";
 
-const Exception = ExceptionFactory("authentication");
+const Exception = ExceptionFactory("authentication", "client");
 
-export default class Authentication {
+export default class AuthenticationClient {
     constructor(options) {
         this.options = Object.assign({
 			/**
@@ -22,7 +23,6 @@ export default class Authentication {
 
         // Token to be used during this session.
         this.token = null;
-        this.tokenRefresh = null;
     }
 
     isAuthenticated() {
@@ -31,12 +31,10 @@ export default class Authentication {
 
     invalidToken() {
         this.token = null;
-        this.tokenRefresh = null;
     }
 
-    setToken(token, tokenRefresh) {
+    setToken(token) {
         this.token = token;
-        this.tokenRefresh = tokenRefresh;
     }
 
     getToken() {
@@ -50,13 +48,22 @@ export default class Authentication {
     async tryRefreshToken() {
 
         // Try to refresh the token
-        if (this.tokenRefresh && this.options.refreshTokenCallback) {
-            const result = await this.options.refreshTokenCallback(this.tokenRefresh);
-            if (result) {
-                Exception.assert("token" in result, "Missing token.");
-                Exception.assert("refresh_token" in result, "Missing refresh token.");
-                this.setToken(this.token, this.tokenRefresh);
-                return;
+        if (this.options.refreshTokenCallback) {
+            console.log("refreshTokenCallback");
+
+            try {
+                const result = await this.options.refreshTokenCallback();
+                console.log(result);
+                if (result) {
+                    Exception.assert("token" in result, "Missing token.");
+                    this.setToken(result.token);
+                    return true;
+                }
+            }
+            catch (e) {
+                if (e.code != 403/*Forbidden*/) {
+                    throw e;
+                }
             }
         }
 
@@ -65,7 +72,8 @@ export default class Authentication {
         if (this.options.unauthorizedCallback) {
             await this.options.unauthorizedCallback();
         }
-        Exception.unreachable("This route requires authentication.");
+
+        return false;
     }
 
     /**
@@ -73,6 +81,7 @@ export default class Authentication {
      */
     async assertAuthentication() {
         if (!this.token) {
+            console.log("tryRefreshToken");
             await this.tryRefreshToken();
         }
     }
