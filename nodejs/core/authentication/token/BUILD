@@ -3,8 +3,8 @@ load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
         "api.json",
+        "client.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -18,8 +18,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
         "api.json",
+        "server.mjs",
     ],
     packages = {
         "jsonwebtoken": "",
