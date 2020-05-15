@@ -9,6 +9,7 @@ import Https from "https";
 import Compression from "compression";
 import Minify from "express-minify";
 import Multer from "multer";
+import CookieParser from "cookie-parser";
 
 import Event from "./event.mjs";
 import FileSystem from "./filesystem.mjs";
@@ -84,6 +85,9 @@ export default class Web {
 
 		// Error handler
 		this.app.use(middlewareErrorHandler);
+
+		// Cookie parser
+		this.app.use(CookieParser());
 
 		// Enable compression
 		if (this.config.useCompression) {

@@ -1,6 +1,6 @@
 "use strict";
 
-import Fetch from "../../../../nodejs/core/fetch.mjs";
+import Fetch from "bzd/core/fetch.mjs";
 
 function _getStatus(item) {
     if (item.conclusion == "success") {
@@ -18,47 +18,44 @@ function _getStatus(item) {
     return "unknown";
 }
 
+function getFetchOptions(username, token) {
+    let options = {
+        expect: "json",
+        headers: {
+            "Content-Type": "application/vnd.github.v3+json",
+            "User-Agent": "curl"
+        }
+    };
+
+    if (token) {
+        options.authentication = {
+            type: "basic",
+            username: username,
+            password: token
+        };
+    }
+
+    return options;
+}
+
 export default {
     cache: [
         {
             collection: "github.builds",
-            fetch: async (username, repository, workflowId, token) => {
+            fetch: async function (username, repository, workflowId, token) {
 
                 // Build the URL
                 const baseUrl = "https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
                 const url = baseUrl + ((workflowId) ? ("/actions/workflows/" + encodeURIComponent(workflowId) + "/runs") : "/actions/runs");
-                let options = {
-                    expect: "json",
-                    headers: {
-                        "Content-Type": "application/vnd.github.v3+json",
-                        "User-Agent": "curl"
-                    }
-                };
 
-                if (token) {
-                    options.authentication = {
-                        type: "basic",
-                        username: username,
-                        password: token
-                    };
-                }
-
-                const result = await Fetch.get(url, options);
+                const result = await Fetch.get(url, getFetchOptions(username, token));
 
                 let builds = [];
                 let promises = [];
                 for (const item of result.workflow_runs || []) {
                     promises.push((async () => {
-                        const resultJobs = await Fetch.get(item.jobs_url, options);
-                        const job = resultJobs.jobs[0] || {};
-                        const dateStart = Date.parse(job.started_at);
-                        const dateEnd = Date.parse(job.completed_at);
-                        builds.push({
-                            duration: (dateEnd - dateStart) || 0,
-                            timestamp: dateStart || Date.now(),
-                            status: _getStatus(item),
-                            link: item.html_url
-                        });
+                        const result = await this.get("github.jobs", item.jobs_url, username, token);
+                        builds.push(result);
                     })());
                 }
 
@@ -66,6 +63,48 @@ export default {
                 return builds;
             },
             timeout: 60 * 1000,
+        },
+        {
+            collection: "github.jobs",
+            fetch: async (url, username, token, prevValue, cacheOptions) => {
+
+                const resultJobs = await Fetch.get(url, getFetchOptions(username, token));
+                const job = resultJobs.jobs[0] || {};
+
+                let dateStart = Date.now();
+                let dateEnd = 0;
+                let status = "unknown";
+                let link = null;
+                for (const job of resultJobs.jobs) {
+                    dateStart = Math.min(dateStart, Date.parse(job.started_at) || Date.now());
+                    dateEnd = Math.max(dateEnd, Date.parse(job.completed_at) || 0);
+                    const jobStatus = _getStatus(job);
+                    if (jobStatus == "in-progress") {
+                        status = jobStatus;
+                    }
+                    else if (jobStatus == "failure") {
+                        status = jobStatus;
+                    }
+                    else if (jobStatus == "success" && status == "unknown") {
+                        status = jobStatus;
+                    }
+                    else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
+                        status = jobStatus;
+                    }
+                    link = job.html_url;
+                }
+
+                if (status == "in-progress") {
+                    cacheOptions.timeout = 60 * 1000; // Refresh every minutes
+                }
+
+                return {
+                    duration: (dateEnd - dateStart) || 0,
+                    timestamp: dateStart || Date.now(),
+                    status: status,
+                    link: link
+                }
+            }
         }
     ],
     fetch: async (data, cache) => {

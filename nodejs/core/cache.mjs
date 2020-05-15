@@ -395,9 +395,12 @@ async function triggerUpdate(collection, id, ...ids)
 		}
 
 		// Set the new data and delete the previous error if any
-		dataId._data = await dataCollection._trigger(...ids, /*Previous value if any*/dataId._data);
-		if ("_timeoutMs" in dataCollection) {
-			dataId._timeout = Cache.getTimestampMs() + Math.max(1, dataCollection._timeoutMs);
+		let options = {
+			timeout: ("_timeoutMs" in dataCollection) ? dataCollection._timeoutMs : null
+		};
+		dataId._data = await dataCollection._trigger.call(this, ...ids, /*Previous value if any*/dataId._data, /*To overwrite options*/options);
+		if (options.timeout) {
+			dataId._timeout = Cache.getTimestampMs() + Math.max(1, options.timeout);
 		}
 		Exception.assert(typeof dataId._data !== "undefined", "Trigger function returned undefined data type for collection '{}'", collection);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize;

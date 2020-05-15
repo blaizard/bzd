@@ -19,6 +19,13 @@ export default class API {
 		this.schema = schema;
 	}
 
+    /**
+     * If authentication is supported
+     */
+    isAuthentication() {
+        return (this.options.authentication !== null);
+    }
+
 	_makePath(endpoint) {
 		return "/api/v" + this.options.version + endpoint;
 	}

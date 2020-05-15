@@ -192,6 +192,7 @@ bzd_nodejs_library(
         "http": "",
         "compression": "",
         "multer": "",
+        "cookie-parser": "",
     },
     visibility = ["//visibility:public"],
     deps = [

@@ -1,6 +1,6 @@
 "use strict";
 
-import Fetch from "../../../../nodejs/core/fetch.mjs";
+import Fetch from "bzd/core/fetch.mjs";
 
 function _getStatus(item) {
     if (item.result == "SUCCESS") {
