@@ -22,9 +22,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
         // Token to be used during this session.
         this.token = null;
         this.interval = null;
-
-        // Try to refresh the current token if any
-        this.tryRefreshAuthentication(/*nothrow*/true);
     }
 
     isAuthenticated() {
@@ -33,21 +30,30 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
     installAPI(api) {
         Log.debug("Installing token-based authentication API.");
+
         api.addSchema(APISchema);
         if (!this.options.refreshTokenCallback) {
             this.options.refreshTokenCallback = async () => {
                 return await api.request("post", "/auth/refresh");
             }
         }
+
+        // Try to refresh the current token if any
+        this.tryRefreshAuthentication(/*nothrow*/true);
     }
 
-    setToken(token, timeoutS) {
+    setToken(token, timeoutS = 0) {
+
+        const isPreviousAuthenticated = this.isAuthenticated();
         this.token = token;
+        if (isPreviousAuthenticated != this.isAuthenticated()) {
+            this.options.onAuthentication(this.isAuthenticated());
+        }
 
         if (this.interval) {
             clearInterval(this.interval);
         }
-        if (timeoutS && this.options.refreshTokenCallback) {
+        if (token && timeoutS && this.options.refreshTokenCallback) {
             // Refresh automatically the token, set to minimum time of 30s
             this.interval = setInterval(() => {
                 this.refreshAuthentication();
@@ -83,7 +89,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
         if (await this.tryRefreshAuthentication(/*nothrow*/false)) {
             return;
         }
-        this.token = null;
+        this.setToken(null);
+        this.options.onAuthentication(false);
 
         if (this.options.unauthorizedCallback) {
             await this.options.unauthorizedCallback();
@@ -113,5 +120,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
     async logout(api) {
         await api.request("post", "/auth/logout");
+        this.setToken(null);
     }
 };
