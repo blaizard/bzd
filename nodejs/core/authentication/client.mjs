@@ -20,6 +20,13 @@ export default class AuthenticationClient {
     }
 
     /**
+     * Return true if the client is authenticated, false otherwise.
+     */
+    isAuthenticated() {
+        Exception.unreachable("'isAuthenticated' must be implemented.");
+    }
+
+    /**
      * Attempt to refresh an authentication
      */
     async refreshAuthentication() {

@@ -22,6 +22,13 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
         // Token to be used during this session.
         this.token = null;
         this.interval = null;
+
+        // Try to refresh the current token if any
+        this.tryRefreshAuthentication(/*nothrow*/true);
+    }
+
+    isAuthenticated() {
+        return (this.token !== null);
     }
 
     installAPI(api) {
@@ -47,26 +54,35 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
             }, Math.max(timeoutS - 60, 30) * 1000);
         }
     }
-
-    async refreshAuthentication() {
-
-        // Try to refresh the token
+    
+    /**
+     * Try to refresh the token
+     */
+    async tryRefreshAuthentication(nothrow = false) {
         if (this.options.refreshTokenCallback) {
             try {
                 const result = await this.options.refreshTokenCallback();
                 if (result) {
                     Exception.assert("token" in result, "Missing token.");
                     this.setToken(result.token, result.timeout);
-                    return;
+                    return true;
                 }
             }
             catch (e) {
-                if (e.code != 401/*Unauthorized*/) {
+                if (!nothrow && e.code != 401/*Unauthorized*/) {
                     throw e;
                 }
             }
         }
+        return false;
+    }
 
+    async refreshAuthentication() {
+
+        // Try to refresh the token
+        if (await this.tryRefreshAuthentication(/*nothrow*/false)) {
+            return;
+        }
         this.token = null;
 
         if (this.options.unauthorizedCallback) {
@@ -78,7 +94,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
     async setAuthentication(fetchOptions) {
 
-        if (!this.token) {
+        if (!this.isAuthenticated()) {
             await this.refreshAuthentication();
         }
 
