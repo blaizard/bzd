@@ -12,6 +12,10 @@ export default class AuthenticationClient {
 			 * a route that requires authentication without it.
 			 */
             unauthorizedCallback: null,
+            /**
+             * Callback to be called each time the authentication status changes.
+             */
+            onAuthentication: (/*isAuthenticated*/) => {}
         }, defaultOptions, options);
     }
 
