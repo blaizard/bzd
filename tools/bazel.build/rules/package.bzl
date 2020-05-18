@@ -1,4 +1,7 @@
 BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
+BzdPackageMetadataFragment = provider(fields = ["manifests"])
+
+# ---- Packages
 
 def _bzd_package_impl(ctx):
     package = ctx.actions.declare_file("{}.package.tar".format(ctx.label.name))
@@ -8,7 +11,14 @@ def _bzd_package_impl(ctx):
 
     tar_cmd = "tar -h --hard-dereference -f \"{}\"".format(package.path)
     inputs = []
+    manifests = []
+    metadata_args = []
     for target, root in ctx.attr.deps.items():
+        if BzdPackageMetadataFragment in target:
+            manifests = target[BzdPackageMetadataFragment].manifests
+            for manifest in manifests:
+                metadata_args += ["--input", root, manifest.path]
+
         if BzdPackageFragment in target:
             fragment = target[BzdPackageFragment]
 
@@ -42,6 +52,16 @@ def _bzd_package_impl(ctx):
         else:
             fail("Dependencies for this rule requires BzdPackageFragment provider.")
 
+    # Merge all metadata fragments together
+    metadata = ctx.actions.declare_file("{}.metadata.manifest".format(ctx.label.name))
+    ctx.actions.run(
+        inputs = manifests,
+        outputs = [metadata],
+        progress_message = "Generating manifest for {}".format(ctx.label),
+        arguments = metadata_args + [metadata.path],
+        executable = ctx.attr._metadata.files_to_run,
+    )
+
     ctx.actions.run_shell(
         inputs = inputs,
         outputs = [package],
@@ -66,6 +86,7 @@ def _bzd_package_impl(ctx):
             runfiles = runfiles,
             files = depset([package]),
         ),
+        OutputGroupInfo(metadata = [metadata]),
     ]
 
 bzd_package = rule(
@@ -73,6 +94,11 @@ bzd_package = rule(
     attrs = {
         "deps": attr.label_keyed_string_dict(
             doc = "Target or files dependencies to be added to the package.",
+        ),
+        "_metadata": attr.label(
+            default = Label("//tools/bazel.build/rules/assets/package:metadata"),
+            cfg = "host",
+            executable = True,
         ),
     },
     executable = True,

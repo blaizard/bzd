@@ -1,5 +1,5 @@
 load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment")
+load("//tools/bazel.build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 
 # ---- Providers
 
@@ -133,17 +133,36 @@ def _bzd_nodejs_install_impl(ctx):
 
     # This will create and populate the node_modules directly in the output directory
     node_modules = ctx.actions.declare_directory("{}.nodejs_install/node_modules".format(ctx.label.name))
+    yarn_lock_json = ctx.actions.declare_file("{}.nodejs_install/yarn.lock".format(ctx.label.name))
     ctx.actions.run(
         inputs = [package_json],
-        outputs = [node_modules],
+        outputs = [node_modules, yarn_lock_json],
         progress_message = "Updating package(s) for {}".format(ctx.label),
-        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--no-lockfile", "--non-interactive"],
+        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive"],
         executable = toolchain_executable.manager.files_to_run,
+    )
+
+    # --- Fill in the metadata
+
+    metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.manifest".format(ctx.label.name))
+    ctx.actions.run(
+        inputs = [package_json, yarn_lock_json, node_modules],
+        outputs = [metadata],
+        progress_message = "Generating manifest for {}".format(ctx.label),
+        arguments = [
+            "--package_json",
+            package_json.path,
+            "--yarn_lock",
+            yarn_lock_json.path,
+            metadata.path,
+        ],
+        executable = ctx.attr._metadata.files_to_run,
     )
 
     # Return the provides (including outputs and dependencies)
     return [
         DefaultInfo(files = depset([package_json, node_modules])),
+        BzdPackageMetadataFragment(manifests = [metadata]),
         BzdNodeJsInstallProvider(
             package_json = package_json,
             node_modules = node_modules,
@@ -157,6 +176,11 @@ _INSTALL_ATTRS.update({
     "_package_json_template": attr.label(
         default = Label("//tools/bazel.build/rules/assets/nodejs:package_json_template"),
         allow_single_file = True,
+    ),
+    "_metadata": attr.label(
+        default = Label("//tools/bazel.build/rules/assets/nodejs:metadata"),
+        cfg = "host",
+        executable = True,
     ),
 })
 
@@ -247,6 +271,10 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
         result.append(BzdPackageFragment(
             files = srcs,
             files_remap = files_remap,
+        ))
+
+        result.append(BzdPackageMetadataFragment(
+            manifests = ctx.attr.install[BzdPackageMetadataFragment].manifests,
         ))
 
     return result
