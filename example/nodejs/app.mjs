@@ -1,4 +1,4 @@
-from Mustache import "mustache";
+import Mustache from "mustache";
 
 var view = {
 	title: "Joe",
@@ -7,6 +7,5 @@ var view = {
 	}
 };
    
-var output = Mustache.render("{{title}} spends {{calc}}", view);
-
+const output = Mustache.render("{{title}} spends {{calc}}", view);
 console.log(output);

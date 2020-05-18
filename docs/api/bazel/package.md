@@ -40,3 +40,21 @@ BzdPackageFragment(<a href="#BzdPackageFragment-root">root</a>, <a href="#BzdPac
 | tars |  (Undocumented)    |
 
 
+<a name="#BzdPackageMetadataFragment"></a>
+
+## BzdPackageMetadataFragment
+
+<pre>
+BzdPackageMetadataFragment(<a href="#BzdPackageMetadataFragment-manifests">manifests</a>)
+</pre>
+
+
+
+**FIELDS**
+
+
+| Name  | Description |
+| :-------------: | :-------------: |
+| manifests |  (Undocumented)    |
+
+
