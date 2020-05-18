@@ -52,21 +52,21 @@ def _bzd_package_impl(ctx):
         else:
             fail("Dependencies for this rule requires BzdPackageFragment provider.")
 
+    ctx.actions.run_shell(
+        inputs = inputs,
+        outputs = [package],
+        progress_message = "Generating package for {}".format(ctx.label),
+        command = "\n".join(package_creation_commands),
+    )
+
     # Merge all metadata fragments together
     metadata = ctx.actions.declare_file("{}.metadata.manifest".format(ctx.label.name))
     ctx.actions.run(
         inputs = manifests,
         outputs = [metadata],
         progress_message = "Generating manifest for {}".format(ctx.label),
-        arguments = metadata_args + [metadata.path],
+        arguments = metadata_args + ["--config", ctx.attr.internal_config, metadata.path],
         executable = ctx.attr._metadata.files_to_run,
-    )
-
-    ctx.actions.run_shell(
-        inputs = inputs,
-        outputs = [package],
-        progress_message = "Generating package for {}".format(ctx.label),
-        command = "\n".join(package_creation_commands),
     )
 
     # In addition create a executable rule to manipulate the package
@@ -89,7 +89,7 @@ def _bzd_package_impl(ctx):
         OutputGroupInfo(metadata = [metadata]),
     ]
 
-bzd_package = rule(
+_bzd_package = rule(
     implementation = _bzd_package_impl,
     attrs = {
         "deps": attr.label_keyed_string_dict(
@@ -100,6 +100,17 @@ bzd_package = rule(
             cfg = "host",
             executable = True,
         ),
+        "internal_config": attr.string(),
     },
     executable = True,
 )
+
+def bzd_package(**kargs):
+    _bzd_package(
+        internal_config = select({
+            "//tools/bazel.build/config:prod": "prod",
+            "//tools/bazel.build/config:dev": "dev",
+            "//conditions:default": "prod",
+        }),
+        **kargs
+    )
