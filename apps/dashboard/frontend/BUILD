@@ -1,5 +1,5 @@
-load("//tools/bazel.build/rules:nodejs_web.bzl", "bzd_nodejs_web")
-load("//tools/bazel.build/rules:package.bzl", "bzd_package")
+load("//tools/bazel_build/rules:nodejs_web.bzl", "bzd_nodejs_web")
+load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 
 bzd_nodejs_web(
     name = "frontend",
