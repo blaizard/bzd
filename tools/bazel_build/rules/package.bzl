@@ -1,19 +1,23 @@
 BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
-BzdPackageMetadataFragment = provider(fields = ["manifests", "type"])
+BzdPackageMetadataFragment = provider(fields = ["manifests"])
+_BzdPackageMetadata = provider(fields = ["manifests"])
 
 # ---- Aspect
 
 def _bzd_package_metadata_aspect_impl(target, ctx):
+    manifests = []
+    if hasattr(ctx.rule.attr, "dep"):
+        manifests += ctx.rule.attr.dep[_BzdPackageMetadata].manifests
     if BzdPackageMetadataFragment in target:
-        print(target, ctx)
-    return []
+        manifests += target[BzdPackageMetadataFragment].manifests
+    return [_BzdPackageMetadata(manifests = manifests)]
 
 """
 Aspects to gather data from bzd depedencies.
 """
-bzd_package_metadata_aspect = aspect(
+_bzd_package_metadata_aspect = aspect(
     implementation = _bzd_package_metadata_aspect_impl,
-    attr_aspects = ["*"],
+    attr_aspects = ["dep"],
 )
 
 # ---- Packages
@@ -29,8 +33,8 @@ def _bzd_package_impl(ctx):
     manifests = []
     metadata_args = []
     for target, root in ctx.attr.deps.items():
-        if BzdPackageMetadataFragment in target:
-            manifests += target[BzdPackageMetadataFragment].manifests
+        if _BzdPackageMetadata in target:
+            manifests += target[_BzdPackageMetadata].manifests
             for manifest in manifests:
                 metadata_args += ["--input", root, manifest.path]
 
@@ -118,6 +122,7 @@ _bzd_package = rule(
     implementation = _bzd_package_impl,
     attrs = {
         "deps": attr.label_keyed_string_dict(
+            aspects = [_bzd_package_metadata_aspect],
             doc = "Target or files dependencies to be added to the package.",
         ),
         "_metadata": attr.label(
