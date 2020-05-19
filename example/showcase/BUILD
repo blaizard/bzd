@@ -1,4 +1,4 @@
-load("//tools/bazel.build/rules:nodejs_web.bzl", "bzd_nodejs_web")
+load("//tools/bazel_build/rules:nodejs_web.bzl", "bzd_nodejs_web")
 
 bzd_nodejs_web(
     name = "showcase",

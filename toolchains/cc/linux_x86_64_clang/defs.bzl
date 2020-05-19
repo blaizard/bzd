@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//tools/bazel.build/toolchains/cc:defs.bzl", "toolchain_maker")
+load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
 load("//toolchains/cc:defs.bzl", "COPTS_CLANG", "LINKOPTS_CLANG")
 
 def _load_linux_x86_64_clang_9_0_0(name):
@@ -19,18 +19,18 @@ def _load_linux_x86_64_clang_9_0_0(name):
         "cpu": "linux_x86_64",
         "compiler": "clang",
         "host_platforms": [
-            "@//tools/bazel.build/platforms:linux_x86_64",
+            "@//tools/bazel_build/platforms:linux_x86_64",
         ],
         "exec_compatible_with": [
-            "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:x86_64",
+            "@//tools/bazel_build/platforms/al:linux",
+            "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "platforms": [
-            "@//tools/bazel.build/platforms:linux_x86_64",
+            "@//tools/bazel_build/platforms:linux_x86_64",
         ],
         "target_compatible_with": [
-            "@//tools/bazel.build/platforms/al:linux",
-            "@//tools/bazel.build/platforms/isa:x86_64",
+            "@//tools/bazel_build/platforms/al:linux",
+            "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",

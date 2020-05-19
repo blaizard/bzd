@@ -69,7 +69,7 @@ cc_library(
         "//cc/libraries/panic",
     ] + selects.with_or({
         (
-            "//tools/bazel.build/config:x86_64",
+            "//tools/bazel_build/config:x86_64",
         ): ["//cc/libraries/platforms/x86_64_cdecl"],
         "//conditions:default": [],
     }),

@@ -1,10 +1,10 @@
 # Bazel 3rd party rules
 
-load("//tools/bazel.build/rules/third_party:dependencies.bzl", "bazel_rules_load")
+load("//tools/bazel_build/rules/third_party:dependencies.bzl", "bazel_rules_load")
 
 bazel_rules_load()
 
-load("//tools/bazel.build/rules/third_party:register.bzl", "bazel_rules_register")
+load("//tools/bazel_build/rules/third_party:register.bzl", "bazel_rules_register")
 
 bazel_rules_register()
 

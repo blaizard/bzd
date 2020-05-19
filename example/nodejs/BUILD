@@ -1,5 +1,5 @@
-load("//tools/bazel.build/rules:nodejs.bzl", "bzd_nodejs_binary")
-load("//tools/bazel.build/rules:package.bzl", "bzd_package")
+load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_binary")
+load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 
 bzd_nodejs_binary(
     name = "nodejs",

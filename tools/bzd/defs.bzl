@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/bazel.build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 # Custom provider for a manifest
 BzdManifestInfo = provider(fields = ["manifest", "artifacts"])
@@ -157,7 +157,7 @@ def _bzd_pack_impl(ctx):
     executable = binary.files_to_run.executable.path
 
     # Gather toolchain information
-    info = ctx.toolchains["//tools/bazel.build/toolchains/cc:toolchain_type"].app
+    info = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
 
     # --- Prepare phase
 
@@ -229,7 +229,7 @@ bzd_pack = rule(
         ),
     },
     executable = True,
-    toolchains = ["//tools/bazel.build/toolchains/cc:toolchain_type"],
+    toolchains = ["//tools/bazel_build/toolchains/cc:toolchain_type"],
 )
 
 """

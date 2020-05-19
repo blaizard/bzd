@@ -19,6 +19,9 @@ test --define=panic=throw
 # Prevent building twice tools used for host and target, for nodejs rules for example.
 build --nodistinct_host_configuration
 
+# Add stamping
+build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
+
 # Development and production configuration
 build:dev --copt "-O0"
 build:dev --define=build=dev
