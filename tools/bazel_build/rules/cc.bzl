@@ -41,7 +41,7 @@ def _bzd_cc_pack_impl(ctx):
     # --- Execution phase
 
     if info.execute:
-        return sh_binary_wrapper_impl(
+        default_info = sh_binary_wrapper_impl(
             ctx = ctx,
             binary = info.execute,
             output = ctx.outputs.executable,
@@ -51,19 +51,20 @@ def _bzd_cc_pack_impl(ctx):
         )
 
     # If no executable are set, execute as a normal shell command
-
-    ctx.actions.write(
-        output = ctx.outputs.executable,
-        is_executable = True,
-        content = "exec {} $@".format(prepare_output.short_path),
-    )
-
-    return [
-        DefaultInfo(
+    else:
+        ctx.actions.write(
+            output = ctx.outputs.executable,
+            is_executable = True,
+            content = "exec {} $@".format(prepare_output.short_path),
+        )
+        default_info = DefaultInfo(
             executable = ctx.outputs.executable,
             runfiles = ctx.runfiles(files = [prepare_output]),
             files = depset([info_report]),
-        ),
+        )
+
+    return [
+        default_info,
         BzdPackageFragment(
             files = [prepare_output],
         ),
