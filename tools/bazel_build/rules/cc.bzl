@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
+load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment")
 
 def _bzd_cc_pack_impl(ctx):
     binary = ctx.attr.binary
@@ -57,11 +58,16 @@ def _bzd_cc_pack_impl(ctx):
         content = "exec {} $@".format(prepare_output.short_path),
     )
 
-    return DefaultInfo(
-        executable = ctx.outputs.executable,
-        runfiles = ctx.runfiles(files = [prepare_output]),
-        files = depset([info_report]),
-    )
+    return [
+        DefaultInfo(
+            executable = ctx.outputs.executable,
+            runfiles = ctx.runfiles(files = [prepare_output]),
+            files = depset([info_report]),
+        ),
+        BzdPackageFragment(
+            files = [prepare_output],
+        )
+    ]
 
 _bzd_cc_pack = rule(
     implementation = _bzd_cc_pack_impl,
