@@ -45,3 +45,22 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+bzl_library(
+    name = "manifest",
+    srcs = [
+        "manifest.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "cc",
+    srcs = [
+        "cc.bzl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":manifest",
+    ],
+)

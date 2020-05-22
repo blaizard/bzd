@@ -7,7 +7,7 @@ interfaces:
         includes: libraries/io/stdout/stdout.h
 """
 
-load("@//tools/bzd:defs.bzl", "bzd_cc_library")
+load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
 
 bzd_cc_library(
     name = "stdout",
