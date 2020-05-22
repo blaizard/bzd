@@ -2,37 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
 
-def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
-    # Generates the auto-generated files to be compiled with the project
-    output_cc = ".bzd/{}.cpp".format(name)
-    output_manifest = ".bzd/{}.manifest".format(name)
-    manifest_rule_name = "{}_manifest".format(name)
-    bzd_manifest_build(
-        name = manifest_rule_name,
-        deps = deps,
-        format = "cpp",
-        output = output_cc,
-        output_manifest = output_manifest,
-    )
-
-    # Generates a library from the auto-generated files
-    library_rule_name = "{}_library".format(name)
-    cc_library(
-        name = library_rule_name,
-        srcs = [output_cc],
-        deps = [manifest_rule_name] + deps,
-        alwayslink = True,
-    )
-
-    # Call the binary/test rule
-    rule_to_use = cc_test if is_test else cc_binary
-    rule_to_use(
-        name = name,
-        deps = deps + [library_rule_name],
-        **kwargs
-    )
-
-def _bzd_pack_impl(ctx):
+def _bzd_cc_pack_impl(ctx):
     binary = ctx.attr.binary
     executable = binary.files_to_run.executable.path
 
@@ -93,8 +63,8 @@ def _bzd_pack_impl(ctx):
         files = depset([info_report]),
     )
 
-bzd_pack = rule(
-    implementation = _bzd_pack_impl,
+_bzd_cc_pack = rule(
+    implementation = _bzd_cc_pack_impl,
     attrs = {
         "binary": attr.label(
             allow_files = False,
@@ -111,6 +81,39 @@ bzd_pack = rule(
     executable = True,
     toolchains = ["//tools/bazel_build/toolchains/cc:toolchain_type"],
 )
+
+def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
+    # Generates the auto-generated files to be compiled with the project
+    output_cc = ".bzd/{}.cpp".format(name)
+    output_manifest = ".bzd/{}.manifest".format(name)
+    bzd_manifest_build(
+        name = name + ".manifest",
+        deps = deps,
+        format = "cpp",
+        output = output_cc,
+        output_manifest = output_manifest,
+    )
+
+    # Generates a library from the auto-generated files
+    cc_library(
+        name = name + ".library",
+        srcs = [output_cc],
+        deps = [name + ".manifest"] + deps,
+        alwayslink = True,
+    )
+
+    # Call the binary/test rule
+    rule_to_use = cc_test if is_test else cc_binary
+    rule_to_use(
+        name = name + ".binary",
+        deps = deps + [name + ".library"],
+        **kwargs
+    )
+
+    _bzd_cc_pack(
+        name = name,
+        binary = name + ".binary",
+    )
 
 """
 Rule to define a bzd binary.

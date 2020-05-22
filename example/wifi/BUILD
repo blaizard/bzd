@@ -11,8 +11,3 @@ cc_binary(
         "//cc:bzd",
     ],
 )
-
-#bzd_pack(
-#    name = "deploy",
-#    binary = ":wifi",
-#)
