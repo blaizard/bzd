@@ -1,5 +1,6 @@
-load("@//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
-load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 
 bzd_manifest(
     name = "config_manifest",
@@ -29,4 +30,11 @@ bzd_cc_binary(
         "//cc/libraries/io/stdout",
         "//cc/libraries/io/stub",
     ],
+)
+
+bzd_package(
+    name = "package",
+    deps = {
+        ":bzd": "bzd",
+    },
 )

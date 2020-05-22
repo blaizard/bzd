@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
-load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment")
+load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 
 def _bzd_cc_pack_impl(ctx):
     binary = ctx.attr.binary
@@ -66,6 +66,9 @@ def _bzd_cc_pack_impl(ctx):
         ),
         BzdPackageFragment(
             files = [prepare_output],
+        ),
+        BzdPackageMetadataFragment(
+            manifests = [ctx.file._metadata_json],
         )
     ]
 
@@ -82,6 +85,10 @@ _bzd_cc_pack = rule(
             cfg = "host",
             allow_files = True,
             default = Label("//tools/bazel_build/rules/assets/cc:info_script"),
+        ),
+        "_metadata_json": attr.label(
+            default = Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
+            allow_single_file = True,
         ),
     },
     executable = True,
