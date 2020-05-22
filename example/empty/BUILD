@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("@//tools/bzd:defs.bzl", "bzd_pack")
+load("@//tools/bazel_build/rules:cc.bzl", "bzd_pack")
 
 cc_binary(
     name = "empty",

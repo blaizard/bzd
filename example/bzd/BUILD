@@ -1,4 +1,5 @@
-load("@//tools/bzd:defs.bzl", "bzd_cc_binary", "bzd_manifest", "bzd_pack")
+load("@//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
+load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary", "bzd_pack")
 
 bzd_manifest(
     name = "config_manifest",
