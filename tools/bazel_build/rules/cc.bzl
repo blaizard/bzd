@@ -4,11 +4,15 @@ load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_bui
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 
 def _bzd_cc_pack_impl(ctx):
-    binary = ctx.attr.binary
-    executable = binary.files_to_run.executable.path
+    binary = ctx.attr.dep
+    executable = binary.files_to_run.executable
 
     # Gather toolchain information
     info = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
+
+    # --- Strip the binary
+
+    executable_stripped = ctx.file.dep_stripped
 
     # --- Prepare phase
 
@@ -17,25 +21,24 @@ def _bzd_cc_pack_impl(ctx):
         # Run the prepare step only if it is present
         prepare_output = ctx.actions.declare_file(".bzd/{}.app".format(ctx.attr.name))
         ctx.actions.run(
-            inputs = [binary.files_to_run.executable],
+            inputs = [executable_stripped],
             outputs = [prepare_output],
             tools = prepare.data_runfiles.files,
-            arguments = [executable, prepare_output.path],
+            arguments = [executable_stripped.path, prepare_output.path],
             executable = prepare.files_to_run,
         )
     else:
-        prepare_output = binary.files_to_run.executable
+        prepare_output = executable_stripped
 
-    # --- Info phase
+    # --- Metadata phase
 
-    info_report = ctx.actions.declare_file(".bzd/{}.json".format(ctx.attr.name))
-    args = [info_report.path]
+    metadata = ctx.actions.declare_file(".bzd/{}.metadata".format(ctx.attr.name))
     ctx.actions.run(
-        inputs = [binary.files_to_run.executable, prepare_output],
-        outputs = [info_report],
-        progress_message = "information report for application {}".format(ctx),
-        arguments = args,
-        executable = ctx.executable._info_script,
+        inputs = [executable, prepare_output],
+        outputs = [metadata],
+        progress_message = "Metadata for {}".format(ctx.attr.name),
+        arguments = [executable.path, prepare_output.path, metadata.path],
+        executable = ctx.executable._metadata_script,
     )
 
     # --- Execution phase
@@ -46,11 +49,10 @@ def _bzd_cc_pack_impl(ctx):
             binary = info.execute,
             output = ctx.outputs.executable,
             extra_runfiles = [prepare_output],
-            files = depset([info_report]),
             command = "{{binary}} \"{}\" $@".format(prepare_output.short_path),
         )
 
-    # If no executable are set, execute as a normal shell command
+        # If no executable are set, execute as a normal shell command
     else:
         ctx.actions.write(
             output = ctx.outputs.executable,
@@ -60,7 +62,6 @@ def _bzd_cc_pack_impl(ctx):
         default_info = DefaultInfo(
             executable = ctx.outputs.executable,
             runfiles = ctx.runfiles(files = [prepare_output]),
-            files = depset([info_report]),
         )
 
     return [
@@ -69,23 +70,28 @@ def _bzd_cc_pack_impl(ctx):
             files = [prepare_output],
         ),
         BzdPackageMetadataFragment(
-            manifests = [ctx.file._metadata_json],
-        )
+            manifests = [metadata, ctx.file._metadata_json],
+        ),
     ]
 
 _bzd_cc_pack = rule(
     implementation = _bzd_cc_pack_impl,
     attrs = {
-        "binary": attr.label(
+        "dep": attr.label(
             allow_files = False,
             mandatory = True,
             doc = "Label of the binary to be packed",
         ),
-        "_info_script": attr.label(
+        "dep_stripped": attr.label(
+            allow_single_file = True,
+            mandatory = True,
+            doc = "Label of the stripped binary to be packed",
+        ),
+        "_metadata_script": attr.label(
             executable = True,
             cfg = "host",
             allow_files = True,
-            default = Label("//tools/bazel_build/rules/assets/cc:info_script"),
+            default = Label("//tools/bazel_build/rules/assets/cc:metadata"),
         ),
         "_metadata_json": attr.label(
             default = Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
@@ -93,7 +99,10 @@ _bzd_cc_pack = rule(
         ),
     },
     executable = True,
-    toolchains = ["//tools/bazel_build/toolchains/cc:toolchain_type"],
+    toolchains = [
+        "@bazel_tools//tools/cpp:toolchain_type",
+        "//tools/bazel_build/toolchains/cc:toolchain_type",
+    ],
 )
 
 def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
@@ -126,7 +135,8 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
 
     _bzd_cc_pack(
         name = name,
-        binary = name + ".binary",
+        dep = name + ".binary",
+        dep_stripped = name + ".binary.stripped",
     )
 
 """

@@ -49,6 +49,8 @@ def _load_linux_x86_64_clang_9_0_0(name):
         ],
         "compile_flags": [
             "-std=c++14",
+            # Add debug symbols, will be removed at the postprocessing stage
+            "-g",
 
             # Do not link or re-order inclusion files
             "-nostdinc++",
@@ -118,6 +120,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
         "bin_cov": "external/{}/bin/llvm-cov".format(clang_package_name),
         "bin_objdump": "external/{}/bin/llvm-objdump".format(clang_package_name),
         "bin_ld": "external/{}/bin/clang++".format(clang_package_name),
+        "bin_strip": "external/{}/bin/llvm-strip".format(clang_package_name),
     }
 
     toolchain_maker(

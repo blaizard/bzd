@@ -10,7 +10,9 @@ filegroup(
 sh_binary_wrapper(
     name = "esp32_prepare",
     binary = "@esptool//:esptool",
-    command = "{binary} --chip esp32 elf2image --flash_mode 'dio' --flash_freq '40m' --flash_size '2MB' --min-rev 0 --elf-sha256-offset 0xb0 -o \"$2\" \"$1\"",
+    command = """
+        {binary} --chip esp32 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "2MB" --min-rev 0 --elf-sha256-offset 0xb0 -o "$2" "$1"
+    """,
     visibility = ["//visibility:public"],
 )
 

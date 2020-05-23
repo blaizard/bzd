@@ -3,16 +3,16 @@
 
 import sys
 import json
+import os
 
 if __name__== "__main__":
 
-	output = sys.argv[1]
-	print("Info script! generating {}".format(output))
+	inputPath = sys.argv[1]
+	inputFinalPath = sys.argv[2]
+	output = sys.argv[3]
 
 	data = {
-		"input_raw": "",
-		"input_prepare": "",
-		"size": "",
+		"size": os.path.getsize(inputFinalPath),
 	}
 
 	with open(output, "w+") as f:

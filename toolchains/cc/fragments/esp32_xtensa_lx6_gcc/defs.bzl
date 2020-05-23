@@ -37,6 +37,8 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         "compile_flags": [
             # C++14
             "-std=c++14",
+            # Add debug symbols, will be removed at the postprocessing stage
+            "-g",
 
             # Warnings
             "-Wall",
@@ -84,5 +86,6 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         "bin_cov": "external/{}/bin/xtensa-esp32-elf-gcov".format(clang_package_name),
         "bin_objdump": "external/{}/bin/xtensa-esp32-elf-objdump".format(clang_package_name),
         "bin_ld": "external/{}/bin/xtensa-esp32-elf-gcc".format(clang_package_name),
+        "bin_strip": "external/{}/bin/xtensa-esp32-elf-strip".format(clang_package_name),
         #"app_info": "xtensa-esp32-elf-size --radix=10 --format=berkley"
     }
