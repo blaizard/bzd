@@ -8,6 +8,18 @@ filegroup(
 )
 
 sh_binary_wrapper(
+    name = "metadata",
+    binary = "//tools/bazel_build/rules/assets/cc:profiler",
+    command = """
+        {binary} --groups $(location //toolchains/cc/fragments/esptool:profile_groups.json) "$1"
+    """,
+    data = [
+        "//toolchains/cc/fragments/esptool:profile_groups.json",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+sh_binary_wrapper(
     name = "esp32_prepare",
     binary = "@esptool//:esptool",
     command = """
