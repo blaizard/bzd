@@ -10,6 +10,8 @@ build --cxxopt "-std=c++14"
 build --copt "-Wall"
 build --copt "-Wextra"
 build --copt "-Werror"
+build --copt "-gdwarf-4"
+build "--strip=never"
 
 # Test specific options
 test --test_output=errors

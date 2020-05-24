@@ -30,6 +30,7 @@ bazel test ... --config=dev --platform_suffix=_dev $EXTRA_FLAGS
 bazel test ... --config=prod --platform_suffix=_prod $EXTRA_FLAGS
 bazel test ... --config=linux_x86_64_clang $EXTRA_FLAGS
 bazel build ... --config=esp32_xtensa_lx6_gcc $EXTRA_FLAGS
+bazel build ... --output_groups=metadata $EXTRA_FLAGS
 
 # Use static analyzers
 bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan $EXTRA_FLAGS
