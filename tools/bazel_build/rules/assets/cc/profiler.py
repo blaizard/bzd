@@ -62,28 +62,21 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    groups = {}
+    if args.groups:
+        with open(args.groups, "r") as f:
+            groupsData = json.load(f)
+            # Compute regular expression from the groups
+            groups = {re.compile(match): group for match, group in groupsData.items()}
+
     if args.format == "elf-dwarf":
         result = processFile(args.binary)
     else:
         raise Exception("Unsupported format.")
-
-    groups = {
-        "/libm/": "libm",
-        "/libc/": "libc",
-        "/libgcc/": "libgcc",
-        "/libstdc\\+\\+": "libstdc++",
-        "/hal/hal/": "hal",
-        "/esp-idf/components/(?P<component>[^/]+)/": "{component}"
-    }
-
+ 
     groupedResult = {}
-    size = 0
-
-    # Compute regular expression from the groups
-    groups = {re.compile(match): group for match, group in groups.items()}
 
     for path, data in result.items():
-        size += data["size"]
         matchedGroup = None
         for regexpr, group in groups.items():
             m = regexpr.search(path)
@@ -99,5 +92,7 @@ if __name__ == '__main__':
         else:
             groupedResult[path] = data
 
-    print(json.dumps(groupedResult))
-    print(size)
+    print(json.dumps({
+        "groups": groupedResult
+    }))
+    sys.exit(0)
