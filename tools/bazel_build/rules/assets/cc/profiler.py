@@ -57,6 +57,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description = "Binary profiler.")
     parser.add_argument("--format", choices = ["elf-dwarf"], default = "elf-dwarf", help = "Binary format.")
+    parser.add_argument("--groups", default = None, help = "Groups schema if any.")
     parser.add_argument("binary", help = "Path of the binary to profile.")
 
     args = parser.parse_args()
