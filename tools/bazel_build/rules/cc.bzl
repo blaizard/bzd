@@ -7,8 +7,8 @@ def _bzd_cc_pack_impl(ctx):
     binary = ctx.attr.dep
     executable = binary.files_to_run.executable
 
-    # Gather toolchain information
-    info = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
+    # Gather toolchain application information
+    application = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
 
     # --- Strip the binary
 
@@ -16,40 +16,50 @@ def _bzd_cc_pack_impl(ctx):
 
     # --- Prepare phase
 
-    prepare = info.prepare
+    prepare = application.prepare
     if prepare:
         # Run the prepare step only if it is present
-        prepare_output = ctx.actions.declare_file(".bzd/{}.app".format(ctx.attr.name))
+        executable_final = ctx.actions.declare_file("{}.binary.final".format(ctx.attr.name))
         ctx.actions.run(
             inputs = [executable_stripped],
-            outputs = [prepare_output],
+            outputs = [executable_final],
             tools = prepare.data_runfiles.files,
-            arguments = [executable_stripped.path, prepare_output.path],
+            arguments = [executable_stripped.path, executable_final.path],
             executable = prepare.files_to_run,
         )
     else:
-        prepare_output = executable_stripped
+        executable_final = executable_stripped
 
     # --- Metadata phase
 
-    metadata = ctx.actions.declare_file(".bzd/{}.metadata".format(ctx.attr.name))
-    ctx.actions.run(
-        inputs = [executable, prepare_output],
-        outputs = [metadata],
-        progress_message = "Metadata for {}".format(ctx.attr.name),
-        arguments = [executable.path, prepare_output.path, metadata.path],
-        executable = ctx.executable._metadata_script,
-    )
+    metadata_list = application.metadatas if application.metadatas else [ctx.attr._metadata_script]
+    metadata_manifests = [ctx.file._metadata_json]
+
+    for index, metadata in enumerate(metadata_list):
+        is_executable = bool(OutputGroupInfo in metadata)
+        if is_executable:
+            metadata_file = ctx.actions.declare_file(".bzd/{}.metadata.{}".format(ctx.attr.name, index))
+            ctx.actions.run(
+                inputs = [executable, executable_final],
+                outputs = [metadata_file],
+                progress_message = "Generating metadata for {}".format(ctx.attr.name),
+                arguments = [executable.path, executable_stripped.path, executable_final.path, metadata_file.path],
+                tools = metadata.data_runfiles.files,
+                executable = metadata.files_to_run,
+            )
+            metadata_manifests.append(metadata_file)
+        else:
+            metadata_manifests.append(metadata.files.to_list()[0])
 
     # --- Execution phase
 
-    if info.execute:
+    if application.execute:
         default_info = sh_binary_wrapper_impl(
             ctx = ctx,
-            binary = info.execute,
+            binary = application.execute,
             output = ctx.outputs.executable,
-            extra_runfiles = [prepare_output],
-            command = "{{binary}} \"{}\" $@".format(prepare_output.short_path),
+            extra_runfiles = [executable_final],
+            command = "{{binary}} \"{}\" $@".format(executable_final.short_path),
         )
 
         # If no executable are set, execute as a normal shell command
@@ -57,20 +67,20 @@ def _bzd_cc_pack_impl(ctx):
         ctx.actions.write(
             output = ctx.outputs.executable,
             is_executable = True,
-            content = "exec {} $@".format(prepare_output.short_path),
+            content = "exec {} $@".format(executable_final.short_path),
         )
         default_info = DefaultInfo(
             executable = ctx.outputs.executable,
-            runfiles = ctx.runfiles(files = [prepare_output]),
+            runfiles = ctx.runfiles(files = [executable_final]),
         )
 
     return [
         default_info,
         BzdPackageFragment(
-            files = [prepare_output],
+            files = [executable_final],
         ),
         BzdPackageMetadataFragment(
-            manifests = [metadata, ctx.file._metadata_json],
+            manifests = metadata_manifests,
         ),
     ]
 
@@ -91,7 +101,7 @@ _bzd_cc_pack = rule(
             executable = True,
             cfg = "host",
             allow_files = True,
-            default = Label("//tools/bazel_build/rules/assets/cc:metadata"),
+            default = Label("//tools/bazel_build/rules/assets/cc:profiler"),
         ),
         "_metadata_json": attr.label(
             default = Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
@@ -100,7 +110,6 @@ _bzd_cc_pack = rule(
     },
     executable = True,
     toolchains = [
-        "@bazel_tools//tools/cpp:toolchain_type",
         "//tools/bazel_build/toolchains/cc:toolchain_type",
     ],
 )
@@ -192,8 +201,8 @@ _bzd_genmanifest = rule(
 
 def _bzd_cc_library_impl(name, interfaces, includes, deps, **kwargs):
     # Create the manifest file
-    genmanifest_name = "genmanifest_{}".format(name)
-    output_genmanifest = ".bzd/genmanifest_{}.manifest".format(name)
+    genmanifest_name = "{}.manifest.auto".format(name)
+    output_genmanifest = ".bzd/{}.manifest.auto".format(name)
     _bzd_genmanifest(
         name = genmanifest_name,
         includes = includes,
@@ -202,7 +211,7 @@ def _bzd_cc_library_impl(name, interfaces, includes, deps, **kwargs):
     )
 
     # Declare the manifest
-    manifest_name = "manifest_{}".format(name)
+    manifest_name = "{}.manifest".format(name)
     bzd_manifest(
         name = manifest_name,
         manifest = [output_genmanifest],

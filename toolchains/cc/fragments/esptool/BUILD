@@ -8,10 +8,10 @@ filegroup(
 )
 
 sh_binary_wrapper(
-    name = "metadata",
+    name = "esp32_metadata",
     binary = "//tools/bazel_build/rules/assets/cc:profiler",
     command = """
-        {binary} --groups $(location profile_groups.json) "$1"
+        {binary} --groups $(location profile_groups.json) "$@"
     """,
     data = [
         "profile_groups.json",

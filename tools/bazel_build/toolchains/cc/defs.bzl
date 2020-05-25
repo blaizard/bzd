@@ -1,13 +1,13 @@
 AppInfo = provider(
     doc = "blah blah.",
-    fields = ["prepare", "info", "execute"],
+    fields = ["prepare", "metadatas", "execute"],
 )
 
 def _app_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
         app = AppInfo(
             prepare = ctx.attr.prepare,
-            info = ctx.attr.info,
+            metadatas = ctx.attr.metadatas,
             execute = ctx.attr.execute,
         ),
     )
@@ -25,7 +25,9 @@ app_toolchain = rule(
             executable = True,
             cfg = "host",
         ),
-        "info": attr.string(),
+        "metadatas": attr.label_list(
+            allow_files = True,
+        ),
         "execute": attr.label(
             executable = True,
             cfg = "host",
@@ -43,8 +45,8 @@ def _impl(ctx):
     app_kwargs = []
     if ctx.attr.app_prepare:
         app_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
-    if ctx.attr.app_info:
-        app_kwargs.append("info = \"{}\",".format(ctx.attr.app_info))
+    if ctx.attr.app_metadatas:
+        app_kwargs.append("metadatas = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadatas])))
     if ctx.attr.app_execute:
         app_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
 
@@ -133,7 +135,7 @@ _toolchain_maker_linux = repository_rule(
         "bin_strip": attr.string(default = "/usr/bin/strip"),
         # Execution
         "app_prepare": attr.string(),
-        "app_info": attr.string(),
+        "app_metadatas": attr.string_list(),
         "app_execute": attr.string(),
     },
 )

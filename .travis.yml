@@ -22,22 +22,22 @@ jobs:
     - name: Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=prod
+      - bazel test ... --output_groups=default,metadata --config=prod
 
     - name: Development
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=dev
+      - bazel test ... --output_groups=default,metadata --config=dev
 
     - name: linux_x86_64_clang
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
+      - bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
     - name: esp32_xtensa_lx6_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
+      - bazel build ... --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
     - name: Sanitizer
       script:
