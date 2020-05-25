@@ -31,7 +31,7 @@ jobs:
 
     - name: Test
       run: |
-        bazel test //...
+        bazel test ... --output_groups=default,metadata
 
     - name: Sanitize
       run: |

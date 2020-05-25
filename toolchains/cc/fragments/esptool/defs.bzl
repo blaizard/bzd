@@ -15,5 +15,8 @@ def toolchain_fragment_esptool():
 
     return {
         "app_prepare": "@//toolchains/cc/fragments/esptool:esp32_prepare",
+        "app_metadatas": [
+            "@//toolchains/cc/fragments/esptool:esp32_metadata",
+        ],
         "app_execute": "@//toolchains/cc/fragments/esptool:esp32_exec",
     }

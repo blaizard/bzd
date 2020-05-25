@@ -4,10 +4,13 @@
 import argparse
 import json
 import re
+import os
 import sys
 from elftools.elf.elffile import ELFFile
 
-def processFile(path):
+def processElfDwarf(path):
+
+    compilers = set()
 
     with open(path, "rb") as f:
         elffile = ELFFile(f)
@@ -26,12 +29,23 @@ def processFile(path):
             size = dieInfoRec(topDIE)
             if size:
                 if name not in result:
-                    result[name] = {
-                        "size": 0
-                    }
-                result[name]["size"] += size
+                    result[name] = 0
+                result[name] += size
 
-    return result
+            # Gather compilers
+            if topDIE.tag == "DW_TAG_compile_unit":
+                if "DW_AT_producer" in topDIE.attributes:
+                    compiler = topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors = "ignore").lower()
+                    # Remove everything after the first argument
+                    index = compiler.find(" -")
+                    if index != -1:
+                        compiler = compiler[0:index]
+                    compilers.add(compiler)
+
+    compilers = list(compilers)
+    compilers.sort()
+
+    return result, compilers
 
 
 def dieInfoRec(die):
@@ -59,6 +73,9 @@ if __name__ == '__main__':
     parser.add_argument("--format", choices = ["elf-dwarf"], default = "elf-dwarf", help = "Binary format.")
     parser.add_argument("--groups", default = None, help = "Groups schema if any.")
     parser.add_argument("binary", help = "Path of the binary to profile.")
+    parser.add_argument("binary_stripped", help = "Path of the stripped binary to profile.")
+    parser.add_argument("binary_final", help = "Path of the final binary to profile.")
+    parser.add_argument("output", help = "Path of the json output.")
 
     args = parser.parse_args()
 
@@ -70,29 +87,33 @@ if __name__ == '__main__':
             groups = {re.compile(match): group for match, group in groupsData.items()}
 
     if args.format == "elf-dwarf":
-        result = processFile(args.binary)
+        result, compilers = processElfDwarf(args.binary)
     else:
         raise Exception("Unsupported format.")
  
     groupedResult = {}
 
-    for path, data in result.items():
+    for path, size in result.items():
         matchedGroup = None
         for regexpr, group in groups.items():
             m = regexpr.search(path)
             if m:
                 assert matchedGroup == None, "Path matched at least 2 groups."
                 matchedGroup = group.format(**m.groupdict())
-        if matchedGroup:
-            if matchedGroup not in groupedResult:
-                groupedResult[matchedGroup] = {
-                    "size": 0
-                }
-            groupedResult[matchedGroup]["size"] += data["size"]
-        else:
-            groupedResult[path] = data
+        matchedGroup = matchedGroup if matchedGroup else path
+        if matchedGroup not in groupedResult:
+            groupedResult[matchedGroup] = 0
+        groupedResult[matchedGroup] += size
 
-    print(json.dumps({
-        "groups": groupedResult
-    }))
+    result = {
+        "size_groups": {
+            "units": groupedResult,
+        },
+        "size": os.path.getsize(args.binary_final),
+        "compilers": compilers
+    }
+
+    with open(args.output, "w+") as f:
+        f.write(json.dumps(result))
+
     sys.exit(0)

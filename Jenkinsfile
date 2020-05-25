@@ -50,14 +50,14 @@ pipeline
 				{
 					steps
 					{
-						sh "bazel test ... --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
+						sh "bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
 					}
 				}
 				stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "bazel build ... --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+						sh "bazel build ... --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
 				stage("Static analyzers")
