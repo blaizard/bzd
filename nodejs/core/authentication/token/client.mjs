@@ -99,7 +99,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
         Exception.unreachable("Unauthorized");
     }
 
-    async setAuthentication(fetchOptions) {
+    async setAuthenticationFetch(fetchOptions) {
 
         if (!this.isAuthenticated()) {
             await this.refreshAuthentication();
@@ -110,6 +110,16 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
             type: "token",
             token: this.token
         }
+    }
+
+    async makeAuthenticationURL(url) {
+
+        if (!this.isAuthenticated()) {
+            await this.refreshAuthentication();
+        }
+
+        url += ((url.includes("?")) ? "&t=" : "?t=") + encodeURIComponent(this.token);
+        return url;
     }
 
     async login(api, uid, password, persistent = false) {

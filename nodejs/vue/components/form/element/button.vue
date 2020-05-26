@@ -25,7 +25,7 @@ export default {
 			/**
 						* Defines a callback to be triggered the submit button is called
 						*/
-			click: this.getOption("click", this.submit),
+			click: this.getOption("click", null),
 		};
 	},
 	computed: {
@@ -71,7 +71,7 @@ export default {
 	methods: {
 		async handleClick() {
 			this.$emit("click");
-			await (this.attrAction.defaultClick || (() => {}))();
+			await (this.click || this.attrAction.defaultClick || (() => {}))();
 		}
 	}
 };

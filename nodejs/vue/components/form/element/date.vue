@@ -9,8 +9,7 @@
 			:description="descriptionDropdown">
 
 		<div class="irform-date-header" @mousedown.stop.prevent="" @mouseup.stop.prevent="">
-            <div v-show="Number(get()) >= decrementStep"
-                    class="irform-date-previous"
+            <div class="irform-date-previous"
                     @click.stop="set(Number(get()) - decrementStep)">
             </div>
             <div class="irform-date-select">
