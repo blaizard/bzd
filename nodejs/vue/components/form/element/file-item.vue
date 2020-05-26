@@ -93,7 +93,7 @@ export default {
 			// Important to ensure that it is triggered even if the value does not change
 			// (is already set to true at the begining)
 			immediate: true,
-			handler: function (val) {
+			handler: function () {
 				if (this.isImage) {
 					this.imagePreload(this.imageUrl);
 				}
