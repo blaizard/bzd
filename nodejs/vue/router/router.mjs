@@ -57,7 +57,7 @@ class RouterManager {
 				// if so ensure that we are authenticated
 				if (route.authentication) {
 					Exception.assert(this.options.authentication, "This route has authentication requirement but no authentication object was specified.");
-					await this.options.authentication.assertAuthentication();
+					await this.options.authentication.refreshAuthentication();
 				}
 
 				if (route.component) {

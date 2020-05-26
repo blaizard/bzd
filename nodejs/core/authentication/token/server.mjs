@@ -103,22 +103,30 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
         });
     }
 
-    async verify(request) {
+    async verify(request, callback = (uid) => true) {
+        let token = null;
         if ("authorization" in request.headers) {
             const data = request.headers["authorization"].split(" ");
             if (data.length == 2 && data[0] == "token") {
-                return await this.verifyToken(data[1], (data) => {
-                    return true;
-                });
+                token = data[1];
             }
         }
+
+        if ("t" in  request.query) {
+            token = request.query.t;
+        }
+
+        if (token) {
+            return await this.verifyToken(token, callback);
+        }
+
         return false;
     }
 
-    async verifyToken(token, verifyCallback = () => true) {
+    async verifyToken(token, verifyCallback = (uid) => true) {
         try {
             const data = await this.readToken(token);
-            return await verifyCallback(data);
+            return await verifyCallback(data.uid);
         }
         catch (e) {
             return false;

@@ -35,7 +35,8 @@ export default {
 		return {
 			error: null,
 			isLoading: false,
-			imgSrc: null
+			imgSrc: null,
+			imageUrl: null
 		};
 	},
 	computed: {
@@ -66,15 +67,6 @@ export default {
 		isUpload() {
 			return !this.isAvailable;
 		},
-		imageUrl() {
-			if (typeof this.config["imageToUrl"] === "function") {
-				return this.config.imageToUrl(this.value);
-			}
-			else if (typeof this.config["imageToUrl"] === "string") {
-				return this.config.imageToUrl;
-			}
-			return false;
-		},
 		progress() {
 			return Math.min(this.value.currentBytes / this.value.totalBytes, 1);
 		},
@@ -102,11 +94,25 @@ export default {
 			// (is already set to true at the begining)
 			immediate: true,
 			handler: function (val) {
-				if (val) {
+				if (this.isImage) {
 					this.imagePreload(this.imageUrl);
 				}
 			}
-		}
+		},
+		value: {
+			immediate: true,
+			handler: async function (value) {
+				this.imageUrl = null;
+				if (this.isAvailable) {
+					if (typeof this.config.imageToUrl === "function") {
+						this.imageUrl = await this.config.imageToUrl(value);
+					}
+					else if (typeof this.config.imageToUrl === "string") {
+						this.imageUrl = this.config.imageToUrl;
+					}
+				}
+			}
+		},
 	},
 	methods: {
 		imagePreload(url) {

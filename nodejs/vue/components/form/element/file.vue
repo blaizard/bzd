@@ -3,7 +3,7 @@
 
 import Upload from "../../../../core/upload.mjs";
 import Array from "./array.vue";
-import fileItem from "./file-item.vue";
+import FileItem from "./file-item.vue";
 
 export default {
 	mixins: [Array],
@@ -16,35 +16,6 @@ export default {
 		}
 
 		return {
-			upload: (isUpload) ? new Upload({
-				/**
-					 * Upload URL, where to send the file to be uploaded
-					 */
-				url: this.getOption("upload"),
-				max: () => (this.nbLeft),
-				filter: this.getOption("filter", null),
-				onInit: (item) => {
-					this.uploadValueList.push(item);
-				},
-				onCancel: (item) => {
-					const index = this.uploadItemToIndex(item);
-					this.uploadValueList.splice(index, 1);
-				},
-				onError: (item, message) => {
-					this.setError(message);
-					console.error(message);
-				},
-				onComplete: (item, response) => {
-					const output = this.uploadResponseHandler(response);
-
-					// Delete the current element
-					const index = this.uploadItemToIndex(item);
-					this.uploadValueList.splice(index, 1);
-
-					// Add the new item
-					this.itemAdd(output);
-				}
-			}) : null,
 			/**
 				 * Read and parse the upload response. Return the url or path of the file associated.
 				 */
@@ -55,7 +26,7 @@ export default {
 			imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
 
 			// ---- Override data from Array ----
-			template: fileItem,
+			template: FileItem,
 			templateAdd: templateAdd,
 			allowDelete: false,
 			inline: true,
@@ -84,6 +55,37 @@ export default {
 		}
 	},
 	computed: {
+		upload() {
+			return (this.getOption("upload")) ? new Upload({
+				/**
+					 * Upload URL, where to send the file to be uploaded
+					 */
+				url: this.getOption("upload"),
+				max: () => (this.nbLeft),
+				filter: this.getOption("filter", null),
+				onInit: (item) => {
+					this.uploadValueList.push(item);
+				},
+				onCancel: (item) => {
+					const index = this.uploadItemToIndex(item);
+					this.uploadValueList.splice(index, 1);
+				},
+				onError: (item, message) => {
+					this.setError(message);
+					console.error(message);
+				},
+				onComplete: (item, response) => {
+					const output = this.uploadResponseHandler(response);
+
+					// Delete the current element
+					const index = this.uploadItemToIndex(item);
+					this.uploadValueList.splice(index, 1);
+
+					// Add the new item
+					this.itemAdd(output);
+				}
+			}) : null;
+		},
 		// Overload internal attributes
 		containerClass() {
 			return "irform-array irform-array-file";

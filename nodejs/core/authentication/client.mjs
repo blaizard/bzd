@@ -54,7 +54,14 @@ export default class AuthenticationClient {
     /**
      * Set authentication information to the fetch request
      */
-    async setAuthentication(fetchOptions) {
-        Exception.unreachable("'setAuthentication' must be implemented.");
+    async setAuthenticationFetch(fetchOptions) {
+        Exception.unreachable("'setAuthenticationFetch' must be implemented.");
+    }
+
+    /**
+     * Make an authentication URL from a base URL
+     */
+    async makeAuthenticationURL(url) {
+        Exception.unreachable("'makeAuthenticationURL' must be implemented.");
     }
 };

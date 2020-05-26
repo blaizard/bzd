@@ -12,6 +12,7 @@ class Context {
 	constructor(request, response) {
 		this.request = request;
 		this.response = response;
+		this.debug = {};
 		this.manualResponse = false;
 	}
 
@@ -31,6 +32,10 @@ class Context {
 		this.response.cookie(name, undefined, {
 			maxAge: 0
 		});
+	}
+
+	addDebug(name, data) {
+		this.debug[name] = data;
 	}
 
 	setStatus(code, message = null) {
@@ -84,8 +89,9 @@ export default class APIServer extends Base {
 			try {
 
 				// Check if this is a request that needs authentication
+				let authenticationData = { uid: null };
 				if (authentication) {
-					if (!authentication.verify(request)) {
+					if (!await authentication.verify(request, (uid) => { authenticationData.uid = uid; return true; })) {
 						return context.setStatus(401, "Unauthorized");
 					}
 				}
@@ -105,7 +111,11 @@ export default class APIServer extends Base {
 					break;
 				}
 
-				const result = await callback.call(context, data);
+				// Add debug information
+				context.addDebug("data", data);
+				context.addDebug("uid", authenticationData.uid);
+
+				const result = await callback.call(context, data, authenticationData.uid);
 				if (!context.manualResponse) {
 					switch (responseOptions.type) {
 					case "json":
@@ -140,6 +150,7 @@ export default class APIServer extends Base {
 			catch (e) {
 				Exception.print("Exception Guard");
 				Exception.print(Exception.fromError(e));
+				Log.error("Context: {:j}", context.debug);
 				response.status(500).send(e.message);
 			}
 		};

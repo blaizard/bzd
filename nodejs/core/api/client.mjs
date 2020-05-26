@@ -61,7 +61,7 @@ export default class APIClient extends Base {
             // Check if this is a request that needs authentication
             if (this.schema[endpoint][method].authentication) {
                 Exception.assert(this.isAuthentication(), "This route has authentication requirement but no authentication object was specified.");
-                await this.options.authentication.setAuthentication(fetchOptions);
+                await this.options.authentication.setAuthenticationFetch(fetchOptions);
             }
 
             try {

@@ -6,6 +6,10 @@
     flex-flow: column;
     user-select: none;
 
+    .irform-dropdown-menu {
+        max-width: 300px;
+    }
+
     .irform-date-header {
         display: flex;
         flex-flow: row nowrap;

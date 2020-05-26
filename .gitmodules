@@ -1,4 +1,4 @@
 [submodule "apps/family"]
 	path = apps/family
-	url = https://github.com/blaizard/family.git
+	url = ../family.git
 	branch = master

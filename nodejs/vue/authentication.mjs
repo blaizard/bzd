@@ -9,6 +9,8 @@ export default {
 			}
 		});
 
+		Vue.prototype.$makeAuthenticationURL = (url) => authentication.makeAuthenticationURL(url);
+
 		authentication.options.onAuthentication = (isAuthenticated) => {
 			Vue.prototype.$authentication.isAuthenticated = isAuthenticated;
 		};

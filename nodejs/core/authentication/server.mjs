@@ -18,7 +18,7 @@ export default class AuthenticationServer {
         Exception.unreachable("'install' must be implemented.");
     }
 
-    async verify(request) {
+    async verify(request, callback = (uid) => true) {
         Exception.unreachable("'verify' must be implemented.");
     }
 
