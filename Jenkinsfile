@@ -37,7 +37,7 @@ pipeline
 				sh "bazel --version"
 				sh "python --version"
 				sh "java --version"
-				git submodule update --init --recursive
+				sh "git submodule update --init --recursive"
 			}
 		}
 		/**
