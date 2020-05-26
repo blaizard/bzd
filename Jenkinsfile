@@ -78,6 +78,7 @@ pipeline
 			steps
 			{
 				sh "bazel run apps/dashboard:push"
+				sh "bazel run apps/family:push"
 			}
 		}
 	}
