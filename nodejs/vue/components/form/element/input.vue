@@ -27,12 +27,13 @@
 			<span v-if="mask"
 					ref="maskInput"
 					type="text"
-					style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
 					v-text="get()"
+					style="width: 1px; height: 1px; overflow: hidden; opacity: 0;"
 					:contenteditable="editable"
 					@focus="handleFocus($event)"
 					@input="handleInputMask()"
-					@blur="handleBlur($event, $event.target.innerText)">
+					@blur="handleBlur($event, $event.target.innerText)"
+					@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
 
 		</span>
