@@ -16,6 +16,7 @@ class Cache
 {
 	constructor(config) {
 		this.config = Object.assign({
+			timeoutMs: 30 * 1000,
 			maxSize: 1000000, // 1MB
 			maxEntries: 100,
 			garbageCollector: true,
@@ -308,11 +309,21 @@ async function get(instant, collection, ...ids)
 		// isFetching
 		if (typeof dataId === "object" && "_fetching" in dataId) {
 			// If instant and there are previous data, return it
-			if (instant && "_data" in dataId) {
-				Log.debug("GET {}::{} ({}, instant)", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
-				return dataId._data;
+			if (instant) {
+				if ("_error" in dataId) {
+					Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
+					throw new Exception(dataId._error);
+				}
+				// isData
+				else if ("_data" in dataId) {
+					Log.debug("GET {}::{} ({}, instant)", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
+					return dataId._data;
+				}
 			}
 			await waitForNextUpdate.call(this);
+			if ("_timeout" in dataId && dataId._timeout > timeStartMs) {
+				instant = true;
+			}
 		}
 		// isDirty
 		else if ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs())) {
@@ -333,9 +344,9 @@ async function get(instant, collection, ...ids)
 			throw new Exception("Invalid state {}::{}, it should never happen.", collection, id);
 		}
 	// Timeout after 30s
-	} while (Date.now() - timeStartMs < 30 * 1000);
+	} while (Date.now() - timeStartMs < this.config.timeoutMs);
 
-	throw new Exception("Get {}::{} timeout (30s).", collection, id);
+	throw new Exception("Get {}::{} timeout ({}s).", collection, id, this.config.timeoutMs / 1000);
 }
 
 /**
@@ -362,11 +373,7 @@ function deleteResourceById(resourceId)
  */
 async function waitForNextUpdate()
 {
-	return new Promise((resolve) => {
-		this.event.on("updated", () => {
-			resolve();
-		}, /*once*/true);
-	});
+	return this.event.waitUntil("updated");
 }
 
 /**

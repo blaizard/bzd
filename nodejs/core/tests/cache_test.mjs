@@ -35,7 +35,8 @@ describe("Cache", () => {
 	it("Stress", async () => {
 
         let cache = new Cache({
-            garbageCollector: false
+            garbageCollector: false,
+            timeoutMs:20 * 1000
         });
 
         let sum = 0;
@@ -44,15 +45,24 @@ describe("Cache", () => {
             return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(parseInt(arg));
-                }, Math.random() * 100);
+                }, Math.random() * 10);
             });
+        }, {
+            timeout: 10
         });
+
+        const promiseDelay = (t) => {
+            return new Promise((resolve) => {
+                setTimeout(resolve, t);
+            });
+        }
 
         let promises = [];
         for (const i in [...Array(10000).keys()]) {
             const n = Math.floor(Math.random() * 10);
             expected += parseInt(n);
             promises.push((async () => {
+                await promiseDelay(Math.random() * 10);
                 const result = await cache.get("test", n);
                 sum += result;
             })());
