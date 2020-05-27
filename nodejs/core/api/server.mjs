@@ -96,7 +96,7 @@ export default class APIServer extends Base {
 					}
 				}
 
-				let data = null;
+				let data = {};
 				switch (requestOptions.type) {
 				case "json":
 					data = request.body.data;
@@ -110,6 +110,9 @@ export default class APIServer extends Base {
 					});
 					break;
 				}
+
+				// Add any params to the data (if any)
+				Object.assign(data, request.params);
 
 				// Add debug information
 				context.addDebug("data", data);
@@ -155,6 +158,12 @@ export default class APIServer extends Base {
 			}
 		};
 
-		web.addRoute(method, this._makePath(endpoint), callbackWrapper, webOptions);
+		// Update the endpoint to support variables
+		// Only supports simple syntax:
+		// -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
+		let regexpr = /{([^}:]+)}/;
+		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
+
+		web.addRoute(method, this._makePath(updatedEndpoint), callbackWrapper, webOptions);
 	}
 }
