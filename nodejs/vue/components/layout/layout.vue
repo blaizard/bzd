@@ -1,8 +1,9 @@
 <template>
-	<div class="bzd-layout">
-		<div class="bzd-layout-header" @click.stop="hideMenu">
+	<div :class="classLayout">
+		<div class="bzd-layout-header">
 
-			<div class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
+			<div v-if="this.state != 'dock'"
+                    class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
                 <i class="bzd-icon-menu"></i>
             </div>
 
@@ -20,11 +21,15 @@
 
 		<div class="bzd-layout-menu">
             <transition name="bzd-fade">
-                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="isMenuVisible">
+                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="state == 'float'">
                 </div>
             </transition>
             <transition name="bzd-translate">
-                <div class="bzd-layout-menu-content" @click.stop="" v-show="isMenuVisible">
+                <div class="bzd-layout-menu-content" @click.stop="" v-show="state != 'hide'">
+                    <div class="bzd-layout-menu-content-pin" @click="toggleDock">
+                        <i v-if="state == 'dock'" class="bzd-icon-pin-on"></i>
+                        <i v-else class="bzd-icon-pin-off"></i>
+                    </div>
                     <slot name="menu"></slot>
                 </div>
             </transition>
@@ -48,7 +53,7 @@ export default {
 	},
 	data: function() {
 		return {
-			isMenuVisible: false
+            state: "hide"
 		};
 	},
 	mounted() {
@@ -59,15 +64,24 @@ export default {
 		window.removeEventListener("resize", this.handleResize, false);
 	},
 	computed: {
+        classLayout() {
+            return {
+                "bzd-layout": true,
+                "bzd-dock": (this.state == "dock")
+            };
+        }
 	},
 	methods: {
 		handleResize() {
 		},
+        toggleDock() {
+            this.state = (this.state == "float") ? "dock" : "hide";
+        },
 		toggleMenu() {
-			this.isMenuVisible = !this.isMenuVisible;
+            this.state = (this.state == "hide") ? "float" : "hide";
 		},
 		hideMenu() {
-			this.isMenuVisible = false;
+            this.state = "hide";
 		}
 	}
 };
@@ -101,7 +115,7 @@ export default {
 
     @use "bzd-style/css/clickable.scss";
 	@use "bzd/icons.scss" with (
-        $bzdIconNames: menu
+        $bzdIconNames: menu pin-on pin-off
     );
 
     html,
@@ -222,6 +236,14 @@ export default {
                 padding: $menuPadding;
                 padding-top: $headerHeight + $menuPadding;
 
+                .bzd-layout-menu-content-pin {
+                    position: absolute;
+                    right: 0;
+                    top: $headerHeight;
+                    padding: .3em;
+                    @extend %bzd-clickable;
+                }
+
                 .bzd-menu-entry-wrapper {
                     display: flex;
                     flex-flow: column;
@@ -242,6 +264,15 @@ export default {
 
         .bzd-layout-content {
             padding: $contentPadding;
+        }
+
+        &.bzd-dock {
+            .bzd-layout-content {
+                margin-left: $menuWidth;
+            }
+            .bzd-layout-menu-content {
+                border-right: 1px solid colors.$bzdGraphColorBlack;
+            }
         }
     }
 </style>
