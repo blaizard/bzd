@@ -26,9 +26,9 @@
             </transition>
             <transition name="bzd-translate">
                 <div class="bzd-layout-menu-content" @click.stop="" v-show="state != 'hide'">
-                    <div class="bzd-layout-menu-content-pin" @click="toggleDock">
-                        <i v-if="state == 'dock'" class="bzd-icon-pin-on"></i>
-                        <i v-else class="bzd-icon-pin-off"></i>
+                    <div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
+                        <i v-if="state == 'dock'" class="bzd-icon-dock-on"></i>
+                        <i v-else class="bzd-icon-dock-off"></i>
                     </div>
                     <slot name="menu"></slot>
                 </div>
@@ -46,14 +46,18 @@
 </template>
 
 <script>
+"use strict";
+
+import LocalStorage from "bzd/core/localstorage.mjs";
+import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+
 export default {
-	props: {
-	},
-	components: {
+	directives: {
+		tooltip: DirectiveTooltip
 	},
 	data: function() {
 		return {
-            state: "hide"
+			state: LocalStorage.get("bzd-layout-state", "hide")
 		};
 	},
 	mounted() {
@@ -64,24 +68,25 @@ export default {
 		window.removeEventListener("resize", this.handleResize, false);
 	},
 	computed: {
-        classLayout() {
-            return {
-                "bzd-layout": true,
-                "bzd-dock": (this.state == "dock")
-            };
-        }
+		classLayout() {
+			return {
+				"bzd-layout": true,
+				"bzd-dock": (this.state == "dock")
+			};
+		}
 	},
 	methods: {
 		handleResize() {
 		},
-        toggleDock() {
-            this.state = (this.state == "float") ? "dock" : "hide";
-        },
+		toggleDock() {
+			this.state = (this.state == "float") ? "dock" : "hide";
+			LocalStorage.set("bzd-layout-state", (this.state == "dock") ? "dock" : "hide");
+		},
 		toggleMenu() {
-            this.state = (this.state == "hide") ? "float" : "hide";
+			this.state = (this.state == "hide") ? "float" : "hide";
 		},
 		hideMenu() {
-            this.state = "hide";
+			this.state = "hide";
 		}
 	}
 };
@@ -96,8 +101,8 @@ export default {
     // Header
     $headerColor: colors.$bzdGraphColorWhite;
     $headerBgColor: colors.$bzdGraphColorBlue;
-    $headerFontSize: 20px;
-    $headerHeight: 44px;
+    $headerFontSize: 22px;
+    $headerHeight: 56px;
     $headerPadding: ($headerHeight - $headerFontSize) / 2;
     $headerZIndex: 10;
 
@@ -105,7 +110,7 @@ export default {
     $menuColor: colors.$bzdGraphColorBlack;
     $menuBgColor: colors.$bzdGraphColorWhite;
     $menuWidth: 300px;
-    $menuPadding: 20px;
+    $menuPadding: 16px;
     $menuZIndex: 9;
 
     // Content
@@ -115,7 +120,7 @@ export default {
 
     @use "bzd-style/css/clickable.scss";
 	@use "bzd/icons.scss" with (
-        $bzdIconNames: menu pin-on pin-off
+        $bzdIconNames: menu dock-on dock-off
     );
 
     html,
@@ -150,7 +155,12 @@ export default {
                 color: $headerColor !important;
             }
 
+            > *:first-child {
+                margin-left: $headerPadding / 2;
+            }
+
             .bzd-layout-header-menu-trigger {
+                margin-left: 0 !important;
                 @extend %bzd-clickable;
 
                 min-width: $headerHeight;
@@ -160,6 +170,7 @@ export default {
             .bzd-layout-header-content {
                 padding-left: $headerPadding / 2;
                 padding-right: $headerPadding / 2;
+                white-space: nowrap;
             }
 
             .bzd-layout-header-padding {
@@ -181,6 +192,8 @@ export default {
                     display: none;
                 }
                 .bzd-menu-entry {
+                    width: 100%;
+                    height: 100%;
                     @extend %bzd-clickable;
                 }
             }
@@ -230,17 +243,20 @@ export default {
                 left: 0;
                 width: $menuWidth;
                 height: 100vh;
+                padding-top: $headerHeight;
 
                 background-color: $menuBgColor;
                 color: $menuColor;
-                padding: $menuPadding;
-                padding-top: $headerHeight + $menuPadding;
+                border-right: 1px solid rgba(0, 0, 0, 0.4);
 
-                .bzd-layout-menu-content-pin {
+                .bzd-layout-menu-content-dock {
                     position: absolute;
                     right: 0;
                     top: $headerHeight;
-                    padding: .3em;
+                    line-height: 2em;
+                    height: 2em;
+                    width: 2em;
+                    text-align: center;
                     @extend %bzd-clickable;
                 }
 
@@ -249,6 +265,7 @@ export default {
                     flex-flow: column;
 
                     .bzd-menu-entry {
+                        padding: $menuPadding;
                         cursor: pointer;
                         &:hover {
                             background-color: #eee;
@@ -256,7 +273,11 @@ export default {
                     }
 
                     .bzd-menu-nested {
-                        padding-left: 10px;
+
+                        .bzd-menu-entry {
+                            padding: 2px;
+                            padding-left: $menuPadding + 10px;
+                        }
                     }
                 }
             }
@@ -269,9 +290,6 @@ export default {
         &.bzd-dock {
             .bzd-layout-content {
                 margin-left: $menuWidth;
-            }
-            .bzd-layout-menu-content {
-                border-right: 1px solid colors.$bzdGraphColorBlack;
             }
         }
     }

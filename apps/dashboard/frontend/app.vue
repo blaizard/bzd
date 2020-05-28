@@ -1,6 +1,6 @@
 <template>
 	<Layout>
-		<template #header><RouterLink link="/">Dashboard</RouterLink></template>
+		<template #header><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink></template>
 		<template #actions>
 			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
 			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
@@ -62,7 +62,11 @@
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
 
-	@use "bzd/icons.scss" with (
+	@use "bzd/icons.scss" as icons with (
 		$bzdIconNames: edit add check
 	);
+
+    .bzd-icon-main {
+		@include icons.defineIcon("icon.svg");
+	}
 </style>

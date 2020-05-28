@@ -5,6 +5,7 @@ bzd_nodejs_web(
     name = "frontend",
     srcs = glob([
         "**/*.vue",
+        "**/*.svg",
         "**/*.mjs",
     ]),
     entries = {

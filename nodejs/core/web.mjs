@@ -101,7 +101,8 @@ export default class Web {
 		{
 			let diskStorageConfig = {
 				filename: (req, file, cb) => {
-					cb(null, Date.now() + "-" + file.originalname);
+					this._initialize.uid = this._initialize.uid || 0;
+					cb(null, Date.now() + "-" + String(this._initialize.uid++) + "-" + file.originalname);
 				}
 			};
 			if (this.config.uploadDir) {

@@ -3,8 +3,10 @@
 ## Test Locally
 
 ```bash
-bazel run apps/dashboard/frontend:local # Generate the frontend
-bazel run apps/dashboard/backend # Run the backend
+# Generate the frontend
+bazel run apps/dashboard/frontend:local
+# Run the backend
+bazel run apps/dashboard/backend
 ```
 
 Restart either frontend/backend to rebuild and inject any update.

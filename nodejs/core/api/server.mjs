@@ -16,6 +16,10 @@ class Context {
 		this.manualResponse = false;
 	}
 
+	setHeader(key, value) {
+		this.response.setHeader(key, value);
+	}
+
 	setCookie(name, value, options) {
 		options = Object.assign({
 			maxAge: 7 * 24 * 60 * 60 * 1000, // in ms
