@@ -9,5 +9,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs:icons",
         "//nodejs:vue",
+        "//nodejs/core:localstorage",
+        "//nodejs/vue/directives:tooltip",
     ],
 )

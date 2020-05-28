@@ -410,7 +410,7 @@ async function triggerUpdate(collection, id, ...ids)
 			dataId._timeout = Cache.getTimestampMs() + Math.max(1, options.timeout);
 		}
 		Exception.assert(typeof dataId._data !== "undefined", "Trigger function returned undefined data type for collection '{}'", collection);
-		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize;
+		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
 		delete dataId._error;
 	}
 	catch (e) {
@@ -420,8 +420,12 @@ async function triggerUpdate(collection, id, ...ids)
 		dataId._size = dataId._error.length || 0;
 		delete dataId._data;
 	}
+	finally {
+		delete dataId._fetching;
+	}
 
 	// Update the size of the collection
+	Exception.assert(typeof dataId._size == "number", "Size is not a number: '{}'", dataId._size);
 	dataCollection._size += (dataId._size - previousSize);
 	this.data._size += (dataId._size - previousSize);
 
@@ -430,7 +434,6 @@ async function triggerUpdate(collection, id, ...ids)
 	dataCollection._nbEntries += nbEntriesDelta;
 	this.data._nbEntries += nbEntriesDelta;
 
-	delete dataId._fetching;
 	this.event.trigger("updated");
 }
 
