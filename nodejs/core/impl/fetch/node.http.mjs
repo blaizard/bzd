@@ -10,6 +10,7 @@ const Exception = ExceptionFactory("fetch", "node.http");
 const Log = LogFactory("fetch", "node.http");
 
 const MAX_REDIRECTION = 3;
+const MAX_TIMEOUT_S = 60;
 
 export default async function request(url, options) {
 
@@ -46,11 +47,16 @@ export default async function request(url, options) {
 			}
 
 			response.setEncoding("utf8");
+
+			const timeoutInstance = setTimeout(() => {
+				reject(new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)"));
+			}, MAX_TIMEOUT_S * 1000);
 			let body = "";
 			response.on("data", (chunk) => {
 				body += chunk;
 			});
 			response.on("end", () => {
+				clearTimeout(timeoutInstance);
 				resolve(body);
 			});
 		});

@@ -107,7 +107,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
         // Automatically add authentication information to the request
         fetchOptions.authentication = {
-            type: "token",
+            type: "bearer",
             token: this.token
         }
     }

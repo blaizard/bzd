@@ -107,7 +107,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
         let token = null;
         if ("authorization" in request.headers) {
             const data = request.headers["authorization"].split(" ");
-            if (data.length == 2 && data[0] == "token") {
+            if (data.length == 2 && data[0] == "bearer") {
                 token = data[1];
             }
         }
