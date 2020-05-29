@@ -34,7 +34,8 @@ export default {
 				"irform-align-top": (this.alignList.indexOf("top") != -1),
 				"irform-align-bottom": (this.alignList.indexOf("bottom") != -1),
 				"irform-align-left": (this.alignList.indexOf("left") != -1),
-				"irform-align-right": (this.alignList.indexOf("right") != -1)
+				"irform-align-right": (this.alignList.indexOf("right") != -1),
+				"irform-align-center": (this.alignList.indexOf("center") != -1)
 			};
 		},
 		isError() {

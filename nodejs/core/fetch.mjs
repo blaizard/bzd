@@ -38,11 +38,11 @@ export default class Fetch {
 			case "basic":
 				{
 					const base64 = await base64Encode(auth.username + ":" + auth.password);
-					headers["Authorization"] = "Basic " + base64;
+					headers["Authorization"] = "basic " + base64;
 				}
 				break;
-			case "token":
-				headers["Authorization"] = "token " + auth.token;
+			case "bearer":
+				headers["Authorization"] = "bearer " + auth.token;
 				break;
 			default:
 				Exception.unreachable("Unsupported authentication type '{}'", auth.type);

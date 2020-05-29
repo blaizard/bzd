@@ -9,11 +9,20 @@ const Log = LogFactory("api", "server");
 
 class Context {
 
-	constructor(request, response) {
+	constructor(request, response, api) {
 		this.request = request;
 		this.response = response;
+		this.api = api;
 		this.debug = {};
 		this.manualResponse = false;
+	}
+
+	getHost() {
+		return this.request.get("host");
+	}
+
+	getEndpoint(endpoint) {
+		return this.getHost() + this.api._makePath(endpoint);
 	}
 
 	setHeader(key, value) {
@@ -86,9 +95,9 @@ export default class APIServer extends Base {
 		}
 
 		// Create a wrapper to the callback
-		const callbackWrapper = async function(request, response) {
+		const callbackWrapper = async (request, response) => {
 
-			let context = new Context(request, response);
+			let context = new Context(request, response, this);
 
 			try {
 

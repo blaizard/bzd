@@ -2,7 +2,7 @@
 	<div :class="classLayout">
 		<div class="bzd-layout-header">
 
-			<div v-if="this.state != 'dock'"
+			<div v-if="['hide', 'float'].includes(menuStateFinal)"
                     class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
                 <i class="bzd-icon-menu"></i>
             </div>
@@ -21,13 +21,13 @@
 
 		<div class="bzd-layout-menu">
             <transition name="bzd-fade">
-                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="state == 'float'">
+                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="menuStateFinal == 'float'">
                 </div>
             </transition>
             <transition name="bzd-translate">
-                <div class="bzd-layout-menu-content" @click.stop="" v-show="state != 'hide'">
+                <div class="bzd-layout-menu-content" @click.stop="" v-show="['dock', 'float'].includes(menuStateFinal)">
                     <div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
-                        <i v-if="state == 'dock'" class="bzd-icon-dock-on"></i>
+                        <i v-if="menuStateFinal == 'dock'" class="bzd-icon-dock-on"></i>
                         <i v-else class="bzd-icon-dock-off"></i>
                     </div>
                     <slot name="menu"></slot>
@@ -57,7 +57,7 @@ export default {
 	},
 	data: function() {
 		return {
-			state: LocalStorage.get("bzd-layout-state", "hide")
+			menuState: LocalStorage.get("bzd-layout-state", "hide")
 		};
 	},
 	mounted() {
@@ -71,22 +71,38 @@ export default {
 		classLayout() {
 			return {
 				"bzd-layout": true,
-				"bzd-dock": (this.state == "dock")
+				"bzd-dock": (this.menuStateFinal == "dock")
 			};
+		},
+		isMenu() {
+			return Boolean(this.$slots.menu);
+		},
+		/**
+            * States can be:
+            * - none: no menu at all
+            * - hide: the menu is minimized
+            * - float: the menu is showing in floating mode
+            * - dock: the menu is showing and affecting the layout
+            */
+		menuStateFinal() {
+			if (this.isMenu) {
+				return this.menuState;
+			}
+			return "none";
 		}
 	},
 	methods: {
 		handleResize() {
 		},
 		toggleDock() {
-			this.state = (this.state == "float") ? "dock" : "hide";
-			LocalStorage.set("bzd-layout-state", (this.state == "dock") ? "dock" : "hide");
+			this.menuState = (this.menuState == "float") ? "dock" : "hide";
+			LocalStorage.set("bzd-layout-state", (this.menuState == "dock") ? "dock" : "hide");
 		},
 		toggleMenu() {
-			this.state = (this.state == "hide") ? "float" : "hide";
+			this.menuState = (this.menuState == "hide") ? "float" : "hide";
 		},
 		hideMenu() {
-			this.state = "hide";
+			this.menuState = "hide";
 		}
 	}
 };
@@ -269,6 +285,10 @@ export default {
                         cursor: pointer;
                         &:hover {
                             background-color: #eee;
+                        }
+
+                        .bzd-menu-entry-icon {
+                            margin: 0 $menuPadding / 2;
                         }
                     }
 

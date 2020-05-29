@@ -194,9 +194,9 @@ export default {
 					this.valueListAdd(text);
 				}
 				else {
-					this.submit();
 					this.valueSet(text);
 					this.$refs.input.blur();
+					this.submit();
 				}
 			}
 			// If press Backspace
