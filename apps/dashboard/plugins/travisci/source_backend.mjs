@@ -29,7 +29,7 @@ export default {
                         "Travis-API-Version": "3"
                     },
                     authentication: {
-                        type: "token",
+                        type: "bearer",
                         token: token
                     }
                 };
