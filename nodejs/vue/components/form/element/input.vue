@@ -55,17 +55,17 @@ export default {
 	data: function() {
 		return {
 			/**
-				 * If the displayed values should be interpreted as HTML or not
-				 */
+			 * If the displayed values should be interpreted as HTML or not
+			 */
 			html: this.getOption("html", false),
 			/**
-				 * Make the content editable
-				 */
+			 * Make the content editable
+			 */
 			editable: this.getOption("editable", true),
 			/**
-				 * This option will allow any value. If set to false, it will allow
-				 * only the preset values.
-				 */
+			 * This option will allow any value. If set to false, it will allow
+			 * only the preset values.
+			 */
 			any: this.getOption("any", true),
 			/**
 			 * Format the displayed value.
@@ -80,24 +80,24 @@ export default {
 			 */
 			mask: this.getOption("mask", false),
 			/**
-				 * Placeholder if no value is input
-				 */
+			 * Placeholder if no value is input
+			 */
 			placeholder: this.getOption("placeholder", ""),
 			/**
-				 * Incorporate a non-editable text preceding the input field
-				 */
+			 * Incorporate a non-editable text preceding the input field
+			 */
 			pre: this.getOption("pre", false),
 			/**
-				 * Incorporate a non-editable text after the input field
-				 */
+			 * Incorporate a non-editable text after the input field
+			 */
 			post: this.getOption("post", false),
 			/**
-				 * Multivalue, this will return an array and not a string
-				 */
+			 * Multivalue, this will return an array and not a string
+			 */
 			multi: this.getOption("multi", false),
 			/**
-				 * Multivalue separators regular expression
-				 */
+			 * Multivalue separators regular expression
+			 */
 			multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
 			// ---- Internal ----
 			hasChanged: false
@@ -213,20 +213,22 @@ export default {
 				this.$emit("key", e.keyCode);
 			}
 		},
-		/*getCaretPosition(element) {
-			const sel = window.getSelection();
-			let offset = 0;
-			if (sel.rangeCount) {
-				const range = sel.getRangeAt(0);
-				const origOffset = offset = range.startOffset;
-				let parent = range.commonAncestorContainer.parentNode;
-				while (parent && parent.parentNode && parent != element) {
-					offset = Array.prototype.indexOf.call(parent.parentNode.children, parent) + origOffset;
-					parent = parent.parentNode;
-				}
-			}
-			return offset;
-		},*/
+		/*
+		 *getCaretPosition(element) {
+		 *const sel = window.getSelection();
+		 *let offset = 0;
+		 *if (sel.rangeCount) {
+		 *const range = sel.getRangeAt(0);
+		 *const origOffset = offset = range.startOffset;
+		 *let parent = range.commonAncestorContainer.parentNode;
+		 *while (parent && parent.parentNode && parent != element) {
+		 *	offset = Array.prototype.indexOf.call(parent.parentNode.children, parent) + origOffset;
+		 *	parent = parent.parentNode;
+		 *}
+		 *}
+		 *return offset;
+		 *},
+		 */
 		setCaretPosition(element, position) {
 			if (!element.childNodes[0]) {
 				return;

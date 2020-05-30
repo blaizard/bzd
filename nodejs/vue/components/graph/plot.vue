@@ -100,22 +100,22 @@ export default {
 			maxPointsPerPlot: 20,
 			cursorXValue: 0,
 			/**
-				 * Vertical offset to position the X label
-				 */
+			 * Vertical offset to position the X label
+			 */
 			labelXCharSize: {
 				width: 16,
 				height: 16
 			},
 			/**
-				 * Horizontal offset to position the Y label
-				 */
+			 * Horizontal offset to position the Y label
+			 */
 			labelYCharSize: {
 				width: 16,
 				height: 16
 			},
 			/**
-				 * Horizontal offset to position the Y label
-				 */
+			 * Horizontal offset to position the Y label
+			 */
 			labelCursorXCharSize: {
 				width: 16,
 				height: 16
@@ -197,14 +197,14 @@ export default {
 			return Math.max(this.configProcessed.formatY(this.valuesMinY).length, this.configProcessed.formatY(this.valuesMaxY).length);
 		},
 		/**
-			 * SVG viewbox
-			 */
+		 * SVG viewbox
+		 */
 		svgViewBox() {
 			return "0 0 " + this.width + " " + this.height;
 		},
 		/**
-			 * SVG style
-			 */
+		 * SVG style
+		 */
 		svgStyle() {
 			return { width: this.width + "px", height: this.height + "px" };
 		},
@@ -219,12 +219,12 @@ export default {
 				 */
 				maxEntries: 100,
 				/**
-					 * Format the X labels
-					 */
+				 * Format the X labels
+				 */
 				formatX: (x) => String(Number(x)),
 				/**
-					 * Format the Y labels
-					 */
+				 * Format the Y labels
+				 */
 				formatY: (y) => Number(y).toFixed(this.labelYMaxResolution),
 				/**
 				 * Add extra offset to the left
@@ -257,26 +257,26 @@ export default {
 			}, this.config);
 		},
 		/**
-			 * Full width of the plot area (excluding offsets)
-			 */
+		 * Full width of the plot area (excluding offsets)
+		 */
 		plotWidth() {
 			return this.width - this.plotOffsetLeft - this.plotOffsetRight;
 		},
 		/**
-			 * Full height of the plot area (excluding offsets)
-			 */
+		 * Full height of the plot area (excluding offsets)
+		 */
 		plotHeight() {
 			return this.height - this.plotOffsetBottom - this.plotOffsetTop;
 		},
 		/**
-			 * Space between the plot and the right
-			 */
+		 * Space between the plot and the right
+		 */
 		plotOffsetRight() {
 			return this.configProcessed.paddingRight;
 		},
 		/**
-			 * Space between the plot and the top
-			 */
+		 * Space between the plot and the top
+		 */
 		plotOffsetTop() {
 			let value = this.configProcessed.paddingTop;
 			if (this.configProcessed.showAxisY) {
@@ -285,8 +285,8 @@ export default {
 			return value;
 		},
 		/**
-			 * Space between the plot and the left
-			 */
+		 * Space between the plot and the left
+		 */
 		plotOffsetLeft() {
 			let value = 0;
 			if (this.configProcessed.showAxisY) {
@@ -296,8 +296,8 @@ export default {
 			return value;
 		},
 		/**
-			 * Space between the plot and the bottom
-			 */
+		 * Space between the plot and the bottom
+		 */
 		plotOffsetBottom() {
 			let value = 0;
 			if (this.configProcessed.showAxisY) {
@@ -313,8 +313,8 @@ export default {
 			return value;
 		},
 		/**
-			 * Minimum Y value to be displayed on the plot
-			 */
+		 * Minimum Y value to be displayed on the plot
+		 */
 		plotMinY() {
 			if (this.configProcessed.minY === null) {
 				// Note here the plotMaxY and valuesMinY are on purpose
@@ -323,20 +323,20 @@ export default {
 			return this.configProcessed.minY;
 		},
 		/**
-			 * Maximum Y value to be displayed on the plot
-			 */
+		 * Maximum Y value to be displayed on the plot
+		 */
 		plotMaxY() {
 			return (this.configProcessed.maxY === null) ? this.valuesMaxY : this.configProcessed.maxY;
 		},
 		/**
-			 * Minimum X value to be displayed on the plot
-			 */
+		 * Minimum X value to be displayed on the plot
+		 */
 		plotMinX() {
 			return (this.configProcessed.minX === null) ? this.valuesMinX : this.configProcessed.minX;
 		},
 		/**
-			 * Maximum X value to be displayed on the plot
-			 */
+		 * Maximum X value to be displayed on the plot
+		 */
 		plotMaxX() {
 			return (this.configProcessed.maxX === null) ? this.valuesMaxX : this.configProcessed.maxX;
 		},
@@ -352,8 +352,8 @@ export default {
 			};
 		},
 		/**
-			 * Pre-calculate ratio and offsets for x and y.
-			 */
+		 * Pre-calculate ratio and offsets for x and y.
+		 */
 		valuesXRatio() {
 			return 1. / (this.plotMaxX - this.plotMinX) * this.plotWidth;
 		},
@@ -370,8 +370,8 @@ export default {
 			return (this.valuesXRatio != Infinity) && (this.valuesYRatio != Infinity);
 		},
 		/**
-			 * Values sorted by X. It should not give a high overhead on already sorted arrays.
-			 */
+		 * Values sorted by X. It should not give a high overhead on already sorted arrays.
+		 */
 		valueSorted() {
 			return this.value.map((item) => {
 				let copyItem = {...item};
@@ -383,8 +383,8 @@ export default {
 			});
 		},
 		/**
-			 * The points to be processed
-			 */
+		 * The points to be processed
+		 */
 		series() {
 			const series = this.valueSorted.map((item, index) => {
 
@@ -460,8 +460,8 @@ export default {
 			return map;
 		},
 		/**
-			 * Spacing between X labels
-			 */
+		 * Spacing between X labels
+		 */
 		labelXSpacingValue() {
 			const defaultSpacingValue = 5 * this.labelXCharSize.width / this.valuesXRatio;
 			const log = Math.log10(defaultSpacingValue);
@@ -543,8 +543,8 @@ export default {
 			this.height = rect.height;
 		},
 		/**
-			 * Return the closest index in the sorted array to x
-			 */
+		 * Return the closest index in the sorted array to x
+		 */
 		findClosestX(values, x) {
 			let index = 0;
 			let indexEnd = values.length - 1;

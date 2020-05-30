@@ -78,12 +78,12 @@ export default {
 			return Boolean(this.$slots.menu);
 		},
 		/**
-            * States can be:
-            * - none: no menu at all
-            * - hide: the menu is minimized
-            * - float: the menu is showing in floating mode
-            * - dock: the menu is showing and affecting the layout
-            */
+		 * States can be:
+		 * - none: no menu at all
+		 * - hide: the menu is minimized
+		 * - float: the menu is showing in floating mode
+		 * - dock: the menu is showing and affecting the layout
+		 */
 		menuStateFinal() {
 			if (this.isMenu) {
 				return this.menuState;

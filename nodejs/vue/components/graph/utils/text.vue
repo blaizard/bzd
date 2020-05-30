@@ -8,9 +8,9 @@
 "use strict";
 
 /**
-     * Print a text at specific coordinates, where x and y are the top-left anchor coordinates.
-     * This is needed as SVG text don't support yet alignment-baseline
-     */
+ * Print a text at specific coordinates, where x and y are the top-left anchor coordinates.
+ * This is needed as SVG text don't support yet alignment-baseline
+ */
 export default {
 	props: {
 		x: {type: String | Number, required: true},

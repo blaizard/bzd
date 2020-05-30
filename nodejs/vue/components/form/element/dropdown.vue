@@ -34,23 +34,25 @@ export default {
 		return {
 			multi: this.getOption("multi", false),
 			/**
-					* If the displayed values should be interpreted as HTML or not
-					*/
+			 * If the displayed values should be interpreted as HTML or not
+			 */
 			html: this.getOption("html", false),
 			/**
-					* Filter the list when editing
-					*/
+			 * Filter the list when editing
+			 */
 			filter: this.getOption("filter", !this.isFctWithArg(this.getOption("list"))),
 			/**
-					* Minimum weight for word matching
-					*/
+			 * Minimum weight for word matching
+			 */
 			minMatchWeight: this.getOption("minMatchWeight", 0.6),
 			/**
-					* Maximum number of entries to display. If set to 0, there is no limit.
-					*/
+			 * Maximum number of entries to display. If set to 0, there is no limit.
+			 */
 			max: this.getOption("max", 0),
-			// ---- Internal values ---------------------------------------
-			// The list of values as they should be printed
+			/*
+			 * ---- Internal values ---------------------------------------
+			 * The list of values as they should be printed
+			 */
 			list: [],
 			filteredList: [],
 			directValue: ""
@@ -115,8 +117,8 @@ export default {
 		},
 
 		/**
-				* Filter the current list to generate the display list
-				*/
+		 * Filter the current list to generate the display list
+		 */
 		processFilter(text) {
 			let list = this.list;
 
@@ -157,9 +159,9 @@ export default {
 		},
 
 		/**
-				* Calculate the matching weight of a word in a sentence.
-				* It performs a fuzzy search on the word using a fast algorithm.
-				*/
+		 * Calculate the matching weight of a word in a sentence.
+		 * It performs a fuzzy search on the word using a fast algorithm.
+		 */
 		getMatchingWeight (word, sentence, minMatch) {
 
 			const firstChar = word.charAt(0);
@@ -220,8 +222,10 @@ export default {
 
 		select(item) {
 			if (!this.isSelected(item)) {
-				// Copy the value before it got altered by the input element losing its focus,
-				// and after all event have been processed, set the new value.
+				/*
+				 * Copy the value before it got altered by the input element losing its focus,
+				 * and after all event have been processed, set the new value.
+				 */
 				setTimeout(() => {
 					if (this.multi) {
 						const curValue = this.curValue.splice(0);
