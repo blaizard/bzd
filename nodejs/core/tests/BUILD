@@ -13,6 +13,7 @@ test_srcs = glob([
         "//nodejs/core:format",
         "//nodejs/core:template",
         "//nodejs/core:timeseries",
+        "//nodejs/core:validation",
         "//nodejs/core/persistence:disk",
         "//nodejs/core/persistence:timeseries",
     ],
