@@ -17,12 +17,12 @@ export default {
 
 		return {
 			/**
-				 * Read and parse the upload response. Return the url or path of the file associated.
-				 */
+			 * Read and parse the upload response. Return the url or path of the file associated.
+			 */
 			uploadResponseHandler: this.getOption("uploadResponseHandler", (response) => response),
 			/**
-				 * Convert the image path to an accessible image url
-				 */
+			 * Convert the image path to an accessible image url
+			 */
 			imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
 
 			// ---- Override data from Array ----
@@ -58,8 +58,8 @@ export default {
 		upload() {
 			return (this.getOption("upload")) ? new Upload({
 				/**
-					 * Upload URL, where to send the file to be uploaded
-					 */
+				 * Upload URL, where to send the file to be uploaded
+				 */
 				url: this.getOption("upload"),
 				max: () => (this.nbLeft),
 				filter: this.getOption("filter", null),

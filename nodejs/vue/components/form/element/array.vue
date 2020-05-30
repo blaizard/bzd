@@ -60,36 +60,36 @@ export default {
 	data: function() {
 		return {
 			/**
-				 * Form description of the template of one single item
-				 */
+			 * Form description of the template of one single item
+			 */
 			template: this.getOption("template", [{ type: "Input", name: "text" }]),
 			/**
-				 * Form description of the template of one single item
-				 */
+			 * Form description of the template of one single item
+			 */
 			templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", click: this.itemAdd }]),
 			/**
-				 * Force the value to have at least one entry
-				 */
+			 * Force the value to have at least one entry
+			 */
 			atLeastOne: this.getOption("atLeastOne", false),
 			/**
-				 * Allow add a new element even if one of the others is empty
-				 */
+			 * Allow add a new element even if one of the others is empty
+			 */
 			allowAddIfEmpty: this.getOption("allowAddIfEmpty", false),
 			/**
-				 * Allow items to be deleted
-				 */
+			 * Allow items to be deleted
+			 */
 			allowDelete: this.getOption("allowDelete", true),
 			/**
-				 * Allow the elements to be inline
-				 */
+			 * Allow the elements to be inline
+			 */
 			inline: this.getOption("inline", false),
 			/**
-				 * Display the grip handle
-				 */
+			 * Display the grip handle
+			 */
 			gripHandle: this.getOption("gripHandle", true),
 			/**
-				 * Maximum number of items (if set to 0, there is no limit)
-				 */
+			 * Maximum number of items (if set to 0, there is no limit)
+			 */
 			max: this.getOption("max", 0)
 		};
 	},
@@ -101,8 +101,8 @@ export default {
 			return "irform-array";
 		},
 		/**
-			 * Returns true if an element in the list is empty
-			 */
+		 * Returns true if an element in the list is empty
+		 */
 		isAtLeastOneItemEmpty() {
 			return this.valueList.some((value) => {
 				if (typeof value === "object") {
@@ -112,20 +112,20 @@ export default {
 			});
 		},
 		/**
-			 * Tells how many remaning items can be added
-			 */
+		 * Tells how many remaning items can be added
+		 */
 		nbLeft() {
 			return (this.max === 0) ? Number.MAX_SAFE_INTEGER : Math.max(this.max - this.valueListToDisplay.length, 0);
 		},
 		/**
-			 * Tells if the array is full or not
-			 */
+		 * Tells if the array is full or not
+		 */
 		isFull() {
 			return (this.nbLeft === 0);
 		},
 		/**
-			 * Tells if the add or create button should be active
-			 */
+		 * Tells if the add or create button should be active
+		 */
 		isAddEnabled() {
 			return !(this.disable || (!this.allowAddIfEmpty && this.isAtLeastOneItemEmpty)) && !this.isFull;
 		},
@@ -134,14 +134,14 @@ export default {
 			return (this.atLeastOne && this.list.length == 0) ? [{}] : list;
 		},
 		/**
-			 * The data to be displayed
-			 */
+		 * The data to be displayed
+		 */
 		valueListToDisplay() {
 			return this.valueList;
 		},
 		/**
-			 * Pass specific options to the template if 
-			 */
+		 * Pass specific options to the template if 
+		 */
 		templateComponentConfig() {
 			return null;
 		}

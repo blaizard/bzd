@@ -180,6 +180,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "validation",
+    srcs = [
+        "validation.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+    ],
+)
+
+bzd_nodejs_library(
     name = "web",
     srcs = glob([
         "web.mjs",

@@ -42,9 +42,11 @@ export default {
 	mounted() {
 		this.fetchList(this.getOption("list", []));
 
-		// Recalculate the position as if the slide geometry changed,
-		// its alignement will be different. This can happen while loading images
-		// or other asynchronous operations.
+		/*
+		 * Recalculate the position as if the slide geometry changed,
+		 * its alignement will be different. This can happen while loading images
+		 * or other asynchronous operations.
+		 */
 		if (typeof ResizeObserver !== "undefined") {
 			const myObserver = new ResizeObserver((/*entries*/) => {
 				this.computeSlidePosition();
@@ -63,31 +65,33 @@ export default {
 	data: function() {
 		return {
 			/**
-				 * Defines how the selected items aligns with the slider.
-				 * Values are "left", "center", "right" or false. False means that the selection
-				 * will not be aligned and slecting a new slide will not affect the scrolling
-				 * of the slider
-				 */
+			 * Defines how the selected items aligns with the slider.
+			 * Values are "left", "center", "right" or false. False means that the selection
+			 * will not be aligned and slecting a new slide will not affect the scrolling
+			 * of the slider
+			 */
 			alignSelection: this.getOption("alignSelection", "center"),
 			/**
-				 * Maximum number of slides visible at a time. If set to 0, all the slides will be collpased.
-				 */
+			 * Maximum number of slides visible at a time. If set to 0, all the slides will be collpased.
+			 */
 			maxVisible: this.getOption("maxVisible", 0),
 			/**
-				 * Margin between the slides
-				 */
+			 * Margin between the slides
+			 */
 			margin: this.getOption("margin", 0),
 			/**
-				 * Print controls. If auto, it will be print them only if necessary, it "none", it will nto print them,
-				 * if "always", it will always print them.
-				 */
+			 * Print controls. If auto, it will be print them only if necessary, it "none", it will nto print them,
+			 * if "always", it will always print them.
+			 */
 			controls: this.getOption("controls", "auto"),
 			/**
-				 * Callback when an element is clicked
-				 */
+			 * Callback when an element is clicked
+			 */
 			click: this.getOption("click", (/*index*/) => {}),
-			// ---- Internal ----
-			// Current slide selected
+			/*
+			 * ---- Internal ----
+			 * Current slide selected
+			 */
 			index: 0,
 			interval: null,
 			slidePosition: 0,
@@ -254,9 +258,11 @@ export default {
 					else if (rect.right - rectContainer.left > rectContainer.width) {
 						this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
 					}
-					// Add the current offset to the slide position as this will be reset right after.
-					// This needs to be done here are we do not want to affect the slidePosition when
-					// it reaches corners cases (see above).
+					/*
+					 * Add the current offset to the slide position as this will be reset right after.
+					 * This needs to be done here are we do not want to affect the slidePosition when
+					 * it reaches corners cases (see above).
+					 */
 					else {
 						this.slidePosition += this.offsetX;
 					}

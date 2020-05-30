@@ -2,18 +2,18 @@
 "use strict";
 
 /**
-	 * The following must be implement for all elements:
-	 * Events:
-	 * - @active: when the element has the focus
-	 * - @input: when the element has a new value
-	 * - @error: when the element failed
-	 * Props:
-	 * - disable: set the element as disabled
-	 *
-	 * It handles the following keys from the "description" property:
-	 * - validate: a string, a list of string or functions to validate the data.
-	 * - valueType: a string defining the type of data present. It can be "number", "list" or "any".
-	 */
+ * The following must be implement for all elements:
+ * Events:
+ * - @active: when the element has the focus
+ * - @input: when the element has a new value
+ * - @error: when the element failed
+ * Props:
+ * - disable: set the element as disabled
+ *
+ * It handles the following keys from the "description" property:
+ * - validate: a string, a list of string or functions to validate the data.
+ * - valueType: a string defining the type of data present. It can be "number", "list" or "any".
+ */
 export default {
 	props: {
 		description: {type: Object, required: false, default: () => ({})},
@@ -113,22 +113,22 @@ export default {
 			return String(str).replace(/[\u00A0-\u9999<>&]/gim, (i) => "&#" + i.charCodeAt(0) + ";");
 		},
 		/**
-			 * Extract the type of a content element. Valid types are:
-			 * - text
-			 * - html
-			 */
+		 * Extract the type of a content element. Valid types are:
+		 * - text
+		 * - html
+		 */
 		getContentType(element) {
 			return (typeof element === "object") ? Object.entries(element)[0][0] : "text";
 		},
 		/**
-			 * Extract the data of a display element
-			 */
+		 * Extract the data of a display element
+		 */
 		getContentData(element) {
 			return (typeof element === "object") ? Object.entries(element)[0][1] : element;
 		},
 		/**
-			 * Set the different status of the item
-			 */
+		 * Set the different status of the item
+		 */
 		setError(message) {
 			this.$emit("error", message);
 		},
@@ -173,14 +173,14 @@ export default {
 			}
 		},
 		/**
-			 * Send a submit signal to the form
-			 */
+		 * Send a submit signal to the form
+		 */
 		submit() {
 			this.$emit("submit");
 		},
 		/**
-			 * Get an attribute from the description
-			 */
+		 * Get an attribute from the description
+		 */
 		getOption(name, defaultValue) {
 			if (name in this.description) {
 				return this.description[name];
@@ -188,8 +188,8 @@ export default {
 			return defaultValue;
 		},
 		/**
-			 * Return the value
-			 */
+		 * Return the value
+		 */
 		get(freezeOnEdit = false) {
 			return (freezeOnEdit) ? this.internalValue : this.externalValue;
 		},
@@ -210,8 +210,10 @@ export default {
 				if (!errorList.length) {
 					this.clearError();
 					this.$emit("input", value);
-					// Keep it at the end, it must be called once all the propagation of the value is done.
-					// This to give the opportunity to safely update the global value in this callback.
+					/*
+					 * Keep it at the end, it must be called once all the propagation of the value is done.
+					 * This to give the opportunity to safely update the global value in this callback.
+					 */
 					(this.getOption("onchange", () => {}))(value);
 				}
 				else {
@@ -222,8 +224,8 @@ export default {
 		// ---- Multi value specific --------------------------------------
 
 		/**
-			 * Returns an array of values containing the keys: value, display and search 
-			 */
+		 * Returns an array of values containing the keys: value, display and search 
+		 */
 		createMultiValueList(list, isHtml) {
 			try {
 				// Build the list

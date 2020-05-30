@@ -54,9 +54,9 @@ const elements = {Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, B
 
 export default {
 	/**
-		 * Rename the elements to create cursomt element names to ensure no conflicts with elements:
-		 * { InputFormElement: Input, ... }
-		 */
+	 * Rename the elements to create cursomt element names to ensure no conflicts with elements:
+	 * { InputFormElement: Input, ... }
+	 */
 	components: Object.assign({ Unknown }, Object.keys(elements).reduce((obj, key) => {
 		obj[key + "FormElement"] = elements[key];
 		return obj;
@@ -68,15 +68,17 @@ export default {
 		value: { type: Object, default: () => {}, required: false },
 		disable: { type: Boolean, default: false, required: false },
 		/**
-			 * Only the diff will be returned
-			 */
+		 * Only the diff will be returned
+		 */
 		diff: { type: Boolean, default: false, required: false }
 	},
 	name: "FormElement",
 	data: function() {
 		return {
-			// Those 2 values are used so that only the update is sent
-			// back to the input event
+			/*
+			 * Those 2 values are used so that only the update is sent
+			 * back to the input event
+			 */
 			currentValue: Object.assign({}, this.value),
 			updatedValue: {},
 			active: -1,

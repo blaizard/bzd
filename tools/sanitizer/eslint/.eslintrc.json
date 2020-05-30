@@ -21,6 +21,8 @@
 		"semi": ["error", "always"],
 		"indent": ["error", "tab", {
             "ObjectExpression": "first"
-        }]
+        }],
+		"camelcase": ["error", { "ignoreDestructuring": true }],
+		"multiline-comment-style": ["error", "starred-block"]
 	}
 }

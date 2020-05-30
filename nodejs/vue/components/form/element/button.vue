@@ -23,8 +23,8 @@ export default {
 	data: function() {
 		return {
 			/**
-						* Defines a callback to be triggered the submit button is called
-						*/
+			 * Defines a callback to be triggered the submit button is called
+			 */
 			click: this.getOption("click", null),
 		};
 	},
@@ -46,8 +46,8 @@ export default {
 			return actionToClass[this.action || this.getOption("action")] || {};
 		},
 		/**
-					* The content of the button
-					*/
+		 * The content of the button
+		 */
 		buttonClass() {
 			return {
 				"irform-button": true,
@@ -55,8 +55,8 @@ export default {
 			};
 		},
 		/**
-					* The content of the button
-					*/
+		 * The content of the button
+		 */
 		attrContent() {
 			return this.content || this.getOption("content", "Submit");
 		},

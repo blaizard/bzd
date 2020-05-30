@@ -45,20 +45,20 @@ export default {
 	data: function() {
 		return {
 			/**
-				 * Sort the table by the columns name
-				 */
+			 * Sort the table by the columns name
+			 */
 			sort: this.getOption("sort", []),
 			/**
-				 * Return the class associated with a specific row
-				 */
+			 * Return the class associated with a specific row
+			 */
 			rowClass: this.getOption("rowClass", (/*value, index*/) => ""),
 			/**
-				 * Return whether or not a row should be disabled
-				 */
+			 * Return whether or not a row should be disabled
+			 */
 			rowDisable: this.getOption("rowDisable", (/*value*/) => false),
 			/**
-				 * The columns to be displayed
-				 */
+			 * The columns to be displayed
+			 */
 			//template: this.getOption("template", [])
 		};
 	},
