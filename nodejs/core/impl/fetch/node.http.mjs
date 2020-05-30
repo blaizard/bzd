@@ -19,10 +19,15 @@ export default async function request(url, options) {
 		// Check if http or https
 		let requestHandler = (url.toLowerCase().startsWith("https://")) ? requestHttps : requestHttp;
 
+		let sharedOptions = {
+			timeoutInstance: null
+		};
+
 		// Create the request
 		let req = requestHandler(url, {
 			method: options.method,
-			headers: options.headers
+			headers: options.headers,
+			timeout: MAX_TIMEOUT_S * 1000
 		}, (response) => {
 
 			// Handle redirection
@@ -48,7 +53,7 @@ export default async function request(url, options) {
 
 			response.setEncoding("utf8");
 
-			const timeoutInstance = setTimeout(() => {
+			sharedOptions.timeoutInstance = setTimeout(() => {
 				reject(new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)"));
 			}, MAX_TIMEOUT_S * 1000);
 			let body = "";
@@ -56,7 +61,7 @@ export default async function request(url, options) {
 				body += chunk;
 			});
 			response.on("end", () => {
-				clearTimeout(timeoutInstance);
+				clearTimeout(sharedOptions.timeoutInstance);
 				resolve(body);
 			});
 		});
@@ -66,6 +71,12 @@ export default async function request(url, options) {
 			req.setHeader("Content-Length", Buffer.byteLength(options.body));
 			req.write(options.body);
 		}
+
+		req.on("timeout", () => {
+			clearTimeout(sharedOptions.timeoutInstance);
+			req.abort();
+			reject(e);
+		});
 
 		req.on("error", (e) => { reject(e); });
 		req.end();
