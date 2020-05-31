@@ -171,6 +171,10 @@ export default class Validation {
 		}
 	}
 
+	isMandatory(name) {
+		return (name in this.schema) ? this.schema[name].mandatory : false;
+	}
+
 	processConstraint(schema, key, name, arg) {
 		const availableConstraints = {
 			mandatory: class Mandatory extends Constraint {

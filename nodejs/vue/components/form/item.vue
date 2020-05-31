@@ -1,7 +1,7 @@
 <template>
 	<div :class="{'irform-item': true, 'irform-error': isError, 'irform-disable': disable}" :style="style">
 		<div class="irform-caption" v-if="caption === ''">&nbsp;</div>
-		<div class="irform-caption" v-else-if="caption !== null">{{ caption }}</div>
+		<div class="irform-caption" v-else-if="caption !== null">{{ caption }}<span v-if="mandatory">*</span></div>
 		<div :class="elementsClass">
 			<slot v-bind:setError="setError"></slot>
 			<span v-if="isError" class="irform-error-message"><i class="irform-icon-warning"></i> {{ errorList.join(" ") }}</span>
@@ -17,7 +17,8 @@ export default {
 		align: {type: String, required: false, default: "top left"},
 		caption: {type: String | Object, required: false, default: null},
 		disable: {type: Boolean, default: false, required: false},
-		width: {type: Number | String, default: 1, required: false}
+		width: {type: Number | String, default: 1, required: false},
+		mandatory: {type: Boolean, default: false, required: false}
 	},
 	data: function() {
 		return {

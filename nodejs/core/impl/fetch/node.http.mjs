@@ -72,7 +72,7 @@ export default async function request(url, options) {
 			req.write(options.body);
 		}
 
-		req.on("timeout", () => {
+		req.on("timeout", (e) => {
 			clearTimeout(sharedOptions.timeoutInstance);
 			req.abort();
 			reject(e);

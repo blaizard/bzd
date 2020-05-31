@@ -9,10 +9,10 @@
 					:align="current.align"
 					:disable="getDisable(current)"
 					:width="current.width"
-					:active="active == index">
+					:active="active == index"
+					:mandatory="isMandatory(current, index)">
 				<template v-slot="item">
-					<component 
-							:is="getType(current)"
+					<component :is="getType(current)"
 							v-model="currentValue[getName(current, index)]"
 							@error="handleError(index, item, $event)"
 							@active="handleActive(index, $event)"
@@ -34,6 +34,7 @@
 "use strict";
 
 import Item from "./item.vue";
+import Validation from "../../../core/validation.mjs";
 
 // Include all the supported elements
 import Input from "./element/input.vue";
@@ -92,6 +93,20 @@ export default {
 		},
 		isError() {
 			return Object.keys(this.errors).length > 0;
+		},
+		validationSchema() {
+			let validation = {};
+			for (const index in this.description) {
+				const current = this.description[index];
+				if ("validation" in current) {
+					const name = this.getName(current, index);
+					validation[name] = current.validation;
+				}
+			}
+			return validation;
+		},
+		validation() {
+			return new Validation(this.validationSchema);
 		}
 	},
 	watch: {
@@ -121,6 +136,10 @@ export default {
 				this.$delete(this.errors, index);
 			}
 			item.setError(message);
+		},
+		isMandatory(description, index) {
+			const name = this.getName(description, index);
+			return this.validation.isMandatory(name);
 		},
 		isLineBreakNeeded(description, index) {
 			if ((description.width || 1) === 1) {
