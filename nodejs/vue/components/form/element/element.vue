@@ -1,6 +1,8 @@
 <script>
 "use strict";
 
+import Validation from "../../../../core/validation.mjs";
+
 /**
  * The following must be implement for all elements:
  * Events:
@@ -11,7 +13,7 @@
  * - disable: set the element as disabled
  *
  * It handles the following keys from the "description" property:
- * - validate: a string, a list of string or functions to validate the data.
+ * - validation: syntax compatible with validation module.
  * - valueType: a string defining the type of data present. It can be "number", "list" or "any".
  */
 export default {
@@ -57,54 +59,16 @@ export default {
 			}
 			return this.externalValue;
 		},
-		validateFctList() {
-			let validate = this.getOption("validate", null);
-
-			// If there is no validate set, set the default one if any
-			if (validate === null) {
-				switch (this.valueType) {
-				case "number":
-					validate = "number";
-					break;
-				}
-			}
-
-			if (typeof validate === "function") {
-				return [validate];
-			}
-
-			if (typeof validate === "string") {
-				validate = validate.split(",");
-			}
-			if (validate instanceof Array) {
-				return validate.map((value) => {
-					return this.getValidateFct(value);
+		validation() {
+			if ("validation" in this.description) {
+				return new Validation({
+					value: this.description["validation"]
 				});
 			}
-			return [];
+			return null;
 		}
 	},
 	methods: {
-		getValidateFct(validate) {
-			if (typeof validate === "function") {
-				return validate;
-			}
-			else if (typeof validate === "string") {
-				switch (validate.trim()) {
-				case "number":
-					return (value) => (value.match(/^-?[0-9]+(?:\.[0-9]*){0,1}$/)) ? true : "Must be a number";
-				case "integer":
-					return (value) => (value.match(/^-?[0-9]+$/)) ? true : "Must be an integer";
-				case "positive":
-					return (value) => ((parseFloat(value) || 0) >= 0) ? true : "Must be positive";
-				case "email":
-					return (value) => (value.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i)) ? true : "Wrong email format";
-				default:
-					console.error("Unknown validate value \"" + validate + "\"");
-				}
-			}
-			return () => true;
-		},
 		/**
 		 * Escape a string to display special characters as non-html interpreted characters.
 		 * This is similar to the PHP function htmlentities.
@@ -198,13 +162,13 @@ export default {
 				let errorList = [];
 
 				// Validate the value only if it is non-empty
-				if (value !== "") {
-					this.validateFctList.forEach((fct) => {
-						const result = fct(value);
-						if (result !== true) {
-							errorList.push(result);
-						}
-					});
+				if (value !== "" && this.validation) {
+					const result = this.validation.validate({
+						value: value
+					}, "return");
+					if ("value" in result) {
+						errorList = result.value;
+					}
 				}
 
 				if (!errorList.length) {

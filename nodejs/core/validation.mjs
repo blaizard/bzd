@@ -1,5 +1,6 @@
 "use strict";
 
+import Format from "./format.mjs";
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("validation");
@@ -23,19 +24,40 @@ class Constraint
 	}
 
 	install() {
-		return (/*value*/) => {}
+		return (/*result, value*/) => {}
 	}
 
-	static assertInteger(arg) {
+	static getAndAssertInteger(arg, result = [], key = null) {
 		const num = parseInt(arg);
-		Exception.assert(!isNaN(num) && String(arg).match(/^-?[0-9]+$/), "Argument must be a valid integer: '{}'", arg);
-		return num;
+		if (Constraint.assert(result, key, !isNaN(num) && String(arg).match(/^-?[0-9]+$/), "integer")) {
+			return num;
+		}
+		Exception.assert(key !== null, "Argument is not a valid integer: '{}'", arg);
+		return undefined;
 	}
 
-	static assertFloat(arg) {
+	static getAndAssertFloat(arg, result = [], key = null) {
 		const num = parseFloat(arg);
-		Exception.assert(!isNaN(num) && String(arg).match(/^-?[0-9]+.?[0-9]*$/), "Argument must be a valid float: '{}'", arg);
-		return num;
+		if (Constraint.assert(result, key, !isNaN(num) && String(arg).match(/^-?[0-9]+.?[0-9]*$/), "float")) {
+			return num;
+		}
+		Exception.assert(key !== null, "Argument is not a valid integer: '{}'", arg);
+		return undefined;
+	}
+
+	static assert(result, key, condition, str, ...args) {
+		if (!condition) {
+			if (!(key in result)) {
+				result[key] = [];
+			}
+			result[key].push(Format(str, ...args));
+			return false;
+		}
+		return true;
+	}
+
+	assert(result, condition, str, ...args) {
+		return Constraint.assert(result, this.key, condition, str, ...args);
 	}
 };
 
@@ -103,23 +125,49 @@ export default class Validation {
 	 * Validate the specific value passed into argument.
 	 * Value must be a dictionary.
 	 */
-	validate(values) {
+	validate(values, output = "throw") {
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
 
+		let result = {};
+
 		for (const key in this.schema) {
-			Exception.assert(!this.schema[key].mandatory || key in values, "Missing mandatory key '{}'", key);
-			if (key in values) {
-				let value = values[key]
-				switch (this.schema[key].type) {
-				case "integer":
-					value = Constraint.assertInteger(value);
-					break;
-				case "float":
-					value = Constraint.assertFloat(value);
-					break;
+			if (Constraint.assert(result, key, !this.schema[key].mandatory || key in values, "mandatory")) {
+				if (key in values) {
+					let value = values[key];
+					switch (this.schema[key].type) {
+					case "integer":
+						value = Constraint.getAndAssertInteger(value, result, key);
+						break;
+					case "float":
+						value = Constraint.getAndAssertFloat(value, result, key);
+						break;
+					}
+					if (value !== undefined) {
+						this.schema[key].constraints.forEach((constraint) => constraint(result, value));
+					}
 				}
-				this.schema[key].constraints.forEach((constraint) => constraint(value));
 			}
+		}
+
+		switch (output) {
+		case "throw":
+			{
+				const keys = Object.keys(result);
+				if (keys.length == 1) {
+					throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
+				}
+				else if (keys.length > 1) {
+					const message = keys.map((key) => {
+						return String(key) + ": (" + result[key].join(", ") + ")";
+					});
+					throw new Exception("Some values do not validate: {}", message.join("; "));
+				}
+			}
+			break;
+		case "return":
+			return result;
+		default:
+			Exception.unreachable("Unsupported output type: '{}'", output);
 		}
 	}
 
@@ -135,25 +183,33 @@ export default class Validation {
 					switch (this.entry.type) {
 					case "string":
 					case "integer":
-						this.arg = Constraint.assertInteger(this.arg);
+						this.arg = Constraint.getAndAssertInteger(this.arg);
 						break;
 					case "float":
-						this.arg = Constraint.assertFloat(this.arg);
+						this.arg = Constraint.getAndAssertFloat(this.arg);
 					}
 
 					switch (this.entry.type) {
 					case "string":
-						return (value) => {
-							Exception.assert(value.length >= this.arg, "Length must be >= {}", this.arg);
+						return (result, value) => {
+							this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
 						};
 					case "integer":
 					case "float":
-						return (value) => {
-							Exception.assert(value >= this.arg, "Number must be >= {}", this.arg);
+						return (result, value) => {
+							this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
 						};
 					default:
 						Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
 					}
+				}
+			},
+			email: class Email extends Constraint {
+				install() {
+					Exception.assert(this.entry.type == "string", "Email is only compatible with string type");
+					return (result, value) => {
+						this.assert(result, value.match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/), "email");
+					};
 				}
 			},
 			type: class Type extends Constraint {
