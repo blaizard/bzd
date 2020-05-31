@@ -187,6 +187,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":exception",
+        ":format",
         "//nodejs:bzd",
     ],
 )

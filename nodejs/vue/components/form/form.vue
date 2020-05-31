@@ -10,17 +10,18 @@
 					:disable="getDisable(current)"
 					:width="current.width"
 					:active="active == index">
-
-				<component slot-scope="item"
-						:is="getType(current)"
-						v-model="currentValue[getName(current, index)]"
-						@error="handleError(index, item, $event)"
-						@active="handleActive(index, $event)"
-						@submit="handleSubmit(current)"
-						@input="handleInput(getName(current, index), $event)"
-						:description="current"
-						:disable="getDisable(current)">
-				</component>
+				<template v-slot="item">
+					<component 
+							:is="getType(current)"
+							v-model="currentValue[getName(current, index)]"
+							@error="handleError(index, item, $event)"
+							@active="handleActive(index, $event)"
+							@submit="handleSubmit(current)"
+							@input="handleInput(getName(current, index), $event)"
+							:description="current"
+							:disable="getDisable(current)">
+					</component>
+				</template>
 			</component>
 
 			<div v-if="isLineBreakNeeded(current, index)" class="irform-linebreak"></div>

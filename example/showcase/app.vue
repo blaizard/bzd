@@ -12,6 +12,7 @@
 				<MenuEntry text="Password" link="/form/password"></MenuEntry>
 				<MenuEntry text="Dropdown" link="/form/dropdown"></MenuEntry>
 				<MenuEntry text="Autocomplete" link="/form/autocomplete"></MenuEntry>
+				<MenuEntry text="Validation" link="/form/validation"></MenuEntry>
 			</MenuEntry>
 		</template>
 		<template #content>
@@ -46,6 +47,7 @@
                     { path: '/form/password', component: () => import("./form/password.vue") },
                     { path: '/form/dropdown', component: () => import("./form/dropdown.vue") },
                     { path: '/form/autocomplete', component: () => import("./form/autocomplete.vue") },
+                    { path: '/form/validation', component: () => import("./form/validation.vue") },
 				],
 			});
 		},

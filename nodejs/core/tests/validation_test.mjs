@@ -6,7 +6,7 @@ import Validation from "../validation.mjs";
 const Exception = ExceptionFactory("test", "validation");
 
 describe("Validation", () => {
-	describe("Simple", () => {
+	describe("min", () => {
 		it("mandatory min", () => {
 			const validator = new Validation({
 				test: "mandatory min(5)"
@@ -35,6 +35,19 @@ describe("Validation", () => {
 			Exception.assertThrows(() => {
 				validator.validate({
 					test: "Me"
+				});
+			});
+		});
+		it("float min", () => {
+			const validator = new Validation({
+				test: "type(float) min(-5.78)"
+			});
+			validator.validate({
+				test: -5.77
+			});
+			Exception.assertThrows(() => {
+				validator.validate({
+					test: -5.79
 				});
 			});
 		});

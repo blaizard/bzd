@@ -9,6 +9,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs:vue",
         "//nodejs/core:upload",
+        "//nodejs/core:validation",
         "//nodejs/vue/directives:touch",
     ],
 )

@@ -3,7 +3,7 @@
 		<div class="irform-caption" v-if="caption === ''">&nbsp;</div>
 		<div class="irform-caption" v-else-if="caption !== null">{{ caption }}</div>
 		<div :class="elementsClass">
-			<slot :setError="setError"></slot>
+			<slot v-bind:setError="setError"></slot>
 			<span v-if="isError" class="irform-error-message"><i class="irform-icon-warning"></i> {{ errorList.join(" ") }}</span>
 		</div>
 	</div>
