@@ -23,6 +23,7 @@
             "ObjectExpression": "first"
         }],
 		"camelcase": ["error", { "ignoreDestructuring": true }],
-		"multiline-comment-style": ["error", "starred-block"]
+		"multiline-comment-style": ["error", "starred-block"],
+		"curly": ["error", "all"]
 	}
 }

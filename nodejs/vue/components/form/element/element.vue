@@ -222,8 +222,8 @@ export default {
 					multiValueList.sort(function(a, b) {
 						const valueA = a.value.toLowerCase();
 						const valueB = b.value.toLowerCase();
-						if (valueA < valueB) return -1;
-						if (valueA > valueB) return 1;
+						if (valueA < valueB) {return -1;}
+						if (valueA > valueB) {return 1;}
 						return 0;
 					});
 				}

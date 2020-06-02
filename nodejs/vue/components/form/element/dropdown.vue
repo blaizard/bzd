@@ -165,7 +165,7 @@ export default {
 		getMatchingWeight (word, sentence, minMatch) {
 
 			const firstChar = word.charAt(0);
-			if (!firstChar) return 0;
+			if (!firstChar) {return 0;}
 
 			let start = -1;
 			let weight = 0;
