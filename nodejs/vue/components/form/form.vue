@@ -193,8 +193,7 @@ export default {
 		},
 		getName(description, index) {
 			let name = description.name || ("key-" + index);
-			if (!(name in this.currentValue))
-			{
+			if (!(name in this.currentValue)) {
 				this.$set(this.currentValue, name, undefined);
 			}
 			return name;
