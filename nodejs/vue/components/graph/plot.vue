@@ -150,7 +150,7 @@ export default {
 			immediate: true,
 			handler(/*value*/) {
 
-				if (DEBUG) console.time("plot render");
+				if (DEBUG) {console.time("plot render");}
 
 				let valuesMinY = Number.MAX_SAFE_INTEGER;
 				let valuesMaxY = -Number.MAX_SAFE_INTEGER;
@@ -424,7 +424,7 @@ export default {
 				}
 				return serie;
 			});
-			if (DEBUG) console.timeEnd("plot render");
+			if (DEBUG) {console.timeEnd("plot render");}
 			return series;
 		},
 		// X Label
@@ -564,8 +564,8 @@ export default {
 				}
 			}
 
-			if (index <= 0) return 0;
-			if (index >= values.length) return values.length - 1;
+			if (index <= 0) {return 0;}
+			if (index >= values.length) {return values.length - 1;}
 
 			return (x - values[index - 1][0] < values[index][0] - x) ? index - 1 : index;
 		},
