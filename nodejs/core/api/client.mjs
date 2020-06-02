@@ -4,6 +4,7 @@ import Base from "./base.mjs";
 import Fetch from "../fetch.mjs";
 import ExceptionFactory from "../exception.mjs";
 import ExceptionFetch from "../impl/fetch/exception.mjs";
+import Validation from "../validation.mjs";
 
 const Exception = ExceptionFactory("api", "client");
 
@@ -17,6 +18,19 @@ export default class APIClient extends Base {
             this.options.authentication.installAPI(this);
         }
 	}
+
+    updateForm(method, endpoint, formDescription) {
+		this._sanityCheck(method, endpoint);
+        const requestOptions = this.schema[endpoint][method].request || {};
+        const validation = requestOptions.validation || {};
+
+        return formDescription.map((description) => {
+            if (description.name && description.name in validation) {
+                description.validation = ((description.validation) ? (description.validation + " ") : "") + validation[description.name];
+            }
+            return description;
+        });
+    }
 
     async login(uid, password) {
         Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
@@ -40,6 +54,12 @@ export default class APIClient extends Base {
 		if ("type" in responseOptions) {
 			fetchOptions.expect = responseOptions.type;
 		}
+
+        if ("validation" in requestOptions) {
+            const validation = new Validation(requestOptions.validation);
+            console.log(requestOptions.validation, data);
+            validation.validate(data);
+        }
 
 		switch (requestOptions.type) {
 		case "json":

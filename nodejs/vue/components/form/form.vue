@@ -10,14 +10,15 @@
 					:disable="getDisable(current)"
 					:width="current.width"
 					:active="active == index"
-					:mandatory="isMandatory(current, index)">
-				<template v-slot="item">
+					:mandatory="isMandatory(index)"
+					:error="getError(current, index)">
+				<template>
 					<component :is="getType(current)"
-							v-model="currentValue[getName(current, index)]"
-							@error="handleError(index, item, $event)"
+							v-model="currentValue[indexToName[index]]"
+							@error="handleError(indexToName[index], $event)"
 							@active="handleActive(index, $event)"
 							@submit="handleSubmit(current)"
-							@input="handleInput(getName(current, index), $event)"
+							@input="handleInput(index, $event)"
 							:description="current"
 							:disable="getDisable(current)">
 					</component>
@@ -37,34 +38,49 @@ import Item from "./item.vue";
 import Validation from "../../../core/validation.mjs";
 
 // Include all the supported elements
-import Input from "./element/input.vue";
-import Password from "./element/password.vue";
-import Checkbox from "./element/checkbox.vue";
-import Textarea from "./element/textarea.vue";
-import Dropdown from "./element/dropdown.vue";
-import Autocomplete from "./element/autocomplete.vue";
-import Button from "./element/button.vue";
-import Array from "./element/array.vue";
-import Table from "./element/table.vue";
-import File from "./element/file.vue";
-import Carousel from "./element/carousel.vue";
-import Editor from "./element/editor.vue";
-import Date from "./element/date.vue";
-import Message from "./element/message.vue";
-import Unknown from "./element/unknown.vue";
-const elements = {Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Button, Array, Table, File, Carousel, Editor, Message, Date};
+import ElementInput from "./element/input.vue";
+import ElementPassword from "./element/password.vue";
+import ElementCheckbox from "./element/checkbox.vue";
+import ElementTextarea from "./element/textarea.vue";
+import ElementDropdown from "./element/dropdown.vue";
+import ElementAutocomplete from "./element/autocomplete.vue";
+import ElementButton from "./element/button.vue";
+import ElementArray from "./element/array.vue";
+import ElementTable from "./element/table.vue";
+import ElementFile from "./element/file.vue";
+import ElementCarousel from "./element/carousel.vue";
+import ElementEditor from "./element/editor.vue";
+import ElementMessage from "./element/message.vue";
+import ElementDate from "./element/date.vue";
+import ElementUnknown from "./element/unknown.vue";
+const elements = {
+	Input: ElementInput,
+	Password: ElementPassword,
+	Checkbox: ElementCheckbox,
+	Texarea: ElementTextarea,
+	Dropdown: ElementDropdown,
+	Autocomplete: ElementAutocomplete,
+	Button: ElementButton,
+	Array: ElementArray,
+	Table: ElementTable,
+	File: ElementFile,
+	Carousel: ElementCarousel,
+	Editor: ElementEditor,
+	Message: ElementMessage,
+	Date: ElementDate
+};
 
 export default {
 	/**
-	 * Rename the elements to create cursomt element names to ensure no conflicts with elements:
+	 * Rename the elements to create custom element names to ensure no conflicts with elements:
 	 * { InputFormElement: Input, ... }
 	 */
-	components: Object.assign({ Unknown }, Object.keys(elements).reduce((obj, key) => {
+	components: Object.assign({ ElementUnknown }, Object.keys(elements).reduce((obj, key) => {
 		obj[key + "FormElement"] = elements[key];
 		return obj;
 	}, {})),
 	props: {
-		description: { type: Object | Array, required: true },
+		description: { type: Array, required: true },
 		tag: { type: String, default: "div", required: false },
 		template: { type: Object, default: () => Item, required: false },
 		value: { type: Object, default: () => {}, required: false },
@@ -99,7 +115,7 @@ export default {
 			for (const index in this.description) {
 				const current = this.description[index];
 				if ("validation" in current) {
-					const name = this.getName(current, index);
+					const name = this.indexToName[index];
 					validation[name] = current.validation;
 				}
 			}
@@ -107,6 +123,9 @@ export default {
 		},
 		validation() {
 			return new Validation(this.validationSchema);
+		},
+		indexToName() {
+			return this.description.map((description, index) => this.getName(description, index));
 		}
 	},
 	watch: {
@@ -115,11 +134,27 @@ export default {
 		}
 	},
 	methods: {
-		handleInput(id, value) {
-			this.$set(this.updatedValue, id, value);
+		getError(description, index) {
+			const name = this.indexToName[index];
+			return (name in this.errors) ? this.errors[name] : [];
+		},
+		handleInput(index, value) {
+			const name = this.indexToName[index];
+			this.$set(this.updatedValue, name, value);
 			this.$emit("input", this.returnedValue);
 		},
 		handleSubmit(/*description*/) {
+
+			const result = this.validation.validate(this.currentValue, {
+				output: "return",
+				valueExists: (key, value) => {
+					return (value !== undefined) && (value !== "");
+				}
+			});
+			for (const name in result) {
+				this.handleError(name, result[name]);
+			}
+
 			if (!this.isError) {
 				this.$emit("submit", this.returnedValue);
 			}
@@ -128,17 +163,16 @@ export default {
 			this.active = (typeof data === "object" && "id" in data) ? index : -1;
 			this.$emit("active", data);
 		},
-		handleError(index, item, message) {
-			if (message) {
-				this.$set(this.errors, index,  message);
+		handleError(name, messageList) {
+			if (messageList) {
+				this.$set(this.errors, name, messageList);
 			}
 			else {
-				this.$delete(this.errors, index);
+				this.$delete(this.errors, name);
 			}
-			item.setError(message);
 		},
-		isMandatory(description, index) {
-			const name = this.getName(description, index);
+		isMandatory(index) {
+			const name = this.indexToName[index];
 			return this.validation.isMandatory(name);
 		},
 		isLineBreakNeeded(description, index) {

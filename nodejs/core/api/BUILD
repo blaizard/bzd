@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:fetch",
+        "//nodejs/core:validation",
     ],
 )
 
@@ -25,5 +26,6 @@ bzd_nodejs_library(
         "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:validation",
     ],
 )

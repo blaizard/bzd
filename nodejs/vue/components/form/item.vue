@@ -3,8 +3,8 @@
 		<div class="irform-caption" v-if="caption === ''">&nbsp;</div>
 		<div class="irform-caption" v-else-if="caption !== null">{{ caption }}<span v-if="mandatory">*</span></div>
 		<div :class="elementsClass">
-			<slot v-bind:setError="setError"></slot>
-			<span v-if="isError" class="irform-error-message"><i class="irform-icon-warning"></i> {{ errorList.join(" ") }}</span>
+			<slot></slot>
+			<span v-if="isError" class="irform-error-message"><i class="irform-icon-warning"></i> {{ error.join(", ") }}</span>
 		</div>
 	</div>
 </template>
@@ -18,11 +18,11 @@ export default {
 		caption: {type: String | Object, required: false, default: null},
 		disable: {type: Boolean, default: false, required: false},
 		width: {type: Number | String, default: 1, required: false},
-		mandatory: {type: Boolean, default: false, required: false}
+		mandatory: {type: Boolean, default: false, required: false},
+		error: {type: Array, default: [], required: false}
 	},
 	data: function() {
 		return {
-			errorList: []
 		};
 	},
 	computed: {
@@ -40,7 +40,7 @@ export default {
 			};
 		},
 		isError() {
-			return this.errorList.length > 0;
+			return (this.error.length > 0);
 		},
 		style() {
 			if ((this.width || 1) === 1) {
@@ -55,19 +55,6 @@ export default {
 			}
 			return this.width;
 		},
-	},
-	methods: {
-		setError(arg) {
-			if (arg instanceof Array) {
-				this.errorList = arg;
-			}
-			else if (typeof arg === "string") {
-				this.errorList = [arg];
-			}
-			else {
-				this.errorList = [];
-			}
-		}
 	}
 };
 </script>

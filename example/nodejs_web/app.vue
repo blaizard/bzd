@@ -18,7 +18,7 @@ export default {
       count.value++
     }
 
-    onMounted(() => console.log('component mounted!'))
+    onMounted(() => console.log("component mounted!"))
 
     return {
       count,

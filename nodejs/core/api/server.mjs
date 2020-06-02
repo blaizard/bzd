@@ -3,6 +3,7 @@
 import Base from "./base.mjs";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
+import Validation from "../validation.mjs";
 
 const Exception = ExceptionFactory("api", "server");
 const Log = LogFactory("api", "server");
@@ -112,7 +113,7 @@ export default class APIServer extends Base {
 				let data = {};
 				switch (requestOptions.type) {
 				case "json":
-					data = request.body.data;
+					data = request.body;
 					break;
 				case "query":
 					data = request.query;
@@ -130,6 +131,11 @@ export default class APIServer extends Base {
 				// Add debug information
 				context.addDebug("data", data);
 				context.addDebug("uid", authenticationData.uid);
+
+				if ("validation" in requestOptions) {
+					const validation = new Validation(requestOptions.validation);
+					validation.validate(data);
+				}
 
 				const result = await callback.call(context, data, authenticationData.uid);
 				if (!context.manualResponse) {
