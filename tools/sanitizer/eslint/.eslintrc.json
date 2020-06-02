@@ -24,6 +24,7 @@
         }],
 		"camelcase": ["error", { "ignoreDestructuring": true }],
 		"multiline-comment-style": ["error", "starred-block"],
-		"curly": ["error", "all"]
+		"curly": ["error", "all"],
+		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }]
 	}
 }

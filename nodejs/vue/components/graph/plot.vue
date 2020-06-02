@@ -166,8 +166,7 @@ export default {
 				});
 
 				// Calculate the [valuesMinX; valuesMaxX]
-				if (this.valueSorted.length && this.valueSorted[0].values.length)
-				{
+				if (this.valueSorted.length && this.valueSorted[0].values.length) {
 					this.valueSorted.forEach((array) => {
 						valuesMinX = Math.min(valuesMinX, array.values[0][0]);
 						valuesMaxX = Math.max(valuesMaxX, array.values[array.values.length - 1][0]);
