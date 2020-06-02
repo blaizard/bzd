@@ -109,10 +109,10 @@
                 this.ready = true;
             },
             async handleCreate() {
-                await this.$api.request("post", "/tile", { data: this.value });
+                await this.$api.request("post", "/tile", this.value);
             },
             async handleUpdate() {
-                await this.$api.request("put", "/tile", { data: { uid: this.uid, value: this.value }});
+                await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
             },
             async fetchPlugins(source) {
                 let plugins = {};

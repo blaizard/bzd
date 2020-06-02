@@ -61,9 +61,7 @@ export default {
 		},
 		validation() {
 			if ("validation" in this.description) {
-				return new Validation({
-					value: this.description["validation"]
-				});
+				return new Validation(this.description["validation"], /*singleValue*/true);
 			}
 			return null;
 		}
@@ -165,7 +163,9 @@ export default {
 				if (value !== "" && this.validation) {
 					const result = this.validation.validate({
 						value: value
-					}, "return");
+					}, {
+						output: "return"
+					});
 					if ("value" in result) {
 						errorList = result.value;
 					}

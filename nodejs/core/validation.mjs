@@ -81,7 +81,14 @@ class Constraint
  * By default all keys are considered as optional unless mandatory is specified.
  */
 export default class Validation {
-	constructor(schema) {
+	constructor(schema, singleValue = false) {
+
+		if (singleValue) {
+			schema = {
+				value: schema
+			}
+		}
+		this.singleValue = singleValue;
 		this.schema = this._processSchema(schema);
 	}
 
@@ -125,13 +132,24 @@ export default class Validation {
 	 * Validate the specific value passed into argument.
 	 * Value must be a dictionary.
 	 */
-	validate(values, output = "throw") {
+	validate(values, options) {
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
+
+		options = Object.assign({
+			/**
+			 * Output type, can be either "throw" or "return"
+			 */
+			output: "throw",
+			/**
+			 * Callback decifing whether or not a valid is conisdered as existent
+			 */
+			valueExists: (key, value) => { return value !== undefined; }
+		}, options);
 
 		let result = {};
 
 		for (const key in this.schema) {
-			if (Constraint.assert(result, key, !this.schema[key].mandatory || key in values, "mandatory")) {
+			if (Constraint.assert(result, key, !this.schema[key].mandatory || (key in values && options.valueExists(key, values[key])), "mandatory")) {
 				if (key in values) {
 					let value = values[key];
 					switch (this.schema[key].type) {
@@ -143,13 +161,13 @@ export default class Validation {
 						break;
 					}
 					if (value !== undefined) {
-						this.schema[key].constraints.forEach((constraint) => constraint(result, value));
+						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
 					}
 				}
 			}
 		}
 
-		switch (output) {
+		switch (options.output) {
 		case "throw":
 			{
 				const keys = Object.keys(result);
@@ -167,7 +185,7 @@ export default class Validation {
 		case "return":
 			return result;
 		default:
-			Exception.unreachable("Unsupported output type: '{}'", output);
+			Exception.unreachable("Unsupported output type: '{}'", options.output);
 		}
 	}
 
@@ -176,6 +194,7 @@ export default class Validation {
 	}
 
 	processConstraint(schema, key, name, arg) {
+		const singleValue = this.singleValue;
 		const availableConstraints = {
 			mandatory: class Mandatory extends Constraint {
 				create() {
@@ -220,6 +239,19 @@ export default class Validation {
 				create() {
 					Exception.assert(["string", "integer", "float"].includes(this.arg), "'{}' is not a supported type", this.arg);
 					this.entry.type = this.arg;
+				}
+			},
+			same: class Same extends Constraint {
+				install() {
+					if (!singleValue) {
+						Exception.assert(this.arg in this.schema, "Key '{}' is not set", this.arg);
+					}
+					return (result, value, values) => {
+						if (singleValue) {
+							return;
+						}
+						this.assert(result, value === values[this.arg], "different from {}", this.arg);
+					};
 				}
 			},
 		};
