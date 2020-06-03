@@ -1,7 +1,7 @@
 <template>
 	<div>
         <h1>Form</h1>
-        <Form v-model="value" :description="formDescription" @submit="handleSumbit" @input="handleInput"></Form>
+        <Form v-model="value" :description="formDescription" @submit="handleSumbit" @input="handleInput" :all="true"></Form>
         <h1>Values</h1>
         <code v-if="submitted">Submitted</code>
         <pre>{{ JSON.stringify(value, null, 4) }}</pre>
@@ -36,3 +36,14 @@
         }
 	}
 </script>
+
+<style lang="scss">
+	.bzd-showcase-form-element {
+		display: flex;
+        flex-flow: row wrap;
+        > * {
+            margin: 5px 20px;
+            flex: 1;
+        }
+	}
+</style>

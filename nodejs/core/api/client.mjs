@@ -57,7 +57,6 @@ export default class APIClient extends Base {
 
         if ("validation" in requestOptions) {
             const validation = new Validation(requestOptions.validation);
-            console.log(requestOptions.validation, data);
             validation.validate(data);
         }
 

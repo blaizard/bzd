@@ -88,25 +88,25 @@ export default {
 		/**
 		 * Only the diff will be returned
 		 */
-		diff: { type: Boolean, default: false, required: false }
+		diff: { type: Boolean, default: false, required: false },
+		/**
+		 * Include elements with no names
+		 */
+		all: { type: Boolean, default: false, required: false }
 	},
 	name: "FormElement",
 	data: function() {
 		return {
-			/*
-			 * Those 2 values are used so that only the update is sent
-			 * back to the input event
-			 */
+			// Copy of the current value
 			currentValue: Object.assign({}, this.value),
-			updatedValue: {},
+			returnedValue: (this.diff) ? {} : Object.assign({}, this.value),
+			// Contains only the unamed elements
+			unamedValue: {},
 			active: -1,
 			errors: {}
 		};
 	},
 	computed: {
-		returnedValue() {
-			return (this.diff) ? this.updatedValue : this.currentValue;
-		},
 		isError() {
 			return Object.keys(this.errors).length > 0;
 		},
@@ -130,7 +130,7 @@ export default {
 	},
 	watch: {
 		value() {
-			this.currentValue = Object.assign({}, this.value);
+			this.currentValue = Object.assign({}, this.unamedValue, this.value);
 		}
 	},
 	methods: {
@@ -140,7 +140,12 @@ export default {
 		},
 		handleInput(index, value) {
 			const name = this.indexToName[index];
-			this.$set(this.updatedValue, name, value);
+			if (this.all || "name" in this.description[index]) {
+				this.$set(this.returnedValue, name, value);
+			}
+			else {
+				this.$set(this.unamedValue, name, value);
+			}
 			this.$emit("input", this.returnedValue);
 		},
 		handleSubmit(/*description*/) {

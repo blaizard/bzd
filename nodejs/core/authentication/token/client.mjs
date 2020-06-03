@@ -123,7 +123,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
     }
 
     async login(api, uid, password, persistent = false) {
-        const result = await api.request("post", "/auth/login", { data: { uid: uid, password: password, persistent: persistent } });
+        const result = await api.request("post", "/auth/login", { uid: uid, password: password, persistent: persistent });
         this.setToken(result.token, result.timeout);
         return true;
     }
