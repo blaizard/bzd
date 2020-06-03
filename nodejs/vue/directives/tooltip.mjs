@@ -1,6 +1,9 @@
 "use strict";
 
-let watcherInstance = null;
+let current = {
+	watcher: null,
+	elt: null
+};
 const watcherPollingPeriodMs = 500;
 const defaultPosition = "e";
 const positionSequences = {
@@ -41,6 +44,8 @@ function getOrCreateTooltip() {
  * Hide the curren tooltip
  */
 export function tooltipHide() {
+	current.elt = null;
+
 	let tooltipElt = getOrCreateTooltip();
 	tooltipElt.style.display = "none";
 
@@ -63,6 +68,7 @@ function eltOutOfScreen(elt) {
  * it will hide the tooltip.
  */
 function setWatcher(elt) {
+
 	// Clear current watcher first
 	clearWatcher();
 
@@ -70,7 +76,7 @@ function setWatcher(elt) {
 		if (!window.getComputedStyle(elt).display) {
 			tooltipHide();
 		}
-		watcherInstance = setTimeout(() => {
+		current.watcher = setTimeout(() => {
 			hideFct();
 		}, watcherPollingPeriodMs);
 	};
@@ -82,18 +88,34 @@ function setWatcher(elt) {
  * Reset and clear the current watcher if any.
  */
 function clearWatcher() {
-	if (watcherInstance) {
-		clearInterval(watcherInstance);
-		watcherInstance = null;
+	if (current.watcher) {
+		clearInterval(current.watcher);
+		current.watcher = null;
 	}
 }
 
 /**
  * Create and show the tooltip
  */
-function tooltipFromEvent(e) {
+async function tooltipFromEvent(e) {
 	e.stopPropagation();
-	tooltip(e.target);
+
+	let elt = e.target;
+
+	// Show instantly
+	tooltip(elt);
+
+	// Run the async function if any
+	if (elt.onceAsync) {
+		const asyncFct = elt.onceAsync;
+		delete elt.onceAsync;
+		const text = await asyncFct();
+		elt.setAttribute("data-irtooltip", text);
+		// Update the displayed content of the tooltip if it is shown
+		if (current.elt === elt) {
+			tooltip(elt);
+		}
+	}
 }
 
 export function tooltipFromCoords(x, y, message, initialPosition = null) {
@@ -114,6 +136,11 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 }
 
 export function tooltip(elt, message = null, initialPosition = null) {
+
+	// Save the current object. Do this event if it is not shown, this is used
+	// by the asynchronous function if it needs to be updated.
+	current.elt = elt;
+
 	message = message || elt.getAttribute("data-irtooltip");
 	if (!message) return;
 
@@ -182,7 +209,11 @@ export default function (el, binding) {
 		/**
 		 * The text to display
 		 */
-		text: undefined,
+		text: null,
+		/**
+		 * Asynchronous function to be called and resolved when the tooltip shows
+		 */
+		async: null,
 		/**
 		 * The position or positions the tooltip can take (by order of priority)
 		 */
@@ -198,6 +229,13 @@ export default function (el, binding) {
 	}
 	else {
 		el.removeAttribute("data-irtooltip");
+	}
+
+	// Add async function if any.
+	// We cannot use an event here as when called multiple times,
+	// multiple event will be associated.
+	if (config.async) {
+		el.onceAsync = config.async;
 	}
 
 	if (config.position == defaultPosition) {
