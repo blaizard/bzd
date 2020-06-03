@@ -13,6 +13,7 @@
 				<MenuEntry text="Dropdown" link="/form/dropdown"></MenuEntry>
 				<MenuEntry text="Autocomplete" link="/form/autocomplete"></MenuEntry>
 				<MenuEntry text="Validation" link="/form/validation"></MenuEntry>
+				<MenuEntry text="Output" link="/form/output"></MenuEntry>
 			</MenuEntry>
 		</template>
 		<template #content>
@@ -48,6 +49,7 @@
                     { path: '/form/dropdown', component: () => import("./form/dropdown.vue") },
                     { path: '/form/autocomplete', component: () => import("./form/autocomplete.vue") },
                     { path: '/form/validation', component: () => import("./form/validation.vue") },
+                    { path: '/form/output', component: () => import("./form/output.vue") },
 				],
 			});
 		},
