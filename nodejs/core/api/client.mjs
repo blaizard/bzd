@@ -56,8 +56,11 @@ export default class APIClient extends Base {
 		}
 
         if ("validation" in requestOptions) {
+            Exception.assert(["json", "query"].includes(requestOptions.type), "{} {}: validation is not available for {}.", method, endpoint, requestOptions.type);
             const validation = new Validation(requestOptions.validation);
-            validation.validate(data);
+            validation.validate(data, {
+                all: true
+            });
         }
 
 		switch (requestOptions.type) {
@@ -84,7 +87,15 @@ export default class APIClient extends Base {
             }
 
             try {
-                return await Fetch.request(this._makePath(endpoint), fetchOptions);
+                const result = await Fetch.request(this._makePath(endpoint), fetchOptions);
+                if ("validation" in responseOptions) {
+                    Exception.assert(["json"].includes(responseOptions.type), "{} {}: validation is not available for {}.", method, endpoint, responseOptions.type);
+                    const validation = new Validation(responseOptions.validation);
+                    validation.validate(result, {
+                        all: true
+                    });
+                }
+                return result;
             }
             catch (e) {
                 if (e instanceof ExceptionFetch) {

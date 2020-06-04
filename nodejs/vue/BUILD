@@ -27,3 +27,14 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
     ],
 )
+
+bzd_nodejs_library(
+    name = "notification",
+    srcs = [
+        "notification.mjs",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)

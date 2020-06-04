@@ -161,9 +161,7 @@ export default {
 
 				// Validate the value only if it is non-empty
 				if (value !== "" && this.validation) {
-					const result = this.validation.validate({
-						value: value
-					}, {
+					const result = this.validation.validate(value, {
 						output: "return"
 					});
 					if ("value" in result) {

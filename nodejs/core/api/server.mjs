@@ -133,11 +133,23 @@ export default class APIServer extends Base {
 				context.addDebug("uid", authenticationData.uid);
 
 				if ("validation" in requestOptions) {
+					Exception.assert(["json", "query"].includes(requestOptions.type), "{} {}: validation is not available for {}.", method, endpoint, requestOptions.type);
 					const validation = new Validation(requestOptions.validation);
-					validation.validate(data);
+					validation.validate(data, {
+						all: true
+					});
 				}
 
 				const result = await callback.call(context, data, authenticationData.uid);
+
+				if ("validation" in responseOptions) {
+					Exception.assert(responseOptions.type == "json", "{} {}: validation is only available for json type.", method, endpoint);
+					const validation = new Validation(responseOptions.validation);
+					validation.validate(result, {
+						all: true
+					});
+				}
+
 				if (!context.manualResponse) {
 					switch (responseOptions.type) {
 					case "json":

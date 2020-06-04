@@ -35,8 +35,20 @@
             </transition>
 		</div>
 
-		<div class="bzd-layout-content">
-			<slot name="content"></slot>
+		<div class="bzd-layout-content-wrapper">
+            <div v-if="$notification"
+                    v-for="entry in $notification.entries"
+                    :key="entry.key"
+                    :class="getNotificationClass(entry)"
+                    :style="getNotificationStyle(entry)">
+                <div class="bzd-notification-content">{{ entry.message }}</div>
+                <div class="bzd-notification-close" @click="notificationClose(entry)">
+                    <i class="bzd-icon-close"></i>
+                </div>
+            </div>
+            <div class="bzd-layout-content">
+                <slot name="content"></slot>
+            </div>
 		</div>
 
 		<div class="bzd-layout-footer">
@@ -92,6 +104,23 @@ export default {
 		}
 	},
 	methods: {
+		getNotificationClass(entry) {
+			return {
+				"bzd-notification": true,
+				"bzd-success": (entry.type == "success"),
+				"bzd-error": (entry.type == "error"),
+				"bzd-info": (entry.type == "info"),
+			};
+		},
+		getNotificationStyle(entry) {
+			if (entry.timeOnScreen) {
+				return "--bzd-notification-time: " + entry.timeOnScreen + "s;";
+			}
+			return "";
+		},
+		notificationClose(entry) {
+			this.$notification.close(entry);
+		},
 		handleResize() {
 		},
 		toggleDock() {
@@ -136,7 +165,7 @@ export default {
 
     @use "bzd-style/css/clickable.scss";
 	@use "bzd/icons.scss" with (
-        $bzdIconNames: menu dock-on dock-off
+        $bzdIconNames: menu dock-on dock-off close
     );
 
     html,
@@ -303,12 +332,68 @@ export default {
             }
         }
 
-        .bzd-layout-content {
-            padding: $contentPadding;
+        .bzd-layout-content-wrapper {
+
+            .bzd-notification {
+                display: flex;
+                flex-flow: row nowrap;
+                position: relative;
+
+                @keyframes bzd-notification-time-animation {
+                    0% {
+                        left: -100%;
+                    }
+                    100% {
+                        left: 0;
+                    }
+                }
+
+                &:after {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 100%;
+                    opacity: 0.2;
+                    background-color: colors.$bzdGraphColorWhite;
+                    animation-name: bzd-notification-time-animation;
+                    animation-duration: var(--bzd-notification-time);
+                    animation-timing-function: linear;
+                    content: ' ';
+                    pointer-events: none;
+                }
+
+                > * {
+                    padding: 10px;
+                }
+                .bzd-notification-content {
+                    flex: 1;
+                }
+                .bzd-notification-close {
+                    @extend %bzd-clickable;
+                }
+
+                &.bzd-info {
+                    background-color: colors.$bzdGraphColorYellow;
+                    color: colors.$bzdGraphColorBlack;
+                }
+                &.bzd-success {
+                    background-color: colors.$bzdGraphColorGreen;
+                    color: colors.$bzdGraphColorWhite;
+                }
+                &.bzd-error {
+                    background-color: colors.$bzdGraphColorRed;
+                    color: colors.$bzdGraphColorWhite;
+                }
+            }
+
+            .bzd-layout-content {
+                padding: $contentPadding;
+            }
         }
 
         &.bzd-dock {
-            .bzd-layout-content {
+            .bzd-layout-content-wrapper {
                 margin-left: $menuWidth;
             }
         }
