@@ -26,14 +26,24 @@ export default {
                         }, entry.timeOnScreen * 1000);
                     }
                 },
-                info(...args) {
-                    this._notify("info", ...args);
+                info(message, options) {
+                    this._notify("info", message, options);
                 },
-                error(...args) {
-                    this._notify("error", ...args);
+                error(message, options) {
+                    if (message instanceof Error) {
+                        const splittedMessage = String(message).split("\n");
+                        message = splittedMessage[0] || "";
+                        if (splittedMessage.length > 1) {
+                            message += "..."
+                        }
+                    }
+                    this._notify("error", message, Object.assign({
+                        timeOnScreen: 0
+                    }, options));
+                    console.error(message);
                 },
-                success(...args) {
-                    this._notify("success", ...args);
+                success(message, options) {
+                    this._notify("success", message, options);
                 },
                 close(entry) {
                     const index = this.entries.indexOf(entry);

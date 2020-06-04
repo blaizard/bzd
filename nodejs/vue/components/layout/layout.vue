@@ -107,6 +107,7 @@ export default {
 		getNotificationClass(entry) {
 			return {
 				"bzd-notification": true,
+				"bzd-notification-time": (entry.timeOnScreen > 0),
 				"bzd-success": (entry.type == "success"),
 				"bzd-error": (entry.type == "error"),
 				"bzd-info": (entry.type == "info"),
@@ -339,28 +340,30 @@ export default {
                 flex-flow: row nowrap;
                 position: relative;
 
-                @keyframes bzd-notification-time-animation {
-                    0% {
-                        left: -100%;
+                &.bzd-notification-time {
+                    @keyframes bzd-notification-time-animation {
+                        0% {
+                            left: -100%;
+                        }
+                        100% {
+                            left: 0;
+                        }
                     }
-                    100% {
-                        left: 0;
-                    }
-                }
 
-                &:after {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    height: 100%;
-                    width: 100%;
-                    opacity: 0.2;
-                    background-color: colors.$bzdGraphColorWhite;
-                    animation-name: bzd-notification-time-animation;
-                    animation-duration: var(--bzd-notification-time);
-                    animation-timing-function: linear;
-                    content: ' ';
-                    pointer-events: none;
+                    &:after {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        height: 100%;
+                        width: 100%;
+                        opacity: 0.2;
+                        background-color: colors.$bzdGraphColorWhite;
+                        animation-name: bzd-notification-time-animation;
+                        animation-duration: var(--bzd-notification-time);
+                        animation-timing-function: linear;
+                        pointer-events: none;
+                        content: " ";
+                    }
                 }
 
                 > * {
