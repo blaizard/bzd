@@ -10,32 +10,32 @@
 </template>
 
 <script>
-	"use strict"
+"use strict";
 
-	import Tile from "./tile.vue";
+import Tile from "./tile.vue";
 
-	export default {
-		components: {
-			Tile
-		},
-		props: {
-			edit: {type: Boolean, mandatory: false, default: false},
-			another: {type: String, mandatory: false, default: null},
-		},
-		data: function () {
-			return {
-				tiles: {}
-			}
-		},
-		mounted() {
-			this.getTiles();
-		},
-		methods: {
-			async getTiles() {
-				this.tiles = await this.$api.request("get", "/tiles");
-			}
+export default {
+	components: {
+		Tile
+	},
+	props: {
+		edit: {type: Boolean, mandatory: false, default: false},
+		another: {type: String, mandatory: false, default: null},
+	},
+	data: function () {
+		return {
+			tiles: {}
+		};
+	},
+	mounted() {
+		this.getTiles();
+	},
+	methods: {
+		async getTiles() {
+			this.tiles = await this.$api.request("get", "/tiles");
 		}
 	}
+};
 </script>
 
 <style lang="scss">

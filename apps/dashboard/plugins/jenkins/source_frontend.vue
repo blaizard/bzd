@@ -1,8 +1,8 @@
 <script>
-    "use strict";
+"use strict";
 
-    export default {
-    }
+export default {
+};
 </script>
 
 <style lang="scss">

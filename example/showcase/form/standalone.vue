@@ -60,39 +60,39 @@
 </template>
 
 <script>
-    import Input from "bzd/vue/components/form/element/input.vue"; 
-    import Password from "bzd/vue/components/form/element/password.vue"; 
-    import Checkbox from "bzd/vue/components/form/element/checkbox.vue"; 
-    import Textarea from "bzd/vue/components/form/element/textarea.vue"; 
-    import Dropdown from "bzd/vue/components/form/element/dropdown.vue"; 
-    import Autocomplete from "bzd/vue/components/form/element/autocomplete.vue"; 
-    import Array from "bzd/vue/components/form/element/array.vue"; 
-    import Table from "bzd/vue/components/form/element/table.vue"; 
-    import File from "bzd/vue/components/form/element/file.vue"; 
-    import Carousel from "bzd/vue/components/form/element/carousel.vue"; 
-    import Editor from "bzd/vue/components/form/element/editor.vue"; 
-    import Button from "bzd/vue/components/form/element/button.vue"; 
-    import DateElement from "bzd/vue/components/form/element/date.vue"; 
+import Input from "bzd/vue/components/form/element/input.vue"; 
+import Password from "bzd/vue/components/form/element/password.vue"; 
+import Checkbox from "bzd/vue/components/form/element/checkbox.vue"; 
+import Textarea from "bzd/vue/components/form/element/textarea.vue"; 
+import Dropdown from "bzd/vue/components/form/element/dropdown.vue"; 
+import Autocomplete from "bzd/vue/components/form/element/autocomplete.vue"; 
+import Array from "bzd/vue/components/form/element/array.vue"; 
+import Table from "bzd/vue/components/form/element/table.vue"; 
+import File from "bzd/vue/components/form/element/file.vue"; 
+import Carousel from "bzd/vue/components/form/element/carousel.vue"; 
+import Editor from "bzd/vue/components/form/element/editor.vue"; 
+import Button from "bzd/vue/components/form/element/button.vue"; 
+import DateElement from "bzd/vue/components/form/element/date.vue"; 
 
-	export default {
-        components: {
-            Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, Button, DateElement
-        },
-		data: function () {
-			return {
-                input: "hello",
-                password: "world",
-                textarea: "hello\nworld!",
-                dropdown: "yes",
-                autocomplete: "",
-                date: Date.now(),
-                file: [],
-                editor: "Hello, I am <b>bold!</b>",
-                carousel: 0,
-                array: [],
-                table: [],
-                checkbox: false
-			}
-		}
+export default {
+	components: {
+		Input, Password, Checkbox, Textarea, Dropdown, Autocomplete, Array, Table, File, Carousel, Editor, Button, DateElement
+	},
+	data: function () {
+		return {
+			input: "hello",
+			password: "world",
+			textarea: "hello\nworld!",
+			dropdown: "yes",
+			autocomplete: "",
+			date: Date.now(),
+			file: [],
+			editor: "Hello, I am <b>bold!</b>",
+			carousel: 0,
+			array: [],
+			table: [],
+			checkbox: false
+		};
 	}
+};
 </script>
