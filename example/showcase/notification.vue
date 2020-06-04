@@ -7,19 +7,19 @@
 </template>
 
 <script>
-	export default {
-        methods: {
-            addInfo() {
-                this.$notification.info("Hello, I am an informative message!");
-            },
-            addError() {
-                this.$notification.error("Hello, I am an error message!");
-            },
-            addSuccess() {
-                this.$notification.success("Hello, I am a success message!");
-            }
-        }
+export default {
+	methods: {
+		addInfo() {
+			this.$notification.info("Hello, I am an informative message!");
+		},
+		addError() {
+			this.$notification.error("Hello, I am an error message!");
+		},
+		addSuccess() {
+			this.$notification.success("Hello, I am a success message!");
+		}
 	}
+};
 </script>
 
 <style lang="scss" scoped>
