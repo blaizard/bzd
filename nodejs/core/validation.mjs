@@ -108,7 +108,7 @@ export default class Validation {
 
 			if (typeof constraints == "string") {
 				const contraintList = constraints.split(" ");
-				contraintList.forEach((constraint) => {
+				contraintList.filter((constraint) => Boolean(constraint)).forEach((constraint) => {
 					const m = constraint.match(patternConstraint);
 					const name = m[1];
 					const arg = m[2];
@@ -133,6 +133,13 @@ export default class Validation {
 	 * Value must be a dictionary.
 	 */
 	validate(values, options) {
+
+		// Convert the value into a dictionary
+		if (this.singleValue) {
+			values = {
+				value: values
+			}
+		}
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
 
 		options = Object.assign({
@@ -143,7 +150,11 @@ export default class Validation {
 			/**
 			 * Callback decifing whether or not a valid is conisdered as existent
 			 */
-			valueExists: (key, value) => { return value !== undefined; }
+			valueExists: (key, value) => { return value !== undefined; },
+			/**
+			 * Ensure that all keys of values are present in the schema.
+			 */
+			all: false
 		}, options);
 
 		let result = {};
@@ -164,6 +175,13 @@ export default class Validation {
 						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
 					}
 				}
+			}
+		}
+
+		// Check that all keys have been covered
+		if (options.all) {
+			for (const key in values) {
+				Constraint.assert(result, key, key in this.schema, "Key '{}' is missing", key);
 			}
 		}
 
