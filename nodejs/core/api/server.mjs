@@ -89,6 +89,8 @@ export default class APIServer extends Base {
 			authentication = this.options.authentication;
 		}
 
+		Log.debug("Installing handler for {} {}{}", method, endpoint, (authentication === null) ? "" : " with authentication");
+
 		// Build the web options
 		let webOptions = {};
 		if ("type" in requestOptions) {

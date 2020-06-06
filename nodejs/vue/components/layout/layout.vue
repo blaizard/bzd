@@ -36,19 +36,23 @@
 		</div>
 
 		<div class="bzd-layout-content-wrapper">
-            <div v-if="$notification"
-                    v-for="entry in $notification.entries"
-                    :key="entry.key"
-                    :class="getNotificationClass(entry)"
-                    :style="getNotificationStyle(entry)">
-                <div class="bzd-notification-content">{{ entry.message }}</div>
-                <div class="bzd-notification-close" @click="notificationClose(entry)">
-                    <i class="bzd-icon-close"></i>
+
+            <template v-if="isNotification">
+                <div v-for="entry in $notification.entries"
+                        :key="entry.key"
+                        :class="getNotificationClass(entry)"
+                        :style="getNotificationStyle(entry)">
+                    <div class="bzd-notification-content">{{ entry.message }}</div>
+                    <div class="bzd-notification-close" @click="notificationClose(entry)">
+                        <i class="bzd-icon-close"></i>
+                    </div>
                 </div>
-            </div>
+            </template>
+    
             <div class="bzd-layout-content">
                 <slot name="content"></slot>
             </div>
+
 		</div>
 
 		<div class="bzd-layout-footer">
@@ -80,6 +84,9 @@ export default {
 		window.removeEventListener("resize", this.handleResize, false);
 	},
 	computed: {
+		isNotification() {
+			return (typeof this.$notification == "object");
+		},
 		classLayout() {
 			return {
 				"bzd-layout": true,
