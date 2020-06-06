@@ -1,5 +1,5 @@
 <template>
-	<component :is="component" v-bind="$attrs" :data-bzd-router-id="routerId"></component>
+	<component :is="component" v-bind="additionalProps" :data-bzd-router-id="routerId"></component>
 </template>
 
 <script>
@@ -11,7 +11,8 @@ export default {
 	data: function () {
 		return {
 			component: null,
-			routerId: null
+			routerId: null,
+			additionalProps: {}
 		};
 	},
 	methods: {
@@ -36,7 +37,7 @@ export default {
 				})
 				: component;
 			this.routerId = routerId;
-			Object.assign(this.$attrs, props);
+			this.additionalProps = Object.assign({}, this.$attrs, props);
 		}				
 	}
 };

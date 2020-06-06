@@ -200,7 +200,7 @@ class RouterManager {
 			data = await router.router.dispatch(parent.pathPropagate);
 		}
 
-		Exception.assert(data !== null, "Dispacthed information is empty.");
+		Exception.assert(data !== null, "Dispatched information is empty.");
 
 		// Update the path of the router
 		router.pathPropagate = "/" + (data.vars["bzd.core.router.rest"] || "");
