@@ -135,23 +135,28 @@ class RouterManager {
 	}
 
 	/**
-	 * Dispatch a new path to the routers
+	 * Get the current route or return null if none is detected
 	 */
-	async dispatch(path = null) {
-
-		// Read the path from the url
+	getRoute(path = null) {
 		if (path === null) {
 			const match = window.location.href.match(this.regexMatchPath);
 			if (match) {
 				path = match[1];
 			}
 		}
+		return "/" + (path || "").split("/").filter(item => item).join("/");
+	}
 
-		// Cleanup the path
-		this.path = "/" + (path || "").split("/").filter(item => item).join("/");
+	/**
+	 * Dispatch a new path to the routers
+	 */
+	async dispatch(path = null, query = {}) {
+
+		this.path = this.getRoute(path);
 
 		// Update the url
-		history.pushState(null, null, (this.options.hash) ? ("#" + this.path) : this.path);		
+		const queryStr = (Object.keys(query).length) ? ("?" + Object.keys(query).map((key) => key + "=" + encodeURIComponent(query[key])).join("&")) : "";
+		history.pushState(null, null, (this.options.hash) ? (queryStr + "#" + this.path) : (this.path + queryStr));		
 
 		// Clear all previously processed path
 		for (const [/*uid*/, config] of this.routers.entries()) {
@@ -224,7 +229,7 @@ export default class {
 
 			// Register hook
 			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
-			this.$once("hook:beforeDestroy", function() {
+			this.$once("hook:beforeDestroy", () => {
 				const uid = routers._getUid(this);
 				routers.unregisterRouter(uid);
 			});
@@ -232,8 +237,12 @@ export default class {
 			await routers.registerRouter(this, routeOptions);
 		};
 
-		Vue.prototype.$routerDispatch = async function (path) {
-			await routers.dispatch(path);
+		Vue.prototype.$routerDispatch = async (path, query = {}) => {
+			await routers.dispatch(path, query);
+		};
+
+		Vue.prototype.$routerGet = () => {
+			return routers.getRoute();
 		};
 
 		routers.dispatch();
