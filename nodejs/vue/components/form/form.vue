@@ -57,7 +57,7 @@ const elements = {
 	Input: ElementInput,
 	Password: ElementPassword,
 	Checkbox: ElementCheckbox,
-	Texarea: ElementTextarea,
+	Textarea: ElementTextarea,
 	Dropdown: ElementDropdown,
 	Autocomplete: ElementAutocomplete,
 	Button: ElementButton,
