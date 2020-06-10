@@ -4,7 +4,8 @@
 			<div v-for="value, index in valueListToDisplay"
 					:key="index"
 					:class="{'irform-array-item': true, 'irform-array-item-inline': inline, 'irform-array-item-draggable': isDraggable(index)}"
-					v-touch="getTouchConfig(index)">
+					v-touch="getTouchConfig(index)"
+					@click.stop="itemClick(index)">
 
 				<div class="irform-array-item-draghandle" v-if="gripHandle">&nbsp;</div>
 
@@ -30,7 +31,8 @@
 				<div class="irform-array-item-delete" v-if="allowDelete" @click="itemDelete(index)">x</div>
 			</div>
 		</span>
-		<span :class="{'irform-array-add': true, 'irform-disable': !isAddEnabled}">
+		
+		<span v-if="isAddEnabled || !hideAddWhenDisabled" :class="{'irform-array-add': true, 'irform-disable': !isAddEnabled}">
 			<Form :description="templateAdd"
 					:disable="!isAddEnabled"
 					@active="handleActive">
@@ -87,6 +89,10 @@ export default {
 			 * Display the grip handle
 			 */
 			gripHandle: this.getOption("gripHandle", true),
+			/**
+			 * Hide the add button when it is supposed to be disabled
+			 */
+			hideAddWhenDisabled: this.getOption("hideAddWhenDisabled", false),
 			/**
 			 * Maximum number of items (if set to 0, there is no limit)
 			 */
@@ -148,7 +154,7 @@ export default {
 	},
 	methods: {
 		isDraggable(index) {
-			return !this.disable && index < this.valueList.length;
+			return !this.disable && this.valueList.length > 1 && index < this.valueList.length;
 		},
 		getTouchConfig(index) {
 			return {
@@ -162,6 +168,8 @@ export default {
 				allowClickThrough: true,
 				triggerEvent: null
 			};
+		},
+		itemClick(/*index*/) {
 		},
 		itemAdd(content) {
 			if (this.isAddEnabled) {
