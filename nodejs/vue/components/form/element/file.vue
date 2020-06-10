@@ -1,6 +1,7 @@
 <script>
 "use strict";
 
+import Vue from "vue";
 import Upload from "../../../../core/upload.mjs";
 import Array from "./array.vue";
 import FileItem from "./file-item.vue";
@@ -9,12 +10,14 @@ export default {
 	mixins: [Array],
 	data: function() {
 
-		const isUpload = (this.getOption("upload", false) !== false);
 		let templateAdd = [];
-		if (isUpload) {
-			templateAdd.push({ type: "Button", content: {html: "<i class=\"bzd-icon-upload\"></i> Upload"}, click: this.triggerUpload });
-		}
 
+		// Add the upload button
+		const uploadContent = this.getOption("uploadContent", "<i class=\"bzd-icon-upload\"></i> Upload");
+		templateAdd.push({ type: "Button", content: {html: uploadContent}, click: this.triggerUpload });
+
+		const allowDelete = this.getOption("allowDelete", true);
+		const templateClass = this.getOption("templateClass", "");
 		return {
 			/**
 			 * Read and parse the upload response. Return the url or path of the file associated.
@@ -26,7 +29,15 @@ export default {
 			imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
 
 			// ---- Override data from Array ----
-			template: FileItem,
+			template: Vue.extend({
+				mixins: [FileItem],
+				data: function() {
+					return {
+						allowDelete: allowDelete,
+						templateClass: templateClass
+					};
+				},
+			}),
 			templateAdd: templateAdd,
 			allowDelete: false,
 			inline: true,
@@ -36,7 +47,7 @@ export default {
 		};
 	},
 	mounted() {
-		if (this.upload) {
+		if (this.isUpload) {
 			// Add drag and drop events
 			this.$el.addEventListener("dragenter", this.dragEnter, false);
 			this.$el.addEventListener("dragover", this.dragOver, false);
@@ -48,15 +59,18 @@ export default {
 		}
 	},
 	beforeDestroy() {
-		if (this.upload) {
+		if (this.isUpload) {
 			// Remove global drag event
 			document.removeEventListener("dragenter", this.globalStartDrag, false);
 			document.removeEventListener("dragleave", this.dragLeave, false);
 		}
 	},
 	computed: {
+		isUpload() {
+			return (this.getOption("upload", false) !== false);
+		},
 		upload() {
-			return (this.getOption("upload")) ? new Upload({
+			return (this.isUpload) ? new Upload({
 				/**
 				 * Upload URL, where to send the file to be uploaded
 				 */
@@ -151,7 +165,12 @@ export default {
 
 		async triggerUpload() {
 			await this.upload.trigger(/*nothrow*/true);
-		}
+		},
+
+		async itemClick(index) {
+			console.log("TESTSTS", index);
+			await this.upload.trigger(/*nothrow*/true);
+		},
 	}
 };
 </script>

@@ -18,7 +18,7 @@
 		</div>
 
 		<!-- Delete button //-->
-		<div class="irform-file-delete" @click="$emit('delete')">x</div>
+		<div v-if="allowDelete" class="irform-file-delete" @click="$emit('delete')">x</div>
 	</div>
 </template>
 
@@ -33,10 +33,12 @@ export default {
 	},
 	data: function() {
 		return {
+			allowDelete: true,
 			error: null,
 			isLoading: false,
 			imgSrc: null,
-			imageUrl: null
+			imageUrl: null,
+			templateClass: ""
 		};
 	},
 	computed: {
@@ -46,7 +48,8 @@ export default {
 				"irform-file-image": this.isImage,
 				"irform-file-file": this.isFile,
 				"irform-file-upload": this.isUpload,
-				"irform-error": this.isError
+				"irform-error": this.isError,
+				[this.templateClass]: true
 			};
 		},
 		isAvailable() {
