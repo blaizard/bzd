@@ -18,7 +18,7 @@
 		</div>
 
 		<!-- Delete button //-->
-		<div v-if="allowDelete" class="irform-file-delete" @click="$emit('delete')">x</div>
+		<div v-if="allowDelete" class="irform-file-delete" @click.stop="$emit('delete')">x</div>
 	</div>
 </template>
 

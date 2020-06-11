@@ -310,6 +310,8 @@ function getWebpackConfigDefault(isDev, config)
 		}
 	});
 
+	const stamp = String(Date.now());
+
 	return {
 		mode: (isDev) ? "development" : "production",
 		// Reduce verbosity
@@ -317,8 +319,8 @@ function getWebpackConfigDefault(isDev, config)
 		target: "web",
 		bail: true,
 		output: {
-			filename: "[name].js",
-			chunkFilename: "[chunkhash].js"
+			filename: "[name]-" + stamp + ".js",
+			chunkFilename: "[chunkhash]-" + stamp + ".js"
 		},
 		optimization: {
 			minimize: (isDev) ? false : true,
@@ -372,7 +374,7 @@ function getWebpackConfigDefault(isDev, config)
 					test: /\.(png|gif|jpg|woff|woff2|eot|ttf)$/,
 					loader: "file-loader",
 					options: {
-						name: "[hash].[ext]",
+						name: "[hash]-" + stamp + ".[ext]",
 						outputPath: (url, resourcePath, context) => {
 							let splitPath = Path.basename(resourcePath).split(".");
 							return (splitPath.length > 1)
@@ -402,8 +404,8 @@ function getWebpackConfigDefault(isDev, config)
 			}),
 			new VueLoaderPlugin(),
 			new MiniCssExtractPlugin({
-				filename: "[name].css",
-				chunkFilename: "[contenthash].css",
+				filename: "[name]-" + stamp + ".css",
+				chunkFilename: "[contenthash]-" + stamp + ".css",
 				ignoreOrder: true
 			}),
 			new WebpackAssetsManifest({

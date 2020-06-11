@@ -3,11 +3,11 @@
 
 import Vue from "vue";
 import Upload from "../../../../core/upload.mjs";
-import Array from "./array.vue";
+import ArrayElement from "./array.vue";
 import FileItem from "./file-item.vue";
 
 export default {
-	mixins: [Array],
+	mixins: [ArrayElement],
 	data: function() {
 
 		let templateAdd = [];
@@ -28,7 +28,7 @@ export default {
 			 */
 			imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
 
-			// ---- Override data from Array ----
+			// ---- Override data from ArrayElement ----
 			template: Vue.extend({
 				mixins: [FileItem],
 				data: function() {
@@ -141,9 +141,13 @@ export default {
 			e.stopPropagation();
 			e.preventDefault();
 		},
-		drop(e) {
+		async drop(e) {
 			e.stopPropagation();
 			e.preventDefault();
+			// Special case, only 1 file and no slot left
+			if (this.max == 1 && this.nbLeft == 0) {
+				await this.itemDelete(0);
+			}
 			this.upload.handleFiles(e.dataTransfer.files, /*nothrow*/true);
 			this.globalStopDrag();
 		},
@@ -152,14 +156,14 @@ export default {
 			return this.uploadValueList.findIndex((uploadItem) => uploadItem.uid === item.uid);
 		},
 
-		itemDelete(index) {
+		async itemDelete(index) {
 			// Means this is about the uploadValueList
 			if (index >= this.valueList.length) {
 				const indexUpload = index - this.valueList.length;
 				this.uploadValueList[indexUpload].cancel();
 			}
 			else {
-				Array.methods.itemDelete.call(this, index);
+				await ArrayElement.methods.itemDelete.call(this, index);
 			}
 		},
 
@@ -168,8 +172,11 @@ export default {
 		},
 
 		async itemClick(index) {
-			console.log("TESTSTS", index);
-			await this.upload.trigger(/*nothrow*/true);
+			await this.upload.trigger(/*nothrow*/true, {
+				beforeUpload: async () => {
+					await this.itemDelete(index);
+				}
+			});
 		},
 	}
 };

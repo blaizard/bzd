@@ -155,7 +155,7 @@ export default {
 		get(freezeOnEdit = false) {
 			return (freezeOnEdit) ? this.internalValue : this.externalValue;
 		},
-		set(value) {
+		async set(value) {
 			if (!this.disable) {
 				let errorList = [];
 
@@ -177,6 +177,8 @@ export default {
 					 * This to give the opportunity to safely update the global value in this callback.
 					 */
 					(this.getOption("onchange", () => {}))(value);
+
+					await this.$nextTick();
 				}
 				else {
 					this.setError(errorList);

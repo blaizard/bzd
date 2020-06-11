@@ -171,28 +171,28 @@ export default {
 		},
 		itemClick(/*index*/) {
 		},
-		itemAdd(content) {
+		async itemAdd(content) {
 			if (this.isAddEnabled) {
 				let valueList = this.valueList.slice(0);
 				valueList.push(content || {});
-				this.set(valueList);
+				await this.set(valueList);
 			}
 		},
-		itemUpdate(index, value) {
+		async itemUpdate(index, value) {
 			let valueList = this.valueList.slice(0);
 			valueList[index] = value;
-			this.set(valueList);
+			await this.set(valueList);
 		},
-		itemDelete(index) {
+		async itemDelete(index) {
 			let valueList = this.valueList.slice(0);
 			valueList.splice(index, 1);
-			this.set(valueList);
+			await this.set(valueList);
 		},
-		itemMove(indexFrom, indexTo) {
+		async itemMove(indexFrom, indexTo) {
 			let valueList = this.valueList.slice(0);
 			const elt = valueList.splice(indexFrom, 1)[0];
 			valueList.splice(indexTo, 0, elt);
-			this.set(valueList);
+			await this.set(valueList);
 		}
 	}
 };
