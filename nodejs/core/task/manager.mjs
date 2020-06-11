@@ -58,6 +58,8 @@ export default class Manager {
 
 		// If the task is already registered, unregister it
 		if (this.isRegistered(task.id)) {
+			Log.info("Task already registered '{}', replacing", task);
+			console.log(JSON.stringify(this.tasks));
 			this.unregister(task.id);
 		}
 

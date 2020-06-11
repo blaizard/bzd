@@ -80,7 +80,14 @@ export default class Upload {
 	 *
 	 * \param nothrow Set to true if the function should no throw exception
 	 */
-	async trigger(nothrow) {
+	async trigger(nothrow, options) {
+		options = Object.assign({
+			/**
+			 * Callback to be called before the upload process takes place
+			 */
+			beforeUpload: async () => {}
+		}, options);
+
 		return new Promise((resolve, reject) => {
 
 			// Create the uploader
@@ -106,7 +113,8 @@ export default class Upload {
 				}).filter((filter) => Boolean(filter)).join(","));
 			}
 			input.style.display = "none";
-			input.addEventListener("change", () => {
+			input.addEventListener("change", async () => {
+				await options.beforeUpload();
 				this.handleFiles(input.files, nothrow).then(resolve).catch(reject);
 			}, false);
 

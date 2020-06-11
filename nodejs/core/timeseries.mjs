@@ -140,6 +140,7 @@ export default class TimeSeries {
 		}
 
 		let index = this.find(timestampStart, (inclusive) ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER);
+		index = Math.max(0, index);
 		let prevTimestamp = -Number.MAX_VALUE;
 		for (; index < this.data.length; ++index) {
 			if (timestampEnd < this.data[index][0]) {

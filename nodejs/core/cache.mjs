@@ -45,8 +45,8 @@ class Cache
 	 */
 	register(collection, trigger, options) {
 
-		Exception.assert(typeof collection === "string", "register(...) must take a string as first argument.");
-		Exception.assert(typeof trigger === "function", "register(...) must take a function as second argument.");
+		Exception.assert(typeof collection === "string", "register(...) must take a string as first argument: {:j}", collection);
+		Exception.assert(typeof trigger === "function", "register(...) must take a function as second argument: {:j}", trigger);
 		Exception.assert(collection.match(/^[a-z0-9.-]+$/i), "Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].", collection);
 		Exception.assert(!(collection in this.data), "The collection '{}' has already been registered.", collection);
 
