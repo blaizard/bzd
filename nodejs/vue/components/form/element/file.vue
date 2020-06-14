@@ -1,5 +1,5 @@
 <script>
-"use strict";
+
 
 import Vue from "vue";
 import Upload from "../../../../core/upload.mjs";

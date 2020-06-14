@@ -4,7 +4,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 export default {
 	props: {

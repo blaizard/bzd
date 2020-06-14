@@ -32,7 +32,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Item from "./item.vue";
 import Validation from "../../../core/validation.mjs";

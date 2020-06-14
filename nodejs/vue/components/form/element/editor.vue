@@ -21,7 +21,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import ElementCarousel from "./carousel.vue";

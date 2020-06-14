@@ -1,5 +1,5 @@
 <script>
-"use strict";
+
 
 import Validation from "../../../../core/validation.mjs";
 

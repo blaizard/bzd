@@ -29,6 +29,21 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "cache",
+    srcs = [
+        "cache.mjs",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:cache",
+        "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_library(
     name = "notification",
     srcs = [
         "notification.mjs",

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Loading from "./router_loading.vue";
 

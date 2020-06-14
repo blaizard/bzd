@@ -7,7 +7,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Dropdown from "./dropdown.vue";
 

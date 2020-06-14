@@ -59,7 +59,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import PlotText from "./utils/text.vue";

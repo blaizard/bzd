@@ -1,3 +1,5 @@
+"use strict";
+
 import API from "../core/api/client.mjs";
 
 export default {

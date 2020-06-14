@@ -16,7 +16,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Colors from "bzd-style/css/colors.scss";
 import DirectiveLoading from "bzd/vue/directives/loading.mjs";

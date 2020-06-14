@@ -20,7 +20,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 import Layout from "bzd/vue/components/layout/layout.vue";

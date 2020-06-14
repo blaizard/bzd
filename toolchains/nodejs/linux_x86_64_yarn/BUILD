@@ -13,8 +13,8 @@ sh_binary_wrapper(
     name = "node",
     binary = "@node//:node",
     command = select({
-        "//tools/bazel_build/config:dev": "export NODE_ENV=development && {binary} --experimental-json-modules --preserve-symlinks --preserve-symlinks-main $@",
-        "//conditions:default": "export NODE_ENV=production && {binary} --experimental-json-modules --preserve-symlinks --preserve-symlinks-main $@",
+        "//tools/bazel_build/config:dev": "export NODE_ENV=development && {binary} --experimental-json-modules --preserve-symlinks --preserve-symlinks-main --use-strict $@",
+        "//conditions:default": "export NODE_ENV=production && {binary} --experimental-json-modules --preserve-symlinks --preserve-symlinks-main --use-strict $@",
     }),
     visibility = ["//visibility:public"],
 )

@@ -31,7 +31,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import TableItem from "./table-item.vue";

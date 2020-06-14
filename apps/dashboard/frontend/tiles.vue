@@ -10,7 +10,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Tile from "./tile.vue";
 

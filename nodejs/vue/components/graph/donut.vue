@@ -15,7 +15,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import HoverChildren from "./directive/hover-children.mjs";
