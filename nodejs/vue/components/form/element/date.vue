@@ -61,7 +61,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import DropdownTemplate from "./dropdown-template.vue";

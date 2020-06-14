@@ -17,7 +17,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import HoverChildren from "./directive/hover-children.mjs";
 import { tooltipHide } from "../../directives/tooltip.mjs";

@@ -1,5 +1,5 @@
 <script>
-"use strict";
+
 
 export default {
 };

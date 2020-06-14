@@ -12,7 +12,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 

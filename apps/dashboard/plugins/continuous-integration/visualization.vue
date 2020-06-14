@@ -29,7 +29,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Plot from "bzd/vue/components/graph/plot.vue"; 
 

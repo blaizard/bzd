@@ -16,7 +16,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import ElementInput from "./input.vue";

@@ -112,6 +112,13 @@ class Cache
 	}
 
 	/**
+	 * \brief Check if the ressource is dirty
+	 */
+	isDirty(collection, ...ids) {
+		return isDirty.call(this, collection, ...ids);
+	}
+
+	/**
 	 * \brief Get the size of the data at the specific location.
 	 * If not data, return 0.
 	 *
@@ -283,6 +290,16 @@ function getObject(collection, ...ids)
 }
 
 /**
+ * Check if the ressource is dirty
+ */
+function isDirty(collection, ...ids)
+{
+	const id = idsToId.call(this, collection, ...ids);
+	const dataId = this.data[collection][id];
+	return ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs()));
+}
+
+/**
  * \brief Get the data requested. Wait until it is available.
  *
  * \param instant If set, and if the data is dirty it will return it
@@ -308,6 +325,7 @@ async function get(instant, collection, ...ids)
 
 		// isFetching
 		if (typeof dataId === "object" && "_fetching" in dataId) {
+
 			// If instant and there are previous data, return it
 			if (instant) {
 				if ("_error" in dataId) {
@@ -326,17 +344,20 @@ async function get(instant, collection, ...ids)
 			}
 		}
 		// isDirty
-		else if ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs())) {
+		else if (isDirty.call(this, collection, ...ids)) {
+
 			timestampFetch = Cache.getTimestampMs();
 			triggerUpdate.call(this, collection, id, ...ids);
 		}
 		// isError
 		else if ("_error" in dataId) {
+
 			Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
 			throw new Exception(dataId._error);
 		}
 		// isData
 		else if ("_data" in dataId) {
+
 			Log.debug("GET {}::{} ({})", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
 			return dataId._data;
 		}
@@ -406,9 +427,15 @@ async function triggerUpdate(collection, id, ...ids)
 			timeout: ("_timeoutMs" in dataCollection) ? dataCollection._timeoutMs : null
 		};
 		dataId._data = await dataCollection._trigger.call(this, ...ids, /*Previous value if any*/dataId._data, /*To overwrite options*/options);
+		
 		if (options.timeout) {
 			dataId._timeout = Cache.getTimestampMs() + Math.max(1, options.timeout);
 		}
+		else {
+			// Delete any timeout, as this is how dirty is set
+			delete dataId._timeout;
+		}
+	
 		Exception.assert(typeof dataId._data !== "undefined", "Trigger function returned undefined data type for collection '{}'", collection);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
 		delete dataId._error;

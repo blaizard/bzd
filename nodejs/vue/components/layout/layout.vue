@@ -62,7 +62,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import LocalStorage from "bzd/core/localstorage.mjs";
 import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";

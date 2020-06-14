@@ -5,7 +5,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Item from "../item.vue";
 

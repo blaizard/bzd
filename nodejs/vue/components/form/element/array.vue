@@ -42,7 +42,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Element from "./element.vue";
 import Touch from "../../../directives/touch.mjs";

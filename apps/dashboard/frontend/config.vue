@@ -16,7 +16,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import Form from "bzd/vue/components/form/form.vue";
 import Button from "bzd/vue/components/form/element/button.vue";

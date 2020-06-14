@@ -3,7 +3,7 @@
 </template>
 
 <script>
-"use strict";
+
 
 import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 

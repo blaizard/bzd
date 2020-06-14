@@ -1,5 +1,5 @@
 <script>
-"use strict";
+
 
 import Input from "./input.vue";
 
