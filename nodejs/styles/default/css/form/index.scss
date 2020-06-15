@@ -246,6 +246,7 @@ $disableBgColor: #eee !default;
  * Button template
  */
 @mixin button($width, $color, $bgColor: transparent) {
+
 	position: relative;
 	width: #{$width}px;
 	height: #{$width}px;
@@ -255,6 +256,9 @@ $disableBgColor: #eee !default;
 	opacity: 0.5;
 	display: inline-block;
 	vertical-align: middle;
+
+	text-align: center;
+	line-height: #{$width}px;
 
 	// Background
 	border-radius: #{$width}px;

@@ -5,7 +5,7 @@
 
 		<!-- Image //-->
 		<div v-if="isLoading">...</div>
-		<img v-else-if="isImage" :src="imgSrc" draggable="false" ondragstart="return false;" />
+		<img v-else-if="isImage" :src="imgSrc" draggable="false" ondragstart="return false;" v-touch="touchDirective" :style="styleImage" />
 		<i v-else class="irform-icon-file"></i>
 
 		<!-- Name //-->
@@ -18,18 +18,25 @@
 		</div>
 
 		<!-- Delete button //-->
-		<div v-if="allowDelete" class="irform-file-delete" @click.stop="$emit('delete')">x</div>
+		<div class="irform-file-actions">
+			<div v-if="templateEdit && isImage" class="irform-file-zoom-in" @click.stop="handleZoomIn">+</div>
+			<div v-if="templateEdit && isImage" class="irform-file-zoom-out" @click.stop="handleZoomOut">-</div>
+			<div v-if="allowDelete" class="irform-file-delete" @click.stop="$emit('delete')">x</div>
+		</div>
 	</div>
 </template>
 
 <script>
-
+import Touch from "../../../directives/touch.mjs";
 
 export default {
 	props: {
 		value: {type: Object | String, required: true, default: () => ({})},
 		disable: {type: Boolean, required: false, default: false},
 		config: {type: Object, required: true, default: () => ({})}
+	},
+	directives: {
+		touch: Touch
 	},
 	data: function() {
 		return {
@@ -38,7 +45,13 @@ export default {
 			isLoading: false,
 			imgSrc: null,
 			imageUrl: null,
-			templateClass: ""
+			templateClass: "",
+			templateEdit: false,
+			imageEdit: {
+				x: 0,
+				y: 0,
+				scale: 1
+			}
 		};
 	},
 	computed: {
@@ -51,6 +64,19 @@ export default {
 				"irform-error": this.isError,
 				[this.templateClass]: true
 			};
+		},
+		touchDirective() {
+			return {
+				enable: this.templateEdit,
+				nop: false,
+				ondrag: (x, y) => {
+					this.imageEdit.x = x;
+					this.imageEdit.y = y;
+				}
+			};
+		},
+		styleImage() {
+			return "left: " + this.imageEdit.x + "px; top: " + this.imageEdit.y + "px; transform: scale(" + this.imageEdit.scale + ");";
 		},
 		isAvailable() {
 			return (typeof this.value === "string");
@@ -120,6 +146,12 @@ export default {
 		},
 	},
 	methods: {
+		handleZoomIn() {
+			this.imageEdit.scale *= 1.1;
+		},
+		handleZoomOut() {
+			this.imageEdit.scale /= 1.1;
+		},
 		imagePreload(url) {
 			let imagePreload = new Image();
 			this.isLoading = true;
@@ -136,3 +168,11 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss" scoped>
+	.irform-file-image {
+		img {
+			position: relative;
+		}
+	}
+</style>

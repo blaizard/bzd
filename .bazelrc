@@ -2,6 +2,9 @@ common --announce_rc
 
 try-import .bazelrc.local
 
+# Add timestamps
+common --show_timestamps
+
 # Build specific options
 build --verbose_failures
 
@@ -23,6 +26,9 @@ build --nodistinct_host_configuration
 
 # Add stamping
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
+
+# Increase hermeticity
+build --incompatible_strict_action_env
 
 # Development and production configuration
 build:dev --copt "-O0"
