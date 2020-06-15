@@ -45,6 +45,7 @@ body.irform-file-drag .irform-array-file {
 	justify-content: center;
 
 	&.irform-file-image {
+		overflow: hidden;
 		img {
 			max-height: 100%;
 			max-width: 100%;
@@ -87,12 +88,29 @@ body.irform-file-drag .irform-array-file {
 		font-size: .8em;
 	}
 
-	.irform-file-delete {
-		@include base.buttonClose(base.$fieldHeight / 1.5, base.$actionerTextColor, base.$fieldHeight / 2.5, base.$actionerBgColor);
-
+	.irform-file-actions {
 		position: absolute;
 		top: #{$borderWidth + 2}px;
 		right: #{$borderWidth + 2}px;
+
+		display: flex;
+		flex-flow: row nowrap;
+
+		> * {
+			margin-left: 5px;
+		}
+
+		.irform-file-zoom-in {
+			@include base.button(base.$fieldHeight / 1.5, base.$actionerTextColor, base.$actionerBgColor);
+		}
+
+		.irform-file-zoom-out {
+			@include base.button(base.$fieldHeight / 1.5, base.$actionerTextColor, base.$actionerBgColor);
+		}
+
+		.irform-file-delete {
+			@include base.buttonClose(base.$fieldHeight / 1.5, base.$actionerTextColor, base.$fieldHeight / 2.5, base.$actionerBgColor);
+		}
 	}
 }
 

@@ -14,10 +14,11 @@ export default {
 
 		// Add the upload button
 		const uploadContent = this.getOption("uploadContent", "<i class=\"bzd-icon-upload\"></i> Upload");
-		templateAdd.push({ type: "Button", content: {html: uploadContent}, click: this.triggerUpload });
+		templateAdd.push({ type: "Button", content: {html: uploadContent}, click: this.triggerUpload, align: this.getOption("align", "left") });
 
 		const allowDelete = this.getOption("allowDelete", true);
 		const templateClass = this.getOption("templateClass", "");
+		const templateEdit = this.getOption("templateEdit", false);
 		return {
 			/**
 			 * Read and parse the upload response. Return the url or path of the file associated.
@@ -34,7 +35,8 @@ export default {
 				data: function() {
 					return {
 						allowDelete: allowDelete,
-						templateClass: templateClass
+						templateClass: templateClass,
+						templateEdit: templateEdit
 					};
 				},
 			}),
