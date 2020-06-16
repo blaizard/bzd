@@ -51,6 +51,7 @@ export default {
 		buttonClass() {
 			return {
 				"irform-button": true,
+				"irform-fill": this.getOption("fill", false),
 				[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false)
 			};
 		},

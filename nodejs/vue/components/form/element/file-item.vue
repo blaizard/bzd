@@ -5,7 +5,7 @@
 
 		<!-- Image //-->
 		<div v-if="isLoading">...</div>
-		<img v-else-if="isImage" :src="imgSrc" draggable="false" ondragstart="return false;" v-touch="touchDirective" :style="styleImage" />
+		<img v-else-if="isImage" :src="imageSrc" draggable="false" ondragstart="return false;" v-touch="touchDirective" :style="styleImage" />
 		<i v-else class="irform-icon-file"></i>
 
 		<!-- Name //-->
@@ -43,16 +43,29 @@ export default {
 			allowDelete: true,
 			error: null,
 			isLoading: false,
-			imgSrc: null,
-			imageUrl: null,
 			templateClass: "",
 			templateEdit: false,
+			imageSrc: null,
+			imageUrl: null,
+			imageFill: "cover",
 			imageEdit: {
+				containerWidth: 0,
+				containerHeight: 0,
 				x: 0,
 				y: 0,
-				scale: 1
+				width: 0,
+				height: 0
+			},
+			current: {
+				x: 0,
+				y: 0
 			}
 		};
+	},
+	mounted() {
+		const rect = this.$el.getBoundingClientRect();
+		this.imageEdit.containerWidth = rect.width;
+		this.imageEdit.containerHeight = rect.height;
 	},
 	computed: {
 		containerClass() {
@@ -70,16 +83,23 @@ export default {
 				enable: this.templateEdit,
 				nop: false,
 				ondrag: (x, y) => {
-					this.imageEdit.x = x;
-					this.imageEdit.y = y;
+					this.current.x = x;
+					this.current.y = y;
+				},
+				onstopdrag: (x, y) => {
+					this.imageEdit.x += this.current.x;
+					this.imageEdit.y += this.current.y;
+					this.current.x = 0;
+					this.current.y = 0;
+					this.updateValue();
 				}
 			};
 		},
 		styleImage() {
-			return "left: " + this.imageEdit.x + "px; top: " + this.imageEdit.y + "px; transform: scale(" + this.imageEdit.scale + ");";
+			return "left: " + (this.imageEdit.x + this.current.x) + "px; top: " + (this.imageEdit.y + this.current.y) + "px; width: " + this.imageEdit.width + "px; height: " + this.imageEdit.height + "px;";
 		},
 		isAvailable() {
-			return (typeof this.value === "string");
+			return (typeof this.value === "string") || ("path" in this.value);
 		},
 		isError() {
 			return (!this.isAvailable && this.value.error) || this.error;
@@ -95,6 +115,12 @@ export default {
 		},
 		isUpload() {
 			return !this.isAvailable;
+		},
+		path() {
+			if (typeof this.value === "string") {
+				return this.value;
+			}
+			return this.value.path;
 		},
 		progress() {
 			return Math.min(this.value.currentBytes / this.value.totalBytes, 1);
@@ -113,7 +139,7 @@ export default {
 			return String(Math.round(size * 100) / 100) + unitList[unitIndex];
 		},
 		fileName() {
-			const path = (this.isAvailable) ? this.value : this.value.fileName;
+			const path = (this.isAvailable) ? this.path : this.value.fileName;
 			return path.split("/").pop();
 		}
 	},
@@ -132,11 +158,11 @@ export default {
 		},
 		value: {
 			immediate: true,
-			handler: async function (value) {
+			handler: async function () {
 				this.imageUrl = null;
 				if (this.isAvailable) {
 					if (typeof this.config.imageToUrl === "function") {
-						this.imageUrl = await this.config.imageToUrl(value);
+						this.imageUrl = await this.config.imageToUrl(this.path);
 					}
 					else if (typeof this.config.imageToUrl === "string") {
 						this.imageUrl = this.config.imageToUrl;
@@ -147,23 +173,48 @@ export default {
 	},
 	methods: {
 		handleZoomIn() {
-			this.imageEdit.scale *= 1.1;
+			this.imageEdit.width *= 1.1;
+			this.imageEdit.height *= 1.1;
+			this.updateValue();
 		},
 		handleZoomOut() {
-			this.imageEdit.scale /= 1.1;
+			this.imageEdit.width /= 1.1;
+			this.imageEdit.height /= 1.1;
+			this.updateValue();
 		},
 		imagePreload(url) {
 			let imagePreload = new Image();
 			this.isLoading = true;
 			imagePreload.onload = () => {
-				this.imgSrc = imagePreload.src;
+				this.imageSrc = imagePreload.src;
 				this.isLoading = false;
+
+				const ratioX = this.imageEdit.containerWidth / imagePreload.width;
+				const ratioY = this.imageEdit.containerHeight / imagePreload.height;
+				let scale = 1.;
+				switch (this.imageFill) {
+				case "cover":
+					scale = (ratioX > ratioY) ? ratioX : ratioY;
+					break;
+				case "contain":
+					scale = (ratioX > ratioY) ? ratioY : ratioX;
+					break;
+				}
+				this.imageEdit.width = (this.value.width) || (imagePreload.width * scale);
+				this.imageEdit.height = (this.value.height) || (imagePreload.height * scale);
 			};
 			imagePreload.onerror = () => {
 				this.error = "Cannot load image";
 				this.isLoading = false;
 			};
 			imagePreload.src = url;
+		},
+		updateValue() {
+			const value =  Object.assign({
+				path: this.path
+			}, this.imageEdit);
+			console.log("value", value);
+			this.$emit("input", value);
 		}
 	}
 };

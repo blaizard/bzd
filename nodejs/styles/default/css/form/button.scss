@@ -28,6 +28,13 @@
 	}
 }
 
+// Fill
+.irform-fill .irform-button,
+.irform-button.irform-fill {
+	width: 100%;
+	height: 100%;
+}
+
 // Error
 .irform-error .irform-button,
 .irform-button.irform-error {
