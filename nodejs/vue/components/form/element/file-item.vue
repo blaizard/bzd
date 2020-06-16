@@ -86,7 +86,7 @@ export default {
 					this.current.x = x;
 					this.current.y = y;
 				},
-				onstopdrag: (x, y) => {
+				onstopdrag: () => {
 					this.imageEdit.x += this.current.x;
 					this.imageEdit.y += this.current.y;
 					this.current.x = 0;
