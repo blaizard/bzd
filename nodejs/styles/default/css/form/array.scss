@@ -1,6 +1,28 @@
 @use "index.scss" as base;
 
 .irform-array {
+
+	&.irform-fill {
+		width: 100%;
+		height: 100%;
+		.irform-array-items {
+			width: 100%;
+			height: 100%;
+			.irform-array-item {
+				width: 100% !important;
+				height: 100%;
+				> .irform-array-item-body {
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+		.irform-array-add {
+			width: 100%;
+			height: 100%;
+		}
+	}
+
 	.irform-array-items {
 		display: flex;
 		flex-flow: row wrap;

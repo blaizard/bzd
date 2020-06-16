@@ -21,6 +21,9 @@ test --test_output=errors
 test --verbose_failures
 test --define=panic=throw
 
+# Coverage specific options
+coverage --combined_report=lcov
+
 # Prevent building twice tools used for host and target, for nodejs rules for example.
 build --nodistinct_host_configuration
 

@@ -19,6 +19,7 @@ export default {
 		const allowDelete = this.getOption("allowDelete", true);
 		const templateClass = this.getOption("templateClass", "");
 		const templateEdit = this.getOption("templateEdit", false);
+		const imageFill = this.getOption("imageFill", "cover");
 		return {
 			/**
 			 * Read and parse the upload response. Return the url or path of the file associated.
@@ -36,7 +37,8 @@ export default {
 					return {
 						allowDelete: allowDelete,
 						templateClass: templateClass,
-						templateEdit: templateEdit
+						templateEdit: templateEdit,
+						imageFill: imageFill
 					};
 				},
 			}),
@@ -104,7 +106,11 @@ export default {
 		},
 		// Overload internal attributes
 		containerClass() {
-			return "irform-array irform-array-file";
+			return {
+				"irform-array": true,
+				"irform-array-file": true,
+				"irform-fill": this.fill
+			};
 		},
 		valueListToDisplay() {
 			return this.valueList.concat(this.uploadValueList);

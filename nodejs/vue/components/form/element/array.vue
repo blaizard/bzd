@@ -1,6 +1,6 @@
 <template>
 	<div :class="containerClass">
-		<span class="irform-array-items" @click.stop="">
+		<span v-if="valueListToDisplay.length" class="irform-array-items" @click.stop="">
 			<div v-for="value, index in valueListToDisplay"
 					:key="index"
 					:class="{'irform-array-item': true, 'irform-array-item-inline': inline, 'irform-array-item-draggable': isDraggable(index)}"
@@ -31,7 +31,7 @@
 				<div class="irform-array-item-delete" v-if="allowDelete" @click="itemDelete(index)">x</div>
 			</div>
 		</span>
-		
+
 		<span v-if="isAddEnabled || !hideAddWhenDisabled" :class="{'irform-array-add': true, 'irform-disable': !isAddEnabled}">
 			<Form :description="templateAdd"
 					:disable="!isAddEnabled"
@@ -96,7 +96,12 @@ export default {
 			/**
 			 * Maximum number of items (if set to 0, there is no limit)
 			 */
-			max: this.getOption("max", 0)
+			max: this.getOption("max", 0),
+			/**
+			 * Let the component fill the whole available space,
+			 * this should be only used when max = 1
+			 */
+			fill: this.getOption("fill", false)
 		};
 	},
 	computed: {
@@ -104,7 +109,10 @@ export default {
 			return "list";
 		},
 		containerClass() {
-			return "irform-array";
+			return {
+				"irform-array": true,
+				"irform-fill": this.fill
+			};
 		},
 		/**
 		 * Returns true if an element in the list is empty
