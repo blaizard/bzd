@@ -103,6 +103,19 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
         ],
+        "coverage_compile_flags": [
+            "-fprofile-instr-generate",
+            "-fcoverage-mapping",
+            "-fprofile-arcs",
+            "-ftest-coverage",
+            "-fno-inline",
+            "-O0",
+        ],
+        "coverage_link_flags": [
+            "-fprofile-instr-generate",
+            "-fcoverage-mapping",
+            "-fprofile-arcs",
+        ],
         "dynamic_runtime_libs": [
             "@{}//:dynamic_libraries".format(clang_package_name),
         ],

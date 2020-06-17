@@ -40,7 +40,7 @@ cc_toolchain_config(
     name = "cc-toolchain-config",
     cpu = "%{cpu}",
     compiler = "%{compiler}",
-    toolchain_identifier = "cc-toolchain-identifier-%{cpu}",
+    toolchain_identifier = "cc-toolchain-identifier-%{cpu}-%{compiler}",
     host_system_name = "i686-unknown-linux-gnu",
     target_system_name = "local",
     target_libc = "glibc_unknown",
@@ -72,6 +72,12 @@ cc_toolchain_config(
     ],
     link_libs = [],
     opt_link_flags = [],
+    coverage_compile_flags = [
+        %{coverage_compile_flags}
+    ],
+    coverage_link_flags = [
+        %{coverage_link_flags}
+    ],
     unfiltered_compile_flags = [],
     supports_start_end_lib = False,
 )
@@ -91,7 +97,7 @@ cc_toolchain(
     static_runtime_lib = ":static_runtime_libs",
 
     toolchain_config = ":cc-toolchain-config",
-    toolchain_identifier = "cc-toolchain-identifier-%{cpu}",
+    toolchain_identifier = "cc-toolchain-identifier-%{cpu}-%{compiler}",
 
     supports_param_files = True,
 )

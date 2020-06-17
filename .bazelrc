@@ -39,8 +39,15 @@ build:dev --define=build=dev
 build:prod --copt "-Os"
 build:prod --define=build=prod
 
+# linux_x86_64_gcc
+build:linux_x86_64_gcc --platforms="@linux_x86_64_gcc//:platform"
+build:linux_x86_64_gcc --extra_execution_platforms="@linux_x86_64_gcc//:host_platform"
+build:linux_x86_64_gcc --incompatible_enable_cc_toolchain_resolution
+build:linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc
+
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
+build:linux_x86_64_clang --extra_execution_platforms="@linux_x86_64_clang//:host_platform"
 build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
 build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
