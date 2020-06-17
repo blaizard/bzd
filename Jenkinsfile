@@ -68,6 +68,13 @@ pipeline
 						sh "bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
 				}
+				stage("Coverage")
+				{
+					steps
+					{
+						sh "bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
+					}
+				}
 			}
 		}
 		/**

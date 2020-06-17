@@ -76,6 +76,8 @@ def _impl(ctx):
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
         "%{app_kwargs}": "\n".join(app_kwargs),
+        "%{coverage_compile_flags}": "\n".join(["'{}',".format(t) for t in ctx.attr.coverage_compile_flags]),
+        "%{coverage_link_flags}": "\n".join(["'{}',".format(t) for t in ctx.attr.coverage_link_flags]),
     }
 
     # Apply substitutions
@@ -120,6 +122,9 @@ _toolchain_maker_linux = repository_rule(
         # Flags
         "link_flags": attr.string_list(),
         "compile_flags": attr.string_list(),
+        # Coverage
+        "coverage_compile_flags": attr.string_list(),
+        "coverage_link_flags": attr.string_list(),
         # Alias
         "alias": attr.string_dict(),
         # Tools

@@ -183,10 +183,13 @@ export default {
 			this.updateValue();
 		},
 		imagePreload(url) {
+			if (this.imageSrc == url) {
+				return;
+			}
 			let imagePreload = new Image();
 			this.isLoading = true;
 			imagePreload.onload = () => {
-				this.imageSrc = imagePreload.src;
+				this.imageSrc = url;
 				this.isLoading = false;
 
 				const ratioX = this.imageEdit.containerWidth / imagePreload.width;

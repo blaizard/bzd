@@ -32,6 +32,12 @@ load("//tools/documentation:dependencies.bzl", "documentation_load")
 
 documentation_load()
 
+# Coverage
+
+load("//tools/coverage:dependencies.bzl", "coverage_load")
+
+coverage_load()
+
 # Sanitizer
 
 load("//tools/sanitizer:dependencies.bzl", "sanitizer_load")
