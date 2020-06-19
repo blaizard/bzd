@@ -265,7 +265,10 @@ export default class Web {
 		}
 
 		if (options.type.indexOf("upload") != -1) {
-			let upload = Multer({ storage: this.storage, limits: { fileSize: options.limit } });
+			let upload = Multer({
+				storage: this.storage,
+				limits: { fileSize: options.limit },
+			});
 			callbackList.unshift(upload.any());
 		}
 

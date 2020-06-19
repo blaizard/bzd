@@ -170,7 +170,7 @@ export default {
 		},
 		handleError(name, messageList) {
 			if (messageList) {
-				this.$set(this.errors, name, messageList);
+				this.$set(this.errors, name, (Array.isArray(messageList)) ? messageList : [messageList]);
 			}
 			else {
 				this.$delete(this.errors, name);
