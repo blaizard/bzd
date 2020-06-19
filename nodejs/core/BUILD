@@ -144,6 +144,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "stream",
+    srcs = [
+        "stream.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+    ],
+)
+
+bzd_nodejs_library(
     name = "template",
     srcs = [
         "template.mjs",

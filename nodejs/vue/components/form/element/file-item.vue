@@ -205,6 +205,9 @@ export default {
 				}
 				this.imageEdit.width = (this.value.width) || (imagePreload.width * scale);
 				this.imageEdit.height = (this.value.height) || (imagePreload.height * scale);
+				this.imageEdit.x = (this.imageEdit.containerWidth - this.imageEdit.width) / 2;
+				this.imageEdit.y = (this.imageEdit.containerHeight - this.imageEdit.height) / 2;
+				this.updateValue();
 			};
 			imagePreload.onerror = () => {
 				this.error = "Cannot load image";
@@ -216,7 +219,6 @@ export default {
 			const value =  Object.assign({
 				path: this.path
 			}, this.imageEdit);
-			console.log("value", value);
 			this.$emit("input", value);
 		}
 	}
@@ -225,8 +227,9 @@ export default {
 
 <style lang="scss" scoped>
 	.irform-file-image {
+		position: relative;
 		img {
-			position: relative;
+			position: absolute;
 		}
 	}
 </style>
