@@ -13,36 +13,32 @@ addons:
 git:
   submodules: false
 
-before_install:
-  - wget https://github.com/bazelbuild/bazel/releases/download/3.2.0/bazel_3.2.0-linux-x86_64.deb
-  - sudo dpkg -i bazel_3.2.0-linux-x86_64.deb
-
 jobs:
   include:
     - name: Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --output_groups=default,metadata --config=prod
+      - ./tools/bazel test ... --output_groups=default,metadata --config=prod
 
     - name: Development
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --output_groups=default,metadata --config=dev
+      - ./tools/bazel test ... --output_groups=default,metadata --config=dev
 
     - name: linux_x86_64_clang
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
+      - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
     - name: esp32_xtensa_lx6_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel build ... --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
+      - ./tools/bazel build ... --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
     - name: Sanitizer
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
+      - ./tools/bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
 
     - name: Sanitizer Script
       script:

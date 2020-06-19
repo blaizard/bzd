@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+# -*- coding: iso-8859-1 -*-
+
+import os
+import sys
+import subprocess
+import requests
+import stat
+
+if __name__== "__main__":
+
+	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
+	bazeliskInstallPath = os.path.join(bazelDirectory, "bazelisk")
+	bazelExecPath = os.environ["BAZEL_REAL"] if "BAZEL_REAL" in os.environ else bazeliskInstallPath
+
+	# If bazel is not installed / available
+	if not os.path.exists(bazelExecPath):
+		print("No bazel binary detected, installing bazelisk...")
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64"
+		r = requests.get(url, allow_redirects=True)
+		# Copy bazelisk
+		bazeliskInstallPath = os.path.join(bazelDirectory, "bazelisk")
+		with open(bazeliskInstallPath, "wb") as f:
+			f.write(r.content)
+		# Set permissions
+		st = os.stat(bazeliskInstallPath)
+		os.chmod(bazeliskInstallPath, st.st_mode | stat.S_IEXEC)
+
+		bazelExecPath = bazeliskInstallPath
+
+	# Forward commands to the real bazel
+	subprocess.run([bazelExecPath] + sys.argv[1:])
