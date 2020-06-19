@@ -14,24 +14,17 @@ jobs:
         java-version: '11.0'
         architecture: x64
 
-    - name: Install bazelisk
-      run: |
-        curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64"
-        mkdir -p "${GITHUB_WORKSPACE}/bin/"
-        mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
-        chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
-
     - name: Environment
       run: |
         cp tools/ci/github/.bazelrc.local .bazelrc.local
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
-        bazel --version
+        ./tools/bazel --version
         python --version
         java --version
 
     - name: Test
       run: |
-        bazel test ... --output_groups=default,metadata
+        ./tools/bazel test ... --output_groups=default,metadata
 
     - name: Sanitize
       run: |

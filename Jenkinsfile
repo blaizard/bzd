@@ -36,6 +36,7 @@ pipeline
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "python --version"
 				sh "java --version"
+				sh "./tools/bazel --version"
 				sh "git submodule update --init --recursive"
 			}
 		}
@@ -76,8 +77,8 @@ pipeline
 		{
 			steps
 			{
-				sh "bazel run apps/dashboard:push"
-				sh "bazel run apps/family:push"
+				sh "./tools/bazel run apps/dashboard:push"
+				sh "./tools/bazel run apps/family:push"
 			}
 		}
 	}
