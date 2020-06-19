@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: iso-8859-1 -*-
 
+import argparse
 import os
 import sys
 import subprocess
@@ -9,7 +10,12 @@ import stat
 
 if __name__== "__main__":
 
+	parser = argparse.ArgumentParser()
+	parser.add_argument("command", nargs="?", default=None)
+	args, unknown = parser.parse_known_args()
+
 	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
+	workspaceDirectory = os.path.dirname(bazelDirectory)
 	bazeliskInstallPath = os.path.join(bazelDirectory, "bazelisk")
 	bazelExecPath = os.environ["BAZEL_REAL"] if "BAZEL_REAL" in os.environ else bazeliskInstallPath
 
@@ -30,3 +36,14 @@ if __name__== "__main__":
 
 	# Forward commands to the real bazel
 	subprocess.run([bazelExecPath] + sys.argv[1:])
+
+	# Generate the coverage report
+	if args.command == "coverage":
+		subprocess.run([bazelExecPath, "run", "//tools/coverage:report", "--",
+				"--show-details",
+				"--sort",
+				"--function-coverage",
+				"--output-directory",
+				"bazel-out/coverage",
+				"bazel-out/_coverage/_coverage_report.dat"])
+		print("Coverage report: {}".format(os.path.join(workspaceDirectory, "bazel-out/coverage/index.html")))
