@@ -63,11 +63,12 @@
 
 <script>
 
-
+import Base from "./base.vue";
 import LocalStorage from "bzd/core/localstorage.mjs";
 import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 
 export default {
+    mixins: [Base],
 	directives: {
 		tooltip: DirectiveTooltip
 	},
@@ -75,13 +76,6 @@ export default {
 		return {
 			menuState: LocalStorage.get("bzd-layout-state", "hide")
 		};
-	},
-	mounted() {
-		window.addEventListener("resize", this.handleResize, false);
-		this.handleResize();
-	},
-	beforeDestroy() {
-		window.removeEventListener("resize", this.handleResize, false);
 	},
 	computed: {
 		isNotification() {
@@ -128,8 +122,6 @@ export default {
 		},
 		notificationClose(entry) {
 			this.$notification.close(entry);
-		},
-		handleResize() {
 		},
 		toggleDock() {
 			this.menuState = (this.menuState == "float") ? "dock" : "hide";

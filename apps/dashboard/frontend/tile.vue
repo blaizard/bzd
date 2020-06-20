@@ -49,7 +49,6 @@ export default {
 			this.fetch();
 		}
 		this.fetchIcon();
-		this.handleError("Noooo1");
 	},
 	beforeDestroy() {
 		if (this.handleTimeout) {
