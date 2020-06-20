@@ -1,7 +1,7 @@
 <template>
 	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="loading">
         <div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
-        <component v-else
+        <component v-if="showComponent"
                 class="content"
                 :is="component"
                 :description="description"
@@ -12,6 +12,7 @@
                 @link="handleLink"
 				@error="handleError">
         </component>
+		<div v-else-if="isError" class="content">Fatal error</div>
         <div class="name"><i :class="icon"></i> {{ name }}</div>
 	</div>
 </template>
@@ -35,6 +36,7 @@ export default {
 	},
 	data: function () {
 		return {
+			showComponent: true,
 			metadata: {},
 			handleTimeout: null,
 			loading: false,
@@ -46,6 +48,7 @@ export default {
 	},
 	mounted() {
 		if (this.sourceType) {
+			this.showComponent = false;
 			this.fetch();
 		}
 		this.fetchIcon();
@@ -126,10 +129,11 @@ export default {
 					uid: this.uid,
 					type: this.sourceType
 				});
+				this.showComponent = true;
 				this.handleTimeout = setTimeout(this.fetch, this.timeout);
 			}
 			catch (e) {
-				this.handleError(e);
+				this.handleError("Error while fetching data: " + String(e));
 				this.handleColor("red");
 			}
 			finally {

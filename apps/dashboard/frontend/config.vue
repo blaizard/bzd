@@ -10,6 +10,7 @@
             <Form :description="formPluginSourceDescription" v-model="value"></Form>
         </template>
 
+		<br/>
         <Button v-if="isUpdate" @click="handleUpdate" action="approve" content="Update"></Button>
         <Button v-else @click="handleCreate" action="approve" content="Create"></Button>
     </div>

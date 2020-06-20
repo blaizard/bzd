@@ -158,7 +158,6 @@ export function tooltip(elt, message = null, initialPosition = null) {
 	tooltipElt.style.marginLeft = 0;
 	tooltipElt.style.marginTop = 0;
 	tooltipElt.style.display = "block";
-	tooltipElt.style.whiteSpace = "nowrap";
 
 	// Calculate the coordinates of the tooltip
 	const coordTooltip = tooltipElt.getBoundingClientRect();
