@@ -97,9 +97,8 @@ export default {
 	name: "FormElement",
 	data: function() {
 		return {
-			// Copy of the current value
-			currentValue: Object.assign({}, this.value),
-			returnedValue: (this.diff) ? {} : Object.assign({}, this.value),
+			currentValue: {},
+			returnedValue: {},
 			// Contains only the unamed elements
 			unamedValue: {},
 			active: -1,
@@ -129,8 +128,16 @@ export default {
 		}
 	},
 	watch: {
-		value() {
-			this.currentValue = Object.assign({}, this.unamedValue, this.value);
+		value: {
+			immediate: true,
+			handler(value) {
+				// Copy of the current value
+				this.currentValue = Object.assign({}, this.unamedValue, value);
+				// Update the return value only if diff is not set
+				if (!this.diff) {
+					this.returnedValue = Object.assign({}, value);
+				}
+			}
 		}
 	},
 	methods: {

@@ -15,6 +15,12 @@ export default {
 			additionalProps: {}
 		};
 	},
+	watch: {
+		$attrs() {
+			// Make it reactive on attribute change
+			this.additionalProps = Object.assign(this.additionalProps, this.$attrs);
+		}
+	},
 	methods: {
 		componentSet(component, routerId, props) {
 			this.component = (typeof component === "function")
