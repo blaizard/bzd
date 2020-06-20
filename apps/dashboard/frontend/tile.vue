@@ -1,6 +1,6 @@
 <template>
-	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!ready">
-        <div v-if="error" class="error">{{ error }}</div>
+	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="loading">
+        <div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
         <component v-else
                 class="content"
                 :is="component"
@@ -9,7 +9,8 @@
                 :color="colorForeground"
                 :background-color="colorBackground"
                 @color="handleColor"
-                @link="handleLink">
+                @link="handleLink"
+				@error="handleError">
         </component>
         <div class="name"><i :class="icon"></i> {{ name }}</div>
 	</div>
@@ -17,9 +18,9 @@
 
 <script>
 
-
 import Colors from "bzd-style/css/colors.scss";
 import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 import { Visualization, Source } from "../plugins/plugins.mjs";
 
 export default {
@@ -29,14 +30,15 @@ export default {
 		edit: {type: Boolean, mandatory: false, default: false},
 	},
 	directives: {
-		"loading": DirectiveLoading
+		loading: DirectiveLoading,
+		tooltip: DirectiveTooltip
 	},
 	data: function () {
 		return {
 			metadata: {},
 			handleTimeout: null,
-			ready: true,
-			error: false,
+			loading: false,
+			errorList: [],
 			color: null,
 			icon: null,
 			link: null
@@ -44,10 +46,10 @@ export default {
 	},
 	mounted() {
 		if (this.sourceType) {
-			this.ready = false;
 			this.fetch();
 		}
 		this.fetchIcon();
+		this.handleError("Noooo1");
 	},
 	beforeDestroy() {
 		if (this.handleTimeout) {
@@ -55,6 +57,14 @@ export default {
 		}
 	},
 	computed: {
+		isError() {
+			return (this.errorList.length > 0);
+		},
+		tooltipErrorConfig() {
+			return {
+				text: this.errorList.map((e) => String(e)).join(", ")
+			};
+		},
 		colorAuto() {
 			const index = Array.from(this.uid).reduce((acc, c) => acc + parseInt(c.charCodeAt(0)), 0);
 			const colorList = Object.keys(Colors);
@@ -106,20 +116,25 @@ export default {
 		}
 	},
 	methods: {
+		handleError(e) {
+			this.errorList.push(e);
+		},
 		async fetch() {
 			this.handleTimeout = null;
+			this.loading = true;
 			try {
 				this.metadata = await this.$api.request("get", "/data", {
 					uid: this.uid,
 					type: this.sourceType
 				});
-				this.ready = true;
 				this.handleTimeout = setTimeout(this.fetch, this.timeout);
 			}
 			catch (e) {
-				this.ready = true;
-				this.error = e;
+				this.handleError(e);
 				this.handleColor("red");
+			}
+			finally {
+				this.loading = false;
 			}
 		},
 		async fetchIcon() {
@@ -149,6 +164,7 @@ export default {
 
 <style lang="scss" scoped>
     @use "bzd-style/css/clickable.scss";
+    @use "bzd-style/css/colors.scss" as colors;
 
     $bzdPadding: 10px;
 
@@ -180,8 +196,7 @@ export default {
             line-height: 2em;
         }
 
-        .content,
-        .error {
+        .content {
             position: absolute;
             top: $bzdPadding;
             bottom: calc(#{$bzdPadding * 2} + 2em);
@@ -189,5 +204,20 @@ export default {
             right: $bzdPadding;
             overflow: hidden;
         }
+
+		.error {
+			position: absolute;
+			right: -1em;
+			top: -1em;
+			width: 2em;
+			height: 2em;
+			border-radius: 1em;
+			border: 1px solid colors.$bzdGraphColorWhite;
+			z-index: 1;
+			color: colors.$bzdGraphColorWhite;
+			background-color: colors.$bzdGraphColorRed;
+			line-height: 2em;
+			text-align: center;
+		}
     }
 </style>
