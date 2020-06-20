@@ -2,7 +2,7 @@
 	<div :class="classLayout">
 		<div class="bzd-layout-header">
 
-			<div v-if="['hide', 'float'].includes(menuStateFinal)"
+			<div v-if="isMobile || !isDock"
                     class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
                 <i class="bzd-icon-menu"></i>
             </div>
@@ -14,22 +14,23 @@
             <div class="bzd-layout-header-padding">
             </div>
 
-            <div class="bzd-layout-header-actions">
+            <div class="bzd-layout-header-actions" v-if="!isMobile">
                 <slot name="actions"></slot>
             </div>
 		</div>
 
-		<div class="bzd-layout-menu">
+		<div class="bzd-layout-menu" v-show="isMenu">
             <transition name="bzd-fade">
-                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="menuStateFinal == 'float'">
+                <div class="bzd-layout-menu-background" @click.stop="hideMenu" v-show="isMenuShow && !isDock && !isMobile">
                 </div>
             </transition>
             <transition name="bzd-translate">
-                <div class="bzd-layout-menu-content" @click.stop="" v-show="['dock', 'float'].includes(menuStateFinal)">
+                <div class="bzd-layout-menu-content" @click.stop="" v-show="isMenuShow || (isDock && !isMobile)">
                     <div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
-                        <i v-if="menuStateFinal == 'dock'" class="bzd-icon-dock-on"></i>
+                        <i v-if="isDock" class="bzd-icon-dock-on"></i>
                         <i v-else class="bzd-icon-dock-off"></i>
                     </div>
+                    <slot name="actions" v-if="isMobile"></slot>
                     <slot name="menu"></slot>
                 </div>
             </transition>
@@ -68,13 +69,14 @@ import LocalStorage from "bzd/core/localstorage.mjs";
 import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 
 export default {
-    mixins: [Base],
+	mixins: [Base],
 	directives: {
 		tooltip: DirectiveTooltip
 	},
 	data: function() {
 		return {
-			menuState: LocalStorage.get("bzd-layout-state", "hide")
+			isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
+			isMenuShow: false
 		};
 	},
 	computed: {
@@ -84,25 +86,13 @@ export default {
 		classLayout() {
 			return {
 				"bzd-layout": true,
-				"bzd-dock": (this.menuStateFinal == "dock")
+				"bzd-mobile": this.isMobile,
+				"bzd-dock": this.isDock && !this.isMobile && this.isMenu
 			};
 		},
 		isMenu() {
-			return Boolean(this.$slots.menu);
+			return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
 		},
-		/**
-		 * States can be:
-		 * - none: no menu at all
-		 * - hide: the menu is minimized
-		 * - float: the menu is showing in floating mode
-		 * - dock: the menu is showing and affecting the layout
-		 */
-		menuStateFinal() {
-			if (this.isMenu) {
-				return this.menuState;
-			}
-			return "none";
-		}
 	},
 	methods: {
 		getNotificationClass(entry) {
@@ -124,14 +114,15 @@ export default {
 			this.$notification.close(entry);
 		},
 		toggleDock() {
-			this.menuState = (this.menuState == "float") ? "dock" : "hide";
-			LocalStorage.set("bzd-layout-state", (this.menuState == "dock") ? "dock" : "hide");
+			this.isDock = !this.isDock;
+			this.isMenuShow = false;
+			LocalStorage.set("bzd-layout-dock", this.isDock);
 		},
 		toggleMenu() {
-			this.menuState = (this.menuState == "hide") ? "float" : "hide";
+			this.isMenuShow = !this.isMenuShow;
 		},
 		hideMenu() {
-			this.menuState = "hide";
+			this.isMenuShow = false;
 		}
 	}
 };
@@ -397,6 +388,27 @@ export default {
         &.bzd-dock {
             .bzd-layout-content-wrapper {
                 margin-left: $menuWidth;
+            }
+        }
+
+        &.bzd-mobile {
+            .bzd-layout-menu {
+                .bzd-translate-enter-active,
+                .bzd-translate-leave-active {
+                    transition: none;
+                }
+                .bzd-translate-enter,
+                .bzd-translate-leave-to {
+                    transform: none;
+                }
+
+                .bzd-layout-menu-content {
+                    width: 100%;
+                    border: none;
+                    .bzd-layout-menu-content-dock {
+                        display: none;
+                    }
+                }
             }
         }
     }
