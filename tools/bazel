@@ -5,8 +5,9 @@ import argparse
 import os
 import sys
 import subprocess
-import requests
+import urllib.request
 import stat
+import shutil
 
 if __name__== "__main__":
 
@@ -21,17 +22,14 @@ if __name__== "__main__":
 
 	# If bazel is not installed / available
 	if not os.path.exists(bazelExecPath):
-		print("No bazel binary detected, installing bazelisk...")
 		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64"
-		r = requests.get(url, allow_redirects=True)
-		# Copy bazelisk
-		bazeliskInstallPath = os.path.join(bazelDirectory, "bazelisk")
-		with open(bazeliskInstallPath, "wb") as f:
-			f.write(r.content)
-		# Set permissions
+		print("No bazel binary detected, downloading bazelisk from {}...".format(url))
+		with urllib.request.urlopen(url) as response, open(bazeliskInstallPath, 'wb') as f:
+			shutil.copyfileobj(response, f)
+
+		# Set permissions and update bazel binary path
 		st = os.stat(bazeliskInstallPath)
 		os.chmod(bazeliskInstallPath, st.st_mode | stat.S_IEXEC)
-
 		bazelExecPath = bazeliskInstallPath
 
 	# Forward commands to the real bazel
