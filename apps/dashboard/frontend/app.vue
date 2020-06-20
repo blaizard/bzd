@@ -7,11 +7,6 @@
 			<MenuEntry v-else text="OK" icon="bzd-icon-check" @click="handleEdit"></MenuEntry>
 		</template>
 		<template #menu>
-			<MenuEntry text="About" icon="bzd-icon-edit">
-				<MenuEntry text="One" icon="bzd-icon-edit"></MenuEntry>
-				<MenuEntry text="Two" icon="bzd-icon-edit"></MenuEntry>
-				<MenuEntry text="Three" icon="bzd-icon-edit"></MenuEntry>
-			</MenuEntry>
 		</template>
 		<template #content>
 			<RouterComponent ref="view" :edit="edit"></RouterComponent>
