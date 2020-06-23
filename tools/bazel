@@ -17,27 +17,25 @@ if __name__== "__main__":
 
 	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
 	workspaceDirectory = os.path.dirname(bazelDirectory)
-	bazeliskInstallPath = os.path.join(bazelDirectory, "bazelisk")
-	bazelExecPath = os.environ["BAZEL_REAL"] if "BAZEL_REAL" in os.environ else bazeliskInstallPath
+	bazeliskPath = os.path.join(bazelDirectory, "bazelisk")
 
 	# If bazel is not installed / available
-	if not os.path.exists(bazelExecPath):
+	if not os.path.exists(bazeliskPath):
 		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64"
 		print("No bazel binary detected, downloading bazelisk from {}...".format(url))
-		with urllib.request.urlopen(url) as response, open(bazeliskInstallPath, "wb") as f:
+		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
 
 		# Set permissions and update bazel binary path
-		st = os.stat(bazeliskInstallPath)
-		os.chmod(bazeliskInstallPath, st.st_mode | stat.S_IEXEC)
-		bazelExecPath = bazeliskInstallPath
+		st = os.stat(bazeliskPath)
+		os.chmod(bazeliskPath, st.st_mode | stat.S_IEXEC)
 
 	# Forward commands to the real bazel
-	subprocess.run([bazelExecPath] + sys.argv[1:])
+	subprocess.run([bazeliskPath] + sys.argv[1:])
 
 	# Generate the coverage report
 	if args.command == "coverage":
-		subprocess.run([bazelExecPath, "run", "//tools/coverage:report", "--",
+		subprocess.run([bazeliskPath, "run", "//tools/coverage:report", "--",
 				"--show-details",
 				"--sort",
 				"--function-coverage",
