@@ -12,6 +12,9 @@ bzd_nodejs_binary(
         "/tmp/db",
     ],
     main = "app.mjs",
+    packages = {
+        "commander": "",
+    },
     visibility = [
         "//apps/dashboard:__pkg__",
     ],

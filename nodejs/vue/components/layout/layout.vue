@@ -1,6 +1,6 @@
 <template>
 	<div :class="classLayout">
-		<div class="bzd-layout-header">
+		<div class="bzd-layout-header" @click.stop="hideMenu">
 
 			<div v-if="isMobile || !isDock"
                     class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
@@ -25,7 +25,7 @@
                 </div>
             </transition>
             <transition name="bzd-translate">
-                <div class="bzd-layout-menu-content" @click.stop="" v-show="isMenuShow || (isDock && !isMobile)">
+                <div class="bzd-layout-menu-content" @click.stop="hideMenu" v-show="isMenuShow || (isDock && !isMobile)">
                     <div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
                         <i v-if="isDock" class="bzd-icon-dock-on"></i>
                         <i v-else class="bzd-icon-dock-off"></i>
@@ -116,13 +116,16 @@ export default {
 		toggleDock() {
 			this.isDock = !this.isDock;
 			this.isMenuShow = false;
-			LocalStorage.set("bzd-layout-dock", this.isDock);
+			LocalStorage.set("bzd-layout-dock", (this.isDock) ? "1": "");
 		},
 		toggleMenu() {
 			this.isMenuShow = !this.isMenuShow;
 		},
 		hideMenu() {
 			this.isMenuShow = false;
+		},
+		handleMenuClick() {
+			this.hideMenu();
 		}
 	}
 };
