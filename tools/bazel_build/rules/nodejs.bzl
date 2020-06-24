@@ -238,10 +238,16 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel_build/toolchains/nodejs:toolchain_type"].executable
 
-    # Attempt but faced yet another issue: SyntaxError: Cannot use import statement outside a module
+    # Run the node process
     command = """
     export BZD_RULE=nodejs
     {{binary}}"""
+
+    # Add prefix command to support code coverage
+    isCoverage = ctx.configuration.coverage_enabled
+    if isCoverage:
+        command += " \"{{root}}/node_modules/c8/bin/c8\" --reporter lcov --reporter text --allowExternal {{binary}}"
+
     if is_test:
         command += " \"{{root}}/node_modules/mocha/bin/mocha\" \"{}\""
     else:

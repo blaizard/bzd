@@ -11,7 +11,7 @@ bzd_nodejs_library(
     name = "mocha",
     packages = {
         "mocha": "",
-        # coverage for nodejs is more complicated, 'nyc' does not support symlinks
+        "c8": "",
     },
     visibility = ["//visibility:public"],
 )
