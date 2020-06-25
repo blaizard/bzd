@@ -253,6 +253,9 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     else:
         command += " \"{}\" $@"
 
+    if isCoverage:
+        command += " && cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\""
+
     # Generate the symlinks for the aliases
     symlinks = bzd_nodejs_aliases_symlinks(files = srcs, aliases = aliases)
 
@@ -270,6 +273,15 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
             symlinks = symlinks,
         ),
     ]
+
+    if isCoverage:
+        result.append(
+            coverage_common.instrumented_files_info(
+                ctx,
+                source_attributes = ["srcs"],
+                extensions = ["js", "cjs", "mjs"],
+            ),
+        )
 
     if not is_test:
         files_remap = {

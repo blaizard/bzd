@@ -39,7 +39,7 @@ if __name__== "__main__":
 				"--show-details",
 				"--sort",
 				"--function-coverage",
-				"--output-directory",
-				"bazel-out/coverage",
+				"--prefix", workspaceDirectory,
+				"--output-directory", "bazel-out/coverage",
 				"bazel-out/_coverage/_coverage_report.dat"])
 		print("Coverage report: {}".format(os.path.join(workspaceDirectory, "bazel-out/coverage/index.html")))
