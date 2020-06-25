@@ -23,6 +23,8 @@ test --define=panic=throw
 
 # Coverage specific options
 coverage --combined_report=lcov
+# Need to find a way to combine C++ and NodeJs coverage reports
+coverage --test_env=LCOV_MERGER=/bin/true
 
 # Prevent building twice tools used for host and target, for nodejs rules for example.
 build --nodistinct_host_configuration
