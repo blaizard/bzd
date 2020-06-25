@@ -2,7 +2,7 @@
 
 .bzd-loading {
     background-color: rgba(colors.$bzdGraphColorWhite, 0.5);
-    z-index: 999;
+    z-index: 1;
     overflow: hidden;
 
     @keyframes bzd-loading-animation {
