@@ -72,7 +72,8 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ..." 
+						sh "./tools/bazel coverage ..."
+						archiveArtifacts artifacts: "bazel-out/coverage/**/*", fingerprint: true
 					}
 				}
 			}
