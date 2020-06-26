@@ -12,7 +12,7 @@ class CompilationDB():
     def __init__(self, config, target, output):
 
         # Generate the list of queries associated with this target
-        queries = executeCommand(["bazel",
+        queries = executeCommand(["./tools/bazel",
             "query",
             "--noshow_progress",
             "--noshow_loading_progress",
@@ -28,7 +28,7 @@ class CompilationDB():
                 if fileName.endswith("compile_commands.json"):
                     os.remove(os.path.join(root, fileName))
 
-        executeCommand(["bazel",
+        executeCommand(["./tools/bazel",
             "build",
             "--symlink_prefix=/",
             "--aspects=@bazel-compilation-database//:aspects.bzl%compilation_database_aspect",
