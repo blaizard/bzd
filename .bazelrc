@@ -23,8 +23,16 @@ test --define=panic=throw
 
 # Coverage specific options
 coverage --combined_report=lcov
-# Need to find a way to combine C++ and NodeJs coverage reports
-coverage --test_env=LCOV_MERGER=/bin/true
+coverage --nobuild_tests_only
+
+# Select only C++ targets
+build:cc --build_tag_filters="-nodejs,-docker"
+test:cc --test_lang_filters=cc
+
+# Select only NodeJs targets
+build:nodejs --build_tag_filters=nodejs
+test:nodejs --test_tag_filters=nodejs
+coverage:nodejs --test_env=LCOV_MERGER=/bin/true
 
 # Prevent building twice tools used for host and target, for nodejs rules for example.
 build --nodistinct_host_configuration
@@ -57,7 +65,6 @@ build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
-build:esp32_xtensa_lx6_gcc --build_tag_filters="-nodejs,-docker"
 build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
 # Sanitizers

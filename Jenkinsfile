@@ -58,22 +58,24 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel build ... --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+						sh "./tools/bazel build ... --output_groups=default,metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
 				stage("Static analyzers")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
+						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
 				}
 				stage("Coverage")
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ..."
-						archiveArtifacts artifacts: "bazel-out/coverage/**/*", fingerprint: true
+						sh "./tools/bazel coverage ... --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
+						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
+						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
 			}

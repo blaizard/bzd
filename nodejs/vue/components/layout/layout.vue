@@ -86,7 +86,7 @@ export default {
 		classLayout() {
 			return {
 				"bzd-layout": true,
-				"bzd-mobile": this.isMobile,
+				"bzd-mobile": this.isMobile,
 				"bzd-dock": this.isDock && !this.isMobile && this.isMenu
 			};
 		},
