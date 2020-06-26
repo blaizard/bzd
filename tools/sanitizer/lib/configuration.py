@@ -10,8 +10,8 @@ class Configuration():
 	def __init__(self, workspace, config, tools = {}):
 		self.workspace = workspace
 		self.config = config
-		self.execRoot = executeCommand(["bazel", "info", "execution_root"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
-		self.bazelBin = executeCommand(["bazel", "info", "bazel-bin"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
+		self.execRoot = executeCommand(["./tools/bazel", "info", "execution_root"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
+		self.bazelBin = executeCommand(["./tools/bazel", "info", "bazel-bin"] + self.getBazelExtraArgs(), self.workspace).splitlines()[0]
 		self.ignoreList = [
 			re.compile(r"^external/"),
 			re.compile(r"^bazel-out/"),
