@@ -9,6 +9,14 @@ import urllib.request
 import stat
 import shutil
 
+"""
+Execute a process and exit if it fails
+"""
+def processRun(args):
+	result = subprocess.run(args)
+	if result.returncode != 0:
+		sys.exit(result.returncode)
+
 if __name__== "__main__":
 
 	parser = argparse.ArgumentParser()
@@ -31,15 +39,12 @@ if __name__== "__main__":
 		os.chmod(bazeliskPath, st.st_mode | stat.S_IEXEC)
 
 	# Forward commands to the real bazel
-	subprocess.run([bazeliskPath] + sys.argv[1:])
+	processRun([bazeliskPath] + sys.argv[1:])
+
+	# If this script is called by the wrapper, ignore
+	if "BAZELISK_SKIP_WRAPPER" in os.environ:
+		sys.exit(0)
 
 	# Generate the coverage report
 	if args.command == "coverage":
-		subprocess.run([bazeliskPath, "run", "//tools/coverage:report", "--",
-				"--show-details",
-				"--sort",
-				"--function-coverage",
-				"--prefix", workspaceDirectory,
-				"--output-directory", "bazel-out/coverage",
-				"bazel-out/_coverage/_coverage_report.dat"])
-		print("Coverage report: {}".format(os.path.join(workspaceDirectory, "bazel-out/coverage/index.html")))
+		processRun([bazeliskPath, "run", "//tools/coverage"])

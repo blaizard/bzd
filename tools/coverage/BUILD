@@ -1,12 +1,14 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
 
-sh_binary_wrapper(
-    name = "report",
-    binary = "@lcov//:genhtml",
-    command = """
-		cd "$BUILD_WORKSPACE_DIRECTORY"
-		pwd
-        {binary} "$@"
-    """,
+py_binary(
+    name = "coverage",
+    srcs = ["coverage.py"],
+    args = [
+        "--genhtml",
+        "$(location @lcov//:genhtml)",
+    ],
+    data = [
+        "@lcov//:genhtml",
+    ],
     visibility = ["//visibility:public"],
 )
