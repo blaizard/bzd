@@ -118,7 +118,9 @@ export default {
 		async fetchPlugins(source) {
 			let plugins = {};
 			for (const [name, description] of Object.entries(source)) {
-				await description.frontend(); // Load the frontend plugin to load the icon
+				if ("frontend" in description) {
+					await description.frontend(); // Load the frontend plugin to load the icon
+				}
 				plugins[name] = Object.assign({}, description);
 			}
 			return plugins;

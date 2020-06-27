@@ -7,9 +7,9 @@ bzd_nodejs_binary(
     ]),
     args = [
         "--static",
-        "/tmp/frontend",
+        "/tmp/bzd/frontend",
         "--data",
-        "/tmp/db",
+        "/tmp/bzd/db",
     ],
     main = "app.mjs",
     packages = {
