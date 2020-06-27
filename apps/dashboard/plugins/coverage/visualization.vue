@@ -27,7 +27,6 @@ export default {
 		metadata: {
 			immediate: true,
 			handler() {
-				this.metadata.link = "index.html";
 				if ("link" in this.metadata) {
 					const url = new URL(this.metadata.link, this.description["coverage.url"]);
 					this.$emit("link", String(url));
