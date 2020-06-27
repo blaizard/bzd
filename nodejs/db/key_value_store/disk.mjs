@@ -117,7 +117,7 @@ export default class KeyValueStoreDisk {
 	async list(bucket, maxOrPaging = 10) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
-		return CollectionPaging.makeFromList(data, maxOrPaging);
+		return CollectionPaging.makeFromObject(data, maxOrPaging);
 	}
 
 	/**
@@ -132,8 +132,14 @@ export default class KeyValueStoreDisk {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
 		const valueList = (Array.isArray(value)) ? value : [value];
-		const filteredData = data.filter((entry) => (subKey in entry && valueList.includes(entry[subKey])));
-		return CollectionPaging.makeFromList(filteredData, maxOrPaging);
+		const filteredData = Object.keys(data).filter((name) => {
+			const entry = data[name];
+			return subKey in entry && valueList.includes(entry[subKey])
+		}).reduce((obj, name) => {
+			obj[name] = data[name];
+			return obj;
+		}, {});
+		return CollectionPaging.makeFromObject(filteredData, maxOrPaging);
 	}
 
 	async delete(bucket, key) {
