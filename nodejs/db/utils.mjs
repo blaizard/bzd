@@ -26,4 +26,14 @@ export class CollectionPaging {
 		const indexEnd = indexStart + paging.max;
 		return new CollectionPaging(data.slice(indexStart, indexEnd), (indexEnd > data.length) ? null : {page: paging.page + 1, max: paging.max});
 	}
+
+	static makeFromObject(data, maxOrPaging) {
+		const keysList = Object.keys(data).sort();
+		let result = this.makeFromList(keysList, maxOrPaging);
+		result._data = result._data.reduce((obj, key) => {
+			obj[key] = data[key];
+			return obj;
+		}, {});
+		return result;
+	}
 };
