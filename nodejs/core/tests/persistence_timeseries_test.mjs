@@ -49,14 +49,33 @@ describe("PersistenceTimeSeries", () => {
 			}
 
 			// Check the samples
-			let count = 0;
-			await timeseries.forEach((timestamp, data) => {
-				Exception.assertEqual(timestamp, data);
-				Exception.assertEqual(sampleList[count], timestamp);
-				++count;
-			});
-
-			Exception.assertEqual(count, sampleList.length);
+			{
+				let count = 0;
+				await timeseries.forEach((timestamp, data) => {
+					Exception.assertEqual(timestamp, data);
+					Exception.assertEqual(sampleList[count], timestamp);
+					++count;
+				});
+				Exception.assertEqual(count, sampleList.length);
+			}
+			{
+				let count = 50;
+				await timeseries.forEach((timestamp, data) => {
+					Exception.assertEqual(timestamp, data);
+					Exception.assertEqual(sampleList[count], timestamp);
+					++count;
+				}, 50);
+				Exception.assertEqual(count, sampleList.length);
+			}
+			{
+				let count = 50;
+				await timeseries.forEach((timestamp, data) => {
+					Exception.assertEqual(timestamp, data);
+					Exception.assertEqual(sampleList[count], timestamp);
+					++count;
+				}, 50, 80);
+				Exception.assertEqual(count, 81);
+			}
 
 			await timeseries.close();
 		}).timeout(30000);

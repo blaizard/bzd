@@ -5,6 +5,7 @@ import Timeseries from "./timeseries.mjs";
 import FileSystem from "../../core/filesystem.mjs";
 import Cache from "../../core/cache.mjs";
 import Path from "path";
+import { CollectionPaging } from "../utils.mjs";
 
 /**
  * Disk timeseries module
@@ -81,19 +82,42 @@ export default class TimeseriesDisk extends Timeseries {
 	}
 
 	/**
-	 * Retrieve the 'maxEntries' most recent entries from 'timestamp'
+	 * List the last N entries.
 	 * 
-	 * This function needs to be optimized
+	 * \param maxOrPaging Paging information.
 	 */
-	async get(bucket, timestamp, maxEntries) {
+	async list(bucket, maxOrPaging) {
+
 		let persistence = await this._getPersistence(bucket);
+
+		// Gather all the data
 		let items = [];
 		await persistence.waitReady();
-		await persistence.forEach((timestamp, data) => {
-			items.push([timestamp, data]);
+		await persistence.forEach((t, data) => {
+			items.push([t, data]);
 		});
-		const extract = items.slice(-maxEntries);
-		extract.reverse();
-		return extract;
+		items.reverse();
+
+		return CollectionPaging.makeFromList(items, maxOrPaging);
+	}
+
+	/**
+	 * List the last entries until a specific timestamp.
+	 * 
+	 * \param maxOrPaging Paging information.
+	 */
+	async listUntilTimestamp(bucket, timestamp, maxOrPaging) {
+
+		let persistence = await this._getPersistence(bucket);
+
+		// Gather all the data
+		let items = [];
+		await persistence.waitReady();
+		await persistence.forEach((t, data) => {
+			items.push([t, data]);
+		}, timestamp);
+		items.reverse();
+
+		return CollectionPaging.makeFromList(items, maxOrPaging);
 	}
 }

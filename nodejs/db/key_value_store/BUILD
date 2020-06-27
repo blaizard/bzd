@@ -13,5 +13,6 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/persistence:disk",
+        "//nodejs/db:utils",
     ],
 )
