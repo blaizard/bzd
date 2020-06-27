@@ -7,7 +7,7 @@ import API from "bzd/core/api/server.mjs";
 import APIv1 from "../api.v1.json";
 import Cache from "bzd/core/cache.mjs";
 import Web from "bzd/core/web.mjs";
-import KeyValueStoreDisk from "bzd/core/key_value_store/disk.mjs";
+import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import { Source } from "../plugins/plugins.mjs";
@@ -77,7 +77,8 @@ Commander.version("1.0.0", "-v, --version")
 
 	let api = new API(APIv1);
 	api.handle(web, "get", "/tiles", async () => {
-		return await keyValueStore.list("tiles");
+		const result = await keyValueStore.list("tiles");
+		return result.data();
 	});
 	api.handle(web, "get", "/tile", async (inputs) => {
 		return await keyValueStore.get("tiles", inputs.uid);

@@ -201,8 +201,7 @@ export default {
 			}
 			this.set(date.getTime());
 		},
-		handleKey(keyCode) {
-			console.log(keyCode);
+		handleKey(/*keyCode*/) {
 		}
 	}
 };

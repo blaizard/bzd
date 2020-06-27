@@ -2,10 +2,11 @@
 
 import Path from "path";
 
-import PersistenceDisk from "../persistence/disk.mjs";
-import Cache from "../cache.mjs";
-import Event from "../event.mjs";
-import FileSystem from "../filesystem.mjs";
+import PersistenceDisk from "../../core/persistence/disk.mjs";
+import Cache from "../../core/cache.mjs";
+import Event from "../../core/event.mjs";
+import FileSystem from "../../core/filesystem.mjs";
+import { CollectionPaging } from "../utils.mjs";
 
 /**
  * Key value store for low demanding application, that presists on the local disk.
@@ -108,10 +109,31 @@ export default class KeyValueStoreDisk {
 		return (key in data) ? data[key] : defaultValue;
 	}
 
-	async list(bucket) {
+	/**
+	 * List all key/value pairs from this bucket.
+	 * \param bucket The bucket to be used.
+	 * \param maxOrPaging Paging information.
+	 */
+	async list(bucket, maxOrPaging = 10) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
-		return data;
+		return CollectionPaging.makeFromList(data, maxOrPaging);
+	}
+
+	/**
+	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values). 
+	 * \param bucket The bucket to be used.
+	 * \param subKey The subkey for the match.
+	 * \param value The value of values (if a list) to match.
+	 * \param maxOrPaging Paging information.
+	 * \return An object contianing the data and the information about paging and how to get the rest of the data.
+	 */
+	async listMatch(bucket, subKey, value, maxOrPaging = 10) {
+		let persistence = await this._getPersistence(bucket);
+		const data = await persistence.get();
+		const valueList = (Array.isArray(value)) ? value : [value];
+		const filteredData = data.filter((entry) => (subKey in entry && valueList.includes(entry[subKey])));
+		return CollectionPaging.makeFromList(filteredData, maxOrPaging);
 	}
 
 	async delete(bucket, key) {

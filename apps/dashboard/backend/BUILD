@@ -25,6 +25,6 @@ bzd_nodejs_binary(
         "//nodejs/core:filesystem",
         "//nodejs/core:web",
         "//nodejs/core/api:server",
-        "//nodejs/core/key_value_store:disk",
+        "//nodejs/db/key_value_store:disk",
     ],
 )

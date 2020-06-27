@@ -14,5 +14,6 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/persistence:timeseries",
+        "//nodejs/db:utils",
     ],
 )
