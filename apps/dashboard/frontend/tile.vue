@@ -142,7 +142,7 @@ export default {
 		},
 		async fetchIcon() {
 			const plugin = (this.sourceType) ? Source[this.sourceType] : Visualization[this.visualizationType];
-			if (plugin) {
+			if (plugin && "frontend" in plugin) {
 				await plugin.frontend(); // Load the frontend plugin to load the icon
 				this.icon = plugin.icon;
 			}
