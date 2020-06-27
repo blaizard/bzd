@@ -7,7 +7,6 @@ export default {
         {
             collection: "coverage.report",
             fetch: async (reportUrl, authentication) => {
-                console.log(authentication);
                 return await Fetch.get(reportUrl, {
                     expect: "json", 
                     authentication: authentication

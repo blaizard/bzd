@@ -19,6 +19,8 @@ if __name__== "__main__":
 	# Build the report
 	data = {
 		"path": os.path.join(args.workspace, args.output, "index.html"),
+		# Link relative to this file
+		"link": "index.html",
 		"coverage": 0,
 		"lines": 0,
 		"files": 0
