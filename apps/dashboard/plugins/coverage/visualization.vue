@@ -17,11 +17,23 @@ export default {
 		description: {type: Object, mandatory: true},
 	},
 	mounted() {
-		this.$emit("link", this.description["link.url"]);
+		
 	},
 	data: function() {
 		return {
 		};
+	},
+	watch: {
+		metadata: {
+			immediate: true,
+			handler() {
+				this.metadata.link = "index.html";
+				if ("link" in this.metadata) {
+					const url = new URL(this.metadata.link, this.description["coverage.url"]);
+					this.$emit("link", String(url));
+				}
+			}
+		}
 	}
 };
 </script>
