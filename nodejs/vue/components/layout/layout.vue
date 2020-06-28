@@ -2,7 +2,7 @@
 	<div :class="classLayout">
 		<div class="bzd-layout-header" @click.stop="hideMenu">
 
-			<div v-if="isMobile || !isDock"
+			<div v-if="isMenu && (isMobile || !isDock)"
                     class="bzd-layout-header-menu-trigger" @click.stop="toggleMenu">
                 <i class="bzd-icon-menu"></i>
             </div>
@@ -415,4 +415,19 @@ export default {
             }
         }
     }
+
+    // Only show the content div in print mode
+    @media print {
+        .bzd-layout-header,
+        .bzd-layout-menu,
+        .bzd-layout-footer {
+            display: none !important;
+        }
+
+        .bzd-layout-content-wrapper {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+    }
+
 </style>
