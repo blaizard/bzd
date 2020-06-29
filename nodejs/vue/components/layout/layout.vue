@@ -152,9 +152,6 @@ export default {
     $menuPadding: 16px;
     $menuZIndex: 9;
 
-    // Content
-    $contentPadding: 20px;
-
     // ----
 
     @use "bzd-style/css/clickable.scss";
@@ -384,7 +381,7 @@ export default {
             }
 
             .bzd-layout-content {
-                padding: $contentPadding;
+                padding: 0;
             }
         }
 

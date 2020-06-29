@@ -9,7 +9,7 @@
 		<template #menu>
 		</template>
 		<template #content>
-			<RouterComponent ref="view" :edit="edit"></RouterComponent>
+			<RouterComponent ref="view" :edit="edit" class="bzd-content"></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -63,5 +63,9 @@ export default {
 
     .bzd-icon-main {
 		@include icons.defineIcon("icon.svg");
+	}
+
+	.bzd-content {
+		padding: 20px;
 	}
 </style>
