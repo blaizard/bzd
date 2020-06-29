@@ -15,7 +15,7 @@ export default class AuthenticationServer {
     }
 
     installAPI(api, web) {
-        Exception.unreachable("'install' must be implemented.");
+        Exception.unreachable("'installAPI' must be implemented.");
     }
 
     async verify(request, callback = (uid) => true) {
