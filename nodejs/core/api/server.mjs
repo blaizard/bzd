@@ -66,19 +66,10 @@ class Context {
 
 export default class APIServer extends Base {
 
-	constructor(schema, options) {
-		super(schema, options);
-	}
-
-	handleAuthentication(web) {
-		Exception.assert(this.options.authentication, "Authentication must be set.");
-		this.options.authentication.installAPI(this, web);
-	}
-
     /**
      * Register a callback to handle a request
      */
-	handle(web, method, endpoint, callback, /*options = {}*/) {
+	handle(method, endpoint, callback, /*options = {}*/) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
 		const responseOptions = this.schema[endpoint][method].response || {};
@@ -197,6 +188,7 @@ export default class APIServer extends Base {
 		let regexpr = /{([^}:]+)}/;
 		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
 
-		web.addRoute(method, this._makePath(updatedEndpoint), callbackWrapper, webOptions);
+		Exception.assert(this.options.channel, "Channel is missing");
+		this.options.channel.addRoute(method, this._makePath(updatedEndpoint), callbackWrapper, webOptions);
 	}
 }

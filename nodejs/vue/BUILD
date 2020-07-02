@@ -53,3 +53,14 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
 )
+
+bzd_nodejs_library(
+    name = "payment",
+    srcs = [
+        "payment.vue",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)

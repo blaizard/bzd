@@ -46,7 +46,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
         });
     }
 
-    installAPI(api, web) {
+    installAPI(api) {
 
         Log.debug("Installing token-based authentication API.");
         api.addSchema(APISchema);
@@ -65,11 +65,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			return await authentication.generateAccessToken({ uid: uid });
 		};
 
-		api.handle(web, "post", "/auth/login", async function (inputs) {
-			Exception.assert("uid" in inputs, "Missing uid: {:j}", inputs);
-			Exception.assert("password" in inputs, "Missing password: {:j}", inputs);
-			Exception.assert("persistent" in inputs, "Missing persistent: {:j}", inputs);
-
+		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
 			if (await authentication.verifyIdentity(inputs.uid, inputs.password)) {
 				return generateTokens.call(this, inputs.uid, inputs.persistent);
@@ -77,11 +73,11 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			return this.setStatus(401, "Unauthorized");
 		});
 
-		api.handle(web, "post", "/auth/logout", async function () {
+		api.handle("post", "/auth/logout", async function () {
 			this.deleteCookie("refresh_token");
 		});
 
-		api.handle(web, "post", "/auth/refresh", async function () {
+		api.handle("post", "/auth/refresh", async function () {
 
             const refreshToken = this.getCookie("refresh_token", null);
             if (refreshToken == null) {
