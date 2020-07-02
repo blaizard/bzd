@@ -14,7 +14,7 @@ export default class AuthenticationServer {
         }, defaultOptions, options);
     }
 
-    installAPI(api, web) {
+    installAPI(api) {
         Exception.unreachable("'installAPI' must be implemented.");
     }
 

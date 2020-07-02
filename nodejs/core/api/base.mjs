@@ -14,9 +14,23 @@ export default class API {
             /**
              * Version of the API to be used.
              */
-            version: 1
+            version: 1,
+            /**
+             * Channel to be used as a transportation mean for this API
+             */
+            channel: null,
+            /**
+             * Include additional plugins if any
+             */
+            plugins: []
         }, options);
-		this.schema = schema;
+
+        this.schema = schema;
+
+        // Install all available plugins
+        this.options.plugins.forEach((plugin) => {
+            plugin.installAPI(this);
+        });
 	}
 
     /**

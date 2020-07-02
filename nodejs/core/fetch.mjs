@@ -31,6 +31,11 @@ export default class Fetch {
 			body = options.data;
 		}
 
+		// Add the content length
+		if (typeof body == "string") {
+			headers["Content-Length"] = body.length;
+		}
+
 		// Update headers with authentication information
 		if ("authentication" in options) {
 			const auth = options.authentication;

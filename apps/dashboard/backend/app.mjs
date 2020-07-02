@@ -75,21 +75,23 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Install the APIs
 
-	let api = new API(APIv1);
-	api.handle(web, "get", "/tiles", async () => {
+	let api = new API(APIv1, {
+		channel: web
+	});
+	api.handle("get", "/tiles", async () => {
 		const result = await keyValueStore.list("tiles");
 		return result.data();
 	});
-	api.handle(web, "get", "/tile", async (inputs) => {
+	api.handle("get", "/tile", async (inputs) => {
 		return await keyValueStore.get("tiles", inputs.uid);
 	});
-	api.handle(web, "post", "/tile", async (inputs) => {
+	api.handle("post", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", null, inputs);
 	});
-	api.handle(web, "put", "/tile", async (inputs) => {
+	api.handle("put", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", inputs.uid, inputs.value);
 	});
-	api.handle(web, "get", "/data", async (inputs) => {
+	api.handle("get", "/data", async (inputs) => {
 		return await cache.get(inputs.type, inputs.uid);
 	});
 

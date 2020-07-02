@@ -10,15 +10,6 @@ const Exception = ExceptionFactory("api", "client");
 
 export default class APIClient extends Base {
 
-	constructor(schema, options) {
-        super(schema, options);
-
-        // Install authentication
-        if (this.isAuthentication()) {
-            this.options.authentication.installAPI(this);
-        }
-	}
-
     updateForm(method, endpoint, formDescription) {
 		this._sanityCheck(method, endpoint);
         const requestOptions = this.schema[endpoint][method].request || {};
