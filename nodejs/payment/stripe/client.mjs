@@ -1,55 +1,53 @@
-import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
 import APISchema from "./api.json";
 import VueComponent from "./client.vue";
 
-const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
 
 export default class StripePayment {
 	constructor(options) {
-        this.options = Object.assign({
-            /**
-             * Callback to create a payment intent.
-             */
+		this.options = Object.assign({
+			/**
+			 * Callback to create a payment intent.
+			 */
 			makePaymentIntent: null,
-            /**
-             * Callback to retreive the public key.
-             */
+			/**
+			 * Callback to retreive the public key.
+			 */
 			getMetadata: null,
-            /**
-             * Callback to confirm the payment.
-             */
-            confirmPayment: null
+			/**
+			 * Callback to confirm the payment.
+			 */
+			confirmPayment: null
 		}, options);
 
 		this.card = null;
 	}
 
-    installAPI(api) {
-        Log.debug("Installing Stripe payment API.");
+	installAPI(api) {
+		Log.debug("Installing Stripe payment API.");
 		api.addSchema(APISchema);
-        if (!this.options.makePaymentIntent) {
-            this.options.makePaymentIntent = async (amount, metadata) => {
-                return await api.request("post", "/payment/stripe/intent", {
+		if (!this.options.makePaymentIntent) {
+			this.options.makePaymentIntent = async (amount, metadata) => {
+				return await api.request("post", "/payment/stripe/intent", {
 					amount: amount,
 					metadata: metadata
 				});
-            }
+			};
 		}
-        if (!this.options.getMetadata) {
-            this.options.getMetadata = async () => {
+		if (!this.options.getMetadata) {
+			this.options.getMetadata = async () => {
 				return await api.request("get", "/payment/stripe/metadata");
-            }
+			};
 		}
-        if (!this.options.confirmPayment) {
-            this.options.confirmPayment = async (intentId, metadata) => {
+		if (!this.options.confirmPayment) {
+			this.options.confirmPayment = async (intentId, metadata) => {
 				return await api.request("post", "/payment/stripe/confirm", {
 					id: intentId,
 					metadata: metadata
 				});
-            }
-        }
+			};
+		}
 	}
 
 	async getComponent(Vue, handleSuccess = () => {}, handleError = () => {}) {

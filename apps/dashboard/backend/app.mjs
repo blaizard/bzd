@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Commander from "commander";
 import Path from "path";

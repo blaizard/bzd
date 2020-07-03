@@ -1,4 +1,4 @@
-"use strict"
+
 
 const Fs = require("fs");
 const Path = require("path");
@@ -18,10 +18,10 @@ class Webpack {
 	static merge(obj1, obj2) {
 		let obj = Object.assign({}, obj1);
 		for (const key in obj2) {
-			if (obj.hasOwnProperty(key) && obj[key] instanceof Array && obj2[key] instanceof Array) {
+			if (key in obj && obj[key] instanceof Array && obj2[key] instanceof Array) {
 				obj[key] = obj[key].concat(obj2[key]);
 			}
-			else if (obj.hasOwnProperty(key) && typeof obj[key] == "object" && typeof obj2[key] == "object") {
+			else if (key in obj && typeof obj[key] == "object" && typeof obj2[key] == "object") {
 				obj[key] = Webpack.merge(obj[key], obj2[key]);
 			}
 			else if (obj2[key] !== undefined) {
@@ -118,11 +118,11 @@ class Webpack {
 				/**
 				 * Write a manifest.json that is used to 
 				 */
-				manifest: (manifest, config) => manifest,
+				manifest: (manifest/*, config*/) => manifest,
 				/**
 				 * Called at the end, after the manifest has been written to disk
 				 */
-				end: (manifest, config) => {}
+				end: (/*manifest, config*/) => {}
 			},
 			/**
 			 * Add custom loaders. For example:
@@ -176,8 +176,8 @@ class Webpack {
 		});
 		Object.keys(config.assets).forEach((key) => {
 			config.assets[key] = (config.assets[key] instanceof Array)
-					? config.assets[key].map((path) => pathResolve(config, path))
-					: pathResolve(config, config.assets[key]);
+				? config.assets[key].map((path) => pathResolve(config, path))
+				: pathResolve(config, config.assets[key]);
 		});
 
 		// ---- Handle extra config -------------------------------------------
@@ -213,8 +213,10 @@ class Webpack {
 				optimization: {
 					runtimeChunk: false,
 					splitChunks: {
-						// This is important, split chunks seems to fail on node library ending up
-						// not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
+						/*
+						 * This is important, split chunks seems to fail on node library ending up
+						 * not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
+						 */
 						chunks: "async"
 					}
 				}
@@ -222,7 +224,7 @@ class Webpack {
 			break;
 
 		default:
-			throw new Exception("Unsupported config type \"" + config.type + "\"");
+			throw new Error("Unsupported config type \"" + config.type + "\"");
 		}
 
 		// ---- Build webpack config ------------------------------------------
@@ -234,7 +236,7 @@ class Webpack {
 			config.output = pathResolve(config, config.output);
 
 			// If hot reloading is enabled, set a flag in the config in order to prevent some expensive operations
-			config["hmr"] = (argv.hasOwnProperty("hot") && argv.hot) ? true : false;
+			config["hmr"] = ("hot" in argv && argv.hot) ? true : false;
 			config["hmrCounter"] = 0;
 
 			// Select dev or prod mode
@@ -279,15 +281,14 @@ class Webpack {
 			return webpackConfig;
 		};
 	}
-};
+}
 
 // ---- Private methods -------------------------------------------------------
 
 /**
  * Default configuration
  */
-function getWebpackConfigDefault(isDev, config)
-{
+function getWebpackConfigDefault(isDev, config) {
 	const verboseStats = {
 		all: false,
 		modules: false,
@@ -307,7 +308,7 @@ function getWebpackConfigDefault(isDev, config)
 			test: new RegExp("\\." + type + "$"),
 			exclude: /node_modules/,
 			loader: config.loaders[type]
-		}
+		};
 	});
 
 	const stamp = String(Date.now());
@@ -375,11 +376,11 @@ function getWebpackConfigDefault(isDev, config)
 					loader: "file-loader",
 					options: {
 						name: "[hash]-" + stamp + ".[ext]",
-						outputPath: (url, resourcePath, context) => {
+						outputPath: (url, resourcePath/*, context*/) => {
 							let splitPath = Path.basename(resourcePath).split(".");
 							return (splitPath.length > 1)
-									? ("assets/" + splitPath.pop() + "/" + url)
-									: ("assets/" + url)
+								? ("assets/" + splitPath.pop() + "/" + url)
+								: ("assets/" + url);
 						}
 					}
 				}
@@ -444,8 +445,10 @@ function getWebpackConfigDefault(isDev, config)
 									+ "<html>"
 										+ "<head>"
 											+ "<meta charset=\"utf-8\" />"
-											// The 2 following lines will prevent caching on the browser side, ensuring any updates
-											// in the css or js content will be detected.
+											/*
+											 * The 2 following lines will prevent caching on the browser side, ensuring any updates
+											 * in the css or js content will be detected.
+											 */
 											+ "<meta http-equiv=\"Cache-control\" content=\"no-cache, no-store, must-revalidate\" />"
 											+ "<meta http-equiv=\"Pragma\" content=\"no-cache\" />"
 											+ "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />"
@@ -480,10 +483,10 @@ function getWebpackConfigDefault(isDev, config)
 								const cssList = (manifest.common.css || []).concat(manifest.entries[configTemplate.entryId].css || []);
 								const jsList = (manifest.common.js || []).concat(manifest.entries[configTemplate.entryId].js || []);
 								html = {
-									base: manifest.path.split("/").filter((entry) => (entry && entry != "/")).map((entry) => "..").join("/") || "/",
+									base: manifest.path.split("/").filter((entry) => (entry && entry != "/")).map((/*entry*/) => "..").join("/") || "/",
 									css: cssList.map((path) => ("<link href=\"" + manifest.path + path + "\" rel=\"stylesheet\"/>")).join(""),
 									js: jsList.map((path) => ("<script src=\"" + manifest.path + path + "\"></script>")).join("")
-								}
+								};
 							}
 
 							// Generate the template
@@ -533,8 +536,7 @@ function getWebpackConfigDefault(isDev, config)
 	};
 }
 
-function cleanUp(config)
-{
+function cleanUp(config) {
 	// Delete the temporary files
 	config.temp.forEach((path) => {
 		Fs.unlink(path, (e) => {
@@ -547,8 +549,7 @@ function cleanUp(config)
 	});
 }
 
-async function manifestCreate(config, entrypoints)
-{
+async function manifestCreate(config, entrypoints) {
 	let manifest = {
 		path: config.publicPath,
 		common: {
@@ -575,7 +576,7 @@ async function manifestCreate(config, entrypoints)
 		// Look for common items
 		entryList.forEach((entry) => {
 			for (const type in entrypoints[entry]) {
-				if (entries.hasOwnProperty(type)) {
+				if (type in entries) {
 					const curEntries = entrypoints[entry][type];
 					entries[type] = curEntries.filter((ep) => (entries[type].indexOf(ep) !== -1));
 				}
@@ -623,8 +624,7 @@ async function manifestCreate(config, entrypoints)
 	return manifest;
 }
 
-function manifestToString(config, manifest)
-{
+function manifestToString(config, manifest) {
 	let stats = {};
 	let maxSizes = ["path", "size", "type"].map((key) => [key, 0]);
 
@@ -675,10 +675,9 @@ function manifestToString(config, manifest)
 /**
  * Remove a directory recursively
  */
-function rmdirSync(path)
-{
+function rmdirSync(path) {
 	if (Fs.existsSync(path)) {
-		Fs.readdirSync(path).forEach((file, index) => {
+		Fs.readdirSync(path).forEach((file/*, index*/) => {
 			const curPath = Path.resolve(path, file);
 			if (Fs.lstatSync(curPath).isDirectory()) {
 				rmdirSync(curPath);
@@ -694,8 +693,7 @@ function rmdirSync(path)
 /**
  * Create a temporary file and returns its name
  */
-function createTempFileSync(config, data, ending, tempDirectoryPath)
-{
+function createTempFileSync(config, data, ending, tempDirectoryPath) {
 	// Create the unique static variable
 	if (typeof createTempFileSync.unique === "undefined") {
 		createTempFileSync.unique = Math.floor(new Date().getTime());
@@ -720,8 +718,7 @@ function createTempFileSync(config, data, ending, tempDirectoryPath)
 /**
  * Resolve a path, by looking at the aliases
  */
-function pathResolve(config, path)
-{
+function pathResolve(config, path) {
 	let isMatch;
 	do {
 		isMatch = false;
@@ -735,30 +732,27 @@ function pathResolve(config, path)
 	} while (isMatch);
 
 	// Use the correct directory separator
-	return path.replace(/[\\\/]/g, Path.sep);
+	return path.replace(/[\\/]/g, Path.sep);
 }
 
 /**
  * Helper functions for promise based
  */
-function readFileAsync(path)
-{
+function readFileAsync(path) {
 	return new Promise((resolve, reject) => {
 		Fs.readFile(path, (e, data) => {
 			return (e) ? reject(e) : resolve(data.toString());
 		});
 	});
 }
-function writeFileAsync(path, data)
-{
+function writeFileAsync(path, data) {
 	return new Promise((resolve, reject) => {
 		Fs.writeFile(path, data, (e) => {
 			return (e) ? reject(e) : resolve();
 		});
 	});
 }
-function readdirAsync(path)
-{
+function readdirAsync(path) {
 	return new Promise((resolve, reject) => {
 		Fs.readdir(path, (e, dataList) => {
 			return (e) ? reject(e) : resolve(dataList);

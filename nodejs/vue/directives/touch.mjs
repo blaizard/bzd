@@ -1,4 +1,4 @@
-"use strict";
+
 
 const DRAG_ELEMENT = "drag-element";
 const DRAG_PLACEHOLDER = "drag-placeholder";
@@ -58,7 +58,7 @@ function synchronizeCssStyles(src, destination, recursive) {
 }
 
 function isVisible(elt) {
-	if (elt.offsetParent === null) return false;
+	if (elt.offsetParent === null) {return false;}
 	while (elt && (elt.body === undefined) && (elt.style.opacity === "" || parseFloat(elt.style.opacity) > 0.1)) {
 		elt = elt.parentNode;
 	}
@@ -67,8 +67,10 @@ function isVisible(elt) {
 }
 
 function isPrimaryButtonOrTouch(e) {
-	// Ignore mousedowns on any button other than the left (or primary)
-	// mouse button, or when a modifier key is pressed.
+	/*
+	 * Ignore mousedowns on any button other than the left (or primary)
+	 * mouse button, or when a modifier key is pressed.
+	 */
 	return (e.which === 1 && !e.ctrlKey && !e.altKey)
 			|| (e.touches && e.touches.length);
 }
@@ -171,9 +173,11 @@ async function dragStart(e) {
 				receiverDocument = iframe.contentWindow.document;
 			}
 			receiverEltList = [...receiverDocument.querySelectorAll(curConfig.selectorReceiver)];
-			// As the selection is made depth-first, we want to have the nested element first in the selection in order
-			// to make sure they will be selected if contained into another selector. Hence a quick trick is to reverse
-			// this selection.
+			/*
+			 * As the selection is made depth-first, we want to have the nested element first in the selection in order
+			 * to make sure they will be selected if contained into another selector. Hence a quick trick is to reverse
+			 * this selection.
+			 */
 			receiverEltList = receiverEltList.reverse();
 			receiverEltList.forEach((elt) => {
 				elt.classList.add(DRAG_RECEIVER_ACTIVE);
@@ -285,8 +289,10 @@ async function dragStart(e) {
 		curConfig.onstartdrag();
 	}
 
-	// Trigger the move event to ensure that the drag element is
-	// updated at the right position
+	/*
+	 * Trigger the move event to ensure that the drag element is
+	 * updated at the right position
+	 */
 	dragMove(e);
 
 	if (curConfig.drag) {
@@ -339,8 +345,10 @@ function detectDropZone() {
 					newActiveReveiverElt = elt;
 					break;
 				}
-				// This will act as the second guess if none of them matched. Note we use the last match as this will be
-				// the outer (not nested) one. And this is what we want for the second guess.
+				/*
+				 * This will act as the second guess if none of them matched. Note we use the last match as this will be
+				 * the outer (not nested) one. And this is what we want for the second guess.
+				 */
 				else if (isPointInRectangle(coordViewPort, coordEltViewPort, curConfig.toleranceReceiverMargin)) {
 					newActiveReceiverEltWithTolerance = elt;
 				}

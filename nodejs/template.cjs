@@ -1,4 +1,4 @@
-"use strict";
+
 
 const Fs = require("fs");
 const Assert = require("assert");
@@ -42,25 +42,27 @@ class Template {
 		const getNextValueInternal = () => {
 			let curArgs = args;
 
-			while (++index < key.length || key[index] == "]")
-			{
+			while (++index < key.length || key[index] == "]") {
 				let curKey = "";
 				for (; index<key.length && (".[]".indexOf(key[index]) === -1); ++index) {
 					curKey += key[index];
 				}
 
 				Assert.ok(typeof curArgs === "object", () => ("The key \"" + key + "\" is invalid (error with \"" + curKey + "\")."));
-				Assert.ok(curArgs.hasOwnProperty(curKey), () => ("The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"));
+				Assert.ok(curKey in curArgs, () => ("The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"));
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {
 				case "[":
-					const curKey = getNextValueInternal();
-					curArgs = curArgs[curKey];
+					{
+						const curKey = getNextValueInternal();
+						curArgs = curArgs[curKey];
+					}
+					break;
 				}
 			}
 			return curArgs;
-		}
+		};
 
 		return getNextValueInternal();
 	}
@@ -85,6 +87,6 @@ class Template {
 
 		return output;
 	}
-};
+}
 
 module.exports = Template;

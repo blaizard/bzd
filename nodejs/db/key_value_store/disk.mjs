@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Path from "path";
 
@@ -16,8 +16,8 @@ export default class KeyValueStoreDisk {
 	constructor(path, options) {
 		this.options = Object.assign({
 			/**
-             * Bucket specific options 
-             */
+			 * Bucket specific options 
+			 */
 			buckets: {},
 		}, options);
 		// The path where to store the database
@@ -46,8 +46,8 @@ export default class KeyValueStoreDisk {
 	}
 
 	/**
-     * Return the persistence associated with a specific bucket and, if needed, create it and load it.
-     */
+	 * Return the persistence associated with a specific bucket and, if needed, create it and load it.
+	 */
 	async _getPersistence(bucket) {
 
 		if (!this.cache.isCollection(bucket)) {
@@ -58,8 +58,8 @@ export default class KeyValueStoreDisk {
 				// Read bucket specific options
 				const optionsBucket = Object.assign({
 					/**
-                     * \brief Perform a savepoint every X seconds
-                     */
+					 * \brief Perform a savepoint every X seconds
+					 */
 					savepointIntervalS: 5 * 60
 				}, (bucket in this.options.buckets) ? this.options.buckets[bucket] : {});
 
@@ -134,7 +134,7 @@ export default class KeyValueStoreDisk {
 		const valueList = (Array.isArray(value)) ? value : [value];
 		const filteredData = Object.keys(data).filter((name) => {
 			const entry = data[name];
-			return subKey in entry && valueList.includes(entry[subKey])
+			return subKey in entry && valueList.includes(entry[subKey]);
 		}).reduce((obj, name) => {
 			obj[name] = data[name];
 			return obj;

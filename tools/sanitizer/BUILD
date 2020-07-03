@@ -8,12 +8,17 @@ py_binary(
         ],
     ),
     args = [
-        "--config=linux_x86_64_clang",
-        "--clang-format",
-        "%EXEC_ROOT%/$(location @linux_x86_64_clang_9_0_0//:clang_format)",
+        "--action",
+        "$(location //tools/sanitizer/actions/eslint)",
+        "--action",
+        "$(location //tools/sanitizer/actions/clang_format)",
     ],
     data = [
-        "@linux_x86_64_clang_9_0_0//:clang_format",
+        "//tools/sanitizer/actions/clang_format",
+        "//tools/sanitizer/actions/eslint",
     ],
     main = "sanitizer.py",
+    deps = [
+        "//python/bzd/utils:run",
+    ],
 )

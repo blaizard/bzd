@@ -1,7 +1,3 @@
-import ExceptionFactory from "../core/exception.mjs";
-
-const Exception = ExceptionFactory("db", "utils");
-
 export class CollectionPaging {
 	constructor(data, nextPaging = null) {
 		this._data = data;
@@ -13,7 +9,7 @@ export class CollectionPaging {
 	}
 
 	isLast() {
-		return !Boolean(this._nextPaging);
+		return !this._nextPaging;
 	}
 
 	getNextPaging() {
@@ -36,4 +32,4 @@ export class CollectionPaging {
 		}, {});
 		return result;
 	}
-};
+}

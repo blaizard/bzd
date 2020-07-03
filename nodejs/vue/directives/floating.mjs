@@ -1,4 +1,4 @@
-"use strict";
+
 
 function update(el, config) {
 

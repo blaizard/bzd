@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Fs from "fs";
 import ExceptionFactory from "./exception.mjs";
@@ -44,8 +44,7 @@ export default class Template {
 		const getNextValueInternal = () => {
 			let curArgs = args;
 
-			while (++index < key.length || key[index] == "]")
-			{
+			while (++index < key.length || key[index] == "]") {
 				let curKey = "";
 				for (; index<key.length && (".[]".indexOf(key[index]) === -1); ++index) {
 					curKey += key[index];

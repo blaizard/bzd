@@ -23,4 +23,4 @@ bzd::Expected<SizeType> DigitalOutputEsp32XtensaLx6::write(const bzd::Span<const
 	return 1;
 }
 
-}}} // namespace bzd::io
+}}} // namespace bzd::io::impl

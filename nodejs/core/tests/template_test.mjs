@@ -1,4 +1,4 @@
-"use strict";
+
 
 import LogFactory from "../log.mjs";
 import ExceptionFactory from "../exception.mjs";

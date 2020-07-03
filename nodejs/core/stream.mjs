@@ -1,4 +1,4 @@
-"use strict";
+
 
 import { Readable } from "stream";
 
@@ -17,8 +17,8 @@ export async function toBuffer(data) {
 export function fromBuffer(buffer) {
 	return new Readable({
 		read() {
-		  this.push(buffer);
-		  this.push(null);
+			this.push(buffer);
+			this.push(null);
 		},
 	});
 }

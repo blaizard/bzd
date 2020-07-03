@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Event from "../../core/event.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
@@ -18,8 +18,8 @@ export default class Storage {
 	}
 
 	/**
-     * Initialize the storage module
-     */
+	 * Initialize the storage module
+	 */
 	async _initialize() {
 		try {
 			this.event.trigger("ready");
@@ -32,8 +32,8 @@ export default class Storage {
 	}
 
 	/**
-     * Initialization function (optional)
-     */
+	 * Initialization function (optional)
+	 */
 	async _initializeImpl() {
 	}
 
@@ -52,29 +52,29 @@ export default class Storage {
 	}
 
 	/**
-     * Tell whether a key exists or not
-     */
+	 * Tell whether a key exists or not
+	 */
 	async is(/*bucket, key*/) {
 		Exception.unreachable("'is' must be implemented.");
 	}
 
 	/**
-     * Return a file read stream from a specific key
-     */
+	 * Return a file read stream from a specific key
+	 */
 	async read(/*bucket, key*/) {
 		Exception.unreachable("'read' must be implemented.");
 	}
 
 	/**
-     * Store a file to a specific key
-     */
+	 * Store a file to a specific key
+	 */
 	async write(/*bucket, key, data*/) {
 		Exception.unreachable("'write' must be implemented.");
 	}
 
 	/**
-     * Delete a file from a bucket
-     */
+	 * Delete a file from a bucket
+	 */
 	async delete(/*bucket, key*/) {
 		Exception.unreachable("'delete' must be implemented.");
 	}

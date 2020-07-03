@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Base from "./base.mjs";
 import ExceptionFactory from "../exception.mjs";
@@ -62,13 +62,13 @@ class Context {
 		}
 		this.manualResponse = true;
 	}
-};
+}
 
 export default class APIServer extends Base {
 
-    /**
-     * Register a callback to handle a request
-     */
+	/**
+	 * Register a callback to handle a request
+	 */
 	handle(method, endpoint, callback, /*options = {}*/) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
@@ -182,9 +182,11 @@ export default class APIServer extends Base {
 			}
 		};
 
-		// Update the endpoint to support variables
-		// Only supports simple syntax:
-		// -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
+		/*
+		 * Update the endpoint to support variables
+		 * Only supports simple syntax:
+		 * -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
+		 */
 		let regexpr = /{([^}:]+)}/;
 		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
 

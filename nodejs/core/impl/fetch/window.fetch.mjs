@@ -1,4 +1,4 @@
-"use strict";
+
 
 import ExceptionFetch from "./exception.mjs";
 

@@ -11,10 +11,7 @@ public:
 		bzd::UInt8Type interface = 0;
 	};
 
-	constexpr I2CEsp32XtensaLx6(const Configuration& config)
-			: bzd::io::I2C{}, config_{config}
-	{
-	}
+	constexpr I2CEsp32XtensaLx6(const Configuration& config) : bzd::io::I2C{}, config_{config} {}
 
 	bzd::Expected<void> connect() override;
 
@@ -24,4 +21,4 @@ public:
 private:
 	Configuration config_;
 };
-}}} // namespace bzd::io
+}}} // namespace bzd::io::impl

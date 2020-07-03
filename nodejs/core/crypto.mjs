@@ -1,4 +1,4 @@
-"use strict";
+
 
 export async function base64Encode(data) {
 	if (process.env.BZD_RULE === "nodejs_web") {

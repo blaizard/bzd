@@ -1,4 +1,4 @@
-"use strict";
+
 
 import { base64Encode } from "./crypto.mjs";
 import ExceptionFactory from "./exception.mjs";

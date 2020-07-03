@@ -1,4 +1,4 @@
-"use strict";
+
 
 import ExceptionFactory from "../exception.mjs";
 import TimeSeries from "../timeseries.mjs";

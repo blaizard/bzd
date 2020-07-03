@@ -1,4 +1,4 @@
-"use strict";
+
 
 let current = {
 	watcher: null,
@@ -137,12 +137,14 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 
 export function tooltip(elt, message = null, initialPosition = null) {
 
-	// Save the current object. Do this event if it is not shown, this is used
-	// by the asynchronous function if it needs to be updated.
+	/*
+	 * Save the current object. Do this event if it is not shown, this is used
+	 * by the asynchronous function if it needs to be updated.
+	 */
 	current.elt = elt;
 
 	message = message || elt.getAttribute("data-irtooltip");
-	if (!message) return;
+	if (!message) {return;}
 
 	const initalPosition = initialPosition || elt.getAttribute("data-irtooltip-position") || defaultPosition;
 
@@ -230,9 +232,11 @@ export default function (el, binding) {
 		el.removeAttribute("data-irtooltip");
 	}
 
-	// Add async function if any.
-	// We cannot use an event here as when called multiple times,
-	// multiple event will be associated.
+	/*
+	 *  Add async function if any.
+	 *  We cannot use an event here as when called multiple times,
+	 *  multiple event will be associated.
+	 */
 	if (config.async) {
 		el.onceAsync = config.async;
 	}

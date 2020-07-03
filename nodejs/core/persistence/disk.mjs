@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Event from "../event.mjs";
 import FileSystem from "../filesystem.mjs";
@@ -116,8 +116,10 @@ export default class PersistenceDisk {
 	 */
 	async initialize(ignoreErrors) {
 
-		// Lock the mutex to make sure no data is accessed while
-		// initializing both the deltas and the datas.
+		/*
+		 * Lock the mutex to make sure no data is accessed while
+		 * initializing both the deltas and the datas.
+		 */
 		await this.mutex.lock();
 
 		Exception.assert(!this.savepointTaskId, "A task ID of the periodic task is already created.");
@@ -274,8 +276,10 @@ export default class PersistenceDisk {
 
 			Log.debug("Data successfully {}", (typeof data === "undefined") ? "reset" : "set");
 
-			// Increase the savepoitn version at the end to ensure that if a savepoint
-			// is currently running with the old data, it will be discarded.
+			/*
+			 * Increase the savepoitn version at the end to ensure that if a savepoint
+			 * is currently running with the old data, it will be discarded.
+			 */
 			this.savepointVersion++;
 			// Only if everything went well, set the ready flag
 			this.event.trigger("ready");
@@ -373,21 +377,27 @@ export default class PersistenceDisk {
 
 			let deltaPath = await this.getDeltaPath();
 
-			// Get the size of the file before appending the data,
-			// this is used to recover the file if an error occured.
+			/*
+			 * Get the size of the file before appending the data,
+			 * this is used to recover the file if an error occured.
+			 */
 			const stats = await FileSystem.stat(deltaPath);
 			let fileSize = stats.size;
 
-			// If the size exceed the maxium size, create a new delta file,
-			// use it and reset the filesize.
+			/*
+			 * If the size exceed the maxium size, create a new delta file,
+			 * use it and reset the filesize.
+			 */
 			if (fileSize > this.options.maxDeltaB) {
 				await this.createDeltaNoLock();
 				deltaPath = await this.getDeltaPath();
 				fileSize = 0;
 			}
 
-			// Pre-read the current data, it is important to do it before writing to the delta file,
-			// otherwise data will be append twice.
+			/*
+			 * Pre-read the current data, it is important to do it before writing to the delta file,
+			 * otherwise data will be append twice.
+			 */
 			await this.get();
 
 			// Add the action to the delta file, make sure it fits on a single line
@@ -500,8 +510,10 @@ export default class PersistenceDisk {
 			// Write the data to a file
 			promiseWrite = FileSystem.writeFile(tempPath, this.options.write(this.data));
 
-			// It will save everything from here. So at this point, if nothing modified
-			// the deltas, it will be cleaned.
+			/*
+			 * It will save everything from here. So at this point, if nothing modified
+			 * the deltas, it will be cleaned.
+			 */
 			this.delta.dirty = false;
 
 			// Release the lock as of now the persistence has already been copied to be written
@@ -612,8 +624,10 @@ export default class PersistenceDisk {
 	async consistencyCheck() {
 		Exception.assert(this.isReady(), "Persistence is not ready yet.");
 
-		// Make sure that the content in the list is the same
-		// as the content on the directory
+		/*
+		 * Make sure that the content in the list is the same
+		 * as the content on the directory
+		 */
 		await this.mutex.lock();
 
 		try {
