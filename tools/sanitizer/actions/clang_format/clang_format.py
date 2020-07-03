@@ -2,6 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import argparse
+import sys
 from bzd.utils.run import localBazelBinary
 from tools.sanitizer.utils.workspace import Files
 
@@ -14,5 +15,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	files = Files(args.workspace, r'.*\.(c|cxx|cpp|h|hpp)$')
+	noError = True
 	for path in files.data():
-		localBazelBinary(args.clang_format, args = ["-style=file", "-i", "-sort-includes", path])
+		result = localBazelBinary(args.clang_format, args = ["-style=file", "-i", "-sort-includes", path])
+		noError = noError and (result.getReturnCode() == 0)
+
+	sys.exit(0 if noError else 1)
