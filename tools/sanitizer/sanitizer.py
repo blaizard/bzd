@@ -19,7 +19,7 @@ if __name__ == "__main__":
     noError = True
     for action in args.actions:
         print("Action '{}'...".format(action))
-        result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace])
+        result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace], timeoutS = 300)
         noError = noError and (result.returncode == 0)
         if result.returncode != 0:
             print(result.getOutput())

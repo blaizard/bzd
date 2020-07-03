@@ -35,19 +35,23 @@ def localCommand(cmds, inputs = None, ignoreFailure = False, env=None, timeoutS 
     timer = threading.Timer(timeoutS, proc.kill)
     sel.register(proc.stdout, selectors.EVENT_READ)
     sel.register(proc.stderr, selectors.EVENT_READ)
+
     try:
         isRunning = True
-        while isRunning:
+        timer.start()
+        while isRunning and timer.is_alive():
             for key, _ in sel.select():
                 data = key.fileobj.read1(128).decode(errors = "ignore")
                 if not data:
                     isRunning = False
                 if data != "":
                     output.append(((key.fileobj is proc.stdout), data))
-        assert proc.poll() != None, "Process did not complete"
 
+        if proc.poll() == None:
+            output.append((False, "Process did not complete"))
         if not timer.is_alive():
             output.append((False, "Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS)))
+
     finally:
         timer.cancel()
 
