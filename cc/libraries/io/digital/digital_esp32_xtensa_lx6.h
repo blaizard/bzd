@@ -7,9 +7,7 @@ namespace bzd { namespace io { namespace impl {
 class DigitalOutputEsp32XtensaLx6 : public bzd::io::DigitalOutput
 {
 public:
-	constexpr DigitalOutputEsp32XtensaLx6(const bzd::UInt8Type& pin) : bzd::io::DigitalOutput{}, pin_{static_cast<gpio_num_t>(pin)}
-	{
-	}
+	constexpr DigitalOutputEsp32XtensaLx6(const bzd::UInt8Type& pin) : bzd::io::DigitalOutput{}, pin_{static_cast<gpio_num_t>(pin)} {}
 
 	bzd::Expected<void> connect() override;
 	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
@@ -17,4 +15,4 @@ public:
 private:
 	const gpio_num_t pin_;
 };
-}}} // namespace bzd::io
+}}} // namespace bzd::io::impl

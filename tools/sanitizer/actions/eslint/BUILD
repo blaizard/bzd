@@ -3,16 +3,12 @@ load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_binary")
 bzd_nodejs_binary(
     name = "eslint",
     srcs = glob([
-        "*.js",
+        "*.cjs",
     ]),
-    args = [
-        "--config",
-        "tools/sanitizer/eslint/.eslintrc.json",
-    ],
     data = [
         ".eslintrc.json",
     ],
-    main = "app.js",
+    main = "app.cjs",
     packages = {
         "eslint": "",
         "eslint-plugin-vue": "",

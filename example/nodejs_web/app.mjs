@@ -1,12 +1,12 @@
-"use strict"
 
-import Vue from "vue"
+
+import Vue from "vue";
 import VueCompositionApi from "@vue/composition-api";
-import App from "./app.vue"
+import App from "./app.vue";
 
 Vue.use(VueCompositionApi);
 
 new Vue({
-	el: '#app',
+	el: "#app",
 	render: (h) => h(App)
 });

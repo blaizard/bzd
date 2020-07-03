@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Event from "../event.mjs";
 import ExceptionFactory from "../exception.mjs";

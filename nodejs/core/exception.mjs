@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Format from "./format.mjs";
 import LogFactory from "./log.mjs";
@@ -68,8 +68,7 @@ const ExceptionFactory = (...topics) => {
 		/**
 		 * Convert an Error into an Exception
 		 */
-		static fromError(e)
-		{
+		static fromError(e) {
 			let exception = new Exception();
 			exception.message = e.message;
 			exception.stack = e.stack;

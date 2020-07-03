@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Event from "../../core/event.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
@@ -18,8 +18,8 @@ export default class Storage {
 	}
 
 	/**
-     * Initialize the storage module
-     */
+	 * Initialize the storage module
+	 */
 	async _initialize() {
 		try {
 			this.event.trigger("ready");
@@ -32,8 +32,8 @@ export default class Storage {
 	}
 
 	/**
-     * Initialization function (optional)
-     */
+	 * Initialization function (optional)
+	 */
 	async _initializeImpl() {
 	}
 
@@ -52,8 +52,8 @@ export default class Storage {
 	}
 
 	/**
-     * Insert a new entry
-     */
+	 * Insert a new entry
+	 */
 	async insert(/*bucket, timestamp, data*/) {
 		Exception.unreachable("'insert' must be implemented.");
 	}

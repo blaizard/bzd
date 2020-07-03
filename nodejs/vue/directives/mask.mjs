@@ -1,4 +1,4 @@
-"use strict";
+
 
 function maskEvent(e) {
 	e.stopPropagation();

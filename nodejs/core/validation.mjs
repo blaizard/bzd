@@ -1,12 +1,11 @@
-"use strict";
+
 
 import Format from "./format.mjs";
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("validation");
 
-class Constraint
-{
+class Constraint {
 	constructor(schema, key, name, arg) {
 		this.name = name;
 		this.arg = arg;
@@ -24,7 +23,7 @@ class Constraint
 	}
 
 	install() {
-		return (/*result, value*/) => {}
+		return (/*result, value*/) => {};
 	}
 
 	static getAndAssertInteger(arg, result = [], key = null) {
@@ -59,7 +58,7 @@ class Constraint
 	assert(result, condition, str, ...args) {
 		return Constraint.assert(result, this.key, condition, str, ...args);
 	}
-};
+}
 
 /**
  * Data validation module
@@ -86,7 +85,7 @@ export default class Validation {
 		if (singleValue) {
 			schema = {
 				value: schema
-			}
+			};
 		}
 		this.singleValue = singleValue;
 		this.schema = this._processSchema(schema);
@@ -138,7 +137,7 @@ export default class Validation {
 		if (this.singleValue) {
 			values = {
 				value: values
-			}
+			};
 		}
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
 
@@ -249,7 +248,7 @@ export default class Validation {
 				install() {
 					Exception.assert(this.entry.type == "string", "Email is only compatible with string type");
 					return (result, value) => {
-						this.assert(result, value.match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/), "email");
+						this.assert(result, value.match(/^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/), "email");
 					};
 				}
 			},

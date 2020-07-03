@@ -1,4 +1,4 @@
-"use strict";
+
 
 import ExceptionFactory from "../core/exception.mjs";
 
@@ -13,8 +13,8 @@ export default class Email {
 	}
 
 	/**
-     * Send an email
-     */
+	 * Send an email
+	 */
 	async send(to, subject, data) {
 		const toList = (Array.isArray(to)) ? to : [to];
 		Exception.assert(typeof data == "object", "'data' must be an object: {}", data);

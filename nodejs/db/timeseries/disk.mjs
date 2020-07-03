@@ -1,4 +1,4 @@
-"use strict";
+
 
 import PersistenceTimeseries from "../../core/persistence/timeseries.mjs";
 import Timeseries from "./timeseries.mjs";
@@ -29,8 +29,8 @@ export default class TimeseriesDisk extends Timeseries {
 	}
 
 	/**
-     * Initialize the timeseries module
-     */
+	 * Initialize the timeseries module
+	 */
 	async _initializeImpl() {
 
 		// Create the directory if it does not exists
@@ -40,8 +40,8 @@ export default class TimeseriesDisk extends Timeseries {
 	}
 
 	/**
-     * Return the persistence associated with a specific bucket and, if needed, create it and load it.
-     */
+	 * Return the persistence associated with a specific bucket and, if needed, create it and load it.
+	 */
 	async _getPersistence(bucket) {
 
 		if (!this.cache.isCollection(bucket)) {
@@ -50,10 +50,10 @@ export default class TimeseriesDisk extends Timeseries {
 			this.cache.register(bucket, async () => {
 
 				// Read bucket specific options
-				const optionsBucket = Object.assign({
+				Object.assign({
 					/**
-                     * \brief Perform a savepoint every X seconds
-                     */
+					 * \brief Perform a savepoint every X seconds
+					 */
 					savepointIntervalS: 5 * 60
 				}, (bucket in this.options.buckets) ? this.options.buckets[bucket] : {});
 

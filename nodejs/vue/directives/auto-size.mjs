@@ -1,4 +1,4 @@
-"use strict";
+
 
 // Used to generated unique Ids
 let elementUid = 0;
@@ -15,8 +15,10 @@ function autoResize(el) {
 		uid = registerObserver(el);
 	}
 
-	// If this element is registered, clear the previous timeout if any and set this one.
-	// This is done to avoid any duplicated calls and keep only the latest one valid.
+	/*
+	 * If this element is registered, clear the previous timeout if any and set this one.
+	 * This is done to avoid any duplicated calls and keep only the latest one valid.
+	 */
 	clearTimeout(observers[uid].instance);
 
 	// Make everything asynchronous to avoid any execution time limit from the ResizeObserver
@@ -59,15 +61,19 @@ function autoResize(el) {
 
 			fontSize = Math.floor((maxFontSize + minFontSize) / 2);
 
-			// console.log(uid + "; max: [" + rectParent.width + "px, " + rectParent.height + "px], size: [" + rect.width + "px, " + rect.height + "px], font: [" + minFontSize + "px, " + maxFontSize + "px]");
-			// The difference is not an integer, therefore we must check the upper limit (hence the >=2 and not > 1)
+			/*
+			 * console.log(uid + "; max: [" + rectParent.width + "px, " + rectParent.height + "px], size: [" + rect.width + "px, " + rect.height + "px], font: [" + minFontSize + "px, " + maxFontSize + "px]");
+			 * The difference is not an integer, therefore we must check the upper limit (hence the >=2 and not > 1)
+			 */
 		} while (Math.abs(maxFontSize - minFontSize) >= 2);
 
 		el.style.fontSize = minFontSize + "px";
 		el.style.opacity = 1;
 
-		// No need to check if there is an observer there must be at this point.
-		// Set the new hash
+		/*
+		 * No need to check if there is an observer there must be at this point.
+		 * Set the new hash
+		 */
 		observers[uid].hash = generateHash(rect, rectParent);
 	}, 10);
 }

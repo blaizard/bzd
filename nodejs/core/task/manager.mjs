@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Task from "./task.mjs";
 import LogFactory from "../log.mjs";
@@ -88,8 +88,10 @@ export default class Manager {
 		const task = this.tasks[taskId.namespace][taskId.name];
 		Log.info("Unregistering task '{}'", task);
 
-		// If the task is pending (it is in the queue but not executed yet),
-		// remove it from the list.
+		/*
+		 * If the task is pending (it is in the queue but not executed yet),
+		 * remove it from the list.
+		 */
 		if (task.status == Task.STATUS_PENDING) {
 			const index = Manager.findInQueue(this.taskQueues[task.priority], task);
 			Exception.assert(index !== -1, "The task is pending but it cannot be found in the queue");
@@ -165,8 +167,10 @@ export default class Manager {
 	popNextTask() {
 		const timestamp = Manager.getTimestampMs();
 
-		// Look for the next task which timestamp already past,
-		// starting from the highest priority
+		/*
+		 * Look for the next task which timestamp already past,
+		 * starting from the highest priority
+		 */
 		for (let priority = this.taskQueues.length - 1; priority >= 0; --priority) {
 			if (this.taskQueues[priority].length && this.taskQueues[priority][0].timestamp <= timestamp) {
 				return this.taskQueues[priority].shift();
@@ -203,8 +207,10 @@ export default class Manager {
 		const nextTimestamp = this.getNextTaskTimestamp();
 
 		if (nextTimestamp !== null) {
-			// Task scheduler is running and its next execution is too late,
-			// stop it and restart it
+			/*
+			 * Task scheduler is running and its next execution is too late,
+			 * stop it and restart it
+			 */
 			if (this.schedulerInstance && nextTimestamp < this.schedulerTimestamp) {
 				clearTimeout(this.schedulerInstance);
 				this.schedulerInstance = null;
@@ -245,8 +251,10 @@ export default class Manager {
 					task.status = Task.STATUS_IDLE;
 				}
 
-				// Re-insert the task if valid. Note, if the task is invalid
-				// it will not insert the task but unregister it
+				/*
+				 * Re-insert the task if valid. Note, if the task is invalid
+				 * it will not insert the task but unregister it
+				 */
 				this.scheduleTaskIfValid(task, task.intervalMs, /*triggerTaskScheduler*/false);
 			}
 		}

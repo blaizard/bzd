@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Cache from  "../core/cache.mjs";
 import ExceptionFactory from  "../core/exception.mjs";

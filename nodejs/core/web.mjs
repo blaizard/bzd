@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Express from "express";
 import Helmet from "helmet";
@@ -53,8 +53,10 @@ export default class Web {
 				maxAge: 60 * 60 * 1000, // 1h
 				index: "index.html",
 				setHeaders: (res, path) => {
-					// Do not cache the index.html
-					// this is usefull when the application updates.
+					/*
+					 * Do not cache the index.html
+					 * this is usefull when the application updates.
+					 */
 					if (path.endsWith("index.html")) {
 						res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
 						res.header("Expires", "-1");
@@ -204,7 +206,7 @@ export default class Web {
 		if (fallback) {
 			this.app.use(uri, ((...args) => (req, res, next) => {
 				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-					(res.sendFile || res.sendfile).call(res, ...args, err => err && next())
+					(res.sendFile || res.sendfile).call(res, ...args, err => err && next());
 				}
 				else {
 					next();
@@ -298,19 +300,19 @@ export default class Web {
 
 // ---- Private members ----
 
-function resetErrorHandler(reject)
-{
+function resetErrorHandler(reject) {
 	this.server.on("error", (e) => {
 		reject(e);
 	});
 }
 
-// It is important that the signature of this function contains the "next" argument,
-// oterhwise it will not be handled correctly. From Express documentation:
-// "error-handling functions have four arguments instead of three: (err, req, res, next)"
+/*
+ * It is important that the signature of this function contains the "next" argument,
+ * oterhwise it will not be handled correctly. From Express documentation:
+ * "error-handling functions have four arguments instead of three: (err, req, res, next)"
+ */
 // eslint-disable-next-line no-unused-vars
-function middlewareErrorHandler(e, req, res, next)
-{
+function middlewareErrorHandler(e, req, res, next) {
 	Exception.print("Receive error; {}", e);
 	res.status(500).send(e.message);
 }

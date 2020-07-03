@@ -25,10 +25,10 @@ class RouterManager {
 			 * Hash mode
 			 */
 			hash: true,
-            /**
-             * Authentication object to be used with this router.
-             */
-            authentication: null,
+			/**
+			 * Authentication object to be used with this router.
+			 */
+			authentication: null,
 		}, options);
 
 		this.routers = new Map();
@@ -53,8 +53,10 @@ class RouterManager {
 		options.routes.forEach((route) => {
 
 			const handler = async (route, args, path) => {
-				// Check if the route requires authentication,
-				// if so ensure that we are authenticated
+				/*
+				 * Check if the route requires authentication,
+				 * if so ensure that we are authenticated
+				 */
 				if (route.authentication) {
 					Exception.assert(this.options.authentication, "This route has authentication requirement but no authentication object was specified.");
 					await this.options.authentication.refreshAuthentication();
@@ -208,8 +210,10 @@ class RouterManager {
 
 		Log.debug("Router '{}' processed path '{}' and propagate path '{}'", uid, router.path, router.pathPropagate);
 
-		// Propagate to nested routers.
-		// Timeout is to ensure routers are unregisters in the mean time.
+		/*
+		 * Propagate to nested routers.
+		 * Timeout is to ensure routers are unregisters in the mean time.
+		 */
 		await delayMs(1);
 
 		let promiseList = Array.from(router.children).map(async (childUid) => { await this._propagate(childUid); });
@@ -227,8 +231,10 @@ export default class {
 
 		Vue.prototype.$routerSet = async function (routeOptions) {
 
-			// Register hook
-			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
+			/*
+			 * Register hook
+			 * https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
+			 */
 			this.$once("hook:beforeDestroy", () => {
 				const uid = routers._getUid(this);
 				routers.unregisterRouter(uid);

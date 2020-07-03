@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Event from "./event.mjs";
 import LogFactory from "./log.mjs";
@@ -12,8 +12,7 @@ const Exception = ExceptionFactory("cache");
  * A collection is a dictionary of data that obey to the same rules (same trigger functions, timeout, etc).
  * Data inside collections are accessed by their id.
  */
-class Cache
-{
+class Cache {
 	constructor(config) {
 		this.config = Object.assign({
 			timeoutMs: 30 * 1000,
@@ -62,12 +61,14 @@ class Cache
 			this.data[collection]._timeoutMs = options.timeout;
 		}
 
-		// Set initial value if any defined and set its timeout to
-		// the past to ensure that a new value will be fetched.
-		//	if (options && typeof options.default !== "undefined") {
-		//		data._data = options.default;
-		//		data._timeout = Cache.getTimestampMs() - 1;
-		//	}
+		/*
+		 *  Set initial value if any defined and set its timeout to
+		 *  the past to ensure that a new value will be fetched.
+		 * 	if (options && typeof options.default !== "undefined") {
+		 * 		data._data = options.default;
+		 * 		data._timeout = Cache.getTimestampMs() - 1;
+		 * 	}
+		 */
 
 		Log.info("Register collection '{}'", collection);
 	}
@@ -229,9 +230,11 @@ class Cache
 	 * \param value The value to be set.
 	 * \param ...path The identifier of the data.
 	 */
-	/*set(value, ...path) {
-		setValue(this.data, {data: value}, "_data", ...path);
-	}*/
+	/*
+	 *set(value, ...path) {
+	 *setValue(this.data, {data: value}, "_data", ...path);
+	 *}
+	 */
 
 	/**
 	 * \brief Set the value of the cache.
@@ -240,22 +243,26 @@ class Cache
 	 * \param timeout The timeout in Ms of the validity of the data.
 	 * \param ...path The identifier of the data.
 	 */
-	/*setWithTimeout(value, timeout, ...path) {
-		setValue(this.data, {
-			data: value,
-			timeout: timeout
-		}, ...path);
-	}*/
+	/*
+	 *setWithTimeout(value, timeout, ...path) {
+	 *setValue(this.data, {
+	 *data: value,
+	 *timeout: timeout
+	 *}, ...path);
+	 *}
+	 */
 
 	/**
 	 * Mark the current data as invalidated (out of date) so it will be reloaded at the next access.
 	 *
 	 * \param ...path The identifier of the data
 	 */
-	/*setDirty(...path) {
-		let data = getOrCreatePath(this.data, ...path);
-		delete data._data;
-	}*/
+	/*
+	 *setDirty(...path) {
+	 *let data = getOrCreatePath(this.data, ...path);
+	 *delete data._data;
+	 *}
+	 */
 }
 
 export default Cache;
@@ -265,8 +272,7 @@ export default Cache;
 /**
  * \brief Return the id from an id list and perform some simple sanity checks.
  */
-function idsToId(collection, ...ids)
-{
+function idsToId(collection, ...ids) {
 	const id = (ids.length) ? ids.reduce((id, currentId) => (id + currentId), "") : "default";
 	Exception.assert(id[0] != "_", "Cache::get({}, {}), ids starting with '_' are protected.", collection, id);
 	Exception.assert(typeof this.data[collection] === "object", "Cache::get({}) does not exist or is not of type object.", collection);
@@ -283,8 +289,7 @@ function idsToId(collection, ...ids)
  *
  * \return The object or null if no object is present.
  */
-function getObject(collection, ...ids)
-{
+function getObject(collection, ...ids) {
 	const id = idsToId.call(this, collection, ...ids);
 	return this.data[collection][id] || null;
 }
@@ -292,8 +297,7 @@ function getObject(collection, ...ids)
 /**
  * Check if the ressource is dirty
  */
-function isDirty(collection, ...ids)
-{
+function isDirty(collection, ...ids) {
 	const id = idsToId.call(this, collection, ...ids);
 	const dataId = this.data[collection][id];
 	return ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs()));
@@ -309,8 +313,7 @@ function isDirty(collection, ...ids)
  *
  * \return The data or a promise that will return the data.
  */
-async function get(instant, collection, ...ids)
-{
+async function get(instant, collection, ...ids) {
 	let timestampFetch = false;
 	const id = idsToId.call(this, collection, ...ids);
 
@@ -373,13 +376,11 @@ async function get(instant, collection, ...ids)
 /**
  * Register the access of a ressource
  */
-function touchResource(collection, id)
-{
+function touchResource(collection, id) {
 	this.resourceMap[collection + "/" + id] = Cache.getTimestampMs();
 }
 
-function deleteResourceById(resourceId)
-{
+function deleteResourceById(resourceId) {
 	const n = resourceId.indexOf("/");
 	Exception.assert(n !== -1, "Invalid resourceId '{}'.", resourceId);
 
@@ -392,16 +393,14 @@ function deleteResourceById(resourceId)
 /**
  * Wait for the next update
  */
-async function waitForNextUpdate()
-{
+async function waitForNextUpdate() {
 	return this.event.waitUntil("updated");
 }
 
 /**
  * \brief Fetch and update the data
  */
-async function triggerUpdate(collection, id, ...ids)
-{
+async function triggerUpdate(collection, id, ...ids) {
 	// Create the data if it does not exists
 	let dataCollection = this.data[collection];
 	if (!(id in dataCollection)) {
@@ -464,22 +463,20 @@ async function triggerUpdate(collection, id, ...ids)
 	this.event.trigger("updated");
 }
 
-function yieldThread()
-{
+function yieldThread() {
 	return new Promise((resolve) => {
 		setTimeout(() => { resolve(); }, 1);
 	});
 }
 
-async function garbageCollector()
-{
+async function garbageCollector() {
 	// If a cleanup is required
 	try {
 		while (this.data._size > this.config.maxSize || (this.config.maxEntries && this.data._nbEntries > this.config.maxEntries)) {
 
 			// Look for the oldest resource
 			const entry = Object.entries(this.resourceMap).reduce((total, cur) => {
-				if (!total || cur[1] < total[1]) return cur;
+				if (!total || cur[1] < total[1]) {return cur;}
 				return total;
 			}, null);
 			Exception.assert(entry, "Could not find entry to remove");

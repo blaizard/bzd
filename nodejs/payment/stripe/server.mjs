@@ -8,7 +8,7 @@ const Log = LogFactory("payment", "stripe");
 
 export default class StripePayment {
 	constructor(options) {
-        this.options = Object.assign({
+		this.options = Object.assign({
 			/**
 			 * The Stripe public key to be used by the client.
 			 */
@@ -25,14 +25,14 @@ export default class StripePayment {
 			 * Function to be called 
 			 */
 			intentCallback: (/*amount, metadata*/) => {}
-        }, options);
+		}, options);
 	}
 
-    installAPI(api) {
-        Log.debug("Installing Stripe payment API.");
+	installAPI(api) {
+		Log.debug("Installing Stripe payment API.");
 		api.addSchema(APISchema);
 
-		api.handle("post", "/payment/stripe/intent", async (inputs, uid) => {
+		api.handle("post", "/payment/stripe/intent", async (inputs/*, uid*/) => {
 
 			this.options.intentCallback(inputs.amount, inputs.metadata);
 	
@@ -62,14 +62,14 @@ export default class StripePayment {
 			return {
 				id: response.id,
 				secret: response.client_secret
-			}
+			};
 		});
 
 		api.handle("get", "/payment/stripe/metadata", async () => {
 			return {
 				pubkey: this.options.publicKey,
 				currency: this.options.currency
-			}
+			};
 		});
 
 		api.handle("post", "/payment/stripe/confirm", async (inputs) => {

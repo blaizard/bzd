@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Assert from "assert";
 

@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Format from "./format.mjs";
 

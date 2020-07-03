@@ -1,4 +1,4 @@
-"use strict";
+
 
 // Used to generated unique Ids
 let elementUid = 0;
@@ -12,15 +12,16 @@ function onResizeProcess(el, callback) {
 
 	// Register the observer if not already done
 	if (callback) {
-		if (observers[uid])
-		{
+		if (observers[uid]) {
 			unregisterObserver(uid);
 		}
 		uid = registerObserver(el, callback);
 	}
 
-	// If this element is registered, clear the previous timeout if any and set this one.
-	// This is done to avoid any duplicated calls and keep only the latest one valid.
+	/*
+	 * If this element is registered, clear the previous timeout if any and set this one.
+	 * This is done to avoid any duplicated calls and keep only the latest one valid.
+	 */
 	clearTimeout(observers[uid].instance);
 
 	// Make everything asynchronous to avoid any execution time limit from the ResizeObserver

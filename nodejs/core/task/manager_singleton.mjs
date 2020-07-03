@@ -1,12 +1,14 @@
-"use strict";
+
 
 import Manager from "./manager.mjs";
 
 // Create a unique, global symbol name
 const _TaskManager = Symbol.for("bzd.core.task.manager");
 
-// Check if the global object has this symbol.
-// Add it if it does not have the symbol, yet.
+/*
+ * Check if the global object has this symbol.
+ * Add it if it does not have the symbol, yet.
+ */
 const globalSymbols = Object.getOwnPropertySymbols(global);
 if (globalSymbols.indexOf(_TaskManager) === -1) {
 	global[_TaskManager] = new Manager();

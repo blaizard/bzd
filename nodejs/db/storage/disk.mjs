@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Path from "path";
 import Fs from "fs";
@@ -22,8 +22,8 @@ export default class StorageDisk extends Storage {
 	}
 
 	/**
-     * Initialize the storage module
-     */
+	 * Initialize the storage module
+	 */
 	async _initializeImpl() {
 		await FileSystem.mkdir(this.path);
 	}

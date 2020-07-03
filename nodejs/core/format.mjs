@@ -1,4 +1,4 @@
-"use strict";
+
 
 /**
  * Format a string using python format syntax.

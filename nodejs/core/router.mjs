@@ -1,4 +1,4 @@
-"use strict";
+
 
 import ExceptionFactory from "./exception.mjs";
 
@@ -59,7 +59,7 @@ export default class Router {
 
 		// Identify the index
 		let counter = matches.length;
-		while (--counter && matches[counter] === undefined);
+		while (--counter && matches[counter] === undefined){} // eslint-disable-line
 
 		const indexRoute = Math.floor((counter - 1) / this.data.maxVars);
 		const indexVar = indexRoute * this.data.maxVars;
@@ -86,8 +86,7 @@ export default class Router {
 	async dispatch(path, ...args) {
 
 		const match = this.match(path);
-		if (match)
-		{
+		if (match) {
 			await match.route.handler(match.vars, ...args);
 			return {
 				matched: true,
@@ -108,16 +107,14 @@ export default class Router {
 /**
  * \brief Escape a string to be used inside a regular expression.
  */
-function escapeRegexp(str)
-{
+function escapeRegexp(str) {
 	return str.replace(/[-[\]/{}()*+?.\\^$|]/g, "\\$&");
 }
 
 /**
  * \brief Pre-process routes before being used.
  */
-function compileRoutes(routes, config)
-{
+function compileRoutes(routes, config) {
 	// Create the master regexpr, to optimize the search speed
 	let routeData = [];
 	// This is used for future computing and will get the maximum number of variable

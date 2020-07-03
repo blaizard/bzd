@@ -1,4 +1,4 @@
-"use strict";
+
 
 import Base from "./base.mjs";
 import Fetch from "../fetch.mjs";
@@ -10,28 +10,28 @@ const Exception = ExceptionFactory("api", "client");
 
 export default class APIClient extends Base {
 
-    updateForm(method, endpoint, formDescription) {
+	updateForm(method, endpoint, formDescription) {
 		this._sanityCheck(method, endpoint);
-        const requestOptions = this.schema[endpoint][method].request || {};
-        const validation = requestOptions.validation || {};
+		const requestOptions = this.schema[endpoint][method].request || {};
+		const validation = requestOptions.validation || {};
 
-        return formDescription.map((description) => {
-            if (description.name && description.name in validation) {
-                description.validation = ((description.validation) ? (description.validation + " ") : "") + validation[description.name];
-            }
-            return description;
-        });
-    }
+		return formDescription.map((description) => {
+			if (description.name && description.name in validation) {
+				description.validation = ((description.validation) ? (description.validation + " ") : "") + validation[description.name];
+			}
+			return description;
+		});
+	}
 
-    async login(uid, password) {
-        Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
-        return await this.options.authentication.login(this, uid, password);
-    }
+	async login(uid, password) {
+		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
+		return await this.options.authentication.login(this, uid, password);
+	}
 
-    async logout() {
-        Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
-        return await this.options.authentication.logout(this);
-    }
+	async logout() {
+		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
+		return await this.options.authentication.logout(this);
+	}
 
 	async request(method, endpoint, data) {
 		this._sanityCheck(method, endpoint);
@@ -46,13 +46,13 @@ export default class APIClient extends Base {
 			fetchOptions.expect = responseOptions.type;
 		}
 
-        if ("validation" in requestOptions) {
-            Exception.assert(["json", "query"].includes(requestOptions.type), "{} {}: validation is not available for {}.", method, endpoint, requestOptions.type);
-            const validation = new Validation(requestOptions.validation);
-            validation.validate(data, {
-                all: true
-            });
-        }
+		if ("validation" in requestOptions) {
+			Exception.assert(["json", "query"].includes(requestOptions.type), "{} {}: validation is not available for {}.", method, endpoint, requestOptions.type);
+			const validation = new Validation(requestOptions.validation);
+			validation.validate(data, {
+				all: true
+			});
+		}
 
 		switch (requestOptions.type) {
 		case "json":
@@ -65,42 +65,42 @@ export default class APIClient extends Base {
 			break;
 		}
 
-        let retry;
-        let retryCounter = 0;
-        do {
-            ++retryCounter;
-            retry = false;
+		let retry;
+		let retryCounter = 0;
+		do {
+			++retryCounter;
+			retry = false;
     
-            // Check if this is a request that needs authentication
-            if (this.schema[endpoint][method].authentication) {
-                Exception.assert(this.isAuthentication(), "This route has authentication requirement but no authentication object was specified.");
-                await this.options.authentication.setAuthenticationFetch(fetchOptions);
-            }
+			// Check if this is a request that needs authentication
+			if (this.schema[endpoint][method].authentication) {
+				Exception.assert(this.isAuthentication(), "This route has authentication requirement but no authentication object was specified.");
+				await this.options.authentication.setAuthenticationFetch(fetchOptions);
+			}
 
-            try {
-                const result = await Fetch.request(this._makePath(endpoint), fetchOptions);
-                if ("validation" in responseOptions) {
-                    Exception.assert(["json"].includes(responseOptions.type), "{} {}: validation is not available for {}.", method, endpoint, responseOptions.type);
-                    const validation = new Validation(responseOptions.validation);
-                    validation.validate(result, {
-                        all: true
-                    });
-                }
-                return result;
-            }
-            catch (e) {
-                if (e instanceof ExceptionFetch) {
-                    if (e.code == 401/*Unauthorized*/) {
-                        if (this.schema[endpoint][method].authentication) {
-                            await this.options.authentication.refreshAuthentication();
-                            retry = true;
-                            continue;
-                        }
-                    }
-                }
-                throw e;
-            }
+			try {
+				const result = await Fetch.request(this._makePath(endpoint), fetchOptions);
+				if ("validation" in responseOptions) {
+					Exception.assert(["json"].includes(responseOptions.type), "{} {}: validation is not available for {}.", method, endpoint, responseOptions.type);
+					const validation = new Validation(responseOptions.validation);
+					validation.validate(result, {
+						all: true
+					});
+				}
+				return result;
+			}
+			catch (e) {
+				if (e instanceof ExceptionFetch) {
+					if (e.code == 401/*Unauthorized*/) {
+						if (this.schema[endpoint][method].authentication) {
+							await this.options.authentication.refreshAuthentication();
+							retry = true;
+							continue;
+						}
+					}
+				}
+				throw e;
+			}
         
-        } while (retry && retryCounter <= 1);
+		} while (retry && retryCounter <= 1);
 	}
 }
