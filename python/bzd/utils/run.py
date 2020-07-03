@@ -13,13 +13,13 @@ class _ExecuteResult:
         self.returncode = returncode
 
     def getStdout(self):
-        return "".join([entry[1] for entry in self.output if entry[0] == True])
+        return b"".join([entry[1] for entry in self.output if entry[0] == True]).decode(errors = "ignore")
 
     def getStderr(self):
-        return "".join([entry[1] for entry in self.output if entry[0] == False])
+        return b"".join([entry[1] for entry in self.output if entry[0] == False]).decode(errors = "ignore")
 
     def getOutput(self):
-        return "".join([entry[1] for entry in self.output])
+        return b"".join([entry[1] for entry in self.output]).decode(errors = "ignore")
 
     def getReturnCode(self):
         return self.returncode
@@ -41,16 +41,16 @@ def localCommand(cmds, inputs = None, ignoreFailure = False, env=None, timeoutS 
         timer.start()
         while isRunning and timer.is_alive():
             for key, _ in sel.select():
-                data = key.fileobj.read1(128).decode(errors = "ignore")
+                data = key.fileobj.read1(128)
                 if not data:
                     isRunning = False
-                if data != "":
+                if data != b"":
                     output.append(((key.fileobj is proc.stdout), data))
 
         if proc.poll() == None:
-            output.append((False, "Process did not complete"))
+            output.append((False, b"Process did not complete"))
         if not timer.is_alive():
-            output.append((False, "Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS)))
+            output.append((False, b"Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS)))
 
     finally:
         timer.cancel()
