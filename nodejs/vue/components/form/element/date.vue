@@ -1,6 +1,6 @@
 <template>
 	<DropdownTemplate
-			class="irform-date"
+			:class="containerClass"
 			ref="dropdown"
 			:value="get()"
 			@input="set"
@@ -80,6 +80,12 @@ export default {
 		};
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-date": true,
+				[this.getOption("class")]: true
+			};
+		},
 		incrementStep() {
 			switch (this.select) {
 			case "day":

@@ -29,6 +29,10 @@ coverage --nobuild_tests_only
 build:cc --build_tag_filters="-nodejs,-docker"
 test:cc --test_lang_filters=cc
 
+# Select only Python targets
+build:py --build_tag_filters="-nodejs,-docker"
+test:py --test_lang_filters=py
+
 # Select only NodeJs targets
 build:nodejs --build_tag_filters=nodejs
 test:nodejs --test_tag_filters=nodejs

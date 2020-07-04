@@ -1,5 +1,5 @@
 <template>
-	<span class="irform-checkbox" @click="handleClick">
+	<span :class="containerClass" @click="handleClick">
 		<input type="checkbox"
 				:id="uid"
 				:checked="get()"
@@ -23,6 +23,12 @@ export default {
 		value: {type: Boolean, required: false, default: false}
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-checkbox": true,
+				[this.getOption("class")]: true
+			};
+		},
 		text() {
 			return this.getOption("text", "");
 		}

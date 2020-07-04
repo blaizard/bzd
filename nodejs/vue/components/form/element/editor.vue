@@ -1,5 +1,5 @@
 <template>
-	<div class="irform-editor">
+	<div :class="containerClass">
 		<ElementCarousel
 				class="irform-editor-toolbar"
 				:disable="disable"
@@ -44,6 +44,12 @@ export default {
 		};
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-editor": true,
+				[this.getOption("class")]: true
+			};
+		},
 		toolbarElements() {
 			const supportedElements = {
 				separator: {

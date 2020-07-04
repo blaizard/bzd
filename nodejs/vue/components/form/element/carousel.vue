@@ -1,5 +1,5 @@
 <template>
-	<div class="irform-carousel">
+	<div :class="containerClass">
 		<!-- Important to use v-show here as the transition animation will be affected
 		with v-if as a redraw is involved //-->
 		<div v-show="isControlPrevious" class="irform-carousel-prev" @click="slidePrevious">&lt;</div>
@@ -106,6 +106,12 @@ export default {
 		}
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-carousel": true,
+				[this.getOption("class")]: true
+			};
+		},
 		touchDirective() {
 			return (this.disable) ? {} : {
 				onswipe: this.onSwipe,

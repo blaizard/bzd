@@ -1,5 +1,5 @@
 <template>
-	<div class="irform-table">
+	<div :class="containerClass">
 		<table class="irform-table-container">
 			<thead>
 				<tr class="irform-table-headers">
@@ -66,6 +66,12 @@ export default {
 		value: {type: Array, required: false, default: () => []}
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-table": true,
+				[this.getOption("class")]: true
+			};
+		},
 		valueType() {
 			return "list";
 		},

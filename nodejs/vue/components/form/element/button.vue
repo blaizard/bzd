@@ -52,7 +52,8 @@ export default {
 			return {
 				"irform-button": true,
 				"irform-fill": this.getOption("fill", false),
-				[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false)
+				[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false),
+				[this.getOption("class")]: true
 			};
 		},
 		/**
