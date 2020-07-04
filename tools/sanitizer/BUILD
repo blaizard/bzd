@@ -17,6 +17,8 @@ py_binary(
     ),
     args = [
         "--action",
+        "$(location //tools/sanitizer/actions/buildifier)",
+        "--action",
         "$(location //tools/sanitizer/actions/eslint)",
         "--action",
         "$(location //tools/sanitizer/actions/clang_format)",
@@ -25,6 +27,7 @@ py_binary(
     ],
     data = [
         ":config",
+        "//tools/sanitizer/actions/buildifier",
         "//tools/sanitizer/actions/clang_format",
         "//tools/sanitizer/actions/eslint",
         "//tools/sanitizer/actions/structure",

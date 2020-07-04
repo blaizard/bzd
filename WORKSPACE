@@ -20,12 +20,6 @@ load("//toolchains:register.bzl", "toolchains_register")
 
 toolchains_register()
 
-# Buildifier
-
-load("//tools/buildifier:dependencies.bzl", "buildifier_load")
-
-buildifier_load()
-
 # Documentation
 
 load("//tools/documentation:dependencies.bzl", "documentation_load")
