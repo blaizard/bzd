@@ -14,7 +14,13 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace, r'.*\.(c|cxx|cpp|h|hpp)$')
+	files = Files(args.workspace, include = [
+		"**/*.c",
+		"**/*.cxx",
+		"**/*.cpp",
+		"**/*.h",
+		"**/*.hpp"
+	])
 	noError = True
 	for path in files.data():
 		result = localBazelBinary(args.clang_format, args = ["-style=file", "-i", "-sort-includes", path])

@@ -5,5 +5,19 @@ py_library(
     srcs = [
         "workspace.py",
     ],
+    data = [
+        "//tools/sanitizer:config",
+    ],
+    deps = [
+        ":filter"
+    ],
+    visibility = ["//tools/sanitizer:__subpackages__"],
+)
+
+py_library(
+    name = "filter",
+    srcs = [
+        "filter.py",
+    ],
     visibility = ["//tools/sanitizer:__subpackages__"],
 )
