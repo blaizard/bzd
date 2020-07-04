@@ -7,9 +7,21 @@ import sys
 import threading
 import selectors
 
+class _ExecuteResultStreamWriter:
+    def __init__(self):
+        self.output = []
+
+    def addStdout(self, data):
+        if data != b"":
+            self.output.append((True, data))
+
+    def addStderr(self, data):
+        if data != b"":
+            self.output.append((False, data))
+
 class _ExecuteResult:
-    def __init__(self, output, returncode):
-        self.output = output
+    def __init__(self, stream: _ExecuteResultStreamWriter, returncode):
+        self.output = stream.output
         self.returncode = returncode
 
     def getStdout(self):
@@ -30,7 +42,7 @@ Run a process locally.
 def localCommand(cmds, inputs = None, ignoreFailure = False, env=None, timeoutS = 60):
 
     sel = selectors.DefaultSelector()
-    output = []
+    stream = _ExecuteResultStreamWriter()
     proc = subprocess.Popen(cmds, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     timer = threading.Timer(timeoutS, proc.kill)
     sel.register(proc.stdout, selectors.EVENT_READ)
@@ -44,19 +56,19 @@ def localCommand(cmds, inputs = None, ignoreFailure = False, env=None, timeoutS 
                 data = key.fileobj.read1(128)
                 if not data:
                     isRunning = False
-                if data != b"":
-                    output.append(((key.fileobj is proc.stdout), data))
-
-        if proc.poll() == None:
-            output.append((False, b"Process did not complete"))
+                (stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
+        stdout, stderr = proc.communicate()
+        stream.addStdout(stdout)
+        stream.addStderr(stderr)
         if not timer.is_alive():
-            output.append((False, "Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS).encode()))
-
+            stream.addStderr("Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS).encode())
+        if proc.returncode == None:
+            stream.addStderr(b"Process did not complete.\n")
     finally:
         timer.cancel()
 
     result = _ExecuteResult(
-            output = output,
+            stream = stream,
             returncode = proc.returncode)
 
     assert ignoreFailure or proc.returncode == 0, "Return code {}\n{}".format(result.getReturnCode(), result.getOutput())
