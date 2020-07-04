@@ -9,13 +9,14 @@ from tools.sanitizer.utils.workspace import Files
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Tool enforcing correct direct and file structure")
-	parser.add_argument("--regexpr", default="^[a-z0-9_/.]+$", help="Regular expression to be used for the matching.")
+	parser.add_argument("--regexpr", default="^[a-z0-9_/.]+(\.S)?$", help="Regular expression to be used for the matching.")
 	parser.add_argument("workspace", help="Workspace to be processed.")
 
 	args = parser.parse_args()
 
 	files = Files(args.workspace, exclude = [
 		"**BUILD",
+		"**BUILD.template",
 		"**WORKSPACE",
 		"**README.md",
 		"**Jenkinsfile"

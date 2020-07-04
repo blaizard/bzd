@@ -72,22 +72,22 @@ export default {
 				"success": {
 					color: "green",
 					display: "Success",
-					icon: "bzd-icon-status-success"
+					icon: "bzd-icon-status_success"
 				},
 				"failure": {
 					color: "red",
 					display: "Failure",
-					icon: "bzd-icon-status-failure"
+					icon: "bzd-icon-status_failure"
 				},
 				"in-progress": {
 					color: "orange",
 					display: "In Progress",
-					icon: "bzd-icon-status-in-progress bzd-icon-spin"
+					icon: "bzd-icon-status_in_progress bzd-icon-spin"
 				},
 				"abort": {
 					color: "gray",
 					display: "Aborted",
-					icon: "bzd-icon-status-abort"
+					icon: "bzd-icon-status_abort"
 				}
 			};
 		},
@@ -198,11 +198,11 @@ export default {
 
 <style lang="scss">
 	@use "bzd/icons.scss" as icons with (
-        $bzdIconNames: status-success status-failure status-in-progress status-abort clock
+        $bzdIconNames: status_success status_failure status_in_progress status_abort clock
     );
 
-    .bzd-icon-continuous-integration {
-		@include icons.defineIcon("continuous-integration.svg");
+    .bzd-icon-continuous_integration {
+		@include icons.defineIcon("continuous_integration.svg");
 	}
 </style>
 

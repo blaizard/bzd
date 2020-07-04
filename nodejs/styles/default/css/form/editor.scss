@@ -1,6 +1,6 @@
 @use "index.scss" as base;
 @use "bzd/icons.scss" with (
-	$bzdIconNames: bold italic underline strike-through undo justify-left justify-center justify-right justify indent unindent ordered-list unordered-list quote clear-format
+	$bzdIconNames: bold italic underline strike_through undo justify_left justify_center justify_right justify indent unindent ordered_list unordered_list quote clear_format
 );
 
 .irform-editor {

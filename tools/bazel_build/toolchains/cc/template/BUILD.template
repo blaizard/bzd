@@ -8,7 +8,7 @@ load("@//tools/bazel_build/toolchains/cc:defs.bzl", "app_toolchain")
 filegroup(
     name = "wrappers",
     srcs = glob([
-		"bin/wrapper-*"
+		"bin/wrapper_*"
 	]),
 )
 
@@ -50,16 +50,16 @@ cc_toolchain_config(
         %{builtin_include_directories}
     ],
     tool_paths = {
-        "gcc": "bin/wrapper-cc",
-        "cpp": "bin/wrapper-cpp",
-        "ar": "bin/wrapper-ar",
-        "nm": "bin/wrapper-nm",
-        "ld": "bin/wrapper-ld",
-        "as": "bin/wrapper-as",
-        "objcopy": "bin/wrapper-objcopy",
-        "gcov": "bin/wrapper-cov",
-        "objdump": "bin/wrapper-objdump",
-        "strip": "bin/wrapper-strip",
+        "gcc": "bin/wrapper_cc",
+        "cpp": "bin/wrapper_cpp",
+        "ar": "bin/wrapper_ar",
+        "nm": "bin/wrapper_nm",
+        "ld": "bin/wrapper_ld",
+        "as": "bin/wrapper_as",
+        "objcopy": "bin/wrapper_objcopy",
+        "gcov": "bin/wrapper_cov",
+        "objdump": "bin/wrapper_objdump",
+        "strip": "bin/wrapper_strip",
     },
     compile_flags = [
         %{compile_flags}

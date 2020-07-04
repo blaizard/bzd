@@ -65,7 +65,7 @@ export default {
 					click: () => this.actionOnSelection("underline")
 				},
 				strike: {
-					html: "<i class=\"bzd-icon-strike-through\"></i>",
+					html: "<i class=\"bzd-icon-strike_through\"></i>",
 					type: "button",
 					click: () => this.actionOnSelection("strikeThrough")
 				},
@@ -79,17 +79,17 @@ export default {
 					}
 				},
 				justifyLeft: {
-					html: "<i class=\"bzd-icon-justify-left\"></i>",
+					html: "<i class=\"bzd-icon-justify_left\"></i>",
 					type: "button",
 					click: () => this.action("justifyLeft")
 				},
 				justifyCenter: {
-					html: "<i class=\"bzd-icon-justify-center\"></i>",
+					html: "<i class=\"bzd-icon-justify_center\"></i>",
 					type: "button",
 					click: () => this.action("justifyCenter")
 				},
 				justifyRight: {
-					html: "<i class=\"bzd-icon-justify-right\"></i>",
+					html: "<i class=\"bzd-icon-justify_right\"></i>",
 					type: "button",
 					click: () => this.action("justifyRight")
 				},
@@ -109,12 +109,12 @@ export default {
 					click: () => this.action("outdent")
 				},
 				orderedList: {
-					html: "<i class=\"bzd-icon-ordered-list\"></i>",
+					html: "<i class=\"bzd-icon-ordered_list\"></i>",
 					type: "button",
 					click: () => this.action("insertOrderedList")
 				},
 				unorderedList: {
-					html: "<i class=\"bzd-icon-unordered-list\"></i>",
+					html: "<i class=\"bzd-icon-unordered_list\"></i>",
 					type: "button",
 					click: () => this.action("insertUnorderedList")
 				},
@@ -124,7 +124,7 @@ export default {
 					click: () => this.action("formatBlock", "blockquote")
 				},
 				clearFormat: {
-					html: "<i class=\"bzd-icon-clear-format\"></i>",
+					html: "<i class=\"bzd-icon-clear_format\"></i>",
 					type: "button",
 					click: () => this.actionRemoveFormat()
 				}

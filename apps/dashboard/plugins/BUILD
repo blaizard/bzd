@@ -9,7 +9,7 @@ bzd_nodejs_library(
         "//apps/dashboard:__subpackages__",
     ],
     deps = [
-        "//apps/dashboard/plugins/continuous-integration",
+        "//apps/dashboard/plugins/continuous_integration",
         "//apps/dashboard/plugins/coverage",
         "//apps/dashboard/plugins/github",
         "//apps/dashboard/plugins/jenkins",

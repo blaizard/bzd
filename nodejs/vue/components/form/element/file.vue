@@ -4,7 +4,7 @@
 import Vue from "vue";
 import Upload from "../../../../core/upload.mjs";
 import ArrayElement from "./array.vue";
-import FileItem from "./file-item.vue";
+import FileItem from "./file_item.vue";
 
 export default {
 	mixins: [ArrayElement],

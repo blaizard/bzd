@@ -34,7 +34,7 @@
 
 
 import Element from "./element.vue";
-import TableItem from "./table-item.vue";
+import TableItem from "./table_item.vue";
 
 export default {
 	mixins: [Element],

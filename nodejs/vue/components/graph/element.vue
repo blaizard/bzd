@@ -19,7 +19,7 @@
 <script>
 
 
-import HoverChildren from "./directive/hover-children.mjs";
+import HoverChildren from "./directive/hover_children.mjs";
 import { tooltipHide } from "../../directives/tooltip.mjs";
 
 export default {

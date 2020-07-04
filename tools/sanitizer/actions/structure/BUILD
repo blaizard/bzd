@@ -9,7 +9,7 @@ py_binary(
     ),
     visibility = ["//tools/sanitizer:__pkg__"],
     deps = [
-        "//tools/sanitizer/utils:workspace",
         "//tools/sanitizer/utils:filter",
+        "//tools/sanitizer/utils:workspace",
     ],
 )
