@@ -17,5 +17,9 @@ class TestRun(unittest.TestCase):
 		self.assertIn("timed out", result.getStderr())
 		self.assertIn("timed out", result.getOutput())
 
+	def testLocalCommandException(self):
+		with self.assertRaises(Exception):
+			bzd.utils.run.localCommand(["sleep", "5"], timeoutS = 0.1)
+
 if __name__ == '__main__':
 	unittest.main()
