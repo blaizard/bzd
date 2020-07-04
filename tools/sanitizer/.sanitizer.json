@@ -1,4 +1,9 @@
 {
-	ignore: {
-	}
+	"exclude": [
+		".**",
+		"docs/**",
+		"bazel-**",
+		"**/__pycache__/**",
+		"**/*.pyc"
+	]
 }

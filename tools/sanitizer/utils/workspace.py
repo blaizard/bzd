@@ -2,16 +2,23 @@
 # -*- coding: iso-8859-1 -*-
 
 import os
+import json
 import re
+from .filter import Filter
 
 class Files:
-	def __init__(self, workspace, regexpr = r'.*'):
+	def __init__(self, workspace, include = ["**"], exclude = []):
+		with open(os.path.join(os.path.dirname(__file__), "..", ".sanitizer.json"), "r") as f:
+			config = json.load(f)
 		self.workspace = workspace
-		self.regexpr = re.compile(regexpr)
+		self.exclude = Filter(config.get("exclude", []) + exclude)
+		self.include = Filter(include)
 
-	def data(self):
+	def data(self, relative = False):
 		for (dirpath, dirnames, filenames) in os.walk(self.workspace):
 			for filename in filenames:
 				path = os.path.join(dirpath, filename)
-				if re.match(self.regexpr, path):
-					yield path
+				relativePath = os.path.relpath(path, self.workspace)
+				if not self.exclude.match(relativePath):
+					if self.include.match(relativePath):
+						yield relativePath if relative else path
