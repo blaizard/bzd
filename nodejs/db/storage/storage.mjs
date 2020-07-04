@@ -59,6 +59,13 @@ export default class Storage {
 	}
 
 	/**
+	 * List all files under this bucket
+	 */
+	async list(/*bucket*/) {
+		Exception.unreachable("'list' must be implemented.");
+	}
+
+	/**
 	 * Return a file read stream from a specific key
 	 */
 	async read(/*bucket, key*/) {

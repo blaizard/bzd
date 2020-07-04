@@ -23,6 +23,10 @@ export default class APIClient extends Base {
 		});
 	}
 
+	getEndpoint(endpoint) {
+		return this._makePath(endpoint);
+	}
+
 	async login(uid, password) {
 		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
 		return await this.options.authentication.login(this, uid, password);

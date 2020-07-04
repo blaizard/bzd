@@ -28,8 +28,8 @@ export default class StorageDisk extends Storage {
 		await FileSystem.mkdir(this.path);
 	}
 
-	_getPath(bucket, key) {
-		return Path.join(this.path, bucket, key);
+	_getPath(bucket, key = undefined) {
+		return (key) ? Path.join(this.path, bucket, key) : Path.join(this.path, bucket);
 	}
 
 	async is(bucket, key) {
@@ -61,5 +61,10 @@ export default class StorageDisk extends Storage {
 
 	async delete(bucket, key) {
 		await FileSystem.unlink(this._getPath(bucket, key));
+	}
+
+	async list(bucket) {
+		const path = this._getPath(bucket);
+		return await FileSystem.readdir(path);
 	}
 }
