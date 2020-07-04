@@ -78,6 +78,13 @@ pipeline
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
+				stage("Sanitize")
+				{
+					steps
+					{
+						sh "./sanitize.sh"
+					}
+				}
 			}
 		}
 		/**
