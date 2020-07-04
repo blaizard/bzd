@@ -2,8 +2,10 @@
 # -*- coding: iso-8859-1 -*-
 
 import argparse
+import logging
 import os
 import sys
+import bzd.env
 
 from bzd.utils.run import localBazelBinary 
 
@@ -15,10 +17,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print("Running sanitizer in '{}'...".format(args.workspace))
+    logging.info("Running sanitizer in '{}'...".format(args.workspace))
     noError = True
     for action in args.actions:
-        print("Action '{}'...".format(action))
+        logging.info("Action '{}'...".format(action))
         result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace], timeoutS = 300)
         noError = noError and (result.getReturnCode() == 0)
         if result.getReturnCode() != 0:
