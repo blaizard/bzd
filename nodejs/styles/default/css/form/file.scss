@@ -32,7 +32,7 @@ body.irform-file-drag .irform-array-file {
 
 	border: 1px solid base.$fieldBorderColor;
 
-	min-width: #{$height}px;
+	width: #{$height}px;
 	height: #{$height}px;
 	position: relative;
 	padding: #{$borderWidth}px;

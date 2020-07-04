@@ -1,5 +1,5 @@
 <template>
-	<div class="irform-input" @click="handleClick">
+	<div :class="containerClass" @click="handleClick">
 		<span class="irform-input-pre" v-if="pre && getContentType(pre) == 'text'" v-text="getContentData(pre)"></span>
 		<span class="irform-input-pre" v-if="pre && getContentType(pre) == 'html'" v-html="getContentData(pre)"></span>
 
@@ -104,6 +104,12 @@ export default {
 		};
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-input": true,
+				[this.getOption("class")]: true
+			};
+		},
 		valueList() {
 			if (this.multi) {
 				return (this.get() instanceof Array) ? this.get() : [];

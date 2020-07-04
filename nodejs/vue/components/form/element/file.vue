@@ -109,7 +109,8 @@ export default {
 			return {
 				"irform-array": true,
 				"irform-array-file": true,
-				"irform-fill": this.fill
+				"irform-fill": this.fill,
+				[this.getOption("class")]: true
 			};
 		},
 		valueListToDisplay() {

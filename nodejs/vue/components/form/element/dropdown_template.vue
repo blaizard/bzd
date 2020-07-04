@@ -1,5 +1,5 @@
 <template>
-	<div :class="{'irform-dropdown': true, 'irform-loading': loading, 'irform-empty': (!Boolean($slots.default))}">
+	<div :class="containerClass">
 		<ElementInput :class="{'irform-dropdown-select': true, 'active': isActive}"
 				:description="inputDescription"
 				:disable="disable"
@@ -40,6 +40,14 @@ export default {
 		};
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-dropdown": true,
+				"irform-loading": this.loading,
+				"irform-empty": (!this.$slots.default),
+				[this.getOption("class")]: true
+			};
+		},
 		delay() {
 			return this.getOption("delay", 1);
 		},

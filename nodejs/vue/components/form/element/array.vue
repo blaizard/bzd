@@ -111,7 +111,8 @@ export default {
 		containerClass() {
 			return {
 				"irform-array": true,
-				"irform-fill": this.fill
+				"irform-fill": this.fill,
+				[this.getOption("class")]: true
 			};
 		},
 		/**

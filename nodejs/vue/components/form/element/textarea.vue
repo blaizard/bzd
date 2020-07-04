@@ -1,5 +1,5 @@
 <template>
-	<component class="irform-textarea"
+	<component :class="containerClass"
 			:is="tag"
 			@input="handleInput"
 			@focus="setActive()"
@@ -32,6 +32,12 @@ export default {
 		};
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-textarea": true,
+				[this.getOption("class")]: true
+			};
+		},
 		paddingTop() {
 			return parseFloat(window.getComputedStyle(this.$el, null).getPropertyValue("padding-top"));
 		}

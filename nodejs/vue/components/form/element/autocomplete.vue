@@ -1,5 +1,5 @@
 <template>
-	<Autocomplete class="irform-autocomplete"
+	<Autocomplete :class="containerClass"
 			:description="descriptionDropdown"
 			:value="value"
 			@input="$emit('input', $event)">
@@ -35,6 +35,12 @@ export default {
 		description: {type: Object, required: false, default: () => ({})}
 	},
 	computed: {
+		containerClass() {
+			return {
+				"irform-autocomplete": true,
+				[this.getOption("class")]: true
+			};
+		},
 		descriptionDropdown() {
 			return Object.assign({}, this.description, {
 				editable: true,
