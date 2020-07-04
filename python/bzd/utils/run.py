@@ -50,7 +50,7 @@ def localCommand(cmds, inputs = None, ignoreFailure = False, env=None, timeoutS 
         if proc.poll() == None:
             output.append((False, b"Process did not complete"))
         if not timer.is_alive():
-            output.append((False, b"Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS)))
+            output.append((False, "Execution of '{}' timed out after {}s, terminating process.\n".format(" ".join(cmds), timeoutS).encode()))
 
     finally:
         timer.cancel()
