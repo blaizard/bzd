@@ -84,19 +84,19 @@ def _impl(ctx):
     build_substitutions = {k: v.replace("%{absolute_external}", absolute_external) for k, v in build_substitutions.items()}
 
     # Set the toolchain BUILD
-    ctx.template("BUILD", Label("//tools/bazel_build/toolchains/cc:template/BUILD.tpl"), build_substitutions)
+    ctx.template("BUILD", Label("//tools/bazel_build/toolchains/cc:template/BUILD.template"), build_substitutions)
 
     # Set the binary wrappers
-    ctx.template("bin/wrapper-ar", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-ar"), {"%{ar}": ctx.attr.bin_ar})
-    ctx.template("bin/wrapper-as", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-as"), {"%{as}": ctx.attr.bin_as})
-    ctx.template("bin/wrapper-cc", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-cc"), {"%{cc}": ctx.attr.bin_cc})
-    ctx.template("bin/wrapper-cpp", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-cpp"), {"%{cpp}": ctx.attr.bin_cpp})
-    ctx.template("bin/wrapper-ld", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-ld"), {"%{ld}": ctx.attr.bin_ld})
-    ctx.template("bin/wrapper-cov", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-cov"), {"%{cov}": ctx.attr.bin_cov})
-    ctx.template("bin/wrapper-nm", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-nm"), {"%{nm}": ctx.attr.bin_nm})
-    ctx.template("bin/wrapper-objdump", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-objdump"), {"%{objdump}": ctx.attr.bin_objdump})
-    ctx.template("bin/wrapper-objcopy", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-objcopy"), {"%{objcopy}": ctx.attr.bin_objcopy})
-    ctx.template("bin/wrapper-strip", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper-strip"), {"%{strip}": ctx.attr.bin_strip})
+    ctx.template("bin/wrapper_ar", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_ar"), {"%{ar}": ctx.attr.bin_ar})
+    ctx.template("bin/wrapper_as", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_as"), {"%{as}": ctx.attr.bin_as})
+    ctx.template("bin/wrapper_cc", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cc"), {"%{cc}": ctx.attr.bin_cc})
+    ctx.template("bin/wrapper_cpp", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cpp"), {"%{cpp}": ctx.attr.bin_cpp})
+    ctx.template("bin/wrapper_ld", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_ld"), {"%{ld}": ctx.attr.bin_ld})
+    ctx.template("bin/wrapper_cov", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cov"), {"%{cov}": ctx.attr.bin_cov})
+    ctx.template("bin/wrapper_nm", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_nm"), {"%{nm}": ctx.attr.bin_nm})
+    ctx.template("bin/wrapper_objdump", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_objdump"), {"%{objdump}": ctx.attr.bin_objdump})
+    ctx.template("bin/wrapper_objcopy", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_objcopy"), {"%{objcopy}": ctx.attr.bin_objcopy})
+    ctx.template("bin/wrapper_strip", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_strip"), {"%{strip}": ctx.attr.bin_strip})
 
 """
 Linux specific implementation of the toolchain

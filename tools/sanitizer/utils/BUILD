@@ -8,10 +8,10 @@ py_library(
     data = [
         "//tools/sanitizer:config",
     ],
-    deps = [
-        ":filter"
-    ],
     visibility = ["//tools/sanitizer:__subpackages__"],
+    deps = [
+        ":filter",
+    ],
 )
 
 py_library(

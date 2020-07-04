@@ -63,7 +63,7 @@
 
 import Element from "./element.vue";
 import PlotText from "./utils/text.vue";
-import HoverChildren from "./directive/hover-children.mjs";
+import HoverChildren from "./directive/hover_children.mjs";
 import Resize from "../../directives/resize.mjs";
 import { tooltip } from "../../directives/tooltip.mjs";
 import RenderLine from "./render/line.vue";

@@ -68,7 +68,7 @@ cc_documentation = rule(
             executable = True,
         ),
         "_doxyfile_template": attr.label(
-            default = Label("//tools/documentation/cc:Doxyfile"),
+            default = Label("//tools/documentation/cc:doxyfile.template"),
             allow_single_file = True,
         ),
     },

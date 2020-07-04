@@ -4,7 +4,7 @@ import Jenkins from "./jenkins/plugins.mjs";
 import TravisCI from "./travisci/plugins.mjs";
 import Github from "./github/plugins.mjs";
 import Coverage from "./coverage/plugins.mjs";
-import ContinuousIntegration from "./continuous-integration/plugins.mjs";
+import ContinuousIntegration from "./continuous_integration/plugins.mjs";
 import Link from "./link/plugins.mjs";
 
 export const Source = {

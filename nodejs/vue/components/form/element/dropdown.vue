@@ -20,7 +20,7 @@
 
 
 import Element from "./element.vue";
-import DropdownTemplate from "./dropdown-template.vue";
+import DropdownTemplate from "./dropdown_template.vue";
 
 export default {
 	mixins: [Element],

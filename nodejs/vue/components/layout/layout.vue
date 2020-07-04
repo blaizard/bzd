@@ -27,8 +27,8 @@
             <transition name="bzd-translate">
                 <div class="bzd-layout-menu-content" @click.stop="hideMenu" v-show="isMenuShow || (isDock && !isMobile)">
                     <div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
-                        <i v-if="isDock" class="bzd-icon-dock-on"></i>
-                        <i v-else class="bzd-icon-dock-off"></i>
+                        <i v-if="isDock" class="bzd-icon-dock_on"></i>
+                        <i v-else class="bzd-icon-dock_off"></i>
                     </div>
                     <slot name="actions" v-if="isMobile"></slot>
                     <slot name="menu"></slot>
@@ -156,7 +156,7 @@ export default {
 
     @use "bzd-style/css/clickable.scss";
 	@use "bzd/icons.scss" with (
-        $bzdIconNames: menu dock-on dock-off close
+        $bzdIconNames: menu dock_on dock_off close
     );
 
     html,
