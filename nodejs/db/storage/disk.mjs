@@ -65,6 +65,9 @@ export default class StorageDisk extends Storage {
 
 	async list(bucket) {
 		const path = this._getPath(bucket);
-		return await FileSystem.readdir(path);
+		if (await FileSystem.exists(path)) {
+			return await FileSystem.readdir(path);
+		}
+		return [];
 	}
 }
