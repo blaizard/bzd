@@ -8,3 +8,9 @@ def docker_images_register():
         repository = "mhart/alpine-node",
         tag = "slim-13",
     )
+    container_pull(
+        name = "docker_nodejs_puppeteer",
+        registry = "index.docker.io",
+        repository = "blaizard/nodejs_puppeteer",
+        tag = "latest",
+    )

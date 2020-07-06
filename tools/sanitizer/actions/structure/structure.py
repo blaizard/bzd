@@ -19,7 +19,8 @@ if __name__ == "__main__":
 		"**BUILD.template",
 		"**WORKSPACE",
 		"**README.md",
-		"**Jenkinsfile"
+		"**Jenkinsfile",
+		"**Dockerfile"
 	])
 	regexpr = re.compile(args.regexpr)
 	noMathList = []
