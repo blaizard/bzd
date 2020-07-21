@@ -156,8 +156,11 @@ export default {
 		buildPerWeek() {
 			const buildsLast2Weeks = this.getLastBuilds(14);
 			const nbBuilds = buildsLast2Weeks.length;
-			const duration = buildsLast2Weeks[0].timestamp - buildsLast2Weeks[nbBuilds - 1].timestamp;
-			return Math.round(buildsLast2Weeks.length / (duration / (7 * 24 * 60 * 60 * 1000)));
+			if (nbBuilds > 0) {
+				const duration = buildsLast2Weeks[0].timestamp - buildsLast2Weeks[nbBuilds - 1].timestamp;
+				return Math.round(buildsLast2Weeks.length / (duration / (7 * 24 * 60 * 60 * 1000)));
+			}
+			return 0;
 		},
 		/**
 		 * Look at the success rate over the last 30 days.
