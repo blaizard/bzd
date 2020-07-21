@@ -10,6 +10,7 @@ def docker_images_register():
     )
     container_pull(
         name = "docker_nodejs_puppeteer",
+        digest = "sha256:68c92c4b27229e1a3ab27e359fb5474a6edc8cfb572e9b2d46fefc230ead7f65",
         registry = "index.docker.io",
         repository = "blaizard/nodejs_puppeteer",
         tag = "latest",

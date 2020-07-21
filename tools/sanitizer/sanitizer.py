@@ -23,7 +23,7 @@ if __name__ == "__main__":
         result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace], timeoutS = 300)
         noError = noError and (result.getReturnCode() == 0)
         if result.getReturnCode() != 0:
-            logging.error("Completed action '{}'".format(action))
+            logging.error("Failed action '{}'".format(action))
             print(result.getOutput())
         else:
             logging.info("Completed action '{}'".format(action))
