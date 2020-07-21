@@ -25,10 +25,13 @@ py_binary(
         "--action",
         "$(location //tools/sanitizer/actions/structure)",
         "--action",
+        "$(location //tools/sanitizer/actions/autopep8)",
+        "--action",
         "$(location //tools/sanitizer/actions/mypy)",
     ],
     data = [
         ":config",
+        "//tools/sanitizer/actions/autopep8",
         "//tools/sanitizer/actions/buildifier",
         "//tools/sanitizer/actions/clang_format",
         "//tools/sanitizer/actions/eslint",

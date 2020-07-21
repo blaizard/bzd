@@ -10,84 +10,88 @@ COMMAND_LINE = 'xtensa-esp32-elf-gcc -std=gnu99 -Og -ggdb -Wno-frame-address -ff
 """
 Parse a command line and extract important information.
 """
+
+
 def parse(cmdStr):
 
-	results = {
-		"files": {
-			"lds": [],
-			"libs": [],
-			"includes": []
-		},
-		"linker": {
-			"lds": [],
-			"libs": []
-		}
-	}
+    results = {
+        "files": {
+            "lds": [],
+            "libs": [],
+            "includes": []
+        },
+        "linker": {
+            "lds": [],
+            "libs": []
+        }
+    }
 
-	libSearchPathList = ["/"]
-	parse.state = None
+    libSearchPathList = ["/"]
+    parse.state = None
 
-	def _handleArg(key, arg, callback):
-		if parse.state == key:
-			parse.state = None
-			callback(arg.strip())
-		elif arg.startswith(key):
-			if arg == key:
-				parse.state = key
-			else:
-				callback(arg[len(key):].strip())
+    def _handleArg(key, arg, callback):
+        if parse.state == key:
+            parse.state = None
+            callback(arg.strip())
+        elif arg.startswith(key):
+            if arg == key:
+                parse.state = key
+            else:
+                callback(arg[len(key):].strip())
 
-	def addLib(name):
-		fileName = name if re.match(r'lib.*\.a', os.path.basename(name)) else "lib{}.a".format(name)
-		for path in libSearchPathList:
-			p = os.path.join(path, fileName)
-			if os.path.isfile(p):
-				results["files"]["libs"].append(p)
-				m = re.match(r'lib(.*)\.a', os.path.basename(p))
-				results["linker"]["libs"].append(m.group(1))
-				return
-		print("WARNING: cannot locate library {}".format(name))
+    def addLib(name):
+        fileName = name if re.match(
+            r'lib.*\.a', os.path.basename(name)) else "lib{}.a".format(name)
+        for path in libSearchPathList:
+            p = os.path.join(path, fileName)
+            if os.path.isfile(p):
+                results["files"]["libs"].append(p)
+                m = re.match(r'lib(.*)\.a', os.path.basename(p))
+                results["linker"]["libs"].append(m.group(1))
+                return
+        print("WARNING: cannot locate library {}".format(name))
 
-	def addLd(fileName):
-		for path in libSearchPathList:
-			p = os.path.join(path, fileName)
-			if os.path.isfile(p):
-				results["files"]["lds"].append(p)
-				results["linker"]["lds"].append(os.path.basename(fileName))
-				return
-		print("WARNING: cannot locate linker script {}".format(fileName))
+    def addLd(fileName):
+        for path in libSearchPathList:
+            p = os.path.join(path, fileName)
+            if os.path.isfile(p):
+                results["files"]["lds"].append(p)
+                results["linker"]["lds"].append(os.path.basename(fileName))
+                return
+        print("WARNING: cannot locate linker script {}".format(fileName))
 
-	for arg in shlex.split(cmdStr):
-		# Lib search path
-		_handleArg("-L", arg, lambda x : libSearchPathList.append(x))
-		# Lib
-		_handleArg("-l", arg, lambda x : addLib(x))
-		if arg.endswith(".a"):
-			addLib(arg)
-		# Linker script
-		_handleArg("-T", arg, lambda x : addLd(x))
-		# Include path
-		_handleArg("-I", arg, lambda x : results["files"]["includes"].append(x))
-	
-	return results
+    for arg in shlex.split(cmdStr):
+        # Lib search path
+        _handleArg("-L", arg, lambda x: libSearchPathList.append(x))
+        # Lib
+        _handleArg("-l", arg, lambda x: addLib(x))
+        if arg.endswith(".a"):
+            addLib(arg)
+        # Linker script
+        _handleArg("-T", arg, lambda x: addLd(x))
+        # Include path
+        _handleArg("-I", arg, lambda x: results["files"]["includes"].append(x))
+
+    return results
+
 
 """
 This utility extracts compilation information from the command line.
 Build your application with make VERBOSE=1 and copy/paste the targted command line into COMMAND_LINE.
 """
-if __name__== "__main__":
+if __name__ == "__main__":
 
-	result = parse(COMMAND_LINE)
+    result = parse(COMMAND_LINE)
 
-	print("# Linker scripts")
-	for p in result["lds"]:
-		print("cp \"{}\" .".format(p))
-	print("# Libraries")
-	for p in result["libs"]:
-		print("cp \"{}\" .".format(p))
-	print("# Linker arguments")
-	for p in result["linker"]:
-		print(p)
-	print("# Include")
-	for p in result["includes"]:
-		print("rsync -avm --include='*.h' -f 'hide,! */' \"{}/\" .".format(p))
+    print("# Linker scripts")
+    for p in result["lds"]:
+        print("cp \"{}\" .".format(p))
+    print("# Libraries")
+    for p in result["libs"]:
+        print("cp \"{}\" .".format(p))
+    print("# Linker arguments")
+    for p in result["linker"]:
+        print(p)
+    print("# Include")
+    for p in result["includes"]:
+        print("rsync -avm --include='*.h' -f 'hide,! */' \"{}/\" .".format(p))

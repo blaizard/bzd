@@ -40,7 +40,7 @@ To run all static sanity checks at once, run the following command:
 |Language|Static Code Analyzers|Code Analyzers|Code Coverage|
 |--|--|--|--|
 |C++|clang-format|asan, lsan|Yes|
-|Python|mypy|||
+|Python|mypy, autopep8|||
 |Node|eslint||Yes|
 |Skylark|buildifier|||
 

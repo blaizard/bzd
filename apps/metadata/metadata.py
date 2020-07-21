@@ -7,7 +7,8 @@ import json
 import os
 import subprocess
 
-def printTable(data, headers = []):
+
+def printTable(data, headers=[]):
 
     # Calculate column sizes
     columnSizes = []
@@ -26,6 +27,7 @@ def printTable(data, headers = []):
             line.append(fmt.format(str(item)))
         print("  " + " | ".join(line))
 
+
 def printMetadataCC(data):
     print(" - Compilers: {}".format(", ".join(data.get("compilers", []))))
 
@@ -37,12 +39,13 @@ def printMetadataCC(data):
             groups.append([unit, partSize])
             size += partSize
         size = data.get("size", size)
-        groups.sort(key = lambda item: item[1], reverse = True)
+        groups.sort(key=lambda item: item[1], reverse=True)
         # Update the percentage
         for line in groups:
             line.append("{:.1%}".format(line[1] / size))
 
-        printTable(groups, headers = [groupName, "size", "percentage"])
+        printTable(groups, headers=[groupName, "size", "percentage"])
+
 
 def printMetadata(metadata):
     for name, data in metadata.get("fragments", {}).items():
@@ -50,11 +53,13 @@ def printMetadata(metadata):
         if data.get("type") == "cc":
             printMetadataCC(data)
 
-if __name__== "__main__":
 
-    parser = argparse.ArgumentParser(description = "Metadata visualizer.")
-    parser.add_argument("--bazel", default = "bazel", help = "Bazel binary path.")
-    parser.add_argument("path", help = "Path of the root or file to be visualized.")
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Metadata visualizer.")
+    parser.add_argument("--bazel", default="bazel", help="Bazel binary path.")
+    parser.add_argument(
+        "path", help="Path of the root or file to be visualized.")
 
     args = parser.parse_args()
 
@@ -63,21 +68,24 @@ if __name__== "__main__":
     # If directory, look for all metadata
     if os.path.isdir(args.path):
 
-        proc = subprocess.run([args.bazel, "query", "kind(bzd_package, //...)"], cwd = args.path, stdout = subprocess.PIPE)
+        proc = subprocess.run(
+            [args.bazel, "query", "kind(bzd_package, //...)"], cwd=args.path, stdout=subprocess.PIPE)
         targets = proc.stdout.decode("ascii").strip().split("\n")
         for target in targets:
             m = re.match(r'^//(.*):(.*)$', target)
             assert m, "Unable to match: {}".format(target)
-            metadataList.append("{}/bazel-bin/{}/{}.metadata.manifest".format(args.path, m.group(1), m.group(2)))
+            metadataList.append(
+                "{}/bazel-bin/{}/{}.metadata.manifest".format(args.path, m.group(1), m.group(2)))
 
     # If file
     elif os.path.isfile(args.path):
-            metadataList.append(args.path)
+        metadataList.append(args.path)
 
     else:
         raise Exception("Invalid path: {}".format(args.path))
 
-    print("Monitoring metadata manifest(s):\n{}".format("\n".join(["  - " + metadata for metadata in metadataList])))
+    print("Monitoring metadata manifest(s):\n{}".format(
+        "\n".join(["  - " + metadata for metadata in metadataList])))
     for metadata in metadataList:
         try:
             with open(metadata, "r") as f:
