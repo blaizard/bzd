@@ -157,7 +157,7 @@ export default {
 			const buildsLast2Weeks = this.getLastBuilds(14);
 			const nbBuilds = buildsLast2Weeks.length;
 			if (nbBuilds > 0) {
-				return Math.round(buildsLast2Weeks.length / (14 * 24 * 60 * 60 * 1000));
+				return Math.round(buildsLast2Weeks.length / 2.);
 			}
 			return 0;
 		},
