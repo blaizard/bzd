@@ -18,18 +18,31 @@ This mono-repository enables the following technologies:
 
 ## Overview
 
-This framework is developped to run on all sort of embedded platforms, from 8-bit bare bones MCU to high performance compute unit.
-It is made to remove any dependencies from STL, but prtempDirPathovide similar set of containers and utilities to develop applications in an
+This framework is built to run on all sort of embedded platforms, from bare metals 8-bit microcontrollers to high performance compute units.
+It is made to remove any dependencies from STL, but provide a similar set of containers and utilities to develop applications in an
 efficient and safe manner.
 
 It features the followings:
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
 - Self contained, no reliance on third-party nor STL dependencies.
 - Flexible error handling model.
-- Compile-time string formting tool.
+- Compile-time string formating tool.
 - Lightweight.
 - Usefull set of containers.
-- API documentation ([see here](./docs/api/cc/index.md))
+
+## Code Quality
+
+All supported languages come with their set of static code analyzers.
+To run all static sanity checks at once, run the following command:
+```
+./sanitize.sh
+```
+|Language|Static Code Analyzers|Code Analyzers|Code Coverage|
+|--|--|--|--|
+|C++|clang-format|asan, lsan|Yes|
+|Python|mypy|||
+|Node|eslint||Yes|
+|Skylark|buildifier|||
 
 ## Memory footprint
 

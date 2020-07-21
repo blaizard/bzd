@@ -2,27 +2,6 @@
 
 set -e
 
-# Handle script arguments
-sanitizer=
-while test $# -gt 0; do
-    case "$1" in
-    --sanitizer) sanitizer=1 && shift;;
-
-    *) echo "Unrecognized argument \"$1\", abort." && exit 1 ;;
-    esac
-done
-
-# Run sanitizer and check if any file changed, if so report an error
-if [ "$sanitizer" ]; then
-	expectedGitDiff=$(git diff --shortstat)
-	./sanitize.sh
-	if [ "$expectedGitDiff" != "$(git diff --shortstat)" ]; then
-		echo "ERROR: Some files have been sanitized, please check and re-run." 1>&2
-		git status 1>&2
-		exit 1
-	fi
-fi
-
 EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$HOME/.yarn"
 
 # Compile and test the different configurations
