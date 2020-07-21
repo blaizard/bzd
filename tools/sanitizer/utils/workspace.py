@@ -4,6 +4,7 @@
 import os
 import json
 import re
+from typing import Iterable
 from .filter import Filter
 
 class Files:
@@ -14,7 +15,7 @@ class Files:
 		self.exclude = Filter(config.get("exclude", []) + exclude)
 		self.include = Filter(include)
 
-	def data(self, relative: bool = False) -> None:
+	def data(self, relative: bool = False) -> Iterable[str]:
 		for (dirpath, dirnames, filenames) in os.walk(self.workspace):
 			for filename in filenames:
 				path = os.path.join(dirpath, filename)
