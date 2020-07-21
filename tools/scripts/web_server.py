@@ -10,7 +10,7 @@ import tempfile
 
 class WebServer(socketserver.TCPServer):
     allow_reuse_address = True
-    def run(self):
+    def run(self) -> None:
         try:
             self.serve_forever()
         except KeyboardInterrupt:

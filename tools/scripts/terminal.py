@@ -8,7 +8,7 @@ import sys
 """
 Configure and return an instance of a Serial interface.
 """
-def configureSerial(args):
+def configureSerial(args) -> serial.Serial:
 
 	dataBitsMapping = {5: serial.FIVEBITS, 6: serial.SIXBITS, 7: serial.SEVENBITS, 8: serial.EIGHTBITS}
 	parityMapping = {"none": serial.PARITY_NONE, "even": serial.PARITY_EVEN, "odd": serial.PARITY_ODD, "mark": serial.PARITY_MARK, "space": serial.PARITY_SPACE}

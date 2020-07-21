@@ -6,18 +6,20 @@ import json
 import re
 import os
 import sys
+from typing import Any, Tuple, Dict, List
 from elftools.elf.elffile import ELFFile
 
-def processElfDwarf(path):
+def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 
     compilers = set()
+    compilerList: List[str] = []
 
     with open(path, "rb") as f:
         elffile = ELFFile(f)
-        result = {}
+        result: Dict[str, int] = {}
 
         if not elffile.has_dwarf_info():
-            return result
+            return result, compilerList
 
         dwarfInfo = elffile.get_dwarf_info()
         for CU in dwarfInfo.iter_CUs():
@@ -42,13 +44,13 @@ def processElfDwarf(path):
                         compiler = compiler[0:index]
                     compilers.add(compiler)
 
-    compilers = list(compilers)
-    compilers.sort()
+    compilerList = list(compilers)
+    compilerList.sort()
 
-    return result, compilers
+    return result, compilerList
 
 
-def dieInfoRec(die):
+def dieInfoRec(die: Any) -> int:
     size = 0
 
     # Compute the size of the current DIE
@@ -105,7 +107,7 @@ if __name__ == '__main__':
             groupedResult[matchedGroup] = 0
         groupedResult[matchedGroup] += size
 
-    result = {
+    finalResult = {
         "size_groups": {
             "units": groupedResult,
         },
@@ -114,6 +116,6 @@ if __name__ == '__main__':
     }
 
     with open(args.output, "w+") as f:
-        f.write(json.dumps(result))
+        f.write(json.dumps(finalResult))
 
     sys.exit(0)

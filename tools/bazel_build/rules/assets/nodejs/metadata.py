@@ -8,8 +8,9 @@ import re
 import shlex
 import json
 import sys
+from typing import Any, Dict
 
-def parseYarn(yarnLockPath, packages = {}):
+def parseYarn(yarnLockPath: str, packages: Dict[str, Any] = {}) -> Dict[str, Any]:
 
 	pattern = re.compile("^(.*)@([^@]*)[:,]$")
 
