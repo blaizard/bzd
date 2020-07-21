@@ -20,11 +20,13 @@ if __name__ == "__main__":
     logging.info("Running sanitizer in '{}'...".format(args.workspace))
     noError = True
     for action in args.actions:
-        logging.info("Action '{}'...".format(action))
         result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace], timeoutS = 300)
         noError = noError and (result.getReturnCode() == 0)
         if result.getReturnCode() != 0:
+            logging.error("Completed action '{}'".format(action))
             print(result.getOutput())
+        else:
+            logging.info("Completed action '{}'".format(action))
 
     # Return the error code
     sys.exit(0 if noError else 1)
