@@ -1,5 +1,5 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-from .manifest import Manifest 
-from .reference import Reference 
+from .manifest import Manifest
+from .reference import Reference

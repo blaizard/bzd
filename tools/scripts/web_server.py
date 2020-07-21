@@ -8,8 +8,10 @@ import socketserver
 import tarfile
 import tempfile
 
+
 class WebServer(socketserver.TCPServer):
     allow_reuse_address = True
+
     def run(self) -> None:
         try:
             self.serve_forever()
@@ -18,12 +20,17 @@ class WebServer(socketserver.TCPServer):
         finally:
             self.server_close()
 
-if __name__== "__main__":
 
-    parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
-    parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to be used.")
-    parser.add_argument("-r", "--root", dest="root", default=None, type=str, help="Prefix path where the files to serve are located.")
-    parser.add_argument("path", default=".", nargs='?', help="Serve files from this specific directory or archive, by default the current directory will be used.")
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description="Web server for testing purpose only.")
+    parser.add_argument("-p", "--port", dest="port",
+                        default=8080, type=int, help="Port to be used.")
+    parser.add_argument("-r", "--root", dest="root", default=None,
+                        type=str, help="Prefix path where the files to serve are located.")
+    parser.add_argument("path", default=".", nargs='?',
+                        help="Serve files from this specific directory or archive, by default the current directory will be used.")
 
     args = parser.parse_args()
 
@@ -35,7 +42,8 @@ if __name__== "__main__":
             tempPath = tempfile.TemporaryDirectory()
             package = tarfile.open(args.path)
             try:
-                print("Extracting content of '{}' to temporary directory '{}'.".format(args.path, tempPath.name))
+                print("Extracting content of '{}' to temporary directory '{}'.".format(
+                    args.path, tempPath.name))
                 package.extractall(tempPath.name)
             finally:
                 package.close()
