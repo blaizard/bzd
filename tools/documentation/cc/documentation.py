@@ -17,7 +17,7 @@ if __name__== "__main__":
 
 	args = parser.parse_args()
 
-	parser = DoxygenParser()
+	doxygen = DoxygenParser()
 
 	# Add all xml files to the parser
 	fileList = glob.glob("{}/**/*".format(args.doxygen), recursive=True)
@@ -25,12 +25,12 @@ if __name__== "__main__":
 		if fileName.lower().endswith(".xml"):
 			try:
 				root = ET.parse(fileName).getroot()
-				parser.parse(root)
+				doxygen.parse(root)
 			except Exception as e:
 				print("file: %s" % (fileName))
 				raise e
 
-	members = Members(parser.getMembersData())
+	members = Members(doxygen.getMembersData())
 
 	# Render to markdown
 	render = MarkdownRender(args.output, members)
