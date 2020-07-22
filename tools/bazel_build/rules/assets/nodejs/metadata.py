@@ -10,8 +10,7 @@ import sys
 from typing import Any, Dict
 
 
-def parseYarn(yarnLockPath: str,
-	packages: Dict[str, Any] = {}) -> Dict[str, Any]:
+def parseYarn(yarnLockPath: str, packages: Dict[str, Any] = {}) -> Dict[str, Any]:
 
 	pattern = re.compile("^(.*)@([^@]*)[:,]$")
 
@@ -37,29 +36,16 @@ def parseYarn(yarnLockPath: str,
 
 if __name__ == "__main__":
 
-	parser = argparse.ArgumentParser(
-		description="Information generator for NodeJs rules.")
-	parser.add_argument("--package_json",
-		type=str,
-		default="packages.json",
-		help="Path of the packages json file.")
-	parser.add_argument("--yarn_lock",
-		type=str,
-		help="Path of the packages json file.")
-	parser.add_argument("output",
-		default="package.manifest",
-		help="Path of the generated file.")
+	parser = argparse.ArgumentParser(description="Information generator for NodeJs rules.")
+	parser.add_argument("--package_json", type=str, default="packages.json", help="Path of the packages json file.")
+	parser.add_argument("--yarn_lock", type=str, help="Path of the packages json file.")
+	parser.add_argument("output", default="package.manifest", help="Path of the generated file.")
 
 	args = parser.parse_args()
 
 	with open(args.package_json) as f:
 		packagesJson = json.load(f)
-	packages = {
-		name: {
-		"requested": version
-		}
-		for name, version in packagesJson.get("dependencies", {}).items()
-	}
+	packages = {name: {"requested": version} for name, version in packagesJson.get("dependencies", {}).items()}
 
 	output = {}
 	if args.yarn_lock:

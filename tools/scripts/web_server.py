@@ -22,14 +22,8 @@ class WebServer(socketserver.TCPServer):
 
 if __name__ == "__main__":
 
-	parser = argparse.ArgumentParser(
-		description="Web server for testing purpose only.")
-	parser.add_argument("-p",
-		"--port",
-		dest="port",
-		default=8080,
-		type=int,
-		help="Port to be used.")
+	parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
+	parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to be used.")
 	parser.add_argument("-r",
 		"--root",
 		dest="root",
@@ -39,9 +33,7 @@ if __name__ == "__main__":
 	parser.add_argument("path",
 		default=".",
 		nargs='?',
-		help=
-		"Serve files from this specific directory or archive, by default the current directory will be used."
-						)
+		help="Serve files from this specific directory or archive, by default the current directory will be used.")
 
 	args = parser.parse_args()
 
@@ -53,9 +45,7 @@ if __name__ == "__main__":
 			tempPath = tempfile.TemporaryDirectory()
 			package = tarfile.open(args.path)
 			try:
-				print(
-					"Extracting content of '{}' to temporary directory '{}'.".
-					format(args.path, tempPath.name))
+				print("Extracting content of '{}' to temporary directory '{}'.".format(args.path, tempPath.name))
 				package.extractall(tempPath.name)
 			finally:
 				package.close()
@@ -71,14 +61,11 @@ if __name__ == "__main__":
 
 		handler = http.server.SimpleHTTPRequestHandler
 		server = WebServer(("", args.port), handler)
-		print(
-			"Web server ready, serving '{}' at 'http://localhost:{}'.".format(
-			args.path, args.port))
+		print("Web server ready, serving '{}' at 'http://localhost:{}'.".format(args.path, args.port))
 		server.run()
 
 	# Cleanup RAII style
 	finally:
 		if tempPath:
-			print("Cleaning up temporary directory '{}'.".format(
-				tempPath.name))
+			print("Cleaning up temporary directory '{}'.".format(tempPath.name))
 			tempPath.cleanup()

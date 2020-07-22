@@ -15,10 +15,7 @@ def mypyWorker(path, stdout):
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
-		args=[
-		"--config-file", configFile, "--no-incremental", "--follow-imports",
-		"silent", "--pretty", path
-		])
+		args=["--config-file", configFile, "--no-incremental", "--follow-imports", "silent", "--pretty", path])
 
 
 def outputStream(result):
@@ -34,13 +31,11 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace,
-		include=[
+	files = Files(args.workspace, include=[
 		"**/*.py",
-		],
-		exclude=[
+	], exclude=[
 		"**tools/bzd/generator/yaml**",
-		])
+	])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)

@@ -6,9 +6,7 @@ import xml.etree.ElementTree as ET
 
 from members import Members, Member
 
-kindToKeep = [
-	"struct", "class", "variable", "function", "typedef", "namespace"
-]
+kindToKeep = ["struct", "class", "variable", "function", "typedef", "namespace"]
 
 
 def commentParser(element, data={}):
@@ -25,27 +23,22 @@ def commentParser(element, data={}):
 				for parameteritem in parameterlist.findall("parameteritem"):
 					param = {}
 					if parameteritem.find("parameternamelist") is not None:
-						param["name"] = ", ".join(text for text in
-							parameteritem.find("parameternamelist").itertext()
-							if text.strip())
+						param["name"] = ", ".join(
+							text for text in parameteritem.find("parameternamelist").itertext() if text.strip())
 					if parameteritem.find("parameterdescription") is not None:
-						param["description"] = commentParser(
-							parameteritem.find("parameterdescription"))
+						param["description"] = commentParser(parameteritem.find("parameterdescription"))
 					paramList.append(param)
-				data["__info__"] = data[
-					"__info__"] if "__info__" in data else {}
+				data["__info__"] = data["__info__"] if "__info__" in data else {}
 				data["__info__"]["description.%s" % (kind)] = paramList
 		elif len(programlistingList):
 			for programlisting in programlistingList:
 				codeBlock = "<code>"
 				for codeline in programlisting.findall("codeline"):
-					codeBlock += " ".join(text
-						for text in codeline.itertext() if text.strip()) + "\n"
+					codeBlock += " ".join(text for text in codeline.itertext() if text.strip()) + "\n"
 				codeBlock += "</code>"
 				textList.append(codeBlock)
 		else:
-			textList.append("".join(text for text in para.itertext()
-				if text.strip()))
+			textList.append("".join(text for text in para.itertext() if text.strip()))
 
 	return "\n".join(text for text in textList if text.strip())
 
@@ -53,10 +46,8 @@ def commentParser(element, data={}):
 commonAttrs = {
 	"id": {},
 	"kind": {
-	"values":
-	["struct", "class", "variable", "function", "typedef", "namespace"],
-	"others":
-	"ignore"
+	"values": ["struct", "class", "variable", "function", "typedef", "namespace"],
+	"others": "ignore"
 	},
 	"prot": {
 	"values": ["private", "public", "protected"],
@@ -100,19 +91,7 @@ commonAttrs = {
 
 name = {"__content__": {"key": "name"}}
 
-param = {
-	"__type__": ["list"],
-	"type": {
-	"__content__": {
-	"key": "type"
-	}
-	},
-	"declname": {
-	"__content__": {
-	"key": "name"
-	}
-	}
-}
+param = {"__type__": ["list"], "type": {"__content__": {"key": "type"}}, "declname": {"__content__": {"key": "name"}}}
 
 args = {
 	"__type__": ["args", "list"],
@@ -170,12 +149,7 @@ node = {
 
 briefdescription = {"__content__": {"key": "descriptionBrief"}}
 
-detaileddescription = {
-	"__content__": {
-	"key": "description",
-	"parser": commentParser
-	}
-}
+detaileddescription = {"__content__": {"key": "description", "parser": commentParser}}
 
 inheritancegraph = {"__type__": ["inheritance"], "node": node}
 
@@ -222,6 +196,7 @@ dictionaryRoot = {"compounddef": compounddef}
 
 
 class DoxygenParser:
+
 	def __init__(self):
 		self.data = {}
 		self.groups = {}
@@ -253,27 +228,19 @@ class DoxygenParser:
 		if value and "values" in rules:
 			acceptedValues = []
 			if isinstance(rules["values"], list):
-				acceptedValues = [
-					v for v in rules["values"] if v == value.lower()
-				]
+				acceptedValues = [v for v in rules["values"] if v == value.lower()]
 			elif isinstance(rules["values"], dict):
-				acceptedValues = [
-					v for k, v in rules["values"].items()
-					if k == value.lower()
-				]
+				acceptedValues = [v for k, v in rules["values"].items() if k == value.lower()]
 			if len(acceptedValues) == 1:
 				value = acceptedValues[0]
 			else:
-				self.assertTrue(
-					True if "others" in rules and rules["others"] == "ignore"
-					else False, "Value '{}' not accepted for key '{}'", value,
-					key)
+				self.assertTrue(True if "others" in rules and rules["others"] == "ignore" else False,
+					"Value '{}' not accepted for key '{}'", value, key)
 				return (key, None)
 
 		if "key" in rules:
 			key = rules["key"]
-		self.assertTrue(key != None,
-			"The 'key' attribute for rule '{}' is missing", rules)
+		self.assertTrue(key != None, "The 'key' attribute for rule '{}' is missing", rules)
 		return (key, value)
 
 	"""
@@ -284,10 +251,9 @@ class DoxygenParser:
 		if value != None:
 			data["__info__"] = data["__info__"] if "__info__" in data else {}
 			if key in data["__info__"]:
-				self.assertTrue(
-					data["__info__"][key] == value,
-					"Overriding key '{}' with a different value '{}' vs '{}': {}",
-					key, data["__info__"][key], value, data)
+				self.assertTrue(data["__info__"][key] == value,
+					"Overriding key '{}' with a different value '{}' vs '{}': {}", key, data["__info__"][key], value,
+					data)
 			data["__info__"][key] = value
 
 	"""
@@ -298,8 +264,7 @@ class DoxygenParser:
 		data["__info__"] = data["__info__"] if "__info__" in data else {}
 		if key not in data["__info__"]:
 			data["__info__"][key] = []
-		self.assertTrue(isinstance(data["__info__"][key], list),
-			"The key '{}' must be a list", key)
+		self.assertTrue(isinstance(data["__info__"][key], list), "The key '{}' must be a list", key)
 		return data["__info__"][key]
 
 	"""
@@ -310,8 +275,7 @@ class DoxygenParser:
 		data["__info__"] = data["__info__"] if "__info__" in data else {}
 		if key not in data["__info__"]:
 			data["__info__"][key] = {}
-		self.assertTrue(isinstance(data["__info__"][key], dict),
-			"The key '{}' must be a dictionary", key)
+		self.assertTrue(isinstance(data["__info__"][key], dict), "The key '{}' must be a dictionary", key)
 		return data["__info__"][key]
 
 	"""
@@ -322,8 +286,7 @@ class DoxygenParser:
 		if "__attrs__" in definition:
 			for key, rules in definition["__attrs__"].items():
 				# Get the value and add it only if it is non-None
-				(key, value) = self.parseValue(rules, element.get(key, None),
-					key)
+				(key, value) = self.parseValue(rules, element.get(key, None), key)
 				self.addMemberInfo(data, key, value)
 
 		if "__content__" in definition:
@@ -339,17 +302,13 @@ class DoxygenParser:
 	"""
 
 	def normalizeName(self, data):
-		if self.assertTrueWarning(
-			"__info__" in data,
-			"Attribute '__info__' is missing from member: {}", data):
+		if self.assertTrueWarning("__info__" in data, "Attribute '__info__' is missing from member: {}", data):
 			return
-		self.assertTrue("name" in data["__info__"],
-			"Attribute 'name' is missing from member: {}", data)
+		self.assertTrue("name" in data["__info__"], "Attribute 'name' is missing from member: {}", data)
 		namespaceList = data["__info__"]["name"].split("::")
 		current = self.data
 		for namespace in namespaceList[:-1]:
-			current[namespace] = current[
-				namespace] if namespace in current else {}
+			current[namespace] = current[namespace] if namespace in current else {}
 			current = current[namespace]
 		data["__info__"]["name"] = namespaceList[-1]
 		self.addMember(current, data)
@@ -362,23 +321,18 @@ class DoxygenParser:
 		if member["__info__"].get("kind", None) in kindToKeep:
 
 			# Generate the member identifier
-			memberData = self.removeNestedKeyword(member["__info__"],
-				"__info__")
+			memberData = self.removeNestedKeyword(member["__info__"], "__info__")
 			identification = Member(memberData).makeIdentifier()
 
-			data[identification] = data[
-				identification] if identification in data else {}
-			data[identification] = self.mergeMember(data[identification],
-				member)
+			data[identification] = data[identification] if identification in data else {}
+			data[identification] = self.mergeMember(data[identification], member)
 
 	"""
 	Merge member2 into member1 and return it
 	"""
 
 	def mergeMember(self, member1, member2):
-		self.assertTrue(
-			type(member1) == type(member2),
-			"Cannot merge different types {} vs {}", member1, member2)
+		self.assertTrue(type(member1) == type(member2), "Cannot merge different types {} vs {}", member1, member2)
 
 		# Merge dictionaries
 		if isinstance(member2, dict):
@@ -397,8 +351,7 @@ class DoxygenParser:
 					member1.append(member2[i])
 
 		else:
-			self.assertTrue(member1 == member2,
-				"Trying to merge different members {} vs {}", member1, member2)
+			self.assertTrue(member1 == member2, "Trying to merge different members {} vs {}", member1, member2)
 
 		return member1
 
@@ -409,15 +362,14 @@ class DoxygenParser:
 	def removeNestedKeyword(self, definition, keyword):
 		if isinstance(definition, dict):
 			if keyword in definition:
-				self.assertTrue(isinstance(definition[keyword], dict),
-					"Sub definition under '{}' must be a dict", keyword)
+				self.assertTrue(isinstance(definition[keyword], dict), "Sub definition under '{}' must be a dict",
+					keyword)
 				return self.removeNestedKeyword(definition[keyword], keyword)
 			for key, value in definition.items():
 				definition[key] = self.removeNestedKeyword(value, keyword)
 		elif isinstance(definition, list):
 			for i in range(len(definition)):
-				definition[i] = self.removeNestedKeyword(
-					definition[i], keyword)
+				definition[i] = self.removeNestedKeyword(definition[i], keyword)
 		return definition
 
 	"""
@@ -429,8 +381,7 @@ class DoxygenParser:
 		for namespace, definition in data.items():
 			if namespace == "__info__":
 				namespaceStr = "::".join(namespaceList[:-1])
-				groups[namespaceStr] = groups[
-					namespaceStr] if namespaceStr in groups else []
+				groups[namespaceStr] = groups[namespaceStr] if namespaceStr in groups else []
 				# Remove nested __info__
 				definition = self.removeNestedKeyword(definition, "__info__")
 				groups[namespaceStr].append(definition)
@@ -467,31 +418,21 @@ class DoxygenParser:
 								inheritanceCurrent = parent
 
 					# Build the inheritance chain
-					def getInheritance(inheritanceCurrent,
-						inheritanceList,
-						visibility="public"):
+					def getInheritance(inheritanceCurrent, inheritanceList, visibility="public"):
 						if inheritanceCurrent:
-							for child in inheritanceCurrent.get(
-								"children", []):
+							for child in inheritanceCurrent.get("children", []):
 								inheritanceNext = child
-								visibility = inheritanceNext.get(
-									"visibility", visibility)
+								visibility = inheritanceNext.get("visibility", visibility)
 								linkId = inheritanceNext.get("id", None)
-								self.assertTrue(linkId != None,
-									"Missing link ID: {}", inheritanceCurrent)
-								inheritanceNext = member["inheritance"].get(
-									linkId, None)
+								self.assertTrue(linkId != None, "Missing link ID: {}", inheritanceCurrent)
+								inheritanceNext = member["inheritance"].get(linkId, None)
 								if inheritanceNext:
 									inheritanceList.append({
-										"visibility":
-										visibility,
-										"link":
-										inheritanceNext.get("link", None),
-										"id":
-										inheritanceNext.get("name", None)
+										"visibility": visibility,
+										"link": inheritanceNext.get("link", None),
+										"id": inheritanceNext.get("name", None)
 									})
-									getInheritance(inheritanceNext,
-										inheritanceList, visibility)
+									getInheritance(inheritanceNext, inheritanceList, visibility)
 
 					inheritanceList = []
 					getInheritance(inheritanceCurrent, inheritanceList)
@@ -519,13 +460,10 @@ class DoxygenParser:
 		for namespace, members in groups.items():
 			for member in members:
 				if "description.param" in member:
-					self.mergeMember(member,
-						{"args": member["description.param"]})
+					self.mergeMember(member, {"args": member["description.param"]})
 					del member["description.param"]
 				if "description.templateparam" in member:
-					self.mergeMember(
-						member,
-						{"template": member["description.templateparam"]})
+					self.mergeMember(member, {"template": member["description.templateparam"]})
 					del member["description.templateparam"]
 
 	"""
@@ -559,50 +497,38 @@ class DoxygenParser:
 							if "member" in definition["__type__"]:
 								current = {}
 							if "template" in definition["__type__"]:
-								current = self.addMemberList(
-									current, "template")
+								current = self.addMemberList(current, "template")
 							if "args" in definition["__type__"]:
 								current = self.addMemberList(current, "args")
 							if "inheritance" in definition["__type__"]:
-								current = self.addMemberDict(
-									current, "inheritance")
+								current = self.addMemberDict(current, "inheritance")
 							if "children" in definition["__type__"]:
-								current = self.addMemberList(
-									current, "children")
+								current = self.addMemberList(current, "children")
 							if "typeref" in definition["__type__"]:
-								current = self.addMemberList(
-									current, "typeref")
+								current = self.addMemberList(current, "typeref")
 							if "list" in definition["__type__"]:
-								self.assertTrue(isinstance(current, list),
-									"Data must be a list '{}'", current)
+								self.assertTrue(isinstance(current, list), "Data must be a list '{}'", current)
 								current.append({})
 								current = current[len(current) - 1]
 							if "dict" in definition["__type__"]:
-								self.assertTrue(
-									isinstance(current, dict),
-									"Data must be a dictionary '{}'", current)
+								self.assertTrue(isinstance(current, dict), "Data must be a dictionary '{}'", current)
 
 						self.parseElement(element, definition, current)
 						self.parseSubElements(element, definition, current)
 
 						# Add this news element
-						if "__type__" in definition and "member" in definition[
-							"__type__"]:
+						if "__type__" in definition and "member" in definition["__type__"]:
 							self.addMember(data, current)
 
-						elif "__type__" in definition and "dict" in definition[
-							"__type__"]:
-							self.assertTrue(
-								"__key__" in current["__info__"],
-								"Data must have a key __key__: {}", current)
-							current[current["__info__"]
-								["__key__"]] = current["__info__"]
+						elif "__type__" in definition and "dict" in definition["__type__"]:
+							self.assertTrue("__key__" in current["__info__"], "Data must have a key __key__: {}",
+								current)
+							current[current["__info__"]["__key__"]] = current["__info__"]
 							del current["__info__"]["__key__"]
 							del current["__info__"]
 
 			# Check if there is a namespace
-			if "__type__" in definition and "container" in definition[
-				"__type__"]:
+			if "__type__" in definition and "container" in definition["__type__"]:
 				self.normalizeName(data)
 
 		except Exception as e:

@@ -10,12 +10,8 @@ isSuccess = True
 
 
 def yapfWorker(path, stdout):
-	result = FormatFile(path,
-		style_config=configFile,
-		in_place=True,
-		logger=stdout)
-	assert result[1] == "utf-8", "Wrong encoding {}, must be utf-8".format(
-		result[1])
+	result = FormatFile(path, style_config=configFile, in_place=True, logger=stdout)
+	assert result[1] == "utf-8", "Wrong encoding {}, must be utf-8".format(result[1])
 
 
 def outputStream(result):
@@ -31,13 +27,11 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace,
-		include=[
+	files = Files(args.workspace, include=[
 		"**/*.py",
-		],
-		exclude=[
+	], exclude=[
 		"**tools/bzd/generator/yaml**",
-		])
+	])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(yapfWorker)

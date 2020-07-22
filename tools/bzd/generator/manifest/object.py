@@ -7,11 +7,11 @@ Represents an object
 
 
 class Object():
+
 	def __init__(self, manifest, identifier, definition=None):
 		self.manifest = manifest
 		self.identifier = identifier
-		self.definition = definition if definition else manifest.getData().get(
-			"objects", {}).get(identifier, {})
+		self.definition = definition if definition else manifest.getData().get("objects", {}).get(identifier, {})
 		self.deps = {"interface": set([self.getInterfaceName()]), "object": {}}
 
 		# Process the definitions
@@ -23,31 +23,24 @@ class Object():
 				if ValidatorObject.isMatch(valueStr):
 					result = ValidatorObject.parse(valueStr)
 					self.deps["interface"].add(result["interface"])
-					self.deps["object"][
-						result["interface"]] = self.deps["object"].get(
-						result["interface"], set())
-					self.deps["object"][result["interface"]].add(
-						result["name"])
+					self.deps["object"][result["interface"]] = self.deps["object"].get(result["interface"], set())
+					self.deps["object"][result["interface"]].add(result["name"])
 					value.setReprCallback(
-						self.manifest,
-						lambda renderer: renderer.get("object", "").format(
-						interface=result["interface"], name=result["name"]))
+						self.manifest, lambda renderer: renderer.get("object", "").format(interface=result["interface"],
+						name=result["name"]))
 
 				# If this represents an interface
 				elif ValidatorInterface.isMatch(valueStr):
 					self.deps["interface"].add(valueStr)
 
 			elif ValidatorCustom.isMatch(value):
-				value.setReprCallback(
-					self.manifest, lambda renderer: renderer.get(value.type))
+				value.setReprCallback(self.manifest, lambda renderer: renderer.get(value.type))
 
 		self._walk(self.definition, visit)
 
 		# Sanity check
-		assert (
-			(self.definition.get("config", None) != None)
-			and (self.definition.get("params", None) != None)
-		) == False, "Object cannot have a configuration (config) and parameters (params) at the same time."
+		assert ((self.definition.get("config", None) != None) and (self.definition.get("params", None) != None)
+				) == False, "Object cannot have a configuration (config) and parameters (params) at the same time."
 
 	"""
 	Return the interface of the object
@@ -121,8 +114,7 @@ class Object():
 			implementationInterface, implementationObjecy, self.identifier)
 		implementation = implementationInterface if implementationInterface else self.definition.get(
 			"implementation", self.getInterfaceName())
-		return self.manifest.getInterface(implementation,
-			mustExists=False).getImplementationOrInterface()
+		return self.manifest.getInterface(implementation, mustExists=False).getImplementationOrInterface()
 
 	"""
 	Get parameters

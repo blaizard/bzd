@@ -7,6 +7,7 @@ from members import Members
 
 
 class MarkdownRender:
+
 	def __init__(self, path, members):
 		self.path = path
 		self.members = members
@@ -14,18 +15,15 @@ class MarkdownRender:
 		self.fileHandle = None
 
 	def generateLink(self, namespace, member=None):
+
 		def identifierToPath(identifierList):
-			path = os.path.join(
-				self.path,
-				os.path.join(
-				*[self.toFileName(name) for name in identifierList]))
+			path = os.path.join(self.path, os.path.join(*[self.toFileName(name) for name in identifierList]))
 			if self.curDir:
 				path = os.path.relpath(path, self.curDir)
 			return path
 
 		# Create the identifier
-		identifier = Members.makeIdentifier(namespace,
-			member.getName() if member else "")
+		identifier = Members.makeIdentifier(namespace, member.getName() if member else "")
 		identifierList = identifier.split("::")
 
 		if self.members.getMemberGroup(identifier):
@@ -38,8 +36,7 @@ class MarkdownRender:
 			self.fileHandle.write("# ")
 			namespaceList = namespace.split("::")
 			for i in range(len(namespaceList)):
-				self.fileHandle.write("{}[`{}`]({})".format(
-					"::" if i else "", namespaceList[i],
+				self.fileHandle.write("{}[`{}`]({})".format("::" if i else "", namespaceList[i],
 					self.generateLink("::".join(namespaceList[0:i]))))
 			self.fileHandle.write("\n\n")
 
@@ -52,23 +49,17 @@ class MarkdownRender:
 		for member in memberList:
 			kind = member.getKind()
 			if kind != prevKind:
-				self.fileHandle.write("\n|{}||\n".format(
-					member.getDefinition()["name"]))
+				self.fileHandle.write("\n|{}||\n".format(member.getDefinition()["name"]))
 				self.fileHandle.write("|:---|:---|\n")
 
 			# Generate the description brief
 			descriptionBrief = member.getDescriptionBrief()
 			aliasList = member.getAlias()
 			if len(aliasList):
-				aliasStr = ", ".join([
-					"[`{}`]({})".format(alias, self.generateLink(alias))
-					for alias in aliasList
-				])
-				descriptionBrief += "{}alias of {}".format(
-					"; " if descriptionBrief else "", aliasStr)
+				aliasStr = ", ".join(["[`{}`]({})".format(alias, self.generateLink(alias)) for alias in aliasList])
+				descriptionBrief += "{}alias of {}".format("; " if descriptionBrief else "", aliasStr)
 
-			self.fileHandle.write("|[`{}`]({})|{}|\n".format(
-				member.printDefinition("{name}"),
+			self.fileHandle.write("|[`{}`]({})|{}|\n".format(member.printDefinition("{name}"),
 				self.generateLink(namespace, member), descriptionBrief))
 			prevKind = kind
 
@@ -88,8 +79,7 @@ class MarkdownRender:
 		for match in pattern.finditer(comment):
 
 			# Format the text add it to the output
-			output += formatText(currentStack[-1],
-				comment[index:match.start()])
+			output += formatText(currentStack[-1], comment[index:match.start()])
 
 			index = match.end()
 
@@ -111,16 +101,13 @@ class MarkdownRender:
 		return output
 
 	def createMember(self, namespace, member, preTitle):
-		self.fileHandle.write("{}`{} {}`\n".format(
-			preTitle, member.printDefinition("{template} {pre} {type}"),
+		self.fileHandle.write("{}`{} {}`\n".format(preTitle, member.printDefinition("{template} {pre} {type}"),
 			member.printDefinition("{name} {post}")))
 
 		if member.getProvenance():
-			self.fileHandle.write("*From {}*\n\n".format(
-				member.getProvenance()))
+			self.fileHandle.write("*From {}*\n\n".format(member.getProvenance()))
 
-		self.fileHandle.write("{}\n".format(
-			self.formatComment(member.getDescription())))
+		self.fileHandle.write("{}\n".format(self.formatComment(member.getDescription())))
 
 		definition = member.getDefinition()
 
@@ -130,8 +117,7 @@ class MarkdownRender:
 			self.fileHandle.write("||||\n")
 			self.fileHandle.write("|---:|:---|:---|\n")
 			for template in member.getTemplate():
-				self.fileHandle.write("|{}|{}|{}|\n".format(
-					template.get("type"), template.get("name"),
+				self.fileHandle.write("|{}|{}|{}|\n".format(template.get("type"), template.get("name"),
 					template.get("description", "")))
 
 		# Set the arguments
@@ -140,8 +126,7 @@ class MarkdownRender:
 			self.fileHandle.write("||||\n")
 			self.fileHandle.write("|---:|:---|:---|\n")
 			for arg in member.getArgs():
-				self.fileHandle.write("|{}|{}|{}|\n".format(
-					arg.get("type"), arg.get("name"),
+				self.fileHandle.write("|{}|{}|{}|\n".format(arg.get("type"), arg.get("name"),
 					arg.get("description", "")))
 
 	def toFileName(self, name):

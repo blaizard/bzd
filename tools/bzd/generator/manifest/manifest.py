@@ -10,6 +10,7 @@ Represent a key, used together with the context for messaging
 
 
 class _Keys():
+
 	def __init__(self):
 		self.keys = []
 
@@ -27,6 +28,7 @@ class _Keys():
 
 
 class Manifest():
+
 	def __init__(self):
 		self.data = {}
 		self.objects = {}
@@ -76,8 +78,7 @@ class Manifest():
 		config = {"interface": None}
 		config.update(filt)
 		for identifier, obj in self.objects.items():
-			if config["interface"] == None or config[
-				"interface"] == obj.getInterfaceName():
+			if config["interface"] == None or config["interface"] == obj.getInterfaceName():
 				yield obj
 
 	"""
@@ -93,8 +94,7 @@ class Manifest():
 
 	def getInterface(self, name, mustExists=True):
 		exists = self.isInterface(name)
-		assert not mustExists or exists, "The interface name '{}' was not discovered or is not valid.".format(
-			str(name))
+		assert not mustExists or exists, "The interface name '{}' was not discovered or is not valid.".format(str(name))
 		return self.interfaces[str(name)] if exists else EmptyInterface(name)
 
 	"""
@@ -136,15 +136,9 @@ class Manifest():
 			# Generate dictionary of depending objects
 			deps = {}
 			[deps.update(obj.getDependentObjects()) for obj in objects]
-			registryEntries[interface.getName()] = {
-				"objects": objects,
-				"deps": deps
-			}
+			registryEntries[interface.getName()] = {"objects": objects, "deps": deps}
 		# Create a dependency graph
-		dependencyGraph = {
-			interface: set()
-			for interface in registryEntries.keys()
-		}
+		dependencyGraph = {interface: set() for interface in registryEntries.keys()}
 		for interface, data in registryEntries.items():
 			for dependency in data["deps"].keys():
 				dependencyGraph[interface].add(dependency)
@@ -157,18 +151,12 @@ class Manifest():
 			registryListInitialLen = len(registryList)
 			for interface, data in dependencyGraph.items():
 				if all([dep not in dependencyGraph for dep in data]):
-					registryList.append({
-						"interface":
-						interface,
-						"objects":
-						registryEntries[interface]["objects"]
-					})
+					registryList.append({"interface": interface, "objects": registryEntries[interface]["objects"]})
 				else:
 					newDependencyGraph[interface] = data
 			if registryListInitialLen == len(registryList):
-				raise Exception(
-					"Circular depedency detected between interfaces: {}.".
-					format(", ".join(dependencyGraph.keys())))
+				raise Exception("Circular depedency detected between interfaces: {}.".format(", ".join(
+					dependencyGraph.keys())))
 			dependencyGraph = newDependencyGraph
 
 		return registryList
@@ -183,10 +171,7 @@ class Manifest():
 			self._mergeAndValidate(self.data, data, self.format, context, path)
 		except Exception as e:
 			raise Exception("Error while merging ({}): {}".format(
-				"; ".join([
-				"{}: '{}'".format(str(key), str(text))
-				for key, text in context.items() if text
-				]), e))
+				"; ".join(["{}: '{}'".format(str(key), str(text)) for key, text in context.items() if text]), e))
 
 	"""
 	Add artifacts to the generated code.
@@ -195,8 +180,7 @@ class Manifest():
 	def addArtifact(self, path, identifier):
 		if "artifacts" not in self.data:
 			self.data["artifacts"] = {}
-		assert identifier not in self.data[
-			"artifacts"], "Identifier '{}' is already used for artifact.".format(
+		assert identifier not in self.data["artifacts"], "Identifier '{}' is already used for artifact.".format(
 			identifier)
 		self.data["artifacts"][identifier] = {"path": path}
 
@@ -212,8 +196,7 @@ class Manifest():
 			try:
 				self.objects[identifier] = Object(self, identifier)
 			except Exception as e:
-				raise Exception("Error while processing object {}: {}".format(
-					identifier, e))
+				raise Exception("Error while processing object {}: {}".format(identifier, e))
 
 		# Interfaces
 		self.interfaces = {}
@@ -221,9 +204,7 @@ class Manifest():
 			try:
 				self.interfaces[identifier] = Interface(self, identifier)
 			except Exception as e:
-				raise Exception(
-					"Error while processing interface {}: {}".format(
-					identifier, e))
+				raise Exception("Error while processing interface {}: {}".format(identifier, e))
 
 		# Artifacts
 		self.artifacts = {}
@@ -232,9 +213,7 @@ class Manifest():
 				self.artifacts[identifier] = Artifact(self, identifier)
 				self.artifacts[identifier].registerObject(self.objects)
 			except Exception as e:
-				raise Exception(
-					"Error while processing artifact {}: {}".format(
-					identifier, e))
+				raise Exception("Error while processing artifact {}: {}".format(identifier, e))
 
 	"""
 	Merge the data
@@ -253,10 +232,7 @@ class Manifest():
 
 			# Validate the data
 			if isinstance(vData, dict):
-				assert isinstance(
-					value, dict
-				), "Key '{}' must contain a dictionary type object.".format(
-					key)
+				assert isinstance(value, dict), "Key '{}' must contain a dictionary type object.".format(key)
 
 				# If it contains key format validator
 				if "_key" in vData:
@@ -266,16 +242,13 @@ class Manifest():
 					dst[key] = {}
 
 				# Go further
-				Manifest._mergeAndValidate(dst[key], value, vData, context,
-					path)
+				Manifest._mergeAndValidate(dst[key], value, vData, context, path)
 
 			else:
 				vData.validate(value)
 				if key not in dst:
 					dst[key] = value
 				else:
-					assert dst[
-						key] == value, "Conflicting values: '{}' != '{}'".format(
-						str(dst[key]), str(value))
+					assert dst[key] == value, "Conflicting values: '{}' != '{}'".format(str(dst[key]), str(value))
 
 			context["key"].pop()

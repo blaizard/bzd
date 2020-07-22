@@ -12,8 +12,7 @@ class Reference(object):
 		self.manifest = None
 
 	def getRepr(self):
-		return self.reprCallback(self.manifest.
-			renderer) if self.reprCallback and self.manifest.renderer else str(
+		return self.reprCallback(self.manifest.renderer) if self.reprCallback and self.manifest.renderer else str(
 			self.value)
 
 	def setReprCallback(self, manifest, callback):

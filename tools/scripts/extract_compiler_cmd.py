@@ -12,17 +12,7 @@ Parse a command line and extract important information.
 
 def parse(cmdStr):
 
-	results = {
-		"files": {
-		"lds": [],
-		"libs": [],
-		"includes": []
-		},
-		"linker": {
-		"lds": [],
-		"libs": []
-		}
-	}
+	results = {"files": {"lds": [], "libs": [], "includes": []}, "linker": {"lds": [], "libs": []}}
 
 	libSearchPathList = ["/"]
 	parse.state = None
@@ -38,8 +28,7 @@ def parse(cmdStr):
 				callback(arg[len(key):].strip())
 
 	def addLib(name):
-		fileName = name if re.match(r'lib.*\.a',
-			os.path.basename(name)) else "lib{}.a".format(name)
+		fileName = name if re.match(r'lib.*\.a', os.path.basename(name)) else "lib{}.a".format(name)
 		for path in libSearchPathList:
 			p = os.path.join(path, fileName)
 			if os.path.isfile(p):

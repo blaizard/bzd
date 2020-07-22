@@ -4,6 +4,7 @@ import re
 
 
 class Filter:
+
 	def __init__(self, filters):
 		self.filters = [Filter._compile(filterStr) for filterStr in filters]
 
