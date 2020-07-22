@@ -6,19 +6,11 @@ from yapf.yapflib.yapf_api import FormatFile
 from tools.sanitizer.utils.workspace import Files
 
 configFile = os.path.join(os.path.dirname(__file__), "yapf.ini")
-isSuccess = True
 
 
 def yapfWorker(path, stdout):
 	result = FormatFile(path, style_config=configFile, in_place=True, logger=stdout)
 	assert result[1] == "utf-8", "Wrong encoding {}, must be utf-8".format(result[1])
-
-
-def outputStream(result):
-	if not result.isSuccess():
-		global isSuccess
-		isSuccess = False
-		print(result.getOutput(), end="")
 
 
 if __name__ == "__main__":
@@ -38,6 +30,13 @@ if __name__ == "__main__":
 	worker.start()
 	for path in files.data():
 		worker.add(path)
-	worker.stop(handler=outputStream)
+
+	isSuccess = True
+	for result in worker.data():
+		if not result.isSuccess():
+			isSuccess = False
+			print(result.getOutput(), end="")
+
+	worker.stop()
 
 	sys.exit(0 if isSuccess else 1)
