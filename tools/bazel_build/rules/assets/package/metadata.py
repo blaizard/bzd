@@ -5,18 +5,13 @@ import json
 
 if __name__ == "__main__":
 
-	parser = argparse.ArgumentParser(
-		description="Information generator rules.")
+	parser = argparse.ArgumentParser(description="Information generator rules.")
 	parser.add_argument("--input",
 		nargs=2,
 		action="append",
-		help=
-		"Pair of application name and an information package json file, can add multiple."
-						)
+		help="Pair of application name and an information package json file, can add multiple.")
 	parser.add_argument("--config", type=str, help="Build configuration.")
-	parser.add_argument("output",
-		default="package.manifest",
-		help="Path of the generated file.")
+	parser.add_argument("output", default="package.manifest", help="Path of the generated file.")
 
 	args = parser.parse_args()
 

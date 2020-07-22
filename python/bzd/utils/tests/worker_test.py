@@ -3,6 +3,7 @@ import bzd.utils.worker
 
 
 class TestWorker(unittest.TestCase):
+
 	@staticmethod
 	def foo(x, stdout):
 		stdout.write("Hello")

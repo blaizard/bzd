@@ -35,18 +35,14 @@ def copyFileTree(output, fileList, pattern):
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(
-		description="Generate the content of the esp32 SDK from esp-idf.")
-	parser.add_argument("output",
-		type=str,
-		help="Output directory where to store the results.")
+	parser = argparse.ArgumentParser(description="Generate the content of the esp32 SDK from esp-idf.")
+	parser.add_argument("output", type=str, help="Output directory where to store the results.")
 
 	args = parser.parse_args()
 
 	# Create the output directory
 	output = os.path.abspath(os.path.expanduser(args.output))
-	if input("Do you want to create and clean '{}'? ".format(
-		output)).lower().strip() == "y":
+	if input("Do you want to create and clean '{}'? ".format(output)).lower().strip() == "y":
 		if os.path.isdir(output):
 			shutil.rmtree(output)
 		os.makedirs(output)
@@ -56,12 +52,8 @@ if __name__ == "__main__":
 
 		copyFiles(os.path.join(output, "ld"), result["files"]["lds"])
 		copyFiles(os.path.join(output, "lib"), result["files"]["libs"])
-		copyFileTree(
-			os.path.join(output, "include"),
-			filter(lambda x: x not in ["."], result["files"]["includes"]),
+		copyFileTree(os.path.join(output, "include"), filter(lambda x: x not in ["."], result["files"]["includes"]),
 			r'.*\.h')
 
-		print("Linker commands (lds): {}".format(" ".join(
-			["-T{}".format(p) for p in result["linker"]["lds"]])))
-		print("Linker commands (libs): {}".format(" ".join(
-			["-l{}".format(p) for p in result["linker"]["libs"]])))
+		print("Linker commands (lds): {}".format(" ".join(["-T{}".format(p) for p in result["linker"]["lds"]])))
+		print("Linker commands (libs): {}".format(" ".join(["-l{}".format(p) for p in result["linker"]["libs"]])))

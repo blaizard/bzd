@@ -37,9 +37,7 @@ def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 			# Gather compilers
 			if topDIE.tag == "DW_TAG_compile_unit":
 				if "DW_AT_producer" in topDIE.attributes:
-					compiler = topDIE.attributes[
-						"DW_AT_producer"].value.decode("ascii",
-						errors="ignore").lower()
+					compiler = topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors="ignore").lower()
 					# Remove everything after the first argument
 					index = compiler.find(" -")
 					if index != -1:
@@ -75,16 +73,11 @@ def dieInfoRec(die: Any) -> int:
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Binary profiler.")
-	parser.add_argument("--format",
-		choices=["elf-dwarf"],
-		default="elf-dwarf",
-		help="Binary format.")
+	parser.add_argument("--format", choices=["elf-dwarf"], default="elf-dwarf", help="Binary format.")
 	parser.add_argument("--groups", default=None, help="Groups schema if any.")
 	parser.add_argument("binary", help="Path of the binary to profile.")
-	parser.add_argument("binary_stripped",
-		help="Path of the stripped binary to profile.")
-	parser.add_argument("binary_final",
-		help="Path of the final binary to profile.")
+	parser.add_argument("binary_stripped", help="Path of the stripped binary to profile.")
+	parser.add_argument("binary_final", help="Path of the final binary to profile.")
 	parser.add_argument("output", help="Path of the json output.")
 
 	args = parser.parse_args()
@@ -94,10 +87,7 @@ if __name__ == '__main__':
 		with open(args.groups, "r") as f:
 			groupsData = json.load(f)
 			# Compute regular expression from the groups
-			groups = {
-				re.compile(match): group
-				for match, group in groupsData.items()
-			}
+			groups = {re.compile(match): group for match, group in groupsData.items()}
 
 	if args.format == "elf-dwarf":
 		result, compilers = processElfDwarf(args.binary)

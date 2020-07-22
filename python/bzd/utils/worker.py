@@ -7,6 +7,7 @@ from typing import Optional
 
 
 class _WorkerResult:
+
 	def __init__(self, output) -> None:
 		self.output = output
 
@@ -21,8 +22,8 @@ class _WorkerResult:
 
 
 class Worker:
-	def __init__(self, task,
-		maxWorker: Optional[int] = os.cpu_count()) -> None:
+
+	def __init__(self, task, maxWorker: Optional[int] = os.cpu_count()) -> None:
 		self.shared = {
 			"stop": multiprocessing.Value("i", 0),
 			"output": multiprocessing.Queue(),
@@ -30,8 +31,7 @@ class Worker:
 		}
 		assert maxWorker
 		self.workerList = [
-			multiprocessing.Process(target=Worker._taskWrapper,
-			args=(task, self.shared)) for i in range(maxWorker)
+			multiprocessing.Process(target=Worker._taskWrapper, args=(task, self.shared)) for i in range(maxWorker)
 		]
 
 	@staticmethod
@@ -56,9 +56,8 @@ class Worker:
 			except:
 				isSuccess = False
 				exceptionType, exceptionValue = sys.exc_info()[:2]
-				stdout.write(
-					"Failed with exception of type '{}' and message: {}\n".
-					format(exceptionType.__name__, exceptionValue))
+				stdout.write("Failed with exception of type '{}' and message: {}\n".format(
+					exceptionType.__name__, exceptionValue))
 
 			shared["output"].put((isSuccess, result, stdout.getvalue()))
 
@@ -80,8 +79,7 @@ class Worker:
 		result = []
 		while (not self.shared["output"].empty()) or (self.isAlive()):
 			try:
-				workerResult = _WorkerResult(
-					self.shared["output"].get_nowait())
+				workerResult = _WorkerResult(self.shared["output"].get_nowait())
 				result.append(workerResult)
 				if handler:
 					handler(workerResult)

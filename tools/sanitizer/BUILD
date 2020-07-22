@@ -31,12 +31,12 @@ py_binary(
     ],
     data = [
         ":config",
-        "//tools/sanitizer/actions/yapf",
         "//tools/sanitizer/actions/buildifier",
         "//tools/sanitizer/actions/clang_format",
         "//tools/sanitizer/actions/eslint",
         "//tools/sanitizer/actions/mypy",
         "//tools/sanitizer/actions/structure",
+        "//tools/sanitizer/actions/yapf",
     ],
     main = "sanitizer.py",
     deps = [

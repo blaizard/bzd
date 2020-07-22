@@ -10,17 +10,9 @@ from parser.doxygen import DoxygenParser
 
 if __name__ == "__main__":
 
-	parser = argparse.ArgumentParser(
-		description="Generate documentation from Doxygen XML output")
-	parser.add_argument('--doxygen',
-		dest="doxygen",
-		default="docs/xml",
-		help="Doxygen XML output directory")
-	parser.add_argument("-o",
-		"--output",
-		dest="output",
-		default="docs/md",
-		help="Output of the generate documentation")
+	parser = argparse.ArgumentParser(description="Generate documentation from Doxygen XML output")
+	parser.add_argument('--doxygen', dest="doxygen", default="docs/xml", help="Doxygen XML output directory")
+	parser.add_argument("-o", "--output", dest="output", default="docs/md", help="Output of the generate documentation")
 
 	args = parser.parse_args()
 

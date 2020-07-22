@@ -5,6 +5,7 @@ from .custom import Custom
 
 
 class ValidatorType:
+
 	@classmethod
 	def isMatch(cls, value):
 		if str in cls.valueTypes and isinstance(value, str):
@@ -24,10 +25,10 @@ Determine wether or not a value is a reference
 
 
 class ValidatorReference:
+
 	@classmethod
 	def isMatch(cls, value):
-		return hasattr(value,
-			"__bzd_reference__") and value.__bzd_reference__ == True
+		return hasattr(value, "__bzd_reference__") and value.__bzd_reference__ == True
 
 
 """
@@ -36,10 +37,10 @@ Determine wether this is a custome type
 
 
 class ValidatorCustom:
+
 	@classmethod
 	def isMatch(cls, value):
-		return hasattr(value,
-			"__bzd_custom__") and value.__bzd_custom__ == True
+		return hasattr(value, "__bzd_custom__") and value.__bzd_custom__ == True
 
 
 """
@@ -48,6 +49,7 @@ Matches everything!
 
 
 class ValidatorAny(ValidatorType):
+
 	@classmethod
 	def isMatch(cls, value):
 		return True
@@ -82,8 +84,7 @@ Determine the object type
 
 class ValidatorObject(ValidatorType):
 	regexprObjectName = r"(?P<name>(?:[A-Za-z_][A-Za-z_0-9]*)+)"
-	regexpr = re.compile(r"^" + ValidatorInterface.regexprClass + r"\." +
-		regexprObjectName + "$")
+	regexpr = re.compile(r"^" + ValidatorInterface.regexprClass + r"\." + regexprObjectName + "$")
 	valueTypes = [str]
 
 	@classmethod
@@ -112,8 +113,7 @@ class Validator():
 		self.formats = formats
 		self.validators = []
 		for f in set(formats):
-			assert f in Validator.validators, "Un-supported validator format '{}'.".format(
-				f)
+			assert f in Validator.validators, "Un-supported validator format '{}'.".format(f)
 			self.validators.append(Validator.validators[f])
 
 	def getFormats(self):
@@ -123,6 +123,5 @@ class Validator():
 		for validator in self.validators:
 			if validator.isMatch(value):
 				return True
-		raise Exception(
-			"Value '{}' does not match the required type(s): {}.".format(
+		raise Exception("Value '{}' does not match the required type(s): {}.".format(
 			str(value), ", ".join(self.formats)))

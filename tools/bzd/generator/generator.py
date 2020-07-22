@@ -10,24 +10,11 @@ from manifest import Manifest
 
 if __name__ == "__main__":
 
-	parser = argparse.ArgumentParser(
-		description="Architect configuration file parser.")
-	parser.add_argument("inputs",
-		nargs="*",
-		help="Input files to be passed to the parser.")
-	parser.add_argument("-o",
-		"--output",
-		default="./out",
-		type=str,
-		help="Output path of generated file.")
-	parser.add_argument("-f",
-		"--format",
-		default="cpp",
-		help="Output format to be used.")
-	parser.add_argument("-m",
-		"--manifest",
-		default=None,
-		help="Generate the resulting manifest.")
+	parser = argparse.ArgumentParser(description="Architect configuration file parser.")
+	parser.add_argument("inputs", nargs="*", help="Input files to be passed to the parser.")
+	parser.add_argument("-o", "--output", default="./out", type=str, help="Output path of generated file.")
+	parser.add_argument("-f", "--format", default="cpp", help="Output format to be used.")
+	parser.add_argument("-m", "--manifest", default=None, help="Generate the resulting manifest.")
 	parser.add_argument("-a",
 		"--artifact",
 		default=[],
@@ -35,9 +22,7 @@ if __name__ == "__main__":
 		help="Artifacts to be added to the generated code.")
 
 	config = parser.parse_args()
-	assert hasattr(formats,
-		config.format), "Unsupported output format '{}'".format(
-		str(config.format))
+	assert hasattr(formats, config.format), "Unsupported output format '{}'".format(str(config.format))
 
 	manifest = Manifest()
 	for path in config.inputs:
@@ -59,9 +44,8 @@ if __name__ == "__main__":
 		Log.fatal("Oups! Something went wrong.", e)
 
 	# Generate the header comments
-	comments = [
-		"This file has been auto-generated and is the result of the following manifest(s):"
-	] + ["- {}".format(path) for path in config.inputs]
+	comments = ["This file has been auto-generated and is the result of the following manifest(s):"
+				] + ["- {}".format(path) for path in config.inputs]
 
 	# Generate the output manifest
 	if config.manifest:

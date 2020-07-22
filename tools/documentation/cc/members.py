@@ -144,6 +144,7 @@ def getDefinition(kind):
 
 
 class Member:
+
 	def __init__(self, data):
 		self.data = data
 
@@ -152,8 +153,7 @@ class Member:
 	"""
 
 	def makeIdentifier(self):
-		return self.printDefinition(
-			formatStr=self.getDefinition()["identifier"])
+		return self.printDefinition(formatStr=self.getDefinition()["identifier"])
 
 	def clone(self):
 		return Member(self.data.copy())
@@ -202,8 +202,7 @@ class Member:
 		return self.data.get("static", False)
 
 	def getVisibility(self):
-		return self.data.get("visibility",
-			self.getDefinition()["defaultVisibility"])
+		return self.data.get("visibility", self.getDefinition()["defaultVisibility"])
 
 	def getTemplate(self):
 		return self.data.get("template", [])
@@ -219,25 +218,19 @@ class Member:
 		return regex.sub(" ", self.data.get("descriptionBrief", "").strip())
 
 	def getDescription(self):
-		return "{}\n{}".format(self.getDescriptionBrief(),
-			self.data.get("description", "")).strip()
+		return "{}\n{}".format(self.getDescriptionBrief(), self.data.get("description", "")).strip()
 
-	def printDefinition(self,
-		formatStr="{template} {pre} {type} {name} {post}"):
+	def printDefinition(self, formatStr="{template} {pre} {type} {name} {post}"):
+
 		def printTemplate(template):
 			if len(template):
-				formatArgs = ", ".join([
-					"{type} {name}".format(type=v.get("type"),
-					name=v.get("name", "")).strip() for v in template
-				])
+				formatArgs = ", ".join(
+					["{type} {name}".format(type=v.get("type"), name=v.get("name", "")).strip() for v in template])
 				return "template<{}>".format(formatArgs)
 			return ""
 
 		def printArgs(args):
-			return ", ".join([
-				"{type} {name}".format(type=v.get("type"),
-				name=v.get("name", "")).strip() for v in args
-			])
+			return ", ".join(["{type} {name}".format(type=v.get("type"), name=v.get("name", "")).strip() for v in args])
 
 		formatRule = self.getDefinition()["format"].copy()
 		for key, rule in formatRule.items():
@@ -260,6 +253,7 @@ class Member:
 
 
 class MemberGroup:
+
 	def __init__(self, memberList, identifier):
 		self.list = []
 		self.identifier = identifier
@@ -275,18 +269,14 @@ class MemberGroup:
 	"""
 
 	def getConstructorName(self):
-		return self.parent.getName(
-		) if self.parent and self.parent.getDefinition(
-		)["constructor"] else None
+		return self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
 	"""
 	Get destructor name if any
 	"""
 
 	def getDestructorName(self):
-		return "~" + self.parent.getName(
-		) if self.parent and self.parent.getDefinition(
-		)["constructor"] else None
+		return "~" + self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
 	def addMembers(self, members, provenance=None):
 		name = self.getIdentifierName()
@@ -294,20 +284,17 @@ class MemberGroup:
 			if member.getVisibility() == "public":
 				if provenance:
 					# If constructor or destructor, do not merge
-					if member.getName() in [
-						self.getConstructorName(),
-						self.getDestructorName()
-					]:
+					if member.getName() in [self.getConstructorName(), self.getDestructorName()]:
 						continue
 					member.setProvenance(provenance)
 				self.list.append(member)
 		self.sort()
 
 	def merge(self, memberGroup, provenance):
-		self.addMembers([member.clone() for member in memberGroup.list],
-			provenance)
+		self.addMembers([member.clone() for member in memberGroup.list], provenance)
 
 	def sort(self):
+
 		def sortKey(k):
 			weight = k.getDefinition()["sort"]
 			if k.getName() == self.getConstructorName():
@@ -333,6 +320,7 @@ class MemberGroup:
 
 
 class Members:
+
 	def __init__(self, data):
 		self.data = {}
 		for identifier, memberList in data.items():
@@ -345,11 +333,9 @@ class Members:
 			for member in memberGroup.get():
 				# List all container to create empty containers if they do not exists
 				if member.isContainer():
-					identiferGroup = self.makeIdentifier(
-						identifier, member.getName())
+					identiferGroup = self.makeIdentifier(identifier, member.getName())
 					if not self.getMemberGroup(identiferGroup):
-						additionalContainerMemberGroupList.append(
-							identiferGroup)
+						additionalContainerMemberGroupList.append(identiferGroup)
 
 		# Add empty containers
 		for identiferGroup in additionalContainerMemberGroupList:
@@ -361,8 +347,7 @@ class Members:
 
 				# Identify and set alias if any. For now an alias type is a type
 				# with more than one typeRef. Then its alias is the first one.
-				if member.getDefinition()["aliasType"] and len(
-					member.getTypeRef()):
+				if member.getDefinition()["aliasType"] and len(member.getTypeRef()):
 					firstAlias = member.getTypeRef()[0]
 					aliasIdentifier = firstAlias.get("id", None)
 					# Only if a group exists
@@ -370,8 +355,7 @@ class Members:
 						member.setAlias(aliasIdentifier)
 
 				if member.isContainer():
-					identiferGroup = self.makeIdentifier(
-						identifier, member.getName())
+					identiferGroup = self.makeIdentifier(identifier, member.getName())
 					containerMemberGroup = self.getMemberGroup(identiferGroup)
 
 					# Set the parent member if any
@@ -382,11 +366,9 @@ class Members:
 						if "id" in inheritance:
 							#tempMemberGroup = self.getMemberGroup("::".join([identifier, member.getName()]), createIfNotExists=True)
 							#print("Merge ", "::".join([identifier, member.getName()]), inheritance["id"])
-							childMemberGroup = self.getMemberGroup(
-								inheritance["id"])
+							childMemberGroup = self.getMemberGroup(inheritance["id"])
 							if containerMemberGroup and childMemberGroup:
-								containerMemberGroup.merge(
-									childMemberGroup, inheritance["id"])
+								containerMemberGroup.merge(childMemberGroup, inheritance["id"])
 							#print(memberGroup, self.getMember(inheritance["id"]))
 							#print("::".join([identifier, member.getName()]))
 				#print(identifier, member.getName())
