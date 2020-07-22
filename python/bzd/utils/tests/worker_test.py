@@ -9,7 +9,7 @@ class TestWorker(unittest.TestCase):
 		stdout.write("Hello")
 		return x * x
 
-	def testEmpty(self) -> None:
+	def Empty(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.foo)
 		worker.start()
 		result = worker.stop()
@@ -24,6 +24,15 @@ class TestWorker(unittest.TestCase):
 		self.assertEqual(result[0].isSuccess(), True)
 		self.assertEqual(result[0].getResult(), 12 * 12)
 		self.assertEqual(result[0].getOutput(), "Hello")
+
+	def testMultiWorkload(self) -> None:
+		worker = bzd.utils.worker.Worker(TestWorker.foo)
+		for i in range(100):
+			worker.add(i)
+		self.assertEqual(worker.shared["count"].value, 100)
+		worker.start()
+		result = worker.stop()
+		self.assertEqual(len(result), 100)
 
 
 if __name__ == '__main__':
