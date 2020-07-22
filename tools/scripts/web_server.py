@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: iso-8859-1 -*-
 
 import argparse
 import http.server

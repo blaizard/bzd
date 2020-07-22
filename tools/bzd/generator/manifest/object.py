@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
 
 from .validator import ValidatorReference, ValidatorCustom, ValidatorObject, ValidatorInterface
 

@@ -8,3 +8,12 @@ py_library(
         "//python:bzd",
     ],
 )
+
+py_library(
+    name = "worker",
+    srcs = ["worker.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//python:bzd",
+    ],
+)

@@ -1,8 +1,10 @@
 import argparse
 import os
 import sys
-from autopep8 import main
+from yapf.yapflib.yapf_api import FormatFile
 from tools.sanitizer.utils.workspace import Files
+
+configFile = os.path.join(os.path.dirname(__file__), "yapf.ini")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Wrapper for mypy")
@@ -17,6 +19,8 @@ if __name__ == "__main__":
     ])
 
     for path in files.data():
-        main(argv=[__file__, "--in-place", path])
+        result = FormatFile(path, style_config = configFile, in_place = True)
+        assert result[1] == "utf-8", "Wrong encoding {}, must be utf-8".format(result[1])
+        break
 
     sys.exit(0)
