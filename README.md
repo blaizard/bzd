@@ -32,17 +32,22 @@ It features the followings:
 
 ## Code Quality
 
-All supported languages come with their set of static code analyzers.
-To run all static sanity checks at once, run the following command:
+All supported languages come with their set of linters / code quality related tool set.
+To run all static sanity checks at once, code formatters and documentation generators, run the following command:
 ```
 ./sanitize.sh
 ```
-|Language|Static Code Analyzers|Code Analyzers|Code Coverage|
-|--|--|--|--|
-|C++|clang-format|asan, lsan|Yes|
-|Python|mypy, autopep8|||
-|Node|eslint||Yes|
-|Skylark|buildifier|||
+To run all tests, run the following command:
+```
+./quality_gate.sh
+```
+
+|Language|Static Code Analyzers|Code Analyzers|Code Coverage|Test Framework|Documentation|
+|--|--|--|--|--|--|
+|C++|clang-format|asan, lsan|Yes|Yes|doxygen-based|
+|Python|mypy, yapf|||Yes||
+|Node|eslint||Yes|Yes||
+|Skylark|buildifier||||stardoc|
 
 ## Memory footprint
 

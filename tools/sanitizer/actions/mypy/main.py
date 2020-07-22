@@ -4,21 +4,21 @@ import sys
 import multiprocessing
 from io import StringIO
 from mypy.main import main
+import bzd.utils.worker
 from tools.sanitizer.utils.workspace import Files
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
+isSuccess = True
 
+def mypyWorker(path, stdout):
+    main(script_path=None, stdout=stdout, stderr=stdout, args=[
+        "--config-file", configFile, "--no-incremental", "--follow-imports", "silent", "--pretty", path])
 
-def mypyWorker(path):
-    output = StringIO()
-    try:
-        main(script_path=None, stdout=output, stderr=output, args=[
-             "--config-file", configFile, "--no-incremental", "--follow-imports", "silent", "--pretty", path])
-    except:
-        print(output.getvalue(), end="")
-        return 1
-    return 0
-
+def outputStream(result):
+    if not result.isSuccess():
+        global isSuccess
+        isSuccess = False
+        print(result.getOutput(), end = "")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Wrapper for mypy")
@@ -33,7 +33,10 @@ if __name__ == "__main__":
     ])
 
     # Process the varous files
-    p = multiprocessing.Pool(os.cpu_count())
-    result = p.map(mypyWorker, files.data())
+    worker = bzd.utils.worker.Worker(mypyWorker)
+    worker.start()
+    for path in files.data():
+        worker.add(path)
+    worker.stop(handler = outputStream)
 
-    sys.exit(0 if sum(result) == 0 else 1)
+    sys.exit(0 if isSuccess else 1)

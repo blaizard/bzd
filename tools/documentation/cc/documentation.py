@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: iso-8859-1 -*-
 
 import xml.etree.ElementTree as ET
 import glob

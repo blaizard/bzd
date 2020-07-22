@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
 
 def getUID():
     getUID.uid = getUID.uid if hasattr(getUID, "uid") else -1
