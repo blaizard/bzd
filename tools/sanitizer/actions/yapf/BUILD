@@ -13,6 +13,7 @@ py_binary(
     ],
     deps = [
         requirement("yapf"),
+        "//python/bzd/utils:worker",
         "//tools/sanitizer/utils:workspace",
     ],
 )

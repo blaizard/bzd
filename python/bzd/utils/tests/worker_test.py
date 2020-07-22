@@ -3,7 +3,6 @@ import bzd.utils.worker
 
 
 class TestWorker(unittest.TestCase):
-
 	@staticmethod
 	def foo(x, stdout):
 		stdout.write("Hello")
@@ -25,5 +24,6 @@ class TestWorker(unittest.TestCase):
 		self.assertEqual(result[0].getResult(), 12 * 12)
 		self.assertEqual(result[0].getOutput(), "Hello")
 
+
 if __name__ == '__main__':
-    unittest.main()
+	unittest.main()
