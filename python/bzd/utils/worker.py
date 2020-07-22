@@ -4,7 +4,7 @@ import queue
 import time
 import multiprocessing
 from io import StringIO
-from typing import Optional
+from typing import Optional, Iterable, Any
 
 
 class _WorkerResult:
@@ -35,7 +35,7 @@ class Worker:
 		self.workerList = [
 			multiprocessing.Process(target=Worker._taskWrapper, args=(i, task, self.shared)) for i in range(maxWorker)
 		]
-		self.expectedData_ = 0
+		self.expectedData = 0
 
 	@staticmethod
 	def _taskWrapper(i, task, shared):
@@ -66,23 +66,23 @@ class Worker:
 
 			shared["output"].put((isSuccess, result, stdout.getvalue()))
 
-	def add(self, data) -> None:
+	def add(self, data: Any) -> None:
 		with self.shared["count"].get_lock():  # type: ignore
 			self.shared["count"].value += 1  # type: ignore
-		self.expectedData_ += 1
+		self.expectedData += 1
 		self.shared["data"].put(data)  # type: ignore
 
 	def start(self) -> None:
 		for worker in self.workerList:
 			worker.start()
 
-	def data(self):
-		while self.expectedData_ > 0:
-			workerResult = _WorkerResult(self.shared["output"].get())
-			self.expectedData_ -= 1
+	def data(self) -> Iterable[_WorkerResult]:
+		while self.expectedData > 0:
+			workerResult = _WorkerResult(self.shared["output"].get())  # type: ignore
+			self.expectedData -= 1
 			yield workerResult
 
-	def stop(self, handler=None):
-		self.shared["stop"].value = 1
+	def stop(self) -> None:
+		self.shared["stop"].value = 1  # type: ignore
 		for worker in self.workerList:
 			worker.join()
