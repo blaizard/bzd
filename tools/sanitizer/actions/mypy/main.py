@@ -8,7 +8,6 @@ import bzd.utils.worker
 from tools.sanitizer.utils.workspace import Files
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
-isSuccess = True
 
 
 def mypyWorker(path, stdout):
@@ -16,13 +15,6 @@ def mypyWorker(path, stdout):
 		stdout=stdout,
 		stderr=stdout,
 		args=["--config-file", configFile, "--no-incremental", "--follow-imports", "silent", "--pretty", path])
-
-
-def outputStream(result):
-	if not result.isSuccess():
-		global isSuccess
-		isSuccess = False
-		print(result.getOutput(), end="")
 
 
 if __name__ == "__main__":
@@ -42,6 +34,13 @@ if __name__ == "__main__":
 	worker.start()
 	for path in files.data():
 		worker.add(path)
-	worker.stop(handler=outputStream)
+
+	isSuccess = True
+	for result in worker.data():
+		if not result.isSuccess():
+			isSuccess = False
+			print(result.getOutput(), end="")
+
+	worker.stop()
 
 	sys.exit(0 if isSuccess else 1)
