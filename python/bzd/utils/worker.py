@@ -28,7 +28,7 @@ class Worker:
 		self.shared = {
 			"stop": multiprocessing.Value("i", 0),
 			"count": multiprocessing.Value("i", 0),
-			"output": multiprocessing.Queue(),
+			"output": multiprocessing.SimpleQueue(),
 			"data": multiprocessing.Queue()
 		}
 		assert maxWorker
