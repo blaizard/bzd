@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 import bzd.env
+import time
 
 from bzd.utils.run import localBazelBinary
 
@@ -23,13 +24,15 @@ if __name__ == "__main__":
 	logging.info("Running sanitizer in '{}'...".format(args.workspace))
 	noError = True
 	for action in args.actions:
+		startTime = time.monotonic()
 		result = localBazelBinary(action, ignoreFailure=True, args=[args.workspace], timeoutS=300)
+		elapsedTime = time.monotonic() - startTime
 		noError = noError and (result.getReturnCode() == 0)
 		if result.getReturnCode() != 0:
-			logging.error("Failed action '{}'".format(action))
+			logging.error("Failed action '{}' ({:.1f}s)".format(action, elapsedTime))
 			print(result.getOutput())
 		else:
-			logging.info("Completed action '{}'".format(action))
+			logging.info("Completed action '{}' ({:.1f}s)".format(action, elapsedTime))
 
 	# Return the error code
 	sys.exit(0 if noError else 1)
