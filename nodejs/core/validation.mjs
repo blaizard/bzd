@@ -111,7 +111,7 @@ export default class Validation {
 					const m = constraint.match(patternConstraint);
 					const name = m[1];
 					const arg = m[2];
-					this.processConstraint(processedSchema, key, name, arg);
+					this._processConstraint(processedSchema, key, name, arg);
 				});
 			}
 			else {
@@ -210,7 +210,7 @@ export default class Validation {
 		return (name in this.schema) ? this.schema[name].mandatory : false;
 	}
 
-	processConstraint(schema, key, name, arg) {
+	_processConstraint(schema, key, name, arg) {
 		const singleValue = this.singleValue;
 		const availableConstraints = {
 			mandatory: class Mandatory extends Constraint {

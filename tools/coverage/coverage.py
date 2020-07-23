@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
 	# Generate the HTML output
 	result = subprocess.run([
-		os.path.abspath(args.genhtml), "--show-details", "--sort", "--function-coverage", "--prefix", args.workspace,
-		"--output-directory", args.output, args.report
+		os.path.abspath(args.genhtml), "--show-details", "--sort", "--function-coverage", "--demangle-cpp", "--prefix",
+		args.workspace, "--output-directory", args.output, args.report
 	],
 		cwd=args.workspace,
 		stdout=subprocess.PIPE,

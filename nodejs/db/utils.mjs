@@ -1,3 +1,5 @@
+import Event from "../core/event.mjs";
+
 export class CollectionPaging {
 	constructor(data, nextPaging = null) {
 		this._data = data;
@@ -31,5 +33,49 @@ export class CollectionPaging {
 			return obj;
 		}, {});
 		return result;
+	}
+}
+
+export class AsyncInitialize {
+
+	constructor() {
+		this.event = new Event({
+			ready: {proactive: true},
+			error: {proactive: true}
+		});
+	}
+
+	/**
+	 * Initialize
+	 */
+	async _initialize() {
+		try {
+			await this._initializeImpl();
+			this.event.trigger("ready");
+		}
+		catch (e) {
+			this.event.trigger("error", e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Initialization function (optional)
+	 */
+	async _initializeImpl() {
+	}
+
+	/**
+	 * This function waits until the module is ready
+	 */
+	async waitReady() {
+		return await this.event.waitUntil("ready");
+	}
+
+	/**
+	 * Check if ready
+	 */
+	isReady() {
+		return this.event.is("ready");
 	}
 }

@@ -26,8 +26,6 @@ const { ESLint } = require("eslint");
 	// 5. Output it.
 	console.log(resultText);
 
-	console.log("dsdsdssd");
-
 	// Return an error if the error count is > 0
 	const totalErrorCount = results.reduce((total, item) => {
 		return total + (item.errorCount - item.fixableErrorCount);

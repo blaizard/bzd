@@ -2,8 +2,8 @@
 
 import Base from "./base.mjs";
 import Fetch from "../fetch.mjs";
+import { FetchException } from "../fetch.mjs";
 import ExceptionFactory from "../exception.mjs";
-import ExceptionFetch from "../impl/fetch/exception.mjs";
 import Validation from "../validation.mjs";
 
 const Exception = ExceptionFactory("api", "client");
@@ -93,7 +93,7 @@ export default class APIClient extends Base {
 				return result;
 			}
 			catch (e) {
-				if (e instanceof ExceptionFetch) {
+				if (e instanceof FetchException) {
 					if (e.code == 401/*Unauthorized*/) {
 						if (this.schema[endpoint][method].authentication) {
 							await this.options.authentication.refreshAuthentication();

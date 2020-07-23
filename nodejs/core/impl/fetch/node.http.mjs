@@ -2,7 +2,7 @@ import{request as requestHttp} from "http";
 import{request as requestHttps} from "https";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
-import ExceptionFetch from "./exception.mjs";
+import { FetchException } from "../../fetch.mjs";
 
 const Exception = ExceptionFactory("fetch", "node.http");
 const Log = LogFactory("fetch", "node.http");
@@ -39,7 +39,7 @@ export default async function request(url, options) {
 				}
 
 				if (response.statusCode < 200 || response.statusCode > 299) {
-					return reject(new ExceptionFetch(response.statusCode,
+					return reject(new FetchException(response.statusCode,
 						"Request to '{}' responded with: {} {}",
 						url,
 						response.statusCode,

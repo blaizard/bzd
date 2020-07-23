@@ -1,6 +1,4 @@
-
-
-import ExceptionFetch from "./exception.mjs";
+import { FetchException } from "../../fetch.mjs";
 
 export default async function request(url, options) {
 
@@ -18,7 +16,7 @@ export default async function request(url, options) {
 
 	if (!response.ok) {
 		const message = await response.text();
-		throw new ExceptionFetch(response.status, message || response.statusText);
+		throw new FetchException(response.status, message || response.statusText);
 	}
 
 	return await response.text();
