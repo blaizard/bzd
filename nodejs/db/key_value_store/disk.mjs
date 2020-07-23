@@ -1,19 +1,19 @@
-
-
 import Path from "path";
 
 import PersistenceDisk from "../../core/persistence/disk.mjs";
 import Cache from "../../core/cache.mjs";
-import Event from "../../core/event.mjs";
+import KeyValueStore from "./key_value_store.mjs";
 import FileSystem from "../../core/filesystem.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 /**
  * Key value store for low demanding application, that presists on the local disk.
  */
-export default class KeyValueStoreDisk {
+export default class KeyValueStoreDisk extends KeyValueStore {
 
 	constructor(path, options) {
+		super();
+
 		this.options = Object.assign({
 			/**
 			 * Bucket specific options 
@@ -26,23 +26,19 @@ export default class KeyValueStoreDisk {
 		this.persistences = {};
 
 		this.cache = null;
-		this.event = new Event({
-			ready: {proactive: true}
-		});
 
 		// Initialize ansynchronously the rest of the data
-		this._initAsync();
+		this._initialize();
 	}
 
 	/**
 	 * Initialization of the class
 	 */
-	async _initAsync() {
+	async _initializeImpl() {
 
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
-		this.event.trigger("ready");
 	}
 
 	/**

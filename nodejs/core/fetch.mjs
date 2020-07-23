@@ -10,7 +10,26 @@ const Log = LogFactory("fetch");
 /**
  * Fetch data from HTTP endpoint.
  */
+export class FetchFactory {
+	constructor(url, options = {}) {
+		this.url = url;
+		this.options = options;
+	}
+
+	async request(endpoint, options = {}) {
+		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options));
+	}
+}
+
+export class FetchException extends ExceptionFactory("fetch", "impl") {
+	constructor (code, ...args) {
+		super(...args);
+		this.code = code;
+	}
+}
+
 export default class Fetch {
+
 	static async request(url, options = {}) {
 
 		// Handle queries

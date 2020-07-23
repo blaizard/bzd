@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "disk",
     srcs = [
         "disk.mjs",
+        "key_value_store.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -13,6 +14,22 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/persistence:disk",
+        "//nodejs/db:utils",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "elastic_search",
+    srcs = [
+        "elastic_search.mjs",
+        "key_value_store.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:fetch",
+        "//nodejs/core:log",
         "//nodejs/db:utils",
     ],
 )
