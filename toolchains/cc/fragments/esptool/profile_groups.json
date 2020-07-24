@@ -1,8 +1,8 @@
 {
-    "/libm/": "libm",
+    "/esp-idf/components/(?P<component>[^/]+)/": "{component}",
+    "/hal/hal/": "hal",
     "/libc/": "libc",
     "/libgcc/": "libgcc",
-    "/libstdc\\+\\+": "libstdc++",
-    "/hal/hal/": "hal",
-    "/esp-idf/components/(?P<component>[^/]+)/": "{component}"
+    "/libm/": "libm",
+    "/libstdc\\+\\+": "libstdc++"
 }

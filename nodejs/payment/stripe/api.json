@@ -1,13 +1,14 @@
 {
-    "/payment/stripe/metadata": {
-        "get": {
-            "documentation": "Get the public key.",
-            "response": {
+    "/payment/stripe/confirm": {
+        "post": {
+            "authentication": true,
+            "documentation": "Confirm payment.",
+            "request": {
                 "type": "json",
-				"validation": {
-					"pubkey": "mandatory",
-					"currency": "mandatory"
-				}
+                "validation": {
+                    "id": "mandatory",
+                    "metadata": ""
+                }
             }
         }
     },
@@ -17,30 +18,29 @@
             "documentation": "Make a payment intent.",
             "request": {
                 "type": "json",
-				"validation": {
-					"amount": "mandatory",
-					"metadata": ""
-				}
+                "validation": {
+                    "amount": "mandatory",
+                    "metadata": ""
+                }
             },
             "response": {
                 "type": "json",
-				"validation": {
-					"secret": "mandatory",
-					"id": "mandatory"
-				}
+                "validation": {
+                    "id": "mandatory",
+                    "secret": "mandatory"
+                }
             }
         }
     },
-    "/payment/stripe/confirm": {
-        "post": {
-            "authentication": true,
-            "documentation": "Confirm payment.",
-            "request": {
+    "/payment/stripe/metadata": {
+        "get": {
+            "documentation": "Get the public key.",
+            "response": {
                 "type": "json",
-				"validation": {
-					"id": "mandatory",
-					"metadata": ""
-				}
+                "validation": {
+                    "currency": "mandatory",
+                    "pubkey": "mandatory"
+                }
             }
         }
     }

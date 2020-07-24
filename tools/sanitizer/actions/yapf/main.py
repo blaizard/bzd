@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import bzd.utils.worker
+from pathlib import Path
 from yapf.yapflib.yapf_api import FormatFile
 from tools.sanitizer.utils.workspace import Files
 
@@ -15,7 +16,7 @@ def yapfWorker(path, stdout):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")
-	parser.add_argument("workspace", help="Workspace to be processed.")
+	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 
 	args = parser.parse_args()
 
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 	worker = bzd.utils.worker.Worker(yapfWorker)
 	worker.start()
 	for path in files.data():
-		worker.add(path)
+		worker.add(path.as_posix())
 
 	isSuccess = True
 	for result in worker.data():

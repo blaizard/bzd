@@ -1,0 +1,9 @@
+objects:
+    bzd::Log.default:
+        params:
+        - !ref 'bzd::OChannel.stdout'
+    bzd::OChannel.stdout:
+        implementation: !ref 'bzd::io::Stdout'
+    bzd::StringView.message:
+        params:
+        - Hello World !!!

@@ -117,7 +117,7 @@ _bzd_cc_pack = rule(
 def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
     # Generates the auto-generated files to be compiled with the project
     output_cc = ".bzd/{}.cpp".format(name)
-    output_manifest = ".bzd/{}.manifest".format(name)
+    output_manifest = ".bzd/{}.yml".format(name)
     bzd_manifest_build(
         name = name + ".manifest",
         deps = deps,

@@ -8,4 +8,7 @@ py_binary(
     main = "generator.py",
     python_version = "PY3",
     visibility = ["//visibility:public"],
+    deps = [
+        "//python/bzd/yaml",
+    ],
 )
