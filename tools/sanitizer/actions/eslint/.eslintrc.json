@@ -1,31 +1,61 @@
 {
-	"env": {
-		"browser": true,
-		"node": true,
-		"es6": true,
-		"mocha": true
-	},
-	"extends": [
-		"eslint:recommended",
-		"plugin:vue/base"
-	],
-	"parserOptions": {
-		"ecmaVersion": 2020,
-		"sourceType": "module",
-		"ecmaFeatures": {
-			"impliedStrict": true
-		}
-	},
-	"rules": {
-		"quotes": ["error", "double"],
-		"semi": ["error", "always"],
-		"indent": ["error", "tab", {
-            "ObjectExpression": "first"
-        }],
-		"camelcase": ["error", { "ignoreDestructuring": true }],
-		"multiline-comment-style": ["error", "starred-block"],
-		"curly": ["error", "all"],
-		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
-		"strict": ["error", "global"]
-	}
+    "env": {
+        "browser": true,
+        "es6": true,
+        "mocha": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:vue/base"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "impliedStrict": true
+        },
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+    },
+    "rules": {
+        "brace-style": [
+            "error",
+            "stroustrup",
+            {
+                "allowSingleLine": true
+            }
+        ],
+        "camelcase": [
+            "error",
+            {
+                "ignoreDestructuring": true
+            }
+        ],
+        "curly": [
+            "error",
+            "all"
+        ],
+        "indent": [
+            "error",
+            "tab",
+            {
+                "ObjectExpression": "first"
+            }
+        ],
+        "multiline-comment-style": [
+            "error",
+            "starred-block"
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "strict": [
+            "error",
+            "global"
+        ]
+    }
 }

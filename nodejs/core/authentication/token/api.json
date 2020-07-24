@@ -3,12 +3,12 @@
         "post": {
             "documentation": "Login API used to exchange credentials for a token.",
             "request": {
+                "type": "json",
                 "validation": {
-                    "uid": "mandatory",
                     "password": "mandatory",
-                    "persistent": ""
-                },
-                "type": "json"
+                    "persistent": "",
+                    "uid": "mandatory"
+                }
             },
             "response": {
                 "type": "json"

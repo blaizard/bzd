@@ -1,35 +1,4 @@
 {
-    "/tile": {
-        "get": {
-            "documentation": "Get a specific tile configuration",
-            "request": {
-                "type": "query"
-            },
-            "response": {
-                "type": "json"
-            }
-        },
-        "put": {
-            "documentation": "Update an existing tile",
-            "request": {
-                "type": "json"
-            }
-        },
-        "post": {
-            "documentation": "Create a new tile",
-            "request": {
-                "type": "json"
-            }
-        }
-    },
-    "/tiles": {
-        "get": {
-            "documentation": "List all tiles and their configuration",
-            "response": {
-                "type": "json"
-            }
-        }
-    },
     "/configuration": {
         "get": {
             "documentation": "Get the current configuration",
@@ -44,6 +13,37 @@
             "request": {
                 "type": "query"
             },
+            "response": {
+                "type": "json"
+            }
+        }
+    },
+    "/tile": {
+        "get": {
+            "documentation": "Get a specific tile configuration",
+            "request": {
+                "type": "query"
+            },
+            "response": {
+                "type": "json"
+            }
+        },
+        "post": {
+            "documentation": "Create a new tile",
+            "request": {
+                "type": "json"
+            }
+        },
+        "put": {
+            "documentation": "Update an existing tile",
+            "request": {
+                "type": "json"
+            }
+        }
+    },
+    "/tiles": {
+        "get": {
+            "documentation": "List all tiles and their configuration",
             "response": {
                 "type": "json"
             }

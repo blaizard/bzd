@@ -32,7 +32,7 @@ It features the followings:
 
 ## Code Quality
 
-All supported languages come with their set of linters / code quality related tool set.
+All supported languages come with their set of code quality related tools.
 To run all static sanity checks at once, code formatters and documentation generators, run the following command:
 ```
 ./sanitize.sh
@@ -42,12 +42,14 @@ To run all tests, run the following command:
 ./quality_gate.sh
 ```
 
-|Language|Static Code Analyzers|Code Analyzers|Code Coverage|Test Framework|Documentation|
+This is a non-exhaustive list of languages and their supported tools. In addition to that
+formater and linters for data files such as YAML, json... are also available.
+|Language|Formatters|Code Analyzers|Code Coverage|Test Framework|Documentation|
 |--|--|--|--|--|--|
 |C++|clang-format|asan, lsan|Yes|Yes|doxygen-based|
-|Python|mypy, yapf|||Yes||
-|Node|eslint||Yes|Yes||
-|Skylark|buildifier||||stardoc|
+|Python|yapf|mypy||Yes||
+|Node|eslint|eslint|Yes|Yes||
+|Skylark|buildifier|buildifier|||stardoc|
 
 ## Memory footprint
 

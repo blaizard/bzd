@@ -1,5 +1,5 @@
 """
-Such rule should generate a config.manifest with the following content
+Such rule should generate a config.yml with the following content
 and will generate a generate the C++ library
 
 interfaces:

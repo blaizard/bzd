@@ -1,7 +1,7 @@
 load("@rules_python//python:python.bzl", "py_binary")
 
 py_binary(
-    name = "structure",
+    name = "files",
     srcs = glob(
         [
             "*.py",
@@ -9,6 +9,8 @@ py_binary(
     ),
     visibility = ["//tools/sanitizer:__pkg__"],
     deps = [
+        "//python/bzd/utils:worker",
+        "//python/bzd/yaml",
         "//tools/sanitizer/utils:workspace",
     ],
 )

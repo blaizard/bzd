@@ -8,10 +8,10 @@ bzd_manifest(
         "message.txt": "test",
     },
     manifest = glob([
-        "config.manifest",
+        "config.yml",
     ]) + select({
-        "@esp32_xtensa_lx6_gcc//:target": ["config_esp32_xtensa_lx6.manifest"],
-        "//conditions:default": ["config_others.manifest"],
+        "@esp32_xtensa_lx6_gcc//:target": ["config_esp32_xtensa_lx6.yml"],
+        "//conditions:default": ["config_others.yml"],
     }),
     deps = [],
 )

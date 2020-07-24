@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+from pathlib import Path
 
 
 class Filter:
@@ -33,8 +34,8 @@ class Filter:
 	Match a filter with a string
 	"""
 
-	def match(self, data: str):
+	def match(self, path: Path) -> bool:
 		for regexpr in self.filters:
-			if re.match(regexpr, data):
+			if re.match(regexpr, path.as_posix()):
 				return True
 		return False

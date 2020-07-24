@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import yaml
+import bzd.yaml
 from log import Log
 from manifest import Reference
 """
@@ -29,8 +29,8 @@ Convert the dict back to a manifest
 
 
 def dictToManifest(data):
-	yaml.add_representer(Ref, Ref.representer)
-	return yaml.dump(data)
+	bzd.yaml.add_representer(Ref, Ref.representer)
+	return bzd.yaml.dump(data)
 
 
 """
@@ -40,14 +40,14 @@ Open a manifest file and convert it to a python dict.
 
 def manifestToDict(path):
 
-	yaml.add_constructor(Ref.tag, Ref)
+	bzd.yaml.add_constructor(Ref.tag, Ref)
 
 	try:
 		f = open(path)
 	except Exception as e:
 		Log.fatal("Unable to open manifest '{}'".format(path), e)
 	try:
-		data = yaml.load(f, Loader=yaml.Loader)
+		data = bzd.yaml.load(f, Loader=bzd.yaml.Loader)
 	except Exception as e:
 		Log.fatal("Unable to parse manifest '{}'".format(path), e)
 	finally:

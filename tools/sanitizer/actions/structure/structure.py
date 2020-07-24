@@ -3,6 +3,7 @@
 import argparse
 import re
 import sys
+from pathlib import Path
 from tools.sanitizer.utils.workspace import Files
 
 if __name__ == "__main__":
@@ -11,7 +12,7 @@ if __name__ == "__main__":
 	parser.add_argument("--regexpr",
 		default="^[a-z0-9_/.]+(\.S)?$",
 		help="Regular expression to be used for the matching.")
-	parser.add_argument("workspace", help="Workspace to be processed.")
+	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 
 	args = parser.parse_args()
 
@@ -20,13 +21,13 @@ if __name__ == "__main__":
 	regexpr = re.compile(args.regexpr)
 	noMathList = []
 	for path in files.data(relative=True):
-		if not re.match(regexpr, path):
+		if not re.match(regexpr, path.as_posix()):
 			noMathList.append(path)
 
 	if len(noMathList) > 0:
 		print("The following path(s) do not match the naming convention '{}':".format(args.regexpr))
 		for path in noMathList:
-			print(" - {}".format(path))
+			print(" - {}".format(path.as_posix()))
 		sys.exit(1)
 
 	sys.exit(0)

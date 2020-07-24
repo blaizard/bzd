@@ -5,6 +5,7 @@ import multiprocessing
 from io import StringIO
 from mypy.main import main
 import bzd.utils.worker
+from pathlib import Path
 from tools.sanitizer.utils.workspace import Files
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
@@ -19,21 +20,19 @@ def mypyWorker(path, stdout):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")
-	parser.add_argument("workspace", help="Workspace to be processed.")
+	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 
 	args = parser.parse_args()
 
 	files = Files(args.workspace, include=[
 		"**/*.py",
-	], exclude=[
-		"**tools/bzd/generator/yaml**",
-	])
+	], exclude=["**tools/bzd/generator/yaml**", "**python/bzd/yaml**"])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
 	worker.start()
 	for path in files.data():
-		worker.add(path)
+		worker.add(path.as_posix())
 
 	isSuccess = True
 	for result in worker.data():
