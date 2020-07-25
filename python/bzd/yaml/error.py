@@ -31,13 +31,11 @@ class Mark:
 				end -= 5
 				break
 		snippet = self.buffer[start:end]
-		return ' '*indent + head + snippet + tail + '\n'  \
-                                                                + ' '*(indent+self.pointer-start+len(head)) + '^'
+		return ' ' * indent + head + snippet + tail + '\n' + ' ' * (indent + self.pointer - start + len(head)) + '^'
 
 	def __str__(self):
 		snippet = self.get_snippet()
-		where = "  in \"%s\", line %d, column %d"   \
-                                                                % (self.name, self.line+1, self.column+1)
+		where = "  in \"%s\", line %d, column %d" % (self.name, self.line + 1, self.column + 1)
 		if snippet is not None:
 			where += ":\n" + snippet
 		return where
@@ -60,10 +58,8 @@ class MarkedYAMLError(YAMLError):
 		lines = []
 		if self.context is not None:
 			lines.append(self.context)
-		if self.context_mark is not None  \
-                                                            and (self.problem is None or self.problem_mark is None
-			or self.context_mark.name != self.problem_mark.name
-			or self.context_mark.line != self.problem_mark.line
+		if self.context_mark is not None and (self.problem is None or self.problem_mark is None
+			or self.context_mark.name != self.problem_mark.name or self.context_mark.line != self.problem_mark.line
 			or self.context_mark.column != self.problem_mark.column):
 			lines.append(str(self.context_mark))
 		if self.problem is not None:

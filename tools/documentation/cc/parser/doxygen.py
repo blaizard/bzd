@@ -23,8 +23,8 @@ def commentParser(element, data={}):
 				for parameteritem in parameterlist.findall("parameteritem"):
 					param = {}
 					if parameteritem.find("parameternamelist") is not None:
-						param["name"] = ", ".join(
-							text for text in parameteritem.find("parameternamelist").itertext() if text.strip())
+						param["name"] = ", ".join(text for text in parameteritem.find("parameternamelist").itertext()
+							if text.strip())
 					if parameteritem.find("parameterdescription") is not None:
 						param["description"] = commentParser(parameteritem.find("parameterdescription"))
 					paramList.append(param)

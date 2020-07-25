@@ -77,8 +77,7 @@ class Object():
 
 	def getDependentInterfaces(self):
 		return [
-			self.manifest.getInterface(dependency)
-			for dependency in self.deps["interface"]
+			self.manifest.getInterface(dependency) for dependency in self.deps["interface"]
 			if self.manifest.isInterface(dependency)
 		]
 
