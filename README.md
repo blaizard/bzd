@@ -6,9 +6,9 @@
 Fullstack, lightweight and flexible framework for IoT applications.
 This mono-repository enables the following technologies:
 
-|C++14                         |Python3                          |Node (v13+)                    |Vue                           |Bazel                           |
-|:----------------------------:|:-------------------------------:|:-----------------------------:|:----------------------------:|:------------------------------:|
-|![](./docs/assets/png/cpp.png)|![](./docs/assets/png/python.png)|![](./docs/assets/png/node.png)|![](./docs/assets/png/vue.png)|![](./docs/assets/png/bazel.png)|
+|             C++14              |              Python3              |           Node (v13+)           |              Vue               |              Bazel               |
+| :----------------------------: | :-------------------------------: | :-----------------------------: | :----------------------------: | :------------------------------: |
+| ![](./docs/assets/png/cpp.png) | ![](./docs/assets/png/python.png) | ![](./docs/assets/png/node.png) | ![](./docs/assets/png/vue.png) | ![](./docs/assets/png/bazel.png) |
 
 ## Menu
 
@@ -23,6 +23,7 @@ It is made to remove any dependencies from STL, but provide a similar set of con
 efficient and safe manner.
 
 It features the followings:
+
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
 - Self contained, no reliance on third-party nor STL dependencies.
 - Flexible error handling model.
@@ -34,10 +35,13 @@ It features the followings:
 
 All supported languages come with their set of code quality related tools.
 To run all static sanity checks at once, code formatters and documentation generators, run the following command:
+
 ```
 ./sanitize.sh
 ```
+
 To run all tests, run the following command:
+
 ```
 ./quality_gate.sh
 ```
@@ -57,4 +61,5 @@ All classes offered by this library have the same objective to have a fixed memo
 is determined at compile time, ensuring no memory allocation at runtime, making this library ideal for any safety-critical application.
 
 Notions:
+
 - Task. A task is similar to the concept of coroutine in C++20, except that there it ensures no dynamic allocation. Tasks are made to run from low ressources embedded systems to high scale compute units.
