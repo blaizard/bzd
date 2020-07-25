@@ -7,9 +7,9 @@
 </template>
 
 <style lang="scss" scoped>
-    .bzd-404-oops {
-        font-size: 2em;
-        font-weight: bold;
-        display: block;
-    }
+	.bzd-404-oops {
+		font-size: 2em;
+		font-weight: bold;
+		display: block;
+	}
 </style>
