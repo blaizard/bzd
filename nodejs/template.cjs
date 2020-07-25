@@ -1,16 +1,17 @@
-
-
 const Fs = require("fs");
 const Assert = require("assert");
 
 class Template {
 	constructor(template, options) {
-		this.options = Object.assign({
-			/**
-			 * The path of the template used (if relevant)
-			 */
-			path: ""
-		}, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * The path of the template used (if relevant)
+				 */
+				path: "",
+			},
+			options
+		);
 
 		Assert.ok(typeof template === "string", "The template is not a string");
 		this.template = template;
@@ -23,7 +24,7 @@ class Template {
 	 */
 	static fromFileSync(path) {
 		return new Template(Fs.readFileSync(path).toString(), {
-			path: path
+			path: path,
 		});
 	}
 
@@ -44,21 +45,24 @@ class Template {
 
 			while (++index < key.length || key[index] == "]") {
 				let curKey = "";
-				for (; index<key.length && (".[]".indexOf(key[index]) === -1); ++index) {
+				for (; index < key.length && ".[]".indexOf(key[index]) === -1; ++index) {
 					curKey += key[index];
 				}
 
-				Assert.ok(typeof curArgs === "object", () => ("The key \"" + key + "\" is invalid (error with \"" + curKey + "\")."));
-				Assert.ok(curKey in curArgs, () => ("The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"));
+				Assert.ok(typeof curArgs === "object", () => 'The key "' + key + '" is invalid (error with "' + curKey + '").');
+				Assert.ok(
+					curKey in curArgs,
+					() => 'The key "' + curKey + '" in "' + JSON.stringify(curArgs) + '" is not available'
+				);
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {
-				case "[":
-					{
-						const curKey = getNextValueInternal();
-						curArgs = curArgs[curKey];
-					}
-					break;
+					case "[":
+						{
+							const curKey = getNextValueInternal();
+							curArgs = curArgs[curKey];
+						}
+						break;
 				}
 			}
 			return curArgs;
@@ -68,7 +72,6 @@ class Template {
 	}
 
 	process(args) {
-
 		let output = "";
 		let index = 0;
 		let m = null;
@@ -76,12 +79,12 @@ class Template {
 			m = this.pattern.exec(this.template);
 
 			// Copy the string that has not been processed and update the current index
-			output += this.template.substring(index, ((m) ? m.index : undefined));
-			index = (m) ? (m.index + m[0].length) : 0;
+			output += this.template.substring(index, m ? m.index : undefined);
+			index = m ? m.index + m[0].length : 0;
 
 			// Handle the operation if any match
 			if (m) {
-				output += this.getValue(args, (m[1]).trim());
+				output += this.getValue(args, m[1].trim());
 			}
 		} while (m);
 

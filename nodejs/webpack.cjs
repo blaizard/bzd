@@ -1,5 +1,3 @@
-
-
 const Fs = require("fs");
 const Path = require("path");
 const Assert = require("assert");
@@ -20,11 +18,9 @@ class Webpack {
 		for (const key in obj2) {
 			if (key in obj && obj[key] instanceof Array && obj2[key] instanceof Array) {
 				obj[key] = obj[key].concat(obj2[key]);
-			}
-			else if (key in obj && typeof obj[key] == "object" && typeof obj2[key] == "object") {
+			} else if (key in obj && typeof obj[key] == "object" && typeof obj2[key] == "object") {
 				obj[key] = Webpack.merge(obj[key], obj2[key]);
-			}
-			else if (obj2[key] !== undefined) {
+			} else if (obj2[key] !== undefined) {
 				obj[key] = obj2[key];
 			}
 		}
@@ -35,8 +31,10 @@ class Webpack {
 	 */
 	static hash(path) {
 		// Keep 8 characters from the path
-		let hashStr = Math.abs(path.split("").reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)).toString();
-		for (let i = 0; i < path.length; i += (path.length / 8)) {
+		let hashStr = Math.abs(
+			path.split("").reduce((prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0, 0)
+		).toString();
+		for (let i = 0; i < path.length; i += path.length / 8) {
 			hashStr += path.charAt(Math.floor(i));
 		}
 		return Buffer.from(hashStr).toString("base64") + "." + Path.basename(path).split(".").slice(0, -1).join(".");
@@ -49,7 +47,7 @@ class Webpack {
 		let dirList = [];
 
 		// Identify the directories that do not exists
-		while (!(Fs.existsSync(curPath))) {
+		while (!Fs.existsSync(curPath)) {
 			dirList.unshift(Path.basename(curPath));
 			curPath = Path.dirname(curPath);
 		}
@@ -64,81 +62,84 @@ class Webpack {
 	 * Generate the webpack configuration
 	 */
 	static generate(config) {
-		config = Webpack.merge({
-			/**
-			 * Entry points for the application. It uses the following format:
-			 * - key: The path of the javascript file
-			 * - value: either a string or an array of string of the html files to be generated.
-			 *          It also accepts an entry of type Template, that will be processed to generate the file.
-			 */
-			entries: {},
-			/**
-			 * Assets to add regardless
-			 */
-			assets: {
-				css: [],
-				js: []
-			},
-			/**
-			 * Output path of the generated content.
-			 * If unset, this option must be defined with the CLI via --output-path
-			 */
-			output: null,
-			/**
-			 * The url where the resource should be fetched by the client
-			 */
-			publicPath: "",
-			/**
-			 * Build mode: development or production.
-			 * If unset, this option must be defined with the CLI via --mode
-			 */
-			mode: null,
-			/**
-			 * Directory path where to store temporary files
-			 */
-			tempPath: Path.join(__dirname, ".temp"),
-			/**
-			 * Set the output type. It can be "html", "node" or "library".
-			 */
-			type: "html",
-			/**
-			 * Path aliases
-			 */
-			alias: {
-				"[lib]": __dirname
-			},
-			/**
-			 * List of templates to be generated
-			 */
-			templates: [],
-			/**
-			 * Hooks to interact with the generation process
-			 */
-			hooks: {
+		config = Webpack.merge(
+			{
 				/**
-				 * Write a manifest.json that is used to 
+				 * Entry points for the application. It uses the following format:
+				 * - key: The path of the javascript file
+				 * - value: either a string or an array of string of the html files to be generated.
+				 *          It also accepts an entry of type Template, that will be processed to generate the file.
 				 */
-				manifest: (manifest/*, config*/) => manifest,
+				entries: {},
 				/**
-				 * Called at the end, after the manifest has been written to disk
+				 * Assets to add regardless
 				 */
-				end: (/*manifest, config*/) => {}
+				assets: {
+					css: [],
+					js: [],
+				},
+				/**
+				 * Output path of the generated content.
+				 * If unset, this option must be defined with the CLI via --output-path
+				 */
+				output: null,
+				/**
+				 * The url where the resource should be fetched by the client
+				 */
+				publicPath: "",
+				/**
+				 * Build mode: development or production.
+				 * If unset, this option must be defined with the CLI via --mode
+				 */
+				mode: null,
+				/**
+				 * Directory path where to store temporary files
+				 */
+				tempPath: Path.join(__dirname, ".temp"),
+				/**
+				 * Set the output type. It can be "html", "node" or "library".
+				 */
+				type: "html",
+				/**
+				 * Path aliases
+				 */
+				alias: {
+					"[lib]": __dirname,
+				},
+				/**
+				 * List of templates to be generated
+				 */
+				templates: [],
+				/**
+				 * Hooks to interact with the generation process
+				 */
+				hooks: {
+					/**
+					 * Write a manifest.json that is used to
+					 */
+					manifest: (manifest /*, config*/) => manifest,
+					/**
+					 * Called at the end, after the manifest has been written to disk
+					 */
+					end: (/*manifest, config*/) => {},
+				},
+				/**
+				 * Add custom loaders. For example:
+				 * { irhtml: "./irhtml-loader.js" }
+				 */
+				loaders: {},
+				/**
+				 * User defined arguments that can be used as data for the template for example
+				 */
+				args: {},
+				// ---- For private use only --------------------------------------
+				/**
+				 * List of temporary files associated with this config object
+				 */
+				temp: [],
 			},
-			/**
-			 * Add custom loaders. For example:
-			 * { irhtml: "./irhtml-loader.js" }
-			 */
-			loaders: {},
-			/**
-			 * User defined arguments that can be used as data for the template for example
-			 */
-			args: {},
-			// ---- For private use only --------------------------------------
-			/**
-			 * List of temporary files associated with this config object
-			 */
-			temp: []
-		}, config);
+			config
+		);
 
 		// ---- Sanity check --------------------------------------------------
 		Assert.ok(Object.keys(config.entries).length > 0, "No entries are defined");
@@ -150,10 +151,11 @@ class Webpack {
 
 		// ---- Execute template for entries ----------------------------------
 		for (const entryId in config.entries) {
-			config.entries[entryId] = (config.entries[entryId] instanceof Array) ? config.entries[entryId] : [config.entries[entryId]];
+			config.entries[entryId] =
+				config.entries[entryId] instanceof Array ? config.entries[entryId] : [config.entries[entryId]];
 			config.entries[entryId] = config.entries[entryId].map((entry) => {
 				if (entry instanceof Template) {
-					console.log("Process template for entry \"" + entryId + "\"");
+					console.log('Process template for entry "' + entryId + '"');
 					const content = entry.process({
 						/**
 						 * The entry identifier currently being used
@@ -162,9 +164,14 @@ class Webpack {
 						/**
 						 * The current configuration
 						 */
-						config: config
+						config: config,
 					});
-					return createTempFileSync(config, content, (entry.getPath()) ? Path.basename(entry.getPath()) : "tmp", config.tempPath);
+					return createTempFileSync(
+						config,
+						content,
+						entry.getPath() ? Path.basename(entry.getPath()) : "tmp",
+						config.tempPath
+					);
 				}
 				return entry;
 			});
@@ -175,84 +182,89 @@ class Webpack {
 			config.entries[entryId] = config.entries[entryId].map((path) => pathResolve(config, path));
 		});
 		Object.keys(config.assets).forEach((key) => {
-			config.assets[key] = (config.assets[key] instanceof Array)
-				? config.assets[key].map((path) => pathResolve(config, path))
-				: pathResolve(config, config.assets[key]);
+			config.assets[key] =
+				config.assets[key] instanceof Array
+					? config.assets[key].map((path) => pathResolve(config, path))
+					: pathResolve(config, config.assets[key]);
 		});
 
 		// ---- Handle extra config -------------------------------------------
 		let webpackExtraConfig = {};
 		switch (config.type) {
+			case "html":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					entry: config.entries,
+				});
+				break;
 
-		case "html":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				entry: config.entries
-			});
-			break;
+			case "library":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					entry: config.entries,
+					output: {
+						filename: "[name].js",
+						library: "[name]",
+						libraryTarget: "umd",
+					},
+				});
+				break;
 
-		case "library":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				entry: config.entries,
-				output: {
-					filename: "[name].js",
-					library: "[name]",
-					libraryTarget: "umd"
-				}
-			});
-			break;
+			case "node":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					target: "node",
+					entry: config.entries,
+					output: {
+						filename: "[name].js",
+						library: "[name]",
+						libraryTarget: "commonjs2",
+					},
+					optimization: {
+						runtimeChunk: false,
+						splitChunks: {
+							/*
+							 * This is important, split chunks seems to fail on node library ending up
+							 * not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
+							 */
+							chunks: "async",
+						},
+					},
+				});
+				break;
 
-		case "node":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				target: "node",
-				entry: config.entries,
-				output: {
-					filename: "[name].js",
-					library: "[name]",
-					libraryTarget: "commonjs2"
-				},
-				optimization: {
-					runtimeChunk: false,
-					splitChunks: {
-						/*
-						 * This is important, split chunks seems to fail on node library ending up
-						 * not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
-						 */
-						chunks: "async"
-					}
-				}
-			});
-			break;
-
-		default:
-			throw new Error("Unsupported config type \"" + config.type + "\"");
+			default:
+				throw new Error('Unsupported config type "' + config.type + '"');
 		}
 
 		// ---- Build webpack config ------------------------------------------
 		return (env, argv) => {
-
 			// Set the output path
-			config.output = (config.output) ? config.output : argv["outputPath"];
+			config.output = config.output ? config.output : argv["outputPath"];
 			Assert.ok(config.output, "Output path must be set.");
 			config.output = pathResolve(config, config.output);
 
 			// If hot reloading is enabled, set a flag in the config in order to prevent some expensive operations
-			config["hmr"] = ("hot" in argv && argv.hot) ? true : false;
+			config["hmr"] = "hot" in argv && argv.hot ? true : false;
 			config["hmrCounter"] = 0;
 
 			// Select dev or prod mode
-			const isDev = (((config.mode) ? config.mode : argv.mode) != "production");
-			console.log("Building with webpack for " + ((isDev) ? "development" : "production") + ((config.hmr) ? " with hmr enabled" : "") + ": " + config.output);
+			const isDev = (config.mode ? config.mode : argv.mode) != "production";
+			console.log(
+				"Building with webpack for " +
+					(isDev ? "development" : "production") +
+					(config.hmr ? " with hmr enabled" : "") +
+					": " +
+					config.output
+			);
 
 			// Setup the webpack config increment
 			let webpackConfig = Webpack.merge(getWebpackConfigDefault(isDev, config), {
 				output: {
 					publicPath: config.publicPath,
-					path: config.output
+					path: config.output,
 				},
 				resolve: {
 					alias: config.alias,
 					symlinks: false,
-				}
+				},
 			});
 
 			// Add extra config
@@ -260,7 +272,7 @@ class Webpack {
 
 			// ---- Remove the content of the directory -----------------------
 			if (config.output) {
-				console.log("Removing content of output directory \"" + config.output + "\"");
+				console.log('Removing content of output directory "' + config.output + '"');
 				rmdirSync(config.output);
 				Webpack.mkdirSync(config.output);
 			}
@@ -273,7 +285,7 @@ class Webpack {
 					const output = "assets/" + type + "/" + Webpack.hash(file) + "." + fileSplit[fileSplit.length - 1];
 					const data = Fs.readFileSync(file);
 					Fs.writeFileSync(Path.resolve(config.output, output), data);
-					console.log("Copy \"" + file + "\" -> \"" + output + "\"");
+					console.log('Copy "' + file + '" -> "' + output + '"');
 					return output;
 				});
 			}
@@ -300,36 +312,36 @@ function getWebpackConfigDefault(isDev, config) {
 		assets: false,
 		children: false,
 		chunks: false,
-		chunkModules: false
+		chunkModules: false,
 	};
 
 	const customRules = Object.keys(config.loaders).map((type) => {
 		return {
 			test: new RegExp("\\." + type + "$"),
 			exclude: /node_modules/,
-			loader: config.loaders[type]
+			loader: config.loaders[type],
 		};
 	});
 
 	const stamp = String(Date.now());
 
 	return {
-		mode: (isDev) ? "development" : "production",
+		mode: isDev ? "development" : "production",
 		// Reduce verbosity
 		stats: verboseStats,
 		target: "web",
 		bail: true,
 		output: {
 			filename: "[name]-" + stamp + ".js",
-			chunkFilename: "[chunkhash]-" + stamp + ".js"
+			chunkFilename: "[chunkhash]-" + stamp + ".js",
 		},
 		optimization: {
-			minimize: (isDev) ? false : true,
+			minimize: isDev ? false : true,
 			occurrenceOrder: true,
 			runtimeChunk: "single",
 			splitChunks: {
-				chunks: "all"
-			}
+				chunks: "all",
+			},
 		},
 		module: {
 			rules: customRules.concat([
@@ -337,8 +349,8 @@ function getWebpackConfigDefault(isDev, config) {
 					test: /\.vue$/,
 					loader: "vue-loader",
 					options: {
-						hotReload: isDev
-					}
+						hotReload: isDev,
+					},
 				},
 				{
 					test: /\.js$/,
@@ -349,42 +361,42 @@ function getWebpackConfigDefault(isDev, config) {
 					test: /\.(sa|sc|c)ss$/,
 					use: [
 						// Only apply CSS extraction for production so that you get CSS hot reload during development.
-						(isDev) ? "vue-style-loader" : {
-							loader: MiniCssExtractPlugin.loader,
-							options: {
-								publicPath: ""
-							}
-						},
+						isDev
+							? "vue-style-loader"
+							: {
+									loader: MiniCssExtractPlugin.loader,
+									options: {
+										publicPath: "",
+									},
+							  },
 						"css-loader",
 						{
 							loader: "sass-loader",
 							options: {
 								// Need to use dart-sass as this is the only implementation that supports @use
-								implementation: require("sass")
+								implementation: require("sass"),
 							},
-						}
-					]
+						},
+					],
 				},
 				{
 					test: /\.svg$/,
 					use: {
 						loader: "url-loader",
-					}
+					},
 				},
 				{
 					test: /\.(png|gif|jpg|woff|woff2|eot|ttf)$/,
 					loader: "file-loader",
 					options: {
 						name: "[hash]-" + stamp + ".[ext]",
-						outputPath: (url, resourcePath/*, context*/) => {
+						outputPath: (url, resourcePath /*, context*/) => {
 							let splitPath = Path.basename(resourcePath).split(".");
-							return (splitPath.length > 1)
-								? ("assets/" + splitPath.pop() + "/" + url)
-								: ("assets/" + url);
-						}
-					}
-				}
-			])
+							return splitPath.length > 1 ? "assets/" + splitPath.pop() + "/" + url : "assets/" + url;
+						},
+					},
+				},
+			]),
 		},
 		devServer: {
 			// Important, so that we can use HMR while serving file statically
@@ -393,7 +405,7 @@ function getWebpackConfigDefault(isDev, config) {
 			stats: verboseStats,
 			host: "localhost",
 			port: 3000,
-			hotOnly: config["hmr"]
+			hotOnly: config["hmr"],
 		},
 		plugins: [
 			new webpack.EnvironmentPlugin(["BZD_RULE"]),
@@ -401,13 +413,13 @@ function getWebpackConfigDefault(isDev, config) {
 				analyzerMode: "static",
 				reportFilename: "./reports/webpack.html",
 				openAnalyzer: false,
-				logLevel: "warn"
+				logLevel: "warn",
 			}),
 			new VueLoaderPlugin(),
 			new MiniCssExtractPlugin({
 				filename: "[name]-" + stamp + ".css",
 				chunkFilename: "[contenthash]-" + stamp + ".css",
-				ignoreOrder: true
+				ignoreOrder: true,
 			}),
 			new WebpackAssetsManifest({
 				entrypoints: true,
@@ -425,48 +437,51 @@ function getWebpackConfigDefault(isDev, config) {
 
 					// Generate the templates
 					for (const i in config.templates) {
-						let configTemplate = Object.assign({
-							/**
-							 * Specific entry to be used, if none, no entry object will be created.
-							 */
-							entryId: false,
-							/**
-							 * Output path where the template should be written to
-							 */
-							output: Path.resolve(config.output, i + ".html"),
-							/**
-							 * Path of the template to be used
-							 */
-							template: null,
-							/**
-							 * Content of the template to be used if not template is specified
-							 */
-							templateContent: "<!DOCTYPE html>"
-									+ "<html>"
-										+ "<head>"
-											+ "<meta charset=\"utf-8\" />"
-											/*
-											 * The 2 following lines will prevent caching on the browser side, ensuring any updates
-											 * in the css or js content will be detected.
-											 */
-											+ "<meta http-equiv=\"Cache-control\" content=\"no-cache, no-store, must-revalidate\" />"
-											+ "<meta http-equiv=\"Pragma\" content=\"no-cache\" />"
-											+ "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />"
-											+ "<base href=\"<% html.base %>\" />"
-											+ "<% html.css %>"
-										+ "</head>"
-										+ "<body>"
-											+ "<div id=\"app\"></div>"
-											+ "<% html.js %>"
-										+ "</body>"
-									+ "</html>"
-						}, config.templates[i]);
+						let configTemplate = Object.assign(
+							{
+								/**
+								 * Specific entry to be used, if none, no entry object will be created.
+								 */
+								entryId: false,
+								/**
+								 * Output path where the template should be written to
+								 */
+								output: Path.resolve(config.output, i + ".html"),
+								/**
+								 * Path of the template to be used
+								 */
+								template: null,
+								/**
+								 * Content of the template to be used if not template is specified
+								 */
+								templateContent:
+									"<!DOCTYPE html>" +
+									"<html>" +
+									"<head>" +
+									'<meta charset="utf-8" />' +
+									/*
+									 * The 2 following lines will prevent caching on the browser side, ensuring any updates
+									 * in the css or js content will be detected.
+									 */
+									'<meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate" />' +
+									'<meta http-equiv="Pragma" content="no-cache" />' +
+									'<meta name="viewport" content="width=device-width, initial-scale=1" />' +
+									'<base href="<% html.base %>" />' +
+									"<% html.css %>" +
+									"</head>" +
+									"<body>" +
+									'<div id="app"></div>' +
+									"<% html.js %>" +
+									"</body>" +
+									"</html>",
+							},
+							config.templates[i]
+						);
 
 						// Update the path
 						configTemplate.output = pathResolve(config, configTemplate.output);
 
 						try {
-
 							let data = configTemplate.templateContent;
 							if (configTemplate.template) {
 								configTemplate.template = pathResolve(config, configTemplate.template);
@@ -483,9 +498,14 @@ function getWebpackConfigDefault(isDev, config) {
 								const cssList = (manifest.common.css || []).concat(manifest.entries[configTemplate.entryId].css || []);
 								const jsList = (manifest.common.js || []).concat(manifest.entries[configTemplate.entryId].js || []);
 								html = {
-									base: manifest.path.split("/").filter((entry) => (entry && entry != "/")).map((/*entry*/) => "..").join("/") || "/",
-									css: cssList.map((path) => ("<link href=\"" + manifest.path + path + "\" rel=\"stylesheet\"/>")).join(""),
-									js: jsList.map((path) => ("<script src=\"" + manifest.path + path + "\"></script>")).join("")
+									base:
+										manifest.path
+											.split("/")
+											.filter((entry) => entry && entry != "/")
+											.map((/*entry*/) => "..")
+											.join("/") || "/",
+									css: cssList.map((path) => '<link href="' + manifest.path + path + '" rel="stylesheet"/>').join(""),
+									js: jsList.map((path) => '<script src="' + manifest.path + path + '"></script>').join(""),
 								};
 							}
 
@@ -500,13 +520,17 @@ function getWebpackConfigDefault(isDev, config) {
 								/**
 								 * HTML specific parameters if needed
 								 */
-								html: html
+								html: html,
 							});
 
 							await writeFileAsync(configTemplate.output, output);
-							console.log("Generated \"" + configTemplate.output + "\"" + ((configTemplate.entryId === false) ? "" : (" for entry \"" + configTemplate.entryId + "\"")));
-						}
-						catch (e) {
+							console.log(
+								'Generated "' +
+									configTemplate.output +
+									'"' +
+									(configTemplate.entryId === false ? "" : ' for entry "' + configTemplate.entryId + '"')
+							);
+						} catch (e) {
 							console.error(e);
 							process.exit(1);
 						}
@@ -516,12 +540,15 @@ function getWebpackConfigDefault(isDev, config) {
 					let updatedManifest = await manifestCreate(config, entrypoints);
 
 					// Write manifest stats
-					console.log("Manifest for \"" + config.output + "\":\n" + manifestToString(config, updatedManifest));
+					console.log('Manifest for "' + config.output + '":\n' + manifestToString(config, updatedManifest));
 
 					// Update the manifest if needed before saving it
 					updatedManifest = await config.hooks.manifest(updatedManifest, config);
-					await writeFileAsync(Path.resolve(config.output, "manifest.json"), JSON.stringify(updatedManifest, null, "\t"));
-					console.log("Generated \"manifest.json\"");
+					await writeFileAsync(
+						Path.resolve(config.output, "manifest.json"),
+						JSON.stringify(updatedManifest, null, "\t")
+					);
+					console.log('Generated "manifest.json"');
 
 					// Hook at the end of the process
 					await config.hooks.end(updatedManifest, config);
@@ -530,9 +557,9 @@ function getWebpackConfigDefault(isDev, config) {
 					if (typeof config["hmrCounter"] === "number") {
 						config["hmrCounter"]++;
 					}
-				}
-			})
-		]
+				},
+			}),
+		],
 	};
 }
 
@@ -543,7 +570,7 @@ function cleanUp(config) {
 			if (e) {
 				// Cannot raise an exception here, otherwise we end up in an infinite loop
 				console.error(e);
-				console.error("Could not delete file \"" + path + "\"");
+				console.error('Could not delete file "' + path + '"');
 			}
 		});
 	});
@@ -554,9 +581,9 @@ async function manifestCreate(config, entrypoints) {
 		path: config.publicPath,
 		common: {
 			js: [],
-			css: []
+			css: [],
 		},
-		entries: {}
+		entries: {},
 	};
 
 	// Inject the common dependencies
@@ -564,7 +591,9 @@ async function manifestCreate(config, entrypoints) {
 
 	// Detect if an entry point is a library or not
 	const isLibrary = (ep) => {
-		return ((["library", "node"].indexOf(config.type) !== -1) && Object.keys(entrypoints).indexOf(ep.replace(".js", "")) !== -1);
+		return (
+			["library", "node"].indexOf(config.type) !== -1 && Object.keys(entrypoints).indexOf(ep.replace(".js", "")) !== -1
+		);
 	};
 
 	// Inject common entries
@@ -578,7 +607,7 @@ async function manifestCreate(config, entrypoints) {
 			for (const type in entrypoints[entry]) {
 				if (type in entries) {
 					const curEntries = entrypoints[entry][type];
-					entries[type] = curEntries.filter((ep) => (entries[type].indexOf(ep) !== -1));
+					entries[type] = curEntries.filter((ep) => entries[type].indexOf(ep) !== -1);
 				}
 			}
 		});
@@ -592,21 +621,23 @@ async function manifestCreate(config, entrypoints) {
 	for (const entryId in entrypoints) {
 		manifest.entries[entryId] = {};
 		for (const type in entrypoints[entryId]) {
-			manifest.entries[entryId][type] = entrypoints[entryId][type].filter((ep) => (manifest.common[type].indexOf(ep) === -1 && !isLibrary(ep)));
+			manifest.entries[entryId][type] = entrypoints[entryId][type].filter(
+				(ep) => manifest.common[type].indexOf(ep) === -1 && !isLibrary(ep)
+			);
 		}
 		manifest.entries[entryId]["lib"] = (entrypoints[entryId]["js"] || []).filter((ep) => isLibrary(ep));
 	}
 
-	let assignedfileList = []; 
+	let assignedfileList = [];
 	// Update the path by adding the publicPath and list all files
 	for (const type in manifest.common) {
 		assignedfileList = assignedfileList.concat(manifest.common[type]);
-		manifest.common[type] = manifest.common[type].map((ep) => (ep));
+		manifest.common[type] = manifest.common[type].map((ep) => ep);
 	}
 	for (const entry in manifest.entries) {
 		for (const type in manifest.entries[entry]) {
 			assignedfileList = assignedfileList.concat(manifest.entries[entry][type]);
-			manifest.entries[entry][type] = manifest.entries[entry][type].map((ep) => (ep));
+			manifest.entries[entry][type] = manifest.entries[entry][type].map((ep) => ep);
 		}
 	}
 
@@ -639,18 +670,20 @@ function manifestToString(config, manifest) {
 
 	const generateStats = (obj) => {
 		let output = [];
-		for (const type in (obj || {})) {
-			output = output.concat(obj[type].map((path) => {
-				const size = Fs.statSync(Path.resolve(config.output, path)).size;
-				const item = {
-					path: path,
-					rawSize: size,
-					size: bytesToString(size),
-					type: type
-				};
-				maxSizes = maxSizes.map((value) => [value[0], Math.max(value[1], (item[value[0]] || "").toString().length)]);
-				return item;
-			}));
+		for (const type in obj || {}) {
+			output = output.concat(
+				obj[type].map((path) => {
+					const size = Fs.statSync(Path.resolve(config.output, path)).size;
+					const item = {
+						path: path,
+						rawSize: size,
+						size: bytesToString(size),
+						type: type,
+					};
+					maxSizes = maxSizes.map((value) => [value[0], Math.max(value[1], (item[value[0]] || "").toString().length)]);
+					return item;
+				})
+			);
 		}
 		return output.sort((a, b) => a.path.localeCompare(b.path));
 	};
@@ -659,14 +692,18 @@ function manifestToString(config, manifest) {
 	for (const entry in manifest.entries) {
 		stats[entry] = generateStats(manifest.entries[entry]);
 	}
-	stats["others (async)"] = generateStats({"": manifest.others});
+	stats["others (async)"] = generateStats({ "": manifest.others });
 
 	// Print the results
 	let outputList = ["    " + maxSizes.map((value) => value[0].padStart(value[1], " ")).join("  ")];
 	for (const entry in stats) {
-		outputList.push("* " + entry + " (" + bytesToString(stats[entry].reduce((sum, value) => (sum + value.rawSize), 0)) + ")");
+		outputList.push(
+			"* " + entry + " (" + bytesToString(stats[entry].reduce((sum, value) => sum + value.rawSize, 0)) + ")"
+		);
 		stats[entry].forEach((stat) => {
-			outputList.push("    " + maxSizes.map((value) => (stat[value[0]] || "").toString().padStart(value[1], " ")).join("  "));
+			outputList.push(
+				"    " + maxSizes.map((value) => (stat[value[0]] || "").toString().padStart(value[1], " ")).join("  ")
+			);
 		});
 	}
 	return outputList.join("\n");
@@ -677,12 +714,11 @@ function manifestToString(config, manifest) {
  */
 function rmdirSync(path) {
 	if (Fs.existsSync(path)) {
-		Fs.readdirSync(path).forEach((file/*, index*/) => {
+		Fs.readdirSync(path).forEach((file /*, index*/) => {
 			const curPath = Path.resolve(path, file);
 			if (Fs.lstatSync(curPath).isDirectory()) {
 				rmdirSync(curPath);
-			}
-			else {
+			} else {
 				Fs.unlinkSync(curPath);
 			}
 		});
@@ -704,7 +740,7 @@ function createTempFileSync(config, data, ending, tempDirectoryPath) {
 	Webpack.mkdirSync(tempDirectoryPath);
 
 	// Generate the fileName and the path
-	const fileName = ".tmp." + createTempFileSync.prefix + (createTempFileSync.unique++) + "." + ending;
+	const fileName = ".tmp." + createTempFileSync.prefix + createTempFileSync.unique++ + "." + ending;
 	const path = Path.join(tempDirectoryPath, fileName);
 
 	Fs.writeFileSync(path, data);
@@ -741,21 +777,21 @@ function pathResolve(config, path) {
 function readFileAsync(path) {
 	return new Promise((resolve, reject) => {
 		Fs.readFile(path, (e, data) => {
-			return (e) ? reject(e) : resolve(data.toString());
+			return e ? reject(e) : resolve(data.toString());
 		});
 	});
 }
 function writeFileAsync(path, data) {
 	return new Promise((resolve, reject) => {
 		Fs.writeFile(path, data, (e) => {
-			return (e) ? reject(e) : resolve();
+			return e ? reject(e) : resolve();
 		});
 	});
 }
 function readdirAsync(path) {
 	return new Promise((resolve, reject) => {
 		Fs.readdir(path, (e, dataList) => {
-			return (e) ? reject(e) : resolve(dataList);
+			return e ? reject(e) : resolve(dataList);
 		});
 	});
 }
