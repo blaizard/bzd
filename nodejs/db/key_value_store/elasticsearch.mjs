@@ -55,7 +55,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
 			return result._source;
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof FetchException) {
 				if (e.code == 404 /*Note Found*/) {
 					return defaultValue;

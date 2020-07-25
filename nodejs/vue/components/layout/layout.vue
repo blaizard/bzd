@@ -63,71 +63,71 @@
 </template>
 
 <script>
-	import Base from "./base.vue";
-	import LocalStorage from "bzd/core/localstorage.mjs";
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+import Base from "./base.vue";
+import LocalStorage from "bzd/core/localstorage.mjs";
+import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 
-	export default {
-		mixins: [Base],
-		directives: {
-			tooltip: DirectiveTooltip,
+export default {
+	mixins: [Base],
+	directives: {
+		tooltip: DirectiveTooltip,
+	},
+	data: function () {
+		return {
+			isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
+			isMenuShow: false,
+		};
+	},
+	computed: {
+		isNotification() {
+			return typeof this.$notification == "object";
 		},
-		data: function () {
+		classLayout() {
 			return {
-				isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
-				isMenuShow: false,
+				"bzd-layout": true,
+				"bzd-mobile": this.isMobile,
+				"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
 			};
 		},
-		computed: {
-			isNotification() {
-				return typeof this.$notification == "object";
-			},
-			classLayout() {
-				return {
-					"bzd-layout": true,
-					"bzd-mobile": this.isMobile,
-					"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
-				};
-			},
-			isMenu() {
-				return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
-			},
+		isMenu() {
+			return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
 		},
-		methods: {
-			getNotificationClass(entry) {
-				return {
-					"bzd-notification": true,
-					"bzd-notification-time": entry.timeOnScreen > 0,
-					"bzd-success": entry.type == "success",
-					"bzd-error": entry.type == "error",
-					"bzd-info": entry.type == "info",
-				};
-			},
-			getNotificationStyle(entry) {
-				if (entry.timeOnScreen) {
-					return "--bzd-notification-time: " + entry.timeOnScreen + "s;";
-				}
-				return "";
-			},
-			notificationClose(entry) {
-				this.$notification.close(entry);
-			},
-			toggleDock() {
-				this.isDock = !this.isDock;
-				this.isMenuShow = false;
-				LocalStorage.set("bzd-layout-dock", this.isDock ? "1" : "");
-			},
-			toggleMenu() {
-				this.isMenuShow = !this.isMenuShow;
-			},
-			hideMenu() {
-				this.isMenuShow = false;
-			},
-			handleMenuClick() {
-				this.hideMenu();
-			},
+	},
+	methods: {
+		getNotificationClass(entry) {
+			return {
+				"bzd-notification": true,
+				"bzd-notification-time": entry.timeOnScreen > 0,
+				"bzd-success": entry.type == "success",
+				"bzd-error": entry.type == "error",
+				"bzd-info": entry.type == "info",
+			};
 		},
-	};
+		getNotificationStyle(entry) {
+			if (entry.timeOnScreen) {
+				return "--bzd-notification-time: " + entry.timeOnScreen + "s;";
+			}
+			return "";
+		},
+		notificationClose(entry) {
+			this.$notification.close(entry);
+		},
+		toggleDock() {
+			this.isDock = !this.isDock;
+			this.isMenuShow = false;
+			LocalStorage.set("bzd-layout-dock", this.isDock ? "1" : "");
+		},
+		toggleMenu() {
+			this.isMenuShow = !this.isMenuShow;
+		},
+		hideMenu() {
+			this.isMenuShow = false;
+		},
+		handleMenuClick() {
+			this.hideMenu();
+		},
+	},
+};
 </script>
 
 <style lang="scss">

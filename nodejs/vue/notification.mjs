@@ -22,7 +22,8 @@ export default {
 						for (const key in message) {
 							this._notifySingle(key, type, message[key], options);
 						}
-					} else {
+					}
+					else {
 						this._notifySingle(++this._uid, type, message, options);
 					}
 				},
@@ -52,7 +53,8 @@ export default {
 					// If null, delete the entry
 					if (message === null) {
 						this.close(entry);
-					} else if (entry.timeOnScreen > 0) {
+					}
+					else if (entry.timeOnScreen > 0) {
 						setTimeout(() => {
 							this.close(entry);
 						}, entry.timeOnScreen * 1000);

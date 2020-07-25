@@ -54,7 +54,8 @@ export class AsyncInitialize {
 		try {
 			await this._initializeImpl();
 			this.event.trigger("ready");
-		} catch (e) {
+		}
+		catch (e) {
 			this.event.trigger("error", e);
 			throw e;
 		}

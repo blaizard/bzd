@@ -150,7 +150,8 @@ export default class Web {
 			}
 			this.server = Https.createServer(options, this.app);
 			configStrList.push("SSL");
-		} else {
+		}
+		else {
 			this.server = Http.createServer(this.app);
 		}
 
@@ -212,7 +213,8 @@ export default class Web {
 				((...args) => (req, res, next) => {
 					if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
 						(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
-					} else {
+					}
+					else {
 						next();
 					}
 				})(fallback, { root: absolutePath })
@@ -253,12 +255,14 @@ export default class Web {
 			callbackList.unshift(async function (request, response) {
 				try {
 					await callback.call(this, request, response);
-				} catch (e) {
+				}
+				catch (e) {
 					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);
 				}
 			});
-		} else {
+		}
+		else {
 			callbackList.unshift(callback);
 		}
 
@@ -280,23 +284,23 @@ export default class Web {
 		}
 
 		switch (type.toLowerCase()) {
-			case "get":
-				this.app.get(uri, ...callbackList);
-				break;
-			case "post":
-				this.app.post(uri, ...callbackList);
-				break;
-			case "put":
-				this.app.put(uri, ...callbackList);
-				break;
-			case "delete":
-				this.app.delete(uri, ...callbackList);
-				break;
-			case "patch":
-				this.app.patch(uri, ...callbackList);
-				break;
-			default:
-				throw new Exception("Unknown HTTP type '{}'.", type);
+		case "get":
+			this.app.get(uri, ...callbackList);
+			break;
+		case "post":
+			this.app.post(uri, ...callbackList);
+			break;
+		case "put":
+			this.app.put(uri, ...callbackList);
+			break;
+		case "delete":
+			this.app.delete(uri, ...callbackList);
+			break;
+		case "patch":
+			this.app.patch(uri, ...callbackList);
+			break;
+		default:
+			throw new Exception("Unknown HTTP type '{}'.", type);
 		}
 
 		Log.debug("Added route: {} {} with options {:j}", type, uri, options);

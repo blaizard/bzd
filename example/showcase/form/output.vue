@@ -25,26 +25,26 @@
 </template>
 
 <script>
-	import Template from "./template.vue";
+import Template from "./template.vue";
 
-	export default {
-		mixins: [Template],
-		data: function () {
-			return {
-				valueDefault: {},
-				valueAll: {},
-				valueDiff: {
-					input: "Hello",
-				},
-			};
-		},
-		computed: {
-			formDescription() {
-				return [
-					{ type: "Input", name: "input", caption: "Input (named)" },
-					{ type: "Input", caption: "Input (unmaned)" },
-				];
+export default {
+	mixins: [Template],
+	data: function () {
+		return {
+			valueDefault: {},
+			valueAll: {},
+			valueDiff: {
+				input: "Hello",
 			},
+		};
+	},
+	computed: {
+		formDescription() {
+			return [
+				{ type: "Input", name: "input", caption: "Input (named)" },
+				{ type: "Input", caption: "Input (unmaned)" },
+			];
 		},
-	};
+	},
+};
 </script>

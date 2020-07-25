@@ -114,7 +114,7 @@ export default class PersistenceMemory {
 	 */
 	async write(type, ...args) {
 		Exception.assert(this.isReady, "Persistence is not ready yet.");
-		Exception.assert(type in this.options.operations, 'The operation "' + type + '" is not supported.');
+		Exception.assert(type in this.options.operations, "The operation \"" + type + "\" is not supported.");
 
 		// Update the current object
 		await this.options.operations[type].call(this.options.operations, this.data, ...args);

@@ -22,11 +22,11 @@ export default function (str, ...args) {
 			const value = args[format.index];
 
 			switch (format.type) {
-				case "j":
-					output += JSON.stringify(value);
-					break;
-				default:
-					output += String(value);
+			case "j":
+				output += JSON.stringify(value);
+				break;
+			default:
+				output += String(value);
 			}
 
 			++substitutionIndex;
