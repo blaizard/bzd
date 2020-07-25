@@ -1,5 +1,3 @@
-
-
 import Path from "path";
 import Fs from "fs";
 
@@ -10,12 +8,10 @@ import FileSystem from "../../core/filesystem.mjs";
  * File storage module
  */
 export default class StorageDisk extends Storage {
-
 	constructor(path, options) {
 		super();
 
-		this.options = Object.assign({
-		}, options);
+		this.options = Object.assign({}, options);
 		this.path = path;
 
 		this._initialize();
@@ -29,7 +25,7 @@ export default class StorageDisk extends Storage {
 	}
 
 	_getPath(bucket, key = undefined) {
-		return (key) ? Path.join(this.path, bucket, key) : Path.join(this.path, bucket);
+		return key ? Path.join(this.path, bucket, key) : Path.join(this.path, bucket);
 	}
 
 	async is(bucket, key) {
@@ -51,11 +47,7 @@ export default class StorageDisk extends Storage {
 		}
 
 		return new Promise((resolve, reject) => {
-			readStream
-				.on("error", reject)
-				.on("end", resolve)
-				.on("finish", resolve)
-				.pipe(writeStream);
+			readStream.on("error", reject).on("end", resolve).on("finish", resolve).pipe(writeStream);
 		});
 	}
 

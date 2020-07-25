@@ -7,14 +7,13 @@ const Exception = ExceptionFactory("db", "kvs");
  * Key value store for low demanding application, that presists on the local disk.
  */
 export default class KeyValueStore extends AsyncInitialize {
-
 	constructor() {
 		super();
 	}
 
 	/**
 	 * Set a key/value pair.
-	 * 
+	 *
 	 * If key is set to null, a unique key is automatically generated.
 	 */
 	async set(/*bucket, key, value*/) {
@@ -38,7 +37,7 @@ export default class KeyValueStore extends AsyncInitialize {
 	}
 
 	/**
-	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values). 
+	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values).
 	 * \param bucket The bucket to be used.
 	 * \param subKey The subkey for the match.
 	 * \param value The value of values (if a list) to match.

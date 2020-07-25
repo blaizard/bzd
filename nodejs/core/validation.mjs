@@ -1,5 +1,3 @@
-
-
 import Format from "./format.mjs";
 import ExceptionFactory from "./exception.mjs";
 
@@ -19,8 +17,7 @@ class Constraint {
 		return this.schema[this.key];
 	}
 
-	create() {
-	}
+	create() {}
 
 	install() {
 		return (/*result, value*/) => {};
@@ -62,9 +59,9 @@ class Constraint {
 
 /**
  * Data validation module
- * 
+ *
  * Validation definition, can be doen through json.
- * 
+ *
  * Here is an example:
  * {
  *     email: "mandatory email",
@@ -72,7 +69,7 @@ class Constraint {
  *     confirm: "mandatory equal(password)",
  *     stayConnnected: "type(bool)"
  * }
- * 
+ *
  * To each keys is associated a constraint. A constraint definition can be done
  * from a string. Each contraints are space separated and must follow the same format:
  * <name>(<argument>)?
@@ -81,10 +78,9 @@ class Constraint {
  */
 export default class Validation {
 	constructor(schema, singleValue = false) {
-
 		if (singleValue) {
 			schema = {
-				value: schema
+				value: schema,
 			};
 		}
 		this.singleValue = singleValue;
@@ -92,7 +88,6 @@ export default class Validation {
 	}
 
 	_processSchema(schema) {
-
 		const patternConstraint = new RegExp("([a-zA-Z0-9_-]+)(?:\\((.*)\\))?");
 
 		let processedSchema = {};
@@ -102,19 +97,20 @@ export default class Validation {
 			processedSchema[key] = {
 				mandatory: false,
 				type: "string",
-				constraints: []
+				constraints: [],
 			};
 
 			if (typeof constraints == "string") {
 				const contraintList = constraints.split(" ");
-				contraintList.filter((constraint) => Boolean(constraint)).forEach((constraint) => {
-					const m = constraint.match(patternConstraint);
-					const name = m[1];
-					const arg = m[2];
-					this._processConstraint(processedSchema, key, name, arg);
-				});
-			}
-			else {
+				contraintList
+					.filter((constraint) => Boolean(constraint))
+					.forEach((constraint) => {
+						const m = constraint.match(patternConstraint);
+						const name = m[1];
+						const arg = m[2];
+						this._processConstraint(processedSchema, key, name, arg);
+					});
+			} else {
 				Exception.unreachable("Constraints type is unsupported: {:j}", constraints);
 			}
 		}
@@ -132,43 +128,54 @@ export default class Validation {
 	 * Value must be a dictionary.
 	 */
 	validate(values, options) {
-
 		// Convert the value into a dictionary
 		if (this.singleValue) {
 			values = {
-				value: values
+				value: values,
 			};
 		}
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
 
-		options = Object.assign({
-			/**
-			 * Output type, can be either "throw" or "return"
-			 */
-			output: "throw",
-			/**
-			 * Callback decifing whether or not a valid is conisdered as existent
-			 */
-			valueExists: (key, value) => { return value !== undefined; },
-			/**
-			 * Ensure that all keys of values are present in the schema.
-			 */
-			all: false
-		}, options);
+		options = Object.assign(
+			{
+				/**
+				 * Output type, can be either "throw" or "return"
+				 */
+				output: "throw",
+				/**
+				 * Callback decifing whether or not a valid is conisdered as existent
+				 */
+				valueExists: (key, value) => {
+					return value !== undefined;
+				},
+				/**
+				 * Ensure that all keys of values are present in the schema.
+				 */
+				all: false,
+			},
+			options
+		);
 
 		let result = {};
 
 		for (const key in this.schema) {
-			if (Constraint.assert(result, key, !this.schema[key].mandatory || (key in values && options.valueExists(key, values[key])), "mandatory")) {
+			if (
+				Constraint.assert(
+					result,
+					key,
+					!this.schema[key].mandatory || (key in values && options.valueExists(key, values[key])),
+					"mandatory"
+				)
+			) {
 				if (key in values) {
 					let value = values[key];
 					switch (this.schema[key].type) {
-					case "integer":
-						value = Constraint.getAndAssertInteger(value, result, key);
-						break;
-					case "float":
-						value = Constraint.getAndAssertFloat(value, result, key);
-						break;
+						case "integer":
+							value = Constraint.getAndAssertInteger(value, result, key);
+							break;
+						case "float":
+							value = Constraint.getAndAssertFloat(value, result, key);
+							break;
 					}
 					if (value !== undefined) {
 						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
@@ -185,29 +192,28 @@ export default class Validation {
 		}
 
 		switch (options.output) {
-		case "throw":
-			{
-				const keys = Object.keys(result);
-				if (keys.length == 1) {
-					throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
+			case "throw":
+				{
+					const keys = Object.keys(result);
+					if (keys.length == 1) {
+						throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
+					} else if (keys.length > 1) {
+						const message = keys.map((key) => {
+							return String(key) + ": (" + result[key].join(", ") + ")";
+						});
+						throw new Exception("Some values do not validate: {}", message.join("; "));
+					}
 				}
-				else if (keys.length > 1) {
-					const message = keys.map((key) => {
-						return String(key) + ": (" + result[key].join(", ") + ")";
-					});
-					throw new Exception("Some values do not validate: {}", message.join("; "));
-				}
-			}
-			break;
-		case "return":
-			return result;
-		default:
-			Exception.unreachable("Unsupported output type: '{}'", options.output);
+				break;
+			case "return":
+				return result;
+			default:
+				Exception.unreachable("Unsupported output type: '{}'", options.output);
 		}
 	}
 
 	isMandatory(name) {
-		return (name in this.schema) ? this.schema[name].mandatory : false;
+		return name in this.schema ? this.schema[name].mandatory : false;
 	}
 
 	_processConstraint(schema, key, name, arg) {
@@ -221,26 +227,26 @@ export default class Validation {
 			min: class Min extends Constraint {
 				install() {
 					switch (this.entry.type) {
-					case "string":
-					case "integer":
-						this.arg = Constraint.getAndAssertInteger(this.arg);
-						break;
-					case "float":
-						this.arg = Constraint.getAndAssertFloat(this.arg);
+						case "string":
+						case "integer":
+							this.arg = Constraint.getAndAssertInteger(this.arg);
+							break;
+						case "float":
+							this.arg = Constraint.getAndAssertFloat(this.arg);
 					}
 
 					switch (this.entry.type) {
-					case "string":
-						return (result, value) => {
-							this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
-						};
-					case "integer":
-					case "float":
-						return (result, value) => {
-							this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
-						};
-					default:
-						Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
+						case "string":
+							return (result, value) => {
+								this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
+							};
+						case "integer":
+						case "float":
+							return (result, value) => {
+								this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
+							};
+						default:
+							Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
 					}
 				}
 			},

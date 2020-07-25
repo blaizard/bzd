@@ -1,22 +1,24 @@
-
-
 import ExceptionFactory from "../exception.mjs";
 
 const Exception = ExceptionFactory("authentication", "client");
 
 export default class AuthenticationClient {
 	constructor(options, defaultOptions = {}) {
-		this.options = Object.assign({
-			/**
-			 * Callback that will be triggered if the user attempt to access
-			 * a route that requires authentication without it.
-			 */
-			unauthorizedCallback: null,
-			/**
-			 * Callback to be called each time the authentication status changes.
-			 */
-			onAuthentication: (/*isAuthenticated*/) => {}
-		}, defaultOptions, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * Callback that will be triggered if the user attempt to access
+				 * a route that requires authentication without it.
+				 */
+				unauthorizedCallback: null,
+				/**
+				 * Callback to be called each time the authentication status changes.
+				 */
+				onAuthentication: (/*isAuthenticated*/) => {},
+			},
+			defaultOptions,
+			options
+		);
 	}
 
 	installAPI(/*api*/) {

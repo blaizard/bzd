@@ -19,10 +19,13 @@ export class CollectionPaging {
 	}
 
 	static makeFromList(data, maxOrPaging) {
-		const paging = (typeof maxOrPaging == "object") ? maxOrPaging : {page: 0, max: maxOrPaging};
+		const paging = typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
 		const indexStart = paging.page * paging.max;
 		const indexEnd = indexStart + paging.max;
-		return new CollectionPaging(data.slice(indexStart, indexEnd), (indexEnd > data.length) ? null : {page: paging.page + 1, max: paging.max});
+		return new CollectionPaging(
+			data.slice(indexStart, indexEnd),
+			indexEnd > data.length ? null : { page: paging.page + 1, max: paging.max }
+		);
 	}
 
 	static makeFromObject(data, maxOrPaging) {
@@ -37,11 +40,10 @@ export class CollectionPaging {
 }
 
 export class AsyncInitialize {
-
 	constructor() {
 		this.event = new Event({
-			ready: {proactive: true},
-			error: {proactive: true}
+			ready: { proactive: true },
+			error: { proactive: true },
 		});
 	}
 
@@ -52,8 +54,7 @@ export class AsyncInitialize {
 		try {
 			await this._initializeImpl();
 			this.event.trigger("ready");
-		}
-		catch (e) {
+		} catch (e) {
 			this.event.trigger("error", e);
 			throw e;
 		}
@@ -62,8 +63,7 @@ export class AsyncInitialize {
 	/**
 	 * Initialization function (optional)
 	 */
-	async _initializeImpl() {
-	}
+	async _initializeImpl() {}
 
 	/**
 	 * This function waits until the module is ready

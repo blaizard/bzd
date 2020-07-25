@@ -1,5 +1,3 @@
-
-
 import ExceptionFactory from "../exception.mjs";
 import Format from "../format.mjs";
 

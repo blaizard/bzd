@@ -1,5 +1,3 @@
-
-
 import Express from "express";
 import Helmet from "helmet";
 import Path from "path";
@@ -21,54 +19,57 @@ const Exception = ExceptionFactory("web");
 
 export default class Web {
 	constructor(port, config) {
-		this.config = Object.assign({
-			/**
-			 * \brief Set the upload directory.
-			 */
-			uploadDir: false,
-			/**
-			 * \brief Set the file transfer limit.
-			 */
-			limit: 1 * 1024 *1024,
-			/**
-			 * \brief Public key of the SSL certificate.
-			 */
-			key: null,
-			/**
-			 * \brief SSL certificate.
-			 */
-			cert: null,
-			/**
-			 * \brief SSL certificate authority.
-			 */
-			ca: null,
-			/**
-			 * \brief Use data compression and minfy certain file types.
-			 */
-			useCompression: true,
-			/**
-			 * Options to be used while serving static files
-			 */
-			staticOptions: {
-				maxAge: 60 * 60 * 1000, // 1h
-				index: "index.html",
-				setHeaders: (res, path) => {
-					/*
-					 * Do not cache the index.html
-					 * this is usefull when the application updates.
-					 */
-					if (path.endsWith("index.html")) {
-						res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-						res.header("Expires", "-1");
-						res.header("Pragma", "no-cache");
-					}
-				}
-			}
-		}, config);
+		this.config = Object.assign(
+			{
+				/**
+				 * \brief Set the upload directory.
+				 */
+				uploadDir: false,
+				/**
+				 * \brief Set the file transfer limit.
+				 */
+				limit: 1 * 1024 * 1024,
+				/**
+				 * \brief Public key of the SSL certificate.
+				 */
+				key: null,
+				/**
+				 * \brief SSL certificate.
+				 */
+				cert: null,
+				/**
+				 * \brief SSL certificate authority.
+				 */
+				ca: null,
+				/**
+				 * \brief Use data compression and minfy certain file types.
+				 */
+				useCompression: true,
+				/**
+				 * Options to be used while serving static files
+				 */
+				staticOptions: {
+					maxAge: 60 * 60 * 1000, // 1h
+					index: "index.html",
+					setHeaders: (res, path) => {
+						/*
+						 * Do not cache the index.html
+						 * this is usefull when the application updates.
+						 */
+						if (path.endsWith("index.html")) {
+							res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+							res.header("Expires", "-1");
+							res.header("Pragma", "no-cache");
+						}
+					},
+				},
+			},
+			config
+		);
 
 		this.event = new Event({
-			ready: {proactive: true},
-			error: {proactive: true}
+			ready: { proactive: true },
+			error: { proactive: true },
 		});
 
 		this._initialize(port).catch((e) => {
@@ -81,7 +82,6 @@ export default class Web {
 	 * Initialize the web module
 	 */
 	async _initialize(port) {
-
 		this.app = Express();
 		this.app.use(Helmet());
 
@@ -94,9 +94,11 @@ export default class Web {
 		// Enable compression
 		if (this.config.useCompression) {
 			this.app.use(Compression());
-			this.app.use(Minify({
-				cache: false // use memory cache
-			}));
+			this.app.use(
+				Minify({
+					cache: false, // use memory cache
+				})
+			);
 		}
 
 		// Set the storage information for upload (if needed)
@@ -105,7 +107,7 @@ export default class Web {
 				filename: (req, file, cb) => {
 					this._initialize.uid = this._initialize.uid || 0;
 					cb(null, Date.now() + "-" + String(this._initialize.uid++) + "-" + file.originalname);
-				}
+				},
 			};
 			if (this.config.uploadDir) {
 				// Create the directory if it does not exists
@@ -128,7 +130,6 @@ export default class Web {
 	 * Start the web server
 	 */
 	async start() {
-
 		await this.event.waitUntil("ready");
 
 		// If any of the certificate file is set, assume SSL is to be used
@@ -149,8 +150,7 @@ export default class Web {
 			}
 			this.server = Https.createServer(options, this.app);
 			configStrList.push("SSL");
-		}
-		else {
+		} else {
 			this.server = Http.createServer(this.app);
 		}
 
@@ -161,7 +161,11 @@ export default class Web {
 		return new Promise((resolve, reject) => {
 			this.server.listen(this.port, undefined, undefined, () => {
 				resetErrorHandler.call(this, reject);
-				Log.info("Web server serving at http://localhost:{}{}", this.port, (configStrList.length) ? (" (" + configStrList.join(" and ") + ")") : "");
+				Log.info(
+					"Web server serving at http://localhost:{}{}",
+					this.port,
+					configStrList.length ? " (" + configStrList.join(" and ") + ")" : ""
+				);
 				resolve();
 			});
 			this.server.on("error", (e) => {
@@ -195,7 +199,6 @@ export default class Web {
 	 * \param fallback (optional) Serve a specific file if nothing else can be served.
 	 */
 	async addStaticRoute(uri, path, fallback) {
-
 		const absolutePath = Path.resolve(path);
 		Exception.assert(absolutePath, "Absolute pat for path '{}' is empty.", path);
 		Exception.assert(await FileSystem.exists(absolutePath), "No file are present at path '{}'.", absolutePath);
@@ -204,14 +207,16 @@ export default class Web {
 
 		// If there is a fallback file
 		if (fallback) {
-			this.app.use(uri, ((...args) => (req, res, next) => {
-				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-					(res.sendFile || res.sendfile).call(res, ...args, err => err && next());
-				}
-				else {
-					next();
-				}
-			})(fallback, { root: absolutePath }));
+			this.app.use(
+				uri,
+				((...args) => (req, res, next) => {
+					if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+						(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
+					} else {
+						next();
+					}
+				})(fallback, { root: absolutePath })
+			);
 		}
 	}
 
@@ -225,35 +230,35 @@ export default class Web {
 	 * \param options (optional) Extra options to be passed to the handler.
 	 */
 	addRoute(type, uri, callback, options) {
-
 		// Update the options
-		options = Object.assign({
-			/**
-			 * Data type expected
-			 */
-			type: [],
-			limit: this.config.limit,
-			path: null,
-			/**
-			 * Add guards to unhandled exceptions. This adds a callstack layer.
-			 */
-			exceptionGuard: false
-		}, options);
+		options = Object.assign(
+			{
+				/**
+				 * Data type expected
+				 */
+				type: [],
+				limit: this.config.limit,
+				path: null,
+				/**
+				 * Add guards to unhandled exceptions. This adds a callstack layer.
+				 */
+				exceptionGuard: false,
+			},
+			options
+		);
 
 		let callbackList = [middlewareErrorHandler];
 
 		if (options.exceptionGuard) {
-			callbackList.unshift(async function(request, response) {
+			callbackList.unshift(async function (request, response) {
 				try {
 					await callback.call(this, request, response);
-				}
-				catch (e) {
+				} catch (e) {
 					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);
 				}
 			});
-		}
-		else {
+		} else {
 			callbackList.unshift(callback);
 		}
 
@@ -275,23 +280,23 @@ export default class Web {
 		}
 
 		switch (type.toLowerCase()) {
-		case "get":
-			this.app.get(uri, ...callbackList);
-			break;
-		case "post":
-			this.app.post(uri, ...callbackList);
-			break;
-		case "put":
-			this.app.put(uri, ...callbackList);
-			break;
-		case "delete":
-			this.app.delete(uri, ...callbackList);
-			break;
-		case "patch":
-			this.app.patch(uri, ...callbackList);
-			break;
-		default:
-			throw new Exception("Unknown HTTP type '{}'.", type);
+			case "get":
+				this.app.get(uri, ...callbackList);
+				break;
+			case "post":
+				this.app.post(uri, ...callbackList);
+				break;
+			case "put":
+				this.app.put(uri, ...callbackList);
+				break;
+			case "delete":
+				this.app.delete(uri, ...callbackList);
+				break;
+			case "patch":
+				this.app.patch(uri, ...callbackList);
+				break;
+			default:
+				throw new Exception("Unknown HTTP type '{}'.", type);
 		}
 
 		Log.debug("Added route: {} {} with options {:j}", type, uri, options);

@@ -1,29 +1,30 @@
-
-
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("router");
 
 export default class Router {
 	constructor(config) {
-		this.config = Object.assign({
-			/**
-			 * \brief If set, the route match will differentiate with upper and lower case.
-			 */
-			caseSensitive: false,
-			/**
-			 * \brief Callback if no routes are matching.
-			 */
-			fallback: (path) => {
-				throw new Exception("Route not found for '{}'.", path);
-			}
-		}, config);
+		this.config = Object.assign(
+			{
+				/**
+				 * \brief If set, the route match will differentiate with upper and lower case.
+				 */
+				caseSensitive: false,
+				/**
+				 * \brief Callback if no routes are matching.
+				 */
+				fallback: (path) => {
+					throw new Exception("Route not found for '{}'.", path);
+				},
+			},
+			config
+		);
 		this.routes = new Map();
 		this.dirty = true;
 		this.data = null;
 	}
 
-	/** 
+	/**
 	 * \brief Associate a new route with a handler (callback).
 	 * It supports the following format:
 	 *	/api/robots
@@ -35,7 +36,7 @@ export default class Router {
 
 		this.routes.set(path, {
 			handler: handler,
-			args: args
+			args: args,
 		});
 		this.dirty = true;
 	}
@@ -59,7 +60,7 @@ export default class Router {
 
 		// Identify the index
 		let counter = matches.length;
-		while (--counter && matches[counter] === undefined){} // eslint-disable-line
+		while (--counter && matches[counter] === undefined) {} // eslint-disable-line
 
 		const indexRoute = Math.floor((counter - 1) / this.data.maxVars);
 		const indexVar = indexRoute * this.data.maxVars;
@@ -76,7 +77,7 @@ export default class Router {
 		return {
 			route: route,
 			args: route.args,
-			vars: vars
+			vars: vars,
 		};
 	}
 
@@ -84,14 +85,13 @@ export default class Router {
 	 * \brief Handle the current request, with routes previously added.
 	 */
 	async dispatch(path, ...args) {
-
 		const match = this.match(path);
 		if (match) {
 			await match.route.handler(match.vars, ...args);
 			return {
 				matched: true,
 				path: path,
-				vars: match.vars
+				vars: match.vars,
 			};
 		}
 
@@ -99,7 +99,7 @@ export default class Router {
 		return {
 			matched: false,
 			path: path,
-			vars: {}
+			vars: {},
 		};
 	}
 }
@@ -123,7 +123,6 @@ function compileRoutes(routes, config) {
 	const regexp = /{([^}:]+):?([^}]*)}/g;
 
 	for (const [path, config] of routes.entries()) {
-
 		let varList = [];
 
 		// Build the regular expression out of the path
@@ -131,12 +130,11 @@ function compileRoutes(routes, config) {
 		let pathRegexpr = escapeRegexp(pathList[0]);
 
 		for (let i = 1; i < pathList.length; i += 3) {
-
 			// Add the variable to the list
 			varList.push(pathList[i]);
 
 			// Update the regular expression of the path
-			pathRegexpr += "(" + ((pathList[i + 1]) ? pathList[i + 1] : "[^/]+") + ")";
+			pathRegexpr += "(" + (pathList[i + 1] ? pathList[i + 1] : "[^/]+") + ")";
 
 			// Add the follow-up of the path if any
 			if (pathList[i + 2]) {
@@ -151,21 +149,21 @@ function compileRoutes(routes, config) {
 			args: config.args,
 			handler: config.handler,
 			varList: varList,
-			pathRegexpr: pathRegexpr
+			pathRegexpr: pathRegexpr,
 		});
 	}
 
 	// Collapse the number of regular expression to be able to identify the regexpr
 	let regexprList = [];
-	routeData.forEach((route, /*index*/) => {
+	routeData.forEach((route /*index*/) => {
 		// +1 to support cases where there are no variables
 		const pathRegexpr = route.pathRegexpr + "()".repeat(maxVars - route.varList.length + 1);
 		regexprList.push(pathRegexpr);
 	});
 
 	return {
-		regexpr: new RegExp("^(?:|" + regexprList.join("|") + ")$", ((config.caseSensitive) ? undefined : "i")),
+		regexpr: new RegExp("^(?:|" + regexprList.join("|") + ")$", config.caseSensitive ? undefined : "i"),
 		routes: routeData,
-		maxVars: maxVars + 1
+		maxVars: maxVars + 1,
 	};
 }

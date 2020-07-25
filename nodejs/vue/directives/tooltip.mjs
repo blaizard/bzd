@@ -1,8 +1,6 @@
-
-
 let current = {
 	watcher: null,
-	elt: null
+	elt: null,
 };
 const watcherPollingPeriodMs = 500;
 const defaultPosition = "e";
@@ -10,7 +8,7 @@ const positionSequences = {
 	w: ["w", "e", "n", "s"],
 	e: ["e", "w", "n", "s"],
 	n: ["n", "s", "w", "e"],
-	s: ["s", "n", "w", "e"]
+	s: ["s", "n", "w", "e"],
 };
 
 /**
@@ -24,7 +22,7 @@ function getOrCreateTooltip() {
 		container.classList.add("irtooltip");
 		Object.assign(container.style, {
 			position: "fixed",
-			"pointer-events": "none"
+			"pointer-events": "none",
 		});
 
 		// The text container
@@ -58,9 +56,9 @@ export function tooltipHide() {
  */
 function eltOutOfScreen(elt) {
 	const rect = elt.getBoundingClientRect();
-	return ((rect.x < 0)
-			|| (rect.y < 0)
-			|| (rect.x + rect.width > window.innerWidth || rect.y + rect.height > window.innerHeight));
+	return (
+		rect.x < 0 || rect.y < 0 || rect.x + rect.width > window.innerWidth || rect.y + rect.height > window.innerHeight
+	);
 }
 
 /**
@@ -68,7 +66,6 @@ function eltOutOfScreen(elt) {
  * it will hide the tooltip.
  */
 function setWatcher(elt) {
-
 	// Clear current watcher first
 	clearWatcher();
 
@@ -125,18 +122,17 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 				top: y,
 				left: x,
 				width: 0,
-				height: 0
+				height: 0,
 			};
 		},
 		getAttribute(/*name*/) {
 			return null;
-		}
+		},
 	};
 	tooltip(eltMock, message, initialPosition);
 }
 
 export function tooltip(elt, message = null, initialPosition = null) {
-
 	/*
 	 * Save the current object. Do this event if it is not shown, this is used
 	 * by the asynchronous function if it needs to be updated.
@@ -144,7 +140,9 @@ export function tooltip(elt, message = null, initialPosition = null) {
 	current.elt = elt;
 
 	message = message || elt.getAttribute("data-irtooltip");
-	if (!message) {return;}
+	if (!message) {
+		return;
+	}
 
 	const initalPosition = initialPosition || elt.getAttribute("data-irtooltip-position") || defaultPosition;
 
@@ -168,8 +166,7 @@ export function tooltip(elt, message = null, initialPosition = null) {
 	let positionList = ["e", "s", "w", "n"];
 	if (positionSequences[initalPosition]) {
 		positionList = positionSequences[initalPosition].slice();
-	}
-	else if (initalPosition.indexOf(",") !== -1) {
+	} else if (initalPosition.indexOf(",") !== -1) {
 		positionList = initalPosition.split(",");
 	}
 
@@ -177,28 +174,27 @@ export function tooltip(elt, message = null, initialPosition = null) {
 		let position = positionList.shift();
 
 		switch (position) {
-		case "e":
-			tooltipElt.style.marginLeft = coordElt.width + "px";
-			tooltipElt.style.marginTop = ((coordElt.height - coordTooltip.height)/2) + "px";
-			tooltipElt.className = "irtooltip irtooltip-e";
-			break;
-		case "s":
-			tooltipElt.style.marginLeft = ((coordElt.width - coordTooltip.width)/2) + "px";
-			tooltipElt.style.marginTop = coordElt.height + "px";
-			tooltipElt.className = "irtooltip irtooltip-s";
-			break;
-		case "w":
-			tooltipElt.style.marginLeft = -coordTooltip.width + "px";
-			tooltipElt.style.marginTop = ((coordElt.height - coordTooltip.height)/2) + "px";
-			tooltipElt.className = "irtooltip irtooltip-w";
-			break;
-		case "n":
-			tooltipElt.style.marginLeft = ((coordElt.width - coordTooltip.width)/2) + "px";
-			tooltipElt.style.marginTop = -coordTooltip.height + "px";
-			tooltipElt.className = "irtooltip irtooltip-n";
-			break;
+			case "e":
+				tooltipElt.style.marginLeft = coordElt.width + "px";
+				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.className = "irtooltip irtooltip-e";
+				break;
+			case "s":
+				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
+				tooltipElt.style.marginTop = coordElt.height + "px";
+				tooltipElt.className = "irtooltip irtooltip-s";
+				break;
+			case "w":
+				tooltipElt.style.marginLeft = -coordTooltip.width + "px";
+				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.className = "irtooltip irtooltip-w";
+				break;
+			case "n":
+				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
+				tooltipElt.style.marginTop = -coordTooltip.height + "px";
+				tooltipElt.className = "irtooltip irtooltip-n";
+				break;
 		}
-
 	} while (eltOutOfScreen(tooltipElt) && positionList.length);
 
 	// Set the watcher on this element
@@ -206,20 +202,23 @@ export function tooltip(elt, message = null, initialPosition = null) {
 }
 
 export default function (el, binding) {
-	const config = Object.assign({
-		/**
-		 * The text to display
-		 */
-		text: null,
-		/**
-		 * Asynchronous function to be called and resolved when the tooltip shows
-		 */
-		async: null,
-		/**
-		 * The position or positions the tooltip can take (by order of priority)
-		 */
-		position: defaultPosition
-	}, binding.value);
+	const config = Object.assign(
+		{
+			/**
+			 * The text to display
+			 */
+			text: null,
+			/**
+			 * Asynchronous function to be called and resolved when the tooltip shows
+			 */
+			async: null,
+			/**
+			 * The position or positions the tooltip can take (by order of priority)
+			 */
+			position: defaultPosition,
+		},
+		binding.value
+	);
 
 	el.addEventListener("mouseenter", tooltipFromEvent, false);
 	el.addEventListener("mouseleave", tooltipHide, false);
@@ -227,8 +226,7 @@ export default function (el, binding) {
 	// Set the attributes
 	if (config.text) {
 		el.setAttribute("data-irtooltip", config.text);
-	}
-	else {
+	} else {
 		el.removeAttribute("data-irtooltip");
 	}
 
@@ -243,11 +241,9 @@ export default function (el, binding) {
 
 	if (config.position == defaultPosition) {
 		el.removeAttribute("data-irtooltip-position");
-	}
-	else if (typeof config.position === "string") {
+	} else if (typeof config.position === "string") {
 		el.setAttribute("data-irtooltip-position", config.position);
-	}
-	else {
+	} else {
 		el.setAttribute("data-irtooltip-position", config.position.join(","));
 	}
 }

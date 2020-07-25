@@ -1,5 +1,3 @@
-
-
 import Fetch from "bzd/core/fetch.mjs";
 
 function _getStatus(item) {
@@ -23,15 +21,15 @@ function getFetchOptions(username, token) {
 		expect: "json",
 		headers: {
 			"Content-Type": "application/vnd.github.v3+json",
-			"User-Agent": "curl"
-		}
+			"User-Agent": "curl",
+		},
 	};
 
 	if (token) {
 		options.authentication = {
 			type: "basic",
 			username: username,
-			password: token
+			password: token,
 		};
 	}
 
@@ -43,20 +41,23 @@ export default {
 		{
 			collection: "github.builds",
 			fetch: async function (username, repository, workflowId, token) {
-
 				// Build the URL
-				const baseUrl = "https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
-				const url = baseUrl + ((workflowId) ? ("/actions/workflows/" + encodeURIComponent(workflowId) + "/runs") : "/actions/runs");
+				const baseUrl =
+					"https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
+				const url =
+					baseUrl + (workflowId ? "/actions/workflows/" + encodeURIComponent(workflowId) + "/runs" : "/actions/runs");
 
 				const result = await Fetch.get(url, getFetchOptions(username, token));
 
 				let builds = [];
 				let promises = [];
 				for (const item of result.workflow_runs || []) {
-					promises.push((async () => {
-						const result = await this.get("github.jobs", item.jobs_url, username, token);
-						builds.push(result);
-					})());
+					promises.push(
+						(async () => {
+							const result = await this.get("github.jobs", item.jobs_url, username, token);
+							builds.push(result);
+						})()
+					);
 				}
 
 				await Promise.all(promises);
@@ -67,7 +68,6 @@ export default {
 		{
 			collection: "github.jobs",
 			fetch: async (url, username, token, prevValue, cacheOptions) => {
-
 				const resultJobs = await Fetch.get(url, getFetchOptions(username, token));
 
 				let dateStart = Date.now();
@@ -80,14 +80,11 @@ export default {
 					const jobStatus = _getStatus(job);
 					if (jobStatus == "in-progress") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "failure") {
+					} else if (jobStatus == "failure") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "success" && status == "unknown") {
+					} else if (jobStatus == "success" && status == "unknown") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
+					} else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
 						status = jobStatus;
 					}
 					link = job.html_url;
@@ -98,18 +95,24 @@ export default {
 				}
 
 				return {
-					duration: (dateEnd - dateStart) || 0,
+					duration: dateEnd - dateStart || 0,
 					timestamp: dateStart || Date.now(),
 					status: status,
-					link: link
+					link: link,
 				};
-			}
-		}
+			},
+		},
 	],
 	fetch: async (data, cache) => {
-		const builds = await cache.get("github.builds", data["github.username"], data["github.repository"], data["github.workflowid"], data["github.token"]);
+		const builds = await cache.get(
+			"github.builds",
+			data["github.username"],
+			data["github.repository"],
+			data["github.workflowid"],
+			data["github.token"]
+		);
 		return {
-			builds: builds
+			builds: builds,
 		};
-	}
+	},
 };

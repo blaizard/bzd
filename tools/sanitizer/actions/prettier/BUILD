@@ -18,5 +18,5 @@ bzd_nodejs_binary(
     deps = [
         "//nodejs/core:filesystem",
         "//tools/sanitizer/utils/nodejs:workspace",
-    ]
+    ],
 )

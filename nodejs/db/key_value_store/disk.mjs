@@ -10,16 +10,18 @@ import { CollectionPaging } from "../utils.mjs";
  * Key value store for low demanding application, that presists on the local disk.
  */
 export default class KeyValueStoreDisk extends KeyValueStore {
-
 	constructor(path, options) {
 		super();
 
-		this.options = Object.assign({
-			/**
-			 * Bucket specific options 
-			 */
-			buckets: {},
-		}, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * Bucket specific options
+				 */
+				buckets: {},
+			},
+			options
+		);
 		// The path where to store the database
 		this.path = path;
 		// Contains all open persistencies (aka buckets)
@@ -35,7 +37,6 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	 * Initialization of the class
 	 */
 	async _initializeImpl() {
-
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
@@ -45,19 +46,19 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	 * Return the persistence associated with a specific bucket and, if needed, create it and load it.
 	 */
 	async _getPersistence(bucket) {
-
 		if (!this.cache.isCollection(bucket)) {
-
 			// Register this bucket in the cache
 			this.cache.register(bucket, async () => {
-
 				// Read bucket specific options
-				const optionsBucket = Object.assign({
-					/**
-					 * \brief Perform a savepoint every X seconds
-					 */
-					savepointIntervalS: 5 * 60
-				}, (bucket in this.options.buckets) ? this.options.buckets[bucket] : {});
+				const optionsBucket = Object.assign(
+					{
+						/**
+						 * \brief Perform a savepoint every X seconds
+						 */
+						savepointIntervalS: 5 * 60,
+					},
+					bucket in this.options.buckets ? this.options.buckets[bucket] : {}
+				);
 
 				// Load the persistence
 				const options = {
@@ -65,13 +66,13 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 					savepointTask: {
 						namespace: "kvs",
 						name: bucket,
-						intervalMs: optionsBucket.savepointIntervalS * 1000
-					}
+						intervalMs: optionsBucket.savepointIntervalS * 1000,
+					},
 				};
 
 				let persistence = new PersistenceDisk(Path.join(this.path, bucket), options);
 				await persistence.waitReady();
-				// Preload the data in order to get accurate attribute size 
+				// Preload the data in order to get accurate attribute size
 				await persistence.get();
 				return persistence;
 			});
@@ -82,7 +83,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	}
 
 	generateUID() {
-		return "UID-" + (Date.now()) + "-" + (Math.floor(Math.random() * 0xffffffff));
+		return "UID-" + Date.now() + "-" + Math.floor(Math.random() * 0xffffffff);
 	}
 
 	/**
@@ -94,7 +95,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 
 	async set(bucket, key, value) {
 		let persistence = await this._getPersistence(bucket);
-		const uid = (key === null) ? this.generateUID() : key;
+		const uid = key === null ? this.generateUID() : key;
 		await persistence.write("set", uid, value);
 		return uid;
 	}
@@ -102,7 +103,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	async get(bucket, key, defaultValue = undefined) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
-		return (key in data) ? data[key] : defaultValue;
+		return key in data ? data[key] : defaultValue;
 	}
 
 	/**
@@ -117,7 +118,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	}
 
 	/**
-	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values). 
+	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values).
 	 * \param bucket The bucket to be used.
 	 * \param subKey The subkey for the match.
 	 * \param value The value of values (if a list) to match.
@@ -127,14 +128,16 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	async listMatch(bucket, subKey, value, maxOrPaging = 10) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
-		const valueList = (Array.isArray(value)) ? value : [value];
-		const filteredData = Object.keys(data).filter((name) => {
-			const entry = data[name];
-			return subKey in entry && valueList.includes(entry[subKey]);
-		}).reduce((obj, name) => {
-			obj[name] = data[name];
-			return obj;
-		}, {});
+		const valueList = Array.isArray(value) ? value : [value];
+		const filteredData = Object.keys(data)
+			.filter((name) => {
+				const entry = data[name];
+				return subKey in entry && valueList.includes(entry[subKey]);
+			})
+			.reduce((obj, name) => {
+				obj[name] = data[name];
+				return obj;
+			}, {});
 		return CollectionPaging.makeFromObject(filteredData, maxOrPaging);
 	}
 

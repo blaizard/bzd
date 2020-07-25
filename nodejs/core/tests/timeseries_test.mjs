@@ -1,15 +1,12 @@
-
-
 import ExceptionFactory from "../exception.mjs";
 import TimeSeries from "../timeseries.mjs";
 
 const Exception = ExceptionFactory("test", "timeseries");
 
 describe("TimeSeries", () => {
-
 	it("Insert non-unique", () => {
 		let timeseries = new TimeSeries();
-		for (let i=0; i<10000; ++i) {
+		for (let i = 0; i < 10000; ++i) {
 			const timestamp = Math.floor(Math.random() * Math.floor(1000));
 			timeseries.insert(timestamp, 0);
 		}
@@ -19,7 +16,7 @@ describe("TimeSeries", () => {
 	it("Insert unique", () => {
 		let timeseries = new TimeSeries({
 			unique: true,
-			uniqueMerge: (a, b) => (a + b)
+			uniqueMerge: (a, b) => a + b,
 		});
 		Exception.assert(timeseries.length == 0, timeseries.data);
 		timeseries.insert(0, 1);
@@ -36,7 +33,7 @@ describe("TimeSeries", () => {
 
 	it("getTimestamp", () => {
 		let timeseries = new TimeSeries();
-		for (let i=0; i<10; ++i) {
+		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 0);
 		}
 
@@ -52,7 +49,7 @@ describe("TimeSeries", () => {
 
 	it("Find", () => {
 		let timeseries = new TimeSeries();
-		for (let i=0; i<10; ++i) {
+		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 0);
 		}
 		Exception.assertEqual(timeseries.find_(0), 0, timeseries.data);
@@ -75,7 +72,7 @@ describe("TimeSeries", () => {
 		}
 
 		// Fill with data
-		for (let i=0; i<10; ++i) {
+		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 0);
 		}
 
@@ -96,14 +93,14 @@ describe("TimeSeries", () => {
 		// From non existing inclusive
 		{
 			let data = [];
-			timeseries.forEach((timestamp) => data.push(timestamp), 3.5, undefined, /*inclusive*/true);
+			timeseries.forEach((timestamp) => data.push(timestamp), 3.5, undefined, /*inclusive*/ true);
 			Exception.assertEqual(data, [3, 4, 5, 6, 7, 8, 9]);
 		}
 
 		// From non existing exclusive
 		{
 			let data = [];
-			timeseries.forEach((timestamp) => data.push(timestamp), 3.5, undefined, /*inclusive*/false);
+			timeseries.forEach((timestamp) => data.push(timestamp), 3.5, undefined, /*inclusive*/ false);
 			Exception.assertEqual(data, [4, 5, 6, 7, 8, 9]);
 		}
 
@@ -117,21 +114,21 @@ describe("TimeSeries", () => {
 		// Until non existing inclusive
 		{
 			let data = [];
-			timeseries.forEach((timestamp) => data.push(timestamp), undefined, 3.5, /*inclusive*/true);
+			timeseries.forEach((timestamp) => data.push(timestamp), undefined, 3.5, /*inclusive*/ true);
 			Exception.assertEqual(data, [0, 1, 2, 3, 4]);
 		}
 
 		// Until non existing exclusive
 		{
 			let data = [];
-			timeseries.forEach((timestamp) => data.push(timestamp), undefined, 3.5, /*inclusive*/false);
+			timeseries.forEach((timestamp) => data.push(timestamp), undefined, 3.5, /*inclusive*/ false);
 			Exception.assertEqual(data, [0, 1, 2, 3]);
 		}
 	});
 
 	it("Consistency", () => {
 		let timeseries = new TimeSeries();
-		for (let i=0; i<10; ++i) {
+		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 0);
 		}
 		Exception.assert(timeseries.consistencyCheck(), timeseries.data);
@@ -148,9 +145,9 @@ describe("TimeSeries", () => {
 	it("Consistency unique", () => {
 		let timeseries = new TimeSeries({
 			unique: true,
-			uniqueMerge: (a, b) => (a + b)
+			uniqueMerge: (a, b) => a + b,
 		});
-		for (let i=0; i<10; ++i) {
+		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 1);
 		}
 		Exception.assert(timeseries.consistencyCheck(), timeseries.data);
@@ -162,6 +159,17 @@ describe("TimeSeries", () => {
 		// Fix consistency issue
 		timeseries.consistencyFix();
 		Exception.assert(timeseries.consistencyCheck(), timeseries.data);
-		Exception.assertEqual(timeseries.data, [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 2], [6, 1], [7, 1], [8, 1], [9, 1]]);
+		Exception.assertEqual(timeseries.data, [
+			[0, 1],
+			[1, 1],
+			[2, 1],
+			[3, 1],
+			[4, 1],
+			[5, 2],
+			[6, 1],
+			[7, 1],
+			[8, 1],
+			[9, 1],
+		]);
 	});
 });

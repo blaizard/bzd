@@ -1,5 +1,3 @@
-
-
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationServer from "../server.mjs";
@@ -35,11 +33,10 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.sign(data, this.options.privateKey, { expiresIn: expiresIn }, (e, token) => {
 				if (e) {
 					reject(e);
-				}
-				else {
+				} else {
 					resolve({
 						token: token,
-						timeout: expiresIn
+						timeout: expiresIn,
 					});
 				}
 			});
@@ -47,20 +44,18 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 	}
 
 	installAPI(api) {
-
 		Log.debug("Installing token-based authentication API.");
 		api.addSchema(APISchema);
 
 		const authentication = this;
 		const generateTokens = async function (uid, persistent) {
-
 			// Generates the refresh tocken and set it to a cookie
 			const refreshToken = await authentication.generateRefreshToken(uid, persistent);
 			this.setCookie("refresh_token", refreshToken.token, {
 				httpOnly: true,
-				maxAge: refreshToken.timeout * 1000
+				maxAge: refreshToken.timeout * 1000,
 			});
-	
+
 			// Generate the access token
 			return await authentication.generateAccessToken({ uid: uid });
 		};
@@ -78,7 +73,6 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 
 		api.handle("post", "/auth/refresh", async function () {
-
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
 				return this.setStatus(401, "Unauthorized");
@@ -87,8 +81,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			let data = null;
 			try {
 				data = await authentication.readToken(refreshToken);
-			}
-			catch (e) {
+			} catch (e) {
 				Log.error(e);
 				return this.setStatus(401, "Unauthorized");
 			}
@@ -108,7 +101,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			}
 		}
 
-		if ("t" in  request.query) {
+		if ("t" in request.query) {
 			token = request.query.t;
 		}
 
@@ -123,8 +116,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		try {
 			const data = await this.readToken(token);
 			return await verifyCallback(data.uid);
-		}
-		catch (e) {
+		} catch (e) {
 			return false;
 		}
 	}
@@ -134,7 +126,10 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 	}
 
 	async generateRefreshToken(uid, persistent) {
-		return await this._generateToken({uid: uid, persistent: persistent}, (persistent) ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn);
+		return await this._generateToken(
+			{ uid: uid, persistent: persistent },
+			persistent ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn
+		);
 	}
 
 	async readToken(token) {
@@ -143,8 +138,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.verify(token, this.options.publicKey || this.options.privateKey, (e, data) => {
 				if (e) {
 					reject(e);
-				}
-				else {
+				} else {
 					resolve(data);
 				}
 			});

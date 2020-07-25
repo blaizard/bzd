@@ -1,5 +1,3 @@
-
-
 import Event from "../../core/event.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 
@@ -9,11 +7,10 @@ const Exception = ExceptionFactory("db", "timeseries");
  * File storage module
  */
 export default class Storage {
-
 	constructor() {
 		this.event = new Event({
-			ready: {proactive: true},
-			error: {proactive: true}
+			ready: { proactive: true },
+			error: { proactive: true },
 		});
 	}
 
@@ -24,8 +21,7 @@ export default class Storage {
 		try {
 			this.event.trigger("ready");
 			await this._initializeImpl();
-		}
-		catch (e) {
+		} catch (e) {
 			this.event.trigger("error", e);
 			throw e;
 		}
@@ -34,8 +30,7 @@ export default class Storage {
 	/**
 	 * Initialization function (optional)
 	 */
-	async _initializeImpl() {
-	}
+	async _initializeImpl() {}
 
 	/**
 	 * This function waits until the persistence is ready

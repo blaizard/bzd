@@ -1,5 +1,3 @@
-
-
 import Path from "path";
 import Fs from "fs";
 
@@ -7,14 +5,13 @@ import Fs from "fs";
  * Collection of Promise-based asynchronous functions for the file system.
  */
 export default class FileSystem {
-
 	/**
 	 * Checks if the file or directory exists
 	 */
 	static async exists(path) {
 		return new Promise((resolve) => {
 			Fs.access(path, Fs.F_OK, (e) => {
-				resolve((e) ? false : true);
+				resolve(e ? false : true);
 			});
 		});
 	}
@@ -25,7 +22,7 @@ export default class FileSystem {
 	static async stat(path) {
 		return new Promise((resolve, reject) => {
 			Fs.stat(path, (e, stats) => {
-				return (e) ? reject(e) : resolve(stats);
+				return e ? reject(e) : resolve(stats);
 			});
 		});
 	}
@@ -35,7 +32,7 @@ export default class FileSystem {
 	 */
 	static async mkdir(path) {
 		await Fs.promises.mkdir(path, {
-			recursive: true
+			recursive: true,
 		});
 	}
 
@@ -43,15 +40,13 @@ export default class FileSystem {
 	 * Remove a directory recursively
 	 */
 	static async rmdir(path) {
-
 		const fileList = await FileSystem.readdir(path);
 		for (const i in fileList) {
 			const curPath = Path.resolve(path, fileList[i]);
 			const stat = await FileSystem.stat(curPath);
 			if (stat.isDirectory()) {
 				await FileSystem.rmdir(curPath);
-			}
-			else {
+			} else {
 				await FileSystem.unlink(curPath);
 			}
 		}
@@ -64,7 +59,7 @@ export default class FileSystem {
 	 */
 	static async readFile(path, options = "utf8") {
 		const data = await Fs.promises.readFile(path, {
-			encoding: options
+			encoding: options,
 		});
 		return data.toString();
 	}
@@ -74,7 +69,7 @@ export default class FileSystem {
 	 */
 	static async writeFile(path, data, options = "utf8") {
 		await Fs.promises.writeFile(path, data, {
-			encoding: options
+			encoding: options,
 		});
 	}
 
@@ -92,7 +87,6 @@ export default class FileSystem {
 	static async move(pathFrom, pathTo) {
 		await Fs.promises.rename(pathFrom, pathTo);
 	}
-
 
 	/**
 	 * Rename a file.

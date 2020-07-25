@@ -8,7 +8,7 @@ export default class LocalStorage {
 
 	static get(key, defaultValue) {
 		const value = window.localStorage.getItem(key);
-		return (value === null) ? (defaultValue || null) : value;
+		return value === null ? defaultValue || null : value;
 	}
 
 	static remove(key) {

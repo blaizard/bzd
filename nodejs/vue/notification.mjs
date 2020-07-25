@@ -1,11 +1,9 @@
-
-
 export default {
 	install(Vue) {
 		Vue.prototype.$notification = new Vue({
 			data: {
 				entries: [],
-				_uid: 0
+				_uid: 0,
 			},
 			methods: {
 				_tryToString(message) {
@@ -24,13 +22,11 @@ export default {
 						for (const key in message) {
 							this._notifySingle(key, type, message[key], options);
 						}
-					}
-					else {
+					} else {
 						this._notifySingle(++this._uid, type, message, options);
 					}
 				},
 				_notifySingle(key, type, message, options) {
-
 					message = this._tryToString(message);
 
 					// If the entry does not exists, create it
@@ -49,15 +45,14 @@ export default {
 					const entry = Object.assign(this.entries[index], options, {
 						type: type,
 						message: message,
-						key: key
+						key: key,
 					});
 					this.entries.splice(index, 1, entry);
 
 					// If null, delete the entry
 					if (message === null) {
 						this.close(entry);
-					}
-					else if (entry.timeOnScreen > 0) {
+					} else if (entry.timeOnScreen > 0) {
 						setTimeout(() => {
 							this.close(entry);
 						}, entry.timeOnScreen * 1000);
@@ -78,9 +73,16 @@ export default {
 					this._notify("info", message, options);
 				},
 				error(message, options) {
-					this._notify("error", message, Object.assign({
-						timeOnScreen: 0
-					}, options));
+					this._notify(
+						"error",
+						message,
+						Object.assign(
+							{
+								timeOnScreen: 0,
+							},
+							options
+						)
+					);
 				},
 				success(message, options) {
 					this._notify("success", message, options);
@@ -90,8 +92,8 @@ export default {
 					if (index != -1) {
 						this.entries.splice(index, 1);
 					}
-				}
-			}
+				},
+			},
 		});
-	}
+	},
 };

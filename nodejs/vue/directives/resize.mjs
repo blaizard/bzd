@@ -1,5 +1,3 @@
-
-
 // Used to generated unique Ids
 let elementUid = 0;
 
@@ -7,7 +5,6 @@ let elementUid = 0;
 let observers = {};
 
 function onResizeProcess(el, callback) {
-
 	let uid = getElementId(el);
 
 	// Register the observer if not already done
@@ -26,7 +23,6 @@ function onResizeProcess(el, callback) {
 
 	// Make everything asynchronous to avoid any execution time limit from the ResizeObserver
 	observers[uid].instance = setTimeout(() => {
-
 		// If the element has been destroyed in the mean time, remove it and ignore this request
 		if (!el.parentElement) {
 			unregisterObserver(uid);
@@ -58,18 +54,17 @@ function registerObserver(el, callback) {
 			}),
 			callback: callback,
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 		observers[uid].obj.observe(el);
-	}
-	else {
+	} else {
 		observers[uid] = {
 			obj: setInterval(() => {
 				onResizeProcess(el);
 			}, 1000),
 			callback: callback,
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 	}
 
@@ -81,8 +76,7 @@ function unregisterObserver(uid) {
 		clearTimeout(observers[uid].instance);
 		if (typeof ResizeObserver !== "undefined") {
 			observers[uid].obj.disconnect();
-		}
-		else {
+		} else {
 			clearInterval(observers[uid].obj);
 		}
 		delete observers[uid];
@@ -94,20 +88,20 @@ function getElementId(el) {
 }
 
 function setElementId(el) {
-	const uid = "autosize-" + (++elementUid);
+	const uid = "autosize-" + ++elementUid;
 	el.setAttribute("data-irresize", uid);
 	return uid;
 }
 
 export default {
-	inserted: function(el, binding) {
+	inserted: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
-	componentUpdated: function(el, binding) {
+	componentUpdated: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
 	unbind: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
-	}
+	},
 };

@@ -1,5 +1,3 @@
-
-
 import Email from "./email.mjs";
 import ExceptionFactory from "../core/exception.mjs";
 import Fetch from "../core/fetch.mjs";
@@ -10,7 +8,6 @@ const Exception = ExceptionFactory("email", "sendgrid");
  * Email module
  */
 export default class Sendgrid extends Email {
-
 	constructor(options) {
 		super();
 
@@ -26,23 +23,27 @@ export default class Sendgrid extends Email {
 	async _sendImpl(toList, subject, data) {
 		await Fetch.request("https://api.sendgrid.com/v3/mail/send", {
 			method: "post",
-			authentication:  {
+			authentication: {
 				type: "bearer",
-				token: this.key
+				token: this.key,
 			},
 			data: {
-				personalizations: [{
-					to: toList.map((to) => ({"email": to})),
-					subject: subject
-				}],
+				personalizations: [
+					{
+						to: toList.map((to) => ({ email: to })),
+						subject: subject,
+					},
+				],
 				from: {
-					"email": this.from
+					email: this.from,
 				},
-				content: [{
-					type: (data.format == "text") ? "text/plain" : "text/html",
-					value: data.content
-				}]
-			}
+				content: [
+					{
+						type: data.format == "text" ? "text/plain" : "text/html",
+						value: data.content,
+					},
+				],
+			},
 		});
 	}
 }

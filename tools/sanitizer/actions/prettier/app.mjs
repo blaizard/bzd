@@ -6,25 +6,23 @@ import FileSystem from "bzd/core/filesystem.mjs";
 	const workspace = process.argv[2];
 
 	const files = new Workspace(workspace, {
-		include: [
-			"**.mjs"
-		]
+		include: ["**.mjs"],
 	});
 
 	for await (const path of files.data()) {
 		const content = await FileSystem.readFile(path);
 		const formattedContent = Prettier.format(content, {
+			printWidth: 120,
 			parser: "babel",
 			useTabs: true,
 			singleQuote: false,
 			semi: true,
-			bracketSpacing: false,
+			bracketSpacing: true,
 			arrowParens: "always",
-			vueIndentScriptAndStyle: true
+			vueIndentScriptAndStyle: true,
 		});
 		await FileSystem.writeFile(path, formattedContent);
 	}
-
 })().catch((error) => {
 	process.exitCode = 1;
 	console.error(error);

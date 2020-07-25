@@ -9,7 +9,7 @@ const { ESLint } = require("eslint");
 		cwd: workspace,
 		resolvePluginsRelativeTo: process.cwd(),
 		overrideConfigFile:
-      process.cwd() + "/tools/sanitizer/actions/eslint/eslint.json",
+      process.cwd() + "/tools/sanitizer/actions/eslint/.eslintrc.json",
 	});
 
 	// 2. Lint files. This doesn't modify target files.

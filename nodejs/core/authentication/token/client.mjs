@@ -1,5 +1,3 @@
-
-
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationClient from "../client.mjs";
@@ -16,7 +14,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			 * Returns a dictionary with the token and refresh_token keys.
 			 * Returns null in case the refresh got invalidated.
 			 */
-			refreshTokenCallback: null
+			refreshTokenCallback: null,
 		});
 
 		// Token to be used during this session.
@@ -25,7 +23,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	isAuthenticated() {
-		return (this.token !== null);
+		return this.token !== null;
 	}
 
 	installAPI(api) {
@@ -39,11 +37,10 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		}
 
 		// Try to refresh the current token if any
-		this.tryRefreshAuthentication(/*nothrow*/true);
+		this.tryRefreshAuthentication(/*nothrow*/ true);
 	}
 
 	setToken(token, timeoutS = 0) {
-
 		const isPreviousAuthenticated = this.isAuthenticated();
 		this.token = token;
 		if (isPreviousAuthenticated != this.isAuthenticated()) {
@@ -60,7 +57,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			}, Math.max(timeoutS - 60, 30) * 1000);
 		}
 	}
-    
+
 	/**
 	 * Try to refresh the token
 	 */
@@ -73,9 +70,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 					this.setToken(result.token, result.timeout);
 					return true;
 				}
-			}
-			catch (e) {
-				if (!nothrow && e.code != 401/*Unauthorized*/) {
+			} catch (e) {
+				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}
 			}
@@ -84,9 +80,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async refreshAuthentication() {
-
 		// Try to refresh the token
-		if (await this.tryRefreshAuthentication(/*nothrow*/false)) {
+		if (await this.tryRefreshAuthentication(/*nothrow*/ false)) {
 			return;
 		}
 		this.setToken(null);
@@ -100,7 +95,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async setAuthenticationFetch(fetchOptions) {
-
 		if (!this.isAuthenticated()) {
 			await this.refreshAuthentication();
 		}
@@ -108,22 +102,25 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		// Automatically add authentication information to the request
 		fetchOptions.authentication = {
 			type: "bearer",
-			token: this.token
+			token: this.token,
 		};
 	}
 
 	async makeAuthenticationURL(url) {
-
 		if (!this.isAuthenticated()) {
 			await this.refreshAuthentication();
 		}
 
-		url += ((url.includes("?")) ? "&t=" : "?t=") + encodeURIComponent(this.token);
+		url += (url.includes("?") ? "&t=" : "?t=") + encodeURIComponent(this.token);
 		return url;
 	}
 
 	async login(api, uid, password, persistent = false) {
-		const result = await api.request("post", "/auth/login", { uid: uid, password: password, persistent: persistent });
+		const result = await api.request("post", "/auth/login", {
+			uid: uid,
+			password: password,
+			persistent: persistent,
+		});
 		this.setToken(result.token, result.timeout);
 		return true;
 	}

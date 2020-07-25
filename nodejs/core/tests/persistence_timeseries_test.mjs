@@ -1,5 +1,3 @@
-
-
 import Path from "path";
 import Fs from "fs";
 import Os from "os";
@@ -16,7 +14,7 @@ const tempDirPath = Fs.mkdtempSync(Path.join(Os.tmpdir(), "persistence-timeserie
 const persistenceOptions = {
 	path: Path.resolve(tempDirPath, "test.persistence.timeseries.json"),
 	maxEntriesPerFile: 10,
-	savepointTask: null
+	savepointTask: null,
 };
 
 after(async () => {
@@ -30,11 +28,8 @@ async function environmentCleanup() {
 }
 
 describe("PersistenceTimeSeries", () => {
-
 	describe("actions", () => {
-
 		it("increasing timestamp", async () => {
-
 			await environmentCleanup();
 
 			let timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
@@ -42,7 +37,7 @@ describe("PersistenceTimeSeries", () => {
 
 			// Build a list of random points to be added
 			let sampleList = [];
-			for (let i = 0; i<100; ++i) {
+			for (let i = 0; i < 100; ++i) {
 				const timestamp = i; //Math.floor(Math.random() * Number.MAX_VALUE - Number.MAX_VALUE / 2);
 				await timeseries.insert(timestamp, timestamp);
 				sampleList.push(timestamp);
@@ -69,11 +64,15 @@ describe("PersistenceTimeSeries", () => {
 			}
 			{
 				let count = 50;
-				await timeseries.forEach((timestamp, data) => {
-					Exception.assertEqual(timestamp, data);
-					Exception.assertEqual(sampleList[count], timestamp);
-					++count;
-				}, 50, 80);
+				await timeseries.forEach(
+					(timestamp, data) => {
+						Exception.assertEqual(timestamp, data);
+						Exception.assertEqual(sampleList[count], timestamp);
+						++count;
+					},
+					50,
+					80
+				);
 				Exception.assertEqual(count, 81);
 			}
 
@@ -81,7 +80,6 @@ describe("PersistenceTimeSeries", () => {
 		}).timeout(30000);
 
 		it("random timestamp", async () => {
-
 			await environmentCleanup();
 
 			let timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
@@ -89,7 +87,7 @@ describe("PersistenceTimeSeries", () => {
 
 			// Build a list of random points to be added
 			let sampleList = [];
-			for (let i = 0; i<100; ++i) {
+			for (let i = 0; i < 100; ++i) {
 				const timestamp = Math.floor(Math.random() * 1000); // - 500);
 
 				// Ignore duplicates (this needs to be fixed)
@@ -110,7 +108,7 @@ describe("PersistenceTimeSeries", () => {
 
 			// Check the samples
 			let count = 0;
-			sampleList.sort((a, b) => (a - b));
+			sampleList.sort((a, b) => a - b);
 
 			await timeseries.forEach((timestamp, data) => {
 				Exception.assertEqual(timestamp, data);
