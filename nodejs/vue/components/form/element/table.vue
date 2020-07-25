@@ -56,10 +56,10 @@
 				 * Return whether or not a row should be disabled
 				 */
 				rowDisable: this.getOption("rowDisable", (/*value*/) => false),
-			/**
-			 * The columns to be displayed
-			 */
-			//template: this.getOption("template", [])
+				/**
+				 * The columns to be displayed
+				 */
+				//template: this.getOption("template", [])
 			};
 		},
 		props: {

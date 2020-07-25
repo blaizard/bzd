@@ -105,7 +105,7 @@
 							// Add the new item
 							this.itemAdd(output);
 						},
-				})
+					})
 					: null;
 			},
 			// Overload internal attributes
@@ -180,7 +180,7 @@
 					const indexUpload = index - this.valueList.length;
 					this.uploadValueList[indexUpload].cancel();
 				}
-			else {
+				else {
 					await ArrayElement.methods.itemDelete.call(this, index);
 				}
 			},

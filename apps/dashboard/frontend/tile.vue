@@ -141,11 +141,11 @@
 					this.showComponent = true;
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
 				}
-			catch (e) {
+				catch (e) {
 					this.handleError("Error while fetching data: " + String(e));
 					this.handleColor("red");
 				}
-			finally {
+				finally {
 					this.loading = false;
 				}
 			},
@@ -160,7 +160,7 @@
 				if (this.edit) {
 					this.$routerDispatch("/update/" + this.uid);
 				}
-			else if (this.link) {
+				else if (this.link) {
 					window.open(this.link);
 				}
 			},

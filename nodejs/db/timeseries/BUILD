@@ -9,11 +9,24 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:cache",
-        "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/persistence:timeseries",
+        "//nodejs/db:utils",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "elasticsearch",
+    srcs = [
+        "elasticsearch.mjs",
+        "timeseries.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:fetch",
         "//nodejs/db:utils",
     ],
 )

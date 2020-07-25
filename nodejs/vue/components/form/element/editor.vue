@@ -210,7 +210,7 @@
 				if (this.isTextSelected()) {
 					document.execCommand("removeFormat", false, null);
 				}
-			else {
+				else {
 					this.contentElement.innerHTML = this.contentElement.innerText;
 					this.contentElement.dispatchEvent(new Event("input"));
 				}
