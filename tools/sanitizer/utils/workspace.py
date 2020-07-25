@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import os
 import json
 import re
@@ -14,12 +12,12 @@ class Files:
 		configRaw = Path(__file__).parent.parent.joinpath(".sanitizer.json").read_text()
 		config = json.loads(configRaw)
 		self.path = path
-		self.workspace = Files.findWorkspace_(path)
+		self.workspace = Files._findWorkspace(path)
 		self.exclude = Filter(config.get("exclude", []) + exclude)
 		self.include = Filter(include)
 
 	@staticmethod
-	def findWorkspace_(path) -> Path:
+	def _findWorkspace(path) -> Path:
 		workspace = Path(path)
 		while True:
 			if workspace.joinpath("WORKSPACE").is_file():

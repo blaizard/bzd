@@ -154,4 +154,19 @@ export default class FileSystem {
 	static async close(fileHandle) {
 		await fileHandle.close();
 	}
+
+	/**
+	 * Walk through a directory and print all files
+	 */
+	static async *walk(path) {
+		const dirents = await Fs.promises.readdir(path, { withFileTypes: true });
+		for (const dirent of dirents) {
+			const res = Path.resolve(path, dirent.name);
+			if (dirent.isDirectory()) {
+				yield* FileSystem.walk(res);
+			} else {
+				yield res;
+			}
+		}
+	}
 }
