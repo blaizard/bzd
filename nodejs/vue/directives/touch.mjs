@@ -1,5 +1,3 @@
-
-
 const DRAG_ELEMENT = "drag-element";
 const DRAG_PLACEHOLDER = "drag-placeholder";
 const DRAG_RECEIVER_ACTIVE = "drag-receiver-active";
@@ -29,16 +27,20 @@ const STATE_INIT = 2;
 const STATE_DRAG = 3;
 let state = STATE_IDLE;
 
-const eventListenerOptions = {capture: true, passive: false};
-const eventIgnoreOptions = {capture: true, passive: false, once: true};
+const eventListenerOptions = { capture: true, passive: false };
+const eventIgnoreOptions = { capture: true, passive: false, once: true };
 
 // WebKit requires cancelable `touchmove` events to be added as early as possible
 if (typeof window === "object") {
-	window.addEventListener("touchmove", (e) => {
-		if (preventScrolling) {
-			e.preventDefault();
-		}
-	}, {passive: false});
+	window.addEventListener(
+		"touchmove",
+		(e) => {
+			if (preventScrolling) {
+				e.preventDefault();
+			}
+		},
+		{ passive: false }
+	);
 }
 
 function synchronizeCssStyles(src, destination, recursive) {
@@ -47,7 +49,7 @@ function synchronizeCssStyles(src, destination, recursive) {
 	if (recursive) {
 		const vSrcElements = src.childNodes;
 		const vDstElements = destination.childNodes;
-		for (let i = vSrcElements.length; i--;) {
+		for (let i = vSrcElements.length; i--; ) {
 			const vSrcElement = vSrcElements[i];
 			let vDstElement = vDstElements[i];
 			if (vSrcElement instanceof HTMLElement) {
@@ -58,12 +60,14 @@ function synchronizeCssStyles(src, destination, recursive) {
 }
 
 function isVisible(elt) {
-	if (elt.offsetParent === null) {return false;}
-	while (elt && (elt.body === undefined) && (elt.style.opacity === "" || parseFloat(elt.style.opacity) > 0.1)) {
+	if (elt.offsetParent === null) {
+		return false;
+	}
+	while (elt && elt.body === undefined && (elt.style.opacity === "" || parseFloat(elt.style.opacity) > 0.1)) {
 		elt = elt.parentNode;
 	}
 	// Note: use "elt.body !== undefined" to support iframes
-	return (elt.body !== undefined);
+	return elt.body !== undefined;
 }
 
 function isPrimaryButtonOrTouch(e) {
@@ -71,19 +75,18 @@ function isPrimaryButtonOrTouch(e) {
 	 * Ignore mousedowns on any button other than the left (or primary)
 	 * mouse button, or when a modifier key is pressed.
 	 */
-	return (e.which === 1 && !e.ctrlKey && !e.altKey)
-			|| (e.touches && e.touches.length);
+	return (e.which === 1 && !e.ctrlKey && !e.altKey) || (e.touches && e.touches.length);
 }
 
 function getCoordinates(e) {
-	return (e.touches && e.touches.length) 
-		? {x: e.touches[0].pageX, y: e.touches[0].pageY}
-		: {x: e.pageX, y: e.pageY};
+	return e.touches && e.touches.length ? { x: e.touches[0].pageX, y: e.touches[0].pageY } : { x: e.pageX, y: e.pageY };
 }
 
 function getCurrentDistance() {
-	return Math.sqrt((originalCoord.x - currentCoord.x) * (originalCoord.x - currentCoord.x)
-			+ (originalCoord.y - currentCoord.y) * (originalCoord.y - currentCoord.y));
+	return Math.sqrt(
+		(originalCoord.x - currentCoord.x) * (originalCoord.x - currentCoord.x) +
+			(originalCoord.y - currentCoord.y) * (originalCoord.y - currentCoord.y)
+	);
 }
 
 function scrollOffsetY() {
@@ -98,19 +101,18 @@ function getEltCoordinates(elt) {
 	const relativePos = elt.getBoundingClientRect();
 	return {
 		x: relativePos.left + scrollOffsetX(),
-		y: relativePos.top + scrollOffsetY()
+		y: relativePos.top + scrollOffsetY(),
 	};
 }
 
 function removeAllClass(className) {
 	const elts = (receiverDocument || document).getElementsByClassName(className);
-	while(elts.length > 0){
+	while (elts.length > 0) {
 		elts[0].classList.remove(className);
 	}
 }
 
 function activateTouch(e, el, config) {
-
 	// Do nothing if the event if not correct
 	if (!config.enable || !isPrimaryButtonOrTouch(e)) {
 		return;
@@ -143,19 +145,18 @@ async function dragStart(e) {
 
 	if (curConfig.disablePointerEvents) {
 		Object.assign(document.body.style, {
-			"pointer-events": "none"
+			"pointer-events": "none",
 		});
 	}
 
 	if (curConfig.drag) {
-
 		// Set the drag active class on the body
 		if (curConfig.bodyDragClass) {
 			document.body.classList.add(curConfig.bodyDragClass);
 		}
 
 		// Reset the coordinates offset
-		receiverCoordOffset = {x: 0, y: 0};
+		receiverCoordOffset = { x: 0, y: 0 };
 		receiverDocument = document;
 
 		// Set class to all
@@ -168,7 +169,7 @@ async function dragStart(e) {
 				const coordIFrameViewPort = iframe.getBoundingClientRect();
 				receiverCoordOffset = {
 					x: coordIFrameViewPort.left,
-					y: coordIFrameViewPort.top
+					y: coordIFrameViewPort.top,
 				};
 				receiverDocument = iframe.contentWindow.document;
 			}
@@ -183,8 +184,7 @@ async function dragStart(e) {
 				elt.classList.add(DRAG_RECEIVER_ACTIVE);
 			});
 			activeReceiverElt = null;
-		}
-		else {
+		} else {
 			activeReceiverElt = originalElt.parentNode;
 			activeReceiverElt.classList.add(DRAG_RECEIVER_ACTIVE);
 			activeReceiverElt.classList.add(DRAG_OVER_ACTIVE);
@@ -195,20 +195,17 @@ async function dragStart(e) {
 		{
 			if (typeof curConfig.placeholder === "function") {
 				placeholderElt = await curConfig.placeholder(originalElt);
-			}
-			else if (curConfig.placeholder == "clone") {
+			} else if (curConfig.placeholder == "clone") {
 				placeholderElt = originalElt.cloneNode(true);
-				synchronizeCssStyles(originalElt, placeholderElt, /*recursive*/true);
-			}
-			else if (curConfig.placeholder == "cloneNode") {
+				synchronizeCssStyles(originalElt, placeholderElt, /*recursive*/ true);
+			} else if (curConfig.placeholder == "cloneNode") {
 				placeholderElt = originalElt.cloneNode(true);
-			}
-			else {
+			} else {
 				placeholderElt = document.createElement("div");
 			}
 			// Add the class
 			placeholderElt.classList.add(DRAG_PLACEHOLDER);
-			(curConfig.placeholderClass) && (placeholderElt.classList.add(curConfig.placeholderClass));
+			curConfig.placeholderClass && placeholderElt.classList.add(curConfig.placeholderClass);
 			for (const key in curConfig.placeholderCss) {
 				placeholderElt.style[key] = curConfig.placeholderCss[key];
 			}
@@ -218,29 +215,30 @@ async function dragStart(e) {
 		{
 			if (typeof curConfig.dragElt === "function") {
 				dragElt = await curConfig.dragElt();
-			}
-			else if (curConfig.dragElt == "clone") {
+			} else if (curConfig.dragElt == "clone") {
 				dragElt = originalElt.cloneNode(true);
-				synchronizeCssStyles(originalElt, dragElt, /*recursive*/true);
-			}
-			else if (curConfig.dragElt == "cloneNode") {
+				synchronizeCssStyles(originalElt, dragElt, /*recursive*/ true);
+			} else if (curConfig.dragElt == "cloneNode") {
 				dragElt = originalElt.cloneNode(true);
-			}
-			else {
+			} else {
 				dragElt = document.createElement("div");
 			}
 			// Add some style
-			Object.assign(dragElt.style, {
-				position: "fixed",
-				"pointer-events": "none",
-				"z-index": 99999999,
-				"margin-left": 0,
-				"margin-top": 0
-			}, curConfig.dragEltCss);
+			Object.assign(
+				dragElt.style,
+				{
+					position: "fixed",
+					"pointer-events": "none",
+					"z-index": 99999999,
+					"margin-left": 0,
+					"margin-top": 0,
+				},
+				curConfig.dragEltCss
+			);
 
 			// Add the class
 			dragElt.classList.add(DRAG_ELEMENT);
-			(curConfig.dragEltClass) && (dragElt.classList.add(curConfig.dragEltClass));
+			curConfig.dragEltClass && dragElt.classList.add(curConfig.dragEltClass);
 
 			// Happened it to the dom
 			document.body.appendChild(dragElt);
@@ -254,13 +252,12 @@ async function dragStart(e) {
 
 				coordOffset = {
 					x: coord.x - pos.x,
-					y: coord.y - pos.y
+					y: coord.y - pos.y,
 				};
-			}
-			else {
+			} else {
 				coordOffset = {
 					x: dragElt.offsetWidth / 2,
-					y: dragElt.offsetHeight / 2
+					y: dragElt.offsetHeight / 2,
 				};
 			}
 		}
@@ -297,7 +294,7 @@ async function dragStart(e) {
 
 	if (curConfig.drag) {
 		// Run the interval function to detect drop location
-		const detectDropZoneCallback = function() {
+		const detectDropZoneCallback = function () {
 			//const startTime = performance.now();
 			detectDropZone();
 			//console.log("detectDropZone took " + Math.round(performance.now() - startTime) + "ms");
@@ -316,17 +313,19 @@ function stopEventPropagation(e) {
  * Detect if a point is inside a rectangle given a specific tolerance
  */
 function isPointInRectangle(point, rectangle, tolerance) {
-	return (rectangle.left - tolerance <= point.x
-			&& rectangle.top - tolerance <= point.y
-			&& rectangle.left + rectangle.width + tolerance >= point.x
-			&& rectangle.top + rectangle.height + tolerance >= point.y);
+	return (
+		rectangle.left - tolerance <= point.x &&
+		rectangle.top - tolerance <= point.y &&
+		rectangle.left + rectangle.width + tolerance >= point.x &&
+		rectangle.top + rectangle.height + tolerance >= point.y
+	);
 }
 
 function detectDropZone() {
 	const coordDragEltViewPort = dragElt.getBoundingClientRect();
 	const coordViewPort = {
 		x: coordDragEltViewPort.left + coordOffset.x - receiverCoordOffset.x,
-		y: coordDragEltViewPort.top + coordOffset.y - receiverCoordOffset.y
+		y: coordDragEltViewPort.top + coordOffset.y - receiverCoordOffset.y,
 	};
 
 	if (receiverEltList) {
@@ -341,15 +340,16 @@ function detectDropZone() {
 				const coordEltViewPort = elt.getBoundingClientRect();
 
 				// First choice with no tolerance, use it
-				if (isPointInRectangle(coordViewPort, coordEltViewPort, /*tolerance*/0)) {
+				if (isPointInRectangle(coordViewPort, coordEltViewPort, /*tolerance*/ 0)) {
 					newActiveReveiverElt = elt;
 					break;
-				}
-				/*
-				 * This will act as the second guess if none of them matched. Note we use the last match as this will be
-				 * the outer (not nested) one. And this is what we want for the second guess.
-				 */
-				else if (isPointInRectangle(coordViewPort, coordEltViewPort, curConfig.toleranceReceiverMargin)) {
+				} else if (
+					/*
+					 * This will act as the second guess if none of them matched. Note we use the last match as this will be
+					 * the outer (not nested) one. And this is what we want for the second guess.
+					 */
+					isPointInRectangle(coordViewPort, coordEltViewPort, curConfig.toleranceReceiverMargin)
+				) {
 					newActiveReceiverEltWithTolerance = elt;
 				}
 			}
@@ -365,8 +365,7 @@ function detectDropZone() {
 			activeReceiverElt = newActiveReveiverElt;
 			removeAllClass(DRAG_OVER_ACTIVE);
 			activeReceiverElt.classList.add(DRAG_OVER_ACTIVE);
-		}
-		else if (activeReceiverElt && !newActiveReveiverElt) {
+		} else if (activeReceiverElt && !newActiveReveiverElt) {
 			activeReceiverElt = newActiveReveiverElt;
 			removeAllClass(DRAG_OVER_ACTIVE);
 		}
@@ -378,17 +377,22 @@ function detectDropZone() {
 		let isPlaceHolderBefore = false;
 
 		// Check if there is a callback
-		const activeReceiverConfig = Object.assign({
-			/**
-			 * List of indexes to be ignored
-			 */
-			ignore: []
-		}, (activeReceiverElt.hasAttribute(DRAG_RECEIVER_CONFIG)) ? JSON.parse(activeReceiverElt.getAttribute(DRAG_RECEIVER_CONFIG)) : undefined);
+		const activeReceiverConfig = Object.assign(
+			{
+				/**
+				 * List of indexes to be ignored
+				 */
+				ignore: [],
+			},
+			activeReceiverElt.hasAttribute(DRAG_RECEIVER_CONFIG)
+				? JSON.parse(activeReceiverElt.getAttribute(DRAG_RECEIVER_CONFIG))
+				: undefined
+		);
 
 		// Identify the active child element
 		{
 			const childList = activeReceiverElt.childNodes;
-			for (let i = 0; i<childList.length; ++i) {
+			for (let i = 0; i < childList.length; ++i) {
 				const child = childList[i];
 
 				// Ignore if this is the placeholder
@@ -398,7 +402,7 @@ function detectDropZone() {
 
 				// Check if this index is in the ignore list, if so ignore it
 				{
-					const actualIndex = (isPlaceHolderBefore) ? i - 1 : i;
+					const actualIndex = isPlaceHolderBefore ? i - 1 : i;
 					if (activeReceiverConfig.ignore.indexOf(actualIndex) !== -1) {
 						continue;
 					}
@@ -407,25 +411,25 @@ function detectDropZone() {
 				const coordChildViewPort = child.getBoundingClientRect();
 
 				// If the mouse pointer is above the child
-				const isOverChild = (coordViewPort.y <= coordChildViewPort.top + coordChildViewPort.height
-							&& coordViewPort.x <= coordChildViewPort.left + coordChildViewPort.width);
+				const isOverChild =
+					coordViewPort.y <= coordChildViewPort.top + coordChildViewPort.height &&
+					coordViewPort.x <= coordChildViewPort.left + coordChildViewPort.width;
 
 				if (isOverChild) {
-
 					// If the children is actually the placeholder, do nothing
 					if (child.classList.contains(DRAG_PLACEHOLDER)) {
 						return;
 					}
 
 					if (isPlaceHolderBefore) {
-
 						// Redraw the content by removing the placeholder to estimate the new coordinates
 						const prevDisplayProp = placeholderElt.style.display;
 						placeholderElt.style.display = "none";
 
 						const coordChildViewPortUpdated = child.getBoundingClientRect();
-						const isOverChildUpdated = (coordViewPort.y <= coordChildViewPortUpdated.top + coordChildViewPortUpdated.height
-								&& coordViewPort.x <= coordChildViewPortUpdated.left + coordChildViewPortUpdated.width);
+						const isOverChildUpdated =
+							coordViewPort.y <= coordChildViewPortUpdated.top + coordChildViewPortUpdated.height &&
+							coordViewPort.x <= coordChildViewPortUpdated.left + coordChildViewPortUpdated.width;
 
 						placeholderElt.style.display = prevDisplayProp;
 
@@ -452,16 +456,13 @@ function detectDropZone() {
 			if (isPlaceHolderBefore) {
 				if (activeChildElt.nextSibling) {
 					activeReceiverElt.insertBefore(placeholderElt, activeChildElt.nextSibling);
-				}
-				else {
+				} else {
 					activeReceiverElt.appendChild(placeholderElt);
 				}
-			}
-			else {
+			} else {
 				activeReceiverElt.insertBefore(placeholderElt, activeChildElt);
 			}
-		}
-		else {
+		} else {
 			activeReceiverElt.appendChild(placeholderElt);
 		}
 	}
@@ -474,7 +475,6 @@ function detectDropZone() {
 }
 
 function dragMove(e) {
-
 	if (!isPrimaryButtonOrTouch(e)) {
 		reset();
 		return;
@@ -497,21 +497,19 @@ function dragMove(e) {
 			// Calculate coordinate of the element according to the viewPort
 			const coordViewPort = {
 				x: currentCoord.x - scrollOffsetX(),
-				y: currentCoord.y - scrollOffsetY()
+				y: currentCoord.y - scrollOffsetY(),
 			};
 			dragElt.style.left = coordViewPort.x - coordOffset.x + "px";
 			dragElt.style.top = coordViewPort.y - coordOffset.y + "px";
 		}
-	}
-	else if (state == STATE_TRIGGER_DRAG_AFTER_MOVE) {
-
+	} else if (state == STATE_TRIGGER_DRAG_AFTER_MOVE) {
 		if (!curConfig.allowClickThrough) {
 			e.preventDefault();
 			e.stopPropagation();
 		}
 
 		if (getCurrentDistance() > 5) {
-			dragStart(e); 
+			dragStart(e);
 		}
 	}
 }
@@ -520,38 +518,31 @@ function dragMove(e) {
  * Reset all data and stop dragging
  */
 function reset() {
-
 	// Reset the user selection
 	if (curConfig.disablePointerEvents) {
 		Object.assign(document.body.style, {
-			"pointer-events": "auto"
+			"pointer-events": "auto",
 		});
 	}
 
 	// If it was previously in drag mode, handle the drop
 	if (state == STATE_DRAG) {
-
 		if (curConfig.onswipe) {
-
 			const distance = getCurrentDistance();
 			if (distance > 10) {
-
 				// Calculate the speed
 				const speedPixelPerSecond = distance / ((new Date().getTime() - originalTime) / 1000);
 
 				if (Math.abs(currentCoord.x - originalCoord.x) > Math.abs(currentCoord.y - originalCoord.y)) {
 					if (currentCoord.x - originalCoord.x > 0) {
 						curConfig.onswipe("right", speedPixelPerSecond);
-					}
-					else {
+					} else {
 						curConfig.onswipe("left", speedPixelPerSecond);
 					}
-				}
-				else {
+				} else {
 					if (currentCoord.y - originalCoord.y > 0) {
 						curConfig.onswipe("down", speedPixelPerSecond);
-					}
-					else {
+					} else {
 						curConfig.onswipe("up", speedPixelPerSecond);
 					}
 				}
@@ -563,22 +554,20 @@ function reset() {
 		}
 
 		if (curConfig.drag) {
-
 			// If a place is found
 			if (placeholderElt.parentNode) {
-
 				// Calculate the current element index
 				let elementIndex = 0;
 				{
 					let curElt = placeholderElt;
-					while((curElt = curElt.previousSibling) != null) {
+					while ((curElt = curElt.previousSibling) != null) {
 						++elementIndex;
 					}
 				}
 				const eventData = {
 					index: elementIndex,
 					container: placeholderElt.parentNode,
-					args: curConfig.args
+					args: curConfig.args,
 				};
 
 				// call the ondrop callback if defined
@@ -589,7 +578,7 @@ function reset() {
 				// Trigger the event
 				if (curConfig.triggerEvent) {
 					const event = new CustomEvent(curConfig.triggerEvent, {
-						detail: eventData
+						detail: eventData,
 					});
 					placeholderElt.parentNode.dispatchEvent(event);
 				}
@@ -620,7 +609,8 @@ function reset() {
 	}
 
 	// Clear the interval
-	((interval) && clearInterval(interval)); interval = null;
+	interval && clearInterval(interval);
+	interval = null;
 
 	// Remove handler
 	document.removeEventListener("touchend", dragStop, eventListenerOptions);
@@ -642,15 +632,16 @@ function reset() {
 	removeAllClass(DRAG_OVER_ACTIVE);
 
 	// Delete the drag element
-	((dragElt) && (dragElt.remove())); dragElt = null;
-	((placeholderElt) && (placeholderElt.remove())); placeholderElt = null;
+	dragElt && dragElt.remove();
+	dragElt = null;
+	placeholderElt && placeholderElt.remove();
+	placeholderElt = null;
 
 	// Reset the state of the state machine
 	state = STATE_IDLE;
 }
 
 function dragStop(e) {
-
 	// To allow the option allowClickThrough to go through
 	if (!curConfig.allowClickThrough && state != STATE_TRIGGER_DRAG_AFTER_MOVE) {
 		e.preventDefault();
@@ -668,117 +659,120 @@ function Touch(el, config) {
 }
 
 Touch.prototype.setConfig = function (config) {
-	this.config = Object.assign({
-		/**
-		 * Kill switch, must be set to true in order to enable the following events
-		 */
-		enable: true,
-		/**
-		 * Boolean to set the drag as enabled or not
-		 */
-		drag: false,
-		/**
-		 * The iframe selector. If set, it will asssume that the selector
-		 * is within the iframe.
-		 */
-		selectorIFrame: null,
-		/**
-		 * The receiver selector. If the selector is null,
-		 * the parent element will be used.
-		 */
-		selectorReceiver: null,
-		/**
-		 * Class set once the draggin is active. This class is set on the body
-		 * of the document. If null, no class will be set.
-		 */
-		bodyDragClass: "drag-active",
-		/**
-		 * Can be either null (will generate an empty div),
-		 * set to "clone", will clone the original element and its CSS,
-		 * set to "cloneNode", will clone the original element only,
-		 * set to a callback that will create the element.
-		 */
-		placeholder: "clone",
-		/**
-		 * The class to add to the placeholder element
-		 */
-		placeholderClass: null,
-		/**
-		 * The css to add to the placeholder element
-		 */
-		placeholderCss: {},
-		/**
-		 * Can be either null (will generate an empty div),
-		 * set to "clone", will clone the original element and its CSS,
-		 * set to "cloneNode", will clone the original element only,
-		 * set to a callback that will create the element.
-		 */
-		dragElt: "clone",
-		/**
-		 * The class to add to dragging element
-		 */
-		dragEltClass: null,
-		/**
-		 * The css to add to dragging element
-		 */
-		dragEltCss: {},
-		/**
-		 * Set to true, if the original element should be moved or cloned
-		 */
-		move: true,
-		/**
-		 * Do not perform any operation
-		 */
-		nop: false,
-		/**
-		 * Let the click events go through
-		 */
-		allowClickThrough: false,
-		/**
-		 * Trigger the event drop, if null, no event is triggered
-		 */
-		triggerEvent: "drop",
-		/**
-		 * Keep the last drop location even if it is out of a drop zone.
-		 */
-		keepLastDrop: !config.selectorReceiver,
-		/**
-		 * Tolerance to be allowed on the receiver to be active.
-		 * It will define an invisible margin around the receivers that will
-		 * be used to detect whether or not the cursor is within the area.
-		 */
-		toleranceReceiverMargin: 50,
-		/**
-		 * Disable all pointer events while dragging (including selections, scrolling...)
-		 */
-		disablePointerEvents: true,
-		/**
-		 * Arguments to be passed to the callback
-		 */
-		args: null,
-		/**
-		 * Detect swipe event and call the associated callback
-		 */
-		onswipe: null,
-		/**
-		 * Callback that will be fired each time the mouse moves while dragging
-		 */
-		ondrag: null,
-		/**
-		 * Callback fired when a successfull drop happened.
-		 * It gets into arguments an object including the index of the child of the container,
-		 * the container and the arguments.
-		 */
-		ondrop: null,
-		/**
-		 * Will be called at the begining of the drag operation
-		 */
-		onstartdrag: null,
-		/**
-		 * Will be called at the end of the drag operation
-		 */
-		onstopdrag: null
-	}, config);
+	this.config = Object.assign(
+		{
+			/**
+			 * Kill switch, must be set to true in order to enable the following events
+			 */
+			enable: true,
+			/**
+			 * Boolean to set the drag as enabled or not
+			 */
+			drag: false,
+			/**
+			 * The iframe selector. If set, it will asssume that the selector
+			 * is within the iframe.
+			 */
+			selectorIFrame: null,
+			/**
+			 * The receiver selector. If the selector is null,
+			 * the parent element will be used.
+			 */
+			selectorReceiver: null,
+			/**
+			 * Class set once the draggin is active. This class is set on the body
+			 * of the document. If null, no class will be set.
+			 */
+			bodyDragClass: "drag-active",
+			/**
+			 * Can be either null (will generate an empty div),
+			 * set to "clone", will clone the original element and its CSS,
+			 * set to "cloneNode", will clone the original element only,
+			 * set to a callback that will create the element.
+			 */
+			placeholder: "clone",
+			/**
+			 * The class to add to the placeholder element
+			 */
+			placeholderClass: null,
+			/**
+			 * The css to add to the placeholder element
+			 */
+			placeholderCss: {},
+			/**
+			 * Can be either null (will generate an empty div),
+			 * set to "clone", will clone the original element and its CSS,
+			 * set to "cloneNode", will clone the original element only,
+			 * set to a callback that will create the element.
+			 */
+			dragElt: "clone",
+			/**
+			 * The class to add to dragging element
+			 */
+			dragEltClass: null,
+			/**
+			 * The css to add to dragging element
+			 */
+			dragEltCss: {},
+			/**
+			 * Set to true, if the original element should be moved or cloned
+			 */
+			move: true,
+			/**
+			 * Do not perform any operation
+			 */
+			nop: false,
+			/**
+			 * Let the click events go through
+			 */
+			allowClickThrough: false,
+			/**
+			 * Trigger the event drop, if null, no event is triggered
+			 */
+			triggerEvent: "drop",
+			/**
+			 * Keep the last drop location even if it is out of a drop zone.
+			 */
+			keepLastDrop: !config.selectorReceiver,
+			/**
+			 * Tolerance to be allowed on the receiver to be active.
+			 * It will define an invisible margin around the receivers that will
+			 * be used to detect whether or not the cursor is within the area.
+			 */
+			toleranceReceiverMargin: 50,
+			/**
+			 * Disable all pointer events while dragging (including selections, scrolling...)
+			 */
+			disablePointerEvents: true,
+			/**
+			 * Arguments to be passed to the callback
+			 */
+			args: null,
+			/**
+			 * Detect swipe event and call the associated callback
+			 */
+			onswipe: null,
+			/**
+			 * Callback that will be fired each time the mouse moves while dragging
+			 */
+			ondrag: null,
+			/**
+			 * Callback fired when a successfull drop happened.
+			 * It gets into arguments an object including the index of the child of the container,
+			 * the container and the arguments.
+			 */
+			ondrop: null,
+			/**
+			 * Will be called at the begining of the drag operation
+			 */
+			onstartdrag: null,
+			/**
+			 * Will be called at the end of the drag operation
+			 */
+			onstopdrag: null,
+		},
+		config
+	);
 };
 
 Touch.prototype.handleEvent = function (e) {
@@ -786,8 +780,7 @@ Touch.prototype.handleEvent = function (e) {
 };
 
 export default function (el, binding) {
-
-	const config = (binding && binding.value) ? binding.value : binding;
+	const config = binding && binding.value ? binding.value : binding;
 
 	if (!el.directiveTouchInstance) {
 		const touch = new Touch(el, config);
@@ -798,8 +791,7 @@ export default function (el, binding) {
 		// Get the list of recievers
 		el.addEventListener("mousedown", touch, eventListenerOptions);
 		el.addEventListener("touchstart", touch, eventListenerOptions);
-	}
-	else {
+	} else {
 		let touch = el.directiveTouchInstance;
 		touch.setConfig(config);
 	}

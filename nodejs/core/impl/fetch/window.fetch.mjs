@@ -1,7 +1,6 @@
 import { FetchException } from "../../fetch.mjs";
 
 export default async function request(url, options) {
-
 	// Add support for FormData
 	if (options.body instanceof FormData) {
 		options.headers["Content-Type"] = "application/x-www-form-urlencoded";
@@ -11,7 +10,7 @@ export default async function request(url, options) {
 	const response = await window.fetch(url, {
 		method: options.method,
 		body: options.body,
-		headers: options.headers
+		headers: options.headers,
 	});
 
 	if (!response.ok) {

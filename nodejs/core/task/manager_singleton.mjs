@@ -1,5 +1,3 @@
-
-
 import Manager from "./manager.mjs";
 
 // Create a unique, global symbol name
@@ -24,5 +22,5 @@ export default {
 	},
 	toJson(namespace) {
 		return manager.toJson(namespace);
-	}
+	},
 };

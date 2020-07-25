@@ -1,5 +1,3 @@
-
-
 import Commander from "commander";
 import Path from "path";
 
@@ -17,13 +15,21 @@ const Log = LogFactory("backend");
 
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
-	.option("-p, --port <number>", "Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.", 8080, parseInt)
+	.option(
+		"-p, --port <number>",
+		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
+		8080,
+		parseInt
+	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option("-d, --data <path>", "Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.", "/bzd/data")
+	.option(
+		"-d, --data <path>",
+		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
+		"/bzd/data"
+	)
 	.parse(process.argv);
 
 (async () => {
-
 	// Read arguments
 	const PORT = process.env.BZD_PORT || Commander.port;
 	const PATH_STATIC = Commander.static;
@@ -60,23 +66,30 @@ Commander.version("1.0.0", "-v, --version")
 		if ("timeout" in Source[type]) {
 			options.timeout = Source[type].timeout;
 		}
-		cache.register(type, async (uid) => {
-		
-			// Check that the UID exists and is of type jenkins
-			const data = await keyValueStore.get("tiles", uid, null);
-			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-			Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
-	
-			Log.debug("Plugin '{}' fetching for '{}'", type, uid);
-			return await plugin.fetch(data, cache);
+		cache.register(
+			type,
+			async (uid) => {
+				// Check that the UID exists and is of type jenkins
+				const data = await keyValueStore.get("tiles", uid, null);
+				Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+				Exception.assert(
+					data["source.type"] == type,
+					"Data type mismatch, stored '{}' vs requested '{}'.",
+					data.type,
+					type
+				);
 
-		}, options);
+				Log.debug("Plugin '{}' fetching for '{}'", type, uid);
+				return await plugin.fetch(data, cache);
+			},
+			options
+		);
 	}
 
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web
+		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {
 		const result = await keyValueStore.list("tiles");
@@ -96,5 +109,4 @@ Commander.version("1.0.0", "-v, --version")
 	});
 
 	web.start();
-
 })();

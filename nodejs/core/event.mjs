@@ -1,21 +1,21 @@
-
-
 /**
  * Add events functionality
  */
 export default class Event {
 	constructor(options) {
-
 		// Loop through event options and adjust them
 		this.options = {};
 		for (const id in options || {}) {
-			this.options[id] = Object.assign({
-				/**
-				 * Set to true if the event once triggered will also
-				 * trigger new one.
-				 */
-				proactive: false
-			}, options[id]);
+			this.options[id] = Object.assign(
+				{
+					/**
+					 * Set to true if the event once triggered will also
+					 * trigger new one.
+					 */
+					proactive: false,
+				},
+				options[id]
+			);
 		}
 
 		this.clear();
@@ -28,7 +28,7 @@ export default class Event {
 	 * \param callback The function to be called when the event is triggered
 	 * \param once If the event is intended to be fired only once
 	 */
-	on (id, callback, once) {
+	on(id, callback, once) {
 		let addToList = true;
 
 		// Handle proactive events
@@ -38,7 +38,7 @@ export default class Event {
 		}
 
 		if (addToList) {
-			(id in this.list) || (this.list[id] = []);
+			id in this.list || (this.list[id] = []);
 			this.list[id].push([callback, once]);
 		}
 		return this;
@@ -46,13 +46,13 @@ export default class Event {
 
 	/**
 	 * \brief Check if an event is active (only for proactive events)
-	 * 
+	 *
 	 * \param id The identifier of the events to be triggered
-	 * 
+	 *
 	 * \return true if the evetn has been triggered, false otherwise.
 	 */
-	is (id) {
-		return (typeof this.proactive[id] !== "undefined");
+	is(id) {
+		return typeof this.proactive[id] !== "undefined";
 	}
 
 	/**
@@ -61,13 +61,13 @@ export default class Event {
 	 * \param id The identifier of the events to be triggered
 	 * \param ... Arguments to be passed to the event callbacks
 	 */
-	trigger (id, ...args) {
+	trigger(id, ...args) {
 		if (this.list[id]) {
 			this.list[id].forEach((e) => {
 				e[0].apply(this, args);
 			});
 			this.list[id] = this.list[id].filter((e) => {
-				return (e[1] !== true);
+				return e[1] !== true;
 			});
 		}
 
@@ -84,12 +84,11 @@ export default class Event {
 	 * Clearing events will remove the proactive trigger for example.
 	 * It will also remove all previously attached events.
 	 */
-	clear (id, onlyProactive) {
+	clear(id, onlyProactive) {
 		if (typeof id === "undefined") {
 			this.proactive = {};
 			this.list = {};
-		}
-		else {
+		} else {
 			delete this.proactive[id];
 			if (!onlyProactive) {
 				delete this.list[id];
@@ -103,9 +102,13 @@ export default class Event {
 	 */
 	async waitUntil(id) {
 		return new Promise((resolve) => {
-			this.on(id, () => {
-				resolve();
-			}, /*once*/true);
+			this.on(
+				id,
+				() => {
+					resolve();
+				},
+				/*once*/ true
+			);
 		});
 	}
 }

@@ -1,5 +1,3 @@
-
-
 import Event from "../event.mjs";
 import ExceptionFactory from "../exception.mjs";
 
@@ -10,31 +8,32 @@ const Exception = ExceptionFactory("persistence", "memory");
  */
 export default class PersistenceMemory {
 	constructor(options) {
-
-		this.options = Object.assign({
-			/**
-			 * Initial value of the data if no data is currently present.
-			 */
-			initial: {},
-			/**
-			 * Type of operations supported.
-			 */
-			operations: {
+		this.options = Object.assign(
+			{
 				/**
-				 * \brief Set a specific key and its value to the data.
+				 * Initial value of the data if no data is currently present.
 				 */
-				set: (data, key, value) => {
-					data[key] = value;
+				initial: {},
+				/**
+				 * Type of operations supported.
+				 */
+				operations: {
+					/**
+					 * \brief Set a specific key and its value to the data.
+					 */
+					set: (data, key, value) => {
+						data[key] = value;
+					},
+					/**
+					 * \brief Delete a specific key from the data.
+					 */
+					delete: (data, key) => {
+						delete data[key];
+					},
 				},
-				/**
-				 * \brief Delete a specific key from the data.
-				 */
-				delete: (data, key) => {
-					delete data[key];
-				}
-			}
-
-		}, options);
+			},
+			options
+		);
 
 		// Make sure that some of the required options are set
 		Exception.assert(typeof this.options.initial !== "undefined");
@@ -43,14 +42,14 @@ export default class PersistenceMemory {
 		// Initialize local variables
 		this.isReady = false;
 		this.event = new Event({
-			ready: {proactive: true}
+			ready: { proactive: true },
 		});
 	}
 
 	/**
 	 * \brief Register an event
 	 */
-	on (...args) {
+	on(...args) {
 		this.event.on(...args);
 	}
 
@@ -66,7 +65,7 @@ export default class PersistenceMemory {
 	 */
 	async reset(data) {
 		// Use the inital value if data is unset
-		const setData = (typeof data === "undefined") ? this.options.initial : data;
+		const setData = typeof data === "undefined" ? this.options.initial : data;
 
 		// Initialize the data
 		this.data = Object.assign({}, setData);
@@ -98,8 +97,7 @@ export default class PersistenceMemory {
 	/**
 	 * Wait until all previous operations are completed
 	 */
-	async waitSync() {
-	}
+	async waitSync() {}
 
 	/**
 	 * \brief Return the latest version of the data persisted.
@@ -116,7 +114,7 @@ export default class PersistenceMemory {
 	 */
 	async write(type, ...args) {
 		Exception.assert(this.isReady, "Persistence is not ready yet.");
-		Exception.assert(type in this.options.operations, "The operation \"" + type + "\" is not supported.");
+		Exception.assert(type in this.options.operations, 'The operation "' + type + '" is not supported.');
 
 		// Update the current object
 		await this.options.operations[type].call(this.options.operations, this.data, ...args);

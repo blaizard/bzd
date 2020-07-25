@@ -1,5 +1,3 @@
-
-
 import ExceptionFactory from "../../core/exception.mjs";
 import { AsyncInitialize } from "../utils.mjs";
 
@@ -9,7 +7,6 @@ const Exception = ExceptionFactory("db", "storage");
  * File storage module
  */
 export default class Storage extends AsyncInitialize {
-
 	constructor() {
 		super();
 	}

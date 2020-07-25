@@ -1,5 +1,3 @@
-
-
 import Task from "./task.mjs";
 import LogFactory from "../log.mjs";
 import ExceptionFactory from "../exception.mjs";
@@ -15,12 +13,10 @@ const TASK_SIZE = 128; // sizeof(Task);
  */
 export default class Manager {
 	constructor(config) {
-		this.config = Object.assign({
-
-		}, config);
+		this.config = Object.assign({}, config);
 
 		this.tasks = {
-			size: 0
+			size: 0,
 		};
 		Exception.assert(Task.PRIORITY_LOWEST === 0, "This assumes that the lowest priority is 0");
 		this.taskQueues = [...Array(Task.PRIORITY_HIGHEST + 1)].map(() => []);
@@ -65,14 +61,14 @@ export default class Manager {
 		// Register
 		Log.info("Registering task '{}' with priority {}", task, task.priority);
 		this.tasks[task.id.namespace] = this.tasks[task.id.namespace] || {
-			size: 0
+			size: 0,
 		};
 		this.tasks[task.id.namespace][task.id.name] = task;
 		this.tasks[task.id.namespace].size += TASK_SIZE;
 		this.tasks.size += TASK_SIZE;
 
 		// Insert to the queue
-		this.scheduleTaskIfValid(task, task.delayMs, /*triggerTaskScheduler*/true);
+		this.scheduleTaskIfValid(task, task.delayMs, /*triggerTaskScheduler*/ true);
 
 		return task;
 	}
@@ -95,7 +91,7 @@ export default class Manager {
 		if (task.status == Task.STATUS_PENDING) {
 			const index = Manager.findInQueue(this.taskQueues[task.priority], task);
 			Exception.assert(index !== -1, "The task is pending but it cannot be found in the queue");
-			this.taskQueues[task.priority].splice(index, 1); 
+			this.taskQueues[task.priority].splice(index, 1);
 		}
 
 		// Delete the registered task
@@ -112,7 +108,7 @@ export default class Manager {
 	 * \return true if registered, false otherwise.
 	 */
 	isRegistered(taskId) {
-		return (taskId.namespace in this.tasks) && (taskId.name in this.tasks[taskId.namespace]);
+		return taskId.namespace in this.tasks && taskId.name in this.tasks[taskId.namespace];
 	}
 
 	/**
@@ -124,20 +120,21 @@ export default class Manager {
 	 */
 	scheduleTaskIfValid(task, delayMs, triggerTaskScheduler) {
 		Exception.assert(this.isRegistered(task.id), "The task " + task + " is not registered");
-		Exception.assert(task.status === Task.STATUS_IDLE, () => ("Task " + task + " should be have its status to idle, instead: " + task.status));
-		Exception.assert(typeof delayMs === "number", () => ("The delay specified is not a number: " + delayMs));
+		Exception.assert(
+			task.status === Task.STATUS_IDLE,
+			() => "Task " + task + " should be have its status to idle, instead: " + task.status
+		);
+		Exception.assert(typeof delayMs === "number", () => "The delay specified is not a number: " + delayMs);
 
 		let isValid = false;
 		try {
 			isValid = task.isValid;
-		}
-		catch (e) {
+		} catch (e) {
 			Exception.fromError(e).print("Task " + task + " validation failed");
 		}
 
 		// If the task is valid, add it to the queue
 		if (isValid) {
-
 			// Calculate the next execution timestamp
 			const timestamp = Manager.getTimestampMs() + delayMs;
 
@@ -188,16 +185,15 @@ export default class Manager {
 	 */
 	getNextTaskTimestamp() {
 		const minTimestamp = this.taskQueues.reduce((minTimestamp, queue) => {
-			return (queue.length) ? Math.min(queue[0].timestamp, minTimestamp) : minTimestamp;
+			return queue.length ? Math.min(queue[0].timestamp, minTimestamp) : minTimestamp;
 		}, Number.MAX_VALUE);
-		return (minTimestamp == Number.MAX_VALUE) ? null : minTimestamp;
+		return minTimestamp == Number.MAX_VALUE ? null : minTimestamp;
 	}
 
 	/**
 	 * Trigger the execution of the scheduler.
 	 */
 	triggerTaskScheduler() {
-
 		// If the scheduler is already running, do nothing
 		if (this.schedulerRunning) {
 			return;
@@ -218,7 +214,12 @@ export default class Manager {
 
 			// Task scheduler is not running, start it
 			if (!this.schedulerInstance) {
-				this.schedulerInstance = setTimeout(() => { this.taskScheduler(); }, (nextTimestamp > timestamp) ? nextTimestamp - timestamp : 1);
+				this.schedulerInstance = setTimeout(
+					() => {
+						this.taskScheduler();
+					},
+					nextTimestamp > timestamp ? nextTimestamp - timestamp : 1
+				);
 				this.schedulerTimestamp = nextTimestamp;
 			}
 		}
@@ -228,7 +229,6 @@ export default class Manager {
 	 * Run current tasks and trigger the next one
 	 */
 	async taskScheduler() {
-
 		// This should never happen, otherwise somethign is wrong in the logic
 		Exception.assert(this.schedulerRunning === false, "Task scheduler is already running");
 		this.schedulerRunning = true;
@@ -237,17 +237,14 @@ export default class Manager {
 			// Execute the next tasks if any
 			let task = null;
 			while ((task = this.popNextTask())) {
-
 				try {
 					if (task.isValid) {
 						++task.iteration;
 						await task.action();
 					}
-				}
-				catch (e) {
+				} catch (e) {
 					Exception.fromError(e).print("Task " + task + " execution error");
-				}
-				finally {
+				} finally {
 					task.status = Task.STATUS_IDLE;
 				}
 
@@ -255,10 +252,9 @@ export default class Manager {
 				 * Re-insert the task if valid. Note, if the task is invalid
 				 * it will not insert the task but unregister it
 				 */
-				this.scheduleTaskIfValid(task, task.intervalMs, /*triggerTaskScheduler*/false);
+				this.scheduleTaskIfValid(task, task.intervalMs, /*triggerTaskScheduler*/ false);
 			}
-		}
-		finally {
+		} finally {
 			// Mark the scheduler as not running anymore
 			this.schedulerInstance = null;
 			this.schedulerRunning = false;
@@ -273,15 +269,17 @@ export default class Manager {
 	 */
 	toJson(namespace) {
 		const timestamp = Manager.getTimestampMs();
-		return Object.keys(this.tasks[namespace]).filter((name) => (name != "size")).map((name) => {
-			const task = this.tasks[namespace][name];
-			return {
-				name: name,
-				status: task.status,
-				priority: task.priority,
-				timestampDelta: Math.max(0, task.timestamp - timestamp)
-			};
-		});
+		return Object.keys(this.tasks[namespace])
+			.filter((name) => name != "size")
+			.map((name) => {
+				const task = this.tasks[namespace][name];
+				return {
+					name: name,
+					status: task.status,
+					priority: task.priority,
+					timestampDelta: Math.max(0, task.timestamp - timestamp),
+				};
+			});
 	}
 
 	/**
@@ -311,7 +309,6 @@ export default class Manager {
 	 * \return the index of the task in the queue if found, -1 otherwise.
 	 */
 	static findInQueue(queue, task) {
-
 		let minIndex = 0;
 		let maxIndex = queue.length - 1;
 		let currentIndex = 0;
@@ -319,12 +316,11 @@ export default class Manager {
 		// Look for the entry
 		while (minIndex <= maxIndex) {
 			// | 0 is equivalent to Math.floor
-			currentIndex = (minIndex + maxIndex) / 2 | 0;
+			currentIndex = ((minIndex + maxIndex) / 2) | 0;
 
 			if (queue[currentIndex].timestamp < task.timestamp) {
 				minIndex = currentIndex + 1;
-			}
-			else if (queue[currentIndex].timestamp > task.timestamp) {
+			} else if (queue[currentIndex].timestamp > task.timestamp) {
 				maxIndex = currentIndex - 1;
 			}
 			// Found exact match. From there look for the exact task
@@ -350,7 +346,6 @@ export default class Manager {
 	 * Insert in a sorted queue
 	 */
 	static insertInQueue(queue, task) {
-
 		let minIndex = 0;
 		let maxIndex = queue.length - 1;
 		let currentIndex = 0;
@@ -358,12 +353,11 @@ export default class Manager {
 		// Look for the entry
 		while (minIndex <= maxIndex) {
 			// | 0 is equivalent to Math.floor
-			currentIndex = (minIndex + maxIndex) / 2 | 0;
+			currentIndex = ((minIndex + maxIndex) / 2) | 0;
 
 			if (queue[currentIndex].timestamp < task.timestamp) {
 				minIndex = currentIndex + 1;
-			}
-			else if (queue[currentIndex].timestamp > task.timestamp) {
+			} else if (queue[currentIndex].timestamp > task.timestamp) {
 				maxIndex = currentIndex - 1;
 			}
 			// Found value equal
@@ -373,7 +367,8 @@ export default class Manager {
 		}
 
 		// Insert
-		currentIndex = (queue[currentIndex] && queue[currentIndex].timestamp < task.timestamp) ? currentIndex + 1 : currentIndex;
+		currentIndex =
+			queue[currentIndex] && queue[currentIndex].timestamp < task.timestamp ? currentIndex + 1 : currentIndex;
 		queue.splice(currentIndex, 0, task);
 	}
 }

@@ -1,5 +1,3 @@
-
-
 import Event from "../event.mjs";
 import FileSystem from "../filesystem.mjs";
 import Mutex from "../mutex.mjs";
@@ -16,77 +14,77 @@ const Exception = ExceptionFactory("persistence", "disk");
  * loss.
  */
 export default class PersistenceDisk {
-
 	constructor(path, options) {
-
-		this.options = Object.assign({
-			/**
-			 * Initial value of the data if no data is currently present.
-			 */
-			initial: {},
-			/**
-			 * Initial value of the data not persisted.
-			 */
-			initialNotPersisted: {},
-			/**
-			 * If initialize should be bypassed, set this flag to false.
-			 */
-			initialize: true,
-			/**
-			 * Read the data from a file and returns it.
-			 */
-			read: async (content) => {
-				this.estimatedSize = content.length;
-				return JSON.parse(content);
-			},
-			/**
-			 * Write the data to a file.
-			 */
-			write: (data) => {
-				const content = JSON.stringify(data);
-				this.estimatedSize = content.length;
-				return content;
-			},
-			/**
-			 * Type of operations supported.
-			 */
-			operations: {
+		this.options = Object.assign(
+			{
 				/**
-				 * \brief Set a specific key and its value to the data.
+				 * Initial value of the data if no data is currently present.
 				 */
-				set: (data, key, value) => {
-					data[key] = value;
+				initial: {},
+				/**
+				 * Initial value of the data not persisted.
+				 */
+				initialNotPersisted: {},
+				/**
+				 * If initialize should be bypassed, set this flag to false.
+				 */
+				initialize: true,
+				/**
+				 * Read the data from a file and returns it.
+				 */
+				read: async (content) => {
+					this.estimatedSize = content.length;
+					return JSON.parse(content);
 				},
 				/**
-				 * \brief Delete a specific key from the data.
+				 * Write the data to a file.
 				 */
-				delete: (data, key) => {
-					delete data[key];
-				}
+				write: (data) => {
+					const content = JSON.stringify(data);
+					this.estimatedSize = content.length;
+					return content;
+				},
+				/**
+				 * Type of operations supported.
+				 */
+				operations: {
+					/**
+					 * \brief Set a specific key and its value to the data.
+					 */
+					set: (data, key, value) => {
+						data[key] = value;
+					},
+					/**
+					 * \brief Delete a specific key from the data.
+					 */
+					delete: (data, key) => {
+						delete data[key];
+					},
+				},
+				/**
+				 * If set, this will create a task to perform a periodic savepoint.
+				 */
+				savepointTask: null,
+				/**
+				 * \brief Perform a savepoint when the close function is called
+				 */
+				savepointOnClose: true,
+				/**
+				 * \brief If the delta file exceed a certain size in bytes,
+				 *        create a new one.
+				 */
+				maxDeltaB: 1024 * 1024,
 			},
-			/**
-			 * If set, this will create a task to perform a periodic savepoint.
-			 */
-			savepointTask: null,
-			/**
-			 * \brief Perform a savepoint when the close function is called
-			 */
-			savepointOnClose: true,
-			/**
-			 * \brief If the delta file exceed a certain size in bytes,
-			 *        create a new one.
-			 */
-			maxDeltaB: 1024 * 1024
-
-		}, options);
+			options
+		);
 
 		// Initialize local variables
 		this.path = path;
 		this.mutex = new Mutex();
 		this.isSavepoint = false;
 		this.event = new Event({
-			ready: {proactive: true},
-			error: {proactive: true}
+			ready: { proactive: true },
+			error: { proactive: true },
 		});
 		// The estimated size of the structure
 		this.estimatedSize = 0;
@@ -100,7 +98,7 @@ export default class PersistenceDisk {
 
 		// Initialize the persistence
 		if (this.options.initialize) {
-			this.initialize(/*ignoreErrors*/false);
+			this.initialize(/*ignoreErrors*/ false);
 		}
 	}
 
@@ -115,7 +113,6 @@ export default class PersistenceDisk {
 	 * \brief Initialize the data by reading the content.
 	 */
 	async initialize(ignoreErrors) {
-
 		/*
 		 * Lock the mutex to make sure no data is accessed while
 		 * initializing both the deltas and the datas.
@@ -132,34 +129,41 @@ export default class PersistenceDisk {
 
 			// Set the periodic savepoint if needed
 			if (this.options.savepointTask !== null) {
+				const taskConfig = Object.assign(
+					{
+						/**
+						 * Default namespace for the periodic savepoint, used for the
+						 * periodic task.
+						 */
+						namespace: "persistence-disk",
+						/**
+						 * Default name for the periodic savepoint, used for the
+						 * periodic task.
+						 */
+						name: this.path,
+						/**
+						 * Task interval in Ms
+						 */
+						intervalMs: 0,
+						isValid: (/*iteration*/) => {
+							return this.isReady();
+						},
+					},
+					this.options.savepointTask
+				);
 
-				const taskConfig = Object.assign({
-					/**
-					 * Default namespace for the periodic savepoint, used for the
-					 * periodic task.
-					 */
-					namespace: "persistence-disk",
-					/**
-					 * Default name for the periodic savepoint, used for the
-					 * periodic task.
-					 */
-					name: this.path,
-					/**
-					 * Task interval in Ms
-					 */
-					intervalMs: 0,
-					isValid: (/*iteration*/) => { return this.isReady(); }
-				}, this.options.savepointTask);
-
-				this.savepointTaskId = TaskManager.register(taskConfig.namespace, taskConfig.name, () => this.taskSavepoint(), taskConfig);
+				this.savepointTaskId = TaskManager.register(
+					taskConfig.namespace,
+					taskConfig.name,
+					() => this.taskSavepoint(),
+					taskConfig
+				);
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			Exception.fromError(e).print("Error while initializing data");
 			this.event.trigger("error", e);
 			throw e;
-		}
-		finally {
+		} finally {
 			this.mutex.release();
 		}
 	}
@@ -175,7 +179,7 @@ export default class PersistenceDisk {
 		let delta = {
 			list: [],
 			dir: this.path + ".delta/",
-			dirty: false
+			dirty: false,
 		};
 
 		// If there is no directories for delta, create it.
@@ -185,7 +189,7 @@ export default class PersistenceDisk {
 		const fileList = (await FileSystem.readdir(delta.dir)).filter((file) => file.match(/^[0-9]+\.log$/));
 
 		// Check if dirty, i.e. if a savepoint can be made
-		delta.dirty = (fileList.length > 1);
+		delta.dirty = fileList.length > 1;
 		if (!delta.dirty) {
 			for (const i in fileList) {
 				if ((await FileSystem.stat(delta.dir + fileList[i])).size > 0) {
@@ -196,11 +200,13 @@ export default class PersistenceDisk {
 		}
 
 		// List and sort all IDs
-		delta.list = fileList.map((name) => {
-			return parseInt(name.substring(0, name.indexOf(".")));
-		}).sort((a, b) => {
-			return a - b;
-		});
+		delta.list = fileList
+			.map((name) => {
+				return parseInt(name.substring(0, name.indexOf(".")));
+			})
+			.sort((a, b) => {
+				return a - b;
+			});
 
 		return delta;
 	}
@@ -209,7 +215,6 @@ export default class PersistenceDisk {
 	 * \brief Read the data from the persistence
 	 */
 	async initializeData() {
-
 		// Read the data file if any
 		if (await FileSystem.exists(this.path)) {
 			const content = await FileSystem.readFile(this.path);
@@ -236,7 +241,6 @@ export default class PersistenceDisk {
 	 * \brief Close the persistence
 	 */
 	async close() {
-
 		// Unregister the current task
 		if (this.options.savepointTask !== null) {
 			Exception.assert(this.savepointTaskId, "The task ID for the periodic savepoint");
@@ -258,7 +262,7 @@ export default class PersistenceDisk {
 	 */
 	async reset(data) {
 		// Use the inital value if data is unset
-		const setData = (typeof data === "undefined") ? this.options.initial : data;
+		const setData = typeof data === "undefined" ? this.options.initial : data;
 
 		// Acquire the lock before performing any operation
 		await this.mutex.lock();
@@ -274,7 +278,7 @@ export default class PersistenceDisk {
 			// Assign the data and the non persisted data
 			this.data = Object.assign({}, setData, this.options.initialNotPersisted);
 
-			Log.debug("Data successfully {}", (typeof data === "undefined") ? "reset" : "set");
+			Log.debug("Data successfully {}", typeof data === "undefined" ? "reset" : "set");
 
 			/*
 			 * Increase the savepoitn version at the end to ensure that if a savepoint
@@ -283,12 +287,10 @@ export default class PersistenceDisk {
 			this.savepointVersion++;
 			// Only if everything went well, set the ready flag
 			this.event.trigger("ready");
-		}
-		catch (e) {
+		} catch (e) {
 			this.event.trigger("error", e);
 			throw e;
-		}
-		finally {
+		} finally {
 			this.mutex.release();
 		}
 	}
@@ -322,7 +324,7 @@ export default class PersistenceDisk {
 		Exception.assert(this.isReady(), "Persistence is not ready yet.");
 
 		// Allocate a new Id
-		let newId = (this.delta.list.length) ? (this.delta.list[this.delta.list.length - 1] + 1) : 0;
+		let newId = this.delta.list.length ? this.delta.list[this.delta.list.length - 1] + 1 : 0;
 
 		// Add it to the list and create an empty file (fails if it already exists)
 		{
@@ -339,7 +341,7 @@ export default class PersistenceDisk {
 	/**
 	 * \brief Register an event
 	 */
-	on (...args) {
+	on(...args) {
 		this.event.on(...args);
 	}
 
@@ -365,7 +367,14 @@ export default class PersistenceDisk {
 	 * \param type The type of operation.
 	 */
 	async write(type, ...args) {
-		Exception.assert(type in this.options.operations, () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
+		Exception.assert(
+			type in this.options.operations,
+			() =>
+				'The operation "' +
+				type +
+				'" is not supported, valid operations are: ' +
+				Object.keys(this.options.operations).join(", ")
+		);
 
 		// This part has to be protected by a mutex in order to make this action atomical
 		await this.mutex.lock();
@@ -410,14 +419,12 @@ export default class PersistenceDisk {
 
 				// If success set the flag to dirty
 				this.delta.dirty = true;
-			}
-			catch (e) {
+			} catch (e) {
 				// Delete the delta previously added
 				await FileSystem.truncate(deltaPath, fileSize);
 				throw Exception.fromError(e);
 			}
-		}
-		finally {
+		} finally {
 			this.mutex.release();
 		}
 
@@ -428,17 +435,15 @@ export default class PersistenceDisk {
 	 * \brief Apply a delta file to the data.
 	 */
 	async applyDelta(id, data) {
-
 		const path = this.getPathFromId(id);
 
-		Exception.assert(await FileSystem.exists(path), "File \"" + path + "\" does not exists.");
+		Exception.assert(await FileSystem.exists(path), 'File "' + path + '" does not exists.');
 
 		// Read the file asynchronously
 		const content = await FileSystem.readFile(path);
 		const lineList = content.split("\n").filter((line) => line);
 
 		for (const i in lineList) {
-
 			const line = lineList[i];
 			const type = line.substring(0, line.indexOf(" "));
 			const argsStr = line.substring(line.indexOf(" ") + 1);
@@ -446,7 +451,14 @@ export default class PersistenceDisk {
 			// Parse the data and apply it
 			const args = JSON.parse(argsStr);
 			Exception.assert(args instanceof Array, "The data must be an array");
-			Exception.assert(type in this.options.operations, () => ("The operation \"" + type + "\" is not supported, valid operations are: " + Object.keys(this.options.operations).join(", ")));
+			Exception.assert(
+				type in this.options.operations,
+				() =>
+					'The operation "' +
+					type +
+					'" is not supported, valid operations are: ' +
+					Object.keys(this.options.operations).join(", ")
+			);
 
 			// Apply the change
 			await this.options.operations[type](data, ...args);
@@ -469,8 +481,7 @@ export default class PersistenceDisk {
 			Log.info("Persistence '{}' is dirty, running savepoint", this.path);
 			try {
 				await this.savepoint();
-			}
-			catch (e) {
+			} catch (e) {
 				Exception.fromError(e).print();
 			}
 		}
@@ -517,13 +528,11 @@ export default class PersistenceDisk {
 			this.delta.dirty = false;
 
 			// Release the lock as of now the persistence has already been copied to be written
-		}
-		catch (e) {
+		} catch (e) {
 			this.isSavepoint = false;
 			Exception.fromError(e).print();
 			throw e;
-		}
-		finally {
+		} finally {
 			this.mutex.release();
 		}
 
@@ -536,12 +545,10 @@ export default class PersistenceDisk {
 			if (!(await this.savepointReplaceData(tempPath, savepointVersion, id))) {
 				Log.warning("The savepoint version differ, meaning that something interfere in parallel");
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			Exception.fromError(e).print();
 			throw e;
-		}
-		finally {
+		} finally {
 			this.isSavepoint = false;
 		}
 	}
@@ -553,16 +560,14 @@ export default class PersistenceDisk {
 		await this.mutex.lock();
 
 		try {
-
-			const isSavepointVersionValid = (savepointVersion === this.savepointVersion);
+			const isSavepointVersionValid = savepointVersion === this.savepointVersion;
 			// Do the actual savepoint only if the savepoint version matches
 			if (isSavepointVersionValid) {
 				await this.replaceDataNoLock(tempPath, lastId);
 			}
 
 			return isSavepointVersionValid;
-		}
-		finally {
+		} finally {
 			this.mutex.release();
 		}
 	}
@@ -573,16 +578,16 @@ export default class PersistenceDisk {
 	 * \note The write lock must be set.
 	 */
 	async replaceDataNoLock(tempPath, lastId) {
-
 		Exception.assert(this.isReady(), "Persistence is not ready yet.");
 
 		await FileSystem.move(tempPath, this.path);
 
 		// Delete other files and update the delta list
-		while (this.delta.list.length
-				// Make sure the id is not the last ID (if defined)
-				&& ((typeof lastId === "undefined") || this.delta.list[0] != lastId)) {
-
+		while (
+			this.delta.list.length &&
+			// Make sure the id is not the last ID (if defined)
+			(typeof lastId === "undefined" || this.delta.list[0] != lastId)
+		) {
 			const curId = this.delta.list.shift();
 			const path = this.getPathFromId(curId);
 			await FileSystem.unlink(path);
@@ -631,26 +636,43 @@ export default class PersistenceDisk {
 		await this.mutex.lock();
 
 		try {
-			const delta = await this.initializeDelta(/*ignoreErrors*/false);
+			const delta = await this.initializeDelta(/*ignoreErrors*/ false);
 
-			Exception.assert(delta.list.length == this.delta.list.length, () => ("Deltas on disk " + JSON.stringify(delta.list)
-					+ " differs from deltas in memory" + JSON.stringify(this.delta.list)));
-			Exception.assert(delta.list.every((id, index) => (this.delta.list[index] == id)), () => ("Deltas on disk " + JSON.stringify(delta.list)
-					+ " differs from deltas in memory" + JSON.stringify(this.delta.list)));
+			Exception.assert(
+				delta.list.length == this.delta.list.length,
+				() =>
+					"Deltas on disk " +
+					JSON.stringify(delta.list) +
+					" differs from deltas in memory" +
+					JSON.stringify(this.delta.list)
+			);
+			Exception.assert(
+				delta.list.every((id, index) => this.delta.list[index] == id),
+				() =>
+					"Deltas on disk " +
+					JSON.stringify(delta.list) +
+					" differs from deltas in memory" +
+					JSON.stringify(this.delta.list)
+			);
 
 			{
 				let prevId = -1;
-				Exception.assert(delta.list.every((id) => {
-					const isIncreasing = (id > prevId);
-					prevId = id;
-					return isIncreasing;
-				}), "Delta list is inconsistent");
+				Exception.assert(
+					delta.list.every((id) => {
+						const isIncreasing = id > prevId;
+						prevId = id;
+						return isIncreasing;
+					}),
+					"Delta list is inconsistent"
+				);
 			}
 
 			// Check the dirty flag
-			Exception.assert(this.delta.dirty || (delta.dirty == this.delta.dirty), "Dirty flag is wrong: " + JSON.stringify(delta) + ", " + JSON.stringify(this.delta));
-		}
-		finally {
+			Exception.assert(
+				this.delta.dirty || delta.dirty == this.delta.dirty,
+				"Dirty flag is wrong: " + JSON.stringify(delta) + ", " + JSON.stringify(this.delta)
+			);
+		} finally {
 			this.mutex.release();
 		}
 

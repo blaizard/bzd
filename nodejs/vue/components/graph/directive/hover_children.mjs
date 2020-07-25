@@ -1,5 +1,5 @@
 export default {
-	bind: function(el, binding, vnode) {
+	bind: function (el, binding, vnode) {
 		const contextKey = binding.expression;
 
 		// Create the context for this directive
@@ -15,7 +15,7 @@ export default {
 						vnode.context[contextKey] = -1;
 					}
 				}
-			}
+			},
 		};
 
 		el.addEventListener("click", el.dataHoverChildren.handleSelect, true);
@@ -26,5 +26,5 @@ export default {
 		el.removeEventListener("mouseleave", el.dataHoverChildren.handleUnselect, true);
 		el.removeEventListener("mouseenter", el.dataHoverChildren.handleSelect, true);
 		el.removeEventListener("click", el.dataHoverChildren.handleSelect, true);
-	}
+	},
 };

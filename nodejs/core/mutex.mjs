@@ -1,5 +1,3 @@
-
-
 /**
  * Simple mutex implementation
  */
@@ -13,7 +11,6 @@ export default class Mutex {
 	 * Lock the ressource and call the callback once the ressource is under the lock.
 	 */
 	lock(callback) {
-
 		// Use promises if the callback is not set
 		if (typeof callback === "undefined") {
 			return new Promise((resolve) => {
@@ -53,8 +50,7 @@ export default class Mutex {
 					this.release();
 				});
 			});
-		}
-		else {
+		} else {
 			this.isLock = false;
 		}
 	}

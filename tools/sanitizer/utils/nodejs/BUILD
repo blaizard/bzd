@@ -15,8 +15,8 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core:filesystem",
-        "//nodejs/core:exception",
         ":filter",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
     ],
 )

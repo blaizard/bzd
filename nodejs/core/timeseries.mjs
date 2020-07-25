@@ -1,5 +1,3 @@
-
-
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("test", "timeseries");
@@ -9,18 +7,21 @@ const Exception = ExceptionFactory("test", "timeseries");
  */
 export default class TimeSeries {
 	constructor(options) {
-		this.options = Object.assign({
-			/**
-			 * Only entries with distinct timestamp are allowed.
-			 */
-			unique: false,
-			/**
-			 * Used only if unique is set. It is called to resolve a conflict when 2 or more entries
-			 * with the same timestamp are found, this function purpose is to merge these entries into one
-			 * and return it.
-			 */
-			uniqueMerge: (a, /*b, timestamp*/) => a
-		}, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * Only entries with distinct timestamp are allowed.
+				 */
+				unique: false,
+				/**
+				 * Used only if unique is set. It is called to resolve a conflict when 2 or more entries
+				 * with the same timestamp are found, this function purpose is to merge these entries into one
+				 * and return it.
+				 */
+				uniqueMerge: (a /*b, timestamp*/) => a,
+			},
+			options
+		);
 
 		// Raw data
 		this.data = [];
@@ -34,8 +35,7 @@ export default class TimeSeries {
 		try {
 			this.data = data;
 			return await callback(this);
-		}
-		finally {
+		} finally {
 			this.data = dataSaved;
 		}
 	}
@@ -56,27 +56,32 @@ export default class TimeSeries {
 
 	/**
 	 * Get a known timestamp value.
-	 * 
+	 *
 	 * \param index A positive value will return the timestamp stating from the begning
 	 * with an offset eequal to the index. A negative value, will return the timestamp
 	 * from the end.
 	 * For example, 0 will return the oldest timestamp while -1 will return the newest.
-	 * 
+	 *
 	 * \return The timestamp or null if out of bound.
 	 */
 	getTimestamp(index) {
 		if (index >= 0 && index < this.data.length) {
 			return this.data[index][0];
-		}
-		else if (index < 0 && -index <= this.data.length) {
+		} else if (index < 0 && -index <= this.data.length) {
 			return this.data[this.data.length + index][0];
 		}
 		return null;
 	}
 
-	static get FIND_EXACT_MACTH() { return 1; }
-	static get FIND_IMMEDIATELY_BEFORE() { return 2; }
-	static get FIND_IMMEDIATELY_AFTER() { return 3; }
+	static get FIND_EXACT_MACTH() {
+		return 1;
+	}
+	static get FIND_IMMEDIATELY_BEFORE() {
+		return 2;
+	}
+	static get FIND_IMMEDIATELY_AFTER() {
+		return 3;
+	}
 
 	/**
 	 * Find a specific timestamp by binary search.
@@ -90,14 +95,14 @@ export default class TimeSeries {
 		}
 
 		switch (mode) {
-		case TimeSeries.FIND_EXACT_MACTH:
-			return null;
-		case TimeSeries.FIND_IMMEDIATELY_BEFORE:
-			return index - 1;
-		case TimeSeries.FIND_IMMEDIATELY_AFTER:
-			return index;
-		default:
-			Exception.unreachable("Unsupported find mode: '{}'", mode);
+			case TimeSeries.FIND_EXACT_MACTH:
+				return null;
+			case TimeSeries.FIND_IMMEDIATELY_BEFORE:
+				return index - 1;
+			case TimeSeries.FIND_IMMEDIATELY_AFTER:
+				return index;
+			default:
+				Exception.unreachable("Unsupported find mode: '{}'", mode);
 		}
 	}
 
@@ -110,15 +115,14 @@ export default class TimeSeries {
 		if (this.options.unique && index < this.data.length && this.data[index][0] == timestamp) {
 			const newData = this.options.uniqueMerge(this.data[index][1], data, timestamp);
 			this.data[index][1] = newData;
-		}
-		else {
+		} else {
 			this.data.splice(index, 0, [timestamp, data]);
 		}
 	}
 
 	/**
 	 * Loop through the data.
-	 * 
+	 *
 	 * \param callback The function to be called for each entry.
 	 * \param timestampStart The starting timestamp. If omitted, it will start at the begining
 	 * \param timestampEnd The ending timestamp. If omitted, it will go until the end.
@@ -126,7 +130,6 @@ export default class TimeSeries {
 	 * and next timestamp will be included. Otherwise not.
 	 */
 	forEach(callback, timestampStart, timestampEnd, inclusive = false) {
-
 		if (!this.data.length) {
 			return;
 		}
@@ -139,7 +142,10 @@ export default class TimeSeries {
 			timestampEnd = this.data[this.data.length - 1][0];
 		}
 
-		let index = this.find(timestampStart, (inclusive) ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER);
+		let index = this.find(
+			timestampStart,
+			inclusive ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER
+		);
 		index = Math.max(0, index);
 		let prevTimestamp = -Number.MAX_VALUE;
 		for (; index < this.data.length; ++index) {
@@ -165,8 +171,7 @@ export default class TimeSeries {
 		for (let index = 0; index < this.data.length; ++index) {
 			if (!this.options.unique && curTimestamp > this.data[index][0]) {
 				return false;
-			}
-			else if (this.options.unique && curTimestamp >= this.data[index][0]) {
+			} else if (this.options.unique && curTimestamp >= this.data[index][0]) {
 				return false;
 			}
 			curTimestamp = this.data[index][0];
@@ -178,7 +183,7 @@ export default class TimeSeries {
 	 * Fix consistency issues
 	 */
 	consistencyFix() {
-		this.data.sort((a, b) => (a[0] - b[0]));
+		this.data.sort((a, b) => a[0] - b[0]);
 
 		// Merge data that share the same timestamp
 		if (this.options.unique) {
@@ -186,7 +191,11 @@ export default class TimeSeries {
 			for (let index = 1; index < this.data.length; ++index) {
 				// If same data is found, merge the data and store it in the current index
 				if (this.data[index - 1][0] == this.data[index][0]) {
-					this.data[index][1] = this.options.uniqueMerge(this.data[index][1], this.data[index - 1][1], this.data[index][0]);
+					this.data[index][1] = this.options.uniqueMerge(
+						this.data[index][1],
+						this.data[index - 1][1],
+						this.data[index][0]
+					);
 					indexToDeleteList.push(index - 1);
 				}
 			}
@@ -213,11 +222,9 @@ export default class TimeSeries {
 			const timestampCurrent = this.data[indexCurrent][0];
 			if (timestampCurrent == timestamp) {
 				return indexCurrent;
-			}
-			else if (timestampCurrent < timestamp) {
+			} else if (timestampCurrent < timestamp) {
 				indexStart = indexCurrent + 1;
-			}
-			else {
+			} else {
 				indexEnd = indexCurrent - 1;
 			}
 		}

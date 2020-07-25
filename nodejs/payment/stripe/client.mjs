@@ -6,20 +6,23 @@ const Log = LogFactory("payment", "stripe");
 
 export default class StripePayment {
 	constructor(options) {
-		this.options = Object.assign({
-			/**
-			 * Callback to create a payment intent.
-			 */
-			makePaymentIntent: null,
-			/**
-			 * Callback to retreive the public key.
-			 */
-			getMetadata: null,
-			/**
-			 * Callback to confirm the payment.
-			 */
-			confirmPayment: null
-		}, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * Callback to create a payment intent.
+				 */
+				makePaymentIntent: null,
+				/**
+				 * Callback to retreive the public key.
+				 */
+				getMetadata: null,
+				/**
+				 * Callback to confirm the payment.
+				 */
+				confirmPayment: null,
+			},
+			options
+		);
 
 		this.card = null;
 	}
@@ -31,7 +34,7 @@ export default class StripePayment {
 			this.options.makePaymentIntent = async (amount, metadata) => {
 				return await api.request("post", "/payment/stripe/intent", {
 					amount: amount,
-					metadata: metadata
+					metadata: metadata,
 				});
 			};
 		}
@@ -44,7 +47,7 @@ export default class StripePayment {
 			this.options.confirmPayment = async (intentId, metadata) => {
 				return await api.request("post", "/payment/stripe/confirm", {
 					id: intentId,
-					metadata: metadata
+					metadata: metadata,
 				});
 			};
 		}
@@ -70,8 +73,8 @@ export default class StripePayment {
 				},
 				handleError(message) {
 					handleError(message);
-				}
-			}
+				},
+			},
 		});
 	}
 }

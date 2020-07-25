@@ -1,13 +1,10 @@
-
-
-import Cache from  "../core/cache.mjs";
-import ExceptionFactory from  "../core/exception.mjs";
+import Cache from "../core/cache.mjs";
+import ExceptionFactory from "../core/exception.mjs";
 
 const Exception = ExceptionFactory("cache");
 
 export default {
 	install(Vue, options = {}) {
-
 		let cache = new Cache();
 		for (const collection in options) {
 			const option = options[collection];
@@ -17,11 +14,10 @@ export default {
 
 		Vue.prototype.$cache = new Vue({
 			data: {
-				content: {}
+				content: {},
 			},
 			methods: {
 				get(collection, id = "default") {
-
 					// If data does not exists, create it
 					if (!(collection in this.content)) {
 						this.$set(this.content, collection, {});
@@ -40,8 +36,8 @@ export default {
 				invalid(collection, id = "default") {
 					cache.setDirty(collection, id);
 					this.content[collection][id] = options[collection].loading || "";
-				}
-			}
+				},
+			},
 		});
-	}
+	},
 };

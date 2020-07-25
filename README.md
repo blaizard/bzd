@@ -48,7 +48,7 @@ formater and linters for data files such as YAML, json... are also available.
 |--|--|--|--|--|--|
 |C++|clang-format|asan, lsan|Yes|Yes|doxygen-based|
 |Python|yapf|mypy||Yes||
-|Node|eslint|eslint|Yes|Yes||
+|Node|prettier|eslint|Yes|Yes||
 |Skylark|buildifier|buildifier|||stardoc|
 
 ## Memory footprint

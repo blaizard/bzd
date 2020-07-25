@@ -7,10 +7,13 @@ const Exception = ExceptionFactory("workspace");
 
 export default class Workspace {
 	constructor(path, options) {
-		this.options = Object.assign({
-			include: [],
-			exclude: []
-		}, options);
+		this.options = Object.assign(
+			{
+				include: [],
+				exclude: [],
+			},
+			options
+		);
 		this.include = new Filter(this.options.include);
 		this.exclude = new Filter(this.options.exclude);
 		this.path = path;
@@ -18,7 +21,7 @@ export default class Workspace {
 
 	static async _findWorkspace(workspace) {
 		let path = workspace;
-		while (true) {
+		while (path) {
 			if (await FileSystem.exists(Path.join(path, "WORKSPACE"))) {
 				return path;
 			}
@@ -34,7 +37,7 @@ export default class Workspace {
 			const relativePath = Path.relative(workspace, path);
 			if (!this.exclude.match(relativePath)) {
 				if (this.include.match(relativePath)) {
-					yield (relative) ? relativePath : path;
+					yield relative ? relativePath : path;
 				}
 			}
 		}

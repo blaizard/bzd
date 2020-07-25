@@ -1,5 +1,3 @@
-
-
 // Used to generated unique Ids
 let elementUid = 0;
 
@@ -7,7 +5,6 @@ let elementUid = 0;
 let observers = {};
 
 function autoResize(el) {
-
 	let uid = getElementId(el);
 
 	// Register the observer if not already done
@@ -23,7 +20,6 @@ function autoResize(el) {
 
 	// Make everything asynchronous to avoid any execution time limit from the ResizeObserver
 	observers[uid].instance = setTimeout(() => {
-
 		// If the element has been destroyed in the mean time, remove it and ignore this request
 		if (!el.parentElement) {
 			unregisterObserver(uid);
@@ -54,8 +50,7 @@ function autoResize(el) {
 			// Update the font size boundaries
 			if (rect.height > rectParent.height || rect.width > rectParent.width) {
 				maxFontSize = fontSize;
-			}
-			else {
+			} else {
 				minFontSize = fontSize;
 			}
 
@@ -90,18 +85,17 @@ function registerObserver(el) {
 				autoResize(el);
 			}),
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 		observers[uid].obj.observe(el);
 		observers[uid].obj.observe(el.parentElement);
-	}
-	else {
+	} else {
 		observers[uid] = {
 			obj: setInterval(() => {
 				autoResize(el);
 			}, 1000),
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 	}
 
@@ -113,8 +107,7 @@ function unregisterObserver(uid) {
 		clearTimeout(observers[uid].instance);
 		if (typeof ResizeObserver !== "undefined") {
 			observers[uid].obj.disconnect();
-		}
-		else {
+		} else {
 			clearInterval(observers[uid].obj);
 		}
 		delete observers[uid];
@@ -126,24 +119,24 @@ function getElementId(el) {
 }
 
 function setElementId(el) {
-	const uid = "autosize-" + (++elementUid);
+	const uid = "autosize-" + ++elementUid;
 	el.setAttribute("data-auto-size", uid);
 	return uid;
 }
 
 function generateHash(rect, rectParent) {
-	return [rect.width, rect.height, rectParent.width, rectParent.height].reduce((n, arg) => (n * 1000 + arg), 0);
+	return [rect.width, rect.height, rectParent.width, rectParent.height].reduce((n, arg) => n * 1000 + arg, 0);
 }
 
 export default {
-	inserted: function(el) {
+	inserted: function (el) {
 		autoResize(el);
 	},
-	componentUpdated: function(el) {
+	componentUpdated: function (el) {
 		autoResize(el);
 	},
 	unbind: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
-	}
+	},
 };

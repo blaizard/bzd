@@ -1,5 +1,5 @@
-import{request as requestHttp} from "http";
-import{request as requestHttps} from "https";
+import { request as requestHttp } from "http";
+import { request as requestHttps } from "https";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import { FetchException } from "../../fetch.mjs";
@@ -13,14 +13,18 @@ const MAX_TIMEOUT_S = 60;
 export default async function request(url, options) {
 	return new Promise((resolve, reject) => {
 		// Check if http or https
-		let requestHandler = (url.toLowerCase().startsWith("https://")) ? requestHttps : requestHttp;
+		let requestHandler = url.toLowerCase().startsWith("https://") ? requestHttps : requestHttp;
 
-		let sharedOptions = {timeoutInstance : null};
+		let sharedOptions = { timeoutInstance: null };
 
 		// Create the request
 		let req = requestHandler(
 			url,
-			{method : options.method, headers : options.headers, timeout : MAX_TIMEOUT_S * 1000},
+			{
+				method: options.method,
+				headers: options.headers,
+				timeout: MAX_TIMEOUT_S * 1000,
+			},
 			(response) => {
 				// Handle redirection
 				if (response.statusCode >= 300 && response.statusCode < 400) {
@@ -39,28 +43,32 @@ export default async function request(url, options) {
 				}
 
 				if (response.statusCode < 200 || response.statusCode > 299) {
-					return reject(new FetchException(response.statusCode,
-						"Request to '{}' responded with: {} {}",
-						url,
-						response.statusCode,
-						response.statusMessage));
+					return reject(
+						new FetchException(
+							response.statusCode,
+							"Request to '{}' responded with: {} {}",
+							url,
+							response.statusCode,
+							response.statusMessage
+						)
+					);
 				}
 
 				response.setEncoding("utf8");
 
-				sharedOptions.timeoutInstance =
-					setTimeout(() => { reject(new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)")); }, MAX_TIMEOUT_S * 1000);
+				sharedOptions.timeoutInstance = setTimeout(() => {
+					reject(new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)"));
+				}, MAX_TIMEOUT_S * 1000);
 				let body = "";
-				response.on(
-					"data",
-					(chunk) => { body += chunk; });
-				response.on(
-					"end",
-					() => {
-						clearTimeout(sharedOptions.timeoutInstance);
-						resolve(body);
-					});
-			});
+				response.on("data", (chunk) => {
+					body += chunk;
+				});
+				response.on("end", () => {
+					clearTimeout(sharedOptions.timeoutInstance);
+					resolve(body);
+				});
+			}
+		);
 
 		if (typeof options.body !== "undefined") {
 			Exception.assert(typeof options.body === "string", "Body passed must be a string: {}", options.body);
@@ -68,17 +76,15 @@ export default async function request(url, options) {
 			req.write(options.body);
 		}
 
-		req.on(
-			"timeout",
-			(e) => {
-				clearTimeout(sharedOptions.timeoutInstance);
-				req.abort();
-				reject(e);
-			});
+		req.on("timeout", (e) => {
+			clearTimeout(sharedOptions.timeoutInstance);
+			req.abort();
+			reject(e);
+		});
 
-		req.on(
-			"error",
-			(e) => { reject(e); });
+		req.on("error", (e) => {
+			reject(e);
+		});
 		req.end();
 	});
 }

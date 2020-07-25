@@ -1,5 +1,3 @@
-
-
 import Base from "./base.mjs";
 import Fetch from "../fetch.mjs";
 import { FetchException } from "../fetch.mjs";
@@ -9,7 +7,6 @@ import Validation from "../validation.mjs";
 const Exception = ExceptionFactory("api", "client");
 
 export default class APIClient extends Base {
-
 	updateForm(method, endpoint, formDescription) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
@@ -17,7 +14,8 @@ export default class APIClient extends Base {
 
 		return formDescription.map((description) => {
 			if (description.name && description.name in validation) {
-				description.validation = ((description.validation) ? (description.validation + " ") : "") + validation[description.name];
+				description.validation =
+					(description.validation ? description.validation + " " : "") + validation[description.name];
 			}
 			return description;
 		});
@@ -44,29 +42,35 @@ export default class APIClient extends Base {
 
 		// Build the options
 		let fetchOptions = {
-			method: method
+			method: method,
 		};
 		if ("type" in responseOptions) {
 			fetchOptions.expect = responseOptions.type;
 		}
 
 		if ("validation" in requestOptions) {
-			Exception.assert(["json", "query"].includes(requestOptions.type), "{} {}: validation is not available for {}.", method, endpoint, requestOptions.type);
+			Exception.assert(
+				["json", "query"].includes(requestOptions.type),
+				"{} {}: validation is not available for {}.",
+				method,
+				endpoint,
+				requestOptions.type
+			);
 			const validation = new Validation(requestOptions.validation);
 			validation.validate(data, {
-				all: true
+				all: true,
 			});
 		}
 
 		switch (requestOptions.type) {
-		case "json":
-			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-			fetchOptions.data = data;
-			break;
-		case "query":
-			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-			fetchOptions.query = data;
-			break;
+			case "json":
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				fetchOptions.data = data;
+				break;
+			case "query":
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				fetchOptions.query = data;
+				break;
 		}
 
 		let retry;
@@ -74,27 +78,35 @@ export default class APIClient extends Base {
 		do {
 			++retryCounter;
 			retry = false;
-    
+
 			// Check if this is a request that needs authentication
 			if (this.schema[endpoint][method].authentication) {
-				Exception.assert(this.isAuthentication(), "This route has authentication requirement but no authentication object was specified.");
+				Exception.assert(
+					this.isAuthentication(),
+					"This route has authentication requirement but no authentication object was specified."
+				);
 				await this.options.authentication.setAuthenticationFetch(fetchOptions);
 			}
 
 			try {
 				const result = await Fetch.request(this._makePath(endpoint), fetchOptions);
 				if ("validation" in responseOptions) {
-					Exception.assert(["json"].includes(responseOptions.type), "{} {}: validation is not available for {}.", method, endpoint, responseOptions.type);
+					Exception.assert(
+						["json"].includes(responseOptions.type),
+						"{} {}: validation is not available for {}.",
+						method,
+						endpoint,
+						responseOptions.type
+					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {
-						all: true
+						all: true,
 					});
 				}
 				return result;
-			}
-			catch (e) {
+			} catch (e) {
 				if (e instanceof FetchException) {
-					if (e.code == 401/*Unauthorized*/) {
+					if (e.code == 401 /*Unauthorized*/) {
 						if (this.schema[endpoint][method].authentication) {
 							await this.options.authentication.refreshAuthentication();
 							retry = true;
@@ -104,7 +116,6 @@ export default class APIClient extends Base {
 				}
 				throw e;
 			}
-        
 		} while (retry && retryCounter <= 1);
 	}
 }

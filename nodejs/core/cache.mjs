@@ -1,5 +1,3 @@
-
-
 import Event from "./event.mjs";
 import LogFactory from "./log.mjs";
 import ExceptionFactory from "./exception.mjs";
@@ -14,23 +12,26 @@ const Exception = ExceptionFactory("cache");
  */
 class Cache {
 	constructor(config) {
-		this.config = Object.assign({
-			timeoutMs: 30 * 1000,
-			maxSize: 1000000, // 1MB
-			maxEntries: 100,
-			garbageCollector: true,
-			garbageCollectorPeriodMs: 10000 // Every 10s
-		}, config);
+		this.config = Object.assign(
+			{
+				timeoutMs: 30 * 1000,
+				maxSize: 1000000, // 1MB
+				maxEntries: 100,
+				garbageCollector: true,
+				garbageCollectorPeriodMs: 10000, // Every 10s
+			},
+			config
+		);
 
 		this.data = {
 			_size: 0,
-			_nbEntries: 0
+			_nbEntries: 0,
 		};
 
 		this.resourceMap = {};
 
 		this.event = new Event({
-			error: {proactive: true}
+			error: { proactive: true },
 		});
 
 		// Run the garbage collector asynchrounsly
@@ -43,21 +44,32 @@ class Cache {
 	 * \brief Register a new data collection
 	 */
 	register(collection, trigger, options) {
-
-		Exception.assert(typeof collection === "string", "register(...) must take a string as first argument: {:j}", collection);
-		Exception.assert(typeof trigger === "function", "register(...) must take a function as second argument: {:j}", trigger);
-		Exception.assert(collection.match(/^[a-z0-9.-]+$/i), "Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].", collection);
+		Exception.assert(
+			typeof collection === "string",
+			"register(...) must take a string as first argument: {:j}",
+			collection
+		);
+		Exception.assert(
+			typeof trigger === "function",
+			"register(...) must take a function as second argument: {:j}",
+			trigger
+		);
+		Exception.assert(
+			collection.match(/^[a-z0-9.-]+$/i),
+			"Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].",
+			collection
+		);
 		Exception.assert(!(collection in this.data), "The collection '{}' has already been registered.", collection);
 
 		this.data[collection] = {
 			_trigger: trigger,
 			_size: 0,
-			_defaultSize: ((options && ("size" in options)) ? options.size : 0),
-			_nbEntries: 0
+			_defaultSize: options && "size" in options ? options.size : 0,
+			_nbEntries: 0,
 		};
 
 		// Build the value object;
-		if (options && ("timeout" in options)) {
+		if (options && "timeout" in options) {
 			this.data[collection]._timeoutMs = options.timeout;
 		}
 
@@ -96,7 +108,7 @@ class Cache {
 	 * \return The data or a promise that will return the data.
 	 */
 	async get(collection, ...ids) {
-		return get.call(this, /*instant*/false, collection, ...ids);
+		return get.call(this, /*instant*/ false, collection, ...ids);
 	}
 
 	/**
@@ -109,7 +121,7 @@ class Cache {
 	 * \return The data or a promise that will return the data.
 	 */
 	async getInstant(collection, ...ids) {
-		return get.call(this, /*instant*/true, collection, ...ids);
+		return get.call(this, /*instant*/ true, collection, ...ids);
 	}
 
 	/**
@@ -130,7 +142,7 @@ class Cache {
 	 */
 	getSize(collection, ...ids) {
 		const obj = getObject.call(this, collection, ...ids);
-		return (obj) ? (obj._size || 0) : 0;
+		return obj ? obj._size || 0 : 0;
 	}
 
 	/**
@@ -144,7 +156,6 @@ class Cache {
 		Log.debug("DELETE {}::{}", collection, id);
 
 		if (id in this.data[collection]) {
-
 			// Update the size
 			const size = this.data[collection][id]._size || 0;
 			this.data[collection]._size -= size;
@@ -196,8 +207,7 @@ class Cache {
 					str += "- " + collection + ": " + this.toString(collection) + "\n";
 				}
 			}
-		}
-		else {
+		} else {
 			const dataCollection = this.data[collection];
 			if ("_timeoutMs" in dataCollection) {
 				str += "timeout=" + dataCollection._timeoutMs + "ms, ";
@@ -216,7 +226,7 @@ class Cache {
 					if ("_size" in dataCollection[key]) {
 						keyInfoList.push("size=" + dataCollection[key]._size);
 					}
-					entryList.push(key + ((keyInfoList.length) ? " (" + keyInfoList.join(", ") + ")" : ""));
+					entryList.push(key + (keyInfoList.length ? " (" + keyInfoList.join(", ") + ")" : ""));
 				}
 			}
 			str += entryList.join(", ") + "]";
@@ -273,9 +283,13 @@ export default Cache;
  * \brief Return the id from an id list and perform some simple sanity checks.
  */
 function idsToId(collection, ...ids) {
-	const id = (ids.length) ? ids.reduce((id, currentId) => (id + currentId), "") : "default";
+	const id = ids.length ? ids.reduce((id, currentId) => id + currentId, "") : "default";
 	Exception.assert(id[0] != "_", "Cache::get({}, {}), ids starting with '_' are protected.", collection, id);
-	Exception.assert(typeof this.data[collection] === "object", "Cache::get({}) does not exist or is not of type object.", collection);
+	Exception.assert(
+		typeof this.data[collection] === "object",
+		"Cache::get({}) does not exist or is not of type object.",
+		collection
+	);
 
 	return id;
 }
@@ -300,7 +314,7 @@ function getObject(collection, ...ids) {
 function isDirty(collection, ...ids) {
 	const id = idsToId.call(this, collection, ...ids);
 	const dataId = this.data[collection][id];
-	return ((typeof dataId !== "object") || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs()));
+	return typeof dataId !== "object" || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs());
 }
 
 /**
@@ -328,7 +342,6 @@ async function get(instant, collection, ...ids) {
 
 		// isFetching
 		if (typeof dataId === "object" && "_fetching" in dataId) {
-
 			// If instant and there are previous data, return it
 			if (instant) {
 				if ("_error" in dataId) {
@@ -337,7 +350,12 @@ async function get(instant, collection, ...ids) {
 				}
 				// isData
 				else if ("_data" in dataId) {
-					Log.debug("GET {}::{} ({}, instant)", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
+					Log.debug(
+						"GET {}::{} ({}, instant)",
+						collection,
+						id,
+						timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache"
+					);
 					return dataId._data;
 				}
 			}
@@ -348,26 +366,27 @@ async function get(instant, collection, ...ids) {
 		}
 		// isDirty
 		else if (isDirty.call(this, collection, ...ids)) {
-
 			timestampFetch = Cache.getTimestampMs();
 			triggerUpdate.call(this, collection, id, ...ids);
 		}
 		// isError
 		else if ("_error" in dataId) {
-
 			Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
 			throw new Exception(dataId._error);
 		}
 		// isData
 		else if ("_data" in dataId) {
-
-			Log.debug("GET {}::{} ({})", collection, id, ((timestampFetch) ? ((Cache.getTimestampMs() - timestampFetch) + "ms") : "cache"));
+			Log.debug(
+				"GET {}::{} ({})",
+				collection,
+				id,
+				timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache"
+			);
 			return dataId._data;
-		}
-		else {
+		} else {
 			throw new Exception("Invalid state {}::{}, it should never happen.", collection, id);
 		}
-	// Timeout after 30s
+		// Timeout after 30s
 	} while (Date.now() - timeStartMs < this.config.timeoutMs);
 
 	throw new Exception("Get {}::{} timeout ({}s).", collection, id, this.config.timeoutMs / 1000);
@@ -409,12 +428,16 @@ async function triggerUpdate(collection, id, ...ids) {
 	let dataId = dataCollection[id];
 	// Save the previous size
 	const previousSize = dataId._size || 0;
-	const previousNbEntries = ("_data" in dataId) ? 1 : 0;
+	const previousNbEntries = "_data" in dataId ? 1 : 0;
 	// Mark as fetching to prevent any concurrent fetching
 	dataId._fetching = true;
 
 	try {
-		Exception.assert(typeof dataCollection._trigger === "function", "No trigger function associated with collection '{}'", collection);
+		Exception.assert(
+			typeof dataCollection._trigger === "function",
+			"No trigger function associated with collection '{}'",
+			collection
+		);
 
 		// Close the previous data if a close function is available
 		if ("_data" in dataId && typeof dataId._data.close === "function") {
@@ -423,40 +446,46 @@ async function triggerUpdate(collection, id, ...ids) {
 
 		// Set the new data and delete the previous error if any
 		let options = {
-			timeout: ("_timeoutMs" in dataCollection) ? dataCollection._timeoutMs : null
+			timeout: "_timeoutMs" in dataCollection ? dataCollection._timeoutMs : null,
 		};
-		dataId._data = await dataCollection._trigger.call(this, ...ids, /*Previous value if any*/dataId._data, /*To overwrite options*/options);
-		
+		dataId._data = await dataCollection._trigger.call(
+			this,
+			...ids,
+			/*Previous value if any*/ dataId._data,
+			/*To overwrite options*/ options
+		);
+
 		if (options.timeout) {
 			dataId._timeout = Cache.getTimestampMs() + Math.max(1, options.timeout);
-		}
-		else {
+		} else {
 			// Delete any timeout, as this is how dirty is set
 			delete dataId._timeout;
 		}
-	
-		Exception.assert(typeof dataId._data !== "undefined", "Trigger function returned undefined data type for collection '{}'", collection);
+
+		Exception.assert(
+			typeof dataId._data !== "undefined",
+			"Trigger function returned undefined data type for collection '{}'",
+			collection
+		);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
 		delete dataId._error;
-	}
-	catch (e) {
+	} catch (e) {
 		// Register the error and delete the previous data if any
 		dataId._error = e.message;
 		dataId._timeout = Cache.getTimestampMs() + 100; // Invalid the error after 100ms
 		dataId._size = dataId._error.length || 0;
 		delete dataId._data;
-	}
-	finally {
+	} finally {
 		delete dataId._fetching;
 	}
 
 	// Update the size of the collection
 	Exception.assert(typeof dataId._size == "number", "Size is not a number: '{}'", dataId._size);
-	dataCollection._size += (dataId._size - previousSize);
-	this.data._size += (dataId._size - previousSize);
+	dataCollection._size += dataId._size - previousSize;
+	this.data._size += dataId._size - previousSize;
 
 	// Update the number of entries
-	const nbEntriesDelta = (("_data" in dataId) ? 1 : 0) - previousNbEntries;
+	const nbEntriesDelta = ("_data" in dataId ? 1 : 0) - previousNbEntries;
 	dataCollection._nbEntries += nbEntriesDelta;
 	this.data._nbEntries += nbEntriesDelta;
 
@@ -465,23 +494,34 @@ async function triggerUpdate(collection, id, ...ids) {
 
 function yieldThread() {
 	return new Promise((resolve) => {
-		setTimeout(() => { resolve(); }, 1);
+		setTimeout(() => {
+			resolve();
+		}, 1);
 	});
 }
 
 async function garbageCollector() {
 	// If a cleanup is required
 	try {
-		while (this.data._size > this.config.maxSize || (this.config.maxEntries && this.data._nbEntries > this.config.maxEntries)) {
-
+		while (
+			this.data._size > this.config.maxSize ||
+			(this.config.maxEntries && this.data._nbEntries > this.config.maxEntries)
+		) {
 			// Look for the oldest resource
 			const entry = Object.entries(this.resourceMap).reduce((total, cur) => {
-				if (!total || cur[1] < total[1]) {return cur;}
+				if (!total || cur[1] < total[1]) {
+					return cur;
+				}
 				return total;
 			}, null);
 			Exception.assert(entry, "Could not find entry to remove");
 
-			Log.info("GARBAGE COLLECTION size={}, nbEntries={}: removing entry '{}'", this.data._size, this.data._nbEntries, entry[0]);
+			Log.info(
+				"GARBAGE COLLECTION size={}, nbEntries={}: removing entry '{}'",
+				this.data._size,
+				this.data._nbEntries,
+				entry[0]
+			);
 
 			// Delete the resource
 			deleteResourceById.call(this, entry[0]);
@@ -489,11 +529,9 @@ async function garbageCollector() {
 			// Yield
 			await yieldThread();
 		}
-	}
-	catch (e) {
+	} catch (e) {
 		Exception.fromError(e).print();
-	}
-	finally {
+	} finally {
 		this.interval = setTimeout(() => {
 			garbageCollector.call(this);
 		}, this.config.garbageCollectorPeriodMs);
