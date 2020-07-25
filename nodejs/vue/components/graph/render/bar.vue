@@ -12,41 +12,41 @@
 </template>
 
 <script>
-export default {
-	props: {
-		serie: { type: Object, required: true },
-		boundingBox: { type: Object, required: true },
-		selected: { type: Number, required: true },
-	},
-	watch: {
-		selected: {
-			immediate: true,
-			handler(value) {
-				if (value != -1) {
-					const elt = this.$refs.container.childNodes[value];
-					this.serie.tooltip(elt);
-				}
+	export default {
+		props: {
+			serie: { type: Object, required: true },
+			boundingBox: { type: Object, required: true },
+			selected: { type: Number, required: true },
+		},
+		watch: {
+			selected: {
+				immediate: true,
+				handler(value) {
+					if (value != -1) {
+						const elt = this.$refs.container.childNodes[value];
+						this.serie.tooltip(elt);
+					}
+				},
 			},
 		},
-	},
-	computed: {
-		barWidth() {
-			let minDiffX = this.boundingBox.right - this.boundingBox.left;
-			let prevX = this.serie.coords[0][0];
-			for (let i = 1; i < this.serie.coords.length; ++i) {
-				minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
-			}
-			return Math.max(minDiffX - 2, 1);
+		computed: {
+			barWidth() {
+				let minDiffX = this.boundingBox.right - this.boundingBox.left;
+				let prevX = this.serie.coords[0][0];
+				for (let i = 1; i < this.serie.coords.length; ++i) {
+					minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
+				}
+				return Math.max(minDiffX - 2, 1);
+			},
 		},
-	},
-	//tooltipFromCoords(coords.x, coords.y, "hello");
-	methods: {
-		getPointClass(index) {
-			return {
-				rectangle: true,
-				selected: index == this.selected,
-			};
+		//tooltipFromCoords(coords.x, coords.y, "hello");
+		methods: {
+			getPointClass(index) {
+				return {
+					rectangle: true,
+					selected: index == this.selected,
+				};
+			},
 		},
-	},
-};
+	};
 </script>

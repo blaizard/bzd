@@ -3,11 +3,11 @@
 </template>
 
 <script>
-import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 
-export default {
-	directives: {
-		loading: DirectiveLoading,
-	},
-};
+	export default {
+		directives: {
+			loading: DirectiveLoading,
+		},
+	};
 </script>

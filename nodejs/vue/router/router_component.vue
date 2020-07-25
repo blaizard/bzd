@@ -3,25 +3,25 @@
 </template>
 
 <script>
-import Loading from "./router_loading.vue";
+	import Loading from "./router_loading.vue";
 
-export default {
-	data: function () {
-		return {
-			component: null,
-			routerId: null,
-			additionalProps: {},
-		};
-	},
-	watch: {
-		$attrs() {
-			// Make it reactive on attribute change
-			this.additionalProps = Object.assign(this.additionalProps, this.$attrs);
+	export default {
+		data: function () {
+			return {
+				component: null,
+				routerId: null,
+				additionalProps: {},
+			};
 		},
-	},
-	methods: {
-		componentSet(component, routerId, props) {
-			this.component =
+		watch: {
+			$attrs() {
+				// Make it reactive on attribute change
+				this.additionalProps = Object.assign(this.additionalProps, this.$attrs);
+			},
+		},
+		methods: {
+			componentSet(component, routerId, props) {
+				this.component =
 					typeof component === "function"
 						? () => ({
 							// The component to load (should be a Promise)
@@ -39,11 +39,11 @@ export default {
 							 *  provided and exceeded. Default: Infinity.
 							 * timeout: 3000
 							 */
-						  })
+						})
 						: component;
-			this.routerId = routerId;
-			this.additionalProps = Object.assign({}, this.$attrs, props);
+				this.routerId = routerId;
+				this.additionalProps = Object.assign({}, this.$attrs, props);
+			},
 		},
-	},
-};
+	};
 </script>

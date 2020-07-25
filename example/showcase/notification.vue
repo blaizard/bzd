@@ -8,27 +8,27 @@
 </template>
 
 <script>
-export default {
-	data() {
-		return {
-			counter: 0,
-		};
-	},
-	methods: {
-		addInfo() {
-			this.$notification.info("Hello, I am an informative message!");
+	export default {
+		data() {
+			return {
+				counter: 0,
+			};
 		},
-		addError() {
-			this.$notification.error("Hello, I am an error message!");
+		methods: {
+			addInfo() {
+				this.$notification.info("Hello, I am an informative message!");
+			},
+			addError() {
+				this.$notification.error("Hello, I am an error message!");
+			},
+			addSuccess() {
+				this.$notification.success("Hello, I am a success message!");
+			},
+			increaseCounter() {
+				this.$notification.success({ counter: "Counter: " + ++this.counter });
+			},
 		},
-		addSuccess() {
-			this.$notification.success("Hello, I am a success message!");
-		},
-		increaseCounter() {
-			this.$notification.success({ counter: "Counter: " + ++this.counter });
-		},
-	},
-};
+	};
 </script>
 
 <style lang="scss" scoped></style>
