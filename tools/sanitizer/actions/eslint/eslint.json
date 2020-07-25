@@ -7,7 +7,7 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:vue/base"
+        "plugin:vue/base",
     ],
     "parserOptions": {
         "ecmaFeatures": {

@@ -8,17 +8,16 @@ const { ESLint } = require("eslint");
 		fix: true,
 		cwd: workspace,
 		resolvePluginsRelativeTo: process.cwd(),
-		overrideConfigFile: process.cwd() + "/tools/sanitizer/actions/eslint/.eslintrc.json"
+		overrideConfigFile:
+      process.cwd() + "/tools/sanitizer/actions/eslint/eslint.json",
 	});
-  
+
 	// 2. Lint files. This doesn't modify target files.
-	const results = await eslint.lintFiles([
-		"**/*.{vue,js,mjs,cjs}",
-	]);
+	const results = await eslint.lintFiles(["**/*.{vue,js,mjs,cjs}"]);
 
 	// 3. Modify the files with the fixed code.
 	await ESLint.outputFixes(results);
-  
+
 	// 4. Format the results.
 	const formatter = await eslint.loadFormatter("stylish");
 	const resultText = formatter.format(results);
@@ -33,7 +32,6 @@ const { ESLint } = require("eslint");
 	if (totalErrorCount > 0) {
 		process.exitCode = 2;
 	}
-
 })().catch((error) => {
 	process.exitCode = 1;
 	console.error(error);
