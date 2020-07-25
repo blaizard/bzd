@@ -6,7 +6,7 @@ import FileSystem from "bzd/core/filesystem.mjs";
 	const workspace = process.argv[2];
 
 	const files = new Workspace(workspace, {
-		include: ["**.mjs"],
+		include: ["**.mjs", "**.cjs", "**.js"],
 	});
 
 	for await (const path of files.data()) {
