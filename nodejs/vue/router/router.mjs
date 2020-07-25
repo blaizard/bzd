@@ -179,8 +179,8 @@ class RouterManager {
 		const queryStr = Object.keys(query).length
 			? "?" +
 			  Object.keys(query)
-					.map((key) => key + "=" + encodeURIComponent(query[key]))
-					.join("&")
+			  	.map((key) => key + "=" + encodeURIComponent(query[key]))
+			  	.join("&")
 			: "";
 		history.pushState(null, null, this.options.hash ? queryStr + "#" + this.path : this.path + queryStr);
 

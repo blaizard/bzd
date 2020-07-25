@@ -166,7 +166,8 @@ export function tooltip(elt, message = null, initialPosition = null) {
 	let positionList = ["e", "s", "w", "n"];
 	if (positionSequences[initalPosition]) {
 		positionList = positionSequences[initalPosition].slice();
-	} else if (initalPosition.indexOf(",") !== -1) {
+	}
+	else if (initalPosition.indexOf(",") !== -1) {
 		positionList = initalPosition.split(",");
 	}
 
@@ -174,26 +175,26 @@ export function tooltip(elt, message = null, initialPosition = null) {
 		let position = positionList.shift();
 
 		switch (position) {
-			case "e":
-				tooltipElt.style.marginLeft = coordElt.width + "px";
-				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
-				tooltipElt.className = "irtooltip irtooltip-e";
-				break;
-			case "s":
-				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
-				tooltipElt.style.marginTop = coordElt.height + "px";
-				tooltipElt.className = "irtooltip irtooltip-s";
-				break;
-			case "w":
-				tooltipElt.style.marginLeft = -coordTooltip.width + "px";
-				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
-				tooltipElt.className = "irtooltip irtooltip-w";
-				break;
-			case "n":
-				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
-				tooltipElt.style.marginTop = -coordTooltip.height + "px";
-				tooltipElt.className = "irtooltip irtooltip-n";
-				break;
+		case "e":
+			tooltipElt.style.marginLeft = coordElt.width + "px";
+			tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+			tooltipElt.className = "irtooltip irtooltip-e";
+			break;
+		case "s":
+			tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
+			tooltipElt.style.marginTop = coordElt.height + "px";
+			tooltipElt.className = "irtooltip irtooltip-s";
+			break;
+		case "w":
+			tooltipElt.style.marginLeft = -coordTooltip.width + "px";
+			tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+			tooltipElt.className = "irtooltip irtooltip-w";
+			break;
+		case "n":
+			tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
+			tooltipElt.style.marginTop = -coordTooltip.height + "px";
+			tooltipElt.className = "irtooltip irtooltip-n";
+			break;
 		}
 	} while (eltOutOfScreen(tooltipElt) && positionList.length);
 
@@ -226,7 +227,8 @@ export default function (el, binding) {
 	// Set the attributes
 	if (config.text) {
 		el.setAttribute("data-irtooltip", config.text);
-	} else {
+	}
+	else {
 		el.removeAttribute("data-irtooltip");
 	}
 
@@ -241,9 +243,11 @@ export default function (el, binding) {
 
 	if (config.position == defaultPosition) {
 		el.removeAttribute("data-irtooltip-position");
-	} else if (typeof config.position === "string") {
+	}
+	else if (typeof config.position === "string") {
 		el.setAttribute("data-irtooltip-position", config.position);
-	} else {
+	}
+	else {
 		el.setAttribute("data-irtooltip-position", config.position.join(","));
 	}
 }

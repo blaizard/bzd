@@ -110,7 +110,8 @@ export default class Validation {
 						const arg = m[2];
 						this._processConstraint(processedSchema, key, name, arg);
 					});
-			} else {
+			}
+			else {
 				Exception.unreachable("Constraints type is unsupported: {:j}", constraints);
 			}
 		}
@@ -170,12 +171,12 @@ export default class Validation {
 				if (key in values) {
 					let value = values[key];
 					switch (this.schema[key].type) {
-						case "integer":
-							value = Constraint.getAndAssertInteger(value, result, key);
-							break;
-						case "float":
-							value = Constraint.getAndAssertFloat(value, result, key);
-							break;
+					case "integer":
+						value = Constraint.getAndAssertInteger(value, result, key);
+						break;
+					case "float":
+						value = Constraint.getAndAssertFloat(value, result, key);
+						break;
 					}
 					if (value !== undefined) {
 						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
@@ -192,23 +193,24 @@ export default class Validation {
 		}
 
 		switch (options.output) {
-			case "throw":
-				{
-					const keys = Object.keys(result);
-					if (keys.length == 1) {
-						throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
-					} else if (keys.length > 1) {
-						const message = keys.map((key) => {
-							return String(key) + ": (" + result[key].join(", ") + ")";
-						});
-						throw new Exception("Some values do not validate: {}", message.join("; "));
-					}
+		case "throw":
+			{
+				const keys = Object.keys(result);
+				if (keys.length == 1) {
+					throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
 				}
-				break;
-			case "return":
-				return result;
-			default:
-				Exception.unreachable("Unsupported output type: '{}'", options.output);
+				else if (keys.length > 1) {
+					const message = keys.map((key) => {
+						return String(key) + ": (" + result[key].join(", ") + ")";
+					});
+					throw new Exception("Some values do not validate: {}", message.join("; "));
+				}
+			}
+			break;
+		case "return":
+			return result;
+		default:
+			Exception.unreachable("Unsupported output type: '{}'", options.output);
 		}
 	}
 
@@ -227,26 +229,26 @@ export default class Validation {
 			min: class Min extends Constraint {
 				install() {
 					switch (this.entry.type) {
-						case "string":
-						case "integer":
-							this.arg = Constraint.getAndAssertInteger(this.arg);
-							break;
-						case "float":
-							this.arg = Constraint.getAndAssertFloat(this.arg);
+					case "string":
+					case "integer":
+						this.arg = Constraint.getAndAssertInteger(this.arg);
+						break;
+					case "float":
+						this.arg = Constraint.getAndAssertFloat(this.arg);
 					}
 
 					switch (this.entry.type) {
-						case "string":
-							return (result, value) => {
-								this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
-							};
-						case "integer":
-						case "float":
-							return (result, value) => {
-								this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
-							};
-						default:
-							Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
+					case "string":
+						return (result, value) => {
+							this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
+						};
+					case "integer":
+					case "float":
+						return (result, value) => {
+							this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
+						};
+					default:
+						Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
 					}
 				}
 			},

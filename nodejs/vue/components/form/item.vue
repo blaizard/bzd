@@ -12,51 +12,51 @@
 </template>
 
 <script>
-	export default {
-		props: {
-			align: { type: String, required: false, default: "top left" },
-			caption: { type: String | Object, required: false, default: null },
-			disable: { type: Boolean, default: false, required: false },
-			width: { type: Number | String, default: 1, required: false },
-			mandatory: { type: Boolean, default: false, required: false },
-			error: { type: Array, default: [], required: false },
+export default {
+	props: {
+		align: { type: String, required: false, default: "top left" },
+		caption: { type: String | Object, required: false, default: null },
+		disable: { type: Boolean, default: false, required: false },
+		width: { type: Number | String, default: 1, required: false },
+		mandatory: { type: Boolean, default: false, required: false },
+		error: { type: Array, default: [], required: false },
+	},
+	data: function () {
+		return {};
+	},
+	computed: {
+		alignList() {
+			return this.align
+				.replace(/[^a-z]/i, " ")
+				.split(" ")
+				.map((align) => align.toLowerCase().trim());
 		},
-		data: function () {
-			return {};
+		elementsClass() {
+			return {
+				"irform-elements": true,
+				"irform-align-top": this.alignList.indexOf("top") != -1,
+				"irform-align-bottom": this.alignList.indexOf("bottom") != -1,
+				"irform-align-left": this.alignList.indexOf("left") != -1,
+				"irform-align-right": this.alignList.indexOf("right") != -1,
+				"irform-align-center": this.alignList.indexOf("center") != -1,
+			};
 		},
-		computed: {
-			alignList() {
-				return this.align
-					.replace(/[^a-z]/i, " ")
-					.split(" ")
-					.map((align) => align.toLowerCase().trim());
-			},
-			elementsClass() {
+		isError() {
+			return this.error.length > 0;
+		},
+		style() {
+			if ((this.width || 1) === 1) {
 				return {
-					"irform-elements": true,
-					"irform-align-top": this.alignList.indexOf("top") != -1,
-					"irform-align-bottom": this.alignList.indexOf("bottom") != -1,
-					"irform-align-left": this.alignList.indexOf("left") != -1,
-					"irform-align-right": this.alignList.indexOf("right") != -1,
-					"irform-align-center": this.alignList.indexOf("center") != -1,
+					width: "100%",
 				};
-			},
-			isError() {
-				return this.error.length > 0;
-			},
-			style() {
-				if ((this.width || 1) === 1) {
-					return {
-						width: "100%",
-					};
-				}
-				if (typeof this.width === "number") {
-					return {
-						flex: this.width * 100 + " 0 0",
-					};
-				}
-				return this.width;
-			},
+			}
+			if (typeof this.width === "number") {
+				return {
+					flex: this.width * 100 + " 0 0",
+				};
+			}
+			return this.width;
 		},
-	};
+	},
+};
 </script>

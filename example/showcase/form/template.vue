@@ -9,32 +9,32 @@
 </template>
 
 <script>
-	import Form from "bzd/vue/components/form/form.vue";
+import Form from "bzd/vue/components/form/form.vue";
 
-	export default {
-		components: {
-			Form,
+export default {
+	components: {
+		Form,
+	},
+	data: function () {
+		return {
+			value: {},
+			submitted: false,
+		};
+	},
+	computed: {
+		formDescription() {
+			return [];
 		},
-		data: function () {
-			return {
-				value: {},
-				submitted: false,
-			};
+	},
+	methods: {
+		handleSumbit() {
+			this.submitted = true;
 		},
-		computed: {
-			formDescription() {
-				return [];
-			},
+		handleInput() {
+			this.submitted = false;
 		},
-		methods: {
-			handleSumbit() {
-				this.submitted = true;
-			},
-			handleInput() {
-				this.submitted = false;
-			},
-		},
-	};
+	},
+};
 </script>
 
 <style lang="scss">

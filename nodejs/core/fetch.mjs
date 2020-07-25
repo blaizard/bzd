@@ -43,7 +43,8 @@ export default class Fetch {
 		if (typeof options.data == "object") {
 			headers["Content-Type"] = "application/json";
 			body = JSON.stringify(options.data);
-		} else if (typeof options.data != "undefined") {
+		}
+		else if (typeof options.data != "undefined") {
 			body = options.data;
 		}
 
@@ -56,20 +57,20 @@ export default class Fetch {
 		if ("authentication" in options) {
 			const auth = options.authentication;
 			switch (auth.type) {
-				case "basic":
-					{
-						const base64 = await base64Encode(auth.username + ":" + auth.password);
-						headers["Authorization"] = "basic " + base64;
-					}
-					break;
-				case "bearer":
-					headers["Authorization"] = "bearer " + auth.token;
-					break;
-				case "token":
-					headers["Authorization"] = "token " + auth.token;
-					break;
-				default:
-					Exception.unreachable("Unsupported authentication type '{}'", auth.type);
+			case "basic":
+				{
+					const base64 = await base64Encode(auth.username + ":" + auth.password);
+					headers["Authorization"] = "basic " + base64;
+				}
+				break;
+			case "bearer":
+				headers["Authorization"] = "bearer " + auth.token;
+				break;
+			case "token":
+				headers["Authorization"] = "token " + auth.token;
+				break;
+			default:
+				Exception.unreachable("Unsupported authentication type '{}'", auth.type);
 			}
 		}
 
@@ -99,15 +100,16 @@ export default class Fetch {
 
 		// Handle expected type
 		switch (options.expect) {
-			case "json":
-				headers["Accept"] = "application/json";
-				break;
+		case "json":
+			headers["Accept"] = "application/json";
+			break;
 		}
 
 		let request = null;
 		if (process.env.BZD_RULE === "nodejs_web") {
 			request = (await import(/* webpackMode: "eager" */ "./impl/fetch/window.fetch.mjs")).default;
-		} else {
+		}
+		else {
 			request = (await import(/* webpackMode: "eager" */ "./impl/fetch/node.http.mjs")).default;
 		}
 
@@ -121,10 +123,10 @@ export default class Fetch {
 		});
 
 		switch (options.expect) {
-			case "json":
-				return JSON.parse(data);
-			default:
-				return data;
+		case "json":
+			return JSON.parse(data);
+		default:
+			return data;
 		}
 	}
 

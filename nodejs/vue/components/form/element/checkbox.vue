@@ -14,31 +14,31 @@
 </template>
 
 <script>
-	import Element from "./element.vue";
+import Element from "./element.vue";
 
-	export default {
-		mixins: [Element],
-		props: {
-			value: { type: Boolean, required: false, default: false },
+export default {
+	mixins: [Element],
+	props: {
+		value: { type: Boolean, required: false, default: false },
+	},
+	computed: {
+		containerClass() {
+			return {
+				"irform-checkbox": true,
+				[this.getOption("class")]: true,
+			};
 		},
-		computed: {
-			containerClass() {
-				return {
-					"irform-checkbox": true,
-					[this.getOption("class")]: true,
-				};
-			},
-			text() {
-				return this.getOption("text", "");
-			},
+		text() {
+			return this.getOption("text", "");
 		},
-		methods: {
-			handleClick() {
-				this.$el.firstChild.focus();
-				this.set(!this.get());
-			},
+	},
+	methods: {
+		handleClick() {
+			this.$el.firstChild.focus();
+			this.set(!this.get());
 		},
-	};
+	},
+};
 </script>
 
 <style lang="scss">

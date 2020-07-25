@@ -6,27 +6,27 @@
 </template>
 
 <script>
-	export default {
-		props: {
-			metadata: { type: Object, mandatory: true },
-			description: { type: Object, mandatory: true },
-		},
-		mounted() {},
-		data: function () {
-			return {};
-		},
-		watch: {
-			metadata: {
-				immediate: true,
-				handler() {
-					if ("link" in this.metadata) {
-						const url = new URL(this.metadata.link, this.description["coverage.url"]);
-						this.$emit("link", String(url));
-					}
-				},
+export default {
+	props: {
+		metadata: { type: Object, mandatory: true },
+		description: { type: Object, mandatory: true },
+	},
+	mounted() {},
+	data: function () {
+		return {};
+	},
+	watch: {
+		metadata: {
+			immediate: true,
+			handler() {
+				if ("link" in this.metadata) {
+					const url = new URL(this.metadata.link, this.description["coverage.url"]);
+					this.$emit("link", String(url));
+				}
 			},
 		},
-	};
+	},
+};
 </script>
 
 <style lang="scss">

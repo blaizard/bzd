@@ -63,14 +63,14 @@ export default class APIClient extends Base {
 		}
 
 		switch (requestOptions.type) {
-			case "json":
-				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-				fetchOptions.data = data;
-				break;
-			case "query":
-				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-				fetchOptions.query = data;
-				break;
+		case "json":
+			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+			fetchOptions.data = data;
+			break;
+		case "query":
+			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+			fetchOptions.query = data;
+			break;
 		}
 
 		let retry;
@@ -104,7 +104,8 @@ export default class APIClient extends Base {
 					});
 				}
 				return result;
-			} catch (e) {
+			}
+			catch (e) {
 				if (e instanceof FetchException) {
 					if (e.code == 401 /*Unauthorized*/) {
 						if (this.schema[endpoint][method].authentication) {

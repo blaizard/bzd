@@ -21,7 +21,8 @@ export default class Storage {
 		try {
 			this.event.trigger("ready");
 			await this._initializeImpl();
-		} catch (e) {
+		}
+		catch (e) {
 			this.event.trigger("error", e);
 			throw e;
 		}

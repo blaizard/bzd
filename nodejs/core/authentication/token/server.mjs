@@ -33,7 +33,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.sign(data, this.options.privateKey, { expiresIn: expiresIn }, (e, token) => {
 				if (e) {
 					reject(e);
-				} else {
+				}
+				else {
 					resolve({
 						token: token,
 						timeout: expiresIn,
@@ -81,7 +82,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			let data = null;
 			try {
 				data = await authentication.readToken(refreshToken);
-			} catch (e) {
+			}
+			catch (e) {
 				Log.error(e);
 				return this.setStatus(401, "Unauthorized");
 			}
@@ -116,7 +118,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		try {
 			const data = await this.readToken(token);
 			return await verifyCallback(data.uid);
-		} catch (e) {
+		}
+		catch (e) {
 			return false;
 		}
 	}
@@ -138,7 +141,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.verify(token, this.options.publicKey || this.options.privateKey, (e, data) => {
 				if (e) {
 					reject(e);
-				} else {
+				}
+				else {
 					resolve(data);
 				}
 			});

@@ -9,7 +9,7 @@ filegroup(
 )
 
 py_binary(
-    name = "sanitizer",
+    name = "analyzer",
     srcs = glob(
         [
             "*.py",

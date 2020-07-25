@@ -16,10 +16,12 @@ export default class Filter {
 				if (index + 1 < filterStr.length && filterStr[index + 1] == "*") {
 					regexpr += ".*";
 					++index;
-				} else {
+				}
+				else {
 					regexpr += "[^/]*";
 				}
-			} else {
+			}
+			else {
 				regexpr += Filter._escapeRegExp(c);
 			}
 			++index;

@@ -5,14 +5,14 @@
 </template>
 
 <script>
-	export default {
-		props: {
-			link: { type: String, mandatory: true },
+export default {
+	props: {
+		link: { type: String, mandatory: true },
+	},
+	methods: {
+		handleClick() {
+			this.$routerDispatch(this.link);
 		},
-		methods: {
-			handleClick() {
-				this.$routerDispatch(this.link);
-			},
-		},
-	};
+	},
+};
 </script>

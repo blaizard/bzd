@@ -7,23 +7,23 @@
 </template>
 
 <script>
-	import Colors from "bzd-style/css/colors.scss";
+import Colors from "bzd-style/css/colors.scss";
 
-	export default {
-		data: function () {
-			return {};
+export default {
+	data: function () {
+		return {};
+	},
+	computed: {
+		colors() {
+			return Colors;
 		},
-		computed: {
-			colors() {
-				return Colors;
-			},
+	},
+	methods: {
+		setStyle(color) {
+			return "background-color: " + color + ";";
 		},
-		methods: {
-			setStyle(color) {
-				return "background-color: " + color + ";";
-			},
-		},
-	};
+	},
+};
 </script>
 
 <style lang="scss" scoped>
