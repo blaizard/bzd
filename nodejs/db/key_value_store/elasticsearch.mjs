@@ -2,12 +2,12 @@ import KeyValueStore from "./key_value_store.mjs";
 import { FetchFactory, FetchException } from "../../core/fetch.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 
-const Exception = ExceptionFactory("db", "kvs", "elastic-search");
+const Exception = ExceptionFactory("db", "kvs", "elasticsearch");
 
 /**
  * Kay valud store adapater to elastic search DB
  */
-export default class KeyValueStoreElasticSearch extends KeyValueStore {
+export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	constructor(host, options) {
 		super();
@@ -68,5 +68,37 @@ export default class KeyValueStoreElasticSearch extends KeyValueStore {
 			method: "delete"
 		});
 		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
+	}
+
+	async _search(bucket, maxOrPaging, query) {
+		const paging = (typeof maxOrPaging == "object") ? maxOrPaging : {page: 0, max: maxOrPaging};
+		const result = await this.fetch.request("/" + encodeURIComponent(bucket) + "/_search?size=" + paging.max + "&from=" + (paging.page * paging.max), {
+			method: "post",
+			data: {
+				query: query
+			}
+		});
+		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
+		return result.hits.hits.reduce((obj, item) => {
+			obj[item._id] = item._source;
+			return obj;
+		}, {});
+	}
+
+	async list(bucket, maxOrPaging = 10) {
+		return await this._search(bucket, maxOrPaging, {
+			"match_all": {}
+		});
+	}
+
+	async listMatch(bucket, subKey, value, maxOrPaging = 10) {
+		return await this._search(bucket, maxOrPaging, {
+			term: {
+				[subKey]: {
+					value: value,
+					boost: 1
+				}
+			}
+		});
 	}
 }

@@ -287,7 +287,7 @@ class Scanner:
 		for level in list(self.possible_simple_keys):
 			key = self.possible_simple_keys[level]
 			if key.line != self.line  \
-                                                        or self.index-key.index > 1024:
+                                                                                            or self.index-key.index > 1024:
 				if key.required:
 					raise ScannerError("while scanning a simple key", key.mark, "could not find expected ':'",
 						self.get_mark())
@@ -682,7 +682,7 @@ class Scanner:
 		# DOCUMENT-START:   ^ '---' (' '|'\n')
 		if self.column == 0:
 			if self.prefix(3) == '---'  \
-                                                        and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
+                                                                                            and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
 				return True
 
 	def check_document_end(self):
@@ -690,7 +690,7 @@ class Scanner:
 		# DOCUMENT-END:     ^ '...' (' '|'\n')
 		if self.column == 0:
 			if self.prefix(3) == '...'  \
-                                                        and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
+                                                                                            and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
 				return True
 
 	def check_block_entry(self):
@@ -734,7 +734,7 @@ class Scanner:
 		# independent.
 		ch = self.peek()
 		return ch not in '\0 \t\r\n\x85\u2028\u2029-?:,[]{}#&*!|>\'\"%@`'  \
-                                        or (self.peek(1) not in '\0 \t\r\n\x85\u2028\u2029'
+                                                                or (self.peek(1) not in '\0 \t\r\n\x85\u2028\u2029'
 			and (ch == '-' or (not self.flow_level and ch in '?:')))
 
 	# Scanners.
@@ -798,7 +798,7 @@ class Scanner:
 		length = 0
 		ch = self.peek(length)
 		while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z'  \
-                                        or ch in '-_':
+                                                                or ch in '-_':
 			length += 1
 			ch = self.peek(length)
 		if not length:
@@ -900,7 +900,7 @@ class Scanner:
 		length = 0
 		ch = self.peek(length)
 		while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z'  \
-                                        or ch in '-_':
+                                                                or ch in '-_':
 			length += 1
 			ch = self.peek(length)
 		if not length:
@@ -1000,7 +1000,7 @@ class Scanner:
 				# This is the folding according to the specification:
 
 				if folded and line_break == '\n'    \
-                                                                        and leading_non_space and self.peek() not in ' \t':
+                                                                                                                        and leading_non_space and self.peek() not in ' \t':
 					if not breaks:
 						chunks.append(' ')
 				else:
@@ -1233,7 +1233,7 @@ class Scanner:
 			# separators.
 			prefix = self.prefix(3)
 			if (prefix == '---' or prefix == '...')   \
-                                                        and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
+                                                                                            and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
 				raise ScannerError("while scanning a quoted scalar", start_mark, "found unexpected document separator",
 					self.get_mark())
 			while self.peek() in ' \t':
@@ -1265,10 +1265,10 @@ class Scanner:
 			while True:
 				ch = self.peek(length)
 				if ch in '\0 \t\r\n\x85\u2028\u2029'    \
-                                                                        or (ch == ':' and
+                                                                                                                        or (ch == ':' and
 					self.peek(length+1) in '\0 \t\r\n\x85\u2028\u2029'
 					+ (u',[]{}' if self.flow_level else u''))\
-                                                                        or (self.flow_level and ch in ',?[]{}'):
+                                                                                                                        or (self.flow_level and ch in ',?[]{}'):
 					break
 				length += 1
 			if length == 0:
@@ -1280,7 +1280,7 @@ class Scanner:
 			end_mark = self.get_mark()
 			spaces = self.scan_plain_spaces(indent, start_mark)
 			if not spaces or self.peek() == '#' \
-                                                        or (not self.flow_level and self.column < indent):
+                                                                                            or (not self.flow_level and self.column < indent):
 				break
 		return ScalarToken(''.join(chunks), True, start_mark, end_mark)
 
@@ -1300,7 +1300,7 @@ class Scanner:
 			self.allow_simple_key = True
 			prefix = self.prefix(3)
 			if (prefix == '---' or prefix == '...')   \
-                                                        and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
+                                                                                            and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
 				return
 			breaks = []
 			while self.peek() in ' \r\n\x85\u2028\u2029':
@@ -1310,7 +1310,7 @@ class Scanner:
 					breaks.append(self.scan_line_break())
 					prefix = self.prefix(3)
 					if (prefix == '---' or prefix == '...')   \
-                                                                                        and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
+                                                                                                                                                    and self.peek(3) in '\0 \t\r\n\x85\u2028\u2029':
 						return
 			if line_break != '\n':
 				chunks.append(line_break)
@@ -1333,7 +1333,7 @@ class Scanner:
 		ch = self.peek(length)
 		if ch != ' ':
 			while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z'  \
-                                                        or ch in '-_':
+                                                                                            or ch in '-_':
 				length += 1
 				ch = self.peek(length)
 			if ch != '!':
@@ -1352,7 +1352,7 @@ class Scanner:
 		length = 0
 		ch = self.peek(length)
 		while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z'  \
-                                        or ch in '-;/?:@&=+$,_.!~*\'()[]%':
+                                                                or ch in '-;/?:@&=+$,_.!~*\'()[]%':
 			if ch == '%':
 				chunks.append(self.prefix(length))
 				self.forward(length)

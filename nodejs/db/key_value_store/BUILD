@@ -19,9 +19,9 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "elastic_search",
+    name = "elasticsearch",
     srcs = [
-        "elastic_search.mjs",
+        "elasticsearch.mjs",
         "key_value_store.mjs",
     ],
     visibility = ["//visibility:public"],
