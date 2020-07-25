@@ -5,9 +5,6 @@ bzd_nodejs_binary(
     srcs = glob([
         "*.mjs",
     ]),
-    data = [
-        "prettier.json",
-    ],
     main = "app.mjs",
     packages = {
         "prettier": "",
