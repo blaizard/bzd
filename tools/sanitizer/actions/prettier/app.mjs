@@ -46,6 +46,12 @@ async function evaluateFiles(parser, workspace, options) {
 			include: ["**.scss"],
 		})
 	);
+	promiseList.push(
+		evaluateFiles("markdown", workspace, {
+			include: ["**.md"],
+			exclude: ["docs/api/**"],
+		})
+	);
 
 	await Promise.all(promiseList);
 })().catch((error) => {

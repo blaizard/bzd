@@ -5,12 +5,14 @@ It support nested router that recieve remaining path during the dispatch process
 This approach helps isolating components in a Vue application.
 
 The motivations to create a new router instead of using the official Vue router are the following:
+
 - Support for nested routers
 - Low memory footprint
 
 ## Getting Started
 
 First of all the router is a Vue plugin and must be installed before being able to access its fuctionality:
+
 ```js
 import Vue from "vue"
 import Router from "bzd/vue/router/router.mjs"
@@ -23,6 +25,7 @@ new Vue({
 ```
 
 The router must be set in the mounted lifecycle hook of the component, for example:
+
 ```js
 ...
 mounted() {
@@ -37,4 +40,5 @@ mounted() {
 },
 ...
 ```
+
 Only one router can be used per component, if you attempt to setup a second one, an error will be raised.
