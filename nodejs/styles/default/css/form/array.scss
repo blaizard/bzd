@@ -1,7 +1,6 @@
 @use "index.scss" as base;
 
 .irform-array {
-
 	&.irform-fill {
 		width: 100%;
 		height: 100%;
@@ -77,7 +76,13 @@
 			}
 
 			.irform-array-item-delete {
-				@include base.buttonClose(base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 3);
+				@include base.buttonClose(
+					base.$fieldHeight,
+					base.$actionerTextColor,
+					base.$fieldHeight / 2,
+					base.$actionerBgColor,
+					3
+				);
 			}
 		}
 	}

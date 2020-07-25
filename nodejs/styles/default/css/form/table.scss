@@ -3,7 +3,6 @@
 $triangleHeight: base.$fieldHeight / 5;
 
 .irform-table {
-
 	// Note, this does not work and I have no idea how to fix it.
 	// More detaisl abotu this issue here: https://stackoverflow.com/questions/18135204/setting-overflow-y-causes-overflow-x-to-change-as-well
 	// There is no working workaround
@@ -14,7 +13,9 @@ $triangleHeight: base.$fieldHeight / 5;
 	// Reset any unwanted style
 	thead,
 	tbody {
-		tr, td, th {
+		tr,
+		td,
+		th {
 			border: none;
 			outline: none;
 			padding: 0;
@@ -54,7 +55,7 @@ $triangleHeight: base.$fieldHeight / 5;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
 						border-color: base.$actionerTextColor transparent transparent transparent;
-						transition: all .3s;
+						transition: all 0.3s;
 					}
 				}
 
@@ -69,7 +70,7 @@ $triangleHeight: base.$fieldHeight / 5;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
 						border-color: transparent transparent base.$actionerTextColor transparent;
-						transition: all .3s;
+						transition: all 0.3s;
 					}
 				}
 			}
@@ -126,7 +127,7 @@ $triangleHeight: base.$fieldHeight / 5;
 
 				// Checkbox
 				.irform-checkbox {
-					input[type=checkbox] {
+					input[type="checkbox"] {
 						&:focus + label:before {
 							@extend %focus-reset;
 						}

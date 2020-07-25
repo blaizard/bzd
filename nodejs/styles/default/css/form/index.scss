@@ -50,7 +50,7 @@ $disableBgColor: #eee !default;
 
 @mixin irform-border {
 	border: #{$fieldBorderThickness}px solid $fieldBorderColor;
-	border-radius: #{$fieldBorderRadius}px;	
+	border-radius: #{$fieldBorderRadius}px;
 }
 
 @mixin irform-focus {
@@ -149,12 +149,12 @@ $disableBgColor: #eee !default;
 %clickable {
 	cursor: pointer;
 
-	transition: background-size .2s ease-out;
+	transition: background-size 0.2s ease-out;
 
-	background-position: center; 
+	background-position: center;
 	background-size: 100% 100%;
 
-	user-select: none; 
+	user-select: none;
 
 	@keyframes clickableAnimation {
 		0% {
@@ -163,7 +163,12 @@ $disableBgColor: #eee !default;
 
 		@for $i from 1 through 10 {
 			#{$i * 10}% {
-				background-image: radial-gradient(circle at center, rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%, transparent 10%, transparent 11%);
+				background-image: radial-gradient(
+					circle at center,
+					rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%,
+					transparent 10%,
+					transparent 11%
+				);
 				background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
 			}
 		}
@@ -176,7 +181,12 @@ $disableBgColor: #eee !default;
 
 		@for $i from 1 through 10 {
 			#{$i * 10}% {
-				background-image: radial-gradient(circle at center, rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%, transparent 10%, transparent 11%);
+				background-image: radial-gradient(
+					circle at center,
+					rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%,
+					transparent 10%,
+					transparent 11%
+				);
 				background-size: ($i * 100 + 100) + 0% ($i * 100 + 100) + 0%;
 			}
 		}
@@ -184,13 +194,13 @@ $disableBgColor: #eee !default;
 
 	&:hover,
 	&:focus {
-		animation: clickableAnimation .25s 1;
+		animation: clickableAnimation 0.25s 1;
 		animation-fill-mode: forwards;
 		opacity: 1;
 	}
 
 	&:active {
-		animation: clickableClickAnimation .25s 1;
+		animation: clickableClickAnimation 0.25s 1;
 		animation-delay: 1s;
 		animation-fill-mode: forwards;
 		opacity: 1;
@@ -246,7 +256,6 @@ $disableBgColor: #eee !default;
  * Button template
  */
 @mixin button($width, $color, $bgColor: transparent) {
-
 	position: relative;
 	width: #{$width}px;
 	height: #{$width}px;
@@ -277,7 +286,7 @@ $disableBgColor: #eee !default;
 		position: absolute;
 		top: #{($width - $crossWidth) / 2}px;
 		left: #{($width - $crossThickness) / 2}px;
-		content: ' ';
+		content: " ";
 		height: #{$crossWidth}px;
 		width: #{$crossThickness}px;
 		background-color: $color;
@@ -300,7 +309,7 @@ $disableBgColor: #eee !default;
 		position: absolute;
 		top: #{($width - $eltWidth) / 2}px;
 		left: #{($width - $eltWidth) / 2}px;
-		content: ' ';
+		content: " ";
 		height: #{$eltWidth}px;
 		width: #{$eltWidth}px;
 		border-top: #{$eltThickness}px solid $color;

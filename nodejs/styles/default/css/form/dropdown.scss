@@ -34,7 +34,7 @@ $triangleHeight: base.$fieldHeight / 5;
 				height: 0;
 				border: #{$triangleHeight}px solid transparent;
 				border-color: base.$fieldSpecialBgColor transparent transparent transparent;
-				transition: all .3s;
+				transition: all 0.3s;
 			}
 		}
 	}
@@ -73,7 +73,7 @@ $triangleHeight: base.$fieldHeight / 5;
 		}
 	}
 
-	.irform-dropdown-select.active  {
+	.irform-dropdown-select.active {
 		.irform-dropdown-arrow:after {
 			transform: rotate(180deg);
 			margin-top: -#{$triangleHeight}px;
