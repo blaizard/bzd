@@ -180,7 +180,7 @@
 						if (typeof this.config.imageToUrl === "function") {
 							this.imageUrl = await this.config.imageToUrl(this.path);
 						}
-					else if (typeof this.config.imageToUrl === "string") {
+						else if (typeof this.config.imageToUrl === "string") {
 							this.imageUrl = this.config.imageToUrl;
 						}
 					}

@@ -90,7 +90,7 @@
 					this.processTimeout = null;
 					await this.process(value);
 				}
-			finally {
+				finally {
 					this.loading = false;
 					// Set the list to the top
 					if (this.$refs.menu) {

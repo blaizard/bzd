@@ -9,6 +9,16 @@
         "eslint:recommended",
         "plugin:vue/base"
     ],
+    "overrides": [
+        {
+            "files": [
+                "*.vue"
+            ],
+            "rules": {
+                "indent": "off"
+            }
+        }
+    ],
     "parserOptions": {
         "ecmaFeatures": {
             "impliedStrict": true

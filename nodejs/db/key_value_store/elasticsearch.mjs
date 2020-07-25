@@ -1,4 +1,5 @@
 import KeyValueStore from "./key_value_store.mjs";
+import { CollectionPaging } from "../utils.mjs";
 import { FetchFactory, FetchException } from "../../core/fetch.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 
@@ -84,10 +85,15 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			}
 		);
 		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
-		return result.hits.hits.reduce((obj, item) => {
-			obj[item._id] = item._source;
-			return obj;
-		}, {});
+
+		const total = result.hits.total.value;
+		return CollectionPaging(
+			result.hits.hits.reduce((obj, item) => {
+				obj[item._id] = item._source;
+				return obj;
+			}, {}),
+			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
+		);
 	}
 
 	async list(bucket, maxOrPaging = 10) {

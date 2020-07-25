@@ -152,7 +152,7 @@
 				if (this.all || "name" in this.description[index]) {
 					this.$set(this.returnedValue, name, value);
 				}
-			else {
+				else {
 					this.$set(this.unamedValue, name, value);
 				}
 				this.$emit("input", this.returnedValue);
@@ -180,7 +180,7 @@
 				if (messageList) {
 					this.$set(this.errors, name, Array.isArray(messageList) ? messageList : [messageList]);
 				}
-			else {
+				else {
 					this.$delete(this.errors, name);
 				}
 			},

@@ -51,7 +51,7 @@
 				});
 				myObserver.observe(this.$refs.slides);
 			}
-		else {
+			else {
 				this.interval = setInterval(this.computeSlidePosition, 1000);
 			}
 		},
@@ -118,7 +118,7 @@
 						ondrag: this.onDrag,
 						onstopdrag: this.onStopDrag,
 						allowClickThrough: true,
-				};
+					};
 			},
 			slidesStyle() {
 				return {
@@ -265,7 +265,7 @@
 						else if (rect.right - rectContainer.left > rectContainer.width) {
 							this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
 						}
-					else {
+						else {
 							/*
 							 * Add the current offset to the slide position as this will be reset right after.
 							 * This needs to be done here are we do not want to affect the slidePosition when
@@ -278,7 +278,7 @@
 					}
 					}
 				}
-			else {
+				else {
 					this.slidePosition = 0;
 				}
 			},
@@ -292,7 +292,7 @@
 				if (e.keyCode == /*arrow left*/ 37) {
 					this.slidePrevious();
 				}
-			else if (e.keyCode == /*arrow right*/ 39) {
+				else if (e.keyCode == /*arrow right*/ 39) {
 					this.slideNext();
 				}
 			},

@@ -136,7 +136,7 @@
 					if (typeof this.format == "function") {
 						return this.format(value);
 					}
-				else if (typeof this.format == "string") {
+					else if (typeof this.format == "string") {
 						let index = 0;
 						return [...this.format].reduce((formatted, c) => {
 							switch (c) {
@@ -149,7 +149,7 @@
 							return formatted;
 						}, "");
 					}
-				else if (typeof this.format == "object") {
+					else if (typeof this.format == "object") {
 						if (value in this.format) {
 							return this.format[value];
 						}
@@ -175,7 +175,7 @@
 				if (this.isValueAcceptable(text)) {
 					this.set(text);
 				}
-			else {
+				else {
 					this.$refs.input.innerHTML = "";
 					this.$emit("directInput", "");
 					this.set("");
@@ -198,7 +198,7 @@
 					if (this.multi) {
 						this.valueListAdd(text);
 					}
-				else {
+					else {
 						this.valueSet(text);
 						this.$refs.input.blur();
 						this.submit();
@@ -279,7 +279,7 @@
 					if (this.multi) {
 						this.valueListAdd(text);
 					}
-				else {
+					else {
 						this.valueSet(text);
 					}
 					this.hasChanged = false;

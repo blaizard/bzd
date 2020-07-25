@@ -194,7 +194,7 @@
 							valuesMaxX = Math.max(valuesMaxX, array.values[array.values.length - 1][0]);
 						});
 					}
-				else {
+					else {
 						valuesMinX = 0;
 						valuesMaxX = 1;
 					}
@@ -584,10 +584,10 @@
 						index = indexCurrent;
 						break;
 					}
-				else if (xCurrent < x) {
+					else if (xCurrent < x) {
 						index = indexCurrent + 1;
 					}
-				else {
+					else {
 						indexEnd = indexCurrent - 1;
 					}
 				}

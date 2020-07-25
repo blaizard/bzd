@@ -110,13 +110,13 @@
 					if (result.error) {
 						this.setError(result.error.message);
 					}
-				else {
+					else {
 						if (result.paymentIntent.status === "succeeded") {
 							await this.confirmPayment(intent.id, this.metadata);
 						}
 					}
 				}
-			finally {
+				finally {
 					this.loading = false;
 				}
 			},

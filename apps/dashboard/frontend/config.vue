@@ -126,7 +126,7 @@
 					.map((name) => {
 						return [
 							name,
-							'<span class="bzd-dashboard-color-picker" style="background-color: ' +
+							"<span class=\"bzd-dashboard-color-picker\" style=\"background-color: " +
 								Colors[name] +
 								"; border-color: " +
 								Colors.black +
