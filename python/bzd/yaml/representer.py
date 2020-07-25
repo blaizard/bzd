@@ -328,10 +328,10 @@ class Representer(SafeRepresenter):
 			newobj = False
 		function_name = '%s.%s' % (function.__module__, function.__name__)
 		if not args and not listitems and not dictitems \
-                                        and isinstance(state, dict) and newobj:
+                                                                and isinstance(state, dict) and newobj:
 			return self.represent_mapping('tag:yaml.org,2002:python/object:' + function_name, state)
 		if not listitems and not dictitems  \
-                                        and isinstance(state, dict) and not state:
+                                                                and isinstance(state, dict) and not state:
 			return self.represent_sequence(tag + function_name, args)
 		value = {}
 		if args:
@@ -348,7 +348,7 @@ class Representer(SafeRepresenter):
 		# Provide uniform representation across different Python versions.
 		data_type = type(data)
 		tag = 'tag:yaml.org,2002:python/object/apply:%s.%s' \
-                                        % (data_type.__module__, data_type.__name__)
+                                                                % (data_type.__module__, data_type.__name__)
 		items = [[key, value] for key, value in data.items()]
 		return self.represent_sequence(tag, [items])
 
