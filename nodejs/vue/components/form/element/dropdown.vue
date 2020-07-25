@@ -5,14 +5,12 @@
 		:disable="disable"
 		:description="descriptionDropdown"
 		@directInput="directValue = $event"
-		@key="handleKey"
-	>
+		@key="handleKey">
 		<div
 			v-for="item in displayList"
 			:class="{ 'irform-dropdown-item': true, 'irform-dropdown-item-selected': isSelected(item) }"
 			v-html="formatMenuEntry(item.display)"
-			@mousedown="select(item)"
-		></div>
+			@mousedown="select(item)"></div>
 	</DropdownTemplate>
 </template>
 

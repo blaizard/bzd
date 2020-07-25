@@ -21,8 +21,7 @@
 				@input="handleInput($event.target.innerText)"
 				@focus="handleFocus($event)"
 				@blur="handleBlur($event, $event.target.innerText)"
-				@keydown="handleKeyDown($event, $event.target.innerText)"
-			>
+				@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
 
 			<span
@@ -35,8 +34,7 @@
 				@focus="handleFocus($event)"
 				@input="handleInputMask()"
 				@blur="handleBlur($event, $event.target.innerText)"
-				@keydown="handleKeyDown($event, $event.target.innerText)"
-			>
+				@keydown="handleKeyDown($event, $event.target.innerText)">
 			</span>
 		</span>
 

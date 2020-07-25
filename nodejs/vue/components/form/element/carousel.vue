@@ -10,15 +10,13 @@
 			@focus="setActive()"
 			@blur="setInactive()"
 			@keydown="handleKeyDown($event)"
-			v-touch="touchDirective"
-		>
+			v-touch="touchDirective">
 			<div class="irform-carousel-slides" ref="slides" :style="slidesStyle">
 				<div
 					v-for="(slide, index) in list"
 					:class="getSlideClass(index)"
 					:style="slideStyle"
-					@click="handleClick(index)"
-				>
+					@click="handleClick(index)">
 					<div class="irform-carousel-slide-container" v-html="slide.display"></div>
 				</div>
 			</div>

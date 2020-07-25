@@ -6,8 +6,7 @@
 			:x="data[0] - barWidth / 2"
 			:y="data[1]"
 			:width="barWidth"
-			:height="boundingBox.bottom > data[1] ? boundingBox.bottom - data[1] : 0"
-		/>
+			:height="boundingBox.bottom > data[1] ? boundingBox.bottom - data[1] : 0"/>
 	</g>
 </template>
 

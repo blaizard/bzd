@@ -11,8 +11,7 @@
 				:width="current.width"
 				:active="active == index"
 				:mandatory="isMandatory(index)"
-				:error="getError(current, index)"
-			>
+				:error="getError(current, index)">
 				<template>
 					<component
 						:is="getType(current)"
@@ -22,8 +21,7 @@
 						@submit="handleSubmit(current)"
 						@input="handleInput(index, $event)"
 						:description="current"
-						:disable="getDisable(current)"
-					>
+						:disable="getDisable(current)">
 					</component>
 				</template>
 			</component>

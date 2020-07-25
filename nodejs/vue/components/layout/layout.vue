@@ -21,8 +21,7 @@
 				<div
 					class="bzd-layout-menu-background"
 					@click.stop="hideMenu"
-					v-show="isMenuShow && !isDock && !isMobile"
-				></div>
+					v-show="isMenuShow && !isDock && !isMobile"></div>
 			</transition>
 			<transition name="bzd-translate">
 				<div class="bzd-layout-menu-content" @click.stop="hideMenu" v-show="isMenuShow || (isDock && !isMobile)">
@@ -42,8 +41,7 @@
 					v-for="entry in $notification.entries"
 					:key="entry.key"
 					:class="getNotificationClass(entry)"
-					:style="getNotificationStyle(entry)"
-				>
+					:style="getNotificationStyle(entry)">
 					<div class="bzd-notification-content">{{ entry.message }}</div>
 					<div class="bzd-notification-close" @click="notificationClose(entry)">
 						<i class="bzd-icon-close"></i>
