@@ -24,36 +24,36 @@
 </template>
 
 <script>
-import Layout from "bzd/vue/components/layout/layout.vue";
-import MenuEntry from "bzd/vue/components/menu/entry.vue";
+	import Layout from "bzd/vue/components/layout/layout.vue";
+	import MenuEntry from "bzd/vue/components/menu/entry.vue";
 
-export default {
-	components: {
-		Layout,
-		MenuEntry,
-	},
-	data: function () {
-		return {};
-	},
-	mounted() {
-		this.$routerSet({
-			ref: "view",
-			routes: [
-				{ path: "/colors", component: () => import("./colors.vue") },
-				{ path: "/notification", component: () => import("./notification.vue") },
-				{ path: "/graph/plot", component: () => import("./graph_plot.vue") },
-				{ path: "/form", component: () => import("./form/form.vue") },
-				{ path: "/form/standalone", component: () => import("./form/standalone.vue") },
-				{ path: "/form/input", component: () => import("./form/input.vue") },
-				{ path: "/form/password", component: () => import("./form/password.vue") },
-				{ path: "/form/dropdown", component: () => import("./form/dropdown.vue") },
-				{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
-				{ path: "/form/validation", component: () => import("./form/validation.vue") },
-				{ path: "/form/output", component: () => import("./form/output.vue") },
-			],
-		});
-	},
-};
+	export default {
+		components: {
+			Layout,
+			MenuEntry,
+		},
+		data: function () {
+			return {};
+		},
+		mounted() {
+			this.$routerSet({
+				ref: "view",
+				routes: [
+					{ path: "/colors", component: () => import("./colors.vue") },
+					{ path: "/notification", component: () => import("./notification.vue") },
+					{ path: "/graph/plot", component: () => import("./graph_plot.vue") },
+					{ path: "/form", component: () => import("./form/form.vue") },
+					{ path: "/form/standalone", component: () => import("./form/standalone.vue") },
+					{ path: "/form/input", component: () => import("./form/input.vue") },
+					{ path: "/form/password", component: () => import("./form/password.vue") },
+					{ path: "/form/dropdown", component: () => import("./form/dropdown.vue") },
+					{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
+					{ path: "/form/validation", component: () => import("./form/validation.vue") },
+					{ path: "/form/output", component: () => import("./form/output.vue") },
+				],
+			});
+		},
+	};
 </script>
 
 <style lang="scss">

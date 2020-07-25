@@ -23,67 +23,67 @@
 </template>
 
 <script>
-import Plot from "bzd/vue/components/graph/plot.vue";
+	import Plot from "bzd/vue/components/graph/plot.vue";
 
-export default {
-	components: {
-		Plot,
-	},
-	data: function () {
-		return {
-			values: [],
-			counter: 0,
-			showAxisX: false,
-			showAxisY: false,
-			showCursor: false,
-			showLegend: false,
-			animate: false,
-		};
-	},
-	mounted() {
-		this.updateValues();
-		setInterval(() => {
-			if (this.animate) {
-				this.updateValues();
-			}
-		}, 50);
-	},
-	computed: {
-		plotConfigNoAxis() {
+	export default {
+		components: {
+			Plot,
+		},
+		data: function () {
 			return {
-				showAxisX: this.showAxisX,
-				showAxisY: this.showAxisY,
-				showCursor: this.showCursor,
-				showLegend: this.showLegend,
-				paddingLeft: 5,
-				paddingRight: 5,
-				paddingTop: 5,
-				paddingBottom: 5,
+				values: [],
+				counter: 0,
+				showAxisX: false,
+				showAxisY: false,
+				showCursor: false,
+				showLegend: false,
+				animate: false,
 			};
 		},
-	},
-	methods: {
-		generateSin() {
-			return [...Array(100).keys()].map((index) => [index + this.counter, Math.sin((index + this.counter) / 10)]);
+		mounted() {
+			this.updateValues();
+			setInterval(() => {
+				if (this.animate) {
+					this.updateValues();
+				}
+			}, 50);
 		},
-		generateRandom() {
-			return [...Array(100).keys()].map((index) => [index + this.counter, Math.random() * 2 - 1]);
+		computed: {
+			plotConfigNoAxis() {
+				return {
+					showAxisX: this.showAxisX,
+					showAxisY: this.showAxisY,
+					showCursor: this.showCursor,
+					showLegend: this.showLegend,
+					paddingLeft: 5,
+					paddingRight: 5,
+					paddingTop: 5,
+					paddingBottom: 5,
+				};
+			},
 		},
-		updateValues() {
-			++this.counter;
-			this.values = [
-				{
-					caption: "Serie 1",
-					values: this.generateSin(),
-				},
-				{
-					caption: "Serie 2",
-					values: this.generateRandom(),
-				},
-			];
+		methods: {
+			generateSin() {
+				return [...Array(100).keys()].map((index) => [index + this.counter, Math.sin((index + this.counter) / 10)]);
+			},
+			generateRandom() {
+				return [...Array(100).keys()].map((index) => [index + this.counter, Math.random() * 2 - 1]);
+			},
+			updateValues() {
+				++this.counter;
+				this.values = [
+					{
+						caption: "Serie 1",
+						values: this.generateSin(),
+					},
+					{
+						caption: "Serie 2",
+						values: this.generateRandom(),
+					},
+				];
+			},
 		},
-	},
-};
+	};
 </script>
 
 <style lang="scss" scoped>

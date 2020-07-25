@@ -59,6 +59,13 @@
         "strict": [
             "error",
             "global"
+        ],
+        "vue/script-indent": [
+            "error",
+            "tab",
+            {
+                "baseIndent": 1
+            }
         ]
     }
 }

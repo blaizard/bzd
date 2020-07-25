@@ -11,71 +11,71 @@
 </template>
 
 <script>
-import Element from "./element.vue";
+	import Element from "./element.vue";
 
-export default {
-	mixins: [Element],
-	props: {
-		action: { type: String, optional: true, default: "" },
-		content: { type: String || Object, optional: true, default: "" },
-	},
-	data: function () {
-		return {
-			/**
-			 * Defines a callback to be triggered the submit button is called
-			 */
-			click: this.getOption("click", null),
-		};
-	},
-	computed: {
-		attrAction() {
-			const actionToClass = {
-				approve: {
-					defaultClick: this.submit,
-					class: "irform-button-approve",
-				},
-				cancel: {
-					class: "irform-button-cancel",
-				},
-				danger: {
-					defaultClick: this.submit,
-					class: "irform-button-danger",
-				},
-			};
-			return actionToClass[this.action || this.getOption("action")] || {};
+	export default {
+		mixins: [Element],
+		props: {
+			action: { type: String, optional: true, default: "" },
+			content: { type: String || Object, optional: true, default: "" },
 		},
-		/**
-		 * The content of the button
-		 */
-		buttonClass() {
+		data: function () {
 			return {
-				"irform-button": true,
-				"irform-fill": this.getOption("fill", false),
-				[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false),
-				[this.getOption("class")]: true,
+				/**
+				 * Defines a callback to be triggered the submit button is called
+				 */
+				click: this.getOption("click", null),
 			};
 		},
-		/**
-		 * The content of the button
-		 */
-		attrContent() {
-			return this.content || this.getOption("content", "Submit");
+		computed: {
+			attrAction() {
+				const actionToClass = {
+					approve: {
+						defaultClick: this.submit,
+						class: "irform-button-approve",
+					},
+					cancel: {
+						class: "irform-button-cancel",
+					},
+					danger: {
+						defaultClick: this.submit,
+						class: "irform-button-danger",
+					},
+				};
+				return actionToClass[this.action || this.getOption("action")] || {};
+			},
+			/**
+			 * The content of the button
+			 */
+			buttonClass() {
+				return {
+					"irform-button": true,
+					"irform-fill": this.getOption("fill", false),
+					[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false),
+					[this.getOption("class")]: true,
+				};
+			},
+			/**
+			 * The content of the button
+			 */
+			attrContent() {
+				return this.content || this.getOption("content", "Submit");
+			},
+			html() {
+				return this.getContentType(this.attrContent) == "html";
+			},
+			contentHtml() {
+				const data = this.getContentData(this.attrContent);
+				return this.html ? data : this.toHtmlEntities(data);
+			},
 		},
-		html() {
-			return this.getContentType(this.attrContent) == "html";
+		methods: {
+			async handleClick() {
+				this.$emit("click");
+				await (this.click || this.attrAction.defaultClick || (() => {}))();
+			},
 		},
-		contentHtml() {
-			const data = this.getContentData(this.attrContent);
-			return this.html ? data : this.toHtmlEntities(data);
-		},
-	},
-	methods: {
-		async handleClick() {
-			this.$emit("click");
-			await (this.click || this.attrAction.defaultClick || (() => {}))();
-		},
-	},
-};
+	};
 </script>
 
 <style lang="scss">
