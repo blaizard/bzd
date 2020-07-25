@@ -11,8 +11,7 @@
 			:background-color="colorBackground"
 			@color="handleColor"
 			@link="handleLink"
-			@error="handleError"
-		>
+			@error="handleError">
 		</component>
 		<div v-else-if="isError" class="content">Fatal error</div>
 		<div class="name"><i :class="icon"></i> {{ name }}</div>

@@ -8,8 +8,7 @@
 						v-if="isConditionSatisfied(description)"
 						:key="index"
 						:class="getHeaderClass(description)"
-						@click="handleHeaderClick(description)"
-					>
+						@click="handleHeaderClick(description)">
 						{{ description.caption }}
 					</th>
 				</tr>
@@ -26,8 +25,7 @@
 					:value="row.value"
 					:template="itemTemplate"
 					@input="itemUpdate(row.index, $event)"
-					@active="handleActive"
-				>
+					@active="handleActive">
 				</Form>
 			</tbody>
 		</table>

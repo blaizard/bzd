@@ -60,6 +60,21 @@
             "error",
             "global"
         ],
+        "vue/html-closing-bracket-newline": [
+            "error",
+            {
+                "multiline": "never",
+                "singleline": "never"
+            }
+        ],
+        "vue/html-indent": [
+            "error",
+            "tab",
+            {
+                "attribute": 1,
+                "baseIndent": 1
+            }
+        ],
         "vue/script-indent": [
             "error",
             "tab",

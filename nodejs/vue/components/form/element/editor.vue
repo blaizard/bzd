@@ -12,8 +12,7 @@
 			:contenteditable="!disable"
 			:description="contentDescription"
 			:data-placeholder="placeholder"
-			v-html="get(/*freezeOnEdit*/ true)"
-		>
+			v-html="get(/*freezeOnEdit*/ true)">
 		</ElementTextarea>
 	</div>
 </template>

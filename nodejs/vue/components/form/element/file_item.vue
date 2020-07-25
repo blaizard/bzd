@@ -11,8 +11,7 @@
 			draggable="false"
 			ondragstart="return false;"
 			v-touch="touchDirective"
-			:style="styleImage"
-		/>
+			:style="styleImage"/>
 		<i v-else class="irform-icon-file"></i>
 
 		<!-- Name //-->

@@ -8,8 +8,7 @@
 			@input="set"
 			@directInput="handleDirectInput"
 			@active="handleActive"
-			@key="handleKey"
-		>
+			@key="handleKey">
 		</ElementInput>
 		<div :class="{ 'irform-dropdown-menu': true, 'irform-dropdown-menu-loading': loading }" ref="menu">
 			<slot></slot>
