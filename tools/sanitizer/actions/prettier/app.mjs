@@ -31,6 +31,11 @@ async function evaluateFiles(parser, workspace, options) {
 			include: ["**.mjs", "**.cjs", "**.js"],
 		})
 	);
+	promiseList.push(
+		evaluateFiles("vue", workspace, {
+			include: ["**.vue"],
+		})
+	);
 
 	await Promise.all(promiseList);
 })().catch((error) => {

@@ -1,14 +1,11 @@
 <script>
-
-
-export default {
-};
+	export default {};
 </script>
 
 <style lang="scss">
 	@use "bzd/icons.scss" as icons;
 
-    .bzd-icon-travisci {
+	.bzd-icon-travisci {
 		@include icons.defineIcon("travisci.svg");
 	}
 </style>
