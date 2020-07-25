@@ -3,7 +3,7 @@
 $switchSize: base.$fieldHeight * 0.6875; //22
 
 .irform-checkbox {
-	input[type=checkbox] {
+	input[type="checkbox"] {
 		opacity: 0;
 		width: 0;
 		height: 0;
@@ -15,7 +15,7 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 			cursor: pointer;
 
 			&:before {
-				content: '';
+				content: "";
 				@include base.button(base.$fieldHeight, base.$actionerTextColor, base.$actionerBgColor);
 				@extend %clickable;
 				margin-right: #{base.$fieldPaddingX}px;
@@ -41,8 +41,8 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 }
 
 // Disable
-.irform-disable.irform-checkbox input[type=checkbox] + label,
-.irform-disable .irform-checkbox input[type=checkbox] + label {
+.irform-disable.irform-checkbox input[type="checkbox"] + label,
+.irform-disable .irform-checkbox input[type="checkbox"] + label {
 	@extend %disable;
 	&:before {
 		@extend %disable-border;
@@ -51,8 +51,8 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 }
 
 // Error
-.irform-error.irform-checkbox input[type=checkbox] + label,
-.irform-error .irform-checkbox input[type=checkbox] + label {
+.irform-error.irform-checkbox input[type="checkbox"] + label,
+.irform-error .irform-checkbox input[type="checkbox"] + label {
 	@extend %error;
 	&:before {
 		@extend %error-border;
@@ -60,8 +60,8 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 }
 
 // Success
-.irform-success.irform-checkbox input[type=checkbox] + label,
-.irform-success .irform-checkbox input[type=checkbox] + label {
+.irform-success.irform-checkbox input[type="checkbox"] + label,
+.irform-success .irform-checkbox input[type="checkbox"] + label {
 	@extend %success;
 	&:before {
 		@extend %success-border;

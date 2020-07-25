@@ -2,76 +2,90 @@
 @use "dropdown.scss";
 
 .irform-date {
-    display: flex;
-    flex-flow: column;
-    user-select: none;
-    min-width: 250px;
+	display: flex;
+	flex-flow: column;
+	user-select: none;
+	min-width: 250px;
 
-    .irform-dropdown-menu {
-        max-width: 300px;
-    }
+	.irform-dropdown-menu {
+		max-width: 300px;
+	}
 
-    .irform-date-header {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: center;
-        justify-content: center;
+	.irform-date-header {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: center;
 
-        .irform-date-select {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
+		.irform-date-select {
+			flex: 1;
+			text-align: center;
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: center;
 
-            .irform-date-select-month,
-            .irform-date-select-year {
-                padding: 0 .5em;
-                font-weight: bold;
-                @extend %clickable;
-            }
-        }
+			.irform-date-select-month,
+			.irform-date-select-year {
+				padding: 0 0.5em;
+				font-weight: bold;
+				@extend %clickable;
+			}
+		}
 
-        .irform-date-previous {
-            @include base.buttonArrow(left, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
-        }
-        .irform-date-next {
-            @include base.buttonArrow(right, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
-        }
-    }
+		.irform-date-previous {
+			@include base.buttonArrow(
+				left,
+				base.$fieldHeight,
+				base.$actionerTextColor,
+				base.$fieldHeight / 2,
+				base.$actionerBgColor,
+				4
+			);
+		}
+		.irform-date-next {
+			@include base.buttonArrow(
+				right,
+				base.$fieldHeight,
+				base.$actionerTextColor,
+				base.$fieldHeight / 2,
+				base.$actionerBgColor,
+				4
+			);
+		}
+	}
 
-    .irform-date-row {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: center;
-        justify-content: center;
+	.irform-date-row {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: center;
 
-        .irform-date-item {
-            text-align: center;
-            color: base.$disableTextColor;
-            background-color: base.$disableBgColor;
-            flex: 1 1 0;
+		.irform-date-item {
+			text-align: center;
+			color: base.$disableTextColor;
+			background-color: base.$disableBgColor;
+			flex: 1 1 0;
 
-            &.irform-date-item-current {
-                color: base.$fieldTextColor;
-                background-color: base.$fieldBgColor;
+			&.irform-date-item-current {
+				color: base.$fieldTextColor;
+				background-color: base.$fieldBgColor;
 
-                @extend %clickable;
-            }
+				@extend %clickable;
+			}
 
-            &.irform-date-item-header {
-                color: base.$actionerTextColor;
-                background-color: base.$actionerBgColor;
-            }
+			&.irform-date-item-header {
+				color: base.$actionerTextColor;
+				background-color: base.$actionerBgColor;
+			}
 
-            &.irform-date-item-selected {
-                color: base.$fieldSpecialTextColor;
-                background-color: base.$fieldSpecialBgColor;
-            }
-        }
-    }
+			&.irform-date-item-selected {
+				color: base.$fieldSpecialTextColor;
+				background-color: base.$fieldSpecialBgColor;
+			}
+		}
+	}
 
-    .irform-dropdown-menu {
-        max-height: none !important;
-    }    
+	.irform-dropdown-menu {
+		max-height: none !important;
+	}
 }

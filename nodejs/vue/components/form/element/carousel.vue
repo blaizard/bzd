@@ -266,11 +266,11 @@
 							else if (rect.right - rectContainer.left > rectContainer.width) {
 								this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
 							} else {
-							/*
-							 * Add the current offset to the slide position as this will be reset right after.
-							 * This needs to be done here are we do not want to affect the slidePosition when
-							 * it reaches corners cases (see above).
-							 */
+								/*
+								 * Add the current offset to the slide position as this will be reset right after.
+								 * This needs to be done here are we do not want to affect the slidePosition when
+								 * it reaches corners cases (see above).
+								 */
 								this.slidePosition += this.offsetX;
 							}
 							// Do not let the slides too much on the right (useless)

@@ -79,7 +79,7 @@ $font-size: 16;
 	/**
 	 * legend-left
 	 */
-	 &.irgraph-layout-legend-left {
+	&.irgraph-layout-legend-left {
 		flex-direction: row-reverse;
 		.irgraph-content {
 			flex: 1;

@@ -47,14 +47,27 @@
 	}
 
 	.irform-carousel-prev {
-		@include base.buttonArrow(left, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
+		@include base.buttonArrow(
+			left,
+			base.$fieldHeight,
+			base.$actionerTextColor,
+			base.$fieldHeight / 2,
+			base.$actionerBgColor,
+			4
+		);
 		margin-left: 4px;
 	}
 	.irform-carousel-next {
-		@include base.buttonArrow(right, base.$fieldHeight, base.$actionerTextColor, base.$fieldHeight / 2, base.$actionerBgColor, 4);
+		@include base.buttonArrow(
+			right,
+			base.$fieldHeight,
+			base.$actionerTextColor,
+			base.$fieldHeight / 2,
+			base.$actionerBgColor,
+			4
+		);
 		margin-right: 4px;
 	}
-
 }
 
 // Error
