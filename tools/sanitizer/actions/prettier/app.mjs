@@ -1,7 +1,6 @@
 import Prettier from "prettier";
 import Workspace from "../../utils/nodejs/workspace.mjs";
 import FileSystem from "bzd/core/filesystem.mjs";
-import { promises } from "fs";
 
 async function evaluateFiles(parser, workspace, options) {
 	const files = new Workspace(workspace, options);

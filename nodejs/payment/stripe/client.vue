@@ -97,11 +97,11 @@
 				try {
 					const intent = await this.makePaymentIntent(this.amount, this.metadata);
 					const result = await this.stripe.confirmCardPayment(intent.secret, {
+						// eslint-disable-next-line
 						payment_method: {
-							// eslint-disable-line
 							card: this.card,
+							// eslint-disable-next-line
 							billing_details: {
-								// eslint-disable-line
 								name: "Jenny Rosen",
 							},
 						},
