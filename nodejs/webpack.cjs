@@ -371,7 +371,12 @@ function getWebpackConfigDefault(isDev, config) {
 									publicPath: "",
 								},
 							  },
-						"css-loader",
+						{
+							loader: "css-loader",
+							options: {
+								esModule: false,
+							}
+						},
 						{
 							loader: "sass-loader",
 							options: {
