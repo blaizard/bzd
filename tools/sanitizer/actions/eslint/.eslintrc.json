@@ -37,7 +37,8 @@
         "camelcase": [
             "error",
             {
-                "ignoreDestructuring": true
+                "ignoreDestructuring": true,
+                "properties": "never"
             }
         ],
         "curly": [

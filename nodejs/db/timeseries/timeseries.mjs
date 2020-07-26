@@ -21,14 +21,14 @@ export default class Storage extends AsyncInitialize {
 	/**
 	 * List the last N entries.
 	 */
-	async list(/*bucket, maxOrPaging*/) {
+	async list(/*bucket, maxOrPaging = 10*/) {
 		Exception.unreachable("'list' must be implemented.");
 	}
 
 	/**
 	 * List the last entries until a specific timestamp.
 	 */
-	async listUntilTimestamp(/*bucket, timestamp, maxOrPaging*/) {
+	async listUntilTimestamp(/*bucket, timestamp, maxOrPaging = 10*/) {
 		Exception.unreachable("'listUntilTimestamp' must be implemented.");
 	}
 }
