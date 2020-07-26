@@ -17,6 +17,9 @@ export default async function request(url, options) {
 
 		let sharedOptions = { timeoutInstance: null };
 
+		// Doing this will help to have a clean stack trace
+		const exceptionTimeout = new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)");
+
 		// Create the request
 		let req = requestHandler(
 			url,
@@ -57,7 +60,7 @@ export default async function request(url, options) {
 				response.setEncoding("utf8");
 
 				sharedOptions.timeoutInstance = setTimeout(() => {
-					reject(new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)"));
+					reject(exceptionTimeout);
 				}, MAX_TIMEOUT_S * 1000);
 				let body = "";
 				response.on("data", (chunk) => {
@@ -76,10 +79,10 @@ export default async function request(url, options) {
 			req.write(options.body);
 		}
 
-		req.on("timeout", (e) => {
+		req.on("timeout", () => {
 			clearTimeout(sharedOptions.timeoutInstance);
 			req.abort();
-			reject(e);
+			reject(exceptionTimeout);
 		});
 
 		req.on("error", (e) => {
