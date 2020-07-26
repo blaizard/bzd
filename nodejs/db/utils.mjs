@@ -18,8 +18,12 @@ export class CollectionPaging {
 		return this._nextPaging;
 	}
 
+	static pagingFromParam(maxOrPaging) {
+		return typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
+	}
+
 	static makeFromList(data, maxOrPaging) {
-		const paging = typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
+		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const indexStart = paging.page * paging.max;
 		const indexEnd = indexStart + paging.max;
 		return new CollectionPaging(
@@ -36,6 +40,13 @@ export class CollectionPaging {
 			return obj;
 		}, {});
 		return result;
+	}
+
+	static makeFromTotal(data, paging, total) {
+		return new CollectionPaging(
+			data,
+			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
+		);
 	}
 }
 

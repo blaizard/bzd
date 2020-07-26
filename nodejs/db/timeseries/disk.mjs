@@ -4,6 +4,9 @@ import FileSystem from "../../core/filesystem.mjs";
 import Cache from "../../core/cache.mjs";
 import Path from "path";
 import { CollectionPaging } from "../utils.mjs";
+import LogFactory from "../../core/log.mjs";
+
+const Log = LogFactory("db", "timeseries", "disk");
 
 /**
  * Disk timeseries module
@@ -25,6 +28,7 @@ export default class TimeseriesDisk extends Timeseries {
 
 		this.cache = null;
 
+		Log.info("Using disk timeseries DB at '{}'.", this.path);
 		this._initialize();
 	}
 

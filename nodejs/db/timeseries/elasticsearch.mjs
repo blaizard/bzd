@@ -2,8 +2,11 @@ import Timeseries from "./timeseries.mjs";
 import { FetchFactory } from "../../core/fetch.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
+import LogFactory from "../../core/log.mjs";
 
 const Exception = ExceptionFactory("db", "timeseries", "elasticsearch");
+const Log = LogFactory("db", "timeseries", "elasticsearch");
+
 export default class TimeseriesElasticsearch extends Timeseries {
 	constructor(host, options) {
 		super();
@@ -11,6 +14,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			{
 				user: null,
 				key: null,
+				prefix: "timeseries_",
 			},
 			options
 		);
@@ -27,12 +31,17 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			};
 		}
 
+		Log.info("Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).", host, this.options.prefix, ("authentication" in fetchOptions) ? "on" : "off");
 		this.fetch = new FetchFactory(host, fetchOptions);
 		this._initialize();
 	}
 
+	_bucketToURI(bucket) {
+		return this.options.prefix + encodeURIComponent(bucket);
+	}
+
 	async insert(bucket, timestamp, data) {
-		await this.fetch.request("/" + encodeURIComponent(bucket) + "/_doc", {
+		await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc", {
 			method: "post",
 			data: {
 				date: timestamp,
@@ -42,9 +51,9 @@ export default class TimeseriesElasticsearch extends Timeseries {
 	}
 
 	async _search(bucket, maxOrPaging, query) {
-		const paging = typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
+		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const result = await this.fetch.request(
-			"/" + encodeURIComponent(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
+			"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
 			{
 				method: "post",
 				data: {
@@ -57,10 +66,10 @@ export default class TimeseriesElasticsearch extends Timeseries {
 		);
 		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
-		const total = result.hits.total.value;
-		return new CollectionPaging(
+		return CollectionPaging.makeFromTotal(
 			result.hits.hits.map((item) => [item._source.date, item._source.data]),
-			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
+			paging,
+			result.hits.total.value
 		);
 	}
 

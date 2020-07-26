@@ -2,8 +2,10 @@ import KeyValueStore from "./key_value_store.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import { FetchFactory, FetchException } from "../../core/fetch.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
+import LogFactory from "../../core/log.mjs";
 
 const Exception = ExceptionFactory("db", "kvs", "elasticsearch");
+const Log = LogFactory("db", "kvs", "elasticsearch");
 
 /**
  * Kay valud store adapater to elastic search DB
@@ -15,6 +17,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			{
 				user: null,
 				key: null,
+				prefix: "kvs_",
 			},
 			options
 		);
@@ -31,12 +34,17 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			};
 		}
 
+		Log.info("Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).", host, this.options.prefix, ("authentication" in fetchOptions) ? "on" : "off");
 		this.fetch = new FetchFactory(host, fetchOptions);
 		this._initialize();
 	}
 
+	_bucketToURI(bucket) {
+		return this.options.prefix + encodeURIComponent(bucket);
+	}
+
 	async set(bucket, key, value) {
-		let endpoint = "/" + encodeURIComponent(bucket) + "/_doc/";
+		let endpoint = "/" + this._bucketToURI(bucket) + "/_doc/";
 		if (key !== null) {
 			endpoint += encodeURIComponent(key);
 		}
@@ -51,7 +59,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async get(bucket, key, defaultValue = undefined) {
 		try {
-			const result = await this.fetch.request("/" + encodeURIComponent(bucket) + "/_doc/" + encodeURIComponent(key), {
+			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 				method: "get",
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
@@ -67,16 +75,16 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	}
 
 	async delete(bucket, key) {
-		const result = await this.fetch.request("/" + encodeURIComponent(bucket) + "/_doc/" + encodeURIComponent(key), {
+		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 			method: "delete",
 		});
 		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
 	}
 
 	async _search(bucket, maxOrPaging, query) {
-		const paging = typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
+		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const result = await this.fetch.request(
-			"/" + encodeURIComponent(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
+			"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
 			{
 				method: "post",
 				data: {
@@ -86,13 +94,13 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		);
 		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
-		const total = result.hits.total.value;
-		return new CollectionPaging(
+		return CollectionPaging.makeFromTotal(
 			result.hits.hits.reduce((obj, item) => {
 				obj[item._id] = item._source;
 				return obj;
 			}, {}),
-			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
+			paging,
+			result.hits.total.value
 		);
 	}
 
