@@ -87,7 +87,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
 		const total = result.hits.total.value;
-		return CollectionPaging(
+		return new CollectionPaging(
 			result.hits.hits.reduce((obj, item) => {
 				obj[item._id] = item._source;
 				return obj;

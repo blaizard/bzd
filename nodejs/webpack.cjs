@@ -375,7 +375,7 @@ function getWebpackConfigDefault(isDev, config) {
 							loader: "css-loader",
 							options: {
 								esModule: false,
-							}
+							},
 						},
 						{
 							loader: "sass-loader",
