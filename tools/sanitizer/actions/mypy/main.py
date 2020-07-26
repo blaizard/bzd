@@ -24,11 +24,9 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace,
-		include=[
+	files = Files(args.workspace, include=[
 		"**/*.py",
-		],
-		exclude=["**python/bzd/yaml**"])
+	], exclude=["**python/bzd/yaml**"])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
