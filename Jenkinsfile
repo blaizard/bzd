@@ -37,6 +37,8 @@ pipeline
 				sh "python --version"
 				sh "java --version"
 				sh "./tools/bazel --version"
+				sh "git submodule foreach --recursive git clean -xfd"
+				sh "git submodule foreach --recursive git reset --hard"
 				sh "git submodule update --init --recursive"
 			}
 		}

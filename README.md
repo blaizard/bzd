@@ -47,7 +47,7 @@ To run all tests, run the following command:
 ```
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that
-formater and linters for data files such as YAML, json... are also available.
+formater and linters for YAML, json and markdown are also available.
 |Language|Formatters|Code Analyzers|Code Coverage|Test Framework|Documentation|
 |--|--|--|--|--|--|
 |C++|clang-format|asan, lsan|Yes|Yes|doxygen-based|

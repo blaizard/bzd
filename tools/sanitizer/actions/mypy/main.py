@@ -28,7 +28,7 @@ if __name__ == "__main__":
 		include=[
 		"**/*.py",
 		],
-		exclude=["**tools/bzd/generator/yaml**", "**python/bzd/yaml**"])
+		exclude=["**python/bzd/yaml**"])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
