@@ -72,10 +72,11 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 		catch (e) {
 			if (e instanceof FetchException) {
-				if (e.code == 404 /*Note Found*/) {
+				if (e.code == 404 /*Not Found*/) {
 					return defaultValue;
 				}
 			}
+			throw e;
 		}
 	}
 
@@ -88,25 +89,35 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async _search(bucket, maxOrPaging, query) {
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
-		const result = await this.fetch.request(
-			"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
-			{
-				method: "post",
-				data: {
-					query: query,
-				},
-			}
-		);
-		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
+		try {
+			const result = await this.fetch.request(
+				"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
+				{
+					method: "post",
+					data: {
+						query: query,
+					},
+				}
+			);
+			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
-		return CollectionPaging.makeFromTotal(
-			result.hits.hits.reduce((obj, item) => {
-				obj[item._id] = item._source;
-				return obj;
-			}, {}),
-			paging,
-			result.hits.total.value
-		);
+			return CollectionPaging.makeFromTotal(
+				result.hits.hits.reduce((obj, item) => {
+					obj[item._id] = item._source;
+					return obj;
+				}, {}),
+				paging,
+				result.hits.total.value
+			);
+		}
+		catch (e) {
+			if (e instanceof FetchException) {
+				if (e.code == 404 /*Not Found*/) {
+					return new CollectionPaging({});
+				}
+			}
+			throw e;
+		}
 	}
 
 	async list(bucket, maxOrPaging = 10) {
