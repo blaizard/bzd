@@ -11,8 +11,7 @@
 			:background-color="colorBackground"
 			@color="handleColor"
 			@link="handleLink"
-			@error="handleError"
-		>
+			@error="handleError">
 		</component>
 		<div v-else-if="isError" class="content">Fatal error</div>
 		<div class="name"><i :class="icon"></i> {{ name }}</div>
@@ -141,10 +140,12 @@
 					});
 					this.showComponent = true;
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
-				} catch (e) {
+				}
+				catch (e) {
 					this.handleError("Error while fetching data: " + String(e));
 					this.handleColor("red");
-				} finally {
+				}
+				finally {
 					this.loading = false;
 				}
 			},
@@ -158,7 +159,8 @@
 			handleClick() {
 				if (this.edit) {
 					this.$routerDispatch("/update/" + this.uid);
-				} else if (this.link) {
+				}
+				else if (this.link) {
 					window.open(this.link);
 				}
 			},

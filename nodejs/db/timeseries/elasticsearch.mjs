@@ -31,7 +31,12 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			};
 		}
 
-		Log.info("Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).", host, this.options.prefix, ("authentication" in fetchOptions) ? "on" : "off");
+		Log.info(
+			"Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).",
+			host,
+			this.options.prefix,
+			"authentication" in fetchOptions ? "on" : "off"
+		);
 		this.fetch = new FetchFactory(host, fetchOptions);
 		this._initialize();
 	}

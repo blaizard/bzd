@@ -26,8 +26,8 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
-        "//nodejs/core:log",
         "//nodejs/core:fetch",
+        "//nodejs/core:log",
         "//nodejs/db:utils",
     ],
 )
