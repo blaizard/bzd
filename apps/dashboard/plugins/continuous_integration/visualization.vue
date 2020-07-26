@@ -7,9 +7,7 @@
 			</div>
 			<div v-if="isValid">
 				<i class="bzd-icon-clock"></i>
-				<span
-					>{{ lastBuildDate[0] }}<small>{{ lastBuildDate[1] }} ago</small></span
-				>
+				<span>{{ lastBuildDate[0] }}<small>{{ lastBuildDate[1] }} ago</small></span>
 			</div>
 		</div>
 		<div class="metrics">
