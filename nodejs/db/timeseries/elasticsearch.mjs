@@ -1,5 +1,5 @@
 import Timeseries from "./timeseries.mjs";
-import { FetchFactory } from "../../core/fetch.mjs";
+import { FetchFactory, FetchException } from "../../core/fetch.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
@@ -57,25 +57,36 @@ export default class TimeseriesElasticsearch extends Timeseries {
 
 	async _search(bucket, maxOrPaging, query) {
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
-		const result = await this.fetch.request(
-			"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
-			{
-				method: "post",
-				data: {
-					query: query,
-					sort: {
-						date: "desc",
-					},
-				},
-			}
-		);
-		Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
-		return CollectionPaging.makeFromTotal(
-			result.hits.hits.map((item) => [item._source.date, item._source.data]),
-			paging,
-			result.hits.total.value
-		);
+		try {
+			const result = await this.fetch.request(
+				"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
+				{
+					method: "post",
+					data: {
+						query: query,
+						sort: {
+							date: "desc",
+						},
+					},
+				}
+			);
+			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
+
+			return CollectionPaging.makeFromTotal(
+				result.hits.hits.map((item) => [item._source.date, item._source.data]),
+				paging,
+				result.hits.total.value
+			);
+		}
+		catch (e) {
+			if (e instanceof FetchException) {
+				if (e.code == 404 /*Not Found*/) {
+					return new CollectionPaging([]);
+				}
+			}
+			throw e;
+		}
 	}
 
 	async list(bucket, maxOrPaging = 10) {
