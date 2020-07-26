@@ -5,6 +5,9 @@ import Cache from "../../core/cache.mjs";
 import KeyValueStore from "./key_value_store.mjs";
 import FileSystem from "../../core/filesystem.mjs";
 import { CollectionPaging } from "../utils.mjs";
+import LogFactory from "../../core/log.mjs";
+
+const Log = LogFactory("db", "kvs", "disk");
 
 /**
  * Key value store for low demanding application, that presists on the local disk.
@@ -30,6 +33,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		this.cache = null;
 
 		// Initialize ansynchronously the rest of the data
+		Log.info("Using disk key value store DB at '{}'.", this.path);
 		this._initialize();
 	}
 

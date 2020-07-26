@@ -3,7 +3,9 @@ import Fs from "fs";
 
 import Storage from "./storage.mjs";
 import FileSystem from "../../core/filesystem.mjs";
+import LogFactory from "../../core/log.mjs";
 
+const Log = LogFactory("db", "storage", "disk");
 /**
  * File storage module
  */
@@ -14,6 +16,7 @@ export default class StorageDisk extends Storage {
 		this.options = Object.assign({}, options);
 		this.path = path;
 
+		Log.info("Using disk storage DB at '{}'.", this.path);
 		this._initialize();
 	}
 
