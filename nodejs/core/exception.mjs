@@ -66,13 +66,15 @@ const ExceptionFactory = (...topics) => {
 		 */
 		static fromError(e) {
 			let exception = new Exception();
-			exception.message = e.message;
-			exception.stack = e.stack;
-			if ("topics" in e) {
-				exception.topics = e.topics;
-			}
-			if ("nestedErrorList" in e) {
-				exception.nestedErrorList = e.nestedErrorList;
+			if (e) {
+				exception.message = e.message || String(e);
+				exception.stack = e.stack;
+				if ("topics" in e) {
+					exception.topics = e.topics;
+				}
+				if ("nestedErrorList" in e) {
+					exception.nestedErrorList = e.nestedErrorList;
+				}
 			}
 			return exception;
 		}
@@ -210,8 +212,8 @@ else {
 		E.fromError(e).print("Exception: uncaughtException");
 		process.exit(1);
 	});
-	process.on("unhandledRejection", (e) => {
-		E.fromError(e).print("Exception: unhandledRejection");
+	process.on("unhandledRejection", (reason, promise) => {
+		E.fromError(reason).print("Exception: unhandledRejection, reason: '{}', promise: '{}'", reason, promise);
 		process.exit(2);
 	});
 }
