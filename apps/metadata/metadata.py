@@ -5,12 +5,13 @@ import re
 import json
 import os
 import subprocess
+from typing import Tuple, List, Mapping, Any
 
 
-def printTable(data, headers=[]):
+def printTable(data: List[List[str]], headers: List[str]) -> None:
 
 	# Calculate column sizes
-	columnSizes = []
+	columnSizes: List[int] = []
 	for row in [headers] + data:
 		for index, item in enumerate(row):
 			if index < len(columnSizes):
@@ -27,12 +28,12 @@ def printTable(data, headers=[]):
 		print("  " + " | ".join(line))
 
 
-def printMetadataCC(data):
+def printMetadataCC(data: Mapping[str, Any]) -> None:
 	print(" - Compilers: {}".format(", ".join(data.get("compilers", []))))
 
 	for groupName, group in data.get("size_groups", {}).items():
 		print(" - Size ({})".format(groupName))
-		groups = []
+		groups: List[List[str]] = []
 		size = 0
 		for unit, partSize in group.items():
 			groups.append([unit, partSize])
@@ -41,12 +42,12 @@ def printMetadataCC(data):
 		groups.sort(key=lambda item: item[1], reverse=True)
 		# Update the percentage
 		for line in groups:
-			line.append("{:.1%}".format(line[1] / size))
+			line.append("{:.1%}".format(int(line[1]) / size))
 
 		printTable(groups, headers=[groupName, "size", "percentage"])
 
 
-def printMetadata(metadata):
+def printMetadata(metadata: Mapping[str, Any]) -> None:
 	for name, data in metadata.get("fragments", {}).items():
 		print("Name: {}".format(name))
 		if data.get("type") == "cc":

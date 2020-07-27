@@ -2,24 +2,25 @@
 
 import bzd.yaml
 from log import Log
-from manifest import Reference
+from manifest.reference import Reference
+from typing import Any, Mapping
 """
 Add support for !ref tag
 """
 
 
-class Ref(Reference):
+class Ref(Reference):  # type: ignore
 	tag = u'!ref'
 
-	def __init__(self, loader, node):
-		self.value = node.value
+	def __init__(self, loader: Any, node: Any) -> None:
 		super(Ref, self).__init__()
+		self.value = node.value
 
-	def __repr__(self):
-		return self.getRepr()
+	def __repr__(self) -> str:
+		return self.getRepr()  # type: ignore
 
 	@staticmethod
-	def representer(dumper, data):
+	def representer(dumper: Any, data: Any) -> Any:
 		return dumper.represent_scalar(Ref.tag, str(data))
 
 
@@ -28,9 +29,9 @@ Convert the dict back to a manifest
 """
 
 
-def dictToManifest(data):
+def dictToManifest(data: Mapping[str, Any]) -> str:
 	bzd.yaml.add_representer(Ref, Ref.representer)
-	return bzd.yaml.dump(data)
+	return bzd.yaml.dump(data)  # type: ignore
 
 
 """
@@ -38,7 +39,7 @@ Open a manifest file and convert it to a python dict.
 """
 
 
-def manifestToDict(path):
+def manifestToDict(path: str) -> Mapping[str, Any]:
 
 	bzd.yaml.add_constructor(Ref.tag, Ref)
 
@@ -53,4 +54,4 @@ def manifestToDict(path):
 	finally:
 		f.close()
 
-	return data
+	return data  # type: ignore

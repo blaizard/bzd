@@ -1,6 +1,11 @@
 #!/usr/bin/python
 
 from .validator import ValidatorReference, ValidatorCustom, ValidatorObject, ValidatorInterface
+
+from typing import Sequence, Callable, Any, Optional, Mapping, Set, Dict, List, Iterable, TYPE_CHECKING
+if TYPE_CHECKING:
+	from .manifest import Manifest
+	from .interface import Interface
 """
 Represents an object
 """
@@ -8,21 +13,24 @@ Represents an object
 
 class Object():
 
-	def __init__(self, manifest, identifier, definition=None):
+	def __init__(self, manifest: "Manifest", identifier: str, definition: Optional[Mapping[str, Any]] = None) -> None:
 		self.manifest = manifest
 		self.identifier = identifier
 		self.definition = definition if definition else manifest.getData().get("objects", {}).get(identifier, {})
 		self.deps = {"interface": set([self.getInterfaceName()]), "object": {}}
 
 		# Process the definitions
-		def visit(value):
+		def visit(value: Any) -> None:
 			if ValidatorReference.isMatch(value):
 				valueStr = value.getRepr()
 
 				# If this represents an object
 				if ValidatorObject.isMatch(valueStr):
 					result = ValidatorObject.parse(valueStr)
+					assert result
+					assert isinstance(self.deps["interface"], set)
 					self.deps["interface"].add(result["interface"])
+					assert isinstance(self.deps["object"], dict)
 					self.deps["object"][result["interface"]] = self.deps["object"].get(result["interface"], set())
 					self.deps["object"][result["interface"]].add(result["name"])
 					value.setReprCallback(
@@ -31,6 +39,7 @@ class Object():
 
 				# If this represents an interface
 				elif ValidatorInterface.isMatch(valueStr):
+					assert isinstance(self.deps["interface"], set)
 					self.deps["interface"].add(valueStr)
 
 			elif ValidatorCustom.isMatch(value):
@@ -46,7 +55,7 @@ class Object():
 	Return the interface of the object
 	"""
 
-	def getInterface(self):
+	def getInterface(self) -> "Interface":
 		name = self.getInterfaceName()
 		return self.manifest.getInterface(name, mustExists=False)
 
@@ -54,7 +63,7 @@ class Object():
 	Return the interface of the object
 	"""
 
-	def getInterfaceName(self):
+	def getInterfaceName(self) -> str:
 		return self.identifier.split(".")[0]
 
 	"""
@@ -62,7 +71,7 @@ class Object():
 	"""
 
 	@staticmethod
-	def _walk(obj, callback):
+	def _walk(obj: Iterable[Any], callback: Callable[[Any], None]) -> None:
 		for value in (obj.values() if isinstance(obj, dict) else obj):
 			if isinstance(value, dict):
 				Object._walk(value, callback)
@@ -75,7 +84,7 @@ class Object():
 	Get all dependent interfaces
 	"""
 
-	def getDependentInterfaces(self):
+	def getDependentInterfaces(self) -> List["Interface"]:
 		return [
 			self.manifest.getInterface(dependency) for dependency in self.deps["interface"]
 			if self.manifest.isInterface(dependency)
@@ -85,39 +94,40 @@ class Object():
 	Get all dependent objects
 	"""
 
-	def getDependentObjects(self):
-		return self.deps["object"]
+	def getDependentObjects(self) -> Dict[str, Set[str]]:
+		return self.deps["object"]  # type: ignore
 
 	"""
 	Return the name of the object
 	"""
 
-	def getName(self):
+	def getName(self) -> str:
 		return self.identifier.split(".")[1]
 
 	"""
 	Return the object config if any, or None otherwise.
 	"""
 
-	def getConfig(self):
-		return self.definition.get("config", None)
+	def getConfig(self) -> Optional[Dict[str, Any]]:
+		return self.definition.get("config", None)  # type: ignore
 
 	"""
 	Get the implementation class for this object. Go as deep as the inheritance goes.
 	"""
 
-	def getImplementation(self):
+	def getImplementation(self) -> str:
 		implementationInterface = self.getInterface().getImplementation()
 		implementationObjecy = self.definition.get("implementation", None)
 		assert implementationInterface == None or implementationObjecy == None, "Both interface implementation '{}' and object implementation '{}' cannot be set at the same time for object identifier '{}'.".format(
 			implementationInterface, implementationObjecy, self.identifier)
 		implementation = implementationInterface if implementationInterface else self.definition.get(
 			"implementation", self.getInterfaceName())
-		return self.manifest.getInterface(implementation, mustExists=False).getImplementationOrInterface()
+		return self.manifest.getInterface(  # type: ignore
+			implementation, mustExists=False).getImplementationOrInterface()
 
 	"""
 	Get parameters
 	"""
 
-	def getParams(self):
-		return self.definition.get("params", [])
+	def getParams(self) -> List[str]:
+		return self.definition.get("params", [])  # type: ignore

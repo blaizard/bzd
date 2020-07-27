@@ -3,13 +3,16 @@
 import os
 import re
 import xml.etree.ElementTree as ET
-
+from typing import Mapping, MutableMapping, Any, Optional, Tuple, List, Dict
 from members import Members, Member
 
 kindToKeep = ["struct", "class", "variable", "function", "typedef", "namespace"]
 
 
-def commentParser(element, data={}):
+def commentParser(element: ET.Element, data: Optional[MutableMapping[str, Any]] = None) -> str:
+
+	if data is None:
+		data = {}
 
 	textList = []
 
@@ -23,10 +26,13 @@ def commentParser(element, data={}):
 				for parameteritem in parameterlist.findall("parameteritem"):
 					param = {}
 					if parameteritem.find("parameternamelist") is not None:
-						param["name"] = ", ".join(text for text in parameteritem.find("parameternamelist").itertext()
-							if text.strip())
+						parameternamelist = parameteritem.find("parameternamelist")
+						assert parameternamelist
+						param["name"] = ", ".join(text for text in parameternamelist.itertext() if text.strip())
 					if parameteritem.find("parameterdescription") is not None:
-						param["description"] = commentParser(parameteritem.find("parameterdescription"))
+						parameterdescription = parameteritem.find("parameterdescription")
+						assert parameterdescription
+						param["description"] = commentParser(parameterdescription)
 					paramList.append(param)
 				data["__info__"] = data["__info__"] if "__info__" in data else {}
 				data["__info__"]["description.%s" % (kind)] = paramList
@@ -197,16 +203,16 @@ dictionaryRoot = {"compounddef": compounddef}
 
 class DoxygenParser:
 
-	def __init__(self):
-		self.data = {}
-		self.groups = {}
+	def __init__(self) -> None:
+		self.data: MutableMapping[str, Any] = {}
+		self.groups: MutableMapping[str, Any] = {}
 
 	"""
 	Write a warning message
 	"""
 
-	def assertTrue(self, condition, message, *argv):
-		if not condition:
+	def assertTrue(self, condition: Any, message: str, *argv: Any) -> None:
+		if not bool(condition):
 			print("[error] %s" % (message.format(*argv)))
 			raise Exception("Assert failed")
 
@@ -214,8 +220,8 @@ class DoxygenParser:
 	Write a warning message
 	"""
 
-	def assertTrueWarning(self, condition, message, *argv):
-		if not condition:
+	def assertTrueWarning(self, condition: Any, message: str, *argv: Any) -> bool:
+		if not bool(condition):
 			print("[warning] %s" % (message.format(*argv)))
 			return True
 		return False
@@ -224,7 +230,7 @@ class DoxygenParser:
 	Parse a value and returns a key value pair
 	"""
 
-	def parseValue(self, rules, value, key=None):
+	def parseValue(self, rules: Mapping[str, Any], value: Any, key: str = "") -> Tuple[str, Any]:
 		if value and "values" in rules:
 			acceptedValues = []
 			if isinstance(rules["values"], list):
@@ -247,7 +253,7 @@ class DoxygenParser:
 	Add member information
 	"""
 
-	def addMemberInfo(self, data, key, value):
+	def addMemberInfo(self, data: MutableMapping[str, Any], key: str, value: Any) -> None:
 		if value != None:
 			data["__info__"] = data["__info__"] if "__info__" in data else {}
 			if key in data["__info__"]:
@@ -260,29 +266,29 @@ class DoxygenParser:
 	Add member list
 	"""
 
-	def addMemberList(self, data, key):
+	def addMemberList(self, data: MutableMapping[str, Any], key: str) -> List[Any]:
 		data["__info__"] = data["__info__"] if "__info__" in data else {}
 		if key not in data["__info__"]:
 			data["__info__"][key] = []
 		self.assertTrue(isinstance(data["__info__"][key], list), "The key '{}' must be a list", key)
-		return data["__info__"][key]
+		return data["__info__"][key]  # type: ignore
 
 	"""
 	Add member dictionary
 	"""
 
-	def addMemberDict(self, data, key):
+	def addMemberDict(self, data: MutableMapping[str, Any], key: str) -> Dict[str, Any]:
 		data["__info__"] = data["__info__"] if "__info__" in data else {}
 		if key not in data["__info__"]:
 			data["__info__"][key] = {}
 		self.assertTrue(isinstance(data["__info__"][key], dict), "The key '{}' must be a dictionary", key)
-		return data["__info__"][key]
+		return data["__info__"][key]  # type: ignore
 
 	"""
 	Parse the attributes of the current element and return a dictionary
 	"""
 
-	def parseElement(self, element, definition, data={}):
+	def parseElement(self, element: ET.Element, definition: Mapping[str, Any], data: MutableMapping[str, Any]) -> None:
 		if "__attrs__" in definition:
 			for key, rules in definition["__attrs__"].items():
 				# Get the value and add it only if it is non-None
@@ -301,7 +307,7 @@ class DoxygenParser:
 	Check if a member has a namespace and if so, replace this member
 	"""
 
-	def normalizeName(self, data):
+	def normalizeName(self, data: MutableMapping[str, Any]) -> None:
 		if self.assertTrueWarning("__info__" in data, "Attribute '__info__' is missing from member: {}", data):
 			return
 		self.assertTrue("name" in data["__info__"], "Attribute 'name' is missing from member: {}", data)
@@ -317,7 +323,7 @@ class DoxygenParser:
 	Register a new member
 	"""
 
-	def addMember(self, data, member):
+	def addMember(self, data: MutableMapping[str, Any], member: MutableMapping[str, Any]) -> None:
 		if member["__info__"].get("kind", None) in kindToKeep:
 
 			# Generate the member identifier
@@ -331,7 +337,7 @@ class DoxygenParser:
 	Merge member2 into member1 and return it
 	"""
 
-	def mergeMember(self, member1, member2):
+	def mergeMember(self, member1: MutableMapping[str, Any], member2: Mapping[str, Any]) -> Mapping[str, Any]:
 		self.assertTrue(type(member1) == type(member2), "Cannot merge different types {} vs {}", member1, member2)
 
 		# Merge dictionaries
@@ -359,7 +365,7 @@ class DoxygenParser:
 	Remove nested keyword
 	"""
 
-	def removeNestedKeyword(self, definition, keyword):
+	def removeNestedKeyword(self, definition: Dict[str, Any], keyword: str) -> Dict[str, Any]:
 		if isinstance(definition, dict):
 			if keyword in definition:
 				self.assertTrue(isinstance(definition[keyword], dict), "Sub definition under '{}' must be a dict",
@@ -376,7 +382,8 @@ class DoxygenParser:
 	Format the data into groups
 	"""
 
-	def makeGroups(self, groups, data, namespaceList=[]):
+	def makeGroups(self, groups: MutableMapping[str, Any], data: MutableMapping[str, Any],
+		namespaceList: List[str]) -> None:
 
 		for namespace, definition in data.items():
 			if namespace == "__info__":
@@ -394,10 +401,10 @@ class DoxygenParser:
 	Resolve and set links
 	"""
 
-	def resolveLinks(self, groups):
-		links = {}
+	def resolveLinks(self, groups: MutableMapping[str, Any]) -> None:
+		links: Dict[str, List[Any]] = {}
 
-		def addLink(dataList):
+		def addLink(dataList: List[Any]) -> None:
 			for data in dataList:
 				link = data.get("link", None)
 				if link:
@@ -418,7 +425,9 @@ class DoxygenParser:
 								inheritanceCurrent = parent
 
 					# Build the inheritance chain
-					def getInheritance(inheritanceCurrent, inheritanceList, visibility="public"):
+					def getInheritance(inheritanceCurrent: Optional[Mapping[str, Any]],
+						inheritanceList: List[Any],
+						visibility: str = "public") -> None:
 						if inheritanceCurrent:
 							for child in inheritanceCurrent.get("children", []):
 								inheritanceNext = child
@@ -434,7 +443,7 @@ class DoxygenParser:
 									})
 									getInheritance(inheritanceNext, inheritanceList, visibility)
 
-					inheritanceList = []
+					inheritanceList: List[Any] = []
 					getInheritance(inheritanceCurrent, inheritanceList)
 					addLink(inheritanceList)
 					member["inheritance"] = inheritanceList
@@ -456,7 +465,7 @@ class DoxygenParser:
 	Merge description with their params and template params
 	"""
 
-	def mergeDescription(self, groups):
+	def mergeDescription(self, groups: MutableMapping[str, Any]) -> None:
 		for namespace, members in groups.items():
 			for member in members:
 				if "description.param" in member:
@@ -470,21 +479,21 @@ class DoxygenParser:
 	Parse a root XML element
 	"""
 
-	def parse(self, root, dictionary=dictionaryRoot):
+	def parse(self, root: ET.Element, dictionary: Mapping[str, Any] = dictionaryRoot) -> None:
 		self.parseSubElements(root, dictionary, {})
 
 	"""
 	Build the database and group data together
 	"""
 
-	def getMembersData(self):
-		groups = {}
-		self.makeGroups(groups, self.data)
+	def getMembersData(self) -> Mapping[str, Any]:
+		groups: MutableMapping[str, Any] = {}
+		self.makeGroups(groups, self.data, [])
 		self.mergeDescription(groups)
 		self.resolveLinks(groups)
 		return groups
 
-	def parseSubElements(self, root, dictionary, data):
+	def parseSubElements(self, root: ET.Element, dictionary: Mapping[str, Any], data: Any) -> None:
 
 		try:
 

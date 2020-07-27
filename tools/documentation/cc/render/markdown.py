@@ -3,20 +3,21 @@
 import re
 import os
 
-from members import Members
+from typing import Mapping, Optional, Sequence, TextIO
+from members import Members, Member
 
 
 class MarkdownRender:
 
-	def __init__(self, path, members):
+	def __init__(self, path: str, members: Members) -> None:
 		self.path = path
 		self.members = members
-		self.curDir = None
-		self.fileHandle = None
+		self.curDir: Optional[str] = None
+		self.fileHandle: Optional[TextIO] = None
 
-	def generateLink(self, namespace, member=None):
+	def generateLink(self, namespace: str, member: Optional[Member] = None) -> str:
 
-		def identifierToPath(identifierList):
+		def identifierToPath(identifierList: Sequence[str]) -> str:
 			path = os.path.join(self.path, os.path.join(*[self.toFileName(name) for name in identifierList]))
 			if self.curDir:
 				path = os.path.relpath(path, self.curDir)
@@ -31,8 +32,9 @@ class MarkdownRender:
 		name = identifierList.pop()
 		return os.path.join(identifierToPath(identifierList), "index.md")
 
-	def createNamespace(self, namespace):
+	def createNamespace(self, namespace: str) -> None:
 		if namespace:
+			assert self.fileHandle
 			self.fileHandle.write("# ")
 			namespaceList = namespace.split("::")
 			for i in range(len(namespaceList)):
@@ -44,8 +46,9 @@ class MarkdownRender:
 		if member:
 			self.createMember(namespace, member, "## ")
 
-	def createListing(self, namespace, memberList):
-		prevKind = -1
+	def createListing(self, namespace: str, memberList: Sequence[Member]) -> None:
+		prevKind = ""
+		assert self.fileHandle
 		for member in memberList:
 			kind = member.getKind()
 			if kind != prevKind:
@@ -63,7 +66,7 @@ class MarkdownRender:
 				self.generateLink(namespace, member), descriptionBrief))
 			prevKind = kind
 
-	def formatComment(self, comment):
+	def formatComment(self, comment: str) -> str:
 
 		pattern = re.compile("<([^>]{1,6})>")
 
@@ -71,7 +74,7 @@ class MarkdownRender:
 		output = ""
 		currentStack = ["comment"]
 
-		def formatText(current, text):
+		def formatText(current: str, text: str) -> str:
 			if current == "comment":
 				return text.replace("\n", "\n\n")
 			return text
@@ -100,7 +103,8 @@ class MarkdownRender:
 
 		return output
 
-	def createMember(self, namespace, member, preTitle):
+	def createMember(self, namespace: str, member: Member, preTitle: str) -> None:
+		assert self.fileHandle
 		self.fileHandle.write("{}`{} {}`\n".format(preTitle, member.printDefinition("{template} {pre} {type}"),
 			member.printDefinition("{name} {post}")))
 
@@ -129,26 +133,28 @@ class MarkdownRender:
 				self.fileHandle.write("|{}|{}|{}|\n".format(arg.get("type"), arg.get("name"),
 					arg.get("description", "")))
 
-	def toFileName(self, name):
+	def toFileName(self, name: str) -> str:
 		return re.sub(r'[^a-z0-9]+', '_', name.lower())
 
-	def useFile(self, namespace):
+	def useFile(self, namespace: str) -> None:
 		# Create directories
 		path = self.generateLink(namespace)
 		self.curDir = os.path.dirname(path)
 		os.makedirs(self.curDir, exist_ok=True)
 		self.fileHandle = open(path, "w")
 
-	def closeFile(self):
+	def closeFile(self) -> None:
+		assert self.fileHandle
 		self.fileHandle.close()
 		self.fileHandle = None
 		self.curDir = None
 
-	def process(self):
+	def process(self) -> None:
 		for namespace, memberGroup in self.members.items():
 			memberList = memberGroup.get()
 
 			self.useFile(namespace)
+			assert self.fileHandle
 
 			self.createNamespace(namespace)
 

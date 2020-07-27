@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 import argparse
-import formats
 import re
 import os
 from log import Log
 from parser import manifestToDict, dictToManifest
-from manifest import Manifest
+from manifest.manifest import Manifest
+from formats.formats import SUPPORTED_FORMATS
 
 if __name__ == "__main__":
 
@@ -22,7 +22,8 @@ if __name__ == "__main__":
 		help="Artifacts to be added to the generated code.")
 
 	config = parser.parse_args()
-	assert hasattr(formats, config.format), "Unsupported output format '{}'".format(str(config.format))
+	assert config.format in SUPPORTED_FORMATS, "Unsupported output format '{}', the following are supported: {}".format(
+		config.format, ", ".join(SUPPORTED_FORMATS.keys()))
 
 	manifest = Manifest()
 	for path in config.inputs:
@@ -57,7 +58,7 @@ if __name__ == "__main__":
 	print("Manifest", config.manifest)
 
 	try:
-		formatter = getattr(formats, config.format)
+		formatter = SUPPORTED_FORMATS[config.format]
 		formatter(manifest, config.output, {"comments": comments})
 	except Exception as e:
 		Log.fatal("Cannot generate '{}' output".format(config.format), e)

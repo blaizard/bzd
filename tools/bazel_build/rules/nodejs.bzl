@@ -1,4 +1,5 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("//tools/bazel_build/settings/cache:defs.bzl", "BzdSettingCacheProvider")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 
 # ---- Providers
@@ -128,6 +129,13 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Fetch and install the packages
 
+    manager_args = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive"]
+
+    # Set the cache directory
+    cache_path = ctx.attr._cache[BzdSettingCacheProvider].path
+    if cache_path:
+        manager_args += ["--cache-folder", "{}/yarn".format(cache_path)]
+
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//tools/bazel_build/toolchains/nodejs:toolchain_type"].executable
 
@@ -138,7 +146,7 @@ def _bzd_nodejs_install_impl(ctx):
         inputs = [package_json],
         outputs = [node_modules, yarn_lock_json],
         progress_message = "Updating package(s) for {}".format(ctx.label),
-        arguments = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive"],
+        arguments = manager_args,
         executable = toolchain_executable.manager.files_to_run,
     )
 
@@ -181,6 +189,9 @@ _INSTALL_ATTRS.update({
         default = Label("//tools/bazel_build/rules/assets/nodejs:metadata"),
         cfg = "host",
         executable = True,
+    ),
+    "_cache": attr.label(
+        default = "//tools/bazel_build/settings/cache",
     ),
 })
 

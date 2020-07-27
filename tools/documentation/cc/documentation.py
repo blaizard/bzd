@@ -29,7 +29,8 @@ if __name__ == "__main__":
 				print("file: %s" % (fileName))
 				raise e
 
-	members = Members(doxygen.getMembersData())
+	data = doxygen.getMembersData()
+	members = Members(data)
 
 	# Render to markdown
 	render = MarkdownRender(args.output, members)

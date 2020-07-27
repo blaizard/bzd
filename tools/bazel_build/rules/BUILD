@@ -25,6 +25,7 @@ bzl_library(
     deps = [
         ":package",
         "//tools/bazel_build:binary_wrapper",
+        "//tools/bazel_build/settings/cache:defs",
     ],
 )
 
