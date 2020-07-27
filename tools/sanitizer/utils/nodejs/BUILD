@@ -13,6 +13,9 @@ bzd_nodejs_library(
     srcs = [
         "workspace.mjs",
     ],
+    data = [
+        "//tools/sanitizer:config",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":filter",

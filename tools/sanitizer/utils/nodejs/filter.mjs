@@ -9,7 +9,7 @@ export default class Filter {
 
 	static _compile(filterStr) {
 		let index = 0;
-		let regexpr = "";
+		let regexpr = "^";
 		while (index < filterStr.length) {
 			const c = filterStr[index];
 			if (c == "*") {
