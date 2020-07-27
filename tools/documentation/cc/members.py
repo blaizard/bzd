@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import re
+from typing import Sequence, Optional, Iterable, Tuple, Mapping, Any, Dict, List, MutableMapping
 """
 Identifer:
 Members are contained with identifiers. An identifier is the C++ namespace used to access the member.
@@ -139,97 +140,97 @@ definition_ = {
 }
 
 
-def getDefinition(kind):
+def getDefinition(kind: str) -> Mapping[str, Any]:
 	return definition_[kind] if kind in definition_ else definition_["default"]
 
 
 class Member:
 
-	def __init__(self, data):
+	def __init__(self, data: Dict[str, Any]) -> None:
 		self.data = data
 
 	"""
 	Generate a namespace identifier
 	"""
 
-	def makeIdentifier(self):
+	def makeIdentifier(self) -> str:
 		return self.printDefinition(formatStr=self.getDefinition()["identifier"])
 
-	def clone(self):
+	def clone(self) -> "Member":
 		return Member(self.data.copy())
 
-	def setProvenance(self, provenance):
+	def setProvenance(self, provenance: str) -> None:
 		self.data["provenance"] = provenance
 
-	def getProvenance(self):
+	def getProvenance(self) -> Optional[str]:
 		return self.data.get("provenance", None)
 
-	def setAlias(self, identifier):
+	def setAlias(self, identifier: str) -> None:
 		self.data["alias"] = self.getAlias()
 		self.data["alias"].append(identifier)
 
-	def getAlias(self):
+	def getAlias(self) -> Sequence[str]:
 		return self.data.get("alias", [])
 
-	def getDefinition(self):
+	def getDefinition(self) -> Mapping[str, Any]:
 		return getDefinition(self.data.get("kind", None))
 
-	def isContainer(self):
-		return self.getDefinition()["container"]
+	def isContainer(self) -> bool:
+		return bool(self.getDefinition()["container"])
 
-	def getName(self):
+	def getName(self) -> str:
 		return self.data.get("name", "")
 
-	def getType(self):
+	def getType(self) -> str:
 		return self.data.get("type", "")
 
-	def getTypeRef(self):
+	def getTypeRef(self) -> Sequence[Mapping[str, Any]]:
 		return self.data.get("typeref", [])
 
-	def getKind(self):
+	def getKind(self) -> str:
 		return self.data.get("kind", "")
 
-	def getVirtual(self):
+	def getVirtual(self) -> bool:
 		return self.data.get("virtual", False)
 
-	def getConst(self):
+	def getConst(self) -> bool:
 		return self.data.get("const", False)
 
-	def getExplicit(self):
+	def getExplicit(self) -> bool:
 		return self.data.get("explicit", False)
 
-	def getStatic(self):
+	def getStatic(self) -> bool:
 		return self.data.get("static", False)
 
-	def getVisibility(self):
+	def getVisibility(self) -> str:
 		return self.data.get("visibility", self.getDefinition()["defaultVisibility"])
 
-	def getTemplate(self):
+	def getTemplate(self) -> Sequence[Mapping[str, Any]]:
 		return self.data.get("template", [])
 
-	def getArgs(self):
+	def getArgs(self) -> Sequence[Mapping[str, Any]]:
 		return self.data.get("args", [])
 
-	def getInheritance(self):
+	def getInheritance(self) -> Sequence[Mapping[str, Any]]:
 		return self.data.get("inheritance", [])
 
-	def getDescriptionBrief(self):
+	def getDescriptionBrief(self) -> str:
 		regex = re.compile(r'[\n\r\t]')
 		return regex.sub(" ", self.data.get("descriptionBrief", "").strip())
 
-	def getDescription(self):
+	def getDescription(self) -> str:
 		return "{}\n{}".format(self.getDescriptionBrief(), self.data.get("description", "")).strip()
 
-	def printDefinition(self, formatStr="{template} {pre} {type} {name} {post}"):
+	def printDefinition(self, formatStr: str = "{template} {pre} {type} {name} {post}") -> str:
 
-		def printTemplate(template):
+		def printTemplate(template: Sequence[Mapping[str, Any]]) -> str:
 			if len(template):
 				formatArgs = ", ".join(
 					["{type} {name}".format(type=v.get("type"), name=v.get("name", "")).strip() for v in template])
 				return "template<{}>".format(formatArgs)
 			return ""
 
-		def printArgs(args):
+		def printArgs(args: Sequence[Mapping[str, Any]]) -> str:
 			return ", ".join(["{type} {name}".format(type=v.get("type"), name=v.get("name", "")).strip() for v in args])
 
 		formatRule = self.getDefinition()["format"].copy()
@@ -254,13 +255,13 @@ class Member:
 
 class MemberGroup:
 
-	def __init__(self, memberList, identifier):
-		self.list = []
+	def __init__(self, memberList: Sequence[Dict[str, Any]], identifier: str) -> None:
+		self.list: List[Member] = []
 		self.identifier = identifier
-		self.parent = None
+		self.parent: Optional[Member] = None
 		self.addMembers([Member(member) for member in memberList])
 
-	def setParent(self, parent):
+	def setParent(self, parent: Member) -> None:
 		self.parent = parent
 		self.sort()
 
@@ -268,21 +269,21 @@ class MemberGroup:
 	Get constructor name if any
 	"""
 
-	def getConstructorName(self):
+	def getConstructorName(self) -> Optional[str]:
 		return self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
 	"""
 	Get destructor name if any
 	"""
 
-	def getDestructorName(self):
+	def getDestructorName(self) -> Optional[str]:
 		return "~" + self.parent.getName() if self.parent and self.parent.getDefinition()["constructor"] else None
 
-	def addMembers(self, members, provenance=None):
+	def addMembers(self, members: Sequence[Member], provenance: Optional[str] = None) -> None:
 		name = self.getIdentifierName()
 		for member in members:
 			if member.getVisibility() == "public":
-				if provenance:
+				if provenance is not None:
 					# If constructor or destructor, do not merge
 					if member.getName() in [self.getConstructorName(), self.getDestructorName()]:
 						continue
@@ -290,12 +291,12 @@ class MemberGroup:
 				self.list.append(member)
 		self.sort()
 
-	def merge(self, memberGroup, provenance):
+	def merge(self, memberGroup: "MemberGroup", provenance: str) -> None:
 		self.addMembers([member.clone() for member in memberGroup.list], provenance)
 
-	def sort(self):
+	def sort(self) -> None:
 
-		def sortKey(k):
+		def sortKey(k: Member) -> str:
 			weight = k.getDefinition()["sort"]
 			if k.getName() == self.getConstructorName():
 				weight -= 0.2
@@ -305,23 +306,23 @@ class MemberGroup:
 
 		self.list = sorted(self.list, key=sortKey)
 
-	def get(self):
+	def get(self) -> Sequence[Member]:
 		return self.list
 
-	def getMember(self, name):
+	def getMember(self, name: str) -> Optional[Member]:
 		for member in self.list:
 			if member.getName() == name:
 				return member
 		return None
 
-	def getIdentifierName(self):
+	def getIdentifierName(self) -> str:
 		name = self.identifier.split("::")[-1]
 		return re.sub(r'<.*>', '', name).strip()
 
 
 class Members:
 
-	def __init__(self, data):
+	def __init__(self, data: Mapping[str, Any]) -> None:
 		self.data = {}
 		for identifier, memberList in data.items():
 			self.data[identifier] = MemberGroup(memberList, identifier)
@@ -375,15 +376,15 @@ class Members:
 				# exit()
 
 	@staticmethod
-	def makeIdentifier(*argv):
+	def makeIdentifier(*argv: str) -> str:
 		return "::".join([n for n in argv if n.strip()])
 
-	def getMemberGroup(self, identifier):
+	def getMemberGroup(self, identifier: str) -> Optional[MemberGroup]:
 		if identifier in self.data:
 			return self.data[identifier]
 		return None
 
-	def getMember(self, namespace):
+	def getMember(self, namespace: str) -> Optional[Member]:
 		identifier = "::".join(namespace.split("::")[:-1])
 		memberGroup = self.getMemberGroup(identifier)
 		if memberGroup:
@@ -391,7 +392,7 @@ class Members:
 			return memberGroup.getMember(name)
 		return None
 
-	def items(self):
+	def items(self) -> Iterable[Tuple[str, MemberGroup]]:
 		sortedNamespaceList = sorted(self.data.keys())
 		for namespace in sortedNamespaceList:
 			yield (namespace, self.data[namespace])

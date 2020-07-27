@@ -3,12 +3,13 @@
 import argparse
 import serial
 import sys
+from typing import Any
 """
 Configure and return an instance of a Serial interface.
 """
 
 
-def configureSerial(args) -> serial.Serial:
+def configureSerial(args: argparse.Namespace) -> serial.Serial:
 
 	dataBitsMapping = {5: serial.FIVEBITS, 6: serial.SIXBITS, 7: serial.SEVENBITS, 8: serial.EIGHTBITS}
 	parityMapping = {

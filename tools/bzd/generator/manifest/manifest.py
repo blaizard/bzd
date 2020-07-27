@@ -4,6 +4,8 @@ from .object import Object
 from .interface import Interface, EmptyInterface
 from .artifact import Artifact
 from .validator import Validator
+
+from typing import Optional, Mapping, Any, Set, Sequence, Iterable, List, Dict, MutableMapping, ValuesView
 """
 Represent a key, used together with the context for messaging
 """
@@ -11,30 +13,29 @@ Represent a key, used together with the context for messaging
 
 class _Keys():
 
-	def __init__(self):
-		self.keys = []
+	def __init__(self) -> None:
+		self.keys: List[str] = []
 
-	def push(self, key):
+	def push(self, key: str) -> None:
 		self.keys.append(key)
 
-	def pop(self):
+	def pop(self) -> None:
 		self.keys.pop()
 
-	def toKey(self):
+	def toKey(self) -> str:
 		return "/".join(self.keys)
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return " > ".join(self.keys)
 
 
 class Manifest():
 
-	def __init__(self):
-		self.data = {}
-		self.objects = {}
-		self.interfaces = {}
-		self.artifacts = {}
-		self.sources = {}
+	def __init__(self) -> None:
+		self.data: Dict[str, Any] = {}
+		self.objects: Dict[str, Object] = {}
+		self.interfaces: Dict[str, Interface] = {}
+		self.artifacts: Dict[str, Artifact] = {}
 		self.setRenderer()
 		self.format = {
 			"artifacts": {
@@ -67,16 +68,17 @@ class Manifest():
 	Set a new renderer for reference objects
 	"""
 
-	def setRenderer(self, renderer=None):
+	def setRenderer(self, renderer: Optional[Mapping[str, Any]] = None) -> None:
 		self.renderer = renderer
 
 	"""
 	List all objects
 	"""
 
-	def getObjects(self, filt={}):
+	def getObjects(self, filt: Optional[Mapping[str, Any]] = None) -> Iterable[Object]:
 		config = {"interface": None}
-		config.update(filt)
+		if filt is not None:
+			config.update(filt)
 		for identifier, obj in self.objects.items():
 			if config["interface"] == None or config["interface"] == obj.getInterfaceName():
 				yield obj
@@ -85,14 +87,14 @@ class Manifest():
 	Return true if this is a known interface, false otherwise
 	"""
 
-	def isInterface(self, name):
+	def isInterface(self, name: str) -> bool:
 		return str(name) in self.interfaces
 
 	"""
 	Get a specific inteface
 	"""
 
-	def getInterface(self, name, mustExists=True):
+	def getInterface(self, name: str, mustExists: bool = True) -> Interface:
 		exists = self.isInterface(name)
 		assert not mustExists or exists, "The interface name '{}' was not discovered or is not valid.".format(str(name))
 		return self.interfaces[str(name)] if exists else EmptyInterface(name)
@@ -101,21 +103,21 @@ class Manifest():
 	Return the raw data of this manifest
 	"""
 
-	def getData(self):
+	def getData(self) -> MutableMapping[str, Any]:
 		return self.data
 
 	"""
 	Return the list of artifact objects
 	"""
 
-	def getArtifacts(self):
+	def getArtifacts(self) -> ValuesView[Artifact]:
 		return self.artifacts.values()
 
 	"""
 	List all depending interfaces
 	"""
 
-	def getDependentInterfaces(self):
+	def getDependentInterfaces(self) -> Set[Interface]:
 
 		# Gather all object dependencies
 		dependencies = set()
@@ -128,7 +130,7 @@ class Manifest():
 	Return the registry sorted by dependency resolution
 	"""
 
-	def getRegistry(self):
+	def getRegistry(self) -> List[Mapping[str, Any]]:
 		registryEntries = {}
 		interfaces = set([obj.getInterface() for obj in self.getObjects()])
 		for interface in interfaces:
@@ -138,22 +140,26 @@ class Manifest():
 			[deps.update(obj.getDependentObjects()) for obj in objects]
 			registryEntries[interface.getName()] = {"objects": objects, "deps": deps}
 		# Create a dependency graph
-		dependencyGraph = {interface: set() for interface in registryEntries.keys()}
-		for interface, data in registryEntries.items():
+		dependencyGraph: Mapping[str, Set[str]] = {interface: set() for interface in registryEntries.keys()}
+		for interfaceStr, data in registryEntries.items():
+			assert isinstance(data["deps"], dict)
 			for dependency in data["deps"].keys():
-				dependencyGraph[interface].add(dependency)
+				dependencyGraph[interfaceStr].add(dependency)
 
 		# Sort the registry
 		# Todo, can be optimized/simplified
-		registryList = []
+		registryList: List[Mapping[str, Any]] = []
 		while dependencyGraph:
 			newDependencyGraph = {}
 			registryListInitialLen = len(registryList)
-			for interface, data in dependencyGraph.items():
-				if all([dep not in dependencyGraph for dep in data]):
-					registryList.append({"interface": interface, "objects": registryEntries[interface]["objects"]})
+			for interfaceStr, dependencies in dependencyGraph.items():
+				if all([dep not in dependencyGraph for dep in dependencies]):
+					registryList.append({
+						"interface": interfaceStr,
+						"objects": registryEntries[interfaceStr]["objects"]
+					})
 				else:
-					newDependencyGraph[interface] = data
+					newDependencyGraph[interfaceStr] = dependencies
 			if registryListInitialLen == len(registryList):
 				raise Exception("Circular depedency detected between interfaces: {}.".format(", ".join(
 					dependencyGraph.keys())))
@@ -165,7 +171,7 @@ class Manifest():
 	Merge data into the current manifest.
 	"""
 
-	def merge(self, data, path):
+	def merge(self, data: Mapping[str, Any], path: str) -> None:
 		context = {"key": _Keys()}
 		try:
 			self._mergeAndValidate(self.data, data, self.format, context, path)
@@ -177,7 +183,7 @@ class Manifest():
 	Add artifacts to the generated code.
 	"""
 
-	def addArtifact(self, path, identifier):
+	def addArtifact(self, path: str, identifier: str) -> None:
 		if "artifacts" not in self.data:
 			self.data["artifacts"] = {}
 		assert identifier not in self.data["artifacts"], "Identifier '{}' is already used for artifact.".format(
@@ -188,7 +194,7 @@ class Manifest():
 	Process the current data of the manifest in order to speed-up later accesses
 	"""
 
-	def process(self):
+	def process(self) -> None:
 
 		# Objects
 		self.objects = {}
@@ -220,7 +226,8 @@ class Manifest():
 	"""
 
 	@staticmethod
-	def _mergeAndValidate(dst, src, validation, context, path):
+	def _mergeAndValidate(dst: MutableMapping[str, Any], src: Mapping[str, Any], validation: Mapping[str, Any],
+		context: MutableMapping[str, Any], path: str) -> None:
 
 		for key, value in src.items():
 			context["key"].push(key)

@@ -4,18 +4,18 @@ import queue
 import time
 import multiprocessing
 from io import StringIO
-from typing import Optional, Iterable, Any
+from typing import Optional, Iterable, Any, Tuple, TextIO, Callable, Mapping
 
 
 class _WorkerResult:
 
-	def __init__(self, output) -> None:
+	def __init__(self, output: Tuple[bool, Any, str]) -> None:
 		self.output = output
 
 	def isSuccess(self) -> bool:
 		return self.output[0]
 
-	def getResult(self):
+	def getResult(self) -> Any:
 		return self.output[1]
 
 	def getOutput(self) -> str:
@@ -24,7 +24,7 @@ class _WorkerResult:
 
 class Worker:
 
-	def __init__(self, task, maxWorker: Optional[int] = os.cpu_count()) -> None:
+	def __init__(self, task: Callable[[Any, TextIO], Any], maxWorker: Optional[int] = os.cpu_count()) -> None:
 		self.shared = {
 			"stop": multiprocessing.Value("i", 0),
 			"count": multiprocessing.Value("i", 0),
@@ -33,12 +33,12 @@ class Worker:
 		}
 		assert maxWorker
 		self.workerList = [
-			multiprocessing.Process(target=Worker._taskWrapper, args=(i, task, self.shared)) for i in range(maxWorker)
+			multiprocessing.Process(target=Worker._taskWrapper, args=(task, self.shared)) for i in range(maxWorker)
 		]
 		self.expectedData = 0
 
 	@staticmethod
-	def _taskWrapper(i, task, shared):
+	def _taskWrapper(task: Callable[[Any, TextIO], Any], shared: Mapping[str, Any]) -> None:
 
 		# Loop unless the workers are notified to be stopped by the master process
 		while shared["count"].value > 0 or shared["stop"].value == 0:
@@ -61,8 +61,12 @@ class Worker:
 			except:
 				isSuccess = False
 				exceptionType, exceptionValue = sys.exc_info()[:2]
+				if isinstance(exceptionType, BaseException):
+					exceptionTypeStr = exceptionType.__name__
+				else:
+					exceptionTypeStr = str(exceptionType)
 				stdout.write("Failed with exception of type '{}' and message: {}\n".format(
-					exceptionType.__name__, exceptionValue))
+					exceptionTypeStr, exceptionValue))
 
 			shared["output"].put((isSuccess, result, stdout.getvalue()))
 

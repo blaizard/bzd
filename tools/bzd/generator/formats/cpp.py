@@ -1,22 +1,27 @@
-#!/usr/bin/python
+from typing import Any, BinaryIO, Mapping, MutableMapping
+from manifest.object import Object
+from manifest.artifact import Artifact
+from manifest.manifest import Manifest
+
+_uid = -1
 
 
-def getUID():
-	getUID.uid = getUID.uid if hasattr(getUID, "uid") else -1
-	getUID.uid += 1
-	return getUID.uid
+def getUID() -> int:
+	global _uid
+	_uid += 1
+	return _uid
 
 
-def valueToString(value):
+def valueToString(value: Any) -> str:
 	return "\"{}\"".format(value) if isinstance(value, str) else repr(value)
 
 
-def paramsToString(obj):
+def paramsToString(obj: Object) -> str:
 	params = [valueToString(param) for param in obj.getParams()]
 	return (", " + ", ".join(params)) if len(params) else ""
 
 
-def artifactToString(artifact):
+def artifactToString(artifact: Artifact) -> str:
 	content = "\""
 	nbBytes = 0
 	for byte in artifact.read():
@@ -26,7 +31,7 @@ def artifactToString(artifact):
 	return content
 
 
-def registryBuild(manifest):
+def registryBuild(manifest: Manifest) -> str:
 
 	manifest.setRenderer({"object": "bzd::Registry<{interface}>::get(\"{name}\")", "artifact": artifactToString})
 
@@ -85,8 +90,8 @@ def registryBuild(manifest):
 	return content
 
 
-def cpp(manifest, output, configuration):
-	config = {"comments": []}
+def cpp(manifest: Manifest, output: str, configuration: Mapping[str, Any]) -> None:
+	config: MutableMapping[str, Any] = {"comments": []}
 	config.update(configuration)
 
 	with open(output, "w") as f:

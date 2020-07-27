@@ -5,11 +5,12 @@ import bzd.utils.worker
 from pathlib import Path
 from yapf.yapflib.yapf_api import FormatFile
 from tools.sanitizer.utils.workspace import Files
+from typing import TextIO
 
 configFile = os.path.join(os.path.dirname(__file__), "yapf.ini")
 
 
-def yapfWorker(path, stdout):
+def yapfWorker(path: str, stdout: TextIO) -> None:
 	result = FormatFile(path, style_config=configFile, in_place=True, logger=stdout)
 	assert result[1] == "utf-8", "Wrong encoding {}, must be utf-8".format(result[1])
 

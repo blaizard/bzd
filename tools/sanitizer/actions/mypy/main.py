@@ -7,15 +7,18 @@ from mypy.main import main
 import bzd.utils.worker
 from pathlib import Path
 from tools.sanitizer.utils.workspace import Files
+from typing import TextIO
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
 
 
-def mypyWorker(path, stdout):
+def mypyWorker(path: str, stdout: TextIO) -> None:
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
-		args=["--config-file", configFile, "--no-incremental", "--follow-imports", "silent", "--pretty", path])
+		args=[
+		"--config-file", configFile, "--strict", "--no-incremental", "--follow-imports", "silent", "--pretty", path
+		])
 
 
 if __name__ == "__main__":
@@ -26,7 +29,7 @@ if __name__ == "__main__":
 
 	files = Files(args.workspace, include=[
 		"**/*.py",
-	], exclude=["**python/bzd/yaml**"])
+	], exclude=["**python/bzd/yaml**", "**_test.py"])
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)

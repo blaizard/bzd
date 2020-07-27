@@ -8,9 +8,10 @@ import bzd.utils.worker
 import bzd.yaml
 from pathlib import Path
 from tools.sanitizer.utils.workspace import Files
+from typing import TextIO, Any, Callable
 
 
-def formatJson(path: str, stdout) -> None:
+def formatJson(path: str, stdout: TextIO) -> None:
 	content = Path(path).read_text()
 	try:
 		parsedContent = json.loads(content)
@@ -21,18 +22,18 @@ def formatJson(path: str, stdout) -> None:
 	Path(path).write_text(formattedContent, encoding="utf-8")
 
 
-def formatYaml(path: str, stdout) -> None:
+def formatYaml(path: str, stdout: TextIO) -> None:
 
-	class Tag():
+	class Tag:
 
-		def __init__(self, tagSuffix, value):
+		def __init__(self, tagSuffix: str, value: str) -> None:
 			self.tagSuffix = tagSuffix
 			self.value = value
 
-	def representer(dumper, data):
+	def representer(dumper: Any, data: Tag) -> Any:
 		return dumper.represent_scalar(data.tagSuffix, data.value)
 
-	def defaultCtor(loader, tagSuffix, node):
+	def defaultCtor(loader: Any, tagSuffix: str, node: Any) -> Tag:
 		return Tag(tagSuffix, node.value)
 
 	bzd.yaml.add_multi_constructor("", defaultCtor)
@@ -52,9 +53,9 @@ def formatYaml(path: str, stdout) -> None:
 	Path(path).write_text(formattedContent, encoding="utf-8")
 
 
-def evaluateFiles(worker, workspace, **kwargs) -> bool:
+def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs: Any) -> bool:
 	files = Files(workspace, **kwargs)
-	worker = bzd.utils.worker.Worker(worker)
+	worker = bzd.utils.worker.Worker(task)
 	worker.start()
 	for path in files.data():
 		worker.add(path.as_posix())

@@ -1,24 +1,24 @@
 import os
 import json
 import re
-from typing import Iterable
+from typing import Iterable, List, Optional
 from pathlib import Path
 from .filter import Filter
 
 
 class Files:
 
-	def __init__(self, path: str, include: list = ["**"], exclude: list = []) -> None:
+	def __init__(self, path: Path, include: Optional[List[str]] = None, exclude: Optional[List[str]] = None) -> None:
 		configRaw = Path(__file__).parent.parent.joinpath(".sanitizer.json").read_text()
 		config = json.loads(configRaw)
 		self.path = path
 		self.workspace = Files._findWorkspace(path)
-		self.exclude = Filter(config.get("exclude", []) + exclude)
-		self.include = Filter(include)
+		self.exclude = Filter(config.get("exclude", []) + ([] if exclude is None else exclude))
+		self.include = Filter(["**"] if include is None else include)
 
 	@staticmethod
-	def _findWorkspace(path) -> Path:
-		workspace = Path(path)
+	def _findWorkspace(path: Path) -> Path:
+		workspace = path
 		while True:
 			if workspace.joinpath("WORKSPACE").is_file():
 				return workspace

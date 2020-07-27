@@ -1,10 +1,11 @@
 import re
 from pathlib import Path
+from typing import Sequence, Pattern
 
 
 class Filter:
 
-	def __init__(self, filters):
+	def __init__(self, filters: Sequence[str]) -> None:
 		self.filters = [Filter._compile(filterStr) for filterStr in filters]
 
 	"""
@@ -12,7 +13,7 @@ class Filter:
 	"""
 
 	@staticmethod
-	def _compile(filterStr):
+	def _compile(filterStr: str) -> Pattern[str]:
 		index = 0
 		regexpr = r''
 		while index < len(filterStr):

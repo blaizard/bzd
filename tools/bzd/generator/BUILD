@@ -10,5 +10,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "//python/bzd/yaml",
+        "//tools/bzd/generator/formats",
+        "//tools/bzd/generator/manifest",
     ],
 )
