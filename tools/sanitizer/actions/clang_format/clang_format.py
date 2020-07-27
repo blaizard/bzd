@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 from bzd.utils.run import localBazelBinary
-from tools.sanitizer.utils.workspace import Files
+from tools.sanitizer.utils.python.workspace import Files
 
 if __name__ == "__main__":
 

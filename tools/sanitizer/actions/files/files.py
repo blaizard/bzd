@@ -7,7 +7,7 @@ import sys
 import bzd.utils.worker
 import bzd.yaml
 from pathlib import Path
-from tools.sanitizer.utils.workspace import Files
+from tools.sanitizer.utils.python.workspace import Files
 from typing import TextIO, Any, Callable
 
 

@@ -4,7 +4,7 @@ import argparse
 import re
 import sys
 from pathlib import Path
-from tools.sanitizer.utils.workspace import Files
+from tools.sanitizer.utils.python.workspace import Files
 
 if __name__ == "__main__":
 
