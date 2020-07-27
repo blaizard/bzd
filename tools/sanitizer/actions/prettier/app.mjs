@@ -17,7 +17,9 @@ async function evaluateFiles(parser, workspace, options) {
 			arrowParens: "always",
 			vueIndentScriptAndStyle: true,
 		});
-		await FileSystem.writeFile(path, formattedContent);
+		if (formattedContent != content) {
+			await FileSystem.writeFile(path, formattedContent);
+		}
 	}
 }
 
