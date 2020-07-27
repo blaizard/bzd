@@ -11,6 +11,6 @@ py_binary(
     deps = [
         "//python/bzd/utils:worker",
         "//python/bzd/yaml",
-        "//tools/sanitizer/utils:workspace",
+        "//tools/sanitizer/utils/python:workspace",
     ],
 )

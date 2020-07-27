@@ -15,7 +15,7 @@ class Filter:
 	@staticmethod
 	def _compile(filterStr: str) -> Pattern[str]:
 		index = 0
-		regexpr = r''
+		regexpr = r'^'
 		while index < len(filterStr):
 			c = filterStr[index]
 			if c == "*":

@@ -9,7 +9,7 @@ from .filter import Filter
 class Files:
 
 	def __init__(self, path: Path, include: Optional[List[str]] = None, exclude: Optional[List[str]] = None) -> None:
-		configRaw = Path(__file__).parent.parent.joinpath(".sanitizer.json").read_text()
+		configRaw = Path(__file__).parent.parent.parent.joinpath(".sanitizer.json").read_text()
 		config = json.loads(configRaw)
 		self.path = path
 		self.workspace = Files._findWorkspace(path)

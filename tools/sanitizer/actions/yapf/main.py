@@ -4,7 +4,7 @@ import sys
 import bzd.utils.worker
 from pathlib import Path
 from yapf.yapflib.yapf_api import FormatFile
-from tools.sanitizer.utils.workspace import Files
+from tools.sanitizer.utils.python.workspace import Files
 from typing import TextIO
 
 configFile = os.path.join(os.path.dirname(__file__), "yapf.ini")

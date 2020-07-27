@@ -6,7 +6,7 @@ from io import StringIO
 from mypy.main import main
 import bzd.utils.worker
 from pathlib import Path
-from tools.sanitizer.utils.workspace import Files
+from tools.sanitizer.utils.python.workspace import Files
 from typing import TextIO
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
