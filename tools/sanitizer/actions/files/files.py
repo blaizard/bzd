@@ -19,7 +19,8 @@ def formatJson(path: str, stdout: TextIO) -> None:
 		stdout.write("Cannot parse json file '{}:{}'\n".format(path, e.lineno))
 		raise
 	formattedContent = json.dumps(parsedContent, indent=4, sort_keys=True)
-	Path(path).write_text(formattedContent, encoding="utf-8")
+	if formattedContent != content:
+		Path(path).write_text(formattedContent, encoding="utf-8")
 
 
 def formatYaml(path: str, stdout: TextIO) -> None:
