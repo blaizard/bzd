@@ -44,6 +44,13 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		this._initialize();
 	}
 
+	async _initializeImpl() {
+		const result = await this.fetch.request("/", {
+			method: "get",
+		});
+		Exception.assert("version" in result, "Unexpected response: {:j}", result);
+	}
+
 	_bucketToURI(bucket) {
 		return this.options.prefix + encodeURIComponent(bucket);
 	}
