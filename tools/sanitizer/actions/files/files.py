@@ -80,6 +80,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	isSuccess = evaluateFiles(formatJson, args.workspace, include=["**/*.json"])
-	isSuccess &= evaluateFiles(formatYaml, args.workspace, include=["**/*.yml"])
+	isSuccess &= evaluateFiles(formatYaml, args.workspace, include=["**/*.yml", "**/*.yaml"])
 
 	sys.exit(0 if isSuccess else 1)
