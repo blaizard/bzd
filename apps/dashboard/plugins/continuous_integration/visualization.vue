@@ -91,6 +91,11 @@
 						display: "Aborted",
 						icon: "bzd-icon-status_abort",
 					},
+					unknown: {
+						color: "gray",
+						display: "Unknown",
+						icon: "",
+					},
 				};
 			},
 			plotConfig() {
@@ -159,7 +164,10 @@
 				return this.isValid ? this.builds[0] : null;
 			},
 			lastBuildStatus() {
-				return this.isValid ? this.lastBuild.status : null;
+				if (this.lastBuild && this.lastBuild.status in this.statusMap) {
+					return this.lastBuild.status
+				}
+				return "unknown";
 			},
 			lastBuildStatusDisplay() {
 				return this.statusMap[this.lastBuildStatus].display;
