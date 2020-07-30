@@ -12,6 +12,27 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
+        "//nodejs/core:stream",
+        "//nodejs/db:utils",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "google_cloud_storage",
+    srcs = [
+        "google_cloud_storage.mjs",
+        "storage.mjs",
+    ],
+    packages = {
+        "@google-cloud/storage": "",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+        "//nodejs/core:stream",
         "//nodejs/db:utils",
     ],
 )

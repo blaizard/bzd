@@ -165,7 +165,7 @@
 			},
 			lastBuildStatus() {
 				if (this.lastBuild && this.lastBuild.status in this.statusMap) {
-					return this.lastBuild.status
+					return this.lastBuild.status;
 				}
 				return "unknown";
 			},

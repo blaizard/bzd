@@ -12,11 +12,20 @@ export async function toBuffer(data) {
 	});
 }
 
-export function fromBuffer(buffer) {
+/**
+ * Create a stream from a string, Buffer or Uint8Array
+ */
+export function fromChunk(data) {
 	return new Readable({
 		read() {
-			this.push(buffer);
+			this.push(data);
 			this.push(null);
 		},
+	});
+}
+
+export async function copy(writeStream, readStream) {
+	return new Promise((resolve, reject) => {
+		readStream.on("error", reject).on("end", resolve).on("finish", resolve).pipe(writeStream);
 	});
 }
