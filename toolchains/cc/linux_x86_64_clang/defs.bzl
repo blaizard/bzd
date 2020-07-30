@@ -35,8 +35,8 @@ def _load_linux_x86_64_clang_9_0_0(name):
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
-            "%package(@{}//)%/include/c++/v1".format(clang_package_name),
-            "%package(@{}//)%/lib/clang/9.0.0/include".format(clang_package_name),
+            "include/c++/v1".format(clang_package_name),
+            "lib/clang/9.0.0/include".format(clang_package_name),
         ],
         "system_directories": [
             "/usr/include/x86_64-linux-gnu",

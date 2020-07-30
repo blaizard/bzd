@@ -18,11 +18,11 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         "cpu": "esp32_xtensa_lx6",
         "compiler": "gcc",
         "builtin_include_directories": [
-            "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
-            "%package(@{}//)%/xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
-            "%package(@{}//)%/xtensa-esp32-elf/include".format(clang_package_name),
-            "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
-            "%package(@{}//)%/lib/gcc/xtensa-esp32-elf/8.2.0/include-fixed".format(clang_package_name),
+            "xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
+            "xtensa-esp32-elf/include/c++/8.2.0".format(clang_package_name),
+            "xtensa-esp32-elf/include".format(clang_package_name),
+            "lib/gcc/xtensa-esp32-elf/8.2.0/include".format(clang_package_name),
+            "lib/gcc/xtensa-esp32-elf/8.2.0/include-fixed".format(clang_package_name),
         ],
         "system_directories": [
             "external/{}/xtensa-esp32-elf/include/c++/8.2.0/xtensa-esp32-elf".format(clang_package_name),
