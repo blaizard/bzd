@@ -2,9 +2,12 @@ import Base from "./storage.mjs";
 import LogFactory from "../../core/log.mjs";
 import CloudAPI from "@google-cloud/storage";
 import { copy as copyStream } from "../../core/stream.mjs";
+import ExceptionFactory from "../../core/exception.mjs";
 
 const Storage = CloudAPI.Storage;
 const Log = LogFactory("db", "storage", "google-cloud-storage");
+const Exception = ExceptionFactory("db", "storage", "google-cloud-storage");
+
 /**
  * File storage module
  */
@@ -12,14 +15,17 @@ export default class StorageGoogleCloudStorage extends Base {
 	constructor(bucketName, options) {
 		super();
 
-		this.options = Object.assign({
-			prefix: "default"
-		}, options);
+		this.options = Object.assign(
+			{
+				prefix: "default",
+			},
+			options
+		);
 		this.storage = new Storage();
 		this.bucketName = bucketName;
 		this.bucket = this.storage.bucket(this.bucketName);
 
-		Log.info("Using Google cloud storage DB with bucket '{}'.", bucketName);
+		Log.info("Using Google cloud storage DB with bucket '{}' and prefix '{}'.", bucketName, this.options.prefix);
 		this._initialize();
 	}
 
@@ -48,11 +54,26 @@ export default class StorageGoogleCloudStorage extends Base {
 		return this._getFile(bucket, key).createReadStream();
 	}
 
+	async _delay(timeMs) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, timeMs);
+		});
+	}
+
+	async _waitUntilExists(bucket, key, timeoutMs = 10000) {
+		let timeMs = 0;
+		while (!(await this._isImpl(bucket, key)) && timeMs < timeoutMs) {
+			await this._delay(1000);
+			timeMs += 1000;
+		}
+		Exception.assert(await this._isImpl(bucket, key), "File bucket='{}', key='{}' does not exists", bucket, key);
+	}
+
 	async _writeImpl(bucket, key, readStream) {
 		const file = this._getFile(bucket, key);
 		let writeStream = file.createWriteStream();
-
-		return copyStream(writeStream, readStream);
+		await copyStream(writeStream, readStream);
+		await this._waitUntilExists(bucket, key);
 	}
 
 	async _deleteImpl(bucket, key) {
