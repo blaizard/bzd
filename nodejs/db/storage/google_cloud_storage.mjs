@@ -12,7 +12,9 @@ export default class StorageGoogleCloudStorage extends Base {
 	constructor(bucketName, options) {
 		super();
 
-		this.options = Object.assign({}, options);
+		this.options = Object.assign({
+			prefix: "default"
+		}, options);
 		this.storage = new Storage();
 		this.bucketName = bucketName;
 		this.bucket = this.storage.bucket(this.bucketName);
@@ -28,8 +30,8 @@ export default class StorageGoogleCloudStorage extends Base {
 		}
 	}
 
-	_makePath(bucket, key) {
-		return bucket + "/" + key;
+	_makePath(bucket, key = "") {
+		return this.options.prefix + "/" + bucket + "/" + key;
 	}
 
 	_getFile(bucket, key) {
@@ -59,7 +61,7 @@ export default class StorageGoogleCloudStorage extends Base {
 	}
 
 	async _listImpl(bucket) {
-		const prefix = bucket + "/";
+		const prefix = this._makePath(bucket);
 		const [files] = await this.bucket.getFiles({
 			prefix: prefix,
 		});
