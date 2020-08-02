@@ -155,7 +155,7 @@
 				return String(Math.round(size * 100) / 100) + unitList[unitIndex];
 			},
 			fileName() {
-				const path = this.isAvailable ? this.path : this.value.fileName;
+				const path = this.isAvailable ? this.path : this.value.item.fileName;
 				return path.split("/").pop();
 			},
 		},

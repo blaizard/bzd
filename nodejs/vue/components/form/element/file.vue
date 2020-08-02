@@ -85,7 +85,7 @@
 						max: () => this.nbLeft,
 						filter: this.getOption("filter", null),
 						onInit: (item) => {
-							this.uploadValueList.push(item);
+							this.uploadValueList.push(this.makeObjectFromItem(item));
 						},
 						onCancel: (item) => {
 							const index = this.uploadItemToIndex(item);
@@ -104,6 +104,10 @@
 
 							// Add the new item
 							this.itemAdd(output);
+						},
+						onProgress: (item) => {
+							const index = this.uploadItemToIndex(item);
+							this.$set(this.uploadValueList, index, this.makeObjectFromItem(item));
 						},
 					})
 					: null;
@@ -170,8 +174,16 @@
 				this.globalStopDrag();
 			},
 
+			makeObjectFromItem(item) {
+				return {
+					item: item,
+					currentBytes: item.currentBytes,
+					totalBytes: item.totalBytes,
+				};
+			},
+
 			uploadItemToIndex(item) {
-				return this.uploadValueList.findIndex((uploadItem) => uploadItem.uid === item.uid);
+				return this.uploadValueList.findIndex((uploadItem) => uploadItem.item.uid === item.uid);
 			},
 
 			async itemDelete(index) {
