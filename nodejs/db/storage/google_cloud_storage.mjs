@@ -89,18 +89,22 @@ export default class StorageGoogleCloudStorage extends Base {
 			autoPaginate: false,
 			prefix: prefix,
 			maxResults: paging.max,
-			pageToken: paging.page || undefined
+			pageToken: paging.page || undefined,
 		});
 		let result = [];
 		for (const file of files) {
 			const name = file.metadata.name.slice(prefix.length);
-			result.push((includeMetadata) ? {
-				name: name,
-				size: parseInt(file.metadata.size),
-				type: file.metadata.contentType,
-				modified: file.metadata.updated,
-				created: file.metadata.timeCreated
-			} : name);
+			result.push(
+				includeMetadata
+					? {
+						name: name,
+						size: parseInt(file.metadata.size),
+						type: file.metadata.contentType,
+						modified: file.metadata.updated,
+						created: file.metadata.timeCreated,
+					  }
+					: name
+			);
 		}
 		if (apiResponse && "pageToken" in apiResponse) {
 			return new CollectionPaging(result, { page: apiResponse.pageToken, max: paging.max });

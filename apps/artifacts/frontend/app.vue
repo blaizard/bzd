@@ -21,15 +21,12 @@
 			tooltip: DirectiveTooltip,
 		},
 		data: function () {
-			return {
-			};
+			return {};
 		},
 		mounted() {
 			this.$routerSet({
 				ref: "view",
-				routes: [
-					{ path: "/", component: () => import("./home.vue") },
-				],
+				routes: [{ path: "/", component: () => import("./home.vue") }],
 			});
 		},
 	};

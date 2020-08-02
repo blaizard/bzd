@@ -20,8 +20,8 @@ bzd_nodejs_web(
         "//nodejs/styles/default",
         "//nodejs/vue:api",
         "//nodejs/vue/components/layout",
-        "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/directives:loading",
+        "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/router",
     ],
 )
