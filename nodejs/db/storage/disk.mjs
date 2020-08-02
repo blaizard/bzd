@@ -5,6 +5,7 @@ import Storage from "./storage.mjs";
 import FileSystem from "../../core/filesystem.mjs";
 import LogFactory from "../../core/log.mjs";
 import { copy as copyStream } from "../../core/stream.mjs";
+import { CollectionPaging } from "../utils.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
 /**
@@ -52,11 +53,12 @@ export default class StorageDisk extends Storage {
 		await FileSystem.unlink(this._getPath(bucket, key));
 	}
 
-	async _listImpl(bucket) {
+	async _listImpl(bucket, maxOrPaging/*, includeMetadata*/) {
 		const path = this._getPath(bucket);
 		if (await FileSystem.exists(path)) {
-			return await FileSystem.readdir(path);
+			const data = await FileSystem.readdir(path);
+			return CollectionPaging.makeFromList(data, maxOrPaging);
 		}
-		return [];
+		return new CollectionPaging([]);
 	}
 }

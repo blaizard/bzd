@@ -3,6 +3,7 @@ import LogFactory from "../../core/log.mjs";
 import CloudAPI from "@google-cloud/storage";
 import { copy as copyStream } from "../../core/stream.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
+import { CollectionPaging } from "../utils.mjs";
 
 const Storage = CloudAPI.Storage;
 const Log = LogFactory("db", "storage", "google-cloud-storage");
@@ -81,11 +82,29 @@ export default class StorageGoogleCloudStorage extends Base {
 		await file.delete();
 	}
 
-	async _listImpl(bucket) {
+	async _listImpl(bucket, maxOrPaging, includeMetadata) {
+		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const prefix = this._makePath(bucket);
-		const [files] = await this.bucket.getFiles({
+		const [files, apiResponse] = await this.bucket.getFiles({
+			autoPaginate: false,
 			prefix: prefix,
+			maxResults: paging.max,
+			pageToken: paging.page || undefined
 		});
-		return files.map((file) => file.metadata.name.slice(prefix.length));
+		let result = [];
+		for (const file of files) {
+			const name = file.metadata.name.slice(prefix.length);
+			result.push((includeMetadata) ? {
+				name: name,
+				size: parseInt(file.metadata.size),
+				type: file.metadata.contentType,
+				modified: file.metadata.updated,
+				created: file.metadata.timeCreated
+			} : name);
+		}
+		if (apiResponse && "pageToken" in apiResponse) {
+			return new CollectionPaging(result, { page: apiResponse.pageToken, max: paging.max });
+		}
+		return new CollectionPaging(result);
 	}
 }
