@@ -1,0 +1,16 @@
+{
+	"/list": {
+		"get": {
+			"documentation": "Get the file/directory list from a specific path.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "path": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+		}
+	}
+}
