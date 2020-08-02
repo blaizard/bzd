@@ -53,7 +53,7 @@ export default class StorageDisk extends Storage {
 		await FileSystem.unlink(this._getPath(bucket, key));
 	}
 
-	async _listImpl(bucket, maxOrPaging/*, includeMetadata*/) {
+	async _listImpl(bucket, maxOrPaging /*, includeMetadata*/) {
 		const path = this._getPath(bucket);
 		if (await FileSystem.exists(path)) {
 			const data = await FileSystem.readdir(path);

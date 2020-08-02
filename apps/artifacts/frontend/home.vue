@@ -9,15 +9,15 @@
 	export default {
 		data: function () {
 			return {
-				response: null
+				response: null,
 			};
 		},
 		methods: {
 			async handleList() {
 				this.response = await this.$api.request("get", "/list", {
-					path: "/"
+					path: "/",
 				});
-			}
-		}
-	}
+			},
+		},
+	};
 </script>

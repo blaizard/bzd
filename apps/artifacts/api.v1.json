@@ -1,7 +1,7 @@
 {
-	"/list": {
-		"get": {
-			"documentation": "Get the file/directory list from a specific path.",
+    "/list": {
+        "get": {
+            "documentation": "Get the file/directory list from a specific path.",
             "request": {
                 "type": "query",
                 "validation": {
@@ -11,6 +11,6 @@
             "response": {
                 "type": "json"
             }
-		}
-	}
+        }
+    }
 }

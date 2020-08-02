@@ -1,4 +1,4 @@
-load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 

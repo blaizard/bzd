@@ -42,8 +42,8 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Test data
 	await keyValueStore.set("volumes", "disk", {
-		"type": "disk",
-		"path": "/"
+		type: "disk",
+		path: "/",
 	});
 
 	// Install the APIs
@@ -54,10 +54,10 @@ Commander.version("1.0.0", "-v, --version")
 
 	function getInternalPath(path) {
 		Exception.assert(typeof path == "string", "Path must be a string: '{}'", path);
-		Exception.assert(path.search(/[^a-z0-9\/_.]/ig) === -1, "Malformed input path: '{}'", path);
-		Exception.assert(path.search(/\.\./ig) === -1, "Path cannot contain '..': '{}'", path);
-		const splitPath =  path.split("/").filter((entry) => entry.length > 0);
-		return {volume: splitPath[0], path: "/" + splitPath.slice(1).join("/")};
+		Exception.assert(path.search(/[^a-z0-9/_.]/gi) === -1, "Malformed input path: '{}'", path);
+		Exception.assert(path.search(/\.\./gi) === -1, "Path cannot contain '..': '{}'", path);
+		const splitPath = path.split("/").filter((entry) => entry.length > 0);
+		return { volume: splitPath[0], path: "/" + splitPath.slice(1).join("/") };
 	}
 
 	api.handle("get", "/list", async (inputs) => {
