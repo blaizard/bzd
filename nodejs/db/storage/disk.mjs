@@ -29,35 +29,47 @@ export default class StorageDisk extends Storage {
 		await FileSystem.mkdir(this.path);
 	}
 
-	_getPath(bucket, key = undefined) {
+	_getFullPath(bucket, key = undefined) {
 		return key ? Path.join(this.path, bucket, key) : Path.join(this.path, bucket);
 	}
 
-	async _isImpl(bucket, key) {
-		return await FileSystem.exists(this._getPath(bucket, key));
+	async _isImpl(path, name) {
+		return await FileSystem.exists(this._getFullPath(path, name));
 	}
 
-	async _readImpl(bucket, key) {
-		return Fs.createReadStream(this._getPath(bucket, key));
+	async _readImpl(path, name) {
+		return Fs.createReadStream(this._getFullPath(path, name));
 	}
 
-	async _writeImpl(bucket, key, readStream) {
-		const path = this._getPath(bucket, key);
-		await FileSystem.mkdir(Path.dirname(path));
-		let writeStream = Fs.createWriteStream(path);
+	async _writeImpl(path, name, readStream) {
+		const fullPath = this._getFullPath(path, name);
+		await FileSystem.mkdir(Path.dirname(fullPath));
+		let writeStream = Fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
 	}
 
-	async _deleteImpl(bucket, key) {
-		await FileSystem.unlink(this._getPath(bucket, key));
+	async _deleteImpl(path, name) {
+		await FileSystem.unlink(this._getFullPath(path, name));
 	}
 
-	async _listImpl(bucket, maxOrPaging /*, includeMetadata*/) {
-		const path = this._getPath(bucket);
-		if (await FileSystem.exists(path)) {
-			const data = await FileSystem.readdir(path);
-			return CollectionPaging.makeFromList(data, maxOrPaging);
+	async _listImpl(path, maxOrPaging, includeMetadata) {
+		const fullPath = this._getFullPath(path);
+		if (await FileSystem.exists(fullPath)) {
+			const data = await FileSystem.readdir(fullPath, /*withFileTypes*/ includeMetadata);
+			if (includeMetadata) {
+				return await CollectionPaging.makeFromList(data, maxOrPaging, async (dirent) => {
+					const stat = await FileSystem.stat(fullPath + "/" + dirent.name);
+					return {
+						name: dirent.name,
+						type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
+						size: stat.size,
+						created: stat.ctime,
+						modified: stat.mtime,
+					};
+				});
+			}
+			return await CollectionPaging.makeFromList(data, maxOrPaging);
 		}
 		return new CollectionPaging([]);
 	}

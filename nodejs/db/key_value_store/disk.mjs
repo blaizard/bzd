@@ -118,7 +118,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	async list(bucket, maxOrPaging = 10) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
-		return CollectionPaging.makeFromObject(data, maxOrPaging);
+		return await CollectionPaging.makeFromObject(data, maxOrPaging);
 	}
 
 	/**
@@ -142,7 +142,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 				obj[name] = data[name];
 				return obj;
 			}, {});
-		return CollectionPaging.makeFromObject(filteredData, maxOrPaging);
+		return await CollectionPaging.makeFromObject(filteredData, maxOrPaging);
 	}
 
 	async delete(bucket, key) {

@@ -100,7 +100,7 @@ export default class TimeseriesDisk extends Timeseries {
 		});
 		items.reverse();
 
-		return CollectionPaging.makeFromList(items, maxOrPaging);
+		return await CollectionPaging.makeFromList(items, maxOrPaging);
 	}
 
 	/**
@@ -119,6 +119,6 @@ export default class TimeseriesDisk extends Timeseries {
 		}, timestamp);
 		items.reverse();
 
-		return CollectionPaging.makeFromList(items, maxOrPaging);
+		return await CollectionPaging.makeFromList(items, maxOrPaging);
 	}
 }

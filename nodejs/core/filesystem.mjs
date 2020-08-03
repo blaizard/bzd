@@ -77,8 +77,8 @@ export default class FileSystem {
 	/**
 	 * Read the content of a directory
 	 */
-	static async readdir(path) {
-		return await Fs.promises.readdir(path);
+	static async readdir(path, withFileTypes = false) {
+		return await Fs.promises.readdir(path, { withFileTypes: withFileTypes });
 	}
 
 	/**

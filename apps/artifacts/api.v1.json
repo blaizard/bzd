@@ -5,11 +5,16 @@
             "request": {
                 "type": "query",
                 "validation": {
+                    "paging": "",
                     "path": "mandatory"
                 }
             },
             "response": {
-                "type": "json"
+                "type": "json",
+                "validation": {
+                    "data": "mandatory",
+                    "next": "mandatory"
+                }
             }
         }
     }

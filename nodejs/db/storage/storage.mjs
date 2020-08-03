@@ -17,52 +17,52 @@ export default class Storage extends AsyncInitialize {
 	/**
 	 * Tell whether a key exists or not
 	 */
-	async is(bucket, key) {
-		return this._isImpl(bucket, key);
+	async is(path, name) {
+		return this._isImpl(path, name);
 	}
 
 	/**
 	 * List all files under this bucket
 	 */
-	async list(bucket, maxOrPaging = 50, includeMetadata = false) {
-		return this._listImpl(bucket, maxOrPaging, includeMetadata);
+	async list(path, maxOrPaging = 50, includeMetadata = false) {
+		return this._listImpl(path, maxOrPaging, includeMetadata);
 	}
 
 	/**
 	 * Return a file read stream from a specific key
 	 */
-	async read(bucket, key) {
-		return this._readImpl(bucket, key);
+	async read(path, name) {
+		return this._readImpl(path, name);
 	}
 
 	/**
 	 * Store a file to a specific key
 	 */
-	async writeFromFile(bucket, key, path) {
-		Exception.assert(typeof path == "string", "Path must be a string, {:j}", path);
-		const readStream = Fs.createReadStream(path);
-		return this._writeImpl(bucket, key, readStream);
+	async writeFromFile(path, name, inputFilePath) {
+		Exception.assert(typeof inputFilePath == "string", "Path must be a string, {:j}", inputFilePath);
+		const readStream = Fs.createReadStream(inputFilePath);
+		return this._writeImpl(path, name, readStream);
 	}
 
 	/**
 	 * Store a file to a specific key
 	 */
-	async writeFromChunk(bucket, key, data) {
+	async writeFromChunk(path, name, data) {
 		const readStream = fromChunk(data);
-		return this._writeImpl(bucket, key, readStream);
+		return this._writeImpl(path, name, readStream);
 	}
 
 	/**
 	 * Store a file to a specific key
 	 */
-	async write(bucket, key, readStream) {
-		return this._writeImpl(bucket, key, readStream);
+	async write(path, name, readStream) {
+		return this._writeImpl(path, name, readStream);
 	}
 
 	/**
 	 * Delete a file from a bucket
 	 */
-	async delete(bucket, key) {
-		return this._deleteImpl(bucket, key);
+	async delete(path, name) {
+		return this._deleteImpl(path, name);
 	}
 }
