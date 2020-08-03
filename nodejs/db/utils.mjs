@@ -22,19 +22,20 @@ export class CollectionPaging {
 		return typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
 	}
 
-	static makeFromList(data, maxOrPaging) {
+	static async makeFromList(data, maxOrPaging, callback = (item) => item) {
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const indexStart = paging.page * paging.max;
 		const indexEnd = indexStart + paging.max;
-		return new CollectionPaging(
-			data.slice(indexStart, indexEnd),
-			indexEnd > data.length ? null : { page: paging.page + 1, max: paging.max }
-		);
+		let slice = [];
+		for (const item of data.slice(indexStart, indexEnd)) {
+			slice.push(await callback(item));
+		}
+		return new CollectionPaging(slice, indexEnd > data.length ? null : { page: paging.page + 1, max: paging.max });
 	}
 
-	static makeFromObject(data, maxOrPaging) {
+	static async makeFromObject(data, maxOrPaging, callback = (item) => item) {
 		const keysList = Object.keys(data).sort();
-		let result = this.makeFromList(keysList, maxOrPaging);
+		let result = await this.makeFromList(keysList, maxOrPaging, callback);
 		result._data = result._data.reduce((obj, key) => {
 			obj[key] = data[key];
 			return obj;

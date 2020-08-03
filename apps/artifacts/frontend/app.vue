@@ -36,4 +36,8 @@
 	@use "bzd-style/css/base.scss";
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
+
+	.bzd-content {
+		margin: 10px;
+	}
 </style>

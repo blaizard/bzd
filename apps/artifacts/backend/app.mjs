@@ -7,6 +7,8 @@ import Web from "bzd/core/web.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
+import StorageDisk from "bzd/db/storage/disk.mjs";
+import Cache from "bzd/core/cache.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -46,6 +48,24 @@ Commander.version("1.0.0", "-v, --version")
 		path: "/",
 	});
 
+	// Set the cache
+
+	let cache = new Cache();
+
+	/**
+	 * Retrieve the storage implementation associated with this volume
+	 */
+	cache.register("volume", async (volume) => {
+		const volumeInfo = await keyValueStore.get("volumes", volume, null);
+		Exception.assert(volumeInfo !== null, "No volume are associated with this id: '{}'", volume);
+		switch (volumeInfo.type) {
+		case "disk":
+			return new StorageDisk(volumeInfo.path);
+		default:
+			Exception.unreachable("Volume type unsupported: '{}'", volumeInfo.type);
+		}
+	});
+
 	// Install the APIs
 
 	let api = new API(APIv1, {
@@ -54,16 +74,21 @@ Commander.version("1.0.0", "-v, --version")
 
 	function getInternalPath(path) {
 		Exception.assert(typeof path == "string", "Path must be a string: '{}'", path);
-		Exception.assert(path.search(/[^a-z0-9/_.]/gi) === -1, "Malformed input path: '{}'", path);
 		Exception.assert(path.search(/\.\./gi) === -1, "Path cannot contain '..': '{}'", path);
 		const splitPath = path.split("/").filter((entry) => entry.length > 0);
 		return { volume: splitPath[0], path: "/" + splitPath.slice(1).join("/") };
 	}
 
 	api.handle("get", "/list", async (inputs) => {
-		const path = getInternalPath(inputs.path);
-		console.log(path);
-		return {};
+		// eslint-disable-next-line
+		const { volume, path } = getInternalPath(inputs.path);
+		const storage = await cache.get("volume", "disk");
+		const maxOrPaging = "paging" in inputs ? JSON.parse(inputs.paging) : 50;
+		const result = await storage.list(path, maxOrPaging, /*includeMetadata*/ true);
+		return {
+			data: result.data(),
+			next: result.getNextPaging(),
+		};
 	});
 
 	Log.info("Application started");

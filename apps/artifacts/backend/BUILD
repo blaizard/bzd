@@ -20,9 +20,11 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/artifacts:api",
+        "//nodejs/core:cache",
         "//nodejs/core:filesystem",
         "//nodejs/core:web",
         "//nodejs/core/api:server",
         "//nodejs/db/key_value_store:disk",
+        "//nodejs/db/storage:disk",
     ],
 )
