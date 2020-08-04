@@ -68,7 +68,7 @@ export default async function request(url, options) {
 				});
 				response.on("end", () => {
 					clearTimeout(sharedOptions.timeoutInstance);
-					resolve(body);
+					resolve([body, response.headers]);
 				});
 			}
 		);

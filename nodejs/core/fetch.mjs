@@ -14,8 +14,8 @@ export class FetchFactory {
 		this.options = options;
 	}
 
-	async request(endpoint, options = {}) {
-		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options));
+	async request(endpoint, options = {}, includeHeaders = false) {
+		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options), includeHeaders);
 	}
 }
 
@@ -27,10 +27,11 @@ export class FetchException extends ExceptionFactory("fetch", "impl") {
 }
 
 export default class Fetch {
-	static async request(url, options = {}) {
+	static async request(url, options = {}, includeHeaders = false) {
 		// Handle queries
 		if ("query" in options) {
 			const query = Object.keys(options.query)
+				.filter((key) => options.query[key] !== undefined)
 				.map((key) => key + "=" + encodeURIComponent(options.query[key]))
 				.join("&");
 			url += query ? "?" + query : "";
@@ -115,28 +116,25 @@ export default class Fetch {
 
 		Log.debug("{} {} (headers: {:j}) (body: {:j})", method, url, Object.assign(headers, options.headers), body);
 
-		const data = await request(url, {
+		const [data, responseHeaders] = await request(url, {
 			method: method,
 			headers: Object.assign(headers, options.headers),
 			body: body,
 			expect: options.expect,
 		});
 
-		switch (options.expect) {
-		case "json":
-			return JSON.parse(data);
-		default:
-			return data;
+		const dataParsed = ((data) => {
+			switch (options.expect) {
+			case "json":
+				return JSON.parse(data);
+			default:
+				return data;
+			}
+		})(data);
+
+		if (includeHeaders) {
+			return [dataParsed, responseHeaders];
 		}
-	}
-
-	static async get(url, options = {}) {
-		options["method"] = "get";
-		return await this.request(url, options);
-	}
-
-	static async post(url, options = {}) {
-		options["method"] = "post";
-		return await this.request(url, options);
+		return dataParsed;
 	}
 }
