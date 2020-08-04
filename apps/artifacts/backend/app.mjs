@@ -8,7 +8,9 @@ import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import StorageDisk from "bzd/db/storage/disk.mjs";
+import StorageDockerV2 from "bzd/db/storage/docker_v2.mjs";
 import Cache from "bzd/core/cache.mjs";
+import { CollectionPaging } from "bzd/db/utils.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -47,6 +49,10 @@ Commander.version("1.0.0", "-v, --version")
 		type: "disk",
 		path: "/",
 	});
+	await keyValueStore.set("volumes", "docker", {
+		type: "docker-v2",
+		host: "https://docker.blaizard.com",
+	});
 
 	// Set the cache
 
@@ -61,6 +67,8 @@ Commander.version("1.0.0", "-v, --version")
 		switch (volumeInfo.type) {
 		case "disk":
 			return new StorageDisk(volumeInfo.path);
+		case "docker-v2":
+			return new StorageDockerV2(volumeInfo.host);
 		default:
 			Exception.unreachable("Volume type unsupported: '{}'", volumeInfo.type);
 		}
@@ -82,9 +90,23 @@ Commander.version("1.0.0", "-v, --version")
 	api.handle("get", "/list", async (inputs) => {
 		// eslint-disable-next-line
 		const { volume, path } = getInternalPath(inputs.path);
-		const storage = await cache.get("volume", "disk");
 		const maxOrPaging = "paging" in inputs ? JSON.parse(inputs.paging) : 50;
+
+		if (!volume) {
+			const volumes = await keyValueStore.list("volumes", maxOrPaging);
+			const data = Object.keys(volumes.data());
+			const result = await CollectionPaging.makeFromList(data, data.length, (item) => {
+				return { name: item, type: "bucket" };
+			});
+			return {
+				data: result.data(),
+				next: volumes.getNextPaging(),
+			};
+		}
+
+		const storage = await cache.get("volume", volume);
 		const result = await storage.list(path, maxOrPaging, /*includeMetadata*/ true);
+
 		return {
 			data: result.data(),
 			next: result.getNextPaging(),

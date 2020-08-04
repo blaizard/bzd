@@ -36,3 +36,19 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
     ],
 )
+
+bzd_nodejs_library(
+    name = "docker_v2",
+    srcs = [
+        "docker_v2.mjs",
+        "storage.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:fetch",
+        "//nodejs/core:log",
+        "//nodejs/db:utils",
+    ],
+)

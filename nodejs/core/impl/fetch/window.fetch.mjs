@@ -18,5 +18,11 @@ export default async function request(url, options) {
 		throw new FetchException(response.status, message || response.statusText);
 	}
 
-	return await response.text();
+	return [
+		await response.text(),
+		[...response.headers].reduce((obj, pair) => {
+			obj[pair[0]] = pair[1];
+			return obj;
+		}, {}),
+	];
 }
