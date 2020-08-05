@@ -17,6 +17,16 @@ export class FetchFactory {
 	async request(endpoint, options = {}, includeHeaders = false) {
 		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options), includeHeaders);
 	}
+
+	async get(endpoint, options = {}, includeHeaders = false) {
+		options["method"] = "get";
+		return await this.request(endpoint, options, includeHeaders);
+	}
+
+	async post(endpoint, options = {}, includeHeaders = false) {
+		options["method"] = "post";
+		return await this.request(endpoint, options, includeHeaders);
+	}
 }
 
 export class FetchException extends ExceptionFactory("fetch", "impl") {
@@ -136,5 +146,15 @@ export default class Fetch {
 			return [dataParsed, responseHeaders];
 		}
 		return dataParsed;
+	}
+
+	static async get(url, options = {}, includeHeaders = false) {
+		options["method"] = "get";
+		return await Fetch.request(url, options, includeHeaders);
+	}
+
+	static async post(url, options = {}, includeHeaders = false) {
+		options["method"] = "post";
+		return await Fetch.request(url, options, includeHeaders);
 	}
 }
