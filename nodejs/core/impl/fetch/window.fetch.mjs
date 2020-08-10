@@ -1,5 +1,3 @@
-import { FetchException } from "../../fetch.mjs";
-
 export default async function request(url, options) {
 	// Add support for FormData
 	if (options.body instanceof FormData) {
@@ -13,16 +11,12 @@ export default async function request(url, options) {
 		headers: options.headers,
 	});
 
-	if (!response.ok) {
-		const message = await response.text();
-		throw new FetchException(response.status, message || response.statusText);
-	}
-
-	return [
-		await response.text(),
-		[...response.headers].reduce((obj, pair) => {
+	return {
+		data: await response.text(),
+		headers: [...response.headers].reduce((obj, pair) => {
 			obj[pair[0]] = pair[1];
 			return obj;
 		}, {}),
-	];
+		code: response.status,
+	};
 }

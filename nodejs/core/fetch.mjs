@@ -14,30 +14,31 @@ export class FetchFactory {
 		this.options = options;
 	}
 
-	async request(endpoint, options = {}, includeHeaders = false) {
-		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options), includeHeaders);
+	async request(endpoint, options = {}, includeAll = false) {
+		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options), includeAll);
 	}
 
-	async get(endpoint, options = {}, includeHeaders = false) {
+	async get(endpoint, options = {}, includeAll = false) {
 		options["method"] = "get";
-		return await this.request(endpoint, options, includeHeaders);
+		return await this.request(endpoint, options, includeAll);
 	}
 
-	async post(endpoint, options = {}, includeHeaders = false) {
+	async post(endpoint, options = {}, includeAll = false) {
 		options["method"] = "post";
-		return await this.request(endpoint, options, includeHeaders);
+		return await this.request(endpoint, options, includeAll);
 	}
 }
 
 export class FetchException extends ExceptionFactory("fetch", "impl") {
-	constructor(code, ...args) {
+	constructor(code, data, ...args) {
 		super(...args);
 		this.code = code;
+		this.data = data;
 	}
 }
 
 export default class Fetch {
-	static async request(url, options = {}, includeHeaders = false) {
+	static async request(url, options = {}, includeAll = false) {
 		// Handle queries
 		if ("query" in options) {
 			const query = Object.keys(options.query)
@@ -71,14 +72,14 @@ export default class Fetch {
 			case "basic":
 				{
 					const base64 = await base64Encode(auth.username + ":" + auth.password);
-					headers["Authorization"] = "basic " + base64;
+					headers["Authorization"] = "Basic " + base64;
 				}
 				break;
 			case "bearer":
-				headers["Authorization"] = "bearer " + auth.token;
+				headers["Authorization"] = "Bearer " + auth.token;
 				break;
 			case "token":
-				headers["Authorization"] = "token " + auth.token;
+				headers["Authorization"] = "Token " + auth.token;
 				break;
 			default:
 				Exception.unreachable("Unsupported authentication type '{}'", auth.type);
@@ -126,35 +127,47 @@ export default class Fetch {
 
 		Log.debug("{} {} (headers: {:j}) (body: {:j})", method, url, Object.assign(headers, options.headers), body);
 
-		const [data, responseHeaders] = await request(url, {
+		const result = await request(url, {
 			method: method,
 			headers: Object.assign(headers, options.headers),
 			body: body,
 			expect: options.expect,
 		});
 
+		if (result.code < 200 || result.code > 299) {
+			const dataCopy = String(result.data);
+			throw new FetchException(
+				result.code,
+				result.data,
+				"Request to '{}' responded with: {}: {}",
+				url,
+				result.code,
+				dataCopy
+			);
+		}
+
 		const dataParsed = ((data) => {
 			switch (options.expect) {
 			case "json":
-				return JSON.parse(data);
+				return data ? JSON.parse(data) : {};
 			default:
 				return data;
 			}
-		})(data);
+		})(result.data);
 
-		if (includeHeaders) {
-			return [dataParsed, responseHeaders];
+		if (includeAll) {
+			return [dataParsed, result.headers, result.code];
 		}
 		return dataParsed;
 	}
 
-	static async get(url, options = {}, includeHeaders = false) {
+	static async get(url, options = {}, includeAll = false) {
 		options["method"] = "get";
-		return await Fetch.request(url, options, includeHeaders);
+		return await Fetch.request(url, options, includeAll);
 	}
 
-	static async post(url, options = {}, includeHeaders = false) {
+	static async post(url, options = {}, includeAll = false) {
 		options["method"] = "post";
-		return await Fetch.request(url, options, includeHeaders);
+		return await Fetch.request(url, options, includeAll);
 	}
 }

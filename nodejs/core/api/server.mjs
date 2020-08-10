@@ -199,7 +199,11 @@ export default class APIServer extends Base {
 			}
 			catch (e) {
 				Exception.print("Exception Guard");
-				Exception.print(Exception.fromError(e));
+				/*
+				 * The formatting string is important to ensure that error message is not
+				 * considered as a formatting string.
+				 */
+				Exception.print("{}", Exception.fromError(e));
 				Log.error("Context: {:j}", context.debug);
 				response.status(500).send(e.message);
 			}
