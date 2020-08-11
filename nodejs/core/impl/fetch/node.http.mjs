@@ -25,7 +25,7 @@ export default async function request(url, options) {
 			{
 				method: options.method,
 				headers: options.headers,
-				timeout: MAX_TIMEOUT_S * 1000,
+				timeout: MAX_TIMEOUT_S * 1000
 			},
 			(response) => {
 				// Handle redirection
@@ -40,7 +40,9 @@ export default async function request(url, options) {
 					// Redirect
 					if ("location" in response.headers) {
 						Log.debug("Redirecting to '{}'", response.headers.location);
-						return request(response.headers.location, options).then(resolve).catch(reject);
+						return request(response.headers.location, options)
+							.then(resolve)
+							.catch(reject);
 					}
 				}
 
@@ -59,7 +61,7 @@ export default async function request(url, options) {
 					resolve({
 						data: body,
 						headers: response.headers,
-						code: response.statusCode,
+						code: response.statusCode
 					});
 				});
 			}

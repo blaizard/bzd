@@ -10,7 +10,7 @@ export default class Template {
 				/**
 				 * The path of the template used (if relevant)
 				 */
-				path: "",
+				path: ""
 			},
 			options
 		);
@@ -26,7 +26,7 @@ export default class Template {
 	 */
 	static fromFileSync(path) {
 		return new Template(Fs.readFileSync(path).toString(), {
-			path: path,
+			path: path
 		});
 	}
 

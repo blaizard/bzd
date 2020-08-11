@@ -55,7 +55,7 @@ export class AsyncInitialize {
 	constructor() {
 		this.event = new Event({
 			ready: { proactive: true },
-			error: { proactive: true },
+			error: { proactive: true }
 		});
 	}
 

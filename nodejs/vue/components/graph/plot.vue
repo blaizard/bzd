@@ -96,17 +96,17 @@
 		components: {
 			Element,
 			PlotText,
-			RenderLine,
+			RenderLine
 		},
 		props: {
 			value: { type: Array, required: false, default: () => [] },
-			config: { type: Object, required: false, default: () => ({}) },
+			config: { type: Object, required: false, default: () => ({}) }
 		},
 		directives: {
 			"hover-children": HoverChildren,
-			resize: Resize,
+			resize: Resize
 		},
-		data: function () {
+		data: function() {
 			return {
 				selected: -1,
 				selectedPoint: -1,
@@ -125,22 +125,22 @@
 				 */
 				labelXCharSize: {
 					width: 16,
-					height: 16,
+					height: 16
 				},
 				/**
 				 * Horizontal offset to position the Y label
 				 */
 				labelYCharSize: {
 					width: 16,
-					height: 16,
+					height: 16
 				},
 				/**
 				 * Horizontal offset to position the Y label
 				 */
 				labelCursorXCharSize: {
 					width: 16,
-					height: 16,
-				},
+					height: 16
+				}
 			};
 		},
 		mounted() {
@@ -148,21 +148,21 @@
 				const rect = this.$refs.labelXReferenceChar.getBoundingClientRect();
 				this.labelXCharSize = {
 					height: rect.height || 16,
-					width: rect.width || 16,
+					width: rect.width || 16
 				};
 			}
 			{
 				const rect = this.$refs.labelYReferenceChar.getBoundingClientRect();
 				this.labelYCharSize = {
 					height: rect.height || 16,
-					width: rect.width || 16,
+					width: rect.width || 16
 				};
 			}
 			{
 				const rect = this.$refs.labelCursorXReferenceChar.getBoundingClientRect();
 				this.labelCursorXCharSize = {
 					height: rect.height || 16,
-					width: rect.width || 16,
+					width: rect.width || 16
 				};
 			}
 		},
@@ -204,8 +204,8 @@
 					this.valuesMaxY = valuesMaxY;
 					this.valuesMinX = valuesMinX;
 					this.valuesMaxX = valuesMaxX;
-				},
-			},
+				}
+			}
 		},
 		computed: {
 			presetColors() {
@@ -278,7 +278,7 @@
 						/**
 						 * Show the cursor
 						 */
-						showCursor: true,
+						showCursor: true
 					},
 					this.config
 				);
@@ -375,7 +375,7 @@
 					top: this.plotOffsetTop,
 					left: this.plotOffsetLeft,
 					bottom: this.height - this.plotOffsetBottom,
-					right: this.width - this.plotOffsetRight,
+					right: this.width - this.plotOffsetRight
 				};
 			},
 			/**
@@ -428,7 +428,7 @@
 								const value = serie.values[this.selectedPoint];
 								tooltip(elt, tooltipFormater(value[0], value[1]));
 							}
-						},
+						}
 					};
 
 					// Prevent non-sense
@@ -482,7 +482,7 @@
 				this.labelX.forEach((n, index) => {
 					map[this.plotOffsetLeft + (this.plotWidth * index) / lastIndex] = {
 						value: this.configProcessed.formatX(n),
-						show: index > 0 && index < lastIndex,
+						show: index > 0 && index < lastIndex
 					};
 				});
 				return map;
@@ -528,12 +528,12 @@
 					[...this.labelY].reverse().forEach((n, index) => {
 						map[this.plotOffsetTop + (this.plotHeight * index) / lastIndex] = {
 							value: this.configProcessed.formatY(n),
-							show: true,
+							show: true
 						};
 					});
 				}
 				return map;
-			},
+			}
 		},
 		methods: {
 			selectColorValue(index, color) {
@@ -548,7 +548,7 @@
 			getItemClass(index) {
 				return {
 					"irgraph-plot-item": true,
-					"irgraph-plot-item-selected": this.selected == -1 ? true : this.selected == index,
+					"irgraph-plot-item-selected": this.selected == -1 ? true : this.selected == index
 				};
 			},
 			getItemStyle(index, serie) {
@@ -636,8 +636,8 @@
 			handleMouseLeave() {
 				this.selected = -1;
 				this.selectedPoint = -1;
-			},
-		},
+			}
+		}
 	};
 </script>
 

@@ -3,12 +3,12 @@
 
 	export default {
 		mixins: [Template],
-		data: function () {
+		data: function() {
 			return {
 				value: {
-					dropdown: "Hello",
+					dropdown: "Hello"
 				},
-				dropdownList: [],
+				dropdownList: []
 			};
 		},
 		mounted() {
@@ -27,27 +27,27 @@
 						type: "Dropdown",
 						caption: "Dropdown (placeholder)",
 						list: ["Hello", "World"],
-						placeholder: "Enter text...",
+						placeholder: "Enter text..."
 					},
 					{ type: "Dropdown", caption: "Dropdown (disabled)", disable: true, list: ["Hello", "World"] },
 					{
 						type: "Dropdown",
 						caption: "Dropdown (editable)",
 						list: { hello: "Hello", world: "World" },
-						editable: true,
+						editable: true
 					},
 					{
 						type: "Dropdown",
 						caption: "Dropdown (html)",
 						list: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
-						html: true,
+						html: true
 					},
 					{
 						type: "Dropdown",
 						caption: "Dropdown (html, multi)",
 						list: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
 						html: true,
-						multi: true,
+						multi: true
 					},
 					{
 						type: "Dropdown",
@@ -55,13 +55,13 @@
 						list: { hello: "Hello", world: "World" },
 						editable: true,
 						multi: true,
-						placeholder: "Type text here...",
+						placeholder: "Type text here..."
 					},
 					{
 						type: "Dropdown",
 						caption: "Dropdown (fct callback)",
 						list: (text) => ["Hello World!", "You typed '" + text + "'"],
-						editable: true,
+						editable: true
 					},
 					{
 						type: "Dropdown",
@@ -74,10 +74,10 @@
 							});
 						},
 						delay: 500,
-						editable: true,
-					},
+						editable: true
+					}
 				];
-			},
-		},
+			}
+		}
 	};
 </script>

@@ -14,7 +14,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			 * Returns a dictionary with the token and refresh_token keys.
 			 * Returns null in case the refresh got invalidated.
 			 */
-			refreshTokenCallback: null,
+			refreshTokenCallback: null
 		});
 
 		// Token to be used during this session.
@@ -103,7 +103,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		// Automatically add authentication information to the request
 		fetchOptions.authentication = {
 			type: "bearer",
-			token: this.token,
+			token: this.token
 		};
 	}
 
@@ -120,7 +120,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		const result = await api.request("post", "/auth/login", {
 			uid: uid,
 			password: password,
-			persistent: persistent,
+			persistent: persistent
 		});
 		this.setToken(result.token, result.timeout);
 		return true;

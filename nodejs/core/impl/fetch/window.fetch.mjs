@@ -8,7 +8,7 @@ export default async function request(url, options) {
 	const response = await window.fetch(url, {
 		method: options.method,
 		body: options.body,
-		headers: options.headers,
+		headers: options.headers
 	});
 
 	return {
@@ -17,6 +17,6 @@ export default async function request(url, options) {
 			obj[pair[0]] = pair[1];
 			return obj;
 		}, {}),
-		code: response.status,
+		code: response.status
 	};
 }

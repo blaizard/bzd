@@ -8,10 +8,10 @@ export default {
 				mixins: [Payment],
 				data() {
 					return {
-						payments: payments,
+						payments: payments
 					};
-				},
+				}
 			})
 		);
-	},
+	}
 };

@@ -14,7 +14,7 @@ export default class AuthenticationClient {
 				/**
 				 * Callback to be called each time the authentication status changes.
 				 */
-				onAuthentication: (/*isAuthenticated*/) => {},
+				onAuthentication: (/*isAuthenticated*/) => {}
 			},
 			defaultOptions,
 			options

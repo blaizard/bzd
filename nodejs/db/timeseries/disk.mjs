@@ -17,7 +17,7 @@ export default class TimeseriesDisk extends Timeseries {
 
 		this.options = Object.assign(
 			{
-				buckets: {},
+				buckets: {}
 			},
 			options
 		);
@@ -55,7 +55,7 @@ export default class TimeseriesDisk extends Timeseries {
 						/**
 						 * \brief Perform a savepoint every X seconds
 						 */
-						savepointIntervalS: 5 * 60,
+						savepointIntervalS: 5 * 60
 					},
 					bucket in this.options.buckets ? this.options.buckets[bucket] : {}
 				);
@@ -66,7 +66,7 @@ export default class TimeseriesDisk extends Timeseries {
 						namespace: "db::timeseries",
 						name: bucket,
 						intervalMs: optionsBucket.savepointIntervalS * 1000
-					}*/,
+					}*/
 				};
 
 				let persistence = new PersistenceTimeseries(Path.join(this.path, bucket), options);

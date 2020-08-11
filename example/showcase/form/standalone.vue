@@ -88,9 +88,9 @@
 			Carousel,
 			Editor,
 			Button,
-			DateElement,
+			DateElement
 		},
-		data: function () {
+		data: function() {
 			return {
 				input: "hello",
 				password: "world",
@@ -103,8 +103,8 @@
 				carousel: 0,
 				array: [],
 				table: [],
-				checkbox: false,
+				checkbox: false
 			};
-		},
+		}
 	};
 </script>

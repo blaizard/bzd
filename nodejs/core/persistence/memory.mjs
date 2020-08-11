@@ -29,8 +29,8 @@ export default class PersistenceMemory {
 					 */
 					delete: (data, key) => {
 						delete data[key];
-					},
-				},
+					}
+				}
 			},
 			options
 		);
@@ -42,7 +42,7 @@ export default class PersistenceMemory {
 		// Initialize local variables
 		this.isReady = false;
 		this.event = new Event({
-			ready: { proactive: true },
+			ready: { proactive: true }
 		});
 	}
 

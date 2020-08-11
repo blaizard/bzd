@@ -9,11 +9,11 @@ export const Source = {
 	jenkins: Jenkins.source,
 	travisci: TravisCI.source,
 	github: Github.source,
-	coverage: Coverage.source,
+	coverage: Coverage.source
 };
 
 export const Visualization = {
 	"continuous-integration": ContinuousIntegration.visualization,
 	link: Link.visualization,
-	coverage: Coverage.visualization,
+	coverage: Coverage.visualization
 };

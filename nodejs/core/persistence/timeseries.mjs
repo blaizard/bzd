@@ -33,18 +33,18 @@ export default class PersistenceTimeSeries {
 				 * Default periodic savepoint task
 				 */
 				savepointTask: {
-					intervalMs: 5000 * 60, // 5min by default
+					intervalMs: 5000 * 60 // 5min by default
 				},
 				/**
 				 * Maximum number of entries before spliting files
 				 */
-				maxEntriesPerFile: 100,
+				maxEntriesPerFile: 100
 			},
 			options
 		);
 
 		this.event = new Event({
-			ready: { proactive: true },
+			ready: { proactive: true }
 		});
 
 		const filePath = Path.basename(path);
@@ -62,11 +62,11 @@ export default class PersistenceTimeSeries {
 				Exception.unreachable(
 					"Duplicate timestamps (" + timestamp + ") are in the index for entries: " + a + " and " + b
 				);
-			},
+			}
 		});
 		this.timeSeriesData = new TimeSeries({
 			unique: this.options.unique,
-			uniqueMerge: this.options.uniqueMerge,
+			uniqueMerge: this.options.uniqueMerge
 		});
 
 		this.initialize(path);
@@ -238,7 +238,7 @@ export default class PersistenceTimeSeries {
 						timeSeriesIndex.insert(timestampBegin, {
 							path: dataFileList[i],
 							length: timestampLength,
-							timestampEnd: timestampEnd,
+							timestampEnd: timestampEnd
 						});
 					});
 				}
@@ -255,7 +255,7 @@ export default class PersistenceTimeSeries {
 		// Build index full content
 		const indexContent = {
 			version: VERSION,
-			list: timeseriesData,
+			list: timeseriesData
 		};
 		// Reset the index persistence with this content
 		await this.persistenceIndex.reset(indexContent);
@@ -296,9 +296,9 @@ export default class PersistenceTimeSeries {
 						);
 						t.data[index][1].timestampEnd = Math.max(t.data[index][1].timestampEnd, timestamp);
 					});
-				},
+				}
 			},
-			savepointTask: this.options.savepointTask,
+			savepointTask: this.options.savepointTask
 		};
 	}
 
@@ -310,15 +310,15 @@ export default class PersistenceTimeSeries {
 					await this.timeSeriesData.wrap(data.list, (t) => {
 						t.insert(timestamp, value);
 					});
-				},
-			},
+				}
+			}
 		};
 	}
 
 	get optionsData() {
 		return Object.assign(
 			{
-				savepointTask: this.options.savepointTask,
+				savepointTask: this.options.savepointTask
 			},
 			this.optionsDataReadOnly
 		);
@@ -363,7 +363,7 @@ export default class PersistenceTimeSeries {
 
 		return Object.assign(
 			{
-				persistence: this.persistenceCache[metadata.path],
+				persistence: this.persistenceCache[metadata.path]
 			},
 			metadata
 		);
@@ -386,7 +386,7 @@ export default class PersistenceTimeSeries {
 					if (indexLeft <= entry[1].length) {
 						return {
 							timestamp: entry[0],
-							index: indexLeft,
+							index: indexLeft
 						};
 					}
 					indexLeft -= entry[1].length;
@@ -402,7 +402,7 @@ export default class PersistenceTimeSeries {
 					if (indexLeft <= entry[1].length) {
 						return {
 							timestamp: entry[0],
-							index: -indexLeft - 1,
+							index: -indexLeft - 1
 						};
 					}
 					indexLeft -= entry[1].length;
@@ -416,7 +416,7 @@ export default class PersistenceTimeSeries {
 		}
 		return Object.assign(
 			{
-				index: result.index,
+				index: result.index
 			},
 			await this.getPersistenceByTimestamp(result.timestamp, /*forWrite*/ false)
 		);
@@ -429,7 +429,7 @@ export default class PersistenceTimeSeries {
 		const metadata = {
 			length: 0,
 			path: timestamp + ".json",
-			timestampEnd: 0,
+			timestampEnd: 0
 		};
 		await this.persistenceIndex.write("insert", timestamp, metadata);
 		return metadata;
@@ -477,7 +477,7 @@ export default class PersistenceTimeSeries {
 				// The timestamp of the file (the one that can be retreived by the index)
 				timestamp: timestamp,
 				// The path of the data file
-				path: metadata.path,
+				path: metadata.path
 			};
 		});
 	}

@@ -45,6 +45,7 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs/core:cache",
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:fetch",

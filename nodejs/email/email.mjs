@@ -20,7 +20,7 @@ export default class Email {
 				// Content format
 				format: "text",
 				// Content to be displayed
-				content: null,
+				content: null
 			},
 			data
 		);

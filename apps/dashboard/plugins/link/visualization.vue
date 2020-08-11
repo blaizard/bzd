@@ -5,14 +5,14 @@
 <script>
 	export default {
 		props: {
-			description: { type: Object, mandatory: true },
+			description: { type: Object, mandatory: true }
 		},
 		mounted() {
 			this.$emit("link", this.description["link.url"]);
 		},
-		data: function () {
+		data: function() {
 			return {};
-		},
+		}
 	};
 </script>
 

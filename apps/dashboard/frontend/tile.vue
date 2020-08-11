@@ -28,13 +28,13 @@
 		props: {
 			description: { type: Object, mandatory: true },
 			uid: { type: String, mandatory: true },
-			edit: { type: Boolean, mandatory: false, default: false },
+			edit: { type: Boolean, mandatory: false, default: false }
 		},
 		directives: {
 			loading: DirectiveLoading,
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {
 				showComponent: true,
 				metadata: {},
@@ -43,7 +43,7 @@
 				errorList: [],
 				color: null,
 				icon: null,
-				link: null,
+				link: null
 			};
 		},
 		mounted() {
@@ -64,7 +64,7 @@
 			},
 			tooltipErrorConfig() {
 				return {
-					text: this.errorList.map((e) => String(e)).join(", "),
+					text: this.errorList.map((e) => String(e)).join(", ")
 				};
 			},
 			colorAuto() {
@@ -83,7 +83,7 @@
 					{
 						yellow: "black",
 						white: "black",
-						pink: "black",
+						pink: "black"
 					}[this.colorBackground] || "white"
 				);
 			},
@@ -109,7 +109,7 @@
 				return {
 					"bzd-dashboard-tile": true,
 					edit: this.edit,
-					clickable: Boolean(this.link) || this.edit,
+					clickable: Boolean(this.link) || this.edit
 				};
 			},
 			tileStyle() {
@@ -124,7 +124,7 @@
 					Colors[this.colorForeground] +
 					";"
 				);
-			},
+			}
 		},
 		methods: {
 			handleError(e) {
@@ -136,7 +136,7 @@
 				try {
 					this.metadata = await this.$api.request("get", "/data", {
 						uid: this.uid,
-						type: this.sourceType,
+						type: this.sourceType
 					});
 					this.showComponent = true;
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
@@ -169,8 +169,8 @@
 			},
 			handleLink(link) {
 				this.link = link;
-			},
-		},
+			}
+		}
 	};
 </script>
 
