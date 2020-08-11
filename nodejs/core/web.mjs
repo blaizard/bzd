@@ -61,15 +61,15 @@ export default class Web {
 							res.header("Expires", "-1");
 							res.header("Pragma", "no-cache");
 						}
-					},
-				},
+					}
+				}
 			},
 			config
 		);
 
 		this.event = new Event({
 			ready: { proactive: true },
-			error: { proactive: true },
+			error: { proactive: true }
 		});
 
 		this._initialize(port).catch((e) => {
@@ -96,7 +96,7 @@ export default class Web {
 			this.app.use(Compression());
 			this.app.use(
 				Minify({
-					cache: false, // use memory cache
+					cache: false // use memory cache
 				})
 			);
 		}
@@ -107,7 +107,7 @@ export default class Web {
 				filename: (req, file, cb) => {
 					this._initialize.uid = this._initialize.uid || 0;
 					cb(null, Date.now() + "-" + String(this._initialize.uid++) + "-" + file.originalname);
-				},
+				}
 			};
 			if (this.config.uploadDir) {
 				// Create the directory if it does not exists
@@ -244,7 +244,7 @@ export default class Web {
 				/**
 				 * Add guards to unhandled exceptions. This adds a callstack layer.
 				 */
-				exceptionGuard: false,
+				exceptionGuard: false
 			},
 			options
 		);
@@ -252,7 +252,7 @@ export default class Web {
 		let callbackList = [middlewareErrorHandler];
 
 		if (options.exceptionGuard) {
-			callbackList.unshift(async function (request, response) {
+			callbackList.unshift(async function(request, response) {
 				try {
 					await callback.call(this, request, response);
 				}
@@ -278,7 +278,7 @@ export default class Web {
 		if (options.type.indexOf("upload") != -1) {
 			let upload = Multer({
 				storage: this.storage,
-				limits: { fileSize: options.limit },
+				limits: { fileSize: options.limit }
 			});
 			callbackList.unshift(upload.any());
 		}

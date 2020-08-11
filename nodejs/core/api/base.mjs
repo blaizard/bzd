@@ -21,7 +21,7 @@ export default class API {
 				/**
 				 * Include additional plugins if any
 				 */
-				plugins: [],
+				plugins: []
 			},
 			options
 		);

@@ -17,9 +17,9 @@
 			disable: { type: Boolean, default: false, required: false },
 			width: { type: Number | String, default: 1, required: false },
 			mandatory: { type: Boolean, default: false, required: false },
-			error: { type: Array, default: [], required: false },
+			error: { type: Array, default: [], required: false }
 		},
-		data: function () {
+		data: function() {
 			return {};
 		},
 		computed: {
@@ -36,7 +36,7 @@
 					"irform-align-bottom": this.alignList.indexOf("bottom") != -1,
 					"irform-align-left": this.alignList.indexOf("left") != -1,
 					"irform-align-right": this.alignList.indexOf("right") != -1,
-					"irform-align-center": this.alignList.indexOf("center") != -1,
+					"irform-align-center": this.alignList.indexOf("center") != -1
 				};
 			},
 			isError() {
@@ -45,16 +45,16 @@
 			style() {
 				if ((this.width || 1) === 1) {
 					return {
-						width: "100%",
+						width: "100%"
 					};
 				}
 				if (typeof this.width === "number") {
 					return {
-						flex: this.width * 100 + " 0 0",
+						flex: this.width * 100 + " 0 0"
 					};
 				}
 				return this.width;
-			},
-		},
+			}
+		}
 	};
 </script>

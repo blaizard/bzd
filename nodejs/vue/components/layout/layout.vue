@@ -68,12 +68,12 @@
 	export default {
 		mixins: [Base],
 		directives: {
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {
 				isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
-				isMenuShow: false,
+				isMenuShow: false
 			};
 		},
 		computed: {
@@ -84,12 +84,12 @@
 				return {
 					"bzd-layout": true,
 					"bzd-mobile": this.isMobile,
-					"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
+					"bzd-dock": this.isDock && !this.isMobile && this.isMenu
 				};
 			},
 			isMenu() {
 				return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
-			},
+			}
 		},
 		methods: {
 			getNotificationClass(entry) {
@@ -98,7 +98,7 @@
 					"bzd-notification-time": entry.timeOnScreen > 0,
 					"bzd-success": entry.type == "success",
 					"bzd-error": entry.type == "error",
-					"bzd-info": entry.type == "info",
+					"bzd-info": entry.type == "info"
 				};
 			},
 			getNotificationStyle(entry) {
@@ -123,8 +123,8 @@
 			},
 			handleMenuClick() {
 				this.hideMenu();
-			},
-		},
+			}
+		}
 	};
 </script>
 

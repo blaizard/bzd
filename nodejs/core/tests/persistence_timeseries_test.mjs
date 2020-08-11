@@ -14,7 +14,7 @@ const tempDirPath = Fs.mkdtempSync(Path.join(Os.tmpdir(), "persistence-timeserie
 const persistenceOptions = {
 	path: Path.resolve(tempDirPath, "test.persistence.timeseries.json"),
 	maxEntriesPerFile: 10,
-	savepointTask: null,
+	savepointTask: null
 };
 
 after(async () => {

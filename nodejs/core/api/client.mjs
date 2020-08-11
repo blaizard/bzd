@@ -42,7 +42,7 @@ export default class APIClient extends Base {
 
 		// Build the options
 		let fetchOptions = {
-			method: method,
+			method: method
 		};
 		if ("type" in responseOptions) {
 			fetchOptions.expect = responseOptions.type;
@@ -58,7 +58,7 @@ export default class APIClient extends Base {
 			);
 			const validation = new Validation(requestOptions.validation);
 			validation.validate(data, {
-				all: true,
+				all: true
 			});
 		}
 
@@ -100,7 +100,7 @@ export default class APIClient extends Base {
 					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {
-						all: true,
+						all: true
 					});
 				}
 				return result;

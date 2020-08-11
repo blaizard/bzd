@@ -3,7 +3,7 @@
  * @param {*} str
  * @param  {...any} args
  */
-export default function (str, ...args) {
+export default function(str, ...args) {
 	let pattern = new RegExp("{([^}:]*)(?::([^}]*))?}", "g");
 	let output = "";
 	let index = 0;
@@ -21,12 +21,15 @@ export default function (str, ...args) {
 			const format = _parseFormat(m[1], m[2], substitutionIndex);
 			const value = args[format.index];
 
-			switch (format.type) {
+			switch (format.type || "") {
 			case "j":
 				output += JSON.stringify(value);
 				break;
-			default:
+			case "":
 				output += String(value);
+				break;
+			default:
+				throw new Error("Unsupported formatting type: " + format.type);
 			}
 
 			++substitutionIndex;
@@ -39,6 +42,6 @@ export default function (str, ...args) {
 function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
 	return {
 		index: substitutionIndex ? parseInt(substitutionIndex) : currentSubstitutionIndex,
-		type: options,
+		type: options
 	};
 }

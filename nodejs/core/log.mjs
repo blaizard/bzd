@@ -15,7 +15,7 @@ class Logger {
 	constructor(config) {
 		this.config = Object.assign(
 			{
-				level: Logger.levels.info.level,
+				level: Logger.levels.info.level
 			},
 			config
 		);
@@ -30,7 +30,7 @@ class Logger {
 			// eslint-disable-next-line no-console
 			warning: { level: 2, text: "warning", fct: console.warn },
 			// eslint-disable-next-line no-console
-			error: { level: 1, text: "error", fct: console.error },
+			error: { level: 1, text: "error", fct: console.error }
 		};
 	}
 
@@ -56,7 +56,7 @@ class Logger {
 
 // Singleton
 let logger = new Logger({
-	level: Logger.levels.info.level,
+	level: Logger.levels.info.level
 });
 
 const custom = (config, ...msgs) => {
@@ -78,7 +78,7 @@ const LoggerFactory = (...topics) => {
 		},
 		performance() {
 			return new Performance();
-		},
+		}
 	};
 };
 

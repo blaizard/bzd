@@ -23,7 +23,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			/**
 			 * Time in seconds after which the refresh token will expire.
 			 */
-			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60,
+			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60
 		});
 	}
 
@@ -37,7 +37,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				else {
 					resolve({
 						token: token,
-						timeout: expiresIn,
+						timeout: expiresIn
 					});
 				}
 			});
@@ -49,19 +49,19 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		api.addSchema(APISchema);
 
 		const authentication = this;
-		const generateTokens = async function (uid, persistent) {
+		const generateTokens = async function(uid, persistent) {
 			// Generates the refresh tocken and set it to a cookie
 			const refreshToken = await authentication.generateRefreshToken(uid, persistent);
 			this.setCookie("refresh_token", refreshToken.token, {
 				httpOnly: true,
-				maxAge: refreshToken.timeout * 1000,
+				maxAge: refreshToken.timeout * 1000
 			});
 
 			// Generate the access token
 			return await authentication.generateAccessToken({ uid: uid });
 		};
 
-		api.handle("post", "/auth/login", async function (inputs) {
+		api.handle("post", "/auth/login", async function(inputs) {
 			// Verify uid/password pair
 			if (await authentication.verifyIdentity(inputs.uid, inputs.password)) {
 				return generateTokens.call(this, inputs.uid, inputs.persistent);
@@ -69,11 +69,11 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			return this.setStatus(401, "Unauthorized");
 		});
 
-		api.handle("post", "/auth/logout", async function () {
+		api.handle("post", "/auth/logout", async function() {
 			this.deleteCookie("refresh_token");
 		});
 
-		api.handle("post", "/auth/refresh", async function () {
+		api.handle("post", "/auth/refresh", async function() {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
 				return this.setStatus(401, "Unauthorized");

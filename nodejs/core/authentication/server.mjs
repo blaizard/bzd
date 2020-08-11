@@ -9,7 +9,7 @@ export default class AuthenticationServer {
 				/**
 				 * Callback to verify once identiy, mathing uid and password pair.
 				 */
-				verifyIdentityCallback: null,
+				verifyIdentityCallback: null
 			},
 			defaultOptions,
 			options

@@ -8,7 +8,9 @@
 				<TreeDirectory :path="makePath(item)" :depth="depth + 1" class="indent"></TreeDirectory>
 			</div>
 		</template>
-		<div v-if="isEmpty">&lt;emtpy&gt;</div>
+		<div v-if="isError" class="error">{{ error }}</div>
+		<div v-else-if="isLoading">...</div>
+		<div v-else-if="isEmpty">&lt;emtpy&gt;</div>
 	</div>
 </template>
 
@@ -16,53 +18,65 @@
 	export default {
 		name: "TreeDirectory",
 		props: {
-			path: { type: String, mandatory: false, default: "/" },
-			depth: { type: Number, mandatory: false, default: 0 },
+			path: { type: Array, mandatory: false, default: () => [] },
+			depth: { type: Number, mandatory: false, default: 0 }
 		},
-		data: function () {
+		data: function() {
 			return {
 				next: true,
 				list: [],
 				expanded: {},
+				error: null
 			};
 		},
 		mounted() {
 			this.fetchPath();
 		},
 		computed: {
-			isEmpty() {
-				return this.list.length == 0 && this.next === null;
+			isError() {
+				return this.error !== null;
 			},
+			isLoading() {
+				return !this.isError && this.next !== null;
+			},
+			isEmpty() {
+				return this.list.length == 0 && !this.isLoading;
+			}
 		},
 		methods: {
 			async fetchPath() {
 				if (this.next === null) {
 					return;
 				}
-				const response = await this.$api.request("get", "/list", {
-					path: this.path,
-					paging: this.next === true ? 1 : JSON.stringify(this.next),
-				});
-				this.next = response.next;
-				this.list = this.list.concat(response.data);
-				this.list.sort(new Intl.Collator().compare);
-				if (this.next) {
-					this.fetchPath();
+				try {
+					const response = await this.$api.request("post", "/list", {
+						path: this.path,
+						paging: this.next === true ? 1 : this.next
+					});
+					this.next = response.next;
+					this.list = this.list.concat(response.data);
+					this.list.sort(new Intl.Collator().compare);
+					if (this.next) {
+						this.fetchPath();
+					}
+				}
+				catch (e) {
+					this.error = e;
 				}
 			},
 			getClass(item) {
 				return {
 					entry: true,
-					child: (this.depth > 0),
+					child: this.depth > 0,
 					expandable: this.isExpandable(item),
-					expanded: item.name in this.expanded,
+					expanded: item.name in this.expanded
 				};
 			},
 			isExpandable(item) {
 				return ["directory", "bucket"].includes(item.type);
 			},
 			makePath(item) {
-				return this.path + ("path" in item ? item.path : item.name) + "/";
+				return this.path.concat([item.name]);
 			},
 			handleClick(item) {
 				if (!this.isExpandable(item)) {
@@ -75,8 +89,8 @@
 				else {
 					this.$set(this.expanded, name, true);
 				}
-			},
-		},
+			}
+		}
 	};
 </script>
 
@@ -103,8 +117,17 @@
 	}
 
 	.container {
-
 		line-height: #{$lineHeight}px;
+
+		.error {
+			color: colors.$bzdGraphColorRed;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			&:hover {
+				white-space: pre-wrap;
+			}
+		}
 
 		.entry {
 			position: relative;

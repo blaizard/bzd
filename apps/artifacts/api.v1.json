@@ -1,9 +1,9 @@
 {
     "/list": {
-        "get": {
+        "post": {
             "documentation": "Get the file/directory list from a specific path.",
             "request": {
-                "type": "query",
+                "type": "json",
                 "validation": {
                     "paging": "",
                     "path": "mandatory"

@@ -66,7 +66,7 @@
 		Carousel: ElementCarousel,
 		Editor: ElementEditor,
 		Message: ElementMessage,
-		Date: ElementDate,
+		Date: ElementDate
 	};
 
 	export default {
@@ -94,17 +94,17 @@
 			/**
 			 * Include elements with no names
 			 */
-			all: { type: Boolean, default: false, required: false },
+			all: { type: Boolean, default: false, required: false }
 		},
 		name: "FormElement",
-		data: function () {
+		data: function() {
 			return {
 				currentValue: {},
 				returnedValue: {},
 				// Contains only the unamed elements
 				unamedValue: {},
 				active: -1,
-				errors: {},
+				errors: {}
 			};
 		},
 		computed: {
@@ -127,7 +127,7 @@
 			},
 			indexToName() {
 				return this.description.map((description, index) => this.getName(description, index));
-			},
+			}
 		},
 		watch: {
 			value: {
@@ -139,8 +139,8 @@
 					if (!this.diff) {
 						this.returnedValue = Object.assign({}, value);
 					}
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			getError(description, index) {
@@ -162,7 +162,7 @@
 					output: "return",
 					valueExists: (key, value) => {
 						return value !== undefined && value !== "";
-					},
+					}
 				});
 				for (const name in result) {
 					this.handleError(name, result[name]);
@@ -219,8 +219,8 @@
 					return description.condition(this.currentValue);
 				}
 				return typeof description.condition === "undefined" ? true : description.condition;
-			},
-		},
+			}
+		}
 	};
 </script>
 

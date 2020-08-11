@@ -9,13 +9,15 @@ const Log = LogFactory("fetch");
  * Fetch data from HTTP endpoint.
  */
 export class FetchFactory {
-	constructor(url, options = {}) {
+	constructor(url, optionsOrCallback = {}) {
 		this.url = url;
-		this.options = options;
+		this.optionsOrCallback = optionsOrCallback;
 	}
 
 	async request(endpoint, options = {}, includeAll = false) {
-		return await Fetch.request(this.url + endpoint, Object.assign({}, this.options, options), includeAll);
+		const baseOptions =
+			typeof this.optionsOrCallback == "function" ? await this.optionsOrCallback(options.args) : this.optionsOrCallback;
+		return await Fetch.request(this.url + endpoint, Object.assign({}, baseOptions, options), includeAll);
 	}
 
 	async get(endpoint, options = {}, includeAll = false) {
@@ -99,7 +101,7 @@ export default class Fetch {
 					connect: 1,
 					options: 1,
 					trace: 1,
-					patch: 1,
+					patch: 1
 				},
 			"Method '{}' is not supported",
 			method
@@ -131,7 +133,7 @@ export default class Fetch {
 			method: method,
 			headers: Object.assign(headers, options.headers),
 			body: body,
-			expect: options.expect,
+			expect: options.expect
 		});
 
 		if (result.code < 200 || result.code > 299) {

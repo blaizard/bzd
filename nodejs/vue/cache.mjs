@@ -14,7 +14,7 @@ export default {
 
 		Vue.prototype.$cache = new Vue({
 			data: {
-				content: {},
+				content: {}
 			},
 			methods: {
 				get(collection, id = "default") {
@@ -36,8 +36,8 @@ export default {
 				invalid(collection, id = "default") {
 					cache.setDirty(collection, id);
 					this.content[collection][id] = options[collection].loading || "";
-				},
-			},
+				}
+			}
 		});
-	},
+	}
 };

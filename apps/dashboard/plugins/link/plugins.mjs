@@ -7,9 +7,9 @@ export default {
 				type: "Input",
 				name: "link.url",
 				caption: "URL",
-				placeholder: "https://www.google.com",
-			},
+				placeholder: "https://www.google.com"
+			}
 		],
-		frontend: () => import("./visualization.vue"),
-	},
+		frontend: () => import("./visualization.vue")
+	}
 };

@@ -20,12 +20,16 @@ export function fromChunk(data) {
 		read() {
 			this.push(data);
 			this.push(null);
-		},
+		}
 	});
 }
 
 export async function copy(writeStream, readStream) {
 	return new Promise((resolve, reject) => {
-		readStream.on("error", reject).on("end", resolve).on("finish", resolve).pipe(writeStream);
+		readStream
+			.on("error", reject)
+			.on("end", resolve)
+			.on("finish", resolve)
+			.pipe(writeStream);
 	});
 }

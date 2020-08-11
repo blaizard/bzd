@@ -1,5 +1,5 @@
 export default {
-	bind: function (el, binding, vnode) {
+	bind: function(el, binding, vnode) {
 		const contextKey = binding.expression;
 
 		// Create the context for this directive
@@ -15,16 +15,16 @@ export default {
 						vnode.context[contextKey] = -1;
 					}
 				}
-			},
+			}
 		};
 
 		el.addEventListener("click", el.dataHoverChildren.handleSelect, true);
 		el.addEventListener("mouseenter", el.dataHoverChildren.handleSelect, true);
 		el.addEventListener("mouseleave", el.dataHoverChildren.handleUnselect, true);
 	},
-	unbind: function (el) {
+	unbind: function(el) {
 		el.removeEventListener("mouseleave", el.dataHoverChildren.handleUnselect, true);
 		el.removeEventListener("mouseenter", el.dataHoverChildren.handleSelect, true);
 		el.removeEventListener("click", el.dataHoverChildren.handleSelect, true);
-	},
+	}
 };

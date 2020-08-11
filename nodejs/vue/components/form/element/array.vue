@@ -7,7 +7,7 @@
 				:class="{
 					'irform-array-item': true,
 					'irform-array-item-inline': inline,
-					'irform-array-item-draggable': isDraggable(index),
+					'irform-array-item-draggable': isDraggable(index)
 				}"
 				v-touch="getTouchConfig(index)"
 				@click.stop="itemClick(index)">
@@ -54,15 +54,15 @@
 		mixins: [Element],
 		components: {
 			// Load asynchronously the form to avoid any circular dependencies
-			Form: () => import("../form.vue"),
+			Form: () => import("../form.vue")
 		},
 		directives: {
-			touch: Touch,
+			touch: Touch
 		},
 		props: {
-			value: { type: Array, required: false, default: () => [] },
+			value: { type: Array, required: false, default: () => [] }
 		},
-		data: function () {
+		data: function() {
 			return {
 				/**
 				 * Form description of the template of one single item
@@ -104,7 +104,7 @@
 				 * Let the component fill the whole available space,
 				 * this should be only used when max = 1
 				 */
-				fill: this.getOption("fill", false),
+				fill: this.getOption("fill", false)
 			};
 		},
 		computed: {
@@ -115,7 +115,7 @@
 				return {
 					"irform-array": true,
 					"irform-fill": this.fill,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
 			},
 			/**
@@ -162,7 +162,7 @@
 			 */
 			templateComponentConfig() {
 				return null;
-			},
+			}
 		},
 		methods: {
 			isDraggable(index) {
@@ -180,7 +180,7 @@
 					bodyDragClass: "irform-drag-active",
 					nop: true,
 					allowClickThrough: true,
-					triggerEvent: null,
+					triggerEvent: null
 				};
 			},
 			itemClick(/*index*/) {},
@@ -206,8 +206,8 @@
 				const elt = valueList.splice(indexFrom, 1)[0];
 				valueList.splice(indexTo, 0, elt);
 				await this.set(valueList);
-			},
-		},
+			}
+		}
 	};
 </script>
 

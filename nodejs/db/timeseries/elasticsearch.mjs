@@ -14,20 +14,20 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			{
 				user: null,
 				key: null,
-				prefix: "timeseries_",
+				prefix: "timeseries_"
 			},
 			options
 		);
 
 		let fetchOptions = {
-			expect: "json",
+			expect: "json"
 		};
 
 		if (this.options.user !== null) {
 			fetchOptions.authentication = {
 				type: "basic",
 				username: this.options.user,
-				password: this.options.key,
+				password: this.options.key
 			};
 		}
 
@@ -43,7 +43,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 
 	async _initializeImpl() {
 		const result = await this.fetch.request("/", {
-			method: "get",
+			method: "get"
 		});
 		Exception.assert("version" in result, "Unexpected response: {:j}", result);
 	}
@@ -57,8 +57,8 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			method: "post",
 			data: {
 				date: timestamp,
-				data: data,
-			},
+				data: data
+			}
 		});
 	}
 
@@ -73,9 +73,9 @@ export default class TimeseriesElasticsearch extends Timeseries {
 					data: {
 						query: query,
 						sort: {
-							date: "desc",
-						},
-					},
+							date: "desc"
+						}
+					}
 				}
 			);
 			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
@@ -98,7 +98,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 
 	async list(bucket, maxOrPaging = 10) {
 		return await this._search(bucket, maxOrPaging, {
-			match_all: {},
+			match_all: {}
 		});
 	}
 
@@ -106,9 +106,9 @@ export default class TimeseriesElasticsearch extends Timeseries {
 		return await this._search(bucket, maxOrPaging, {
 			range: {
 				date: {
-					gte: timestamp,
-				},
-			},
+					gte: timestamp
+				}
+			}
 		});
 	}
 }

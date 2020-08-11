@@ -31,7 +31,7 @@ class Context {
 		options = Object.assign(
 			{
 				maxAge: 7 * 24 * 60 * 60 * 1000, // in ms
-				httpOnly: false,
+				httpOnly: false
 			},
 			options
 		);
@@ -44,7 +44,7 @@ class Context {
 
 	deleteCookie(name) {
 		this.response.cookie(name, undefined, {
-			maxAge: 0,
+			maxAge: 0
 		});
 	}
 
@@ -123,7 +123,7 @@ export default class APIServer extends Base {
 					break;
 				case "upload":
 					data = Object.assign({}, request.query || {}, {
-						files: Object.keys(request.files || {}).map((key) => request.files[key].path),
+						files: Object.keys(request.files || {}).map((key) => request.files[key].path)
 					});
 					break;
 				}
@@ -145,7 +145,7 @@ export default class APIServer extends Base {
 					);
 					const validation = new Validation(requestOptions.validation);
 					validation.validate(data, {
-						all: true,
+						all: true
 					});
 				}
 
@@ -160,7 +160,7 @@ export default class APIServer extends Base {
 					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {
-						all: true,
+						all: true
 					});
 				}
 
@@ -181,7 +181,11 @@ export default class APIServer extends Base {
 						}
 						else if ("pipe" in result) {
 							await new Promise((resolve, reject) => {
-								result.on("error", reject).on("end", resolve).on("finish", resolve).pipe(response);
+								result
+									.on("error", reject)
+									.on("end", resolve)
+									.on("finish", resolve)
+									.pipe(response);
 							});
 							response.end();
 						}

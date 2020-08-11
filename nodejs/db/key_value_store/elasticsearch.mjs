@@ -17,20 +17,20 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			{
 				user: null,
 				key: null,
-				prefix: "kvs_",
+				prefix: "kvs_"
 			},
 			options
 		);
 
 		let fetchOptions = {
-			expect: "json",
+			expect: "json"
 		};
 
 		if (this.options.user !== null) {
 			fetchOptions.authentication = {
 				type: "basic",
 				username: this.options.user,
-				password: this.options.key,
+				password: this.options.key
 			};
 		}
 
@@ -46,7 +46,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async _initializeImpl() {
 		const result = await this.fetch.request("/", {
-			method: "get",
+			method: "get"
 		});
 		Exception.assert("version" in result, "Unexpected response: {:j}", result);
 	}
@@ -62,7 +62,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 		const result = await this.fetch.request(endpoint, {
 			method: "post",
-			data: value,
+			data: value
 		});
 		Exception.assert(["created", "updated"].includes(result.result), "Unexpected result, received: {}", result.result);
 		Exception.assert("_id" in result, "Response is malformed: {:j}", result);
@@ -72,7 +72,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	async get(bucket, key, defaultValue = undefined) {
 		try {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
-				method: "get",
+				method: "get"
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
 			return result._source;
@@ -89,7 +89,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async delete(bucket, key) {
 		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
-			method: "delete",
+			method: "delete"
 		});
 		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
 	}
@@ -102,8 +102,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				{
 					method: "post",
 					data: {
-						query: query,
-					},
+						query: query
+					}
 				}
 			);
 			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
@@ -129,7 +129,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async list(bucket, maxOrPaging = 10) {
 		return await this._search(bucket, maxOrPaging, {
-			match_all: {}, // eslint-disable-line
+			match_all: {} // eslint-disable-line
 		});
 	}
 
@@ -138,9 +138,9 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			term: {
 				[subKey]: {
 					value: value,
-					boost: 1,
-				},
-			},
+					boost: 1
+				}
+			}
 		});
 	}
 }

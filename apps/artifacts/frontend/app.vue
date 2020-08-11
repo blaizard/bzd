@@ -15,20 +15,20 @@
 
 	export default {
 		components: {
-			Layout,
+			Layout
 		},
 		directives: {
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {};
 		},
 		mounted() {
 			this.$routerSet({
 				ref: "view",
-				routes: [{ path: "/", component: () => import("./home.vue") }],
+				routes: [{ path: "/", component: () => import("./home.vue") }]
 			});
-		},
+		}
 	};
 </script>
 

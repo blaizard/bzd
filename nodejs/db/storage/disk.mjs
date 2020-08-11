@@ -29,32 +29,32 @@ export default class StorageDisk extends Storage {
 		await FileSystem.mkdir(this.path);
 	}
 
-	_getFullPath(bucket, key = undefined) {
-		return key ? Path.join(this.path, bucket, key) : Path.join(this.path, bucket);
+	_getFullPath(pathList, name = undefined) {
+		return name ? Path.join(this.path, ...pathList, name) : Path.join(this.path, ...pathList);
 	}
 
-	async _isImpl(path, name) {
-		return await FileSystem.exists(this._getFullPath(path, name));
+	async _isImpl(pathList, name) {
+		return await FileSystem.exists(this._getFullPath(pathList, name));
 	}
 
-	async _readImpl(path, name) {
-		return Fs.createReadStream(this._getFullPath(path, name));
+	async _readImpl(pathList, name) {
+		return Fs.createReadStream(this._getFullPath(pathList, name));
 	}
 
-	async _writeImpl(path, name, readStream) {
-		const fullPath = this._getFullPath(path, name);
+	async _writeImpl(pathList, name, readStream) {
+		const fullPath = this._getFullPath(pathList, name);
 		await FileSystem.mkdir(Path.dirname(fullPath));
 		let writeStream = Fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
 	}
 
-	async _deleteImpl(path, name) {
-		await FileSystem.unlink(this._getFullPath(path, name));
+	async _deleteImpl(pathList, name) {
+		await FileSystem.unlink(this._getFullPath(pathList, name));
 	}
 
-	async _listImpl(path, maxOrPaging, includeMetadata) {
-		const fullPath = this._getFullPath(path);
+	async _listImpl(pathList, maxOrPaging, includeMetadata) {
+		const fullPath = this._getFullPath(pathList);
 		if (await FileSystem.exists(fullPath)) {
 			const data = await FileSystem.readdir(fullPath, /*withFileTypes*/ includeMetadata);
 			if (includeMetadata) {
@@ -65,7 +65,7 @@ export default class StorageDisk extends Storage {
 						type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
 						size: stat.size,
 						created: stat.ctime,
-						modified: stat.mtime,
+						modified: stat.mtime
 					};
 				});
 			}

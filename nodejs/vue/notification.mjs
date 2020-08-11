@@ -3,7 +3,7 @@ export default {
 		Vue.prototype.$notification = new Vue({
 			data: {
 				entries: [],
-				_uid: 0,
+				_uid: 0
 			},
 			methods: {
 				_tryToString(message) {
@@ -37,7 +37,7 @@ export default {
 							/**
 							 * Time to display this item on the screen (in seconds)
 							 */
-							timeOnScreen: 5,
+							timeOnScreen: 5
 						});
 						index = this.entries.length - 1;
 					}
@@ -46,7 +46,7 @@ export default {
 					const entry = Object.assign(this.entries[index], options, {
 						type: type,
 						message: message,
-						key: key,
+						key: key
 					});
 					this.entries.splice(index, 1, entry);
 
@@ -80,7 +80,7 @@ export default {
 						message,
 						Object.assign(
 							{
-								timeOnScreen: 0,
+								timeOnScreen: 0
 							},
 							options
 						)
@@ -94,8 +94,8 @@ export default {
 					if (index != -1) {
 						this.entries.splice(index, 1);
 					}
-				},
-			},
+				}
+			}
 		});
-	},
+	}
 };

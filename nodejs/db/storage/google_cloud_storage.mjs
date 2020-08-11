@@ -18,7 +18,7 @@ export default class StorageGoogleCloudStorage extends Base {
 
 		this.options = Object.assign(
 			{
-				prefix: null,
+				prefix: null
 			},
 			options
 		);
@@ -37,23 +37,23 @@ export default class StorageGoogleCloudStorage extends Base {
 		}
 	}
 
-	_getFullPath(path, name = null) {
-		const fullPathPrefix = this.options.prefix ? this.options.prefix + "/" + path : path;
+	_getFullPath(pathList, name = null) {
+		const fullPathPrefix = this.options.prefix ? this.options.prefix + "/" + pathList.join("/") : pathList.join("/");
 		return name ? fullPathPrefix + "/" + name : fullPathPrefix;
 	}
 
-	_getFile(path, name) {
-		return this.bucket.file(this._getFullPath(path, name));
+	_getFile(pathList, name) {
+		return this.bucket.file(this._getFullPath(pathList, name));
 	}
 
-	async _isImpl(path, name) {
-		const file = this._getFile(path, name);
+	async _isImpl(pathList, name) {
+		const file = this._getFile(pathList, name);
 		const result = await file.exists();
 		return result[0];
 	}
 
-	async _readImpl(path, name) {
-		return this._getFile(path, name).createReadStream();
+	async _readImpl(pathList, name) {
+		return this._getFile(pathList, name).createReadStream();
 	}
 
 	async _delay(timeMs) {
@@ -62,35 +62,35 @@ export default class StorageGoogleCloudStorage extends Base {
 		});
 	}
 
-	async _waitUntilExists(path, name, timeoutMs = 10000) {
+	async _waitUntilExists(pathList, name, timeoutMs = 10000) {
 		let timeMs = 0;
-		while (!(await this._isImpl(path, name)) && timeMs < timeoutMs) {
+		while (!(await this._isImpl(pathList, name)) && timeMs < timeoutMs) {
 			await this._delay(1000);
 			timeMs += 1000;
 		}
-		Exception.assert(await this._isImpl(path, name), "File path='{}', name='{}' does not exists", path, name);
+		Exception.assert(await this._isImpl(pathList, name), "File path='{:j}', name='{}' does not exists", pathList, name);
 	}
 
-	async _writeImpl(path, name, readStream) {
-		const file = this._getFile(path, name);
+	async _writeImpl(pathList, name, readStream) {
+		const file = this._getFile(pathList, name);
 		let writeStream = file.createWriteStream();
 		await copyStream(writeStream, readStream);
-		await this._waitUntilExists(path, name);
+		await this._waitUntilExists(pathList, name);
 	}
 
-	async _deleteImpl(path, name) {
-		const file = this._getFile(path, name);
+	async _deleteImpl(pathList, name) {
+		const file = this._getFile(pathList, name);
 		await file.delete();
 	}
 
-	async _listImpl(path, maxOrPaging, includeMetadata) {
+	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
-		const prefix = this._getFullPath(path);
+		const prefix = this._getFullPath(pathList);
 		const [files, apiResponse] = await this.bucket.getFiles({
 			autoPaginate: false,
 			prefix: prefix,
 			maxResults: paging.max,
-			pageToken: paging.page || undefined,
+			pageToken: paging.page || undefined
 		});
 		let result = [];
 		for (const file of files) {
@@ -102,7 +102,7 @@ export default class StorageGoogleCloudStorage extends Base {
 						size: parseInt(file.metadata.size),
 						type: file.metadata.contentType,
 						modified: file.metadata.updated,
-						created: file.metadata.timeCreated,
+						created: file.metadata.timeCreated
 					  }
 					: name
 			);

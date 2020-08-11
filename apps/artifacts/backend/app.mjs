@@ -1,6 +1,8 @@
 import Commander from "commander";
 import Path from "path";
 
+import Filesystem from "bzd/core/filesystem.mjs";
+
 import API from "bzd/core/api/server.mjs";
 import APIv1 from "../api.v1.json";
 import Web from "bzd/core/web.mjs";
@@ -47,11 +49,18 @@ Commander.version("1.0.0", "-v, --version")
 	// Test data
 	await keyValueStore.set("volumes", "disk", {
 		type: "disk",
-		path: "/",
+		path: "/"
 	});
-	await keyValueStore.set("volumes", "docker", {
-		type: "docker-v2",
-		host: "https://docker.blaizard.com",
+	/*
+	 *await keyValueStore.set("volumes", "docker", {
+	 *type: "docker-v2",
+	 *host: "https://index.docker.io",
+	 *});
+	 */
+	await keyValueStore.set("volumes", "docker.gcr", {
+		type: "docker-gcr",
+		key: await Filesystem.readFile("/home/blaise/Downloads/blaizard-451e23f9c667.json"),
+		service: "gcr.io"
 	});
 
 	// Set the cache
@@ -64,33 +73,44 @@ Commander.version("1.0.0", "-v, --version")
 	cache.register("volume", async (volume) => {
 		const volumeInfo = await keyValueStore.get("volumes", volume, null);
 		Exception.assert(volumeInfo !== null, "No volume are associated with this id: '{}'", volume);
+		let storage = null;
 		switch (volumeInfo.type) {
 		case "disk":
-			return new StorageDisk(volumeInfo.path);
+			storage = new StorageDisk(volumeInfo.path);
+			break;
 		case "docker-v2":
-			return new StorageDockerV2(volumeInfo.host);
+			storage = new StorageDockerV2(volumeInfo.host);
+			break;
+		case "docker-gcr":
+			storage = StorageDockerV2.makeFromGcr(volumeInfo.key, volumeInfo.service);
+			break;
 		default:
 			Exception.unreachable("Volume type unsupported: '{}'", volumeInfo.type);
 		}
+		await storage.waitReady();
+		return storage;
 	});
 
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web,
+		channel: web
 	});
 
-	function getInternalPath(path) {
-		Exception.assert(typeof path == "string", "Path must be a string: '{}'", path);
-		Exception.assert(path.search(/\.\./gi) === -1, "Path cannot contain '..': '{}'", path);
-		const splitPath = path.split("/").filter((entry) => entry.length > 0);
-		return { volume: splitPath[0], path: "/" + splitPath.slice(1).join("/") };
+	function getInternalPath(pathList) {
+		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
+		Exception.assert(
+			pathList.every((path) => Boolean(path)),
+			"Path elements cannot be empty: '{:j}'",
+			pathList
+		);
+		return { volume: pathList[0], pathList: pathList.slice(1) };
 	}
 
-	api.handle("get", "/list", async (inputs) => {
+	api.handle("post", "/list", async (inputs) => {
 		// eslint-disable-next-line
-		const { volume, path } = getInternalPath(inputs.path);
-		const maxOrPaging = "paging" in inputs ? JSON.parse(inputs.paging) : 50;
+		const { volume, pathList } = getInternalPath(inputs.path);
+		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
 
 		if (!volume) {
 			const volumes = await keyValueStore.list("volumes", maxOrPaging);
@@ -100,16 +120,16 @@ Commander.version("1.0.0", "-v, --version")
 			});
 			return {
 				data: result.data(),
-				next: volumes.getNextPaging(),
+				next: volumes.getNextPaging()
 			};
 		}
 
 		const storage = await cache.get("volume", volume);
-		const result = await storage.list(path, maxOrPaging, /*includeMetadata*/ true);
+		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
 
 		return {
 			data: result.data(),
-			next: result.getNextPaging(),
+			next: result.getNextPaging()
 		};
 	});
 

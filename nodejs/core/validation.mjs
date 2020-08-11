@@ -80,7 +80,7 @@ export default class Validation {
 	constructor(schema, singleValue = false) {
 		if (singleValue) {
 			schema = {
-				value: schema,
+				value: schema
 			};
 		}
 		this.singleValue = singleValue;
@@ -97,7 +97,7 @@ export default class Validation {
 			processedSchema[key] = {
 				mandatory: false,
 				type: "string",
-				constraints: [],
+				constraints: []
 			};
 
 			if (typeof constraints == "string") {
@@ -132,7 +132,7 @@ export default class Validation {
 		// Convert the value into a dictionary
 		if (this.singleValue) {
 			values = {
-				value: values,
+				value: values
 			};
 		}
 		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
@@ -152,7 +152,7 @@ export default class Validation {
 				/**
 				 * Ensure that all keys of values are present in the schema.
 				 */
-				all: false,
+				all: false
 			},
 			options
 		);
@@ -278,7 +278,7 @@ export default class Validation {
 						this.assert(result, value === values[this.arg], "different from {}", this.arg);
 					};
 				}
-			},
+			}
 		};
 
 		Exception.assert(name in availableConstraints, "Unknown validation function '{}'", name);
