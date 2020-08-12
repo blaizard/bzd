@@ -51,7 +51,7 @@
 				try {
 					const response = await this.$api.request("post", "/list", {
 						path: this.path,
-						paging: this.next === true ? 1 : this.next
+						paging: this.next === true ? 50 : this.next
 					});
 					this.next = response.next;
 					this.list = this.list.concat(response.data);
