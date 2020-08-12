@@ -137,6 +137,31 @@ export default class StorageDockerV2 extends Base {
 		);
 	}
 
+	async _listLayers(imageName, tag, maxOrPaging) {
+		const result = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
+			args: "repository:" + imageName + ":pull",
+			headers: {
+				Accept: "application/vnd.docker.distribution.manifest.v2+json"
+			}
+		});
+		const data = [
+			{
+				name: "manifest.json",
+				size: result.config.size,
+				digest: result.config.digest
+			}
+		].concat(
+			result.layers.map((layer) => {
+				return {
+					name: layer.digest,
+					size: layer.size
+				};
+			})
+		);
+
+		return await CollectionPaging.makeFromList(data, maxOrPaging);
+	}
+
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		if (pathList.length == 0) {
 			return await this._listCatalog(maxOrPaging, includeMetadata);
@@ -146,12 +171,8 @@ export default class StorageDockerV2 extends Base {
 			return await this._listTags(imageName, maxOrPaging);
 		}
 		const tag = pathList[1];
-		const result3 = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
-			args: "repository:" + imageName + ":pull",
-			headers: {
-				Accept: "application/vnd.docker.distribution.manifest.v2+json"
-			}
-		});
-		console.log(result3);
+		if (pathList.length == 2) {
+			return await this._listLayers(imageName, tag, maxOrPaging);
+		}
 	}
 }
