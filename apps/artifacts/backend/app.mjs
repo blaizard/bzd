@@ -13,6 +13,7 @@ import StorageDisk from "bzd/db/storage/disk.mjs";
 import StorageDockerV2 from "bzd/db/storage/docker_v2.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
+import DockerV2Proxy from "./docker_v2_proxy.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -90,6 +91,11 @@ Commander.version("1.0.0", "-v, --version")
 		await storage.waitReady();
 		return storage;
 	});
+
+	// Start the proxy
+
+	const proxy = new DockerV2Proxy(5050, await cache.get("volume", "docker.gcr"));
+	await proxy.start();
 
 	// Install the APIs
 

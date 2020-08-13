@@ -22,14 +22,19 @@ export default class StorageDockerV2 extends Base {
 			options
 		);
 
+		this.url = url;
 		this.cache = new Cache();
 
 		// Handle authentication, this function will call a callback to generate the token
 		this.cache.register("token", async (scope, prevToken, options) => {
-			const result = await this.options.authentication(this.fetch, scope);
+			const startTime = new Date();
+			const result = await this.options.authentication.call(this, scope);
+			const elpasedTimeS = (new Date() - startTime) / 1000;
+
 			// Default to 60s if omitted: https://docs.docker.com/registry/spec/auth/token/
 			const expiresInS = "expires_in" in result ? result.expires_in : 60;
-			options.timeout = (expiresInS * 1000) / 2;
+			options.timeout = (expiresInS - elpasedTimeS * 2) * 1000;
+
 			return result.token;
 		});
 
@@ -53,15 +58,15 @@ export default class StorageDockerV2 extends Base {
 			);
 		});
 
-		Log.info("Using Docker v2 at '{}'.", url);
+		Log.info("Using Docker v2 at '{}'.", this.url);
 		this._initialize();
 	}
 
 	static makeFromGcr(keyContent, service = "gcr.io") {
 		Exception.assert(typeof keyContent == "string", "keyContent must be a string: {:j}", keyContent);
 		return new StorageDockerV2("https://" + service, {
-			authentication: async (fetch, scope) => {
-				return StorageDockerV2._authentication(fetch, service, scope, {
+			authentication: async function(scope) {
+				return await this.authenticationScope(service, scope, {
 					authentication: {
 						type: "basic",
 						username: "_json_key",
@@ -72,8 +77,8 @@ export default class StorageDockerV2 extends Base {
 		});
 	}
 
-	static async _authentication(fetch, service, scope, fetchOptions) {
-		return fetch.get(
+	async authenticationScope(service, scope, fetchOptions) {
+		return this.fetch.get(
 			"/v2/token",
 			Object.assign(
 				{

@@ -137,14 +137,13 @@ export default class Fetch {
 		});
 
 		if (result.code < 200 || result.code > 299) {
-			const dataCopy = String(result.data);
 			throw new FetchException(
 				result.code,
 				result.data,
 				"Request to '{}' responded with: {}: {}",
 				url,
 				result.code,
-				dataCopy
+				result.data
 			);
 		}
 
