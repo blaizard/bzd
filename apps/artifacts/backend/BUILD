@@ -14,6 +14,8 @@ bzd_nodejs_binary(
     main = "app.mjs",
     packages = {
         "commander": "",
+        "http": "",
+        "http-proxy": "",
     },
     visibility = [
         "//apps/artifacts:__pkg__",
@@ -21,7 +23,9 @@ bzd_nodejs_binary(
     deps = [
         "//apps/artifacts:api",
         "//nodejs/core:cache",
+        "//nodejs/core:exception",
         "//nodejs/core:filesystem",
+        "//nodejs/core:log",
         "//nodejs/core:web",
         "//nodejs/core/api:server",
         "//nodejs/db:utils",
