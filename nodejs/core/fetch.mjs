@@ -71,17 +71,21 @@ export default class Fetch {
 		if ("authentication" in options) {
 			const auth = options.authentication;
 			switch (auth.type) {
+			// base64-encoded credentials - RFC 7617
 			case "basic":
 				{
+					// Big 'B' for Basic is important for at least Google GCR
 					const base64 = await base64Encode(auth.username + ":" + auth.password);
 					headers["Authorization"] = "Basic " + base64;
 				}
 				break;
+				// bearer tokens to access OAuth 2.0-protected resources - RFC 6750
 			case "bearer":
 				headers["Authorization"] = "Bearer " + auth.token;
 				break;
 			case "token":
-				headers["Authorization"] = "Token " + auth.token;
+				// Small 't' for token is important for at least Travis CI
+				headers["Authorization"] = "token " + auth.token;
 				break;
 			default:
 				Exception.unreachable("Unsupported authentication type '{}'", auth.type);

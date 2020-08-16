@@ -3,5 +3,5 @@ import Docker from "./docker/backend.mjs";
 
 export default {
 	fs: Fs,
-	dockerV2: Docker
+	docker: Docker
 };
