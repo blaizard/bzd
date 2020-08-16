@@ -6,7 +6,8 @@ import Url from "url";
 const Log = LogFactory("docker-v2-proxy");
 
 export default class DockerV2Proxy {
-	constructor(port, dockerStorage) {
+	constructor(service, port, dockerStorage) {
+		this.service = service;
 		this.port = port;
 		this.url = dockerStorage.url;
 		this.dockerStorage = dockerStorage;
@@ -18,7 +19,8 @@ export default class DockerV2Proxy {
 
 		this.proxy.on("proxyRes", (proxyRes /*, req, res*/) => {
 			if (proxyRes.statusCode == 401 && "www-authenticate" in proxyRes.headers) {
-				proxyRes.headers["www-authenticate"] = "Bearer realm=\"http://127.0.0.1:5050/v2/token\",service=\"127.0.0.1:5050\"";
+				proxyRes.headers["www-authenticate"] =
+					"Bearer realm=\"http://" + this.service + "/v2/token\",service=\"" + this.service + "\"";
 			}
 		});
 

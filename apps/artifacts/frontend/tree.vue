@@ -3,6 +3,9 @@
 		<template v-for="item in list">
 			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
 				{{ item.name }}
+				<span class="actions" @click.stop="">
+					<i v-if="depth == 0" class="bzd-icon-configuration" @click="handleAction('config', item)"></i>
+				</span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
 				<TreeDirectory :path="makePath(item)" :depth="depth + 1" class="indent"></TreeDirectory>
@@ -89,17 +92,27 @@
 				else {
 					this.$set(this.expanded, name, true);
 				}
+			},
+			handleAction(type, item) {
+				console.log(type, item);
 			}
 		}
 	};
 </script>
+
+<style lang="scss">
+	@use "bzd/icons.scss" as icons with (
+        $bzdIconNames: configuration
+    );
+</style>
 
 <style lang="scss" scoped>
 	@use "bzd-style/css/colors.scss" as colors;
 
 	$indent: 20;
 	$arrowSize: 5;
-	$lineHeight: 20;
+	$fontSize: 16;
+	$lineHeight: 24;
 	$arrowOffsetY: $lineHeight / 2;
 	$lineColor: colors.$bzdGraphColorGray;
 
@@ -117,6 +130,7 @@
 	}
 
 	.container {
+		font-size: #{$fontSize}px;
 		line-height: #{$lineHeight}px;
 
 		.error {
@@ -132,6 +146,15 @@
 		.entry {
 			position: relative;
 			padding-left: #{$arrowSize * 2}px;
+			white-space: nowrap;
+
+			.actions {
+				float: right;
+				opacity: 0.3;
+				&:hover {
+					opacity: 1;
+				}
+			}
 
 			&.child:after {
 				position: absolute;

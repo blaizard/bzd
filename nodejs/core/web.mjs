@@ -79,11 +79,24 @@ export default class Web {
 	}
 
 	/**
+	 * If any of the certificate file is set, assume SSL is to be used.
+	 */
+	_isSSL() {
+		return Boolean(this.config.key || this.config.cert || this.config.ca);
+	}
+
+	/**
 	 * Initialize the web module
 	 */
 	async _initialize(port) {
 		this.app = Express();
-		this.app.use(Helmet());
+
+		this.app.use(
+			Helmet({
+				// Only use Strict-Transport-Security if SSL is enabled
+				hsts: this._isSSL()
+			})
+		);
 
 		// Error handler
 		this.app.use(middlewareErrorHandler);
@@ -132,12 +145,10 @@ export default class Web {
 	async start() {
 		await this.event.waitUntil("ready");
 
-		// If any of the certificate file is set, assume SSL is to be used
-		const useSSL = this.config.key || this.config.cert || this.config.ca;
 		let configStrList = [];
 
 		// Create the server
-		if (useSSL) {
+		if (this._isSSL()) {
 			let options = {};
 			if (this.config.key) {
 				options.key = await FileSystem.readFile(this.config.key);

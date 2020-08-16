@@ -14,14 +14,13 @@ bzd_nodejs_binary(
     main = "app.mjs",
     packages = {
         "commander": "",
-        "http": "",
-        "http-proxy": "",
     },
     visibility = [
         "//apps/artifacts:__pkg__",
     ],
     deps = [
         "//apps/artifacts:api",
+        "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
@@ -30,7 +29,5 @@ bzd_nodejs_binary(
         "//nodejs/core/api:server",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
-        "//nodejs/db/storage:disk",
-        "//nodejs/db/storage:docker_v2",
     ],
 )
