@@ -6,10 +6,10 @@
 		<template #content>
 			<div class="layout">
 				<div class="tree">
-					<RouterComponent ref="view" class="bzd-content"></RouterComponent>
+					<Tree @config="handleConfig"></Tree>
 				</div>
 				<div class="content">
-					<Config name=""></Config>
+					<RouterComponent ref="view" class="bzd-content"></RouterComponent>
 				</div>
 			</div>
 		</template>
@@ -19,13 +19,13 @@
 <script>
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Layout from "bzd/vue/components/layout/layout.vue";
-	import Config from "./config.vue";
+	import Tree from "./tree.vue";
 	import Plugins from "../plugins/frontend.mjs";
 
 	export default {
 		components: {
 			Layout,
-			Config
+			Tree
 		},
 		directives: {
 			tooltip: DirectiveTooltip
@@ -36,9 +36,16 @@
 		mounted() {
 			this.$routerSet({
 				ref: "view",
-				routes: [{ path: "/", component: () => import("./tree.vue") }]
+				routes: [{ path: "/config", component: () => import("./config.vue") }]
 			});
 			console.log(Plugins);
+		},
+		methods: {
+			handleConfig(volume) {
+				this.$routerDispatch("/config", {
+					volume: volume
+				});
+			}
 		}
 	};
 </script>
@@ -68,6 +75,7 @@
 		.tree {
 			width: 400px;
 			margin-right: 15px;
+			padding: 10px;
 		}
 		.content {
 			flex: 1;

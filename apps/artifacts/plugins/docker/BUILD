@@ -13,7 +13,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__pkg__",
     ],
     deps = [
-        "//nodejs/core:log",
+        "//nodejs/core:exception",
         "//nodejs/db/storage:docker_v2",
     ],
 )
