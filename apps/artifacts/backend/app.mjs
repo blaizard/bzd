@@ -9,11 +9,10 @@ import Web from "bzd/core/web.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
-import StorageDisk from "bzd/db/storage/disk.mjs";
-import StorageDockerV2 from "bzd/db/storage/docker_v2.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
-import DockerV2Proxy from "./docker_v2_proxy.mjs";
+
+import Plugins from "../plugins/backend.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -49,54 +48,44 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Test data
 	await keyValueStore.set("volumes", "disk", {
-		type: "disk",
-		path: "/"
+		type: "fs",
+		"fs.root": "/"
 	});
-	/*
-	 *await keyValueStore.set("volumes", "docker", {
-	 *type: "docker-v2",
-	 *host: "https://index.docker.io",
-	 *});
-	 */
+	await keyValueStore.set("volumes", "docker.blaizard.com", {
+		type: "docker-v2",
+		host: "https://docker.blaizard.com"
+	});
 	await keyValueStore.set("volumes", "docker.gcr", {
 		type: "docker-gcr",
-		key: await Filesystem.readFile("/home/blaise/Downloads/blaizard-451e23f9c667.json"),
+		key: await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
 		service: "gcr.io"
 	});
 
-	// Set the cache
+	// Load all plugns
+	Log.info("Using plugins: {}", Object.keys(Plugins).join(", "));
 
+	// Set the cache
 	let cache = new Cache();
 
 	/**
 	 * Retrieve the storage implementation associated with this volume
 	 */
 	cache.register("volume", async (volume) => {
-		const volumeInfo = await keyValueStore.get("volumes", volume, null);
-		Exception.assert(volumeInfo !== null, "No volume are associated with this id: '{}'", volume);
-		let storage = null;
-		switch (volumeInfo.type) {
-		case "disk":
-			storage = new StorageDisk(volumeInfo.path);
-			break;
-		case "docker-v2":
-			storage = new StorageDockerV2(volumeInfo.host);
-			break;
-		case "docker-gcr":
-			storage = StorageDockerV2.makeFromGcr(volumeInfo.key, volumeInfo.service);
-			break;
-		default:
-			Exception.unreachable("Volume type unsupported: '{}'", volumeInfo.type);
-		}
+		const params = await keyValueStore.get("volumes", volume, null);
+		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
+		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
+		Exception.assert(params.type in Plugins, "Volume type unsupported: '{}'", params.type);
+		Exception.assert("storage" in Plugins[params.type], "Storage not supported by plugin '{}'", params.type);
+		const storage = Plugins[params.type].storage(params);
 		await storage.waitReady();
 		return storage;
 	});
 
 	// Start the proxy
-
-	const proxy = new DockerV2Proxy(5050, await cache.get("volume", "docker.gcr"));
-	await proxy.start();
-
+	/*
+	 *const proxy = new DockerV2Proxy("127.0.0.1:5050", 5050, await cache.get("volume", "docker.gcr"));
+	 *await proxy.start();
+	 */
 	// Install the APIs
 
 	let api = new API(APIv1, {

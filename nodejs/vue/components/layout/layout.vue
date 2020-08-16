@@ -70,6 +70,9 @@
 		directives: {
 			tooltip: DirectiveTooltip
 		},
+		props: {
+			fullPage: { required: false, default: false, type: Boolean }
+		},
 		data: function() {
 			return {
 				isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
@@ -84,7 +87,8 @@
 				return {
 					"bzd-layout": true,
 					"bzd-mobile": this.isMobile,
-					"bzd-dock": this.isDock && !this.isMobile && this.isMenu
+					"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
+					"bzd-full-page": this.fullPage
 				};
 			},
 			isMenu() {
@@ -402,6 +406,16 @@
 					.bzd-layout-menu-content-dock {
 						display: none;
 					}
+				}
+			}
+		}
+
+		&.bzd-full-page {
+			.bzd-layout-content-wrapper {
+				height: calc(100vh - #{$headerHeight});
+				.bzd-layout-content {
+					width: 100%;
+					height: 100%;
 				}
 			}
 		}

@@ -16,6 +16,8 @@ bzd_nodejs_web(
     ],
     deps = [
         "//apps/artifacts:api",
+        "//apps/artifacts/plugins:frontend",
+        "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/styles/default",
         "//nodejs/vue:api",
