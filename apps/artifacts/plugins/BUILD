@@ -2,7 +2,7 @@ load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 _PLUGINS = [
     "fs",
-    "docker_v2",
+    "docker",
 ]
 
 bzd_nodejs_library(

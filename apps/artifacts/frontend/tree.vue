@@ -4,7 +4,7 @@
 			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
 				{{ item.name }}
 				<span class="actions" @click.stop="">
-					<i v-if="depth == 0" class="bzd-icon-configuration" @click="handleAction('config', item)"></i>
+					<i v-if="depth == 0" class="bzd-icon-configuration" @click="handleConfig(item.name)"></i>
 				</span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
@@ -93,8 +93,8 @@
 					this.$set(this.expanded, name, true);
 				}
 			},
-			handleAction(type, item) {
-				console.log(type, item);
+			handleConfig(name) {
+				this.$emit("config", name);
 			}
 		}
 	};

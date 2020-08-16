@@ -94,7 +94,9 @@ export default class Web {
 		this.app.use(
 			Helmet({
 				// Only use Strict-Transport-Security if SSL is enabled
-				hsts: this._isSSL()
+				hsts: this._isSSL(),
+				// and Content-Security-Policy
+				contentSecurityPolicy: this._isSSL()
 			})
 		);
 

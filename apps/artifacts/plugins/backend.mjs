@@ -1,7 +1,7 @@
 import Fs from "./fs/backend.mjs";
-import DockerV2 from "./docker_v2/backend.mjs";
+import Docker from "./docker/backend.mjs";
 
 export default {
 	fs: Fs,
-	dockerV2: DockerV2
+	dockerV2: Docker
 };
