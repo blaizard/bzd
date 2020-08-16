@@ -56,9 +56,10 @@ Commander.version("1.0.0", "-v, --version")
 		host: "https://docker.blaizard.com"
 	});
 	await keyValueStore.set("volumes", "docker.gcr", {
-		type: "docker-gcr",
-		key: await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
-		service: "gcr.io"
+		type: "docker",
+		"docker.type": "gcr",
+		"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
+		"docker.service": "gcr.io"
 	});
 
 	// Load all plugns
@@ -101,6 +102,10 @@ Commander.version("1.0.0", "-v, --version")
 		);
 		return { volume: pathList[0], pathList: pathList.slice(1) };
 	}
+
+	api.handle("get", "/config", async (inputs) => {
+		return await keyValueStore.get("volumes", inputs.volume, {});
+	});
 
 	api.handle("post", "/list", async (inputs) => {
 		// eslint-disable-next-line

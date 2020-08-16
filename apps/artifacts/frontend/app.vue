@@ -20,7 +20,6 @@
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Layout from "bzd/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
-	import Plugins from "../plugins/frontend.mjs";
 
 	export default {
 		components: {
@@ -36,15 +35,12 @@
 		mounted() {
 			this.$routerSet({
 				ref: "view",
-				routes: [{ path: "/config", component: () => import("./config.vue") }]
+				routes: [{ path: "/config/{volume}", component: () => import("./config.vue") }]
 			});
-			console.log(Plugins);
 		},
 		methods: {
 			handleConfig(volume) {
-				this.$routerDispatch("/config", {
-					volume: volume
-				});
+				this.$routerDispatch("/config/" + volume);
 			}
 		}
 	};

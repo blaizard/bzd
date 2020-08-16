@@ -1,10 +1,12 @@
 import Vue from "vue";
 import Router from "bzd/vue/router/router.mjs";
 import API from "bzd/vue/api.mjs";
+import AsyncComputed from "vue-async-computed";
 
 import App from "./app.vue";
 import APIv1 from "../api.v1.json";
 
+Vue.use(AsyncComputed);
 Vue.use(Router, {
 	hash: false
 });

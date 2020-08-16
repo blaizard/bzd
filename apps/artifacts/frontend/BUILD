@@ -11,6 +11,9 @@ bzd_nodejs_web(
     entries = {
         "app.mjs": "index",
     },
+    packages = {
+        "vue-async-computed": "",
+    },
     visibility = [
         "//apps/artifacts:__pkg__",
     ],
@@ -21,6 +24,7 @@ bzd_nodejs_web(
         "//nodejs:vue",
         "//nodejs/styles/default",
         "//nodejs/vue:api",
+        "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",
