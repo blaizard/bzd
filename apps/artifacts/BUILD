@@ -41,3 +41,15 @@ container_image(
         ":package",
     ],
 )
+
+container_push(
+    name = "push",
+    format = "Docker",
+    image = ":artifacts",
+    registry = "docker.blaizard.com",
+    repository = "apps/artifacts",
+    tag = "latest",
+    tags = [
+        "docker",
+    ],
+)
