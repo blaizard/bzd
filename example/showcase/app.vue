@@ -9,6 +9,7 @@
 			</MenuEntry>
 			<MenuEntry text="Form" link="/form">
 				<MenuEntry text="Standalone" link="/form/standalone"></MenuEntry>
+				<MenuEntry text="Condition" link="/form/condition"></MenuEntry>
 				<MenuEntry text="Input" link="/form/input"></MenuEntry>
 				<MenuEntry text="Password" link="/form/password"></MenuEntry>
 				<MenuEntry text="Dropdown" link="/form/dropdown"></MenuEntry>
@@ -44,6 +45,7 @@
 					{ path: "/graph/plot", component: () => import("./graph_plot.vue") },
 					{ path: "/form", component: () => import("./form/form.vue") },
 					{ path: "/form/standalone", component: () => import("./form/standalone.vue") },
+					{ path: "/form/condition", component: () => import("./form/condition.vue") },
 					{ path: "/form/input", component: () => import("./form/input.vue") },
 					{ path: "/form/password", component: () => import("./form/password.vue") },
 					{ path: "/form/dropdown", component: () => import("./form/dropdown.vue") },

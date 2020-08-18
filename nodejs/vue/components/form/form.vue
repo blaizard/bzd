@@ -2,7 +2,7 @@
 	<component class="irform" :is="tag">
 		<template v-for="(current, index) in description">
 			<component
-				v-if="isConditionSatisfied(current)"
+				v-if="isConditionSatisfied(index)"
 				:key="index"
 				:is="template"
 				:caption="current.caption"
@@ -26,7 +26,7 @@
 				</template>
 			</component>
 
-			<div v-if="isLineBreakNeeded(current, index)" class="irform-linebreak"></div>
+			<div v-if="isLineBreakNeeded(current, index)" :key="index + '-break'" class="irform-linebreak"></div>
 		</template>
 		<!--Value: {{ returnedValue }}//-->
 	</component>
@@ -127,6 +127,14 @@
 			},
 			indexToName() {
 				return this.description.map((description, index) => this.getName(description, index));
+			},
+			conditions() {
+				return this.description.map((current) => {
+					if (typeof current.condition === "object") {
+						return new Validation(current.condition);
+					}
+					return current.condition;
+				});
 			}
 		},
 		watch: {
@@ -214,11 +222,18 @@
 			getDisable(description) {
 				return "disable" in description ? Boolean(description.disable) : this.disable;
 			},
-			isConditionSatisfied(description) {
-				if (typeof description.condition === "function") {
-					return description.condition(this.currentValue);
+			isConditionSatisfied(index) {
+				const condition = this.conditions[index];
+				if (typeof condition === "function") {
+					return condition(this.currentValue);
 				}
-				return typeof description.condition === "undefined" ? true : description.condition;
+				else if (condition instanceof Validation) {
+					const result = condition.validate(this.currentValue, {
+						output: "return"
+					});
+					return Object.keys(result).length == 0;
+				}
+				return typeof condition === "undefined" ? true : condition;
 			}
 		}
 	};
