@@ -45,12 +45,12 @@ Commander.version("1.0.0", "-v, --version")
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	// Test data
-	/*
-	 *await keyValueStore.set("volume", "disk", {
-	 *	type: "fs",
-	 *	"fs.root": "/"
-	 *});
-	 *await keyValueStore.set("volume", "docker.blaizard.com", {
+	
+	await keyValueStore.set("volume", "disk", {
+		type: "fs",
+		"fs.root": "/"
+	});
+	 /*await keyValueStore.set("volume", "docker.blaizard.com", {
 	 *	type: "docker",
 	 *	"docker.type": "v2",
 	 *	"docker.url": "https://docker.blaizard.com"
