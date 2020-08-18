@@ -4,11 +4,18 @@ import ExceptionFactory from "./exception.mjs";
 const Exception = ExceptionFactory("validation");
 
 class Constraint {
-	constructor(schema, key, name, arg) {
+	constructor(schema, key, name, args) {
 		this.name = name;
-		this.arg = arg;
+		this.args = args;
 		this.schema = schema;
 		this.key = key;
+
+		Exception.assert(
+			this.isValidNbArgs(this.args.length),
+			"Wrong number of arguments passed to '{}': {}",
+			this.name,
+			this.args.length
+		);
 
 		this.create();
 	}
@@ -21,6 +28,10 @@ class Constraint {
 
 	install() {
 		return (/*result, value*/) => {};
+	}
+
+	isValidNbArgs(/*n*/) {
+		return true;
 	}
 
 	static getAndAssertInteger(arg, result = [], key = null) {
@@ -66,7 +77,7 @@ class Constraint {
  * {
  *     email: "mandatory email",
  *     password: "mandatory min(6)",
- *     confirm: "mandatory equal(password)",
+ *     confirm: "mandatory same(password)",
  *     stayConnnected: "type(bool)"
  * }
  *
@@ -107,8 +118,8 @@ export default class Validation {
 					.forEach((constraint) => {
 						const m = constraint.match(patternConstraint);
 						const name = m[1];
-						const arg = m[2];
-						this._processConstraint(processedSchema, key, name, arg);
+						const args = (m[2] || "").split(",").filter((arg) => arg !== "");
+						this._processConstraint(processedSchema, key, name, args);
 					});
 			}
 			else {
@@ -144,7 +155,7 @@ export default class Validation {
 				 */
 				output: "throw",
 				/**
-				 * Callback decifing whether or not a valid is conisdered as existent
+				 * Callback deciding whether or not a valid is conisdered as existent
 				 */
 				valueExists: (key, value) => {
 					return value !== undefined;
@@ -218,34 +229,50 @@ export default class Validation {
 		return name in this.schema ? this.schema[name].mandatory : false;
 	}
 
-	_processConstraint(schema, key, name, arg) {
+	_processConstraint(schema, key, name, args) {
 		const singleValue = this.singleValue;
 		const availableConstraints = {
 			mandatory: class Mandatory extends Constraint {
+				isValidNbArgs(n) {
+					return n == 0;
+				}
 				create() {
 					this.entry.mandatory = true;
 				}
 			},
+			values: class Values extends Constraint {
+				isValidNbArgs(n) {
+					return n > 0;
+				}
+				install() {
+					return (result, value) => {
+						this.assert(result, this.args.includes(value), "must be equal to one of {:j}", this.args);
+					};
+				}
+			},
 			min: class Min extends Constraint {
+				isValidNbArgs(n) {
+					return n == 1;
+				}
 				install() {
 					switch (this.entry.type) {
 					case "string":
 					case "integer":
-						this.arg = Constraint.getAndAssertInteger(this.arg);
+						this.args[0] = Constraint.getAndAssertInteger(this.args[0]);
 						break;
 					case "float":
-						this.arg = Constraint.getAndAssertFloat(this.arg);
+						this.args[0] = Constraint.getAndAssertFloat(this.args[0]);
 					}
 
 					switch (this.entry.type) {
 					case "string":
 						return (result, value) => {
-							this.assert(result, value.length >= this.arg, "at least {} characters", this.arg);
+							this.assert(result, value.length >= this.args[0], "at least {} characters", this.args[0]);
 						};
 					case "integer":
 					case "float":
 						return (result, value) => {
-							this.assert(result, value >= this.arg, "greater or equal to {}", this.arg);
+							this.assert(result, value >= this.args[0], "greater or equal to {}", this.args[0]);
 						};
 					default:
 						Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
@@ -253,6 +280,9 @@ export default class Validation {
 				}
 			},
 			email: class Email extends Constraint {
+				isValidNbArgs(n) {
+					return n == 0;
+				}
 				install() {
 					Exception.assert(this.entry.type == "string", "Email is only compatible with string type");
 					return (result, value) => {
@@ -261,27 +291,37 @@ export default class Validation {
 				}
 			},
 			type: class Type extends Constraint {
+				isValidNbArgs(n) {
+					return n == 1;
+				}
 				create() {
-					Exception.assert(["string", "integer", "float"].includes(this.arg), "'{}' is not a supported type", this.arg);
-					this.entry.type = this.arg;
+					Exception.assert(
+						["string", "integer", "float"].includes(this.args[0]),
+						"'{}' is not a supported type",
+						this.args[0]
+					);
+					this.entry.type = this.args[0];
 				}
 			},
 			same: class Same extends Constraint {
+				isValidNbArgs(n) {
+					return n == 1;
+				}
 				install() {
 					if (!singleValue) {
-						Exception.assert(this.arg in this.schema, "Key '{}' is not set", this.arg);
+						Exception.assert(this.args[0] in this.schema, "Key '{}' is not set", this.args[0]);
 					}
 					return (result, value, values) => {
 						if (singleValue) {
 							return;
 						}
-						this.assert(result, value === values[this.arg], "different from {}", this.arg);
+						this.assert(result, value === values[this.args[0]], "different from {}", this.args[0]);
 					};
 				}
 			}
 		};
 
 		Exception.assert(name in availableConstraints, "Unknown validation function '{}'", name);
-		schema[key].constraints.push(new availableConstraints[name](schema, key, name, arg));
+		schema[key].constraints.push(new availableConstraints[name](schema, key, name, args));
 	}
 }
