@@ -98,7 +98,7 @@ pipeline
 			{
 				sh "./tools/bazel run apps/dashboard:push"
 				sh "./tools/bazel run apps/family:push"
-				sh "./tools/bazel run apps/family:artifacts"
+				sh "./tools/bazel run apps/artifacts:push"
 			}
 		}
 	}
