@@ -29,13 +29,12 @@ export default class TimeseriesDisk extends Timeseries {
 		this.cache = null;
 
 		Log.info("Using disk timeseries DB at '{}'.", this.path);
-		this._initialize();
 	}
 
 	/**
 	 * Initialize the timeseries module
 	 */
-	async _initializeImpl() {
+	async _initialize() {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
@@ -69,8 +68,7 @@ export default class TimeseriesDisk extends Timeseries {
 					}*/
 				};
 
-				let persistence = new PersistenceTimeseries(Path.join(this.path, bucket), options);
-				await persistence.waitReady();
+				let persistence = await PersistenceTimeseries.make(Path.join(this.path, bucket), options);
 				return persistence;
 			});
 		}

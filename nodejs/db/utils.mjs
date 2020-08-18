@@ -1,5 +1,3 @@
-import Event from "../core/event.mjs";
-
 export class CollectionPaging {
 	constructor(data, nextPaging = null) {
 		this._data = data;
@@ -49,46 +47,30 @@ export class CollectionPaging {
 			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
 		);
 	}
+
+	static async *makeIterator(generator, maxOrPaging) {
+		do {
+			const results = await generator(maxOrPaging);
+			const data = results.data();
+			for (const name in data) {
+				yield [name, data[name]];
+			}
+			maxOrPaging = results.getNextPaging();
+		} while (maxOrPaging !== null);
+	}
 }
 
 export class AsyncInitialize {
-	constructor() {
-		this.event = new Event({
-			ready: { proactive: true },
-			error: { proactive: true }
-		});
+	static async make(...args) {
+		const instance = new this(...args);
+		await instance._initialize();
+		return instance;
 	}
 
 	/**
-	 * Initialize
+	 * Initialize (optional)
 	 */
 	async _initialize() {
-		try {
-			await this._initializeImpl();
-			this.event.trigger("ready");
-		}
-		catch (e) {
-			this.event.trigger("error", e);
-			throw e;
-		}
-	}
-
-	/**
-	 * Initialization function (optional)
-	 */
-	async _initializeImpl() {}
-
-	/**
-	 * This function waits until the module is ready
-	 */
-	async waitReady() {
-		return await this.event.waitUntil("ready");
-	}
-
-	/**
-	 * Check if ready
-	 */
-	isReady() {
-		return this.event.is("ready");
+		await this._initializeImpl();
 	}
 }

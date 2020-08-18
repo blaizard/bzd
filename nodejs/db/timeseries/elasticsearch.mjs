@@ -38,10 +38,9 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			"authentication" in fetchOptions ? "on" : "off"
 		);
 		this.fetch = new FetchFactory(host, fetchOptions);
-		this._initialize();
 	}
 
-	async _initializeImpl() {
+	async _initialize() {
 		const result = await this.fetch.request("/", {
 			method: "get"
 		});

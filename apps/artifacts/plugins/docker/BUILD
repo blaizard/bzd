@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",
+        "docker_v2_proxy.mjs",
     ],
     packages = {
         "http": "",

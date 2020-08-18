@@ -39,8 +39,7 @@ Commander.version("1.0.0", "-v, --version")
 	let web = new Web(PORT);
 	web.addStaticRoute("/", PATH_STATIC, "index.html");
 
-	let keyValueStore = new KeyValueStoreDisk(Path.join(PATH_DATA, "db"));
-	await keyValueStore.waitReady();
+	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	let cache = new Cache();
 

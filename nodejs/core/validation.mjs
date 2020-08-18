@@ -163,7 +163,11 @@ export default class Validation {
 				/**
 				 * Ensure that all keys of values are present in the schema.
 				 */
-				all: false
+				all: false,
+				/**
+				 * This forces all values to be considered as mandatory.
+				 */
+				allMandatory: false
 			},
 			options
 		);
@@ -175,7 +179,8 @@ export default class Validation {
 				Constraint.assert(
 					result,
 					key,
-					!this.schema[key].mandatory || (key in values && options.valueExists(key, values[key])),
+					!(this.schema[key].mandatory || options.allMandatory) ||
+						(key in values && options.valueExists(key, values[key])),
 					"mandatory"
 				)
 			) {

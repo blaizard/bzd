@@ -115,7 +115,7 @@
 				let validation = {};
 				for (const index in this.description) {
 					const current = this.description[index];
-					if ("validation" in current) {
+					if ("validation" in current && this.isConditionSatisfied(index)) {
 						const name = this.indexToName[index];
 						validation[name] = current.validation;
 					}
@@ -179,6 +179,14 @@
 				if (!this.isError) {
 					this.$emit("submit", this.returnedValue);
 				}
+				else {
+					console.error(
+						"Validation error(s); " +
+							Object.keys(result)
+								.map((name) => name + ": " + result[name])
+								.join(", ")
+					);
+				}
 			},
 			handleActive(index, data) {
 				this.active = typeof data === "object" && "id" in data ? index : -1;
@@ -229,7 +237,8 @@
 				}
 				else if (condition instanceof Validation) {
 					const result = condition.validate(this.currentValue, {
-						output: "return"
+						output: "return",
+						allMandatory: true
 					});
 					return Object.keys(result).length == 0;
 				}
