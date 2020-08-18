@@ -17,9 +17,9 @@ export default {
 	cache: [
 		{
 			collection: "travisci.builds",
-			fetch: async (repositorySlug, token) => {
+			fetch: async (endpoint, repositorySlug, token) => {
 				// Build the URL
-				const url = "https://api.travis-ci.com/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
+				const url = endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
 				let options = {
 					expect: "json",
 					headers: {
@@ -48,7 +48,12 @@ export default {
 		}
 	],
 	fetch: async (data, cache) => {
-		const builds = await cache.get("travisci.builds", data["travisci.repository"], data["travisci.token"]);
+		const builds = await cache.get(
+			"travisci.builds",
+			data["travisci.endpoint"],
+			data["travisci.repository"],
+			data["travisci.token"]
+		);
 		return {
 			builds: builds
 		};

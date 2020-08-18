@@ -5,9 +5,17 @@ export default {
 		visualization: ["continuous-integration"],
 		form: [
 			{
+				type: "Dropdown",
+				name: "travisci.endpoint",
+				caption: "Endpoint",
+				validation: "mandatory",
+				list: ["https://api.travis-ci.org", "https://api.travis-ci.com"]
+			},
+			{
 				type: "Input",
 				name: "travisci.repository",
 				caption: "Repository",
+				validation: "mandatory",
 				placeholder: "For example, blaizard/cpp-async",
 				width: 0.5
 			},
