@@ -12,6 +12,7 @@ export default class DockerV2Proxy {
 		this.url = dockerStorage.url;
 		this.dockerStorage = dockerStorage;
 		this.proxy = null;
+		this.server = null;
 	}
 
 	async start() {
@@ -24,7 +25,7 @@ export default class DockerV2Proxy {
 			}
 		});
 
-		let server = Http.createServer(async (req, res) => {
+		this.server = Http.createServer(async (req, res) => {
 			if (req.url.startsWith("/v2/token")) {
 				const queryObject = Url.parse(req.url, true).query;
 				const auth = await this.dockerStorage.options.authentication.call(this.dockerStorage, queryObject.scope);
@@ -39,11 +40,20 @@ export default class DockerV2Proxy {
 			}
 		});
 
-		Log.info("Docker proxy deployed at port {}", this.port);
-		server.listen(this.port);
+		Log.info("Docker proxy '{}' deployed at port {}", this.service, this.port);
+		this.server.listen(this.port);
 	}
 
-	async close() {
+	_closeServer() {
+		return new Promise((resolve) => {
+			this.server.close(() => {
+				resolve();
+			});
+		});
+	}
+
+	async stop() {
 		this.proxy.close();
+		await this._closeServer();
 	}
 }

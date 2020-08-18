@@ -27,10 +27,9 @@ export default class StorageGoogleCloudStorage extends Base {
 		this.bucket = this.storage.bucket(this.bucketName);
 
 		Log.info("Using Google cloud storage DB with bucket '{}' and prefix '{}'.", bucketName, this.options.prefix);
-		this._initialize();
 	}
 
-	async _initializeImpl() {
+	async _initialize() {
 		const result = await this.bucket.exists();
 		if (!result[0]) {
 			await this.storage.createBucket(this.bucketName);

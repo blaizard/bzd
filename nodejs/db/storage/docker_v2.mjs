@@ -59,12 +59,11 @@ export default class StorageDockerV2 extends Base {
 		});
 
 		Log.info("Using Docker v2 at '{}'.", this.url);
-		this._initialize();
 	}
 
-	static makeFromGcr(keyContent, service = "gcr.io") {
+	static async makeFromGcr(keyContent, service = "gcr.io") {
 		Exception.assert(typeof keyContent == "string", "keyContent must be a string: {:j}", keyContent);
-		return new StorageDockerV2("https://" + service, {
+		return await StorageDockerV2.make("https://" + service, {
 			authentication: async function(scope) {
 				return await this.authenticationScope(service, scope, {
 					authentication: {
@@ -92,7 +91,7 @@ export default class StorageDockerV2 extends Base {
 		);
 	}
 
-	async _initializeImpl() {
+	async _initialize() {
 		await this.fetch.request("/v2/", {
 			args: "registry:catalog:*",
 			method: "get"

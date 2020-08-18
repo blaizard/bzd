@@ -42,7 +42,7 @@ export default class PersistenceTimeSeries {
 			},
 			options
 		);
-
+		this.path = path;
 		this.event = new Event({
 			ready: { proactive: true }
 		});
@@ -68,24 +68,27 @@ export default class PersistenceTimeSeries {
 			unique: this.options.unique,
 			uniqueMerge: this.options.uniqueMerge
 		});
+	}
 
-		this.initialize(path);
+	static async make(...args) {
+		const instance = new this(...args);
+		await instance._initialize();
+		return instance;
 	}
 
 	/**
 	 * Initialize the persistence
 	 */
-	async initialize(path) {
+	async _initialize() {
 		// Load the index
-		this.persistenceIndex = new PersistenceDisk(path, this.optionsIndex);
-		await this.persistenceIndex.waitReady();
+		this.persistenceIndex = await PersistenceDisk.make(this.path, this.optionsIndex);
 		/*
 		 * Quick check to see if the index need to be rebuilt
 		 * There seems to be an issue if it is not rebuilt (test fails sporadically)
 		 */
 		if ((await this.persistenceIndex.get()).version != VERSION) {
 			await this.rebuildIndex();
-			Log.info("Successfully rebuilt index of timeseries {}", path);
+			Log.info("Successfully rebuilt index of timeseries {}", this.path);
 		}
 		this.event.trigger("ready");
 	}
@@ -224,8 +227,7 @@ export default class PersistenceTimeSeries {
 				let persistence = null;
 				try {
 					// Open the persistence
-					persistence = new PersistenceDisk(fullPath, this.optionsDataReadOnly);
-					await persistence.waitReady();
+					persistence = await PersistenceDisk.make(fullPath, this.optionsDataReadOnly);
 					// Read some metadata
 					await this.timeSeriesData.wrap((await persistence.get()).list, (timeSeriesData) => {
 						Exception.assert(timeSeriesData.consistencyCheck(), "Data file '" + fullPath + "' is not consistent");
@@ -348,8 +350,7 @@ export default class PersistenceTimeSeries {
 
 			await FileSystem.mkdir(this.options.dataDir);
 			const fullPath = Path.join(this.options.dataDir, metadata.path);
-			let persistence = new PersistenceDisk(fullPath, this.optionsData);
-			await persistence.waitReady();
+			let persistence = await PersistenceDisk.make(fullPath, this.optionsData);
 
 			this.persistenceCache[metadata.path] = persistence;
 		}

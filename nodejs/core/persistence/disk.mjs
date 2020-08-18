@@ -26,10 +26,6 @@ export default class PersistenceDisk {
 				 */
 				initialNotPersisted: {},
 				/**
-				 * If initialize should be bypassed, set this flag to false.
-				 */
-				initialize: true,
-				/**
 				 * Read the data from a file and returns it.
 				 */
 				read: async (content) => {
@@ -95,11 +91,12 @@ export default class PersistenceDisk {
 
 		// The persistence needs to be initialized
 		this.isInitialized = false;
+	}
 
-		// Initialize the persistence
-		if (this.options.initialize) {
-			this.initialize(/*ignoreErrors*/ false);
-		}
+	static async make(...args) {
+		const instance = new this(...args);
+		await instance._initialize();
+		return instance;
 	}
 
 	/**
@@ -112,7 +109,7 @@ export default class PersistenceDisk {
 	/**
 	 * \brief Initialize the data by reading the content.
 	 */
-	async initialize(ignoreErrors) {
+	async _initialize(ignoreErrors) {
 		/*
 		 * Lock the mutex to make sure no data is accessed while
 		 * initializing both the deltas and the datas.

@@ -32,8 +32,7 @@ describe("PersistenceTimeSeries", () => {
 		it("increasing timestamp", async () => {
 			await environmentCleanup();
 
-			let timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
-			await timeseries.waitReady();
+			let timeseries = await PersistenceTimeSeries.make(persistenceOptions.path, persistenceOptions);
 
 			// Build a list of random points to be added
 			let sampleList = [];
@@ -82,8 +81,7 @@ describe("PersistenceTimeSeries", () => {
 		it("random timestamp", async () => {
 			await environmentCleanup();
 
-			let timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
-			await timeseries.waitReady();
+			let timeseries = await PersistenceTimeSeries.make(persistenceOptions.path, persistenceOptions);
 
 			// Build a list of random points to be added
 			let sampleList = [];
@@ -101,8 +99,7 @@ describe("PersistenceTimeSeries", () => {
 				// Randomly close and re-open the persistence
 				if (Math.floor(Math.random() * 10) == 0) {
 					await timeseries.close();
-					timeseries = new PersistenceTimeSeries(persistenceOptions.path, persistenceOptions);
-					await timeseries.waitReady();
+					timeseries = await PersistenceTimeSeries.make(persistenceOptions.path, persistenceOptions);
 				}
 			}
 

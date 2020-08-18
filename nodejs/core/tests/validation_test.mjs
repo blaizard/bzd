@@ -49,5 +49,35 @@ describe("Validation", () => {
 				});
 			});
 		});
+		it("wrong number of arguments", () => {
+			Exception.assertThrows(() => {
+				new Validation({
+					test: "type"
+				});
+			});
+			Exception.assertThrows(() => {
+				new Validation({
+					test: "type()"
+				});
+			});
+			Exception.assertThrows(() => {
+				new Validation({
+					test: "type(float,integer)"
+				});
+			});
+		});
+		it("values", () => {
+			const validator = new Validation({
+				test: "values(hello,world)"
+			});
+			validator.validate({
+				test: "world"
+			});
+			Exception.assertThrows(() => {
+				validator.validate({
+					test: "me"
+				});
+			});
+		});
 	});
 });

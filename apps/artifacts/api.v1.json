@@ -1,5 +1,14 @@
 {
     "/config": {
+        "delete": {
+            "documentation": "Delete a volume and its configuration.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "volume": "mandatory"
+                }
+            }
+        },
         "get": {
             "documentation": "Get the current configuration of a volume.",
             "request": {
@@ -10,6 +19,16 @@
             },
             "response": {
                 "type": "json"
+            }
+        },
+        "post": {
+            "documentation": "Set the configuration of a volume.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "config": "mandatory",
+                    "volume": "mandatory"
+                }
             }
         }
     },

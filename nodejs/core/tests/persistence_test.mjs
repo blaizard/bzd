@@ -14,7 +14,11 @@ const persistenceOptions = {
 	iterations: 1000
 };
 
-let persistence = new PersistenceDisk(persistenceOptions.path, persistenceOptions);
+let persistence = null;
+
+before(async () => {
+	persistence = await PersistenceDisk.make(persistenceOptions.path, persistenceOptions);
+});
 
 after(async () => {
 	await persistence.close();
@@ -160,8 +164,7 @@ describe("Persistence", function() {
 						commandQueue.push("restart");
 
 						persistence.close();
-						persistence = new PersistenceDisk(persistenceOptions.path, persistenceOptions);
-						await persistence.waitReady();
+						persistence = await PersistenceDisk.make(persistenceOptions.path, persistenceOptions);
 						await persistence.consistencyCheck();
 						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
 					}

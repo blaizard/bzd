@@ -46,6 +46,12 @@ export default class PersistenceMemory {
 		});
 	}
 
+	static async make(...args) {
+		const instance = new this(...args);
+		await instance._initialize();
+		return instance;
+	}
+
 	/**
 	 * \brief Register an event
 	 */
@@ -56,7 +62,7 @@ export default class PersistenceMemory {
 	/**
 	 * \brief Initialize the data by reading the content.
 	 */
-	async initialize() {
+	async _initialize() {
 		return this.reset();
 	}
 

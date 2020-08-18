@@ -4,10 +4,12 @@ import Fs from "fs";
 import Storage from "./storage.mjs";
 import FileSystem from "../../core/filesystem.mjs";
 import LogFactory from "../../core/log.mjs";
+import ExceptionFactory from "../../core/exception.mjs";
 import { copy as copyStream } from "../../core/stream.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
+const Exception = ExceptionFactory("db", "storage", "disk");
 /**
  * File storage module
  */
@@ -15,18 +17,28 @@ export default class StorageDisk extends Storage {
 	constructor(path, options) {
 		super();
 
-		this.options = Object.assign({}, options);
+		this.options = Object.assign(
+			{
+				/**
+				 * If false, it will attempt to create a directory if it does not exists.
+				 */
+				mustExists: false
+			},
+			options
+		);
 		this.path = path;
 
 		Log.info("Using disk storage DB at '{}'.", this.path);
-		this._initialize();
 	}
 
 	/**
 	 * Initialize the storage module
 	 */
-	async _initializeImpl() {
-		await FileSystem.mkdir(this.path);
+	async _initialize() {
+		if (!(await FileSystem.exists(this.path))) {
+			Exception.assert(!this.options.mustExists, "'{}' is not a valid path.", this.path);
+			await FileSystem.mkdir(this.path);
+		}
 	}
 
 	_getFullPath(pathList, name = undefined) {

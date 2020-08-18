@@ -34,13 +34,12 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 
 		// Initialize ansynchronously the rest of the data
 		Log.info("Using disk key value store DB at '{}'.", this.path);
-		this._initialize();
 	}
 
 	/**
 	 * Initialization of the class
 	 */
-	async _initializeImpl() {
+	async _initialize() {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
@@ -74,8 +73,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 					}
 				};
 
-				let persistence = new PersistenceDisk(Path.join(this.path, bucket), options);
-				await persistence.waitReady();
+				let persistence = await PersistenceDisk.make(Path.join(this.path, bucket), options);
 				// Preload the data in order to get accurate attribute size
 				await persistence.get();
 				return persistence;
