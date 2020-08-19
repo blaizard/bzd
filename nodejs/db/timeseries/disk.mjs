@@ -38,7 +38,6 @@ export default class TimeseriesDisk extends Timeseries {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
-		this.event.trigger("ready");
 	}
 
 	/**

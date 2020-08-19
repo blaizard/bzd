@@ -9,7 +9,7 @@ export default {
 				name: "travisci.endpoint",
 				caption: "Endpoint",
 				validation: "mandatory",
-				list: ["https://api.travis-ci.org", "https://api.travis-ci.com"]
+				list: ["travis-ci.org", "travis-ci.com"]
 			},
 			{
 				type: "Input",

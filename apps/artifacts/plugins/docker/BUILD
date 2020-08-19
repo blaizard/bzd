@@ -15,6 +15,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//nodejs/core:exception",
+        "//nodejs/core:log",
         "//nodejs/db/storage:docker_v2",
     ],
 )

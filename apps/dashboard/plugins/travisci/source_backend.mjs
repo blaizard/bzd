@@ -10,6 +10,9 @@ function _getStatus(item) {
 	if (item.state == "created" || item.state == "started") {
 		return "in-progress";
 	}
+	if (item.state == "canceled") {
+		return "abort";
+	}
 	return "unknown";
 }
 
@@ -19,7 +22,7 @@ export default {
 			collection: "travisci.builds",
 			fetch: async (endpoint, repositorySlug, token) => {
 				// Build the URL
-				const url = endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
+				const url = "https://api." + endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
 				let options = {
 					expect: "json",
 					headers: {
@@ -32,15 +35,14 @@ export default {
 				};
 
 				const result = await Fetch.get(url, options);
-
 				return (result.builds || []).map((item) => {
 					const status = _getStatus(item);
 					return {
 						// Duration is not correct as it includes accumulated duration from teh jobs eventhough they run in parallel
 						duration: Date.parse(item.finished_at) - Date.parse(item.started_at) || item.duration * 1000,
-						timestamp: Date.parse(item.started_at) || Date.now(),
+						timestamp: Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.now(),
 						status: status,
-						link: "https://travis-ci.com/" + repositorySlug + "/builds/" + item.id
+						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id
 					};
 				});
 			},
