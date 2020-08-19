@@ -32,11 +32,11 @@ export default {
 		{ type: "Checkbox", name: "docker.proxy", caption: "Proxy" },
 		{
 			type: "Input",
-			name: "docker.proxy.service",
-			caption: "Proxy Registry Service",
+			name: "docker.proxy.url",
+			caption: "Proxy Registry URL",
 			width: 0.5,
 			validation: "mandatory",
-			placeholder: "docker.blaizard.com:8000",
+			placeholder: "https://docker.blaizard.com",
 			condition: (v) => v["docker.proxy"]
 		},
 		{

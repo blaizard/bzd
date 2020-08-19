@@ -21,9 +21,8 @@ export default {
 				return params["docker.proxy"] == true;
 			},
 			async start(params, context) {
-				// const proxy = new DockerV2Proxy("127.0.0.1:5050", 5050, await context.getVolume());
-				const proxy = new DockerV2Proxy(
-					params["docker.proxy.service"],
+				const proxy = DockerV2Proxy.makeFromStorageDockerV2(
+					params["docker.proxy.url"],
 					params["docker.proxy.port"],
 					await context.getVolume()
 				);
