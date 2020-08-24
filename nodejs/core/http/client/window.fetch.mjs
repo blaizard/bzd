@@ -1,15 +1,30 @@
+import ExceptionFactory from "../../exception.mjs";
+
+const Exception = ExceptionFactory("http", "client", "window.fetch");
+
 export default async function request(url, options) {
 	// Add support for FormData
-	if (options.body instanceof FormData) {
+	if (options.data instanceof FormData) {
 		options.headers["Content-Type"] = "application/x-www-form-urlencoded";
-		options.body = JSON.stringify(options.body);
+		options.data = JSON.stringify(options.data);
 	}
 
-	const response = await window.fetch(url, {
+	const promiseFetch = window.fetch(url, {
 		method: options.method,
-		body: options.body,
+		data: options.data,
 		headers: options.headers
 	});
+
+	const promiseTimeout = new Promise((resolve) => {
+		setTimeout(resolve, options.timeoutMs, {
+			timeout: true
+		});
+	});
+
+	const response = await Promise.race([promiseFetch, promiseTimeout]);
+	if (response.timeout) {
+		throw new Exception("Request timeout (" + options.timeoutMs + " ms)");
+	}
 
 	return {
 		data: await response.text(),

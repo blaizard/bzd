@@ -100,18 +100,15 @@ export default class StorageDockerV2 extends Base {
 
 	async _listPagination(endpoint, maxOrPaging, scope, callback) {
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
-		const [result, headers] = await this.fetch.request(
-			endpoint,
-			{
-				args: scope,
-				method: "get",
-				query: {
-					n: paging.max,
-					last: paging.page === 0 ? undefined : paging.page
-				}
+		const [result, headers] = await this.fetch.request(endpoint, {
+			args: scope,
+			method: "get",
+			query: {
+				n: paging.max,
+				last: paging.page === 0 ? undefined : paging.page
 			},
-			/*includeAll*/ true
-		);
+			includeAll: true
+		});
 		const data = callback(result);
 		return new CollectionPaging(data, "link" in headers ? { page: data[data.length - 1].name, max: paging.max } : null);
 	}

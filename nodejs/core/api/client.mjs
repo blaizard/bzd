@@ -40,6 +40,14 @@ export default class APIClient extends Base {
 		const requestOptions = this.schema[endpoint][method].request || {};
 		const responseOptions = this.schema[endpoint][method].response || {};
 
+		// Enforce best practice
+		Exception.assert(
+			!(data && method == "get"),
+			"{}: Body cannot be set with method '{}', this is against recommendation in the HTTP/1.1 spec, section 4.3",
+			endpoint,
+			method
+		);
+
 		// Build the options
 		let fetchOptions = {
 			method: method
@@ -49,13 +57,6 @@ export default class APIClient extends Base {
 		}
 
 		if ("validation" in requestOptions) {
-			Exception.assert(
-				["json", "query"].includes(requestOptions.type),
-				"{} {}: validation is not available for {}.",
-				method,
-				endpoint,
-				requestOptions.type
-			);
 			const validation = new Validation(requestOptions.validation);
 			validation.validate(data, {
 				all: true
@@ -65,12 +66,14 @@ export default class APIClient extends Base {
 		switch (requestOptions.type) {
 		case "json":
 			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-			fetchOptions.data = data;
+			fetchOptions.json = data;
 			break;
 		case "query":
 			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
 			fetchOptions.query = data;
 			break;
+		default:
+			Exception.unreachable("{} {}: Unsupported resuest type '{}'", method, endpoint, requestOptions.type);
 		}
 
 		let retry;
