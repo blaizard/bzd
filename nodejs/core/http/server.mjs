@@ -14,10 +14,10 @@ import FileSystem from "./filesystem.mjs";
 import LogFactory from "./log.mjs";
 import ExceptionFactory from "./exception.mjs";
 
-const Log = LogFactory("web");
-const Exception = ExceptionFactory("web");
+const Log = LogFactory("http", "server");
+const Exception = ExceptionFactory("http", "server");
 
-export default class Web {
+export default class HttpServer {
 	constructor(port, config) {
 		this.config = Object.assign(
 			{

@@ -187,28 +187,3 @@ bzd_nodejs_library(
         "//nodejs:bzd",
     ],
 )
-
-bzd_nodejs_library(
-    name = "web",
-    srcs = glob([
-        "web.mjs",
-    ]),
-    packages = {
-        "express": "",
-        "express-minify": "",
-        "helmet": "",
-        "body-parser": "",
-        "http": "",
-        "compression": "",
-        "multer": "",
-        "cookie-parser": "",
-    },
-    visibility = ["//visibility:public"],
-    deps = [
-        ":event",
-        ":exception",
-        ":filesystem",
-        ":log",
-        "//nodejs:bzd",
-    ],
-)
