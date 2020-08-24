@@ -94,9 +94,8 @@ export default class HttpProxy {
 			Log.debug("< {} {} {}", proxyResponse.statusCode, request.method, request.url);
 			Log.trace("< {:j}", proxyResponse.headers);
 		});
-		this.server.setTimeout(this.options.timeoutMs, (socket) => {
+		this.server.setTimeout(this.options.timeoutMs, () => {
 			Log.error("TIMEOUT server {} ({} ms)", this.target.hostname, this.server.timeout);
-			console.log(socket);
 		});
 
 		this.server.keepAliveTimeout = this.options.timeoutMs;

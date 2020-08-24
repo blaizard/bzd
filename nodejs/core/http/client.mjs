@@ -135,6 +135,8 @@ export default class HttpClient {
 			break;
 		}
 
+		Object.assign(headers, options.headers);
+
 		let request = null;
 		if (process.env.BZD_RULE === "nodejs_web") {
 			request = (await import(/* webpackMode: "eager" */ "./client/window.fetch.mjs")).default;
@@ -143,12 +145,12 @@ export default class HttpClient {
 			request = (await import(/* webpackMode: "eager" */ "./client/node.http.mjs")).default;
 		}
 
-		Log.debug("{} {} (headers: {:j})", method, url, Object.assign(headers, options.headers));
+		Log.debug("{} {} (headers: {:j})", method, url, headers);
 		Log.trace("(body: {})", data);
 
 		const result = await request(url, {
 			method: method,
-			headers: Object.assign(headers, options.headers),
+			headers: headers,
 			data: data,
 			expect: options.expect,
 			timeoutMs: options.timeoutMs
