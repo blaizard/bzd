@@ -3,6 +3,9 @@
 		<template #header>
 			Artifacts
 		</template>
+		<template #actions>
+			<MenuEntry text="Add" icon="bzd-icon-add" link="/config"></MenuEntry>
+		</template>
 		<template #content>
 			<div class="layout">
 				<div class="tree">
@@ -20,11 +23,13 @@
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Layout from "bzd/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
+	import MenuEntry from "bzd/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
 			Layout,
-			Tree
+			Tree,
+			MenuEntry
 		},
 		directives: {
 			tooltip: DirectiveTooltip
@@ -35,7 +40,10 @@
 		mounted() {
 			this.$routerSet({
 				ref: "view",
-				routes: [{ path: "/config/{volume}", component: () => import("./config.vue") }]
+				routes: [
+					{ path: "/config/{volume}", component: () => import("./config.vue") },
+					{ path: "/config", component: () => import("./config.vue") }
+				]
 			});
 		},
 		methods: {
@@ -50,6 +58,10 @@
 	@use "bzd-style/css/base.scss";
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
+
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: add
+	);
 
 	.bzd-content {
 		margin: 10px;

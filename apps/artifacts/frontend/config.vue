@@ -12,7 +12,7 @@
 
 	export default {
 		props: {
-			volume: { mandatory: true, type: String }
+			volume: { mandatory: false, type: String, default: null }
 		},
 		components: {
 			Form

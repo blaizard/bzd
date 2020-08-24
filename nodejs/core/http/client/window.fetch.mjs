@@ -11,7 +11,7 @@ export default async function request(url, options) {
 
 	const promiseFetch = window.fetch(url, {
 		method: options.method,
-		data: options.data,
+		body: options.data,
 		headers: options.headers
 	});
 
