@@ -7,7 +7,7 @@ import ExceptionFactory from "../../core/exception.mjs";
 const Log = LogFactory("router");
 const Exception = ExceptionFactory("router");
 
-Log.setMinLevel("debug");
+Log.setLevel("debug");
 
 async function delayMs(time) {
 	return new Promise((resolve) => {

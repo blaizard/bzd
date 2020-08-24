@@ -27,7 +27,7 @@ export default class Sendgrid extends Email {
 				type: "bearer",
 				token: this.key
 			},
-			data: {
+			json: {
 				personalizations: [
 					{
 						to: toList.map((to) => ({ email: to })),

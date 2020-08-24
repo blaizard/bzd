@@ -14,20 +14,20 @@ export class HttpClientFactory {
 		this.optionsOrCallback = optionsOrCallback;
 	}
 
-	async request(endpoint, options = {}, includeAll = false) {
+	async request(endpoint, options = {}) {
 		const baseOptions =
 			typeof this.optionsOrCallback == "function" ? await this.optionsOrCallback(options.args) : this.optionsOrCallback;
-		return await HttpClient.request(this.url + endpoint, Object.assign({}, baseOptions, options), includeAll);
+		return await HttpClient.request(this.url + endpoint, Object.assign({}, baseOptions, options));
 	}
 
-	async get(endpoint, options = {}, includeAll = false) {
+	async get(endpoint, options = {}) {
 		options["method"] = "get";
-		return await this.request(endpoint, options, includeAll);
+		return await this.request(endpoint, options);
 	}
 
-	async post(endpoint, options = {}, includeAll = false) {
+	async post(endpoint, options = {}) {
 		options["method"] = "post";
-		return await this.request(endpoint, options, includeAll);
+		return await this.request(endpoint, options);
 	}
 }
 
@@ -40,7 +40,25 @@ export class HttpClientException extends ExceptionFactory("fetch", "impl") {
 }
 
 export default class HttpClient {
-	static async request(url, options = {}, includeAll = false) {
+	static async request(url, options = {}) {
+		options = Object.assign(
+			{
+				/**
+				 * Includes all outputs (in this order): data, headers, status code
+				 */
+				includeAll: false,
+				/**
+				 * Throw if the response status code is not within the 2xx boundaries
+				 */
+				throwOnResponseError: true,
+				/**
+				 * Maximum request timeout in ms
+				 */
+				timeoutMs: 60 * 1000
+			},
+			options
+		);
+
 		// Handle queries
 		if ("query" in options) {
 			const query = Object.keys(options.query)
@@ -51,20 +69,20 @@ export default class HttpClient {
 		}
 
 		let headers = {};
-		let body = undefined;
+		let data = undefined;
 
 		// Generate body
-		if (typeof options.data == "object") {
+		if ("json" in options) {
 			headers["Content-Type"] = "application/json";
-			body = JSON.stringify(options.data);
+			data = JSON.stringify(options.json);
 		}
 		else if (typeof options.data != "undefined") {
-			body = options.data;
+			data = options.data;
 		}
 
 		// Add the content length
-		if (typeof body == "string") {
-			headers["Content-Length"] = body.length;
+		if (typeof data == "string") {
+			headers["Content-Length"] = data.length;
 		}
 
 		// Update headers with authentication information
@@ -84,7 +102,6 @@ export default class HttpClient {
 				headers["Authorization"] = "Bearer " + auth.token;
 				break;
 			case "token":
-				// Small 't' for token is important for at least Travis CI
 				headers["Authorization"] = "token " + auth.token;
 				break;
 			default:
@@ -110,11 +127,6 @@ export default class HttpClient {
 			"Method '{}' is not supported",
 			method
 		);
-		Exception.assert(
-			!(body && method in { get: 1 }),
-			"Body cannot be set with method '{}', this is against recommendation in the HTTP/1.1 spec, section 4.3",
-			method
-		);
 
 		// Handle expected type
 		switch (options.expect) {
@@ -131,16 +143,18 @@ export default class HttpClient {
 			request = (await import(/* webpackMode: "eager" */ "./client/node.http.mjs")).default;
 		}
 
-		Log.debug("{} {} (headers: {:j}) (body: {:j})", method, url, Object.assign(headers, options.headers), body);
+		Log.debug("{} {} (headers: {:j})", method, url, Object.assign(headers, options.headers));
+		Log.trace("(body: {})", data);
 
 		const result = await request(url, {
 			method: method,
 			headers: Object.assign(headers, options.headers),
-			body: body,
-			expect: options.expect
+			data: data,
+			expect: options.expect,
+			timeoutMs: options.timeoutMs
 		});
 
-		if (result.code < 200 || result.code > 299) {
+		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {
 			throw new HttpClientException(
 				result.code,
 				result.data,
@@ -160,19 +174,19 @@ export default class HttpClient {
 			}
 		})(result.data);
 
-		if (includeAll) {
+		if (options.includeAll) {
 			return [dataParsed, result.headers, result.code];
 		}
 		return dataParsed;
 	}
 
-	static async get(url, options = {}, includeAll = false) {
+	static async get(url, options = {}) {
 		options["method"] = "get";
-		return await HttpClient.request(url, options, includeAll);
+		return await HttpClient.request(url, options);
 	}
 
-	static async post(url, options = {}, includeAll = false) {
+	static async post(url, options = {}) {
 		options["method"] = "post";
-		return await HttpClient.request(url, options, includeAll);
+		return await HttpClient.request(url, options);
 	}
 }

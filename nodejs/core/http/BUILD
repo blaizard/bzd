@@ -17,9 +17,9 @@ bzd_nodejs_library(
 
 bzd_nodejs_library(
     name = "server",
-    srcs = glob([
+    srcs = [
         "server.mjs",
-    ]),
+    ],
     packages = {
         "express": "",
         "express-minify": "",
@@ -47,6 +47,7 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":client",
         "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",

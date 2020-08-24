@@ -9,10 +9,10 @@ import Minify from "express-minify";
 import Multer from "multer";
 import CookieParser from "cookie-parser";
 
-import Event from "./event.mjs";
-import FileSystem from "./filesystem.mjs";
-import LogFactory from "./log.mjs";
-import ExceptionFactory from "./exception.mjs";
+import Event from "../event.mjs";
+import FileSystem from "../filesystem.mjs";
+import LogFactory from "../log.mjs";
+import ExceptionFactory from "../exception.mjs";
 
 const Log = LogFactory("http", "server");
 const Exception = ExceptionFactory("http", "server");

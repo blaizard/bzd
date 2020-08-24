@@ -17,6 +17,9 @@ export default class DockerV2Proxy {
 		this._urlParsed = new Url.URL(this.url);
 
 		this.proxy = new HttpProxy(this.proxiedUrl, this.port, {
+			timeoutMs: 84600 * 1000,
+			// See https://docs.docker.com/registry/deploying/#importantrequired-http-headers
+			xForward: true,
 			beforeRequest: async (request, response) => {
 				if (request.url.startsWith("/v2/token")) {
 					const url = new Url.URL(request.url, this.proxiedUrl);

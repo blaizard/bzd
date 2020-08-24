@@ -24,6 +24,8 @@ class Logger {
 	static get levels() {
 		return {
 			// eslint-disable-next-line no-console
+			trace: { level: 5, text: "trace", fct: console.log },
+			// eslint-disable-next-line no-console
 			debug: { level: 4, text: "debug", fct: console.log },
 			// eslint-disable-next-line no-console
 			info: { level: 3, text: "info", fct: console.info },
@@ -37,6 +39,10 @@ class Logger {
 	// Configuration options
 	setLevel(level) {
 		this.config.level = Logger.levels[level].level;
+	}
+
+	getLevel() {
+		return this.config.level;
 	}
 
 	// Support traces
@@ -65,13 +71,17 @@ const custom = (config, ...msgs) => {
 
 const LoggerFactory = (...topics) => {
 	return {
+		trace: (...msgs) => custom({ level: "trace", topics: topics }, ...msgs),
 		debug: (...msgs) => custom({ level: "debug", topics: topics }, ...msgs),
 		info: (...msgs) => custom({ level: "info", topics: topics }, ...msgs),
 		warning: (...msgs) => custom({ level: "warning", topics: topics }, ...msgs),
 		error: (...msgs) => custom({ level: "error", topics: topics }, ...msgs),
 		custom: (...args) => custom(...args),
-		setMinLevel(level) {
+		setLevel(level) {
 			logger.setLevel(level);
+		},
+		getLevel() {
+			return logger.getLevel();
 		},
 		mute() {
 			logger.setLevel("error");

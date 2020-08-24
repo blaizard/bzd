@@ -1,14 +1,12 @@
 import Http from "http";
-import Https from "https";
 import Url from "url";
 
+import HttpClient from "./client.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 
 const Log = LogFactory("http", "proxy");
 const Exception = ExceptionFactory("http", "proxy");
-
-const debugLevel = 2;
 
 export default class HttpProxy {
 	constructor(target, port, options) {
@@ -17,9 +15,9 @@ export default class HttpProxy {
 		this.options = Object.assign(
 			{
 				// Maximum request timeout
-				timeoutMs: 84600 * 1000,
+				timeoutMs: 60 * 1000,
 				// Send X-Forward-* headers
-				xForward: true,
+				xForward: false,
 				beforeRequest: (/*request, response*/) => {},
 				afterRequest: (/*request, response*/) => {}
 			},
@@ -32,26 +30,6 @@ export default class HttpProxy {
 			"Protocol not supported '{}'",
 			this.target.protocol
 		);
-	}
-
-	/**
-	 * Test function to sniff and display insights from the HTTP requests
-	 */
-	_sniffProxyRequest(req) {
-		if (debugLevel == 1) {
-			Log.info("> {} {}", req.method, req.url);
-		}
-		else {
-			Log.info("> {} {} {:j}", req.method, req.url, req.headers);
-		}
-	}
-	_sniffProxyResponse(req, response) {
-		if (debugLevel == 1) {
-			Log.info("< {} {} {}", response.statusCode, req.method, req.url);
-		}
-		else if (debugLevel == 2) {
-			Log.info("< {} {} {} {:j}", response.statusCode, req.method, req.url, response.headers);
-		}
 	}
 
 	async start() {
@@ -67,9 +45,6 @@ export default class HttpProxy {
 				Log.info("ABORT response {}/{}", this.target.hostname, request.url);
 			});
 
-			request.headers["user-agent"] = "gcr-proxy/0.1 customDomain/127.0.0.1";
-			request.headers["accept"] = "*/*";
-
 			if (this.options.xForward) {
 				const appendHeader = (name, newValue) => {
 					request.headers[name] = (request.headers[name] ? request.headers[name] + "," : "") + newValue;
@@ -80,7 +55,9 @@ export default class HttpProxy {
 				request.headers["x-forwarded-host"] = request.headers["x-forwarded-host"] || request.headers["host"] || "";
 			}
 
-			this._sniffProxyRequest(request);
+			// Logger for request
+			Log.debug("> {} {}", request.method, request.url);
+			Log.trace("> {:j}", request.headers);
 
 			await this.options.beforeRequest(request, response);
 
@@ -92,55 +69,30 @@ export default class HttpProxy {
 			// Delete host header as it will be set afterward
 			delete request.headers.host;
 
-			// Protocol use and call the request
-			const Protocol = this.target.protocol == "http:" ? Http : Https;
-			let proxyRequest = Protocol.request({
-				hostname: this.target.hostname,
-				port: this.target.port,
-				path: request.url,
+			const proxyUrl = new URL(request.url, this.target);
+			let proxyResponse = {};
+			[proxyResponse.data, proxyResponse.headers, proxyResponse.statusCode] = await HttpClient.request(proxyUrl.href, {
 				method: request.method,
 				headers: request.headers,
-				timeout: this.options.timeoutMs
+				data: request,
+				expect: "stream",
+				timeoutMs: this.options.timeoutMs,
+				includeAll: true,
+				throwOnResponseError: false
 			});
 
-			proxyRequest.on("abort", () => {
-				Log.info("ABORT {}/{}", this.target.hostname, request.url);
+			await this.options.afterRequest(request, proxyResponse);
+
+			response.writeHead(proxyResponse.statusCode, proxyResponse.headers);
+
+			// Pipe the response directly
+			proxyResponse.data.pipe(response, {
+				end: true
 			});
 
-			proxyRequest.on("timeout", () => {
-				Log.error("TIMEOUT proxy request {}/{}", this.target.hostname, request.url);
-				proxyRequest.abort();
-			});
-
-			proxyRequest.on("error", (e) => {
-				Log.error("{}/{}: {:j}", this.target.hostname, request.url, e);
-			});
-
-			proxyRequest.on("end", () => {
-				if (!response.complete) {
-					Log.error(
-						"{}/{}: The connection was terminated while the message was still being sent",
-						this.target.hostname,
-						request.url
-					);
-				}
-			});
-
-			proxyRequest.on("response", async (proxyResponse) => {
-				await this.options.afterRequest(request, proxyResponse);
-
-				response.writeHead(proxyResponse.statusCode, proxyResponse.headers);
-
-				// Pipe the response directly
-				proxyResponse.pipe(response, {
-					end: true
-				});
-
-				this._sniffProxyResponse(request, proxyResponse);
-			});
-
-			// Pipe the data to the proxy
-			request.pipe(proxyRequest, { end: true });
+			// Logger for response
+			Log.debug("< {} {} {}", proxyResponse.statusCode, request.method, request.url);
+			Log.trace("< {:j}", proxyResponse.headers);
 		});
 		this.server.setTimeout(this.options.timeoutMs, (socket) => {
 			Log.error("TIMEOUT server {} ({} ms)", this.target.hostname, this.server.timeout);
@@ -156,7 +108,7 @@ export default class HttpProxy {
 		});
 
 		this.server.listen(this.port, () => {
-			Log.info("Deployed Proxy to '{}' listening on port {}", this.target.href, this.port);
+			Log.info("Deployed HTTP Proxy for '{}' listening on port {}", this.target.href, this.port);
 		});
 	}
 

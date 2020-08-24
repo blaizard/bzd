@@ -7,17 +7,14 @@ const Exception = ExceptionFactory("http", "client", "node.http");
 const Log = LogFactory("http", "client", "node.http");
 
 const MAX_REDIRECTION = 3;
-const MAX_TIMEOUT_S = 60;
 
 export default async function request(url, options) {
 	return new Promise((resolve, reject) => {
 		// Check if http or https
 		let requestHandler = url.toLowerCase().startsWith("https://") ? requestHttps : requestHttp;
 
-		let sharedOptions = { timeoutInstance: null };
-
 		// Doing this will help to have a clean stack trace
-		const exceptionTimeout = new Exception("Request timeout (" + MAX_TIMEOUT_S + "s)");
+		const exceptionTimeout = new Exception("Request timeout (" + options.timeoutMs + " ms)");
 
 		// Create the request
 		let req = requestHandler(
@@ -25,7 +22,7 @@ export default async function request(url, options) {
 			{
 				method: options.method,
 				headers: options.headers,
-				timeout: MAX_TIMEOUT_S * 1000
+				timeout: options.timeoutMs
 			},
 			(response) => {
 				// Handle redirection
@@ -46,35 +43,46 @@ export default async function request(url, options) {
 					}
 				}
 
-				response.setEncoding("utf8");
+				let result = {
+					data: null,
+					headers: response.headers,
+					code: response.statusCode
+				};
 
-				sharedOptions.timeoutInstance = setTimeout(() => {
-					reject(exceptionTimeout);
-				}, MAX_TIMEOUT_S * 1000);
-
-				let body = "";
-				response.on("data", (chunk) => {
-					body += chunk;
-				});
-				response.on("end", () => {
-					clearTimeout(sharedOptions.timeoutInstance);
-					resolve({
-						data: body,
-						headers: response.headers,
-						code: response.statusCode
+				if (options.expect == "stream") {
+					result.data = response;
+					resolve(result);
+				}
+				else {
+					let data = "";
+					response.on("data", (chunk) => {
+						data += chunk;
 					});
-				});
+					response.on("end", () => {
+						result.data = data;
+						resolve(result);
+					});
+				}
 			}
 		);
 
-		if (typeof options.body !== "undefined") {
-			Exception.assert(typeof options.body === "string", "Body passed must be a string: {}", options.body);
-			req.setHeader("Content-Length", Buffer.byteLength(options.body));
-			req.write(options.body);
+		// A string
+		if (typeof options.data == "string") {
+			req.write(options.data);
+			req.end();
+		}
+		// A read stream
+		else if (typeof options.data == "object" && typeof options.data.pipe == "function") {
+			options.data.pipe(req, { end: true });
+		}
+		else if (typeof options.data == "undefined") {
+			req.end();
+		}
+		else {
+			reject(new Exception("Unsupported data format: {:j}", options.data));
 		}
 
 		req.on("timeout", () => {
-			clearTimeout(sharedOptions.timeoutInstance);
 			req.abort();
 			reject(exceptionTimeout);
 		});
@@ -82,6 +90,5 @@ export default async function request(url, options) {
 		req.on("error", (e) => {
 			reject(e);
 		});
-		req.end();
 	});
 }
