@@ -3,7 +3,7 @@ import Path from "path";
 
 import API from "bzd/core/api/server.mjs";
 import APIv1 from "../api.v1.json";
-import Web from "bzd/core/web.mjs";
+import HttpServer from "bzd/core/http/server.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
@@ -39,7 +39,7 @@ Commander.version("1.0.0", "-v, --version")
 	const PATH_DATA = process.env.BZD_PATH_DATA || Commander.data;
 
 	// Set-up the web server
-	let web = new Web(PORT);
+	let web = new HttpServer(PORT);
 	web.addStaticRoute("/", PATH_STATIC, "index.html");
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));

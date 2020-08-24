@@ -16,6 +16,31 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "server",
+    srcs = glob([
+        "server.mjs",
+    ]),
+    packages = {
+        "express": "",
+        "express-minify": "",
+        "helmet": "",
+        "body-parser": "",
+        "http": "",
+        "compression": "",
+        "multer": "",
+        "cookie-parser": "",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+    ],
+)
+
+bzd_nodejs_library(
     name = "proxy",
     srcs = [
         "proxy.mjs",
