@@ -9,6 +9,6 @@ bzd_nodejs_library(
         "//apps/dashboard/plugins:__pkg__",
     ],
     deps = [
-        "//nodejs/core:fetch",
+        "//nodejs/core/http:client",
     ],
 )

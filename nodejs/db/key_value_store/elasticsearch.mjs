@@ -1,6 +1,6 @@
 import KeyValueStore from "./key_value_store.mjs";
 import { CollectionPaging } from "../utils.mjs";
-import { FetchFactory, FetchException } from "../../core/fetch.mjs";
+import { HttpClientFactory, HttpClientException } from "../../core/http/client.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
 
@@ -40,7 +40,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			this.options.prefix,
 			"authentication" in fetchOptions ? "on" : "off"
 		);
-		this.fetch = new FetchFactory(host, fetchOptions);
+		this.fetch = new HttpClientFactory(host, fetchOptions);
 	}
 
 	async _initialize() {
@@ -77,7 +77,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			return result._source;
 		}
 		catch (e) {
-			if (e instanceof FetchException) {
+			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return defaultValue;
 				}
@@ -117,7 +117,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			);
 		}
 		catch (e) {
-			if (e instanceof FetchException) {
+			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return new CollectionPaging({});
 				}

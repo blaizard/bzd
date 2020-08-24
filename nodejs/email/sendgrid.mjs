@@ -1,6 +1,6 @@
 import Email from "./email.mjs";
 import ExceptionFactory from "../core/exception.mjs";
-import Fetch from "../core/fetch.mjs";
+import HttpClient from "../core/http/client.mjs";
 
 const Exception = ExceptionFactory("email", "sendgrid");
 
@@ -21,7 +21,7 @@ export default class Sendgrid extends Email {
 	 * Send an email
 	 */
 	async _sendImpl(toList, subject, data) {
-		await Fetch.request("https://api.sendgrid.com/v3/mail/send", {
+		await HttpClient.request("https://api.sendgrid.com/v3/mail/send", {
 			method: "post",
 			authentication: {
 				type: "bearer",

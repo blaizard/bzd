@@ -1,11 +1,11 @@
-import Fetch from "bzd/core/fetch.mjs";
+import HttpClient from "bzd/core/http/client.mjs";
 
 export default {
 	cache: [
 		{
 			collection: "coverage.report",
 			fetch: async (reportUrl, authentication) => {
-				return await Fetch.get(reportUrl, {
+				return await HttpClient.get(reportUrl, {
 					expect: "json",
 					authentication: authentication
 				});

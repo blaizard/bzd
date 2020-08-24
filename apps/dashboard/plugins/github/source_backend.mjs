@@ -1,4 +1,4 @@
-import Fetch from "bzd/core/fetch.mjs";
+import HttpClient from "bzd/core/http/client.mjs";
 
 function _getStatus(item) {
 	if (item.conclusion == "success") {
@@ -47,7 +47,7 @@ export default {
 				const url =
 					baseUrl + (workflowId ? "/actions/workflows/" + encodeURIComponent(workflowId) + "/runs" : "/actions/runs");
 
-				const result = await Fetch.get(url, getFetchOptions(username, token));
+				const result = await HttpClient.get(url, getFetchOptions(username, token));
 
 				let builds = [];
 				let promises = [];
@@ -68,7 +68,7 @@ export default {
 		{
 			collection: "github.jobs",
 			fetch: async (url, username, token, prevValue, cacheOptions) => {
-				const resultJobs = await Fetch.get(url, getFetchOptions(username, token));
+				const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
 
 				let dateStart = Date.now();
 				let dateEnd = 0;

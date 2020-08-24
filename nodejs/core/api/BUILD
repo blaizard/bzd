@@ -10,8 +10,8 @@ bzd_nodejs_library(
     deps = [
         "//nodejs:bzd",
         "//nodejs/core:exception",
-        "//nodejs/core:fetch",
         "//nodejs/core:validation",
+        "//nodejs/core/http:client",
     ],
 )
 

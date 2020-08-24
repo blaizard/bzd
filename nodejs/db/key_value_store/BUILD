@@ -28,8 +28,8 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:event",
         "//nodejs/core:exception",
-        "//nodejs/core:fetch",
         "//nodejs/core:log",
+        "//nodejs/core/http:client",
         "//nodejs/db:utils",
     ],
 )

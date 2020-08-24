@@ -1,4 +1,4 @@
-import Fetch from "bzd/core/fetch.mjs";
+import HttpClient from "bzd/core/http/client.mjs";
 
 function _getStatus(item) {
 	if (item.state == "passed") {
@@ -34,7 +34,7 @@ export default {
 					}
 				};
 
-				const result = await Fetch.get(url, options);
+				const result = await HttpClient.get(url, options);
 				return (result.builds || []).map((item) => {
 					const status = _getStatus(item);
 					return {

@@ -1,32 +1,29 @@
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "server",
-    srcs = [
-        "api.json",
-        "server.mjs",
-    ],
+    name = "client",
+    srcs = glob([
+        "client.mjs",
+        "client/*.mjs",
+    ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:bzd",
+        "//nodejs/core:crypto",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/core/http:client",
     ],
 )
 
 bzd_nodejs_library(
-    name = "client",
+    name = "proxy",
     srcs = [
-        "api.json",
-        "client.mjs",
-        "client.vue",
+        "proxy.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:vue",
+        "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/vue/components/form",
-        "//nodejs/vue/directives:loading",
     ],
 )

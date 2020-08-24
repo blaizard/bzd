@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import Fetch from "../../core/fetch.mjs";
+	import HttpClient from "../../core/http/client.mjs";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import Button from "bzd/vue/components/form/element/button.vue";
 	import Colors from "bzd-style/css/colors.scss";
@@ -77,7 +77,7 @@
 		methods: {
 			async _getStripeJs() {
 				if (!("Stripe" in window)) {
-					const stripeJs = await Fetch.request("https://js.stripe.com/v3/", {
+					const stripeJs = await HttpClient.request("https://js.stripe.com/v3/", {
 						method: "get"
 					});
 					eval(stripeJs);

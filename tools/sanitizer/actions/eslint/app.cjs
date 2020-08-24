@@ -18,7 +18,7 @@ const { ESLint } = require("eslint");
 	await ESLint.outputFixes(results);
 
 	// 4. Format the results.
-	const formatter = await eslint.loadFormatter("stylish");
+	const formatter = await eslint.loadFormatter("unix");
 	const resultText = formatter.format(results);
 
 	// 5. Output it.

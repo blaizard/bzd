@@ -1,4 +1,4 @@
-import Fetch from "bzd/core/fetch.mjs";
+import HttpClient from "bzd/core/http/client.mjs";
 
 function _getStatus(item) {
 	if (item.result == "SUCCESS") {
@@ -36,7 +36,7 @@ export default {
 					};
 				}
 
-				const result = await Fetch.get(
+				const result = await HttpClient.get(
 					baseUrl + "/api/json?&tree=builds[duration,result,id,timestamp,estimatedDuration]{0,100}",
 					options
 				);
