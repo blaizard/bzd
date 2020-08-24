@@ -309,8 +309,14 @@ export default class Web {
 		case "delete":
 			this.app.delete(uri, ...callbackList);
 			break;
+		case "head":
+			this.app.head(uri, ...callbackList);
+			break;
 		case "patch":
 			this.app.patch(uri, ...callbackList);
+			break;
+		case "*":
+			this.app.all(uri, ...callbackList);
 			break;
 		default:
 			throw new Exception("Unknown HTTP type '{}'.", type);

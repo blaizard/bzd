@@ -3,7 +3,7 @@ import LogFactory from "../../core/log.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import Cache from "../../core/cache.mjs";
 import { CollectionPaging } from "../utils.mjs";
-import { FetchFactory } from "../../core/fetch.mjs";
+import { HttpClientFactory } from "../../core/http/client.mjs";
 
 const Log = LogFactory("db", "storage", "docker-v2");
 const Exception = ExceptionFactory("db", "storage", "docker-v2");
@@ -38,7 +38,7 @@ export default class StorageDockerV2 extends Base {
 			return result.token;
 		});
 
-		this.fetch = new FetchFactory(url, async (scope) => {
+		this.fetch = new HttpClientFactory(url, async (scope) => {
 			let options = {};
 
 			if (scope && this.options.authentication) {

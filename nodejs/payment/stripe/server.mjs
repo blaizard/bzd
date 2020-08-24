@@ -1,6 +1,6 @@
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
-import Fetch from "../../core/fetch.mjs";
+import HttpClient from "../../core/http/client.mjs";
 import APISchema from "./api.json";
 
 const Exception = ExceptionFactory("payment", "stripe");
@@ -48,7 +48,7 @@ export default class StripePayment {
 			}
 			Exception.assert(amount, "Amount incorrect: {}", amount);
 
-			const response = await Fetch.request("https://api.stripe.com/v1/payment_intents", {
+			const response = await HttpClient.request("https://api.stripe.com/v1/payment_intents", {
 				method: "post",
 				authentication: {
 					type: "basic",
@@ -75,7 +75,7 @@ export default class StripePayment {
 		});
 
 		api.handle("post", "/payment/stripe/confirm", async (inputs) => {
-			const response = await Fetch.request("https://api.stripe.com/v1/payment_intents/" + inputs.id, {
+			const response = await HttpClient.request("https://api.stripe.com/v1/payment_intents/" + inputs.id, {
 				method: "get",
 				authentication: {
 					type: "basic",

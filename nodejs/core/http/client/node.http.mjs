@@ -3,8 +3,8 @@ import { request as requestHttps } from "https";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 
-const Exception = ExceptionFactory("fetch", "node.http");
-const Log = LogFactory("fetch", "node.http");
+const Exception = ExceptionFactory("http", "client", "node.http");
+const Log = LogFactory("http", "client", "node.http");
 
 const MAX_REDIRECTION = 3;
 const MAX_TIMEOUT_S = 60;

@@ -9,7 +9,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
-        "//nodejs/core:fetch",
         "//nodejs/core:log",
+        "//nodejs/core/http:client",
     ],
 )

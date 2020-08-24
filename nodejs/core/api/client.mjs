@@ -1,6 +1,6 @@
 import Base from "./base.mjs";
-import Fetch from "../fetch.mjs";
-import { FetchException } from "../fetch.mjs";
+import HttpClient from "../http/client.mjs";
+import { HttpClientException } from "../http/client.mjs";
 import ExceptionFactory from "../exception.mjs";
 import Validation from "../validation.mjs";
 
@@ -89,7 +89,7 @@ export default class APIClient extends Base {
 			}
 
 			try {
-				const result = await Fetch.request(this._makePath(endpoint), fetchOptions);
+				const result = await HttpClient.request(this._makePath(endpoint), fetchOptions);
 				if ("validation" in responseOptions) {
 					Exception.assert(
 						["json"].includes(responseOptions.type),
@@ -106,7 +106,7 @@ export default class APIClient extends Base {
 				return result;
 			}
 			catch (e) {
-				if (e instanceof FetchException) {
+				if (e instanceof HttpClientException) {
 					if (e.code == 401 /*Unauthorized*/) {
 						if (this.schema[endpoint][method].authentication) {
 							await this.options.authentication.refreshAuthentication();

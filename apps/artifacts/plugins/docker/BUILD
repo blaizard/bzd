@@ -6,16 +6,13 @@ bzd_nodejs_library(
         "backend.mjs",
         "docker_v2_proxy.mjs",
     ],
-    packages = {
-        "http": "",
-        "http-proxy": "",
-    },
     visibility = [
         "//apps/artifacts/plugins:__pkg__",
     ],
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/http:proxy",
         "//nodejs/db/storage:docker_v2",
     ],
 )

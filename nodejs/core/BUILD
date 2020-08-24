@@ -84,21 +84,6 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "fetch",
-    srcs = glob([
-        "fetch.mjs",
-        "impl/fetch/*",
-    ]),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":crypto",
-        ":exception",
-        ":log",
-        "//nodejs:bzd",
-    ],
-)
-
-bzd_nodejs_library(
     name = "filesystem",
     srcs = [
         "filesystem.mjs",

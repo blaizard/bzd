@@ -1,14 +1,14 @@
-import { base64Encode } from "./crypto.mjs";
-import ExceptionFactory from "./exception.mjs";
-import LogFactory from "./log.mjs";
+import { base64Encode } from "../crypto.mjs";
+import ExceptionFactory from "../exception.mjs";
+import LogFactory from "../log.mjs";
 
-const Exception = ExceptionFactory("fetch");
-const Log = LogFactory("fetch");
+const Exception = ExceptionFactory("http", "client");
+const Log = LogFactory("http", "client");
 
 /**
  * Fetch data from HTTP endpoint.
  */
-export class FetchFactory {
+export class HttpClientFactory {
 	constructor(url, optionsOrCallback = {}) {
 		this.url = url;
 		this.optionsOrCallback = optionsOrCallback;
@@ -17,7 +17,7 @@ export class FetchFactory {
 	async request(endpoint, options = {}, includeAll = false) {
 		const baseOptions =
 			typeof this.optionsOrCallback == "function" ? await this.optionsOrCallback(options.args) : this.optionsOrCallback;
-		return await Fetch.request(this.url + endpoint, Object.assign({}, baseOptions, options), includeAll);
+		return await HttpClient.request(this.url + endpoint, Object.assign({}, baseOptions, options), includeAll);
 	}
 
 	async get(endpoint, options = {}, includeAll = false) {
@@ -31,7 +31,7 @@ export class FetchFactory {
 	}
 }
 
-export class FetchException extends ExceptionFactory("fetch", "impl") {
+export class HttpClientException extends ExceptionFactory("fetch", "impl") {
 	constructor(code, data, ...args) {
 		super(...args);
 		this.code = code;
@@ -39,7 +39,7 @@ export class FetchException extends ExceptionFactory("fetch", "impl") {
 	}
 }
 
-export default class Fetch {
+export default class HttpClient {
 	static async request(url, options = {}, includeAll = false) {
 		// Handle queries
 		if ("query" in options) {
@@ -125,10 +125,10 @@ export default class Fetch {
 
 		let request = null;
 		if (process.env.BZD_RULE === "nodejs_web") {
-			request = (await import(/* webpackMode: "eager" */ "./impl/fetch/window.fetch.mjs")).default;
+			request = (await import(/* webpackMode: "eager" */ "./client/window.fetch.mjs")).default;
 		}
 		else {
-			request = (await import(/* webpackMode: "eager" */ "./impl/fetch/node.http.mjs")).default;
+			request = (await import(/* webpackMode: "eager" */ "./client/node.http.mjs")).default;
 		}
 
 		Log.debug("{} {} (headers: {:j}) (body: {:j})", method, url, Object.assign(headers, options.headers), body);
@@ -141,7 +141,7 @@ export default class Fetch {
 		});
 
 		if (result.code < 200 || result.code > 299) {
-			throw new FetchException(
+			throw new HttpClientException(
 				result.code,
 				result.data,
 				"Request to '{}' responded with: {}: {}",
@@ -168,11 +168,11 @@ export default class Fetch {
 
 	static async get(url, options = {}, includeAll = false) {
 		options["method"] = "get";
-		return await Fetch.request(url, options, includeAll);
+		return await HttpClient.request(url, options, includeAll);
 	}
 
 	static async post(url, options = {}, includeAll = false) {
 		options["method"] = "post";
-		return await Fetch.request(url, options, includeAll);
+		return await HttpClient.request(url, options, includeAll);
 	}
 }

@@ -1,5 +1,5 @@
 import Timeseries from "./timeseries.mjs";
-import { FetchFactory, FetchException } from "../../core/fetch.mjs";
+import { HttpClientFactory, HttpClientException } from "../../core/http/client.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
@@ -37,7 +37,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			this.options.prefix,
 			"authentication" in fetchOptions ? "on" : "off"
 		);
-		this.fetch = new FetchFactory(host, fetchOptions);
+		this.fetch = new HttpClientFactory(host, fetchOptions);
 	}
 
 	async _initialize() {
@@ -86,7 +86,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			);
 		}
 		catch (e) {
-			if (e instanceof FetchException) {
+			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return new CollectionPaging([]);
 				}
