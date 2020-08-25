@@ -17,7 +17,7 @@ export default {
 				content: {}
 			},
 			methods: {
-				get(collection, id = "default") {
+				getReactive(collection, id = "default") {
 					// If data does not exists, create it
 					if (!(collection in this.content)) {
 						this.$set(this.content, collection, {});
@@ -32,6 +32,9 @@ export default {
 						})();
 					}
 					return this.content[collection][id];
+				},
+				async get(collection, ...ids) {
+					return await cache.get(collection, ...ids);
 				},
 				invalid(collection, id = "default") {
 					cache.setDirty(collection, id);

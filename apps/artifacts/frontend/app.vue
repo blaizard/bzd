@@ -9,7 +9,7 @@
 		<template #content>
 			<div class="layout">
 				<div class="tree">
-					<Tree @config="handleConfig"></Tree>
+					<Tree :key="refreshCounter" @item="handleItem"></Tree>
 				</div>
 				<div class="content">
 					<RouterComponent ref="view" class="bzd-content"></RouterComponent>
@@ -35,20 +35,34 @@
 			tooltip: DirectiveTooltip
 		},
 		data: function() {
-			return {};
+			return {
+				refreshCounter: 0,
+				path: []
+			};
 		},
 		mounted() {
 			this.$routerSet({
 				ref: "view",
 				routes: [
+					{ path: "/", component: null },
+					{
+						path: "/refresh",
+						handler: () => {
+							++this.refreshCounter;
+							this.$routerDispatch("/");
+						}
+					},
 					{ path: "/config/{volume}", component: () => import("./config.vue") },
-					{ path: "/config", component: () => import("./config.vue") }
+					{ path: "/config", component: () => import("./config.vue") },
+					{ path: "/view/{path:.*}", component: () => import("./view.vue") }
 				]
 			});
 		},
 		methods: {
-			handleConfig(volume) {
-				this.$routerDispatch("/config/" + volume);
+			handleItem(item) {
+				console.log(item);
+				this.path = item.path.concat([item.item.name]);
+				this.$routerDispatch("/view/" + this.path.map((c) => encodeURIComponent(c)).join("/"));
 			}
 		}
 	};

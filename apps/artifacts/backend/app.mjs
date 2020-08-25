@@ -9,7 +9,7 @@ import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
-import Filesystem from "bzd/core/filesystem.mjs";
+//import Filesystem from "bzd/core/filesystem.mjs";
 import Services from "./services.mjs";
 import Plugins from "../plugins/backend.mjs";
 
@@ -46,19 +46,16 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Test data
 
-	/*
-	 *await keyValueStore.set("volume", "disk", {
-	 *type: "fs",
-	 *"fs.root": "/"
-	 *});
-	 */
-	/*
-	 *await keyValueStore.set("volume", "docker.blaizard.com", {
-	 *	type: "docker",
-	 *	"docker.type": "v2",
-	 *	"docker.url": "https://docker.blaizard.com"
-	 *});
-	 */
+	/*await keyValueStore.set("volume", "disk", {
+		type: "fs",
+		"fs.root": "/"
+	});
+
+	await keyValueStore.set("volume", "docker.blaizard.com", {
+		type: "docker",
+		"docker.type": "v2",
+		"docker.url": "https://docker.blaizard.com"
+	});
 
 	await keyValueStore.set("volume", "docker.gcr", {
 		type: "docker",
@@ -68,8 +65,8 @@ Commander.version("1.0.0", "-v, --version")
 		"docker.url": "https://docker.blaizard.com",
 		"docker.proxy": true,
 		"docker.proxy.url": "http://127.0.0.1:5050",
-		"docker.proxy.port": 5050
-	});
+		"docker.proxy.port": 5051
+	});*/
 
 	// Set the cache
 	let cache = new Cache();
@@ -146,16 +143,24 @@ Commander.version("1.0.0", "-v, --version")
 			}
 		}
 
+		// Check if it needs to be renamed
+		const volume = inputs.config.volume;
+		delete inputs.config.volume;
+
 		// Stop all services related to this config
 		await services.stop(inputs.volume);
 
-		await keyValueStore.set("volume", inputs.volume, params);
+		await keyValueStore.set("volume", volume, params);
 		await cache.setDirty("volume", inputs.volume);
+		if (volume != inputs.volume) {
+			await keyValueStore.delete("volume", inputs.volume);
+		}
 
-		await services.start(inputs.volume, params.type, params);
+		await services.start(volume, params.type, params);
 	});
 
 	api.handle("delete", "/config", async (inputs) => {
+		await services.stop(inputs.volume);
 		return await keyValueStore.delete("volume", inputs.volume);
 	});
 
