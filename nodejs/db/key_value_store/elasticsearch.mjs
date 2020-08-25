@@ -61,7 +61,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 		const result = await this.fetch.request(endpoint, {
 			method: "post",
-			data: value
+			json: value
 		});
 		Exception.assert(["created", "updated"].includes(result.result), "Unexpected result, received: {}", result.result);
 		Exception.assert("_id" in result, "Response is malformed: {:j}", result);
@@ -100,7 +100,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
 				{
 					method: "post",
-					data: {
+					json: {
 						query: query
 					}
 				}

@@ -46,27 +46,29 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Test data
 
-	/*await keyValueStore.set("volume", "disk", {
-		type: "fs",
-		"fs.root": "/"
-	});
-
-	await keyValueStore.set("volume", "docker.blaizard.com", {
-		type: "docker",
-		"docker.type": "v2",
-		"docker.url": "https://docker.blaizard.com"
-	});
-
-	await keyValueStore.set("volume", "docker.gcr", {
-		type: "docker",
-		"docker.type": "gcr",
-		"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
-		"docker.service": "gcr.io",
-		"docker.url": "https://docker.blaizard.com",
-		"docker.proxy": true,
-		"docker.proxy.url": "http://127.0.0.1:5050",
-		"docker.proxy.port": 5051
-	});*/
+	/*
+	 *await keyValueStore.set("volume", "disk", {
+	 *type: "fs",
+	 *"fs.root": "/"
+	 *});
+	 *
+	 *await keyValueStore.set("volume", "docker.blaizard.com", {
+	 *type: "docker",
+	 *"docker.type": "v2",
+	 *"docker.url": "https://docker.blaizard.com"
+	 *});
+	 *
+	 *await keyValueStore.set("volume", "docker.gcr", {
+	 *type: "docker",
+	 *"docker.type": "gcr",
+	 *"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
+	 *"docker.service": "gcr.io",
+	 *"docker.url": "https://docker.blaizard.com",
+	 *"docker.proxy": true,
+	 *"docker.proxy.url": "http://127.0.0.1:5050",
+	 *"docker.proxy.port": 5051
+	 *});
+	 */
 
 	// Set the cache
 	let cache = new Cache();
