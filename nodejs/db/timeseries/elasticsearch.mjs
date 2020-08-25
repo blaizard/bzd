@@ -54,7 +54,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 	async insert(bucket, timestamp, data) {
 		await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc", {
 			method: "post",
-			data: {
+			json: {
 				date: timestamp,
 				data: data
 			}
@@ -69,7 +69,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 				"/" + this._bucketToURI(bucket) + "/_search?size=" + paging.max + "&from=" + paging.page * paging.max,
 				{
 					method: "post",
-					data: {
+					json: {
 						query: query,
 						sort: {
 							date: "desc"
