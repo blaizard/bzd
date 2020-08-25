@@ -21,8 +21,7 @@
 		mounted() {
 			this.fetchServices();
 		},
-		computed: {
-		},
+		computed: {},
 		methods: {
 			async fetchServices() {
 				await this.handleSubmit(async () => {
