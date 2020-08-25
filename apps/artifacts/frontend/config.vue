@@ -1,24 +1,36 @@
 <template>
-	<div>
-		<h1>Configuration for {{ volume }}</h1>
-		<Form :description="formDescription" v-model="config"></Form>
-		<Form :description="formDescriptionTyped || []" v-model="config" @submit="handleSubmit"></Form>
+	<div v-loading="loading">
+		<h1>Configuration</h1>
+		<Form :description="formDescription" v-model="config" @error="handleError"></Form>
+		<Form
+			:description="formDescriptionTyped || []"
+			v-model="config"
+			@submit="handleSubmitConfig"
+			@error="handleError"></Form>
 	</div>
 </template>
 
 <script>
 	import Plugins from "../plugins/frontend.mjs";
 	import Form from "bzd/vue/components/form/form.vue";
+	import Component from "bzd/vue/components/layout/component.vue";
+	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 
 	export default {
 		props: {
 			volume: { mandatory: false, type: String, default: null }
 		},
+		directives: {
+			loading: DirectiveLoading
+		},
 		components: {
 			Form
 		},
+		mixins: [Component],
 		mounted() {
-			this.fetchConfig();
+			if (this.volume !== null) {
+				this.fetchConfig();
+			}
 		},
 		data: function() {
 			return {
@@ -29,8 +41,16 @@
 			formDescription() {
 				return [
 					{
+						type: "Input",
+						name: "volume",
+						caption: "Name",
+						validation: "mandatory"
+					},
+					{
 						type: "Dropdown",
 						name: "type",
+						caption: "Type",
+						validation: "mandatory",
 						list: Object.keys(Plugins).reduce((obj, key) => {
 							obj[key] = Plugins[key].name;
 							return obj;
@@ -62,19 +82,28 @@
 		},
 		methods: {
 			async fetchConfig() {
-				this.config = await this.$api.request("get", "/config", {
-					volume: this.volume
+				await this.handleSubmit(async () => {
+					this.config = await this.$api.request("get", "/config", {
+						volume: this.volume
+					});
+					this.config.volume = this.volume;
 				});
 			},
-			async handleSubmit() {
-				await this.$api.request("post", "/config", {
-					volume: this.volume,
-					config: this.config
+			async handleSubmitConfig() {
+				await this.handleSubmit(async () => {
+					await this.$api.request("post", "/config", {
+						volume: this.volume,
+						config: this.config
+					});
+					this.$routerDispatch("/refresh");
 				});
 			},
 			async handleDelete() {
-				await this.$api.request("delete", "/config", {
-					volume: this.volume
+				await this.handleSubmit(async () => {
+					await this.$api.request("delete", "/config", {
+						volume: this.volume
+					});
+					this.$routerDispatch("/refresh");
 				});
 			}
 		}

@@ -5,7 +5,7 @@ export default {
 		{
 			type: "Dropdown",
 			name: "docker.type",
-			caption: "Type",
+			caption: "Registry Type",
 			list: {
 				v2: "Docker V2",
 				gcr: "Google Container Registry"

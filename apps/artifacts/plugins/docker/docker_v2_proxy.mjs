@@ -84,6 +84,6 @@ export default class DockerV2Proxy {
 	}
 
 	async stop() {
-		await this.proxy.close();
+		await this.proxy.stop();
 	}
 }

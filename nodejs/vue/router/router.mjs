@@ -68,7 +68,7 @@ class RouterManager {
 					await this.options.authentication.refreshAuthentication();
 				}
 
-				if (route.component) {
+				if ("component" in route) {
 					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt), args);
 				}
 				if (route.handler) {

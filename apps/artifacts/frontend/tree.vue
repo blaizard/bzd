@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container" v-loading="loading">
 		<template v-for="item in list">
 			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
 				{{ item.name }}
@@ -8,25 +8,34 @@
 				</span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
-				<TreeDirectory :path="makePath(item)" :depth="depth + 1" class="indent"></TreeDirectory>
+				<TreeDirectory
+					:path="makePath(item)"
+					:depth="depth + 1"
+					class="indent"
+					@item="handleItemPropagation(item.name, $event)"></TreeDirectory>
 			</div>
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
-		<div v-else-if="isLoading">...</div>
 		<div v-else-if="isEmpty">&lt;emtpy&gt;</div>
 	</div>
 </template>
 
 <script>
+	import Component from "bzd/vue/components/layout/component.vue";
+	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+
 	export default {
+		mixins: [Component],
 		name: "TreeDirectory",
 		props: {
 			path: { type: Array, mandatory: false, default: () => [] },
 			depth: { type: Number, mandatory: false, default: 0 }
 		},
+		directives: {
+			loading: DirectiveLoading
+		},
 		data: function() {
 			return {
-				next: true,
 				list: [],
 				expanded: {},
 				error: null
@@ -39,29 +48,16 @@
 			isError() {
 				return this.error !== null;
 			},
-			isLoading() {
-				return !this.isError && this.next !== null;
-			},
 			isEmpty() {
-				return this.list.length == 0 && !this.isLoading;
+				return this.list.length == 0;
 			}
 		},
 		methods: {
 			async fetchPath() {
-				if (this.next === null) {
-					return;
-				}
 				try {
-					const response = await this.$api.request("post", "/list", {
-						path: this.path,
-						paging: this.next === true ? 50 : this.next
-					});
-					this.next = response.next;
-					this.list = this.list.concat(response.data);
-					this.list.sort(new Intl.Collator().compare);
-					if (this.next) {
-						this.fetchPath();
-					}
+					await this.handleSubmit(async () => {
+						this.list = await this.$cache.get("list", ...this.path);
+					}, /*throwOnError*/ true);
 				}
 				catch (e) {
 					this.error = e;
@@ -82,6 +78,12 @@
 				return this.path.concat([item.name]);
 			},
 			handleClick(item) {
+				// Propagate the item message up with the arguments
+				this.$emit("item", {
+					item: item,
+					path: []
+				});
+
 				if (!this.isExpandable(item)) {
 					return;
 				}
@@ -94,7 +96,11 @@
 				}
 			},
 			handleConfig(name) {
-				this.$emit("config", name);
+				this.$routerDispatch("/config/" + name);
+			},
+			handleItemPropagation(name, item) {
+				item.path.unshift(name);
+				this.$emit("item", item);
 			}
 		}
 	};

@@ -78,6 +78,8 @@ export default class APIClient extends Base {
 			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
 			fetchOptions.query = data;
 			break;
+		case undefined:
+			break;
 		default:
 			Exception.unreachable("{} {}: Unsupported request type '{}'", method, endpoint, requestOptions.type);
 		}
