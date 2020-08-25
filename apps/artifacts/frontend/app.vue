@@ -4,6 +4,7 @@
 			Artifacts
 		</template>
 		<template #actions>
+			<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
 			<MenuEntry text="Add" icon="bzd-icon-add" link="/config"></MenuEntry>
 		</template>
 		<template #content>
@@ -54,7 +55,8 @@
 					},
 					{ path: "/config/{volume}", component: () => import("./config.vue") },
 					{ path: "/config", component: () => import("./config.vue") },
-					{ path: "/view/{path:.*}", component: () => import("./view.vue") }
+					{ path: "/view/{path:.*}", component: () => import("./view.vue") },
+					{ path: "/services", component: () => import("./services.vue") }
 				]
 			});
 		},
@@ -74,7 +76,7 @@
 	@use "bzd-style/css/loading.scss";
 
 	@use "bzd/icons.scss" as icons with (
-		$bzdIconNames: add
+		$bzdIconNames: add tile
 	);
 
 	.bzd-content {

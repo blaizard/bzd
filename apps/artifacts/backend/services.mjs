@@ -32,6 +32,17 @@ export default class Services {
 		}
 	}
 
+	/**
+	 * Get list of active services
+	 */
+	getActive() {
+		let services = {};
+		for (const name in this.instances) {
+			services[name] = Object.keys(this.instances[name]);
+		}
+		return services;
+	}
+
 	async start(name, namespace, params) {
 		Exception.assert(!(name in this.instances), "Instances for '{}' are already created.", name);
 		for (const [type, service] of this._iterate(namespace)) {

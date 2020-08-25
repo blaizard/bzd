@@ -23,9 +23,7 @@
 			};
 		},
 		mounted() {
-			if (this.volume !== null) {
-				this.fetchConfig();
-			}
+			this.fetchConfig();
 		},
 		computed: {
 			pathList() {

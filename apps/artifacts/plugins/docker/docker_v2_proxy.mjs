@@ -79,7 +79,7 @@ export default class DockerV2Proxy {
 	}
 
 	async start() {
-		this.proxy.start();
+		await this.proxy.start();
 		Log.info("Deployed Docker proxy at '{}' on port {}", this.url, this.port);
 	}
 

@@ -9,7 +9,7 @@ import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
-//import Filesystem from "bzd/core/filesystem.mjs";
+import Filesystem from "bzd/core/filesystem.mjs";
 import Services from "./services.mjs";
 import Plugins from "../plugins/backend.mjs";
 
@@ -46,29 +46,27 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Test data
 
+	 await keyValueStore.set("volume", "disk", {
+	 type: "fs",
+	 "fs.root": "/"
+	 });
 	/*
-	 *await keyValueStore.set("volume", "disk", {
-	 *type: "fs",
-	 *"fs.root": "/"
-	 *});
-	 *
 	 *await keyValueStore.set("volume", "docker.blaizard.com", {
 	 *type: "docker",
 	 *"docker.type": "v2",
 	 *"docker.url": "https://docker.blaizard.com"
 	 *});
-	 *
-	 *await keyValueStore.set("volume", "docker.gcr", {
-	 *type: "docker",
-	 *"docker.type": "gcr",
-	 *"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
-	 *"docker.service": "gcr.io",
-	 *"docker.url": "https://docker.blaizard.com",
-	 *"docker.proxy": true,
-	 *"docker.proxy.url": "http://127.0.0.1:5050",
-	 *"docker.proxy.port": 5051
-	 *});
 	 */
+	 await keyValueStore.set("volume", "docker.gcr", {
+	 type: "docker",
+	 "docker.type": "gcr",
+	 "docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
+	 "docker.service": "gcr.io",
+	 "docker.url": "https://docker.blaizard.com",
+	 "docker.proxy": true,
+	 "docker.proxy.url": "http://127.0.0.1:5050",
+	 "docker.proxy.port": 5051
+	 });
 
 	// Set the cache
 	let cache = new Cache();
@@ -167,7 +165,7 @@ Commander.version("1.0.0", "-v, --version")
 	});
 
 	api.handle("post", "/list", async (inputs) => {
-		// eslint-disable-next-line
+
 		const { volume, pathList } = getInternalPath(inputs.path);
 		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
 
@@ -190,6 +188,10 @@ Commander.version("1.0.0", "-v, --version")
 			data: result.data(),
 			next: result.getNextPaging()
 		};
+	});
+
+	api.handle("get", "/services", async (inputs) => {
+		return services.getActive();
 	});
 
 	Log.info("Application started");
