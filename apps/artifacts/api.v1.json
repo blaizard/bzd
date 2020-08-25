@@ -50,5 +50,13 @@
                 }
             }
         }
+    },
+    "/services": {
+        "get": {
+            "documentation": "Get the list of active services.",
+            "response": {
+                "type": "json"
+            }
+        }
     }
 }
