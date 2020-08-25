@@ -153,7 +153,7 @@ export default class StorageDockerV2 extends Base {
 		});
 
 		const resultDigest = await this.fetch.get("/v2/" + imageName + "/blobs/" + result.config.digest, {
-			args: "repository:" + imageName + ":pull",
+			args: "repository:" + imageName + ":pull"
 		});
 		data.unshift({
 			name: "manifest.json",
