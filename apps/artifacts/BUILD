@@ -36,6 +36,7 @@ container_image(
     env = {
         "NODE_ENV": "production",
     },
+    stamp = True,
     tags = ["nodejs"],
     tars = [
         ":package",
