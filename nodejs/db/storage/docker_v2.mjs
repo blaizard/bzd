@@ -145,20 +145,25 @@ export default class StorageDockerV2 extends Base {
 				Accept: "application/vnd.docker.distribution.manifest.v2+json"
 			}
 		});
-		const data = [
-			{
-				name: "manifest.json",
-				size: result.config.size,
-				digest: result.config.digest
-			}
-		].concat(
-			result.layers.map((layer) => {
-				return {
-					name: layer.digest,
-					size: layer.size
-				};
-			})
-		);
+		let data = result.layers.map((layer) => {
+			return {
+				name: layer.digest,
+				size: layer.size
+			};
+		});
+
+		const resultDigest = await this.fetch.get("/v2/" + imageName + "/blobs/" + result.config.digest, {
+			args: "repository:" + imageName + ":pull",
+		});
+		data.unshift({
+			name: "manifest.json",
+			size: result.config.size,
+			digest: result.config.digest,
+			architecture: resultDigest.architecture,
+			os: resultDigest.os,
+			created: resultDigest.created,
+			author: resultDigest.author
+		});
 
 		return await CollectionPaging.makeFromList(data, maxOrPaging);
 	}
