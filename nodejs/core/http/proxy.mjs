@@ -107,10 +107,13 @@ export default class HttpProxy {
 		});
 
 		return new Promise((resolve, reject) => {
-			this.server.listen(this.port).once("listening", () => {
-				Log.info("Deployed HTTP Proxy for '{}' listening on port {}", this.target.href, this.port);
-				resolve();
-			}).once("error", reject);
+			this.server
+				.listen(this.port)
+				.once("listening", () => {
+					Log.info("Deployed HTTP Proxy for '{}' listening on port {}", this.target.href, this.port);
+					resolve();
+				})
+				.once("error", reject);
 		});
 	}
 
