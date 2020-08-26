@@ -62,7 +62,6 @@
 		},
 		methods: {
 			handleItem(item) {
-				console.log(item);
 				this.path = item.path.concat([item.item.name]);
 				this.$routerDispatch("/view/" + this.path.map((c) => encodeURIComponent(c)).join("/"));
 			}

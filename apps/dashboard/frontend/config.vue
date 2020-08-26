@@ -122,7 +122,6 @@
 				return this.dropdownPluginList(this.pluginsSource, this.value["visualization.type"]);
 			},
 			dropdownColorList() {
-				console.log(Colors);
 				return Object.keys(Colors)
 					.map((name) => {
 						return [
