@@ -68,7 +68,6 @@ Commander.version("1.0.0", "-v, --version")
 	 *"docker.proxy.port": 5051
 	 *});
 	 */
-
 	// Set the cache
 	let cache = new Cache();
 
@@ -171,9 +170,9 @@ Commander.version("1.0.0", "-v, --version")
 
 		if (!volume) {
 			const volumes = await keyValueStore.list("volume", maxOrPaging);
-			const data = Object.keys(volumes.data());
+			const data = Object.entries(volumes.data());
 			const result = await CollectionPaging.makeFromList(data, data.length, (item) => {
-				return { name: item, type: "bucket" };
+				return { name: item[0], type: "bucket", plugin: item[1].type };
 			});
 			return {
 				data: result.data(),

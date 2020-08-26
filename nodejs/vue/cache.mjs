@@ -17,7 +17,9 @@ export default {
 				content: {}
 			},
 			methods: {
-				getReactive(collection, id = "default") {
+				getReactive(collection, ...ids) {
+					const id = ids.map((id) => String(id)).join("/") || "default";
+
 					// If data does not exists, create it
 					if (!(collection in this.content)) {
 						this.$set(this.content, collection, {});
@@ -26,11 +28,10 @@ export default {
 						this.$set(this.content[collection], id, options[collection].default || "");
 					}
 
-					if (cache.isDirty(collection, id)) {
-						(async () => {
-							this.content[collection][id] = await cache.get(collection, id);
-						})();
-					}
+					cache.get(collection, ...ids).then((value) => {
+						this.content[collection][id] = value;
+					});
+
 					return this.content[collection][id];
 				},
 				async get(collection, ...ids) {

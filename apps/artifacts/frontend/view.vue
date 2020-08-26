@@ -1,13 +1,17 @@
 <template>
 	<div v-loading="loading">
-		{{ pathList }}
-		<div>{{ item }}</div>
+		<component :is="viewComponent" :path-list="pathList"></component>
 	</div>
 </template>
 
 <script>
 	import Component from "bzd/vue/components/layout/component.vue";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import ExceptionFactory from "bzd/core/exception.mjs";
+
+	import Plugins from "../plugins/frontend.mjs";
+
+	const Exception = ExceptionFactory("view");
 
 	export default {
 		mixins: [Component],
@@ -19,6 +23,7 @@
 		},
 		data: function() {
 			return {
+				volumes: [],
 				itemList: []
 			};
 		},
@@ -29,23 +34,28 @@
 			pathList() {
 				return this.path.split("/").map((c) => decodeURIComponent(c));
 			},
-			name() {
-				return this.pathList.slice(-1);
+			volume() {
+				return this.pathList[0] || null;
 			},
-			item() {
-				for (const item of this.itemList) {
-					if (item.name == this.name) {
-						return item;
+			plugin() {
+				for (const item of this.volumes) {
+					if (item.name == this.volume) {
+						Exception.assert(item.plugin in Plugins, "Unsupported plugin '{}'", item.plugin);
+						return Plugins[item.plugin];
 					}
 				}
 				return null;
+			},
+			viewComponent() {
+				if (this.plugin !== null) {
+					return this.plugin.visualization;
+				}
 			}
 		},
 		methods: {
 			async fetchConfig() {
 				await this.handleSubmit(async () => {
-					const containingPath = this.pathList.slice(0, -1);
-					this.itemList = await this.$cache.get("list", ...containingPath);
+					this.volumes = await this.$cache.get("list");
 				});
 			}
 		}

@@ -319,6 +319,15 @@ function isDirty(collection, ...ids) {
 }
 
 /**
+ * Check if the ressource is currently fetching
+ */
+function isFetching(collection, ...ids) {
+	const id = idsToId.call(this, collection, ...ids);
+	const dataId = this.data[collection][id];
+	return typeof dataId === "object" && "_fetching" in dataId;
+}
+
+/**
  * \brief Get the data requested. Wait until it is available.
  *
  * \param instant If set, and if the data is dirty it will return it
@@ -342,7 +351,7 @@ async function get(instant, collection, ...ids) {
 		const dataId = this.data[collection][id];
 
 		// isFetching
-		if (typeof dataId === "object" && "_fetching" in dataId) {
+		if (isFetching.call(this, collection, ...ids)) {
 			// If instant and there are previous data, return it
 			if (instant) {
 				if ("_error" in dataId) {

@@ -30,6 +30,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "table",
     srcs = [
+        "base.vue",
         "table.vue",
     ],
     visibility = [
