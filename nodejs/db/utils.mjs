@@ -48,7 +48,7 @@ export class CollectionPaging {
 		);
 	}
 
-	static async *makeIterator(generator, maxOrPaging) {
+	static async *makeIterator(generator, maxOrPaging = 20) {
 		do {
 			const results = await generator(maxOrPaging);
 			const data = results.data();
