@@ -1,6 +1,14 @@
 <template>
-	<div v-loading="loading">
-		<component :is="viewComponent" :path-list="pathList"></component>
+	<div v-loading="loading" class="view">
+		<div class="view-path">
+			<template v-for="(segment, index) in pathList">
+				<span class="view-path-separator" :key="index + '.sep'"> / </span>
+				<code class="view-path-segment" :key="index">
+					<RouterLink :link="getLink(index)">{{ segment }}</RouterLink>
+				</code>
+			</template>
+		</div>
+		<component class="bzd-content" :is="viewComponent" :path-list="pathList"></component>
 	</div>
 </template>
 
@@ -48,7 +56,7 @@
 			},
 			viewComponent() {
 				if (this.plugin !== null) {
-					return this.plugin.visualization;
+					return this.plugin.view;
 				}
 			}
 		},
@@ -57,7 +65,28 @@
 				await this.handleSubmit(async () => {
 					this.volumes = await this.$cache.get("list");
 				});
+			},
+			getLink(index) {
+				return (
+					"/view/" +
+					this.pathList
+						.slice(0, index + 1)
+						.map((segment) => encodeURIComponent(segment))
+						.join("/")
+				);
 			}
 		}
 	};
 </script>
+
+<style lang="scss" scoped>
+	.view {
+		margin: 0 !important;
+		.view-path {
+			font-size: 1.5em;
+			line-height: 2em;
+			padding: 0 10px;
+			background-color: #eee;
+		}
+	}
+</style>

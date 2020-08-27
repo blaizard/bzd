@@ -16,6 +16,7 @@
 			</div>
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
+		<div v-if="loading" class="loading">&nbsp;</div>
 		<div v-else-if="isEmpty">&lt;emtpy&gt;</div>
 	</div>
 </template>
@@ -49,7 +50,7 @@
 				return this.error !== null;
 			},
 			isEmpty() {
-				return this.list.length == 0;
+				return !this.loading && this.list.length == 0;
 			}
 		},
 		methods: {

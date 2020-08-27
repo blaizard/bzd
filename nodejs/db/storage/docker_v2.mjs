@@ -147,8 +147,10 @@ export default class StorageDockerV2 extends Base {
 		});
 		let data = result.layers.map((layer) => {
 			return {
-				name: layer.digest,
-				size: layer.size
+				name: layer.digest.replace(/^.*:/, ""),
+				size: layer.size,
+				type: "layer",
+				digest: layer.digest
 			};
 		});
 
@@ -158,6 +160,7 @@ export default class StorageDockerV2 extends Base {
 		data.unshift({
 			name: "manifest.json",
 			size: result.config.size,
+			type: "manifest",
 			digest: result.config.digest,
 			architecture: resultDigest.architecture,
 			os: resultDigest.os,

@@ -18,7 +18,7 @@
 				if (this.isExpandable) {
 					return this.$cache.getReactive("list", ...this.pathList);
 				}
-				return [];
+				return null;
 			},
 			name() {
 				return this.pathList.slice(-1);

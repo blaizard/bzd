@@ -26,6 +26,6 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__pkg__",
     ],
     deps = [
-        "//apps/artifacts/plugins:table",
+        "//apps/artifacts/plugins:default",
     ],
 )
