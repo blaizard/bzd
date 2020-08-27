@@ -25,7 +25,7 @@ export default class Storage extends AsyncInitialize {
 	/**
 	 * List all files under this bucket
 	 */
-	async list(path, maxOrPaging = 50, includeMetadata = false) {
+	async list(path, maxOrPaging = 20, includeMetadata = false) {
 		return this._listImpl(Array.isArray(path) ? path : [path], maxOrPaging, includeMetadata);
 	}
 

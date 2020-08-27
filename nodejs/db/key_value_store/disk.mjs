@@ -95,17 +95,23 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return this.event.waitUntil("ready");
 	}
 
-	async set(bucket, key, value) {
+	async _setImpl(bucket, key, value) {
 		let persistence = await this._getPersistence(bucket);
 		const uid = key === null ? this.generateUID() : key;
 		await persistence.write("set", uid, value);
 		return uid;
 	}
 
-	async get(bucket, key, defaultValue = undefined) {
+	async _getImpl(bucket, key, defaultValue) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
 		return key in data ? data[key] : defaultValue;
+	}
+
+	async _countImpl(bucket) {
+		let persistence = await this._getPersistence(bucket);
+		const data = await persistence.get();
+		return Object.keys(data).length;
 	}
 
 	/**
@@ -113,7 +119,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	 * \param bucket The bucket to be used.
 	 * \param maxOrPaging Paging information.
 	 */
-	async list(bucket, maxOrPaging = 10) {
+	async _listImpl(bucket, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
 		return await CollectionPaging.makeFromObject(data, maxOrPaging);
@@ -127,7 +133,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	 * \param maxOrPaging Paging information.
 	 * \return An object contianing the data and the information about paging and how to get the rest of the data.
 	 */
-	async listMatch(bucket, subKey, value, maxOrPaging = 10) {
+	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
 		const valueList = Array.isArray(value) ? value : [value];
@@ -143,7 +149,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return await CollectionPaging.makeFromObject(filteredData, maxOrPaging);
 	}
 
-	async delete(bucket, key) {
+	async _deleteImpl(bucket, key) {
 		let persistence = await this._getPersistence(bucket);
 		await persistence.write("delete", key);
 	}

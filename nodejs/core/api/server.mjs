@@ -1,3 +1,5 @@
+import Url from "url";
+
 import Base from "./base.mjs";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
@@ -16,11 +18,12 @@ class Context {
 	}
 
 	getHost() {
-		return this.request.get("host");
+		let host = new Url.URL((this.request.secure ? "https://" : "http://") + this.request.get("host"));
+		return host.toString();
 	}
 
 	getEndpoint(endpoint) {
-		return this.getHost() + this.api._makePath(endpoint);
+		return new Url.URL(this.api._makePath(endpoint), this.getHost()).href;
 	}
 
 	setHeader(key, value) {

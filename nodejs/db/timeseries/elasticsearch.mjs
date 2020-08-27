@@ -51,7 +51,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 		return this.options.prefix + encodeURIComponent(bucket);
 	}
 
-	async insert(bucket, timestamp, data) {
+	async _insertImpl(bucket, timestamp, data) {
 		await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc", {
 			method: "post",
 			json: {
@@ -95,13 +95,13 @@ export default class TimeseriesElasticsearch extends Timeseries {
 		}
 	}
 
-	async list(bucket, maxOrPaging = 10) {
+	async _listImpl(bucket, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
 			match_all: {}
 		});
 	}
 
-	async listUntilTimestamp(bucket, timestamp, maxOrPaging = 10) {
+	async _listUntilTimestampImpl(bucket, timestamp, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
 			range: {
 				date: {

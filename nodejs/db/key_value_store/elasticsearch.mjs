@@ -54,7 +54,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		return this.options.prefix + encodeURIComponent(bucket);
 	}
 
-	async set(bucket, key, value) {
+	async _setImpl(bucket, key, value) {
 		let endpoint = "/" + this._bucketToURI(bucket) + "/_doc/";
 		if (key !== null) {
 			endpoint += encodeURIComponent(key);
@@ -68,7 +68,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		return result._id;
 	}
 
-	async get(bucket, key, defaultValue = undefined) {
+	async _getImpl(bucket, key, defaultValue) {
 		try {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 				method: "get"
@@ -86,11 +86,27 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 	}
 
-	async delete(bucket, key) {
-		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
-			method: "delete"
-		});
-		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
+	async _countImpl(bucket) {
+		try {
+			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_count", {
+				method: "post",
+				json: {
+					query: {
+						match_all: {}
+					}
+				}
+			});
+			Exception.assert("count" in result, "Result malformed: {:j}", result);
+			return result.count;
+		}
+		catch (e) {
+			if (e instanceof HttpClientException) {
+				if (e.code == 404 /*Not Found*/) {
+					return 0;
+				}
+			}
+			throw e;
+		}
 	}
 
 	async _search(bucket, maxOrPaging, query) {
@@ -126,13 +142,13 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 	}
 
-	async list(bucket, maxOrPaging = 10) {
+	async _listImpl(bucket, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
 			match_all: {} // eslint-disable-line
 		});
 	}
 
-	async listMatch(bucket, subKey, value, maxOrPaging = 10) {
+	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
 			term: {
 				[subKey]: {
@@ -141,5 +157,12 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				}
 			}
 		});
+	}
+
+	async _deleteImpl(bucket, key) {
+		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
+			method: "delete"
+		});
+		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
 	}
 }

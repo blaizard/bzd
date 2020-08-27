@@ -76,7 +76,7 @@ export default class TimeseriesDisk extends Timeseries {
 		return persistence;
 	}
 
-	async insert(bucket, timestamp, data) {
+	async _insertImpl(bucket, timestamp, data) {
 		let persistence = await this._getPersistence(bucket);
 		await persistence.insert(timestamp, data);
 	}
@@ -86,7 +86,7 @@ export default class TimeseriesDisk extends Timeseries {
 	 *
 	 * \param maxOrPaging Paging information.
 	 */
-	async list(bucket, maxOrPaging) {
+	async _listImpl(bucket, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 
 		// Gather all the data
@@ -105,7 +105,7 @@ export default class TimeseriesDisk extends Timeseries {
 	 *
 	 * \param maxOrPaging Paging information.
 	 */
-	async listUntilTimestamp(bucket, timestamp, maxOrPaging) {
+	async _listUntilTimestampImpl(bucket, timestamp, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 
 		// Gather all the data
