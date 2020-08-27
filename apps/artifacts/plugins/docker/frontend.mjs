@@ -49,5 +49,5 @@ export default {
 			condition: (v) => v["docker.proxy"]
 		}
 	],
-	visualization: () => import("../table.vue")
+	view: () => import("../default.vue")
 };

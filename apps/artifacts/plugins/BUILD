@@ -28,12 +28,15 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "table",
+    name = "default",
     srcs = [
         "base.vue",
-        "table.vue",
+        "default.vue",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/utils:to_string",
     ],
 )
