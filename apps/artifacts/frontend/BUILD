@@ -22,6 +22,7 @@ bzd_nodejs_web(
         "//apps/artifacts/plugins:frontend",
         "//nodejs:icons",
         "//nodejs:vue",
+        "//nodejs/db/storage:permissions",
         "//nodejs/styles/default",
         "//nodejs/vue:api",
         "//nodejs/vue:cache",

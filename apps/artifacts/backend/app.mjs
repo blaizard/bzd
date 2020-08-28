@@ -9,9 +9,10 @@ import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
-//import Filesystem from "bzd/core/filesystem.mjs";
+import Filesystem from "bzd/core/filesystem.mjs";
 import Services from "./services.mjs";
 import Plugins from "../plugins/backend.mjs";
+import Permissions from "bzd/db/storage/permissions.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -45,29 +46,29 @@ Commander.version("1.0.0", "-v, --version")
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	// Test data
-	/*
-	 *await keyValueStore.set("volume", "disk", {
-	 *	type: "fs",
-	 *	"fs.root": "/"
-	 *});
-	 *
-	 *await keyValueStore.set("volume", "docker.blaizard.com", {
-	 *	type: "docker",
-	 *	"docker.type": "v2",
-	 *	"docker.url": "https://docker.blaizard.com"
-	 *});
-	 *
-	 *await keyValueStore.set("volume", "docker.gcr", {
-	 *	type: "docker",
-	 *	"docker.type": "gcr",
-	 *	"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
-	 *	"docker.service": "gcr.io",
-	 *	"docker.url": "https://docker.blaizard.com",
-	 *	"docker.proxy": true,
-	 *	"docker.proxy.url": "http://127.0.0.1:5050",
-	 *	"docker.proxy.port": 5051
-	 *});
-	 */
+
+	await keyValueStore.set("volume", "disk", {
+		type: "fs",
+		"fs.root": "/"
+	});
+
+	await keyValueStore.set("volume", "docker.blaizard.com", {
+		type: "docker",
+		"docker.type": "v2",
+		"docker.url": "https://docker.blaizard.com"
+	});
+
+	await keyValueStore.set("volume", "docker.gcr", {
+		type: "docker",
+		"docker.type": "gcr",
+		"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
+		"docker.service": "gcr.io",
+		"docker.url": "https://docker.blaizard.com",
+		"docker.proxy": true,
+		"docker.proxy.url": "http://127.0.0.1:5050",
+		"docker.proxy.port": 5051
+	});
+
 	// Set the cache
 	let cache = new Cache();
 
@@ -172,7 +173,16 @@ Commander.version("1.0.0", "-v, --version")
 			const volumes = await keyValueStore.list("volume", maxOrPaging);
 			const data = Object.entries(volumes.data());
 			const result = await CollectionPaging.makeFromList(data, data.length, (item) => {
-				return { name: item[0], type: "bucket", plugin: item[1].type };
+				return Permissions.makeEntry(
+					{
+						name: item[0],
+						type: "bucket",
+						plugin: item[1].type
+					},
+					{
+						list: true
+					}
+				);
 			});
 			return {
 				data: result.data(),
