@@ -9,23 +9,29 @@ export default class AuthenticationServer {
 				/**
 				 * Callback to verify once identiy, mathing uid and password pair.
 				 */
-				verifyIdentityCallback: null
+				verifyIdentityAndGetRolesCallback: null,
+				verifyRefreshCallback: null
 			},
 			defaultOptions,
 			options
 		);
 	}
 
-	installAPI(/*api*/) {
-		Exception.unreachable("'installAPI' must be implemented.");
+	installAPI(api) {
+		return this._installAPIImpl(api);
 	}
 
-	async verify(/*request, callback = (uid) => true*/) {
-		Exception.unreachable("'verify' must be implemented.");
+	async verify(request, callback = async (/*user*/) => true) {
+		return this._verifyImpl(request, callback);
 	}
 
-	async verifyIdentity(uid, password) {
-		Exception.assert(this.options.verifyIdentityCallback, "verifyIdentityCallback is not set.");
-		return await this.options.verifyIdentityCallback(uid, password);
+	async verifyIdentityAndGetRoles(uid, password) {
+		Exception.assert(this.options.verifyIdentityAndGetRolesCallback, "verifyIdentityAndGetRolesCallback is not set.");
+		return await this.options.verifyIdentityAndGetRolesCallback(uid, password);
+	}
+
+	async verifyRefresh(uid, session) {
+		Exception.assert(this.options.verifyRefreshCallback, "verifyRefreshCallback is not set.");
+		return await this.options.verifyRefreshCallback(uid, session);
 	}
 }

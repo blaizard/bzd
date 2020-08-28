@@ -22,11 +22,11 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		this.interval = null;
 	}
 
-	isAuthenticated() {
+	_isAuthenticatedImpl() {
 		return this.token !== null;
 	}
 
-	installAPI(api) {
+	_installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
 
 		api.addSchema(APISchema);
@@ -80,7 +80,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return false;
 	}
 
-	async refreshAuthentication() {
+	async _refreshAuthenticationImpl() {
 		// Try to refresh the token
 		if (await this.tryRefreshAuthentication(/*nothrow*/ false)) {
 			return;
@@ -95,7 +95,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		Exception.unreachable("Unauthorized");
 	}
 
-	async setAuthenticationFetch(fetchOptions) {
+	async _setAuthenticationFetchImpl(fetchOptions) {
 		if (!this.isAuthenticated()) {
 			await this.refreshAuthentication();
 		}
@@ -107,7 +107,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		};
 	}
 
-	async makeAuthenticationURL(url) {
+	async _makeAuthenticationURLImpl(url) {
 		if (!this.isAuthenticated()) {
 			await this.refreshAuthentication();
 		}
@@ -116,7 +116,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return url;
 	}
 
-	async login(api, uid, password, persistent = false) {
+	async _loginImpl(api, uid, password, persistent) {
 		const result = await api.request("post", "/auth/login", {
 			uid: uid,
 			password: password,
@@ -126,7 +126,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return true;
 	}
 
-	async logout(api) {
+	async _logoutImpl(api) {
 		await api.request("post", "/auth/logout");
 		this.setToken(null);
 	}
