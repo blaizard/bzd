@@ -1,6 +1,17 @@
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "user",
+    srcs = [
+        "user.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+    ],
+)
+
+bzd_nodejs_library(
     name = "client",
     srcs = [
         "client.mjs",

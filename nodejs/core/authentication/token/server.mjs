@@ -1,6 +1,7 @@
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationServer from "../server.mjs";
+import User from "../user.mjs";
 import Jwt from "jsonwebtoken";
 import APISchema from "./api.json";
 
@@ -44,27 +45,53 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	installAPI(api) {
+	_generateSessionUid(uid) {
+		let sessionUid = uid + "_";
+		for (let i = 0; i < 4; ++i) {
+			sessionUid += Math.random()
+				.toString(36)
+				.substr(2, 8);
+		}
+		return sessionUid;
+	}
+
+	_installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
 		api.addSchema(APISchema);
 
 		const authentication = this;
-		const generateTokens = async function(uid, persistent) {
-			// Generates the refresh tocken and set it to a cookie
-			const refreshToken = await authentication.generateRefreshToken(uid, persistent);
+		const generateTokens = async function(uid, roles, persistent, session) {
+			// Generates the refresh token and set it to a cookie
+			const refreshToken = await authentication.generateRefreshToken(uid, roles, persistent, session);
+
+			/*
+			 * Validate the authentication for this UID and session
+			 * and return some arguments to be passed to the access token
+			 */
+			if (!(await authentication.verifyRefresh(uid, session, refreshToken.timeout))) {
+				return this.setStatus(401, "Unauthorized");
+			}
+
 			this.setCookie("refresh_token", refreshToken.token, {
 				httpOnly: true,
 				maxAge: refreshToken.timeout * 1000
 			});
 
 			// Generate the access token
-			return await authentication.generateAccessToken({ uid: uid });
+			return await authentication.generateAccessToken({ uid: uid, roles: roles });
 		};
 
 		api.handle("post", "/auth/login", async function(inputs) {
 			// Verify uid/password pair
-			if (await authentication.verifyIdentity(inputs.uid, inputs.password)) {
-				return generateTokens.call(this, inputs.uid, inputs.persistent);
+			const roles = await authentication.verifyIdentityAndGetRoles(inputs.uid, inputs.password);
+			if (roles !== false) {
+				return generateTokens.call(
+					this,
+					inputs.uid,
+					roles,
+					inputs.persistent,
+					authentication._generateSessionUid(inputs.uid)
+				);
 			}
 			return this.setStatus(401, "Unauthorized");
 		});
@@ -90,11 +117,13 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 			// Check access here
 			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
-			return generateTokens.call(this, data.uid, data.persistent || false);
+			Exception.assert("roles" in data, "Invalid token: {:j}", data);
+			Exception.assert("session" in data, "Invalid token: {:j}", data);
+			return generateTokens.call(this, data.uid, data.roles, data.persistent || false, data.session);
 		});
 	}
 
-	async verify(request, callback = (/*uid*/) => true) {
+	async _verifyImpl(request, callback) {
 		let token = null;
 		if ("authorization" in request.headers) {
 			const data = request.headers["authorization"].split(" ");
@@ -114,23 +143,26 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		return false;
 	}
 
-	async verifyToken(token, verifyCallback = (/*uid*/) => true) {
+	async verifyToken(token, verifyCallback) {
+		let data = null;
 		try {
-			const data = await this.readToken(token);
-			return await verifyCallback(data.uid);
+			data = await this.readToken(token);
+			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
+			Exception.assert(data && "roles" in data, "Invalid token: {:j}", data);
 		}
 		catch (e) {
 			return false;
 		}
+		return await verifyCallback(new User(data.uid, data.roles));
 	}
 
 	async generateAccessToken(data) {
 		return await this._generateToken(data, this.options.tokenAccessExpiresIn);
 	}
 
-	async generateRefreshToken(uid, persistent) {
+	async generateRefreshToken(uid, roles, persistent, session) {
 		return await this._generateToken(
-			{ uid: uid, persistent: persistent },
+			{ uid: uid, roles: roles, persistent: persistent, session: session },
 			persistent ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn
 		);
 	}

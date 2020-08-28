@@ -71,7 +71,7 @@ export default class APIServer extends Base {
 	/**
 	 * Register a callback to handle a request
 	 */
-	handle(method, endpoint, callback /*options = {}*/) {
+	handle(method, endpoint, callback /*, options = {}*/) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
 		const responseOptions = this.schema[endpoint][method].response || {};
@@ -104,14 +104,13 @@ export default class APIServer extends Base {
 
 			try {
 				// Check if this is a request that needs authentication
-				let authenticationData = { uid: null };
+				let authenticationData = { user: null };
 				if (authentication) {
-					if (
-						!(await authentication.verify(request, (uid) => {
-							authenticationData.uid = uid;
-							return true;
-						}))
-					) {
+					const isAuthorized = await authentication.verify(request, (user) => {
+						authenticationData.user = user;
+						return true;
+					});
+					if (!isAuthorized) {
 						return context.setStatus(401, "Unauthorized");
 					}
 				}
@@ -136,7 +135,7 @@ export default class APIServer extends Base {
 
 				// Add debug information
 				context.addDebug("data", data);
-				context.addDebug("uid", authenticationData.uid);
+				context.addDebug("user", authenticationData.user);
 
 				if ("validation" in requestOptions) {
 					Exception.assert(
@@ -152,7 +151,7 @@ export default class APIServer extends Base {
 					});
 				}
 
-				const result = await callback.call(context, data, authenticationData.uid);
+				const result = await callback.call(context, data, authenticationData.user);
 
 				if ("validation" in responseOptions) {
 					Exception.assert(
