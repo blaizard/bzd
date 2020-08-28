@@ -4,6 +4,7 @@ import CloudAPI from "@google-cloud/storage";
 import { copy as copyStream } from "../../core/stream.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import { CollectionPaging } from "../utils.mjs";
+import Permissions from "./permissions.mjs";
 
 const Storage = CloudAPI.Storage;
 const Log = LogFactory("db", "storage", "google-cloud-storage");
@@ -96,13 +97,20 @@ export default class StorageGoogleCloudStorage extends Base {
 			const name = file.metadata.name.slice(prefix.length);
 			result.push(
 				includeMetadata
-					? {
-						name: name,
-						size: parseInt(file.metadata.size),
-						type: file.metadata.contentType,
-						modified: file.metadata.updated,
-						created: file.metadata.timeCreated
-					  }
+					? Permissions.makeEntry(
+						{
+							name: name,
+							size: parseInt(file.metadata.size),
+							type: file.metadata.contentType,
+							modified: file.metadata.updated,
+							created: file.metadata.timeCreated
+						},
+						{
+							read: true,
+							write: true,
+							delete: true
+						}
+					  )
 					: name
 			);
 		}

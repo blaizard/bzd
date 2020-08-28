@@ -8,7 +8,12 @@
 			</div>
 		</div>
 		<template v-if="innerItemList">
-			<h2>Contains</h2>
+			<h2>
+				Contains
+				<small>({{ innerItemList.length }}
+					<template v-if="innerItemList.length > 1">items)</template>
+					<template v-else>item)</template></small>
+			</h2>
 			<table>
 				<tr>
 					<th v-for="key in innerItemListSortedKeys" :key="key">{{ key }}</th>

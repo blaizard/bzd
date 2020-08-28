@@ -1,9 +1,10 @@
-import Base from "./storage.mjs";
+import Storage from "./storage.mjs";
 import LogFactory from "../../core/log.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import Cache from "../../core/cache.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import { HttpClientFactory } from "../../core/http/client.mjs";
+import Permissions from "./permissions.mjs";
 
 const Log = LogFactory("db", "storage", "docker-v2");
 const Exception = ExceptionFactory("db", "storage", "docker-v2");
@@ -11,7 +12,7 @@ const Exception = ExceptionFactory("db", "storage", "docker-v2");
 /**
  * File storage module
  */
-export default class StorageDockerV2 extends Base {
+export default class StorageDockerV2 extends Storage {
 	constructor(url, options = {}) {
 		super();
 
@@ -113,14 +114,19 @@ export default class StorageDockerV2 extends Base {
 		return new CollectionPaging(data, "link" in headers ? { page: data[data.length - 1].name, max: paging.max } : null);
 	}
 
-	async _listCatalog(maxOrPaging, includeMetadata) {
+	async _listCatalog(maxOrPaging) {
 		return await this._listPagination("/v2/_catalog", maxOrPaging, "registry:catalog:*", (result) => {
-			return includeMetadata
-				? result.repositories.map((item) => ({
-					name: item,
-					type: "directory"
-				  }))
-				: result.repositories;
+			return result.repositories.map((item) =>
+				Permissions.makeEntry(
+					{
+						name: item,
+						type: "directory"
+					},
+					{
+						list: true
+					}
+				)
+			);
 		});
 	}
 
@@ -130,10 +136,17 @@ export default class StorageDockerV2 extends Base {
 			maxOrPaging,
 			"repository:" + imageName + ":pull",
 			(result) => {
-				return result.tags.map((item) => ({
-					name: item,
-					type: "directory"
-				}));
+				return result.tags.map((item) =>
+					Permissions.makeEntry(
+						{
+							name: item,
+							type: "directory"
+						},
+						{
+							list: true
+						}
+					)
+				);
 			}
 		);
 	}
@@ -146,42 +159,58 @@ export default class StorageDockerV2 extends Base {
 			}
 		});
 		let data = result.layers.map((layer) => {
-			return {
-				name: layer.digest.replace(/^.*:/, ""),
-				size: layer.size,
-				type: "layer",
-				digest: layer.digest
-			};
+			return Permissions.makeEntry(
+				{
+					name: layer.digest.replace(/^.*:/, ""),
+					size: layer.size,
+					type: "layer",
+					digest: layer.digest
+				},
+				{
+					read: true
+				}
+			);
 		});
 
 		const resultDigest = await this.fetch.get("/v2/" + imageName + "/blobs/" + result.config.digest, {
 			args: "repository:" + imageName + ":pull"
 		});
-		data.unshift({
-			name: "manifest.json",
-			size: result.config.size,
-			type: "manifest",
-			digest: result.config.digest,
-			architecture: resultDigest.architecture,
-			os: resultDigest.os,
-			created: resultDigest.created,
-			author: resultDigest.author
-		});
+		data.unshift(
+			Permissions.makeEntry(
+				{
+					name: "manifest.json",
+					size: result.config.size,
+					type: "manifest",
+					digest: result.config.digest,
+					architecture: resultDigest.architecture,
+					os: resultDigest.os,
+					created: resultDigest.created,
+					author: resultDigest.author
+				},
+				{
+					read: true
+				}
+			)
+		);
 
 		return await CollectionPaging.makeFromList(data, maxOrPaging);
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		if (pathList.length == 0) {
-			return await this._listCatalog(maxOrPaging, includeMetadata);
+			const results = await this._listCatalog(maxOrPaging, includeMetadata);
+			return includeMetadata ? results : results.map((item) => item.name);
 		}
 		const imageName = pathList[0];
 		if (pathList.length == 1) {
-			return await this._listTags(imageName, maxOrPaging);
+			const results = await this._listTags(imageName, maxOrPaging);
+			return includeMetadata ? results : results.map((item) => item.name);
 		}
 		const tag = pathList[1];
 		if (pathList.length == 2) {
-			return await this._listLayers(imageName, tag, maxOrPaging);
+			const results = await this._listLayers(imageName, tag, maxOrPaging);
+			return includeMetadata ? results : results.map((item) => item.name);
 		}
+		Exception.unreachable("Invalid path '{:j}'", pathList);
 	}
 }

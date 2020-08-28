@@ -7,6 +7,7 @@ import LogFactory from "../../core/log.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import { copy as copyStream } from "../../core/stream.mjs";
 import { CollectionPaging } from "../utils.mjs";
+import Permissions from "./permissions.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
@@ -72,13 +73,21 @@ export default class StorageDisk extends Storage {
 			if (includeMetadata) {
 				return await CollectionPaging.makeFromList(data, maxOrPaging, async (dirent) => {
 					const stat = await FileSystem.stat(fullPath + "/" + dirent.name);
-					return {
-						name: dirent.name,
-						type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
-						size: stat.size,
-						created: stat.ctime,
-						modified: stat.mtime
-					};
+					return Permissions.makeEntry(
+						{
+							name: dirent.name,
+							type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
+							size: stat.size,
+							created: stat.ctime,
+							modified: stat.mtime
+						},
+						{
+							read: dirent.isDirectory() ? false : true,
+							write: dirent.isDirectory() ? false : true,
+							delete: dirent.isDirectory() ? false : true,
+							list: dirent.isDirectory() ? true : false
+						}
+					);
 				});
 			}
 			return await CollectionPaging.makeFromList(data, maxOrPaging);

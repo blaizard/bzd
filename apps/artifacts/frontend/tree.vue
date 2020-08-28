@@ -68,12 +68,12 @@
 				return {
 					entry: true,
 					child: this.depth > 0,
-					expandable: this.isExpandable(item),
+					expandable: this.isPermissionList(item),
 					expanded: item.name in this.expanded
 				};
 			},
-			isExpandable(item) {
-				return ["directory", "bucket"].includes(item.type);
+			isPermissionList(item) {
+				return item.permissions.isList();
 			},
 			makePath(item) {
 				return this.path.concat([item.name]);
@@ -85,7 +85,7 @@
 					path: []
 				});
 
-				if (!this.isExpandable(item)) {
+				if (!this.isPermissionList(item)) {
 					return;
 				}
 				const name = item.name;

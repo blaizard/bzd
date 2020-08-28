@@ -5,6 +5,7 @@ import Router from "bzd/vue/router/router.mjs";
 import API from "bzd/vue/api.mjs";
 import Notification from "bzd/vue/notification.mjs";
 import CachePlugin from "bzd/vue/cache.mjs";
+import Permissions from "bzd/db/storage/permissions.mjs";
 
 import App from "./app.vue";
 import APIv1 from "../api.v1.json";
@@ -39,7 +40,12 @@ Vue.use(CachePlugin, {
 					paging: next
 				});
 				next = response.next;
-				list = list.concat(response.data);
+				list = list.concat(
+					response.data.map((item) => {
+						item.permissions = Permissions.makeFromEntry(item);
+						return item;
+					})
+				);
 				list.sort(new Intl.Collator().compare);
 			} while (next);
 
