@@ -3,6 +3,10 @@ import ExceptionFactory from "../core/exception.mjs";
 
 const Exception = ExceptionFactory("cache");
 
+function idsToId(...ids) {
+	return ids.map((id) => String(id)).join("/") || "default";
+}
+
 export default {
 	install(Vue, options = {}) {
 		let cache = new Cache();
@@ -18,7 +22,7 @@ export default {
 			},
 			methods: {
 				getReactive(collection, ...ids) {
-					const id = ids.map((id) => String(id)).join("/") || "default";
+					const id = idsToId(...ids);
 
 					// If data does not exists, create it
 					if (!(collection in this.content)) {
@@ -37,8 +41,9 @@ export default {
 				async get(collection, ...ids) {
 					return await cache.get(collection, ...ids);
 				},
-				invalid(collection, id = "default") {
-					cache.setDirty(collection, id);
+				invalid(collection, ...ids) {
+					const id = idsToId(...ids);
+					cache.setDirty(collection, ...ids);
 					this.content[collection][id] = options[collection].loading || "";
 				}
 			}
