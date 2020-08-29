@@ -106,10 +106,18 @@ export default class APIServer extends Base {
 				// Check if this is a request that needs authentication
 				let authenticationData = { user: null };
 				if (authentication) {
-					const isAuthorized = await authentication.verify(request, (user) => {
+					// Check if user is authorized
+					let isAuthorized = await authentication.verify(request, (user) => {
 						authenticationData.user = user;
 						return true;
 					});
+					// Check if use has any of the roles
+					{
+						const authenticationSchema = this.schema[endpoint][method].authentication;
+						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
+							isAuthorized &= await authenticationData.user.matchAnyRoles(authenticationSchema);
+						}
+					}
 					if (!isAuthorized) {
 						return context.setStatus(401, "Unauthorized");
 					}

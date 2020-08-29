@@ -17,4 +17,22 @@ export default class User {
 	async getRoles() {
 		return this.roles;
 	}
+
+	/**
+	 * Ensure that all roles are associated with this user.
+	 */
+	async matchAllRoles(roleOrRoles) {
+		const roleList = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
+		const roles = await this.getRoles();
+		return roleList.every((role) => roles.includes(role));
+	}
+
+	/**
+	 * Ensure that at least one role is associated with this user.
+	 */
+	async matchAnyRoles(roleOrRoles) {
+		const roleList = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
+		const roles = await this.getRoles();
+		return roleList.some((role) => roles.includes(role));
+	}
 }
