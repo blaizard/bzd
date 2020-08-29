@@ -28,7 +28,7 @@ export class CollectionPaging {
 		for (const item of data.slice(indexStart, indexEnd)) {
 			slice.push(await callback(item));
 		}
-		return new CollectionPaging(slice, indexEnd > data.length ? null : { page: paging.page + 1, max: paging.max });
+		return new CollectionPaging(slice, indexEnd >= data.length ? null : { page: paging.page + 1, max: paging.max });
 	}
 
 	static async makeFromObject(data, maxOrPaging, callback = (item) => item) {
