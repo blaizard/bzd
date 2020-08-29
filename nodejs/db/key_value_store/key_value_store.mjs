@@ -25,6 +25,13 @@ export default class KeyValueStore extends AsyncInitialize {
 	}
 
 	/**
+	 * Check if a key exists.
+	 */
+	async is(bucket, key) {
+		return (await this.get(bucket, key)) !== undefined;
+	}
+
+	/**
 	 * Return the number of entries in this bucket.
 	 */
 	async count(bucket) {
