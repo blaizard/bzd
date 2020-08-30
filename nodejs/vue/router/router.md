@@ -33,7 +33,8 @@ mounted() {
 		ref: "my-component",
 		routes: [
 			{ path: "/dashboard", nested: true, component: () => import("dashboard.vue") },
-			{ path: "/add", component: () => import("add.vue") }
+			{ path: "/add", component: () => import("add.vue") },
+			{ path: "/list/{page:i}", component: () => import("page.vue") }
 		],
 		fallback: { component: () => import("404.vue") }
 	});

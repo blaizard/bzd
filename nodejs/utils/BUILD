@@ -10,3 +10,25 @@ bzd_nodejs_library(
         "//nodejs:bzd",
     ],
 )
+
+bzd_nodejs_library(
+    name = "uid",
+    srcs = [
+        "uid.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "regexpr",
+    srcs = [
+        "regexpr.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:bzd",
+    ],
+)

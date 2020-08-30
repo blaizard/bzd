@@ -29,7 +29,9 @@ bzd_nodejs_library(
         "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:validation",
         "//nodejs/core/authentication:server",
         "//nodejs/core/authentication:user",
+        "//nodejs/utils:uid",
     ],
 )

@@ -1,3 +1,4 @@
+import { regexprEscape } from "../utils/regexpr.mjs";
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("router");
@@ -28,8 +29,9 @@ export default class Router {
 	 * \brief Associate a new route with a handler (callback).
 	 * It supports the following format:
 	 *	/api/robots
-	 *	/api/robots/search/{name}
-	 *	/api/robots/{id:[0-9]+}
+	 *	/api/robots/search/{name} // match the next segment of the path (until the next slash)
+	 *	/api/robots/{id:i}        // match integer
+	 *  /api/robots/{rest:*}      // match all the rest of the path (including slashes)
 	 */
 	add(path, handler, args = {}) {
 		Exception.assert(handler !== undefined, "You must define a handler for the route '{}'.", path);
@@ -69,8 +71,8 @@ export default class Router {
 
 		// Build the variables
 		let vars = {};
-		route.varList.forEach((name, index) => {
-			vars[name] = matches[index + indexVar + 1];
+		route.varList.forEach((varSchema, index) => {
+			vars[varSchema.name] = varSchema.cast(matches[index + indexVar + 1]);
 		});
 
 		// Return the match
@@ -105,13 +107,6 @@ export default class Router {
 }
 
 /**
- * \brief Escape a string to be used inside a regular expression.
- */
-function escapeRegexp(str) {
-	return str.replace(/[-[\]/{}()*+?.\\^$|]/g, "\\$&");
-}
-
-/**
  * \brief Pre-process routes before being used.
  */
 function compileRoutes(routes, config) {
@@ -127,18 +122,36 @@ function compileRoutes(routes, config) {
 
 		// Build the regular expression out of the path
 		const pathList = path.split(regexp);
-		let pathRegexpr = escapeRegexp(pathList[0]);
+		let pathRegexpr = regexprEscape(pathList[0]);
 
 		for (let i = 1; i < pathList.length; i += 3) {
-			// Add the variable to the list
-			varList.push(pathList[i]);
+			let castType = String;
 
-			// Update the regular expression of the path
-			pathRegexpr += "(" + (pathList[i + 1] ? pathList[i + 1] : "[^/]+") + ")";
+			// Update the regular expression of the path based on the format given
+			switch (String(pathList[i + 1])) {
+			case "":
+				pathRegexpr += "[^/]+";
+				break;
+			case "*":
+				pathRegexpr += "(.+)";
+				break;
+			case "i":
+				castType = parseInt;
+				pathRegexpr += "([0-9]+)";
+				break;
+			default:
+				Exception.unreachable("Unsupported router format: '{}' from route: {}", pathList[i + 1], path);
+			}
+
+			// Add the variable to the list
+			varList.push({
+				cast: castType,
+				name: pathList[i]
+			});
 
 			// Add the follow-up of the path if any
 			if (pathList[i + 2]) {
-				pathRegexpr += escapeRegexp(pathList[i + 2]);
+				pathRegexpr += regexprEscape(pathList[i + 2]);
 			}
 		}
 
