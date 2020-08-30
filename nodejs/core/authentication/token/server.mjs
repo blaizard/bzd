@@ -1,5 +1,7 @@
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
+import Validation from "../../validation.mjs";
+import { makeUid } from "../../../utils/uid.mjs";
 import AuthenticationServer from "../server.mjs";
 import User from "../user.mjs";
 import Jwt from "jsonwebtoken";
@@ -26,6 +28,13 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			 */
 			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60
 		});
+
+		this.validationRefreshToken = new Validation({
+			uid: "mandatory",
+			roles: "mandatory",
+			persistent: "mandatory",
+			session: "mandatory"
+		});
 	}
 
 	async _generateToken(data, expiresIn) {
@@ -43,16 +52,6 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				}
 			});
 		});
-	}
-
-	_generateSessionUid(uid) {
-		let sessionUid = uid + "_";
-		for (let i = 0; i < 4; ++i) {
-			sessionUid += Math.random()
-				.toString(36)
-				.substr(2, 8);
-		}
-		return sessionUid;
 	}
 
 	_installAPIImpl(api) {
@@ -85,13 +84,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Verify uid/password pair
 			const userInfo = await authentication.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
-				return generateTokens.call(
-					this,
-					userInfo.uid,
-					userInfo.roles,
-					inputs.persistent,
-					authentication._generateSessionUid(userInfo.uid)
-				);
+				return generateTokens.call(this, userInfo.uid, userInfo.roles, inputs.persistent, makeUid(userInfo.uid));
 			}
 			return this.setStatus(401, "Unauthorized");
 		});
@@ -109,16 +102,19 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			let data = null;
 			try {
 				data = await authentication.readToken(refreshToken);
+
+				/*
+				 * This ensures that a wrongly formatted token will trigger a new token being generated
+				 * while still having the error reported. This ensure smooth transition to new token format.
+				 */
+				authentication.validationRefreshToken.validate(data);
 			}
 			catch (e) {
-				Log.error(e);
+				Log.error("{}", e);
 				return this.setStatus(401, "Unauthorized");
 			}
 
 			// Check access here
-			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
-			Exception.assert("roles" in data, "Invalid token: {:j}", data);
-			Exception.assert("session" in data, "Invalid token: {:j}", data);
 			return generateTokens.call(this, data.uid, data.roles, data.persistent || false, data.session);
 		});
 	}

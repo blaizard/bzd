@@ -4,6 +4,7 @@ import PersistenceDisk from "../../core/persistence/disk.mjs";
 import Cache from "../../core/cache.mjs";
 import KeyValueStore from "./key_value_store.mjs";
 import FileSystem from "../../core/filesystem.mjs";
+import { makeUid } from "../../utils/uid.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import LogFactory from "../../core/log.mjs";
 
@@ -84,10 +85,6 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return persistence;
 	}
 
-	generateUID() {
-		return "UID-" + Date.now() + "-" + Math.floor(Math.random() * 0xffffffff) + "-" + ++KeyValueStoreDisk.uidCounter;
-	}
-
 	/**
 	 * This function waits until the key value store database is ready
 	 */
@@ -97,7 +94,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 
 	async _setImpl(bucket, key, value) {
 		let persistence = await this._getPersistence(bucket);
-		const uid = key === null ? this.generateUID() : key;
+		const uid = key === null ? makeUid() : key;
 		await persistence.write("set", uid, value);
 		return uid;
 	}
@@ -154,5 +151,3 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		await persistence.write("delete", key);
 	}
 }
-
-KeyValueStoreDisk.uidCounter = 0;

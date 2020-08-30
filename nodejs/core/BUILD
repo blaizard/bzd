@@ -125,6 +125,7 @@ bzd_nodejs_library(
     deps = [
         ":exception",
         "//nodejs:bzd",
+        "//nodejs/utils:regexpr",
     ],
 )
 
