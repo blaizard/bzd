@@ -8,8 +8,10 @@ export default class AuthenticationServer {
 			{
 				/**
 				 * Callback to verify once identiy, mathing uid and password pair.
+				 * In return on success, it will return the UID to be used and roles as a dictionary.
+				 * Otherwise, false should be returned.
 				 */
-				verifyIdentityAndGetRolesCallback: null,
+				verifyIdentityCallback: null,
 				verifyRefreshCallback: null
 			},
 			defaultOptions,
@@ -25,9 +27,9 @@ export default class AuthenticationServer {
 		return this._verifyImpl(request, callback);
 	}
 
-	async verifyIdentityAndGetRoles(uid, password) {
-		Exception.assert(this.options.verifyIdentityAndGetRolesCallback, "verifyIdentityAndGetRolesCallback is not set.");
-		return await this.options.verifyIdentityAndGetRolesCallback(uid, password);
+	async verifyIdentity(uid, password) {
+		Exception.assert(this.options.verifyIdentityCallback, "verifyIdentityCallback is not set.");
+		return await this.options.verifyIdentityCallback(uid, password);
 	}
 
 	async verifyRefresh(uid, session) {
