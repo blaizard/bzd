@@ -83,14 +83,14 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		api.handle("post", "/auth/login", async function(inputs) {
 			// Verify uid/password pair
-			const roles = await authentication.verifyIdentityAndGetRoles(inputs.uid, inputs.password);
-			if (roles !== false) {
+			const userInfo = await authentication.verifyIdentity(inputs.uid, inputs.password);
+			if (userInfo) {
 				return generateTokens.call(
 					this,
-					inputs.uid,
-					roles,
+					userInfo.uid,
+					userInfo.roles,
 					inputs.persistent,
-					authentication._generateSessionUid(inputs.uid)
+					authentication._generateSessionUid(userInfo.uid)
 				);
 			}
 			return this.setStatus(401, "Unauthorized");

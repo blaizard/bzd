@@ -85,7 +85,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	}
 
 	generateUID() {
-		return "UID-" + Date.now() + "-" + Math.floor(Math.random() * 0xffffffff);
+		return "UID-" + Date.now() + "-" + Math.floor(Math.random() * 0xffffffff) + "-" + ++KeyValueStoreDisk.uidCounter;
 	}
 
 	/**
@@ -154,3 +154,5 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		await persistence.write("delete", key);
 	}
 }
+
+KeyValueStoreDisk.uidCounter = 0;
