@@ -19,6 +19,13 @@ export default class User {
 	}
 
 	/**
+	 * Check if a single role is present.
+	 */
+	async matchRole(role) {
+		return await this.matchAnyRoles(role);
+	}
+
+	/**
 	 * Ensure that all roles are associated with this user.
 	 */
 	async matchAllRoles(roleOrRoles) {
