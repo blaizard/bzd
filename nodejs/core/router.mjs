@@ -130,7 +130,7 @@ function compileRoutes(routes, config) {
 			// Update the regular expression of the path based on the format given
 			switch (String(pathList[i + 1])) {
 			case "":
-				pathRegexpr += "[^/]+";
+				pathRegexpr += "([^/]+)";
 				break;
 			case "*":
 				pathRegexpr += "(.+)";
