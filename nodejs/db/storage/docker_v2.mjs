@@ -152,11 +152,12 @@ export default class StorageDockerV2 extends Storage {
 	}
 
 	async _listLayers(imageName, tag, maxOrPaging) {
-		const result = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
+		const [result, headers] = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
 			args: "repository:" + imageName + ":pull",
 			headers: {
 				Accept: "application/vnd.docker.distribution.manifest.v2+json"
-			}
+			},
+			includeAll: true
 		});
 		let data = result.layers.map((layer) => {
 			return Permissions.makeEntry(
@@ -191,6 +192,14 @@ export default class StorageDockerV2 extends Storage {
 					read: true
 				}
 			)
+		);
+
+		data.unshift(
+			Permissions.makeEntry({
+				name: ".metadata",
+				type: "metadata",
+				digest: headers["docker-content-digest"]
+			})
 		);
 
 		return await CollectionPaging.makeFromList(data, maxOrPaging);
