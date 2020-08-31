@@ -358,7 +358,8 @@ function getWebpackConfigDefault(isDev, config) {
 					test: /\.vue$/,
 					loader: "vue-loader",
 					options: {
-						hotReload: isDev
+						hotReload: isDev,
+						prettify: false
 					}
 				},
 				{
