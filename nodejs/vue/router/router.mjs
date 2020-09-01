@@ -235,7 +235,13 @@ class RouterManager {
 			data.path.length - router.pathPropagate.length + (router.pathPropagate == "/" ? 1 : 0)
 		);
 
-		Log.debug("Router '{}' processed path '{}' and propagate path '{}'", uid, router.path, router.pathPropagate);
+		Log.debug(
+			"Router '{}' processed path '{}' (with vars {:j}) and propagate path '{}'",
+			uid,
+			router.path,
+			data.vars,
+			router.pathPropagate
+		);
 
 		/*
 		 * Propagate to nested routers.
