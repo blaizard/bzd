@@ -110,7 +110,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				authentication.validationRefreshToken.validate(data);
 			}
 			catch (e) {
-				Log.error("{}", e);
+				Exception.fromError(e).print();
 				return this.setStatus(401, "Unauthorized");
 			}
 
