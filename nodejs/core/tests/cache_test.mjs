@@ -27,7 +27,7 @@ describe("Cache", () => {
 				await cache.get("tefst", "world");
 			});
 			await Exception.assertThrows(async () => {
-				await cache.get("test");
+				await cache.get("test", false);
 			});
 			await Exception.assertThrows(async () => {
 				await cache.get("tedst");
