@@ -48,7 +48,9 @@ export default class TimeseriesElasticsearch extends Timeseries {
 	}
 
 	_bucketToURI(bucket) {
-		return this.options.prefix + encodeURIComponent(bucket);
+		const indexName = this.options.prefix + encodeURIComponent(bucket);
+		// Elastic search only accepts lower case index names
+		return indexName.toLowerCase();
 	}
 
 	async _insertImpl(bucket, timestamp, data) {
