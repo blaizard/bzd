@@ -111,6 +111,18 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return Object.keys(data).length;
 	}
 
+	async _updateImpl(bucket, key, modifier, defaultValue) {
+		let persistence = await this._getPersistence(bucket);
+		await persistence.write(
+			"update",
+			key,
+			async (value) => {
+				return await modifier(value);
+			},
+			defaultValue
+		);
+	}
+
 	/**
 	 * List all key/value pairs from this bucket.
 	 * \param bucket The bucket to be used.
