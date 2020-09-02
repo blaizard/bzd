@@ -55,6 +55,12 @@ export default class PersistenceDisk {
 					 */
 					delete: (data, key) => {
 						delete data[key];
+					},
+					/**
+					 * Perform a read / modify / write operation
+					 */
+					update: async (data, key, callback, defaultValue = undefined) => {
+						data[key] = await callback(key in data ? data[key] : defaultValue);
 					}
 				},
 				/**

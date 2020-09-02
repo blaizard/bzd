@@ -54,36 +54,71 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		return this.options.prefix + encodeURIComponent(bucket);
 	}
 
-	async _setImpl(bucket, key, value) {
+	async _setImpl(bucket, key, value, query = {}) {
 		let endpoint = "/" + this._bucketToURI(bucket) + "/_doc/";
 		if (key !== null) {
 			endpoint += encodeURIComponent(key);
 		}
 		const result = await this.fetch.request(endpoint, {
 			method: "post",
-			json: value
+			json: value,
+			query: query
 		});
 		Exception.assert(["created", "updated"].includes(result.result), "Unexpected result, received: {}", result.result);
 		Exception.assert("_id" in result, "Response is malformed: {:j}", result);
 		return result._id;
 	}
 
-	async _getImpl(bucket, key, defaultValue) {
+	async _getImpl(bucket, key, defaultValue, includeVersion = false) {
 		try {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 				method: "get"
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
+			if (includeVersion) {
+				return { value: result._source, version: result._version };
+			}
 			return result._source;
 		}
 		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
+					if (includeVersion) {
+						return { value: defaultValue, version: undefined };
+					}
 					return defaultValue;
 				}
 			}
 			throw e;
 		}
+	}
+
+	async _updateImpl(bucket, key, modifier, defaultValue) {
+		// Re-iterate until there is no conflict
+		let maxConflicts = 100;
+		do {
+			const { value, version } = await this._getImpl(bucket, key, defaultValue, /*includeVersion*/ true);
+			const updatedValue = await modifier(value);
+			try {
+				return await this._setImpl(bucket, key, updatedValue, {
+					version: version
+				});
+			}
+			catch (e) {
+				if (e instanceof HttpClientException) {
+					if (e.code == 409 /*Conflict*/ && version !== undefined) {
+						continue;
+					}
+				}
+				throw e;
+			}
+		} while (maxConflicts--);
+
+		Exception.unreachable(
+			"Too many conflicts have occured with update request ({}, {}), something is wrong, aborting.",
+			bucket,
+			key
+		);
 	}
 
 	async _countImpl(bucket) {
