@@ -42,6 +42,7 @@ export default class PersistenceDisk {
 				},
 				/**
 				 * Type of operations supported.
+				 * Note arguments needs to be POD as they will be saved as JSON format into file before being replayed.
 				 */
 				operations: {
 					/**
@@ -55,12 +56,6 @@ export default class PersistenceDisk {
 					 */
 					delete: (data, key) => {
 						delete data[key];
-					},
-					/**
-					 * Perform a read / modify / write operation
-					 */
-					update: async (data, key, callback, defaultValue = undefined) => {
-						data[key] = await callback(key in data ? data[key] : defaultValue);
 					}
 				},
 				/**
@@ -94,6 +89,8 @@ export default class PersistenceDisk {
 		this.savepointVersion = 0;
 		// Task ID of the periodic savepoint if any
 		this.savepointTaskId = null;
+		// Running version of the document, this number increments after each write operation.
+		this.version = 0;
 
 		// The persistence needs to be initialized
 		this.isInitialized = false;
@@ -346,6 +343,13 @@ export default class PersistenceDisk {
 	}
 
 	/**
+	 * \brief Get current running version of the document.
+	 */
+	getVersion() {
+		return this.version;
+	}
+
+	/**
 	 * \brief Register an event
 	 */
 	on(...args) {
@@ -366,6 +370,20 @@ export default class PersistenceDisk {
 		}
 
 		return this.data;
+	}
+
+	/**
+	 * Write new data only if the version number matches.
+	 *
+	 * \param version The version number.
+	 * \param type The type of operation.
+	 */
+	async writeCompare(version, type, ...args) {
+		if (version === this.getVersion()) {
+			await this.write(type, ...args);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -423,6 +441,9 @@ export default class PersistenceDisk {
 			// Update the current object
 			try {
 				await this.options.operations[type].call(this, this.data, ...args);
+
+				// Increment the version number uppon success
+				++this.version;
 
 				// If success set the flag to dirty
 				this.delta.dirty = true;

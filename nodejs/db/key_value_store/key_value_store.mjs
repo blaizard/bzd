@@ -27,8 +27,8 @@ export default class KeyValueStore extends AsyncInitialize {
 	/**
 	 * Atomic operation that consists of a read, modify and write operation.
 	 */
-	async update(bucket, key, modifier = async (value) => value, defaultValue = undefined) {
-		return this._updateImpl(bucket, key, modifier, defaultValue);
+	async update(bucket, key, modifier = async (value) => value, defaultValue = undefined, maxConflicts = 100) {
+		return this._updateImpl(bucket, key, modifier, defaultValue, maxConflicts);
 	}
 
 	/**

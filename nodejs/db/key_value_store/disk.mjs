@@ -111,16 +111,16 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return Object.keys(data).length;
 	}
 
-	async _updateImpl(bucket, key, modifier, defaultValue) {
+	async _updateImpl(bucket, key, modifier, defaultValue, maxConflicts) {
 		let persistence = await this._getPersistence(bucket);
-		await persistence.write(
-			"update",
-			key,
-			async (value) => {
-				return await modifier(value);
-			},
-			defaultValue
-		);
+
+		let isSuccess = false;
+		do {
+			const version = persistence.getVersion();
+			const data = await persistence.get();
+			const modifiedValue = await modifier(key in data ? data[key] : defaultValue);
+			isSuccess = await persistence.writeCompare(version, "set", key, modifiedValue);
+		} while (!isSuccess && maxConflicts--);
 	}
 
 	/**
