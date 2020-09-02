@@ -488,7 +488,6 @@ async function triggerUpdate(collection, id, ...ids) {
 		dataId._timeout = Cache.getTimestampMs() + 100; // Invalid the error after 100ms
 		dataId._size = dataId._error.length || 0;
 		delete dataId._data;
-		throw e;
 	}
 	finally {
 		delete dataId._fetching;
