@@ -93,9 +93,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		}
 	}
 
-	async _updateImpl(bucket, key, modifier, defaultValue) {
+	async _updateImpl(bucket, key, modifier, defaultValue, maxConflicts) {
 		// Re-iterate until there is no conflict
-		let maxConflicts = 100;
 		do {
 			const { value, version } = await this._getImpl(bucket, key, defaultValue, /*includeVersion*/ true);
 			const updatedValue = await modifier(value);
