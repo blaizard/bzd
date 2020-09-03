@@ -34,6 +34,28 @@ class Constraint {
 		return true;
 	}
 
+	/**
+	 * Cast all arguments of the function to their type
+	 */
+	castArgsToType() {
+		for (const i in this.args) {
+			switch (this.entry.type) {
+			case "integer":
+				this.args[i] = Constraint.getAndAssertInteger(this.args[i]);
+				break;
+			case "float":
+				this.args[i] = Constraint.getAndAssertFloat(this.args[i]);
+				break;
+			case "boolean":
+				this.args[i] = Constraint.getAndAssertBoolean(this.args[i]);
+				break;
+			case "string":
+				this.args[i] = String(this.args[i]);
+				break;
+			}
+		}
+	}
+
 	static getAndAssertInteger(arg, result = [], key = null) {
 		const num = parseInt(arg);
 		if (Constraint.assert(result, key, !isNaN(num) && String(arg).match(/^-?[0-9]+$/), "integer")) {
@@ -49,6 +71,15 @@ class Constraint {
 			return num;
 		}
 		Exception.assert(key !== null, "Argument is not a valid integer: '{}'", arg);
+		return undefined;
+	}
+
+	static getAndAssertBoolean(arg, result = [], key = null) {
+		const value = typeof arg == "string" ? { true: true, false: false }[arg] : arg;
+		if (Constraint.assert(result, key, typeof value == "boolean", "boolean")) {
+			return value;
+		}
+		Exception.assert(key !== null, "Argument is not a valid boolean: '{}'", arg);
 		return undefined;
 	}
 
@@ -193,6 +224,9 @@ export default class Validation {
 					case "float":
 						value = Constraint.getAndAssertFloat(value, result, key);
 						break;
+					case "boolean":
+						value = Constraint.getAndAssertBoolean(value, result, key);
+						break;
 					}
 					if (value !== undefined) {
 						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
@@ -250,8 +284,14 @@ export default class Validation {
 					return n > 0;
 				}
 				install() {
+					this.castArgsToType();
 					return (result, value) => {
-						this.assert(result, this.args.includes(value), "must be equal to one of {:j}", this.args);
+						if (this.args.length == 1) {
+							this.assert(result, this.args.includes(value), "must be equal to {}", this.args[0]);
+						}
+						else {
+							this.assert(result, this.args.includes(value), "must be equal to one of {:j}", this.args);
+						}
 					};
 				}
 			},
@@ -260,15 +300,7 @@ export default class Validation {
 					return n == 1;
 				}
 				install() {
-					switch (this.entry.type) {
-					case "string":
-					case "integer":
-						this.args[0] = Constraint.getAndAssertInteger(this.args[0]);
-						break;
-					case "float":
-						this.args[0] = Constraint.getAndAssertFloat(this.args[0]);
-					}
-
+					this.castArgsToType();
 					switch (this.entry.type) {
 					case "string":
 						return (result, value) => {
@@ -301,7 +333,7 @@ export default class Validation {
 				}
 				create() {
 					Exception.assert(
-						["string", "integer", "float"].includes(this.args[0]),
+						["string", "integer", "float", "boolean"].includes(this.args[0]),
 						"'{}' is not a supported type",
 						this.args[0]
 					);
