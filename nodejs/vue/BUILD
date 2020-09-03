@@ -44,6 +44,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "lang",
+    srcs = [
+        "lang.mjs",
+    ],
+    packages = {
+        "vue": "",
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "notification",
     srcs = [
         "notification.mjs",
