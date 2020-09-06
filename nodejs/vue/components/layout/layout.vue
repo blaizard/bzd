@@ -220,13 +220,22 @@
 
 				> * {
 					min-width: $headerHeight;
+					height: $headerHeight;
 					text-align: center;
 				}
 
-				.bzd-menu-nested,
-				.bzd-menu-entry-text {
+				.bzd-menu-entry-text,
+				.bzd-menu-nested {
 					display: none;
 				}
+
+				.bzd-menu-entry-wrapper:hover {
+					.bzd-menu-nested {
+						display: block !important;
+						background-color: $headerBgColor;
+					}
+				}
+
 				.bzd-menu-entry {
 					width: 100%;
 					height: 100%;

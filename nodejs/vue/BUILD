@@ -52,6 +52,9 @@ bzd_nodejs_library(
         "vue": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:localstorage",
+    ],
 )
 
 bzd_nodejs_library(

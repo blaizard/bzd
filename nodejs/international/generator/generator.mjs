@@ -2547,7 +2547,7 @@ class Flags {
 		let index = 0;
 		let countriesJs = {};
 		let countriesCssList = [
-			"*[class^=\"bzd-flag-\"] {display: inline-block;content: '';vertical-align: text-top;background: url(" +
+			"*[class^=\"bzd-flag-\"] {display:inline-block;content:'';vertical-align:middle;background:url(" +
 				Path.join(config.importOutputPath, Path.basename(config.outputImage)) +
 				") no-repeat left top;width:" +
 				config.width +
