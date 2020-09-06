@@ -68,7 +68,7 @@
 				}
 			};
 		},
-		mounted() {
+		updated() {
 			const rect = this.$el.getBoundingClientRect();
 			this.imageEdit.containerWidth = rect.width;
 			this.imageEdit.containerHeight = rect.height;
