@@ -1,4 +1,5 @@
 import ExceptionFactory from "../core/exception.mjs";
+import LocalStorage from "bzd/core/localstorage.mjs";
 
 const Exception = ExceptionFactory("lang");
 
@@ -10,8 +11,12 @@ export default {
 				dictionary: {}
 			},
 			methods: {
+				getLang() {
+					return this.lang;
+				},
 				async setLang(lang) {
 					this.lang = lang;
+					LocalStorage.set("bzd-lang", lang);
 					this.dictionary = await this.fetchDictionary(lang);
 				},
 				async fetchDictionary(lang) {
@@ -27,6 +32,6 @@ export default {
 				}
 			}
 		});
-		Vue.prototype.$lang.setLang("en");
+		Vue.prototype.$lang.setLang(LocalStorage.get("bzd-lang", "gb"));
 	}
 };

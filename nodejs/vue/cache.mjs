@@ -44,7 +44,9 @@ export default {
 				invalid(collection, ...ids) {
 					const id = idsToId(...ids);
 					cache.setDirty(collection, ...ids);
-					this.content[collection][id] = options[collection].loading || "";
+					if (collection in this.content) {
+						this.content[collection][id] = options[collection].loading || "";
+					}
 				}
 			}
 		});

@@ -72,7 +72,8 @@ export default class Router {
 		// Build the variables
 		let vars = {};
 		route.varList.forEach((varSchema, index) => {
-			vars[varSchema.name] = varSchema.cast(matches[index + indexVar + 1]);
+			const varStr = decodeURIComponent(matches[index + indexVar + 1]);
+			vars[varSchema.name] = varSchema.cast(varStr);
 		});
 
 		// Return the match
