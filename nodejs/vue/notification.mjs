@@ -1,9 +1,18 @@
+import ExceptionFactory from "../core/exception.mjs";
+
+const Exception = ExceptionFactory("notification");
+
 export default {
 	install(Vue) {
 		Vue.prototype.$notification = new Vue({
 			data: {
 				entries: [],
 				_uid: 0
+			},
+			computed: {
+				defaultActions() {
+					return [{ id: "close", callback: (entry) => this.close(entry) }];
+				}
 			},
 			methods: {
 				_tryToString(message) {
@@ -17,18 +26,20 @@ export default {
 					return message;
 				},
 				_notify(type, message, options = {}) {
-					message = this._tryToString(message);
-					if (typeof message == "object") {
+					if (typeof this._tryToString(message) == "string") {
+						this._notifySingle(++this._uid, type, message, options);
+					}
+					else if (typeof message == "object") {
 						for (const key in message) {
 							this._notifySingle(key, type, message[key], options);
 						}
 					}
 					else {
-						this._notifySingle(++this._uid, type, message, options);
+						Exception.unreachable("Unsupported message type: {:j}", message);
 					}
 				},
 				_notifySingle(key, type, message, options) {
-					message = this._tryToString(message);
+					const messageStr = this._tryToString(message);
 
 					// If the entry does not exists, create it
 					let index = this._find(key);
@@ -37,7 +48,13 @@ export default {
 							/**
 							 * Time to display this item on the screen (in seconds)
 							 */
-							timeOnScreen: 5
+							timeOnScreen: 5,
+							/**
+							 * Actions associated with this action, if empty no action will be shown.
+							 * An action is an html key (which represents the text associated with this action)
+							 * and a callback.
+							 */
+							actions: [...this.defaultActions]
 						});
 						index = this.entries.length - 1;
 					}
@@ -45,13 +62,14 @@ export default {
 					// Method splice is necessary to make it reactive
 					const entry = Object.assign(this.entries[index], options, {
 						type: type,
-						message: message,
+						message: messageStr,
+						raw: message,
 						key: key
 					});
 					this.entries.splice(index, 1, entry);
 
 					// If null, delete the entry
-					if (message === null) {
+					if (messageStr === null) {
 						this.close(entry);
 					}
 					else if (entry.timeOnScreen > 0) {

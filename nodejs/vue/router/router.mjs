@@ -55,7 +55,7 @@ class RouterManager {
 		});
 
 		options.routes.forEach((route) => {
-			const handler = async (route, args, path) => {
+			const handler = async (route, args, path, routerOptions) => {
 				/*
 				 * Check if the route requires authentication,
 				 * if so ensure that we are authenticated
@@ -69,15 +69,19 @@ class RouterManager {
 				}
 
 				if ("component" in route) {
-					vueElt.$refs[options.ref].componentSet(route.component, this._getUid(vueElt), args);
+					vueElt.$refs[options.ref].componentSet(
+						route.component,
+						this._getUid(vueElt),
+						Object.assign({}, args, routerOptions.props)
+					);
 				}
 				if (route.handler) {
-					route.handler(path);
+					route.handler(path, routerOptions);
 				}
 			};
 
-			router.add(route.path, (args) => {
-				handler(route, args, "/");
+			router.add(route.path, (args, routerOptions) => {
+				handler(route, args, "/", routerOptions);
 			});
 
 			// To handle nested components
@@ -172,14 +176,28 @@ class RouterManager {
 	/**
 	 * Dispatch a new path to the routers
 	 */
-	async dispatch(path = null, query = {}) {
+	async dispatch(path = null, options = {}) {
 		this.path = this.getRoute(path);
 
+		options = Object.assign(
+			{
+				/**
+				 * Query to be added to the URL.
+				 */
+				query: {},
+				/**
+				 * Custom properties that will be added to the component.
+				 */
+				props: {}
+			},
+			options
+		);
+
 		// Update the url
-		const queryStr = Object.keys(query).length
+		const queryStr = Object.keys(options.query).length
 			? "?" +
-			  Object.keys(query)
-			  	.map((key) => key + "=" + encodeURIComponent(query[key]))
+			  Object.keys(options.query)
+			  	.map((key) => key + "=" + encodeURIComponent(options.query[key]))
 			  	.join("&")
 			: "";
 		history.pushState(null, null, this.options.hash ? queryStr + "#" + this.path : this.path + queryStr);
@@ -196,7 +214,7 @@ class RouterManager {
 		let promiseList = [];
 		for (const [uid, config] of this.routers.entries()) {
 			if (config.parent == null) {
-				promiseList.push(this._propagate(uid));
+				promiseList.push(this._propagate(uid, options));
 			}
 		}
 		await Promise.all(promiseList);
@@ -205,7 +223,7 @@ class RouterManager {
 	/**
 	 * Propagate a dispatch request to the routers
 	 */
-	async _propagate(uid) {
+	async _propagate(uid, options = {}) {
 		let router = this.routers.get(uid);
 
 		// If this router is already processed, do nothing
@@ -216,14 +234,14 @@ class RouterManager {
 		let data = null;
 		// If this is a top level router
 		if (router.parent === null) {
-			data = await router.router.dispatch(this.path);
+			data = await router.router.dispatch(this.path, options);
 		}
 		// Otherwise it must be a nested router
 		else {
 			const parent = this.routers.get(router.parent);
 			Exception.assert(parent, "Router '{}' is set as nested but has an invalid parent '{}'", uid, router.parent);
 			Exception.assert(parent.pathPropagate !== null, "Propagated path from parent '{}' is null", router.parent);
-			data = await router.router.dispatch(parent.pathPropagate);
+			data = await router.router.dispatch(parent.pathPropagate, options);
 		}
 
 		Exception.assert(data !== null, "Dispatched information is empty.");
@@ -250,7 +268,7 @@ class RouterManager {
 		await delayMs(1);
 
 		let promiseList = Array.from(router.children).map(async (childUid) => {
-			await this._propagate(childUid);
+			await this._propagate(childUid, options);
 		});
 		await Promise.all(promiseList);
 	}
@@ -276,8 +294,8 @@ export default class {
 			await routers.registerRouter(this, routeOptions);
 		};
 
-		Vue.prototype.$routerDispatch = async (path, query = {}) => {
-			await routers.dispatch(path, query);
+		Vue.prototype.$routerDispatch = async (path, options = {}) => {
+			await routers.dispatch(path, options);
 		};
 
 		Vue.prototype.$routerGet = () => {
