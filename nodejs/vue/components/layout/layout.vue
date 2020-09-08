@@ -43,9 +43,12 @@
 					:class="getNotificationClass(entry)"
 					:style="getNotificationStyle(entry)">
 					<div class="bzd-notification-content">{{ entry.message }}</div>
-					<div class="bzd-notification-close" @click="notificationClose(entry)">
-						<i class="bzd-icon-close"></i>
-					</div>
+					<div
+						v-for="(action, index) in entry.actions"
+						:key="index"
+						class="bzd-notification-action"
+						@click="action.callback(entry)"
+						v-html="getActionHtml(action)"></div>
 				</div>
 			</template>
 
@@ -96,6 +99,13 @@
 			}
 		},
 		methods: {
+			getActionHtml(action) {
+				switch (action.id) {
+				case "close":
+					return "<i class=\"bzd-icon-close\"></i>";
+				}
+				return action.html;
+			},
 			getNotificationClass(entry) {
 				return {
 					"bzd-notification": true,
@@ -369,7 +379,7 @@
 				.bzd-notification-content {
 					flex: 1;
 				}
-				.bzd-notification-close {
+				.bzd-notification-action {
 					@extend %bzd-clickable;
 				}
 
