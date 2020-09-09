@@ -8,6 +8,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
+        "//nodejs/core:format",
     ],
 )
 
