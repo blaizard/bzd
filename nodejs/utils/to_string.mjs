@@ -1,3 +1,5 @@
+import Format from "../core/format.mjs";
+
 function _unitsToString(unitList, value, maxNbUnits = 1, decimalPoints = 1) {
 	let unitIndex = 0;
 
@@ -49,4 +51,17 @@ export function timeMsToString(value, maxNbUnits = 1) {
 		maxNbUnits,
 		/*decimalPoints*/ 0
 	);
+}
+
+export function dateToString(format, timestamp) {
+	const date = new Date(timestamp);
+	return Format(format, {
+		ms: date.getMilliseconds(),
+		s: date.getSeconds(),
+		min: date.getMinutes(),
+		h: date.getHours(),
+		d: date.getDate(),
+		m: date.getMonth() + 1,
+		y: date.getFullYear()
+	});
 }

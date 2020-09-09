@@ -4,6 +4,7 @@
  * @param  {...any} args
  */
 export default function(str, ...args) {
+	// By default false, as it gets updated during the processing part.
 	let pattern = new RegExp("{([^}:]*)(?::([^}]*))?}", "g");
 	let output = "";
 	let index = 0;
@@ -19,7 +20,7 @@ export default function(str, ...args) {
 		// Handle the operation if any match
 		if (m) {
 			const format = _parseFormat(m[1], m[2], substitutionIndex);
-			const value = args[format.index];
+			const value = typeof format.index == "string" ? args[0][format.index] : args[format.index];
 
 			switch (format.type || "") {
 			case "j":
@@ -40,8 +41,9 @@ export default function(str, ...args) {
 }
 
 function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
+	const index = substitutionIndex ? parseInt(substitutionIndex) : currentSubstitutionIndex;
 	return {
-		index: substitutionIndex ? parseInt(substitutionIndex) : currentSubstitutionIndex,
+		index: isNaN(index) ? substitutionIndex : index,
 		type: options
 	};
 }
