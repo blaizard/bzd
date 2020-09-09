@@ -17,8 +17,6 @@ import Permissions from "bzd/db/storage/permissions.mjs";
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
 
-const USE_TEST_DATA = false;
-
 Commander.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option(
@@ -33,6 +31,7 @@ Commander.version("1.0.0", "-v, --version")
 		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
 		"/bzd/data"
 	)
+	.option("--test", "Use test data.")
 	.parse(process.argv);
 
 (async () => {
@@ -48,7 +47,7 @@ Commander.version("1.0.0", "-v, --version")
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	// Test data
-	if (USE_TEST_DATA) {
+	if (Commander.test) {
 		await keyValueStore.set("volume", "disk", {
 			type: "fs",
 			"fs.root": "/"
