@@ -72,7 +72,7 @@ export default class Router {
 		// Build the variables
 		let vars = {};
 		route.varList.forEach((varSchema, index) => {
-			const varStr = decodeURIComponent(matches[index + indexVar + 1]);
+			const varStr = matches[index + indexVar + 1];
 			vars[varSchema.name] = varSchema.cast(varStr);
 		});
 
@@ -131,9 +131,11 @@ function compileRoutes(routes, config) {
 			// Update the regular expression of the path based on the format given
 			switch (String(pathList[i + 1])) {
 			case "":
+				castType = decodeURIComponent;
 				pathRegexpr += "([^/]+)";
 				break;
 			case "*":
+				// No cast here, a raw string should be used here to differenciate between slashes and components.
 				pathRegexpr += "(.+)";
 				break;
 			case "i":
