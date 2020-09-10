@@ -76,7 +76,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
 			if (includeAll) {
-				return result;
+				return [result._source, result, false];
 			}
 			return result._source;
 		}
@@ -84,7 +84,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					if (includeAll) {
-						return { _source: defaultValue };
+						return [defaultValue, undefined, true];
 					}
 					return defaultValue;
 				}
@@ -96,23 +96,19 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	async _updateImpl(bucket, key, modifier, defaultValue, maxConflicts) {
 		// Re-iterate until there is no conflict
 		do {
-			const rawValue = await this._getImpl(bucket, key, undefined, /*includeVersion*/ true);
-			let value;
+			const [value, rawValue, isDefault] = await this._getImpl(bucket, key, undefined, /*includeAll*/ true);
+			let modifiedValue = await modifier(value);
 			let query = {};
-			if (rawValue === undefined) {
-				value = await modifier(defaultValue);
-			}
-			else {
-				value = await modifier(rawValue._source);
+			if (!isDefault) {
 				Exception.assert("_seq_no" in rawValue && "_primary_term" in rawValue, "Response is malformed: {:j}", rawValue);
 				query = { if_seq_no: rawValue._seq_no, if_primary_term: rawValue._primary_term };
 			}
 			try {
-				return await this._setImpl(bucket, key, value, query);
+				return await this._setImpl(bucket, key, modifiedValue, query);
 			}
 			catch (e) {
 				if (e instanceof HttpClientException) {
-					if (e.code == 409 /*Conflict*/ && "_seq_no" in rawValue && "_primary_term" in rawValue) {
+					if (e.code == 409 /*Conflict*/ && isDefault) {
 						continue;
 					}
 				}
@@ -162,6 +158,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 					}
 				}
 			);
+
 			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
 			return CollectionPaging.makeFromTotal(
@@ -191,11 +188,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
-			term: {
-				[subKey]: {
-					value: value,
-					boost: 1
-				}
+			match_phrase: {
+				[subKey]: value
 			}
 		});
 	}
