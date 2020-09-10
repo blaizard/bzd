@@ -94,7 +94,7 @@ export default class StorageGoogleCloudStorage extends Base {
 		});
 		let result = [];
 		for (const file of files) {
-			const name = file.metadata.name.slice(prefix.length);
+			const name = file.metadata.name.slice(prefix.length + 1);
 			result.push(
 				includeMetadata
 					? Permissions.makeEntry(
