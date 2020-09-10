@@ -69,22 +69,22 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		return result._id;
 	}
 
-	async _getImpl(bucket, key, defaultValue, includeVersion = false) {
+	async _getImpl(bucket, key, defaultValue, includeAll = false) {
 		try {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 				method: "get"
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
-			if (includeVersion) {
-				return { value: result._source, version: result._version };
+			if (includeAll) {
+				return result;
 			}
 			return result._source;
 		}
 		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
-					if (includeVersion) {
-						return { value: defaultValue, version: undefined };
+					if (includeAll) {
+						return { _source: defaultValue };
 					}
 					return defaultValue;
 				}
@@ -96,16 +96,23 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	async _updateImpl(bucket, key, modifier, defaultValue, maxConflicts) {
 		// Re-iterate until there is no conflict
 		do {
-			const { value, version } = await this._getImpl(bucket, key, defaultValue, /*includeVersion*/ true);
-			const updatedValue = await modifier(value);
+			const rawValue = await this._getImpl(bucket, key, undefined, /*includeVersion*/ true);
+			let value;
+			let query = {};
+			if (rawValue === undefined) {
+				value = await modifier(defaultValue);
+			}
+			else {
+				value = await modifier(rawValue._source);
+				Exception.assert("_seq_no" in rawValue && "_primary_term" in rawValue, "Response is malformed: {:j}", rawValue);
+				query = { if_seq_no: rawValue._seq_no, if_primary_term: rawValue._primary_term };
+			}
 			try {
-				return await this._setImpl(bucket, key, updatedValue, {
-					version: version
-				});
+				return await this._setImpl(bucket, key, value, query);
 			}
 			catch (e) {
 				if (e instanceof HttpClientException) {
-					if (e.code == 409 /*Conflict*/ && version !== undefined) {
+					if (e.code == 409 /*Conflict*/ && "_seq_no" in rawValue && "_primary_term" in rawValue) {
 						continue;
 					}
 				}
