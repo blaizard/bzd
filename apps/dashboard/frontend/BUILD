@@ -34,6 +34,7 @@ bzd_nodejs_web(
 bzd_package(
     name = "local",
     args = ["/tmp/bzd"],
+    include_metadata = True,
     tags = ["nodejs"],
     deps = {
         ":frontend": "frontend",

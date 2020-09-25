@@ -1,6 +1,7 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/settings/cache:defs.bzl", "BzdSettingCacheProvider")
-load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
+load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment", "bzd_package")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
 
 # ---- Providers
 
@@ -152,7 +153,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Fill in the metadata
 
-    metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.manifest".format(ctx.label.name))
+    metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.json".format(ctx.label.name))
     ctx.actions.run(
         inputs = [package_json, yarn_lock_json, node_modules],
         outputs = [metadata],
@@ -201,7 +202,7 @@ bzd_nodejs_install = rule(
     toolchains = ["//tools/bazel_build/toolchains/nodejs:toolchain_type"],
 )
 
-# ---- bzd_nodejs_node_modules_symlinks
+# ---- bzd_nodejs_aliases_symlinks
 
 """
 Generate the symlinks dictionary to be passed to root_symlinks or symlinks
@@ -377,3 +378,56 @@ def bzd_nodejs_test(name, main, deps = [], visibility = [], tags = [], **kwargs)
         tags = ["nodejs"] + tags,
         visibility = visibility,
     )
+
+# ---- Docker Package ----
+
+def bzd_nodejs_docker(name, deps, cmd, base = "@docker_nodejs//image", include_metadata = False, deploy = {}):
+    bzd_package(
+        name = "{}.package".format(name),
+        tags = ["nodejs"],
+        deps = deps,
+        include_metadata = include_metadata,
+    )
+
+    root_directory = "/bzd/bin"
+    map_to_directory = {dir_name: "{}/{}".format(root_directory, dir_name) for dir_name in deps.values()}
+
+    symlinks = {}
+    if include_metadata:
+        symlinks["metadata.json"] = "{}/metadata.json".format(root_directory)
+
+    container_image(
+        name = name,
+        base = base,
+        cmd = [
+            "node",
+            "--experimental-json-modules",
+        ] + [item.format(**map_to_directory) for item in cmd],
+        symlinks = symlinks,
+        directory = root_directory,
+        env = {
+            "NODE_ENV": "production",
+        },
+        stamp = True,
+        tags = ["nodejs"],
+        tars = [
+            "{}.package".format(name),
+        ],
+    )
+
+    # Add deploy rules if any
+    for rule_name, url in deploy.items():
+        registry = url.split("/")[0]
+        repository = "/".join(url.split("/")[1:])
+
+        container_push(
+            name = rule_name,
+            format = "Docker",
+            image = ":{}".format(name),
+            registry = registry,
+            repository = repository,
+            tag = "latest",
+            tags = [
+                "docker",
+            ],
+        )

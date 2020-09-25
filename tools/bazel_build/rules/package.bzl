@@ -71,13 +71,6 @@ def _bzd_package_impl(ctx):
         else:
             fail("Dependencies for this rule requires BzdPackageFragment provider.")
 
-    ctx.actions.run_shell(
-        inputs = inputs,
-        outputs = [package],
-        progress_message = "Generating package for {}".format(ctx.label),
-        command = "\n".join(package_creation_commands),
-    )
-
     # Build buildstamp
     buildstamp = ctx.actions.declare_file("{}.buildstamp.json".format(ctx.label.name))
     ctx.actions.run(
@@ -89,7 +82,7 @@ def _bzd_package_impl(ctx):
     )
 
     # Merge all metadata fragments together
-    metadata = ctx.actions.declare_file("{}.metadata.manifest".format(ctx.label.name))
+    metadata = ctx.actions.declare_file("{}.metadata.json".format(ctx.label.name))
     ctx.actions.run(
         inputs = manifests + [buildstamp],
         outputs = [metadata],
@@ -98,7 +91,20 @@ def _bzd_package_impl(ctx):
         executable = ctx.attr._metadata.files_to_run,
     )
 
-    # In addition create a executable rule to manipulate the package
+    # If the metadata is request, add it to the package
+    if ctx.attr.include_metadata:
+        inputs.append(metadata)
+        package_creation_commands.append("{} --append \"{}\" --transform 's,^{},metadata.json,'".format(tar_cmd, metadata.path, metadata.path))
+
+    # Build the actual package
+    ctx.actions.run_shell(
+        inputs = inputs,
+        outputs = [package],
+        progress_message = "Generating package for {}".format(ctx.label),
+        command = "\n".join(package_creation_commands),
+    )
+
+    # In addition create an executable rule to manipulate the package
     ctx.actions.write(
         output = ctx.outputs.executable,
         content = """#!/bin/bash
@@ -124,6 +130,10 @@ _bzd_package = rule(
         "deps": attr.label_keyed_string_dict(
             aspects = [_bzd_package_metadata_aspect],
             doc = "Target or files dependencies to be added to the package.",
+        ),
+        "include_metadata": attr.bool(
+            default = False,
+            doc = "Include the metadata as part of the package.",
         ),
         "_metadata": attr.label(
             default = Label("//tools/bazel_build/rules/assets/package:metadata"),

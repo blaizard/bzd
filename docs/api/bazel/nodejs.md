@@ -129,6 +129,29 @@ bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_node
 | kwargs |  <p align="center"> - </p>   |  none |
 
 
+<a name="#bzd_nodejs_docker"></a>
+
+## bzd_nodejs_docker
+
+<pre>
+bzd_nodejs_docker(<a href="#bzd_nodejs_docker-name">name</a>, <a href="#bzd_nodejs_docker-deps">deps</a>, <a href="#bzd_nodejs_docker-cmd">cmd</a>, <a href="#bzd_nodejs_docker-base">base</a>, <a href="#bzd_nodejs_docker-include_metadata">include_metadata</a>, <a href="#bzd_nodejs_docker-deploy">deploy</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :-------------: | :-------------: | :-------------: |
+| name |  <p align="center"> - </p>   |  none |
+| deps |  <p align="center"> - </p>   |  none |
+| cmd |  <p align="center"> - </p>   |  none |
+| base |  <p align="center"> - </p>   |  <code>"@docker_nodejs//image"</code> |
+| include_metadata |  <p align="center"> - </p>   |  <code>False</code> |
+| deploy |  <p align="center"> - </p>   |  <code>{}</code> |
+
+
 <a name="#bzd_nodejs_test"></a>
 
 ## bzd_nodejs_test
