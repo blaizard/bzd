@@ -11,7 +11,7 @@ if __name__ == "__main__":
 	parser.add_argument("output", help="Json output.")
 
 	args = parser.parse_args()
-	output = {"host": platform.platform()}
+	output = {"build_host": platform.platform()}
 	for key, value in BUILDSTAMP.items():
 		if key.startswith("BZD_"):
 			output[key[4:].lower()] = value

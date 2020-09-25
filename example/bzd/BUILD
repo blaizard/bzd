@@ -34,6 +34,7 @@ bzd_cc_binary(
 
 bzd_package(
     name = "package",
+    include_metadata = True,
     deps = {
         ":bzd": "bzd",
     },

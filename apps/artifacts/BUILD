@@ -1,6 +1,4 @@
-load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
-load("//tools/bazel_build/rules:package.bzl", "bzd_package")
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_docker", "bzd_nodejs_library")
 
 bzd_nodejs_library(
     name = "api",
@@ -13,44 +11,19 @@ bzd_nodejs_library(
     ],
 )
 
-bzd_package(
-    name = "package",
-    tags = ["nodejs"],
+bzd_nodejs_docker(
+    name = "artifacts",
+    cmd = [
+        "{backend}/apps/artifacts/backend/app.mjs",
+        "--static",
+        "{frontend}",
+    ],
+    deploy = {
+        "push": "docker.blaizard.com/apps/artifacts",
+    },
+    include_metadata = True,
     deps = {
         "//apps/artifacts/frontend": "frontend",
         "//apps/artifacts/backend": "backend",
     },
-)
-
-container_image(
-    name = "artifacts",
-    base = "@docker_nodejs//image",
-    cmd = [
-        "node",
-        "--experimental-json-modules",
-        "/bzd/bin/backend/apps/artifacts/backend/app.mjs",
-        "--static",
-        "/bzd/bin/frontend",
-    ],
-    directory = "/bzd/bin",
-    env = {
-        "NODE_ENV": "production",
-    },
-    stamp = True,
-    tags = ["nodejs"],
-    tars = [
-        ":package",
-    ],
-)
-
-container_push(
-    name = "push",
-    format = "Docker",
-    image = ":artifacts",
-    registry = "docker.blaizard.com",
-    repository = "apps/artifacts",
-    tag = "latest",
-    tags = [
-        "docker",
-    ],
 )

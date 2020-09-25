@@ -4,4 +4,9 @@ Show metadata information of a bazel target.
 
 ## Example of usage
 
-Seems to be broken... :-\
+```bash
+# Build the metadata
+bazel build example/bzd/... --output_groups=metadata
+# Visualize
+bazel run apps/metadata -- $(pwd)
+```

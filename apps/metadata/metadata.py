@@ -72,7 +72,7 @@ if __name__ == "__main__":
 		for target in targets:
 			m = re.match(r'^//(.*):(.*)$', target)
 			assert m, "Unable to match: {}".format(target)
-			metadataList.append("{}/bazel-bin/{}/{}.metadata.manifest".format(args.path, m.group(1), m.group(2)))
+			metadataList.append("{}/bazel-bin/{}/{}.metadata.json".format(args.path, m.group(1), m.group(2)))
 
 	# If file
 	elif os.path.isfile(args.path):
