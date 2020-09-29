@@ -16,3 +16,9 @@ bazel-*
 
 # Backup/temporary files
 *~
+
+# Eagle
+*.l#*
+*.d#*
+*.b#*
+*.s#*
