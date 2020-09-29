@@ -5,7 +5,7 @@
 <description>&lt;b&gt;Current Sensing&lt;/b&gt;
 </description>
 <attributes>
-<attribute name="BOARDSIZE" value="466 x 506 mil"/>
+<attribute name="BOARDSIZE" value="468 x 508 mil"/>
 <attribute name="LAYERS" value="1: 1"/>
 </attributes>
 <drawings>
@@ -8240,10 +8240,10 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="0" y1="0" x2="11.684" y2="0" width="0.1524" layer="20"/>
 <wire x1="11.684" y1="0" x2="11.684" y2="12.7" width="0.1524" layer="20"/>
 <wire x1="11.684" y1="12.7" x2="0" y2="12.7" width="0.1524" layer="20"/>
-<wire x1="0.508" y1="12.192" x2="0.508" y2="0.508" width="0.508" layer="21" style="shortdash"/>
-<wire x1="0.508" y1="0.508" x2="11.176" y2="0.508" width="0.508" layer="21" style="shortdash"/>
-<wire x1="11.176" y1="0.508" x2="11.176" y2="12.192" width="0.508" layer="21" style="shortdash"/>
-<wire x1="11.176" y1="12.192" x2="0.508" y2="12.192" width="0.508" layer="21" style="shortdash"/>
+<wire x1="0.508" y1="12.192" x2="0.508" y2="0.508" width="0.254" layer="21" style="shortdash"/>
+<wire x1="0.508" y1="0.508" x2="11.176" y2="0.508" width="0.254" layer="21" style="shortdash"/>
+<wire x1="11.176" y1="0.508" x2="11.176" y2="12.192" width="0.254" layer="21" style="shortdash"/>
+<wire x1="11.176" y1="12.192" x2="0.508" y2="12.192" width="0.254" layer="21" style="shortdash"/>
 </plain>
 <libraries>
 <library name="bzd">
