@@ -1,3 +1,4 @@
 pyelftools
 mypy
 yapf
+gitignore_parser
