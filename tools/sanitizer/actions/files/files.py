@@ -4,11 +4,12 @@ import argparse
 import json
 import re
 import sys
+from pathlib import Path
+from typing import TextIO, Any, Callable
+
 import bzd.utils.worker
 import bzd.yaml
-from pathlib import Path
 from tools.sanitizer.utils.python.workspace import Files
-from typing import TextIO, Any, Callable
 
 
 def formatJson(path: str, stdout: TextIO) -> None:
@@ -55,7 +56,7 @@ def formatYaml(path: str, stdout: TextIO) -> None:
 
 
 def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs: Any) -> bool:
-	files = Files(workspace, **kwargs)
+	files = Files(workspace, useGitignore=True, **kwargs)
 	worker = bzd.utils.worker.Worker(task)
 	worker.start()
 	for path in files.data():
