@@ -29,7 +29,7 @@
 					:class="{
 						'irform-date-item': true,
 						'irform-date-item-current': day.current,
-						'irform-date-item-selected': day.selected
+						'irform-date-item-selected': day.selected,
 					}"
 					@mousedown.stop="selectDate($event, day.date || null)">
 					{{ day.text }}
@@ -45,7 +45,7 @@
 					:class="{
 						'irform-date-item': true,
 						'irform-date-item-current': month.current,
-						'irform-date-item-selected': month.selected
+						'irform-date-item-selected': month.selected,
 					}"
 					@mousedown.stop="selectDate($event, month.date || null, 'day')">
 					{{ month.text }}
@@ -61,7 +61,7 @@
 					:class="{
 						'irform-date-item': true,
 						'irform-date-item-current': month.current,
-						'irform-date-item-selected': month.selected
+						'irform-date-item-selected': month.selected,
 					}"
 					@mousedown.stop="selectDate($event, month.date || null, 'month')">
 					{{ month.text }}
@@ -78,21 +78,21 @@
 	export default {
 		mixins: [Element],
 		components: {
-			DropdownTemplate
+			DropdownTemplate,
 		},
 		props: {
-			value: { type: Number, required: false, default: 0 }
+			value: { type: Number, required: false, default: 0 },
 		},
-		data: function() {
+		data: function () {
 			return {
-				select: "day"
+				select: "day",
 			};
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-date": true,
-					[this.getOption("class")]: true
+					[this.getOption("class")]: true,
 				};
 			},
 			incrementStep() {
@@ -145,7 +145,7 @@
 						const options = { year: "numeric", month: "long", day: "numeric" };
 						return date.toLocaleDateString(undefined, options);
 					},
-					editable: false
+					editable: false,
 				});
 			},
 			nbDaysCurMonth() {
@@ -177,7 +177,7 @@
 							current: true,
 							selected: this.date.getMonth() == index,
 							text: this.months[index],
-							date: date
+							date: date,
 						});
 					}
 				}
@@ -198,7 +198,7 @@
 							current: true,
 							selected: day == this.date.getDate(),
 							text: day,
-							date: new Date(this.date.getFullYear(), this.date.getMonth(), day)
+							date: new Date(this.date.getFullYear(), this.date.getMonth(), day),
 						});
 					}
 					index = 0;
@@ -212,7 +212,7 @@
 				}
 
 				return matrix;
-			}
+			},
 		},
 		methods: {
 			isValidDate(date) {
@@ -228,8 +228,8 @@
 				}
 				this.set(date.getTime());
 			},
-			handleKey(/*keyCode*/) {}
-		}
+			handleKey(/*keyCode*/) {},
+		},
 	};
 </script>
 

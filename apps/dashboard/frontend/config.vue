@@ -26,22 +26,22 @@
 	export default {
 		components: {
 			Form,
-			Button
+			Button,
 		},
 		directives: {
-			loading: DirectiveLoading
+			loading: DirectiveLoading,
 		},
 		props: {
-			uid: { type: String, mandatory: false, default: null }
+			uid: { type: String, mandatory: false, default: null },
 		},
-		data: function() {
+		data: function () {
 			return {
 				ready: true,
 				value: {
-					"visualization.color": "auto"
+					"visualization.color": "auto",
 				},
 				pluginsVisualization: {},
-				pluginsSource: {}
+				pluginsSource: {},
 			};
 		},
 		mounted() {
@@ -78,8 +78,8 @@
 						caption: "Color",
 						width: 0.5,
 						list: this.dropdownColorList,
-						html: true
-					}
+						html: true,
+					},
 				];
 			},
 			formSourceDescription() {
@@ -93,8 +93,8 @@
 						html: true,
 						onchange: () => {
 							this.value = Object.assign({}, this.value, this.metadataSource.defaultValue);
-						}
-					}
+						},
+					},
 				];
 			},
 			formVisualizationDescription() {
@@ -105,8 +105,8 @@
 						caption: "Type",
 						width: 0.5,
 						list: this.dropdownPluginList(this.pluginsVisualization, "*"),
-						html: true
-					}
+						html: true,
+					},
 				].concat(...(this.metadataVisualization["form"] || []));
 			},
 			metadataSource() {
@@ -131,7 +131,7 @@
 								"; border-color: " +
 								Colors.black +
 								";\"></span> " +
-								name
+								name,
 						];
 					})
 					.reduce(
@@ -140,10 +140,10 @@
 							return acc;
 						},
 						{
-							auto: "Auto"
+							auto: "Auto",
 						}
 					);
-			}
+			},
 		},
 		methods: {
 			async fetchValue() {
@@ -177,7 +177,7 @@
 					.map((type) => {
 						return {
 							key: type,
-							html: "<i class=\"" + plugins[type].icon + "\"></i> " + decodeURIComponent(plugins[type].name || type)
+							html: "<i class=\"" + plugins[type].icon + "\"></i> " + decodeURIComponent(plugins[type].name || type),
 						};
 					});
 
@@ -185,8 +185,8 @@
 					result[data.key] = data.html;
 					return result;
 				}, {});
-			}
-		}
+			},
+		},
 	};
 </script>
 

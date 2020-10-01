@@ -19,7 +19,7 @@ export default class StripePayment {
 				/**
 				 * Callback to confirm the payment.
 				 */
-				confirmPayment: null
+				confirmPayment: null,
 			},
 			options
 		);
@@ -34,7 +34,7 @@ export default class StripePayment {
 			this.options.makePaymentIntent = async (amount, metadata) => {
 				return await api.request("post", "/payment/stripe/intent", {
 					amount: amount,
-					metadata: metadata
+					metadata: metadata,
 				});
 			};
 		}
@@ -47,7 +47,7 @@ export default class StripePayment {
 			this.options.confirmPayment = async (intentId, metadata) => {
 				return await api.request("post", "/payment/stripe/confirm", {
 					id: intentId,
-					metadata: metadata
+					metadata: metadata,
 				});
 			};
 		}
@@ -73,8 +73,8 @@ export default class StripePayment {
 				},
 				handleError(message) {
 					handleError(message);
-				}
-			}
+				},
+			},
 		});
 	}
 }

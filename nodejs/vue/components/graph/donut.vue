@@ -22,18 +22,18 @@
 
 	export default {
 		components: {
-			Element
+			Element,
 		},
 		props: {
 			value: { type: Array, required: false, default: () => [] },
-			text: { type: String | Number, required: false, default: false }
+			text: { type: String | Number, required: false, default: false },
 		},
 		directives: {
-			"hover-children": HoverChildren
+			"hover-children": HoverChildren,
 		},
-		data: function() {
+		data: function () {
 			return {
-				selected: -1
+				selected: -1,
 			};
 		},
 		computed: {
@@ -43,7 +43,7 @@
 					let defaultItem = {
 						caption: "",
 						value: 0,
-						color: "red"
+						color: "red",
 					};
 					if (typeof item === "object") {
 						return Object.assign(defaultItem, item);
@@ -71,20 +71,20 @@
 				return circumferenceList.map((circumferenceCovered) => {
 					const style = {
 						strokeDashoffset: -curOffset + "px",
-						strokeDasharray: circumferenceCovered + " " + (circumference - circumferenceCovered)
+						strokeDasharray: circumferenceCovered + " " + (circumference - circumferenceCovered),
 					};
 					curOffset += circumferenceCovered;
 					return style;
 				});
-			}
+			},
 		},
 		methods: {
 			getCircleClass(index, selected1, selected2) {
 				return {
-					"irgraph-selected": index === (selected1 === -1 ? selected2 : selected1)
+					"irgraph-selected": index === (selected1 === -1 ? selected2 : selected1),
 				};
-			}
-		}
+			},
+		},
 	};
 </script>
 

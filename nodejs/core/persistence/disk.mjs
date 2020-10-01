@@ -56,7 +56,7 @@ export default class PersistenceDisk {
 					 */
 					delete: (data, key) => {
 						delete data[key];
-					}
+					},
 				},
 				/**
 				 * If set, this will create a task to perform a periodic savepoint.
@@ -70,7 +70,7 @@ export default class PersistenceDisk {
 				 * \brief If the delta file exceed a certain size in bytes,
 				 *        create a new one.
 				 */
-				maxDeltaB: 1024 * 1024
+				maxDeltaB: 1024 * 1024,
 			},
 			options
 		);
@@ -81,7 +81,7 @@ export default class PersistenceDisk {
 		this.isSavepoint = false;
 		this.event = new Event({
 			ready: { proactive: true },
-			error: { proactive: true }
+			error: { proactive: true },
 		});
 		// The estimated size of the structure
 		this.estimatedSize = 0;
@@ -147,7 +147,7 @@ export default class PersistenceDisk {
 						intervalMs: 0,
 						isValid: (/*iteration*/) => {
 							return this.isReady();
-						}
+						},
 					},
 					this.options.savepointTask
 				);
@@ -181,7 +181,7 @@ export default class PersistenceDisk {
 		let delta = {
 			list: [],
 			dir: this.path + ".delta/",
-			dirty: false
+			dirty: false,
 		};
 
 		// If there is no directories for delta, create it.

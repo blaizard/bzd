@@ -9,11 +9,11 @@
 	import Loading from "./router_loading.vue";
 
 	export default {
-		data: function() {
+		data: function () {
 			return {
 				component: null,
 				routerId: null,
-				additionalProps: {}
+				additionalProps: {},
 			};
 		},
 		methods: {
@@ -30,7 +30,7 @@
 							 * error: PageError,
 							 *  Delay before showing the loading component. Default: 200ms.
 							 */
-							delay: 200
+							delay: 200,
 							/*
 							 *  The error component will be displayed if a timeout is
 							 *  provided and exceeded. Default: Infinity.
@@ -40,7 +40,7 @@
 						: component;
 				this.routerId = routerId;
 				this.additionalProps = props;
-			}
-		}
+			},
+		},
 	};
 </script>
