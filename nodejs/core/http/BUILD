@@ -24,7 +24,6 @@ bzd_nodejs_library(
         "express": "",
         "express-minify": "",
         "helmet": "",
-        "body-parser": "",
         "http": "",
         "compression": "",
         "multer": "",
