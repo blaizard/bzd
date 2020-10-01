@@ -22,7 +22,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 				/**
 				 * Bucket specific options
 				 */
-				buckets: {}
+				buckets: {},
 			},
 			options
 		);
@@ -59,7 +59,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 						/**
 						 * \brief Perform a savepoint every X seconds
 						 */
-						savepointIntervalS: 5 * 60
+						savepointIntervalS: 5 * 60,
 					},
 					bucket in this.options.buckets ? this.options.buckets[bucket] : {}
 				);
@@ -70,8 +70,8 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 					savepointTask: {
 						namespace: "kvs",
 						name: bucket,
-						intervalMs: optionsBucket.savepointIntervalS * 1000
-					}
+						intervalMs: optionsBucket.savepointIntervalS * 1000,
+					},
 				};
 
 				let persistence = await PersistenceDisk.make(Path.join(this.path, bucket), options);

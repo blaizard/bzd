@@ -3,9 +3,9 @@
 
 	export default {
 		mixins: [Template],
-		data: function() {
+		data: function () {
 			return {
-				value: {}
+				value: {},
 			};
 		},
 		computed: {
@@ -24,10 +24,10 @@
 						placeholder: "Type hello...",
 						multi: true,
 						format: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
-						html: true
-					}
+						html: true,
+					},
 				];
-			}
-		}
+			},
+		},
 	};
 </script>

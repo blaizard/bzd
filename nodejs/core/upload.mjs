@@ -71,7 +71,7 @@ export default class Upload {
 				/**
 				 * To be called once the upload successfully completes
 				 */
-				onComplete: (/*item, response*/) => {}
+				onComplete: (/*item, response*/) => {},
 			},
 			config
 		);
@@ -88,7 +88,7 @@ export default class Upload {
 				/**
 				 * Callback to be called before the upload process takes place
 				 */
-				beforeUpload: async () => {}
+				beforeUpload: async () => {},
 			},
 			options
 		);
@@ -127,9 +127,7 @@ export default class Upload {
 				"change",
 				async () => {
 					await options.beforeUpload();
-					this.handleFiles(input.files, nothrow)
-						.then(resolve)
-						.catch(reject);
+					this.handleFiles(input.files, nothrow).then(resolve).catch(reject);
 				},
 				false
 			);
@@ -146,7 +144,7 @@ export default class Upload {
 					}
 					window.removeEventListener("focus", resolveCancel, { once: true });
 					document.removeEventListener("mousemove", resolveCancel, {
-						once: true
+						once: true,
 					});
 				}, 100);
 			};

@@ -45,7 +45,7 @@
 				}
 				const keyList = Array.from(keys);
 				return keyList.sort(this.sortStrategy);
-			}
+			},
 		},
 		methods: {
 			sortStrategy(key1, key2) {
@@ -70,8 +70,8 @@
 				default:
 					return value;
 				}
-			}
-		}
+			},
+		},
 	};
 </script>
 

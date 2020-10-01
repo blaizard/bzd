@@ -15,7 +15,7 @@
 	export default {
 		props: {
 			serie: { type: Object, required: true },
-			selected: { type: Number, required: true }
+			selected: { type: Number, required: true },
 		},
 		computed: {
 			path() {
@@ -27,15 +27,15 @@
 					path += i == 0 ? "M " + x + " " + y : " L " + x + " " + y;
 				}
 				return path;
-			}
+			},
 		},
 		methods: {
 			getPointClass(index) {
 				return {
 					circle: true,
-					selected: index == this.selected
+					selected: index == this.selected,
 				};
-			}
-		}
+			},
+		},
 	};
 </script>
