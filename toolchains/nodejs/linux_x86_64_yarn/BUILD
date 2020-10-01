@@ -15,7 +15,7 @@ sh_binary_wrapper(
 sh_binary_wrapper(
     name = "yarn",
     binary = "@yarn//:yarn",
-    command = "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex network:\"localhost:49689\" $@",
+    command = "export PATH=$(pwd)/$RUNFILES_DIR/node:$PATH && {binary} --color=always --mutex file $@",
     data = [
         "@node",
     ],
