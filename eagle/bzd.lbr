@@ -239,6 +239,25 @@
 <wire x1="9.2" y1="-4.5" x2="0" y2="-4.5" width="0.127" layer="21"/>
 <text x="0.5" y="-4" size="1.27" layer="25">&gt;NAME</text>
 </package>
+<package name="RELAY_SONGLE">
+<pad name="COMMAND_V+" x="0" y="0" drill="1" diameter="2.54"/>
+<pad name="NC_V+" x="12.2" y="0" drill="1" diameter="2.54"/>
+<pad name="COMMAND_V-" x="0" y="-12" drill="1" diameter="2.54"/>
+<pad name="NO_V+" x="12.2" y="-12" drill="1" diameter="2.54"/>
+<pad name="V-" x="-2" y="-6" drill="1" diameter="2.54"/>
+<wire x1="-5.1" y1="2.2" x2="-5.1" y2="-14.3" width="0.127" layer="21"/>
+<wire x1="-5.1" y1="2.2" x2="17.4" y2="2.2" width="0.127" layer="21"/>
+<wire x1="-5.1" y1="-14.3" x2="17.4" y2="-14.3" width="0.127" layer="21"/>
+<wire x1="17.4" y1="2.2" x2="17.4" y2="-14.3" width="0.127" layer="21"/>
+<text x="-5" y="2.6" size="1.27" layer="25">&gt;NAME</text>
+<wire x1="-2.1" y1="-6" x2="7.5" y2="-6" width="0.127" layer="25"/>
+<wire x1="7.5" y1="-6" x2="11.1" y2="-1.9" width="0.127" layer="25"/>
+<wire x1="11.1" y1="-1.9" x2="12.2" y2="-1.9" width="0.127" layer="25"/>
+<wire x1="12.2" y1="-1.9" x2="13.5" y2="-1.9" width="0.127" layer="25"/>
+<wire x1="12.2" y1="0" x2="12.2" y2="-1.9" width="0.127" layer="25"/>
+<wire x1="12.2" y1="-12.1" x2="12.2" y2="-10.1" width="0.127" layer="25"/>
+<wire x1="11" y1="-10.1" x2="13.3" y2="-10.1" width="0.127" layer="25"/>
+</package>
 </packages>
 <symbols>
 <symbol name="ARDUINO_NANO_33_IOT">
@@ -443,6 +462,25 @@
 <wire x1="7.62" y1="-5.08" x2="7.62" y2="5.08" width="0.254" layer="94"/>
 <wire x1="7.62" y1="5.08" x2="-2.54" y2="5.08" width="0.254" layer="94"/>
 <text x="-1.778" y="5.588" size="1.778" layer="95">&gt;NAME</text>
+</symbol>
+<symbol name="RELAY">
+<pin name="IDLE_V+" x="12.7" y="10.16" length="middle" rot="R180"/>
+<pin name="V-" x="12.7" y="2.54" length="middle" rot="R180"/>
+<pin name="ACTIVE_V+" x="12.7" y="-5.08" length="middle" rot="R180"/>
+<wire x1="7.62" y1="10.16" x2="-5.08" y2="10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-5.08" x2="-5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="7.62" y1="2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="-2.54" y2="7.62" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="7.62" x2="-5.08" y2="7.62" width="0.508" layer="94"/>
+<wire x1="-5.08" y1="12.7" x2="5.08" y2="12.7" width="0.508" layer="94"/>
+<pin name="COMMAND_V+" x="0" y="17.78" visible="off" length="middle" rot="R270"/>
+<pin name="COMMAND_V-" x="0" y="-12.7" visible="off" length="middle" rot="R90"/>
+<wire x1="-5.08" y1="-7.62" x2="5.08" y2="-7.62" width="0.508" layer="94"/>
+<wire x1="-7.62" y1="15.24" x2="-7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-10.16" x2="7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-10.16" x2="7.62" y2="15.24" width="0.254" layer="94"/>
+<wire x1="7.62" y1="15.24" x2="-7.62" y2="15.24" width="0.254" layer="94"/>
+<text x="4.064" y="16.002" size="1.778" layer="95">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -672,6 +710,25 @@
 <connects>
 <connect gate="G$1" pin="V+" pad="1"/>
 <connect gate="G$1" pin="V-" pad="2 3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="RELAY_SONGLE">
+<gates>
+<gate name="G$1" symbol="RELAY" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="RELAY_SONGLE">
+<connects>
+<connect gate="G$1" pin="ACTIVE_V+" pad="NO_V+"/>
+<connect gate="G$1" pin="COMMAND_V+" pad="COMMAND_V+"/>
+<connect gate="G$1" pin="COMMAND_V-" pad="COMMAND_V-"/>
+<connect gate="G$1" pin="IDLE_V+" pad="NC_V+"/>
+<connect gate="G$1" pin="V-" pad="V-"/>
 </connects>
 <technologies>
 <technology name=""/>
