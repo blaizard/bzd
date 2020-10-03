@@ -183,6 +183,13 @@ Rev 1</text>
 <hole x="73.6" y="2.3" drill="2"/>
 <hole x="73.6" y="20.2" drill="2"/>
 <hole x="59.9" y="2.3" drill="2"/>
+<wire x1="0.7" y1="22.3" x2="55.9" y2="22.3" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="55.9" y1="22.3" x2="56.1" y2="22.1" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="56.1" y1="22.1" x2="56.1" y2="0.4" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="0.7" y1="24.2" x2="75.2" y2="24.2" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="58.1" y1="0.4" x2="58.1" y2="22.1" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="58.1" y1="22.1" x2="75.2" y2="22.1" width="0.1524" layer="21" style="shortdash"/>
+<wire x1="75.2" y1="22.1" x2="75.3" y2="22" width="0.1524" layer="21" style="shortdash"/>
 </plain>
 <libraries>
 <library name="rcl" urn="urn:adsk.eagle:library:334">
@@ -2427,6 +2434,14 @@ design rules under a new name.</description>
 <wire x1="14.424" y1="49.7" x2="14.424" y2="49.954" width="0.6096" layer="1"/>
 <wire x1="14.424" y1="49.7" x2="14.423996875" y2="49.700003125" width="0.6096" layer="16"/>
 <wire x1="6.992" y1="55.542" x2="8.328" y2="55.542" width="0.6096" layer="1"/>
+<polygon width="0.1524" layer="16">
+<vertex x="1.1" y="80.5"/>
+<vertex x="1.1" y="24.4"/>
+<vertex x="75.3" y="24.4"/>
+<vertex x="75.3" y="80.5"/>
+<vertex x="75.2" y="80.6"/>
+<vertex x="1.2" y="80.6"/>
+</polygon>
 </signal>
 <signal name="7V">
 <contactref element="U$1" pad="PIN_29"/>

@@ -1,0 +1,42 @@
+Partlist exported from /home/blaise/projects/cpp-coroutines/apps/homelab_manager/board/motherboard.sch at 03.10.20 10:38
+
+Qty Value            Device           Package          Parts                                Description                          MF    MPN        OC_FARNELL OC_NEWARK POPULARITY SPICEPREFIX
+1   0.1              R-EU_R1206       R1206            R3                                   RESISTOR, European symbol                                                  41         R          
+2   0.1u             C-EUC0805        C0805            C10, C11                             CAPACITOR, European symbol                                                 88         C          
+8   100k             R-EU_R0805       R0805            R1, R6, R10, R13, R14, R19, R21, R24 RESISTOR, European symbol                                                  86         R          
+4   100n             C-EUC0805        C0805            C1, C2, C3, C7                       CAPACITOR, European symbol                                                 88         C          
+1   100u             C-EUC0805        C0805            C6                                   CAPACITOR, European symbol                                                 88         C          
+5   10k              R-EU_R0805       R0805            R2, R4, R7, R8, R11                  RESISTOR, European symbol                                                  86         R          
+2   10u              C-EUC0805        C0805            C5, C9                               CAPACITOR, European symbol                                                 88         C          
+3   1N4148           DIODE-DO-214AC   DO-214AC         D2, D3, D4                           DIODE                                                                      25                    
+4   1k               R-EU_R0805       R0805            R5, R12, R18, R23                    RESISTOR, European symbol                                                  86         R          
+2   22-23-2021       22-23-2021       22-23-2021       RELAY, RELAY1                        .100" (2.54mm) Center Header - 2 Pin MOLEX 22-23-2021 1462926    25C3832   40                    
+1   330              R-EU_R0805       R0805            R16                                  RESISTOR, European symbol                                                  86         R          
+1   4.5V-17V         PINHD-1X1        1X01             JP5                                  PIN HEADER                                                                 64                    
+1   4.7u             L-USL3225M       L3225M           L3                                   INDUCTOR, American symbol                                                  11         L          
+1   50u              C-EUC0805        C0805            C12                                  CAPACITOR, European symbol                                                 88         C          
+1   5V               PINHD-1X1        1X01             JP11                                 PIN HEADER                                                                 64                    
+2   5k               R-EU_R0805       R0805            R15, R17                             RESISTOR, European symbol                                                  86         R          
+1   7V               PINHD-1X1        1X01             JP6                                  PIN HEADER                                                                 64                    
+1   90k              R-EU_R0805       R0805            R9                                   RESISTOR, European symbol                                                  86         R          
+1   DC_POWER_2.1MM   DC_POWER_2.1MM   DC_POWER_2.1MM   DC_12V                                                                                                                                
+1   ESP32_DEVKIT_V1  ESP32_DEVKIT_V1  ESP32_DEVKIT_V1  U$1                                                                                                                                   
+1   FAN1             PINHD-1X1        1X01             JP3                                  PIN HEADER                                                                 64                    
+1   FAN1             PINHD-1X3        1X03             JP1                                  PIN HEADER                                                                 92                    
+1   FAN2             PINHD-1X1        1X01             JP7                                  PIN HEADER                                                                 64                    
+1   FAN2             PINHD-1X3        1X03             JP4                                  PIN HEADER                                                                 92                    
+1   HOMELAB          PINHD-1X1        1X01             JP12                                 PIN HEADER                                                                 64                    
+1   INA169           INA169           SOT23_5_PIN      U$3                                                                                                                                   
+1   LD1117           LD1117           SOT223_3_PIN     U$9                                                                                                                                   
+1   LED              PINHD-1X1        1X01             JP10                                 PIN HEADER                                                                 64                    
+1   LED              PINHD-1X2        1X02             LED                                  PIN HEADER                                                                 98                    
+4   MGSF1N03L        MGSF1N03L        SOT23_3_PIN      U$5, U$6, U$8, U$11                                                                                                                   
+1   MOMENTARY_SWITCH MOMENTARY_SWITCH MOMENTARY_SWITCH U$14                                                                                                                                  
+1   MQ_2             MQ_2             MQ_2             U$2                                                                                                                                   
+1   RELAY_SONGLE     RELAY_SONGLE     RELAY_SONGLE     U$7                                                                                                                                   
+2   SCREW_TERMINAL   SCREW_TERMINAL   SCREW_TERMINAL   U$12, U$13                                                                                                                            
+1   SWITCH_LED       PINHD-1X3        1X03             SWITCH_LED                           PIN HEADER                                                                 92                    
+1   TMP101           TMP101           SOT23_6_PIN      U$10                                                                                                                                  
+1   TPS561201        TPS561201        SOT23_6_PIN      U$4                                                                                                                                   
+1   UI               PINHD-1X11       1X11             JP9                                  PIN HEADER                                                                 12                    
+1   VSENSE           PINHD-1X1        1X01             JP2                                  PIN HEADER                                                                 64                    
