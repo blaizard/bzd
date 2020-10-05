@@ -6,13 +6,13 @@ import App from "./app.vue";
 import APIv1 from "../api.v1.json";
 
 Vue.use(Router, {
-	hash: false,
+	hash: false
 });
 Vue.use(API, {
-	schema: APIv1,
+	schema: APIv1
 });
 
 new Vue({
 	el: "#app",
-	render: (h) => h(App),
+	render: (h) => h(App)
 });

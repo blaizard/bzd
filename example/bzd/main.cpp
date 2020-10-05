@@ -27,6 +27,15 @@
 	return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }*/
 
+/*
+static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
+{
+	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
+	bzd::Array<bzd::UInt8Type, 3> data{(ESP_SLAVE_ADDR << 1), reg, value};
+	i2c.write(data);
+}
+*/
+
 static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");

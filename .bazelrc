@@ -9,7 +9,7 @@ common --show_timestamps
 build --verbose_failures
 
 # Set default options used by the default run
-build --cxxopt "-std=c++14"
+build --cxxopt "-std=c++17"
 build --copt "-Wall"
 build --copt "-Wextra"
 build --copt "-Werror"

@@ -30,16 +30,16 @@
 		name: "TreeDirectory",
 		props: {
 			path: { type: Array, mandatory: false, default: () => [] },
-			depth: { type: Number, mandatory: false, default: 0 },
+			depth: { type: Number, mandatory: false, default: 0 }
 		},
 		directives: {
-			loading: DirectiveLoading,
+			loading: DirectiveLoading
 		},
-		data: function () {
+		data: function() {
 			return {
 				list: [],
 				expanded: {},
-				error: null,
+				error: null
 			};
 		},
 		mounted() {
@@ -51,7 +51,7 @@
 			},
 			isEmpty() {
 				return !this.loading && this.list.length == 0;
-			},
+			}
 		},
 		methods: {
 			async fetchPath() {
@@ -69,7 +69,7 @@
 					entry: true,
 					child: this.depth > 0,
 					expandable: this.isPermissionList(item),
-					expanded: item.name in this.expanded,
+					expanded: item.name in this.expanded
 				};
 			},
 			isPermissionList(item) {
@@ -82,7 +82,7 @@
 				// Propagate the item message up with the arguments
 				this.$emit("item", {
 					item: item,
-					path: [],
+					path: []
 				});
 
 				if (!this.isPermissionList(item)) {
@@ -102,8 +102,8 @@
 			handleItemPropagation(name, item) {
 				item.path.unshift(name);
 				this.$emit("item", item);
-			},
-		},
+			}
+		}
 	};
 </script>
 

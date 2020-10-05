@@ -1,6 +1,6 @@
 import { mask, maskRemove } from "./mask.mjs";
 
-export default function (el, binding) {
+export default function(el, binding) {
 	if (binding.value) {
 		mask(el, "bzd-loading");
 	}

@@ -3,7 +3,9 @@
 	"version": "1.0.0",
 	"license": "UNLICENSED",
 	"private": true,
-	"type": "module",
+	"installConfig": {
+		"pnp": false
+	},
 	"dependencies": {
 		{dependencies}
 	}

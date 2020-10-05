@@ -48,7 +48,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "external/{}/lib".format(clang_package_name),
         ],
         "compile_flags": [
-            "-std=c++14",
+            "-std=c++17",
             # Add debug symbols, will be removed at the postprocessing stage
             "-g",
 

@@ -35,8 +35,8 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             "external/{}/xtensa-esp32-elf/lib".format(clang_package_name),
         ],
         "compile_flags": [
-            # C++14
-            "-std=c++14",
+            # C++17
+            "-std=c++17",
             # Add debug symbols, will be removed at the postprocessing stage
             "-g",
 

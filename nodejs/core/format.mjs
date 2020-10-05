@@ -3,7 +3,7 @@
  * @param {*} str
  * @param  {...any} args
  */
-export default function (str, ...args) {
+export default function(str, ...args) {
 	// By default false, as it gets updated during the processing part.
 	let pattern = new RegExp("{([^}:]*)(?::([^}]*))?}", "g");
 	let output = "";
@@ -44,6 +44,6 @@ function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
 	const index = substitutionIndex ? parseInt(substitutionIndex) : currentSubstitutionIndex;
 	return {
 		index: isNaN(index) ? substitutionIndex : index,
-		type: options,
+		type: options
 	};
 }

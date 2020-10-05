@@ -9,10 +9,10 @@
 	export default {
 		props: {
 			metadata: { type: Object, mandatory: true },
-			description: { type: Object, mandatory: true },
+			description: { type: Object, mandatory: true }
 		},
 		mounted() {},
-		data: function () {
+		data: function() {
 			return {};
 		},
 		watch: {
@@ -23,9 +23,9 @@
 						const url = new URL(this.metadata.link, this.description["coverage.url"]);
 						this.$emit("link", String(url));
 					}
-				},
-			},
-		},
+				}
+			}
+		}
 	};
 </script>
 
