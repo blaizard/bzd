@@ -19,10 +19,10 @@
 			text: { type: String, required: true },
 			icon: { type: String | Object, required: false, default: null },
 			tooltip: { type: Object, required: false, default: null },
-			link: { type: String, required: false, default: null },
+			link: { type: String, required: false, default: null }
 		},
 		directives: {
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
 		computed: {
 			isIconComponent() {
@@ -37,7 +37,7 @@
 			},
 			tooltipObject() {
 				return this.tooltip ? this.tooltip : { text: this.text };
-			},
+			}
 		},
 		methods: {
 			handleClick() {
@@ -45,7 +45,7 @@
 				if (this.link) {
 					this.$routerDispatch(this.link);
 				}
-			},
-		},
+			}
+		}
 	};
 </script>

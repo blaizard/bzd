@@ -66,7 +66,7 @@
 		Carousel: ElementCarousel,
 		Editor: ElementEditor,
 		Message: ElementMessage,
-		Date: ElementDate,
+		Date: ElementDate
 	};
 
 	export default {
@@ -94,17 +94,17 @@
 			/**
 			 * Include elements with no names
 			 */
-			all: { type: Boolean, default: false, required: false },
+			all: { type: Boolean, default: false, required: false }
 		},
 		name: "FormElement",
-		data: function () {
+		data: function() {
 			return {
 				currentValue: {},
 				returnedValue: {},
 				// Contains only the unamed elements
 				unamedValue: {},
 				active: -1,
-				errors: {},
+				errors: {}
 			};
 		},
 		computed: {
@@ -135,7 +135,7 @@
 					}
 					return current.condition;
 				});
-			},
+			}
 		},
 		watch: {
 			value: {
@@ -147,8 +147,8 @@
 					if (!this.diff) {
 						this.returnedValue = Object.assign({}, value);
 					}
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			getError(description, index) {
@@ -170,7 +170,7 @@
 					output: "return",
 					valueExists: (key, value) => {
 						return value !== undefined && value !== "";
-					},
+					}
 				});
 				for (const name in result) {
 					this.handleError(name, result[name]);
@@ -238,13 +238,13 @@
 				else if (condition instanceof Validation) {
 					const result = condition.validate(this.currentValue, {
 						output: "return",
-						allMandatory: true,
+						allMandatory: true
 					});
 					return Object.keys(result).length == 0;
 				}
 				return typeof condition === "undefined" ? true : condition;
-			},
-		},
+			}
+		}
 	};
 </script>
 

@@ -68,7 +68,7 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "external/{}/usr/lib/x86_64-linux-gnu".format(gcc_package_name),
         ],
         "compile_flags": [
-            "-std=c++14",
+            "-std=c++17",
             # Add debug symbols, will be removed at the postprocessing stage
             "-g",
 

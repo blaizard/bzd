@@ -21,12 +21,12 @@
 	export default {
 		mixins: [Element],
 		components: {
-			DropdownTemplate,
+			DropdownTemplate
 		},
 		props: {
-			value: { type: String | Array, required: false, default: "" },
+			value: { type: String | Array, required: false, default: "" }
 		},
-		data: function () {
+		data: function() {
 			return {
 				multi: this.getOption("multi", false),
 				/**
@@ -51,7 +51,7 @@
 				 */
 				list: [],
 				filteredList: [],
-				directValue: "",
+				directValue: ""
 			};
 		},
 		computed: {
@@ -59,7 +59,7 @@
 				return Object.assign({}, this.description, {
 					editable: this.getOption("editable", false),
 					format: this.presets,
-					process: this.process,
+					process: this.process
 				});
 			},
 			presets() {
@@ -85,15 +85,15 @@
 			},
 			isListFctWithArg() {
 				return this.isFctWithArg(this.rawList);
-			},
+			}
 		},
 		watch: {
 			rawList: {
-				handler: async function () {
+				handler: async function() {
 					this.list = [];
 					await this.process(this.directValue);
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			formatMenuEntry(value) {
@@ -241,8 +241,8 @@
 					return this.curValue.indexOf(item.value) != -1;
 				}
 				return this.curValue === item.value;
-			},
-		},
+			}
+		}
 	};
 </script>
 

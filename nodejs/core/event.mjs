@@ -12,7 +12,7 @@ export default class Event {
 					 * Set to true if the event once triggered will also
 					 * trigger new one.
 					 */
-					proactive: false,
+					proactive: false
 				},
 				options[id]
 			);

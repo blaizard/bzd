@@ -88,7 +88,7 @@ Commander.version("1.0.0", "-v, --version")
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web,
+		channel: web
 	});
 	api.handle("get", "/tiles", async () => {
 		const result = await keyValueStore.list("tiles");

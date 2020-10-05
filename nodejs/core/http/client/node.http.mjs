@@ -22,7 +22,7 @@ export default async function request(url, options) {
 			{
 				method: options.method,
 				headers: options.headers,
-				timeout: options.timeoutMs,
+				timeout: options.timeoutMs
 			},
 			(response) => {
 				// Handle redirection
@@ -37,14 +37,16 @@ export default async function request(url, options) {
 					// Redirect
 					if ("location" in response.headers) {
 						Log.debug("Redirecting to '{}'", response.headers.location);
-						return request(response.headers.location, options).then(resolve).catch(reject);
+						return request(response.headers.location, options)
+							.then(resolve)
+							.catch(reject);
 					}
 				}
 
 				let result = {
 					data: null,
 					headers: response.headers,
-					code: response.statusCode,
+					code: response.statusCode
 				};
 
 				if (options.expect == "stream") {

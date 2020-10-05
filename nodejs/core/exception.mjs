@@ -164,7 +164,7 @@ const ExceptionFactory = (...topics) => {
 			Log.custom(
 				{
 					level: "error",
-					topics: topics,
+					topics: topics
 				},
 				...args
 			);
@@ -191,7 +191,13 @@ const ExceptionFactory = (...topics) => {
 				this.name +
 				(this.message ? " with message: " + String(this.message) : "") +
 				// Remove the first line of the stack to avoid poluting the output
-				(this.stack ? "; Callstack:\n" + String(this.stack).split("\n").slice(1).join("\n") : "");
+				(this.stack
+					? "; Callstack:\n" +
+					  String(this.stack)
+					  	.split("\n")
+					  	.slice(1)
+					  	.join("\n")
+					: "");
 			message += this.nestedErrorList.map((e) => "\nFrom: " + String(e));
 			return message;
 		}

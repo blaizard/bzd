@@ -32,7 +32,7 @@ export default class FileSystem {
 	 */
 	static async mkdir(path) {
 		await Fs.promises.mkdir(path, {
-			recursive: true,
+			recursive: true
 		});
 	}
 
@@ -60,7 +60,7 @@ export default class FileSystem {
 	 */
 	static async readFile(path, options = "utf8") {
 		const data = await Fs.promises.readFile(path, {
-			encoding: options,
+			encoding: options
 		});
 		return data.toString();
 	}
@@ -70,7 +70,7 @@ export default class FileSystem {
 	 */
 	static async writeFile(path, data, options = "utf8") {
 		await Fs.promises.writeFile(path, data, {
-			encoding: options,
+			encoding: options
 		});
 	}
 

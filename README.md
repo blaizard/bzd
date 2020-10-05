@@ -6,7 +6,7 @@
 Fullstack, lightweight and flexible framework for IoT applications.
 This mono-repository enables the following technologies:
 
-|             C++14              |              Python3              |           Node (v13+)           |              Vue               |              Bazel               |              Eagle               |
+|             C++17              |              Python3              |           Node (v13+)           |              Vue               |              Bazel               |              Eagle               |
 | :----------------------------: | :-------------------------------: | :-----------------------------: | :----------------------------: | :------------------------------: | :------------------------------: |
 | ![](./docs/assets/png/cpp.png) | ![](./docs/assets/png/python.png) | ![](./docs/assets/png/node.png) | ![](./docs/assets/png/vue.png) | ![](./docs/assets/png/bazel.png) | ![](./docs/assets/png/eagle.png) |
 

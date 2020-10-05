@@ -18,20 +18,20 @@ class Cache {
 				maxSize: 1000000, // 1MB
 				maxEntries: 100,
 				garbageCollector: true,
-				garbageCollectorPeriodMs: 10000, // Every 10s
+				garbageCollectorPeriodMs: 10000 // Every 10s
 			},
 			config
 		);
 
 		this.data = {
 			_size: 0,
-			_nbEntries: 0,
+			_nbEntries: 0
 		};
 
 		this.resourceMap = {};
 
 		this.event = new Event({
-			error: { proactive: true },
+			error: { proactive: true }
 		});
 
 		// Run the garbage collector asynchrounsly
@@ -65,7 +65,7 @@ class Cache {
 			_trigger: trigger,
 			_size: 0,
 			_defaultSize: options && "size" in options ? options.size : 0,
-			_nbEntries: 0,
+			_nbEntries: 0
 		};
 
 		// Build the value object;
@@ -457,7 +457,7 @@ async function triggerUpdate(collection, id, ...ids) {
 
 		// Set the new data and delete the previous error if any
 		let options = {
-			timeout: "_timeoutMs" in dataCollection ? dataCollection._timeoutMs : null,
+			timeout: "_timeoutMs" in dataCollection ? dataCollection._timeoutMs : null
 		};
 		dataId._data = await dataCollection._trigger.call(
 			this,

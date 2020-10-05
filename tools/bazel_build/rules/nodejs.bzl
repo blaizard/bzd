@@ -143,6 +143,7 @@ def _bzd_nodejs_install_impl(ctx):
     # This will create and populate the node_modules directly in the output directory
     node_modules = ctx.actions.declare_directory("{}.nodejs_install/node_modules".format(ctx.label.name))
     yarn_lock_json = ctx.actions.declare_file("{}.nodejs_install/yarn.lock".format(ctx.label.name))
+
     ctx.actions.run(
         inputs = [package_json],
         outputs = [node_modules, yarn_lock_json],
