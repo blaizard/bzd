@@ -1,0 +1,23 @@
+/*const MyType myfriend = 12;
+
+NewType world;*/
+
+const in32 defaultConstant [min -1 , max 35 ];
+
+const in32 defaultConstant = 42;
+
+interface MyFy {
+
+        MyType var;
+        const MyType varConst [ always true ];
+        MyType varInitialized = 42;    
+
+}
+
+/*
+
+MyType var;
+const MyType varConst;
+MyType varInitialized = 42;
+
+*/
