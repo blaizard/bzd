@@ -1,15 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
 load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
-
-py_binary(
-    name = "test",
-    srcs = [
-        "test.py",
-    ],
-    data = [
-        ":i2c.bzl",
-    ],
-)
 
 bzd_cc_library(
     name = "i2c",
