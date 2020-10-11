@@ -1,10 +1,10 @@
-from typing import Mapping, TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from tools.bzd2.element import Element
 	from tools.bzd2.grammar import Grammar
 
-Attributes = Mapping[str, str]
+Attributes = Dict[str, str]
 
 
 class Fragment:
@@ -13,12 +13,20 @@ class Fragment:
 	It describes any entity discovered by the parser. 
 	"""
 
+	default: Dict[str, str] = {}
+
 	def __init__(self, index: int, attrs: Attributes) -> None:
 		self.index = index
-		self.attrs = attrs
+		self.attrs = self.default.copy()
+		self.attrs.update(attrs)
 
-	def getAttrs(self) -> Attributes:
-		return self.attrs
+	def merge(self, attrs: Attributes) -> None:
+		"""
+		Merge current attributes with existing ones
+		"""
+		for key, value in self.attrs.items():
+			assert key not in attrs, "Attribute '{}' already set".format(key)
+			attrs[key] = value
 
 	def next(self, element: "Element", grammar: "Grammar") -> "Element":
 		"""
@@ -43,7 +51,8 @@ class Type(Fragment):
 
 
 class Const(Fragment):
-	pass
+
+	default: Dict[str, str] = {"const": ""}
 
 
 class Equal(Fragment):

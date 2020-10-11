@@ -60,6 +60,12 @@ _grammarVariable: Grammar = [
 
 _grammar: Grammar = _grammarVariable + makeGrammarClass(_grammarVariable)
 
+class ParsedData:
+	def __init__(self, data: Sequence) -> None:
+		self.data = data
+
+	def __repr__(self) -> str:
+		return str(self.data)
 
 class Parser:
 
@@ -85,7 +91,7 @@ class Parser:
 		print("\n".join(contentByLine))
 		raise Exception()
 
-	def parse(self) -> None:
+	def parse(self) -> ParsedData:
 		index = 0
 		root = Sequence(parent=None, grammar=_grammar)
 		element = root.makeElement()
@@ -113,3 +119,6 @@ class Parser:
 		print(element.getGrammar())
 
 		print(m)
+
+
+		return ParsedData(root)

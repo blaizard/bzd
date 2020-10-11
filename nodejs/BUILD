@@ -43,7 +43,7 @@ bzd_nodejs_library(
         "babel-loader": "",
         "babel-plugin-syntax-dynamic-import": "",
         # Webpack
-        "webpack": "",
+        "webpack": "4.44.2",
         "webpack-cli": "",
         "webpack-assets-manifest": "",
         "webpack-bundle-analyzer": "",

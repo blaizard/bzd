@@ -1,6 +1,6 @@
 import typing
 
-from tools.bzd2.fragments import Fragment
+from tools.bzd2.fragments import Fragment, Attributes
 from tools.bzd2.grammar import Grammar
 
 
@@ -38,14 +38,26 @@ class Element:
 	def __init__(self, grammar: Grammar, parent: typing.Optional[Sequence] = None) -> None:
 		self.grammar = grammar
 		self.parent = parent
-		self.fragments: typing.List[Fragment] = []
+		self.attrs: Attributes = {}
 		self.sequences: typing.Dict[str, Sequence] = {}
 
+	def empty(self):
+		"""
+		Check wether or not an element is empty. Empty means with no data.
+		"""
+		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
+
 	def add(self, fragment: Fragment) -> None:
-		self.fragments.append(fragment)
+		"""
+		Add a new fragment to this element.
+		"""
+		fragment.merge(self.attrs)
 
 	def setGrammar(self, grammar: Grammar) -> None:
 		"""
+	def getAttrs(self) -> Attributes:
+		return self.attrs
+
 		Update the grammar of the current element.
 		"""
 		self.grammar = grammar
@@ -64,10 +76,10 @@ class Element:
 		return self.parent
 
 	def __repr__(self) -> str:
-		content = "fragments=" + ",".join([repr(fragment) for fragment in self.fragments])
-		content += "\ngrammar=" + str(self.grammar)
+		content = "<Element {}/>".format(" ".join(["{}=\"{}\"".format(key, value)
+			for key, value in self.attrs.items()]))
 
 		for kind, sequence in self.sequences.items():
-			content += "\n{}: (grammar {})\n{}".format(kind, sequence.getGrammar(), repr(sequence))
+			content += "\n{}:\n{}".format(kind, repr(sequence))
 
 		return content

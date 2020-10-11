@@ -13,7 +13,8 @@ class TestRun(unittest.TestCase):
 	def testParser(self) -> None:
 		assert self.filePath is not None
 		parser = Parser(self.filePath)
-		parser.parse()
+		data = parser.parse()
+		print(data)
 
 
 if __name__ == '__main__':
