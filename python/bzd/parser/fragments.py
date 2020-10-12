@@ -1,8 +1,8 @@
 from typing import Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from tools.bzd2.element import Element
-	from tools.bzd2.grammar import Grammar
+	from bzd.parser.element import Element
+	from bzd.parser.grammar import Grammar
 
 Attributes = Dict[str, str]
 
@@ -42,62 +42,39 @@ class Fragment:
 			" ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
 
 
-class Comment(Fragment):
-	pass
-
-
-class Type(Fragment):
-	pass
-
-
-class Const(Fragment):
-
-	default: Dict[str, str] = {"const": ""}
-
-
-class Equal(Fragment):
-	pass
-
-
-class Name(Fragment):
-	pass
-
-
-class Value(Fragment):
-	pass
-
-
-class End(Fragment):
+class FragmentNewElement(Fragment):
+	"""
+	Helper fragment to create a new element.
+	"""
 
 	def next(self, element: "Element", grammar: "Grammar") -> "Element":
 		return element.getSequence().makeElement()
 
 
-class BracketOpen(Fragment):
-
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
-		return element.makeElement("children", grammar)
-
-
-class BracketClose(Fragment):
-
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
-		return element.getSequence().getElement().getSequence().makeElement()
-
-
-class ContractOpen(Fragment):
-
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
-		return element.makeElement("contract", grammar)
-
-
-class ContractClose(Fragment):
+class FragmentParentElement(Fragment):
+	"""
+	Helper fragment to continue on the parent element.
+	"""
 
 	def next(self, element: "Element", grammar: "Grammar") -> "Element":
 		return element.getSequence().getElement()
 
 
-class ContractNext(Fragment):
+class FragmentNestedStart(Fragment):
+	"""
+	Helper fragment to start a nested sequence.
+	"""
+
+	nestedName = "nested"
 
 	def next(self, element: "Element", grammar: "Grammar") -> "Element":
-		return element.getSequence().makeElement()
+		return element.makeElement(self.nestedName, grammar)
+
+
+class FragmentNestedStop(Fragment):
+	"""
+	Helper fragment to stop a nested sequence.
+	"""
+
+	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+		return element.getSequence().getElement().getSequence().makeElement()

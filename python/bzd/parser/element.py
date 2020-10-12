@@ -1,7 +1,7 @@
 import typing
 
-from tools.bzd2.fragments import Fragment, Attributes
-from tools.bzd2.grammar import Grammar
+from bzd.parser.fragments import Fragment, Attributes
+from bzd.parser.grammar import Grammar
 
 
 class Sequence:
@@ -41,11 +41,19 @@ class Element:
 		self.attrs: Attributes = {}
 		self.sequences: typing.Dict[str, Sequence] = {}
 
-	def empty(self):
+	def isEmpty(self) -> bool:
 		"""
 		Check wether or not an element is empty. Empty means with no data.
 		"""
 		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
+
+	def isAttr(self, name: str) -> bool:
+		"""
+		Check if an attribute is present
+		"""
+		if name in self.attrs:
+			return True
+		return False
 
 	def add(self, fragment: Fragment) -> None:
 		"""
@@ -55,9 +63,6 @@ class Element:
 
 	def setGrammar(self, grammar: Grammar) -> None:
 		"""
-	def getAttrs(self) -> Attributes:
-		return self.attrs
-
 		Update the grammar of the current element.
 		"""
 		self.grammar = grammar
@@ -74,6 +79,9 @@ class Element:
 		assert self.parent is not None, "reached parent element"
 		assert isinstance(self.parent, Sequence), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent
+
+	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
+		return self.sequences.get(kind, None)
 
 	def __repr__(self) -> str:
 		content = "<Element {}/>".format(" ".join(["{}=\"{}\"".format(key, value)

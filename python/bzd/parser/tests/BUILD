@@ -12,6 +12,6 @@ py_test(
         "grammar.bdl",
     ],
     deps = [
-        "//tools/bzd2:grammar",
+        "//python/bzd/parser",
     ],
 )

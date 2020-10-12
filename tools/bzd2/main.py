@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from parser import Parser
+from grammar import Parser
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")

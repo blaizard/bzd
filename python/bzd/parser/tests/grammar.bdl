@@ -1,0 +1,6 @@
+// I am a comment
+const int myVar = 42;
+void hello()
+{
+        float nestedVar = 2;
+}
