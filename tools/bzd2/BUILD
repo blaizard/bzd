@@ -1,15 +1,13 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
-    name = "parser",
-    srcs = glob([
-        "parser.py",
-        "fragments.py",
-        "element.py",
+    name = "grammar",
+    srcs = [
         "grammar.py",
-    ]),
-    visibility = [
-        "//tools/bzd2/tests:__pkg__",
+    ],
+    visibility = [":__subpackages__"],
+    deps = [
+        "//python/bzd/parser",
     ],
 )
 
@@ -20,6 +18,6 @@ py_binary(
     ],
     main = "main.py",
     deps = [
-        ":parser",
+        ":grammar",
     ],
 )

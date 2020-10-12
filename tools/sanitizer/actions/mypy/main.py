@@ -13,11 +13,12 @@ configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
 
 
 def mypyWorker(path: str, stdout: TextIO) -> None:
+	
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
 		args=[
-		"--config-file", configFile, "--strict", "--no-incremental", "--follow-imports", "silent", "--pretty", path
+		"--config-file", configFile, "--strict", "--no-incremental", "--follow-imports", "normal", "--pretty", path
 		])
 
 
@@ -30,6 +31,8 @@ if __name__ == "__main__":
 	files = Files(args.workspace, include=[
 		"**/*.py",
 	], exclude=["**python/bzd/yaml**", "**_test.py"])
+
+	os.environ["MYPYPATH"] = "{workspace}:{workspace}/python".format(workspace = args.workspace)
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
