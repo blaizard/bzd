@@ -1,9 +1,7 @@
-#!/usr/bin/python
-
 import re
-from .custom import Custom
 from typing import Type, Any, List, Optional, Pattern, Mapping
 
+from tools.bzd.generator.manifest.custom import Custom
 
 class ValidatorType:
 	valueTypes: List[Any] = []

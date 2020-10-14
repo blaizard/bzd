@@ -21,24 +21,24 @@ class TestRun(unittest.TestCase):
 		class Checker(Visitor):
 			nestedKind = "children"
 
-			def __init__(self):
+			def __init__(self) -> None:
 				self.content = ""
 				self.level = 0
 
-			def visitElement(self, element):
+			def visitElement(self, element: typing.Any) -> None:
 				print(element)
 
-			def visitNestedIn(self, element):
+			def visitNestedIn(self, element: typing.Any) -> None:
 				print("{")
 
-			def visitNestedOut(self, element):
+			def visitNestedOut(self, element: typing.Any) -> None:
 				print("}")
 
 		checker = Checker()
 		checker.visit(data.data)
 		print(checker.content)
 
-		raise Exception()
+		#raise Exception()
 
 
 if __name__ == '__main__':

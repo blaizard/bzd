@@ -1,11 +1,9 @@
-#!/usr/bin/python
-
-from .validator import ValidatorReference, ValidatorCustom, ValidatorObject, ValidatorInterface
-
 from typing import Sequence, Callable, Any, Optional, Mapping, Set, Dict, List, Iterable, TYPE_CHECKING
+
+from tools.bzd.generator.manifest.validator import ValidatorReference, ValidatorCustom, ValidatorObject, ValidatorInterface
 if TYPE_CHECKING:
-	from .manifest import Manifest
-	from .interface import Interface
+	from tools.bzd.generator.manifest.manifest import Manifest
+	from tools.bzd.generator.manifest.interface import Interface
 """
 Represents an object
 """
@@ -122,7 +120,7 @@ class Object():
 			implementationInterface, implementationObjecy, self.identifier)
 		implementation = implementationInterface if implementationInterface else self.definition.get(
 			"implementation", self.getInterfaceName())
-		return self.manifest.getInterface(  # type: ignore
+		return self.manifest.getInterface(
 			implementation, mustExists=False).getImplementationOrInterface()
 
 	"""

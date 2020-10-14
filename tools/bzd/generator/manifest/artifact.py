@@ -1,12 +1,10 @@
-#!/usr/bin/python
-
 import os
-from .object import Object
-from .custom import Custom
-
 from typing import Iterable, MutableMapping, TYPE_CHECKING
+
+from tools.bzd.generator.manifest.object import Object
+from tools.bzd.generator.manifest.custom import Custom
 if TYPE_CHECKING:
-	from .manifest import Manifest
+	from tools.bzd.generator.manifest.manifest import Manifest
 """
 Represents an artifact
 """

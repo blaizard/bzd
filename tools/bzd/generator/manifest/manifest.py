@@ -1,11 +1,10 @@
-#!/usr/bin/python
-
-from .object import Object
-from .interface import Interface, EmptyInterface
-from .artifact import Artifact
-from .validator import Validator
-
 from typing import Optional, Mapping, Any, Set, Sequence, Iterable, List, Dict, MutableMapping, ValuesView
+
+from tools.bzd.generator.manifest.object import Object
+from tools.bzd.generator.manifest.interface import Interface, EmptyInterface
+from tools.bzd.generator.manifest.artifact import Artifact
+from tools.bzd.generator.manifest.validator import Validator
+
 """
 Represent a key, used together with the context for messaging
 """

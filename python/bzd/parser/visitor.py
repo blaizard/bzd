@@ -16,11 +16,11 @@ class Visitor:
 	printer.visit(data)
 	"""
 
-	nestedKind = None
+	nestedKind: str = "nested"
 
 	def visit(self, data: typing.Union[Sequence, ParsedData]) -> None:
 		sequence = data.data if isinstance(data, ParsedData) else data
-		for element in data.list:
+		for element in sequence.getList():
 			if not element.isEmpty():
 				self.visitElement(element)
 				nestedSequence = element.getNestedSequence(kind=self.nestedKind)
