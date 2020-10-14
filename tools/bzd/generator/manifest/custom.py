@@ -2,7 +2,6 @@ from typing import Any, Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from tools.bzd.generator.manifest.manifest import Manifest
-
 """
 Represents a custom value
 """

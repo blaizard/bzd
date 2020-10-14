@@ -12,15 +12,15 @@ from typing import TextIO
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
 includePaths = ["python"]
 
+
 def mypyWorker(package: str, stdout: TextIO) -> None:
-	
+
 	# To support namespace, the package has to be passed
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
-		args=[
-		"--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package
-		])
+		args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
 	worker.start()
-	for path in files.data(relative = True):
+	for path in files.data(relative=True):
 
 		# Strip name from include paths (if available)
 		# and generate package name

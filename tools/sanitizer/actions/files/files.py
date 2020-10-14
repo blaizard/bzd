@@ -38,20 +38,17 @@ def formatYaml(path: str, stdout: TextIO) -> None:
 	def defaultCtor(loader: Any, tagSuffix: str, node: Any) -> Tag:
 		return Tag(tagSuffix, node.value)
 
-	bzd.yaml.add_multi_constructor("", defaultCtor) # type: ignore
-	bzd.yaml.add_representer(Tag, representer) # type: ignore
+	bzd.yaml.add_multi_constructor("", defaultCtor)  # type: ignore
+	bzd.yaml.add_representer(Tag, representer)  # type: ignore
 
 	content = Path(path).read_text()
 	try:
-		parsedContent = bzd.yaml.load(content, Loader=bzd.yaml.Loader) # type: ignore
+		parsedContent = bzd.yaml.load(content, Loader=bzd.yaml.Loader)  # type: ignore
 	except Exception:
 		stdout.write("Cannot parse yaml file '{}'\n".format(path))
 		raise
-	formattedContent = bzd.yaml.dump(parsedContent, # type: ignore
-		default_flow_style=False,
-		allow_unicode=True,
-		indent=4,
-		encoding=None)
+	formattedContent = bzd.yaml.dump(  # type: ignore
+		parsedContent, default_flow_style=False, allow_unicode=True, indent=4, encoding=None)
 	Path(path).write_text(formattedContent, encoding="utf-8")
 
 

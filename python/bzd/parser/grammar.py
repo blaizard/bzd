@@ -6,18 +6,20 @@ Grammar = List["GrammarItem"]
 
 class GrammarItem:
 
-	def __init__(self,
-		regexpr: str,
-		fragment: Union[Type[Fragment], str] = Fragment,
-		grammar: Optional[Grammar] = None) -> None:
+	def __init__(
+			self,
+			regexpr: str,
+			fragment: Union[Type[Fragment], str] = Fragment,
+			grammar: Optional[Grammar] = None) -> None:
 		self.regexpr = regexpr
 		if isinstance(fragment, str):
+
 			class Temp(Fragment):
 				default = {str(fragment): ""}
 
 			self.fragment = Temp
 		else:
-			self.fragment = fragment # type: ignore
+			self.fragment = fragment  # type: ignore
 		self.grammar = grammar
 
 	def __repr__(self) -> str:
