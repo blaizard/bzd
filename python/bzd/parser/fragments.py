@@ -1,4 +1,4 @@
-from typing import Dict, TYPE_CHECKING
+from typing import Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from bzd.parser.element import Element
@@ -28,7 +28,7 @@ class Fragment:
 			assert key not in attrs, "Attribute '{}' already set".format(key)
 			attrs[key] = value
 
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		"""
 		Returns the next element for the next entity.
 		This is where elements can be terminated and new ones can be generated.
@@ -47,7 +47,7 @@ class FragmentNewElement(Fragment):
 	Helper fragment to create a new element.
 	"""
 
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		return element.getSequence().makeElement()
 
 
@@ -56,7 +56,7 @@ class FragmentParentElement(Fragment):
 	Helper fragment to continue on the parent element.
 	"""
 
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		return element.getSequence().getElement()
 
 
@@ -67,7 +67,8 @@ class FragmentNestedStart(Fragment):
 
 	nestedName = "nested"
 
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+		assert grammar is not None, "Grammar must be set"
 		return element.makeElement(self.nestedName, grammar)
 
 
@@ -76,5 +77,5 @@ class FragmentNestedStop(Fragment):
 	Helper fragment to stop a nested sequence.
 	"""
 
-	def next(self, element: "Element", grammar: "Grammar") -> "Element":
+	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		return element.getSequence().getElement().getSequence().makeElement()

@@ -1,7 +1,8 @@
-from typing import Any, BinaryIO, Mapping, MutableMapping
-from manifest.object import Object
-from manifest.artifact import Artifact
-from manifest.manifest import Manifest
+from typing import Any, BinaryIO, Mapping, MutableMapping, Set
+
+from tools.bzd.generator.manifest.object import Object
+from tools.bzd.generator.manifest.artifact import Artifact
+from tools.bzd.generator.manifest.manifest import Manifest
 
 _uid = -1
 
@@ -41,7 +42,7 @@ def registryBuild(manifest: Manifest) -> str:
 	content += "#include \"bzd.h\"\n\n"
 
 	# Include object dependencies
-	includes = set()
+	includes: Set[str] = set()
 	for interface in manifest.getDependentInterfaces():
 		includes.update(interface.getIncludes())
 	for include in sorted(list(includes)):

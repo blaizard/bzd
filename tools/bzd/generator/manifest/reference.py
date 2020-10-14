@@ -1,8 +1,7 @@
-#!/usr/bin/python
-
 from typing import Callable, Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
-	from .manifest import Manifest
+	from tools.bzd.generator.manifest.manifest import Manifest
 """
 Represents a reference value
 """

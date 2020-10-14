@@ -1,8 +1,8 @@
-#!/usr/bin/python
-
 from typing import Optional, Sequence, Set, TYPE_CHECKING
+
 if TYPE_CHECKING:
-	from .manifest import Manifest
+	from tools.bzd.generator.manifest.manifest import Manifest
+
 """
 Represents an interface
 """

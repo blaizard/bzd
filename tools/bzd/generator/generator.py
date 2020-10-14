@@ -1,12 +1,12 @@
-#!/usr/bin/python
-
 import argparse
 import re
 import os
-from log import Log
-from parser import manifestToDict, dictToManifest
-from manifest.manifest import Manifest
-from formats.formats import SUPPORTED_FORMATS
+import sys
+
+from tools.bzd.generator.log import Log
+from tools.bzd.generator.parser import manifestToDict, dictToManifest
+from tools.bzd.generator.manifest.manifest import Manifest
+from tools.bzd.generator.formats.formats import SUPPORTED_FORMATS
 
 if __name__ == "__main__":
 

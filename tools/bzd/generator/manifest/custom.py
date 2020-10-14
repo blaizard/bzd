@@ -1,8 +1,8 @@
-#!/usr/bin/python
-
 from typing import Any, Callable, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
-	from .manifest import Manifest
+	from tools.bzd.generator.manifest.manifest import Manifest
+
 """
 Represents a custom value
 """

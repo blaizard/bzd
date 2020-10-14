@@ -9,7 +9,7 @@ class Sequence:
 	This represents a sequence of Elements.
 	"""
 
-	def __init__(self, grammar: Grammar, parent: "Element") -> None:
+	def __init__(self, grammar: Grammar, parent: typing.Optional["Element"]) -> None:
 		self.grammar = grammar
 		self.parent = parent
 		self.list: typing.List["Element"] = []
@@ -23,7 +23,11 @@ class Sequence:
 		return self.grammar
 
 	def getElement(self) -> "Element":
+		assert self.parent, "This sequence is at the top level."
 		return self.parent
+
+	def getList(self) -> typing.List["Element"]:
+		return self.list
 
 	def __repr__(self) -> str:
 		listStr = []

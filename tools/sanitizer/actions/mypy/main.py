@@ -10,17 +10,17 @@ from tools.sanitizer.utils.python.workspace import Files
 from typing import TextIO
 
 configFile = os.path.join(os.path.dirname(__file__), "mypy.ini")
+includePaths = ["python"]
 
-
-def mypyWorker(path: str, stdout: TextIO) -> None:
+def mypyWorker(package: str, stdout: TextIO) -> None:
 	
+	# To support namespace, the package has to be passed
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
 		args=[
-		"--config-file", configFile, "--strict", "--no-incremental", "--follow-imports", "normal", "--pretty", path
+		"--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package
 		])
-
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")
@@ -32,13 +32,25 @@ if __name__ == "__main__":
 		"**/*.py",
 	], exclude=["**python/bzd/yaml**", "**_test.py"])
 
-	os.environ["MYPYPATH"] = "{workspace}:{workspace}/python".format(workspace = args.workspace)
+	# Set the include paths
+	includeFullPaths = [args.workspace.as_posix()] + ["{}/{}".format(args.workspace, path) for path in includePaths]
+	os.environ["MYPYPATH"] = ":".join(includeFullPaths)
 
 	# Process the varous files
 	worker = bzd.utils.worker.Worker(mypyWorker)
 	worker.start()
-	for path in files.data():
-		worker.add(path.as_posix())
+	for path in files.data(relative = True):
+
+		# Strip name from include paths (if available)
+		# and generate package name
+		pathStr = path.with_suffix("").as_posix()
+		for strippedPath in includePaths:
+			if pathStr.startswith(strippedPath):
+				pathStr = pathStr[len(strippedPath) + 1:]
+				break
+		package = ".".join(pathStr.split("/"))
+
+		worker.add(package)
 
 	isSuccess = True
 	for result in worker.data():
