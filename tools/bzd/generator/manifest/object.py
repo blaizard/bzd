@@ -120,8 +120,7 @@ class Object():
 			implementationInterface, implementationObjecy, self.identifier)
 		implementation = implementationInterface if implementationInterface else self.definition.get(
 			"implementation", self.getInterfaceName())
-		return self.manifest.getInterface(
-			implementation, mustExists=False).getImplementationOrInterface()
+		return self.manifest.getInterface(implementation, mustExists=False).getImplementationOrInterface()
 
 	"""
 	Get parameters

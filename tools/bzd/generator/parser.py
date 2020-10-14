@@ -3,7 +3,6 @@ from typing import Any, Mapping
 import bzd.yaml
 from tools.bzd.generator.log import Log
 from tools.bzd.generator.manifest.reference import Reference
-
 """
 Add support for !ref tag
 """
@@ -30,7 +29,7 @@ Convert the dict back to a manifest
 
 
 def dictToManifest(data: Mapping[str, Any]) -> str:
-	bzd.yaml.add_representer(Ref, Ref.representer) # type: ignore
+	bzd.yaml.add_representer(Ref, Ref.representer)  # type: ignore
 	return bzd.yaml.dump(data)  # type: ignore
 
 
@@ -41,14 +40,14 @@ Open a manifest file and convert it to a python dict.
 
 def manifestToDict(path: str) -> Mapping[str, Any]:
 
-	bzd.yaml.add_constructor(Ref.tag, Ref) # type: ignore
+	bzd.yaml.add_constructor(Ref.tag, Ref)  # type: ignore
 
 	try:
 		f = open(path)
 	except Exception as e:
 		Log.fatal("Unable to open manifest '{}'".format(path), e)
 	try:
-		data = bzd.yaml.load(f, Loader=bzd.yaml.Loader) # type: ignore
+		data = bzd.yaml.load(f, Loader=bzd.yaml.Loader)  # type: ignore
 	except Exception as e:
 		Log.fatal("Unable to parse manifest '{}'".format(path), e)
 	finally:

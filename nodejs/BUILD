@@ -44,7 +44,7 @@ bzd_nodejs_library(
         "babel-plugin-syntax-dynamic-import": "",
         # Webpack
         "webpack": "4.44.2",
-        "webpack-cli": "",
+        "webpack-cli": "3.3.12",
         "webpack-assets-manifest": "",
         "webpack-bundle-analyzer": "",
         # Vue

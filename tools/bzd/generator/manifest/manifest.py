@@ -4,7 +4,6 @@ from tools.bzd.generator.manifest.object import Object
 from tools.bzd.generator.manifest.interface import Interface, EmptyInterface
 from tools.bzd.generator.manifest.artifact import Artifact
 from tools.bzd.generator.manifest.validator import Validator
-
 """
 Represent a key, used together with the context for messaging
 """
