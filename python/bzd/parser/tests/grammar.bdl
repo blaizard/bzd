@@ -2,5 +2,6 @@
 const int myVar = 42;
 void hello()
 {
+        // I am a nested comment
         float nestedVar = 2;
 }

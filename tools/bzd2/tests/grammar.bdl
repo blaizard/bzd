@@ -1,6 +1,7 @@
 /*const MyType myfriend = 12;
 
 NewType world;*/
+// This is a single line comment
 
 const int32 defaultConstant [min -1 , max 35 ];
 

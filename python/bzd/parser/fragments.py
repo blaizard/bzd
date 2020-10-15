@@ -42,6 +42,25 @@ class Fragment:
 			" ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
 
 
+class FragmentComment(Fragment):
+	"""
+	Helper fragment for comments.
+	"""
+
+	def merge(self, attrs: Attributes) -> None:
+		for key, value in self.attrs.items():
+
+			# Remove prefix and trailing spaces
+			minTrailingSpaces = min([len(s) - len(s.lstrip(" ")) for s in value.split("\n")])
+			updatedValue = "\n".join([s[minTrailingSpaces:].rstrip() for s in value.split("\n")])
+
+			# Append the comments
+			if key in attrs:
+				attrs[key] += "\n\n{}".format(updatedValue)
+			else:
+				attrs[key] = updatedValue
+
+
 class FragmentNewElement(Fragment):
 	"""
 	Helper fragment to create a new element.
