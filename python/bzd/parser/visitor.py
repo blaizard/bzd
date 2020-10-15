@@ -16,24 +16,38 @@ class Visitor:
 	printer.visit(data)
 	"""
 
-	nestedKind: str = "nested"
+	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, data: typing.Union[Sequence, ParsedData]) -> None:
+	def visit(self, data: typing.Union[Sequence, ParsedData], result: typing.Any = None) -> typing.Any:
 		sequence = data.data if isinstance(data, ParsedData) else data
 		for element in sequence.getList():
 			if not element.isEmpty():
-				self.visitElement(element)
-				nestedSequence = element.getNestedSequence(kind=self.nestedKind)
-				if nestedSequence is not None:
-					self.visitNestedIn(element)
-					self.visit(nestedSequence)
-					self.visitNestedOut(element)
+				result = self.visitElement(element, result)
+				if self.nestedKind is not None:
+					nestedSequence = element.getNestedSequence(kind=self.nestedKind)
+					if nestedSequence is not None:
+						result = self.visitNested(element, nestedSequence, result)
+		return result
 
-	def visitElement(self, element: Element) -> None:
-		pass
+	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
+		return result
 
-	def visitNestedIn(self, element: Element) -> None:
-		pass
+	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.Any) -> typing.Any:
+		return self.visit(nestedSequence, result)
 
-	def visitNestedOut(self, element: Element) -> None:
-		pass
+
+class VisitorJson(Visitor):
+	"""
+	Converts a ParsedData structure into a Json view.
+	"""
+
+	nestedKind = None
+
+	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
+
+		if result is None:
+			result = []
+		result.append({"attrs": element.getAttrs()})
+		for kind, sequence in element.getNestedSequences():
+			result[-1][kind] = self.visit(data=sequence, result=[])
+		return result

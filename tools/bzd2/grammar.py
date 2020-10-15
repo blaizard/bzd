@@ -2,7 +2,7 @@ from pathlib import Path
 
 from bzd.parser.parser import Parser as ParserBase
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
-from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentParentElement
+from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
 
@@ -10,7 +10,6 @@ class ContractStart(FragmentNestedStart):
 	nestedName = "contract"
 
 
-_regexprComment = r"/\*(?P<comment>([\s\S]*?))\*/"
 _regexprClass = r"(?P<kind>(:?interface|struct))\s+(?P<name>\S+)"
 _regexprConst = r"const\b"
 _regexprClassType = r"(?P<kind>(:?interface|struct))\b"
@@ -65,8 +64,13 @@ _grammarVariable: Grammar = [
 
 _grammar: Grammar = _grammarVariable + makeGrammarClass(_grammarVariable)
 
+_grammarComments = [
+	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentComment),
+	GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)
+]
+
 
 class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
-		super().__init__(path, grammar=_grammar, defaultGrammar=[GrammarItemSpaces, GrammarItem(_regexprComment)])
+		super().__init__(path, grammar=_grammar, defaultGrammar=[GrammarItemSpaces] + _grammarComments)

@@ -51,6 +51,12 @@ class Element:
 		"""
 		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
 
+	def getAttrs(self) -> typing.Mapping[str, str]:
+		"""
+		Return the attributes as a dictionary.
+		"""
+		return self.attrs
+
 	def isAttr(self, name: str) -> bool:
 		"""
 		Check if an attribute is present
@@ -86,6 +92,10 @@ class Element:
 
 	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
 		return self.sequences.get(kind, None)
+
+	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
+		for kind, sequence in self.sequences.items():
+			yield kind, sequence
 
 	def __repr__(self) -> str:
 		content = "<Element {}/>".format(" ".join(["{}=\"{}\"".format(key, value)

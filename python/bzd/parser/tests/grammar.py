@@ -6,12 +6,13 @@ from pathlib import Path
 from bzd.parser.parser import Parser
 from bzd.parser.visitor import Visitor
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
-from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement
+from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentComment
 from bzd.parser.element import Element
+from bzd.parser.visitor import VisitorJson
 
 # Simple Grammar
 
-_grammarComment = [GrammarItem(r"//(?P<comment>[^\n]*)")]
+_grammarComment = [GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)]
 _grammarVariableDeclaration = [
 	GrammarItem(r"const", "const"),
 	GrammarItem(r"(?P<kind>int|float)", "variable", [
@@ -41,7 +42,37 @@ class TestRun(unittest.TestCase):
 	def testParser(self) -> None:
 		assert self.filePath is not None
 		parser = Parser(self.filePath, _grammar, [GrammarItemSpaces] + _grammarComment)
-		parser.parse()
+		data = parser.parse()
+
+		visitor = VisitorJson()
+		result = visitor.visit(data)
+		expected = [{
+			'attrs': {
+			'comment': 'I am a comment',
+			'const': '',
+			'variable': '',
+			'kind': 'int',
+			'name': 'myVar',
+			'value': '42'
+			}
+		}, {
+			'attrs': {
+			'function': '',
+			'return': 'void',
+			'name': 'hello'
+			},
+			'nested': [{
+			'attrs': {
+			'comment': 'I am a nested comment',
+			'variable': '',
+			'kind': 'float',
+			'name': 'nestedVar',
+			'value': '2'
+			}
+			}]
+		}]
+
+		self.assertListEqual(expected, result)
 
 
 if __name__ == '__main__':
