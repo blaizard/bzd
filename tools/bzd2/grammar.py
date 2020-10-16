@@ -8,7 +8,7 @@ from bzd.parser.element import Element
 # Match: interface, struct
 _regexprClass = r"(?P<type>(:?interface|struct))"
 # Match: any type expect protected types
-_regexprType = r"(?P<kind>(?!const|interface|struct)[^\s<>,]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct)[^\s<>,]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_-]+)\b"
 # Match: "string", 12, -45, 5.1854
@@ -69,19 +69,18 @@ def makeGrammarContracts() -> Grammar:
 	class ContractStart(FragmentNestedStart):
 		nestedName = "contract"
 
-	_grammarContractEntry: Grammar = []
-	_grammarContractEntry.append(
-		GrammarItem(_regexprType, Fragment, [
-			GrammarItem(_regexprValue, Fragment, [
-				GrammarItem(r"\]", FragmentParentElement),
-				GrammarItem(r",", FragmentNewElement, _grammarContractEntry)
-			])
-		])
-	)
-
 	return [
-		GrammarItem(r"\[", ContractStart,
-		[_grammarContractEntry, GrammarItem(r"\]", FragmentParentElement)]),
+		GrammarItem(r"\[", ContractStart, [
+			GrammarItem(_regexprType, Fragment, [
+				GrammarItem(r"=", Fragment, [
+					GrammarItem(_regexprValue, Fragment),
+					GrammarItem(r",", FragmentNewElement),
+					GrammarItem(r"\]", FragmentParentElement),
+				]),
+				GrammarItem(r",", FragmentNewElement),
+				GrammarItem(r"\]", FragmentParentElement),
+			])
+		]),
 	]
 
 # variable: [const] type name [= value] [contract];
