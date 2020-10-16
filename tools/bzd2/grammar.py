@@ -8,9 +8,9 @@ from bzd.parser.element import Element
 # Match: interface, struct
 _regexprClass = r"(?P<type>(:?interface|struct))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct)[^\s<>,]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct)[0-9a-zA-Z_]+)"
 # Match name
-_regexprName = r"(?P<name>[0-9a-zA-Z_-]+)\b"
+_regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
 
