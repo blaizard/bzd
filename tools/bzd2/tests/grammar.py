@@ -25,7 +25,7 @@ class TestRun(unittest.TestCase):
 		checker.visit(data.data)
 		print(checker)
 
-		#raise Exception()
+		raise Exception()
 
 
 if __name__ == '__main__':

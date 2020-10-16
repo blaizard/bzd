@@ -4,7 +4,6 @@ import typing
 from pathlib import Path
 
 from bzd.parser.parser import Parser
-from bzd.parser.visitor import Visitor
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentComment
 from bzd.parser.element import Element

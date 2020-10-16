@@ -1,8 +1,9 @@
 import re
 from pathlib import Path
+from typing import Iterator
 
 from bzd.parser.element import Sequence
-from bzd.parser.grammar import Grammar, GrammarItemSpaces
+from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 
 
 class ParsedData:
@@ -40,13 +41,20 @@ class Parser:
 		print("\n".join(contentByLine))
 		raise Exception()
 
+	def iterateGrammar(self, grammar: Grammar) -> Iterator[GrammarItem]:
+		for item in grammar:
+			if isinstance(item, list):
+				yield from self.iterateGrammar(item)
+			else:
+				yield item
+
 	def parse(self) -> ParsedData:
 		index = 0
 		root = Sequence(parent=None, grammar=self.grammar)
 		element = root.makeElement()
 		while index < len(self.content):
 			m = None
-			for item in self.defaultGrammar + element.getGrammar():
+			for item in self.iterateGrammar(self.defaultGrammar + element.getGrammar()):
 				m = re.match(item.regexpr, self.content[index:], re.MULTILINE)
 				if m:
 					if item.fragment:

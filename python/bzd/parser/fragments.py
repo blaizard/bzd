@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -50,7 +51,11 @@ class FragmentComment(Fragment):
 	def merge(self, attrs: Attributes) -> None:
 		for key, value in self.attrs.items():
 
-			# Remove prefix and trailing spaces
+			# Remove empty lines at the begining and end
+			value = re.sub(r"^(\s*\n)+", "", value)
+			value = re.sub(r"(\n\s*)+$", "", value)
+
+			# Remove common prefix and trailing spaces
 			minTrailingSpaces = min([len(s) - len(s.lstrip(" ")) for s in value.split("\n")])
 			updatedValue = "\n".join([s[minTrailingSpaces:].rstrip() for s in value.split("\n")])
 
