@@ -27,14 +27,15 @@ def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
 
 	return [
 		GrammarItem(_regexprClass, Fragment, [
-			GrammarItem(_regexprName, Fragment, [
-				GrammarItem(r"{", FragmentNestedStart, [
-					nestedGrammar,
-					GrammarItem(r"}", FragmentNestedStop),
-				]),
-			])
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r"{", FragmentNestedStart, [
+		nestedGrammar,
+		GrammarItem(r"}", FragmentNestedStop),
+		]),
+		])
 		])
 	]
+
 
 def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 	"""
@@ -48,15 +49,14 @@ def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 		nestedName = "template"
 
 	grammar: Grammar = []
-	grammar.append(GrammarItem(_regexprType, Fragment, [
-		GrammarItem(r"<", TemplateStart, [
-			grammar
-		]),
+	grammar.append(
+		GrammarItem(_regexprType, Fragment, [
+		GrammarItem(r"<", TemplateStart, [grammar]),
 		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r">", FragmentParentElement),
-		nextGrammar
-	]))
+		GrammarItem(r">", FragmentParentElement), nextGrammar
+		]))
 	return grammar
+
 
 def makeGrammarContracts() -> Grammar:
 	"""
@@ -71,32 +71,38 @@ def makeGrammarContracts() -> Grammar:
 
 	return [
 		GrammarItem(r"\[", ContractStart, [
-			GrammarItem(_regexprType, Fragment, [
-				GrammarItem(r"=", Fragment, [
-					GrammarItem(_regexprValue, Fragment),
-					GrammarItem(r",", FragmentNewElement),
-					GrammarItem(r"\]", FragmentParentElement),
-				]),
-				GrammarItem(r",", FragmentNewElement),
-				GrammarItem(r"\]", FragmentParentElement),
-			])
+		GrammarItem(_regexprType, Fragment, [
+		GrammarItem(r"=", Fragment, [
+		GrammarItem(_regexprValue, Fragment),
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\]", FragmentParentElement),
+		]),
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\]", FragmentParentElement),
+		])
 		]),
 	]
 
-# variable: [const] type name [= value] [contract];
-_grammarVariable: Grammar = [
-	GrammarItem(r"const", "const"),
-] + makeGrammarType([
-	GrammarItem(
-	_regexprName, Fragment, [makeGrammarContracts(),
-	GrammarItem(r"=", Fragment,
-	[GrammarItem(_regexprValue, Fragment, [GrammarItem(r";", FragmentNewElement)])]),
-	GrammarItem(r";", FragmentNewElement)
+
+def makeGrammarVariable() -> Grammar:
+	"""
+	Generate a grammar for Variables, it accepts the following format:
+	[const] type name [= value] [contract];
+	"""
+	return [
+		GrammarItem(r"const", "const"),
+	] + makeGrammarType([
+		GrammarItem(_regexprName, Fragment, [
+		makeGrammarContracts(),
+		GrammarItem(r"=", Fragment,
+		[GrammarItem(_regexprValue, Fragment,
+		[makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
+		GrammarItem(r";", FragmentNewElement)
+		])
 	])
-])
 
-_grammar: Grammar = _grammarVariable + makeGrammarClass(_grammarVariable)
 
+# Comments allowed by the grammar
 _grammarComments = [
 	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentComment),
 	GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)
@@ -106,4 +112,6 @@ _grammarComments = [
 class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
-		super().__init__(path, grammar=_grammar, defaultGrammar=[GrammarItemSpaces] + _grammarComments)
+		super().__init__(path,
+			grammar=makeGrammarVariable() + makeGrammarClass(makeGrammarVariable()),
+			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

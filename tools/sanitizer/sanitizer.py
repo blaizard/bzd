@@ -30,6 +30,7 @@ if __name__ == "__main__":
 		noError = noError and (result.getReturnCode() == 0)
 		if result.getReturnCode() != 0:
 			logging.error("Failed action '{}' ({:.1f}s)".format(action, elapsedTime))
+			logging.error("Run: bazel run {} -- \"{}\"".format(action, args.workspace))
 			print(result.getOutput())
 		else:
 			logging.info("Completed action '{}' ({:.1f}s)".format(action, elapsedTime))

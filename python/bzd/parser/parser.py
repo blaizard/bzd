@@ -46,6 +46,8 @@ class Parser:
 			if isinstance(item, list):
 				yield from self.iterateGrammar(item)
 			else:
+				assert isinstance(item,
+					GrammarItem), "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
 				yield item
 
 	def parse(self) -> ParsedData:

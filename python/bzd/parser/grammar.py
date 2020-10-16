@@ -1,7 +1,7 @@
-from typing import Optional, Dict, List, Pattern, Union, Type, TYPE_CHECKING
+from typing import Any, Optional, Dict, List, Pattern, Union, Type, TYPE_CHECKING
 from bzd.parser.fragments import Fragment
 
-Grammar = List["GrammarItem"]
+Grammar = List[Any]
 
 
 class GrammarItem:
