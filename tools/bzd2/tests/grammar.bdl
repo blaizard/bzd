@@ -1,18 +1,34 @@
-/*const MyType myfriend = 12;
+/*
+ This is a multi-line comment
+*/
 
-NewType world;*/
-// This is a single line comment
+// Single line
 
+// Simple variable
+int16 varSimple1;
+const String varSimple2;
+
+// Template variable
+List<int32> varTemplate1;
+const Variant<Boolean, String> varTemplate2;
+
+// Complex nested template variable
+Variant<List<Int>, Optional<List<Float>>, Boolean> varNested;
+
+// Initialized variable
+int16 varInit1 = 12;
+const int16 varInit2 = -5;
+const String varInit3 = "Hello World! <here>";
+Float varInit4 = 5.12;
+
+// Contracts
 const int32 defaultConstant [min -1 , max 35 ];
-
-const int32 defaultConstant = 42;
+//int32 defaultConstant = 42 [min -1 , max 35 ];
 
 interface MyFy {
-
         MyType var;
         const MyType varConst [ always 959 ];
         MyType varInitialized = 42;    
-
 }
 
 /*

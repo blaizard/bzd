@@ -5,62 +5,96 @@ from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
-
-class ContractStart(FragmentNestedStart):
-	nestedName = "contract"
-
-
-_regexprClass = r"(?P<kind>(:?interface|struct))\s+(?P<name>\S+)"
-_regexprConst = r"const\b"
-_regexprClassType = r"(?P<kind>(:?interface|struct))\b"
-_regexprType = r"(?P<kind>(?!const|interface|struct)[^\s]+)\b"
-_regexprName = r"(?P<name>\S+)\b"
-_regexprBracketOpen = r"{"
-_regexprBracketClose = r"}"
-_regexprContractOpen = r"\["
-_regexprContractClose = r"\]"
-_regexprContractNext = r","
-_regexprEqual = r"="
-_regexprEnd = r";"
-_regexprValue = r"(?P<value>-?[0-9]+)"
+# Match: interface, struct
+_regexprClass = r"(?P<type>(:?interface|struct))"
+# Match: any type expect protected types
+_regexprType = r"(?P<kind>(?!const|interface|struct)[^\s<>,]+)"
+# Match name
+_regexprName = r"(?P<name>[0-9a-zA-Z_-]+)\b"
+# Match: "string", 12, -45, 5.1854
+_regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
 
 
-def makeGrammarClass(nestedGrammarItems: Grammar) -> Grammar:
+def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
+	"""
+	Generate a grammar for Class., it accepst the following format:
+	(interface|struct) name {
+		nestedGrammar
+	}
+
+	Nested type elements are included under `nested`.
+	"""
+
 	return [
 		GrammarItem(_regexprClass, Fragment, [
-		GrammarItem(_regexprBracketOpen, FragmentNestedStart, nestedGrammarItems + [
-		GrammarItem(_regexprBracketClose, FragmentNestedStop),
-		]),
+			GrammarItem(_regexprName, Fragment, [
+				GrammarItem(r"{", FragmentNestedStart, [
+					nestedGrammar,
+					GrammarItem(r"}", FragmentNestedStop),
+				]),
+			])
 		])
 	]
 
+def makeGrammarType(nextGrammar: Grammar) -> Grammar:
+	"""
+	Generate a grammar for Type, it accepts the following format:
+	Type = Type1[<Type, Type, ...>]
 
-_grammarContractEntry: Grammar = []
-_grammarContractEntry.append(
-	GrammarItem(_regexprType, Fragment, [
-	GrammarItem(_regexprValue, Fragment, [
-	GrammarItem(_regexprContractClose, FragmentParentElement),
-	GrammarItem(_regexprContractNext, FragmentNewElement, _grammarContractEntry)
-	])
+	Nested type elements are included under `template`.
+	"""
+
+	class TemplateStart(FragmentNestedStart):
+		nestedName = "template"
+
+	grammar: Grammar = []
+	grammar.append(GrammarItem(_regexprType, Fragment, [
+		GrammarItem(r"<", TemplateStart, [
+			grammar
+		]),
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r">", FragmentParentElement),
+		nextGrammar
 	]))
+	return grammar
 
-_grammarContract: Grammar = [
-	GrammarItem(_regexprContractOpen, ContractStart,
-	_grammarContractEntry + [GrammarItem(_regexprContractClose, FragmentParentElement)]),
-]
+def makeGrammarContracts() -> Grammar:
+	"""
+	Generate a grammar for Contracts, it accepts the following format:
+	[Type1 [= value], Type2 [= value], ...]
+
+	Nested type elements are included under `contracts`.
+	"""
+
+	class ContractStart(FragmentNestedStart):
+		nestedName = "contract"
+
+	_grammarContractEntry: Grammar = []
+	_grammarContractEntry.append(
+		GrammarItem(_regexprType, Fragment, [
+			GrammarItem(_regexprValue, Fragment, [
+				GrammarItem(r"\]", FragmentParentElement),
+				GrammarItem(r",", FragmentNewElement, _grammarContractEntry)
+			])
+		])
+	)
+
+	return [
+		GrammarItem(r"\[", ContractStart,
+		[_grammarContractEntry, GrammarItem(r"\]", FragmentParentElement)]),
+	]
 
 # variable: [const] type name [= value] [contract];
 _grammarVariable: Grammar = [
-	GrammarItem(_regexprConst, "const"),
-	GrammarItem(_regexprType, Fragment, [
+	GrammarItem(r"const", "const"),
+] + makeGrammarType([
 	GrammarItem(
-	_regexprName, Fragment, _grammarContract + [
-	GrammarItem(_regexprEqual, Fragment,
-	[GrammarItem(_regexprValue, Fragment, [GrammarItem(_regexprEnd, FragmentNewElement)])]),
-	GrammarItem(_regexprEnd, FragmentNewElement)
+	_regexprName, Fragment, [makeGrammarContracts(),
+	GrammarItem(r"=", Fragment,
+	[GrammarItem(_regexprValue, Fragment, [GrammarItem(r";", FragmentNewElement)])]),
+	GrammarItem(r";", FragmentNewElement)
 	])
-	]),
-]
+])
 
 _grammar: Grammar = _grammarVariable + makeGrammarClass(_grammarVariable)
 
