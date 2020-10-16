@@ -22,12 +22,12 @@ const String varInit3 = "Hello World! <here>";
 Float varInit4 = 5.12;
 
 // Contracts
-const int32 defaultConstant [min -1 , max 35 ];
+const int32 defaultConstant [min = -1 , max = 35 ];
 //int32 defaultConstant = 42 [min -1 , max 35 ];
 
 interface MyFy {
         MyType var;
-        const MyType varConst [ always 959 ];
+        const MyType varConst [ always ];
         MyType varInitialized = 42;    
 }
 
