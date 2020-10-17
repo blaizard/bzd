@@ -9,7 +9,7 @@ from typing import Optional, Iterable, Any, Tuple, TextIO, Callable, Mapping
 
 class _WorkerResult:
 
-	def __init__(self, output: Tuple[bool, Any, str]) -> None:
+	def __init__(self, output: Tuple[bool, Any, str, Any]) -> None:
 		self.output = output
 
 	def isSuccess(self) -> bool:
@@ -21,6 +21,8 @@ class _WorkerResult:
 	def getOutput(self) -> str:
 		return self.output[2]
 
+	def getInput(self) -> Any:
+		return self.output[3]
 
 class Worker:
 
@@ -68,7 +70,7 @@ class Worker:
 				stdout.write("Failed with exception of type '{}' and message: {}\n".format(
 					exceptionTypeStr, exceptionValue))
 
-			shared["output"].put((isSuccess, result, stdout.getvalue()))
+			shared["output"].put((isSuccess, result, stdout.getvalue(), data))
 
 	def add(self, data: Any) -> None:
 		with self.shared["count"].get_lock():  # type: ignore

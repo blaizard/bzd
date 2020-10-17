@@ -1,11 +1,19 @@
 import re
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import Dict, Mapping, MutableMapping, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from bzd.parser.element import Element
 	from bzd.parser.grammar import Grammar
 
-Attributes = Dict[str, str]
+
+class Attribute:
+
+	def __init__(self, index: int, value: str):
+		self.index = index
+		self.value = value
+
+
+Attributes = MutableMapping[str, Attribute]
 
 
 class Fragment:
@@ -16,7 +24,7 @@ class Fragment:
 
 	default: Dict[str, str] = {}
 
-	def __init__(self, index: int, attrs: Attributes) -> None:
+	def __init__(self, index: int, attrs: Mapping[str, str]) -> None:
 		self.index = index
 		self.attrs = self.default.copy()
 		self.attrs.update(attrs)
@@ -27,7 +35,7 @@ class Fragment:
 		"""
 		for key, value in self.attrs.items():
 			assert key not in attrs, "Attribute '{}' already set".format(key)
-			attrs[key] = value
+			attrs[key] = Attribute(index=self.index, value=value)
 
 	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		"""
@@ -61,9 +69,9 @@ class FragmentComment(Fragment):
 
 			# Append the comments
 			if key in attrs:
-				attrs[key] += "\n\n{}".format(updatedValue)
+				attrs[key].value += "\n\n{}".format(updatedValue)
 			else:
-				attrs[key] = updatedValue
+				attrs[key] = Attribute(index=self.index, value=updatedValue)
 
 
 class FragmentNewElement(Fragment):

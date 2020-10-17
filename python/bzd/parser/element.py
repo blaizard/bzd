@@ -1,7 +1,9 @@
 import typing
 
-from bzd.parser.fragments import Fragment, Attributes
+from bzd.parser.fragments import Fragment, Attributes, Attribute
 from bzd.parser.grammar import Grammar
+if typing.TYPE_CHECKING:
+	from bzd.parser.parser import Parser
 
 
 class Sequence:
@@ -9,13 +11,14 @@ class Sequence:
 	This represents a sequence of Elements.
 	"""
 
-	def __init__(self, grammar: Grammar, parent: typing.Optional["Element"]) -> None:
+	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional["Element"]) -> None:
+		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
 		self.list: typing.List["Element"] = []
 
 	def makeElement(self) -> "Element":
-		element = Element(grammar=self.grammar, parent=self)
+		element = Element(parser=self.parser, grammar=self.grammar, parent=self)
 		self.list.append(element)
 		return element
 
@@ -39,7 +42,8 @@ class Sequence:
 
 class Element:
 
-	def __init__(self, grammar: Grammar, parent: typing.Optional[Sequence] = None) -> None:
+	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional[Sequence] = None) -> None:
+		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
 		self.attrs: Attributes = {}
@@ -51,11 +55,19 @@ class Element:
 		"""
 		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
 
-	def getAttrs(self) -> typing.Mapping[str, str]:
+	def getAttrs(self) -> typing.Mapping[str, Attribute]:
 		"""
 		Return the attributes as a dictionary.
 		"""
 		return self.attrs
+
+	def getAttr(self, name: str, default: str = "") -> Attribute:
+		"""
+		Return a specific name attribute
+		"""
+		if name in self.attrs:
+			return self.attrs[name]
+		return Attribute(index=0, value=default)
 
 	def isAttr(self, name: str) -> bool:
 		"""
@@ -82,13 +94,16 @@ class Element:
 
 	def makeElement(self, kind: str, grammar: Grammar) -> "Element":
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence(grammar=grammar, parent=self)
+			self.sequences[kind] = Sequence(parser=self.parser, grammar=grammar, parent=self)
 		return self.sequences[kind].makeElement()
 
 	def getSequence(self) -> Sequence:
 		assert self.parent is not None, "reached parent element"
 		assert isinstance(self.parent, Sequence), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent
+
+	def isNestedSequence(self, kind: str) -> bool:
+		return bool(kind in self.sequences)
 
 	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
 		return self.sequences.get(kind, None)
@@ -98,8 +113,8 @@ class Element:
 			yield kind, sequence
 
 	def __repr__(self) -> str:
-		content = "<Element {}/>".format(" ".join(["{}=\"{}\"".format(key, value)
-			for key, value in self.attrs.items()]))
+		content = "<Element {}/>".format(" ".join(
+			["{}:{}=\"{}\"".format(key, attr.index, attr.value) for key, attr in self.attrs.items()]))
 
 		for kind, sequence in self.sequences.items():
 			content += "\n{}:\n{}".format(kind, repr(sequence))

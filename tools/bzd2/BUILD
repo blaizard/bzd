@@ -11,6 +11,17 @@ py_library(
     ],
 )
 
+py_library(
+    name = "formatter",
+    srcs = [
+        "formatter.py",
+    ],
+    visibility = [":__subpackages__"],
+    deps = [
+        "//python/bzd/parser",
+    ],
+)
+
 py_binary(
     name = "bzd2",
     srcs = [
@@ -18,6 +29,7 @@ py_binary(
     ],
     main = "main.py",
     deps = [
+        ":formatter",
         ":grammar",
     ],
 )
