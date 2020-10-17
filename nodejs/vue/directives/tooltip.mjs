@@ -1,6 +1,6 @@
 let current = {
 	watcher: null,
-	elt: null
+	elt: null,
 };
 const watcherPollingPeriodMs = 500;
 const defaultPosition = "e";
@@ -8,7 +8,7 @@ const positionSequences = {
 	w: ["w", "e", "n", "s"],
 	e: ["e", "w", "n", "s"],
 	n: ["n", "s", "w", "e"],
-	s: ["s", "n", "w", "e"]
+	s: ["s", "n", "w", "e"],
 };
 
 /**
@@ -22,7 +22,7 @@ function getOrCreateTooltip() {
 		container.classList.add("irtooltip");
 		Object.assign(container.style, {
 			position: "fixed",
-			"pointer-events": "none"
+			"pointer-events": "none",
 		});
 
 		// The text container
@@ -122,12 +122,12 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 				top: y,
 				left: x,
 				width: 0,
-				height: 0
+				height: 0,
 			};
 		},
 		getAttribute(/*name*/) {
 			return null;
-		}
+		},
 	};
 	tooltip(eltMock, message, initialPosition);
 }
@@ -202,7 +202,7 @@ export function tooltip(elt, message = null, initialPosition = null) {
 	setWatcher(elt);
 }
 
-export default function(el, binding) {
+export default function (el, binding) {
 	const config = Object.assign(
 		{
 			/**
@@ -216,7 +216,7 @@ export default function(el, binding) {
 			/**
 			 * The position or positions the tooltip can take (by order of priority)
 			 */
-			position: defaultPosition
+			position: defaultPosition,
 		},
 		binding.value
 	);

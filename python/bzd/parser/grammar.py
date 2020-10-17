@@ -15,7 +15,7 @@ class GrammarItem:
 		if isinstance(fragment, dict):
 
 			class SimpleFragment(Fragment):
-				default = fragment.copy() # type: ignore
+				default = fragment.copy()  # type: ignore
 
 			self.fragment = SimpleFragment
 

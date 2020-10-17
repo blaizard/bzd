@@ -11,7 +11,7 @@
 	export default {
 		data() {
 			return {
-				counter: 0
+				counter: 0,
 			};
 		},
 		methods: {
@@ -26,8 +26,8 @@
 			},
 			increaseCounter() {
 				this.$notification.success({ counter: "Counter: " + ++this.counter });
-			}
-		}
+			},
+		},
 	};
 </script>
 
