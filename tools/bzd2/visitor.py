@@ -9,6 +9,22 @@ class VisitorType(VisitorBase):
 
 	nestedKind = "template"
 
+	def __init__(self, element: Element) -> None:
+
+		# Deal with the main type, do not include the comment as
+		# it is taken care by the main visitComment block.
+		assertHasAttr(element=element, attr="type")
+		kind = self.visitType(kind=element.getAttr("type").value, comment=None)
+
+		# Construct the template if any.
+		template = None
+		if element.isNestedSequence("template"):
+			sequence = element.getNestedSequence("template")
+			assert sequence is not None
+			template = self.visit(sequence=sequence)
+
+		self.result = self.visitTypeTemplate(kind=kind, template=template)
+
 	def visitBegin(self, result: typing.Any) -> typing.List[str]:
 		return []
 
@@ -17,29 +33,13 @@ class VisitorType(VisitorBase):
 
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
 		assertHasAttr(element=element, attr="type")
-		result.append(self.visitType(kind=element.getAttrValue("type"), comment=element.getAttrValue("comment")))
+		result.append(self.visitType(kind=element.getAttr("type").value, comment=element.getAttrValue("comment")))
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.List[str]) -> typing.List[str]:
-		nestedResult = self._visit(nestedSequence, [])
+		nestedResult = self.visit(nestedSequence)
 		result[-1] = self.visitTypeTemplate(kind=result[-1], template=nestedResult)
 		return result
-
-	def visit(self, element: Element) -> str:
-
-		# Deal with the main type, do not include the comment as
-		# it is taken care by the main visitComment block.
-		assertHasAttr(element=element, attr="type")
-		kind = self.visitType(kind=element.getAttrValue("type"),comment=None)
-
-		# Construct the template if any.
-		template = None
-		if element.isNestedSequence("template"):
-			sequence = element.getNestedSequence("template")
-			assert sequence is not None
-			template = self._visit(sequence=sequence)
-
-		return self.visitTypeTemplate(kind=kind, template=template)
 
 	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
 		"""
@@ -56,7 +56,7 @@ class VisitorType(VisitorBase):
 
 		return ""
 
-	def visitTypeTemplate(self, kind: str, template: typing.Optional[str]):
+	def visitTypeTemplate(self, kind: str, template: typing.Optional[str]) -> str:
 		"""
 		Called to assemble a type with its template.
 		"""
@@ -77,7 +77,7 @@ class VisitorContract(VisitorBase):
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
 		assertHasAttr(element=element, attr="type")
 		result.append(
-			self.visitContract(kind=element.getAttrValue("type"),
+			self.visitContract(kind=element.getAttr("type").value,
 			value=element.getAttrValue("value"),
 			comment=element.getAttrValue("comment")))
 		return result
@@ -120,12 +120,11 @@ class Visitor(VisitorBase):
 		assertHasAttr(element=element, attr="category")
 
 		# Handle comments
-		comment = element.getAttrValue("comment", "")
-		if comment:
-			result += self.applyIndent(self.visitComment(comment=comment))
+		if element.isAttr("comment"):
+			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
 
 		# Handle class
-		if element.getAttrValue("category") == "class":
+		if element.getAttr("category").value == "class":
 
 			assertHasAttr(element=element, attr="type")
 			assertHasAttr(element=element, attr="name")
@@ -142,7 +141,7 @@ class Visitor(VisitorBase):
 			result += self.applyIndent(self.visitClassEnd(element=element))
 
 		# Handle variable
-		elif element.getAttrValue("category") == "variable":
+		elif element.getAttr("category").value == "variable":
 
 			assertHasAttr(element=element, attr="type")
 			assertHasAttr(element=element, attr="name")
@@ -151,7 +150,7 @@ class Visitor(VisitorBase):
 
 		# Should never go here
 		else:
-			raise Exception("Unexpected element category: {}", element.getAttrValue("category"))
+			raise Exception("Unexpected element category: {}", element.getAttr("category").value)
 
 		return result
 

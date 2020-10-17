@@ -61,6 +61,13 @@ class Element:
 		"""
 		return self.attrs
 
+	def getAttr(self, name: str) -> Attribute:
+		"""
+		Return a specific name attribute value
+		"""
+		assert name in self.attrs, "Attribute '{}' is not present in '{}'".format(name, str(self))
+		return self.attrs[name]
+
 	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
 		"""
 		Return a specific name attribute value
