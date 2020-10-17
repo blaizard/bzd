@@ -35,11 +35,11 @@
 
 	export default {
 		components: {
-			Plot
+			Plot,
 		},
 		props: {
 			metadata: { type: Object, mandatory: true },
-			color: { type: String, mandatory: true }
+			color: { type: String, mandatory: true },
 		},
 		mounted() {
 			this.instanceInterval = setInterval(() => {
@@ -49,10 +49,10 @@
 		beforeDestroy() {
 			clearInterval(this.instanceInterval);
 		},
-		data: function() {
+		data: function () {
 			return {
 				timestamp: Date.now(),
-				instanceInterval: null
+				instanceInterval: null,
 			};
 		},
 		watch: {
@@ -65,8 +65,8 @@
 							this.$emit("link", this.lastBuild.link);
 						}
 					}
-				}
-			}
+				},
+			},
 		},
 		computed: {
 			statusMap() {
@@ -74,28 +74,28 @@
 					success: {
 						color: "green",
 						display: "Success",
-						icon: "bzd-icon-status_success"
+						icon: "bzd-icon-status_success",
 					},
 					failure: {
 						color: "red",
 						display: "Failure",
-						icon: "bzd-icon-status_failure"
+						icon: "bzd-icon-status_failure",
 					},
 					"in-progress": {
 						color: "orange",
 						display: "In Progress",
-						icon: "bzd-icon-status_in_progress bzd-icon-spin"
+						icon: "bzd-icon-status_in_progress bzd-icon-spin",
 					},
 					abort: {
 						color: "gray",
 						display: "Aborted",
-						icon: "bzd-icon-status_abort"
+						icon: "bzd-icon-status_abort",
 					},
 					unknown: {
 						color: "gray",
 						display: "Unknown",
-						icon: ""
-					}
+						icon: "",
+					},
 				};
 			},
 			plotConfig() {
@@ -109,7 +109,7 @@
 					showCursor: false,
 					paddingLeft: 5,
 					paddingRight: 5,
-					formatY: (y) => (Number(y) / 1000 / 60).toFixed(1) + " min"
+					formatY: (y) => (Number(y) / 1000 / 60).toFixed(1) + " min",
 				};
 			},
 			builds() {
@@ -142,8 +142,8 @@
 								duration[1] +
 								"</small>"
 							);
-						}
-					}
+						},
+					},
 				];
 			},
 			lastBuildDate() {
@@ -193,7 +193,7 @@
 					return total + (build.status == "success" ? 1 : 0);
 				}, 0);
 				return Math.round((nbSuccessfullBuilds / buildsLast30Days.length) * 100);
-			}
+			},
 		},
 		methods: {
 			getDuration(timestampDuration) {
@@ -215,8 +215,8 @@
 			getLastBuilds(days) {
 				const timestamp = this.timestamp - days * 24 * 60 * 60 * 1000;
 				return this.builds.filter((build) => build.timestamp > timestamp);
-			}
-		}
+			},
+		},
 	};
 </script>
 

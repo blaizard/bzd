@@ -25,25 +25,25 @@ export default class Sendgrid extends Email {
 			method: "post",
 			authentication: {
 				type: "bearer",
-				token: this.key
+				token: this.key,
 			},
 			json: {
 				personalizations: [
 					{
 						to: toList.map((to) => ({ email: to })),
-						subject: subject
-					}
+						subject: subject,
+					},
 				],
 				from: {
-					email: this.from
+					email: this.from,
 				},
 				content: [
 					{
 						type: data.format == "text" ? "text/plain" : "text/html",
-						value: data.content
-					}
-				]
-			}
+						value: data.content,
+					},
+				],
+			},
 		});
 	}
 }

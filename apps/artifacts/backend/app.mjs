@@ -50,13 +50,13 @@ Commander.version("1.0.0", "-v, --version")
 	if (Commander.test) {
 		await keyValueStore.set("volume", "disk", {
 			type: "fs",
-			"fs.root": "/"
+			"fs.root": "/",
 		});
 
 		await keyValueStore.set("volume", "docker.blaizard.com", {
 			type: "docker",
 			"docker.type": "v2",
-			"docker.url": "https://docker.blaizard.com"
+			"docker.url": "https://docker.blaizard.com",
 		});
 
 		await keyValueStore.set("volume", "docker.gcr", {
@@ -67,7 +67,7 @@ Commander.version("1.0.0", "-v, --version")
 			"docker.url": "https://docker.blaizard.com",
 			"docker.proxy": true,
 			"docker.proxy.url": "http://127.0.0.1:5050",
-			"docker.proxy.port": 5051
+			"docker.proxy.port": 5051,
 		});
 	}
 	// Set the cache
@@ -91,9 +91,9 @@ Commander.version("1.0.0", "-v, --version")
 			return {
 				async getVolume() {
 					return await cache.get("volume", volume);
-				}
+				},
 			};
-		}
+		},
 	});
 
 	// Register all plugns
@@ -116,7 +116,7 @@ Commander.version("1.0.0", "-v, --version")
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web
+		channel: web,
 	});
 
 	function getInternalPath(pathList) {
@@ -137,7 +137,7 @@ Commander.version("1.0.0", "-v, --version")
 		// Delete all keys that do not start with <inputs.config.type>.
 		Exception.assert("type" in inputs.config, "Configuration type is missing.");
 		let params = {
-			type: inputs.config.type
+			type: inputs.config.type,
 		};
 		for (const name in inputs.config) {
 			if (name.startsWith(params.type + ".")) {
@@ -178,16 +178,16 @@ Commander.version("1.0.0", "-v, --version")
 					{
 						name: item[0],
 						type: "bucket",
-						plugin: item[1].type
+						plugin: item[1].type,
 					},
 					{
-						list: true
+						list: true,
 					}
 				);
 			});
 			return {
 				data: result.data(),
-				next: volumes.getNextPaging()
+				next: volumes.getNextPaging(),
 			};
 		}
 
@@ -196,7 +196,7 @@ Commander.version("1.0.0", "-v, --version")
 
 		return {
 			data: result.data(),
-			next: result.getNextPaging()
+			next: result.getNextPaging(),
 		};
 	});
 

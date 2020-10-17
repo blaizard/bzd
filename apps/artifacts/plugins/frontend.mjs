@@ -3,5 +3,5 @@ import Docker from "./docker/frontend.mjs";
 
 export default {
 	fs: Fs,
-	docker: Docker
+	docker: Docker,
 };

@@ -6,7 +6,7 @@
 
 	export default {
 		mixins: [ArrayElement],
-		data: function() {
+		data: function () {
 			let templateAdd = [];
 
 			// Add the upload button
@@ -15,7 +15,7 @@
 				type: "Button",
 				content: { html: uploadContent },
 				click: this.triggerUpload,
-				align: this.getOption("align", "left")
+				align: this.getOption("align", "left"),
 			});
 
 			const allowDelete = this.getOption("allowDelete", true);
@@ -35,21 +35,21 @@
 				// ---- Override data from ArrayElement ----
 				template: Vue.extend({
 					mixins: [FileItem],
-					data: function() {
+					data: function () {
 						return {
 							allowDelete: allowDelete,
 							templateClass: templateClass,
 							templateEdit: templateEdit,
-							imageFill: imageFill
+							imageFill: imageFill,
 						};
-					}
+					},
 				}),
 				templateAdd: templateAdd,
 				allowDelete: false,
 				inline: true,
 				gripHandle: false,
 				// To track the current uploads
-				uploadValueList: []
+				uploadValueList: [],
 			};
 		},
 		mounted() {
@@ -108,7 +108,7 @@
 						onProgress: (item) => {
 							const index = this.uploadItemToIndex(item);
 							this.$set(this.uploadValueList, index, this.makeObjectFromItem(item));
-						}
+						},
 					})
 					: null;
 			},
@@ -118,7 +118,7 @@
 					"irform-array": true,
 					"irform-array-file": true,
 					"irform-fill": this.fill,
-					[this.getOption("class")]: true
+					[this.getOption("class")]: true,
 				};
 			},
 			valueListToDisplay() {
@@ -126,7 +126,7 @@
 			},
 			templateComponentConfig() {
 				return {
-					imageToUrl: this.imageToUrl
+					imageToUrl: this.imageToUrl,
 				};
 			},
 			browserClientWidth() {
@@ -134,7 +134,7 @@
 			},
 			browserClientHeight() {
 				return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-			}
+			},
 		},
 		methods: {
 			globalStartDrag() {
@@ -178,7 +178,7 @@
 				return {
 					item: item,
 					currentBytes: item.currentBytes,
-					totalBytes: item.totalBytes
+					totalBytes: item.totalBytes,
 				};
 			},
 
@@ -205,10 +205,10 @@
 				await this.upload.trigger(/*nothrow*/ true, {
 					beforeUpload: async () => {
 						await this.itemDelete(index);
-					}
+					},
 				});
-			}
-		}
+			},
+		},
 	};
 </script>
 

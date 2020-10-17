@@ -24,6 +24,7 @@ class _WorkerResult:
 	def getInput(self) -> Any:
 		return self.output[3]
 
+
 class Worker:
 
 	def __init__(self, task: Callable[[Any, TextIO], Any], maxWorker: Optional[int] = os.cpu_count()) -> None:
