@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import argparse
 import sys
 from bzd.utils.run import localBazelBinary
