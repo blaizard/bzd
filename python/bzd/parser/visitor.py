@@ -17,7 +17,10 @@ class Visitor:
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, sequence: Sequence, result: typing.Any = None) -> typing.Any:
+	def visit(self, sequence: Sequence) -> typing.Any:
+		return self._visit(sequence=sequence)
+
+	def _visit(self, sequence: Sequence, result: typing.Any = None) -> typing.Any:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
 
 		result = self.visitBegin(result)
@@ -42,7 +45,7 @@ class Visitor:
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.Any) -> typing.Any:
-		return self.visit(nestedSequence, result)
+		return self._visit(sequence=nestedSequence, result=result)
 
 
 class VisitorJson(Visitor):
@@ -52,6 +55,11 @@ class VisitorJson(Visitor):
 
 	nestedKind = None
 
+	def visitBegin(self, result: typing.Any) -> typing.Any:
+		if result is None:
+			return []
+		return result
+
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 
 		if result is None:
@@ -59,5 +67,5 @@ class VisitorJson(Visitor):
 		print(element.getAttrs())
 		result.append({"attrs": {key: attr.value for key, attr in element.getAttrs().items()}})
 		for kind, sequence in element.getNestedSequences():
-			result[-1][kind] = self.visit(sequence=sequence, result=[])
+			result[-1][kind] = self.visit(sequence=sequence)
 		return result

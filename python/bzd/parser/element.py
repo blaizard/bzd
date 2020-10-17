@@ -61,13 +61,13 @@ class Element:
 		"""
 		return self.attrs
 
-	def getAttr(self, name: str, default: str = "") -> Attribute:
+	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
 		"""
-		Return a specific name attribute
+		Return a specific name attribute value
 		"""
 		if name in self.attrs:
-			return self.attrs[name]
-		return Attribute(index=0, value=default)
+			return self.attrs[name].value
+		return default
 
 	def isAttr(self, name: str) -> bool:
 		"""
