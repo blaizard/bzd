@@ -4,7 +4,7 @@ import typing
 from pathlib import Path
 
 from tools.bzd2.grammar import Parser
-from tools.bzd2.format.bdl import Formatter
+from tools.bzd2.format.bdl import BdlFormatter
 
 
 class TestRun(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestRun(unittest.TestCase):
 		parser = Parser(self.filePath)
 		data = parser.parse()
 
-		formatter = Formatter()
+		formatter = BdlFormatter()
 		result = formatter.visit(data)
 
 		expected = """/*

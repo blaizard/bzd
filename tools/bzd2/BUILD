@@ -33,6 +33,19 @@ py_library(
     ],
 )
 
+py_library(
+    name = "lib",
+    srcs = [
+        "lib.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":format",
+        ":grammar",
+        ":visitor",
+    ],
+)
+
 py_binary(
     name = "bzd2",
     srcs = [
@@ -40,8 +53,6 @@ py_binary(
     ],
     main = "main.py",
     deps = [
-        ":format",
-        ":grammar",
-        ":visitor",
+        ":lib",
     ],
 )

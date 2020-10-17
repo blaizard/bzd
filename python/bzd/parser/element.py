@@ -7,15 +7,34 @@ if typing.TYPE_CHECKING:
 
 
 class Sequence:
+
+	def __init__(self) -> None:
+		self.list: typing.List["Element"] = []
+
+	def getList(self) -> typing.List["Element"]:
+		return self.list
+
+	def merge(self, sequence: "Sequence") -> None:
+		self.list += sequence.list
+
+	def __repr__(self) -> str:
+		listStr = []
+		for element in self.list:
+			formattedStr = "- {}".format("\n  ".join(repr(element).split("\n")))
+			listStr.append(formattedStr)
+		return "\n".join(listStr)
+
+
+class SequenceParser(Sequence):
 	"""
 	This represents a sequence of Elements.
 	"""
 
 	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional["Element"]) -> None:
+		super().__init__()
 		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
-		self.list: typing.List["Element"] = []
 
 	def makeElement(self) -> "Element":
 		element = Element(parser=self.parser, grammar=self.grammar, parent=self)
@@ -29,25 +48,15 @@ class Sequence:
 		assert self.parent, "This sequence is at the top level."
 		return self.parent
 
-	def getList(self) -> typing.List["Element"]:
-		return self.list
-
-	def __repr__(self) -> str:
-		listStr = []
-		for element in self.list:
-			formattedStr = "- {}".format("\n  ".join(repr(element).split("\n")))
-			listStr.append(formattedStr)
-		return "\n".join(listStr)
-
 
 class Element:
 
-	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional[Sequence] = None) -> None:
+	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
 		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
 		self.attrs: Attributes = {}
-		self.sequences: typing.Dict[str, Sequence] = {}
+		self.sequences: typing.Dict[str, SequenceParser] = {}
 
 	def isEmpty(self) -> bool:
 		"""
@@ -101,21 +110,22 @@ class Element:
 
 	def makeElement(self, kind: str, grammar: Grammar) -> "Element":
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence(parser=self.parser, grammar=grammar, parent=self)
+			self.sequences[kind] = SequenceParser(parser=self.parser, grammar=grammar, parent=self)
 		return self.sequences[kind].makeElement()
 
-	def getSequence(self) -> Sequence:
+	def getSequence(self) -> SequenceParser:
 		assert self.parent is not None, "reached parent element"
-		assert isinstance(self.parent, Sequence), "parent must be a sequence, instead {}".format(type(self.parent))
+		assert isinstance(self.parent,
+			SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent
 
 	def isNestedSequence(self, kind: str) -> bool:
 		return bool(kind in self.sequences)
 
-	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
+	def getNestedSequence(self, kind: str) -> typing.Optional[SequenceParser]:
 		return self.sequences.get(kind, None)
 
-	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
+	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, SequenceParser]]:
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
 
