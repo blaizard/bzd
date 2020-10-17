@@ -61,7 +61,6 @@ class VisitorJson(Visitor):
 
 		if result is None:
 			result = []
-		print(element.getAttrs())
 		result.append({"attrs": {key: attr.value for key, attr in element.getAttrs().items()}})
 		for kind, sequence in element.getNestedSequences():
 			result[-1][kind] = self.visit(sequence=sequence)
