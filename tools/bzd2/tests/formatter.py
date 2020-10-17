@@ -4,7 +4,7 @@ import typing
 from pathlib import Path
 
 from tools.bzd2.grammar import Parser
-from tools.bzd2.formatter import Formatter
+from tools.bzd2.format.bdl import Formatter
 
 
 class TestRun(unittest.TestCase):
@@ -19,8 +19,22 @@ class TestRun(unittest.TestCase):
 		formatter = Formatter()
 		result = formatter.visit(data)
 
-		print(result)
-		#raise Exception()
+		expected = """/*
+ * This is a multi-line comment
+ * 
+ * Contracts
+ */
+const int32 defaultConstant [min = -1, max = 35];
+int32<Int, List<T</*Variable A*/ A, B, C<45>>>> defaultConstant;
+interface MyFy
+{
+	MyType var;
+	// A nested comment
+	const MyType<T> varConst [/*Immer*/ always];
+	MyType varInitialized = 42;
+}"""
+
+		self.assertEqual(expected, result)
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ def handleFromElement(element: Element, attr: typing.Optional[str], message: str
 	# Look for the index
 	index = 0
 	if attr is not None and element.isAttr(attr):
-		index = element.getAttr(attr).index
+		index = element.getAttrs()[attr].index
 
 	# Use the begining of the element
 	else:

@@ -12,13 +12,24 @@ py_library(
 )
 
 py_library(
-    name = "formatter",
+    name = "visitor",
     srcs = [
-        "formatter.py",
+        "visitor.py",
     ],
     visibility = [":__subpackages__"],
     deps = [
         "//python/bzd/parser",
+    ],
+)
+
+py_library(
+    name = "format",
+    srcs = glob([
+        "format/*.py",
+    ]),
+    visibility = [":__subpackages__"],
+    deps = [
+        ":visitor",
     ],
 )
 
@@ -29,7 +40,8 @@ py_binary(
     ],
     main = "main.py",
     deps = [
-        ":formatter",
+        ":format",
         ":grammar",
+        ":visitor",
     ],
 )

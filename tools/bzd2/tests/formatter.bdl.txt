@@ -1,11 +1,11 @@
 /*
- This is a multi-line comment
-*/
+  This is a multi-line comment
+ */
 
 // Contracts
 const int32 defaultConstant [min = -1 , max = 35 ];
 
-int32<Int, List<T<A, B, C<45>>>> defaultConstant;
+int32<Int, List<T<A/*Variable A*/, B, C<45>>>> defaultConstant;
 
 interface MyFy {
                  MyType var;
@@ -14,6 +14,7 @@ interface MyFy {
           A nested comment
          */
 
-        const MyType<T> varConst [ always ];
+        const MyType<T> varConst [ /*    Immer */
+        always ];
  MyType varInitialized = 42;    
 }
