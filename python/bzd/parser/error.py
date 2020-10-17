@@ -6,6 +6,12 @@ if typing.TYPE_CHECKING:
 	from bzd.parser.parser import Parser
 
 
+class ExceptionParser(Exception):
+
+	def __init__(self, message: str) -> None:
+		super().__init__(message)
+
+
 def handleError(parser: "Parser", index: int, message: str) -> None:
 	contentByLine = parser.content.split("\n")
 	# Identify the line and column
@@ -21,8 +27,7 @@ def handleError(parser: "Parser", index: int, message: str) -> None:
 	# Position the cursor
 	contentByLine.insert(line + 1, "{}^".format(" " * column))
 	contentByLine.insert(line + 2, "{}:{}:{}: error: {}".format(parser.path, line + 1, column + 1, message))
-	print("\n".join(contentByLine))
-	raise Exception()
+	raise ExceptionParser(message="\n".join(contentByLine))
 
 
 def handleFromElement(element: Element, attr: typing.Optional[str], message: str) -> None:

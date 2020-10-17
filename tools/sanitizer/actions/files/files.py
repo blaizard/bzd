@@ -9,7 +9,16 @@ from typing import TextIO, Any, Callable
 
 import bzd.utils.worker
 import bzd.yaml
+from bzd.parser.error import ExceptionParser
+from tools.bzd2.lib import main as bdlFormatter
 from tools.sanitizer.utils.python.workspace import Files
+
+
+def formatBdl(path: str, stdout: TextIO) -> None:
+	content = Path(path).read_text()
+	formattedContent = bdlFormatter(format="bdl", inputs=[Path(path)])
+	if formattedContent != content:
+		Path(path).write_text(formattedContent, encoding="utf-8")
 
 
 def formatJson(path: str, stdout: TextIO) -> None:
@@ -79,5 +88,6 @@ if __name__ == "__main__":
 
 	isSuccess = evaluateFiles(formatJson, args.workspace, include=["**/*.json"])
 	isSuccess &= evaluateFiles(formatYaml, args.workspace, include=["**/*.yml", "**/*.yaml"])
+	isSuccess &= evaluateFiles(formatBdl, args.workspace, include=["**/*.bdl"])
 
 	sys.exit(0 if isSuccess else 1)

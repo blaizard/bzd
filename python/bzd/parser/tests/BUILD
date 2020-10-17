@@ -6,10 +6,10 @@ py_test(
         "grammar.py",
     ],
     args = [
-        "$(location grammar.bdl)",
+        "$(location grammar.txt)",
     ],
     data = [
-        "grammar.bdl",
+        "grammar.txt",
     ],
     deps = [
         "//python/bzd/parser",

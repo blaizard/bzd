@@ -38,7 +38,7 @@ class _VisitorContract(VisitorContract):
 		return " ".join(items)
 
 
-class Formatter(Visitor):
+class BdlFormatter(Visitor):
 
 	def visitComment(self, comment: str) -> str:
 
