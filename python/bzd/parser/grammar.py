@@ -6,20 +6,25 @@ Grammar = List[Any]
 
 class GrammarItem:
 
-	def __init__(
-			self,
-			regexpr: str,
-			fragment: Union[Type[Fragment], str] = Fragment,
-			grammar: Optional[Grammar] = None) -> None:
+	def __init__(self,
+		regexpr: str,
+		fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
+		grammar: Optional[Grammar] = None) -> None:
+
 		self.regexpr = regexpr
-		if isinstance(fragment, str):
+		if isinstance(fragment, dict):
 
-			class Temp(Fragment):
-				default = {str(fragment): ""}
+			class SimpleFragment(Fragment):
+				default = fragment.copy() # type: ignore
 
-			self.fragment = Temp
-		else:
+			self.fragment = SimpleFragment
+
+		elif isinstance(fragment, type(Fragment)):
 			self.fragment = fragment  # type: ignore
+
+		else:
+			raise Exception("Unsupported type for GrammarItem::fragment argument: {}".format(type(fragment)))
+
 		self.grammar = grammar
 
 	def __repr__(self) -> str:

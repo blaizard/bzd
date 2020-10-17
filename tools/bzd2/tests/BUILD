@@ -15,3 +15,20 @@ py_test(
         "//tools/bzd2:grammar",
     ],
 )
+
+py_test(
+    name = "formatter",
+    srcs = [
+        "formatter.py",
+    ],
+    args = [
+        "$(location formatter.bdl.txt)",
+    ],
+    data = [
+        "formatter.bdl.txt",
+    ],
+    deps = [
+        "//tools/bzd2:formatter",
+        "//tools/bzd2:grammar",
+    ],
+)

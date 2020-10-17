@@ -22,19 +22,22 @@ class TestRun(unittest.TestCase):
 			'attrs': {
 			'comment': 'This is a multi-line comment\n\nSingle line\n\nSimple variable',
 			'type': 'int16',
-			'name': 'varSimple1'
+			'name': 'varSimple1',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'const': '',
 			'type': 'String',
-			'name': 'varSimple2'
+			'name': 'varSimple2',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'comment': 'Template variable',
 			'type': 'List',
-			'name': 'varTemplate1'
+			'name': 'varTemplate1',
+			'category': 'variable'
 			},
 			'template': [{
 			'attrs': {
@@ -45,7 +48,8 @@ class TestRun(unittest.TestCase):
 			'attrs': {
 			'const': '',
 			'type': 'Variant',
-			'name': 'varTemplate2'
+			'name': 'varTemplate2',
+			'category': 'variable'
 			},
 			'template': [{
 			'attrs': {
@@ -60,7 +64,8 @@ class TestRun(unittest.TestCase):
 			'attrs': {
 			'comment': 'Complex nested template variable',
 			'type': 'Variant',
-			'name': 'varNested'
+			'name': 'varNested',
+			'category': 'variable'
 			},
 			'template': [{
 			'attrs': {
@@ -95,34 +100,39 @@ class TestRun(unittest.TestCase):
 			'comment': 'Initialized variable',
 			'type': 'int16',
 			'name': 'varInit1',
-			'value': '12'
+			'value': '12',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'const': '',
 			'type': 'int16',
 			'name': 'varInit2',
-			'value': '-5'
+			'value': '-5',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'const': '',
 			'type': 'String',
 			'name': 'varInit3',
-			'value': '"Hello World! <here>"'
+			'value': '"Hello World! <here>"',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'type': 'Float',
 			'name': 'varInit4',
-			'value': '5.12'
+			'value': '5.12',
+			'category': 'variable'
 			}
 		}, {
 			'attrs': {
 			'comment': 'Contracts',
 			'const': '',
 			'type': 'int32',
-			'name': 'defaultConstant'
+			'name': 'defaultConstant',
+			'category': 'variable'
 			},
 			'contract': [{
 			'attrs': {
@@ -139,7 +149,8 @@ class TestRun(unittest.TestCase):
 			'attrs': {
 			'type': 'int32',
 			'name': 'defaultConstant',
-			'value': '42'
+			'value': '42',
+			'category': 'variable'
 			},
 			'contract': [{
 			'attrs': {
@@ -153,19 +164,22 @@ class TestRun(unittest.TestCase):
 			}]
 		}, {
 			'attrs': {
+			'category': 'class',
 			'type': 'interface',
 			'name': 'MyFy'
 			},
 			'nested': [{
 			'attrs': {
 			'type': 'MyType',
-			'name': 'var'
+			'name': 'var',
+			'category': 'variable'
 			}
 			}, {
 			'attrs': {
 			'const': '',
 			'type': 'MyType',
-			'name': 'varConst'
+			'name': 'varConst',
+			'category': 'variable'
 			},
 			'contract': [{
 			'attrs': {
@@ -176,7 +190,8 @@ class TestRun(unittest.TestCase):
 			'attrs': {
 			'type': 'MyType',
 			'name': 'varInitialized',
-			'value': '42'
+			'value': '42',
+			'category': 'variable'
 			}
 			}]
 		}]

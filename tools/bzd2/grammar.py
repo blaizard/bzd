@@ -26,7 +26,7 @@ def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
 	"""
 
 	return [
-		GrammarItem(_regexprClass, Fragment, [
+		GrammarItem(_regexprClass, {"category": "class"}, [
 		GrammarItem(_regexprName, Fragment, [
 		GrammarItem(r"{", FragmentNestedStart, [
 		nestedGrammar,
@@ -90,9 +90,9 @@ def makeGrammarVariable() -> Grammar:
 	[const] type name [= value] [contract];
 	"""
 	return [
-		GrammarItem(r"const", "const"),
+		GrammarItem(r"const", {"const": ""}),
 	] + makeGrammarType([
-		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(_regexprName, {"category": "variable"}, [
 		makeGrammarContracts(),
 		GrammarItem(r"=", Fragment,
 		[GrammarItem(_regexprValue, Fragment,

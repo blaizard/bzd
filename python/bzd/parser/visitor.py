@@ -1,7 +1,6 @@
 import typing
 
 from bzd.parser.element import Sequence, Element
-from bzd.parser.parser import ParsedData
 
 
 class Visitor:
@@ -18,8 +17,11 @@ class Visitor:
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, data: typing.Union[Sequence, ParsedData], result: typing.Any = None) -> typing.Any:
-		sequence = data.data if isinstance(data, ParsedData) else data
+	def visit(self, sequence: Sequence, result: typing.Any = None) -> typing.Any:
+		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
+
+		result = self.visitBegin(result)
+
 		for element in sequence.getList():
 			if not element.isEmpty():
 				result = self.visitElement(element, result)
@@ -27,6 +29,13 @@ class Visitor:
 					nestedSequence = element.getNestedSequence(kind=self.nestedKind)
 					if nestedSequence is not None:
 						result = self.visitNested(element, nestedSequence, result)
+
+		return self.visitEnd(result)
+
+	def visitBegin(self, result: typing.Any) -> typing.Any:
+		return result
+
+	def visitEnd(self, result: typing.Any) -> typing.Any:
 		return result
 
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
@@ -38,7 +47,7 @@ class Visitor:
 
 class VisitorJson(Visitor):
 	"""
-	Converts a ParsedData structure into a Json view.
+	Converts a Sequence into a Json view.
 	"""
 
 	nestedKind = None
@@ -47,7 +56,8 @@ class VisitorJson(Visitor):
 
 		if result is None:
 			result = []
-		result.append({"attrs": element.getAttrs()})
+		print(element.getAttrs())
+		result.append({"attrs": {key: attr.value for key, attr in element.getAttrs().items()}})
 		for kind, sequence in element.getNestedSequences():
-			result[-1][kind] = self.visit(data=sequence, result=[])
+			result[-1][kind] = self.visit(sequence=sequence, result=[])
 		return result

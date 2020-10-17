@@ -13,8 +13,8 @@ from bzd.parser.visitor import VisitorJson
 
 _grammarComment = [GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)]
 _grammarVariableDeclaration = [
-	GrammarItem(r"const", "const"),
-	GrammarItem(r"(?P<kind>int|float)", "variable", [
+	GrammarItem(r"const", {"const": ""}),
+	GrammarItem(r"(?P<kind>int|float)", {"variable": ""}, [
 	GrammarItem(r"(?P<name>[a-zA-Z_]+)", Fragment, [
 	GrammarItem(r";", FragmentNewElement),
 	GrammarItem(r"=", Fragment,
@@ -25,7 +25,7 @@ _grammarVariableDeclaration = [
 	]),
 ]
 _grammarFunctionDeclaration = [
-	GrammarItem(r"(?P<return>void|int|float)", "function", [
+	GrammarItem(r"(?P<return>void|int|float)", {"function": ""}, [
 	GrammarItem(r"(?P<name>[a-zA-Z_]+)\s*\(\s*\)", Fragment,
 	[GrammarItem(r"{", FragmentNestedStart, _grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStop, [])])])
 	]),
