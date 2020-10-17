@@ -6,7 +6,7 @@ from bzd.parser.error import handleFromElement, assertHasAttr, assertHasSequence
 from bzd.parser.element import Sequence, Element
 
 
-class VisitorType(VisitorBase):
+class VisitorType(VisitorBase[str]):
 
 	nestedKind = "template"
 
@@ -65,7 +65,7 @@ class VisitorType(VisitorBase):
 		return ""
 
 
-class VisitorContract(VisitorBase):
+class VisitorContract(VisitorBase[str]):
 
 	nestedKind = None
 
@@ -99,7 +99,7 @@ class VisitorContract(VisitorBase):
 		return kind
 
 
-class Visitor(VisitorBase):
+class Visitor(VisitorBase[str]):
 
 	nestedKind = None
 

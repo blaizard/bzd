@@ -1,6 +1,6 @@
 /*
- * This is a multi-line comment,
- * with exactly 2 lines
+ *  This is a multi-line comment,
+ *  with exactly 2 lines
  */
 int16 varSimple1;
 const String varSimple2;

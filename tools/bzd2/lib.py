@@ -20,4 +20,4 @@ def main(format: str, inputs: typing.List[Path]) -> str:
 
 	# Format using a specific formatter
 	formatter = formatters[format]()
-	return str(formatter.visit(data))
+	return formatter.visit(data)

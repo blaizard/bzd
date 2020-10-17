@@ -2,8 +2,9 @@ import typing
 
 from bzd.parser.element import Sequence, Element
 
+T = typing.TypeVar("T")
 
-class Visitor:
+class Visitor(typing.Generic[T]):
 	"""
 	Visitor for parsed sequence.
 
@@ -17,7 +18,7 @@ class Visitor:
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, sequence: Sequence, result: typing.Any = None) -> typing.Any:
+	def visit(self, sequence: Sequence, result: typing.Any = None) -> T:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
 
 		result = self.visitBegin(result)
@@ -35,8 +36,8 @@ class Visitor:
 	def visitBegin(self, result: typing.Any) -> typing.Any:
 		return result
 
-	def visitEnd(self, result: typing.Any) -> typing.Any:
-		return result
+	def visitEnd(self, result: typing.Any) -> T:
+		return typing.cast(T, result)
 
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 		return result
@@ -45,7 +46,9 @@ class Visitor:
 		return self.visit(sequence=nestedSequence, result=result)
 
 
-class VisitorJson(Visitor):
+JsonType = typing.List[typing.Any]
+
+class VisitorJson(Visitor[JsonType]):
 	"""
 	Converts a Sequence into a Json view.
 	"""
@@ -59,8 +62,6 @@ class VisitorJson(Visitor):
 
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 
-		if result is None:
-			result = []
 		result.append({"attrs": {key: attr.value for key, attr in element.getAttrs().items()}})
 		for kind, sequence in element.getNestedSequences():
 			result[-1][kind] = self.visit(sequence=sequence)
