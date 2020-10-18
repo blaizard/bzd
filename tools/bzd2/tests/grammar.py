@@ -20,7 +20,7 @@ class TestRun(unittest.TestCase):
 		result = json.visit(data)
 		expected = [{
 			'attrs': {
-			'comment': '* This is a multi-line comment,\n* with exactly 2 lines',
+			'comment': 'This is a multi-line comment,\nwith exactly 2 lines',
 			'type': 'int16',
 			'name': 'varSimple1',
 			'category': 'variable'

@@ -28,6 +28,7 @@ class Fragment:
 		self.index = index
 		self.attrs = self.default.copy()
 		self.attrs.update(attrs)
+		self.process()
 
 	def merge(self, attrs: Attributes) -> None:
 		"""
@@ -36,6 +37,12 @@ class Fragment:
 		for key, value in self.attrs.items():
 			assert key not in attrs, "Attribute '{}' already set".format(key)
 			attrs[key] = Attribute(index=self.index, value=value)
+
+	def process(self) -> None:
+		"""
+		Post process a value discovered.
+		"""
+		pass
 
 	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
 		"""
