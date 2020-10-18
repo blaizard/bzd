@@ -52,6 +52,7 @@ py_binary(
         "main.py",
     ],
     main = "main.py",
+    visibility = ["//visibility:public"],
     deps = [
         ":lib",
     ],

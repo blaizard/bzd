@@ -1,0 +1,4 @@
+interface MyInterface
+{
+	uint16_t magic = 42;
+}

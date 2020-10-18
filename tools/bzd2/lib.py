@@ -3,9 +3,10 @@ from pathlib import Path
 
 from bzd.parser.element import Sequence
 from tools.bzd2.format.bdl import BdlFormatter
+from tools.bzd2.format.cc import CcFormatter
 from tools.bzd2.grammar import Parser
 
-formatters = {"bdl": BdlFormatter}
+formatters = {"bdl": BdlFormatter, "cc": CcFormatter}
 
 
 def main(format: str, inputs: typing.List[Path]) -> str:

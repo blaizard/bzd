@@ -67,3 +67,11 @@ bzl_library(
         ":manifest",
     ],
 )
+
+bzl_library(
+    name = "bdl",
+    srcs = [
+        "bdl.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)

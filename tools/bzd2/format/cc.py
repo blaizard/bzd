@@ -38,7 +38,7 @@ class _VisitorContract(VisitorContract):
 		return " ".join(items)
 
 
-class BdlFormatter(Visitor):
+class CcFormatter(Visitor):
 
 	def visitComment(self, comment: str) -> str:
 
@@ -82,15 +82,14 @@ class BdlFormatter(Visitor):
 		contentList = []
 
 		# Handle the type
-		visitorType = _VisitorType(element=element)
-		contentList.append(visitorType.result)
+		contentList.append("class")
 
 		# Handle the name
 		contentList.append(element.getAttr("name").value)
 
 		# Assemble
-		return "{content}\n{{\n".format(content=" ".join(contentList))
+		return "{content}\n{{\npublic:\n".format(content=" ".join(contentList))
 
 	def visitClassEnd(self, element: Element) -> str:
 
-		return "}\n"
+		return "};\n"
