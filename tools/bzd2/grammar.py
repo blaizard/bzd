@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from bzd.parser.parser import Parser as ParserBase
@@ -13,6 +14,13 @@ _regexprType = r"(?P<type>(?!const|interface|struct)[0-9a-zA-Z_]+)"
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
+
+
+class FragmentBlockComment(FragmentComment):
+
+	def process(self) -> None:
+		assert "comment" in self.attrs, "Missing comment attribute."
+		self.attrs["comment"] = re.sub(re.compile("^\ {0,2}\*+", re.MULTILINE), "", self.attrs["comment"])
 
 
 def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
@@ -104,7 +112,7 @@ def makeGrammarVariable() -> Grammar:
 
 # Comments allowed by the grammar
 _grammarComments = [
-	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentComment),
+	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentBlockComment),
 	GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)
 ]
 

@@ -1,4 +1,3 @@
-import re
 import typing
 
 from bzd.parser.visitor import Visitor as VisitorBase
@@ -123,7 +122,6 @@ class Visitor(VisitorBase[str]):
 		# Handle comments
 		if element.isAttr("comment"):
 			comment = element.getAttr("comment").value
-			comment = re.sub(re.compile("^\*+", re.MULTILINE), "", comment)
 			result += self.applyIndent(self.visitComment(comment=comment))
 
 		# Handle class

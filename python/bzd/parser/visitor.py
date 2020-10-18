@@ -4,6 +4,7 @@ from bzd.parser.element import Sequence, Element
 
 T = typing.TypeVar("T")
 
+
 class Visitor(typing.Generic[T]):
 	"""
 	Visitor for parsed sequence.
@@ -47,6 +48,7 @@ class Visitor(typing.Generic[T]):
 
 
 JsonType = typing.List[typing.Any]
+
 
 class VisitorJson(Visitor[JsonType]):
 	"""
