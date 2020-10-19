@@ -5,7 +5,7 @@
 class MyType : public MyInterface
 {
 public:
-	uint16_t getMagic() const { return magic; }
+	int getMagic() const { return magic; }
 };
 
 int main()

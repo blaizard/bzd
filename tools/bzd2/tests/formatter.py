@@ -32,7 +32,8 @@ interface MyFy
 	// A nested comment
 	const MyType<T> varConst [/*Immer*/ always];
 	MyType varInitialized = 42;
-}"""
+}
+"""
 
 		self.assertEqual(expected, result)
 
