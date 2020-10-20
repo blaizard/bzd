@@ -27,9 +27,13 @@ py_library(
     srcs = glob([
         "format/*.py",
     ]),
+    data = glob([
+        "format/**/*.template",
+    ]),
     visibility = [":__subpackages__"],
     deps = [
         ":visitor",
+        "//python/bzd/template",
     ],
 )
 

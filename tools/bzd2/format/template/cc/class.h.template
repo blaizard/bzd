@@ -1,0 +1,9 @@
+{for name, data in classes}
+class {name}
+{{
+protected:
+	{for varName, var in data.nested.variables}
+	int {varName};
+	{end}
+};
+{end}

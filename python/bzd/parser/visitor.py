@@ -3,9 +3,10 @@ import typing
 from bzd.parser.element import Sequence, Element
 
 T = typing.TypeVar("T")
+U = typing.TypeVar("U")
 
 
-class Visitor(typing.Generic[T]):
+class Visitor(typing.Generic[T, U]):
 	"""
 	Visitor for parsed sequence.
 
@@ -19,7 +20,11 @@ class Visitor(typing.Generic[T]):
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, sequence: Sequence, result: typing.Any = None) -> T:
+	def visit(self, sequence: Sequence) -> U:
+		result = self._visit(sequence=sequence)
+		return self.visitFinal(result=result)
+
+	def _visit(self, sequence: Sequence, result: typing.Any = None) -> T:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
 
 		result = self.visitBegin(result)
@@ -40,17 +45,20 @@ class Visitor(typing.Generic[T]):
 	def visitEnd(self, result: typing.Any) -> T:
 		return typing.cast(T, result)
 
+	def visitFinal(self, result: typing.Any) -> U:
+		return typing.cast(U, result)
+
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.Any) -> typing.Any:
-		return self.visit(sequence=nestedSequence, result=result)
+		return self._visit(sequence=nestedSequence, result=result)
 
 
 JsonType = typing.List[typing.Any]
 
 
-class VisitorJson(Visitor[JsonType]):
+class VisitorJson(Visitor[JsonType, JsonType]):
 	"""
 	Converts a Sequence into a Json view.
 	"""
