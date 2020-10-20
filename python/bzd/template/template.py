@@ -1,5 +1,6 @@
 import re
 import typing
+from pathlib import Path
 
 SubstitutionType = typing.Dict[str, typing.Any]
 """
@@ -7,14 +8,19 @@ Process a template with specific values.
 All block {<action>} must end with {end}, actions can be:
 - {if <condition>}: Process the following block only if the condition evaluates to True.
 - {for <variable> in <identifier>} or {for <key>, <value> in <identifier>}: Run the block as many times as there are entries.
+- {include <path>}: Include a template while processing the template.
 All strings "{{" are replace with "{".
 """
 
 
 class Template:
 
-	def __init__(self, template: str) -> None:
+	def __init__(
+			self,
+			template: str,
+			includeDirs: typing.Sequence[Path] = [Path(__file__).parent.parent.parent.parent]) -> None:
 		self.template = template
+		self.includeDirs = includeDirs
 
 		# Pre-process regexpr
 		self.pattern = re.compile("\{([^\{]+)\}")
@@ -22,8 +28,13 @@ class Template:
 		self.patternFor = re.compile("^for\s+([^\s]+)\s+in\s+([^\s]+)$")
 		self.patternForIndex = re.compile("^for\s+([^\s]+)\s*,\s*([^\s]+)\s+in\s+([^\s]+)$")
 		self.patternSet = re.compile("^[^\s]+$")
+		self.patternInclude = re.compile("^include\s+([^\s]+)\s*$")
 		self.patternEnd = re.compile("^end$")
 		self.patternWord = re.compile("[^\s]+")
+
+	def _processInclude(self, content: str, args: SubstitutionType) -> str:
+		template = Template(template=content, includeDirs=self.includeDirs)
+		return template.process(args)
 
 	def _getValue(self, args: SubstitutionType, key: str) -> typing.Any:
 
@@ -139,6 +150,18 @@ class Template:
 						del args[matchForIndex.group(1)]
 
 				ignoreOutput += 1
+				continue
+
+			# Include pattern
+			matchInclude = self.patternInclude.match(operation)
+			if matchInclude:
+				if not ignoreOutput:
+					path = Path(matchInclude.group(1))
+					# Look for the template
+					paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
+					assert len(paths) > 0, "Cannot find template '{}' from any paths: {}".format(
+						path, ", ".join([base.as_posix() for base in self.includeDirs]))
+					output += self._processInclude(paths[0].read_text(), args)
 				continue
 
 			# End pattern
