@@ -23,7 +23,7 @@ class Template:
 		self.includeDirs = includeDirs
 
 		# Pre-process regexpr
-		self.pattern = re.compile("\{([^\{]+)\}")
+		self.pattern = re.compile("(?:^|(?<=[^{])){([^{}]+)}")
 		self.patternIf = re.compile("^if\s+([^\{]+)$")
 		self.patternFor = re.compile("^for\s+([^\s]+)\s+in\s+([^\s]+)$")
 		self.patternForIndex = re.compile("^for\s+([^\s]+)\s*,\s*([^\s]+)\s+in\s+([^\s]+)$")
@@ -31,10 +31,6 @@ class Template:
 		self.patternInclude = re.compile("^include\s+([^\s]+)\s*$")
 		self.patternEnd = re.compile("^end$")
 		self.patternWord = re.compile("[^\s]+")
-
-	def _processInclude(self, content: str, args: SubstitutionType) -> str:
-		template = Template(template=content, includeDirs=self.includeDirs)
-		return template.process(args)
 
 	def _getValue(self, args: SubstitutionType, key: str) -> typing.Any:
 
@@ -114,8 +110,7 @@ class Template:
 			matchIf = self.patternIf.match(operation)
 			if matchIf:
 				if (not ignoreOutput) and self._evalCondition(args, matchIf.group(1)):
-					result, _ = self._process(template[index:len(template)], args)
-					output += result
+					output += self._process(template[index:len(template)], args)[0]
 				ignoreOutput += 1
 				continue
 
@@ -125,8 +120,7 @@ class Template:
 				if not ignoreOutput:
 					for value in self._getValue(args, matchFor.group(2)):
 						args[matchFor.group(1)] = value
-						result, _ = self._process(template[index:len(template)], args)
-						output += result
+						output += self._process(template[index:len(template)], args)[0]
 						del args[matchFor.group(1)]
 
 				ignoreOutput += 1
@@ -144,8 +138,7 @@ class Template:
 					for key, value in iterator:
 						args[matchForIndex.group(1)] = str(key)
 						args[matchForIndex.group(2)] = value
-						result, _ = self._process(template[index:len(template)], args)
-						output += result
+						output += self._process(template[index:len(template)], args)[0]
 						del args[matchForIndex.group(2)]
 						del args[matchForIndex.group(1)]
 
@@ -161,7 +154,7 @@ class Template:
 					paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
 					assert len(paths) > 0, "Cannot find template '{}' from any paths: {}".format(
 						path, ", ".join([base.as_posix() for base in self.includeDirs]))
-					output += self._processInclude(paths[0].read_text(), args)
+					output += self._process(template=paths[0].read_text(), args=args)[0]
 				continue
 
 			# End pattern

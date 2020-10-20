@@ -38,7 +38,10 @@ class _VisitorContract(VisitorContract):
 		return " ".join(items)
 
 
-class BdlFormatter(Visitor):
+class BdlFormatter(Visitor[str]):
+
+	def visitBegin(self, result: typing.Any) -> str:
+		return ""
 
 	def visitComment(self, comment: str) -> str:
 
@@ -47,7 +50,7 @@ class BdlFormatter(Visitor):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitVariable(self, element: Element) -> str:
+	def visitVariable(self, result: str, element: Element) -> str:
 
 		contentList = []
 
@@ -74,10 +77,15 @@ class BdlFormatter(Visitor):
 			visitorContract = _VisitorContract()
 			contentList.append(visitorContract.visit(sequence))
 
-		# Assemble
-		return "{content};\n".format(content=" ".join(contentList))
+		# Handle comments
+		if element.isAttr("comment"):
+			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
 
-	def visitClassBegin(self, element: Element) -> str:
+		# Assemble
+		result += self.applyIndent("{content};\n".format(content=" ".join(contentList)))
+		return result
+
+	def visitClass(self, result: str, nestedResult: str, element: Element) -> str:
 
 		contentList = []
 
@@ -88,9 +96,15 @@ class BdlFormatter(Visitor):
 		# Handle the name
 		contentList.append(element.getAttr("name").value)
 
+		# Handle comments
+		if element.isAttr("comment"):
+			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
+
 		# Assemble
-		return "{content}\n{{\n".format(content=" ".join(contentList))
+		result += self.applyIndent("{content}\n{{\n".format(content=" ".join(contentList)))
 
-	def visitClassEnd(self, element: Element) -> str:
+		result += nestedResult
 
-		return "}\n"
+		result += self.applyIndent("}\n")
+
+		return result

@@ -1,7 +1,9 @@
 import typing
+from pathlib import Path
 
 from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract
 from bzd.parser.element import Element
+from bzd.template.template import Template
 
 
 class _VisitorType(VisitorType):
@@ -38,58 +40,56 @@ class _VisitorContract(VisitorContract):
 		return " ".join(items)
 
 
-class CcFormatter(Visitor):
+ResultType = typing.Dict[str, typing.Any]
 
-	def visitComment(self, comment: str) -> str:
+
+class CcFormatter(Visitor[ResultType]):
+
+	def visitBegin(self, result: typing.Any) -> ResultType:
+		return {"variables": {}, "classes": {}}
+
+	def visitComment(self, comment: typing.Optional[str]) -> typing.Optional[str]:
+
+		if comment is None:
+			return None
 
 		if len(comment.split("\n")) > 1:
 			return "/*\n{comment}\n */\n".format(
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitVariable(self, element: Element) -> str:
+	def visitVariable(self, result: ResultType, element: Element) -> ResultType:
 
-		contentList = []
+		name = element.getAttrValue("name")
+		result["variables"][name] = {
+			"const": element.isAttr("const"),
+			"type": _VisitorType(element=element).result,
+			"isValue": element.isAttr("value"),
+			"value": element.getAttrValue("value"),
+			"comment": self.visitComment(comment=element.getAttrValue("comment"))
+		}
 
-		# Handle the const
-		if element.isAttr("const"):
-			contentList.append("const")
+		return result
 
-		# Handle the type
-		visitorType = _VisitorType(element=element)
-		contentList.append(visitorType.result)
+	def visitClass(self, result: ResultType, nestedResult: ResultType, element: Element) -> ResultType:
 
-		# Handle the name
-		contentList.append(element.getAttr("name").value)
+		name = element.getAttrValue("name")
+		result["classes"][name] = {
+			"type": _VisitorType(element=element).result,
+			"comment": self.visitComment(comment=element.getAttrValue("comment")),
+			"nested": nestedResult
+		}
 
-		# Handle the value
-		if element.isAttr("value"):
-			contentList.append("=")
-			contentList.append(element.getAttr("value").value)
+		return result
 
-		# Handle the contract
-		if element.isNestedSequence("contract"):
-			sequence = element.getNestedSequence("contract")
-			assert sequence is not None
-			visitorContract = _VisitorContract()
-			contentList.append(visitorContract.visit(sequence))
+	def visitFinal(self, result: ResultType) -> str:
 
-		# Assemble
-		return "{content};\n".format(content=" ".join(contentList))
+		print(result)
 
-	def visitClassBegin(self, element: Element) -> str:
+		content = (Path(__file__).parent / "template/cc/class.h.template").read_text()
+		template = Template(content)
+		output = template.process(result)
 
-		contentList = []
+		print(output)
 
-		# Handle the type
-		contentList.append("class")
-
-		# Handle the name
-		contentList.append(element.getAttr("name").value)
-
-		# Assemble
-		return "{content}\n{{\npublic:\n".format(content=" ".join(contentList))
-
-	def visitClassEnd(self, element: Element) -> str:
-
-		return "};\n"
+		return output

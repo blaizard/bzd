@@ -5,7 +5,7 @@ from bzd.parser.error import handleFromElement, assertHasAttr, assertHasSequence
 from bzd.parser.element import Sequence, Element
 
 
-class VisitorType(VisitorBase[str]):
+class VisitorType(VisitorBase[str, str]):
 
 	nestedKind = "template"
 
@@ -21,7 +21,7 @@ class VisitorType(VisitorBase[str]):
 		if element.isNestedSequence("template"):
 			sequence = element.getNestedSequence("template")
 			assert sequence is not None
-			template = self.visit(sequence=sequence)
+			template = self._visit(sequence=sequence)
 
 		self.result = self.visitTypeTemplate(kind=kind, template=template)
 
@@ -37,7 +37,7 @@ class VisitorType(VisitorBase[str]):
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.List[str]) -> typing.List[str]:
-		nestedResult = self.visit(nestedSequence)
+		nestedResult = self._visit(nestedSequence)
 		result[-1] = self.visitTypeTemplate(kind=result[-1], template=nestedResult)
 		return result
 
@@ -64,7 +64,7 @@ class VisitorType(VisitorBase[str]):
 		return ""
 
 
-class VisitorContract(VisitorBase[str]):
+class VisitorContract(VisitorBase[str, str]):
 
 	nestedKind = None
 
@@ -98,31 +98,30 @@ class VisitorContract(VisitorBase[str]):
 		return kind
 
 
-class Visitor(VisitorBase[str]):
+T = typing.TypeVar("T")
+
+
+class Visitor(VisitorBase[T, str]):
 
 	nestedKind = None
 
 	def __init__(self) -> None:
 		self.level = 0
 
-	def visitBegin(self, result: typing.Any) -> str:
-		return ""
-
-	def makeIndent(self, level: int) -> str:
-		return "\t" * level
-
 	def applyIndent(self, result: str) -> str:
-		indent = self.makeIndent(self.level)
+		"""
+		Helper function to add indentation to blocks.
+		"""
+
+		indent = "\t" * self.level
 		return "\n".join(["{}{}".format(indent, line) if len(line.strip()) else line for line in result.split("\n")])
 
-	def visitElement(self, element: Element, result: str) -> str:
+	def visitElement(self, element: Element, result: T) -> T:
+		"""
+		Main visitor, called each time a new element is discovered.
+		"""
 
 		assertHasAttr(element=element, attr="category")
-
-		# Handle comments
-		if element.isAttr("comment"):
-			comment = element.getAttr("comment").value
-			result += self.applyIndent(self.visitComment(comment=comment))
 
 		# Handle class
 		if element.getAttr("category").value == "class":
@@ -131,15 +130,15 @@ class Visitor(VisitorBase[str]):
 			assertHasAttr(element=element, attr="name")
 			assertHasSequence(element=element, sequence="nested")
 
-			result += self.applyIndent(self.visitClassBegin(element=element))
 			self.level += 1
 
 			sequence = element.getNestedSequence("nested")
 			assert sequence is not None
-			result += self.visit(sequence)
+			nestedResult = self._visit(sequence)
 
 			self.level -= 1
-			result += self.applyIndent(self.visitClassEnd(element=element))
+
+			result = self.visitClass(result=result, nestedResult=nestedResult, element=element)
 
 		# Handle variable
 		elif element.getAttr("category").value == "variable":
@@ -147,7 +146,7 @@ class Visitor(VisitorBase[str]):
 			assertHasAttr(element=element, attr="type")
 			assertHasAttr(element=element, attr="name")
 
-			result += self.applyIndent(self.visitVariable(element=element))
+			result = self.visitVariable(result=result, element=element)
 
 		# Should never go here
 		else:
@@ -155,30 +154,19 @@ class Visitor(VisitorBase[str]):
 
 		return result
 
-	def visitVariable(self, element: Element) -> str:
+	def visitFinal(self, result: T) -> str:
+		return str(result)
+
+	def visitClass(self, result: T, nestedResult: T, element: Element) -> T:
+		"""
+		Called when discovering a class.
+		"""
+
+		return result
+
+	def visitVariable(self, result: T, element: Element) -> T:
 		"""
 		Called when discovering a variable.
 		"""
 
-		return ""
-
-	def visitClassBegin(self, element: Element) -> str:
-		"""
-		Called when discovering a new class.
-		"""
-
-		return ""
-
-	def visitClassEnd(self, element: Element) -> str:
-		"""
-		Called when ending the current class.
-		"""
-
-		return ""
-
-	def visitComment(self, comment: str) -> str:
-		"""
-		Called for each comments.
-		"""
-
-		return ""
+		return result
