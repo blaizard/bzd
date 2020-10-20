@@ -3,7 +3,7 @@ load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
 bzd_cc_library(
     name = "i2c",
     srcs = select({
-        "@esp32_xtensa_lx6_gcc//:target": ["i2c_esp32_xtensa_lx6.cpp"],
+        "@esp32_xtensa_lx6_gcc//:target": ["i2c_esp32_xtensa_lx6.cc"],
         "//conditions:default": [],
     }),
     hdrs = [

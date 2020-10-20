@@ -33,7 +33,7 @@ cc_library(
 filegroup(
     name = "sources",
     srcs = glob([
-        "bzd/**/*.cpp",
+        "bzd/**/*.cc",
     ]),
     visibility = ["//visibility:private"],
 )

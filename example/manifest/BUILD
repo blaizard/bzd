@@ -11,7 +11,7 @@ bzd_manifest(
 cc_binary(
     name = "manifest",
     srcs = [
-        "main.cpp",
+        "main.cc",
     ],
     deps = [
         ":manifest_file",

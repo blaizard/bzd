@@ -91,7 +91,7 @@ def registryBuild(manifest: Manifest) -> str:
 	return content
 
 
-def cpp(manifest: Manifest, output: str, configuration: Mapping[str, Any]) -> None:
+def cc(manifest: Manifest, output: str, configuration: Mapping[str, Any]) -> None:
 	config: MutableMapping[str, Any] = {"comments": []}
 	config.update(configuration)
 

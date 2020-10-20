@@ -6,7 +6,7 @@ cc_library(
     srcs = selects.with_or({
         (
             "//tools/bazel_build/config:x86_64",
-        ): ["bootstrap_x86_64.cpp"],
+        ): ["bootstrap_x86_64.cc"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],

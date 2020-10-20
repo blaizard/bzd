@@ -11,7 +11,7 @@ config_setting(
 cc_library(
     name = "trap",
     srcs = glob([
-        "*.cpp",
+        "*.cc",
     ]),
     visibility = ["//visibility:public"],
     deps = [
