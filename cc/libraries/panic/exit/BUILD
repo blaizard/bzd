@@ -11,7 +11,7 @@ config_setting(
 cc_library(
     name = "exit",
     srcs = glob([
-        "*.cpp",
+        "*.cc",
     ]),
     visibility = ["//visibility:public"],
     deps = [

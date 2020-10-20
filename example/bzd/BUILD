@@ -19,7 +19,7 @@ bzd_manifest(
 bzd_cc_binary(
     name = "bzd",
     srcs = [
-        "main.cpp",
+        "main.cc",
     ],
     visibility = ["//visibility:public"],
     deps = [
