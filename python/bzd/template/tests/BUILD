@@ -5,6 +5,9 @@ py_test(
     srcs = [
         "template.py",
     ],
+    data = [
+        "nested_template.txt",
+    ],
     deps = [
         "//python/bzd/template",
     ],

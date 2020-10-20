@@ -41,6 +41,11 @@ class TestRun(unittest.TestCase):
 		result = template.process({"message": [["H", "e", "l", "l", "o"], ["W", "o", "r", "l", "d"]]})
 		self.assertEqual("Hello World ", result)
 
+	def testInclude(self) -> None:
+		template = Template("-->[{include python/bzd/template/tests/nested_template.txt}]<--")
+		result = template.process({"name": "Hello World"})
+		self.assertEqual("-->[Nested Hello World template]<--", result)
+
 
 if __name__ == '__main__':
 	unittest.main()
