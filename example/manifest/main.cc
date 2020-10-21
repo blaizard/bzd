@@ -4,8 +4,6 @@
 
 class MyType : public MyInterface
 {
-public:
-	int getMagic() const { return magic; }
 };
 
 int main()

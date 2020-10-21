@@ -46,6 +46,11 @@ class TestRun(unittest.TestCase):
 		result = template.process({"name": "Hello World"})
 		self.assertEqual("-->[Nested Hello World template]<--", result)
 
+	def testDoubleBracket(self) -> None:
+		template = Template("{replace}{{a}}{{{replace}{replace}{replace}}")
+		result = template.process({"replace": ""})
+		self.assertEqual("{a}{}", result)
+
 
 if __name__ == '__main__':
 	unittest.main()

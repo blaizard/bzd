@@ -22,25 +22,16 @@ class _VisitorType(VisitorType):
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
 
-class _VisitorContract(VisitorContract):
-
-	def visitContractItems(self, items: typing.List[str]) -> str:
-		return "[{}]".format(", ".join(items))
-
-	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> str:
-
-		items = []
-		if comment is not None:
-			items.append("/*{}*/".format(comment))
-		items.append(kind)
-		if value is not None:
-			items.append("=")
-			items.append(value)
-
-		return " ".join(items)
-
-
 ResultType = typing.Dict[str, typing.Any]
+
+
+class _VisitorContract(VisitorContract[ResultType, ResultType]):
+
+	def visitContractItems(self, items: typing.List[ResultType]) -> ResultType:
+		return {item["type"]: item for item in items}
+
+	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> ResultType:
+		return {"type": kind, "value": value, "comment": comment}
 
 
 class CcFormatter(Visitor[ResultType]):
@@ -48,10 +39,14 @@ class CcFormatter(Visitor[ResultType]):
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return {"variables": {}, "classes": {}}
 
-	def visitComment(self, comment: typing.Optional[str]) -> typing.Optional[str]:
+	def toCamelCase(self, string: str) -> str:
+		assert len(string), "String cannot be empty."
+		return string[0].upper() + string[1:]
+
+	def visitComment(self, comment: typing.Optional[str]) -> str:
 
 		if comment is None:
-			return None
+			return ""
 
 		if len(comment.split("\n")) > 1:
 			return "/*\n{comment}\n */\n".format(
@@ -60,13 +55,23 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitVariable(self, result: ResultType, element: Element) -> ResultType:
 
+		contracts = {}
+		if element.isNestedSequence("contract"):
+			visitorContract = _VisitorContract()
+			sequence = element.getNestedSequence("contract")
+			assert sequence
+			contracts = visitorContract.visit(sequence)
+
 		name = element.getAttrValue("name")
+		assert name
 		result["variables"][name] = {
+			"nameCamelCase": self.toCamelCase(name),
 			"const": element.isAttr("const"),
 			"type": _VisitorType(element=element).result,
 			"isValue": element.isAttr("value"),
 			"value": element.getAttrValue("value"),
-			"comment": self.visitComment(comment=element.getAttrValue("comment"))
+			"comment": self.visitComment(comment=element.getAttrValue("comment")),
+			"contracts": contracts
 		}
 
 		return result
@@ -74,7 +79,9 @@ class CcFormatter(Visitor[ResultType]):
 	def visitClass(self, result: ResultType, nestedResult: ResultType, element: Element) -> ResultType:
 
 		name = element.getAttrValue("name")
+		assert name
 		result["classes"][name] = {
+			"nameCamelCase": self.toCamelCase(name),
 			"type": _VisitorType(element=element).result,
 			"comment": self.visitComment(comment=element.getAttrValue("comment")),
 			"nested": nestedResult
@@ -84,9 +91,7 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitFinal(self, result: ResultType) -> str:
 
-		print(result)
-
-		content = (Path(__file__).parent / "template/cc/class.h.template").read_text()
+		content = (Path(__file__).parent / "template/cc/file.h.template").read_text()
 		template = Template(content)
 		output = template.process(result)
 

@@ -23,7 +23,7 @@ class Template:
 		self.includeDirs = includeDirs
 
 		# Pre-process regexpr
-		self.pattern = re.compile("(?:^|(?<=[^{])){([^{}]+)}")
+		self.pattern = re.compile("{([^}{}]*)}")
 		self.patternIf = re.compile("^if\s+([^\{]+)$")
 		self.patternFor = re.compile("^for\s+([^\s]+)\s+in\s+([^\s]+)$")
 		self.patternForIndex = re.compile("^for\s+([^\s]+)\s*,\s*([^\s]+)\s+in\s+([^\s]+)$")
@@ -68,8 +68,12 @@ class Template:
 			raise Exception("Cannot evaluate condition '{}'.".format(conditionStr))
 		return bool(condition)
 
+	def prepareTemplate(self, template: str) -> str:
+		template = template.replace("{{", "\x01")
+		return template
+
 	def process(self, args: SubstitutionType, removeEmptyLines: bool = True, recursive: bool = False) -> str:
-		processedTemplate = self.template
+		processedTemplate = self.prepareTemplate(self.template)
 
 		# Process the template
 		nbIterations = 0
@@ -81,7 +85,8 @@ class Template:
 			if nbIterations > 10:
 				raise Exception("Too many iterations (>10)")
 
-		processedTemplate = processedTemplate.replace("{{", "{")
+		processedTemplate = processedTemplate.replace("\x01", "{")
+		processedTemplate = processedTemplate.replace("}}", "}")
 		if removeEmptyLines:
 			processedTemplate = "\n".join([line for line in processedTemplate.split("\n") if line.strip() != ""])
 		return processedTemplate
@@ -154,7 +159,8 @@ class Template:
 					paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
 					assert len(paths) > 0, "Cannot find template '{}' from any paths: {}".format(
 						path, ", ".join([base.as_posix() for base in self.includeDirs]))
-					output += self._process(template=paths[0].read_text(), args=args)[0]
+					includeTemplate = self.prepareTemplate(paths[0].read_text())
+					output += self._process(template=includeTemplate, args=args)[0]
 				continue
 
 			# End pattern
