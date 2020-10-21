@@ -1,0 +1,39 @@
+#include <cassert>
+
+{for name, data in classes}
+class {name}
+{{
+public:
+	{for varName, var in data.nested.variables}
+	// Getter for {varName}_
+	constexpr const {var.type}& get{var.nameCamelCase}() const noexcept
+	{
+		return {varName}_;
+	}
+	{if not var.const}
+	// Setter for {varName}_
+	constexpr void set{var.nameCamelCase}(const {var.type}& value)
+	{
+		{for type, contract in var.contracts}
+		{if type == "min"}
+		// Minimum contract
+		assert(value >= {contract.value});
+		{end}
+		{if type == "max"}
+		// Maximum contract
+		assert(value <= {contract.value});
+		{end}
+		{end}
+
+		{varName}_ = value;
+	}
+	{end}
+	{end}
+
+private:
+	{for varName, var in data.nested.variables}
+	{var.comment}
+	{if var.const}const {end}{var.type} {varName}_{{{if var.isValue}{var.value}{end} }};
+	{end}
+}};
+{end}

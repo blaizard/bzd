@@ -20,7 +20,7 @@ class _VisitorType(VisitorType):
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
 
-class _VisitorContract(VisitorContract):
+class _VisitorContract(VisitorContract[str, str]):
 
 	def visitContractItems(self, items: typing.List[str]) -> str:
 		return "[{}]".format(", ".join(items))

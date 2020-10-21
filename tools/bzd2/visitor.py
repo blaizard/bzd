@@ -64,17 +64,21 @@ class VisitorType(VisitorBase[str, str]):
 		return ""
 
 
-class VisitorContract(VisitorBase[str, str]):
+U1 = typing.TypeVar("U1")
+U2 = typing.TypeVar("U2")
+
+
+class VisitorContract(VisitorBase[U1, U2]):
 
 	nestedKind = None
 
-	def visitBegin(self, result: typing.Any) -> typing.List[str]:
+	def visitBegin(self, result: typing.Any) -> typing.List[U1]:
 		return []
 
-	def visitEnd(self, result: typing.List[str]) -> str:
+	def visitFinal(self, result: typing.List[U1]) -> U2:
 		return self.visitContractItems(items=result)
 
-	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
+	def visitElement(self, element: Element, result: typing.List[U1]) -> typing.List[U1]:
 		assertHasAttr(element=element, attr="type")
 		result.append(
 			self.visitContract(kind=element.getAttr("type").value,
@@ -82,20 +86,20 @@ class VisitorContract(VisitorBase[str, str]):
 			comment=element.getAttrValue("comment")))
 		return result
 
-	def visitContractItems(self, items: typing.List[str]) -> str:
+	def visitContractItems(self, items: typing.List[U1]) -> U2:
 		"""
 		Called once all contract elements have been discovered.
 		This function should assemble the elements together.
 		"""
 
-		return ""
+		return typing.cast(U2, items)
 
-	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> str:
+	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> U1:
 		"""
 		Called when a single contract needs to be formatted.
 		"""
 
-		return kind
+		return typing.cast(U1, kind)
 
 
 T = typing.TypeVar("T")
