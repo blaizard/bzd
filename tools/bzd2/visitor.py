@@ -152,6 +152,13 @@ class Visitor(VisitorBase[T, str]):
 
 			result = self.visitVariable(result=result, element=element)
 
+		# Handle method
+		elif element.getAttr("category").value == "method":
+
+			assertHasAttr(element=element, attr="name")
+
+			result = self.visitMethod(result=result, element=element)
+
 		# Should never go here
 		else:
 			raise Exception("Unexpected element category: {}", element.getAttr("category").value)
@@ -171,6 +178,13 @@ class Visitor(VisitorBase[T, str]):
 	def visitVariable(self, result: T, element: Element) -> T:
 		"""
 		Called when discovering a variable.
+		"""
+
+		return result
+
+	def visitMethod(self, result: T, element: Element) -> T:
+		"""
+		Called when discovering a method.
 		"""
 
 		return result

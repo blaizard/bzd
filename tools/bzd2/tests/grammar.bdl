@@ -19,7 +19,11 @@ const int32 defaultConstant [min = -1, max = 35];
 int32 defaultConstant = 42 [min = -1, read];
 interface MyFy
 {
+	// Send a message
+	method send(Sequence<char> message) -> Result<int>;
 	MyType var;
 	const MyType varConst [always];
 	MyType varInitialized = 42;
 }
+// Return hello world!
+method hello();

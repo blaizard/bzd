@@ -29,13 +29,12 @@ class Visitor(typing.Generic[T, U]):
 
 		result = self.visitBegin(result)
 
-		for element in sequence.getList():
-			if not element.isEmpty():
-				result = self.visitElement(element, result)
-				if self.nestedKind is not None:
-					nestedSequence = element.getNestedSequence(kind=self.nestedKind)
-					if nestedSequence is not None:
-						result = self.visitNested(element, nestedSequence, result)
+		for element in sequence.iterate():
+			result = self.visitElement(element, result)
+			if self.nestedKind is not None:
+				nestedSequence = element.getNestedSequence(kind=self.nestedKind)
+				if nestedSequence is not None:
+					result = self.visitNested(element, nestedSequence, result)
 
 		return self.visitEnd(result)
 
