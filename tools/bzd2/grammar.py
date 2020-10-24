@@ -7,9 +7,9 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match: interface, struct
-_regexprClass = r"(?P<type>(:?interface|struct))"
+_regexprClass = r"(?P<type>(:?interface|struct|method))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|method)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
@@ -92,7 +92,7 @@ def makeGrammarContracts() -> Grammar:
 	]
 
 
-def makeGrammarVariable() -> Grammar:
+def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
 	[const] type name [= value] [contract];
@@ -102,12 +102,35 @@ def makeGrammarVariable() -> Grammar:
 	] + makeGrammarType([
 		GrammarItem(_regexprName, {"category": "variable"}, [
 		makeGrammarContracts(),
-		GrammarItem(r"=", Fragment,
-		[GrammarItem(_regexprValue, Fragment,
-		[makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
-		GrammarItem(r";", FragmentNewElement)
+		GrammarItem(r"=", Fragment, [GrammarItem(_regexprValue, Fragment, [makeGrammarContracts(), finalGrammar])]),
+		finalGrammar
 		])
 	])
+
+
+def makeGrammarMethod() -> Grammar:
+	"""
+	Generate a grammar for methods, it accepts the following format:
+	method name([inputs...]) [-> returntype [contract]];
+	"""
+
+	class ArgumentStart(FragmentNestedStart):
+		nestedName = "argument"
+
+	return [
+		GrammarItem(r"method", {"category": "method"}, [
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r"\(", ArgumentStart, [
+		makeGrammarVariable([GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement)]),
+		GrammarItem(r"\)", FragmentParentElement)
+		]),
+		GrammarItem(r"->", Fragment,
+		[makeGrammarType([makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
+		GrammarItem(r";", FragmentNewElement)
+		])
+		])
+	]
 
 
 # Comments allowed by the grammar
@@ -121,5 +144,6 @@ class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
 		super().__init__(path,
-			grammar=makeGrammarVariable() + makeGrammarClass(makeGrammarVariable()),
+			grammar=makeGrammarVariable() + makeGrammarMethod() +
+			makeGrammarClass(makeGrammarVariable() + makeGrammarMethod()),
 			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

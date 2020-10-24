@@ -50,7 +50,15 @@ class BdlFormatter(Visitor[str]):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitVariable(self, result: str, element: Element) -> str:
+	def _visitContractIfAny(self, contentList: typing.List[str], element: Element) -> None:
+
+		if element.isNestedSequence("contract"):
+			sequence = element.getNestedSequence("contract")
+			assert sequence is not None
+			visitorContract = _VisitorContract()
+			contentList.append(visitorContract.visit(sequence))
+
+	def _visitVariable(self, element: Element) -> str:
 
 		contentList = []
 
@@ -71,11 +79,43 @@ class BdlFormatter(Visitor[str]):
 			contentList.append(element.getAttr("value").value)
 
 		# Handle the contract
-		if element.isNestedSequence("contract"):
-			sequence = element.getNestedSequence("contract")
+		self._visitContractIfAny(contentList, element)
+
+		return " ".join(contentList)
+
+	def visitVariable(self, result: str, element: Element) -> str:
+
+		# Handle comments
+		if element.isAttr("comment"):
+			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
+
+		# Assemble
+		result += self.applyIndent("{content};\n".format(content=self._visitVariable(element)))
+		return result
+
+	def visitMethod(self, result: str, element: Element) -> str:
+
+		contentList = ["method"]
+
+		# Handle the name + arguments
+		nameArgs = element.getAttr("name").value + "("
+		if element.isNestedSequence("argument"):
+			sequence = element.getNestedSequence("argument")
 			assert sequence is not None
-			visitorContract = _VisitorContract()
-			contentList.append(visitorContract.visit(sequence))
+			args = []
+			for arg in sequence.iterate():
+				args.append(self._visitVariable(arg))
+			nameArgs += ", ".join(args)
+		contentList.append(nameArgs + ")")
+
+		# Return type
+		if element.isAttr("type"):
+			contentList.append("->")
+			visitorType = _VisitorType(element=element)
+			contentList.append(visitorType.result)
+
+		# Handle the contract
+		self._visitContractIfAny(contentList, element)
 
 		# Handle comments
 		if element.isAttr("comment"):

@@ -17,4 +17,7 @@ interface MyFy {
         const MyType<T> varConst [ /*    Immer */
         always ];
  MyType varInitialized = 42;    
+
+
+      method myMethod() -> void;
 }

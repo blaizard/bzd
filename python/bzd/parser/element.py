@@ -11,8 +11,10 @@ class Sequence:
 	def __init__(self) -> None:
 		self.list: typing.List["Element"] = []
 
-	def getList(self) -> typing.List["Element"]:
-		return self.list
+	def iterate(self) -> typing.Iterator["Element"]:
+		for element in self.list:
+			if not element.isEmpty():
+				yield element
 
 	def merge(self, sequence: "Sequence") -> None:
 		self.list += sequence.list

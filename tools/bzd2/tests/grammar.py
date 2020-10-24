@@ -170,6 +170,30 @@ class TestRun(unittest.TestCase):
 			},
 			'nested': [{
 			'attrs': {
+			'comment': 'Send a message',
+			'category': 'method',
+			'name': 'send',
+			'type': 'Result'
+			},
+			'template': [{
+			'attrs': {
+			'type': 'int'
+			}
+			}],
+			'argument': [{
+			'attrs': {
+			'type': 'Sequence',
+			'category': 'variable',
+			'name': 'message'
+			},
+			'template': [{
+			'attrs': {
+			'type': 'char'
+			}
+			}]
+			}]
+			}, {
+			'attrs': {
 			'type': 'MyType',
 			'name': 'var',
 			'category': 'variable'
@@ -194,8 +218,16 @@ class TestRun(unittest.TestCase):
 			'category': 'variable'
 			}
 			}]
+		}, {
+			'attrs': {
+			'comment': 'Return hello world!',
+			'category': 'method',
+			'name': 'hello'
+			},
+			'argument': []
 		}]
 
+		print(result)
 		self.assertListEqual(expected, result)
 
 
