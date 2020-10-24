@@ -4,6 +4,7 @@
 	class {name}
 	{{
 	public:
+		// ---- Variables Accessors ----
 		{for varName, var in data.nested.variables}
 			// Getter for {varName}_
 			constexpr const {var.type}& get{var.nameCamelCase}() const noexcept
@@ -31,9 +32,10 @@
 		{end}
 
 	private:
+		// ---- Variables ----
 		{for varName, var in data.nested.variables}
-		{var.comment}
-		{if var.const}const {end}{var.type} {varName}_{{{if var.isValue}{var.value}{end} }};
+			{var.comment}
+			{if var.const}const {end}{var.type} {varName}_{{{if var.isValue}{var.value}{end} }};
 		{end}
 	}};
 {end}
