@@ -11,12 +11,12 @@ class StringChannel : public bzd::OChannel
 public:
 	constexpr StringChannel(bzd::interface::String& str) : string_(str) {}
 
-	bzd::Expected<SizeType> write(const bzd::StringView& data) noexcept
+	bzd::Result<SizeType> write(const bzd::StringView& data) noexcept
 	{
 		return write({reinterpret_cast<const UInt8Type*>(data.data()), data.size()});
 	}
 
-	bzd::Expected<SizeType> write(const bzd::Span<const UInt8Type>& data) noexcept override
+	bzd::Result<SizeType> write(const bzd::Span<const UInt8Type>& data) noexcept override
 	{
 		return string_.append(reinterpret_cast<const char*>(data.data()), data.size());
 	}

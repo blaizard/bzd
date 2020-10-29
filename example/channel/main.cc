@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "bzd/core/channel.h"
-#include "bzd/container/expected.h"
+#include "bzd/container/result.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/string.h"
 
@@ -10,10 +10,10 @@
 class Transport : public bzd::IOChannel
 {
 public:
-	bzd::Expected<bzd::SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override
+	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override
 	{
 		if (data.size() < 2) {
-			return bzd::makeUnexpected(0);
+			return bzd::makeError(0);
 		}
 		std::cout << "[id=" << static_cast<int>(data[0]) << "] [length=" << static_cast<int>(data[1]) << "] ";
 		for (auto it = data.begin() + 2; it != data.end(); ++it) {
@@ -23,7 +23,7 @@ public:
 		return data.size();
 	}
 
-	bzd::Expected<bzd::SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override
+	bzd::Result<bzd::SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override
 	{
 		return data.size();
 	}
@@ -42,12 +42,12 @@ public:
 	};
 
 	template <typename T>
-	bzd::Expected<void> serialize(const T&) const {
+	bzd::Result<void> serialize(const T&) const {
 		return {};
 	}
 
 	template <typename T>
-	bzd::Expected<void> deserialize(const T&) const {
+	bzd::Result<void> deserialize(const T&) const {
 		return {};
 	}
 
@@ -65,7 +65,7 @@ private:
  * <id> <length> <payload>
  */
 template <>
-bzd::Expected<void> Adapter::serialize<Adapter::Data>(const Data& data) const
+bzd::Result<void> Adapter::serialize<Adapter::Data>(const Data& data) const
 {
 	bzd::UInt8Type buffer[42] = {id_, static_cast<bzd::UInt8Type>(data.str.size())};
 	bzd::algorithm::copy(data.str.begin(), data.str.end(), &buffer[2]);

@@ -3,7 +3,7 @@
 #include "driver/i2c.h"
 namespace bzd { namespace io { namespace impl {
 
-bzd::Expected<void> I2CEsp32XtensaLx6::connect()
+bzd::Result<void> I2CEsp32XtensaLx6::connect()
 {
 	i2c_port_t i2c_master_port = static_cast<i2c_port_t>(config_.interface);
 	i2c_config_t conf{};
@@ -30,7 +30,7 @@ bzd::Expected<void> I2CEsp32XtensaLx6::connect()
 	return {};
 }
 
-bzd::Expected<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
+bzd::Result<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
 {
 	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 	i2c_master_start(cmd);
@@ -44,7 +44,7 @@ bzd::Expected<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt
 	return data.size();
 }
 
-bzd::Expected<SizeType> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) noexcept
+bzd::Result<SizeType> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) noexcept
 {
 	data[0] = 1;
 	return 1;
