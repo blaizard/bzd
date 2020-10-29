@@ -2,6 +2,6 @@
 
 #include "bzd/type_traits/integral_constant.h"
 
-namespace bzd { namespace typeTraits {
+namespace bzd::typeTraits {
 using TrueType = IntegralConstant<bool, true>;
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

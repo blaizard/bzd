@@ -2,7 +2,7 @@
 
 #include "libraries/io/i2c/i2c.h"
 
-namespace bzd { namespace io { namespace impl {
+namespace bzd::io::impl {
 class I2CEsp32XtensaLx6 : public bzd::io::I2C
 {
 public:
@@ -21,4 +21,4 @@ public:
 private:
 	Configuration config_;
 };
-}}} // namespace bzd::io::impl
+} // namespace bzd::io::impl

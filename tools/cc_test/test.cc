@@ -7,14 +7,12 @@
 #include <sstream>
 #include <vector>
 
-namespace bzd { namespace test {
-
 // Empty namespace to hold all the registered tests
 namespace {
-static ::std::map<const char*, ::std::map<const char*, Manager::TestInfo>> tests_;
+static ::std::map<const char*, ::std::map<const char*, bzd::test::Manager::TestInfo>> tests_;
 }
 
-namespace impl {
+namespace bzd::test::impl {
 bool strcmp(const char* str1, const char* str2)
 {
 	return (::std::strcmp(str1, str2) == 0);
@@ -24,8 +22,9 @@ bool near(const double number1, const double number2, const double absError)
 	const double diff = ::fabs(number1 - number2);
 	return (diff <= absError);
 }
-} // namespace impl
+} // namespace bzd::test::impl
 
+namespace bzd::test {
 void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {
 	currentTestFailed_ = true;
@@ -113,7 +112,7 @@ bool bzd::test::Manager::run()
 	return (failedTests.empty()) ? true : false;
 }
 
-}} // namespace bzd::test
+} // namespace bzd::test
 
 int main()
 {

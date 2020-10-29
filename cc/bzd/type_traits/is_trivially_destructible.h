@@ -11,8 +11,7 @@
 #define __has_feature(__x) 0
 #endif
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 #if __has_keyword(__is_trivially_destructible)
 template <class T>
 struct IsTriviallyDestructible : public bzd::typeTraits::IntegralConstant<bool, __is_trivially_destructible(T)>
@@ -26,12 +25,13 @@ struct IsTriviallyDestructible : public bzd::typeTraits::IntegralConstant<bool, 
 #else
 static_assert(false, "Unsupported compiler");
 #endif
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using IsTriviallyDestructible = typename impl::IsTriviallyDestructible<T>;
 
 template <class T>
 constexpr bool isTriviallyDestructible = IsTriviallyDestructible<T>::value;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

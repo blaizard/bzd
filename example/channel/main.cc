@@ -69,13 +69,14 @@ bzd::Result<void> Adapter::serialize<Adapter::Data>(const Data& data) const
 	return {};
 }
 
+/*
 class Channel
 {
 public:
 	Channel(bzd::OChannel& transport, Adapter& adapter) : transport_{transport}, adapter_{adapter} {}
 
 	template <typename T>
-	void write(const T& data)
+	void write(const T&)
 	{
 	}
 
@@ -83,6 +84,7 @@ private:
 	bzd::OChannel& transport_;
 	Adapter& adapter_;
 };
+*/
 
 int main()
 {

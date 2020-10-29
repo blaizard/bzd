@@ -4,8 +4,7 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/remove_cv.h"
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <class T>
 struct IsIntegral
 	: IntegralConstant<bool,
@@ -15,12 +14,13 @@ struct IsIntegral
 						   isSame<unsigned long long, RemoveCV<T>> || isSame<long long, RemoveCV<T>> || isSame<bool, RemoveCV<T>>>
 {
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using IsIntegral = typename impl::IsIntegral<T>;
 
 template <class T>
 constexpr bool isIntegral = IsIntegral<T>::value;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

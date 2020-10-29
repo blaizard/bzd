@@ -1,6 +1,6 @@
 #include "libraries/io/digital/digital_esp32_xtensa_lx6.h"
 
-namespace bzd { namespace io { namespace impl {
+namespace bzd::io::impl {
 
 bzd::Result<void> DigitalOutputEsp32XtensaLx6::connect()
 {
@@ -23,4 +23,4 @@ bzd::Result<SizeType> DigitalOutputEsp32XtensaLx6::write(const bzd::Span<const b
 	return 1;
 }
 
-}}} // namespace bzd::io::impl
+} // namespace bzd::io::impl

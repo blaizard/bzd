@@ -2,8 +2,8 @@
 
 #include "bzd/core/channel.h"
 
-namespace bzd { namespace io {
+namespace bzd::io {
 class DigitalOutput : public bzd::OChannel
 {
 };
-}} // namespace bzd::io
+} // namespace bzd::io

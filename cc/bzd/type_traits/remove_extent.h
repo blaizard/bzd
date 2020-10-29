@@ -1,7 +1,6 @@
 #pragma once
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <class T>
 struct RemoveExtent
 {
@@ -17,9 +16,10 @@ struct RemoveExtent<T[N]>
 {
 	typedef T type;
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using RemoveExtent = typename impl::RemoveExtent<T>::type;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

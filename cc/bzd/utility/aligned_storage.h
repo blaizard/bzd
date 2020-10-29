@@ -2,8 +2,7 @@
 
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <SizeType Len, SizeType Align>
 struct AlignedStorage
 {
@@ -12,8 +11,9 @@ struct AlignedStorage
 		alignas(Align) unsigned char data[Len];
 	};
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 template <SizeType Len, SizeType Align>
 using AlignedStorage = typename impl::AlignedStorage<Len, Align>::type;
 
