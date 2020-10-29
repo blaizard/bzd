@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/container/expected.h"
+#include "bzd/container/result.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/system.h"
 #include "bzd/log.h"
@@ -17,11 +17,11 @@ constexpr void isTrue(const bool condition, Args&&... args)
 }
 
 template <class T, class E>
-constexpr void isExpected(const Expected<T, E>& expected)
+constexpr void isResult(const Result<T, E>& result)
 {
-	if (!expected)
+	if (!result)
 	{
-		bzd::assert::isTrue(false, CSTR("Expected failed: {}"), expected.error());
+		bzd::assert::isTrue(false, CSTR("Result failed: {}"), result.error());
 	}
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/container/expected.h"
+#include "bzd/container/result.h"
 #include "bzd/core/assert.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
@@ -146,23 +146,23 @@ public:
 	}
 
 	template <class T>
-	constexpr bzd::Expected<const T&, bool> get() const
+	constexpr bzd::Result<const T&, bool> get() const
 	{
 		if (is<T>())
 		{
 			return data_.template get<T>();
 		}
-		return bzd::makeUnexpected(false);
+		return bzd::makeError(false);
 	}
 
 	template <class T>
-	constexpr bzd::Expected<T&, bool> get()
+	constexpr bzd::Result<T&, bool> get()
 	{
 		if (is<T>())
 		{
 			return data_.template get<T>();
 		}
-		return bzd::makeUnexpected(false);
+		return bzd::makeError(false);
 	}
 
 	template <class... Functors>

@@ -13,10 +13,10 @@ public:
 
 	constexpr I2CEsp32XtensaLx6(const Configuration& config) : bzd::io::I2C{}, config_{config} {}
 
-	bzd::Expected<void> connect() override;
+	bzd::Result<void> connect() override;
 
-	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
-	bzd::Expected<SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override;
+	bzd::Result<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
+	bzd::Result<SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override;
 
 private:
 	Configuration config_;

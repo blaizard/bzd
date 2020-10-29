@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/container/expected.h"
+#include "bzd/container/result.h"
 #include "bzd/container/map.h"
 #include "bzd/container/string_view.h"
 #include "bzd/core/assert.h"
@@ -20,15 +20,15 @@ protected:
 	constexpr Registry(MapType& registry) { get(&registry); }
 
 public:
-	static constexpr bzd::Expected<MapType&, const char*> get() { return get(nullptr); }
+	static constexpr bzd::Result<MapType&, const char*> get() { return get(nullptr); }
 
 private:
-	static bzd::Expected<MapType&, const char*> get(MapType* registry)
+	static bzd::Result<MapType&, const char*> get(MapType* registry)
 	{
 		static MapType* instance = registry;
 		if (instance == nullptr)
 		{
-			return bzd::makeUnexpected("Registry was not initialized");
+			return bzd::makeError("Registry was not initialized");
 		}
 		return *instance;
 	}

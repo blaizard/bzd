@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/container/expected.h"
+#include "bzd/container/result.h"
 #include "bzd/container/span.h"
 #include "bzd/types.h"
 
@@ -10,8 +10,8 @@ namespace impl {
 class IOChannelCommon
 {
 public:
-	virtual bzd::Expected<void> connect() { return {}; }
-	virtual bzd::Expected<void> disconnect() { return {}; }
+	virtual bzd::Result<void> connect() { return {}; }
+	virtual bzd::Result<void> disconnect() { return {}; }
 };
 
 template <class T>
@@ -21,12 +21,12 @@ protected:
 	OChannel() = default;
 
 public:
-	bzd::Expected<SizeType> write(const Span<const char>& data)
+	bzd::Result<SizeType> write(const Span<const char>& data)
 	{
 		return write(Span<const T>(reinterpret_cast<const T*>(data.data()), data.size()));
 	}
-	virtual bzd::Expected<SizeType> write(const Span<const T>& data) noexcept = 0;
-	virtual bzd::Expected<SizeType> write(const T& data) noexcept { return write(Span<const T>(&data, 1)); }
+	virtual bzd::Result<SizeType> write(const Span<const T>& data) noexcept = 0;
+	virtual bzd::Result<SizeType> write(const T& data) noexcept { return write(Span<const T>(&data, 1)); }
 };
 
 template <class T>
@@ -36,8 +36,8 @@ protected:
 	IChannel() = default;
 
 public:
-	virtual bzd::Expected<SizeType> read(Span<T>& data) noexcept = 0;
-	virtual bzd::Expected<SizeType> read(T& data) noexcept
+	virtual bzd::Result<SizeType> read(Span<T>& data) noexcept = 0;
+	virtual bzd::Result<SizeType> read(T& data) noexcept
 	{
 		auto temp = Span<T>(&data, 1);
 		return read(temp);

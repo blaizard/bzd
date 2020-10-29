@@ -12,40 +12,40 @@ namespace bzd {
 namespace impl {
 // Forward declaration for the "friend" attribute
 template <class T, class E>
-class Expected;
+class Result;
 
 /**
- * Internal class used to create an unexpected object type.
+ * Internal class used to create an unexpected result object type.
  */
 template <class E>
-class Unexpected
+class Error
 {
 public:
-	constexpr Unexpected(const E& error) : error_(error) {}
+	constexpr Error(const E& error) : error_(error) {}
 
 private:
 	template <class A, class B>
-	friend class bzd::impl::Expected;
+	friend class bzd::impl::Result;
 	E error_;
 };
 
 template <class T, class E>
-class Expected
+class Result
 {
 private:
 	using Value = bzd::typeTraits::RemoveReference<T>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 public:
-	constexpr Expected(T&& value) : isError_(false), value_(bzd::forward<T>(value)) {}
+	constexpr Result(T&& value) : isError_(false), value_(bzd::forward<T>(value)) {}
 
 	template <class U>
-	constexpr Expected(impl::Unexpected<U>&& u) : isError_(true), error_(u.error_)
+	constexpr Result(impl::Error<U>&& u) : isError_(true), error_(u.error_)
 	{
 	}
 
 	// Move constructor
-	constexpr Expected(Expected<T, E>&& e) : isError_(e.isError_)
+	constexpr Result(Result<T, E>&& e) : isError_(e.isError_)
 	{
 		if (isError_)
 			error_ = bzd::move(e.error_);
@@ -53,7 +53,7 @@ public:
 			value_ = bzd::move(e.value_);
 	}
 
-	~Expected()
+	~Result()
 	{
 		if (isError_)
 			error_.~E();
@@ -102,14 +102,14 @@ protected:
 };
 
 template <class E>
-class Expected<void, E> : private Expected<void*, E>
+class Result<void, E> : private Result<void*, E>
 {
 public:
-	using Expected<void*, E>::Expected;
-	using Expected<void*, E>::operator bool;
-	using Expected<void*, E>::error;
+	using Result<void*, E>::Result;
+	using Result<void*, E>::operator bool;
+	using Result<void*, E>::error;
 
-	constexpr Expected() : Expected<void*, E>(nullptr) {}
+	constexpr Result() : Result<void*, E>(nullptr) {}
 };
 } // namespace impl
 
@@ -120,12 +120,12 @@ public:
  * value, and error, representing error and containing an error value.
  */
 template <class T, class E = bool>
-using Expected = impl::Expected<T, E>;
+using Result = impl::Result<T, E>;
 
 template <class E>
-constexpr impl::Unexpected<bzd::typeTraits::Decay<E>> makeUnexpected(E&& e)
+constexpr impl::Error<bzd::typeTraits::Decay<E>> makeError(E&& e)
 {
-	return impl::Unexpected<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
+	return impl::Error<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
 }
 
 } // namespace bzd

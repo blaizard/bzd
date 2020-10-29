@@ -11,7 +11,7 @@ namespace impl {
 class Stub : public bzd::OChannel
 {
 public:
-	bzd::Expected<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override { return data.size(); }
+	bzd::Result<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override { return data.size(); }
 };
 
 bzd::OChannel& getOChannel()
