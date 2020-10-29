@@ -4,8 +4,7 @@
 #include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 class StringChannel : public bzd::OChannel
 {
 public:
@@ -28,12 +27,13 @@ public:
 protected:
 	bzd::interface::String& string_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 using StringChannel = bzd::impl::StringChannel;
 }
 
+namespace bzd {
 template <SizeType N>
 class StringChannel : public bzd::interface::StringChannel
 {

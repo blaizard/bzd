@@ -2,8 +2,7 @@
 
 #include "bzd/type_traits/remove_reference.h"
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <class T>
 struct TypeIdentity
 {
@@ -17,9 +16,9 @@ template <class T>
 struct AddPointer : decltype(impl::tryAddPointer<T>(0))
 {
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using AddPointer = typename impl::AddPointer<T>::type;
-
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

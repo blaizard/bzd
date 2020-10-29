@@ -2,8 +2,7 @@
 
 #include "bzd/type_traits/is_same.h"
 
-namespace bzd { namespace meta {
-namespace impl {
+namespace bzd::meta::impl {
 template <class T, class U, class... Ts>
 struct Contains
 {
@@ -15,9 +14,10 @@ struct Contains<T, U>
 {
 	static constexpr const bool value = bzd::typeTraits::isSame<T, U>;
 };
-} // namespace impl
+} // namespace bzd::meta::impl
 
+namespace bzd::meta {
 template <class T, class... Ts>
 using Contains = typename impl::Contains<T, Ts...>;
 
-}} // namespace bzd::meta
+} // namespace bzd::meta

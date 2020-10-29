@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T, class Impl>
 class Vector : public Impl
 {
@@ -60,13 +59,14 @@ public:
 protected:
 	const SizeType capacity_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class T>
 using Vector = impl::Vector<T, Span<T>>;
 }
 
+namespace bzd {
 template <class T, SizeType N>
 class Vector : public interface::Vector<T>
 {

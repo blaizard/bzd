@@ -1,7 +1,6 @@
 #pragma once
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <bool Condition, class T = void>
 struct EnableIf
 {
@@ -12,8 +11,9 @@ struct EnableIf<true, T>
 {
 	typedef T type;
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <bool Condition, class T = void>
 using EnableIf = typename impl::EnableIf<Condition, T>::type;
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

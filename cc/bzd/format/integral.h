@@ -8,8 +8,7 @@
 #include "bzd/type_traits/is_floating_point.h"
 #include "bzd/type_traits/is_integral.h"
 
-namespace bzd { namespace format {
-namespace impl {
+namespace bzd::format::impl {
 namespace {
 static constexpr const char* const digits = "0123456789abcdef";
 }
@@ -81,8 +80,9 @@ constexpr void fixedPoint(bzd::OChannel& stream, const T& n, const SizeType maxP
 	}
 	stream.write(buffer);
 }
-} // namespace impl
+} // namespace bzd::format::impl
 
+namespace bzd::format {
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toString(bzd::OChannel& stream, const T& data)
 {
@@ -150,4 +150,4 @@ constexpr void toString(bzd::interface::String& str, Args&&... args)
 	bzd::interface::StringChannel stream(str);
 	toString(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
 }
-}} // namespace bzd::format
+} // namespace bzd::format

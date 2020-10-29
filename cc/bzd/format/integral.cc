@@ -1,6 +1,6 @@
 #include "bzd/format/integral.h"
 
-namespace bzd { namespace format {
+namespace bzd::format {
 
 void toString(bzd::OChannel& stream, const bzd::StringView& data)
 {
@@ -11,4 +11,4 @@ void toString(bzd::OChannel& stream, const char c)
 {
 	stream.write(bzd::StringView(&c, 1));
 }
-}} // namespace bzd::format
+} // namespace bzd::format

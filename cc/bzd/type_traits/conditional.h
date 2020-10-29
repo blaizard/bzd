@@ -1,7 +1,6 @@
 #pragma once
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <bool Condition, class T, class F>
 struct Conditional
 {
@@ -13,9 +12,9 @@ struct Conditional<false, T, F>
 {
 	typedef F type;
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <bool Condition, class T, class F>
 using Conditional = typename impl::Conditional<Condition, T, F>::type;
-
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

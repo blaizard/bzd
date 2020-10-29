@@ -1,7 +1,6 @@
 #pragma once
 
-namespace bzd { namespace assert {
-namespace impl {
+namespace bzd::assert::impl {
 inline void assertHelper(bool test)
 {
 	throw "Assert error";
@@ -9,7 +8,9 @@ inline void assertHelper(bool test)
 
 void backend(const char* message1, const char* message2 = nullptr);
 
-} // namespace impl
+} // namespace bzd::assert::impl
+
+namespace bzd::assert {
 
 constexpr bool isTrueConstexpr(const bool condition)
 {
@@ -34,4 +35,4 @@ constexpr void isTrue(const bool condition, const char* message)
 
 void unreachable();
 
-}} // namespace bzd::assert
+} // namespace bzd::assert

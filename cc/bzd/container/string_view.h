@@ -3,8 +3,7 @@
 #include "bzd/container/span.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T, class Impl>
 class StringView : public Impl
 {
@@ -42,8 +41,9 @@ public:
 
 	constexpr void clear() noexcept { removePrefix(size_); }
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 using StringView = impl::StringView<char, bzd::Span<const char>>;
 } // namespace bzd
 

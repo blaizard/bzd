@@ -6,8 +6,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/forward.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T>
 using TupleTypeOf = typename T::type;
 
@@ -119,8 +118,9 @@ public:
 		return elem<M>::get();
 	}
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 template <class... T>
 class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 {

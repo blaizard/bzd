@@ -1,9 +1,9 @@
-#include <iostream>
-
-#include "bzd/core/channel.h"
 #include "bzd/container/result.h"
-#include "bzd/container/string_view.h"
 #include "bzd/container/string.h"
+#include "bzd/container/string_view.h"
+#include "bzd/core/channel.h"
+
+#include <iostream>
 
 // This is a demo of what a channel implementation could look like
 
@@ -12,29 +12,26 @@ class Transport : public bzd::IOChannel
 public:
 	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override
 	{
-		if (data.size() < 2) {
+		if (data.size() < 2)
+		{
 			return bzd::makeError(0);
 		}
 		std::cout << "[id=" << static_cast<int>(data[0]) << "] [length=" << static_cast<int>(data[1]) << "] ";
-		for (auto it = data.begin() + 2; it != data.end(); ++it) {
-			std::cout << static_cast<char>(*it); 
+		for (auto it = data.begin() + 2; it != data.end(); ++it)
+		{
+			std::cout << static_cast<char>(*it);
 		}
 		std::cout << std::endl;
 		return data.size();
 	}
 
-	bzd::Result<bzd::SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override
-	{
-		return data.size();
-	}
+	bzd::Result<bzd::SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override { return data.size(); }
 };
 
 class Adapter
 {
 public:
-	Adapter(bzd::IOChannel& transport, const uint8_t id) : transport_{transport}, id_{id}
-	{
-	}
+	Adapter(bzd::IOChannel& transport, const uint8_t id) : transport_{transport}, id_{id} {}
 
 	struct Data
 	{
@@ -42,19 +39,18 @@ public:
 	};
 
 	template <typename T>
-	bzd::Result<void> serialize(const T&) const {
+	bzd::Result<void> serialize(const T&) const
+	{
 		return {};
 	}
 
 	template <typename T>
-	bzd::Result<void> deserialize(const T&) const {
+	bzd::Result<void> deserialize(const T&) const
+	{
 		return {};
 	}
 
-	bool filter(const bzd::Span<const bzd::UInt8Type>&)
-	{
-		return true;
-	}
+	bool filter(const bzd::Span<const bzd::UInt8Type>&) { return true; }
 
 private:
 	bzd::IOChannel& transport_;

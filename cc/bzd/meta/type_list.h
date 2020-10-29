@@ -6,7 +6,7 @@
 #include "bzd/meta/find_conditional.h"
 #include "bzd/types.h"
 
-namespace bzd { namespace meta {
+namespace bzd::meta {
 template <class... Ts>
 struct TypeList
 {
@@ -25,4 +25,4 @@ struct TypeList
 	template <class T, template <class, class> class Condition>
 	using FindConditional = FindConditional<Condition, T, Ts...>;
 };
-}} // namespace bzd::meta
+} // namespace bzd::meta

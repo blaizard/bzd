@@ -3,13 +3,12 @@
 #include "bzd/interface/stack.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 extern "C" void contextSwitch(void** stack1, void* stack2);
 extern "C" void* contextTask();
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 class Task
 {
 public:
@@ -39,5 +38,4 @@ protected:
 	const FctPtrType fct_;
 	interface::Stack* stack_;
 };
-} // namespace interface
-} // namespace bzd
+} // namespace bzd::interface

@@ -7,8 +7,7 @@
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class StorageType, class... Ts>
 class Variant
 {
@@ -176,8 +175,9 @@ protected:
 	int id_ = -1;
 	StorageType data_ = {};
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 template <class... Ts>
 class VariantConstexpr : public bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts...>, Ts...>
 {

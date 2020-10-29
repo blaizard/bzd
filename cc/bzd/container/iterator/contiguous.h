@@ -2,7 +2,7 @@
 
 #include "bzd/types.h"
 
-namespace bzd { namespace iterator {
+namespace bzd::iterator {
 template <class DataType>
 class Contiguous
 {
@@ -76,4 +76,4 @@ private:
 	DataType* data_;
 	SizeType index_;
 };
-}} // namespace bzd::iterator
+} // namespace bzd::iterator

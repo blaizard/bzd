@@ -5,8 +5,7 @@
 #include "bzd/type_traits/integral_constant.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 struct IsDestructibleHelper
 {
 	template <class T, class = decltype(bzd::typeTraits::declval<T&>().~T())>
@@ -52,12 +51,12 @@ template <class T>
 struct IsDestructible<T[]> : public IsDestructible<T>
 {
 };
-} // namespace impl
-
+} // namespace bzd::typeTraits::impl
+namespace bzd::typeTraits {
 template <class T>
 using IsDestructible = typename impl::IsDestructible<T>;
 
 template <class T>
 constexpr bool isDestructible = IsDestructible<T>::value;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

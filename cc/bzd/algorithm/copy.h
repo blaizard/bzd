@@ -1,6 +1,6 @@
 #pragma once
 
-namespace bzd { namespace algorithm {
+namespace bzd::algorithm {
 template <class InputIt, class OutputIt>
 constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result)
 {
@@ -10,4 +10,4 @@ constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result)
 	}
 	return result;
 }
-}} // namespace bzd::algorithm
+} // namespace bzd::algorithm

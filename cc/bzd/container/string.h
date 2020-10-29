@@ -7,8 +7,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/min.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T, class Impl>
 class String : public Impl
 {
@@ -89,12 +88,13 @@ public:
 public:
 	const SizeType capacity_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 using String = impl::String<char, Span<char>>;
 }
 
+namespace bzd {
 template <SizeType N>
 class String : public interface::String
 {

@@ -2,17 +2,15 @@
 
 #include "bzd/types.h"
 
-namespace bzd { namespace meta {
-
-namespace range {
+namespace bzd::meta::range {
 template <SizeType... N>
 struct Type
 {
 	typedef Type<N...> type;
 };
-} // namespace range
+} // namespace bzd::meta::range
 
-namespace impl {
+namespace bzd::meta::impl {
 
 template <SizeType C, SizeType P, SizeType... N>
 struct GetRange : GetRange<C - 1, P + 1, N..., P>
@@ -29,9 +27,10 @@ struct Range : GetRange<End - Start, Start>
 {
 };
 
-} // namespace impl
+} // namespace bzd::meta::impl
 
+namespace bzd::meta {
 template <SizeType Start, SizeType End>
 using Range = typename impl::Range<Start, End>::type;
 
-}} // namespace bzd::meta
+} // namespace bzd::meta

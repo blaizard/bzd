@@ -3,8 +3,7 @@
 #include "bzd/container/span.h"
 #include "bzd/container/string_view.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T>
 class Buffer : public bzd::Span<T>
 {
@@ -24,7 +23,9 @@ public:
 	{
 	}
 };
-} // namespace impl
+} // namespace bzd::impl
+
+namespace bzd {
 
 using Buffer = impl::Buffer<bzd::UInt8Type>;
 using ConstBuffer = impl::Buffer<const bzd::UInt8Type>;
