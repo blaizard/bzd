@@ -30,7 +30,8 @@ The following built-in types should be made available by the implementation.
 - Optional<T>
 - Result<T, E>
 - Sequence<T>
-- Variant<T, V, ...>
+- Tuple<T, U, ...>
+- Variant<T, U, ...>
 
 ### Custom
 
@@ -65,14 +66,14 @@ import "cc/bzd/core/my_interface.bdl"
 
 A variable is defined as follow:
 ```
-[mutable] <type> <name> [= <value>] [[<constraints>...]];
+[const] <type> <name> [= <value>] [[<constraints>...]];
 ```
 
-## Functions
+## Methods
 
 A function is defined as follow:
 ```
-<type> <name>(<variable1>, ...);
+method <name>(<variable1>, ...) [-> <type>] [[<constraints>...]];
 ```
 
 ## Interfaces
