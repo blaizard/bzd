@@ -1,7 +1,6 @@
 #pragma once
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <class T>
 struct RemoveReference
 {
@@ -19,9 +18,10 @@ struct RemoveReference<T&&>
 {
 	typedef T type;
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using RemoveReference = typename impl::RemoveReference<T>::type;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

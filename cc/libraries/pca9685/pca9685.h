@@ -2,7 +2,7 @@
 
 #include "bzd/core/channel.h"
 
-namespace bzd { namespace io {
+namespace bzd::io {
 class PCA9685
 {
 public:
@@ -17,4 +17,4 @@ private:
 	bzd::IOChannel& i2c_;
 	const bzd::UInt8Type address_ = 0;
 };
-}} // namespace bzd::io
+} // namespace bzd::io

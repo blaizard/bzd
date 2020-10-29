@@ -1,7 +1,7 @@
 #include "libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
 
 #include "driver/i2c.h"
-namespace bzd { namespace io { namespace impl {
+namespace bzd::io::impl {
 
 bzd::Result<void> I2CEsp32XtensaLx6::connect()
 {
@@ -50,4 +50,4 @@ bzd::Result<SizeType> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) n
 	return 1;
 }
 
-}}} // namespace bzd::io::impl
+} // namespace bzd::io::impl

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace bzd { namespace typeTraits {
+namespace bzd::typeTraits {
 template <class...>
 using VoidType = void;
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

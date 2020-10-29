@@ -3,8 +3,7 @@
 #include "bzd/type_traits/false_type.h"
 #include "bzd/type_traits/true_type.h"
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 // Primary template
 template <class>
 struct IsFunction : FalseType
@@ -64,12 +63,13 @@ template <class Ret, class... Args>
 struct IsFunction<Ret(Args...) const volatile&&> : TrueType
 {
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using IsFunction = typename impl::IsFunction<T>;
 
 template <class T>
 constexpr bool isFunction = IsFunction<T>::value;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

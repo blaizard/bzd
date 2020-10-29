@@ -2,7 +2,7 @@
 
 #include "bzd/core/channel.h"
 
-namespace bzd { namespace io {
+namespace bzd::io {
 class I2C : public bzd::IOChannel
 {
 public:
@@ -23,4 +23,4 @@ public:
 		bzd::UInt32Type frequency = 100000;
 	};
 };
-}} // namespace bzd::io
+} // namespace bzd::io

@@ -60,9 +60,7 @@
 		}                                                      \
 	}
 
-namespace bzd { namespace test {
-
-namespace impl {
+namespace bzd::test::impl {
 bool strcmp(const char* str1, const char* str2);
 bool near(const double number1, const double number2, const double absError);
 
@@ -203,8 +201,9 @@ private:
 	char buffer_[100];
 };
 
-} // namespace impl
+} // namespace bzd::test::impl
 
+namespace bzd::test {
 class Test
 {
 public:
@@ -284,4 +283,4 @@ private:
 	bool currentTestFailed_ = false;
 };
 
-}} // namespace bzd::test
+} // namespace bzd::test
