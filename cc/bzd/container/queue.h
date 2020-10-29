@@ -6,8 +6,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/forward.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T, class CapacityType = SizeType>
 class Queue
 {
@@ -76,13 +75,14 @@ private:
 	CapacityType first_;
 	CapacityType last_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class T, class CapacityType = SizeType>
 using Queue = impl::Queue<T, CapacityType>;
 }
 
+namespace bzd {
 /**
  */
 template <class T, SizeType N, class CapacityType = SizeType>

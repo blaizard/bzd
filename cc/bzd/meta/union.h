@@ -4,8 +4,7 @@
 #include "bzd/type_traits/is_same.h"
 #include "bzd/utility/forward.h"
 
-namespace bzd { namespace meta {
-namespace impl {
+namespace bzd::meta::impl {
 template <class T, class... Ts>
 union UnionConstexpr {
 public:
@@ -155,10 +154,11 @@ protected:
 	{
 	} dummy_;
 };
-} // namespace impl
+} // namespace bzd::meta::impl
 
+namespace bzd::meta {
 template <class... Ts>
 using Union = impl::Union<Ts...>;
 template <class... Ts>
 using UnionConstexpr = impl::UnionConstexpr<Ts...>;
-}} // namespace bzd::meta
+} // namespace bzd::meta

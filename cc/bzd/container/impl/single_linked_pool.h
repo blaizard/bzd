@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace bzd { namespace impl {
+namespace bzd::impl {
 template <class T, class CapacityType = SizeType>
 struct SingleLinkedPoolElement
 {
@@ -83,4 +83,4 @@ public:
 private:
 	CapacityType free_;
 };
-}} // namespace bzd::impl
+} // namespace bzd::impl

@@ -2,7 +2,7 @@
 
 #include "bzd/types.h"
 
-namespace bzd { namespace interface {
+namespace bzd::interface {
 /**
  * Application stack definition
  */
@@ -42,4 +42,4 @@ protected:
 	UInt8Type* stack_;
 	static const Direction direction_;
 };
-}} // namespace bzd::interface
+} // namespace bzd::interface

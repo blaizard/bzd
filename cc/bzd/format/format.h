@@ -16,9 +16,7 @@
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_pointer.h"
 
-namespace bzd { namespace format {
-
-namespace impl {
+namespace bzd::format::impl {
 /**
  * Simple vector container working with conxtexpr
  */
@@ -601,8 +599,9 @@ constexpr void toStringRuntime(bzd::OChannel& out, const bzd::StringView& str, b
 	bzd::format::impl::print(out, str, argList);
 }
 
-} // namespace impl
+} // namespace bzd::format::impl
 
+namespace bzd::format {
 /**
  * \brief String formating.
  *
@@ -651,4 +650,4 @@ constexpr void toString(bzd::OChannel& out, const ConstexprStringView& str, Args
 	bzd::format::toString(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 }
 
-}} // namespace bzd::format
+} // namespace bzd::format

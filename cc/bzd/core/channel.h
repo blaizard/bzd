@@ -4,8 +4,7 @@
 #include "bzd/container/span.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 
 class IOChannelCommon
 {
@@ -50,8 +49,9 @@ class IOChannel
 	, public OChannel<T>
 {
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 using OChannel = impl::OChannel<bzd::UInt8Type>;
 using IChannel = impl::IChannel<bzd::UInt8Type>;
 using IOChannel = impl::IOChannel<bzd::UInt8Type>;

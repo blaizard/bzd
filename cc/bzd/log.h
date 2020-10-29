@@ -7,7 +7,7 @@
 #include "bzd/format/format.h"
 #include "bzd/utility/forward.h"
 
-namespace bzd { namespace log {
+namespace bzd::log {
 enum class Level
 {
 	CRITICAL = 0,
@@ -22,10 +22,9 @@ void print(Args&&... args) noexcept
 {
 	bzd::format::toString(bzd::getOut(), bzd::forward<Args>(args)...);
 }
-}} // namespace bzd::log
+} // namespace bzd::log
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 class Log
 {
 public:
@@ -73,12 +72,13 @@ private:
 
 	bzd::OChannel& out_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 using Log = impl::Log;
 }
 
+namespace bzd {
 class Log : public interface::Log
 {
 public:

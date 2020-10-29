@@ -2,7 +2,7 @@
 
 #include "bzd/utility/swap.h"
 
-namespace bzd { namespace algorithm {
+namespace bzd::algorithm {
 template <class BidirIt>
 constexpr void reverse(BidirIt first, BidirIt last)
 {
@@ -11,4 +11,4 @@ constexpr void reverse(BidirIt first, BidirIt last)
 		bzd::swap(*first++, *last);
 	}
 }
-}} // namespace bzd::algorithm
+} // namespace bzd::algorithm

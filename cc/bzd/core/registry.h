@@ -1,14 +1,13 @@
 #pragma once
 
-#include "bzd/container/result.h"
 #include "bzd/container/map.h"
+#include "bzd/container/result.h"
 #include "bzd/container/string_view.h"
 #include "bzd/core/assert.h"
 #include "bzd/types.h"
 #include "bzd/utility/singleton.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T>
 class Registry
 {
@@ -33,13 +32,14 @@ private:
 		return *instance;
 	}
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class T>
 using Registry = impl::Registry<T>;
 }
 
+namespace bzd {
 /**
  * \brief Fixed-size registry object.
  *

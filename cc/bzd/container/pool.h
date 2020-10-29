@@ -5,8 +5,7 @@
 #include "bzd/types.h"
 #include "bzd/utility/container_of.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T, class CapacityType = SizeType>
 class Pool : public SingleLinkedPool<T, CapacityType>
 {
@@ -30,12 +29,14 @@ public:
 	 */
 	constexpr T& reserve() noexcept { return SingleLinkedPool<T, CapacityType>::reserve().container_; }
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class T, class CapacityType = SizeType>
 using Pool = impl::Pool<T, CapacityType>;
 }
+
+namespace bzd {
 
 /**
  * A Pool is a fixed memory buffer containing fixed size elements that can be

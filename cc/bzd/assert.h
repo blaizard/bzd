@@ -5,7 +5,7 @@
 #include "bzd/core/system.h"
 #include "bzd/log.h"
 
-namespace bzd { namespace assert {
+namespace bzd::assert {
 template <class... Args>
 constexpr void isTrue(const bool condition, Args&&... args)
 {
@@ -25,4 +25,4 @@ constexpr void isResult(const Result<T, E>& result)
 	}
 }
 
-}} // namespace bzd::assert
+} // namespace bzd::assert

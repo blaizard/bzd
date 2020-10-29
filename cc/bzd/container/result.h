@@ -8,8 +8,7 @@
 #include "bzd/utility/move.h"
 #include "bzd/utility/reference_wrapper.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 // Forward declaration for the "friend" attribute
 template <class T, class E>
 class Result;
@@ -111,8 +110,9 @@ public:
 
 	constexpr Result() : Result<void*, E>(nullptr) {}
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 /**
  * \brief This is the type used for returning and propagating errors.
  *

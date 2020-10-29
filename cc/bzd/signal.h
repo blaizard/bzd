@@ -5,8 +5,7 @@
 #include "bzd/container/buffer.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 
 class ComputeMethodIdentical
 {
@@ -78,8 +77,9 @@ struct SignalInternals<7>
 	using Type = UInt64Type;
 	using ExtractedType = UInt64Type;
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 template <class Type, bzd::SizeType OffsetBits, bzd::SizeType SizeBits, class CompuMethod = impl::ComputeMethodIdentical>
 class Signal
 {

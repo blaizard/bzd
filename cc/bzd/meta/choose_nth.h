@@ -3,8 +3,7 @@
 #include "bzd/meta/type.h"
 #include "bzd/types.h"
 
-namespace bzd { namespace meta {
-namespace impl {
+namespace bzd::meta::impl {
 template <SizeType N, class... Ts>
 struct ChooseNth;
 
@@ -17,8 +16,8 @@ template <class H, class... Ts>
 struct ChooseNth<0, H, Ts...> : Type<H>
 {
 };
-} // namespace impl
-
+} // namespace bzd::meta::impl
+namespace bzd::meta {
 template <SizeType N, class... Ts>
 using ChooseNth = typename impl::ChooseNth<N, Ts...>::type;
-}} // namespace bzd::meta
+} // namespace bzd::meta

@@ -5,8 +5,7 @@
 #include "bzd/core/registry.h"
 #include "bzd/core/system.h"
 
-namespace bzd { namespace assert {
-namespace impl {
+namespace bzd::assert::impl {
 
 class Stub : public bzd::OChannel
 {
@@ -29,11 +28,12 @@ void backend(const char* message1, const char* message2)
 	}
 	bzd::panic();
 }
-} // namespace impl
+} // namespace bzd::assert::impl
 
+namespace bzd::assert {
 void unreachable()
 {
 	impl::backend("Code unreachable.\n");
 }
 
-}} // namespace bzd::assert
+} // namespace bzd::assert

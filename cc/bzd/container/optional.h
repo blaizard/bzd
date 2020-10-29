@@ -8,8 +8,7 @@
 #include "bzd/utility/move.h"
 #include "bzd/utility/reference_wrapper.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 template <class T>
 class Optional
 {
@@ -57,8 +56,9 @@ protected:
 		ValueContainer value_;
 	};
 };
-} // namespace impl
+} // namespace bzd::impl
 
+namespace bzd {
 /**
  * \brief Type managing an optional contained value, i.e. a value that may or
  * may not be present.

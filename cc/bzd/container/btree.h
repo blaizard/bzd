@@ -5,8 +5,7 @@
 #include "bzd/container/vector.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 /**
  * Implementation of a B-tree.
  *
@@ -86,13 +85,14 @@ protected:
 	Node** root_;
 	bzd::interface::Pool<Node>& nodes_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class K, class V, SizeType Order>
 using BTree = impl::BTree<K, V, Order>;
 }
 
+namespace bzd {
 template <class K, class V, SizeType N, SizeType Order>
 class BTree : public interface::BTree<K, V, Order>
 {

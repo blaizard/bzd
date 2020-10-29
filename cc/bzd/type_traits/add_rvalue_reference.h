@@ -3,8 +3,7 @@
 #include "bzd/type_traits/is_reference.h"
 #include "bzd/type_traits/is_void.h"
 
-namespace bzd { namespace typeTraits {
-namespace impl {
+namespace bzd::typeTraits::impl {
 template <typename T, bool b>
 struct AddRValueReferenceHelper
 {
@@ -22,9 +21,10 @@ struct AddRValueReference
 {
 	typedef typename AddRValueReferenceHelper<T, (isVoid<T> == false && isReference<T> == false)>::type type;
 };
-} // namespace impl
+} // namespace bzd::typeTraits::impl
 
+namespace bzd::typeTraits {
 template <class T>
 using AddRValueReference = typename impl::AddRValueReference<T>::type;
 
-}} // namespace bzd::typeTraits
+} // namespace bzd::typeTraits

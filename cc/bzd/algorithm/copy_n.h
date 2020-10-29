@@ -2,7 +2,7 @@
 
 #include "bzd/types.h"
 
-namespace bzd { namespace algorithm {
+namespace bzd::algorithm {
 template <class InputIt, class OutputIt>
 constexpr OutputIt copyN(InputIt first, const SizeType size, OutputIt result)
 {
@@ -16,4 +16,4 @@ constexpr OutputIt copyN(InputIt first, const SizeType size, OutputIt result)
 	}
 	return result;
 }
-}} // namespace bzd::algorithm
+} // namespace bzd::algorithm

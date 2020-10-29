@@ -5,8 +5,7 @@
 #include "bzd/core/assert.h"
 #include "bzd/types.h"
 
-namespace bzd {
-namespace impl {
+namespace bzd::impl {
 /**
  * \brief Flat map implementation.
  */
@@ -69,12 +68,14 @@ public:
 protected:
 	bzd::interface::Vector<Element>& data_;
 };
-} // namespace impl
+} // namespace bzd::impl
 
-namespace interface {
+namespace bzd::interface {
 template <class K, class V>
 using Map = impl::Map<K, V>;
 }
+
+namespace bzd {
 
 template <class K, class V, SizeType N>
 class Map : public interface::Map<K, V>
