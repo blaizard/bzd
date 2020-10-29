@@ -29,7 +29,13 @@ void fct2()
 		bzd::yield();
 	}
 }
-
+/*
+class Promise
+{
+public:
+	virtual Result<bool> isReady() = 0;
+};
+*/
 int main()
 {
 	task1.bind(stack1);

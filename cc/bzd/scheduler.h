@@ -43,4 +43,12 @@ private:
 
 void yield();
 
+template <class T>
+void await(T&&)
+{
+	yield();
+}
+
 } // namespace bzd
+
+#define bzd_yield bzd::yield()
