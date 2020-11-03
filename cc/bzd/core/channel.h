@@ -2,7 +2,7 @@
 
 #include "bzd/container/result.h"
 #include "bzd/container/span.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "bzd/meta/choose_nth.h"
+#include "bzd/platform/types.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_same.h"
-#include "bzd/types.h"
 #include "bzd/utility/forward.h"
 
 namespace bzd::impl {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/meta/type.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::meta::impl {
 template <SizeType N, class... Ts>

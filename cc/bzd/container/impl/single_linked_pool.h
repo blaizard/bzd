@@ -2,7 +2,7 @@
 
 #include "bzd/container/span.h"
 #include "bzd/core/assert.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 #include <iostream>
 

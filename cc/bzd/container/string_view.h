@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/span.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 template <class T, class Impl>

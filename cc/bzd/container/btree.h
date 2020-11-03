@@ -3,7 +3,7 @@
 #include "bzd/container/pool.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/vector.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 /**

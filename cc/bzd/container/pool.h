@@ -2,7 +2,7 @@
 
 #include "bzd/container/impl/single_linked_pool.h"
 #include "bzd/container/span.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 #include "bzd/utility/container_of.h"
 
 namespace bzd::impl {

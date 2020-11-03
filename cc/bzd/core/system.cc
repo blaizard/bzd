@@ -1,6 +1,6 @@
 #include "bzd/core/system.h"
 
-#include "bzd/core/channel.h"
+#include "bzd/core/assert.h"
 #include "bzd/core/registry.h"
 
 namespace bzd::impl {

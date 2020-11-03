@@ -1,12 +1,12 @@
 #pragma once
 
+#include "bzd/container/reference_wrapper.h"
 #include "bzd/core/assert.h"
+#include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/is_reference.h"
-#include "bzd/types.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
-#include "bzd/utility/reference_wrapper.h"
 
 namespace bzd::impl {
 template <class T>
