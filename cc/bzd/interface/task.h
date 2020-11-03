@@ -1,7 +1,8 @@
 #pragma once
 
 #include "bzd/interface/stack.h"
-#include "bzd/types.h"
+#include "bzd/platform/system.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 extern "C" void contextSwitch(void** stack1, void* stack2);

@@ -1,6 +1,16 @@
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
+# --- new rules ---
+
+cc_library(
+    name = "includes",
+    includes = ["."],
+    visibility = [":__subpackages__"],
+)
+
+# --- old rules ---
+
 filegroup(
     name = "documentation",
     srcs = glob([
@@ -66,7 +76,7 @@ cc_library(
         "//cc/libraries:__subpackages__",
     ],
     deps = [
-        "//cc/libraries/panic",
+        "//cc/bzd/lib/panic",
     ] + selects.with_or({
         (
             "//tools/bazel_build/config:x86_64",
@@ -80,6 +90,6 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         ":bzd_core",
-        "//cc/libraries/log",
+        "//cc/bzd/lib/log",
     ],
 )

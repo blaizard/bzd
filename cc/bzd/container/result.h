@@ -1,12 +1,12 @@
 #pragma once
 
+#include "bzd/container/reference_wrapper.h"
 #include "bzd/core/assert.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_reference.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
-#include "bzd/utility/reference_wrapper.h"
 
 namespace bzd::impl {
 // Forward declaration for the "friend" attribute
@@ -64,19 +64,19 @@ public:
 
 	constexpr const E& error() const
 	{
-		bzd::assert::isTrue(isError_);
+		// bzd::assert::isTrue(isError_);
 		return error_;
 	}
 
 	constexpr const Value& operator*() const
 	{
-		bzd::assert::isTrue(!isError_);
+		// bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 
 	constexpr Value& operator*()
 	{
-		bzd::assert::isTrue(!isError_);
+		// bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 

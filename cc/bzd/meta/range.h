@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::meta::range {
 template <SizeType... N>

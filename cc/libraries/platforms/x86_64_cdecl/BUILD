@@ -10,6 +10,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc:header_system",
+        "//cc/bzd/interface:stack",
     ],
     alwayslink = True,
 )

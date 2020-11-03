@@ -1,7 +1,23 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", original_cc_binary = "cc_binary", original_cc_library = "cc_library", original_cc_test = "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
+
+def cc_library(deps = [], **kwargs):
+    original_cc_library(
+        deps = deps + ["//cc:includes"],
+        **kwargs
+    )
+
+def cc_binary(**kwargs):
+    original_cc_binary(
+        **kwargs
+    )
+
+def cc_test(**kwargs):
+    original_cc_test(
+        **kwargs
+    )
 
 def _bzd_cc_pack_impl(ctx):
     binary = ctx.attr.dep

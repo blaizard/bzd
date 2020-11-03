@@ -3,7 +3,7 @@
 #include "bzd/container/optional.h"
 #include "bzd/container/vector.h"
 #include "bzd/core/assert.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 /**

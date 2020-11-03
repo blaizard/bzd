@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/buffer.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 #include "bzd/utility/forward.h"
 
 namespace bzd {

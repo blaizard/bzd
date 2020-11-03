@@ -4,7 +4,7 @@
 #include "bzd/meta/contains.h"
 #include "bzd/meta/find.h"
 #include "bzd/meta/find_conditional.h"
-#include "bzd/types.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::meta {
 template <class... Ts>

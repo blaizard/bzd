@@ -4,8 +4,8 @@
 #include "bzd/core/assert.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
+#include "bzd/platform/types.h"
 #include "bzd/type_traits/is_constructible.h"
-#include "bzd/types.h"
 
 namespace bzd::impl {
 template <class StorageType, class... Ts>
