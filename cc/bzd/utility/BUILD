@@ -2,7 +2,8 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
 cc_library(
     name = "utility",
-    hdrs = [
+    visibility = ["//visibility:public"],
+    deps = [
         ":aligned_storage",
         ":bit",
         ":container_of",
@@ -11,10 +12,10 @@ cc_library(
         ":min",
         ":move",
         ":offset_of",
+        ":signal",
         ":singleton",
         ":swap",
     ],
-    visibility = ["//visibility:public"],
 )
 
 # ---- Individual items ----
@@ -95,6 +96,20 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "signal",
+    hdrs = [
+        "signal.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/algorithm:copy_n",
+        "//cc/bzd/algorithm:reverse",
+        "//cc/bzd/container:buffer",
         "//cc/bzd/platform:types",
     ],
 )

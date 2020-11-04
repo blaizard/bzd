@@ -1,38 +1,28 @@
 #pragma once
 
-namespace bzd::assert::impl {
-inline void assertHelper(bool test)
-{
-	throw "Assert error";
-}
-
-void backend(const char* message1, const char* message2 = nullptr);
-
-} // namespace bzd::assert::impl
+#include "bzd/container/result.h"
+#include "bzd/core/assert/minimal.h"
+#include "bzd/core/log.h"
+#include "bzd/platform/system.h"
 
 namespace bzd::assert {
-
-constexpr bool isTrueConstexpr(const bool condition)
-{
-	return (condition) ? true : (impl::assertHelper(condition), false);
-}
-
-constexpr void isTrue(const bool condition)
+template <class... Args>
+constexpr void isTrue(const bool condition, Args&&... args)
 {
 	if (!condition)
 	{
-		impl::backend("Assertion failed.\n");
+		bzd::log::print(bzd::forward<Args>(args)...);
+		bzd::platform::panic();
 	}
 }
 
-constexpr void isTrue(const bool condition, const char* message)
+template <class T, class E>
+constexpr void isResult(const Result<T, E>& result)
 {
-	if (!condition)
+	if (!result)
 	{
-		impl::backend("Assertion failed with message: ", message);
+		bzd::assert::isTrue(false, CSTR("Result failed: {}"), result.error());
 	}
 }
-
-void unreachable();
 
 } // namespace bzd::assert

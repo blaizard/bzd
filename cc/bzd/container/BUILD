@@ -20,7 +20,7 @@ cc_library(
         ":string_view",
         ":variant",
         ":vector",
-        "//cc/bzd/core:assert",
+        "//cc/bzd/core:assert_minimal",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_library(
     deps = [
         ":optional",
         ":vector",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
     ],
 )
@@ -99,7 +99,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":reference_wrapper",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_reference",
@@ -131,7 +131,7 @@ cc_library(
     deps = [
         ":span",
         "//cc/bzd/container/impl:single_linked_pool",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
     ],
@@ -156,7 +156,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":reference_wrapper",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:is_reference",
@@ -244,7 +244,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":result",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/meta:type_list",
         "//cc/bzd/meta:union",
         "//cc/bzd/platform:types",
@@ -260,7 +260,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":span",
-        "//cc/bzd/core:assert_header",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
     ],

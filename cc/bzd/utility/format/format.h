@@ -4,7 +4,7 @@
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/vector.h"
-#include "bzd/core/assert.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/core/channel.h"
 #include "bzd/meta/range.h"
 #include "bzd/type_traits/decay.h"

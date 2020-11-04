@@ -1,4 +1,7 @@
 #include "bzd.h"
+#include "example/scheduler.h"
+#include "example/stack.h"
+#include "example/task.h"
 
 #include <chrono>
 #include <iostream>

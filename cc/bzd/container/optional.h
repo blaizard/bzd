@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/reference_wrapper.h"
-#include "bzd/core/assert.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/is_reference.h"

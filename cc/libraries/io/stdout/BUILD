@@ -22,6 +22,6 @@ bzd_cc_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        "//cc:bzd_core",
+        "//cc/bzd/core:channel",
     ],
 )
