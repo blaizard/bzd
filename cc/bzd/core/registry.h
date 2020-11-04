@@ -3,7 +3,7 @@
 #include "bzd/container/map.h"
 #include "bzd/container/result.h"
 #include "bzd/container/string_view.h"
-#include "bzd/core/assert.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/singleton.h"
 

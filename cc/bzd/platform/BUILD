@@ -9,21 +9,27 @@ cc_library(
 )
 
 cc_library(
-    name = "platform",
-    hdrs = [
-        "system.h",
-    ],
+    name = "system",
     visibility = ["//visibility:public"],
-    deps = select({
-        "//tools/bazel_build/config:x86_64": ["//cc/bzd/platform/x86_64_system_v"],
+    deps = [":headers"] + select({
+        "//tools/bazel_build/config:x86_64": [
+            "//cc/bzd/platform/x86_64_system_v/context",
+            "//cc/bzd/platform/panic",
+            "//cc/bzd/platform/log",
+            "//cc/bzd/platform/posix/bootstrap",
+        ],
     }),
 )
 
-exports_files(
-    [
+cc_library(
+    name = "headers",
+    hdrs = [
+        "stack.h",
         "system.h",
+        "types.h",
     ],
-    visibility = [
-        "//cc/bzd/platform:__subpackages__",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core:channel",
     ],
 )

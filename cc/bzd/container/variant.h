@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/result.h"
-#include "bzd/core/assert.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/meta/type_list.h"
 #include "bzd/meta/union.h"
 #include "bzd/platform/types.h"

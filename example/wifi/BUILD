@@ -8,6 +8,6 @@ cc_binary(
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc:bzd",
+        "//cc/bzd",
     ],
 )

@@ -1,12 +1,12 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//tools/bazel_build/rules:cc.bzl", "cc_binary")
 
-bzd_cc_binary(
+cc_binary(
     name = "channel",
     srcs = [
         "main.cc",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc:bzd",
+        "//cc/bzd",
     ],
 )

@@ -6,6 +6,6 @@ cc_binary(
         "main.cc",
     ],
     deps = [
-        "//cc:bzd",
+        "//cc/bzd",
     ],
 )

@@ -19,10 +19,10 @@ void toString(bzd::OChannel& os, const Date& d)
 
 int main()
 {
-	bzd::format::toString(bzd::getOut(), CSTR("The answer is {}.\n"), 42);
+	bzd::format::toString(bzd::platform::getOut(), CSTR("The answer is {}.\n"), 42);
 
 	const Date date{2020, 8, 4};
-	bzd::format::toString(bzd::getOut(), CSTR("This date {} is {:.2%} true!\n"), date, 0.85);
+	bzd::format::toString(bzd::platform::getOut(), CSTR("This date {} is {:.2%} true!\n"), date, 0.85);
 
 	return 0;
 }

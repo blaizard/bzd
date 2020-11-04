@@ -6,7 +6,7 @@ int main()
 	bzd::interface::StringChannel sstream(str);
 
 	bzd::format::toString(str, 12);
-	bzd::getOut().write(str);
+	bzd::platform::getOut().write(str);
 
 	/*	str.clear();
 		bzd::format::toStringBin(sstream, 12);

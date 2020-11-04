@@ -24,7 +24,7 @@ bzd_cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":config_manifest",
-        "//cc:bzd",
+        "//cc/bzd",
         "//cc/libraries/io/digital",
         "//cc/libraries/io/i2c",
         "//cc/libraries/io/stdout",

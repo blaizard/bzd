@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bzd/container/span.h"
-#include "bzd/core/assert.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 
 #include <iostream>

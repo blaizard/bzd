@@ -10,6 +10,7 @@ cc_library(
         ":add_pointer",
         ":add_reference",
         ":add_rvalue_reference",
+        ":add_volatile",
         ":conditional",
         ":decay",
         ":declval",
@@ -100,6 +101,14 @@ cc_library(
         ":is_reference",
         ":is_void",
     ],
+)
+
+cc_library(
+    name = "add_volatile",
+    hdrs = [
+        "add_volatile.h",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
