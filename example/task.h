@@ -47,10 +47,18 @@ public:
 	Task(Callable&& callable) : interface::Task(makePtr(bzd::forward<Callable>(callable))) {}
 
 	// TODO support the creation of 2 tasks of the same type.
-	static FctPtrType makePtr(Callable&& callable)
+	static FctPtrType makePtr(Callable&& instance)
 	{
-		static bzd::typeTraits::Decay<Callable> storage{bzd::forward<Callable>(callable)};
-		return []() { storage(); };
+		using CallableStorageType = bzd::typeTraits::Decay<Callable>;
+		static bool used = false;
+		static CallableStorageType callable{bzd::forward<Callable>(instance)};
+		if (used)
+		{
+			callable.~CallableStorageType();
+			new (&callable) CallableStorageType(bzd::forward<Callable>(instance));
+		}
+		used = true;
+		return []() { callable(); };
 	}
 };
 } // namespace bzd
