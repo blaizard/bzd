@@ -1,6 +1,5 @@
 #include "bzd.h"
 #include "example/scheduler.h"
-#include "example/stack.h"
 #include "example/task.h"
 
 #include <chrono>
@@ -9,8 +8,8 @@
 void fct1();
 void fct2();
 
-bzd::Stack<2000> stack1;
-bzd::Stack<2000> stack2;
+bzd::platform::Stack<2000> stack1;
+bzd::platform::Stack<2000> stack2;
 bzd::Task<decltype(fct1)> task1(fct1);
 bzd::Task<decltype(fct2)> task2(fct2);
 

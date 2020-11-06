@@ -22,7 +22,7 @@ public:
 	{
 		task_ = queue_.front();
 		queue_.pop();
-		task_->start(&mainStack_);
+		task_->start(mainStack_);
 	}
 
 	void yield()
@@ -38,7 +38,7 @@ public:
 private:
 	bzd::Queue<bzd::interface::Task*, 10> queue_;
 	bzd::interface::Task* task_;
-	void* mainStack_ = nullptr;
+	bzd::platform::interface::Stack mainStack_{};
 };
 
 void yield();

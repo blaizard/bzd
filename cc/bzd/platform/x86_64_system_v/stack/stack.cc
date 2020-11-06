@@ -2,21 +2,24 @@
 #include "cc/bzd/platform/system.h"
 
 namespace bzd::impl {
-extern "C" void contextSwitch(void** stack1, void* stack2);
+extern "C" void contextSwitch(bzd::UInt8Type** stack1, bzd::UInt8Type* stack2);
 extern "C" void* contextTask();
 } // namespace bzd::impl
 
-void bzd::platform::contextSwitch(void** stack1, void* stack2) noexcept
+void bzd::platform::interface::Stack::contextSwitch(Stack& stack) noexcept
 {
-	bzd::impl::contextSwitch(stack1, stack2);
+	bzd::impl::contextSwitch(&stack_, stack.stack_);
 }
 
-void* contextTask() noexcept
+/**
+ * Save the context from the stack.
+ */
+/*void* contextTask() noexcept
 {
 	return bzd::impl::contextTask();
-}
+}*/
 
-void bzd::interface::Stack::reset(const FctPtrType fct, void* context)
+void bzd::platform::interface::Stack::reset(const FctPtrType fct, void* context) noexcept
 {
 	auto pStack = last<void*, 16>();
 	// pStack[0] is for the return address
