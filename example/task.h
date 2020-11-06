@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bzd/type_traits/decay.h"
+#include "bzd/utility/forward.h"
 #include "example/task_interface.h"
 
 namespace bzd {
@@ -12,31 +14,43 @@ struct resultOf<T (&)(Args&&...)>
 	typedef T type;
 };
 
-template <class T, class... Args>
+template <typename Callable>
+union storage {
+	storage() {}
+	bzd::typeTraits::Decay<Callable> callable;
+};
+
+template <int, typename Callable, typename Ret, typename... Args>
+auto fnptr_(Callable&& c, Ret (*)(Args...))
+{
+	static bool used = false;
+	static storage<Callable> s;
+	using type = decltype(s.callable);
+
+	if (used) s.callable.~type();
+	new (&s.callable) type(bzd::forward<Callable>(c));
+	used = true;
+
+	return [](Args... args) -> Ret { return Ret(s.callable(bzd::forward<Args>(args)...)); };
+}
+
+template <typename Fn, int N = 0, typename Callable>
+Fn* fnptr(Callable&& c)
+{
+	return fnptr_<N>(bzd::forward<Callable>(c), (Fn*)nullptr);
+}
+
+template <class Callable>
 class Task : public interface::Task
 {
-private:
-	struct Context
-	{
-		const T& callable_;
-	};
-
 public:
-	Task(const T& callable) :
-		interface::Task(static_cast<PtrType>(&context_), reinterpret_cast<FctPtrType>(callable)),
-						//reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>)),
-		context_{callable}
+	Task(Callable&& callable) : interface::Task(makePtr(bzd::forward<Callable>(callable))) {}
+
+	// TODO support the creation of 2 tasks of the same type.
+	static FctPtrType makePtr(Callable&& callable)
 	{
+		static bzd::typeTraits::Decay<Callable> storage{bzd::forward<Callable>(callable)};
+		return []() { storage(); };
 	}
-/*
-	template <class R>
-	static void wrapper()
-	{
-		Context* context = reinterpret_cast<Context*>(bzd::impl::contextTask());
-		context->callable_();
-	}
-*/
-private:
-	Context context_;
 };
 } // namespace bzd

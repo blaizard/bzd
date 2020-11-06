@@ -53,12 +53,3 @@ contextSwitch:
     leaq 0x40(%rsp), %rsp // Prepare stack
 
 	jmp *%r8
-
-/*
-.globl contextTask
-.type contextTask,@function
-
-contextTask:
-    movq 0x8(%rbp), %rax
-    ret
-*/

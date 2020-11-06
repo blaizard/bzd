@@ -5,15 +5,11 @@
 #include "bzd/platform/system.h"
 #include "bzd/platform/types.h"
 
-namespace bzd::impl {
-extern "C" void* contextTask();
-} // namespace bzd::impl
-
 namespace bzd::interface {
 class Task
 {
 public:
-	Task(PtrType context, const FctPtrType fct) : context_(context), fct_(fct) {}
+	Task(const FctPtrType fct) : fct_(fct) {}
 
 	/**
 	 * Bind a task to a stack
@@ -22,7 +18,7 @@ public:
 	{
 		bzd::assert::isTrue(stack_ == nullptr, "Stack already bound to a stack.");
 		stack_ = &stack;
-		stack_->reset(fct_, context_);
+		stack_->reset(fct_);
 	}
 
 	void start(platform::interface::Stack& stack)
@@ -41,7 +37,6 @@ public:
 	}
 
 protected:
-	PtrType const context_;
 	const FctPtrType fct_;
 	platform::interface::Stack* stack_{nullptr};
 };
