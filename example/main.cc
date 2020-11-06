@@ -10,8 +10,6 @@ void fct2();
 
 bzd::platform::Stack<2000> stack1;
 bzd::platform::Stack<2000> stack2;
-bzd::Task<decltype(fct1)> task1(fct1);
-bzd::Task<decltype(fct2)> task2(fct2);
 
 int i = 0;
 
@@ -73,6 +71,25 @@ void fct2()
 
 int main()
 {
+	int i = 10;
+	bzd::Task task1{[&i] {
+		while (i > 0)
+		{
+			std::cout << "Fct 1: " << i-- << std::endl;
+			bzd::yield();
+		}
+		std::cout << "Fct 1: end" << std::endl;
+	}};
+
+	bzd::Task task2{[&i] {
+		while (i > 0)
+		{
+			std::cout << "Fct 2: " << i-- << std::endl;
+			bzd::yield();
+		}
+		std::cout << "Fct 2: end" << std::endl;
+	}};
+
 	task1.bind(stack1);
 	task2.bind(stack2);
 

@@ -11,9 +11,9 @@ class Stack
 public:
 	/**
 	 * Reset the stack for initial use.
-	 * This function sets the entry point in the stack and the context pointer.
+	 * This function sets the entry point in the stack.
 	 */
-	void reset(const FctPtrType fct, void* context) noexcept;
+	void reset(const FctPtrType fct) noexcept;
 
 	void contextSwitch(Stack& stack) noexcept;
 
