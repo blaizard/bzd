@@ -13,10 +13,14 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [":headers"] + select({
         "//tools/bazel_build/config:x86_64": [
-            "//cc/bzd/platform/x86_64_system_v/context",
+            "//cc/bzd/platform/x86_64_system_v/stack",
             "//cc/bzd/platform/panic",
             "//cc/bzd/platform/log",
             "//cc/bzd/platform/posix/bootstrap",
+        ],
+        "@esp32_xtensa_lx6_gcc//:target": [
+            "//cc/bzd/platform/panic",
+            "//cc/bzd/platform/log",
         ],
     }),
 )

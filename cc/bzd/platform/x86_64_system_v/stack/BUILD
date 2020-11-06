@@ -1,10 +1,10 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "context",
+    name = "stack",
     srcs = [
-        "context.S",
-        "context.cc",
+        "stack.S",
+        "stack.cc",
     ],
     tags = ["manual"],
     visibility = ["//cc/bzd/platform:__pkg__"],
