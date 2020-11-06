@@ -54,9 +54,11 @@ contextSwitch:
 
 	jmp *%r8
 
+/*
 .globl contextTask
 .type contextTask,@function
 
 contextTask:
     movq 0x8(%rbp), %rax
     ret
+*/

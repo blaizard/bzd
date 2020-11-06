@@ -23,19 +23,19 @@ private:
 
 public:
 	Task(const T& callable) :
-		interface::Task(static_cast<PtrType>(&context_),
-						reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>)),
+		interface::Task(static_cast<PtrType>(&context_), reinterpret_cast<FctPtrType>(callable)),
+						//reinterpret_cast<FctPtrType>(wrapper<typename resultOf<decltype(callable)>::type>)),
 		context_{callable}
 	{
 	}
-
+/*
 	template <class R>
 	static void wrapper()
 	{
 		Context* context = reinterpret_cast<Context*>(bzd::impl::contextTask());
 		context->callable_();
 	}
-
+*/
 private:
 	Context context_;
 };
