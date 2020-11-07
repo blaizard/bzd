@@ -20,9 +20,11 @@ cc_library(
         ":invoke_result",
         ":is_arithmetic",
         ":is_array",
+        ":is_class",
         ":is_const",
         ":is_constructible",
         ":is_destructible",
+        ":is_enum",
         ":is_floating_point",
         ":is_function",
         ":is_integral",
@@ -32,6 +34,7 @@ cc_library(
         ":is_rvalue_reference",
         ":is_same",
         ":is_trivially_destructible",
+        ":is_union",
         ":is_void",
         ":is_volatile",
         ":remove_const",
@@ -219,6 +222,19 @@ cc_library(
 )
 
 cc_library(
+    name = "is_class",
+    hdrs = [
+        "is_class.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":integral_constant",
+        ":is_union",
+    ],
+)
+
+cc_library(
     name = "is_const",
     hdrs = [
         "is_const.h",
@@ -254,6 +270,18 @@ cc_library(
         ":false_type",
         ":integral_constant",
         ":true_type",
+    ],
+)
+
+cc_library(
+    name = "is_enum",
+    hdrs = [
+        "is_enum.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":integral_constant",
+        ":remove_cv",
     ],
 )
 
@@ -366,6 +394,18 @@ cc_library(
     deps = [
         ":integral_constant",
         ":is_destructible",
+    ],
+)
+
+cc_library(
+    name = "is_union",
+    hdrs = [
+        "is_union.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":integral_constant",
+        ":remove_cv",
     ],
 )
 
