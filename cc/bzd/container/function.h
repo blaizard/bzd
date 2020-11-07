@@ -3,6 +3,7 @@
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/add_pointer.h"
 #include "bzd/type_traits/decay.h"
+#include "bzd/type_traits/invoke_result.h"
 #include "bzd/utility/forward.h"
 
 #include <new> // Used only for placement new
@@ -27,11 +28,16 @@ class Function
 {
 protected:
 	using FctPtrType = bzd::typeTraits::AddPointer<T>;
+	using ReturnType = bzd::typeTraits::InvokeResult<T>;
 
 public:
 	Function(const FctPtrType callable) : callable_{callable} {}
 
-	void operator()() { callable_(); }
+	template <class... Args>
+	ReturnType operator()(Args&&... args)
+	{
+		return callable_(bzd::forward<Args>(args)...);
+	}
 
 private:
 	FctPtrType callable_;
@@ -44,7 +50,7 @@ template <class T>
 class Function : public interface::Function<T>
 {
 private:
-	using FctPtrType = typename interface::Function<T>::FctPtrType;
+	using ReturnType = typename interface::Function<T>::ReturnType;
 
 public:
 	template <class Callable>
@@ -53,8 +59,8 @@ public:
 	}
 
 private:
-	template <class Callable>
-	static FctPtrType makeFunctionPointer(Callable&& instance)
+	template <class Callable, class... Args>
+	static auto makeFunctionPointer(Callable&& instance)
 	{
 		using CallableStorageType = bzd::typeTraits::Decay<Callable>;
 		static bool used = false;
@@ -65,7 +71,7 @@ private:
 			new (&callable) CallableStorageType(bzd::forward<Callable>(instance));
 		}
 		used = true;
-		return []() { callable(); };
+		return [](Args&&... args) -> ReturnType { return callable(bzd::forward<Args>(args)...); };
 	}
 };
 
