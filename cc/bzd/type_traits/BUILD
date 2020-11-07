@@ -20,6 +20,7 @@ cc_library(
         ":invoke_result",
         ":is_arithmetic",
         ":is_array",
+        ":is_base_of",
         ":is_class",
         ":is_const",
         ":is_constructible",
@@ -189,6 +190,7 @@ cc_library(
         ":declval",
         ":enable_if",
         ":false_type",
+        ":is_base_of",
         ":is_function",
         ":true_type",
         "//cc/bzd/container:reference_wrapper",
@@ -217,6 +219,20 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":false_type",
+        ":true_type",
+    ],
+)
+
+cc_library(
+    name = "is_base_of",
+    hdrs = [
+        "is_base_of.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":integral_constant",
+        ":is_class",
         ":true_type",
     ],
 )

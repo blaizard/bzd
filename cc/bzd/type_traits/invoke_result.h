@@ -5,11 +5,10 @@
 #include "bzd/type_traits/declval.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/false_type.h"
+#include "bzd/type_traits/is_base_of.h"
 #include "bzd/type_traits/is_function.h"
 #include "bzd/type_traits/true_type.h"
 #include "bzd/utility/forward.h"
-
-#include <type_traits>
 
 namespace bzd::typeTraits::impl {
 template <class T>
@@ -33,7 +32,7 @@ struct InvokeImpl<MT B::*>
 {
 	template <class T,
 			  class Td = typename bzd::typeTraits::Decay<T>,
-			  class = typename bzd::typeTraits::EnableIf<std::is_base_of<B, Td>::value>>
+			  class = typename bzd::typeTraits::EnableIf<typeTraits::isBaseOf<B, Td>>>
 	static auto get(T&& t) -> T&&;
 
 	template <class T,
@@ -43,7 +42,7 @@ struct InvokeImpl<MT B::*>
 
 	template <class T,
 			  class Td = typename bzd::typeTraits::Decay<T>,
-			  class = typename bzd::typeTraits::EnableIf<!std::is_base_of<B, Td>::value>,
+			  class = typename bzd::typeTraits::EnableIf<!typeTraits::isBaseOf<B, Td>>,
 			  class = typename bzd::typeTraits::EnableIf<!IsReferenceWrapper<Td>::value>>
 	static auto get(T&& t) -> decltype(*bzd::forward<T>(t));
 
