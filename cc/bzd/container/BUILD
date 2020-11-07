@@ -8,6 +8,7 @@ cc_library(
         ":artifact",
         ":btree",
         ":buffer",
+        ":function",
         ":map",
         ":optional",
         ":pool",
@@ -74,6 +75,20 @@ cc_library(
     deps = [
         ":span",
         ":string_view",
+    ],
+)
+
+cc_library(
+    name = "function",
+    hdrs = [
+        "function.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:add_pointer",
+        "//cc/bzd/type_traits:decay",
+        "//cc/bzd/utility:forward",
     ],
 )
 
