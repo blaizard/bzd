@@ -8,6 +8,7 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_test")
     deps = [
         "//cc/bzd/container",
         "//cc/bzd/meta:union",
+        "//cc/bzd/type_traits:is_same",
         "//tools/cc_test",
     ],
 ) for path in glob([

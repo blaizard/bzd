@@ -33,6 +33,13 @@ const int& constReferenceFct()
 	return a;
 }
 
+void voidFctWithArgs(int) {}
+
+int complexFctWithArgs(double, char*)
+{
+	return 0;
+}
+
 TEST(InvokeResult, rawFunctions)
 {
 	{
@@ -57,6 +64,14 @@ TEST(InvokeResult, rawFunctions)
 	}
 	{
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(constReferenceFct)>, const int&>;
+		EXPECT_TRUE(result);
+	}
+	{
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(voidFctWithArgs), int>, void>;
+		EXPECT_TRUE(result);
+	}
+	{
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(complexFctWithArgs), double, char*>, int>;
 		EXPECT_TRUE(result);
 	}
 }
@@ -99,6 +114,16 @@ TEST(InvokeResult, functions)
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, const int&>;
 		EXPECT_TRUE(result);
 	}
+	{
+		bzd::Function<void(int)> callable{[](int) {}};
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), int>, void>;
+		EXPECT_TRUE(result);
+	}
+	{
+		bzd::Function<float(char*, double)> callable{[](char*, double) -> float { return 0.f; }};
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), char*, double>, float>;
+		EXPECT_TRUE(result);
+	}
 }
 
 TEST(InvokeResult, lambda)
@@ -137,6 +162,16 @@ TEST(InvokeResult, lambda)
 			return a;
 		};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, const int&>;
+		EXPECT_TRUE(result);
+	}
+	{
+		auto callable = [](int) {};
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), int>, void>;
+		EXPECT_TRUE(result);
+	}
+	{
+		auto callable = [](int&, char*) -> int { return 0; };
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), int&, char*>, int>;
 		EXPECT_TRUE(result);
 	}
 }

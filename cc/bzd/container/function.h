@@ -23,43 +23,39 @@ namespace bzd::interface {
  * in the smallest block scope, class scope, or namespace scope that contains
  * the corresponding lambda-expression.
  */
-template <class T>
+template <class F, class... Args>
 class Function
 {
 protected:
-	using FctPtrType = bzd::typeTraits::AddPointer<T>;
-	using ReturnType = bzd::typeTraits::InvokeResult<T>;
+	using FctPtrType = bzd::typeTraits::AddPointer<F(Args...)>;
+	using ReturnType = bzd::typeTraits::InvokeResult<F(Args...), Args...>;
 
 public:
 	Function(const FctPtrType callable) : callable_{callable} {}
 
-	template <class... Args>
-	ReturnType operator()(Args&&... args)
-	{
-		return callable_(bzd::forward<Args>(args)...);
-	}
+	ReturnType operator()(Args&&... args) { return callable_(bzd::forward<Args>(args)...); }
 
 private:
 	FctPtrType callable_;
 };
 } // namespace bzd::interface
 
-namespace bzd {
+namespace bzd::impl {
 
-template <class T>
-class Function : public interface::Function<T>
+template <class F, class... Args>
+class Function : public interface::Function<F, Args...>
 {
 private:
-	using ReturnType = typename interface::Function<T>::ReturnType;
+	using ReturnType = typename interface::Function<F, Args...>::ReturnType;
 
 public:
 	template <class Callable>
-	Function(Callable&& instance) : interface::Function<T>{makeFunctionPointer(bzd::forward<Callable>(instance))}
+	Function(Callable&& instance) : interface::Function<F, Args...>{makeFunctionPointer(bzd::forward<Callable>(instance))}
 	{
 	}
 
 private:
-	template <class Callable, class... Args>
+	template <class Callable>
 	static auto makeFunctionPointer(Callable&& instance)
 	{
 		using CallableStorageType = bzd::typeTraits::Decay<Callable>;
@@ -71,8 +67,18 @@ private:
 			new (&callable) CallableStorageType(bzd::forward<Callable>(instance));
 		}
 		used = true;
-		return [](Args&&... args) -> ReturnType { return callable(bzd::forward<Args>(args)...); };
+		return [](Args... args) -> ReturnType { return callable(bzd::forward<Args>(args)...); };
 	}
+};
+
+} // namespace bzd::impl
+
+namespace bzd {
+template <class>
+struct Function;
+template <class F, class... ArgTypes>
+struct Function<F(ArgTypes...)> : impl::Function<F, ArgTypes...>
+{
 };
 
 } // namespace bzd
