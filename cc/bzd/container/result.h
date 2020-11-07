@@ -64,19 +64,19 @@ public:
 
 	constexpr const E& error() const
 	{
-		// bzd::assert::isTrue(isError_);
+		bzd::assert::isTrue(isError_);
 		return error_;
 	}
 
 	constexpr const Value& operator*() const
 	{
-		// bzd::assert::isTrue(!isError_);
+		bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 
 	constexpr Value& operator*()
 	{
-		// bzd::assert::isTrue(!isError_);
+		bzd::assert::isTrue(!isError_);
 		return value_;
 	}
 
