@@ -17,6 +17,7 @@ cc_library(
         ":enable_if",
         ":false_type",
         ":integral_constant",
+        ":invoke_result",
         ":is_arithmetic",
         ":is_array",
         ":is_const",
@@ -172,6 +173,24 @@ cc_library(
         "integral_constant.h",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "invoke_result",
+    hdrs = [
+        "invoke_result.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":decay",
+        ":declval",
+        ":enable_if",
+        ":false_type",
+        ":is_function",
+        ":true_type",
+        "//cc/bzd/container:reference_wrapper",
+        "//cc/bzd/utility:forward",
+    ],
 )
 
 cc_library(

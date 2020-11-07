@@ -6,6 +6,7 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_test")
         path,
     ],
     deps = [
+        "//cc/bzd/container:function",
         "//cc/bzd/type_traits",
         "//tools/cc_test",
     ],
