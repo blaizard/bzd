@@ -1,3 +1,5 @@
+#pragma once
+
 #include "bzd/type_traits/integral_constant.h"
 #include "bzd/type_traits/remove_cv.h"
 
