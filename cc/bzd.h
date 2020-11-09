@@ -29,6 +29,7 @@
 #include "bzd/core/channel.h"
 #include "bzd/core/log.h"
 #include "bzd/core/registry.h"
+#include "bzd/core/task.h"
 
 // Meta
 #include "bzd/meta/choose_nth.h"
@@ -40,7 +41,9 @@
 #include "bzd/meta/union.h"
 
 // Platform
-#include "bzd/platform/system.h"
+#include "bzd/platform/out.h"
+#include "bzd/platform/panic.h"
+#include "bzd/platform/stack.h"
 #include "bzd/platform/types.h"
 
 // Type Traits

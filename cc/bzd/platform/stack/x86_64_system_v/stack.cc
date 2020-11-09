@@ -1,10 +1,11 @@
-#include "cc/bzd/platform/stack.h"
-
-#include "cc/bzd/platform/system.h"
+#include "bzd/platform/stack.h"
+#include "bzd/platform/types.h"
 
 namespace bzd::impl {
 extern "C" void contextSwitch(bzd::UInt8Type** stack1, bzd::UInt8Type* stack2);
 } // namespace bzd::impl
+
+const bzd::platform::interface::Stack::Direction bzd::platform::interface::Stack::direction_ = bzd::platform::interface::Stack::Direction::DOWNWARD;
 
 void bzd::platform::interface::Stack::contextSwitch(Stack& stack) noexcept
 {

@@ -8,6 +8,7 @@ cc_library(
         ":channel",
         ":log",
         ":registry",
+        ":task",
     ],
 )
 
@@ -92,5 +93,20 @@ cc_library(
         "//cc/bzd/container:string_view",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:singleton",
+    ],
+)
+
+cc_library(
+    name = "task",
+    hdrs = [
+        "task.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":assert_minimal_header",
+        "//cc/bzd/container:function",
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/platform:types",
+        "//cc/bzd/platform:system",
     ],
 )

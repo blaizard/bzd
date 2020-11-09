@@ -3,7 +3,7 @@
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
-#include "bzd/platform/system.h"
+#include "bzd/platform/out.h"
 #include "bzd/utility/format/format.h"
 #include "bzd/utility/forward.h"
 

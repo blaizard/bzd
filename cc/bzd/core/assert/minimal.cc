@@ -3,20 +3,20 @@
 #include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
 #include "bzd/core/registry.h"
-#include "bzd/platform/system.h"
+#include "bzd/platform/panic.h"
+#include "bzd/platform/out.h"
+
+namespace {
+	bzd::OChannel& getOChannel()
+	{
+		if (bzd::Registry<bzd::OChannel>::is("stdout")) {
+			return bzd::Registry<bzd::OChannel>::get("stdout");
+		}
+		return bzd::platform::getOut();
+	}
+}
 
 namespace bzd::assert::impl {
-
-class Stub : public bzd::OChannel
-{
-public:
-	bzd::Result<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override { return data.size(); }
-};
-
-bzd::OChannel& getOChannel()
-{
-	return bzd::Registry<bzd::OChannel>::getOrCreate<Stub>("stdout");
-}
 
 void backend(const char* message1, const char* message2)
 {

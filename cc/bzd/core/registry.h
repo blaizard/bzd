@@ -118,6 +118,15 @@ public:
 	}
 
 	/**
+	 * \brief Check wether or not a key available.
+	 */
+	static constexpr bool is(const KeyType& key)
+	{
+		auto result = interface::Registry<Interface>::get();
+		return static_cast<bool>(result);
+	}
+
+	/**
 	 * \brief Get a ressource or create one if it does not exists.
 	 * In order to be created, the ressource must have a default constructor. This is a limitation
 	 * to ensure reproductability.
