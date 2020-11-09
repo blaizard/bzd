@@ -1,4 +1,4 @@
-#include "bzd/platform/system.h"
+#include "bzd/platform/out.h"
 
 #include <iostream>
 

@@ -1,14 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "stack",
+    name = "std",
     srcs = [
-        "stack.S",
-        "stack.cc",
+        "std.cc",
     ],
-    tags = ["manual"],
-    visibility = ["//cc/bzd/platform:__pkg__"],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:headers",
     ],
+    alwayslink = True,
 )

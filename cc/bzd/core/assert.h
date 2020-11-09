@@ -3,7 +3,7 @@
 #include "bzd/container/result.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/core/log.h"
-#include "bzd/platform/system.h"
+#include "bzd/platform/panic.h"
 
 namespace bzd::assert {
 template <class... Args>

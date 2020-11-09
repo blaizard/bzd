@@ -3,7 +3,7 @@
 #include "bzd/container/queue.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/singleton.h"
-#include "example/task_interface.h"
+#include "bzd/core/task.h"
 
 namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>

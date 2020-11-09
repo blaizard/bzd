@@ -1,4 +1,4 @@
-#include "bzd/platform/system.h"
+#include "bzd/platform/panic.h"
 
 void bzd::platform::panic()
 {
