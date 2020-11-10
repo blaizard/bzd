@@ -2,6 +2,10 @@
 
 #include "bzd/platform/types.h"
 
+namespace bzd::interface {
+class Task;
+}
+
 namespace bzd::platform::interface {
 /**
  * Application stack definition
@@ -9,11 +13,15 @@ namespace bzd::platform::interface {
 class Stack
 {
 public:
+	using TaskPtrType = bzd::interface::Task*;
+	typedef void (*FctPtrType)(const TaskPtrType);
+
+public:
 	/**
 	 * Reset the stack for initial use.
 	 * This function sets the entry point in the stack.
 	 */
-	void reset(const FctPtrType fct) noexcept;
+	void reset(const FctPtrType fct, const TaskPtrType task) noexcept;
 
 	void contextSwitch(Stack& stack) noexcept;
 

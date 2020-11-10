@@ -3,18 +3,19 @@
 #include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
 #include "bzd/core/registry.h"
-#include "bzd/platform/panic.h"
 #include "bzd/platform/out.h"
+#include "bzd/platform/panic.h"
 
 namespace {
-	bzd::OChannel& getOChannel()
+bzd::OChannel& getOChannel()
+{
+	if (bzd::Registry<bzd::OChannel>::is("stdout"))
 	{
-		if (bzd::Registry<bzd::OChannel>::is("stdout")) {
-			return bzd::Registry<bzd::OChannel>::get("stdout");
-		}
-		return bzd::platform::getOut();
+		return bzd::Registry<bzd::OChannel>::get("stdout");
 	}
+	return bzd::platform::getOut();
 }
+} // namespace
 
 namespace bzd::assert::impl {
 

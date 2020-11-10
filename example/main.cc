@@ -1,5 +1,4 @@
 #include "bzd.h"
-#include "example/scheduler.h"
 
 #include <chrono>
 #include <iostream>
@@ -70,7 +69,7 @@ void fct2()
 
 int main()
 {
-	int i = 10;
+	int i = 100;
 	bzd::Task task1{[&i] {
 		while (i > 0)
 		{
@@ -96,10 +95,10 @@ int main()
 	std::cout << promise.isReady() << std::endl;
 	std::cout << getTimestampMs() << std::endl;
 
-	bzd::Scheduler::getInstance().addTask(task1);
-	bzd::Scheduler::getInstance().addTask(task2);
+	bzd::getScheduler().addTask(task1);
+	bzd::getScheduler().addTask(task2);
 
-	bzd::Scheduler::getInstance().start();
+	bzd::getScheduler().start();
 
 	return 0;
 }

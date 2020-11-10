@@ -43,7 +43,7 @@ public:
 		return pool_[last_].container_;
 	}
 
-	constexpr void push(T&& value) noexcept
+	constexpr T& push(T&& value) noexcept
 	{
 		auto& item = pool_.reserve();
 		const auto index = pool_.getIndex(item);
@@ -59,6 +59,7 @@ public:
 		}
 
 		item.container_ = bzd::forward<T>(value);
+		return item.container_;
 	}
 
 	constexpr void pop() noexcept
