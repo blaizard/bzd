@@ -29,6 +29,7 @@
 #include "bzd/core/channel.h"
 #include "bzd/core/log.h"
 #include "bzd/core/registry.h"
+#include "bzd/core/scheduler.h"
 #include "bzd/core/task.h"
 
 // Meta

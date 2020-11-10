@@ -8,6 +8,7 @@ cc_library(
         ":channel",
         ":log",
         ":registry",
+        ":scheduler",
         ":task",
     ],
 )
@@ -97,16 +98,33 @@ cc_library(
 )
 
 cc_library(
+    name = "scheduler",
+    srcs = [
+        "scheduler.cc",
+    ],
+    hdrs = [
+        "scheduler.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":task",
+        "//cc/bzd/container:queue",
+        "//cc/bzd/utility:move",
+        "//cc/bzd/utility:singleton",
+    ],
+)
+
+cc_library(
     name = "task",
     hdrs = [
         "task.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":assert_minimal_header",
+        ":assert",
         "//cc/bzd/container:function",
-        "//cc/bzd/utility:forward",
-        "//cc/bzd/platform:types",
         "//cc/bzd/platform:system",
+        "//cc/bzd/platform:types",
+        "//cc/bzd/utility:forward",
     ],
 )

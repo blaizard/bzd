@@ -28,9 +28,9 @@ cc_library(
 cc_library(
     name = "headers",
     hdrs = [
-        "stack.h",
         "out.h",
         "panic.h",
+        "stack.h",
         "types.h",
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],

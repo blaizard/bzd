@@ -1,9 +1,9 @@
 #pragma once
 
 #include "bzd/container/queue.h"
+#include "bzd/core/task.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/singleton.h"
-#include "bzd/core/task.h"
 
 namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
@@ -22,17 +22,20 @@ public:
 	{
 		task_ = queue_.front();
 		queue_.pop();
-		task_->start(mainStack_);
+		task_->resume(mainStack_);
 	}
 
 	void yield()
 	{
+		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED)
+		{
+		}
+
 		// Push back the current task
-		auto* previousTask = task_;
-		queue_.push(bzd::move(task_));
+		auto previousTask = queue_.push(bzd::move(task_));
 		task_ = queue_.front();
 		queue_.pop();
-		previousTask->yield(*task_);
+		task_->resume(previousTask->getStack());
 	}
 
 private:
@@ -48,6 +51,8 @@ void await(T&&)
 {
 	yield();
 }
+
+bzd::Scheduler& getScheduler();
 
 } // namespace bzd
 
