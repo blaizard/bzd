@@ -1,47 +1,103 @@
 #pragma once
 
+#include "bzd/container/optional.h"
 #include "bzd/container/queue.h"
+#include "bzd/core/assert.h"
 #include "bzd/core/task.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/singleton.h"
+#include "bzd/utility/swap.h"
+
+#include <iostream>
 
 namespace bzd {
+
+class MainTask : public bzd::interface::TaskUser
+{
+public:
+	MainTask() : interface::TaskUser{[]() {}} { stack_ = &mainStack_; }
+
+private:
+	bzd::platform::interface::Stack mainStack_{};
+};
+
 class Scheduler : public SingletonThreadLocal<Scheduler>
 {
+private:
+	using TaskPtr = bzd::interface::Task*;
+
 public:
 	/**
 	 * Add a new task to the scheduler
 	 */
-	void addTask(bzd::interface::Task& task)
+	void addTask(TaskPtr task)
 	{
 		// Only add bounded tasks if (task.isBind())
-		queue_.push(&task);
+		bzd::assert::isTrue(task->hasStack(), "Task can only be added if bounded to a stack.");
+		queue_.push(task);
 	}
 
 	void start()
 	{
-		task_ = queue_.front();
+		task_ = &mainTask_;
+		auto maybeTask = getNextTask();
+		if (maybeTask)
+		{
+			resumeTask(*maybeTask);
+		}
+		/*task_ = queue_.front();
 		queue_.pop();
-		task_->resume(mainStack_);
+		mainStack_.contextSwitch(task_->getStack());*/
 	}
 
 	void yield()
 	{
 		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED)
 		{
+			queue_.push(bzd::move(task_));
 		}
 
 		// Push back the current task
-		auto previousTask = queue_.push(bzd::move(task_));
-		task_ = queue_.front();
-		queue_.pop();
-		task_->resume(previousTask->getStack());
+		auto maybeTask = getNextTask();
+		if (maybeTask)
+		{
+			resumeTask(*maybeTask);
+		}
+		else
+		{
+			resumeTask(&mainTask_);
+		}
 	}
 
 private:
-	bzd::Queue<bzd::interface::Task*, 10> queue_;
-	bzd::interface::Task* task_;
-	bzd::platform::interface::Stack mainStack_{};
+	/**
+	 * Get the next task to be executed from teh main task queue.
+	 */
+	bzd::Optional<TaskPtr> getNextTask() noexcept
+	{
+		if (queue_.empty())
+		{
+			return {};
+		}
+		auto task = queue_.front();
+		queue_.pop();
+		return task;
+	}
+
+	/**
+	 * Resume a task and set it as the current task.
+	 */
+	void resumeTask(TaskPtr task)
+	{
+		auto previousTask = task_;
+		task_ = task;
+		previousTask->getStack().contextSwitch(task_->getStack());
+	}
+
+private:
+	bzd::Queue<TaskPtr, 10> queue_;
+	TaskPtr task_;
+	MainTask mainTask_{};
 };
 
 void yield();

@@ -43,7 +43,9 @@ public:
 		return pool_[last_].container_;
 	}
 
-	constexpr T& push(T&& value) noexcept
+	// Needed for perfect forwarding
+	template <class U = T>
+	constexpr T& push(U&& value) noexcept
 	{
 		auto& item = pool_.reserve();
 		const auto index = pool_.getIndex(item);

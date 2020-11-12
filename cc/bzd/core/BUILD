@@ -108,9 +108,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":task",
+        "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:singleton",
+        "//cc/bzd/utility:swap",
     ],
 )
 
