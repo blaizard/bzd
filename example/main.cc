@@ -69,7 +69,7 @@ void fct2()
 
 int main()
 {
-	int i = 100;
+	int i = 10;
 	bzd::Task task1{[&i] {
 		while (i > 0)
 		{
@@ -95,10 +95,13 @@ int main()
 	std::cout << promise.isReady() << std::endl;
 	std::cout << getTimestampMs() << std::endl;
 
-	bzd::getScheduler().addTask(task1);
-	bzd::getScheduler().addTask(task2);
+	bzd::getScheduler().addTask(&task1);
+	bzd::getScheduler().addTask(&task2);
 
 	bzd::getScheduler().start();
+
+	std::cout << "done!" << std::endl;
+	std::cout << getTimestampMs() << std::endl;
 
 	return 0;
 }

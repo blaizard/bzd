@@ -8,27 +8,33 @@ TEST(Scheduler, SimpleScheduling)
 {
 	bzd::String<100> output;
 
-	bzd::platform::Stack<100> stackA;
+	static bzd::platform::Stack<1000> stackA;
+	static bzd::platform::Stack<1000> stackB;
+
 	bzd::Task taskA{[&output] {
 		for (int i = 0; i < 10; ++i)
 		{
 			output += 'A';
+			std::cout << "A" << std::endl;
 			bzd::yield();
 		}
+		std::cout << "done A" << std::endl;
 	}};
 	taskA.bind(stackA);
-	bzd::getScheduler().addTask(taskA);
+	bzd::getScheduler().addTask(&taskA);
 
-	bzd::platform::Stack<100> stackB;
 	bzd::Task taskB{[&output] {
 		for (int i = 0; i < 10; ++i)
 		{
 			output += 'B';
+			std::cout << "B" << std::endl;
 			bzd::yield();
 		}
+		std::cout << "done B" << std::endl;
 	}};
 	taskB.bind(stackB);
-	bzd::getScheduler().addTask(taskB);
+	bzd::getScheduler().addTask(&taskB);
 
-	// bzd::getScheduler().start();
+	bzd::getScheduler().start();
+	std::cout << "OUT!" << std::endl;
 }
