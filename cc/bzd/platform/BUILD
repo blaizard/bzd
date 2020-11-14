@@ -2,6 +2,9 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
 cc_library(
     name = "system",
+    srcs = [
+        "stack.cc",
+    ],
     visibility = ["//visibility:public"],
     deps = [":headers"] + select({
         "//tools/bazel_build/config:x86_64": [

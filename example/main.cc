@@ -6,9 +6,6 @@
 void fct1();
 void fct2();
 
-bzd::platform::Stack<2000> stack1;
-bzd::platform::Stack<2000> stack2;
-
 int i = 0;
 
 void fct1()
@@ -69,6 +66,12 @@ void fct2()
 
 int main()
 {
+	bzd::platform::Stack<2000> stack1;
+	bzd::platform::Stack<2000> stack2;
+
+	stack1.taint(0xaa);
+	stack2.taint(0xaa);
+
 	int i = 10;
 	bzd::Task task1{[&i] {
 		while (i > 0)
