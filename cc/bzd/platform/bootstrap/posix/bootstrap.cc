@@ -1,78 +1,77 @@
 // std
-#include <cstring>
 #include <csignal>
-#include <iostream>
-
+#include <cstring>
 #include <cxxabi.h>
 #include <execinfo.h>
 #include <iomanip>
+#include <iostream>
 #include <memory>
 
 namespace {
 const char* getSignalName(int sig) noexcept
 {
-    switch (sig)
-    {
-    case SIGINT:
-                return "SIGINT";
-            case SIGILL:
-                return "SIGILL";
-            case SIGABRT:
-                return "SIGABRT";
-            case SIGFPE:
-                return "SIGFPE";
-            case SIGSEGV:
-                return "SIGSEGV";
-            case SIGTERM:
-                return "SIGTERM";
-            case SIGHUP:
-                return "SIGHUP";
-            case SIGQUIT:
-                return "SIGQUIT";
-            case SIGTRAP:
-                return "SIGTRAP";
-            case SIGKILL:
-                return "SIGKILL";
-            case SIGBUS:
-                return "SIGBUS";
-            case SIGSYS:
-                return "SIGSYS";
-            case SIGPIPE:
-                return "SIGPIPE";
-            case SIGALRM:
-                return "SIGALRM";
-            case SIGURG:
-                return "SIGURG";
-            case SIGSTOP:
-                return "SIGSTOP";
-            case SIGTSTP:
-                return "SIGTSTP";
-            case SIGCONT:
-                return "SIGCONT";
-            case SIGCHLD:
-                return "SIGCHLD";
-            case SIGTTIN:
-                return "SIGTTIN";
-            case SIGTTOU:
-                return "SIGTTOU";
-            case SIGPOLL:
-                return "SIGPOLL";
-            case SIGXCPU:
-                return "SIGXCPU";
-            case SIGXFSZ:
-                return "SIGXFSZ";
-            case SIGVTALRM:
-                return "SIGVTALRM";
-            case SIGPROF:
-                return "SIGPROF";
-            case SIGUSR1:
-                return "SIGUSR1";
-            case SIGUSR2:
-                return "SIGUSR2";
-            default:
-                return "<unknown>";
-        }
-    }
+	switch (sig)
+	{
+	case SIGINT:
+		return "SIGINT";
+	case SIGILL:
+		return "SIGILL";
+	case SIGABRT:
+		return "SIGABRT";
+	case SIGFPE:
+		return "SIGFPE";
+	case SIGSEGV:
+		return "SIGSEGV";
+	case SIGTERM:
+		return "SIGTERM";
+	case SIGHUP:
+		return "SIGHUP";
+	case SIGQUIT:
+		return "SIGQUIT";
+	case SIGTRAP:
+		return "SIGTRAP";
+	case SIGKILL:
+		return "SIGKILL";
+	case SIGBUS:
+		return "SIGBUS";
+	case SIGSYS:
+		return "SIGSYS";
+	case SIGPIPE:
+		return "SIGPIPE";
+	case SIGALRM:
+		return "SIGALRM";
+	case SIGURG:
+		return "SIGURG";
+	case SIGSTOP:
+		return "SIGSTOP";
+	case SIGTSTP:
+		return "SIGTSTP";
+	case SIGCONT:
+		return "SIGCONT";
+	case SIGCHLD:
+		return "SIGCHLD";
+	case SIGTTIN:
+		return "SIGTTIN";
+	case SIGTTOU:
+		return "SIGTTOU";
+	case SIGPOLL:
+		return "SIGPOLL";
+	case SIGXCPU:
+		return "SIGXCPU";
+	case SIGXFSZ:
+		return "SIGXFSZ";
+	case SIGVTALRM:
+		return "SIGVTALRM";
+	case SIGPROF:
+		return "SIGPROF";
+	case SIGUSR1:
+		return "SIGUSR1";
+	case SIGUSR2:
+		return "SIGUSR2";
+	default:
+		return "<unknown>";
+	}
+}
 
 bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexcept
 {
@@ -165,14 +164,14 @@ void callStack(std::ostream& out) noexcept
 void sigHandler(const int sig, siginfo_t* /*info*/, void* /*secret*/)
 {
 	// Ensure only one instance is running at a time
-    static volatile bool sigHandlerInProgress = false;
-    if (sigHandlerInProgress)
-    {
-        return;
-    }
+	static volatile bool sigHandlerInProgress = false;
+	if (sigHandlerInProgress)
+	{
+		return;
+	}
 	sigHandlerInProgress = true;
 
-    std::cout << "\nCaught signal: " << getSignalName(sig) << std::endl;
+	std::cout << "\nCaught signal: " << getSignalName(sig) << std::endl;
 	callStack(std::cout);
 	std::exit(sig);
 }
