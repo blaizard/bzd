@@ -1,6 +1,6 @@
 .text
-.globl contextSwitch
-.type contextSwitch,@function
+.globl stackSwitch
+.type stackSwitch,@function
 .align 16
 
 /**
@@ -14,7 +14,7 @@
  * |       R12      | RSP + 0x8
  * |    MMX & x87   | RSP
  */
-contextSwitch:
+stackSwitch:
 
 	// Reserve 0x38 bytes on the current stack
 	leaq -0x38(%rsp), %rsp
@@ -34,7 +34,7 @@ contextSwitch:
 	movq %rsp, (%rdi)
 
 	// Move the stack to the new context
-	movq %rsi, %rsp
+	movq (%rsi), %rsp
 
 	// Restore registers
     ldmxcsr (%rsp) // Restore MMX control- and status-word

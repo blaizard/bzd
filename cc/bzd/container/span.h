@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/container/iterator/contiguous.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_const.h"
@@ -127,7 +128,10 @@ public:
 		return data_;
 	}
 
-	constexpr const DataType* data() const noexcept { return data_; }
+	constexpr const DataType* data() const noexcept
+	{
+		return data_;
+	}
 
 	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
 	{

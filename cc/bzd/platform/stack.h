@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/platform/types.h"
+#include <iostream>
 
 namespace bzd::platform::interface {
 
@@ -66,6 +67,17 @@ public: // Exposed functions.
 	 * \param fct The entry point to be set.
 	 */
 	void reset(const FctPtrType fct) noexcept;
+
+	/**
+	 * Taint the stack
+	 */
+	void taint(UInt8Type pattern = 0xff)
+	{
+		for (int i = 0 ; i < size_; ++i)
+		{
+			stackBase_[i] = pattern;
+		}
+	}
 
 protected: // Constructor.
 	StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack(), stackBase_{stack}, size_{size} {}
