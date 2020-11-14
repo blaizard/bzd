@@ -40,13 +40,13 @@ public: // Exposed functions.
 	 *
 	 * \param stack The New stack to be used.
 	 */
-	void contextSwitch(Stack& stack) noexcept;
+	void shift(Stack& stack) noexcept;
 
 protected: // Variables.
 	/**
 	 * The stack pointer.
 	 */
-	UInt8Type* stack_{nullptr};
+	bzd::PtrType stack_{nullptr};
 
 	/**
 	 * The direction to which the stack grows.
@@ -81,7 +81,7 @@ public: // Exposed functions.
 	}
 
 protected: // Constructor.
-	StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack(), stackBase_{stack}, size_{size} {}
+	StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack{}, stackBase_{stack}, size_{size} {}
 
 protected: // Internal functions.
 	/**
@@ -108,7 +108,7 @@ template <const SizeType N>
 class Stack : public interface::StackUser
 {
 public: // Constructor.
-	Stack() noexcept : interface::StackUser(data_, N) {}
+	Stack() noexcept : interface::StackUser{data_, N} {}
 
 private: // Variables.
 	UInt8Type data_[N];

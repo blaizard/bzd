@@ -45,9 +45,6 @@ public:
 		{
 			resumeTask(*maybeTask);
 		}
-		/*task_ = queue_.front();
-		queue_.pop();
-		mainStack_.contextSwitch(task_->getStack());*/
 	}
 
 	void yield()
@@ -91,7 +88,7 @@ private:
 	{
 		auto previousTask = task_;
 		task_ = task;
-		previousTask->getStack().contextSwitch(task_->getStack());
+		previousTask->getStack().shift(task_->getStack());
 	}
 
 private:
