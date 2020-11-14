@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/platform/types.h"
+
 #include <iostream>
 
 namespace bzd::platform::interface {
@@ -73,7 +74,7 @@ public: // Exposed functions.
 	 */
 	void taint(UInt8Type pattern = 0xff)
 	{
-		for (int i = 0 ; i < size_; ++i)
+		for (int i = 0; i < size_; ++i)
 		{
 			stackBase_[i] = pattern;
 		}

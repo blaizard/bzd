@@ -128,10 +128,7 @@ public:
 		return data_;
 	}
 
-	constexpr const DataType* data() const noexcept
-	{
-		return data_;
-	}
+	constexpr const DataType* data() const noexcept { return data_; }
 
 	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
 	{

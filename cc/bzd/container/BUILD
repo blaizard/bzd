@@ -188,7 +188,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
