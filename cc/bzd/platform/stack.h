@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/platform/types.h"
 #include "bzd/algorithm/fill.h"
+#include "bzd/platform/types.h"
 #include "bzd/utility/align_down.h"
 #include "bzd/utility/align_up.h"
 
@@ -73,10 +73,7 @@ public: // Exposed functions.
 	/**
 	 * Taint the stack.
 	 */
-	void taint(UInt8Type pattern = 0xaa) noexcept
-	{
-		bzd::algorithm::fill(stackBase_, stackBase_ + size_, pattern);
-	}
+	void taint(UInt8Type pattern = 0xaa) noexcept { bzd::algorithm::fill(stackBase_, stackBase_ + size_, pattern); }
 
 protected: // Constructor.
 	constexpr StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack{}, stackBase_{stack}, size_{size} {}

@@ -5,9 +5,9 @@ namespace bzd::algorithm {
 template <class InputIt, class T>
 constexpr void fill(InputIt first, InputIt last, const T& value)
 {
-    for (; first != last; ++first)
+	for (; first != last; ++first)
 	{
-        *first = value;
-    }
+		*first = value;
+	}
 }
 } // namespace bzd::algorithm
