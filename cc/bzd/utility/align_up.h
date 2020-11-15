@@ -5,10 +5,10 @@
 namespace bzd {
 /**
  * The directional alignment functions can be used with pointers or integral values to align up.
- * 
+ *
  * \tparam Align Power of 2 alignement.
  * \param value Value to be aligned.
- * 
+ *
  * \return The value at or after than the provided value that is at least alignment bytes aligned.
  */
 template <UInt8Type Align, class T>

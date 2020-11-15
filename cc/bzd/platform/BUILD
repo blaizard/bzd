@@ -14,6 +14,7 @@ cc_library(
             "//cc/bzd/platform/bootstrap/posix",
         ],
         "@esp32_xtensa_lx6_gcc//:target": [
+            "//cc/bzd/platform/stack/stub",
             "//cc/bzd/platform/panic",
             "//cc/bzd/platform/out/std",
         ],
@@ -38,8 +39,8 @@ cc_library(
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
-        "//cc/bzd/core:channel",
         "//cc/bzd/algorithm:fill",
+        "//cc/bzd/core:channel",
         "//cc/bzd/utility:align_down",
         "//cc/bzd/utility:align_up",
     ],
