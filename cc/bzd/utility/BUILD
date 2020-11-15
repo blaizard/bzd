@@ -4,6 +4,8 @@ cc_library(
     name = "utility",
     visibility = ["//visibility:public"],
     deps = [
+        ":align_down",
+        ":align_up",
         ":aligned_storage",
         ":bit",
         ":container_of",
@@ -19,6 +21,28 @@ cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "align_down",
+    hdrs = [
+        "align_down.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "align_up",
+    hdrs = [
+        "align_up.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
 
 cc_library(
     name = "aligned_storage",

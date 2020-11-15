@@ -39,5 +39,8 @@ cc_library(
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
         "//cc/bzd/core:channel",
+        "//cc/bzd/algorithm:fill",
+        "//cc/bzd/utility:align_down",
+        "//cc/bzd/utility:align_up",
     ],
 )
