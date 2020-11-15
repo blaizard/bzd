@@ -6,6 +6,7 @@ cc_library(
     deps = [
         ":copy",
         ":copy_n",
+        ":fill",
         ":reverse",
     ],
 )
@@ -24,6 +25,14 @@ cc_library(
     name = "copy_n",
     hdrs = [
         "copy_n.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "fill",
+    hdrs = [
+        "fill.h",
     ],
     visibility = ["//visibility:public"],
 )

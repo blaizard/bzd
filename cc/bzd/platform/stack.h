@@ -1,8 +1,9 @@
 #pragma once
 
 #include "bzd/platform/types.h"
-
-#include <iostream>
+#include "bzd/algorithm/fill.h"
+#include "bzd/utility/align_down.h"
+#include "bzd/utility/align_up.h"
 
 namespace bzd::platform::interface {
 
@@ -31,7 +32,7 @@ public: // Type.
 	};
 
 public: // Constructor.
-	Stack() noexcept = default;
+	constexpr Stack() noexcept = default;
 
 public: // Exposed functions.
 	/**
@@ -70,27 +71,29 @@ public: // Exposed functions.
 	void reset(const FctPtrType fct) noexcept;
 
 	/**
-	 * Taint the stack
+	 * Taint the stack.
 	 */
-	void taint(UInt8Type pattern = 0xff)
+	void taint(UInt8Type pattern = 0xaa) noexcept
 	{
-		for (int i = 0; i < size_; ++i)
-		{
-			stackBase_[i] = pattern;
-		}
+		bzd::algorithm::fill(stackBase_, stackBase_ + size_, pattern);
 	}
 
 protected: // Constructor.
-	StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack{}, stackBase_{stack}, size_{size} {}
+	constexpr StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack{}, stackBase_{stack}, size_{size} {}
 
-protected: // Internal functions.
+protected: // Internal functions.types
 	/**
 	 * Return the last element of the stack casted to a certain type.
 	 */
 	template <class T, unsigned int Align = 1>
-	T* last()
+	constexpr T* last() noexcept
 	{
-		return reinterpret_cast<T*>(&stackBase_[((size_ - sizeof(T)) / Align) * Align]);
+		static_assert(Align >= 1, "Alignment must be greater than 0.");
+		if (direction_ == Direction::DOWNWARD)
+		{
+			return reinterpret_cast<T*>(bzd::alignDown<Align>(&stackBase_[size_ - sizeof(T)]));
+		}
+		return reinterpret_cast<T*>(bzd::alignUp<Align>(stackBase_));
 	}
 
 private: // Variables.
@@ -108,7 +111,7 @@ template <const SizeType N>
 class Stack : public interface::StackUser
 {
 public: // Constructor.
-	Stack() noexcept : interface::StackUser{data_, N} {}
+	constexpr Stack() noexcept : interface::StackUser{data_, N} {}
 
 private: // Variables.
 	UInt8Type data_[N];
