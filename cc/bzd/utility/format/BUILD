@@ -1,6 +1,26 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
 cc_library(
+    name = "integral",
+    srcs = [
+        "integral.cc",
+    ],
+    hdrs = [
+        "integral.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/algorithm:reverse",
+        "//cc/bzd/container:string",
+        "//cc/bzd/container:string_channel",
+        "//cc/bzd/container:vector",
+        "//cc/bzd/core:channel",
+        "//cc/bzd/type_traits:is_floating_point",
+        "//cc/bzd/type_traits:is_integral",
+    ],
+)
+
+cc_library(
     name = "format",
     srcs = [
         "integral.cc",
@@ -11,9 +31,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/algorithm:reverse",
+        ":integral",
         "//cc/bzd/container:string",
-        "//cc/bzd/container:string_channel",
         "//cc/bzd/container:string_view",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
