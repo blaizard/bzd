@@ -7,7 +7,6 @@
 TEST(Scheduler, SimpleScheduling)
 {
 	bzd::String<100> output;
-
 	static bzd::platform::Stack<1000> stackA;
 	static bzd::platform::Stack<1000> stackB;
 
@@ -34,4 +33,28 @@ TEST(Scheduler, SimpleScheduling)
 	bzd::getScheduler().start();
 
 	EXPECT_STREQ(output.data(), "ABABABABABABABABABAB");
+}
+
+TEST(Scheduler, SingleTaskScheduling)
+{
+	bzd::String<100> output;
+	static bzd::platform::Stack<1000> stack;
+
+	bzd::Task task{[&output] {
+		for (int i = 0; i < 10; ++i)
+		{
+			output += 'A';
+			bzd::yield();
+		}
+	}};
+	task.bind(stack);
+	bzd::getScheduler().addTask(&task);
+	bzd::getScheduler().start();
+
+	EXPECT_STREQ(output.data(), "AAAAAAAAAA");
+}
+
+TEST(Scheduler, NoTaskScheduling)
+{
+	bzd::getScheduler().start();
 }
