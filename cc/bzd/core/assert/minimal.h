@@ -1,12 +1,14 @@
 #pragma once
 
+#include "bzd/utility/source_location.h"
+
 namespace bzd::assert::impl {
 inline void assertHelper(bool test)
 {
 	throw "Assert error";
 }
 
-void backend(const char* message1, const char* message2 = nullptr);
+void backend(const bzd::SourceLocation& location, const char* message1, const char* message2 = nullptr);
 
 } // namespace bzd::assert::impl
 
@@ -17,22 +19,22 @@ constexpr bool isTrueConstexpr(const bool condition)
 	return (condition) ? true : (impl::assertHelper(condition), false);
 }
 
-constexpr void isTrue(const bool condition)
+constexpr void isTrue(const bool condition, const bzd::SourceLocation location = bzd::SourceLocation::current())
 {
 	if (!condition)
 	{
-		impl::backend("Assertion failed.\n");
+		impl::backend(location, "Assertion failed.\n");
 	}
 }
 
-constexpr void isTrue(const bool condition, const char* message)
+constexpr void isTrue(const bool condition, const char* message, const bzd::SourceLocation location = bzd::SourceLocation::current())
 {
 	if (!condition)
 	{
-		impl::backend("Assertion failed with message: ", message);
+		impl::backend(location, "Assertion failed with message: ", message);
 	}
 }
 
-void unreachable();
+void unreachable(const bzd::SourceLocation location = bzd::SourceLocation::current());
 
 } // namespace bzd::assert

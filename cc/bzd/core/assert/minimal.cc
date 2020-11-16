@@ -5,6 +5,7 @@
 #include "bzd/core/registry.h"
 #include "bzd/platform/out.h"
 #include "bzd/platform/panic.h"
+#include "bzd/utility/format/integral.h"
 
 namespace {
 bzd::OChannel& getOChannel()
@@ -19,9 +20,15 @@ bzd::OChannel& getOChannel()
 
 namespace bzd::assert::impl {
 
-void backend(const char* message1, const char* message2)
+void backend(const bzd::SourceLocation& location, const char* message1, const char* message2)
 {
 	auto& out = getOChannel();
+	out.write(bzd::StringView{location.getFile()});
+	bzd::String<10> str;
+	bzd::format::toString(str, location.getLine());
+	out.write(bzd::StringView{":"});
+	out.write(bzd::StringView{str});
+	out.write(bzd::StringView{": "});
 	out.write(bzd::StringView{message1});
 	if (message2)
 	{
@@ -32,9 +39,9 @@ void backend(const char* message1, const char* message2)
 } // namespace bzd::assert::impl
 
 namespace bzd::assert {
-void unreachable()
+void unreachable(const bzd::SourceLocation location)
 {
-	impl::backend("Code unreachable.\n");
+	impl::backend(location, "Code unreachable.\n");
 }
 
 } // namespace bzd::assert

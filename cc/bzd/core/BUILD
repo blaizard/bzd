@@ -35,6 +35,9 @@ cc_library(
         "assert/minimal.h",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility:source_location",
+    ],
 )
 
 cc_library(
@@ -49,6 +52,7 @@ cc_library(
         ":registry",
         "//cc/bzd/container:string_view",
         "//cc/bzd/platform:system",
+        "//cc/bzd/utility/format:integral",
     ],
 )
 

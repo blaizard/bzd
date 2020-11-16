@@ -16,6 +16,7 @@ cc_library(
         ":offset_of",
         ":signal",
         ":singleton",
+        ":source_location",
         ":swap",
     ],
 )
@@ -144,6 +145,17 @@ cc_library(
         "singleton.h",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "source_location",
+    hdrs = [
+        "source_location.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
 )
 
 cc_library(
