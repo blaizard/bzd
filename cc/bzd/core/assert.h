@@ -4,6 +4,7 @@
 #include "bzd/core/assert/minimal.h"
 #include "bzd/core/log.h"
 #include "bzd/platform/panic.h"
+#include "bzd/utility/source_location.h"
 
 namespace bzd::assert {
 template <class... Args>
