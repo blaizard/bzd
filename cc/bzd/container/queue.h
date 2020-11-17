@@ -15,7 +15,7 @@ protected:
 	using Element = typename PoolType::Element;
 
 public:
-	constexpr explicit Queue(const bzd::Span<Element> data) noexcept : pool_(data), first_(PoolType::npos), last_(PoolType::npos) {}
+	constexpr explicit Queue(const bzd::Span<Element> data) noexcept : pool_{data}, first_{PoolType::npos}, last_{PoolType::npos} {}
 
 	constexpr CapacityType capacity() const noexcept { return pool_.capacity(); }
 
@@ -95,7 +95,7 @@ private:
 	using typename interface::Queue<T, CapacityType>::Element;
 
 public:
-	constexpr Queue() : interface::Queue<T, CapacityType>({data_, N}) {}
+	constexpr Queue() : interface::Queue<T, CapacityType>{{data_, N}} {}
 
 private:
 	Element data_[N];

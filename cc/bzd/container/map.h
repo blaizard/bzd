@@ -35,7 +35,7 @@ public:
 				return it;
 			}
 		}
-		return {};
+		return bzd::nullopt;
 	}
 
 	constexpr V& operator[](const K& key) const

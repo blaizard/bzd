@@ -7,8 +7,8 @@
 TEST(Scheduler, SimpleScheduling)
 {
 	bzd::String<100> output;
-	static bzd::platform::Stack<1000> stackA;
-	static bzd::platform::Stack<1000> stackB;
+	static bzd::platform::Stack<5000> stackA;
+	static bzd::platform::Stack<5000> stackB;
 
 	bzd::Task taskA{[&output] {
 		for (int i = 0; i < 10; ++i)
@@ -38,7 +38,7 @@ TEST(Scheduler, SimpleScheduling)
 TEST(Scheduler, SingleTaskScheduling)
 {
 	bzd::String<100> output;
-	static bzd::platform::Stack<1000> stack;
+	static bzd::platform::Stack<5000> stack;
 
 	bzd::Task task{[&output] {
 		for (int i = 0; i < 10; ++i)
