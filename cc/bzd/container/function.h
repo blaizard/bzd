@@ -33,10 +33,10 @@ protected:
 public:
 	Function(const FctPtrType callable) : callable_{callable} {}
 
-	ReturnType operator()(Args&&... args) { return callable_(bzd::forward<Args>(args)...); }
+	ReturnType operator()(Args&&... args) const { return callable_(bzd::forward<Args>(args)...); }
 
 private:
-	FctPtrType callable_;
+	const FctPtrType callable_;
 };
 } // namespace bzd::interface
 

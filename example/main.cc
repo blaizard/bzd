@@ -26,16 +26,60 @@ public:
 };
 */
 
-template <class T>
-class Promise
+class Awaiter
 {
 public:
-	Promise(T&& callack) : callack_{callack} {}
-	bool isReady() const { return callack_(); }
+	/**
+	 * Used when polling
+	 */
+	bool isReady();
+};
+
+// Polling typ promise
+// event type promise
+
+template <class V>
+class Resolve
+{
+public:
+	Resolve(V&& value) : value_{bzd::forward<V>(value)} {}
+
+	V value_{};
+};
+
+template <class V>
+class Reject
+{
+public:
+	Reject(V&& value) : value_{bzd::forward<V>(value)} {}
+
+	V value_{};
+};
+
+template <class V, class E>
+using PromiseReturnType = bzd::Optional<bzd::Result<V, E>>;
+
+template <class V, class E, class T>
+class Promise
+{
+private:
+	using ReturnType = PromiseReturnType<V, E>;
+
+public:
+	Promise(T&& callack) : callack_{bzd::forward<T>(callack)} {}
+	void poll() { state_ = callack_(); }
+	bool isReady() const { return static_cast<bool>(state_); }
 
 private:
-	T callack_;
+	ReturnType state_{static_cast<bool>(false)};
+	const bzd::Function<ReturnType(void)> callack_;
 };
+
+template <class V, class E, class T>
+Promise<V, E, T> makePromise(T&& callback)
+{
+	return Promise<V, E, T>(bzd::forward<T>(callback));
+}
 
 uint64_t getTimestampMs()
 {
@@ -45,13 +89,15 @@ uint64_t getTimestampMs()
 auto delay(const int timeMs)
 {
 	const auto timestampMs = getTimestampMs();
-	return Promise([timestampMs, timeMs]() {
+	// 3 states: no result, resolve, reject
+	return makePromise<bool, int>([timestampMs, timeMs]() -> PromiseReturnType<bool, int> {
 		const auto currentTimestampMs = getTimestampMs();
 		if (currentTimestampMs < timestampMs + timeMs)
 		{
-			return false;
+			return bzd::nullopt;
 		}
-		return true;
+		return false;
+		// return bzd::makeError(12);
 	});
 }
 

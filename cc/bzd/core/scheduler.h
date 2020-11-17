@@ -8,8 +8,6 @@
 #include "bzd/utility/singleton.h"
 #include "bzd/utility/swap.h"
 
-#include <iostream>
-
 namespace bzd {
 
 class MainTask : public bzd::interface::TaskUser
@@ -56,6 +54,7 @@ public:
 
 		// Push back the current task
 		auto maybeTask = getNextTask();
+
 		if (maybeTask)
 		{
 			resumeTask(*maybeTask);
@@ -74,7 +73,7 @@ private:
 	{
 		if (queue_.empty())
 		{
-			return {};
+			return bzd::nullopt;
 		}
 		auto task = queue_.front();
 		queue_.pop();

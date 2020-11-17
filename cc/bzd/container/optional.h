@@ -9,6 +9,12 @@
 #include "bzd/utility/move.h"
 
 namespace bzd::impl {
+
+struct OptionalNull
+{
+	explicit constexpr OptionalNull() noexcept {}
+};
+
 template <class T>
 class Optional
 {
@@ -17,9 +23,14 @@ private:
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 public:
-	constexpr Optional(T&& value) : isValue_(true), value_(bzd::forward<T>(value)) {}
+	template <class U>
+	constexpr Optional(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
+	{
+	}
 
-	constexpr Optional() : isValue_(false), empty_{} {}
+	constexpr Optional(const OptionalNull& null) : Optional{} {}
+
+	explicit constexpr Optional() : isValue_{false}, empty_{} {}
 
 	constexpr operator bool() const noexcept { return isValue_; }
 
@@ -49,6 +60,11 @@ public:
 		return &value_;
 	}
 
+	~Optional()
+	{
+		if (isValue_) value_.~ValueContainer();
+	}
+
 protected:
 	const bool isValue_;
 	union {
@@ -59,6 +75,9 @@ protected:
 } // namespace bzd::impl
 
 namespace bzd {
+
+constexpr impl::OptionalNull nullopt{};
+
 /**
  * \brief Type managing an optional contained value, i.e. a value that may or
  * may not be present.
