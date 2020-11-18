@@ -7,6 +7,7 @@ cc_library(
         ":assert",
         ":channel",
         ":log",
+        ":promise",
         ":registry",
         ":scheduler",
         ":task",
@@ -86,6 +87,18 @@ cc_library(
 )
 
 cc_library(
+    name = "promise",
+    hdrs = [
+        "promise.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:result",
+        "//cc/bzd/container:optional",
+    ],
+)
+
+cc_library(
     name = "registry",
     hdrs = [
         "registry.h",
@@ -112,6 +125,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":task",
+        ":promise",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
         "//cc/bzd/utility:move",

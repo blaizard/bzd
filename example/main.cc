@@ -38,53 +38,23 @@ public:
 // Polling typ promise
 // event type promise
 
-template <class V>
-class Resolve
-{
-public:
-	Resolve(V&& value) : value_{bzd::forward<V>(value)} {}
-
-	V value_{};
-};
-
-template <class V>
-class Reject
-{
-public:
-	Reject(V&& value) : value_{bzd::forward<V>(value)} {}
-
-	V value_{};
-};
-
 template <class V, class E>
 using PromiseReturnType = bzd::Optional<bzd::Result<V, E>>;
-/*
-namespace bzd::interface
-{
-	class Promise
-	{
-	public:
-		Promise() = default;
 
-		virtual void poll() = 0;
-		virtual bool isReady() const = 0;
-		virtual ~Promise() = default;
-	};
-}
-*/
 template <class V, class E, class T>
-class Promise //: bzd::interface::Promise
+class Promise : public bzd::Promise<V, E>
 {
 private:
 	using ReturnType = PromiseReturnType<V, E>;
+	using bzd::Promise<V, E>::setResult;
 
 public:
-	Promise(T&& callack) : /*bzd::interface::Promise{},*/ callack_{bzd::forward<T>(callack)} {}
-	void poll() { state_ = callack_(); }
-	bool isReady() const { return static_cast<bool>(state_); }
+	using bzd::Promise<V, E>::isReady;
+
+	Promise(T&& callack) : bzd::Promise<V, E>{}, callack_{bzd::forward<T>(callack)} {}
+	bool poll() override { setResult(callack_()); return isReady(); }
 
 private:
-	ReturnType state_{static_cast<bool>(false)};
 	const bzd::Function<ReturnType(void)> callack_;
 };
 
@@ -103,14 +73,13 @@ auto delay(const int timeMs)
 {
 	const auto timestampMs = getTimestampMs();
 	// 3 states: no result, resolve, reject
-	return makePromise<bool, int>([timestampMs, timeMs]() -> PromiseReturnType<bool, int> {
+	return makePromise<uint64_t, int>([timestampMs, timeMs]() -> PromiseReturnType<uint64_t, int> {
 		const auto currentTimestampMs = getTimestampMs();
 		if (currentTimestampMs < timestampMs + timeMs)
 		{
 			return bzd::nullopt;
 		}
-		return false;
-		// return bzd::makeError(12);
+		return currentTimestampMs;
 	});
 }
 
@@ -132,10 +101,13 @@ int main()
 	stack2.taint(0xaa);
 
 	int i = 10;
-	bzd::Task task1{[&i] {
+	bzd::Task task1{[] {
+		int i = 10;
 		while (i > 0)
 		{
-			std::cout << "Fct 1: " << i-- << std::endl;
+			auto promise = delay(500);
+			auto result = bzd::await(promise);
+			std::cout << "Fct 1: " << i-- << "  " << *result << std::endl;
 			bzd::yield();
 		}
 		std::cout << "Fct 1: end" << std::endl;
