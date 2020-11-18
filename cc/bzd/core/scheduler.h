@@ -4,6 +4,7 @@
 #include "bzd/container/queue.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/task.h"
+#include "bzd/core/promise.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/singleton.h"
 #include "bzd/utility/swap.h"
@@ -43,6 +44,16 @@ public:
 		{
 			resumeTask(*maybeTask);
 		}
+	}
+
+	template <class V, class E>
+	typename bzd::Promise<V, E>::ResultType&& await(bzd::Promise<V, E>& promise)
+	{
+		while (!promise.poll())
+		{
+			bzd::yield();
+		}
+		return bzd::move(promise.getResult());
 	}
 
 	void yield()
@@ -96,15 +107,14 @@ private:
 	MainTask mainTask_{};
 };
 
+bzd::Scheduler& getScheduler();
 void yield();
 
-template <class T>
-void await(T&&)
+template <class V, class E>
+typename bzd::Promise<V, E>::ResultType&& await(bzd::Promise<V, E>& promise)
 {
-	yield();
+	return bzd::move(getScheduler().await(promise));
 }
-
-bzd::Scheduler& getScheduler();
 
 } // namespace bzd
 

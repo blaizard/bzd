@@ -36,7 +36,8 @@ private:
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 public:
-	constexpr Result(T&& value) : isError_(false), value_(bzd::forward<T>(value)) {}
+	template <class U>
+	constexpr Result(U&& value) : isError_(false), value_(bzd::forward<U>(value)) {}
 
 	template <class U>
 	constexpr Result(impl::Error<U>&& u) : isError_(true), error_(u.error_)

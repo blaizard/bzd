@@ -22,7 +22,7 @@ private:
 	using Value = bzd::typeTraits::RemoveReference<T>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
-public:
+public: // Constructors
 	template <class U>
 	constexpr Optional(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
@@ -30,8 +30,11 @@ public:
 
 	constexpr Optional(const OptionalNull& null) : Optional{} {}
 
-	// Move constructor
-	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
+	explicit constexpr Optional() : isValue_{false}, empty_{} {}
+
+public: // Move
+
+    constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
 
 	// Move assignment
 	constexpr void operator=(Optional<T>&& optional)
@@ -40,8 +43,7 @@ public:
 		if (isValue_) value_ = bzd::move(optional.value_);
 	}
 
-	explicit constexpr Optional() : isValue_{false}, empty_{} {}
-
+public:
 	constexpr operator bool() const noexcept { return isValue_; }
 
 	constexpr const Value& valueOr(const Value& defaultValue) const { return (isValue_) ? value_ : defaultValue; }
