@@ -44,12 +44,16 @@ public:
 	}
 
 	// Move constructor
-	constexpr Result(Result<T, E>&& e) : isError_(e.isError_)
+	constexpr Result(Result<T, E>&& result) { *this = bzd::move(result); }
+
+	// Move assignment
+	constexpr void operator=(Result<T, E>&& result)
 	{
+		isError_ = result.isError_;
 		if (isError_)
-			error_ = bzd::move(e.error_);
+			error_ = bzd::move(result.error_);
 		else
-			value_ = bzd::move(e.value_);
+			value_ = bzd::move(result.value_);
 	}
 
 	~Result()
@@ -93,7 +97,7 @@ public:
 	}
 
 protected:
-	const bool isError_;
+	bool isError_;
 	union {
 		ValueContainer value_;
 		E error_;
