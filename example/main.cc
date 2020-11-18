@@ -58,15 +58,28 @@ public:
 
 template <class V, class E>
 using PromiseReturnType = bzd::Optional<bzd::Result<V, E>>;
+/*
+namespace bzd::interface
+{
+	class Promise
+	{
+	public:
+		Promise() = default;
 
+		virtual void poll() = 0;
+		virtual bool isReady() const = 0;
+		virtual ~Promise() = default;
+	};
+}
+*/
 template <class V, class E, class T>
-class Promise
+class Promise //: bzd::interface::Promise
 {
 private:
 	using ReturnType = PromiseReturnType<V, E>;
 
 public:
-	Promise(T&& callack) : callack_{bzd::forward<T>(callack)} {}
+	Promise(T&& callack) : /*bzd::interface::Promise{},*/ callack_{bzd::forward<T>(callack)} {}
 	void poll() { state_ = callack_(); }
 	bool isReady() const { return static_cast<bool>(state_); }
 

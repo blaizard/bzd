@@ -30,6 +30,16 @@ public:
 
 	constexpr Optional(const OptionalNull& null) : Optional{} {}
 
+	// Move constructor
+	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
+
+	// Move assignment
+	constexpr void operator=(Optional<T>&& optional)
+	{
+		isValue_ = optional.isValue_;
+		if (isValue_) value_ = bzd::move(optional.value_);
+	}
+
 	explicit constexpr Optional() : isValue_{false}, empty_{} {}
 
 	constexpr operator bool() const noexcept { return isValue_; }
@@ -66,7 +76,7 @@ public:
 	}
 
 protected:
-	const bool isValue_;
+	bool isValue_;
 	union {
 		bzd::UInt8Type empty_;
 		ValueContainer value_;
