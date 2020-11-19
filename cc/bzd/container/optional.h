@@ -33,8 +33,7 @@ public: // Constructors
 	explicit constexpr Optional() : isValue_{false}, empty_{} {}
 
 public: // Move
-
-    constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
+	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
 
 	// Move assignment
 	constexpr void operator=(Optional<T>&& optional)

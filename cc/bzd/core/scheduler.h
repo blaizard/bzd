@@ -3,32 +3,30 @@
 #include "bzd/container/optional.h"
 #include "bzd/container/queue.h"
 #include "bzd/core/assert.h"
-#include "bzd/core/task.h"
 #include "bzd/core/promise.h"
+#include "bzd/core/task.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/singleton.h"
 #include "bzd/utility/swap.h"
 
-namespace bzd
-{
-	bzd::Scheduler& getScheduler();
-	void yield();
-}
+namespace bzd {
+bzd::Scheduler& getScheduler();
+void yield();
+} // namespace bzd
 
-namespace bzd::impl
+namespace bzd::impl {
+struct AwaitType
 {
-	struct AwaitType
-	{
-		explicit constexpr AwaitType() noexcept {}
-	};
-	constexpr AwaitType await_{};
+	explicit constexpr AwaitType() noexcept {}
+};
+constexpr AwaitType await_{};
 
-	template <class T>
-	auto&& operator>(const AwaitType&, T&& promise)
-	{
-		return bzd::move(getScheduler().await(promise));
-	}
+template <class T>
+auto&& operator>(const AwaitType&, T&& promise)
+{
+	return bzd::move(getScheduler().await(promise));
 }
+} // namespace bzd::impl
 
 namespace bzd {
 
@@ -131,4 +129,4 @@ private:
 } // namespace bzd
 
 // Syntax suggar for await operator
-#define await bzd::impl::await_>
+#define await bzd::impl::await_ >
