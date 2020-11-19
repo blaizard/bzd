@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/container/result.h"
 #include "bzd/container/optional.h"
+#include "bzd/container/result.h"
 
 namespace bzd::interface {
 class Promise

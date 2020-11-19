@@ -93,8 +93,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container:result",
         "//cc/bzd/container:optional",
+        "//cc/bzd/container:result",
     ],
 )
 
@@ -124,8 +124,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":task",
         ":promise",
+        ":task",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
         "//cc/bzd/utility:move",
