@@ -9,6 +9,27 @@
 #include "bzd/utility/singleton.h"
 #include "bzd/utility/swap.h"
 
+namespace bzd
+{
+	bzd::Scheduler& getScheduler();
+	void yield();
+}
+
+namespace bzd::impl
+{
+	struct AwaitType
+	{
+		explicit constexpr AwaitType() noexcept {}
+	};
+	constexpr AwaitType await_{};
+
+	template <class T>
+	auto&& operator>(const AwaitType&, T&& promise)
+	{
+		return bzd::move(getScheduler().await(promise));
+	}
+}
+
 namespace bzd {
 
 class MainTask : public bzd::interface::TaskUser
@@ -107,15 +128,7 @@ private:
 	MainTask mainTask_{};
 };
 
-bzd::Scheduler& getScheduler();
-void yield();
-
-template <class V, class E>
-typename bzd::Promise<V, E>::ResultType&& await(bzd::Promise<V, E>& promise)
-{
-	return bzd::move(getScheduler().await(promise));
-}
-
 } // namespace bzd
 
-#define bzd_yield bzd::yield()
+// Syntax suggar for await operator
+#define await bzd::impl::await_>

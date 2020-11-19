@@ -1,17 +1,18 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstddef>
 
 namespace bzd {
 /**
  * \brief Memory pointer type.
  */
-typedef void* PtrType;
+using PtrType = void*;
 
 /**
  * \brief Integer type capable of holding a memory pointer
  */
-typedef intptr_t IntPtrType;
+using IntPtrType = intptr_t;
 
 /**
  * \brief Function pointer type.
@@ -22,50 +23,55 @@ typedef void (*FctPtrType)();
  * \brief Unsigned integer that can store the maximum size of a theoretically
  * possible object of any type.
  */
-typedef unsigned long SizeType;
+using SizeType = std::size_t;
 
 /**
  * \brief Boolean type.
  */
-typedef bool BoolType;
+using BoolType = bool;
 
 /**
  * \brief Signed integer type with a fixed width of 8-bit.
  */
-typedef int8_t Int8Type;
+using Int8Type = std::int8_t;
 
 /**
  * \brief Signed integer type with a fixed width of 16-bit.
  */
-typedef int16_t Int16Type;
+using Int16Type = std::int16_t;
 
 /**
  * \brief Signed integer type with a fixed width of 32-bit.
  */
-typedef int32_t Int32Type;
+using Int32Type = std::int32_t;
 
 /**
  * \brief Signed integer type with a fixed width of 64-bit.
  */
-typedef int64_t Int64Type;
+using Int64Type = std::int64_t;
 
 /**
  * \brief Unsigned integer type with a fixed width of 8-bit.
  */
-typedef uint8_t UInt8Type;
+using UInt8Type = std::uint8_t;
 
 /**
  * \brief Unsigned integer type with a fixed width of 16-bit.
  */
-typedef uint16_t UInt16Type;
+using UInt16Type = std::uint16_t;
 
 /**
  * \brief Unsigned integer type with a fixed width of 32-bit.
  */
-typedef uint32_t UInt32Type;
+using UInt32Type = std::uint32_t;
 
 /**
  * \brief Unsigned integer type with a fixed width of 64-bit.
  */
-typedef uint64_t UInt64Type;
+using UInt64Type = std::uint64_t;
+
+/**
+ * \brief Clock value type.
+ */
+using ClockTickType = std::uint32_t;
 } // namespace bzd
