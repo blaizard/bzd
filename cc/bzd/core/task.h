@@ -91,4 +91,5 @@ private:
 		return []() { bind(); };
 	}
 };
+
 } // namespace bzd
