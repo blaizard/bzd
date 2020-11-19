@@ -14,20 +14,6 @@ bzd::Scheduler& getScheduler();
 void yield();
 } // namespace bzd
 
-namespace bzd::impl {
-struct AwaitType
-{
-	explicit constexpr AwaitType() noexcept {}
-};
-constexpr AwaitType await_{};
-
-template <class T>
-auto&& operator>(const AwaitType&, T&& promise)
-{
-	return bzd::move(getScheduler().await(promise));
-}
-} // namespace bzd::impl
-
 namespace bzd {
 
 class MainTask : public bzd::interface::TaskUser
@@ -127,6 +113,20 @@ private:
 };
 
 } // namespace bzd
+
+namespace bzd::impl {
+struct AwaitType
+{
+	explicit constexpr AwaitType() noexcept {}
+};
+constexpr AwaitType await_{};
+
+template <class T>
+auto&& operator>(const AwaitType&, T&& promise)
+{
+	return bzd::move(getScheduler().await(promise));
+}
+} // namespace bzd::impl
 
 // Syntax suggar for await operator
 #define await bzd::impl::await_ >
