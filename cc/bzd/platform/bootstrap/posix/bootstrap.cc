@@ -185,15 +185,11 @@ bool installBootstrap()
 	sa.sa_sigaction = static_cast<void (*)(int, siginfo_t*, void*)>(sigHandler);
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART | SA_SIGINFO;
+
 	for (const auto& signal :
-		 {SIGABRT, SIGALRM, SIGBUS,	 SIGCHLD, SIGCONT, SIGFPE,	SIGHUP,	 SIGILL,  SIGINT, SIGKILL, SIGPIPE, SIGQUIT,   SIGSEGV, SIGSTOP,
-		  SIGTERM, SIGTSTP, SIGTTIN, SIGTTOU, SIGUSR1, SIGUSR2, SIGPOLL, SIGPROF, SIGSYS, SIGTRAP, SIGURG,	SIGVTALRM, SIGXCPU, SIGXFSZ})
+		 {SIGSEGV, SIGFPE, SIGILL, SIGSYS, SIGABRT, SIGBUS, SIGTERM, SIGINT, SIGHUP})
 	{
 		sigaction(signal, &sa, nullptr);
-		/*
-		if (sigaction(signal, &sa, nullptr) < 0) {
-			return false;
-		}*/
 	}
 	return true;
 }
