@@ -105,8 +105,9 @@ int main()
 		int i = 10;
 		while (i > 0)
 		{
-			auto promise = delay(500);
-			auto result = bzd::await(promise);
+			//auto promise = delay(500);
+			auto result = await delay(500);
+			//auto result = bzd::await(promise);
 			std::cout << "Fct 1: " << i-- << "  " << *result << std::endl;
 			bzd::yield();
 		}
