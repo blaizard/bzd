@@ -6,7 +6,7 @@
 
 #define EXPECT_TRUE(condition) BZDTEST_TEST_BOOLEAN_(condition, condition, true, BZDTEST_FAIL_NONFATAL_)
 
-#define EXPECT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!condition, condition, false, BZDTEST_FAIL_NONFATAL_)
+#define EXPECT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_NONFATAL_)
 
 #define EXPECT_EQ(expression1, expression2) BZDTEST_TEST_EQ_(expression1, expression2, BZDTEST_FAIL_NONFATAL_)
 
@@ -18,7 +18,7 @@
 
 #define ASSERT_TRUE(condition) BZDTEST_TEST_BOOLEAN_(condition, condition, true, BZDTEST_FAIL_FATAL_)
 
-#define ASSERT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!condition, condition, false, BZDTEST_FAIL_FATAL_)
+#define ASSERT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_FATAL_)
 
 #define ASSERT_EQ(expression1, expression2) BZDTEST_TEST_EQ_(expression1, expression2, BZDTEST_FAIL_FATAL_)
 

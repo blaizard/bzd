@@ -2,7 +2,7 @@
 
 #include "cc_test/test.h"
 
-TEST(NamedType, simple)
+TEST(NamedType, arithmetic)
 {
 	using Kilo = bzd::NamedType<int, struct KiloTag, bzd::Arithmetic>;
 	Kilo kg{12};
@@ -66,5 +66,36 @@ TEST(NamedType, simple)
 		const auto result = kg % number;
 		EXPECT_EQ(kg.get(), 2);
 		EXPECT_EQ(result.get(), 2);
+	}
+
+	// Comparable
+	{
+		const Kilo equal{2};
+		const Kilo lower{-3};
+		const Kilo greater{42};
+
+		EXPECT_FALSE(kg == lower);
+		EXPECT_FALSE(kg == greater);
+		EXPECT_TRUE(kg == equal);
+
+		EXPECT_TRUE(kg != lower);
+		EXPECT_TRUE(kg != greater);
+		EXPECT_FALSE(kg != equal);
+
+		EXPECT_TRUE(kg > lower);
+		EXPECT_FALSE(kg > greater);
+		EXPECT_FALSE(kg > equal);
+
+		EXPECT_TRUE(kg >= lower);
+		EXPECT_FALSE(kg >= greater);
+		EXPECT_TRUE(kg >= equal);
+
+		EXPECT_FALSE(kg < lower);
+		EXPECT_TRUE(kg < greater);
+		EXPECT_FALSE(kg < equal);
+
+		EXPECT_FALSE(kg <= lower);
+		EXPECT_TRUE(kg <= greater);
+		EXPECT_TRUE(kg <= equal);
 	}
 }
