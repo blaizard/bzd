@@ -28,7 +28,6 @@ class NamedType : public Skills<NamedType<T, PhantomType, Skills...>>...
 public: // Constructors.
 	constexpr NamedType() noexcept = default;
 	explicit constexpr NamedType(const T& value) noexcept : value_{value} {}
-
 	explicit constexpr NamedType(T&& value) noexcept : value_{bzd::move(value)} {}
 
 public: // Accessors.
