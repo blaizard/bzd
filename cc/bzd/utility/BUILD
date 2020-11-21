@@ -14,6 +14,7 @@ cc_library(
         ":min",
         ":move",
         ":offset_of",
+        ":ratio",
         ":signal",
         ":singleton",
         ":source_location",
@@ -118,6 +119,17 @@ cc_library(
     name = "offset_of",
     hdrs = [
         "offset_of.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "ratio",
+    hdrs = [
+        "ratio.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
