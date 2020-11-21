@@ -5,10 +5,10 @@ cc_library(
     srcs = [
         "clock.cc",
     ],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:headers",
     ],
-    tags = ["manual"],
     alwayslink = True,
 )
