@@ -192,7 +192,10 @@
 				const nbSuccessfullBuilds = buildsLast30Days.reduce((total, build) => {
 					return total + (build.status == "success" ? 1 : 0);
 				}, 0);
-				return Math.round((nbSuccessfullBuilds / buildsLast30Days.length) * 100);
+				const nbFailureSuccessdBuilds = buildsLast30Days.reduce((total, build) => {
+					return total + (build.status in ["success", "failure"] ? 1 : 0);
+				}, 0);
+				return Math.round((nbSuccessfullBuilds / nbFailureSuccessdBuilds) * 100);
 			},
 		},
 		methods: {
