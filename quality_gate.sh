@@ -2,7 +2,7 @@
 
 set -e
 
-EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$HOME/.yarn"
+EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$HOME/.yarn $@"
 
 # Compile and test the different configurations
 ./tools/bazel test ... --output_groups=default,metadata --config=dev --platform_suffix=_dev $EXTRA_FLAGS
