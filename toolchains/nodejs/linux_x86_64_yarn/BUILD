@@ -6,8 +6,8 @@ sh_binary_wrapper(
     name = "node",
     binary = "@node//:node",
     command = select({
-        "//tools/bazel_build/config:dev": "export NODE_ENV=development && {binary} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
-        "//conditions:default": "export NODE_ENV=production && {binary} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
+        "//tools/bazel_build/config:dev": "export NODE_ENV=development && {binary} --preserve-symlinks --preserve-symlinks-main --experimental-json-modules --use-strict $@",
+        "//conditions:default": "export NODE_ENV=production && {binary} --preserve-symlinks --preserve-symlinks-main --experimental-json-modules --use-strict $@",
     }),
     visibility = ["//visibility:public"],
 )
