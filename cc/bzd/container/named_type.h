@@ -78,7 +78,7 @@ template <class T>
 class Addable : public impl::NamedTypeCRTP<T, Addable>
 {
 public:
-	constexpr T operator+(const T& other) const { return T(this->underlying().get() + other.get()); }
+	constexpr T operator+(const T& other) const { return T{this->underlying().get() + other.get()}; }
 	constexpr T& operator+=(const T& other)
 	{
 		this->underlying().get() += other.get();
@@ -90,7 +90,7 @@ template <class T>
 class Subtractable : public impl::NamedTypeCRTP<T, Subtractable>
 {
 public:
-	constexpr T operator-(const T& other) const { return T(this->underlying().get() - other.get()); }
+	constexpr T operator-(const T& other) const { return T{this->underlying().get() - other.get()}; }
 	constexpr T& operator-=(const T& other)
 	{
 		this->underlying().get() -= other.get();
@@ -102,7 +102,7 @@ template <class T>
 class Multiplicable : public impl::NamedTypeCRTP<T, Multiplicable>
 {
 public:
-	constexpr T operator*(const T& other) const { return T(this->underlying().get() * other.get()); }
+	constexpr T operator*(const T& other) const { return T{this->underlying().get() * other.get()}; }
 	constexpr T& operator*=(const T& other)
 	{
 		this->underlying().get() *= other.get();
@@ -114,7 +114,7 @@ template <class T>
 class Divisible : public impl::NamedTypeCRTP<T, Divisible>
 {
 public:
-	constexpr T operator/(const T& other) const { return T(this->underlying().get() / other.get()); }
+	constexpr T operator/(const T& other) const { return T{this->underlying().get() / other.get()}; }
 	constexpr T& operator/=(const T& other)
 	{
 		this->underlying().get() /= other.get();
@@ -126,12 +126,72 @@ template <class T>
 class Modulable : public impl::NamedTypeCRTP<T, Modulable>
 {
 public:
-	constexpr T operator%(const T& other) const { return T(this->underlying().get() % other.get()); }
+	constexpr T operator%(const T& other) const { return T{this->underlying().get() % other.get()}; }
 	constexpr T& operator%=(const T& other)
 	{
 		this->underlying().get() %= other.get();
 		return this->underlying();
 	}
+};
+
+template <class T>
+class BitOperation : public impl::NamedTypeCRTP<T, BitOperation>
+{
+public:
+    constexpr T operator~() const
+    {
+        return T{~this->underlying().get()};
+    }
+
+    constexpr T operator&(const T& other) const
+    {
+        return T{this->underlying().get() & other.get()};
+    }
+    constexpr T& operator&=(const T& other)
+    {
+        this->underlying().get() &= other.get();
+        return this->underlying();
+    }
+
+    constexpr T operator|(const T& other) const
+    {
+        return T{this->underlying().get() | other.get()};
+    }
+    constexpr T& operator|=(const T& other)
+    {
+        this->underlying().get() |= other.get();
+        return this->underlying();
+    }
+
+    constexpr T operator^(const T& other) const
+    {
+        return T{this->underlying().get() ^ other.get()};
+    }
+    constexpr T& operator^=(const T& other)
+    {
+        this->underlying().get() ^= other.get();
+        return this->underlying();
+    }
+
+    constexpr T operator<<(const T& other) const
+    {
+        return T{this->underlying().get() << other.get()};
+    }
+    constexpr T& operator<<=(const T& other)
+    {
+        this->underlying().get() <<= other.get();
+        return this->underlying();
+    }
+
+    constexpr T operator>>(const T& other) const
+    {
+        return T{this->underlying().get() >> other.get()};
+    }
+    constexpr T& operator>>=(const T& other)
+    {
+        this->underlying().get() >>= other.get();
+        return this->underlying();
+    }
 };
 
 template <class T>
@@ -173,6 +233,7 @@ class Arithmetic
 	, public Multiplicable<T>
 	, public Divisible<T>
 	, public Modulable<T>
+	, public BitOperation<T>
 	, public Comparable<T>
 {
 };
