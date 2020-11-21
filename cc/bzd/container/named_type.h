@@ -10,8 +10,8 @@ template <typename T, template <class> class crtpType>
 class NamedTypeCRTP
 {
 protected:
-	T& underlying() { return static_cast<T&>(*this); }
-	const T& underlying() const { return static_cast<const T&>(*this); }
+	constexpr T& underlying() { return static_cast<T&>(*this); }
+	constexpr const T& underlying() const { return static_cast<const T&>(*this); }
 };
 } // namespace bzd::impl
 
@@ -44,12 +44,12 @@ template <class T>
 class Incrementable : public impl::NamedTypeCRTP<T, Incrementable>
 {
 public:
-	T& operator++()
+	constexpr T& operator++()
 	{
 		++this->underlying().get();
 		return this->underlying();
 	}
-	T operator++(int)
+	constexpr T operator++(int)
 	{
 		auto copy = this->underlying();
 		this->underlying().get()++;
@@ -61,12 +61,12 @@ template <class T>
 class Decrementable : public impl::NamedTypeCRTP<T, Decrementable>
 {
 public:
-	T& operator--()
+	constexpr T& operator--()
 	{
 		--this->underlying().get();
 		return this->underlying();
 	}
-	T operator--(int)
+	constexpr T operator--(int)
 	{
 		auto copy = this->underlying();
 		this->underlying().get()--;
@@ -78,8 +78,8 @@ template <class T>
 class Addable : public impl::NamedTypeCRTP<T, Addable>
 {
 public:
-	T operator+(const T& other) const { return T(this->underlying().get() + other.get()); }
-	T& operator+=(const T& other)
+	constexpr T operator+(const T& other) const { return T(this->underlying().get() + other.get()); }
+	constexpr T& operator+=(const T& other)
 	{
 		this->underlying().get() += other.get();
 		return this->underlying();
@@ -90,8 +90,8 @@ template <class T>
 class Subtractable : public impl::NamedTypeCRTP<T, Subtractable>
 {
 public:
-	T operator-(const T& other) const { return T(this->underlying().get() - other.get()); }
-	T& operator-=(const T& other)
+	constexpr T operator-(const T& other) const { return T(this->underlying().get() - other.get()); }
+	constexpr T& operator-=(const T& other)
 	{
 		this->underlying().get() -= other.get();
 		return this->underlying();
@@ -102,8 +102,8 @@ template <class T>
 class Multiplicable : public impl::NamedTypeCRTP<T, Multiplicable>
 {
 public:
-	T operator*(const T& other) const { return T(this->underlying().get() * other.get()); }
-	T& operator*=(const T& other)
+	constexpr T operator*(const T& other) const { return T(this->underlying().get() * other.get()); }
+	constexpr T& operator*=(const T& other)
 	{
 		this->underlying().get() *= other.get();
 		return this->underlying();
@@ -114,8 +114,8 @@ template <class T>
 class Divisible : public impl::NamedTypeCRTP<T, Divisible>
 {
 public:
-	T operator/(const T& other) const { return T(this->underlying().get() / other.get()); }
-	T& operator/=(const T& other)
+	constexpr T operator/(const T& other) const { return T(this->underlying().get() / other.get()); }
+	constexpr T& operator/=(const T& other)
 	{
 		this->underlying().get() /= other.get();
 		return this->underlying();
@@ -126,12 +126,42 @@ template <class T>
 class Modulable : public impl::NamedTypeCRTP<T, Modulable>
 {
 public:
-	T operator%(const T& other) const { return T(this->underlying().get() % other.get()); }
-	T& operator%=(const T& other)
+	constexpr T operator%(const T& other) const { return T(this->underlying().get() % other.get()); }
+	constexpr T& operator%=(const T& other)
 	{
 		this->underlying().get() %= other.get();
 		return this->underlying();
 	}
+};
+
+template <class T>
+class Comparable : public impl::NamedTypeCRTP<T, Comparable>
+{
+public:
+    constexpr bool operator<(const T& other) const
+    {
+        return (this->underlying().get() < other.get());
+    }
+    constexpr bool operator>(const T& other) const
+    {
+        return (this->underlying().get() > other.get());
+    }
+    constexpr bool operator<=(const T& other) const
+    {
+        return (this->underlying().get() <= other.get());
+    }
+    constexpr bool operator>=(const T& other) const
+    {
+        return (this->underlying().get() >= other.get());
+    }
+    constexpr bool operator==(const T& other) const
+    {
+        return (this->underlying().get() == other.get());
+    }
+    constexpr bool operator!=(const T& other) const
+    {
+        return (this->underlying().get() != other.get());
+    }
 };
 
 template <class T>
@@ -143,6 +173,7 @@ class Arithmetic
 	, public Multiplicable<T>
 	, public Divisible<T>
 	, public Modulable<T>
+	, public Comparable<T>
 {
 };
 } // namespace bzd
