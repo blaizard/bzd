@@ -24,7 +24,7 @@ public:
 private:
 	bzd::platform::interface::Stack mainStack_{};
 };
-}
+} // namespace bzd::impl
 
 namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
