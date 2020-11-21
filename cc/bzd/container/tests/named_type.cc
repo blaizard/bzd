@@ -98,4 +98,16 @@ TEST(NamedType, arithmetic)
 		EXPECT_TRUE(kg <= greater);
 		EXPECT_TRUE(kg <= equal);
 	}
+
+	// BitOperation
+	{
+		const Kilo number{4};
+		kg |= number;
+		kg &= number;
+		kg = ~kg;
+		kg ^= number;
+		kg <<= number;
+		kg >>= number;
+		EXPECT_EQ(kg.get(), -1);
+	}
 }

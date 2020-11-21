@@ -68,13 +68,15 @@ template <class T>
 class Value
 {
 public:
+	constexpr Value(const T& value) { valueToString(buffer_, value); }
+
 	template <class U>
-	Value(U&& value) : buffer_{}
+	constexpr Value(U&& value)
 	{
 		valueToString(buffer_, value);
 	}
 
-	const char* valueToString() const { return buffer_; }
+	constexpr const char* valueToString() const { return buffer_; }
 
 private:
 	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
@@ -89,13 +91,21 @@ private:
 	char* valueToString(char* pBuffer, long long int value, const int base = 10)
 	{
 		constexpr char digitToChar[] = "0123456789abcdef";
+		const bool isNegative = (value < 0);
 		char* ptr = pBuffer + 16;
 		*ptr = 0;
+		value = (isNegative) ? -value : value;
+
 		do
 		{
 			*--ptr = digitToChar[static_cast<int>(value % base)];
 			value = static_cast<long long int>(value / base);
 		} while (value);
+
+		if (isNegative)
+		{
+			*--ptr = '-';
+		}
 
 		// Move toward the begining
 		const int diff = ptr - pBuffer;
@@ -198,7 +208,7 @@ private:
 	}
 
 private:
-	char buffer_[100];
+	char buffer_[100]{};
 };
 
 } // namespace bzd::test::impl
