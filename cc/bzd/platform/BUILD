@@ -15,7 +15,7 @@ cc_library(
             "//cc/bzd/platform/stack/x86_64_system_v",
         ],
         "@esp32_xtensa_lx6_gcc//:target": [
-            "//cc/bzd/platform/clock/stub",
+            "//cc/bzd/platform/clock/esp32_xtensa_lx6",
             "//cc/bzd/platform/out/std",
             "//cc/bzd/platform/panic",
             "//cc/bzd/platform/stack/stub",

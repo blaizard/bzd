@@ -12,6 +12,7 @@
 #include "bzd/container/buffer.h"
 #include "bzd/container/function.h"
 #include "bzd/container/map.h"
+#include "bzd/container/named_type.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/pool.h"
 #include "bzd/container/queue.h"

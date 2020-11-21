@@ -10,6 +10,7 @@ cc_library(
         ":buffer",
         ":function",
         ":map",
+        ":named_type",
         ":optional",
         ":pool",
         ":queue",
@@ -104,6 +105,17 @@ cc_library(
         ":vector",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "named_type",
+    hdrs = [
+        "named_type.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility:move",
     ],
 )
 
