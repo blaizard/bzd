@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/utility/move.h"
+#include "bzd/utility/ratio.h"
 
 namespace bzd::impl {
 /**
@@ -13,18 +14,13 @@ protected:
 	constexpr T& underlying() { return static_cast<T&>(*this); }
 	constexpr const T& underlying() const { return static_cast<const T&>(*this); }
 };
-} // namespace bzd::impl
 
-namespace bzd {
-
-/**
- * Strong type.
- *
- * Implementation inspired from: https://github.com/joboccara/NamedType/blob/master/include/NamedType/
- */
-template <class T, typename PhantomType, template <class> class... Skills>
-class NamedType : public Skills<NamedType<T, PhantomType, Skills...>>...
+template <class T, typename PhantomType, class Ratio, template <class> class... Skills>
+class NamedType : public Skills<NamedType<T, PhantomType, Ratio, Skills...>>...
 {
+private:
+	using Self = NamedType<T, PhantomType, Ratio, Skills...>;
+
 public: // Constructors.
 	constexpr NamedType() noexcept = default;
 	explicit constexpr NamedType(const T& value) noexcept : value_{value} {}
@@ -36,6 +32,21 @@ public: // Accessors.
 
 private:
 	T value_{};
+};
+
+} // namespace bzd::impl
+
+namespace bzd {
+
+/**
+ * Strong type.
+ */
+template <class T, typename PhantomType, template <class> class... Skills>
+class NamedType : public impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>
+{
+public:
+	using impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>::NamedType;
+	using impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>::operator=;
 };
 
 // ---- Skills

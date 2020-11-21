@@ -116,6 +116,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility:move",
+        "//cc/bzd/utility:ratio",
     ],
 )
 

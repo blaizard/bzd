@@ -103,5 +103,6 @@
 #include "bzd/utility/min.h"
 #include "bzd/utility/move.h"
 #include "bzd/utility/offset_of.h"
+#include "bzd/utility/ratio.h"
 #include "bzd/utility/singleton.h"
 #include "bzd/utility/swap.h"
