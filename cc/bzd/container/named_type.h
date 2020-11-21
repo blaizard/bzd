@@ -15,12 +15,9 @@ protected:
 	constexpr const T& underlying() const { return static_cast<const T&>(*this); }
 };
 
-template <class T, typename PhantomType, class Ratio, template <class> class... Skills>
-class NamedType : public Skills<NamedType<T, PhantomType, Ratio, Skills...>>...
+template <class T, typename PhantomType, class Ratio>
+class NamedType
 {
-private:
-	using Self = NamedType<T, PhantomType, Ratio, Skills...>;
-
 public: // Constructors.
 	constexpr NamedType() noexcept = default;
 	explicit constexpr NamedType(const T& value) noexcept : value_{value} {}
@@ -42,11 +39,10 @@ namespace bzd {
  * Strong type.
  */
 template <class T, typename PhantomType, template <class> class... Skills>
-class NamedType : public impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>
+class NamedType : public impl::NamedType<T, PhantomType, bzd::Ratio<1>>, public Skills<NamedType<T, PhantomType, Skills...>>...
 {
 public:
-	using impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>::NamedType;
-	using impl::NamedType<T, PhantomType, bzd::Ratio<1>, Skills...>::operator=;
+	using impl::NamedType<T, PhantomType, bzd::Ratio<1>>::NamedType;
 };
 
 // ---- Skills
