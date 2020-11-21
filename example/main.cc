@@ -72,14 +72,6 @@ private:
 	const PollFct poll_;
 };
 
-/*
-template <class V, class E, class T>
-auto makePromise(T&& callback)
-{
-	return Promise<V, E, T>(bzd::forward<T>(callback));
-}
-*/
-
 template <class T, class V = typename bzd::typeTraits::InvokeResult<T>::Value, class E = typename bzd::typeTraits::InvokeResult<T>::Error>
 auto makePromise(T&& callback)
 {

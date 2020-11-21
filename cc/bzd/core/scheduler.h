@@ -14,7 +14,7 @@ bzd::Scheduler& getScheduler();
 void yield();
 } // namespace bzd
 
-namespace bzd {
+namespace bzd::impl {
 
 class MainTask : public bzd::interface::TaskUser
 {
@@ -24,7 +24,9 @@ public:
 private:
 	bzd::platform::interface::Stack mainStack_{};
 };
+}
 
+namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
 {
 private:
@@ -109,7 +111,7 @@ private:
 private:
 	bzd::Queue<TaskPtr, 10> queue_;
 	TaskPtr task_;
-	MainTask mainTask_{};
+	impl::MainTask mainTask_{};
 };
 
 } // namespace bzd
