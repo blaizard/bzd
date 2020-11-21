@@ -39,7 +39,7 @@ export default {
 					const status = _getStatus(item);
 					return {
 						// Duration is not correct as it includes accumulated duration from teh jobs eventhough they run in parallel
-						duration: Date.parse(item.finished_at) - Date.parse(item.started_at) || item.duration * 1000,
+						duration: item.duration * 1000,
 						timestamp: Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.now(),
 						status: status,
 						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id,
