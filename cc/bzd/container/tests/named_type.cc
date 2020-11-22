@@ -10,6 +10,26 @@ TEST(NamedType, arithmetic)
 	const Kilo constKg{13};
 	EXPECT_EQ(constKg.get(), 13);
 
+	// Copy
+	{
+		const Kilo construct{kg};
+		EXPECT_EQ(construct.get(), 12);
+		Kilo assign;
+		assign = kg;
+		EXPECT_EQ(assign.get(), 12);
+	}
+
+	// Move
+	{
+		Kilo toMove{32};
+		const Kilo construct{bzd::move(toMove)};
+		EXPECT_EQ(construct.get(), 32);
+		Kilo toMoveAssign{34};
+		Kilo assign;
+		assign = bzd::move(toMoveAssign);
+		EXPECT_EQ(assign.get(), 34);
+	}
+
 	// Incrementable
 	++kg;
 	EXPECT_EQ(kg.get(), 13);
@@ -110,4 +130,14 @@ TEST(NamedType, arithmetic)
 		kg >>= number;
 		EXPECT_EQ(kg.get(), -1);
 	}
+}
+
+TEST(NamedType, multiple_of)
+{
+	using Kilogram = bzd::NamedType<int, struct KiloTag, bzd::Arithmetic>;
+	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 12500>>;
+
+	const Pound pound{12};
+	//const Kilogram kg{pound};
+	//EXPECT_EQ(kg.get(), 12);
 }
