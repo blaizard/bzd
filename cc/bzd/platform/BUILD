@@ -44,6 +44,7 @@ cc_library(
         ":types",
         "//cc/bzd/algorithm:fill",
         "//cc/bzd/core:channel",
+        "//cc/bzd/core:units",
         "//cc/bzd/utility:align_down",
         "//cc/bzd/utility:align_up",
     ],
