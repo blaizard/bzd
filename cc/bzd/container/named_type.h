@@ -23,12 +23,11 @@ public: // Constructors.
 	explicit constexpr NamedType(const T& value) noexcept : value_{value} {}
 	explicit constexpr NamedType(T&& value) noexcept : value_{bzd::move(value)} {}
 
+	// Convert and round the result
 	template <class OtherRatio>
-	constexpr operator NamedType<T, PhantomType, OtherRatio>() const
+	explicit constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other)
+			: value_{(other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den)}
 	{
-		return NamedType<T, PhantomType, OtherRatio>{
-			get() * Ratio::num / Ratio::den * OtherRatio::den / OtherRatio::num
-		};
 	}
 
 public: // Accessors.
@@ -57,15 +56,18 @@ public:
 	using impl::NamedType<T, PhantomType, bzd::Ratio<1>>::NamedType;
 };
 
+/**
+ * Creates a multiple of an existing NamedType.
+ */
 template <class T, class Ratio>
-class MultipleOf: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, bzd::Ratio<1>>
+class MultipleOf: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>
 {
 public:
 	using UnderlyingType = typename T::UnderlyingType;
 	using Tag = typename T::Tag;
 
 public:
-	using impl::NamedType<UnderlyingType, Tag, bzd::Ratio<1>>::NamedType;
+	using impl::NamedType<UnderlyingType, Tag, Ratio>::NamedType;
 };
 
 // ---- Skills
