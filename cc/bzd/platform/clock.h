@@ -7,7 +7,7 @@
 namespace bzd::platform {
 
 using ClockTick = bzd::NamedType<bzd::UInt32Type, struct ClockTickTag, bzd::Arithmetic>;
-using ClockDuration = bzd::NamedType<bzd::UInt64Type, struct ClockDurationTag>;
+using ClockDuration = bzd::NamedType<bzd::UInt64Type, struct ClockDurationTag, bzd::Arithmetic>;
 
 ClockTick getTicks() noexcept;
 ClockDuration msToTicks(const bzd::units::Millisecond time) noexcept;
