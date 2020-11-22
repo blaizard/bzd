@@ -141,7 +141,7 @@ TEST(NamedType, arithmetic)
 TEST(NamedType, multipleOf)
 {
 	using Kilogram = bzd::NamedType<int, struct KiloTag, bzd::Arithmetic>;
-	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 125000>>;
+	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 125000>, bzd::Arithmetic>;
 
 	// Exact conversion
 	{
@@ -157,5 +157,23 @@ TEST(NamedType, multipleOf)
 		EXPECT_EQ(kg.get(), 6);
 		const Pound pound{Kilogram{3}};
 		EXPECT_EQ(pound.get(), 7);
+	}
+
+	// Skills inheritance
+	{
+		const Kilogram kg{3};
+		const Pound pound{12};
+		{
+			auto result = kg + pound;
+			EXPECT_EQ(result.get(), 3 + 5);
+		}
+		{
+			auto result = pound + kg;
+			EXPECT_EQ(result.get(), 7 + 12);
+		}
+		Pound copy{pound};
+		EXPECT_EQ(copy.get(), 12);
+		copy += pound;
+		EXPECT_EQ(copy.get(), 24);
 	}
 }
