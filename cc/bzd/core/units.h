@@ -32,10 +32,4 @@ using Microsecond = bzd::MultipleOf<Second, bzd::ratio::Micro, bzd::Arithmetic>;
 using Nanosecond = bzd::MultipleOf<Second, bzd::ratio::Nano, bzd::Arithmetic>;
 using Picosecond = bzd::MultipleOf<Second, bzd::ratio::Pico, bzd::Arithmetic>;
 /// \}
-
-//Time - second (s)
-//Electric current - ampere (A)
-//Temperature - kelvin (K)
-//Luminous intensity - candela (cd)
-//Mass - kilogram (kg)
 }
