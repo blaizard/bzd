@@ -10,6 +10,12 @@ TEST(NamedType, arithmetic)
 	const Kilo constKg{13};
 	EXPECT_EQ(constKg.get(), 13);
 
+	// Empty
+	{
+		Kilo empty{};
+		EXPECT_EQ(empty.get(), 0);
+	}
+
 	// Copy
 	{
 		const Kilo construct{kg};
@@ -132,12 +138,24 @@ TEST(NamedType, arithmetic)
 	}
 }
 
-TEST(NamedType, multiple_of)
+TEST(NamedType, multipleOf)
 {
 	using Kilogram = bzd::NamedType<int, struct KiloTag, bzd::Arithmetic>;
-	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 12500>>;
+	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 125000>>;
 
-	const Pound pound{12};
-	//const Kilogram kg{pound};
-	//EXPECT_EQ(kg.get(), 12);
+	// Exact conversion
+	{
+		const Kilogram kg{Pound{125000}};
+		EXPECT_EQ(kg.get(), 56699);
+		const Pound pound{kg};
+		EXPECT_EQ(pound.get(), 125000);
+	}
+
+	// Round
+	{
+		const Kilogram kg{Pound{13}};
+		EXPECT_EQ(kg.get(), 6);
+		const Pound pound{Kilogram{3}};
+		EXPECT_EQ(pound.get(), 7);
+	}
 }
