@@ -96,6 +96,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
+        "//cc/bzd/type_traits:invoke_result",
     ],
 )
 

@@ -38,48 +38,6 @@ public:
 // Polling typ promise
 // event type promise
 
-template <class V, class E>
-// using PromiseReturnType = bzd::Optional<bzd::Result<V, E>>;
-class PromiseReturnType : public bzd::Optional<bzd::Result<V, E>>
-{
-public:
-	using Value = V;
-	using Error = E;
-	using bzd::Optional<bzd::Result<V, E>>::Optional;
-};
-
-template <class V, class E, class PollFct>
-class Promise : public bzd::Promise<V, E>
-{
-private:
-	using ReturnType = PromiseReturnType<V, E>;
-	using bzd::Promise<V, E>::setResult;
-
-public:
-	using bzd::Promise<V, E>::isReady;
-
-	template <class T = PollFct>
-	Promise(T&& callack) : bzd::Promise<V, E>{}, poll_{bzd::forward<T>(callack)}
-	{
-	}
-	bool poll() override
-	{
-		setResult(poll_());
-		return isReady();
-	}
-
-private:
-	const PollFct poll_;
-};
-
-template <class T, class V = typename bzd::typeTraits::InvokeResult<T>::Value, class E = typename bzd::typeTraits::InvokeResult<T>::Error>
-auto makePromise(T&& callback)
-{
-	return Promise<V, E, T>(bzd::forward<T>(callback));
-}
-
-//	constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), int&, char*>, int>;
-
 uint64_t getTimestampMs()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -89,7 +47,7 @@ auto delay(const int timeMs, int id = 1)
 {
 	const auto timestampMs = getTimestampMs();
 	// 3 states: no result, resolve, reject
-	return makePromise([timestampMs, timeMs, id]() -> PromiseReturnType<uint32_t, int> {
+	return bzd::makePromise([timestampMs, timeMs, id]() -> bzd::Promise<uint32_t, int>::ReturnType {
 		const auto currentTimestampMs = getTimestampMs();
 		if (currentTimestampMs < timestampMs + timeMs)
 		{
