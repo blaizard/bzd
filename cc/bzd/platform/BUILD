@@ -43,9 +43,9 @@ cc_library(
     deps = [
         ":types",
         "//cc/bzd/algorithm:fill",
+        "//cc/bzd/container:named_type",
         "//cc/bzd/core:channel",
         "//cc/bzd/core:units",
-        "//cc/bzd/container:named_type",
         "//cc/bzd/utility:align_down",
         "//cc/bzd/utility:align_up",
     ],

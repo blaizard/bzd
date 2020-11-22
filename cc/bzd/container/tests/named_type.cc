@@ -73,6 +73,7 @@ TEST(NamedType, arithmetic)
 		const auto result = kg * constKg;
 		EXPECT_EQ(kg.get(), 156);
 		EXPECT_EQ(result.get(), 2028);
+		EXPECT_EQ((kg * 2).get(), 312);
 	}
 
 	// Divisible
@@ -82,6 +83,7 @@ TEST(NamedType, arithmetic)
 		const auto result = kg / constKg;
 		EXPECT_EQ(kg.get(), 12);
 		EXPECT_EQ(result.get(), 0);
+		EXPECT_EQ((kg / 2).get(), 6);
 	}
 
 	// Modulable
@@ -92,6 +94,7 @@ TEST(NamedType, arithmetic)
 		const auto result = kg % number;
 		EXPECT_EQ(kg.get(), 2);
 		EXPECT_EQ(result.get(), 2);
+		EXPECT_EQ((kg % 2).get(), 0);
 	}
 
 	// Comparable

@@ -1,20 +1,13 @@
 #pragma once
 
+#include "bzd/container/named_type.h"
 #include "bzd/core/units.h"
 #include "bzd/platform/types.h"
-#include "bzd/container/named_type.h"
 
 namespace bzd::platform {
 
 using ClockTick = bzd::NamedType<bzd::UInt32Type, struct ClockTickTag, bzd::Arithmetic>;
-
-/*
-class ClockDuration : public bzd::NamedType<bzd::UInt64Type, struct ClockDuration, bzd::Arithmetic>
-{
-public:
-
-};*/
-using ClockDuration = bzd::NamedType<bzd::UInt64Type, struct ClockDurationTag, bzd::Arithmetic>;
+using ClockDuration = bzd::NamedType<bzd::UInt64Type, struct ClockDurationTag>;
 
 ClockTick getTicks() noexcept;
 ClockDuration msToTicks(const bzd::units::Millisecond time) noexcept;
