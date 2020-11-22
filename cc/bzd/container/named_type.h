@@ -25,7 +25,7 @@ public: // Constructors.
 
 	// Convert and round the result
 	template <class OtherRatio>
-	explicit constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other)
+	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other)
 			: value_{(other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den)}
 	{
 	}
@@ -59,8 +59,8 @@ public:
 /**
  * Creates a multiple of an existing NamedType.
  */
-template <class T, class Ratio>
-class MultipleOf: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>
+template <class T, class Ratio, template <class> class... Skills>
+class MultipleOf: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>, public Skills<MultipleOf<T, Ratio, Skills...>>...
 {
 public:
 	using UnderlyingType = typename T::UnderlyingType;
