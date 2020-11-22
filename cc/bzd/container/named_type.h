@@ -25,8 +25,8 @@ public: // Constructors.
 
 	// Convert and round the result
 	template <class OtherRatio>
-	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other)
-			: value_{(other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den)}
+	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
+		value_{(other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den)}
 	{
 	}
 
@@ -46,7 +46,9 @@ namespace bzd {
  * Strong type.
  */
 template <class T, typename PhantomType, template <class> class... Skills>
-class NamedType : public impl::NamedType<T, PhantomType, bzd::Ratio<1>>, public Skills<NamedType<T, PhantomType, Skills...>>...
+class NamedType
+	: public impl::NamedType<T, PhantomType, bzd::Ratio<1>>
+	, public Skills<NamedType<T, PhantomType, Skills...>>...
 {
 public:
 	using UnderlyingType = T;
@@ -60,7 +62,9 @@ public:
  * Creates a multiple of an existing NamedType.
  */
 template <class T, class Ratio, template <class> class... Skills>
-class MultipleOf: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>, public Skills<MultipleOf<T, Ratio, Skills...>>...
+class MultipleOf
+	: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>
+	, public Skills<MultipleOf<T, Ratio, Skills...>>...
 {
 public:
 	using UnderlyingType = typename T::UnderlyingType;
@@ -170,90 +174,54 @@ template <class T>
 class BitOperation : public impl::NamedTypeCRTP<T, BitOperation>
 {
 public:
-    constexpr T operator~() const
-    {
-        return T{~this->underlying().get()};
-    }
+	constexpr T operator~() const { return T{~this->underlying().get()}; }
 
-    constexpr T operator&(const T& other) const
-    {
-        return T{this->underlying().get() & other.get()};
-    }
-    constexpr T& operator&=(const T& other)
-    {
-        this->underlying().get() &= other.get();
-        return this->underlying();
-    }
+	constexpr T operator&(const T& other) const { return T{this->underlying().get() & other.get()}; }
+	constexpr T& operator&=(const T& other)
+	{
+		this->underlying().get() &= other.get();
+		return this->underlying();
+	}
 
-    constexpr T operator|(const T& other) const
-    {
-        return T{this->underlying().get() | other.get()};
-    }
-    constexpr T& operator|=(const T& other)
-    {
-        this->underlying().get() |= other.get();
-        return this->underlying();
-    }
+	constexpr T operator|(const T& other) const { return T{this->underlying().get() | other.get()}; }
+	constexpr T& operator|=(const T& other)
+	{
+		this->underlying().get() |= other.get();
+		return this->underlying();
+	}
 
-    constexpr T operator^(const T& other) const
-    {
-        return T{this->underlying().get() ^ other.get()};
-    }
-    constexpr T& operator^=(const T& other)
-    {
-        this->underlying().get() ^= other.get();
-        return this->underlying();
-    }
+	constexpr T operator^(const T& other) const { return T{this->underlying().get() ^ other.get()}; }
+	constexpr T& operator^=(const T& other)
+	{
+		this->underlying().get() ^= other.get();
+		return this->underlying();
+	}
 
-    constexpr T operator<<(const T& other) const
-    {
-        return T{this->underlying().get() << other.get()};
-    }
-    constexpr T& operator<<=(const T& other)
-    {
-        this->underlying().get() <<= other.get();
-        return this->underlying();
-    }
+	constexpr T operator<<(const T& other) const { return T{this->underlying().get() << other.get()}; }
+	constexpr T& operator<<=(const T& other)
+	{
+		this->underlying().get() <<= other.get();
+		return this->underlying();
+	}
 
-    constexpr T operator>>(const T& other) const
-    {
-        return T{this->underlying().get() >> other.get()};
-    }
-    constexpr T& operator>>=(const T& other)
-    {
-        this->underlying().get() >>= other.get();
-        return this->underlying();
-    }
+	constexpr T operator>>(const T& other) const { return T{this->underlying().get() >> other.get()}; }
+	constexpr T& operator>>=(const T& other)
+	{
+		this->underlying().get() >>= other.get();
+		return this->underlying();
+	}
 };
 
 template <class T>
 class Comparable : public impl::NamedTypeCRTP<T, Comparable>
 {
 public:
-    constexpr bool operator<(const T& other) const
-    {
-        return (this->underlying().get() < other.get());
-    }
-    constexpr bool operator>(const T& other) const
-    {
-        return (this->underlying().get() > other.get());
-    }
-    constexpr bool operator<=(const T& other) const
-    {
-        return (this->underlying().get() <= other.get());
-    }
-    constexpr bool operator>=(const T& other) const
-    {
-        return (this->underlying().get() >= other.get());
-    }
-    constexpr bool operator==(const T& other) const
-    {
-        return (this->underlying().get() == other.get());
-    }
-    constexpr bool operator!=(const T& other) const
-    {
-        return (this->underlying().get() != other.get());
-    }
+	constexpr bool operator<(const T& other) const { return (this->underlying().get() < other.get()); }
+	constexpr bool operator>(const T& other) const { return (this->underlying().get() > other.get()); }
+	constexpr bool operator<=(const T& other) const { return (this->underlying().get() <= other.get()); }
+	constexpr bool operator>=(const T& other) const { return (this->underlying().get() >= other.get()); }
+	constexpr bool operator==(const T& other) const { return (this->underlying().get() == other.get()); }
+	constexpr bool operator!=(const T& other) const { return (this->underlying().get() != other.get()); }
 };
 
 template <class T>
