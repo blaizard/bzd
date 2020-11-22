@@ -1,6 +1,7 @@
 #include "bzd/core/units.h"
 
 #include "cc_test/test.h"
+
 #include <iostream>
 
 TEST(Units, length)
