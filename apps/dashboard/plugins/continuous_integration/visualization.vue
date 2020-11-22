@@ -115,7 +115,7 @@
 			builds() {
 				let copy = [...(this.metadata.builds || [])];
 				copy.sort((a, b) => b.timestamp - a.timestamp);
-				return copy;
+				return copy.filter((build) => build.status != "abort");
 			},
 			plotValue() {
 				let last30Builds = this.builds.slice(0, 30).reverse();
@@ -193,9 +193,9 @@
 					return total + (build.status == "success" ? 1 : 0);
 				}, 0);
 				const nbFailureSuccessdBuilds = buildsLast30Days.reduce((total, build) => {
-					return total + (build.status in ["success", "failure"] ? 1 : 0);
+					return total + (["success", "failure"].includes(build.status) ? 1 : 0);
 				}, 0);
-				return Math.round((nbSuccessfullBuilds / nbFailureSuccessdBuilds) * 100);
+				return nbFailureSuccessdBuilds ? Math.round((nbSuccessfullBuilds / nbFailureSuccessdBuilds) * 100) : 0;
 			},
 		},
 		methods: {
