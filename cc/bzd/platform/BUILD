@@ -38,10 +38,10 @@ cc_library(
         "out.h",
         "panic.h",
         "stack.h",
-        "types.h",
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
+        ":types",
         "//cc/bzd/algorithm:fill",
         "//cc/bzd/core:channel",
         "//cc/bzd/utility:align_down",

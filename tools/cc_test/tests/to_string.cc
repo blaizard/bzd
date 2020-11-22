@@ -14,4 +14,8 @@ TEST(Test, integer)
 		bzd::test::impl::Value v{static_cast<int>(-1)};
 		EXPECT_STREQ(v.valueToString(), "-1");
 	}
+	{
+		bzd::test::impl::Value v{static_cast<long int>(86400000)};
+		EXPECT_STREQ(v.valueToString(), "86400000");
+	}
 }
