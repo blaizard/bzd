@@ -13,7 +13,10 @@ TEST(Units, length)
 	EXPECT_EQ(bzd::units::Millimeter{m}.get(), 1200000);
 	EXPECT_EQ(bzd::units::Kilometer{m}.get(), 1);
 	EXPECT_EQ(bzd::units::Hectometer{m}.get(), 12);
-	EXPECT_EQ(bzd::units::Decameter{m}.get(), 120);	
+	EXPECT_EQ(bzd::units::Decameter{m}.get(), 120);
+
+	EXPECT_EQ((12_m).get(), 12);
+	EXPECT_EQ((13_km).get(), 13);
 }
 
 TEST(Units, time)
