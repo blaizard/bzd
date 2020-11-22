@@ -92,8 +92,7 @@ private:
 	{
 		constexpr char digitToChar[] = "0123456789abcdef";
 		const bool isNegative = (value < 0);
-		char* ptr = pBuffer + 16;
-		*ptr = 0;
+		char* ptr = pBuffer + 17;
 		value = (isNegative) ? -value : value;
 
 		do
@@ -107,13 +106,14 @@ private:
 			*--ptr = '-';
 		}
 
-		// Move toward the begining
+		// Move toward the begining and set the end character
 		const int diff = ptr - pBuffer;
 		while (*ptr)
 		{
 			ptr[-diff] = ptr[0];
 			++ptr;
 		}
+		ptr[-diff] = 0;
 
 		return &ptr[-diff];
 	}

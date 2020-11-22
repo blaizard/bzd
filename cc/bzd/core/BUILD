@@ -11,6 +11,7 @@ cc_library(
         ":registry",
         ":scheduler",
         ":task",
+        ":units",
     ],
 )
 
@@ -146,5 +147,17 @@ cc_library(
         "//cc/bzd/platform:system",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
+    ],
+)
+
+cc_library(
+    name = "units",
+    hdrs = [
+        "units.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:named_type",
+        "//cc/bzd/platform:types",
     ],
 )
