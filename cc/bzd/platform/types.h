@@ -69,9 +69,4 @@ using UInt32Type = std::uint32_t;
  * \brief Unsigned integer type with a fixed width of 64-bit.
  */
 using UInt64Type = std::uint64_t;
-
-/**
- * \brief Clock value type.
- */
-using ClockTickType = std::uint32_t;
 } // namespace bzd
