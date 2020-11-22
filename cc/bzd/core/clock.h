@@ -15,7 +15,7 @@ public:
 	}
 
 	virtual bzd::UInt32Type tickToMs() const noexcept = 0;
-	//virtual bzd::ClockTickType getTick() const noexcept = 0;
+	// virtual bzd::ClockTickType getTick() const noexcept = 0;
 	virtual void registerHandler() noexcept {}
 
 	virtual ~Clock() noexcept = default;

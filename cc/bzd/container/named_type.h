@@ -7,7 +7,7 @@ namespace bzd::impl {
 /**
  * Curiously Recuring Template Pattern
  */
-template <typename T, template <class> class crtpType>
+template <typename T, template <class, class> class crtpType>
 class NamedTypeCRTP
 {
 protected:
@@ -45,10 +45,10 @@ namespace bzd {
 /**
  * Strong type.
  */
-template <class T, typename PhantomType, template <class> class... Skills>
+template <class T, typename PhantomType, template <class, class> class... Skills>
 class NamedType
 	: public impl::NamedType<T, PhantomType, bzd::Ratio<1>>
-	, public Skills<NamedType<T, PhantomType, Skills...>>...
+	, public Skills<NamedType<T, PhantomType, Skills...>, T>...
 {
 public:
 	using UnderlyingType = T;
@@ -61,10 +61,10 @@ public:
 /**
  * Creates a multiple of an existing NamedType.
  */
-template <class T, class Ratio, template <class> class... Skills>
+template <class T, class Ratio, template <class, class> class... Skills>
 class MultipleOf
 	: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>
-	, public Skills<MultipleOf<T, Ratio, Skills...>>...
+	, public Skills<MultipleOf<T, Ratio, Skills...>, T>...
 {
 public:
 	using UnderlyingType = typename T::UnderlyingType;
@@ -76,7 +76,7 @@ public:
 
 // ---- Skills
 
-template <class T>
+template <class T, class UnderlyingType>
 class Incrementable : public impl::NamedTypeCRTP<T, Incrementable>
 {
 public:
@@ -93,7 +93,7 @@ public:
 	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Decrementable : public impl::NamedTypeCRTP<T, Decrementable>
 {
 public:
@@ -110,7 +110,7 @@ public:
 	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Addable : public impl::NamedTypeCRTP<T, Addable>
 {
 public:
@@ -122,7 +122,7 @@ public:
 	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Subtractable : public impl::NamedTypeCRTP<T, Subtractable>
 {
 public:
@@ -134,7 +134,7 @@ public:
 	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Multiplicable : public impl::NamedTypeCRTP<T, Multiplicable>
 {
 public:
@@ -144,9 +144,15 @@ public:
 		this->underlying().get() *= other.get();
 		return this->underlying();
 	}
+	constexpr T operator*(const UnderlyingType& value) const { return T{this->underlying().get() * value}; }
+	constexpr T& operator*=(const UnderlyingType& value)
+	{
+		this->underlying().get() *= value;
+		return this->underlying();
+	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Divisible : public impl::NamedTypeCRTP<T, Divisible>
 {
 public:
@@ -156,9 +162,15 @@ public:
 		this->underlying().get() /= other.get();
 		return this->underlying();
 	}
+	constexpr T operator/(const UnderlyingType& value) const { return T{this->underlying().get() / value}; }
+	constexpr T& operator/=(const UnderlyingType& value)
+	{
+		this->underlying().get() /= value;
+		return this->underlying();
+	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Modulable : public impl::NamedTypeCRTP<T, Modulable>
 {
 public:
@@ -168,9 +180,15 @@ public:
 		this->underlying().get() %= other.get();
 		return this->underlying();
 	}
+	constexpr T operator%(const UnderlyingType& value) const { return T{this->underlying().get() % value}; }
+	constexpr T& operator%=(const UnderlyingType& value)
+	{
+		this->underlying().get() %= value;
+		return this->underlying();
+	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class BitOperation : public impl::NamedTypeCRTP<T, BitOperation>
 {
 public:
@@ -204,15 +222,29 @@ public:
 		return this->underlying();
 	}
 
+	constexpr T operator<<(const UnderlyingType& value) const { return T{this->underlying().get() << value}; }
+	constexpr T& operator<<=(const UnderlyingType& value)
+	{
+		this->underlying().get() <<= value;
+		return this->underlying();
+	}
+
 	constexpr T operator>>(const T& other) const { return T{this->underlying().get() >> other.get()}; }
 	constexpr T& operator>>=(const T& other)
 	{
 		this->underlying().get() >>= other.get();
 		return this->underlying();
 	}
+
+	constexpr T operator>>(const UnderlyingType& value) const { return T{this->underlying().get() >> value}; }
+	constexpr T& operator>>=(const UnderlyingType& value)
+	{
+		this->underlying().get() >>= value;
+		return this->underlying();
+	}
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Comparable : public impl::NamedTypeCRTP<T, Comparable>
 {
 public:
@@ -224,17 +256,17 @@ public:
 	constexpr bool operator!=(const T& other) const { return (this->underlying().get() != other.get()); }
 };
 
-template <class T>
+template <class T, class UnderlyingType>
 class Arithmetic
-	: public Incrementable<T>
-	, public Decrementable<T>
-	, public Addable<T>
-	, public Subtractable<T>
-	, public Multiplicable<T>
-	, public Divisible<T>
-	, public Modulable<T>
-	, public BitOperation<T>
-	, public Comparable<T>
+	: public Incrementable<T, UnderlyingType>
+	, public Decrementable<T, UnderlyingType>
+	, public Addable<T, UnderlyingType>
+	, public Subtractable<T, UnderlyingType>
+	, public Multiplicable<T, UnderlyingType>
+	, public Divisible<T, UnderlyingType>
+	, public Modulable<T, UnderlyingType>
+	, public BitOperation<T, UnderlyingType>
+	, public Comparable<T, UnderlyingType>
 {
 };
 } // namespace bzd
