@@ -3,17 +3,17 @@
 #include "sdkconfig.h"
 #include "xtensa/core-macros.h"
 
-bzd::ClockTickType bzd::platform::getTicks() noexcept
+bzd::platform::ClockTick bzd::platform::getTicks() noexcept
 {
-	return XTHAL_GET_CCOUNT();
+	return static_cast<bzd::platform::ClockTick>(XTHAL_GET_CCOUNT());
 }
 
-bzd::platform::ClockDurationType msToTicks(const bzd::units::Millisecond time) noexcept
+bzd::platform::ClockDuration msToTicks(const bzd::units::Millisecond time) noexcept
 {
-	return static_cast<bzd::platform::ClockDurationType>(time.get()) * (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000);
+	return static_cast<bzd::platform::ClockDuration>(static_cast<bzd::UInt64Type>(time.get()) * (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
 }
 
-bzd::units::Millisecond ticksToMs(const bzd::ClockTickType ticks) noexcept
+bzd::units::Millisecond ticksToMs(const bzd::platform::ClockTick ticks) noexcept
 {
-	return static_cast<bzd::units::Millisecond>(ticks / (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
+	return static_cast<bzd::units::Millisecond>(ticks.get() / (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
 }
