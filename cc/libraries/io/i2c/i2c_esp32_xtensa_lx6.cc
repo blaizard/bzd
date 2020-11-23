@@ -3,7 +3,7 @@
 #include "driver/i2c.h"
 namespace bzd::io::impl {
 
-bzd::Result<void> I2CEsp32XtensaLx6::connect()
+bzd::Result<> I2CEsp32XtensaLx6::connect()
 {
 	i2c_port_t i2c_master_port = static_cast<i2c_port_t>(config_.interface);
 	i2c_config_t conf{};
@@ -27,7 +27,7 @@ bzd::Result<void> I2CEsp32XtensaLx6::connect()
 	i2c_param_config(i2c_master_port, &conf);
 	i2c_driver_install(i2c_master_port, conf.mode, 0, 0, 0);
 
-	return {};
+	return bzd::nullresult;
 }
 
 bzd::Result<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept

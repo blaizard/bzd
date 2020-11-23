@@ -138,6 +138,9 @@ TEST(NamedType, arithmetic)
 		kg <<= number;
 		kg >>= number;
 		EXPECT_EQ(kg.get(), -1);
+		kg <<= 2;
+		kg >>= 2;
+		EXPECT_EQ(kg.get(), -1);
 	}
 }
 

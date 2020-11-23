@@ -12,6 +12,10 @@ namespace bzd::impl {
 
 struct OptionalNull
 {
+public:
+	static constexpr OptionalNull make() { return OptionalNull{}; }
+
+private:
 	explicit constexpr OptionalNull() noexcept {}
 };
 
@@ -87,7 +91,7 @@ protected:
 
 namespace bzd {
 
-constexpr impl::OptionalNull nullopt{};
+constexpr impl::OptionalNull nullopt = impl::OptionalNull::make();
 
 /**
  * \brief Type managing an optional contained value, i.e. a value that may or

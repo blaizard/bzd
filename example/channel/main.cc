@@ -39,15 +39,15 @@ public:
 	};
 
 	template <typename T>
-	bzd::Result<void> serialize(const T&) const
+	bzd::Result<> serialize(const T&) const
 	{
-		return {};
+		return bzd::nullresult;
 	}
 
 	template <typename T>
-	bzd::Result<void> deserialize(const T&) const
+	bzd::Result<> deserialize(const T&) const
 	{
-		return {};
+		return bzd::nullresult;
 	}
 
 	bool filter(const bzd::Span<const bzd::UInt8Type>&) { return true; }
@@ -61,12 +61,12 @@ private:
  * <id> <length> <payload>
  */
 template <>
-bzd::Result<void> Adapter::serialize<Adapter::Data>(const Data& data) const
+bzd::Result<> Adapter::serialize<Adapter::Data>(const Data& data) const
 {
 	bzd::UInt8Type buffer[42] = {id_, static_cast<bzd::UInt8Type>(data.str.size())};
 	bzd::algorithm::copy(data.str.begin(), data.str.end(), &buffer[2]);
 	transport_.write(bzd::Span<const bzd::UInt8Type>{buffer, 2 + data.str.size()});
-	return {};
+	return bzd::nullresult;
 }
 
 /*
