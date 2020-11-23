@@ -115,6 +115,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/type_traits:enable_if",
+        "//cc/bzd/type_traits:is_arithmetic",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:ratio",
     ],
@@ -186,6 +188,7 @@ cc_library(
     deps = [
         ":reference_wrapper",
         "//cc/bzd/core:assert_minimal_header",
+        "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:is_reference",

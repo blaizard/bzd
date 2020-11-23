@@ -6,6 +6,7 @@ cc_library(
     deps = [
         ":assert",
         ":channel",
+        ":delay",
         ":log",
         ":promise",
         ":registry",
@@ -68,6 +69,19 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container:span",
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "delay",
+    hdrs = [
+        "delay.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":promise",
+        ":units",
+        "//cc/bzd/platform:system",
     ],
 )
 

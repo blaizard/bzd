@@ -9,8 +9,8 @@ namespace bzd::impl {
 class IOChannelCommon
 {
 public:
-	virtual bzd::Result<void> connect() { return {}; }
-	virtual bzd::Result<void> disconnect() { return {}; }
+	virtual bzd::Result<> connect() { return bzd::nullresult; }
+	virtual bzd::Result<> disconnect() { return bzd::nullresult; }
 };
 
 template <class T>

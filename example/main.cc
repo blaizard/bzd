@@ -47,7 +47,7 @@ auto delay(const int timeMs, int id = 1)
 {
 	const auto timestampMs = getTimestampMs();
 	// 3 states: no result, resolve, reject
-	return bzd::makePromise([timestampMs, timeMs, id]() -> bzd::Promise<uint32_t, int>::ReturnType {
+	return bzd::makePromise([timestampMs, timeMs, id]() -> bzd::PromiseReturnType<uint32_t, int> {
 		const auto currentTimestampMs = getTimestampMs();
 		if (currentTimestampMs < timestampMs + timeMs)
 		{
@@ -79,8 +79,8 @@ int main()
 		int i = 3;
 		while (i > 0)
 		{
-			auto result = await delay(500);
-			std::cout << "Fct 1: " << i-- << "  " << *result << std::endl;
+			await bzd::delay(1_s);
+			std::cout << "Fct 1: " << i-- << "  " << getTimestampMs() << std::endl;
 		}
 		std::cout << "Fct 1: end" << std::endl;
 	}};
@@ -89,7 +89,7 @@ int main()
 		while (i > 0)
 		{
 			std::cout << "Fct 2: " << i-- << std::endl;
-			await delay(100);
+			await bzd::delay(200_ms);
 		}
 		std::cout << "Fct 2: end" << std::endl;
 	}};

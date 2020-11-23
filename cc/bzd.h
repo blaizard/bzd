@@ -28,6 +28,7 @@
 // Core
 #include "bzd/core/assert.h"
 #include "bzd/core/channel.h"
+#include "bzd/core/delay.h"
 #include "bzd/core/log.h"
 #include "bzd/core/promise.h"
 #include "bzd/core/registry.h"

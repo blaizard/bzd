@@ -54,7 +54,7 @@ public:
 	}
 
 	template <class V, class E>
-	typename bzd::Promise<V, E>::ResultType&& await(bzd::Promise<V, E>& promise)
+	constexpr typename bzd::impl::Promise<V, E>::ResultType&& await(bzd::impl::Promise<V, E>& promise)
 	{
 		while (!promise.poll())
 		{
@@ -124,7 +124,7 @@ struct AwaitType
 constexpr AwaitType await_{};
 
 template <class T>
-auto&& operator>(const AwaitType&, T&& promise)
+constexpr auto&& operator>(const AwaitType&, T&& promise)
 {
 	return bzd::move(getScheduler().await(promise));
 }

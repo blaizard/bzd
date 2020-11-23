@@ -8,7 +8,7 @@ TEST(ContainerResult, returnVoid)
 {
 	auto fct = [](const bool makeError) -> bzd::Result<void, std::string> {
 		if (makeError) return bzd::makeError("KO");
-		return {};
+		return bzd::nullresult;
 	};
 
 	const auto ret = fct(/*makeError*/ true);

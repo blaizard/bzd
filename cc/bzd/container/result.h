@@ -2,6 +2,7 @@
 
 #include "bzd/container/reference_wrapper.h"
 #include "bzd/core/assert/minimal.h"
+#include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_reference.h"
@@ -9,6 +10,16 @@
 #include "bzd/utility/move.h"
 
 namespace bzd::impl {
+
+struct ResultNull
+{
+public:
+	static constexpr ResultNull make() { return ResultNull{}; }
+
+private:
+	explicit constexpr ResultNull() noexcept {}
+};
+
 // Forward declaration for the "friend" attribute
 template <class T, class E>
 class Result;
@@ -115,7 +126,8 @@ public:
 	using Result<void*, E>::operator bool;
 	using Result<void*, E>::error;
 
-	constexpr Result() : Result<void*, E>(nullptr) {}
+	// constexpr Result() : Result<void*, E>(nullptr) {}
+	constexpr Result(const ResultNull&) : Result<void*, E>(nullptr) {}
 };
 } // namespace bzd::impl
 
@@ -126,8 +138,10 @@ namespace bzd {
  * It is a variants with 2 states, valid, representing success and containing a
  * value, and error, representing error and containing an error value.
  */
-template <class T, class E = bool>
+template <class T = void, class E = bzd::BoolType>
 using Result = impl::Result<T, E>;
+
+constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
 template <class E>
 constexpr impl::Error<bzd::typeTraits::Decay<E>> makeError(E&& e)

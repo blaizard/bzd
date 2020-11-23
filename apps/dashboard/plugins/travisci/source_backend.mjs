@@ -41,7 +41,8 @@ export default {
 					return {
 						// Duration is not correct as it includes accumulated duration from teh jobs eventhough they run in parallel
 						duration: item.duration * 1000,
-						timestamp: Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.parse(item.updated_at) || Date.now(),
+						timestamp:
+							Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.parse(item.updated_at) || Date.now(),
 						status: status,
 						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id,
 					};
