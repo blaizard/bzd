@@ -5,6 +5,13 @@
 #include "bzd/platform/clock.h"
 
 namespace bzd {
+/**
+ * Pauses the program for the amount of time (in milliseconds) specified as parameter.
+ *
+ * \param time Time to pause the program.
+ *
+ * \return A promise object.
+ */
 inline auto delay(const bzd::units::Millisecond time)
 {
 	auto duration = bzd::platform::getTicks().toDuration();

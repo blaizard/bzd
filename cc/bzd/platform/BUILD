@@ -34,6 +34,7 @@ cc_library(
 cc_library(
     name = "headers",
     hdrs = [
+        "atomic.h",
         "clock.h",
         "out.h",
         "panic.h",

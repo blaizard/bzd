@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	constexpr bool poll() override
+	bool poll() override
 	{
 		setResult(poll_());
 		return isReady();
