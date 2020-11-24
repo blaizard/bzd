@@ -1,8 +1,10 @@
 #include "bzd/platform/atomic.h"
+#include "bzd/platform/types.h"
 
 #include "cc_test/test.h"
 
-TEST(Atomic, Base)
+template <class T>
+void baseTypeUnitTest()
 {
 	bzd::Atomic<int> empty{};
 	(void)empty;
@@ -24,4 +26,14 @@ TEST(Atomic, Base)
 	EXPECT_EQ(test.load(), 7);
 	--test;
 	EXPECT_EQ(test.load(), 6);
+}
+
+TEST(Atomic, Base)
+{
+	baseTypeUnitTest<bzd::UInt8Type>();
+	baseTypeUnitTest<bzd::Int8Type>();
+	baseTypeUnitTest<bzd::UInt16Type>();
+	baseTypeUnitTest<bzd::Int16Type>();
+	baseTypeUnitTest<bzd::UInt32Type>();
+	baseTypeUnitTest<bzd::Int32Type>();
 }
