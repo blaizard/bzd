@@ -30,7 +30,7 @@ namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
 {
 private:
-	using TaskPtr = bzd::interface::Task*;
+	using TaskPtr = bzd::interface::Task::PtrType;
 
 public:
 	/**
@@ -110,7 +110,12 @@ private:
 
 private:
 	bzd::Queue<TaskPtr, 10> queue_;
+	/**
+	 * Main task queue, which contains only active tasks.
+	 * It is implemented as a ring list with atomic insertion/deletion.
+	 */
 	TaskPtr task_;
+	TaskPtr task2_{nullptr};
 	impl::MainTask mainTask_{};
 };
 

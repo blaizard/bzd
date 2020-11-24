@@ -14,7 +14,8 @@ void yield();
 namespace bzd::interface {
 class Task
 {
-public:
+public: // Types.
+	using PtrType = Task*;
 	enum class Status
 	{
 		IDLE = 0,
@@ -41,6 +42,8 @@ protected:
 protected:
 	Status status_{Status::IDLE};
 	platform::interface::Stack* stack_{nullptr};
+	PtrType next_{nullptr};
+	PtrType previous_{nullptr};
 };
 
 class TaskUser : public Task
