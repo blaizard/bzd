@@ -48,7 +48,9 @@ def _bzd_package_impl(ctx):
             if hasattr(fragment, "files"):
                 for f in fragment.files:
                     inputs.append(f)
-                    package_creation_commands.append("{} --append \"{}\" --transform 's,^,{}/,'".format(tar_cmd, f.path, root))
+                    # Convertion to short_path is needed for generated files
+                    package_creation_commands.append("{} --append \"{}\" --transform 's,^{},{}/{},'".format(tar_cmd, f.path, f.path, root, f.short_path))
+
 
             # Remap single files or symlinks
             if hasattr(fragment, "files_remap"):
