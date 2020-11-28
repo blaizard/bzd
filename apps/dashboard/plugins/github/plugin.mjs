@@ -1,14 +1,14 @@
 export default {
-	source: {
-		name: "Github CI",
-		icon: "bzd-icon-github",
-		visualization: ["continuous-integration"],
-		form: [
-			{
-				type: "Input",
+	type: "source",
+	name: "Github CI",
+	icon: "bzd-icon-github",
+	visualization: ["continuous_integration"],
+	form: [
+		{
+			type: "Input",
 				name: "github.username",
-				caption: "Username",
-				placeholder: "For example, blaizard",
+			caption: "Username",
+			placeholder: "For example, blaizard",
 				width: 0.5,
 			},
 			{
@@ -33,7 +33,4 @@ export default {
 			},
 		],
 		timeout: 60 * 1000, // ms
-		frontend: () => import("./source_frontend.vue"),
-		backend: () => import("./source_backend.mjs"),
-	},
 };

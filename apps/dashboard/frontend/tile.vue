@@ -22,7 +22,8 @@
 	import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
-	import { Visualization, Source } from "../plugins/plugins.mjs";
+	//import Plugins from "../plugins/frontend.mjs";
+	import Plugins from "../plugins/plugins.frontend.index.mjs";
 
 	export default {
 		props: {
@@ -100,10 +101,10 @@
 				return this.description["source.type"] || null;
 			},
 			timeout() {
-				return Source[this.sourceType].timeout || 0;
+				return Plugins[this.sourceType].metadata.timeout || 0;
 			},
 			component() {
-				return (Visualization[this.visualizationType] || {}).frontend;
+				return Plugins[this.visualizationType].module;
 			},
 			tileClass() {
 				return {
@@ -150,9 +151,9 @@
 				}
 			},
 			async fetchIcon() {
-				const plugin = this.sourceType ? Source[this.sourceType] : Visualization[this.visualizationType];
-				if (plugin && "frontend" in plugin) {
-					await plugin.frontend(); // Load the frontend plugin to load the icon
+				const plugin = this.sourceType ? Plugins[this.sourceType] : Plugins[this.visualizationType];
+				if (plugin && "module" in plugin) {
+					await plugin.module(); // Load the frontend plugin to load the icon
 					this.icon = plugin.icon || "";
 				}
 			},

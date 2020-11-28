@@ -1,8 +1,8 @@
 export default {
-	source: {
-		name: "Jenkins",
+	name: "Jenkins",
+		type: "source",
 		icon: "bzd-icon-jenkins",
-		visualization: ["continuous-integration"],
+		visualization: ["continuous_integration"],
 		form: [
 			{
 				type: "Input",
@@ -33,7 +33,4 @@ export default {
 			"jenkins.branch": "master",
 		},
 		timeout: 60 * 1000, // ms
-		frontend: () => import("./source_frontend.vue"),
-		backend: () => import("./source_backend.mjs"),
-	},
 };

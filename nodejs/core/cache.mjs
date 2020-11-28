@@ -55,8 +55,8 @@ class Cache {
 			trigger
 		);
 		Exception.assert(
-			collection.match(/^[a-z0-9.-]+$/i),
-			"Invalid collection name '{}', it must contain only the following characters [a-z0-9.-].",
+			collection.match(/^[a-z0-9.-_]+$/i),
+			"Invalid collection name '{}', it must contain only the following characters [a-z0-9.-_].",
 			collection
 		);
 		Exception.assert(!(collection in this.data), "The collection '{}' has already been registered.", collection);

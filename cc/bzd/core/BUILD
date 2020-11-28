@@ -28,7 +28,7 @@ cc_library(
         ":log",
         "//cc/bzd/container:result",
         "//cc/bzd/core:assert_minimal",
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_library(
         ":channel",
         ":registry",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
         "//cc/bzd/utility/format:integral",
     ],
 )
@@ -81,7 +81,7 @@ cc_library(
     deps = [
         ":promise",
         ":units",
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
     ],
 )
 
@@ -95,7 +95,7 @@ cc_library(
         ":channel",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/format",
     ],
@@ -159,7 +159,7 @@ cc_library(
     deps = [
         ":assert",
         "//cc/bzd/container:function",
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
     ],

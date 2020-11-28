@@ -13,7 +13,7 @@ cc_library(
     includes = ["."],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
     ],
     alwayslink = True,
 )
