@@ -152,9 +152,11 @@
 			},
 			async handleCreate() {
 				await this.$api.request("post", "/tile", this.value);
+				await this.$routerDispatch("/");
 			},
 			async handleUpdate() {
 				await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
+				await this.$routerDispatch("/");
 			},
 			/**
 			 * Plugins will have the following structure:

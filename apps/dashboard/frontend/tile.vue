@@ -1,5 +1,5 @@
 <template>
-	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="loading">
+	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!initialized">
 		<div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
 		<component
 			v-if="showComponent"
@@ -11,7 +11,8 @@
 			:background-color="colorBackground"
 			@color="handleColor"
 			@link="handleLink"
-			@error="handleError">
+			@error="handleError"
+			@event="handleEvent">
 		</component>
 		<div v-else-if="isError" class="content">Fatal error</div>
 		<div class="name"><i :class="icon"></i> {{ name }}</div>
@@ -36,10 +37,10 @@
 		},
 		data: function () {
 			return {
+				initialized: true,
 				showComponent: true,
 				metadata: {},
 				handleTimeout: null,
-				loading: false,
 				errorList: [],
 				color: null,
 				icon: null,
@@ -48,6 +49,7 @@
 		},
 		mounted() {
 			if (this.sourceType) {
+				this.initialized = false;
 				this.showComponent = false;
 				this.fetch();
 			}
@@ -132,7 +134,6 @@
 			},
 			async fetch() {
 				this.handleTimeout = null;
-				this.loading = true;
 				try {
 					this.metadata = await this.$api.request("get", "/data", {
 						uid: this.uid,
@@ -146,14 +147,15 @@
 					this.handleColor("red");
 				}
 				finally {
-					this.loading = false;
+					this.initialized = true;
 				}
 			},
 			async fetchIcon() {
 				const plugin = this.sourceType ? Plugins[this.sourceType] : Plugins[this.visualizationType];
+				console.log(plugin);
 				if (plugin && "module" in plugin) {
 					await plugin.module(); // Load the frontend plugin to load the icon
-					this.icon = plugin.icon || "";
+					this.icon = plugin.metadata.icon || "";
 				}
 			},
 			handleClick() {
@@ -170,6 +172,19 @@
 			handleLink(link) {
 				this.link = link;
 			},
+			async handleEvent(type) {
+				try {
+					this.metadata = await this.$api.request("post", "/event", {
+						uid: this.uid,
+						type: this.sourceType,
+						event: type,
+					});
+				}
+				catch (e) {
+					this.handleError("Error while triggering event: " + String(e));
+					this.handleColor("red");
+				}
+			}
 		},
 	};
 </script>

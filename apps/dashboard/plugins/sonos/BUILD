@@ -1,25 +1,20 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 
-bzd_nodejs_library(
-    name = "fontend",
-    srcs = [
-        "sonos.svg",
-        "source_frontend.mjs",
-    ],
-    visibility = [
-        "//apps/dashboard/plugins:__pkg__",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "backend",
-    srcs = [
-        "source_backend.mjs",
-    ],
-    packages = {
+bzd_plugin(
+    name = "sonos",
+    backend_packages = {
         "sonos": "",
     },
-    visibility = [
-        "//apps/dashboard/plugins:__pkg__",
+    backend_entry_point = "sonos_backend.mjs",
+    frontend_entry_point = "sonos_frontend.vue",
+    frontend_srcs = [
+        "sonos.svg",
     ],
+    metadata = "sonos.mjs",
+)
+
+bzd_plugin(
+    name = "media_player",
+    frontend_entry_point = "media_player.vue",
+    metadata = "media_player.mjs",
 )

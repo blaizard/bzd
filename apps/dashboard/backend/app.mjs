@@ -29,6 +29,20 @@ Commander.version("1.0.0", "-v, --version")
 	)
 	.parse(process.argv);
 
+async function getData(type, uid, keyValueStore)
+{
+	// Check that the UID exists and is of type jenkins
+	const data = await keyValueStore.get("tiles", uid, null);
+		Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+		Exception.assert(
+			data["source.type"] == type,
+			"Data type mismatch, stored '{}' vs requested '{}'.",
+			data.type,
+			type
+		);
+	return data;
+}
+
 (async () => {
 	// Read arguments
 	const PORT = process.env.BZD_PORT || Commander.port;
@@ -42,6 +56,7 @@ Commander.version("1.0.0", "-v, --version")
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	let cache = new Cache();
+	let events = {};
 
 	// Register plugins
 
@@ -69,21 +84,18 @@ Commander.version("1.0.0", "-v, --version")
 			cache.register(
 				type,
 				async (uid) => {
-					// Check that the UID exists and is of type jenkins
-					const data = await keyValueStore.get("tiles", uid, null);
-					Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-					Exception.assert(
-						data["source.type"] == type,
-						"Data type mismatch, stored '{}' vs requested '{}'.",
-						data.type,
-						type
-					);
-
+					const data = await getData(type, uid, keyValueStore);
 					Log.debug("Plugin '{}' fetching for '{}'", type, uid);
 					return await plugin.fetch(data, cache);
 				},
 				options
 			);
+
+			// Install events
+			if ("events" in plugin) {
+				Log.info("Register events for '{}'", type);
+				events[type] = plugin.events;
+			}
 		}
 	}
 
@@ -106,6 +118,17 @@ Commander.version("1.0.0", "-v, --version")
 		await keyValueStore.set("tiles", inputs.uid, inputs.value);
 	});
 	api.handle("get", "/data", async (inputs) => {
+		return await cache.get(inputs.type, inputs.uid);
+	});
+	api.handle("post", "/event", async (inputs) => {
+		Exception.assert(inputs.type in events, "No event associated with '{}'.", inputs.type);
+		Exception.assert(inputs.event in events[inputs.type], "'{}' is not a valid event for '{}'.", inputs.event, inputs.type);
+		const data = await getData(inputs.type, inputs.uid, keyValueStore);
+		await events[inputs.type][inputs.event](data, cache, inputs.args);
+
+		// Invalidates the cache
+		await cache.setDirty(inputs.type, inputs.uid);
+
 		return await cache.get(inputs.type, inputs.uid);
 	});
 
