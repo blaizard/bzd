@@ -29,7 +29,7 @@ export default {
 		return {
 			title: track.title,
 			artist: track.artist,
-			state: _getState(state) // transitioning. playing
+			state: _getState(state), // transitioning. playing
 		};
 	},
 	events: {
@@ -40,6 +40,6 @@ export default {
 		async pause(data, cache) {
 			const device = await cache.get("sonos.device");
 			await device.pause();
-		}
-	}
+		},
+	},
 };
