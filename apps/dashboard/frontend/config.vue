@@ -21,7 +21,11 @@
 	import Button from "bzd/vue/components/form/element/button.vue";
 	import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
-	import { Source, Visualization } from "../plugins/plugins.mjs";
+	//import Plugins from "../plugins/frontend.mjs";
+	import Plugins from "../plugins/plugins.frontend.index.mjs";
+	import ExceptionFactory from "bzd/core/exception.mjs";
+
+	const Exception = ExceptionFactory("config");
 
 	export default {
 		components: {
@@ -40,19 +44,16 @@
 				value: {
 					"visualization.color": "auto",
 				},
-				pluginsVisualization: {},
-				pluginsSource: {},
+				plugins: {
+					visualization: {},
+					source: {}
+				}
 			};
 		},
 		mounted() {
-			this.fetchPlugins(Source)
+			this.fetchPlugins()
 				.then((plugins) => {
-					this.pluginsSource = plugins;
-				})
-				.catch(console.error);
-			this.fetchPlugins(Visualization)
-				.then((plugins) => {
-					this.pluginsVisualization = plugins;
+					this.plugins = plugins;
 				})
 				.catch(console.error);
 
@@ -104,22 +105,22 @@
 						name: "visualization.type",
 						caption: "Type",
 						width: 0.5,
-						list: this.dropdownPluginList(this.pluginsVisualization, "*"),
+						list: this.dropdownPluginList(this.plugins.visualization, "*"),
 						html: true,
 					},
 				].concat(...(this.metadataVisualization["form"] || []));
 			},
 			metadataSource() {
-				return this.pluginsSource[this.value["source.type"]] || {};
+				return (this.plugins.source[this.value["source.type"]] || {metadata: {}}).metadata;
 			},
 			formPluginSourceDescription() {
 				return this.metadataSource.form || [];
 			},
 			metadataVisualization() {
-				return this.pluginsVisualization[this.value["visualization.type"]] || {};
+				return (this.plugins.visualization[this.value["visualization.type"]] || {metadata: {}}).metadata;
 			},
 			dropdownSourceList() {
-				return this.dropdownPluginList(this.pluginsSource, this.value["visualization.type"]);
+				return this.dropdownPluginList(this.plugins.source, this.value["visualization.type"]);
 			},
 			dropdownColorList() {
 				return Object.keys(Colors)
@@ -156,7 +157,29 @@
 			async handleUpdate() {
 				await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
 			},
+			/**
+			 * Plugins will have the following structure:
+			 * source:
+			 *   travisci:
+			 *      metadata:
+			 *      module:
+			 *   ...
+			 */
 			async fetchPlugins(source) {
+				let plugins = {
+					"source": {},
+					"visualization": {}
+				};
+				for (const [name, data] of Object.entries(Plugins)) {
+					Exception.assert("metadata" in data && "type" in data.metadata, "Missing type for plugin: '{}'", name);
+					Exception.assert(["source", "visualization"].includes(data.metadata.type), "Unsupported plugin type: '{}'", data.metadata.type);
+					data.module = ("module" in data) ? await data.module() : {}; // Load the frontend plugin to load the icon
+					plugins[data.metadata.type][name] = data;
+				}
+
+				return plugins;
+
+/*
 				let plugins = {};
 				for (const [name, description] of Object.entries(source)) {
 					if ("frontend" in description) {
@@ -164,7 +187,7 @@
 					}
 					plugins[name] = Object.assign({}, description);
 				}
-				return plugins;
+				return plugins;*/
 			},
 			dropdownPluginList(plugins, filter) {
 				const list = Object.keys(plugins)
@@ -172,12 +195,12 @@
 						if (filter == "*") {
 							return true;
 						}
-						return (plugins[type].visualization || []).includes(filter);
+						return (plugins[type].metadata.visualization || []).includes(filter);
 					})
 					.map((type) => {
 						return {
 							key: type,
-							html: "<i class=\"" + plugins[type].icon + "\"></i> " + decodeURIComponent(plugins[type].name || type),
+							html: "<i class=\"" + plugins[type].metadata.icon + "\"></i> " + decodeURIComponent(plugins[type].metadata.name || type),
 						};
 					});
 

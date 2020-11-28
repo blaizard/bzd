@@ -6,7 +6,7 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_test")
         path,
     ],
     deps = [
-        "//cc/bzd/platform:system",
+        "//cc/bzd/platform",
         "//tools/cc_test",
     ],
 ) for path in glob([

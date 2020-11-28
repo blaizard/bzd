@@ -1,8 +1,8 @@
 export default {
-	source: {
+		type: "source",
 		name: "Travis CI",
 		icon: "bzd-icon-travisci",
-		visualization: ["continuous-integration"],
+		visualization: ["continuous_integration"],
 		form: [
 			{
 				type: "Dropdown",
@@ -22,7 +22,4 @@ export default {
 			{ type: "Input", name: "travisci.token", caption: "Token", width: 0.5 },
 		],
 		timeout: 60 * 1000, // ms
-		frontend: () => import("./source_frontend.vue"),
-		backend: () => import("./source_backend.mjs"),
-	},
 };

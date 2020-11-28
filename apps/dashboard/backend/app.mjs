@@ -8,7 +8,7 @@ import HttpServer from "bzd/core/http/server.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import LogFactory from "bzd/core/log.mjs";
-import { Source } from "../plugins/plugins.mjs";
+import Plugins from "../plugins/plugins.backend.index.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -45,44 +45,46 @@ Commander.version("1.0.0", "-v, --version")
 
 	// Register plugins
 
-	for (const type in Source) {
-		Log.info("Register plugin '{}'", type);
-		const plugin = (await Source[type].backend()).default;
+	for (const type in Plugins) {
+		if ("module" in Plugins[type]) {
+			Log.info("Register plugin '{}'", type);
+			const plugin = (await Plugins[type].module()).default;
 
-		// Install plugin specific cache entries
-		(plugin.cache || []).forEach((entry) => {
-			Exception.assert(entry.collection, "Cache collection must be set.");
-			Exception.assert(typeof entry.fetch === "function", "Cache fetch must be a function.");
+			// Install plugin specific cache entries
+			(plugin.cache || []).forEach((entry) => {
+				Exception.assert(entry.collection, "Cache collection must be set.");
+				Exception.assert(typeof entry.fetch === "function", "Cache fetch must be a function.");
+				let options = {};
+				if ("timeout" in entry) {
+					options.timeout = entry.timeout;
+				}
+				cache.register(entry.collection, entry.fetch, options);
+			});
+
+			// Install plugin
 			let options = {};
-			if ("timeout" in entry) {
-				options.timeout = entry.timeout;
+			if ("timeout" in Plugins[type].metadata) {
+				options.timeout = Plugins[type].metadata.timeout;
 			}
-			cache.register(entry.collection, entry.fetch, options);
-		});
+			cache.register(
+				type,
+				async (uid) => {
+					// Check that the UID exists and is of type jenkins
+					const data = await keyValueStore.get("tiles", uid, null);
+					Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+					Exception.assert(
+						data["source.type"] == type,
+						"Data type mismatch, stored '{}' vs requested '{}'.",
+						data.type,
+						type
+					);
 
-		// Install plugin
-		let options = {};
-		if ("timeout" in Source[type]) {
-			options.timeout = Source[type].timeout;
+					Log.debug("Plugin '{}' fetching for '{}'", type, uid);
+					return await plugin.fetch(data, cache);
+				},
+				options
+			);
 		}
-		cache.register(
-			type,
-			async (uid) => {
-				// Check that the UID exists and is of type jenkins
-				const data = await keyValueStore.get("tiles", uid, null);
-				Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-				Exception.assert(
-					data["source.type"] == type,
-					"Data type mismatch, stored '{}' vs requested '{}'.",
-					data.type,
-					type
-				);
-
-				Log.debug("Plugin '{}' fetching for '{}'", type, uid);
-				return await plugin.fetch(data, cache);
-			},
-			options
-		);
 	}
 
 	// Install the APIs

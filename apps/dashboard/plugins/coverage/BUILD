@@ -1,11 +1,13 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 
-bzd_nodejs_library(
+bzd_plugin(
+    name = "coverage_report",
+    metadata = "report.mjs",
+    backend_entry_point = "source_backend.mjs",
+)
+
+bzd_plugin(
     name = "coverage",
-    srcs = glob([
-        "*",
-    ]),
-    visibility = [
-        "//apps/dashboard/plugins:__pkg__",
-    ],
+    metadata = "coverage.mjs",
+    frontend_entry_point = "visualization.vue"
 )

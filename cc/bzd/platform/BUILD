@@ -1,7 +1,7 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
 cc_library(
-    name = "system",
+    name = "platform",
     srcs = [
         "stack.cc",
     ],

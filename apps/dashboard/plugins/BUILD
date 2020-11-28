@@ -1,19 +1,14 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("//apps/dashboard/plugins:defs.bzl", "bzd_plugins")
 
-bzd_nodejs_library(
+bzd_plugins(
     name = "plugins",
-    srcs = [
-        "plugins.mjs",
-    ],
-    visibility = [
-        "//apps/dashboard:__subpackages__",
-    ],
-    deps = [
-        "//apps/dashboard/plugins/continuous_integration",
-        "//apps/dashboard/plugins/coverage",
-        "//apps/dashboard/plugins/github",
-        "//apps/dashboard/plugins/jenkins",
-        "//apps/dashboard/plugins/link",
-        "//apps/dashboard/plugins/travisci",
-    ],
+    plugins = [
+        "//apps/dashboard/plugins/coverage:coverage",
+        "//apps/dashboard/plugins/coverage:coverage_report",
+        "//apps/dashboard/plugins/continuous_integration:continuous_integration",
+        "//apps/dashboard/plugins/github:github",
+        "//apps/dashboard/plugins/jenkins:jenkins",
+        "//apps/dashboard/plugins/link:link",
+        "//apps/dashboard/plugins/travisci:travisci",
+    ]
 )

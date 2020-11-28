@@ -5,8 +5,6 @@
 #include <atomic>
 
 namespace bzd {
-using MemoryOrder = std::memory_order;
-
 template <class T>
 class Atomic : public bzd::NamedType<std::atomic<T>, struct AtomicTag, bzd::Comparable, bzd::Incrementable, bzd::Decrementable>
 {
@@ -27,6 +25,6 @@ public:
 
 	constexpr T exchange(T v) { return this->get().exchange(v); }
 
-	constexpr bool compare_exchange(T& expected, T desired) { return this->get().compare_exchange_strong(expected, desired); }
+	constexpr bool compareExchange(T& expected, T desired) { return this->get().compare_exchange_strong(expected, desired); }
 };
 } // namespace bzd

@@ -1,14 +1,14 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 
-bzd_nodejs_library(
+bzd_plugin(
     name = "jenkins",
-    srcs = glob([
-        "*",
-    ]),
-    visibility = [
-        "//apps/dashboard/plugins:__pkg__",
+    metadata = "plugin.mjs",
+    frontend_entry_point = "source_frontend.vue",
+    frontend_srcs = [
+        "jenkins.svg",
     ],
-    deps = [
+    backend_entry_point = "source_backend.mjs",
+    backend_deps = [
         "//nodejs/core/http:client",
     ],
 )

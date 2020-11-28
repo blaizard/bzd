@@ -1,5 +1,5 @@
 export default {
-	visualization: {
+		type: "visualization",
 		name: "Link",
 		icon: "bzd-icon-link",
 		form: [
@@ -10,6 +10,4 @@ export default {
 				placeholder: "https://www.google.com",
 			},
 		],
-		frontend: () => import("./visualization.vue"),
-	},
 };

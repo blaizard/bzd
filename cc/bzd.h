@@ -45,6 +45,8 @@
 #include "bzd/meta/union.h"
 
 // Platform
+#include "bzd/platform/atomic.h"
+#include "bzd/platform/clock.h"
 #include "bzd/platform/out.h"
 #include "bzd/platform/panic.h"
 #include "bzd/platform/stack.h"
