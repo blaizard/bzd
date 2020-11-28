@@ -10,5 +10,7 @@ bzd_plugins(
         "//apps/dashboard/plugins/jenkins",
         "//apps/dashboard/plugins/link",
         "//apps/dashboard/plugins/travisci",
+        "//apps/dashboard/plugins/sonos",
+        "//apps/dashboard/plugins/sonos:media_player",
     ],
 )

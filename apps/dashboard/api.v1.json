@@ -18,6 +18,17 @@
             }
         }
     },
+    "/event": {
+        "post": {
+            "documentation": "Get data from a tile",
+            "request": {
+                "type": "json"
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    },
     "/tile": {
         "get": {
             "documentation": "Get a specific tile configuration",
