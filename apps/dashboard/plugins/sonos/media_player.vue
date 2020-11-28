@@ -27,7 +27,8 @@
 			},
 			containerStyle() {
 				return {
-					"--title-scroll": this.titleScroll + "px",
+					"--title-scroll-start": (this.titleScroll) ? "10px" : 0,
+					"--title-scroll-end": (this.titleScroll) ? ((this.titleScroll - 10) + "px") : 0,
 					"--title-scroll-speed": -this.titleScroll / 20 + "s",
 				};
 			},
@@ -40,7 +41,6 @@
 					const container = this.$refs.container.getBoundingClientRect();
 					const rect = this.$refs.title.getBoundingClientRect();
 					this.titleScroll = -Math.max(0, rect.width - container.width);
-					console.log(this.titleScroll);
 				},
 			},
 		},
@@ -60,7 +60,8 @@
 	@use "bzd-style/css/clickable.scss";
 
 	.media-player {
-		--title-scroll: -100%;
+		--title-scroll-start: 0;
+		--title-scroll-end: 0;
 		--title-scroll-speed: 5s;
 
 		.clickable {
@@ -75,13 +76,13 @@
 
 		@keyframes marquee {
 			0% {
-				left: 0;
+				left: var(--title-scroll-start);
 			}
 			50% {
-				left: var(--title-scroll);
+				left: var(--title-scroll-end);
 			}
 			100% {
-				left: 0%;
+				left: var(--title-scroll-start);
 			}
 		}
 
