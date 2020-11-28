@@ -184,7 +184,7 @@
 					this.handleError("Error while triggering event: " + String(e));
 					this.handleColor("red");
 				}
-			}
+			},
 		},
 	};
 </script>

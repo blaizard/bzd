@@ -1,7 +1,7 @@
 <template>
 	<div class="media-player" ref="container" :style="containerStyle">
 		<div class="title" ref="title">{{ title }}</div>
-		<div class="state" @click="onStateClick">
+		<div class="state clickable" @click="onStateClick">
 			<i v-if="metadata.state == 'play'" class="bzd-icon-pause"></i>
 			<i v-else class="bzd-icon-play"></i>
 		</div>
@@ -15,7 +15,7 @@
 		},
 		data: function () {
 			return {
-				titleScroll: 0
+				titleScroll: 0,
 			};
 		},
 		computed: {
@@ -28,9 +28,9 @@
 			containerStyle() {
 				return {
 					"--title-scroll": this.titleScroll + "px",
-					"--title-scroll-speed": (-this.titleScroll / 20) + "s"
-				}
-			}
+					"--title-scroll-speed": -this.titleScroll / 20 + "s",
+				};
+			},
 		},
 		watch: {
 			title: {
@@ -41,17 +41,15 @@
 					const rect = this.$refs.title.getBoundingClientRect();
 					this.titleScroll = -Math.max(0, rect.width - container.width);
 					console.log(this.titleScroll);
-				}
-			}
+				},
+			},
 		},
 		methods: {
 			async onStateClick() {
-				if (this.metadata.state == "pause")
-					this.$emit("event", "play");
-				else
-					this.$emit("event", "pause");
-			}
-		}
+				if (this.metadata.state == "pause") {this.$emit("event", "play");}
+				else {this.$emit("event", "pause");}
+			},
+		},
 	};
 </script>
 
@@ -59,10 +57,15 @@
 	@use "bzd/icons.scss" with (
         $bzdIconNames: play pause stop
     );
+	@use "bzd-style/css/clickable.scss";
 
 	.media-player {
 		--title-scroll: -100%;
 		--title-scroll-speed: 5s;
+
+		.clickable {
+			@extend %bzd-clickable;
+		}
 
 		.title {
 			white-space: nowrap;
@@ -71,18 +74,27 @@
 		}
 
 		@keyframes marquee {
-			0% { left: 0; }
-			50% { left: var(--title-scroll); }
-			100% { left: 0%; }
+			0% {
+				left: 0;
+			}
+			50% {
+				left: var(--title-scroll);
+			}
+			100% {
+				left: 0%;
+			}
 		}
 
 		.state {
 			text-align: center;
 			position: absolute;
-			top: 35%;
+			top: calc(50% - 20px);
+			left: calc(50% - 30px);
+			width: 60px;
+			height: 60px;
+			line-height: 60px;
 			font-size: 56px;
-			width: 100%;
-			cursor: pointer;
+			border-radius: 5px;
 		}
 	}
 </style>

@@ -110,7 +110,6 @@ _bzd_plugins_gen_index = rule(
 )
 
 def bzd_plugins(name, plugins):
-
     plugins_normalized = [str(Label(plugin)) for plugin in plugins]
 
     _bzd_plugins_gen_index(

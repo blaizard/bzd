@@ -29,17 +29,11 @@ Commander.version("1.0.0", "-v, --version")
 	)
 	.parse(process.argv);
 
-async function getData(type, uid, keyValueStore)
-{
+async function getData(type, uid, keyValueStore) {
 	// Check that the UID exists and is of type jenkins
 	const data = await keyValueStore.get("tiles", uid, null);
-		Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-		Exception.assert(
-			data["source.type"] == type,
-			"Data type mismatch, stored '{}' vs requested '{}'.",
-			data.type,
-			type
-		);
+	Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+	Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
 	return data;
 }
 
@@ -122,7 +116,12 @@ async function getData(type, uid, keyValueStore)
 	});
 	api.handle("post", "/event", async (inputs) => {
 		Exception.assert(inputs.type in events, "No event associated with '{}'.", inputs.type);
-		Exception.assert(inputs.event in events[inputs.type], "'{}' is not a valid event for '{}'.", inputs.event, inputs.type);
+		Exception.assert(
+			inputs.event in events[inputs.type],
+			"'{}' is not a valid event for '{}'.",
+			inputs.event,
+			inputs.type
+		);
 		const data = await getData(inputs.type, inputs.uid, keyValueStore);
 		await events[inputs.type][inputs.event](data, cache, inputs.args);
 
