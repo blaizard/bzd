@@ -7,7 +7,7 @@ PluginInfo = provider(
         "metadata": "metadata information",
         "entry_point": "entry point",
         "deps": "dependencies",
-    }
+    },
 )
 
 def _bzd_plugin_impl(ctx):
@@ -17,11 +17,11 @@ _bzd_plugin = rule(
     implementation = _bzd_plugin_impl,
     attrs = {
         "plugin_name": attr.string(
-            mandatory = True
+            mandatory = True,
         ),
         "metadata": attr.label(
             allow_single_file = True,
-            mandatory = True
+            mandatory = True,
         ),
         "entry_point": attr.label(
             allow_single_file = True,
@@ -31,7 +31,6 @@ _bzd_plugin = rule(
 )
 
 def bzd_plugin(name, metadata, frontend_entry_point = None, frontend_srcs = [], frontend_deps = [], frontend_packages = {}, backend_entry_point = None, backend_srcs = [], backend_deps = [], backend_packages = {}):
-
     bzd_nodejs_library(
         name = "{}.frontend.library".format(name),
         srcs = frontend_srcs + [metadata] + ([frontend_entry_point] if frontend_entry_point else []),
@@ -67,7 +66,6 @@ def bzd_plugin(name, metadata, frontend_entry_point = None, frontend_srcs = [], 
     )
 
 def _bzd_plugins_gen_index_impl(ctx):
-
     content_imports = []
     content_entries = []
 
@@ -106,22 +104,24 @@ _bzd_plugins_gen_index = rule(
     attrs = {
         "plugins": attr.label_list(
             providers = [PluginInfo],
-            mandatory = True
+            mandatory = True,
         ),
     },
 )
 
 def bzd_plugins(name, plugins):
 
+    plugins_normalized = [str(Label(plugin)) for plugin in plugins]
+
     _bzd_plugins_gen_index(
         name = "{}.frontend.index".format(name),
-        plugins = ["{}.frontend".format(plugin) for plugin in plugins],
+        plugins = ["{}.frontend".format(plugin) for plugin in plugins_normalized],
         visibility = ["//visibility:public"],
     )
 
     _bzd_plugins_gen_index(
         name = "{}.backend.index".format(name),
-        plugins = ["{}.backend".format(plugin) for plugin in plugins],
+        plugins = ["{}.backend".format(plugin) for plugin in plugins_normalized],
         visibility = ["//visibility:public"],
     )
 
@@ -130,7 +130,7 @@ def bzd_plugins(name, plugins):
         srcs = [
             "{}.frontend.index".format(name),
         ],
-        deps = ["{}.frontend.library".format(plugin) for plugin in plugins], # + ["//apps/dashboard/plugins/coverage:coverage_report.frontend.library"],
+        deps = ["{}.frontend.library".format(plugin) for plugin in plugins_normalized],
         visibility = ["//visibility:public"],
     )
 
@@ -139,6 +139,6 @@ def bzd_plugins(name, plugins):
         srcs = [
             "{}.backend.index".format(name),
         ],
-        deps = ["{}.backend.library".format(plugin) for plugin in plugins],
+        deps = ["{}.backend.library".format(plugin) for plugin in plugins_normalized],
         visibility = ["//visibility:public"],
     )
