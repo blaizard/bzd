@@ -1,15 +1,15 @@
 import { AsyncDeviceDiscovery } from "sonos";
 
 /*
-function runDeviceDiscovery()
-{
-	return new Promise((resolve, reject) => {
-		DeviceDiscovery().once("DeviceAvailable", (device) => {
-			resolve(device.host);
-		});
-	});
-}
-*/
+ *function runDeviceDiscovery()
+ *{
+ *	return new Promise((resolve, reject) => {
+ *		DeviceDiscovery().once("DeviceAvailable", (device) => {
+ *			resolve(device.host);
+ *		});
+ *	});
+ *}
+ */
 export default {
 	cache: [
 		{

@@ -3,8 +3,8 @@ load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "fontend",
     srcs = [
-        "source_frontend.mjs",
         "sonos.svg",
+        "source_frontend.mjs",
     ],
     visibility = [
         "//apps/dashboard/plugins:__pkg__",

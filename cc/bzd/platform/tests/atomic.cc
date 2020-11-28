@@ -1,6 +1,6 @@
 #include "bzd/platform/atomic.h"
-#include "bzd/platform/types.h"
 
+#include "bzd/platform/types.h"
 #include "cc_test/test.h"
 
 template <class T>

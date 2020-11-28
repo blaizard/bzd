@@ -21,7 +21,6 @@
 	import Button from "bzd/vue/components/form/element/button.vue";
 	import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
-	//import Plugins from "../plugins/frontend.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 	import ExceptionFactory from "bzd/core/exception.mjs";
 
@@ -46,8 +45,8 @@
 				},
 				plugins: {
 					visualization: {},
-					source: {}
-				}
+					source: {},
+				},
 			};
 		},
 		mounted() {
@@ -111,13 +110,13 @@
 				].concat(...(this.metadataVisualization["form"] || []));
 			},
 			metadataSource() {
-				return (this.plugins.source[this.value["source.type"]] || {metadata: {}}).metadata;
+				return (this.plugins.source[this.value["source.type"]] || { metadata: {} }).metadata;
 			},
 			formPluginSourceDescription() {
 				return this.metadataSource.form || [];
 			},
 			metadataVisualization() {
-				return (this.plugins.visualization[this.value["visualization.type"]] || {metadata: {}}).metadata;
+				return (this.plugins.visualization[this.value["visualization.type"]] || { metadata: {} }).metadata;
 			},
 			dropdownSourceList() {
 				return this.dropdownPluginList(this.plugins.source, this.value["visualization.type"]);
@@ -165,29 +164,23 @@
 			 *      module:
 			 *   ...
 			 */
-			async fetchPlugins(source) {
+			async fetchPlugins() {
 				let plugins = {
-					"source": {},
-					"visualization": {}
+					source: {},
+					visualization: {},
 				};
 				for (const [name, data] of Object.entries(Plugins)) {
 					Exception.assert("metadata" in data && "type" in data.metadata, "Missing type for plugin: '{}'", name);
-					Exception.assert(["source", "visualization"].includes(data.metadata.type), "Unsupported plugin type: '{}'", data.metadata.type);
-					data.module = ("module" in data) ? await data.module() : {}; // Load the frontend plugin to load the icon
+					Exception.assert(
+						["source", "visualization"].includes(data.metadata.type),
+						"Unsupported plugin type: '{}'",
+						data.metadata.type
+					);
+					data.module = "module" in data ? await data.module() : {}; // Load the frontend plugin to load the icon
 					plugins[data.metadata.type][name] = data;
 				}
 
 				return plugins;
-
-/*
-				let plugins = {};
-				for (const [name, description] of Object.entries(source)) {
-					if ("frontend" in description) {
-						await description.frontend(); // Load the frontend plugin to load the icon
-					}
-					plugins[name] = Object.assign({}, description);
-				}
-				return plugins;*/
 			},
 			dropdownPluginList(plugins, filter) {
 				const list = Object.keys(plugins)
@@ -200,7 +193,11 @@
 					.map((type) => {
 						return {
 							key: type,
-							html: "<i class=\"" + plugins[type].metadata.icon + "\"></i> " + decodeURIComponent(plugins[type].metadata.name || type),
+							html:
+								"<i class=\"" +
+								plugins[type].metadata.icon +
+								"\"></i> " +
+								decodeURIComponent(plugins[type].metadata.name || type),
 						};
 					});
 

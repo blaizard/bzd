@@ -22,7 +22,6 @@
 	import Colors from "bzd-style/css/colors.scss";
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
-	//import Plugins from "../plugins/frontend.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 
 	export default {

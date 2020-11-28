@@ -16,12 +16,11 @@ bzd_nodejs_web(
     ],
     deps = [
         "//apps/dashboard:api",
-        #"//apps/dashboard/plugins:frontend",
         "//apps/dashboard/plugins:plugins.frontend",
         "//nodejs:icons",
         "//nodejs:vue",
-        "//nodejs/core/http:client",
         "//nodejs/core:exception",
+        "//nodejs/core/http:client",
         "//nodejs/styles/default",
         "//nodejs/vue:api",
         "//nodejs/vue/components/form",
