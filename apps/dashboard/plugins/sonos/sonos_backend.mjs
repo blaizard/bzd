@@ -17,18 +17,25 @@ export default {
 			collection: "sonos.device",
 			fetch: async () => {
 				let discovery = new Sonos.AsyncDeviceDiscovery();
-				return await discovery.discover();
+				const device = await discovery.discover();
+				const description = await device.deviceDescription();
+				return {
+					device: device,
+					name: description.displayName + " - " + description.roomName
+				}
 			},
 			timeout: 60 * 1000 * 30,
 		},
 	],
 	fetch: async (data, cache) => {
 		const device = await cache.get("sonos.device");
-		const track = await device.currentTrack();
-		const state = await device.getCurrentState();
+		const track = await device.device.currentTrack();
+		const state = await device.device.getCurrentState();
+
 		return {
 			title: track.title,
 			artist: track.artist,
+			name: device.name,
 			state: _getState(state), // transitioning. playing
 		};
 	},
