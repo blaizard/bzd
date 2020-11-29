@@ -27,8 +27,8 @@
 			},
 			containerStyle() {
 				return {
-					"--title-scroll-start": (this.titleScroll) ? "10px" : 0,
-					"--title-scroll-end": (this.titleScroll) ? ((this.titleScroll - 10) + "px") : 0,
+					"--title-scroll-start": this.titleScroll ? "10px" : 0,
+					"--title-scroll-end": this.titleScroll ? this.titleScroll - 10 + "px" : 0,
 					"--title-scroll-speed": -this.titleScroll / 20 + "s",
 				};
 			},
@@ -46,15 +46,19 @@
 		},
 		methods: {
 			async onStateClick() {
-				if (this.metadata.state == "pause") {this.$emit("event", "play");}
-				else {this.$emit("event", "pause");}
+				if (this.metadata.state == "pause") {
+					this.$emit("event", "play");
+				}
+				else {
+					this.$emit("event", "pause");
+				}
 			},
 			handleOver() {
 				this.$emit("clickable", true);
 			},
 			handleLeave() {
 				this.$emit("clickable", false);
-			}
+			},
 		},
 	};
 </script>
