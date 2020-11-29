@@ -42,11 +42,11 @@ export default {
 	events: {
 		async play(data, cache) {
 			const device = await cache.get("sonos.device");
-			await device.play();
+			await device.device.play();
 		},
 		async pause(data, cache) {
 			const device = await cache.get("sonos.device");
-			await device.pause();
+			await device.device.pause();
 		},
 	},
 };
