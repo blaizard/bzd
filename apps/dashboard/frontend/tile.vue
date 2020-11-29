@@ -13,7 +13,8 @@
 			@link="handleLink"
 			@error="handleError"
 			@clickable="handleClickable"
-			@event="handleEvent">
+			@event="handleEvent"
+			@name="handleName">
 		</component>
 		<div v-else-if="isError" class="content">Fatal error</div>
 		<div class="name"><i :class="icon"></i> {{ name }}</div>
@@ -50,6 +51,7 @@
 				icon: null,
 				link: null,
 				clickable: false,
+				manualName: null
 			};
 		},
 		mounted() {
@@ -95,7 +97,7 @@
 				);
 			},
 			name() {
-				return this.description.name || this.sourceType || this.visualizationType;
+				return this.description.name || this.manualName || this.sourceType || this.visualizationType;
 			},
 			visualizationColor() {
 				return this.description["visualization.color"] || "auto";
@@ -180,6 +182,9 @@
 			},
 			handleClickable(clickable) {
 				this.clickable = clickable;
+			},
+			handleName(name) {
+				this.manualName = name;
 			},
 			async handleEvent(type) {
 				try {
