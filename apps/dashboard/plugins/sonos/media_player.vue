@@ -1,7 +1,7 @@
 <template>
 	<div class="media-player" ref="container" :style="containerStyle">
 		<div class="title" ref="title">{{ title }}</div>
-		<div class="state clickable" @click="onStateClick">
+		<div class="state" @click="onStateClick" @mouseover="handleOver" @mouseleave="handleLeave">
 			<i v-if="metadata.state == 'play'" class="bzd-icon-pause"></i>
 			<i v-else class="bzd-icon-play"></i>
 		</div>
@@ -49,6 +49,12 @@
 				if (this.metadata.state == "pause") {this.$emit("event", "play");}
 				else {this.$emit("event", "pause");}
 			},
+			handleOver() {
+				this.$emit("clickable", true);
+			},
+			handleLeave() {
+				this.$emit("clickable", false);
+			}
 		},
 	};
 </script>
@@ -57,16 +63,11 @@
 	@use "bzd/icons.scss" with (
         $bzdIconNames: play pause stop
     );
-	@use "bzd-style/css/clickable.scss";
 
 	.media-player {
 		--title-scroll-start: 0;
 		--title-scroll-end: 0;
 		--title-scroll-speed: 5s;
-
-		.clickable {
-			@extend %bzd-clickable;
-		}
 
 		.title {
 			white-space: nowrap;

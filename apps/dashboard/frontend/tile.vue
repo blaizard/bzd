@@ -12,6 +12,7 @@
 			@color="handleColor"
 			@link="handleLink"
 			@error="handleError"
+			@clickable="handleClickable"
 			@event="handleEvent">
 		</component>
 		<div v-else-if="isError" class="content">Fatal error</div>
@@ -48,6 +49,7 @@
 				color: null,
 				icon: null,
 				link: null,
+				clickable: false
 			};
 		},
 		mounted() {
@@ -115,7 +117,7 @@
 				return {
 					"bzd-dashboard-tile": true,
 					edit: this.edit,
-					clickable: Boolean(this.link) || this.edit,
+					clickable: Boolean(this.clickable) || Boolean(this.link) || this.edit,
 				};
 			},
 			tileStyle() {
@@ -175,6 +177,9 @@
 			},
 			handleLink(link) {
 				this.link = link;
+			},
+			handleClickable(clickable) {
+				this.clickable = clickable;
 			},
 			async handleEvent(type) {
 				try {

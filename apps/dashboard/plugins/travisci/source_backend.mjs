@@ -37,7 +37,6 @@ export default {
 				const result = await HttpClient.get(url, options);
 				return (result.builds || []).map((item) => {
 					const status = _getStatus(item);
-					console.log(item);
 					return {
 						// Duration is not correct as it includes accumulated duration from teh jobs eventhough they run in parallel
 						duration: item.duration * 1000,
