@@ -15,7 +15,7 @@
 		},
 		data: function () {
 			return {
-				titleScroll: 0,
+				titleScroll: 0
 			};
 		},
 		computed: {
@@ -24,6 +24,9 @@
 					return this.metadata.artist + " - " + this.metadata.title;
 				}
 				return this.metadata.title;
+			},
+			name() {
+				return this.metadata.name;
 			},
 			containerStyle() {
 				return {
@@ -43,6 +46,12 @@
 					this.titleScroll = -Math.max(0, rect.width - container.width);
 				},
 			},
+			name: {
+				immediate: true,
+				async handler() {
+					this.$emit("name", this.name);
+				},
+			}
 		},
 		methods: {
 			async onStateClick() {
