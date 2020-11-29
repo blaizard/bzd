@@ -49,7 +49,7 @@
 				color: null,
 				icon: null,
 				link: null,
-				clickable: false
+				clickable: false,
 			};
 		},
 		mounted() {
