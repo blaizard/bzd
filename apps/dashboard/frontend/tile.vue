@@ -1,5 +1,5 @@
 <template>
-	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!initialized">
+	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!(initialized || edit)">
 		<div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
 		<component
 			v-if="showComponent"
@@ -24,6 +24,9 @@
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
+	import ExceptionFactory from "bzd/core/exception.mjs";
+
+	const Exception = ExceptionFactory("tile");
 
 	export default {
 		props: {
@@ -105,6 +108,7 @@
 				return Plugins[this.sourceType].metadata.timeout || 0;
 			},
 			component() {
+				Exception.assert(this.visualizationType in Plugins, "Unsupported plugin '{}'", this.visualizationType);
 				return Plugins[this.visualizationType].module;
 			},
 			tileClass() {
