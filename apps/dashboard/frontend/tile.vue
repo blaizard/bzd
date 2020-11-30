@@ -1,23 +1,26 @@
 <template>
-	<div :class="tileClass" :style="tileStyle" @click="handleClick" v-loading="!(initialized || edit)">
-		<div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
-		<component
-			v-if="showComponent"
-			class="content"
-			:is="component"
-			:description="description"
-			:metadata="metadata"
-			:color="colorForeground"
-			:background-color="colorBackground"
-			@color="handleColor"
-			@link="handleLink"
-			@error="handleError"
-			@clickable="handleClickable"
-			@event="handleEvent"
-			@name="handleName">
-		</component>
-		<div v-else-if="isError" class="content">Fatal error</div>
-		<div class="name"><i :class="icon"></i> {{ name }}</div>
+	<div class="bzd-dashboard-tile" :style="tileStyle">
+		<div :class="tileClass" :style="containerStyle" @click="handleClick" v-loading="!(initialized || edit)">
+			<div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
+			<component
+				v-if="showComponent"
+				class="content"
+				:is="component"
+				:description="description"
+				:metadata="metadata"
+				:color="colorForeground"
+				:background-color="colorBackground"
+				@color="handleColor"
+				@link="handleLink"
+				@error="handleError"
+				@clickable="handleClickable"
+				@event="handleEvent"
+				@name="handleName"
+				@image="handleImage">
+			</component>
+			<div v-else-if="isError" class="content">Fatal error</div>
+			<div class="name"><i :class="icon"></i> {{ name }}</div>
+		</div>
 	</div>
 </template>
 
@@ -26,6 +29,7 @@
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
+	import Color from "bzd/utils/color.mjs";
 	import ExceptionFactory from "bzd/core/exception.mjs";
 
 	const Exception = ExceptionFactory("tile");
@@ -51,7 +55,8 @@
 				icon: null,
 				link: null,
 				clickable: false,
-				manualName: null
+				manualName: null,
+				image: null,
 			};
 		},
 		mounted() {
@@ -117,15 +122,22 @@
 			},
 			tileClass() {
 				return {
-					"bzd-dashboard-tile": true,
+					container: true,
 					edit: this.edit,
 					clickable: Boolean(this.clickable) || Boolean(this.link) || this.edit,
 				};
 			},
 			tileStyle() {
+				return "background-image: url(" + this.image + ");";
+			},
+			containerStyle() {
+				//console.log(Colors[this.colorBackground]);
+				let color = new Color(Colors[this.colorBackground]);
+				color.setAlpha(0.5);
+				const backgroundColor = this.image ? color.toString() : Colors[this.colorBackground];
 				return (
 					"background-color: " +
-					Colors[this.colorBackground] +
+					backgroundColor +
 					"; color: " +
 					Colors[this.colorForeground] +
 					"; border-color: " +
@@ -186,6 +198,9 @@
 			handleName(name) {
 				this.manualName = name;
 			},
+			handleImage(image) {
+				this.image = image;
+			},
 			async handleEvent(type) {
 				try {
 					this.metadata = await this.$api.request("post", "/event", {
@@ -210,54 +225,63 @@
 	$bzdPadding: 10px;
 
 	.bzd-dashboard-tile {
-		&.clickable {
-			@extend %bzd-clickable;
-		}
-
 		width: 300px;
 		height: 300px;
 		margin: 10px;
+		padding: 0px;
 
-		border-width: 1px;
-		border-style: solid;
-		position: relative;
+		background-repeat: no-repeat;
+		background-size: contain;
 
-		&.edit {
-			border-style: dashed;
-			border-width: 2px;
-		}
+		.container {
+			&.clickable {
+				@extend %bzd-clickable;
+			}
 
-		.name {
-			position: absolute;
-			bottom: $bzdPadding;
-			left: $bzdPadding;
-			right: $bzdPadding;
-			overflow: hidden;
-			line-height: 2em;
-		}
+			width: 300px;
+			height: 300px;
 
-		.content {
-			position: absolute;
-			top: $bzdPadding;
-			bottom: calc(#{$bzdPadding * 2} + 2em);
-			left: $bzdPadding;
-			right: $bzdPadding;
-			overflow: hidden;
-		}
+			border-width: 1px;
+			border-style: solid;
+			position: relative;
 
-		.error {
-			position: absolute;
-			right: -1em;
-			top: -1em;
-			width: 2em;
-			height: 2em;
-			border-radius: 1em;
-			border: 1px solid colors.$bzdGraphColorWhite;
-			z-index: 1;
-			color: colors.$bzdGraphColorWhite;
-			background-color: colors.$bzdGraphColorRed;
-			line-height: 2em;
-			text-align: center;
+			&.edit {
+				border-style: dashed;
+				border-width: 2px;
+			}
+
+			.name {
+				position: absolute;
+				bottom: $bzdPadding;
+				left: $bzdPadding;
+				right: $bzdPadding;
+				overflow: hidden;
+				line-height: 2em;
+			}
+
+			.content {
+				position: absolute;
+				top: $bzdPadding;
+				bottom: calc(#{$bzdPadding * 2} + 2em);
+				left: $bzdPadding;
+				right: $bzdPadding;
+				overflow: hidden;
+			}
+
+			.error {
+				position: absolute;
+				right: -1em;
+				top: -1em;
+				width: 2em;
+				height: 2em;
+				border-radius: 1em;
+				border: 1px solid colors.$bzdGraphColorWhite;
+				z-index: 1;
+				color: colors.$bzdGraphColorWhite;
+				background-color: colors.$bzdGraphColorRed;
+				line-height: 2em;
+				text-align: center;
+			}
 		}
 	}
 </style>
