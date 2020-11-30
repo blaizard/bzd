@@ -22,6 +22,7 @@ bzd_nodejs_web(
         "//nodejs/core:exception",
         "//nodejs/core/http:client",
         "//nodejs/styles/default",
+        "//nodejs/utils:color",
         "//nodejs/vue:api",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout",
