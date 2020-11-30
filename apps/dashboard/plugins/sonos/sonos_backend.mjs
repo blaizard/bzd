@@ -17,13 +17,15 @@ async function _next(data, cache, increment) {
 
 	while (counter--) {
 		if (device.playlist.includes(device.track.uid)) {
-			const index = (device.playlist.indexOf(device.track.uid) + increment) % device.playlist.length;
+			let index = (device.playlist.indexOf(device.track.uid) + increment) % device.playlist.length;
+			index = (index < 0) ? (device.playlist.length + index) : index; 
 			device.track.uid = device.playlist[index];
 		}
 		else {
 			const uid = device.playlist[0] || null;
 			device.track.uid = uid;
 		}
+
 		try {
 			await device.instance.setAVTransportURI(device.track.uid);
 			break;
@@ -52,7 +54,7 @@ export default {
 						return "uri" in item;
 					})
 					.map((item) => {
-						return decodeURIComponent(item.uri);
+						return item.uri;
 					});
 
 				let track = Object.assign(
