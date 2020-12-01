@@ -7,24 +7,32 @@ export default class Color {
 		this.data = this._parse(str);
 	}
 
+	_normalizeColor(str) {
+		let ctx = document.createElement("canvas").getContext("2d");
+		ctx.fillStyle = str;
+		return ctx.fillStyle;
+	}
+
 	_parse(str) {
-		if (str.length == 4) {
+		const normalizedStr = this._normalizeColor(str);
+
+		if (normalizedStr.length == 4) {
 			return {
-				r: parseInt("0x" + str[1] + str[1]),
-				g: parseInt("0x" + str[2] + str[2]),
-				b: parseInt("0x" + str[3] + str[3]),
+				r: parseInt("0x" + normalizedStr[1] + normalizedStr[1]),
+				g: parseInt("0x" + normalizedStr[2] + normalizedStr[2]),
+				b: parseInt("0x" + normalizedStr[3] + normalizedStr[3]),
 				a: 1,
 			};
 		}
-		else if (str.length == 7) {
+		else if (normalizedStr.length == 7) {
 			return {
-				r: parseInt("0x" + str[1] + str[2]),
-				g: parseInt("0x" + str[3] + str[4]),
-				b: parseInt("0x" + str[5] + str[6]),
+				r: parseInt("0x" + normalizedStr[1] + normalizedStr[2]),
+				g: parseInt("0x" + normalizedStr[3] + normalizedStr[4]),
+				b: parseInt("0x" + normalizedStr[5] + normalizedStr[6]),
 				a: 1,
 			};
 		}
-		Exception.unreachable("Unsupported color format: '{}'", str);
+		Exception.unreachable("Unsupported color format: '{}'", normalizedStr);
 	}
 
 	setAlpha(alpha) {
