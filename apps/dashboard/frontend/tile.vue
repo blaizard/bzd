@@ -128,12 +128,11 @@
 				};
 			},
 			tileStyle() {
-				return "background-image: url(" + this.image + ");";
+				return "background-image: url(\"" + this.image + "\");";
 			},
 			containerStyle() {
-				//console.log(Colors[this.colorBackground]);
 				let color = new Color(Colors[this.colorBackground]);
-				color.setAlpha(0.5);
+				color.setAlpha(0.6);
 				const backgroundColor = this.image ? color.toString() : Colors[this.colorBackground];
 				return (
 					"background-color: " +
@@ -172,7 +171,6 @@
 			},
 			async fetchIcon() {
 				const plugin = this.sourceType ? Plugins[this.sourceType] : Plugins[this.visualizationType];
-				console.log(plugin);
 				if (plugin && "module" in plugin) {
 					await plugin.module(); // Load the frontend plugin to load the icon
 					this.icon = plugin.metadata.icon || "";
@@ -232,6 +230,7 @@
 
 		background-repeat: no-repeat;
 		background-size: contain;
+		background-position: center;
 
 		.container {
 			&.clickable {
