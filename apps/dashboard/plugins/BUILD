@@ -12,5 +12,7 @@ bzd_plugins(
         "//apps/dashboard/plugins/travisci",
         "//apps/dashboard/plugins/sonos",
         "//apps/dashboard/plugins/sonos:media_player",
+        "//apps/dashboard/plugins/snmp",
+        "//apps/dashboard/plugins/system_monitor",
     ],
 )

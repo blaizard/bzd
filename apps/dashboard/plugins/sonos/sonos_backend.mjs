@@ -18,7 +18,7 @@ async function _next(data, cache, increment) {
 	while (counter--) {
 		if (device.playlist.includes(device.track.uid)) {
 			let index = (device.playlist.indexOf(device.track.uid) + increment) % device.playlist.length;
-			index = (index < 0) ? (device.playlist.length + index) : index; 
+			index = index < 0 ? device.playlist.length + index : index;
 			device.track.uid = device.playlist[index];
 		}
 		else {
@@ -63,10 +63,12 @@ export default {
 						title: null,
 						artist: null,
 						art: null,
+						state: "pause",
 					},
 					(previous || {}).track
 				);
 
+				// Hook on track change event
 				instance.on("CurrentTrack", (currentTrack) => {
 					if (currentTrack.title.startsWith("x-")) {
 						track.uid = currentTrack.title;
@@ -76,6 +78,11 @@ export default {
 						track.artist = currentTrack.artist;
 						track.art = currentTrack.albumArtURI;
 					}
+				});
+
+				// Hook on new state event
+				instance.on("PlayState", (state) => {
+					track.state = _getState(state);
 				});
 
 				return {
@@ -90,24 +97,25 @@ export default {
 	],
 	fetch: async (data, cache) => {
 		const device = await cache.get("sonos.device");
-		const state = await device.instance.getCurrentState();
 
 		return {
 			title: device.track.title,
 			artist: device.track.artist,
 			art: device.track.art,
 			name: device.name,
-			state: _getState(state),
+			state: device.track.state,
 		};
 	},
 	events: {
 		async play(data, cache) {
-			const device = await cache.get("sonos.device");
+			let device = await cache.get("sonos.device");
 			await device.instance.play();
+			device.track.state = "play";
 		},
 		async pause(data, cache) {
-			const device = await cache.get("sonos.device");
+			let device = await cache.get("sonos.device");
 			await device.instance.pause();
+			device.track.state = "pause";
 		},
 		async next(data, cache) {
 			await _next(data, cache, 1);
