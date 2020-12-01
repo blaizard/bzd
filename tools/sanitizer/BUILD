@@ -53,8 +53,8 @@ py_binary(
         "$(location //tools/sanitizer/actions/clang_format)",
         "--action",
         "$(location //tools/sanitizer/actions/yapf)",
-        "--action",
-        "$(location //tools/sanitizer/actions/files)",
+        #"--action",
+        #"$(location //tools/sanitizer/actions/files)",
     ],
     data = [
         ":config",
