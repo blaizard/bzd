@@ -41,7 +41,7 @@
 		<span
 			v-if="isAddEnabled || !hideAddWhenDisabled"
 			:class="{ 'irform-array-add': true, 'irform-disable': !isAddEnabled }">
-			<Form :description="templateAdd" :disable="!isAddEnabled" @active="handleActive"> </Form>
+			<Form :description="templateAdd" :disable="!isAddEnabled" @active="handleActive" @submit="itemAdd"> </Form>
 		</span>
 	</div>
 </template>
@@ -71,7 +71,7 @@
 				/**
 				 * Form description of the template of one single item
 				 */
-				templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", click: this.itemAdd }]),
+				templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", action: "approve" }]),
 				/**
 				 * Force the value to have at least one entry
 				 */

@@ -30,6 +30,15 @@
         }
     },
     "/tile": {
+        "delete": {
+            "documentation": "Delete an existing tile",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
+            }
+        },
         "get": {
             "documentation": "Get a specific tile configuration",
             "request": {
@@ -58,15 +67,6 @@
                 "validation": {
                     "uid": "mandatory",
                     "value": "mandatory"
-                }
-            }
-        },
-        "delete": {
-            "documentation": "Delete an existing tile",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "uid": "mandatory"
                 }
             }
         }
