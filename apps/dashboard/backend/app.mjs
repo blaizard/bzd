@@ -106,10 +106,13 @@ async function getData(type, uid, keyValueStore) {
 		return await keyValueStore.get("tiles", inputs.uid);
 	});
 	api.handle("post", "/tile", async (inputs) => {
-		await keyValueStore.set("tiles", null, inputs);
+		await keyValueStore.set("tiles", null, inputs.value);
 	});
 	api.handle("put", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", inputs.uid, inputs.value);
+	});
+	api.handle("delete", "/tile", async (inputs) => {
+		await keyValueStore.delete("tiles", inputs.uid);
 	});
 	api.handle("get", "/data", async (inputs) => {
 		return await cache.get(inputs.type, inputs.uid);

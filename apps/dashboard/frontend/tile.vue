@@ -30,9 +30,9 @@
 	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 	import Color from "bzd/utils/color.mjs";
-	import ExceptionFactory from "bzd/core/exception.mjs";
+	import LogFactory from "bzd/core/log.mjs";
 
-	const Exception = ExceptionFactory("tile");
+	const Log = LogFactory("tile");
 
 	export default {
 		props: {
@@ -117,7 +117,10 @@
 				return Plugins[this.sourceType].metadata.timeout || 0;
 			},
 			component() {
-				Exception.assert(this.visualizationType in Plugins, "Unsupported plugin '{}'", this.visualizationType);
+				if (!(this.visualizationType in Plugins)) {
+					Log.error("Unsupported plugin '{}'", this.visualizationType);
+					return null;
+				}
 				return Plugins[this.visualizationType].module;
 			},
 			tileClass() {
