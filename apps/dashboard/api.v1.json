@@ -33,7 +33,10 @@
         "get": {
             "documentation": "Get a specific tile configuration",
             "request": {
-                "type": "query"
+                "type": "query",
+                "validation": {
+                    "uid": "mandatory"
+                }
             },
             "response": {
                 "type": "json"
@@ -42,13 +45,29 @@
         "post": {
             "documentation": "Create a new tile",
             "request": {
-                "type": "json"
+                "type": "json",
+                "validation": {
+                    "value": "mandatory"
+                }
             }
         },
         "put": {
             "documentation": "Update an existing tile",
             "request": {
-                "type": "json"
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory",
+                    "value": "mandatory"
+                }
+            }
+        },
+        "delete": {
+            "documentation": "Delete an existing tile",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
             }
         }
     },

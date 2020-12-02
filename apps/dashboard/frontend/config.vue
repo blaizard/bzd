@@ -13,6 +13,7 @@
 		<br />
 		<Button v-if="isUpdate" @click="handleUpdate" action="approve" content="Update"></Button>
 		<Button v-else @click="handleCreate" action="approve" content="Create"></Button>
+		<Button @click="handleDelete" action="danger" content="Delete"></Button>
 	</div>
 </template>
 
@@ -151,11 +152,18 @@
 				this.ready = true;
 			},
 			async handleCreate() {
-				await this.$api.request("post", "/tile", this.value);
+				await this.$api.request("post", "/tile", { value: this.value });
+				this.$notification.success("New tile created");
 				await this.$routerDispatch("/");
 			},
 			async handleUpdate() {
 				await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
+				this.$notification.success("Tile updated");
+				await this.$routerDispatch("/");
+			},
+			async handleDelete() {
+				await this.$api.request("delete", "/tile", { uid: this.uid });
+				this.$notification.success("Tile deleted");
 				await this.$routerDispatch("/");
 			},
 			/**
