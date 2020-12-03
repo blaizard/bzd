@@ -10,12 +10,19 @@ class Snmp {
 		});
 	}
 
-	_castValue(data) {
+	static _castValue(data) {
 		switch (data.type) {
 		case SnmpNative.ObjectType.OctetString:
 			return data.value.toString();
+		case SnmpNative.ObjectType.Integer:
+			return data.value;
 		}
-		Exception.unreachable("Unsupported value type.");
+		console.log(data);
+		Exception.unreachable("Unsupported value type: '{}'.", data.type);
+	}
+
+	static normalizeOid(oid) {
+		return String(oid).split(".").filter((item) => Boolean(item)).join(".");
 	}
 
 	async get(oids) {
@@ -31,7 +38,7 @@ class Snmp {
 							reject(new Exception(SnmpNative.varbindError(varbinds[i])));
 							return;
 						}
-						result[varbinds[i].oid] = this._castValue(varbinds[i]);
+						result[varbinds[i].oid] = Snmp._castValue(varbinds[i]);
 					}
 					resolve(result);
 				}
@@ -57,27 +64,40 @@ export default {
 	cache: [
 		{
 			collection: "snmp.oid",
-			fetch: async (host, community, oid, ttl, previous, options) => {
+			fetch: async (host, community, oids, ttl, previous, options) => {
 				// Update the time in ms.
 				options.timeout = ttl * 1000;
 
 				// Get the data
 				const snmp = new Snmp(host, community);
-				const result = await snmp.getAndClose([oid]);
-				return { value: result[Object.keys(result)[0]] };
-			},
-			timeout: 2 * 1000,
+				return await snmp.getAndClose(oids);
+			}
 		},
 	],
 	fetch: async (data, cache) => {
-		console.log(data);
-		const results = await cache.get(
-			"snmp.oid",
-			data["snmp.host"],
-			data["snmp.community"],
-			"1.3.6.1.4.1.6574.1.5.1.0",
-			60 * 1000
-		);
+
+		let results = {};
+
+		// Sort the Oids by ttl
+		const sortedOids = data["snmp.array"].reduce((obj, item) => {
+			const ttl = item.ttl || 2000;
+			obj[ttl] = obj[ttl] || [];
+			obj[ttl].push(Snmp.normalizeOid(item.oid));
+			return obj;
+		}, {});
+
+		for (const ttl in sortedOids) {
+			const oids = sortedOids[ttl];
+			const localResults = await cache.get(
+				"snmp.oid",
+				data["snmp.host"],
+				data["snmp.community"],
+				oids,
+				ttl
+			);
+			Object.assign(results, localResults);
+		}
+
 		console.log(results);
 		return results;
 	},
