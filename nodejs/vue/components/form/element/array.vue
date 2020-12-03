@@ -73,6 +73,10 @@
 				 */
 				templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", action: "approve" }]),
 				/**
+				 * Conversion function to translate to values when add is pressed.
+				 */
+				toValues: this.getOption("toValues", (values) => values),
+				/**
 				 * Force the value to have at least one entry
 				 */
 				atLeastOne: this.getOption("atLeastOne", false),
@@ -187,7 +191,8 @@
 			async itemAdd(content) {
 				if (this.isAddEnabled) {
 					let valueList = this.valueList.slice(0);
-					valueList.push(content || {});
+					const values = this.toValues(content || {});
+					valueList.push(values);
 					await this.set(valueList);
 				}
 			},
