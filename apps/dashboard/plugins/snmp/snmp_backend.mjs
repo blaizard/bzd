@@ -20,10 +20,7 @@ class Snmp {
 
 	async get(oids) {
 		return new Promise((resolve, reject) => {
-			console.log("Getting " + oids);
 			this.session.get(oids, (error, varbinds) => {
-				console.log("Received " + oids);
-
 				if (error) {
 					reject(new Exception(error));
 				}
@@ -59,17 +56,28 @@ class Snmp {
 export default {
 	cache: [
 		{
-			collection: "snmp.oids",
-			fetch: async () => {
-				const snmp = new Snmp("192.168.1.200", "public");
-				return await snmp.getAndClose(["1.3.6.1.4.1.6574.1.5.1.0"]);
+			collection: "snmp.oid",
+			fetch: async (host, community, oid, ttl, previous, options) => {
+				// Update the time in ms.
+				options.timeout = ttl * 1000;
+
+				// Get the data
+				const snmp = new Snmp(host, community);
+				const result = await snmp.getAndClose([oid]);
+				return { value: result[Object.keys(result)[0]] };
 			},
 			timeout: 2 * 1000,
 		},
 	],
 	fetch: async (data, cache) => {
 		console.log(data);
-		const results = await cache.get("snmp.oids");
+		const results = await cache.get(
+			"snmp.oid",
+			data["snmp.host"],
+			data["snmp.community"],
+			"1.3.6.1.4.1.6574.1.5.1.0",
+			60 * 1000
+		);
 		console.log(results);
 		return results;
 	},
