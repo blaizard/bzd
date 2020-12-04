@@ -22,7 +22,14 @@ class Snmp {
 	}
 
 	static normalizeOid(oid) {
-		return String(oid).split(".").filter((item) => Boolean(item)).join(".");
+		return String(oid)
+			.split(".")
+			.filter((item) => Boolean(item))
+			.join(".");
+	}
+
+	static isOid(value) {
+		return /^\.?([0-9]+\.){2,}[0-9]+$/.test(value);
 	}
 
 	async get(oids) {
@@ -71,34 +78,72 @@ export default {
 				// Get the data
 				const snmp = new Snmp(host, community);
 				return await snmp.getAndClose(oids);
-			}
+			},
 		},
 	],
 	fetch: async (data, cache) => {
+		const updateObj = (obj, oid, ttl) => {
+			oid = Snmp.normalizeOid(oid);
+			obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
+		};
 
-		let results = {};
-
-		// Sort the Oids by ttl
-		const sortedOids = (data["snmp.array"] || []).reduce((obj, item) => {
+		const oidTtlMap = (data["snmp.array"] || []).reduce((obj, item) => {
 			const ttl = item.ttl || 2000;
-			obj[ttl] = obj[ttl] || [];
-			obj[ttl].push(Snmp.normalizeOid(item.oid));
+			updateObj(obj, item.oid, ttl);
+			(item.ops || [])
+				.filter((item) => Snmp.isOid(item.value))
+				.forEach((item) => {
+					updateObj(obj, item.value, ttl);
+				});
 			return obj;
 		}, {});
 
+		// Sort the Oids by ttl
+		const sortedOids = Object.keys(oidTtlMap).reduce((obj, oid) => {
+			const ttl = oidTtlMap[oid];
+			obj[ttl] = obj[ttl] || [];
+			obj[ttl].push(oid);
+			return obj;
+		}, {});
+
+		let values = {};
 		for (const ttl in sortedOids) {
 			const oids = sortedOids[ttl];
-			const localResults = await cache.get(
-				"snmp.oid",
-				data["snmp.host"],
-				data["snmp.community"],
-				oids,
-				ttl
-			);
-			Object.assign(results, localResults);
+			const localResults = await cache.get("snmp.oid", data["snmp.host"], data["snmp.community"], oids, ttl);
+			Object.assign(values, localResults);
 		}
 
-		console.log(results);
+		// Map oids to name and perform the operations
+		const results = (data["snmp.array"] || []).map((item) => {
+			const oid = Snmp.normalizeOid(item.oid);
+			let result = {
+				id: item.id || "unknown",
+				value: values[oid],
+			};
+
+			(item.ops || []).forEach((operation) => {
+				const opValue = Snmp.isOid(operation.value) ? values[Snmp.normalizeOid(operation.value)] : operation.value;
+				switch (operation.type) {
+				case "mul":
+					result.value *= opValue;
+					break;
+				case "div":
+					result.value /= opValue;
+					break;
+				case "add":
+					result.value += opValue;
+					break;
+				case "sub":
+					result.value -= opValue;
+					break;
+				default:
+					Exception.unreachable("Unsupported operation type: '{}'", operation.type);
+				}
+			});
+
+			return result;
+		});
+
 		return results;
 	},
 };
