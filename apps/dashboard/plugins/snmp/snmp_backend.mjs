@@ -79,7 +79,7 @@ export default {
 		let results = {};
 
 		// Sort the Oids by ttl
-		const sortedOids = data["snmp.array"].reduce((obj, item) => {
+		const sortedOids = (data["snmp.array"] || []).reduce((obj, item) => {
 			const ttl = item.ttl || 2000;
 			obj[ttl] = obj[ttl] || [];
 			obj[ttl].push(Snmp.normalizeOid(item.oid));
