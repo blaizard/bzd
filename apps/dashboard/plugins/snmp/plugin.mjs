@@ -61,7 +61,7 @@ export default {
 						"memory.free:1.3.6.1.4.1.2021.4.6.0:10:add:.1.3.6.1.4.1.2021.4.15.0": "Free Memory (bytes)",
 						"temperature:1.3.6.1.4.1.6574.2.1.1.6.0:10": "Disk 1 Temperature (C)",
 						"temperature:1.3.6.1.4.1.6574.2.1.1.6.1:10": "Disk 2 Temperature (C)",
-						"ups.charge:1.3.6.1.4.1.6574.4.3.1.1.0:60": "UPS Battery Charge (%)",
+						"ups.charge:1.3.6.1.4.1.6574.4.3.1.1.0:60:div:100": "UPS Battery Charge (%)",
 						"ups.load:1.3.6.1.4.1.6574.4.2.12.1.0:60": "UPS Battery Load",
 						"disk.total:1.3.6.1.2.1.25.2.3.1.5.51:600:mul:1.3.6.1.2.1.25.2.3.1.4.51": "/volume1 Total Space (bytes)",
 						"disk.used:1.3.6.1.2.1.25.2.3.1.6.51:60:mul:1.3.6.1.2.1.25.2.3.1.4.51": "/volume1 Used Space (bytes)",
