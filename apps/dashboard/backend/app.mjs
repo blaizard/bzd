@@ -29,10 +29,10 @@ Commander.version("1.0.0", "-v, --version")
 	)
 	.parse(process.argv);
 
-async function getData(type, uid, keyValueStore) {
-	// Check that the UID exists and is of type jenkins
-	const data = await keyValueStore.get("tiles", uid, null);
-	Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+async function getData(type, uid, cache) {
+	const data = await cache.get("data", uid);
+
+	// Check that the UID is of the right type
 	Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
 	return data;
 }
@@ -52,8 +52,26 @@ async function getData(type, uid, keyValueStore) {
 	let cache = new Cache();
 	let events = {};
 
-	// Register plugins
+	// Register constructors
+	cache.register("data", async (uid) => {
+		let data = await keyValueStore.get("tiles", uid, null);
+		Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
 
+		// If there is a constructor, call it
+		const type = data["source.type"];
+		if (type in Plugins && "module" in Plugins[type]) {
+			const plugin = (await Plugins[type].module()).default;
+			if ("constructor" in plugin) {
+				data = await plugin.constructor(data);
+			}
+		}
+
+		return data;
+	}, {
+		timeout: 60 * 60 * 1000 // 1h
+	});
+
+	// Register plugins
 	for (const type in Plugins) {
 		if ("module" in Plugins[type]) {
 			Log.info("Register plugin '{}'", type);
@@ -78,7 +96,7 @@ async function getData(type, uid, keyValueStore) {
 			cache.register(
 				type,
 				async (uid) => {
-					const data = await getData(type, uid, keyValueStore);
+					const data = await getData(type, uid, cache);
 					Log.debug("Plugin '{}' fetching for '{}'", type, uid);
 					return await plugin.fetch(data, cache);
 				},
@@ -107,9 +125,11 @@ async function getData(type, uid, keyValueStore) {
 	});
 	api.handle("post", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", null, inputs.value);
+		await cache.setDirty("data", inputs.uid);
 	});
 	api.handle("put", "/tile", async (inputs) => {
 		await keyValueStore.set("tiles", inputs.uid, inputs.value);
+		await cache.setDirty("data", inputs.uid);
 	});
 	api.handle("delete", "/tile", async (inputs) => {
 		await keyValueStore.delete("tiles", inputs.uid);
@@ -125,12 +145,11 @@ async function getData(type, uid, keyValueStore) {
 			inputs.event,
 			inputs.type
 		);
-		const data = await getData(inputs.type, inputs.uid, keyValueStore);
+		const data = await getData(inputs.type, inputs.uid, cache);
 		await events[inputs.type][inputs.event](data, cache, inputs.args);
 
 		// Invalidates the cache
 		await cache.setDirty(inputs.type, inputs.uid);
-
 		return await cache.get(inputs.type, inputs.uid);
 	});
 

@@ -101,7 +101,8 @@ export default {
 			},
 		},
 	],
-	fetch: async (data, cache) => {
+	constructor: async (data) => {
+
 		const updateObj = (obj, oid, ttl) => {
 			oid = Snmp.normalizeOid(oid);
 			obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
@@ -119,16 +120,22 @@ export default {
 		}, {});
 
 		// Sort the Oids by ttl
-		const sortedOids = Object.keys(oidTtlMap).reduce((obj, oid) => {
+		data.oidsByTtl = Object.keys(oidTtlMap).reduce((obj, oid) => {
 			const ttl = oidTtlMap[oid];
 			obj[ttl] = obj[ttl] || [];
 			obj[ttl].push(oid);
 			return obj;
 		}, {});
 
+		return data;
+	},
+	fetch: async (data, cache) => {
+
+		Exception.assert("oidsByTtl" in data, "Seems that the constructor was not called.");
+
 		let promises = [];
-		for (const ttl in sortedOids) {
-			const oids = sortedOids[ttl];
+		for (const ttl in data.oidsByTtl) {
+			const oids = data.oidsByTtl[ttl];
 			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.community"], oids, ttl);
 			promises.push(promise);
 		}
