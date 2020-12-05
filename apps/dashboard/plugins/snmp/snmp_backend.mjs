@@ -18,9 +18,26 @@ class Snmp {
 			return data.value.toString();
 		case SnmpNative.ObjectType.Integer:
 			return data.value;
-		default:
-			Log.error("Unsupported value type '{}': {:j}", data.type, data);
+		case SnmpNative.ObjectType.Opaque:
+			/*
+			 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
+			 * BER-encoded data / type / length / value
+			 * Float type
+			 */
+			if (data.value[0] == 0x9f && data.value[1] == 0x78) {
+				const length = data.value[2];
+				let view = new DataView(new ArrayBuffer(length));
+				for (let i = 0; i < length; i++) {
+					view.setInt8(i, data.value[3 + i]);
+				}
+				switch (length) {
+				case 4:
+					return view.getFloat32(0);
+				}
+			}
+			break;
 		}
+		Log.error("Unsupported value type '{}': {:j}", data.type, data);
 		return "unsupported";
 	}
 
