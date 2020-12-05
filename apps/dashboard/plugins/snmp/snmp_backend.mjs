@@ -1,7 +1,9 @@
 import SnmpNative from "net-snmp";
 import ExceptionFactory from "bzd/core/exception.mjs";
+import LogFactory from "bzd/core/log.mjs";
 
 const Exception = ExceptionFactory("snmp");
+const Log = LogFactory("snmp");
 
 class Snmp {
 	constructor(host, community) {
@@ -16,9 +18,10 @@ class Snmp {
 			return data.value.toString();
 		case SnmpNative.ObjectType.Integer:
 			return data.value;
+		default:
+			Log.error("Unsupported value type '{}': {:j}", data.type, data);
 		}
-		console.log(data);
-		Exception.unreachable("Unsupported value type: '{}'.", data.type);
+		return "unsupported";
 	}
 
 	static normalizeOid(oid) {
@@ -106,12 +109,16 @@ export default {
 			return obj;
 		}, {});
 
-		let values = {};
+		let promises = [];
 		for (const ttl in sortedOids) {
 			const oids = sortedOids[ttl];
-			const localResults = await cache.get("snmp.oid", data["snmp.host"], data["snmp.community"], oids, ttl);
-			Object.assign(values, localResults);
+			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.community"], oids, ttl);
+			promises.push(promise);
 		}
+
+		const values = (await Promise.all(promises)).reduce((obj, result) => {
+			return Object.assign(obj, result);
+		}, {});
 
 		// Map oids to name and perform the operations
 		const results = (data["snmp.array"] || []).map((item) => {
