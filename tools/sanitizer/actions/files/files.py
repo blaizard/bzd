@@ -18,7 +18,6 @@ def formatBdl(path: str, stdout: TextIO) -> None:
 	if formattedContent != content:
 		Path(path).write_text(formattedContent, encoding="utf-8")
 
-
 def formatJson(path: str, stdout: TextIO) -> None:
 	content = Path(path).read_text()
 	try:
@@ -29,7 +28,6 @@ def formatJson(path: str, stdout: TextIO) -> None:
 	formattedContent = json.dumps(parsedContent, indent=4, sort_keys=True)
 	if formattedContent != content:
 		Path(path).write_text(formattedContent, encoding="utf-8")
-
 
 def formatYaml(path: str, stdout: TextIO) -> None:
 

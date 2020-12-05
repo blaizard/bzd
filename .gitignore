@@ -1,3 +1,6 @@
+# Git directory
+.git/
+
 # C/C++
 *.o
 *.d
@@ -5,6 +8,7 @@
 # Python
 __pycache__/
 *.pyc
+.mypy_cache/
 
 # Bazel
 bazel-*

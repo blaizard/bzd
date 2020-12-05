@@ -41,10 +41,13 @@ class Files:
 
 	def data(self, relative: bool = False) -> Iterable[Path]:
 		for (dirpath, dirnames, filenames) in os.walk(self.path):
+			# Ignore symlinks and gitignore directories
+			if self.gitignoreMatches:
+				dirnames[:] = [d for d in dirnames if not Path(dirpath).joinpath(d).is_symlink() and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())]
 			for filename in filenames:
 				path = Path(dirpath).joinpath(filename)
-				relativePath = path.relative_to(self.workspace)
 				if self.gitignoreMatches is None or not self.gitignoreMatches(path.as_posix()):
+					relativePath = path.relative_to(self.workspace)
 					if not self.exclude.match(relativePath):
 						if self.include.match(relativePath):
 							yield relativePath if relative else path
