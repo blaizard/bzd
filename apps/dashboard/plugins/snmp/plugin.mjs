@@ -56,8 +56,7 @@ export default {
 					list: {
 						"name:1.3.6.1.4.1.6574.1.5.1.0:600": "Model Name",
 						"tempature:1.3.6.1.4.1.6574.1.2.0:10": "System Temperature (C)",
-						"cpu:1.3.6.1.4.1.2021.10.1.5.1:10": "CPU Load (1 min) (%)",
-						"cpu:1.3.6.1.4.1.2021.10.1.5.2:10": "CPU Load (5 min) (%)",
+						"cpu:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",
 						"memory.total:1.3.6.1.4.1.2021.4.5.0:600": "Total Memory (bytes)",
 						"memory.free:1.3.6.1.4.1.2021.4.6.0:10:add:.1.3.6.1.4.1.2021.4.15.0": "Free Memory (bytes)",
 						"temperature:1.3.6.1.4.1.6574.2.1.1.6.0:10": "Disk 1 Temperature (C)",
