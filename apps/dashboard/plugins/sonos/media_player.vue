@@ -41,7 +41,7 @@
 				return {
 					"--title-scroll-start": this.titleScroll ? "10px" : 0,
 					"--title-scroll-end": this.titleScroll ? this.titleScroll - 10 + "px" : 0,
-					"--title-scroll-speed": -this.titleScroll / 20 + "s",
+					"--title-scroll-speed": -(this.titleScroll - 20) / 20 + "s",
 				};
 			},
 		},
