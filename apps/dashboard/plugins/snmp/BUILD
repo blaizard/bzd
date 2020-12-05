@@ -7,4 +7,8 @@ bzd_plugin(
         "net-snmp": "",
     },
     metadata = "plugin.mjs",
+    backend_deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:log",        
+    ]
 )
