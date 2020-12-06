@@ -6,9 +6,15 @@ const Exception = ExceptionFactory("snmp");
 const Log = LogFactory("snmp");
 
 class Snmp {
-	constructor(host, community) {
+	constructor(host, version, community) {
+		const versionMapping = {
+			1: SnmpNative.Version1,
+			"2c": SnmpNative.Version2c,
+			3: SnmpNative.Version3,
+		};
+		Exception.assert(version in versionMapping, "Unsupported version '{}'", version);
 		this.session = new SnmpNative.createSession(host, community, {
-			version: SnmpNative.Version2c,
+			version: versionMapping[version],
 		});
 	}
 
@@ -91,18 +97,17 @@ export default {
 	cache: [
 		{
 			collection: "snmp.oid",
-			fetch: async (host, community, oids, ttl, previous, options) => {
+			fetch: async (host, version, community, oids, ttl, previous, options) => {
 				// Update the time in ms.
 				options.timeout = ttl * 1000;
 
 				// Get the data
-				const snmp = new Snmp(host, community);
+				const snmp = new Snmp(host, version, community);
 				return await snmp.getAndClose(oids);
 			},
 		},
 	],
 	constructor: async (data) => {
-
 		const updateObj = (obj, oid, ttl) => {
 			oid = Snmp.normalizeOid(oid);
 			obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
@@ -130,13 +135,12 @@ export default {
 		return data;
 	},
 	fetch: async (data, cache) => {
-
 		Exception.assert("oidsByTtl" in data, "Seems that the constructor was not called.");
 
 		let promises = [];
 		for (const ttl in data.oidsByTtl) {
 			const oids = data.oidsByTtl[ttl];
-			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.community"], oids, ttl);
+			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.version"], data["snmp.community"], oids, ttl);
 			promises.push(promise);
 		}
 
