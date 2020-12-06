@@ -1,6 +1,5 @@
 <template>
 	<div class="system-monitor">
-		{{ metadata }}
 		<div class="gauges">
 			<div v-if="isCpu" class="gauge">
 				<div class="name">CPU</div>
