@@ -8,11 +8,18 @@
 					<div class="bar" :style="cpuStyle"></div>
 				</div>
 			</div>
-			<div v-if="isMemory" class="gauge">
+			<div v-if="isMemory" class="gauge" v-tooltip="memoryTooltip">
 				<div class="name">Memory</div>
 				<div class="value">
 					{{ memoryPercent.toFixed(1) }}%
 					<div class="bar" :style="memoryStyle"></div>
+				</div>
+			</div>
+			<div v-if="isSwap" class="gauge" v-tooltip="swapTooltip">
+				<div class="name">Swap</div>
+				<div class="value">
+					{{ swapPercent.toFixed(1) }}%
+					<div class="bar" :style="swapStyle"></div>
 				</div>
 			</div>
 		</div>
@@ -20,9 +27,15 @@
 </template>
 
 <script>
+	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import { bytesToString, capitalize } from "bzd/utils/to_string.mjs";
+
 	export default {
 		props: {
 			metadata: { type: Object, mandatory: true },
+		},
+		directives: {
+			tooltip: DirectiveTooltip,
 		},
 		data: function () {
 			return {};
@@ -31,19 +44,36 @@
 			isMemory() {
 				return this.has("memory.free") && this.has("memory.total");
 			},
-			memoryFree() {
-				return this.getItems("memory.free").reduce((value, item) => value + item.value, 0);
-			},
-			memoryTotal() {
-				return this.getItems("memory.total").reduce((value, item) => value + item.value, 0);
+			memory() {
+				return this.makeMemoryMap("memory");
 			},
 			memoryPercent() {
-				return (1 - this.memoryFree / this.memoryTotal) * 100;
+				return this.makeMemoryPercent(this.memory);
 			},
 			memoryStyle() {
 				return {
 					width: this.memoryPercent + "%",
 				};
+			},
+			memoryTooltip() {
+				return this.makeMemoryTooltip("Memory", this.memory);
+			},
+			isSwap() {
+				return this.has("swap.free") && this.has("swap.total");
+			},
+			swap() {
+				return this.makeMemoryMap("swap");
+			},
+			swapPercent() {
+				return this.makeMemoryPercent(this.swap);
+			},
+			swapStyle() {
+				return {
+					width: this.swapPercent + "%",
+				};
+			},
+			swapTooltip() {
+				return this.makeMemoryTooltip("Swap", this.swap);
 			},
 			isCpu() {
 				return this.has("cpu.load");
@@ -62,7 +92,7 @@
 		methods: {
 			has(id) {
 				for (const i in this.metadata) {
-					if (this.metadata[i].id == id) {
+					if (this.metadata[i].id.startsWith(id)) {
 						return true;
 					}
 				}
@@ -72,7 +102,40 @@
 			 * Get an iterable of all values matching a certain id.
 			 */
 			getItems(id) {
-				return this.metadata.filter((item) => item.id == id);
+				return this.metadata.filter((item) => item.id.startsWith(id));
+			},
+			makeMemoryMap(name) {
+				let map = this.getItems(name + ".free").reduce((obj, item) => {
+					const id = item.id.substring((name + ".free").length + 1) || "undefined";
+					obj[id] = obj[id] || { free: 0, total: 0 };
+					obj[id].free += item.value;
+					return obj;
+				}, {});
+				this.getItems(name + ".total").forEach((item) => {
+					const id = item.id.substring((name + ".total").length + 1) || "undefined";
+					map[id].total += item.value;
+				});
+				return map;
+			},
+			makeMemoryPercent(map) {
+				const free = Object.keys(map).reduce((value, key) => value + map[key].free, 0);
+				const total = Object.keys(map).reduce((value, key) => value + map[key].total, 0);
+				return (1 - free / total) * 100;
+			},
+			makeMemoryTooltip(displayName, map) {
+				const messageList = Object.keys(map).map((key) => {
+					return (
+						"<li>" +
+						(key != "undefined" ? capitalize(key) + ": " : "") +
+						bytesToString(map[key].free) +
+						" free / " +
+						bytesToString(map[key].total) +
+						" (" +
+						((map[key].free / map[key].total) * 100).toFixed(1) +
+						"%)</li>"
+					);
+				});
+				return { text: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
 		},
 	};
@@ -117,8 +180,7 @@
 						bottom: 0;
 						right: 0;
 						background-color: currentColor;
-						opacity: 0.3;
-						transition: width 0.5s;
+						opacity: 0.2;
 					}
 
 					.bar {
@@ -127,6 +189,7 @@
 						left: 0;
 						bottom: 0;
 						background-color: currentColor;
+						transition: width 0.5s;
 					}
 				}
 			}
