@@ -53,23 +53,27 @@ async function getData(type, uid, cache) {
 	let events = {};
 
 	// Register constructors
-	cache.register("data", async (uid) => {
-		let data = await keyValueStore.get("tiles", uid, null);
-		Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
+	cache.register(
+		"data",
+		async (uid) => {
+			let data = await keyValueStore.get("tiles", uid, null);
+			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
 
-		// If there is a constructor, call it
-		const type = data["source.type"];
-		if (type in Plugins && "module" in Plugins[type]) {
-			const plugin = (await Plugins[type].module()).default;
-			if ("constructor" in plugin) {
-				data = await plugin.constructor(data);
+			// If there is a constructor, call it
+			const type = data["source.type"];
+			if (type in Plugins && "module" in Plugins[type]) {
+				const plugin = (await Plugins[type].module()).default;
+				if ("constructor" in plugin) {
+					data = await plugin.constructor(data);
+				}
 			}
-		}
 
-		return data;
-	}, {
-		timeout: 60 * 60 * 1000 // 1h
-	});
+			return data;
+		},
+		{
+			timeout: 60 * 60 * 1000, // 1h
+		}
+	);
 
 	// Register plugins
 	for (const type in Plugins) {

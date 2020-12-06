@@ -8,7 +8,15 @@ export default {
 			caption: "Host",
 			name: "snmp.host",
 			validation: "mandatory",
-			width: 0.5,
+			width: 0.4,
+		},
+		{
+			type: "Dropdown",
+			caption: "Version",
+			name: "snmp.version",
+			validation: "mandatory",
+			list: ["1", "2c", "3"],
+			width: 0.3,
 		},
 		{
 			type: "Input",
@@ -16,7 +24,7 @@ export default {
 			name: "snmp.community",
 			validation: "mandatory",
 			placeholder: "public",
-			width: 0.5,
+			width: 0.3,
 		},
 		{
 			type: "Array",
@@ -56,7 +64,7 @@ export default {
 					list: {
 						"name:1.3.6.1.4.1.6574.1.5.1.0:600": "Model Name",
 						"tempature:1.3.6.1.4.1.6574.1.2.0:10": "System Temperature (C)",
-						"cpu:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",
+						"cpu.load:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",
 						"memory.total:1.3.6.1.4.1.2021.4.5.0:600": "Total Memory (bytes)",
 						"memory.free:1.3.6.1.4.1.2021.4.6.0:10:add:.1.3.6.1.4.1.2021.4.15.0": "Free Memory (bytes)",
 						"temperature:1.3.6.1.4.1.6574.2.1.1.6.0:10": "Disk 1 Temperature (C)",
