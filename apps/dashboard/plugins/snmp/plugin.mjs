@@ -36,7 +36,7 @@ export default {
 				{ type: "Input", caption: "Time To Live", name: "ttl", width: 0.2, post: "s" },
 				{
 					type: "Array",
-					caption: "Operations",
+					caption: "Operation(s)",
 					name: "ops",
 					width: 0.4,
 					template: [
@@ -63,12 +63,12 @@ export default {
 					// Check available disks: snmpwalk -v 2c -c public 192.168.1.200 1.3.6.1.2.1.25.2.3.1.3
 					list: {
 						"name:1.3.6.1.4.1.6574.1.5.1.0::600": "Model Name",
-						"tempature.system:1.3.6.1.4.1.6574.1.2.0:10": "System Temperature (C)",
 						"cpu.load:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",
 						"memory.total:1.3.6.1.4.1.2021.4.5.0:600:mul:1024": "Total Memory (bytes)",
 						"memory.free:1.3.6.1.4.1.2021.4.6.0:10:add:.1.3.6.1.4.1.2021.4.15.0:mul:1024": "Free Memory (bytes)",
 						"swap.total:1.3.6.1.4.1.2021.4.3.0:600:mul:1024": "Total Swap Memory (bytes)",
 						"swap.free:1.3.6.1.4.1.2021.4.4.0:600:mul:1024": "Free Swap Memory (bytes)",
+						"temperature.system:1.3.6.1.4.1.6574.1.2.0:10": "System Temperature (C)",
 						"temperature.hdd1:1.3.6.1.4.1.6574.2.1.1.6.0:10": "Disk 1 Temperature (C)",
 						"temperature.hdd2:1.3.6.1.4.1.6574.2.1.1.6.1:10": "Disk 2 Temperature (C)",
 						"ups.charge:1.3.6.1.4.1.6574.4.3.1.1.0:60:div:100": "UPS Battery Charge (%)",

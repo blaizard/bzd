@@ -1,5 +1,5 @@
 <template>
-	<div v-loading="!ready">
+	<div v-loading="loading">
 		<h2>Config</h2>
 		<Form :description="formDescription" v-model="value"></Form>
 		<Form :description="formVisualizationDescription" v-model="value"></Form>
@@ -24,6 +24,7 @@
 	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 	import ExceptionFactory from "bzd/core/exception.mjs";
+	import Component from "bzd/vue/components/layout/component.vue";
 
 	const Exception = ExceptionFactory("config");
 
@@ -38,9 +39,9 @@
 		props: {
 			uid: { type: String, mandatory: false, default: null },
 		},
+		mixins: [Component],
 		data: function () {
 			return {
-				ready: true,
 				value: {
 					"visualization.color": "auto",
 				},
@@ -59,7 +60,6 @@
 
 			// Update specific uid if needed
 			if (this.isUpdate) {
-				this.ready = false;
 				this.fetchValue();
 			}
 		},
@@ -148,23 +148,30 @@
 		},
 		methods: {
 			async fetchValue() {
-				this.value = Object.assign({}, this.value, await this.$api.request("get", "/tile", { uid: this.uid }));
-				this.ready = true;
+				this.handleSubmit(async () => {
+					this.value = Object.assign({}, this.value, await this.$api.request("get", "/tile", { uid: this.uid }));
+				});
 			},
 			async handleCreate() {
-				await this.$api.request("post", "/tile", { value: this.value });
-				this.$notification.success("New tile created");
-				await this.$routerDispatch("/");
+				this.handleSubmit(async () => {
+					await this.$api.request("post", "/tile", { value: this.value });
+					this.$notification.success("New tile created");
+					await this.$routerDispatch("/");
+				});
 			},
 			async handleUpdate() {
-				await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
-				this.$notification.success("Tile updated");
-				await this.$routerDispatch("/");
+				this.handleSubmit(async () => {
+					await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
+					this.$notification.success("Tile updated");
+					await this.$routerDispatch("/");
+				});
 			},
 			async handleDelete() {
-				await this.$api.request("delete", "/tile", { uid: this.uid });
-				this.$notification.success("Tile deleted");
-				await this.$routerDispatch("/");
+				this.handleSubmit(async () => {
+					await this.$api.request("delete", "/tile", { uid: this.uid });
+					this.$notification.success("Tile deleted");
+					await this.$routerDispatch("/");
+				});
 			},
 			/**
 			 * Plugins will have the following structure:
