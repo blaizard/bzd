@@ -45,7 +45,7 @@ bzd_nodejs_library(
         # Webpack
         "webpack": "4.44.2",
         "webpack-cli": "3.3.12",
-        "webpack-assets-manifest": "",
+        "webpack-assets-manifest": "3.1.1",
         "webpack-bundle-analyzer": "",
         # Vue
         "vue-loader": "^15",

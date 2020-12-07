@@ -1,11 +1,32 @@
 <template>
 	<div class="system-monitor">
+		<!-- Header //-->
+		<div class="header">
+			<span v-if="isTemperature" class="entry" v-tooltip="temperatureTooltip">
+				<i class="bzd-icon-thermometer"></i>
+				<span class="value">{{ temperatureMax.toFixed(0) }}°C</span>
+			</span>
+
+			<span v-if="isBattery" class="entry">
+				<i class="bzd-icon-battery"></i>
+				<span class="value">{{ batteryPercent.toFixed(0) }}%</span>
+			</span>
+		</div>
+
+		<!-- Gauges //-->
 		<div class="gauges">
-			<div v-if="isCpu" class="gauge">
+			<div v-if="isCpu" class="gauge" v-tooltip="cpuTooltip">
 				<div class="name">CPU</div>
 				<div class="value">
 					{{ cpuPercent.toFixed(1) }}%
 					<div class="bar" :style="cpuStyle"></div>
+				</div>
+			</div>
+			<div v-if="isGpu" class="gauge" v-tooltip="gpuTooltip">
+				<div class="name">GPU</div>
+				<div class="value">
+					{{ gpuPercent.toFixed(1) }}%
+					<div class="bar" :style="gpuStyle"></div>
 				</div>
 			</div>
 			<div v-if="isMemory" class="gauge" v-tooltip="memoryTooltip">
@@ -78,15 +99,58 @@
 			isCpu() {
 				return this.has("cpu.load");
 			},
+			cpu() {
+				return this.makeCpuMap("cpu");
+			},
 			cpuPercent() {
-				const cpuLoads = this.getItems("cpu.load");
-				const cpuLoadSum = this.getItems("cpu.load").reduce((value, item) => value + item.value, 0);
-				return (cpuLoadSum / cpuLoads.length) * 100;
+				return this.makeCpuPercent(this.cpu);
 			},
 			cpuStyle() {
 				return {
 					width: this.cpuPercent + "%",
 				};
+			},
+			cpuTooltip() {
+				return this.makeCpuTooltip("CPU", this.cpu);
+			},
+			isGpu() {
+				return this.has("gpu.load");
+			},
+			gpu() {
+				return this.makeCpuMap("gpu");
+			},
+			gpuPercent() {
+				return this.makeCpuPercent(this.gpu);
+			},
+			gpuStyle() {
+				return {
+					width: this.gpuPercent + "%",
+				};
+			},
+			gpuTooltip() {
+				return this.makeCpuTooltip("GPU", this.gpu);
+			},
+			isTemperature() {
+				return this.has("temperature");
+			},
+			temperature() {
+				return this.getItems("temperature").reduce((obj, item) => {
+					const id = item.id.substring("temperature".length + 1) || "undefined";
+					obj[id] = Math.max(obj[id] || 0, item.value);
+					return obj;
+				}, {});
+			},
+			temperatureMax() {
+				return Object.keys(this.temperature).reduce((value, key) => Math.max(value, this.temperature[key]), 0);
+			},
+			temperatureTooltip() {
+				return this.makeTooltip("Max Temperature", this.temperature, (temperature) => temperature.toFixed(0) + "°C");
+			},
+			isBattery() {
+				return this.has("ups.charge");
+			},
+			batteryPercent() {
+				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
 			},
 		},
 		methods: {
@@ -104,6 +168,25 @@
 			getItems(id) {
 				return this.metadata.filter((item) => item.id.startsWith(id));
 			},
+			// CPU
+			makeCpuMap(name) {
+				return this.getItems(name + ".load").reduce((obj, item) => {
+					const id = item.id.substring((name + ".load").length + 1) || "undefined";
+					obj[id] = obj[id] || { load: 0 };
+					obj[id].load = Math.max(obj[id].load, item.value);
+					return obj;
+				}, {});
+			},
+			makeCpuPercent(map) {
+				const loadSum = Object.keys(map).reduce((value, key) => value + map[key].load, 0);
+				return (loadSum / Object.keys(map).length) * 100;
+			},
+			makeCpuTooltip(displayName, map) {
+				return this.makeTooltip(displayName, map, (item) => {
+					return (item.load * 100).toFixed(1) + "% load";
+				});
+			},
+			// Memory
 			makeMemoryMap(name) {
 				let map = this.getItems(name + ".free").reduce((obj, item) => {
 					const id = item.id.substring((name + ".free").length + 1) || "undefined";
@@ -123,17 +206,20 @@
 				return (1 - free / total) * 100;
 			},
 			makeMemoryTooltip(displayName, map) {
-				const messageList = Object.keys(map).map((key) => {
+				return this.makeTooltip(displayName, map, (item) => {
 					return (
-						"<li>" +
-						(key != "undefined" ? capitalize(key) + ": " : "") +
-						bytesToString(map[key].free) +
+						bytesToString(item.free) +
 						" free / " +
-						bytesToString(map[key].total) +
+						bytesToString(item.total) +
 						" (" +
-						((map[key].free / map[key].total) * 100).toFixed(1) +
-						"%)</li>"
+						((item.free / item.total) * 100).toFixed(1) +
+						"%)"
 					);
+				});
+			},
+			makeTooltip(displayName, map, callback) {
+				const messageList = Object.keys(map).map((key) => {
+					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
 				});
 				return { text: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
@@ -143,10 +229,18 @@
 
 <style lang="scss">
 	@use "bzd/icons.scss" with (
-        $bzdIconNames: play pause stop next previous
+        $bzdIconNames: thermometer battery
     );
 
 	.system-monitor {
+		.header {
+			text-align: right;
+			margin-bottom: 20px;
+			.entry {
+				margin-left: 20px;
+			}
+		}
+
 		.gauges {
 			width: 100%;
 
