@@ -228,7 +228,7 @@
 	.bzd-dashboard-tile {
 		width: 300px;
 		height: 300px;
-		margin: 10px;
+		margin: 1px;
 		padding: 0px;
 
 		background-repeat: no-repeat;
