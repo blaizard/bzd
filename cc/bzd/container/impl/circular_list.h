@@ -5,6 +5,7 @@
 #include "bzd/container/result.h"
 #include "bzd/platform/types.h"
 #include "bzd/platform/atomic.h"
+#include "bzd/test/inject_point.h"
 
 #include <iostream>
 
@@ -31,14 +32,12 @@ enum class ListErrorType
 	unhandledRaceCondition,
 	sanityCheck,
 };
-template <bzd::SizeType id, class... Callables>
-class InjectPoint
-{
-public:
-	static void make()
-	{
-	}
-};
+
+struct Point1 {};
+struct Point2 {};
+struct Point3 {};
+struct Point4 {};
+struct Point5 {};
 
 /**
  * Implementation of a non-owning circular double linked list.
@@ -104,7 +103,7 @@ public:
 			const auto nodePrevious = &root_;
 			const auto nodeNext = nodePrevious->next_.load();
 
-			InjectPoint<1, Args...>::make();
+			bzd::test::InjectPoint<Point1, Args...>();
 		/*	if constexpr (Inject == 1) {
 				return nullresult;
 			}
@@ -117,13 +116,11 @@ public:
 				}
 			}
 
-			InjectPoint<2, Args...>::make();
+			bzd::test::InjectPoint<Point2, Args...>();
 
 			// From here, element cannot be used by any other concurrent operation,
 			// as it has already been flagged as inserted.
 			element->previous_.store(nodePrevious);
-
-			InjectPoint<3, Args...>::make();
 
 			{
 				BasePtrType expected{nodePrevious};
@@ -135,8 +132,6 @@ public:
 					continue;
 				}
 			}
-
-			InjectPoint<4, Args...>::make();
 
 			{
 				BasePtrType expected{nodeNext};
@@ -154,8 +149,6 @@ public:
 					return makeError(ListErrorType::unhandledRaceCondition);
 				}
 			}
-
-			InjectPoint<5, Args...>::make();
 
 			break;
 		}

@@ -23,6 +23,7 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
+        "//cc/bzd/test:inject_point",
     ],
 )
 
