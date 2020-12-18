@@ -10,7 +10,7 @@ public:
 	using SelfType = Contiguous<DataType>;
 
 public:
-	constexpr Contiguous(DataType* data, const SizeType index) : data_(data), index_(index) {}
+	constexpr Contiguous(DataType* data, const SizeType index) : data_{data}, index_{index} {}
 
 	constexpr SelfType& operator++() noexcept
 	{

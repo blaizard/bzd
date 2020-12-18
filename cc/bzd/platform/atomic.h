@@ -22,6 +22,7 @@ public:
 	constexpr T operator&=(const T& value) { return this->get().fetch_and(value); }
 	constexpr T operator|=(const T& value) { return this->get().fetch_or(value); }
 	constexpr T operator^=(const T& value) { return this->get().fetch_xor(value); }
+	constexpr explicit operator bool() const { return static_cast<bool>(this->get()); }
 
 	constexpr T exchange(T v) { return this->get().exchange(v); }
 
