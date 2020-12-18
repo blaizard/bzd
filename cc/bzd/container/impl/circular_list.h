@@ -1,67 +1,302 @@
 #pragma once
 
-#include "bzd/container/span.h"
 #include "bzd/core/assert/minimal.h"
+#include "bzd/container/optional.h"
+#include "bzd/container/result.h"
 #include "bzd/platform/types.h"
+#include "bzd/platform/atomic.h"
+
+#include <iostream>
 
 namespace bzd::impl {
 class CircularListElement
 {
 public:
-	CircularListElement* next_{};
-	CircularListElement* previous_{};
+	constexpr CircularListElement() = default;
+	constexpr CircularListElement(CircularListElement&& elt)
+		: next_{elt.next_.load()},
+		previous_{elt.previous_.load()}
+	{
+	}
+
+	bzd::Atomic<CircularListElement*> next_{};
+	bzd::Atomic<CircularListElement*> previous_{};
+};
+
+enum class ListErrorType
+{
+	/// The element is already inserted into the list and cannot be insterted twice.
+	elementAlreadyInserted,
+	elementAlreadyRemoved,
+	unhandledRaceCondition,
+	sanityCheck,
+};
+template <bzd::SizeType id, class... Callables>
+class InjectPoint
+{
+public:
+	static void make()
+	{
+	}
 };
 
 /**
- * Implementation of a non-owning circular doubled linked list.
+ * Implementation of a non-owning circular double linked list.
  * This implementation is thread safe.
- *
- * Implementation inspired by:
- * https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.4693&rep=rep1&type=pdf
- * The main algorithm steps, see Figure 4, for inserting a new node at an arbitrary
-position in our doubly linked list will thus be as follows: I) Atomically update the
-next pointer of the to-be-previous node, II) Atomically update the prev pointer
-of the to-be-next node. The main steps of the algorithm for deleting a node at an
-arbitrary position are the following: I) Set the deletion mark on the next pointer
-of the to-be-deleted node, II) Set the deletion mark on the prev pointer of the
-to-be-deleted node, III) Atomically update the next pointer of the previous node
-of the to-be-deleted node, IV) Atomically update the prev pointer of the next
-node of the to-be-deleted node. As will be shown later in the detailed description
-of the algorithm, helping techniques need to be applied in order to achieve the
-lock-free property, following the same steps as the main algorithm for inserting
-and deleting.
  */
 template <class T>
 class CircularList
 {
-private:
+public:
+	using BasePtrType = CircularListElement*;
 	using PtrType = T*;
+	template <class V>
+	using Result = bzd::Result<V, ListErrorType>;
+
+private:
+	const BasePtrType deleteMark_{reinterpret_cast<const BasePtrType>(1)};
 
 public:
-	constexpr SingleLinkedList() noexcept = default;
+	constexpr CircularList() noexcept
+	{
+		root_.next_.store(&root_);
+		root_.previous_.store(&root_);
+	};
 
 	/**
-	 * Insert an element from the list.
-	 * It will be insert just after the current element pointed by node_.
+	 * Insert an element into the list from the root element.
+	 * The idea is to ensure that the last operation is the one that make the element discoverable,
+	 * this ensures that any element is consistent.
+	 * 
+	 * Given the following:
+	 * | R | -> | A |
+	 * |   | <- |   |
+	 * 
+	 * To insert element B, first set the next and previous pointers of this element:
+	 * | R | <---------> | A |  
+	 * |   | <- | B | -> |   |
+	 * 
+	 * What happen if:
+	 * - R is deleted: Cannot happen.
+	 * - A is deleted: If so, previous pointer to A will be marked as deleted and the next operation will fail.
+	 * 
+	 * Then update A previous pointer to B, if it fails restart from the begining
+	 * | R | ----------> | A |
+	 * |   | <- | B | -> |   |
+	 * |   |    |   | <- |   |
+	 * 
+	 * What happen if:
+	 * - R is deleted: Cannot happen.
+	 * - A is deleted: Linkage is up-to-date, no problems.
+	 * - Concurrent insertion after R: it will fail when update A previous pointer which is expected to be R but it is B.
+	 * - Concurrent insertion after A: Linkage is up-to-date, no problems.
+	 * 
+	 * Finally update next pointer of A, if it fails? TBD
+	 * | R | <- | B | -> | A |
+	 * |   | -> |   | <- |   |
 	 */
-	void insert(PtrType element)
+	template <class... Args>
+	Result<void> insert(PtrType element) noexcept
 	{
-		if (node_)
+		while (true)
 		{
-			element->next_ = node_->next_;
-			element->previous = node_;
-			node_->next_ = element;
-			node_->next->previous_ = element;
+			// Save the previous and next positions of expected future element pointers
+			const auto nodePrevious = &root_;
+			const auto nodeNext = nodePrevious->next_.load();
+
+			InjectPoint<1, Args...>::make();
+		/*	if constexpr (Inject == 1) {
+				return nullresult;
+			}
+*/
+			// Prepare the current element to be inserted between nodePrevious and nodeNext
+			{
+				BasePtrType expected{nullptr};
+				if (!element->next_.compareExchange(expected, nodeNext)) {
+					return makeError(ListErrorType::elementAlreadyInserted);
+				}
+			}
+
+			InjectPoint<2, Args...>::make();
+
+			// From here, element cannot be used by any other concurrent operation,
+			// as it has already been flagged as inserted.
+			element->previous_.store(nodePrevious);
+
+			InjectPoint<3, Args...>::make();
+
+			{
+				BasePtrType expected{nodePrevious};
+				if (!nodeNext->previous_.compareExchange(expected, element)) {
+					// The previous node has been altered, retry.
+					// Note the order here is important.
+					element->previous_.store(nullptr);
+					element->next_.store(nullptr);
+					continue;
+				}
+			}
+
+			InjectPoint<4, Args...>::make();
+
+			{
+				BasePtrType expected{nodeNext};
+				if (!nodePrevious->next_.compareExchange(expected, element)) {
+
+					std::cout << "RACE! 1" << std::endl;
+					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+
+					//0x7ffd02779e18 <- 0x55fd079d9020 -> 0x55fd079d9050
+					//0x7ffd02779e18 -> 0x7ffd02779e18 | 0 <- 0x55fd079d9050
+
+					// Should never happen
+					return makeError(ListErrorType::unhandledRaceCondition);
+				}
+			}
+
+			InjectPoint<5, Args...>::make();
+
+			break;
 		}
-		else
+
+		// Point to the next element if node is pointing to root.
 		{
-			element->next_ = element;
-			element->previous_ = element;
-			node_ = element;
+			BasePtrType expected{&root_};
+			node_.compareExchange(expected, element);
 		}
+
+		return nullresult;
+	}
+
+	/**
+	 * Remove an element from the queue.
+	 */
+	Result<void> remove(PtrType element) noexcept
+	{
+		while (true)
+		{
+			// Save the previous and next positions of current element pointers
+			const auto nodePrevious = element->previous_.load();
+			const auto nodeNext = element->next_.load();
+
+			// Ensure that the pointers are valid
+			if (!nodePrevious || !nodeNext) {
+				return makeError(ListErrorType::elementAlreadyRemoved);
+			}
+
+			// Detach this element from the chain
+			{
+				BasePtrType expected{element};
+				if (!nodePrevious->next_.compareExchange(expected, nodeNext)) {
+
+					std::cout << "RACE! 1" << std::endl;
+					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+
+					continue;
+				}
+			}
+
+			// Try to remove the right link
+			{
+				BasePtrType expected{element};
+
+				if (!nodeNext->previous_.compareExchange(expected, nodePrevious)) {
+
+					std::cout << "RACE! 2" << std::endl;
+					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+
+					// nodeNext has been deleted.
+					// Try to revert the previously changed node, if it fails, discard it would have meant
+					// that the previous has been altered.
+					expected = nodeNext;
+					nodePrevious->next_.compareExchange(expected, element);
+					continue;
+				}
+			}
+
+			// Element is completly out of the chain
+			element->next_.store(nullptr);
+			element->previous_.store(nullptr);
+
+			break;
+		}
+
+		return nullresult;
+	}
+
+	/**
+	 * Get the current element if any.
+	 */
+	constexpr bzd::Optional<T&> get() noexcept
+	{
+		auto ptr = node_.load();
+		if (ptr == &root_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<T&>(*ptr);
+	}
+
+	constexpr bzd::Optional<const T&> get() const noexcept
+	{
+		const auto ptr = node_.load();
+		if (ptr == &root_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<const T&>(*ptr);		
+	}
+
+	/**
+	 * Make the list point to the next element.
+	 */
+	constexpr void next()
+	{
+	}
+
+	/**
+	 * Ensures that all element are properly connected.
+	 * \return The number of node evaluated.
+	 */
+	template <class U>
+	Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
+	{
+		bzd::SizeType counter = 0;
+		auto prevNode = &root_;
+		auto curNode = prevNode->next_.load();
+		while (true)
+		{
+			if (prevNode->next_.load() != curNode || curNode->previous_.load() != prevNode)
+			{
+				return makeError(ListErrorType::sanityCheck);
+			}
+
+			if (curNode == &root_) {
+				break;
+			}
+
+			const bool result = sanityCheckElement(reinterpret_cast<T&>(*curNode));
+			if (!result) {
+				return makeError(ListErrorType::sanityCheck);
+			}
+
+			++counter;
+			prevNode = curNode;
+			curNode = curNode->next_.load();
+		}
+
+		return counter;
 	}
 
 private:
-	PtrType node_{};
+	// Having a root elemment will simplify the logic to not have to take care
+	// of the empty case
+	CircularListElement root_;
+	bzd::Atomic<BasePtrType> node_{&root_};
 };
 } // namespace bzd::impl

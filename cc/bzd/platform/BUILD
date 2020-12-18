@@ -32,9 +32,19 @@ cc_library(
 )
 
 cc_library(
-    name = "headers",
+    name = "atomic",
     hdrs = [
         "atomic.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:named_type",
+    ]
+)
+
+cc_library(
+    name = "headers",
+    hdrs = [
         "clock.h",
         "out.h",
         "panic.h",
@@ -42,9 +52,9 @@ cc_library(
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
+        ":atomic",
         ":types",
         "//cc/bzd/algorithm:fill",
-        "//cc/bzd/container:named_type",
         "//cc/bzd/core:channel",
         "//cc/bzd/core:units",
         "//cc/bzd/utility:align_down",
