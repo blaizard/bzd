@@ -18,9 +18,10 @@ public:
 		{
 			auto& points = SyncPoint<tag>::getInstance();
 			std::unique_lock<std::mutex> lock(points.mutex_);
-			points.cv_.wait(lock, [&points] { return points.index_.load() == I; });
+			points.cv_.wait(lock, [&points] { return points.index_.load() >= I; });
 			std::cout << "**** Synchronization point " << I << " ****" << std::endl;
-			points.index_.store(I + 1);
+			bzd::SizeType expected = I;
+			points.index_.compareExchange(expected, I + 1);
 			points.cv_.notify_all();
 		}
 	};

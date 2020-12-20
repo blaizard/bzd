@@ -37,80 +37,28 @@ TEST(CircularList, simple)
 TEST(CircularList, concurrency)
 {
 	{
-	/*	DummyElement a{1};
+		DummyElement a{1};
 		DummyElement b{1};
 		bzd::impl::CircularList<DummyElement> list;
-		list.insert(&a);*/
+		list.insert(&a);
 		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
-		std::thread worker1([]() {
-			SyncPoint::Type<1>();
-			SyncPoint::Type<3>();
-			SyncPoint::Type<5>();
-			SyncPoint::Type<6>();
-			SyncPoint::Type<8>();
-			//list.insert<1, SyncPoint2, SyncPoint5>(&b);
+		std::thread worker1([&list, &b]() {
+			std::cout << "Before!" << std::endl;
+			const auto result = list.insert<bzd::impl::ListInjectPoint1, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
+			std::cout << "Finished!" << std::endl;
+			EXPECT_TRUE(result);
 		});
-		std::thread worker2([]() {
+		std::thread worker2([&list, &a]() {
 			SyncPoint::Type<2>();
-			SyncPoint::Type<4>();
-			SyncPoint::Type<7>();
-			SyncPoint::Type<9>();
-			//const auto result = list.remove(&a);
-			//EXPECT_TRUE(result);
+			const auto result = list.remove(&a);
+			EXPECT_TRUE(result);
+			SyncPoint::Type<3>();
 		});
 
-
-		//list.insert<SyncPoint>(&b);
-		//const auto result = list.remove(&a);
 		worker1.join();
 		worker2.join();
 		EXPECT_TRUE(true);
-	}
-
-	{
-		DummyElement a{1};
-		DummyElement b{1};
-		bzd::impl::CircularList<DummyElement> list;
-		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
-
-		list.insert(&a);
-		list.insert<bzd::impl::ListInjectPoint1, SyncPoint::Type<1>>(&b);
-		const auto result = list.remove(&a);
-		EXPECT_TRUE(result);
-	}
-
-	{
-		DummyElement a{1};
-		DummyElement b{1};
-		bzd::impl::CircularList<DummyElement> list;
-
-		list.insert(&a);
-		//list.insert<3>(&b);
-		const auto result = list.remove(&a);
-		EXPECT_TRUE(result);
-	}
-
-	{
-		DummyElement a{1};
-		DummyElement b{1};
-		bzd::impl::CircularList<DummyElement> list;
-
-		list.insert(&a);
-		//list.insert<4>(&b);
-		const auto result = list.remove(&a);
-		EXPECT_TRUE(result);
-	}
-
-	{
-		DummyElement a{1};
-		DummyElement b{1};
-		bzd::impl::CircularList<DummyElement> list;
-
-		list.insert(&a);
-		//list.insert<5>(&b);
-		const auto result = list.remove(&a);
-		EXPECT_TRUE(result);
 	}
 }
 
