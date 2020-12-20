@@ -1,5 +1,5 @@
 #include "bzd/container/impl/circular_list.h"
-#include "bzd/test/sync_points.h"
+#include "bzd/test/sync_point.h"
 
 #include "cc_test/test.h"
 
@@ -41,21 +41,21 @@ TEST(CircularList, concurrency)
 		DummyElement b{1};
 		bzd::impl::CircularList<DummyElement> list;
 		list.insert(&a);*/
-		using SyncPoints = bzd::test::SyncPoints<struct concurrency>;
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 		std::thread worker1([]() {
-			SyncPoints::Type<1>()();
-			SyncPoints::make<3>();
-			SyncPoints::make<5>();
-			SyncPoints::make<6>();
-			SyncPoints::make<8>();
+			SyncPoint::Type<1>();
+			SyncPoint::Type<3>();
+			SyncPoint::Type<5>();
+			SyncPoint::Type<6>();
+			SyncPoint::Type<8>();
 			//list.insert<1, SyncPoint2, SyncPoint5>(&b);
 		});
 		std::thread worker2([]() {
-			SyncPoints::make<2>();
-			SyncPoints::make<4>();
-			SyncPoints::make<7>();
-			SyncPoints::make<9>();
+			SyncPoint::Type<2>();
+			SyncPoint::Type<4>();
+			SyncPoint::Type<7>();
+			SyncPoint::Type<9>();
 			//const auto result = list.remove(&a);
 			//EXPECT_TRUE(result);
 		});
@@ -72,10 +72,10 @@ TEST(CircularList, concurrency)
 		DummyElement a{1};
 		DummyElement b{1};
 		bzd::impl::CircularList<DummyElement> list;
-		using SyncPoints = bzd::test::SyncPoints<struct concurrency>;
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 		list.insert(&a);
-		list.insert<bzd::impl::Point1, SyncPoints::Type<2>>(&b);
+		list.insert<bzd::impl::ListInjectPoint1, SyncPoint::Type<1>>(&b);
 		const auto result = list.remove(&a);
 		EXPECT_TRUE(result);
 	}

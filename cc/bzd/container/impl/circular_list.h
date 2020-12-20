@@ -33,11 +33,11 @@ enum class ListErrorType
 	sanityCheck,
 };
 
-struct Point1 {};
-struct Point2 {};
-struct Point3 {};
-struct Point4 {};
-struct Point5 {};
+struct ListInjectPoint1 {};
+struct ListInjectPoint2 {};
+struct ListInjectPoint3 {};
+struct ListInjectPoint4 {};
+struct ListInjectPoint5 {};
 
 /**
  * Implementation of a non-owning circular double linked list.
@@ -103,11 +103,8 @@ public:
 			const auto nodePrevious = &root_;
 			const auto nodeNext = nodePrevious->next_.load();
 
-			bzd::test::InjectPoint<Point1, Args...>();
-		/*	if constexpr (Inject == 1) {
-				return nullresult;
-			}
-*/
+			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
+
 			// Prepare the current element to be inserted between nodePrevious and nodeNext
 			{
 				BasePtrType expected{nullptr};
@@ -116,11 +113,13 @@ public:
 				}
 			}
 
-			bzd::test::InjectPoint<Point2, Args...>();
+			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
 			// From here, element cannot be used by any other concurrent operation,
 			// as it has already been flagged as inserted.
 			element->previous_.store(nodePrevious);
+
+			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
 
 			{
 				BasePtrType expected{nodePrevious};
@@ -133,6 +132,8 @@ public:
 				}
 			}
 
+			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
+
 			{
 				BasePtrType expected{nodeNext};
 				if (!nodePrevious->next_.compareExchange(expected, element)) {
@@ -142,13 +143,12 @@ public:
 					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
 					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
 
-					//0x7ffd02779e18 <- 0x55fd079d9020 -> 0x55fd079d9050
-					//0x7ffd02779e18 -> 0x7ffd02779e18 | 0 <- 0x55fd079d9050
-
 					// Should never happen
 					return makeError(ListErrorType::unhandledRaceCondition);
 				}
 			}
+
+			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
 			break;
 		}
