@@ -24,6 +24,7 @@ cc_library(
         ":is_class",
         ":is_const",
         ":is_constructible",
+        ":is_default_constructible",
         ":is_destructible",
         ":is_enum",
         ":is_floating_point",
@@ -272,6 +273,19 @@ cc_library(
         ":declval",
         ":integral_constant",
         ":void_type",
+    ],
+)
+
+cc_library(
+    name = "is_default_constructible",
+    hdrs = [
+        "is_default_constructible.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":void_type",
+        ":true_type",
     ],
 )
 

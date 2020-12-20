@@ -73,6 +73,7 @@
 #include "bzd/type_traits/is_class.h"
 #include "bzd/type_traits/is_const.h"
 #include "bzd/type_traits/is_constructible.h"
+#include "bzd/type_traits/is_default_constructible.h"
 #include "bzd/type_traits/is_destructible.h"
 #include "bzd/type_traits/is_enum.h"
 #include "bzd/type_traits/is_floating_point.h"
