@@ -103,12 +103,18 @@ public:
 			const auto nodePrevious = &root_;
 			const auto nodeNext = nodePrevious->next_.load();
 
+			std::cout << "insert" << std::endl;
+
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
+
+			std::cout << "after insert" << std::endl;
 
 			// Prepare the current element to be inserted between nodePrevious and nodeNext
 			{
 				BasePtrType expected{nullptr};
 				if (!element->next_.compareExchange(expected, nodeNext)) {
+					std::cout << "1 no!" << std::endl;
+
 					return makeError(ListErrorType::elementAlreadyInserted);
 				}
 			}
