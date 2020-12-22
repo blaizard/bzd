@@ -34,7 +34,7 @@ TEST(CircularList, simple)
 	}
 }
 
-TEST(CircularList, concurrency)
+TEST(CircularList, removeWhileInsert)
 {
 	{
 		DummyElement a{1};
@@ -44,9 +44,7 @@ TEST(CircularList, concurrency)
 		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 		std::thread worker1([&list, &b]() {
-			std::cout << "Before!" << std::endl;
 			const auto result = list.insert<bzd::impl::ListInjectPoint1, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
-			std::cout << "Finished!" << std::endl;
 			EXPECT_TRUE(result);
 		});
 		std::thread worker2([&list, &a]() {
@@ -58,10 +56,128 @@ TEST(CircularList, concurrency)
 
 		worker1.join();
 		worker2.join();
-		EXPECT_TRUE(true);
+
+		const auto result = list.sanityCheck([](const auto&) -> bool {
+			return true;
+		});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(*result, 1);
+	}
+
+	{
+		DummyElement a{1};
+		DummyElement b{1};
+		bzd::impl::CircularList<DummyElement> list;
+		list.insert(&a);
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+		std::thread worker1([&list, &b]() {
+			const auto result = list.insert<bzd::impl::ListInjectPoint2, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
+			EXPECT_TRUE(result);
+		});
+		std::thread worker2([&list, &a]() {
+			SyncPoint::Type<2>();
+			const auto result = list.remove(&a);
+			EXPECT_TRUE(result);
+			SyncPoint::Type<3>();
+		});
+
+		worker1.join();
+		worker2.join();
+
+		const auto result = list.sanityCheck([](const auto&) -> bool {
+			return true;
+		});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(*result, 1);
+	}
+
+	{
+		DummyElement a{1};
+		DummyElement b{1};
+		bzd::impl::CircularList<DummyElement> list;
+		list.insert(&a);
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+		std::thread worker1([&list, &b]() {
+			const auto result = list.insert<bzd::impl::ListInjectPoint3, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
+			EXPECT_TRUE(result);
+		});
+		std::thread worker2([&list, &a]() {
+			SyncPoint::Type<2>();
+			const auto result = list.remove(&a);
+			EXPECT_TRUE(result);
+			SyncPoint::Type<3>();
+		});
+
+		worker1.join();
+		worker2.join();
+
+		const auto result = list.sanityCheck([](const auto&) -> bool {
+			return true;
+		});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(*result, 1);
+	}
+
+	{
+		DummyElement a{1};
+		DummyElement b{1};
+		bzd::impl::CircularList<DummyElement> list;
+		list.insert(&a);
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+		std::thread worker1([&list, &b]() {
+			const auto result = list.insert<bzd::impl::ListInjectPoint4, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
+			EXPECT_TRUE(result);
+		});
+		std::thread worker2([&list, &a]() {
+			SyncPoint::Type<2>();
+			const auto result = list.remove(&a);
+			EXPECT_TRUE(result);
+			SyncPoint::Type<3>();
+		});
+
+		worker1.join();
+		worker2.join();
+
+		const auto result = list.sanityCheck([](const auto&) -> bool {
+			return true;
+		});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(*result, 1);
+	}
+
+	{
+		DummyElement a{1};
+		DummyElement b{1};
+		bzd::impl::CircularList<DummyElement> list;
+		list.insert(&a);
+		using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+		std::thread worker1([&list, &b]() {
+			const auto result = list.insert<bzd::impl::ListInjectPoint5, SyncPoint::Type<1>, SyncPoint::Type<4>>(&b);
+			EXPECT_TRUE(result);
+		});
+		std::thread worker2([&list, &a]() {
+			SyncPoint::Type<2>();
+			const auto result = list.remove(&a);
+			EXPECT_TRUE(result);
+			SyncPoint::Type<3>();
+		});
+
+		worker1.join();
+		worker2.join();
+
+		const auto result = list.sanityCheck([](const auto&) -> bool {
+			return true;
+		});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(*result, 1);		
 	}
 }
 
+/*
 #include <thread>
 #include <iostream>
 #include <vector>
@@ -155,3 +271,4 @@ TEST(CircularList, insertionStress)
 		EXPECT_EQ(inserted[i].load(), 0);
 	}
 }
+*/
