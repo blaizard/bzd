@@ -7,6 +7,13 @@
 #include <iostream>
 #include <memory>
 
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
+
 namespace {
 const char* getSignalName(int sig) noexcept
 {
@@ -71,6 +78,28 @@ const char* getSignalName(int sig) noexcept
 	default:
 		return "<unknown>";
 	}
+}
+
+char* exec(const char* cmd)
+{
+	constexpr std::size_t maxSize = 1024;
+	static char result[maxSize + 1];
+	std::memset(result, 0, sizeof(result));
+
+	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+	if (!pipe)
+	{
+		return nullptr;
+	}
+
+	std::size_t index = 0;
+	while (index < maxSize && fgets(&result[index], maxSize - index, pipe.get()) != nullptr)
+	{
+		index = strlen(result);
+	}
+
+	result[sizeof(result) - 1] = '\0';
+	return result;
 }
 
 bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexcept
@@ -142,6 +171,35 @@ void callStack(std::ostream& out) noexcept
 		// Print stack trace number and memory address
 		out << "#" << std::dec << std::left << std::setfill(' ') << std::setw(3) << level << "0x" << std::setfill('0') << std::hex
 			<< std::right << std::setw(16) << reinterpret_cast<uint64_t>(addresses[level]);
+
+		// Look for improved function/source names with addr2line
+		{
+			char cmd[1024];
+			snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
+			pSymbol = exec(cmd);
+			if (pSymbol) {
+				// Function
+				if (pSymbol[0] != '?') {
+					const auto pEnd = std::strchr(pSymbol, '\n');
+					if (pEnd)
+					{
+						*pEnd = '\0';
+						pFunction = pSymbol;
+						pSymbol = pEnd + 1;
+					}
+				}
+				// Source path
+				if (pSymbol[0] != '?') {
+					const auto pEnd = std::strchr(pSymbol, '\n');
+					if (pEnd)
+					{
+						*pEnd = '\0';
+						pSourcePath = pSymbol;
+						pSymbol = pEnd + 1;
+					}
+				}
+			}
+		}
 
 		char pBuffer[1024];
 		if (pFunction)
