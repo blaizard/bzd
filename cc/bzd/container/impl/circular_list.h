@@ -376,9 +376,27 @@ public:
 		auto curNode = removeDeletionMark(prevNode->next_.load());
 		while (true)
 		{
-			if (prevNode->next_.load() != curNode || curNode->previous_.load() != prevNode)
+			//std::cout << curNode-> previous_.load() << " <- " << curNode << " -> " << curNode-> next_.load() << std::endl;
+	
+			// Ensure that the next pointer points to the current node.
+			if (prevNode->next_.load() != curNode)
 			{
 				return makeError(ListErrorType::sanityCheck);
+			}
+
+			// Ensure that the previous pointers points to a previous node.
+			auto previousNode = curNode->previous_.load();
+			while (previousNode != prevNode)
+			{
+				if (!previousNode)
+				{
+					return makeError(ListErrorType::sanityCheck);
+				}
+				previousNode = previousNode->next_.load();
+				if (previousNode == &root_)
+				{
+					return makeError(ListErrorType::sanityCheck);
+				}
 			}
 
 			if (curNode == &root_) {

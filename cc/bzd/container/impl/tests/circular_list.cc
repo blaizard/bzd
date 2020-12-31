@@ -11,7 +11,7 @@ public:
 
 	bzd::SizeType value_;
 };
-/*
+
 TEST(CircularList, simple)
 {
 	DummyElement elements[10]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -33,7 +33,7 @@ TEST(CircularList, simple)
 		EXPECT_TRUE(result);
 	}
 }
-*/
+
 template <class T>
 void insertWhileInsertDoWork()
 {
@@ -147,7 +147,7 @@ TEST(CircularList, insertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint2>();
-	//insertWhileRemoveDoWork<bzd::impl::ListInjectPoint3>();
+	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint3>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint4>();
 }
 
@@ -180,11 +180,6 @@ TEST(CircularList, insertionStress)
 		{
 			auto& element = elements[rand() % elements.size()];
 
-			//if (inserted[element.value_].load() > 0) {
-			//	std::this_thread::yield();
-			//	continue;
-			//}
-
 			std::cout << "Trying to insert " << element.value_ << std::endl;
 			const auto result = list.insert(&element);
 			if (!result)
@@ -203,11 +198,6 @@ TEST(CircularList, insertionStress)
 		while (--counter)
 		{
 			auto& element = elements[rand() % nbElements];
-
-			if (inserted[element.value_].load() == 0) {
-				std::this_thread::yield();
-				continue;
-			}
 
 			std::cout << "Trying to remove " << element.value_ << std::endl;
 			const auto result = list.remove(&element);
