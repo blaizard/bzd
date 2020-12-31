@@ -258,8 +258,10 @@ public:
 					break;
 				}
 				if (!previousNext) {
-					std::cout << "null 2" << std::endl;
-					return makeError(ListErrorType::unhandledRaceCondition);
+					// Element got deleted concurrently, need to reiterate
+					// to find the previous node.
+					nodePrevious = element->previous_.load();
+					continue;
 				}
 				if (previousNext == &root_) {
 					std::cout << "ROOT " << count << std::endl;
@@ -280,24 +282,6 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
-			// Detach this element from the chain
-			{
-				BasePtrType expected{element};
-				if (!nodeNext->previous_.compareExchange(expected, nodePrevious)) {
-
-					std::cout << "RACE! 1 remove" << std::endl;
-					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
-
-					// Check if necessary.
-					// Idea is if it fails, it means a concurrent operation changed the pointer already.
-					//continue;
-				}
-			}
-
-			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
-
 			// Try to remove the right link
 			{
 				BasePtrType expected{nodePreviousNext};
@@ -311,10 +295,28 @@ public:
 					// nodeNext has been deleted.
 					// Try to revert the previously changed node, if it fails, discard it would have meant
 					// that the previous has been altered.
-					expected = nodePrevious;
-					nodeNext->previous_.compareExchange(expected, element);
+					//expected = nodePrevious;
+					//nodeNext->previous_.compareExchange(expected, element);
 
 					continue;
+				}
+			}
+
+			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
+
+			// Detach this element from the chain
+			{
+				BasePtrType expected{element};
+				if (!nodeNext->previous_.compareExchange(expected, nodePrevious)) {
+
+					std::cout << "RACE! 1 remove" << std::endl;
+					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+
+					// Check if necessary.
+					// Idea is if it fails, it means a concurrent operation changed the pointer already.
+					//continue;
 				}
 			}
 

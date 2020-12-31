@@ -147,7 +147,7 @@ TEST(CircularList, insertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint2>();
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint3>();
+	//insertWhileRemoveDoWork<bzd::impl::ListInjectPoint3>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint4>();
 }
 
