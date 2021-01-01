@@ -18,11 +18,11 @@ cc_library(
     ],
     visibility = ["//cc/bzd:__subpackages__"],
     deps = [
-        "//cc/bzd/platform:atomic",
-        "//cc/bzd/core:assert_minimal",
-        "//cc/bzd/platform:types",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
+        "//cc/bzd/core:assert_minimal",
+        "//cc/bzd/platform:atomic",
+        "//cc/bzd/platform:types",
         "//cc/bzd/test:inject_point",
     ],
 )

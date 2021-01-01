@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mutex>
 #include <condition_variable>
-#include <thread>
 #include <iostream>
+#include <mutex>
+#include <thread>
 
 namespace bzd::test {
 
@@ -26,10 +26,7 @@ public:
 		}
 	};
 
-	static void reset() noexcept
-	{
-		SyncPoint<tag>::getInstance().index_ = 1;
-	}
+	static void reset() noexcept { SyncPoint<tag>::getInstance().index_ = 1; }
 
 private:
 	static SyncPoint& getInstance() noexcept
@@ -46,4 +43,4 @@ private:
 	bzd::Atomic<bzd::SizeType> index_{1};
 };
 
-}
+} // namespace bzd::test

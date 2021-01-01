@@ -7,12 +7,16 @@
 namespace bzd::typeTraits::impl {
 
 template <class T, class = void>
-struct IsDefaultConstructible : bzd::typeTraits::FalseType { };
+struct IsDefaultConstructible : bzd::typeTraits::FalseType
+{
+};
 
 template <class T>
-struct IsDefaultConstructible<T, bzd::typeTraits::VoidType<decltype(T())>> : bzd::typeTraits::TrueType { };
+struct IsDefaultConstructible<T, bzd::typeTraits::VoidType<decltype(T())>> : bzd::typeTraits::TrueType
+{
+};
 
-}
+} // namespace bzd::typeTraits::impl
 
 namespace bzd::typeTraits {
 
@@ -22,4 +26,4 @@ using IsDefaultConstructible = typename impl::IsDefaultConstructible<T>;
 template <class T>
 constexpr bool isDefaultConstructible = IsDefaultConstructible<T>::value;
 
-}
+} // namespace bzd::typeTraits

@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:cc.bzl", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "circular_list",
@@ -6,12 +6,12 @@ cc_library(
         "circular_list.cc",
     ],
     linkopts = [
-        "-pthread"
-    ],
-    deps = [
-        "//cc/bzd/container/impl",
-        "//tools/cc_test",
-        "//cc/bzd/test:sync_point",
+        "-pthread",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container/impl",
+        "//cc/bzd/test:sync_point",
+        "//tools/cc_test",
+    ],
 )

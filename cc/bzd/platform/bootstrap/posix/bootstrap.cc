@@ -1,18 +1,15 @@
 // std
+#include <array>
 #include <csignal>
+#include <cstdio>
 #include <cstring>
 #include <cxxabi.h>
 #include <execinfo.h>
 #include <iomanip>
 #include <iostream>
 #include <memory>
-
-#include <cstdio>
-#include <iostream>
-#include <memory>
 #include <stdexcept>
 #include <string>
-#include <array>
 
 namespace {
 const char* getSignalName(int sig) noexcept
@@ -177,9 +174,11 @@ void callStack(std::ostream& out) noexcept
 			char cmd[1024];
 			snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
 			pSymbol = exec(cmd);
-			if (pSymbol) {
+			if (pSymbol)
+			{
 				// Function
-				if (pSymbol[0] != '?') {
+				if (pSymbol[0] != '?')
+				{
 					const auto pEnd = std::strchr(pSymbol, '\n');
 					if (pEnd)
 					{
@@ -189,7 +188,8 @@ void callStack(std::ostream& out) noexcept
 					}
 				}
 				// Source path
-				if (pSymbol[0] != '?') {
+				if (pSymbol[0] != '?')
+				{
 					const auto pEnd = std::strchr(pSymbol, '\n');
 					if (pEnd)
 					{
