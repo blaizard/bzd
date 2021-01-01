@@ -36,7 +36,7 @@
 				return this.icon + " bzd-menu-entry-icon";
 			},
 			tooltipObject() {
-				return this.tooltip ? this.tooltip : { text: this.text };
+				return this.tooltip ? this.tooltip : { data: this.text };
 			},
 		},
 		methods: {

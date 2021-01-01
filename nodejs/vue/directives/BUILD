@@ -20,6 +20,9 @@ bzd_nodejs_library(
         "vue": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+    ],
 )
 
 bzd_nodejs_library(
