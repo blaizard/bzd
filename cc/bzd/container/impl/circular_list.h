@@ -155,9 +155,6 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
-//0x55867c0933b0 <- 0x55867c093398 -> 0x55867c0933c8
-//0x55867c0933b0 -> 0x55867c093398 | 0x55867c0933b0 <- 0x55867c0933c8
-
 			{
 				BasePtrType expected{nodePrevious};
 				if (!nodeNext->previous_.compareExchange(expected, element)) {
@@ -242,6 +239,8 @@ public:
 			BasePtrType nodePreviousNext{nullptr};
 			const auto nodeNext = removeDeletionMark(element->next_.load());
 
+			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
+
 			// In case of concurrent insertion, the previous node might not be the
 			// actual one, therefore we need to go down the chain to find the actual
 			// one.
@@ -272,7 +271,7 @@ public:
 				++count;
 			}
 
-			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
+			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
 			// Ensure that the pointers are valid
 			if (!nodePrevious || !nodeNext) {
@@ -280,7 +279,7 @@ public:
 				return makeError(ListErrorType::unhandledRaceCondition);
 			}
 
-			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
+			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
 
 			// Try to remove the right link
 			{
@@ -302,7 +301,7 @@ public:
 				}
 			}
 
-			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
+			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
 			// Detach this element from the chain
 			{
@@ -320,7 +319,7 @@ public:
 				}
 			}
 
-			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
+			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
 			// Element is completly out of the chain
 			// Note here the order is important, the next pointer should be updated
