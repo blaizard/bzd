@@ -19,7 +19,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform",
-        "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:is_default_constructible",
+        "//cc/bzd/type_traits:is_same",
     ],
 )

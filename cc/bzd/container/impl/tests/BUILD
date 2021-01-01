@@ -10,7 +10,7 @@ cc_test(
         "//tools/cc_test",
     ] + select({
         "//tools/bazel_build/config:x86_64": [
-            "//cc/bzd/container/impl/tests/std:circular_list"
+            "//cc/bzd/container/impl/tests/std:circular_list",
         ],
         "//conditions:default": [],
     }),

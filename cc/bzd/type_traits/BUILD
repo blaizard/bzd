@@ -284,8 +284,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":false_type",
-        ":void_type",
         ":true_type",
+        ":void_type",
     ],
 )
 

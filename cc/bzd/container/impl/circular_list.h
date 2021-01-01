@@ -1,10 +1,10 @@
 #pragma once
 
-#include "bzd/core/assert/minimal.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
-#include "bzd/platform/types.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/atomic.h"
+#include "bzd/platform/types.h"
 #include "bzd/test/inject_point.h"
 
 #include <iostream>
@@ -14,11 +14,7 @@ class CircularListElement
 {
 public:
 	constexpr CircularListElement() = default;
-	constexpr CircularListElement(CircularListElement&& elt)
-		: next_{elt.next_.load()},
-		previous_{elt.previous_.load()}
-	{
-	}
+	constexpr CircularListElement(CircularListElement&& elt) : next_{elt.next_.load()}, previous_{elt.previous_.load()} {}
 
 	bzd::Atomic<CircularListElement*> next_{};
 	bzd::Atomic<CircularListElement*> previous_{};
@@ -33,11 +29,21 @@ enum class ListErrorType
 	sanityCheck,
 };
 
-struct ListInjectPoint1 {};
-struct ListInjectPoint2 {};
-struct ListInjectPoint3 {};
-struct ListInjectPoint4 {};
-struct ListInjectPoint5 {};
+struct ListInjectPoint1
+{
+};
+struct ListInjectPoint2
+{
+};
+struct ListInjectPoint3
+{
+};
+struct ListInjectPoint4
+{
+};
+struct ListInjectPoint5
+{
+};
 
 /**
  * Implementation of a non-owning circular double linked list.
@@ -66,30 +72,30 @@ public:
 	 * Insert an element into the list from the root element.
 	 * The idea is to ensure that the last operation is the one that make the element discoverable,
 	 * this ensures that any element is consistent.
-	 * 
+	 *
 	 * Given the following:
 	 * | R | -> | A |
 	 * |   | <- |   |
-	 * 
+	 *
 	 * To insert element B, first set the next and previous pointers of this element:
-	 * | R | <---------> | A |  
+	 * | R | <---------> | A |
 	 * |   | <- | B | -> |   |
-	 * 
+	 *
 	 * What happen if:
 	 * - R is deleted: Cannot happen.
 	 * - A is deleted: If so, previous pointer to A will be marked as deleted and the next operation will fail.
-	 * 
+	 *
 	 * Then update A previous pointer to B, if it fails restart from the begining
 	 * | R | ----------> | A |
 	 * |   | <- | B | -> |   |
 	 * |   |    |   | <- |   |
-	 * 
+	 *
 	 * What happen if:
 	 * - R is deleted: Cannot happen.
 	 * - A is deleted: Linkage is up-to-date, no problems.
 	 * - Concurrent insertion after R: it will fail when update A previous pointer which is expected to be R but it is B.
 	 * - Concurrent insertion after A: Linkage is up-to-date, no problems.
-	 * 
+	 *
 	 * Finally update next pointer of A, if it fails? TBD
 	 * | R | <- | B | -> | A |
 	 * |   | -> |   | <- |   |
@@ -101,12 +107,12 @@ public:
 
 		while (true)
 		{
-			if (--retry == 0) {
+			if (--retry == 0)
+			{
 				std::cout << "ERROR" << std::endl;
 				volatile char* tmo = nullptr;
 				tmo[13] = 2;
 			}
-
 
 			// Save the previous and next positions of expected future element pointers
 			const auto nodePrevious = &root_;
@@ -117,7 +123,8 @@ public:
 			// Prepare the current element to be inserted between nodePrevious and nodeNext
 			{
 				BasePtrType expected{nullptr};
-				if (!element->next_.compareExchange(expected, addDeletionMark(nodeNext))) {
+				if (!element->next_.compareExchange(expected, addDeletionMark(nodeNext)))
+				{
 					std::cout << "1 no!" << std::endl;
 
 					return makeError(ListErrorType::elementAlreadyInserted);
@@ -134,8 +141,8 @@ public:
 
 			{
 				BasePtrType expected{nodeNext};
-				if (!nodePrevious->next_.compareExchange(expected, element)) {
-
+				if (!nodePrevious->next_.compareExchange(expected, element))
+				{
 					std::cout << "sakls" << std::endl;
 
 					// The next node has been altered, retry.
@@ -157,16 +164,16 @@ public:
 
 			{
 				BasePtrType expected{nodePrevious};
-				if (!nodeNext->previous_.compareExchange(expected, element)) {
-
+				if (!nodeNext->previous_.compareExchange(expected, element))
+				{
 					// Nothing needs to be done here, it means that the
 					// pointer has been updated by another node.
 					// Reverting things now will might lead to unconsitency between nodes.
 
 					std::cout << "RACE! 1 insert" << std::endl;
-					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
 
 					// The next node has been altered, retry.
 					// Note the order here is important.
@@ -174,12 +181,12 @@ public:
 					nodePrevious->next_.compareExchange(expected, nodeNext);
 					element->previous_.store(nullptr);
 					element->next_.store(nullptr);
-					
+
 					continue;*/
-					//break;
+					// break;
 
 					// Should never happen
-					//return makeError(ListErrorType::unhandledRaceCondition);
+					// return makeError(ListErrorType::unhandledRaceCondition);
 				}
 			}
 
@@ -218,7 +225,8 @@ public:
 			BasePtrType expected{removeDeletionMark(element->next_.load())};
 			do
 			{
-				if (!expected || isDeletionMark(expected)) {
+				if (!expected || isDeletionMark(expected))
+				{
 					return makeError(ListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element->next_.compareExchange(expected, addDeletionMark(expected)));
@@ -228,7 +236,8 @@ public:
 
 		while (true)
 		{
-			if (--retry == 0) {
+			if (--retry == 0)
+			{
 				std::cout << "ERROR" << std::endl;
 				volatile char* tmo = nullptr;
 				tmo[13] = 2;
@@ -247,25 +256,28 @@ public:
 			bzd::SizeType count = 0;
 			while (true)
 			{
-				if (!nodePrevious) {
+				if (!nodePrevious)
+				{
 					std::cout << "null 1" << std::endl;
 					return makeError(ListErrorType::unhandledRaceCondition);
 				}
 				nodePreviousNext = nodePrevious->next_.load();
 				const auto previousNext = removeDeletionMark(nodePreviousNext);
-				if (previousNext == element) {
+				if (previousNext == element)
+				{
 					break;
 				}
-				if (!previousNext) {
+				if (!previousNext)
+				{
 					// Element got deleted concurrently, need to reiterate
 					// to find the previous node.
 					nodePrevious = element->previous_.load();
 					continue;
 				}
-				if (previousNext == &root_) {
+				if (previousNext == &root_)
+				{
 					std::cout << "ROOT " << count << std::endl;
-					if (count > 100)
-					return makeError(ListErrorType::unhandledRaceCondition);
+					if (count > 100) return makeError(ListErrorType::unhandledRaceCondition);
 				}
 				nodePrevious = previousNext;
 				++count;
@@ -274,7 +286,8 @@ public:
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
 			// Ensure that the pointers are valid
-			if (!nodePrevious || !nodeNext) {
+			if (!nodePrevious || !nodeNext)
+			{
 				std::cout << "null 3 " << nodePrevious << " " << nodeNext << std::endl;
 				return makeError(ListErrorType::unhandledRaceCondition);
 			}
@@ -284,18 +297,19 @@ public:
 			// Try to remove the right link
 			{
 				BasePtrType expected{nodePreviousNext};
-				if (!nodePrevious->next_.compareExchange(expected, (isDeletionMark(nodePreviousNext)) ? addDeletionMark(nodeNext) : nodeNext)) {
-
+				if (!nodePrevious->next_.compareExchange(expected,
+														 (isDeletionMark(nodePreviousNext)) ? addDeletionMark(nodeNext) : nodeNext))
+				{
 					std::cout << "RACE! 2 remove" << std::endl;
-					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
 
 					// nodeNext has been deleted.
 					// Try to revert the previously changed node, if it fails, discard it would have meant
 					// that the previous has been altered.
-					//expected = nodePrevious;
-					//nodeNext->previous_.compareExchange(expected, element);
+					// expected = nodePrevious;
+					// nodeNext->previous_.compareExchange(expected, element);
 
 					continue;
 				}
@@ -306,16 +320,16 @@ public:
 			// Detach this element from the chain
 			{
 				BasePtrType expected{element};
-				if (!nodeNext->previous_.compareExchange(expected, nodePrevious)) {
-
+				if (!nodeNext->previous_.compareExchange(expected, nodePrevious))
+				{
 					std::cout << "RACE! 1 remove" << std::endl;
-					std::cout << nodePrevious << " <- " <<  element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " <<  nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " <<  nodeNext << std::endl;
+					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
+					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
+					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
 
 					// Check if necessary.
 					// Idea is if it fails, it means a concurrent operation changed the pointer already.
-					//continue;
+					// continue;
 				}
 			}
 
@@ -353,15 +367,13 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return reinterpret_cast<const T&>(*ptr);		
+		return reinterpret_cast<const T&>(*ptr);
 	}
 
 	/**
 	 * Make the list point to the next element.
 	 */
-	constexpr void next()
-	{
-	}
+	constexpr void next() {}
 
 	/**
 	 * Ensures that all element are properly connected.
@@ -375,8 +387,8 @@ public:
 		auto curNode = removeDeletionMark(prevNode->next_.load());
 		while (true)
 		{
-			//std::cout << curNode-> previous_.load() << " <- " << curNode << " -> " << curNode-> next_.load() << std::endl;
-	
+			// std::cout << curNode-> previous_.load() << " <- " << curNode << " -> " << curNode-> next_.load() << std::endl;
+
 			// Ensure that the next pointer points to the current node.
 			if (prevNode->next_.load() != curNode)
 			{
@@ -398,12 +410,14 @@ public:
 				}
 			}
 
-			if (curNode == &root_) {
+			if (curNode == &root_)
+			{
 				break;
 			}
 
 			const bool result = sanityCheckElement(reinterpret_cast<T&>(*curNode));
-			if (!result) {
+			if (!result)
+			{
 				return makeError(ListErrorType::sanityCheck);
 			}
 
@@ -416,11 +430,7 @@ public:
 	}
 
 private:
-
-	constexpr bool isDeletionMark(BasePtrType node) const noexcept
-	{
-		return (reinterpret_cast<IntPtrType>(node) & 1);
-	}
+	constexpr bool isDeletionMark(BasePtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 1); }
 
 	constexpr BasePtrType addDeletionMark(BasePtrType node) const noexcept
 	{

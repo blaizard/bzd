@@ -39,7 +39,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:named_type",
-    ]
+    ],
 )
 
 cc_library(
