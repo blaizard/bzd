@@ -25,7 +25,7 @@
 			</transition>
 			<transition name="bzd-translate">
 				<div class="bzd-layout-menu-content" @click.stop="hideMenu" v-show="isMenuShow || (isDock && !isMobile)">
-					<div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ text: 'Dock menu' }">
+					<div class="bzd-layout-menu-content-dock" @click="toggleDock" v-tooltip="{ type: 'text', data: 'Dock menu' }">
 						<i v-if="isDock" class="bzd-icon-dock_on"></i>
 						<i v-else class="bzd-icon-dock_off"></i>
 					</div>

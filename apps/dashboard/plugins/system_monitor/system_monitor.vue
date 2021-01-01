@@ -221,7 +221,7 @@
 				const messageList = Object.keys(map).map((key) => {
 					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
 				});
-				return { text: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
+				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
 		},
 	};

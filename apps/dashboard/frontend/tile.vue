@@ -78,7 +78,8 @@
 			},
 			tooltipErrorConfig() {
 				return {
-					text: this.errorList.map((e) => String(e)).join(", "),
+					type: "text",
+					data: this.errorList.map((e) => String(e)).join(", "),
 				};
 			},
 			colorAuto() {

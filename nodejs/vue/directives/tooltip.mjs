@@ -1,3 +1,6 @@
+import ExceptionFactory from "bzd/core/exception.mjs";
+const Exception = ExceptionFactory("tooltip");
+
 let current = {
 	watcher: null,
 	elt: null,
@@ -106,8 +109,8 @@ async function tooltipFromEvent(e) {
 	if (elt.onceAsync) {
 		const asyncFct = elt.onceAsync;
 		delete elt.onceAsync;
-		const text = await asyncFct();
-		elt.setAttribute("data-irtooltip", text);
+		const data = await asyncFct();
+		elt.setAttribute("data-irtooltip", data);
 		// Update the displayed content of the tooltip if it is shown
 		if (current.elt === elt) {
 			tooltip(elt);
@@ -148,7 +151,12 @@ export function tooltip(elt, message = null, initialPosition = null) {
 
 	// Get the tooltip and set the message
 	let tooltipElt = getOrCreateTooltip();
-	tooltipElt.firstChild.innerHTML = message;
+	if (elt.getAttribute("data-irtooltip-type") == "html") {
+		tooltipElt.firstChild.innerHTML = message;
+	}
+	else {
+		tooltipElt.firstChild.textContent = message;
+	}
 
 	// Get element coordinates and update the coordinates
 	const coordElt = elt.getBoundingClientRect();
@@ -206,9 +214,13 @@ export default function (el, binding) {
 	const config = Object.assign(
 		{
 			/**
-			 * The text to display
+			 * Type of data to be displayed, values are html or text.
 			 */
-			text: null,
+			type: "html",
+			/**
+			 * The data to be displayed
+			 */
+			data: null,
 			/**
 			 * Asynchronous function to be called and resolved when the tooltip shows
 			 */
@@ -225,17 +237,21 @@ export default function (el, binding) {
 	el.addEventListener("mouseleave", tooltipHide, false);
 
 	// Set the attributes
-	if (config.text) {
-		el.setAttribute("data-irtooltip", config.text);
+	if (config.data) {
+		el.setAttribute("data-irtooltip", config.data);
 	}
 	else {
 		el.removeAttribute("data-irtooltip");
 	}
 
+	// Set the type of data to be displayed
+	Exception.assert(["text", "html"].includes(config.type), "Unsupported type: '{}'.", config.type);
+	el.setAttribute("data-irtooltip-type", config.type);
+
 	/*
-	 *  Add async function if any.
-	 *  We cannot use an event here as when called multiple times,
-	 *  multiple event will be associated.
+	 * Add async function if any.
+	 * We cannot use an event here as when called multiple times,
+	 * multiple event will be associated.
 	 */
 	if (config.async) {
 		el.onceAsync = config.async;
