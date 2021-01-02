@@ -64,8 +64,8 @@ private:
 public:
 	constexpr CircularList() noexcept
 	{
-		root_.next_.store(&root_);
-		root_.previous_.store(&root_);
+		head_.next_.store(&tail_);
+		tail_.previous_.store(&head_);
 	};
 
 	/**
@@ -115,7 +115,7 @@ public:
 			}
 
 			// Save the previous and next positions of expected future element pointers
-			const auto nodePrevious = &root_;
+			const auto nodePrevious = &head_;
 			const auto nodeNext = removeDeletionMark(nodePrevious->next_.load());
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
@@ -205,7 +205,7 @@ public:
 
 		// Point to the next element if node is pointing to root.
 		{
-			BasePtrType expected{&root_};
+			BasePtrType expected{&head_};
 			node_.compareExchange(expected, element);
 		}
 
@@ -270,14 +270,16 @@ public:
 				if (!previousNext)
 				{
 					// Element got deleted concurrently, need to reiterate
-					// to find the previous node.
-					nodePrevious = element->previous_.load();
+					// to find the previous node. Note head_ is used here
+					// instead of nodePrevious to ensure that elements inserted
+					// in other lists will still be found.
+					nodePrevious = &head_;
 					continue;
 				}
-				if (previousNext == &root_)
+				if (previousNext == &tail_)
 				{
-					std::cout << "ROOT " << count << std::endl;
-					if (count > 100) return makeError(ListErrorType::unhandledRaceCondition);
+					/*std::cout << "ROOT " << count << std::endl;
+					if (count > 100)*/ return makeError(ListErrorType::unhandledRaceCondition);
 				}
 				nodePrevious = previousNext;
 				++count;
@@ -353,7 +355,7 @@ public:
 	constexpr bzd::Optional<T&> get() noexcept
 	{
 		auto ptr = node_.load();
-		if (ptr == &root_)
+		if (ptr == &head_)
 		{
 			return bzd::nullopt;
 		}
@@ -363,7 +365,7 @@ public:
 	constexpr bzd::Optional<const T&> get() const noexcept
 	{
 		const auto ptr = node_.load();
-		if (ptr == &root_)
+		if (ptr == &head_)
 		{
 			return bzd::nullopt;
 		}
@@ -383,7 +385,7 @@ public:
 	Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
 		bzd::SizeType counter = 0;
-		auto prevNode = &root_;
+		auto prevNode = &head_;
 		auto curNode = removeDeletionMark(prevNode->next_.load());
 		while (true)
 		{
@@ -404,13 +406,13 @@ public:
 					return makeError(ListErrorType::sanityCheck);
 				}
 				previousNode = previousNode->next_.load();
-				if (previousNode == &root_)
+				if (previousNode == &tail_)
 				{
 					return makeError(ListErrorType::sanityCheck);
 				}
 			}
 
-			if (curNode == &root_)
+			if (curNode == &tail_)
 			{
 				break;
 			}
@@ -445,7 +447,8 @@ private:
 private:
 	// Having a root elemment will simplify the logic to not have to take care
 	// of the empty case
-	CircularListElement root_;
-	bzd::Atomic<BasePtrType> node_{&root_};
+	CircularListElement head_;
+	CircularListElement tail_;
+	bzd::Atomic<BasePtrType> node_{&head_};
 };
 } // namespace bzd::impl
