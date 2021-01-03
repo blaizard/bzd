@@ -132,6 +132,13 @@ public:
 	};
 
 	/**
+	 * Get the number of elements currently held by this container.
+	 * 
+	 * \return The number of elments.
+	 */
+	constexpr SizeType size() const noexcept { return size_.load(); }
+
+	/**
 	 * Insert an element into the list from the root element.
 	 * The idea is to ensure that the last operation is the one that make the element discoverable,
 	 * this ensures that any element is consistent.
@@ -266,6 +273,9 @@ public:
 			break;
 		}
 
+		// Increase the element count.
+		++size_;
+
 		// Point to the next element if node is pointing to root.
 		{
 			BasePtrType expected{&head_};
@@ -381,6 +391,9 @@ public:
 			break;
 		}
 
+		// Decrease the element count.
+		--size_;
+
 		return nullresult;
 	}
 
@@ -420,39 +433,49 @@ public:
 	Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
 		bzd::SizeType counter = 0;
-		auto prevNode = &head_;
-		auto curNode = removeDeletionMark(prevNode->next_.load());
+		auto previous = &head_;
+		auto node = removeDeletionMark(previous->next_.load());
 		while (true)
 		{
-			// std::cout << curNode-> previous_.load() << " <- " << curNode << " -> " << curNode-> next_.load() << std::endl;
-
 			// Ensure that the next pointer points to the current node.
-			if (prevNode->next_.load() != curNode)
+			if (previous->next_.load() != node)
 			{
 				return makeError(ListErrorType::sanityCheck);
 			}
 
 			// Ensure that the previous pointers points to a previous node.
-			const auto previous = findPreviousNode(curNode, curNode->previous_.load());
-			if (!previous)
 			{
-				return makeError(ListErrorType::sanityCheck);
+				const auto result = findPreviousNode(node, node->previous_.load());
+				if (!result)
+				{
+					return makeError(ListErrorType::sanityCheck);
+				}
 			}
 
-			if (curNode == &tail_)
+			// Check if the end is reached.
+			if (node == &tail_)
 			{
 				break;
 			}
 
-			const bool result = sanityCheckElement(reinterpret_cast<T&>(*curNode));
-			if (!result)
+			// Check the element.
 			{
-				return makeError(ListErrorType::sanityCheck);
+				const bool result = sanityCheckElement(reinterpret_cast<T&>(*node));
+				if (!result)
+				{
+					return makeError(ListErrorType::sanityCheck);
+				}
 			}
 
 			++counter;
-			prevNode = curNode;
-			curNode = curNode->next_.load();
+			previous = node;
+			node = node->next_.load();
+		}
+
+		// Element count should be equal.
+		if (size() != counter)
+		{
+			return makeError(ListErrorType::sanityCheck);
 		}
 
 		return counter;
@@ -472,10 +495,11 @@ private:
 	}
 
 private:
-	// Having a root elemment will simplify the logic to not have to take care
-	// of the empty case
+	// Having a head & tail elemment will simplify the logic to not have to take care of the edge cases.
 	CircularListElement head_;
 	CircularListElement tail_;
+	// Number of elements.
+	bzd::Atomic<bzd::SizeType> size_{0};
 	bzd::Atomic<BasePtrType> node_{&head_};
 };
 } // namespace bzd::impl
