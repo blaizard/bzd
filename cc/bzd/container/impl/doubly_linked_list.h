@@ -60,8 +60,6 @@ public:
 	using Result = bzd::Result<V, ListErrorType>;
 
 private:
-	const BasePtrType deleteMark_{reinterpret_cast<const BasePtrType>(1)};
-
 	/**
 	 * Structure to return node information when found.
 	 */
@@ -104,17 +102,17 @@ private:
 			}
 
 			// Element got deleted concurrently, need to reiterate
-			// to find the previous node. Note head_ is used here
+			// to find the previous node. Note front_ is used here
 			// instead of 'previous' to ensure that elements inserted
 			// in other lists will still be found.
 			if (!previousNext)
 			{
-				result.node = &head_;
+				result.node = &front_;
 				continue;
 			}
 
 			// Node was not found within the chain.
-			if (previousNext == &tail_)
+			if (previousNext == &back_)
 			{
 				return makeError(ListErrorType::notFound);
 			}
@@ -127,8 +125,8 @@ private:
 public:
 	constexpr DoublyLinkedList() noexcept
 	{
-		head_.next_.store(&tail_);
-		tail_.previous_.store(&head_);
+		front_.next_.store(&back_);
+		back_.previous_.store(&front_);
 	};
 
 	/**
@@ -185,7 +183,7 @@ public:
 			}
 
 			// Save the previous and next positions of expected future element pointers
-			const auto nodePrevious = &head_;
+			const auto nodePrevious = &front_;
 			const auto nodeNext = removeDeletionMark(nodePrevious->next_.load());
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
@@ -275,12 +273,6 @@ public:
 
 		// Increase the element count.
 		++size_;
-
-		// Point to the next element if node is pointing to root.
-		{
-			BasePtrType expected{&head_};
-			node_.compareExchange(expected, element);
-		}
 
 		return nullresult;
 	}
@@ -397,33 +389,43 @@ public:
 		return nullresult;
 	}
 
-	/**
-	 * Get the current element if any.
-	 */
-	constexpr bzd::Optional<T&> get() noexcept
+	constexpr bzd::Optional<T&> front() noexcept
 	{
-		auto ptr = node_.load();
-		if (ptr == &head_)
+		auto ptr = front_.next_.load();
+		if (ptr == &back_)
 		{
 			return bzd::nullopt;
 		}
 		return reinterpret_cast<T&>(*ptr);
 	}
-
-	constexpr bzd::Optional<const T&> get() const noexcept
+	constexpr bzd::Optional<const T&> front() const noexcept
 	{
-		const auto ptr = node_.load();
-		if (ptr == &head_)
+		const auto ptr = front_.next_.load();
+		if (ptr == &back_)
 		{
 			return bzd::nullopt;
 		}
 		return reinterpret_cast<const T&>(*ptr);
 	}
 
-	/**
-	 * Make the list point to the next element.
-	 */
-	constexpr void next() {}
+	constexpr bzd::Optional<T&> back() noexcept
+	{
+		auto ptr = back_.previous_.load();
+		if (ptr == &front_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<T&>(*ptr);
+	}
+	constexpr bzd::Optional<const T&> back() const noexcept
+	{
+		const auto ptr = back_.previous_.load();
+		if (ptr == &front_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<const T&>(*ptr);
+	}
 
 	/**
 	 * Ensures that all element are properly connected.
@@ -433,7 +435,7 @@ public:
 	Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
 		bzd::SizeType counter = 0;
-		auto previous = &head_;
+		auto previous = &front_;
 		auto node = removeDeletionMark(previous->next_.load());
 		while (true)
 		{
@@ -453,7 +455,7 @@ public:
 			}
 
 			// Check if the end is reached.
-			if (node == &tail_)
+			if (node == &back_)
 			{
 				break;
 			}
@@ -495,11 +497,10 @@ private:
 	}
 
 private:
-	// Having a head & tail elemment will simplify the logic to not have to take care of the edge cases.
-	DoublyLinkedListElement head_;
-	DoublyLinkedListElement tail_;
+	// Having a front & back elemment will simplify the logic to not have to take care of the edge cases.
+	DoublyLinkedListElement front_;
+	DoublyLinkedListElement back_;
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
-	bzd::Atomic<BasePtrType> node_{&head_};
 };
 } // namespace bzd::impl
