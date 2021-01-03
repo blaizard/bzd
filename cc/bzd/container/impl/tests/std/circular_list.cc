@@ -45,6 +45,7 @@ void insertWhileInsertDoWork()
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
 	EXPECT_TRUE(result);
 	EXPECT_EQ(*result, 3);
+	EXPECT_EQ(list.size(), 3);
 }
 
 TEST(CircularList, insertWhileInsert)
@@ -82,6 +83,7 @@ void removeWhileInsertDoWork()
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
 	EXPECT_TRUE(result);
 	EXPECT_EQ(*result, 1);
+	EXPECT_EQ(list.size(), 1);
 }
 
 TEST(CircularList, removeWhileInsert)
@@ -119,6 +121,7 @@ void insertWhileRemoveDoWork()
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
 	EXPECT_TRUE(result);
 	EXPECT_EQ(*result, 1);
+	EXPECT_EQ(list.size(), 1);
 }
 
 TEST(CircularList, insertWhileRemove)
