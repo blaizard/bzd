@@ -1,8 +1,8 @@
-#include "bzd/container/impl/circular_list.h"
+#include "bzd/container/impl/doubly_linked_list.h"
 
 #include "cc_test/test.h"
 
-class DummyElement : public bzd::impl::CircularListElement
+class DummyElement : public bzd::impl::DoublyLinkedListElement
 {
 public:
 	DummyElement(bzd::SizeType value) : value_{value} {}
@@ -11,10 +11,10 @@ public:
 	bzd::SizeType value_;
 };
 
-TEST(CircularList, simple)
+TEST(DoublyLinkedList, simple)
 {
 	DummyElement elements[10]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	bzd::impl::CircularList<DummyElement> list;
+	bzd::impl::DoublyLinkedList<DummyElement> list;
 	EXPECT_EQ(list.size(), 0);
 
 	{

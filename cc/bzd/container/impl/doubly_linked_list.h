@@ -10,14 +10,14 @@
 #include <iostream>
 
 namespace bzd::impl {
-class CircularListElement
+class DoublyLinkedListElement
 {
 public:
-	constexpr CircularListElement() = default;
-	constexpr CircularListElement(CircularListElement&& elt) : next_{elt.next_.load()}, previous_{elt.previous_.load()} {}
+	constexpr DoublyLinkedListElement() = default;
+	constexpr DoublyLinkedListElement(DoublyLinkedListElement&& elt) : next_{elt.next_.load()}, previous_{elt.previous_.load()} {}
 
-	bzd::Atomic<CircularListElement*> next_{};
-	bzd::Atomic<CircularListElement*> previous_{};
+	bzd::Atomic<DoublyLinkedListElement*> next_{};
+	bzd::Atomic<DoublyLinkedListElement*> previous_{};
 };
 
 enum class ListErrorType
@@ -47,14 +47,14 @@ struct ListInjectPoint5
 };
 
 /**
- * Implementation of a non-owning circular double linked list.
+ * Implementation of a non-owning doubly linked list.
  * This implementation is thread safe.
  */
 template <class T>
-class CircularList
+class DoublyLinkedList
 {
 public:
-	using BasePtrType = CircularListElement*;
+	using BasePtrType = DoublyLinkedListElement*;
 	using PtrType = T*;
 	template <class V>
 	using Result = bzd::Result<V, ListErrorType>;
@@ -125,7 +125,7 @@ private:
 	}
 
 public:
-	constexpr CircularList() noexcept
+	constexpr DoublyLinkedList() noexcept
 	{
 		head_.next_.store(&tail_);
 		tail_.previous_.store(&head_);
@@ -496,8 +496,8 @@ private:
 
 private:
 	// Having a head & tail elemment will simplify the logic to not have to take care of the edge cases.
-	CircularListElement head_;
-	CircularListElement tail_;
+	DoublyLinkedListElement head_;
+	DoublyLinkedListElement tail_;
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
 	bzd::Atomic<BasePtrType> node_{&head_};

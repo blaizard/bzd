@@ -1,4 +1,4 @@
-#include "bzd/container/impl/circular_list.h"
+#include "bzd/container/impl/doubly_linked_list.h"
 
 #include "bzd/test/sync_point.h"
 #include "cc_test/test.h"
@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-class DummyElement : public bzd::impl::CircularListElement
+class DummyElement : public bzd::impl::DoublyLinkedListElement
 {
 public:
 	DummyElement(bzd::SizeType value) : value_{value} {}
@@ -24,7 +24,7 @@ void insertWhileInsertDoWork()
 	DummyElement a{1};
 	DummyElement b{2};
 	DummyElement c{3};
-	bzd::impl::CircularList<DummyElement> list;
+	bzd::impl::DoublyLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -48,7 +48,7 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 3);
 }
 
-TEST(CircularList, insertWhileInsert)
+TEST(DoublyLinkedList, insertWhileInsert)
 {
 	insertWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
@@ -62,7 +62,7 @@ void removeWhileInsertDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::CircularList<DummyElement> list;
+	bzd::impl::DoublyLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -86,7 +86,7 @@ void removeWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(CircularList, removeWhileInsert)
+TEST(DoublyLinkedList, removeWhileInsert)
 {
 	removeWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
 	removeWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
@@ -100,7 +100,7 @@ void insertWhileRemoveDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::CircularList<DummyElement> list;
+	bzd::impl::DoublyLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -124,7 +124,7 @@ void insertWhileRemoveDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(CircularList, insertWhileRemove)
+TEST(DoublyLinkedList, insertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint2>();
@@ -133,7 +133,7 @@ TEST(CircularList, insertWhileRemove)
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
 }
 
-TEST(CircularList, insertionStress)
+TEST(DoublyLinkedList, insertionStress)
 {
 	constexpr bzd::SizeType nbIterations = 10000;
 	constexpr bzd::SizeType nbElements = 4;
@@ -141,7 +141,7 @@ TEST(CircularList, insertionStress)
 	srand(time(NULL));
 
 	// List
-	bzd::impl::CircularList<DummyElement> list;
+	bzd::impl::DoublyLinkedList<DummyElement> list;
 
 	// Elements
 	std::vector<DummyElement> elements;
