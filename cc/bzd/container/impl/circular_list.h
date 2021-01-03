@@ -26,6 +26,7 @@ enum class ListErrorType
 	elementAlreadyInserted,
 	elementAlreadyRemoved,
 	unhandledRaceCondition,
+	notFound,
 	sanityCheck,
 };
 
@@ -60,6 +61,68 @@ public:
 
 private:
 	const BasePtrType deleteMark_{reinterpret_cast<const BasePtrType>(1)};
+
+	/**
+	 * Structure to return node information when found.
+	 */
+	struct NodeFound
+	{
+		/**
+		 * Pointer of the previous node.
+		 */
+		BasePtrType node;
+		/**
+		 * Raw pointer of the next pointer of the previous node.
+		 * Raw means without removing deletion mark.
+		 */
+		BasePtrType nextRaw;
+	};
+
+	/**
+	 * Look for the previous node of the one passed into argument.
+	 * In case of concurrent insertion, the previous node might not be the
+	 * actual one, therefore we need to go down the chain to find the actual one.
+	 * 
+	 * \param node We are looking for the previous node of this node.
+	 * \param previous A hint to find the previous node.
+	 * 
+	 * \return A structure containing the previous node and the raw pointer its next node.
+	 */
+	Result<NodeFound> findPreviousNode(BasePtrType node, BasePtrType previous) noexcept
+	{
+		NodeFound result{previous, nullptr};
+
+		while (result.node)
+		{
+			result.nextRaw = result.node->next_.load();
+			const auto previousNext = removeDeletionMark(result.nextRaw);
+
+			// This is the node we are looking for.
+			if (previousNext == node)
+			{
+				return result;
+			}
+
+			// Element got deleted concurrently, need to reiterate
+			// to find the previous node. Note head_ is used here
+			// instead of 'previous' to ensure that elements inserted
+			// in other lists will still be found.
+			if (!previousNext)
+			{
+				result.node = &head_;
+				continue;
+			}
+
+			// Node was not found within the chain.
+			if (previousNext == &tail_)
+			{
+				return makeError(ListErrorType::notFound);
+			}
+			result.node = previousNext;
+		}
+
+		return makeError(ListErrorType::unhandledRaceCondition);
+	}
 
 public:
 	constexpr CircularList() noexcept
@@ -245,45 +308,17 @@ public:
 
 			// Save the previous and next positions of current element pointers
 			auto nodePrevious = element->previous_.load();
-			BasePtrType nodePreviousNext{nullptr};
 			const auto nodeNext = removeDeletionMark(element->next_.load());
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
-			// In case of concurrent insertion, the previous node might not be the
-			// actual one, therefore we need to go down the chain to find the actual
-			// one.
-			bzd::SizeType count = 0;
-			while (true)
+			// Look for the previous node.
+			const auto previous = findPreviousNode(element, nodePrevious);
+			if (!previous)
 			{
-				if (!nodePrevious)
-				{
-					std::cout << "null 1" << std::endl;
-					return makeError(ListErrorType::unhandledRaceCondition);
-				}
-				nodePreviousNext = nodePrevious->next_.load();
-				const auto previousNext = removeDeletionMark(nodePreviousNext);
-				if (previousNext == element)
-				{
-					break;
-				}
-				if (!previousNext)
-				{
-					// Element got deleted concurrently, need to reiterate
-					// to find the previous node. Note head_ is used here
-					// instead of nodePrevious to ensure that elements inserted
-					// in other lists will still be found.
-					nodePrevious = &head_;
-					continue;
-				}
-				if (previousNext == &tail_)
-				{
-					/*std::cout << "ROOT " << count << std::endl;
-					if (count > 100)*/ return makeError(ListErrorType::unhandledRaceCondition);
-				}
-				nodePrevious = previousNext;
-				++count;
+				return makeError(ListErrorType::unhandledRaceCondition);
 			}
+			nodePrevious = previous->node;
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
@@ -298,9 +333,9 @@ public:
 
 			// Try to remove the right link
 			{
-				BasePtrType expected{nodePreviousNext};
+				BasePtrType expected{previous->nextRaw};
 				if (!nodePrevious->next_.compareExchange(expected,
-														 (isDeletionMark(nodePreviousNext)) ? addDeletionMark(nodeNext) : nodeNext))
+														 (isDeletionMark(previous->nextRaw)) ? addDeletionMark(nodeNext) : nodeNext))
 				{
 					std::cout << "RACE! 2 remove" << std::endl;
 					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
@@ -398,18 +433,10 @@ public:
 			}
 
 			// Ensure that the previous pointers points to a previous node.
-			auto previousNode = curNode->previous_.load();
-			while (previousNode != prevNode)
+			const auto previous = findPreviousNode(curNode, curNode->previous_.load());
+			if (!previous)
 			{
-				if (!previousNode)
-				{
-					return makeError(ListErrorType::sanityCheck);
-				}
-				previousNode = previousNode->next_.load();
-				if (previousNode == &tail_)
-				{
-					return makeError(ListErrorType::sanityCheck);
-				}
+				return makeError(ListErrorType::sanityCheck);
 			}
 
 			if (curNode == &tail_)
