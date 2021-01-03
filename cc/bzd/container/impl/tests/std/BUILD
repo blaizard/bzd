@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "circular_list",
+    name = "doubly_linked_list",
     srcs = [
-        "circular_list.cc",
+        "doubly_linked_list.cc",
     ],
     linkopts = [
         "-pthread",
