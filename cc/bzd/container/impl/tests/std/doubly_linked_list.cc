@@ -150,14 +150,13 @@ TEST(DoublyLinkedList, insertionStress)
 		elements.push_back(DummyElement{i});
 	}
 
-	const auto workloadInsert = [&list, &elements]() {
+	const auto workloadInsert = [&elements](bzd::impl::DoublyLinkedList<DummyElement>* pList) {
 		int counter = nbIterations;
 		while (--counter)
 		{
 			auto& element = elements[rand() % elements.size()];
 
-			std::cout << "Trying to insert " << element.value_ << std::endl;
-			const auto result = list.insert(&element);
+			const auto result = pList->insert(&element);
 			if (!result)
 			{
 				ASSERT_EQ(result.error(), bzd::impl::ListErrorType::elementAlreadyInserted);
@@ -169,14 +168,13 @@ TEST(DoublyLinkedList, insertionStress)
 		}
 	};
 
-	const auto workloadRemove = [&list, &elements]() {
+	const auto workloadRemove = [&elements](bzd::impl::DoublyLinkedList<DummyElement>* pList) {
 		int counter = nbIterations;
 		while (--counter)
 		{
 			auto& element = elements[rand() % nbElements];
 
-			std::cout << "Trying to remove " << element.value_ << std::endl;
-			const auto result = list.remove(&element);
+			const auto result = pList->remove(&element);
 			if (!result)
 			{
 				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved);
@@ -187,12 +185,11 @@ TEST(DoublyLinkedList, insertionStress)
 			}
 		}
 	};
-	(void)workloadRemove;
 
-	std::thread worker1(workloadInsert);
-	std::thread worker2(workloadRemove);
-	std::thread worker3(workloadInsert);
-	std::thread worker4(workloadInsert);
+	std::thread worker1(workloadInsert, &list);
+	std::thread worker2(workloadRemove, &list);
+	std::thread worker3(workloadInsert, &list);
+	std::thread worker4(workloadInsert, &list);
 
 	worker1.join();
 	worker2.join();
