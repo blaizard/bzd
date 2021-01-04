@@ -135,83 +135,113 @@ TEST(DoublyLinkedList, insertWhileRemove)
 
 TEST(DoublyLinkedList, insertionStress)
 {
-	constexpr bzd::SizeType nbIterations = 10000;
-	constexpr bzd::SizeType nbElements = 4;
-	static bzd::Atomic<bzd::UInt8Type> inserted[nbElements]{};
 	srand(time(NULL));
 
+	constexpr bzd::SizeType nbIterations = 10000;
+	constexpr bzd::SizeType nbElements = 4;
+
+	struct Data
+	{
+		bzd::impl::DoublyLinkedList<DummyElement> list{};
+		bzd::Atomic<bzd::UInt8Type> inserted[nbElements]{};
+
+		void sanityCheck()
+		{
+			const auto result = list.sanityCheck([this](const auto& element) -> bool {
+				// std::cout << "Checking " << element.value_ << std::endl;
+				const auto value = inserted[element.value_].load();
+				if (value == 0)
+				{
+					std::cout << "Value not present " << element.value_ << std::endl;
+					return false;
+				}
+				inserted[element.value_].store(0);
+				return true;
+			});
+			EXPECT_TRUE(result);
+
+			// Ensure everything is empty
+			for (bzd::SizeType i = 0; i < nbElements; ++i)
+			{
+				EXPECT_EQ(inserted[i].load(), 0);
+			}
+		}
+	};
+
 	// List
-	bzd::impl::DoublyLinkedList<DummyElement> list;
+	Data data1{};
+//	Data data2{};
 
 	// Elements
-	std::vector<DummyElement> elements;
+	static std::vector<DummyElement> elements;
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
 		elements.push_back(DummyElement{i});
+		std::cout << i << ": " << &elements[i] << std::endl;
 	}
+	ASSERT_EQ(nbElements, elements.size());
 
-	const auto workloadInsert = [&elements](bzd::impl::DoublyLinkedList<DummyElement>* pList) {
+	const auto workloadInsert = [](Data* pData) {
 		int counter = nbIterations;
 		while (--counter)
 		{
-			auto& element = elements[rand() % elements.size()];
+			auto& element = elements[rand() % nbElements];
 
-			const auto result = pList->insert(&element);
+			//std::cout << "insert " << &element << std::endl;
+
+			const auto result = pData->list.insert(&element);
 			if (!result)
 			{
 				ASSERT_EQ(result.error(), bzd::impl::ListErrorType::elementAlreadyInserted);
 			}
 			else
 			{
-				++inserted[element.value_];
+				++(pData->inserted[element.value_]);
 			}
 		}
 	};
 
-	const auto workloadRemove = [&elements](bzd::impl::DoublyLinkedList<DummyElement>* pList) {
+	const auto workloadRemove = [](Data* pData) {
 		int counter = nbIterations;
 		while (--counter)
 		{
 			auto& element = elements[rand() % nbElements];
 
-			const auto result = pList->remove(&element);
+			//std::cout << "remove " << &element << std::endl;
+
+			const auto result = pData->list.remove(&element);
 			if (!result)
 			{
 				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved);
 			}
 			else
 			{
-				--inserted[element.value_];
+				--(pData->inserted[element.value_]);
 			}
 		}
 	};
 
-	std::thread worker1(workloadInsert, &list);
-	std::thread worker2(workloadRemove, &list);
-	std::thread worker3(workloadInsert, &list);
-	std::thread worker4(workloadInsert, &list);
+	std::thread worker1(workloadInsert, &data1);
+	std::thread worker2(workloadInsert, &data1);
+	std::thread worker3(workloadRemove, &data1);
+	std::thread worker4(workloadInsert, &data1);
+//	std::thread worker5(workloadInsert, &data2);
+//	std::thread worker6(workloadRemove, &data2);
 
 	worker1.join();
 	worker2.join();
 	worker3.join();
 	worker4.join();
+//	worker5.join();
+//	worker6.join();
 
-	const auto result = list.sanityCheck([](const auto& element) -> bool {
-		// std::cout << "Checking " << element.value_ << std::endl;
-		const auto value = inserted[element.value_].load();
-		if (value == 0)
-		{
-			std::cout << "Value not present " << element.value_ << std::endl;
-			return false;
-		}
-		inserted[element.value_].store(0);
-		return true;
-	});
-	EXPECT_TRUE(result);
-
-	// Ensure everything is empty
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
-		EXPECT_EQ(inserted[i].load(), 0);
+		std::cout << i << ": ";
+		data1.list.printNode(&elements[i]);
+		// << &elements[i] << std::endl;
 	}
+	std::cout << std::endl;
+	data1.sanityCheck();
+//	data2.sanityCheck();
 }

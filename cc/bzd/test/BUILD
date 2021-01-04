@@ -21,5 +21,6 @@ cc_library(
         "//cc/bzd/platform",
         "//cc/bzd/type_traits:is_default_constructible",
         "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/utility:forward",
     ],
 )
