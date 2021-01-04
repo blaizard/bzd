@@ -170,14 +170,13 @@ TEST(DoublyLinkedList, insertionStress)
 
 	// List
 	Data data1{};
-//	Data data2{};
+	Data data2{};
 
 	// Elements
 	static std::vector<DummyElement> elements;
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
 		elements.push_back(DummyElement{i});
-		std::cout << i << ": " << &elements[i] << std::endl;
 	}
 	ASSERT_EQ(nbElements, elements.size());
 
@@ -212,7 +211,7 @@ TEST(DoublyLinkedList, insertionStress)
 			const auto result = pData->list.remove(&element);
 			if (!result)
 			{
-				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved);
+				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved || result.error() == bzd::impl::ListErrorType::notFound);
 			}
 			else
 			{
@@ -224,16 +223,16 @@ TEST(DoublyLinkedList, insertionStress)
 	std::thread worker1(workloadInsert, &data1);
 	std::thread worker2(workloadInsert, &data1);
 	std::thread worker3(workloadRemove, &data1);
-	std::thread worker4(workloadInsert, &data1);
-//	std::thread worker5(workloadInsert, &data2);
-//	std::thread worker6(workloadRemove, &data2);
+	std::thread worker4(workloadInsert, &data2);
+	std::thread worker5(workloadInsert, &data2);
+	std::thread worker6(workloadRemove, &data2);
 
 	worker1.join();
 	worker2.join();
 	worker3.join();
 	worker4.join();
-//	worker5.join();
-//	worker6.join();
+	worker5.join();
+	worker6.join();
 
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
@@ -243,5 +242,5 @@ TEST(DoublyLinkedList, insertionStress)
 	}
 	std::cout << std::endl;
 	data1.sanityCheck();
-//	data2.sanityCheck();
+	data2.sanityCheck();
 }

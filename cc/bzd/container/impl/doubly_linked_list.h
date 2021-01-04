@@ -87,13 +87,22 @@ private:
 	 * 
 	 * \return A structure containing the previous node and the raw pointer its next node.
 	 */
-	Result<NodeFound> findPreviousNode(BasePtrType node, BasePtrType previous) noexcept
+	Optional<NodeFound> findPreviousNode(BasePtrType node, BasePtrType previous) noexcept
 	{
 		bzd::UInt8Type retry{2};
 		NodeFound result{previous, nullptr};
+		bzd::SizeType temp = 1000;
 
 		while (result.node && retry)
 		{
+			if (--temp == 0)
+			{
+				std::cout << "TOO MANY" << std::endl;
+				sanityCheck([](const auto&) { return true;});
+				volatile char* tmo = nullptr;
+				tmo[13] = 2;
+			}
+
 			result.nextRaw = result.node->next_.load();
 			const auto previousNext = removeDeletionMark(result.nextRaw);
 
@@ -120,8 +129,8 @@ private:
 			result.node = previousNext;
 		}
 
-		std::cout << "Unknown" << std::endl;
-		return makeError(ListErrorType::notFound);
+		std::cout << "Not found" << std::endl;
+		return bzd::nullopt;
 	}
 
 public:
@@ -173,7 +182,7 @@ public:
 	template <class... Args>
 	Result<void> insert(PtrType element) noexcept
 	{
-		bzd::SizeType retry = 100000;
+		bzd::SizeType retry = 1000;
 
 		while (true)
 		{
@@ -214,18 +223,7 @@ public:
 				BasePtrType expected{nodeNext};
 				if (!nodePrevious->next_.compareExchange(expected, element))
 				{
-					//std::cout << "sakls" << std::endl;
-
-					// The next node has been altered, retry.
-					// Note the order here is important.
-					{
-						BasePtrType expected{nodePrevious};
-						element->previous_.compareExchange(expected, nullptr);
-					}
-					{
-						BasePtrType expected{nodeNext};
-						element->next_.compareExchange(expected, nullptr);
-					}
+					element->previous_.store(nullptr);
 					element->next_.store(nullptr);
 					continue;
 				}
@@ -293,7 +291,7 @@ public:
 	template <class... Args>
 	Result<void> remove(PtrType element) noexcept
 	{
-		bzd::SizeType retry = 100000;
+		bzd::SizeType retry = 1000;
 
 		// Add deletion mark
 		{
@@ -325,11 +323,20 @@ public:
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
 			// Look for the previous node.
-			const auto previous = findPreviousNode(element, nodePrevious);
+			const auto previous = findPreviousNode(element, &front_);
 			if (!previous)
 			{
 				std::cout << "findPreviousNode race " << nodePrevious << std::endl;
-				return makeError(ListErrorType::unhandledRaceCondition);
+
+				// Remove busy mark
+				{
+					BasePtrType expected{addDeletionMark(nodeNext)};
+					while (!element->next_.compareExchange(expected, removeDeletionMark(expected)))
+					{
+					}
+				}
+
+				return makeError(ListErrorType::notFound);
 			}
 			nodePrevious = previous->node;
 
