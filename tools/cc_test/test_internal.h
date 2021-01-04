@@ -22,7 +22,7 @@
 #define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                   \
 	if (!static_cast<bool>(condition))                                                \
 	{                                                                                 \
-		failFct("Failure\nTest [bool]: " #actual " == " #expected, actual, expected); \
+		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected)); \
 	}
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                    \
@@ -144,7 +144,7 @@ private:
 		*pBuffer++ = '(';
 		*pBuffer++ = '0';
 		*pBuffer++ = 'x';
-		pBuffer = valueToString(pBuffer, static_cast<int>(value), 16);
+		pBuffer = valueToString(pBuffer, static_cast<unsigned int>(value) & 0xff, 16);
 		*pBuffer++ = ')';
 		*pBuffer++ = '\0';
 		return pBuffer;

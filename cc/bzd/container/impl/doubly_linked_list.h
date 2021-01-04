@@ -8,6 +8,7 @@
 #include "bzd/test/inject_point.h"
 
 #include <iostream>
+#include <iomanip>
 
 namespace bzd::impl {
 class DoublyLinkedListElement
@@ -88,9 +89,10 @@ private:
 	 */
 	Result<NodeFound> findPreviousNode(BasePtrType node, BasePtrType previous) noexcept
 	{
+		bzd::UInt8Type retry{2};
 		NodeFound result{previous, nullptr};
 
-		while (result.node)
+		while (result.node && retry)
 		{
 			result.nextRaw = result.node->next_.load();
 			const auto previousNext = removeDeletionMark(result.nextRaw);
@@ -108,18 +110,18 @@ private:
 			if (!previousNext)
 			{
 				result.node = &front_;
+
+				// Retry one more time to do the full chain from the start,
+				// if this fails once more, it means that the element is not there.
+				--retry;
 				continue;
 			}
 
-			// Node was not found within the chain.
-			if (previousNext == &back_)
-			{
-				return makeError(ListErrorType::notFound);
-			}
 			result.node = previousNext;
 		}
 
-		return makeError(ListErrorType::unhandledRaceCondition);
+		std::cout << "Unknown" << std::endl;
+		return makeError(ListErrorType::notFound);
 	}
 
 public:
@@ -185,6 +187,7 @@ public:
 			// Save the previous and next positions of expected future element pointers
 			const auto nodePrevious = &front_;
 			const auto nodeNext = removeDeletionMark(nodePrevious->next_.load());
+			//std::cout << nodeNext << "  " << addDeletionMark(nodeNext) << std::endl;
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
@@ -193,7 +196,7 @@ public:
 				BasePtrType expected{nullptr};
 				if (!element->next_.compareExchange(expected, addDeletionMark(nodeNext)))
 				{
-					std::cout << "1 no!" << std::endl;
+				//	std::cout << "1 no!" << std::endl;
 
 					return makeError(ListErrorType::elementAlreadyInserted);
 				}
@@ -211,7 +214,7 @@ public:
 				BasePtrType expected{nodeNext};
 				if (!nodePrevious->next_.compareExchange(expected, element))
 				{
-					std::cout << "sakls" << std::endl;
+					//std::cout << "sakls" << std::endl;
 
 					// The next node has been altered, retry.
 					// Note the order here is important.
@@ -238,10 +241,17 @@ public:
 					// pointer has been updated by another node.
 					// Reverting things now will might lead to unconsitency between nodes.
 
-					std::cout << "RACE! 1 insert" << std::endl;
+			/*		std::cout << "RACE! 1 insert" << std::endl;
 					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
 					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
 					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
+*/
+					// LOOK FOR BETTER WAY
+					//nodeNext->previous_.store(&front_);
+
+					// Look for the previous node
+					// auto result = findPreviousNode(element, nodePrevious);
+					// std::cout << result->node << std::endl;
 
 					// The next node has been altered, retry.
 					// Note the order here is important.
@@ -318,6 +328,7 @@ public:
 			const auto previous = findPreviousNode(element, nodePrevious);
 			if (!previous)
 			{
+				std::cout << "findPreviousNode race " << nodePrevious << std::endl;
 				return makeError(ListErrorType::unhandledRaceCondition);
 			}
 			nodePrevious = previous->node;
@@ -339,11 +350,11 @@ public:
 				if (!nodePrevious->next_.compareExchange(expected,
 														 (isDeletionMark(previous->nextRaw)) ? addDeletionMark(nodeNext) : nodeNext))
 				{
-					std::cout << "RACE! 2 remove" << std::endl;
+			/*		std::cout << "RACE! 2 remove" << std::endl;
 					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
 					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
 					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
-
+*/
 					// nodeNext has been deleted.
 					// Try to revert the previously changed node, if it fails, discard it would have meant
 					// that the previous has been altered.
@@ -361,11 +372,11 @@ public:
 				BasePtrType expected{element};
 				if (!nodeNext->previous_.compareExchange(expected, nodePrevious))
 				{
-					std::cout << "RACE! 1 remove" << std::endl;
+		/*			std::cout << "RACE! 1 remove" << std::endl;
 					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
 					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
 					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
-
+*/
 					// Check if necessary.
 					// Idea is if it fails, it means a concurrent operation changed the pointer already.
 					// continue;
@@ -437,11 +448,23 @@ public:
 		bzd::SizeType counter = 0;
 		auto previous = &front_;
 		auto node = removeDeletionMark(previous->next_.load());
+
+		printNode(previous);
+
 		while (true)
 		{
+			if (isDeletionMark(node))
+			{
+				std::cout << "Deletion mark" << std::endl;
+				return makeError(ListErrorType::sanityCheck);
+			}
+
+			printNode(node);
+
 			// Ensure that the next pointer points to the current node.
 			if (previous->next_.load() != node)
-			{
+			{	
+				std::cout << "Mistmatch previous->next and node" << std::endl;
 				return makeError(ListErrorType::sanityCheck);
 			}
 
@@ -450,6 +473,7 @@ public:
 				const auto result = findPreviousNode(node, node->previous_.load());
 				if (!result)
 				{
+					std::cout << "Cannot find previous node" << std::endl;
 					return makeError(ListErrorType::sanityCheck);
 				}
 			}
@@ -465,6 +489,7 @@ public:
 				const bool result = sanityCheckElement(reinterpret_cast<T&>(*node));
 				if (!result)
 				{
+					std::cout << "sanityCheckElement failed" << std::endl;
 					return makeError(ListErrorType::sanityCheck);
 				}
 			}
@@ -477,10 +502,38 @@ public:
 		// Element count should be equal.
 		if (size() != counter)
 		{
+			std::cout << "Counter (" << counter << ") mistmatch with actual size (" << size() << ")" << std::endl;
 			return makeError(ListErrorType::sanityCheck);
 		}
 
 		return counter;
+	}
+
+public:
+	void printNode(BasePtrType node)
+	{
+		const auto printAddress = [this](const BasePtrType address) {
+			std::cout << std::setw(16) << address;
+			if (address == &front_)
+			{
+				std::cout << " (F)";
+			}
+			else if (address == &back_)
+			{
+				std::cout << " (B)";
+			}
+			else
+			{
+				std::cout << "    ";
+			}
+		};
+
+		printAddress(node->previous_.load());
+		std::cout << " <- ";
+		printAddress(node);
+		std::cout << " -> ";
+		printAddress(node->next_.load());
+		std::cout << std::endl;
 	}
 
 private:
