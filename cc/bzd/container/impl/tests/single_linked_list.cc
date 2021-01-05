@@ -1,8 +1,8 @@
-#include "bzd/container/impl/doubly_linked_list.h"
+#include "bzd/container/impl/single_linked_list.h"
 
 #include "cc_test/test.h"
 
-class DummyElement : public bzd::impl::DoublyLinkedListElement
+class DummyElement : public bzd::impl::SingleLinkedListElement
 {
 public:
 	DummyElement(bzd::SizeType value) : value_{value} {}
@@ -11,13 +11,13 @@ public:
 	bzd::SizeType value_;
 };
 
-TEST(DoublyLinkedList, simple)
+TEST(SingleLinkedList, simple)
 {
 	DummyElement elements[10]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	bzd::impl::DoublyLinkedList<DummyElement> list;
+	bzd::impl::SingleLinkedList<DummyElement> list;
 	EXPECT_EQ(list.size(), 0);
 	EXPECT_FALSE(list.front());
-	EXPECT_FALSE(list.back());
+	//EXPECT_FALSE(list.back());
 
 	{
 		const auto result = list.insert(&elements[0]);
@@ -27,12 +27,6 @@ TEST(DoublyLinkedList, simple)
 
 	{
 		const auto& result = list.front();
-		EXPECT_TRUE(result);
-		EXPECT_EQ((*result).value_, elements[0].value_);
-	}
-
-	{
-		const auto& result = list.back();
 		EXPECT_TRUE(result);
 		EXPECT_EQ((*result).value_, elements[0].value_);
 	}

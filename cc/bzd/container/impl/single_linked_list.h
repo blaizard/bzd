@@ -11,14 +11,13 @@
 #include <iomanip>
 
 namespace bzd::impl {
-class DoublyLinkedListElement
+class SingleLinkedListElement
 {
 public:
-	constexpr DoublyLinkedListElement() = default;
-	constexpr DoublyLinkedListElement(DoublyLinkedListElement&& elt) : next_{elt.next_.load()}, previous_{elt.previous_.load()} {}
+	constexpr SingleLinkedListElement() = default;
+	constexpr SingleLinkedListElement(SingleLinkedListElement&& elt) : next_{elt.next_.load()} {} //, previous_{elt.previous_.load()} {}
 
-	bzd::Atomic<DoublyLinkedListElement*> next_{};
-	bzd::Atomic<DoublyLinkedListElement*> previous_{};
+	bzd::Atomic<SingleLinkedListElement*> next_{};
 };
 
 enum class ListErrorType
@@ -52,10 +51,10 @@ struct ListInjectPoint5
  * This implementation is thread safe.
  */
 template <class T>
-class DoublyLinkedList
+class SingleLinkedList
 {
 public:
-	using BasePtrType = DoublyLinkedListElement*;
+	using BasePtrType = SingleLinkedListElement*;
 	using PtrType = T*;
 	template <class V>
 	using Result = bzd::Result<V, ListErrorType>;
@@ -134,10 +133,9 @@ private:
 	}
 
 public:
-	constexpr DoublyLinkedList() noexcept
+	constexpr SingleLinkedList() noexcept
 	{
 		front_.next_.store(&back_);
-		back_.previous_.store(&front_);
 	};
 
 	/**
@@ -215,7 +213,6 @@ public:
 
 			// From here, element cannot be used by any other concurrent operation,
 			// as it has already been flagged as inserted.
-			element->previous_.store(nodePrevious);
 
 			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
 
@@ -223,48 +220,12 @@ public:
 				BasePtrType expected{nodeNext};
 				if (!nodePrevious->next_.compareExchange(expected, element))
 				{
-					element->previous_.store(nullptr);
 					element->next_.store(nullptr);
 					continue;
 				}
 			}
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
-
-			{
-				BasePtrType expected{nodePrevious};
-				if (!nodeNext->previous_.compareExchange(expected, element))
-				{
-					// Nothing needs to be done here, it means that the
-					// pointer has been updated by another node.
-					// Reverting things now will might lead to unconsitency between nodes.
-
-			/*		std::cout << "RACE! 1 insert" << std::endl;
-					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
-*/
-					// LOOK FOR BETTER WAY
-					//nodeNext->previous_.store(&front_);
-
-					// Look for the previous node
-					// auto result = findPreviousNode(element, nodePrevious);
-					// std::cout << result->node << std::endl;
-
-					// The next node has been altered, retry.
-					// Note the order here is important.
-					/*BasePtrType expected{element};
-					nodePrevious->next_.compareExchange(expected, nodeNext);
-					element->previous_.store(nullptr);
-					element->next_.store(nullptr);
-
-					continue;*/
-					// break;
-
-					// Should never happen
-					// return makeError(ListErrorType::unhandledRaceCondition);
-				}
-			}
 
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
@@ -317,7 +278,6 @@ public:
 			}
 
 			// Save the previous and next positions of current element pointers
-			auto nodePrevious = element->previous_.load();
 			const auto nodeNext = removeDeletionMark(element->next_.load());
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
@@ -326,7 +286,7 @@ public:
 			const auto previous = findPreviousNode(element, &front_);
 			if (!previous)
 			{
-				std::cout << "findPreviousNode race " << nodePrevious << std::endl;
+				std::cout << "findPreviousNode race" << std::endl;
 
 				// Remove busy mark
 				{
@@ -338,14 +298,14 @@ public:
 
 				return makeError(ListErrorType::notFound);
 			}
-			nodePrevious = previous->node;
+			auto nodePrevious = previous->node;
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
 			// Ensure that the pointers are valid
-			if (!nodePrevious || !nodeNext)
+			if (!nodeNext)
 			{
-				std::cout << "null 3 " << nodePrevious << " " << nodeNext << std::endl;
+				std::cout << "null 3 " << nodeNext << std::endl;
 				return makeError(ListErrorType::unhandledRaceCondition);
 			}
 
@@ -374,28 +334,11 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
-			// Detach this element from the chain
-			{
-				BasePtrType expected{element};
-				if (!nodeNext->previous_.compareExchange(expected, nodePrevious))
-				{
-		/*			std::cout << "RACE! 1 remove" << std::endl;
-					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
-*/
-					// Check if necessary.
-					// Idea is if it fails, it means a concurrent operation changed the pointer already.
-					// continue;
-				}
-			}
-
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
 			// Element is completly out of the chain
 			// Note here the order is important, the next pointer should be updated
 			// the last to make it insertable only at the end.
-			element->previous_.store(nullptr);
 			element->next_.store(nullptr);
 
 			break;
@@ -420,25 +363,6 @@ public:
 	{
 		const auto ptr = front_.next_.load();
 		if (ptr == &back_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<const T&>(*ptr);
-	}
-
-	constexpr bzd::Optional<T&> back() noexcept
-	{
-		auto ptr = back_.previous_.load();
-		if (ptr == &front_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<T&>(*ptr);
-	}
-	constexpr bzd::Optional<const T&> back() const noexcept
-	{
-		const auto ptr = back_.previous_.load();
-		if (ptr == &front_)
 		{
 			return bzd::nullopt;
 		}
@@ -473,16 +397,6 @@ public:
 			{	
 				std::cout << "Mistmatch previous->next and node" << std::endl;
 				return makeError(ListErrorType::sanityCheck);
-			}
-
-			// Ensure that the previous pointers points to a previous node.
-			{
-				const auto result = findPreviousNode(node, node->previous_.load());
-				if (!result)
-				{
-					std::cout << "Cannot find previous node" << std::endl;
-					return makeError(ListErrorType::sanityCheck);
-				}
 			}
 
 			// Check if the end is reached.
@@ -535,8 +449,8 @@ public:
 			}
 		};
 
-		printAddress(node->previous_.load());
-		std::cout << " <- ";
+	//	printAddress(node->previous_.load());
+	//	std::cout << " <- ";
 		printAddress(node);
 		std::cout << " -> ";
 		printAddress(node->next_.load());
@@ -558,8 +472,9 @@ private:
 
 private:
 	// Having a front & back elemment will simplify the logic to not have to take care of the edge cases.
-	DoublyLinkedListElement front_;
-	DoublyLinkedListElement back_;
+	SingleLinkedListElement front_;
+	SingleLinkedListElement back_;
+	bzd::Atomic<SingleLinkedListElement*> last_{nullptr};
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
 };

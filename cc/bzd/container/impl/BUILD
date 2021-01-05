@@ -4,7 +4,7 @@ cc_library(
     name = "impl",
     visibility = ["//visibility:public"],
     deps = [
-        ":doubly_linked_list",
+        ":single_linked_list",
         ":single_linked_pool",
     ],
 )
@@ -12,9 +12,9 @@ cc_library(
 # ---- Individual items ----
 
 cc_library(
-    name = "doubly_linked_list",
+    name = "single_linked_list",
     hdrs = [
-        "doubly_linked_list.h",
+        "single_linked_list.h",
     ],
     visibility = ["//cc/bzd:__subpackages__"],
     deps = [

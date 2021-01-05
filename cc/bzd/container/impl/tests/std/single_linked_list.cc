@@ -1,4 +1,4 @@
-#include "bzd/container/impl/doubly_linked_list.h"
+#include "bzd/container/impl/single_linked_list.h"
 
 #include "bzd/test/sync_point.h"
 #include "cc_test/test.h"
@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-class DummyElement : public bzd::impl::DoublyLinkedListElement
+class DummyElement : public bzd::impl::SingleLinkedListElement
 {
 public:
 	DummyElement(bzd::SizeType value) : value_{value} {}
@@ -24,7 +24,7 @@ void insertWhileInsertDoWork()
 	DummyElement a{1};
 	DummyElement b{2};
 	DummyElement c{3};
-	bzd::impl::DoublyLinkedList<DummyElement> list;
+	bzd::impl::SingleLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -48,7 +48,7 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 3);
 }
 
-TEST(DoublyLinkedList, insertWhileInsert)
+TEST(SingleLinkedList, insertWhileInsert)
 {
 	insertWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
@@ -62,7 +62,7 @@ void removeWhileInsertDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::DoublyLinkedList<DummyElement> list;
+	bzd::impl::SingleLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -86,7 +86,7 @@ void removeWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(DoublyLinkedList, removeWhileInsert)
+TEST(SingleLinkedList, removeWhileInsert)
 {
 	removeWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
 	removeWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
@@ -100,7 +100,7 @@ void insertWhileRemoveDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::DoublyLinkedList<DummyElement> list;
+	bzd::impl::SingleLinkedList<DummyElement> list;
 	list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -124,7 +124,7 @@ void insertWhileRemoveDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(DoublyLinkedList, insertWhileRemove)
+TEST(SingleLinkedList, insertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint1>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint2>();
@@ -133,7 +133,7 @@ TEST(DoublyLinkedList, insertWhileRemove)
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
 }
 
-TEST(DoublyLinkedList, insertionStress)
+TEST(SingleLinkedList, insertionStress)
 {
 	srand(time(NULL));
 
@@ -142,7 +142,7 @@ TEST(DoublyLinkedList, insertionStress)
 
 	struct Data
 	{
-		bzd::impl::DoublyLinkedList<DummyElement> list{};
+		bzd::impl::SingleLinkedList<DummyElement> list{};
 		bzd::Atomic<bzd::UInt8Type> inserted[nbElements]{};
 
 		void sanityCheck()
