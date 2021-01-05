@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "doubly_linked_list",
+    name = "single_linked_list",
     srcs = [
-        "doubly_linked_list.cc",
+        "single_linked_list.cc",
     ],
     linkopts = [
         "-pthread",
