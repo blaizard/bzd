@@ -19,9 +19,9 @@
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
-#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                   \
-	if (!static_cast<bool>(condition))                                                \
-	{                                                                                 \
+#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                                                         \
+	if (!static_cast<bool>(condition))                                                                                      \
+	{                                                                                                                       \
 		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected)); \
 	}
 

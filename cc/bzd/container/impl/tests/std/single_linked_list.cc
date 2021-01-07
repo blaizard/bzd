@@ -1,6 +1,7 @@
 #include "bzd/container/impl/single_linked_list.h"
 
 #include "bzd/test/sync_point.h"
+#include "bzd/utility/ignore.h"
 #include "cc_test/test.h"
 
 #include <iostream>
@@ -8,11 +9,10 @@
 #include <set>
 #include <thread>
 #include <vector>
-
 class DummyElement : public bzd::impl::SingleLinkedListElement
 {
 public:
-	DummyElement(bzd::SizeType value) : value_{value} {}
+	DummyElement(bzd::SizeType value) : bzd::impl::SingleLinkedListElement{}, value_{value} {}
 	DummyElement(DummyElement&&) = default;
 
 	bzd::SizeType value_;
@@ -25,7 +25,7 @@ void insertWhileInsertDoWork()
 	DummyElement b{2};
 	DummyElement c{3};
 	bzd::impl::SingleLinkedList<DummyElement> list;
-	list.insert(&a);
+	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsertB([&list, &b]() {
@@ -63,7 +63,7 @@ void removeWhileInsertDoWork()
 	DummyElement a{1};
 	DummyElement b{2};
 	bzd::impl::SingleLinkedList<DummyElement> list;
-	list.insert(&a);
+	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsert([&list, &b]() {
@@ -101,7 +101,7 @@ void insertWhileRemoveDoWork()
 	DummyElement a{1};
 	DummyElement b{2};
 	bzd::impl::SingleLinkedList<DummyElement> list;
-	list.insert(&a);
+	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsert([&list, &b]() {
@@ -133,17 +133,104 @@ TEST(SingleLinkedList, insertWhileRemove)
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
 }
 
+template <class T>
+void removeWhileRemoveLeftDoWork()
+{
+	DummyElement a{1};
+	DummyElement b{2};
+	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::ignore = list.insert(&a);
+	bzd::ignore = list.insert(&b);
+	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+	std::thread workerRemove1([&list, &b]() {
+		typename SyncPoint::template Type<2>();
+		const auto result = list.remove(&b);
+		EXPECT_TRUE(result);
+		typename SyncPoint::template Type<3>();
+	});
+	std::thread workerRemove2([&list, &a]() {
+		const auto result = list.remove<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(&a);
+		EXPECT_TRUE(result);
+	});
+
+	workerRemove1.join();
+	workerRemove2.join();
+
+	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
+	EXPECT_TRUE(result);
+	EXPECT_EQ(*result, 0);
+	EXPECT_EQ(list.size(), 0);
+}
+
+TEST(SingleLinkedList, removeWhileRemoveLeft)
+{
+	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint1>();
+	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint2>();
+	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint3>();
+	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint4>();
+	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint5>();
+}
+
+template <class T>
+void removeWhileRemoveRightDoWork()
+{
+	DummyElement a{1};
+	DummyElement b{2};
+	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::ignore = list.insert(&a);
+	bzd::ignore = list.insert(&b);
+	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
+
+	std::thread workerRemove1([&list, &a]() {
+		typename SyncPoint::template Type<2>();
+		const auto result = list.remove(&a);
+		EXPECT_TRUE(result);
+		typename SyncPoint::template Type<3>();
+	});
+	std::thread workerRemove2([&list, &b]() {
+		const auto result = list.remove<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(&b);
+		EXPECT_TRUE(result);
+	});
+
+	workerRemove1.join();
+	workerRemove2.join();
+
+	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
+	EXPECT_TRUE(result);
+	EXPECT_EQ(*result, 0);
+	EXPECT_EQ(list.size(), 0);
+}
+
+TEST(SingleLinkedList, removeWhileRemoveRight)
+{
+	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint1>();
+	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint2>();
+	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint3>();
+	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint4>();
+	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint5>();
+}
+
+uint64_t getTimestampMs()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
 TEST(SingleLinkedList, insertionStress)
 {
 	srand(time(NULL));
 
 	constexpr bzd::SizeType nbIterations = 10000;
-	constexpr bzd::SizeType nbElements = 4;
+	constexpr bzd::SizeType nbElements = 8;
+	constexpr uint64_t timeMaxMs = 10 * 1000;
+	const auto timeStart = getTimestampMs();
 
 	struct Data
 	{
 		bzd::impl::SingleLinkedList<DummyElement> list{};
-		bzd::Atomic<bzd::UInt8Type> inserted[nbElements]{};
+		bzd::Atomic<bzd::UInt16Type> inserted[nbElements]{};
+		bzd::Atomic<bzd::SizeType> insertion{0};
+		bzd::Atomic<bzd::SizeType> removal{0};
 
 		void sanityCheck()
 		{
@@ -180,13 +267,12 @@ TEST(SingleLinkedList, insertionStress)
 	}
 	ASSERT_EQ(nbElements, elements.size());
 
-	const auto workloadInsert = [](Data* pData) {
+	const auto workloadInsert = [&timeStart](Data* pData) {
 		int counter = nbIterations;
-		while (--counter)
+		while (--counter && getTimestampMs() - timeStart < timeMaxMs)
 		{
+			// std::this_thread::yield();
 			auto& element = elements[rand() % nbElements];
-
-			//std::cout << "insert " << &element << std::endl;
 
 			const auto result = pData->list.insert(&element);
 			if (!result)
@@ -196,26 +282,28 @@ TEST(SingleLinkedList, insertionStress)
 			else
 			{
 				++(pData->inserted[element.value_]);
+				++pData->insertion;
 			}
 		}
 	};
 
-	const auto workloadRemove = [](Data* pData) {
+	const auto workloadRemove = [&timeStart](Data* pData) {
 		int counter = nbIterations;
-		while (--counter)
+		while (--counter && getTimestampMs() - timeStart < timeMaxMs)
 		{
+			// std::this_thread::yield();
 			auto& element = elements[rand() % nbElements];
-
-			//std::cout << "remove " << &element << std::endl;
 
 			const auto result = pData->list.remove(&element);
 			if (!result)
 			{
-				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved || result.error() == bzd::impl::ListErrorType::notFound);
+				ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved ||
+							result.error() == bzd::impl::ListErrorType::notFound);
 			}
 			else
 			{
 				--(pData->inserted[element.value_]);
+				++pData->removal;
 			}
 		}
 	};
@@ -223,9 +311,11 @@ TEST(SingleLinkedList, insertionStress)
 	std::thread worker1(workloadInsert, &data1);
 	std::thread worker2(workloadInsert, &data1);
 	std::thread worker3(workloadRemove, &data1);
-	std::thread worker4(workloadInsert, &data2);
+	std::thread worker4(workloadRemove, &data1);
 	std::thread worker5(workloadInsert, &data2);
-	std::thread worker6(workloadRemove, &data2);
+	std::thread worker6(workloadInsert, &data2);
+	std::thread worker7(workloadRemove, &data2);
+	std::thread worker8(workloadRemove, &data2);
 
 	worker1.join();
 	worker2.join();
@@ -233,14 +323,26 @@ TEST(SingleLinkedList, insertionStress)
 	worker4.join();
 	worker5.join();
 	worker6.join();
+	worker7.join();
+	worker8.join();
 
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
 		std::cout << i << ": ";
 		data1.list.printNode(&elements[i]);
-		// << &elements[i] << std::endl;
 	}
 	std::cout << std::endl;
+
+	EXPECT_TRUE(getTimestampMs() - timeStart < timeMaxMs);
+
+	std::cout << "data1.sanityCheck();" << std::endl;
+	std::cout << "Insertion: " << data1.insertion.load() << std::endl;
+	std::cout << "Removal: " << data1.removal.load() << std::endl;
 	data1.sanityCheck();
+	std::cout << "data2.sanityCheck();" << std::endl;
+	std::cout << "Insertion: " << data2.insertion.load() << std::endl;
+	std::cout << "Removal: " << data2.removal.load() << std::endl;
 	data2.sanityCheck();
+
+	EXPECT_TRUE(data1.insertion.load() > 0 || data2.insertion.load() > 0);
 }
