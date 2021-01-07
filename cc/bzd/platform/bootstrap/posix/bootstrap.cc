@@ -123,6 +123,9 @@ void callStack(std::ostream& out) noexcept
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
 	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
 
+	// Reset filters
+	std::cout << std::dec << std::noshowbase;
+
 	for (int level = 0; level < nbLevels; ++level)
 	{
 		char* pSymbol = symbols.get()[level];
@@ -172,7 +175,15 @@ void callStack(std::ostream& out) noexcept
 		// Look for improved function/source names with addr2line
 		{
 			char cmd[1024];
-			snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
+			if (pOffset)
+			{
+				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
+			}
+			else
+			{
+				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" 0x%lx", pSourcePath, reinterpret_cast<uint64_t>(addresses[level]));
+			}
+
 			pSymbol = exec(cmd);
 			if (pSymbol)
 			{

@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//cc/bzd/container/impl",
         "//cc/bzd/test:sync_point",
+        "//cc/bzd/utility:ignore",
         "//tools/cc_test",
     ],
 )

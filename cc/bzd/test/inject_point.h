@@ -10,8 +10,8 @@ class InjectPoint
 {
 private: // Preconditions
 	static_assert(!typeTraits::isSame<Id, void>, "Invalid identifier type.");
-//	static_assert((typeTraits::isDefaultConstructible<Callables> && ...),
-//				  "Only default constructible types should be passed as arguments.");
+	//	static_assert((typeTraits::isDefaultConstructible<Callables> && ...),
+	//				  "Only default constructible types should be passed as arguments.");
 
 public:
 	template <class... Args>

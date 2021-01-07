@@ -10,6 +10,7 @@ cc_library(
         ":bit",
         ":container_of",
         ":forward",
+        ":ignore",
         ":max",
         ":min",
         ":move",
@@ -86,6 +87,14 @@ cc_library(
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:remove_reference",
     ],
+)
+
+cc_library(
+    name = "ignore",
+    hdrs = [
+        "ignore.h",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

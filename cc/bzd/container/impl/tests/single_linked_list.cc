@@ -17,7 +17,7 @@ TEST(SingleLinkedList, simple)
 	bzd::impl::SingleLinkedList<DummyElement> list;
 	EXPECT_EQ(list.size(), 0);
 	EXPECT_FALSE(list.front());
-	//EXPECT_FALSE(list.back());
+	// EXPECT_FALSE(list.back());
 
 	{
 		const auto result = list.insert(&elements[0]);

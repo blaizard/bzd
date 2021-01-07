@@ -7,8 +7,10 @@
 #include "bzd/platform/types.h"
 #include "bzd/test/inject_point.h"
 
-#include <iostream>
+#include <cstdlib>
 #include <iomanip>
+#include <iostream>
+#include <thread>
 
 namespace bzd::impl {
 class SingleLinkedListElement
@@ -17,7 +19,8 @@ public:
 	constexpr SingleLinkedListElement() = default;
 	constexpr SingleLinkedListElement(SingleLinkedListElement&& elt) : next_{elt.next_.load()} {} //, previous_{elt.previous_.load()} {}
 
-	bzd::Atomic<SingleLinkedListElement*> next_{};
+	bzd::Atomic<SingleLinkedListElement*> next_{nullptr};
+	bzd::Atomic<void*> parent_{nullptr};
 };
 
 enum class ListErrorType
@@ -80,30 +83,21 @@ private:
 	 * Look for the previous node of the one passed into argument.
 	 * In case of concurrent insertion, the previous node might not be the
 	 * actual one, therefore we need to go down the chain to find the actual one.
-	 * 
+	 *
 	 * \param node We are looking for the previous node of this node.
 	 * \param previous A hint to find the previous node.
-	 * 
+	 *
 	 * \return A structure containing the previous node and the raw pointer its next node.
 	 */
-	Optional<NodeFound> findPreviousNode(BasePtrType node, BasePtrType previous) noexcept
+	Optional<NodeFound> findPreviousNode(BasePtrType node) noexcept
 	{
-		bzd::UInt8Type retry{2};
-		NodeFound result{previous, nullptr};
+		NodeFound result{&front_, nullptr};
 		bzd::SizeType temp = 1000;
 
-		while (result.node && retry)
+		while (result.node != &back_)
 		{
-			if (--temp == 0)
-			{
-				std::cout << "TOO MANY" << std::endl;
-				sanityCheck([](const auto&) { return true;});
-				volatile char* tmo = nullptr;
-				tmo[13] = 2;
-			}
-
 			result.nextRaw = result.node->next_.load();
-			const auto previousNext = removeDeletionMark(result.nextRaw);
+			const auto previousNext = removeMarks(result.nextRaw);
 
 			// This is the node we are looking for.
 			if (previousNext == node)
@@ -118,32 +112,24 @@ private:
 			if (!previousNext)
 			{
 				result.node = &front_;
-
-				// Retry one more time to do the full chain from the start,
-				// if this fails once more, it means that the element is not there.
-				--retry;
 				continue;
 			}
 
 			result.node = previousNext;
 		}
 
-		std::cout << "Not found" << std::endl;
 		return bzd::nullopt;
 	}
 
 public:
-	constexpr SingleLinkedList() noexcept
-	{
-		front_.next_.store(&back_);
-	};
+	constexpr SingleLinkedList() noexcept { front_.next_.store(&back_); };
 
 	/**
 	 * Get the number of elements currently held by this container.
-	 * 
+	 *
 	 * \return The number of elments.
 	 */
-	constexpr SizeType size() const noexcept { return size_.load(); }
+	[[nodiscard]] constexpr SizeType size() const noexcept { return size_.load(); }
 
 	/**
 	 * Insert an element into the list from the root element.
@@ -178,36 +164,29 @@ public:
 	 * |   | -> |   | <- |   |
 	 */
 	template <class... Args>
-	Result<void> insert(PtrType element) noexcept
+	[[nodiscard]] Result<void> insert(PtrType element) noexcept
 	{
-		bzd::SizeType retry = 1000;
-
 		while (true)
 		{
-			if (--retry == 0)
-			{
-				std::cout << "ERROR" << std::endl;
-				volatile char* tmo = nullptr;
-				tmo[13] = 2;
-			}
-
 			// Save the previous and next positions of expected future element pointers
 			const auto nodePrevious = &front_;
-			const auto nodeNext = removeDeletionMark(nodePrevious->next_.load());
-			//std::cout << nodeNext << "  " << addDeletionMark(nodeNext) << std::endl;
+			const auto nodeNext = removeMarks(nodePrevious->next_.load());
+			// std::cout << nodeNext << "  " << addDeletionMark(nodeNext) << std::endl;
 
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
 			// Prepare the current element to be inserted between nodePrevious and nodeNext
 			{
 				BasePtrType expected{nullptr};
-				if (!element->next_.compareExchange(expected, addDeletionMark(nodeNext)))
+				if (!element->next_.compareExchange(expected, addInsertionMark(nodeNext)))
 				{
-				//	std::cout << "1 no!" << std::endl;
+					//	std::cout << "1 no!" << std::endl;
 
 					return makeError(ListErrorType::elementAlreadyInserted);
 				}
 			}
+
+			std::cout << "Inserting " << element << std::endl;
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
@@ -227,11 +206,14 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
+			// Set the parent
+			element->parent_.store(this);
+
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
 			// Remove busy mark
 			{
-				BasePtrType expected{addDeletionMark(nodeNext)};
+				BasePtrType expected{addInsertionMark(nodeNext)};
 				while (!element->next_.compareExchange(expected, removeDeletionMark(expected)))
 				{
 				}
@@ -248,34 +230,65 @@ public:
 
 	/**
 	 * Remove an element from the queue.
+	 *
+	 * (F) -> A -> B  -> C
+	 * (F) -> A -> B -x> C
+	 * (F) -> A -> B -x> C
 	 */
 	template <class... Args>
-	Result<void> remove(PtrType element) noexcept
+	[[nodiscard]] Result<void> remove(PtrType element) noexcept
 	{
-		bzd::SizeType retry = 1000;
-
 		// Add deletion mark
 		{
-			BasePtrType expected{removeDeletionMark(element->next_.load())};
+			BasePtrType expected{element->next_.load()};
 			do
 			{
-				if (!expected || isDeletionMark(expected))
+				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
 					return makeError(ListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element->next_.compareExchange(expected, addDeletionMark(expected)));
+
+			// Make sure it exists
+			// const auto previous = findPreviousNode(element);
+			// if (!previous)
+
+			if (element->parent_.load() != this)
+			{
+				// Remove busy mark
+				expected = addDeletionMark(expected);
+				while (!element->next_.compareExchange(expected, removeDeletionMark(expected)))
+				{
+				}
+
+				return makeError(ListErrorType::notFound);
+			}
 		}
 
 		// At this point no other concurrent operation can use this element for removal nor insertion
 
+		// bzd::SizeType counter = 10000;
+
+		std::cout << "Deleting " << element << std::endl;
+
 		while (true)
 		{
-			if (--retry == 0)
-			{
-				std::cout << "ERROR" << std::endl;
-				volatile char* tmo = nullptr;
-				tmo[13] = 2;
-			}
+			/*	std::cout << ".";
+				if (--counter == 0)
+				{
+					std::cout << "Timeout loop remove" << std::endl;
+					printNode(element);
+
+					BasePtrType cur = &front_;
+					while (cur && cur != &back_)
+					{
+						printNode(cur);
+						cur = removeDeletionMark(cur->next_.load());
+					}
+
+					int a = 0;
+					int b = 12 / a;
+				}*/
 
 			// Save the previous and next positions of current element pointers
 			const auto nodeNext = removeDeletionMark(element->next_.load());
@@ -283,22 +296,43 @@ public:
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
 			// Look for the previous node.
-			const auto previous = findPreviousNode(element, &front_);
+			const auto previous = findPreviousNode(element);
 			if (!previous)
 			{
 				std::cout << "findPreviousNode race" << std::endl;
 
 				// Remove busy mark
+				/*	{
+						BasePtrType expected{addDeletionMark(nodeNext)};
+						while (!element->next_.compareExchange(expected, removeDeletionMark(expected)))
+						{
+						}
+					}*/
+
+				std::cout << "Timeout loop remove" << std::endl;
+				printNode(element);
+
+				BasePtrType cur = &front_;
+				while (cur && cur != &back_)
 				{
-					BasePtrType expected{addDeletionMark(nodeNext)};
-					while (!element->next_.compareExchange(expected, removeDeletionMark(expected)))
-					{
-					}
+					printNode(cur);
+					cur = removeDeletionMark(cur->next_.load());
 				}
 
-				return makeError(ListErrorType::notFound);
+				int a = 0;
+				int b = 12 / a;
+
+				// It must exists, as it was checked in the initial stage.
+				return makeError(ListErrorType::unhandledRaceCondition);
 			}
 			auto nodePrevious = previous->node;
+
+			// TODO
+			// Ensure the element was not removed
+			// if (removeDeletionMark(element->next_.load()) != nodeNext)
+			//{
+			//	continue;
+			//}
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
@@ -311,17 +345,26 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
 
-			// Try to remove the right link
+			if (isDeletionMark(previous->nextRaw))
+			{
+				std::this_thread::yield();
+				// std::cout << "DMARK" << std::endl;
+				continue;
+			}
+
+			// Try to remove the link
 			{
 				BasePtrType expected{previous->nextRaw};
 				if (!nodePrevious->next_.compareExchange(expected,
-														 (isDeletionMark(previous->nextRaw)) ? addDeletionMark(nodeNext) : nodeNext))
+														 (isInsertionMark(previous->nextRaw)) ? addInsertionMark(nodeNext) : nodeNext))
+				// BasePtrType expected{element};
+				// if (!nodePrevious->next_.compareExchange(expected, nodeNext))
 				{
-			/*		std::cout << "RACE! 2 remove" << std::endl;
-					std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
-					std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
-					std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
-*/
+					/*		std::cout << "RACE! 2 remove" << std::endl;
+							std::cout << nodePrevious << " <- " << element << " -> " << nodeNext << std::endl;
+							std::cout << nodePrevious << " -> " << nodePrevious->next_.load() << " | ";
+							std::cout << nodeNext->previous_.load() << " <- " << nodeNext << std::endl;
+		*/
 					// nodeNext has been deleted.
 					// Try to revert the previously changed node, if it fails, discard it would have meant
 					// that the previous has been altered.
@@ -335,6 +378,9 @@ public:
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
+
+			// Check if the next element is supposed to be deleted as well,
+			// If so tries to
 
 			// Element is completly out of the chain
 			// Note here the order is important, the next pointer should be updated
@@ -350,7 +396,7 @@ public:
 		return nullresult;
 	}
 
-	constexpr bzd::Optional<T&> front() noexcept
+	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
 	{
 		auto ptr = front_.next_.load();
 		if (ptr == &back_)
@@ -359,7 +405,7 @@ public:
 		}
 		return reinterpret_cast<T&>(*ptr);
 	}
-	constexpr bzd::Optional<const T&> front() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
 	{
 		const auto ptr = front_.next_.load();
 		if (ptr == &back_)
@@ -374,7 +420,7 @@ public:
 	 * \return The number of node evaluated.
 	 */
 	template <class U>
-	Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
+	[[nodiscard]] Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
 		bzd::SizeType counter = 0;
 		auto previous = &front_;
@@ -390,11 +436,23 @@ public:
 				return makeError(ListErrorType::sanityCheck);
 			}
 
+			if (isInsertionMark(node))
+			{
+				std::cout << "Deletion mark" << std::endl;
+				return makeError(ListErrorType::sanityCheck);
+			}
+
 			printNode(node);
+
+			if (!node)
+			{
+				std::cout << "Node cannot be null" << std::endl;
+				return makeError(ListErrorType::sanityCheck);
+			}
 
 			// Ensure that the next pointer points to the current node.
 			if (previous->next_.load() != node)
-			{	
+			{
 				std::cout << "Mistmatch previous->next and node" << std::endl;
 				return makeError(ListErrorType::sanityCheck);
 			}
@@ -434,7 +492,7 @@ public:
 	void printNode(BasePtrType node)
 	{
 		const auto printAddress = [this](const BasePtrType address) {
-			std::cout << std::setw(16) << address;
+			std::cout << std::setw(16) << std::showbase << std::hex << reinterpret_cast<uint64_t>(address);
 			if (address == &front_)
 			{
 				std::cout << " (F)";
@@ -449,25 +507,39 @@ public:
 			}
 		};
 
-	//	printAddress(node->previous_.load());
-	//	std::cout << " <- ";
+		//	printAddress(node->previous_.load());
+		//	std::cout << " <- ";
 		printAddress(node);
-		std::cout << " -> ";
-		printAddress(node->next_.load());
-		std::cout << std::endl;
+		if (node)
+		{
+			std::cout << " -> ";
+			printAddress(node->next_.load());
+		}
+		std::cout << std::dec << std::endl;
 	}
 
 private:
 	constexpr bool isDeletionMark(BasePtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 1); }
+	constexpr bool isInsertionMark(BasePtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 2); }
 
 	constexpr BasePtrType addDeletionMark(BasePtrType node) const noexcept
 	{
 		return reinterpret_cast<BasePtrType>(reinterpret_cast<IntPtrType>(node) | 0x1);
 	}
 
+	constexpr BasePtrType addInsertionMark(BasePtrType node) const noexcept
+	{
+		return reinterpret_cast<BasePtrType>(reinterpret_cast<IntPtrType>(node) | 0x2);
+	}
+
 	constexpr BasePtrType removeDeletionMark(BasePtrType node) const noexcept
 	{
-		return reinterpret_cast<BasePtrType>(reinterpret_cast<IntPtrType>(node) & ~1);
+		return reinterpret_cast<BasePtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
+	}
+
+	constexpr BasePtrType removeMarks(BasePtrType node) const noexcept
+	{
+		return reinterpret_cast<BasePtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
 	}
 
 private:
