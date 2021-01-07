@@ -118,7 +118,7 @@ async function tooltipFromEvent(e) {
 	}
 }
 
-export function tooltipFromCoords(x, y, message, initialPosition = null) {
+export function tooltipFromCoords(x, y, options) {
 	const eltMock = {
 		getBoundingClientRect() {
 			return {
@@ -132,30 +132,37 @@ export function tooltipFromCoords(x, y, message, initialPosition = null) {
 			return null;
 		},
 	};
-	tooltip(eltMock, message, initialPosition);
+	tooltip(eltMock, options);
 }
 
-export function tooltip(elt, message = null, initialPosition = null) {
+export function tooltip(elt, options) {
+	options = Object.assign(
+		{
+			type: "html",
+			data: elt.getAttribute("data-irtooltip"),
+			position: elt.getAttribute("data-irtooltip-position") || defaultPosition,
+		},
+		options
+	);
+
+	// Data must be filled.
+	if (!options.data) {
+		return;
+	}
+
 	/*
 	 * Save the current object. Do this event if it is not shown, this is used
 	 * by the asynchronous function if it needs to be updated.
 	 */
 	current.elt = elt;
 
-	message = message || elt.getAttribute("data-irtooltip");
-	if (!message) {
-		return;
-	}
-
-	const initalPosition = initialPosition || elt.getAttribute("data-irtooltip-position") || defaultPosition;
-
 	// Get the tooltip and set the message
 	let tooltipElt = getOrCreateTooltip();
-	if (elt.getAttribute("data-irtooltip-type") == "html") {
-		tooltipElt.firstChild.innerHTML = message;
+	if (options.type == "html") {
+		tooltipElt.firstChild.innerHTML = options.data;
 	}
 	else {
-		tooltipElt.firstChild.textContent = message;
+		tooltipElt.firstChild.textContent = options.data;
 	}
 
 	// Get element coordinates and update the coordinates
@@ -172,11 +179,11 @@ export function tooltip(elt, message = null, initialPosition = null) {
 
 	// Create the position list
 	let positionList = ["e", "s", "w", "n"];
-	if (positionSequences[initalPosition]) {
-		positionList = positionSequences[initalPosition].slice();
+	if (options.position in positionSequences) {
+		positionList = positionSequences[options.position].slice();
 	}
-	else if (initalPosition.indexOf(",") !== -1) {
-		positionList = initalPosition.split(",");
+	else if (options.position.indexOf(",") !== -1) {
+		positionList = options.position.split(",");
 	}
 
 	do {

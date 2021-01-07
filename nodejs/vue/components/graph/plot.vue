@@ -426,7 +426,10 @@
 						tooltip: (elt) => {
 							if (index == this.selected) {
 								const value = serie.values[this.selectedPoint];
-								tooltip(elt, tooltipFormater(value[0], value[1]));
+								tooltip(elt, {
+									type: "html",
+									data: tooltipFormater(value[0], value[1]),
+								});
 							}
 						},
 					};

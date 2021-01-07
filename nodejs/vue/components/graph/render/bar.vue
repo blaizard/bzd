@@ -38,7 +38,6 @@
 				return Math.max(minDiffX - 2, 1);
 			},
 		},
-		//tooltipFromCoords(coords.x, coords.y, "hello");
 		methods: {
 			getPointClass(index) {
 				return {
