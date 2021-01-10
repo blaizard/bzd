@@ -132,7 +132,7 @@ TEST(SingleLinkedList, insertWhileRemove)
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint4>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
 }
-
+/*
 template <class T>
 void removeWhileRemoveLeftDoWork()
 {
@@ -210,7 +210,7 @@ TEST(SingleLinkedList, removeWhileRemoveRight)
 	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint4>();
 	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint5>();
 }
-
+*/
 uint64_t getTimestampMs()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -220,9 +220,9 @@ TEST(SingleLinkedList, insertionStress)
 {
 	srand(time(NULL));
 
-	constexpr bzd::SizeType nbIterations = 10000;
-	constexpr bzd::SizeType nbElements = 8;
-	constexpr uint64_t timeMaxMs = 10 * 1000;
+	constexpr bzd::SizeType nbIterations = 100000;
+	constexpr bzd::SizeType nbElements = 10;
+	constexpr uint64_t timeMaxMs = 1000 * 1000;
 	const auto timeStart = getTimestampMs();
 
 	struct Data
@@ -307,6 +307,8 @@ TEST(SingleLinkedList, insertionStress)
 			}
 		}
 	};
+
+	bzd::ignore = workloadRemove;
 
 	std::thread worker1(workloadInsert, &data1);
 	std::thread worker2(workloadInsert, &data1);

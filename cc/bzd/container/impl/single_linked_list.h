@@ -17,9 +17,10 @@ class SingleLinkedListElement
 {
 public:
 	constexpr SingleLinkedListElement() = default;
-	constexpr SingleLinkedListElement(SingleLinkedListElement&& elt) : next_{elt.next_.load()} {} //, previous_{elt.previous_.load()} {}
+	constexpr SingleLinkedListElement(SingleLinkedListElement&& elt) : next_{elt.next_.load()}, previous_{elt.previous_.load()} {}
 
 	bzd::Atomic<SingleLinkedListElement*> next_{nullptr};
+	bzd::Atomic<SingleLinkedListElement*> previous_{nullptr};
 	bzd::Atomic<void*> parent_{nullptr};
 };
 
@@ -91,9 +92,8 @@ private:
 	 */
 	Optional<NodeFound> findPreviousNode(BasePtrType node) noexcept
 	{
+		// auto previous = node->previous_.load();
 		NodeFound result{&front_, nullptr};
-		bzd::SizeType temp = 1000;
-
 		while (result.node != &back_)
 		{
 			result.nextRaw = result.node->next_.load();
@@ -122,7 +122,11 @@ private:
 	}
 
 public:
-	constexpr SingleLinkedList() noexcept { front_.next_.store(&back_); };
+	constexpr SingleLinkedList() noexcept
+	{
+		front_.next_.store(&back_);
+		back_.previous_.store(&front_);
+	};
 
 	/**
 	 * Get the number of elements currently held by this container.
@@ -186,12 +190,14 @@ public:
 				}
 			}
 
-			std::cout << "Inserting " << element << std::endl;
+			// std::cout << "Inserting " << element << std::endl;
 
 			bzd::test::InjectPoint<ListInjectPoint2, Args...>();
 
 			// From here, element cannot be used by any other concurrent operation,
 			// as it has already been flagged as inserted.
+
+			element->previous_.store(nodePrevious);
 
 			bzd::test::InjectPoint<ListInjectPoint3, Args...>();
 
@@ -206,10 +212,34 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
+			// Set the previous node of the next element.
+			// In case the nodeNext get deleted, it does not matter.
+			nodeNext->previous_.store(element);
+			/*{
+				BasePtrType expected{nodePrevious};
+				if (!nodeNext->previous_.compareExchange(expected, element))
+				{
+					nodeNext->previous_.store(nullptr);
+				}
+			}*/
+
 			// Set the parent
 			element->parent_.store(this);
 
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
+
+			// Make sure the previous pointer is still up-to-date.
+			// It might have changed, if an element was inserted in the mean-time.
+			/*	auto previous = findPreviousNode(element);
+				if (!previous)
+				{
+					return makeError(ListErrorType::unhandledRaceCondition);
+				}
+				while (previous->node != nodePrevious)
+				{
+					element->previous_.store(previous->node);
+					nodePrevious = previous->node;
+				}*/
 
 			// Remove busy mark
 			{
@@ -269,7 +299,7 @@ public:
 
 		// bzd::SizeType counter = 10000;
 
-		std::cout << "Deleting " << element << std::endl;
+		// std::cout << "Deleting " << element << std::endl;
 
 		while (true)
 		{
@@ -296,7 +326,8 @@ public:
 			bzd::test::InjectPoint<ListInjectPoint1, Args...>();
 
 			// Look for the previous node.
-			const auto previous = findPreviousNode(element);
+			auto nodePrevious = element->previous_.load();
+			auto previous = findPreviousNode(element);
 			if (!previous)
 			{
 				std::cout << "findPreviousNode race" << std::endl;
@@ -309,7 +340,6 @@ public:
 						}
 					}*/
 
-				std::cout << "Timeout loop remove" << std::endl;
 				printNode(element);
 
 				BasePtrType cur = &front_;
@@ -325,7 +355,15 @@ public:
 				// It must exists, as it was checked in the initial stage.
 				return makeError(ListErrorType::unhandledRaceCondition);
 			}
-			auto nodePrevious = previous->node;
+
+			// If the previous pointer is different from the one registered on the element,
+			// it might be the result of a race, attempt to fix it.
+			while (previous->node != element->previous_.load())
+			{
+				element->previous_.store(previous->node);
+				previous = findPreviousNode(element);
+			}
+			nodePrevious = previous->node;
 
 			// TODO
 			// Ensure the element was not removed
@@ -347,9 +385,19 @@ public:
 
 			if (isDeletionMark(previous->nextRaw))
 			{
-				std::this_thread::yield();
 				// std::cout << "DMARK" << std::endl;
 				continue;
+			}
+
+			// Update the previous pointer
+			{
+				nodeNext->previous_.store(previous->node);
+				/*BasePtrType expected{element};
+				if (!nodeNext->previous_.compareExchange(expected, nodePrevious))
+				{
+					// Something change because of a race, mark the previous element as invalid.
+					nodeNext->previous_.store(nullptr);
+				}*/
 			}
 
 			// Try to remove the link
@@ -377,6 +425,15 @@ public:
 
 			bzd::test::InjectPoint<ListInjectPoint4, Args...>();
 
+			{
+				BasePtrType expected{element};
+				if (!nodeNext->previous_.compareExchange(expected, nodePrevious))
+				{
+					// Something change because of a race, mark the previous element as invalid.
+					nodeNext->previous_.store(nullptr);
+				}
+			}
+
 			bzd::test::InjectPoint<ListInjectPoint5, Args...>();
 
 			// Check if the next element is supposed to be deleted as well,
@@ -385,6 +442,7 @@ public:
 			// Element is completly out of the chain
 			// Note here the order is important, the next pointer should be updated
 			// the last to make it insertable only at the end.
+			element->previous_.store(nullptr);
 			element->next_.store(nullptr);
 
 			break;
@@ -413,6 +471,15 @@ public:
 			return bzd::nullopt;
 		}
 		return reinterpret_cast<const T&>(*ptr);
+	}
+	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
+	{
+		const auto previous = findPreviousNode(&back_);
+		if (previous->node == &front_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<T&>(*previous->node);
 	}
 
 	/**
@@ -451,15 +518,52 @@ public:
 			}
 
 			// Ensure that the next pointer points to the current node.
-			if (previous->next_.load() != node)
-			{
-				std::cout << "Mistmatch previous->next and node" << std::endl;
-				return makeError(ListErrorType::sanityCheck);
-			}
+			/*	if (previous->next_.load() != node)
+				{
+					std::cout << "Mistmatch previous->next and node" << std::endl;
+					return makeError(ListErrorType::sanityCheck);
+				}*/
+
+			// Ensure that the previous pointer points to the current node.
+			/*	BasePtrType cur = node->previous_.load();
+				if (cur)
+				{
+					std::size_t distance = 0;
+					while (cur && cur != node)
+					{
+						++distance;
+						cur = removeDeletionMark(cur->next_.load());
+					}
+					if (!cur)
+					{
+						std::cout << "Mistmatch node->previous and previous" << std::endl;
+						return makeError(ListErrorType::sanityCheck);
+					}
+					if (distance > 2)
+					{
+						std::cout << "Distance: " << distance << std::endl;
+						return makeError(ListErrorType::sanityCheck);
+					}
+				}*/
 
 			// Check if the end is reached.
 			if (node == &back_)
 			{
+				const auto maybeBack = back();
+				if (!maybeBack)
+				{
+					if (counter != 0)
+					{
+						std::cout << "Expected 0 size but got: " << counter << std::endl;
+						return makeError(ListErrorType::sanityCheck);
+					}
+				}
+				else if (previous != &(*maybeBack))
+				{
+					std::cout << "Last pointer is not pointing to the last element: " << previous << " vs " << &(*maybeBack) << std::endl;
+					return makeError(ListErrorType::sanityCheck);
+				}
+
 				break;
 			}
 
@@ -507,8 +611,8 @@ public:
 			}
 		};
 
-		//	printAddress(node->previous_.load());
-		//	std::cout << " <- ";
+		printAddress(node->previous_.load());
+		std::cout << " <- ";
 		printAddress(node);
 		if (node)
 		{
@@ -546,7 +650,6 @@ private:
 	// Having a front & back elemment will simplify the logic to not have to take care of the edge cases.
 	SingleLinkedListElement front_;
 	SingleLinkedListElement back_;
-	bzd::Atomic<SingleLinkedListElement*> last_{nullptr};
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
 };
