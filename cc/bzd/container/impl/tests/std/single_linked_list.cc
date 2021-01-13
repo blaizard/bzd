@@ -47,7 +47,7 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(*result, 3);
 	EXPECT_EQ(list.size(), 3);
 }
-
+/*
 TEST(SingleLinkedList, insertWhileInsert)
 {
 	insertWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
@@ -132,7 +132,7 @@ TEST(SingleLinkedList, insertWhileRemove)
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint4>();
 	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
 }
-/*
+
 template <class T>
 void removeWhileRemoveLeftDoWork()
 {
@@ -171,7 +171,7 @@ TEST(SingleLinkedList, removeWhileRemoveLeft)
 	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint4>();
 	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint5>();
 }
-
+*/
 template <class T>
 void removeWhileRemoveRightDoWork()
 {
@@ -204,13 +204,15 @@ void removeWhileRemoveRightDoWork()
 
 TEST(SingleLinkedList, removeWhileRemoveRight)
 {
-	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint1>();
-	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint2>();
-	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint3>();
-	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint4>();
-	// removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint5>();
+/*	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint1>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint2>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint3>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint4>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint5>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint6>();
+	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint7>();*/
 }
-*/
+
 uint64_t getTimestampMs()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
