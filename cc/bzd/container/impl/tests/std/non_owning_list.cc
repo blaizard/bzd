@@ -1,4 +1,4 @@
-#include "bzd/container/impl/single_linked_list.h"
+#include "bzd/container/impl/non_owning_list.h"
 
 #include "bzd/test/sync_point.h"
 #include "bzd/utility/ignore.h"
@@ -9,10 +9,10 @@
 #include <set>
 #include <thread>
 #include <vector>
-class DummyElement : public bzd::impl::SingleLinkedListElement
+class DummyElement : public bzd::impl::ListElement<bzd::impl::ListElementMultiContainer>
 {
 public:
-	DummyElement(bzd::SizeType value) : bzd::impl::SingleLinkedListElement{}, value_{value} {}
+	DummyElement(bzd::SizeType value) : value_{value} {}
 	DummyElement(DummyElement&&) = default;
 
 	bzd::SizeType value_;
@@ -24,7 +24,7 @@ void insertWhileInsertDoWork()
 	DummyElement a{1};
 	DummyElement b{2};
 	DummyElement c{3};
-	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::impl::NonOwningList<DummyElement> list;
 	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -47,14 +47,14 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(*result, 3);
 	EXPECT_EQ(list.size(), 3);
 }
-/*
-TEST(SingleLinkedList, insertWhileInsert)
+
+TEST(NonOwningList, insertWhileInsert)
 {
-	insertWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
-	insertWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
-	insertWhileInsertDoWork<bzd::impl::ListInjectPoint3>();
-	insertWhileInsertDoWork<bzd::impl::ListInjectPoint4>();
-	insertWhileInsertDoWork<bzd::impl::ListInjectPoint5>();
+	insertWhileInsertDoWork<bzd::test::InjectPoint0>();
+	insertWhileInsertDoWork<bzd::test::InjectPoint1>();
+	insertWhileInsertDoWork<bzd::test::InjectPoint2>();
+	insertWhileInsertDoWork<bzd::test::InjectPoint3>();
+	insertWhileInsertDoWork<bzd::test::InjectPoint4>();
 }
 
 template <class T>
@@ -62,7 +62,7 @@ void removeWhileInsertDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::impl::NonOwningList<DummyElement> list;
 	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -86,13 +86,13 @@ void removeWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(SingleLinkedList, removeWhileInsert)
+TEST(NonOwningList, removeWhileInsert)
 {
-	removeWhileInsertDoWork<bzd::impl::ListInjectPoint1>();
-	removeWhileInsertDoWork<bzd::impl::ListInjectPoint2>();
-	removeWhileInsertDoWork<bzd::impl::ListInjectPoint3>();
-	removeWhileInsertDoWork<bzd::impl::ListInjectPoint4>();
-	removeWhileInsertDoWork<bzd::impl::ListInjectPoint5>();
+	removeWhileInsertDoWork<bzd::test::InjectPoint0>();
+	removeWhileInsertDoWork<bzd::test::InjectPoint1>();
+	removeWhileInsertDoWork<bzd::test::InjectPoint2>();
+	removeWhileInsertDoWork<bzd::test::InjectPoint3>();
+	removeWhileInsertDoWork<bzd::test::InjectPoint4>();
 }
 
 template <class T>
@@ -100,7 +100,7 @@ void insertWhileRemoveDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::impl::NonOwningList<DummyElement> list;
 	bzd::ignore = list.insert(&a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -124,13 +124,13 @@ void insertWhileRemoveDoWork()
 	EXPECT_EQ(list.size(), 1);
 }
 
-TEST(SingleLinkedList, insertWhileRemove)
+TEST(NonOwningList, insertWhileRemove)
 {
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint1>();
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint2>();
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint3>();
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint4>();
-	insertWhileRemoveDoWork<bzd::impl::ListInjectPoint5>();
+	insertWhileRemoveDoWork<bzd::test::InjectPoint0>();
+	insertWhileRemoveDoWork<bzd::test::InjectPoint1>();
+	insertWhileRemoveDoWork<bzd::test::InjectPoint2>();
+	insertWhileRemoveDoWork<bzd::test::InjectPoint3>();
+	insertWhileRemoveDoWork<bzd::test::InjectPoint4>();
 }
 
 template <class T>
@@ -138,7 +138,7 @@ void removeWhileRemoveLeftDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::impl::NonOwningList<DummyElement> list;
 	bzd::ignore = list.insert(&a);
 	bzd::ignore = list.insert(&b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
@@ -163,21 +163,21 @@ void removeWhileRemoveLeftDoWork()
 	EXPECT_EQ(list.size(), 0);
 }
 
-TEST(SingleLinkedList, removeWhileRemoveLeft)
+TEST(NonOwningList, removeWhileRemoveLeft)
 {
-	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint1>();
-	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint2>();
-	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint3>();
-	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint4>();
-	removeWhileRemoveLeftDoWork<bzd::impl::ListInjectPoint5>();
+	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint0>();
+	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint1>();
+	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint2>();
+	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint3>();
+	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint4>();
 }
-*/
+
 template <class T>
 void removeWhileRemoveRightDoWork()
 {
 	DummyElement a{1};
 	DummyElement b{2};
-	bzd::impl::SingleLinkedList<DummyElement> list;
+	bzd::impl::NonOwningList<DummyElement> list;
 	bzd::ignore = list.insert(&a);
 	bzd::ignore = list.insert(&b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
@@ -202,15 +202,15 @@ void removeWhileRemoveRightDoWork()
 	EXPECT_EQ(list.size(), 0);
 }
 
-TEST(SingleLinkedList, removeWhileRemoveRight)
+TEST(NonOwningList, removeWhileRemoveRight)
 {
-/*	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint1>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint2>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint3>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint4>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint5>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint6>();
-	removeWhileRemoveRightDoWork<bzd::impl::ListInjectPoint7>();*/
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint0>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint1>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint2>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint3>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint4>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint5>();
+	removeWhileRemoveRightDoWork<bzd::test::InjectPoint6>();
 }
 
 uint64_t getTimestampMs()
@@ -218,7 +218,7 @@ uint64_t getTimestampMs()
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-TEST(SingleLinkedList, insertionStress)
+TEST(NonOwningList, insertionStress)
 {
 	srand(time(NULL));
 
@@ -229,7 +229,7 @@ TEST(SingleLinkedList, insertionStress)
 
 	struct Data
 	{
-		bzd::impl::SingleLinkedList<DummyElement> list{};
+		bzd::impl::NonOwningList<DummyElement> list{};
 		bzd::Atomic<bzd::UInt16Type> inserted[nbElements]{};
 		bzd::Atomic<bzd::SizeType> insertion{0};
 		bzd::Atomic<bzd::SizeType> removal{0};

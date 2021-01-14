@@ -24,4 +24,44 @@ public:
 	}
 };
 
+struct InjectPoint0
+{
+};
+
+struct InjectPoint1
+{
+};
+
+struct InjectPoint2
+{
+};
+
+struct InjectPoint3
+{
+};
+
+struct InjectPoint4
+{
+};
+
+struct InjectPoint5
+{
+};
+
+struct InjectPoint6
+{
+};
+
+struct InjectPoint7
+{
+};
+
+struct InjectPoint8
+{
+};
+
+struct InjectPoint9
+{
+};
+
 } // namespace bzd::test
