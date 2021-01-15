@@ -10,7 +10,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/impl",
+        "//cc/bzd/container/impl/tests:non_owning_list_lib",
         "//cc/bzd/test:sync_point",
         "//cc/bzd/utility:ignore",
         "//tools/cc_test",
