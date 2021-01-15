@@ -12,8 +12,6 @@ namespace bzd::impl {
 
 class ListElementVoid
 {
-public:
-	bzd::Atomic<void*> parent_{nullptr};
 };
 
 class ListElementMultiContainer
@@ -435,7 +433,6 @@ protected:
 	constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 1; }
 	constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 2; }
 	constexpr bool isWeakMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
-	constexpr bool isMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3); }
 
 	constexpr BaseElementPtrType setDeletionMark(BaseElementPtrType node) const noexcept
 	{
