@@ -101,8 +101,8 @@ int main()
 	std::cout << promise.isReady() << std::endl;
 	std::cout << getTimestampMs() << std::endl;
 
-	bzd::getScheduler().addTask(&task1);
-	bzd::getScheduler().addTask(&task2);
+	bzd::getScheduler().addTask(task1);
+	bzd::getScheduler().addTask(task2);
 
 	bzd::getScheduler().start();
 

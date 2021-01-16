@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/container/function.h"
+#include "bzd/container/impl/non_owning_list.h"
 #include "bzd/core/assert.h"
 #include "bzd/platform/stack.h"
 #include "bzd/platform/types.h"
@@ -12,7 +13,7 @@ void yield();
 } // namespace bzd
 
 namespace bzd::interface {
-class Task
+class Task : public bzd::impl::ListElement</*MultiContainer*/true>
 {
 public: // Types.
 	using PtrType = Task*;
@@ -42,8 +43,6 @@ protected:
 protected:
 	Status status_{Status::IDLE};
 	platform::interface::Stack* stack_{nullptr};
-	PtrType next_{nullptr};
-	PtrType previous_{nullptr};
 };
 
 class TaskUser : public Task
