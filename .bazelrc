@@ -24,6 +24,7 @@ test --define=panic=throw
 # Coverage specific options
 coverage --combined_report=lcov
 coverage --nobuild_tests_only
+coverage --instrument_test_targets
 
 # Select only C++ targets
 build:cc --build_tag_filters="-nodejs,-docker"
