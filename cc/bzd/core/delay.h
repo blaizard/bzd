@@ -8,7 +8,7 @@ namespace bzd {
 /**
  * Pauses the program for the amount of time (in milliseconds) specified as parameter.
  *
- * \param time Time to pause the program.
+ * \param time Time to pause the program for.
  *
  * \return A promise object.
  */

@@ -12,7 +12,7 @@
 #include <string>
 
 namespace {
-const char* getSignalName(int sig) noexcept
+constexpr const char* getSignalName(int sig) noexcept
 {
 	switch (sig)
 	{
@@ -118,7 +118,7 @@ bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexc
 void callStack(std::ostream& out) noexcept
 {
 	constexpr size_t MAX_STACK_LEVEL = 64;
-	void* addresses[MAX_STACK_LEVEL];
+	static void* addresses[MAX_STACK_LEVEL];
 
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
 	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
@@ -212,7 +212,7 @@ void callStack(std::ostream& out) noexcept
 			}
 		}
 
-		char pBuffer[1024];
+		static char pBuffer[1024];
 		if (pFunction)
 		{
 			if (demangle(pBuffer, sizeof(pBuffer), pFunction))
