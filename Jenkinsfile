@@ -90,6 +90,22 @@ pipeline
 			}
 		}
 		/**
+		 * Run stress tests
+		 */
+		stage("Stress")
+		{
+			parallel
+			{
+				stage("linux_x86_64_clang")
+				{
+					steps
+					{
+						sh "./tools/bazel test ... --config=linux_x86_64_clang --build_tag_filters=stress --test_tag_filters=stress --runs_per_test=100 --platform_suffix=_linux_x86_64_clang" 
+					}
+				}
+			}
+		}
+		/**
 		 * Auto publish some artifacts
 		 */
 		stage("Publish")

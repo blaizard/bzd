@@ -8,7 +8,6 @@ cc_library(
     linkopts = [
         "-pthread",
     ],
-    tags = ["stress"],
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container/impl/tests:non_owning_list_lib",

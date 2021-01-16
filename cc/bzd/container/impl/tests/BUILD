@@ -20,6 +20,7 @@ cc_test(
         "non_owning_list.cc",
         "non_owning_list.h",
     ],
+    tags = ["stress"],
     deps = [
         "//tools/cc_test",
         ":non_owning_list_lib",
