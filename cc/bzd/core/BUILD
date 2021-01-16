@@ -144,6 +144,7 @@ cc_library(
         ":task",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
+        "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:singleton",
         "//cc/bzd/utility:swap",
@@ -159,6 +160,7 @@ cc_library(
     deps = [
         ":assert",
         "//cc/bzd/container:function",
+        "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/platform",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",

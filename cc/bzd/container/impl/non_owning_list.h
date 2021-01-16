@@ -76,6 +76,13 @@ public:
 	[[nodiscard]] constexpr SizeType size() const noexcept { return size_.load(); }
 
 	/**
+	 * Tells if the list is empty.
+	 * 
+	 * \return True if the list is empty, false otherwise.
+	 */
+	[[nodiscard]] constexpr bool empty() const noexcept { return size_.load() == 0; }
+
+	/**
 	 * Insert an element into the list from the root element.
 	 * The idea is to ensure that the last operation is the one that make the element discoverable,
 	 * this ensures that any element is consistent.

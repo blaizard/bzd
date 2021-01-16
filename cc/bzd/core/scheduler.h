@@ -2,6 +2,7 @@
 
 #include "bzd/container/optional.h"
 #include "bzd/container/queue.h"
+#include "bzd/container/impl/non_owning_list.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/promise.h"
 #include "bzd/core/task.h"
@@ -30,17 +31,17 @@ namespace bzd {
 class Scheduler : public SingletonThreadLocal<Scheduler>
 {
 private:
-	using TaskPtr = bzd::interface::Task::PtrType;
+	using Task = bzd::interface::Task;
 
 public:
 	/**
-	 * Add a new task to the scheduler
+	 * Add a new task to the scheduler.
 	 */
-	void addTask(TaskPtr task)
+	void addTask(Task& task)
 	{
 		// Only add bounded tasks if (task.isBind())
-		bzd::assert::isTrue(task->hasStack(), "Task can only be added if bounded to a stack.");
-		queue_.push(task);
+		bzd::assert::isTrue(task.hasStack(), "Task can only be added if bounded to a stack.");
+		tasks_.pushFront(task);
 	}
 
 	void start()
@@ -67,19 +68,18 @@ public:
 	{
 		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED)
 		{
-			queue_.push(bzd::move(task_));
+			tasks_.pushFront(*task_);
 		}
 
 		// Push back the current task
 		auto maybeTask = getNextTask();
-
 		if (maybeTask)
 		{
 			resumeTask(*maybeTask);
 		}
 		else
 		{
-			resumeTask(&mainTask_);
+			resumeTask(mainTask_);
 		}
 	}
 
@@ -87,35 +87,32 @@ private:
 	/**
 	 * Get the next task to be executed from teh main task queue.
 	 */
-	bzd::Optional<TaskPtr> getNextTask() noexcept
+	bzd::Optional<Task&> getNextTask() noexcept
 	{
-		if (queue_.empty())
+		auto result = tasks_.back();
+		if (!result)
 		{
 			return bzd::nullopt;
 		}
-		auto task = queue_.front();
-		queue_.pop();
-		return task;
+		tasks_.pop(*result);
+		return result;
 	}
 
 	/**
 	 * Resume a task and set it as the current task.
 	 */
-	void resumeTask(TaskPtr task)
+	void resumeTask(Task& task)
 	{
 		auto previousTask = task_;
-		task_ = task;
+		task_ = &task;
 		previousTask->getStack().shift(task_->getStack());
 	}
 
 private:
-	bzd::Queue<TaskPtr, 10> queue_;
-	/**
-	 * Main task queue, which contains only active tasks.
-	 * It is implemented as a ring list with atomic insertion/deletion.
-	 */
-	TaskPtr task_;
-	TaskPtr task2_{nullptr};
+	// Main task list, which contains only active tasks.
+	bzd::impl::NonOwningList<Task> tasks_{};
+	// The current task
+	Task* task_{nullptr};
 	impl::MainTask mainTask_{};
 };
 

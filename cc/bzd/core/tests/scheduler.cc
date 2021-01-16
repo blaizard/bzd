@@ -18,7 +18,7 @@ TEST(Scheduler, SimpleScheduling)
 		}
 	}};
 	taskA.bind(stackA);
-	bzd::getScheduler().addTask(&taskA);
+	bzd::getScheduler().addTask(taskA);
 
 	bzd::Task taskB{[&output] {
 		for (int i = 0; i < 10; ++i)
@@ -28,7 +28,7 @@ TEST(Scheduler, SimpleScheduling)
 		}
 	}};
 	taskB.bind(stackB);
-	bzd::getScheduler().addTask(&taskB);
+	bzd::getScheduler().addTask(taskB);
 
 	bzd::getScheduler().start();
 
@@ -48,7 +48,7 @@ TEST(Scheduler, SingleTaskScheduling)
 		}
 	}};
 	task.bind(stack);
-	bzd::getScheduler().addTask(&task);
+	bzd::getScheduler().addTask(task);
 	bzd::getScheduler().start();
 
 	EXPECT_STREQ(output.data(), "AAAAAAAAAA");
