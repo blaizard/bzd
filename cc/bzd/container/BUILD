@@ -193,6 +193,7 @@ cc_library(
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:is_reference",
+        "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
     ],
