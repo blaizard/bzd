@@ -3,6 +3,22 @@
 #include "cc_test/test.h"
 
 #include <string>
+/*
+constexpr bzd::Result<void, int> constexprResultFct(const bool makeError)
+{
+	if (makeError)
+	{
+		return bzd::makeError(42);
+	}
+	return bzd::nullresult;
+}
+*/
+TEST(ContainerResult, constexprType)
+{
+	//constexpr auto ret = constexprResultFct(/*makeError*/ true);
+	//EXPECT_FALSE(ret);
+	//EXPECT_STREQ(ret.error().c_str(), "KO");
+}
 
 TEST(ContainerResult, returnVoid)
 {
