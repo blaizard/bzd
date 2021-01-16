@@ -38,7 +38,6 @@ public:
 
 enum class ListErrorType
 {
-	/// The element is already inserted into the list and cannot be insterted twice.
 	elementAlreadyInserted,
 	elementAlreadyRemoved,
 	notFound,
@@ -397,7 +396,7 @@ protected:
 	 *
 	 * \return A structure containing the previous node and the raw pointer its next node.
 	 */
-	Optional<NodeFound> findPreviousNode(BaseElementPtrType node) noexcept
+	[[nodiscard]] constexpr Optional<NodeFound> findPreviousNode(BaseElementPtrType node) noexcept
 	{
 		NodeFound result{&front_, nullptr};
 		while (result.node != &back_)
@@ -428,26 +427,26 @@ protected:
 	}
 
 protected:
-	constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 1; }
-	constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 2; }
-	constexpr bool isWeakMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
+	[[nodiscard]] constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 1; }
+	[[nodiscard]] constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 2; }
+	[[nodiscard]] constexpr bool isWeakMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
 
-	constexpr BaseElementPtrType setDeletionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr BaseElementPtrType setDeletionMark(BaseElementPtrType node) const noexcept
 	{
 		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x1);
 	}
 
-	constexpr BaseElementPtrType setInsertionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr BaseElementPtrType setInsertionMark(BaseElementPtrType node) const noexcept
 	{
 		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x2);
 	}
 
-	constexpr BaseElementPtrType setWeakMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr BaseElementPtrType setWeakMark(BaseElementPtrType node) const noexcept
 	{
 		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x3);
 	}
 
-	constexpr BaseElementPtrType removeMarks(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr BaseElementPtrType removeMarks(BaseElementPtrType node) const noexcept
 	{
 		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
 	}

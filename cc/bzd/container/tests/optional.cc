@@ -23,6 +23,14 @@ TEST(ContainerOptional, simpleNoData)
 	EXPECT_EQ(v.valueOr(10), 10);
 }
 
+TEST(ContainerOptional, constexprType)
+{
+	constexpr bzd::Optional<int> v;
+
+	EXPECT_FALSE(v);
+	EXPECT_EQ(v.valueOr(10), 10);
+}
+
 TEST(ContainerOptional, complexData)
 {
 	struct Value

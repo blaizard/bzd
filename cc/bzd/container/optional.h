@@ -8,6 +8,10 @@
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 
+#include "bzd/type_traits/enable_if.h"
+#include "bzd/type_traits/is_trivially_destructible.h"
+
+
 namespace bzd::impl {
 
 struct OptionalNull
@@ -20,62 +24,23 @@ private:
 };
 
 template <class T>
-class Optional
+class OptionalNonTrivialDestructorStorage
 {
-private:
-	using Value = bzd::typeTraits::RemoveReference<T>;
+protected:
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 public: // Constructors
 	template <class U>
-	constexpr Optional(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
+	constexpr OptionalNonTrivialDestructorStorage(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
 	}
 
-	constexpr Optional(const OptionalNull& null) : Optional{} {}
+	constexpr OptionalNonTrivialDestructorStorage(const OptionalNull& null) : OptionalNonTrivialDestructorStorage{} {}
 
-	explicit constexpr Optional() : isValue_{false}, empty_{} {}
-
-public: // Move
-	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
-
-	// Move assignment
-	constexpr void operator=(Optional<T>&& optional)
-	{
-		isValue_ = optional.isValue_;
-		if (isValue_) value_ = bzd::move(optional.value_);
-	}
+	explicit constexpr OptionalNonTrivialDestructorStorage() : isValue_{false}, empty_{} {}
 
 public:
-	constexpr operator bool() const noexcept { return isValue_; }
-
-	constexpr const Value& valueOr(const Value& defaultValue) const { return (isValue_) ? value_ : defaultValue; }
-
-	constexpr const Value& operator*() const
-	{
-		bzd::assert::isTrue(isValue_);
-		return value_;
-	}
-
-	constexpr Value& operator*()
-	{
-		bzd::assert::isTrue(isValue_);
-		return value_;
-	}
-
-	constexpr const Value* operator->() const
-	{
-		bzd::assert::isTrue(isValue_);
-		return &value_;
-	}
-
-	constexpr Value* operator->()
-	{
-		bzd::assert::isTrue(isValue_);
-		return &value_;
-	}
-
-	~Optional()
+	~OptionalNonTrivialDestructorStorage()
 	{
 		if (isValue_) value_.~ValueContainer();
 	}
@@ -87,6 +52,85 @@ protected:
 		ValueContainer value_;
 	};
 };
+
+template <class T>
+class OptionalTrivialDestructorStorage
+{
+protected:
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+
+public: // Constructors
+	template <class U>
+	constexpr OptionalTrivialDestructorStorage(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
+	{
+	}
+
+	constexpr OptionalTrivialDestructorStorage(const OptionalNull& null) : OptionalTrivialDestructorStorage{} {}
+
+	explicit constexpr OptionalTrivialDestructorStorage() : isValue_{false}, empty_{} {}
+
+protected:
+	bool isValue_;
+	union {
+		bzd::UInt8Type empty_;
+		ValueContainer value_;
+	};
+};
+
+template <class T>
+class Optional : public bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T>, OptionalTrivialDestructorStorage<T>, OptionalNonTrivialDestructorStorage<T>>
+{
+protected:
+	using Value = bzd::typeTraits::RemoveReference<T>;
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+	using Parent = bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T>, OptionalTrivialDestructorStorage<T>, OptionalNonTrivialDestructorStorage<T>>;
+
+public: // Constructors
+	template <class... Args>
+	constexpr Optional(Args&&... value) : Parent{bzd::forward<Args>(value)...}
+	{
+	}
+
+public: // Move
+	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
+
+	// Move assignment
+	constexpr void operator=(Optional<T>&& optional)
+	{
+		this->isValue_ = optional.isValue_;
+		if (this->isValue_) this->value_ = bzd::move(optional.value_);
+	}
+
+public:
+	constexpr operator bool() const noexcept { return this->isValue_; }
+
+	constexpr const Value& valueOr(const Value& defaultValue) const { return (this->isValue_) ? this->value_ : defaultValue; }
+
+	constexpr const Value& operator*() const
+	{
+		bzd::assert::isTrue(this->isValue_);
+		return this->value_;
+	}
+
+	constexpr Value& operator*()
+	{
+		bzd::assert::isTrue(this->isValue_);
+		return this->value_;
+	}
+
+	constexpr const Value* operator->() const
+	{
+		bzd::assert::isTrue(this->isValue_);
+		return &this->value_;
+	}
+
+	constexpr Value* operator->()
+	{
+		bzd::assert::isTrue(this->isValue_);
+		return &this->value_;
+	}
+};
+
 } // namespace bzd::impl
 
 namespace bzd {
@@ -100,3 +144,4 @@ constexpr impl::OptionalNull nullopt = impl::OptionalNull::make();
 template <class T>
 using Optional = impl::Optional<T>;
 } // namespace bzd
+
