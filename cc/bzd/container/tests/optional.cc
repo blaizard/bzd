@@ -29,6 +29,11 @@ TEST(ContainerOptional, constexprType)
 
 	EXPECT_FALSE(v);
 	EXPECT_EQ(v.valueOr(10), 10);
+
+	constexpr bzd::Optional<int> u{23};
+
+	EXPECT_TRUE(u);
+	EXPECT_EQ(u.valueOr(10), 23);
 }
 
 TEST(ContainerOptional, complexData)

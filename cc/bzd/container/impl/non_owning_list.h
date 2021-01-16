@@ -427,9 +427,18 @@ protected:
 	}
 
 protected:
-	[[nodiscard]] constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 1; }
-	[[nodiscard]] constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 2; }
-	[[nodiscard]] constexpr bool isWeakMark(BaseElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
+	[[nodiscard]] constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept
+	{
+		return (reinterpret_cast<IntPtrType>(node) & 3) == 1;
+	}
+	[[nodiscard]] constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept
+	{
+		return (reinterpret_cast<IntPtrType>(node) & 3) == 2;
+	}
+	[[nodiscard]] constexpr bool isWeakMark(BaseElementPtrType node) const noexcept
+	{
+		return (reinterpret_cast<IntPtrType>(node) & 3) == 3;
+	}
 
 	[[nodiscard]] constexpr BaseElementPtrType setDeletionMark(BaseElementPtrType node) const noexcept
 	{
