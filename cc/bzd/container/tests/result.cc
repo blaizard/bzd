@@ -3,7 +3,7 @@
 #include "cc_test/test.h"
 
 #include <string>
-/*
+
 constexpr bzd::Result<void, int> constexprResultFct(const bool makeError)
 {
 	if (makeError)
@@ -12,12 +12,12 @@ constexpr bzd::Result<void, int> constexprResultFct(const bool makeError)
 	}
 	return bzd::nullresult;
 }
-*/
+
 TEST(ContainerResult, constexprType)
 {
-	// constexpr auto ret = constexprResultFct(/*makeError*/ true);
-	// EXPECT_FALSE(ret);
-	// EXPECT_STREQ(ret.error().c_str(), "KO");
+	constexpr auto ret = constexprResultFct(/*makeError*/ true);
+	EXPECT_FALSE(ret);
+	EXPECT_EQ(ret.error(), 42);
 }
 
 TEST(ContainerResult, returnVoid)

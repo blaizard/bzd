@@ -11,6 +11,8 @@
 
 namespace bzd::impl {
 
+// nullopt
+
 struct OptionalNull
 {
 public:
@@ -19,6 +21,8 @@ public:
 private:
 	explicit constexpr OptionalNull() noexcept {}
 };
+
+// Storage
 
 template <class T>
 struct OptionalNonTrivialStorage

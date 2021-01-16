@@ -95,7 +95,7 @@ public:
 	 * \return An error in case of failure, void otherwise.
 	 */
 	template <class... Args>
-	[[nodiscard]] Result<void> pushFront(ElementType& element) noexcept
+	[[nodiscard]] constexpr Result<void> pushFront(ElementType& element) noexcept
 	{
 		while (true)
 		{
@@ -174,7 +174,7 @@ public:
 	 * \return An error in case of failure, void otherwise.
 	 */
 	template <class... Args>
-	[[nodiscard]] Result<void> pop(ElementType& element) noexcept
+	[[nodiscard]] constexpr Result<void> pop(ElementType& element) noexcept
 	{
 		// Add deletion mark, this must be done in 2 parts.
 		// First set a temporary mark and check wether or not this element

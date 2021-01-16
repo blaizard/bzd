@@ -6,6 +6,7 @@
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_reference.h"
+#include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 
@@ -22,7 +23,9 @@ private:
 
 // Forward declaration for the "friend" attribute
 template <class T, class E>
-class Result;
+class ResultNonTrivialStorage;
+template <class T, class E>
+class ResultTrivialStorage;
 
 /**
  * Internal class used to create an unexpected result object type.
@@ -35,8 +38,64 @@ public:
 
 private:
 	template <class A, class B>
-	friend class bzd::impl::Result;
+	friend class bzd::impl::ResultNonTrivialStorage;
+	template <class A, class B>
+	friend class bzd::impl::ResultTrivialStorage;
 	E error_;
+};
+
+// Storage
+
+template <class T, class E>
+struct ResultNonTrivialStorage
+{
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+
+	template <class U>
+	constexpr ResultNonTrivialStorage(U&& value) : isError_(false), value_(bzd::forward<U>(value))
+	{
+	}
+
+	template <class U>
+	constexpr ResultNonTrivialStorage(impl::Error<U>&& u) : isError_(true), error_(u.error_)
+	{
+	}
+
+	~ResultNonTrivialStorage()
+	{
+		if (isError_)
+			error_.~E();
+		else
+			value_.~ValueContainer();
+	}
+
+	bool isError_;
+	union {
+		ValueContainer value_;
+		E error_;
+	};
+};
+
+template <class T, class E>
+struct ResultTrivialStorage
+{
+	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+
+	template <class U>
+	constexpr ResultTrivialStorage(U&& value) : isError_(false), value_(bzd::forward<U>(value))
+	{
+	}
+
+	template <class U>
+	constexpr ResultTrivialStorage(impl::Error<U>&& u) : isError_(true), error_(u.error_)
+	{
+	}
+
+	bool isError_;
+	union {
+		ValueContainer value_;
+		E error_;
+	};
 };
 
 template <class T, class E>
@@ -44,16 +103,14 @@ class Result
 {
 private:
 	using Value = bzd::typeTraits::RemoveReference<T>;
-	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+	using StorageType =
+		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T> && bzd::typeTraits::isTriviallyDestructible<E>,
+									 ResultTrivialStorage<T, E>,
+									 ResultNonTrivialStorage<T, E>>;
 
 public:
 	template <class U>
-	constexpr Result(U&& value) : isError_(false), value_(bzd::forward<U>(value))
-	{
-	}
-
-	template <class U>
-	constexpr Result(impl::Error<U>&& u) : isError_(true), error_(u.error_)
+	constexpr Result(U&& value) : storage_{bzd::forward<U>(value)}
 	{
 	}
 
@@ -63,59 +120,47 @@ public:
 	// Move assignment
 	constexpr void operator=(Result<T, E>&& result)
 	{
-		isError_ = result.isError_;
-		if (isError_)
-			error_ = bzd::move(result.error_);
+		storage_.isError_ = result.storage_.isError_;
+		if (storage_.isError_)
+			storage_.error_ = bzd::move(result.storage_.error_);
 		else
-			value_ = bzd::move(result.value_);
+			storage_.value_ = bzd::move(result.storage_.value_);
 	}
 
-	~Result()
-	{
-		if (isError_)
-			error_.~E();
-		else
-			value_.~ValueContainer();
-	}
-
-	constexpr operator bool() const noexcept { return !isError_; }
+	constexpr operator bool() const noexcept { return !storage_.isError_; }
 
 	constexpr const E& error() const
 	{
-		bzd::assert::isTrue(isError_);
-		return error_;
+		bzd::assert::isTrue(storage_.isError_);
+		return storage_.error_;
 	}
 
 	constexpr const Value& operator*() const
 	{
-		bzd::assert::isTrue(!isError_);
-		return value_;
+		bzd::assert::isTrue(!storage_.isError_);
+		return storage_.value_;
 	}
 
 	constexpr Value& operator*()
 	{
-		bzd::assert::isTrue(!isError_);
-		return value_;
+		bzd::assert::isTrue(!storage_.isError_);
+		return storage_.value_;
 	}
 
 	constexpr const Value* operator->() const
 	{
-		bzd::assert::isTrue(!isError_);
-		return &value_;
+		bzd::assert::isTrue(!storage_.isError_);
+		return &storage_.value_;
 	}
 
 	constexpr Value* operator->()
 	{
-		bzd::assert::isTrue(!isError_);
-		return &value_;
+		bzd::assert::isTrue(!storage_.isError_);
+		return &storage_.value_;
 	}
 
 protected:
-	bool isError_;
-	union {
-		ValueContainer value_;
-		E error_;
-	};
+	StorageType storage_;
 };
 
 template <class E>
