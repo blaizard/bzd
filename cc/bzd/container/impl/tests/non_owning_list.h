@@ -37,7 +37,7 @@ public:
 	 * \return The number of node evaluated.
 	 */
 	template <class U>
-	[[nodiscard]] Result<bzd::SizeType> sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
+	[[nodiscard]] bzd::SizeType sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
 		bzd::SizeType counter = 0;
 		auto previous = &this->front_;

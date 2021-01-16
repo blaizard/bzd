@@ -11,7 +11,7 @@ TEST(NonOwningList, simple)
 	EXPECT_FALSE(list.back());
 
 	{
-		const auto result = list.insert(elements[0]);
+		const auto result = list.pushFront(elements[0]);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(list.size(), 1);
 	}
@@ -23,7 +23,7 @@ TEST(NonOwningList, simple)
 	}
 
 	{
-		const auto result = list.remove(elements[0]);
+		const auto result = list.pop(elements[0]);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(list.size(), 0);
 	}

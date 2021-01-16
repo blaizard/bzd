@@ -17,16 +17,16 @@ void insertWhileInsertDoWork()
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::ListElementMultiContainer c{3};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	bzd::ignore = list.insert(a);
+	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsertB([&list, &b]() {
-		const auto result = list.insert<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
+		const auto result = list.pushFront<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
 		EXPECT_TRUE(result);
 	});
 	std::thread workerInsertC([&list, &c]() {
 		typename SyncPoint::template Type<2>();
-		const auto result = list.insert(c);
+		const auto result = list.pushFront(c);
 		EXPECT_TRUE(result);
 		typename SyncPoint::template Type<3>();
 	});
@@ -35,8 +35,7 @@ void insertWhileInsertDoWork()
 	workerInsertC.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 3);
+	EXPECT_EQ(result, 3);
 	EXPECT_EQ(list.size(), 3);
 }
 
@@ -55,16 +54,16 @@ void removeWhileInsertDoWork()
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	bzd::ignore = list.insert(a);
+	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsert([&list, &b]() {
-		const auto result = list.insert<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
+		const auto result = list.pushFront<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
 		EXPECT_TRUE(result);
 	});
 	std::thread workerRemove([&list, &a]() {
 		typename SyncPoint::template Type<2>();
-		const auto result = list.remove(a);
+		const auto result = list.pop(a);
 		EXPECT_TRUE(result);
 		typename SyncPoint::template Type<3>();
 	});
@@ -73,8 +72,7 @@ void removeWhileInsertDoWork()
 	workerRemove.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 1);
+	EXPECT_EQ(result, 1);
 	EXPECT_EQ(list.size(), 1);
 }
 
@@ -93,17 +91,17 @@ void insertWhileRemoveDoWork()
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	bzd::ignore = list.insert(a);
+	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerInsert([&list, &b]() {
 		typename SyncPoint::template Type<2>();
-		const auto result = list.insert(b);
+		const auto result = list.pushFront(b);
 		EXPECT_TRUE(result);
 		typename SyncPoint::template Type<3>();
 	});
 	std::thread workerRemove([&list, &a]() {
-		const auto result = list.remove<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(a);
+		const auto result = list.pop<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(a);
 		EXPECT_TRUE(result);
 	});
 
@@ -111,8 +109,7 @@ void insertWhileRemoveDoWork()
 	workerRemove.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 1);
+	EXPECT_EQ(result, 1);
 	EXPECT_EQ(list.size(), 1);
 }
 
@@ -132,18 +129,18 @@ void removeWhileRemoveLeftDoWork()
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	bzd::ignore = list.insert(a);
-	bzd::ignore = list.insert(b);
+	bzd::ignore = list.pushFront(a);
+	bzd::ignore = list.pushFront(b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerRemove1([&list, &b]() {
 		typename SyncPoint::template Type<2>();
-		const auto result = list.remove(b);
+		const auto result = list.pop(b);
 		EXPECT_TRUE(result);
 		typename SyncPoint::template Type<3>();
 	});
 	std::thread workerRemove2([&list, &a]() {
-		const auto result = list.remove<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(a);
+		const auto result = list.pop<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(a);
 		EXPECT_TRUE(result);
 	});
 
@@ -151,8 +148,7 @@ void removeWhileRemoveLeftDoWork()
 	workerRemove2.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 0);
+	EXPECT_EQ(result, 0);
 	EXPECT_EQ(list.size(), 0);
 }
 
@@ -172,18 +168,18 @@ void removeWhileRemoveRightDoWork()
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	bzd::ignore = list.insert(a);
-	bzd::ignore = list.insert(b);
+	bzd::ignore = list.pushFront(a);
+	bzd::ignore = list.pushFront(b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
 	std::thread workerRemove1([&list, &a]() {
 		typename SyncPoint::template Type<2>();
-		const auto result = list.remove(a);
+		const auto result = list.pop(a);
 		EXPECT_TRUE(result);
 		typename SyncPoint::template Type<3>();
 	});
 	std::thread workerRemove2([&list, &b]() {
-		const auto result = list.remove<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
+		const auto result = list.pop<T, typename SyncPoint::template Type<1>, typename SyncPoint::template Type<4>>(b);
 		EXPECT_TRUE(result);
 	});
 
@@ -191,8 +187,7 @@ void removeWhileRemoveRightDoWork()
 	workerRemove2.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 0);
+	EXPECT_EQ(result, 0);
 	EXPECT_EQ(list.size(), 0);
 }
 
@@ -231,7 +226,7 @@ struct Data
 			inserted[element.value_].store(0);
 			return true;
 		});
-		EXPECT_TRUE(result);
+		bzd::ignore = result;
 
 		// Ensure everything is empty
 		for (bzd::SizeType i = 0; i < nbElements; ++i)
@@ -249,7 +244,7 @@ void workloadInsert(Data<T>* pData)
 	{
 		auto& element = pData->elements[rand() % nbElements];
 
-		const auto result = pData->list.insert(element);
+		const auto result = pData->list.pushFront(element);
 		if (!result)
 		{
 			ASSERT_EQ(result.error(), bzd::impl::ListErrorType::elementAlreadyInserted);
@@ -270,7 +265,7 @@ void workloadRemove(Data<T>* pData)
 	{
 		auto& element = pData->elements[rand() % nbElements];
 
-		const auto result = pData->list.remove(element);
+		const auto result = pData->list.pop(element);
 		if (!result)
 		{
 			ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved ||
@@ -356,11 +351,19 @@ TEST(NonOwningList, insertionStress)
 	std::thread worker2(workloadInsert<bzd::test::ListElement>, &data1);
 	std::thread worker3(workloadRemove<bzd::test::ListElement>, &data1);
 	std::thread worker4(workloadRemove<bzd::test::ListElement>, &data1);
+	std::thread worker5(workloadInsert<bzd::test::ListElement>, &data1);
+	std::thread worker6(workloadInsert<bzd::test::ListElement>, &data1);
+	std::thread worker7(workloadRemove<bzd::test::ListElement>, &data1);
+	std::thread worker8(workloadRemove<bzd::test::ListElement>, &data1);
 
 	worker1.join();
 	worker2.join();
 	worker3.join();
 	worker4.join();
+	worker5.join();
+	worker6.join();
+	worker7.join();
+	worker8.join();
 
 	for (bzd::SizeType i = 0; i < nbElements; ++i)
 	{
