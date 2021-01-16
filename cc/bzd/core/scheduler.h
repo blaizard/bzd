@@ -1,8 +1,8 @@
 #pragma once
 
+#include "bzd/container/impl/non_owning_list.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/queue.h"
-#include "bzd/container/impl/non_owning_list.h"
 #include "bzd/core/assert.h"
 #include "bzd/core/promise.h"
 #include "bzd/core/task.h"

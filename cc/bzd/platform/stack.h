@@ -43,6 +43,13 @@ public: // Exposed functions.
 	 */
 	void shift(Stack& stack) noexcept;
 
+	/**
+	 * Get the current stack pointer.
+	 *
+	 * \return The stack pointer.
+	 */
+	bzd::PtrType getPtr() const noexcept { return stack_; }
+
 protected: // Variables.
 	/**
 	 * The stack pointer.
@@ -73,7 +80,12 @@ public: // Exposed functions.
 	/**
 	 * Taint the stack.
 	 */
-	void taint(UInt8Type pattern = 0xaa) noexcept { bzd::algorithm::fill(stackBase_, stackBase_ + size_, pattern); }
+	void taint(UInt8Type pattern = 0xaa) noexcept;
+
+	/**
+	 * Estimate the maximum usage of the stack by analyziing the taint.
+	 */
+	bzd::SizeType estimateMaxUsage(UInt8Type pattern = 0xaa) const noexcept;
 
 protected: // Constructor.
 	constexpr StackUser(UInt8Type* stack, const SizeType size) noexcept : Stack{}, stackBase_{stack}, size_{size} {}

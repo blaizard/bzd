@@ -77,7 +77,7 @@ public:
 
 	/**
 	 * Tells if the list is empty.
-	 * 
+	 *
 	 * \return True if the list is empty, false otherwise.
 	 */
 	[[nodiscard]] constexpr bool empty() const noexcept { return size_.load() == 0; }

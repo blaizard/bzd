@@ -19,3 +19,26 @@ void bzd::platform::interface::Stack::shift(Stack& stack) noexcept
 {
 	bzd::platform::impl::stackSwitch(&stack_, &stack.stack_);
 }
+
+void bzd::platform::interface::StackUser::taint(UInt8Type pattern) noexcept
+{
+	bzd::algorithm::fill(stackBase_, stackBase_ + size_, pattern);
+}
+
+bzd::SizeType bzd::platform::interface::StackUser::estimateMaxUsage(UInt8Type pattern) const noexcept
+{
+	if (direction_ == Direction::DOWNWARD)
+	{
+		bzd::SizeType i{0};
+		for (; i < size_ && stackBase_[i] == pattern; ++i)
+		{
+		}
+		return size_ - i;
+	}
+
+	bzd::SizeType i{size_ - 1};
+	for (; i >= 0 && stackBase_[i] == pattern; --i)
+	{
+	}
+	return i;
+}
