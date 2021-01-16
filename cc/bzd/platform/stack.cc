@@ -37,7 +37,7 @@ bzd::SizeType bzd::platform::interface::StackUser::estimateMaxUsage(UInt8Type pa
 	}
 
 	bzd::SizeType i{size_ - 1};
-	for (; i >= 0 && stackBase_[i] == pattern; --i)
+	for (; i > 0 && stackBase_[i] == pattern; --i)
 	{
 	}
 	return i;
