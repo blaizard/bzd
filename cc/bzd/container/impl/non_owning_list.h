@@ -41,9 +41,7 @@ enum class ListErrorType
 	/// The element is already inserted into the list and cannot be insterted twice.
 	elementAlreadyInserted,
 	elementAlreadyRemoved,
-	unhandledRaceCondition,
 	notFound,
-	sanityCheck,
 };
 
 /**
@@ -98,7 +96,7 @@ public:
 	 * \return An error in case of failure, void otherwise.
 	 */
 	template <class... Args>
-	[[nodiscard]] Result<void> insert(ElementType& element) noexcept
+	[[nodiscard]] Result<void> pushFront(ElementType& element) noexcept
 	{
 		while (true)
 		{
@@ -177,7 +175,7 @@ public:
 	 * \return An error in case of failure, void otherwise.
 	 */
 	template <class... Args>
-	[[nodiscard]] Result<void> remove(ElementType& element) noexcept
+	[[nodiscard]] Result<void> pop(ElementType& element) noexcept
 	{
 		// Add deletion mark, this must be done in 2 parts.
 		// First set a temporary mark and check wether or not this element
