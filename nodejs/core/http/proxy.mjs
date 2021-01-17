@@ -19,7 +19,7 @@ export default class HttpProxy {
 				// Send X-Forward-* headers
 				xForward: false,
 				beforeRequest: (/*request, response*/) => {},
-				afterRequest: (/*request, response*/) => {},
+				afterRequest: (/*request, response*/) => {}
 			},
 			options
 		);
@@ -78,7 +78,7 @@ export default class HttpProxy {
 				expect: "stream",
 				timeoutMs: this.options.timeoutMs,
 				includeAll: true,
-				throwOnResponseError: false,
+				throwOnResponseError: false
 			});
 
 			await this.options.afterRequest(request, proxyResponse);
@@ -87,7 +87,7 @@ export default class HttpProxy {
 
 			// Pipe the response directly
 			proxyResponse.data.pipe(response, {
-				end: true,
+				end: true
 			});
 
 			// Logger for response

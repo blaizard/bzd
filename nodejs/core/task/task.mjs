@@ -41,7 +41,7 @@ export default class Task {
 				 *
 				 * \param iteration The number of times this task has already been executed.
 				 */
-				isValid: (iteration) => iteration < 1,
+				isValid: (iteration) => iteration < 1
 			},
 			config
 		);

@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
+load("@//tools/bazel_build/toolchains/cc:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
 load("@//tools/bazel_build/toolchains/cc:defs.bzl", "app_toolchain")
 
 # C++ toolchain
@@ -113,7 +113,7 @@ toolchain(
         %{target_compatible_with}
     ],
     toolchain = ":cc_toolchain",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+    toolchain_type = "@rules_cc//cc:toolchain_type",
 )
 
 # Application toolchain

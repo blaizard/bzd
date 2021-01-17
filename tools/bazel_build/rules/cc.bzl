@@ -1,7 +1,9 @@
-load("@rules_cc//cc:defs.bzl", original_cc_binary = "cc_binary", original_cc_library = "cc_library", original_cc_test = "cc_test")
+load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library", original_cc_test = "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
+load("@bazel_skylib//lib:new_sets.bzl", "sets")
+load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 
 def cc_library(deps = [], **kwargs):
     original_cc_library(
@@ -9,10 +11,53 @@ def cc_library(deps = [], **kwargs):
         **kwargs
     )
 
-def cc_binary(**kwargs):
-    original_cc_binary(
-        **kwargs
+def _cc_binary_impl(ctx):
+    # Gather all CC providers from dependencies
+    cc_info_providers = sets.make()
+    for dep in ctx.attr.deps:
+        sets.insert(cc_info_providers, dep[CcInfo])
+    cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
+
+    # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.
+    # See this related issue: https://github.com/bazelbuild/rules_cc/issues/74
+    cc_toolchain = ctx.toolchains["@rules_cc//cc:toolchain_type"]
+    if not hasattr(cc_toolchain, "all_files"):
+        cc_toolchain = find_cc_toolchain(ctx)
+
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features,
+        unsupported_features = ctx.disabled_features,
     )
+
+    linking_outputs = cc_common.link(
+        name = ctx.attr.name,
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        linking_contexts = [cc_info_providers.linking_context],
+        user_link_flags = [],
+    )
+
+    return [DefaultInfo(executable = linking_outputs.executable)]
+
+cc_binary = rule(
+    implementation = _cc_binary_impl,
+    attrs = {
+        "deps": attr.label_list(
+            doc = "C++ dependencies",
+            providers = [CcInfo],
+            default = [],
+        ),
+        "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
+    },
+    executable = True,
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+    ],
+    fragments = ["cpp"],
+)
 
 def cc_test(**kwargs):
     original_cc_test(
@@ -20,35 +65,35 @@ def cc_test(**kwargs):
     )
 
 def _bzd_cc_pack_impl(ctx):
-    binary = ctx.attr.dep
+    binary = ctx.attr.binary
     executable = binary.files_to_run.executable
 
-    # Gather toolchain application information
-    application = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
+    # Gather toolchain information
+    app_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/cc:toolchain_type"].app
 
     # --- Strip the binary
 
-    executable_stripped = ctx.file.dep_stripped
+    binary_stripped = executable  #ctx.file.binary_stripped
 
     # --- Prepare phase
 
-    prepare = application.prepare
+    prepare = app_toolchain.prepare
     if prepare:
         # Run the prepare step only if it is present
-        executable_final = ctx.actions.declare_file("{}.binary.final".format(ctx.attr.name))
+        binary_final = ctx.actions.declare_file("{}.binary.final".format(ctx.attr.name))
         ctx.actions.run(
-            inputs = [executable_stripped],
-            outputs = [executable_final],
+            inputs = [binary_stripped],
+            outputs = [binary_final],
             tools = prepare.data_runfiles.files,
-            arguments = [executable_stripped.path, executable_final.path],
+            arguments = [binary_stripped.path, binary_final.path],
             executable = prepare.files_to_run,
         )
     else:
-        executable_final = executable_stripped
+        binary_final = binary_stripped
 
     # --- Metadata phase
 
-    metadata_list = application.metadatas if application.metadatas else [ctx.attr._metadata_script]
+    metadata_list = app_toolchain.metadatas if app_toolchain.metadatas else [ctx.attr._metadata_script]
     metadata_manifests = [ctx.file._metadata_json]
 
     for index, metadata in enumerate(metadata_list):
@@ -56,10 +101,10 @@ def _bzd_cc_pack_impl(ctx):
         if is_executable:
             metadata_file = ctx.actions.declare_file(".bzd/{}.metadata.{}".format(ctx.attr.name, index))
             ctx.actions.run(
-                inputs = [executable, executable_final],
+                inputs = [executable, binary_final],
                 outputs = [metadata_file],
                 progress_message = "Generating metadata for {}".format(ctx.attr.name),
-                arguments = [executable.path, executable_stripped.path, executable_final.path, metadata_file.path],
+                arguments = [executable.path, binary_stripped.path, binary_final.path, metadata_file.path],
                 tools = metadata.data_runfiles.files,
                 executable = metadata.files_to_run,
             )
@@ -69,13 +114,13 @@ def _bzd_cc_pack_impl(ctx):
 
     # --- Execution phase
 
-    if application.execute:
+    if app_toolchain.execute:
         default_info = sh_binary_wrapper_impl(
             ctx = ctx,
-            binary = application.execute,
+            binary = app_toolchain.execute,
             output = ctx.outputs.executable,
-            extra_runfiles = [executable_final],
-            command = "{{binary}} \"{}\" $@".format(executable_final.short_path),
+            extra_runfiles = [binary_final],
+            command = "{{binary}} \"{}\" $@".format(binary_final.short_path),
         )
 
         # If no executable are set, execute as a normal shell command
@@ -83,17 +128,17 @@ def _bzd_cc_pack_impl(ctx):
         ctx.actions.write(
             output = ctx.outputs.executable,
             is_executable = True,
-            content = "exec {} $@".format(executable_final.short_path),
+            content = "exec {} $@".format(binary_final.short_path),
         )
         default_info = DefaultInfo(
             executable = ctx.outputs.executable,
-            runfiles = ctx.runfiles(files = [executable_final]),
+            runfiles = ctx.runfiles(files = [binary_final]),
         )
 
     return [
         default_info,
         BzdPackageFragment(
-            files = [executable_final],
+            files = [binary_final],
         ),
         BzdPackageMetadataFragment(
             manifests = metadata_manifests,
@@ -103,15 +148,10 @@ def _bzd_cc_pack_impl(ctx):
 _bzd_cc_pack = rule(
     implementation = _bzd_cc_pack_impl,
     attrs = {
-        "dep": attr.label(
+        "binary": attr.label(
             allow_files = False,
             mandatory = True,
             doc = "Label of the binary to be packed",
-        ),
-        "dep_stripped": attr.label(
-            allow_single_file = True,
-            mandatory = True,
-            doc = "Label of the stripped binary to be packed",
         ),
         "_metadata_script": attr.label(
             executable = True,
@@ -160,8 +200,7 @@ def _bzd_cc_macro_impl(is_test, name, deps, **kwargs):
 
     _bzd_cc_pack(
         name = name,
-        dep = name + ".binary",
-        dep_stripped = name + ".binary.stripped",
+        binary = name + ".binary",
     )
 
 """

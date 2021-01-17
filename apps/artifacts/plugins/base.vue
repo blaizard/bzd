@@ -1,7 +1,7 @@
 <script>
 	export default {
 		props: {
-			pathList: { mandatory: true, type: Array },
+			pathList: { mandatory: true, type: Array }
 		},
 		computed: {
 			itemList() {
@@ -30,7 +30,7 @@
 					}
 				}
 				return null;
-			},
-		},
+			}
+		}
 	};
 </script>

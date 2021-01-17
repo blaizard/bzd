@@ -26,14 +26,14 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			/**
 			 * Time in seconds after which the refresh token will expire.
 			 */
-			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60,
+			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60
 		});
 
 		this.validationRefreshToken = new Validation({
 			uid: "mandatory",
 			roles: "mandatory",
 			persistent: "mandatory",
-			session: "mandatory",
+			session: "mandatory"
 		});
 	}
 
@@ -47,7 +47,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				else {
 					resolve({
 						token: token,
-						timeout: expiresIn,
+						timeout: expiresIn
 					});
 				}
 			});
@@ -59,7 +59,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		api.addSchema(APISchema);
 
 		const authentication = this;
-		const generateTokens = async function (uid, roles, persistent, session) {
+		const generateTokens = async function(uid, roles, persistent, session) {
 			// Generates the refresh token and set it to a cookie
 			const refreshToken = await authentication.generateRefreshToken(uid, roles, persistent, session);
 
@@ -73,14 +73,14 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 			this.setCookie("refresh_token", refreshToken.token, {
 				httpOnly: true,
-				maxAge: refreshToken.timeout * 1000,
+				maxAge: refreshToken.timeout * 1000
 			});
 
 			// Generate the access token
 			return await authentication.generateAccessToken({ uid: uid, roles: roles });
 		};
 
-		api.handle("post", "/auth/login", async function (inputs) {
+		api.handle("post", "/auth/login", async function(inputs) {
 			// Verify uid/password pair
 			const userInfo = await authentication.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
@@ -89,11 +89,11 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			return this.setStatus(401, "Unauthorized");
 		});
 
-		api.handle("post", "/auth/logout", async function () {
+		api.handle("post", "/auth/logout", async function() {
 			this.deleteCookie("refresh_token");
 		});
 
-		api.handle("post", "/auth/refresh", async function () {
+		api.handle("post", "/auth/refresh", async function() {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
 				return this.setStatus(401, "Unauthorized");
