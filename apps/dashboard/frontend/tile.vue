@@ -38,13 +38,13 @@
 		props: {
 			description: { type: Object, mandatory: true },
 			uid: { type: String, mandatory: true },
-			edit: { type: Boolean, mandatory: false, default: false },
+			edit: { type: Boolean, mandatory: false, default: false }
 		},
 		directives: {
 			loading: DirectiveLoading,
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {
 				initialized: true,
 				showComponent: true,
@@ -56,7 +56,7 @@
 				link: null,
 				clickable: false,
 				manualName: null,
-				image: null,
+				image: null
 			};
 		},
 		mounted() {
@@ -79,7 +79,7 @@
 			tooltipErrorConfig() {
 				return {
 					type: "text",
-					data: this.errorList.map((e) => String(e)).join(", "),
+					data: this.errorList.map((e) => String(e)).join(", ")
 				};
 			},
 			colorAuto() {
@@ -98,7 +98,7 @@
 					{
 						yellow: "black",
 						white: "black",
-						pink: "black",
+						pink: "black"
 					}[this.colorBackground] || "white"
 				);
 			},
@@ -128,7 +128,7 @@
 				return {
 					container: true,
 					edit: this.edit,
-					clickable: Boolean(this.clickable) || Boolean(this.link) || this.edit,
+					clickable: Boolean(this.clickable) || Boolean(this.link) || this.edit
 				};
 			},
 			tileStyle() {
@@ -149,7 +149,7 @@
 					Colors[this.colorForeground] +
 					";"
 				);
-			},
+			}
 		},
 		methods: {
 			handleError(e) {
@@ -160,7 +160,7 @@
 				try {
 					this.metadata = await this.$api.request("get", "/data", {
 						uid: this.uid,
-						type: this.sourceType,
+						type: this.sourceType
 					});
 					this.showComponent = true;
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
@@ -208,15 +208,15 @@
 					this.metadata = await this.$api.request("post", "/event", {
 						uid: this.uid,
 						type: this.sourceType,
-						event: type,
+						event: type
 					});
 				}
 				catch (e) {
 					this.handleError("Error while triggering event: " + String(e));
 					this.handleColor("red");
 				}
-			},
-		},
+			}
+		}
 	};
 </script>
 

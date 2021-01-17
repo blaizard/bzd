@@ -53,12 +53,12 @@
 
 	export default {
 		props: {
-			metadata: { type: Object, mandatory: true },
+			metadata: { type: Object, mandatory: true }
 		},
 		directives: {
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {};
 		},
 		computed: {
@@ -73,7 +73,7 @@
 			},
 			memoryStyle() {
 				return {
-					width: this.memoryPercent + "%",
+					width: this.memoryPercent + "%"
 				};
 			},
 			memoryTooltip() {
@@ -90,7 +90,7 @@
 			},
 			swapStyle() {
 				return {
-					width: this.swapPercent + "%",
+					width: this.swapPercent + "%"
 				};
 			},
 			swapTooltip() {
@@ -107,7 +107,7 @@
 			},
 			cpuStyle() {
 				return {
-					width: this.cpuPercent + "%",
+					width: this.cpuPercent + "%"
 				};
 			},
 			cpuTooltip() {
@@ -124,7 +124,7 @@
 			},
 			gpuStyle() {
 				return {
-					width: this.gpuPercent + "%",
+					width: this.gpuPercent + "%"
 				};
 			},
 			gpuTooltip() {
@@ -151,7 +151,7 @@
 			},
 			batteryPercent() {
 				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
-			},
+			}
 		},
 		methods: {
 			has(id) {
@@ -222,8 +222,8 @@
 					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
 				});
 				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
-			},
-		},
+			}
+		}
 	};
 </script>
 

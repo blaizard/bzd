@@ -15,13 +15,13 @@
 	export default {
 		props: {
 			amount: { type: Number, mandatory: true },
-			metadata: { type: Object, mandatory: false, default: () => ({}) },
+			metadata: { type: Object, mandatory: false, default: () => ({}) }
 		},
 		directives: {
-			loading: DirectiveLoading,
+			loading: DirectiveLoading
 		},
 		components: {
-			Button,
+			Button
 		},
 		async mounted() {
 			this.stripeMetadata = await this.getMetadata();
@@ -34,13 +34,13 @@
 					fontSmoothing: "antialiased",
 					fontSize: "16px",
 					"::placeholder": {
-						color: Colors.gray,
-					},
+						color: Colors.gray
+					}
 				},
 				invalid: {
 					color: Colors.red,
-					iconColor: Colors.red,
-				},
+					iconColor: Colors.red
+				}
 			};
 			this.card = elements.create("card", { style: style });
 			this.card.mount(this.$refs.card);
@@ -54,7 +54,7 @@
 				stripe: null,
 				card: null,
 				error: null,
-				loading: false,
+				loading: false
 			};
 		},
 		computed: {
@@ -64,7 +64,7 @@
 					const currencyMap = {
 						eur: "€",
 						usd: "$",
-						ron: "L",
+						ron: "L"
 					};
 					const currency = currencyMap[this.stripeMetadata.currency] || null;
 					if (currency) {
@@ -72,13 +72,13 @@
 					}
 				}
 				return message;
-			},
+			}
 		},
 		methods: {
 			async _getStripeJs() {
 				if (!("Stripe" in window)) {
 					const stripeJs = await HttpClient.request("https://js.stripe.com/v3/", {
-						method: "get",
+						method: "get"
 					});
 					eval(stripeJs);
 				}
@@ -102,9 +102,9 @@
 							card: this.card,
 							// eslint-disable-next-line
 							billing_details: {
-								name: "Jenny Rosen",
-							},
-						},
+								name: "Jenny Rosen"
+							}
+						}
 					});
 
 					if (result.error) {
@@ -119,8 +119,8 @@
 				finally {
 					this.loading = false;
 				}
-			},
-		},
+			}
+		}
 	};
 </script>
 

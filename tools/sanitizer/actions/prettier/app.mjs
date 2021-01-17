@@ -15,7 +15,7 @@ async function evaluateFiles(parser, workspace, options) {
 			semi: true,
 			bracketSpacing: true,
 			arrowParens: "always",
-			vueIndentScriptAndStyle: true,
+			vueIndentScriptAndStyle: true
 		});
 		if (formattedContent != content) {
 			await FileSystem.writeFile(path, formattedContent);
@@ -29,28 +29,28 @@ async function evaluateFiles(parser, workspace, options) {
 	let promiseList = [];
 	promiseList.push(
 		evaluateFiles("babel", workspace, {
-			include: ["**.mjs", "**.cjs", "**.js"],
+			include: ["**.mjs", "**.cjs", "**.js"]
 		})
 	);
 	promiseList.push(
 		evaluateFiles("vue", workspace, {
-			include: ["**.vue"],
+			include: ["**.vue"]
 		})
 	);
 	promiseList.push(
 		evaluateFiles("css", workspace, {
-			include: ["**.css"],
+			include: ["**.css"]
 		})
 	);
 	promiseList.push(
 		evaluateFiles("scss", workspace, {
-			include: ["**.scss"],
+			include: ["**.scss"]
 		})
 	);
 	promiseList.push(
 		evaluateFiles("markdown", workspace, {
 			include: ["**.md"],
-			exclude: ["docs/api/**"],
+			exclude: ["docs/api/**"]
 		})
 	);
 
