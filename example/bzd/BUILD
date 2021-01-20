@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//tools/bazel_build/rules:cc.bzl", "cc_binary")
 load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 
 bzd_manifest(
@@ -32,7 +32,7 @@ cc_library(
     ],
 )
 
-bzd_cc_binary(
+cc_binary(
     name = "bzd",
     visibility = ["//visibility:public"],
     deps = [

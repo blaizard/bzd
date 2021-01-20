@@ -1082,75 +1082,52 @@ def _impl(ctx):
         ],
     )
 
-    is_linux = ctx.attr.target_libc != "macosx"
-
-    # TODO(#8303): Mac crosstool should also declare every feature.
-    if is_linux:
-        features = [
-            dependency_file_feature,
-            random_seed_feature,
-            pic_feature,
-            per_object_debug_info_feature,
-            preprocessor_defines_feature,
-            includes_feature,
-            include_paths_feature,
-            fdo_instrument_feature,
-            cs_fdo_instrument_feature,
-            cs_fdo_optimize_feature,
-            thinlto_feature,
-            fdo_prefetch_hints_feature,
-            autofdo_feature,
-            build_interface_libraries_feature,
-            dynamic_library_linker_tool_feature,
-            symbol_counts_feature,
-            shared_flag_feature,
-            linkstamps_feature,
-            output_execpath_flags_feature,
-            runtime_library_search_directories_feature,
-            library_search_directories_feature,
-            archiver_flags_feature,
-            force_pic_flags_feature,
-            fission_support_feature,
-            strip_debug_symbols_feature,
-            coverage_feature,
-            supports_pic_feature,
-        ] + (
-            [
-                supports_start_end_lib_feature,
-            ] if ctx.attr.supports_start_end_lib else []
-        ) + [
-            default_compile_flags_feature,
-            default_link_flags_feature,
-            libraries_to_link_feature,
-            user_link_flags_feature,
-            static_libgcc_feature,
-            fdo_optimize_feature,
-            supports_dynamic_linker_feature,
-            dbg_feature,
-            opt_feature,
-            user_compile_flags_feature,
-            sysroot_feature,
-            unfiltered_compile_flags_feature,
-        ]
-    else:
-        features = [
-            supports_pic_feature,
-        ] + (
-            [
-                supports_start_end_lib_feature,
-            ] if ctx.attr.supports_start_end_lib else []
-        ) + [
-            coverage_feature,
-            default_compile_flags_feature,
-            default_link_flags_feature,
-            fdo_optimize_feature,
-            supports_dynamic_linker_feature,
-            dbg_feature,
-            opt_feature,
-            user_compile_flags_feature,
-            sysroot_feature,
-            unfiltered_compile_flags_feature,
-        ]
+    features = [
+        dependency_file_feature,
+        random_seed_feature,
+        pic_feature,
+        per_object_debug_info_feature,
+        preprocessor_defines_feature,
+        includes_feature,
+        include_paths_feature,
+        fdo_instrument_feature,
+        cs_fdo_instrument_feature,
+        cs_fdo_optimize_feature,
+        thinlto_feature,
+        fdo_prefetch_hints_feature,
+        autofdo_feature,
+        build_interface_libraries_feature,
+        dynamic_library_linker_tool_feature,
+        symbol_counts_feature,
+        shared_flag_feature,
+        linkstamps_feature,
+        output_execpath_flags_feature,
+        runtime_library_search_directories_feature,
+        library_search_directories_feature,
+        archiver_flags_feature,
+        force_pic_flags_feature,
+        fission_support_feature,
+        strip_debug_symbols_feature,
+        coverage_feature,
+        supports_pic_feature,
+    ] + (
+        [
+            supports_start_end_lib_feature,
+        ] if ctx.attr.supports_start_end_lib else []
+    ) + [
+        default_compile_flags_feature,
+        default_link_flags_feature,
+        libraries_to_link_feature,
+        user_link_flags_feature,
+        static_libgcc_feature,
+        fdo_optimize_feature,
+        supports_dynamic_linker_feature,
+        dbg_feature,
+        opt_feature,
+        user_compile_flags_feature,
+        sysroot_feature,
+        unfiltered_compile_flags_feature,
+    ]
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,

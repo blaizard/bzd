@@ -1,0 +1,326 @@
+             VMA              LMA     Size Align Out     In      Symbol
+          2002e0           2002e0       1c     1 .interp
+          2002e0           2002e0       1c     1         <internal>:(.interp)
+          2002fc           2002fc       20     4 .note.ABI-tag
+          2002fc           2002fc       20     4         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o:(.note.ABI-tag)
+          20031c           20031c       20     4 .note.gnu.build-id
+          20031c           20031c       20     4         <internal>:(.note.gnu.build-id)
+          200340           200340      870     8 .dynsym
+          200340           200340      870     8         <internal>:(.dynsym)
+          200bb0           200bb0       b4     2 .gnu.version
+          200bb0           200bb0       b4     2         <internal>:(.gnu.version)
+          200c64           200c64       70     4 .gnu.version_r
+          200c64           200c64       70     4         <internal>:(.gnu.version_r)
+          200cd8           200cd8      1a0     8 .gnu.hash
+          200cd8           200cd8      1a0     8         <internal>:(.gnu.hash)
+          200e78           200e78     14d2     1 .dynstr
+          200e78           200e78     14d2     1         <internal>:(.dynstr)
+          202350           202350      108     8 .rela.dyn
+          202350           202350      108     8         <internal>:(.rela.dyn)
+          202458           202458      240     8 .rela.plt
+          202458           202458      240     8         <internal>:(.rela.plt)
+          2026a0           2026a0      3d6    16 .rodata
+          2026a0           2026a0        4     4         <internal>:(.rodata)
+          2026a4           2026a4      287     1         <internal>:(.rodata)
+          20292b           20292b        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.rodata._ZN3bzd4implL6await_E)
+          20292b           20292b        1     1                 bzd::impl::await_
+          20292c           20292c       93     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.rodata._ZTSN3bzd4impl11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS6_EEEEUlvE_EE)
+          20292c           20292c       93     1                 typeinfo name for bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>
+          2029bf           2029bf       18     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.rodata._ZTSN3bzd4impl7PromiseIvbEE)
+          2029bf           2029bf       18     1                 typeinfo name for bzd::impl::Promise<void, bool>
+          2029d7           2029d7       19     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.rodata._ZTSN3bzd9interface7PromiseE)
+          2029d7           2029d7       19     1                 typeinfo name for bzd::interface::Promise
+          2029f0           2029f0       30    16         <internal>:(.rodata)
+          202a20           202a20       20     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.rodata._ZTSN12_GLOBAL__N_113StdoutChannelE)
+          202a20           202a20       20     1                 typeinfo name for (anonymous namespace)::StdoutChannel
+          202a40           202a40       18     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.rodata._ZTSN3bzd4impl8OChannelIhEE)
+          202a40           202a40       18     1                 typeinfo name for bzd::impl::OChannel<unsigned char>
+          202a58           202a58       1d     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.rodata._ZTSN3bzd4impl15IOChannelCommonE)
+          202a58           202a58       1d     1                 typeinfo name for bzd::impl::IOChannelCommon
+          202a75           202a75        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.rodata._ZN3bzd8platform9interface5Stack10direction_E)
+          202a75           202a75        1     1                 bzd::platform::interface::Stack::direction_
+          202a78           202a78      198     4 .gcc_except_table
+          202a78           202a78      128     4         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.gcc_except_table)
+          202a78           202a78        0     1                 GCC_except_table0
+          202ab0           202ab0        0     1                 GCC_except_table2
+          202ac4           202ac4        0     1                 GCC_except_table3
+          202adc           202adc        0     1                 GCC_except_table4
+          202b24           202b24        0     1                 GCC_except_table5
+          202b38           202b38        0     1                 GCC_except_table6
+          202b5c           202b5c        0     1                 GCC_except_table7
+          202b74           202b74        0     1                 GCC_except_table12
+          202ba0           202ba0       48     4         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.gcc_except_table)
+          202ba0           202ba0        0     1                 GCC_except_table1
+          202bbc           202bbc        0     1                 GCC_except_table3
+          202bd0           202bd0        0     1                 GCC_except_table5
+          202be8           202be8       14     4         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.gcc_except_table)
+          202be8           202be8        0     1                 GCC_except_table0
+          202bfc           202bfc       14     4         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.gcc_except_table)
+          202bfc           202bfc        0     1                 GCC_except_table3
+          202c10           202c10      13c     4 .eh_frame_hdr
+          202c10           202c10      13c     4         <internal>:(.eh_frame_hdr)
+          202d50           202d50      5d4     8 .eh_frame
+          202d50           202d50       5c     1         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o:(.eh_frame+0x0)
+          202db0           202db0       60     1         /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS):(.eh_frame+0x18)
+          202e10           202e10       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x18)
+          202e28           202e28       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x2c)
+          202e40           202e40       2c     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x40)
+          202e70           202e70       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x6c)
+          202e88           202e88       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x80)
+          202ea0           202ea0       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x94)
+          202eb8           202eb8       50     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.eh_frame+0x18)
+          202f08           202f08       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.eh_frame+0x7c)
+          202f20           202f20       80     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.eh_frame+0x18)
+          202fa0           202fa0       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.eh_frame+0x2c)
+          202fd8           202fd8       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.eh_frame+0x18)
+          203010           203010       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.eh_frame+0x4c)
+          203028           203028       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.eh_frame+0x18)
+          203040           203040       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.eh_frame+0x2c)
+          203058           203058       14     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.eh_frame+0x40)
+          203070           203070       20     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.eh_frame+0x54)
+          203090           203090       20     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.eh_frame+0x18)
+          2030b0           2030b0       18     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.eh_frame+0x18)
+          2030c8           2030c8       84     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0xa8)
+          203150           203150       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x12c)
+          203188           203188       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x160)
+          2031c0           2031c0       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x194)
+          2031f8           2031f8       34     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x1c8)
+          203230           203230       2c     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x1fc)
+          203260           203260       38     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.eh_frame+0x228)
+          203298           203298       30     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.eh_frame+0xb0)
+          2032c8           2032c8       28     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.eh_frame+0x80)
+          2032f0           2032f0       30     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.eh_frame+0xa8)
+          204000           204000     1f86    16 .text
+          204000           204000       32    16         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o:(.text)
+          204000           204000       2b     1                 _start
+          204030           204030        2     1                 _dl_relocate_static_pie
+          204040           204040       a7    16         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o:(.text)
+          204040           204040        0     1                 deregister_tm_clones
+          204070           204070        0     1                 register_tm_clones
+          2040b0           2040b0        0     1                 __do_global_dtors_aux
+          2040e0           2040e0        0     1                 frame_dummy
+          2040f0           2040f0       72    16         /usr/lib/x86_64-linux-gnu/libc_nonshared.a(elf-init.oS):(.text)
+          2040f0           2040f0       65     1                 __libc_csu_init
+          204160           204160        2     1                 __libc_csu_fini
+          204170           204170      65a    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text.main)
+          204170           204170      65a     1                 main
+          2047d0           2047d0        b    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text.__clang_call_terminate)
+          2047d0           2047d0        b     1                 __clang_call_terminate
+          2047e0           2047e0      14b    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
+          2047e0           2047e0      14b     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pushFront<>(bzd::interface::Task&)
+          204930           204930      261    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
+          204930           204930      261     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pop<>(bzd::interface::Task&)
+          204ba0           204ba0      150    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m)
+          204ba0           204ba0      150     1                 std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+          204cf0           204cf0      15f    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZNSt3__116__pad_and_outputIcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_)
+          204cf0           204cf0      15f     1                 std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)
+          204e50           204e50      1b8    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_0E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_ENUlvE_8__invokeEv)
+          204e50           204e50      1b8     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()&&)::'lambda'()::__invoke()
+          205010           205010       d2    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4implgtINS0_11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS7_EEEEUlvE_EEEEODaRKNS0_9AwaitTypeEOT_)
+          205010           205010       d2     1                 auto&& bzd::impl::operator><bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()> >(bzd::impl::AwaitType const&, bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>&&)
+          2050f0           2050f0        1    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd9interface7PromiseD2Ev)
+          2050f0           2050f0        1     1                 bzd::interface::Promise::~Promise()
+          205100           205100       62    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS6_EEEEUlvE_E4pollEv)
+          205100           205100       62     1                 bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>::poll()
+          205170           205170        5    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS6_EEEEUlvE_ED0Ev)
+          205170           205170        5     1                 bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>::~PromisePoll()
+          205180           205180        5    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZZN3bzd4TaskIZ4mainE3$_0E15callableWrapperEOS1_PNS_9interface8TaskUserEENUlvE0_8__invokeEv)
+          205180           205180        5     1                 bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda0'()::__invoke()
+          205190           205190      1b8    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_1E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_ENUlvE_8__invokeEv)
+          205190           205190      1b8     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()&&)::'lambda'()::__invoke()
+          205350           205350        5    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZZN3bzd4TaskIZ4mainE3$_1E15callableWrapperEOS1_PNS_9interface8TaskUserEENUlvE0_8__invokeEv)
+          205350           205350        5     1                 bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda0'()::__invoke()
+          205360           205360      113    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.text._ZN3bzd5yieldEv)
+          205360           205360      113     1                 bzd::yield()
+          205480           205480      18d    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.text._ZN3bzd9Scheduler5yieldEv)
+          205480           205480      18d     1                 bzd::Scheduler::yield()
+          205610           205610      105    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.text._ZN3bzd12getSchedulerEv)
+          205610           205610      105     1                 bzd::getScheduler()
+          205720           205720        1    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.text._ZZN3bzd4impl8MainTaskC1EvENUlvE_8__invokeEv)
+          205720           205720        1     1                 bzd::impl::MainTask::MainTask()::'lambda'()::__invoke()
+          205730           205730      3c3    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.text._ZN3bzd6assert4impl7backendERKNS_14SourceLocationEPKcS6_)
+          205730           205730      3c3     1                 bzd::assert::impl::backend(bzd::SourceLocation const&, char const*, char const*)
+          205b00           205b00       18    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.text._ZN3bzd6assert11unreachableENS_14SourceLocationE)
+          205b00           205b00       18     1                 bzd::assert::unreachable(bzd::SourceLocation)
+          205b20           205b20      229    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.text._ZN3bzd8RegistryINS_4impl8OChannelIhEEE3getERKNS1_10StringViewIcNS_4SpanIKcEEEE)
+          205b20           205b20      229     1                 bzd::Registry<bzd::impl::OChannel<unsigned char> >::get(bzd::impl::StringView<char, bzd::Span<char const> > const&)
+          205d50           205d50       13    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.text._ZN3bzd8platform9interface5Stack5shiftERS2_)
+          205d50           205d50       13     1                 bzd::platform::interface::Stack::shift(bzd::platform::interface::Stack&)
+          205d70           205d70       1c    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.text._ZN3bzd8platform9interface9StackUser5taintEh)
+          205d70           205d70       1c     1                 bzd::platform::interface::StackUser::taint(unsigned char)
+          205d90           205d90       5f    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.text._ZNK3bzd8platform9interface9StackUser16estimateMaxUsageEh)
+          205d90           205d90       5f     1                 bzd::platform::interface::StackUser::estimateMaxUsage(unsigned char) const
+          205df0           205df0       25    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.text._ZN3bzd8platform8getTicksEv)
+          205df0           205df0       25     1                 bzd::platform::getTicks()
+          205e20           205e20        4    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.text._ZN3bzd8platform9msToTicksENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS5_EEE)
+          205e20           205e20        4     1                 bzd::platform::msToTicks(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)
+          205e30           205e30        3    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.text._ZN3bzd8platform9ticksToMsENS0_9ClockTickE)
+          205e30           205e30        3     1                 bzd::platform::ticksToMs(bzd::platform::ClockTick)
+          205e40           205e40        8    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.text._ZN3bzd8platform6getOutEv)
+          205e40           205e40        8     1                 bzd::platform::getOut()
+          205e50           205e50        f    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.text._ZN3bzd4impl15IOChannelCommon7connectEv)
+          205e50           205e50        f     1                 bzd::impl::IOChannelCommon::connect()
+          205e60           205e60        f    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.text._ZN3bzd4impl15IOChannelCommon10disconnectEv)
+          205e60           205e60        f     1                 bzd::impl::IOChannelCommon::disconnect()
+          205e70           205e70       3c    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.text._ZN12_GLOBAL__N_113StdoutChannel5writeERKN3bzd4SpanIKhEE)
+          205e70           205e70       3c     1                 (anonymous namespace)::StdoutChannel::write(bzd::Span<unsigned char const> const&)
+          205eb0           205eb0       2c    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.text._ZN3bzd4impl8OChannelIhE5writeERKh)
+          205eb0           205eb0       2c     1                 bzd::impl::OChannel<unsigned char>::write(unsigned char const&)
+          205ee0           205ee0        e    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.text._ZN3bzd8platform5panicEv)
+          205ee0           205ee0        e     1                 bzd::platform::panic()
+          205ef0           205ef0       64    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.text)
+          205ef0           205ef0        0     1                 stackSwitch
+          205f60           205f60       26    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.text._ZN3bzd8platform9interface9StackUser5resetEPFvvE)
+          205f60           205f60       26     1                 bzd::platform::interface::StackUser::reset(void (*)())
+          205f88           205f88       17     4 .init
+          205f88           205f88       12     4         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crti.o:(.init)
+          205f88           205f88        0     1                 _init
+          205f9a           205f9a        5     1         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crtn.o:(.init)
+          205fa0           205fa0        9     4 .fini
+          205fa0           205fa0        4     4         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crti.o:(.fini)
+          205fa0           205fa0        0     1                 _fini
+          205fa4           205fa4        5     1         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crtn.o:(.fini)
+          205fb0           205fb0      190    16 .plt
+          205fb0           205fb0      190    16         <internal>:(.plt)
+          206140           206140       68     8 .tbss
+          206140           206140       60     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.tbss._ZZN3bzd20SingletonThreadLocalINS_9SchedulerEE11getInstanceEvE8instance)
+               0                0       60     1                 bzd::SingletonThreadLocal<bzd::Scheduler>::getInstance()::instance
+          2061a0           2061a0        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.tbss._ZGVZN3bzd20SingletonThreadLocalINS_9SchedulerEE11getInstanceEvE8instance)
+              60               60        8     1                 guard variable for bzd::SingletonThreadLocal<bzd::Scheduler>::getInstance()::instance
+          207000           207000        8     8 .fini_array
+          207000           207000        8     8         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o:(.fini_array)
+          207000           207000        0     1                 __do_global_dtors_aux_fini_array_entry
+          207008           207008        8     8 .init_array
+          207008           207008        8     8         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o:(.init_array)
+          207008           207008        0     1                 __frame_dummy_init_array_entry
+          207010           207010       d8     8 .data.rel.ro
+          207010           207010       28     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data.rel.ro._ZTVN3bzd4impl11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS6_EEEEUlvE_EE)
+          207010           207010       28     1                 vtable for bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>
+          207038           207038       10     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data.rel.ro._ZTIN3bzd9interface7PromiseE)
+          207038           207038       10     1                 typeinfo for bzd::interface::Promise
+          207048           207048       18     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data.rel.ro._ZTIN3bzd4impl7PromiseIvbEE)
+          207048           207048       18     1                 typeinfo for bzd::impl::Promise<void, bool>
+          207060           207060       18     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data.rel.ro._ZTIN3bzd4impl11PromisePollIvbZNS_5delayENS_10MultipleOfINS_9NamedTypeIiNS_5units9SecondTagEJNS_10ArithmeticEEEENS_5RatioILm1ELm1000EEEJS6_EEEEUlvE_EE)
+          207060           207060       18     1                 typeinfo for bzd::impl::PromisePoll<void, bool, bzd::delay(bzd::MultipleOf<bzd::NamedType<int, bzd::units::SecondTag, bzd::Arithmetic>, bzd::Ratio<1ul, 1000ul>, bzd::Arithmetic>)::'lambda'()>
+          207078           207078       30     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.data.rel.ro._ZTVN12_GLOBAL__N_113StdoutChannelE)
+          207078           207078       30     1                 vtable for (anonymous namespace)::StdoutChannel
+          2070a8           2070a8       10     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.data.rel.ro._ZTIN3bzd4impl15IOChannelCommonE)
+          2070a8           2070a8       10     1                 typeinfo for bzd::impl::IOChannelCommon
+          2070b8           2070b8       18     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.data.rel.ro._ZTIN3bzd4impl8OChannelIhEE)
+          2070b8           2070b8       18     1                 typeinfo for bzd::impl::OChannel<unsigned char>
+          2070d0           2070d0       18     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.data.rel.ro._ZTIN12_GLOBAL__N_113StdoutChannelE)
+          2070d0           2070d0       18     1                 typeinfo for (anonymous namespace)::StdoutChannel
+          2070e8           2070e8      2b0     8 .dynamic
+          2070e8           2070e8      2b0     8         <internal>:(.dynamic)
+          207398           207398       48     8 .got
+          207398           207398       48     8         <internal>:(.got)
+          2073e0           2073e0       d8     8 .got.plt
+          2073e0           2073e0       d8     8         <internal>:(.got.plt)
+          2074b8           2074b8        0     1 .bss.rel.ro
+          2074b8           2074b8        0     1         <internal>:(.bss.rel.ro)
+          208000           208000     4e68     8 .data
+          208000           208000        4     1         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o:(.data)
+          208000           208000        0     1                 data_start
+          208000           208000        0     1                 __data_start
+          208008           208008     2728     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data._ZZ4mainE6stack1)
+          208008           208008     2728     1                 main::stack1
+          20a730           20a730     2728     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data._ZZ4mainE6stack2)
+          20a730           20a730     2728     1                 main::stack2
+          20ce58           20ce58        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.data.DW.ref.__gxx_personality_v0)
+          20ce58           20ce58        8     1                 DW.ref.__gxx_personality_v0
+          20ce60           20ce60        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.data._ZZN3bzd8platform6getOutEvE7stdout_)
+          20ce60           20ce60        8     1                 bzd::platform::getOut()::stdout_
+          20ce68           20ce68        0     8 .tm_clone_table
+          20ce68           20ce68        0     8         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o:(.tm_clone_table)
+          20ce68           20ce68        0     1                 __TMC_LIST__
+          20ce68           20ce68        0     8         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtend.o:(.tm_clone_table)
+          20ce68           20ce68        0     1                 __TMC_END__
+          20ce68           20ce68       68     8 .bss
+          20ce68           20ce68        1     1         /usr/lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o:(.bss)
+          20ce68           20ce68        1     1                 completed.7698
+          20ce70           20ce70        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZGVZN3bzd4TaskIZ4mainE3$_0E15callableWrapperEOS1_PNS_9interface8TaskUserEE4bind)
+          20ce70           20ce70        8     1                 guard variable for bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::bind
+          20ce78           20ce78        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_0E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E4used)
+          20ce78           20ce78        1     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()&&)::used
+          20ce80           20ce80       10     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_0E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E8callable)
+          20ce80           20ce80       10     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()&&)::callable
+          20ce90           20ce90        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZGVZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_0E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E8callable)
+          20ce90           20ce90        8     1                 guard variable for auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_0>::callableWrapper(main::$_0&&, bzd::interface::TaskUser*)::'lambda'()&&)::callable
+          20ce98           20ce98        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZGVZN3bzd4TaskIZ4mainE3$_1E15callableWrapperEOS1_PNS_9interface8TaskUserEE4bind)
+          20ce98           20ce98        8     1                 guard variable for bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::bind
+          20cea0           20cea0        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_1E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E4used)
+          20cea0           20cea0        1     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()&&)::used
+          20cea8           20cea8       10     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_1E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E8callable)
+          20cea8           20cea8       10     1                 auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()&&)::callable
+          20ceb8           20ceb8        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.bss._ZGVZN3bzd4impl8FunctionIvJEE19makeFunctionPointerIZNS_4TaskIZ4mainE3$_1E15callableWrapperEOS5_PNS_9interface8TaskUserEEUlvE_EEDaOT_E8callable)
+          20ceb8           20ceb8        8     1                 guard variable for auto bzd::impl::Function<void>::makeFunctionPointer<bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()>(bzd::Task<main::$_1>::callableWrapper(main::$_1&&, bzd::interface::TaskUser*)::'lambda'()&&)::callable
+          20cec0           20cec0        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.bss._ZZN3bzd4impl8RegistryINS0_8OChannelIhEEE3getEPNS0_3MapINS0_10StringViewIcNS_4SpanIKcEEEEPS3_EEE8instance)
+          20cec0           20cec0        8     1                 bzd::impl::Registry<bzd::impl::OChannel<unsigned char> >::get(bzd::impl::Map<bzd::impl::StringView<char, bzd::Span<char const> >, bzd::impl::OChannel<unsigned char>*>*)::instance
+          20cec8           20cec8        8     8         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.bss._ZGVZN3bzd4impl8RegistryINS0_8OChannelIhEEE3getEPNS0_3MapINS0_10StringViewIcNS_4SpanIKcEEEEPS3_EEE8instance)
+          20cec8           20cec8        8     1                 guard variable for bzd::impl::Registry<bzd::impl::OChannel<unsigned char> >::get(bzd::impl::Map<bzd::impl::StringView<char, bzd::Span<char const> >, bzd::impl::OChannel<unsigned char>*>*)::instance
+          20ced0           20ced0        0     1         <internal>:(.bss)
+               0                0       69     1 .comment
+               0                0       69     1         <internal>:(.comment)
+               0                0    19bbc     1 .debug_str
+               0                0    19bbc     1         <internal>:(.debug_str)
+               0                0     9046     1 .debug_loc
+               0                0     48df     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_loc)
+            48df             48df     33e6     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_loc)
+            7cc5             7cc5      ea6     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_loc)
+            8b6b             8b6b      197     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_loc)
+            8d02             8d02      2db     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_loc)
+            8fdd             8fdd       69     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_loc)
+               0                0     1e7b     1 .debug_abbrev
+               0                0      8d6     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_abbrev)
+             8d6              8d6      61f     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_abbrev)
+             ef5              ef5      4cb     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_abbrev)
+            13c0             13c0      1be     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_abbrev)
+            157e             157e      30b     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.debug_abbrev)
+            1889             1889      3c6     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_abbrev)
+            1c4f             1c4f       30     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.debug_abbrev)
+            1c7f             1c7f       28     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_abbrev)
+            1ca7             1ca7      1d4     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_abbrev)
+               0                0    21779     1 .debug_info
+               0                0     dae9     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_info)
+            dae9             dae9     7f08     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_info)
+           159f1            159f1     53ad     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_info)
+           1ad9e            1ad9e      5ca     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_info)
+           1b368            1b368     30b8     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.debug_info)
+           1e420            1e420     2c4f     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_info)
+           2106f            2106f       50     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.debug_info)
+           210bf            210bf       ad     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_info)
+           2116c            2116c      60d     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_info)
+               0                0     1a00     1 .debug_ranges
+               0                0      cd0     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_ranges)
+             cd0              cd0      710     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_ranges)
+            13e0             13e0      4e0     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_ranges)
+            18c0             18c0       a0     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_ranges)
+            1960             1960       40     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.debug_ranges)
+            19a0             19a0       60     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_ranges)
+               0                0        8     1 .debug_macinfo
+               0                0        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_macinfo)
+               1                1        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_macinfo)
+               2                2        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_macinfo)
+               3                3        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_macinfo)
+               4                4        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.debug_macinfo)
+               5                5        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_macinfo)
+               6                6        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.debug_macinfo)
+               7                7        1     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_macinfo)
+               0                0     3158     1 .debug_line
+               0                0     122f     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.debug_line)
+            122f             122f      a0c     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o):(.debug_line)
+            1c3b             1c3b      8f9     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o):(.debug_line)
+            2534             2534      253     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/libplatform.a(stack.pic.o):(.debug_line)
+            2787             2787      29a     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/clock/std/libstd.lo(std.pic.o):(.debug_line)
+            2a21             2a21      480     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/out/std/libstd.lo(std.pic.o):(.debug_line)
+            2ea1             2ea1       59     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/panic/exit/libexit.lo(exit.pic.o):(.debug_line)
+            2efa             2efa       77     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_line)
+            2f71             2f71      1e7     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_line)
+               0                0       30     1 .debug_aranges
+               0                0       30     1         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/cc/bzd/platform/stack/x86_64_system_v/libx86_64_system_v.a(stack.pic.o):(.debug_aranges)
+               0                0      e28     8 .symtab
+               0                0      e28     8         <internal>:(.symtab)
+               0                0      1b1     1 .shstrtab
+               0                0      1b1     1         <internal>:(.shstrtab)
+               0                0     18b2     1 .strtab
+               0                0     18b2     1         <internal>:(.strtab)
