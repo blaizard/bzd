@@ -86,17 +86,8 @@ pipeline
 					{
 						sh "./sanitize.sh"
 					}
-				}
-			}
-		}
-		/**
-		 * Run stress tests
-		 */
-		stage("Stress")
-		{
-			parallel
-			{
-				stage("linux_x86_64_clang")
+				},
+				stage("Stress")
 				{
 					steps
 					{

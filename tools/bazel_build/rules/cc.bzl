@@ -1,22 +1,29 @@
-load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library", original_cc_test = "cc_test")
+load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest", "bzd_manifest_build")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
+load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 
-def cc_library(deps = [], **kwargs):
-    original_cc_library(
-        deps = deps + ["//cc:includes"],
-        **kwargs
-    )
+def _collect_libs(cc_linking):
+    libs = sets.make()
+    for li in cc_linking.linker_inputs.to_list():
+        for library_to_link in li.libraries:
+            for library in [library_to_link.static_library, library_to_link.pic_static_library]:
+                if library:
+                    sets.insert(libs, library)
+    return sets.to_list(libs)
 
-def _cc_binary_impl(ctx):
-    # Gather all CC providers from dependencies
+def _cc_link_impl(ctx):
+    # Gather all CC providers from all dependencies
     cc_info_providers = sets.make()
     for dep in ctx.attr.deps:
         sets.insert(cc_info_providers, dep[CcInfo])
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
+
+    # Build the list of library files
+    libs = _collect_libs(cc_info_providers.linking_context)
 
     # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.
     # See this related issue: https://github.com/bazelbuild/rules_cc/issues/74
@@ -31,37 +38,122 @@ def _cc_binary_impl(ctx):
         unsupported_features = ctx.disabled_features,
     )
 
-    linking_outputs = cc_common.link(
-        name = ctx.attr.name,
-        actions = ctx.actions,
-        feature_configuration = feature_configuration,
+    binary_file = ctx.actions.declare_file(ctx.label.name)
+    link_variables = cc_common.create_link_variables(
         cc_toolchain = cc_toolchain,
-        linking_contexts = [cc_info_providers.linking_context],
-        user_link_flags = [],
+        feature_configuration = feature_configuration,
+        output_file = binary_file.path,
     )
 
-    return [DefaultInfo(executable = linking_outputs.executable)]
+    args = cc_common.get_memory_inefficient_command_line(
+        feature_configuration = feature_configuration,
+        action_name = ACTION_NAMES.cpp_link_executable,
+        variables = link_variables,
+    )
 
-cc_binary = rule(
-    implementation = _cc_binary_impl,
-    attrs = {
-        "deps": attr.label_list(
-            doc = "C++ dependencies",
-            providers = [CcInfo],
-            default = [],
+    linker_path = cc_common.get_tool_for_action(
+        feature_configuration = feature_configuration,
+        action_name = ACTION_NAMES.cpp_link_executable,
+    )
+
+    env = cc_common.get_environment_variables(
+        feature_configuration = feature_configuration,
+        action_name = ACTION_NAMES.cpp_link_executable,
+        variables = link_variables,
+    )
+
+    # Run the linker stage.
+    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
+    ctx.actions.run(
+        executable = linker_path,
+        arguments = args + ["-Wl,-Map={}".format(map_file.path)] + [f.path for f in libs],
+        env = env,
+        inputs = depset(
+            direct = libs,
+            transitive = [
+                cc_toolchain.all_files,
+            ],
         ),
-        "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
-    },
-    executable = True,
-    toolchains = [
-        "@rules_cc//cc:toolchain_type",
-    ],
-    fragments = ["cpp"],
-)
+        outputs = [binary_file, map_file],
+    )
 
-def cc_test(**kwargs):
-    original_cc_test(
+    # Analyze the map file.
+    metadata_file = ctx.actions.declare_file(".bzd/{}.metadata.map".format(ctx.attr.name))
+    script = ctx.attr._map_analyzer_script
+    ctx.actions.run(
+        inputs = [map_file],
+        outputs = [metadata_file],
+        progress_message = "Generating metadata for {}".format(ctx.attr.name),
+        arguments = [map_file.path, metadata_file.path],
+        tools = script.data_runfiles.files,
+        executable = script.files_to_run,
+    )
+
+    return [
+        DefaultInfo(executable = binary_file),
+        BzdPackageFragment(
+            files = [binary_file],
+        ),
+        BzdPackageMetadataFragment(
+            manifests = [metadata_file],
+        ),
+    ]
+
+def _cc_link(is_test):
+    return rule(
+        implementation = _cc_link_impl,
+        attrs = {
+            "deps": attr.label_list(
+                doc = "C++ dependencies",
+                providers = [CcInfo],
+                default = [],
+            ),
+            "_map_analyzer_script": attr.label(
+                executable = True,
+                cfg = "host",
+                default = Label("//tools/bazel_build/rules/assets/cc/map_analyzer"),
+            ),
+            "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
+        },
+        executable = True,
+        test = is_test,
+        toolchains = [
+            "@rules_cc//cc:toolchain_type",
+        ],
+        fragments = ["cpp"],
+    )
+
+cc_link_binary = _cc_link(is_test = False)
+cc_link_test = _cc_link(is_test = True)
+
+def cc_library(deps = [], **kwargs):
+    original_cc_library(
+        deps = deps + ["//cc:includes"],
         **kwargs
+    )
+
+def cc_binary(name, tags = [], **kwags):
+    cc_library(
+        name = name + ".library",
+        tags = tags + ["cc"],
+        **kwags
+    )
+    cc_link_binary(
+        name = name,
+        tags = tags + ["cc"],
+        deps = [name + ".library"],
+    )
+
+def cc_test(name, tags = [], **kwags):
+    cc_library(
+        name = name + ".library",
+        tags = tags + ["cc"],
+        **kwags
+    )
+    cc_link_test(
+        name = name,
+        tags = tags + ["cc"],
+        deps = [name + ".library"],
     )
 
 def _bzd_cc_pack_impl(ctx):
