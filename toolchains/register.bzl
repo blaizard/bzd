@@ -11,7 +11,7 @@ def toolchains_register():
     load_linux_x86_64_python()
     load_linux_x86_64_yarn()
 
-    # Register default app toolchain
+    # Register default binary toolchain
     native.register_toolchains(
-        "//toolchains:app_toolchain",
+        "//toolchains:binary_toolchain",
     )

@@ -1,6 +1,6 @@
-load("//tools/bazel_build/rules:cc.bzl", "cc_test")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
-[cc_test(
+[bzd_cc_test(
     name = path.replace(".cc", ""),
     srcs = [
         path,

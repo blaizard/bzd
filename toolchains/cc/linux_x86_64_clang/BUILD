@@ -1,6 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
-cc_test(
+bzd_cc_test(
     name = "test",
     srcs = select({
         "@linux_x86_64_clang//:target": ["clang_test.cc"],

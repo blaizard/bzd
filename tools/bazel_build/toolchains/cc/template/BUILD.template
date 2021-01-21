@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@//tools/bazel_build/toolchains/cc:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
-load("@//tools/bazel_build/toolchains/cc:defs.bzl", "app_toolchain")
+load("@//tools/bazel_build/toolchains/binary:defs.bzl", "binary_toolchain")
 
 # C++ toolchain
 
@@ -116,15 +116,15 @@ toolchain(
     toolchain_type = "@rules_cc//cc:toolchain_type",
 )
 
-# Application toolchain
+# Binary toolchain
 
-app_toolchain(
-    name = "app",
-    %{app_kwargs}
+binary_toolchain(
+    name = "binary",
+    %{binary_kwargs}
 )
 
 toolchain(
-    name = "app_toolchain",
+    name = "binary_toolchain",
     exec_compatible_with = [
         ":compiler",
         %{exec_compatible_with}
@@ -133,9 +133,11 @@ toolchain(
         ":compiler",
         %{target_compatible_with}
     ],
-    toolchain = ":app",
-    toolchain_type = "@//tools/bazel_build/toolchains/cc:toolchain_type",
+    toolchain = ":binary",
+    toolchain_type = "@//tools/bazel_build/toolchains/binary:toolchain_type",
 )
+
+# Platform definition
 
 constraint_value(
     name = "compiler",

@@ -86,7 +86,7 @@ pipeline
 					{
 						sh "./sanitize.sh"
 					}
-				},
+				}
 				stage("Stress")
 				{
 					steps

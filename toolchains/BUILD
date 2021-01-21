@@ -1,17 +1,17 @@
-load("//tools/bazel_build/toolchains/cc:defs.bzl", "app_toolchain")
+load("//tools/bazel_build/toolchains/binary:defs.bzl", "binary_toolchain")
 
-app_toolchain(
-    name = "app",
+binary_toolchain(
+    name = "binary",
 )
 
 toolchain(
-    name = "app_toolchain",
+    name = "binary_toolchain",
     exec_compatible_with = [
         "@platforms//os:linux",
     ],
     target_compatible_with = [
         "@platforms//os:linux",
     ],
-    toolchain = ":app",
-    toolchain_type = "//tools/bazel_build/toolchains/cc:toolchain_type",
+    toolchain = ":binary",
+    toolchain_type = "//tools/bazel_build/toolchains/binary:toolchain_type",
 )

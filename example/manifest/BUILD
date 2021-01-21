@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest")
 
 bzd_manifest(
@@ -8,7 +8,7 @@ bzd_manifest(
     ],
 )
 
-cc_binary(
+bzd_cc_binary(
     name = "manifest",
     srcs = [
         "main.cc",
