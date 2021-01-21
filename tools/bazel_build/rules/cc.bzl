@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_test", original_cc_library = "cc_library")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
