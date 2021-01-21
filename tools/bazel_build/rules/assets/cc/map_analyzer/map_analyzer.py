@@ -26,9 +26,7 @@ if __name__ == '__main__':
 	data.filter(".xt.lit*")
 	data.filter(".xt.prop*")
 
-	final = {"units": data.getByUnits(), "sections": data.getBySections()}
-
 	with open(args.output, "w+") as f:
-		f.write(json.dumps(final))
+		f.write(json.dumps({"size_groups": {"units": data.getByUnits(), "sections": data.getBySections()}}))
 
 	sys.exit(0)

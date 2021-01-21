@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:cc.bzl", "cc_binary", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary", "cc_library")
 
 cc_library(
     name = "lib",
@@ -10,7 +10,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+bzd_cc_binary(
     name = "channel",
     visibility = ["//visibility:public"],
     deps = [

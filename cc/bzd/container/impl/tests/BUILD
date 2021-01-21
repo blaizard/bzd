@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:cc.bzl", "cc_test")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
 cc_library(
     name = "non_owning_list_lib",
@@ -14,7 +14,7 @@ cc_library(
     ],
 )
 
-cc_test(
+bzd_cc_test(
     name = "non_owning_list",
     srcs = [
         "non_owning_list.cc",

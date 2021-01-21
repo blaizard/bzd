@@ -35,11 +35,18 @@ def printMetadataCC(data: Mapping[str, Any]) -> None:
 		print(" - Size ({})".format(groupName))
 		groups: List[List[str]] = []
 		size = 0
-		for unit, partSize in group.items():
+		for unit, item in group.items():
+
+			if isinstance(item, int):
+				partSize = item
+			elif isinstance(item, dict):
+				partSize = sum([value for value in item.values()])
+
 			groups.append([unit, partSize])
 			size += partSize
 		size = data.get("size", size)
 		groups.sort(key=lambda item: item[1], reverse=True)
+
 		# Update the percentage
 		for line in groups:
 			line.append("{:.1%}".format(int(line[1]) / size))

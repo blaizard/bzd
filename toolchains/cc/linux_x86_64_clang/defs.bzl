@@ -4,10 +4,10 @@ load("//toolchains/cc:defs.bzl", "COPTS_CLANG", "LINKOPTS_CLANG")
 
 def _load_linux_x86_64_clang_9_0_0(name):
     # Load dependencies
-    clang_package_name = "linux_x86_64_clang_9_0_0"
+    package_name = "linux_x86_64_clang_9_0_0"
     http_archive(
-        name = clang_package_name,
-        build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(clang_package_name),
+        name = package_name,
+        build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(package_name),
         urls = [
             "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
         ],
@@ -35,17 +35,17 @@ def _load_linux_x86_64_clang_9_0_0(name):
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
-            "include/c++/v1".format(clang_package_name),
-            "lib/clang/9.0.0/include".format(clang_package_name),
+            "include/c++/v1".format(package_name),
+            "lib/clang/9.0.0/include".format(package_name),
         ],
         "system_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
-            "external/{}/include/c++/v1".format(clang_package_name),
-            "external/{}/lib/clang/9.0.0/include".format(clang_package_name),
+            "external/{}/include/c++/v1".format(package_name),
+            "external/{}/lib/clang/9.0.0/include".format(package_name),
         ],
         "linker_dirs": [
-            "external/{}/lib".format(clang_package_name),
+            "external/{}/lib".format(package_name),
         ],
         "compile_flags": [
             "-std=c++17",
@@ -97,7 +97,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-lgcc",
             "-Wl,-z,relro,-z,now",
             "-no-canonical-prefixes",
-            "-Wl,-rpath=%{{absolute_external}}/{}/lib".format(clang_package_name),
+            "-Wl,-rpath=%{{absolute_external}}/{}/lib".format(package_name),
 
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",
@@ -117,23 +117,23 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-fprofile-arcs",
         ],
         "dynamic_runtime_libs": [
-            "@{}//:dynamic_libraries".format(clang_package_name),
+            "@{}//:dynamic_libraries".format(package_name),
         ],
         "static_runtime_libs": [
-            "@{}//:static_libraries".format(clang_package_name),
+            "@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [
-            "@{}//:includes".format(clang_package_name),
-            "@{}//:bin".format(clang_package_name),
+            "@{}//:includes".format(package_name),
+            "@{}//:bin".format(package_name),
         ],
-        "bin_ar": "external/{}/bin/llvm-ar".format(clang_package_name),
-        "bin_as": "external/{}/bin/llvm-as".format(clang_package_name),
-        "bin_cc": "external/{}/bin/clang".format(clang_package_name),
-        "bin_cpp": "external/{}/bin/clang".format(clang_package_name),
-        "bin_cov": "external/{}/bin/llvm-cov".format(clang_package_name),
-        "bin_objdump": "external/{}/bin/llvm-objdump".format(clang_package_name),
-        "bin_ld": "external/{}/bin/clang++".format(clang_package_name),
-        "bin_strip": "external/{}/bin/llvm-strip".format(clang_package_name),
+        "bin_ar": "external/{}/bin/llvm-ar".format(package_name),
+        "bin_as": "external/{}/bin/llvm-as".format(package_name),
+        "bin_cc": "external/{}/bin/clang".format(package_name),
+        "bin_cpp": "external/{}/bin/clang".format(package_name),
+        "bin_cov": "external/{}/bin/llvm-cov".format(package_name),
+        "bin_objdump": "external/{}/bin/llvm-objdump".format(package_name),
+        "bin_ld": "external/{}/bin/clang++".format(package_name),
+        "bin_strip": "external/{}/bin/llvm-strip".format(package_name),
     }
 
     toolchain_maker(

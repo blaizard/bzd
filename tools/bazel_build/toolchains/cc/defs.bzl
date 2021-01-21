@@ -1,54 +1,17 @@
-AppInfo = provider(
-    doc = "blah blah.",
-    fields = ["prepare", "metadatas", "execute"],
-)
-
-def _app_toolchain_impl(ctx):
-    toolchain_info = platform_common.ToolchainInfo(
-        app = AppInfo(
-            prepare = ctx.attr.prepare,
-            metadatas = ctx.attr.metadatas,
-            execute = ctx.attr.execute,
-        ),
-    )
-    return [toolchain_info]
-
-"""
-Defines an application toolchain.
-An application toolchain extends a compiler toolchain but added functionalities
-like execute, profile...
-"""
-app_toolchain = rule(
-    implementation = _app_toolchain_impl,
-    attrs = {
-        "prepare": attr.label(
-            executable = True,
-            cfg = "host",
-        ),
-        "metadatas": attr.label_list(
-            allow_files = True,
-        ),
-        "execute": attr.label(
-            executable = True,
-            cfg = "host",
-        ),
-    },
-)
-
 def _impl(ctx):
     # Absolute path of the external directory (used for linking librairies for example)
     absolute_external = ctx.execute(["pwd"], working_directory = "..").stdout.rstrip()
 
     alias_template = "alias(name = \"{}\", actual = \"{}\")"
 
-    # Build the application toolchain arguments
-    app_kwargs = []
+    # Build the binary toolchain arguments
+    binary_kwargs = []
     if ctx.attr.app_prepare:
-        app_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
+        binary_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
     if ctx.attr.app_metadatas:
-        app_kwargs.append("metadatas = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadatas])))
+        binary_kwargs.append("metadatas = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadatas])))
     if ctx.attr.app_execute:
-        app_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
+        binary_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
 
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
@@ -74,7 +37,7 @@ def _impl(ctx):
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
-        "%{app_kwargs}": "\n".join(app_kwargs),
+        "%{binary_kwargs}": "\n".join(binary_kwargs),
         "%{coverage_compile_flags}": "\n".join(["'{}',".format(t) for t in ctx.attr.coverage_compile_flags]),
         "%{coverage_link_flags}": "\n".join(["'{}',".format(t) for t in ctx.attr.coverage_link_flags]),
     }
@@ -164,7 +127,7 @@ def toolchain_maker(name, implementation, definition):
 
         native.register_toolchains(
             "@{}//:toolchain".format(name),
-            "@{}//:app_toolchain".format(name),
+            "@{}//:binary_toolchain".format(name),
         )
 
         native.register_execution_platforms(

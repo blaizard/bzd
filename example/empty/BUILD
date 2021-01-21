@@ -1,6 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 
-cc_binary(
+bzd_cc_binary(
     name = "empty",
     srcs = [
         "main.cc",
