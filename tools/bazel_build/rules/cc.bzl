@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library")
+load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
@@ -302,15 +302,10 @@ Rule to define a bzd C++ test.
 """
 
 def bzd_cc_test(name, tags = [], **kwags):
-    cc_library(
-        name = name + ".library",
-        tags = tags + ["cc"],
-        **kwags
-    )
-    _bzd_cc_test(
+    cc_test(
         name = name,
         tags = tags + ["cc"],
-        deps = [name + ".library"],
+        **kwags
     )
 
 def _bzd_genmanifest_impl(ctx):

@@ -42,7 +42,7 @@ def printMetadataCC(data: Mapping[str, Any]) -> None:
 			elif isinstance(item, dict):
 				partSize = sum([value for value in item.values()])
 
-			groups.append([unit, partSize])
+			groups.append([unit, partSize])  # type: ignore
 			size += partSize
 		size = data.get("size", size)
 		groups.sort(key=lambda item: item[1], reverse=True)
