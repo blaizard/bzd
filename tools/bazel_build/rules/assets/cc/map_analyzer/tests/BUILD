@@ -15,6 +15,7 @@ py_test(
         "esp32_xtensa_lx6_gcc.map",
         "gcc.map",
     ],
+    tags = ["manual"],
     deps = [
         "//tools/bazel_build/rules/assets/cc/map_analyzer/parser",
     ],

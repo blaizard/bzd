@@ -75,6 +75,7 @@ build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
 # Sanitizers
 
+build:sanitizer --build_tests_only
 build:sanitizer --keep_going
 build:sanitizer --copt -O1
 build:sanitizer --copt -g

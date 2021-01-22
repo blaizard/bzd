@@ -121,10 +121,10 @@ def _cc_linker(ctx, cc_info_providers, map_analyzer):
     # Analyze the map file.
     metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
     ctx.actions.run(
-        inputs = [map_file],
+        inputs = [map_file, binary_file],
         outputs = [metadata_file],
         progress_message = "Generating metadata for {}".format(ctx.attr.name),
-        arguments = [map_file.path, metadata_file.path],
+        arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
         tools = map_analyzer.data_runfiles.files,
         executable = map_analyzer.files_to_run,
     )

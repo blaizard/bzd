@@ -76,5 +76,5 @@ class ParserClang(Parser):
 					if m:
 						units.append({"section": section, "size": int(maybeSize, 16), "units": m.group(1)})
 
-			self.setParsedData(units=units, sections=sections)
+			self.setParsedData(units=units, sections=sections, areUnitsPath=True)
 		return True

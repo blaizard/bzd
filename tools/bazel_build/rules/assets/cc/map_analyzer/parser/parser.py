@@ -1,9 +1,12 @@
 import re
+import os
 import pathlib
 import typing
 
 SectionType = typing.Dict[str, int]
+AggregatedSectionType = typing.Dict[str, typing.Dict[str, int]]
 UnitsType = typing.Dict[str, typing.Dict[str, int]]
+AggregatedUnitsType = typing.Dict[str, typing.Dict[str, int]]
 Fragment = typing.Sequence[typing.Dict[str, typing.Any]]
 
 
@@ -12,12 +15,17 @@ class Parser:
 	Parser base class.
 	"""
 
+	unsetAggregrate = "unknown"
+
 	def __init__(self, path: pathlib.Path) -> None:
 		self.path = path
+		self.mapping: typing.Dict[str, str] = {}
 		self.setParsedData()
 
-	def setParsedData(self, sections: typing.Optional[Fragment] = None,
-		units: typing.Optional[Fragment] = None) -> None:
+	def setParsedData(self,
+		sections: typing.Optional[Fragment] = None,
+		units: typing.Optional[Fragment] = None,
+		areUnitsPath: bool = False) -> None:
 		"""
 		Set the raw data from the specialized parser.
 
@@ -30,8 +38,9 @@ class Parser:
 		self.units: UnitsType = {}
 		if sections:
 			self.sections = self._aggregateSections(sections)
+			self.mapping = {section: Parser.unsetAggregrate for section in self.sections}
 		if units:
-			self.units = self._aggregateUnits(units)
+			self.units = self._aggregateUnits(units, areUnitsPath)
 
 	def parse(self) -> bool:
 		"""
@@ -82,7 +91,7 @@ class Parser:
 		return {section: size for section, size in aggregatedSections.items() if size > 0}
 
 	@staticmethod
-	def _aggregateUnits(units: Fragment) -> UnitsType:
+	def _aggregateUnits(units: Fragment, areUnitsPath: bool) -> UnitsType:
 		"""
 		Aggregates and cleanup unit fragments.
 
@@ -104,6 +113,9 @@ class Parser:
 		# Remove empty sections
 		for unit, sections in aggregatedUnits.items():
 			aggregatedUnits[unit] = {section: size for section, size in sections.items() if size > 0}
+		# Normalize units if it represents path
+		if areUnitsPath:
+			return {os.path.normpath(key): value for key, value in aggregatedUnits.items()}
 		return aggregatedUnits
 
 	def getBySections(self) -> SectionType:
@@ -125,6 +137,41 @@ class Parser:
 		"""
 
 		return self.units
+
+	def getByAggregatedSections(self) -> AggregatedSectionType:
+		"""
+		Accessor of the aggregated sections.
+
+		Returns:
+			The sections.
+		"""
+		sections: AggregatedSectionType = {}
+		for section, size in self.sections.items():
+			aggregate = self.mapping.get(section, Parser.unsetAggregrate)
+			if aggregate not in sections:
+				sections[aggregate] = {}
+			sections[aggregate].update({section: size})
+
+		return sections
+
+	def getByAggregatedUnits(self) -> AggregatedUnitsType:
+		"""
+		Accessor of the aggregated units.
+
+		Returns:
+			The units.
+		"""
+
+		units: AggregatedUnitsType = {}
+		for name, sections in self.units.items():
+			units[name] = {}
+			for section, size in sections.items():
+				aggregate = self.mapping.get(section, Parser.unsetAggregrate)
+				if aggregate not in sections:
+					units[name][aggregate] = 0
+				units[name][aggregate] += size
+
+		return units
 
 	@staticmethod
 	def _patternToRegexpr(pattern: str) -> typing.Pattern[str]:
@@ -157,3 +204,18 @@ class Parser:
 		# Filter units
 		for unit, sections in self.units.items():
 			self.units[unit] = {section: data for section, data in sections.items() if not regexpr.fullmatch(section)}
+
+	def addAggregation(self, name: str, patternList: typing.Sequence[str]) -> None:
+		"""
+		Add aggregation mapping.
+
+		Args:
+			name: Aggregate categroy name.
+			patternList: List of pattern to map with the name provided.
+		"""
+
+		regexprList = [self._patternToRegexpr(pattern) for pattern in patternList]
+		for section, aggregate in self.mapping.items():
+			if aggregate == Parser.unsetAggregrate:
+				if any(regexpr.fullmatch(section) for regexpr in regexprList):
+					self.mapping[section] = name
