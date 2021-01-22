@@ -113,7 +113,7 @@ class TestRun(unittest.TestCase):
 			'.iram0.text': 858,
 			'.flash.rodata': 154
 			},
-			'/home/blaise/.cache/bazel/_bazel_blaise/487b37b7551c3a6035cab0c6471a2d4b/external/esp32_xtensa_lx6_gcc_8.2.0/bin/../lib/gcc/xtensa-esp32-elf/8.2.0/no-rtti/libgcc.a':
+			'/home/blaise/.cache/bazel/_bazel_blaise/487b37b7551c3a6035cab0c6471a2d4b/external/esp32_xtensa_lx6_gcc_8.2.0/lib/gcc/xtensa-esp32-elf/8.2.0/no-rtti/libgcc.a':
 			{
 			'.iram0.text': 104,
 			'.dram0.data': 4,

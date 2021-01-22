@@ -89,6 +89,6 @@ class ParserGcc(Parser):
 							"units": m.group(1) if m else "undefined"
 						})
 
-			self.setParsedData(units=units, sections=sections)
+			self.setParsedData(units=units, sections=sections, areUnitsPath=True)
 
 		return True
