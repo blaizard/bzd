@@ -245,16 +245,16 @@ class TestRun(unittest.TestCase):
 			})
 		self.assertDictEqual(
 			parser.getByUnits(), {
-			'/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o': {
+			'/usr/lib/x86_64-linux-gnu/Scrt1.o': {
 			'.note.ABI-tag': 32,
 			'.text': 43,
 			'.data': 4
 			},
-			'/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o': {
+			'/usr/lib/x86_64-linux-gnu/crti.o': {
 			'.init': 18,
 			'.fini': 4
 			},
-			'/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o': {
+			'/usr/lib/x86_64-linux-gnu/crtn.o': {
 			'.init': 5,
 			'.fini': 5
 			},
@@ -389,7 +389,7 @@ class TestRun(unittest.TestCase):
 			'.shstrtab': 433,
 			'.strtab': 6322
 			},
-			'/usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o': {
+			'/usr/lib/x86_64-linux-gnu/crt1.o': {
 			'.note.ABI-tag': 32,
 			'.eh_frame': 92,
 			'.text': 50,
@@ -452,11 +452,11 @@ class TestRun(unittest.TestCase):
 			'.init_array': 8,
 			'.bss': 1
 			},
-			'/usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crti.o': {
+			'/usr/lib/x86_64-linux-gnu/crti.o': {
 			'.init': 18,
 			'.fini': 4
 			},
-			'/usr/lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crtn.o': {
+			'/usr/lib/x86_64-linux-gnu/crtn.o': {
 			'.init': 5,
 			'.fini': 5
 			},
