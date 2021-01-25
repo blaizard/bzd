@@ -1,23 +1,95 @@
 # Channels
 
-Channels are ways to communicate to the external environement.
+Channels are ways to communicate to the external world.
 It can be used as a communication mean through local buses (I2C, UART...) or more widely via ethernet or internet.
 
 A channel consists of 2 layers, the adapter and the transport layer.
 The adapter layer has the role to serialize/deserialize the data as well as consistency/errors checks at the data level.
-The tranport layer has the role to transport data blobs via a bus.
+The tranport layer has the role to transport data blobs via a bus, in addition to a blob, on specific buses it needs inputs
+such as destination address, etc.
+
+When configuring a channel, the transport can only be configured once (durign initialization), while the adapter
+is responsible to "adapt" the Data payload to the transport. The adapter is initialized with arguments
+that can be used with the transport interface, for the example a chip select, or I2C device address.
+
+A channel (adapter + transport), exposes a common interface through a Data payload (adapter) and a common way to
+monitor and control the transport component (transport).
+Note, at compile time a channel is fully defined, makind this composition between the 2 layers a constant expression
+exposing a Channel<Data> interface.
+
+Some buses might have a Channel interface as well, buses like UART for example, which do not need adapters in betweeen and
+can be used directly as is.
+Also a channel can be made on top of another channel, by making one part of the transport interface, this allow nestiing channels
+for complex schemes.
 
 ## Declaration
 
 ```
 registry {
+	// Register an I2C bus driver. This has an unique instance withinI2CTransport the application.
+	// This is to ensure unique access if needed and avoid code duplication.
+	// A communication driver must have a transport interface.
 	i2c = I2C(role = "master", speed = 1000000);
 }
 
-channel I2CTempSensor {
-	adapter = I2CDevice(address = 12, addressing = 10/*bit*/);
-	transport = &i2c;
+interface I2CTransport
+{
+	read(...)
+	write(...);
+};
+
+using I2CDevice = Adapter<Buffer, I2CTransport>;
+
+registry {
+	I2CDevice tempSensor(address = 12, addressing = 10/*bit*/, transport = &i2c); 
 }
+```
+
+The representation of the Channel class in C++ would look like this:
+```C++
+using I2CDevice = Adapter<Data, I2CTransport>;
+
+I2CDevice<10/*receive*/, 10/*send*/> i2CTempSensor(12, 10/*bit*/, &i2c);
+
+template <class Data>
+class I2CTempSensor : public Adapter<Data, I2CTransport>
+{
+public:
+	constexpr I2CTempSensor(int address, int addressing)
+			: Adapter<Data, I2CTransport>{address, addressing}
+	{
+	}
+
+private:
+	buffer<RecvBufferSize> receive_;
+	buffer<SendBufferSize> send_;
+};
+
+template <class Data, class Transport>
+class Adapter : public Channel<Data>
+{
+public:
+
+	Adapter(Transport& transport) : transport_{transport} {}
+
+	Result write(Data data) override
+	{
+		transport_.write(data);
+	}
+
+private:
+	Transport& transport_;
+};
+
+// Specialization for I2C
+...
+	Adapter(int address, int mode, Transport& transport) : address_{address}, mode_{mode}, transport_{transport} {}
+
+	Result write(Data data) override
+	{
+		transport_.write(address, data);
+	}
+...
 ```
 
 ## Adapter
@@ -73,7 +145,8 @@ Result<Sequence<Byte>> serialize<uint8_t>(const uint8_t& data) const
 
 ## Transport
 
-The transport implementation must have the following interface:
+The transport implementation should have an interface as follow, the service related information
+should remain the same, while the read/write method can have a specialized interface.
 
 ```
 interface Transport {
@@ -83,7 +156,10 @@ interface Transport {
 	method stop() -> Result<void>;
 	method getStatus() -> Status;
 
+	// Statistics
+
 	// Data
+	onRead() -> // Optional
 	method read() -> Result<Sequence<Byte>>;
 	method write(Sequence<Byte>) -> Result<void>;
 }
@@ -104,3 +180,32 @@ interface Channel {
 	read() ->
 }
 ```
+
+# Buffers
+
+An optional message queue should be available in the transport layer for bus-wide messages, but also in the adapter layer for messages
+that should be kept per instance, for example, for a specific SPI channel or a specific CAN message.
+
+## Use Cases
+
+### I2C device address or chip select interface
+
+Some protocol need to set a signal or append some id to the payload in order to select the destination device. This is done in the adapter layer.
+
+### Transport with exclusive access
+
+Some transport layer might have access limited to a single transaction at a time.
+This can be handled in the transport layer, with a mutex mechanism to prevent mutual access.
+
+# Interrupt driven drivers
+
+interrupt driven driver will write their payload into a receive queue, this can be handled
+in the transport layer.
+However, the adaptor might also want to keep some messages in a queue as well, for example
+for some critical messages that should not be missed.
+
+# Runtime discoverable adapter config
+
+Some devices might require for example a discovery stage before assigning their addresses
+from the adaptor.
+!!! no supported yet

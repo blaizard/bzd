@@ -23,11 +23,10 @@ class Span
 protected:
 	using DataType = T;
 	using SelfType = Span<DataType>;
-	using IsConst = bzd::typeTraits::IsConst<DataType>;
+	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
 
 public:
 	using Iterator = bzd::iterator::Contiguous<DataType>;
-	using ConstIterator = bzd::iterator::Contiguous<const DataType>;
 
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
@@ -35,36 +34,33 @@ public:
 	constexpr Span() noexcept = default;
 	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
+	template <bzd::SizeType N>
+	constexpr Span(DataType (&data)[N]) noexcept : data_(data), size_(N)
+	{
+	}
+
+	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
 	constexpr Span(const Span<bzd::typeTraits::RemoveConst<DataType>>& span) noexcept : data_(span.data_), size_(span.size_)
 	{
 	}
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr Iterator begin() noexcept
-	{
-		return Iterator(data_, 0);
-	}
+	// Iterators
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr Iterator end() noexcept
-	{
-		return Iterator(data_, size());
-	}
+	constexpr Iterator begin() const noexcept { return Iterator(data_, 0); }
 
-	constexpr ConstIterator begin() const noexcept { return ConstIterator(data_, 0); }
+	constexpr Iterator end() const noexcept { return Iterator(data_, size()); }
 
-	constexpr ConstIterator cbegin() const noexcept { return begin(); }
-
-	constexpr ConstIterator end() const noexcept { return ConstIterator(data_, size()); }
-
-	constexpr ConstIterator cend() const noexcept { return end(); }
+	// Size
 
 	constexpr SizeType size() const noexcept { return size_; }
 
+	constexpr SizeType sizeBytes() const noexcept { return size_ * sizeof(DataType); }
+
+	constexpr bool empty() const noexcept { return (size_ == 0); }
+
 	// Equality operator
 
-	constexpr bool operator==(const SelfType& rhs) const
+	constexpr bool operator==(const SelfType& rhs) const noexcept
 	{
 		if (size() != rhs.size())
 		{
@@ -84,57 +80,35 @@ public:
 
 	// Inequality operator
 
-	constexpr bool operator!=(const SelfType& rhs) const { return !(*this == rhs); }
+	constexpr bool operator!=(const SelfType& rhs) const noexcept { return !(*this == rhs); }
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr DataType& operator[](const SizeType index)
-	{
-		return data_[index];
-	}
+	// Accessors
 
-	constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
+	constexpr DataType& operator[](const SizeType index) const noexcept { return at(index); }
 
 	// at
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr DataType& at(const SizeType index)
-	{
-		return data_[index];
-	}
-
-	constexpr const T& at(const SizeType index) const { return data_[index]; }
+	constexpr DataType& at(const SizeType index) const noexcept { return data_[index]; }
 
 	// front
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr DataType& front() noexcept
-	{
-		return data_[0];
-	}
-	constexpr const DataType& front() const noexcept { return data_[0]; }
+	constexpr DataType& front() const noexcept { return at(0); }
 
 	// back
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr DataType& back() noexcept
-	{
-		return data_[size_ - 1];
-	}
-	constexpr const DataType& back() const noexcept { return data_[size_ - 1]; }
+	constexpr DataType& back() const noexcept { return at(size_ - 1); }
 
-	template <class Q = IsConst, bzd::typeTraits::EnableIf<!Q::value, void>* = nullptr>
-	constexpr DataType* data() noexcept
-	{
-		return data_;
-	}
+	// data
 
-	constexpr const DataType* data() const noexcept { return data_; }
+	constexpr DataType* data() const noexcept { return data_; }
+
+	// find
 
 	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
 	{
 		for (SizeType i = start; i < size_; ++i)
 		{
-			if (data_[i] == item)
+			if (at(i) == item)
 			{
 				return i;
 			}
@@ -142,13 +116,37 @@ public:
 		return npos;
 	}
 
-	constexpr bool empty() const noexcept { return (size_ == 0); }
+	// subviews
+
+	constexpr Span<DataType> subspan(const SizeType offset = 0, const SizeType count = npos) const noexcept
+	{
+		bzd::assert::isTrue(offset < size_);
+		const auto actualCount = (count == npos) ? (size_ - offset) : count;
+		bzd::assert::isTrue(offset + actualCount <= size_);
+		return Span<DataType>{data_ + offset, actualCount};
+	}
+
+	constexpr Span<DataType> first(const SizeType count) const noexcept { return subspan(/*offset*/ 0, count); }
+
+	constexpr Span<DataType> last(const SizeType count) const noexcept { return subspan(/*offset*/ size_ - count, count); }
+
+	// Convert to bytes
+
+	constexpr Span<const bzd::ByteType> asBytes() const noexcept
+	{
+		return Span<const bzd::ByteType>{reinterpret_cast<const bzd::ByteType*>(data_), sizeBytes()};
+	}
+
+	constexpr Span<bzd::ByteType> asWritableBytes() const noexcept
+	{
+		return Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data_), sizeBytes()};
+	}
 
 protected:
 	template <class Q>
 	friend class Span;
 
-	T* data_ = nullptr;
+	DataType* data_ = nullptr;
 	SizeType size_ = 0;
 };
 } // namespace bzd

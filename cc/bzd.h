@@ -7,9 +7,7 @@
 
 // Container
 #include "bzd/container/array.h"
-#include "bzd/container/artifact.h"
 #include "bzd/container/btree.h"
-#include "bzd/container/buffer.h"
 #include "bzd/container/function.h"
 #include "bzd/container/map.h"
 #include "bzd/container/named_type.h"

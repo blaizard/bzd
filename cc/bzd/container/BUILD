@@ -5,9 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":array",
-        ":artifact",
         ":btree",
-        ":buffer",
         ":function",
         ":map",
         ":named_type",
@@ -41,19 +39,6 @@ cc_library(
 )
 
 cc_library(
-    name = "artifact",
-    hdrs = [
-        "artifact.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":buffer",
-        "//cc/bzd/platform:types",
-        "//cc/bzd/utility:forward",
-    ],
-)
-
-cc_library(
     name = "btree",
     hdrs = [
         "btree.h",
@@ -64,18 +49,6 @@ cc_library(
         ":tuple",
         ":vector",
         "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
-    name = "buffer",
-    hdrs = [
-        "buffer.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":span",
-        ":string_view",
     ],
 )
 

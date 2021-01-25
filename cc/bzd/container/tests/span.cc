@@ -14,6 +14,7 @@ TEST(ContainerSpan, Constructor)
 {
 	int test[5];
 	bzd::Span<int> span(test, 5);
+	bzd::Span<int> spanArray(test);
 
 	// Copy
 	bzd::Span<int> spanCopy(span);
@@ -72,14 +73,30 @@ TEST(ContainerSpan, ConstIterator)
 		EXPECT_EQ(++it, span.end());
 	}
 
+	for (auto& c : span)
 	{
-		auto it = span.cbegin();
+		c = 'A';
+	}
+	EXPECT_EQ(span[0], 'A');
+	EXPECT_EQ(span[1], 'A');
+	EXPECT_EQ(span[2], 'A');
+	EXPECT_EQ(span[3], 'A');
+	EXPECT_EQ(span[4], 'A');
+}
+
+TEST(ContainerSpan, ConstConstIterator)
+{
+	int test[5] = {0, 1, 2, 3, 4};
+	const bzd::Span<const int> span(test, 5);
+
+	{
+		auto it = span.begin();
 		EXPECT_EQ(*it, 0);
 		EXPECT_EQ(*++it, 1);
 		EXPECT_EQ(*++it, 2);
 		EXPECT_EQ(*++it, 3);
 		EXPECT_EQ(*++it, 4);
-		EXPECT_EQ(++it, span.cend());
+		EXPECT_EQ(++it, span.end());
 	}
 }
 
@@ -96,16 +113,6 @@ TEST(ContainerSpan, Constexpr)
 		EXPECT_EQ(*++it, 3);
 		EXPECT_EQ(*++it, 4);
 		EXPECT_EQ(++it, span.end());
-	}
-
-	{
-		auto it = span.cbegin();
-		EXPECT_EQ(*it, 0);
-		EXPECT_EQ(*++it, 1);
-		EXPECT_EQ(*++it, 2);
-		EXPECT_EQ(*++it, 3);
-		EXPECT_EQ(*++it, 4);
-		EXPECT_EQ(++it, span.cend());
 	}
 }
 
@@ -139,4 +146,96 @@ TEST(ContainerSpan, Copy)
 	EXPECT_EQ(copyConstSpanAssign[0], 0);
 	EXPECT_EQ(copyConstSpanAssign[4], 4);
 	EXPECT_EQ(copyConstSpanAssign.size(), 5);
+}
+
+TEST(ContainerSpan, ConstNonConst)
+{
+	// Both the span and the content can be modified.
+	{
+		int test[5] = {0, 1, 2, 3, 4};
+		bzd::Span<int> spanNonNon{test, 5};
+		spanNonNon[1] = 45;
+		EXPECT_EQ(spanNonNon[1], 45);
+	}
+	{
+		int test[5] = {0, 1, 2, 3, 4};
+		const bzd::Span<int> spanConstNon{test, 5};
+		spanConstNon[1] = 45;
+		EXPECT_EQ(spanConstNon[1], 45);
+	}
+	{
+		int test[5] = {0, 1, 2, 3, 4};
+		bzd::Span<const int> spanNonConst{test, 5};
+		// Not possible
+		// spanNonConst[1] = 45;
+		EXPECT_EQ(spanNonConst[1], 1);
+	}
+	{
+		int test[5] = {0, 1, 2, 3, 4};
+		const bzd::Span<const int> spanConstConst{test, 5};
+		// Not possible
+		// spanConstConst[1] = 45;
+		EXPECT_EQ(spanConstConst[1], 1);
+	}
+}
+
+TEST(ContainerSpan, Subspan)
+{
+	int test[5] = {0, 1, 2, 3, 4};
+	bzd::Span<int> span(test, 5);
+
+	{
+		const auto subspan = span.subspan();
+		EXPECT_EQ(subspan.size(), 5);
+	}
+	{
+		const auto subspan = span.subspan(1);
+		EXPECT_EQ(subspan.size(), 4);
+	}
+	{
+		const auto subspan = span.subspan(4);
+		EXPECT_EQ(subspan.size(), 1);
+		EXPECT_EQ(subspan[0], 4);
+	}
+	{
+		const auto subspan = span.subspan(1, 2);
+		EXPECT_EQ(subspan.size(), 2);
+		EXPECT_EQ(subspan[0], 1);
+		EXPECT_EQ(subspan[1], 2);
+	}
+	{
+		const auto subspan = span.subspan(1, 4);
+		EXPECT_EQ(subspan.size(), 4);
+		EXPECT_EQ(subspan[2], 3);
+		EXPECT_EQ(subspan[3], 4);
+	}
+	{
+		const auto subspan = span.first(2);
+		EXPECT_EQ(subspan.size(), 2);
+		EXPECT_EQ(subspan[0], 0);
+		EXPECT_EQ(subspan[1], 1);
+	}
+	{
+		const auto subspan = span.last(2);
+		EXPECT_EQ(subspan.size(), 2);
+		EXPECT_EQ(subspan[0], 3);
+		EXPECT_EQ(subspan[1], 4);
+	}
+}
+
+TEST(ContainerSpan, AsBytes)
+{
+	bzd::UInt32Type test[5] = {0, 1, 2, 3, 4};
+	bzd::Span<bzd::UInt32Type> span(test, 5);
+
+	EXPECT_EQ(span.size(), 5);
+	EXPECT_EQ(span.sizeBytes(), 20);
+
+	const auto buffer = span.asBytes();
+	EXPECT_EQ(buffer.size(), 20);
+	EXPECT_EQ(buffer.sizeBytes(), 20);
+
+	const auto writableBuffer = span.asWritableBytes();
+	EXPECT_EQ(writableBuffer.size(), 20);
+	EXPECT_EQ(writableBuffer.sizeBytes(), 20);
 }

@@ -13,47 +13,34 @@ public:
 	virtual bzd::Result<> disconnect() { return bzd::nullresult; }
 };
 
-template <class T>
 class OChannel : public IOChannelCommon
 {
 protected:
 	OChannel() = default;
 
 public:
-	bzd::Result<SizeType> write(const Span<const char>& data)
-	{
-		return write(Span<const T>(reinterpret_cast<const T*>(data.data()), data.size()));
-	}
-	virtual bzd::Result<SizeType> write(const Span<const T>& data) noexcept = 0;
-	virtual bzd::Result<SizeType> write(const T& data) noexcept { return write(Span<const T>(&data, 1)); }
+	virtual bzd::Result<SizeType> write(const Span<const bzd::ByteType>& data) noexcept = 0;
 };
 
-template <class T>
 class IChannel : public IOChannelCommon
 {
 protected:
 	IChannel() = default;
 
 public:
-	virtual bzd::Result<SizeType> read(Span<T>& data) noexcept = 0;
-	virtual bzd::Result<SizeType> read(T& data) noexcept
-	{
-		auto temp = Span<T>(&data, 1);
-		return read(temp);
-	}
+	virtual bzd::Result<SizeType> read(const Span<bzd::ByteType>& data) noexcept = 0;
 };
 
-template <class T>
 class IOChannel
-	: public IChannel<T>
-	, public OChannel<T>
+	: public IChannel
+	, public OChannel
 {
 };
 } // namespace bzd::impl
 
 namespace bzd {
-using OChannel = impl::OChannel<bzd::UInt8Type>;
-using IChannel = impl::IChannel<bzd::UInt8Type>;
-using IOChannel = impl::IOChannel<bzd::UInt8Type>;
+using OChannel = impl::OChannel;
+using IChannel = impl::IChannel;
+using IOChannel = impl::IOChannel;
 
 } // namespace bzd

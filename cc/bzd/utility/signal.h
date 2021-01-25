@@ -2,7 +2,7 @@
 
 #include "bzd/algorithm/copy_n.h"
 #include "bzd/algorithm/reverse.h"
-#include "bzd/container/buffer.h"
+#include "bzd/container/span.h"
 #include "bzd/platform/types.h"
 
 namespace bzd::impl {
@@ -96,29 +96,29 @@ private:
 
 	constexpr void adjustEndianess(typename SignalInternals::Type& value)
 	{
-		bzd::algorithm::reverse(reinterpret_cast<bzd::UInt8Type*>(&value),
-								reinterpret_cast<bzd::UInt8Type*>(&value) + sizeof(typename SignalInternals::Type));
+		bzd::algorithm::reverse(reinterpret_cast<bzd::ByteType*>(&value),
+								reinterpret_cast<bzd::ByteType*>(&value) + sizeof(typename SignalInternals::Type));
 	}
 
 public:
 	// Need to handle different endianess
-	static constexpr const Type get(const bzd::ConstBuffer& data)
+	static constexpr const Type get(const bzd::Span<const bzd::ByteType>& data)
 	{
 		typename SignalInternals::ExtractedType extracted;
-		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
+		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
 		const typename SignalInternals::Type type = (extracted >> shiftBits_) & mask_;
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}
 
-	static constexpr void set(bzd::Buffer& data, const Type& value)
+	static constexpr void set(const bzd::Span<bzd::ByteType>& data, const Type& value)
 	{
 		typename SignalInternals::ExtractedType extracted;
-		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::UInt8Type*>(&extracted));
+		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
 		extracted &= ~(mask_ << shiftBits_);
 
 		const typename SignalInternals::Type valueTyped = CompuMethod::template toBuffer<Type, decltype(valueTyped)>(value);
 		extracted |= ((static_cast<decltype(extracted)>(valueTyped) & mask_) << shiftBits_);
-		bzd::algorithm::copyN(reinterpret_cast<bzd::UInt8Type*>(&extracted), sizeof(extracted), &data.at(startByte_));
+		bzd::algorithm::copyN(reinterpret_cast<bzd::ByteType*>(&extracted), sizeof(extracted), &data.at(startByte_));
 	}
 };
 

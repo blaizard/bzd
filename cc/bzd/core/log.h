@@ -60,7 +60,7 @@ private:
 		default:
 			bzd::assert::unreachable();
 		}
-		out_.write(str);
+		out_.write(str.asBytes());
 	}
 
 	template <class... Args>

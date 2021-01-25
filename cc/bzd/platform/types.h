@@ -69,4 +69,11 @@ using UInt32Type = std::uint32_t;
  * \brief Unsigned integer type with a fixed width of 64-bit.
  */
 using UInt64Type = std::uint64_t;
+
+/**
+ * \brief Byte type.
+ */
+enum class ByteType : std::uint8_t
+{
+};
 } // namespace bzd

@@ -112,8 +112,7 @@ public:
 
 	void printNode(BaseElementPtrType node)
 	{
-		bzd::StringChannel<256> stream;
-		const auto printAddress = [this, &stream](const BaseElementPtrType address) {
+		const auto printAddress = [this](const BaseElementPtrType address) {
 			bzd::format::toString(bzd::platform::getOut(),
 								  CSTR("{} {}"),
 								  address,
@@ -123,11 +122,10 @@ public:
 		printAddress(node);
 		if (node)
 		{
-			stream.write(" -> ");
+			bzd::platform::getOut().write(bzd::StringView{" -> "}.asBytes());
 			printAddress(node->next_.load());
 		}
-		stream.write("\n");
-		bzd::platform::getOut().write(stream.str());
+		bzd::platform::getOut().write(bzd::StringView{"\n"}.asBytes());
 	}
 };
 } // namespace bzd::test

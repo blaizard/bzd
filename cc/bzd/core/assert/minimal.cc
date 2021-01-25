@@ -23,16 +23,16 @@ namespace bzd::assert::impl {
 void backend(const bzd::SourceLocation& location, const char* message1, const char* message2)
 {
 	auto& out = getOChannel();
-	out.write(bzd::StringView{location.getFile()});
+	out.write(bzd::StringView{location.getFile()}.asBytes());
 	bzd::String<10> str;
 	bzd::format::toString(str, location.getLine());
-	out.write(bzd::StringView{":"});
-	out.write(bzd::StringView{str});
-	out.write(bzd::StringView{": "});
-	out.write(bzd::StringView{message1});
+	out.write(bzd::StringView{":"}.asBytes());
+	out.write(bzd::StringView{str}.asBytes());
+	out.write(bzd::StringView{": "}.asBytes());
+	out.write(bzd::StringView{message1}.asBytes());
 	if (message2)
 	{
-		out.write(bzd::StringView{message2});
+		out.write(bzd::StringView{message2}.asBytes());
 	}
 	bzd::platform::panic();
 }
