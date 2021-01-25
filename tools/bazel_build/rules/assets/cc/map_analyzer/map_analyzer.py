@@ -11,23 +11,24 @@ from tools.bazel_build.rules.assets.cc.map_analyzer.parser.gcc import ParserGcc
 
 FilterConfigType = typing.List[str]
 AggregateConfigType = typing.Dict[str, typing.List[str]]
-"""
-Classify sections to match berkeley display:
-	remove: !SEC_ALLOC
-	text: SEC_CODE || SEC_READONLY
-	data: SEC_HAS_CONTENTS
-	bss: other
-
-Those flags can be obtained with objdump:
-objdump -h bazel-bin/example/example.stripped
-
-See implementation from GNU size:
-static void berkeley_sum (bfd *abfd ATTRIBUTE_UNUSED, sec_ptr sec,
-	      void *ignore ATTRIBUTE_UNUSED)
-"""
 
 
-def generateConfig(filePath: pathlib.Path) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
+def generateBerkeleyConfig(
+		filePath: pathlib.Path) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
+	"""
+	Classify sections to match berkeley respresentation:
+		remove: !SEC_ALLOC
+		text: SEC_CODE || SEC_READONLY
+		data: SEC_HAS_CONTENTS
+		bss: other
+
+	Those flags can be obtained with objdump:
+	objdump -h bazel-bin/example/example.stripped
+
+	See implementation from GNU size:
+	static void berkeley_sum (bfd *abfd ATTRIBUTE_UNUSED, sec_ptr sec,
+			void *ignore ATTRIBUTE_UNUSED)
+	"""
 
 	filterConfig: FilterConfigType = []
 	aggregateConfig: AggregateConfigType = {"text": [], "data": [], "bss": []}
@@ -81,7 +82,7 @@ if __name__ == '__main__':
 	filterConfig: FilterConfigType = [".debug_*", ".comment", ".symtab", ".strtab"]
 	aggregateConfig: AggregateConfigType = {}
 	if args.binary:
-		result = generateConfig(args.binary)
+		result = generateBerkeleyConfig(args.binary)
 		if result:
 			filterConfig, aggregateConfig = result
 

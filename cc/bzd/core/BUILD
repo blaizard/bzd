@@ -13,6 +13,7 @@ cc_library(
         ":scheduler",
         ":task",
         ":units",
+        "//cc/bzd/core/interfaces:channel",
     ],
 )
 

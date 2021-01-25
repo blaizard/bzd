@@ -10,7 +10,7 @@ public:
 	using SelfType = Contiguous<DataType>;
 
 public:
-	constexpr Contiguous(DataType* data, const SizeType index) : data_{data}, index_{index} {}
+	constexpr Contiguous(DataType* const data, const SizeType index) : data_{data}, index_{index} {}
 
 	constexpr SelfType& operator++() noexcept
 	{
@@ -73,7 +73,7 @@ public:
 	constexpr DataType* operator->() const { return &data_[index_]; }
 
 private:
-	DataType* data_;
+	DataType* const data_;
 	SizeType index_;
 };
 } // namespace bzd::iterator

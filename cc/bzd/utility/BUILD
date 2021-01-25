@@ -155,7 +155,7 @@ cc_library(
     deps = [
         "//cc/bzd/algorithm:copy_n",
         "//cc/bzd/algorithm:reverse",
-        "//cc/bzd/container:buffer",
+        "//cc/bzd/container:span",
         "//cc/bzd/platform:types",
     ],
 )

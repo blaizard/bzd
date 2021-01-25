@@ -40,7 +40,7 @@ static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Typ
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
 	bzd::Array<bzd::UInt8Type, 3> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/ 0, reg, value};
-	i2c.write(data);
+	i2c.write(data.asBytes());
 }
 
 #define PCA9685_MODE1 0x00
@@ -58,7 +58,7 @@ void setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
 	bzd::Array<bzd::UInt8Type, 6> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/ 0, PCA9685_LED0_ON_L + 4 * num, on, on >> 8, off, off >> 8};
-	i2c.write(data);
+	i2c.write(data.asBytes());
 }
 
 #define PCA9685_MODE1_ALLCALL 1
@@ -127,11 +127,13 @@ int main()
 	// i2c_master_init();
 
 	// LED blinking
+	bzd::Array<const char, 1> on{1};
+	bzd::Array<const char, 1> off{0};
 	auto& port = bzd::Registry<bzd::OChannel>::get("led");
-	port.write(1);
+	port.write(on.asBytes());
 	sleep(1);
 	// vTaskDelay(500 / portTICK_PERIOD_MS);
-	port.write(0);
+	port.write(off.asBytes());
 
 	startSequence2();
 

@@ -41,7 +41,41 @@ public:
 protected:
 	ReturnType return_{};
 };
+} // namespace bzd::impl
 
+namespace bzd {
+	/*
+template <class V, class E>
+class Promise : public bzd::impl::Promise<V, E>
+{
+private:
+	using FctPtrType = bzd::FctPtrType;
+
+public:
+	template <class Object, class T>
+	Promise() : bzd::impl::Promise<V, E>{}
+	{
+	}
+
+	bool poll() override
+	{
+		//setResult(poll_());
+		return isReady();
+	}
+
+public:
+	// Promise type
+	enum class Type
+	{
+		POLLING,
+		EVENT
+	};
+	Type type_;
+	//bzd::Variant<>
+	// Need to abstract the member->fct call. See functionoid for a possible implementation.
+	// https://isocpp.org/wiki/faq/pointers-to-members#typedef-for-ptr-to-memfn
+};
+*/
 template <class V, class E, class PollFct>
 class PromisePoll : public bzd::impl::Promise<V, E>
 {
@@ -66,9 +100,7 @@ private:
 	// Callback is statefull, therefore it cannot be const.
 	PollFct poll_;
 };
-} // namespace bzd::impl
 
-namespace bzd {
 template <class V = void, class E = bzd::BoolType>
 class PromiseReturnType : public bzd::Optional<bzd::Result<V, E>>
 {
@@ -81,6 +113,6 @@ public:
 template <class T, class V = typename bzd::typeTraits::InvokeResult<T>::Value, class E = typename bzd::typeTraits::InvokeResult<T>::Error>
 constexpr auto makePromise(T&& callback)
 {
-	return bzd::impl::PromisePoll<V, E, T>(bzd::forward<T>(callback));
+	return bzd::PromisePoll<V, E, T>(bzd::forward<T>(callback));
 }
 } // namespace bzd

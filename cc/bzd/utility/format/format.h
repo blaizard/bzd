@@ -403,28 +403,28 @@ void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadat
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
 		{
-			stream.write({"0b", 2});
+			stream.write(bzd::StringView{"0b", 2}.asBytes());
 		}
 		bzd::format::toStringBin(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_LOWER:
 		if (metadata.alternate)
 		{
-			stream.write({"0x", 2});
+			stream.write(bzd::StringView{"0x", 2}.asBytes());
 		}
 		bzd::format::toStringHex(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_UPPER:
 		if (metadata.alternate)
 		{
-			stream.write({"0x", 2});
+			stream.write(bzd::StringView{"0x", 2}.asBytes());
 		}
 		bzd::format::toStringHex(stream, value, "0123456789ABCDEF");
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
 		{
-			stream.write({"0o", 2});
+			stream.write(bzd::StringView{"0o", 2}.asBytes());
 		}
 		bzd::format::toStringOct(stream, value);
 		break;
@@ -449,7 +449,7 @@ void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& meta
 		break;
 	case Metadata::Format::FIXED_POINT_PERCENT:
 		bzd::format::toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
-		stream.write(bzd::StringView("%"));
+		stream.write(bzd::StringView("%").asBytes());
 		break;
 	case Metadata::Format::BINARY:
 	case Metadata::Format::HEXADECIMAL_LOWER:
@@ -490,7 +490,8 @@ static void toString(bzd::OChannel& stream, const bzd::StringView stringView, co
 	switch (metadata.format)
 	{
 	case Metadata::Format::AUTO:
-		stream.write((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
+		stream.write(
+			((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView).asBytes());
 		break;
 	case Metadata::Format::FIXED_POINT:
 	case Metadata::Format::FIXED_POINT_PERCENT:
@@ -511,7 +512,7 @@ public:
 		stream_(stream), args_(args)
 	{
 	}
-	void addSubstring(const bzd::StringView& str) { stream_.write(str); }
+	void addSubstring(const bzd::StringView& str) { stream_.write(str.asBytes()); }
 	void addMetadata(const Metadata& metadata) { args_[metadata.index]->print(stream_, metadata); }
 	constexpr void onError(const bzd::StringView& message) const {}
 

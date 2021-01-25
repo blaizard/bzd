@@ -42,7 +42,7 @@ def _bzd_manifest_impl(ctx):
     return providerCc
 
 """
-Bzd description language rule
+Bzd description language rule_bzd_manifest_impl_cc
 """
 bzd_manifest = rule(
     implementation = _bzd_manifest_impl,

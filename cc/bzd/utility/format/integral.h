@@ -63,9 +63,9 @@ constexpr void fixedPoint(bzd::OChannel& stream, const T& n, const SizeType maxP
 
 	bzd::String<40> buffer;
 	bzd::format::impl::integer(buffer, static_cast<int>(roundedNumber));
-	stream.write(buffer);
+	stream.write(buffer.asBytes());
 
-	stream.write({".", 1});
+	stream.write(bzd::StringView{".", 1}.asBytes());
 
 	buffer.clear();
 	auto afterComma = (roundedNumber - static_cast<T>(static_cast<int>(n)));
@@ -78,7 +78,7 @@ constexpr void fixedPoint(bzd::OChannel& stream, const T& n, const SizeType maxP
 		buffer.append('0' + digit);
 		afterComma -= static_cast<T>(digit);
 	}
-	stream.write(buffer);
+	stream.write(buffer.asBytes());
 }
 } // namespace bzd::format::impl
 
@@ -88,7 +88,7 @@ constexpr void toString(bzd::OChannel& stream, const T& data)
 {
 	bzd::String<40> buffer; // 40 is a the length
 	bzd::format::impl::integer(buffer, data);
-	stream.write(buffer);
+	stream.write(buffer.asBytes());
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, void>* = nullptr>
@@ -102,7 +102,7 @@ constexpr void toStringHex(bzd::OChannel& stream, const T& data, const char* con
 {
 	bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
 	bzd::format::impl::integer<16>(buffer, data, digits);
-	stream.write(buffer);
+	stream.write(buffer.asBytes());
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
@@ -110,7 +110,7 @@ constexpr void toStringOct(bzd::OChannel& stream, const T& data)
 {
 	bzd::String<32> buffer;
 	bzd::format::impl::integer<8>(buffer, data);
-	stream.write(buffer);
+	stream.write(buffer.asBytes());
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
@@ -133,9 +133,9 @@ constexpr void toStringBin(bzd::OChannel& stream, const T& data)
 			// Fill the string with zeros
 			const auto n = 16 - buffer.size();
 			bzd::String<16> padding(n, '0');
-			stream.write(padding);
+			stream.write(padding.asBytes());
 		}
-		stream.write(buffer);
+		stream.write(buffer.asBytes());
 	}
 }
 
