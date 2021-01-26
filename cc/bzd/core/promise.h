@@ -3,6 +3,7 @@
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
 #include "bzd/type_traits/invoke_result.h"
+#include "bzd/container/impl/non_owning_list.h"
 
 namespace bzd::interface {
 class Promise
@@ -13,12 +14,14 @@ protected:
 public:
 	virtual bool poll() = 0;
 	virtual ~Promise() = default;
+
+	// virtual void detach() {}
 };
 } // namespace bzd::interface
 
 namespace bzd::impl {
 template <class V, class E>
-class Promise : public bzd::interface::Promise
+class Promise : public bzd::interface::Promise, public bzd::impl::ListElement</*MultiContainer*/ true>
 {
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
@@ -38,13 +41,19 @@ public:
 		return bzd::move(*return_);
 	}
 
+	// When lifespan of this promise terminates, remove it from wherever it was.
+	~Promise()
+	{
+		//this->popFromList();
+	}
+
 protected:
 	ReturnType return_{};
 };
 } // namespace bzd::impl
 
 namespace bzd {
-	/*
+
 template <class V, class E>
 class Promise : public bzd::impl::Promise<V, E>
 {
@@ -60,7 +69,7 @@ public:
 	bool poll() override
 	{
 		//setResult(poll_());
-		return isReady();
+		return this->isReady();
 	}
 
 public:
@@ -75,7 +84,7 @@ public:
 	// Need to abstract the member->fct call. See functionoid for a possible implementation.
 	// https://isocpp.org/wiki/faq/pointers-to-members#typedef-for-ptr-to-memfn
 };
-*/
+
 template <class V, class E, class PollFct>
 class PromisePoll : public bzd::impl::Promise<V, E>
 {
