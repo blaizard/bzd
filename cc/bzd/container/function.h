@@ -33,7 +33,8 @@ protected:
 public:
 	Function(const FctPtrType callable) : callable_{callable} {}
 
-	ReturnType operator()(Args&&... args) const { return callable_(bzd::forward<Args>(args)...); }
+	template <class... Params> // Needed for perfect forwarding
+	ReturnType operator()(Params&&... args) const { return callable_(bzd::forward<Params>(args)...); }
 
 private:
 	const FctPtrType callable_;

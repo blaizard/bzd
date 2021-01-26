@@ -81,9 +81,12 @@ def _cc_linker(ctx, cc_info_providers, map_analyzer):
         A tuple containing the binary file and the metadatas.
     """
 
-    # Build the list of libraries from the cc_info_providers
+    # Build the list of libraries and linker flags from the cc_info_providers
     library_files = sets.make()
+    linker_flags = sets.make()
     for li in cc_info_providers.linking_context.linker_inputs.to_list():
+        for flag in li.user_link_flags:
+            sets.insert(linker_flags, flag)
         for library_to_link in li.libraries:
             for library in [library_to_link.static_library, library_to_link.pic_static_library]:
                 if library:
@@ -105,6 +108,7 @@ def _cc_linker(ctx, cc_info_providers, map_analyzer):
         cc_toolchain = cc_toolchain,
         feature_configuration = feature_configuration,
         output_file = binary_file.path,
+        user_link_flags = sets.to_list(linker_flags),
     )
 
     # Run the linker stage.

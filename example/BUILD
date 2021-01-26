@@ -8,6 +8,9 @@ cc_library(
         "*.h",
         "*.cc",
     ]),
+    linkopts = [
+        "-pthread",
+    ],
     deps = [
         "//cc/bzd",
     ],

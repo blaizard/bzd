@@ -11,18 +11,18 @@
 			</div>
 		</div>
 		<div class="metrics">
-			<div v-if="isValid">
+			<div v-if="isValid" v-tooltip="tooltipBuilds">
 				<div class="name">Buids</div>
 				<div class="value">{{ buildPerWeek }}<small>/week</small></div>
 			</div>
-			<div v-if="isValid">
+			<div v-if="isValid" v-tooltip="tooltipReliability">
 				<div class="name">Reliability</div>
 				<div class="value">{{ buildReliability }}<small>%</small></div>
 			</div>
-			<div v-if="isValid">
+			<div v-if="isValid" v-tooltip="tooltipSpeed">
 				<div class="name">Speed</div>
 				<div class="value">
-					{{ lastBuildDuration[0] }}<small>{{ lastBuildDuration[1] }}</small>
+					{{ avgBuildDuration[0] }}<small>{{ avgBuildDuration[1] }}</small>
 				</div>
 			</div>
 		</div>
@@ -32,6 +32,7 @@
 
 <script>
 	import Plot from "bzd/vue/components/graph/plot.vue";
+	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 
 	export default {
 		components: {
@@ -40,6 +41,9 @@
 		props: {
 			metadata: { type: Object, mandatory: true },
 			color: { type: String, mandatory: true }
+		},
+		directives: {
+			tooltip: DirectiveTooltip
 		},
 		mounted() {
 			this.instanceInterval = setInterval(() => {
@@ -69,6 +73,15 @@
 			}
 		},
 		computed: {
+			tooltipSpeed() {
+				return {data: "Average successful build speed over the last 14 days.<br/><small>(or the last successful build if none is available)</small>"};
+			},
+			tooltipReliability() {
+				return {data: "Success rate over the last 30 days."};
+			},
+			tooltipBuilds() {
+				return {data: "Average number of build per 7 days.<br/><small>(taken over a period of 14 days)</small>"};
+			},
 			statusMap() {
 				return {
 					success: {
@@ -149,16 +162,19 @@
 			lastBuildDate() {
 				return this.getDuration(this.timestamp - this.builds[0].timestamp);
 			},
-			lastBuildDuration() {
-				// Look for the last completed build
-				let index = 0;
-				for (const i in this.builds) {
-					if (this.builds[i].status == "success" || this.builds[i].status == "failure") {
-						index = i;
-						break;
+			avgBuildDuration() {
+				let buildList = this.getLastBuilds(14).filter((build) => build.status == "success");
+				// If no elements
+				if (!buildList) {
+					buildList = this.builds.filter((build) => build.status == "success");
+					if (buildList) {
+						buildList = [buildList[0]];
 					}
 				}
-				return this.getDuration(this.builds[index].duration);
+
+				// Build the average
+				const sum = buildList.reduce((sum, build) => sum + build.duration, 0);
+				return (sum) ? this.getDuration(sum / buildList.length) : this.getDuration();
 			},
 			lastBuild() {
 				return this.isValid ? this.builds[0] : null;
@@ -200,6 +216,9 @@
 		},
 		methods: {
 			getDuration(timestampDuration) {
+				if (timestampDuration == undefined) {
+					return ["-", ""];
+				}
 				timestampDuration /= 1000;
 				if (timestampDuration < 60) {
 					return [timestampDuration.toFixed(0), "s"];
