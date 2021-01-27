@@ -25,11 +25,11 @@ public:
 };
 
 template <class T>
-class NonOwningList : public bzd::impl::NonOwningList<T>
+class NonOwningList : public bzd::NonOwningList<T>
 {
 public:
-	using Self = typename bzd::impl::NonOwningList<T>;
-	using typename Self::BaseElementPtrType;
+	using Self = typename bzd::NonOwningList<T>;
+	using typename Self::ElementPtrType;
 
 public:
 	/**
@@ -91,7 +91,7 @@ public:
 
 	constexpr void printChain(bool onlyIfFails = true, bzd::SizeType maxElements = 100)
 	{
-		BaseElementPtrType cur = &this->front_;
+		ElementPtrType cur = &this->front_;
 		while (--maxElements && cur && cur != &this->back_)
 		{
 			if (!onlyIfFails)
@@ -110,9 +110,9 @@ public:
 		}
 	}
 
-	void printNode(BaseElementPtrType node)
+	void printNode(ElementPtrType node)
 	{
-		const auto printAddress = [this](const BaseElementPtrType address) {
+		const auto printAddress = [this](const ElementPtrType address) {
 			bzd::format::toString(bzd::platform::getOut(),
 								  CSTR("{} {}"),
 								  address,

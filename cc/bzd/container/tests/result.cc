@@ -63,26 +63,38 @@ TEST(ContainerResult, returnPointer)
 TEST(ContainerResult, constructor)
 {
 	// value copied
-	{
-		bzd::Result<int, const char*> result{12};
-		EXPECT_TRUE(result);
-		EXPECT_EQ(*result, 12);
+	bzd::Result<int, const char*> resultValue{12};
+	EXPECT_TRUE(resultValue);
+	EXPECT_EQ(*resultValue, 12);
 
-		// Only move constructors are possible
-		bzd::Result<int, const char*> resultMoved{bzd::move(result)};
-		EXPECT_TRUE(resultMoved);
-		EXPECT_EQ(*resultMoved, 12);
-	}
+	// Only move constructors are possible
+	bzd::Result<int, const char*> resultValueMoved{bzd::move(resultValue)};
+	EXPECT_TRUE(resultValueMoved);
+	EXPECT_EQ(*resultValueMoved, 12);
 
 	// error copied
-	{
-		bzd::Result<int, const char*> result{bzd::makeError("ha")};
-		EXPECT_FALSE(result);
-		EXPECT_STREQ(result.error(), "ha");
+	bzd::Result<int, const char*> resultError{bzd::makeError("ha")};
+	EXPECT_FALSE(resultError);
+	EXPECT_STREQ(resultError.error(), "ha");
 
-		// Only move constructors are possible
-		bzd::Result<int, const char*> resultMoved{bzd::move(result)};
-		EXPECT_FALSE(resultMoved);
-		EXPECT_STREQ(resultMoved.error(), "ha");
-	}
+	// Only move constructors are possible
+	bzd::Result<int, const char*> resultErrorMoved{bzd::move(resultError)};
+	EXPECT_FALSE(resultErrorMoved);
+	EXPECT_STREQ(resultErrorMoved.error(), "ha");
+
+	// Move assignment
+	resultValue = bzd::move(resultErrorMoved);
+	EXPECT_FALSE(resultValue);
+	EXPECT_STREQ(resultValue.error(), "ha");
+
+	// Move assignment
+	resultError = bzd::move(resultValue);
+	EXPECT_FALSE(resultError);
+	EXPECT_STREQ(resultError.error(), "ha");
+
+	// Move void
+	bzd::Result<void, bool> resultVoid{bzd::nullresult};
+	EXPECT_TRUE(resultVoid);
+	bzd::Result<void, bool> resultVoidMoved = bzd::move(resultVoid);
+	EXPECT_TRUE(resultVoidMoved);
 }

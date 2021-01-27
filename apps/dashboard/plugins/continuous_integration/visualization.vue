@@ -74,13 +74,16 @@
 		},
 		computed: {
 			tooltipSpeed() {
-				return {data: "Average successful build speed over the last 14 days.<br/><small>(or the last successful build if none is available)</small>"};
+				return {
+					data:
+						"Average successful build speed over the last 14 days.<br/><small>(or the last successful build if none is available)</small>"
+				};
 			},
 			tooltipReliability() {
-				return {data: "Success rate over the last 30 days."};
+				return { data: "Success rate over the last 30 days." };
 			},
 			tooltipBuilds() {
-				return {data: "Average number of build per 7 days.<br/><small>(taken over a period of 14 days)</small>"};
+				return { data: "Average number of build per 7 days.<br/><small>(taken over a period of 14 days)</small>" };
 			},
 			statusMap() {
 				return {
@@ -174,7 +177,7 @@
 
 				// Build the average
 				const sum = buildList.reduce((sum, build) => sum + build.duration, 0);
-				return (sum) ? this.getDuration(sum / buildList.length) : this.getDuration();
+				return sum ? this.getDuration(sum / buildList.length) : this.getDuration();
 			},
 			lastBuild() {
 				return this.isValid ? this.builds[0] : null;
