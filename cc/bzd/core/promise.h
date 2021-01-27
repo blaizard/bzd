@@ -1,9 +1,9 @@
 #pragma once
 
+#include "bzd/container/impl/non_owning_list.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
 #include "bzd/type_traits/invoke_result.h"
-#include "bzd/container/impl/non_owning_list.h"
 
 namespace bzd::interface {
 class Promise
@@ -21,7 +21,9 @@ public:
 
 namespace bzd::impl {
 template <class V, class E>
-class Promise : public bzd::interface::Promise, public bzd::impl::ListElement</*MultiContainer*/ true>
+class Promise
+	: public bzd::interface::Promise
+	, public bzd::impl::ListElement</*MultiContainer*/ true>
 {
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
@@ -44,7 +46,7 @@ public:
 	// When lifespan of this promise terminates, remove it from wherever it was.
 	~Promise()
 	{
-		//this->popFromList();
+		// this->popFromList();
 	}
 
 protected:
@@ -68,7 +70,7 @@ public:
 
 	bool poll() override
 	{
-		//setResult(poll_());
+		// setResult(poll_());
 		return this->isReady();
 	}
 
@@ -80,7 +82,7 @@ public:
 		EVENT
 	};
 	Type type_;
-	//bzd::Variant<>
+	// bzd::Variant<>
 	// Need to abstract the member->fct call. See functionoid for a possible implementation.
 	// https://isocpp.org/wiki/faq/pointers-to-members#typedef-for-ptr-to-memfn
 };

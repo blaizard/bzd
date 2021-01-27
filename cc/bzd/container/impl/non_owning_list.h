@@ -59,8 +59,6 @@ class NonOwningList
 public:
 	using ElementType = T;
 	using ElementPtrType = ElementType*;
-	using BaseElementType = ListElement<ElementType::isMultiContainer_>;
-	using BaseElementPtrType = BaseElementType*;
 
 	template <class V>
 	using Result = bzd::Result<V, ListErrorType>;
@@ -121,7 +119,7 @@ public:
 			// Prepare the current element to be inserted between nodePrevious and nodeNext,
 			// update the next pointer.
 			{
-				BaseElementPtrType expected{nullptr};
+				ElementPtrType expected{nullptr};
 				if (!element.next_.compareExchange(expected, setInsertionMark(nodeNext)))
 				{
 					return makeError(ListErrorType::elementAlreadyInserted);
@@ -138,7 +136,7 @@ public:
 			// Update the next pointer of the previous element. If it fails check
 			// if there was a weak mark.
 			{
-				BaseElementPtrType expected{nodeNext};
+				ElementPtrType expected{nodeNext};
 				if (!nodePrevious->next_.compareExchange(expected, &element))
 				{
 					element.next_.store(nullptr);
@@ -158,7 +156,7 @@ public:
 
 			// Remove the insertion mark
 			{
-				BaseElementPtrType expected{setInsertionMark(nodeNext)};
+				ElementPtrType expected{setInsertionMark(nodeNext)};
 				while (!element.next_.compareExchange(expected, removeMarks(expected)))
 				{
 				}
@@ -189,7 +187,7 @@ public:
 		// replace the mark with the deletion mark.
 		if constexpr (ElementType::isMultiContainer_)
 		{
-			BaseElementPtrType expected{element.next_.load()};
+			ElementPtrType expected{element.next_.load()};
 			do
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
@@ -219,7 +217,7 @@ public:
 		}
 		else
 		{
-			BaseElementPtrType expected{element.next_.load()};
+			ElementPtrType expected{element.next_.load()};
 			do
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
@@ -284,7 +282,7 @@ public:
 				{
 					// Set the mark
 					{
-						BaseElementPtrType expected{removeMarks(previous->nextRaw)};
+						ElementPtrType expected{removeMarks(previous->nextRaw)};
 						if (!previous->node->next_.compareExchange(expected, setWeakMark(expected)))
 						{
 							continue;
@@ -316,7 +314,7 @@ public:
 
 			// Try to remove the link, if fails reiterate.
 			{
-				BaseElementPtrType expected{previous->nextRaw};
+				ElementPtrType expected{previous->nextRaw};
 				if (!previous->node->next_.compareExchange(expected,
 														   (isInsertionMark(previous->nextRaw)) ? setInsertionMark(nodeNext) : nodeNext))
 				{
@@ -337,46 +335,6 @@ public:
 		return nullresult;
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
-	{
-		auto ptr = front_.next_.load();
-		if (ptr == &back_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<T&>(*ptr);
-	}
-
-	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
-	{
-		const auto ptr = front_.next_.load();
-		if (ptr == &back_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<const T&>(*ptr);
-	}
-
-	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
-	{
-		const auto previous = findPreviousNode(&back_);
-		if (previous->node == &front_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<T&>(*previous->node);
-	}
-
-	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
-	{
-		const auto previous = findPreviousNode(&back_);
-		if (previous->node == &front_)
-		{
-			return bzd::nullopt;
-		}
-		return reinterpret_cast<const T&>(*previous->node);
-	}
-
 protected:
 	/**
 	 * Structure to return node information when found.
@@ -386,12 +344,12 @@ protected:
 		/**
 		 * Pointer of the previous node.
 		 */
-		BaseElementPtrType node;
+		ElementPtrType node;
 		/**
 		 * Raw pointer of the next pointer of the previous node.
 		 * Raw means without removing deletion mark.
 		 */
-		BaseElementPtrType nextRaw;
+		ElementPtrType nextRaw;
 	};
 
 	/**
@@ -403,7 +361,7 @@ protected:
 	 *
 	 * \return A structure containing the previous node and the raw pointer its next node.
 	 */
-	[[nodiscard]] constexpr Optional<NodeFound> findPreviousNode(BaseElementPtrType node) noexcept
+	[[nodiscard]] constexpr Optional<NodeFound> findPreviousNode(ElementPtrType node) noexcept
 	{
 		NodeFound result{&front_, nullptr};
 		while (result.node != &back_)
@@ -434,44 +392,101 @@ protected:
 	}
 
 protected:
-	[[nodiscard]] constexpr bool isDeletionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr bool isDeletionMark(ElementPtrType node) const noexcept
 	{
 		return (reinterpret_cast<IntPtrType>(node) & 3) == 1;
 	}
-	[[nodiscard]] constexpr bool isInsertionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr bool isInsertionMark(ElementPtrType node) const noexcept
 	{
 		return (reinterpret_cast<IntPtrType>(node) & 3) == 2;
 	}
-	[[nodiscard]] constexpr bool isWeakMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr bool isWeakMark(ElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
+
+	[[nodiscard]] constexpr ElementPtrType setDeletionMark(ElementPtrType node) const noexcept
 	{
-		return (reinterpret_cast<IntPtrType>(node) & 3) == 3;
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x1);
 	}
 
-	[[nodiscard]] constexpr BaseElementPtrType setDeletionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr ElementPtrType setInsertionMark(ElementPtrType node) const noexcept
 	{
-		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x1);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x2);
 	}
 
-	[[nodiscard]] constexpr BaseElementPtrType setInsertionMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr ElementPtrType setWeakMark(ElementPtrType node) const noexcept
 	{
-		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x2);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x3);
 	}
 
-	[[nodiscard]] constexpr BaseElementPtrType setWeakMark(BaseElementPtrType node) const noexcept
+	[[nodiscard]] constexpr ElementPtrType removeMarks(ElementPtrType node) const noexcept
 	{
-		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x3);
-	}
-
-	[[nodiscard]] constexpr BaseElementPtrType removeMarks(BaseElementPtrType node) const noexcept
-	{
-		return reinterpret_cast<BaseElementPtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
 	}
 
 protected:
 	// Having a front & back elemment will simplify the logic to not have to take care of the edge cases.
-	BaseElementType front_;
-	BaseElementType back_;
+	ElementType front_;
+	ElementType back_;
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
 };
 } // namespace bzd::impl
+
+namespace bzd {
+
+/**
+ * Implementation of a non-owning linked list.
+ *
+ * Lock-free, multi-producer, multi-consumer.
+ * In addition it supports insertion and deletion from preemptive OS
+ * within a critical section.
+ * Elements can be moved from one list instance to another.
+ *
+ * \tparam T Element type.
+ */
+template <class T>
+class NonOwningList : public bzd::impl::NonOwningList<bzd::impl::ListElement<T::isMultiContainer_>>
+{
+public:
+	using bzd::impl::NonOwningList<bzd::impl::ListElement<T::isMultiContainer_>>::NonOwningList;
+
+	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
+	{
+		auto ptr = this->front_.next_.load();
+		if (ptr == &this->back_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<T&>(*ptr);
+	}
+
+	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
+	{
+		const auto ptr = this->front_.next_.load();
+		if (ptr == &this->back_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<const T&>(*ptr);
+	}
+
+	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
+	{
+		const auto previous = this->findPreviousNode(&this->back_);
+		if (previous->node == &this->front_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<T&>(*previous->node);
+	}
+
+	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
+	{
+		const auto previous = this->findPreviousNode(&this->back_);
+		if (previous->node == &this->front_)
+		{
+			return bzd::nullopt;
+		}
+		return reinterpret_cast<const T&>(*previous->node);
+	}
+};
+} // namespace bzd

@@ -6,6 +6,7 @@
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/type_traits/is_reference.h"
+#include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
@@ -98,13 +99,16 @@ template <class T, class E>
 class Result
 {
 private:
-	using Value = bzd::typeTraits::RemoveReference<T>;
+	using NonVoidValue = bzd::typeTraits::Conditional<bzd::typeTraits::isSame<T, void>, void*, T>;
+	using Value = bzd::typeTraits::RemoveReference<NonVoidValue>;
 	using StorageType =
-		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T> && bzd::typeTraits::isTriviallyDestructible<E>,
-									 ResultTrivialStorage<T, E>,
-									 ResultNonTrivialStorage<T, E>>;
+		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> && bzd::typeTraits::isTriviallyDestructible<E>,
+									 ResultTrivialStorage<NonVoidValue, E>,
+									 ResultNonTrivialStorage<NonVoidValue, E>>;
 
 public:
+	constexpr Result(const ResultNull&) : storage_{nullptr} {}
+
 	template <class U>
 	constexpr Result(U&& value) : storage_{bzd::forward<U>(value)}
 	{
@@ -115,16 +119,16 @@ public:
 	{
 	}
 
-	constexpr Result(const Result<T, E>& result) = delete;
+	constexpr Result(const impl::Result<T, E>& result) = delete;
 
 	// Move constructor, forward it to storage.
-	constexpr Result(Result<T, E>&& result) : storage_{bzd::move(result.storage_)} {}
+	template <class U, class V>
+	constexpr Result(impl::Result<U, V>&& result) : storage_{bzd::move(result.storage_)}
+	{
+	}
 
 	// Move assignment
-	constexpr void operator=(Result<T, E>&& result)
-	{
-		storage_ = bzd::move(result.storage_);
-	}
+	constexpr void operator=(impl::Result<T, E>&& result) { storage_ = bzd::move(result.storage_); }
 
 	constexpr operator bool() const noexcept { return !storage_.isError_; }
 
@@ -159,9 +163,12 @@ public:
 	}
 
 protected:
+	template <class A, class B>
+	friend class bzd::impl::Result;
 	StorageType storage_;
 };
 
+/*
 template <class E>
 class Result<void, E> : private Result<void*, E>
 {
@@ -172,7 +179,7 @@ public:
 
 	// constexpr Result() : Result<void*, E>(nullptr) {}
 	constexpr Result(const ResultNull&) : Result<void*, E>(nullptr) {}
-};
+};*/
 } // namespace bzd::impl
 
 namespace bzd {

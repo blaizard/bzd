@@ -110,7 +110,7 @@ private:
 
 private:
 	// Main task list, which contains only active tasks.
-	bzd::impl::NonOwningList<Task> tasks_{};
+	bzd::NonOwningList<Task> tasks_{};
 	// The current task
 	Task* task_{nullptr};
 	impl::MainTask mainTask_{};

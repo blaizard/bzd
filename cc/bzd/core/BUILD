@@ -109,9 +109,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
+        "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/type_traits:invoke_result",
     ],
 )

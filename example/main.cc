@@ -66,10 +66,7 @@ private:
 class Delay
 {
 public:
-	void waitForEventNoArgs()
-	{
-		waitForEvent(1_s);
-	}
+	void waitForEventNoArgs() { waitForEvent(1_s); }
 
 	void waitForEvent(const bzd::units::Millisecond time)
 	{
@@ -79,9 +76,7 @@ public:
 
 	auto delayEvent(const bzd::units::Millisecond time)
 	{
-		static std::thread first([this, time] {
-			this->waitForEvent(time);
-		});
+		static std::thread first([this, time] { this->waitForEvent(time); });
 		return bzd::nullopt;
 	}
 
@@ -115,23 +110,19 @@ class FunctionPointer
 {
 public:
 	template <class Object, class T>
-	constexpr FunctionPointer(Object& obj, T memberPtr) : obj_{&obj}, callable_{[memberPtr](void* ptr) {
-		(reinterpret_cast<Object*>(ptr)->*memberPtr)();
-	}}
+	constexpr FunctionPointer(Object& obj, T memberPtr) :
+		obj_{&obj}, callable_{[memberPtr](void* ptr) { (reinterpret_cast<Object*>(ptr)->*memberPtr)(); }}
 	{
 	}
 
-/*	template <class T>
-	constexpr FunctionPointer(T* fctPtr) : obj_{nullptr}, callable_{[](void*) {
-		(reinterpret_cast<Object*>(ptr)->*memberPtr)();
-	}}
-	{
-	}
-*/
-	void call()
-	{
-		return callable_(obj_);
-	}
+	/*	template <class T>
+		constexpr FunctionPointer(T* fctPtr) : obj_{nullptr}, callable_{[](void*) {
+			(reinterpret_cast<Object*>(ptr)->*memberPtr)();
+		}}
+		{
+		}
+	*/
+	void call() { return callable_(obj_); }
 
 private:
 	void* obj_;
@@ -151,11 +142,10 @@ int main()
 	FunctionPointer abs{object, &decltype(object)::waitForEventNoArgs};
 	abs.call();
 
-	//object.waitForEvent(1_s);
+	// object.waitForEvent(1_s);
 
 	int i = 20;
 	bzd::Task task1{[&i, &object] {
-
 		std::cout << "> Delay polling 1s..." << std::endl;
 		await object.delayPolling(1_s);
 		std::cout << "< Delay polling 1s" << std::endl;
