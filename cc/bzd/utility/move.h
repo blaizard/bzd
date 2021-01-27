@@ -4,7 +4,7 @@
 
 namespace bzd {
 template <class T>
-bzd::typeTraits::RemoveReference<T>&& move(T&& arg)
+constexpr bzd::typeTraits::RemoveReference<T>&& move(T&& arg)
 {
 	return static_cast<bzd::typeTraits::RemoveReference<T>&&>(arg);
 }

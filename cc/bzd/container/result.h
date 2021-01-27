@@ -23,9 +23,7 @@ private:
 
 // Forward declaration for the "friend" attribute
 template <class T, class E>
-class ResultNonTrivialStorage;
-template <class T, class E>
-class ResultTrivialStorage;
+class Result;
 
 /**
  * Internal class used to create an unexpected result object type.
@@ -38,9 +36,7 @@ public:
 
 private:
 	template <class A, class B>
-	friend class bzd::impl::ResultNonTrivialStorage;
-	template <class A, class B>
-	friend class bzd::impl::ResultTrivialStorage;
+	friend class bzd::impl::Result;
 	E error_;
 };
 
@@ -52,12 +48,12 @@ struct ResultNonTrivialStorage
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 	template <class U>
-	constexpr ResultNonTrivialStorage(U&& value) : isError_(false), value_(bzd::forward<U>(value))
+	constexpr ResultNonTrivialStorage(U&& value) : isError_{false}, value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
-	constexpr ResultNonTrivialStorage(impl::Error<U>&& u) : isError_(true), error_(u.error_)
+	constexpr ResultNonTrivialStorage(U&& value, bool) : isError_{true}, error_{bzd::forward<U>(value)}
 	{
 	}
 
@@ -82,12 +78,12 @@ struct ResultTrivialStorage
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 	template <class U>
-	constexpr ResultTrivialStorage(U&& value) : isError_(false), value_(bzd::forward<U>(value))
+	constexpr ResultTrivialStorage(U&& value) : isError_{false}, value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
-	constexpr ResultTrivialStorage(impl::Error<U>&& u) : isError_(true), error_(u.error_)
+	constexpr ResultTrivialStorage(U&& value, bool) : isError_{true}, error_{bzd::forward<U>(value)}
 	{
 	}
 
@@ -114,17 +110,20 @@ public:
 	{
 	}
 
-	// Move constructor
-	constexpr Result(Result<T, E>&& result) { *this = bzd::move(result); }
+	template <class U>
+	constexpr Result(impl::Error<U>&& u) : storage_{bzd::move(u.error_), false}
+	{
+	}
+
+	constexpr Result(const Result<T, E>& result) = delete;
+
+	// Move constructor, forward it to storage.
+	constexpr Result(Result<T, E>&& result) : storage_{bzd::move(result.storage_)} {}
 
 	// Move assignment
 	constexpr void operator=(Result<T, E>&& result)
 	{
-		storage_.isError_ = result.storage_.isError_;
-		if (storage_.isError_)
-			storage_.error_ = bzd::move(result.storage_.error_);
-		else
-			storage_.value_ = bzd::move(result.storage_.value_);
+		storage_ = bzd::move(result.storage_);
 	}
 
 	constexpr operator bool() const noexcept { return !storage_.isError_; }
