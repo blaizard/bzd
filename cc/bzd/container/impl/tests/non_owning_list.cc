@@ -27,4 +27,18 @@ TEST(NonOwningList, simple)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(list.size(), 0);
 	}
+
+	{
+		const auto result = list.pushFront(elements[2]);
+		EXPECT_TRUE(result);
+		EXPECT_EQ(list.size(), 1);
+
+		const auto result2 = elements[2].pop();
+		EXPECT_TRUE(result2);
+		EXPECT_EQ(list.size(), 0);
+
+		const auto result3 = elements[2].pop();
+		EXPECT_FALSE(result3);
+		EXPECT_EQ(list.size(), 0);
+	}
 }

@@ -10,32 +10,6 @@
 
 namespace bzd::impl {
 
-class ListElementVoid
-{
-};
-
-class ListElementMultiContainer
-{
-public:
-	bzd::Atomic<void*> parent_{nullptr};
-};
-
-template <bzd::BoolType MultiContainer = true>
-class ListElement : public bzd::typeTraits::Conditional<MultiContainer, ListElementMultiContainer, ListElementVoid>
-{
-public:
-	static const constexpr bzd::BoolType isMultiContainer_{MultiContainer};
-
-private:
-	using Self = ListElement<MultiContainer>;
-
-public:
-	constexpr ListElement() = default;
-	constexpr ListElement(Self&& elt) : next_{elt.next_.load()} {}
-
-	bzd::Atomic<Self*> next_{nullptr};
-};
-
 enum class ListErrorType
 {
 	elementAlreadyInserted,
@@ -429,25 +403,86 @@ protected:
 	// Number of elements.
 	bzd::Atomic<bzd::SizeType> size_{0};
 };
+
+// ---- NonOwningListElement
+
+class NonOwningListElementVoid
+{
+};
+
+class NonOwningListElementMultiContainer
+{
+public:
+	// Pointer to the current container.
+	bzd::Atomic<void*> parent_{nullptr};
+};
+
+template <bzd::BoolType MultiContainer>
+class NonOwningListElement
+	: public bzd::typeTraits::Conditional<MultiContainer, NonOwningListElementMultiContainer, NonOwningListElementVoid>
+{
+public:
+	static const constexpr bzd::BoolType isMultiContainer_{MultiContainer};
+
+private:
+	using Self = NonOwningListElement<MultiContainer>;
+	using Container = NonOwningList<Self>;
+	template <class V>
+	using Result = bzd::Result<V, ListErrorType>;
+
+public:
+	constexpr NonOwningListElement() = default;
+	constexpr NonOwningListElement(Self&& elt) : next_{elt.next_.load()} {}
+
+	/**
+	 * Pop the current element from the list. This is available only if
+	 * MultiContainer is enabled, as it has the knowledge of the parent container.
+	 */
+	template <bzd::BoolType T = MultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
+	[[nodiscard]] constexpr Result<void> pop() noexcept
+	{
+		auto* container = reinterpret_cast<Container*>(this->parent_.load());
+		if (container)
+		{
+			return container->pop(*this);
+		}
+		return bzd::makeError(ListErrorType::elementAlreadyRemoved);
+	}
+
+	// Pointer to the next element from the list.
+	bzd::Atomic<Self*> next_{nullptr};
+};
 } // namespace bzd::impl
 
 namespace bzd {
 
 /**
+ * Element for the non-owning list.
+ *
+ * \tparam MultiContainer Whether multicontainer should be supported or not.
+ *         This means that an element can pop from one list and push a different one.
+ */
+template <bzd::BoolType MultiContainer>
+using NonOwningListElement = impl::NonOwningListElement<MultiContainer>;
+
+/**
  * Implementation of a non-owning linked list.
  *
+ * The implementation is based on a single linked list, which should be efficient
+ * enough for insertion and removal for small lists.
+ *
  * Lock-free, multi-producer, multi-consumer.
- * In addition it supports insertion and deletion from preemptive OS
- * within a critical section.
+ * In addition it supports lock-free insertion and deletion from critical section,
+ * meaning that a call will always return without the need of task preemption.
  * Elements can be moved from one list instance to another.
  *
  * \tparam T Element type.
  */
 template <class T>
-class NonOwningList : public bzd::impl::NonOwningList<bzd::impl::ListElement<T::isMultiContainer_>>
+class NonOwningList : public bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>
 {
 public:
-	using bzd::impl::NonOwningList<bzd::impl::ListElement<T::isMultiContainer_>>::NonOwningList;
+	using bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>::NonOwningList;
 
 	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
 	{
