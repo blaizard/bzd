@@ -6,7 +6,7 @@
 
 namespace bzd::test {
 
-class ListElementMultiContainer : public bzd::impl::ListElement</*MultiContainer*/ true>
+class ListElementMultiContainer : public bzd::NonOwningListElement</*MultiContainer*/ true>
 {
 public:
 	ListElementMultiContainer(bzd::SizeType value) : value_{value} {}
@@ -15,7 +15,7 @@ public:
 	bzd::SizeType value_;
 };
 
-class ListElement : public bzd::impl::ListElement<false>
+class ListElement : public bzd::NonOwningListElement<false>
 {
 public:
 	ListElement(bzd::SizeType value) : value_{value} {}

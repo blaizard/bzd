@@ -113,6 +113,7 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/type_traits:invoke_result",
+        "//cc/bzd/utility:ignore",
     ],
 )
 

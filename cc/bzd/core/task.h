@@ -13,7 +13,7 @@ void yield();
 } // namespace bzd
 
 namespace bzd::interface {
-class Task : public bzd::impl::ListElement</*MultiContainer*/ true>
+class Task : public bzd::NonOwningListElement</*MultiContainer*/ true>
 {
 public: // Types.
 	using PtrType = Task*;

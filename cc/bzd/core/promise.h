@@ -4,6 +4,7 @@
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
 #include "bzd/type_traits/invoke_result.h"
+#include "bzd/utility/ignore.h"
 
 namespace bzd::interface {
 class Promise
@@ -23,7 +24,7 @@ namespace bzd::impl {
 template <class V, class E>
 class Promise
 	: public bzd::interface::Promise
-	, public bzd::impl::ListElement</*MultiContainer*/ true>
+	, public bzd::NonOwningListElement</*MultiContainer*/ true>
 {
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
@@ -44,10 +45,7 @@ public:
 	}
 
 	// When lifespan of this promise terminates, remove it from wherever it was.
-	~Promise()
-	{
-		// this->popFromList();
-	}
+	~Promise() { bzd::ignore = this->pop(); }
 
 protected:
 	ReturnType return_{};
