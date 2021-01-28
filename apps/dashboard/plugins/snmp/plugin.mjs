@@ -76,8 +76,16 @@ export default {
 						"disk.total.volume1:1.3.6.1.2.1.25.2.3.1.5.51:600:mul:1.3.6.1.2.1.25.2.3.1.4.51":
 							"/volume1 Total Space (bytes)",
 						"disk.used.volume1:1.3.6.1.2.1.25.2.3.1.6.51:60:mul:1.3.6.1.2.1.25.2.3.1.4.51":
-							"/volume1 Used Space (bytes)"
-					},
+							"/volume1 Used Space (bytes)",
+						"io.read.sda:1.3.6.1.4.1.6574.101.1.1.3.1:10": "sda Total Read (bytes)",
+						"io.read.sdb:1.3.6.1.4.1.6574.101.1.1.3.2:10": "sdb Total Read (bytes)",
+						"io.write.sda:1.3.6.1.4.1.6574.101.1.1.4.1:10": "sda Total Write (bytes)",
+						"io.write.sdb:1.3.6.1.4.1.6574.101.1.1.4.2:10": "sdb Total Write (bytes)",
+						"network.in.eth0:1.3.6.1.2.1.31.1.1.1.6.3:10": "eth0 Total Received (bytes)",
+						"network.in.eth1:1.3.6.1.2.1.31.1.1.1.6.4:10": "eth1 Total Received (bytes)",
+						"network.out.eth0:1.3.6.1.2.1.31.1.1.1.10.3:10": "eth0 Total Sent (bytes)",
+						"network.out.eth1:1.3.6.1.2.1.31.1.1.1.10.4:10": "eth1 Total Sent (bytes)",
+						},
 					width: 0.4
 				},
 				{ type: "Button", content: "Add", action: "approve", width: 0.2, align: "bottom" }
