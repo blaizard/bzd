@@ -60,7 +60,10 @@ export default {
 					name: "oid",
 					caption: "OIDs",
 					condition: (values) => values["preset"] == "synology",
-					// Check available disks: snmpwalk -v 2c -c public 192.168.1.200 1.3.6.1.2.1.25.2.3.1.3
+					/*
+					 * Check available disks: snmpwalk -v 2c -c public 192.168.1.200 1.3.6.1.2.1.25.2.3.1.3
+					 * https://global.download.synology.com/download/Document/Software/DeveloperGuide/Firmware/DSM/All/enu/Synology_DiskStation_MIB_Guide.pdf
+					 */
 					list: {
 						"name:1.3.6.1.4.1.6574.1.5.1.0::600": "Model Name",
 						"cpu.load:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",
@@ -71,21 +74,22 @@ export default {
 						"temperature.system:1.3.6.1.4.1.6574.1.2.0:10": "System Temperature (C)",
 						"temperature.hdd1:1.3.6.1.4.1.6574.2.1.1.6.0:10": "Disk 1 Temperature (C)",
 						"temperature.hdd2:1.3.6.1.4.1.6574.2.1.1.6.1:10": "Disk 2 Temperature (C)",
+						"ups.name:1.3.6.1.4.1.6574.4.1.1.0:600": "UPS Model Name",
 						"ups.charge:1.3.6.1.4.1.6574.4.3.1.1.0:60:div:100": "UPS Battery Charge (%)",
 						"ups.load:1.3.6.1.4.1.6574.4.2.12.1.0:60": "UPS Battery Load",
 						"disk.total.volume1:1.3.6.1.2.1.25.2.3.1.5.51:600:mul:1.3.6.1.2.1.25.2.3.1.4.51":
 							"/volume1 Total Space (bytes)",
 						"disk.used.volume1:1.3.6.1.2.1.25.2.3.1.6.51:60:mul:1.3.6.1.2.1.25.2.3.1.4.51":
 							"/volume1 Used Space (bytes)",
-						"io.read.sda:1.3.6.1.4.1.6574.101.1.1.3.1:10": "sda Total Read (bytes)",
-						"io.read.sdb:1.3.6.1.4.1.6574.101.1.1.3.2:10": "sdb Total Read (bytes)",
-						"io.write.sda:1.3.6.1.4.1.6574.101.1.1.4.1:10": "sda Total Write (bytes)",
-						"io.write.sdb:1.3.6.1.4.1.6574.101.1.1.4.2:10": "sdb Total Write (bytes)",
-						"network.in.eth0:1.3.6.1.2.1.31.1.1.1.6.3:10": "eth0 Total Received (bytes)",
-						"network.in.eth1:1.3.6.1.2.1.31.1.1.1.6.4:10": "eth1 Total Received (bytes)",
-						"network.out.eth0:1.3.6.1.2.1.31.1.1.1.10.3:10": "eth0 Total Sent (bytes)",
-						"network.out.eth1:1.3.6.1.2.1.31.1.1.1.10.4:10": "eth1 Total Sent (bytes)",
-						},
+						"io.total.in.sda:1.3.6.1.4.1.6574.101.1.1.3.1:10": "sda Total Read (bytes)",
+						"io.total.in.sdb:1.3.6.1.4.1.6574.101.1.1.3.2:10": "sdb Total Read (bytes)",
+						"io.total.out.sda:1.3.6.1.4.1.6574.101.1.1.4.1:10": "sda Total Write (bytes)",
+						"io.total.out.sdb:1.3.6.1.4.1.6574.101.1.1.4.2:10": "sdb Total Write (bytes)",
+						"network.total.in.eth0:1.3.6.1.2.1.31.1.1.1.6.3:10": "eth0 Total Received (bytes)",
+						"network.total.in.eth1:1.3.6.1.2.1.31.1.1.1.6.4:10": "eth1 Total Received (bytes)",
+						"network.total.out.eth0:1.3.6.1.2.1.31.1.1.1.10.3:10": "eth0 Total Sent (bytes)",
+						"network.total.out.eth1:1.3.6.1.2.1.31.1.1.1.10.4:10": "eth1 Total Sent (bytes)"
+					},
 					width: 0.4
 				},
 				{ type: "Button", content: "Add", action: "approve", width: 0.2, align: "bottom" }

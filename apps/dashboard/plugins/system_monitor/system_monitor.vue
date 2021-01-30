@@ -43,6 +43,10 @@
 					<div class="bar" :style="swapStyle"></div>
 				</div>
 			</div>
+			<div v-if="isIO" class="gauge">
+				<div class="name">IO</div>
+				<div class="value">Read: {{ ioRateRead }} - Write: {{ ioRateWrite }}</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -59,7 +63,9 @@
 			tooltip: DirectiveTooltip
 		},
 		data: function() {
-			return {};
+			return {
+				history: {}
+			};
 		},
 		computed: {
 			isMemory() {
@@ -151,6 +157,18 @@
 			},
 			batteryPercent() {
 				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
+			},
+			isIO() {
+				return this.has("io.total.in") || this.has("io.total.out");
+			},
+			ioRate() {
+				return this.getRate("io", this.makeIOMap("io"));
+			},
+			ioRateRead() {
+				return bytesToString(Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.in || 0), 0)) + "/s";
+			},
+			ioRateWrite() {
+				return bytesToString(Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.out || 0), 0)) + "/s";
 			}
 		},
 		methods: {
@@ -216,6 +234,65 @@
 						"%)"
 					);
 				});
+			},
+			// IO
+			makeIOMap(name) {
+				let map = this.getItems(name + ".total.in").reduce((obj, item) => {
+					const id = item.id.substring((name + ".total.in").length + 1) || "undefined";
+					obj[id] = obj[id] || { in: 0, out: 0 };
+					obj[id].in += item.value;
+					return obj;
+				}, {});
+				this.getItems(name + ".total.out").forEach((item) => {
+					const id = item.id.substring((name + ".total.out").length + 1) || "undefined";
+					map[id] = map[id] || { in: 0, out: 0 };
+					map[id].out += item.value;
+				});
+				return map;
+			},
+			addHistory(name, map) {
+				this.history[name] = this.history[name] || [];
+				// Find the insertion timestamp of the last element
+				let lastTimestamp = 0;
+				if (this.history[name].length) {
+					lastTimestamp = this.history[name][0].timestamp;
+				}
+
+				// Add a new element every 6 seconds
+				if (Date.now() - lastTimestamp > 6000) {
+					this.history[name].unshift({
+						timestamp: Date.now(),
+						value: JSON.parse(JSON.stringify(map))
+					});
+					// Keep max 10 elements (1 min of data)
+					this.history[name] = this.history[name].slice(0, 10);
+				}
+
+				let previous = null;
+				for (const entry of Object.values(this.history[name])) {
+					if (previous !== null) {
+						if (JSON.stringify(previous.value) != JSON.stringify(entry.value)) {
+							return entry;
+						}
+					}
+					previous = entry;
+				}
+
+				return this.history[name][this.history[name].length - 1];
+			},
+			getRate(name, map) {
+				const previous = this.addHistory(name, map);
+
+				let diff = {};
+				const delayS = (Date.now() - previous.timestamp) / 1000;
+				for (const id in map) {
+					diff[id] = {};
+					for (const key in map[id]) {
+						diff[id][key] = (map[id][key] - ((previous.value[id] || {})[key] || 0)) / delayS;
+					}
+				}
+
+				return diff;
 			},
 			makeTooltip(displayName, map, callback) {
 				const messageList = Object.keys(map).map((key) => {
