@@ -24,6 +24,8 @@ class Snmp {
 			return data.value.toString();
 		case SnmpNative.ObjectType.Integer:
 			return data.value;
+		case SnmpNative.ObjectType.Counter:
+			return data.value;
 		case SnmpNative.ObjectType.Opaque:
 			/*
 			 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
