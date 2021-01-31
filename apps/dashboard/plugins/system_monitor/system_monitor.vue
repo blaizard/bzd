@@ -45,7 +45,7 @@
 			</div>
 			<div v-if="isIO" class="gauge">
 				<div class="name">IO</div>
-				<div class="value">Read: {{ ioRateRead }} - Write: {{ ioRateWrite }}</div>
+				<div class="value">{{ ioRateRead }} / {{ ioRateWrite }} (R/W)</div>
 			</div>
 		</div>
 	</div>
@@ -337,9 +337,8 @@
 					overflow: hidden;
 					white-space: nowrap;
 					position: absolute;
-					top: 25%;
-					bottom: 25%;
-					font-size: 0.5em;
+					top: 10%;
+					font-size: 0.8em;
 					text-align: right;
 					padding-right: 4px;
 
