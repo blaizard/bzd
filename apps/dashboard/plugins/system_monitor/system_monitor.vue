@@ -17,35 +17,52 @@
 		<div class="gauges">
 			<div v-if="isCpu" class="gauge" v-tooltip="cpuTooltip">
 				<div class="name">CPU</div>
-				<div class="value">
-					{{ cpuPercent.toFixed(1) }}%
-					<div class="bar" :style="cpuStyle"></div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="cpuStyle"></div>
+						{{ cpuPercent.toFixed(1) }}%
+					</div>
 				</div>
 			</div>
 			<div v-if="isGpu" class="gauge" v-tooltip="gpuTooltip">
 				<div class="name">GPU</div>
-				<div class="value">
-					{{ gpuPercent.toFixed(1) }}%
-					<div class="bar" :style="gpuStyle"></div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="gpuStyle"></div>
+						{{ gpuPercent.toFixed(1) }}%
+					</div>
 				</div>
 			</div>
 			<div v-if="isMemory" class="gauge" v-tooltip="memoryTooltip">
 				<div class="name">Memory</div>
-				<div class="value">
-					{{ memoryPercent.toFixed(1) }}%
-					<div class="bar" :style="memoryStyle"></div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="memoryStyle"></div>
+						{{ memoryPercent.toFixed(1) }}%
+					</div>
 				</div>
 			</div>
 			<div v-if="isSwap" class="gauge" v-tooltip="swapTooltip">
 				<div class="name">Swap</div>
-				<div class="value">
-					{{ swapPercent.toFixed(1) }}%
-					<div class="bar" :style="swapStyle"></div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="swapStyle"></div>
+						{{ swapPercent.toFixed(1) }}%
+					</div>
 				</div>
 			</div>
 			<div v-if="isIO" class="gauge">
 				<div class="name">IO</div>
-				<div class="value">{{ ioRateRead }} / {{ ioRateWrite }} (R/W)</div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="ioReadStyle"></div>
+						R: {{ formatBytesRate(ioRateRead) }}
+					</div>
+					<div class="value">
+						<div class="bar" :style="ioWriteStyle"></div>
+						W: {{ formatBytesRate(ioRateWrite) }}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -165,10 +182,24 @@
 				return this.getRate("io", this.makeIOMap("io"));
 			},
 			ioRateRead() {
-				return bytesToString(Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.in || 0), 0)) + "/s";
+				return Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.in || 0), 0);
 			},
 			ioRateWrite() {
-				return bytesToString(Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.out || 0), 0)) + "/s";
+				return Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.out || 0), 0);
+			},
+			ioReadStyle() {
+				const rate = this.ioRateRead / 10000;
+				const value = -1 / Math.log(rate + 1) + 1;
+				return {
+					width: value * 100 + "%"
+				};
+			},
+			ioWriteStyle() {
+				const rate = this.ioRateWrite / 10000;
+				const value = -1 / Math.log(rate + 1) + 1;
+				return {
+					width: value * 100 + "%"
+				};
 			}
 		},
 		methods: {
@@ -294,6 +325,9 @@
 
 				return diff;
 			},
+			formatBytesRate(rate) {
+				return bytesToString(rate) + "/s";
+			},
 			makeTooltip(displayName, map, callback) {
 				const messageList = Object.keys(map).map((key) => {
 					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
@@ -320,46 +354,51 @@
 
 		.gauges {
 			width: 100%;
+			padding-right: 10px;
 
 			.gauge {
 				width: 100%;
-				position: relative;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
 
 				.name {
-					display: inline-block;
 					width: 30%;
 					text-align: right;
 					padding-right: 10px;
 				}
-				.value {
-					display: inline-block;
-					width: 60%;
-					overflow: hidden;
-					white-space: nowrap;
-					position: absolute;
-					top: 10%;
-					font-size: 0.8em;
-					text-align: right;
-					padding-right: 4px;
+				.values {
+					flex: 1;
+					.value {
+						overflow: hidden;
+						white-space: nowrap;
+						position: relative;
+						top: 10%;
+						font-size: 0.8em;
+						text-align: right;
+						padding-right: 4px;
+						isolation: isolate;
 
-					&:before {
-						content: " ";
-						position: absolute;
-						left: 0;
-						top: 0;
-						bottom: 0;
-						right: 0;
-						background-color: currentColor;
-						opacity: 0.2;
-					}
+						&:before {
+							content: " ";
+							position: absolute;
+							left: 0;
+							top: 0;
+							bottom: 0;
+							right: 0;
+							background-color: currentColor;
+							opacity: 0.1;
+						}
 
-					.bar {
-						position: absolute;
-						top: 0;
-						left: 0;
-						bottom: 0;
-						background-color: currentColor;
-						transition: width 0.5s;
+						.bar {
+							position: absolute;
+							top: 0;
+							left: 0;
+							bottom: 0;
+							background-color: currentColor;
+							transition: width 0.5s;
+							mix-blend-mode: difference;
+						}
 					}
 				}
 			}
