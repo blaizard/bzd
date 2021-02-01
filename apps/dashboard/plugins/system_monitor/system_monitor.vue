@@ -191,14 +191,14 @@
 				const rate = this.ioRateRead / 10000;
 				const value = -1 / Math.log(rate + 1) + 1;
 				return {
-					width: value * 100 + "%"
+					width: ((value < 0) ? 0 : value * 100) + "%"
 				};
 			},
 			ioWriteStyle() {
 				const rate = this.ioRateWrite / 10000;
 				const value = -1 / Math.log(rate + 1) + 1;
 				return {
-					width: value * 100 + "%"
+					width: ((value < 0) ? 0 : value * 100) + "%"
 				};
 			}
 		},
