@@ -189,14 +189,14 @@
 			},
 			ioReadStyle() {
 				const rate = this.ioRateRead / 10000;
-				const value = -1 / Math.log(rate + 1) + 1;
+				const value = -1 / Math.log(rate + 10) + 1;
 				return {
 					width: ((value < 0) ? 0 : value * 100) + "%"
 				};
 			},
 			ioWriteStyle() {
 				const rate = this.ioRateWrite / 10000;
-				const value = -1 / Math.log(rate + 1) + 1;
+				const value = -1 / Math.log(rate + 10) + 1;
 				return {
 					width: ((value < 0) ? 0 : value * 100) + "%"
 				};
