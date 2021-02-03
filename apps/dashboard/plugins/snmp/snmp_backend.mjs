@@ -26,6 +26,14 @@ class Snmp {
 			return data.value;
 		case SnmpNative.ObjectType.Counter:
 			return data.value;
+		case SnmpNative.ObjectType.Counter64: {
+			let view = new DataView(new ArrayBuffer(8));
+			const length = data.value.length;
+			for (let i = 0; i < length; i++) {
+				view.setInt8(length - i - 1, data.value[i]);
+			}
+			return view.getBigUint64(0, /*littleEndian*/ true).toString();
+		}
 		case SnmpNative.ObjectType.Opaque:
 			/*
 			 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
