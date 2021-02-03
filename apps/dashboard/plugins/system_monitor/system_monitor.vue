@@ -7,7 +7,7 @@
 				<span class="value">{{ temperatureMax.toFixed(0) }}°C</span>
 			</span>
 
-			<span v-if="isBattery" class="entry">
+			<span v-if="isBattery" class="entry" v-tooltip="batteryTooltip">
 				<i class="bzd-icon-battery"></i>
 				<span class="value">{{ batteryPercent.toFixed(0) }}%</span>
 			</span>
@@ -51,7 +51,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="isIO" class="gauge">
+			<div v-if="isIO" class="gauge" v-tooltip="ioTooltip">
 				<div class="name">IO</div>
 				<div class="values">
 					<div class="value">
@@ -61,6 +61,19 @@
 					<div class="value">
 						<div class="bar" :style="ioWriteStyle"></div>
 						W: {{ formatBytesRate(ioRateWrite) }}
+					</div>
+				</div>
+			</div>
+			<div v-if="isNetwork" class="gauge" v-tooltip="networkTooltip">
+				<div class="name">Network</div>
+				<div class="values">
+					<div class="value">
+						<div class="bar" :style="networkReadStyle"></div>
+						R: {{ formatBytesRate(networkRateRead) }}
+					</div>
+					<div class="value">
+						<div class="bar" :style="networkWriteStyle"></div>
+						S: {{ formatBytesRate(networkRateWrite) }}
 					</div>
 				</div>
 			</div>
@@ -169,12 +182,24 @@
 			temperatureTooltip() {
 				return this.makeTooltip("Max Temperature", this.temperature, (temperature) => temperature.toFixed(0) + "°C");
 			},
+			// Battery
 			isBattery() {
 				return this.has("ups.charge");
 			},
 			batteryPercent() {
 				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
 			},
+			batteryTooltip() {
+				if (!this.getItems("ups.name")) {
+					return null;
+				}
+				return {
+					data: this.getItems("ups.name")
+						.map((item) => item.value)
+						.join(", ")
+				};
+			},
+			// IO
 			isIO() {
 				return this.has("io.total.in") || this.has("io.total.out");
 			},
@@ -188,18 +213,43 @@
 				return Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.out || 0), 0);
 			},
 			ioReadStyle() {
-				const rate = this.ioRateRead / 10000;
-				const value = -1 / Math.log(rate + 2.7185) + 1;
 				return {
-					width: ((value < 0) ? 0 : value * 100) + "%"
+					width: this.makeRate(this.ioRateRead / 20000) * 100 + "%"
 				};
 			},
 			ioWriteStyle() {
-				const rate = this.ioRateWrite / 10000;
-				const value = -1 / Math.log(rate + 2.7185) + 1;
 				return {
-					width: ((value < 0) ? 0 : value * 100) + "%"
+					width: this.makeRate(this.ioRateWrite / 20000) * 100 + "%"
 				};
+			},
+			ioTooltip() {
+				return this.makeRateTooltip("IO", this.ioRate, { in: "read", out: "write" });
+			},
+			// Network
+			isNetwork() {
+				return this.has("network.total.in") || this.has("network.total.out");
+			},
+			networkRate() {
+				return this.getRate("network", this.makeIOMap("network"));
+			},
+			networkRateRead() {
+				return Object.values(this.networkRate).reduce((sum, obj) => sum + (obj.in || 0), 0);
+			},
+			networkRateWrite() {
+				return Object.values(this.networkRate).reduce((sum, obj) => sum + (obj.out || 0), 0);
+			},
+			networkReadStyle() {
+				return {
+					width: this.makeRate(this.networkRateRead / 20000) * 100 + "%"
+				};
+			},
+			networkWriteStyle() {
+				return {
+					width: this.makeRate(this.networkRateWrite / 20000) * 100 + "%"
+				};
+			},
+			networkTooltip() {
+				return this.makeRateTooltip("Network", this.networkRate, { in: "recv", out: "sent" });
 			}
 		},
 		methods: {
@@ -325,6 +375,16 @@
 
 				return diff;
 			},
+			makeRateTooltip(displayName, map, mapping) {
+				return this.makeTooltip(displayName, map, (item) => {
+					const output = Object.keys(mapping)
+						.filter((key) => key in item)
+						.map((key) => {
+							return mapping[key] + ": " + this.formatBytesRate(item[key]);
+						});
+					return output.join(", ");
+				});
+			},
 			formatBytesRate(rate) {
 				return bytesToString(rate) + "/s";
 			},
@@ -333,6 +393,12 @@
 					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
 				});
 				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
+			},
+			/**
+			 * From a positive value, return a rate from 0 to 1.
+			 */
+			makeRate(x) {
+				return -1 / Math.log(x + Math.exp(1)) + 1;
 			}
 		}
 	};
@@ -361,6 +427,8 @@
 				display: flex;
 				flex-direction: row;
 				flex-wrap: nowrap;
+				font-size: 0.8em;
+				margin-bottom: 5px;
 
 				.name {
 					width: 30%;
@@ -373,8 +441,6 @@
 						overflow: hidden;
 						white-space: nowrap;
 						position: relative;
-						top: 10%;
-						font-size: 0.8em;
 						text-align: right;
 						padding-right: 4px;
 						isolation: isolate;
