@@ -60,6 +60,10 @@
 			};
 		},
 		mounted() {
+			// Set the default link if any
+			if ("link.url" in this.description) {
+				this.link = this.description["link.url"];
+			}
 			if (this.sourceType) {
 				this.initialized = false;
 				this.showComponent = false;

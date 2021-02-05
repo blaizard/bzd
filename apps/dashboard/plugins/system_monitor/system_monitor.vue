@@ -20,7 +20,7 @@
 				<div class="values">
 					<div class="value">
 						<div class="bar" :style="cpuStyle"></div>
-						{{ cpuPercent.toFixed(1) }}%
+						<div class="overlay">{{ cpuPercent.toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -29,7 +29,7 @@
 				<div class="values">
 					<div class="value">
 						<div class="bar" :style="gpuStyle"></div>
-						{{ gpuPercent.toFixed(1) }}%
+						<div class="overlay">{{ gpuPercent.toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -38,7 +38,7 @@
 				<div class="values">
 					<div class="value">
 						<div class="bar" :style="memoryStyle"></div>
-						{{ memoryPercent.toFixed(1) }}%
+						<div class="overlay">{{ memoryPercent.toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -47,7 +47,7 @@
 				<div class="values">
 					<div class="value">
 						<div class="bar" :style="swapStyle"></div>
-						{{ swapPercent.toFixed(1) }}%
+						<div class="overlay">{{ swapPercent.toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -55,12 +55,9 @@
 				<div class="name">IO</div>
 				<div class="values">
 					<div class="value">
-						<div class="bar" :style="ioReadStyle"></div>
-						R: {{ formatBytesRate(ioRateRead) }}
-					</div>
-					<div class="value">
-						<div class="bar" :style="ioWriteStyle"></div>
-						W: {{ formatBytesRate(ioRateWrite) }}
+						<div class="bar fit-2" :style="ioReadStyle"></div>
+						<div class="bar fit-2" :style="ioWriteStyle"></div>
+						<div class="overlay">{{ formatBytesRate(ioRateRead + ioRateWrite) }}</div>
 					</div>
 				</div>
 			</div>
@@ -68,12 +65,9 @@
 				<div class="name">Network</div>
 				<div class="values">
 					<div class="value">
-						<div class="bar" :style="networkReadStyle"></div>
-						R: {{ formatBytesRate(networkRateRead) }}
-					</div>
-					<div class="value">
-						<div class="bar" :style="networkWriteStyle"></div>
-						S: {{ formatBytesRate(networkRateWrite) }}
+						<div class="bar fit-2" :style="networkReadStyle"></div>
+						<div class="bar fit-2" :style="networkWriteStyle"></div>
+						<div class="overlay">{{ formatBytesRate(networkRateRead + networkRateWrite) }}</div>
 					</div>
 				</div>
 			</div>
@@ -441,9 +435,9 @@
 						overflow: hidden;
 						white-space: nowrap;
 						position: relative;
-						text-align: right;
-						padding-right: 4px;
 						isolation: isolate;
+						height: 1.5em;
+						line-height: 1.5em;
 
 						&:before {
 							content: " ";
@@ -456,6 +450,10 @@
 							opacity: 0.1;
 						}
 
+						&:after {
+							content: " ";
+						}
+
 						.bar {
 							position: absolute;
 							top: 0;
@@ -464,6 +462,21 @@
 							background-color: currentColor;
 							transition: width 0.5s;
 							mix-blend-mode: difference;
+
+							&.fit-2 {
+								position: relative;
+								height: calc(50% - 1px);
+								margin: 1px 0;
+							}
+						}
+
+						.overlay {
+							position: absolute;
+							top: 0;
+							width: 100%;
+							mix-blend-mode: difference;
+							text-align: right;
+							padding: 0 4px;
 						}
 					}
 				}
