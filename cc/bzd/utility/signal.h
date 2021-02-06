@@ -26,7 +26,7 @@ public:
 template <bzd::SizeType SizeBytes>
 struct SignalInternals
 {
-	static_assert(SizeBytes > 0 && SizeBytes <= 8, "Singal size must be within 0 and 8 bytes.");
+	static_assert(SizeBytes > 0 && SizeBytes <= 8, "Signal size must be within 1 and 8 bytes.");
 };
 
 template <>
