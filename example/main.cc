@@ -3,6 +3,8 @@
 #include <iostream>
 #include <thread>
 
+#include "example/terminal.h"
+
 /**
 Uses cases for promises:
 
@@ -146,6 +148,9 @@ int main()
 
 	int i = 20;
 	bzd::Task task1{[&i, &object] {
+
+		Terminal term{};
+
 		std::cout << "> Delay polling 1s..." << std::endl;
 		await object.delayPolling(1_s);
 		std::cout << "< Delay polling 1s" << std::endl;
@@ -154,6 +159,7 @@ int main()
 		{
 			await bzd::delay(1_s);
 			std::cout << "Fct 1: " << i-- << " (1s)" << std::endl;
+			std::cout << "You pressed " << term.getch() << std::endl;
 		}
 		std::cout << "Fct 1: end" << std::endl;
 	}};
