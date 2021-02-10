@@ -68,6 +68,42 @@ def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwar
         **kwargs
     )
 
+def _cc_linker_wiath_for_bazel_401(ctx, cc_info_providers, map_analyzer):
+    cc_toolchain = find_cc_toolchain(ctx)
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features,
+        unsupported_features = ctx.disabled_features,
+    )
+
+    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
+    (linking_context, linking_outputs) = cc_common.link(
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        #compilation_outputs = cc_info_providers.compilation_outputs,
+        linking_contexts = [cc_info_providers.linking_context],
+        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+        additional_outputs = [map_file],
+        link_deps_statically = True,
+        stamp = 1,
+    )
+
+    binary_file = linking_outputs.executable
+
+    metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
+    ctx.actions.run(
+        inputs = [map_file, binary_file],
+        outputs = [metadata_file],
+        progress_message = "Generating metadata for {}".format(ctx.attr.name),
+        arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
+        tools = map_analyzer.data_runfiles.files,
+        executable = map_analyzer.files_to_run,
+    )
+
+    return binary_file, [metadata_file]
+
 def _cc_linker(ctx, cc_info_providers, map_analyzer):
     """
     Link cc providers and generate metadata from the linker map.

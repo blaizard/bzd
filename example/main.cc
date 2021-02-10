@@ -1,9 +1,9 @@
 #include "bzd.h"
+#include "example/mutex.h"
+#include "example/terminal.h"
 
 #include <iostream>
 #include <thread>
-
-#include "example/terminal.h"
 
 /**
 Uses cases for promises:
@@ -86,7 +86,7 @@ public:
 	{
 		auto duration = bzd::platform::getTicks().toDuration();
 		const auto targetDuration = duration + bzd::platform::msToTicks(time);
-		return bzd::makePromise([duration, targetDuration]() mutable -> bzd::PromiseReturnType<> {
+		return bzd::makePromise([duration, targetDuration](bzd::interface::Promise&) mutable -> bzd::PromiseReturnType<> {
 			const auto curTicks = bzd::platform::getTicks();
 
 			// Update the current duration and update the wrapping counter
@@ -131,35 +131,20 @@ private:
 	bzd::Function<void(void*)> callable_;
 };
 
-int main()
+void simpleDelay()
 {
 	static bzd::platform::Stack<10000> stack1;
 	static bzd::platform::Stack<10000> stack2;
 
-	Delay object{};
-
 	stack1.taint();
 	stack2.taint();
 
-	FunctionPointer abs{object, &decltype(object)::waitForEventNoArgs};
-	abs.call();
-
-	// object.waitForEvent(1_s);
-
 	int i = 20;
-	bzd::Task task1{[&i, &object] {
-
-		Terminal term{};
-
-		std::cout << "> Delay polling 1s..." << std::endl;
-		await object.delayPolling(1_s);
-		std::cout << "< Delay polling 1s" << std::endl;
-
+	bzd::Task task1{[&i] {
 		while (i > 0)
 		{
 			await bzd::delay(1_s);
 			std::cout << "Fct 1: " << i-- << " (1s)" << std::endl;
-			std::cout << "You pressed " << term.getch() << std::endl;
 		}
 		std::cout << "Fct 1: end" << std::endl;
 	}};
@@ -183,6 +168,70 @@ int main()
 
 	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
 	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
+}
 
-	return 0;
+void exampleMutex()
+{
+	static bzd::platform::Stack<10000> stack1;
+	static bzd::platform::Stack<10000> stack2;
+	static bzd::platform::Stack<10000> stack3;
+
+	stack1.taint();
+	stack2.taint();
+	stack3.taint();
+
+	Mutex mutex{};
+
+	bzd::Task task1{[&mutex] {
+		for (int i = 0; i < 3; ++i)
+		{
+			await mutex.lock();
+			std::cout << "<1.." << std::flush;
+			await bzd::delay(100_ms);
+			std::cout << "..1>" << std::endl;
+			mutex.unlock();
+		}
+	}};
+
+	bzd::Task task2{[&mutex] {
+		for (int i = 0; i < 3; ++i)
+		{
+			await mutex.lock();
+			std::cout << "<2.." << std::flush;
+			await bzd::delay(100_ms);
+			std::cout << "..2>" << std::endl;
+			mutex.unlock();
+		}
+	}};
+
+	bzd::Task task3{[&mutex] {
+		for (int i = 0; i < 3; ++i)
+		{
+			await mutex.lock();
+			std::cout << "<3.." << std::flush;
+			await bzd::delay(100_ms);
+			std::cout << "..3>" << std::endl;
+			mutex.unlock();
+		}
+	}};
+
+	task1.bind(stack1);
+	task2.bind(stack2);
+	task3.bind(stack3);
+
+	bzd::getScheduler().addTask(task1);
+	bzd::getScheduler().addTask(task2);
+	bzd::getScheduler().addTask(task3);
+
+	bzd::getScheduler().start();
+
+	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack3: " << stack3.estimateMaxUsage() << std::endl;
+}
+
+int main()
+{
+	// simpleDelay();
+	exampleMutex();
 }

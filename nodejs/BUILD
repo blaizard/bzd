@@ -54,7 +54,7 @@ bzd_nodejs_library(
         "mini-css-extract-plugin": "0.8.0",  # Seems that 0.9.0 has some issue: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/493
         "css-loader": "3.6.0",  # From 4.0.0 the keyword :export seems broken
         "node-sass": "",
-        "sass-loader": "10.1.1", # Breaking changes from 11 onward, only support webpack v5+
+        "sass-loader": "10.1.1",  # Breaking changes from 11 onward, only support webpack v5+
         "sass": "",
         "file-loader": "",
         "url-loader": "",
