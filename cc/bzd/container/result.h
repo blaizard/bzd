@@ -168,18 +168,6 @@ protected:
 	StorageType storage_;
 };
 
-/*
-template <class E>
-class Result<void, E> : private Result<void*, E>
-{
-public:
-	using Result<void*, E>::Result;
-	using Result<void*, E>::operator bool;
-	using Result<void*, E>::error;
-
-	// constexpr Result() : Result<void*, E>(nullptr) {}
-	constexpr Result(const ResultNull&) : Result<void*, E>(nullptr) {}
-};*/
 } // namespace bzd::impl
 
 namespace bzd {
@@ -194,8 +182,8 @@ using Result = impl::Result<T, E>;
 
 constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
-template <class E>
-constexpr impl::Error<bzd::typeTraits::Decay<E>> makeError(E&& e)
+template <class E = bzd::BoolType>
+constexpr impl::Error<bzd::typeTraits::Decay<E>> makeError(E&& e = true)
 {
 	return impl::Error<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
 }

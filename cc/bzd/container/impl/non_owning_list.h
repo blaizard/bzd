@@ -441,7 +441,7 @@ public:
 	template <bzd::BoolType T = MultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> pop() noexcept
 	{
-		auto* container = reinterpret_cast<Container*>(this->parent_.load());
+		auto* container = static_cast<Container*>(this->parent_.load());
 		if (container)
 		{
 			return container->pop(*this);
@@ -491,7 +491,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return reinterpret_cast<T&>(*ptr);
+		return static_cast<T&>(*ptr);
 	}
 
 	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
@@ -501,7 +501,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return reinterpret_cast<const T&>(*ptr);
+		return static_cast<const T&>(*ptr);
 	}
 
 	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
@@ -511,7 +511,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return reinterpret_cast<T&>(*previous->node);
+		return static_cast<T&>(*previous->node);
 	}
 
 	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
@@ -521,7 +521,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return reinterpret_cast<const T&>(*previous->node);
+		return static_cast<const T&>(*previous->node);
 	}
 };
 } // namespace bzd

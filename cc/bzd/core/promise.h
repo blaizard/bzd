@@ -7,7 +7,9 @@
 #include "bzd/utility/ignore.h"
 
 namespace bzd::interface {
-class Promise
+class Task;
+
+class Promise : public bzd::NonOwningListElement</*MultiContainer*/ true>
 {
 protected:
 	constexpr Promise() noexcept = default;
@@ -17,24 +19,25 @@ public:
 	virtual ~Promise() = default;
 
 	// virtual void detach() {}
+
+	bzd::interface::Task* task_{nullptr};
 };
 } // namespace bzd::interface
 
 namespace bzd::impl {
 template <class V, class E>
-class Promise
-	: public bzd::interface::Promise
-	, public bzd::NonOwningListElement</*MultiContainer*/ true>
+class Promise : public bzd::interface::Promise
 {
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
 	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
 
 public: // Constructors.
-	constexpr Promise() noexcept : interface::Promise{} {}
+	constexpr Promise(const BoolType isEvent) noexcept : interface::Promise{}, isEvent_{isEvent} {}
 
 public:
 	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
+	constexpr bool isEvent() const noexcept { return isEvent_; }
 	constexpr void setResult(ReturnType&& optionalResult) noexcept { return_ = bzd::move(optionalResult); }
 	constexpr void setResult(ResultType&& result) noexcept { return_ = bzd::move(result); }
 
@@ -48,6 +51,7 @@ public:
 	~Promise() { bzd::ignore = this->pop(); }
 
 protected:
+	BoolType isEvent_;
 	ReturnType return_{};
 };
 } // namespace bzd::impl
@@ -95,13 +99,16 @@ public:
 	using bzd::impl::Promise<V, E>::isReady;
 
 	template <class T = PollFct>
-	constexpr PromisePoll(T&& callack) : bzd::impl::Promise<V, E>{}, poll_{bzd::forward<T>(callack)}
+	constexpr PromisePoll(T&& callack, const BoolType isEvent) : bzd::impl::Promise<V, E>{isEvent}, poll_{bzd::forward<T>(callack)}
 	{
 	}
 
 	bool poll() override
 	{
-		setResult(poll_());
+		if (!isReady())
+		{
+			setResult(poll_(*this));
+		}
 		return isReady();
 	}
 
@@ -119,9 +126,11 @@ public:
 	using bzd::Optional<bzd::Result<V, E>>::Optional;
 };
 
-template <class T, class V = typename bzd::typeTraits::InvokeResult<T>::Value, class E = typename bzd::typeTraits::InvokeResult<T>::Error>
-constexpr auto makePromise(T&& callback)
+template <class T,
+		  class V = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&>::Value,
+		  class E = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&>::Error>
+constexpr auto makePromise(T&& callback, const BoolType isEvent = false)
 {
-	return bzd::PromisePoll<V, E, T>(bzd::forward<T>(callback));
+	return bzd::PromisePoll<V, E, T>(bzd::forward<T>(callback), isEvent);
 }
 } // namespace bzd

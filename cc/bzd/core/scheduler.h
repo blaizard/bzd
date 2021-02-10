@@ -57,16 +57,27 @@ public:
 	template <class V, class E>
 	constexpr typename bzd::impl::Promise<V, E>::ResultType&& await(bzd::impl::Promise<V, E>& promise)
 	{
+		// Associate the promise with the task
+		task_->registerPromise(promise);
+
+		// Use a tri-state return code from poll() instead to remove isEvent
 		while (!promise.poll())
 		{
+			if (promise.isEvent())
+			{
+				setPending();
+			}
 			bzd::yield();
 		}
+
+		task_->unregisterPromise(promise);
+
 		return bzd::move(promise.getResult());
 	}
 
 	void yield()
 	{
-		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED)
+		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED && task_->getStatus() != bzd::interface::Task::Status::PENDING)
 		{
 			tasks_.pushFront(*task_);
 		}
@@ -81,6 +92,21 @@ public:
 		{
 			resumeTask(mainTask_);
 		}
+	}
+
+	/**
+	 * Set the current stack to pending state.
+	 */
+	void setPending() noexcept
+	{
+		tasks_.pop(*task_);
+		task_->status_ = bzd::interface::Task::Status::PENDING;
+	}
+
+	void setActive(bzd::interface::Task& task) noexcept
+	{
+		task.status_ = bzd::interface::Task::Status::RUNNING;
+		tasks_.pushFront(task);
 	}
 
 private:
@@ -111,6 +137,7 @@ private:
 private:
 	// Main task list, which contains only active tasks.
 	bzd::NonOwningList<Task> tasks_{};
+	bzd::NonOwningList<Task> pendingTasks_{};
 	// The current task
 	Task* task_{nullptr};
 	impl::MainTask mainTask_{};

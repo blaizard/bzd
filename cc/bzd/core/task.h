@@ -3,12 +3,14 @@
 #include "bzd/container/function.h"
 #include "bzd/container/impl/non_owning_list.h"
 #include "bzd/core/assert.h"
+#include "bzd/core/promise.h"
 #include "bzd/platform/stack.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/forward.h"
 
 namespace bzd {
 class Scheduler;
+bzd::Scheduler& getScheduler();
 void yield();
 } // namespace bzd
 
@@ -21,6 +23,7 @@ public: // Types.
 	{
 		IDLE = 0,
 		RUNNING,
+		PENDING,
 		TERMINATED
 	};
 
@@ -31,6 +34,8 @@ public:
 
 	Status getStatus() const noexcept { return status_; }
 
+	void setActive() noexcept;
+
 protected:
 	friend class bzd::Scheduler;
 
@@ -40,9 +45,20 @@ protected:
 		return *stack_;
 	}
 
+	void registerPromise(bzd::interface::Promise& promise)
+	{
+		promise.task_ = this;
+		promises_.pushFront(promise);
+	}
+
+	void unregisterPromise(bzd::interface::Promise& promise) { promises_.pop(promise); }
+
 protected:
 	Status status_{Status::IDLE};
 	platform::interface::Stack* stack_{nullptr};
+
+public:
+	bzd::NonOwningList<bzd::interface::Promise> promises_{};
 };
 
 class TaskUser : public Task

@@ -11,7 +11,6 @@ cc_library(
         ":promise",
         ":registry",
         ":scheduler",
-        ":task",
         ":units",
         "//cc/bzd/core/interfaces:channel",
     ],
@@ -137,36 +136,26 @@ cc_library(
     name = "scheduler",
     srcs = [
         "scheduler.cc",
+        "task.cc",
     ],
     hdrs = [
         "scheduler.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":promise",
-        ":task",
-        "//cc/bzd/container:optional",
-        "//cc/bzd/container:queue",
-        "//cc/bzd/container/impl:non_owning_list",
-        "//cc/bzd/utility:move",
-        "//cc/bzd/utility:singleton",
-        "//cc/bzd/utility:swap",
-    ],
-)
-
-cc_library(
-    name = "task",
-    hdrs = [
         "task.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":assert",
+        ":promise",
         "//cc/bzd/container:function",
+        "//cc/bzd/container:optional",
+        "//cc/bzd/container:queue",
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/platform",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:move",
+        "//cc/bzd/utility:singleton",
+        "//cc/bzd/utility:swap",
     ],
 )
 
