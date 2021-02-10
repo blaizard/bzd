@@ -138,7 +138,7 @@ export function tooltipFromCoords(x, y, options) {
 export function tooltip(elt, options) {
 	options = Object.assign(
 		{
-			type: "html",
+			type: elt.getAttribute("data-irtooltip-type") || "html",
 			data: elt.getAttribute("data-irtooltip"),
 			position: elt.getAttribute("data-irtooltip-position") || defaultPosition
 		},
