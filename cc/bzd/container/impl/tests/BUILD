@@ -2,9 +2,9 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
 cc_library(
-    name = "non_owning_list_lib",
+    name = "non_owning_list_for_test",
     hdrs = [
-        "non_owning_list.h",
+        "non_owning_list_for_test.h",
     ],
     visibility = ["//cc/bzd/container/impl/tests:__subpackages__"],
     deps = [
@@ -18,12 +18,11 @@ bzd_cc_test(
     name = "non_owning_list",
     srcs = [
         "non_owning_list.cc",
-        "non_owning_list.h",
     ],
     tags = ["stress"],
     deps = [
         "//tools/cc_test",
-        ":non_owning_list_lib",
+        ":non_owning_list_for_test",
     ] + select({
         "//tools/bazel_build/config:x86_64": [
             "//cc/bzd/container/impl/tests/std:non_owning_list",
