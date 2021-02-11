@@ -25,6 +25,9 @@ TEST(NonOwningList, simple)
 		const auto result = list.pop(elements[0]);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(list.size(), 0);
+		const auto result2 = list.pop(elements[0]);
+		EXPECT_FALSE(result2);
+		EXPECT_EQ(result2.error(), bzd::ListErrorType::elementAlreadyRemoved);
 	}
 
 	{
