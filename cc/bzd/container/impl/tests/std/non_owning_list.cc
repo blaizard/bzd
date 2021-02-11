@@ -1,5 +1,4 @@
 #include "bzd/container/impl/tests/non_owning_list_for_test.h"
-
 #include "bzd/test/sync_point.h"
 #include "bzd/utility/ignore.h"
 #include "cc_test/test.h"

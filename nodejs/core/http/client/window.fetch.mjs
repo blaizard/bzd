@@ -12,12 +12,12 @@ export default async function request(url, options) {
 	const promiseFetch = window.fetch(url, {
 		method: options.method,
 		body: options.data,
-		headers: options.headers
+		headers: options.headers,
 	});
 
 	const promiseTimeout = new Promise((resolve) => {
 		setTimeout(resolve, options.timeoutMs, {
-			timeout: true
+			timeout: true,
 		});
 	});
 
@@ -32,6 +32,6 @@ export default async function request(url, options) {
 			obj[pair[0]] = pair[1];
 			return obj;
 		}, {}),
-		code: response.status
+		code: response.status,
 	};
 }

@@ -7,7 +7,7 @@
 
 	export default {
 		directives: {
-			loading: DirectiveLoading
-		}
+			loading: DirectiveLoading,
+		},
 	};
 </script>

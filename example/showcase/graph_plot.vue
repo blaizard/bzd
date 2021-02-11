@@ -27,9 +27,9 @@
 
 	export default {
 		components: {
-			Plot
+			Plot,
 		},
-		data: function() {
+		data: function () {
 			return {
 				values: [],
 				counter: 0,
@@ -37,7 +37,7 @@
 				showAxisY: false,
 				showCursor: false,
 				showLegend: false,
-				animate: false
+				animate: false,
 			};
 		},
 		mounted() {
@@ -58,9 +58,9 @@
 					paddingLeft: 5,
 					paddingRight: 5,
 					paddingTop: 5,
-					paddingBottom: 5
+					paddingBottom: 5,
 				};
-			}
+			},
 		},
 		methods: {
 			generateSin() {
@@ -74,15 +74,15 @@
 				this.values = [
 					{
 						caption: "Serie 1",
-						values: this.generateSin()
+						values: this.generateSin(),
 					},
 					{
 						caption: "Serie 2",
-						values: this.generateRandom()
-					}
+						values: this.generateRandom(),
+					},
 				];
-			}
-		}
+			},
+		},
 	};
 </script>
 

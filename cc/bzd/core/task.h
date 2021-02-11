@@ -22,7 +22,7 @@ public: // Types.
 	enum class Status
 	{
 		IDLE = 0,
-		RUNNING,
+		ACTIVE,
 		PENDING,
 		TERMINATED
 	};
@@ -36,6 +36,8 @@ public:
 
 	void setActive() noexcept;
 
+	void setPending() noexcept;
+
 protected:
 	friend class bzd::Scheduler;
 
@@ -45,20 +47,11 @@ protected:
 		return *stack_;
 	}
 
-	void registerPromise(bzd::interface::Promise& promise)
-	{
-		promise.task_ = this;
-		promises_.pushFront(promise);
-	}
-
-	void unregisterPromise(bzd::interface::Promise& promise) { promises_.pop(promise); }
+	void registerPromise(bzd::interface::Promise& promise) { promise.task_ = this; }
 
 protected:
 	Status status_{Status::IDLE};
 	platform::interface::Stack* stack_{nullptr};
-
-public:
-	bzd::NonOwningList<bzd::interface::Promise> promises_{};
 };
 
 class TaskUser : public Task

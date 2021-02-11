@@ -14,10 +14,10 @@ public:
 				{
 					return bzd::nullresult;
 				}
-				// Set the promise to the chain list here
-				bzd::ignore = promise.pop();
-				bzd::ignore = list_.pushFront(promise);
-				// std::cout << "Lock " << &promise << ", size: " << list_.size() << std::endl;
+
+				//std::cout << "Lock " << &promise << ", size: " << list_.size() << std::endl;
+				promise.setPending(list_);
+
 				return bzd::nullopt;
 			},
 			/*isEvent*/ true);
@@ -30,13 +30,11 @@ public:
 		if (element)
 		{
 			auto& promise = *element;
-			// std::cout << "Unlock " << &promise << ", size: " << list_.size() << std::endl;
+			//std::cout << "Unlock " << &promise << ", size: " << list_.size() << std::endl;
 
+			promise.setActive(list_);
+			// Acquire the lock. this ensures that this specific promise gets.
 			promise.poll();
-			bzd::ignore = list_.pop(promise);
-			// Move promise back to its task
-			// bzd::ignore = promise.task_->promises_.pushFront(promise);
-			promise.task_->setActive();
 		}
 	}
 

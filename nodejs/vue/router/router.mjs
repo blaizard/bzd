@@ -28,7 +28,7 @@ class RouterManager {
 				/**
 				 * Authentication object to be used with this router.
 				 */
-				authentication: null
+				authentication: null,
 			},
 			options
 		);
@@ -51,7 +51,7 @@ class RouterManager {
 		let router = new Router({
 			fallback: (path) => {
 				Log.error("Route '{}' not found", path);
-			}
+			},
 		});
 
 		options.routes.forEach((route) => {
@@ -110,7 +110,7 @@ class RouterManager {
 			children: new Set(),
 			parent: null,
 			path: null,
-			pathPropagate: null
+			pathPropagate: null,
 		});
 
 		// Build component hierarchy
@@ -188,7 +188,7 @@ class RouterManager {
 				/**
 				 * Custom properties that will be added to the component.
 				 */
-				props: {}
+				props: {},
 			},
 			options
 		);
@@ -281,7 +281,7 @@ export default class {
 
 		let routers = new RouterManager(options);
 
-		Vue.prototype.$routerSet = async function(routeOptions) {
+		Vue.prototype.$routerSet = async function (routeOptions) {
 			/*
 			 * Register hook
 			 * https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners

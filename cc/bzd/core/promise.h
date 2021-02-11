@@ -18,6 +18,16 @@ public:
 	virtual bool poll() = 0;
 	virtual ~Promise() = default;
 
+	/**
+	 * Set the promise as pending and attach it to a list.
+	 */
+	void setPending(bzd::NonOwningList<bzd::interface::Promise>& list);
+
+	/**
+	 * Set back the promise as active and detach it from the list.
+	 */
+	void setActive(bzd::NonOwningList<bzd::interface::Promise>& list);
+
 	// virtual void detach() {}
 
 	bzd::interface::Task* task_{nullptr};

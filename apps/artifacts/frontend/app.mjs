@@ -13,10 +13,10 @@ import APIv1 from "../api.v1.json";
 Vue.use(AsyncComputed);
 Vue.use(Notification);
 Vue.use(Router, {
-	hash: false
+	hash: false,
 });
 Vue.use(API, {
-	schema: APIv1
+	schema: APIv1,
 });
 
 Vue.use(CachePlugin, {
@@ -37,7 +37,7 @@ Vue.use(CachePlugin, {
 			do {
 				const response = await Vue.prototype.$api.request("post", "/list", {
 					path: pathList,
-					paging: next
+					paging: next,
 				});
 				next = response.next;
 				list = list.concat(
@@ -54,12 +54,12 @@ Vue.use(CachePlugin, {
 		default: [],
 		loading: [],
 		options: {
-			timeout: 5000 // ms
-		}
-	}
+			timeout: 5000, // ms
+		},
+	},
 });
 
 new Vue({
 	el: "#app",
-	render: (h) => h(App)
+	render: (h) => h(App),
 });

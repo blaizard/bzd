@@ -8,14 +8,16 @@
 #include "bzd/test/inject_point.h"
 #include "bzd/type_traits/conditional.h"
 
-namespace bzd::impl {
+namespace {
+	enum class ListErrorType
+	{
+		elementAlreadyInserted,
+		elementAlreadyRemoved,
+		notFound,
+	};
+}
 
-enum class ListErrorType
-{
-	elementAlreadyInserted,
-	elementAlreadyRemoved,
-	notFound,
-};
+namespace bzd::impl {
 
 /**
  * Implementation of a non-owning linked list.

@@ -63,7 +63,7 @@ export default {
 						title: null,
 						artist: null,
 						art: null,
-						state: "pause"
+						state: "pause",
 					},
 					(previous || {}).track
 				);
@@ -89,11 +89,11 @@ export default {
 					track: track,
 					instance: instance,
 					name: description.displayName + " - " + description.roomName,
-					playlist: playlist
+					playlist: playlist,
 				};
 			},
-			timeout: 60 * 1000 * 30
-		}
+			timeout: 60 * 1000 * 30,
+		},
 	],
 	fetch: async (data, cache) => {
 		const device = await cache.get("sonos.device");
@@ -103,7 +103,7 @@ export default {
 			artist: device.track.artist,
 			art: device.track.art,
 			name: device.name,
-			state: device.track.state
+			state: device.track.state,
 		};
 	},
 	events: {
@@ -122,6 +122,6 @@ export default {
 		},
 		async previous(data, cache) {
 			await _next(data, cache, -1);
-		}
-	}
+		},
+	},
 };

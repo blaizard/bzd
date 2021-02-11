@@ -36,13 +36,11 @@ private:
 public:
 	/**
 	 * Add a new task to the scheduler.
+	 *
+	 * \note The task cannot be associated with a scheduler already,
+	 * must have a stack and must be in idle mode.
 	 */
-	void addTask(Task& task)
-	{
-		// Only add bounded tasks if (task.isBind())
-		bzd::assert::isTrue(task.hasStack(), "Task can only be added if bounded to a stack.");
-		tasks_.pushFront(task);
-	}
+	void addTask(Task& task) noexcept;
 
 	void start()
 	{
@@ -63,49 +61,60 @@ public:
 		// Use a tri-state return code from poll() instead to remove isEvent
 		while (!promise.poll())
 		{
-			if (promise.isEvent())
-			{
-				setPending();
-			}
 			bzd::yield();
 		}
-
-		task_->unregisterPromise(promise);
 
 		return bzd::move(promise.getResult());
 	}
 
 	void yield()
 	{
-		if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED && task_->getStatus() != bzd::interface::Task::Status::PENDING)
+		do
 		{
-			tasks_.pushFront(*task_);
-		}
+			// Push back the current task
+			if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED && task_->getStatus() != bzd::interface::Task::Status::PENDING)
+			{
+				tasks_.pushFront(*task_);
+			}
 
-		// Push back the current task
-		auto maybeTask = getNextTask();
-		if (maybeTask)
-		{
-			resumeTask(*maybeTask);
-		}
-		else
-		{
-			resumeTask(mainTask_);
-		}
+			// Switch to the next task
+			auto maybeTask = getNextTask();
+			if (maybeTask)
+			{
+				return resumeTask(*maybeTask);
+			}
+
+		// If no next task, loop until there are still pending tasks
+		} while (!pendingTasks_.empty());
+
+		// Else return to the main stack
+		resumeTask(mainTask_);
 	}
 
 	/**
-	 * Set the current stack to pending state.
+	 * Set the current task to pending state.
 	 */
-	void setPending() noexcept
+	void fromActiveToPending(bzd::interface::Task& task) noexcept
 	{
-		tasks_.pop(*task_);
-		task_->status_ = bzd::interface::Task::Status::PENDING;
+		bzd::assert::isTrue(task.getStatus() == bzd::interface::Task::Status::ACTIVE, "Task is not active.");
+
+		const auto resultPop = tasks_.pop(task);
+		bzd::assert::isTrue(resultPop || resultPop.error() == ListErrorType::elementAlreadyRemoved, "Cannot remove task from task list.");
+
+		const auto resultPush = pendingTasks_.pushFront(task);
+		bzd::assert::isTrue(resultPush, "Cannot push task to pending list.");
+
+		task.status_ = bzd::interface::Task::Status::PENDING;
 	}
 
-	void setActive(bzd::interface::Task& task) noexcept
+	/**
+	 * Activate a task currently pending.
+	 */
+	void fromPendingToActive(bzd::interface::Task& task) noexcept
 	{
-		task.status_ = bzd::interface::Task::Status::RUNNING;
+		bzd::assert::isTrue(task.getStatus() == bzd::interface::Task::Status::PENDING, "Task is not pending.");
+		task.status_ = bzd::interface::Task::Status::ACTIVE;
+		pendingTasks_.pop(task);
 		tasks_.pushFront(task);
 	}
 

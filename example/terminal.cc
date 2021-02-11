@@ -1,5 +1,6 @@
-#include "bzd/utility/singleton.h"
 #include "example/terminal.h"
+
+#include "bzd/utility/singleton.h"
 
 #include <poll.h>
 #include <stdio.h>
