@@ -86,7 +86,7 @@ public:
 	{
 		auto duration = bzd::platform::getTicks().toDuration();
 		const auto targetDuration = duration + bzd::platform::msToTicks(time);
-		return bzd::makePromise([duration, targetDuration](bzd::interface::Promise&) mutable -> bzd::PromiseReturnType<> {
+		return bzd::makePromise([duration, targetDuration](bzd::interface::Promise&) mutable -> bzd::Promise<>::ReturnType {
 			const auto curTicks = bzd::platform::getTicks();
 
 			// Update the current duration and update the wrapping counter
@@ -232,6 +232,6 @@ void exampleMutex()
 
 int main()
 {
-	// simpleDelay();
+	simpleDelay();
 	exampleMutex();
 }
