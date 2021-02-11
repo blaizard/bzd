@@ -246,7 +246,7 @@ void workloadInsert(Data<T>* pData)
 		const auto result = pData->list.pushFront(element);
 		if (!result)
 		{
-			ASSERT_EQ(result.error(), bzd::impl::ListErrorType::elementAlreadyInserted);
+			ASSERT_EQ(result.error(), bzd::ListErrorType::elementAlreadyInserted);
 		}
 		else
 		{
@@ -267,8 +267,8 @@ void workloadRemove(Data<T>* pData)
 		const auto result = pData->list.pop(element);
 		if (!result)
 		{
-			ASSERT_TRUE(result.error() == bzd::impl::ListErrorType::elementAlreadyRemoved ||
-						result.error() == bzd::impl::ListErrorType::notFound);
+			ASSERT_TRUE(result.error() == bzd::ListErrorType::elementAlreadyRemoved ||
+						result.error() == bzd::ListErrorType::notFound);
 		}
 		else
 		{

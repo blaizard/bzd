@@ -8,7 +8,8 @@
 #include "bzd/test/inject_point.h"
 #include "bzd/type_traits/conditional.h"
 
-namespace {
+namespace bzd
+{
 	enum class ListErrorType
 	{
 		elementAlreadyInserted,
