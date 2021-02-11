@@ -86,7 +86,7 @@ function registerObserver(el) {
 				autoResize(el);
 			}),
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 		observers[uid].obj.observe(el);
 		observers[uid].obj.observe(el.parentElement);
@@ -97,7 +97,7 @@ function registerObserver(el) {
 				autoResize(el);
 			}, 1000),
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 	}
 
@@ -132,14 +132,14 @@ function generateHash(rect, rectParent) {
 }
 
 export default {
-	inserted: function(el) {
+	inserted: function (el) {
 		autoResize(el);
 	},
-	componentUpdated: function(el) {
+	componentUpdated: function (el) {
 		autoResize(el);
 	},
-	unbind: function(el) {
+	unbind: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
-	}
+	},
 };

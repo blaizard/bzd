@@ -4,5 +4,10 @@
 
 void bzd::interface::Task::setActive() noexcept
 {
-	getScheduler().setActive(*this);
+	getScheduler().fromPendingToActive(*this);
+}
+
+void bzd::interface::Task::setPending() noexcept
+{
+	getScheduler().fromActiveToPending(*this);
 }

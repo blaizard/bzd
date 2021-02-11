@@ -16,7 +16,7 @@ describe("TimeSeries", () => {
 	it("Insert unique", () => {
 		let timeseries = new TimeSeries({
 			unique: true,
-			uniqueMerge: (a, b) => a + b
+			uniqueMerge: (a, b) => a + b,
 		});
 		Exception.assert(timeseries.length == 0, timeseries.data);
 		timeseries.insert(0, 1);
@@ -145,7 +145,7 @@ describe("TimeSeries", () => {
 	it("Consistency unique", () => {
 		let timeseries = new TimeSeries({
 			unique: true,
-			uniqueMerge: (a, b) => a + b
+			uniqueMerge: (a, b) => a + b,
 		});
 		for (let i = 0; i < 10; ++i) {
 			timeseries.insert(i, 1);
@@ -169,7 +169,7 @@ describe("TimeSeries", () => {
 			[6, 1],
 			[7, 1],
 			[8, 1],
-			[9, 1]
+			[9, 1],
 		]);
 	});
 });

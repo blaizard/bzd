@@ -17,14 +17,14 @@
 	export default {
 		props: {
 			description: { type: Object, required: false, default: () => ({}) },
-			disable: { type: Boolean, default: false, required: false }
+			disable: { type: Boolean, default: false, required: false },
 		},
-		data: function() {
+		data: function () {
 			return {
 				uid: this._uid,
 				internalIsValueFrozen: false,
 				internalFrozenValue: "",
-				isActive: false
+				isActive: false,
 			};
 		},
 		computed: {
@@ -61,7 +61,7 @@
 					return new Validation(this.description["validation"], /*singleValue*/ true);
 				}
 				return null;
-			}
+			},
 		},
 		methods: {
 			/**
@@ -112,7 +112,7 @@
 					this.$emit("active", {
 						id: this.uid,
 						element: this.$el,
-						message: this.getOption("description", undefined)
+						message: this.getOption("description", undefined),
 					});
 				}
 			},
@@ -158,7 +158,7 @@
 					// Validate the value only if it is non-empty
 					if (value !== "" && this.validation) {
 						const result = this.validation.validate(value, {
-							output: "return"
+							output: "return",
 						});
 						if ("value" in result) {
 							errorList = result.value;
@@ -207,7 +207,7 @@
 									display: item[1],
 									search: (typeof item[2] === "object" ? item[2] : [String(item[2] || item[1])]).map((item) =>
 										item.toLowerCase()
-									)
+									),
 								};
 							}
 							return { value: isHtml ? index : item, display: item, search: [String(item).toLowerCase()] };
@@ -221,7 +221,7 @@
 						}
 
 						// Sort the list alphabetically
-						multiValueList.sort(function(a, b) {
+						multiValueList.sort(function (a, b) {
 							const valueA = a.value.toLowerCase();
 							const valueB = b.value.toLowerCase();
 							if (valueA < valueB) {
@@ -240,7 +240,7 @@
 					this.setError(e.message);
 				}
 				return [];
-			}
-		}
+			},
+		},
 	};
 </script>

@@ -3,9 +3,9 @@
 
 	export default {
 		mixins: [Template],
-		data: function() {
+		data: function () {
 			return {
-				value: {}
+				value: {},
 			};
 		},
 		computed: {
@@ -20,11 +20,11 @@
 									resolve(["You typed '" + text + "'", "delay 1000ms"]);
 								}, 1000);
 							});
-						}
+						},
 					},
-					{ type: "Autocomplete", caption: "Autocomplete (disable)", disable: true }
+					{ type: "Autocomplete", caption: "Autocomplete (disable)", disable: true },
 				];
-			}
-		}
+			},
+		},
 	};
 </script>

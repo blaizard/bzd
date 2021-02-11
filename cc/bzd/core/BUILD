@@ -8,7 +8,6 @@ cc_library(
         ":channel",
         ":delay",
         ":log",
-        ":promise",
         ":registry",
         ":scheduler",
         ":units",
@@ -79,7 +78,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":promise",
+        ":scheduler",
         ":units",
         "//cc/bzd/platform",
     ],
@@ -102,21 +101,6 @@ cc_library(
 )
 
 cc_library(
-    name = "promise",
-    hdrs = [
-        "promise.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:optional",
-        "//cc/bzd/container:result",
-        "//cc/bzd/container/impl:non_owning_list",
-        "//cc/bzd/type_traits:invoke_result",
-        "//cc/bzd/utility:ignore",
-    ],
-)
-
-cc_library(
     name = "registry",
     hdrs = [
         "registry.h",
@@ -135,24 +119,28 @@ cc_library(
 cc_library(
     name = "scheduler",
     srcs = [
+        "promise.cc",
         "scheduler.cc",
         "task.cc",
     ],
     hdrs = [
+        "promise.h",
         "scheduler.h",
         "task.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":assert",
-        ":promise",
         "//cc/bzd/container:function",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
+        "//cc/bzd/container:result",
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/platform",
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:invoke_result",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:ignore",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:singleton",
         "//cc/bzd/utility:swap",

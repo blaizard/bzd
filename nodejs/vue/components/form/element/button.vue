@@ -16,14 +16,14 @@
 		mixins: [Element],
 		props: {
 			action: { type: String, optional: true, default: "" },
-			content: { type: String || Object, optional: true, default: "" }
+			content: { type: String || Object, optional: true, default: "" },
 		},
-		data: function() {
+		data: function () {
 			return {
 				/**
 				 * Defines a callback to be triggered the submit button is called
 				 */
-				click: this.getOption("click", null)
+				click: this.getOption("click", null),
 			};
 		},
 		computed: {
@@ -31,15 +31,15 @@
 				const actionToClass = {
 					approve: {
 						defaultClick: this.submit,
-						class: "irform-button-approve"
+						class: "irform-button-approve",
 					},
 					cancel: {
-						class: "irform-button-cancel"
+						class: "irform-button-cancel",
 					},
 					danger: {
 						defaultClick: this.submit,
-						class: "irform-button-danger"
-					}
+						class: "irform-button-danger",
+					},
 				};
 				return actionToClass[this.action || this.getOption("action")] || {};
 			},
@@ -51,7 +51,7 @@
 					"irform-button": true,
 					"irform-fill": this.getOption("fill", false),
 					[this.attrAction.class || "nop"]: Boolean(this.attrAction.class || false),
-					[this.getOption("class")]: true
+					[this.getOption("class")]: true,
 				};
 			},
 			/**
@@ -66,14 +66,14 @@
 			contentHtml() {
 				const data = this.getContentData(this.attrContent);
 				return this.html ? data : this.toHtmlEntities(data);
-			}
+			},
 		},
 		methods: {
 			async handleClick() {
 				this.$emit("click");
 				await (this.click || this.attrAction.defaultClick || (() => {}))();
-			}
-		}
+			},
+		},
 	};
 </script>
 

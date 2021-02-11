@@ -26,12 +26,12 @@ export default {
 				let options = {
 					expect: "json",
 					headers: {
-						"Travis-API-Version": "3"
+						"Travis-API-Version": "3",
 					},
 					authentication: {
 						type: "token",
-						token: token
-					}
+						token: token,
+					},
 				};
 
 				const result = await HttpClient.get(url, options);
@@ -43,12 +43,12 @@ export default {
 						timestamp:
 							Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.parse(item.updated_at) || Date.now(),
 						status: status,
-						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id
+						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id,
 					};
 				});
 			},
-			timeout: 10 * 1000
-		}
+			timeout: 10 * 1000,
+		},
 	],
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
@@ -58,7 +58,7 @@ export default {
 			data["travisci.token"]
 		);
 		return {
-			builds: builds
+			builds: builds,
 		};
-	}
+	},
 };
