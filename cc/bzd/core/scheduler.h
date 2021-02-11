@@ -53,7 +53,7 @@ public:
 	}
 
 	template <class V, class E>
-	constexpr typename bzd::impl::Promise<V, E>::ResultType&& await(bzd::impl::Promise<V, E>& promise)
+	constexpr typename bzd::Promise<V, E>::ResultType&& await(bzd::Promise<V, E>& promise)
 	{
 		// Associate the promise with the task
 		task_->registerPromise(promise);

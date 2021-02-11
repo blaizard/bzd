@@ -70,7 +70,7 @@ struct OptionalTrivialStorage
 template <class T>
 class Optional
 {
-protected:
+public:
 	using Value = bzd::typeTraits::RemoveReference<T>;
 	using StorageType =
 		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T>, OptionalTrivialStorage<T>, OptionalNonTrivialStorage<T>>;

@@ -98,13 +98,16 @@ struct ResultTrivialStorage
 template <class T, class E>
 class Result
 {
+public:
+	using Value = T;
+	using Error = E;
+
 private:
-	using NonVoidValue = bzd::typeTraits::Conditional<bzd::typeTraits::isSame<T, void>, void*, T>;
-	using Value = bzd::typeTraits::RemoveReference<NonVoidValue>;
+	using NonVoidValue = bzd::typeTraits::Conditional<bzd::typeTraits::isSame<Value, void>, void*, Value>;
 	using StorageType =
-		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> && bzd::typeTraits::isTriviallyDestructible<E>,
-									 ResultTrivialStorage<NonVoidValue, E>,
-									 ResultNonTrivialStorage<NonVoidValue, E>>;
+		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> && bzd::typeTraits::isTriviallyDestructible<Error>,
+									 ResultTrivialStorage<NonVoidValue, Error>,
+									 ResultNonTrivialStorage<NonVoidValue, Error>>;
 
 public:
 	constexpr Result(const ResultNull&) : storage_{nullptr} {}
@@ -138,25 +141,25 @@ public:
 		return storage_.error_;
 	}
 
-	constexpr const Value& operator*() const
+	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>& operator*() const
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return storage_.value_;
 	}
 
-	constexpr Value& operator*()
+	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>& operator*()
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return storage_.value_;
 	}
 
-	constexpr const Value* operator->() const
+	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>* operator->() const
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return &storage_.value_;
 	}
 
-	constexpr Value* operator->()
+	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>* operator->()
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return &storage_.value_;
