@@ -9,6 +9,7 @@
 #include "bzd/container/array.h"
 #include "bzd/container/btree.h"
 #include "bzd/container/function.h"
+#include "bzd/container/function_pointer.h"
 #include "bzd/container/map.h"
 #include "bzd/container/named_type.h"
 #include "bzd/container/optional.h"
