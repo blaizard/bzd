@@ -3,7 +3,6 @@
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/add_pointer.h"
 #include "bzd/type_traits/decay.h"
-#include "bzd/type_traits/invoke_result.h"
 #include "bzd/utility/forward.h"
 
 #include <new> // Used only for placement new
@@ -28,7 +27,7 @@ class Function
 {
 protected:
 	using FctPtrType = bzd::typeTraits::AddPointer<F(Args...)>;
-	using ReturnType = bzd::typeTraits::InvokeResult<F(Args...), Args...>;
+	using ReturnType = F;
 
 public:
 	Function(const FctPtrType callable) : callable_{callable} {}

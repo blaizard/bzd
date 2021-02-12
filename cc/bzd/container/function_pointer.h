@@ -1,7 +1,6 @@
 #pragma once
 
 #include "bzd/container/function.h"
-#include "bzd/type_traits/invoke_result.h"
 #include "bzd/utility/ignore.h"
 
 namespace bzd::impl {
@@ -10,7 +9,7 @@ template <typename Tag, class F, class... Args>
 class FunctionPointer
 {
 protected:
-	using ReturnType = bzd::typeTraits::InvokeResult<F(Args...), Args...>;
+	using ReturnType = F;
 
 public:
 	/**
@@ -18,7 +17,7 @@ public:
 	 */
 	template <class Object, class T>
 	constexpr FunctionPointer(Object& obj, T memberPtr) :
-		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) { (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
+		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) -> auto { return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
 	{
 	}
 
@@ -50,7 +49,7 @@ public:
 
 private:
 	void* obj_;
-	bzd::Function<void(void*, Args...)> callable_;
+	bzd::Function<ReturnType(void*, Args...)> callable_;
 };
 
 struct FunctionPointerTag
