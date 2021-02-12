@@ -104,10 +104,10 @@ public:
 
 private:
 	using NonVoidValue = bzd::typeTraits::Conditional<bzd::typeTraits::isSame<Value, void>, void*, Value>;
-	using StorageType =
-		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> && bzd::typeTraits::isTriviallyDestructible<Error>,
-									 ResultTrivialStorage<NonVoidValue, Error>,
-									 ResultNonTrivialStorage<NonVoidValue, Error>>;
+	using StorageType = bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> &&
+														 bzd::typeTraits::isTriviallyDestructible<Error>,
+													 ResultTrivialStorage<NonVoidValue, Error>,
+													 ResultNonTrivialStorage<NonVoidValue, Error>>;
 
 public:
 	constexpr Result(const ResultNull&) : storage_{nullptr} {}

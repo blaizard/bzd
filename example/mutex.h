@@ -9,18 +9,17 @@ public:
 
 	auto lock()
 	{
-		return bzd::makePromise(
-			[this](bzd::interface::Promise& promise) mutable -> bzd::Promise<>::ReturnType {
-				bzd::BoolType expected{false};
-				if (acquired_.compareExchange(expected, true))
-				{
-					return bzd::nullresult;
-				}
+		return bzd::makePromise([this](bzd::interface::Promise& promise) mutable -> bzd::Promise<>::ReturnType {
+			bzd::BoolType expected{false};
+			if (acquired_.compareExchange(expected, true))
+			{
+				return bzd::nullresult;
+			}
 
-				//std::cout << "Lock " << &promise << ", size: " << list_.size() << std::endl;
-				promise.setPending(list_);
-				return bzd::nullopt;
-			});
+			// std::cout << "Lock " << &promise << ", size: " << list_.size() << std::endl;
+			promise.setPending(list_);
+			return bzd::nullopt;
+		});
 	}
 
 	void unlock()
@@ -30,7 +29,7 @@ public:
 		if (element)
 		{
 			auto& promise = *element;
-			//std::cout << "Unlock " << &promise << ", size: " << list_.size() << std::endl;
+			// std::cout << "Unlock " << &promise << ", size: " << list_.size() << std::endl;
 
 			promise.setActive(list_);
 			// Acquire the lock. this ensures that this specific promise gets.

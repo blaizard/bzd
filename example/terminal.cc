@@ -70,7 +70,7 @@ static bzd::Promise<bzd::SizeType>::ReturnType getChar()
 	// Set mutex here
 
 	return makePromise([&data]() {
-		
+
 	});
 }
 */

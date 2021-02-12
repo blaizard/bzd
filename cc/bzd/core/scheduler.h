@@ -72,7 +72,8 @@ public:
 		do
 		{
 			// Push back the current task
-			if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED && task_->getStatus() != bzd::interface::Task::Status::PENDING)
+			if (task_->getStatus() != bzd::interface::Task::Status::TERMINATED &&
+				task_->getStatus() != bzd::interface::Task::Status::PENDING)
 			{
 				tasks_.pushFront(*task_);
 			}
@@ -84,7 +85,7 @@ public:
 				return resumeTask(*maybeTask);
 			}
 
-		// If no next task, loop until there are still pending tasks
+			// If no next task, loop until there are still pending tasks
 		} while (!pendingTasks_.empty());
 
 		// Else return to the main stack

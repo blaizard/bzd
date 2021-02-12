@@ -2,8 +2,7 @@
 
 #include "cc_test/test.h"
 
-namespace
-{
+namespace {
 class Dummy
 {
 public:
@@ -17,7 +16,7 @@ public:
 private:
 	int val_;
 };
-}
+} // namespace
 
 TEST(ContainerFunctionPointer, simple)
 {
