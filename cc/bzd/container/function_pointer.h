@@ -16,8 +16,17 @@ public:
 	/**
 	 * Points to a member function.
 	 */
-	template <class Object, class T, class Uid = int>
-	constexpr FunctionPointer(Object& obj, T memberPtr, Uid uid = 0) :
+	template <class Object, class T>
+	constexpr FunctionPointer(Object& obj, T memberPtr) :
+		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) {(reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
+	{
+	}
+
+	/**
+	 * Points to a member function, supporting tags.
+	 */
+	template <class Object, class T>
+	constexpr FunctionPointer(Object& obj, T memberPtr, Tag uid) :
 		obj_{&obj}, callable_{[memberPtr, uid](void* ptr, Args... args) { bzd::ignore = uid; (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
 	{
 	}
