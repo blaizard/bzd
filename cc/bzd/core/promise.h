@@ -57,10 +57,7 @@ public:
 		return bzd::move(*return_);
 	}
 
-	bool poll() override
-	{
-		return isReady();
-	}
+	bool poll() override { return isReady(); }
 
 	// When lifespan of this promise terminates, remove it from wherever it was.
 	~Promise() { bzd::ignore = this->pop(); }

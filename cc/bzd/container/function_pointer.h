@@ -18,7 +18,7 @@ public:
 	 */
 	template <class Object, class T>
 	constexpr FunctionPointer(Object& obj, T memberPtr) :
-		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) {(reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
+		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) { (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
 	{
 	}
 
@@ -27,7 +27,10 @@ public:
 	 */
 	template <class Object, class T>
 	constexpr FunctionPointer(Object& obj, T memberPtr, Tag uid) :
-		obj_{&obj}, callable_{[memberPtr, uid](void* ptr, Args... args) { bzd::ignore = uid; (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...); }}
+		obj_{&obj}, callable_{[memberPtr, uid](void* ptr, Args... args) {
+			bzd::ignore = uid;
+			(reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
+		}}
 	{
 	}
 
@@ -50,9 +53,11 @@ private:
 	bzd::Function<void(void*, Args...)> callable_;
 };
 
-struct FunctionPointerTag {};
+struct FunctionPointerTag
+{
+};
 
-}
+} // namespace bzd::impl
 
 namespace bzd {
 

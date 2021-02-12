@@ -267,8 +267,7 @@ void workloadRemove(Data<T>* pData)
 		const auto result = pData->list.pop(element);
 		if (!result)
 		{
-			ASSERT_TRUE(result.error() == bzd::ListErrorType::elementAlreadyRemoved ||
-						result.error() == bzd::ListErrorType::notFound);
+			ASSERT_TRUE(result.error() == bzd::ListErrorType::elementAlreadyRemoved || result.error() == bzd::ListErrorType::notFound);
 		}
 		else
 		{

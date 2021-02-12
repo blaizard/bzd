@@ -8,14 +8,13 @@
 #include "bzd/test/inject_point.h"
 #include "bzd/type_traits/conditional.h"
 
-namespace bzd
+namespace bzd {
+enum class ListErrorType
 {
-	enum class ListErrorType
-	{
-		elementAlreadyInserted,
-		elementAlreadyRemoved,
-		notFound,
-	};
+	elementAlreadyInserted,
+	elementAlreadyRemoved,
+	notFound,
+};
 }
 
 namespace bzd::impl {
