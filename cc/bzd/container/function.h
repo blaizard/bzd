@@ -4,7 +4,6 @@
 #include "bzd/type_traits/add_pointer.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/utility/forward.h"
-#include "bzd/utility/ignore.h"
 
 #include <new> // Used only for placement new
 
