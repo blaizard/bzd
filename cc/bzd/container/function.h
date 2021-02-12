@@ -78,10 +78,11 @@ private:
 } // namespace bzd::impl
 
 namespace bzd {
+
 template <class>
-struct Function;
+class Function;
 template <class F, class... ArgTypes>
-struct Function<F(ArgTypes...)> : impl::Function<F, ArgTypes...>
+class Function<F(ArgTypes...)> : public impl::Function<F, ArgTypes...>
 {
 };
 

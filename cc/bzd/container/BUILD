@@ -7,6 +7,7 @@ cc_library(
         ":array",
         ":btree",
         ":function",
+        ":function_pointer",
         ":map",
         ":named_type",
         ":optional",
@@ -64,6 +65,19 @@ cc_library(
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:invoke_result",
         "//cc/bzd/utility:forward",
+    ],
+)
+
+cc_library(
+    name = "function_pointer",
+    hdrs = [
+        "function_pointer.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":function",
+        "//cc/bzd/type_traits:invoke_result",
+        "//cc/bzd/utility:ignore",
     ],
 )
 
