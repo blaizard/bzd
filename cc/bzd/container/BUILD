@@ -63,7 +63,6 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_pointer",
         "//cc/bzd/type_traits:decay",
-        "//cc/bzd/type_traits:invoke_result",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -76,7 +75,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":function",
-        "//cc/bzd/type_traits:invoke_result",
         "//cc/bzd/utility:ignore",
     ],
 )
