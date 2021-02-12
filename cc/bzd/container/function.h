@@ -4,6 +4,7 @@
 #include "bzd/type_traits/add_pointer.h"
 #include "bzd/type_traits/decay.h"
 #include "bzd/utility/forward.h"
+#include "bzd/utility/ignore.h"
 
 #include <new> // Used only for placement new
 
@@ -39,13 +40,13 @@ public:
 	}
 
 private:
-	const FctPtrType callable_;
+	FctPtrType callable_;
 };
 } // namespace bzd::interface
 
 namespace bzd::impl {
 
-template <class F, class... Args>
+template <typename Tag, class F, class... Args>
 class Function : public interface::Function<F, Args...>
 {
 private:
@@ -74,14 +75,20 @@ private:
 	}
 };
 
+struct FunctionTag {};
+
 } // namespace bzd::impl
 
 namespace bzd {
 
-template <class>
+template <class, typename Tag = impl::FunctionTag>
 class Function;
 template <class F, class... ArgTypes>
-class Function<F(ArgTypes...)> : public impl::Function<F, ArgTypes...>
+class Function<F(ArgTypes...)> : public impl::Function<impl::FunctionTag, F, ArgTypes...>
+{
+};
+template <typename Tag, class F, class... ArgTypes>
+class Function<F(ArgTypes...), Tag> : public impl::Function<Tag, F, ArgTypes...>
 {
 };
 

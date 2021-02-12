@@ -50,6 +50,24 @@ TEST(ContainerFunction, capturingLambda)
 	}
 }
 
+TEST(ContainerFunction, tags)
+{
+	int j = 0;
+	bzd::Function<void(void)> callable1{[&j]() { j = -1; }};
+	bzd::Function<void(void)> callable2{[&j]() { j = -5; }};
+	callable1();
+	EXPECT_EQ(j, -1);
+	callable2();
+	EXPECT_EQ(j, -5);
+
+	// copy
+	callable2 = callable1;
+	callable2();
+	EXPECT_EQ(j, -1);
+	callable1();
+	EXPECT_EQ(j, -1);
+}
+
 static int rawFunctionTestVariable_ = 0;
 void rawFunction()
 {
