@@ -13,13 +13,27 @@ public:
 
 	void callSet(int val) { val_ = val; }
 
-	int callSetAndReturn(int val) { val_ = val; return val_; }
+	int callSetAndReturn(int val)
+	{
+		val_ = val;
+		return val_;
+	}
 
 	int getValue() const { return val_; }
 
-private:
+	virtual void callVirtualAdd(int val) { val_ += val; }
+
+protected:
 	int val_;
 };
+
+class DummyChild : public Dummy
+{
+public:
+	using Dummy::Dummy;
+	virtual void callVirtualAdd(int) override { val_ = 42; }
+};
+
 } // namespace
 
 TEST(ContainerFunctionPointer, classMemberSimple)
@@ -47,6 +61,23 @@ TEST(ContainerFunctionPointer, classMemberWithArgsAndReturn)
 	EXPECT_EQ(dummy.getValue(), 882);
 	EXPECT_EQ(ptr(3), 3);
 	EXPECT_EQ(dummy.getValue(), 3);
+}
+
+TEST(ContainerFunctionPointer, classMemberVirtual)
+{
+	// Base class
+	Dummy dummy{-1};
+	bzd::FunctionPointer<void(int)> ptr{dummy, &Dummy::callVirtualAdd};
+	EXPECT_EQ(dummy.getValue(), -1);
+	ptr(15);
+	EXPECT_EQ(dummy.getValue(), 14);
+
+	// Child class
+	DummyChild child{32};
+	bzd::FunctionPointer<void(int)> ptrChild{static_cast<Dummy&>(child), &Dummy::callVirtualAdd};
+	EXPECT_EQ(child.getValue(), 32);
+	ptrChild(15);
+	EXPECT_EQ(child.getValue(), 42);
 }
 
 TEST(ContainerFunctionPointer, classMemberTags)
