@@ -125,3 +125,30 @@ TEST(ContainerFunctionPointer, functionReturn)
 	bzd::FunctionPointer<int(int)> ptr{callSquare};
 	EXPECT_EQ(ptr(9), 81);
 }
+
+TEST(ContainerFunctionPointer, objectFunctionNoArgs)
+{
+	int a = 0;
+	bzd::Function<void(void)> fct{[&]() {
+		a += 42;
+	}};
+	bzd::FunctionPointer<void(void)> ptr{fct};
+	EXPECT_EQ(a, 0);
+	fct();
+	EXPECT_EQ(a, 42);
+	ptr();
+	EXPECT_EQ(a, 84);
+}
+
+TEST(ContainerFunctionPointer, objectFunctionArgsReturn)
+{
+	int a = 2;
+	bzd::Function<int(int)> fct{[&](int b) -> int {
+		return b * b + a;
+	}};
+	bzd::FunctionPointer<int(int)> ptr{fct};
+	EXPECT_EQ(a, 2);
+	EXPECT_EQ(fct(5), 27);
+	EXPECT_EQ(ptr(3), 11);
+}
+

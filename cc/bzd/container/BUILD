@@ -76,6 +76,7 @@ cc_library(
     deps = [
         ":function",
         ":variant",
+        "//cc/bzd/type_traits:add_pointer",
         "//cc/bzd/utility:ignore",
     ],
 )

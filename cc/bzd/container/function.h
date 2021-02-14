@@ -38,6 +38,14 @@ public:
 		return callable_(bzd::forward<Params>(args)...);
 	}
 
+	/**
+	 *
+	 */
+	explicit operator FctPtrType() const noexcept
+	{
+		return callable_;
+	}
+
 private:
 	FctPtrType callable_;
 };
