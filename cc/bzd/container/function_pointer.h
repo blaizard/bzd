@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/container/function.h"
+#include "bzd/container/variant.h"
 
 namespace bzd::impl {
 
@@ -15,42 +16,39 @@ public:
 	 * Points to a member function.
 	 */
 	template <class Object, class T>
-	constexpr FunctionPointer(Object& obj, T memberPtr) :
-		obj_{&obj}, callable_{[memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
+	constexpr FunctionPointer(Object& obj, T memberPtr) noexcept :
+		storage_{
+			FunctionMember{&obj, [memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
 }
 } // namespace bzd::impl
+}
 {
 }
 
-/**
- * Points to a member function, supporting tags.
- */
-/*template <class Object, class T>
-constexpr FunctionPointer(Object& obj, T memberPtr, Tag uid) :
-	obj_{&obj}, callable_{[memberPtr, uid](void* ptr, Args... args) {
-		bzd::ignore = uid;
-		(reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
-	}}
-{
-}*/
-
-/*	template <class T>
-	constexpr FunctionPointer(T* fctPtr) : obj_{nullptr}, callable_{[](void*) {
-		(reinterpret_cast<Object*>(ptr)->*memberPtr)();
-	}}
-	{
-	}
-*/
+constexpr explicit FunctionPointer(ReturnType (*function)(Args...)) noexcept : storage_{reinterpret_cast<FctPtrType>(function)} {}
 
 template <class... Params> // Needed for perfect forwarding
-ReturnType operator()(Params&&... args) const
+constexpr ReturnType operator()(Params&&... args) const
 {
-	return callable_(obj_, bzd::forward<Params>(args)...);
+	if (storage_.template is<FunctionMember>())
+	{
+		auto& obj = *storage_.template get<FunctionMember>();
+		return obj.callable_(obj.obj_, bzd::forward<Params>(args)...);
+	}
+	else
+	{
+		auto function = *storage_.template get<FctPtrType>();
+		return reinterpret_cast<ReturnType (*)(Args...)>(function)(bzd::forward<Params>(args)...);
+	}
 }
 
 private:
-void* obj_;
-bzd::Function<ReturnType(void*, Args...), Tag> callable_;
+struct FunctionMember
+{
+	void* obj_;
+	bzd::Function<ReturnType(void*, Args...), Tag> callable_;
+};
+bzd::Variant<FunctionMember, FctPtrType> storage_;
 }
 ;
 
