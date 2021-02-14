@@ -108,29 +108,6 @@ public:
 	}
 };
 
-class FunctionPointer
-{
-public:
-	template <class Object, class T>
-	constexpr FunctionPointer(Object& obj, T memberPtr) :
-		obj_{&obj}, callable_{[memberPtr](void* ptr) { (reinterpret_cast<Object*>(ptr)->*memberPtr)(); }}
-	{
-	}
-
-	/*	template <class T>
-		constexpr FunctionPointer(T* fctPtr) : obj_{nullptr}, callable_{[](void*) {
-			(reinterpret_cast<Object*>(ptr)->*memberPtr)();
-		}}
-		{
-		}
-	*/
-	void call() { return callable_(obj_); }
-
-private:
-	void* obj_;
-	bzd::Function<void(void*)> callable_;
-};
-
 void simpleDelay()
 {
 	static bzd::platform::Stack<10000> stack1;

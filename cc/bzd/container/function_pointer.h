@@ -2,6 +2,7 @@
 
 #include "bzd/container/function.h"
 #include "bzd/container/variant.h"
+#include "bzd/type_traits/add_pointer.h"
 
 namespace bzd::impl {
 
@@ -10,6 +11,8 @@ class FunctionPointer
 {
 protected:
 	using ReturnType = F;
+	using RawFctPtrType = bzd::typeTraits::AddPointer<ReturnType(Args...)>;
+	using BzdFctPtrType = bzd::Function<ReturnType(Args...)>;
 
 public:
 	/**
@@ -25,7 +28,9 @@ public:
 {
 }
 
-constexpr explicit FunctionPointer(ReturnType (*function)(Args...)) noexcept : storage_{reinterpret_cast<FctPtrType>(function)} {}
+constexpr explicit FunctionPointer(RawFctPtrType function) noexcept : storage_{function} {}
+
+constexpr explicit FunctionPointer(BzdFctPtrType function) noexcept : FunctionPointer{static_cast<RawFctPtrType>(function)} {}
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const
@@ -37,8 +42,8 @@ constexpr ReturnType operator()(Params&&... args) const
 	}
 	else
 	{
-		auto function = *storage_.template get<FctPtrType>();
-		return reinterpret_cast<ReturnType (*)(Args...)>(function)(bzd::forward<Params>(args)...);
+		auto function = *storage_.template get<RawFctPtrType>();
+		return function(bzd::forward<Params>(args)...);
 	}
 }
 
@@ -48,7 +53,7 @@ struct FunctionMember
 	void* obj_;
 	bzd::Function<ReturnType(void*, Args...), Tag> callable_;
 };
-bzd::Variant<FunctionMember, FctPtrType> storage_;
+bzd::Variant<FunctionMember, RawFctPtrType> storage_;
 }
 ;
 

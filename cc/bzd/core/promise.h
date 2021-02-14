@@ -3,6 +3,7 @@
 #include "bzd/container/impl/non_owning_list.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
+#include "bzd/container/function_pointer.h"
 #include "bzd/type_traits/invoke_result.h"
 #include "bzd/utility/ignore.h"
 
@@ -44,7 +45,8 @@ public: // Types.
 	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
 
 public: // Constructors.
-	constexpr Promise() noexcept : interface::Promise{} {}
+	template <class... Args>
+	constexpr Promise(Args&&... args) noexcept : interface::Promise{}, pollPtr_{bzd::forward<Args>(args)...} {}
 
 public:
 	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
@@ -57,36 +59,44 @@ public:
 		return bzd::move(*return_);
 	}
 
-	bool poll() override { return isReady(); }
+	bool poll() override final
+	{
+		if (!isReady())
+		{
+			setResult(pollPtr_(*this));
+		}
+		return isReady();
+	}
 
 	// When lifespan of this promise terminates, remove it from wherever it was.
 	~Promise() { bzd::ignore = this->pop(); }
 
 protected:
 	ReturnType return_{};
+	bzd::FunctionPointer<ReturnType(bzd::interface::Promise&)> pollPtr_{};
 };
 
 template <class V, class E, class PollFct>
 class PromisePoll : public bzd::Promise<V, E>
 {
 private:
-	using bzd::Promise<V, E>::setResult;
+	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
 
 public:
 	using bzd::Promise<V, E>::isReady;
 
 	template <class T = PollFct>
-	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{}, poll_{bzd::forward<T>(callack)}
+	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{*this, &PromisePoll<V, E, PollFct>::call}, poll_{bzd::forward<T>(callack)}
 	{
 	}
 
-	bool poll() override
+protected:
+	/**
+	 * Wrapper to be pointed by the function pointer.
+	 */
+	constexpr ReturnType call(bzd::interface::Promise& promise)
 	{
-		if (!isReady())
-		{
-			setResult(poll_(*this));
-		}
-		return isReady();
+		return poll_(promise);
 	}
 
 private:
