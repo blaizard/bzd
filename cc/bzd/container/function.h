@@ -74,7 +74,9 @@ private:
 	}
 };
 
-struct FunctionTag {};
+struct FunctionTag
+{
+};
 
 } // namespace bzd::impl
 

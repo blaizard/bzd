@@ -75,6 +75,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":function",
+        ":variant",
         "//cc/bzd/utility:ignore",
     ],
 )

@@ -34,6 +34,18 @@ public:
 	virtual void callVirtualAdd(int) override { val_ = 42; }
 };
 
+void callNoArgs() {}
+
+void callArgsAdd1(int& val)
+{
+	++val;
+}
+
+int callSquare(int val)
+{
+	return val * val;
+}
+
 } // namespace
 
 TEST(ContainerFunctionPointer, classMemberSimple)
@@ -92,4 +104,24 @@ TEST(ContainerFunctionPointer, classMemberTags)
 	ptr2();
 	EXPECT_EQ(dummy1.getValue(), 11);
 	EXPECT_EQ(dummy2.getValue(), 48);
+}
+
+TEST(ContainerFunctionPointer, functionNoArgs)
+{
+	bzd::FunctionPointer<void(void)> ptr{callNoArgs};
+	ptr();
+}
+
+TEST(ContainerFunctionPointer, functionArgs)
+{
+	bzd::FunctionPointer<void(int&)> ptr{&callArgsAdd1};
+	int a = 6;
+	ptr(a);
+	EXPECT_EQ(a, 7);
+}
+
+TEST(ContainerFunctionPointer, functionReturn)
+{
+	bzd::FunctionPointer<int(int)> ptr{callSquare};
+	EXPECT_EQ(ptr(9), 81);
 }
