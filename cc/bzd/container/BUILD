@@ -7,7 +7,7 @@ cc_library(
         ":array",
         ":btree",
         ":function",
-        ":function_pointer",
+        ":function_view",
         ":map",
         ":named_type",
         ":optional",
@@ -68,9 +68,9 @@ cc_library(
 )
 
 cc_library(
-    name = "function_pointer",
+    name = "function_view",
     hdrs = [
-        "function_pointer.h",
+        "function_view.h",
     ],
     visibility = ["//visibility:public"],
     deps = [

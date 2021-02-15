@@ -7,7 +7,7 @@
 namespace bzd::impl {
 
 template <typename Tag, class F, class... Args>
-class FunctionPointer
+class FunctionView
 {
 protected:
 	using ReturnType = F;
@@ -16,10 +16,10 @@ protected:
 
 public:
 	/**
-	 * Points to a member function.
+	 * Construct from a member function.
 	 */
-	template <class Object, class T>
-	constexpr FunctionPointer(Object& obj, T memberPtr) noexcept :
+	template <class Object, class Member>
+	constexpr FunctionView(Object& obj, Member memberPtr) noexcept :
 		storage_{
 			FunctionMember{&obj, [memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
 }
@@ -28,9 +28,15 @@ public:
 {
 }
 
-constexpr explicit FunctionPointer(RawFctPtrType function) noexcept : storage_{function} {}
+/**
+ * Construct from a function pointer.
+ */
+constexpr explicit FunctionView(RawFctPtrType function) noexcept : storage_{function} {}
 
-constexpr explicit FunctionPointer(BzdFctPtrType function) noexcept : FunctionPointer{static_cast<RawFctPtrType>(function)} {}
+/**
+ * Construct from a bzd::Function object.
+ */
+constexpr explicit FunctionView(BzdFctPtrType function) noexcept : FunctionView{static_cast<RawFctPtrType>(function)} {}
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const
@@ -57,7 +63,7 @@ bzd::Variant<FunctionMember, RawFctPtrType> storage_;
 }
 ;
 
-struct FunctionPointerTag
+struct FunctionViewTag
 {
 };
 
@@ -65,19 +71,19 @@ struct FunctionPointerTag
 
 namespace bzd {
 
-template <class, typename Tag = impl::FunctionPointerTag>
-class FunctionPointer;
+template <class, typename Tag = impl::FunctionViewTag>
+class FunctionView;
 template <class F, class... ArgTypes>
-class FunctionPointer<F(ArgTypes...)> : public impl::FunctionPointer<impl::FunctionPointerTag, F, ArgTypes...>
+class FunctionView<F(ArgTypes...)> : public impl::FunctionView<impl::FunctionViewTag, F, ArgTypes...>
 {
 public:
-	using impl::FunctionPointer<impl::FunctionPointerTag, F, ArgTypes...>::FunctionPointer;
+	using impl::FunctionView<impl::FunctionViewTag, F, ArgTypes...>::FunctionView;
 };
 template <typename Tag, class F, class... ArgTypes>
-class FunctionPointer<F(ArgTypes...), Tag> : public impl::FunctionPointer<Tag, F, ArgTypes...>
+class FunctionView<F(ArgTypes...), Tag> : public impl::FunctionView<Tag, F, ArgTypes...>
 {
 public:
-	using impl::FunctionPointer<Tag, F, ArgTypes...>::FunctionPointer;
+	using impl::FunctionView<Tag, F, ArgTypes...>::FunctionView;
 };
 
 } // namespace bzd

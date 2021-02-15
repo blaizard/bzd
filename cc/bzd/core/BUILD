@@ -132,7 +132,7 @@ cc_library(
     deps = [
         ":assert",
         "//cc/bzd/container:function",
-        "//cc/bzd/container:function_pointer",
+        "//cc/bzd/container:function_view",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:queue",
         "//cc/bzd/container:result",

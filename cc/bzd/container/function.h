@@ -41,10 +41,7 @@ public:
 	/**
 	 *
 	 */
-	explicit operator FctPtrType() const noexcept
-	{
-		return callable_;
-	}
+	explicit operator FctPtrType() const noexcept { return callable_; }
 
 private:
 	FctPtrType callable_;
