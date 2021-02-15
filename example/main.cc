@@ -207,8 +207,54 @@ void exampleMutex()
 	std::cout << "Max stack usage stack3: " << stack3.estimateMaxUsage() << std::endl;
 }
 
+void exampleTerminal()
+{
+	Terminal terminal;
+	static bzd::platform::Stack<10000> stack1;
+	static bzd::platform::Stack<10000> stack2;
+
+	stack1.taint();
+	stack2.taint();
+
+	bool isExit{false};
+	bzd::Task task1{[&isExit] {
+		while (isExit == false)
+		{
+			await bzd::delay(1_s);
+			std::cout << "." << std::flush;
+		}
+	}};
+
+	bzd::Task task2{[&isExit, &terminal] {
+		std::cout << "Press 'q' to exit." << std::endl;
+		while (isExit == false)
+		{
+			bzd::String<1> data{" "};
+			await terminal.read(data.asWritableBytes());
+			if (data[0] == 'q')
+			{
+				isExit = true;
+			}
+			std::cout << data[0] << std::flush;
+		}
+	}};
+
+	task1.bind(stack1);
+	task2.bind(stack2);
+
+	bzd::getScheduler().addTask(task1);
+	bzd::getScheduler().addTask(task2);
+
+	bzd::getScheduler().start();
+
+	std::cout << std::endl;
+	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
+}
+
 int main()
 {
-	simpleDelay();
-	exampleMutex();
+	//simpleDelay();
+	//exampleMutex();
+	exampleTerminal();
 }
