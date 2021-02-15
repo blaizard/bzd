@@ -16,7 +16,7 @@ protected:
 
 public:
 	/**
-	 * Construct from a member function.
+	 * Constructor from member function.
 	 */
 	template <class Object, class Member>
 	constexpr FunctionView(Object& obj, Member memberPtr) noexcept :
@@ -29,14 +29,20 @@ public:
 }
 
 /**
- * Construct from a function pointer.
+ * Constructor from function pointer.
  */
 constexpr explicit FunctionView(RawFctPtrType function) noexcept : storage_{function} {}
 
 /**
- * Construct from a bzd::Function object.
+ * Constructor from bzd::Function object.
  */
-constexpr explicit FunctionView(BzdFctPtrType function) noexcept : FunctionView{static_cast<RawFctPtrType>(function)} {}
+constexpr explicit FunctionView(BzdFctPtrType& function) noexcept : FunctionView{function.callable_} {}
+
+/**
+ * Constructor from lambda.
+ */
+template <class T>
+constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &T::operator()} {}
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const

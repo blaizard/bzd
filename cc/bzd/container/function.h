@@ -7,6 +7,13 @@
 
 #include <new> // Used only for placement new
 
+
+namespace bzd::impl {
+/// Forward declaration for friend
+template <typename Tag, class F, class... Args>
+class FunctionView;
+}
+
 namespace bzd::interface {
 
 /**
@@ -38,12 +45,11 @@ public:
 		return callable_(bzd::forward<Params>(args)...);
 	}
 
-	/**
-	 *
-	 */
-	explicit operator FctPtrType() const noexcept { return callable_; }
-
 private:
+
+	template <typename Tag, class A, class... B>
+	friend class ::bzd::impl::FunctionView;
+
 	FctPtrType callable_;
 };
 } // namespace bzd::interface
