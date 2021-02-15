@@ -131,6 +131,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":assert",
+        "//cc/bzd/container:any_reference",
         "//cc/bzd/container:function",
         "//cc/bzd/container:function_view",
         "//cc/bzd/container:optional",

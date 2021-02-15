@@ -9,7 +9,7 @@ public:
 
 	auto lock()
 	{
-		return bzd::makePromise([this](bzd::interface::Promise& promise) mutable -> bzd::Promise<>::ReturnType {
+		return bzd::makePromise([this](bzd::interface::Promise& promise, bzd::AnyReference&) mutable -> bzd::Promise<>::ReturnType {
 			bzd::BoolType expected{false};
 			if (acquired_.compareExchange(expected, true))
 			{

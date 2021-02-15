@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bzd/container/result.h"
+#include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 
 namespace bzd::impl {
@@ -18,6 +19,8 @@ namespace bzd {
 class AnyReference
 {
 public:
+	constexpr AnyReference() noexcept = default;
+
 	template <class T>
 	constexpr explicit AnyReference(T& object) noexcept : typeId_{bzd::impl::getTypeId<T>()}, object_{&object}
 	{
@@ -48,8 +51,24 @@ public:
 		return makeError();
 	}
 
+	template <class T>
+	[[nodiscard]] constexpr T& cast() noexcept
+	{
+		auto result = get<T>();
+		bzd::assert::isTrue(result, "Invalid any cast");
+		return *result;
+	}
+
+	template <class T>
+	[[nodiscard]] constexpr const T& cast() const noexcept
+	{
+		const auto result = get<T>();
+		bzd::assert::isTrue(result, "Invalid any cast");
+		return *result;
+	}
+
 private:
-	bzd::impl::TypeIdType typeId_;
-	void* object_;
+	bzd::impl::TypeIdType typeId_{0};
+	void* object_{nullptr};
 };
 } // namespace bzd
