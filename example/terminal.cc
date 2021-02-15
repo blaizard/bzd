@@ -22,10 +22,34 @@ public:
 		tcsetattr(0, TCSANOW, &current_);
 	}
 
+	bzd::Promise<bzd::SizeType>::ReturnType promise(bzd::interface::Promise&)
+	{
+		::pollfd fd{};
+		fd.fd = STDIN_FILENO;
+		fd.events = POLLIN;
+		const auto ret = ::poll(&fd, 1, 0);
+		if (ret < 0)
+		{
+			return bzd::makeError();
+		}
+		if (ret > 0 && (fd.revents & POLLIN) != 0)
+		{
+			const auto size = ::read(STDIN_FILENO, data_.data(), data_.size());
+			return size;
+		}
+		return bzd::nullopt;
+	}
+
+	void registerData(const bzd::Span<bzd::ByteType>& data)
+	{
+		data_ = data;
+	}
+
 	~Terminal() { tcsetattr(0, TCSANOW, &old_); }
 
 private:
 	struct termios old_, current_;
+	bzd::Span<bzd::ByteType> data_;
 };
 } // namespace impl
 
@@ -34,43 +58,13 @@ bzd::Result<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>&
 	return 0;
 }
 
-bzd::Result<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data)
+bzd::Promise<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data)
 {
-	bzd::ignore = impl::Terminal::getInstance();
-	::pollfd fd{};
-	fd.fd = STDIN_FILENO;
-	fd.events = POLLIN;
-	const auto ret = ::poll(&fd, 1, 0);
-	if (ret > 0 && ((fd.revents & POLLIN) != 0))
-	{
-		const auto size = ::read(STDIN_FILENO, data.data(), data.size());
-		return size;
-	}
-	return bzd::makeError();
-}
-/*
-static bzd::Promise<bzd::SizeType>::ReturnType getChar()
-{
-	::pollfd fd{};
-	fd.fd = STDIN_FILENO;
-	fd.events = POLLIN;
-	const auto ret = ::poll(&fd, 1, 0);
-	if (ret > 0 && ((fd.revents & POLLIN) != 0))
-	{
-		const auto size = ::read(STDIN_FILENO, data.data(), data.size());
-		return size;
-	}
-	return bzd::makeError();
-}
-*/
-/*bzd::Promise<bzd::SizeType> Terminal::read2(const bzd::Span<bzd::ByteType>& data)
-{
-	bzd::ignore = impl::Terminal::getInstance();
+	auto& terminal = impl::Terminal::getInstance();
 
 	// Set mutex here
 
-	return makePromise([&data]() {
+	terminal.registerData(data);
 
-	});
+	return bzd::Promise<bzd::SizeType>{terminal, &impl::Terminal::promise};
 }
-*/

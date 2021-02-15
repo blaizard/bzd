@@ -46,7 +46,6 @@ public:
 	}
 
 private:
-
 	template <typename Tag, class A, class... B>
 	friend class ::bzd::impl::FunctionView;
 

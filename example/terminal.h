@@ -14,8 +14,7 @@ public:
 	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data);
 
 	/**
-	 * Block until at least one character is available.
+	 * Block until at least one character is available and return it immediatly.
 	 */
-	bzd::Result<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data);
-	// bzd::Promise<bzd::SizeType> read2(const bzd::Span<bzd::ByteType>& data);
+	bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data);
 };
