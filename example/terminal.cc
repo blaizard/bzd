@@ -40,10 +40,7 @@ public:
 		return bzd::nullopt;
 	}
 
-	void registerData(const bzd::Span<bzd::ByteType>& data)
-	{
-		data_ = data;
-	}
+	void registerData(const bzd::Span<bzd::ByteType>& data) { data_ = data; }
 
 	~Terminal() { tcsetattr(0, TCSANOW, &old_); }
 

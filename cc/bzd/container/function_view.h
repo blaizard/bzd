@@ -42,7 +42,9 @@ constexpr explicit FunctionView(BzdFctPtrType& function) noexcept : FunctionView
  * Constructor from lambda.
  */
 template <class T>
-constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &T::operator()} {}
+constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &T::operator()}
+{
+}
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const

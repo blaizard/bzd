@@ -4,6 +4,7 @@ cc_library(
     name = "container",
     visibility = ["//visibility:public"],
     deps = [
+        ":any_reference",
         ":array",
         ":btree",
         ":function",
@@ -26,6 +27,18 @@ cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "any_reference",
+    hdrs = [
+        "any_reference.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":result",
+        "//cc/bzd/platform:types",
+    ],
+)
 
 cc_library(
     name = "array",

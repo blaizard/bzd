@@ -7,12 +7,11 @@
 
 #include <new> // Used only for placement new
 
-
 namespace bzd::impl {
 /// Forward declaration for friend
 template <typename Tag, class F, class... Args>
 class FunctionView;
-}
+} // namespace bzd::impl
 
 namespace bzd::interface {
 
