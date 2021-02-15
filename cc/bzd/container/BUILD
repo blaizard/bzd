@@ -36,6 +36,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":result",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
     ],
 )

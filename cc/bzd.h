@@ -6,6 +6,7 @@
 #include "bzd/algorithm/reverse.h"
 
 // Container
+#include "bzd/container/any_reference.h"
 #include "bzd/container/array.h"
 #include "bzd/container/btree.h"
 #include "bzd/container/function.h"

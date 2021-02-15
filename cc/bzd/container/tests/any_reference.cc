@@ -54,4 +54,24 @@ TEST(ContainerAnyReference, constAny)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(*result, 23);
 	}
+	{
+		auto result = ref.get<const int>();
+		EXPECT_FALSE(result);
+	}
+}
+
+TEST(ContainerAnyReference, cast)
+{
+	int a = 23;
+	bzd::AnyReference ref{a};
+	auto& aRef = ref.cast<int>();
+	EXPECT_EQ(aRef, 23);
+}
+
+TEST(ContainerAnyReference, constCast)
+{
+	int a = 23;
+	const bzd::AnyReference ref{a};
+	auto& aRef = ref.cast<int>();
+	EXPECT_EQ(aRef, 23);
 }

@@ -86,25 +86,26 @@ public:
 	{
 		auto duration = bzd::platform::getTicks().toDuration();
 		const auto targetDuration = duration + bzd::platform::msToTicks(time);
-		return bzd::makePromise([duration, targetDuration](bzd::interface::Promise&) mutable -> bzd::Promise<>::ReturnType {
-			const auto curTicks = bzd::platform::getTicks();
+		return bzd::makePromise(
+			[duration, targetDuration](bzd::interface::Promise&, bzd::AnyReference&) mutable -> bzd::Promise<>::ReturnType {
+				const auto curTicks = bzd::platform::getTicks();
 
-			// Update the current duration and update the wrapping counter
-			auto details = duration.getDetails();
-			if (details.ticks > curTicks.get())
-			{
-				++details.wrappingCounter;
-			}
-			details.ticks = curTicks.get();
-			duration.setFromDetails(details);
+				// Update the current duration and update the wrapping counter
+				auto details = duration.getDetails();
+				if (details.ticks > curTicks.get())
+				{
+					++details.wrappingCounter;
+				}
+				details.ticks = curTicks.get();
+				duration.setFromDetails(details);
 
-			// Check if the duration is reached
-			if (duration >= targetDuration)
-			{
-				return bzd::nullresult;
-			}
-			return bzd::nullopt;
-		});
+				// Check if the duration is reached
+				if (duration >= targetDuration)
+				{
+					return bzd::nullresult;
+				}
+				return bzd::nullopt;
+			});
 	}
 };
 

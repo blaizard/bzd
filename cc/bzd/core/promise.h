@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bzd/container/any_reference.h"
 #include "bzd/container/function_view.h"
 #include "bzd/container/impl/non_owning_list.h"
 #include "bzd/container/optional.h"
@@ -43,10 +44,17 @@ class Promise : public bzd::interface::Promise
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
 	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
+	using FunctionType = ReturnType(bzd::interface::Promise&, bzd::AnyReference);
+	using FunctionViewType = bzd::FunctionView<FunctionType>;
 
 public: // Constructors.
-	template <class... Args>
-	constexpr Promise(Args&&... args) noexcept : interface::Promise{}, poll_{bzd::forward<Args>(args)...}
+	template <class F, class Args>
+	constexpr Promise(F&& fct, Args&& args) noexcept : interface::Promise{}, poll_{bzd::forward<F>(fct)}, args_{bzd::forward<Args>(args)}
+	{
+	}
+
+	template <class F>
+	constexpr Promise(F&& fct) noexcept : interface::Promise{}, poll_{bzd::forward<F>(fct)}
 	{
 	}
 
@@ -65,7 +73,7 @@ public:
 	{
 		if (!isReady())
 		{
-			setResult(poll_(*this));
+			setResult(poll_(*this, args_));
 		}
 		return isReady();
 	}
@@ -75,7 +83,8 @@ public:
 
 protected:
 	ReturnType return_{};
-	bzd::FunctionView<ReturnType(bzd::interface::Promise&)> poll_{};
+	FunctionViewType poll_{};
+	bzd::AnyReference args_{};
 };
 
 template <class V, class E, class PollFct>
@@ -83,12 +92,13 @@ class PromisePoll : public bzd::Promise<V, E>
 {
 private:
 	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
+	using typename bzd::Promise<V, E>::FunctionViewType;
 
 public:
 	using bzd::Promise<V, E>::isReady;
 
 	template <class T = PollFct>
-	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{poll_}, poll_{bzd::forward<T>(callack)}
+	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{FunctionViewType{poll_}}, poll_{bzd::forward<T>(callack)}
 	{
 	}
 
@@ -98,10 +108,11 @@ private:
 };
 
 template <class T,
-		  class V = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&>::Value::Value,
-		  class E = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&>::Value::Error>
+		  class V = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&, bzd::AnyReference&>::Value::Value,
+		  class E = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&, bzd::AnyReference&>::Value::Error>
 constexpr auto makePromise(T&& callback)
 {
 	return bzd::PromisePoll<V, E, T>(bzd::forward<T>(callback));
 }
+
 } // namespace bzd
