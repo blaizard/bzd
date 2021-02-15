@@ -88,7 +88,7 @@ public:
 	using bzd::Promise<V, E>::isReady;
 
 	template <class T = PollFct>
-	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{poll_, &PollFct::operator()}, poll_{bzd::forward<T>(callack)}
+	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{poll_}, poll_{bzd::forward<T>(callack)}
 	{
 	}
 

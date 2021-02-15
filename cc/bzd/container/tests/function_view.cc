@@ -147,3 +147,27 @@ TEST(ContainerFunctionView, objectFunctionArgsReturn)
 	EXPECT_EQ(fct(5), 27);
 	EXPECT_EQ(ptr(3), 11);
 }
+
+TEST(ContainerFunctionView, lambdaNoArgs)
+{
+	int a = 0;
+	auto lambda = [&a]() {
+		++a;
+	};
+	bzd::FunctionView<void(void)> ptr{lambda};
+	EXPECT_EQ(a, 0);
+	lambda();
+	EXPECT_EQ(a, 1);
+	ptr();
+	EXPECT_EQ(a, 2);
+}
+
+TEST(ContainerFunctionView, lambdaArgsReturn)
+{
+	auto lambda = [](int a) {
+		return a * a;
+	};
+	bzd::FunctionView<int(int)> ptr{lambda};
+	EXPECT_EQ(lambda(7), 49);
+	EXPECT_EQ(ptr(3), 9);
+}
