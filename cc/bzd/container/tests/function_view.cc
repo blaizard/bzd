@@ -1,4 +1,4 @@
-#include "bzd/container/function_pointer.h"
+#include "bzd/container/function_view.h"
 
 #include "cc_test/test.h"
 
@@ -48,56 +48,56 @@ int callSquare(int val)
 
 } // namespace
 
-TEST(ContainerFunctionPointer, classMemberSimple)
+TEST(ContainerFunctionView, classMemberSimple)
 {
 	Dummy dummy{10};
-	bzd::FunctionPointer<void(void)> ptr{dummy, &Dummy::callNoArgsAdd1};
+	bzd::FunctionView<void(void)> ptr{dummy, &Dummy::callNoArgsAdd1};
 	EXPECT_EQ(dummy.getValue(), 10);
 	ptr();
 	EXPECT_EQ(dummy.getValue(), 11);
 }
 
-TEST(ContainerFunctionPointer, classMemberWithArgs)
+TEST(ContainerFunctionView, classMemberWithArgs)
 {
 	Dummy dummy{-1};
-	bzd::FunctionPointer<void(int)> ptr{dummy, &Dummy::callSet};
+	bzd::FunctionView<void(int)> ptr{dummy, &Dummy::callSet};
 	EXPECT_EQ(dummy.getValue(), -1);
 	ptr(15);
 	EXPECT_EQ(dummy.getValue(), 15);
 }
 
-TEST(ContainerFunctionPointer, classMemberWithArgsAndReturn)
+TEST(ContainerFunctionView, classMemberWithArgsAndReturn)
 {
 	Dummy dummy{882};
-	bzd::FunctionPointer<int(int)> ptr{dummy, &Dummy::callSetAndReturn};
+	bzd::FunctionView<int(int)> ptr{dummy, &Dummy::callSetAndReturn};
 	EXPECT_EQ(dummy.getValue(), 882);
 	EXPECT_EQ(ptr(3), 3);
 	EXPECT_EQ(dummy.getValue(), 3);
 }
 
-TEST(ContainerFunctionPointer, classMemberVirtual)
+TEST(ContainerFunctionView, classMemberVirtual)
 {
 	// Base class
 	Dummy dummy{-1};
-	bzd::FunctionPointer<void(int)> ptr{dummy, &Dummy::callVirtualAdd};
+	bzd::FunctionView<void(int)> ptr{dummy, &Dummy::callVirtualAdd};
 	EXPECT_EQ(dummy.getValue(), -1);
 	ptr(15);
 	EXPECT_EQ(dummy.getValue(), 14);
 
 	// Child class
 	DummyChild child{32};
-	bzd::FunctionPointer<void(int)> ptrChild{static_cast<Dummy&>(child), &Dummy::callVirtualAdd};
+	bzd::FunctionView<void(int)> ptrChild{static_cast<Dummy&>(child), &Dummy::callVirtualAdd};
 	EXPECT_EQ(child.getValue(), 32);
 	ptrChild(15);
 	EXPECT_EQ(child.getValue(), 42);
 }
 
-TEST(ContainerFunctionPointer, classMemberTags)
+TEST(ContainerFunctionView, classMemberTags)
 {
 	Dummy dummy1{10};
 	Dummy dummy2{45};
-	bzd::FunctionPointer<void(void)> ptr1{dummy1, &Dummy::callNoArgsAdd1};
-	bzd::FunctionPointer<void(void), struct A> ptr2{dummy2, &Dummy::callNoArgsAdd3};
+	bzd::FunctionView<void(void)> ptr1{dummy1, &Dummy::callNoArgsAdd1};
+	bzd::FunctionView<void(void), struct A> ptr2{dummy2, &Dummy::callNoArgsAdd3};
 	EXPECT_EQ(dummy1.getValue(), 10);
 	EXPECT_EQ(dummy2.getValue(), 45);
 	ptr1();
@@ -106,33 +106,31 @@ TEST(ContainerFunctionPointer, classMemberTags)
 	EXPECT_EQ(dummy2.getValue(), 48);
 }
 
-TEST(ContainerFunctionPointer, functionNoArgs)
+TEST(ContainerFunctionView, functionNoArgs)
 {
-	bzd::FunctionPointer<void(void)> ptr{callNoArgs};
+	bzd::FunctionView<void(void)> ptr{callNoArgs};
 	ptr();
 }
 
-TEST(ContainerFunctionPointer, functionArgs)
+TEST(ContainerFunctionView, functionArgs)
 {
-	bzd::FunctionPointer<void(int&)> ptr{&callArgsAdd1};
+	bzd::FunctionView<void(int&)> ptr{&callArgsAdd1};
 	int a = 6;
 	ptr(a);
 	EXPECT_EQ(a, 7);
 }
 
-TEST(ContainerFunctionPointer, functionReturn)
+TEST(ContainerFunctionView, functionReturn)
 {
-	bzd::FunctionPointer<int(int)> ptr{callSquare};
+	bzd::FunctionView<int(int)> ptr{callSquare};
 	EXPECT_EQ(ptr(9), 81);
 }
 
-TEST(ContainerFunctionPointer, objectFunctionNoArgs)
+TEST(ContainerFunctionView, objectFunctionNoArgs)
 {
 	int a = 0;
-	bzd::Function<void(void)> fct{[&]() {
-		a += 42;
-	}};
-	bzd::FunctionPointer<void(void)> ptr{fct};
+	bzd::Function<void(void)> fct{[&]() { a += 42; }};
+	bzd::FunctionView<void(void)> ptr{fct};
 	EXPECT_EQ(a, 0);
 	fct();
 	EXPECT_EQ(a, 42);
@@ -140,15 +138,12 @@ TEST(ContainerFunctionPointer, objectFunctionNoArgs)
 	EXPECT_EQ(a, 84);
 }
 
-TEST(ContainerFunctionPointer, objectFunctionArgsReturn)
+TEST(ContainerFunctionView, objectFunctionArgsReturn)
 {
 	int a = 2;
-	bzd::Function<int(int)> fct{[&](int b) -> int {
-		return b * b + a;
-	}};
-	bzd::FunctionPointer<int(int)> ptr{fct};
+	bzd::Function<int(int)> fct{[&](int b) -> int { return b * b + a; }};
+	bzd::FunctionView<int(int)> ptr{fct};
 	EXPECT_EQ(a, 2);
 	EXPECT_EQ(fct(5), 27);
 	EXPECT_EQ(ptr(3), 11);
 }
-
