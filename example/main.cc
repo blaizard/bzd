@@ -254,7 +254,7 @@ void exampleTerminal()
 
 int main()
 {
-	//simpleDelay();
-	//exampleMutex();
+	// simpleDelay();
+	// exampleMutex();
 	exampleTerminal();
 }
