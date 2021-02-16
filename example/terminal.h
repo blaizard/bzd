@@ -11,10 +11,10 @@ class Terminal
 		};
 	*/
 public:
-	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data);
+	[[nodiscard]] bzd::Promise<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept;
 
 	/**
 	 * Block until at least one character is available and return it immediatly.
 	 */
-	bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data);
+	[[nodiscard]] bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept;
 };

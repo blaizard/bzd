@@ -111,56 +111,39 @@ public:
 
 void simpleDelay()
 {
-	static bzd::platform::Stack<10000> stack1;
-	static bzd::platform::Stack<10000> stack2;
-
-	stack1.taint();
-	stack2.taint();
-
 	int i = 20;
-	bzd::Task task1{[&i] {
+	static auto task1 = bzd::makeTask<10000>([&i] {
 		while (i > 0)
 		{
 			await bzd::delay(1_s);
 			std::cout << "Fct 1: " << i-- << " (1s)" << std::endl;
 		}
 		std::cout << "Fct 1: end" << std::endl;
-	}};
+	});
 
-	bzd::Task task2{[&i] {
+	static auto task2 = bzd::makeTask<10000>([&i] {
 		while (i > 0)
 		{
 			std::cout << "Fct 2: " << i-- << " (200ms)" << std::endl;
 			await bzd::delay(200_ms);
 		}
 		std::cout << "Fct 2: end" << std::endl;
-	}};
-
-	task1.bind(stack1);
-	task2.bind(stack2);
+	});
 
 	bzd::getScheduler().addTask(task1);
 	bzd::getScheduler().addTask(task2);
 
 	bzd::getScheduler().start();
 
-	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
-	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack1: " << task1.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack2: " << task2.estimateMaxUsage() << std::endl;
 }
 
 void exampleMutex()
 {
-	static bzd::platform::Stack<10000> stack1;
-	static bzd::platform::Stack<10000> stack2;
-	static bzd::platform::Stack<10000> stack3;
-
-	stack1.taint();
-	stack2.taint();
-	stack3.taint();
-
 	Mutex mutex{};
 
-	bzd::Task task1{[&mutex] {
+	static auto task1 = bzd::makeTask<10000>([&mutex] {
 		for (int i = 0; i < 3; ++i)
 		{
 			await mutex.lock();
@@ -169,9 +152,9 @@ void exampleMutex()
 			std::cout << "..1>" << std::endl;
 			mutex.unlock();
 		}
-	}};
+	});
 
-	bzd::Task task2{[&mutex] {
+	static auto task2 = bzd::makeTask<10000>([&mutex] {
 		for (int i = 0; i < 3; ++i)
 		{
 			await mutex.lock();
@@ -180,9 +163,9 @@ void exampleMutex()
 			std::cout << "..2>" << std::endl;
 			mutex.unlock();
 		}
-	}};
+	});
 
-	bzd::Task task3{[&mutex] {
+	static auto task3 = bzd::makeTask<10000>([&mutex] {
 		for (int i = 0; i < 3; ++i)
 		{
 			await mutex.lock();
@@ -191,11 +174,7 @@ void exampleMutex()
 			std::cout << "..3>" << std::endl;
 			mutex.unlock();
 		}
-	}};
-
-	task1.bind(stack1);
-	task2.bind(stack2);
-	task3.bind(stack3);
+	});
 
 	bzd::getScheduler().addTask(task1);
 	bzd::getScheduler().addTask(task2);
@@ -203,45 +182,47 @@ void exampleMutex()
 
 	bzd::getScheduler().start();
 
-	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
-	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
-	std::cout << "Max stack usage stack3: " << stack3.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack1: " << task1.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack2: " << task2.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack3: " << task3.estimateMaxUsage() << std::endl;
 }
 
 void exampleTerminal()
 {
-	Terminal terminal;
-	static bzd::platform::Stack<10000> stack1;
-	static bzd::platform::Stack<10000> stack2;
-
-	stack1.taint();
-	stack2.taint();
+	Terminal terminal{};
 
 	bool isExit{false};
-	bzd::Task task1{[&isExit] {
-		while (isExit == false)
+	static auto task1 = bzd::makeTask<10000>([&isExit] {
+		int i = 0;
+		while (isExit == false && i < 20)
 		{
-			await bzd::delay(1_s);
+			await bzd::delay(200_ms);
 			std::cout << "." << std::flush;
+			++i;
 		}
-	}};
+		isExit = true;
+	});
 
-	bzd::Task task2{[&isExit, &terminal] {
+	static auto task2 = bzd::makeTask<10000>([&isExit, &terminal] {
 		std::cout << "Press 'q' to exit." << std::endl;
 		while (isExit == false)
 		{
 			bzd::String<1> data{" "};
-			await terminal.read(data.asWritableBytes());
+			await bzd::delay(500_ms);
+			auto promiseTerminal = terminal.read(data.asWritableBytes());
+			//auto promiseTerminal = bzd::delay(500_ms);
+			//bzd::ignore = bzd::Promise<bzd::SizeType>();
+
+			//bzd::PromiseOr promiseOr{promiseTerminal, promiseDelay};
+			await promiseTerminal;
+
 			if (data[0] == 'q')
 			{
 				isExit = true;
 			}
-			std::cout << data[0] << std::flush;
+			std::cout << "[" << data[0] << "]" << std::endl;
 		}
-	}};
-
-	task1.bind(stack1);
-	task2.bind(stack2);
+	});
 
 	bzd::getScheduler().addTask(task1);
 	bzd::getScheduler().addTask(task2);
@@ -249,13 +230,13 @@ void exampleTerminal()
 	bzd::getScheduler().start();
 
 	std::cout << std::endl;
-	std::cout << "Max stack usage stack1: " << stack1.estimateMaxUsage() << std::endl;
-	std::cout << "Max stack usage stack2: " << stack2.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack1: " << task1.estimateMaxUsage() << std::endl;
+	std::cout << "Max stack usage stack2: " << task2.estimateMaxUsage() << std::endl;
 }
 
 int main()
 {
-	// simpleDelay();
-	// exampleMutex();
+	//simpleDelay();
+	//exampleMutex();
 	exampleTerminal();
 }
