@@ -75,3 +75,13 @@ TEST(ContainerAnyReference, constCast)
 	auto& aRef = ref.cast<int>();
 	EXPECT_EQ(aRef, 23);
 }
+
+TEST(ContainerAnyReference, interference)
+{
+	int a = 23;
+	int b = 12;
+	const bzd::AnyReference refA{a};
+	const bzd::AnyReference refB{b};
+	int u = refA.cast<int>() + refB.cast<int>();
+	EXPECT_EQ(u, 35);
+}

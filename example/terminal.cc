@@ -1,6 +1,6 @@
 #include "example/terminal.h"
 
-#include "bzd/utility/singleton.h"
+#include "bzd.h"
 
 #include <poll.h>
 #include <stdio.h>
@@ -34,9 +34,11 @@ public:
 			return bzd::makeError();
 		}
 		if (ret > 0 && (fd.revents & POLLIN) != 0)
-		{
+		{	
 			const auto& data = arg.cast<const bzd::Span<bzd::ByteType>>();
+			bzd::assert::isTrue(data.size(), "Empty buffer supplied.");
 			const auto size = ::read(STDIN_FILENO, data.data(), data.size());
+			std::cout << "msg! " << ret << " " << fd.revents << " " << size << std::endl;
 			return size;
 		}
 		return bzd::nullopt;
@@ -49,12 +51,12 @@ private:
 };
 } // namespace impl
 
-bzd::Result<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>& /*data*/)
+bzd::Promise<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>&) noexcept
 {
-	return 0;
+	return bzd::Promise<bzd::SizeType>();
 }
 
-bzd::Promise<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data)
+bzd::Promise<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data) noexcept
 {
 	auto& terminal = impl::Terminal::getInstance();
 	return bzd::Promise<bzd::SizeType>{bzd::Promise<bzd::SizeType>::FunctionViewType{terminal, &impl::Terminal::promise}, data};

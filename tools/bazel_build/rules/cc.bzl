@@ -232,10 +232,10 @@ def _cc_binary(ctx, binary_file):
 
         # If no executable are set, execute as a normal shell command
     else:
-        ctx.actions.write(
+        ctx.actions.symlink(
             output = ctx.outputs.executable,
-            is_executable = True,
-            content = "exec {} $@".format(final_binary_file.short_path),
+            target_file = final_binary_file,
+            is_executable = True
         )
         default_info = DefaultInfo(
             executable = ctx.outputs.executable,
@@ -255,6 +255,7 @@ def _bzd_cc_generic_impl(ctx):
     binary_file, link_metadata_files = _cc_linker(ctx, cc_info_providers, ctx.attr._map_analyzer_script)
 
     # Strip the binary.
+    """
     stripped_binary_file = ctx.actions.declare_file("{}.stripped".format(ctx.label.name))
     _cc_run_action(
         ctx = ctx,
@@ -263,9 +264,10 @@ def _bzd_cc_generic_impl(ctx):
         args = ["-o", stripped_binary_file.path, binary_file.path],
         outputs = [stripped_binary_file],
     )
+    """
 
     # Make the executor from the binary toolchain
-    default_info, binary_metadata_files = _cc_binary(ctx, stripped_binary_file)
+    default_info, binary_metadata_files = _cc_binary(ctx, binary_file)
 
     return [
         default_info,

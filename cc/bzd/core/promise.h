@@ -58,6 +58,10 @@ public: // Constructors.
 	{
 	}
 
+	constexpr Promise() noexcept : interface::Promise{}, poll_{&promiseNoop}
+	{
+	}
+
 public:
 	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
 	constexpr void setResult(ReturnType&& optionalResult) noexcept { return_ = bzd::move(optionalResult); }
@@ -80,6 +84,12 @@ public:
 
 	// When lifespan of this promise terminates, remove it from wherever it was.
 	~Promise() { bzd::ignore = this->pop(); }
+
+private:
+	static ReturnType promiseNoop(bzd::interface::Promise&, bzd::AnyReference) noexcept
+	{
+		return bzd::nullopt;
+	}
 
 protected:
 	ReturnType return_{};

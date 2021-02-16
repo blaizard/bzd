@@ -1,5 +1,6 @@
 // std
 #include <array>
+#include <atomic>
 #include <csignal>
 #include <cstdio>
 #include <cstring>
@@ -117,7 +118,7 @@ bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexc
 
 void callStack(std::ostream& out) noexcept
 {
-	constexpr size_t MAX_STACK_LEVEL = 64;
+	constexpr size_t MAX_STACK_LEVEL = 10; //< A larger number causes some hanging
 	static void* addresses[MAX_STACK_LEVEL];
 
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
@@ -230,15 +231,14 @@ void callStack(std::ostream& out) noexcept
 	}
 }
 
-void sigHandler(const int sig, siginfo_t* /*info*/, void* /*secret*/)
+void sigHandler(const int sig)
 {
 	// Ensure only one instance is running at a time
-	static volatile bool sigHandlerInProgress = false;
-	if (sigHandlerInProgress)
+	static volatile std::atomic_flag sigHandlerInProgress = ATOMIC_FLAG_INIT;
+	if (sigHandlerInProgress.test_and_set())
 	{
 		return;
 	}
-	sigHandlerInProgress = true;
 
 	std::cout << "\nCaught signal: " << getSignalName(sig) << std::endl;
 	callStack(std::cout);
@@ -248,17 +248,15 @@ void sigHandler(const int sig, siginfo_t* /*info*/, void* /*secret*/)
 
 bool installBootstrap()
 {
-	struct sigaction sa
-	{
-	};
-	sa.sa_sigaction = static_cast<void (*)(int, siginfo_t*, void*)>(sigHandler);
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART | SA_SIGINFO;
-
+	struct ::sigaction sa;
 	for (const auto& signal : {SIGSEGV, SIGFPE, SIGILL, SIGSYS, SIGABRT, SIGBUS, SIGTERM, SIGINT, SIGHUP})
 	{
-		sigaction(signal, &sa, nullptr);
+		::memset(&sa, 0, sizeof(sa));
+    	sa.sa_handler = sigHandler;
+		::sigemptyset(&sa.sa_mask);
+		::sigaction(signal, &sa, nullptr);
 	}
+
 	return true;
 }
 

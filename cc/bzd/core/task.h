@@ -65,6 +65,7 @@ public:
 	void bind(platform::interface::StackUser& stack)
 	{
 		bzd::assert::isTrue(stack_ == nullptr, "Task already bound to a stack.");
+		stack.taint();
 		stack.reset(fct_);
 		stack_ = &stack;
 	}
@@ -85,11 +86,22 @@ namespace bzd {
 /**
  * Creates a task.
  */
-template <class Callable>
+template <class Callable, bzd::SizeType StackSize = 0>
 class Task : public interface::TaskUser
 {
 public:
-	Task(Callable&& callable) : interface::TaskUser{callableWrapper(bzd::forward<Callable>(callable), this)} {}
+	Task(Callable&& callable) : interface::TaskUser{callableWrapper(bzd::forward<Callable>(callable), this)}
+	{
+		if constexpr (StackSize > 0)
+		{
+			bind(stack_);
+		}
+	}
+
+	bzd::SizeType estimateMaxUsage() const noexcept
+	{
+		return stack_.estimateMaxUsage();
+	}
 
 private:
 	static FctPtrType callableWrapper(Callable&& callable, interface::TaskUser* task)
@@ -101,5 +113,15 @@ private:
 		}};
 		return []() { bind(); };
 	}
+
+private:
+	bzd::platform::Stack<StackSize> stack_;
 };
+
+template <bzd::SizeType StackSize, class Callable>
+auto makeTask(Callable&& callable)
+{
+	return Task<Callable, StackSize>(bzd::forward<Callable>(callable));
+}
+
 } // namespace bzd
