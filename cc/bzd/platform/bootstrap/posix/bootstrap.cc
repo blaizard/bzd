@@ -252,7 +252,7 @@ bool installBootstrap()
 	for (const auto& signal : {SIGSEGV, SIGFPE, SIGILL, SIGSYS, SIGABRT, SIGBUS, SIGTERM, SIGINT, SIGHUP})
 	{
 		::memset(&sa, 0, sizeof(sa));
-    	sa.sa_handler = sigHandler;
+		sa.sa_handler = sigHandler;
 		::sigemptyset(&sa.sa_mask);
 		::sigaction(signal, &sa, nullptr);
 	}

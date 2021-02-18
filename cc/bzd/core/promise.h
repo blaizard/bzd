@@ -44,7 +44,7 @@ class Promise : public bzd::interface::Promise
 public: // Types.
 	using ResultType = bzd::Result<V, E>;
 	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
-	using FunctionType = ReturnType(bzd::interface::Promise&, bzd::AnyReference);
+	using FunctionType = ReturnType(bzd::interface::Promise&, bzd::AnyReference&);
 	using FunctionViewType = bzd::FunctionView<FunctionType>;
 
 public: // Constructors.
@@ -58,9 +58,7 @@ public: // Constructors.
 	{
 	}
 
-	constexpr Promise() noexcept : interface::Promise{}, poll_{&promiseNoop}
-	{
-	}
+	constexpr Promise() noexcept : interface::Promise{}, poll_{&promiseNoop} {}
 
 public:
 	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
@@ -86,10 +84,7 @@ public:
 	~Promise() { bzd::ignore = this->pop(); }
 
 private:
-	static ReturnType promiseNoop(bzd::interface::Promise&, bzd::AnyReference) noexcept
-	{
-		return bzd::nullopt;
-	}
+	static ReturnType promiseNoop(bzd::interface::Promise&, bzd::AnyReference&) noexcept { return bzd::nullopt; }
 
 protected:
 	ReturnType return_{};
