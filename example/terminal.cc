@@ -34,11 +34,10 @@ public:
 			return bzd::makeError();
 		}
 		if (ret > 0 && (fd.revents & POLLIN) != 0)
-		{	
+		{
 			const auto& data = arg.cast<const bzd::Span<bzd::ByteType>>();
 			bzd::assert::isTrue(data.size(), "Empty buffer supplied.");
 			const auto size = ::read(STDIN_FILENO, data.data(), data.size());
-			std::cout << "msg! " << ret << " " << fd.revents << " " << size << std::endl;
 			return size;
 		}
 		return bzd::nullopt;

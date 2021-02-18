@@ -98,10 +98,7 @@ public:
 		}
 	}
 
-	bzd::SizeType estimateMaxUsage() const noexcept
-	{
-		return stack_.estimateMaxUsage();
-	}
+	bzd::SizeType estimateMaxUsage() const noexcept { return stack_.estimateMaxUsage(); }
 
 private:
 	static FctPtrType callableWrapper(Callable&& callable, interface::TaskUser* task)

@@ -235,7 +235,7 @@ def _cc_binary(ctx, binary_file):
         ctx.actions.symlink(
             output = ctx.outputs.executable,
             target_file = final_binary_file,
-            is_executable = True
+            is_executable = True,
         )
         default_info = DefaultInfo(
             executable = ctx.outputs.executable,

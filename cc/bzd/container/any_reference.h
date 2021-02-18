@@ -3,6 +3,7 @@
 #include "bzd/container/result.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
+#include "bzd/type_traits/is_same.h"
 
 namespace bzd::impl {
 using TypeIdType = IntPtrType;
@@ -24,6 +25,12 @@ public:
 	template <class T>
 	constexpr explicit AnyReference(T& object) noexcept : typeId_{bzd::impl::getTypeId<T>()}, object_{&object}
 	{
+	}
+
+	template <class T>
+	constexpr explicit AnyReference(T&& object) noexcept
+	{
+		static_assert(!typeTraits::isSame<T, T>, "Cannot construct bzd::AnyReference from a rvalue.");
 	}
 
 	template <class T>

@@ -38,6 +38,7 @@ cc_library(
         ":result",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:is_same",
     ],
 )
 

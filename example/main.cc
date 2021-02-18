@@ -208,12 +208,10 @@ void exampleTerminal()
 		while (isExit == false)
 		{
 			bzd::String<1> data{" "};
-			await bzd::delay(500_ms);
-			auto promiseTerminal = terminal.read(data.asWritableBytes());
-			//auto promiseTerminal = bzd::delay(500_ms);
-			//bzd::ignore = bzd::Promise<bzd::SizeType>();
+			auto bytes = data.asWritableBytes();
+			auto promiseTerminal = terminal.read(bytes);
 
-			//bzd::PromiseOr promiseOr{promiseTerminal, promiseDelay};
+			await bzd::delay(500_ms);
 			await promiseTerminal;
 
 			if (data[0] == 'q')
@@ -236,7 +234,7 @@ void exampleTerminal()
 
 int main()
 {
-	//simpleDelay();
-	//exampleMutex();
+	// simpleDelay();
+	// exampleMutex();
 	exampleTerminal();
 }
