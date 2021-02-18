@@ -50,9 +50,11 @@ private:
 };
 } // namespace impl
 
-bzd::Promise<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>&) noexcept
+bzd::Promise<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>& data) noexcept
 {
-	return bzd::Promise<bzd::SizeType>();
+	std::cout.write(reinterpret_cast<const char*>(data.data()), data.size());
+	std::cout.flush();
+	return bzd::Promise<bzd::SizeType>{data.size()};
 }
 
 bzd::Promise<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data) noexcept

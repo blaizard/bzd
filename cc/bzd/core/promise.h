@@ -48,17 +48,17 @@ public: // Types.
 	using FunctionViewType = bzd::FunctionView<FunctionType>;
 
 public: // Constructors.
-	template <class F, class Args>
-	constexpr Promise(F&& fct, Args&& args) noexcept : interface::Promise{}, poll_{bzd::forward<F>(fct)}, args_{bzd::forward<Args>(args)}
+	template <class Args>
+	constexpr Promise(FunctionViewType&& fct, Args&& args) noexcept : interface::Promise{}, poll_{fct}, args_{bzd::forward<Args>(args)}
 	{
 	}
 
-	template <class F>
-	constexpr Promise(F&& fct) noexcept : interface::Promise{}, poll_{bzd::forward<F>(fct)}
+	constexpr Promise(FunctionViewType&& fct) noexcept : interface::Promise{}, poll_{fct} {}
+
+	template <class T>
+	constexpr Promise(T&& result) noexcept : interface::Promise{}, poll_{&promiseNoop}, return_{bzd::forward<T>(result)}
 	{
 	}
-
-	constexpr Promise() noexcept : interface::Promise{}, poll_{&promiseNoop} {}
 
 public:
 	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
@@ -76,8 +76,9 @@ public:
 		if (!isReady())
 		{
 			setResult(poll_(*this, args_));
+			return isReady();
 		}
-		return isReady();
+		return true;
 	}
 
 	// When lifespan of this promise terminates, remove it from wherever it was.

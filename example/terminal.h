@@ -18,15 +18,6 @@ public:
 	 */
 	[[nodiscard]] bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept;
 
-	template <class T>
-	constexpr void write(const T&&) noexcept
-	{
-		static_assert(!bzd::typeTraits::isSame<T, T>, "Not allowed to pass an rvalue.");
-	}
-
-	template <class T>
-	constexpr void read(const T&&) noexcept
-	{
-		static_assert(!bzd::typeTraits::isSame<T, T>, "Not allowed to pass an rvalue.");
-	}
+	[[nodiscard]] bzd::Promise<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>&& data) noexcept = delete;
+	[[nodiscard]] bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>&& data) noexcept = delete;
 };

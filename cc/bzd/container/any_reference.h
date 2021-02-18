@@ -28,15 +28,13 @@ public:
 	}
 
 	template <class T>
-	constexpr explicit AnyReference(T&& object) noexcept
-	{
-		static_assert(!typeTraits::isSame<T, T>, "Cannot construct bzd::AnyReference from a rvalue.");
-	}
-
-	template <class T>
 	constexpr explicit AnyReference(const T& object) noexcept : typeId_{bzd::impl::getTypeId<const T>()}, object_{const_cast<T*>(&object)}
 	{
 	}
+
+	// Forbid rvalues
+	template <class T>
+	constexpr explicit AnyReference(T&& object) noexcept = delete;
 
 	template <class T>
 	[[nodiscard]] constexpr bzd::Result<T&> get() noexcept
