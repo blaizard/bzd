@@ -207,18 +207,19 @@ void exampleTerminal()
 		std::cout << "Press 'q' to exit." << std::endl;
 		while (isExit == false)
 		{
-			bzd::String<1> data{" "};
+			bzd::Array<char, 10> data;
 			auto bytes = data.asWritableBytes();
-			auto promiseTerminal = terminal.read(bytes);
 
-			await bzd::delay(500_ms);
-			await promiseTerminal;
+			const auto result = await terminal.read(bytes);
+			bzd::assert::isTrue(result, "I/O error");
+
+			bzd::Span<const bzd::ByteType> out{bytes.data(), *result};
+			await terminal.write(out);
 
 			if (data[0] == 'q')
 			{
 				isExit = true;
 			}
-			std::cout << "[" << data[0] << "]" << std::endl;
 		}
 	});
 
@@ -234,7 +235,7 @@ void exampleTerminal()
 
 int main()
 {
-	// simpleDelay();
-	// exampleMutex();
+	//	simpleDelay();
+	//	exampleMutex();
 	exampleTerminal();
 }
