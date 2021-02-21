@@ -15,8 +15,8 @@ public:
 
 	bzd::Result<> connect() override;
 
-	bzd::Result<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept override;
-	bzd::Result<SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept override;
+	bzd::Result<SizeType> write(const bzd::Span<const bzd::UInt8Type>& data) noexcept;
+	bzd::Result<SizeType> read(bzd::Span<bzd::UInt8Type>& data) noexcept;
 
 private:
 	Configuration config_;
