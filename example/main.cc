@@ -62,53 +62,6 @@ private:
 
 */
 
-/**
- * Polling implementation.
- */
-class Delay
-{
-public:
-	void waitForEventNoArgs() { waitForEvent(1_s); }
-
-	void waitForEvent(const bzd::units::Millisecond time)
-	{
-		std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(time.get()));
-		std::cout << "Event!" << std::endl;
-	}
-
-	auto delayEvent(const bzd::units::Millisecond time)
-	{
-		static std::thread first([this, time] { this->waitForEvent(time); });
-		return bzd::nullopt;
-	}
-
-	auto delayPolling(const bzd::units::Millisecond time)
-	{
-		auto duration = bzd::platform::getTicks().toDuration();
-		const auto targetDuration = duration + bzd::platform::msToTicks(time);
-		return bzd::makePromise(
-			[duration, targetDuration](bzd::interface::Promise&, bzd::AnyReference&) mutable -> bzd::Promise<>::ReturnType {
-				const auto curTicks = bzd::platform::getTicks();
-
-				// Update the current duration and update the wrapping counter
-				auto details = duration.getDetails();
-				if (details.ticks > curTicks.get())
-				{
-					++details.wrappingCounter;
-				}
-				details.ticks = curTicks.get();
-				duration.setFromDetails(details);
-
-				// Check if the duration is reached
-				if (duration >= targetDuration)
-				{
-					return bzd::nullresult;
-				}
-				return bzd::nullopt;
-			});
-	}
-};
-
 void simpleDelay()
 {
 	int i = 20;
@@ -187,6 +140,23 @@ void exampleMutex()
 	std::cout << "Max stack usage stack3: " << task3.estimateMaxUsage() << std::endl;
 }
 
+void terminalTask()
+{
+	Terminal terminal{};
+
+	{
+		const bzd::String<2> prompt{"> "};
+		const auto bytes = prompt.asBytes();
+		await terminal.write(bytes);
+	}
+/*
+	bzd::String<64> input;
+	bzd::Array<char, 10> data;
+	auto bytes = data.asWritableBytes();
+	const auto result = await terminal.read(bytes);
+*/
+}
+
 void exampleTerminal()
 {
 	Terminal terminal{};
@@ -204,6 +174,9 @@ void exampleTerminal()
 	});
 
 	static auto task2 = bzd::makeTask<10000>([&isExit, &terminal] {
+
+		terminalTask();
+
 		std::cout << "Press 'q' to exit." << std::endl;
 		while (isExit == false)
 		{
@@ -213,7 +186,7 @@ void exampleTerminal()
 			const auto result = await terminal.read(bytes);
 			bzd::assert::isTrue(result, "I/O error");
 
-			bzd::Span<const bzd::ByteType> out{bytes.data(), *result};
+			const auto out = bytes.subspan(0, *result);
 			await terminal.write(out);
 
 			if (data[0] == 'q')
