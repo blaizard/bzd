@@ -49,8 +49,8 @@ class ParserClang(Parser):
 			if not table:
 				return False
 
-			if not table.isValidIdentifier("size") or not table.isValidIdentifier("out") or not table.isValidIdentifier(
-				"in"):
+			if not table.isValidIdentifier("vma") or not table.isValidIdentifier("size") or not table.isValidIdentifier(
+				"out") or not table.isValidIdentifier("in"):
 				return False
 
 			section = None
@@ -64,11 +64,15 @@ class ParserClang(Parser):
 				if not maybeSize:
 					continue
 
+				maybeAddress = parts.get("vma")
+				if not maybeAddress:
+					continue
+
 				# Extract important data
 				cellOut = parts.get("out")
 				if cellOut:
 					section = cellOut
-					sections.append({"section": section, "size": int(maybeSize, 16)})
+					sections.append({"section": section, "address": int(maybeAddress, 16), "size": int(maybeSize, 16)})
 
 				cellIn = parts.get("in")
 				if cellIn:

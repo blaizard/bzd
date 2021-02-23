@@ -17,7 +17,6 @@
 	bzd::Promise<bzd::SizeType> read(bzd::Span<bzd::ByteType>&& data) noexcept = delete;
 */
 
-
 namespace bzd {
 
 class OChannel
@@ -25,11 +24,11 @@ class OChannel
 public:
 	/**
 	 * Write data to an output channel.
-	 * 
+	 *
 	 * The promise resolves only after all the data is transmitted.
-	 * 
+	 *
 	 * \param data The data to be sent via this output channel.
-	 * 
+	 *
 	 * \return A promise resolving when all the data have been transmitted.
 	 */
 	virtual [[nodiscard]] Promise<> write(const Span<const ByteType>& data) noexcept = 0;
@@ -41,11 +40,11 @@ class IChannel
 public:
 	/**
 	 * Read data from an input channel.
-	 * 
+	 *
 	 * The promise resolves only after at least one byte is received.
-	 * 
+	 *
 	 * \param data The input buffer to store the data received.
-	 * 
+	 *
 	 * \return A promise resolving as the number of bytes received.
 	 */
 	virtual [[nodiscard]] Promise<SizeType> read(const Span<ByteType>& data) noexcept = 0;
@@ -63,7 +62,6 @@ public:
 			buffer = buffer.subspan(*result);
 		}
 	}
-
 
 	Promise<SizeType> read(Span<ByteType>&& data) noexcept = delete;
 };
