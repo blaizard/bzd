@@ -14,6 +14,7 @@ class TestRun(unittest.TestCase):
 	pathClang: typing.Optional[pathlib.Path] = None
 
 	def testParserGccEsp32XtensaLx6(self) -> None:
+		self.maxDiff = None
 
 		assert self.pathGccEsp32XtensaLx6
 		parser = ParserGcc(self.pathGccEsp32XtensaLx6)
@@ -28,13 +29,34 @@ class TestRun(unittest.TestCase):
 
 		self.assertDictEqual(
 			parser.getBySections(), {
-			'.iram0.vectors': 1024,
-			'.iram0.text': 36087,
-			'.dram0.data': 8208,
-			'.dram0.bss': 29664,
-			'.flash.rodata': 89472,
-			'.flash.text': 230350,
-			'.xtensa.info': 56
+			'.dram0.bss': {
+			'address': 1073422352,
+			'size': 29664
+			},
+			'.dram0.data': {
+			'address': 1073414144,
+			'size': 8208
+			},
+			'.flash.rodata': {
+			'address': 1061158944,
+			'size': 89472
+			},
+			'.flash.text': {
+			'address': 1074593816,
+			'size': 230350
+			},
+			'.iram0.text': {
+			'address': 1074267136,
+			'size': 36087
+			},
+			'.iram0.vectors': {
+			'address': 1074266112,
+			'size': 1024
+			},
+			'.xtensa.info': {
+			'address': 0,
+			'size': 56
+			}
 			})
 		self.assertDictEqual(
 			parser.getByUnits(), {
@@ -211,37 +233,130 @@ class TestRun(unittest.TestCase):
 
 		self.assertDictEqual(
 			parser.getBySections(), {
-			'.interp': 28,
-			'.note.ABI-tag': 32,
-			'.note.gnu.build-id': 36,
-			'.dynsym': 11472,
-			'.dynstr': 32813,
-			'.gnu.hash': 3376,
-			'.gnu.version': 956,
-			'.gnu.version_r': 192,
-			'.rela.dyn': 1560,
-			'.rela.plt': 408,
-			'.init': 23,
-			'.plt': 288,
-			'.text': 24898,
-			'.fini': 9,
-			'.rodata': 3162,
-			'.gcc_except_table': 111,
-			'.eh_frame': 12428,
-			'.eh_frame_hdr': 3004,
-			'.tbss': 104,
-			'.data.rel.ro.local': 24,
-			'.fini_array': 8,
-			'.init_array': 40,
-			'.data.rel.ro': 448,
-			'.dynamic': 752,
-			'.got': 64,
-			'.got.plt': 160,
-			'.data': 32,
-			'.bss': 20273,
-			'.note.gnu.gold-version': 28,
-			'.strtab': 45531,
-			'.shstrtab': 432
+			'.interp': {
+			'address': 624,
+			'size': 28
+			},
+			'.note.ABI-tag': {
+			'address': 652,
+			'size': 32
+			},
+			'.note.gnu.build-id': {
+			'address': 684,
+			'size': 36
+			},
+			'.dynsym': {
+			'address': 720,
+			'size': 11472
+			},
+			'.dynstr': {
+			'address': 12192,
+			'size': 32813
+			},
+			'.gnu.hash': {
+			'address': 45008,
+			'size': 3376
+			},
+			'.gnu.version': {
+			'address': 48384,
+			'size': 956
+			},
+			'.gnu.version_r': {
+			'address': 49340,
+			'size': 192
+			},
+			'.rela.dyn': {
+			'address': 49536,
+			'size': 1560
+			},
+			'.rela.plt': {
+			'address': 51096,
+			'size': 408
+			},
+			'.init': {
+			'address': 51504,
+			'size': 23
+			},
+			'.plt': {
+			'address': 51536,
+			'size': 288
+			},
+			'.text': {
+			'address': 51824,
+			'size': 24898
+			},
+			'.fini': {
+			'address': 76724,
+			'size': 9
+			},
+			'.rodata': {
+			'address': 76736,
+			'size': 3162
+			},
+			'.gcc_except_table': {
+			'address': 79898,
+			'size': 111
+			},
+			'.eh_frame': {
+			'address': 80016,
+			'size': 12428
+			},
+			'.eh_frame_hdr': {
+			'address': 92444,
+			'size': 3004
+			},
+			'.tbss': {
+			'address': 100904,
+			'size': 104
+			},
+			'.data.rel.ro.local': {
+			'address': 100904,
+			'size': 24
+			},
+			'.fini_array': {
+			'address': 100928,
+			'size': 8
+			},
+			'.init_array': {
+			'address': 100936,
+			'size': 40
+			},
+			'.data.rel.ro': {
+			'address': 100976,
+			'size': 448
+			},
+			'.dynamic': {
+			'address': 101424,
+			'size': 752
+			},
+			'.got': {
+			'address': 102176,
+			'size': 64
+			},
+			'.got.plt': {
+			'address': 102240,
+			'size': 160
+			},
+			'.data': {
+			'address': 102400,
+			'size': 32
+			},
+			'.bss': {
+			'address': 102432,
+			'size': 20273
+			},
+			'.note.gnu.gold-version': {
+			'address': 0,
+			'size': 28
+			},
+			'.strtab': {
+			'address': 0,
+			'size': 45531
+			},
+			'.shstrtab': {
+			'address': 0,
+			'size': 432
+			}
 			})
 		self.assertDictEqual(
 			parser.getByUnits(), {
@@ -325,6 +440,7 @@ class TestRun(unittest.TestCase):
 			})
 
 	def testParserClang(self) -> None:
+		self.maxDiff = None
 
 		# Working case
 		assert self.pathClang
@@ -338,35 +454,122 @@ class TestRun(unittest.TestCase):
 
 		self.assertDictEqual(
 			parser.getBySections(), {
-			'.interp': 28,
-			'.note.ABI-tag': 32,
-			'.note.gnu.build-id': 32,
-			'.dynsym': 2160,
-			'.gnu.version': 180,
-			'.gnu.version_r': 112,
-			'.gnu.hash': 416,
-			'.dynstr': 5330,
-			'.rela.dyn': 264,
-			'.rela.plt': 576,
-			'.rodata': 982,
-			'.gcc_except_table': 408,
-			'.eh_frame_hdr': 316,
-			'.eh_frame': 1492,
-			'.text': 8070,
-			'.init': 23,
-			'.fini': 9,
-			'.plt': 400,
-			'.tbss': 104,
-			'.fini_array': 8,
-			'.init_array': 8,
-			'.data.rel.ro': 216,
-			'.dynamic': 688,
-			'.got': 72,
-			'.got.plt': 216,
-			'.data': 20072,
-			'.bss': 104,
-			'.shstrtab': 433,
-			'.strtab': 6322
+			'.interp': {
+			'size': 28,
+			'address': 2097888
+			},
+			'.note.ABI-tag': {
+			'size': 32,
+			'address': 2097916
+			},
+			'.note.gnu.build-id': {
+			'size': 32,
+			'address': 2097948
+			},
+			'.dynsym': {
+			'size': 2160,
+			'address': 2097984
+			},
+			'.gnu.version': {
+			'size': 180,
+			'address': 2100144
+			},
+			'.gnu.version_r': {
+			'size': 112,
+			'address': 2100324
+			},
+			'.gnu.hash': {
+			'size': 416,
+			'address': 2100440
+			},
+			'.dynstr': {
+			'size': 5330,
+			'address': 2100856
+			},
+			'.rela.dyn': {
+			'size': 264,
+			'address': 2106192
+			},
+			'.rela.plt': {
+			'size': 576,
+			'address': 2106456
+			},
+			'.rodata': {
+			'size': 982,
+			'address': 2107040
+			},
+			'.gcc_except_table': {
+			'size': 408,
+			'address': 2108024
+			},
+			'.eh_frame_hdr': {
+			'size': 316,
+			'address': 2108432
+			},
+			'.eh_frame': {
+			'size': 1492,
+			'address': 2108752
+			},
+			'.text': {
+			'size': 8070,
+			'address': 2113536
+			},
+			'.init': {
+			'size': 23,
+			'address': 2121608
+			},
+			'.fini': {
+			'size': 9,
+			'address': 2121632
+			},
+			'.plt': {
+			'size': 400,
+			'address': 2121648
+			},
+			'.tbss': {
+			'size': 104,
+			'address': 2122048
+			},
+			'.fini_array': {
+			'size': 8,
+			'address': 2125824
+			},
+			'.init_array': {
+			'size': 8,
+			'address': 2125832
+			},
+			'.data.rel.ro': {
+			'size': 216,
+			'address': 2125840
+			},
+			'.dynamic': {
+			'size': 688,
+			'address': 2126056
+			},
+			'.got': {
+			'size': 72,
+			'address': 2126744
+			},
+			'.got.plt': {
+			'size': 216,
+			'address': 2126816
+			},
+			'.data': {
+			'size': 20072,
+			'address': 2129920
+			},
+			'.bss': {
+			'size': 104,
+			'address': 2149992
+			},
+			'.shstrtab': {
+			'size': 433,
+			'address': 0
+			},
+			'.strtab': {
+			'size': 6322,
+			'address': 0
+			}
 			})
 		self.assertDictEqual(
 			parser.getByUnits(), {
@@ -464,6 +667,7 @@ class TestRun(unittest.TestCase):
 			})
 
 	def testParserNonWorking(self) -> None:
+		self.maxDiff = None
 
 		# Non-working cases
 		assert self.pathGccX86

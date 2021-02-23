@@ -2,9 +2,10 @@ import re
 import os
 import pathlib
 import typing
+import sys
 
-SectionType = typing.Dict[str, int]
-AggregatedSectionType = typing.Dict[str, typing.Dict[str, int]]
+SectionType = typing.Dict[str, typing.Dict[str, int]]
+AggregatedSectionType = typing.Dict[str, SectionType]
 UnitsType = typing.Dict[str, typing.Dict[str, int]]
 AggregatedUnitsType = typing.Dict[str, typing.Dict[str, int]]
 Fragment = typing.Sequence[typing.Dict[str, typing.Any]]
@@ -82,13 +83,20 @@ class Parser:
 		"""
 
 		aggregatedSections: SectionType = {}
+
 		# Combine sections
 		for item in sections:
 			if item["section"] not in aggregatedSections:
-				aggregatedSections[item["section"]] = 0
-			aggregatedSections[item["section"]] += item["size"]
+				aggregatedSections[item["section"]] = {"size": 0}
+
+			aggregatedSections[item["section"]]["size"] += item["size"]
+
+			if "address" in item and item["size"]:
+				aggregatedSections[item["section"]]["address"] = min(
+					aggregatedSections[item["section"]].get("address", sys.maxsize), item["address"])
+
 		# Remove empty sections
-		return {section: size for section, size in aggregatedSections.items() if size > 0}
+		return {section: obj for section, obj in aggregatedSections.items() if obj["size"] > 0}
 
 	@staticmethod
 	def _aggregateUnits(units: Fragment, areUnitsPath: bool) -> UnitsType:
@@ -146,11 +154,11 @@ class Parser:
 			The sections.
 		"""
 		sections: AggregatedSectionType = {}
-		for section, size in self.sections.items():
+		for section, obj in self.sections.items():
 			aggregate = self.mapping.get(section, Parser.unsetAggregrate)
 			if aggregate not in sections:
 				sections[aggregate] = {}
-			sections[aggregate].update({section: size})
+			sections[aggregate].update({section: obj})
 
 		return sections
 
@@ -161,13 +169,13 @@ class Parser:
 		Returns:
 			The units.
 		"""
-
 		units: AggregatedUnitsType = {}
 		for name, sections in self.units.items():
 			units[name] = {}
+
 			for section, size in sections.items():
 				aggregate = self.mapping.get(section, Parser.unsetAggregrate)
-				if aggregate not in sections:
+				if aggregate not in units[name]:
 					units[name][aggregate] = 0
 				units[name][aggregate] += size
 

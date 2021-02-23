@@ -149,12 +149,12 @@ void terminalTask()
 		const auto bytes = prompt.asBytes();
 		await terminal.write(bytes);
 	}
-/*
-	bzd::String<64> input;
-	bzd::Array<char, 10> data;
-	auto bytes = data.asWritableBytes();
-	const auto result = await terminal.read(bytes);
-*/
+	/*
+		bzd::String<64> input;
+		bzd::Array<char, 10> data;
+		auto bytes = data.asWritableBytes();
+		const auto result = await terminal.read(bytes);
+	*/
 }
 
 void exampleTerminal()
@@ -174,7 +174,6 @@ void exampleTerminal()
 	});
 
 	static auto task2 = bzd::makeTask<10000>([&isExit, &terminal] {
-
 		terminalTask();
 
 		std::cout << "Press 'q' to exit." << std::endl;

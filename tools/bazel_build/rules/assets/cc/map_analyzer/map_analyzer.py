@@ -8,6 +8,7 @@ from elftools.elf.elffile import ELFFile
 
 from tools.bazel_build.rules.assets.cc.map_analyzer.parser.clang import ParserClang
 from tools.bazel_build.rules.assets.cc.map_analyzer.parser.gcc import ParserGcc
+from tools.bazel_build.rules.assets.cc.map_analyzer.parser.parser import Parser
 
 FilterConfigType = typing.List[str]
 AggregateConfigType = typing.Dict[str, typing.List[str]]
@@ -64,6 +65,44 @@ def generateBerkeleyConfig(
 		return filterConfig, aggregateConfig
 
 
+def analyze(data: Parser) -> None:
+	"""
+	Analyze the data gathered from the linker map.
+	"""
+
+	# Build a list sorted by addresses
+	byAddresses: typing.Dict[int, typing.Dict[str, typing.Any]] = {}
+	for section, obj in data.getBySections().items():
+		address = obj.get("address")
+		if address:
+			if address in byAddresses:
+				print("Sections '{}' and '{}' are located at the same address: {:#08x}.".format(
+					section, byAddresses[address]["section"], address),
+					file=sys.stderr)
+				continue
+			byAddresses[address] = {"size": obj.get("size"), "address": address, "section": section}
+	sortedByAddresses: typing.List[typing.Dict[str, typing.Any]] = sorted([obj for address, obj in byAddresses.items()],
+		key=lambda x: x["address"])  # type: ignore
+
+	# Ensure there is no overlaps
+	addressEnd = 0
+	previousSection = None
+	for item in sortedByAddresses:
+
+		address = item["address"]
+		size = item["size"]
+		section = item["section"]
+
+		assert isinstance(address, int)
+		if address < addressEnd:
+			print("Section '{}'@{:#08x} overlaps with previous section '{}'.".format(section, address, previousSection),
+				file=sys.stderr)
+
+		addressEnd = address + size
+		previousSection = section
+		#print("{:#08x} {:#08x} {:8} {:32}".format(address, addressEnd, size, section))
+
+
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Map file analyzer.")
@@ -77,6 +116,9 @@ if __name__ == '__main__':
 		data = ParserType(args.map)
 		if data.parse():
 			break
+
+	# Analyze the data
+	analyze(data)
 
 	# If a binary is provided, open it and generate configuration from it.
 	filterConfig: FilterConfigType = [".debug_*", ".comment", ".symtab", ".strtab"]
@@ -100,6 +142,8 @@ if __name__ == '__main__':
 			{"size_groups": {
 			"units": data.getByAggregatedUnits(),
 			"sections": data.getByAggregatedSections()
-			}}))
+			}},
+			indent=4,
+			sort_keys=True))
 
 	sys.exit(0)

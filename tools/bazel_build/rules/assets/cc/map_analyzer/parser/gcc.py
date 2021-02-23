@@ -51,12 +51,20 @@ class ParserGcc(Parser):
 
 				# Identify the current section
 				maybeSection = parts.get(0)
+
 				if maybeSection:
+					# Ignore *fill* sections
+					if "*fill*" in maybeSection:
+						continue
+
 					# Sub sections are one space off, ignore them
 					cellContent = parts.get(0, strip=False)
 					assert cellContent
 					if cellContent[0] != " ":
-						section = maybeSection
+						# Some section are appended with some extra info, ignore it, such as:
+						# - <section> memory region -> ram
+						# - <section> memory region ->
+						section = re.sub(r'memory\s+region\s+->.*$', '', maybeSection)
 						isSection = True
 
 				# If the data only contains the section, ignore as we have already handled it
@@ -73,7 +81,7 @@ class ParserGcc(Parser):
 
 				# Populate the section
 				if section and isSection:
-					sections.append({"section": section, "size": int(maybeSize, 16)})
+					sections.append({"section": section, "address": int(maybeAddress, 16), "size": int(maybeSize, 16)})
 				isSection = False
 
 				# Populate the unit
@@ -82,7 +90,7 @@ class ParserGcc(Parser):
 					cellContent = parts.get(3, strip=False)
 					assert cellContent
 					if cellContent[1] != " ":
-						m = re.match(r'^([^\(:]+).*$', maybeUnit)
+						m = re.match(r'^(?!LONG|load address)([^\(:]+).*$', maybeUnit)
 						units.append({
 							"section": section,
 							"size": int(maybeSize, 16),
