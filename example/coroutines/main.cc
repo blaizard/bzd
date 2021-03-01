@@ -232,10 +232,11 @@ auto promise(Fct fct)
 using awaitable_type = std::experimental::coroutine_handle<>;
 static std::deque<awaitable_type> myqyeye;
 
-auto promiseAll(awaitable_type&& awaitable1, awaitable_type&& awaitable2)
+template <class A, class B>
+auto promiseAll(A& a, B& b)
 {
-	myqyeye.push_back(awaitable1);
-	myqyeye.push_back(awaitable2);
+	myqyeye.push_back(a.coro);
+	myqyeye.push_back(b.coro);
 
 	struct Awaitable
 	{
@@ -247,6 +248,7 @@ auto promiseAll(awaitable_type&& awaitable1, awaitable_type&& awaitable2)
 
 		auto await_suspend(std::experimental::coroutine_handle<> awaiting)
 		{
+			//std::cout << "SWITCH" << std::endl;
 			myqyeye.push_back(awaiting);
 			auto newWait = myqyeye.front();
 			myqyeye.pop_front();
@@ -295,9 +297,9 @@ Async<int> answer()
 	auto awaitableB = simple_loop(2, 5);
 
 	/*
-	   co_await promiseAll(awaitableA, awaitableB);
+	co_await promiseAll(awaitableA, awaitableB);
 
-		co_return 12;
+	co_return 12;
 	*/
 	auto b = co_await awaitableB;
 	auto a = co_await awaitableA;

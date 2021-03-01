@@ -180,34 +180,37 @@ void callStack(std::ostream& out) noexcept
 			{
 				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
 			}
-			else
+			else if (pSourcePath)
 			{
 				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" 0x%lx", pSourcePath, reinterpret_cast<uint64_t>(addresses[level]));
 			}
 
-			pSymbol = exec(cmd);
-			if (pSymbol)
+			if (pOffset || pSourcePath)
 			{
-				// Function
-				if (pSymbol[0] != '?')
+				pSymbol = exec(cmd);
+				if (pSymbol)
 				{
-					const auto pEnd = std::strchr(pSymbol, '\n');
-					if (pEnd)
+					// Function
+					if (pSymbol[0] != '?')
 					{
-						*pEnd = '\0';
-						pFunction = pSymbol;
-						pSymbol = pEnd + 1;
+						const auto pEnd = std::strchr(pSymbol, '\n');
+						if (pEnd)
+						{
+							*pEnd = '\0';
+							pFunction = pSymbol;
+							pSymbol = pEnd + 1;
+						}
 					}
-				}
-				// Source path
-				if (pSymbol[0] != '?')
-				{
-					const auto pEnd = std::strchr(pSymbol, '\n');
-					if (pEnd)
+					// Source path
+					if (pSymbol[0] != '?')
 					{
-						*pEnd = '\0';
-						pSourcePath = pSymbol;
-						pSymbol = pEnd + 1;
+						const auto pEnd = std::strchr(pSymbol, '\n');
+						if (pEnd)
+						{
+							*pEnd = '\0';
+							pSourcePath = pSymbol;
+							pSymbol = pEnd + 1;
+						}
 					}
 				}
 			}
@@ -226,7 +229,14 @@ void callStack(std::ostream& out) noexcept
 			}
 		}
 
-		out << " (" << pSourcePath << ")";
+		if (pSourcePath)
+		{
+			out << " (" << pSourcePath << ")";
+		}
+		else
+		{
+			out << " (<unknown>)";
+		}
 		out << std::endl;
 	}
 }
