@@ -9,6 +9,10 @@
         "eslint:recommended",
         "plugin:vue/base"
     ],
+    "ignorePatterns": [
+        ".*",
+        "bazel-*"
+    ],
     "overrides": [
         {
             "files": [
