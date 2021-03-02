@@ -119,6 +119,16 @@ struct Async
 		}
 	}
 
+	int sync()
+	{
+		// std::cout << "We got asked for the return value..." << std::endl;
+		if (!handle.done())
+		{
+			handle.resume();
+		}
+		return 42; //bzd::move(handle.promise().value);
+	}
+
 	bool await_ready()
 	{
 		return false; // handle.done();
@@ -145,7 +155,7 @@ struct Async
 	coroutine_handle<Promise> handle;
 };
 
-void promiseAnd(coroutine_handle<> a, coroutine_handle<> b)
+Async promiseAnd(coroutine_handle<> a, coroutine_handle<> b)
 {
 	register_coro(a);
 	register_coro(b);
@@ -156,9 +166,11 @@ void promiseAnd(coroutine_handle<> a, coroutine_handle<> b)
 		std::this_thread::sleep_for(10ms);
 	}
 	std::cout << "end promiseAnd" << std::endl;
+
+	co_return 42;
 }
 
-void promiseOr(coroutine_handle<> a, coroutine_handle<> b)
+Async promiseOr(coroutine_handle<> a, coroutine_handle<> b)
 {
 	register_coro(a);
 	register_coro(b);
@@ -168,10 +180,17 @@ void promiseOr(coroutine_handle<> a, coroutine_handle<> b)
 		coro.resume();
 		std::this_thread::sleep_for(10ms);
 	}
+
+	//if (!a.done())
+	//	a.destroy();
+	//if (!b.done())
+	//	b.destroy();
 	// Remove a and b from list
 	// note, sub coroutines also needs to be deleted, like the ones in
 	// register_delay_coro for example.
 	std::cout << "end promiseOr" << std::endl;
+
+	co_return 42;
 }
 
 Async nop()
@@ -186,8 +205,18 @@ Async count(int id, int n)
 	for (int i = 0; i < n; ++i)
 	{
 		std::cout << id << ": " << i << std::endl;
-		if (n - i > 5) sum += co_await count(id * 10, n - 1);
-		sum += co_await nop();
+
+		auto coro_nop = nop();
+
+		if (n-i > 5)
+		{
+			std::cout << "Start" << std::endl;
+			auto coro_count1 = count(id * 10 + 1, n - 3);
+			auto coro_count2 = count(id * 10, n - 1);
+			co_await promiseAnd(coro_count1.handle, coro_count2.handle);
+		}
+		else
+			sum += co_await coro_nop;
 	}
 
 	co_return sum;
@@ -197,11 +226,21 @@ Async count(int id, int n)
 // Another https://stackoverflow.com/questions/41413489/c1z-coroutine-threading-context-and-coroutine-scheduling
 int main()
 {
-	auto mycoro1 = count(1, 3);
-	auto mycoro2 = count(2, 6);
+	{
+		auto mycoro1 = count(1, 3);
+		auto mycoro2 = count(2, 6);
 
-	promiseAnd(mycoro1.handle, mycoro2.handle);
+		auto promise = promiseAnd(mycoro1.handle, mycoro2.handle);
+		promise.sync();
+	}
+/*
+	{
+		auto mycoro1 = count(1, 2);
+		auto mycoro2 = count(2, 6);
 
+		promiseOr(mycoro1.handle, mycoro2.handle);
+	}
+*/
 	isEnd.store(true);
 	return 0;
 }
