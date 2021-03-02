@@ -28,7 +28,7 @@ if __name__== "__main__":
 
 	# If bazel is not installed / available
 	if not os.path.exists(bazeliskPath):
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64"
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64"
 		print("No bazel binary detected, downloading bazelisk from {}...".format(url))
 		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
