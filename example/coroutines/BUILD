@@ -16,7 +16,6 @@ cc_binary(
     ],
 )
 
-
 cc_binary(
     name = "2",
     srcs = [
@@ -28,7 +27,7 @@ cc_binary(
         "-fcoroutines-ts",
     ],
     linkopts = [
-        "-pthread"
+        "-pthread",
     ],
     tags = ["manual"],
     deps = [

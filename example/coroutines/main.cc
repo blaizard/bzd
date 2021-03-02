@@ -248,7 +248,7 @@ auto promiseAll(A& a, B& b)
 
 		auto await_suspend(std::experimental::coroutine_handle<> awaiting)
 		{
-			//std::cout << "SWITCH" << std::endl;
+			// std::cout << "SWITCH" << std::endl;
 			myqyeye.push_back(awaiting);
 			auto newWait = myqyeye.front();
 			myqyeye.pop_front();
