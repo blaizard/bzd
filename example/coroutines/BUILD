@@ -16,6 +16,8 @@ cc_binary(
     ],
 )
 
+# For g++-10
+# Run with bazel-real run example/coroutines:2 --config=docker -s --config=linux_x86_64_gcc --copt='-Wno-unused-value'
 cc_binary(
     name = "2",
     srcs = [
@@ -23,8 +25,9 @@ cc_binary(
     ],
     copts = [
         "-std=c++2a",
-        "-stdlib=libc++",
-        "-fcoroutines-ts",
+        #"-stdlib=libc++",
+        #"-fcoroutines-ts",
+        "-fcoroutines",
     ],
     linkopts = [
         "-pthread",

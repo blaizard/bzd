@@ -58,7 +58,7 @@ void register_delay_coro(coroutine_handle<>& handle)
 	tempQueue.push_back(handle);
 }
 
-coroutine_handle<>&& get_next()
+coroutine_handle<> get_next()
 {
 	// Wait until there is something in the queue
 	while (queue.empty())
@@ -69,7 +69,7 @@ coroutine_handle<>&& get_next()
 	auto coro = queue.front();
 	// std::cout << "Executing " << coro.address() << ", count: " << queue.size() << std::endl;
 	queue.pop_front();
-	return std::move(coro);
+	return coro;
 }
 
 struct Async
