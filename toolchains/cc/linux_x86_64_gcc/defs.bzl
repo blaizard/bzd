@@ -48,24 +48,25 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "builtin_include_directories": [
-            "usr/include/c++/8".format(package_name),
-            "usr/include/x86_64-linux-gnu/c++/8".format(package_name),
-            "usr/lib/gcc/x86_64-linux-gnu/8/include".format(package_name),
-            "usr/lib/gcc/x86_64-linux-gnu/8/include-fixed".format(package_name),
+            "/usr/lib/gcc/x86_64-linux-gnu/10/include",
+            "/usr/include/c++/10",
+            "/usr/include/x86_64-linux-gnu/c++/10",
+            "/usr/lib/gcc/x86_64-linux-gnu/10/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/10/include-fixed",
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "system_directories": [
-            "external/{}/usr/include/c++/8".format(package_name),
-            "external/{}/usr/include/x86_64-linux-gnu/c++/8".format(package_name),
-            "external/{}/usr/lib/gcc/x86_64-linux-gnu/8/include".format(package_name),
-            "external/{}/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed".format(package_name),
+            "/usr/include/c++/10",
+            "/usr/include/x86_64-linux-gnu/c++/10",
+            "/usr/lib/gcc/x86_64-linux-gnu/10/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/10/include-fixed",
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "linker_dirs": [
-            "external/{}/usr/lib/gcc/x86_64-linux-gnu/8".format(package_name),
-            "external/{}/usr/lib/x86_64-linux-gnu".format(package_name),
+            "/usr/lib/gcc/x86_64-linux-gnu/10",
+            "/usr/lib/x86_64-linux-gnu",
         ],
         "compile_flags": [
             "-std=c++17",
@@ -73,7 +74,7 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "-g",
 
             # Do not link or re-order inclusion files
-            "-nostdinc++",
+            #"-nostdinc++",
             #"-nostdinc",
             "--no-standard-includes",
 
@@ -86,10 +87,11 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "-Wall",
             "-Wno-missing-braces",
             "-Wno-builtin-macro-redefined",
-            "-Wno-unused-command-line-argument",
 
             # Keep stack frames for debugging
             "-fno-omit-frame-pointer",
+
+            "-Wno-stringop-truncation",
 
             # Optimization
             "-O3",
@@ -104,24 +106,18 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "-D__TIME__=\"redacted\"",
         ] + COPTS_GCC,
         "link_flags": LINKOPTS_GCC + [
-            "-fuse-ld=lld",
             "-Wl,--disable-new-dtags",
             "-Wl,--gc-sections",
             "-rdynamic",
-            "-stdlib=libc++",
-            "-lm",
-            "-lc++",
-            "-lc++abi",
-            "-lc",
-            "-lgcc_s",
-            "-lgcc",
             "-Wl,-z,relro,-z,now",
             "-no-canonical-prefixes",
-            "-Wl,-rpath=%{{absolute_external}}/{}/usr/lib/gcc/x86_64-linux-gnu/8".format(package_name),
+            #"-Wl,-rpath=%{{absolute_external}}/{}/usr/lib/gcc/x86_64-linux-gnu/8".format(package_name),
 
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
+
+            "-lstdc++",
         ],
         "coverage_compile_flags": [
             "-fprofile-instr-generate",
@@ -137,23 +133,23 @@ def _load_linux_x86_64_gcc_8_4_0(name):
             "-fprofile-arcs",
         ],
         "dynamic_runtime_libs": [
-            "@{}//:dynamic_libraries".format(package_name),
+            #"@{}//:dynamic_libraries".format(package_name),
         ],
         "static_runtime_libs": [
-            "@{}//:static_libraries".format(package_name),
+            #"@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [
-            "@{}//:includes".format(package_name),
-            "@{}//:bin".format(package_name),
+            #"@{}//:includes".format(package_name),
+            #"@{}//:bin".format(package_name),
         ],
-        "bin_ar": "external/{}/usr/bin/x86_64-linux-gnu-ar".format(package_name),
-        "bin_as": "external/{}/usr/bin/x86_64-linux-gnu-as".format(package_name),
-        "bin_cc": "external/{}/usr/bin/x86_64-linux-gnu-gcc-8".format(package_name),
-        "bin_cpp": "external/{}/usr/bin/x86_64-linux-gnu-cpp-8".format(package_name),
-        "bin_cov": "external/{}/usr/bin/x86_64-linux-gnu-gcov-8".format(package_name),
-        "bin_objdump": "external/{}/usr/bin/x86_64-linux-gnu-objdump".format(package_name),
-        "bin_ld": "external/{}/usr/bin/x86_64-linux-gnu-ld".format(package_name),
-        "bin_strip": "external/{}/usr/bin/x86_64-linux-gnu-strip".format(package_name),
+        "bin_ar": "/usr/bin/x86_64-linux-gnu-ar",
+        "bin_as": "/usr/bin/x86_64-linux-gnu-as",
+        "bin_cc": "/usr/bin/x86_64-linux-gnu-gcc-10",
+        "bin_cpp": "/usr/bin/x86_64-linux-gnu-cpp-10",
+        "bin_cov": "/usr/bin/x86_64-linux-gnu-gcov-10",
+        "bin_objdump": "/usr/bin/x86_64-linux-gnu-objdump",
+        "bin_ld": "/usr/bin/x86_64-linux-gnu-ld",
+        "bin_strip": "/usr/bin/x86_64-linux-gnu-strip",
     }
 
     toolchain_maker(

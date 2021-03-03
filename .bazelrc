@@ -29,6 +29,12 @@ coverage --copt=-fno-inline
 coverage --copt=-fno-inline-small-functions
 coverage --copt=-fno-default-inline
 
+# Docker sandbox test
+build:docker --experimental_docker_image=testimage
+build:docker --experimental_docker_verbose
+build:docker --experimental_enable_docker_sandbox
+build:docker --spawn_strategy=docker --strategy=Javac=docker --genrule_strategy=docker
+
 # Select only C++ targets
 build:cc --build_tag_filters="cc"
 test:cc --test_tag_filters=cc
