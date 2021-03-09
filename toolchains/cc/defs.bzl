@@ -8,6 +8,12 @@ COPTS_COMMON = [
     "-Wextra-semi",
     "-Wnull-dereference",
     "-Wswitch-enum",
+
+    # C++17
+    "-std=c++17",
+
+    # Add debug symbols, will be removed at the postprocessing stage
+    "-g",
 ]
 
 COPTS_GCC = COPTS_COMMON

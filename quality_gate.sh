@@ -8,6 +8,7 @@ EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=dev --platform_suffix=_dev
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=prod --platform_suffix=_prod
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=linux_x86_64_clang --config=cc
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=linux_x86_64_gcc --config=cc
 ./tools/bazel build ...  $EXTRA_FLAGS --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --config=cc
 
 # Stress tests
