@@ -160,6 +160,9 @@ platform(
     constraint_values = [
         ":compiler",
     ],
+    exec_properties = {
+        %{exec_properties}
+    },
     parents = [
         %{host_platforms}
     ],

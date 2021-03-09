@@ -13,6 +13,10 @@ def _impl(ctx):
     if ctx.attr.app_execute:
         binary_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
 
+    exec_properties = {}
+    if ctx.attr.docker_image:
+        exec_properties["container-image"] = ctx.attr.docker_image
+
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
@@ -34,6 +38,7 @@ def _impl(ctx):
             ["'-L{}',".format(t) for t in ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in ctx.attr.link_flags],
         ),
+        "%{exec_properties}": "\n".join(['"{}": "{}"'.format(k, v) for k, v in exec_properties.items()]),
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
@@ -70,6 +75,8 @@ _toolchain_maker_linux = repository_rule(
         "compiler": attr.string(),
         "platforms": attr.string_list(),
         "host_platforms": attr.string_list(),
+        # Docker image
+        "docker_image": attr.string(),
         # Compatibility
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),

@@ -30,6 +30,11 @@ jobs:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=cc --platform_suffix=_linux_x86_64_clang
 
+    - name: linux_x86_64_gcc
+      script:
+      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+      - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc
+
     - name: esp32_xtensa_lx6_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local

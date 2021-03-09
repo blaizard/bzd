@@ -59,6 +59,7 @@ def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwar
         executable = executable,
         env = action_env,
         arguments = action_args + args,
+        mnemonic = "CcAction",
         inputs = depset(
             direct = inputs,
             transitive = [

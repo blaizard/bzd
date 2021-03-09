@@ -22,7 +22,7 @@ filegroup(
 filegroup(
     name = "dynamic_libraries",
     srcs = glob([
-        "usr/lib/gcc/x86_64-linux-gnu/8/libstdc++.so",
+        "usr/lib/gcc/x86_64-linux-gnu/10/libstdc++.so",
         "usr/lib/x86_64-linux-gnu/**/*"
     ]),
 )
