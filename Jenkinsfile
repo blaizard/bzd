@@ -24,6 +24,7 @@ pipeline
 			// additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
 			args "-v $CACHE_PATH:/cache"
+			args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "--network host"
 		}
 	}
