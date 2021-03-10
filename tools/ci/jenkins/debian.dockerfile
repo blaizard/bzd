@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - gpgv - needed add the key to apt.
 # - libxml2-dev - needed for LLVM (need to be removed).
 # - openjdk-11-jdk, unzip, zip are used by bazel
-RUN apt-get update && apt-get install -y git sudo build-essential unzip zip gzip libc6-dev curl gpgv python libxml2-dev openjdk-11-jdk
+RUN apt-get update && apt-get install -y git sudo build-essential unzip zip gzip libc6-dev curl gpgv python libxml2-dev openjdk-11-jdk docker-ce
 
 # Add Jenkins user
 RUN sudo groupadd -g 1000 1000
