@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:20.04
 
 # Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,7 +11,35 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - gpgv - needed add the key to apt.
 # - libxml2-dev - needed for LLVM (need to be removed).
 # - openjdk-11-jdk, unzip, zip are used by bazel
-RUN apt-get update && apt-get install -y git sudo build-essential unzip zip gzip libc6-dev curl gpgv python libxml2-dev openjdk-11-jdk docker-ce
+RUN apt-get update && apt-get install -y git \
+										sudo \
+										build-essential \
+										unzip \
+										zip \
+										gzip \
+										libc6-dev \
+										curl \
+										gpgv \
+										gnupg \
+										python \
+										libxml2-dev \
+										openjdk-11-jdk \
+										apt-transport-https \
+										ca-certificates \
+										lsb-release
+
+# Add Docker's official GPG key
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Set up the stable docker repository
+RUN echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install docker engine
+RUN apt-get update && apt-get install -y docker-ce \
+										docker-ce-cli \
+										containerd.io
 
 # Add Jenkins user
 RUN sudo groupadd -g 1000 1000
