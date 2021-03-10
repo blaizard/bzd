@@ -1,4 +1,6 @@
-FROM ubuntu:20.04
+FROM ubuntu:bionic
+# Note updating to ubuntu:20 brings this error message with python:
+# ImportError: libffi.so.6: cannot open shared object file: No such file or directory
 
 # Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
 ENV DEBIAN_FRONTEND=noninteractive
