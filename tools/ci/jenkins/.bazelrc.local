@@ -10,3 +10,4 @@ build --noshow_loading_progress
 #build --sandbox_add_mount_pair=/cache
 #build --sandbox_writable_path=/cache
 #build --//tools/bazel_build/settings/cache=/cache
+build ---sandbox_debug
