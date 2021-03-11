@@ -26,6 +26,7 @@ pipeline
 			args "-v $CACHE_PATH:/cache"
 			args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
+			args "--privileged"
 			args "--network host"
 		}
 	}
@@ -51,13 +52,13 @@ pipeline
 		{
 			parallel
 			{
-				stage("linux_x86_64_clang")
+			/*	stage("linux_x86_64_clang")
 				{
 					steps
 					{
 						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
 					}
-				}
+				}*/
 				stage("linux_x86_64_gcc")
 				{
 					steps
@@ -65,7 +66,7 @@ pipeline
 						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
 					}
 				}
-				stage("esp32_xtensa_lx6_gcc")
+			/*	stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
@@ -78,7 +79,7 @@ pipeline
 					{
 						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
-				}
+				}*/
 				stage("Coverage")
 				{
 					steps
@@ -89,7 +90,7 @@ pipeline
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
-				stage("Sanitize")
+				/*stage("Sanitize")
 				{
 					steps
 					{
@@ -102,7 +103,7 @@ pipeline
 					{
 						sh "./tools/bazel test ... --config=linux_x86_64_clang --build_tag_filters=stress --test_tag_filters=stress --runs_per_test=100 --platform_suffix=_linux_x86_64_clang" 
 					}
-				}
+				}*/
 			}
 		}
 		/**
