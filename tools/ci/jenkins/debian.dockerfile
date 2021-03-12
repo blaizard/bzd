@@ -39,9 +39,9 @@ RUN echo \
 	$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install docker engine
-RUN apt-get update && apt-get install -y docker-ce \
-	docker-ce-cli \
-	containerd.io
+#RUN apt-get update && apt-get install -y docker-ce \
+#	docker-ce-cli \
+#	containerd.io
 
 # Add Jenkins user
 RUN sudo groupadd -g 1000 1000
