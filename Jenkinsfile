@@ -26,6 +26,7 @@ pipeline
 			args "-v $CACHE_PATH:/cache"
 			args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
+			args "-v $(which docker):/usr/bin/docker"
 			//args "--privileged"
 			args "--network host"
 		}
