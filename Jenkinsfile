@@ -27,7 +27,7 @@ pipeline
 			//args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
 			//args "-v /usr/local/bin/docker:/usr/bin/docker"
-			//args "--privileged"
+			args "--privileged"
 			args "--network host"
 		}
 	}
