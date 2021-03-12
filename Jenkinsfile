@@ -17,8 +17,7 @@ pipeline
 		cron("@weekly")
 		pollSCM("H H/8 * * *") // Every 8 hours
 	}
-	agent any
-	/*agent
+	agent
 	{
 		dockerfile
 		{
@@ -27,10 +26,10 @@ pipeline
 			args "-v $CACHE_PATH:/cache"
 			args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
-			args "--privileged"
+			//args "--privileged"
 			args "--network host"
 		}
-	}*/
+	}
 	stages
 	{
 		stage("Environment")
@@ -38,8 +37,8 @@ pipeline
 			steps
 			{
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
-				/*sh "python --version"*/
-				/*sh "java --version"*/
+				sh "python --version"
+				sh "java --version"
 				sh "./tools/bazel --version"
 				sh "git submodule foreach --recursive git clean -xfd"
 				sh "git submodule foreach --recursive git reset --hard"
