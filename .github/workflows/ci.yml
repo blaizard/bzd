@@ -21,6 +21,7 @@ jobs:
         ./tools/bazel --version
         python --version
         java --version
+        printenv
 
     - name: Test
       run: |
