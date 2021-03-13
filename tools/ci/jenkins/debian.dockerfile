@@ -50,3 +50,5 @@ RUN sudo mkdir -p /home/1000
 RUN sudo chown -R 1000:1000 /home/1000
 
 RUN usermod -aG docker 1000
+
+ENTRYPOINT ["/bin/sh", "-c", "service docker start && /sbin/tini -- /usr/local/bin/jenkins.sh"]
