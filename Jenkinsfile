@@ -28,7 +28,7 @@ pipeline
 			args "-v /etc/localtime:/etc/localtime:ro"
 			args "-e DOCKER_HOST='tcp://dind:2375'"
 			args "--network dind"
-			args "-v /usr/local/bin/docker:/usr/bin/docker"
+			//args "-v /usr/local/bin/docker:/usr/bin/docker"
 			//args "--privileged"
 			args "--network host"
 		}
