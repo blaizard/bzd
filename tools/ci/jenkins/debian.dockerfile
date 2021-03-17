@@ -51,4 +51,4 @@ RUN sudo chown -R 1000:1000 /home/1000
 
 RUN usermod -aG docker 1000
 
-ENV DOCKER_HOST=tcp://dind:2375
+ENV DOCKER_HOST=tcp://host:2375
