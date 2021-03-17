@@ -26,8 +26,10 @@ pipeline
 			args "-v $CACHE_PATH:/cache"
 			//args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
+			args "-e DOCKER_HOST='tcp://dind:2375'"
+			args "--network dind"
 			//args "-v /usr/local/bin/docker:/usr/bin/docker"
-			args "--privileged"
+			//args "--privileged"
 			args "--network host"
 		}
 	}
