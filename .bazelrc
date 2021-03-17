@@ -58,7 +58,7 @@ build --nodistinct_host_configuration
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
 
 # Increase hermeticity
-#build --incompatible_strict_action_env
+build --incompatible_strict_action_env
 
 # Development and production configuration
 build:dev --copt "-O0"
