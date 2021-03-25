@@ -5,11 +5,11 @@ build --noshow_progress
 build --noshow_loading_progress
 
 # cache
-startup --output_user_root=/cache/output
-build --disk_cache=/cache/bazel
-build --sandbox_add_mount_pair=/cache
-build --sandbox_writable_path=/cache
-build --//tools/bazel_build/settings/cache=/cache
+startup --output_user_root=/volume1/docker/jenkins/cache/output
+build --disk_cache=/volume1/docker/jenkins/cache/bazel
+build --sandbox_add_mount_pair=/volume1/docker/jenkins/cache
+build --sandbox_writable_path=/volume1/docker/jenkins/cache
+build --//tools/bazel_build/settings/cache=/volume1/docker/jenkins/cache
 
 build --sandbox_debug
 build --action_env=DOCKER_HOST="tcp://localhost:2375"
