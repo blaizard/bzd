@@ -30,12 +30,6 @@ RUN apt-get update && apt-get install -y git \
 	ca-certificates \
 	lsb-release
 
-
-FROM ubuntu:bionic
-
-# Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Add Docker's official GPG key
 #RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
