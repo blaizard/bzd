@@ -41,6 +41,7 @@ pipeline
 			{
 				sh "id"
 				sh "printenv"
+				sh "ls -ll /"
 				sh "ls -ll /cache"
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "python --version"
