@@ -23,7 +23,7 @@ pipeline
 		{
 			// additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
-			args "-v $CACHE_PATH:$CACHE_PATH"
+			args "-v $CACHE_PATH:/cache"
 			//args "-v /var/run/docker.sock:/var/run/docker.sock"
 			args "-v /etc/localtime:/etc/localtime:ro"
 			args "-e DOCKER_HOST=tcp://localhost:2375"
