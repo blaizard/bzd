@@ -23,10 +23,11 @@ pipeline
 		{
 			// additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
-			args "-v $CACHE_PATH:/cache"
+			//args "-v $CACHE_PATH:/cache"
+			args "-v /volume1/docker/jenkins/cache:/cache"
 			//args "-v /var/run/docker.sock:/var/run/docker.sock"
 			//args "-v /etc/localtime:/etc/localtime:ro"
-			//args "-e DOCKER_HOST=tcp://localhost:2375"
+			args "-e DOCKER_HOST=tcp://localhost:2375"
 			//args "--network dind"
 			//args "-v /usr/local/bin/docker:/usr/bin/docker"
 			//args "--privileged"
