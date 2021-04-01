@@ -23,15 +23,14 @@ pipeline
 		{
 			// additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
-			args '-v /cache:/cache'
-			args '-e DOCKER_HOST=tcp://localhost:2375'
+			args "-v /cache:/cache -e DOCKER_HOST=tcp://localhost:2375 --network host"
 			//args "-v /var/run/docker.sock:/var/run/docker.sock"
 			//args "-v /etc/localtime:/etc/localtime:ro"
-			args "-e DOCKER_HOST=tcp://localhost:2375"
+			//args "-e DOCKER_HOST=tcp://localhost:2375"
 			//args "--network dind"
 			//args "-v /usr/local/bin/docker:/usr/bin/docker"
 			//args "--privileged"
-			args "--network host"
+			//args "--network host"
 		}
 	}
 	stages
