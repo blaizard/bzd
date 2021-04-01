@@ -10,7 +10,3 @@ build --disk_cache=/cache/bazel
 build --sandbox_add_mount_pair=/cache
 build --sandbox_writable_path=/cache
 build --//tools/bazel_build/settings/cache=/cache
-
-build --sandbox_debug
-build --action_env=DOCKER_HOST="tcp://localhost:2375"
-build --host_action_env=DOCKER_HOST="tcp://localhost:2375"

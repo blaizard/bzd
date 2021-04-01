@@ -51,5 +51,3 @@ RUN sudo chown -R 1000:1000 /home/1000
 
 # Add the user to the docker group
 RUN usermod -aG docker 1000
-
-#ENV DOCKER_HOST=tcp://localhost:2375

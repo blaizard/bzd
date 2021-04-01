@@ -21,17 +21,9 @@ pipeline
 	{
 		dockerfile
 		{
-			// additionalBuildArgs "--pull"
 			filename "tools/ci/jenkins/debian.dockerfile"
 			// Only a single args argument can be used
-			args "-v /cache:/cache -e DOCKER_HOST=tcp://localhost:2375 --network host"
-			//args "-v /var/run/docker.sock:/var/run/docker.sock"
-			//args "-v /etc/localtime:/etc/localtime:ro"
-			//args "-e DOCKER_HOST=tcp://localhost:2375"
-			//args "--network dind"
-			//args "-v /usr/local/bin/docker:/usr/bin/docker"
-			//args "--privileged"
-			//args "--network host"
+			args "-v /cache:/cache -v /etc/localtime:/etc/localtime:ro -e DOCKER_HOST=tcp://localhost:2375 --network host"
 		}
 	}
 	stages
@@ -42,8 +34,6 @@ pipeline
 			{
 				sh "id"
 				sh "printenv"
-				sh "ls -ll /"
-				sh "ls -ll /cache"
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
 				sh "python --version"
 				sh "java --version"
@@ -60,21 +50,21 @@ pipeline
 		{
 			parallel
 			{
-			/*	stage("linux_x86_64_clang")
+				stage("linux_x86_64_clang")
 				{
 					steps
 					{
 						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
 					}
-				}*/
+				}
 				stage("linux_x86_64_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
+						sh "./tools/bazel test ... --output_groups=default,metadata --config=cc --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
 					}
 				}
-			/*	stage("esp32_xtensa_lx6_gcc")
+				stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
@@ -87,7 +77,7 @@ pipeline
 					{
 						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
-				}*/
+				}
 				stage("Coverage")
 				{
 					steps
@@ -98,7 +88,7 @@ pipeline
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
-				/*stage("Sanitize")
+				stage("Sanitize")
 				{
 					steps
 					{
@@ -111,7 +101,7 @@ pipeline
 					{
 						sh "./tools/bazel test ... --config=linux_x86_64_clang --build_tag_filters=stress --test_tag_filters=stress --runs_per_test=100 --platform_suffix=_linux_x86_64_clang" 
 					}
-				}*/
+				}
 			}
 		}
 		/**
