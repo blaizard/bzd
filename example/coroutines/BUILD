@@ -23,14 +23,24 @@ cc_binary(
     srcs = [
         "coroutines2.cc",
     ],
+    tags = [
+        "cc"
+    ],
+    target_compatible_with = select({
+        "@linux_x86_64_gcc//:target": [
+            "@linux_x86_64_gcc//:compiler",
+        ],
+        "@linux_x86_64_clang//:target": [
+            "@linux_x86_64_clang//:compiler",
+        ],
+        "//conditions:default": ["@linux_x86_64_clang//:compiler",]
+    }),
     copts = [
-        #"-stdlib=libc++",
-        #"-fcoroutines-ts",
+        "-Wno-unused-value",
     ],
     linkopts = [
         "-pthread",
     ],
-    tags = ["manual"],
     deps = [
         "//cc/bzd",
     ],
