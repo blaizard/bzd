@@ -9,9 +9,6 @@ _COPTS_COMMON = [
     "-Wnull-dereference",
     "-Wswitch-enum",
 
-    # C++17
-    "-std=c++17",
-
     # Add debug symbols, will be removed at the postprocessing stage.
     "-g",
 
@@ -58,6 +55,15 @@ LINKOPTS_COMMON = [
     # Raise a compilation error if a symbol is undefined during linking
     #"-Wl,-no-undefined",
     "-Wl,-no-as-needed",
+
+    # Do not expand any symbolic links, resolve references to /../
+    # or /./, or make the path absolute when generating a relative
+    # prefix. This is needed for bazel to properly identify.
+    # dependencies.
+    "-no-canonical-prefixes",
+
+    # Use garbage collection.
+    "-Wl,--gc-sections",
 ]
 
 LINKOPTS_GCC = LINKOPTS_COMMON

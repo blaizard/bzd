@@ -56,6 +56,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
 
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",
+            "--no-standard-includes",
 
         ] + COPTS_CLANG,
         "link_flags": LINKOPTS_CLANG + [
