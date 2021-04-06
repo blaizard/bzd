@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//toolchains/cc:defs.bzl", "COPTS_GCC", "LINKOPTS_GCC")
+load("//toolchains/cc:defs.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_GCC")
 
 def toolchain_fragment_esp32_xtensa_lx6_gcc():
     package_name = "esp32_xtensa_lx6_gcc_8.2.0"
@@ -34,29 +34,20 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         "linker_dirs": [
             "external/{}/xtensa-esp32-elf/lib".format(package_name),
         ],
+        "compile_dev_flags": COPTS_GCC_DEV,
+        "compile_prod_flags": COPTS_GCC_PROD,
         "compile_flags": [
             # C++17
             "-std=c++17",
-            # Add debug symbols, will be removed at the postprocessing stage
-            "-g",
-
-            # Warnings
-            "-Wall",
-            "-Wextra",
-            "-Werror",
-
-            # Optimization
-            "-Os",
 
             # Do not link or re-order inclusion files
             "-nostdinc",
             "-nostdinc++",
             "--no-standard-includes",
 
-            # Removal of unused code and data at link time
-            "-ffunction-sections",
-            "-fdata-sections",
+            # Allow long calls
             "-mlongcalls",
+
         ] + COPTS_GCC,
         "link_flags": LINKOPTS_GCC + [
             # No standard libraries
@@ -70,7 +61,6 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
 
             # Do not link with shared libraries
             "-Wl,-static",
-            "-Wl,-Map=output.map",
         ],
         "static_runtime_libs": [
             "@{}//:static_libraries".format(package_name),

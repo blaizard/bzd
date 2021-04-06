@@ -58,12 +58,7 @@ def _load_linux_x86_64_gcc_10_2_0(name):
             "-Wl,--gc-sections",
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
-            "-no-canonical-prefixes",
             #"-Wl,-rpath=%{{absolute_external}}/{}/usr/lib/gcc/x86_64-linux-gnu/8".format(package_name),
-
-            # Stamp the binary with a unique identifier
-            "-Wl,--build-id=md5",
-            "-Wl,--hash-style=gnu",
 
             "-lstdc++",
         ],
