@@ -1,5 +1,5 @@
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
-load("//toolchains/cc:defs.bzl", "COPTS_GCC", "LINKOPTS_GCC")
+load("//toolchains/cc:defs.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_GCC")
 
 def _load_linux_x86_64_gcc_10_2_0(name):
     # Load dependencies
@@ -44,38 +44,14 @@ def _load_linux_x86_64_gcc_10_2_0(name):
             "/usr/lib/gcc/x86_64-linux-gnu/10",
             "/usr/lib/x86_64-linux-gnu",
         ],
+        "compile_dev_flags": COPTS_GCC_DEV,
+        "compile_prod_flags": COPTS_GCC_PROD,
         "compile_flags": [
-            # Do not link or re-order inclusion files
-            #"-nostdinc++",
-            #"-nostdinc",
-            "--no-standard-includes",
 
-            # Make the compilation deterministic
-            "-fstack-protector",
-            "-fPIE",
-            "-no-canonical-prefixes",
+            # Use a subset of C++20 to have coroutine support.
+            "-std=c++2a",
+            "-fcoroutines",
 
-            # Warnings
-            "-Wall",
-            "-Wno-missing-braces",
-            "-Wno-builtin-macro-redefined",
-
-            # Keep stack frames for debugging
-            "-fno-omit-frame-pointer",
-
-            "-Wno-stringop-truncation",
-
-            # Optimization
-            "-O3",
-
-            # Removal of unused code and data at link time
-            "-ffunction-sections",
-            "-fdata-sections",
-
-            # Use linkstamping instead of these
-            "-D__DATE__=\"redacted\"",
-            "-D__TIMESTAMP__=\"redacted\"",
-            "-D__TIME__=\"redacted\"",
         ] + COPTS_GCC,
         "link_flags": LINKOPTS_GCC + [
             "-Wl,--disable-new-dtags",

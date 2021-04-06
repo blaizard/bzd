@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
-load("//toolchains/cc:defs.bzl", "COPTS_CLANG", "LINKOPTS_CLANG")
+load("//toolchains/cc:defs.bzl", "COPTS_CLANG", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "LINKOPTS_CLANG")
 
 def _load_linux_x86_64_clang_9_0_0(name):
     # Load dependencies
@@ -47,41 +47,16 @@ def _load_linux_x86_64_clang_9_0_0(name):
         "linker_dirs": [
             "external/{}/lib".format(package_name),
         ],
+        "compile_dev_flags": COPTS_CLANG_DEV,
+        "compile_prod_flags": COPTS_CLANG_PROD,
         "compile_flags": [
+
+            # Use C++17
             "-std=c++17",
-            # Add debug symbols, will be removed at the postprocessing stage
-            "-g",
 
-            # Do not link or re-order inclusion files
-            "-nostdinc++",
-            #"-nostdinc",
-            "--no-standard-includes",
+            # Standard includes, this is needed to avoid indefined include complain from Bazel.
+            "-nostdinc",
 
-            # Make the compilation deterministic
-            "-fstack-protector",
-            "-fPIE",
-            "-no-canonical-prefixes",
-
-            # Warnings
-            "-Wall",
-            "-Wno-missing-braces",
-            "-Wno-builtin-macro-redefined",
-            "-Wno-unused-command-line-argument",
-
-            # Keep stack frames for debugging
-            "-fno-omit-frame-pointer",
-
-            # Optimization
-            "-O3",
-
-            # Removal of unused code and data at link time
-            "-ffunction-sections",
-            "-fdata-sections",
-
-            # Use linkstamping instead of these
-            "-D__DATE__=\"redacted\"",
-            "-D__TIMESTAMP__=\"redacted\"",
-            "-D__TIME__=\"redacted\"",
         ] + COPTS_CLANG,
         "link_flags": LINKOPTS_CLANG + [
             "-fuse-ld=lld",

@@ -34,6 +34,12 @@ def _impl(ctx):
             ["'-isystem', '{}',".format(t) for t in ctx.attr.system_directories] +
             ["'{}',".format(t) for t in ctx.attr.compile_flags],
         ),
+        "%{compile_dev_flags}": "\n".join(
+            ["'{}',".format(t) for t in ctx.attr.compile_dev_flags],
+        ),
+        "%{compile_prod_flags}": "\n".join(
+            ["'{}',".format(t) for t in ctx.attr.compile_prod_flags],
+        ),
         "%{link_flags}": "\n".join(
             ["'-L{}',".format(t) for t in ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in ctx.attr.link_flags],
@@ -91,6 +97,8 @@ _toolchain_maker_linux = repository_rule(
         # Flags
         "link_flags": attr.string_list(),
         "compile_flags": attr.string_list(),
+        "compile_dev_flags": attr.string_list(),
+        "compile_prod_flags": attr.string_list(),
         # Coverage
         "coverage_compile_flags": attr.string_list(),
         "coverage_link_flags": attr.string_list(),

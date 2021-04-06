@@ -24,10 +24,8 @@ cc_binary(
         "coroutines2.cc",
     ],
     copts = [
-        "-std=c++2a",
         #"-stdlib=libc++",
         #"-fcoroutines-ts",
-        "-fcoroutines",
     ],
     linkopts = [
         "-pthread",
