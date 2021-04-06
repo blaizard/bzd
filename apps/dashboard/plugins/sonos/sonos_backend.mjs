@@ -70,12 +70,7 @@ export default {
 
 				// Hook on track change event
 				instance.on("CurrentTrack", (currentTrack) => {
-					if (!("title" in currentTrack)) {
-						track.title = null;
-						track.artist = null;
-						track.art = null;
-					}
-					else if (currentTrack.title.startsWith("x-")) {
+					if (String(currentTrack.title).startsWith("x-")) {
 						track.uid = currentTrack.title;
 					}
 					else {
