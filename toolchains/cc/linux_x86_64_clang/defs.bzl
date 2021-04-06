@@ -49,7 +49,7 @@ def _load_linux_x86_64_clang_9_0_0(name):
         ],
         "compile_dev_flags": COPTS_CLANG_DEV,
         "compile_prod_flags": COPTS_CLANG_PROD,
-        "compile_flags": [
+        "compile_flags": COPTS_CLANG + [
 
             # Use C++17
             "-std=c++17",
@@ -58,7 +58,12 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-nostdinc",
             "--no-standard-includes",
 
-        ] + COPTS_CLANG,
+            # Add support to coroutines.
+            "-Wno-unused-command-line-argument",
+            "-stdlib=libc++",
+            "-fcoroutines-ts",
+
+        ],
         "link_flags": LINKOPTS_CLANG + [
             "-fuse-ld=lld",
             "-Wl,--disable-new-dtags",

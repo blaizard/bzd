@@ -28,7 +28,7 @@ _COPTS_COMMON_DEV = [
     # level of choice for the standard edit-compile-debug cycle.
     "-Og",
 
-    # Keep stack frames for debugging
+    # Keep stack frames for debugging.
     "-fno-omit-frame-pointer",
 
     # Emit extra code to check for buffer overflows.
@@ -46,10 +46,10 @@ COPTS_GCC_PROD = _COPTS_COMMON_PROD
 COPTS_GCC = _COPTS_COMMON
 
 COPTS_CLANG_DEV = _COPTS_COMMON_DEV
-COPTS_CLANG_PROD = _COPTS_COMMON
-COPTS_CLANG = _COPTS_COMMON_PROD
+COPTS_CLANG_PROD = _COPTS_COMMON_PROD
+COPTS_CLANG = _COPTS_COMMON
 
-LINKOPTS_COMMON = [
+_LINKOPTS_COMMON = [
     # Removes unused shared libraries
     #"-Wl,-as-needed",
     # Raise a compilation error if a symbol is undefined during linking
@@ -66,6 +66,6 @@ LINKOPTS_COMMON = [
     "-Wl,--gc-sections",
 ]
 
-LINKOPTS_GCC = LINKOPTS_COMMON
+LINKOPTS_GCC = _LINKOPTS_COMMON
 
-LINKOPTS_CLANG = LINKOPTS_COMMON
+LINKOPTS_CLANG = _LINKOPTS_COMMON
