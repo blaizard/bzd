@@ -9,12 +9,10 @@ common --show_timestamps
 build --verbose_failures
 
 # Set default options used by the default run
-build --cxxopt "-std=c++17"
-build --copt "-Wall"
-build --copt "-Wextra"
-build --copt "-Werror"
-build --copt "-gdwarf-4"
 build "--strip=never"
+
+# Use default platform
+#build --config=linux_x86_64_clang
 
 # Test specific options
 test --test_output=errors
@@ -61,10 +59,16 @@ build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
 build --incompatible_strict_action_env
 
 # Development and production configuration
-build:dev --copt "-O0"
+build:dev -c dbg
 build:dev --define=build=dev
-build:prod --copt "-Os"
+build:prod -c opt
 build:prod --define=build=prod
+
+# linux_x86_64_clang
+build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
+build:linux_x86_64_clang --extra_execution_platforms="@linux_x86_64_clang//:host_platform"
+build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
+build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
 # linux_x86_64_gcc
 build:linux_x86_64_gcc --platforms="@linux_x86_64_gcc//:platform"
@@ -72,12 +76,6 @@ build:linux_x86_64_gcc --extra_execution_platforms="@linux_x86_64_gcc//:host_pla
 build:linux_x86_64_gcc --incompatible_enable_cc_toolchain_resolution
 build:linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc
 build:linux_x86_64_gcc --config=cc-docker-sandbox
-
-# linux_x86_64_clang
-build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
-build:linux_x86_64_clang --extra_execution_platforms="@linux_x86_64_clang//:host_platform"
-build:linux_x86_64_clang --incompatible_enable_cc_toolchain_resolution
-build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
 
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"

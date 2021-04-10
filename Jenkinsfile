@@ -40,11 +40,18 @@ pipeline
 		{
 			parallel
 			{
-				stage("linux_x86_64_clang")
+				stage("linux_x86_64_clang dev")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --platform_suffix=_linux_x86_64_clang" 
+						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_linux_x86_64_clang_dev" 
+					}
+				}
+				stage("linux_x86_64_clang prod")
+				{
+					steps
+					{
+						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod" 
 					}
 				}
 				stage("linux_x86_64_gcc")
