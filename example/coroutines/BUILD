@@ -16,8 +16,6 @@ cc_binary(
     ],
 )
 
-# For g++-10
-# Run with bazel-real run example/coroutines:2 --config=docker -s --config=linux_x86_64_gcc --copt='-Wno-unused-value'
 cc_binary(
     name = "2",
     srcs = [
