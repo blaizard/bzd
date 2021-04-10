@@ -7,7 +7,6 @@ addons:
     packages:
       - wget
       - pkg-config
-      - g++
       - python
 
 git:
@@ -15,20 +14,15 @@ git:
 
 jobs:
   include:
-    - name: Production
+    - name: linux_x86_64_clang Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=default,metadata --config=prod
+      - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod
 
-    - name: Development
+    - name: linux_x86_64_clang Development
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=default,metadata --config=dev
-
-    - name: linux_x86_64_clang
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=cc --platform_suffix=_linux_x86_64_clang
+      - ./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_linux_x86_64_clang_dev
 
     - name: linux_x86_64_gcc
       script:
