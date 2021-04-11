@@ -79,8 +79,8 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=linux_x86_64_clang --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
-						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
+						//sh "./tools/bazel coverage ... --config=linux_x86_64_clang --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						//archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}

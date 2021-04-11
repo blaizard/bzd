@@ -1,5 +1,4 @@
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
-load("//toolchains/cc:defs.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_GCC")
 
 def _load_linux_x86_64_gcc_10_2_0(name):
     # Load dependencies
@@ -44,36 +43,20 @@ def _load_linux_x86_64_gcc_10_2_0(name):
             "/usr/lib/gcc/x86_64-linux-gnu/10",
             "/usr/lib/x86_64-linux-gnu",
         ],
-        "compile_dev_flags": COPTS_GCC_DEV,
-        "compile_prod_flags": COPTS_GCC_PROD,
         "compile_flags": [
 
             # Use a subset of C++20 to have coroutine support.
             "-std=c++2a",
             "-fcoroutines",
 
-        ] + COPTS_GCC,
-        "link_flags": LINKOPTS_GCC + [
+        ],
+        "link_flags": [
             "-Wl,--disable-new-dtags",
             "-Wl,--gc-sections",
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
-            #"-Wl,-rpath=%{{absolute_external}}/{}/usr/lib/gcc/x86_64-linux-gnu/8".format(package_name),
 
             "-lstdc++",
-        ],
-        "coverage_compile_flags": [
-            "-fprofile-instr-generate",
-            "-fcoverage-mapping",
-            "-fprofile-arcs",
-            "-ftest-coverage",
-            "-fno-inline",
-            "-O0",
-        ],
-        "coverage_link_flags": [
-            "-fprofile-instr-generate",
-            "-fcoverage-mapping",
-            "-fprofile-arcs",
         ],
         "dynamic_runtime_libs": [
             #"@{}//:dynamic_libraries".format(package_name),
@@ -97,7 +80,7 @@ def _load_linux_x86_64_gcc_10_2_0(name):
 
     toolchain_maker(
         name = name,
-        implementation = "linux",
+        implementation = "linux_gcc",
         definition = toolchain_definition,
     )
 

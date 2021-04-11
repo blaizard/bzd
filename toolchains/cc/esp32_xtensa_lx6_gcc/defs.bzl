@@ -27,6 +27,6 @@ def load_esp32_xtensa_lx6_gcc():
 
     toolchain_maker(
         name = "esp32_xtensa_lx6_gcc",
-        implementation = "linux",
+        implementation = "linux_gcc",
         definition = toolchain_definition,
     )

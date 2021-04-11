@@ -1,5 +1,4 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//toolchains/cc:defs.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_GCC")
 
 def toolchain_fragment_esp32_xtensa_lx6_gcc():
     package_name = "esp32_xtensa_lx6_gcc_8.2.0"
@@ -34,8 +33,6 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         "linker_dirs": [
             "external/{}/xtensa-esp32-elf/lib".format(package_name),
         ],
-        "compile_dev_flags": COPTS_GCC_DEV,
-        "compile_prod_flags": COPTS_GCC_PROD,
         "compile_flags": [
             # C++17
             "-std=c++17",
@@ -48,8 +45,8 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             # Allow long calls
             "-mlongcalls",
 
-        ] + COPTS_GCC,
-        "link_flags": LINKOPTS_GCC + [
+        ],
+        "link_flags": [
             # No standard libraries
             "-nostdlib",
 
