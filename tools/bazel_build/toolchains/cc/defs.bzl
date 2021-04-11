@@ -1,3 +1,5 @@
+load("//tools/bazel_build/toolchains/cc:flags.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "COPTS_GCC_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE", "COPTS_CLANG", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_CLANG_COVERAGE", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE")
+
 def _impl(ctx):
     # Absolute path of the external directory (used for linking librairies for example)
     absolute_external = ctx.execute(["pwd"], working_directory = "..").stdout.rstrip()
@@ -134,38 +136,70 @@ This rule also creates few important assets:
 """
 
 def toolchain_maker(name, implementation, definition):
-    if implementation == "linux":
+    if implementation == "linux_gcc":
+
+        updated_definition = toolchain_merge({
+            "compile_dev_flags": COPTS_GCC_DEV,
+            "compile_prod_flags": COPTS_GCC_PROD,
+            "compile_flags": COPTS_GCC,
+            "link_flags": LINKOPTS_GCC,
+            "coverage_compile_flags": COPTS_GCC_COVERAGE,
+            "coverage_link_flags": LINKOPTS_GCC_COVERAGE,
+        }, definition)
+
         _toolchain_maker_linux(
             name = name,
-            **definition
+            **updated_definition
         )
 
-        native.register_toolchains(
-            "@{}//:toolchain".format(name),
-            "@{}//:binary_toolchain".format(name),
-        )
+    elif implementation == "linux_clang":
 
-        native.register_execution_platforms(
-            "@{}//:host_platform".format(name),
+        updated_definition = toolchain_merge({
+            "compile_dev_flags": COPTS_CLANG_DEV,
+            "compile_prod_flags": COPTS_CLANG_PROD,
+            "compile_flags": COPTS_CLANG,
+            "link_flags": LINKOPTS_CLANG,
+            "coverage_compile_flags": COPTS_CLANG_COVERAGE,
+            "coverage_link_flags": LINKOPTS_CLANG_COVERAGE,
+        }, definition)
+
+        _toolchain_maker_linux(
+            name = name,
+            **updated_definition
         )
 
     else:
         fail("Unsupported toolchain type '{}'".format(implementation))
+
+    native.register_toolchains(
+        "@{}//:toolchain".format(name),
+        "@{}//:binary_toolchain".format(name),
+    )
+
+    native.register_execution_platforms(
+        "@{}//:host_platform".format(name),
+    )
 
 """
 Merge 2 toolchain data entries.
 """
 
 def toolchain_merge(data1, data2):
+
+    # Make a copy of data1 so that it can be mutated
+    result = {}
+    result.update(data1)
+
+    # Populate the data2 items
     for key2, value2 in data2.items():
         if key2 in data1:
             if type(data1[key2]) != type(value2):
                 fail("Trying to merge conflicting types for key '{}'.".format(key2))
             if type(value2) == "list":
-                data1[key2] += value2
+                result[key2] = data1[key2] + value2
             elif data1[key2] != value2:
                 fail("Trying to merge different values for key '{}'.".format(key2))
         else:
-            data1[key2] = value2
+            result[key2] = value2
 
-    return data1
+    return result
