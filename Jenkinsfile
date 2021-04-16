@@ -25,6 +25,7 @@ pipeline
 				sh "id"
 				sh "printenv"
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
+				sh "docker info"
 				sh "python --version"
 				sh "java --version"
 				sh "./tools/bazel --version"
