@@ -59,21 +59,21 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=cc --config=linux_x86_64_gcc --output_user_root=linux_x86_64_gcc" 
+						sh "./tools/bazel test ... --output_groups=default,metadata --config=cc --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
 					}
 				}
 				stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel build ... --output_groups=default,metadata --config=cc --config=esp32_xtensa_lx6_gcc --output_user_root=esp32_xtensa_lx6_gcc" 
+						sh "./tools/bazel build ... --output_groups=default,metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
 				stage("Static analyzers")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --output_user_root=sanitizer" 
+						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
 					}
 				}
 				stage("Coverage")
