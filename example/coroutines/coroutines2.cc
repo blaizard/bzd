@@ -1,4 +1,6 @@
 #include "example/coroutines/coroutine.h"
+#include "cc/bzd/container/impl/non_owning_list.h"
+#include "cc/bzd/utility/ignore.h"
 
 #include <atomic>
 #include <chrono>
@@ -9,14 +11,7 @@
 
 using namespace std::chrono_literals;
 
-static std::deque<bzd::coroutine::impl::coroutine_handle<>> queue;
 static std::atomic<bool> isEnd{false};
-
-void register_coro(bzd::coroutine::impl::coroutine_handle<>& handle)
-{
-	//std::cout << "Registering " << handle.address() << std::endl;
-	queue.push_back(handle);
-}
 
 class RAIIThread
 {
@@ -31,7 +26,7 @@ public:
 private:
 	std::thread t_;
 };
-
+/*
 void register_delay_coro(bzd::coroutine::impl::coroutine_handle<>& handle)
 {
 	static std::deque<bzd::coroutine::impl::coroutine_handle<>> tempQueue;
@@ -50,27 +45,12 @@ void register_delay_coro(bzd::coroutine::impl::coroutine_handle<>& handle)
 
 	tempQueue.push_back(handle);
 }
-
-bzd::coroutine::impl::coroutine_handle<> get_next()
-{
-	// Wait until there is something in the queue
-	while (queue.empty())
-	{
-		//std::cout << "wait get_next()" << std::endl;
-		std::this_thread::sleep_for(100ms);
-	}
-	auto coro = queue.front();
-	// std::cout << "Executing " << coro.address() << ", count: " << queue.size() << std::endl;
-	queue.pop_front();
-
-	//std::cout << "next: " << coro.address() << " " << queue.size() << std::endl;
-
-	return coro;
-}
+*/
+bzd::coroutine::impl::coroutine_handle<> get_next_task();
 
 struct Async
 {
-	struct Promise
+	struct Promise : public bzd::NonOwningListElement<true>
 	{
 		constexpr Promise() = default;
 
@@ -126,21 +106,8 @@ struct Async
 		//std::cout << "~Async" << handle.address() << std::endl;
 		if (handle)
 		{
+			bzd::ignore = handle.promise().pop();
 			handle.destroy();
-		}
-
-		// Remove from queue
-		for (auto it = queue.begin(); it != queue.end(); )
-		{
-			if (it->address() == handle.address())
-			{
-				//std::cout << "remove " << handle.address() << std::endl;
-				it = queue.erase(it);
-			}
-			else
-			{
-				++it;
-			}
 		}
 	}
 
@@ -175,19 +142,7 @@ struct Async
 		return false; //handle.done();
 	}
 
-	auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
-	{
-		//std::cout << "await_suspend caller " << caller.address() << ", handle " << handle.address() << std::endl;
-		handle.promise().caller = caller;
-
-		// Must be valid as there is at least a single entry
-		// The coroutine should be added to the list when it resolves
-		//std::cout << "await_suspend" << std::endl;
-		register_coro(handle);
-
-		//std::cout << "get_next() " << handle.address() << std::endl;
-		return get_next();
-	}
+	auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller);
 
 	auto await_resume()
 	{
@@ -198,23 +153,59 @@ struct Async
 	bzd::coroutine::impl::coroutine_handle<Promise> handle;
 };
 
+static bzd::NonOwningList<Async::Promise> tasks{};
+void register_task(bzd::coroutine::impl::coroutine_handle<Async::Promise>& handle)
+{
+	bzd::ignore = tasks.pushFront(handle.promise());
+}
+
+bzd::coroutine::impl::coroutine_handle<> get_next_task()
+{
+	while (tasks.empty())
+	{
+		//std::cout << "wait get_next()" << std::endl;
+		std::this_thread::sleep_for(100ms);
+	}
+	auto promise = tasks.back();
+	// std::cout << "Executing " << coro.address() << ", count: " << queue.size() << std::endl;
+	bzd::ignore = tasks.pop(*promise);
+
+	//std::cout << "next: " << coro.address() << " " << queue.size() << std::endl;
+
+	return bzd::coroutine::impl::coroutine_handle<Async::Promise>::from_promise(*promise);
+}
+
+auto Async::await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
+{
+	//std::cout << "await_suspend caller " << caller.address() << ", handle " << handle.address() << std::endl;
+	handle.promise().caller = caller;
+
+	// Must be valid as there is at least a single entry
+	// The coroutine should be added to the list when it resolves
+	//std::cout << "await_suspend" << std::endl;
+	register_task(handle);
+
+	//std::cout << "get_next() " << handle.address() << std::endl;
+	return get_next_task();
+}
+
 auto always_await()
 {
 	struct Awaitable : bzd::coroutine::impl::suspend_always
 	{
-		auto await_suspend(bzd::coroutine::impl::coroutine_handle<> b)
+		auto await_suspend(bzd::coroutine::impl::coroutine_handle<Async::Promise> b)
 		{
-			register_coro(b);
-			return get_next();
+			register_task(b);
+			return get_next_task();
 		}
 	};
 
 	return Awaitable{};
 }
 
-Async promiseTest(bzd::coroutine::impl::coroutine_handle<> a)
+Async promiseTest(bzd::coroutine::impl::coroutine_handle<Async::Promise> a)
 {
-	register_coro(a);
+	register_task(a);
 	if (!a.done())
 	{
 		//std::cout << "promiseTest" << std::endl;
@@ -228,10 +219,10 @@ Async promiseTest(bzd::coroutine::impl::coroutine_handle<> a)
 	co_return 42;
 }
 
-Async promiseAnd(bzd::coroutine::impl::coroutine_handle<> a, bzd::coroutine::impl::coroutine_handle<> b)
+Async promiseAnd(bzd::coroutine::impl::coroutine_handle<Async::Promise> a, bzd::coroutine::impl::coroutine_handle<Async::Promise> b)
 {
-	register_coro(a);
-	register_coro(b);
+	register_task(a);
+	register_task(b);
 	while (!a.done() || !b.done())
 	{
 		//std::cout << "promiseAnd" << std::endl;
@@ -247,11 +238,11 @@ Async promiseAnd(bzd::coroutine::impl::coroutine_handle<> a, bzd::coroutine::imp
 	co_return 42;
 }
 
-Async promiseOr(bzd::coroutine::impl::coroutine_handle<> a, bzd::coroutine::impl::coroutine_handle<> b)
+Async promiseOr(bzd::coroutine::impl::coroutine_handle<Async::Promise> a, bzd::coroutine::impl::coroutine_handle<Async::Promise> b)
 {
 	//std::cout << "promiseOr START" << std::endl;
-	register_coro(a);
-	register_coro(b);
+	register_task(a);
+	register_task(b);
 	while (!a.done() && !b.done())
 	{
 		//std::cout << "promiseOr" << std::endl;
