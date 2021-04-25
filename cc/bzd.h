@@ -103,6 +103,7 @@
 #include "bzd/utility/format/format.h"
 #include "bzd/utility/format/integral.h"
 #include "bzd/utility/forward.h"
+#include "bzd/utility/ignore.h"
 #include "bzd/utility/max.h"
 #include "bzd/utility/min.h"
 #include "bzd/utility/move.h"

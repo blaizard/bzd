@@ -40,7 +40,7 @@ public:
 	using Result = bzd::Result<V, ListErrorType>;
 
 public:
-	constexpr NonOwningList() noexcept { front_.next_.store(&back_); };
+	constexpr NonOwningList() noexcept { front_.next_.store(&back_); }
 
 	/**
 	 * Get the number of elements currently held by this container.
