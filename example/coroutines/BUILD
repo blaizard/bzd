@@ -17,9 +17,21 @@ cc_binary(
 )
 
 cc_binary(
+    name = "eager",
+    srcs = [
+        "eager.cc",
+    ],
+    tags = ["manual"],
+    deps = [
+        "//cc/bzd",
+    ],
+)
+
+cc_binary(
     name = "2",
     srcs = [
         "coroutines2.cc",
+        "coroutine.h",
     ],
     tags = [
         "cc"
