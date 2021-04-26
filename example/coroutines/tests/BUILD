@@ -1,0 +1,22 @@
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
+
+bzd_cc_test(
+    name = "tests",
+    srcs = [
+        "coroutine.cc",
+    ],
+    target_compatible_with = select({
+        "@linux_x86_64_gcc//:target": [
+            "@linux_x86_64_gcc//:compiler",
+        ],
+        "@linux_x86_64_clang//:target": [
+            "@linux_x86_64_clang//:compiler",
+        ],
+        "//conditions:default": ["@linux_x86_64_clang//:compiler",]
+    }),
+    deps = [
+        "//cc/bzd",
+        "//tools/cc_test",
+        "//example/coroutines:async"
+    ],
+)

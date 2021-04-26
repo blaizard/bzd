@@ -27,11 +27,27 @@ cc_binary(
     ],
 )
 
+cc_library(
+    name = "async",
+    srcs = [
+        "coroutine.h",
+        "promise.h",
+        "async.h",
+        "executor.h",
+    ],
+    hdrs = [
+        "async.h"
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd",
+    ],
+)
+
 cc_binary(
     name = "2",
     srcs = [
         "coroutines2.cc",
-        "coroutine.h",
     ],
     tags = [
         "cc"
@@ -53,6 +69,7 @@ cc_binary(
     ],
     deps = [
         "//cc/bzd",
+        ":async"
     ],
 )
 
