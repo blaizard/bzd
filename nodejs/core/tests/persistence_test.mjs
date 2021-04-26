@@ -120,6 +120,7 @@ describe("Persistence", function () {
 		it("run (" + nbOperationsLeft + " iterations)", async function () {
 			while (nbOperationsLeft--) {
 				const randomValue = Math.floor(Math.random() * Math.floor(5));
+				process.stdout.write(randomValue + " ");
 				switch (randomValue) {
 				case 0:
 					{
@@ -181,7 +182,7 @@ describe("Persistence", function () {
 					break;
 				}
 			}
-		}).timeout(60000);
+		}).timeout(120000);
 	});
 
 	describe("stress asynchronous", function () {
@@ -238,6 +239,6 @@ describe("Persistence", function () {
 
 			// Close the persistence
 			persistence.close();
-		}).timeout(60000);
+		}).timeout(120000);
 	});
 });
