@@ -33,32 +33,32 @@ describe("Persistence", function () {
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.ok(data.hello == "world", persistence.data);
-		});
+		}).timeout(10000);
 		it("set mister", async function () {
 			await persistence.write("set", "mister", ["a"]);
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.ok(data.mister instanceof Array, data);
 			Assert.ok(data.mister[0] == "a", data);
-		});
+		}).timeout(10000);
 		it("delete", async function () {
 			await persistence.write("delete", "hello");
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.ok(data.hello == undefined, data);
-		});
+		}).timeout(10000);
 	});
 
 	describe("savepoint", function () {
 		it("single", async function () {
 			await persistence.savepoint();
 			await persistence.consistencyCheck();
-		});
+		}).timeout(10000);
 		it("multiple", async function () {
 			const promise = [persistence.savepoint(), persistence.savepoint(), persistence.savepoint()];
 			await Promise.all(promise);
 			await persistence.consistencyCheck();
-		});
+		}).timeout(10000);
 	});
 
 	describe("reset", function () {
@@ -67,7 +67,7 @@ describe("Persistence", function () {
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, {}, JSON.stringify(data));
-		});
+		}).timeout(10000);
 		it("data", async function () {
 			const d = {
 				hello: "world",
@@ -77,7 +77,7 @@ describe("Persistence", function () {
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, d, JSON.stringify(data));
-		});
+		}).timeout(10000);
 	});
 
 	describe("use case 1", function () {
@@ -86,25 +86,25 @@ describe("Persistence", function () {
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, {});
-		});
+		}).timeout(10000);
 		it("set a -> b", async function () {
 			await persistence.write("set", "a", "b");
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, { a: "b" });
-		});
+		}).timeout(10000);
 		it("restart", async function () {
 			await persistence.reset({ a: "b" });
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, { a: "b" });
-		});
+		}).timeout(10000);
 		it("reset", async function () {
 			await persistence.reset();
 			await persistence.consistencyCheck();
 			const data = await persistence.get();
 			Assert.deepStrictEqual(data, {});
-		});
+		}).timeout(10000);
 	});
 
 	describe("stress synchronous", function () {
@@ -114,7 +114,7 @@ describe("Persistence", function () {
 		it("reset", async function () {
 			await persistence.reset();
 			Assert.deepStrictEqual(await persistence.get(), expectedValue);
-		});
+		}).timeout(10000);
 
 		let nbOperationsLeft = persistenceOptions.iterations;
 		it("run (" + nbOperationsLeft + " iterations)", async function () {
@@ -191,7 +191,7 @@ describe("Persistence", function () {
 		it("reset", async function () {
 			await persistence.reset();
 			Assert.deepStrictEqual(await persistence.get(), expectedValue);
-		});
+		}).timeout(10000);
 
 		let nbOperationsLeft = persistenceOptions.iterations;
 		it("run (" + nbOperationsLeft + " iterations)", async function () {
