@@ -120,4 +120,11 @@ public:
 protected:
 	interface::String::DataType data_[N + 1] = {}; // needed for constexpr
 };
+
+// Comparison to char*
+constexpr bool operator==(interface::String& lhs, const char* const rhs) noexcept
+{
+	return (StringView{lhs} == StringView{rhs});
+}
+
 } // namespace bzd

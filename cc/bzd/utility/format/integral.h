@@ -144,10 +144,16 @@ void toString(bzd::OChannel& stream, const bzd::StringView& data);
 void toString(bzd::OChannel& stream, const char c);
 
 template <class... Args>
+constexpr void appendToString(bzd::interface::String& str, Args&&... args)
+{
+	bzd::interface::StringChannel stream(str);
+	toString(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
+}
+
+template <class... Args>
 constexpr void toString(bzd::interface::String& str, Args&&... args)
 {
 	str.clear();
-	bzd::interface::StringChannel stream(str);
-	toString(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
+	appendToString(str, bzd::forward<Args>(args)...);
 }
 } // namespace bzd::format
