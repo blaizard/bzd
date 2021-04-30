@@ -12,7 +12,8 @@ class Scheduler : public bzd::Singleton<Scheduler>
 public:
 	constexpr Scheduler() = default;
 
-	void push(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise>& handle)
+	template <class T>
+	void push(bzd::coroutine::impl::coroutine_handle<T>& handle)
 	{
 		bzd::ignore = queue_.pushFront(handle.promise());
 	}
@@ -26,10 +27,10 @@ public:
 		auto promise = queue_.back();
 		bzd::ignore = queue_.pop(*promise);
 
-		return bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise>::from_promise(*promise);
+		return bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(*promise);
 	}
 
 private:
-	bzd::NonOwningList<bzd::coroutine::Promise> queue_{};
+	bzd::NonOwningList<bzd::coroutine::interface::Promise> queue_{};
 };
 }

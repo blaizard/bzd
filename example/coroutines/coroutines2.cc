@@ -46,21 +46,6 @@ void register_delay_coro(bzd::coroutine::impl::coroutine_handle<>& handle)
 }
 */
 
-auto always_await()
-{
-	struct Awaitable : bzd::coroutine::impl::suspend_always
-	{
-		auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise> b)
-		{
-			bzd::Scheduler::getInstance().push(b);
-			return bzd::Scheduler::getInstance().pop();
-		}
-	};
-
-	return Awaitable{};
-}
-
-
 bzd::Async nop()
 {
 	co_return 42;

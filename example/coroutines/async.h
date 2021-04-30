@@ -8,9 +8,10 @@
 
 namespace bzd::impl
 {
+	template <class V, class E>
 	struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 	{
-		auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise> handle)
+		auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<V, E>> handle)
 		{
 			bzd::Scheduler::getInstance().push(handle);
 			return bzd::Scheduler::getInstance().pop();
@@ -22,7 +23,7 @@ namespace bzd
 {
 struct Async
 {
-	using promise_type = bzd::coroutine::Promise;
+	using promise_type = bzd::coroutine::Promise<int, int>;
 
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<promise_type> h) : handle_(h)
 	{
@@ -103,7 +104,7 @@ static Async waitAll(Async& a, Async& b)
 	bzd::Scheduler::getInstance().push(b.handle_);
 	while (!a.isReady() || !b.isReady())
 	{
-		co_await bzd::impl::SuspendAlways{};
+		co_await bzd::impl::SuspendAlways<int, int>{};
 	}
 
 	co_return 42;
@@ -123,7 +124,7 @@ static Async waitAny(Async& a, Async& b)
 	bzd::Scheduler::getInstance().push(b.handle_);
 	while (!a.isReady() && !b.isReady())
 	{
-		co_await bzd::impl::SuspendAlways{};
+		co_await bzd::impl::SuspendAlways<int, int>{};
 	}
 
 	co_return 42;
