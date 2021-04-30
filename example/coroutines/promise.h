@@ -17,16 +17,15 @@ public:
 
 	bzd::coroutine::impl::suspend_always initial_suspend() { return {}; }
 
-	struct final_awaiter
+	struct FinalAwaiter
 	{
 		bool await_ready() noexcept { return false; }
 
-		bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<Promise> h) noexcept
+		bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<Promise> handle) noexcept
 		{
-			auto& continuation = h.promise().caller;
+			auto& continuation = handle.promise().caller;
 			if (continuation)
 			{
-				//std::cout << "continuation: " << continuation.address() << std::endl;
 				return continuation;
 			}
 			return bzd::coroutine::impl::noop_coroutine();
@@ -35,7 +34,7 @@ public:
 		void await_resume() noexcept {}
 	};
 
-	final_awaiter final_suspend()
+	FinalAwaiter final_suspend()
 	{
 		callback_();
 		return {};
@@ -48,10 +47,7 @@ public:
 
 	void unhandled_exception() {}
 
-	~Promise()
-	{
-		//std::cout << "~Promise" << std::endl;
-	}
+	~Promise() = default;
 
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
 	std::function<void(void)> callback_ = []() {};
