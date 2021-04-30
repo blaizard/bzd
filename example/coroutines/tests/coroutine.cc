@@ -100,6 +100,27 @@ TEST(Coroutine, waitAllMany)
 	EXPECT_EQ(trace, "[a1][b1][c1][d1][a0][a2][b0][b2][c0][c2][d0][d2]");
 }
 
+bzd::Async waitAllNested(bzd::interface::String& trace, bzd::StringView id)
+{
+	appendToTrace(trace, id, 5);
+	auto promiseY = nested(trace, "y");
+	auto promiseZ = nested(trace, "z");
+	co_await bzd::waitAll(promiseY, promiseZ);
+	appendToTrace(trace, id, 6);
+
+	co_return 12;
+}
+
+TEST(Coroutine, waitAllNested)
+{
+	bzd::String<128> trace;
+	auto promiseA = waitAllNested(trace, "a");
+	auto promiseB = deepNested(trace, "b");
+	auto promise = bzd::waitAll(promiseA, promiseB);
+	bzd::ignore = promise.sync();
+	EXPECT_EQ(trace, "[a5][b3][b1][y1][z1][b0][b2][b4][b3][y0][y2][z0][z2][a6][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
+}
+
 TEST(Coroutine, waitAny)
 {
 	bzd::String<128> trace;
