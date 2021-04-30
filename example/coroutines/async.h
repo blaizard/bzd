@@ -23,8 +23,11 @@ namespace bzd
 {
 struct Async
 {
+public:
 	using promise_type = bzd::coroutine::Promise<int, int>;
+	using ValueType = int;
 
+public:
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<promise_type> h) : handle_(h)
 	{
 	}
@@ -101,6 +104,8 @@ public:
 template <class... Asyncs>
 static Async waitAll(Asyncs&... asyncs)
 {
+	//using ValueType = bzd::Tuple<Asyncs::ValueType>;
+
 	// Push all handles to the scheduler
 	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
 
