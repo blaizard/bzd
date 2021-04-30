@@ -68,32 +68,32 @@ TEST(Coroutine, DeepNested)
 	EXPECT_EQ(trace, "[a3][a1][a0][a2][a4][a3][a1][a0][a2][a4][a3][a1][a0][a2][a4]");
 }
 
-TEST(Coroutine, PromiseAnd)
+TEST(Coroutine, waitAll)
 {
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
 	auto promiseB = nested(trace, "b");
-	auto promise = bzd::Async::promiseAnd(promiseA, promiseB);
+	auto promise = bzd::waitAll(promiseA, promiseB);
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a1][b1][a0][a2][b0][b2]");
 }
 
-TEST(Coroutine, PromiseAndDifferent)
+TEST(Coroutine, waitAllDifferent)
 {
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
-	auto promise = bzd::Async::promiseAnd(promiseA, promiseB);
+	auto promise = bzd::waitAll(promiseA, promiseB);
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a1][b3][a0][a2][b1][b0][b2][b4][b3][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
 }
 
-TEST(Coroutine, PromiseOr)
+TEST(Coroutine, waitAny)
 {
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
 	auto promiseB = nested(trace, "b");
-	auto promise = bzd::Async::promiseOr(promiseA, promiseB);
+	auto promise = bzd::waitAny(promiseA, promiseB);
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a1][b1][a0][a2]");
 }

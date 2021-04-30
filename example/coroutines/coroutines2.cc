@@ -52,8 +52,8 @@ auto always_await()
 	{
 		auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise> b)
 		{
-			bzd::Executor::getInstance().push(b);
-			return bzd::Executor::getInstance().pop();
+			bzd::Scheduler::getInstance().push(b);
+			return bzd::Scheduler::getInstance().pop();
 		}
 	};
 
@@ -80,7 +80,7 @@ bzd::Async count(int id, int n)
 		{
 			auto coro_count1 = count(id * 10 + 1, n - 3);
 			auto coro_count2 = count(id * 10, n - 1);
-			co_await bzd::Async::promiseAnd(coro_count1, coro_count2);
+			co_await bzd::waitAll(coro_count1, coro_count2);
 		}
 		else
 		{
@@ -103,7 +103,7 @@ int main()
 		auto mycoro1 = count(1, 3);
 		auto mycoro2 = count(2, 6);
 
-		auto promise = bzd::Async::promiseAnd(mycoro1, mycoro2);
+		auto promise = bzd::waitAll(mycoro1, mycoro2);
 		promise.sync();
 	}
 
@@ -113,7 +113,7 @@ int main()
 		auto mycoro1 = count(1, 3);
 		auto mycoro2 = count(2, 6);
 
-		auto promise = bzd::Async::promiseOr(mycoro1, mycoro2);
+		auto promise = bzd::waitAny(mycoro1, mycoro2);
 		promise.sync();
 	}
 

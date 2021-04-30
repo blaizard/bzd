@@ -33,7 +33,7 @@ cc_library(
         "coroutine.h",
         "promise.h",
         "async.h",
-        "executor.h",
+        "scheduler.h",
     ],
     hdrs = [
         "async.h"
