@@ -98,11 +98,14 @@ public:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
 };
 
-static Async waitAll(Async& a, Async& b)
+template <class... Asyncs>
+static Async waitAll(Asyncs&... asyncs)
 {
-	bzd::Scheduler::getInstance().push(a.handle_);
-	bzd::Scheduler::getInstance().push(b.handle_);
-	while (!a.isReady() || !b.isReady())
+	// Push all handles to the scheduler
+	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
+
+	// Loop until all asyncs are ready
+	while (!(asyncs.isReady() && ...))
 	{
 		co_await bzd::impl::SuspendAlways<int, int>{};
 	}

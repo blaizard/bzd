@@ -20,7 +20,7 @@ constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, 
 bzd::Async nop(bzd::interface::String& trace, bzd::StringView id)
 {
 	appendToTrace(trace, id, 0);
-	co_return 42;
+	co_return bzd::makeError(12);
 }
 
 TEST(Coroutine, Base)
@@ -86,6 +86,18 @@ TEST(Coroutine, waitAllDifferent)
 	auto promise = bzd::waitAll(promiseA, promiseB);
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a1][b3][a0][a2][b1][b0][b2][b4][b3][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
+}
+
+TEST(Coroutine, waitAllMany)
+{
+	bzd::String<128> trace;
+	auto promiseA = nested(trace, "a");
+	auto promiseB = nested(trace, "b");
+	auto promiseC = nested(trace, "c");
+	auto promiseD = nested(trace, "d");
+	auto promise = bzd::waitAll(promiseA, promiseB, promiseC, promiseD);
+	bzd::ignore = promise.sync();
+	EXPECT_EQ(trace, "[a1][b1][c1][d1][a0][a2][b0][b2][c0][c2][d0][d2]");
 }
 
 TEST(Coroutine, waitAny)
