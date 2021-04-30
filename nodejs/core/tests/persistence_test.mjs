@@ -11,7 +11,7 @@ const tempDirPath = Fs.mkdtempSync(Path.join(Os.tmpdir(), "persistence-"));
 const persistenceOptions = {
 	path: Path.join(tempDirPath, "test.persistence.json"),
 	savepointOnClose: false,
-	iterations: 1000,
+	iterations: 100,
 };
 
 let persistence = null;
