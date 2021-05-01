@@ -58,7 +58,6 @@ public:
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
 	std::function<void(void)> callback_ = []() {};
 
-private:
 	bzd::Optional<T> result_{};
 };
 

@@ -19,4 +19,8 @@ bzd_cc_test(
         "//example/coroutines:async",
         "//tools/cc_test",
     ],
+    copts = [
+        # With gcc there seems to be a flase positive on co_return, to be checked.
+        "-Wno-unused-value",
+    ]
 )
