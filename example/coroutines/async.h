@@ -77,8 +77,7 @@ public:
 
 	auto await_resume()
 	{
-		// std::cout << "Await value is returned: " << 23 << std::endl;
-		return 23;
+		return handle_.promise().result_;
 	}
 
 public:
