@@ -45,7 +45,7 @@ export default class DockerV2Proxy {
 
 				// See https://docs.docker.com/registry/deploying/#importantrequired-http-headers
 				response.headers["docker-distribution-api-version"] = "registry/2.0";
-			},
+			}
 		});
 	}
 
@@ -74,7 +74,7 @@ export default class DockerV2Proxy {
 	_getServiceFromUrl() {
 		return Url.format({
 			hostname: this._urlParsed.hostname,
-			port: this._urlParsed.port,
+			port: this._urlParsed.port
 		});
 	}
 

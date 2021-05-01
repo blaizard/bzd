@@ -30,7 +30,7 @@ describe("Format", () => {
 		it("Simple", () => {
 			let text = Format("{hello} {world}!", {
 				hello: "Hello",
-				world: "World",
+				world: "World"
 			});
 			Exception.assertEqual(text, "Hello World!");
 		});

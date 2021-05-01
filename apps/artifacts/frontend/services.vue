@@ -25,11 +25,11 @@
 	export default {
 		mixins: [Component],
 		directives: {
-			loading: DirectiveLoading,
+			loading: DirectiveLoading
 		},
-		data: function () {
+		data: function() {
 			return {
-				services: {},
+				services: {}
 			};
 		},
 		mounted() {
@@ -41,7 +41,7 @@
 				await this.handleSubmit(async () => {
 					this.services = await this.$api.request("get", "/services");
 				});
-			},
-		},
+			}
+		}
 	};
 </script>

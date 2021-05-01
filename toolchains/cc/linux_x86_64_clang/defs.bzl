@@ -59,7 +59,6 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "-Wno-unused-command-line-argument",
             "-stdlib=libc++",
             "-fcoroutines-ts",
-
         ],
         "link_flags": [
             "-fuse-ld=lld",

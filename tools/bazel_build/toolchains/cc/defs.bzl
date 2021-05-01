@@ -1,4 +1,4 @@
-load("//tools/bazel_build/toolchains/cc:flags.bzl", "COPTS_GCC", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "COPTS_GCC_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE", "COPTS_CLANG", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_CLANG_COVERAGE", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE")
+load("//tools/bazel_build/toolchains/cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
 
 def _impl(ctx):
     # Absolute path of the external directory (used for linking librairies for example)
@@ -137,7 +137,6 @@ This rule also creates few important assets:
 
 def toolchain_maker(name, implementation, definition):
     if implementation == "linux_gcc":
-
         updated_definition = toolchain_merge({
             "compile_dev_flags": COPTS_GCC_DEV,
             "compile_prod_flags": COPTS_GCC_PROD,
@@ -153,7 +152,6 @@ def toolchain_maker(name, implementation, definition):
         )
 
     elif implementation == "linux_clang":
-
         updated_definition = toolchain_merge({
             "compile_dev_flags": COPTS_CLANG_DEV,
             "compile_prod_flags": COPTS_CLANG_PROD,
@@ -185,7 +183,6 @@ Merge 2 toolchain data entries.
 """
 
 def toolchain_merge(data1, data2):
-
     # Make a copy of data1 so that it can be mutated
     result = {}
     result.update(data1)

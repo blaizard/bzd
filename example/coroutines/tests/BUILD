@@ -12,11 +12,11 @@ bzd_cc_test(
         "@linux_x86_64_clang//:target": [
             "@linux_x86_64_clang//:compiler",
         ],
-        "//conditions:default": ["@linux_x86_64_clang//:compiler",]
+        "//conditions:default": ["@linux_x86_64_clang//:compiler"],
     }),
     deps = [
         "//cc/bzd",
+        "//example/coroutines:async",
         "//tools/cc_test",
-        "//example/coroutines:async"
     ],
 )

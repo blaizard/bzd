@@ -44,7 +44,6 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
 
             # Allow long calls
             "-mlongcalls",
-
         ],
         "link_flags": [
             # No standard libraries

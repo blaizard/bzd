@@ -66,7 +66,7 @@ COPTS_CLANG_COVERAGE = _COPTS_COMMON_COVERAGE + [
     "-fprofile-instr-generate",
     "-fcoverage-mapping",
     "-fprofile-arcs",
-    "-ftest-coverage"
+    "-ftest-coverage",
 ]
 
 _LINKOPTS_COMMON = [
