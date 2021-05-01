@@ -9,6 +9,8 @@
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
 
+#include <new> // Used only for placement new
+
 namespace bzd::impl {
 
 // nullopt
@@ -74,6 +76,7 @@ public:
 	using Value = bzd::typeTraits::RemoveReference<T>;
 	using StorageType =
 		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T>, OptionalTrivialStorage<T>, OptionalNonTrivialStorage<T>>;
+	using ValueContainer = typename StorageType::ValueContainer;
 
 public: // Constructors
 	template <class U>
@@ -122,6 +125,21 @@ public:
 	{
 		bzd::assert::isTrue(storage_.isValue_);
 		return &storage_.value_;
+	}
+
+	/**
+	 * Constructs the contained value in-place.
+	 * If *this already contains a value before the call, the contained value is destroyed by calling its destructor.
+	 */
+	template <class... Args>
+	constexpr void emplace(Args&&... args) noexcept
+	{
+		if (storage_.isValue_)
+		{
+			storage_.value_.~ValueContainer();
+		}
+		::new (&(storage_.value_)) ValueContainer(bzd::forward<Args>(args)...);
+		storage_.isValue_ = true;
 	}
 
 private:
