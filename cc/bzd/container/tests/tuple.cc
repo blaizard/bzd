@@ -51,3 +51,17 @@ TEST(ContainerTuple, Constexpr)
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_STREQ(tuple.get<1>(), "Hello");
 }
+
+TEST(ContainerTuple, NonDefaultConstructor)
+{
+	class NonDefaultConstructor
+	{
+	public:
+		constexpr explicit NonDefaultConstructor(int v) : value{v} {}
+		int value;
+	};
+
+	constexpr const bzd::Tuple<NonDefaultConstructor, NonDefaultConstructor> tuple{12, -2};
+	EXPECT_EQ(tuple.get<0>().value, 12);
+	EXPECT_EQ(tuple.get<1>().value, -2);
+}
