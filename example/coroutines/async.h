@@ -17,13 +17,12 @@ struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 		return bzd::Scheduler::getInstance().pop();
 	}
 };
-} // namespace bzd::impl
 
-namespace bzd {
+template <class T = bzd::Result<int, int>>
 class Async
 {
 public:
-	using ResultType = bzd::Result<int, int>;
+	using ResultType = T;
 	using promise_type = bzd::coroutine::Promise<ResultType>;
 
 public:
@@ -39,14 +38,13 @@ public:
 		}
 	}
 
-	int sync()
+	ResultType sync()
 	{
 		while (!isReady())
 		{
-			// std::cout << "sync" << std::endl;
 			handle_.resume();
 		}
-		return 42; // bzd::move(handle.promise().value);
+		return getResult();
 	}
 
 	// Cancel the current coroutine and nested ones
@@ -60,6 +58,11 @@ public:
 	}
 
 	bool isReady() const noexcept { return handle_.done(); }
+
+	auto& getResult() const noexcept
+	{
+		return handle_.promise().result_;
+	}
 
 	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback; }
 
@@ -77,22 +80,30 @@ public:
 
 	auto await_resume()
 	{
-		return handle_.promise().result_;
+		return getResult();
 	}
 
 public:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
 };
+
 template <class T>
-using Type = bzd::Optional<typename bzd::typeTraits::RemoveReference<T>::ResultType>;
+using AsyncOptionalResultType = bzd::Optional<typename bzd::typeTraits::RemoveReference<T>::ResultType>;
+
+} // namespace bzd::impl
+
+namespace bzd {
+
+class Async : public impl::Async<>
+{
+public:
+	using impl::Async<>::Async;
+};
 
 template <class... Asyncs>
-static Async waitAll(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> waitAll(Asyncs&&... asyncs)
 {
-	using ResultType = bzd::Tuple<Type<Asyncs>...>;
-
-	ResultType ret{};
-	(void)ret;
+	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
 	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
@@ -100,10 +111,12 @@ static Async waitAll(Asyncs&&... asyncs)
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
 	{
-		co_await bzd::impl::SuspendAlways<Async::ResultType>{};
+		co_await bzd::impl::SuspendAlways<ResultType>{};
 	}
 
-	co_return 42;
+	// Build the result and return it.
+	ResultType result{(asyncs.getResult(), ...)};
+	co_return result;
 }
 
 static Async waitAny(Async& a, Async& b)
