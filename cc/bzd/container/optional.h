@@ -142,6 +142,15 @@ public:
 		storage_.isValue_ = true;
 	}
 
+	constexpr void reset() noexcept
+	{
+		if (storage_.isValue_)
+		{
+			storage_.value_.~ValueContainer();
+		}
+		storage_.isValue_ = false;
+	}
+
 private:
 	StorageType storage_;
 };

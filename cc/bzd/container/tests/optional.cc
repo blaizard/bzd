@@ -15,7 +15,11 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_EQ(*v, 13);
 
 	v.emplace(45);
+	EXPECT_TRUE(v);
 	EXPECT_EQ(*v, 45);
+
+	v.reset();
+	EXPECT_FALSE(v);
 }
 
 TEST(ContainerOptional, simpleNoData)
@@ -45,7 +49,7 @@ TEST(ContainerOptional, complexData)
 	{
 		int a;
 	};
-	bzd::Optional<Value> v{Value{45}};
+	bzd::Optional<Value> v{45};
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.valueOr({12}).a, 45);
@@ -54,6 +58,9 @@ TEST(ContainerOptional, complexData)
 	v.emplace(Value{23});
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v->a, 23);
+
+	v.reset();
+	EXPECT_FALSE(v);
 }
 
 TEST(ContainerOptional, reference)
