@@ -10,19 +10,19 @@
 	import Colors from "bzd-style/css/colors.scss";
 
 	export default {
-		data: function () {
+		data: function() {
 			return {};
 		},
 		computed: {
 			colors() {
 				return Colors;
-			},
+			}
 		},
 		methods: {
 			setStyle(color) {
 				return "background-color: " + color + ";";
-			},
-		},
+			}
+		}
 	};
 </script>
 

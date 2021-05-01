@@ -17,11 +17,11 @@
 <script>
 	export default {
 		props: {
-			metadata: { type: Object, mandatory: true },
+			metadata: { type: Object, mandatory: true }
 		},
-		data: function () {
+		data: function() {
 			return {
-				titleScroll: 0,
+				titleScroll: 0
 			};
 		},
 		computed: {
@@ -41,9 +41,9 @@
 				return {
 					"--title-scroll-start": this.titleScroll ? "10px" : 0,
 					"--title-scroll-end": this.titleScroll ? this.titleScroll - 10 + "px" : 0,
-					"--title-scroll-speed": -(this.titleScroll - 20) / 20 + "s",
+					"--title-scroll-speed": -(this.titleScroll - 20) / 20 + "s"
 				};
-			},
+			}
 		},
 		watch: {
 			title: {
@@ -53,20 +53,20 @@
 					const container = this.$refs.container.getBoundingClientRect();
 					const rect = this.$refs.title.getBoundingClientRect();
 					this.titleScroll = -Math.max(0, rect.width - container.width);
-				},
+				}
 			},
 			name: {
 				immediate: true,
 				async handler() {
 					this.$emit("name", this.name);
-				},
+				}
 			},
 			image: {
 				immediate: true,
 				async handler() {
 					this.$emit("image", this.image);
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			onStateClick() {
@@ -88,8 +88,8 @@
 			},
 			handleLeave() {
 				this.$emit("clickable", false);
-			},
-		},
+			}
+		}
 	};
 </script>
 

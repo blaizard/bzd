@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
     name = "coroutines",
@@ -30,13 +30,13 @@ cc_binary(
 cc_library(
     name = "async",
     srcs = [
+        "async.h",
         "coroutine.h",
         "promise.h",
-        "async.h",
         "scheduler.h",
     ],
     hdrs = [
-        "async.h"
+        "async.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -49,8 +49,14 @@ cc_binary(
     srcs = [
         "coroutines2.cc",
     ],
+    copts = [
+        "-Wno-unused-value",
+    ],
+    linkopts = [
+        "-pthread",
+    ],
     tags = [
-        "cc"
+        "cc",
     ],
     target_compatible_with = select({
         "@linux_x86_64_gcc//:target": [
@@ -59,17 +65,11 @@ cc_binary(
         "@linux_x86_64_clang//:target": [
             "@linux_x86_64_clang//:compiler",
         ],
-        "//conditions:default": ["@linux_x86_64_clang//:compiler",]
+        "//conditions:default": ["@linux_x86_64_clang//:compiler"],
     }),
-    copts = [
-        "-Wno-unused-value",
-    ],
-    linkopts = [
-        "-pthread",
-    ],
     deps = [
+        ":async",
         "//cc/bzd",
-        ":async"
     ],
 )
 

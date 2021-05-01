@@ -1,21 +1,19 @@
-#include "example/coroutines/async.h"
 #include "bzd/container/string.h"
 #include "bzd/utility/format/integral.h"
-
 #include "cc_test/test.h"
+#include "example/coroutines/async.h"
 
 #include <iostream>
 
-namespace
-{
+namespace {
 constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkpoint)
 {
-  trace += '[';
-  trace += id;
-  bzd::format::appendToString(trace, checkpoint);
-  trace += ']';
+	trace += '[';
+	trace += id;
+	bzd::format::appendToString(trace, checkpoint);
+	trace += ']';
 }
-}
+} // namespace
 
 bzd::Async nop(bzd::interface::String& trace, bzd::StringView id)
 {
@@ -50,7 +48,7 @@ TEST(Coroutine, Nested)
 bzd::Async deepNested(bzd::interface::String& trace, bzd::StringView id)
 {
 	int result = 0;
-	for (int i = 0; i<3; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		result += i;
 		appendToTrace(trace, id, 3);

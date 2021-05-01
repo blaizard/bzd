@@ -1,12 +1,11 @@
 #pragma once
 
-#include "example/coroutines/promise.h"
 #include "bzd/container/impl/non_owning_list.h"
-#include "bzd/utility/singleton.h"
 #include "bzd/utility/ignore.h"
+#include "bzd/utility/singleton.h"
+#include "example/coroutines/promise.h"
 
-namespace bzd
-{
+namespace bzd {
 class Scheduler : public bzd::Singleton<Scheduler>
 {
 public:
@@ -33,4 +32,4 @@ public:
 private:
 	bzd::NonOwningList<bzd::coroutine::interface::Promise> queue_{};
 };
-}
+} // namespace bzd

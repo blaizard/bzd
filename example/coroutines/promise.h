@@ -1,28 +1,25 @@
 #pragma once
 
-#include "example/coroutines/coroutine.h"
 #include "cc/bzd/container/impl/non_owning_list.h"
 #include "cc/bzd/container/optional.h"
-#include "cc/bzd/container/result.h"
+#include "example/coroutines/coroutine.h"
 
 #include <functional>
 
-namespace bzd::coroutine::interface
-{
+namespace bzd::coroutine::interface {
 class Promise : public bzd::NonOwningListElement<true>
 {
-public:	
+public:
 	constexpr Promise() = default;
 };
-}
+} // namespace bzd::coroutine::interface
 
-namespace bzd::coroutine
-{
+namespace bzd::coroutine {
 
-template <class V, class E>
+template <class T>
 class Promise : public bzd::coroutine::interface::Promise
 {
-public:	
+public:
 	constexpr Promise() = default;
 
 	auto get_return_object() { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
@@ -52,10 +49,7 @@ public:
 		return {};
 	}
 
-	void return_value(bzd::Result<V, E>&& result)
-	{
-		result_ = bzd::move(result);
-	}
+	void return_value(T&& result) { result_ = bzd::move(result); }
 
 	void unhandled_exception() {}
 
@@ -65,7 +59,7 @@ public:
 	std::function<void(void)> callback_ = []() {};
 
 private:
-	bzd::Optional<bzd::Result<V, E>> result_{};
+	bzd::Optional<T> result_{};
 };
 
-}
+} // namespace bzd::coroutine

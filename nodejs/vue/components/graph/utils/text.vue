@@ -13,11 +13,11 @@
 		props: {
 			x: { type: String | Number, required: true },
 			y: { type: String | Number, required: true },
-			hAlign: { type: String, required: false, default: "left" },
+			hAlign: { type: String, required: false, default: "left" }
 		},
-		data: function () {
+		data: function() {
 			return {
-				dy: 0,
+				dy: 0
 			};
 		},
 		computed: {
@@ -30,7 +30,7 @@
 				case "right":
 					return "end";
 				}
-			},
+			}
 		},
 		watch: {
 			y: {
@@ -38,8 +38,8 @@
 				async handler(y) {
 					await this.$nextTick();
 					this.dy += parseFloat(y) - this.$refs.text.getBBox().y;
-				},
-			},
-		},
+				}
+			}
+		}
 	};
 </script>

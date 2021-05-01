@@ -1,12 +1,12 @@
-#include "example/coroutines/async.h"
 #include "cc/bzd/utility/ignore.h"
+#include "example/coroutines/async.h"
 
 #include <atomic>
 #include <chrono>
 #include <deque>
+#include <functional>
 #include <iostream>
 #include <thread>
-#include <functional>
 
 using namespace std::chrono_literals;
 
@@ -61,7 +61,7 @@ bzd::Async count(int id, int n)
 
 		auto coro_nop = nop();
 
-		if (n-i > 5)
+		if (n - i > 5)
 		{
 			auto coro_count1 = count(id * 10 + 1, n - 3);
 			auto coro_count2 = count(id * 10, n - 1);
