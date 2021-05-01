@@ -10,6 +10,7 @@
 #include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
+#include "bzd/type_traits/enable_if.h"
 
 namespace bzd::impl {
 
@@ -112,23 +113,19 @@ private:
 public:
 	constexpr Result(const ResultNull&) : storage_{nullptr} {}
 
-	template <class U>
-	constexpr Result(U&& value) : storage_{bzd::forward<U>(value)}
-	{
-	}
+	// Ensure perfect forwarding is on
+	template <class U, class V = bzd::typeTraits::EnableIf<bzd::typeTraits::isSame<U, NonVoidValue>>>
+	constexpr Result(U&& value) : storage_{bzd::forward<U>(value)} {}
 
 	template <class U>
-	constexpr Result(impl::Error<U>&& u) : storage_{bzd::move(u.error_), false}
-	{
-	}
+	constexpr Result(impl::Error<U>&& u) : storage_{bzd::move(u.error_), false} {}
 
-	constexpr Result(const impl::Result<T, E>& result) = delete;
+	// Copy constructore/assignment not allowed.
+	constexpr Result(const impl::Result<T, E>&) = delete;
+	constexpr void operator=(const impl::Result<T, E>&) = delete;
 
-	// Move constructor, forward it to storage.
-	template <class U, class V>
-	constexpr Result(impl::Result<U, V>&& result) : storage_{bzd::move(result.storage_)}
-	{
-	}
+	// Move constructor
+	constexpr Result(impl::Result<T, E>&& result) : storage_{bzd::move(result.storage_)} {}
 
 	// Move assignment
 	constexpr void operator=(impl::Result<T, E>&& result) { storage_ = bzd::move(result.storage_); }

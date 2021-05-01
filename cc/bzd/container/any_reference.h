@@ -51,7 +51,7 @@ public:
 	{
 		if (bzd::impl::getTypeId<T>() == typeId_)
 		{
-			return *static_cast<T*>(object_);
+			return *static_cast<const T*>(object_);
 		}
 		return makeError();
 	}
