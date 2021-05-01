@@ -72,8 +72,10 @@ TEST(Coroutine, waitAll)
 	auto promiseA = nested(trace, "a");
 	auto promiseB = nested(trace, "b");
 	auto promise = bzd::waitAll(promiseA, promiseB);
-	bzd::ignore = promise.sync();
+	const auto result = promise.sync();
 	EXPECT_EQ(trace, "[a1][b1][a0][a2][b0][b2]");
+	EXPECT_EQ(result.size(), 2);
+	EXPECT_TRUE(result.get<0>());
 }
 
 TEST(Coroutine, waitAllDifferent)
