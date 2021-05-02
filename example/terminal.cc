@@ -38,7 +38,7 @@ public:
 			const auto& data = arg.cast<const bzd::Span<bzd::ByteType>>();
 			bzd::assert::isTrue(data.size(), "Empty buffer supplied.");
 			const auto size = ::read(STDIN_FILENO, data.data(), data.size());
-			return size;
+			return static_cast<unsigned long>(size);
 		}
 		return bzd::nullopt;
 	}
