@@ -59,9 +59,9 @@ public:
 
 	bool isReady() const noexcept { return handle_.done(); }
 
-	auto& getResult() const noexcept
+	ResultType& getResult() noexcept
 	{
-		return handle_.promise().result_;
+		return *(handle_.promise().result_);
 	}
 
 	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback; }
@@ -78,7 +78,7 @@ public:
 		return Scheduler::getInstance().pop();
 	}
 
-	auto await_resume()
+	ResultType await_resume()
 	{
 		return getResult();
 	}
@@ -88,7 +88,7 @@ public:
 };
 
 template <class T>
-using AsyncOptionalResultType = bzd::Optional<typename bzd::typeTraits::RemoveReference<T>::ResultType>;
+using AsyncOptionalResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
 
 } // namespace bzd::impl
 
@@ -115,10 +115,10 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> waitAll(Asyncs
 	}
 
 	// Build the result and return it.
-	ResultType result{(asyncs.getResult(), ...)};
+	ResultType result{asyncs.getResult()...};
 	co_return result;
 }
-
+/*
 static Async waitAny(Async& a, Async& b)
 {
 	a.set_callback([&b]() { b.cancel(); });
@@ -134,4 +134,5 @@ static Async waitAny(Async& a, Async& b)
 
 	co_return 42;
 }
+*/
 } // namespace bzd
