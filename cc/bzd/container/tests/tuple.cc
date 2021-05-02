@@ -1,6 +1,6 @@
 #include "bzd/container/tuple.h"
-#include "bzd/utility/move.h"
 
+#include "bzd/utility/move.h"
 #include "cc_test/test.h"
 
 TEST(ContainerTuple, Base)

@@ -5,12 +5,13 @@
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
+#include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_reference.h"
 #include "bzd/type_traits/is_same.h"
+#include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
-#include "bzd/type_traits/enable_if.h"
 
 namespace bzd::impl {
 
@@ -113,12 +114,14 @@ private:
 public:
 	constexpr Result(const ResultNull&) noexcept : storage_{nullptr} {}
 
-	// Ensure perfect forwarding is on
-	template <class U, class V = bzd::typeTraits::EnableIf<bzd::typeTraits::isSame<U, NonVoidValue>>>
-	constexpr Result(U&& value) noexcept : storage_{bzd::forward<U>(value)} {}
+	constexpr Result(const NonVoidValue& value) noexcept : storage_{value}
+	{
+	}
 
 	template <class U>
-	constexpr Result(impl::Error<U>&& u) noexcept : storage_{bzd::move(u.error_), false} {}
+	constexpr Result(impl::Error<U>&& u) noexcept : storage_{bzd::move(u.error_), false}
+	{
+	}
 
 	// Copy constructore/assignment.
 	constexpr Result(const impl::Result<T, E>& result) noexcept : storage_{result.storage_} {}

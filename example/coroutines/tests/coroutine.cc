@@ -121,10 +121,10 @@ TEST(Coroutine, waitAllNested)
 	auto promiseA = waitAllNested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
 	auto promise = bzd::waitAll(promiseA, promiseB);
-	 promise.sync();
+	promise.sync();
 	EXPECT_EQ(trace, "[a5][b3][b1][y1][z1][b0][b2][b4][b3][y0][y2][z0][z2][a6][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
 }
-/*
+
 TEST(Coroutine, waitAny)
 {
 	bzd::String<128> trace;
@@ -134,4 +134,3 @@ TEST(Coroutine, waitAny)
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a1][b1][a0][a2]");
 }
-*/

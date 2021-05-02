@@ -5,6 +5,10 @@ bzd_cc_test(
     srcs = [
         "coroutine.cc",
     ],
+    copts = [
+        # With gcc there seems to be a flase positive on co_return, to be checked.
+        "-Wno-unused-value",
+    ],
     target_compatible_with = select({
         "@linux_x86_64_gcc//:target": [
             "@linux_x86_64_gcc//:compiler",
@@ -19,8 +23,4 @@ bzd_cc_test(
         "//example/coroutines:async",
         "//tools/cc_test",
     ],
-    copts = [
-        # With gcc there seems to be a flase positive on co_return, to be checked.
-        "-Wno-unused-value",
-    ]
 )

@@ -59,10 +59,7 @@ public:
 
 	bool isReady() const noexcept { return handle_.done(); }
 
-	ResultType& getResult() noexcept
-	{
-		return *(handle_.promise().result_);
-	}
+	ResultType& getResult() noexcept { return *(handle_.promise().result_); }
 
 	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback; }
 
@@ -78,10 +75,7 @@ public:
 		return Scheduler::getInstance().pop();
 	}
 
-	ResultType await_resume()
-	{
-		return getResult();
-	}
+	ResultType await_resume() { return getResult(); }
 
 public:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
@@ -118,7 +112,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> waitAll(Asyncs
 	ResultType result{asyncs.getResult()...};
 	co_return result;
 }
-/*
+
 static Async waitAny(Async& a, Async& b)
 {
 	a.set_callback([&b]() { b.cancel(); });
@@ -134,5 +128,5 @@ static Async waitAny(Async& a, Async& b)
 
 	co_return 42;
 }
-*/
+
 } // namespace bzd
