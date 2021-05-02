@@ -67,7 +67,12 @@ TEST(ContainerResult, constructor)
 	EXPECT_TRUE(resultValue);
 	EXPECT_EQ(*resultValue, 12);
 
-	// Only move constructors are possible
+	// Copy constructors
+	bzd::Result<int, const char*> resultValueCopied{resultValue};
+	EXPECT_TRUE(resultValueCopied);
+	EXPECT_EQ(*resultValueCopied, 12);
+
+	// Move constructors
 	bzd::Result<int, const char*> resultValueMoved{bzd::move(resultValue)};
 	EXPECT_TRUE(resultValueMoved);
 	EXPECT_EQ(*resultValueMoved, 12);
@@ -77,7 +82,7 @@ TEST(ContainerResult, constructor)
 	EXPECT_FALSE(resultError);
 	EXPECT_STREQ(resultError.error(), "ha");
 
-	// Only move constructors are possible
+	// Move constructors
 	bzd::Result<int, const char*> resultErrorMoved{bzd::move(resultError)};
 	EXPECT_FALSE(resultErrorMoved);
 	EXPECT_STREQ(resultErrorMoved.error(), "ha");

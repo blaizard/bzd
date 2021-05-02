@@ -5,6 +5,7 @@
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_same.h"
 #include "bzd/utility/forward.h"
+#include "bzd/utility/move.h"
 
 namespace bzd::impl {
 template <class T>
@@ -80,6 +81,9 @@ public:
 	constexpr T& get() noexcept { return elem_; }
 	constexpr const T& get() const noexcept { return elem_; }
 
+	constexpr void set(const T& value) noexcept { elem_ = value; }
+	constexpr void set(T&& value) noexcept { elem_ = bzd::move(value); }
+
 private:
 	T elem_; //{};
 };
@@ -93,29 +97,46 @@ template <SizeType... N, class... T>
 class TupleImpl<TupleSizes<N...>, T...> : TupleElem<N, T>...
 {
 private:
+	using Self = TupleImpl<TupleSizes<N...>, T...>;
 	template <SizeType M>
-	using pick = bzd::meta::ChooseNth<M, T...>;
+	using Pick = bzd::meta::ChooseNth<M, T...>;
 	template <SizeType M>
-	using elem = TupleElem<M, pick<M>>;
+	using Elem = TupleElem<M, Pick<M>>;
 
 public:
+	constexpr TupleImpl() noexcept = default;
+
 	template <class... Args>
 	constexpr TupleImpl(Args&&... args) noexcept : TupleElem<N, T>{TupleChooseN<N, Args...>(bzd::forward<Args>(args)...)}...
 	{
 	}
 
+	// Copy constructor/assignment.
+	constexpr TupleImpl(const Self& tuple) noexcept : TupleElem<N, T>{tuple.get<N>()}... {}
+	constexpr void operator=(const Self& tuple) noexcept
+	{
+		(Elem<N>::set(tuple.get<N>()), ...);
+	}
+
+	// Move constructor/assignment.
+	constexpr TupleImpl(Self&& tuple) noexcept : TupleElem<N, T>{bzd::move(tuple.get<N>())}... {}
+	constexpr void operator=(Self&& tuple) noexcept
+	{
+		(Elem<N>::set(bzd::move(tuple.get<N>())), ...);
+	}
+
 	// Access by index as template (type is automatically deducted)
 
 	template <SizeType M>
-	constexpr pick<M>& get() noexcept
+	constexpr Pick<M>& get() noexcept
 	{
-		return elem<M>::get();
+		return Elem<M>::get();
 	}
 
 	template <SizeType M>
-	constexpr const pick<M>& get() const noexcept
+	constexpr const Pick<M>& get() const noexcept
 	{
-		return elem<M>::get();
+		return Elem<M>::get();
 	}
 };
 } // namespace bzd::impl
@@ -125,12 +146,7 @@ template <class... T>
 class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 {
 public:
-	// Forward constructor as constexpr
-
-	template <class... Args>
-	constexpr Tuple(Args&&... args) noexcept : impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>(bzd::forward<Args>(args)...)
-	{
-	}
+	using impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>::TupleImpl;
 
 	static constexpr SizeType size() noexcept { return sizeof...(T); }
 };

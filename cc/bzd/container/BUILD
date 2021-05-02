@@ -270,6 +270,7 @@ cc_library(
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:move",
     ],
 )
 
