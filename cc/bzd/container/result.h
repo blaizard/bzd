@@ -5,10 +5,10 @@
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
 #include "bzd/type_traits/decay.h"
+#include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_reference.h"
 #include "bzd/type_traits/is_same.h"
-#include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
@@ -114,9 +114,7 @@ private:
 public:
 	constexpr Result(const ResultNull&) noexcept : storage_{nullptr} {}
 
-	constexpr Result(const NonVoidValue& value) noexcept : storage_{value}
-	{
-	}
+	constexpr Result(const NonVoidValue& value) noexcept : storage_{value} {}
 
 	template <class U>
 	constexpr Result(impl::Error<U>&& u) noexcept : storage_{bzd::move(u.error_), false}
