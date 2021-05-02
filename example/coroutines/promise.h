@@ -49,7 +49,11 @@ public:
 		return {};
 	}
 
-	void return_value(T&& result) { result_ = bzd::move(result); }
+	template <class U>
+	void return_value(U&& result) noexcept
+	{
+		result_.emplace(bzd::forward<U>(result));
+	}
 
 	void unhandled_exception() {}
 
