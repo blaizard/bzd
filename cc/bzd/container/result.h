@@ -111,24 +111,22 @@ private:
 													 ResultNonTrivialStorage<NonVoidValue, Error>>;
 
 public:
-	constexpr Result(const ResultNull&) : storage_{nullptr} {}
+	constexpr Result(const ResultNull&) noexcept : storage_{nullptr} {}
 
 	// Ensure perfect forwarding is on
 	template <class U, class V = bzd::typeTraits::EnableIf<bzd::typeTraits::isSame<U, NonVoidValue>>>
-	constexpr Result(U&& value) : storage_{bzd::forward<U>(value)} {}
+	constexpr Result(U&& value) noexcept : storage_{bzd::forward<U>(value)} {}
 
 	template <class U>
-	constexpr Result(impl::Error<U>&& u) : storage_{bzd::move(u.error_), false} {}
+	constexpr Result(impl::Error<U>&& u) noexcept : storage_{bzd::move(u.error_), false} {}
 
-	// Copy constructore/assignment not allowed.
-	constexpr Result(const impl::Result<T, E>&) = delete;
-	constexpr void operator=(const impl::Result<T, E>&) = delete;
+	// Copy constructore/assignment.
+	constexpr Result(const impl::Result<T, E>& result) noexcept : storage_{result.storage_} {}
+	constexpr void operator=(const impl::Result<T, E>& result) noexcept { storage_ = result.storage_; }
 
-	// Move constructor
-	constexpr Result(impl::Result<T, E>&& result) : storage_{bzd::move(result.storage_)} {}
-
-	// Move assignment
-	constexpr void operator=(impl::Result<T, E>&& result) { storage_ = bzd::move(result.storage_); }
+	// Move constructor/assignment.
+	constexpr Result(impl::Result<T, E>&& result) noexcept : storage_{bzd::move(result.storage_)} {}
+	constexpr void operator=(impl::Result<T, E>&& result) noexcept { storage_ = bzd::move(result.storage_); }
 
 	constexpr operator bool() const noexcept { return !storage_.isError_; }
 

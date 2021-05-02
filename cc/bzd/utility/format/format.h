@@ -641,7 +641,7 @@ template <class ConstexprStringView, class... Args>
 constexpr void toString(bzd::OChannel& out, const ConstexprStringView& str, Args&&... args)
 {
 	// Compile-time format check
-	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple;
+	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
 	constexpr const auto context = bzd::format::impl::contextBuild(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
