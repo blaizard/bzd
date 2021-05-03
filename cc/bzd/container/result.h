@@ -129,6 +129,9 @@ public:
 	constexpr Result(impl::Result<T, E>&& result) noexcept : storage_{bzd::move(result.storage_)} {}
 	constexpr void operator=(impl::Result<T, E>&& result) noexcept { storage_ = bzd::move(result.storage_); }
 
+	constexpr bool isValue() const noexcept { return !storage_.isError_; }
+	constexpr bool isError() const noexcept { return storage_.isError_; }
+
 	constexpr operator bool() const noexcept { return !storage_.isError_; }
 
 	constexpr const E& error() const
@@ -137,29 +140,21 @@ public:
 		return storage_.error_;
 	}
 
-	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>& operator*() const
+	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>& value() const
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return storage_.value_;
 	}
 
-	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>& operator*()
+	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>& valueMutable()
 	{
 		bzd::assert::isTrue(!storage_.isError_);
 		return storage_.value_;
 	}
 
-	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>* operator->() const
-	{
-		bzd::assert::isTrue(!storage_.isError_);
-		return &storage_.value_;
-	}
+	constexpr const bzd::typeTraits::RemoveReference<NonVoidValue>* operator->() const { return &value(); }
 
-	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>* operator->()
-	{
-		bzd::assert::isTrue(!storage_.isError_);
-		return &storage_.value_;
-	}
+	constexpr bzd::typeTraits::RemoveReference<NonVoidValue>* operator->() { return &valueMutable(); }
 
 protected:
 	template <class A, class B>

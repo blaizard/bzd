@@ -23,9 +23,9 @@ TEST(ContainerVariant, ImplicitConstructor)
 TEST(ContainerVariant, CopyConstructor)
 {
 	bzd::Variant<int, bool, double> variant1{static_cast<double>(3.1415)};
-	EXPECT_NEAR(*variant1.get<double>(), 3.1415, 0.0001);
+	EXPECT_NEAR(variant1.get<double>().value(), 3.1415, 0.0001);
 	bzd::Variant<int, bool, double> variant2{variant1};
-	EXPECT_NEAR(*variant2.get<double>(), 3.1415, 0.0001);
+	EXPECT_NEAR(variant2.get<double>().value(), 3.1415, 0.0001);
 }
 
 TEST(ContainerVariant, Destructor)
@@ -99,9 +99,9 @@ TEST(ContainerVariant, Get)
 
 	auto retInt = variantInt.get<int>();
 	EXPECT_TRUE(retInt);
-	EXPECT_EQ(*retInt, -12);
-	*retInt = 42;
-	EXPECT_EQ(*(variantInt.get<int>()), 42);
+	EXPECT_EQ(retInt.value(), -12);
+	retInt.valueMutable() = 42;
+	EXPECT_EQ(variantInt.get<int>().value(), 42);
 }
 
 TEST(ContainerVariant, Match)
@@ -141,8 +141,8 @@ TEST(ContainerVariant, Constexpr)
 	EXPECT_TRUE(variantDouble.is<double>());
 
 	const auto ret = variantDouble.get<double>();
-	EXPECT_TRUE(ret);
-	EXPECT_NEAR(*ret, 5.4, 0.01);
+	EXPECT_TRUE(ret.isValue());
+	EXPECT_NEAR(ret.value(), 5.4, 0.01);
 
 	{
 		constexpr bzd::VariantConstexpr<int, bool, double> variant(static_cast<double>(5.6));

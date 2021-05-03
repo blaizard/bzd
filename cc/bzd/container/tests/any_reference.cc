@@ -10,8 +10,8 @@ TEST(ContainerAnyReference, simple)
 	{
 		auto result = ref.get<int>();
 		EXPECT_TRUE(result);
-		EXPECT_EQ(*result, 23);
-		*result = 12;
+		EXPECT_EQ(result.value(), 23);
+		result.valueMutable() = 12;
 		EXPECT_EQ(a, 12);
 	}
 	{
@@ -36,7 +36,7 @@ TEST(ContainerAnyReference, constObject)
 	{
 		auto result = ref.get<const int>();
 		EXPECT_TRUE(result);
-		EXPECT_EQ(*result, 23);
+		EXPECT_EQ(result.value(), 23);
 	}
 	{
 		auto result = ref.get<int>();
@@ -52,7 +52,7 @@ TEST(ContainerAnyReference, constAny)
 	{
 		auto result = ref.get<int>();
 		EXPECT_TRUE(result);
-		EXPECT_EQ(*result, 23);
+		EXPECT_EQ(result.value(), 23);
 	}
 	{
 		auto result = ref.get<const int>();

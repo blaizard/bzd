@@ -48,7 +48,7 @@ public:
 		auto maybeTask = getNextTask();
 		if (maybeTask)
 		{
-			resumeTask(*maybeTask);
+			resumeTask(maybeTask.valueMutable());
 		}
 	}
 
@@ -82,7 +82,7 @@ public:
 			auto maybeTask = getNextTask();
 			if (maybeTask)
 			{
-				return resumeTask(*maybeTask);
+				return resumeTask(maybeTask.valueMutable());
 			}
 
 			// If no next task, loop until there are still pending tasks
@@ -130,7 +130,7 @@ private:
 		{
 			return bzd::nullopt;
 		}
-		tasks_.pop(*result);
+		tasks_.pop(result.valueMutable());
 		return result;
 	}
 

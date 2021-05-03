@@ -8,15 +8,15 @@ TEST(ContainerOptional, simpleData)
 	bzd::Optional<int> v(42);
 
 	EXPECT_TRUE(v);
-	EXPECT_EQ(*v, 42);
+	EXPECT_EQ(v.value(), 42);
 	EXPECT_EQ(v.valueOr(10), 42);
 
-	*v = 13;
-	EXPECT_EQ(*v, 13);
+	v.valueMutable() = 13;
+	EXPECT_EQ(v.value(), 13);
 
 	v.emplace(45);
 	EXPECT_TRUE(v);
-	EXPECT_EQ(*v, 45);
+	EXPECT_EQ(v.value(), 45);
 
 	v.reset();
 	EXPECT_FALSE(v);
@@ -69,16 +69,16 @@ TEST(ContainerOptional, reference)
 	bzd::Optional<int&> v(a);
 
 	EXPECT_TRUE(v);
-	EXPECT_EQ(*v, 42);
+	EXPECT_EQ(v.value(), 42);
 	a = -85;
-	EXPECT_EQ(*v, -85);
+	EXPECT_EQ(v.value(), -85);
 
 	int b = 12;
 	v.emplace(b);
 	EXPECT_TRUE(v);
-	EXPECT_EQ(*v, 12);
+	EXPECT_EQ(v.value(), 12);
 	b = -25;
-	EXPECT_EQ(*v, -25);
+	EXPECT_EQ(v.value(), -25);
 }
 
 TEST(ContainerOptional, pointer)
@@ -87,9 +87,9 @@ TEST(ContainerOptional, pointer)
 	bzd::Optional<int*> v(&a);
 
 	EXPECT_TRUE(v);
-	EXPECT_EQ(*(*v), 42);
+	EXPECT_EQ(*(v.value()), 42);
 	a = -85;
-	EXPECT_EQ(*(*v), -85);
+	EXPECT_EQ(*(v.value()), -85);
 }
 
 TEST(ContainerOptional, result)
@@ -98,23 +98,23 @@ TEST(ContainerOptional, result)
 		bzd::Optional<bzd::Result<int, bool>> v({45});
 
 		EXPECT_TRUE(v);
-		EXPECT_EQ(*v.valueOr({12}), 45);
+		EXPECT_EQ(v.valueOr({12}).value(), 45);
 	}
 
 	{
 		bzd::Optional<bzd::Result<int, bool>> v{};
 
 		EXPECT_FALSE(v);
-		EXPECT_EQ(*v.valueOr({12}), 12);
+		EXPECT_EQ(v.valueOr({12}).value(), 12);
 
 		v.emplace(43);
 		EXPECT_TRUE(v);
-		EXPECT_TRUE(*v);
-		EXPECT_EQ(*v.valueOr({12}), 43);
+		EXPECT_TRUE(v.value());
+		EXPECT_EQ(v.valueOr({12}).value(), 43);
 
 		v.emplace(bzd::makeError(false));
 		EXPECT_TRUE(v);
-		EXPECT_FALSE(*v);
-		EXPECT_FALSE((*v).error());
+		EXPECT_FALSE(v.value());
+		EXPECT_FALSE((v.value()).error());
 	}
 }

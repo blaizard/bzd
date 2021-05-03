@@ -100,7 +100,7 @@ public:
 		{
 			auto result = interface::Registry<Interface>::get();
 			bzd::assert::isTrue(result);
-			(*result).insert(str, static_cast<Interface*>(&object_));
+			result.valueMutable().insert(str, static_cast<Interface*>(&object_));
 		}
 
 	private:
@@ -114,7 +114,7 @@ public:
 	{
 		auto result = interface::Registry<Interface>::get();
 		bzd::assert::isTrue(result);
-		return *(*result)[key];
+		return *(result.valueMutable())[key];
 	}
 
 	/**
@@ -135,13 +135,13 @@ public:
 	static Interface& getOrCreate(const KeyType& key)
 	{
 		auto result = interface::Registry<Interface>::get();
-		if (!result || !(*result).contains(key))
+		if (!result || !result.value().contains(key))
 		{
 			static T defaultObject{};
 			return static_cast<Interface&>(defaultObject);
 		}
 
-		return *(*result)[key];
+		return *(result.valueMutable())[key];
 	}
 };
 } // namespace bzd

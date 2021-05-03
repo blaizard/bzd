@@ -98,7 +98,7 @@ protected:
 		template <class T>
 		constexpr void operator()(T& value)
 		{
-			value = *variant_.get<T>();
+			value = variant_.get<T>().value();
 		}
 
 	private:

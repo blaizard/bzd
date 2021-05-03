@@ -59,7 +59,7 @@ public:
 
 	bool isReady() const noexcept { return handle_.done(); }
 
-	ResultType& getResult() noexcept { return *(handle_.promise().result_); }
+	ResultType& getResult() noexcept { return handle_.promise().result_.valueMutable(); }
 
 	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback; }
 
@@ -121,6 +121,7 @@ static Async waitAny(Async& a, Async& b)
 
 	bzd::Scheduler::getInstance().push(a.handle_);
 	bzd::Scheduler::getInstance().push(b.handle_);
+
 	while (!a.isReady() && !b.isReady())
 	{
 		co_await bzd::impl::SuspendAlways<Async::ResultType>{};
