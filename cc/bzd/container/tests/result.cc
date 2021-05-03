@@ -41,9 +41,9 @@ TEST(ContainerResult, returnReference)
 		return data;
 	};
 	const auto ret = fct(false); // makeError
-	EXPECT_EQ(*ret, 42);
+	EXPECT_EQ(ret.value(), 42);
 	data = 37;
-	EXPECT_EQ(*ret, 37);
+	EXPECT_EQ(ret.value(), 37);
 }
 
 TEST(ContainerResult, returnPointer)
@@ -55,9 +55,9 @@ TEST(ContainerResult, returnPointer)
 		return &data;
 	};
 	const auto ret = fct(false); // makeError
-	EXPECT_EQ(*(*ret), 42);
+	EXPECT_EQ(*(ret.value()), 42);
 	data = 37;
-	EXPECT_EQ(*(*ret), 37);
+	EXPECT_EQ(*(ret.value()), 37);
 }
 
 TEST(ContainerResult, constructor)
@@ -65,17 +65,17 @@ TEST(ContainerResult, constructor)
 	// value copied
 	bzd::Result<int, const char*> resultValue{12};
 	EXPECT_TRUE(resultValue);
-	EXPECT_EQ(*resultValue, 12);
+	EXPECT_EQ(resultValue.value(), 12);
 
 	// Copy constructors
 	bzd::Result<int, const char*> resultValueCopied{resultValue};
 	EXPECT_TRUE(resultValueCopied);
-	EXPECT_EQ(*resultValueCopied, 12);
+	EXPECT_EQ(resultValueCopied.value(), 12);
 
 	// Move constructors
 	bzd::Result<int, const char*> resultValueMoved{bzd::move(resultValue)};
 	EXPECT_TRUE(resultValueMoved);
-	EXPECT_EQ(*resultValueMoved, 12);
+	EXPECT_EQ(resultValueMoved.value(), 12);
 
 	// error copied
 	bzd::Result<int, const char*> resultError{bzd::makeError("ha")};

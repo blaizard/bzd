@@ -15,26 +15,26 @@ constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, 
 }
 } // namespace
 
-bzd::Async nop(bzd::interface::String& trace, bzd::StringView id)
+bzd::Async nop(bzd::interface::String& trace, bzd::StringView id, int retVal)
 {
 	appendToTrace(trace, id, 0);
-	co_return 43;
+	co_return retVal;
 }
 
 TEST(Coroutine, Base)
 {
 	bzd::String<32> trace;
-	auto promise = nop(trace, "a");
+	auto promise = nop(trace, "a", 42);
 	auto result = promise.sync();
 	EXPECT_EQ(trace, "[a0]");
 	EXPECT_TRUE(result);
-	EXPECT_EQ(*result, 43);
+	EXPECT_EQ(result.value(), 42);
 }
 
-bzd::Async nested(bzd::interface::String& trace, bzd::StringView id)
+bzd::Async nested(bzd::interface::String& trace, bzd::StringView id, int retVal = 42)
 {
 	appendToTrace(trace, id, 1);
-	auto result = co_await nop(trace, id);
+	auto result = co_await nop(trace, id, retVal);
 	appendToTrace(trace, id, 2);
 	co_return result;
 }
@@ -71,15 +71,15 @@ TEST(Coroutine, DeepNested)
 TEST(Coroutine, waitAll)
 {
 	bzd::String<128> trace;
-	auto promiseA = nested(trace, "a");
-	auto promiseB = nested(trace, "b");
+	auto promiseA = nested(trace, "a", 10);
+	auto promiseB = nested(trace, "b", -4);
 	auto promise = bzd::waitAll(promiseA, promiseB);
 	auto result = promise.sync();
 	EXPECT_EQ(trace, "[a1][b1][a0][a2][b0][b2]");
 	EXPECT_EQ(result.size(), 2);
 	EXPECT_TRUE(result.get<0>());
-	EXPECT_EQ(*result.get<0>(), 43);
-	EXPECT_EQ(*result.get<1>(), 43);
+	EXPECT_EQ(result.get<0>().value(), 10);
+	EXPECT_EQ(result.get<1>().value(), -4);
 }
 
 TEST(Coroutine, waitAllDifferent)

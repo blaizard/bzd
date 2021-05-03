@@ -42,7 +42,7 @@ public:
 	{
 		auto result = find(key);
 		bzd::assert::isTrue(result, "Key does not exists");
-		return (*result)->second;
+		return result.valueMutable()->second;
 	}
 
 	constexpr bool contains(const K& key) const noexcept { return find(key); }
@@ -55,7 +55,7 @@ public:
 		auto result = find(key);
 		if (result)
 		{
-			insert(*result, bzd::forward<V>(value));
+			insert(result.value(), bzd::forward<V>(value));
 		}
 		else
 		{

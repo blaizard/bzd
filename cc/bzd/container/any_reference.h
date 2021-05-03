@@ -61,7 +61,7 @@ public:
 	{
 		auto result = get<T>();
 		bzd::assert::isTrue(result, "Invalid any cast");
-		return *result;
+		return result.valueMutable();
 	}
 
 	template <class T>
@@ -69,7 +69,7 @@ public:
 	{
 		const auto result = get<T>();
 		bzd::assert::isTrue(result, "Invalid any cast");
-		return *result;
+		return result.value();
 	}
 
 private:

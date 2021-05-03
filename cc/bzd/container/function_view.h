@@ -51,12 +51,12 @@ constexpr ReturnType operator()(Params&&... args) const
 {
 	if (storage_.template is<FunctionMember>())
 	{
-		auto& obj = *storage_.template get<FunctionMember>();
+		auto& obj = storage_.template get<FunctionMember>().valueMutable();
 		return obj.callable_(obj.obj_, bzd::forward<Params>(args)...);
 	}
 	else
 	{
-		auto function = *storage_.template get<RawFctPtrType>();
+		auto function = storage_.template get<RawFctPtrType>().valueMutable();
 		return function(bzd::forward<Params>(args)...);
 	}
 }

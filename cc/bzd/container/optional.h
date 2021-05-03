@@ -101,31 +101,26 @@ public: // Move
 public:
 	constexpr operator bool() const noexcept { return storage_.isValue_; }
 
-	constexpr const Value& valueOr(const Value& defaultValue) const { return (storage_.isValue_) ? storage_.value_ : defaultValue; }
+	constexpr const Value& valueOr(const Value& defaultValue) const noexcept
+	{
+		return (storage_.isValue_) ? storage_.value_ : defaultValue;
+	}
 
-	constexpr const Value& operator*() const
+	constexpr const Value& value() const
 	{
 		bzd::assert::isTrue(storage_.isValue_);
 		return storage_.value_;
 	}
 
-	constexpr Value& operator*()
+	constexpr Value& valueMutable()
 	{
 		bzd::assert::isTrue(storage_.isValue_);
 		return storage_.value_;
 	}
 
-	constexpr const Value* operator->() const
-	{
-		bzd::assert::isTrue(storage_.isValue_);
-		return &storage_.value_;
-	}
+	constexpr const Value* operator->() const { return &value(); }
 
-	constexpr Value* operator->()
-	{
-		bzd::assert::isTrue(storage_.isValue_);
-		return &storage_.value_;
-	}
+	constexpr Value* operator->() { return &valueMutable(); }
 
 	/**
 	 * Constructs the contained value in-place.

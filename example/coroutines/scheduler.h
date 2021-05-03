@@ -24,9 +24,9 @@ public:
 			// Call wait callback
 		}
 		auto promise = queue_.back();
-		bzd::ignore = queue_.pop(*promise);
+		bzd::ignore = queue_.pop(promise.valueMutable());
 
-		return bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(*promise);
+		return bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(promise.valueMutable());
 	}
 
 private:

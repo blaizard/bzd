@@ -15,7 +15,7 @@ TEST(ContainerMap, single)
 	{
 		const auto result = map.find(12);
 		EXPECT_TRUE(result);
-		EXPECT_EQ((*result)->second, 5);
+		EXPECT_EQ(result.value()->second, 5);
 		EXPECT_EQ(map[12], 5);
 	}
 }
