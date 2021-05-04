@@ -129,8 +129,9 @@ TEST(Coroutine, waitAny)
 {
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
-	auto promiseB = nested(trace, "b");
+	auto promiseB = deepNested(trace, "b");
 	auto promise = bzd::waitAny(promiseA, promiseB);
 	bzd::ignore = promise.sync();
-	EXPECT_EQ(trace, "[a1][b1][a0][a2]");
+	std::cout << trace.data() <<std::endl;
+	EXPECT_EQ(trace, "[a1][b3][a0][a2]");
 }

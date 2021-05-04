@@ -68,7 +68,7 @@ public:
 	constexpr ResultType&& getResult() noexcept
 	{
 		bzd::assert::isTrue(return_);
-		return bzd::move(*return_);
+		return bzd::move(return_.valueMutable());
 	}
 
 	bool poll() override final

@@ -28,7 +28,7 @@ public:
 		auto element = list_.back();
 		if (element)
 		{
-			auto& promise = *element;
+			auto& promise = element.valueMutable();
 			// std::cout << "Unlock " << &promise << ", size: " << list_.size() << std::endl;
 
 			promise.setActive(list_);
