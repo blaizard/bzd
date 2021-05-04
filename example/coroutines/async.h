@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bzd/container/optional.h"
 #include "bzd/container/result.h"
 #include "bzd/type_traits/remove_reference.h"
 #include "bzd/utility/ignore.h"
@@ -61,7 +62,7 @@ public:
 
 	ResultType& getResult() noexcept { return handle_.promise().result_.valueMutable(); }
 
-	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback; }
+	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback;}
 
 	bool await_ready() { return isReady(); }
 
@@ -82,7 +83,10 @@ public:
 };
 
 template <class T>
-using AsyncOptionalResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
+using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
+
+template <class T>
+using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 
 } // namespace bzd::impl
 
@@ -95,9 +99,9 @@ public:
 };
 
 template <class... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> waitAll(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... asyncs)
 {
-	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
+	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
 	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
@@ -113,16 +117,28 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> waitAll(Asyncs
 	co_return result;
 }
 
-static Async waitAny(Async& a, Async& b)
+template <class... Asyncs>
+static Async waitAny(Asyncs&&... asyncs)
 {
-	a.set_callback([&b]() { b.cancel(); });
+	//using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
-	b.set_callback([&a]() { a.cancel(); });
+/*	(asyncs.set_callback([&](void* addr){
+		for (auto& async : {asyncs...}) {
+			if (&async != addr) {
+				//const_cast<Async&>(async).cancel();
+			}
+		} 
+	}), ...);*/
 
-	bzd::Scheduler::getInstance().push(a.handle_);
-	bzd::Scheduler::getInstance().push(b.handle_);
+	Async* as[]{&asyncs...};
+	as[0]->set_callback([&as]() { as[1]->cancel(); });
+	as[1]->set_callback([&as]() { as[0]->cancel(); });
 
-	while (!a.isReady() && !b.isReady())
+	// Push all handles to the scheduler
+	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
+
+	// Loop until one async is ready
+	while (!(asyncs.isReady() || ...))
 	{
 		co_await bzd::impl::SuspendAlways<Async::ResultType>{};
 	}

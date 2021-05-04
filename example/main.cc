@@ -185,7 +185,7 @@ void exampleTerminal()
 			const auto result = await terminal.read(bytes);
 			bzd::assert::isTrue(result, "I/O error");
 
-			const auto out = bytes.subspan(0, *result);
+			const auto out = bytes.subspan(0, result.value());
 			await terminal.write(out);
 
 			if (data[0] == 'q')
