@@ -5,6 +5,12 @@
 #include "bzd/container/optional.h"
 #include "example/coroutines/coroutine.h"
 
+// Forward declaration
+namespace bzd::impl {
+	template <class T>
+	class Async;
+}
+
 namespace bzd::coroutine::interface {
 class Promise : public bzd::NonOwningListElement<true>
 {
@@ -18,18 +24,12 @@ namespace bzd::coroutine {
 template <class T>
 class Promise : public bzd::coroutine::interface::Promise
 {
-public:
-	constexpr Promise() = default;
-
-	auto get_return_object() { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
-
-	bzd::coroutine::impl::suspend_always initial_suspend() { return {}; }
-
+private:
 	struct FinalAwaiter
 	{
-		bool await_ready() noexcept { return false; }
+		constexpr bool await_ready() noexcept { return false; }
 
-		bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<Promise> handle) noexcept
+		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<Promise> handle) noexcept
 		{
 			auto& continuation = handle.promise().caller;
 			if (continuation)
@@ -39,10 +39,17 @@ public:
 			return bzd::coroutine::impl::noop_coroutine();
 		}
 
-		void await_resume() noexcept {}
+		constexpr void await_resume() noexcept {}
 	};
 
-	FinalAwaiter final_suspend()
+public:
+	constexpr Promise() = default;
+
+	constexpr auto get_return_object() { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
+
+	constexpr bzd::coroutine::impl::suspend_always initial_suspend() { return {}; }
+
+	constexpr FinalAwaiter final_suspend()
 	{
 		if (onTerminateCallback_)
 		{
@@ -52,18 +59,21 @@ public:
 	}
 
 	template <class U>
-	void return_value(U&& result) noexcept
+	constexpr void return_value(U&& result) noexcept
 	{
 		result_.emplace(bzd::forward<U>(result));
 	}
 
-	void unhandled_exception() {}
+	constexpr void unhandled_exception() noexcept {}
 
 	~Promise() = default;
 
+private:
+	template <class U>
+	friend class ::bzd::impl::Async;
+
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
 	bzd::Optional<bzd::FunctionView<void(interface::Promise&)>> onTerminateCallback_{};
-
 	bzd::Optional<T> result_{};
 };
 
