@@ -132,7 +132,7 @@ TEST(Coroutine, waitAny)
 	auto promiseB = deepNested(trace, "b");
 	auto promise = bzd::waitAny(promiseA, promiseB);
 	bzd::ignore = promise.sync();
-	std::cout << trace.data() <<std::endl;
+	std::cout << trace.data() << std::endl;
 	EXPECT_EQ(trace, "[a1][b3][a0][a2]");
 }
 

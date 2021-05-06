@@ -31,7 +31,7 @@ export default {
 			},
 			async stop(proxy) {
 				await proxy.stop();
-			}
-		}
-	}
+			},
+		},
+	},
 };

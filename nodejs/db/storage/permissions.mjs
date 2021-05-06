@@ -9,7 +9,7 @@ export default class Permissions {
 			read: permissionsStr.includes("r"),
 			write: permissionsStr.includes("w"),
 			delete: permissionsStr.includes("d"),
-			list: permissionsStr.includes("l")
+			list: permissionsStr.includes("l"),
 		});
 	}
 

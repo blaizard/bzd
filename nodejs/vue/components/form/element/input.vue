@@ -48,9 +48,9 @@
 	export default {
 		mixins: [Element],
 		props: {
-			value: { type: String | Array, required: false, default: "" }
+			value: { type: String | Array, required: false, default: "" },
 		},
-		data: function() {
+		data: function () {
 			return {
 				/**
 				 * If the displayed values should be interpreted as HTML or not
@@ -98,14 +98,14 @@
 				 */
 				multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
 				// ---- Internal ----
-				hasChanged: false
+				hasChanged: false,
 			};
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-input": true,
-					[this.getOption("class")]: true
+					[this.getOption("class")]: true,
 				};
 			},
 			valueList() {
@@ -122,7 +122,7 @@
 			},
 			format() {
 				return this.getOption("format", false);
-			}
+			},
 		},
 		methods: {
 			handleClick() {
@@ -285,8 +285,8 @@
 					this.hasChanged = false;
 				}
 				this.setInactive();
-			}
-		}
+			},
+		},
 	};
 </script>
 

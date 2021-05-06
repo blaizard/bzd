@@ -1,9 +1,9 @@
 #pragma once
 
 #include "bzd/container/array.h"
+#include "bzd/container/function_view.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
-#include "bzd/container/function_view.h"
 #include "bzd/type_traits/remove_reference.h"
 #include "bzd/utility/ignore.h"
 #include "example/coroutines/coroutine.h"
@@ -78,7 +78,10 @@ public:
 
 	ResultType await_resume() { return getResult(); }
 
-	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback) { handle_.promise().onTerminateCallback_ = callback;}
+	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback)
+	{
+		handle_.promise().onTerminateCallback_ = callback;
+	}
 
 	bool isSame(bzd::coroutine::interface::Promise& promise) const noexcept
 	{
@@ -127,7 +130,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... as
 template <class... Asyncs>
 static Async waitAny(Asyncs&&... asyncs)
 {
-	//using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
+	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
 	// Install callbacks on terminate, note the lifetime of the array and the callback
 	// is longer than the promises.

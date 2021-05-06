@@ -19,7 +19,7 @@ export default class StorageGoogleCloudStorage extends Base {
 
 		this.options = Object.assign(
 			{
-				prefix: null
+				prefix: null,
 			},
 			options
 		);
@@ -90,7 +90,7 @@ export default class StorageGoogleCloudStorage extends Base {
 			autoPaginate: false,
 			prefix: prefix,
 			maxResults: paging.max,
-			pageToken: paging.page || undefined
+			pageToken: paging.page || undefined,
 		});
 		let result = [];
 		for (const file of files) {
@@ -103,12 +103,12 @@ export default class StorageGoogleCloudStorage extends Base {
 							size: parseInt(file.metadata.size),
 							type: file.metadata.contentType,
 							modified: file.metadata.updated,
-							created: file.metadata.timeCreated
+							created: file.metadata.timeCreated,
 						},
 						{
 							read: true,
 							write: true,
-							delete: true
+							delete: true,
 						}
 					  )
 					: name

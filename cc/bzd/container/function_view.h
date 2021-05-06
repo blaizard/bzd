@@ -21,9 +21,12 @@ public:
 	template <class Object, class Member>
 	constexpr FunctionView(Object& obj, Member memberPtr) noexcept :
 		storage_{
-			FunctionMember{&obj, [memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);}}}
-	{
-	}
+			FunctionMember{&obj, [memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
+}
+} // namespace bzd::impl
+}
+{
+}
 
 /**
  * Constructor from function pointer.
@@ -43,9 +46,7 @@ constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &
 {
 }
 
-constexpr FunctionView(const FunctionView& function) noexcept : storage_{function.storage_}
-{
-}
+constexpr FunctionView(const FunctionView& function) noexcept : storage_{function.storage_} {}
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const

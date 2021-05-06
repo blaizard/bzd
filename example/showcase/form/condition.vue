@@ -3,11 +3,11 @@
 
 	export default {
 		mixins: [Template],
-		data: function() {
+		data: function () {
 			return {
 				value: {
-					condition: "function"
-				}
+					condition: "function",
+				},
 			};
 		},
 		computed: {
@@ -15,9 +15,9 @@
 				return [
 					{ type: "Dropdown", caption: "Condition", name: "condition", list: ["function", "validation"] },
 					{ type: "Input", caption: "Trigered by a function", condition: (value) => value.condition == "function" },
-					{ type: "Input", caption: "Trigered by a validation object", condition: { condition: "values(validation)" } }
+					{ type: "Input", caption: "Trigered by a validation object", condition: { condition: "values(validation)" } },
 				];
-			}
-		}
+			},
+		},
 	};
 </script>

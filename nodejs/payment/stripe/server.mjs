@@ -25,7 +25,7 @@ export default class StripePayment {
 				/**
 				 * Function to be called
 				 */
-				intentCallback: (/*amount, metadata*/) => {}
+				intentCallback: (/*amount, metadata*/) => {},
 			},
 			options
 		);
@@ -53,24 +53,24 @@ export default class StripePayment {
 				authentication: {
 					type: "basic",
 					username: this.options.privateKey,
-					password: ""
+					password: "",
 				},
 				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
+					"Content-Type": "application/x-www-form-urlencoded",
 				},
 				expect: "json",
-				data: "amount=" + amount + "&currency=" + this.options.currency + "&payment_method_types[]=card"
+				data: "amount=" + amount + "&currency=" + this.options.currency + "&payment_method_types[]=card",
 			});
 			return {
 				id: response.id,
-				secret: response.client_secret
+				secret: response.client_secret,
 			};
 		});
 
 		api.handle("get", "/payment/stripe/metadata", async () => {
 			return {
 				pubkey: this.options.publicKey,
-				currency: this.options.currency
+				currency: this.options.currency,
 			};
 		});
 
@@ -80,9 +80,9 @@ export default class StripePayment {
 				authentication: {
 					type: "basic",
 					username: this.options.privateKey,
-					password: ""
+					password: "",
 				},
-				expect: "json"
+				expect: "json",
 			});
 
 			Exception.assert(response.amount == response.amount_received, "Payment has not been received");

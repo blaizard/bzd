@@ -23,7 +23,7 @@ export default class StorageDisk extends Storage {
 				/**
 				 * If false, it will attempt to create a directory if it does not exists.
 				 */
-				mustExists: false
+				mustExists: false,
 			},
 			options
 		);
@@ -79,13 +79,13 @@ export default class StorageDisk extends Storage {
 							type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
 							size: stat.size,
 							created: stat.ctime,
-							modified: stat.mtime
+							modified: stat.mtime,
 						},
 						{
 							read: dirent.isDirectory() ? false : true,
 							write: dirent.isDirectory() ? false : true,
 							delete: dirent.isDirectory() ? false : true,
-							list: dirent.isDirectory() ? true : false
+							list: dirent.isDirectory() ? true : false,
 						}
 					);
 				});
