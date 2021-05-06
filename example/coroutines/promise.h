@@ -1,10 +1,9 @@
 #pragma once
 
-#include "cc/bzd/container/impl/non_owning_list.h"
-#include "cc/bzd/container/optional.h"
+#include "bzd/container/impl/non_owning_list.h"
+#include "bzd/container/optional.h"
+#include "bzd/container/function_view.h"
 #include "example/coroutines/coroutine.h"
-
-#include <functional>
 
 namespace bzd::coroutine::interface {
 class Promise : public bzd::NonOwningListElement<true>
@@ -45,7 +44,10 @@ public:
 
 	FinalAwaiter final_suspend()
 	{
-		callback_();
+		if (onTerminateCallback_)
+		{
+			(onTerminateCallback_.value())(*this);
+		}
 		return {};
 	}
 
@@ -60,7 +62,7 @@ public:
 	~Promise() = default;
 
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
-	std::function<void(void)> callback_ = []() {};
+	bzd::Optional<bzd::FunctionView<void(interface::Promise&)>> onTerminateCallback_{};
 
 	bzd::Optional<T> result_{};
 };

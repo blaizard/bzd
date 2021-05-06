@@ -135,3 +135,15 @@ TEST(Coroutine, waitAny)
 	std::cout << trace.data() <<std::endl;
 	EXPECT_EQ(trace, "[a1][b3][a0][a2]");
 }
+
+TEST(Coroutine, waitAnyMany)
+{
+	bzd::String<128> trace;
+	auto promiseA = deepNested(trace, "a");
+	auto promiseB = deepNested(trace, "b");
+	auto promiseC = nested(trace, "c");
+	auto promiseD = deepNested(trace, "d");
+	auto promise = bzd::waitAny(bzd::move(promiseA), bzd::move(promiseB), bzd::move(promiseC), bzd::move(promiseD));
+	bzd::ignore = promise.sync();
+	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][c2]");
+}
