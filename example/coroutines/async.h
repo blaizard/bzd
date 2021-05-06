@@ -144,10 +144,9 @@ static Async waitAny(Asyncs&&... asyncs)
 			}
 		}
 	};
-	const bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> temp{onTerminateCallback};
 	for (auto async : async_list)
 	{
-		async->onTerminate(temp);
+		async->onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback});
 	}
 
 	// Push all handles to the scheduler
