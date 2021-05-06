@@ -21,6 +21,12 @@ struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 	}
 };
 
+template <class T>
+using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
+
+template <class T>
+using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
+
 template <class T = bzd::Result<int, int>>
 class Async
 {
@@ -40,7 +46,7 @@ public:
 		}
 	}
 
-	ResultType sync()
+	constexpr ResultType sync()
 	{
 		while (!isReady())
 		{
@@ -50,7 +56,7 @@ public:
 	}
 
 	// Cancel the current coroutine and nested ones
-	void cancel()
+	constexpr void cancel()
 	{
 		if (handle_)
 		{
@@ -60,43 +66,45 @@ public:
 		}
 	}
 
-	bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
+	constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
-	ResultType& getResult() noexcept { return handle_.promise().result_.valueMutable(); }
+	constexpr ResultType& getResult() noexcept { return handle_.promise().result_.valueMutable(); }
 
-	bool await_ready() { return isReady(); }
+	constexpr bool await_ready() { return isReady(); }
 
-	auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
+	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
 	{
 		// To handle continuation
 		handle_.promise().caller = caller;
 
 		// Push the current handle to the scheduler and pop the next one.
-		Scheduler::getInstance().push(handle_);
+		pushToScheduler();
 		return Scheduler::getInstance().pop();
 	}
 
-	ResultType await_resume() { return getResult(); }
+	constexpr ResultType await_resume() { return getResult(); }
 
 	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback)
 	{
 		handle_.promise().onTerminateCallback_ = callback;
 	}
 
-	bool isSame(bzd::coroutine::interface::Promise& promise) const noexcept
+	constexpr bool isSame(bzd::coroutine::interface::Promise& promise) const noexcept
 	{
 		return (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) == &promise);
 	}
 
-public:
+	/**
+	 * Push the current handle to the scheduler.
+	 */
+	constexpr void pushToScheduler() noexcept
+	{
+		bzd::Scheduler::getInstance().push(handle_);
+	}
+
+private:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
 };
-
-template <class T>
-using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
-
-template <class T>
-using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 
 } // namespace bzd::impl
 
@@ -114,7 +122,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... as
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
-	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
+	(asyncs.pushToScheduler(), ...);
 
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
@@ -128,7 +136,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... as
 }
 
 template <class... Asyncs>
-static Async waitAny(Asyncs&&... asyncs)
+Async waitAny(Asyncs&&... asyncs)
 {
 	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
@@ -150,7 +158,7 @@ static Async waitAny(Asyncs&&... asyncs)
 	}
 
 	// Push all handles to the scheduler
-	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
+	(asyncs.pushToScheduler(), ...);
 
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))
