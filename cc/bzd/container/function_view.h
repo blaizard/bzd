@@ -10,11 +10,12 @@ template <typename Tag, class F, class... Args>
 class FunctionView
 {
 protected:
+	using Self = FunctionView<Tag, F, Args...>;
 	using ReturnType = F;
 	using RawFctPtrType = bzd::typeTraits::AddPointer<ReturnType(Args...)>;
 	using BzdFctPtrType = bzd::Function<ReturnType(Args...)>;
 
-public:
+public: // Constructor/Assignment
 	/**
 	 * Constructor from member function.
 	 */
@@ -46,7 +47,15 @@ constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &
 {
 }
 
-constexpr FunctionView(const FunctionView& function) noexcept : storage_{function.storage_} {}
+// Copy constructor/assignment.
+constexpr FunctionView(const Self& view) noexcept : storage_{view.storage_} {}
+constexpr void operator=(const Self& view) noexcept { storage_ = view.storage_; }
+
+// Move constructor/assignment.
+constexpr FunctionView(Self&& view) noexcept : storage_{bzd::move(view.storage_)} {}
+constexpr void operator=(Self&& view) noexcept { storage_ = bzd::move(view.storage_); }
+
+public: // API
 
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const

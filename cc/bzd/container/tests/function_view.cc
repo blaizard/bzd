@@ -55,6 +55,13 @@ TEST(ContainerFunctionView, classMemberSimple)
 	EXPECT_EQ(dummy.getValue(), 10);
 	ptr();
 	EXPECT_EQ(dummy.getValue(), 11);
+
+	auto ptrCopy = ptr;
+	ptrCopy();
+	EXPECT_EQ(dummy.getValue(), 12);
+	auto ptrMove = bzd::move(ptr);
+	ptrMove();
+	EXPECT_EQ(dummy.getValue(), 13);
 }
 
 TEST(ContainerFunctionView, classMemberWithArgs)
@@ -64,6 +71,13 @@ TEST(ContainerFunctionView, classMemberWithArgs)
 	EXPECT_EQ(dummy.getValue(), -1);
 	ptr(15);
 	EXPECT_EQ(dummy.getValue(), 15);
+
+	auto ptrCopy = ptr;
+	ptrCopy(2);
+	EXPECT_EQ(dummy.getValue(), 2);
+	auto ptrMove = bzd::move(ptr);
+	ptrMove(9);
+	EXPECT_EQ(dummy.getValue(), 9);
 }
 
 TEST(ContainerFunctionView, classMemberWithArgsAndReturn)
@@ -73,13 +87,19 @@ TEST(ContainerFunctionView, classMemberWithArgsAndReturn)
 	EXPECT_EQ(dummy.getValue(), 882);
 	EXPECT_EQ(ptr(3), 3);
 	EXPECT_EQ(dummy.getValue(), 3);
+
+	auto ptrCopy = ptr;
+	EXPECT_EQ(ptrCopy(2), 2);
+	auto ptrMove = bzd::move(ptr);
+	EXPECT_EQ(ptrMove(9), 9);
 }
 
 TEST(ContainerFunctionView, classMemberVirtual)
 {
 	// Base class
 	Dummy dummy{-1};
-	bzd::FunctionView<void(int)> ptr{dummy, &Dummy::callVirtualAdd};
+	bzd::FunctionView<
+	void(int)> ptr{dummy, &Dummy::callVirtualAdd};
 	EXPECT_EQ(dummy.getValue(), -1);
 	ptr(15);
 	EXPECT_EQ(dummy.getValue(), 14);
@@ -89,6 +109,13 @@ TEST(ContainerFunctionView, classMemberVirtual)
 	bzd::FunctionView<void(int)> ptrChild{static_cast<Dummy&>(child), &Dummy::callVirtualAdd};
 	EXPECT_EQ(child.getValue(), 32);
 	ptrChild(15);
+	EXPECT_EQ(child.getValue(), 42);
+
+	auto ptrChildCopy = ptrChild;
+	ptrChildCopy(24);
+	EXPECT_EQ(child.getValue(), 42);
+	auto ptrChildMove = bzd::move(ptrChild);
+	ptrChildMove(24);
 	EXPECT_EQ(child.getValue(), 42);
 }
 
@@ -166,4 +193,9 @@ TEST(ContainerFunctionView, lambdaArgsReturn)
 	bzd::FunctionView<int(int)> ptr{lambda};
 	EXPECT_EQ(lambda(7), 49);
 	EXPECT_EQ(ptr(3), 9);
+
+	auto ptrCopy = ptr;
+	EXPECT_EQ(ptrCopy(2), 4);
+	auto ptrMove = bzd::move(ptr);
+	EXPECT_EQ(ptrMove(9), 81);
 }

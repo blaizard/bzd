@@ -147,3 +147,42 @@ TEST(Coroutine, waitAnyMany)
 	bzd::ignore = promise.sync();
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][c2]");
 }
+
+bzd::Async asyncAdd(int a, int b)
+{
+    co_return a + b;
+}
+
+bzd::Async asyncFibonacci(int n)
+{
+    if (n <= 2)
+        co_return 1;
+
+    int a = 1;
+    int b = 1;
+
+    // iterate computing fib(n)
+    for (int i = 0; i < n - 2; ++i)
+    {
+        const auto c = co_await asyncAdd(a, b);
+        a = b;
+        b = c.value();
+    }
+
+    co_return b;
+}
+
+TEST(Coroutine, fibonacci)
+{
+	auto fibonacci1 = asyncFibonacci(12);
+	auto fibonacci2 = asyncFibonacci(16);
+	auto fibonacci3 = asyncFibonacci(18);
+	auto fibonacci4 = asyncFibonacci(20);
+	auto promise = bzd::waitAll(fibonacci1, fibonacci2, fibonacci3, fibonacci4);
+	const auto result = promise.sync();
+	EXPECT_EQ(result.size(), 4);
+	EXPECT_EQ(result.get<0>().value(), 144);
+	EXPECT_EQ(result.get<1>().value(), 987);
+	EXPECT_EQ(result.get<2>().value(), 2584);
+	EXPECT_EQ(result.get<3>().value(), 6765);
+}
