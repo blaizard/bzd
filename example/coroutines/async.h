@@ -1,7 +1,9 @@
 #pragma once
 
+#include "bzd/container/array.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
+#include "bzd/container/function_view.h"
 #include "bzd/type_traits/remove_reference.h"
 #include "bzd/utility/ignore.h"
 #include "example/coroutines/coroutine.h"
@@ -34,7 +36,6 @@ public:
 		// Detach it from where it is and destroy the handle.
 		if (handle_)
 		{
-			bzd::ignore = handle_.promise().pop();
 			cancel();
 		}
 	}
@@ -53,16 +54,15 @@ public:
 	{
 		if (handle_)
 		{
+			bzd::ignore = handle_.promise().pop();
 			handle_.destroy();
 			handle_ = nullptr;
 		}
 	}
 
-	bool isReady() const noexcept { return handle_.done(); }
+	bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
 	ResultType& getResult() noexcept { return handle_.promise().result_.valueMutable(); }
-
-	void set_callback(std::function<void(void)> callback) { handle_.promise().callback_ = callback;}
 
 	bool await_ready() { return isReady(); }
 
@@ -77,6 +77,13 @@ public:
 	}
 
 	ResultType await_resume() { return getResult(); }
+
+	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback) { handle_.promise().onTerminateCallback_ = callback;}
+
+	bool isSame(bzd::coroutine::interface::Promise& promise) const noexcept
+	{
+		return (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) == &promise);
+	}
 
 public:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
@@ -122,17 +129,23 @@ static Async waitAny(Asyncs&&... asyncs)
 {
 	//using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
-/*	(asyncs.set_callback([&](void* addr){
-		for (auto& async : {asyncs...}) {
-			if (&async != addr) {
-				//const_cast<Async&>(async).cancel();
+	// Install callbacks on terminate, note the lifetime of the array and the callback
+	// is longer than the promises.
+	const bzd::Array<Async*, sizeof...(asyncs)> async_list{&asyncs...};
+	auto onTerminateCallback = [&async_list](bzd::coroutine::interface::Promise& promise) {
+		for (auto async : async_list)
+		{
+			if (!async->isSame(promise))
+			{
+				async->cancel();
 			}
-		} 
-	}), ...);*/
-
-	Async* as[]{&asyncs...};
-	as[0]->set_callback([&as]() { as[1]->cancel(); });
-	as[1]->set_callback([&as]() { as[0]->cancel(); });
+		}
+	};
+	const bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> temp{onTerminateCallback};
+	for (auto async : async_list)
+	{
+		async->onTerminate(temp);
+	}
 
 	// Push all handles to the scheduler
 	(bzd::Scheduler::getInstance().push(asyncs.handle_), ...);
