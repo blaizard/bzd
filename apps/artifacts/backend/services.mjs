@@ -12,7 +12,7 @@ export default class Services {
 				 * Generate context based on the current name.
 				 * Contet are passed to the start function.
 				 */
-				makeContext: (/*name*/) => ({})
+				makeContext: (/*name*/) => ({}),
 			},
 			options
 		);
@@ -53,7 +53,7 @@ export default class Services {
 					this.instances[name] = this.instances[name] || {};
 					this.instances[name][type] = {
 						result: result,
-						service: service
+						service: service,
 					};
 				}
 				catch (e) {

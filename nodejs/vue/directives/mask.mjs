@@ -33,7 +33,7 @@ export function mask(el, className = "") {
 	}
 }
 
-export default function(el, binding) {
+export default function (el, binding) {
 	// If set to true, set the mask
 	if (binding.value) {
 		mask(el);
