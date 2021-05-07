@@ -183,7 +183,7 @@ void exampleTerminal()
 			auto bytes = data.asWritableBytes();
 
 			const auto result = await terminal.read(bytes);
-			bzd::assert::isTrue(result, "I/O error");
+			bzd::assert::isTrue(result.hasValue(), "I/O error");
 
 			const auto out = bytes.subspan(0, result.value());
 			await terminal.write(out);
