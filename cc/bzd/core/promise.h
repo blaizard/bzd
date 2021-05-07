@@ -67,7 +67,7 @@ public:
 
 	constexpr ResultType&& getResult() noexcept
 	{
-		bzd::assert::isTrue(return_);
+		bzd::assert::isTrue(return_.hasValue());
 		return bzd::move(return_.valueMutable());
 	}
 
