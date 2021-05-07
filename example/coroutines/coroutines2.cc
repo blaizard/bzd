@@ -65,7 +65,7 @@ bzd::Async<int, int> count(int id, int n)
 		{
 			auto coro_count1 = count(id * 10 + 1, n - 3);
 			auto coro_count2 = count(id * 10, n - 1);
-			co_await bzd::waitAll(coro_count1, coro_count2);
+			co_await bzd::async::all(coro_count1, coro_count2);
 		}
 		else
 		{
@@ -88,7 +88,7 @@ int main()
 		auto mycoro1 = count(1, 3);
 		auto mycoro2 = count(2, 6);
 
-		auto promise = bzd::waitAll(mycoro1, mycoro2);
+		auto promise = bzd::async::all(mycoro1, mycoro2);
 		promise.sync();
 	}
 
@@ -98,7 +98,7 @@ int main()
 		auto mycoro1 = count(1, 3);
 		auto mycoro2 = count(2, 6);
 
-		auto promise = bzd::waitAny(mycoro1, mycoro2);
+		auto promise = bzd::async::any(mycoro1, mycoro2);
 		promise.sync();
 	}
 
