@@ -120,8 +120,12 @@ public:
 	using impl::Async<bzd::Result<V, E>>::Async;
 };
 
+} // namespace bzd
+
+namespace bzd::async {
+
 template <class... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs)
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
@@ -140,7 +144,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... as
 }
 
 template <class... Asyncs>
-Async<int, int> waitAny(Asyncs&&... asyncs)
+Async<int, int> any(Asyncs&&... asyncs)
 {
 	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
@@ -164,4 +168,4 @@ Async<int, int> waitAny(Asyncs&&... asyncs)
 	co_return 42;
 }
 
-} // namespace bzd
+}
