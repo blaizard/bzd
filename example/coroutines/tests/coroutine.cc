@@ -15,7 +15,7 @@ constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, 
 }
 } // namespace
 
-bzd::Async<int, int> nop(bzd::interface::String& trace, bzd::StringView id, int retVal)
+bzd::Async<int> nop(bzd::interface::String& trace, bzd::StringView id, int retVal)
 {
 	appendToTrace(trace, id, 0);
 	co_return retVal;
@@ -31,7 +31,7 @@ TEST(Coroutine, Base)
 	EXPECT_EQ(result.value(), 42);
 }
 
-bzd::Async<int, int> nested(bzd::interface::String& trace, bzd::StringView id, int retVal = 42)
+bzd::Async<int> nested(bzd::interface::String& trace, bzd::StringView id, int retVal = 42)
 {
 	appendToTrace(trace, id, 1);
 	auto result = co_await nop(trace, id, retVal);
@@ -47,7 +47,7 @@ TEST(Coroutine, Nested)
 	EXPECT_EQ(trace, "[a1][a0][a2]");
 }
 
-bzd::Async<int, int> deepNested(bzd::interface::String& trace, bzd::StringView id)
+bzd::Async<int> deepNested(bzd::interface::String& trace, bzd::StringView id)
 {
 	int result = 0;
 	for (int i = 0; i < 3; ++i)
@@ -104,7 +104,7 @@ TEST(Coroutine, asyncAllMany)
 	EXPECT_EQ(trace, "[a1][b1][c1][d1][a0][a2][b0][b2][c0][c2][d0][d2]");
 }
 
-bzd::Async<int, int> asyncAllNested(bzd::interface::String& trace, bzd::StringView id)
+bzd::Async<int> asyncAllNested(bzd::interface::String& trace, bzd::StringView id)
 {
 	appendToTrace(trace, id, 5);
 	auto promiseY = nested(trace, "y");
@@ -148,12 +148,12 @@ TEST(Coroutine, asyncAnyMany)
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][c2]");
 }
 
-bzd::Async<int, int> asyncAdd(int a, int b)
+bzd::Async<int> asyncAdd(int a, int b)
 {
     co_return a + b;
 }
 
-bzd::Async<int, int> asyncFibonacci(int n)
+bzd::Async<int> asyncFibonacci(int n)
 {
     if (n <= 2)
         co_return 1;
