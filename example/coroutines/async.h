@@ -89,9 +89,12 @@ public:
 		handle_.promise().onTerminateCallback_ = callback;
 	}
 
-	constexpr bool isSame(bzd::coroutine::interface::Promise& promise) const noexcept
+	constexpr void cancelIfDifferent(bzd::coroutine::interface::Promise& promise) noexcept
 	{
-		return (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) == &promise);
+		if (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) != &promise)
+		{
+			cancel();
+		}
 	}
 
 	/**
@@ -110,10 +113,11 @@ private:
 
 namespace bzd {
 
-class Async : public impl::Async<>
+template <class V = void, class E = bzd::BoolType>
+class Async : public impl::Async<bzd::Result<V, E>>
 {
 public:
-	using impl::Async<>::Async;
+	using impl::Async<bzd::Result<V, E>>::Async;
 };
 
 template <class... Asyncs>
@@ -136,34 +140,25 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> waitAll(Asyncs&&... as
 }
 
 template <class... Asyncs>
-Async waitAny(Asyncs&&... asyncs)
+Async<int, int> waitAny(Asyncs&&... asyncs)
 {
 	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
-	// Install callbacks on terminate, note the lifetime of the array and the callback
-	// is longer than the promises.
-	const bzd::Array<Async*, sizeof...(asyncs)> async_list{&asyncs...};
-	auto onTerminateCallback = [&async_list](bzd::coroutine::interface::Promise& promise) {
-		for (auto async : async_list)
-		{
-			if (!async->isSame(promise))
-			{
-				async->cancel();
-			}
-		}
+	// Install callbacks on terminate.
+	// Note: the lifetime of the lambda is longer than the promises, so it is fine.
+	auto onTerminateCallback = [&asyncs...](bzd::coroutine::interface::Promise& promise) {
+		(asyncs.cancelIfDifferent(promise), ...);
 	};
-	for (auto async : async_list)
-	{
-		async->onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback});
-	}
 
+	// Register on terminate callbacks
+	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
 	// Push all handles to the scheduler
 	(asyncs.pushToScheduler(), ...);
 
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))
 	{
-		co_await bzd::impl::SuspendAlways<Async::ResultType>{};
+		co_await bzd::impl::SuspendAlways<Async<int, int>::ResultType>{};
 	}
 
 	co_return 42;

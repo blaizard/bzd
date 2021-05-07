@@ -46,12 +46,12 @@ void register_delay_coro(bzd::coroutine::impl::coroutine_handle<>& handle)
 }
 */
 
-bzd::Async nop()
+bzd::Async<int, int> nop()
 {
 	co_return 42;
 }
 
-bzd::Async count(int id, int n)
+bzd::Async<int, int> count(int id, int n)
 {
 	int sum = 0;
 	// std::cout << id << ": count(" << n << ")" << std::endl;
