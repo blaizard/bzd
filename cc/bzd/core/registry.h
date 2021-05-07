@@ -99,7 +99,7 @@ public:
 		constexpr Register(const KeyType& str, Args&&... args) : object_{bzd::forward<Args>(args)...}
 		{
 			auto result = interface::Registry<Interface>::get();
-			bzd::assert::isTrue(result);
+			bzd::assert::isTrue(result.hasValue());
 			result.valueMutable().insert(str, static_cast<Interface*>(&object_));
 		}
 
@@ -113,7 +113,7 @@ public:
 	static constexpr Interface& get(const KeyType& key)
 	{
 		auto result = interface::Registry<Interface>::get();
-		bzd::assert::isTrue(result);
+		bzd::assert::isTrue(result.hasValue());
 		return *(result.valueMutable())[key];
 	}
 
@@ -123,7 +123,7 @@ public:
 	static constexpr bool is(const KeyType& key)
 	{
 		auto result = interface::Registry<Interface>::get();
-		return static_cast<bool>(result);
+		return result.hasValue();
 	}
 
 	/**

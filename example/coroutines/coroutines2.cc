@@ -69,7 +69,7 @@ bzd::Async count(int id, int n)
 		}
 		else
 		{
-			sum += co_await coro_nop;
+			sum += (co_await coro_nop).value();
 		}
 	}
 

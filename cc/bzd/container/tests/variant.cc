@@ -141,7 +141,7 @@ TEST(ContainerVariant, Constexpr)
 	EXPECT_TRUE(variantDouble.is<double>());
 
 	const auto ret = variantDouble.get<double>();
-	EXPECT_TRUE(ret.isValue());
+	EXPECT_TRUE(ret);
 	EXPECT_NEAR(ret.value(), 5.4, 0.01);
 
 	{

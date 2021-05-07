@@ -100,10 +100,10 @@ public:
 		bzd::assert::isTrue(task.getStatus() == bzd::interface::Task::Status::ACTIVE, "Task is not active.");
 
 		const auto resultPop = tasks_.pop(task);
-		bzd::assert::isTrue(resultPop || resultPop.error() == ListErrorType::elementAlreadyRemoved, "Cannot remove task from task list.");
+		bzd::assert::isTrue(resultPop.hasValue() || resultPop.error() == ListErrorType::elementAlreadyRemoved, "Cannot remove task from task list.");
 
 		const auto resultPush = pendingTasks_.pushFront(task);
-		bzd::assert::isTrue(resultPush, "Cannot push task to pending list.");
+		bzd::assert::isTrue(resultPush.hasValue(), "Cannot push task to pending list.");
 
 		task.status_ = bzd::interface::Task::Status::PENDING;
 	}
