@@ -88,10 +88,8 @@ public: // Constructors
 
 	explicit constexpr Optional() : storage_{} {}
 
-public: // Move
+public: // move constructor/assignment
 	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
-
-	// Move assignment
 	constexpr void operator=(Optional<T>&& optional)
 	{
 		storage_.isValue_ = optional.storage_.isValue_;
