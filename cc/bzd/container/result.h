@@ -129,10 +129,10 @@ public:
 	constexpr Result(impl::Result<T, E>&& result) noexcept : storage_{bzd::move(result.storage_)} {}
 	constexpr void operator=(impl::Result<T, E>&& result) noexcept { storage_ = bzd::move(result.storage_); }
 
-	constexpr bool isValue() const noexcept { return !storage_.isError_; }
-	constexpr bool isError() const noexcept { return storage_.isError_; }
+	constexpr bool hasValue() const noexcept { return !storage_.isError_; }
+	constexpr bool hasError() const noexcept { return storage_.isError_; }
 
-	constexpr operator bool() const noexcept { return !storage_.isError_; }
+	constexpr explicit operator bool() const noexcept { return hasValue(); }
 
 	constexpr const E& error() const
 	{

@@ -7,7 +7,7 @@ void bzd::interface::Promise::setPending(bzd::NonOwningList<bzd::interface::Prom
 {
 	bzd::assert::isTrue(task_, "Promise is not associated to a task.");
 	const auto result = list.pushFront(*this);
-	bzd::assert::isTrue(result, "Cannot associate promise with list.");
+	bzd::assert::isTrue(result.hasValue(), "Cannot associate promise with list.");
 	task_->setPending();
 }
 
@@ -15,6 +15,6 @@ void bzd::interface::Promise::setActive(bzd::NonOwningList<bzd::interface::Promi
 {
 	bzd::assert::isTrue(task_, "Promise is not associated to a task.");
 	const auto result = list.pop(*this);
-	bzd::assert::isTrue(result, "The promise couldn't be detached.");
+	bzd::assert::isTrue(result.hasValue(), "The promise couldn't be detached.");
 	task_->setActive();
 }

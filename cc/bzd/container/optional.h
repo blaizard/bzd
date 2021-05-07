@@ -99,7 +99,8 @@ public: // Move
 	}
 
 public:
-	constexpr operator bool() const noexcept { return storage_.isValue_; }
+	constexpr bool hasValue() const noexcept { return storage_.isValue_; }
+	constexpr explicit operator bool() const noexcept { return hasValue(); }
 
 	constexpr const Value& valueOr(const Value& defaultValue) const noexcept
 	{

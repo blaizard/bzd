@@ -10,7 +10,7 @@ void Scheduler::addTask(Task& task) noexcept
 
 	task.status_ = bzd::interface::Task::Status::ACTIVE;
 	const auto result = tasks_.pushFront(task);
-	bzd::assert::isTrue(result, "Cannot add task to the list.");
+	bzd::assert::isTrue(result.hasValue(), "Cannot add task to the list.");
 }
 
 void yield()

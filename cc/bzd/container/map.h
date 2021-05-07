@@ -41,11 +41,11 @@ public:
 	constexpr V& operator[](const K& key) const
 	{
 		auto result = find(key);
-		bzd::assert::isTrue(result, "Key does not exists");
+		bzd::assert::isTrue(result.hasValue(), "Key does not exists");
 		return result.valueMutable()->second;
 	}
 
-	constexpr bool contains(const K& key) const noexcept { return find(key); }
+	constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
 
 	/**
 	 * Insert a new element or replace the existing one

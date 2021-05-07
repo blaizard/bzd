@@ -60,7 +60,7 @@ public:
 	[[nodiscard]] constexpr T& cast() noexcept
 	{
 		auto result = get<T>();
-		bzd::assert::isTrue(result, "Invalid any cast");
+		bzd::assert::isTrue(result.hasValue(), "Invalid any cast");
 		return result.valueMutable();
 	}
 
@@ -68,7 +68,7 @@ public:
 	[[nodiscard]] constexpr const T& cast() const noexcept
 	{
 		const auto result = get<T>();
-		bzd::assert::isTrue(result, "Invalid any cast");
+		bzd::assert::isTrue(result.hasValue(), "Invalid any cast");
 		return result.value();
 	}
 
