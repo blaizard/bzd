@@ -65,6 +65,12 @@ TEST(ContainerTuple, NonDefaultConstructor)
 	constexpr const bzd::Tuple<NonDefaultConstructor, NonDefaultConstructor> tuple{12, -2};
 	EXPECT_EQ(tuple.get<0>().value, 12);
 	EXPECT_EQ(tuple.get<1>().value, -2);
+
+	auto tupleCopy{tuple};
+	EXPECT_EQ(tupleCopy.get<0>().value, 12);
+
+	auto tupleMove{bzd::move(tuple)};
+	EXPECT_EQ(tupleMove.get<0>().value, 12);
 }
 
 TEST(ContainerTuple, Copy)
