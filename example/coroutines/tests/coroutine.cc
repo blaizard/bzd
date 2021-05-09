@@ -131,9 +131,12 @@ TEST(Coroutine, asyncAny)
 	auto promiseA = nested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
 	auto promise = bzd::async::any(promiseA, promiseB);
-	bzd::ignore = promise.sync();
-	std::cout << trace.data() << std::endl;
+	const auto result = promise.sync();
 	EXPECT_EQ(trace, "[a1][b3][a0][a2]");
+	EXPECT_EQ(result.size(), 2);
+	EXPECT_TRUE(result.get<0>());
+	EXPECT_FALSE(result.get<1>());
+	EXPECT_EQ(result.get<0>().value().value(), 42);
 }
 
 TEST(Coroutine, asyncAnyMany)
@@ -141,11 +144,17 @@ TEST(Coroutine, asyncAnyMany)
 	bzd::String<128> trace;
 	auto promiseA = deepNested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
-	auto promiseC = nested(trace, "c");
+	auto promiseC = nested(trace, "c", -432);
 	auto promiseD = deepNested(trace, "d");
 	auto promise = bzd::async::any(bzd::move(promiseA), bzd::move(promiseB), bzd::move(promiseC), bzd::move(promiseD));
-	bzd::ignore = promise.sync();
+	const auto result = promise.sync();
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][c2]");
+	EXPECT_EQ(result.size(), 4);
+	EXPECT_FALSE(result.get<0>());
+	EXPECT_FALSE(result.get<1>());
+	EXPECT_TRUE(result.get<2>());
+	EXPECT_FALSE(result.get<3>());
+	EXPECT_EQ(result.get<2>().value().value(), -432);
 }
 
 bzd::Async<int> asyncAdd(int a, int b)

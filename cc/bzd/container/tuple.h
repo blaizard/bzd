@@ -71,7 +71,7 @@ class TupleElem
 {
 public:
 	constexpr TupleElem() noexcept = default;
-	// constexpr TupleElem(const T& value) noexcept : elem_(value) {}
+	constexpr TupleElem(const T& value) noexcept : elem_(value) {}
 	template <class Value, typeTraits::EnableIf<!typeTraits::isSame<Value, NoType>>* = nullptr>
 	constexpr TupleElem(Value&& value) noexcept : elem_{bzd::forward<Value>(value)}
 	{
@@ -103,7 +103,7 @@ private:
 	template <SizeType M>
 	using Elem = TupleElem<M, Pick<M>>;
 
-public:
+public: // constructors
 	constexpr TupleImpl() noexcept = default;
 
 	template <class... Args>
@@ -111,13 +111,14 @@ public:
 	{
 	}
 
-	// Copy constructor/assignment.
-	constexpr TupleImpl(const Self& tuple) noexcept : TupleElem<N, T>{tuple.get<N>()}... {}
-	constexpr void operator=(const Self& tuple) noexcept { (Elem<N>::set(tuple.get<N>()), ...); }
+	// Copy/move constructor/assignment.
+	constexpr TupleImpl(const Self& tuple) noexcept = default;
+	constexpr Self& operator=(const Self& tuple) noexcept = default;
+	constexpr TupleImpl(Self&& tuple) noexcept = default;
+	constexpr Self& operator=(Self&& tuple) noexcept = default;
+	~TupleImpl() noexcept = default;
 
-	// Move constructor/assignment.
-	constexpr TupleImpl(Self&& tuple) noexcept : TupleElem<N, T>{bzd::move(tuple.get<N>())}... {}
-	constexpr void operator=(Self&& tuple) noexcept { (Elem<N>::set(bzd::move(tuple.get<N>())), ...); }
+public: // API
 
 	// Access by index as template (type is automatically deducted)
 

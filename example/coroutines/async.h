@@ -10,6 +10,8 @@
 #include "example/coroutines/promise.h"
 #include "example/coroutines/scheduler.h"
 
+#include <tuple>
+
 namespace bzd::impl {
 template <class T>
 struct SuspendAlways : public bzd::coroutine::impl::suspend_always
@@ -69,7 +71,14 @@ public:
 
 	constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
-	constexpr bzd::Optional<ResultType>& getResult() noexcept { return handle_.promise().result_; }
+	constexpr bzd::Optional<ResultType> getResult() noexcept
+	{
+		if (handle_)
+		{
+			return handle_.promise().result_;
+		}
+		return nullopt;
+	}
 
 	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback)
 	{
@@ -155,9 +164,9 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 }
 
 template <class... Asyncs>
-Async<int, int> any(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs)
 {
-	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
+	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
 	// Install callbacks on terminate.
 	// Note: the lifetime of the lambda is longer than the promises, so it is fine.
@@ -171,11 +180,12 @@ Async<int, int> any(Asyncs&&... asyncs)
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))
 	{
-		co_await bzd::impl::SuspendAlways<Async<int, int>::ResultType>{};
+		co_await bzd::impl::SuspendAlways<ResultType>{};
 	}
 
 	// Build the result and return it.
-	co_return 42;
+	ResultType result{asyncs.getResult()...};
+	co_return result;
 }
 
 } // namespace bzd::async
