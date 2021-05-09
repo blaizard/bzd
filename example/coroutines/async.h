@@ -10,8 +10,6 @@
 #include "example/coroutines/promise.h"
 #include "example/coroutines/scheduler.h"
 
-#include <tuple>
-
 namespace bzd::impl {
 template <class T>
 struct SuspendAlways : public bzd::coroutine::impl::suspend_always
@@ -145,7 +143,7 @@ public:
 namespace bzd::async {
 
 template <class... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
@@ -164,12 +162,12 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 }
 
 template <class... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs)
+impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
 	// Install callbacks on terminate.
-	// Note: the lifetime of the lambda is longer than the promises, so it is fine.
+	// Note: the lifetime of the lambda is longer than the promises.
 	auto onTerminateCallback = [&asyncs...](bzd::coroutine::interface::Promise& promise) { (asyncs.cancelIfDifferent(promise), ...); };
 
 	// Register on terminate callbacks
