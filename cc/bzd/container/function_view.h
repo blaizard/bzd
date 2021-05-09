@@ -49,14 +49,19 @@ constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &
 
 // Copy constructor/assignment.
 constexpr FunctionView(const Self& view) noexcept : storage_{view.storage_} {}
-constexpr void operator=(const Self& view) noexcept { storage_ = view.storage_; }
+constexpr void operator=(const Self& view) noexcept
+{
+	storage_ = view.storage_;
+}
 
 // Move constructor/assignment.
 constexpr FunctionView(Self&& view) noexcept : storage_{bzd::move(view.storage_)} {}
-constexpr void operator=(Self&& view) noexcept { storage_ = bzd::move(view.storage_); }
+constexpr void operator=(Self&& view) noexcept
+{
+	storage_ = bzd::move(view.storage_);
+}
 
-public: // API
-
+public:					   // API
 template <class... Params> // Needed for perfect forwarding
 constexpr ReturnType operator()(Params&&... args) const
 {

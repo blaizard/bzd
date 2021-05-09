@@ -15,7 +15,7 @@
 
 namespace bzd::impl {
 
-struct ResultNull
+class ResultNull
 {
 public:
 	static constexpr ResultNull make() { return ResultNull{}; }
@@ -48,19 +48,25 @@ private:
 template <class T, class E>
 struct ResultNonTrivialStorage
 {
+	using Self = ResultNonTrivialStorage<T, E>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 	template <class U>
-	constexpr ResultNonTrivialStorage(U&& value) : isError_{false}, value_{bzd::forward<U>(value)}
+	constexpr ResultNonTrivialStorage(U&& value) noexcept : isError_{false}, value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
-	constexpr ResultNonTrivialStorage(U&& value, bool) : isError_{true}, error_{bzd::forward<U>(value)}
+	constexpr ResultNonTrivialStorage(U&& value, bool) noexcept : isError_{true}, error_{bzd::forward<U>(value)}
 	{
 	}
 
-	~ResultNonTrivialStorage()
+	constexpr ResultNonTrivialStorage(const Self& value) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr ResultNonTrivialStorage(Self&& value) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept = default;
+
+	~ResultNonTrivialStorage() noexcept
 	{
 		if (isError_)
 			error_.~E();
@@ -78,17 +84,24 @@ struct ResultNonTrivialStorage
 template <class T, class E>
 struct ResultTrivialStorage
 {
+	using Self = ResultTrivialStorage<T, E>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
 	template <class U>
-	constexpr ResultTrivialStorage(U&& value) : isError_{false}, value_{bzd::forward<U>(value)}
+	constexpr ResultTrivialStorage(U&& value) noexcept : isError_{false}, value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
-	constexpr ResultTrivialStorage(U&& value, bool) : isError_{true}, error_{bzd::forward<U>(value)}
+	constexpr ResultTrivialStorage(U&& value, bool) noexcept : isError_{true}, error_{bzd::forward<U>(value)}
 	{
 	}
+
+	constexpr ResultTrivialStorage(const Self& value) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr ResultTrivialStorage(Self&& value) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept = default;
+	~ResultTrivialStorage() noexcept = default;
 
 	bool isError_;
 	union {
@@ -105,13 +118,14 @@ public:
 	using Error = E;
 
 private:
+	using Self = Result<T, E>;
 	using NonVoidValue = bzd::typeTraits::Conditional<bzd::typeTraits::isSame<Value, void>, void*, Value>;
 	using StorageType = bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<NonVoidValue> &&
 														 bzd::typeTraits::isTriviallyDestructible<Error>,
 													 ResultTrivialStorage<NonVoidValue, Error>,
 													 ResultNonTrivialStorage<NonVoidValue, Error>>;
 
-public:
+public: // Constructors
 	constexpr Result(const ResultNull&) noexcept : storage_{nullptr} {}
 
 	constexpr Result(const NonVoidValue& value) noexcept : storage_{value} {}
@@ -121,14 +135,13 @@ public:
 	{
 	}
 
-	// Copy constructore/assignment.
-	constexpr Result(const impl::Result<T, E>& result) noexcept : storage_{result.storage_} {}
-	constexpr void operator=(const impl::Result<T, E>& result) noexcept { storage_ = result.storage_; }
+	// Copy/move constructore/assignment.
+	constexpr Result(const Self& result) noexcept = default;
+	constexpr Self& operator=(const Self& result) noexcept = default;
+	constexpr Result(Self&& result) noexcept = default;
+	constexpr Self& operator=(Self&& result) noexcept = default;
 
-	// Move constructor/assignment.
-	constexpr Result(impl::Result<T, E>&& result) noexcept : storage_{bzd::move(result.storage_)} {}
-	constexpr void operator=(impl::Result<T, E>&& result) noexcept { storage_ = bzd::move(result.storage_); }
-
+public: // API
 	constexpr bool hasValue() const noexcept { return !storage_.isError_; }
 	constexpr bool hasError() const noexcept { return storage_.isError_; }
 

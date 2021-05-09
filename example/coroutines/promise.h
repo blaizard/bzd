@@ -7,8 +7,8 @@
 
 // Forward declaration
 namespace bzd::impl {
-	template <class T>
-	class Async;
+template <class T>
+class Async;
 }
 
 namespace bzd::coroutine::interface {

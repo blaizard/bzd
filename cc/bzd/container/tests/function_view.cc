@@ -98,8 +98,7 @@ TEST(ContainerFunctionView, classMemberVirtual)
 {
 	// Base class
 	Dummy dummy{-1};
-	bzd::FunctionView<
-	void(int)> ptr{dummy, &Dummy::callVirtualAdd};
+	bzd::FunctionView<void(int)> ptr{dummy, &Dummy::callVirtualAdd};
 	EXPECT_EQ(dummy.getValue(), -1);
 	ptr(15);
 	EXPECT_EQ(dummy.getValue(), 14);

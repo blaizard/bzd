@@ -14,6 +14,22 @@ TEST(ContainerOptional, simpleData)
 	v.valueMutable() = 13;
 	EXPECT_EQ(v.value(), 13);
 
+	auto vCopy{v};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy.value(), 13);
+
+	auto vMove{bzd::move(v)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove.value(), 13);
+
+	vCopy = vMove;
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy.value(), 13);
+
+	vMove = bzd::move(vCopy);
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove.value(), 13);
+
 	v.emplace(45);
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.value(), 45);
@@ -41,6 +57,14 @@ TEST(ContainerOptional, constexprType)
 
 	EXPECT_TRUE(u);
 	EXPECT_EQ(u.valueOr(10), 23);
+
+	constexpr auto vCopy{u};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy.value(), 23);
+
+	constexpr auto vMove{bzd::move(vCopy)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove.value(), 23);
 }
 
 TEST(ContainerOptional, complexData)
@@ -54,6 +78,14 @@ TEST(ContainerOptional, complexData)
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.valueOr({12}).a, 45);
 	EXPECT_EQ(v->a, 45);
+
+	auto vCopy{v};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy->a, 45);
+
+	auto vMove{bzd::move(vCopy)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove->a, 45);
 
 	v.emplace(Value{23});
 	EXPECT_TRUE(v);
@@ -79,6 +111,18 @@ TEST(ContainerOptional, reference)
 	EXPECT_EQ(v.value(), 12);
 	b = -25;
 	EXPECT_EQ(v.value(), -25);
+
+	auto vCopy{v};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy.value(), -25);
+	b = 34;
+	EXPECT_EQ(vCopy.value(), 34);
+
+	auto vMove{bzd::move(vCopy)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove.value(), 34);
+	b = 7;
+	EXPECT_EQ(vMove.value(), 7);
 }
 
 TEST(ContainerOptional, pointer)
@@ -90,15 +134,35 @@ TEST(ContainerOptional, pointer)
 	EXPECT_EQ(*(v.value()), 42);
 	a = -85;
 	EXPECT_EQ(*(v.value()), -85);
+
+	auto vCopy{v};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(*(vCopy.value()), -85);
+	a = 34;
+	EXPECT_EQ(*(vCopy.value()), 34);
+
+	auto vMove{bzd::move(vCopy)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(*(vMove.value()), 34);
+	a = 7;
+	EXPECT_EQ(*(vMove.value()), 7);
 }
 
 TEST(ContainerOptional, result)
 {
 	{
-		bzd::Optional<bzd::Result<int, bool>> v({45});
+		bzd::Optional<bzd::Result<int, bool>> v(45);
 
 		EXPECT_TRUE(v);
 		EXPECT_EQ(v.valueOr({12}).value(), 45);
+
+		auto vCopy{v};
+		EXPECT_TRUE(vCopy);
+		EXPECT_EQ(vCopy.value().value(), 45);
+
+		auto vMove{bzd::move(vCopy)};
+		EXPECT_TRUE(vMove);
+		EXPECT_EQ(vMove.value().value(), 45);
 	}
 
 	{

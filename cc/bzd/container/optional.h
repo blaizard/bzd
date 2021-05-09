@@ -4,7 +4,10 @@
 #include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/conditional.h"
+#include "bzd/type_traits/decay.h"
+#include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_reference.h"
+#include "bzd/type_traits/is_same.h"
 #include "bzd/type_traits/is_trivially_destructible.h"
 #include "bzd/utility/forward.h"
 #include "bzd/utility/move.h"
@@ -15,7 +18,7 @@ namespace bzd::impl {
 
 // nullopt
 
-struct OptionalNull
+class OptionalNull
 {
 public:
 	static constexpr OptionalNull make() { return OptionalNull{}; }
@@ -29,16 +32,22 @@ private:
 template <class T>
 struct OptionalNonTrivialStorage
 {
+	using Self = OptionalNonTrivialStorage<T>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
-	constexpr OptionalNonTrivialStorage() : isValue_{false}, empty_{} {}
+	constexpr OptionalNonTrivialStorage() noexcept : isValue_{false}, empty_{} {}
 
 	template <class U>
-	constexpr OptionalNonTrivialStorage(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
+	constexpr OptionalNonTrivialStorage(U&& value) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
 	}
 
-	~OptionalNonTrivialStorage()
+	constexpr OptionalNonTrivialStorage(const Self& value) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr OptionalNonTrivialStorage(Self&& value) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept = default;
+
+	~OptionalNonTrivialStorage() noexcept
 	{
 		if (isValue_) value_.~ValueContainer();
 	}
@@ -53,14 +62,21 @@ struct OptionalNonTrivialStorage
 template <class T>
 struct OptionalTrivialStorage
 {
+	using Self = OptionalTrivialStorage<T>;
 	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
 
-	constexpr OptionalTrivialStorage() : isValue_{false}, empty_{} {}
+	constexpr OptionalTrivialStorage() noexcept : isValue_{false}, empty_{} {}
 
 	template <class U>
-	constexpr OptionalTrivialStorage(U&& value) : isValue_{true}, value_{bzd::forward<U>(value)}
+	constexpr OptionalTrivialStorage(U&& value) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
 	}
+
+	constexpr OptionalTrivialStorage(const Self& value) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr OptionalTrivialStorage(Self&& value) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept = default;
+	~OptionalTrivialStorage() noexcept = default;
 
 	bool isValue_{false};
 	union {
@@ -73,30 +89,35 @@ template <class T>
 class Optional
 {
 public:
+	using Self = Optional<T>;
 	using Value = bzd::typeTraits::RemoveReference<T>;
 	using StorageType =
 		bzd::typeTraits::Conditional<bzd::typeTraits::isTriviallyDestructible<T>, OptionalTrivialStorage<T>, OptionalNonTrivialStorage<T>>;
 	using ValueContainer = typename StorageType::ValueContainer;
 
-public: // Constructors
 	template <class U>
+	using IsSelf = bzd::typeTraits::IsSame<bzd::typeTraits::Decay<U>, Self>;
+
+public: // Constructors
+	// Default constructor
+	explicit constexpr Optional() noexcept = default;
+
+	// Copy/move constructor/assignment
+	constexpr Optional(const Self& optional) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr Optional(Self&& optional) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept = default;
+
+	// Support for bzd::nullopt
+	constexpr Optional(const OptionalNull& null) noexcept : Optional{} {}
+
+	// Forward constructor to storage type for all non-self typed
+	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value>>
 	constexpr Optional(U&& value) : storage_{bzd::forward<U>(value)}
 	{
 	}
 
-	constexpr Optional(const OptionalNull& null) : Optional{} {}
-
-	explicit constexpr Optional() : storage_{} {}
-
-public: // move constructor/assignment
-	constexpr Optional(Optional<T>&& optional) { *this = bzd::move(optional); }
-	constexpr void operator=(Optional<T>&& optional)
-	{
-		storage_.isValue_ = optional.storage_.isValue_;
-		if (storage_.isValue_) storage_.value_ = bzd::move(optional.storage_.value_);
-	}
-
-public:
+public: // API
 	constexpr bool hasValue() const noexcept { return storage_.isValue_; }
 	constexpr explicit operator bool() const noexcept { return hasValue(); }
 
