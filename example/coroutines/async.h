@@ -73,7 +73,7 @@ public:
 
 	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback)
 	{
-		handle_.promise().onTerminateCallback_ = callback;
+		handle_.promise().onTerminateCallback_.emplace(callback);
 	}
 
 	constexpr void cancelIfDifferent(bzd::coroutine::interface::Promise& promise) noexcept
@@ -102,7 +102,6 @@ public:
 	}
 
 public: // coroutine specific
-
 	constexpr bool await_ready() { return isReady(); }
 
 	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
@@ -158,13 +157,11 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 template <class... Asyncs>
 Async<int, int> any(Asyncs&&... asyncs)
 {
-	//using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
+	// using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
 	// Install callbacks on terminate.
 	// Note: the lifetime of the lambda is longer than the promises, so it is fine.
-	auto onTerminateCallback = [&asyncs...](bzd::coroutine::interface::Promise& promise) {
-		(asyncs.cancelIfDifferent(promise), ...);
-	};
+	auto onTerminateCallback = [&asyncs...](bzd::coroutine::interface::Promise& promise) { (asyncs.cancelIfDifferent(promise), ...); };
 
 	// Register on terminate callbacks
 	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
@@ -181,4 +178,4 @@ Async<int, int> any(Asyncs&&... asyncs)
 	co_return 42;
 }
 
-}
+} // namespace bzd::async

@@ -150,26 +150,25 @@ TEST(Coroutine, asyncAnyMany)
 
 bzd::Async<int> asyncAdd(int a, int b)
 {
-    co_return a + b;
+	co_return a + b;
 }
 
 bzd::Async<int> asyncFibonacci(int n)
 {
-    if (n <= 2)
-        co_return 1;
+	if (n <= 2) co_return 1;
 
-    int a = 1;
-    int b = 1;
+	int a = 1;
+	int b = 1;
 
-    // iterate computing fib(n)
-    for (int i = 0; i < n - 2; ++i)
-    {
-        const auto c = co_await asyncAdd(a, b);
-        a = b;
-        b = c.value();
-    }
+	// iterate computing fib(n)
+	for (int i = 0; i < n - 2; ++i)
+	{
+		const auto c = co_await asyncAdd(a, b);
+		a = b;
+		b = c.value();
+	}
 
-    co_return b;
+	co_return b;
 }
 
 TEST(Coroutine, fibonacci)
