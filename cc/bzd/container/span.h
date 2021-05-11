@@ -22,7 +22,7 @@ class Span
 {
 protected:
 	using DataType = T;
-	using SelfType = Span<DataType>;
+	using Self = Span<DataType>;
 	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
 
 public:
@@ -60,7 +60,7 @@ public:
 
 	// Equality operator
 
-	constexpr bool operator==(const SelfType& rhs) const noexcept
+	constexpr bool operator==(const Self& rhs) const noexcept
 	{
 		if (size() != rhs.size())
 		{
@@ -80,7 +80,7 @@ public:
 
 	// Inequality operator
 
-	constexpr bool operator!=(const SelfType& rhs) const noexcept { return !(*this == rhs); }
+	constexpr bool operator!=(const Self& rhs) const noexcept { return !(*this == rhs); }
 
 	// Accessors
 
