@@ -11,8 +11,22 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <unistd.h>
+
+#include "bzd/container/array.h"
+#include "bzd/container/string_view.h"
+#include "bzd/container/optional.h"
+#include "bzd/utility/ignore.h"
+#include "bzd/platform/types.h"
+#include "bzd/utility/singleton.h"
 
 namespace {
+void asyncSignalSafeWrite(bzd::StringView str) noexcept
+{
+	constexpr int fd = STDERR_FILENO;
+	bzd::ignore = ::write(fd, str.data(), str.size());
+}
+
 constexpr const char* getSignalName(int sig) noexcept
 {
 	switch (sig)
@@ -100,25 +114,49 @@ char* exec(const char* cmd)
 	return result;
 }
 
-bool demangle(char* pBuffer, const size_t size, const char* const pSymbol) noexcept
+struct DemangledBuffer{
+	static constexpr bzd::SizeType initialSize = 1024;
+
+	DemangledBuffer() noexcept
+	{
+		data = static_cast<char*>(::malloc(initialSize));
+		bzd::assert::isTrue(data);
+		size = initialSize;
+	}
+
+	~DemangledBuffer()
+	{
+		if (data)
+		{
+			::free(data);
+		}
+	}
+
+	char* data{nullptr};
+	bzd::SizeType size{0};
+};
+// Pre-allocate data for demangling
+DemangledBuffer demangleBuffer{};
+
+bzd::Optional<bzd::StringView> tryDemangle(const char* const pSymbol) noexcept
 {
 	int status;
-	try
+	auto data = abi::__cxa_demangle(pSymbol, demangleBuffer.data, &demangleBuffer.size, &status);
+	if (data)
 	{
-		const std::unique_ptr<char, decltype(&std::free)> demangled(abi::__cxa_demangle(pSymbol, 0, 0, &status), &std::free);
-		std::strncpy(pBuffer, ((demangled && status == 0) ? demangled.get() : pSymbol), size);
+		demangleBuffer.data = data;
 	}
-	catch (...)
+	if (status != 0)
 	{
-		// Ignore and return false
-		return false;
+		return bzd::nullopt;
 	}
-	return (size > 0 && pBuffer[0] != '\0');
+
+	return bzd::StringView{demangleBuffer.data};
 }
 
 void callStack(std::ostream& out) noexcept
 {
-	constexpr size_t MAX_STACK_LEVEL = 10; //< A larger number causes some hanging
+	constexpr size_t MAX_STACK_LEVEL = 32;
 	static void* addresses[MAX_STACK_LEVEL];
 
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
@@ -129,6 +167,13 @@ void callStack(std::ostream& out) noexcept
 
 	for (int level = 0; level < nbLevels; ++level)
 	{
+		// Do not print the last stack trace, but ellipsis instead.
+		if (level == MAX_STACK_LEVEL - 1)
+		{
+			asyncSignalSafeWrite("...\n");
+			return;
+		}
+
 		char* pSymbol = symbols.get()[level];
 		const char* pSourcePath = nullptr;
 		const char* pFunction = nullptr;
@@ -175,7 +220,7 @@ void callStack(std::ostream& out) noexcept
 
 		// Look for improved function/source names with addr2line
 		{
-			char cmd[1024];
+			static char cmd[1024];
 			if (pOffset)
 			{
 				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
@@ -216,16 +261,21 @@ void callStack(std::ostream& out) noexcept
 			}
 		}
 
-		static char pBuffer[1024];
 		if (pFunction)
 		{
-			if (demangle(pBuffer, sizeof(pBuffer), pFunction))
+			const auto maybeDemangled = tryDemangle(pFunction);
+			if (maybeDemangled)
 			{
-				out << " in " << pBuffer;
+				out << " in ";
+				out.write(maybeDemangled->data(), maybeDemangled->size());
 				if (pOffset)
 				{
 					out << "+" << pOffset;
 				}
+			}
+			else
+			{
+				out << pFunction;
 			}
 		}
 
@@ -243,14 +293,17 @@ void callStack(std::ostream& out) noexcept
 
 void sigHandler(const int sig)
 {
-	// Ensure only one instance is running at a time
+	// Ensure only a single instance is running at a time
 	static volatile std::atomic_flag sigHandlerInProgress = ATOMIC_FLAG_INIT;
 	if (sigHandlerInProgress.test_and_set())
 	{
 		return;
 	}
 
-	std::cout << "\nCaught signal: " << getSignalName(sig) << std::endl;
+	asyncSignalSafeWrite("\nCaught signal: ");
+	asyncSignalSafeWrite(getSignalName(sig));
+	asyncSignalSafeWrite("\n");
+
 	callStack(std::cout);
 	std::exit(sig);
 }
@@ -258,12 +311,21 @@ void sigHandler(const int sig)
 
 bool installBootstrap()
 {
+	// Specify that the signal handler will be allocated onto the alternate signal stack.
+    static bzd::Array<bzd::UInt8Type, SIGSTKSZ * 10> stack;
+
+    stack_t signalStack{};
+	signalStack.ss_size = stack.size();
+    signalStack.ss_sp = stack.data();
+	bzd::assert::isTrue(sigaltstack(&signalStack, 0) != -1);
+
 	struct ::sigaction sa;
+    sigemptyset(&sa.sa_mask);
+	sa.sa_handler = sigHandler;
+	sa.sa_flags = SA_ONSTACK;
+
 	for (const auto& signal : {SIGSEGV, SIGFPE, SIGILL, SIGSYS, SIGABRT, SIGBUS, SIGTERM, SIGINT, SIGHUP})
 	{
-		::memset(&sa, 0, sizeof(sa));
-		sa.sa_handler = sigHandler;
-		::sigemptyset(&sa.sa_mask);
 		::sigaction(signal, &sa, nullptr);
 	}
 

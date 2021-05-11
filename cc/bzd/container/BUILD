@@ -219,6 +219,7 @@ cc_library(
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:remove_const",
         "//cc/bzd/utility:swap",
+        "//cc/bzd/core:assert_minimal_header",
     ],
 )
 
