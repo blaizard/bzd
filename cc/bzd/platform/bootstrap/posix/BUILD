@@ -10,6 +10,7 @@ cc_library(
         "//cc/bzd/container:array",
         "//cc/bzd/container:string_view",
         "//cc/bzd/container:optional",
+        "//cc/bzd/utility/format",
         "//cc/bzd/utility:ignore",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:singleton",
