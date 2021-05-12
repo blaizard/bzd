@@ -36,7 +36,7 @@ cc_library(
         "//cc/bzd/container:string_view",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
-        "//cc/bzd/core:assert_minimal",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/core:channel",
         "//cc/bzd/meta:range",
         "//cc/bzd/type_traits:decay",

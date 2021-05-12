@@ -17,15 +17,22 @@
 #include "bzd/container/string_view.h"
 #include "bzd/container/optional.h"
 #include "bzd/utility/ignore.h"
+#include "bzd/utility/format/format.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/singleton.h"
+#include "bzd/core/channel.h"
 
-namespace {
-void asyncSignalSafeWrite(bzd::StringView str) noexcept
+namespace
 {
-	constexpr int fd = STDERR_FILENO;
-	bzd::ignore = ::write(fd, str.data(), str.size());
-}
+class AsyncSignalSafeChannel : public bzd::OChannel
+{
+public:
+	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept final
+	{
+		constexpr int fd = STDERR_FILENO;
+		return ::write(fd, data.data(), data.size());
+	}
+};
 
 constexpr const char* getSignalName(int sig) noexcept
 {
@@ -162,6 +169,8 @@ void callStack(std::ostream& out) noexcept
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
 	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
 
+	AsyncSignalSafeChannel channel;
+	
 	// Reset filters
 	std::cout << std::dec << std::noshowbase;
 
@@ -170,7 +179,7 @@ void callStack(std::ostream& out) noexcept
 		// Do not print the last stack trace, but ellipsis instead.
 		if (level == MAX_STACK_LEVEL - 1)
 		{
-			asyncSignalSafeWrite("...\n");
+			bzd::format::toString(channel, CSTR("...\n"));
 			return;
 		}
 
@@ -215,8 +224,7 @@ void callStack(std::ostream& out) noexcept
 		}
 
 		// Print stack trace number and memory address
-		out << "#" << std::dec << std::left << std::setfill(' ') << std::setw(3) << level << "0x" << std::setfill('0') << std::hex
-			<< std::right << std::setw(16) << reinterpret_cast<uint64_t>(addresses[level]);
+		bzd::format::toString(channel, CSTR("#{:d} {:#x}"), level, reinterpret_cast<uint64_t>(addresses[level]));
 
 		// Look for improved function/source names with addr2line
 		{
@@ -300,9 +308,8 @@ void sigHandler(const int sig)
 		return;
 	}
 
-	asyncSignalSafeWrite("\nCaught signal: ");
-	asyncSignalSafeWrite(getSignalName(sig));
-	asyncSignalSafeWrite("\n");
+	AsyncSignalSafeChannel channel;
+	bzd::format::toString(channel, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig);
 
 	callStack(std::cout);
 	std::exit(sig);
