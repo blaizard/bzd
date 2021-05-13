@@ -1,341 +1,67 @@
-// infiniteDataStream.cpp
+#include "example/coroutines/async.h"
 
-#if __has_include(<coroutine>)
-#include <coroutine>
-using namespace std;
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-using namespace std::experimental;
-#else
-static_assert(false, "No co_await support");
-#endif
-
-#include "bzd.h"
+#include "bzd/core/units.h"
+#include "bzd/platform/clock.h"
 
 #include <iostream>
-#include <memory>
-#include <unistd.h>
 
-template <typename T>
-struct Generator
+bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 {
-	struct promise_type;
-	using handle_type = std::experimental::coroutine_handle<promise_type>;
+	auto duration = bzd::platform::getTicks().toDuration();
+	const auto targetDuration = duration + bzd::platform::msToTicks(time);
 
-	void* operator new(std::size_t count);
+	std::cout << "Start" << std::endl;
 
-	Generator(handle_type h) : coro(h) {} // (3)
-	handle_type coro;
-
-	~Generator()
+	do
 	{
-		if (coro) coro.destroy();
-	}
-	Generator(const Generator&) = delete;
-	Generator& operator=(const Generator&) = delete;
-	Generator(Generator&& oth) noexcept : coro(oth.coro) { oth.coro = nullptr; }
-	Generator& operator=(Generator&& oth) noexcept
-	{
-		coro = oth.coro;
-		oth.coro = nullptr;
-		return *this;
-	}
-	T getValue() { return coro.promise().current_value; }
-	bool next()
-	{ // (5)
-		coro.resume();
-		return !coro.done();
-	}
-	struct promise_type
-	{
-		promise_type() = default; // (1)
-
-		~promise_type() = default;
-
-		auto initial_suspend()
-		{ // (4)
-			return std::experimental::suspend_always{};
+		co_await bzd::impl::SuspendAlways{};
+/*
+		{
+			auto&& awaiter = bzd::impl::SuspendAlways{};
+			if (!awaiter.await_ready()) {
+				awaiter.await_suspend(std::coroutine_handle<> p); 
+				// compiler added suspend/resume hook
+			}
+			awaiter.await_resume();
 		}
-		auto final_suspend() { return std::experimental::suspend_always{}; }
-		auto get_return_object()
-		{ // (2)
-			return Generator{handle_type::from_promise(*this)};
-		}
-		auto return_void() { return std::experimental::suspend_never{}; }
+*/
 
-		auto yield_value(const T value)
-		{ // (6)
-			current_value = value;
-			return std::experimental::suspend_always{};
-		}
-		void unhandled_exception() { std::exit(1); }
-		T current_value;
-	};
-};
+		const auto curTicks = bzd::platform::getTicks();
 
-Generator<int> getNext(int start = 0, int step = 1) noexcept
-{
-	auto value = start;
-	for (int i = 0;; ++i)
-	{
-		co_yield value;
-		value += step;
-	}
+		// Update the current duration and update the wrapping counter
+		auto details = duration.getDetails();
+		if (details.ticks > curTicks.get())
+		{
+			++details.wrappingCounter;
+		}
+		details.ticks = curTicks.get();
+		duration.setFromDetails(details);
+
+		//std::cout << duration.get() << " - " << targetDuration.get() << std::endl;
+
+		// Check if the duration is reached
+	} while (duration < targetDuration);
+
+	co_return;
 }
 
-// https://kirit.com/How%20C%2B%2B%20coroutines%20work/My%20first%20coroutine
-
-#include <queue>
-
-template <typename T>
-struct Async
+bzd::Async<void> task1() noexcept
 {
-	struct promise_type;
-	using handle_type = std::experimental::coroutine_handle<promise_type>;
-	handle_type coro;
-
-	Async(handle_type h) : coro(h)
+	for (int i = 0; i<10; ++i)
 	{
-		//    std::cout << "Created an Async object" << std::endl;
+		co_await delay(1_s);
+		std::cout << "." << std::endl;
 	}
 
-	Async(const Async&) = delete;
-	Async(Async&& s) : coro(s.coro)
-	{
-		//  std::cout << "Sync moved leaving behind a husk" << std::endl;
-		s.coro = nullptr;
-	}
-
-	Async& operator=(const Async&) = delete;
-	Async& operator=(Async&& s)
-	{
-		coro = s.coro;
-		s.coro = nullptr;
-		return *this;
-	}
-
-	~Async()
-	{
-		// std::cout << "Async gone" << std::endl;
-		if (coro) coro.destroy();
-	}
-	T&& get()
-	{
-		// std::cout << "We got asked for the return value..." << std::endl;
-		if (!this->coro.done())
-		{
-			this->coro.resume();
-		}
-		return bzd::move(coro.promise().value);
-	}
-
-	struct awaitable_type
-	{
-		handle_type coro;
-		bool await_ready()
-		{
-			//    const auto ready = coro.done();
-			//    std::cout << "Await " << (ready ? "is ready" : "isn't ready") << std::endl;
-			return coro.done();
-		}
-		auto await_suspend(std::experimental::coroutine_handle<> awaiting)
-		{
-			//  std::cout << "Got to resume the lazy" << std::endl;
-			coro.resume();
-			// std::cout << "Got to resume the awaiter" << std::endl;
-			return awaiting;
-		}
-		auto await_resume()
-		{
-			const auto r = coro.promise().value;
-			// std::cout << "Await value is returned: " << r << std::endl;
-			return r;
-		}
-	};
-
-	auto operator co_await() { return awaitable_type{coro}; }
-
-	struct promise_type
-	{
-		T value;
-
-		promise_type()
-		{
-			// std::cout << "Promise created" << std::endl;
-		}
-		~promise_type()
-		{
-			// std::cout << "Promise died" << std::endl;
-		}
-		auto get_return_object()
-		{
-			// std::cout << "Send back an Async" << std::endl;
-			return Async<T>{handle_type::from_promise(*this)};
-		}
-		auto initial_suspend()
-		{
-			// std::cout << "Started the coroutine, don't stop now!" << std::endl;
-			return std::experimental::suspend_always{};
-		}
-		auto return_value(T&& v)
-		{
-			// std::cout << "Got an answer of " << v << std::endl;
-			value = bzd::move(v);
-			return std::experimental::suspend_never{};
-		}
-		auto final_suspend()
-		{
-			// std::cout << "Finished the coro" << std::endl;
-			return std::experimental::suspend_always{};
-		}
-		void unhandled_exception() { std::exit(1); }
-	};
-};
-
-template <class T, class Fct>
-auto promise(Fct fct)
-{
-	struct Awaitable
-	{
-		Fct fct;
-		T value{};
-
-		bool await_ready()
-		{
-			// std::cout << "Is it ready?" << std::endl;
-			return false;
-		}
-
-		auto await_suspend(std::experimental::coroutine_handle<> awaiting)
-		{
-			// std::cout << "Got to resume the await" << std::endl;
-			fct([this, awaiting](T value) mutable {
-				// std::cout << "resolve callback" << std::endl;
-				this->value = value;
-				awaiting.resume();
-			});
-			return std::experimental::noop_coroutine();
-			// return awaiting;
-			// schedule here
-		}
-
-		auto await_resume()
-		{
-			// std::cout << "await_resume" << std::endl;
-			return value;
-		}
-	};
-
-	return Awaitable{fct};
+	co_return;
 }
 
-using awaitable_type = std::experimental::coroutine_handle<>;
-static std::deque<awaitable_type> myqyeye;
-
-template <class A, class B>
-auto promiseAll(A& a, B& b)
-{
-	myqyeye.push_back(a.coro);
-	myqyeye.push_back(b.coro);
-
-	struct Awaitable
-	{
-		bool await_ready()
-		{
-			// std::cout << "Is it ready?" << std::endl;
-			return false;
-		}
-
-		auto await_suspend(std::experimental::coroutine_handle<> awaiting)
-		{
-			// std::cout << "SWITCH" << std::endl;
-			myqyeye.push_back(awaiting);
-			auto newWait = myqyeye.front();
-			myqyeye.pop_front();
-			return newWait;
-		}
-
-		auto await_resume()
-		{
-			// std::cout << "await_resume" << std::endl;
-			return 12;
-		}
-	};
-
-	return Awaitable{};
-}
-
-auto my_number2()
-{
-	std::cout << "my_number2" << std::endl;
-	return promise<int>([](auto resolve) { resolve(23); });
-}
-
-Async<int> my_number1()
-{
-	std::cout << "my_number1" << std::endl;
-	co_return 34;
-}
-
-Async<int> simple_loop(int id, int counter)
-{
-	int sum = 0;
-	while (counter--)
-	{
-		std::cout << "--- " << id << ": sum " << sum << std::endl;
-		sum += co_await my_number1();
-		sum += co_await my_number2();
-	}
-	co_return bzd::move(sum);
-}
-
-Async<int> answer()
-{
-	std::cout << "Thinking deep thoghts..." << std::endl;
-
-	auto awaitableA = simple_loop(1, 10);
-	auto awaitableB = simple_loop(2, 5);
-
-	/*
-	co_await promiseAll(awaitableA, awaitableB);
-
-	co_return 12;
-	*/
-	auto b = co_await awaitableB;
-	auto a = co_await awaitableA;
-
-	co_return a + b;
-}
 
 int main()
 {
-	auto a = answer();
-	std::cout << "Got a coroutine, let's get a value" << std::endl;
-	auto v = a.get();
-	std::cout << "And the coroutine value is: " << v << std::endl;
+	std::cout << "start" << std::endl;
+	auto promise = task1();
+	promise.sync();
+	std::cout << "end" << std::endl;
 	return 0;
 }
-
-/*
-int main() {
-	std::cout << std::endl;
-
-	std::cout << "getNext():";
-	auto gen = getNext();
-	for (int i = 0; i <= 10; ++i) {
-		gen.next();
-		std::cout << " " << gen.getValue();                      // (7)
-	}
-
-	std::cout << "\n\n";
-
-	std::cout << "getNext(100, -10):";
-	auto gen2 = getNext(100, -10);
-	for (int i = 0; i <= 20; ++i) {
-		gen2.next();
-		std::cout << " " << gen2.getValue();
-	}
-
-	std::cout << std::endl;
-
-}*/
