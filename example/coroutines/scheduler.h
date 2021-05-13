@@ -12,12 +12,12 @@ public:
 	constexpr Scheduler() = default;
 
 	template <class T>
-	void push(bzd::coroutine::impl::coroutine_handle<T>& handle)
+	constexpr void push(bzd::coroutine::impl::coroutine_handle<T>& handle) noexcept
 	{
 		bzd::ignore = queue_.pushFront(handle.promise());
 	}
 
-	bzd::coroutine::impl::coroutine_handle<> pop()
+	bzd::coroutine::impl::coroutine_handle<> pop() noexcept
 	{
 		while (queue_.empty())
 		{
@@ -25,8 +25,14 @@ public:
 		}
 		auto promise = queue_.back();
 		bzd::ignore = queue_.pop(promise.valueMutable());
+		auto handle = bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(promise.valueMutable());
 
-		return bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(promise.valueMutable());
+		// Show the stack usage
+		//int dummy;
+		//static void* base = &dummy;
+		//std::cout << handle.address() << " stack: "  << (reinterpret_cast<bzd::IntPtrType>(base) - reinterpret_cast<bzd::IntPtrType>(&dummy)) << std::endl;
+
+		return handle;
 	}
 
 private:

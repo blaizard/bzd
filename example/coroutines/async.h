@@ -11,10 +11,10 @@
 #include "example/coroutines/scheduler.h"
 
 namespace bzd::impl {
-template <class T>
 struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 {
-	auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle)
+	template <class T>
+	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
 	{
 		bzd::Scheduler::getInstance().push(handle);
 		return bzd::Scheduler::getInstance().pop();
@@ -27,17 +27,18 @@ using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType
 template <class T>
 using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 
-template <class T = bzd::Result<int, int>>
+template <class T>
 class Async
 {
 public:
-	using ResultType = T;
-	using promise_type = bzd::coroutine::Promise<ResultType>;
+	using PromiseType = bzd::coroutine::Promise<T>;
+	using ResultType = typename PromiseType::ResultType;
+	using promise_type = PromiseType;
 
 public: // constructor/destructor
-	constexpr Async(bzd::coroutine::impl::coroutine_handle<promise_type> h) : handle_(h) {}
+	constexpr Async(bzd::coroutine::impl::coroutine_handle<promise_type> h) noexcept : handle_(h) {}
 
-	~Async()
+	~Async() noexcept
 	{
 		// Detach it from where it is and destroy the handle.
 		if (handle_)
@@ -47,7 +48,7 @@ public: // constructor/destructor
 	}
 
 public:
-	constexpr ResultType sync()
+	constexpr ResultType sync() noexcept
 	{
 		while (!isReady())
 		{
@@ -57,7 +58,7 @@ public:
 	}
 
 	// Cancel the current coroutine and nested ones
-	constexpr void cancel()
+	constexpr void cancel() noexcept
 	{
 		if (handle_)
 		{
@@ -78,7 +79,7 @@ public:
 		return nullopt;
 	}
 
-	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback)
+	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback) noexcept
 	{
 		handle_.promise().onTerminateCallback_.emplace(callback);
 	}
@@ -109,9 +110,9 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() { return isReady(); }
+	constexpr bool await_ready() noexcept { return isReady(); }
 
-	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller)
+	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
 	{
 		// To handle continuation
 		handle_.promise().caller = caller;
@@ -121,7 +122,7 @@ public: // coroutine specific
 		return Scheduler::getInstance().pop();
 	}
 
-	constexpr ResultType await_resume() { return getResult().value(); }
+	constexpr ResultType await_resume() noexcept { return getResult().value(); }
 
 private:
 	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
@@ -131,16 +132,28 @@ private:
 
 namespace bzd {
 
-template <class V = void, class E = bzd::BoolType>
+template <class V, class E = bzd::BoolType>
 class Async : public impl::Async<bzd::Result<V, E>>
 {
 public:
 	using impl::Async<bzd::Result<V, E>>::Async;
 };
 
+template <>
+class Async<void> : public impl::Async<void>
+{
+public:
+	using impl::Async<void>::Async;
+};
+
 } // namespace bzd
 
 namespace bzd::async {
+
+constexpr auto yield() noexcept
+{
+	return bzd::impl::SuspendAlways{};
+}
 
 template <class... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
@@ -153,7 +166,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
 	{
-		co_await bzd::impl::SuspendAlways<ResultType>{};
+		co_await yield();
 	}
 
 	// Build the result and return it.
@@ -178,7 +191,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))
 	{
-		co_await bzd::impl::SuspendAlways<ResultType>{};
+		co_await yield();
 	}
 
 	// Build the result and return it.

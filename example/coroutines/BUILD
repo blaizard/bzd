@@ -6,13 +6,12 @@ cc_binary(
         "main.cc",
     ],
     copts = [
-        "-std=c++2a",
-        "-stdlib=libc++",
-        "-fcoroutines-ts",
+        "-Wno-unused-value",
     ],
     tags = ["manual"],
     deps = [
         "//cc/bzd",
+        ":async",
     ],
 )
 

@@ -15,6 +15,20 @@ constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, 
 }
 } // namespace
 
+bzd::Async<void> nopVoid(bzd::interface::String& trace, bzd::StringView id)
+{
+	appendToTrace(trace, id, -1);
+	co_return;
+}
+
+TEST(Coroutine, Void)
+{
+	bzd::String<32> trace;
+	auto promise = nopVoid(trace, "a");
+	promise.sync();
+	EXPECT_EQ(trace, "[a-1]");
+}
+
 bzd::Async<int> nop(bzd::interface::String& trace, bzd::StringView id, int retVal)
 {
 	appendToTrace(trace, id, 0);
