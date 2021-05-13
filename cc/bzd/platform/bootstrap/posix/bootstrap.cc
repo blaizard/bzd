@@ -1,4 +1,13 @@
 // std
+#include "bzd/container/array.h"
+#include "bzd/container/optional.h"
+#include "bzd/container/string_view.h"
+#include "bzd/core/channel.h"
+#include "bzd/platform/types.h"
+#include "bzd/utility/format/format.h"
+#include "bzd/utility/ignore.h"
+#include "bzd/utility/singleton.h"
+
 #include <array>
 #include <atomic>
 #include <csignal>
@@ -13,17 +22,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "bzd/container/array.h"
-#include "bzd/container/string_view.h"
-#include "bzd/container/optional.h"
-#include "bzd/utility/ignore.h"
-#include "bzd/utility/format/format.h"
-#include "bzd/platform/types.h"
-#include "bzd/utility/singleton.h"
-#include "bzd/core/channel.h"
-
-namespace
-{
+namespace {
 class AsyncSignalSafeChannel : public bzd::OChannel
 {
 public:
@@ -121,7 +120,8 @@ char* exec(const char* cmd)
 	return result;
 }
 
-struct DemangledBuffer{
+struct DemangledBuffer
+{
 	static constexpr bzd::SizeType initialSize = 1024;
 
 	DemangledBuffer() noexcept
@@ -170,7 +170,7 @@ void callStack(std::ostream& out) noexcept
 	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
 
 	AsyncSignalSafeChannel channel;
-	
+
 	// Reset filters
 	std::cout << std::dec << std::noshowbase;
 
@@ -319,15 +319,15 @@ void sigHandler(const int sig)
 bool installBootstrap()
 {
 	// Specify that the signal handler will be allocated onto the alternate signal stack.
-    static bzd::Array<bzd::UInt8Type, SIGSTKSZ * 10> stack;
+	static bzd::Array<bzd::UInt8Type, SIGSTKSZ * 10> stack;
 
-    stack_t signalStack{};
+	stack_t signalStack{};
 	signalStack.ss_size = stack.size();
-    signalStack.ss_sp = stack.data();
+	signalStack.ss_sp = stack.data();
 	bzd::assert::isTrue(sigaltstack(&signalStack, 0) != -1);
 
 	struct ::sigaction sa;
-    sigemptyset(&sa.sa_mask);
+	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sigHandler;
 	sa.sa_flags = SA_ONSTACK;
 

@@ -75,8 +75,7 @@
 		computed: {
 			tooltipSpeed() {
 				return {
-					data:
-						"Average successful build speed over the last 14 days.<br/><small>(or the last successful build if none is available)</small>",
+					data: "Average successful build speed over the last 14 days.<br/><small>(or the last successful build if none is available)</small>",
 				};
 			},
 			tooltipReliability() {

@@ -13,8 +13,8 @@ cc_library(
     includes = ["."],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/core:assert_minimal",
         "//cc/bzd/platform",
-        "//cc/bzd/core:assert_minimal"
     ],
     alwayslink = True,
 )

@@ -223,14 +223,17 @@ export default class HttpServer {
 		if (fallback) {
 			this.app.use(
 				uri,
-				((...args) => (req, res, next) => {
-					if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-						(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
-					}
-					else {
-						next();
-					}
-				})(fallback, { root: absolutePath })
+				(
+					(...args) =>
+						(req, res, next) => {
+							if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+								(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
+							}
+							else {
+								next();
+							}
+						}
+				)(fallback, { root: absolutePath })
 			);
 		}
 	}
