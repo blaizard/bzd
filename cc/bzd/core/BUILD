@@ -11,7 +11,6 @@ cc_library(
         ":registry",
         ":scheduler",
         ":units",
-        "//cc/bzd/core/interfaces:channel",
     ],
 )
 

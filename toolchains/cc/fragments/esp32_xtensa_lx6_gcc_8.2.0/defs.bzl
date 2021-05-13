@@ -5,7 +5,7 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
 
     http_archive(
         name = package_name,
-        build_file = "//toolchains/cc/fragments/esp32_xtensa_lx6_gcc:{}.BUILD".format(package_name),
+        build_file = "//toolchains/cc/fragments/esp32_xtensa_lx6_gcc_8.2.0:{}.BUILD".format(package_name),
         urls = [
             "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz",
         ],
