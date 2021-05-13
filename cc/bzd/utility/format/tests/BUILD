@@ -8,5 +8,6 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/utility/format",
         "//tools/cc_test",
+        "//cc/bzd/core:assert_minimal",
     ],
 )
