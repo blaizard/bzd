@@ -28,9 +28,10 @@ public:
 		auto handle = bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(promise.valueMutable());
 
 		// Show the stack usage
-		//int dummy;
-		//static void* base = &dummy;
-		//std::cout << handle.address() << " stack: "  << (reinterpret_cast<bzd::IntPtrType>(base) - reinterpret_cast<bzd::IntPtrType>(&dummy)) << std::endl;
+		// int dummy;
+		// static void* base = &dummy;
+		// std::cout << handle.address() << " stack: "  << (reinterpret_cast<bzd::IntPtrType>(base) -
+		// reinterpret_cast<bzd::IntPtrType>(&dummy)) << std::endl;
 
 		return handle;
 	}

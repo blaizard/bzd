@@ -119,7 +119,6 @@ public: // constructors
 	~TupleImpl() noexcept = default;
 
 public: // API
-
 	// Access by index as template (type is automatically deducted)
 
 	template <SizeType M>

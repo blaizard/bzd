@@ -54,13 +54,9 @@ public:
 		return {};
 	}
 
-	constexpr void unhandled_exception() noexcept {
-		bzd::assert::unreachable();
-	}
+	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
-	~Promise() noexcept
-	{
-	}
+	~Promise() noexcept {}
 
 private:
 	template <class U>
@@ -95,7 +91,6 @@ private:
 	bzd::Optional<T> result_{};
 };
 
-
 template <>
 class Promise<void> : public impl::Promise<Promise<void>>
 {
@@ -103,13 +98,9 @@ public:
 	using ResultType = bool;
 	using impl::Promise<Promise<void>>::Promise;
 
-	auto get_return_object() noexcept { 
-		return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
+	auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
 
-    constexpr void return_void() noexcept
-	{
-		result_ = true;
-	}
+	constexpr void return_void() noexcept { result_ = true; }
 
 private:
 	template <class U>
@@ -117,4 +108,4 @@ private:
 
 	bzd::Optional<bool> result_{};
 };
-}
+} // namespace bzd::coroutine

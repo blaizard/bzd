@@ -10,8 +10,8 @@ cc_binary(
     ],
     tags = ["manual"],
     deps = [
-        "//cc/bzd",
         ":async",
+        "//cc/bzd",
     ],
 )
 

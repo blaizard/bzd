@@ -1,7 +1,6 @@
-#include "example/coroutines/async.h"
-
 #include "bzd/core/units.h"
 #include "bzd/platform/clock.h"
+#include "example/coroutines/async.h"
 
 #include <iostream>
 
@@ -15,16 +14,16 @@ bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 	do
 	{
 		co_await bzd::impl::SuspendAlways{};
-/*
-		{
-			auto&& awaiter = bzd::impl::SuspendAlways{};
-			if (!awaiter.await_ready()) {
-				awaiter.await_suspend(std::coroutine_handle<> p); 
-				// compiler added suspend/resume hook
-			}
-			awaiter.await_resume();
-		}
-*/
+		/*
+				{
+					auto&& awaiter = bzd::impl::SuspendAlways{};
+					if (!awaiter.await_ready()) {
+						awaiter.await_suspend(std::coroutine_handle<> p);
+						// compiler added suspend/resume hook
+					}
+					awaiter.await_resume();
+				}
+		*/
 
 		const auto curTicks = bzd::platform::getTicks();
 
@@ -37,7 +36,7 @@ bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 		details.ticks = curTicks.get();
 		duration.setFromDetails(details);
 
-		//std::cout << duration.get() << " - " << targetDuration.get() << std::endl;
+		// std::cout << duration.get() << " - " << targetDuration.get() << std::endl;
 
 		// Check if the duration is reached
 	} while (duration < targetDuration);
@@ -47,7 +46,7 @@ bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 
 bzd::Async<void> task1() noexcept
 {
-	for (int i = 0; i<10; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		co_await delay(1_s);
 		std::cout << "." << std::endl;
@@ -55,7 +54,6 @@ bzd::Async<void> task1() noexcept
 
 	co_return;
 }
-
 
 int main()
 {
