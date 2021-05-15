@@ -1,6 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
+    name = "not",
+    srcs = [
+        "not_working.cc",
+    ],
+    tags = ["manual"],
+)
+
+cc_binary(
     name = "coroutines",
     srcs = [
         "main.cc",
