@@ -85,7 +85,7 @@ public:
 	constexpr void set(T&& value) noexcept { elem_ = bzd::move(value); }
 
 private:
-	T elem_; //{};
+	T elem_{};
 };
 
 // Tuple implementation

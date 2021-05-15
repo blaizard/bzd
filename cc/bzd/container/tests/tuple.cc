@@ -1,4 +1,5 @@
 #include "bzd/container/tuple.h"
+#include "bzd/container/string_view.h"
 
 #include "bzd/utility/move.h"
 #include "cc_test/test.h"
@@ -51,6 +52,13 @@ TEST(ContainerTuple, Constexpr)
 	constexpr const bzd::Tuple<int, const char*> tuple{12, "Hello"};
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_STREQ(tuple.get<1>(), "Hello");
+}
+
+TEST(ContainerTuple, ConstexprStringView)
+{
+	constexpr const bzd::Tuple<int, bzd::StringView> tuple2{12, "Hello"};
+	EXPECT_EQ(tuple2.get<0>(), 12);
+	EXPECT_STREQ(tuple2.get<1>().data(), "Hello");
 }
 
 TEST(ContainerTuple, NonDefaultConstructor)
