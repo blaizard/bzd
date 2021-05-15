@@ -9,21 +9,9 @@ bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 	auto duration = bzd::platform::getTicks().toDuration();
 	const auto targetDuration = duration + bzd::platform::msToTicks(time);
 
-	std::cout << "Start" << std::endl;
-
 	do
 	{
-		co_await bzd::impl::SuspendAlways{};
-		/*
-				{
-					auto&& awaiter = bzd::impl::SuspendAlways{};
-					if (!awaiter.await_ready()) {
-						awaiter.await_suspend(std::coroutine_handle<> p);
-						// compiler added suspend/resume hook
-					}
-					awaiter.await_resume();
-				}
-		*/
+		co_await bzd::async::yield();
 
 		const auto curTicks = bzd::platform::getTicks();
 
@@ -40,8 +28,6 @@ bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 
 		// Check if the duration is reached
 	} while (duration < targetDuration);
-
-	co_return;
 }
 
 bzd::Async<void> task1() noexcept
@@ -51,8 +37,6 @@ bzd::Async<void> task1() noexcept
 		co_await delay(1_s);
 		std::cout << "." << std::endl;
 	}
-
-	co_return;
 }
 
 int main()

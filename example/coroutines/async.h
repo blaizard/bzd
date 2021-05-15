@@ -33,10 +33,9 @@ class Async
 public:
 	using PromiseType = bzd::coroutine::Promise<T>;
 	using ResultType = typename PromiseType::ResultType;
-	using promise_type = PromiseType;
 
 public: // constructor/destructor
-	constexpr Async(bzd::coroutine::impl::coroutine_handle<promise_type> h) noexcept : handle_(h) {}
+	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
 
 	~Async() noexcept
 	{
@@ -84,7 +83,7 @@ public:
 		handle_.promise().onTerminateCallback_.emplace(callback);
 	}
 
-	constexpr void cancelIfDifferent(bzd::coroutine::interface::Promise& promise) noexcept
+	constexpr void cancelIfDifferent(const bzd::coroutine::interface::Promise& promise) noexcept
 	{
 		if (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) != &promise)
 		{
@@ -110,8 +109,10 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() noexcept { return isReady(); }
+	using promise_type = PromiseType;
 
+	constexpr bool await_ready() noexcept { return isReady(); }
+/*
 	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
 	{
 		// To handle continuation
@@ -121,11 +122,28 @@ public: // coroutine specific
 		attach();
 		return Scheduler::getInstance().pop();
 	}
+*/
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
+	{
+		// To handle continuation
+		handle_.promise().caller = caller;
+
+		// Push the current handle to the scheduler and pop the next one.
+		attach();
+		auto handle = Scheduler::getInstance().pop();
+
+		// Resume the coroutine.
+		handle.resume();
+
+		// Returns control to the caller/resumer of the current coroutine,
+		// as the current coroutine is already queued for execution.
+		return true;
+	}
 
 	constexpr ResultType await_resume() noexcept { return getResult().value(); }
 
 private:
-	bzd::coroutine::impl::coroutine_handle<promise_type> handle_;
+	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_;
 };
 
 } // namespace bzd::impl
