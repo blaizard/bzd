@@ -5,6 +5,9 @@ cc_library(
     srcs = ["bootstrap.cc"],
     tags = ["manual"],
     visibility = ["//visibility:public"],
+    linkopts = [
+        "-ldl",
+    ],
     deps = [
         "//cc/bzd/container:array",
         "//cc/bzd/container:optional",

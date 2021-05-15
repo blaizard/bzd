@@ -23,10 +23,10 @@ protected:
 	}
 
 public:
-	constexpr StringView() : Impl(nullptr, 0) {}
-	constexpr StringView(const T* const str) : Impl(str, strlen(str)) {}
-	constexpr StringView(const T* const str, const SizeType size) : Impl(str, size) {}
-	constexpr StringView(const Span<char>& span) : Impl(span.data(), span.size()) {}
+	constexpr StringView() noexcept : Impl(nullptr, 0) {}
+	constexpr StringView(const T* const str) noexcept : Impl(str, strlen(str)) {}
+	constexpr StringView(const T* const str, const SizeType size) noexcept : Impl(str, size) {}
+	constexpr StringView(const Span<char>& span) noexcept : Impl(span.data(), span.size()) {}
 
 	constexpr StringView subStr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 	{
