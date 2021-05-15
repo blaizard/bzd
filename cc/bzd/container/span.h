@@ -32,10 +32,10 @@ public:
 
 public:
 	constexpr Span() noexcept = default;
-	constexpr Span(DataType* const data, const SizeType size) noexcept : data_(data), size_(size) {}
+	constexpr Span(DataType* const data, const SizeType size) noexcept : data_{data}, size_{size} {}
 
 	template <bzd::SizeType N>
-	constexpr Span(DataType (&data)[N]) noexcept : data_(data), size_(N)
+	constexpr Span(DataType (&data)[N]) noexcept : data_{data}, size_{N}
 	{
 	}
 

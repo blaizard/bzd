@@ -2,6 +2,7 @@
 #include "bzd/container/array.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/string_view.h"
+#include "bzd/container/string_channel.h"
 #include "bzd/core/channel.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/format/format.h"
@@ -21,6 +22,10 @@
 #include <stdexcept>
 #include <string>
 #include <unistd.h>
+#include <dlfcn.h>
+#include <link.h>
+
+#include <iostream>
 
 namespace {
 class AsyncSignalSafeChannel : public bzd::OChannel
@@ -98,7 +103,7 @@ constexpr const char* getSignalName(int sig) noexcept
 	}
 }
 
-char* exec(const char* cmd)
+bzd::StringView exec(const char* cmd)
 {
 	constexpr std::size_t maxSize = 1024;
 	static char result[maxSize + 1];
@@ -117,7 +122,21 @@ char* exec(const char* cmd)
 	}
 
 	result[sizeof(result) - 1] = '\0';
-	return result;
+	return bzd::StringView{result};
+}
+
+bzd::StringView readLine(bzd::StringView str, bzd::SizeType& start)
+{
+	const auto end = str.find('\n', start);
+	if (end != bzd::StringView::npos)
+	{
+		const auto line = str.subStr(start, end - start);
+		// Needs to be modified
+		const_cast<char&>(str[end]) = '\0';
+		start = end + 1;
+		return line;
+	}
+	return "";
 }
 
 struct DemangledBuffer
@@ -161,18 +180,56 @@ bzd::Optional<bzd::StringView> tryDemangle(const char* const pSymbol) noexcept
 	return bzd::StringView{demangleBuffer.data};
 }
 
-void callStack(std::ostream& out) noexcept
+struct SymbolicInfo
+{
+	bzd::StringView path{};
+	bzd::StringView symbol{};
+	void* address{};
+	bzd::IntPtrType offset{};
+};
+
+static void* getSelfBaseAddress()
+{
+	Dl_info info{};
+	const auto result = ::dladdr(reinterpret_cast<const void*>(getSelfBaseAddress), &info);
+	return (result) ? info.dli_fbase : nullptr;
+}
+
+SymbolicInfo makeSymbolicInfo(void* address)
+{
+	static auto selfBaseAddress = getSelfBaseAddress();
+	SymbolicInfo symbolicInfo{};
+	Dl_info info{};
+	void* extraInfo{nullptr};
+	const auto result = ::dladdr1(address, &info, &extraInfo, RTLD_DL_LINKMAP);
+
+	if (result)
+	{
+		if (info.dli_saddr)
+		{
+			symbolicInfo.offset = reinterpret_cast<bzd::IntPtrType>(address) - reinterpret_cast<bzd::IntPtrType>(info.dli_saddr);
+		}
+		else if (extraInfo)
+		{
+			const ::link_map& linkMap = reinterpret_cast<const ::link_map&>(extraInfo);
+			symbolicInfo.offset = reinterpret_cast<bzd::IntPtrType>(address) - reinterpret_cast<bzd::IntPtrType>(linkMap.l_ld);
+		}
+	}
+
+	symbolicInfo.address = (info.dli_fbase == selfBaseAddress) ? address : reinterpret_cast<void*>(symbolicInfo.offset);
+	symbolicInfo.path = (info.dli_fname) ? bzd::StringView{info.dli_fname} : bzd::StringView{""};
+	symbolicInfo.symbol = (info.dli_sname) ? bzd::StringView{info.dli_sname} : bzd::StringView{""};
+
+	return symbolicInfo;
+}
+
+void callStack() noexcept
 {
 	constexpr size_t MAX_STACK_LEVEL = 32;
 	static void* addresses[MAX_STACK_LEVEL];
 
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
-	const std::unique_ptr<char*, decltype(&std::free)> symbols(::backtrace_symbols(addresses, nbLevels), &std::free);
-
 	AsyncSignalSafeChannel channel;
-
-	// Reset filters
-	std::cout << std::dec << std::noshowbase;
 
 	for (int level = 0; level < nbLevels; ++level)
 	{
@@ -183,119 +240,41 @@ void callStack(std::ostream& out) noexcept
 			return;
 		}
 
-		char* pSymbol = symbols.get()[level];
-		const char* pSourcePath = nullptr;
-		const char* pFunction = nullptr;
-		const char* pOffset = nullptr;
+		auto address = addresses[level];
+		const auto info = makeSymbolicInfo(address);
+		bzd::StringView path{info.path};
+		bzd::StringView symbol{info.symbol};
 
-		// Look for the source path
+		// Look for improved function/source names with addr2line
 		{
-			const auto pEnd = std::strchr(pSymbol, '(');
-			if (pEnd)
+			bzd::StringChannel<1024> command;
+			bzd::format::toString(command, CSTR("addr2line -f -e \"{}\" {:#x} {:#x}"), info.path.data(), reinterpret_cast<bzd::IntPtrType>(info.address), info.offset);
+
 			{
-				*pEnd = '\0';
-				pSourcePath = pSymbol;
-				pSymbol = pEnd + 1;
+				const auto result = exec(command.str().data());
+				bzd::SizeType start = 0;
+				const auto line1 = readLine(result, start);
+				const auto line2 = readLine(result, start);
+				const auto line3 = readLine(result, start);
+				const auto line4 = readLine(result, start);
+				symbol = (line1.size() && line1.at(0) != '?') ? line1 : symbol;
+				symbol = (line3.size() && line3.at(0) != '?') ? line3 : symbol;
+				path = (line2.size() && line2.at(0) != '?') ? line2 : path;
+				path = (line4.size() && line4.at(0) != '?') ? line4 : path;
 			}
 		}
 
-		// Look for the function
-		if (pSourcePath)
+		if (symbol.data())
 		{
-			const auto pEnd = std::strchr(pSymbol, '+');
-			if (pEnd)
+			const auto maybeDemangled = tryDemangle(symbol.data());
+			if (maybeDemangled)
 			{
-				*pEnd = '\0';
-				pFunction = pSymbol;
-				pSymbol = pEnd + 1;
-			}
-		}
-
-		// Look for the offset
-		if (pFunction)
-		{
-			const auto pEnd = std::strchr(pSymbol, ')');
-			if (pEnd)
-			{
-				*pEnd = '\0';
-				pOffset = pSymbol;
-				pSymbol = pEnd + 1;
+				symbol = maybeDemangled.value();
 			}
 		}
 
 		// Print stack trace number and memory address
-		bzd::format::toString(channel, CSTR("#{:d} {:#x}"), level, reinterpret_cast<uint64_t>(addresses[level]));
-
-		// Look for improved function/source names with addr2line
-		{
-			static char cmd[1024];
-			if (pOffset)
-			{
-				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" %s", pSourcePath, pOffset);
-			}
-			else if (pSourcePath)
-			{
-				snprintf(cmd, sizeof(cmd), "addr2line -f -e \"%s\" 0x%lx", pSourcePath, reinterpret_cast<uint64_t>(addresses[level]));
-			}
-
-			if (pOffset || pSourcePath)
-			{
-				pSymbol = exec(cmd);
-				if (pSymbol)
-				{
-					// Function
-					if (pSymbol[0] != '?')
-					{
-						const auto pEnd = std::strchr(pSymbol, '\n');
-						if (pEnd)
-						{
-							*pEnd = '\0';
-							pFunction = pSymbol;
-							pSymbol = pEnd + 1;
-						}
-					}
-					// Source path
-					if (pSymbol[0] != '?')
-					{
-						const auto pEnd = std::strchr(pSymbol, '\n');
-						if (pEnd)
-						{
-							*pEnd = '\0';
-							pSourcePath = pSymbol;
-							pSymbol = pEnd + 1;
-						}
-					}
-				}
-			}
-		}
-
-		if (pFunction)
-		{
-			const auto maybeDemangled = tryDemangle(pFunction);
-			if (maybeDemangled)
-			{
-				out << " in ";
-				out.write(maybeDemangled->data(), maybeDemangled->size());
-				if (pOffset)
-				{
-					out << "+" << pOffset;
-				}
-			}
-			else
-			{
-				out << pFunction;
-			}
-		}
-
-		if (pSourcePath)
-		{
-			out << " (" << pSourcePath << ")";
-		}
-		else
-		{
-			out << " (<unknown>)";
-		}
-		out << std::endl;
+		bzd::format::toString(channel, CSTR("#{:d} {:#x} in {}+{:#x} {}\n"), level, reinterpret_cast<uint64_t>(address), symbol.data(), info.offset, path.data());
 	}
 }
 
@@ -311,7 +290,7 @@ void sigHandler(const int sig)
 	AsyncSignalSafeChannel channel;
 	bzd::format::toString(channel, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig);
 
-	callStack(std::cout);
+	callStack();
 	std::exit(sig);
 }
 } // namespace
