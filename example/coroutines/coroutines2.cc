@@ -89,7 +89,7 @@ int main()
 		auto mycoro2 = count(2, 6);
 
 		auto promise = bzd::async::all(mycoro1, mycoro2);
-		promise.sync();
+		bzd::async::run(promise);
 	}
 
 	std::cout << "-----------------" << std::endl;
@@ -99,7 +99,7 @@ int main()
 		auto mycoro2 = count(2, 6);
 
 		auto promise = bzd::async::any(mycoro1, mycoro2);
-		promise.sync();
+		bzd::async::run(promise);
 	}
 
 	std::cout << "-----------------" << std::endl;

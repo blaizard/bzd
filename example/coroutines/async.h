@@ -14,10 +14,10 @@ namespace bzd::impl {
 struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 {
 	template <class T>
-	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
 	{
 		bzd::Scheduler::getInstance().push(handle);
-		return bzd::Scheduler::getInstance().pop();
+		return true;
 	}
 };
 
@@ -47,15 +47,6 @@ public: // constructor/destructor
 	}
 
 public:
-	constexpr ResultType sync() noexcept
-	{
-		while (!isReady())
-		{
-			handle_.resume();
-		}
-		return getResult().value();
-	}
-
 	// Cancel the current coroutine and nested ones
 	constexpr void cancel() noexcept
 	{
@@ -112,28 +103,14 @@ public: // coroutine specific
 	using promise_type = PromiseType;
 
 	constexpr bool await_ready() noexcept { return isReady(); }
-/*
-	constexpr auto await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
-	{
-		// To handle continuation
-		handle_.promise().caller = caller;
 
-		// Push the current handle to the scheduler and pop the next one.
-		attach();
-		return Scheduler::getInstance().pop();
-	}
-*/
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
 	{
 		// To handle continuation
 		handle_.promise().caller = caller;
 
-		// Push the current handle to the scheduler and pop the next one.
+		// Push the current handle to the scheduler.
 		attach();
-		auto handle = Scheduler::getInstance().pop();
-
-		// Resume the coroutine.
-		handle.resume();
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.
@@ -167,6 +144,26 @@ public:
 } // namespace bzd
 
 namespace bzd::async {
+
+template <class... Asyncs>
+bzd::Tuple<impl::AsyncResultType<Asyncs>...> run(Asyncs&&... asyncs) noexcept
+{
+	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
+
+	// Push all handles to the scheduler
+	(asyncs.attach(), ...);
+
+	// Loop until all asyncs are ready
+	while (!(asyncs.isReady() && ...))
+	{
+		auto handle = Scheduler::getInstance().pop();
+		handle.resume();
+	}
+
+	// Build the result and return it.
+	ResultType result{asyncs.getResult().value()...};
+	return result;
+}
 
 constexpr auto yield() noexcept
 {

@@ -1,6 +1,6 @@
 #include "bzd/container/tuple.h"
-#include "bzd/container/string_view.h"
 
+#include "bzd/container/string_view.h"
 #include "bzd/utility/move.h"
 #include "cc_test/test.h"
 

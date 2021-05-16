@@ -1,8 +1,8 @@
 // std
 #include "bzd/container/array.h"
 #include "bzd/container/optional.h"
-#include "bzd/container/string_view.h"
 #include "bzd/container/string_channel.h"
+#include "bzd/container/string_view.h"
 #include "bzd/core/channel.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/format/format.h"
@@ -15,17 +15,15 @@
 #include <cstdio>
 #include <cstring>
 #include <cxxabi.h>
+#include <dlfcn.h>
 #include <execinfo.h>
 #include <iomanip>
 #include <iostream>
+#include <link.h>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <unistd.h>
-#include <dlfcn.h>
-#include <link.h>
-
-#include <iostream>
 
 namespace {
 class AsyncSignalSafeChannel : public bzd::OChannel
@@ -248,7 +246,11 @@ void callStack() noexcept
 		// Look for improved function/source names with addr2line
 		{
 			bzd::StringChannel<1024> command;
-			bzd::format::toString(command, CSTR("addr2line -f -e \"{}\" {:#x} {:#x}"), info.path.data(), reinterpret_cast<bzd::IntPtrType>(info.address), info.offset);
+			bzd::format::toString(command,
+								  CSTR("addr2line -f -e \"{}\" {:#x} {:#x}"),
+								  info.path.data(),
+								  reinterpret_cast<bzd::IntPtrType>(info.address),
+								  info.offset);
 
 			{
 				const auto result = exec(command.str().data());
@@ -274,7 +276,13 @@ void callStack() noexcept
 		}
 
 		// Print stack trace number and memory address
-		bzd::format::toString(channel, CSTR("#{:d} {:#x} in {}+{:#x} {}\n"), level, reinterpret_cast<uint64_t>(address), symbol.data(), info.offset, path.data());
+		bzd::format::toString(channel,
+							  CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
+							  level,
+							  reinterpret_cast<uint64_t>(address),
+							  symbol.data(),
+							  info.offset,
+							  path.data());
 	}
 }
 
