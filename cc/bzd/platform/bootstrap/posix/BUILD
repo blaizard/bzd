@@ -3,11 +3,11 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 cc_library(
     name = "posix",
     srcs = ["bootstrap.cc"],
-    tags = ["manual"],
-    visibility = ["//visibility:public"],
     linkopts = [
         "-ldl",
     ],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:array",
         "//cc/bzd/container:optional",

@@ -34,7 +34,9 @@ bzd::Async<void> task1() noexcept
 {
 	for (int i = 0; i < 10; ++i)
 	{
-		co_await delay(1_s);
+		auto task1 = delay(1_s);
+		auto task2 = delay(1_s);
+		co_await bzd::async::all(task1, task2);
 		std::cout << "." << std::endl;
 	}
 }
@@ -43,7 +45,7 @@ int main()
 {
 	std::cout << "start" << std::endl;
 	auto promise = task1();
-	promise.sync();
+	bzd::async::run(promise);
 	std::cout << "end" << std::endl;
 	return 0;
 }
