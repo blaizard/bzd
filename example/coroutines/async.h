@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/array.h"
 #include "bzd/container/function_view.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
+#include "bzd/container/tuple.h"
 #include "bzd/type_traits/remove_reference.h"
 #include "bzd/utility/ignore.h"
 #include "example/coroutines/coroutine.h"
@@ -145,24 +145,22 @@ public:
 
 namespace bzd::async {
 
-template <class... Asyncs>
-bzd::Tuple<impl::AsyncResultType<Asyncs>...> run(Asyncs&&... asyncs) noexcept
+template <class T>
+impl::AsyncResultType<T> run(T& async) noexcept
 {
-	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
+	// Push the handle to the scheduler
+	async.attach();
 
-	// Push all handles to the scheduler
-	(asyncs.attach(), ...);
-
-	// Loop until all asyncs are ready
-	while (!(asyncs.isReady() && ...))
+	// Loop until it is completed.
+	while (!async.isReady())
 	{
+		// Drain remaining handles
 		auto handle = Scheduler::getInstance().pop();
 		handle.resume();
 	}
 
-	// Build the result and return it.
-	ResultType result{asyncs.getResult().value()...};
-	return result;
+	// Return the result.
+	return async.getResult().value();
 }
 
 constexpr auto yield() noexcept
