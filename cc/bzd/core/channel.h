@@ -19,7 +19,7 @@ protected:
 	OChannel() = default;
 
 public:
-	virtual bzd::Result<SizeType> write(const Span<const bzd::ByteType>& data) noexcept = 0;
+	virtual bzd::Result<SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept = 0;
 };
 
 class IChannel : public IOChannelCommon
@@ -28,7 +28,7 @@ protected:
 	IChannel() = default;
 
 public:
-	virtual bzd::Result<SizeType> read(const Span<bzd::ByteType>& data) noexcept = 0;
+	virtual bzd::Result<SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept = 0;
 };
 
 class IOChannel

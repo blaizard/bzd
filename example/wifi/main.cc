@@ -150,7 +150,7 @@ static void tcp_server_task(void* /*pvParameters*/)
 		{
 			inet6_ntoa_r(source_addr.sin6_addr, addr_str, sizeof(addr_str) - 1);
 		}
-		bzd::format::toString(bzd::getOut(), CSTR("Socket accepted ip address: {}"), addr_str);
+		bzd::format::toString(bzd::getOut(), "Socket accepted ip address: {}"_sv, addr_str);
 
 		ESP_LOGI(TAG, "Socket accepted ip address: %s", addr_str);
 
@@ -169,7 +169,7 @@ int main()
 {
 	ESP_LOGI(TAG, "START");
 
-	bzd::format::toString(bzd::getOut(), CSTR("START.\n"));
+	bzd::format::toString(bzd::getOut(), "START.\n"_sv);
 
 	// Initialize NVS
 	esp_err_t ret = nvs_flash_init();
@@ -187,7 +187,7 @@ int main()
 	ESP_LOGI(TAG, "ESP_WIFI_MODE_AP");
 	wifi_init_softap();
 
-	bzd::format::toString(bzd::getOut(), CSTR("start task.\n"));
+	bzd::format::toString(bzd::getOut(), "start task.\n"_sv);
 
 	xTaskCreate(tcp_server_task, "tcp_server", 4096, NULL, 5, NULL);
 

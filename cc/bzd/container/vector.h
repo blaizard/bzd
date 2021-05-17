@@ -1,24 +1,22 @@
 #pragma once
 
-#include "bzd/container/span.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/forward.h"
-
-#include <iostream>
+#include "bzd/container/impl/span.h"
+#include "bzd/container/storage/contiguous_resizeable.h"
+#include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
-template <class T, class Impl>
-class Vector : public Impl
+template <class T, class Storage>
+class Vector : public impl::Span<T, Storage>
 {
 protected:
-	using Parent = Impl;
-	using Impl::data_;
-	using Impl::size_;
+	using Parent = impl::Span<T, Storage>;
+	using StorageType = typename Parent::StorageType;
 
 public:
-	template <class... Args>
-	constexpr explicit Vector(const SizeType capacity, Args&&... args) : Impl(args...), capacity_(capacity)
+	constexpr explicit Vector(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
 	{
 	}
 
@@ -30,11 +28,11 @@ public:
 	 *
 	 * \param value Value to be copied (or moved) to the new element.
 	 */
-	constexpr void pushBack(T&& value)
+	constexpr void pushBack(const T& value)
 	{
-		bzd::assert::isTrue(size_ < capacity_, "Out of bound");
-		Parent::at(size_) = bzd::forward<T>(value);
-		++size_;
+		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
+		++this->storage_.sizeMutable();
+		this->at(this->size() - 1) = value;
 	}
 
 	/**
@@ -54,7 +52,7 @@ public:
 	 *
 	 * \param n The new size. Note, it must a be lower or equal to the capacity.
 	 */
-	constexpr void resize(const bzd::SizeType n) noexcept { size_ = (n < capacity_) ? n : capacity_; }
+	constexpr void resize(const bzd::SizeType n) noexcept { this->storage_.sizeMutable() = (n < capacity_) ? n : capacity_; }
 
 protected:
 	const SizeType capacity_;
@@ -63,20 +61,42 @@ protected:
 
 namespace bzd::interface {
 template <class T>
-using Vector = impl::Vector<T, Span<T>>;
+using Vector = impl::Vector<T, impl::NonOwningStorage<T>>;
 }
 
 namespace bzd {
 template <class T, SizeType N>
 class Vector : public interface::Vector<T>
 {
+protected:
+	using Parent = interface::Vector<T>;
+	using StorageType = typename Parent::StorageType;
+
 public:
+	constexpr Vector() noexcept : Parent{StorageType{data_, 0}, N} {}
+
 	template <class... Args>
-	constexpr explicit Vector(Args&&... args) : interface::Vector<T>(N, data_, sizeof...(Args)), data_{bzd::forward<Args>(args)...}
+	constexpr explicit Vector(Args&&... args) noexcept : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{bzd::forward<Args>(args)...}
 	{
 	}
 
+private:
+	T data_[N]{};
+};
+
+template <class T, SizeType N>
+class VectorConstexpr : public impl::Vector<T, impl::ContiguousResizeableStorage<T, N>>
+{
 protected:
-	T data_[N];
+	using Parent = impl::Vector<T, impl::ContiguousResizeableStorage<T, N>>;
+	using StorageType = typename Parent::StorageType;
+
+public:
+	constexpr VectorConstexpr() noexcept : Parent{StorageType{}, N} {}
+
+	template <class... Args>
+	constexpr explicit VectorConstexpr(Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}, N}
+	{
+	}
 };
 } // namespace bzd

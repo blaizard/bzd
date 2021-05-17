@@ -26,7 +26,7 @@ public:
 	constexpr StringView() noexcept : Impl(nullptr, 0) {}
 	constexpr StringView(const T* const str) noexcept : Impl(str, strlen(str)) {}
 	constexpr StringView(const T* const str, const SizeType size) noexcept : Impl(str, size) {}
-	constexpr StringView(const Span<char>& span) noexcept : Impl(span.data(), span.size()) {}
+	constexpr StringView(const bzd::Span<char>& span) noexcept : Impl(span.data(), span.size()) {}
 
 	constexpr StringView subStr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 	{
@@ -47,14 +47,7 @@ namespace bzd {
 using StringView = impl::StringView<char, bzd::Span<const char>>;
 } // namespace bzd
 
-// Creates a compilation time stringview object
-#define CSTR(strLiteral)                                                                                  \
-	[] {                                                                                                  \
-		constexpr char s[] = #strLiteral;                                                                 \
-		static_assert(s[0] == '"' && s[sizeof(s) - 2] == '"', "Argument must be a string literal.");      \
-		using StrView = struct                                                                            \
-		{                                                                                                 \
-			static constexpr auto value() { return bzd::StringView(strLiteral, sizeof(strLiteral) - 1); } \
-		};                                                                                                \
-		return StrView{};                                                                                 \
-	}()
+constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept
+{
+	return bzd::StringView{str, size};
+}

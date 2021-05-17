@@ -40,6 +40,7 @@ cc_library(
         "//cc/bzd/core:channel",
         "//cc/bzd/meta:range",
         "//cc/bzd/type_traits:decay",
+        "//cc/bzd/type_traits:declval",
         "//cc/bzd/type_traits:is_arithmetic",
         "//cc/bzd/type_traits:is_constructible",
         "//cc/bzd/type_traits:is_floating_point",
