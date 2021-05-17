@@ -59,12 +59,12 @@ public:
 				const auto maybeBack = Self::back();
 				if (!maybeBack)
 				{
-					bzd::assert::isTrue(counter == 0, CSTR("Expected 0 size but got: {}"), counter);
+					bzd::assert::isTrue(counter == 0, "Expected 0 size but got: {}"_sv, counter);
 				}
 				else
 				{
 					bzd::assert::isTrue(previous == &(maybeBack.value()),
-										CSTR("Last pointer is not pointing to the last element: {} vs {}"),
+										"Last pointer is not pointing to the last element: {} vs {}"_sv,
 										previous,
 										&(maybeBack.value()));
 				}
@@ -84,7 +84,7 @@ public:
 		}
 
 		// Element count should be equal.
-		bzd::assert::isTrue(Self::size() == counter, CSTR("Counter ({}) mistmatch with actual size ({})"), counter, Self::size());
+		bzd::assert::isTrue(Self::size() == counter, "Counter ({}) mistmatch with actual size ({})"_sv, counter, Self::size());
 
 		return counter;
 	}
@@ -114,7 +114,7 @@ public:
 	{
 		const auto printAddress = [this](const ElementPtrType address) {
 			bzd::format::toString(bzd::platform::getOut(),
-								  CSTR("{} {}"),
+								  "{} {}"_sv,
 								  address,
 								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "));
 		};

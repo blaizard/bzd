@@ -7,66 +7,66 @@ template <class DataType>
 class Contiguous
 {
 public:
-	using SelfType = Contiguous<DataType>;
+	using Self = Contiguous<DataType>;
 
 public:
 	constexpr Contiguous(DataType* const data, const SizeType index) : data_{data}, index_{index} {}
 
-	constexpr SelfType& operator++() noexcept
+	constexpr Self& operator++() noexcept
 	{
 		++index_;
 		return *this;
 	}
 
-	constexpr SelfType operator++(int) noexcept
+	constexpr Self operator++(int) noexcept
 	{
 		auto it = *this;
 		++index_;
 		return it;
 	}
 
-	constexpr SelfType& operator--() noexcept
+	constexpr Self& operator--() noexcept
 	{
 		--index_;
 		return *this;
 	}
 
-	constexpr SelfType operator--(int) noexcept
+	constexpr Self operator--(int) noexcept
 	{
 		auto it = *this;
 		--index_;
 		return it;
 	}
 
-	constexpr SelfType operator-(const int n) const noexcept
+	constexpr Self operator-(const int n) const noexcept
 	{
-		SelfType it(*this);
+		Self it(*this);
 		it.index_ -= n;
 		return it;
 	}
 
-	constexpr SelfType operator+(const int n) const noexcept
+	constexpr Self operator+(const int n) const noexcept
 	{
-		SelfType it(*this);
+		Self it(*this);
 		it.index_ += n;
 		return it;
 	}
 
-	constexpr SelfType& operator-=(const int n) noexcept
+	constexpr Self& operator-=(const int n) noexcept
 	{
 		index_ -= n;
 		return *this;
 	}
 
-	constexpr SelfType& operator+=(const int n) noexcept
+	constexpr Self& operator+=(const int n) noexcept
 	{
 		index_ += n;
 		return *this;
 	}
 
-	constexpr bool operator==(const SelfType& it) const noexcept { return it.index_ == index_; }
+	constexpr bool operator==(const Self& it) const noexcept { return it.index_ == index_; }
 
-	constexpr bool operator!=(const SelfType& it) const noexcept { return !(it == *this); }
+	constexpr bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
 	constexpr DataType& operator*() const { return data_[index_]; }
 

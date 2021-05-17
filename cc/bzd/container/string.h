@@ -25,7 +25,7 @@ public:
 	}
 
 	// Converter
-	constexpr SizeType append(const StringView& str) noexcept { return append(str.data(), str.size()); }
+	constexpr SizeType append(const bzd::StringView& str) noexcept { return append(str.data(), str.size()); }
 	constexpr SizeType append(const T c) noexcept { return append(&c, 1); }
 	constexpr SizeType append(const T* data, const SizeType n) noexcept
 	{

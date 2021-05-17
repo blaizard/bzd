@@ -6,6 +6,7 @@ cc_library(
     deps = [
         ":non_owning_list",
         ":single_linked_pool",
+        ":span",
     ],
 )
 
@@ -38,4 +39,15 @@ cc_library(
         "//cc/bzd/core:assert_minimal",
         "//cc/bzd/platform:types",
     ],
+)
+
+cc_library(
+    name = "span",
+    hdrs = [
+        "span.h",
+    ],
+    visibility = ["//cc/bzd/container:__pkg__"],
+    deps = [
+        "//cc/bzd/container/iterator:contiguous",
+    ]
 )

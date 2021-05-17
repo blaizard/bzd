@@ -5,6 +5,8 @@
 #include "bzd/container/vector.h"
 #include "cc_test/test.h"
 
+#include <stdexcept>
+
 class ContextTest
 {
 public:
@@ -171,47 +173,47 @@ TEST(Format_, StringFormat)
 {
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {:d}"), 12);
+		bzd::format::toString(stream, "Hello {:d}"_sv, 12);
 		EXPECT_STREQ(stream.str().data(), "Hello 12");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {1} {0:d}"), 12, -89);
+		bzd::format::toString(stream, "Hello {1} {0:d}"_sv, 12, -89);
 		EXPECT_STREQ(stream.str().data(), "Hello -89 12");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {:f}"), 12.45);
+		bzd::format::toString(stream, "Hello {:f}"_sv, 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {:.3f}"), 12.45);
+		bzd::format::toString(stream, "Hello {:.3f}"_sv, 12.45);
 		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {:%}"), 0.15);
+		bzd::format::toString(stream, "Hello {:%}"_sv, 0.15);
 		EXPECT_STREQ(stream.str().data(), "Hello 15.%");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {}"), "World");
+		bzd::format::toString(stream, "Hello {}"_sv, "World");
 		EXPECT_STREQ(stream.str().data(), "Hello World");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("Hello {:.2}"), "World");
+		bzd::format::toString(stream, "Hello {:.2}"_sv, "World");
 		EXPECT_STREQ(stream.str().data(), "Hello Wo");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
+		bzd::format::toString(stream, "This {1} is {0:.1%}"_sv, 0.0349, "milk");
 		EXPECT_STREQ(stream.str().data(), "This milk is 3.5%");
 	}
 	{
 		bzd::StringChannel<256> stream;
-		bzd::format::toString(stream, CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
+		bzd::format::toString(stream, "{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"_sv, 42);
 		EXPECT_STREQ(stream.str().data(), "42 == 0b101010 == 0o52 == 0x2a == 0x2A");
 	}
 }

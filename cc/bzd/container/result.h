@@ -135,7 +135,7 @@ public: // Constructors
 	{
 	}
 
-	// Copy/move constructore/assignment.
+	// Copy/move constructor/assignment.
 	constexpr Result(const Self& result) noexcept = default;
 	constexpr Self& operator=(const Self& result) noexcept = default;
 	constexpr Result(Self&& result) noexcept = default;

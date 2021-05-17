@@ -234,7 +234,7 @@ void callStack() noexcept
 		// Do not print the last stack trace, but ellipsis instead.
 		if (level == MAX_STACK_LEVEL - 1)
 		{
-			bzd::format::toString(channel, CSTR("...\n"));
+			bzd::format::toString(channel, "...\n"_sv);
 			return;
 		}
 
@@ -247,7 +247,7 @@ void callStack() noexcept
 		{
 			bzd::StringChannel<1024> command;
 			bzd::format::toString(command,
-								  CSTR("addr2line -f -e \"{}\" {:#x} {:#x}"),
+								  "addr2line -f -e \"{}\" {:#x} {:#x}"_sv,
 								  info.path.data(),
 								  reinterpret_cast<bzd::IntPtrType>(info.address),
 								  info.offset);
@@ -277,7 +277,7 @@ void callStack() noexcept
 
 		// Print stack trace number and memory address
 		bzd::format::toString(channel,
-							  CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
+							  "#{:d} {:#x} in {}+{:#x} {}\n"_sv,
 							  level,
 							  reinterpret_cast<uint64_t>(address),
 							  symbol.data(),
@@ -296,7 +296,7 @@ void sigHandler(const int sig)
 	}
 
 	AsyncSignalSafeChannel channel;
-	bzd::format::toString(channel, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig);
+	bzd::format::toString(channel, "\nCaught signal: {} ({:d})\n"_sv, getSignalName(sig), sig);
 
 	callStack();
 	std::exit(sig);

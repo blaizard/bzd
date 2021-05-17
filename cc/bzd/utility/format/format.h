@@ -8,6 +8,7 @@
 #include "bzd/core/channel.h"
 #include "bzd/meta/range.h"
 #include "bzd/type_traits/decay.h"
+#include "bzd/type_traits/declval.h"
 #include "bzd/type_traits/is_arithmetic.h"
 #include "bzd/type_traits/is_constructible.h"
 #include "bzd/type_traits/is_floating_point.h"
@@ -16,52 +17,6 @@
 #include "bzd/utility/format/integral.h"
 
 namespace bzd::format::impl {
-/**
- * Simple vector container working with conxtexpr
- */
-template <class T, SizeType N>
-class ConstexprVector
-{
-	using SelfType = ConstexprVector<T, N>;
-	using DataType = T;
-
-public:
-	class Iterator
-	{
-	public:
-		constexpr Iterator(const SelfType& container, const SizeType index) : container_(&container), index_(index) {}
-		constexpr Iterator& operator++() noexcept
-		{
-			++index_;
-			return *this;
-		}
-		constexpr bool operator==(const Iterator& it) const noexcept { return it.index_ == index_; }
-		constexpr bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
-		constexpr const DataType& operator*() const { return (*container_)[index_]; }
-
-	private:
-		const SelfType* container_;
-		SizeType index_;
-	};
-
-public:
-	constexpr ConstexprVector() noexcept {}
-	template <class... Args>
-	constexpr ConstexprVector(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...}
-	{
-	}
-	constexpr Iterator begin() const noexcept { return Iterator(*this, 0); }
-	constexpr Iterator end() const noexcept { return Iterator(*this, size()); }
-	constexpr SizeType size() const noexcept { return size_; }
-	constexpr SizeType capacity() const noexcept { return N; }
-	constexpr void push_back(const T& element) noexcept { data_[size_++] = element; }
-	constexpr DataType& operator[](const SizeType index) { return data_[index]; }
-	constexpr const DataType& operator[](const SizeType index) const { return data_[index]; }
-
-private:
-	T data_[N] = {};
-	SizeType size_ = 0;
-};
 
 struct Metadata
 {
@@ -96,7 +51,7 @@ struct Metadata
 template <class T>
 class HasFormatter
 {
-	template <class C, class = decltype(toString(std::declval<bzd::OChannel&>(), std::declval<C>()))>
+	template <class C, class = decltype(toString(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -108,7 +63,7 @@ public:
 template <class T>
 class HasFormatterWithMetadata
 {
-	template <class C, class = decltype(toString(std::declval<bzd::OChannel&>(), std::declval<C>(), std::declval<const Metadata>()))>
+	template <class C, class = decltype(toString(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>(), bzd::typeTraits::declval<const Metadata>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -382,12 +337,12 @@ public:
 	}
 };
 
-class CheckContext : public ConstexprVector<Metadata, 128>
+class CheckContext : public bzd::VectorConstexpr<Metadata, 128>
 {
 public:
 	constexpr CheckContext() = default;
 	constexpr void addSubstring(const bzd::StringView&) {}
-	constexpr void addMetadata(const Metadata& metadata) { push_back(metadata); }
+	constexpr void addMetadata(const Metadata& metadata) { pushBack(metadata); }
 	constexpr void onError(const bzd::StringView& message) const { bzd::assert::isTrueConstexpr(false); }
 };
 
@@ -403,28 +358,28 @@ void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadat
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0b", 2}.asBytes());
+			stream.write(bzd::StringView{"0b"}.asBytes());
 		}
 		bzd::format::toStringBin(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_LOWER:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0x", 2}.asBytes());
+			stream.write(bzd::StringView{"0x"}.asBytes());
 		}
 		bzd::format::toStringHex(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_UPPER:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0x", 2}.asBytes());
+			stream.write(bzd::StringView{"0x"}.asBytes());
 		}
 		bzd::format::toStringHex(stream, value, "0123456789ABCDEF");
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0o", 2}.asBytes());
+			stream.write(bzd::StringView{"0o"}.asBytes());
 		}
 		bzd::format::toStringOct(stream, value);
 		break;
