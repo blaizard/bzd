@@ -59,7 +59,7 @@ public:
 			{
 				return result;
 			}
-			buffer = buffer.subspan(*result);
+			buffer = buffer.subSpan(*result);
 		}
 	}
 
