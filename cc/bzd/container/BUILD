@@ -17,7 +17,6 @@ cc_library(
         ":reference_wrapper",
         ":result",
         ":span",
-        ":span2",
         ":string",
         ":string_channel",
         ":string_view",
@@ -52,6 +51,7 @@ cc_library(
     deps = [
         ":span",
         "//cc/bzd/platform:types",
+        "//cc/bzd/container/storage:fixed",
     ],
 )
 
@@ -215,22 +215,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/iterator:contiguous",
-        "//cc/bzd/core:assert_minimal_header",
-        "//cc/bzd/type_traits:enable_if",
-        "//cc/bzd/type_traits:is_const",
-        "//cc/bzd/type_traits:remove_const",
-        "//cc/bzd/utility:swap",
-    ],
-)
-
-cc_library(
-    name = "span2",
-    hdrs = [
-        "span2.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
         "//cc/bzd/container/storage:non_owning",
         "//cc/bzd/container/impl:span",
         "//cc/bzd/core:assert_minimal_header",
@@ -261,7 +245,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":span2",
+        ":span",
         "//cc/bzd/platform:types",
         "//cc/bzd/container/storage:non_owning",
     ],
@@ -322,11 +306,11 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":span2",
+        ":span",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
-        "//cc/bzd/container/storage:contiguous_resizeable",
+        "//cc/bzd/container/storage:resizeable",
         "//cc/bzd/container/storage:non_owning",
     ],
 )

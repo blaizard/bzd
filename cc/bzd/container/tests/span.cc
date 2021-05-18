@@ -1,4 +1,4 @@
-#include "bzd/container/span2.h"
+#include "bzd/container/span.h"
 
 #include "cc_test/test.h"
 
@@ -21,12 +21,12 @@ TEST(ContainerSpan, Constructor)
 	EXPECT_EQ(spanCopy.size(), 5);
 
 	// Copy non-const to const
-//	bzd::Span<const int> spanCopyConst(span);
-//	EXPECT_EQ(spanCopyConst.size(), 5);
+	bzd::Span<const int> spanCopyConst(span);
+	EXPECT_EQ(spanCopyConst.size(), 5);
 
 	// Copy const to const
-//	bzd::Span<const int> spanCopyConstSquare(spanCopyConst);
-//	EXPECT_EQ(spanCopyConstSquare.size(), 5);
+	bzd::Span<const int> spanCopyConstSquare(spanCopyConst);
+	EXPECT_EQ(spanCopyConstSquare.size(), 5);
 
 	// Copy const to non-const (not allowed!)
 	// bzd::Span<int> spanCopyNonConst(spanCopyConst);
@@ -135,17 +135,17 @@ TEST(ContainerSpan, Copy)
 	EXPECT_EQ(copySpanAssign.size(), 5);
 
 	// From non-const to const constructor
-//	bzd::Span<const int> copyConstSpan(span);
-//	EXPECT_EQ(copyConstSpan[0], 0);
-//	EXPECT_EQ(copyConstSpan[4], 4);
-//	EXPECT_EQ(copyConstSpan.size(), 5);
+	bzd::Span<const int> copyConstSpan(span);
+	EXPECT_EQ(copyConstSpan[0], 0);
+	EXPECT_EQ(copyConstSpan[4], 4);
+	EXPECT_EQ(copyConstSpan.size(), 5);
 
 	// From non-const to const Assignment
-//	bzd::Span<const int> copyConstSpanAssign;
-//	copyConstSpanAssign = span;
-//	EXPECT_EQ(copyConstSpanAssign[0], 0);
-//	EXPECT_EQ(copyConstSpanAssign[4], 4);
-//	EXPECT_EQ(copyConstSpanAssign.size(), 5);
+	bzd::Span<const int> copyConstSpanAssign;
+	copyConstSpanAssign = span;
+	EXPECT_EQ(copyConstSpanAssign[0], 0);
+	EXPECT_EQ(copyConstSpanAssign[4], 4);
+	EXPECT_EQ(copyConstSpanAssign.size(), 5);
 }
 
 TEST(ContainerSpan, ConstNonConst)

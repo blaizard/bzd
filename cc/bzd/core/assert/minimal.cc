@@ -27,7 +27,7 @@ void backend(const bzd::SourceLocation& location, const char* message1, const ch
 	bzd::String<10> str;
 	bzd::format::toString(str, location.getLine());
 	out.write(bzd::StringView{":"}.asBytes());
-	out.write(bzd::StringView{str}.asBytes());
+	out.write(str.asBytes());
 	out.write(bzd::StringView{": "}.asBytes());
 	out.write(bzd::StringView{message1}.asBytes());
 	if (message2)

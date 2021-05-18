@@ -1,14 +1,11 @@
 #pragma once
 
-#include "bzd/container/iterator/contiguous.h"
-#include "bzd/core/assert/minimal.h"
+#include "bzd/container/impl/span.h"
 #include "bzd/platform/types.h"
-#include "bzd/type_traits/enable_if.h"
-#include "bzd/type_traits/is_const.h"
-#include "bzd/type_traits/remove_const.h"
-#include "bzd/utility/swap.h"
+#include "bzd/container/storage/non_owning.h"
 
 namespace bzd {
+
 /**
  * \brief The class template span describes an object that can refer to a
  * contiguous sequence of objects with the first element of the sequence at
@@ -18,135 +15,51 @@ namespace bzd {
  * type.
  */
 template <class T>
-class Span
+class Span : public impl::Span<T, impl::NonOwningStorage<T>>
 {
-protected:
-	using DataType = T;
-	using Self = Span<DataType>;
-	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
+private:
+	using Parent = impl::Span<T, impl::NonOwningStorage<T>>;
+	using DataType = typename Parent::DataType;
+	using StorageType = typename Parent::StorageType;
 
-public:
-	using Iterator = bzd::iterator::Contiguous<DataType>;
+public: // Constructors
+	using impl::Span<T, impl::NonOwningStorage<T>>::Span;
 
-	static constexpr const SizeType npos = static_cast<SizeType>(-1);
-
-public:
-	constexpr Span() noexcept = default;
-	constexpr Span(DataType* const data, const SizeType size) noexcept : data_{data}, size_{size} {}
+	constexpr Span(DataType* const data, const SizeType size) noexcept : Parent{StorageType{data, size}} {}
 
 	template <bzd::SizeType N>
-	constexpr Span(DataType (&data)[N]) noexcept : data_{data}, size_{N}
-	{
-	}
-
-	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr Span(const Span<bzd::typeTraits::RemoveConst<DataType>>& span) noexcept : data_(span.data_), size_(span.size_)
-	{
-	}
-
-	// Iterators
-
-	constexpr Iterator begin() const noexcept { return Iterator(data_, 0); }
-
-	constexpr Iterator end() const noexcept { return Iterator(data_, size()); }
-
-	// Size
-
-	constexpr SizeType size() const noexcept { return size_; }
-
-	constexpr SizeType sizeBytes() const noexcept { return size_ * sizeof(DataType); }
-
-	constexpr bool empty() const noexcept { return (size_ == 0); }
-
-	// Equality operator
-
-	constexpr bool operator==(const Self& rhs) const noexcept
-	{
-		if (size() != rhs.size())
-		{
-			return false;
-		}
-
-		for (bzd::SizeType index = 0; index < size(); ++index)
-		{
-			if (at(index) != rhs.at(index))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Inequality operator
-
-	constexpr bool operator!=(const Self& rhs) const noexcept { return !(*this == rhs); }
-
-	// Accessors
-
-	constexpr DataType& operator[](const SizeType index) const noexcept { return at(index); }
-
-	// at
-
-	constexpr DataType& at(const SizeType index) const noexcept { return data_[index]; }
-
-	// front
-
-	constexpr DataType& front() const noexcept { return at(0); }
-
-	// back
-
-	constexpr DataType& back() const noexcept { return at(size_ - 1); }
-
-	// data
-
-	constexpr DataType* data() const noexcept { return data_; }
-
-	// find
-
-	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
-	{
-		for (SizeType i = start; i < size_; ++i)
-		{
-			if (at(i) == item)
-			{
-				return i;
-			}
-		}
-		return npos;
-	}
-
-	// subviews
-
-	constexpr Span<DataType> subspan(const SizeType offset = 0, const SizeType count = npos) const noexcept
-	{
-		bzd::assert::isTrue(offset < size_);
-		const auto actualCount = (count == npos) ? (size_ - offset) : count;
-		bzd::assert::isTrue(offset + actualCount <= size_);
-		return Span<DataType>{data_ + offset, actualCount};
-	}
-
-	constexpr Span<DataType> first(const SizeType count) const noexcept { return subspan(/*offset*/ 0, count); }
-
-	constexpr Span<DataType> last(const SizeType count) const noexcept { return subspan(/*offset*/ size_ - count, count); }
-
-	// Convert to bytes
-
-	constexpr Span<const bzd::ByteType> asBytes() const noexcept
-	{
-		return Span<const bzd::ByteType>{reinterpret_cast<const bzd::ByteType*>(data_), sizeBytes()};
-	}
-
-	constexpr Span<bzd::ByteType> asWritableBytes() const noexcept
-	{
-		return Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data_), sizeBytes()};
-	}
-
-protected:
-	template <class Q>
-	friend class Span;
-
-	DataType* data_ = nullptr;
-	SizeType size_ = 0;
+	constexpr Span(DataType (&data)[N]) noexcept : Parent{StorageType{data, N}} {}
 };
-} // namespace bzd
+
+}
+
+// Implementation of Span specific impl::Span functions.
+namespace bzd::impl
+{
+template <class T, class Storage>
+constexpr bzd::Span<T> Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) const noexcept
+{
+	bzd::assert::isTrue(offset < size());
+	const auto actualCount = (count == npos) ? (size() - offset) : count;
+	bzd::assert::isTrue(offset + actualCount <= size());
+	return bzd::Span<DataType>{data() + offset, actualCount};
+}
+
+template <class T, class Storage>
+constexpr bzd::Span<T> Span<T, Storage>::first(const SizeType count) const noexcept { return subSpan(0, count); }
+
+template <class T, class Storage>
+constexpr bzd::Span<T> Span<T, Storage>::last(const SizeType count) const noexcept { return subSpan(size() - count, count); }
+
+template <class T, class Storage>
+constexpr bzd::Span<const bzd::ByteType> Span<T, Storage>::asBytes() const noexcept
+{
+	return bzd::Span<const bzd::ByteType>{reinterpret_cast<const bzd::ByteType*>(data()), sizeBytes()};
+}
+
+template <class T, class Storage>
+constexpr bzd::Span<bzd::ByteType> Span<T, Storage>::asWritableBytes() const noexcept
+{
+	return bzd::Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data()), sizeBytes()};
+}
+}

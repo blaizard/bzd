@@ -6,23 +6,31 @@
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/add_const.h"
 #include "bzd/utility/min.h"
+#include "bzd/container/impl/span.h"
+#include "bzd/container/storage/resizeable.h"
+#include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
-template <class T, class Impl>
-class String : public Impl
+template <class T, class Storage>
+class String : public impl::Span<T, Storage>
 {
 protected:
-	using Parent = Impl;
-	using Impl::data_;
-	using Impl::size_;
-
-	using StringView = bzd::impl::StringView<T, bzd::Span<bzd::typeTraits::AddConst<T>>>;
+	using Self = String;
+	using Parent = impl::Span<T, Storage>;
+	using StorageType = typename Parent::StorageType;
+	using DataType = typename Parent::DataType;
+	using StringView = bzd::impl::StringView<bzd::typeTraits::AddConst<T>>;
 
 public:
-	template <class... Args>
-	constexpr explicit String(const SizeType capacity, Args&&... args) : Impl(args...), capacity_(capacity)
+	constexpr String(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
 	{
 	}
+
+	// Copy/move constructor/assignment.
+	constexpr String(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = delete;
+	constexpr String(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	// Converter
 	constexpr SizeType append(const bzd::StringView& str) noexcept { return append(str.data(), str.size()); }
@@ -30,11 +38,11 @@ public:
 	constexpr SizeType append(const T* data, const SizeType n) noexcept
 	{
 		// Handles overflows
-		const SizeType sizeLeft = capacity_ - size_ - 1;
+		const SizeType sizeLeft = capacity_ - this->size() - 1;
 		const SizeType actualN = bzd::min(sizeLeft, n);
-		bzd::algorithm::copy(data, data + actualN, &Parent::at(size_));
-		size_ += actualN;
-		Parent::at(size_) = '\0';
+		bzd::algorithm::copy(data, data + actualN, &this->at(this->size()));
+		this->storage_.sizeMutable() += actualN;
+		this->at(this->size()) = '\0';
 
 		return actualN;
 	}
@@ -42,14 +50,14 @@ public:
 	// Fill
 	constexpr SizeType append(const SizeType n, const T c) noexcept
 	{
-		const SizeType sizeLeft = capacity_ - size_ - 1;
+		const SizeType sizeLeft = capacity_ - this->size() - 1;
 		const SizeType actualN = bzd::min(sizeLeft, n);
 		for (SizeType i = 0; i < actualN; ++i)
 		{
-			Parent::at(size_ + i) = c;
+			this->at(this->size() + i) = c;
 		}
-		size_ += actualN;
-		Parent::at(size_) = '\0';
+		this->storage_.sizeMutable() += actualN;
+		this->at(this->size()) = '\0';
 
 		return actualN;
 	}
@@ -67,55 +75,59 @@ public:
 
 	constexpr void resize(const SizeType n) noexcept
 	{
-		size_ = (n < capacity_ - 1) ? n : capacity_ - 1;
-		Parent::at(size_) = '\0';
+		this->storage_.sizeMutable() = (n < capacity_ - 1) ? n : capacity_ - 1;
+		this->at(this->size()) = '\0';
 	}
 
 	template <class U>
-	constexpr String<T, Impl>& operator+=(const U& data) noexcept
+	constexpr Self& operator+=(const U& data) noexcept
 	{
 		append(data);
 		return *this;
 	}
 
 	template <class U>
-	constexpr String<T, Impl>& operator=(const U& data) noexcept
+	constexpr Self& operator=(const U& data) noexcept
 	{
 		assign(data);
 		return *this;
 	}
 
 public:
-	const SizeType capacity_;
+	const bzd::SizeType capacity_;
 };
 } // namespace bzd::impl
 
 namespace bzd::interface {
-using String = impl::String<char, Span<char>>;
+using String = impl::String<char, impl::NonOwningStorage<char>>;
 }
 
 namespace bzd {
 template <SizeType N>
 class String : public interface::String
 {
+protected:
+	using Self = String;
+	using Parent = interface::String;
+	using StorageType = typename Parent::StorageType;
+
 public:
-	constexpr String() : interface::String(N + 1, data_, 0) { data_[0] = '\0'; }
-	constexpr String(const bzd::StringView& str) : String() { append(str); }
-	constexpr String(const SizeType n, const char c) : String() { append(n, c); }
+	constexpr String() noexcept : Parent{StorageType{data_, 0}, N + 1} { data_[0] = '\0'; }
+	constexpr String(const bzd::StringView& str) noexcept : String() { append(str); }
+	constexpr String(const SizeType n, const char c) noexcept : String() { append(n, c); }
 
 	template <class T>
-	constexpr String<N>& operator=(const T& data) noexcept
+	constexpr Self& operator=(const T& data) noexcept
 	{
 		assign(data);
 		return *this;
 	}
 
-	// Copy assignment, has to be non-templated
-	constexpr String<N>& operator=(const String<N>& data) noexcept
-	{
-		assign(data);
-		return *this;
-	}
+	// Copy/move constructor/assignment.
+	constexpr String(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = delete;
+	constexpr String(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = delete;
 
 protected:
 	interface::String::DataType data_[N + 1] = {}; // needed for constexpr
@@ -124,7 +136,7 @@ protected:
 // Comparison to char*
 constexpr bool operator==(interface::String& lhs, const char* const rhs) noexcept
 {
-	return (StringView{lhs} == StringView{rhs});
+	return (StringView{lhs.data(), lhs.size()} == StringView{rhs});
 }
 
 } // namespace bzd
