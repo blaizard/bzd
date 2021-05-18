@@ -4,7 +4,7 @@
 #include "bzd/platform/types.h"
 #include "bzd/utility/forward.h"
 #include "bzd/container/impl/span.h"
-#include "bzd/container/storage/contiguous_resizeable.h"
+#include "bzd/container/storage/resizeable.h"
 #include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
@@ -23,9 +23,7 @@ public:
 	/**
 	 * \brief Adds a new element at the end of the vector, after its current last
 	 * element.
-	 *
 	 * The content of val is copied (or moved) to the new element.
-	 *
 	 * \param value Value to be copied (or moved) to the new element.
 	 */
 	constexpr void pushBack(const T& value)
@@ -33,6 +31,20 @@ public:
 		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
 		++this->storage_.sizeMutable();
 		this->at(this->size() - 1) = value;
+	}
+
+	/**
+	 * Appends a new element to the end of the container.
+	 * The element is constructed through using placement-new in-place at the location provided by the iterator.
+	 * \param args... Arguments forwarded to the constructor.
+	 */
+	template <class... Args>
+	constexpr void emplaceBack(Args&&... args)
+	{
+		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
+		auto it = this->end();
+		this->emplace(it, bzd::forward<Args>(args)...);
+		++this->storage_.sizeMutable();
 	}
 
 	/**
@@ -85,10 +97,10 @@ private:
 };
 
 template <class T, SizeType N>
-class VectorConstexpr : public impl::Vector<T, impl::ContiguousResizeableStorage<T, N>>
+class VectorConstexpr : public impl::Vector<T, impl::ResizeableStorage<T, N>>
 {
 protected:
-	using Parent = impl::Vector<T, impl::ContiguousResizeableStorage<T, N>>;
+	using Parent = impl::Vector<T, impl::ResizeableStorage<T, N>>;
 	using StorageType = typename Parent::StorageType;
 
 public:

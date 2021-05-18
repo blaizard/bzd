@@ -2,6 +2,8 @@
 
 #include "bzd/container/span.h"
 #include "bzd/platform/types.h"
+#include "bzd/container/impl/span.h"
+#include "bzd/container/storage/fixed.h"
 
 namespace bzd {
 /**
@@ -13,15 +15,19 @@ namespace bzd {
  * it doesn't decay to T* automatically.
  */
 template <class T, SizeType N>
-class Array : public Span<T>
+class Array : public impl::Span<T, impl::FixedStorage<T, N>>
 {
+protected:
+	using Parent = impl::Span<T, impl::FixedStorage<T, N>>;
+	using StorageType = typename Parent::StorageType;
+
 public:
 	template <class... Args>
-	constexpr explicit Array(Args&&... args) noexcept : Span<T>(data_, N), data_{args...}
+	constexpr explicit Array(Args&&... args) noexcept : Parent{StorageType{args...}}
 	{
 	}
 
-	constexpr Array() noexcept : Span<T>(data_, N) {}
+	constexpr Array() noexcept = default;
 
 	/**
 	 * \brief Returns the number of elements that the array can hold.
@@ -29,8 +35,5 @@ public:
 	 * \return Maximum number of element this array can hold.
 	 */
 	constexpr SizeType capacity() const noexcept { return N; }
-
-protected:
-	T data_[N];
 };
 } // namespace bzd

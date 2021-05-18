@@ -49,5 +49,6 @@ cc_library(
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
         "//cc/bzd/container/iterator:contiguous",
+        "//cc/bzd/utility:forward"
     ]
 )

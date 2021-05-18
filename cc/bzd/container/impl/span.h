@@ -6,7 +6,9 @@
 #include "bzd/type_traits/enable_if.h"
 #include "bzd/type_traits/is_const.h"
 #include "bzd/type_traits/remove_const.h"
+#include "bzd/utility/forward.h"
 
+#include <new> // operator new for "placement new"
 namespace bzd {
 	template <class T>
 	class Span;
@@ -32,7 +34,6 @@ protected:
 
 public:
 	using Iterator = bzd::iterator::Contiguous<DataType>;
-	using ConstIterator = bzd::iterator::Contiguous<DataType>;
 
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
@@ -47,10 +48,9 @@ public: // Constructor/assignment
 
 	constexpr Span(const Storage& storage) noexcept : storage_{storage} {}
 
-	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr Span(const Span<bzd::typeTraits::RemoveConst<DataType>, StorageType>& span) noexcept : storage_(storage_)
-	{
-	}
+	// Forward the copy constraint to the storage type.
+	template <class U, class V>
+	constexpr Span(const Span<U, V>& span) noexcept : storage_(span.storage_) {}
 
 public: // Iterators
 
@@ -100,6 +100,15 @@ public: // Accessors
 	constexpr auto data() const noexcept { return storage_.data(); }
 	constexpr auto data() noexcept { return storage_.dataMutable(); }
 
+public: // Emplace
+
+	template <class... Args>
+	constexpr void emplace(bzd::iterator::Contiguous<DataType> pos, Args&&... args) noexcept
+	{
+		pos->~DataType();
+		::new (&(*pos)) DataType{bzd::forward<Args>(args)...}; 
+	}
+
 public: // Find
 
 	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
@@ -126,6 +135,9 @@ public: // Convert to bytes
 	constexpr bzd::Span<bzd::ByteType> asWritableBytes() const noexcept;
 
 protected:
+	template <class U, class V>
+	friend class Span;
+
 	StorageType storage_{};
 };
 } // namespace bzd

@@ -2,15 +2,17 @@
 
 #include "bzd/container/span.h"
 #include "bzd/platform/types.h"
+#include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
-template <class T, class Impl>
-class StringView : public Impl
+template <class T>
+class StringView : public impl::Span<T, impl::NonOwningStorage<T>>
 {
 protected:
-	using Impl::data_;
-	using Impl::size_;
+	using Parent = impl::Span<T, impl::NonOwningStorage<T>>;
+	using StorageType = typename Parent::StorageType;
 
+protected:
 	// This function is not constepr, hence need to re-implement it
 	constexpr SizeType strlen(const T* const str) noexcept
 	{
@@ -23,28 +25,28 @@ protected:
 	}
 
 public:
-	constexpr StringView() noexcept : Impl(nullptr, 0) {}
-	constexpr StringView(const T* const str) noexcept : Impl(str, strlen(str)) {}
-	constexpr StringView(const T* const str, const SizeType size) noexcept : Impl(str, size) {}
-	constexpr StringView(const bzd::Span<char>& span) noexcept : Impl(span.data(), span.size()) {}
+	constexpr StringView() noexcept : Parent{StorageType{nullptr, 0}} {}
+	constexpr StringView(const T* const str) noexcept : Parent{StorageType{str, strlen(str)}} {}
+	constexpr StringView(const T* const str, const SizeType size) noexcept : Parent{StorageType{str, size}} {}
+	constexpr StringView(const bzd::Span<char>& span) noexcept : Parent{StorageType{span.data(), span.size()}} {}
 
 	constexpr StringView subStr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
 	{
-		return StringView(&data_[pos], (count == StringView::npos) ? (size_ - pos) : count);
+		return StringView(&this->at(pos), (count == StringView::npos) ? (this->size() - pos) : count);
 	}
 
 	constexpr void removePrefix(const SizeType n) noexcept
 	{
-		data_ += n;
-		size_ -= n;
+		this->storage_.dataMutable() += n;
+		this->storage_.sizeMutable() -= n;
 	}
 
-	constexpr void clear() noexcept { removePrefix(size_); }
+	constexpr void clear() noexcept { removePrefix(this->size()); }
 };
 } // namespace bzd::impl
 
 namespace bzd {
-using StringView = impl::StringView<char, bzd::Span<const char>>;
+using StringView = impl::StringView<const char>;
 } // namespace bzd
 
 constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept

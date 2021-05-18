@@ -4,15 +4,29 @@ cc_library(
 		"non_owning.h",
 	],
     visibility = ["//visibility:public"],
+	deps = [
+		"//cc/bzd/platform:types",
+	]
 )
 
 cc_library(
-	name = "contiguous_resizeable",
+	name = "resizeable",
 	hdrs = [
-		"contiguous_resizeable.h",
+		"resizeable.h",
 	],
     visibility = ["//visibility:public"],
 	deps = [
-		"//cc/bzd/utility:forward",
+		"//cc/bzd/platform:types",
+	]
+)
+
+cc_library(
+	name = "fixed",
+	hdrs = [
+		"fixed.h",
+	],
+    visibility = ["//visibility:public"],
+	deps = [
+		"//cc/bzd/platform:types",
 	]
 )
