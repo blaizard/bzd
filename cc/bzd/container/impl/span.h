@@ -9,6 +9,7 @@
 #include "bzd/utility/forward.h"
 
 #include <new> // operator new for "placement new"
+
 namespace bzd {
 template <class T>
 class Span;
