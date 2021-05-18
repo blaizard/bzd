@@ -1,8 +1,8 @@
 #pragma once
 
 #include "bzd/platform/types.h"
-#include "bzd/utility/forward.h"
 #include "bzd/type_traits/remove_const.h"
+#include "bzd/utility/forward.h"
 
 namespace bzd::impl {
 /**
@@ -15,9 +15,10 @@ public:
 	using Self = NonOwningStorage<T>;
 	using SelfNonConst = NonOwningStorage<bzd::typeTraits::RemoveConst<T>>;
 	using IsDataConst = bzd::typeTraits::IsConst<T>;
+	using DataType = T;
+	using DataMutableType = T;
 
 public: // Constructors
-
 	// Default/copy/move constructor/assignment.
 	constexpr NonOwningStorage() noexcept = default;
 	constexpr NonOwningStorage(const Self&) noexcept = default;
@@ -29,11 +30,14 @@ public: // Constructors
 
 	// Ability to construct a const storage from a non-const
 	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr NonOwningStorage(const NonOwningStorage<bzd::typeTraits::RemoveConst<T>>& storage) noexcept : data_{storage.data_}, size_{storage.size_} {}
+	constexpr NonOwningStorage(const NonOwningStorage<bzd::typeTraits::RemoveConst<T>>& storage) noexcept :
+		data_{storage.data_}, size_{storage.size_}
+	{
+	}
 
 public: // Accessors
-	constexpr T* data() const noexcept { return data_; }
-	constexpr T*& dataMutable() noexcept { return data_; }
+	constexpr DataType* data() const noexcept { return data_; }
+	constexpr DataMutableType*& dataMutable() noexcept { return data_; }
 	constexpr bzd::SizeType size() const noexcept { return size_; }
 	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
 
@@ -44,4 +48,4 @@ private:
 	T* data_{};
 	bzd::SizeType size_{0};
 };
-}
+} // namespace bzd::impl

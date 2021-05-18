@@ -50,8 +50,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":span",
-        "//cc/bzd/platform:types",
         "//cc/bzd/container/storage:fixed",
+        "//cc/bzd/platform:types",
     ],
 )
 
@@ -215,8 +215,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/storage:non_owning",
         "//cc/bzd/container/impl:span",
+        "//cc/bzd/container/storage:non_owning",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
@@ -246,8 +246,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":span",
-        "//cc/bzd/platform:types",
         "//cc/bzd/container/storage:non_owning",
+        "//cc/bzd/platform:types",
     ],
 )
 
@@ -307,10 +307,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":span",
+        "//cc/bzd/container/storage:non_owning",
+        "//cc/bzd/container/storage:resizeable",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
-        "//cc/bzd/container/storage:resizeable",
-        "//cc/bzd/container/storage:non_owning",
     ],
 )

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "bzd/container/impl/span.h"
+#include "bzd/container/storage/non_owning.h"
+#include "bzd/container/storage/resizeable.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/platform/types.h"
 #include "bzd/utility/forward.h"
-#include "bzd/container/impl/span.h"
-#include "bzd/container/storage/resizeable.h"
-#include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
 template <class T, class Storage>

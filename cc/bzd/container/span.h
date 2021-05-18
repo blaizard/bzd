@@ -1,8 +1,8 @@
 #pragma once
 
 #include "bzd/container/impl/span.h"
-#include "bzd/platform/types.h"
 #include "bzd/container/storage/non_owning.h"
+#include "bzd/platform/types.h"
 
 namespace bzd {
 
@@ -28,14 +28,15 @@ public: // Constructors
 	constexpr Span(DataType* const data, const SizeType size) noexcept : Parent{StorageType{data, size}} {}
 
 	template <bzd::SizeType N>
-	constexpr Span(DataType (&data)[N]) noexcept : Parent{StorageType{data, N}} {}
+	constexpr Span(DataType (&data)[N]) noexcept : Parent{StorageType{data, N}}
+	{
+	}
 };
 
-}
+} // namespace bzd
 
 // Implementation of Span specific impl::Span functions.
-namespace bzd::impl
-{
+namespace bzd::impl {
 template <class T, class Storage>
 constexpr bzd::Span<T> Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) const noexcept
 {
@@ -46,10 +47,16 @@ constexpr bzd::Span<T> Span<T, Storage>::subSpan(const SizeType offset, const Si
 }
 
 template <class T, class Storage>
-constexpr bzd::Span<T> Span<T, Storage>::first(const SizeType count) const noexcept { return subSpan(0, count); }
+constexpr bzd::Span<T> Span<T, Storage>::first(const SizeType count) const noexcept
+{
+	return subSpan(0, count);
+}
 
 template <class T, class Storage>
-constexpr bzd::Span<T> Span<T, Storage>::last(const SizeType count) const noexcept { return subSpan(size() - count, count); }
+constexpr bzd::Span<T> Span<T, Storage>::last(const SizeType count) const noexcept
+{
+	return subSpan(size() - count, count);
+}
 
 template <class T, class Storage>
 constexpr bzd::Span<const bzd::ByteType> Span<T, Storage>::asBytes() const noexcept
@@ -62,4 +69,4 @@ constexpr bzd::Span<bzd::ByteType> Span<T, Storage>::asWritableBytes() const noe
 {
 	return bzd::Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data()), sizeBytes()};
 }
-}
+} // namespace bzd::impl

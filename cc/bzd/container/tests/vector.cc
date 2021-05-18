@@ -34,7 +34,7 @@ TEST(ContainerVector, Constexpr)
 
 	static constexpr bzd::Vector<const int, 3> testDefault{};
 	EXPECT_EQ(testDefault.capacity(), 3);
-	EXPECT_EQ(testDefault.size(), 0);	
+	EXPECT_EQ(testDefault.size(), 0);
 }
 
 TEST(ContainerVector, NonStaticConstexpr)
@@ -46,5 +46,5 @@ TEST(ContainerVector, NonStaticConstexpr)
 
 	constexpr bzd::VectorConstexpr<const int, 3> testDefault{};
 	EXPECT_EQ(testDefault.capacity(), 3);
-	EXPECT_EQ(testDefault.size(), 0);	
+	EXPECT_EQ(testDefault.size(), 0);
 }

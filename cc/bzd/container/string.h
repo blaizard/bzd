@@ -1,14 +1,14 @@
 #pragma once
 
 #include "bzd/algorithm/copy.h"
+#include "bzd/container/impl/span.h"
 #include "bzd/container/span.h"
+#include "bzd/container/storage/non_owning.h"
+#include "bzd/container/storage/resizeable.h"
 #include "bzd/container/string_view.h"
 #include "bzd/platform/types.h"
 #include "bzd/type_traits/add_const.h"
 #include "bzd/utility/min.h"
-#include "bzd/container/impl/span.h"
-#include "bzd/container/storage/resizeable.h"
-#include "bzd/container/storage/non_owning.h"
 
 namespace bzd::impl {
 template <class T, class Storage>
@@ -22,9 +22,7 @@ protected:
 	using StringView = bzd::impl::StringView<bzd::typeTraits::AddConst<T>>;
 
 public:
-	constexpr String(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
-	{
-	}
+	constexpr String(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity} {}
 
 	// Copy/move constructor/assignment.
 	constexpr String(const Self&) noexcept = default;
