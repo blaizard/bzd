@@ -10,8 +10,8 @@
 
 #include <new> // operator new for "placement new"
 namespace bzd {
-	template <class T>
-	class Span;
+template <class T>
+class Span;
 }
 
 namespace bzd::impl {
@@ -33,12 +33,12 @@ protected:
 	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
 
 public:
-	using Iterator = bzd::iterator::Contiguous<DataType>;
+	using ConstIterator = bzd::iterator::Contiguous<typename StorageType::DataType>;
+	using Iterator = bzd::iterator::Contiguous<typename StorageType::DataMutableType>;
 
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
 public: // Constructor/assignment
-
 	// Default/copy/move constructor/assignment.
 	constexpr Span() noexcept = default;
 	constexpr Span(const Self&) noexcept = default;
@@ -50,23 +50,22 @@ public: // Constructor/assignment
 
 	// Forward the copy constraint to the storage type.
 	template <class U, class V>
-	constexpr Span(const Span<U, V>& span) noexcept : storage_(span.storage_) {}
+	constexpr Span(const Span<U, V>& span) noexcept : storage_(span.storage_)
+	{
+	}
 
 public: // Iterators
-
-	constexpr auto begin() noexcept { return bzd::iterator::Contiguous(data(), 0); }
-	constexpr auto begin() const noexcept { return bzd::iterator::Contiguous(data(), 0); }
-	constexpr auto end() noexcept { return bzd::iterator::Contiguous(data(), size()); }
-	constexpr auto end() const noexcept { return bzd::iterator::Contiguous(data(), size()); }
+	constexpr auto begin() noexcept { return Iterator{data(), 0}; }
+	constexpr auto begin() const noexcept { return ConstIterator{data(), 0}; }
+	constexpr auto end() noexcept { return Iterator{data(), size()}; }
+	constexpr auto end() const noexcept { return ConstIterator{data(), size()}; }
 
 public: // Size
-
 	constexpr SizeType size() const noexcept { return storage_.size(); }
 	constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(DataType); }
 	constexpr bool empty() const noexcept { return (size() == 0); }
 
 public: // Operators
-
 	constexpr bool operator==(const Self& rhs) const noexcept
 	{
 		if (size() != rhs.size())
@@ -88,7 +87,6 @@ public: // Operators
 	constexpr bool operator!=(const Self& rhs) const noexcept { return !(*this == rhs); }
 
 public: // Accessors
-
 	constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
 	constexpr auto& operator[](const SizeType index) const noexcept { return at(index); }
 	constexpr auto& at(const SizeType index) noexcept { return data()[index]; }
@@ -101,16 +99,14 @@ public: // Accessors
 	constexpr auto data() noexcept { return storage_.dataMutable(); }
 
 public: // Emplace
-
 	template <class... Args>
 	constexpr void emplace(bzd::iterator::Contiguous<DataType> pos, Args&&... args) noexcept
 	{
 		pos->~DataType();
-		::new (&(*pos)) DataType{bzd::forward<Args>(args)...}; 
+		::new (&(*pos)) DataType{bzd::forward<Args>(args)...};
 	}
 
 public: // Find
-
 	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
 	{
 		for (SizeType i = start; i < size(); ++i)
@@ -123,14 +119,12 @@ public: // Find
 		return npos;
 	}
 
-public: // Subviews. Their definition is in bzd::Span 
-
+public: // Subviews. Their definition is in bzd::Span
 	constexpr bzd::Span<DataType> subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
 	constexpr bzd::Span<DataType> first(const SizeType count) const noexcept;
 	constexpr bzd::Span<DataType> last(const SizeType count) const noexcept;
 
 public: // Convert to bytes
-
 	constexpr bzd::Span<const bzd::ByteType> asBytes() const noexcept;
 	constexpr bzd::Span<bzd::ByteType> asWritableBytes() const noexcept;
 
@@ -140,4 +134,4 @@ protected:
 
 	StorageType storage_{};
 };
-} // namespace bzd
+} // namespace bzd::impl

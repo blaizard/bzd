@@ -12,9 +12,10 @@ class FixedStorage
 {
 public:
 	using Self = FixedStorage<T, N>;
+	using DataType = const T;
+	using DataMutableType = T;
 
 public: // Constructors
-
 	// Default/copy/move constructor/assignment.
 	constexpr FixedStorage() noexcept = default;
 	constexpr FixedStorage(const Self&) noexcept = default;
@@ -23,11 +24,13 @@ public: // Constructors
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr explicit FixedStorage(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...} {}
+	constexpr explicit FixedStorage(Args&&... args) noexcept : data_{bzd::forward<Args>(args)...}
+	{
+	}
 
 public: // Accessors
-	constexpr const T* data() const noexcept { return data_; }
-	constexpr T* dataMutable() noexcept { return data_; }
+	constexpr DataType* data() const noexcept { return data_; }
+	constexpr DataMutableType* dataMutable() noexcept { return data_; }
 	constexpr bzd::SizeType size() const noexcept { return size_; }
 	constexpr bzd::SizeType sizeMutable() noexcept { return size_; }
 
@@ -35,4 +38,4 @@ private:
 	T data_[N]{};
 	bzd::SizeType size_{N};
 };
-}
+} // namespace bzd::impl

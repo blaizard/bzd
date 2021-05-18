@@ -63,7 +63,9 @@ public:
 template <class T>
 class HasFormatterWithMetadata
 {
-	template <class C, class = decltype(toString(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>(), bzd::typeTraits::declval<const Metadata>()))>
+	template <class C,
+			  class = decltype(toString(
+				  bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>(), bzd::typeTraits::declval<const Metadata>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
