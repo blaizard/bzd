@@ -4,6 +4,7 @@
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/vector.h"
+#include "bzd/container/optional.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/core/channel.h"
 #include "bzd/meta/range.h"
@@ -15,8 +16,6 @@
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_pointer.h"
 #include "bzd/utility/format/integral.h"
-
-#include <iostream>
 
 namespace bzd::format::impl {
 
@@ -301,29 +300,91 @@ constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& fo
 }
 
 template <class Ctx, class T>
-constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
+class Parse
 {
-	bzd::SizeType autoIndex = 0;
-	do
+public:
+	constexpr Parse(Ctx& ctx, bzd::StringView format,const T& args) noexcept
+	: iteratorBegin_{ctx, format, args}
 	{
-		const auto result = parseStaticString(context, format);
-		if (!result.str.empty())
+	}
+
+class Iterator
+{
+public:
+	struct Result
+	{
+		const bzd::Optional<const Metadata&> metadata;
+		const StringView& str;
+	};
+
+public:
+	constexpr Iterator(Ctx& ctx, bzd::StringView format,const T& args) noexcept : context_{ctx}, format_{format}, args_{args}
+	{
+		next();
+	}
+
+	constexpr Iterator& operator++() noexcept
+	{
+		next();
+		return *this;
+	}
+
+	constexpr operator bool() const noexcept
+	{
+		return end_;
+	}
+
+	constexpr Result operator*() const noexcept
+	{
+		return (result_.isMetadata) ? Result{metadata_, result_.str} : Result{nullopt, result_.str};
+	}
+
+private:
+	constexpr void next() noexcept
+	{
+		if (format_.empty())
 		{
-			context.processSubstring(result.str);
+			end_ = true;
 		}
-		if (result.isMetadata)
+		else
 		{
-			context.assertTrue(format.front() == '{', "Unexpected return state for parseStaticString");
-			context.assertTrue(format.size() > 1, "Unexpected return state for parseStaticString");
-			format.removePrefix(1);
-			const auto metadata = parseMetadata(context, format, autoIndex++);
-			context.assertTrue(metadata.index < args.size(),
-							   "The index specified is greater than the number of "
-							   "arguments provided");
-			context.processMetadata(metadata);
+			result_ = parseStaticString(context_, format_);
+			if (result_.isMetadata)
+			{
+				context_.assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
+				context_.assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
+				format_.removePrefix(1);
+				metadata_ = parseMetadata(context_, format_, autoIndex_++);
+				context_.assertTrue(metadata_.index < args_.size(),
+								"The index specified is greater than the number of "
+								"arguments provided");
+			}
 		}
-	} while (!format.empty());
-}
+	}
+
+private:
+	Ctx& context_;
+	bzd::StringView format_;
+	const T& args_;
+	ResultStaticString result_{};
+	Metadata metadata_{};
+	SizeType autoIndex_ = 0;
+	bool end_ = false;
+};
+
+	constexpr Iterator begin() noexcept
+	{
+		return iteratorBegin_;
+	}
+
+	constexpr bool end() noexcept
+	{
+		return true;
+	}
+
+private:
+	const Iterator iteratorBegin_;
+};
 
 /**
  * Context used for the current parsing operation.
@@ -486,7 +547,16 @@ template <class T>
 constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, const T& tuple)
 {
 	Context<CheckContext> ctx{};
-	parse(ctx, format, tuple);
+	Parse parser{ctx, format, tuple};
+
+	for (const auto& result : parser)
+	{
+		if (result.metadata.hasValue())
+		{
+			ctx.processMetadata(result.metadata.value());
+		}
+	}
+
 	return ctx;
 }
 
@@ -495,7 +565,19 @@ static void print(bzd::OChannel& stream,
 				  const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args)
 {
 	Context<PrintContext> ctx(stream, args);
-	parse(ctx, format, args);
+	Parse parser{ctx, format, args};
+
+	for (const auto& result : parser)
+	{
+		if (!result.str.empty())
+		{
+			ctx.processSubstring(result.str);
+		}
+		if (result.metadata.hasValue())
+		{
+			ctx.processMetadata(result.metadata.value());
+		}
+	}
 }
 
 /**
