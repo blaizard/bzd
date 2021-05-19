@@ -16,6 +16,8 @@
 #include "bzd/type_traits/is_pointer.h"
 #include "bzd/utility/format/integral.h"
 
+#include <iostream>
+
 namespace bzd::format::impl {
 
 struct Metadata
@@ -257,18 +259,17 @@ constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bz
 	return metadata;
 }
 
+struct ResultStaticString
+{
+	bool isMetadata;
+	StringView str;
+};
+
 /**
- * Parse a static string and call addSubstring to the context information
- * when needed.
- *
- * This function returns either when the string is consumed (return false)
- * or when a metadata has been identified.
+ * Parse a static string and returns when there is data to be processed.
  */
-
-// return a size corresponding to the number of characters to be processed
-/*
 template <class Ctx>
-constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
+constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& format)
 {
 	SizeType offset = 0;
 	while (offset < format.size())
@@ -283,39 +284,9 @@ constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 
 		if (format[offset] == c)
 		{
-			return offset;
-		}
-
-		context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
-
-		--offset;
-		break;
-	}
-
-	return offset;
-}
-*/
-
-template <class Ctx>
-constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
-{
-	SizeType offset = 0;
-	while (offset < format.size())
-	{
-		const auto c = format[offset++];
-		if (c != '{' && c != '}')
-		{
-			continue;
-		}
-
-		context.assertTrue(offset < format.size(), "Unexpected static string termination");
-
-		if (format[offset] == c)
-		{
-			context.processSubstring(format.subStr(0, offset));
+			const auto str = format.subStr(0, offset);
 			format.removePrefix(offset + 1);
-			offset = 0;
-			continue;
+			return {false, str};
 		}
 
 		context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
@@ -324,13 +295,9 @@ constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 		break;
 	}
 
-	if (offset)
-	{
-		context.processSubstring(format.subStr(0, offset));
-		format.removePrefix(offset);
-	}
-
-	return format.size();
+	const auto str = format.subStr(0, offset);
+	format.removePrefix(offset);
+	return {!format.empty(), str};
 }
 
 template <class Ctx, class T>
@@ -339,7 +306,12 @@ constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
 	bzd::SizeType autoIndex = 0;
 	do
 	{
-		if (parseStaticString(context, format))
+		const auto result = parseStaticString(context, format);
+		if (!result.str.empty())
+		{
+			context.processSubstring(result.str);
+		}
+		if (result.isMetadata)
 		{
 			context.assertTrue(format.front() == '{', "Unexpected return state for parseStaticString");
 			context.assertTrue(format.size() > 1, "Unexpected return state for parseStaticString");
@@ -350,7 +322,7 @@ constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
 							   "arguments provided");
 			context.processMetadata(metadata);
 		}
-	} while (format.size() > 0);
+	} while (!format.empty());
 }
 
 /**
