@@ -32,11 +32,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":integral",
+        "//cc/bzd/container:optional",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
-        "//cc/bzd/container:optional",
         "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/core:channel",
         "//cc/bzd/meta:range",
