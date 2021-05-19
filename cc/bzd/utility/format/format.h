@@ -264,6 +264,9 @@ constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bz
  * This function returns either when the string is consumed (return false)
  * or when a metadata has been identified.
  */
+
+// return a size corresponding to the number of characters to be processed
+/*
 template <class Ctx>
 constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 {
@@ -280,7 +283,36 @@ constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 
 		if (format[offset] == c)
 		{
-			context.addSubstring(format.subStr(0, offset));
+			return offset;
+		}
+
+		context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
+
+		--offset;
+		break;
+	}
+
+	return offset;
+}
+*/
+
+template <class Ctx>
+constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
+{
+	SizeType offset = 0;
+	while (offset < format.size())
+	{
+		const auto c = format[offset++];
+		if (c != '{' && c != '}')
+		{
+			continue;
+		}
+
+		context.assertTrue(offset < format.size(), "Unexpected static string termination");
+
+		if (format[offset] == c)
+		{
+			context.processSubstring(format.subStr(0, offset));
 			format.removePrefix(offset + 1);
 			offset = 0;
 			continue;
@@ -294,7 +326,7 @@ constexpr bool parseStaticString(Ctx& context, bzd::StringView& format)
 
 	if (offset)
 	{
-		context.addSubstring(format.subStr(0, offset));
+		context.processSubstring(format.subStr(0, offset));
 		format.removePrefix(offset);
 	}
 
@@ -316,7 +348,7 @@ constexpr void parse(Ctx& context, bzd::StringView format, const T& args)
 			context.assertTrue(metadata.index < args.size(),
 							   "The index specified is greater than the number of "
 							   "arguments provided");
-			context.addMetadata(metadata);
+			context.processMetadata(metadata);
 		}
 	} while (format.size() > 0);
 }
@@ -343,8 +375,8 @@ class CheckContext : public bzd::VectorConstexpr<Metadata, 128>
 {
 public:
 	constexpr CheckContext() = default;
-	constexpr void addSubstring(const bzd::StringView&) {}
-	constexpr void addMetadata(const Metadata& metadata) { pushBack(metadata); }
+	constexpr void processSubstring(const bzd::StringView&) {}
+	constexpr void processMetadata(const Metadata& metadata) { pushBack(metadata); }
 	constexpr void onError(const bzd::StringView& message) const { bzd::assert::isTrueConstexpr(false); }
 };
 
@@ -469,8 +501,8 @@ public:
 		stream_(stream), args_(args)
 	{
 	}
-	void addSubstring(const bzd::StringView& str) { stream_.write(str.asBytes()); }
-	void addMetadata(const Metadata& metadata) { args_[metadata.index]->print(stream_, metadata); }
+	void processSubstring(const bzd::StringView& str) { stream_.write(str.asBytes()); }
+	void processMetadata(const Metadata& metadata) { args_[metadata.index]->print(stream_, metadata); }
 	constexpr void onError(const bzd::StringView& message) const {}
 
 private:

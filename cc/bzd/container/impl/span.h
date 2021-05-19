@@ -32,10 +32,12 @@ protected:
 	using StorageType = Storage;
 	using Self = Span<DataType, StorageType>;
 	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
+	using StorageDataType = typename StorageType::DataType;
+	using StorageDataMutableType = typename StorageType::DataMutableType;
 
 public:
-	using ConstIterator = bzd::iterator::Contiguous<typename StorageType::DataType>;
-	using Iterator = bzd::iterator::Contiguous<typename StorageType::DataMutableType>;
+	using ConstIterator = bzd::iterator::Contiguous<StorageDataType>;
+	using Iterator = bzd::iterator::Contiguous<StorageDataMutableType>;
 
 	static constexpr const SizeType npos = static_cast<SizeType>(-1);
 
@@ -121,13 +123,16 @@ public: // Find
 	}
 
 public: // Subviews. Their definition is in bzd::Span
-	constexpr bzd::Span<DataType> subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
-	constexpr bzd::Span<DataType> first(const SizeType count) const noexcept;
-	constexpr bzd::Span<DataType> last(const SizeType count) const noexcept;
+	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
+	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) noexcept;
+	constexpr auto first(const SizeType count) const noexcept;
+	constexpr auto first(const SizeType count) noexcept;
+	constexpr auto last(const SizeType count) const noexcept;
+	constexpr auto last(const SizeType count) noexcept;
 
 public: // Convert to bytes
-	constexpr bzd::Span<const bzd::ByteType> asBytes() const noexcept;
-	constexpr bzd::Span<bzd::ByteType> asWritableBytes() const noexcept;
+	constexpr auto asBytes() const noexcept;
+	constexpr auto asWritableBytes() noexcept;
 
 protected:
 	template <class U, class V>
