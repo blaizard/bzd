@@ -22,55 +22,62 @@ TEST(Format_, ParseStaticString)
 	{
 		Context ctx;
 		bzd::StringView str("Hello");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 1);
-		EXPECT_STREQ(ctx.substrings_[0].data(), "Hello");
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result.isMetadata);
+		EXPECT_EQ(result.str, "Hello"_sv);
 		EXPECT_TRUE(str.empty());
 	}
 
 	{
 		Context ctx;
 		bzd::StringView str("Hello {}");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 1);
-		EXPECT_STREQ(ctx.substrings_[0].data(), "Hello ");
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_TRUE(result.isMetadata);
+		EXPECT_EQ(result.str, "Hello "_sv);
 		EXPECT_EQ(str.front(), '{');
 	}
 
 	{
 		Context ctx;
 		bzd::StringView str("{}");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 0);
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_TRUE(result.isMetadata);
+		EXPECT_TRUE(result.str.empty());
 		EXPECT_EQ(str.front(), '{');
 	}
 
 	{
 		Context ctx;
 		bzd::StringView str("Hello {{");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 1);
-		EXPECT_STREQ(ctx.substrings_[0].data(), "Hello {");
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result.isMetadata);
+		EXPECT_EQ(result.str, "Hello {"_sv);
 		EXPECT_TRUE(str.empty());
 	}
 
 	{
 		Context ctx;
 		bzd::StringView str("{{{{");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 2);
-		EXPECT_STREQ(ctx.substrings_[0].data(), "{");
-		EXPECT_STREQ(ctx.substrings_[1].data(), "{");
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result.isMetadata);
+		EXPECT_EQ(result.str, "{"_sv);
+		EXPECT_EQ(str, "{{"_sv);
+		const auto result2 = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result2.isMetadata);
+		EXPECT_EQ(result2.str, "{"_sv);
 		EXPECT_TRUE(str.empty());
 	}
 
 	{
 		Context ctx;
 		bzd::StringView str("}}}}");
-		bzd::format::impl::parseStaticString(ctx, str);
-		EXPECT_EQ(ctx.substrings_.size(), 2);
-		EXPECT_STREQ(ctx.substrings_[0].data(), "}");
-		EXPECT_STREQ(ctx.substrings_[1].data(), "}");
+		const auto result = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result.isMetadata);
+		EXPECT_EQ(result.str, "}"_sv);
+		EXPECT_EQ(str, "}}"_sv);
+		const auto result2 = bzd::format::impl::parseStaticString(ctx, str);
+		EXPECT_FALSE(result2.isMetadata);
+		EXPECT_EQ(result2.str, "}"_sv);
 		EXPECT_TRUE(str.empty());
 	}
 
@@ -85,6 +92,7 @@ TEST(Format_, ParseStaticString)
 		bzd::StringView str("} ");
 		EXPECT_ANY_THROW(bzd::format::impl::parseStaticString(ctx, str));
 	}
+
 }
 
 TEST(Format_, ParseMetadata)
