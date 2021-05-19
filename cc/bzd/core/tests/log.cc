@@ -5,5 +5,5 @@
 TEST(Log, Base)
 {
 	bzd::Log log{bzd::platform::getOut()};
-	log.info("Hello {}"_sv, "World");
+	log.info(CSTR("Hello {}"), "World");
 }

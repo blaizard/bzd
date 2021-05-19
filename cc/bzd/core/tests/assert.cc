@@ -4,6 +4,6 @@
 
 TEST(Assert, Base)
 {
-	bzd::assert::isTrue(true, "This should not fail, {}"_sv, "no no");
+	bzd::assert::isTrue(true, CSTR("This should not fail, {}"), "no no");
 	EXPECT_ANY_THROW(bzd::assert::isTrue(false));
 }

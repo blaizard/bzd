@@ -122,7 +122,7 @@ int main()
 	auto& log = bzd::Registry<bzd::Log>::get("default");
 
 	// Log a new message
-	log.info("Message: {}\n"_sv, bzd::Registry<bzd::StringView>::get("message"));
+	log.info(CSTR("Message: {}\n"), bzd::Registry<bzd::StringView>::get("message"));
 
 	// i2c_master_init();
 
