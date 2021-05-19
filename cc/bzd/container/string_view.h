@@ -53,3 +53,12 @@ constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noe
 {
 	return bzd::StringView{str, size};
 }
+
+#define CSTR(strLiteral)                                                                                  \
+	[] {                                                                                                  \
+		using StrView = struct                                                                            \
+		{                                                                                                 \
+			static constexpr auto value() { return bzd::StringView(strLiteral, sizeof(strLiteral) - 1); } \
+		};                                                                                                \
+		return StrView{};                                                                                 \
+	}()

@@ -22,7 +22,7 @@ constexpr void isResult(const Result<T, E>& result)
 {
 	if (!result)
 	{
-		bzd::assert::isTrue(false, "Result failed: {}"_sv, result.error());
+		bzd::assert::isTrue(false, CSTR("Result failed: {}"), result.error());
 	}
 }
 

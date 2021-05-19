@@ -150,7 +150,7 @@ static void tcp_server_task(void* /*pvParameters*/)
 		{
 			inet6_ntoa_r(source_addr.sin6_addr, addr_str, sizeof(addr_str) - 1);
 		}
-		bzd::format::toString(bzd::getOut(), "Socket accepted ip address: {}"_sv, addr_str);
+		bzd::format::toString(bzd::getOut(), CSTR("Socket accepted ip address: {}"), addr_str);
 
 		ESP_LOGI(TAG, "Socket accepted ip address: %s", addr_str);
 
