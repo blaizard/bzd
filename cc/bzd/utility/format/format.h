@@ -1,10 +1,10 @@
 #pragma once
 
+#include "bzd/container/optional.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
 #include "bzd/container/tuple.h"
 #include "bzd/container/vector.h"
-#include "bzd/container/optional.h"
 #include "bzd/core/assert/minimal.h"
 #include "bzd/core/channel.h"
 #include "bzd/meta/range.h"
@@ -303,84 +303,72 @@ template <class Ctx, class T>
 class Parse
 {
 public:
-	constexpr Parse(Ctx& ctx, bzd::StringView format,const T& args) noexcept
-	: iteratorBegin_{ctx, format, args}
-	{
-	}
+	constexpr Parse(Ctx& ctx, bzd::StringView format, const T& args) noexcept : iteratorBegin_{ctx, format, args} {}
 
-class Iterator
-{
-public:
-	struct Result
+	class Iterator
 	{
-		const bzd::Optional<const Metadata&> metadata;
-		const StringView& str;
-	};
-
-public:
-	constexpr Iterator(Ctx& ctx, bzd::StringView format,const T& args) noexcept : context_{ctx}, format_{format}, args_{args}
-	{
-		next();
-	}
-
-	constexpr Iterator& operator++() noexcept
-	{
-		next();
-		return *this;
-	}
-
-	constexpr operator bool() const noexcept
-	{
-		return end_;
-	}
-
-	constexpr Result operator*() const noexcept
-	{
-		return (result_.isMetadata) ? Result{metadata_, result_.str} : Result{nullopt, result_.str};
-	}
-
-private:
-	constexpr void next() noexcept
-	{
-		if (format_.empty())
+	public:
+		struct Result
 		{
-			end_ = true;
+			const bzd::Optional<const Metadata&> metadata;
+			const StringView& str;
+		};
+
+	public:
+		constexpr Iterator(Ctx& ctx, bzd::StringView format, const T& args) noexcept : context_{ctx}, format_{format}, args_{args}
+		{
+			next();
 		}
-		else
+
+		constexpr Iterator& operator++() noexcept
 		{
-			result_ = parseStaticString(context_, format_);
-			if (result_.isMetadata)
+			next();
+			return *this;
+		}
+
+		constexpr operator bool() const noexcept { return end_; }
+
+		constexpr Result operator*() const noexcept
+		{
+			return (result_.isMetadata) ? Result{metadata_, result_.str} : Result{nullopt, result_.str};
+		}
+
+	private:
+		constexpr void next() noexcept
+		{
+			if (format_.empty())
 			{
-				context_.assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
-				context_.assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
-				format_.removePrefix(1);
-				metadata_ = parseMetadata(context_, format_, autoIndex_++);
-				context_.assertTrue(metadata_.index < args_.size(),
-								"The index specified is greater than the number of "
-								"arguments provided");
+				end_ = true;
+			}
+			else
+			{
+				result_ = parseStaticString(context_, format_);
+				if (result_.isMetadata)
+				{
+					context_.assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
+					context_.assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
+					format_.removePrefix(1);
+					metadata_ = parseMetadata(context_, format_, autoIndex_++);
+					context_.assertTrue(metadata_.index < args_.size(),
+										"The index specified is greater than the number of "
+										"arguments provided");
+				}
 			}
 		}
-	}
 
-private:
-	Ctx& context_;
-	bzd::StringView format_;
-	const T& args_;
-	ResultStaticString result_{};
-	Metadata metadata_{};
-	SizeType autoIndex_ = 0;
-	bool end_ = false;
-};
+	private:
+		Ctx& context_;
+		bzd::StringView format_;
+		const T& args_;
+		ResultStaticString result_{};
+		Metadata metadata_{};
+		SizeType autoIndex_ = 0;
+		bool end_ = false;
+	};
 
-	constexpr Iterator begin() noexcept
-	{
-		return iteratorBegin_;
-	}
+	constexpr Iterator begin() noexcept { return iteratorBegin_; }
 
-	constexpr bool end() noexcept
-	{
-		return true;
-	}
+	constexpr bool end() noexcept { return true; }
 
 private:
 	const Iterator iteratorBegin_;

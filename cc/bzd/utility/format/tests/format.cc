@@ -92,7 +92,6 @@ TEST(Format_, ParseStaticString)
 		bzd::StringView str("} ");
 		EXPECT_ANY_THROW(bzd::format::impl::parseStaticString(ctx, str));
 	}
-
 }
 
 TEST(Format_, ParseMetadata)
