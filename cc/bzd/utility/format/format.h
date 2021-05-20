@@ -49,10 +49,10 @@ struct Metadata
 	Format format = Format::AUTO;
 };
 
-template <class T>
+template <class Adapter, class T>
 class HasFormatter
 {
-	template <class C, class = decltype(toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>()))>
+	template <class C, class = typename Adapter::template FormatterType<C>>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -61,12 +61,10 @@ public:
 	static constexpr bool value = decltype(test<T>(0))::value;
 };
 
-template <class T>
+template <class Adapter, class T>
 class HasFormatterWithMetadata
 {
-	template <class C,
-			  class = decltype(toStream(
-				  bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>(), bzd::typeTraits::declval<const Metadata>()))>
+	template <class C, class = typename Adapter::template FormatterWithMetadataType<C>>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -84,19 +82,19 @@ public:
 	virtual void print(bzd::OChannel& os, const Metadata& metadata) const {};
 };
 
-template <class T>
+template <class Adapter, class T>
 class FormatterSpecialized : public Formatter
 {
 public:
 	explicit constexpr FormatterSpecialized(const T& v) : Formatter{}, value_{v} {}
 
-	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<U>::value, void>* = nullptr>
+	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
 	constexpr void printToString(bzd::OChannel& os, const Metadata& /*metadata*/) const
 	{
 		toStream(os, value_);
 	}
 
-	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<U>::value, void>* = nullptr>
+	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
 	constexpr void printToString(bzd::OChannel& os, const Metadata& metadata) const
 	{
 		toStream(os, value_, metadata);
@@ -315,10 +313,7 @@ public:
 		};
 
 	public:
-		constexpr Iterator(bzd::StringView format) noexcept : format_{format}
-		{
-			next();
-		}
+		constexpr Iterator(bzd::StringView format) noexcept : format_{format} { next(); }
 
 		constexpr Iterator& operator++() noexcept
 		{
@@ -373,15 +368,15 @@ private:
  * Adapter used for the current parsing operation.
  * Different adapters are used for compile timme or runtime operations.
  */
-template <class T>
-class Adapter : public T
+template <class... Ts>
+class Adapter : public Ts...
 {
 public:
 	static constexpr void assertTrue(const bool condition, const bzd::StringView& message)
 	{
 		if (!condition)
 		{
-			T::onError(message);
+			Adapter::onError(message);
 		}
 	}
 };
@@ -396,6 +391,17 @@ class RuntimeAssert
 {
 public:
 	static constexpr void onError(const bzd::StringView& view) { bzd::assert::isTrue(false, view.data()); }
+};
+
+class StreamFormatter
+{
+public:
+	template <class T>
+	using FormatterType = decltype(toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>()));
+
+	template <class T>
+	using FormatterWithMetadataType = decltype(
+		toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 };
 
 template <class T>
@@ -512,27 +518,6 @@ static void toStream(bzd::OChannel& stream, const bzd::StringView stringView, co
 	}
 }
 
-static void print(bzd::OChannel& stream,
-				  const bzd::StringView& format,
-				  const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args)
-{
-	using RuntimeAdapter = Adapter<RuntimeAssert>;
-	Parse<RuntimeAdapter> parser{format};
-
-	for (const auto& result : parser)
-	{
-		if (!result.str.empty())
-		{
-			stream.write(result.str.asBytes());
-		}
-		if (result.metadata.hasValue())
-		{
-			const auto& metadata = result.metadata.value();
-			args[metadata.index]->print(stream, metadata);
-		}
-	}
-}
-
 /**
  * \brief Check the format context.
  *
@@ -543,8 +528,8 @@ template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTrait
 constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
-	Adapter::assertTrue(HasFormatter<decltype(value)>::value || HasFormatterWithMetadata<decltype(value)>::value,
-					   "Argument type is not supported, it must contain a valid formatter.");
+	Adapter::assertTrue(HasFormatter<Adapter, decltype(value)>::value || HasFormatterWithMetadata<Adapter, decltype(value)>::value,
+						"Argument type is not supported, it must contain a valid formatter.");
 
 	bool usedAtLeastOnce = false;
 	for (const auto& metadata : metadataList)
@@ -587,7 +572,7 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T&)
 template <class T>
 constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
 {
-	using ConstexprAdapter = Adapter<ConstexprAssert>;
+	using ConstexprAdapter = Adapter<ConstexprAssert, StreamFormatter>;
 	bzd::VectorConstexpr<Metadata, 128> metadataList{};
 	Parse<ConstexprAdapter> parser{format};
 
@@ -603,15 +588,29 @@ constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
 }
 
 template <SizeType... I, class... Args>
-constexpr void toStreamRuntime(bzd::OChannel& out, const bzd::StringView& str, bzd::meta::range::Type<I...>, Args&&... args)
+constexpr void toStreamRuntime(bzd::OChannel& stream, const bzd::StringView& format, bzd::meta::range::Type<I...>, Args&&... args)
 {
 	using bzd::format::impl::FormatterSpecialized;
+	using RuntimeAdapter = Adapter<RuntimeAssert, StreamFormatter>;
 
 	// Run-time call
-	const bzd::Tuple<FormatterSpecialized<bzd::typeTraits::Decay<Args>>...> tuple{
-		FormatterSpecialized<bzd::typeTraits::Decay<Args>>(args)...};
+	const bzd::Tuple<FormatterSpecialized<RuntimeAdapter, bzd::typeTraits::Decay<Args>>...> tuple{
+		FormatterSpecialized<RuntimeAdapter, bzd::typeTraits::Decay<Args>>(args)...};
 	const bzd::Vector<const bzd::format::impl::Formatter*, sizeof...(args)> argList{(&tuple.template get<I>())...};
-	bzd::format::impl::print(out, str, argList);
+	Parse<RuntimeAdapter> parser{format};
+
+	for (const auto& result : parser)
+	{
+		if (!result.str.empty())
+		{
+			stream.write(result.str.asBytes());
+		}
+		if (result.metadata.hasValue())
+		{
+			const auto& metadata = result.metadata.value();
+			argList[metadata.index]->print(stream, metadata);
+		}
+	}
 }
 
 } // namespace bzd::format::impl
@@ -659,7 +658,7 @@ constexpr void toStream(bzd::OChannel& out, const ConstexprStringView& str, Args
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
 	constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
-	static_assert(isValid, "String format check failed");
+	static_assert(isValid, "Compile-time string format check failed.");
 
 	// Run-time call
 	bzd::format::toStream(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
