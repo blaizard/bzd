@@ -79,7 +79,8 @@ public:
 class Formatter
 {
 public:
-	virtual void print(bzd::OChannel& os, const Metadata& metadata) const {};
+	virtual void print(bzd::OChannel& os, const Metadata& metadata) const noexcept {};
+	virtual ~Formatter() noexcept = default;
 };
 
 template <class Adapter, class T>
@@ -89,18 +90,18 @@ public:
 	explicit constexpr FormatterSpecialized(const T& v) : Formatter{}, value_{v} {}
 
 	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
-	constexpr void printToString(bzd::OChannel& os, const Metadata& /*metadata*/) const
+	constexpr void printToStream(bzd::OChannel& os, const Metadata&) const noexcept
 	{
 		toStream(os, value_);
 	}
 
 	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
-	constexpr void printToString(bzd::OChannel& os, const Metadata& metadata) const
+	constexpr void printToStream(bzd::OChannel& os, const Metadata& metadata) const noexcept
 	{
 		toStream(os, value_, metadata);
 	}
 
-	void print(bzd::OChannel& os, const Metadata& metadata) const override { printToString(os, metadata); }
+	void print(bzd::OChannel& os, const Metadata& metadata) const noexcept override { printToStream(os, metadata); }
 
 private:
 	// Can be optimized to avoid copy if non-temporary
