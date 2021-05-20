@@ -20,7 +20,7 @@ enum class Level
 template <class... Args>
 void print(Args&&... args) noexcept
 {
-	bzd::format::toString(bzd::platform::getOut(), bzd::forward<Args>(args)...);
+	bzd::format::toStream(bzd::platform::getOut(), bzd::forward<Args>(args)...);
 }
 } // namespace bzd::log
 
@@ -67,7 +67,7 @@ private:
 	constexpr void print(const bzd::log::Level level, Args&&... args) noexcept
 	{
 		printHeader(level);
-		bzd::format::toString(out_, bzd::forward<Args>(args)...);
+		bzd::format::toStream(out_, bzd::forward<Args>(args)...);
 	}
 
 	bzd::OChannel& out_;
