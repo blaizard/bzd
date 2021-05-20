@@ -52,7 +52,7 @@ struct Metadata
 template <class T>
 class HasFormatter
 {
-	template <class C, class = decltype(toString(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>()))>
+	template <class C, class = decltype(toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
@@ -65,7 +65,7 @@ template <class T>
 class HasFormatterWithMetadata
 {
 	template <class C,
-			  class = decltype(toString(
+			  class = decltype(toStream(
 				  bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<C>(), bzd::typeTraits::declval<const Metadata>()))>
 	static bzd::typeTraits::TrueType test(bzd::SizeType);
 	template <class C>
@@ -91,15 +91,15 @@ public:
 	explicit constexpr FormatterSpecialized(const T& v) : Formatter{}, value_{v} {}
 
 	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<U>::value, void>* = nullptr>
-	void printToString(bzd::OChannel& os, const Metadata& /*metadata*/) const
+	constexpr void printToString(bzd::OChannel& os, const Metadata& /*metadata*/) const
 	{
-		toString(os, value_);
+		toStream(os, value_);
 	}
 
 	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<U>::value, void>* = nullptr>
-	void printToString(bzd::OChannel& os, const Metadata& metadata) const
+	constexpr void printToString(bzd::OChannel& os, const Metadata& metadata) const
 	{
-		toString(os, value_, metadata);
+		toStream(os, value_, metadata);
 	}
 
 	void print(bzd::OChannel& os, const Metadata& metadata) const override { printToString(os, metadata); }
@@ -128,8 +128,8 @@ static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeTyp
 /**
  * Return the positional index
  */
-template <class Ctx>
-constexpr bzd::SizeType parseIndex(Ctx& context, bzd::StringView& format, const bzd::SizeType autoIndex)
+template <class Adapter>
+constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType autoIndex)
 {
 	bzd::SizeType index = 0;
 	const bool isDefined = parseUnsignedInteger(format, index);
@@ -139,15 +139,15 @@ constexpr bzd::SizeType parseIndex(Ctx& context, bzd::StringView& format, const 
 	}
 	else
 	{
-		context.assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
+		Adapter::assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
 	}
 	return (isDefined) ? index : autoIndex;
 }
 
 // Sign
 
-template <class Ctx>
-constexpr void parseSign(Ctx& context, bzd::StringView& format, Metadata& metadata)
+template <class Adapter>
+constexpr void parseSign(bzd::StringView& format, Metadata& metadata)
 {
 	switch (format.front())
 	{
@@ -182,29 +182,29 @@ constexpr void parseSign(Ctx& context, bzd::StringView& format, Metadata& metada
  * p    Pointer
  * %	Percentage. Multiples by 100 and puts % at the end.
  */
-template <class Ctx>
-constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bzd::SizeType current)
+template <class Adapter>
+constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current)
 {
 	const auto endIndex = format.find('}');
-	context.assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
+	Adapter::assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
 	auto metadataStr = format.subStr(0, endIndex + 1);
 
 	Metadata metadata;
 
 	// Look for the index
-	metadata.index = parseIndex(context, metadataStr, current);
-	context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
+	metadata.index = parseIndex<Adapter>(metadataStr, current);
+	Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
 
 	// Parse sign: [sign]
-	parseSign(context, metadataStr, metadata);
-	context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseSign)");
+	parseSign<Adapter>(metadataStr, metadata);
+	Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseSign)");
 
 	// Parse alternate form [#]
 	if (metadataStr.front() == '#')
 	{
 		metadata.alternate = true;
 		metadataStr.removePrefix(1);
-		context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
+		Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
 	}
 
 	// Parse precision [.precision]
@@ -212,7 +212,7 @@ constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bz
 	{
 		metadataStr.removePrefix(1);
 		metadata.isPrecision = parseUnsignedInteger(metadataStr, metadata.precision);
-		context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
+		Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
 	}
 
 	// Parse type [type]
@@ -245,14 +245,14 @@ constexpr Metadata parseMetadata(Ctx& context, bzd::StringView& format, const bz
 			metadata.format = Metadata::Format::POINTER;
 			break;
 		default:
-			context.onError(
+			Adapter::onError(
 				"Unsupported conversion format, only the following is "
 				"supported: [bdoxXfp%]");
 		}
 		metadataStr.removePrefix(1);
-		context.assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
+		Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
 	}
-	context.assertTrue(metadataStr.front() == '}', "Invalid format for replacement field, expecting '}'");
+	Adapter::assertTrue(metadataStr.front() == '}', "Invalid format for replacement field, expecting '}'");
 
 	format.removePrefix(endIndex + 1);
 	return metadata;
@@ -267,8 +267,8 @@ struct ResultStaticString
 /**
  * Parse a static string and returns when there is data to be processed.
  */
-template <class Ctx>
-constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& format)
+template <class Adapter>
+constexpr ResultStaticString parseStaticString(bzd::StringView& format)
 {
 	SizeType offset = 0;
 	while (offset < format.size())
@@ -279,7 +279,7 @@ constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& fo
 			continue;
 		}
 
-		context.assertTrue(offset < format.size(), "Unexpected static string termination");
+		Adapter::assertTrue(offset < format.size(), "Unexpected static string termination");
 
 		if (format[offset] == c)
 		{
@@ -288,7 +288,7 @@ constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& fo
 			return {false, str};
 		}
 
-		context.assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
+		Adapter::assertTrue(c == '{', "'}' must be part of a pair '{...}' or doubled '}}'");
 
 		--offset;
 		break;
@@ -299,11 +299,11 @@ constexpr ResultStaticString parseStaticString(Ctx& context, bzd::StringView& fo
 	return {!format.empty(), str};
 }
 
-template <class Ctx, class T>
+template <class Adapter>
 class Parse
 {
 public:
-	constexpr Parse(Ctx& ctx, bzd::StringView format, const T& args) noexcept : iteratorBegin_{ctx, format, args} {}
+	constexpr Parse(bzd::StringView format) noexcept : iteratorBegin_{format} {}
 
 	class Iterator
 	{
@@ -315,7 +315,7 @@ public:
 		};
 
 	public:
-		constexpr Iterator(Ctx& ctx, bzd::StringView format, const T& args) noexcept : context_{ctx}, format_{format}, args_{args}
+		constexpr Iterator(bzd::StringView format) noexcept : format_{format}
 		{
 			next();
 		}
@@ -342,24 +342,19 @@ public:
 			}
 			else
 			{
-				result_ = parseStaticString(context_, format_);
+				result_ = parseStaticString<Adapter>(format_);
 				if (result_.isMetadata)
 				{
-					context_.assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
-					context_.assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
+					Adapter::assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
+					Adapter::assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
 					format_.removePrefix(1);
-					metadata_ = parseMetadata(context_, format_, autoIndex_++);
-					context_.assertTrue(metadata_.index < args_.size(),
-										"The index specified is greater than the number of "
-										"arguments provided");
+					metadata_ = parseMetadata<Adapter>(format_, autoIndex_++);
 				}
 			}
 		}
 
 	private:
-		Ctx& context_;
 		bzd::StringView format_;
-		const T& args_;
 		ResultStaticString result_{};
 		Metadata metadata_{};
 		SizeType autoIndex_ = 0;
@@ -375,15 +370,14 @@ private:
 };
 
 /**
- * Context used for the current parsing operation.
- * Different context are used to check or print the formated string.
+ * Adapter used for the current parsing operation.
+ * Different adapters are used for compile timme or runtime operations.
  */
 template <class T>
-class Context : public T
+class Adapter : public T
 {
 public:
-	using T::T;
-	constexpr inline void assertTrue(const bool condition, const bzd::StringView& message) const
+	static constexpr void assertTrue(const bool condition, const bzd::StringView& message)
 	{
 		if (!condition)
 		{
@@ -392,13 +386,16 @@ public:
 	}
 };
 
-class CheckContext : public bzd::VectorConstexpr<Metadata, 128>
+class ConstexprAssert
 {
 public:
-	constexpr CheckContext() = default;
-	constexpr void processSubstring(const bzd::StringView&) {}
-	constexpr void processMetadata(const Metadata& metadata) { pushBack(metadata); }
-	constexpr void onError(const bzd::StringView& message) const { bzd::assert::isTrueConstexpr(false); }
+	static constexpr void onError(const bzd::StringView&) { bzd::assert::isTrueConstexpr(false); }
+};
+
+class RuntimeAssert
+{
+public:
+	static constexpr void onError(const bzd::StringView& view) { bzd::assert::isTrue(false, view.data()); }
 };
 
 template <class T>
@@ -408,35 +405,35 @@ void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadat
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toString(stream, value);
+		bzd::format::toStream(stream, value);
 		break;
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
 		{
 			stream.write(bzd::StringView{"0b"}.asBytes());
 		}
-		bzd::format::toStringBin(stream, value);
+		bzd::format::toStreamBin(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_LOWER:
 		if (metadata.alternate)
 		{
 			stream.write(bzd::StringView{"0x"}.asBytes());
 		}
-		bzd::format::toStringHex(stream, value);
+		bzd::format::toStreamHex(stream, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_UPPER:
 		if (metadata.alternate)
 		{
 			stream.write(bzd::StringView{"0x"}.asBytes());
 		}
-		bzd::format::toStringHex(stream, value, "0123456789ABCDEF");
+		bzd::format::toStreamHex(stream, value, "0123456789ABCDEF");
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
 		{
 			stream.write(bzd::StringView{"0o"}.asBytes());
 		}
-		bzd::format::toStringOct(stream, value);
+		bzd::format::toStreamOct(stream, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
 	case Metadata::Format::FIXED_POINT_PERCENT:
@@ -452,13 +449,13 @@ void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& meta
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toString(stream, value);
+		bzd::format::toStream(stream, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
-		bzd::format::toString(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
+		bzd::format::toStream(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
 		break;
 	case Metadata::Format::FIXED_POINT_PERCENT:
-		bzd::format::toString(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		bzd::format::toStream(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 		stream.write(bzd::StringView("%").asBytes());
 		break;
 	case Metadata::Format::BINARY:
@@ -470,16 +467,16 @@ void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& meta
 	}
 }
 
-// Specialization of toString for the native types
+// Specialization of toStream for the native types
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-void toString(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	printInteger(stream, value, metadata);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-void toString(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	printFixedPoint(stream, value, metadata);
 }
@@ -487,7 +484,7 @@ void toString(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 template <
 	class T,
 	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-void toString(bzd::OChannel& stream, const T& value, const Metadata&)
+void toStream(bzd::OChannel& stream, const T& value, const Metadata&)
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
@@ -495,7 +492,7 @@ void toString(bzd::OChannel& stream, const T& value, const Metadata&)
 	printInteger(stream, reinterpret_cast<SizeType>(value), metadata);
 }
 
-static void toString(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
+static void toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -515,55 +512,23 @@ static void toString(bzd::OChannel& stream, const bzd::StringView stringView, co
 	}
 }
 
-class PrintContext
-{
-public:
-	constexpr PrintContext(bzd::OChannel& stream, const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args) :
-		stream_(stream), args_(args)
-	{
-	}
-	void processSubstring(const bzd::StringView& str) { stream_.write(str.asBytes()); }
-	void processMetadata(const Metadata& metadata) { args_[metadata.index]->print(stream_, metadata); }
-	constexpr void onError(const bzd::StringView& message) const {}
-
-private:
-	bzd::OChannel& stream_;
-	const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args_;
-};
-
-template <class T>
-constexpr Context<CheckContext> contextBuild(const bzd::StringView& format, const T& tuple)
-{
-	Context<CheckContext> ctx{};
-	Parse parser{ctx, format, tuple};
-
-	for (const auto& result : parser)
-	{
-		if (result.metadata.hasValue())
-		{
-			ctx.processMetadata(result.metadata.value());
-		}
-	}
-
-	return ctx;
-}
-
 static void print(bzd::OChannel& stream,
 				  const bzd::StringView& format,
 				  const bzd::interface::Vector<const bzd::format::impl::Formatter*>& args)
 {
-	Context<PrintContext> ctx(stream, args);
-	Parse parser{ctx, format, args};
+	using RuntimeAdapter = Adapter<RuntimeAssert>;
+	Parse<RuntimeAdapter> parser{format};
 
 	for (const auto& result : parser)
 	{
 		if (!result.str.empty())
 		{
-			ctx.processSubstring(result.str);
+			stream.write(result.str.asBytes());
 		}
 		if (result.metadata.hasValue())
 		{
-			ctx.processMetadata(result.metadata.value());
+			const auto& metadata = result.metadata.value();
+			args[metadata.index]->print(stream, metadata);
 		}
 	}
 }
@@ -574,16 +539,17 @@ static void print(bzd::OChannel& stream,
  * Check the format context with the argument type, this to ensure type safety.
  * This function should only be used at compile time.
  */
-template <SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
-constexpr bool contextCheck(const Ctx& context, const T& tuple)
+template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
+constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 {
 	auto value = tuple.template get<N - 1>();
-	context.assertTrue(HasFormatter<decltype(value)>::value || HasFormatterWithMetadata<decltype(value)>::value,
+	Adapter::assertTrue(HasFormatter<decltype(value)>::value || HasFormatterWithMetadata<decltype(value)>::value,
 					   "Argument type is not supported, it must contain a valid formatter.");
 
 	bool usedAtLeastOnce = false;
-	for (const auto& metadata : context)
+	for (const auto& metadata : metadataList)
 	{
+		Adapter::assertTrue(metadata.index < T::size(), "The index specified is greater than the number of arguments provided");
 		if (metadata.index == N - 1)
 		{
 			usedAtLeastOnce = true;
@@ -593,12 +559,12 @@ constexpr bool contextCheck(const Ctx& context, const T& tuple)
 			case Metadata::Format::OCTAL:
 			case Metadata::Format::HEXADECIMAL_LOWER:
 			case Metadata::Format::HEXADECIMAL_UPPER:
-				context.assertTrue(bzd::typeTraits::isIntegral<decltype(value)>, "Argument must an integral");
+				Adapter::assertTrue(bzd::typeTraits::isIntegral<decltype(value)>, "Argument must be an integral");
 				break;
 			case Metadata::Format::DECIMAL:
 			case Metadata::Format::FIXED_POINT:
 			case Metadata::Format::FIXED_POINT_PERCENT:
-				context.assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>, "Argument must arithmetic");
+				Adapter::assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>, "Argument must be arithmetic");
 				break;
 			case Metadata::Format::POINTER:
 				break;
@@ -608,18 +574,36 @@ constexpr bool contextCheck(const Ctx& context, const T& tuple)
 		}
 	}
 
-	context.assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
-	return contextCheck<N - 1>(context, tuple);
+	Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
+	return contextCheck<N - 1, Adapter>(metadataList, tuple);
 }
 
-template <SizeType N, class Ctx, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
-constexpr bool contextCheck(const Ctx&, const T&)
+template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
+constexpr bool contextCheck(const MetadataList& metadataList, const T&)
 {
 	return true;
 }
 
+template <class T>
+constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
+{
+	using ConstexprAdapter = Adapter<ConstexprAssert>;
+	bzd::VectorConstexpr<Metadata, 128> metadataList{};
+	Parse<ConstexprAdapter> parser{format};
+
+	for (const auto& result : parser)
+	{
+		if (result.metadata.hasValue())
+		{
+			metadataList.pushBack(result.metadata.value());
+		}
+	}
+
+	return bzd::format::impl::contextCheck<T::size(), ConstexprAdapter>(metadataList, tuple);
+}
+
 template <SizeType... I, class... Args>
-constexpr void toStringRuntime(bzd::OChannel& out, const bzd::StringView& str, bzd::meta::range::Type<I...>, Args&&... args)
+constexpr void toStreamRuntime(bzd::OChannel& out, const bzd::StringView& str, bzd::meta::range::Type<I...>, Args&&... args)
 {
 	using bzd::format::impl::FormatterSpecialized;
 
@@ -662,23 +646,23 @@ namespace bzd::format {
  */
 
 template <class... Args>
-constexpr void toString(bzd::OChannel& out, const bzd::StringView& str, Args&&... args)
+constexpr void toStream(bzd::OChannel& out, const bzd::StringView& str, Args&&... args)
 {
 	// Run-time call
-	impl::toStringRuntime(out, str, bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
+	impl::toStreamRuntime(out, str, bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
 }
 
 template <class ConstexprStringView, class... Args>
-constexpr void toString(bzd::OChannel& out, const ConstexprStringView& str, Args&&... args)
+constexpr void toStream(bzd::OChannel& out, const ConstexprStringView& str, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const auto context = bzd::format::impl::contextBuild(ConstexprStringView::value(), tuple);
+	constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
-	static_assert(bzd::format::impl::contextCheck<tuple.size()>(context, tuple), "String format check failed");
+	static_assert(isValid, "String format check failed");
 
 	// Run-time call
-	bzd::format::toString(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
+	bzd::format::toStream(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::format
