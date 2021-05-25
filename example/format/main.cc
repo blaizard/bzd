@@ -30,7 +30,7 @@ int main()
 	bzd::format::toStream(bzd::platform::getOut(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);
 
 	bzd::String<128> str;
-	bzd::format::toString(str, "This date {}\n", 12);
+	bzd::format::toString(str, "This date {}.", 12);
 	std::cout << str.data() << std::endl;
 
 	return 0;
