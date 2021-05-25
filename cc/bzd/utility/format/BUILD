@@ -35,7 +35,7 @@ cc_library(
         "//cc/bzd/container:function_view",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string",
-        "//cc/bzd/container:string_view",
+        "//cc/bzd/container:array",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
         "//cc/bzd/core:assert_minimal_header",

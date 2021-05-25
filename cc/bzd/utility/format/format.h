@@ -18,8 +18,6 @@
 #include "bzd/type_traits/is_pointer.h"
 #include "bzd/utility/format/integral.h"
 
-#include <iostream>
-
 namespace bzd::format::impl {
 
 struct Metadata
@@ -641,7 +639,7 @@ private:
 	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) {
+		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) {
 			Adapter::process(transport, args, metadata);
 		}...);
 		using LambdaTupleType = decltype(lambdas);
