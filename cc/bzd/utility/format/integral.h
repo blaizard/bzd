@@ -17,10 +17,10 @@ template <SizeType Base = 10, class T, bzd::typeTraits::EnableIf<(Base > 1 && Ba
 constexpr void integer(interface::String& str, const T& n, const char* const digits = bzd::format::impl::digits)
 {
 	auto data = str.data();
-	SizeType index = 0;
+	const SizeType indexBegin = str.size();
+	SizeType index = indexBegin;
 	const SizeType indexEnd = str.capacity();
 	T number = (n < 0) ? -n : n;
-
 
 	if (index != indexEnd)
 	{
@@ -37,7 +37,7 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 		}
 	}
 	str.resize(index);
-	bzd::algorithm::reverse(str.begin(), str.end());
+	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
 }
 
 template <class T>
@@ -83,7 +83,7 @@ namespace bzd::format {
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toStream(bzd::OChannel& stream, const T& data)
 {
-	bzd::String<40> buffer; // 40 is a the length
+	bzd::String<40> buffer; // 40 is the maximum length
 	bzd::format::impl::integer(buffer, data);
 	stream.write(buffer.asBytes());
 }
@@ -131,16 +131,10 @@ void toStream(bzd::OChannel& stream, const bzd::StringView& data);
 void toStream(bzd::OChannel& stream, const char c);
 
 template <class... Args>
-constexpr void appendToString(bzd::interface::String& str, Args&&... args)
-{
-	bzd::interface::StringChannel stream(str);
-	toStream(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
-}
-
-template <class... Args>
 constexpr void toStream(bzd::interface::String& str, Args&&... args)
 {
 	str.clear();
-	appendToString(str, bzd::forward<Args>(args)...);
+	bzd::interface::StringChannel stream(str);
+	toStream(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
 }
 } // namespace bzd::format

@@ -10,7 +10,7 @@ constexpr void appendToTrace(bzd::interface::String& trace, bzd::StringView id, 
 {
 	trace += '[';
 	trace += id;
-	bzd::format::appendToString(trace, checkpoint);
+	bzd::format::toString(trace, checkpoint);
 	trace += ']';
 }
 } // namespace
