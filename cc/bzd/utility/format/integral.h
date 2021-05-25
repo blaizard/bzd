@@ -80,13 +80,6 @@ constexpr void fixedPoint(interface::String& str, const T& n, const SizeType max
 } // namespace bzd::format::impl
 
 namespace bzd::format {
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toStream(bzd::OChannel& stream, const T& data)
-{
-	bzd::String<40> buffer; // 40 is the maximum length
-	bzd::format::impl::integer(buffer, data);
-	stream.write(buffer.asBytes());
-}
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toString(bzd::interface::String& str, const T& data)
@@ -95,46 +88,37 @@ constexpr void toString(bzd::interface::String& str, const T& data)
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, void>* = nullptr>
-constexpr void toStream(bzd::OChannel& stream, const T& data, const SizeType maxPrecision = 6)
+constexpr void toString(bzd::interface::String& str, const T& data, const SizeType maxPrecision = 6)
 {
-	bzd::String<64> buffer;
-	bzd::format::impl::fixedPoint(buffer, data, maxPrecision);
-	stream.write(buffer.asBytes());
+	bzd::format::impl::fixedPoint(str, data, maxPrecision);
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, void>* = nullptr>
-constexpr void toStreamHex(bzd::OChannel& stream, const T& data, const char* const digits = bzd::format::impl::digits)
+constexpr void toStringHex(bzd::interface::String& str, const T& data, const char* const digits = bzd::format::impl::digits)
 {
-	bzd::String<16> buffer; // 16 is a the length of a 128-bit data in binary
-	bzd::format::impl::integer<16>(buffer, data, digits);
-	stream.write(buffer.asBytes());
+	bzd::format::impl::integer<16>(str, data, digits);
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toStreamOct(bzd::OChannel& stream, const T& data)
+constexpr void toStringOct(bzd::interface::String& str, const T& data)
 {
-	bzd::String<32> buffer;
-	bzd::format::impl::integer<8>(buffer, data);
-	stream.write(buffer.asBytes());
+	bzd::format::impl::integer<8>(str, data);
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toStreamBin(bzd::OChannel& stream, const T& data)
+constexpr void toStringBin(bzd::interface::String& str, const T& data)
 {
-	bzd::String<64> buffer; // 64-bit number max.
-	bzd::format::impl::integer<2>(buffer, data);
-	stream.write(buffer.asBytes());
+	bzd::format::impl::integer<2>(str, data);
 }
 
-void toStream(bzd::OChannel& stream, const bzd::StringView& data);
-
-void toStream(bzd::OChannel& stream, const char c);
-
-template <class... Args>
-constexpr void toStream(bzd::interface::String& str, Args&&... args)
+constexpr void toString(bzd::interface::String& str, const bzd::StringView& data)
 {
-	str.clear();
-	bzd::interface::StringChannel stream(str);
-	toStream(static_cast<bzd::OChannel&>(stream), bzd::forward<Args>(args)...);
+	str.append(data);
 }
+
+constexpr void toString(bzd::interface::String& str, const char c)
+{
+	str.append(c);
+}
+
 } // namespace bzd::format

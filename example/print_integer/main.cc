@@ -5,7 +5,7 @@ int main()
 	bzd::String<32> str;
 	bzd::interface::StringChannel sstream(str);
 
-	bzd::format::toStream(str, 12);
+	bzd::format::toString(str, 12);
 	bzd::platform::getOut().write(str.asBytes());
 
 	/*	str.clear();
