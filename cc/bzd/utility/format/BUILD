@@ -32,6 +32,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":integral",
+        "//cc/bzd/container:function_view",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",

@@ -21,6 +21,7 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 	const SizeType indexEnd = str.capacity();
 	T number = (n < 0) ? -n : n;
 
+
 	if (index != indexEnd)
 	{
 		do
@@ -85,6 +86,12 @@ constexpr void toStream(bzd::OChannel& stream, const T& data)
 	bzd::String<40> buffer; // 40 is a the length
 	bzd::format::impl::integer(buffer, data);
 	stream.write(buffer.asBytes());
+}
+
+template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
+constexpr void toString(bzd::interface::String& str, const T& data)
+{
+	bzd::format::impl::integer(str, data);
 }
 
 template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, void>* = nullptr>

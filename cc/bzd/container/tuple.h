@@ -103,6 +103,10 @@ private:
 	template <SizeType M>
 	using Elem = TupleElem<M, Pick<M>>;
 
+public:
+	template <SizeType M>
+	using ItemType = Pick<M>;
+
 public: // constructors
 	constexpr TupleImpl() noexcept = default;
 
@@ -144,4 +148,11 @@ public:
 
 	static constexpr SizeType size() noexcept { return sizeof...(T); }
 };
+
+template <class... Args>
+constexpr auto makeTuple(Args&&... args) noexcept
+{
+	return bzd::Tuple<Args...>{bzd::forward<Args>(args)...};
+}
+
 } // namespace bzd
