@@ -413,42 +413,42 @@ public:
 };
 
 
-template <class T>
-void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
+void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toStream(stream, value);
+		bzd::format::toString(str, value);
 		break;
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0b"}.asBytes());
+			str += "0b"_sv;
 		}
-		bzd::format::toStreamBin(stream, value);
+		bzd::format::toStringBin(str, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_LOWER:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0x"}.asBytes());
+			str += "0x"_sv;
 		}
-		bzd::format::toStreamHex(stream, value);
+		bzd::format::toStringHex(str, value);
 		break;
 	case Metadata::Format::HEXADECIMAL_UPPER:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0x"}.asBytes());
+			str += "0x"_sv;
 		}
-		bzd::format::toStreamHex(stream, value, "0123456789ABCDEF");
+		bzd::format::toStringHex(str, value, "0123456789ABCDEF");
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
 		{
-			stream.write(bzd::StringView{"0o"}.asBytes());
+			str += "0o"_sv;
 		}
-		bzd::format::toStreamOct(stream, value);
+		bzd::format::toStringOct(str, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
 	case Metadata::Format::FIXED_POINT_PERCENT:
@@ -457,21 +457,21 @@ void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadat
 	}
 }
 
-template <class T>
-void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
+void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toStream(stream, value);
+		bzd::format::toString(str, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
-		bzd::format::toStream(stream, value, (metadata.isPrecision) ? metadata.precision : 6);
+		bzd::format::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
 		break;
 	case Metadata::Format::FIXED_POINT_PERCENT:
-		bzd::format::toStream(stream, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
-		stream.write(bzd::StringView("%").asBytes());
+		bzd::format::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		str += "%"_sv;
 		break;
 	case Metadata::Format::BINARY:
 	case Metadata::Format::HEXADECIMAL_LOWER:
@@ -487,13 +487,17 @@ void printFixedPoint(bzd::OChannel& stream, const T& value, const Metadata& meta
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
 void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
-	printInteger(stream, value, metadata);
+	bzd::String<80> str{};
+	toString(str, value, metadata);
+	stream.write(str.asBytes());
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
 void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
-	printFixedPoint(stream, value, metadata);
+	bzd::String<80> str{};
+	toString(str, value, metadata);
+	stream.write(str.asBytes());
 }
 
 template <
@@ -501,10 +505,12 @@ template <
 	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
 void toStream(bzd::OChannel& stream, const T& value, const Metadata&)
 {
+	bzd::String<80> str{};
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
 	metadata.alternate = true;
-	printInteger(stream, reinterpret_cast<SizeType>(value), metadata);
+	toString(str, reinterpret_cast<SizeType>(value), metadata);
+	stream.write(str.asBytes());
 }
 
 static void toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)

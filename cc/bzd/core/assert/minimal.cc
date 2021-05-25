@@ -25,7 +25,7 @@ void backend(const bzd::SourceLocation& location, const char* message1, const ch
 	auto& out = getOChannel();
 	out.write(bzd::StringView{location.getFile()}.asBytes());
 	bzd::String<10> str;
-	bzd::format::toStream(str, location.getLine());
+	bzd::format::toString(str, location.getLine());
 	out.write(bzd::StringView{":"}.asBytes());
 	out.write(str.asBytes());
 	out.write(bzd::StringView{": "}.asBytes());
