@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bzd/container/array.h"
 #include "bzd/container/optional.h"
 #include "bzd/container/string.h"
 #include "bzd/container/string_view.h"
@@ -16,6 +17,8 @@
 #include "bzd/type_traits/is_integral.h"
 #include "bzd/type_traits/is_pointer.h"
 #include "bzd/utility/format/integral.h"
+
+#include <iostream>
 
 namespace bzd::format::impl {
 
@@ -71,41 +74,6 @@ class HasFormatterWithMetadata
 
 public:
 	static constexpr bool value = decltype(test<T>(0))::value;
-};
-
-/**
- * Type removal of the type-specific formatter.
- */
-class Formatter
-{
-public:
-	virtual void print(bzd::OChannel& os, const Metadata& metadata) const noexcept {};
-	virtual ~Formatter() noexcept = default;
-};
-
-template <class Adapter, class T>
-class FormatterSpecialized : public Formatter
-{
-public:
-	explicit constexpr FormatterSpecialized(const T& v) : Formatter{}, value_{v} {}
-
-	template <class U = T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
-	constexpr void printToStream(bzd::OChannel& os, const Metadata&) const noexcept
-	{
-		toStream(os, value_);
-	}
-
-	template <class U = T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<Adapter, U>::value, void>* = nullptr>
-	constexpr void printToStream(bzd::OChannel& os, const Metadata& metadata) const noexcept
-	{
-		toStream(os, value_, metadata);
-	}
-
-	void print(bzd::OChannel& os, const Metadata& metadata) const noexcept override { printToStream(os, metadata); }
-
-private:
-	// Can be optimized to avoid copy if non-temporary
-	const T value_;
 };
 
 /**
@@ -299,10 +267,10 @@ constexpr ResultStaticString parseStaticString(bzd::StringView& format)
 }
 
 template <class Adapter>
-class Parse
+class Parser
 {
 public:
-	constexpr Parse(bzd::StringView format) noexcept : iteratorBegin_{format} {}
+	constexpr Parser(bzd::StringView format) noexcept : iteratorBegin_{format} {}
 
 	class Iterator
 	{
@@ -403,7 +371,49 @@ public:
 	template <class T>
 	using FormatterWithMetadataType = decltype(
 		toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+
+	using FormatterTransportType = bzd::OChannel;
+
+public:
+	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
+	static constexpr void process(bzd::OChannel& stream, const T& value, const Metadata&) noexcept
+	{
+		toStream(stream, value);
+	}
+
+	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
+	static constexpr void process(bzd::OChannel& stream, const T& value, const Metadata& metadata) noexcept
+	{
+		toStream(stream, value, metadata);
+	}
 };
+
+class StringFormatter
+{
+public:
+	template <class T>
+	using FormatterType = decltype(toString(bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>()));
+
+	template <class T>
+	using FormatterWithMetadataType = decltype(
+		toString(bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+
+	using FormatterTransportType = bzd::interface::String;
+
+public:
+	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
+	static constexpr void process(bzd::interface::String& str, const T& value, const Metadata&) noexcept
+	{
+		toString(str, value);
+	}
+
+	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
+	static constexpr void process(bzd::interface::String& str, const T& value, const Metadata& metadata) noexcept
+	{
+		toString(str, value, metadata);
+	}
+};
+
 
 template <class T>
 void printInteger(bzd::OChannel& stream, const T& value, const Metadata& metadata)
@@ -575,7 +585,7 @@ constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
 {
 	using ConstexprAdapter = Adapter<ConstexprAssert, StreamFormatter>;
 	bzd::VectorConstexpr<Metadata, 128> metadataList{};
-	Parse<ConstexprAdapter> parser{format};
+	Parser<ConstexprAdapter> parser{format};
 
 	for (const auto& result : parser)
 	{
@@ -588,31 +598,62 @@ constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
 	return bzd::format::impl::contextCheck<T::size(), ConstexprAdapter>(metadataList, tuple);
 }
 
-template <SizeType... I, class... Args>
-constexpr void toStreamRuntime(bzd::OChannel& stream, const bzd::StringView& format, bzd::meta::range::Type<I...>, Args&&... args)
+template <class Adapter>
+class Formatter
 {
-	using bzd::format::impl::FormatterSpecialized;
-	using RuntimeAdapter = Adapter<RuntimeAssert, StreamFormatter>;
+public:
+	using TransportType = typename Adapter::FormatterTransportType;
 
-	// Run-time call
-	const bzd::Tuple<FormatterSpecialized<RuntimeAdapter, bzd::typeTraits::Decay<Args>>...> tuple{
-		FormatterSpecialized<RuntimeAdapter, bzd::typeTraits::Decay<Args>>(args)...};
-	const bzd::Vector<const bzd::format::impl::Formatter*, sizeof...(args)> argList{(&tuple.template get<I>())...};
-	Parse<RuntimeAdapter> parser{format};
-
-	for (const auto& result : parser)
+public:
+	template <class... Args>
+	static constexpr auto make(Args&&... args) noexcept
 	{
-		if (!result.str.empty())
-		{
-			stream.write(result.str.asBytes());
-		}
-		if (result.metadata.hasValue())
-		{
-			const auto& metadata = result.metadata.value();
-			argList[metadata.index]->print(stream, metadata);
-		}
+		return makeInternal(bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
 	}
-}
+
+private:
+	template <class Lambdas, class LambdasErased, SizeType... I>
+	class FormatterType
+	{
+	public:
+		constexpr FormatterType(Lambdas& lambdas, const LambdasErased& typeErasedLambdas) noexcept :
+			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas},
+			fcts_{(typeErasedLambdas_.template get<I>())...},
+			ptrs_{(reinterpret_cast<const void*>(&lambdas_.template get<I>()))...}
+		{
+		}
+
+		constexpr void process(TransportType& transport, const Metadata& metadata) const noexcept
+		{
+			const auto index = metadata.index;
+			fcts_[index](ptrs_[index], transport, metadata);
+		}
+
+	private:
+		const Lambdas lambdas_;
+		const LambdasErased typeErasedLambdas_;
+		const bzd::Array<void (*)(const void*, TransportType&, const Metadata&), Lambdas::size()> fcts_;
+		const bzd::Array<const void*, Lambdas::size()> ptrs_;
+	};
+
+private:
+	template <SizeType... I, class... Args>
+	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
+	{
+		// Make the actual lambda
+		auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) {
+			Adapter::process(transport, args, metadata);
+		}...);
+		using LambdaTupleType = decltype(lambdas);
+		// Make the lambda with type erasure
+		const auto typeErasedLambdas = bzd::makeTuple([](const void* lambda, TransportType& out, const Metadata& metadata) {
+			(*reinterpret_cast<const typename LambdaTupleType::template ItemType<I>*>(lambda))(out, metadata);
+		}...);
+		using LambdaTypeErasedTupleType = decltype(typeErasedLambdas);
+
+		return FormatterType<LambdaTupleType, LambdaTypeErasedTupleType, I...>{lambdas, typeErasedLambdas};
+	};
+};
 
 } // namespace bzd::format::impl
 
@@ -644,16 +685,52 @@ namespace bzd::format {
  * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
+template <class... Args>
+constexpr void toStream(bzd::OChannel& stream, const bzd::StringView& format, Args&&... args)
+{
+	using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>;
+
+	const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
+	impl::Parser<RuntimeAdapter> parser{format};
+
+	// Run-time call
+	for (const auto& result : parser)
+	{
+		if (!result.str.empty())
+		{
+			stream.write(result.str.asBytes());
+		}
+		if (result.metadata.hasValue())
+		{
+			formatter.process(stream, result.metadata.value());
+		}
+	}
+}
 
 template <class... Args>
-constexpr void toStream(bzd::OChannel& out, const bzd::StringView& str, Args&&... args)
+constexpr void toString(bzd::interface::String& str, const bzd::StringView& format, Args&&... args)
 {
+	using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>;
+
+	const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
+	impl::Parser<RuntimeAdapter> parser{format};
+
 	// Run-time call
-	impl::toStreamRuntime(out, str, bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
+	for (const auto& result : parser)
+	{
+		if (!result.str.empty())
+		{
+			str.append(result.str);
+		}
+		if (result.metadata.hasValue())
+		{
+			formatter.process(str, result.metadata.value());
+		}
+	}
 }
 
 template <class ConstexprStringView, class... Args>
-constexpr void toStream(bzd::OChannel& out, const ConstexprStringView& str, Args&&... args)
+constexpr void toStream(bzd::OChannel& stream, const ConstexprStringView& format, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
@@ -662,7 +739,7 @@ constexpr void toStream(bzd::OChannel& out, const ConstexprStringView& str, Args
 	static_assert(isValid, "Compile-time string format check failed.");
 
 	// Run-time call
-	bzd::format::toStream(out, ConstexprStringView::value(), bzd::forward<Args>(args)...);
+	bzd::format::toStream(stream, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::format
