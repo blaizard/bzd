@@ -4,11 +4,11 @@
 #include "bzd/container/optional.h"
 #include "bzd/container/result.h"
 #include "bzd/container/tuple.h"
+#include "bzd/core/coroutine.h"
+#include "bzd/core/promise.h"
+#include "bzd/core/scheduler.h"
 #include "bzd/type_traits/remove_reference.h"
 #include "bzd/utility/ignore.h"
-#include "example/coroutines/coroutine.h"
-#include "example/coroutines/promise.h"
-#include "example/coroutines/scheduler.h"
 
 namespace bzd::impl {
 struct SuspendAlways : public bzd::coroutine::impl::suspend_always

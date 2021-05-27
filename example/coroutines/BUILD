@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary", "cc_library")
 
 cc_binary(
     name = "not",
@@ -8,7 +8,7 @@ cc_binary(
     tags = ["manual"],
 )
 
-cc_binary(
+bzd_cc_binary(
     name = "coroutines",
     srcs = [
         "main.cc",
@@ -18,7 +18,6 @@ cc_binary(
     ],
     tags = ["manual"],
     deps = [
-        ":async",
         "//cc/bzd",
     ],
 )
@@ -29,23 +28,6 @@ cc_binary(
         "eager.cc",
     ],
     tags = ["manual"],
-    deps = [
-        "//cc/bzd",
-    ],
-)
-
-cc_library(
-    name = "async",
-    srcs = [
-        "async.h",
-        "coroutine.h",
-        "promise.h",
-        "scheduler.h",
-    ],
-    hdrs = [
-        "async.h",
-    ],
-    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd",
     ],

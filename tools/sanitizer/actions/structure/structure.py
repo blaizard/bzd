@@ -14,9 +14,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace,
-		exclude=["**BUILD", "**BUILD.template", "**WORKSPACE", "**README.md", "**Jenkinsfile", "**Dockerfile"],
-		useGitignore=True)
+	files = Files(args.workspace, excludeFile=".structureignore", useGitignore=True)
 	regexpr = re.compile(args.regexpr)
 	noMathList = []
 	for path in files.data(relative=True):

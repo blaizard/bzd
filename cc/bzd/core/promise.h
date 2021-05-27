@@ -1,124 +1,111 @@
 #pragma once
 
-#include "bzd/container/any_reference.h"
 #include "bzd/container/function_view.h"
 #include "bzd/container/impl/non_owning_list.h"
 #include "bzd/container/optional.h"
-#include "bzd/container/result.h"
-#include "bzd/type_traits/invoke_result.h"
-#include "bzd/utility/ignore.h"
+#include "bzd/core/coroutine.h"
 
-namespace bzd::interface {
-class Task;
-
-class Promise : public bzd::NonOwningListElement</*MultiContainer*/ true>
-{
-protected:
-	constexpr Promise() noexcept = default;
-	virtual ~Promise() = default;
-
-public:
-	virtual bool poll() = 0;
-
-	/**
-	 * Set the promise and its associated task as pending and attach it to a list.
-	 */
-	void setPending(bzd::NonOwningList<bzd::interface::Promise>& list);
-
-	/**
-	 * Set back the promise and its associated task as active and detach it from the list.
-	 */
-	void setActive(bzd::NonOwningList<bzd::interface::Promise>& list);
-
-protected:
-	friend class bzd::interface::Task;
-
-	bzd::interface::Task* task_{nullptr};
-};
-} // namespace bzd::interface
-
-namespace bzd {
-template <class V = void, class E = bzd::BoolType>
-class Promise : public bzd::interface::Promise
-{
-public: // Types.
-	using ResultType = bzd::Result<V, E>;
-	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
-	using FunctionType = ReturnType(bzd::interface::Promise&, bzd::AnyReference&);
-	using FunctionViewType = bzd::FunctionView<FunctionType>;
-
-public: // Constructors.
-	template <class Args>
-	constexpr Promise(FunctionViewType&& fct, Args&& args) noexcept : interface::Promise{}, poll_{fct}, args_{bzd::forward<Args>(args)}
-	{
-	}
-
-	constexpr Promise(FunctionViewType&& fct) noexcept : interface::Promise{}, poll_{fct} {}
-
-	template <class T>
-	constexpr Promise(T&& result) noexcept : interface::Promise{}, poll_{&promiseNoop}, return_{bzd::forward<T>(result)}
-	{
-	}
-
-public:
-	constexpr bool isReady() const noexcept { return static_cast<bool>(return_); }
-	constexpr void setResult(ReturnType&& optionalResult) noexcept { return_ = bzd::move(optionalResult); }
-	constexpr void setResult(ResultType&& result) noexcept { return_ = bzd::move(result); }
-
-	constexpr ResultType&& getResult() noexcept
-	{
-		bzd::assert::isTrue(return_.hasValue());
-		return bzd::move(return_.valueMutable());
-	}
-
-	bool poll() override final
-	{
-		if (!isReady())
-		{
-			setResult(poll_(*this, args_));
-			return isReady();
-		}
-		return true;
-	}
-
-	// When lifespan of this promise terminates, remove it from wherever it was.
-	~Promise() { bzd::ignore = this->pop(); }
-
-private:
-	static ReturnType promiseNoop(bzd::interface::Promise&, bzd::AnyReference&) noexcept { return bzd::nullopt; }
-
-protected:
-	ReturnType return_{};
-	FunctionViewType poll_{};
-	bzd::AnyReference args_{};
-};
-
-template <class V, class E, class PollFct>
-class PromisePoll : public bzd::Promise<V, E>
-{
-private:
-	using ReturnType = bzd::Optional<bzd::Result<V, E>>;
-	using typename bzd::Promise<V, E>::FunctionViewType;
-
-public:
-	using bzd::Promise<V, E>::isReady;
-
-	template <class T = PollFct>
-	constexpr PromisePoll(T&& callack) : bzd::Promise<V, E>{FunctionViewType{poll_}}, poll_{bzd::forward<T>(callack)}
-	{
-	}
-
-private:
-	// Callback is statefull, therefore it cannot be const.
-	PollFct poll_;
-};
-
-template <class T,
-		  class V = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&, bzd::AnyReference&>::Value::Value,
-		  class E = typename bzd::typeTraits::InvokeResult<T, bzd::interface::Promise&, bzd::AnyReference&>::Value::Error>
-constexpr auto makePromise(T&& callback)
-{
-	return bzd::PromisePoll<V, E, T>(bzd::forward<T>(callback));
+// Forward declaration
+namespace bzd::impl {
+template <class T>
+class Async;
 }
 
-} // namespace bzd
+namespace bzd::coroutine::interface {
+class Promise : public bzd::NonOwningListElement<true>
+{
+};
+} // namespace bzd::coroutine::interface
+
+namespace bzd::coroutine::impl {
+
+template <class T>
+class Promise : public bzd::coroutine::interface::Promise
+{
+private:
+	struct FinalAwaiter
+	{
+		constexpr bool await_ready() noexcept { return false; }
+
+		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+		{
+			auto& continuation = handle.promise().caller;
+			if (continuation)
+			{
+				return continuation;
+			}
+			return bzd::coroutine::impl::noop_coroutine();
+		}
+
+		constexpr void await_resume() noexcept {}
+	};
+
+public:
+	constexpr Promise() noexcept = default;
+
+	constexpr bzd::coroutine::impl::suspend_always initial_suspend() noexcept { return {}; }
+
+	constexpr FinalAwaiter final_suspend() noexcept
+	{
+		if (onTerminateCallback_)
+		{
+			(onTerminateCallback_.value())(*this);
+		}
+		return {};
+	}
+
+	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
+
+	~Promise() noexcept {}
+
+private:
+	template <class U>
+	friend class ::bzd::impl::Async;
+
+	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
+	bzd::Optional<bzd::FunctionView<void(interface::Promise&)>> onTerminateCallback_{};
+};
+
+} // namespace bzd::coroutine::impl
+
+namespace bzd::coroutine {
+template <class T>
+class Promise : public impl::Promise<Promise<T>>
+{
+public:
+	using ResultType = T;
+	using impl::Promise<Promise<T>>::Promise;
+
+	constexpr auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
+
+	template <class U>
+	constexpr void return_value(U&& result) noexcept
+	{
+		result_.emplace(bzd::forward<U>(result));
+	}
+
+private:
+	template <class U>
+	friend class ::bzd::impl::Async;
+
+	bzd::Optional<T> result_{};
+};
+
+template <>
+class Promise<void> : public impl::Promise<Promise<void>>
+{
+public:
+	using ResultType = bool;
+	using impl::Promise<Promise<void>>::Promise;
+
+	auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
+
+	constexpr void return_void() noexcept { result_ = true; }
+
+private:
+	template <class U>
+	friend class ::bzd::impl::Async;
+
+	bzd::Optional<bool> result_{};
+};
+} // namespace bzd::coroutine

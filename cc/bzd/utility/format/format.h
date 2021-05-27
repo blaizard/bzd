@@ -393,8 +393,8 @@ public:
 	using FormatterType = decltype(toString(bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>()));
 
 	template <class T>
-	using FormatterWithMetadataType = decltype(
-		toString(bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+	using FormatterWithMetadataType = decltype(toString(
+		bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
 	using FormatterTransportType = bzd::interface::String;
 
@@ -411,7 +411,6 @@ public:
 		toString(str, value, metadata);
 	}
 };
-
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
 void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
@@ -621,8 +620,7 @@ private:
 	{
 	public:
 		constexpr FormatterType(Lambdas& lambdas, const LambdasErased& typeErasedLambdas) noexcept :
-			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas},
-			fcts_{(typeErasedLambdas_.template get<I>())...},
+			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas}, fcts_{(typeErasedLambdas_.template get<I>())...},
 			ptrs_{(reinterpret_cast<const void*>(&lambdas_.template get<I>()))...}
 		{
 		}
@@ -645,9 +643,8 @@ private:
 	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) {
-			Adapter::process(transport, args, metadata);
-		}...);
+		const auto lambdas =
+			bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) { Adapter::process(transport, args, metadata); }...);
 		using LambdaTupleType = decltype(lambdas);
 		// Make the lambda with type erasure
 		const auto typeErasedLambdas = bzd::makeTuple([](const void* lambda, TransportType& out, const Metadata& metadata) {

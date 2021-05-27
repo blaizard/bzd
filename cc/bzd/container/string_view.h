@@ -27,6 +27,10 @@ protected:
 public:
 	constexpr StringView() noexcept : Parent{StorageType{nullptr, 0}} {}
 	constexpr StringView(const T* const str) noexcept : Parent{StorageType{str, strlen(str)}} {}
+	template <SizeType N>
+	constexpr StringView(const T (&data)[N]) noexcept : Parent{StorageType{data, N}}
+	{
+	}
 	constexpr StringView(const T* const str, const SizeType size) noexcept : Parent{StorageType{str, size}} {}
 	constexpr StringView(const bzd::Span<char>& span) noexcept : Parent{StorageType{span.data(), span.size()}} {}
 

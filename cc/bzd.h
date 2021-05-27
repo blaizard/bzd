@@ -27,13 +27,13 @@
 
 // Core
 #include "bzd/core/assert.h"
+#include "bzd/core/async.h"
 #include "bzd/core/channel.h"
 #include "bzd/core/delay.h"
 #include "bzd/core/log.h"
 #include "bzd/core/promise.h"
 #include "bzd/core/registry.h"
 #include "bzd/core/scheduler.h"
-#include "bzd/core/task.h"
 
 // Meta
 #include "bzd/meta/choose_nth.h"
