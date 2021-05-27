@@ -48,6 +48,9 @@ def _load_linux_x86_64_gcc_10_2_0(name):
             # Use a subset of C++20 to have coroutine support.
             "-std=c++2a",
             "-fcoroutines",
+
+            # There is a bug with coroutines
+            "-Wno-unused-value",
         ],
         "link_flags": [
             "-Wl,--disable-new-dtags",
