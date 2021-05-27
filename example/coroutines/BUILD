@@ -1,13 +1,5 @@
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary", "cc_library")
 
-cc_binary(
-    name = "not",
-    srcs = [
-        "not_working.cc",
-    ],
-    tags = ["manual"],
-)
-
 bzd_cc_binary(
     name = "coroutines",
     srcs = [
@@ -15,62 +7,6 @@ bzd_cc_binary(
     ],
     copts = [
         "-Wno-unused-value",
-    ],
-    tags = ["manual"],
-    deps = [
-        "//cc/bzd",
-    ],
-)
-
-cc_binary(
-    name = "eager",
-    srcs = [
-        "eager.cc",
-    ],
-    tags = ["manual"],
-    deps = [
-        "//cc/bzd",
-    ],
-)
-
-cc_binary(
-    name = "2",
-    srcs = [
-        "coroutines2.cc",
-    ],
-    copts = [
-        "-Wno-unused-value",
-    ],
-    linkopts = [
-        "-pthread",
-    ],
-    tags = [
-        "cc",
-    ],
-    target_compatible_with = select({
-        "@linux_x86_64_gcc//:target": [
-            "@linux_x86_64_gcc//:compiler",
-        ],
-        "@linux_x86_64_clang//:target": [
-            "@linux_x86_64_clang//:compiler",
-        ],
-        "//conditions:default": ["@linux_x86_64_clang//:compiler"],
-    }),
-    deps = [
-        ":async",
-        "//cc/bzd",
-    ],
-)
-
-cc_binary(
-    name = "lewis",
-    srcs = [
-        "lewis.cc",
-    ],
-    copts = [
-        "-std=c++2a",
-        "-stdlib=libc++",
-        "-fcoroutines-ts",
     ],
     tags = ["manual"],
     deps = [
