@@ -8,6 +8,7 @@ cc_library(
         "*.h",
         "*.cc",
     ]),
+    tags = ["manual"],
     linkopts = [
         "-pthread",
     ],
@@ -27,6 +28,7 @@ bzd_cc_binary(
 bzd_package(
     name = "package",
     include_metadata = True,
+    tags = ["manual"],
     deps = {
         ":example": "example",
     },
