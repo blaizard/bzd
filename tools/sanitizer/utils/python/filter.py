@@ -8,12 +8,21 @@ class Filter:
 	def __init__(self, filters: Sequence[str]) -> None:
 		self.filters = [Filter._compile(filterStr) for filterStr in filters]
 
-	"""
-	Compile a filter
-	"""
+	@staticmethod
+	def fromFile(path: Path) -> "Filter":
+		"""
+		Make a filter object from a file.
+		The file must contain a filer per line, it also supports comments starting with '#'.
+		"""
+		with path.open() as f:
+			filters = [line for line in [line.strip() for line in f] if line and not line.startswith("#")]
+		return Filter(filters=filters)
 
 	@staticmethod
 	def _compile(filterStr: str) -> Pattern[str]:
+		"""
+		Compile a filter
+		"""
 		index = 0
 		regexpr = r'^'
 		while index < len(filterStr):
@@ -29,11 +38,10 @@ class Filter:
 			index += 1
 		return re.compile(regexpr + r'$')
 
-	"""
-	Match a filter with a string
-	"""
-
 	def match(self, path: Path) -> bool:
+		"""
+		Match a filter with a string
+		"""
 		for regexpr in self.filters:
 			if re.match(regexpr, path.as_posix()):
 				return True

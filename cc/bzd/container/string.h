@@ -92,7 +92,7 @@ public:
 	}
 
 public:
-	const bzd::SizeType capacity_;
+	const bzd::SizeType capacity_{};
 };
 } // namespace bzd::impl
 
@@ -108,6 +108,7 @@ protected:
 	using Self = String;
 	using Parent = interface::String;
 	using StorageType = typename Parent::StorageType;
+	using DataType = typename interface::String::DataType;
 
 public:
 	constexpr String() noexcept : Parent{StorageType{data_, 0}, N + 1} { data_[0] = '\0'; }
@@ -128,7 +129,7 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 protected:
-	interface::String::DataType data_[N + 1] = {}; // needed for constexpr
+	DataType data_[N + 1]{}; // needed for constexpr
 };
 
 // Comparison to char*

@@ -20,4 +20,4 @@ RUN cd compiler-explorer && make dist
 WORKDIR /compiler-explorer
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["make", "EXTRA_ARGS='--language c++'"]
+CMD ["make", "EXTRA_ARGS='--language c++ --noCache'"]

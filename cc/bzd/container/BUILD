@@ -22,6 +22,7 @@ cc_library(
         ":string_view",
         ":variant",
         ":vector",
+        "//cc/bzd/container/impl",
         "//cc/bzd/core:assert_minimal",
     ],
 )

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/core/promise.h"
+#include "bzd/core/async.h"
 #include "bzd/core/units.h"
 #include "bzd/platform/clock.h"
 
@@ -12,11 +12,15 @@ namespace bzd {
  *
  * \return A promise object.
  */
-inline auto delay(const bzd::units::Millisecond time)
+bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 {
 	auto duration = bzd::platform::getTicks().toDuration();
 	const auto targetDuration = duration + bzd::platform::msToTicks(time);
-	return bzd::makePromise([duration, targetDuration](bzd::interface::Promise&, bzd::AnyReference&) mutable -> bzd::Promise<>::ReturnType {
+
+	do
+	{
+		co_await bzd::async::yield();
+
 		const auto curTicks = bzd::platform::getTicks();
 
 		// Update the current duration and update the wrapping counter
@@ -29,11 +33,7 @@ inline auto delay(const bzd::units::Millisecond time)
 		duration.setFromDetails(details);
 
 		// Check if the duration is reached
-		if (duration >= targetDuration)
-		{
-			return bzd::nullresult;
-		}
-		return bzd::nullopt;
-	});
+	} while (duration < targetDuration);
 }
+
 } // namespace bzd
