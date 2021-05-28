@@ -16,7 +16,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("Hello me", result)
 
 	def testIfBlock(self) -> None:
-		template = Template("Hello {if condition == \"2\"}Me!{end}")
+		template = Template("Hello {if condition == 2}Me!{end}")
 		result = template.process({"condition": "1"})
 		self.assertEqual("Hello ", result)
 		result = template.process({"condition": "2"})

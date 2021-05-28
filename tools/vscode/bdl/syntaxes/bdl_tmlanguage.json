@@ -1,9 +1,0 @@
-{
-    "scopeName": "source.bdl",
-    "patterns": [
-        {
-            "match": "interface",
-            "name": "bdl.symbol.interface"
-        }
-    ]
-}

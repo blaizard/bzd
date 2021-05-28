@@ -1,15 +1,32 @@
 {
-    "name": "bdl",
-    "publisher": "Blaise Lengrand",
     "contributes": {
-        "languages": [{
-            "id": "bdl",
-            "extensions": ["bdl"]
-        }],
-        "grammars": [{
-            "language": "bdl",
-            "scopeName": "source.bdl",
-            "path": "syntaxes/bdl_tmlanguage.json"
-        }]
-    }
+        "grammars": [
+            {
+                "language": "bdl",
+                "path": "bdl_grammar.json",
+                "scopeName": "source.bdl"
+            }
+        ],
+        "languages": [
+            {
+                "extensions": [
+                    ".bdl"
+                ],
+                "id": "bdl"
+            }
+        ]
+    },
+    "description": "Syntax highlighting for .bdl language.",
+    "displayName": "::bzd",
+    "engines": {
+        "vscode": "*"
+    },
+    "license": "MIT",
+    "name": "bzd",
+    "publisher": "Blaizard",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/blaizard/cpp-async.git"
+    },
+    "version": "1.0.0"
 }
