@@ -7,13 +7,15 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match: interface, struct
-_regexprClass = r"(?P<type>(:?interface|struct|method))"
+_regexprClass = r"(?P<type>(:?interface|struct|method|namespace|import))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|method)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|method|namespace|import)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
+# Match string
+_regexprString = r"\"(?P<value>.*?)\""
 
 
 class FragmentBlockComment(FragmentComment):
@@ -133,6 +135,33 @@ def makeGrammarMethod() -> Grammar:
 	]
 
 
+def makeGrammarNamespace() -> Grammar:
+	"""
+	Generate a grammar for namespace, it accepts the following format:
+	namespace level1[.level2[.level3...]];
+	"""
+
+	class NamespaceStart(FragmentNestedStart):
+		default = {"category": "namespace"}
+		nestedName = "name"
+
+	return [
+		GrammarItem(r"namespace", NamespaceStart, [
+		GrammarItem(_regexprName, Fragment,
+		[GrammarItem(r"\.", FragmentNewElement),
+		GrammarItem(r";", FragmentNestedStop)])
+		])
+	]
+
+
+def makeGrammarImport() -> Grammar:
+	"""
+	Generate a grammar for import, it accepts the following format:
+	import "path/to/file"
+	"""
+	return [GrammarItem(r"import", {"category": "import"}, [GrammarItem(_regexprString, FragmentNewElement)])]
+
+
 # Comments allowed by the grammar
 _grammarComments = [
 	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentBlockComment),
@@ -144,6 +173,6 @@ class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
 		super().__init__(path,
-			grammar=makeGrammarVariable() + makeGrammarMethod() +
+			grammar=makeGrammarNamespace() + makeGrammarImport() + makeGrammarVariable() + makeGrammarMethod() +
 			makeGrammarClass(makeGrammarVariable() + makeGrammarMethod()),
 			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

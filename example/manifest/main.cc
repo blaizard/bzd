@@ -2,8 +2,10 @@
 
 #include <iostream>
 
-class MyType : public MyInterface
+class MyType : public bzd::manifest::MyInterface
 {
+public:
+	int start(int a) override { return a; }
 };
 
 int main()

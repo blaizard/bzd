@@ -46,7 +46,7 @@ def _load_linux_x86_64_gcc_10_2_0(name):
         "compile_flags": [
 
             # Use a subset of C++20 to have coroutine support.
-            "-std=c++2a",
+            "-std=c++17",
             "-fcoroutines",
 
             # There is a bug with coroutines

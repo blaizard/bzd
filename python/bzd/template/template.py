@@ -40,6 +40,16 @@ class Template:
 
 		return args
 
+	def _isNumber(self, potentialNumber: str) -> bool:
+		"""
+		Check if a string is convertible into a number.
+		"""
+		try:
+			float(potentialNumber)
+		except:
+			return False
+		return True
+
 	def _evalCondition(self, args: SubstitutionType, conditionStr: str) -> bool:
 
 		def replaceValue(match: typing.Match[str]) -> str:
@@ -53,6 +63,8 @@ class Template:
 				if isinstance(value, bool):
 					return str(value)
 				elif isinstance(value, str):
+					if self._isNumber(value):
+						return value
 					return "\"{}\"".format(value)
 				elif isinstance(value, list):
 					return str(bool(value))

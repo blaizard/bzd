@@ -9,9 +9,9 @@ from tools.bzd2.grammar import Parser
 formatters = {"bdl": BdlFormatter, "cc": CcFormatter}
 
 
-def main(format: str, inputs: typing.List[Path]) -> str:
+def main(formatType: str, inputs: typing.List[Path]) -> str:
 
-	assert format in formatters, "Format '{}' not supported.".format(format)
+	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Parse all files and merge them
 	data = Sequence()
@@ -20,5 +20,5 @@ def main(format: str, inputs: typing.List[Path]) -> str:
 		data.merge(parsedData)
 
 	# Format using a specific formatter
-	formatter = formatters[format]()
+	formatter = formatters[formatType]()
 	return formatter.visit(data)  # type: ignore
