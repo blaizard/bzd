@@ -1,4 +1,5 @@
 import typing
+from pathlib import Path
 
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import handleFromElement, assertHasAttr, assertHasSequence
@@ -102,6 +103,37 @@ class VisitorContract(VisitorBase[U1, U2]):
 		return typing.cast(U1, kind)
 
 
+class VisitorNamespace(VisitorBase[str, str]):
+
+	nestedKind = None
+
+	def __init__(self, element: Element) -> None:
+
+		assertHasSequence(element=element, sequence="name")
+		sequence = element.getNestedSequence("name")
+		assert sequence is not None
+		self.result = self._visit(sequence=sequence)
+
+	def visitBegin(self, result: typing.Any) -> typing.List[str]:
+		return []
+
+	def visitEnd(self, result: typing.List[str]) -> str:
+		return self.visitNamespaceItems(items=result)
+
+	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
+		assertHasAttr(element=element, attr="name")
+		result.append(element.getAttr("name").value)
+		return result
+
+	def visitNamespaceItems(self, items: typing.List[str]) -> str:
+		"""
+		Called once all contract elements have been discovered.
+		This function should assemble the elements together.
+		"""
+
+		return ".".join(items)
+
+
 T = typing.TypeVar("T")
 
 
@@ -111,6 +143,7 @@ class Visitor(VisitorBase[T, str]):
 
 	def __init__(self) -> None:
 		self.level = 0
+		self.hasNamespace = False
 
 	def applyIndent(self, result: str) -> str:
 		"""
@@ -159,6 +192,23 @@ class Visitor(VisitorBase[T, str]):
 
 			result = self.visitMethod(result=result, element=element)
 
+		# Handle namespace
+		elif element.getAttr("category").value == "namespace":
+
+			if self.hasNamespace:
+				handleFromElement(element=element, message="Only a single namespace can be specified per file.")
+			self.hasNamespace = True
+
+			result = self.visitNamespace(result=result, element=element)
+
+		# Handle import
+		elif element.getAttr("category").value == "import":
+
+			assertHasAttr(element=element, attr="value")
+			path = element.getAttrValue("value")
+			assert path
+			result = self.visitImport(result=result, path=Path(path))
+
 		# Should never go here
 		else:
 			raise Exception("Unexpected element category: {}", element.getAttr("category").value)
@@ -185,6 +235,20 @@ class Visitor(VisitorBase[T, str]):
 	def visitMethod(self, result: T, element: Element) -> T:
 		"""
 		Called when discovering a method.
+		"""
+
+		return result
+
+	def visitNamespace(self, result: T, element: Element) -> T:
+		"""
+		Called when discovering a namespace.
+		"""
+
+		return result
+
+	def visitImport(self, result: T, path: Path) -> T:
+		"""
+		Called when discovering an import statement.
 		"""
 
 		return result

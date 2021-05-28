@@ -1,0 +1,15 @@
+{
+    "name": "bdl",
+    "publisher": "Blaise Lengrand",
+    "contributes": {
+        "languages": [{
+            "id": "bdl",
+            "extensions": ["bdl"]
+        }],
+        "grammars": [{
+            "language": "bdl",
+            "scopeName": "source.bdl",
+            "path": "syntaxes/bdl_tmlanguage.json"
+        }]
+    }
+}

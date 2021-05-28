@@ -1,5 +1,8 @@
+namespace bzd.manifest;
+
 interface MyInterface
 {
+	method start(int a) -> int;
 	// Magic number for demo purpose
 	int magic = 42 [min = 5, max = 100];
 	// Read only value

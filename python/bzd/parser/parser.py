@@ -42,6 +42,8 @@ class Parser:
 						element = fragment.next(element, item.grammar)
 					break
 			if m is None:
+				# Uncomment for debug
+				# print(root)
 				self.handleError(index=index, message="Invalid syntax.")
 			assert m is not None
 			index += m.end()

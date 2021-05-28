@@ -1,7 +1,7 @@
 import typing
 from pathlib import Path
 
-from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract
+from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
@@ -34,14 +34,40 @@ class _VisitorContract(VisitorContract[ResultType, ResultType]):
 		return {"type": kind, "value": value, "comment": comment}
 
 
+class _VisitorNamespace(VisitorNamespace):
+
+	def visitNamespaceItems(self, items: typing.List[str]) -> str:
+		return "::".join(items)
+
+
 class CcFormatter(Visitor[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
-		return {"variables": {}, "classes": {}}
+		return {"variables": {}, "classes": {}, "methods": {}, "imports": {}}
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
 		return string[0].upper() + string[1:]
+
+	def getVariable(self, element: Element) -> typing.Any:
+		contracts = {}
+		if element.isNestedSequence("contract"):
+			visitorContract = _VisitorContract()
+			sequence = element.getNestedSequence("contract")
+			assert sequence
+			contracts = visitorContract.visit(sequence)
+
+		name = element.getAttrValue("name")
+		assert name
+		return {
+			"name": name,
+			"const": element.isAttr("const"),
+			"type": _VisitorType(element=element).result,
+			"isValue": element.isAttr("value"),
+			"value": element.getAttrValue("value"),
+			"comment": self.visitComment(comment=element.getAttrValue("comment")),
+			"contracts": contracts
+		}
 
 	def visitComment(self, comment: typing.Optional[str]) -> str:
 
@@ -53,26 +79,32 @@ class CcFormatter(Visitor[ResultType]):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitVariable(self, result: ResultType, element: Element) -> ResultType:
+	def visitMethod(self, result: ResultType, element: Element) -> ResultType:
 
-		contracts = {}
-		if element.isNestedSequence("contract"):
-			visitorContract = _VisitorContract()
-			sequence = element.getNestedSequence("contract")
-			assert sequence
-			contracts = visitorContract.visit(sequence)
+		# Handle the name + arguments
+		args = []
+		if element.isNestedSequence("argument"):
+			sequence = element.getNestedSequence("argument")
+			assert sequence is not None
+			for arg in sequence.iterate():
+				args.append(self.getVariable(element=arg))
 
 		name = element.getAttrValue("name")
 		assert name
-		result["variables"][name] = {
-			"nameCamelCase": self.toCamelCase(name),
-			"const": element.isAttr("const"),
-			"type": _VisitorType(element=element).result,
-			"isValue": element.isAttr("value"),
-			"value": element.getAttrValue("value"),
+		result["methods"][name] = {
+			"type": _VisitorType(element=element).result if element.isAttr("type") else "void",
 			"comment": self.visitComment(comment=element.getAttrValue("comment")),
-			"contracts": contracts
+			"args": args
 		}
+
+		return result
+
+	def visitVariable(self, result: ResultType, element: Element) -> ResultType:
+
+		variable = self.getVariable(element=element)
+		name = variable["name"]
+		variable["nameCamelCase"] = self.toCamelCase(name)
+		result["variables"][name] = variable
 
 		return result
 
@@ -89,6 +121,11 @@ class CcFormatter(Visitor[ResultType]):
 
 		return result
 
+	def visitNamespace(self, result: ResultType, element: Element) -> ResultType:
+
+		result["namespace"] = _VisitorNamespace(element=element).result
+		return result
+
 	def visitFinal(self, result: ResultType) -> str:
 
 		content = (Path(__file__).parent / "template/cc/file.h.template").read_text()
@@ -96,5 +133,12 @@ class CcFormatter(Visitor[ResultType]):
 		output = template.process(result)
 
 		print(output)
+		print(result)
 
 		return output
+
+	def visitImport(self, result: ResultType, path: Path) -> ResultType:
+
+		result["imports"][path.as_posix()] = True
+
+		return result

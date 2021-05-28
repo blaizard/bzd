@@ -1,41 +1,86 @@
 #include <cassert>
 
+{for path, _ in imports}
+#include "{path}"
+{end}
+
+{if namespace}
+namespace {namespace} {
+{end}
+
 {for name, data in classes}
-	class {name}
-	{{
-	public:
-		// ---- Variables Accessors ----
-		{for varName, var in data.nested.variables}
-			// Getter for {varName}_
-			constexpr const {var.type}& get{var.nameCamelCase}() const noexcept
-			{
-				return {varName}_;
-			}
-			{if not var.const}
-				// Setter for {varName}_
-				constexpr void set{var.nameCamelCase}(const {var.type}& value)
-				{
-					{for type, contract in var.contracts}
-						{if type == "min"}
-							// Minimum contract
-							assert(value >= {contract.value});
-						{end}
-						{if type == "max"}
-							// Maximum contract
-							assert(value <= {contract.value});
-						{end}
-					{end}
+class {name}
+{
+public: // Methods.
 
-					{varName}_ = value;
-				}
-			{end}
+	{for methodName, method in data.nested.methods}
+	{method.comment}
+	virtual {method.type} {methodName}({for i, var in method.args}{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}) = 0;
+	{end}
+
+public: // Variable accessors.
+
+	{for varName, var in data.nested.variables}
+
+	// Getter for {varName}_.
+	constexpr const {var.type}& get{var.nameCamelCase}() const noexcept
+	{
+		return {varName}_;
+	}
+
+	{if not var.const}
+	// Setter for {varName}_.
+	constexpr void set{var.nameCamelCase}(const {var.type}& value)
+	{
+		{for type, contract in var.contracts}
+		{if type == "min"}
+		// Minimum contract
+		assert(value >= {contract.value});
+		{end}
+		{if type == "max"}
+		// Maximum contract
+		assert(value <= {contract.value});
+		{end}
 		{end}
 
-	private:
-		// ---- Variables ----
-		{for varName, var in data.nested.variables}
-			{var.comment}
-			{if var.const}const {end}{var.type} {varName}_{{{if var.isValue}{var.value}{end} }};
+		{varName}_ = value;
+	}
+	{end}
+	{end}
+
+protected: // Protected variable accessors.
+
+	{for varName, var in data.nested.variables}
+
+	{if var.const}
+	// Setter for {varName}_.
+	constexpr void set{var.nameCamelCase}(const {var.type}& value)
+	{
+		{for type, contract in var.contracts}
+		{if type == "min"}
+		// Minimum contract
+		assert(value >= {contract.value});
 		{end}
-	}};
+		{if type == "max"}
+		// Maximum contract
+		assert(value <= {contract.value});
+		{end}
+		{end}
+
+		{varName}_ = value;
+	}
+	{end}
+	{end}
+
+private: // Variables.
+
+	{for varName, var in data.nested.variables}
+	{var.comment}
+	{var.type} {varName}_{{{if var.isValue}{var.value}{end}}};
+	{end}
+}};
+{end}
+
+{if namespace}
+}
 {end}

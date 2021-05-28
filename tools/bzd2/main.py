@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 	config = parser.parse_args()
 
-	output = main(format=config.format, inputs=config.inputs)
+	output = main(formatType=config.format, inputs=config.inputs)
 
 	if config.output is None:
 		print(output)

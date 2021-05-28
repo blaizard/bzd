@@ -14,7 +14,7 @@ from tools.sanitizer.utils.python.workspace import Files
 
 def formatBdl(path: str, stdout: TextIO) -> None:
 	content = Path(path).read_text()
-	formattedContent = bdlFormatter(format="bdl", inputs=[Path(path)])
+	formattedContent = bdlFormatter(formatType="bdl", inputs=[Path(path)])
 	if formattedContent != content:
 		Path(path).write_text(formattedContent, encoding="utf-8")
 

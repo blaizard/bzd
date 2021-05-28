@@ -27,10 +27,10 @@ def handleError(parser: "Parser", index: int, message: str) -> None:
 	# Position the cursor
 	contentByLine.insert(line + 1, "{}^".format(" " * column))
 	contentByLine.insert(line + 2, "{}:{}:{}: error: {}".format(parser.path, line + 1, column + 1, message))
-	raise ExceptionParser(message="\n".join(contentByLine))
+	raise ExceptionParser(message="\n" + "\n".join(contentByLine))
 
 
-def handleFromElement(element: Element, attr: typing.Optional[str], message: str) -> None:
+def handleFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> None:
 
 	# Look for the index
 	index = 0

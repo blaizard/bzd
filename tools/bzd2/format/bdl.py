@@ -1,6 +1,7 @@
 import typing
+from pathlib import Path
 
-from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract
+from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
 from bzd.parser.element import Element
 
 
@@ -36,6 +37,12 @@ class _VisitorContract(VisitorContract[str, str]):
 			items.append(value)
 
 		return " ".join(items)
+
+
+class _VisitorNamespace(VisitorNamespace):
+
+	def visitNamespaceItems(self, items: typing.List[str]) -> str:
+		return ".".join(items)
 
 
 class BdlFormatter(Visitor[str]):
@@ -146,5 +153,17 @@ class BdlFormatter(Visitor[str]):
 		result += nestedResult
 
 		result += self.applyIndent("}\n")
+
+		return result
+
+	def visitNamespace(self, result: str, element: Element) -> str:
+
+		result += self.applyIndent("namespace {namespaces};\n\n".format(namespaces=_VisitorNamespace(element).result))
+
+		return result
+
+	def visitImport(self, result: str, path: Path) -> str:
+
+		result += "import \"{path}\"\n".format(path=path.as_posix())
 
 		return result
