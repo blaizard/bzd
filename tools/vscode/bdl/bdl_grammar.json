@@ -1,0 +1,18 @@
+{
+    "patterns": [
+        {
+            "match": "interface",
+            "name": "storage.class"
+        },
+        {
+            "begin": "/\\*",
+            "end": "\\*/",
+            "name": "comment.block"
+        },
+        {
+            "match": "(//).*$\\n?",
+            "name": "comment.line"
+        }
+    ],
+    "scopeName": "source.bdl"
+}
