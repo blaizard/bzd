@@ -12,7 +12,7 @@ py_test(
         "grammar.bdl",
     ],
     deps = [
-        "//tools/bzd2:grammar",
+        "//tools/bdl:grammar",
     ],
 )
 
@@ -28,7 +28,7 @@ py_test(
         "formatter.bdl.txt",
     ],
     deps = [
-        "//tools/bzd2:format",
-        "//tools/bzd2:grammar",
+        "//tools/bdl:format",
+        "//tools/bdl:grammar",
     ],
 )

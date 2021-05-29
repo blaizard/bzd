@@ -1,4 +1,4 @@
-#include "bzd-auto/example/manifest/manifest_file.h"
+#include "example/manifest/interface.h"
 
 #include <iostream>
 

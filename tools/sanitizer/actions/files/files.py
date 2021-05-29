@@ -8,7 +8,7 @@ from typing import TextIO, Any, Callable
 import bzd.utils.worker
 import bzd.yaml
 from bzd.parser.error import ExceptionParser
-from tools.bzd2.lib import main as bdlFormatter
+from tools.bdl.lib import main as bdlFormatter
 from tools.sanitizer.utils.python.workspace import Files
 
 

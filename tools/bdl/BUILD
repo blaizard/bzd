@@ -51,7 +51,7 @@ py_library(
 )
 
 py_binary(
-    name = "bzd2",
+    name = "bdl",
     srcs = [
         "main.py",
     ],
