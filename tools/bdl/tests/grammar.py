@@ -3,7 +3,7 @@ import unittest
 import typing
 from pathlib import Path
 
-from tools.bzd2.grammar import Parser
+from tools.bdl.grammar import Parser
 from bzd.parser.visitor import VisitorJson
 
 

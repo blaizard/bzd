@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from tools.bzd2.lib import formatters, main
+from tools.bdl.lib import formatters, main
 
 if __name__ == "__main__":
 

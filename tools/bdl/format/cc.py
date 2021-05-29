@@ -1,7 +1,7 @@
 import typing
 from pathlib import Path
 
-from tools.bzd2.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
+from tools.bdl.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
