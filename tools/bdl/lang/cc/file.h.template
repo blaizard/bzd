@@ -1,5 +1,7 @@
 #include <cassert>
 
+#include "tools/bdl/lang/cc/adapter/types.h"
+
 {for path, _ in imports}
 #include "{path}"
 {end}

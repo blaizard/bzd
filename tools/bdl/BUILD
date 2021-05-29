@@ -23,12 +23,12 @@ py_library(
 )
 
 py_library(
-    name = "format",
+    name = "lang",
     srcs = glob([
-        "format/*.py",
+        "lang/*.py",
     ]),
     data = glob([
-        "format/**/*.template",
+        "lang/**/*.template",
     ]),
     visibility = [":__subpackages__"],
     deps = [
@@ -44,7 +44,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":format",
+        ":lang",
         ":grammar",
         ":visitor",
     ],

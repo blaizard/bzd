@@ -1,10 +1,24 @@
 cc_library(
 	name = "linux",
-	srcs = [
-		"core.cc",
+	hdrs = [
+		"core.h",
 	],
 	deps = [
 		"//cc/bzd/platform:core",
+		"//cc/bzd/platform/core:stack",
+		"//cc/bzd/container:optional"
 	],
-	tags = ["manual"],
+	linkopts = [
+		"-lpthread",
+	]
+)
+
+cc_binary(
+	name = "main",
+	srcs = [
+		"main.cc"
+	],
+	deps = [
+		":linux"
+	]
 )

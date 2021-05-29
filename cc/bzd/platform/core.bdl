@@ -3,6 +3,10 @@ namespace bzd.platform;
 // A core is a processing unit that accepts a single scheduler.
 interface Core
 {
-	method start();
-	method stop();
+	// Initialize the core.
+	method init();
+	// Blocking function to execute a workload on the core and wait until it terminates.
+	method run(WorkloadType workload);
+	// Get the current stack ussage.
+	method getStackUsage() -> SizeType;
 }
