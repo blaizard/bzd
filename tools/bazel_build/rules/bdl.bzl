@@ -1,14 +1,23 @@
-"""
-C++ specific provider
-"""
+load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
 def _bzd_manifest_impl_cc(ctx, output):
+    """
+    C++ specific provider
+    """
     compilation_context = cc_common.create_compilation_context(
         headers = depset([output]),
         includes = depset([ctx.bin_dir.path]),
     )
 
-    return [CcInfo(compilation_context = compilation_context)]
+    cc_info_providers = sets.make()
+    sets.insert(cc_info_providers, CcInfo(compilation_context = compilation_context))
+
+    # Merge providers from deps rules
+    for dep in ctx.attr._deps_cc:
+        sets.insert(cc_info_providers, dep[CcInfo])
+    cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
+
+    return [cc_info_providers]
 
 def _bzd_manifest_impl(ctx):
     formats = {
@@ -53,6 +62,10 @@ bzd_manifest = rule(
             default = Label("//tools/bdl"),
             cfg = "host",
             executable = True,
+        ),
+        "_deps_cc": attr.label_list(
+            default = [Label("//tools/bdl/lang/cc/adapter:types")],
+            cfg = "host",
         ),
     },
 )

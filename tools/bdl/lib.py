@@ -2,8 +2,8 @@ import typing
 from pathlib import Path
 
 from bzd.parser.element import Sequence
-from tools.bdl.format.bdl import BdlFormatter
-from tools.bdl.format.cc import CcFormatter
+from tools.bdl.lang.bdl import BdlFormatter
+from tools.bdl.lang.cc import CcFormatter
 from tools.bdl.grammar import Parser
 
 formatters = {"bdl": BdlFormatter, "cc": CcFormatter}

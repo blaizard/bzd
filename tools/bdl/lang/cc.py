@@ -17,6 +17,10 @@ class _VisitorType(VisitorType):
 		return "{}{}".format(kind, template)
 
 	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
+
+		if kind == "FunctionView":
+			kind = "bzd::FunctionView"
+
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
@@ -128,7 +132,7 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitFinal(self, result: ResultType) -> str:
 
-		content = (Path(__file__).parent / "template/cc/file.h.template").read_text()
+		content = (Path(__file__).parent / "cc/file.h.template").read_text()
 		template = Template(content)
 		output = template.process(result)
 

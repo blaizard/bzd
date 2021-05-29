@@ -4,7 +4,7 @@ import typing
 from pathlib import Path
 
 from tools.bdl.grammar import Parser
-from tools.bdl.format.bdl import BdlFormatter
+from tools.bdl.lang.bdl import BdlFormatter
 
 
 class TestRun(unittest.TestCase):

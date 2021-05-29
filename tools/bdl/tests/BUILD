@@ -28,7 +28,7 @@ py_test(
         "formatter.bdl.txt",
     ],
     deps = [
-        "//tools/bdl:format",
+        "//tools/bdl:lang",
         "//tools/bdl:grammar",
     ],
 )
