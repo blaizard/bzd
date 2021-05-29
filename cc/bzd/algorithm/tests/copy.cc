@@ -1,6 +1,6 @@
-#include "bzd/algorithm/copy.h"
+#include "cc/bzd/algorithm/copy.h"
 
-#include "bzd/container/array.h"
+#include "cc/bzd/container/array.h"
 #include "cc_test/test.h"
 
 TEST(Copy, Base)

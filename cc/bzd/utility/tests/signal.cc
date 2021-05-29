@@ -1,6 +1,6 @@
-#include "bzd/utility/signal.h"
+#include "cc/bzd/utility/signal.h"
 
-#include "bzd/utility/bit.h"
+#include "cc/bzd/utility/bit.h"
 #include "cc_test/test.h"
 
 TEST(Signal, Base)

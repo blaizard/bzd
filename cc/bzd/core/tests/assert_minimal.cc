@@ -1,4 +1,4 @@
-#include "bzd/core/assert/minimal.h"
+#include "cc/bzd/core/assert/minimal.h"
 #include "cc_test/test.h"
 
 TEST(AssertMinimal, Base)

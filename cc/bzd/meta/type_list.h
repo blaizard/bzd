@@ -1,10 +1,10 @@
 #pragma once
 
-#include "bzd/meta/choose_nth.h"
-#include "bzd/meta/contains.h"
-#include "bzd/meta/find.h"
-#include "bzd/meta/find_conditional.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/meta/choose_nth.h"
+#include "cc/bzd/meta/contains.h"
+#include "cc/bzd/meta/find.h"
+#include "cc/bzd/meta/find_conditional.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::meta {
 template <class... Ts>

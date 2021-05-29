@@ -1,12 +1,12 @@
 #pragma once
 
-#include "bzd/container/iterator/contiguous.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/enable_if.h"
-#include "bzd/type_traits/is_const.h"
-#include "bzd/type_traits/remove_const.h"
-#include "bzd/utility/forward.h"
+#include "cc/bzd/container/iterator/contiguous.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/enable_if.h"
+#include "cc/bzd/type_traits/is_const.h"
+#include "cc/bzd/type_traits/remove_const.h"
+#include "cc/bzd/utility/forward.h"
 
 #include <new> // operator new for "placement new"
 

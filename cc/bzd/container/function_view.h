@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/function.h"
-#include "bzd/container/variant.h"
-#include "bzd/type_traits/add_pointer.h"
+#include "cc/bzd/container/function.h"
+#include "cc/bzd/container/variant.h"
+#include "cc/bzd/type_traits/add_pointer.h"
 
 namespace bzd::impl {
 
@@ -22,9 +22,9 @@ public: // Constructor/Assignment
 	template <class Object, class Member>
 	constexpr FunctionView(Object& obj, Member memberPtr) noexcept :
 		storage_{
-			FunctionMember{&obj, [memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
+			FunctionMember{&obj, {[memberPtr](void* ptr, Args... args) -> auto {return (reinterpret_cast<Object*>(ptr)->*memberPtr)(args...);
 }
-} // namespace bzd::impl
+}}
 }
 {
 }

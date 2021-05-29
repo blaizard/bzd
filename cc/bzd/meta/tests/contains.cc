@@ -1,6 +1,6 @@
-#include "bzd/meta/contains.h"
+#include "cc/bzd/meta/contains.h"
 
-#include "bzd/meta/type_list.h"
+#include "cc/bzd/meta/type_list.h"
 #include "cc_test/test.h"
 
 TEST(Meta, Contains)

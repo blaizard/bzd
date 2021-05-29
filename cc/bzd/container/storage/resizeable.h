@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/platform/types.h"
-#include "bzd/utility/forward.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/utility/forward.h"
 
 namespace bzd::impl {
 /**
@@ -35,7 +35,7 @@ public: // Accessors
 	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
 
 private:
-	T data_[N]{};
+	T data_[(N == 0) ? 1 : N]{};
 	bzd::SizeType size_{0};
 };
 } // namespace bzd::impl

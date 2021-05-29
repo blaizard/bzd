@@ -1,6 +1,6 @@
-#include "bzd/algorithm/fill.h"
+#include "cc/bzd/algorithm/fill.h"
 
-#include "bzd/container/array.h"
+#include "cc/bzd/container/array.h"
 #include "cc_test/test.h"
 
 TEST(Fill, Base)

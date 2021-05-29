@@ -1,11 +1,11 @@
 #pragma once
 
-#include "bzd/container/string.h"
-#include "bzd/container/string_view.h"
-#include "bzd/core/channel.h"
-#include "bzd/platform/out.h"
-#include "bzd/utility/format/format.h"
-#include "bzd/utility/forward.h"
+#include "cc/bzd/container/string.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/core/channel.h"
+#include "cc/bzd/platform/out.h"
+#include "cc/bzd/utility/format/format.h"
+#include "cc/bzd/utility/forward.h"
 
 namespace bzd::log {
 enum class Level

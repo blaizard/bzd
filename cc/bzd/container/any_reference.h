@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/result.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/is_same.h"
+#include "cc/bzd/container/result.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/is_same.h"
 
 namespace bzd::impl {
 using TypeIdType = IntPtrType;

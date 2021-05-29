@@ -1,12 +1,12 @@
 #pragma once
 
-#include "bzd/type_traits/add_pointer.h"
-#include "bzd/type_traits/conditional.h"
-#include "bzd/type_traits/is_array.h"
-#include "bzd/type_traits/is_function.h"
-#include "bzd/type_traits/remove_cv.h"
-#include "bzd/type_traits/remove_extent.h"
-#include "bzd/type_traits/remove_reference.h"
+#include "cc/bzd/type_traits/add_pointer.h"
+#include "cc/bzd/type_traits/conditional.h"
+#include "cc/bzd/type_traits/is_array.h"
+#include "cc/bzd/type_traits/is_function.h"
+#include "cc/bzd/type_traits/remove_cv.h"
+#include "cc/bzd/type_traits/remove_extent.h"
+#include "cc/bzd/type_traits/remove_reference.h"
 
 namespace bzd::typeTraits::impl {
 template <class T>

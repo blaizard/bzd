@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/string.h"
-#include "bzd/container/string_view.h"
-#include "bzd/core/channel.h"
+#include "cc/bzd/container/string.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/core/channel.h"
 
 namespace bzd::impl {
 class StringChannel : public bzd::OChannel

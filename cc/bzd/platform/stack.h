@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/algorithm/fill.h"
-#include "bzd/platform/types.h"
-#include "bzd/utility/align_down.h"
-#include "bzd/utility/align_up.h"
+#include "cc/bzd/algorithm/fill.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/utility/align_down.h"
+#include "cc/bzd/utility/align_up.h"
 
 namespace bzd::platform::interface {
 

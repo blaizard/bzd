@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/type_traits/integral_constant.h"
-#include "bzd/type_traits/is_same.h"
-#include "bzd/type_traits/remove_cv.h"
+#include "cc/bzd/type_traits/integral_constant.h"
+#include "cc/bzd/type_traits/is_same.h"
+#include "cc/bzd/type_traits/remove_cv.h"
 
 namespace bzd::typeTraits::impl {
 template <class T>

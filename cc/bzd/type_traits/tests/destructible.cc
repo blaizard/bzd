@@ -1,4 +1,4 @@
-#include "bzd/type_traits/is_destructible.h"
+#include "cc/bzd/type_traits/is_destructible.h"
 #include "cc_test/test.h"
 
 TEST(TypeTraits, isDestructible)

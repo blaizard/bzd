@@ -1,6 +1,6 @@
-#include "bzd/platform/stack.h"
+#include "cc/bzd/platform/stack.h"
 
-#include "bzd/platform/types.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::platform::impl {
 /**

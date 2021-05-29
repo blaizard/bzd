@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/algorithm/copy_n.h"
-#include "bzd/algorithm/reverse.h"
-#include "bzd/container/span.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/algorithm/copy_n.h"
+#include "cc/bzd/algorithm/reverse.h"
+#include "cc/bzd/container/span.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::impl {
 

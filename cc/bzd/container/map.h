@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/optional.h"
-#include "bzd/container/vector.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/container/optional.h"
+#include "cc/bzd/container/vector.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::impl {
 /**

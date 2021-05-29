@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/utility/source_location.h"
+#include "cc/bzd/utility/source_location.h"
 
 namespace bzd::assert::impl {
-inline void assertHelper(bool test)
+inline void assertHelper(bool /*test*/)
 {
 	throw "Assert error";
 }

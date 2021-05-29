@@ -35,6 +35,7 @@ cc_library(
         ":is_reference",
         ":is_rvalue_reference",
         ":is_same",
+        ":is_signed",
         ":is_trivially_destructible",
         ":is_union",
         ":is_void",
@@ -412,6 +413,19 @@ cc_library(
     deps = [
         ":false_type",
         ":true_type",
+    ],
+)
+
+cc_library(
+    name = "is_signed",
+    hdrs = [
+        "is_signed.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":is_arithmetic",
+        ":integral_constant",
     ],
 )
 

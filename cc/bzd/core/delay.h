@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/core/async.h"
-#include "bzd/core/units.h"
-#include "bzd/platform/clock.h"
+#include "cc/bzd/core/async.h"
+#include "cc/bzd/core/units.h"
+#include "cc/bzd/platform/clock.h"
 
 namespace bzd {
 /**

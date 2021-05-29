@@ -1,4 +1,4 @@
-#include "bzd/core/registry.h"
+#include "cc/bzd/core/registry.h"
 
 #include "cc_test/test.h"
 
@@ -53,13 +53,13 @@ TEST(Registry, PureVirtual)
 TEST(Registry, Overflow)
 {
 	bzd::Registry<float>::Declare<1> reg_;
-	bzd::Registry<float>::Register<> m0("0", 12);
-	EXPECT_ANY_THROW(bzd::Registry<float>::Register<> m1("1", -1));
+	bzd::Registry<float>::Register<> m0("0", 12.0f);
+	EXPECT_ANY_THROW(bzd::Registry<float>::Register<> m1("1", -1.0f));
 }
 
 TEST(Registry, NotDeclared)
 {
-	EXPECT_ANY_THROW(bzd::Registry<double>::Register<> m1("1", -1));
+	EXPECT_ANY_THROW(bzd::Registry<double>::Register<> m1("1", -1.8));
 }
 
 TEST(Registry, GetOrCreate)

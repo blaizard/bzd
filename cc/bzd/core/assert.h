@@ -1,10 +1,10 @@
 #pragma once
 
-#include "bzd/container/result.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/core/log.h"
-#include "bzd/platform/panic.h"
-#include "bzd/utility/source_location.h"
+#include "cc/bzd/container/result.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/core/log.h"
+#include "cc/bzd/platform/panic.h"
+#include "cc/bzd/utility/source_location.h"
 
 namespace bzd::assert {
 template <class... Args>

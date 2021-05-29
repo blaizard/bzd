@@ -1,3 +1,6 @@
+namespace bzd.platform;
+
+// A core is a processing unit that accepts a single scheduler.
 interface Core
 {
 	method start();

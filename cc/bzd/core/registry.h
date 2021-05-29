@@ -1,11 +1,11 @@
 #pragma once
 
-#include "bzd/container/map.h"
-#include "bzd/container/result.h"
-#include "bzd/container/string_view.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/platform/types.h"
-#include "bzd/utility/singleton.h"
+#include "cc/bzd/container/map.h"
+#include "cc/bzd/container/result.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/utility/singleton.h"
 
 namespace bzd::impl {
 template <class T>
@@ -120,7 +120,7 @@ public:
 	/**
 	 * \brief Check wether or not a key available.
 	 */
-	static constexpr bool is(const KeyType& key)
+	static constexpr bool is(const KeyType& /*key*/)
 	{
 		auto result = interface::Registry<Interface>::get();
 		return result.hasValue();
