@@ -1,7 +1,7 @@
-#include "bzd/core/async.h"
+#include "cc/bzd/core/async.h"
 
-#include "bzd/container/string.h"
-#include "bzd/utility/format/integral.h"
+#include "cc/bzd/container/string.h"
+#include "cc/bzd/utility/format/integral.h"
 #include "cc_test/test.h"
 
 #include <iostream>

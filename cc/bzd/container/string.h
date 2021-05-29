@@ -1,14 +1,14 @@
 #pragma once
 
-#include "bzd/algorithm/copy.h"
-#include "bzd/container/impl/span.h"
-#include "bzd/container/span.h"
-#include "bzd/container/storage/non_owning.h"
-#include "bzd/container/storage/resizeable.h"
-#include "bzd/container/string_view.h"
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/add_const.h"
-#include "bzd/utility/min.h"
+#include "cc/bzd/algorithm/copy.h"
+#include "cc/bzd/container/impl/span.h"
+#include "cc/bzd/container/span.h"
+#include "cc/bzd/container/storage/non_owning.h"
+#include "cc/bzd/container/storage/resizeable.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/add_const.h"
+#include "cc/bzd/utility/min.h"
 
 namespace bzd::impl {
 template <class T, class Storage>

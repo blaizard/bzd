@@ -1,6 +1,6 @@
-#include "bzd/container/function.h"
+#include "cc/bzd/container/function.h"
 
-#include "bzd/type_traits/is_same.h"
+#include "cc/bzd/type_traits/is_same.h"
 #include "cc_test/test.h"
 
 TEST(ContainerFunction, nonCapturingLambda)

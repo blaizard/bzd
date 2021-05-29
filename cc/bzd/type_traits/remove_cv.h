@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/type_traits/remove_const.h"
-#include "bzd/type_traits/remove_volatile.h"
+#include "cc/bzd/type_traits/remove_const.h"
+#include "cc/bzd/type_traits/remove_volatile.h"
 
 namespace bzd::typeTraits {
 

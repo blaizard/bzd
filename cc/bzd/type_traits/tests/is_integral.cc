@@ -1,4 +1,4 @@
-#include "bzd/type_traits/is_integral.h"
+#include "cc/bzd/type_traits/is_integral.h"
 
 #include "cc_test/test.h"
 

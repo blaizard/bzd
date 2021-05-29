@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/type_traits/integral_constant.h"
-#include "bzd/type_traits/is_destructible.h"
+#include "cc/bzd/type_traits/integral_constant.h"
+#include "cc/bzd/type_traits/is_destructible.h"
 
 #ifndef __is_identifier
 #define __is_identifier(__x) 1

@@ -1,4 +1,4 @@
-#include "bzd/platform/panic.h"
+#include "cc/bzd/platform/panic.h"
 
 #include <stdlib.h>
 

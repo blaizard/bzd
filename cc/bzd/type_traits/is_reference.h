@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/type_traits/integral_constant.h"
-#include "bzd/type_traits/is_lvalue_reference.h"
-#include "bzd/type_traits/is_rvalue_reference.h"
+#include "cc/bzd/type_traits/integral_constant.h"
+#include "cc/bzd/type_traits/is_lvalue_reference.h"
+#include "cc/bzd/type_traits/is_rvalue_reference.h"
 
 namespace bzd::typeTraits::impl {
 template <class T>

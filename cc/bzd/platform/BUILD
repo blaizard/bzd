@@ -1,4 +1,13 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
+load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest")
+
+bzd_manifest(
+    name = "core",
+    srcs = [
+        "core.bdl",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "platform",

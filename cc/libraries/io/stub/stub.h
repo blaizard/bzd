@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bzd/core/channel.h"
+#include "cc/bzd/core/channel.h"
 
 namespace bzd::io {
 class Stub : public bzd::OChannel

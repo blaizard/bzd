@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/impl/span.h"
-#include "bzd/container/span.h"
-#include "bzd/container/storage/fixed.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/container/impl/span.h"
+#include "cc/bzd/container/span.h"
+#include "cc/bzd/container/storage/fixed.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd {
 /**

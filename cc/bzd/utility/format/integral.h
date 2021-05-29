@@ -1,12 +1,13 @@
 #pragma once
 
-#include "bzd/algorithm/reverse.h"
-#include "bzd/container/string.h"
-#include "bzd/container/string_channel.h"
-#include "bzd/container/vector.h"
-#include "bzd/core/channel.h"
-#include "bzd/type_traits/is_floating_point.h"
-#include "bzd/type_traits/is_integral.h"
+#include "cc/bzd/algorithm/reverse.h"
+#include "cc/bzd/container/string.h"
+#include "cc/bzd/container/string_channel.h"
+#include "cc/bzd/container/vector.h"
+#include "cc/bzd/core/channel.h"
+#include "cc/bzd/type_traits/is_floating_point.h"
+#include "cc/bzd/type_traits/is_integral.h"
+#include "cc/bzd/type_traits/is_signed.h"
 
 namespace bzd::format::impl {
 namespace {
@@ -20,7 +21,11 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 	const SizeType indexBegin = str.size();
 	SizeType index = indexBegin;
 	const SizeType indexEnd = str.capacity();
-	T number = (n < 0) ? -n : n;
+	T number = n;
+	if constexpr (bzd::typeTraits::isSigned<T>)
+	{
+		number = (n < 0) ? -n : n;
+	}
 
 	if (index != indexEnd)
 	{
@@ -31,9 +36,12 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 			data[index++] = static_cast<char>(digit);
 		} while (number && index != indexEnd);
 
-		if (n < 0 && index != indexEnd)
+		if constexpr (bzd::typeTraits::isSigned<T>)
 		{
-			data[index++] = '-';
+			if (n < 0 && index != indexEnd)
+			{
+				data[index++] = '-';
+			}
 		}
 	}
 	str.resize(index);

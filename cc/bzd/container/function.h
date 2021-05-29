@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/add_pointer.h"
-#include "bzd/type_traits/decay.h"
-#include "bzd/utility/forward.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/add_pointer.h"
+#include "cc/bzd/type_traits/decay.h"
+#include "cc/bzd/utility/forward.h"
 
 #include <new> // Used only for placement new
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/type_traits/enable_if.h"
-#include "bzd/type_traits/is_arithmetic.h"
-#include "bzd/utility/move.h"
-#include "bzd/utility/ratio.h"
+#include "cc/bzd/type_traits/enable_if.h"
+#include "cc/bzd/type_traits/is_arithmetic.h"
+#include "cc/bzd/utility/move.h"
+#include "cc/bzd/utility/ratio.h"
 
 namespace bzd::impl {
 /**
@@ -28,7 +28,7 @@ public: // Constructors.
 	// Convert and round the result
 	template <class OtherRatio>
 	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
-		value_{(other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den)}
+		value_{static_cast<T>((other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den))}
 	{
 	}
 

@@ -1,11 +1,11 @@
-#include "bzd/core/assert/minimal.h"
+#include "cc/bzd/core/assert/minimal.h"
 
-#include "bzd/container/string_view.h"
-#include "bzd/core/channel.h"
-#include "bzd/core/registry.h"
-#include "bzd/platform/out.h"
-#include "bzd/platform/panic.h"
-#include "bzd/utility/format/integral.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/core/channel.h"
+#include "cc/bzd/core/registry.h"
+#include "cc/bzd/platform/out.h"
+#include "cc/bzd/platform/panic.h"
+#include "cc/bzd/utility/format/integral.h"
 
 namespace {
 bzd::OChannel& getOChannel()

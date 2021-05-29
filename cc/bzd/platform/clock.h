@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/named_type.h"
-#include "bzd/core/units.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/container/named_type.h"
+#include "cc/bzd/core/units.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::platform {
 

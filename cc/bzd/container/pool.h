@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/impl/single_linked_pool.h"
-#include "bzd/container/span.h"
-#include "bzd/platform/types.h"
-#include "bzd/utility/container_of.h"
+#include "cc/bzd/container/impl/single_linked_pool.h"
+#include "cc/bzd/container/span.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/utility/container_of.h"
 
 namespace bzd::impl {
 template <class T, class CapacityType = SizeType>

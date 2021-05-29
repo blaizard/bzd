@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/type_traits/is_reference.h"
-#include "bzd/type_traits/is_void.h"
+#include "cc/bzd/type_traits/is_reference.h"
+#include "cc/bzd/type_traits/is_void.h"
 
 namespace bzd::typeTraits::impl {
 template <typename T, bool b>

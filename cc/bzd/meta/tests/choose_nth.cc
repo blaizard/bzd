@@ -1,6 +1,6 @@
-#include "bzd/meta/choose_nth.h"
+#include "cc/bzd/meta/choose_nth.h"
 
-#include "bzd/meta/type_list.h"
+#include "cc/bzd/meta/type_list.h"
 #include "cc_test/test.h"
 
 #include <typeinfo>

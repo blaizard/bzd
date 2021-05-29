@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bzd/container/pool.h"
-#include "bzd/container/tuple.h"
-#include "bzd/container/vector.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/container/pool.h"
+#include "cc/bzd/container/tuple.h"
+#include "cc/bzd/container/vector.h"
+#include "cc/bzd/platform/types.h"
 
 namespace bzd::impl {
 /**

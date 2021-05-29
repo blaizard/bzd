@@ -1,7 +1,7 @@
-#include "bzd/container/tuple.h"
+#include "cc/bzd/container/tuple.h"
 
-#include "bzd/container/string_view.h"
-#include "bzd/utility/move.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/utility/move.h"
 #include "cc_test/test.h"
 
 TEST(ContainerTuple, Base)
@@ -23,7 +23,7 @@ TEST(ContainerTuple, Base)
 
 TEST(ContainerTuple, Constructor)
 {
-	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{12, true, 5.32, -21, "Hello"};
+	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{12u, true, 5.32, -21, "Hello"};
 
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_EQ(tuple.get<1>(), true);
@@ -34,7 +34,7 @@ TEST(ContainerTuple, Constructor)
 
 TEST(ContainerTuple, ConstructorPartial)
 {
-	bzd::Tuple<unsigned int, bool, double, int> tuple{12, true};
+	bzd::Tuple<unsigned int, bool, double, int> tuple{12u, true};
 
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_EQ(tuple.get<1>(), true);

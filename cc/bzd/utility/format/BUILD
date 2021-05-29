@@ -14,6 +14,7 @@ cc_library(
         "//cc/bzd/core:channel",
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
+        "//cc/bzd/type_traits:is_signed",
     ],
 )
 

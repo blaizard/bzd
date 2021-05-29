@@ -5,7 +5,6 @@ cc_library(
     hdrs = [
         "bzd.h",
     ],
-    includes = ["."],
     visibility = ["//visibility:public"],
 )
 

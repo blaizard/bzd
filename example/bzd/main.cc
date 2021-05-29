@@ -1,4 +1,4 @@
-#include "bzd.h"
+#include "cc/bzd.h"
 
 #include <unistd.h>
 
@@ -39,7 +39,7 @@ static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Typ
 static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 3> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/ 0, reg, value};
+	bzd::Array<bzd::UInt8Type, 3> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0), reg, value};
 	i2c.write(data.asBytes());
 }
 
@@ -57,7 +57,7 @@ static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Typ
 void setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 6> data{(ESP_SLAVE_ADDR << 1) | /*write bit*/ 0, PCA9685_LED0_ON_L + 4 * num, on, on >> 8, off, off >> 8};
+	bzd::Array<bzd::UInt8Type, 6> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0), static_cast<bzd::UInt8Type>(PCA9685_LED0_ON_L + 4 * num), static_cast<bzd::UInt8Type>(on), static_cast<bzd::UInt8Type>(on >> 8), static_cast<bzd::UInt8Type>(off), static_cast<bzd::UInt8Type>(off >> 8)};
 	i2c.write(data.asBytes());
 }
 
@@ -127,8 +127,8 @@ int main()
 	// i2c_master_init();
 
 	// LED blinking
-	bzd::Array<const char, 1> on{1};
-	bzd::Array<const char, 1> off{0};
+	bzd::Array<const char, 1> on{static_cast<char>(1)};
+	bzd::Array<const char, 1> off{static_cast<char>(0)};
 	auto& port = bzd::Registry<bzd::OChannel>::get("led");
 	port.write(on.asBytes());
 	sleep(1);

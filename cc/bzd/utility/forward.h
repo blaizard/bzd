@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bzd/type_traits/is_lvalue_reference.h"
-#include "bzd/type_traits/remove_reference.h"
+#include "cc/bzd/type_traits/is_lvalue_reference.h"
+#include "cc/bzd/type_traits/remove_reference.h"
 
 namespace bzd {
 template <class T>

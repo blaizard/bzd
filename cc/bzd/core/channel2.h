@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bzd/container/promise.h"
-#include "bzd/container/span.h"
-#include "bzd/platform/types.h"
+#include "cc/bzd/container/promise.h"
+#include "cc/bzd/container/span.h"
+#include "cc/bzd/platform/types.h"
 
 /*
 	[[nodiscard]] bzd::Promise<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept;

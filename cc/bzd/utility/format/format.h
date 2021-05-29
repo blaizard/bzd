@@ -1,22 +1,22 @@
 #pragma once
 
-#include "bzd/container/array.h"
-#include "bzd/container/optional.h"
-#include "bzd/container/string.h"
-#include "bzd/container/string_view.h"
-#include "bzd/container/tuple.h"
-#include "bzd/container/vector.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/core/channel.h"
-#include "bzd/meta/range.h"
-#include "bzd/type_traits/decay.h"
-#include "bzd/type_traits/declval.h"
-#include "bzd/type_traits/is_arithmetic.h"
-#include "bzd/type_traits/is_constructible.h"
-#include "bzd/type_traits/is_floating_point.h"
-#include "bzd/type_traits/is_integral.h"
-#include "bzd/type_traits/is_pointer.h"
-#include "bzd/utility/format/integral.h"
+#include "cc/bzd/container/array.h"
+#include "cc/bzd/container/optional.h"
+#include "cc/bzd/container/string.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/container/tuple.h"
+#include "cc/bzd/container/vector.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/core/channel.h"
+#include "cc/bzd/meta/range.h"
+#include "cc/bzd/type_traits/decay.h"
+#include "cc/bzd/type_traits/declval.h"
+#include "cc/bzd/type_traits/is_arithmetic.h"
+#include "cc/bzd/type_traits/is_constructible.h"
+#include "cc/bzd/type_traits/is_floating_point.h"
+#include "cc/bzd/type_traits/is_integral.h"
+#include "cc/bzd/type_traits/is_pointer.h"
+#include "cc/bzd/utility/format/integral.h"
 
 namespace bzd::format::impl {
 
@@ -512,7 +512,7 @@ void toStream(bzd::OChannel& stream, const T& value, const Metadata&)
 	stream.write(str.asBytes());
 }
 
-static void toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
+inline void toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -578,7 +578,7 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 }
 
 template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
-constexpr bool contextCheck(const MetadataList& metadataList, const T&)
+constexpr bool contextCheck(const MetadataList&, const T&)
 {
 	return true;
 }
@@ -653,7 +653,7 @@ private:
 		using LambdaTypeErasedTupleType = decltype(typeErasedLambdas);
 
 		return FormatterType<LambdaTupleType, LambdaTypeErasedTupleType, I...>{lambdas, typeErasedLambdas};
-	};
+	}
 };
 
 } // namespace bzd::format::impl
@@ -731,7 +731,7 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView& form
 }
 
 template <class ConstexprStringView, class... Args>
-constexpr void toStream(bzd::OChannel& stream, const ConstexprStringView& format, Args&&... args)
+constexpr void toStream(bzd::OChannel& stream, const ConstexprStringView&, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};

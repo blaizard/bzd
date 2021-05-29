@@ -1,8 +1,8 @@
-#include "bzd/utility/format/format.h"
+#include "cc/bzd/utility/format/format.h"
 
-#include "bzd/container/string_channel.h"
-#include "bzd/container/string_view.h"
-#include "bzd/container/vector.h"
+#include "cc/bzd/container/string_channel.h"
+#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/container/vector.h"
 #include "cc_test/test.h"
 
 #include <stdexcept>

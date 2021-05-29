@@ -1,16 +1,16 @@
 #pragma once
 
-#include "bzd/container/reference_wrapper.h"
-#include "bzd/core/assert/minimal.h"
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/conditional.h"
-#include "bzd/type_traits/decay.h"
-#include "bzd/type_traits/enable_if.h"
-#include "bzd/type_traits/is_reference.h"
-#include "bzd/type_traits/is_same.h"
-#include "bzd/type_traits/is_trivially_destructible.h"
-#include "bzd/utility/forward.h"
-#include "bzd/utility/move.h"
+#include "cc/bzd/container/reference_wrapper.h"
+#include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/conditional.h"
+#include "cc/bzd/type_traits/decay.h"
+#include "cc/bzd/type_traits/enable_if.h"
+#include "cc/bzd/type_traits/is_reference.h"
+#include "cc/bzd/type_traits/is_same.h"
+#include "cc/bzd/type_traits/is_trivially_destructible.h"
+#include "cc/bzd/utility/forward.h"
+#include "cc/bzd/utility/move.h"
 
 #include <new> // Used only for placement new
 
@@ -109,7 +109,7 @@ public: // Constructors
 	constexpr Self& operator=(Self&& optional) noexcept = default;
 
 	// Support for bzd::nullopt
-	constexpr Optional(const OptionalNull& null) noexcept : Optional{} {}
+	constexpr Optional(const OptionalNull&) noexcept : Optional{} {}
 
 	// Forward constructor to storage type for all non-self typed
 	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value>>

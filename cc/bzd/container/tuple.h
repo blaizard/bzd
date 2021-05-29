@@ -1,11 +1,11 @@
 #pragma once
 
-#include "bzd/meta/choose_nth.h"
-#include "bzd/platform/types.h"
-#include "bzd/type_traits/enable_if.h"
-#include "bzd/type_traits/is_same.h"
-#include "bzd/utility/forward.h"
-#include "bzd/utility/move.h"
+#include "cc/bzd/meta/choose_nth.h"
+#include "cc/bzd/platform/types.h"
+#include "cc/bzd/type_traits/enable_if.h"
+#include "cc/bzd/type_traits/is_same.h"
+#include "cc/bzd/utility/forward.h"
+#include "cc/bzd/utility/move.h"
 
 namespace bzd::impl {
 template <class T>
@@ -47,19 +47,19 @@ constexpr NoType TupleChooseN()
 }
 
 template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<(Index > sizeof...(Ts))>* = nullptr>
-constexpr NoType TupleChooseN(T&& t, Ts&&... ts)
+constexpr NoType TupleChooseN(T&&, Ts&&...)
 {
 	return NoType{};
 }
 
 template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<Index == 0>* = nullptr>
-constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
+constexpr decltype(auto) TupleChooseN(T&& t, Ts&&...)
 {
 	return bzd::forward<T>(t);
 }
 
 template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<(Index > 0 && Index <= sizeof...(Ts))>* = nullptr>
-constexpr decltype(auto) TupleChooseN(T&& t, Ts&&... ts)
+constexpr decltype(auto) TupleChooseN(T&&, Ts&&... ts)
 {
 	return TupleChooseN<Index - 1>(bzd::forward<Ts>(ts)...);
 }
