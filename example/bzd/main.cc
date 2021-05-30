@@ -57,7 +57,12 @@ static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Typ
 void setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 6> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0), static_cast<bzd::UInt8Type>(PCA9685_LED0_ON_L + 4 * num), static_cast<bzd::UInt8Type>(on), static_cast<bzd::UInt8Type>(on >> 8), static_cast<bzd::UInt8Type>(off), static_cast<bzd::UInt8Type>(off >> 8)};
+	bzd::Array<bzd::UInt8Type, 6> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0),
+									   static_cast<bzd::UInt8Type>(PCA9685_LED0_ON_L + 4 * num),
+									   static_cast<bzd::UInt8Type>(on),
+									   static_cast<bzd::UInt8Type>(on >> 8),
+									   static_cast<bzd::UInt8Type>(off),
+									   static_cast<bzd::UInt8Type>(off >> 8)};
 	i2c.write(data.asBytes());
 }
 

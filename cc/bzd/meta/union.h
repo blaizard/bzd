@@ -56,7 +56,7 @@ public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
 	constexpr Union() : next_{} {}
-	~Union(){} // This is the only difference with a constexpr Union
+	~Union() {} // This is the only difference with a constexpr Union
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
 	constexpr Union(U&& value) : next_{bzd::forward<U>(value)}

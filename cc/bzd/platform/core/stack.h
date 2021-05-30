@@ -1,8 +1,8 @@
 #pragma once
 
+#include "cc/bzd/algorithm/fill.h"
 #include "cc/bzd/container/array.h"
 #include "cc/bzd/platform/types.h"
-#include "cc/bzd/algorithm/fill.h"
 
 namespace bzd::platform {
 
@@ -30,20 +30,11 @@ public: // Type.
 public:
 	constexpr Stack() noexcept = default;
 
-	constexpr void taint(UInt8Type pattern = 0xaa) noexcept
-	{
-		bzd::algorithm::fill(stack_.begin(), stack_.end(), pattern);
-	}
+	constexpr void taint(UInt8Type pattern = 0xaa) noexcept { bzd::algorithm::fill(stack_.begin(), stack_.end(), pattern); }
 
-	constexpr DataType* data() noexcept
-	{
-		return stack_.data();
-	}
+	constexpr DataType* data() noexcept { return stack_.data(); }
 
-	constexpr SizeType size() const noexcept
-	{
-		return stack_.size();
-	}
+	constexpr SizeType size() const noexcept { return stack_.size(); }
 
 	bzd::SizeType estimateMaxUsage(UInt8Type pattern = 0xaa) const noexcept
 	{
@@ -69,4 +60,4 @@ private:
 	bzd::Array<DataType, stackSize> stack_{};
 };
 
-}
+} // namespace bzd::platform
