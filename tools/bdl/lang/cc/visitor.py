@@ -132,7 +132,7 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitFinal(self, result: ResultType) -> str:
 
-		content = (Path(__file__).parent / "cc/file.h.template").read_text()
+		content = (Path(__file__).parent / "template/file.h.template").read_text()
 		template = Template(content)
 		output = template.process(result)
 

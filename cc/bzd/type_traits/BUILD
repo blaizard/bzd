@@ -424,8 +424,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":false_type",
-        ":is_arithmetic",
         ":integral_constant",
+        ":is_arithmetic",
     ],
 )
 

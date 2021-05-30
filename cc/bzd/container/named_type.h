@@ -28,7 +28,8 @@ public: // Constructors.
 	// Convert and round the result
 	template <class OtherRatio>
 	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
-		value_{static_cast<T>((other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) / (Ratio::num * OtherRatio::den))}
+		value_{static_cast<T>((other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) /
+							  (Ratio::num * OtherRatio::den))}
 	{
 	}
 

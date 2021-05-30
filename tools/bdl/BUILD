@@ -25,7 +25,7 @@ py_library(
 py_library(
     name = "lang",
     srcs = glob([
-        "lang/*.py",
+        "lang/**/*.py",
     ]),
     data = glob([
         "lang/**/*.template",
@@ -44,8 +44,8 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":lang",
         ":grammar",
+        ":lang",
         ":visitor",
     ],
 )

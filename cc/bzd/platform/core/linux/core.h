@@ -1,12 +1,11 @@
 #pragma once
 
-#include "cc/bzd/platform/core/stack.h"
-#include "cc/bzd/platform/core.h"
 #include "cc/bzd/container/optional.h"
-
-#include <pthread.h>
+#include "cc/bzd/platform/core.h"
+#include "cc/bzd/platform/core/stack.h"
 
 #include <iostream>
+#include <pthread.h>
 
 namespace bzd::platform::core {
 
@@ -19,9 +18,7 @@ private:
 public:
 	explicit Linux() = default;
 
-	void init() noexcept final
-	{
-	}
+	void init() noexcept final {}
 
 	void run(WorkloadType workload) noexcept final
 	{
@@ -31,8 +28,8 @@ public:
 		pthread_t thread_;
 
 		if (pthread_attr_init(&attr_) == -1)
-		{                                        
-			return;                                                           
+		{
+			return;
 		}
 
 		{
@@ -56,7 +53,7 @@ public:
 		// Workload should be running here
 
 		{
-		    const auto result = pthread_join(thread_, nullptr);
+			const auto result = pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
 				return;
@@ -72,10 +69,7 @@ public:
 		}
 	}
 
-	SizeType getStackUsage() noexcept final
-	{
-		return stack_.estimateMaxUsage();
-	}
+	SizeType getStackUsage() noexcept final { return stack_.estimateMaxUsage(); }
 
 private:
 	static void* workloadWrapper(void* object)
