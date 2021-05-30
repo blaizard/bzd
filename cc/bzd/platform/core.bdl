@@ -1,7 +1,7 @@
 namespace bzd.platform;
 
 // Stack size
-using StackSize = Integer [min = 0, max = 8000000];
+using StackSize = SizeType [min = 0, max = 8000000];
 
 // A core is a processing unit that accepts a single scheduler.
 interface Core
@@ -13,7 +13,7 @@ interface Core
 	method run(Callable workload);
 
 	// Get the current stack ussage.
-	method getStackUsage() -> SizeType;
+	method getStackUsage() -> StackSize;
 
 }
 
