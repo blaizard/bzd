@@ -97,7 +97,7 @@ class BdlFormatter(Visitor[str]):
 			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
 
 		# Assemble
-		result += self.applyIndent("{content};\n".format(content=self._visitVariable(element)))
+		result += self.applyIndent("{content};\n\n".format(content=self._visitVariable(element)))
 		return result
 
 	def visitMethod(self, result: str, element: Element) -> str:
@@ -129,7 +129,7 @@ class BdlFormatter(Visitor[str]):
 			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
 
 		# Assemble
-		result += self.applyIndent("{content};\n".format(content=" ".join(contentList)))
+		result += self.applyIndent("{content};\n\n".format(content=" ".join(contentList)))
 		return result
 
 	def visitClass(self, result: str, nestedResult: str, element: Element) -> str:
@@ -152,7 +152,30 @@ class BdlFormatter(Visitor[str]):
 
 		result += nestedResult
 
-		result += self.applyIndent("}\n")
+		result += self.applyIndent("}\n\n")
+
+		return result
+
+	def visitUsing(self, result: str, element: Element) -> str:
+
+		contentList = ["using"]
+
+		# Handle the name
+		contentList.append(element.getAttr("name").value)
+		contentList.append("=")
+
+		# Handle the type
+		visitorType = _VisitorType(element=element)
+		contentList.append(visitorType.result)
+
+		# Handle the contract
+		self._visitContractIfAny(contentList, element)
+
+		# Handle comments
+		if element.isAttr("comment"):
+			result += self.applyIndent(self.visitComment(comment=element.getAttr("comment").value))
+
+		result += self.applyIndent("{content};\n\n".format(content=" ".join(contentList)))
 
 		return result
 
@@ -164,6 +187,6 @@ class BdlFormatter(Visitor[str]):
 
 	def visitImport(self, result: str, path: Path) -> str:
 
-		result += "import \"{path}\"\n".format(path=path.as_posix())
+		result += "import \"{path}\"\n\n".format(path=path.as_posix())
 
 		return result

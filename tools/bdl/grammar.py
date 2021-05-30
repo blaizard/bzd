@@ -7,9 +7,9 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match: interface, struct
-_regexprClass = r"(?P<type>(:?interface|struct|method|namespace|import))"
+_regexprClass = r"(?P<type>(:?interface|struct))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|method|namespace|import)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|method|namespace|import|using)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
@@ -27,7 +27,7 @@ class FragmentBlockComment(FragmentComment):
 
 def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
 	"""
-	Generate a grammar for Class., it accepst the following format:
+	Generate a grammar for a class, it accepst the following format:
 	(interface|struct) name {
 		nestedGrammar
 	}
@@ -135,6 +135,21 @@ def makeGrammarMethod() -> Grammar:
 	]
 
 
+def makeGrammarUsing() -> Grammar:
+	"""
+	Generate a grammar for using keyword, it accepts the following format:
+	using name = Type [contract];
+	"""
+
+	return [
+		GrammarItem(r"using", {"category": "using"}, [
+		GrammarItem(_regexprName, Fragment,
+		[GrammarItem(r"=", Fragment, makeGrammarType([makeGrammarContracts(),
+		GrammarItem(r";", FragmentNewElement)]))])
+		])
+	]
+
+
 def makeGrammarNamespace() -> Grammar:
 	"""
 	Generate a grammar for namespace, it accepts the following format:
@@ -173,6 +188,6 @@ class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
 		super().__init__(path,
-			grammar=makeGrammarNamespace() + makeGrammarImport() + makeGrammarVariable() + makeGrammarMethod() +
-			makeGrammarClass(makeGrammarVariable() + makeGrammarMethod()),
+			grammar=makeGrammarNamespace() + makeGrammarImport() + makeGrammarUsing() + makeGrammarVariable() +
+			makeGrammarMethod() + makeGrammarClass(makeGrammarVariable() + makeGrammarMethod()),
 			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

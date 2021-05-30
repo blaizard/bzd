@@ -17,10 +17,6 @@ class _VisitorType(VisitorType):
 		return "{}{}".format(kind, template)
 
 	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
-
-		if kind == "FunctionView":
-			kind = "bzd::FunctionView"
-
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
