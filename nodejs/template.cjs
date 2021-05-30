@@ -49,20 +49,20 @@ class Template {
 					curKey += key[index];
 				}
 
-				Assert.ok(typeof curArgs === "object", () => "The key \"" + key + "\" is invalid (error with \"" + curKey + "\").");
+				Assert.ok(typeof curArgs === "object", () => 'The key "' + key + '" is invalid (error with "' + curKey + '").');
 				Assert.ok(
 					curKey in curArgs,
-					() => "The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"
+					() => 'The key "' + curKey + '" in "' + JSON.stringify(curArgs) + '" is not available'
 				);
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {
-				case "[":
-					{
-						const curKey = getNextValueInternal();
-						curArgs = curArgs[curKey];
-					}
-					break;
+					case "[":
+						{
+							const curKey = getNextValueInternal();
+							curArgs = curArgs[curKey];
+						}
+						break;
 				}
 			}
 			return curArgs;

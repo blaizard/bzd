@@ -35,8 +35,15 @@ class Template:
 	def _getValue(self, args: SubstitutionType, key: str) -> typing.Any:
 
 		for k in key.split("."):
-			assert k in args, "Template value '{}' is not set.".format(key)
-			args = args[k]() if callable(args[k]) else args[k]
+			if k in args:
+				args = args[k]
+			elif hasattr(args, k):
+				args = getattr(args, k)
+			else:
+				raise Exception("Template value '{}' is not set.".format(key))
+
+			if callable(args):
+				args = args()
 
 		return args
 
@@ -54,11 +61,13 @@ class Template:
 
 		def replaceValue(match: typing.Match[str]) -> str:
 			if match.group() not in ["and", "or", "not", "(", ")"]:
-				value = args
-				for k in match.group().split("."):
-					if k not in value:
-						return match.group()
-					value = value[k]
+
+				# Try to read the value
+				try:
+					value = self._getValue(args=args, key=match.group())
+				except:
+					return match.group()
+
 				# Replace the value
 				if isinstance(value, bool):
 					return str(value)

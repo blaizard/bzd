@@ -98,18 +98,18 @@ export default class StorageGoogleCloudStorage extends Base {
 			result.push(
 				includeMetadata
 					? Permissions.makeEntry(
-						{
-							name: name,
-							size: parseInt(file.metadata.size),
-							type: file.metadata.contentType,
-							modified: file.metadata.updated,
-							created: file.metadata.timeCreated,
-						},
-						{
-							read: true,
-							write: true,
-							delete: true,
-						}
+							{
+								name: name,
+								size: parseInt(file.metadata.size),
+								type: file.metadata.contentType,
+								modified: file.metadata.updated,
+								created: file.metadata.timeCreated,
+							},
+							{
+								read: true,
+								write: true,
+								delete: true,
+							}
 					  )
 					: name
 			);

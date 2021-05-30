@@ -1,7 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
+from tools.bdl.visitor import Visitor, VisitorType, VisitorNamespace
+from tools.bdl.contracts import Contracts
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
@@ -25,15 +26,6 @@ class _VisitorType(VisitorType):
 ResultType = typing.Dict[str, typing.Any]
 
 
-class _VisitorContract(VisitorContract[ResultType, ResultType]):
-
-	def visitContractItems(self, items: typing.List[ResultType]) -> ResultType:
-		return {item["type"]: item for item in items}
-
-	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> ResultType:
-		return {"type": kind, "value": value, "comment": comment}
-
-
 class _VisitorNamespace(VisitorNamespace):
 
 	def visitNamespaceItems(self, items: typing.List[str]) -> str:
@@ -50,12 +42,11 @@ class CcFormatter(Visitor[ResultType]):
 		return string[0].upper() + string[1:]
 
 	def getVariable(self, element: Element) -> typing.Any:
-		contracts = {}
+		contracts = []
 		if element.isNestedSequence("contract"):
-			visitorContract = _VisitorContract()
 			sequence = element.getNestedSequence("contract")
 			assert sequence
-			contracts = visitorContract.visit(sequence)
+			contracts = Contracts(sequence)
 
 		name = element.getAttrValue("name")
 		assert name

@@ -1,7 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor, VisitorType, VisitorContract, VisitorNamespace
+from tools.bdl.visitor import Visitor, VisitorType, VisitorNamespace
+from tools.bdl.contracts import Contracts
 from bzd.parser.element import Element
 
 
@@ -19,24 +20,6 @@ class _VisitorType(VisitorType):
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
-
-
-class _VisitorContract(VisitorContract[str, str]):
-
-	def visitContractItems(self, items: typing.List[str]) -> str:
-		return "[{}]".format(", ".join(items))
-
-	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> str:
-
-		items = []
-		if comment is not None:
-			items.append("/*{}*/".format(comment))
-		items.append(kind)
-		if value is not None:
-			items.append("=")
-			items.append(value)
-
-		return " ".join(items)
 
 
 class _VisitorNamespace(VisitorNamespace):
@@ -62,8 +45,20 @@ class BdlFormatter(Visitor[str]):
 		if element.isNestedSequence("contract"):
 			sequence = element.getNestedSequence("contract")
 			assert sequence is not None
-			visitorContract = _VisitorContract()
-			contentList.append(visitorContract.visit(sequence))
+			contracts = Contracts(sequence)
+
+			items = []
+			for contract in contracts:
+				temp = []
+				if contract.comment is not None:
+					temp.append("/*{}*/".format(contract.comment))
+				temp.append(contract.kind)
+				if contract.value is not None:
+					temp.append("=")
+					temp.append(contract.value)
+				items.append(" ".join(temp))
+
+			contentList.append("[{}]".format(", ".join(items)))
 
 	def _visitVariable(self, element: Element) -> str:
 
