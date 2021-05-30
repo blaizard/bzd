@@ -11,8 +11,7 @@
 			draggable="false"
 			ondragstart="return false;"
 			v-touch="touchDirective"
-			:style="styleImage"
-		/>
+			:style="styleImage"/>
 		<i v-else class="irform-icon-file"></i>
 
 		<!-- Name //-->
@@ -180,7 +179,8 @@
 					if (this.isAvailable) {
 						if (typeof this.config.imageToUrl === "function") {
 							this.imageUrl = await this.config.imageToUrl(this.path);
-						} else if (typeof this.config.imageToUrl === "string") {
+						}
+						else if (typeof this.config.imageToUrl === "string") {
 							this.imageUrl = this.config.imageToUrl;
 						}
 					}
@@ -212,12 +212,12 @@
 					const ratioY = this.imageEdit.containerHeight / imagePreload.height;
 					let scale = 1;
 					switch (this.imageFill) {
-						case "cover":
-							scale = ratioX > ratioY ? ratioX : ratioY;
-							break;
-						case "contain":
-							scale = ratioX > ratioY ? ratioY : ratioX;
-							break;
+					case "cover":
+						scale = ratioX > ratioY ? ratioX : ratioY;
+						break;
+					case "contain":
+						scale = ratioX > ratioY ? ratioY : ratioX;
+						break;
 					}
 					this.imageEdit.width = this.value.width || imagePreload.width * scale;
 					this.imageEdit.height = this.value.height || imagePreload.height * scale;
