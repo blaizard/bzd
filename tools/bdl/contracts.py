@@ -15,8 +15,8 @@ class _VisitorContract(Visitor[_Contract, typing.List[_Contract]]):
 
 	nestedKind = None
 
-	def __init__(self):
-		self.uniqueTypes = set()
+	def __init__(self) -> None:
+		self.uniqueTypes: typing.Set[str] = set()
 
 	def visitBegin(self, result: typing.Any) -> typing.List[_Contract]:
 		return []
@@ -53,5 +53,5 @@ class Contracts:
 				return contract
 		return None
 
-	def __iter__(self):
+	def __iter__(self) -> typing.Iterator[_Contract]:
 		return self.data.__iter__()

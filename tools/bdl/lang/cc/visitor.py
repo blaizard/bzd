@@ -42,7 +42,7 @@ class CcFormatter(Visitor[ResultType]):
 		return string[0].upper() + string[1:]
 
 	def getVariable(self, element: Element) -> typing.Any:
-		contracts = []
+		contracts: typing.Iterable[typing.Any] = []
 		if element.isNestedSequence("contract"):
 			sequence = element.getNestedSequence("contract")
 			assert sequence

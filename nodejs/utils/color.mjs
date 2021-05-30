@@ -23,7 +23,8 @@ export default class Color {
 				b: parseInt("0x" + normalizedStr[3] + normalizedStr[3]),
 				a: 1,
 			};
-		} else if (normalizedStr.length == 7) {
+		}
+		else if (normalizedStr.length == 7) {
 			return {
 				r: parseInt("0x" + normalizedStr[1] + normalizedStr[2]),
 				g: parseInt("0x" + normalizedStr[3] + normalizedStr[4]),

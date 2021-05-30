@@ -46,7 +46,8 @@ export default class FileSystem {
 			const stat = await FileSystem.stat(curPath);
 			if (stat.isDirectory()) {
 				await FileSystem.rmdir(curPath);
-			} else {
+			}
+			else {
 				await FileSystem.unlink(curPath);
 			}
 		}
@@ -158,7 +159,8 @@ export default class FileSystem {
 			const res = Path.resolve(path, dirent.name);
 			if (dirent.isDirectory()) {
 				yield* FileSystem.walk(res);
-			} else {
+			}
+			else {
 				yield res;
 			}
 		}

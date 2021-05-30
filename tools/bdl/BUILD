@@ -14,8 +14,8 @@ py_library(
 py_library(
     name = "visitor",
     srcs = [
-        "visitor.py",
         "contracts.py",
+        "visitor.py",
     ],
     visibility = [":__subpackages__"],
     deps = [

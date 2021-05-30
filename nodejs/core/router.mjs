@@ -130,20 +130,20 @@ function compileRoutes(routes, config) {
 
 			// Update the regular expression of the path based on the format given
 			switch (String(pathList[i + 1])) {
-				case "":
-					castType = decodeURIComponent;
-					pathRegexpr += "([^/]+)";
-					break;
-				case "*":
-					// No cast here, a raw string should be used here to differenciate between slashes and components.
-					pathRegexpr += "(.+)";
-					break;
-				case "i":
-					castType = parseInt;
-					pathRegexpr += "([0-9]+)";
-					break;
-				default:
-					Exception.unreachable("Unsupported router format: '{}' from route: {}", pathList[i + 1], path);
+			case "":
+				castType = decodeURIComponent;
+				pathRegexpr += "([^/]+)";
+				break;
+			case "*":
+				// No cast here, a raw string should be used here to differenciate between slashes and components.
+				pathRegexpr += "(.+)";
+				break;
+			case "i":
+				castType = parseInt;
+				pathRegexpr += "([0-9]+)";
+				break;
+			default:
+				Exception.unreachable("Unsupported router format: '{}' from route: {}", pathList[i + 1], path);
 			}
 
 			// Add the variable to the list
