@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "index.scss" as base;
 
 .irform-input {
@@ -46,7 +47,7 @@
 				@extend %clickable;
 
 				.irform-input-multi-delete {
-					@include base.buttonClose(base.$fieldTextHeight / 1.5, base.$fieldSpecialTextColor);
+					@include base.buttonClose(math.div(base.$fieldTextHeight, 1.5), base.$fieldSpecialTextColor);
 				}
 			}
 		}

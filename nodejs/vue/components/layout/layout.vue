@@ -144,6 +144,7 @@
 
 <style lang="scss">
 	// ---- Configuration
+	@use "sass:math";
 	@use "bzd-style/css/colors.scss" as colors;
 
 	// Global
@@ -153,7 +154,7 @@
 	$headerBgColor: colors.$bzdGraphColorBlue;
 	$headerFontSize: 22px;
 	$headerHeight: 56px;
-	$headerPadding: ($headerHeight - $headerFontSize) / 2;
+	$headerPadding: math.div($headerHeight - $headerFontSize, 2);
 	$headerZIndex: 10;
 
 	// Menu
@@ -203,7 +204,7 @@
 			}
 
 			> *:first-child {
-				margin-left: $headerPadding / 2;
+				margin-left: math.div($headerPadding, 2);
 			}
 
 			.bzd-layout-header-menu-trigger {
@@ -215,8 +216,8 @@
 			}
 
 			.bzd-layout-header-content {
-				padding-left: $headerPadding / 2;
-				padding-right: $headerPadding / 2;
+				padding-left: math.div($headerPadding, 2);
+				padding-right: math.div($headerPadding, 2);
 				white-space: nowrap;
 			}
 
@@ -327,7 +328,7 @@
 						}
 
 						.bzd-menu-entry-icon {
-							margin: 0 $menuPadding / 2;
+							margin: 0 math.div($menuPadding, 2);
 						}
 					}
 

@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "index.scss" as base;
 @use "dropdown.scss";
 
@@ -37,7 +38,7 @@
 				left,
 				base.$fieldHeight,
 				base.$actionerTextColor,
-				base.$fieldHeight / 2,
+				math.div(base.$fieldHeight, 2),
 				base.$actionerBgColor,
 				4
 			);
@@ -47,7 +48,7 @@
 				right,
 				base.$fieldHeight,
 				base.$actionerTextColor,
-				base.$fieldHeight / 2,
+				math.div(base.$fieldHeight, 2),
 				base.$actionerBgColor,
 				4
 			);

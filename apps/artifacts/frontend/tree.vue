@@ -114,13 +114,15 @@
 </style>
 
 <style lang="scss" scoped>
+
+	@use "sass:math";
 	@use "bzd-style/css/colors.scss" as colors;
 
 	$indent: 20;
 	$arrowSize: 5;
 	$fontSize: 16;
 	$lineHeight: 24;
-	$arrowOffsetY: $lineHeight / 2;
+	$arrowOffsetY: math.div($lineHeight, 2);
 	$lineColor: colors.$bzdGraphColorGray;
 
 	.indent {
@@ -177,7 +179,7 @@
 
 				&:before {
 					position: absolute;
-					left: #{-$arrowSize / 2}px;
+					left: #{math.div(-$arrowSize, 2)}px;
 					top: #{$arrowOffsetY - $arrowSize}px;
 					width: 0;
 					height: 0;
@@ -191,7 +193,7 @@
 			}
 
 			&.expanded:before {
-				transform: rotate(90deg) translateY(#{$arrowSize / 2}px) translateX(#{$arrowSize / 2}px);
+				transform: rotate(90deg) translateY(#{math.div($arrowSize, 2)}px) translateX(#{math.div($arrowSize, 2)}px);
 			}
 		}
 	}

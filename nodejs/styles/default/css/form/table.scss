@@ -1,6 +1,7 @@
+@use "sass:math";
 @use "index.scss" as base;
 
-$triangleHeight: base.$fieldHeight / 5;
+$triangleHeight: math.div(base.$fieldHeight, 5);
 
 .irform-table {
 	// Note, this does not work and I have no idea how to fix it.
@@ -49,8 +50,8 @@ $triangleHeight: base.$fieldHeight / 5;
 					&:after {
 						position: absolute;
 						content: "";
-						top: #{(base.$fieldHeight - $triangleHeight) / 2}px;
-						right: #{base.$fieldHeight / 3}px;
+						top: #{math.div(base.$fieldHeight - $triangleHeight, 2)}px;
+						right: #{math.div(base.$fieldHeight, 3)}px;
 						width: 0;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
@@ -64,8 +65,8 @@ $triangleHeight: base.$fieldHeight / 5;
 					&:after {
 						position: absolute;
 						content: "";
-						top: #{(base.$fieldHeight + $triangleHeight) / 2 - $triangleHeight * 2}px;
-						right: #{base.$fieldHeight / 3}px;
+						top: #{math.div(base.$fieldHeight + $triangleHeight, 2) - $triangleHeight * 2}px;
+						right: #{math.div(base.$fieldHeight, 3)}px;
 						width: 0;
 						height: 0;
 						border: #{$triangleHeight}px solid transparent;
