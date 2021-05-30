@@ -43,7 +43,7 @@ class _VisitorNamespace(VisitorNamespace):
 class CcFormatter(Visitor[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
-		return {"variables": {}, "classes": {}, "methods": {}, "imports": {}}
+		return {"variables": {}, "classes": {}, "methods": {}, "imports": {}, "using": {}}
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
@@ -117,6 +117,18 @@ class CcFormatter(Visitor[ResultType]):
 			"type": _VisitorType(element=element).result,
 			"comment": self.visitComment(comment=element.getAttrValue("comment")),
 			"nested": nestedResult
+		}
+
+		return result
+
+	def visitUsing(self, result: ResultType, element: Element) -> ResultType:
+
+		name = element.getAttrValue("name")
+		assert name
+		result["using"][name] = {
+			"name": name,
+			"type": _VisitorType(element=element).result,
+			"comment": self.visitComment(comment=element.getAttrValue("comment"))
 		}
 
 		return result

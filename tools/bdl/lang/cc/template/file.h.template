@@ -10,6 +10,10 @@
 namespace {namespace} {
 {end}
 
+{for name, data in using}
+using {name} = {data.type};
+{end}
+
 {for name, data in classes}
 class {name}
 {
