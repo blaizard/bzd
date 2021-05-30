@@ -9,6 +9,7 @@
 
 // ---- Configuration ----
 
+@use "sass:math";
 @use "bzd-style/css/colors.scss" as colors;
 
 $font: "Helvetica";
@@ -99,7 +100,7 @@ $disableBgColor: #eee !default;
 	overflow: hidden;
 	height: auto;
 	line-height: #{$fieldTextHeight * 1.1}px;
-	padding-top: #{($fieldHeight - $fieldTextHeight * 1.1) / 2}px;
+	padding-top: #{math.div($fieldHeight - $fieldTextHeight * 1.1, 2)}px;
 }
 
 /**
@@ -165,7 +166,7 @@ $disableBgColor: #eee !default;
 			#{$i * 10}% {
 				background-image: radial-gradient(
 					circle at center,
-					rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%,
+					rgba(0, 0, 0, min(math.div(0.16, math.div($i, 2.5)), 0.16)) 9%,
 					transparent 10%,
 					transparent 11%
 				);
@@ -183,7 +184,7 @@ $disableBgColor: #eee !default;
 			#{$i * 10}% {
 				background-image: radial-gradient(
 					circle at center,
-					rgba(0, 0, 0, min(0.16 / ($i / 2.5), 0.16)) 9%,
+					rgba(0, 0, 0, min(math.div(0.16, math.div($i, 2.5)), 0.16)) 9%,
 					transparent 10%,
 					transparent 11%
 				);
@@ -244,7 +245,7 @@ $disableBgColor: #eee !default;
  */
 %scrollbar {
 	&::-webkit-scrollbar {
-		width: #{$fieldTextHeight / 2}px;
+		width: #{math.div($fieldTextHeight, 2)}px;
 		background-color: $disableBgColor;
 	}
 	&::-webkit-scrollbar-thumb {
@@ -284,8 +285,8 @@ $disableBgColor: #eee !default;
 	&:before,
 	&:after {
 		position: absolute;
-		top: #{($width - $crossWidth) / 2}px;
-		left: #{($width - $crossThickness) / 2}px;
+		top: #{math.div($width - $crossWidth, 2)}px;
+		left: #{math.div($width - $crossThickness, 2)}px;
 		content: " ";
 		height: #{$crossWidth}px;
 		width: #{$crossThickness}px;
@@ -307,8 +308,8 @@ $disableBgColor: #eee !default;
 	&:before {
 		box-sizing: border-box;
 		position: absolute;
-		top: #{($width - $eltWidth) / 2}px;
-		left: #{($width - $eltWidth) / 2}px;
+		top: #{math.div($width - $eltWidth, 2)}px;
+		left: #{math.div($width - $eltWidth, 2)}px;
 		content: " ";
 		height: #{$eltWidth}px;
 		width: #{$eltWidth}px;

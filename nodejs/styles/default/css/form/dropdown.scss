@@ -1,7 +1,8 @@
+@use "sass:math";
 @use "index.scss" as base;
 @use "input.scss";
 
-$triangleHeight: base.$fieldHeight / 5;
+$triangleHeight: math.div(base.$fieldHeight, 5);
 
 .irform-dropdown {
 	@extend %reset;
@@ -22,14 +23,14 @@ $triangleHeight: base.$fieldHeight / 5;
 		position: relative;
 
 		.irform-dropdown-arrow {
-			width: #{base.$fieldHeight / 1.5}px;
+			width: #{math.div(base.$fieldHeight, 1.5)}px;
 			display: inline-block;
 
 			&:after {
 				position: absolute;
 				content: "";
-				top: #{(base.$fieldHeight - $triangleHeight) / 2}px;
-				right: #{base.$fieldHeight / 3}px;
+				top: #{math.div(base.$fieldHeight - $triangleHeight, 2)}px;
+				right: #{math.div(base.$fieldHeight, 3)}px;
 				width: 0;
 				height: 0;
 				border: #{$triangleHeight}px solid transparent;

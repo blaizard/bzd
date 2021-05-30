@@ -25,15 +25,22 @@ class TestRun(unittest.TestCase):
  * Contracts
  */
 const int32 defaultConstant [min = -1, max = 35];
+
 int32<Int, List<T</*Variable A*/ A, B, C<45>>>> defaultConstant;
+
 interface MyFy
 {
 	MyType var;
+
 	// A nested comment
 	const MyType<T> varConst [/*Immer*/ always];
+
 	MyType varInitialized = 42;
+
 	method myMethod() -> void;
+
 }
+
 """
 
 		self.assertEqual(expected, result)
