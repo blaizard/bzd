@@ -38,12 +38,12 @@ public: // Variable accessors.
 	// Setter for {varName}_.
 	constexpr void set{var.nameCamelCase}(const {var.type}& value)
 	{
-		{for type, contract in var.contracts}
-		{if type == "min"}
+		{for contract in var.contracts}
+		{if contract.kind == "min"}
 		// Minimum contract
 		assert(value >= {contract.value});
 		{end}
-		{if type == "max"}
+		{if contract.kind == "max"}
 		// Maximum contract
 		assert(value <= {contract.value});
 		{end}

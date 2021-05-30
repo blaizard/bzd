@@ -36,7 +36,8 @@
 			#{$i * 10}% {
 				background-image: radial-gradient(
 					circle at center,
-					rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min(math.div($bzdOpacity, math.div($i, 2.5)), $bzdOpacity)) 9%,
+					rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min(math.div($bzdOpacity, math.div($i, 2.5)), $bzdOpacity))
+						9%,
 					transparent 10%,
 					transparent 11%
 				);
@@ -59,7 +60,8 @@
 			#{$i * 10}% {
 				background-image: radial-gradient(
 					circle at center,
-					rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min(math.div($bzdOpacity, math.div($i, 2.5)), $bzdOpacity)) 9%,
+					rgba($bzdColorRed, $bzdColorGreen, $bzdColorBlue, min(math.div($bzdOpacity, math.div($i, 2.5)), $bzdOpacity))
+						9%,
 					transparent 10%,
 					transparent 11%
 				);

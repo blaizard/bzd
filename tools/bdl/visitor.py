@@ -5,6 +5,8 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import handleFromElement, assertHasAttr, assertHasSequence
 from bzd.parser.element import Sequence, Element
 
+from .contracts import Contracts
+
 
 class VisitorType(VisitorBase[str, str]):
 
@@ -65,44 +67,6 @@ class VisitorType(VisitorBase[str, str]):
 		return ""
 
 
-U1 = typing.TypeVar("U1")
-U2 = typing.TypeVar("U2")
-
-
-class VisitorContract(VisitorBase[U1, U2]):
-
-	nestedKind = None
-
-	def visitBegin(self, result: typing.Any) -> typing.List[U1]:
-		return []
-
-	def visitFinal(self, result: typing.List[U1]) -> U2:
-		return self.visitContractItems(items=result)
-
-	def visitElement(self, element: Element, result: typing.List[U1]) -> typing.List[U1]:
-		assertHasAttr(element=element, attr="type")
-		result.append(
-			self.visitContract(kind=element.getAttr("type").value,
-			value=element.getAttrValue("value"),
-			comment=element.getAttrValue("comment")))
-		return result
-
-	def visitContractItems(self, items: typing.List[U1]) -> U2:
-		"""
-		Called once all contract elements have been discovered.
-		This function should assemble the elements together.
-		"""
-
-		return typing.cast(U2, items)
-
-	def visitContract(self, kind: str, value: typing.Optional[str], comment: typing.Optional[str]) -> U1:
-		"""
-		Called when a single contract needs to be formatted.
-		"""
-
-		return typing.cast(U1, kind)
-
-
 class VisitorNamespace(VisitorBase[str, str]):
 
 	nestedKind = None
@@ -153,6 +117,14 @@ class Visitor(VisitorBase[T, str]):
 		indent = "\t" * self.level
 		return "\n".join(["{}{}".format(indent, line) if len(line.strip()) else line for line in result.split("\n")])
 
+	def visitContractIfAny(self, element: Element) -> typing.Optional[Contracts]:
+
+		if element.isNestedSequence("contract"):
+			sequence = element.getNestedSequence("contract")
+			assert sequence is not None
+			return Contracts(sequence=sequence)
+		return None
+
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
 		Main visitor, called each time a new element is discovered.
@@ -198,6 +170,8 @@ class Visitor(VisitorBase[T, str]):
 			assertHasAttr(element=element, attr="name")
 			assertHasAttr(element=element, attr="type")
 
+			self.visitContractIfAny(element=element)
+
 			result = self.visitUsing(result=result, element=element)
 
 		# Handle namespace
@@ -211,6 +185,8 @@ class Visitor(VisitorBase[T, str]):
 
 		# Handle import
 		elif element.getAttr("category").value == "import":
+
+			Contracts
 
 			assertHasAttr(element=element, attr="value")
 			path = element.getAttrValue("value")
