@@ -1,4 +1,4 @@
-# Bzd Description Language
+# Bzd Description Language (bdl)
 
 The following describes the the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
 
@@ -20,22 +20,22 @@ For example:
 
 ### Built-in Types
 
-The following built-in types should be made available by the implementation.
+The following built-in types are made available by the implementation as built-in types.
 
-- Void
 - Boolean
 - Integer
 - Float
-- Sting
+- String
 - Optional<T>
 - Result<T, E>
+- Async<T, E>
 - Sequence<T>
 - Tuple<T, U, ...>
 - Variant<T, U, ...>
+- Callable
 
-### Custom
+### Structures
 
-In addition to built-in types, any struct can be used, it should be declared as follow:
 ```
 struct Coord
 {
@@ -44,16 +44,29 @@ struct Coord
 }
 ```
 
+### Enumeration
+```
+enum MyEnum
+{
+	FIRST,
+	SECOND
+}
+```
+
+### Strong Types
+
+Strong typing is supported with the `using` keyword. For example, to define an integer strong type, this can be done as follow:
+```
+using MyStrongType = Integer [min = 0, max = 23];
+```
+
 ## Namespaces
 
-To prevent symbol leakage, all modules are automatically in a namespace that is defined by their path.
-When referenced, all namespaces are relative to the root of the repository.
-
-For example, an interface (MyInterface) defined under cc/bzd/core/my_interface.bdl would be referenced
-as follow:
+To prevent symbol leakage, files can be defined to be under a specific namespace, with the following keyword:
 ```
-cc.bzd.core.MyInterface
+namespace bzd.dummy;
 ```
+In this example, all entities declared in this file will be accessed prepended by the `bzd.dummy` namespace.
 
 ## Dependencies
 

@@ -20,7 +20,7 @@ public:
 
 	void init() noexcept final {}
 
-	void run(WorkloadType workload) noexcept final
+	void run(Callable workload) noexcept final
 	{
 		stack_.taint();
 
@@ -84,7 +84,7 @@ private:
 
 private:
 	Stack<StackSize> stack_{};
-	bzd::Optional<WorkloadType> workload_;
+	bzd::Optional<Callable> workload_;
 };
 
 } // namespace bzd::platform::core

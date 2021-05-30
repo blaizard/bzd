@@ -192,6 +192,14 @@ class Visitor(VisitorBase[T, str]):
 
 			result = self.visitMethod(result=result, element=element)
 
+		# Handle using
+		elif element.getAttr("category").value == "using":
+
+			assertHasAttr(element=element, attr="name")
+			assertHasAttr(element=element, attr="type")
+
+			result = self.visitUsing(result=result, element=element)
+
 		# Handle namespace
 		elif element.getAttr("category").value == "namespace":
 
@@ -235,6 +243,13 @@ class Visitor(VisitorBase[T, str]):
 	def visitMethod(self, result: T, element: Element) -> T:
 		"""
 		Called when discovering a method.
+		"""
+
+		return result
+
+	def visitUsing(self, result: T, element: Element) -> T:
+		"""
+		Called when discovering a using keyword.
 		"""
 
 		return result
