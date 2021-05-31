@@ -4,6 +4,7 @@ from pathlib import Path
 from bzd.parser.element import Element
 from bzd.parser.error import assertHasAttr
 
+
 class Use:
 
 	def __init__(self, element: Element) -> None:

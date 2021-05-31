@@ -11,8 +11,7 @@
 				:width="current.width"
 				:active="active == index"
 				:mandatory="isMandatory(index)"
-				:error="getError(current, index)"
-			>
+				:error="getError(current, index)">
 				<template>
 					<component
 						:is="getType(current)"
@@ -22,8 +21,7 @@
 						@submit="handleSubmit(current)"
 						@input="handleInput(index, $event)"
 						:description="current"
-						:disable="getDisable(current)"
-					>
+						:disable="getDisable(current)">
 					</component>
 				</template>
 			</component>
@@ -161,7 +159,8 @@
 				const name = this.indexToName[index];
 				if (this.all || "name" in this.description[index]) {
 					this.$set(this.returnedValue, name, value);
-				} else {
+				}
+				else {
 					this.$set(this.unamedValue, name, value);
 				}
 				this.$emit("input", this.returnedValue);
@@ -179,7 +178,8 @@
 
 				if (!this.isError) {
 					this.$emit("submit", this.returnedValue);
-				} else {
+				}
+				else {
 					console.error(
 						"Validation error(s); " +
 							Object.keys(result)
@@ -195,7 +195,8 @@
 			handleError(name, messageList) {
 				if (messageList) {
 					this.$set(this.errors, name, Array.isArray(messageList) ? messageList : [messageList]);
-				} else {
+				}
+				else {
 					this.$delete(this.errors, name);
 				}
 			},
@@ -233,7 +234,8 @@
 				const condition = this.conditions[index];
 				if (typeof condition === "function") {
 					return condition(this.currentValue);
-				} else if (condition instanceof Validation) {
+				}
+				else if (condition instanceof Validation) {
 					const result = condition.validate(this.currentValue, {
 						output: "return",
 						allMandatory: true,

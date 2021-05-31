@@ -4,6 +4,7 @@ from bzd.parser.element import Element
 from bzd.parser.error import assertHasAttr
 from tools.bdl.entity.type import Type
 
+
 class Nested:
 
 	def __init__(self, element: Element, nested: typing.List[typing.Any], visitor: typing.Any) -> None:

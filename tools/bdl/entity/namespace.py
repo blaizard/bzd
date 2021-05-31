@@ -4,6 +4,7 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import assertHasSequence, assertHasAttr
 from bzd.parser.visitor import Visitor as VisitorBase
 
+
 class _Visitor(VisitorBase[str, typing.List[str]]):
 
 	nestedKind = None
@@ -19,6 +20,7 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		assertHasAttr(element=element, attr="name")
 		result.append(element.getAttr("name").value)
 		return result
+
 
 class Namespace:
 
