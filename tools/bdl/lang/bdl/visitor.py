@@ -13,6 +13,7 @@ from tools.bdl.entity.type import Visitor as VisitorType
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
+
 class _VisitorType(VisitorType):
 
 	def visitTemplateItems(self, items: typing.List[str]) -> str:
@@ -27,6 +28,7 @@ class _VisitorType(VisitorType):
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
+
 
 class BdlFormatter(Visitor):
 
@@ -86,7 +88,8 @@ class BdlFormatter(Visitor):
 
 		return result
 
-	def visitNestedEntity(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
+	def visitNestedEntity(self, result: ResultType, nestedResult: ResultType, element: Element,
+		entity: Nested) -> ResultType:
 
 		name = entity.name
 		result["classes"][name] = {
