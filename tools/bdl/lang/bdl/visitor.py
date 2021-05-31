@@ -88,7 +88,7 @@ class BdlFormatter(Visitor):
 
 		return result
 
-	def visitNestedEntity(self, result: ResultType, nestedResult: ResultType, element: Element,
+	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element,
 		entity: Nested) -> ResultType:
 
 		name = entity.name
