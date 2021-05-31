@@ -28,7 +28,7 @@ class Contract:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment(self.element.getAttrValue("comment"))
+		return self.visitor.visitComment("contract", self.element.getAttrValue("comment"))
 
 
 class _VisitorContract(Visitor[Contract, typing.List[Contract]]):
@@ -71,6 +71,10 @@ class Contracts:
 			if contract.type == type:
 				return contract
 		return None
+
+	@property
+	def empty(self) -> bool:
+		return not bool(self.data)
 
 	def __iter__(self) -> typing.Iterator[Contract]:
 		return self.data.__iter__()

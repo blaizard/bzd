@@ -20,12 +20,16 @@ class Method:
 		return self.element.getAttr("name").value
 
 	@property
+	def isType(self) -> bool:
+		return self.element.isAttr("type")
+
+	@property
 	def type(self) -> typing.Optional[str]:
-		return Type(element=self.element) if self.element.isAttr("type") else None
+		return Type(element=self.element) if self.isType else None
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment(self.element.getAttrValue("comment"))
+		return self.visitor.visitComment("method", self.element.getAttrValue("comment"))
 
 	@property
 	def args(self) -> typing.List[Variable]:

@@ -4,7 +4,7 @@ import typing
 from pathlib import Path
 
 from tools.bdl.grammar import Parser
-from tools.bdl.lang.bdl import BdlFormatter
+from tools.bdl.lang.bdl.visitor import BdlFormatter
 
 
 class TestRun(unittest.TestCase):
@@ -25,23 +25,17 @@ class TestRun(unittest.TestCase):
  * Contracts
  */
 const int32 defaultConstant [min = -1, max = 35];
-
-int32<Int, List<T</*Variable A*/ A, B, C<45>>>> defaultConstant;
-
+int32<Int, List<T</*Variable A*/ A, B, C<45>>>> complex;
 interface MyFy
 {
-	MyType var;
-
-	// A nested comment
-	const MyType<T> varConst [/*Immer*/ always];
-
-	MyType varInitialized = 42;
-
 	method myMethod() -> void;
+	MyType var;
+	// A nested comment
+	const MyType<T> varConst [/*Immer*/always];
+	MyType varInitialized = 42;
+}"""
 
-}
-
-"""
+		print(result)
 
 		self.assertEqual(expected, result)
 

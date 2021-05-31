@@ -159,10 +159,10 @@ class Template:
 			if matchForIndex:
 				if not ignoreOutput:
 					valueObject = self._getValue(args, matchForIndex.group(3))
-					if isinstance(valueObject, list):
-						iterator = enumerate(valueObject)
-					else:
+					if isinstance(valueObject, dict):
 						iterator = valueObject.items()
+					else:
+						iterator = enumerate(valueObject)
 					for key, value in iterator:
 						args[matchForIndex.group(1)] = str(key)
 						args[matchForIndex.group(2)] = value

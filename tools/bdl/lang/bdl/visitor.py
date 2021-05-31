@@ -12,7 +12,6 @@ from tools.bdl.entity.type import Visitor as VisitorType
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
-
 class _VisitorType(VisitorType):
 
 	def visitTemplateItems(self, items: typing.List[str]) -> str:
@@ -28,23 +27,21 @@ class _VisitorType(VisitorType):
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
-
 ResultType = typing.Dict[str, typing.Any]
 
 
-class CcFormatter(Visitor[ResultType]):
+class BdlFormatter(Visitor[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return {"variables": {}, "classes": {}, "methods": {}, "uses": {}, "using": {}, "namespace": False}
-
-	def toCamelCase(self, string: str) -> str:
-		assert len(string), "String cannot be empty."
-		return string[0].upper() + string[1:]
 
 	def visitComment(self, context: str, comment: typing.Optional[str]) -> str:
 
 		if comment is None:
 			return ""
+
+		if context == "contract":
+			return "/*{}*/".format(comment)
 
 		if len(comment.split("\n")) > 1:
 			return "/*\n{comment}\n */\n".format(
@@ -57,7 +54,6 @@ class CcFormatter(Visitor[ResultType]):
 		for arg in entity.args:
 			args.append({
 				"name": arg.name,
-				"nameCamelCase": self.toCamelCase(arg.name),
 				"const": arg.const,
 				"type": arg.type.visit(_VisitorType),
 				"value": arg.value,
@@ -69,7 +65,8 @@ class CcFormatter(Visitor[ResultType]):
 		name = entity.name
 		result["methods"][name] = {
 			"name": name,
-			"type": entity.type.visit(_VisitorType) if entity.type else "void",
+			"isType": entity.isType,
+			"type": entity.type.visit(_VisitorType) if entity.type else None,
 			"comment": entity.comment,
 			"args": args
 		}
@@ -81,7 +78,6 @@ class CcFormatter(Visitor[ResultType]):
 		name = entity.name
 		result["variables"][name] = {
 			"name": name,
-			"nameCamelCase": self.toCamelCase(name),
 			"const": entity.const,
 			"type": entity.type.visit(_VisitorType),
 			"value": entity.value,
@@ -97,7 +93,6 @@ class CcFormatter(Visitor[ResultType]):
 		name = entity.name
 		result["classes"][name] = {
 			"name": name,
-			"nameCamelCase": self.toCamelCase(name),
 			"type": entity.type.visit(_VisitorType),
 			"comment": entity.comment,
 			"nested": entity.nested
@@ -119,7 +114,7 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitNamespace(self, result: ResultType, element: Element, entity: Namespace) -> ResultType:
 
-		result["namespace"] = "::".join(entity.nameList)
+		result["namespace"] = ".".join(entity.nameList)
 		return result
 
 	def visitUse(self, result: ResultType, entity: Use) -> ResultType:
@@ -130,8 +125,9 @@ class CcFormatter(Visitor[ResultType]):
 
 	def visitFinal(self, result: ResultType) -> str:
 
-		content = (Path(__file__).parent / "template/file.h.template").read_text()
+		content = (Path(__file__).parent / "template/file.bdl.template").read_text()
 		template = Template(content)
+		print(result)
 		output = template.process(result)
 
 		print(output)
