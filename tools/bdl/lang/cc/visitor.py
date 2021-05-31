@@ -31,6 +31,7 @@ class _VisitorType(VisitorType):
 
 ResultType = typing.Dict[str, typing.Any]
 
+
 class CcFormatter(Visitor[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:

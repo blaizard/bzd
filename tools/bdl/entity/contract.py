@@ -63,12 +63,12 @@ class Contracts:
 	def __init__(self, sequence: typing.Optional[Sequence], visitor: typing.Any) -> None:
 		self.data = _VisitorContract(visitor=visitor).visit(sequence) if sequence else []
 
-	def get(self, kind: str) -> typing.Optional[Contract]:
+	def get(self, type: str) -> typing.Optional[Contract]:
 		"""
 		Get a specific contract type if present.
 		"""
 		for contract in self.data:
-			if contract.kind == kind:
+			if contract.type == type:
 				return contract
 		return None
 

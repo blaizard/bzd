@@ -5,6 +5,7 @@ from bzd.parser.error import assertHasAttr
 from tools.bdl.entity.type import Type
 from tools.bdl.entity.variable import Variable
 
+
 class Method:
 
 	def __init__(self, element: Element, visitor: typing.Any) -> None:

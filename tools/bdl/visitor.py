@@ -14,6 +14,7 @@ from tools.bdl.entity.use import Use
 
 T = typing.TypeVar("T")
 
+
 class Visitor(VisitorBase[T, str]):
 
 	nestedKind = None
@@ -50,7 +51,10 @@ class Visitor(VisitorBase[T, str]):
 
 			self.level -= 1
 
-			result = self.visitNested(result=result, nestedResult=nestedResult, element=element, entity=Nested(element=element, nested=nestedResult, visitor=self))
+			result = self.visitNested(result=result,
+				nestedResult=nestedResult,
+				element=element,
+				entity=Nested(element=element, nested=nestedResult, visitor=self))
 
 		# Handle variable
 		elif element.getAttr("category").value == "variable":

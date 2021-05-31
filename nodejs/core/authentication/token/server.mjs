@@ -43,7 +43,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.sign(data, this.options.privateKey, { expiresIn: expiresIn }, (e, token) => {
 				if (e) {
 					reject(e);
-				} else {
+				}
+				else {
 					resolve({
 						token: token,
 						timeout: expiresIn,
@@ -107,7 +108,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				 * while still having the error reported. This ensure smooth transition to new token format.
 				 */
 				authentication.validationRefreshToken.validate(data);
-			} catch (e) {
+			}
+			catch (e) {
 				Exception.fromError(e).print();
 				return this.setStatus(401, "Unauthorized");
 			}
@@ -143,7 +145,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			data = await this.readToken(token);
 			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
 			Exception.assert(data && "roles" in data, "Invalid token: {:j}", data);
-		} catch (e) {
+		}
+		catch (e) {
 			return false;
 		}
 		return await verifyCallback(new User(data.uid, data.roles));
@@ -166,7 +169,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.verify(token, this.options.publicKey || this.options.privateKey, (e, data) => {
 				if (e) {
 					reject(e);
-				} else {
+				}
+				else {
 					resolve(data);
 				}
 			});
