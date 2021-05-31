@@ -3,6 +3,7 @@ import sys
 import queue
 import time
 import multiprocessing
+import traceback
 from io import StringIO
 from typing import Optional, Iterable, Any, Tuple, TextIO, Callable, Mapping
 
@@ -70,6 +71,7 @@ class Worker:
 					exceptionTypeStr = str(exceptionType)
 				stdout.write("Failed with exception of type '{}' and message: {}\n".format(
 					exceptionTypeStr, exceptionValue))
+				stdout.write(traceback.format_exc())
 
 			shared["output"].put((isSuccess, result, stdout.getvalue(), data))
 

@@ -164,7 +164,7 @@ class TestRun(unittest.TestCase):
 			}]
 		}, {
 			'attrs': {
-			'category': 'class',
+			'category': 'nested',
 			'type': 'interface',
 			'name': 'MyFy'
 			},

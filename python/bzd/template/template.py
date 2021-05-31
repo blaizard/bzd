@@ -35,10 +35,10 @@ class Template:
 	def _getValue(self, args: SubstitutionType, key: str) -> typing.Any:
 
 		for k in key.split("."):
-			if k in args:
-				args = args[k]
-			elif hasattr(args, k):
+			if hasattr(args, k):
 				args = getattr(args, k)
+			elif k in args:
+				args = args[k]
 			else:
 				raise Exception("Template value '{}' is not set.".format(key))
 
@@ -61,6 +61,8 @@ class Template:
 
 		def replaceValue(match: typing.Match[str]) -> str:
 			if match.group() not in ["and", "or", "not", "(", ")"]:
+
+				print(match.group(), args)
 
 				# Try to read the value
 				try:

@@ -10,13 +10,15 @@
 			@focus="setActive()"
 			@blur="setInactive()"
 			@keydown="handleKeyDown($event)"
-			v-touch="touchDirective">
+			v-touch="touchDirective"
+		>
 			<div class="irform-carousel-slides" ref="slides" :style="slidesStyle">
 				<div
 					v-for="(slide, index) in list"
 					:class="getSlideClass(index)"
 					:style="slideStyle"
-					@click="handleClick(index)">
+					@click="handleClick(index)"
+				>
 					<div class="irform-carousel-slide-container" v-html="slide.display"></div>
 				</div>
 			</div>
@@ -50,8 +52,7 @@
 					this.computeSlidePosition();
 				});
 				myObserver.observe(this.$refs.slides);
-			}
-			else {
+			} else {
 				this.interval = setInterval(this.computeSlidePosition, 1000);
 			}
 		},
@@ -114,11 +115,11 @@
 				return this.disable
 					? {}
 					: {
-						onswipe: this.onSwipe,
-						ondrag: this.onDrag,
-						onstopdrag: this.onStopDrag,
-						allowClickThrough: true,
-					};
+							onswipe: this.onSwipe,
+							ondrag: this.onDrag,
+							onstopdrag: this.onStopDrag,
+							allowClickThrough: true,
+					  };
 			},
 			slidesStyle() {
 				return {
@@ -161,29 +162,29 @@
 				let curSlideWidth = rectCurSlide.width;
 
 				switch (direction) {
-				case "right":
-					// Identify the slide currently selected
-					for (let slidesWidth = 0; this.index > 0 && slidesWidth + curSlideWidth / 2 < this.offsetX; this.index--) {
-						const rect = this.$refs.slides.children[this.index - 1].getBoundingClientRect();
-						curSlideWidth = rect.width;
-						slidesWidth += curSlideWidth;
-					}
-					this.slideSelectByIndex(this.index - nbExtraSlides);
-					break;
+					case "right":
+						// Identify the slide currently selected
+						for (let slidesWidth = 0; this.index > 0 && slidesWidth + curSlideWidth / 2 < this.offsetX; this.index--) {
+							const rect = this.$refs.slides.children[this.index - 1].getBoundingClientRect();
+							curSlideWidth = rect.width;
+							slidesWidth += curSlideWidth;
+						}
+						this.slideSelectByIndex(this.index - nbExtraSlides);
+						break;
 
-				case "left":
-					// Identify the slide currently selected
-					for (
-						let totalSlideWidth = 0;
-						this.index < this.list.length - 1 && totalSlideWidth + curSlideWidth / 2 < -this.offsetX;
-						this.index++
-					) {
-						const rect = this.$refs.slides.children[this.index + 1].getBoundingClientRect();
-						curSlideWidth = rect.width;
-						totalSlideWidth += curSlideWidth;
-					}
-					this.slideSelectByIndex(this.index + nbExtraSlides);
-					break;
+					case "left":
+						// Identify the slide currently selected
+						for (
+							let totalSlideWidth = 0;
+							this.index < this.list.length - 1 && totalSlideWidth + curSlideWidth / 2 < -this.offsetX;
+							this.index++
+						) {
+							const rect = this.$refs.slides.children[this.index + 1].getBoundingClientRect();
+							curSlideWidth = rect.width;
+							totalSlideWidth += curSlideWidth;
+						}
+						this.slideSelectByIndex(this.index + nbExtraSlides);
+						break;
 				}
 			},
 			onDrag(x /*y*/) {
@@ -246,39 +247,37 @@
 					const rect = this.$refs.slides.children[this.index].getBoundingClientRect();
 
 					switch (this.alignSelection) {
-					case "center":
-						this.slidePosition = Math.round(rectBase.left - rect.left - rect.width / 2);
-						break;
-					case "right":
-						this.slidePosition = Math.round(rectBase.left - rect.left - rect.width);
-						break;
-					case "left":
-						this.slidePosition = Math.round(rectBase.left - rect.left);
-						break;
-					default: {
-						const rectContainer = this.$refs.container.getBoundingClientRect();
-						// if the selection is too much on the left (not visible)
-						if (rect.left - rectContainer.left < 0) {
+						case "center":
+							this.slidePosition = Math.round(rectBase.left - rect.left - rect.width / 2);
+							break;
+						case "right":
+							this.slidePosition = Math.round(rectBase.left - rect.left - rect.width);
+							break;
+						case "left":
 							this.slidePosition = Math.round(rectBase.left - rect.left);
+							break;
+						default: {
+							const rectContainer = this.$refs.container.getBoundingClientRect();
+							// if the selection is too much on the left (not visible)
+							if (rect.left - rectContainer.left < 0) {
+								this.slidePosition = Math.round(rectBase.left - rect.left);
+							}
+							// if the selection is too much on the right (not visible)
+							else if (rect.right - rectContainer.left > rectContainer.width) {
+								this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
+							} else {
+								/*
+								 * Add the current offset to the slide position as this will be reset right after.
+								 * This needs to be done here are we do not want to affect the slidePosition when
+								 * it reaches corners cases (see above).
+								 */
+								this.slidePosition += this.offsetX;
+							}
+							// Do not let the slides too much on the right (useless)
+							this.slidePosition = Math.min(0, this.slidePosition);
 						}
-						// if the selection is too much on the right (not visible)
-						else if (rect.right - rectContainer.left > rectContainer.width) {
-							this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
-						}
-						else {
-							/*
-							 * Add the current offset to the slide position as this will be reset right after.
-							 * This needs to be done here are we do not want to affect the slidePosition when
-							 * it reaches corners cases (see above).
-							 */
-							this.slidePosition += this.offsetX;
-						}
-						// Do not let the slides too much on the right (useless)
-						this.slidePosition = Math.min(0, this.slidePosition);
 					}
-					}
-				}
-				else {
+				} else {
 					this.slidePosition = 0;
 				}
 			},
@@ -291,8 +290,7 @@
 			handleKeyDown(e) {
 				if (e.keyCode == /*arrow left*/ 37) {
 					this.slidePrevious();
-				}
-				else if (e.keyCode == /*arrow right*/ 39) {
+				} else if (e.keyCode == /*arrow right*/ 39) {
 					this.slideNext();
 				}
 			},
