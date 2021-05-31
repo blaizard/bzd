@@ -1,0 +1,33 @@
+{for path, _ in uses}
+use "{path}"
+{end}
+
+{if namespace}
+namespace "{namespace}";
+{end}
+
+{for name, data in using}
+{data.comment}
+using {name} = {data.type};
+{end}
+
+{for varName, var in variables}
+{var.comment}
+{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
+{end}
+
+{for name, data in classes}
+{data.comment}
+{data.type} {name}
+{
+	{for methodName, method in data.nested.methods}
+	{method.comment}
+	method {methodName}({for i, var in method.args}{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type}{end};
+	{end}
+
+	{for varName, var in data.nested.variables}
+	{var.comment}
+	{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
+	{end}
+}
+{end}

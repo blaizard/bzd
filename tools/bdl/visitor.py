@@ -22,6 +22,7 @@ class Visitor(VisitorBase[T, str]):
 	def __init__(self) -> None:
 		self.level = 0
 		self.hasNamespace = False
+		self.type= None
 
 	def applyIndent(self, result: str) -> str:
 		"""
@@ -94,7 +95,7 @@ class Visitor(VisitorBase[T, str]):
 	def visitFinal(self, result: T) -> str:
 		return str(result)
 
-	def visitComment(self, comment: str) -> str:
+	def visitComment(self, context: str, comment: str) -> str:
 		"""
 		Called when a comment is discovered.
 		"""

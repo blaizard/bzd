@@ -38,7 +38,7 @@ class Variable:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment(self.element.getAttrValue("comment"))
+		return self.visitor.visitComment("variable", self.element.getAttrValue("comment"))
 
 	@property
 	def contracts(self) -> Contracts:
