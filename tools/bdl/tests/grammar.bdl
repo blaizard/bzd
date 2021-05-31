@@ -1,21 +1,12 @@
-// Return hello world!
-method hello();
-/*
- * This is a multi-line comment,
- * with exactly 2 lines
- */
-int16 varSimple1;
-const String varSimple2;
-// Template variable
-List<int32> varTemplate1;
-const Variant<Boolean, String> varTemplate2;
-// Complex nested template variable
-Variant<List<Int>, Optional<List<Float>>, Boolean> varNested;
-// Initialized variable
-int16 varInit1 = 12;
-const int16 varInit2 = -5;
-const String varInit3 = "Hello World! <here>";
 Float varInit4 = 5.12;
 // Contracts
 const int32 defaultConstant [min = -1, max = 35];
 int32 defaultConstant2 = 42 [min = -1, read];
+interface MyFy
+{
+	// Send a message
+	method send(Sequence<char> message) -> Result<int>;
+	MyType var;
+	const MyType varConst [always];
+	MyType varInitialized = 42;
+}
