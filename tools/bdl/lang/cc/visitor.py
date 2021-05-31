@@ -41,7 +41,7 @@ class CcFormatter(Visitor[ResultType]):
 		assert len(string), "String cannot be empty."
 		return string[0].upper() + string[1:]
 
-	def visitComment(self, context: str, comment: typing.Optional[str]) -> str:
+	def visitComment(self, context: typing.Any, comment: typing.Optional[str]) -> str:
 
 		if comment is None:
 			return ""

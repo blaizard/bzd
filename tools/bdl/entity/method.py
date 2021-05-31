@@ -29,7 +29,7 @@ class Method:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment("method", self.element.getAttrValue("comment"))
+		return self.visitor.visitComment(context=Method, comment=self.element.getAttrValue("comment"))
 
 	@property
 	def args(self) -> typing.List[Variable]:

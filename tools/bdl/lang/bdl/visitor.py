@@ -2,6 +2,7 @@ import typing
 from pathlib import Path
 
 from tools.bdl.visitor import Visitor
+from tools.bdl.entity.contract import Contract
 from tools.bdl.entity.variable import Variable
 from tools.bdl.entity.nested import Nested
 from tools.bdl.entity.method import Method
@@ -35,12 +36,12 @@ class BdlFormatter(Visitor[ResultType]):
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return {"variables": {}, "classes": {}, "methods": {}, "uses": {}, "using": {}, "namespace": False}
 
-	def visitComment(self, context: str, comment: typing.Optional[str]) -> str:
+	def visitComment(self, context: typing.Any, comment: typing.Optional[str]) -> str:
 
 		if comment is None:
 			return ""
 
-		if context == "contract":
+		if context == Contract:
 			return "/*{}*/".format(comment)
 
 		if len(comment.split("\n")) > 1:
