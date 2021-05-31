@@ -24,12 +24,13 @@ class Method:
 		return self.element.isAttr("type")
 
 	@property
-	def type(self) -> typing.Optional[str]:
+	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element) if self.isType else None
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment(context=Method, comment=self.element.getAttrValue("comment"))
+		comment = self.visitor.visitComment(context=Method, comment=self.element.getAttrValue("comment"))
+		return typing.cast(typing.Optional[str], comment)
 
 	@property
 	def args(self) -> typing.List[Variable]:
