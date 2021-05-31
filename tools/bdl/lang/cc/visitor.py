@@ -1,7 +1,7 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor
+from tools.bdl.visitor import Visitor, ResultType
 from tools.bdl.entity.variable import Variable
 from tools.bdl.entity.nested import Nested
 from tools.bdl.entity.method import Method
@@ -28,11 +28,7 @@ class _VisitorType(VisitorType):
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
-
-ResultType = typing.Dict[str, typing.Any]
-
-
-class CcFormatter(Visitor[ResultType]):
+class CcFormatter(Visitor):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return {"variables": {}, "classes": {}, "methods": {}, "uses": {}, "using": {}, "namespace": False}
@@ -92,7 +88,7 @@ class CcFormatter(Visitor[ResultType]):
 
 		return result
 
-	def visitNested(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
+	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
 
 		name = entity.name
 		result["classes"][name] = {
