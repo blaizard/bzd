@@ -1,8 +1,14 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor, VisitorType, VisitorNamespace
-from tools.bdl.contracts import Contracts
+from tools.bdl.visitor import Visitor
+from tools.bdl.entity.variable import Variable
+from tools.bdl.entity.nested import Nested
+from tools.bdl.entity.method import Method
+from tools.bdl.entity.using import Using
+from tools.bdl.entity.namespace import Namespace
+from tools.bdl.entity.use import Use
+from tools.bdl.entity.type import Visitor as VisitorType
 from bzd.parser.element import Element
 from bzd.template.template import Template
 
@@ -25,40 +31,14 @@ class _VisitorType(VisitorType):
 
 ResultType = typing.Dict[str, typing.Any]
 
-
-class _VisitorNamespace(VisitorNamespace):
-
-	def visitNamespaceItems(self, items: typing.List[str]) -> str:
-		return "::".join(items)
-
-
 class CcFormatter(Visitor[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
-		return {"variables": {}, "classes": {}, "methods": {}, "imports": {}, "using": {}}
+		return {"variables": {}, "classes": {}, "methods": {}, "uses": {}, "using": {}}
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
 		return string[0].upper() + string[1:]
-
-	def getVariable(self, element: Element) -> typing.Any:
-		contracts: typing.Iterable[typing.Any] = []
-		if element.isNestedSequence("contract"):
-			sequence = element.getNestedSequence("contract")
-			assert sequence
-			contracts = Contracts(sequence)
-
-		name = element.getAttrValue("name")
-		assert name
-		return {
-			"name": name,
-			"const": element.isAttr("const"),
-			"type": _VisitorType(element=element).result,
-			"isValue": element.isAttr("value"),
-			"value": element.getAttrValue("value"),
-			"comment": self.visitComment(comment=element.getAttrValue("comment")),
-			"contracts": contracts
-		}
 
 	def visitComment(self, comment: typing.Optional[str]) -> str:
 
@@ -70,63 +50,75 @@ class CcFormatter(Visitor[ResultType]):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitMethod(self, result: ResultType, element: Element) -> ResultType:
+	def visitMethod(self, result: ResultType, element: Element, entity: Method) -> ResultType:
 
-		# Handle the name + arguments
 		args = []
-		if element.isNestedSequence("argument"):
-			sequence = element.getNestedSequence("argument")
-			assert sequence is not None
-			for arg in sequence.iterate():
-				args.append(self.getVariable(element=arg))
+		for arg in entity.args:
+			args.append({
+				"name": arg.name,
+				"nameCamelCase": self.toCamelCase(arg.name),
+				"const": arg.const,
+				"type": arg.type.visit(_VisitorType),
+				"value": arg.value,
+				"isValue": arg.isValue,
+				"comment": self.visitComment(comment=arg.comment),
+				"contracts": arg.contracts
+			})
 
-		name = element.getAttrValue("name")
-		assert name
+		name = entity.name
 		result["methods"][name] = {
-			"type": _VisitorType(element=element).result if element.isAttr("type") else "void",
-			"comment": self.visitComment(comment=element.getAttrValue("comment")),
+			"name": name,
+			"type": entity.type.visit(_VisitorType) if entity.type else "void",
+			"comment": self.visitComment(comment=entity.comment),
 			"args": args
 		}
 
 		return result
 
-	def visitVariable(self, result: ResultType, element: Element) -> ResultType:
+	def visitVariable(self, result: ResultType, element: Element, entity: Variable) -> ResultType:
 
-		variable = self.getVariable(element=element)
-		name = variable["name"]
-		variable["nameCamelCase"] = self.toCamelCase(name)
-		result["variables"][name] = variable
-
-		return result
-
-	def visitClass(self, result: ResultType, nestedResult: ResultType, element: Element) -> ResultType:
-
-		name = element.getAttrValue("name")
-		assert name
-		result["classes"][name] = {
+		name = entity.name
+		result["variables"][name] = {
+			"name": name,
 			"nameCamelCase": self.toCamelCase(name),
-			"type": _VisitorType(element=element).result,
-			"comment": self.visitComment(comment=element.getAttrValue("comment")),
-			"nested": nestedResult
+			"const": entity.const,
+			"type": entity.type.visit(_VisitorType),
+			"value": entity.value,
+			"isValue": entity.isValue,
+			"comment": self.visitComment(comment=entity.comment),
+			"contracts": entity.contracts
 		}
 
 		return result
 
-	def visitUsing(self, result: ResultType, element: Element) -> ResultType:
+	def visitNested(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
 
-		name = element.getAttrValue("name")
-		assert name
+		name = entity.name
+		result["classes"][name] = {
+			"name": name,
+			"nameCamelCase": self.toCamelCase(name),
+			"type": entity.type.visit(_VisitorType),
+			"comment": self.visitComment(comment=entity.comment),
+			"nested": entity.nested
+		}
+
+		return result
+
+	def visitUsing(self, result: ResultType, element: Element, entity: Using) -> ResultType:
+
+		name = entity.name
 		result["using"][name] = {
 			"name": name,
-			"type": _VisitorType(element=element).result,
-			"comment": self.visitComment(comment=element.getAttrValue("comment"))
+			"contracts": entity.contracts,
+			"type": entity.type.visit(_VisitorType),
+			"comment": self.visitComment(comment=entity.comment),
 		}
 
 		return result
 
-	def visitNamespace(self, result: ResultType, element: Element) -> ResultType:
+	def visitNamespace(self, result: ResultType, element: Element, entity: Namespace) -> ResultType:
 
-		result["namespace"] = _VisitorNamespace(element=element).result
+		result["namespace"] = "::".join(entity.nameList)
 		return result
 
 	def visitFinal(self, result: ResultType) -> str:
@@ -140,8 +132,8 @@ class CcFormatter(Visitor[ResultType]):
 
 		return output
 
-	def visitImport(self, result: ResultType, path: Path) -> ResultType:
+	def visitUse(self, result: ResultType, entity: Use) -> ResultType:
 
-		result["imports"][path.as_posix()] = True
+		result["uses"][entity.path.as_posix()] = True
 
 		return result

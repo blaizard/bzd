@@ -14,7 +14,14 @@ py_library(
 py_library(
     name = "visitor",
     srcs = [
-        "contracts.py",
+        "entity/contract.py",
+        "entity/type.py",
+        "entity/variable.py",
+        "entity/nested.py",
+        "entity/method.py",
+        "entity/using.py",
+        "entity/namespace.py",
+        "entity/use.py",
         "visitor.py",
     ],
     visibility = [":__subpackages__"],

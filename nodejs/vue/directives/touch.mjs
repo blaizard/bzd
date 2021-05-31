@@ -184,8 +184,7 @@ async function dragStart(e) {
 				elt.classList.add(DRAG_RECEIVER_ACTIVE);
 			});
 			activeReceiverElt = null;
-		}
-		else {
+		} else {
 			activeReceiverElt = originalElt.parentNode;
 			activeReceiverElt.classList.add(DRAG_RECEIVER_ACTIVE);
 			activeReceiverElt.classList.add(DRAG_OVER_ACTIVE);
@@ -196,15 +195,12 @@ async function dragStart(e) {
 		{
 			if (typeof curConfig.placeholder === "function") {
 				placeholderElt = await curConfig.placeholder(originalElt);
-			}
-			else if (curConfig.placeholder == "clone") {
+			} else if (curConfig.placeholder == "clone") {
 				placeholderElt = originalElt.cloneNode(true);
 				synchronizeCssStyles(originalElt, placeholderElt, /*recursive*/ true);
-			}
-			else if (curConfig.placeholder == "cloneNode") {
+			} else if (curConfig.placeholder == "cloneNode") {
 				placeholderElt = originalElt.cloneNode(true);
-			}
-			else {
+			} else {
 				placeholderElt = document.createElement("div");
 			}
 			// Add the class
@@ -219,15 +215,12 @@ async function dragStart(e) {
 		{
 			if (typeof curConfig.dragElt === "function") {
 				dragElt = await curConfig.dragElt();
-			}
-			else if (curConfig.dragElt == "clone") {
+			} else if (curConfig.dragElt == "clone") {
 				dragElt = originalElt.cloneNode(true);
 				synchronizeCssStyles(originalElt, dragElt, /*recursive*/ true);
-			}
-			else if (curConfig.dragElt == "cloneNode") {
+			} else if (curConfig.dragElt == "cloneNode") {
 				dragElt = originalElt.cloneNode(true);
-			}
-			else {
+			} else {
 				dragElt = document.createElement("div");
 			}
 			// Add some style
@@ -261,8 +254,7 @@ async function dragStart(e) {
 					x: coord.x - pos.x,
 					y: coord.y - pos.y,
 				};
-			}
-			else {
+			} else {
 				coordOffset = {
 					x: dragElt.offsetWidth / 2,
 					y: dragElt.offsetHeight / 2,
@@ -351,8 +343,7 @@ function detectDropZone() {
 				if (isPointInRectangle(coordViewPort, coordEltViewPort, /*tolerance*/ 0)) {
 					newActiveReveiverElt = elt;
 					break;
-				}
-				else if (
+				} else if (
 					/*
 					 * This will act as the second guess if none of them matched. Note we use the last match as this will be
 					 * the outer (not nested) one. And this is what we want for the second guess.
@@ -374,8 +365,7 @@ function detectDropZone() {
 			activeReceiverElt = newActiveReveiverElt;
 			removeAllClass(DRAG_OVER_ACTIVE);
 			activeReceiverElt.classList.add(DRAG_OVER_ACTIVE);
-		}
-		else if (activeReceiverElt && !newActiveReveiverElt) {
+		} else if (activeReceiverElt && !newActiveReveiverElt) {
 			activeReceiverElt = newActiveReveiverElt;
 			removeAllClass(DRAG_OVER_ACTIVE);
 		}
@@ -466,16 +456,13 @@ function detectDropZone() {
 			if (isPlaceHolderBefore) {
 				if (activeChildElt.nextSibling) {
 					activeReceiverElt.insertBefore(placeholderElt, activeChildElt.nextSibling);
-				}
-				else {
+				} else {
 					activeReceiverElt.appendChild(placeholderElt);
 				}
-			}
-			else {
+			} else {
 				activeReceiverElt.insertBefore(placeholderElt, activeChildElt);
 			}
-		}
-		else {
+		} else {
 			activeReceiverElt.appendChild(placeholderElt);
 		}
 	}
@@ -515,8 +502,7 @@ function dragMove(e) {
 			dragElt.style.left = coordViewPort.x - coordOffset.x + "px";
 			dragElt.style.top = coordViewPort.y - coordOffset.y + "px";
 		}
-	}
-	else if (state == STATE_TRIGGER_DRAG_AFTER_MOVE) {
+	} else if (state == STATE_TRIGGER_DRAG_AFTER_MOVE) {
 		if (!curConfig.allowClickThrough) {
 			e.preventDefault();
 			e.stopPropagation();
@@ -550,16 +536,13 @@ function reset() {
 				if (Math.abs(currentCoord.x - originalCoord.x) > Math.abs(currentCoord.y - originalCoord.y)) {
 					if (currentCoord.x - originalCoord.x > 0) {
 						curConfig.onswipe("right", speedPixelPerSecond);
-					}
-					else {
+					} else {
 						curConfig.onswipe("left", speedPixelPerSecond);
 					}
-				}
-				else {
+				} else {
 					if (currentCoord.y - originalCoord.y > 0) {
 						curConfig.onswipe("down", speedPixelPerSecond);
-					}
-					else {
+					} else {
 						curConfig.onswipe("up", speedPixelPerSecond);
 					}
 				}
@@ -808,8 +791,7 @@ export default function (el, binding) {
 		// Get the list of recievers
 		el.addEventListener("mousedown", touch, eventListenerOptions);
 		el.addEventListener("touchstart", touch, eventListenerOptions);
-	}
-	else {
+	} else {
 		let touch = el.directiveTouchInstance;
 		touch.setConfig(config);
 	}

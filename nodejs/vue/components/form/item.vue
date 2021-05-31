@@ -4,7 +4,9 @@
 		<div class="irform-caption" v-else-if="caption !== null">{{ caption }}<span v-if="mandatory">*</span></div>
 		<div :class="elementsClass">
 			<slot></slot>
-			<span v-if="isError" class="irform-error-message"><i class="irform-icon-warning"></i> {{ error.join(", ") }}</span>
+			<span v-if="isError" class="irform-error-message"
+				><i class="irform-icon-warning"></i> {{ error.join(", ") }}</span
+			>
 		</div>
 	</div>
 </template>

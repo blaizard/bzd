@@ -50,8 +50,7 @@ function autoResize(el) {
 			// Update the font size boundaries
 			if (rect.height > rectParent.height || rect.width > rectParent.width) {
 				maxFontSize = fontSize;
-			}
-			else {
+			} else {
 				minFontSize = fontSize;
 			}
 
@@ -90,8 +89,7 @@ function registerObserver(el) {
 		};
 		observers[uid].obj.observe(el);
 		observers[uid].obj.observe(el.parentElement);
-	}
-	else {
+	} else {
 		observers[uid] = {
 			obj: setInterval(() => {
 				autoResize(el);
@@ -109,8 +107,7 @@ function unregisterObserver(uid) {
 		clearTimeout(observers[uid].instance);
 		if (typeof ResizeObserver !== "undefined") {
 			observers[uid].obj.disconnect();
-		}
-		else {
+		} else {
 			clearInterval(observers[uid].obj);
 		}
 		delete observers[uid];

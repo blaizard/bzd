@@ -2,7 +2,7 @@
 
 #include "tools/bdl/lang/cc/adapter/types.h"
 
-{for path, _ in imports}
+{for path, _ in uses}
 #include "{path}"
 {end}
 
@@ -39,11 +39,11 @@ public: // Variable accessors.
 	constexpr void set{var.nameCamelCase}(const {var.type}& value)
 	{
 		{for contract in var.contracts}
-		{if contract.kind == "min"}
+		{if contract.type == "min"}
 		// Minimum contract
 		assert(value >= {contract.value});
 		{end}
-		{if contract.kind == "max"}
+		{if contract.type == "max"}
 		// Maximum contract
 		assert(value <= {contract.value});
 		{end}
@@ -62,12 +62,12 @@ protected: // Protected variable accessors.
 	// Setter for {varName}_.
 	constexpr void set{var.nameCamelCase}(const {var.type}& value)
 	{
-		{for type, contract in var.contracts}
-		{if type == "min"}
+		{for contract in var.contracts}
+		{if contract.type == "min"}
 		// Minimum contract
 		assert(value >= {contract.value});
 		{end}
-		{if type == "max"}
+		{if contract.type == "max"}
 		// Maximum contract
 		assert(value <= {contract.value});
 		{end}

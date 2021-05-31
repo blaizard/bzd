@@ -7,9 +7,9 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match: interface, struct
-_regexprClass = r"(?P<type>(:?interface|struct))"
+_regexprNested = r"(?P<type>(:?interface|struct))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|method|namespace|import|using)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|method|namespace|use|using)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match: "string", 12, -45, 5.1854
@@ -25,9 +25,9 @@ class FragmentBlockComment(FragmentComment):
 		self.attrs["comment"] = re.sub(re.compile("^\ {0,2}\*+", re.MULTILINE), "", self.attrs["comment"])
 
 
-def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
+def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 	"""
-	Generate a grammar for a class, it accepst the following format:
+	Generate a grammar for a nested entity, it accepst the following format:
 	(interface|struct) name {
 		nestedGrammar
 	}
@@ -36,7 +36,7 @@ def makeGrammarClass(nestedGrammar: Grammar) -> Grammar:
 	"""
 
 	return [
-		GrammarItem(_regexprClass, {"category": "class"}, [
+		GrammarItem(_regexprNested, {"category": "nested"}, [
 		GrammarItem(_regexprName, Fragment, [
 		GrammarItem(r"{", FragmentNestedStart, [
 		nestedGrammar,
@@ -169,12 +169,12 @@ def makeGrammarNamespace() -> Grammar:
 	]
 
 
-def makeGrammarImport() -> Grammar:
+def makeGrammarUse() -> Grammar:
 	"""
-	Generate a grammar for import, it accepts the following format:
-	import "path/to/file"
+	Generate a grammar for use, it accepts the following format:
+	use "path/to/file"
 	"""
-	return [GrammarItem(r"import", {"category": "import"}, [GrammarItem(_regexprString, FragmentNewElement)])]
+	return [GrammarItem(r"use", {"category": "use"}, [GrammarItem(_regexprString, FragmentNewElement)])]
 
 
 # Comments allowed by the grammar
@@ -188,6 +188,6 @@ class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
 		super().__init__(path,
-			grammar=makeGrammarNamespace() + makeGrammarImport() + makeGrammarUsing() + makeGrammarVariable() +
-			makeGrammarMethod() + makeGrammarClass(makeGrammarVariable() + makeGrammarMethod()),
+			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarVariable() +
+			makeGrammarMethod() + makeGrammarNested(makeGrammarVariable() + makeGrammarMethod()),
 			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

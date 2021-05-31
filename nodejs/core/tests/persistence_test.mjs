@@ -122,64 +122,64 @@ describe("Persistence", function () {
 				const randomValue = Math.floor(Math.random() * Math.floor(5));
 				process.stdout.write(randomValue + " ");
 				switch (randomValue) {
-				case 0:
-					{
-						const key = Math.random();
-						const value = Math.random();
+					case 0:
+						{
+							const key = Math.random();
+							const value = Math.random();
 
-						commandQueue.push("add value " + key + " -> " + value);
+							commandQueue.push("add value " + key + " -> " + value);
 
-						await persistence.write("set", key, value);
-						expectedValue[key] = value;
-						await persistence.consistencyCheck();
-						Assert.ok(persistence.isDirty(), JSON.stringify(commandQueue));
-						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
-					}
-					break;
-				case 1:
-					{
-						const keyList = Object.keys(expectedValue);
-						const key = keyList[Math.floor(Math.random() * keyList.length)];
+							await persistence.write("set", key, value);
+							expectedValue[key] = value;
+							await persistence.consistencyCheck();
+							Assert.ok(persistence.isDirty(), JSON.stringify(commandQueue));
+							Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
+						}
+						break;
+					case 1:
+						{
+							const keyList = Object.keys(expectedValue);
+							const key = keyList[Math.floor(Math.random() * keyList.length)];
 
-						commandQueue.push("delete key " + key);
+							commandQueue.push("delete key " + key);
 
-						await persistence.write("delete", key);
-						delete expectedValue[key];
-						await persistence.consistencyCheck();
-						Assert.ok(persistence.isDirty(), JSON.stringify(commandQueue));
-						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
-					}
-					break;
-				case 2:
-					{
-						commandQueue.push("savepoint");
+							await persistence.write("delete", key);
+							delete expectedValue[key];
+							await persistence.consistencyCheck();
+							Assert.ok(persistence.isDirty(), JSON.stringify(commandQueue));
+							Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
+						}
+						break;
+					case 2:
+						{
+							commandQueue.push("savepoint");
 
-						await persistence.savepoint();
-						await persistence.consistencyCheck();
-						Assert.ok(!persistence.isDirty(), JSON.stringify(commandQueue));
-						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
-					}
-					break;
-				case 3:
-					{
-						commandQueue.push("restart");
+							await persistence.savepoint();
+							await persistence.consistencyCheck();
+							Assert.ok(!persistence.isDirty(), JSON.stringify(commandQueue));
+							Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
+						}
+						break;
+					case 3:
+						{
+							commandQueue.push("restart");
 
-						persistence.close();
-						persistence = await PersistenceDisk.make(persistenceOptions.path, persistenceOptions);
-						await persistence.consistencyCheck();
-						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
-					}
-					break;
-				case 4:
-					{
-						commandQueue.push("reset");
+							persistence.close();
+							persistence = await PersistenceDisk.make(persistenceOptions.path, persistenceOptions);
+							await persistence.consistencyCheck();
+							Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
+						}
+						break;
+					case 4:
+						{
+							commandQueue.push("reset");
 
-						await persistence.reset(expectedValue);
-						await persistence.consistencyCheck();
-						Assert.ok(!persistence.isDirty(), JSON.stringify(commandQueue));
-						Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
-					}
-					break;
+							await persistence.reset(expectedValue);
+							await persistence.consistencyCheck();
+							Assert.ok(!persistence.isDirty(), JSON.stringify(commandQueue));
+							Assert.deepStrictEqual(await persistence.get(), expectedValue, JSON.stringify(commandQueue));
+						}
+						break;
 				}
 			}
 		}).timeout(120000);
@@ -199,37 +199,37 @@ describe("Persistence", function () {
 			while (nbOperationsLeft--) {
 				const randomValue = Math.floor(Math.random() * Math.floor(4));
 				switch (randomValue) {
-				case 0:
-					{
-						const key = Math.random();
-						const value = Math.random();
-						commandQueue.push("add value " + key + " -> " + value);
-						persistence.write("set", key, value);
-						expectedValue[key] = value;
-					}
-					break;
-				case 1:
-					{
-						const keyList = Object.keys(expectedValue);
-						const key = keyList[Math.floor(Math.random() * keyList.length)];
-						commandQueue.push("delete " + key);
+					case 0:
+						{
+							const key = Math.random();
+							const value = Math.random();
+							commandQueue.push("add value " + key + " -> " + value);
+							persistence.write("set", key, value);
+							expectedValue[key] = value;
+						}
+						break;
+					case 1:
+						{
+							const keyList = Object.keys(expectedValue);
+							const key = keyList[Math.floor(Math.random() * keyList.length)];
+							commandQueue.push("delete " + key);
 
-						persistence.write("delete", key);
-						delete expectedValue[key];
-					}
-					break;
-				case 2:
-					{
-						commandQueue.push("savepoint");
-						persistence.savepoint();
-					}
-					break;
-				case 3:
-					{
-						commandQueue.push("reset");
-						persistence.reset(expectedValue);
-					}
-					break;
+							persistence.write("delete", key);
+							delete expectedValue[key];
+						}
+						break;
+					case 2:
+						{
+							commandQueue.push("savepoint");
+							persistence.savepoint();
+						}
+						break;
+					case 3:
+						{
+							commandQueue.push("reset");
+							persistence.reset(expectedValue);
+						}
+						break;
 				}
 			}
 
