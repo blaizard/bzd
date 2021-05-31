@@ -21,4 +21,4 @@ def main(formatType: str, inputs: typing.List[Path]) -> str:
 
 	# Format using a specific formatter
 	formatter = formatters[formatType]()
-	return formatter.visit(data)  # type: ignore
+	return formatter.visit(data)

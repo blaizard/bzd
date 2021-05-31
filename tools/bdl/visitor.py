@@ -12,10 +12,9 @@ from tools.bdl.entity.using import Using
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.use import Use
 
-T = typing.TypeVar("T")
+ResultType = typing.Dict[str, typing.Any]
 
-
-class Visitor(VisitorBase[T, str]):
+class Visitor(VisitorBase[ResultType, str]):
 
 	nestedKind = None
 
@@ -32,7 +31,7 @@ class Visitor(VisitorBase[T, str]):
 		indent = "\t" * self.level
 		return "\n".join(["{}{}".format(indent, line) if len(line.strip()) else line for line in result.split("\n")])
 
-	def visitElement(self, element: Element, result: T) -> T:
+	def visitElement(self, element: Element, result: ResultType) -> ResultType:
 		"""
 		Main visitor, called each time a new element is discovered.
 		"""
@@ -52,10 +51,10 @@ class Visitor(VisitorBase[T, str]):
 
 			self.level -= 1
 
-			result = self.visitNested(result=result,
+			result = self.visitNestedEntities(result=result,
 				nestedResult=nestedResult,
 				element=element,
-				entity=Nested(element=element, nested=nestedResult, visitor=self))
+				entity=Nested(element=element, nested=typing.cast(typing.List[typing.Any], nestedResult), visitor=self))
 
 		# Handle variable
 		elif element.getAttr("category").value == "variable":
@@ -92,7 +91,7 @@ class Visitor(VisitorBase[T, str]):
 
 		return result
 
-	def visitFinal(self, result: T) -> str:
+	def visitFinal(self, result: ResultType) -> str:
 		return str(result)
 
 	def visitComment(self, context: typing.Any, comment: str) -> str:
@@ -102,42 +101,42 @@ class Visitor(VisitorBase[T, str]):
 
 		return comment
 
-	def visitNested(self, result: T, nestedResult: T, element: Element, entity: Nested) -> T:
+	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
 		"""
 		Called when discovering a nested entity.
 		"""
 
 		return result
 
-	def visitVariable(self, result: T, element: Element, variable: Variable) -> T:
+	def visitVariable(self, result: ResultType, element: Element, entity: Variable) -> ResultType:
 		"""
 		Called when discovering a variable.
 		"""
 
 		return result
 
-	def visitMethod(self, result: T, element: Element, entity: Method) -> T:
+	def visitMethod(self, result: ResultType, element: Element, entity: Method) -> ResultType:
 		"""
 		Called when discovering a method.
 		"""
 
 		return result
 
-	def visitUsing(self, result: T, element: Element, entity: Using) -> T:
+	def visitUsing(self, result: ResultType, element: Element, entity: Using) -> ResultType:
 		"""
 		Called when discovering a using keyword.
 		"""
 
 		return result
 
-	def visitNamespace(self, result: T, element: Element, entity: Namespace) -> T:
+	def visitNamespace(self, result: ResultType, element: Element, entity: Namespace) -> ResultType:
 		"""
 		Called when discovering a namespace.
 		"""
 
 		return result
 
-	def visitUse(self, result: T, entity: Use) -> T:
+	def visitUse(self, result: ResultType, entity: Use) -> ResultType:
 		"""
 		Called when discovering an use statement.
 		"""
