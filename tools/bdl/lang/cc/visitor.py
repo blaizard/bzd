@@ -28,6 +28,7 @@ class _VisitorType(VisitorType):
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
+
 class CcFormatter(Visitor):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
@@ -88,7 +89,8 @@ class CcFormatter(Visitor):
 
 		return result
 
-	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
+	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element,
+		entity: Nested) -> ResultType:
 
 		name = entity.name
 		result["classes"][name] = {

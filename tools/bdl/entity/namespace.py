@@ -17,6 +17,7 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		result.append(element.getAttr("name").value)
 		return result
 
+
 class Namespace:
 
 	def __init__(self, element: Element) -> None:

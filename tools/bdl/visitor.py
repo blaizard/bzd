@@ -14,6 +14,7 @@ from tools.bdl.entity.use import Use
 
 ResultType = typing.Dict[str, typing.Any]
 
+
 class Visitor(VisitorBase[ResultType, str]):
 
 	nestedKind = None
@@ -21,7 +22,7 @@ class Visitor(VisitorBase[ResultType, str]):
 	def __init__(self) -> None:
 		self.level = 0
 		self.hasNamespace = False
-		self.type= None
+		self.type = None
 
 	def applyIndent(self, result: str) -> str:
 		"""
@@ -101,7 +102,8 @@ class Visitor(VisitorBase[ResultType, str]):
 
 		return comment
 
-	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element, entity: Nested) -> ResultType:
+	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element,
+		entity: Nested) -> ResultType:
 		"""
 		Called when discovering a nested entity.
 		"""
