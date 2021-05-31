@@ -95,7 +95,7 @@ class Visitor(VisitorBase[T, str]):
 	def visitFinal(self, result: T) -> str:
 		return str(result)
 
-	def visitComment(self, context: str, comment: str) -> str:
+	def visitComment(self, context: typing.Any, comment: str) -> str:
 		"""
 		Called when a comment is discovered.
 		"""

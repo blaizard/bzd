@@ -3,6 +3,8 @@ import typing
 from pathlib import Path
 
 SubstitutionType = typing.Dict[str, typing.Any]
+Iterator = typing.Iterable[typing.Any]
+
 """
 Process a template with specific values.
 All block {<action>} must end with {end}, actions can be:
@@ -159,10 +161,9 @@ class Template:
 			if matchForIndex:
 				if not ignoreOutput:
 					valueObject = self._getValue(args, matchForIndex.group(3))
-					if isinstance(valueObject, dict):
-						iterator = valueObject.items()
-					else:
-						iterator = enumerate(valueObject)
+
+					iterator: Iterator = valueObject.items() if isinstance(valueObject, dict) else enumerate(valueObject)
+
 					for key, value in iterator:
 						args[matchForIndex.group(1)] = str(key)
 						args[matchForIndex.group(2)] = value

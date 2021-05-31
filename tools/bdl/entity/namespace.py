@@ -9,10 +9,6 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 
 	nestedKind = None
 
-	def __init__(self, sequence: Sequence) -> None:
-
-		self.result = self._visit(sequence=sequence)
-
 	def visitBegin(self, result: typing.Any) -> typing.List[str]:
 		return []
 
@@ -20,7 +16,6 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		assertHasAttr(element=element, attr="name")
 		result.append(element.getAttr("name").value)
 		return result
-
 
 class Namespace:
 
@@ -34,4 +29,4 @@ class Namespace:
 	def nameList(self) -> typing.List[str]:
 		sequence = self.element.getNestedSequence("name")
 		assert sequence is not None
-		return _Visitor(sequence=sequence).result
+		return _Visitor().visit(sequence=sequence)
