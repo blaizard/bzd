@@ -28,7 +28,7 @@ class Contract:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.visitor.visitComment("contract", self.element.getAttrValue("comment"))
+		return self.visitor.visitComment(context=Contract, comment=self.element.getAttrValue("comment"))
 
 
 class _VisitorContract(Visitor[Contract, typing.List[Contract]]):

@@ -2,16 +2,11 @@
 interface OChannel
 {
 	method write(const Span<char> data) -> Result<int16>;
-
 }
-
 interface IChannel
 {
 	method read(Span<char> data) -> Result<int16>;
-
 }
-
 interface Channel
 {
 }
-

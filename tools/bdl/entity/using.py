@@ -30,4 +30,4 @@ class Using:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
+		return self.visitor.visitComment(context=Using, comment=self.element.getAttrValue("comment"))

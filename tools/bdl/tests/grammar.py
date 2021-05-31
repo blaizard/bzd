@@ -148,7 +148,7 @@ class TestRun(unittest.TestCase):
 		}, {
 			'attrs': {
 			'type': 'int32',
-			'name': 'defaultConstant',
+			'name': 'defaultConstant2',
 			'value': '42',
 			'category': 'variable'
 			},
