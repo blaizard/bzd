@@ -20,119 +20,18 @@ class TestRun(unittest.TestCase):
 		result = json.visit(data)
 		expected = [{
 			'attrs': {
-			'comment': 'This is a multi-line comment,\nwith exactly 2 lines',
-			'type': 'int16',
-			'name': 'varSimple1',
-			'category': 'variable'
-			}
-		}, {
-			'attrs': {
-			'const': '',
-			'type': 'String',
-			'name': 'varSimple2',
-			'category': 'variable'
-			}
-		}, {
-			'attrs': {
-			'comment': 'Template variable',
-			'type': 'List',
-			'name': 'varTemplate1',
-			'category': 'variable'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'int32'
-			}
-			}]
-		}, {
-			'attrs': {
-			'const': '',
-			'type': 'Variant',
-			'name': 'varTemplate2',
-			'category': 'variable'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'Boolean'
-			}
-			}, {
-			'attrs': {
-			'type': 'String'
-			}
-			}]
-		}, {
-			'attrs': {
-			'comment': 'Complex nested template variable',
-			'type': 'Variant',
-			'name': 'varNested',
-			'category': 'variable'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'List'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'Int'
-			}
-			}]
-			}, {
-			'attrs': {
-			'type': 'Optional'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'List'
-			},
-			'template': [{
-			'attrs': {
-			'type': 'Float'
-			}
-			}]
-			}]
-			}, {
-			'attrs': {
-			'type': 'Boolean'
-			}
-			}]
-		}, {
-			'attrs': {
-			'comment': 'Initialized variable',
-			'type': 'int16',
-			'name': 'varInit1',
-			'value': '12',
-			'category': 'variable'
-			}
-		}, {
-			'attrs': {
-			'const': '',
-			'type': 'int16',
-			'name': 'varInit2',
-			'value': '-5',
-			'category': 'variable'
-			}
-		}, {
-			'attrs': {
-			'const': '',
-			'type': 'String',
-			'name': 'varInit3',
-			'value': '"Hello World! <here>"',
-			'category': 'variable'
-			}
-		}, {
-			'attrs': {
 			'type': 'Float',
+			'category': 'variable',
 			'name': 'varInit4',
-			'value': '5.12',
-			'category': 'variable'
+			'value': '5.12'
 			}
 		}, {
 			'attrs': {
 			'comment': 'Contracts',
 			'const': '',
 			'type': 'int32',
-			'name': 'defaultConstant',
-			'category': 'variable'
+			'category': 'variable',
+			'name': 'defaultConstant'
 			},
 			'contract': [{
 			'attrs': {
@@ -148,9 +47,9 @@ class TestRun(unittest.TestCase):
 		}, {
 			'attrs': {
 			'type': 'int32',
+			'category': 'variable',
 			'name': 'defaultConstant2',
-			'value': '42',
-			'category': 'variable'
+			'value': '42'
 			},
 			'contract': [{
 			'attrs': {
@@ -175,11 +74,6 @@ class TestRun(unittest.TestCase):
 			'name': 'send',
 			'type': 'Result'
 			},
-			'template': [{
-			'attrs': {
-			'type': 'int'
-			}
-			}],
 			'argument': [{
 			'attrs': {
 			'type': 'Sequence',
@@ -191,19 +85,24 @@ class TestRun(unittest.TestCase):
 			'type': 'char'
 			}
 			}]
+			}],
+			'template': [{
+			'attrs': {
+			'type': 'int'
+			}
 			}]
 			}, {
 			'attrs': {
 			'type': 'MyType',
-			'name': 'var',
-			'category': 'variable'
+			'category': 'variable',
+			'name': 'var'
 			}
 			}, {
 			'attrs': {
 			'const': '',
 			'type': 'MyType',
-			'name': 'varConst',
-			'category': 'variable'
+			'category': 'variable',
+			'name': 'varConst'
 			},
 			'contract': [{
 			'attrs': {
@@ -213,21 +112,13 @@ class TestRun(unittest.TestCase):
 			}, {
 			'attrs': {
 			'type': 'MyType',
+			'category': 'variable',
 			'name': 'varInitialized',
-			'value': '42',
-			'category': 'variable'
+			'value': '42'
 			}
 			}]
-		}, {
-			'attrs': {
-			'comment': 'Return hello world!',
-			'category': 'method',
-			'name': 'hello'
-			},
-			'argument': []
 		}]
 
-		print(result)
 		self.assertListEqual(expected, result)
 
 
