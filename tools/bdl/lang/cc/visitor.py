@@ -53,13 +53,12 @@ class CcFormatter(Visitor):
 
 		content = (Path(__file__).parent / "template/file.h.template").read_text()
 		template = Template(content)
-		result["camelCase"] = CcFormatter.toCamelCase
-		result["typeToStr"] = CcFormatter.typeToStr
-		result["namespaceToStr"] = CcFormatter.namespaceToStr
-		result["normalComment"] = CcFormatter.normalComment
+		result.update({
+			"camelCase": CcFormatter.toCamelCase,
+			"typeToStr": CcFormatter.typeToStr,
+			"namespaceToStr": CcFormatter.namespaceToStr,
+			"normalComment": CcFormatter.normalComment
+		})
 		output = template.process(result)
-
-		print(output)
-		print(result)
 
 		return output
