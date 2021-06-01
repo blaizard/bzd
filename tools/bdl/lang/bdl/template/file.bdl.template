@@ -1,38 +1,40 @@
-{for path, _ in uses}
-use "{path}"
+{for use in useList}
+use "{use.path}"
 {end}
 
-{if namespace}
-namespace {namespace};
+{if isNamespace}
+{for namespace in namespaceList}
+namespace {namespace | namespaceToStr};
+{end}
 {end}
 
-{for name, data in using}
-{data.comment}
-using {name} = {data.type}{if not data.contracts.empty} [{for i, contract in data.contracts}{if i}, {end}{contract.comment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
+{for data in usingList}
+{data.comment | normalComment}
+using {data.name} = {data.type | typeToStr}{if not data.contracts.empty} [{for i, contract in data.contracts}{if i}, {end}{contract.comment | inlineComment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
 {end}
 
-{for methodName, method in methods}
-{method.comment}
-method {methodName}({for i, var in method.args}{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type}{end};
+{for method in methodList}
+{method.comment | normalComment}
+method {method.name}({for i, var in method.args}{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type | typeToStr}{end};
 {end}
 
-{for varName, var in variables}
-{var.comment}
-{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
+{for var in variableList}
+{var.comment | normalComment}
+{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment | inlineComment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
 {end}
 
-{for name, data in classes}
-{data.comment}
-{data.type} {name}
+{for data in nestedList}
+{data.comment | normalComment}
+{data.type} {data.name}
 {
-	{for methodName, method in data.nested.methods}
-	{method.comment}
-	method {methodName}({for i, var in method.args}{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type}{end};
+	{for method in data.nested.methodList}
+	{method.comment | normalComment}
+	method {method.name}({for i, var in method.args}{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type | typeToStr}{end};
 	{end}
 
-	{for varName, var in data.nested.variables}
-	{var.comment}
-	{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
+	{for var in data.nested.variableList}
+	{var.comment | normalComment}
+	{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment | inlineComment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
 	{end}
 }
 {end}

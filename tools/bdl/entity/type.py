@@ -13,14 +13,6 @@ class Type:
 		self.kind = element.getAttr("type").value
 		self.template = element.getNestedSequence("template")
 
-	def visit(self, visitor: typing.Type["Visitor"]) -> str:
-		"""
-		Creates a string from the type.
-		"""
-
-		return visitor(entity=self).result
-
-
 class Visitor(VisitorBase[str, str]):
 
 	nestedKind = "template"

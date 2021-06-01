@@ -51,6 +51,11 @@ class TestRun(unittest.TestCase):
 		result = template.process({"replace": ""})
 		self.assertEqual("{a}{}", result)
 
+	def testPipe(self) -> None:
+		template = Template("{str | lowerCase | capitalize }")
+		result = template.process({"str": "ThIs IS SOMEhting MesSy", "lowerCase": lambda x:x.lower(), "capitalize": lambda x:x.capitalize()})
+		self.assertEqual("This is somehting messy", result)
+
 
 if __name__ == '__main__':
 	unittest.main()

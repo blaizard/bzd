@@ -23,8 +23,15 @@ class Namespace:
 	def __init__(self, element: Element) -> None:
 
 		assertHasSequence(element=element, sequence="name")
-
 		self.element = element
+
+	@property
+	def symbol(self) -> str:
+		return self.nameList[-1]
+
+	@property
+	def category(self) -> str:
+		return "namespace"
 
 	@property
 	def nameList(self) -> typing.List[str]:

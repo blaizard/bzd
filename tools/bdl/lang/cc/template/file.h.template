@@ -2,41 +2,44 @@
 
 #include "tools/bdl/lang/cc/adapter/types.h"
 
-{for path, _ in uses}
-#include "{path}"
+{for use in useList}
+#include "{use.path}"
 {end}
 
-{if namespace}
-namespace {namespace} {
+{if isNamespace}
+{for namespace in namespaceList}
+namespace {namespace | namespaceToStr} {
+{end}
 {end}
 
-{for name, data in using}
-using {name} = {data.type};
+{for data in usingList}
+using {data.name} = {data.type | typeToStr};
 {end}
 
-{for name, data in classes}
-class {name}
+{for data in nestedList}
+{data.comment | normalComment}
+class {data.name}
 {
 public: // Methods.
 
-	{for methodName, method in data.nested.methods}
-	{method.comment}
-	virtual {method.type} {methodName}({for i, var in method.args}{if var.const}const {end}{var.type} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}) = 0;
+	{for method in data.nested.methodList}
+	{method.comment | normalComment}
+	virtual {method.type | typeToStr} {method.name}({for i, var in method.args}{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}) = 0;
 	{end}
 
 public: // Variable accessors.
 
-	{for varName, var in data.nested.variables}
+	{for var in data.nested.variableList}
 
-	// Getter for {varName}_.
-	constexpr const {var.type}& get{var.nameCamelCase}() const noexcept
+	// Getter for {var.name}_.
+	constexpr const {var.type | typeToStr}& get{var.name | camelCase}() const noexcept
 	{
-		return {varName}_;
+		return {var.name}_;
 	}
 
 	{if not var.const}
-	// Setter for {varName}_.
-	constexpr void set{var.nameCamelCase}(const {var.type}& value)
+	// Setter for {var.name}_.
+	constexpr void set{var.name | camelCase}(const {var.type | typeToStr}& value)
 	{
 		{for contract in var.contracts}
 		{if contract.type == "min"}
@@ -49,18 +52,18 @@ public: // Variable accessors.
 		{end}
 		{end}
 
-		{varName}_ = value;
+		{var.name}_ = value;
 	}
 	{end}
 	{end}
 
 protected: // Protected variable accessors.
 
-	{for varName, var in data.nested.variables}
+	{for var in data.nested.variableList}
 
 	{if var.const}
-	// Setter for {varName}_.
-	constexpr void set{var.nameCamelCase}(const {var.type}& value)
+	// Setter for {var.name}_.
+	constexpr void set{var.name | camelCase}(const {var.type | typeToStr}& value)
 	{
 		{for contract in var.contracts}
 		{if contract.type == "min"}
@@ -73,20 +76,20 @@ protected: // Protected variable accessors.
 		{end}
 		{end}
 
-		{varName}_ = value;
+		{var.name}_ = value;
 	}
 	{end}
 	{end}
 
 private: // Variables.
 
-	{for varName, var in data.nested.variables}
-	{var.comment}
-	{var.type} {varName}_{{{if var.isValue}{var.value}{end}}};
+	{for var in data.nested.variableList}
+	{var.comment | normalComment}
+	{var.type | typeToStr} {var.name}_{{{if var.isValue}{var.value}{end}}};
 	{end}
 }};
 {end}
 
-{if namespace}
+{if isNamespace}
 }
 {end}

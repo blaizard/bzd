@@ -2,14 +2,8 @@ import typing
 from pathlib import Path
 
 from tools.bdl.visitor import Visitor, ResultType
-from tools.bdl.entity.variable import Variable
-from tools.bdl.entity.nested import Nested
-from tools.bdl.entity.method import Method
-from tools.bdl.entity.using import Using
 from tools.bdl.entity.namespace import Namespace
-from tools.bdl.entity.use import Use
-from tools.bdl.entity.type import Visitor as VisitorType
-from bzd.parser.element import Element
+from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
 
 
@@ -31,105 +25,38 @@ class _VisitorType(VisitorType):
 
 class CcFormatter(Visitor):
 
-	def visitBegin(self, result: typing.Any) -> ResultType:
-		return {"variables": {}, "classes": {}, "methods": {}, "uses": {}, "using": {}, "namespace": False}
-
-	def toCamelCase(self, string: str) -> str:
+	@staticmethod
+	def toCamelCase(string: str) -> str:
 		assert len(string), "String cannot be empty."
 		return string[0].upper() + string[1:]
 
-	def visitComment(self, context: typing.Any, comment: typing.Optional[str]) -> str:
+	@staticmethod
+	def namespaceToStr(entity: Namespace) -> str:
+		return "::".join(entity.nameList)
 
+	@staticmethod
+	def typeToStr(entity: typing.Optional[Type]) -> str:
+		if entity is None:
+			return "void"
+		return _VisitorType(entity=entity).result
+
+	@staticmethod
+	def normalComment(comment: typing.Optional[str]) -> str:
 		if comment is None:
 			return ""
-
 		if len(comment.split("\n")) > 1:
 			return "/*\n{comment}\n */\n".format(
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def visitMethod(self, result: ResultType, element: Element, entity: Method) -> ResultType:
-
-		args = []
-		for arg in entity.args:
-			args.append({
-				"name": arg.name,
-				"nameCamelCase": self.toCamelCase(arg.name),
-				"const": arg.const,
-				"type": arg.type.visit(_VisitorType),
-				"value": arg.value,
-				"isValue": arg.isValue,
-				"comment": arg.comment,
-				"contracts": arg.contracts
-			})
-
-		name = entity.name
-		result["methods"][name] = {
-			"name": name,
-			"type": entity.type.visit(_VisitorType) if entity.type else "void",
-			"comment": entity.comment,
-			"args": args
-		}
-
-		return result
-
-	def visitVariable(self, result: ResultType, element: Element, entity: Variable) -> ResultType:
-
-		name = entity.name
-		result["variables"][name] = {
-			"name": name,
-			"nameCamelCase": self.toCamelCase(name),
-			"const": entity.const,
-			"type": entity.type.visit(_VisitorType),
-			"value": entity.value,
-			"isValue": entity.isValue,
-			"comment": entity.comment,
-			"contracts": entity.contracts
-		}
-
-		return result
-
-	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element,
-		entity: Nested) -> ResultType:
-
-		name = entity.name
-		result["classes"][name] = {
-			"name": name,
-			"nameCamelCase": self.toCamelCase(name),
-			"type": entity.type.visit(_VisitorType),
-			"comment": entity.comment,
-			"nested": entity.nested
-		}
-
-		return result
-
-	def visitUsing(self, result: ResultType, element: Element, entity: Using) -> ResultType:
-
-		name = entity.name
-		result["using"][name] = {
-			"name": name,
-			"contracts": entity.contracts,
-			"type": entity.type.visit(_VisitorType),
-			"comment": entity.comment,
-		}
-
-		return result
-
-	def visitNamespace(self, result: ResultType, element: Element, entity: Namespace) -> ResultType:
-
-		result["namespace"] = "::".join(entity.nameList)
-		return result
-
-	def visitUse(self, result: ResultType, entity: Use) -> ResultType:
-
-		result["uses"][entity.path.as_posix()] = True
-
-		return result
-
 	def visitFinal(self, result: ResultType) -> str:
 
 		content = (Path(__file__).parent / "template/file.h.template").read_text()
 		template = Template(content)
+		result["camelCase"] = CcFormatter.toCamelCase
+		result["typeToStr"] = CcFormatter.typeToStr
+		result["namespaceToStr"] = CcFormatter.namespaceToStr
+		result["normalComment"] = CcFormatter.normalComment
 		output = template.process(result)
 
 		print(output)

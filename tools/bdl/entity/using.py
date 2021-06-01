@@ -8,13 +8,20 @@ from tools.bdl.entity.contract import Contracts
 
 class Using:
 
-	def __init__(self, element: Element, visitor: typing.Any) -> None:
+	def __init__(self, element: Element) -> None:
 
 		assertHasAttr(element=element, attr="name")
 		assertHasAttr(element=element, attr="type")
 
 		self.element = element
-		self.visitor = visitor
+
+	@property
+	def symbol(self) -> str:
+		return self.name
+
+	@property
+	def category(self) -> str:
+		return "using"
 
 	@property
 	def name(self) -> str:
@@ -22,7 +29,7 @@ class Using:
 
 	@property
 	def contracts(self) -> Contracts:
-		return Contracts(sequence=self.element.getNestedSequence("contract"), visitor=self.visitor)
+		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
 	@property
 	def type(self) -> Type:
@@ -30,5 +37,4 @@ class Using:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		comment = self.visitor.visitComment(context=Using, comment=self.element.getAttrValue("comment"))
-		return typing.cast(typing.Optional[str], comment)
+		return self.element.getAttrValue("comment")
