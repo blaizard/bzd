@@ -6,6 +6,7 @@ from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
 
+
 class _VisitorType(VisitorType):
 
 	def visitTemplateItems(self, items: typing.List[str]) -> str:

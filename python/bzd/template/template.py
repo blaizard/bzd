@@ -2,8 +2,12 @@ import re
 import typing
 from pathlib import Path
 
-SubstitutionType = typing.Dict[str, typing.Any]
+# Can be anything, a dictionary, an object with properties...
+SubstitutionType = typing.Any
 Iterator = typing.Iterable[typing.Any]
+
+_defaultValue: typing.Any = {}
+
 """
 Process a template with specific values.
 All block {<action>} must end with {end}, actions can be:
@@ -12,7 +16,6 @@ All block {<action>} must end with {end}, actions can be:
 - {include <path>}: Include a template while processing the template.
 All strings "{{" are replace with "{".
 """
-
 
 class Template:
 
@@ -33,7 +36,7 @@ class Template:
 		self.patternEnd = re.compile("^end$")
 		self.patternWord = re.compile("[^\s]+")
 
-	def _getValue(self, args: SubstitutionType, key: str, param: typing.Any = {}) -> typing.Any:
+	def _getValue(self, args: SubstitutionType, key: str, param: typing.Any = _defaultValue) -> typing.Any:
 		"""
 		Return a value from the argument list given a key.
 		"""
@@ -47,7 +50,7 @@ class Template:
 			else:
 				raise Exception("Template value '{}' is not set.".format(key))
 
-			if param is not self._getValue.__defaults__[0]:
+			if param is not _defaultValue:
 				assert callable(args), "'{}' must be callable.".format(key)
 				args = args(param)
 			elif callable(args):

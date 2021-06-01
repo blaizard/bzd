@@ -13,6 +13,7 @@ class Type:
 		self.kind = element.getAttr("type").value
 		self.template = element.getNestedSequence("template")
 
+
 class Visitor(VisitorBase[str, str]):
 
 	nestedKind = "template"
