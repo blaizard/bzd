@@ -23,19 +23,22 @@ class ResultType:
 		self.ext: typing.Dict[str, typing.Any] = {}
 
 	def __setitem__(self, key: str, value: typing.Any) -> None:
-		setattr(self, key, value)
+		self.ext[key] = value
 
 	def __getitem__(self, key: str) -> typing.Any:
-		return getattr(self, key)
+		return self.ext[key]
 
 	def __delitem__(self, key: str) -> None:
-		self[key] = None
+		del self.ext[key]
 
-	def setExt(self, ext: typing.Any) -> None:
+	def __contains__(self, key: str) -> bool:
+		return key in self.ext
+
+	def update(self, ext: typing.Any) -> None:
 		"""
 		Set extensions.
 		"""
-		self.ext = ext
+		self.ext.update(ext)
 
 	def register(self, element: Element, entity: SymbolType) -> None:
 		"""

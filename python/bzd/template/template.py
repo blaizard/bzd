@@ -73,8 +73,6 @@ class Template:
 		def replaceValue(match: typing.Match[str]) -> str:
 			if match.group() not in ["and", "or", "not", "(", ")"]:
 
-				print(match.group(), args)
-
 				# Try to read the value
 				try:
 					value = self._getValue(args=args, key=match.group())

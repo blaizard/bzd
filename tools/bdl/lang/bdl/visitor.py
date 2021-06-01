@@ -54,13 +54,12 @@ class BdlFormatter(Visitor):
 
 		content = (Path(__file__).parent / "template/file.bdl.template").read_text()
 		template = Template(content)
-		result["typeToStr"] = BdlFormatter.typeToStr
-		result["namespaceToStr"] = BdlFormatter.namespaceToStr
-		result["inlineComment"] = BdlFormatter.inlineComment
-		result["normalComment"] = BdlFormatter.normalComment
+		result.update({
+			"typeToStr": BdlFormatter.typeToStr,
+			"namespaceToStr": BdlFormatter.namespaceToStr,
+			"inlineComment": BdlFormatter.inlineComment,
+			"normalComment": BdlFormatter.normalComment
+		})
 		output = template.process(result)
-
-		print(output)
-		print(result)
 
 		return output
