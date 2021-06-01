@@ -7,24 +7,30 @@ from tools.bdl.entity.type import Type
 
 class Nested:
 
-	def __init__(self, element: Element, nested: typing.List[typing.Any], visitor: typing.Any) -> None:
+	def __init__(self, element: Element, nested: typing.List[typing.Any]) -> None:
 
 		assertHasAttr(element=element, attr="name")
 		assertHasAttr(element=element, attr="type")
 
 		self.element = element
 		self.nested = nested
-		self.visitor = visitor
+
+	@property
+	def symbol(self) -> str:
+		return self.name
+
+	@property
+	def category(self) -> str:
+		return "nested"
 
 	@property
 	def name(self) -> str:
 		return self.element.getAttr("name").value
 
 	@property
-	def type(self) -> Type:
-		return Type(element=self.element)
+	def type(self) -> str:
+		return self.element.getAttr("type").value
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		comment = self.visitor.visitComment(context=Nested, comment=self.element.getAttrValue("comment"))
-		return typing.cast(typing.Optional[str], comment)
+		return self.element.getAttrValue("comment")

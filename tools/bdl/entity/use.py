@@ -14,5 +14,13 @@ class Use:
 		self.element = element
 
 	@property
+	def symbol(self) -> str:
+		return "@use@" + self.path.as_posix()
+
+	@property
+	def category(self) -> str:
+		return "use"
+
+	@property
 	def path(self) -> Path:
 		return Path(self.element.getAttr("value").value)

@@ -24,18 +24,22 @@ class Template:
 		self.includeDirs = includeDirs
 
 		# Pre-process regexpr
-		self.pattern = re.compile("{([^}{}]*)}")
+		self.pattern = re.compile("{([^}{]*)}")
 		self.patternIf = re.compile("^if\s+([^\{]+)$")
 		self.patternFor = re.compile("^for\s+([^\s]+)\s+in\s+([^\s]+)$")
 		self.patternForIndex = re.compile("^for\s+([^\s]+)\s*,\s*([^\s]+)\s+in\s+([^\s]+)$")
-		self.patternSet = re.compile("^[^\s]+$")
+		self.patternSet = re.compile("^([^\s]+(\s*|\*)?)+$")
 		self.patternInclude = re.compile("^include\s+([^\s]+)\s*$")
 		self.patternEnd = re.compile("^end$")
 		self.patternWord = re.compile("[^\s]+")
 
-	def _getValue(self, args: SubstitutionType, key: str) -> typing.Any:
+	def _getValue(self, args: SubstitutionType, key: str, param: typing.Any = {}) -> typing.Any:
+		"""
+		Return a value from the argument list given a key.
+		"""
 
 		for k in key.split("."):
+
 			if hasattr(args, k):
 				args = getattr(args, k)
 			elif k in args:
@@ -43,7 +47,10 @@ class Template:
 			else:
 				raise Exception("Template value '{}' is not set.".format(key))
 
-			if callable(args):
+			if param is not self._getValue.__defaults__[0]:
+				assert callable(args), "'{}' must be callable.".format(key)
+				args = args(param)
+			elif callable(args):
 				args = args()
 
 		return args
@@ -198,8 +205,13 @@ class Template:
 			# Set value
 			matchSet = self.patternSet.match(operation)
 			if matchSet:
+				matchList = [s.strip() for s in matchSet.group(0).split("|")]
+				assert len(matchList) > 0, "No valid item found in '{}'".format(matchSet.group(0))
 				if not ignoreOutput:
-					output += str(self._getValue(args, matchSet.group(0)))
+					value = self._getValue(args, matchList[0])
+					for item in matchList[1:]:
+						value = self._getValue(args, item, value)
+					output += str(value)
 				continue
 
 			raise Exception("Template operation '{}' is not valid.".format(operation))

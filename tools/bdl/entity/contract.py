@@ -7,12 +7,11 @@ from bzd.parser.error import handleFromElement, assertHasAttr
 
 class Contract:
 
-	def __init__(self, element: Element, visitor: typing.Any) -> None:
+	def __init__(self, element: Element) -> None:
 
 		assertHasAttr(element=element, attr="type")
 
 		self.element = element
-		self.visitor = visitor
 
 	@property
 	def type(self) -> str:
@@ -28,24 +27,22 @@ class Contract:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		comment = self.visitor.visitComment(context=Contract, comment=self.element.getAttrValue("comment"))
-		return typing.cast(typing.Optional[str], comment)
+		return self.element.getAttrValue("comment")
 
 
 class _VisitorContract(Visitor[Contract, typing.List[Contract]]):
 
 	nestedKind = None
 
-	def __init__(self, visitor: typing.Any) -> None:
+	def __init__(self) -> None:
 		self.uniqueTypes: typing.Set[str] = set()
-		self.visitor = visitor
 
 	def visitBegin(self, result: typing.Any) -> typing.List[Contract]:
 		return []
 
 	def visitElement(self, element: Element, result: typing.List[Contract]) -> typing.List[Contract]:
 
-		contract = Contract(element=element, visitor=self.visitor)
+		contract = Contract(element=element)
 
 		if contract.type in self.uniqueTypes:
 			handleFromElement(element=element, message="The contract type '{}' is set twice.".format(contract.type))
@@ -61,8 +58,8 @@ class Contracts:
 	A contract is an unsorted sequence of types associated with an optional value and/or commment.
 	"""
 
-	def __init__(self, sequence: typing.Optional[Sequence], visitor: typing.Any) -> None:
-		self.data = _VisitorContract(visitor=visitor).visit(sequence) if sequence else []
+	def __init__(self, sequence: typing.Optional[Sequence]) -> None:
+		self.data = _VisitorContract().visit(sequence) if sequence else []
 
 	def get(self, type: str) -> typing.Optional[Contract]:
 		"""

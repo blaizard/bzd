@@ -12,8 +12,87 @@ from tools.bdl.entity.using import Using
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.use import Use
 
-ResultType = typing.Dict[str, typing.Any]
+SymbolType = typing.Union[Variable, Nested, Method, Using, Namespace, Use]
 
+class ResultType:
+
+	def __init__(self):
+		self.symbolSet = set()
+		self.symbols: typing.List[SymbolType] = []
+		self.ext = {}
+
+	def __setitem__(self, key, value):
+		setattr(self, key, value)
+
+	def __getitem__(self, key):
+		return getattr(self, key)
+
+	def __delitem__(self, k):
+		self[k] = None
+
+	def setExt(self, ext: typing.Any) -> None:
+		"""
+		Set extensions.
+		"""
+		self.ext = ext
+
+	def register(self, entity: SymbolType) -> None:
+		"""
+		Register a symbol to the result type.
+		"""
+
+		if entity.symbol in self.symbolSet:
+			handleFromElement(element=element, message="Conflicting symbol '{}', already defined earlier.".format(entity.symbol))
+		self.symbolSet.add(entity.symbol)
+		self.symbols.append(entity)
+
+	@property
+	def isNested(self) -> bool:
+		return bool(self.nestedList)
+
+	@property
+	def nestedList(self) -> typing.List[Nested]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Nested)]
+
+	@property
+	def isVariable(self) -> bool:
+		return bool(self.variableList)
+
+	@property
+	def variableList(self) -> typing.List[Variable]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Variable)]
+
+	@property
+	def isMethod(self) -> bool:
+		return bool(self.methodList)
+
+	@property
+	def methodList(self) -> typing.List[Method]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Method)]
+
+	@property
+	def isUsing(self) -> bool:
+		return bool(self.usingList)
+
+	@property
+	def usingList(self) -> typing.List[Using]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Using)]
+
+	@property
+	def isNamespace(self) -> bool:
+		return bool(self.namespaceList)
+
+	@property
+	def namespaceList(self) -> typing.List[Namespace]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Namespace)]
+
+	@property
+	def isUse(self) -> bool:
+		return bool(self.useList)
+
+	@property
+	def useList(self) -> typing.List[Use]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Use)]
 
 class Visitor(VisitorBase[ResultType, str]):
 
@@ -22,15 +101,15 @@ class Visitor(VisitorBase[ResultType, str]):
 	def __init__(self) -> None:
 		self.level = 0
 		self.hasNamespace = False
-		self.type = None
 
-	def applyIndent(self, result: str) -> str:
-		"""
-		Helper function to add indentation to blocks.
-		"""
+	def registerSymbol(self, result: typing.Any, entity: SymbolType) -> None:
+		if entity.symbol in result["symbolsSet"]:
+			handleFromElement(element=element, message="Conflicting symbol '{}', already defined earlier.".format(entity.symbol))
+		result["symbolsSet"].add(entity.symbol)
+		result["symbols"].append(entity)
 
-		indent = "\t" * self.level
-		return "\n".join(["{}{}".format(indent, line) if len(line.strip()) else line for line in result.split("\n")])
+	def visitBegin(self, result: typing.Any) -> ResultType:
+		return ResultType()
 
 	def visitElement(self, element: Element, result: ResultType) -> ResultType:
 		"""
@@ -52,39 +131,38 @@ class Visitor(VisitorBase[ResultType, str]):
 
 			self.level -= 1
 
-			result = self.visitNestedEntities(result=result,
-				nestedResult=nestedResult,
-				element=element,
-				entity=Nested(element=element, nested=typing.cast(typing.List[typing.Any], nestedResult), visitor=self))
+			entity = self.visitNestedEntities(entity=Nested(element=element, nested=typing.cast(typing.List[typing.Any], nestedResult)))
+			result.register(entity=entity)
 
 		# Handle variable
 		elif element.getAttr("category").value == "variable":
 
-			result = self.visitVariable(result=result, element=element, entity=Variable(element=element, visitor=self))
+			entity = self.visitVariable(entity=Variable(element=element))
+			result.register(entity=entity)
 
 		# Handle method
 		elif element.getAttr("category").value == "method":
 
-			result = self.visitMethod(result=result, element=element, entity=Method(element=element, visitor=self))
+			entity = self.visitMethod(entity=Method(element=element))
+			result.register(entity=entity)
 
 		# Handle using
 		elif element.getAttr("category").value == "using":
 
-			result = self.visitUsing(result=result, element=element, entity=Using(element=element, visitor=self))
+			entity = self.visitUsing(entity=Using(element=element))
+			result.register(entity=entity)
 
 		# Handle namespace
 		elif element.getAttr("category").value == "namespace":
 
-			if self.hasNamespace:
-				handleFromElement(element=element, message="Only a single namespace can be specified per file.")
-			self.hasNamespace = True
-
-			result = self.visitNamespace(result=result, element=element, entity=Namespace(element=element))
+			entity = self.visitNamespace(entity=Namespace(element=element))
+			result.register(entity=entity)
 
 		# Handle use
 		elif element.getAttr("category").value == "use":
 
-			result = self.visitUse(result=result, entity=Use(element=element))
+			entity = self.visitUse(entity=Use(element=element))
+			result.register(entity=entity)
 
 		# Should never go here
 		else:
@@ -102,45 +180,44 @@ class Visitor(VisitorBase[ResultType, str]):
 
 		return comment
 
-	def visitNestedEntities(self, result: ResultType, nestedResult: ResultType, element: Element,
-		entity: Nested) -> ResultType:
+	def visitNestedEntities(self, entity: Nested) -> Nested:
 		"""
 		Called when discovering a nested entity.
 		"""
 
-		return result
+		return entity
 
-	def visitVariable(self, result: ResultType, element: Element, entity: Variable) -> ResultType:
+	def visitVariable(self, entity: Variable) -> Variable:
 		"""
 		Called when discovering a variable.
 		"""
 
-		return result
+		return entity
 
-	def visitMethod(self, result: ResultType, element: Element, entity: Method) -> ResultType:
+	def visitMethod(self, entity: Method) -> Method:
 		"""
 		Called when discovering a method.
 		"""
 
-		return result
+		return entity
 
-	def visitUsing(self, result: ResultType, element: Element, entity: Using) -> ResultType:
+	def visitUsing(self, entity: Using) -> Using:
 		"""
 		Called when discovering a using keyword.
 		"""
 
-		return result
+		return entity
 
-	def visitNamespace(self, result: ResultType, element: Element, entity: Namespace) -> ResultType:
+	def visitNamespace(self, entity: Namespace) -> Namespace:
 		"""
 		Called when discovering a namespace.
 		"""
 
-		return result
+		return entity
 
-	def visitUse(self, result: ResultType, entity: Use) -> ResultType:
+	def visitUse(self, entity: Use) -> Use:
 		"""
 		Called when discovering an use statement.
 		"""
 
-		return result
+		return entity
