@@ -14,21 +14,22 @@ from tools.bdl.entity.use import Use
 
 SymbolType = typing.Union[Variable, Nested, Method, Using, Namespace, Use]
 
+
 class ResultType:
 
-	def __init__(self):
-		self.symbolSet = set()
+	def __init__(self) -> None:
+		self.symbolSet: typing.Set[str] = set()
 		self.symbols: typing.List[SymbolType] = []
-		self.ext = {}
+		self.ext: typing.Dict[str, typing.Any] = {}
 
-	def __setitem__(self, key, value):
+	def __setitem__(self, key: str, value: typing.Any) -> None:
 		setattr(self, key, value)
 
-	def __getitem__(self, key):
+	def __getitem__(self, key: str) -> typing.Any:
 		return getattr(self, key)
 
-	def __delitem__(self, k):
-		self[k] = None
+	def __delitem__(self, key: str) -> None:
+		self[key] = None
 
 	def setExt(self, ext: typing.Any) -> None:
 		"""
@@ -36,13 +37,14 @@ class ResultType:
 		"""
 		self.ext = ext
 
-	def register(self, entity: SymbolType) -> None:
+	def register(self, element: Element, entity: SymbolType) -> None:
 		"""
 		Register a symbol to the result type.
 		"""
 
 		if entity.symbol in self.symbolSet:
-			handleFromElement(element=element, message="Conflicting symbol '{}', already defined earlier.".format(entity.symbol))
+			handleFromElement(element=element,
+				message="Conflicting symbol '{}', already defined earlier.".format(entity.symbol))
 		self.symbolSet.add(entity.symbol)
 		self.symbols.append(entity)
 
@@ -94,6 +96,7 @@ class ResultType:
 	def useList(self) -> typing.List[Use]:
 		return [symbol for symbol in self.symbols if isinstance(symbol, Use)]
 
+
 class Visitor(VisitorBase[ResultType, str]):
 
 	nestedKind = None
@@ -101,12 +104,6 @@ class Visitor(VisitorBase[ResultType, str]):
 	def __init__(self) -> None:
 		self.level = 0
 		self.hasNamespace = False
-
-	def registerSymbol(self, result: typing.Any, entity: SymbolType) -> None:
-		if entity.symbol in result["symbolsSet"]:
-			handleFromElement(element=element, message="Conflicting symbol '{}', already defined earlier.".format(entity.symbol))
-		result["symbolsSet"].add(entity.symbol)
-		result["symbols"].append(entity)
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return ResultType()
@@ -131,38 +128,39 @@ class Visitor(VisitorBase[ResultType, str]):
 
 			self.level -= 1
 
-			entity = self.visitNestedEntities(entity=Nested(element=element, nested=typing.cast(typing.List[typing.Any], nestedResult)))
-			result.register(entity=entity)
+			nested = self.visitNestedEntities(
+				entity=Nested(element=element, nested=typing.cast(typing.List[typing.Any], nestedResult)))
+			result.register(element=element, entity=nested)
 
 		# Handle variable
 		elif element.getAttr("category").value == "variable":
 
-			entity = self.visitVariable(entity=Variable(element=element))
-			result.register(entity=entity)
+			variable = self.visitVariable(entity=Variable(element=element))
+			result.register(element=element, entity=variable)
 
 		# Handle method
 		elif element.getAttr("category").value == "method":
 
-			entity = self.visitMethod(entity=Method(element=element))
-			result.register(entity=entity)
+			method = self.visitMethod(entity=Method(element=element))
+			result.register(element=element, entity=method)
 
 		# Handle using
 		elif element.getAttr("category").value == "using":
 
-			entity = self.visitUsing(entity=Using(element=element))
-			result.register(entity=entity)
+			using = self.visitUsing(entity=Using(element=element))
+			result.register(element=element, entity=using)
 
 		# Handle namespace
 		elif element.getAttr("category").value == "namespace":
 
-			entity = self.visitNamespace(entity=Namespace(element=element))
-			result.register(entity=entity)
+			namespace = self.visitNamespace(entity=Namespace(element=element))
+			result.register(element=element, entity=namespace)
 
 		# Handle use
 		elif element.getAttr("category").value == "use":
 
-			entity = self.visitUse(entity=Use(element=element))
-			result.register(entity=entity)
+			use = self.visitUse(entity=Use(element=element))
+			result.register(element=element, entity=use)
 
 		# Should never go here
 		else:
