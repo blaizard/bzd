@@ -208,4 +208,4 @@ for some critical messages that should not be missed.
 
 Some devices might require for example a discovery stage before assigning their addresses
 from the adaptor.
-!!! no supported yet
+!!! not supported yet

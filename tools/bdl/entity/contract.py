@@ -22,6 +22,20 @@ class Contract:
 		return self.element.getAttrValue("value")
 
 	@property
+	def valueNumber(self) -> float:
+		try:
+			return float(self.valueString)
+		except:
+			handleFromElement(element=self.element, message="Expected a valid number.")
+
+	@property
+	def valueString(self) -> str:
+		value = self.element.getAttrValue("value")
+		if value is None:
+			handleFromElement(element=self.element, message="A value must be present.")
+		return value
+
+	@property
 	def isValue(self) -> bool:
 		return self.element.isAttr("value")
 
@@ -61,12 +75,12 @@ class Contracts:
 	def __init__(self, sequence: typing.Optional[Sequence]) -> None:
 		self.data = _VisitorContract().visit(sequence) if sequence else []
 
-	def get(self, type: str) -> typing.Optional[Contract]:
+	def get(self, kind: str) -> typing.Optional[Contract]:
 		"""
 		Get a specific contract type if present.
 		"""
 		for contract in self.data:
-			if contract.type == type:
+			if contract.type == kind:
 				return contract
 		return None
 

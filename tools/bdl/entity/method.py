@@ -23,10 +23,6 @@ class Method:
 		return "method"
 
 	@property
-	def symbol(self) -> str:
-		return self.name
-
-	@property
 	def isType(self) -> bool:
 		return self.element.isAttr("type")
 

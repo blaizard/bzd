@@ -32,7 +32,7 @@ class SequenceParser(Sequence):
 	This represents a sequence of Elements.
 	"""
 
-	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional["Element"]) -> None:
+	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional["Element"]) -> None:
 		super().__init__()
 		self.parser = parser
 		self.grammar = grammar
@@ -53,7 +53,7 @@ class SequenceParser(Sequence):
 
 class Element:
 
-	def __init__(self, parser: "Parser", grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
+	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
 		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
@@ -139,3 +139,27 @@ class Element:
 			content += "\n{}:\n{}".format(kind, repr(sequence))
 
 		return content
+
+	@staticmethod
+	def fromDict(data: typing.Dict[str, typing.Any]) -> "Element":
+		"""
+		Create an element from a dictionary.
+		"""
+
+		def populateElement(element: Element, data: typing.Dict[str, typing.Any]) -> None:
+
+			# Add attributes
+			fragment = Fragment(0, {k: v for k, v in data.items() if not isinstance(v, list)})
+			element.add(fragment)
+
+			# Add nested sequences
+			for k, v in data.items():
+				if isinstance(v, list):
+					for nested in v:
+						nestedElement = element.makeElement(kind=k, grammar=[])
+						populateElement(element = nestedElement, data = nested)
+
+		element = Element(parser=None, grammar=[])
+		populateElement(element = element, data = data)
+
+		return element

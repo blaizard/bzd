@@ -1,7 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor, ResultType
+from tools.bdl.result import ResultType
+from tools.bdl.visitor import Visitor
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
@@ -18,6 +19,7 @@ class _VisitorType(VisitorType):
 		return "{}{}".format(kind, template)
 
 	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
+		print(kind)
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
@@ -49,6 +51,34 @@ class CcFormatter(Visitor):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
+	def chooseIntegerType(self, entity):
+		maybeContractMin = entity.contracts.get("min")
+		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
+		maybeContractMax = entity.contracts.get("max")
+		bits = 32
+		if maybeContractMax is not None:
+			maxValue = maybeContractMax.valueNumber
+			if maxValue < 2**8:
+				bits = 8
+			elif maxValue < 2**16:
+				bits = 16
+			elif maxValue < 2**32:
+				bits = 32
+			elif maxValue < 2**64:
+				bits = 64
+		if isSigned:
+			return "bzd::Int{}Type".format(bits)
+		return "bzd::UInt{}Type".format(bits)
+
+	def visitUsing(self, entity: "Using") -> "Using":
+		# Create strong types
+		if entity.type.name in ["Integer", "Float"]:
+			underlyingType = self.chooseIntegerType(entity)
+			newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying = underlyingType, name = entity.name)
+			Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name = entity.name)])
+			print("String type!", entity.name, newType)
+		return entity
+
 	def visitFinal(self, result: ResultType) -> str:
 
 		content = (Path(__file__).parent / "template/file.h.template").read_text()
@@ -59,6 +89,6 @@ class CcFormatter(Visitor):
 			"namespaceToStr": CcFormatter.namespaceToStr,
 			"normalComment": CcFormatter.normalComment
 		})
-		output = template.process(result)
+		output = template.process(result, removeEmptyLines=True)
 
 		return output

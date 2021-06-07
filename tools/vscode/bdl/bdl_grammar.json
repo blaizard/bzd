@@ -2,7 +2,31 @@
     "patterns": [
         {
             "match": "interface",
-            "name": "storage.class"
+            "name": "storage.type.class"
+        },
+        {
+            "match": "namespace",
+            "name": "storage.type.namespace"
+        },
+        {
+            "match": "method",
+            "name": "storage.type.function"
+        },
+        {
+            "match": "enum",
+            "name": "storage.type.enum"
+        },
+        {
+            "match": "use",
+            "name": "keyword.control"
+        },
+        {
+            "match": "using",
+            "name": "keyword.control"
+        },
+        {
+            "match": "const",
+            "name": "storage.modifier.const"
         },
         {
             "begin": "/\\*",
@@ -12,6 +36,11 @@
         {
             "match": "(//).*$\\n?",
             "name": "comment.line"
+        },
+        {
+            "begin": "\"",
+            "end": "\"",
+            "name": "string.quoted.double"
         }
     ],
     "scopeName": "source.bdl"

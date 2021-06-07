@@ -13,16 +13,9 @@ py_library(
 
 py_library(
     name = "visitor",
-    srcs = [
-        "entity/contract.py",
-        "entity/method.py",
-        "entity/namespace.py",
-        "entity/nested.py",
-        "entity/type.py",
-        "entity/use.py",
-        "entity/using.py",
-        "entity/variable.py",
+    srcs = glob(["entity/*.py"]) + [
         "visitor.py",
+        "result.py",
     ],
     visibility = [":__subpackages__"],
     deps = [

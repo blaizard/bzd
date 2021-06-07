@@ -16,10 +16,6 @@ class Variable:
 		self.element = element
 
 	@property
-	def symbol(self) -> str:
-		return self.name
-
-	@property
 	def category(self) -> str:
 		return "variable"
 

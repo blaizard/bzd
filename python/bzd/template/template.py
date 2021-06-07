@@ -104,7 +104,7 @@ class Template:
 		template = template.replace("{{", "\x01")
 		return template
 
-	def process(self, args: SubstitutionType, removeEmptyLines: bool = True, recursive: bool = False) -> str:
+	def process(self, args: SubstitutionType, removeEmptyLines: bool = False, recursive: bool = False) -> str:
 		processedTemplate = self.prepareTemplate(self.template)
 
 		# Process the template

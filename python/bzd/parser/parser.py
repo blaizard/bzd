@@ -43,7 +43,10 @@ class Parser:
 					break
 			if m is None:
 				# Uncomment for debug
-				# print(root)
+				#print(root)
+				#print(self.content[index:])
+				#for item in self.iterateGrammar(element.getGrammar()):
+				#	print(item.regexpr)
 				self.handleError(index=index, message="Invalid syntax.")
 			assert m is not None
 			index += m.end()
