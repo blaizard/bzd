@@ -70,7 +70,7 @@ class CcFormatter(Visitor):
 			return "bzd::Int{}Type".format(bits)
 		return "bzd::UInt{}Type".format(bits)
 
-	def visitUsing(self, entity: "Using") -> "Using":
+	def visitUsing_(self, entity: "Using") -> "Using":
 		# Create strong types
 		if entity.type.name in ["Integer", "Float"]:
 			underlyingType = self.chooseIntegerType(entity)

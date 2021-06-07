@@ -57,7 +57,7 @@ class Visitor(typing.Generic[T, U]):
 JsonType = typing.List[typing.Any]
 
 
-class VisitorJson(Visitor[JsonType, JsonType]):
+class VisitorSerialize(Visitor[JsonType, JsonType]):
 	"""
 	Converts a Sequence into a Json view.
 	"""
@@ -71,7 +71,8 @@ class VisitorJson(Visitor[JsonType, JsonType]):
 
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 
-		result.append({"attrs": {key: attr.value for key, attr in element.getAttrs().items()}})
+		result.append({"@": {key: {"v": attr.value, "i": attr.index} for key, attr in element.getAttrs().items()}})
 		for kind, sequence in element.getNestedSequences():
+			assert kind not in result[-1], "Conflicting nested sequence name '{}'.".format(kind)
 			result[-1][kind] = self.visit(sequence=sequence)
 		return result
