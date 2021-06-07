@@ -50,13 +50,8 @@ class SequenceParser(Sequence):
 		assert self.parent, "This sequence is at the top level."
 		return self.parent
 
-
-class Element:
-
-	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
-		self.parser = parser
-		self.grammar = grammar
-		self.parent = parent
+class ElementBase:
+	def __init__(self) -> None:
 		self.attrs: Attributes = {}
 		self.sequences: typing.Dict[str, SequenceParser] = {}
 
@@ -95,6 +90,47 @@ class Element:
 			return True
 		return False
 
+	def isNestedSequence(self, kind: str) -> bool:
+		"""
+		Check if a sequence exists.
+		"""
+		return bool(kind in self.sequences)
+
+	def getNestedSequence(self, kind: str) -> typing.Optional[SequenceParser]:
+		"""
+		Get a current sequence of None if it does not exists.
+		"""
+		assert kind != "@", "Nested sequence name '@' cannot be used."
+		return self.sequences.get(kind, None)
+
+	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, SequenceParser]]:
+		"""
+		Generator going through all sequences.
+		"""
+		for kind, sequence in self.sequences.items():
+			yield kind, sequence
+
+	def __repr__(self) -> str:
+		"""
+		Human readable string representation of the element.
+		"""
+		content = "<Element {}/>".format(" ".join(
+			["{}:{}=\"{}\"".format(key, attr.index, attr.value) for key, attr in self.attrs.items()]))
+
+		for kind, sequence in self.sequences.items():
+			content += "\n{}:\n{}".format(kind, repr(sequence))
+
+		return content
+
+# To be renamed ElementParser
+class Element(ElementBase):
+
+	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
+		super().__init__()
+		self.parser = parser
+		self.grammar = grammar
+		self.parent = parent
+
 	def add(self, fragment: Fragment) -> None:
 		"""
 		Add a new fragment to this element.
@@ -120,25 +156,6 @@ class Element:
 		assert isinstance(self.parent,
 			SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent
-
-	def isNestedSequence(self, kind: str) -> bool:
-		return bool(kind in self.sequences)
-
-	def getNestedSequence(self, kind: str) -> typing.Optional[SequenceParser]:
-		return self.sequences.get(kind, None)
-
-	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, SequenceParser]]:
-		for kind, sequence in self.sequences.items():
-			yield kind, sequence
-
-	def __repr__(self) -> str:
-		content = "<Element {}/>".format(" ".join(
-			["{}:{}=\"{}\"".format(key, attr.index, attr.value) for key, attr in self.attrs.items()]))
-
-		for kind, sequence in self.sequences.items():
-			content += "\n{}:\n{}".format(kind, repr(sequence))
-
-		return content
 
 	@staticmethod
 	def fromDict(data: typing.Dict[str, typing.Any]) -> "Element":

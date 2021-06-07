@@ -7,7 +7,7 @@ from bzd.parser.parser import Parser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentComment
 from bzd.parser.element import Element
-from bzd.parser.visitor import VisitorJson
+from bzd.parser.visitor import VisitorSerialize
 
 # Simple Grammar
 
@@ -43,33 +43,9 @@ class TestRun(unittest.TestCase):
 		parser = Parser(self.filePath, _grammar, [GrammarItemSpaces] + _grammarComment)
 		data = parser.parse()
 
-		visitor = VisitorJson()
+		visitor = VisitorSerialize()
 		result = visitor.visit(data)
-		expected = [{
-			'attrs': {
-			'comment': 'I am a comment',
-			'const': '',
-			'variable': '',
-			'kind': 'int',
-			'name': 'myVar',
-			'value': '42'
-			}
-		}, {
-			'attrs': {
-			'function': '',
-			'return': 'void',
-			'name': 'hello'
-			},
-			'nested': [{
-			'attrs': {
-			'comment': 'I am a nested comment',
-			'variable': '',
-			'kind': 'float',
-			'name': 'nestedVar',
-			'value': '2'
-			}
-			}]
-		}]
+		expected = [{'@': {'comment': {'v': 'I am a comment', 'i': 0}, 'const': {'v': '', 'i': 18}, 'variable': {'v': '', 'i': 24}, 'kind': {'v': 'int', 'i': 24}, 'name': {'v': 'myVar', 'i': 28}, 'value': {'v': '42', 'i': 36}}}, {'@': {'function': {'v': '', 'i': 40}, 'return': {'v': 'void', 'i': 40}, 'name': {'v': 'hello', 'i': 45}}, 'nested': [{'@': {'comment': {'v': 'I am a nested comment', 'i': 63}, 'variable': {'v': '', 'i': 96}, 'kind': {'v': 'float', 'i': 96}, 'name': {'v': 'nestedVar', 'i': 102}, 'value': {'v': '2', 'i': 114}}}]}]
 
 		self.assertListEqual(expected, result)
 

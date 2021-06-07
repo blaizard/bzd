@@ -4,13 +4,10 @@ The following describes the the Bzd Description Language (BDL) used to describe 
 
 ## Use Cases
 
-Provide an interface to communicate within the same application between components.
-Ability to communication between applications and programming languages.
-
-Also, interfaces should be described once but the possibility to generate code in the different
-language reduces the possibility of errors and reduces the amount of boiler plate code.
-
-Enforce contracts for input and outputs of the components.
+The following use cases are coverd by this description language:
+- Provide an inter-core/inter-language communication mean between components.
+- Reduce boiler plate for interfaces.
+- Enfore input/output constraints (contracts).
 
 For example:
 - Describe API for REST-based communication between client and server.
@@ -23,8 +20,8 @@ For example:
 The following built-in types are made available by the implementation as built-in types.
 
 - Boolean
-- Integer
-- Float
+- Integer (*)
+- Float (*)
 - String
 - Optional<T>
 - Result<T, E>
@@ -33,6 +30,8 @@ The following built-in types are made available by the implementation as built-i
 - Tuple<T, U, ...>
 - Variant<T, U, ...>
 - Callable
+
+(*) These types cannot be used directly and need to be used through a `using` statement to enforce strong typing.
 
 ### Structures
 
@@ -79,17 +78,34 @@ import "cc/bzd/core/my_interface.bdl"
 
 A variable is defined as follow:
 ```
-[const] <type> <name> [= <value>] [[<constraints>...]];
+[const] <type> <name> [= <value>] [[<contracts>...]];
 ```
 
 ## Methods
 
 A function is defined as follow:
 ```
-method <name>(<variable1>, ...) [-> <type>] [[<constraints>...]];
+method <name>(<variable1>, ...) [-> <type>] [[<contracts>...]];
 ```
 
 ## Interfaces
 
 Interfaces are pure virtual classes that are defined with the keywork `interface`.
 It contains children which can be either functions or variables.
+
+## Module
+
+A module is basically an implementation of an interface. It can be instantiated and exposes
+the functionality of the interface it inherits from.
+In addition it expose things like configuration details, dependencies... to the description language.
+
+For example:
+```
+namespace bzd.platform.impl;
+
+module MyModule : bzd.platform.Reader
+{
+config:
+	Integer channel [template];
+}
+```
