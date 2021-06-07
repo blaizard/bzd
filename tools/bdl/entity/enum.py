@@ -18,19 +18,28 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		return result
 
 
-class Namespace:
+class Enum:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasSequence(element=element, sequence="name")
+		assertHasAttr(element=element, attr="name")
+		assertHasSequence(element=element, sequence="values")
 		self.element = element
 
 	@property
-	def category(self) -> str:
-		return "namespace"
+	def name(self) -> str:
+		return self.element.getAttr("name").value
 
 	@property
-	def nameList(self) -> typing.List[str]:
-		sequence = self.element.getNestedSequence("name")
+	def category(self) -> str:
+		return "enum"
+
+	@property
+	def comment(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("comment")
+
+	@property
+	def valueList(self) -> typing.List[str]:
+		sequence = self.element.getNestedSequence("values")
 		assert sequence is not None
 		return _Visitor().visit(sequence=sequence)

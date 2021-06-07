@@ -3,9 +3,7 @@ use "{use.path}"
 {end}
 
 {if isNamespace}
-{for namespace in namespaceList}
 namespace {namespace | namespaceToStr};
-{end}
 {end}
 
 {for data in usingList}
@@ -23,10 +21,26 @@ method {method.name}({for i, var in method.args}{if var.const}const {end}{var.ty
 {if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if not var.contracts.empty} [{for i, contract in var.contracts}{if i}, {end}{contract.comment | inlineComment}{contract.type}{if contract.isValue} = {contract.value}{end}{end}]{end};
 {end}
 
+{for data in enumList}
+{data.comment | normalComment}
+enum {data.name}
+{
+	{for i, value in data.valueList}{if i}, {end}{value}{end}
+}
+{end}
+
 {for data in nestedList}
 {data.comment | normalComment}
 {data.type} {data.name}
 {
+	{for enum in data.nested.enumList}
+	{enum.comment | normalComment}
+	enum {enum.name}
+	{
+		{for i, value in enum.valueList}{if i}, {end}{value}{end}
+	}
+	{end}
+
 	{for method in data.nested.methodList}
 	{method.comment | normalComment}
 	method {method.name}({for i, var in method.args}{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}){if method.isType} -> {method.type | typeToStr}{end};

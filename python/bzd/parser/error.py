@@ -12,7 +12,10 @@ class ExceptionParser(Exception):
 		super().__init__(message)
 
 
-def handleError(parser: "Parser", index: int, message: str) -> None:
+def handleError(parser: typing.Optional["Parser"], index: int, message: str) -> None:
+	if parser is None:
+		raise ExceptionParser(message=message)
+
 	contentByLine = parser.content.split("\n")
 	# Identify the line and column
 	current = 0

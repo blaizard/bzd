@@ -16,10 +16,6 @@ class Nested:
 		self.nested = nested
 
 	@property
-	def symbol(self) -> str:
-		return self.name
-
-	@property
 	def category(self) -> str:
 		return "nested"
 

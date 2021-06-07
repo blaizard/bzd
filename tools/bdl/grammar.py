@@ -150,6 +150,29 @@ def makeGrammarUsing() -> Grammar:
 	]
 
 
+def makeGrammarEnum() -> Grammar:
+	"""
+	Generate a grammar for an enum, it accepts the following format:
+	enum name { VALUE1 [,VALUE2 [,...]] }
+	"""
+
+	class EnumStart(FragmentNestedStart):
+		nestedName = "values"
+
+	return [
+		GrammarItem(r"enum", {"category": "enum"}, [
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r"{", EnumStart, [
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"}", FragmentNestedStop),
+		])
+		])
+		])
+		])
+	]
+
+
 def makeGrammarNamespace() -> Grammar:
 	"""
 	Generate a grammar for namespace, it accepts the following format:
@@ -188,6 +211,7 @@ class Parser(ParserBase):
 
 	def __init__(self, path: Path) -> None:
 		super().__init__(path,
-			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarVariable() +
-			makeGrammarMethod() + makeGrammarNested(makeGrammarVariable() + makeGrammarMethod()),
+			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarEnum() +
+			makeGrammarVariable() + makeGrammarMethod() +
+			makeGrammarNested(makeGrammarEnum() + makeGrammarVariable() + makeGrammarMethod()),
 			defaultGrammar=[GrammarItemSpaces] + _grammarComments)

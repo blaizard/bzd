@@ -1,4 +1,8 @@
 namespace bzd.manifest;
+enum Test
+{
+	ELLL
+}
 interface MyInterface
 {
 	method start(int a) -> int;

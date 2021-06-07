@@ -4,7 +4,7 @@
 
 int main()
 {
-	static bzd::platform::core::Linux<100000> linux{};
+	static bzd::platform::core::Linux<100000> linux{1};
 	auto workload = []() { std::cout << "Workload" << std::endl; };
 	linux.run(static_cast<Callable>(workload));
 

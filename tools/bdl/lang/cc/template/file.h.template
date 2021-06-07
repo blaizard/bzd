@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cassert>
 
 #include "tools/bdl/lang/cc/adapter/types.h"
@@ -7,19 +9,34 @@
 {end}
 
 {if isNamespace}
-{for namespace in namespaceList}
 namespace {namespace | namespaceToStr} {
-{end}
 {end}
 
 {for data in usingList}
 using {data.name} = {data.type | typeToStr};
 {end}
 
+{for data in enumList}
+{data.comment | normalComment}
+enum class {data.name}
+{
+	{for i, value in data.valueList}{if i}, {end}{value}{end}
+};
+{end}
+
 {for data in nestedList}
 {data.comment | normalComment}
 class {data.name}
 {
+public: // Types
+	{for enum in data.nested.enumList}
+	{enum.comment | normalComment}
+	enum class {enum.name}
+	{
+		{for i, value in enum.valueList}{if i}, {end}{value}{end}
+	};
+	{end}
+
 public: // Methods.
 
 	{for method in data.nested.methodList}

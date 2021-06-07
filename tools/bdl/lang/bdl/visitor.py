@@ -1,7 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitor import Visitor, ResultType
+from tools.bdl.result import ResultType
+from tools.bdl.visitor import Visitor
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
@@ -60,6 +61,6 @@ class BdlFormatter(Visitor):
 			"inlineComment": BdlFormatter.inlineComment,
 			"normalComment": BdlFormatter.normalComment
 		})
-		output = template.process(result)
+		output = template.process(result, removeEmptyLines=True)
 
 		return output
