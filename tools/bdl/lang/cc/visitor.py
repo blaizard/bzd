@@ -4,6 +4,7 @@ from pathlib import Path
 from tools.bdl.result import ResultType
 from tools.bdl.visitor import Visitor
 from tools.bdl.entity.namespace import Namespace
+from tools.bdl.entity.using import Using
 from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
 
@@ -51,7 +52,7 @@ class CcFormatter(Visitor):
 				comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 		return "// {comment}\n".format(comment=comment)
 
-	def chooseIntegerType(self, entity):
+	def chooseIntegerType(self, entity: Using) -> str:
 		maybeContractMin = entity.contracts.get("min")
 		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
 		maybeContractMax = entity.contracts.get("max")
@@ -70,12 +71,12 @@ class CcFormatter(Visitor):
 			return "bzd::Int{}Type".format(bits)
 		return "bzd::UInt{}Type".format(bits)
 
-	def visitUsing_(self, entity: "Using") -> "Using":
+	def visitUsing_(self, entity: Using) -> Using:
 		# Create strong types
 		if entity.type.name in ["Integer", "Float"]:
 			underlyingType = self.chooseIntegerType(entity)
 			newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying=underlyingType, name=entity.name)
-			Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name=entity.name)])
+			#Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name=entity.name)])
 			print("String type!", entity.name, newType)
 		return entity
 

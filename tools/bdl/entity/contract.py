@@ -33,7 +33,7 @@ class Contract:
 		value = self.element.getAttrValue("value")
 		if value is None:
 			Error.handleFromElement(element=self.element, message="A value must be present.")
-			return "" # To make mypy happy
+		assert value is not None
 		return value
 
 	@property

@@ -78,7 +78,8 @@ class Element:
 		e = Element()
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
-		e.sequences = {key: Sequence.fromSerialize(sequence) for key, sequence in element.items() if key != "@"} # type: ignore
+		e.sequences = {key: Sequence.fromSerialize(sequence) # type: ignore
+			for key, sequence in element.items() if key != "@"}
 		return e
 
 	def isEmpty(self) -> bool:
