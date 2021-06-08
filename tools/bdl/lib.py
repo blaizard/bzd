@@ -8,7 +8,6 @@ from tools.bdl.grammar import Parser
 
 formatters = {"bdl": BdlFormatter, "cc": CcFormatter}
 
-
 def main(formatType: str, inputs: typing.List[Path]) -> str:
 
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
