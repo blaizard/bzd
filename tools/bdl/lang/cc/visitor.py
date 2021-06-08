@@ -74,8 +74,8 @@ class CcFormatter(Visitor):
 		# Create strong types
 		if entity.type.name in ["Integer", "Float"]:
 			underlyingType = self.chooseIntegerType(entity)
-			newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying = underlyingType, name = entity.name)
-			Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name = entity.name)])
+			newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying=underlyingType, name=entity.name)
+			Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name=entity.name)])
 			print("String type!", entity.name, newType)
 		return entity
 

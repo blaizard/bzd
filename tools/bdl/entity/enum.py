@@ -1,7 +1,7 @@
 import typing
 
 from bzd.parser.element import Element, Sequence
-from bzd.parser.error import assertHasSequence, assertHasAttr
+from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
 
@@ -13,7 +13,7 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		return []
 
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
-		assertHasAttr(element=element, attr="name")
+		Error.assertHasAttr(element=element, attr="name")
 		result.append(element.getAttr("name").value)
 		return result
 
@@ -22,8 +22,8 @@ class Enum:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasAttr(element=element, attr="name")
-		assertHasSequence(element=element, sequence="values")
+		Error.assertHasAttr(element=element, attr="name")
+		Error.assertHasSequence(element=element, sequence="values")
 		self.element = element
 
 	@property

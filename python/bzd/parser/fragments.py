@@ -1,16 +1,39 @@
 import re
-from typing import Dict, Mapping, MutableMapping, Optional, TYPE_CHECKING
+from typing import cast, Dict, Mapping, MutableMapping, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from bzd.parser.element import Element
+	from bzd.parser.element import ElementParser
 	from bzd.parser.grammar import Grammar
+
+AttributeSerialize = MutableMapping[str, Union[int, str]]
+AttributesSerialize = Dict[str, AttributeSerialize]
 
 
 class Attribute:
 
-	def __init__(self, index: int, value: str):
-		self.index = index
-		self.value = value
+	def __init__(self, data: AttributeSerialize) -> None:
+		self.data = data
+
+	@property
+	def index(self) -> int:
+		return cast(int, self.data["i"])
+
+	@property
+	def value(self) -> str:
+		return cast(str, self.data["v"])
+
+	@staticmethod
+	def fromSerialize(attribute: AttributeSerialize) -> "Attribute":
+		"""
+		Create an attribute from a serialized attribute.
+		"""
+		return Attribute(attribute)
+
+
+class AttributeParser(Attribute):
+
+	def __init__(self, index: int, value: str) -> None:
+		super().__init__({"v": value, "i": index})
 
 
 Attributes = MutableMapping[str, Attribute]
@@ -36,7 +59,7 @@ class Fragment:
 		"""
 		for key, value in self.attrs.items():
 			assert key not in attrs, "Attribute '{}' already set".format(key)
-			attrs[key] = Attribute(index=self.index, value=value)
+			attrs[key] = AttributeParser(index=self.index, value=value)
 
 	def process(self) -> None:
 		"""
@@ -44,7 +67,7 @@ class Fragment:
 		"""
 		pass
 
-	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		"""
 		Returns the next element for the next entity.
 		This is where elements can be terminated and new ones can be generated.
@@ -76,9 +99,10 @@ class FragmentComment(Fragment):
 
 			# Append the comments
 			if key in attrs:
-				attrs[key].value += "\n\n{}".format(updatedValue)
+				attrs[key] = AttributeParser(index=attrs[key].index,
+					value=attrs[key].value + "\n\n{}".format(updatedValue))
 			else:
-				attrs[key] = Attribute(index=self.index, value=updatedValue)
+				attrs[key] = AttributeParser(index=self.index, value=updatedValue)
 
 
 class FragmentNewElement(Fragment):
@@ -86,7 +110,7 @@ class FragmentNewElement(Fragment):
 	Helper fragment to create a new element.
 	"""
 
-	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		return element.getSequence().makeElement()
 
 
@@ -95,7 +119,7 @@ class FragmentParentElement(Fragment):
 	Helper fragment to continue on the parent element.
 	"""
 
-	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		return element.getSequence().getElement()
 
 
@@ -106,7 +130,7 @@ class FragmentNestedStart(Fragment):
 
 	nestedName = "nested"
 
-	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		assert grammar is not None, "Grammar must be set"
 		return element.makeElement(self.nestedName, grammar)
 
@@ -116,5 +140,5 @@ class FragmentNestedStop(Fragment):
 	Helper fragment to stop a nested sequence.
 	"""
 
-	def next(self, element: "Element", grammar: Optional["Grammar"]) -> "Element":
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		return element.getSequence().getElement().getSequence().makeElement()

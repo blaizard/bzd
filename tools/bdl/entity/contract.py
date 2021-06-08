@@ -2,15 +2,14 @@ import typing
 
 from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor
-from bzd.parser.error import handleFromElement, assertHasAttr
+from bzd.parser.error import Error
 
 
 class Contract:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasAttr(element=element, attr="type")
-
+		Error.assertHasAttr(element=element, attr="type")
 		self.element = element
 
 	@property
@@ -26,13 +25,15 @@ class Contract:
 		try:
 			return float(self.valueString)
 		except:
-			handleFromElement(element=self.element, message="Expected a valid number.")
+			Error.handleFromElement(element=self.element, message="Expected a valid number.")
+		return 0.0 # To make mypy happy
 
 	@property
 	def valueString(self) -> str:
 		value = self.element.getAttrValue("value")
 		if value is None:
-			handleFromElement(element=self.element, message="A value must be present.")
+			Error.handleFromElement(element=self.element, message="A value must be present.")
+			return "" # To make mypy happy
 		return value
 
 	@property
@@ -59,7 +60,8 @@ class _VisitorContract(Visitor[Contract, typing.List[Contract]]):
 		contract = Contract(element=element)
 
 		if contract.type in self.uniqueTypes:
-			handleFromElement(element=element, message="The contract type '{}' is set twice.".format(contract.type))
+			Error.handleFromElement(element=element,
+				message="The contract type '{}' is set twice.".format(contract.type))
 		self.uniqueTypes.add(contract.type)
 
 		result.append(contract)

@@ -1,9 +1,12 @@
 import typing
 
-from bzd.parser.fragments import Fragment, Attributes, Attribute
+from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributesSerialize
 from bzd.parser.grammar import Grammar
 if typing.TYPE_CHECKING:
 	from bzd.parser.parser import Parser
+
+ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
+SequenceSerialize = typing.List[ElementSerialize]
 
 
 class Sequence:
@@ -26,34 +29,57 @@ class Sequence:
 			listStr.append(formattedStr)
 		return "\n".join(listStr)
 
+	@staticmethod
+	def fromSerialize(sequence: SequenceSerialize) -> "Sequence":
+		"""
+		Create a sequence from a serialized sequence.
+		"""
+		s = Sequence()
+		s.list = [Element.fromSerialize(e) for e in sequence]
+		return s
+
 
 class SequenceParser(Sequence):
 	"""
 	This represents a sequence of Elements.
 	"""
 
-	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional["Element"]) -> None:
+	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar,
+		parent: typing.Optional["ElementParser"]) -> None:
 		super().__init__()
 		self.parser = parser
 		self.grammar = grammar
 		self.parent = parent
 
-	def makeElement(self) -> "Element":
-		element = Element(parser=self.parser, grammar=self.grammar, parent=self)
+	def makeElement(self) -> "ElementParser":
+		element = ElementParser(parser=self.parser, grammar=self.grammar, parent=self)
 		self.list.append(element)
 		return element
 
 	def getGrammar(self) -> Grammar:
 		return self.grammar
 
-	def getElement(self) -> "Element":
+	def getElement(self) -> "ElementParser":
 		assert self.parent, "This sequence is at the top level."
 		return self.parent
 
-class ElementBase:
+
+class Element:
+
 	def __init__(self) -> None:
 		self.attrs: Attributes = {}
-		self.sequences: typing.Dict[str, SequenceParser] = {}
+		self.sequences: typing.Dict[str, Sequence] = {}
+
+	@staticmethod
+	def fromSerialize(element: ElementSerialize) -> "Element":
+		"""
+		Create an element from a serialized element.
+		"""
+		e = Element()
+		assert isinstance(element["@"], dict)
+		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
+		e.sequences = {key: Sequence.fromSerialize(sequence) for key, sequence in element.items() if key != "@"} # type: ignore
+		return e
 
 	def isEmpty(self) -> bool:
 		"""
@@ -96,14 +122,14 @@ class ElementBase:
 		"""
 		return bool(kind in self.sequences)
 
-	def getNestedSequence(self, kind: str) -> typing.Optional[SequenceParser]:
+	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
 		"""
 		Get a current sequence of None if it does not exists.
 		"""
 		assert kind != "@", "Nested sequence name '@' cannot be used."
 		return self.sequences.get(kind, None)
 
-	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, SequenceParser]]:
+	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
 		"""
 		Generator going through all sequences.
 		"""
@@ -122,10 +148,13 @@ class ElementBase:
 
 		return content
 
-# To be renamed ElementParser
-class Element(ElementBase):
 
-	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar, parent: typing.Optional[SequenceParser] = None) -> None:
+class ElementParser(Element):
+
+	def __init__(self,
+		parser: typing.Optional["Parser"],
+		grammar: Grammar,
+		parent: typing.Optional[SequenceParser] = None) -> None:
 		super().__init__()
 		self.parser = parser
 		self.grammar = grammar
@@ -146,10 +175,10 @@ class Element(ElementBase):
 	def getGrammar(self) -> Grammar:
 		return self.grammar
 
-	def makeElement(self, kind: str, grammar: Grammar) -> "Element":
+	def makeElement(self, kind: str, grammar: Grammar) -> "ElementParser":
 		if kind not in self.sequences:
 			self.sequences[kind] = SequenceParser(parser=self.parser, grammar=grammar, parent=self)
-		return self.sequences[kind].makeElement()
+		return typing.cast(SequenceParser, self.sequences[kind]).makeElement()
 
 	def getSequence(self) -> SequenceParser:
 		assert self.parent is not None, "reached parent element"
@@ -158,12 +187,12 @@ class Element(ElementBase):
 		return self.parent
 
 	@staticmethod
-	def fromDict(data: typing.Dict[str, typing.Any]) -> "Element":
+	def fromDict(data: typing.Dict[str, typing.Any]) -> "ElementParser":
 		"""
 		Create an element from a dictionary.
 		"""
 
-		def populateElement(element: Element, data: typing.Dict[str, typing.Any]) -> None:
+		def populateElement(element: ElementParser, data: typing.Dict[str, typing.Any]) -> None:
 
 			# Add attributes
 			fragment = Fragment(0, {k: v for k, v in data.items() if not isinstance(v, list)})
@@ -174,9 +203,9 @@ class Element(ElementBase):
 				if isinstance(v, list):
 					for nested in v:
 						nestedElement = element.makeElement(kind=k, grammar=[])
-						populateElement(element = nestedElement, data = nested)
+						populateElement(element=nestedElement, data=nested)
 
-		element = Element(parser=None, grammar=[])
-		populateElement(element = element, data = data)
+		element = ElementParser(parser=None, grammar=[])
+		populateElement(element=element, data=data)
 
 		return element

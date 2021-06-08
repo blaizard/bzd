@@ -1,6 +1,8 @@
 import typing
+from pathlib import Path
 
 from bzd.parser.element import Sequence, Element
+from bzd.parser.error import Error
 
 T = typing.TypeVar("T")
 U = typing.TypeVar("U")
@@ -20,7 +22,8 @@ class Visitor(typing.Generic[T, U]):
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, sequence: Sequence) -> U:
+	def visit(self, sequence: Sequence, path: typing.Optional[Path] = None) -> U:
+		Error.setContext(path=path)
 		result = self._visit(sequence=sequence)
 		return self.visitFinal(result=result)
 

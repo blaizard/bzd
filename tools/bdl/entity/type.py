@@ -2,23 +2,20 @@ import typing
 
 from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
-from bzd.parser.error import handleFromElement, assertHasAttr
+from bzd.parser.error import Error
 
 
 class Type:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasAttr(element=element, attr="type")
+		Error.assertHasAttr(element=element, attr="type")
 		self.kind = element.getAttr("type").value
 		self.template = element.getNestedSequence("template")
 
 	@staticmethod
 	def makeCustom(kind: str, template: typing.Optional[typing.List[str]] = None) -> "Type":
-		element = Element.fromDict({
-			"kind": kind,
-			"nested": [{"name": t} for t in template] if template else []
-		})
+		element = Element.fromDict({"kind": kind, "nested": [{"name": t} for t in template] if template else []})
 		print(element)
 
 	@property
@@ -48,7 +45,7 @@ class Visitor(VisitorBase[str, str]):
 		return self.visitTemplateItems(items=result)
 
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
-		assertHasAttr(element=element, attr="type")
+		Error.assertHasAttr(element=element, attr="type")
 		result.append(self.visitType(kind=element.getAttr("type").value, comment=element.getAttrValue("comment")))
 		return result
 
