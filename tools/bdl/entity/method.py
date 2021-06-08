@@ -1,7 +1,7 @@
 import typing
 
 from bzd.parser.element import Element
-from bzd.parser.error import assertHasAttr
+from bzd.parser.error import Error
 from tools.bdl.entity.type import Type
 from tools.bdl.entity.variable import Variable
 
@@ -10,8 +10,7 @@ class Method:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasAttr(element=element, attr="name")
-
+		Error.assertHasAttr(element=element, attr="name")
 		self.element = element
 
 	@property

@@ -9,9 +9,7 @@ interface Core
 	// Error codes for core-related functionality.
 	enum Error
 	{
-		UNINITIALIZED,
-		ALIGNMENT,
-		SIZE
+		UNINITIALIZED, ALIGNMENT, SIZE
 	}
 	// Initialize the core.
 	method init();

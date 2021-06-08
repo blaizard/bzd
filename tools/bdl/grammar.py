@@ -209,8 +209,8 @@ _grammarComments = [
 
 class Parser(ParserBase):
 
-	def __init__(self, path: Path) -> None:
-		super().__init__(path,
+	def __init__(self, content: str) -> None:
+		super().__init__(content,
 			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarEnum() +
 			makeGrammarVariable() + makeGrammarMethod() +
 			makeGrammarNested(makeGrammarEnum() + makeGrammarVariable() + makeGrammarMethod()),

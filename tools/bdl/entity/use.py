@@ -2,15 +2,14 @@ import typing
 from pathlib import Path
 
 from bzd.parser.element import Element
-from bzd.parser.error import assertHasAttr
+from bzd.parser.error import Error
 
 
 class Use:
 
 	def __init__(self, element: Element) -> None:
 
-		assertHasAttr(element=element, attr="value")
-
+		Error.assertHasAttr(element=element, attr="value")
 		self.element = element
 
 	@property

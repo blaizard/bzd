@@ -1,22 +1,33 @@
 import re
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator, Type
 
 from bzd.parser.element import SequenceParser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
-from bzd.parser.error import handleError
+from bzd.parser.error import Error
 
 
 class Parser:
 
-	def __init__(self, path: Path, grammar: Grammar, defaultGrammar: Grammar = [GrammarItemSpaces]) -> None:
-		self.path = path
+	def __init__(self, content: str, grammar: Grammar, defaultGrammar: Grammar = [GrammarItemSpaces]) -> None:
+
 		self.grammar = grammar
 		self.defaultGrammar = defaultGrammar
-		self.content = path.read_text()
+		self.content = content
+
+		Error.setContext(content=self.content)
+
+	@classmethod
+	def fromPath(cls: Type["Parser"], path: Path, *args: Any, **kwargs: Any) -> "Parser":
+
+		content = path.read_text()
+		parser = cls(content, *args, **kwargs)
+		Error.setContext(path=path, content=content)
+
+		return parser
 
 	def handleError(self, index: int, message: str) -> None:
-		handleError(parser=self, index=index, message=message)
+		Error.handle(index=index, message=message)
 
 	def iterateGrammar(self, grammar: Grammar) -> Iterator[GrammarItem]:
 		for item in grammar:

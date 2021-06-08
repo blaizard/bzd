@@ -1,7 +1,7 @@
 from pathlib import Path
 import typing
 
-from bzd.parser.error import handleFromElement
+from bzd.parser.error import Error
 from bzd.parser.element import Element
 
 from tools.bdl.entity.variable import Variable
@@ -49,7 +49,7 @@ class ResultType:
 		"""
 
 		if entity.name in self.symbolSet:
-			handleFromElement(element=element,
+			Error.handleFromElement(element=element,
 				message="Conflicting symbol '{}', already defined earlier.".format(entity.name))
 		self.symbolSet.add(entity.name)
 		self.symbols.append(entity)
@@ -60,10 +60,10 @@ class ResultType:
 		"""
 
 		if self.namespace is not None:
-			handleFromElement(element=element,
+			Error.handleFromElement(element=element,
 				message="A namespace has already been defined earlier '{}'.".format(".".join(self.namespace.nameList)))
 		if self.level != 0:
-			handleFromElement(element=element, message="Namespace can only be defined at top level.")
+			Error.handleFromElement(element=element, message="Namespace can only be defined at top level.")
 		self.namespace = entity
 
 	def registerUse(self, element: Element, entity: Use) -> None:
@@ -72,7 +72,8 @@ class ResultType:
 		"""
 
 		if entity.path in self.useDict:
-			handleFromElement(element=element, message="Duplicate path '{}' already used earlier.".format(entity.path))
+			Error.handleFromElement(element=element,
+				message="Duplicate path '{}' already used earlier.".format(entity.path))
 		self.useDict[entity.path] = entity
 
 	@property

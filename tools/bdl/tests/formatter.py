@@ -13,7 +13,7 @@ class TestRun(unittest.TestCase):
 
 	def testFormatter(self) -> None:
 		assert self.filePath is not None
-		parser = Parser(self.filePath)
+		parser = Parser.fromPath(self.filePath)
 		data = parser.parse()
 
 		formatter = BdlFormatter()

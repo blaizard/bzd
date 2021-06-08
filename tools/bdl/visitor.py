@@ -2,7 +2,7 @@ import typing
 from pathlib import Path
 
 from bzd.parser.visitor import Visitor as VisitorBase
-from bzd.parser.error import assertHasAttr, assertHasSequence
+from bzd.parser.error import Error
 from bzd.parser.element import Element
 
 from tools.bdl.result import ResultType
@@ -31,12 +31,12 @@ class Visitor(VisitorBase[ResultType, str]):
 		Main visitor, called each time a new element is discovered.
 		"""
 
-		assertHasAttr(element=element, attr="category")
+		Error.assertHasAttr(element=element, attr="category")
 
 		# Handle class
 		if element.getAttr("category").value == "nested":
 
-			assertHasSequence(element=element, sequence="nested")
+			Error.assertHasSequence(element=element, sequence="nested")
 
 			self.level += 1
 

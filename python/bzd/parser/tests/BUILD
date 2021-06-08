@@ -13,5 +13,17 @@ py_test(
     ],
     deps = [
         "//python/bzd/parser",
+        "//python/bzd/parser/tests/support",
+    ],
+)
+
+py_test(
+    name = "serialize",
+    srcs = [
+        "serialize.py",
+    ],
+    deps = [
+        "//python/bzd/parser",
+        "//python/bzd/parser/tests/support",
     ],
 )

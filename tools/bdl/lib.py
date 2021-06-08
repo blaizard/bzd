@@ -16,7 +16,7 @@ def main(formatType: str, inputs: typing.List[Path]) -> str:
 	# Parse all files and merge them
 	data = Sequence()
 	for path in inputs:
-		parsedData = Parser(path).parse()
+		parsedData = Parser.fromPath(path).parse()
 		data.merge(parsedData)
 
 	# Format using a specific formatter
