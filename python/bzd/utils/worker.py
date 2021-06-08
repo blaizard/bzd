@@ -76,10 +76,10 @@ class Worker:
 			shared["output"].put((isSuccess, result, stdout.getvalue(), data))
 
 	def add(self, data: Any) -> None:
-		with self.shared["count"].get_lock():  # type: ignore
-			self.shared["count"].value += 1  # type: ignore
+		with self.shared["count"].get_lock():
+			self.shared["count"].value += 1
 		self.expectedData += 1
-		self.shared["data"].put(data)  # type: ignore
+		self.shared["data"].put(data)
 
 	def start(self) -> None:
 		for worker in self.workerList:
@@ -87,11 +87,11 @@ class Worker:
 
 	def data(self) -> Iterable[_WorkerResult]:
 		while self.expectedData > 0:
-			workerResult = _WorkerResult(self.shared["output"].get())  # type: ignore
+			workerResult = _WorkerResult(self.shared["output"].get())
 			self.expectedData -= 1
 			yield workerResult
 
 	def stop(self) -> None:
-		self.shared["stop"].value = 1  # type: ignore
+		self.shared["stop"].value = 1
 		for worker in self.workerList:
 			worker.join()

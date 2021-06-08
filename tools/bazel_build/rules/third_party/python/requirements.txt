@@ -2,3 +2,4 @@ pyelftools
 mypy
 yapf
 gitignore_parser
+toml
