@@ -13,11 +13,6 @@ class Type:
 		self.kind = element.getAttr("type").value
 		self.template = element.getNestedSequence("template")
 
-	@staticmethod
-	def makeCustom(kind: str, template: typing.Optional[typing.List[str]] = None) -> "Type":
-		element = Element.fromDict({"kind": kind, "nested": [{"name": t} for t in template] if template else []})
-		print(element)
-
 	@property
 	def name(self) -> str:
 		return Visitor(entity=self).result
