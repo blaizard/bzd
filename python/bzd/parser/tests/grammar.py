@@ -4,7 +4,6 @@ import typing
 from pathlib import Path
 
 from bzd.parser.tests.support.parser import TestParser
-from bzd.parser.visitor import VisitorSerialize
 
 
 class TestRun(unittest.TestCase):
@@ -16,8 +15,7 @@ class TestRun(unittest.TestCase):
 		parser = TestParser.fromPath(self.filePath)
 		data = parser.parse()
 
-		visitor = VisitorSerialize()
-		result = visitor.visit(data)
+		result = data.serialize()
 		expected = [{
 			'@': {
 			'comment': {
@@ -92,8 +90,7 @@ class TestRun(unittest.TestCase):
 		parser = TestParser("float myVar = 42;")
 		data = parser.parse()
 
-		visitor = VisitorSerialize()
-		result = visitor.visit(data)
+		result = data.serialize()
 		expected = [{
 			'@': {
 			'variable': {

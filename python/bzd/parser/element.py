@@ -29,6 +29,12 @@ class Sequence:
 			listStr.append(formattedStr)
 		return "\n".join(listStr)
 
+	def serialize(self) -> SequenceSerialize:
+		"""
+		Serialize a sequence.
+		"""
+		return [element.serialize() for element in self.iterate()]
+
 	@staticmethod
 	def fromSerialize(sequence: SequenceSerialize) -> "Sequence":
 		"""
@@ -78,8 +84,10 @@ class Element:
 		e = Element()
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
-		e.sequences = {key: Sequence.fromSerialize(sequence) # type: ignore
-			for key, sequence in element.items() if key != "@"}
+		e.sequences = {
+			key: Sequence.fromSerialize(sequence)  # type: ignore
+			for key, sequence in element.items() if key != "@"
+		}
 		return e
 
 	def isEmpty(self) -> bool:
@@ -136,6 +144,17 @@ class Element:
 		"""
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
+
+	def serialize(self, ignoreNested: typing.Optional[typing.List[str]] = None) -> ElementSerialize:
+		"""
+		Serialize an element.
+		"""
+		data: ElementSerialize = {"@": {key: {"v": attr.value, "i": attr.index} for key, attr in self.getAttrs().items()}}
+		for kind, sequence in self.getNestedSequences():
+			if ignoreNested and kind in ignoreNested:
+				continue
+			data[kind] = sequence.serialize()
+		return data
 
 	def __repr__(self) -> str:
 		"""

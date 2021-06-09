@@ -26,7 +26,7 @@ class Contract:
 			return float(self.valueString)
 		except:
 			Error.handleFromElement(element=self.element, message="Expected a valid number.")
-		return 0.0 # To make mypy happy
+		return 0.0  # To make mypy happy
 
 	@property
 	def valueString(self) -> str:

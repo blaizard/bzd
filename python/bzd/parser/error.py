@@ -72,6 +72,15 @@ class Error:
 		Error.handle(index=index, message=message)
 
 	@staticmethod
+	def assertTrue(element: Element, condition: bool, message: str) -> None:
+		"""
+		Ensures a specific condition evaluates to True.
+		"""
+
+		if not condition:
+			Error.handleFromElement(element=element, attr=None, message=message)
+
+	@staticmethod
 	def assertHasAttr(element: Element, attr: str) -> None:
 		"""
 		Ensures an element has a specific attribute.
