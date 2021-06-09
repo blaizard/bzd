@@ -5,12 +5,6 @@ py_test(
     srcs = [
         "grammar.py",
     ],
-    args = [
-        "$(location grammar.bdl)",
-    ],
-    data = [
-        "grammar.bdl",
-    ],
     deps = [
         "//tools/bdl:grammar",
     ],

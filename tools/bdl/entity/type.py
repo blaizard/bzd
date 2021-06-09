@@ -4,18 +4,34 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
+from tools.bdl.entity.contract import Contracts
+
 
 class Type:
 
 	def __init__(self, element: Element) -> None:
 
 		Error.assertHasAttr(element=element, attr="type")
-		self.kind = element.getAttr("type").value
-		self.template = element.getNestedSequence("template")
+		self.element = element
+		self.underlying: typing.Optional[typing.Any] = None
+
+	def setUnderlying(self, underlying: typing.Any) -> None:
+		"""
+		Set the underlying type
+		"""
+		self.underlying = underlying
+
+	@property
+	def kind(self) -> str:
+		return self.element.getAttr("type").value
 
 	@property
 	def name(self) -> str:
 		return Visitor(entity=self).result
+
+	@property
+	def hasUnderlying(self) -> bool:
+		return (self.underlying is not None)
 
 
 class Visitor(VisitorBase[str, str]):
@@ -29,7 +45,8 @@ class Visitor(VisitorBase[str, str]):
 		kind = self.visitType(kind=entity.kind, comment=None)
 
 		# Construct the template if any.
-		template = None if entity.template is None else self._visit(sequence=entity.template)
+		nested = entity.element.getNestedSequence("template")
+		template = None if nested is None else self._visit(sequence=nested)
 
 		self.result = self.visitTypeTemplate(kind=kind, template=template)
 

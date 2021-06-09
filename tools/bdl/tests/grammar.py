@@ -8,11 +8,19 @@ from tools.bdl.grammar import Parser
 
 class TestRun(unittest.TestCase):
 
-	filePath: typing.Optional[Path] = None
-
 	def testParser(self) -> None:
-		assert self.filePath is not None
-		parser = Parser.fromPath(self.filePath)
+		parser = Parser(content="""Float varInit4 = 5.12;
+// Contracts
+const int32 defaultConstant [min = -1, max = 35];
+int32 defaultConstant2 = 42 [min = -1, read];
+interface MyFy
+{
+	// Send a message
+	method send(Sequence<char> message) -> Result<int>;
+	MyType var;
+	const MyType varConst [always];
+	MyType varInitialized = 42;
+}""")
 		data = parser.parse()
 
 		result = data.serialize()
@@ -253,5 +261,4 @@ class TestRun(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	TestRun.filePath = Path(sys.argv.pop())
 	unittest.main()

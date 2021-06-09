@@ -13,33 +13,34 @@ from tools.bdl.entity.enum import Enum
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.use import Use
 
+NamespaceType = typing.List[str]
+EntityType = typing.Union[Variable, Nested, Method, Using, Enum, Namespace, Use]
+
 T = typing.TypeVar("T")
-U = typing.TypeVar("U")
 
 
-class Visitor(VisitorBase[T, U]):
+class Visitor(VisitorBase[T, T]):
 
 	nestedKind = None
 
 	def __init__(self) -> None:
 		self.level = 0
-		self.namespace: typing.List[str] = []
+		self.namespace: NamespaceType = []
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
 		Main visitor, called each time a new element is discovered.
 		"""
 
-		Error.assertHasAttr(element=element, attr="category")
+		entity = self.elementToEntity(element=element)
 
 		# Handle nested object
-		if element.getAttr("category").value == "nested":
+		if isinstance(entity, Nested):
 
 			Error.assertHasSequence(element=element, sequence="nested")
-			nested = Nested(element=element)
 
 			self.level += 1
-			self.namespace.append(nested.name)
+			self.namespace.append(entity.name)
 
 			sequence = element.getNestedSequence("nested")
 			assert sequence is not None
@@ -48,53 +49,80 @@ class Visitor(VisitorBase[T, U]):
 			self.namespace.pop()
 			self.level -= 1
 
-			nested.setNested(nested=typing.cast(typing.List[typing.Any], nestedResult))
-			self.visitNestedEntities(entity=nested, result=result)
+			entity.setNested(nested=typing.cast(typing.List[typing.Any], nestedResult))
+			self.visitNestedEntities(entity=entity, result=result)
 
 		# Handle variable
-		elif element.getAttr("category").value == "variable":
+		elif isinstance(entity, Variable):
 
-			self.visitVariable(entity=Variable(element=element), result=result)
+			self.visitVariable(entity=entity, result=result)
 
 		# Handle method
-		elif element.getAttr("category").value == "method":
+		elif isinstance(entity, Method):
 
-			self.visitMethod(entity=Method(element=element), result=result)
-
-		# Handle using
-		elif element.getAttr("category").value == "using":
-
-			self.visitUsing(entity=Using(element=element), result=result)
+			self.visitMethod(entity=entity, result=result)
 
 		# Handle using
-		elif element.getAttr("category").value == "enum":
+		elif isinstance(entity, Using):
 
-			self.visitEnum(entity=Enum(element=element), result=result)
+			self.visitUsing(entity=entity, result=result)
+
+		# Handle using
+		elif isinstance(entity, Enum):
+
+			self.visitEnum(entity=entity, result=result)
 
 		# Handle namespace
-		elif element.getAttr("category").value == "namespace":
+		elif isinstance(entity, Namespace):
 
 			Error.assertTrue(element=element,
 				condition=(self.level == 0),
 				message="Namespaces can only be declared at top level.")
 
-			namespace = Namespace(element=element)
-			self.visitNamespace(entity=namespace, result=result)
+			self.visitNamespace(entity=entity, result=result)
 
 			# Update the current namespace
-			self.namespace.extend(namespace.nameList)
+			self.namespace.extend(entity.nameList)
 
 		# Handle use
-		elif element.getAttr("category").value == "use":
+		elif isinstance(entity, Use):
 
-			self.visitUse(entity=Use(element=element), result=result)
+			self.visitUse(entity=entity, result=result)
 
 		# Should never go here
 		else:
-			Error.handleFromElement(element=element,
-				message="Unexpected element category: {}".format(element.getAttr("category").value))
+			raise Exception()
 
 		return result
+
+	def elementToEntity(self, element: Element) -> EntityType:
+		"""
+		Instantiate an entity from an element.
+		"""
+
+		categoryToEntity: typing.Dict[str, typing.Type[EntityType]] = {
+			"nested": Nested,
+			"variable": Variable,
+			"method": Method,
+			"using": Using,
+			"enum": Enum,
+			"namespace": Namespace,
+			"use": Use
+		}
+
+		Error.assertHasAttr(element=element, attr="category")
+		category = element.getAttr("category").value
+
+		if category not in categoryToEntity:
+			Error.handleFromElement(element=element, message="Unexpected element category: {}".format(category))
+
+		return categoryToEntity[category](element=element)
+
+	def makeFQN(self, name: str, namespace: typing.Optional[NamespaceType] = None) -> str:
+		"""
+		Make the fully qualified name from a symbol name
+		"""
+		return ".".join((self.namespace if namespace is None else namespace) + [name])
 
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""

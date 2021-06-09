@@ -5,7 +5,7 @@
 class MyType : public bzd::manifest::MyInterface
 {
 public:
-	int start(int a) override { return a; }
+	bzd::manifest::Test start(int a) override { return (a > 10) ? bzd::manifest::Test::FIRST : bzd::manifest::Test::SECOND; }
 };
 
 int main()
