@@ -4,7 +4,6 @@ import typing
 from pathlib import Path
 
 from bzd.parser.tests.support.parser import TestParser
-from bzd.parser.visitor import VisitorSerialize
 from bzd.parser.element import Sequence
 
 
@@ -21,14 +20,13 @@ class TestRun(unittest.TestCase):
 		data = parser.parse()
 
 		# Serialize
-		visitor = VisitorSerialize()
-		result = visitor.visit(data)
+		result = data.serialize()
 
 		# Deserialize
 		sequence = Sequence.fromSerialize(result)
 
 		# Re-serialize
-		result2 = visitor.visit(sequence)
+		result2 = sequence.serialize()
 
 		self.assertListEqual(result, result2)
 

@@ -2,7 +2,7 @@ import typing
 from pathlib import Path
 
 from tools.bdl.result import ResultType
-from tools.bdl.visitor import Visitor
+from tools.bdl.visitors.result import Visitor
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
@@ -24,7 +24,7 @@ class _VisitorType(VisitorType):
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
 
-class BdlFormatter(Visitor):
+class BdlFormatter(Visitor[str]):
 
 	@staticmethod
 	def namespaceToStr(entity: Namespace) -> str:

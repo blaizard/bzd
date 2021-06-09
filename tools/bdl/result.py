@@ -43,36 +43,36 @@ class ResultType:
 		"""
 		self.ext.update(ext)
 
-	def registerSymbol(self, element: Element, entity: SymbolType) -> None:
+	def registerSymbol(self, entity: SymbolType) -> None:
 		"""
 		Register a symbol to the result type.
 		"""
 
 		if entity.name in self.symbolSet:
-			Error.handleFromElement(element=element,
+			Error.handleFromElement(element=entity.element,
 				message="Conflicting symbol '{}', already defined earlier.".format(entity.name))
 		self.symbolSet.add(entity.name)
 		self.symbols.append(entity)
 
-	def registerNamespace(self, element: Element, entity: Namespace) -> None:
+	def registerNamespace(self, entity: Namespace) -> None:
 		"""
 		Register a namespace
 		"""
 
 		if self.namespace is not None:
-			Error.handleFromElement(element=element,
+			Error.handleFromElement(element=entity.element,
 				message="A namespace has already been defined earlier '{}'.".format(".".join(self.namespace.nameList)))
 		if self.level != 0:
-			Error.handleFromElement(element=element, message="Namespace can only be defined at top level.")
+			Error.handleFromElement(element=entity.element, message="Namespace can only be defined at top level.")
 		self.namespace = entity
 
-	def registerUse(self, element: Element, entity: Use) -> None:
+	def registerUse(self, entity: Use) -> None:
 		"""
 		Register a use specifier
 		"""
 
 		if entity.path in self.useDict:
-			Error.handleFromElement(element=element,
+			Error.handleFromElement(element=entity.element,
 				message="Duplicate path '{}' already used earlier.".format(entity.path))
 		self.useDict[entity.path] = entity
 

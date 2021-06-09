@@ -13,7 +13,10 @@ py_library(
 
 py_library(
     name = "visitor",
-    srcs = glob(["entity/*.py"]) + [
+    srcs = glob([
+        "entity/*.py",
+        "visitors/*.py",
+    ]) + [
         "visitor.py",
         "result.py",
     ],

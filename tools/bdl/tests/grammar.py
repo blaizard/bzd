@@ -4,7 +4,6 @@ import typing
 from pathlib import Path
 
 from tools.bdl.grammar import Parser
-from bzd.parser.visitor import VisitorSerialize
 
 
 class TestRun(unittest.TestCase):
@@ -16,8 +15,7 @@ class TestRun(unittest.TestCase):
 		parser = Parser.fromPath(self.filePath)
 		data = parser.parse()
 
-		json = VisitorSerialize()
-		result = json.visit(data)
+		result = data.serialize()
 		expected = [{
 			'@': {
 			'type': {

@@ -2,7 +2,7 @@ import typing
 from pathlib import Path
 
 from tools.bdl.result import ResultType
-from tools.bdl.visitor import Visitor
+from tools.bdl.visitors.result import Visitor
 from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.using import Using
 from tools.bdl.entity.type import Type, Visitor as VisitorType
@@ -26,7 +26,7 @@ class _VisitorType(VisitorType):
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
 
 
-class CcFormatter(Visitor):
+class CcFormatter(Visitor[str]):
 
 	@staticmethod
 	def toCamelCase(string: str) -> str:
@@ -71,14 +71,13 @@ class CcFormatter(Visitor):
 			return "bzd::Int{}Type".format(bits)
 		return "bzd::UInt{}Type".format(bits)
 
-	def visitUsing_(self, entity: Using) -> Using:
+	def visitUsing_(self, entity: Using, result: ResultType) -> None:
 		# Create strong types
 		if entity.type.name in ["Integer", "Float"]:
 			underlyingType = self.chooseIntegerType(entity)
 			newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying=underlyingType, name=entity.name)
 			#Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name=entity.name)])
 			print("String type!", entity.name, newType)
-		return entity
 
 	def visitFinal(self, result: ResultType) -> str:
 
