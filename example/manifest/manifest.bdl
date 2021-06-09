@@ -1,13 +1,13 @@
 namespace bzd.manifest;
 enum Test
 {
-	ELLL
+	FIRST, SECOND
 }
 interface MyInterface
 {
-	method start(int a) -> int;
+	method start(Integer a) -> Test;
 	// Magic number for demo purpose
-	int magic = 42 [min = 5, max = 100];
+	Integer magic = 42 [min = 5, max = 100];
 	// Read only value
-	const float readOnly = -3.14;
+	const Float readOnly = -3.14;
 }

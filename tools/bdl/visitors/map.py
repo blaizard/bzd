@@ -15,7 +15,8 @@ from tools.bdl.entity.enum import Enum
 
 MapType = typing.Dict[str, typing.Any]
 
-class Map(Visitor[MapType, MapType]):
+
+class Map(Visitor[MapType]):
 
 	def __init__(self) -> None:
 		super().__init__()
@@ -27,7 +28,7 @@ class Map(Visitor[MapType, MapType]):
 	def mapEntity(self, entity: SymbolType) -> None:
 
 		# Build the symbol name and ensure it is unique
-		symbol = ".".join(self.namespace + [entity.name])
+		symbol = self.makeFQN(entity.name)
 		Error.assertTrue(element=entity.element,
 			condition=(symbol not in self.map),
 			message="Symbol name is in conflict with a previous one {}.".format(symbol))

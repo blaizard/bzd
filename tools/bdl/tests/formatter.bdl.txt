@@ -19,5 +19,5 @@ interface MyFy {
  MyType varInitialized = 42;    
 
 
-      method myMethod() -> void;
+      method myMethod() -> Integer;
 }

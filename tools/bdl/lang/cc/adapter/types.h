@@ -5,5 +5,6 @@
 
 using Callable = bzd::FunctionView<void(void)>;
 using Integer = bzd::Int32Type;
+using Float = float;
 template <class V, class E>
 using Result = bzd::Result<V, E>;

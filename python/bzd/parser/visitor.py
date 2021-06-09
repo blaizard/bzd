@@ -22,8 +22,8 @@ class Visitor(typing.Generic[T, U]):
 
 	nestedKind: typing.Optional[str] = "nested"
 
-	def visit(self, sequence: Sequence, path: typing.Optional[Path] = None) -> U:
-		Error.setContext(path=path)
+	def visit(self, sequence: Sequence) -> U:
+
 		result = self._visit(sequence=sequence)
 		return self.visitFinal(result=result)
 

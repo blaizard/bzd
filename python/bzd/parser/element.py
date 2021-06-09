@@ -149,7 +149,13 @@ class Element:
 		"""
 		Serialize an element.
 		"""
-		data: ElementSerialize = {"@": {key: {"v": attr.value, "i": attr.index} for key, attr in self.getAttrs().items()}}
+		data: ElementSerialize = {
+			"@": {key: {
+			"v": attr.value,
+			"i": attr.index
+			}
+			for key, attr in self.getAttrs().items()}
+		}
 		for kind, sequence in self.getNestedSequences():
 			if ignoreNested and kind in ignoreNested:
 				continue
