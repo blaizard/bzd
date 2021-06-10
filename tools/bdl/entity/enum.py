@@ -4,6 +4,8 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
+from tools.bdl.entity.entity import Entity
+
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
 
@@ -18,17 +20,12 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		return result
 
 
-class Enum:
+class Enum(Entity):
 
 	def __init__(self, element: Element) -> None:
-
+		super().__init__(element)
 		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasSequence(element=element, sequence="values")
-		self.element = element
-
-	@property
-	def name(self) -> str:
-		return self.element.getAttr("name").value
 
 	@property
 	def category(self) -> str:

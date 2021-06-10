@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element
 
 from tools.bdl.entity.variable import Variable
+from tools.bdl.entity.builtin import Builtin
 from tools.bdl.entity.nested import Nested
 from tools.bdl.entity.method import Method
 from tools.bdl.entity.using import Using
@@ -14,7 +15,7 @@ from tools.bdl.entity.namespace import Namespace
 from tools.bdl.entity.use import Use
 
 NamespaceType = typing.List[str]
-EntityType = typing.Union[Variable, Nested, Method, Using, Enum, Namespace, Use]
+EntityType = typing.Union[Variable, Nested, Method, Using, Enum, Namespace, Use, Builtin]
 
 T = typing.TypeVar("T")
 
@@ -91,7 +92,7 @@ class Visitor(VisitorBase[T, T]):
 
 		# Should never go here
 		else:
-			raise Exception()
+			Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
 
 		return result
 
@@ -102,6 +103,7 @@ class Visitor(VisitorBase[T, T]):
 
 		categoryToEntity: typing.Dict[str, typing.Type[EntityType]] = {
 			"nested": Nested,
+			"builtin": Builtin,
 			"variable": Variable,
 			"method": Method,
 			"using": Using,
