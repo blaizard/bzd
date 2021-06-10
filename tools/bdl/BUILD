@@ -14,7 +14,7 @@ py_library(
 py_library(
     name = "visitor",
     srcs = glob([
-        "entity/*.py",
+        "entity/**/*.py",
         "visitors/*.py",
     ]) + [
         "visitor.py",

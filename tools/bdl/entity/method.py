@@ -2,20 +2,16 @@ import typing
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
-from tools.bdl.entity.type import Type
+from tools.bdl.entity.fragment.type import Type
 from tools.bdl.entity.variable import Variable
+from tools.bdl.entity.entity import Entity
 
 
-class Method:
+class Method(Entity):
 
 	def __init__(self, element: Element) -> None:
-
+		super().__init__(element)
 		Error.assertHasAttr(element=element, attr="name")
-		self.element = element
-
-	@property
-	def name(self) -> str:
-		return self.element.getAttr("name").value
 
 	@property
 	def category(self) -> str:
@@ -27,7 +23,7 @@ class Method:
 
 	@property
 	def type(self) -> typing.Optional[Type]:
-		return Type(element=self.element) if self.isType else None
+		return Type(element=self.element, kind="type", template="template") if self.isType else None
 
 	@property
 	def comment(self) -> typing.Optional[str]:
