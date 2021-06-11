@@ -1,7 +1,7 @@
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entity.entity import Entity
+from tools.bdl.entities.impl.entity import Entity
 
 
 class Builtin(Entity):
@@ -13,3 +13,6 @@ class Builtin(Entity):
 	@property
 	def category(self) -> str:
 		return "builtin"
+
+	def __repr__(self) -> str:
+		return self.toString({"name": self.name})

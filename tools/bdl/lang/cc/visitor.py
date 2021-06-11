@@ -2,9 +2,8 @@ import typing
 from pathlib import Path
 
 from tools.bdl.result import ResultType
-from tools.bdl.entity.namespace import Namespace
-from tools.bdl.entity.using import Using
-from tools.bdl.entity.fragment.type import Type, Visitor as VisitorType
+from tools.bdl.entities.all import Namespace, Using
+from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
 
 

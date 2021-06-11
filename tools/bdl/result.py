@@ -4,13 +4,7 @@ import typing
 from bzd.parser.error import Error
 from bzd.parser.element import Element
 
-from tools.bdl.entity.variable import Variable
-from tools.bdl.entity.nested import Nested
-from tools.bdl.entity.method import Method
-from tools.bdl.entity.using import Using
-from tools.bdl.entity.enum import Enum
-from tools.bdl.entity.namespace import Namespace
-from tools.bdl.entity.use import Use
+from tools.bdl.entities.all import Variable, Nested, Method, Using, Enum, Namespace, Use
 
 SymbolType = typing.Union[Variable, Nested, Method, Using, Enum]
 
@@ -127,3 +121,17 @@ class ResultType:
 	@property
 	def useList(self) -> typing.List[Use]:
 		return sorted(self.useDict.values(), key=lambda x: x.path)
+
+	def __repr__(self) -> str:
+		"""
+		Human readable string representation of a result.
+		"""
+		contentList = []
+		for use in self.useDict.values():
+			contentList.append(str(use))
+		if self.namespace is not None:
+			contentList.append(str(self.namespace))
+		for symbol in self.symbols:
+			contentList.append(str(symbol))
+
+		return "\n".join(contentList)

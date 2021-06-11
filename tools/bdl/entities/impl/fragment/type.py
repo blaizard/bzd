@@ -4,7 +4,7 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
-from tools.bdl.entity.fragment.contract import Contracts
+from tools.bdl.entities.impl.fragment.contract import Contracts
 
 
 class Type:

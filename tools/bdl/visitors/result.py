@@ -1,22 +1,15 @@
 import typing
 from pathlib import Path
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.error import Error
 
 from tools.bdl.result import ResultType, SymbolType
 from tools.bdl.visitors.map import MapType
 from tools.bdl.visitor import Visitor as VisitorBase
 
-from tools.bdl.entity.variable import Variable
-from tools.bdl.entity.builtin import Builtin
-from tools.bdl.entity.nested import Nested
-from tools.bdl.entity.method import Method
-from tools.bdl.entity.using import Using
-from tools.bdl.entity.enum import Enum
-from tools.bdl.entity.namespace import Namespace
-from tools.bdl.entity.use import Use
-from tools.bdl.entity.fragment.type import Type
+from tools.bdl.entities.all import Variable, Builtin, Nested, Method, Using, Enum, Namespace, Use
+from tools.bdl.entities.impl.fragment.type import Type
 
 ElementsMap = typing.Dict[str, Element]
 
@@ -26,17 +19,14 @@ class Result(VisitorBase[ResultType]):
 	def __init__(self, symbols: MapType) -> None:
 		super().__init__()
 		self.symbols = {
-			"Integer": self.makeBuiltin("Integer"),
-			"Float": self.makeBuiltin("Float"),
-			"Result": self.makeBuiltin("Result"),
-			"Callable": self.makeBuiltin("Callable")
+			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
+			"Float": self.makeEntity("builtin", values={"name": "Float"}),
+			"Result": self.makeEntity("builtin", values={"name": "Result"}),
+			"Callable": self.makeEntity("builtin", values={"name": "Callable"})
 		}
 		self.elements: ElementsMap = {}
 
 		self.registerSymbols(symbols)
-
-	def makeBuiltin(self, name: str) -> typing.Any:
-		return {"@": {"name": {"v": name, "i": 0}, "category": {"v": "builtin", "i": 0}}}
 
 	def registerSymbols(self, symbols: MapType) -> None:
 		"""

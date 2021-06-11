@@ -1,4 +1,4 @@
-# Bzd Description Language (bdl)
+# Bdl > Syntax
 
 The following describes the the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
 

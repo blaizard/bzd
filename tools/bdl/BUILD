@@ -14,7 +14,7 @@ py_library(
 py_library(
     name = "visitor",
     srcs = glob([
-        "entity/**/*.py",
+        "entities/**/*.py",
         "visitors/*.py",
     ]) + [
         "visitor.py",
@@ -45,6 +45,7 @@ py_library(
     name = "lib",
     srcs = [
         "lib.py",
+        "object.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
