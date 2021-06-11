@@ -1,5 +1,7 @@
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
+BdlProvider = provider(fields = ["outputs"])
+
 def _bzd_manifest_impl_cc(ctx, output):
     """
     C++ specific provider
@@ -17,7 +19,7 @@ def _bzd_manifest_impl_cc(ctx, output):
         sets.insert(cc_info_providers, dep[CcInfo])
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
 
-    return [cc_info_providers]
+    return cc_info_providers
 
 def _bzd_manifest_impl(ctx):
     formats = {
@@ -27,11 +29,14 @@ def _bzd_manifest_impl(ctx):
         },
     }
 
+    # Input bdl files
+    bdl_deps = depset([], transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps])
+
     for fmt, data in formats.items():
         # Generate the output
         data["output"] = ctx.actions.declare_file("{}{}".format(ctx.label.name, data["extension"]))
         ctx.actions.run(
-            inputs = ctx.files.srcs,
+            inputs = ctx.files.srcs + bdl_deps.to_list(),
             outputs = [data["output"]],
             progress_message = "Generating {} build files from manifest {}".format(data["display"], ctx.label),
             arguments = ["--format", fmt, "--output", data["output"].path] + [f.path for f in ctx.files.srcs],
@@ -39,9 +44,13 @@ def _bzd_manifest_impl(ctx):
         )
 
     # Generate the various providers
-    providerCc = _bzd_manifest_impl_cc(ctx = ctx, output = formats["cc"]["output"])
+    cc_info_provider = _bzd_manifest_impl_cc(ctx = ctx, output = formats["cc"]["output"])
+    cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
 
-    return providerCc
+    return [
+        BdlProvider(outputs=depset(ctx.files.srcs)),
+        cc_info_providers
+    ]
 
 """
 Bzd description language rule_bzd_manifest_impl_cc
@@ -57,6 +66,10 @@ bzd_manifest = rule(
             mandatory = True,
             allow_files = [".bdl"],
             doc = "List of Bzd Description Language (bdl) files to be included.",
+        ),
+        "deps": attr.label_list(
+            providers = [BdlProvider],
+            doc = "List of bdl dependencies.",
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),

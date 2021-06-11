@@ -7,7 +7,7 @@ from bzd.parser.element import Element, Sequence
 from tools.bdl.grammar import Parser
 from tools.bdl.visitors.map import Map, MapType
 from tools.bdl.visitors.validation import Validation
-
+from tools.bdl.entities.impl.fragment.type import Type
 
 class Object:
 	"""
@@ -60,30 +60,36 @@ class Object:
 			assert key not in self.symbols, "Symbol conflict '{}'.".format(key)
 			self.symbols[key] = element
 
-	def getElement(self, symbol: str) -> typing.Optional[Element]:
+	def getElement(self, fqn: str) -> typing.Optional[Element]:
 
-		if symbol not in self.symbols:
+		if fqn not in self.symbols:
 			return None
 
 		# Not memoized
-		if symbol not in self.elements:
-			element = Element.fromSerialize(element=self.symbols[symbol])
-			self.elements[symbol] = element
+		if fqn not in self.elements:
+			element = Element.fromSerialize(element=self.symbols[fqn])
+			self.elements[fqn] = element
 
 		# Return the element
-		return self.elements[symbol]
+		return self.elements[fqn]
 
 	def getElementFromName(self, name: str, namespace: typing.List[str]) -> typing.Optional[Element]:
 
 		# Look for a symbol match
 		namespace = namespace.copy()
 		while True:
-			symbol = Map.makeFQN(name=name, namespace=namespace)
-			if symbol in self.symbols:
+			fqn = Map.makeFQN(name=name, namespace=namespace)
+			if fqn in self.symbols:
 				break
 			if not namespace:
 				return None
 			namespace.pop()
 
 		# Match found
-		return self.getElement(symbol=symbol)
+		return self.getElement(fqn=fqn)
+
+	def getElementFromType(self, entity: Type, namespace: typing.List[str]) -> typing.Optional[Element]:
+
+		if entity.isFQN:
+			return self.getElement(fqn=entity.kind)
+		return self.getElementFromName(name=entity.kind, namespace=namespace)

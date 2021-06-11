@@ -35,6 +35,15 @@ class Type:
 	def hasUnderlying(self) -> bool:
 		return (self.underlying is not None)
 
+	@property
+	def isFQN(self) -> bool:
+		"""
+		Return True if this contains a fully qualified name already, False otherwise.
+		"""
+		return "." in self.kind
+
+	def __repr__(self) -> str:
+		return self.name
 
 class Visitor(VisitorBase[str, str]):
 

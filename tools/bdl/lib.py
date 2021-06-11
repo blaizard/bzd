@@ -18,6 +18,7 @@ def main(formatType: str, path: Path) -> str:
 	# Parse the input file
 	bdl = Object.fromPath(path=path)
 
+	# Set context for the error handling
 	Error.setContext(path=path)
 
 	# Process the result
