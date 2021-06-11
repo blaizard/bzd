@@ -125,12 +125,6 @@ class Visitor(VisitorBase[T, T]):
 
 		return categoryToEntity[category](element=element)
 
-	def makeFQN(self, name: str, namespace: typing.Optional[NamespaceType] = None) -> str:
-		"""
-		Make the fully qualified name from a symbol name
-		"""
-		return ".".join((self.namespace if namespace is None else namespace) + [name])
-
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""
 		Called when discovering a nested entity.

@@ -7,34 +7,27 @@ from bzd.parser.error import Error
 from tools.bdl.result import ResultType, SymbolType
 from tools.bdl.visitors.map import MapType
 from tools.bdl.visitor import Visitor as VisitorBase
+from tools.bdl.object import Object
 
 from tools.bdl.entities.all import Variable, Builtin, Nested, Method, Using, Enum, Namespace, Use
 from tools.bdl.entities.impl.fragment.type import Type
 
-ElementsMap = typing.Dict[str, Element]
-
 
 class Result(VisitorBase[ResultType]):
 
-	def __init__(self, symbols: MapType) -> None:
+	def __init__(self, bdl: Object) -> None:
 		super().__init__()
-		self.symbols = {
+		self.bdl = bdl
+
+		self.bdl.registerSymbols({
 			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
 			"Float": self.makeEntity("builtin", values={"name": "Float"}),
 			"Result": self.makeEntity("builtin", values={"name": "Result"}),
 			"Callable": self.makeEntity("builtin", values={"name": "Callable"})
-		}
-		self.elements: ElementsMap = {}
+		})
 
-		self.registerSymbols(symbols)
-
-	def registerSymbols(self, symbols: MapType) -> None:
-		"""
-		Add new symbols to the current symbol list.
-		"""
-		for key, element in symbols.items():
-			assert key not in self.elements, "Symbol conflict '{}'.".format(key)
-			self.symbols[key] = element
+	def process(self) -> ResultType:
+		return self.visit(self.bdl.parsed)
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return ResultType(level=self.level)
@@ -47,23 +40,16 @@ class Result(VisitorBase[ResultType]):
 			return
 		name = entity.kind
 
-		# Look for a symbol match
-		namespace = self.namespace.copy()
-		while True:
-			symbol = self.makeFQN(name=name, namespace=namespace)
-			if symbol in self.symbols:
-				break
+		# Look for a match
+		maybeElement = self.bdl.getElementFromName(name=name, namespace=self.namespace)
+		if not maybeElement:
 			# Failed to match any symbol from the map
-			Error.assertTrue(element=entity.element,
-				condition=bool(namespace),
+			Error.handleFromElement(element=entity.element,
 				message="Symbol '{}' in namespace '{}' could not be resolved.".format(name, ".".join(self.namespace)))
-			namespace.pop()
 
-		# Save the entity
-		if symbol not in self.elements:
-			element = Element.fromSerialize(element=self.symbols[symbol])
-			self.elements[symbol] = element
-		entity.setUnderlying(self.elementToEntity(element))
+		# Save the underlying element
+		assert maybeElement
+		entity.setUnderlying(self.elementToEntity(maybeElement))
 
 	def visitNestedEntities(self, entity: Nested, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)

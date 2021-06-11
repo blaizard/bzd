@@ -19,13 +19,20 @@ class Map(Visitor[MapType]):
 		super().__init__()
 		self.map: MapType = {}
 
+	@staticmethod
+	def makeFQN(name: str, namespace: typing.List[str]) -> str:
+		"""
+		Make the fully qualified name from a symbol name
+		"""
+		return ".".join(namespace + [name])
+
 	def visitFinal(self, result: MapType) -> MapType:
 		return self.map
 
 	def mapEntity(self, entity: SymbolType) -> None:
 
 		# Build the symbol name and ensure it is unique
-		symbol = self.makeFQN(entity.name)
+		symbol = self.makeFQN(name=entity.name, namespace=self.namespace)
 		Error.assertTrue(element=entity.element,
 			condition=(symbol not in self.map),
 			message="Symbol name is in conflict with a previous one {}.".format(symbol))
