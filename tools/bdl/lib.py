@@ -21,7 +21,7 @@ def main(formatType: str, path: Path) -> str:
 	Error.setContext(path=path)
 
 	# Process the result
-	result = Result(symbols=bdl.symbols).visit(bdl.parsed)
+	result = Result(bdl=bdl).process()
 
 	print(result)
 

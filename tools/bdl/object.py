@@ -1,7 +1,8 @@
 import json
+import typing
 from pathlib import Path
 
-from bzd.parser.element import Sequence
+from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
 from tools.bdl.visitors.map import Map, MapType
@@ -16,6 +17,7 @@ class Object:
 	def __init__(self, parsed: Sequence, symbols: MapType) -> None:
 		self.parsed = parsed
 		self.symbols = symbols
+		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
 	def fromPath(path: Path) -> "Object":
@@ -49,3 +51,39 @@ class Object:
 		"""
 
 		return json.dumps({"parsed": self.parsed.serialize(), "symbols": self.symbols}, separators=(",", ":"))
+
+	def registerSymbols(self, symbols: MapType) -> None:
+		"""
+		Register multiple symbols.
+		"""
+		for key, element in symbols.items():
+			assert key not in self.symbols, "Symbol conflict '{}'.".format(key)
+			self.symbols[key] = element
+
+	def getElement(self, symbol: str) -> typing.Optional[Element]:
+
+		if symbol not in self.symbols:
+			return None
+
+		# Not memoized
+		if symbol not in self.elements:
+			element = Element.fromSerialize(element=self.symbols[symbol])
+			self.elements[symbol] = element
+
+		# Return the element
+		return self.elements[symbol]
+
+	def getElementFromName(self, name: str, namespace: typing.List[str]) -> typing.Optional[Element]:
+
+		# Look for a symbol match
+		namespace = namespace.copy()
+		while True:
+			symbol = Map.makeFQN(name=name, namespace=namespace)
+			if symbol in self.symbols:
+				break
+			if not namespace:
+				return None
+			namespace.pop()
+
+		# Match found
+		return self.getElement(symbol=symbol)
