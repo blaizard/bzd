@@ -22,6 +22,11 @@ class Sequence:
 	def merge(self, sequence: "Sequence") -> None:
 		self.list += sequence.list
 
+	def copy(self) -> "Sequence":
+		sequence = Sequence()
+		sequence.list = self.list.copy()
+		return sequence
+
 	def __repr__(self) -> str:
 		listStr = []
 		for element in self.list:
@@ -145,22 +150,32 @@ class Element:
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
 
-	def serialize(self, ignoreNested: typing.Optional[typing.List[str]] = None) -> ElementSerialize:
+	def setNestedSequence(self, kind: str, sequence: Sequence) -> None:
+		"""
+		Set a nested sequence and overwrite exsiting one.
+		"""
+		self.sequences[kind] = sequence
+
+	def serialize(self) -> ElementSerialize:
 		"""
 		Serialize an element.
 		"""
-		data: ElementSerialize = {
-			"@": {key: {
-			"v": attr.value,
-			"i": attr.index
-			}
-			for key, attr in self.getAttrs().items()}
-		}
+		data: ElementSerialize = {"@": {key: attr.serialize() for key, attr in self.getAttrs().items()}}
 		for kind, sequence in self.getNestedSequences():
-			if ignoreNested and kind in ignoreNested:
-				continue
 			data[kind] = sequence.serialize()
 		return data
+
+	def copy(self, ignoreNested: typing.List[str] = []) -> "Element":
+		"""
+		Copy an element to create a new element object.
+		"""
+		element = Element()
+		element.attrs = self.attrs.copy()
+		element.sequences = {
+			kind: sequence.copy()
+			for kind, sequence in self.sequences.items() if kind not in ignoreNested
+		}
+		return element
 
 	def __repr__(self) -> str:
 		"""
@@ -211,27 +226,3 @@ class ElementParser(Element):
 		assert isinstance(self.parent,
 			SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent
-
-	@staticmethod
-	def fromDict(data: typing.Dict[str, typing.Any]) -> "ElementParser":
-		"""
-		Create an element from a dictionary.
-		"""
-
-		def populateElement(element: ElementParser, data: typing.Dict[str, typing.Any]) -> None:
-
-			# Add attributes
-			fragment = Fragment(0, {k: v for k, v in data.items() if not isinstance(v, list)})
-			element.add(fragment)
-
-			# Add nested sequences
-			for k, v in data.items():
-				if isinstance(v, list):
-					for nested in v:
-						nestedElement = element.makeElement(kind=k, grammar=[])
-						populateElement(element=nestedElement, data=nested)
-
-		element = ElementParser(parser=None, grammar=[])
-		populateElement(element=element, data=data)
-
-		return element

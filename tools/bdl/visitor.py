@@ -3,19 +3,12 @@ from pathlib import Path
 
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementSerialize
+from bzd.parser.fragments import Attribute
 
-from tools.bdl.entity.variable import Variable
-from tools.bdl.entity.builtin import Builtin
-from tools.bdl.entity.nested import Nested
-from tools.bdl.entity.method import Method
-from tools.bdl.entity.using import Using
-from tools.bdl.entity.enum import Enum
-from tools.bdl.entity.namespace import Namespace
-from tools.bdl.entity.use import Use
+from tools.bdl.entities.all import Variable, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
 
 NamespaceType = typing.List[str]
-EntityType = typing.Union[Variable, Nested, Method, Using, Enum, Namespace, Use, Builtin]
 
 T = typing.TypeVar("T")
 
@@ -27,6 +20,18 @@ class Visitor(VisitorBase[T, T]):
 	def __init__(self) -> None:
 		self.level = 0
 		self.namespace: NamespaceType = []
+
+	@staticmethod
+	def makeEntity(category: str,
+		attrs: typing.MutableMapping[str, Attribute] = {},
+		values: typing.MutableMapping[str, str] = {}) -> ElementSerialize:
+		"""
+		Create an entity from a dictionary of attributes
+		"""
+		updatedAttrs = {key: value.serialize() for key, value in attrs.items()}
+		updatedAttrs.update({key: {"v": value, "i": 0} for key, value in values.items()})
+		updatedAttrs["category"] = {"v": category, "i": 0}
+		return {"@": updatedAttrs}
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""

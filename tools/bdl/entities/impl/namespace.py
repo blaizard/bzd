@@ -4,7 +4,7 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
-from tools.bdl.entity.entity import Entity
+from tools.bdl.entities.impl.entity import Entity
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
@@ -20,23 +20,21 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 		return result
 
 
-class Enum(Entity):
+class Namespace(Entity):
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element)
-		Error.assertHasAttr(element=element, attr="name")
-		Error.assertHasSequence(element=element, sequence="values")
+		Error.assertHasSequence(element=element, sequence="name")
 
 	@property
 	def category(self) -> str:
-		return "enum"
+		return "namespace"
 
 	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
-
-	@property
-	def valueList(self) -> typing.List[str]:
-		sequence = self.element.getNestedSequence("values")
+	def nameList(self) -> typing.List[str]:
+		sequence = self.element.getNestedSequence("name")
 		assert sequence is not None
 		return _Visitor().visit(sequence=sequence)
+
+	def __repr__(self) -> str:
+		return self.toString({"name": ".".join(self.nameList)})

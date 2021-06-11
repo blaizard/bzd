@@ -4,7 +4,7 @@ from pathlib import Path
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entity.entity import Entity
+from tools.bdl.entities.impl.entity import Entity
 
 
 class Use(Entity):
@@ -21,3 +21,6 @@ class Use(Entity):
 	@property
 	def path(self) -> Path:
 		return Path(self.element.getAttr("value").value)
+
+	def __repr__(self) -> str:
+		return self.toString({"path": self.path.as_posix()})

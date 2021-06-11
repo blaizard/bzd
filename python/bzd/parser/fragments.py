@@ -22,6 +22,9 @@ class Attribute:
 	def value(self) -> str:
 		return cast(str, self.data["v"])
 
+	def serialize(self) -> AttributeSerialize:
+		return self.data
+
 	@staticmethod
 	def fromSerialize(attribute: AttributeSerialize) -> "Attribute":
 		"""
@@ -36,7 +39,7 @@ class AttributeParser(Attribute):
 		super().__init__({"v": value, "i": index})
 
 
-Attributes = MutableMapping[str, Attribute]
+Attributes = Dict[str, Attribute]
 
 
 class Fragment:

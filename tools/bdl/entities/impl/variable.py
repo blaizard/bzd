@@ -3,9 +3,9 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entity.fragment.type import Type
-from tools.bdl.entity.fragment.contract import Contracts
-from tools.bdl.entity.entity import Entity
+from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.contract import Contracts
+from tools.bdl.entities.impl.entity import Entity
 
 
 class Variable(Entity):
@@ -43,3 +43,6 @@ class Variable(Entity):
 	@property
 	def contracts(self) -> Contracts:
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
+
+	def __repr__(self) -> str:
+		return self.toString({"name": self.name})
