@@ -38,14 +38,13 @@ class Result(VisitorBase[ResultType]):
 		"""
 		if entity is None:
 			return
-		name = entity.kind
 
 		# Look for a match
-		maybeElement = self.bdl.getElementFromName(name=name, namespace=self.namespace)
+		maybeElement = self.bdl.getElementFromType(entity=entity, namespace=self.namespace)
 		if not maybeElement:
 			# Failed to match any symbol from the map
 			Error.handleFromElement(element=entity.element,
-				message="Symbol '{}' in namespace '{}' could not be resolved.".format(name, ".".join(self.namespace)))
+				message="Symbol '{}' in namespace '{}' could not be resolved.".format(entity.kind, ".".join(self.namespace)))
 
 		# Save the underlying element
 		assert maybeElement
@@ -53,6 +52,8 @@ class Result(VisitorBase[ResultType]):
 
 	def visitNestedEntities(self, entity: Nested, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
+		for inheritance in entity.inheritanceList:
+			self.resolveTypeIfAny(entity=inheritance)
 
 	def visitVariable(self, entity: Variable, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
@@ -74,3 +75,5 @@ class Result(VisitorBase[ResultType]):
 
 	def visitUse(self, entity: Use, result: ResultType) -> None:
 		result.registerUse(entity=entity)
+		bdl = Object.fromPath(entity.path)
+		self.bdl.registerSymbols(bdl.symbols)

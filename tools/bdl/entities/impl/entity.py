@@ -13,7 +13,7 @@ class Entity:
 		return self.element.getAttr("name").value
 
 	def toString(self, attrs: typing.MutableMapping[str, str] = {}) -> str:
-		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items()]
+		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 	def __repr__(self) -> str:

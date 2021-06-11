@@ -31,7 +31,7 @@ enum {data.name}
 
 {for data in nestedList}
 {data.comment | normalComment}
-{data.type} {data.name}
+{data.type} {data.name}{if data.hasInheritance} : {data.inheritanceList | inheritanceToStr}{end}
 {
 	{for enum in data.nested.enumList}
 	{enum.comment | normalComment}

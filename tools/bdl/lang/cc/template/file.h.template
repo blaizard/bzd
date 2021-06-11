@@ -26,7 +26,7 @@ enum class {data.name}
 
 {for data in nestedList}
 {data.comment | normalComment}
-class {data.name}
+class {data.name}{if data.hasInheritance} : {data.inheritanceList}{end}
 {
 public: // Types
 	{for enum in data.nested.enumList}
