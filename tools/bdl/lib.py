@@ -10,16 +10,14 @@ from tools.bdl.object import Object
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
 
-
-def main(formatType: str, path: Path) -> str:
-
-	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
+def preprocess(path: Path) -> Object:
 
 	# Parse the input file
-	bdl = Object.fromPath(path=path)
+	return Object.fromPath(path=path)
 
-	# Set context for the error handling
-	Error.setContext(path=path)
+def build(formatType: str, bdl: Object) -> str:
+
+	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Process the result
 	result = Result(bdl=bdl).process()
@@ -28,3 +26,12 @@ def main(formatType: str, path: Path) -> str:
 
 	# Format using a specific formatter
 	return formatters[formatType](result)
+
+def main(formatType: str, path: Path) -> str:
+
+	bdl = preprocess(path=path)
+
+	# Set context for the error handling
+	Error.setContext(path=path)
+
+	return build(formatType=formatType, bdl=bdl)

@@ -35,3 +35,12 @@ Part of this process, the parser also goes through a basic validation step, to c
 
 The bdl object stage creates a symbol map of the current compilation unit and serializes the output to a file (for re-use purpose).
 This stage generates the preprocessed artifact that can be consumed by other compilation units importing other `bdl` files.
+
+## Generators
+
+The following describes buitl-in generators and how custom generators can be added.
+
+### C++
+
+The C++ formatter will generate a C++ compulation unit which interface is accessible from the .h counter part of the .bdl rule. For example, core.bdl -> core.h
+This is to ensure that inclusion can find the correspondiing header file.

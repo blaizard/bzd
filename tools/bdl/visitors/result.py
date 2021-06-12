@@ -44,7 +44,8 @@ class Result(VisitorBase[ResultType]):
 		if not maybeElement:
 			# Failed to match any symbol from the map
 			Error.handleFromElement(element=entity.element,
-				message="Symbol '{}' in namespace '{}' could not be resolved.".format(entity.kind, ".".join(self.namespace)))
+				message="Symbol '{}' in namespace '{}' could not be resolved.".format(
+				entity.kind, ".".join(self.namespace)))
 
 		# Save the underlying element
 		assert maybeElement

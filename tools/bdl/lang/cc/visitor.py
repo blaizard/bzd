@@ -18,7 +18,10 @@ class _VisitorType(VisitorType):
 		return "{}{}".format(kind, template)
 
 	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
-		print(kind)
+
+		if "." in kind:
+			kind = "::".join(kind.split("."))
+
 		if comment is None:
 			return kind
 		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
@@ -76,6 +79,14 @@ def _normalComment(comment: typing.Optional[str]) -> str:
 	return "// {comment}\n".format(comment=comment)
 
 
+def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
+	return ", ".join(["public {}".format(str(_typeToStr(inheritance))) for inheritance in inheritanceList])
+
+
+def _bdlPathToHeader(path: Path) -> str:
+	return path.as_posix().replace(".bdl", ".h")
+
+
 def formatCc(result: ResultType) -> str:
 	content = (Path(__file__).parent / "template/file.h.template").read_text()
 	template = Template(content)
@@ -83,7 +94,9 @@ def formatCc(result: ResultType) -> str:
 		"camelCase": _toCamelCase,
 		"typeToStr": _typeToStr,
 		"namespaceToStr": _namespaceToStr,
-		"normalComment": _normalComment
+		"normalComment": _normalComment,
+		"inheritanceToStr": _inheritanceToStr,
+		"bdlPathToHeader": _bdlPathToHeader
 	})
 	output = template.process(result, removeEmptyLines=True)
 

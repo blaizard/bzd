@@ -42,18 +42,17 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 
 	return [
 		GrammarItem(_regexprNested, {"category": "nested"}, [
-			GrammarItem(_regexprName, Fragment, [
-				GrammarItem(r":", InheritanceStart, [
-					GrammarItem(_regexprSymbol, Fragment, [
-						GrammarItem(r",", FragmentNewElement),
-						GrammarItem(r"(?={)", FragmentParentElement)
-					])
-				]),
-				GrammarItem(r"{", FragmentNestedStart, [
-					nestedGrammar,
-					GrammarItem(r"}", FragmentNestedStop),
-				]),
-			])
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r":", InheritanceStart, [
+		GrammarItem(_regexprSymbol, Fragment,
+		[GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"(?={)", FragmentParentElement)])
+		]),
+		GrammarItem(r"{", FragmentNestedStart, [
+		nestedGrammar,
+		GrammarItem(r"}", FragmentNestedStop),
+		]),
+		])
 		])
 	]
 

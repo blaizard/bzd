@@ -1,4 +1,4 @@
-#include "example/manifest/interface.h"
+#include "example/manifest/manifest.h"
 
 #include <iostream>
 

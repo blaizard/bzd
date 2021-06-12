@@ -46,8 +46,10 @@ def _normalComment(comment: typing.Optional[str]) -> str:
 		return "/*\n{comment}\n */\n".format(comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
 	return "// {comment}\n".format(comment=comment)
 
+
 def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 	return ", ".join([str(_typeToStr(inheritance)) for inheritance in inheritanceList])
+
 
 def formatBdl(result: ResultType) -> str:
 

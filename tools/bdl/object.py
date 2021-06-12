@@ -9,6 +9,7 @@ from tools.bdl.visitors.map import Map, MapType
 from tools.bdl.visitors.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
 
+
 class Object:
 	"""
 	BDL object representation.
