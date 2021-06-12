@@ -15,12 +15,14 @@
 				this.loading = true;
 				try {
 					return await action();
-				} catch (e) {
+				}
+				catch (e) {
 					this.handleError(e);
 					if (throwOnError) {
 						throw e;
 					}
-				} finally {
+				}
+				finally {
 					this.loading = false;
 				}
 			},

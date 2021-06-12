@@ -6,10 +6,10 @@ bzd_manifest(
     srcs = [
         "linux.bdl",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:core",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -21,9 +21,9 @@ cc_library(
         "-lpthread",
     ],
     deps = [
+        ":bdl",
         "//cc/bzd/container:optional",
         "//cc/bzd/platform/core:stack",
-        ":bdl",
     ],
 )
 

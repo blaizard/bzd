@@ -12,8 +12,7 @@
 					:path="makePath(item)"
 					:depth="depth + 1"
 					class="indent"
-					@item="handleItemPropagation(item.name, $event)"
-				></TreeDirectory>
+					@item="handleItemPropagation(item.name, $event)"></TreeDirectory>
 			</div>
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
@@ -60,7 +59,8 @@
 					await this.handleSubmit(async () => {
 						this.list = await this.$cache.get("list", ...this.path);
 					}, /*throwOnError*/ true);
-				} catch (e) {
+				}
+				catch (e) {
 					this.error = e;
 				}
 			},
@@ -91,7 +91,8 @@
 				const name = item.name;
 				if (name in this.expanded) {
 					this.$delete(this.expanded, name);
-				} else {
+				}
+				else {
 					this.$set(this.expanded, name, true);
 				}
 			},

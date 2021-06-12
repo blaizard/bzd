@@ -159,11 +159,13 @@ export default class PersistenceDisk {
 					taskConfig
 				);
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			Exception.fromError(e).print("Error while initializing data");
 			this.event.trigger("error", e);
 			throw e;
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 	}
@@ -287,10 +289,12 @@ export default class PersistenceDisk {
 			this.savepointVersion++;
 			// Only if everything went well, set the ready flag
 			this.event.trigger("ready");
-		} catch (e) {
+		}
+		catch (e) {
 			this.event.trigger("error", e);
 			throw e;
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 	}
@@ -391,9 +395,9 @@ export default class PersistenceDisk {
 		Exception.assert(
 			type in this.options.operations,
 			() =>
-				'The operation "' +
+				"The operation \"" +
 				type +
-				'" is not supported, valid operations are: ' +
+				"\" is not supported, valid operations are: " +
 				Object.keys(this.options.operations).join(", ")
 		);
 
@@ -443,12 +447,14 @@ export default class PersistenceDisk {
 
 				// If success set the flag to dirty
 				this.delta.dirty = true;
-			} catch (e) {
+			}
+			catch (e) {
 				// Delete the delta previously added
 				await FileSystem.truncate(deltaPath, fileSize);
 				throw Exception.fromError(e);
 			}
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 
@@ -461,7 +467,7 @@ export default class PersistenceDisk {
 	async applyDelta(id, data) {
 		const path = this.getPathFromId(id);
 
-		Exception.assert(await FileSystem.exists(path), 'File "' + path + '" does not exists.');
+		Exception.assert(await FileSystem.exists(path), "File \"" + path + "\" does not exists.");
 
 		// Read the file asynchronously
 		const content = await FileSystem.readFile(path);
@@ -478,9 +484,9 @@ export default class PersistenceDisk {
 			Exception.assert(
 				type in this.options.operations,
 				() =>
-					'The operation "' +
+					"The operation \"" +
 					type +
-					'" is not supported, valid operations are: ' +
+					"\" is not supported, valid operations are: " +
 					Object.keys(this.options.operations).join(", ")
 			);
 
@@ -505,7 +511,8 @@ export default class PersistenceDisk {
 			Log.info("Persistence '{}' is dirty, running savepoint", this.path);
 			try {
 				await this.savepoint();
-			} catch (e) {
+			}
+			catch (e) {
 				Exception.fromError(e).print();
 			}
 		}
@@ -552,11 +559,13 @@ export default class PersistenceDisk {
 			this.delta.dirty = false;
 
 			// Release the lock as of now the persistence has already been copied to be written
-		} catch (e) {
+		}
+		catch (e) {
 			this.isSavepoint = false;
 			Exception.fromError(e).print();
 			throw e;
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 
@@ -569,10 +578,12 @@ export default class PersistenceDisk {
 			if (!(await this.savepointReplaceData(tempPath, savepointVersion, id))) {
 				Log.warning("The savepoint version differ, meaning that something interfere in parallel");
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			Exception.fromError(e).print();
 			throw e;
-		} finally {
+		}
+		finally {
 			this.isSavepoint = false;
 		}
 	}
@@ -591,7 +602,8 @@ export default class PersistenceDisk {
 			}
 
 			return isSavepointVersionValid;
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 	}
@@ -696,7 +708,8 @@ export default class PersistenceDisk {
 				this.delta.dirty || delta.dirty == this.delta.dirty,
 				"Dirty flag is wrong: " + JSON.stringify(delta) + ", " + JSON.stringify(this.delta)
 			);
-		} finally {
+		}
+		finally {
 			this.mutex.release();
 		}
 
