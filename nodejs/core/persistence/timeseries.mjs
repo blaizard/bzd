@@ -210,8 +210,7 @@ export default class PersistenceTimeSeries {
 			const stat = await FileSystem.stat(fullPath);
 			if (stat.isFile()) {
 				dataFileList.add(fileList[i]);
-			}
-			else if (stat.isDirectory() && fileList[i].match(/^.+\.delta$/)) {
+			} else if (stat.isDirectory() && fileList[i].match(/^.+\.delta$/)) {
 				dataFileList.add(fileList[i].replace(/\.delta$/, ""));
 			}
 		}
@@ -243,11 +242,9 @@ export default class PersistenceTimeSeries {
 							timestampEnd: timestampEnd,
 						});
 					});
-				}
-				catch (e) {
+				} catch (e) {
 					Log.error("Ignoring data file '{}' seems to be corrupted: {}", fullPath, e);
-				}
-				finally {
+				} finally {
 					// Close the persistence
 					await persistence.close();
 				}
@@ -393,8 +390,7 @@ export default class PersistenceTimeSeries {
 					indexLeft -= entry[1].length;
 				}
 			});
-		}
-		else {
+		} else {
 			// Loop through the index and count the element until index is reached
 			result = await this.timeSeriesIndex.wrap((await this.persistenceIndex.get()).list, async (timeSeriesIndex) => {
 				let indexLeft = -(index + 1);
@@ -462,8 +458,7 @@ export default class PersistenceTimeSeries {
 				if (forWrite && metadata.length >= this.options.maxEntriesPerFile && metadata.timestampEnd < timestamp) {
 					Log.info("Creating a new data file, current is full");
 					index = -1;
-				}
-				else {
+				} else {
 					timestamp = timeSeriesIndex.data[index][0];
 				}
 			}

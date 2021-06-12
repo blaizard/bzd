@@ -32,7 +32,7 @@ export default class DockerV2Proxy {
 				// Redirect authentication request to this proxy
 				if (response.statusCode == 401 && "www-authenticate" in response.headers) {
 					response.headers["www-authenticate"] =
-						"Bearer realm=\"" + this.url + "/v2/token\",service=\"" + this._getServiceFromUrl() + "\"";
+						'Bearer realm="' + this.url + '/v2/token",service="' + this._getServiceFromUrl() + '"';
 				}
 
 				// Update location with the correct URL

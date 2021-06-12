@@ -40,11 +40,11 @@ export default class StripePayment {
 
 			let amount = 0;
 			switch (this.options.currency) {
-			case "eur":
-				amount = Math.floor(inputs.amount * 100);
-				break;
-			default:
-				Exception.unreachable("Unsupported currency: {}", this.options.currency);
+				case "eur":
+					amount = Math.floor(inputs.amount * 100);
+					break;
+				default:
+					Exception.unreachable("Unsupported currency: {}", this.options.currency);
 			}
 			Exception.assert(amount, "Amount incorrect: {}", amount);
 

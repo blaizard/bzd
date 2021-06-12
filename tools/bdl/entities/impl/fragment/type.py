@@ -45,6 +45,7 @@ class Type:
 	def __repr__(self) -> str:
 		return self.name
 
+
 class Visitor(VisitorBase[str, str]):
 
 	nestedKind = "template"

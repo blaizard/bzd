@@ -5,7 +5,7 @@
 #include "tools/bdl/lang/cc/adapter/types.h"
 
 {for use in useList}
-#include "{use.path}"
+#include "{use.path | bdlPathToHeader}"
 {end}
 
 {if isNamespace}
@@ -26,7 +26,7 @@ enum class {data.name}
 
 {for data in nestedList}
 {data.comment | normalComment}
-class {data.name}{if data.hasInheritance} : {data.inheritanceList}{end}
+class {data.name}{if data.hasInheritance} : {data.inheritanceList | inheritanceToStr}{end}
 {
 public: // Types
 	{for enum in data.nested.enumList}

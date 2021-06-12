@@ -7,6 +7,7 @@ from bzd.parser.visitor import Visitor
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity
 
+
 class _VisitorInheritance(Visitor[Type, typing.List[Type]]):
 
 	nestedKind = None
@@ -18,6 +19,7 @@ class _VisitorInheritance(Visitor[Type, typing.List[Type]]):
 		Error.assertHasAttr(element=element, attr="symbol")
 		result.append(Type(element=element, kind="symbol"))
 		return result
+
 
 class Nested(Entity):
 
@@ -57,6 +59,10 @@ class Nested(Entity):
 		return _VisitorInheritance().visit(sequence=sequence)
 
 	def __repr__(self) -> str:
-		content = self.toString({"name": self.name, "type": self.type, "inheritance": ", ".join([str(t) for t in self.inheritanceList])})
+		content = self.toString({
+			"name": self.name,
+			"type": self.type,
+			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
+		})
 		content += "\n  ".join([""] + repr(self.nested).split("\n"))
 		return content
