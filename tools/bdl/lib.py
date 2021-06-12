@@ -15,7 +15,7 @@ def preprocess(path: Path) -> Object:
 	# Parse the input file
 	return Object.fromPath(path=path)
 
-def build(formatType: str, bdl: Object) -> str:
+def generate(formatType: str, bdl: Object) -> str:
 
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
@@ -34,4 +34,4 @@ def main(formatType: str, path: Path) -> str:
 	# Set context for the error handling
 	Error.setContext(path=path)
 
-	return build(formatType=formatType, bdl=bdl)
+	return generate(formatType=formatType, bdl=bdl)
