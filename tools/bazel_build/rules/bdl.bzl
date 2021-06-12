@@ -37,7 +37,6 @@ def _bzd_manifest_impl(ctx):
 
     # Computet each input file independently
     for input_file in ctx.files.srcs:
-
         # Build the relative path of the input file from the BUILD file
         build_root_path = ctx.build_file_path.rsplit("/", 1)[0] + "/"
         relative_name = input_file.path.replace(build_root_path, "").replace(".bdl", "")
@@ -62,6 +61,7 @@ def _bzd_manifest_impl(ctx):
                 arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, bdl_object.path],
                 executable = ctx.attr._bdl.files_to_run,
             )
+
             # Save the outputs
             generated[fmt] += outputs
 
@@ -70,8 +70,8 @@ def _bzd_manifest_impl(ctx):
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
 
     return [
-        BdlProvider(outputs=depset(ctx.files.srcs)),
-        cc_info_providers
+        BdlProvider(outputs = depset(ctx.files.srcs)),
+        cc_info_providers,
     ]
 
 """

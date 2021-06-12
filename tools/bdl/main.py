@@ -23,8 +23,8 @@ if __name__ == "__main__":
 
 	elif config.stage == "generate":
 
-		bdl = config.input.read_text()
-		output = generate(formatType=config.format, bdl=Object.fromSerialize(bdl))
+		bdl = config.input.read_text(encoding="ascii")
+		output = generate(formatType=config.format, bdl=Object.fromSerialize(str(bdl)))
 
 	else:
 		output = main(formatType=config.format, path=config.input)
@@ -32,4 +32,4 @@ if __name__ == "__main__":
 	if config.output is None:
 		print(output)
 	else:
-		config.output.write_text(output)
+		config.output.write_text(output, encoding="ascii")

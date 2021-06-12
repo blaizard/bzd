@@ -16,9 +16,7 @@ class TestRun(unittest.TestCase):
 		assert self.filePath is not None
 		bdl = Object.fromPath(path=self.filePath)
 
-		result = Result(bdl).process()
-
-		output = formatBdl(result)
+		output = formatBdl(bdl)
 
 		expected = """/*
  * This is a multi-line comment
