@@ -25,7 +25,11 @@ method {method.name}({for i, var in method.args}{if var.const}const {end}{var.ty
 {data.comment | normalComment}
 enum {data.name}
 {
-	{for i, value in data.valueList}{if i}, {end}{value}{end}
+	{for i, value in data.values}
+	{if i},{end}
+	{value.comment | normalComment}
+	{value.name}
+	{end}
 }
 {end}
 
@@ -37,7 +41,11 @@ enum {data.name}
 	{enum.comment | normalComment}
 	enum {enum.name}
 	{
-		{for i, value in enum.valueList}{if i}, {end}{value}{end}
+		{for i, value in enum.values}
+		{if i},{end}
+		{value.comment | normalComment}
+		{value.name}
+		{end}
 	}
 	{end}
 

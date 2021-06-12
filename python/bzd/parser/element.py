@@ -8,11 +8,15 @@ if typing.TYPE_CHECKING:
 ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
 SequenceSerialize = typing.List[ElementSerialize]
 
-
 class Sequence:
 
 	def __init__(self) -> None:
 		self.list: typing.List["Element"] = []
+
+	def __iter__(self) -> typing.Iterator["Element"]:
+		for element in self.list:
+			if not element.isEmpty():
+				yield element
 
 	def iterate(self) -> typing.Iterator["Element"]:
 		for element in self.list:
