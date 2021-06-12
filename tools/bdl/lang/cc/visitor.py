@@ -2,6 +2,8 @@ import typing
 from pathlib import Path
 
 from tools.bdl.result import ResultType
+from tools.bdl.visitors.result import Result
+from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
 from bzd.template.template import Template
@@ -87,7 +89,11 @@ def _bdlPathToHeader(path: Path) -> str:
 	return path.as_posix().replace(".bdl", ".h")
 
 
-def formatCc(result: ResultType) -> str:
+def formatCc(bdl: Object) -> str:
+
+	# Process the result
+	result = Result(bdl=bdl, resolve=True, include=True).process()
+
 	content = (Path(__file__).parent / "template/file.h.template").read_text()
 	template = Template(content)
 	result.update({

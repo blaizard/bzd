@@ -15,9 +15,20 @@ from tools.bdl.entities.impl.fragment.type import Type
 
 class Result(VisitorBase[ResultType]):
 
-	def __init__(self, bdl: Object) -> None:
+	def __init__(self, bdl: Object, resolve: bool = False, include: bool = False) -> None:
+		"""
+		Create a result object.
+		- Params:
+			resolve: Resolve symbols.
+			include: Follow use statement.
+		"""
+
 		super().__init__()
 		self.bdl = bdl
+
+		# Options
+		self.isResolve = resolve
+		self.isInclude = include
 
 		self.bdl.registerSymbols({
 			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
@@ -36,12 +47,15 @@ class Result(VisitorBase[ResultType]):
 		"""
 		Resolve a symbol looking at the symbol map going up into the namespaces.
 		"""
-		if entity is None:
+		if not self.isResolve or entity is None:
 			return
 
 		# Look for a match
 		maybeElement = self.bdl.getElementFromType(entity=entity, namespace=self.namespace)
 		if not maybeElement:
+			# Silently return if include is disabled
+			if not self.isInclude:
+				return
 			# Failed to match any symbol from the map
 			Error.handleFromElement(element=entity.element,
 				message="Symbol '{}' in namespace '{}' could not be resolved.".format(
@@ -76,5 +90,6 @@ class Result(VisitorBase[ResultType]):
 
 	def visitUse(self, entity: Use, result: ResultType) -> None:
 		result.registerUse(entity=entity)
-		bdl = Object.fromPath(entity.path)
-		self.bdl.registerSymbols(bdl.symbols)
+		if self.isInclude:
+			bdl = Object.fromPath(entity.path)
+			self.bdl.registerSymbols(bdl.symbols)
