@@ -1,7 +1,9 @@
 namespace bzd.manifest;
 enum Test
 {
-	FIRST, SECOND
+	FIRST
+	,
+	SECOND
 }
 interface MyInterface
 {

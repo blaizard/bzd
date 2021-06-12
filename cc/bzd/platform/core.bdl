@@ -9,7 +9,14 @@ interface Core
 	// Error codes for core-related functionality.
 	enum Error
 	{
-		UNINITIALIZED, ALIGNMENT, SIZE
+		// The object was used before being properly initialized.
+		UNINITIALIZED
+		,
+		// The error comes from something related to memory alignment.
+		ALIGNMENT
+		,
+		// The error comes from something related to memory size.
+		SIZE
 	}
 	// Initialize the core.
 	method init();

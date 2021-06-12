@@ -20,7 +20,11 @@ using {data.name} = {data.type | typeToStr};
 {data.comment | normalComment}
 enum class {data.name}
 {
-	{for i, value in data.valueList}{if i}, {end}{value}{end}
+	{for i, value in data.values}
+	{if i},{end}
+	{value.comment | normalComment}
+	{value.name}
+	{end}
 };
 {end}
 
@@ -33,7 +37,11 @@ public: // Types
 	{enum.comment | normalComment}
 	enum class {enum.name}
 	{
-		{for i, value in enum.valueList}{if i}, {end}{value}{end}
+		{for i, value in enum.values}
+		{if i},{end}
+		{value.comment | normalComment}
+		{value.name}
+		{end}
 	};
 	{end}
 
