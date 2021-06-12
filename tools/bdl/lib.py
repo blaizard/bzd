@@ -10,22 +10,20 @@ from tools.bdl.object import Object
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
 
+
 def preprocess(path: Path) -> Object:
 
 	# Parse the input file
 	return Object.fromPath(path=path)
 
+
 def generate(formatType: str, bdl: Object) -> str:
 
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
-	# Process the result
-	result = Result(bdl=bdl).process()
-
-	print(result)
-
 	# Format using a specific formatter
-	return formatters[formatType](result)
+	return formatters[formatType](bdl=bdl)
+
 
 def main(formatType: str, path: Path) -> str:
 
