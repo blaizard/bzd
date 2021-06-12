@@ -8,6 +8,7 @@ if typing.TYPE_CHECKING:
 ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
 SequenceSerialize = typing.List[ElementSerialize]
 
+
 class Sequence:
 
 	def __init__(self) -> None:

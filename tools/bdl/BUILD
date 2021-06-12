@@ -19,6 +19,7 @@ py_library(
     ]) + [
         "visitor.py",
         "result.py",
+        "object.py",
     ],
     visibility = [":__subpackages__"],
     deps = [
@@ -45,7 +46,6 @@ py_library(
     name = "lib",
     srcs = [
         "lib.py",
-        "object.py",
     ],
     visibility = ["//visibility:public"],
     deps = [

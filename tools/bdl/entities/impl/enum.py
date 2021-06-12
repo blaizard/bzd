@@ -6,6 +6,7 @@ from bzd.parser.visitor import Visitor as VisitorBase
 
 from tools.bdl.entities.impl.entity import Entity
 
+
 class EnumValue(Entity):
 
 	def __init__(self, element: Element) -> None:
@@ -15,6 +16,7 @@ class EnumValue(Entity):
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
+
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
 
@@ -45,16 +47,10 @@ class Enum(Entity):
 		return self.element.getAttrValue("comment")
 
 	@property
-	def values(self) -> Sequence:
+	def values(self) -> typing.Iterable[EnumValue]:
 		sequence = self.element.getNestedSequence("values")
 		assert sequence is not None
 		return [EnumValue(element) for element in sequence]
-
-	@property
-	def valueList(self) -> typing.List[str]:
-		sequence = self.element.getNestedSequence("values")
-		assert sequence is not None
-		return _Visitor().visit(sequence=sequence)
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name, "values": ", ".join([e.name for e in self.values])})
