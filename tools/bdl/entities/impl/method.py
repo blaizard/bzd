@@ -35,7 +35,7 @@ class Method(Entity):
 		if self.element.isNestedSequence("argument"):
 			sequence = self.element.getNestedSequence("argument")
 			assert sequence is not None
-			return [Variable(element=arg) for arg in sequence.iterate()]
+			return [Variable(element=arg) for arg in sequence]
 		return []
 
 	def __repr__(self) -> str:

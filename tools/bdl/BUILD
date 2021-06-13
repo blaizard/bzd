@@ -28,12 +28,12 @@ py_library(
 )
 
 py_library(
-    name = "lang",
+    name = "generators",
     srcs = glob([
-        "lang/**/*.py",
+        "generators/**/*.py",
     ]),
     data = glob([
-        "lang/**/*.template",
+        "generators/**/*.template",
     ]),
     visibility = [":__subpackages__"],
     deps = [
@@ -49,8 +49,8 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":generators",
         ":grammar",
-        ":lang",
         ":visitor",
     ],
 )

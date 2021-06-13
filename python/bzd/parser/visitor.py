@@ -32,7 +32,7 @@ class Visitor(typing.Generic[T, U]):
 
 		result = self.visitBegin(result)
 
-		for element in sequence.iterate():
+		for element in sequence:
 			result = self.visitElement(element, result)
 			if self.nestedKind is not None:
 				nestedSequence = element.getNestedSequence(kind=self.nestedKind)

@@ -11,9 +11,13 @@ _defaultValue: typing.Any = {}
 Process a template with specific values.
 All block {<action>} must end with {end}, actions can be:
 - {if <condition>}: Process the following block only if the condition evaluates to True.
-- {for <variable> in <identifier>} or {for <key>, <value> in <identifier>}: Run the block as many times as there are entries.
+- {for <variable> in <iterable>} or {for <key>, <value> in <iterable>}: Run the block as many times as there are entries.
 - {include <path>}: Include a template while processing the template.
 All strings "{{" are replace with "{".
+
+To be implemented
+{% define my_block(a, b) %}{{a}} + {{b}}{% end %}
+{% call my_block %}
 """
 
 

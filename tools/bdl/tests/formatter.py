@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tools.bdl.object import Object
 from tools.bdl.visitors.result import Result
-from tools.bdl.lang.bdl.visitor import formatBdl
+from tools.bdl.generators.bdl.visitor import formatBdl
 
 
 class TestRun(unittest.TestCase):

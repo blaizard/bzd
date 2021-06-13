@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "tools/bdl/lang/cc/adapter/types.h"
+#include "tools/bdl/generators/cc/adapter/types.h"
 
 {for use in useList}
 #include "{use.path | bdlPathToHeader}"
@@ -29,6 +29,11 @@ enum class {data.name}
 {end}
 
 {for data in nestedList}
+
+{if data.type == "module"}
+namespace impl {
+{end}
+
 {data.comment | normalComment}
 class {data.name}{if data.hasInheritance} : {data.inheritanceList | inheritanceToStr}{end}
 {
@@ -113,6 +118,11 @@ private: // Variables.
 	{var.type | typeToStr} {var.name}_{{{if var.isValue}{var.value}{end}}};
 	{end}
 }};
+
+{if data.type == "module"}
+}
+{end}
+
 {end}
 
 {if isNamespace}
