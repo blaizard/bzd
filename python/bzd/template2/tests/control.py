@@ -25,5 +25,6 @@ class TestRun(unittest.TestCase):
 		result = template.process({"sequence": ["a", "b", "c", "d"]})
 		self.assertEqual("0:a,1:b,2:c,3:d,", result)
 
+
 if __name__ == '__main__':
 	unittest.main()

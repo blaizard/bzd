@@ -10,8 +10,10 @@ _regexprContent = r"(?P<content>(.+?(?={{|{%)|.+))"
 # Match a name
 _regexprName = r"(?P<name>([a-zA-Z_\-0-9\.]+))"
 
-def makeRegexprName(name: str) -> typing.Pattern[str]:
-	return r"(?P<" + name +  r">([a-zA-Z_\-0-9\.]+))"
+
+def makeRegexprName(name: str) -> str:
+	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.]+))"
+
 
 def makeGrammarContent() -> Grammar:
 	"""
@@ -50,6 +52,7 @@ def makeGrammarSubstitution() -> Grammar:
 		])
 	]
 
+
 def makeGrammarControlFor() -> Grammar:
 	"""
 	Generate the grammar for the for loop control block.
@@ -60,47 +63,44 @@ def makeGrammarControlFor() -> Grammar:
 	grammarFromIn = [
 		GrammarItemSpaces,
 		GrammarItem(r"in", Fragment, [
-			GrammarItemSpaces,
-			GrammarItem(makeRegexprName("iterable"), Fragment, [
-				GrammarItemSpaces,
-				GrammarItem(r"%}", FragmentNestedStart, "root")
-			])
+		GrammarItemSpaces,
+		GrammarItem(makeRegexprName("iterable"), Fragment,
+		[GrammarItemSpaces, GrammarItem(r"%}", FragmentNestedStart, "root")])
 		])
 	]
 
 	return [
 		GrammarItem(r"for", {"category": "for"}, [
-				GrammarItemSpaces,
-				GrammarItem(makeRegexprName("value1"), Fragment, [
-					GrammarItemSpaces,
-					GrammarItem(r",", Fragment, [
-						GrammarItemSpaces,
-						GrammarItem(makeRegexprName("value2"), Fragment, grammarFromIn)
-					])
-				] + grammarFromIn)
-			])
+		GrammarItemSpaces,
+		GrammarItem(makeRegexprName("value1"), Fragment, [
+		GrammarItemSpaces,
+		GrammarItem(r",", Fragment,
+		[GrammarItemSpaces, GrammarItem(makeRegexprName("value2"), Fragment, grammarFromIn)])
+		] + grammarFromIn)
+		])
 	]
+
 
 def makeGrammarControlEnd() -> Grammar:
 	"""
 	Generate the grammar for the end control block.
 	"""
-	return [
-		GrammarItem(r"end\s*%}", FragmentNestedStop)
-	]
+	return [GrammarItem(r"end\s*%}", FragmentNestedStop)]
+
 
 def makeGrammarControl() -> Grammar:
 	"""
 	Generate the grammar for all control blocks.
 	"""
 
-	return [
-		GrammarItem(r"{%", Fragment, [
-			GrammarItemSpaces,	
-		] + makeGrammarControlFor() + makeGrammarControlEnd())
-	]
+	return [GrammarItem(r"{%", Fragment, [
+		GrammarItemSpaces,
+	] + makeGrammarControlFor() + makeGrammarControlEnd())]
+
 
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
-		super().__init__(content, grammar=makeGrammarSubstitution() + makeGrammarControl() + makeGrammarContent(), defaultGrammar=[])
+		super().__init__(content,
+			grammar=makeGrammarSubstitution() + makeGrammarControl() + makeGrammarContent(),
+			defaultGrammar=[])

@@ -9,7 +9,8 @@ class GrammarItem:
 	def __init__(self,
 		regexpr: str,
 		fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
-		grammar: Optional[Union[Grammar, str]] = None, checkpoint: Optional[str] = None) -> None:
+		grammar: Optional[Union[Grammar, str]] = None,
+		checkpoint: Optional[str] = None) -> None:
 
 		self.regexpr = regexpr
 		if isinstance(fragment, dict):
