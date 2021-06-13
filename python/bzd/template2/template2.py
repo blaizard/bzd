@@ -13,7 +13,7 @@ _defaultValue: typing.Any = {}
 
 
 class VisitorTemplate(Visitor[str, str]):
-	nestedKind: None
+	nestedKind = None
 
 	def __init__(self, substitutions: SubstitutionsType) -> None:
 		self.substitutions = substitutions
@@ -50,37 +50,90 @@ class VisitorTemplate(Visitor[str, str]):
 
 		return value
 
+	def visitSubstitution(self, element: Element) -> str:
+		"""
+		Handle substitution.
+		"""
+		Error.assertHasAttr(element=element, attr="name")
+		value = self.resolveName(substitutions=self.substitutions, name=element.getAttr("name").value)
+
+		# Process the pipes if any.
+		pipes = element.getNestedSequence("pipe")
+		if pipes:
+			# Note, element is used on purpose here to ensure a more accurate error reporting.
+			for element in pipes:
+				Error.assertHasAttr(element=element, attr="name")
+				value = self.resolveName(substitutions=self.substitutions,
+					name=element.getAttr("name").value,
+					argument=value)
+
+		# Save the output
+		assert isinstance(value,
+			(int, float, str)), "The resulting substitued value must be a number or a string."
+		return str(value)
+
+	def visitForBlock(self, element: Element) -> str:
+		"""
+		Handle for loop block.
+		"""
+
+		Error.assertHasAttr(element=element, attr="value1")
+		Error.assertHasAttr(element=element, attr="iterable")
+		Error.assertHasSequence(element=element, sequence="nested")
+
+		value1 = element.getAttr("value1").value
+		Error.assertTrue(element=element, condition=value1 not in self.substitutions, message="Name conflict, '{}' already exists in the substitution map.".format(value1))
+
+		value2 = element.getAttrValue("value2")
+		Error.assertTrue(element=element, condition=(value2 is None) or (value2 not in self.substitutions), message="Name conflict, '{}' already exists in the substitution map.".format(value2))
+
+		sequence = element.getNestedSequence(kind="nested")
+		assert sequence
+
+		# Loop through the elements
+		result = ""
+		iterable = self.resolveName(substitutions=self.substitutions, name=element.getAttr("iterable").value)
+		if value2 is None:
+			for value in iterable:
+				self.substitutions[value1] = value
+				result += self._visit(sequence = sequence)
+				del self.substitutions[value1]
+		else:
+			iterablePair: typing.Iterator = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
+			for key, value in iterablePair:
+				self.substitutions[value1] = key
+				self.substitutions[value2] = value
+				result += self._visit(sequence = sequence)
+				del self.substitutions[value2]
+				del self.substitutions[value1]
+
+		return result
+
 	def visitElement(self, element: Element, result: str) -> str:
+		"""
+		Go through all elements and dispatch the action.
+		"""
 
 		Error.assertHasAttr(element=element, attr="category")
 		category = element.getAttr("category").value
 
 		try:
 
+			# Raw content
 			if category == "content":
-
 				Error.assertHasAttr(element=element, attr="content")
 				result += element.getAttr("content").value
 
+			# Substitution
 			elif category == "substitution":
+				result += self.visitSubstitution(element = element)
 
-				Error.assertHasAttr(element=element, attr="name")
-				value = self.resolveName(substitutions=self.substitutions, name=element.getAttr("name").value)
+			# For loop block
+			elif category == "for":
+				result += self.visitForBlock(element = element)
 
-				# Process the pipes if any.
-				pipes = element.getNestedSequence("pipe")
-				if pipes:
-					# Note, element is used on purpose here to ensure a more accurate error reporting.
-					for element in pipes:
-						Error.assertHasAttr(element=element, attr="name")
-						value = self.resolveName(substitutions=self.substitutions,
-							name=element.getAttr("name").value,
-							argument=value)
-
-				# Save the output
-				assert isinstance(value,
-					(int, float, str)), "The resulting substitued value must be a number or a string."
-				result += str(value)
+			else:
+				raise Exception("Unsupported category: '{}'.".format(category))
 
 		except Exception as e:
 			Error.handleFromElement(element=element, message=str(e))

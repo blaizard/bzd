@@ -23,6 +23,6 @@ py_test(
     ],
     deps = [
         "//tools/bdl:grammar",
-        "//tools/bdl:lang",
+        "//tools/bdl:generators",
     ],
 )
