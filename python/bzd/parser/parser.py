@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Iterator, MutableMapping, Type
+from typing import Any, Iterator, MutableMapping, Type, Optional
 
 from bzd.parser.element import SequenceParser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
@@ -42,19 +42,20 @@ class Parser:
 					GrammarItem), "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
 				yield item
 
-	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Grammar:
+	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Optional[Grammar]:
 		"""
 		Get the grammar from a grammar item and update the checkpoint if needed.
 		"""
-
 		# Grammar link to a checkpoint
 		if isinstance(item.grammar, str):
-			assert item.grammar in checkpoints, "Unknown checkpoint '{}', ensure the parser discovered it before referencing it.".format(item.grammar)
+			assert item.grammar in checkpoints, "Unknown checkpoint '{}', ensure the parser discovered it before referencing it.".format(
+				item.grammar)
 			assert item.checkpoint is None, "A grammar item referencing to a checkpoint cannot set a checkpoint."
 			return checkpoints[item.grammar]
 
 		# Register the checkpoint
 		if item.checkpoint is not None:
+			assert item.grammar, "Grammar must be set for a checkpoint."
 			checkpoints[item.checkpoint] = item.grammar
 
 		return item.grammar
@@ -67,9 +68,7 @@ class Parser:
 		index = 0
 		root = SequenceParser(parser=self, parent=None, grammar=self.grammar)
 		element = root.makeElement()
-		checkpoints: MutableMapping[str, Grammar] = {
-			"root": self.grammar
-		}
+		checkpoints: MutableMapping[str, Grammar] = {"root": self.grammar}
 
 		try:
 			while index < len(self.content):
@@ -80,7 +79,7 @@ class Parser:
 						if item.fragment:
 							fragment = item.fragment(index, attrs=m.groupdict())
 							element.add(fragment)
-							grammar = self.getGrammar(checkpoints = checkpoints, item = item)
+							grammar = self.getGrammar(checkpoints=checkpoints, item=item)
 							element = fragment.next(element, grammar)
 						break
 				if m is None:

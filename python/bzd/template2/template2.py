@@ -68,8 +68,7 @@ class VisitorTemplate(Visitor[str, str]):
 					argument=value)
 
 		# Save the output
-		assert isinstance(value,
-			(int, float, str)), "The resulting substitued value must be a number or a string."
+		assert isinstance(value, (int, float, str)), "The resulting substitued value must be a number or a string."
 		return str(value)
 
 	def visitForBlock(self, element: Element) -> str:
@@ -82,10 +81,14 @@ class VisitorTemplate(Visitor[str, str]):
 		Error.assertHasSequence(element=element, sequence="nested")
 
 		value1 = element.getAttr("value1").value
-		Error.assertTrue(element=element, condition=value1 not in self.substitutions, message="Name conflict, '{}' already exists in the substitution map.".format(value1))
+		Error.assertTrue(element=element,
+			condition=value1 not in self.substitutions,
+			message="Name conflict, '{}' already exists in the substitution map.".format(value1))
 
 		value2 = element.getAttrValue("value2")
-		Error.assertTrue(element=element, condition=(value2 is None) or (value2 not in self.substitutions), message="Name conflict, '{}' already exists in the substitution map.".format(value2))
+		Error.assertTrue(element=element,
+			condition=(value2 is None) or (value2 not in self.substitutions),
+			message="Name conflict, '{}' already exists in the substitution map.".format(value2))
 
 		sequence = element.getNestedSequence(kind="nested")
 		assert sequence
@@ -96,14 +99,14 @@ class VisitorTemplate(Visitor[str, str]):
 		if value2 is None:
 			for value in iterable:
 				self.substitutions[value1] = value
-				result += self._visit(sequence = sequence)
+				result += self._visit(sequence=sequence)
 				del self.substitutions[value1]
 		else:
-			iterablePair: typing.Iterator = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
+			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
 				self.substitutions[value1] = key
 				self.substitutions[value2] = value
-				result += self._visit(sequence = sequence)
+				result += self._visit(sequence=sequence)
 				del self.substitutions[value2]
 				del self.substitutions[value1]
 
@@ -126,11 +129,11 @@ class VisitorTemplate(Visitor[str, str]):
 
 			# Substitution
 			elif category == "substitution":
-				result += self.visitSubstitution(element = element)
+				result += self.visitSubstitution(element=element)
 
 			# For loop block
 			elif category == "for":
-				result += self.visitForBlock(element = element)
+				result += self.visitForBlock(element=element)
 
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))
