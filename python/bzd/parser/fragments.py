@@ -145,3 +145,18 @@ class FragmentNestedStop(Fragment):
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		return element.getSequence().getElement().getSequence().makeElement()
+
+class FragmentCheckpoint(Fragment):
+	"""
+	Helper fragment to go back to the root element.
+	"""
+
+	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
+		while True:
+			parentElement = element.getSequence().getElement()
+			print(parentElement)
+			if parentElement.isRoot:
+				break
+			element = parentElement
+		print("NEXT")
+		return element.getSequence().makeElement()

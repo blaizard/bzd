@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Iterator, Type
+from typing import Any, Iterator, MutableMapping, Type
 
 from bzd.parser.element import SequenceParser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
@@ -19,6 +19,9 @@ class Parser:
 
 	@classmethod
 	def fromPath(cls: Type["Parser"], path: Path, *args: Any, **kwargs: Any) -> "Parser":
+		"""
+		Make a parser instance from a file path using its text as a content.
+		"""
 
 		content = path.read_text()
 		parser = cls(content, *args, **kwargs)
@@ -26,10 +29,11 @@ class Parser:
 
 		return parser
 
-	def handleError(self, index: int, message: str) -> None:
-		Error.handle(index=index, message=message)
-
 	def iterateGrammar(self, grammar: Grammar) -> Iterator[GrammarItem]:
+		"""
+		Helper to loop through the grammars.
+		"""
+
 		for item in grammar:
 			if isinstance(item, list):
 				yield from self.iterateGrammar(item)
@@ -38,28 +42,59 @@ class Parser:
 					GrammarItem), "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
 				yield item
 
+	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Grammar:
+		"""
+		Get the grammar from a grammar item and update the checkpoint if needed.
+		"""
+
+		# Grammar link to a checkpoint
+		if isinstance(item.grammar, str):
+			assert item.grammar in checkpoints, "Unknown checkpoint '{}', ensure the parser discovered it before referencing it.".format(item.grammar)
+			assert item.checkpoint is None, "A grammar item referencing to a checkpoint cannot set a checkpoint."
+			return checkpoints[item.grammar]
+
+		# Register the checkpoint
+		if item.checkpoint is not None:
+			checkpoints[item.checkpoint] = item.grammar
+
+		return item.grammar
+
 	def parse(self) -> SequenceParser:
+		"""
+		Parse the content using the provided grammar.
+		"""
+
 		index = 0
 		root = SequenceParser(parser=self, parent=None, grammar=self.grammar)
 		element = root.makeElement()
-		while index < len(self.content):
-			m = None
-			for item in self.iterateGrammar(self.defaultGrammar + element.getGrammar()):
-				m = re.match(item.regexpr, self.content[index:], re.MULTILINE)
-				if m:
-					if item.fragment:
-						fragment = item.fragment(index, attrs=m.groupdict())
-						element.add(fragment)
-						element = fragment.next(element, item.grammar)
-					break
-			if m is None:
-				# Uncomment for debug
-				print(root)
-				#print(self.content[index:])
-				for item in self.iterateGrammar(element.getGrammar()):
-					print(item.regexpr)
-				self.handleError(index=index, message="Invalid syntax.")
-			assert m is not None
-			index += m.end()
+		checkpoints: MutableMapping[str, Grammar] = {
+			"root": self.grammar
+		}
+
+		try:
+			while index < len(self.content):
+				m = None
+				for item in self.iterateGrammar(self.defaultGrammar + element.getGrammar()):
+					m = re.match(item.regexpr, self.content[index:], re.MULTILINE)
+					if m:
+						if item.fragment:
+							fragment = item.fragment(index, attrs=m.groupdict())
+							element.add(fragment)
+							grammar = self.getGrammar(checkpoints = checkpoints, item = item)
+							element = fragment.next(element, grammar)
+						break
+				if m is None:
+					raise Exception("Invalid syntax.")
+				assert m is not None
+				index += m.end()
+
+		except Exception as e:
+
+			# Uncomment for debug
+			print("**** debug ****\n", root)
+			for item in self.iterateGrammar(element.getGrammar()):
+				print(item.regexpr)
+
+			Error.handle(index=index, message=str(e))
 
 		return root

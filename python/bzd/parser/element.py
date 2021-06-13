@@ -201,6 +201,10 @@ class ElementParser(Element):
 		self.grammar = grammar
 		self.parent = parent
 
+	@property
+	def isRoot(self) -> bool:
+		return self.parent is None
+
 	def add(self, fragment: Fragment) -> None:
 		"""
 		Add a new fragment to this element.
@@ -222,7 +226,7 @@ class ElementParser(Element):
 		return typing.cast(SequenceParser, self.sequences[kind]).makeElement()
 
 	def getSequence(self) -> SequenceParser:
-		assert self.parent is not None, "reached parent element"
+		assert not self.isRoot, "reached root element"
 		assert isinstance(self.parent,
 			SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent

@@ -9,3 +9,13 @@ py_test(
         "//python/bzd/template2",
     ],
 )
+
+py_test(
+    name = "control",
+    srcs = [
+        "control.py",
+    ],
+    deps = [
+        "//python/bzd/template2",
+    ],
+)
