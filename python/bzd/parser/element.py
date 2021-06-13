@@ -19,11 +19,6 @@ class Sequence:
 			if not element.isEmpty():
 				yield element
 
-	def iterate(self) -> typing.Iterator["Element"]:
-		for element in self.list:
-			if not element.isEmpty():
-				yield element
-
 	def merge(self, sequence: "Sequence") -> None:
 		self.list += sequence.list
 
@@ -43,7 +38,7 @@ class Sequence:
 		"""
 		Serialize a sequence.
 		"""
-		return [element.serialize() for element in self.iterate()]
+		return [element.serialize() for element in self]
 
 	@staticmethod
 	def fromSerialize(sequence: SequenceSerialize) -> "Sequence":

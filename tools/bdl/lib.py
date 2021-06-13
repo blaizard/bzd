@@ -3,8 +3,8 @@ from pathlib import Path
 
 from bzd.parser.error import Error
 
-from tools.bdl.lang.bdl.visitor import formatBdl
-from tools.bdl.lang.cc.visitor import formatCc
+from tools.bdl.generators.bdl.visitor import formatBdl
+from tools.bdl.generators.cc.visitor import formatCc
 from tools.bdl.visitors.result import Result
 from tools.bdl.object import Object
 

@@ -99,7 +99,7 @@ bzd_manifest = rule(
             executable = True,
         ),
         "_deps_cc": attr.label_list(
-            default = [Label("//tools/bdl/lang/cc/adapter:types")],
+            default = [Label("//tools/bdl/generators/cc/adapter:types")],
             cfg = "host",
         ),
     },

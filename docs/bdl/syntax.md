@@ -1,4 +1,4 @@
-# Bdl > Syntax
+# Bdl Syntax
 
 The following describes the the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
 
@@ -95,7 +95,7 @@ It contains children which can be either functions or variables.
 
 ## Module
 
-A module is basically an implementation of an interface. It can be instantiated and exposes
+A module is the implementation of one or multiple interfaces. It can be instantiated and exposes
 the functionality of the interface it inherits from.
 In addition it expose things like configuration details, dependencies... to the description language.
 
@@ -109,3 +109,4 @@ config:
 	Integer channel [template];
 }
 ```
+

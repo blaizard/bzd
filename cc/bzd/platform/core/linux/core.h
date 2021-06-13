@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/optional.h"
-#include "cc/bzd/platform/core.h"
+#include "cc/bzd/platform/core/linux/linux.h"
 #include "cc/bzd/platform/core/stack.h"
 
 #ifndef _GNU_SOURCE
@@ -15,7 +15,7 @@
 namespace bzd::platform::core {
 
 template <SizeType N>
-class Linux : public bzd::platform::Core
+class Linux : public bzd::platform::core::impl::Linux
 {
 private:
 	using Self = Linux<N>;
