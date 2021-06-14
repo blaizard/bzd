@@ -3,7 +3,7 @@ from pathlib import Path
 
 from bzd.parser.parser import Parser as ParserBase
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
-from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStop, FragmentNewElement, FragmentParentElement, FragmentComment
+from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
 # Match: interface, struct
@@ -50,7 +50,7 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		]),
 		GrammarItem(r"{", FragmentNestedStart, [
 		nestedGrammar,
-		GrammarItem(r"}", FragmentNestedStop),
+		GrammarItem(r"}", FragmentNestedStopNewElement),
 		]),
 		])
 		])
@@ -175,7 +175,7 @@ def makeGrammarEnum() -> Grammar:
 		GrammarItem(r"{", EnumStart, [
 		GrammarItem(_regexprName, Fragment, [
 		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"}", FragmentNestedStop),
+		GrammarItem(r"}", FragmentNestedStopNewElement),
 		])
 		])
 		])
@@ -197,7 +197,7 @@ def makeGrammarNamespace() -> Grammar:
 		GrammarItem(r"namespace", NamespaceStart, [
 		GrammarItem(_regexprName, Fragment,
 		[GrammarItem(r"\.", FragmentNewElement),
-		GrammarItem(r";", FragmentNestedStop)])
+		GrammarItem(r";", FragmentNestedStopNewElement)])
 		])
 	]
 
@@ -224,4 +224,4 @@ class Parser(ParserBase):
 			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarEnum() +
 			makeGrammarVariable() + makeGrammarMethod() +
 			makeGrammarNested(makeGrammarEnum() + makeGrammarVariable() + makeGrammarMethod()),
-			defaultGrammar=[GrammarItemSpaces] + _grammarComments)
+			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

@@ -114,7 +114,7 @@ class FragmentNewElement(Fragment):
 	"""
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().makeElement()
+		return element.getSequence().makeElement(grammar = grammar)
 
 
 class FragmentParentElement(Fragment):
@@ -123,7 +123,10 @@ class FragmentParentElement(Fragment):
 	"""
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().getElement()
+		element = element.getSequence().getElement()
+		#if grammar is not None:
+		#	element.setGrammar(grammar)
+		return element
 
 
 class FragmentNestedStart(Fragment):
@@ -138,26 +141,10 @@ class FragmentNestedStart(Fragment):
 		return element.makeElement(self.nestedName, grammar)
 
 
-class FragmentNestedStop(Fragment):
+class FragmentNestedStopNewElement(Fragment):
 	"""
-	Helper fragment to stop a nested sequence.
-	"""
-
-	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().getElement().getSequence().makeElement()
-
-
-class FragmentCheckpoint(Fragment):
-	"""
-	Helper fragment to go back to the root element.
+	Helper fragment to stop a nested sequence and create a new element.
 	"""
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		while True:
-			parentElement = element.getSequence().getElement()
-			print(parentElement)
-			if parentElement.isRoot:
-				break
-			element = parentElement
-		print("NEXT")
-		return element.getSequence().makeElement()
+		return element.getSequence().getElement().getSequence().makeElement(grammar = grammar)

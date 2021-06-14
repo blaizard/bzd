@@ -62,8 +62,13 @@ class SequenceParser(Sequence):
 		self.grammar = grammar
 		self.parent = parent
 
-	def makeElement(self) -> "ElementParser":
-		element = ElementParser(parser=self.parser, grammar=self.grammar, parent=self)
+	def makeElement(self, grammar: typing.Optional[Grammar] = None) -> "ElementParser":
+		"""
+		Create a new element in the sequence.
+		Params:
+		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
+		"""
+		element = ElementParser(parser=self.parser, grammar=self.grammar if grammar is None else grammar, parent=self)
 		self.list.append(element)
 		return element
 

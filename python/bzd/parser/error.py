@@ -24,12 +24,12 @@ class Error:
 		Error.content_ = content
 
 	@staticmethod
-	def handle(index: int, message: str) -> None:
+	def toString(index: int, message: str) -> str:
 
 		# Look for the content
 		if Error.content_ is None:
 			if Error.path_ is None:
-				raise ExceptionParser(message=message)
+				return message
 			content = Error.path_.read_text()
 		else:
 			content = Error.content_
@@ -51,10 +51,10 @@ class Error:
 			line + 2, "{}:{}:{}: error: {}".format("<string>" if Error.path_ is None else Error.path_, line + 1,
 			column + 1, message))
 
-		raise ExceptionParser(message="\n" + "\n".join(contentByLine))
+		return "\n" + "\n".join(contentByLine)
 
 	@staticmethod
-	def handleFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> None:
+	def toStringFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> str:
 
 		# Look for the index
 		index = 0
@@ -69,7 +69,15 @@ class Error:
 			if startIndex < sys.maxsize:
 				index = startIndex
 
-		Error.handle(index=index, message=message)
+		return Error.toString(index=index, message=message)
+
+	@staticmethod
+	def handle(index: int, message: str) -> None:
+		raise ExceptionParser(message=Error.toString(index=index, message=message))
+
+	@staticmethod
+	def handleFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> None:
+		raise ExceptionParser(message=Error.toStringFromElement(element=element, attr=attr, message=message))
 
 	@staticmethod
 	def assertTrue(element: Element, condition: bool, message: str) -> None:
