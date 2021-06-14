@@ -21,5 +21,10 @@ Substitutions are denoted as follow: `{{...}}`
   - Bool evaluation of condition, ex: `{% if value %} ... {% end %}`
   - Comparison operators (`==`, `!=`, `<`, `>`, `>=`, `<=`), ex: `{% if value == 12 %} ... {% end %}`
   - Association operators (`and`, `or`), ex: `{% if value == 12 or value == 14 %} ... {% end %}`
+  - In operators, ex: `{% if value in [1, 2, 3] %} ... {% end %}`
+  - Consecutive `else` and `elif` statement, ex: `{% if value1 %} ... {% elif value2 %} ... {% else %} ... {% end %}`
+
+- Macro blocks:
+  - Reusable block anywhere, ex: `{% macro my_block() %} ... {% end %}` -> `{% my_block() %}`
 
 Control blocks are denoted as follow: `{%...%}`

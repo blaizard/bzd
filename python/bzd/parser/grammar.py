@@ -1,5 +1,7 @@
+import re
+
 from typing import Any, Optional, Dict, List, Pattern, Union, Type, TYPE_CHECKING
-from bzd.parser.fragments import Fragment, FragmentCheckpoint
+from bzd.parser.fragments import Fragment
 
 Grammar = List[Any]
 
@@ -7,12 +9,14 @@ Grammar = List[Any]
 class GrammarItem:
 
 	def __init__(self,
-		regexpr: str,
+		regexpr: Optional[str] = None,
 		fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
 		grammar: Optional[Union[Grammar, str]] = None,
 		checkpoint: Optional[str] = None) -> None:
 
-		self.regexpr = regexpr
+		# Precompile the regular expression
+		self.regexpr = re.compile(r"") if regexpr is None else re.compile(regexpr, re.MULTILINE)
+
 		if isinstance(fragment, dict):
 
 			class SimpleFragment(Fragment):

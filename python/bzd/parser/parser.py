@@ -9,10 +9,15 @@ from bzd.parser.error import Error
 
 class Parser:
 
-	def __init__(self, content: str, grammar: Grammar, defaultGrammar: Grammar = [GrammarItemSpaces]) -> None:
+	def __init__(self,
+		content: str,
+		grammar: Grammar,
+		defaultGrammarPre: Grammar = [],
+		defaultGrammarPost: Grammar = []) -> None:
 
 		self.grammar = grammar
-		self.defaultGrammar = defaultGrammar
+		self.defaultGrammarPre = defaultGrammarPre
+		self.defaultGrammarPost = defaultGrammarPost
 		self.content = content
 
 		Error.setContext(content=self.content)
@@ -73,8 +78,9 @@ class Parser:
 		try:
 			while index < len(self.content):
 				m = None
-				for item in self.iterateGrammar(self.defaultGrammar + element.getGrammar()):
-					m = re.match(item.regexpr, self.content[index:], re.MULTILINE)
+				for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() +
+					self.defaultGrammarPost):
+					m = re.match(item.regexpr, self.content[index:])
 					if m:
 						if item.fragment:
 							fragment = item.fragment(index, attrs=m.groupdict())
