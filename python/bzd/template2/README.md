@@ -18,6 +18,7 @@ Substitutions are denoted as follow: `{{...}}`
   - Index-based iterable, ex: `{% for index, data in my.list %} ... {% end %}`.
 
 - If blocks:
+
   - Bool evaluation of condition, ex: `{% if value %} ... {% end %}`
   - Comparison operators (`==`, `!=`, `<`, `>`, `>=`, `<=`), ex: `{% if value == 12 %} ... {% end %}`
   - Association operators (`and`, `or`), ex: `{% if value == 12 or value == 14 %} ... {% end %}`

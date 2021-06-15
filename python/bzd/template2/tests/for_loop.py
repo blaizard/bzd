@@ -47,5 +47,6 @@ class TestRun(unittest.TestCase):
 		result = template.process({"sequence": ["a", "b"]})
 		self.assertEqual(" aa ab ba bb", result)
 
+
 if __name__ == '__main__':
 	unittest.main()

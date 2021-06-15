@@ -114,7 +114,7 @@ class FragmentNewElement(Fragment):
 	"""
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().makeElement(grammar = grammar)
+		return element.getSequence().makeElement(grammar=grammar)
 
 
 class FragmentParentElement(Fragment):
@@ -147,4 +147,4 @@ class FragmentNestedStopNewElement(Fragment):
 	"""
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().getElement().getSequence().makeElement(grammar = grammar)
+		return element.getSequence().getElement().getSequence().makeElement(grammar=grammar)

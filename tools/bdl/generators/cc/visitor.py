@@ -6,7 +6,7 @@ from tools.bdl.visitors.result import Result
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
-from bzd.template.template import Template
+from bzd.template2.template2 import Template
 
 
 class _VisitorType(VisitorType):
@@ -104,6 +104,5 @@ def formatCc(bdl: Object) -> str:
 		"inheritanceToStr": _inheritanceToStr,
 		"bdlPathToHeader": _bdlPathToHeader
 	})
-	output = template.process(result, removeEmptyLines=True)
-
+	output = template.process(result)  # type: ignore
 	return output

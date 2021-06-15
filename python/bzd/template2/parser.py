@@ -6,11 +6,12 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match all remaining content
-_regexprContent = r"(?P<content>(.+?(?={{|{%)|.+))"
+_regexprContent = r"(?P<content>([\s\S]+?(?={{|{%)|.+))"
 # Match a name
 _regexprName = r"(?P<name>([a-zA-Z_\-0-9\.]+))"
 # Match condition
 _regexprCondition = r"(?P<condition>(.+?(?=-?%})))"
+
 
 def makeRegexprName(name: str) -> str:
 	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.]+))"
@@ -28,36 +29,30 @@ def makeGrammarContent() -> Grammar:
 
 
 def makeGrammarSubstitutionStart(grammar: Grammar) -> Grammar:
-	return [
-		GrammarItem(r"{{-", {"stripLeft": True}, grammar),
-		GrammarItem(r"{{", Fragment, grammar)
-	]
+	return [GrammarItem(r"{{-", {"stripLeft": "1"}, grammar), GrammarItem(r"{{", Fragment, grammar)]
+
 
 def makeGrammarControlStart(keyword: str, attribute: str, grammar: Grammar) -> Grammar:
 	return [
 		GrammarItem(r"{%\s*" + keyword, Fragment, grammar),
-		GrammarItem(r"{%-\s*" + keyword, {attribute: True}, grammar)
+		GrammarItem(r"{%-\s*" + keyword, {attribute: "1"}, grammar)
 	]
 
-def makeGrammarSubstitutionStop(fragment: Fragment) -> Grammar:
+
+def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 	return [
-		GrammarItem(r"(?=}})", Fragment, [
-			GrammarItem(r"}}", fragment)
-		]),
-		GrammarItem(r"(?=-}})", {"stripRight": True}, [
-			GrammarItem(r"-}}", fragment)
-		]),
+		GrammarItem(r"(?=}})", Fragment, [GrammarItem(r"}}", fragment)]),
+		GrammarItem(r"(?=-}})", {"stripRight": "1"}, [GrammarItem(r"-}}", fragment)]),
 	]
 
-def makeGrammarControlStop(fragment: Fragment, grammar: typing.Optional[Grammar] = None) -> Grammar:
+
+def makeGrammarControlStop(fragment: typing.Type[Fragment],
+	grammar: typing.Optional[typing.Union[Grammar, str]] = None) -> Grammar:
 	return [
-		GrammarItem(r"(?=%})", Fragment, [
-			GrammarItem(r"%}", fragment, grammar)
-		]),
-		GrammarItem(r"(?=-%})", {"stripRight": True}, [
-			GrammarItem(r"-%}", fragment, grammar)
-		]),
+		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}", fragment, grammar)]),
+		GrammarItem(r"(?=-%})", {"stripRight": "1"}, [GrammarItem(r"-%}", fragment, grammar)]),
 	]
+
 
 def makeGrammarSubstitution() -> Grammar:
 	"""
@@ -71,12 +66,12 @@ def makeGrammarSubstitution() -> Grammar:
 		GrammarItem(makeRegexprName("name"), {"category": "substitution"}, [
 		GrammarItem(r"\|", PipeStart, [
 		GrammarItem(makeRegexprName("name"), Fragment,
-		[
-			GrammarItem(r"\|", FragmentNewElement),
-			GrammarItem(None, FragmentParentElement)
+		[GrammarItem(r"\|", FragmentNewElement),
+		GrammarItem(None, FragmentParentElement)])
 		])
-		])] + makeGrammarSubstitutionStop(FragmentNewElement)),
-		] + makeGrammarSubstitutionStop(FragmentNewElement))
+		] + makeGrammarSubstitutionStop(FragmentNewElement)),
+	] + makeGrammarSubstitutionStop(FragmentNewElement))
+
 
 def makeGrammarControlFor() -> Grammar:
 	"""
@@ -110,6 +105,7 @@ def makeGrammarControlIf() -> Grammar:
 		[GrammarItem(_regexprCondition, Fragment, makeGrammarControlStop(FragmentNestedStart, "root"))])
 	])
 
+
 def makeGrammarControlElseIf() -> Grammar:
 	"""
 	Generate the grammar for the else / elif block.
@@ -122,13 +118,13 @@ def makeGrammarControlElseIf() -> Grammar:
 		default = {"category": "else"}
 
 	return [
-		GrammarItem(r"(?={%-?\s*(else|elif))", FragmentNestedStopNewElement,
-			makeGrammarControlStart(r"elif", "stripLeft", [
-				GrammarItem(_regexprCondition, {"category": "else"}, makeGrammarControlStop(FragmentNestedStart, "root"))
-			]) + 
-			makeGrammarControlStart(r"else", "stripLeft", makeGrammarControlStop(ElseFragment, "root"))
-		)
+		GrammarItem(
+		r"(?={%-?\s*(else|elif))", FragmentNestedStopNewElement,
+		makeGrammarControlStart(r"elif", "stripLeft",
+		[GrammarItem(_regexprCondition, {"category": "else"}, makeGrammarControlStop(FragmentNestedStart, "root"))]) +
+		makeGrammarControlStart(r"else", "stripLeft", makeGrammarControlStop(ElseFragment, "root")))
 	]
+
 
 def makeGrammarControlEnd() -> Grammar:
 	"""
@@ -139,17 +135,24 @@ def makeGrammarControlEnd() -> Grammar:
 		default = {"category": "end"}
 
 	return [
-		GrammarItem(r"(?={%-?\s*end)", FragmentParentElement, makeGrammarControlStart(r"end", "nestedStripRight", [
-			GrammarItem(None, FragmentNewElement, makeGrammarControlStop(FragmentEndElement))
-		]))
+		GrammarItem(
+		r"(?={%-?\s*end)", FragmentParentElement,
+		makeGrammarControlStart(r"end", "nestedStripRight",
+		[GrammarItem(None, FragmentNewElement, makeGrammarControlStop(FragmentEndElement))]))
 	]
+
 
 def makeGrammarControl() -> Grammar:
 	"""
 	Generate the grammar for all control blocks.
 	"""
 
-	return [GrammarItem(r"(?={%)", Fragment, makeGrammarControlFor() + makeGrammarControlIf() + makeGrammarControlElseIf() + makeGrammarControlEnd())]
+	return [
+		GrammarItem(
+		r"(?={%)", Fragment,
+		makeGrammarControlFor() + makeGrammarControlIf() + makeGrammarControlElseIf() + makeGrammarControlEnd())
+	]
+
 
 class Parser(ParserBase):
 
