@@ -82,7 +82,6 @@ class Parser:
 					self.defaultGrammarPost):
 					m = re.match(item.regexpr, self.content[index:])
 					if m:
-						print(m, item)
 						if item.fragment:
 							fragment = item.fragment(index, attrs=m.groupdict())
 							element.add(fragment)

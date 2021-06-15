@@ -5,6 +5,11 @@
                 "language": "bdl",
                 "path": "bdl_grammar.json",
                 "scopeName": "source.bdl"
+            },
+            {
+                "language": "btl",
+                "path": "btl_grammar.json",
+                "scopeName": "source.btl"
             }
         ],
         "languages": [
@@ -13,10 +18,16 @@
                     ".bdl"
                 ],
                 "id": "bdl"
+            },
+            {
+                "extensions": [
+                    ".btl"
+                ],
+                "id": "btl"
             }
         ]
     },
-    "description": "Syntax highlighting for .bdl language.",
+    "description": "Syntax highlighting for .bdl & .btl language.",
     "displayName": "::bzd",
     "engines": {
         "vscode": "*"
