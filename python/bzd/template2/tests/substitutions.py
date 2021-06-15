@@ -34,6 +34,25 @@ class TestRun(unittest.TestCase):
 		})
 		self.assertEqual("This is somehting messy", result)
 
+	def testNoStrip(self) -> None:
+		template = Template("   Hello {{world}}    I am   happy ")
+		result = template.process({"world": "World"})
+		self.assertEqual("   Hello World    I am   happy ", result)
 
+	def testStripLeft(self) -> None:
+		template = Template("Hel {{-world}}")
+		result = template.process({"world": "lo"})
+		self.assertEqual("Hello", result)
+
+	def testStripRight(self) -> None:
+		template = Template("{{world -}} ld")
+		result = template.process({"world": "Wor"})
+		self.assertEqual("World", result)
+
+	def testStripVarious(self) -> None:
+		template = Template("{{a -}} | {{- a}} | {{a}} | {{- a -}} |")
+		result = template.process({"a": "0"})
+		self.assertEqual("0|0 | 0 |0|", result)
+	
 if __name__ == '__main__':
 	unittest.main()

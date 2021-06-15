@@ -9,19 +9,26 @@ from bzd.parser.error import Error, ExceptionParser
 from bzd.template2.parser import Parser
 
 SubstitutionsType = typing.Dict[str, typing.Any]
+ResultType = typing.List[str]
 
 _defaultValue: typing.Any = {}
 
-class VisitorTemplate(Visitor[str, str]):
+class VisitorTemplate(Visitor[ResultType, str]):
 	nestedKind = None
 
 	def __init__(self, substitutions: SubstitutionsType) -> None:
 		self.substitutions = substitutions
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).
 		self.followElse = False
+		# Used to strip the next element after a this flag is set.
+		# This is used by substitutions.
+		self.stripLeftNextResult = False
 
-	def visitBegin(self, result: str) -> str:
-		return ""
+	def visitBegin(self, result: ResultType) -> ResultType:
+		return []
+
+	def visitFinal(self, result: ResultType) -> str:
+		return "".join(result)
 
 	def resolveName(self, name: str, argument: typing.Any = _defaultValue) -> typing.Any:
 		"""
@@ -51,7 +58,7 @@ class VisitorTemplate(Visitor[str, str]):
 
 		return value
 
-	def visitSubstitution(self, element: Element) -> str:
+	def visitSubstitution(self, element: Element) -> ResultType:
 		"""
 		Handle substitution.
 		"""
@@ -67,9 +74,20 @@ class VisitorTemplate(Visitor[str, str]):
 
 		# Save the output
 		assert isinstance(value, (int, float, str)), "The resulting substitued value must be a number or a string."
-		return str(value)
+		return [str(value)]
 
-	def visitForBlock(self, element: Element) -> str:
+	def processNestedResult(self, element: Element, result: ResultType) -> ResultType:
+		"""
+		Format the nested result before returning it.
+		"""
+		if result:
+			if element.getAttrValue("stripRight", False):
+				result[0] = result[0].lstrip()
+			if element.getAttrValue("nestedStripRight", False):
+				result[-1] = result[-1].rstrip()
+		return result
+
+	def visitForBlock(self, element: Element, result: ResultType) -> ResultType:
 		"""
 		Handle for loop block.
 		"""
@@ -92,25 +110,24 @@ class VisitorTemplate(Visitor[str, str]):
 		assert sequence
 
 		# Loop through the elements
-		result = ""
 		iterable = self.resolveName(name=element.getAttr("iterable").value)
 		if value2 is None:
 			for value in iterable:
 				self.substitutions[value1] = value
-				result += self._visit(sequence=sequence)
+				output = self._visit(sequence=sequence)
+				result += self.processNestedResult(element=element, result=output)
 				del self.substitutions[value1]
 		else:
 			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
 				self.substitutions[value1] = key
 				self.substitutions[value2] = value
-				result += self._visit(sequence=sequence)
+				output = self._visit(sequence=sequence)
+				result += self.processNestedResult(element=element, result=output)
 				del self.substitutions[value2]
 				del self.substitutions[value1]
 
-		return result
-
-	def visitIfBlock(self, element: Element, conditionStr: str) -> str:
+	def visitIfBlock(self, element: Element, result: ResultType, conditionStr: str) -> ResultType:
 		"""
 		Handle if block.
 		"""
@@ -119,13 +136,11 @@ class VisitorTemplate(Visitor[str, str]):
 		sequence = element.getNestedSequence(kind="nested")
 		assert sequence
 
-		result = ""
 		condition = self.evaluateCondition(conditionStr=conditionStr)
 		self.followElse = not condition
 		if condition:
-			result += self._visit(sequence=sequence)
-
-		return result
+			output = self._visit(sequence=sequence)
+			result += self.processNestedResult(element=element, result=output)
 
 	def evaluateCondition(self, conditionStr: str) -> bool:
 		"""
@@ -158,7 +173,7 @@ class VisitorTemplate(Visitor[str, str]):
 
 		return bool(condition)
 
-	def visitElement(self, element: Element, result: str) -> str:
+	def visitElement(self, element: Element, result: ResultType) -> ResultType:
 		"""
 		Go through all elements and dispatch the action.
 		"""
@@ -167,19 +182,21 @@ class VisitorTemplate(Visitor[str, str]):
 		category = element.getAttr("category").value
 
 		# Remove white spaces at the begining of the next ammendment
-		if element.getAttrValue("stripLeft", False):
-			result = result.rstrip()
+		if result and element.getAttrValue("stripLeft", False):
+			result[-1] = result[-1].rstrip()
 
 		try:
+
+			output = []
 
 			# Raw content
 			if category == "content":
 				Error.assertHasAttr(element=element, attr="content")
-				result += element.getAttr("content").value
+				output = [element.getAttr("content").value]
 
 			# Substitution
 			elif category == "substitution":
-				result += self.visitSubstitution(element=element)
+				output = self.visitSubstitution(element=element)
 
 			# End statement
 			elif category == "end":
@@ -187,22 +204,29 @@ class VisitorTemplate(Visitor[str, str]):
 
 			# For loop block
 			elif category == "for":
-				result += self.visitForBlock(element=element)
+				self.visitForBlock(element=element, result=output)
 
 			# If block
 			elif category == "if":
 				Error.assertHasAttr(element=element, attr="condition")
 				conditionStr = element.getAttr("condition").value
-				result += self.visitIfBlock(element=element, conditionStr=conditionStr)
+				self.visitIfBlock(element=element, result=output, conditionStr=conditionStr)
 
 			# Else block
 			elif category == "else":
 				if self.followElse:
 					conditionStr = element.getAttrValue("condition", "True")
-					result += self.visitIfBlock(element=element, conditionStr=conditionStr)
+					self.visitIfBlock(element=element, result=output, conditionStr=conditionStr)
 
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))
+
+			if output and self.stripLeftNextResult:
+				output[0] = output[0].lstrip()
+			self.stripLeftNextResult = element.getAttrValue("stripRight", False)
+
+			# Update the final result
+			result += output
 
 		# Propagate processed exception to the top layer
 		except ExceptionParser as e:

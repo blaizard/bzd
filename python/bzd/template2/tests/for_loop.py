@@ -25,6 +25,27 @@ class TestRun(unittest.TestCase):
 		result = template.process({"sequence": ["a", "b", "c", "d"]})
 		self.assertEqual("0:a,1:b,2:c,3:d,", result)
 
+	def testForStrip(self) -> None:
+		template = Template("{% for char in sequence -%}   {{char}}        \t {%- end %}")
+		result = template.process({"sequence": ["a", "b", "c", "d"]})
+		self.assertEqual("abcd", result)
+
+		template = Template("{% for char in sequence %}   {{char}}        \t {%- end %}")
+		result = template.process({"sequence": ["a", "b", "c", "d"]})
+		self.assertEqual("   a   b   c   d", result)
+
+		template = Template("{% for char in sequence -%}   {{char}}\t{% end %}")
+		result = template.process({"sequence": ["a", "b", "c", "d"]})
+		self.assertEqual("a\tb\tc\td\t", result)
+
+	def testForStripNested(self) -> None:
+		template = Template("{% for a in sequence -%}  {% for b in sequence -%} {{a}}{{b}}       {%- end %} {%- end %}")
+		result = template.process({"sequence": ["a", "b"]})
+		self.assertEqual("aaabbabb", result)
+
+		template = Template("{% for a in sequence -%} {% for b in sequence %} {{a}}{{b}}       {%- end %} {%- end %}")
+		result = template.process({"sequence": ["a", "b"]})
+		self.assertEqual(" aa ab ba bb", result)
 
 if __name__ == '__main__':
 	unittest.main()
