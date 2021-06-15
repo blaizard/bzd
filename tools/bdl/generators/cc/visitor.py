@@ -94,7 +94,7 @@ def formatCc(bdl: Object) -> str:
 	# Process the result
 	result = Result(bdl=bdl, resolve=True, include=True).process()
 
-	content = (Path(__file__).parent / "template/file.h.template").read_text()
+	content = (Path(__file__).parent / "template/file.h.btl").read_text()
 	template = Template(content)
 	result.update({
 		"camelCase": _toCamelCase,

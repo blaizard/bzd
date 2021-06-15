@@ -34,6 +34,7 @@ py_library(
     ]),
     data = glob([
         "generators/**/*.template",
+        "generators/**/*.btl",
     ]),
     visibility = [":__subpackages__"],
     deps = [

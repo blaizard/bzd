@@ -260,10 +260,6 @@ class Template:
 	def process(self, substitutions: SubstitutionsType) -> str:
 
 		sequence = Parser(self.template).parse()
-
-		print("%%%%%%")
-		print(sequence)
-
 		result = VisitorTemplate(substitutions).visit(sequence)
 
 		return result

@@ -1,0 +1,270 @@
+{
+	"name": "btl",
+	"scopeName": "source.btl",
+	"comment": "Bzd Template language",
+	"fileTypes": ["btl"],
+	"foldingStartMarker": "({%-?\\s*(for|if))",
+	"foldingStopMarker": "({%-?\\s*(end)\\s*-?%})",
+	"patterns": [
+		{
+			"begin": "({%-?)\\s*(raw)\\s*(-?%})",
+			"captures": {
+				"1": {
+					"name": "entity.other.btl.delimiter.tag"
+				},
+				"2": {
+					"name": "keyword.control.btl"
+				},
+				"3": {
+					"name": "entity.other.btl.delimiter.tag"
+				}
+			},
+			"end": "({%-?)\\s*(end)\\s*(-?%})",
+			"name": "comment.block.btl.raw"
+		},
+		{
+			"begin": "{#-?",
+			"captures": [
+				{
+					"name": "entity.other.btl.delimiter.comment"
+				}
+			],
+			"end": "-?#}",
+			"name": "comment.block.btl"
+		},
+		{
+			"begin": "{{-?",
+			"captures": [
+				{
+					"name": "entity.other.btl.delimiter.variable"
+				}
+			],
+			"end": "-?}}",
+			"name": "meta.scope.btl.variable",
+			"patterns": [
+				{
+					"include": "#expression"
+				}
+			]
+		},
+		{
+			"begin": "{%-?",
+			"captures": [
+				{
+					"name": "entity.other.btl.delimiter.tag"
+				}
+			],
+			"end": "-?%}",
+			"name": "meta.scope.btl.tag",
+			"patterns": [
+				{
+					"include": "#expression"
+				}
+			]
+		}
+	],
+	"repository": {
+		"expression": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "keyword.control.btl"
+						},
+						"2": {
+							"name": "variable.other.btl.test"
+						}
+					},
+					"match": "\\s*\\b(is)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "keyword.control.btl"
+						}
+					},
+					"match": "(?<=\\{\\%-|\\{\\%)\\s*\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?!\\s*[,=])"
+				},
+				{
+					"match": "\\b(and|else|if|elif|in|include|not|or)\\b",
+					"name": "keyword.control.btl"
+				},
+				{
+					"match": "[a-zA-Z_][a-zA-Z0-9_]*",
+					"name": "variable.other.btl"
+				},
+				{
+					"match": "(\\+|\\-|\\*\\*|\\*|\/\/|\/|%)",
+					"name": "keyword.operator.arithmetic.btl"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.other.btl"
+						},
+						"2": {
+							"name": "variable.other.btl.filter"
+						}
+					},
+					"match": "(\\|)([a-zA-Z_][a-zA-Z0-9_]*)"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.other.btl"
+						},
+						"2": {
+							"name": "variable.other.btl.attribute"
+						}
+					},
+					"match": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)"
+				},
+				{
+					"begin": "\\[",
+					"captures": [
+						{
+							"name": "punctuation.other.btl"
+						}
+					],
+					"end": "\\]",
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
+					"begin": "\\(",
+					"captures": [
+						{
+							"name": "punctuation.other.btl"
+						}
+					],
+					"end": "\\)",
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
+					"begin": "\\{",
+					"captures": [
+						{
+							"name": "punctuation.other.btl"
+						}
+					],
+					"end": "\\}",
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				},
+				{
+					"match": "(\\.|:|\\||,)",
+					"name": "punctuation.other.btl"
+				},
+				{
+					"match": "(==|<=|=>|<|>|!=)",
+					"name": "keyword.operator.comparison.btl"
+				},
+				{
+					"match": "=",
+					"name": "keyword.operator.assignment.btl"
+				},
+				{
+					"begin": "\"",
+					"beginCaptures": [
+						{
+							"name": "punctuation.definition.string.begin.btl"
+						}
+					],
+					"end": "\"",
+					"endCaptures": [
+						{
+							"name": "punctuation.definition.string.end.btl"
+						}
+					],
+					"name": "string.quoted.double.btl",
+					"patterns": [
+						{
+							"include": "#string"
+						}
+					]
+				},
+				{
+					"begin": "'",
+					"beginCaptures": [
+						{
+							"name": "punctuation.definition.string.begin.btl"
+						}
+					],
+					"end": "'",
+					"endCaptures": [
+						{
+							"name": "punctuation.definition.string.end.btl"
+						}
+					],
+					"name": "string.quoted.single.btl",
+					"patterns": [
+						{
+							"include": "#string"
+						}
+					]
+				}
+			]
+		},
+		"simple_escapes": {
+			"captures": {
+				"1": {
+					"name": "constant.character.escape.newline.btl"
+				},
+				"10": {
+					"name": "constant.character.escape.tab.btl"
+				},
+				"11": {
+					"name": "constant.character.escape.vertical-tab.btl"
+				},
+				"2": {
+					"name": "constant.character.escape.backlash.btl"
+				},
+				"3": {
+					"name": "constant.character.escape.double-quote.btl"
+				},
+				"4": {
+					"name": "constant.character.escape.single-quote.btl"
+				},
+				"5": {
+					"name": "constant.character.escape.bell.btl"
+				},
+				"6": {
+					"name": "constant.character.escape.backspace.btl"
+				},
+				"7": {
+					"name": "constant.character.escape.formfeed.btl"
+				},
+				"8": {
+					"name": "constant.character.escape.linefeed.btl"
+				},
+				"9": {
+					"name": "constant.character.escape.return.btl"
+				}
+			},
+			"match": "(\\\\\\n)|(\\\\\\\\)|(\\\\\\\")|(\\\\')|(\\\\a)|(\\\\b)|(\\\\f)|(\\\\n)|(\\\\r)|(\\\\t)|(\\\\v)"
+		},
+		"string": {
+			"patterns": [
+				{
+					"include": "#simple_escapes"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#escaped_unicode_char"
+				}
+			]
+		}
+	}
+}

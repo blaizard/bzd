@@ -1,6 +1,6 @@
 # Template
 
-Simple templating library that supports:
+Bzd templating language (`btl`) library that supports:
 
 - Substitutions:
   - Direct and nested, ex: `{{ my.nested.var }}`.
@@ -27,5 +27,8 @@ Substitutions are denoted as follow: `{{...}}`
 
 - Macro blocks:
   - Reusable block anywhere, ex: `{% macro my_block() %} ... {% end %}` -> `{% my_block() %}`
+
+- Whitespace control
+  - Using control or subsitution blocks with `-` to strip whitespaces, ex: `{%- ... %}` or `{{ ... -}}`
 
 Control blocks are denoted as follow: `{%...%}`
