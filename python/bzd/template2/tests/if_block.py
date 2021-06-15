@@ -83,5 +83,24 @@ class TestRun(unittest.TestCase):
 		result = template.process({"value1": True, "value2": False})
 		self.assertEqual("02", result)
 
+	def testSripCondition(self) -> None:
+		template = Template("{% if value -%} hello {%- end %}")
+		result = template.process({"value": True})
+		self.assertEqual("hello", result)
+
+	def testSripNestedCondition(self) -> None:
+		template = Template("{% if value -%} {%if value %}  {%if value -%}    hello  {%- end %}{%- end %} {%- end %}")
+		result = template.process({"value": True})
+		self.assertEqual("  hello", result)
+
+	def testSripElseIfCondition(self) -> None:
+		template = Template("{% if value1 -%} a {%- elif value2 -%} b {%- else -%} c {%- end %}")
+		result = template.process({"value1": True, "value2": False})
+		self.assertEqual("a", result)
+		result = template.process({"value1": False, "value2": True})
+		self.assertEqual("b", result)
+		result = template.process({"value1": False, "value2": False})
+		self.assertEqual("c", result)
+
 if __name__ == '__main__':
 	unittest.main()

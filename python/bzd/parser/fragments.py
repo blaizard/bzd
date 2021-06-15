@@ -124,8 +124,8 @@ class FragmentParentElement(Fragment):
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		element = element.getSequence().getElement()
-		#if grammar is not None:
-		#	element.setGrammar(grammar)
+		if grammar is not None:
+			element.setGrammar(grammar)
 		return element
 
 
