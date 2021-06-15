@@ -102,5 +102,6 @@ class TestRun(unittest.TestCase):
 		result = template.process({"value1": False, "value2": False})
 		self.assertEqual("c", result)
 
+
 if __name__ == '__main__':
 	unittest.main()

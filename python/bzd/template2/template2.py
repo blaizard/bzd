@@ -8,10 +8,11 @@ from bzd.parser.error import Error, ExceptionParser
 
 from bzd.template2.parser import Parser
 
-SubstitutionsType = typing.Dict[str, typing.Any]
+SubstitutionsType = typing.MutableMapping[str, typing.Any]
 ResultType = typing.List[str]
 
 _defaultValue: typing.Any = {}
+
 
 class VisitorTemplate(Visitor[ResultType, str]):
 	nestedKind = None
@@ -22,7 +23,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		self.followElse = False
 		# Used to strip the next element after a this flag is set.
 		# This is used by substitutions.
-		self.stripLeftNextResult = False
+		self.stripLeftNextResult: typing.Optional[str] = None
 
 	def visitBegin(self, result: ResultType) -> ResultType:
 		return []
@@ -81,13 +82,13 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		Format the nested result before returning it.
 		"""
 		if result:
-			if element.getAttrValue("stripRight", False):
+			if element.getAttrValue("stripRight"):
 				result[0] = result[0].lstrip()
-			if element.getAttrValue("nestedStripRight", False):
+			if element.getAttrValue("nestedStripRight"):
 				result[-1] = result[-1].rstrip()
 		return result
 
-	def visitForBlock(self, element: Element, result: ResultType) -> ResultType:
+	def visitForBlock(self, element: Element, result: ResultType) -> None:
 		"""
 		Handle for loop block.
 		"""
@@ -127,7 +128,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 				del self.substitutions[value2]
 				del self.substitutions[value1]
 
-	def visitIfBlock(self, element: Element, result: ResultType, conditionStr: str) -> ResultType:
+	def visitIfBlock(self, element: Element, result: ResultType, conditionStr: str) -> None:
 		"""
 		Handle if block.
 		"""
@@ -182,7 +183,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		category = element.getAttr("category").value
 
 		# Remove white spaces at the begining of the next ammendment
-		if result and element.getAttrValue("stripLeft", False):
+		if result and element.getAttrValue("stripLeft"):
 			result[-1] = result[-1].rstrip()
 
 		try:
@@ -200,7 +201,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 
 			# End statement
 			elif category == "end":
-				pass # nothing to do
+				pass  # nothing to do
 
 			# For loop block
 			elif category == "for":
@@ -215,7 +216,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			# Else block
 			elif category == "else":
 				if self.followElse:
-					conditionStr = element.getAttrValue("condition", "True")
+					conditionStr = element.getAttrValue("condition", "True")  # type: ignore
 					self.visitIfBlock(element=element, result=output, conditionStr=conditionStr)
 
 			else:
@@ -223,7 +224,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 
 			if output and self.stripLeftNextResult:
 				output[0] = output[0].lstrip()
-			self.stripLeftNextResult = element.getAttrValue("stripRight", False)
+			self.stripLeftNextResult = element.getAttrValue("stripRight")
 
 			# Update the final result
 			result += output
@@ -238,7 +239,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		# hello    {{- hello -}} me   <- next
 		# {for -} in {} <- each loop
 		# {for} dsd
-		# {- end}   <- 
+		# {- end}   <-
 
 		# Remove white spaces at the begining of the next ammendment
 		#if element.getAttr("stripRight").value:

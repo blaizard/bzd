@@ -15,7 +15,7 @@ class GrammarItem:
 		checkpoint: Optional[str] = None) -> None:
 
 		# Precompile the regular expression
-		self.regexpr = re.compile(r"") if regexpr is None else re.compile(regexpr, re.MULTILINE)
+		self.regexpr = re.compile(r"") if regexpr is None else re.compile(regexpr, re.DOTALL)
 
 		if isinstance(fragment, dict):
 

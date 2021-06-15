@@ -53,6 +53,12 @@ class TestRun(unittest.TestCase):
 		template = Template("{{a -}} | {{- a}} | {{a}} | {{- a -}} |")
 		result = template.process({"a": "0"})
 		self.assertEqual("0|0 | 0 |0|", result)
-	
+
+	def testStripSpecialChars(self) -> None:
+		template = Template(" {  12 }  }}   \n     a ")
+		result = template.process({"a": "0"})
+		self.assertEqual(" {  12 }  }}   \n     a ", result)
+
+
 if __name__ == '__main__':
 	unittest.main()

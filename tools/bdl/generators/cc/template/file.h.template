@@ -4,127 +4,127 @@
 
 #include "tools/bdl/generators/cc/adapter/types.h"
 
-{for use in useList}
-#include "{use.path | bdlPathToHeader}"
-{end}
+{% for use in useList %}
+#include "{{ use.path | bdlPathToHeader }}"
+{% end %}
 
-{if isNamespace}
-namespace {namespace | namespaceToStr} {
-{end}
+{% if isNamespace %}
+namespace {{ namespace | namespaceToStr }} {
+{% end %}
 
-{for data in usingList}
-using {data.name} = {data.type | typeToStr};
-{end}
+{% for data in usingList %}
+using {{ data.name }} = {{ data.type | typeToStr }};
+{% end %}
 
-{for data in enumList}
-{data.comment | normalComment}
-enum class {data.name}
+{% for data in enumList %}
+{{ data.comment | normalComment }}
+enum class {{ data.name }}
 {
-	{for i, value in data.values}
-	{if i},{end}
-	{value.comment | normalComment}
-	{value.name}
-	{end}
+	{% for i, value in data.values %}
+	{% if i %},{% end %}
+	{{ value.comment | normalComment }}
+	{{ value.name }}
+	{% end %}
 };
-{end}
+{% end %}
 
-{for data in nestedList}
+{% for data in nestedList %}
 
-{if data.type == "module"}
+{% if data.type == "module" %}
 namespace impl {
-{end}
+{% end %}
 
-{data.comment | normalComment}
-class {data.name}{if data.hasInheritance} : {data.inheritanceList | inheritanceToStr}{end}
+{{ data.comment | normalComment }}
+class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
-	{for enum in data.nested.enumList}
-	{enum.comment | normalComment}
-	enum class {enum.name}
+	{% for enum in data.nested.enumList %}
+	{{ enum.comment | normalComment }}
+	enum class {{ enum.name }}
 	{
-		{for i, value in enum.values}
-		{if i},{end}
-		{value.comment | normalComment}
-		{value.name}
-		{end}
+		{% for i, value in enum.values %}
+		{% if i %},{% end %}
+		{{ value.comment | normalComment }}
+		{{ value.name }}
+		{% end %}
 	};
-	{end}
+	{% end %}
 
 public: // Methods.
 
-	{for method in data.nested.methodList}
-	{method.comment | normalComment}
-	virtual {method.type | typeToStr} {method.name}({for i, var in method.args}{if var.const}const {end}{var.type | typeToStr} {var.name}{if var.isValue} = {var.value}{end}{if i},{end}{end}) = 0;
-	{end}
+	{% for method in data.nested.methodList %}
+	{{ method.comment | normalComment }}
+	virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
+	{% end %}
 
 public: // Variable accessors.
 
-	{for var in data.nested.variableList}
+	{% for var in data.nested.variableList %}
 
-	// Getter for {var.name}_.
-	constexpr const {var.type | typeToStr}& get{var.name | camelCase}() const noexcept
+	// Getter for {{ var.name }}_.
+	constexpr const {{ var.type | typeToStr }}& get{{ var.name | camelCase }}() const noexcept
 	{
-		return {var.name}_;
+		return {{ var.name }}_;
 	}
 
-	{if not var.const}
-	// Setter for {var.name}_.
-	constexpr void set{var.name | camelCase}(const {var.type | typeToStr}& value)
+	{% if not var.const %}
+	// Setter for {{ var.name }}_.
+	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
-		{for contract in var.contracts}
-		{if contract.type == "min"}
+		{% for contract in var.contracts %}
+		{% if contract.type == "min" %}
 		// Minimum contract
-		assert(value >= {contract.value});
-		{end}
-		{if contract.type == "max"}
+		assert(value >= {{ contract.value }});
+		{% end %}
+		{% if contract.type == "max" %}
 		// Maximum contract
-		assert(value <= {contract.value});
-		{end}
-		{end}
+		assert(value <= {{ contract.value }});
+		{% end %}
+		{% end %}
 
-		{var.name}_ = value;
+		{{ var.name }}_ = value;
 	}
-	{end}
-	{end}
+	{% end %}
+	{% end %}
 
 protected: // Protected variable accessors.
 
-	{for var in data.nested.variableList}
+	{% for var in data.nested.variableList %}
 
-	{if var.const}
-	// Setter for {var.name}_.
-	constexpr void set{var.name | camelCase}(const {var.type | typeToStr}& value)
+	{% if var.const %}
+	// Setter for {{ var.name }}_.
+	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
-		{for contract in var.contracts}
-		{if contract.type == "min"}
+		{% for contract in var.contracts %}
+		{% if contract.type == "min" %}
 		// Minimum contract
-		assert(value >= {contract.value});
-		{end}
-		{if contract.type == "max"}
+		assert(value >= {{ contract.value }});
+		{% end %}
+		{% if contract.type == "max" %}
 		// Maximum contract
-		assert(value <= {contract.value});
-		{end}
-		{end}
+		assert(value <= {{ contract.value }});
+		{% end %}
+		{% end %}
 
-		{var.name}_ = value;
+		{{ var.name }}_ = value;
 	}
-	{end}
-	{end}
+	{% end %}
+	{% end %}
 
 private: // Variables.
 
-	{for var in data.nested.variableList}
-	{var.comment | normalComment}
-	{var.type | typeToStr} {var.name}_{{{if var.isValue}{var.value}{end}}};
-	{end}
-}};
+	{% for var in data.nested.variableList %}
+	{{ var.comment | normalComment }}
+	{{ var.type | typeToStr }} {{ var.name }}_{ {% if var.isValue %}{{ var.value }}{% end %} };
+	{% end %}
+};
 
-{if data.type == "module"}
+{% if data.type == "module" %}
 }
-{end}
+{% end %}
 
-{end}
+{% end %}
 
-{if isNamespace}
+{% if isNamespace %}
 }
-{end}
+{% end %}

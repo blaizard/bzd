@@ -39,6 +39,7 @@ py_library(
     deps = [
         ":visitor",
         "//python/bzd/template",
+        "//python/bzd/template2",
     ],
 )
 

@@ -21,8 +21,10 @@ _grammarVariableDeclaration = [
 ]
 _grammarFunctionDeclaration = [
 	GrammarItem(r"(?P<return>void|int|float)", {"function": ""}, [
-	GrammarItem(r"(?P<name>[a-zA-Z_]+)\s*\(\s*\)", Fragment,
-	[GrammarItem(r"{", FragmentNestedStart, _grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStopNewElement)])])
+	GrammarItem(r"(?P<name>[a-zA-Z_]+)\s*\(\s*\)", Fragment, [
+	GrammarItem(r"{", FragmentNestedStart,
+	_grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStopNewElement)])
+	])
 	]),
 ]
 
@@ -32,4 +34,4 @@ _grammar: Grammar = _grammarVariableDeclaration + _grammarFunctionDeclaration
 class TestParser(Parser):
 
 	def __init__(self, content: str) -> None:
-		super().__init__(content, grammar = _grammar, defaultGrammarPre = [GrammarItemSpaces] + _grammarComment)
+		super().__init__(content, grammar=_grammar, defaultGrammarPre=[GrammarItemSpaces] + _grammarComment)
