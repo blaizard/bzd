@@ -199,6 +199,10 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			elif category == "substitution":
 				output = self.visitSubstitution(element=element)
 
+			# Comments
+			elif category == "comment":
+				pass  # nothing to do
+
 			# End statement
 			elif category == "end":
 				pass  # nothing to do

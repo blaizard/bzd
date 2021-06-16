@@ -6,11 +6,13 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match all remaining content
-_regexprContent = r"(?P<content>([\s\S]+?(?={{|{%)|.+))"
+_regexprContent = r"(?P<content>([\s\S]+?(?={{|{%|{#)|.+))"
 # Match a name
 _regexprName = r"(?P<name>([a-zA-Z_\-0-9\.]+))"
 # Match condition
 _regexprCondition = r"(?P<condition>(.+?(?=-?%})))"
+# Match comment
+_regexprComment = r"(?P<comment>(.+?(?=-?#})))"
 
 
 def makeRegexprName(name: str) -> str:
@@ -39,6 +41,13 @@ def makeGrammarControlStart(keyword: str, attribute: str, grammar: Grammar) -> G
 	]
 
 
+def makeGrammarCommentStart(grammar: Grammar) -> Grammar:
+	return [
+		GrammarItem(r"{#-", {"stripLeft": "1"}, grammar),
+		GrammarItem(r"{#", Fragment, grammar),
+	]
+
+
 def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 	return [
 		GrammarItem(r"(?=}})", Fragment, [GrammarItem(r"}}", fragment)]),
@@ -51,6 +60,13 @@ def makeGrammarControlStop(fragment: typing.Type[Fragment],
 	return [
 		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}", fragment, grammar)]),
 		GrammarItem(r"(?=-%})", {"stripRight": "1"}, [GrammarItem(r"-%}", fragment, grammar)]),
+	]
+
+
+def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
+	return [
+		GrammarItem(r"(?=#})", Fragment, [GrammarItem(r"#}", fragment)]),
+		GrammarItem(r"(?=-#})", {"stripRight": "1"}, [GrammarItem(r"-#}", fragment)]),
 	]
 
 
@@ -154,9 +170,18 @@ def makeGrammarControl() -> Grammar:
 	]
 
 
+def makeGrammarComments() -> Grammar:
+	"""
+	Generate the grammar code comments.
+	"""
+
+	return makeGrammarCommentStart(
+		[GrammarItem(_regexprComment, {"category": "comment"}, makeGrammarCommentStop(FragmentNewElement))])
+
+
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
 		super().__init__(content,
-			grammar=makeGrammarSubstitution() + makeGrammarControl() + makeGrammarContent(),
+			grammar=makeGrammarSubstitution() + makeGrammarControl() + makeGrammarComments() + makeGrammarContent(),
 			defaultGrammarPost=[GrammarItemSpaces])

@@ -2,14 +2,21 @@
 
 Bzd templating language (`btl`) library that supports:
 
+Syntax:
+
+- Substitutions blocks are denoted as follow: `{{...}}`
+- Control blocks are denoted as follow: `{%...%}`
+- Comment blocks are denoted as follow: `{#...#}`
+
+All blocks implement whitespace control. Using `-` inside a block will strip the left of right side of the expression,
+ex: `{%- ... %}` or `{{ ... -}}`
+
 - Substitutions:
   - Direct and nested, ex: `{{ my.nested.var }}`.
   - Resolution from mapping, sequences or callable.
   - Support piping to a callable, ex: `{{ var | lower | capitalize }}`.
 
 Piped data can be of arbitrary type but the final substitued value must be either a number or a string.
-
-Substitutions are denoted as follow: `{{...}}`
 
 - For loops:
 
@@ -27,8 +34,3 @@ Substitutions are denoted as follow: `{{...}}`
 
 - Macro blocks:
   - Reusable block anywhere, ex: `{% macro my_block() %} ... {% end %}` -> `{% my_block() %}`
-
-- Whitespace control
-  - Using control or subsitution blocks with `-` to strip whitespaces, ex: `{%- ... %}` or `{{ ... -}}`
-
-Control blocks are denoted as follow: `{%...%}`
