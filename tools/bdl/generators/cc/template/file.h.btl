@@ -1,3 +1,32 @@
+{#- Reusable macros -#}
+{#- Enum -#}
+{%- macro makeEnum(element) %}
+{{ element.comment | normalComment }}
+enum class {{ element.name }} : bzd::UInt8Type
+{
+	{%- for i, value in element.values -%}
+	{%- if i -%},{%- end -%}
+	{{ value.comment | normalComment }}
+	{{ value.name }}
+	{%- end %}
+};
+{% end -%}
+
+{#- Contract assertion -#}
+{%- macro makeContractAssertions(sequence) -%}
+{%- for contract in sequence -%}
+{% if contract.type == "min" -%}
+// Minimum contract
+assert(value >= {{ contract.value }});
+{% elif contract.type == "max" -%}
+// Maximum contract
+assert(value <= {{ contract.value }});
+{% end -%}
+{%- end -%} 
+{%- end -%}
+
+{#- Start of the actual template -#}
+
 #pragma once
 
 #include <cassert>
@@ -16,17 +45,7 @@ namespace {{ namespace | namespaceToStr }} {
 using {{ data.name }} = {{ data.type | typeToStr }};
 {% end -%}
 
-{%- for data in enumList -%}
-{{ data.comment | normalComment }}
-enum class {{ data.name }}
-{
-	{%- for i, value in data.values -%}
-	{%- if i -%},{%- end -%}
-	{{ value.comment | normalComment }}
-	{{ value.name }}
-	{%- end %}
-};
-{% end -%}
+{%- for data in enumList -%}{{ makeEnum(data) }}{%- end -%}
 
 {%- for data in nestedList -%}
 
@@ -38,17 +57,7 @@ namespace impl {
 class {{ data.name }}{%- if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr -}}{%- end %}
 {
 public: // Types
-	{% for enum in data.nested.enumList -%}
-	{{ enum.comment | normalComment }}
-	enum class {{ enum.name }}
-	{
-		{% for i, value in enum.values -%}
-		{%- if i -%},{%- end -%}
-		{{ value.comment | normalComment }}
-		{{ value.name }}
-		{%- end %}
-	};
-	{%- end %}
+	{%- for nested in data.nested.enumList -%}{{ makeEnum(nested) }}{%- end -%}
 
 public: // Methods.
 
@@ -71,17 +80,7 @@ public: // Variable accessors.
 	// Setter for {{ var.name }}_.
 	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
-		{% for contract in var.contracts -%}
-		{%- if contract.type == "min" %}
-		// Minimum contract
-		assert(value >= {{ contract.value }});
-		{% end -%}
-		{%- if contract.type == "max" %}
-		// Maximum contract
-		assert(value <= {{ contract.value }});
-		{% end -%}
-		{% end %}
-
+		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
 	{% end %}
@@ -95,17 +94,7 @@ protected: // Protected variable accessors.
 	// Setter for {{ var.name }}_.
 	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
-		{%- for contract in var.contracts -%}
-		{% if contract.type == "min" -%}
-		// Minimum contract
-		assert(value >= {{ contract.value }});
-		{% end -%}
-		{% if contract.type == "max" -%}
-		// Maximum contract
-		assert(value <= {{ contract.value }});
-		{% end -%}
-		{% end %}
-
+		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
 	{% end %}
