@@ -19,6 +19,9 @@ class Sequence:
 			if not element.isEmpty():
 				yield element
 
+	def __len__(self) -> int:
+		return len([e for e in self.list if not e.isEmpty()])
+
 	def merge(self, sequence: "Sequence") -> None:
 		self.list += sequence.list
 

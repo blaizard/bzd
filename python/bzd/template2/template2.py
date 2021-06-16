@@ -14,11 +14,37 @@ ResultType = typing.List[str]
 _defaultValue: typing.Any = {}
 
 
+class SubstitutionWrapper:
+
+	def __init__(self, substitutions: SubstitutionsType) -> None:
+		self.substitutions = substitutions
+		self.ext: typing.Dict[str, typing.Any] = {}
+
+	def register(self, element: Element, key: str, value: typing.Any) -> None:
+		Error.assertTrue(element=element,
+			condition=(key not in self),
+			message="Name conflict, '{}' already exists in the substitution map.".format(key))
+		self.ext[key] = value
+
+	def __getitem__(self, key: str) -> typing.Any:
+		if hasattr(self.substitutions, key):
+			return getattr(self.substitutions, key)
+		elif key in self.substitutions:
+			return self.substitutions[key]
+		return self.ext[key]
+
+	def __delitem__(self, key: str) -> None:
+		del self.ext[key]
+
+	def __contains__(self, key: str) -> bool:
+		return hasattr(self.substitutions, key) or key in self.substitutions or key in self.ext
+
+
 class VisitorTemplate(Visitor[ResultType, str]):
 	nestedKind = None
 
 	def __init__(self, substitutions: SubstitutionsType) -> None:
-		self.substitutions = substitutions
+		self.substitutions = SubstitutionWrapper(substitutions)
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).
 		self.followElse = False
 		# Used to strip the next element after a this flag is set.
@@ -31,7 +57,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 	def visitFinal(self, result: ResultType) -> str:
 		return "".join(result)
 
-	def resolveName(self, name: str, argument: typing.Any = _defaultValue) -> typing.Any:
+	def resolveName(self, name: str, isCallable: bool = False, *args: typing.Any) -> typing.Any:
 		"""
 		Resolve a name from the current substitution list.
 		Names are splited at the '.' character and each symbol is matched with the current
@@ -42,6 +68,10 @@ class VisitorTemplate(Visitor[ResultType, str]):
 
 		for symbol in name.split("."):
 
+			# If this is a callable, process its value
+			if callable(value):
+				value = value()
+
 			# Look for the corresponding nested value
 			if hasattr(value, symbol):
 				value = getattr(value, symbol)
@@ -50,12 +80,11 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			else:
 				raise Exception("Substitution value for '{}' does not exists.".format(name))
 
-			# If this is a callable, process its value
-			if argument is not _defaultValue:
-				assert callable(value), "'{}' must be callable.".format(name)
-				value = value(argument)
-			elif callable(value):
-				value = value()
+		if isCallable:
+			assert callable(value), "'{}' must be callable.".format(name)
+			value = value(*args)
+		elif callable(value):
+			value = value()
 
 		return value
 
@@ -64,14 +93,26 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		Handle substitution.
 		"""
 		Error.assertHasAttr(element=element, attr="name")
-		value = self.resolveName(name=element.getAttr("name").value)
+		name = element.getAttr("name").value
+
+		# Check if callable and if there are arguments
+		arguments = element.getNestedSequence("argument")
+		if arguments is None:
+			value = self.resolveName(name=name)
+		else:
+			# Resolve all arguments
+			args = []
+			for arg in arguments:
+				Error.assertHasAttr(element=arg, attr="name")
+				args.append(self.resolveName(arg.getAttr("name").value))
+			value = self.resolveName(name, True, *args)
 
 		# Process the pipes if any.
 		pipes = element.getNestedSequence("pipe")
 		if pipes:
 			for pipe in pipes:
 				Error.assertHasAttr(element=pipe, attr="name")
-				value = self.resolveName(name=pipe.getAttr("name").value, argument=value)
+				value = self.resolveName(pipe.getAttr("name").value, True, value)
 
 		# Save the output
 		assert isinstance(value, (int, float, str)), "The resulting substitued value must be a number or a string."
@@ -98,14 +139,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		Error.assertHasSequence(element=element, sequence="nested")
 
 		value1 = element.getAttr("value1").value
-		Error.assertTrue(element=element,
-			condition=value1 not in self.substitutions,
-			message="Name conflict, '{}' already exists in the substitution map.".format(value1))
-
 		value2 = element.getAttrValue("value2")
-		Error.assertTrue(element=element,
-			condition=(value2 is None) or (value2 not in self.substitutions),
-			message="Name conflict, '{}' already exists in the substitution map.".format(value2))
 
 		sequence = element.getNestedSequence(kind="nested")
 		assert sequence
@@ -114,15 +148,15 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		iterable = self.resolveName(name=element.getAttr("iterable").value)
 		if value2 is None:
 			for value in iterable:
-				self.substitutions[value1] = value
+				self.substitutions.register(element=element, key=value1, value=value)
 				output = self._visit(sequence=sequence)
 				result += self.processNestedResult(element=element, result=output)
 				del self.substitutions[value1]
 		else:
 			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
-				self.substitutions[value1] = key
-				self.substitutions[value2] = value
+				self.substitutions.register(element=element, key=value1, value=key)
+				self.substitutions.register(element=element, key=value2, value=value)
 				output = self._visit(sequence=sequence)
 				result += self.processNestedResult(element=element, result=output)
 				del self.substitutions[value2]
@@ -142,6 +176,51 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		if condition:
 			output = self._visit(sequence=sequence)
 			result += self.processNestedResult(element=element, result=output)
+
+	def processMacro(self, element: Element, *args: typing.Any) -> str:
+		"""
+		Process a macro already defined.
+		"""
+
+		sequence = element.getNestedSequence("nested")
+		assert sequence
+
+		# Build the argument list
+		argList = []
+		argument = element.getNestedSequence("argument")
+		assert argument is not None
+		for arg in argument:
+			Error.assertHasAttr(element=arg, attr="name")
+			argList.append(arg.getAttr("name").value)
+
+		for i, name in enumerate(argList):
+			self.substitutions.register(element=element, key=name, value=args[i])
+
+		# Process the template
+		output = self._visit(sequence=sequence)
+		output = self.processNestedResult(element=element, result=output)
+
+		for name in argList:
+			del self.substitutions[name]
+
+		return "".join(output)
+
+	def visitMacro(self, element: Element) -> None:
+		"""
+		Handle macro definition block.
+		"""
+		Error.assertHasSequence(element=element, sequence="argument")
+		Error.assertHasSequence(element=element, sequence="nested")
+		Error.assertHasAttr(element=element, attr="name")
+
+		name = element.getAttr("name").value
+		Error.assertTrue(element=element,
+			attr="name",
+			condition=(name not in self.substitutions),
+			message="Name conflict with macro and an already existing name: '{}'.".format(name))
+
+		# Register the macro
+		self.substitutions.register(element=element, key=name, value=lambda *args: self.processMacro(element, *args))
 
 	def evaluateCondition(self, conditionStr: str) -> bool:
 		"""
@@ -222,6 +301,10 @@ class VisitorTemplate(Visitor[ResultType, str]):
 				if self.followElse:
 					conditionStr = element.getAttrValue("condition", "True")  # type: ignore
 					self.visitIfBlock(element=element, result=output, conditionStr=conditionStr)
+
+			# Macro block
+			elif category == "macro":
+				self.visitMacro(element=element)
 
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))

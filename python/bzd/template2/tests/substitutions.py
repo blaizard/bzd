@@ -20,6 +20,16 @@ class TestRun(unittest.TestCase):
 		result = template.process({"a": lambda: 42})
 		self.assertEqual("Hello 42", result)
 
+	def testExplicitCallableSubsitution(self) -> None:
+		template = Template("Hello {{a()}}")
+		result = template.process({"a": lambda: 42})
+		self.assertEqual("Hello 42", result)
+
+	def testExplicitCallableArgsSubsitution(self) -> None:
+		template = Template("Hello {{a(b1, b2)}}")
+		result = template.process({"a": lambda x, y: x + y, "b1": "[", "b2": "]"})
+		self.assertEqual("Hello []", result)
+
 	def testCallableNestedSubsitution(self) -> None:
 		template = Template("Hello {{a.b}}")
 		result = template.process({"a": lambda: {"b": lambda: "Me!"}})
