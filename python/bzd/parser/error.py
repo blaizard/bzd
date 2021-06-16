@@ -80,13 +80,13 @@ class Error:
 		raise ExceptionParser(message=Error.toStringFromElement(element=element, attr=attr, message=message))
 
 	@staticmethod
-	def assertTrue(element: Element, condition: bool, message: str) -> None:
+	def assertTrue(element: Element, condition: bool, message: str, attr: typing.Optional[str] = None) -> None:
 		"""
 		Ensures a specific condition evaluates to True.
 		"""
 
 		if not condition:
-			Error.handleFromElement(element=element, attr=None, message=message)
+			Error.handleFromElement(element=element, attr=attr, message=message)
 
 	@staticmethod
 	def assertHasAttr(element: Element, attr: str) -> None:

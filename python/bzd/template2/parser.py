@@ -9,6 +9,8 @@ from bzd.parser.element import Element
 _regexprContent = r"(?P<content>([\s\S]+?(?={{|{%|{#)|.+))"
 # Match a name
 _regexprName = r"(?P<name>([a-zA-Z_\-0-9\.]+))"
+# Match an identifier
+_regexprIdentifier = r"(?P<name>([a-zA-Z_\-0-9]+))"
 # Match condition
 _regexprCondition = r"(?P<condition>(.+?(?=-?%})))"
 # Match comment
@@ -70,6 +72,26 @@ def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
 	]
 
 
+def makeGrammarSymbol(fragment: typing.Dict[str, str], grammar: Grammar) -> Grammar:
+	"""
+	Generate a grammar for a symbol.
+	"""
+
+	class ArgumentStart(FragmentNestedStart):
+		nestedName = "argument"
+
+	return [
+		GrammarItem(makeRegexprName("name"), fragment, [
+		GrammarItem(r"\(", ArgumentStart, [
+		GrammarItem(_regexprName, Fragment,
+		[GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement, grammar)]),
+		GrammarItem(r"\)", FragmentParentElement, grammar)
+		])
+		] + grammar)
+	]
+
+
 def makeGrammarSubstitution() -> Grammar:
 	"""
 	Generate a grammar for substitution blocks.
@@ -78,15 +100,14 @@ def makeGrammarSubstitution() -> Grammar:
 	class PipeStart(FragmentNestedStart):
 		nestedName = "pipe"
 
-	return makeGrammarSubstitutionStart([
-		GrammarItem(makeRegexprName("name"), {"category": "substitution"}, [
+	return makeGrammarSubstitutionStart(
+		makeGrammarSymbol({"category": "substitution"}, [
 		GrammarItem(r"\|", PipeStart, [
 		GrammarItem(makeRegexprName("name"), Fragment,
 		[GrammarItem(r"\|", FragmentNewElement),
 		GrammarItem(None, FragmentParentElement)])
 		])
-		] + makeGrammarSubstitutionStop(FragmentNewElement)),
-	] + makeGrammarSubstitutionStop(FragmentNewElement))
+		] + makeGrammarSubstitutionStop(FragmentNewElement)) + makeGrammarSubstitutionStop(FragmentNewElement))
 
 
 def makeGrammarControlFor() -> Grammar:
@@ -142,6 +163,51 @@ def makeGrammarControlElseIf() -> Grammar:
 	]
 
 
+"""
+	class ArgumentStart(FragmentNestedStart):
+		nestedName = "argument"
+
+	return [
+		GrammarItem(r"method", {"category": "method"}, [
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r"\(", ArgumentStart, [
+		makeGrammarVariable([
+			GrammarItem(r",", FragmentNewElement),
+			GrammarItem(r"\)", FragmentParentElement)
+		]),
+		GrammarItem(r"\)", FragmentParentElement)
+		]),
+		GrammarItem(r"->", Fragment,
+		[makeGrammarType([makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
+		GrammarItem(r";", FragmentNewElement)
+		])
+		])
+"""
+
+
+# makeGrammarControlStop(FragmentNestedStart, "root")
+def makeGrammarControlMacro() -> Grammar:
+	"""
+	Generate the grammar for a macro block.
+	It matches the following:
+		macro name(arg1, arg2, ...) %}
+	"""
+
+	class ArgumentStart(FragmentNestedStart):
+		nestedName = "argument"
+		default = {"category": "macro"}
+
+	return makeGrammarControlStart(r"macro", "stripLeft", [
+		GrammarItem(_regexprIdentifier + r"\(", ArgumentStart, [
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement, makeGrammarControlStop(FragmentNestedStart, "root"))
+		]),
+		GrammarItem(r"\)", FragmentParentElement, makeGrammarControlStop(FragmentNestedStart, "root"))
+		])
+	])
+
+
 def makeGrammarControlEnd() -> Grammar:
 	"""
 	Generate the grammar for the end control block.
@@ -166,7 +232,8 @@ def makeGrammarControl() -> Grammar:
 	return [
 		GrammarItem(
 		r"(?={%)", Fragment,
-		makeGrammarControlFor() + makeGrammarControlIf() + makeGrammarControlElseIf() + makeGrammarControlEnd())
+		makeGrammarControlFor() + makeGrammarControlIf() + makeGrammarControlElseIf() + makeGrammarControlMacro() +
+		makeGrammarControlEnd())
 	]
 
 
