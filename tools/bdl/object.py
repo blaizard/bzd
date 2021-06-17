@@ -2,6 +2,7 @@ import json
 import typing
 from pathlib import Path
 
+from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
@@ -15,7 +16,8 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, parsed: Sequence, symbols: MapType) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: MapType) -> None:
+		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
 		self.elements: typing.Dict[str, Element] = {}
@@ -27,7 +29,8 @@ class Object:
 		"""
 
 		# Parse the input file
-		data = Parser.fromPath(path).parse()
+		parser = Parser.fromPath(path)
+		data = parser.parse()
 
 		# Validation step
 		Validation().visit(data)
@@ -35,7 +38,7 @@ class Object:
 		# Generate the symbol map
 		symbols = Map().visit(data)
 
-		return Object(parsed=data, symbols=symbols)
+		return Object(context=parser.context, parsed=data, symbols=symbols)
 
 	@staticmethod
 	def fromSerialize(data: str) -> "Object":
@@ -44,14 +47,23 @@ class Object:
 		"""
 
 		payload = json.loads(data)
-		return Object(parsed=Sequence.fromSerialize(payload["parsed"]), symbols=payload["symbols"])
+		context = Context.fromSerialize(payload["context"])
+		return Object(context=context,
+			parsed=Sequence.fromSerialize(payload["parsed"], context),
+			symbols=payload["symbols"])
 
 	def serialize(self) -> str:
 		"""
 		Serialize the current object.
 		"""
 
-		return json.dumps({"parsed": self.parsed.serialize(), "symbols": self.symbols}, separators=(",", ":"))
+		return json.dumps(
+			{
+			"context": self.context.serialize(),
+			"parsed": self.parsed.serialize(),
+			"symbols": self.symbols
+			},
+			separators=(",", ":"))
 
 	def registerSymbols(self, symbols: MapType) -> None:
 		"""

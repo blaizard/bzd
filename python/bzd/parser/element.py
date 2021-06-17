@@ -2,8 +2,7 @@ import typing
 
 from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributesSerialize
 from bzd.parser.grammar import Grammar
-if typing.TYPE_CHECKING:
-	from bzd.parser.parser import Parser
+from bzd.parser.context import Context
 
 ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
 SequenceSerialize = typing.List[ElementSerialize]
@@ -11,7 +10,8 @@ SequenceSerialize = typing.List[ElementSerialize]
 
 class Sequence:
 
-	def __init__(self) -> None:
+	def __init__(self, context: typing.Optional[Context] = None) -> None:
+		self.context = context
 		self.list: typing.List["Element"] = []
 
 	def __iter__(self) -> typing.Iterator["Element"]:
@@ -44,12 +44,12 @@ class Sequence:
 		return [element.serialize() for element in self]
 
 	@staticmethod
-	def fromSerialize(sequence: SequenceSerialize) -> "Sequence":
+	def fromSerialize(sequence: SequenceSerialize, context: typing.Optional[Context] = None) -> "Sequence":
 		"""
 		Create a sequence from a serialized sequence.
 		"""
-		s = Sequence()
-		s.list = [Element.fromSerialize(e) for e in sequence]
+		s = Sequence(context)
+		s.list = [Element.fromSerialize(e, context) for e in sequence]
 		return s
 
 
@@ -58,10 +58,9 @@ class SequenceParser(Sequence):
 	This represents a sequence of Elements.
 	"""
 
-	def __init__(self, parser: typing.Optional["Parser"], grammar: Grammar,
+	def __init__(self, context: typing.Optional[Context], grammar: Grammar,
 		parent: typing.Optional["ElementParser"]) -> None:
-		super().__init__()
-		self.parser = parser
+		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent
 
@@ -71,7 +70,7 @@ class SequenceParser(Sequence):
 		Params:
 		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
 		"""
-		element = ElementParser(parser=self.parser, grammar=self.grammar if grammar is None else grammar, parent=self)
+		element = ElementParser(context=self.context, grammar=self.grammar if grammar is None else grammar, parent=self)
 		self.list.append(element)
 		return element
 
@@ -85,20 +84,21 @@ class SequenceParser(Sequence):
 
 class Element:
 
-	def __init__(self) -> None:
+	def __init__(self, context: typing.Optional[Context] = None) -> None:
+		self.context = context
 		self.attrs: Attributes = {}
 		self.sequences: typing.Dict[str, Sequence] = {}
 
 	@staticmethod
-	def fromSerialize(element: ElementSerialize) -> "Element":
+	def fromSerialize(element: ElementSerialize, context: typing.Optional[Context] = None) -> "Element":
 		"""
 		Create an element from a serialized element.
 		"""
-		e = Element()
+		e = Element(context)
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
 		e.sequences = {
-			key: Sequence.fromSerialize(sequence)  # type: ignore
+			key: Sequence.fromSerialize(sequence, context)  # type: ignore
 			for key, sequence in element.items() if key != "@"
 		}
 		return e
@@ -201,11 +201,10 @@ class Element:
 class ElementParser(Element):
 
 	def __init__(self,
-		parser: typing.Optional["Parser"],
+		context: typing.Optional[Context],
 		grammar: Grammar,
 		parent: typing.Optional[SequenceParser] = None) -> None:
-		super().__init__()
-		self.parser = parser
+		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent
 
@@ -230,7 +229,7 @@ class ElementParser(Element):
 
 	def makeElement(self, kind: str, grammar: Grammar) -> "ElementParser":
 		if kind not in self.sequences:
-			self.sequences[kind] = SequenceParser(parser=self.parser, grammar=grammar, parent=self)
+			self.sequences[kind] = SequenceParser(context=self.context, grammar=grammar, parent=self)
 		return typing.cast(SequenceParser, self.sequences[kind]).makeElement()
 
 	def getSequence(self) -> SequenceParser:

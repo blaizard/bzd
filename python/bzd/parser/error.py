@@ -3,6 +3,7 @@ import sys
 
 from pathlib import Path
 from bzd.parser.element import Element
+from bzd.parser.context import Context
 
 
 class ExceptionParser(Exception):
@@ -15,24 +16,19 @@ class Error:
 	"""
 	Handle errors.
 	"""
-	path_: typing.Optional[Path] = None
-	content_: typing.Optional[str] = None
 
 	@staticmethod
-	def setContext(path: typing.Optional[Path] = None, content: typing.Optional[str] = None) -> None:
-		Error.path_ = path
-		Error.content_ = content
-
-	@staticmethod
-	def toString(index: int, message: str) -> str:
+	def toString(context: typing.Optional[Context], index: int, message: str) -> str:
 
 		# Look for the content
-		if Error.content_ is None:
-			if Error.path_ is None:
+		if context is None:
+			return message
+		if context.content is None:
+			if context.path is None:
 				return message
-			content = Error.path_.read_text()
+			content = context.path.read_text()
 		else:
-			content = Error.content_
+			content = context.content
 		contentByLine = content.split("\n")
 
 		# Identify the line and column
@@ -48,7 +44,7 @@ class Error:
 		# Position the cursor
 		contentByLine.insert(line + 1, "{}^".format(" " * column))
 		contentByLine.insert(
-			line + 2, "{}:{}:{}: error: {}".format("<string>" if Error.path_ is None else Error.path_, line + 1,
+			line + 2, "{}:{}:{}: error: {}".format("<string>" if context.path is None else context.path, line + 1,
 			column + 1, message))
 
 		return "\n" + "\n".join(contentByLine)
@@ -69,11 +65,11 @@ class Error:
 			if startIndex < sys.maxsize:
 				index = startIndex
 
-		return Error.toString(index=index, message=message)
+		return Error.toString(context=element.context, index=index, message=message)
 
 	@staticmethod
-	def handle(index: int, message: str) -> None:
-		raise ExceptionParser(message=Error.toString(index=index, message=message))
+	def handle(context: Context, index: int, message: str) -> None:
+		raise ExceptionParser(message=Error.toString(context=context, index=index, message=message))
 
 	@staticmethod
 	def handleFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> None:
