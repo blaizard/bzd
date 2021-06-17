@@ -1,9 +1,15 @@
 namespace bzd.manifest;
+using NextType = Integer;
 enum Test
 {
 	FIRST
 	,
 	SECOND
+}
+struct MyType
+{
+	Test test;
+	NextType type;
 }
 interface MyInterface
 {

@@ -18,26 +18,34 @@ class SubstitutionWrapper:
 
 	def __init__(self, substitutions: SubstitutionsType) -> None:
 		self.substitutions = substitutions
-		self.ext: typing.Dict[str, typing.Any] = {}
+		self.ext: typing.Dict[str, typing.List[typing.Any]] = {}
 
 	def register(self, element: Element, key: str, value: typing.Any) -> None:
 		Error.assertTrue(element=element,
-			condition=(key not in self),
+			condition=(not self.isInSubstitutions(key)),
 			message="Name conflict, '{}' already exists in the substitution map.".format(key))
-		self.ext[key] = value
+		if key not in self.ext:
+			self.ext[key] = []
+		self.ext[key].append(value)
+
+	def unregister(self, key: str) -> None:
+		self.ext[key].pop()
 
 	def __getitem__(self, key: str) -> typing.Any:
 		if hasattr(self.substitutions, key):
 			return getattr(self.substitutions, key)
 		elif key in self.substitutions:
 			return self.substitutions[key]
-		return self.ext[key]
+		return self.ext[key][-1]
 
-	def __delitem__(self, key: str) -> None:
-		del self.ext[key]
+	def isInSubstitutions(self, key: str) -> bool:
+		"""
+		If the element is in the original subsitution map.
+		"""
+		return hasattr(self.substitutions, key) or key in self.substitutions
 
 	def __contains__(self, key: str) -> bool:
-		return hasattr(self.substitutions, key) or key in self.substitutions or key in self.ext
+		return self.isInSubstitutions(key) or key in self.ext
 
 
 class VisitorTemplate(Visitor[ResultType, str]):
@@ -73,6 +81,8 @@ class VisitorTemplate(Visitor[ResultType, str]):
 				value = value()
 
 			# Look for the corresponding nested value
+			# Note, the following conditions must remains eventhough they are handled by Substitution type
+			# but only at the top level.
 			if hasattr(value, symbol):
 				value = getattr(value, symbol)
 			elif symbol in value:
@@ -103,8 +113,16 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			# Resolve all arguments
 			args = []
 			for arg in arguments:
-				Error.assertHasAttr(element=arg, attr="name")
-				args.append(self.resolveName(arg.getAttr("name").value))
+				Error.assertHasAttr(element=arg, attr="value")
+				Error.assertHasAttr(element=arg, attr="type")
+				argType = arg.getAttr("type").value
+				argValue = arg.getAttr("value").value
+				if argType == "name":
+					args.append(self.resolveName(argValue))
+				elif argType == "number":
+					args.append(float(argValue))
+				elif argType == "string":
+					args.append(argValue)
 			value = self.resolveName(name, True, *args)
 
 		# Process the pipes if any.
@@ -151,7 +169,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 				self.substitutions.register(element=element, key=value1, value=value)
 				output = self._visit(sequence=sequence)
 				result += self.processNestedResult(element=element, result=output)
-				del self.substitutions[value1]
+				self.substitutions.unregister(value1)
 		else:
 			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
@@ -159,8 +177,8 @@ class VisitorTemplate(Visitor[ResultType, str]):
 				self.substitutions.register(element=element, key=value2, value=value)
 				output = self._visit(sequence=sequence)
 				result += self.processNestedResult(element=element, result=output)
-				del self.substitutions[value2]
-				del self.substitutions[value1]
+				self.substitutions.unregister(value2)
+				self.substitutions.unregister(value1)
 
 	def visitIfBlock(self, element: Element, result: ResultType, conditionStr: str) -> None:
 		"""
@@ -201,7 +219,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		output = self.processNestedResult(element=element, result=output)
 
 		for name in argList:
-			del self.substitutions[name]
+			self.substitutions.unregister(name)
 
 		return "".join(output)
 
@@ -347,6 +365,10 @@ class Template:
 	def process(self, substitutions: SubstitutionsType) -> str:
 
 		sequence = Parser(self.template).parse()
+		*_, last = sequence
+		if last.getAttrValue("category", None) in ["if", "else", "for", "macro"]:
+			Error.handleFromElement(element=last, message="Unterminated control block.")
+
 		result = VisitorTemplate(substitutions).visit(sequence)
 
 		return result
