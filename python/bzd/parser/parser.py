@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from typing import Any, Iterator, MutableMapping, Type, Optional
 
+from bzd.parser.context import Context
 from bzd.parser.element import SequenceParser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.error import Error
@@ -18,9 +19,9 @@ class Parser:
 		self.grammar = grammar
 		self.defaultGrammarPre = defaultGrammarPre
 		self.defaultGrammarPost = defaultGrammarPost
-		self.content = content
 
-		Error.setContext(content=self.content)
+		# Save the context
+		self.context = Context(content=content)
 
 	@classmethod
 	def fromPath(cls: Type["Parser"], path: Path, *args: Any, **kwargs: Any) -> "Parser":
@@ -30,7 +31,7 @@ class Parser:
 
 		content = path.read_text()
 		parser = cls(content, *args, **kwargs)
-		Error.setContext(path=path, content=content)
+		parser.context.path = path
 
 		return parser
 
@@ -71,16 +72,20 @@ class Parser:
 		"""
 
 		index = 0
-		root = SequenceParser(parser=self, parent=None, grammar=self.grammar)
+		root = SequenceParser(context=self.context, parent=None, grammar=self.grammar)
 		element = root.makeElement()
 		checkpoints: MutableMapping[str, Grammar] = {"root": self.grammar}
 
+		# Keep a reference to the content
+		assert self.context.content
+		content: str = self.context.content
+
 		try:
-			while index < len(self.content):
+			while index < len(content):
 				m = None
 				for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() +
 					self.defaultGrammarPost):
-					m = re.match(item.regexpr, self.content[index:])
+					m = re.match(item.regexpr, content[index:])
 					if m:
 						if item.fragment:
 							fragment = item.fragment(index, attrs=m.groupdict())
@@ -100,6 +105,6 @@ class Parser:
 			for item in self.iterateGrammar(element.getGrammar()):
 				print(item.regexpr)
 
-			Error.handle(index=index, message=str(e))
+			Error.handle(context=self.context, index=index, message=str(e))
 
 		return root

@@ -274,7 +274,7 @@ class VisitorTemplate(Visitor[ResultType, ResultType]):
 			message="The inlcude path '{}' must point to a valid file.".format(includePathStr))
 
 		template = Template(template=f.read_text(), includeDirs=self.includeDirs)
-		output, substitutions = template._process(substitutions=self.substitutions) # type: ignore
+		output, substitutions = template._process(substitutions=self.substitutions)  # type: ignore
 
 		# Update the current substitution object
 		self.substitutions.update(substitutions)
