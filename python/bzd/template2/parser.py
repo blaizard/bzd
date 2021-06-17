@@ -125,6 +125,16 @@ def makeGrammarSubstitution() -> Grammar:
 		] + makeGrammarSubstitutionStop(FragmentNewElement)) + makeGrammarSubstitutionStop(FragmentNewElement))
 
 
+def makeGrammarControlInclude() -> Grammar:
+	"""
+	Generate the grammar for the include block.
+	It matches the following:
+		include value %}
+	"""
+	return makeGrammarControlStart(
+		r"include", "stripLeft", makeGrammarValue({"category": "include"}, makeGrammarControlStop(FragmentNewElement)))
+
+
 def makeGrammarControlFor() -> Grammar:
 	"""
 	Generate the grammar for the for loop control block.
@@ -225,7 +235,7 @@ def makeGrammarControl() -> Grammar:
 		GrammarItem(
 		r"(?={%)", Fragment,
 		makeGrammarControlFor() + makeGrammarControlIf() + makeGrammarControlElseIf() + makeGrammarControlMacro() +
-		makeGrammarControlEnd())
+		makeGrammarControlInclude() + makeGrammarControlEnd())
 	]
 
 

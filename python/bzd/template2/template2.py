@@ -31,6 +31,17 @@ class SubstitutionWrapper:
 	def unregister(self, key: str) -> None:
 		self.ext[key].pop()
 
+	def update(self, other: "SubstitutionWrapper") -> None:
+		"""
+		Update the current object with another substitution wrapper.
+		This will only update the ext part.
+		"""
+		for key, value in other.ext.items():
+			if value:
+				if key not in self.ext:
+					self.ext[key] = []
+				self.ext[key].append(value[-1])
+
 	def __getitem__(self, key: str) -> typing.Any:
 		if hasattr(self.substitutions, key):
 			return getattr(self.substitutions, key)
@@ -48,11 +59,15 @@ class SubstitutionWrapper:
 		return self.isInSubstitutions(key) or key in self.ext
 
 
-class VisitorTemplate(Visitor[ResultType, str]):
+class VisitorTemplate(Visitor[ResultType, ResultType]):
 	nestedKind = None
 
-	def __init__(self, substitutions: SubstitutionsType) -> None:
+	def __init__(
+			self,
+			substitutions: SubstitutionsType,
+			includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent]) -> None:
 		self.substitutions = SubstitutionWrapper(substitutions)
+		self.includeDirs = includeDirs
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).
 		self.followElse = False
 		# Used to strip the next element after a this flag is set.
@@ -61,9 +76,6 @@ class VisitorTemplate(Visitor[ResultType, str]):
 
 	def visitBegin(self, result: ResultType) -> ResultType:
 		return []
-
-	def visitFinal(self, result: ResultType) -> str:
-		return "".join(result)
 
 	def resolveName(self, name: str, isCallable: bool = False, *args: typing.Any) -> typing.Any:
 		"""
@@ -98,6 +110,22 @@ class VisitorTemplate(Visitor[ResultType, str]):
 
 		return value
 
+	def readValue(self, element: Element) -> typing.Any:
+		"""
+		Read a value from an element.
+		"""
+
+		Error.assertHasAttr(element=element, attr="value")
+		Error.assertHasAttr(element=element, attr="type")
+		valueType = element.getAttr("type").value
+		value = element.getAttr("value").value
+		if valueType == "name":
+			return self.resolveName(value)
+		elif valueType == "number":
+			return float(value)
+		elif valueType == "string":
+			return value
+
 	def visitSubstitution(self, element: Element) -> ResultType:
 		"""
 		Handle substitution.
@@ -113,16 +141,7 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			# Resolve all arguments
 			args = []
 			for arg in arguments:
-				Error.assertHasAttr(element=arg, attr="value")
-				Error.assertHasAttr(element=arg, attr="type")
-				argType = arg.getAttr("type").value
-				argValue = arg.getAttr("value").value
-				if argType == "name":
-					args.append(self.resolveName(argValue))
-				elif argType == "number":
-					args.append(float(argValue))
-				elif argType == "string":
-					args.append(argValue)
+				args.append(self.readValue(element=arg))
 			value = self.resolveName(name, True, *args)
 
 		# Process the pipes if any.
@@ -240,6 +259,28 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		# Register the macro
 		self.substitutions.register(element=element, key=name, value=lambda *args: self.processMacro(element, *args))
 
+	def visitInclude(self, element: Element) -> ResultType:
+		"""
+		Handle include.
+		"""
+
+		includePathStr = self.readValue(element=element)
+		Error.assertTrue(element=element,
+			condition=isinstance(includePathStr, str),
+			message="The include path must resolve into a string, instead: '{}'.".format(includePathStr))
+		f = pathlib.Path(includePathStr)
+		Error.assertTrue(element=element,
+			condition=f.is_file(),
+			message="The inlcude path '{}' must point to a valid file.".format(includePathStr))
+
+		template = Template(template=f.read_text(), includeDirs=self.includeDirs)
+		output, substitutions = template._process(substitutions=self.substitutions) # type: ignore
+
+		# Update the current substitution object
+		self.substitutions.update(substitutions)
+
+		return output
+
 	def evaluateCondition(self, conditionStr: str) -> bool:
 		"""
 		Resolve names and evaluate a condition statement.
@@ -324,6 +365,9 @@ class VisitorTemplate(Visitor[ResultType, str]):
 			elif category == "macro":
 				self.visitMacro(element=element)
 
+			elif category == "include":
+				output = self.visitInclude(element=element)
+
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))
 
@@ -341,15 +385,6 @@ class VisitorTemplate(Visitor[ResultType, str]):
 		except Exception as e:
 			Error.handleFromElement(element=element, message=str(e))
 
-		# hello    {{- hello -}} me   <- next
-		# {for -} in {} <- each loop
-		# {for} dsd
-		# {- end}   <-
-
-		# Remove white spaces at the begining of the next ammendment
-		#if element.getAttr("stripRight").value:
-		#	result = result.rstrip()
-
 		return result
 
 
@@ -363,12 +398,17 @@ class Template:
 		self.includeDirs = includeDirs
 
 	def process(self, substitutions: SubstitutionsType) -> str:
+		output, _ = self._process(substitutions=substitutions)
+		return "".join(output)
+
+	def _process(self, substitutions: SubstitutionsType) -> typing.Tuple[ResultType, SubstitutionWrapper]:
 
 		sequence = Parser(self.template).parse()
 		*_, last = sequence
 		if last.getAttrValue("category", None) in ["if", "else", "for", "macro"]:
 			Error.handleFromElement(element=last, message="Unterminated control block.")
 
-		result = VisitorTemplate(substitutions).visit(sequence)
+		visitor = VisitorTemplate(substitutions, self.includeDirs)
+		result = visitor.visit(sequence)
 
-		return result
+		return result, visitor.substitutions

@@ -34,5 +34,9 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
   - Consecutive `else` and `elif` statement, ex: `{% if value1 %} ... {% elif value2 %} ... {% else %} ... {% end %}`
 
 - Macro blocks:
+
   - Reusable block anywhere, ex: `{% macro my_block() %} ... {% end %}` -> `{{ my_block() }}`
   - Symbol substitution, ex: `{% macro my_block(a) %} ... {% end %}` -> `{{ my_block(b) }}`
+
+- Inclusion blocks:
+  - Include another btl file as if it was part of the document, ex: `{% include "my/path.btl" %}`
