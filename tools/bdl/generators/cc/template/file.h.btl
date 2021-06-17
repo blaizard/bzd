@@ -1,28 +1,69 @@
 {#- Reusable macros -#}
+
 {#- Enum -#}
 {%- macro makeEnum(element) %}
-{{ element.comment | normalComment }}
-enum class {{ element.name }} : bzd::UInt8Type
-{
-	{%- for i, value in element.values -%}
-	{%- if i -%},{%- end -%}
-	{{ value.comment | normalComment }}
-	{{ value.name }}
-	{%- end %}
-};
+	{{ element.comment | normalComment }}
+	enum class {{ element.name }} : bzd::UInt8Type
+	{
+		{%- for i, value in element.values -%}
+		{%- if i -%},{%- end -%}
+		{{ value.comment | normalComment }}
+		{{ value.name }}
+		{%- end %}
+	};
 {% end -%}
 
 {#- Contract assertion -#}
 {%- macro makeContractAssertions(sequence) -%}
-{%- for contract in sequence -%}
-{% if contract.type == "min" -%}
-// Minimum contract
-assert(value >= {{ contract.value }});
-{% elif contract.type == "max" -%}
-// Maximum contract
-assert(value <= {{ contract.value }});
-{% end -%}
-{%- end -%} 
+	{%- for contract in sequence -%}
+		{% if contract.type == "min" -%}
+			// Minimum contract
+			assert(value >= {{ contract.value }});
+		{% elif contract.type == "max" -%}
+			// Maximum contract
+			assert(value <= {{ contract.value }});
+		{% end -%}
+	{%- end -%} 
+{%- end -%}
+
+{#- Variables -#}
+{%- macro makeVariable(element, prepend) -%}
+{{- element.comment | normalComment }}
+{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- if element.isValue %}{{ element.value }}{% end -%} };
+{%- end -%}
+
+{#- Nested structure -#}
+{%- macro makeStruct(element) -%}
+	{{ element.comment | normalComment -}}
+	struct {{ element.name }}{%- if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr -}}{%- end %}
+	{
+		{{ makeTrivialTypes(element.nested.symbols) }}
+		{%- for element in element.nested.variableList -%}
+		{{ makeVariable(element, "") }}
+		{% end -%}
+	};
+{%- end -%}
+
+{#- Build types -#}
+{%- macro makeTrivialTypes(sequence) -%}
+	{%- for data in sequence -%}
+		{#- using -#}
+		{%- if data.category == "using" -%}
+			{{ data.comment | normalComment }}
+			using {{ data.name }} = {{ data.type | typeToStr }};
+
+		{#- enum -#}
+		{%- elif data.category == "enum" -%}
+			{{ makeEnum(data) }}
+
+		{#- nested -#}
+		{%- elif data.category == "nested" -%}
+			{% if data.type == "struct" %} 
+				{{ makeStruct(data) }}
+			{%- end -%}
+
+		{%- end -%}
+	{%- end -%}
 {%- end -%}
 
 {#- Start of the actual template -#}
@@ -41,11 +82,7 @@ assert(value <= {{ contract.value }});
 namespace {{ namespace | namespaceToStr }} {
 {% end -%}
 
-{%- for data in usingList -%}
-using {{ data.name }} = {{ data.type | typeToStr }};
-{% end -%}
-
-{%- for data in enumList -%}{{ makeEnum(data) }}{%- end -%}
+{{ makeTrivialTypes(symbols) }}
 
 {%- for data in nestedList -%}
 
@@ -53,11 +90,13 @@ using {{ data.name }} = {{ data.type | typeToStr }};
 namespace impl {
 {%- end %}
 
+{%- if data.type in ["module", "interface"] -%}
+
 {{ data.comment | normalComment -}}
 class {{ data.name }}{%- if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr -}}{%- end %}
 {
 public: // Types
-	{%- for nested in data.nested.enumList -%}{{ makeEnum(nested) }}{%- end -%}
+	{{ makeTrivialTypes(data.nested.symbols) }}
 
 public: // Methods.
 
@@ -102,10 +141,11 @@ protected: // Protected variable accessors.
 
 private: // Variables.
 	{% for var in data.nested.variableList %}
-	{{ var.comment | normalComment }}
-	{{ var.type | typeToStr }} {{ var.name }}_{ {% if var.isValue %}{{ var.value }}{% end %} };
+	{{ makeVariable(var, "_") }}
 	{%- end %}
 };
+
+{%- end -%}
 
 {%- if data.type == "module" %}
 }

@@ -15,6 +15,10 @@ _regexprIdentifier = r"(?P<name>([a-zA-Z_\-0-9]+))"
 _regexprCondition = r"(?P<condition>(.+?(?=-?%})))"
 # Match comment
 _regexprComment = r"(?P<comment>(.+?(?=-?#})))"
+# Number
+_regexprNumber = r"(?P<value>-?[0-9]+(?:\.[0-9]*)?)"
+# String
+_regexprString = r"\"(?P<value>.*?(?<!\\))\""
 
 
 def makeRegexprName(name: str) -> str:
@@ -72,9 +76,21 @@ def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
 	]
 
 
+def makeGrammarValue(fragment: typing.Dict[str, str], grammar: Grammar) -> Grammar:
+	"""
+	A value is either a name, a number or a string.
+	"""
+	return [
+		GrammarItem(_regexprNumber, dict(fragment, type="number"), grammar),
+		GrammarItem(_regexprString, dict(fragment, type="string"), grammar),
+		GrammarItem(makeRegexprName("value"), dict(fragment, type="name"), grammar),
+	]
+
+
 def makeGrammarSymbol(fragment: typing.Dict[str, str], grammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for a symbol.
+	A symbol is a entity that must be resolved from substitution.
 	"""
 
 	class ArgumentStart(FragmentNestedStart):
@@ -82,12 +98,11 @@ def makeGrammarSymbol(fragment: typing.Dict[str, str], grammar: Grammar) -> Gram
 
 	return [
 		GrammarItem(makeRegexprName("name"), fragment, [
-		GrammarItem(r"\(", ArgumentStart, [
-		GrammarItem(_regexprName, Fragment,
+		GrammarItem(
+		r"\(", ArgumentStart,
+		makeGrammarValue({},
 		[GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement, grammar)]),
-		GrammarItem(r"\)", FragmentParentElement, grammar)
-		])
+		GrammarItem(r"\)", FragmentParentElement, grammar)]) + [GrammarItem(r"\)", FragmentParentElement, grammar)])
 		] + grammar)
 	]
 
@@ -163,29 +178,6 @@ def makeGrammarControlElseIf() -> Grammar:
 	]
 
 
-"""
-	class ArgumentStart(FragmentNestedStart):
-		nestedName = "argument"
-
-	return [
-		GrammarItem(r"method", {"category": "method"}, [
-		GrammarItem(_regexprName, Fragment, [
-		GrammarItem(r"\(", ArgumentStart, [
-		makeGrammarVariable([
-			GrammarItem(r",", FragmentNewElement),
-			GrammarItem(r"\)", FragmentParentElement)
-		]),
-		GrammarItem(r"\)", FragmentParentElement)
-		]),
-		GrammarItem(r"->", Fragment,
-		[makeGrammarType([makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
-		GrammarItem(r";", FragmentNewElement)
-		])
-		])
-"""
-
-
-# makeGrammarControlStop(FragmentNestedStart, "root")
 def makeGrammarControlMacro() -> Grammar:
 	"""
 	Generate the grammar for a macro block.
