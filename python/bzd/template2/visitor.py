@@ -12,20 +12,21 @@ from bzd.template2.substitution import SubstitutionsType, SubstitutionWrapper
 
 ResultType = typing.List[str]
 
+
 class Visitor(VisitorBase[ResultType, ResultType]):
 	nestedKind = None
 
-	def __init__(
-			self,
-			substitutions: typing.Union[SubstitutionsType, SubstitutionWrapper],
-			includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
-			indent: bool = False) -> None:
+	def __init__(self,
+		substitutions: typing.Union[SubstitutionsType, SubstitutionWrapper],
+		includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
+		indent: bool = False) -> None:
 		# Re-use directly substitution wrapper if provided.
 		# This is needed by the include control block, as we want macros (for example) to be executed
 		# with the current substition object and not a copy at a given time.
-		self.substitutions = substitutions if isinstance(substitutions, SubstitutionWrapper) else SubstitutionWrapper(substitutions)
+		self.substitutions = substitutions if isinstance(substitutions,
+			SubstitutionWrapper) else SubstitutionWrapper(substitutions)
 		self.includeDirs = includeDirs
-		# Indent multiline substitution blocks to mmaatch the start of the block. 
+		# Indent multiline substitution blocks to mmaatch the start of the block.
 		self.indent = indent
 		self.indentRegexpr = re.compile(r"(?:^|\n)([ \t]*)$")
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).
@@ -83,7 +84,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		elif valueType == "string":
 			return value
 
-	def visitSubstitution(self, element: Element, result: ResultType) -> ResultType:
+	def visitSubstitution(self, element: Element, result: ResultType) -> None:
 		"""
 		Handle substitution.
 		"""
@@ -151,7 +152,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		sequence = element.getNestedSequence(kind="nested")
 		assert sequence
 
-		block = []
+		block: ResultType = []
 
 		# Loop through the elements
 		iterable = self.resolveName(name=element.getAttr("iterable").value)
@@ -248,9 +249,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
 		Error.assertTrue(element=element,
 			condition=len(paths) > 0,
-			message="No valid file '{}' within {}".format(includePathStr, str([f.as_posix() for f in self.includeDirs])))
+			message="No valid file '{}' within {}".format(includePathStr,
+			str([f.as_posix() for f in self.includeDirs])))
 
-		template = bzd.template2.template2.Template(template=paths[0].read_text(), includeDirs=self.includeDirs, indent=self.indent)
+		template = bzd.template2.template2.Template(template=paths[0].read_text(),
+			includeDirs=self.includeDirs,
+			indent=self.indent)
 		result, substitutions = template._render(substitutions=self.substitutions)
 
 		# Update the current substitution object

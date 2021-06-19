@@ -5,6 +5,7 @@ from bzd.parser.error import Error
 
 SubstitutionsType = typing.MutableMapping[str, typing.Any]
 
+
 class SubstitutionWrapper:
 
 	def __init__(self, substitutions: SubstitutionsType) -> None:
@@ -48,4 +49,3 @@ class SubstitutionWrapper:
 
 	def __contains__(self, key: str) -> bool:
 		return self.isInSubstitutions(key) or key in self.ext
-

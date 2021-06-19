@@ -20,6 +20,7 @@ _regexprNumber = r"(?P<value>-?[0-9]+(?:\.[0-9]*)?)"
 # String
 _regexprString = r"\"(?P<value>.*?(?<!\\))\""
 
+
 def makeRegexprName(name: str) -> str:
 	"""
 	Match a name.
@@ -186,7 +187,7 @@ def makeGrammarControlElseIf() -> Grammar:
 	return [
 		GrammarItem(
 		r"(?={%-?\s*(else|elif))", FragmentNestedStopNewElement,
-		makeGrammarControlStart(r"elif", 
+		makeGrammarControlStart(r"elif",
 		[GrammarItem(_regexprCondition, {"category": "else"}, makeGrammarControlStop(FragmentNestedStart, "root"))]) +
 		makeGrammarControlStart(r"else", makeGrammarControlStop(ElseFragment, "root")))
 	]
@@ -225,7 +226,7 @@ def makeGrammarControlEnd() -> Grammar:
 	return [
 		GrammarItem(
 		r"(?={%-?\s*end)", FragmentParentElement,
-		makeGrammarControlStart(r"end", 
+		makeGrammarControlStart(r"end",
 		[GrammarItem(None, FragmentNewElement, makeGrammarControlStop(FragmentEndElement))]))
 	]
 

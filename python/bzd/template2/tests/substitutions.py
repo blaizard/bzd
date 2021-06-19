@@ -82,5 +82,6 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": "0\n1\n2"})
 		self.assertEqual("    0\n    1\n    2", result)
 
+
 if __name__ == '__main__':
 	unittest.main()
