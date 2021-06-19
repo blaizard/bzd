@@ -6,7 +6,7 @@ from tools.bdl.visitors.result import Result
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
-from bzd.template2.template2 import Template
+from bzd.template.template import Template
 
 
 class _VisitorType(VisitorType):
