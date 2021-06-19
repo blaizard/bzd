@@ -2,8 +2,6 @@ namespace bzd.manifest;
 
 using NextType = Integer;
 
-
-
 enum Test
 {
 	// First test value.
@@ -12,17 +10,23 @@ enum Test
 }
 
 struct MyType{
-
-
 	Test test;
+	
 	NextType type1;
+	
+	
 }
+
 interface MyInterface{
-
 	method start(NextType a) -> Test;
-
+	
 	// Magic number for demo purpose
 	Integer magic = 42 [min = 5, max = 100];
+	
 	// Read only value
 	const Float readOnly = -3.14;
+	
+	
 }
+
+
