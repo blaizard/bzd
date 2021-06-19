@@ -110,7 +110,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				value = self.resolveName(pipe.getAttr("name").value, True, value)
 
 		# Save the output
-		assert isinstance(value, (int, float, str)), "The resulting substitued value must be a number or a string."
+		assert isinstance(value,
+			(int, float, str, pathlib.Path)), "The resulting substitued value must be a number, a string or a path."
 		self.appendSubstitution(element=element, result=result, string=str(value))
 
 	def appendSubstitution(self, element: Element, result: ResultType, string: str) -> ResultType:
