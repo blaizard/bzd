@@ -1,0 +1,41 @@
+{#- Enum -#}
+{%- macro declareEnum(element) %}
+{{ element.comment | normalComment }}enum class {{ element.name }} : bzd::UInt8Type
+{
+	{% for i, value in element.values %}
+	{% if i %},{% end %}
+	{{ value.comment | normalComment }}{{ value.name }}
+	{% end %}
+};
+{% end -%}
+
+{#- Variables -#}
+{%- macro declareVariable(element, prepend) %}
+{{ element.comment | normalComment }}{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- if element.isValue %}{{ element.value }}{% end -%} };
+{% end -%}
+
+{#- Nested structure -#}
+{%- macro declareStruct(element) %}
+{{ element.comment | normalComment }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
+{
+	{{ declareTrivialTypes(element.nested.symbols) }}
+	{% for element in element.nested.variableList %}
+	{{ declareVariable(element, "") }}
+	{% end %}
+};
+{% end -%}
+
+{#- Build types -#}
+{%- macro declareTrivialTypes(sequence) %}
+	{% for data in sequence %}
+		{% if data.category == "using" %}
+{{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }};
+		{% elif data.category == "enum" %}
+{{ declareEnum(data) }}
+		{% elif data.category == "nested" %}
+			{% if data.type == "struct" %} 
+{{ declareStruct(data) }}
+			{% end %}
+		{% end %}
+	{% end %}
+{% end -%}
