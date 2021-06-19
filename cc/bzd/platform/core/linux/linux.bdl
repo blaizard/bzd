@@ -1,12 +1,9 @@
 use "cc/bzd/platform/core.bdl"
 namespace bzd.platform.core;
 
-
-
-
-
 // Core abstraction on Linux operating system.
 module Linux : bzd.platform.Core{
-
-
+	
 }
+
+
