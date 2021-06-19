@@ -7,8 +7,8 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error, ExceptionParser
 
 # Needed by the include method
-import bzd.template2.template2
-from bzd.template2.substitution import SubstitutionsType, SubstitutionWrapper
+import bzd.template.template
+from bzd.template.substitution import SubstitutionsType, SubstitutionWrapper
 
 ResultType = typing.List[str]
 
@@ -241,7 +241,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			message="No valid file '{}' within {}".format(includePathStr,
 			str([f.as_posix() for f in self.includeDirs])))
 
-		template = bzd.template2.template2.Template(template=paths[0].read_text(),
+		template = bzd.template.template.Template(template=paths[0].read_text(),
 			includeDirs=self.includeDirs,
 			indent=self.indent)
 		result, substitutions = template._render(substitutions=self.substitutions)

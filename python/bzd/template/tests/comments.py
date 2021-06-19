@@ -1,6 +1,6 @@
 import unittest
 
-from bzd.template2.template2 import Template
+from bzd.template.template import Template
 
 
 class TestRun(unittest.TestCase):

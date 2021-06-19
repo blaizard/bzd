@@ -8,5 +8,6 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//python:bzd",
+        "//python/bzd/parser",
     ],
 )
