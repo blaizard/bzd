@@ -6,8 +6,8 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match all remaining content
-_regexprContent = r"^(?P<content>((?!{[{%#]).)+?)(?={[{%#])"
-_regexprContentStripRight = r"^(?P<content>((?!{[{%#]).)*?)\s*(?={[{%#]-)"
+_regexprContent = r"(?P<content>((?!{[{%#]).)+?)(?={[{%#])"
+_regexprContentStripRight = r"(?P<content>((?!{[{%#]).)*?)\s*(?={[{%#]-)"
 _regexprContentEndOfFile = r"(?P<content>[\s\S]+?)(?=$)"
 # Match an identifier
 _regexprIdentifier = r"(?P<name>([a-zA-Z_\-0-9]+))"
@@ -68,14 +68,14 @@ def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 def makeGrammarControlStop(fragment: typing.Type[Fragment],
 	grammar: typing.Optional[typing.Union[Grammar, str]] = None) -> Grammar:
 	return [
-		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}", fragment, grammar)]),
+		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}([ \t]*\n|[. \t]*$)?", fragment, grammar)]),
 		GrammarItem(r"(?=-%})", Fragment, [GrammarItem(r"-%}\s*", fragment, grammar)]),
 	]
 
 
 def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
 	return [
-		GrammarItem(r"(?=#})", Fragment, [GrammarItem(r"#}", fragment)]),
+		GrammarItem(r"(?=#})", Fragment, [GrammarItem(r"#}([ \t]*\n|[. \t]*$)?", fragment)]),
 		GrammarItem(r"(?=-#})", Fragment, [GrammarItem(r"-#}\s*", fragment)]),
 	]
 

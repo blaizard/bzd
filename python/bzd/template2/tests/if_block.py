@@ -102,11 +102,21 @@ class TestRun(unittest.TestCase):
 		result = template.render({"value1": False, "value2": False})
 		self.assertEqual("c", result)
 
-	def testSripConfigCondition(self) -> None:
+	def testAutoSripEndBlock(self) -> None:
+		template = Template("{% if value %}hello{% end %}   ")
+		result = template.render({"value": True})
+		self.assertEqual("hello", result)
+
+	def testAutoSripNewLineEndBlock(self) -> None:
+		template = Template("{% if value %}hello{% end %}  \n ")
+		result = template.render({"value": True})
+		self.assertEqual("hello ", result)
+
+	def testAutoSrip(self) -> None:
 		template = Template("""
-    {% if value %}
+{% if value %}
   hello
-    {% end %}""")
+{% end %}""")
 		result = template.render({"value": True})
 		self.assertEqual("\n  hello\n", result)
 

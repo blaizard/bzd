@@ -19,27 +19,17 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			self,
 			substitutions: typing.Union[SubstitutionsType, SubstitutionWrapper],
 			includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
-			trim: bool = False,
-			lstrip: bool = False,
 			indent: bool = False) -> None:
 		# Re-use directly substitution wrapper if provided.
 		# This is needed by the include control block, as we want macros (for example) to be executed
 		# with the current substition object and not a copy at a given time.
 		self.substitutions = substitutions if isinstance(substitutions, SubstitutionWrapper) else SubstitutionWrapper(substitutions)
 		self.includeDirs = includeDirs
-		# If this is set to True the first newline after a block is removed (block, not variable tag!).
-		self.trim = trim
-		self.trimRegexpr = re.compile(r"^[ \t]*\n?")
-		# If this is set to True leading spaces and tabs are stripped from the start of a line to a control block.
-		self.lstrip = lstrip
-		self.lstripRegexpr = re.compile(r"\n([ \t]*)$")
+		# Indent multiline substitution blocks to mmaatch the start of the block. 
 		self.indent = indent
 		self.indentRegexpr = re.compile(r"(?:^|\n)([ \t]*)$")
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).
 		self.followElse = False
-		# Used to strip the next element after a this flag is set.
-		# This is used by substitutions.
-		self.stripNewLineLeftNextResult: bool = False
 
 	def visitBegin(self, result: ResultType) -> ResultType:
 		return []
@@ -135,10 +125,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def appendBlock(self, element: Element, result: ResultType, block: ResultType) -> ResultType:
 
-		# Strip the element if needed
-		if self.lstrip and result:
-			result[-1] = self.lstripRegexpr.sub("\n", result[-1])
-
 		result += block
 		return result
 
@@ -147,20 +133,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Format the nested result and append it to the result
 		"""
 		if nested:
-			if self.trim:
-				nested[0] = self.trimRegexpr.sub("", nested[0])
-			if element.getAttrValue("nestedStripRight"):
-				nested[-1] = nested[-1].rstrip()
-
 			result += nested
 		return result
-
-	def visitUnaryBlock(self) -> None:
-		if self.trim:
-			self.stripNewLineLeftNextResult = True
-
-	def visitNestedBlock(self) -> None:
-		self.stripNewLineLeftNextResult = False
 
 	def visitForBlock(self, element: Element) -> ResultType:
 		"""
@@ -276,7 +250,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			condition=len(paths) > 0,
 			message="No valid file '{}' within {}".format(includePathStr, str([f.as_posix() for f in self.includeDirs])))
 
-		template = bzd.template2.template2.Template(template=paths[0].read_text(), includeDirs=self.includeDirs, trim=self.trim, lstrip=self.lstrip, indent=self.indent)
+		template = bzd.template2.template2.Template(template=paths[0].read_text(), includeDirs=self.includeDirs, indent=self.indent)
 		result, substitutions = template._render(substitutions=self.substitutions)
 
 		# Update the current substitution object
@@ -329,33 +303,27 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			if category == "content":
 				Error.assertHasAttr(element=element, attr="content")
 				string = element.getAttr("content").value
-				if self.stripNewLineLeftNextResult:
-					string = self.trimRegexpr.sub("", string)
-					self.stripNewLineLeftNextResult = False
 				result.append(string)
 
 			# Substitution
 			elif category == "substitution":
-				self.visitNestedBlock()
 				self.visitSubstitution(element=element, result=result)
 
 			# Comments
 			elif category == "comment":
-				self.visitUnaryBlock()
+				pass
 
 			# End statement
 			elif category == "end":
-				self.visitUnaryBlock()
+				pass
 
 			# For loop block
 			elif category == "for":
-				self.visitNestedBlock()
 				block = self.visitForBlock(element=element)
 				self.appendBlock(element=element, result=result, block=block)
 
 			# If block
 			elif category == "if":
-				self.visitNestedBlock()
 				Error.assertHasAttr(element=element, attr="condition")
 				conditionStr = element.getAttr("condition").value
 				block = self.visitIfBlock(element=element, conditionStr=conditionStr)
@@ -363,7 +331,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 			# Else block
 			elif category == "else":
-				self.visitNestedBlock()
 				block = []
 				if self.followElse:
 					conditionStr = element.getAttrValue("condition", "True")  # type: ignore
@@ -372,13 +339,11 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 			# Macro block
 			elif category == "macro":
-				self.visitNestedBlock()
 				self.visitMacro(element=element)
 
 			elif category == "include":
 				block = self.visitInclude(element=element)
 				self.appendBlock(element=element, result=result, block=block)
-				self.visitUnaryBlock()
 
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))
