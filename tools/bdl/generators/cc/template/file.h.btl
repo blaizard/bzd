@@ -3,15 +3,15 @@
 
 {#- Contract assertion -#}
 {%- macro makeContractAssertions(sequence) %}
-{% for contract in sequence %}
-{% if contract.type == "min" %}
+	{% for contract in sequence %}
+		{% if contract.type == "min" %}
 // Minimum contract
 assert(value >= {{ contract.value }});
-{% elif contract.type == "max" %}
+		{% elif contract.type == "max" %}
 // Maximum contract
 assert(value <= {{ contract.value }});
-{% end %}
-{% end %} 
+		{% end %}
+	{% end %} 
 {% end -%}
 
 {#- Start of the actual template -#}
@@ -35,22 +35,22 @@ namespace {{ namespace | namespaceToStr }} {
 {{- declareTrivialTypes(symbols) -}}
 
 {% for data in nestedList %}
-{% if data.type == "module" %}
+	{% if data.type == "module" %}
 namespace impl {
-{% end %}
-{% if data.type in ["module", "interface"] %}
+	{% end %}
+	{% if data.type in ["module", "interface"] %}
 {{ data.comment | normalComment }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
 	{{ declareTrivialTypes(data.nested.symbols) }}
 
 public: // Methods.
-{% for method in data.nested.methodList %}
+	{% for method in data.nested.methodList %}
 	{{ method.comment | normalComment }}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
-{% end %}
+	{% end %}
 
 public: // Variable accessors.
-{% for var in data.nested.variableList %}
+	{% for var in data.nested.variableList %}
 
 	/**
 	 * Getter for the variable '{{ var.name }}'.
@@ -61,7 +61,7 @@ public: // Variable accessors.
 		return {{ var.name }}_;
 	}
 
-{% if not var.const %}
+		{% if not var.const %}
 	/**
 	 * Setter for the variable '{{ var.name }}'.
 	 * \param value The new value to be set.
@@ -71,13 +71,13 @@ public: // Variable accessors.
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
-{% end %}
-{% end %}
+		{% end %}
+	{% end %}
 
 protected: // Protected variable accessors.
 
-{% for var in data.nested.variableList %}
-{% if var.const %}
+	{% for var in data.nested.variableList %}
+		{% if var.const %}
 	/**
 	 * Setter for the constant variable '{{ var.name }}'.
 	 * \param value The new value to be set.
@@ -87,13 +87,13 @@ protected: // Protected variable accessors.
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
-{% end %}
-{% end %}
+		{% end %}
+	{% end %}
 
 private: // Variables.
-{% for var in data.nested.variableList %}
+	{% for var in data.nested.variableList %}
 	{{ declareVariable(var, "_") }}
-{% end %}
+	{% end %}
 };
 
 {%- end -%}

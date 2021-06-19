@@ -7,7 +7,11 @@ from bzd.parser.element import Element
 
 # Match all remaining content
 _regexprContent = r"(?P<content>((?!{[{%#]).)+?)(?={[{%#])"
+# Strip left of control and comments blocks until the first newline
+_regexprContentStripAuto = r"(?P<content>((?!{[{%#]).)*?\n)[ \t]*(?={[%#])"
+# Strip right of content when followed by a left stripped block
 _regexprContentStripRight = r"(?P<content>((?!{[{%#]).)*?)\s*(?={[{%#]-)"
+# Match all remaining content until the end of the file
 _regexprContentEndOfFile = r"(?P<content>[\s\S]+?)(?=$)"
 # Match an identifier
 _regexprIdentifier = r"(?P<name>([a-zA-Z_\-0-9]+))"
@@ -37,7 +41,9 @@ def makeGrammarContent() -> Grammar:
 		default = {"category": "content"}
 
 	return [
+		# Note the order is important here.
 		GrammarItem(_regexprContentStripRight, FragmentContent),
+		GrammarItem(_regexprContentStripAuto, FragmentContent),
 		GrammarItem(_regexprContent, FragmentContent),
 		GrammarItem(_regexprContentEndOfFile, FragmentContent)
 	]
@@ -49,13 +55,13 @@ def makeGrammarSubstitutionStart(grammar: Grammar) -> Grammar:
 
 def makeGrammarControlStart(keyword: str, grammar: Grammar) -> Grammar:
 	return [
-		GrammarItem(r"{%-?\s*" + keyword, Fragment, grammar),
+		GrammarItem(r"(^[ \t]*)?{%-?\s*" + keyword, Fragment, grammar),
 	]
 
 
 def makeGrammarCommentStart(grammar: Grammar) -> Grammar:
 	return [
-		GrammarItem(r"{#-?", Fragment, grammar),
+		GrammarItem(r"(^[ \t]*)?{#-?", Fragment, grammar),
 	]
 
 
@@ -69,14 +75,14 @@ def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 def makeGrammarControlStop(fragment: typing.Type[Fragment],
 	grammar: typing.Optional[typing.Union[Grammar, str]] = None) -> Grammar:
 	return [
-		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}([ \t]*\n|[. \t]*$)?", fragment, grammar)]),
+		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}([ \t]*\n[ \t]*(?={[%#])|[ \t]*\n|[. \t]*$)?", fragment, grammar)]),
 		GrammarItem(r"(?=-%})", Fragment, [GrammarItem(r"-%}\s*", fragment, grammar)]),
 	]
 
 
 def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
 	return [
-		GrammarItem(r"(?=#})", Fragment, [GrammarItem(r"#}([ \t]*\n|[. \t]*$)?", fragment)]),
+		GrammarItem(r"(?=#})", Fragment, [GrammarItem(r"#}([ \t]*\n[ \t]*(?={[%#])|[ \t]*\n|[. \t]*$)?", fragment)]),
 		GrammarItem(r"(?=-#})", Fragment, [GrammarItem(r"-#}\s*", fragment)]),
 	]
 
