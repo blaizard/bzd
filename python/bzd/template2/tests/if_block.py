@@ -146,5 +146,6 @@ class TestRun(unittest.TestCase):
 		# Not supported
 		#self.assertEqual("hello", result)
 
+
 if __name__ == '__main__':
 	unittest.main()

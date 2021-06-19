@@ -75,7 +75,8 @@ def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 def makeGrammarControlStop(fragment: typing.Type[Fragment],
 	grammar: typing.Optional[typing.Union[Grammar, str]] = None) -> Grammar:
 	return [
-		GrammarItem(r"(?=%})", Fragment, [GrammarItem(r"%}([ \t]*\n[ \t]*(?={[%#])|[ \t]*\n|[. \t]*$)?", fragment, grammar)]),
+		GrammarItem(r"(?=%})", Fragment,
+		[GrammarItem(r"%}([ \t]*\n[ \t]*(?={[%#])|[ \t]*\n|[. \t]*$)?", fragment, grammar)]),
 		GrammarItem(r"(?=-%})", Fragment, [GrammarItem(r"-%}\s*", fragment, grammar)]),
 	]
 

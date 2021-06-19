@@ -1,0 +1,52 @@
+{% for use in useList %}
+use "{{ use.path }}"
+{% end %}
+
+{%- if isNamespace %}
+namespace {{ namespace | namespaceToStr }};
+{% end %}
+
+{% for data in usingList %}
+{{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }}{% if not data.contracts.empty %} [{% for i, contract in data.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};
+{% end %}
+
+{% for method in methodList %}
+{{ method.comment | normalComment }}method {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{ var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}){% if method.isType %} -> {{ method.type | typeToStr }}{% end %};
+{% end %}
+
+{% for var in variableList %}
+{{ var.comment | normalComment }}{% if var.const %}const {% end %}{{ var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if not var.contracts.empty %} [{% for i, contract in var.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};
+{% end %}
+
+{% for data in enumList %}
+{{ data.comment | normalComment }}enum {{ data.name }}
+{
+	{% for i, value in data.values %}
+		{% if i %},{% end %}
+	{{ value.comment | normalComment }}{{ value.name }}
+	{% end %}
+}
+{% end %}
+
+{% for data in nestedList %}
+{{ data.comment | normalComment }}{{ data.type }} {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
+{
+	{% for enum in data.nested.enumList %}
+	{{ enum.comment | normalComment }}enum {{ enum.name }}
+	{
+		{% for i, value in enum.values %}
+		{% if i %},{% end %}
+		{{ value.comment | normalComment }}{{ value.name }}
+		{% end %}
+	}
+	{% end %}
+
+	{% for method in data.nested.methodList %}
+	{{ method.comment | normalComment }}method {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{ var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}){% if method.isType %} -> {{ method.type | typeToStr }}{% end %};
+	{% end %}
+
+	{% for var in data.nested.variableList %}
+	{{ var.comment | normalComment }}{% if var.const %}const {% end %}{{ var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if not var.contracts.empty %} [{% for i, contract in var.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};
+	{% end %}
+}
+{% end %}

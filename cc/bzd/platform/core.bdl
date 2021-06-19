@@ -1,23 +1,26 @@
 namespace bzd.platform;
+
 // Type describing the size of a stack.
 using StackSize = Integer [min = 0, max = 8000000];
 // Type describing the identifier of a core.
 using CoreId = Integer [min = 0, max = 64];
+
+
+
+
 // A core is a processing unit that accepts a single scheduler.
-interface Core
-{
+interface Core{
 	// Error codes for core-related functionality.
 	enum Error
 	{
 		// The object was used before being properly initialized.
 		UNINITIALIZED
-		,
-		// The error comes from something related to memory alignment.
+,		// The error comes from something related to memory alignment.
 		ALIGNMENT
-		,
-		// The error comes from something related to memory size.
+,		// The error comes from something related to memory size.
 		SIZE
 	}
+
 	// Initialize the core.
 	method init();
 	// Blocking function to execute a workload on the core and wait until it terminates.
@@ -26,4 +29,5 @@ interface Core
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
 	method getId() -> CoreId;
+
 }

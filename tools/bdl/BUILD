@@ -33,7 +33,6 @@ py_library(
         "generators/**/*.py",
     ]),
     data = glob([
-        "generators/**/*.template",
         "generators/**/*.btl",
     ]),
     visibility = [":__subpackages__"],
