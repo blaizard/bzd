@@ -34,8 +34,6 @@ class Template:
 		if last.getAttrValue("category", None) in ["if", "else", "for", "macro"]:
 			Error.handleFromElement(element=last, message="Unterminated control block.")
 
-		print(sequence)
-
 		visitor = Visitor(substitutions, *self.args, **self.kwargs)
 		result = visitor.visit(sequence)
 

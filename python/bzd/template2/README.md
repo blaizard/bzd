@@ -8,8 +8,10 @@ Syntax:
 - Control blocks are denoted as follow: `{%...%}`
 - Comment blocks are denoted as follow: `{#...#}`
 
-All blocks implement whitespace control. Using `-` inside a block will strip the left of right side of the expression,
+- White spaces:
+  - All blocks implement whitespace control. Using `-` inside a block will strip the left of right side of the expression,
 ex: `{%- ... %}` or `{{ ... -}}`
+  - The first newline after a block and trailing spaces are stripped (for all control and comment blocks).
 
 - Substitutions:
   - Direct and nested, ex: `{{ my.nested.var }}`.

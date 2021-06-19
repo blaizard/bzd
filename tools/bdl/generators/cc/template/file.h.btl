@@ -1,18 +1,18 @@
 {#- Re-usable macros -#}
-{% include "tools/bdl/generators/cc/template/declarations.h.btl" %}
+{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 {#- Contract assertion -#}
-{%- macro makeContractAssertions(sequence) -%}
-	{%- for contract in sequence -%}
-		{% if contract.type == "min" -%}
-			// Minimum contract
-			assert(value >= {{ contract.value }});
-		{% elif contract.type == "max" -%}
-			// Maximum contract
-			assert(value <= {{ contract.value }});
-		{% end -%}
-	{%- end -%} 
-{%- end -%}
+{%- macro makeContractAssertions(sequence) %}
+{% for contract in sequence %}
+{% if contract.type == "min" %}
+// Minimum contract
+assert(value >= {{ contract.value }});
+{% elif contract.type == "max" %}
+// Maximum contract
+assert(value <= {{ contract.value }});
+{% end %}
+{% end %} 
+{% end -%}
 
 {#- Start of the actual template -#}
 
@@ -22,70 +22,73 @@
 
 #include "tools/bdl/generators/cc/adapter/types.h"
 
-{% for use in useList -%}
+// **** Dependencies ****
+{% for use in useList %}
 #include "{{ use.path | bdlPathToHeader }}"
-{% end -%}
+{% end %}
+// ****
 
-{%- if isNamespace -%}
+{% if isNamespace %}
 namespace {{ namespace | namespaceToStr }} {
 {% end %}
 
-{{ declareTrivialTypes(symbols) }}
+{{- declareTrivialTypes(symbols) -}}
 
-{%- for data in nestedList -%}
-
-{%- if data.type == "module" -%}
+{% for data in nestedList %}
+{% if data.type == "module" %}
 namespace impl {
-{%- end %}
-
-{%- if data.type in ["module", "interface"] -%}
-
-{{ data.comment | normalComment -}}
-class {{ data.name }}{%- if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr -}}{%- end %}
+{% end %}
+{% if data.type in ["module", "interface"] %}
+{{ data.comment | normalComment }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
 	{{ declareTrivialTypes(data.nested.symbols) }}
 
 public: // Methods.
-
-	{% for method in data.nested.methodList -%}
-	{{ method.comment | normalComment }}
-	virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
-	{%- end %}
+{% for method in data.nested.methodList %}
+	{{ method.comment | normalComment }}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
+{% end %}
 
 public: // Variable accessors.
+{% for var in data.nested.variableList %}
 
-	{% for var in data.nested.variableList -%}
-
-	// Getter for {{ var.name }}_.
+	/**
+	 * Getter for the variable '{{ var.name }}'.
+	 * \return The value of '{{ var.name }}'.
+	 */
 	constexpr const {{ var.type | typeToStr }}& get{{ var.name | camelCase }}() const noexcept
 	{
 		return {{ var.name }}_;
 	}
 
-	{% if not var.const -%}
-	// Setter for {{ var.name }}_.
+{% if not var.const %}
+	/**
+	 * Setter for the variable '{{ var.name }}'.
+	 * \param value The new value to be set.
+	 */
 	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
-	{% end %}
-	{%- end %}
+{% end %}
+{% end %}
 
 protected: // Protected variable accessors.
 
-	{% for var in data.nested.variableList -%}
-
-	{% if var.const %}
-	// Setter for {{ var.name }}_.
+{% for var in data.nested.variableList %}
+{% if var.const %}
+	/**
+	 * Setter for the constant variable '{{ var.name }}'.
+	 * \param value The new value to be set.
+	 */
 	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
 	}
-	{% end %}
-	{%- end %}
+{% end %}
+{% end %}
 
 private: // Variables.
 {% for var in data.nested.variableList %}

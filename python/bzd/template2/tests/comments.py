@@ -20,6 +20,11 @@ class TestRun(unittest.TestCase):
 		result = template.render({})
 		self.assertEqual("empty", result)
 
+	def testAutoStripComment(self) -> None:
+		template = Template("{# Comment #}  \n here ")
+		result = template.render({})
+		self.assertEqual(" here ", result)
+
 
 if __name__ == '__main__':
 	unittest.main()

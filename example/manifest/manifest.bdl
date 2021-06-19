@@ -2,6 +2,7 @@ namespace bzd.manifest;
 using NextType = Integer;
 enum Test
 {
+	// First test value.
 	FIRST
 	,
 	SECOND
@@ -13,7 +14,7 @@ struct MyType
 }
 interface MyInterface
 {
-	method start(Integer a) -> Test;
+	method start(NextType a) -> Test;
 	// Magic number for demo purpose
 	Integer magic = 42 [min = 5, max = 100];
 	// Read only value
