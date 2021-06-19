@@ -129,14 +129,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		result += block
 		return result
 
-	def appendNested(self, element: Element, result: ResultType, nested: ResultType) -> ResultType:
-		"""
-		Format the nested result and append it to the result
-		"""
-		if nested:
-			result += nested
-		return result
-
 	def visitForBlock(self, element: Element) -> ResultType:
 		"""
 		Handle for loop block.
@@ -159,16 +151,14 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		if value2 is None:
 			for value in iterable:
 				self.substitutions.register(element=element, key=value1, value=value)
-				nested = self._visit(sequence=sequence)
-				self.appendNested(element=element, result=block, nested=nested)
+				block += self._visit(sequence=sequence)
 				self.substitutions.unregister(value1)
 		else:
 			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
 				self.substitutions.register(element=element, key=value1, value=key)
 				self.substitutions.register(element=element, key=value2, value=value)
-				nested = self._visit(sequence=sequence)
-				self.appendNested(element=element, result=block, nested=nested)
+				block += self._visit(sequence=sequence)
 				self.substitutions.unregister(value2)
 				self.substitutions.unregister(value1)
 
@@ -186,8 +176,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		condition = self.evaluateCondition(conditionStr=conditionStr)
 		self.followElse = not condition
 		if condition:
-			nested = self._visit(sequence=sequence)
-			return self.appendNested(element=element, result=[], nested=nested)
+			return self._visit(sequence=sequence)
 
 		return []
 
@@ -211,8 +200,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			self.substitutions.register(element=element, key=name, value=args[i])
 
 		# Process the template
-		nested = self._visit(sequence=sequence)
-		result = self.appendNested(element=element, result=[], nested=nested)
+		result = self._visit(sequence=sequence)
 
 		for name in argList:
 			self.substitutions.unregister(name)

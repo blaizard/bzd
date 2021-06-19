@@ -10,7 +10,7 @@ enum Test
 struct MyType
 {
 	Test test;
-	NextType type;
+	NextType type1;
 }
 interface MyInterface
 {

@@ -114,12 +114,37 @@ class TestRun(unittest.TestCase):
 
 	def testAutoSrip(self) -> None:
 		template = Template("""
-{% if value %}
+	{% if value %}
   hello
-{% end %}""")
+			{% end %}""")
 		result = template.render({"value": True})
 		self.assertEqual("\n  hello\n", result)
 
+	def testAutoSripNested(self) -> None:
+		template = Template("""
+	{% if value %} {% if value %}
+  hello
+		{% end %} {% end %}
+""")
+		result = template.render({"value": True})
+		self.assertEqual("\n   hello\n ", result)
+
+	def testAutoSripNested2(self) -> None:
+		template = Template("""
+	{% if value %}
+		{% if value %}
+  hello
+		{% end %}
+	{% end %}
+""")
+		result = template.render({"value": True})
+		self.assertEqual("\n  hello\n", result)
+
+	def testAutoSripStartOfFile(self) -> None:
+		template = Template("""       {% if value %}hello{% end %}""")
+		result = template.render({"value": True})
+		# Not supported
+		#self.assertEqual("hello", result)
 
 if __name__ == '__main__':
 	unittest.main()
