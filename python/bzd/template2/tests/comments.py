@@ -7,17 +7,17 @@ class TestRun(unittest.TestCase):
 
 	def testSimpleComment(self) -> None:
 		template = Template("a {# hello #} b")
-		result = template.process({})
+		result = template.render({})
 		self.assertEqual("a  b", result)
 
 	def testStripComment(self) -> None:
 		template = Template("a {#- hello -#} b")
-		result = template.process({})
+		result = template.render({})
 		self.assertEqual("ab", result)
 
 	def testEmptyComment(self) -> None:
 		template = Template("em{# #}pty")
-		result = template.process({})
+		result = template.render({})
 		self.assertEqual("empty", result)
 
 

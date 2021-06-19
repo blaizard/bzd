@@ -1,17 +1,5 @@
-{#- Reusable macros -#}
-
-{#- Enum -#}
-{%- macro makeEnum(element) %}
-	{{ element.comment | normalComment }}
-	enum class {{ element.name }} : bzd::UInt8Type
-	{
-		{%- for i, value in element.values -%}
-		{%- if i -%},{%- end -%}
-		{{ value.comment | normalComment }}
-		{{ value.name }}
-		{%- end %}
-	};
-{% end -%}
+{#- Re-usable macros -#}
+{% include "tools/bdl/generators/cc/template/declarations.h.btl" %}
 
 {#- Contract assertion -#}
 {%- macro makeContractAssertions(sequence) -%}
@@ -24,46 +12,6 @@
 			assert(value <= {{ contract.value }});
 		{% end -%}
 	{%- end -%} 
-{%- end -%}
-
-{#- Variables -#}
-{%- macro makeVariable(element, prepend) -%}
-{{- element.comment | normalComment }}
-{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- if element.isValue %}{{ element.value }}{% end -%} };
-{%- end -%}
-
-{#- Nested structure -#}
-{%- macro makeStruct(element) -%}
-	{{ element.comment | normalComment -}}
-	struct {{ element.name }}{%- if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr -}}{%- end %}
-	{
-		{{ makeTrivialTypes(element.nested.symbols) }}
-		{%- for element in element.nested.variableList -%}
-		{{ makeVariable(element, "") }}
-		{% end -%}
-	};
-{%- end -%}
-
-{#- Build types -#}
-{%- macro makeTrivialTypes(sequence) -%}
-	{%- for data in sequence -%}
-		{#- using -#}
-		{%- if data.category == "using" -%}
-			{{ data.comment | normalComment }}
-			using {{ data.name }} = {{ data.type | typeToStr }};
-
-		{#- enum -#}
-		{%- elif data.category == "enum" -%}
-			{{ makeEnum(data) }}
-
-		{#- nested -#}
-		{%- elif data.category == "nested" -%}
-			{% if data.type == "struct" %} 
-				{{ makeStruct(data) }}
-			{%- end -%}
-
-		{%- end -%}
-	{%- end -%}
 {%- end -%}
 
 {#- Start of the actual template -#}
@@ -80,9 +28,9 @@
 
 {%- if isNamespace -%}
 namespace {{ namespace | namespaceToStr }} {
-{% end -%}
+{% end %}
 
-{{ makeTrivialTypes(symbols) }}
+{{ declareTrivialTypes(symbols) }}
 
 {%- for data in nestedList -%}
 
@@ -96,7 +44,7 @@ namespace impl {
 class {{ data.name }}{%- if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr -}}{%- end %}
 {
 public: // Types
-	{{ makeTrivialTypes(data.nested.symbols) }}
+	{{ declareTrivialTypes(data.nested.symbols) }}
 
 public: // Methods.
 
@@ -140,9 +88,9 @@ protected: // Protected variable accessors.
 	{%- end %}
 
 private: // Variables.
-	{% for var in data.nested.variableList %}
-	{{ makeVariable(var, "_") }}
-	{%- end %}
+{% for var in data.nested.variableList %}
+	{{ declareVariable(var, "_") }}
+{% end %}
 };
 
 {%- end -%}

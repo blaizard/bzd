@@ -47,7 +47,7 @@ class Error:
 			line + 2, "{}:{}:{}: error: {}".format("<string>" if context.path is None else context.path, line + 1,
 			column + 1, message))
 
-		return "\n" + "\n".join(contentByLine)
+		return "\n" + "\n".join(contentByLine[max(0, line-1):line+3])
 
 	@staticmethod
 	def toStringFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> str:
