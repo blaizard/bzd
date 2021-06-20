@@ -28,10 +28,11 @@ pipeline
 				sh "docker info"
 				sh "python --version"
 				sh "java --version"
-				sh "./tools/bazel --version"
 				sh "git submodule foreach --recursive git clean -xfd"
 				sh "git submodule foreach --recursive git reset --hard"
 				sh "git submodule update --init --recursive"
+				sh "./tools/bazel --version"
+				sh "./tools/bazel run //toolchains/nodejs/linux_x86_64_yarn:yarn -- cache dir"
 			}
 		}
 		/**
