@@ -17,3 +17,11 @@ bzd_cc_binary(
         ":interface",
     ],
 )
+
+bzd_cc_binary(
+    name = "test",
+    srcs = [
+        "test.cc",
+    ],
+    tags = ["manual"],
+)
