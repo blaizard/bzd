@@ -83,6 +83,18 @@ cc_library(
 )
 
 cc_library(
+    name = "executor",
+    hdrs = [
+        "executor.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:core",
+        ":log",
+    ],
+)
+
+cc_library(
     name = "log",
     hdrs = [
         "log.h",

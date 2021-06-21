@@ -46,7 +46,7 @@ public: // Types
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
-	{{ method.comment | normalComment }}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
+	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]]{% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.args %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.isValue %} = {{ var.value }}{% end %}{% if i %},{% end %}{% end %}) = 0;
 	{% end %}
 
 public: // Variable accessors.
@@ -56,7 +56,7 @@ public: // Variable accessors.
 	 * Getter for the variable '{{ var.name }}'.
 	 * \return The value of '{{ var.name }}'.
 	 */
-	constexpr const {{ var.type | typeToStr }}& get{{ var.name | camelCase }}() const noexcept
+	[[nodiscard]] constexpr const {{ var.type | typeToStr }}& get{{ var.name | camelCase }}() const noexcept
 	{
 		return {{ var.name }}_;
 	}

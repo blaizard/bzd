@@ -5,6 +5,10 @@ namespace bzd.platform.core;
 module Linux : bzd.platform.Core
 {
 	
+config:
+	// Stack size for the current core.
+	StackSize stackSize [template];
+	
 }
 
 

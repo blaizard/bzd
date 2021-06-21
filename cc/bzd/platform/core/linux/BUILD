@@ -34,5 +34,8 @@ cc_binary(
     ],
     deps = [
         ":linux",
+        "//cc/bzd/core:executor",
+        "//cc/bzd/core:async",
+        "//cc/bzd/core:delay",
     ],
 )

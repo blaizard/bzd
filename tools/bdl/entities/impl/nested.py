@@ -30,10 +30,22 @@ class Nested(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasAttr(element=element, attr="type")
 
-		self.nested: typing.Any = []
+		self.nestedCategories: typing.Dict[str, typing.Any] = {}
 
-	def setNested(self, nested: typing.Any) -> None:
-		self.nested = nested
+	def setNested(self, category: str, nested: typing.Any) -> None:
+		self.nestedCategories[category] = nested
+
+	@property
+	def nested(self) -> typing.Any:
+		return self.nestedCategories.get("nested", [])
+
+	@property
+	def isConfig(self) -> bool:
+		return "config" in self.nestedCategories
+
+	@property
+	def config(self) -> typing.Any:
+		return self.nestedCategories["config"]
 
 	@property
 	def category(self) -> str:
@@ -64,5 +76,8 @@ class Nested(Entity):
 			"type": self.type,
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
-		content += "\n  ".join([""] + repr(self.nested).split("\n"))
+		for category, nested in self.nestedCategories.items():
+			if nested:
+				content += category + ":\n"
+				content += "\n  ".join([""] + repr(nested).split("\n"))
 		return content

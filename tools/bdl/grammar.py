@@ -9,7 +9,7 @@ from bzd.parser.element import Element
 # Match: interface, struct
 _regexprNested = r"(?P<type>(:?interface|struct|module))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|module|method|namespace|use|using)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|module|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match a symbol
@@ -40,6 +40,15 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 	class InheritanceStart(FragmentNestedStart):
 		nestedName = "inheritance"
 
+	def makeNestedCategory(name: str) -> GrammarItem:
+
+		class CategoryFragmentStart(FragmentNestedStart):
+			nestedName = name
+
+		return GrammarItem(name + r"(?=:)", FragmentParentElement, [
+			GrammarItem(r":", CategoryFragmentStart, nestedGrammar + [GrammarItem(r"}", FragmentNestedStopNewElement)])
+		])
+
 	return [
 		GrammarItem(_regexprNested, {"category": "nested"}, [
 		GrammarItem(_regexprName, Fragment, [
@@ -48,8 +57,8 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		[GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"(?={)", FragmentParentElement)])
 		]),
-		GrammarItem(r"{", FragmentNestedStart, [
-		nestedGrammar,
+		GrammarItem(r"{", FragmentNestedStart, nestedGrammar + [
+		makeNestedCategory("config"),
 		GrammarItem(r"}", FragmentNestedStopNewElement),
 		]),
 		])

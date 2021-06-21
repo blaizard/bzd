@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/result.h"
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/platform/core/linux/linux.h"
 #include "cc/bzd/platform/core/stack.h"
@@ -23,13 +24,19 @@ private:
 public:
 	explicit Linux(const CoreId coreId) noexcept : id_{coreId} {}
 
-	void init() noexcept final
+	Result<void, Error> start() noexcept final
 	{
 		const auto nbCores = sysconf(_SC_NPROCESSORS_ONLN);
 		if (id_ >= nbCores)
 		{
-			return;
+			return bzd::makeError(Error::OTHER);
 		}
+		return bzd::nullresult;
+	}
+
+	Result<void, Error> stop() noexcept final
+	{
+		return bzd::nullresult;
 	}
 
 	void run(Callable workload) noexcept final

@@ -21,6 +21,10 @@
 {% end %}
 {
 	{{ declareSymbols(data.nested.symbols) }}
+	{% if data.isConfig %}
+config:
+	{{ declareSymbols(data.config.symbols) }}
+	{% end %}
 }
 {% end -%}
 
