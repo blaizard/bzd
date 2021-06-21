@@ -18,10 +18,6 @@ jobs:
       run: |
         cp tools/ci/github/.bazelrc.local .bazelrc.local
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
-        ./tools/bazel --version
-        python --version
-        java --version
-        printenv
         ./info.sh
 
     - name: linux_x86_64_clang

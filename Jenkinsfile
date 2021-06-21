@@ -22,16 +22,10 @@ pipeline
 		{
 			steps
 			{
-				sh "id"
-				sh "printenv"
 				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
-				sh "docker info"
-				sh "python --version"
-				sh "java --version"
 				sh "git submodule foreach --recursive git clean -xfd"
 				sh "git submodule foreach --recursive git reset --hard"
 				sh "git submodule update --init --recursive"
-				sh "./tools/bazel --version"
 				sh "./info.sh"
 			}
 		}
