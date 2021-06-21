@@ -48,14 +48,15 @@ class Visitor(VisitorBase[T, T]):
 			self.level += 1
 			self.namespace.append(entity.name)
 
-			sequence = element.getNestedSequence("nested")
-			assert sequence is not None
-			nestedResult = self._visit(sequence)
+			for category in ["nested", "config"]:
+				sequence = element.getNestedSequence(category)
+				if sequence is not None:
+					nestedResult = self._visit(sequence)
+					entity.setNested(category=category, nested=typing.cast(typing.List[typing.Any], nestedResult))
 
 			self.namespace.pop()
 			self.level -= 1
 
-			entity.setNested(nested=typing.cast(typing.List[typing.Any], nestedResult))
 			self.visitNestedEntities(entity=entity, result=result)
 
 		# Handle variable

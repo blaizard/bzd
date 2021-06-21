@@ -23,6 +23,7 @@ class TestRun(unittest.TestCase):
 		self.assertRegex(output, r"interface MyFy")
 		self.assertRegex(output, r"method myMethod")
 
+
 if __name__ == '__main__':
 	TestRun.filePath = Path(sys.argv.pop())
 	unittest.main()

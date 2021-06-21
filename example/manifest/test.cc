@@ -12,10 +12,7 @@ public:
 class ModuleImplementation : public Interface
 {
 public:
-	int myFunc(int a)
-	{
-		return a + a_;
-	}
+	int myFunc(int a) { return a + a_; }
 
 private:
 	const int a_ = 32;
