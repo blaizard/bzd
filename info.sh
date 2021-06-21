@@ -1,7 +1,18 @@
 #/bin/bash
 
-BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-stdout,-stderr --noshow_progress'
+BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-warning,-stdout,-stderr --noshow_progress'
 
+echo "---- environment --------------------------------------------------------"
+echo -n "id: `id`"
+printenv
+echo "---- docker -------------------------------------------------------------"
+docker info
+echo "---- local python -------------------------------------------------------"
+python --version
+echo "---- local java ---------------------------------------------------------"
+java --version
+echo "---- bazel --------------------------------------------------------------"
+./tools/bazel version
 echo "---- node ---------------------------------------------------------------"
 ${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:node -- --version
 echo "---- yarn ---------------------------------------------------------------"
