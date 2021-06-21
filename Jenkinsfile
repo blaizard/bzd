@@ -32,6 +32,7 @@ pipeline
 				sh "git submodule foreach --recursive git reset --hard"
 				sh "git submodule update --init --recursive"
 				sh "./tools/bazel --version"
+				sh "./info.sh"
 			}
 		}
 		/**

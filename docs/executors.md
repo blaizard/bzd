@@ -13,6 +13,6 @@ Also cores can be assigned with a maximum load or other specific atrtibutes.
 executor esp32
 {
    FreeRTOS core0(4000, 0) [load = 20%];
-   FreeRTOS core0(10000, 1);
+   FreeRTOS core1(10000, 1);
 }
 ```
