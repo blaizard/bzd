@@ -22,6 +22,7 @@ jobs:
         python --version
         java --version
         printenv
+				./info.sh
 
     - name: linux_x86_64_clang
       run: |
