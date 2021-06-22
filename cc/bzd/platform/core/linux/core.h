@@ -24,68 +24,61 @@ private:
 public:
 	explicit Linux(const CoreId coreId) noexcept : id_{coreId} {}
 
-	Result<void, Error> start() noexcept final
+	Result<void, Error> stop() noexcept final
+	{
+		{
+			const auto result = pthread_join(thread_, nullptr);
+			if (result != 0)
+			{
+				return bzd::makeError(Error::OTHER);
+			}
+		}
+
+		{
+			const auto result = pthread_attr_destroy(&attr_);
+			if (result != 0)
+			{
+				return bzd::makeError(Error::OTHER);
+			}
+		}
+
+		return bzd::nullresult;
+	}
+
+	bzd::Result<void, Error> start(Callable workload) noexcept final
 	{
 		const auto nbCores = sysconf(_SC_NPROCESSORS_ONLN);
 		if (id_ >= nbCores)
 		{
 			return bzd::makeError(Error::OTHER);
 		}
-		return bzd::nullresult;
-	}
 
-	Result<void, Error> stop() noexcept final
-	{
-		return bzd::nullresult;
-	}
-
-	void run(Callable workload) noexcept final
-	{
 		stack_.taint();
 
-		pthread_attr_t attr;
-		pthread_t thread;
-
-		if (pthread_attr_init(&attr) == -1)
+		if (pthread_attr_init(&attr_) == -1)
 		{
-			return;
+			return bzd::makeError(Error::OTHER);
 		}
 
 		{
-			const auto result = pthread_attr_setstack(&attr, stack_.data(), stack_.size());
+			const auto result = pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
-				return;
+				return bzd::makeError(Error::OTHER);
 			}
 		}
 
 		workload_ = workload;
 
 		{
-			const auto result = pthread_create(&thread, &attr, &workloadWrapper, this);
+			const auto result = pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
-				return;
+				return bzd::makeError(Error::OTHER);
 			}
 		}
 
-		// Workload should be running here
-
-		{
-			const auto result = pthread_join(thread, nullptr);
-			if (result != 0)
-			{
-				return;
-			}
-		}
-
-		{
-			const auto result = pthread_attr_destroy(&attr);
-			if (result != 0)
-			{
-				return;
-			}
-		}
+		return bzd::nullresult;
 	}
 
 	StackSize getStackUsage() noexcept final { return stack_.estimateMaxUsage(); }
@@ -116,6 +109,8 @@ private:
 	Stack<N> stack_{};
 	bzd::Optional<Callable> workload_;
 	CoreId id_;
+	pthread_attr_t attr_;
+	pthread_t thread_;
 };
 
 } // namespace bzd::platform::core

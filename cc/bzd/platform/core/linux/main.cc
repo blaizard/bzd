@@ -1,6 +1,5 @@
 #include "cc/bzd/platform/core/linux/core.h"
 #include "cc/bzd/core/executor.h"
-#include "cc/bzd/core/async.h"
 #include "cc/bzd/core/delay.h"
 
 #include <iostream>
@@ -8,7 +7,8 @@
 // registry.h
 struct
 {
-	bzd::platform::core::Linux<100000> linux{1};
+	bzd::platform::core::Linux<100000> linux0{0};
+	bzd::platform::core::Linux<100000> linux1{1};
 } registry;
 
 /*
@@ -21,6 +21,8 @@ executors linux
 	Linux core1(100000, 1);
 	Linux core2(100000, 2);
 	Linux core3(100000, 3);
+
+	Executor linux(core0, core1, core2, core3);
 }
 
 executors AurixCore0
@@ -62,8 +64,9 @@ composition
 }
 
 // Functional level specific.
-// This can only run on a critical core
-composition [critical]
+// This can only run on a critical core and the exec and periodic calls
+// will always run in the same core, hence sequencially.
+composition [critical, same]
 {
 	Monitor monitor;
 
@@ -89,12 +92,11 @@ bzd::Async<void> task1() noexcept
 	}
 }
 
-void payload()
+void payload(bzd::core::Executor& executor)
 {
 	auto promise = task1();
-	auto promiseAll = bzd::async::all(promise);
 
-	bzd::async::run(promiseAll);
+	executor.run(promise);
 }
 
 int main()
@@ -104,19 +106,19 @@ int main()
 	// Assign workload to  executors based on their constraints
 	// ....
 
-	bzd::core::Executor executor{registry.linux};
+	bzd::core::Executor executor{registry.linux1};
 
 	executor.start();
 
-	payload();
+	payload(executor);
 
 	//task1.sync();
 	// executor.dispatch(task1, 23);
 
 	auto workload = []() { std::cout << "Workload" << std::endl; };
-	registry.linux.run(static_cast<Callable>(workload));
+	registry.linux1.start(static_cast<Callable>(workload));
 
-	std::cout << registry.linux.getStackUsage() << std::endl;
+	std::cout << registry.linux1.getStackUsage() << std::endl;
 
 	executor.stop();
 
