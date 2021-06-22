@@ -25,8 +25,7 @@ public:
 	AsyncResultType<T> run(T& async) noexcept
 	{
 		// Push the handle to the scheduler
-		async.setExecutor(*this);
-		async.queue();
+		async.attach();
 
 		// Run the scheduler
 		run();
