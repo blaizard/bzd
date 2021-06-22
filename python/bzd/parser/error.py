@@ -1,4 +1,5 @@
 import typing
+import logging
 import sys
 
 from pathlib import Path
@@ -26,7 +27,11 @@ class Error:
 		if context.content is None:
 			if context.path is None:
 				return message
-			content = context.path.read_text()
+			try:
+				content = context.path.read_text()
+			except:
+				logging.warning("Could not open file '{}'.".format(context.path.as_posix()))
+				return message
 		else:
 			content = context.content
 		contentByLine = content.split("\n")

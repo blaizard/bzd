@@ -5,10 +5,15 @@
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/core/coroutine.h"
 
+#include <iostream>
+
 // Forward declaration
 namespace bzd::impl {
 template <class T>
 class Async;
+}
+namespace bzd {
+	class Scheduler;
 }
 
 namespace bzd::coroutine::interface {
@@ -18,6 +23,24 @@ class Promise : public bzd::NonOwningListElement<true>
 } // namespace bzd::coroutine::interface
 
 namespace bzd::coroutine::impl {
+
+struct SuspendAlways : public bzd::coroutine::impl::suspend_always
+{
+	template <class T>
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+	{
+		bzd::assert::isTrue(handle.promise().executor_);
+		handle.promise().executor_->push(handle);
+		return true;
+	}
+};
+
+template <class T>
+struct Attach
+{
+	Attach(T& async) : async_{async} {}
+	T& async_;
+};
 
 template <class T>
 class Promise : public bzd::coroutine::interface::Promise
@@ -56,13 +79,46 @@ public:
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
+/*
+	template <class Awaitable>
+	auto&& await_transform(Awaitable&& awaitable)
+	{
+		return bzd::move(awaitable);
+	}
+*/
+	template <class U>
+	auto&& await_transform(bzd::impl::Async<U>&& awaitable)
+	{
+		// Associate the async with the same executor as the current prommise.
+		awaitable.setExecutor(*executor_);
+
+		return bzd::move(awaitable);
+	}
+
+	auto&& await_transform(bzd::coroutine::impl::SuspendAlways&& awaitable)
+	{
+		return bzd::move(awaitable);
+	}
+
+	template <class U>
+	bzd::coroutine::impl::suspend_never await_transform(bzd::coroutine::impl::Attach<U>&& attach)
+	{
+		// Associate the async with the same executor as the current prommise.
+		attach.async_.setExecutor(*executor_);
+		attach.async_.queue();
+		return {};
+	}
+
 	~Promise() noexcept {}
 
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
 
+	friend struct ::bzd::coroutine::impl::SuspendAlways;
+
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
+	bzd::Scheduler* executor_{nullptr};
 	bzd::Optional<bzd::FunctionView<void(interface::Promise&)>> onTerminateCallback_{};
 };
 
@@ -87,7 +143,6 @@ public:
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
-
 	bzd::Optional<T> result_{};
 };
 
@@ -108,4 +163,5 @@ private:
 
 	bzd::Optional<bool> result_{};
 };
+
 } // namespace bzd::coroutine

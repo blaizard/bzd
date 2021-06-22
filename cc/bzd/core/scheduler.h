@@ -9,6 +9,10 @@ namespace bzd {
 class Scheduler : public bzd::Singleton<Scheduler>
 {
 public:
+	template <class T>
+	using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
+
+public:
 	constexpr Scheduler() = default;
 
 	template <class T>
@@ -17,14 +21,43 @@ public:
 		bzd::ignore = queue_.pushFront(handle.promise());
 	}
 
-	bzd::coroutine::impl::coroutine_handle<> pop() noexcept
+	template <class T>
+	AsyncResultType<T> run(T& async) noexcept
 	{
-		while (queue_.empty())
+		// Push the handle to the scheduler
+		async.setExecutor(*this);
+		async.queue();
+
+		// Run the scheduler
+		run();
+
+		// Return the result.
+		return async.getResult().value();
+	}
+
+	void run()
+	{
+		// Loop until there are still elements
+		while (!queue_.empty())
 		{
-			// Call wait callback
+			// Drain remaining handles
+			auto handle = pop();
+			if (handle.hasValue())
+			{
+				handle->resume();
+			}
 		}
+	}
+
+private:
+	bzd::Optional<bzd::coroutine::impl::coroutine_handle<>> pop() noexcept
+	{
 		auto promise = queue_.back();
-		bzd::ignore = queue_.pop(promise.valueMutable());
+		const auto result = queue_.pop(promise.valueMutable());
+		if (!result)
+		{
+			return bzd::nullopt;
+		}
 		auto handle = bzd::coroutine::impl::coroutine_handle<bzd::coroutine::interface::Promise>::from_promise(promise.valueMutable());
 
 		// Show the stack usage

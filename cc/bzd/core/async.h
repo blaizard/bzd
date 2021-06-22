@@ -11,15 +11,6 @@
 #include "cc/bzd/utility/ignore.h"
 
 namespace bzd::impl {
-struct SuspendAlways : public bzd::coroutine::impl::suspend_always
-{
-	template <class T>
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
-	{
-		bzd::Scheduler::getInstance().push(handle);
-		return true;
-	}
-};
 
 template <class T>
 using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
@@ -83,6 +74,14 @@ public:
 	}
 
 	/**
+	 * Set an executor to the current async.
+	 */
+	void setExecutor(bzd::Scheduler& scheduler) noexcept
+	{
+		handle_.promise().executor_ = &scheduler;
+	}
+
+	/**
 	 * Detach the current async from its scheduler (if attached).
 	 */
 	constexpr void detach() noexcept
@@ -90,13 +89,19 @@ public:
 		bzd::assert::isTrue(static_cast<bool>(handle_));
 		bzd::ignore = handle_.promise().pop();
 	}
+
 	/**
 	 * Attach the current async to the scheduler.
 	 */
-	constexpr void attach() noexcept
+	constexpr auto attach() noexcept
 	{
-		bzd::assert::isTrue(static_cast<bool>(handle_));
-		bzd::Scheduler::getInstance().push(handle_);
+		return bzd::coroutine::impl::Attach{*this};
+	}
+
+	void queue()
+	{
+		bzd::assert::isTrue(handle_.promise().executor_);
+		handle_.promise().executor_->push(handle_);
 	}
 
 public: // coroutine specific
@@ -110,7 +115,8 @@ public: // coroutine specific
 		handle_.promise().caller = caller;
 
 		// Push the current handle to the scheduler.
-		attach();
+		bzd::assert::isTrue(handle_.promise().executor_);
+		handle_.promise().executor_->push(handle_);
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.
@@ -145,27 +151,9 @@ public:
 
 namespace bzd::async {
 
-template <class T>
-impl::AsyncResultType<T> run(T& async) noexcept
-{
-	// Push the handle to the scheduler
-	async.attach();
-
-	// Loop until it is completed.
-	while (!async.isReady())
-	{
-		// Drain remaining handles
-		auto handle = Scheduler::getInstance().pop();
-		handle.resume();
-	}
-
-	// Return the result.
-	return async.getResult().value();
-}
-
 constexpr auto yield() noexcept
 {
-	return bzd::impl::SuspendAlways{};
+	return bzd::coroutine::impl::SuspendAlways{};
 }
 
 template <class... Asyncs>
@@ -174,7 +162,8 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
-	(asyncs.attach(), ...);
+	(co_await asyncs.attach(), ...);
+	//(asyncs.queue(), ...);
 
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
@@ -199,7 +188,8 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	// Register on terminate callbacks
 	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
 	// Push all handles to the scheduler
-	(asyncs.attach(), ...);
+	(co_await asyncs.attach(), ...);
+	//(asyncs.queue(), ...);
 
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))

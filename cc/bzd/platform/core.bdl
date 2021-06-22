@@ -9,21 +9,17 @@ interface Core{
 	// Error codes for core-related functionality.
 	enum Error
 	{
-		// The object was used before being properly initialized.
-		UNINITIALIZED
-	,	// The error comes from something related to memory alignment.
+		// The error comes from something related to memory alignment.
 		ALIGNMENT
 	,	// The error comes from something related to memory size.
 		SIZE,
 		OTHER
 	}
 	
-	// Initialize the core.
-	method start() -> Result<void, Error>;
+	// Start a workload on the core and return immediatly.
+	method start(Callable workload) -> Result<void, Error>;
 	// Initialize the core.
 	method stop() -> Result<void, Error>;
-	// Execute a workload on the core and return immediatly.
-	method run(Callable workload);
 	// Get the current stack usage.
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
@@ -31,4 +27,9 @@ interface Core{
 	
 }
 
-
+interface Executor
+{
+	// Start the executor and starts all cores previously initialized.
+	method start(List<Core> cores);
+	method stop();
+}

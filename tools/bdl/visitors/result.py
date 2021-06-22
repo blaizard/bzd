@@ -34,6 +34,7 @@ class Result(VisitorBase[ResultType]):
 			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
 			"Float": self.makeEntity("builtin", values={"name": "Float"}),
 			"Result": self.makeEntity("builtin", values={"name": "Result"}),
+			"List": self.makeEntity("builtin", values={"name": "List"}),
 			"Callable": self.makeEntity("builtin", values={"name": "Callable"})
 		})
 

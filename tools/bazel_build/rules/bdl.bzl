@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
-BdlProvider = provider(fields = ["outputs"])
+BdlProvider = provider(fields = ["outputs", "bdls"])
 
 def _bzd_manifest_impl_cc(ctx, inputs):
     """
@@ -30,7 +30,7 @@ def _bzd_manifest_impl(ctx):
     }
 
     # Input bdl files
-    bdl_deps = depset([], transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps])
+    bdl_deps = depset(ctx.files.srcs, transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps])
 
     # Generated outputs
     generated = {fmt: [] for fmt in formats.keys()}
@@ -54,6 +54,7 @@ def _bzd_manifest_impl(ctx):
         for fmt, data in formats.items():
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(relative_name)) for output in data["outputs"]]
+
             ctx.actions.run(
                 inputs = [bdl_object] + bdl_deps.to_list(),
                 outputs = outputs,
@@ -70,7 +71,7 @@ def _bzd_manifest_impl(ctx):
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
 
     return [
-        BdlProvider(outputs = depset(ctx.files.srcs)),
+        BdlProvider(outputs = bdl_deps),
         cc_info_providers,
     ]
 

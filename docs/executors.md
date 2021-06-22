@@ -1,7 +1,7 @@
 # Executors
 
 An executor is a group of computation units (cores) that can share workload between each others.
-Each core however, runs its own scheduler, therefore an executor can have multiple schedulers.
+They share the same work queue.
 ```
 [ executor ] 1 <- * [ core ]
 ```
