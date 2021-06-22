@@ -11,6 +11,15 @@
 #include "cc/bzd/utility/ignore.h"
 
 namespace bzd::impl {
+struct SuspendAlways : public bzd::coroutine::impl::suspend_always
+{
+	template <class T>
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
+	{
+		bzd::Scheduler::getInstance().push(handle);
+		return true;
+	}
+};
 
 template <class T>
 using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
@@ -74,14 +83,6 @@ public:
 	}
 
 	/**
-	 * Set an executor to the current async.
-	 */
-	void setExecutor(bzd::Scheduler& scheduler) noexcept
-	{
-		handle_.promise().executor_ = &scheduler;
-	}
-
-	/**
 	 * Detach the current async from its scheduler (if attached).
 	 */
 	constexpr void detach() noexcept
@@ -93,15 +94,10 @@ public:
 	/**
 	 * Attach the current async to the scheduler.
 	 */
-	constexpr auto attach() noexcept
+	constexpr void attach() noexcept
 	{
-		return bzd::coroutine::impl::Attach{*this};
-	}
-
-	void queue()
-	{
-		bzd::assert::isTrue(handle_.promise().executor_);
-		handle_.promise().executor_->push(handle_);
+		bzd::assert::isTrue(static_cast<bool>(handle_));
+		bzd::Scheduler::getInstance().push(handle_);
 	}
 
 public: // coroutine specific
@@ -115,8 +111,7 @@ public: // coroutine specific
 		handle_.promise().caller = caller;
 
 		// Push the current handle to the scheduler.
-		bzd::assert::isTrue(handle_.promise().executor_);
-		handle_.promise().executor_->push(handle_);
+		attach();
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.
@@ -153,7 +148,7 @@ namespace bzd::async {
 
 constexpr auto yield() noexcept
 {
-	return bzd::coroutine::impl::SuspendAlways{};
+	return bzd::impl::SuspendAlways{};
 }
 
 template <class... Asyncs>
@@ -162,8 +157,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
-	(co_await asyncs.attach(), ...);
-	//(asyncs.queue(), ...);
+	(asyncs.attach(), ...);
 
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
@@ -188,8 +182,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	// Register on terminate callbacks
 	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
 	// Push all handles to the scheduler
-	(co_await asyncs.attach(), ...);
-	//(asyncs.queue(), ...);
+	(asyncs.attach(), ...);
 
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))
