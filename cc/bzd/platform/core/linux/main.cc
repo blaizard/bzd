@@ -1,6 +1,6 @@
-#include "cc/bzd/platform/core/linux/core.h"
-#include "cc/bzd/core/executor.h"
 #include "cc/bzd/core/delay.h"
+#include "cc/bzd/core/executor.h"
+#include "cc/bzd/platform/core/linux/core.h"
 
 #include <iostream>
 
@@ -112,7 +112,7 @@ int main()
 
 	payload(executor);
 
-	//task1.sync();
+	// task1.sync();
 	// executor.dispatch(task1, 23);
 
 	auto workload = []() { std::cout << "Workload" << std::endl; };

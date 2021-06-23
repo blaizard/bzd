@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cc/bzd/platform/core.h"
-#include "cc/bzd/core/log.h"
 #include "cc/bzd/core/async.h"
+#include "cc/bzd/core/log.h"
+#include "cc/bzd/platform/core.h"
 
 namespace bzd::core {
 
@@ -13,7 +13,7 @@ public:
 
 	constexpr void start() noexcept
 	{
-		(void) execution_;
+		(void)execution_;
 		/*const auto result = execution_.start();
 		if (result.hasError())
 		{
@@ -31,13 +31,11 @@ public:
 		bzd::Scheduler::getInstance().run();
 	}
 
-	constexpr void stop()
-	{
-	}
+	constexpr void stop() {}
 
 private:
-	//bzd::Vector<platform::Core&>
+	// bzd::Vector<platform::Core&>
 	platform::Core& execution_;
 };
 
-}
+} // namespace bzd::core
