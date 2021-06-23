@@ -16,7 +16,9 @@ struct SuspendAlways : public bzd::coroutine::impl::suspend_always
 	template <class T>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
 	{
-		bzd::Scheduler::getInstance().push(handle);
+		bzd::assert::isTrue(handle.promise().executor_);
+		handle.promise().executor_->push(handle);
+		// bzd::Scheduler::getInstance().push(handle);
 		return true;
 	}
 };
@@ -33,9 +35,20 @@ class Async
 public:
 	using PromiseType = bzd::coroutine::Promise<T>;
 	using ResultType = typename PromiseType::ResultType;
+	using Self = Async<T>;
 
-public: // constructor/destructor
+public: // constructor/destructor//assignments
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
+
+	constexpr Async(const Self&) noexcept = delete;
+	constexpr Self& operator=(const Self&) noexcept = delete;
+
+	constexpr Async(Self&& async) noexcept : handle_{bzd::move(async.handle_)} { async.handle_ = nullptr; }
+	constexpr Self& operator=(Self&& async) noexcept
+	{
+		handle_ = bzd::move(async.handle_);
+		async.handle_ = nullptr;
+	}
 
 	~Async() noexcept
 	{
@@ -92,12 +105,14 @@ public:
 	}
 
 	/**
-	 * Attach the current async to the scheduler.
+	 * Associate an executor to this async.
 	 */
-	constexpr void attach() noexcept
+	constexpr void setExecutor(bzd::Scheduler& executor) noexcept { handle_.promise().executor_ = &executor; }
+
+	constexpr void enqueue() noexcept
 	{
-		bzd::assert::isTrue(static_cast<bool>(handle_));
-		bzd::Scheduler::getInstance().push(handle_);
+		bzd::assert::isTrue(handle_.promise().executor_);
+		handle_.promise().executor_->push(handle_);
 	}
 
 public: // coroutine specific
@@ -105,13 +120,16 @@ public: // coroutine specific
 
 	constexpr bool await_ready() noexcept { return isReady(); }
 
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<> caller) noexcept
+	template <class U>
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
 	{
 		// To handle continuation
 		handle_.promise().caller = caller;
 
 		// Push the current handle to the scheduler.
-		attach();
+		setExecutor(*caller.promise().executor_);
+		// setExecutor(bzd::Scheduler::getInstance());
+		enqueue();
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.
@@ -121,7 +139,7 @@ public: // coroutine specific
 	constexpr ResultType await_resume() noexcept { return getResult().value(); }
 
 private:
-	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_;
+	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_{};
 };
 
 } // namespace bzd::impl
@@ -157,7 +175,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
 	// Push all handles to the scheduler
-	(asyncs.attach(), ...);
+	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
 
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
@@ -182,7 +200,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	// Register on terminate callbacks
 	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
 	// Push all handles to the scheduler
-	(asyncs.attach(), ...);
+	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
 
 	// Loop until one async is ready
 	while (!(asyncs.isReady() || ...))

@@ -244,6 +244,7 @@ void callStack() noexcept
 		bzd::StringView symbol{info.symbol};
 
 		// Look for improved function/source names with addr2line
+		if (!info.path.empty())
 		{
 			bzd::StringChannel<1024> command;
 			bzd::format::toStream(command,

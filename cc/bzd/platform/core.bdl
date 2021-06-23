@@ -12,8 +12,8 @@ interface Core{
 		// The error comes from something related to memory alignment.
 		ALIGNMENT
 	,	// The error comes from something related to memory size.
-		SIZE,
-		OTHER
+		SIZE
+	,	OTHER
 	}
 	
 	// Start a workload on the core and return immediatly.
@@ -27,9 +27,11 @@ interface Core{
 	
 }
 
-interface Executor
-{
+interface Executor{
 	// Start the executor and starts all cores previously initialized.
 	method start(List<Core> cores);
 	method stop();
+	
 }
+
+
