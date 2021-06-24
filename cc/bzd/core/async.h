@@ -6,22 +6,10 @@
 #include "cc/bzd/container/tuple.h"
 #include "cc/bzd/core/coroutine.h"
 #include "cc/bzd/core/promise.h"
-#include "cc/bzd/core/scheduler.h"
 #include "cc/bzd/type_traits/remove_reference.h"
 #include "cc/bzd/utility/ignore.h"
 
 namespace bzd::impl {
-struct SuspendAlways : public bzd::coroutine::impl::suspend_always
-{
-	template <class T>
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<T>> handle) noexcept
-	{
-		bzd::assert::isTrue(handle.promise().executor_);
-		handle.promise().executor_->push(handle);
-		// bzd::Scheduler::getInstance().push(handle);
-		return true;
-	}
-};
 
 template <class T>
 using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
@@ -32,7 +20,7 @@ using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 template <class T>
 class Async
 {
-public:
+public: // Traits
 	using PromiseType = bzd::coroutine::Promise<T>;
 	using ResultType = typename PromiseType::ResultType;
 	using Self = Async<T>;
@@ -60,7 +48,9 @@ public: // constructor/destructor//assignments
 	}
 
 public:
-	// Cancel the current coroutine and nested ones
+	/**
+	 * Cancel the current async and nested ones.
+	 */
 	constexpr void cancel() noexcept
 	{
 		if (handle_)
@@ -71,8 +61,14 @@ public:
 		}
 	}
 
+	/**
+	 * Notifies if the async is completed.
+	 */
 	constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
+	/**
+	 * Get the current result. If the async is not terminated, an empty value is returned.
+	 */
 	constexpr bzd::Optional<ResultType> getResult() noexcept
 	{
 		if (handle_)
@@ -82,37 +78,48 @@ public:
 		return nullopt;
 	}
 
-	void onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)> callback) noexcept
+	void onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)> callback) noexcept
 	{
 		handle_.promise().onTerminateCallback_.emplace(callback);
 	}
 
-	constexpr void cancelIfDifferent(const bzd::coroutine::interface::Promise& promise) noexcept
+	constexpr void cancelIfDifferent(const bzd::Executor::Executable& promise) noexcept
 	{
-		if (handle_ && static_cast<bzd::coroutine::interface::Promise*>(&handle_.promise()) != &promise)
+		if (handle_ && static_cast<bzd::Executor::Executable*>(&handle_.promise()) != &promise)
 		{
 			cancel();
 		}
 	}
 
 	/**
-	 * Detach the current async from its scheduler (if attached).
+	 * Detach the current async from its executor (if attached).
 	 */
-	constexpr void detach() noexcept
-	{
-		bzd::assert::isTrue(static_cast<bool>(handle_));
-		bzd::ignore = handle_.promise().pop();
-	}
+	constexpr void detach() noexcept { bzd::ignore = getExecutable().pop(); }
 
 	/**
 	 * Associate an executor to this async.
 	 */
-	constexpr void setExecutor(bzd::Scheduler& executor) noexcept { handle_.promise().executor_ = &executor; }
+	constexpr void setExecutor(bzd::Executor& executor) noexcept { handle_.promise().executor_ = &executor; }
 
-	constexpr void enqueue() noexcept
+	/**
+	 * Run the current async on a given executor.
+	 * This call will block until completion of the async.
+	 *
+	 * \param executor The executor to run on.
+	 * \return The result of the async.
+	 */
+	ResultType run(bzd::Executor& executor) noexcept
 	{
-		bzd::assert::isTrue(handle_.promise().executor_);
-		handle_.promise().executor_->push(handle_);
+		// Associate the executor with this async
+		setExecutor(executor);
+		// Enqueue the async to the work queue of the executor
+		getExecutable().enqueue();
+
+		// Run the executor
+		executor.run();
+
+		// Return the result.
+		return getResult().value();
 	}
 
 public: // coroutine specific
@@ -123,13 +130,13 @@ public: // coroutine specific
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
 	{
-		// To handle continuation
-		handle_.promise().caller = caller;
+		auto& promise = handle_.promise();
 
-		// Push the current handle to the scheduler.
-		setExecutor(*caller.promise().executor_);
-		// setExecutor(bzd::Scheduler::getInstance());
-		enqueue();
+		// To handle continuation
+		promise.caller = caller;
+
+		// Push the current handle to the executor.
+		promise.enqueue();
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.
@@ -139,6 +146,14 @@ public: // coroutine specific
 	constexpr ResultType await_resume() noexcept { return getResult().value(); }
 
 private:
+	friend bzd::coroutine::impl::Enqueue;
+
+	constexpr bzd::Executor::Executable& getExecutable() noexcept
+	{
+		bzd::assert::isTrue(static_cast<bool>(handle_));
+		return handle_.promise();
+	}
+
 	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_{};
 };
 
@@ -166,7 +181,7 @@ namespace bzd::async {
 
 constexpr auto yield() noexcept
 {
-	return bzd::impl::SuspendAlways{};
+	return bzd::coroutine::impl::Yield{};
 }
 
 template <class... Asyncs>
@@ -174,7 +189,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
-	// Push all handles to the scheduler
+	// Push all handles to the executor
 	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
 
 	// Loop until all asyncs are ready
@@ -195,14 +210,15 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 
 	// Install callbacks on terminate.
 	// Note: the lifetime of the lambda is longer than the promises.
-	auto onTerminateCallback = [&asyncs...](bzd::coroutine::interface::Promise& promise) { (asyncs.cancelIfDifferent(promise), ...); };
+	auto onTerminateCallback = [&asyncs...](bzd::Executor::Executable& promise) { (asyncs.cancelIfDifferent(promise), ...); };
 
 	// Register on terminate callbacks
-	(asyncs.onTerminate(bzd::FunctionView<void(bzd::coroutine::interface::Promise&)>{onTerminateCallback}), ...);
-	// Push all handles to the scheduler
+	(asyncs.onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)>{onTerminateCallback}), ...);
+
+	// Push all handles to the executor
 	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
 
-	// Loop until one async is ready
+	// Loop until one async is ready, the others will be canceled.
 	while (!(asyncs.isReady() || ...))
 	{
 		co_await yield();

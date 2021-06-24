@@ -4,6 +4,7 @@
 #include "cc/bzd/container/impl/non_owning_list.h"
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/core/coroutine.h"
+#include "cc/bzd/core/executor.h"
 
 #include <iostream>
 
@@ -13,29 +14,36 @@ template <class T>
 class Async;
 }
 
-namespace bzd {
-class Scheduler;
-}
-
-namespace bzd::coroutine::interface {
-class Promise : public bzd::NonOwningListElement<true>
-{
-public:
-	bzd::Scheduler* executor_{nullptr};
-};
-} // namespace bzd::coroutine::interface
-
 namespace bzd::coroutine::impl {
 
-template <class T>
+/**
+ * Awaitable to enqueue an async object.
+ */
 struct Enqueue
 {
-	constexpr Enqueue(T& async) noexcept : async_{async} {}
-	T& async_;
+	template <class T>
+	constexpr Enqueue(T& async) noexcept : exectuable_{async.getExecutable()}
+	{
+	}
+	bzd::Executor::Executable& exectuable_;
+};
+
+/**
+ * Awaitable to yield the current execution.
+ */
+struct Yield : public bzd::coroutine::impl::suspend_always
+{
+	template <class T>
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+	{
+		bzd::assert::isTrue(handle.promise().executor_);
+		handle.promise().executor_->push(handle.promise());
+		return true;
+	}
 };
 
 template <class T>
-class Promise : public bzd::coroutine::interface::Promise
+class Promise : public bzd::Executor::Executable
 {
 private:
 	using Self = Promise<T>;
@@ -80,19 +88,21 @@ public:
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
-	template <class U>
-	constexpr auto await_transform(bzd::coroutine::impl::Enqueue<U>&& object) noexcept
+	constexpr auto await_transform(bzd::coroutine::impl::Enqueue&& object) noexcept
 	{
-		auto& async = object.async_;
-		async.setExecutor(*executor_);
-		async.enqueue();
+		auto& exectuable = object.exectuable_;
+		exectuable.executor_ = executor_;
+		exectuable.enqueue();
 		return bzd::coroutine::impl::suspend_never{};
 	}
 
-	template <class Awaitable>
-	constexpr auto&& await_transform(Awaitable&& awaitable) noexcept
+	constexpr auto&& await_transform(bzd::coroutine::impl::Yield&& awaitable) noexcept { return bzd::move(awaitable); }
+
+	template <class Async>
+	constexpr auto&& await_transform(Async&& async) noexcept
 	{
-		return bzd::move(awaitable);
+		async.setExecutor(*executor_);
+		return bzd::move(async);
 	}
 
 private:
@@ -100,7 +110,7 @@ private:
 	friend class ::bzd::impl::Async;
 
 	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
-	bzd::Optional<bzd::FunctionView<void(interface::Promise&)>> onTerminateCallback_{};
+	bzd::Optional<bzd::FunctionView<void(Executor::Executable&)>> onTerminateCallback_{};
 };
 
 } // namespace bzd::coroutine::impl

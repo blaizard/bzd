@@ -19,7 +19,8 @@ int main()
 {
 	std::cout << "start" << std::endl;
 	auto promise = task1();
-	bzd::async::run(promise);
+	bzd::Executor executor{};
+	promise.run(executor);
 	std::cout << "end" << std::endl;
 	return 0;
 }

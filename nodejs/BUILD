@@ -55,7 +55,7 @@ bzd_nodejs_library(
         "css-loader": "3.6.0",  # From 4.0.0 the keyword :export seems broken
         "node-sass": "",
         "sass-loader": "10.1.1",  # Breaking changes from 11 onward, only support webpack v5+
-        "sass": "",
+        "sass": "1.35.1",
         "file-loader": "",
         "url-loader": "",
     },

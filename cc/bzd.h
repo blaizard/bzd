@@ -30,10 +30,10 @@
 #include "cc/bzd/core/async.h"
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/core/delay.h"
+#include "cc/bzd/core/executor.h"
 #include "cc/bzd/core/log.h"
 #include "cc/bzd/core/promise.h"
 #include "cc/bzd/core/registry.h"
-#include "cc/bzd/core/scheduler.h"
 
 // Meta
 #include "cc/bzd/meta/choose_nth.h"

@@ -83,18 +83,6 @@ cc_library(
 )
 
 cc_library(
-    name = "executor",
-    hdrs = [
-        "executor.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":log",
-        "//cc/bzd/platform:core",
-    ],
-)
-
-cc_library(
     name = "log",
     hdrs = [
         "log.h",
@@ -115,8 +103,8 @@ cc_library(
     hdrs = [
         "async.h",
         "coroutine.h",
+        "executor.h",
         "promise.h",
-        "scheduler.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -127,7 +115,6 @@ cc_library(
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:ignore",
-        "//cc/bzd/utility:singleton",
     ],
 )
 
