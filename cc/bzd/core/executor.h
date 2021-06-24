@@ -1,41 +1,69 @@
 #pragma once
 
-#include "cc/bzd/core/async.h"
-#include "cc/bzd/core/log.h"
-#include "cc/bzd/platform/core.h"
+#include "cc/bzd/container/impl/non_owning_list.h"
+#include "cc/bzd/core/promise.h"
+#include "cc/bzd/utility/ignore.h"
 
-namespace bzd::core {
-
+namespace bzd {
 class Executor
 {
 public:
-	Executor(platform::Core& execution) : execution_{execution} {}
-
-	constexpr void start() noexcept
+	class Executable : public bzd::NonOwningListElement<true>
 	{
-		(void)execution_;
-		/*const auto result = execution_.start();
-		if (result.hasError())
+	public:
+		constexpr void enqueue() noexcept
 		{
-			log::print(CSTR("Error while initializing."));
-		}*/
-	}
+			bzd::assert::isTrue(executor_);
+			executor_->push(*this);
+		}
 
-	template <class... Asyncs>
-	constexpr void run(Asyncs&&... asyncs)
+		bzd::Executor* executor_{nullptr};
+	};
+
+public:
+	template <class T>
+	using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
+
+public:
+	constexpr Executor() = default;
+
+	constexpr void push(Executable& exectuable) noexcept { bzd::ignore = queue_.pushFront(exectuable); }
+
+	void run()
 	{
-		// Assign asyncs to their executors
-
-		auto promiseAll = bzd::async::all(bzd::forward<Asyncs>(asyncs)...);
-		promiseAll.attach();
-		bzd::Scheduler::getInstance().run();
+		// Loop until there are still elements
+		while (!queue_.empty())
+		{
+			// Drain remaining handles
+			auto handle = pop();
+			if (handle.hasValue())
+			{
+				handle->resume();
+			}
+		}
 	}
-
-	constexpr void stop() {}
 
 private:
-	// bzd::Vector<platform::Core&>
-	platform::Core& execution_;
-};
+	bzd::Optional<bzd::coroutine::impl::coroutine_handle<>> pop() noexcept
+	{
+		auto exectuable = queue_.back();
+		const auto result = queue_.pop(exectuable.valueMutable());
+		if (!result)
+		{
+			return bzd::nullopt;
+		}
+		auto handle = bzd::coroutine::impl::coroutine_handle<bzd::Executor::Executable>::from_promise(exectuable.valueMutable());
 
-} // namespace bzd::core
+		// Show the stack usage
+		// void* stack = __builtin_frame_address(0);
+		// static void* initial_stack = &stack;
+		// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
+		// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
+
+		return handle;
+	}
+
+private:
+	bzd::NonOwningList<bzd::Executor::Executable> queue_{};
+};
+} // namespace bzd

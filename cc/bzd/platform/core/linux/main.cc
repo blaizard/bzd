@@ -1,5 +1,4 @@
 #include "cc/bzd/core/delay.h"
-#include "cc/bzd/core/executor.h"
 #include "cc/bzd/platform/core/linux/core.h"
 
 #include <iostream>
