@@ -71,7 +71,7 @@ In this example, all entities declared in this file will be accessed prepended b
 
 All BDL dependencies should be imported at the top of the file, referenced by their path.
 ```
-import "cc/bzd/core/my_interface.bdl"
+use "cc/bzd/core/my_interface.bdl"
 ```
 
 ## Variables
@@ -93,9 +93,9 @@ method <name>(<variable1>, ...) [-> <type>] [[<contracts>...]];
 Interfaces are pure virtual classes that are defined with the keywork `interface`.
 It contains children which can be either functions or variables.
 
-## Module
+## Components
 
-A module is the implementation of one or multiple interfaces. It can be instantiated and exposes
+A component is the implementation of one or multiple interfaces. It can be instantiated and exposes
 the functionality of the interface it inherits from.
 In addition it expose things like configuration details, dependencies... to the description language.
 
@@ -103,10 +103,9 @@ For example:
 ```
 namespace bzd.platform.impl;
 
-module MyModule : bzd.platform.Reader
+component MyModule : bzd.platform.Reader
 {
 config:
 	Integer channel [template];
 }
 ```
-

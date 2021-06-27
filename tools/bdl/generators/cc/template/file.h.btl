@@ -35,10 +35,10 @@ namespace {{ namespace | namespaceToStr }} {
 {{- declareTrivialTypes(symbols) -}}
 
 {% for data in nestedList %}
-	{% if data.type == "module" %}
+	{% if data.type == "component" %}
 namespace impl {
 	{% end %}
-	{% if data.type in ["module", "interface"] %}
+	{% if data.type in ["component", "interface"] %}
 {{ data.comment | normalComment }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
@@ -98,7 +98,7 @@ private: // Variables.
 
 {%- end -%}
 
-{%- if data.type == "module" %}
+{%- if data.type == "component" %}
 }
 {%- end %}
 

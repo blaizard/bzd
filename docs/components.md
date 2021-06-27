@@ -1,35 +1,57 @@
 # Components
 
-This framework defines a component based development. Components comes at various level of the development and can be asociated to become a larger component.
-A component is defined by the following.
-- Inputs
-- Outputs
-- Constraints
+This framework offers component based development. Components comes at various level of the development and can be asociated to become a larger component. Components can also contains sub-components. It defines a composable entity which roles varies from a driver to a functional component.
 
-Inputs and outputs are handeled by the communication framework which abstracts all implementation details to the user and uses the best communication mean to transfer data from/to components or from/to the outer world.
+It is declared and defined through a bdl language file. A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation specific configuration.
 
-# System
+For exampe, we will define a square which interface is a generic shape.
 
-A system represents a microcontroller and all its peripherals. It contains both drivers that are accessible via the registry and services for background functionalities, like wifi for example.
+```bdl
+interface Shape
+{
+	using Area = Integer [min = 0];
+	method surface() -> Area;
+}
 
-# Components
+component Square : Shape
+{
+config:
+	width = Integer;
+}
+```
 
-Components are defined to acheive a functionality. They take as input values and/or reference to objects and based on this generates one or multiple outputs.
+A square is defined by its border width. Such component is instantiated from a composable scope:
 
-For example, a components that reads data from an ADC channel and send the data periodically via I2C can have the following definition:
+```bdl
+composition
+{
+	square = Square(width = 12);
+}
+```
 
-- name: MyComponent
-- inputs:
-	- adc: "type(object)"
-	- i2c: "type(object)"
-	- frequency: "type(int)"
-- outputs:
-	- <none>
+This component exposes the `Shape` interface.
 
-And will be used as follow:
-- components:
-	- MyComponent:
-		- inputs:
-			- adc: "adc_temperature"
-			- i2c: "i2c_device"
-			- frequency: 10
+## Sub-components
+
+Components can be made from other components. The syntax is similar to a top level component, except that everything takes part in the component definition.
+
+```bdl
+component ComplexShape : Shape
+{
+config:
+	width1 = Integer;
+	width2 = Integer;
+
+composition:
+	square1  = Square(width = width1);
+	square2  = Square(width = width2);
+}
+```
+
+The C++ implementation of the complex component could be something like:
+```c++
+Area ComplexShape::surface()
+{
+	return square1.surface() + square2.surface();
+}
+```

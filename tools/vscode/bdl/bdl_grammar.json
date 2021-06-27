@@ -9,7 +9,7 @@
             "name": "storage.type.class"
         },
         {
-            "match": "module",
+            "match": "component",
             "name": "storage.type.class"
         },
         {
