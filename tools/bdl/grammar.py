@@ -7,9 +7,9 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 # Match: interface, struct
-_regexprNested = r"(?P<type>(:?interface|struct|module))"
+_regexprNested = r"(?P<type>(:?interface|struct|component))"
 # Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|module|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
+_regexprType = r"(?P<type>(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
 # Match name
 _regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
 # Match a symbol
