@@ -8,34 +8,34 @@ from tools.bdl.grammar import Parser
 class TestRun(unittest.TestCase):
 
 	def testParser(self) -> None:
-		parser = Parser(content="""Float varInit4 = 5.12;
+		parser = Parser(content="""varInit4 = Float(5.12);
 // Contracts
-const int32 defaultConstant [min = -1, max = 35];
-int32 defaultConstant2 = 42 [min = -1, read];
+defaultConstant = const int32 [min = -1, max = 35];
+defaultConstant2 = int32(42) [min = -1, read];
 interface MyFy
 {
 	// Send a message
-	method send(Sequence<char> message) -> Result<int>;
-	MyType var;
-	const MyType varConst [always];
-	MyType varInitialized = 42;
+	method send(message = Sequence<char>) -> Result<int>;
+	var = MyType;
+	varConst = const MyType [always];
+	varInitialized = MyType(42);
 }""")
 		data = parser.parse()
 
 		result = data.serialize()
 		expected = [{
 			'@': {
-			'type': {
-			'v': 'Float',
-			'i': 0
-			},
 			'category': {
 			'v': 'variable',
-			'i': 6
+			'i': 0
 			},
 			'name': {
 			'v': 'varInit4',
-			'i': 6
+			'i': 0
+			},
+			'type': {
+			'v': 'Float',
+			'i': 11
 			},
 			'value': {
 			'v': '5.12',
@@ -46,83 +46,83 @@ interface MyFy
 			'@': {
 			'comment': {
 			'v': 'Contracts',
-			'i': 23
-			},
-			'const': {
-			'v': '',
-			'i': 36
-			},
-			'type': {
-			'v': 'int32',
-			'i': 42
+			'i': 24
 			},
 			'category': {
 			'v': 'variable',
-			'i': 48
+			'i': 37
 			},
 			'name': {
 			'v': 'defaultConstant',
-			'i': 48
+			'i': 37
+			},
+			'const': {
+			'v': '',
+			'i': 55
+			},
+			'type': {
+			'v': 'int32',
+			'i': 61
 			}
 			},
 			'contract': [{
 			'@': {
 			'type': {
 			'v': 'min',
-			'i': 65
+			'i': 68
 			},
 			'value': {
 			'v': '-1',
-			'i': 71
+			'i': 74
 			}
 			}
 			}, {
 			'@': {
 			'type': {
 			'v': 'max',
-			'i': 75
+			'i': 78
 			},
 			'value': {
 			'v': '35',
-			'i': 81
+			'i': 84
 			}
 			}
 			}]
 		}, {
 			'@': {
-			'type': {
-			'v': 'int32',
-			'i': 86
-			},
 			'category': {
 			'v': 'variable',
-			'i': 92
+			'i': 89
 			},
 			'name': {
 			'v': 'defaultConstant2',
-			'i': 92
+			'i': 89
+			},
+			'type': {
+			'v': 'int32',
+			'i': 108
 			},
 			'value': {
 			'v': '42',
-			'i': 111
+			'i': 114
 			}
 			},
 			'contract': [{
 			'@': {
 			'type': {
 			'v': 'min',
-			'i': 115
+			'i': 119
 			},
 			'value': {
 			'v': '-1',
-			'i': 121
+			'i': 125
 			}
 			}
 			}, {
 			'@': {
 			'type': {
 			'v': 'read',
-			'i': 125
+			'i': 129
 			}
 			}
 			}]
@@ -130,56 +130,56 @@ interface MyFy
 			'@': {
 			'category': {
 			'v': 'nested',
-			'i': 132
+			'i': 136
 			},
 			'type': {
 			'v': 'interface',
-			'i': 132
+			'i': 136
 			},
 			'name': {
 			'v': 'MyFy',
-			'i': 142
+			'i': 146
 			}
 			},
 			'nested': [{
 			'@': {
 			'comment': {
 			'v': 'Send a message',
-			'i': 150
+			'i': 154
 			},
 			'category': {
 			'v': 'method',
-			'i': 169
+			'i': 173
 			},
 			'name': {
 			'v': 'send',
-			'i': 176
+			'i': 180
 			},
 			'type': {
 			'v': 'Result',
-			'i': 208
+			'i': 214
 			}
 			},
 			'argument': [{
 			'@': {
-			'type': {
-			'v': 'Sequence',
-			'i': 181
-			},
 			'category': {
 			'v': 'variable',
-			'i': 196
+			'i': 185
 			},
 			'name': {
 			'v': 'message',
-			'i': 196
+			'i': 185
+			},
+			'type': {
+			'v': 'Sequence',
+			'i': 195
 			}
 			},
 			'template': [{
 			'@': {
 			'type': {
 			'v': 'char',
-			'i': 190
+			'i': 204
 			}
 			}
 			}]
@@ -188,73 +188,75 @@ interface MyFy
 			'@': {
 			'type': {
 			'v': 'int',
-			'i': 215
+			'i': 221
 			}
 			}
 			}]
 			}, {
 			'@': {
-			'type': {
-			'v': 'MyType',
-			'i': 222
-			},
 			'category': {
 			'v': 'variable',
-			'i': 229
+			'i': 228
 			},
 			'name': {
 			'v': 'var',
-			'i': 229
+			'i': 228
+			},
+			'type': {
+			'v': 'MyType',
+			'i': 234
 			}
 			}
 			}, {
 			'@': {
-			'const': {
-			'v': '',
-			'i': 235
-			},
-			'type': {
-			'v': 'MyType',
-			'i': 241
-			},
 			'category': {
 			'v': 'variable',
-			'i': 248
+			'i': 243
 			},
 			'name': {
 			'v': 'varConst',
-			'i': 248
+			'i': 243
+			},
+			'const': {
+			'v': '',
+			'i': 254
+			},
+			'type': {
+			'v': 'MyType',
+			'i': 260
 			}
 			},
 			'contract': [{
 			'@': {
 			'type': {
 			'v': 'always',
-			'i': 258
+			'i': 268
 			}
 			}
 			}]
 			}, {
 			'@': {
-			'type': {
-			'v': 'MyType',
-			'i': 268
-			},
 			'category': {
 			'v': 'variable',
-			'i': 275
+			'i': 278
 			},
 			'name': {
 			'v': 'varInitialized',
-			'i': 275
+			'i': 278
+			},
+			'type': {
+			'v': 'MyType',
+			'i': 295
 			},
 			'value': {
 			'v': '42',
-			'i': 292
+			'i': 302
 			}
 			}
 			}]
 		}]
+
+		print(result)
 
 		self.assertListEqual(expected, result)
 

@@ -17,7 +17,7 @@ interface Core{
 	}
 	
 	// Start a workload on the core and return immediatly.
-	method start(Callable workload) -> Result<void, Error>;
+	method start(workload = Callable) -> Result<void, Error>;
 	// Initialize the core.
 	method stop() -> Result<void, Error>;
 	// Get the current stack usage.
@@ -29,7 +29,7 @@ interface Core{
 
 interface Executor{
 	// Start the executor and starts all cores previously initialized.
-	method start(List<Core> cores);
+	method start(cores = List<Core>);
 	method stop();
 	
 }

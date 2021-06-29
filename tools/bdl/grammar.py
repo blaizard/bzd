@@ -11,7 +11,7 @@ _regexprNested = r"(?P<type>(:?interface|struct|component))"
 # Match: any type expect protected types
 _regexprType = r"(?P<type>(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
 # Match name
-_regexprName = r"(?P<name>[0-9a-zA-Z_]+)\b"
+_regexprName = r"(?P<name>(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
 # Match a symbol
 _regexprSymbol = r"(?P<symbol>[0-9a-zA-Z_\.]+)"
 # Match: "string", 12, -45, 5.1854
@@ -116,16 +116,20 @@ def makeGrammarContracts() -> Grammar:
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	type name [= value] [contract];
+	name = type[(value)] [contract];
 	"""
-	return makeGrammarType([
-		GrammarItem(_regexprName, {"category": "variable"}, [
-		makeGrammarContracts(),
-		GrammarItem(r"=", Fragment, [GrammarItem(_regexprValue, Fragment, [makeGrammarContracts(), finalGrammar])]),
-		finalGrammar
-		])
-	])
 
+	return [
+		GrammarItem(_regexprName, {"category": "variable"}, [
+		GrammarItem(
+		r"=", Fragment,
+		makeGrammarType([
+		GrammarItem(r"\(", Fragment,
+		[GrammarItem(_regexprValue, Fragment, [GrammarItem(r"\)", Fragment, [makeGrammarContracts(), finalGrammar])])]),
+		makeGrammarContracts(), finalGrammar
+		]))
+		])
+	]
 
 def makeGrammarMethod() -> Grammar:
 	"""

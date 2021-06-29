@@ -108,7 +108,7 @@ class TestRun(unittest.TestCase):
 		parser = Parser(content="method simple();")
 		self.assertParserEqual(parser, [{"@": {"category": "method", "name": "simple"}, "argument": []}])
 
-		parser = Parser(content="method withArgs(int a);")
+		parser = Parser(content="method withArgs(a = int);")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "method",
@@ -123,7 +123,7 @@ class TestRun(unittest.TestCase):
 			}]
 		}])
 
-		parser = Parser(content="method withMultiArgs(int a, const float b);")
+		parser = Parser(content="method withMultiArgs(a = int, b = const float);")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "method",
@@ -153,6 +153,37 @@ class TestRun(unittest.TestCase):
 			"type": "float"
 			},
 			"argument": []
+		}])
+
+	def testVariable(self) -> None:
+		parser = Parser(content="var1 = Integer;")
+		self.assertParserEqual(parser, [{"@": {"category": "variable", "name": "var1", "type": "Integer"}}])
+
+		parser = Parser(content="var1 = Integer(12);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "variable",
+			"name": "var1",
+			"type": "Integer",
+			"value": "12"
+			}
+		}])
+
+		parser = Parser(content="var1 = const Float(-2.5) [test = 1];")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "variable",
+			"const": "",
+			"name": "var1",
+			"type": "Float",
+			"value": "-2.5"
+			},
+			"contract": [{
+			"@": {
+			"type": "test",
+			"value": "1"
+			}
+			}]
 		}])
 
 

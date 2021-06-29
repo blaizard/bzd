@@ -9,17 +9,17 @@ enum Test
 }
 
 struct MyType{
-	Test test;
-	NextType type1;
+	test = Test;
+	type1 = NextType;
 	
 }
 
 interface MyInterface{
-	method start(NextType a) -> Test;
+	method start(a = NextType) -> Test;
 	// Magic number for demo purpose
-	Integer magic = 42 [min = 5, max = 100];
+	magic = Integer(42) [min = 5, max = 100];
 	// Read only value
-	const Float readOnly = -3.14;
+	readOnly = const Float(-3.14);
 	
 }
 
