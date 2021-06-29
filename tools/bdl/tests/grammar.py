@@ -1,263 +1,159 @@
 import sys
 import unittest
 import typing
-from pathlib import Path
 
 from tools.bdl.grammar import Parser
 
 
 class TestRun(unittest.TestCase):
 
-	def testParser(self) -> None:
-		parser = Parser(content="""Float varInit4 = 5.12;
-// Contracts
-const int32 defaultConstant [min = -1, max = 35];
-int32 defaultConstant2 = 42 [min = -1, read];
-interface MyFy
-{
-	// Send a message
-	method send(Sequence<char> message) -> Result<int>;
-	MyType var;
-	const MyType varConst [always];
-	MyType varInitialized = 42;
-}""")
+	def _clearSertializedForCompare(self, sequence: typing.List[typing.Any]) -> None:
+		for element in sequence:
+			for key in element.keys():
+				if key == "@":
+					element["@"] = {key: value["v"] for key, value in element["@"].items()}
+				else:
+					self._clearSertializedForCompare(element[key])
+
+	def assertParserEqual(self, parser: Parser, match: typing.List[typing.Any]) -> None:
+		"""
+		Check that a parsed data contains only the specified properties.
+		"""
+
 		data = parser.parse()
-
 		result = data.serialize()
-		expected = [{
-			'@': {
-			'type': {
-			'v': 'Float',
-			'i': 0
-			},
-			'category': {
-			'v': 'variable',
-			'i': 6
-			},
-			'name': {
-			'v': 'varInit4',
-			'i': 6
-			},
-			'value': {
-			'v': '5.12',
-			'i': 17
-			}
-			}
-		}, {
-			'@': {
-			'comment': {
-			'v': 'Contracts',
-			'i': 23
-			},
-			'const': {
-			'v': '',
-			'i': 36
-			},
-			'type': {
-			'v': 'int32',
-			'i': 42
-			},
-			'category': {
-			'v': 'variable',
-			'i': 48
-			},
-			'name': {
-			'v': 'defaultConstant',
-			'i': 48
-			}
-			},
-			'contract': [{
-			'@': {
-			'type': {
-			'v': 'min',
-			'i': 65
-			},
-			'value': {
-			'v': '-1',
-			'i': 71
-			}
-			}
-			}, {
-			'@': {
-			'type': {
-			'v': 'max',
-			'i': 75
-			},
-			'value': {
-			'v': '35',
-			'i': 81
-			}
-			}
-			}]
-		}, {
-			'@': {
-			'type': {
-			'v': 'int32',
-			'i': 86
-			},
-			'category': {
-			'v': 'variable',
-			'i': 92
-			},
-			'name': {
-			'v': 'defaultConstant2',
-			'i': 92
-			},
-			'value': {
-			'v': '42',
-			'i': 111
-			}
-			},
-			'contract': [{
-			'@': {
-			'type': {
-			'v': 'min',
-			'i': 115
-			},
-			'value': {
-			'v': '-1',
-			'i': 121
-			}
-			}
-			}, {
-			'@': {
-			'type': {
-			'v': 'read',
-			'i': 125
-			}
-			}
-			}]
-		}, {
-			'@': {
-			'category': {
-			'v': 'nested',
-			'i': 132
-			},
-			'type': {
-			'v': 'interface',
-			'i': 132
-			},
-			'name': {
-			'v': 'MyFy',
-			'i': 142
-			}
-			},
-			'nested': [{
-			'@': {
-			'comment': {
-			'v': 'Send a message',
-			'i': 150
-			},
-			'category': {
-			'v': 'method',
-			'i': 169
-			},
-			'name': {
-			'v': 'send',
-			'i': 176
-			},
-			'type': {
-			'v': 'Result',
-			'i': 208
-			}
-			},
-			'argument': [{
-			'@': {
-			'type': {
-			'v': 'Sequence',
-			'i': 181
-			},
-			'category': {
-			'v': 'variable',
-			'i': 196
-			},
-			'name': {
-			'v': 'message',
-			'i': 196
-			}
-			},
-			'template': [{
-			'@': {
-			'type': {
-			'v': 'char',
-			'i': 190
-			}
-			}
-			}]
-			}],
-			'template': [{
-			'@': {
-			'type': {
-			'v': 'int',
-			'i': 215
-			}
-			}
-			}]
-			}, {
-			'@': {
-			'type': {
-			'v': 'MyType',
-			'i': 222
-			},
-			'category': {
-			'v': 'variable',
-			'i': 229
-			},
-			'name': {
-			'v': 'var',
-			'i': 229
-			}
-			}
-			}, {
-			'@': {
-			'const': {
-			'v': '',
-			'i': 235
-			},
-			'type': {
-			'v': 'MyType',
-			'i': 241
-			},
-			'category': {
-			'v': 'variable',
-			'i': 248
-			},
-			'name': {
-			'v': 'varConst',
-			'i': 248
-			}
-			},
-			'contract': [{
-			'@': {
-			'type': {
-			'v': 'always',
-			'i': 258
-			}
-			}
-			}]
-			}, {
-			'@': {
-			'type': {
-			'v': 'MyType',
-			'i': 268
-			},
-			'category': {
-			'v': 'variable',
-			'i': 275
-			},
-			'name': {
-			'v': 'varInitialized',
-			'i': 275
-			},
-			'value': {
-			'v': '42',
-			'i': 292
-			}
-			}
-			}]
-		}]
+		self._clearSertializedForCompare(result)
+		self.assertListEqual(result, match)
 
-		self.assertListEqual(expected, result)
+	def testUse(self) -> None:
+		parser = Parser(content="use \"Hello\"")
+		self.assertParserEqual(parser, [{"@": {"category": "use", "value": "Hello"}}])
+
+		parser = Parser(content="use \"a/normal/path.bdl\"")
+		self.assertParserEqual(parser, [{"@": {"category": "use", "value": "a/normal/path.bdl"}}])
+
+	def testNamespace(self) -> None:
+		parser = Parser(content="namespace Simple;")
+		self.assertParserEqual(parser, [{"@": {"category": "namespace"}, "name": [{"@": {"name": "Simple"}}]}])
+
+		parser = Parser(content="namespace Composed.Name;")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "namespace"
+			},
+			"name": [{
+			"@": {
+			"name": "Composed"
+			}
+			}, {
+			"@": {
+			"name": "Name"
+			}
+			}]
+		}])
+
+	def testEnum(self) -> None:
+		parser = Parser(content="enum MyName { VAL }")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "enum",
+			"name": "MyName"
+			},
+			"values": [{
+			"@": {
+			"name": "VAL"
+			}
+			}]
+		}])
+
+		parser = Parser(content="enum MyName { VAL1, VAL2 }")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "enum",
+			"name": "MyName"
+			},
+			"values": [{
+			"@": {
+			"name": "VAL1"
+			}
+			}, {
+			"@": {
+			"name": "VAL2"
+			}
+			}]
+		}])
+
+	def testUsing(self) -> None:
+		parser = Parser(content="using MyType = Integer;")
+		self.assertParserEqual(parser, [{"@": {"category": "using", "name": "MyType", "type": "Integer"}}])
+
+		parser = Parser(content="using MyType = Complex<Type>;")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "using",
+			"name": "MyType",
+			"type": "Complex"
+			},
+			"template": [{
+			"@": {
+			"type": "Type"
+			}
+			}]
+		}])
+
+		parser = Parser(content="using MyType = const Integer;")
+		self.assertParserEqual(parser, [{"@": {"category": "using", "const": "", "name": "MyType", "type": "Integer"}}])
+
+	def testMethod(self) -> None:
+		parser = Parser(content="method simple();")
+		self.assertParserEqual(parser, [{"@": {"category": "method", "name": "simple"}, "argument": []}])
+
+		parser = Parser(content="method withArgs(int a);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "method",
+			"name": "withArgs"
+			},
+			"argument": [{
+			"@": {
+			"category": "variable",
+			"name": "a",
+			"type": "int"
+			}
+			}]
+		}])
+
+		parser = Parser(content="method withMultiArgs(int a, const float b);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "method",
+			"name": "withMultiArgs"
+			},
+			"argument": [{
+			"@": {
+			"category": "variable",
+			"name": "a",
+			"type": "int"
+			}
+			}, {
+			"@": {
+			"category": "variable",
+			"name": "b",
+			"type": "float",
+			"const": ""
+			}
+			}]
+		}])
+
+		parser = Parser(content="method withReturn() -> float;")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "method",
+			"name": "withReturn",
+			"type": "float"
+			},
+			"argument": []
+		}])
 
 
 if __name__ == '__main__':

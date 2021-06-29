@@ -2,6 +2,7 @@ import json
 import typing
 from pathlib import Path
 
+from bzd.parser.parser import Parser as BaseParser
 from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
@@ -23,13 +24,10 @@ class Object:
 		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
-	def fromPath(path: Path) -> "Object":
+	def _makeObject(parser: BaseParser) -> "Object":
 		"""
-		Make an object from a bdl path file.
+		Helper to make an opbject from a parser.
 		"""
-
-		# Parse the input file
-		parser = Parser.fromPath(path)
 		data = parser.parse()
 
 		# Validation step
@@ -39,6 +37,26 @@ class Object:
 		symbols = Map().visit(data)
 
 		return Object(context=parser.context, parsed=data, symbols=symbols)
+
+	@staticmethod
+	def fromContent(content: str) -> "Object":
+		"""
+		Make an object from a the content of a bdl file.
+		This is mainly used for testing purpose.
+		"""
+
+		parser = Parser(content)
+		return Object._makeObject(parser=parser)
+
+	@staticmethod
+	def fromPath(path: Path) -> "Object":
+		"""
+		Make an object from a bdl path file.
+		"""
+
+		# Parse the input file
+		parser = Parser.fromPath(path)
+		return Object._makeObject(parser=parser)
 
 	@staticmethod
 	def fromSerialize(data: str) -> "Object":
