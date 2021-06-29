@@ -16,20 +16,20 @@ class TestRun(unittest.TestCase):
  */
 
 // Contracts
-const int32 defaultConstant [min = -1 , max = 35 ];
+defaultConstant = const int32 [min = -1 , max = 35 ];
 
-int32<Int, List<T<A/*Variable A*/, B, C<45>>>> complex;
+complex = int32<Int, List<T<A/*Variable A*/, B, C<45>>>>;
 
 interface MyFy {
-                 MyType var;
+                 var     =MyType;
 
 /*
           A nested comment
          */
 
-        const MyType<T> varConst [ /*    Immer */
+        varConst = const MyType<T> [ /*    Immer */
         always ];
- MyType varInitialized = 42;    
+varInitialized= MyType(   42 );    
 
 
       method myMethod() -> Integer;
