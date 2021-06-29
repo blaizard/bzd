@@ -1,28 +1,14 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
-py_test(
-    name = "grammar",
+[py_test(
+    name = path.replace(".py", ""),
     srcs = [
-        "grammar.py",
-    ],
-    deps = [
-        "//tools/bdl:grammar",
-    ],
-)
-
-py_test(
-    name = "formatter",
-    srcs = [
-        "formatter.py",
-    ],
-    args = [
-        "$(location formatter.bdl.txt)",
-    ],
-    data = [
-        "formatter.bdl.txt",
+        path,
     ],
     deps = [
         "//tools/bdl:generators",
         "//tools/bdl:grammar",
     ],
-)
+) for path in glob([
+    "*.py",
+])]

@@ -30,7 +30,7 @@ class FragmentBlockComment(FragmentComment):
 def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for a nested entity, it accepst the following format:
-	(interface|struct) name {
+	(interface|struct|component) name {
 		nestedGrammar
 	}
 
@@ -69,7 +69,7 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for Type, it accepts the following format:
-	Type = Type1[<Type, Type, ...>]
+	Type = [const] Type1[<Type, Type, ...>]
 
 	Nested type elements are included under `template`.
 	"""
@@ -77,7 +77,7 @@ def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 	class TemplateStart(FragmentNestedStart):
 		nestedName = "template"
 
-	grammar: Grammar = []
+	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
 	grammar.append(
 		GrammarItem(_regexprType, Fragment, [
 		GrammarItem(r"<", TemplateStart, [grammar]),
@@ -116,11 +116,9 @@ def makeGrammarContracts() -> Grammar:
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	[const] type name [= value] [contract];
+	type name [= value] [contract];
 	"""
-	return [
-		GrammarItem(r"const", {"const": ""}),
-	] + makeGrammarType([
+	return makeGrammarType([
 		GrammarItem(_regexprName, {"category": "variable"}, [
 		makeGrammarContracts(),
 		GrammarItem(r"=", Fragment, [GrammarItem(_regexprValue, Fragment, [makeGrammarContracts(), finalGrammar])]),
