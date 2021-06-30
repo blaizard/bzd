@@ -25,6 +25,10 @@
 config:
 	{{ declareSymbols(data.config.symbols) }}
 	{% end %}
+	{% if data.isComposition %}
+composition:
+	{{ declareSymbols(data.composition.symbols) }}
+	{% end %}
 }
 {% end -%}
 

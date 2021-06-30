@@ -13,13 +13,38 @@ NamespaceType = typing.List[str]
 T = typing.TypeVar("T")
 
 
+class Parent:
+
+	def __init__(self, entity: typing.Union[Nested, Namespace], category: typing.Optional[str] = None) -> None:
+		self.entity = entity
+		self.category = category
+
+	@property
+	def namespace(self) -> typing.List[str]:
+		if isinstance(self.entity, Nested):
+			return [self.entity.name]
+		if isinstance(self.entity, Namespace):
+			return self.entity.nameList
+
+
 class Visitor(VisitorBase[T, T]):
 
 	nestedKind = None
 
 	def __init__(self) -> None:
 		self.level = 0
-		self.namespace: NamespaceType = []
+		self.parents: typing.List[Parent] = []
+
+	@property
+	def parent(self) -> typing.Optional[Parent]:
+		return self.parents[-1] if len(self.parents) else None
+
+	@property
+	def namespace(self) -> typing.List[str]:
+		"""
+		Get the list of name constituing the namespace.
+		"""
+		return [name for parent in self.parents for name in parent.namespace]
 
 	@staticmethod
 	def makeEntity(category: str,
@@ -46,15 +71,15 @@ class Visitor(VisitorBase[T, T]):
 			Error.assertHasSequence(element=element, sequence="nested")
 
 			self.level += 1
-			self.namespace.append(entity.name)
 
-			for category in ["nested", "config"]:
+			for category in ["nested", "config", "composition"]:
 				sequence = element.getNestedSequence(category)
 				if sequence is not None:
+					self.parents.append(Parent(entity=entity, category=category))
 					nestedResult = self._visit(sequence)
 					entity.setNested(category=category, nested=typing.cast(typing.List[typing.Any], nestedResult))
+					self.parents.pop()
 
-			self.namespace.pop()
 			self.level -= 1
 
 			self.visitNestedEntities(entity=entity, result=result)
@@ -89,7 +114,7 @@ class Visitor(VisitorBase[T, T]):
 			self.visitNamespace(entity=entity, result=result)
 
 			# Update the current namespace
-			self.namespace.extend(entity.nameList)
+			self.parents.append(Parent(entity=entity))
 
 		# Handle use
 		elif isinstance(entity, Use):

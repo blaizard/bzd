@@ -6,9 +6,9 @@ from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
-_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+"
+_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition)[0-9a-zA-Z_]+"
 # Match: interface, struct
-_regexprNested = r"(?P<type>(:?interface|struct|component))"
+_regexprNested = r"(?P<type>(:?interface|struct|component|composition))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match: any type expect protected types
@@ -58,8 +58,10 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		[GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"(?={)", FragmentParentElement)])
 		]),
-		GrammarItem(r"{", FragmentNestedStart, nestedGrammar + [
+		GrammarItem(
+		r"{", FragmentNestedStart, nestedGrammar + [
 		makeNestedCategory("config"),
+		makeNestedCategory("composition"),
 		GrammarItem(r"}", FragmentNestedStopNewElement),
 		]),
 		])
