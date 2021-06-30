@@ -48,6 +48,14 @@ class Nested(Entity):
 		return self.nestedCategories["config"]
 
 	@property
+	def isComposition(self) -> bool:
+		return "composition" in self.nestedCategories
+
+	@property
+	def composition(self) -> typing.Any:
+		return self.nestedCategories["composition"]
+
+	@property
 	def category(self) -> str:
 		return "nested"
 

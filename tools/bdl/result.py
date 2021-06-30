@@ -42,9 +42,8 @@ class ResultType:
 		Register a symbol to the result type.
 		"""
 
-		if entity.name in self.symbolSet:
-			Error.handleFromElement(element=entity.element,
-				message="Conflicting symbol '{}', already defined earlier.".format(entity.name))
+		entity.assertTrue(condition=entity.name not in self.symbolSet,
+			message="Conflicting symbol '{}', already defined earlier.".format(entity.name))
 		self.symbolSet.add(entity.name)
 		self.symbols.append(entity)
 
@@ -53,11 +52,8 @@ class ResultType:
 		Register a namespace
 		"""
 
-		if self.namespace is not None:
-			Error.handleFromElement(element=entity.element,
-				message="A namespace has already been defined earlier '{}'.".format(".".join(self.namespace.nameList)))
-		if self.level != 0:
-			Error.handleFromElement(element=entity.element, message="Namespace can only be defined at top level.")
+		entity.assertTrue(condition=self.namespace is None, message="A namespace has already been defined earlier.")
+		entity.assertTrue(condition=self.level == 0, message="Namespace can only be defined at top level.")
 		self.namespace = entity
 
 	def registerUse(self, entity: Use) -> None:
@@ -65,9 +61,8 @@ class ResultType:
 		Register a use specifier
 		"""
 
-		if entity.path in self.useDict:
-			Error.handleFromElement(element=entity.element,
-				message="Duplicate path '{}' already used earlier.".format(entity.path))
+		entity.assertTrue(condition=entity.path not in self.useDict,
+			message="Duplicate path '{}' already used earlier.".format(entity.path))
 		self.useDict[entity.path] = entity
 
 	@property

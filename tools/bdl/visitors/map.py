@@ -33,8 +33,7 @@ class Map(Visitor[MapType]):
 
 		# Build the symbol name and ensure it is unique
 		symbol = self.makeFQN(name=entity.name, namespace=self.namespace)
-		Error.assertTrue(element=entity.element,
-			condition=(symbol not in self.map),
+		entity.assertTrue(condition=(symbol not in self.map),
 			message="Symbol name is in conflict with a previous one {}.".format(symbol))
 
 		# Save the serialized payload and convert nested dependencies and make them links
