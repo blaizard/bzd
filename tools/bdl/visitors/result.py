@@ -9,7 +9,7 @@ from tools.bdl.visitors.map import MapType
 from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.object import Object
 
-from tools.bdl.entities.all import Variable, Builtin, Nested, Method, Using, Enum, Namespace, Use
+from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use
 from tools.bdl.entities.impl.fragment.type import Type
 
 
@@ -71,7 +71,7 @@ class Result(VisitorBase[ResultType]):
 		for inheritance in entity.inheritanceList:
 			self.resolveTypeIfAny(entity=inheritance)
 
-	def visitVariable(self, entity: Variable, result: ResultType) -> None:
+	def visitExpression(self, entity: Expression, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
 
 	def visitMethod(self, entity: Method, result: ResultType) -> None:

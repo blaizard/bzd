@@ -8,7 +8,7 @@ from bzd.parser.element import Sequence
 
 from tools.bdl.visitor import Visitor
 from tools.bdl.result import SymbolType
-from tools.bdl.entities.all import Variable, Nested, Method, Using, Enum
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Enum
 
 MapType = typing.Dict[str, typing.Any]
 
@@ -55,7 +55,7 @@ class Map(Visitor[MapType]):
 	def visitNestedEntities(self, entity: Nested, result: MapType) -> None:
 		self.mapEntity(entity=entity)
 
-	def visitVariable(self, entity: Variable, result: MapType) -> None:
+	def visitExpression(self, entity: Expression, result: MapType) -> None:
 		self.mapEntity(entity=entity)
 
 	def visitMethod(self, entity: Method, result: MapType) -> None:

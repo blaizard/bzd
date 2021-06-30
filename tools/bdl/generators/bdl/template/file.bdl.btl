@@ -4,7 +4,7 @@
 {{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }}{% if not data.contracts.empty %} [{% for i, contract in data.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};{% end -%}
 
 {%- macro declareMethod(data) %}
-{{ data.comment | normalComment }}method {{ data.name }}({% for i, var in data.args %}{{ var.name }} = {% if var.const %}const {% end %}{{ var.type | typeToStr }}{% if var.isValue %}({ var.value }}){% end %}{% if i %},{% end %}{% end %}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
+{{ data.comment | normalComment }}method {{ data.name }}({% for i, var in data.args %}{{ var.name }} = {% if var.const %}const {% end %}{{ var.type | typeToStr }}{% for i, arg in var.args %}({%if i %}, {% end %}{{ arg.value }}){% end %}{% if i %},{% end %}{% end %}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
 
 {%- macro declareEnum(data) %}
 {{ data.comment | normalComment }}enum {{ data.name }}
@@ -28,8 +28,8 @@ config:
 }
 {% end -%}
 
-{%- macro declareVariable(data) %}
-{{ data.comment | normalComment }}{{ data.name }} = {% if data.const %}const {% end %}{{ data.type | typeToStr }}{% if data.isValue %}({{ data.value }}){% end %}{% if not data.contracts.empty %} [{% for i, contract in data.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};{% end -%}
+{%- macro declareExpression(data) %}
+{{ data.comment | normalComment }}{{ data.name }} = {% if data.const %}const {% end %}{{ data.type | typeToStr }}{% for i, arg in data.args %}({%if i %}, {% end %}{{ arg.value }}){% end %}{% if not data.contracts.empty %} [{% for i, contract in data.contracts %}{% if i %}, {% end %}{{ contract.comment | inlineComment }}{{ contract.type }}{% if contract.isValue %} = {{ contract.value }}{% end %}{% end %}]{% end %};{% end -%}
 
 {%- macro declareSymbols(sequence) %}
 	{% for data in sequence %}
@@ -41,8 +41,8 @@ config:
 {{ declareMethod(data) }}
 		{% elif data.category == "nested" %}
 {{ declareNested(data) }}
-		{% elif data.category == "variable" %}
-{{ declareVariable(data) }}
+		{% elif data.category == "expression" %}
+{{ declareExpression(data) }}
 		{% end %}
 	{% end %}
 {% end -%}

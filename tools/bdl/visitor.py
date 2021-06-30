@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.fragments import Attribute
 
-from tools.bdl.entities.all import Variable, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
+from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
 
 NamespaceType = typing.List[str]
 
@@ -59,10 +59,10 @@ class Visitor(VisitorBase[T, T]):
 
 			self.visitNestedEntities(entity=entity, result=result)
 
-		# Handle variable
-		elif isinstance(entity, Variable):
+		# Handle expression
+		elif isinstance(entity, Expression):
 
-			self.visitVariable(entity=entity, result=result)
+			self.visitExpression(entity=entity, result=result)
 
 		# Handle method
 		elif isinstance(entity, Method):
@@ -110,7 +110,7 @@ class Visitor(VisitorBase[T, T]):
 		categoryToEntity: typing.Dict[str, typing.Type[EntityType]] = {
 			"nested": Nested,
 			"builtin": Builtin,
-			"variable": Variable,
+			"expression": Expression,
 			"method": Method,
 			"using": Using,
 			"enum": Enum,
@@ -132,9 +132,9 @@ class Visitor(VisitorBase[T, T]):
 		"""
 		pass
 
-	def visitVariable(self, entity: Variable, result: T) -> None:
+	def visitExpression(self, entity: Expression, result: T) -> None:
 		"""
-		Called when discovering a variable.
+		Called when discovering an expression.
 		"""
 		pass
 

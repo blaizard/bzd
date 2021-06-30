@@ -4,7 +4,7 @@ from bzd.parser.element import Element
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type
-from tools.bdl.entities.impl.variable import Variable
+from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.entity import Entity
 
 
@@ -31,11 +31,11 @@ class Method(Entity):
 		return self.element.getAttrValue("comment")
 
 	@property
-	def args(self) -> typing.List[Variable]:
+	def args(self) -> typing.List[Expression]:
 		if self.element.isNestedSequence("argument"):
 			sequence = self.element.getNestedSequence("argument")
 			assert sequence is not None
-			return [Variable(element=arg) for arg in sequence]
+			return [Expression(element=arg) for arg in sequence]
 		return []
 
 	def __repr__(self) -> str:
