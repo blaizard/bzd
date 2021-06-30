@@ -9,9 +9,9 @@
 };
 {% end -%}
 
-{#- Variables -#}
-{%- macro declareVariable(element, prepend) %}
-{{ element.comment | normalComment }}{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- if element.isValue %}{{ element.value }}{% end -%} };
+{#- Expressions -#}
+{%- macro declareExpression(element, prepend) %}
+{{ element.comment | normalComment }}{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- for i, arg in element.args %}{% if i %}, {% end %}{{ arg.value }}{% end -%} };
 {% end -%}
 
 {#- Nested structure -#}
@@ -19,8 +19,8 @@
 {{ element.comment | normalComment }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
 	{{ declareTrivialTypes(element.nested.symbols) }}
-	{% for element in element.nested.variableList %}
-	{{ declareVariable(element, "") }}
+	{% for element in element.nested.expressionList %}
+	{{ declareExpression(element, "") }}
 	{% end %}
 };
 {% end -%}

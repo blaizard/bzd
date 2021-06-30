@@ -116,7 +116,7 @@ class TestRun(unittest.TestCase):
 			},
 			"argument": [{
 			"@": {
-			"category": "variable",
+			"category": "expression",
 			"name": "a",
 			"type": "int"
 			}
@@ -131,13 +131,13 @@ class TestRun(unittest.TestCase):
 			},
 			"argument": [{
 			"@": {
-			"category": "variable",
+			"category": "expression",
 			"name": "a",
 			"type": "int"
 			}
 			}, {
 			"@": {
-			"category": "variable",
+			"category": "expression",
 			"name": "b",
 			"type": "float",
 			"const": ""
@@ -155,33 +155,119 @@ class TestRun(unittest.TestCase):
 			"argument": []
 		}])
 
-	def testVariable(self) -> None:
+	def testExpression(self) -> None:
 		parser = Parser(content="var1 = Integer;")
-		self.assertParserEqual(parser, [{"@": {"category": "variable", "name": "var1", "type": "Integer"}}])
+		self.assertParserEqual(parser, [{"@": {"category": "expression", "name": "var1", "type": "Integer"}}])
+
+		parser = Parser(content="Integer;")
+		self.assertParserEqual(parser, [{"@": {"category": "expression", "type": "Integer"}}])
 
 		parser = Parser(content="var1 = Integer(12);")
 		self.assertParserEqual(parser, [{
 			"@": {
-			"category": "variable",
+			"category": "expression",
 			"name": "var1",
 			"type": "Integer",
+			},
+			"argument": [{
+			"@": {
 			"value": "12"
 			}
+			}]
 		}])
 
 		parser = Parser(content="var1 = const Float(-2.5) [test = 1];")
 		self.assertParserEqual(parser, [{
 			"@": {
-			"category": "variable",
+			"category": "expression",
 			"const": "",
 			"name": "var1",
 			"type": "Float",
-			"value": "-2.5"
 			},
+			"argument": [{
+			"@": {
+			"value": "-2.5"
+			}
+			}],
 			"contract": [{
 			"@": {
 			"type": "test",
 			"value": "1"
+			}
+			}]
+		}])
+
+		parser = Parser(content="var1 = Integer(-2.5, 54);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"name": "var1",
+			"type": "Integer",
+			},
+			"argument": [{
+			"@": {
+			"value": "-2.5"
+			}
+			}, {
+			"@": {
+			"value": "54"
+			}
+			}]
+		}])
+
+		parser = Parser(content="var1 = Integer(key = 12);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"name": "var1",
+			"type": "Integer",
+			},
+			"argument": [{
+			"@": {
+			"name": "key",
+			"value": "12"
+			}
+			}]
+		}])
+
+		parser = Parser(content="var1 = Integer(key = my.symbol);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"name": "var1",
+			"type": "Integer",
+			},
+			"argument": [{
+			"@": {
+			"name": "key",
+			"symbol": "my.symbol"
+			}
+			}]
+		}])
+
+		parser = Parser(content="fct(key = 12);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"type": "fct",
+			},
+			"argument": [{
+			"@": {
+			"name": "key",
+			"value": "12"
+			}
+			}]
+		}])
+
+		parser = Parser(content="this.is.fqn(12);")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"type": "this.is.fqn",
+			},
+			"argument": [{
+			"@": {
+			"value": "12"
 			}
 			}]
 		}])

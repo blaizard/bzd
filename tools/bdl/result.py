@@ -4,9 +4,9 @@ import typing
 from bzd.parser.error import Error
 from bzd.parser.element import Element
 
-from tools.bdl.entities.all import Variable, Nested, Method, Using, Enum, Namespace, Use
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Enum, Namespace, Use
 
-SymbolType = typing.Union[Variable, Nested, Method, Using, Enum]
+SymbolType = typing.Union[Expression, Nested, Method, Using, Enum]
 
 
 class ResultType:
@@ -79,12 +79,12 @@ class ResultType:
 		return [symbol for symbol in self.symbols if isinstance(symbol, Nested)]
 
 	@property
-	def isVariable(self) -> bool:
-		return bool(self.variableList)
+	def isExpression(self) -> bool:
+		return bool(self.expressionList)
 
 	@property
-	def variableList(self) -> typing.List[Variable]:
-		return [symbol for symbol in self.symbols if isinstance(symbol, Variable)]
+	def expressionList(self) -> typing.List[Expression]:
+		return [symbol for symbol in self.symbols if isinstance(symbol, Expression)]
 
 	@property
 	def isMethod(self) -> bool:

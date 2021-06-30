@@ -8,17 +8,40 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import Entity
 
 
-class Variable(Entity):
+class Argument(Entity):
 
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element)
-		Error.assertHasAttr(element=element, attr="name")
+		Error.assertHasAttr(element=element, attr="value")
+
+	@property
+	def comment(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("comment")
+
+	@property
+	def value(self) -> str:
+		return self.element.getAttr("value").value
+
+	@property
+	def key(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("name")
+
+
+class Expression(Entity):
+
+	def __init__(self, element: Element) -> None:
+
+		super().__init__(element)
 		Error.assertHasAttr(element=element, attr="type")
 
 	@property
+	def isName(self) -> bool:
+		return self.element.isAttr("name")
+
+	@property
 	def category(self) -> str:
-		return "variable"
+		return "expression"
 
 	@property
 	def const(self) -> bool:
@@ -29,12 +52,13 @@ class Variable(Entity):
 		return Type(element=self.element, kind="type", template="template")
 
 	@property
-	def value(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("value")
+	def args(self) -> typing.List[Argument]:
+		arguments = self.element.getNestedSequence("argument")
+		return [] if arguments is None else [Argument(arg) for arg in arguments]
 
 	@property
-	def isValue(self) -> bool:
-		return self.element.isAttr("value")
+	def isArg(self) -> bool:
+		return len(self.args) > 0
 
 	@property
 	def comment(self) -> typing.Optional[str]:
@@ -45,4 +69,4 @@ class Variable(Entity):
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
 	def __repr__(self) -> str:
-		return self.toString({"name": self.name})
+		return self.toString({"name": self.name if self.isName else "", "type": str(self.type)})

@@ -6,14 +6,15 @@ from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
+_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+"
 # Match: interface, struct
 _regexprNested = r"(?P<type>(:?interface|struct|component))"
-# Match: any type expect protected types
-_regexprType = r"(?P<type>(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
 # Match name
-_regexprName = r"(?P<name>(?!const|interface|struct|component|method|namespace|use|using|config)[0-9a-zA-Z_]+)"
+_regexprName = r"(?P<name>" + _regexprBaseName + r")"
+# Match: any type expect protected types
+_regexprType = r"(?P<type>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match a symbol
-_regexprSymbol = r"(?P<symbol>[0-9a-zA-Z_\.]+)"
+_regexprSymbol = r"(?P<symbol>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match: "string", 12, -45, 5.1854
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
 # Match string
@@ -113,6 +114,34 @@ def makeGrammarContracts() -> Grammar:
 	]
 
 
+def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
+	"""
+	Generate a grammar for an expression, it accepts the following format:
+	type[(arg1, arg2, ...)] [contract];
+	"""
+
+	class ArgumentStart(FragmentNestedStart):
+		nestedName = "argument"
+
+	grammarValue = [
+		GrammarItem(_regexprValue, Fragment,
+		[GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement)]),
+		GrammarItem(_regexprSymbol, Fragment,
+		[GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement)])
+	]
+
+	grammar = makeGrammarType([
+		GrammarItem(r"\(", ArgumentStart,
+		[GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
+		GrammarItem(r"\)", FragmentParentElement)] + grammarValue),
+		makeGrammarContracts(), finalGrammar
+	])
+
+	return grammar
+
+
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
@@ -120,16 +149,23 @@ def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewEl
 	"""
 
 	return [
-		GrammarItem(_regexprName, {"category": "variable"}, [
-		GrammarItem(
-		r"=", Fragment,
-		makeGrammarType([
-		GrammarItem(r"\(", Fragment,
-		[GrammarItem(_regexprValue, Fragment, [GrammarItem(r"\)", Fragment, [makeGrammarContracts(), finalGrammar])])]),
-		makeGrammarContracts(), finalGrammar
-		]))
-		])
+		GrammarItem(_regexprName + r"\s*=", {"category": "expression"}, makeGrammarExpressionFragment(finalGrammar))
 	]
+
+
+def makeGrammarExpression() -> Grammar:
+	"""
+	Generate a grammar for Variables, it accepts the following format:
+	[name =] type[(value)] [contract];
+	"""
+
+	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]
+
+	return makeGrammarVariable(finalGrammar) + [
+		GrammarItem(r"(?=" + _regexprBaseName + r")", {"category": "expression"},
+		makeGrammarExpressionFragment(finalGrammar))
+	]
+
 
 def makeGrammarMethod() -> Grammar:
 	"""
@@ -233,6 +269,6 @@ class Parser(ParserBase):
 	def __init__(self, content: str) -> None:
 		super().__init__(content,
 			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarEnum() +
-			makeGrammarVariable() + makeGrammarMethod() +
-			makeGrammarNested(makeGrammarEnum() + makeGrammarVariable() + makeGrammarMethod()),
+			makeGrammarExpression() + makeGrammarMethod() +
+			makeGrammarNested(makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()),
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

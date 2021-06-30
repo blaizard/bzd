@@ -21,14 +21,3 @@ class Entity:
 		Human readable string representation of a result.
 		"""
 		return self.toString()
-
-
-def EntityFactory(isSymbol: bool) -> typing.Type[Entity]:
-
-	class Factory(Entity):
-
-		@property
-		def isSymbol(self) -> bool:
-			return isSymbol
-
-	return Factory

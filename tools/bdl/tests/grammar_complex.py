@@ -26,7 +26,7 @@ interface MyFy
 		expected = [{
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 0
 			},
 			'name': {
@@ -36,12 +36,16 @@ interface MyFy
 			'type': {
 			'v': 'Float',
 			'i': 11
+			}
 			},
+			'argument': [{
+			'@': {
 			'value': {
 			'v': '5.12',
 			'i': 17
 			}
 			}
+			}]
 		}, {
 			'@': {
 			'comment': {
@@ -49,7 +53,7 @@ interface MyFy
 			'i': 24
 			},
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 37
 			},
 			'name': {
@@ -91,7 +95,7 @@ interface MyFy
 		}, {
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 89
 			},
 			'name': {
@@ -101,12 +105,16 @@ interface MyFy
 			'type': {
 			'v': 'int32',
 			'i': 108
+			}
 			},
+			'argument': [{
+			'@': {
 			'value': {
 			'v': '42',
 			'i': 114
 			}
-			},
+			}
+			}],
 			'contract': [{
 			'@': {
 			'type': {
@@ -163,7 +171,7 @@ interface MyFy
 			'argument': [{
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 185
 			},
 			'name': {
@@ -195,7 +203,7 @@ interface MyFy
 			}, {
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 228
 			},
 			'name': {
@@ -210,7 +218,7 @@ interface MyFy
 			}, {
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 243
 			},
 			'name': {
@@ -237,7 +245,7 @@ interface MyFy
 			}, {
 			'@': {
 			'category': {
-			'v': 'variable',
+			'v': 'expression',
 			'i': 278
 			},
 			'name': {
@@ -247,12 +255,16 @@ interface MyFy
 			'type': {
 			'v': 'MyType',
 			'i': 295
+			}
 			},
+			'argument': [{
+			'@': {
 			'value': {
 			'v': '42',
 			'i': 302
 			}
 			}
+			}]
 			}]
 		}]
 
