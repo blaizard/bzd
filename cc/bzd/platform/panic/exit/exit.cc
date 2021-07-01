@@ -1,8 +1,9 @@
 #include "cc/bzd/platform/panic.h"
 
-#include <stdlib.h>
+#include <exception>
 
 void bzd::platform::panic()
 {
-	exit(42);
+	// Propagate a signal on POSIX which provoques a stack trace dump.
+	std::terminate();
 }

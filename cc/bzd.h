@@ -99,6 +99,7 @@
 // Utility
 #include "cc/bzd/utility/aligned_storage.h"
 #include "cc/bzd/utility/bit.h"
+#include "cc/bzd/utility/constexpr_for.h"
 #include "cc/bzd/utility/container_of.h"
 #include "cc/bzd/utility/format/format.h"
 #include "cc/bzd/utility/format/integral.h"

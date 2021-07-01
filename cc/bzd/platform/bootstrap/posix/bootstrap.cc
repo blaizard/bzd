@@ -248,7 +248,7 @@ void callStack() noexcept
 		{
 			bzd::StringChannel<1024> command;
 			bzd::format::toStream(command,
-								  CSTR("addr2line -f -e \"{}\" {:#x} {:#x}"),
+								  CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
 								  info.path.data(),
 								  reinterpret_cast<bzd::IntPtrType>(info.address),
 								  info.offset);

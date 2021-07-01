@@ -16,6 +16,7 @@ cc_library(
     name = "linux",
     hdrs = [
         "core.h",
+        "executor.h",
     ],
     linkopts = [
         "-lpthread",
@@ -24,6 +25,7 @@ cc_library(
         ":bdl",
         "//cc/bzd/container:optional",
         "//cc/bzd/platform/core:stack",
+        "//cc/bzd/utility:constexpr_for",
     ],
 )
 
@@ -32,7 +34,6 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
-    tags = ["manual"],
     deps = [
         ":linux",
         "//cc/bzd/core:async",

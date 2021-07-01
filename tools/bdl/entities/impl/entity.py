@@ -10,6 +10,10 @@ class Entity:
 		self.element = element
 
 	@property
+	def isName(self) -> bool:
+		return self.element.isAttr("name")
+
+	@property
 	def name(self) -> str:
 		return self.element.getAttr("name").value
 

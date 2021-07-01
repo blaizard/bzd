@@ -8,6 +8,7 @@ cc_library(
         ":align_up",
         ":aligned_storage",
         ":bit",
+        ":constexpr_for",
         ":container_of",
         ":forward",
         ":ignore",
@@ -64,6 +65,19 @@ cc_library(
         "bit.h",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "constexpr_for",
+    hdrs = [
+        "constexpr_for.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:decay",
+        "//cc/bzd/type_traits:integral_constant",
+    ],
 )
 
 cc_library(

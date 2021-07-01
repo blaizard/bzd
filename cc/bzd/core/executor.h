@@ -4,6 +4,8 @@
 #include "cc/bzd/core/promise.h"
 #include "cc/bzd/utility/ignore.h"
 
+#include <iostream>
+
 namespace bzd {
 class Executor
 {
@@ -47,20 +49,24 @@ private:
 	bzd::Optional<bzd::coroutine::impl::coroutine_handle<>> pop() noexcept
 	{
 		auto exectuable = queue_.back();
-		const auto result = queue_.pop(exectuable.valueMutable());
-		if (!result)
+		if (exectuable)
 		{
-			return bzd::nullopt;
+			const auto result = queue_.pop(exectuable.valueMutable());
+			if (result)
+			{
+				auto handle = bzd::coroutine::impl::coroutine_handle<bzd::Executor::Executable>::from_promise(exectuable.valueMutable());
+
+				// Show the stack usage
+				// void* stack = __builtin_frame_address(0);
+				// static void* initial_stack = &stack;
+				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
+				// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
+
+				return handle;
+			}
 		}
-		auto handle = bzd::coroutine::impl::coroutine_handle<bzd::Executor::Executable>::from_promise(exectuable.valueMutable());
 
-		// Show the stack usage
-		// void* stack = __builtin_frame_address(0);
-		// static void* initial_stack = &stack;
-		// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
-		// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
-
-		return handle;
+		return bzd::nullopt;
 	}
 
 private:

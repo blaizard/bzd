@@ -31,6 +31,10 @@ class Map(Visitor[MapType]):
 
 	def mapEntity(self, entity: SymbolType) -> None:
 
+		# Map an entity only if the name is available.
+		if not entity.isName:
+			return
+
 		# Build the symbol name and ensure it is unique
 		symbol = self.makeFQN(name=entity.name, namespace=self.namespace)
 		entity.assertTrue(condition=(symbol not in self.map),
