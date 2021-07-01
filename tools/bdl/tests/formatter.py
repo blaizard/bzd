@@ -15,10 +15,12 @@ class TestRun(unittest.TestCase):
   This is a multi-line comment
  */
 
+struct   ab {
 // Contracts
 defaultConstant = const int32 [min = -1 , max = 35 ];
 
 complex = int32<Int, List<T<A/*Variable A*/, B, C<45>>>>;
+}
 
 interface MyFy {
                  var     =MyType;
