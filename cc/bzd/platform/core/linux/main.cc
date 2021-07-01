@@ -3,6 +3,8 @@
 #include "cc/bzd/platform/core/linux/core.h"
 #include "cc/bzd/platform/core/linux/executor.h"
 
+#include "cc/bzd/platform/core/linux/pi.h"
+
 #include <iostream>
 
 // registry.h
@@ -106,7 +108,9 @@ int main()
 {
 	bzd::platform::core::Executor executor{registry.linux0, registry.linux1};
 
-	auto promise = task1();
+	//auto promise = task1();
+
+	auto promise = calculatePi<2>();
 	executor.enqueue(promise);
 
 	executor.start();

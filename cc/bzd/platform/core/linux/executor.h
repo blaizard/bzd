@@ -14,8 +14,8 @@ class Executor : public bzd::platform::Executor
 public:
 	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::Executor::run} {}
 
-	template <class Async>
-	constexpr void enqueue(Async& async) noexcept
+	template <class V, class E>
+	constexpr void enqueue(bzd::Async<V, E>& async) noexcept
 	{
 		async.enqueue(executor_);
 	}

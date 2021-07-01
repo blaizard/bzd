@@ -33,6 +33,7 @@ cc_binary(
     name = "main",
     srcs = [
         "main.cc",
+        "pi.h"
     ],
     deps = [
         ":linux",
