@@ -1,5 +1,7 @@
 #include "cc/bzd/core/delay.h"
+#include "cc/bzd/core/executor.h"
 #include "cc/bzd/platform/core/linux/core.h"
+#include "cc/bzd/platform/core/linux/executor.h"
 
 #include <iostream>
 
@@ -91,21 +93,45 @@ bzd::Async<void> task1() noexcept
 	}
 }
 
+/*
 void payload(bzd::core::Executor& executor)
 {
 	auto promise = task1();
 
 	executor.run(promise);
 }
+*/
 
 int main()
 {
+	bzd::platform::core::Executor executor{registry.linux0, registry.linux1};
+
+	auto promise = task1();
+	executor.enqueue(promise);
+
+	executor.start();
+
+	executor.stop();
+
+	/*
+		auto workload = [&executor]() { executor.run(); };
+		registry.linux0.start(static_cast<Callable>(workload));
+		registry.linux1.start(static_cast<Callable>(workload));
+
+		registry.linux1.stop();
+		registry.linux0.stop();
+	*/
+	std::cout << registry.linux0.getStackUsage() << std::endl;
+	std::cout << registry.linux1.getStackUsage() << std::endl;
+
+	// bzd::core::Executor
+
 	// Start all executors
 	// ....
 	// Assign workload to  executors based on their constraints
 	// ....
 
-	bzd::core::Executor executor{registry.linux1};
+	/*bzd::core::Executor executor{registry.linux1};
 
 	executor.start();
 
@@ -119,7 +145,7 @@ int main()
 
 	std::cout << registry.linux1.getStackUsage() << std::endl;
 
-	executor.stop();
+	executor.stop();*/
 
 	return 0;
 }

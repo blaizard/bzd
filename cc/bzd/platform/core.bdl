@@ -29,7 +29,7 @@ interface Core{
 
 interface Executor{
 	// Start the executor and starts all cores previously initialized.
-	method start(cores = List<Core>);
+	method start();
 	method stop();
 	
 }

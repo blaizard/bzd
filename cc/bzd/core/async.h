@@ -102,6 +102,16 @@ public:
 	constexpr void setExecutor(bzd::Executor& executor) noexcept { handle_.promise().executor_ = &executor; }
 
 	/**
+	 * Associate an executor to this async and push it to the queue.
+	 */
+	constexpr void enqueue(bzd::Executor& executor) noexcept
+	{
+		setExecutor(executor);
+		// Enqueue the async to the work queue of the executor
+		getExecutable().enqueue();
+	}
+
+	/**
 	 * Run the current async on a given executor.
 	 * This call will block until completion of the async.
 	 *
@@ -110,10 +120,8 @@ public:
 	 */
 	ResultType run(bzd::Executor& executor) noexcept
 	{
-		// Associate the executor with this async
-		setExecutor(executor);
-		// Enqueue the async to the work queue of the executor
-		getExecutable().enqueue();
+		// Associate the executor with this async and enqueue it.
+		enqueue(executor);
 
 		// Run the executor
 		executor.run();
