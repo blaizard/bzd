@@ -32,16 +32,16 @@ def _load_linux_x86_64_clang_9_0_0(name):
             "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "builtin_include_directories": [
-            "/usr/include/x86_64-linux-gnu",
-            "/usr/include",
             "include/c++/v1".format(package_name),
             "lib/clang/9.0.0/include".format(package_name),
-        ],
-        "system_directories": [
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
+        ],
+        "system_directories": [
             "external/{}/include/c++/v1".format(package_name),
             "external/{}/lib/clang/9.0.0/include".format(package_name),
+            "/usr/include/x86_64-linux-gnu",
+            "/usr/include",
         ],
         "linker_dirs": [
             "external/{}/lib".format(package_name),

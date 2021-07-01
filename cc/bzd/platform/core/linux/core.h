@@ -83,6 +83,25 @@ public:
 
 	StackSize getStackUsage() noexcept final { return stack_.estimateMaxUsage(); }
 
+	bzd::SizeType getUsage() noexcept
+	{
+        // Get the clock_id associated to the current thread.
+        clockid_t clockId;
+        pthread_getcpuclockid(thread_, &clockId);
+
+		struct timespec ts;
+		if (::clock_gettime(clockId, &ts))
+		{
+		}
+
+		const auto timeNano = ts.tv_sec * 1000000000 + ts.tv_nsec;
+		(void)timeNano;
+
+		// in percent
+		// use pthread_getcpuclockid
+		return 0;
+	}
+
 	CoreId getId() noexcept final { return id_; }
 
 private:
