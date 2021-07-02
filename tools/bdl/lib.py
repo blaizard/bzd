@@ -11,10 +11,10 @@ from tools.bdl.object import Object
 formatters = {"bdl": formatBdl, "cc": formatCc}
 
 
-def preprocess(path: Path, use_path: typing.Optional[typing.List[Path]] = None) -> Object:
+def preprocess(path: Path, **kwargs) -> Object:
 
 	# Parse the input file
-	return Object.fromPath(path=path, use_path=[] if use_path else use_path)
+	return Object.fromPath(path=path, **kwargs)
 
 
 def generate(formatType: str, bdl: Object) -> str:
@@ -25,7 +25,7 @@ def generate(formatType: str, bdl: Object) -> str:
 	return formatters[formatType](bdl=bdl)
 
 
-def main(formatType: str, path: Path, use_path: typing.Optional[typing.List[Path]] = None) -> str:
+def main(formatType: str, path: Path, **kwargs) -> str:
 
-	bdl = preprocess(path=path, use_path=[] if use_path else use_path)
+	bdl = preprocess(path=path, **kwargs)
 	return generate(formatType=formatType, bdl=bdl)

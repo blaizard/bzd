@@ -94,6 +94,4 @@ class Result(VisitorBase[ResultType]):
 		result.registerUse(entity=entity)
 		if self.isInclude:
 			# TODO: handle transitive inclusions.
-			self.bdl.registerUse(entity, "{}.o")
-			#bdl = Object.fromPath(entity.path)
-			#self.bdl.registerSymbols(bdl.symbols)
+			self.bdl.registerUse(entity)
