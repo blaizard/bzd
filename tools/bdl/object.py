@@ -18,11 +18,14 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: MapType, use_path: typing.List[Path] = []) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: MapType,
+			usePath: typing.Optional[typing.List[Path]] = None,
+			preprocessFormat: typing.Optional[str] = None) -> None:
 		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
-		self.use_path = use_path
+		self.usePath = [] if usePath is None else usePath
+		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
 		# Memoized buffer holding the elements, this is constructed while being used.
 		self.elements: typing.Dict[str, Element] = {}
 
@@ -95,15 +98,15 @@ class Object:
 			},
 			separators=(",", ":"))
 
-	def registerUse(self, entity: Use, preprocessFormat: str) -> None:
+	def registerUse(self, entity: Use) -> None:
 		"""
 		Update the content of this object with an existing one.
 		"""
 
-		preprocessPath = preprocessFormat.format(entity.path.as_posix())
-		for root in self.use_path:
+		preprocessPath = self.preprocessFormat.format(entity.path.as_posix())
+		for root in self.usePath:
 			if (root / preprocessPath).is_file():
-				bdl = Object.fromSerializePath(root / preprocessPath, use_path=self.use_path)
+				bdl = Object.fromSerializePath(root / preprocessPath)
 				self.registerSymbols(bdl.symbols)
 				return
 

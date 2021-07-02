@@ -42,15 +42,20 @@ class Map(Visitor[MapType]):
 
 		# Save the serialized payload and convert nested dependencies and make them links
 		element = entity.element
-		nested = element.getNestedSequence("nested")
-		if nested:
-			references = [
-				self.makeEntity(category="reference", attrs={"symbol": element.getAttr("name")}) for element in nested
-				if element.isAttr("name")
-			]
-			sequence = Sequence.fromSerialize(references)
-			element = element.copy(ignoreNested=["nested"])
-			element.setNestedSequence("nested", sequence)
+		if isinstance(entity, Nested):
+
+			preparedElement = element.copy(ignoreNested=["nested", "config", "composition"])
+			for category in ["nested", "config", "composition"]:
+				nested = element.getNestedSequence(category)
+				if nested:
+					references = [
+						self.makeEntity(category="reference", attrs={"symbol": element.getAttr("name")}) for element in nested
+						if element.isAttr("name")
+					]
+					sequence = Sequence.fromSerialize(references)
+					preparedElement.setNestedSequence(category, sequence)
+
+			element = preparedElement
 
 		payload = element.serialize()
 		self.map[symbol] = payload
