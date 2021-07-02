@@ -30,36 +30,48 @@ def _bzd_manifest_impl(ctx):
     }
 
     # Input bdl files
-    bdl_deps = depset(ctx.files.srcs, transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps])
+    bdl_deps = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps]).to_list()
+
+    # Output files
+    bdl_objects = []
 
     # Generated outputs
     generated = {fmt: [] for fmt in formats.keys()}
 
-    # Computet each input file independently
+    # Compute each input file independently
     for input_file in ctx.files.srcs:
         # Build the relative path of the input file from the BUILD file
         build_root_path = ctx.build_file_path.rsplit("/", 1)[0] + "/"
         relative_name = input_file.path.replace(build_root_path, "").replace(".bdl", "")
 
         # Preprocess the files here
-        bdl_object = ctx.actions.declare_file("{}.bld.o".format(relative_name))
+        output = ctx.actions.declare_file("{}.bdl.o".format(relative_name))
         ctx.actions.run(
-            inputs = ctx.files.srcs + bdl_deps.to_list(),
-            outputs = [bdl_object],
+            inputs = ctx.files.srcs + bdl_deps,
+            outputs = [output],
             progress_message = "Preprocess BDL manifest {}".format(input_file.short_path),
-            arguments = ["--stage", "preprocess", "--output", bdl_object.path, input_file.path],
+            arguments = ["--stage", "preprocess", "--output", output.path, input_file.path],
             executable = ctx.attr._bdl.files_to_run,
         )
+        bdl_objects.append({
+            "output": output,
+            "input": input_file,
+            "relative_name": relative_name,
+        })
 
+    # Combine the output with the exsitng deps
+    bdl_deps += [bdl["output"] for bdl in bdl_objects]
+
+    # Generate the format specific outputs
+    for bdl_object in bdl_objects:
         for fmt, data in formats.items():
             # Generate the output
-            outputs = [ctx.actions.declare_file(output.format(relative_name)) for output in data["outputs"]]
-
+            outputs = [ctx.actions.declare_file(output.format(bdl_object["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(
-                inputs = [bdl_object] + bdl_deps.to_list(),
+                inputs = bdl_deps,
                 outputs = outputs,
-                progress_message = "Generating {} build files from manifest {}".format(data["display"], input_file.short_path),
-                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, bdl_object.path],
+                progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl_object["input"].short_path),
+                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--use_path", ctx.bin_dir.path, bdl_object["output"].path],
                 executable = ctx.attr._bdl.files_to_run,
             )
 
@@ -71,7 +83,7 @@ def _bzd_manifest_impl(ctx):
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
 
     return [
-        BdlProvider(outputs = bdl_deps),
+        BdlProvider(outputs = depset(bdl_deps)),
         cc_info_providers,
     ]
 

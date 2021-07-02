@@ -1,15 +1,7 @@
 {
     "patterns": [
         {
-            "match": "struct",
-            "name": "storage.type.class"
-        },
-        {
-            "match": "interface",
-            "name": "storage.type.class"
-        },
-        {
-            "match": "component",
+            "match": "(struct|interface|component|composition)",
             "name": "storage.type.class"
         },
         {

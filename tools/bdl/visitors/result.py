@@ -73,6 +73,7 @@ class Result(VisitorBase[ResultType]):
 
 	def visitExpression(self, entity: Expression, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
+		self.resolveTypeIfAny(entity=entity.type)
 
 	def visitMethod(self, entity: Method, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
@@ -92,5 +93,7 @@ class Result(VisitorBase[ResultType]):
 	def visitUse(self, entity: Use, result: ResultType) -> None:
 		result.registerUse(entity=entity)
 		if self.isInclude:
-			bdl = Object.fromPath(entity.path)
-			self.bdl.registerSymbols(bdl.symbols)
+			# TODO: handle transitive inclusions.
+			self.bdl.registerUse(entity, "{}.o")
+			#bdl = Object.fromPath(entity.path)
+			#self.bdl.registerSymbols(bdl.symbols)

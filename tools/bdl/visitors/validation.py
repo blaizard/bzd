@@ -17,3 +17,15 @@ class Validation(VisitorBase[None]):
 		if entity.type == "interface":
 			entity.assertTrue(condition=not entity.hasInheritance, message="Interfaces cannot have inheritance.")
 			entity.assertTrue(condition=entity.isName, message="Interfaces must have a valid name.")
+
+		elif entity.type == "struct":
+			entity.assertTrue(condition=entity.isName, message="Structures must have a valid name.")
+
+		elif entity.type == "component":
+			entity.assertTrue(condition=entity.isName, message="Components must have a valid name.")
+
+		elif entity.type == "composition":
+			entity.assertTrue(condition=not entity.hasInheritance, message="Compositions cannot have inheritance.")
+
+		else:
+			entity.assertTrue(condition=False, message="Unsupported nested type: '{}'.".format(entity.type))

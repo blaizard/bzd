@@ -22,7 +22,7 @@ class Parent:
 	@property
 	def namespace(self) -> typing.List[str]:
 		if isinstance(self.entity, Nested):
-			return [self.entity.name]
+			return [self.entity.name] if self.entity.isName else []
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
 

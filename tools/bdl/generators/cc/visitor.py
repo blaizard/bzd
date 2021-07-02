@@ -92,9 +92,11 @@ def _bdlPathToHeader(path: Path) -> str:
 def formatCc(bdl: Object) -> str:
 
 	# Process the result
-	result = Result(bdl=bdl, resolve=True, include=True).process()
+	visitor = Result(bdl=bdl, resolve=True, include=True)
+	result = visitor.process()
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
+
 	result.update({
 		"camelCase": _toCamelCase,
 		"typeToStr": _typeToStr,
@@ -103,5 +105,8 @@ def formatCc(bdl: Object) -> str:
 		"inheritanceToStr": _inheritanceToStr,
 		"bdlPathToHeader": _bdlPathToHeader
 	})
+
+	visitor.bdl.printSymbols()
+
 	output = template.render(result)  # type: ignore
 	return output

@@ -27,7 +27,6 @@ class Nested(Entity):
 
 		super().__init__(element)
 
-		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasAttr(element=element, attr="type")
 
 		self.nestedCategories: typing.Dict[str, typing.Any] = {}
@@ -80,7 +79,7 @@ class Nested(Entity):
 
 	def __repr__(self) -> str:
 		content = self.toString({
-			"name": self.name,
+			"name": self.name if self.isName else "",
 			"type": self.type,
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
