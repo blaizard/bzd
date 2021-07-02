@@ -14,6 +14,11 @@ git:
 
 jobs:
   include:
+    - name: info
+      script:
+      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+      - ./info.sh
+
     - name: linux_x86_64_clang Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
