@@ -55,8 +55,7 @@ export default {
 					promises.push(
 						(async () => {
 							const result = await this.get("github.jobs", item.jobs_url, username, token);
-							if ("status" in result)
-							{
+							if ("status" in result) {
 								builds.push(result);
 							}
 						})()
@@ -74,8 +73,7 @@ export default {
 				const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
 
 				// Filter out empty jobs
-				if (resultJobs.jobs.length == 0)
-				{
+				if (resultJobs.jobs.length == 0) {
 					return {};
 				}
 

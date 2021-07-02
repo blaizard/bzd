@@ -37,10 +37,21 @@ class ResultType:
 		"""
 		self.ext.update(ext)
 
+	def registerComposition(self, entity: SymbolType) -> None:
+		"""
+		Register a composition element.
+		"""
+
+		pass
+
 	def registerSymbol(self, entity: SymbolType) -> None:
 		"""
 		Register a symbol to the result type.
 		"""
+
+		# Register a symbol only if it has a symbol
+		if not entity.isName:
+			return
 
 		entity.assertTrue(condition=entity.name not in self.symbolSet,
 			message="Conflicting symbol '{}', already defined earlier.".format(entity.name))

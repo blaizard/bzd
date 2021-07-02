@@ -10,6 +10,7 @@ from tools.bdl.grammar import Parser
 from tools.bdl.visitors.map import Map, MapType
 from tools.bdl.visitors.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.use import Use
 
 
 class Object:
@@ -17,14 +18,16 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: MapType) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: MapType, use_path: typing.List[Path] = []) -> None:
 		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
+		self.use_path = use_path
+		# Memoized buffer holding the elements, this is constructed while being used.
 		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
-	def _makeObject(parser: BaseParser) -> "Object":
+	def _makeObject(parser: BaseParser, **kwargs: typing.Any) -> "Object":
 		"""
 		Helper to make an opbject from a parser.
 		"""
@@ -36,30 +39,38 @@ class Object:
 		# Generate the symbol map
 		symbols = Map().visit(data)
 
-		return Object(context=parser.context, parsed=data, symbols=symbols)
+		return Object(context=parser.context, parsed=data, symbols=symbols, **kwargs)
 
 	@staticmethod
-	def fromContent(content: str) -> "Object":
+	def fromContent(content: str, **kwargs: typing.Any) -> "Object":
 		"""
 		Make an object from a the content of a bdl file.
 		This is mainly used for testing purpose.
 		"""
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser)
+		return Object._makeObject(parser=parser, **kwargs)
 
 	@staticmethod
-	def fromPath(path: Path) -> "Object":
+	def fromSerializePath(path: Path, **kwargs: typing.Any) -> "Object":
+		"""
+		From a serialized object.
+		"""
+
+		bdl = path.read_text(encoding="ascii")
+		return Object.fromSerialize(str(bdl), **kwargs)
+
+	@staticmethod
+	def fromPath(path: Path, **kwargs: typing.Any) -> "Object":
 		"""
 		Make an object from a bdl path file.
 		"""
-
 		# Parse the input file
 		parser = Parser.fromPath(path)
-		return Object._makeObject(parser=parser)
+		return Object._makeObject(parser=parser, **kwargs)
 
 	@staticmethod
-	def fromSerialize(data: str) -> "Object":
+	def fromSerialize(data: str, **kwargs: typing.Any) -> "Object":
 		"""
 		Make an object from a serialized payload.
 		"""
@@ -68,7 +79,8 @@ class Object:
 		context = Context.fromSerialize(payload["context"])
 		return Object(context=context,
 			parsed=Sequence.fromSerialize(payload["parsed"], context),
-			symbols=payload["symbols"])
+			symbols=payload["symbols"],
+			**kwargs)
 
 	def serialize(self) -> str:
 		"""
@@ -82,6 +94,20 @@ class Object:
 			"symbols": self.symbols
 			},
 			separators=(",", ":"))
+
+	def registerUse(self, entity: Use, preprocessFormat: str) -> None:
+		"""
+		Update the content of this object with an existing one.
+		"""
+
+		preprocessPath = preprocessFormat.format(entity.path.as_posix())
+		for root in self.use_path:
+			if (root / preprocessPath).is_file():
+				bdl = Object.fromSerializePath(root / preprocessPath, use_path=self.use_path)
+				self.registerSymbols(bdl.symbols)
+				return
+
+		entity.assertTrue(condition=False, message="Cannot find path: '{}'.".format(entity.path))
 
 	def registerSymbols(self, symbols: MapType) -> None:
 		"""
@@ -106,7 +132,7 @@ class Object:
 
 	def getElementFromName(self, name: str, namespace: typing.List[str]) -> typing.Optional[Element]:
 
-		# Look for a symbol match
+		# Look for a symbol matchparsed
 		namespace = namespace.copy()
 		while True:
 			fqn = Map.makeFQN(name=name, namespace=namespace)
@@ -124,3 +150,10 @@ class Object:
 		if entity.isFQN:
 			return self.getElement(fqn=entity.kind)
 		return self.getElementFromName(name=entity.kind, namespace=namespace)
+
+	def printSymbols(self) -> None:
+		"""
+		Print the symbol map.
+		"""
+		for symbol, data in self.symbols.items():
+			print("{}".format(symbol))

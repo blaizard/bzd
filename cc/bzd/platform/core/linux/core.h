@@ -13,16 +13,16 @@
 #include <sched.h>
 #include <unistd.h>
 
-namespace bzd::platform::core {
+namespace bzd::platform::linux {
 
 template <SizeType N>
-class Linux : public bzd::platform::core::impl::Linux
+class Core : public bzd::platform::linux::impl::Core
 {
 private:
-	using Self = Linux<N>;
+	using Self = Core<N>;
 
 public:
-	explicit Linux(const CoreId coreId) noexcept : id_{coreId} {}
+	explicit Core(const CoreId coreId) noexcept : id_{coreId} {}
 
 	Result<void, Error> stop() noexcept final
 	{
@@ -83,11 +83,11 @@ public:
 
 	StackSize getStackUsage() noexcept final { return stack_.estimateMaxUsage(); }
 
-	bzd::SizeType getUsage() noexcept
+	bzd::SizeType startUsageMonitoring() noexcept
 	{
-        // Get the clock_id associated to the current thread.
-        clockid_t clockId;
-        pthread_getcpuclockid(thread_, &clockId);
+		// Get the clock_id associated to the current thread.
+		clockid_t clockId;
+		pthread_getcpuclockid(thread_, &clockId);
 
 		struct timespec ts;
 		if (::clock_gettime(clockId, &ts))
@@ -101,6 +101,8 @@ public:
 		// use pthread_getcpuclockid
 		return 0;
 	}
+
+	void getUsage() noexcept {}
 
 	CoreId getId() noexcept final { return id_; }
 
@@ -132,4 +134,4 @@ private:
 	pthread_t thread_;
 };
 
-} // namespace bzd::platform::core
+} // namespace bzd::platform::linux

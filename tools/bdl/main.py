@@ -9,6 +9,10 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")
 	parser.add_argument("-o", "--output", default=None, type=Path, help="Output path of generated file.")
 	parser.add_argument("--format", default="bdl", type=str, choices=formatters.keys(), help="Formatting type.")
+	parser.add_argument("--use_path",
+		action='append',
+		type=Path,
+		help="Path to be used as a root directory to ssearch for included files.")
 	parser.add_argument("--stage",
 		choices=["preprocess", "generate"],
 		help="Only perform a specific stage of the full process.")
@@ -18,16 +22,16 @@ if __name__ == "__main__":
 
 	if config.stage == "preprocess":
 
-		bdl = preprocess(path=config.input)
+		bdl = preprocess(path=config.input, use_path=config.use_path)
 		output = bdl.serialize()
 
 	elif config.stage == "generate":
 
-		bdl = config.input.read_text(encoding="ascii")
-		output = generate(formatType=config.format, bdl=Object.fromSerialize(str(bdl)))
+		output = generate(formatType=config.format,
+			bdl=Object.fromSerializePath(config.input, use_path=config.use_path))
 
 	else:
-		output = main(formatType=config.format, path=config.input)
+		output = main(formatType=config.format, path=config.input, use_path=config.use_path)
 
 	if config.output is None:
 		print(output)

@@ -14,17 +14,26 @@ class Executor : public bzd::platform::Executor
 public:
 	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::Executor::run} {}
 
+	/**
+	 * Assign a workload to this executor.
+	 */
 	template <class V, class E>
 	constexpr void enqueue(bzd::Async<V, E>& async) noexcept
 	{
 		async.enqueue(executor_);
 	}
 
+	/**
+	 * Start the executor.
+	 */
 	void start() noexcept override
 	{
 		constexprForContainerInc(cores_, [&](auto item) { item->start(start_); });
 	}
 
+	/**
+	 * Stop the executor.
+	 */
 	void stop() noexcept override
 	{
 		constexprForContainerDec(cores_, [&](auto item) { item->stop(); });

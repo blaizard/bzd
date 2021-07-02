@@ -5,6 +5,7 @@ bzd_manifest(
     name = "bdl",
     srcs = [
         "linux.bdl",
+        "main.bdl",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -33,7 +34,7 @@ cc_binary(
     name = "main",
     srcs = [
         "main.cc",
-        "pi.h"
+        "pi.h",
     ],
     deps = [
         ":linux",
