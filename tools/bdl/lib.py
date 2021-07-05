@@ -6,15 +6,15 @@ from bzd.parser.error import Error
 from tools.bdl.generators.bdl.visitor import formatBdl
 from tools.bdl.generators.cc.visitor import formatCc
 from tools.bdl.visitors.result import Result
-from tools.bdl.object import Object
+from tools.bdl.object import Object, ObjectContext
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
 
 
-def preprocess(path: Path, **kwargs) -> Object:
+def preprocess(path: Path, objectContext: ObjectContext) -> Object:
 
-	# Parse the input file
-	return Object.fromPath(path=path, **kwargs)
+	# Preprocess the object
+	return Object.fromPath(path=path, objectContext=objectContext)
 
 
 def generate(formatType: str, bdl: Object) -> str:
@@ -25,7 +25,7 @@ def generate(formatType: str, bdl: Object) -> str:
 	return formatters[formatType](bdl=bdl)
 
 
-def main(formatType: str, path: Path, **kwargs) -> str:
+def main(formatType: str, path: Path, objectContext: ObjectContext) -> str:
 
-	bdl = preprocess(path=path, **kwargs)
+	bdl = preprocess(path=path, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl)

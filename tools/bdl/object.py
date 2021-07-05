@@ -7,34 +7,103 @@ from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
+from tools.bdl.visitors.preprocess import Preprocess
 from tools.bdl.visitors.map import Map, MapType
 from tools.bdl.visitors.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.use import Use
 
+import os
+
+class ObjectContext:
+
+	def __init__(self,
+			root: Path = Path(),
+			usePath: typing.Optional[typing.List[Path]] = None,
+			preprocessFormat: typing.Optional[str] = None) -> None:
+
+		self.root = root
+		self.usePath = [] if usePath is None else usePath
+		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
+		self.dependencies: typing.List[Path] = []
+
+	def pushDependency(self, path: Path) -> None:
+		"""
+		Push a dependency for this object.
+		"""
+		# Check for circular dependencies
+		if path in self.dependencies:
+			raise Exception("Circular dependency detected:\n{}".format("\n".join(self.dependencies)))
+		self.dependencies.append(path)
+
+	def popDependency(self) -> None:
+		"""
+		Pop last dependency.
+		"""
+		self.dependencies.pop()
+
+	def getPreprocessedPath(self, path: Path) -> Path:
+		"""
+		Return the preprocessed path from a BDL path.
+		"""
+		return self.root / Path(self.preprocessFormat.format(path.as_posix()))
+
+	def isPreprocessed(self, path: Path) -> bool:
+		"""
+		Check if a BDL file has a preprocessed counter-part.
+		"""
+
+		preprocessed = self.getPreprocessedPath(path=path)
+		if preprocessed.is_file():
+			return True
+		return False
+
+	def savePreprocess(self, path: Path, object: "Object") -> None:
+		"""
+		Save the serialized content of preprocessed object.
+		"""
+
+		content = object.serialize()
+		self.getPreprocessedPath(path=path).write_text(content, encoding="ascii")
+
+	def loadPreprocess(self, path: Path) -> "Object":
+		"""
+		Read a serialized preprocessed file and return it.
+		"""
+
+		preprocessedPath = self.getPreprocessedPath(path=path)
+		bdl = preprocessedPath.read_text(encoding="ascii")
+		return Object.fromSerialize(str(bdl), objectContext=self)
+
+	def preprocess(self, path: Path) -> None:
+		"""
+		Preprocess a file.
+		"""
+
+		Object.fromPath(path=path, objectContext=self)
 
 class Object:
 	"""
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: MapType,
-			usePath: typing.Optional[typing.List[Path]] = None,
-			preprocessFormat: typing.Optional[str] = None) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: MapType, objectContext: ObjectContext) -> None:
 		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
-		self.usePath = [] if usePath is None else usePath
-		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
+		self.objectContext = objectContext
 		# Memoized buffer holding the elements, this is constructed while being used.
 		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
-	def _makeObject(parser: BaseParser, **kwargs: typing.Any) -> "Object":
+	def _makeObject(parser: BaseParser, objectContext: ObjectContext) -> "Object":
 		"""
-		Helper to make an opbject from a parser.
+		Helper to make an object from a parser.
 		"""
 		data = parser.parse()
+
+		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
+		Preprocess(objectContext=objectContext).visit(data)
 
 		# Validation step
 		Validation().visit(data)
@@ -42,38 +111,49 @@ class Object:
 		# Generate the symbol map
 		symbols = Map().visit(data)
 
-		return Object(context=parser.context, parsed=data, symbols=symbols, **kwargs)
+		return Object(context=parser.context, parsed=data, symbols=symbols, objectContext=objectContext)
 
 	@staticmethod
-	def fromContent(content: str, **kwargs: typing.Any) -> "Object":
+	def fromContent(content: str, objectContext: ObjectContext) -> "Object":
 		"""
 		Make an object from a the content of a bdl file.
 		This is mainly used for testing purpose.
 		"""
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser, **kwargs)
+		return Object._makeObject(parser=parser, objectContext=objectContext)
 
 	@staticmethod
-	def fromSerializePath(path: Path, **kwargs: typing.Any) -> "Object":
+	def fromSerializePath(path: Path, objectContext: ObjectContext) -> "Object":
 		"""
 		From a serialized object.
 		"""
 
 		bdl = path.read_text(encoding="ascii")
-		return Object.fromSerialize(str(bdl), **kwargs)
+		return Object.fromSerialize(str(bdl), objectContext=objectContext)
 
 	@staticmethod
-	def fromPath(path: Path, **kwargs: typing.Any) -> "Object":
+	def fromPath(path: Path, objectContext: ObjectContext) -> "Object":
 		"""
-		Make an object from a bdl path file.
+		Make an object from a bdl path file and save its output.
 		"""
-		# Parse the input file
+		# Push current dependency
+		objectContext.pushDependency(path)
+
+		# Parse the input file.
 		parser = Parser.fromPath(path)
-		return Object._makeObject(parser=parser, **kwargs)
+		bdl = Object._makeObject(parser=parser, objectContext=objectContext)
+
+		# Save the preprocessed payload to a file.
+		objectContext.savePreprocess(path=path, object=bdl)
+
+		# Pop dependency
+		objectContext.popDependency()
+
+		return bdl
 
 	@staticmethod
-	def fromSerialize(data: str, **kwargs: typing.Any) -> "Object":
+	def fromSerialize(data: str, objectContext: ObjectContext) -> "Object":
 		"""
 		Make an object from a serialized payload.
 		"""
@@ -83,7 +163,7 @@ class Object:
 		return Object(context=context,
 			parsed=Sequence.fromSerialize(payload["parsed"], context),
 			symbols=payload["symbols"],
-			**kwargs)
+			objectContext = objectContext)
 
 	def serialize(self) -> str:
 		"""
@@ -103,6 +183,11 @@ class Object:
 		Update the content of this object with an existing one.
 		"""
 
+		entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path), message="Cannot find preprocessed entity for '{}'.".format(entity.path))
+
+		bdl = self.objectContext.loadPreprocess(path=entity.path)
+		self.registerSymbols(bdl.symbols)
+		"""
 		preprocessPath = self.preprocessFormat.format(entity.path.as_posix())
 		for root in self.usePath:
 			if (root / preprocessPath).is_file():
@@ -111,6 +196,7 @@ class Object:
 				return
 
 		entity.assertTrue(condition=False, message="Cannot find path: '{}'.".format(entity.path))
+		"""
 
 	def registerSymbols(self, symbols: MapType) -> None:
 		"""

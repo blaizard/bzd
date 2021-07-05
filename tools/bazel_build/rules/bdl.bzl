@@ -29,6 +29,8 @@ def _bzd_manifest_impl(ctx):
         },
     }
 
+    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
+
     # Input bdl files
     bdl_deps = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps]).to_list()
 
@@ -37,6 +39,9 @@ def _bzd_manifest_impl(ctx):
 
     # Generated outputs
     generated = {fmt: [] for fmt in formats.keys()}
+
+    print(ctx.bin_dir.path)
+    print(ctx.genfiles_dir.path)
 
     # Compute each input file independently
     for input_file in ctx.files.srcs:
@@ -50,7 +55,7 @@ def _bzd_manifest_impl(ctx):
             inputs = ctx.files.srcs + bdl_deps,
             outputs = [output],
             progress_message = "Preprocess BDL manifest {}".format(input_file.short_path),
-            arguments = ["--stage", "preprocess", "--output", output.path, input_file.path],
+            arguments = ["--stage", "preprocess", "--preprocess-format", _PREPROCESS_FORMAT, "--output", output.path, input_file.path],
             executable = ctx.attr._bdl.files_to_run,
         )
         bdl_objects.append({
@@ -71,7 +76,7 @@ def _bzd_manifest_impl(ctx):
                 inputs = bdl_deps,
                 outputs = outputs,
                 progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl_object["input"].short_path),
-                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--preprocess-format", "{}.o", "--use-path", ctx.bin_dir.path, bdl_object["output"].path],
+                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--preprocess-format", _PREPROCESS_FORMAT, "--use-path", ctx.bin_dir.path, bdl_object["output"].path],
                 executable = ctx.attr._bdl.files_to_run,
             )
 
