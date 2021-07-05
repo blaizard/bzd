@@ -17,9 +17,12 @@ class Entity:
 	def name(self) -> str:
 		return self.element.getAttr("name").value
 
+	def error(self, message: str) -> None:
+		Error.handleFromElement(element=self.element, message=message)
+
 	def assertTrue(self, condition: bool, message: str) -> None:
 		if not condition:
-			Error.handleFromElement(element=self.element, message=message)
+			self.error(message=message)
 
 	def toString(self, attrs: typing.MutableMapping[str, str] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
