@@ -4,7 +4,7 @@ from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.entities.all import Use
 
 
-class Preprocess(VisitorBase[None]):
+class ProcessInclusions(VisitorBase[None]):
 	"""
 	Preprocess stage, look for all inclusion and make pre-process them.
 	"""

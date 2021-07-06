@@ -7,7 +7,7 @@ from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
-from tools.bdl.visitors.preprocess import Preprocess
+from tools.bdl.visitors.process_inclusions import ProcessInclusions
 from tools.bdl.visitors.map import Map, MapType
 from tools.bdl.visitors.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
@@ -123,7 +123,7 @@ class Object:
 
 		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
 		if includeDeps:
-			Preprocess(objectContext=objectContext).visit(data)
+			ProcessInclusions(objectContext=objectContext).visit(data)
 
 		# Validation step
 		Validation().visit(data)
