@@ -11,10 +11,14 @@ from tools.bdl.object import Object, ObjectContext
 formatters = {"bdl": formatBdl, "cc": formatCc}
 
 
-def preprocess(path: Path, objectContext: ObjectContext) -> Object:
+def preprocess(path: Path, objectContext: typing.Optional[ObjectContext] = None) -> Object:
+
+	includeDeps = objectContext is not None
+	objectContext = objectContext if includeDeps else ObjectContext()
 
 	# Preprocess the object
-	return Object.fromPath(path=path, objectContext=objectContext)
+	assert objectContext
+	return objectContext.preprocess(path=path, includeDeps=includeDeps)
 
 
 def generate(formatType: str, bdl: Object) -> str:
@@ -25,7 +29,7 @@ def generate(formatType: str, bdl: Object) -> str:
 	return formatters[formatType](bdl=bdl)
 
 
-def main(formatType: str, path: Path, objectContext: ObjectContext) -> str:
+def main(formatType: str, path: Path, objectContext: typing.Optional[ObjectContext] = None) -> str:
 
 	bdl = preprocess(path=path, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl)

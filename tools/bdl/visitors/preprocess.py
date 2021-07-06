@@ -1,3 +1,5 @@
+import typing
+
 from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.entities.all import Use
 
@@ -7,7 +9,7 @@ class Preprocess(VisitorBase[None]):
 	Preprocess stage, look for all inclusion and make pre-process them.
 	"""
 
-	def __init__(self, objectContext) -> None:
+	def __init__(self, objectContext: typing.Any) -> None:
 		super().__init__()
 		self.objectContext = objectContext
 

@@ -13,14 +13,13 @@ from tools.bdl.visitors.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.use import Use
 
-import os
 
 class ObjectContext:
 
 	def __init__(self,
-			root: Path = Path(),
-			usePath: typing.Optional[typing.List[Path]] = None,
-			preprocessFormat: typing.Optional[str] = None) -> None:
+		root: Path = Path(),
+		usePath: typing.Optional[typing.List[Path]] = None,
+		preprocessFormat: typing.Optional[str] = None) -> None:
 
 		self.root = root
 		self.usePath = [] if usePath is None else usePath
@@ -33,7 +32,8 @@ class ObjectContext:
 		"""
 		# Check for circular dependencies
 		if path in self.dependencies:
-			raise Exception("Circular dependency detected:\n{}".format("\n".join(self.dependencies)))
+			raise Exception("Circular dependency detected:\n{}".format("\n".join(
+				[f.as_posix() for f in self.dependencies])))
 		self.dependencies.append(path)
 
 	def popDependency(self) -> None:
@@ -75,12 +75,31 @@ class ObjectContext:
 		bdl = preprocessedPath.read_text(encoding="ascii")
 		return Object.fromSerialize(str(bdl), objectContext=self)
 
-	def preprocess(self, path: Path) -> None:
+	def preprocess(self, path: Path, includeDeps: bool = True) -> "Object":
 		"""
-		Preprocess a file.
+		Preprocess a bdl file and save its output, or use the preprocessed file if present.
 		"""
 
-		Object.fromPath(path=path, objectContext=self)
+		if self.isPreprocessed(path=path):
+			return self.loadPreprocess(path=path)
+
+		# Push current dependency
+		self.pushDependency(path)
+
+		# Parse the input file.
+		parser = Parser.fromPath(path)
+		bdl = Object._makeObject(parser=parser, objectContext=self, includeDeps=includeDeps)
+
+		# Save the preprocessed payload to a file.
+		# Do not save when ignoring dependencies, as this creates un-complete views.
+		if includeDeps:
+			self.savePreprocess(path=path, object=bdl)
+
+		# Pop dependency
+		self.popDependency()
+
+		return bdl
+
 
 class Object:
 	"""
@@ -96,14 +115,15 @@ class Object:
 		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
-	def _makeObject(parser: BaseParser, objectContext: ObjectContext) -> "Object":
+	def _makeObject(parser: BaseParser, objectContext: ObjectContext, includeDeps: bool) -> "Object":
 		"""
 		Helper to make an object from a parser.
 		"""
 		data = parser.parse()
 
 		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
-		Preprocess(objectContext=objectContext).visit(data)
+		if includeDeps:
+			Preprocess(objectContext=objectContext).visit(data)
 
 		# Validation step
 		Validation().visit(data)
@@ -114,43 +134,16 @@ class Object:
 		return Object(context=parser.context, parsed=data, symbols=symbols, objectContext=objectContext)
 
 	@staticmethod
-	def fromContent(content: str, objectContext: ObjectContext) -> "Object":
+	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
 		"""
 		Make an object from a the content of a bdl file.
 		This is mainly used for testing purpose.
 		"""
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser, objectContext=objectContext)
-
-	@staticmethod
-	def fromSerializePath(path: Path, objectContext: ObjectContext) -> "Object":
-		"""
-		From a serialized object.
-		"""
-
-		bdl = path.read_text(encoding="ascii")
-		return Object.fromSerialize(str(bdl), objectContext=objectContext)
-
-	@staticmethod
-	def fromPath(path: Path, objectContext: ObjectContext) -> "Object":
-		"""
-		Make an object from a bdl path file and save its output.
-		"""
-		# Push current dependency
-		objectContext.pushDependency(path)
-
-		# Parse the input file.
-		parser = Parser.fromPath(path)
-		bdl = Object._makeObject(parser=parser, objectContext=objectContext)
-
-		# Save the preprocessed payload to a file.
-		objectContext.savePreprocess(path=path, object=bdl)
-
-		# Pop dependency
-		objectContext.popDependency()
-
-		return bdl
+		return Object._makeObject(parser=parser,
+			objectContext=ObjectContext() if objectContext is None else objectContext,
+			includeDeps=objectContext is not None)
 
 	@staticmethod
 	def fromSerialize(data: str, objectContext: ObjectContext) -> "Object":
@@ -163,7 +156,7 @@ class Object:
 		return Object(context=context,
 			parsed=Sequence.fromSerialize(payload["parsed"], context),
 			symbols=payload["symbols"],
-			objectContext = objectContext)
+			objectContext=objectContext)
 
 	def serialize(self) -> str:
 		"""
@@ -183,20 +176,11 @@ class Object:
 		Update the content of this object with an existing one.
 		"""
 
-		entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path), message="Cannot find preprocessed entity for '{}'.".format(entity.path))
+		entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path),
+			message="Cannot find preprocessed entity for '{}'.".format(entity.path))
 
 		bdl = self.objectContext.loadPreprocess(path=entity.path)
 		self.registerSymbols(bdl.symbols)
-		"""
-		preprocessPath = self.preprocessFormat.format(entity.path.as_posix())
-		for root in self.usePath:
-			if (root / preprocessPath).is_file():
-				bdl = Object.fromSerializePath(root / preprocessPath)
-				self.registerSymbols(bdl.symbols)
-				return
-
-		entity.assertTrue(condition=False, message="Cannot find path: '{}'.".format(entity.path))
-		"""
 
 	def registerSymbols(self, symbols: MapType) -> None:
 		"""

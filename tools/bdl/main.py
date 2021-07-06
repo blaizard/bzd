@@ -13,38 +13,38 @@ if __name__ == "__main__":
 		action="append",
 		type=Path,
 		help="Path to be used as a root directory to ssearch for included files.")
-	parser.add_argument("--root",
-		type=Path,
-		default=Path(),
-		help="Root directory to be used for inclusions.")
-	parser.add_argument("--preprocess-format", default=None, type=str, help="This is how is named a preprocessed file, used for auto-discovering preprocessed files instead of re-generating them.")
+	parser.add_argument("--root", type=Path, default=Path(), help="Root directory to be used for inclusions.")
+	parser.add_argument("--preprocess-format",
+		default=None,
+		type=str,
+		help=
+		"This is how is named a preprocessed file, used for auto-discovering preprocessed files instead of re-generating them."
+						)
 	parser.add_argument("--stage",
 		choices=["preprocess", "generate"],
 		help="Only perform a specific stage of the full process.")
-	parser.add_argument("input", type=Path, help="Input file to be passed to the parser.")
+	parser.add_argument("inputs", type=Path, nargs="+", help="Input file to be passed to the parser.")
 
 	config = parser.parse_args()
 
-	objectContext = ObjectContext(
-		root = config.root,
-		usePath = config.use_path,
-		preprocessFormat = config.preprocess_format
-	)
+	objectContext = ObjectContext(root=config.root, usePath=config.use_path, preprocessFormat=config.preprocess_format)
 
-	if config.stage == "preprocess":
+	for inputPath in config.inputs:
 
-		preprocess(path=config.input, objectContext=objectContext)
+		if config.stage == "preprocess":
 
-	else:
-		if config.stage == "generate":
-
-			output = generate(formatType=config.format,
-				bdl=Object.fromSerializePath(config.input, objectContext=objectContext))
+			preprocess(path=inputPath, objectContext=objectContext)
 
 		else:
-			output = main(formatType=config.format, path=config.input, objectContext=objectContext)
+			if config.stage == "generate":
 
-		if config.output is None:
-			print(output)
-		else:
-			config.output.write_text(output, encoding="ascii")
+				bdl = objectContext.loadPreprocess(path=inputPath)
+				output = generate(formatType=config.format, bdl=bdl)
+
+			else:
+				output = main(formatType=config.format, path=inputPath, objectContext=objectContext)
+
+			if config.output is None:
+				print(output)
+			else:
+				config.output.write_text(output, encoding="ascii")

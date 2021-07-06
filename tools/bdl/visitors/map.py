@@ -49,8 +49,8 @@ class Map(Visitor[MapType]):
 				nested = element.getNestedSequence(category)
 				if nested:
 					references = [
-						self.makeEntity(category="reference", attrs={"symbol": element.getAttr("name")}) for element in nested
-						if element.isAttr("name")
+						self.makeEntity(category="reference", attrs={"symbol": element.getAttr("name")})
+						for element in nested if element.isAttr("name")
 					]
 					sequence = Sequence.fromSerialize(references)
 					preparedElement.setNestedSequence(category, sequence)
