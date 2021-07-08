@@ -130,6 +130,12 @@ class Element:
 			return self.attrs[name].value
 		return default
 
+	def updateAttrValue(self, name: str, value: str) -> None:
+		"""
+		Update the value of an existing attribute.
+		"""
+		self.attrs[name].setValue(value)
+
 	def isAttr(self, name: str) -> bool:
 		"""
 		Check if an attribute is present

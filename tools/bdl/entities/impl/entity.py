@@ -17,6 +17,12 @@ class Entity:
 	def name(self) -> str:
 		return self.element.getAttr("name").value
 
+	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+		"""
+		Resolve the current symbol.
+		"""
+		pass
+
 	def error(self, message: str) -> None:
 		Error.handleFromElement(element=self.element, message=message)
 

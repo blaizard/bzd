@@ -49,15 +49,6 @@ def _chooseIntegerType(entity: Using) -> str:
 	return "bzd::UInt{}Type".format(bits)
 
 
-def visitUsing_(entity: Using, result: ResultType) -> None:
-	# Create strong types
-	if entity.type.name in ["Integer", "Float"]:
-		underlyingType = _chooseIntegerType(entity)
-		newType = "bzd::NamedType<{underlying}, struct {name}>".format(underlying=underlyingType, name=entity.name)
-		#Type.makeCustom("bzd::NamedType", [underlyingType, "struct {name}".format(name=entity.name)])
-		print("String type!", entity.name, newType)
-
-
 def _toCamelCase(string: str) -> str:
 	assert len(string), "String cannot be empty."
 	return string[0].upper() + string[1:]

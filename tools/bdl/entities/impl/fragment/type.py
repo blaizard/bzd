@@ -15,13 +15,11 @@ class Type:
 		self.element = element
 		self.kindAttr = kind
 		self.templateAttr = template
-		self.underlying: typing.Optional[typing.Any] = None
 
-	def setUnderlying(self, underlying: typing.Any) -> None:
-		"""
-		Set the underlying type
-		"""
-		self.underlying = underlying
+	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace)
+		Error.assertTrue(element=self.element, condition=(fqn is not None), message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
+		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
 	@property
 	def kind(self) -> str:
@@ -30,10 +28,6 @@ class Type:
 	@property
 	def name(self) -> str:
 		return Visitor(entity=self).result
-
-	@property
-	def hasUnderlying(self) -> bool:
-		return (self.underlying is not None)
 
 	@property
 	def isFQN(self) -> bool:

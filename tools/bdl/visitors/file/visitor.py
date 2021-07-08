@@ -28,14 +28,6 @@ class Visitor(VisitorBase[ResultType]):
 		self.isResolve = resolve
 		self.isInclude = include
 
-		self.bdl.registerBuiltins({
-			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
-			"Float": self.makeEntity("builtin", values={"name": "Float"}),
-			"Result": self.makeEntity("builtin", values={"name": "Result"}),
-			"List": self.makeEntity("builtin", values={"name": "List"}),
-			"Callable": self.makeEntity("builtin", values={"name": "Callable"})
-		})
-
 	def process(self) -> ResultType:
 		return self.visit(self.bdl.parsed)
 
@@ -66,18 +58,12 @@ class Visitor(VisitorBase[ResultType]):
 
 	def visitNestedEntities(self, entity: Nested, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
-		for inheritance in entity.inheritanceList:
-			self.resolveTypeIfAny(entity=inheritance)
 
 	def visitExpression(self, entity: Expression, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
-		self.resolveTypeIfAny(entity=entity.type)
 
 	def visitMethod(self, entity: Method, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
-		self.resolveTypeIfAny(entity=entity.type)
-		for arg in entity.args:
-			self.resolveTypeIfAny(entity=arg.type)
 
 	def visitUsing(self, entity: Using, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
