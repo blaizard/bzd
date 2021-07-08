@@ -20,12 +20,15 @@ class Parent:
 		self.category = category
 
 	@property
+	def isNested(self) -> bool:
+		return isinstance(self.entity, Nested)
+
+	@property
 	def namespace(self) -> typing.List[str]:
-		if isinstance(self.entity, Nested):
+		if self.isNested:
 			return [self.entity.name] if self.entity.isName else []
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
-
 
 class Visitor(VisitorBase[T, T]):
 
@@ -45,6 +48,18 @@ class Visitor(VisitorBase[T, T]):
 		Get the list of name constituing the namespace.
 		"""
 		return [name for parent in self.parents for name in parent.namespace]
+
+	@property
+	def category(self) -> str:
+		"""
+		Return the current category: global, composition, config
+		"""
+		for parent in reversed(self.parents):
+			if parent.category in ["composition", "config"]:
+				return parent.category
+			if parent.isNested and parent.entity.type in ["composition", "config"]:
+				return parent.entity.type
+		return "global"
 
 	@staticmethod
 	def makeEntity(category: str,

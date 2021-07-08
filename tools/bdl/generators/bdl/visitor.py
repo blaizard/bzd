@@ -1,8 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.result import ResultType
-from tools.bdl.visitors.result import Result
+from tools.bdl.visitors.file.visitor import Visitor
+from tools.bdl.visitors.file.result import ResultType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
@@ -56,7 +56,7 @@ def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 def formatBdl(bdl: Object) -> str:
 
 	# Process the result
-	result = Result(bdl=bdl).process()
+	result = Visitor(bdl=bdl).process()
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
 	result.update({

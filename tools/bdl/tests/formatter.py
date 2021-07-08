@@ -3,7 +3,6 @@ import unittest
 import typing
 
 from tools.bdl.object import Object
-from tools.bdl.visitors.result import Result
 from tools.bdl.generators.bdl.visitor import formatBdl
 
 

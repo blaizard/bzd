@@ -1,8 +1,8 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.result import ResultType
-from tools.bdl.visitors.result import Result
+from tools.bdl.visitors.file.visitor import Visitor
+from tools.bdl.visitors.file.result import ResultType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
@@ -92,7 +92,7 @@ def _bdlPathToHeader(path: Path) -> str:
 def formatCc(bdl: Object) -> str:
 
 	# Process the result
-	visitor = Result(bdl=bdl, resolve=True, include=True)
+	visitor = Visitor(bdl=bdl, resolve=True, include=True)
 	result = visitor.process()
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
@@ -105,8 +105,6 @@ def formatCc(bdl: Object) -> str:
 		"inheritanceToStr": _inheritanceToStr,
 		"bdlPathToHeader": _bdlPathToHeader
 	})
-
-	visitor.bdl.printSymbols()
 
 	output = template.render(result)  # type: ignore
 	return output

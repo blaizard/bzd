@@ -5,7 +5,6 @@ from bzd.parser.error import Error
 
 from tools.bdl.generators.bdl.visitor import formatBdl
 from tools.bdl.generators.cc.visitor import formatCc
-from tools.bdl.visitors.result import Result
 from tools.bdl.object import Object, ObjectContext
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
@@ -13,12 +12,11 @@ formatters = {"bdl": formatBdl, "cc": formatCc}
 
 def preprocess(path: Path, objectContext: typing.Optional[ObjectContext] = None) -> Object:
 
-	includeDeps = objectContext is not None
-	objectContext = objectContext if includeDeps else ObjectContext()
+	objectContext = objectContext if objectContext is not None else ObjectContext()
+	assert objectContext
 
 	# Preprocess the object
-	assert objectContext
-	return objectContext.preprocess(path=path, includeDeps=includeDeps)
+	return objectContext.preprocess(path=path)
 
 
 def generate(formatType: str, bdl: Object) -> str:

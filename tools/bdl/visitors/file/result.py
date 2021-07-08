@@ -4,10 +4,7 @@ import typing
 from bzd.parser.error import Error
 from bzd.parser.element import Element
 
-from tools.bdl.entities.all import Expression, Nested, Method, Using, Enum, Namespace, Use
-
-SymbolType = typing.Union[Expression, Nested, Method, Using, Enum]
-
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Enum, Namespace, Use, SymbolType
 
 class ResultType:
 
@@ -49,14 +46,15 @@ class ResultType:
 		Register a symbol to the result type.
 		"""
 
-		# Register a symbol only if it has a symbol
+		self.symbols.append(entity)
+
+		# Register a symbol name only if it has a symbol
 		if not entity.isName:
 			return
 
 		entity.assertTrue(condition=entity.name not in self.symbolSet,
 			message="Conflicting symbol '{}', already defined earlier.".format(entity.name))
 		self.symbolSet.add(entity.name)
-		self.symbols.append(entity)
 
 	def registerNamespace(self, entity: Namespace) -> None:
 		"""
