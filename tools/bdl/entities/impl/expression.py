@@ -51,6 +51,12 @@ class Expression(Entity):
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 
+	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+		"""
+		Resolve entities.
+		"""
+		self.type.resolve(symbols=symbols, namespace=namespace)
+
 	@property
 	def args(self) -> typing.List[Argument]:
 		arguments = self.element.getNestedSequence("argument")

@@ -22,6 +22,9 @@ class Attribute:
 	def value(self) -> str:
 		return cast(str, self.data["v"])
 
+	def setValue(self, value: str) -> None:
+		self.data["v"] = value
+
 	def serialize(self) -> AttributeSerialize:
 		return self.data
 

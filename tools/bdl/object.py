@@ -164,17 +164,10 @@ class Object:
 			},
 			separators=(",", ":"))
 
-	def registerBuiltins(self, symbols: typing.Dict[str, typing.Any]) -> None:
-		"""
-		Register multiple symbols.
-		"""
-		for fqn, element in symbols.items():
-			self.symbols.insert(fqn=fqn, element=Element.fromSerialize(element), path=Path(), category="builtins")
-
 	def getElementFromType(self, entity: Type, namespace: typing.List[str], category: typing.Optional[str] = None) -> typing.Optional[Element]:
 
 		if entity.isFQN:
-			return self.symbols.getElement(key=entity.kind, category=category)
+			return self.symbols.getElement(fqn=entity.kind, category=category)
 		return self.symbols.getElementFromName(name=entity.kind, namespace=namespace, category=category)
 
 	def __repr__(self) -> str:

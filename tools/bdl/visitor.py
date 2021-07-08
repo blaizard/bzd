@@ -12,6 +12,11 @@ NamespaceType = typing.List[str]
 
 T = typing.TypeVar("T")
 
+CATEGORY_COMPOSITION = "composition"
+CATEGORY_CONFIG = "config"
+CATEGORY_NESTED = "nested"
+CATEGORY_GLOBAL = "global"
+CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL]
 
 class Parent:
 
@@ -55,11 +60,11 @@ class Visitor(VisitorBase[T, T]):
 		Return the current category: global, composition, config
 		"""
 		for parent in reversed(self.parents):
-			if parent.category in ["composition", "config"]:
+			if parent.category in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
 				return parent.category
-			if parent.isNested and parent.entity.type in ["composition", "config"]:
+			if parent.isNested and parent.entity.type in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
 				return parent.entity.type
-		return "global"
+		return CATEGORY_GLOBAL
 
 	@staticmethod
 	def makeEntity(category: str,
@@ -83,11 +88,11 @@ class Visitor(VisitorBase[T, T]):
 		# Handle nested object
 		if isinstance(entity, Nested):
 
-			Error.assertHasSequence(element=element, sequence="nested")
+			Error.assertHasSequence(element=element, sequence=CATEGORY_NESTED)
 
 			self.level += 1
 
-			for category in ["nested", "config", "composition"]:
+			for category in CATEGORIES:
 				sequence = element.getNestedSequence(category)
 				if sequence is not None:
 					self.parents.append(Parent(entity=entity, category=category))

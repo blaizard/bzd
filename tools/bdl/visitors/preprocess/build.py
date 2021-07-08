@@ -2,7 +2,7 @@ import typing
 
 from bzd.parser.element import Sequence
 
-from tools.bdl.visitor import Visitor
+from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL, CATEGORIES
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType
 from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
@@ -21,24 +21,14 @@ class Build(Visitor[SymbolList]):
 	def visitBegin(self, result: SymbolList) -> SymbolList:
 		return []
 
-	def registerComposition(self, sequence: SymbolList, name: typing.Optional[str] = None) -> None:
-		"""
-		Register a composition sequence. All the elements will added the the global
-		composition overview.
-		It should contain only expressions.
-		"""
-
-		for entity in sequence:
-			# The symbol is already registered
-			print(self.symbols)
-
-			# TODO SAVE this into a composition list
-
 	def registerSymbol(self, entity: SymbolType) -> None:
 
 		# Map an entity only if the name is available.
 		if not entity.isName:
 			return
+
+		# Resolve the symbol
+		entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
 		# Build the symbol name and ensure it is unique
 		symbol = SymbolMap.makeFQN(name=entity.name, namespace=self.namespace)
@@ -47,12 +37,13 @@ class Build(Visitor[SymbolList]):
 		element = entity.element
 		if isinstance(entity, Nested):
 
-			preparedElement = element.copy(ignoreNested=["nested", "config", "composition"])
-			for category in ["nested", "config", "composition"]:
+			nestedNamespace = self.namespace + [entity.name]
+			preparedElement = element.copy(ignoreNested=CATEGORIES)
+			for category in CATEGORIES:
 				nested = element.getNestedSequence(category)
 				if nested:
 					references = [
-						self.makeEntity(category="reference", attrs={"symbol": element.getAttr("name")})
+						self.makeEntity("reference", values={"name": SymbolMap.makeFQN(name=element.getAttr("name").value, namespace=nestedNamespace)})
 						for element in nested if element.isAttr("name")
 					]
 					sequence = Sequence.fromSerialize(references)
@@ -65,8 +56,9 @@ class Build(Visitor[SymbolList]):
 	def visitNestedEntities(self, entity: Nested, result: SymbolList) -> None:
 		if entity.type in ["struct", "interface", "component"]:
 			self.registerSymbol(entity=entity)
+		# Composition acts as a namespace, so we don't want to register the symbol.
 		elif entity.type == "composition":
-			self.registerComposition(sequence=entity.nested, name=entity.name if entity.isName else None)
+			pass
 		else:
 			entity.error(message="Unsupported entity type: '{}'.".format(entity.type))
 

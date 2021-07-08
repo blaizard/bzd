@@ -26,6 +26,15 @@ class Method(Entity):
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element, kind="type", template="template") if self.isType else None
 
+	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+		"""
+		Resolve entities.
+		"""
+		if self.isType:
+			self.type.resolve(symbols=symbols, namespace=namespace)
+		for arg in self.args:
+			arg.type.resolve(symbols=symbols, namespace=namespace)
+
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")

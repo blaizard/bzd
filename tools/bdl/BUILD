@@ -19,6 +19,7 @@ py_library(
     ]) + [
         "visitor.py",
         "object.py",
+        "builtins.py",
     ],
     visibility = [":__subpackages__"],
     deps = [
