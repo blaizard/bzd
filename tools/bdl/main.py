@@ -9,11 +9,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")
 	parser.add_argument("-o", "--output", default=None, type=Path, help="Output path of generated file.")
 	parser.add_argument("--format", default="bdl", type=str, choices=formatters.keys(), help="Formatting type.")
-	parser.add_argument("--use-path",
-		action="append",
-		type=Path,
-		help="Path to be used as a root directory to ssearch for included files.")
-	parser.add_argument("--root", type=Path, default=Path(), help="Root directory to be used for inclusions.")
 	parser.add_argument("--preprocess-format",
 		default=None,
 		type=str,
@@ -27,7 +22,7 @@ if __name__ == "__main__":
 
 	config = parser.parse_args()
 
-	objectContext = ObjectContext(root=config.root, usePath=config.use_path, preprocessFormat=config.preprocess_format)
+	objectContext = ObjectContext(preprocessFormat=config.preprocess_format, includeDeps=True)
 
 	for inputPath in config.inputs:
 

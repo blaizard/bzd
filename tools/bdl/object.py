@@ -7,46 +7,49 @@ from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
-from tools.bdl.visitors.process_inclusions import ProcessInclusions
-from tools.bdl.visitors.map import Map, MapType
-from tools.bdl.visitors.validation import Validation
+from tools.bdl.visitors.preprocess.process_inclusions import ProcessInclusions
+from tools.bdl.visitors.preprocess.build import Build
+from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+from tools.bdl.visitors.preprocess.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.use import Use
 
 
 class ObjectContext:
 
-	def __init__(self,
-		root: Path = Path(),
-		usePath: typing.Optional[typing.List[Path]] = None,
-		preprocessFormat: typing.Optional[str] = None) -> None:
+	def __init__(self, preprocessFormat: typing.Optional[str] = None, includeDeps: bool = False) -> None:
 
-		self.root = root
-		self.usePath = [] if usePath is None else usePath
 		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
-		self.dependencies: typing.List[Path] = []
+		self.sources: typing.List[Path] = []
+		self.includeDeps = includeDeps
 
-	def pushDependency(self, path: Path) -> None:
+	def pushSource(self, path: Path) -> None:
 		"""
 		Push a dependency for this object.
 		"""
 		# Check for circular dependencies
-		if path in self.dependencies:
+		if path in self.sources:
 			raise Exception("Circular dependency detected:\n{}".format("\n".join(
-				[f.as_posix() for f in self.dependencies])))
-		self.dependencies.append(path)
+				[f.as_posix() for f in self.sources])))
+		self.sources.append(path)
 
-	def popDependency(self) -> None:
+	def popSource(self) -> None:
 		"""
 		Pop last dependency.
 		"""
-		self.dependencies.pop()
+		self.sources.pop()
+
+	def getSource(self) -> typing.Optional[Path]:
+		"""
+		Get the current source file path.
+		"""
+		return self.sources[-1] if len(self.sources) > 0 else None
 
 	def getPreprocessedPath(self, path: Path) -> Path:
 		"""
 		Return the preprocessed path from a BDL path.
 		"""
-		return self.root / Path(self.preprocessFormat.format(path.as_posix()))
+		return Path(self.preprocessFormat.format(path.as_posix()))
 
 	def isPreprocessed(self, path: Path) -> bool:
 		"""
@@ -72,10 +75,16 @@ class ObjectContext:
 		"""
 
 		preprocessedPath = self.getPreprocessedPath(path=path)
-		bdl = preprocessedPath.read_text(encoding="ascii")
-		return Object.fromSerialize(str(bdl), objectContext=self)
+		data = preprocessedPath.read_text(encoding="ascii")
 
-	def preprocess(self, path: Path, includeDeps: bool = True) -> "Object":
+		# Unserialize the data
+		payload = json.loads(data)
+		context = Context.fromSerialize(payload["context"])
+		return Object(context=context,
+			parsed=Sequence.fromSerialize(payload["parsed"], context),
+			symbols=SymbolMap.fromSerialize(payload["symbols"]))
+
+	def preprocess(self, path: Path) -> "Object":
 		"""
 		Preprocess a bdl file and save its output, or use the preprocessed file if present.
 		"""
@@ -84,19 +93,19 @@ class ObjectContext:
 			return self.loadPreprocess(path=path)
 
 		# Push current dependency
-		self.pushDependency(path)
+		self.pushSource(path)
 
 		# Parse the input file.
 		parser = Parser.fromPath(path)
-		bdl = Object._makeObject(parser=parser, objectContext=self, includeDeps=includeDeps)
+		bdl = Object._makeObject(parser=parser, objectContext=self)
 
 		# Save the preprocessed payload to a file.
 		# Do not save when ignoring dependencies, as this creates un-complete views.
-		if includeDeps:
+		if self.includeDeps:
 			self.savePreprocess(path=path, object=bdl)
 
 		# Pop dependency
-		self.popDependency()
+		self.popSource()
 
 		return bdl
 
@@ -106,57 +115,41 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: MapType, objectContext: ObjectContext) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: SymbolMap) -> None:
 		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
-		self.objectContext = objectContext
-		# Memoized buffer holding the elements, this is constructed while being used.
-		self.elements: typing.Dict[str, Element] = {}
 
 	@staticmethod
-	def _makeObject(parser: BaseParser, objectContext: ObjectContext, includeDeps: bool) -> "Object":
+	def _makeObject(parser: BaseParser, objectContext: ObjectContext) -> "Object":
 		"""
 		Helper to make an object from a parser.
 		"""
 		data = parser.parse()
 
 		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
-		if includeDeps:
+		if objectContext.includeDeps:
 			ProcessInclusions(objectContext=objectContext).visit(data)
 
 		# Validation step
 		Validation().visit(data)
 
 		# Generate the symbol map
-		symbols = Map().visit(data)
+		resolve = Build(objectContext=objectContext)
+		resolve.visit(data)
+		symbols = resolve.getSymbolMap()
 
-		return Object(context=parser.context, parsed=data, symbols=symbols, objectContext=objectContext)
+		return Object(context=parser.context, parsed=data, symbols=symbols)
 
 	@staticmethod
-	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
+	def fromContent(content: str) -> "Object":
 		"""
 		Make an object from a the content of a bdl file.
 		This is mainly used for testing purpose.
 		"""
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser,
-			objectContext=ObjectContext() if objectContext is None else objectContext,
-			includeDeps=objectContext is not None)
-
-	@staticmethod
-	def fromSerialize(data: str, objectContext: ObjectContext) -> "Object":
-		"""
-		Make an object from a serialized payload.
-		"""
-
-		payload = json.loads(data)
-		context = Context.fromSerialize(payload["context"])
-		return Object(context=context,
-			parsed=Sequence.fromSerialize(payload["parsed"], context),
-			symbols=payload["symbols"],
-			objectContext=objectContext)
+		return Object._makeObject(parser=parser, objectContext=ObjectContext())
 
 	def serialize(self) -> str:
 		"""
@@ -167,66 +160,31 @@ class Object:
 			{
 			"context": self.context.serialize(),
 			"parsed": self.parsed.serialize(),
-			"symbols": self.symbols
+			"symbols": self.symbols.serialize()
 			},
 			separators=(",", ":"))
 
-	def registerUse(self, entity: Use) -> None:
-		"""
-		Update the content of this object with an existing one.
-		"""
-
-		entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path),
-			message="Cannot find preprocessed entity for '{}'.".format(entity.path))
-
-		bdl = self.objectContext.loadPreprocess(path=entity.path)
-		self.registerSymbols(bdl.symbols)
-
-	def registerSymbols(self, symbols: MapType) -> None:
+	def registerBuiltins(self, symbols: typing.Dict[str, typing.Any]) -> None:
 		"""
 		Register multiple symbols.
 		"""
-		for key, element in symbols.items():
-			assert key not in self.symbols, "Symbol conflict '{}'.".format(key)
-			self.symbols[key] = element
+		for fqn, element in symbols.items():
+			self.symbols.insert(fqn=fqn, element=Element.fromSerialize(element), path=Path(), category="builtins")
 
-	def getElement(self, fqn: str) -> typing.Optional[Element]:
-
-		if fqn not in self.symbols:
-			return None
-
-		# Not memoized
-		if fqn not in self.elements:
-			element = Element.fromSerialize(element=self.symbols[fqn])
-			self.elements[fqn] = element
-
-		# Return the element
-		return self.elements[fqn]
-
-	def getElementFromName(self, name: str, namespace: typing.List[str]) -> typing.Optional[Element]:
-
-		# Look for a symbol matchparsed
-		namespace = namespace.copy()
-		while True:
-			fqn = Map.makeFQN(name=name, namespace=namespace)
-			if fqn in self.symbols:
-				break
-			if not namespace:
-				return None
-			namespace.pop()
-
-		# Match found
-		return self.getElement(fqn=fqn)
-
-	def getElementFromType(self, entity: Type, namespace: typing.List[str]) -> typing.Optional[Element]:
+	def getElementFromType(self, entity: Type, namespace: typing.List[str], category: typing.Optional[str] = None) -> typing.Optional[Element]:
 
 		if entity.isFQN:
-			return self.getElement(fqn=entity.kind)
-		return self.getElementFromName(name=entity.kind, namespace=namespace)
+			return self.symbols.getElement(key=entity.kind, category=category)
+		return self.symbols.getElementFromName(name=entity.kind, namespace=namespace, category=category)
 
-	def printSymbols(self) -> None:
+	def __repr__(self) -> str:
 		"""
-		Print the symbol map.
+		Print an object (for debug purpose only).
 		"""
-		for symbol, data in self.symbols.items():
-			print("{}".format(symbol))
+		content = ""
+		content += "--- Symbols\n"
+		content += "".join(["\t{}\n".format(line) for line in str(self.symbols).split("\n")])
+		content += "--- Parsed\n"
+		content += "".join(["\t{}\n".format(line) for line in str(self.parsed).split("\n")])
+
+		return content

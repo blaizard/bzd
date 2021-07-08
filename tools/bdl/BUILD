@@ -15,10 +15,9 @@ py_library(
     name = "visitor",
     srcs = glob([
         "entities/**/*.py",
-        "visitors/*.py",
+        "visitors/**/*.py",
     ]) + [
         "visitor.py",
-        "result.py",
         "object.py",
     ],
     visibility = [":__subpackages__"],

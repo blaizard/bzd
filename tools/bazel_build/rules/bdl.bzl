@@ -78,7 +78,7 @@ def _bzd_manifest_impl(ctx):
                 inputs = bdl_deps,
                 outputs = outputs,
                 progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--preprocess-format", _PREPROCESS_FORMAT, "--use-path", ctx.bin_dir.path, bdl["input"].path],
+                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--preprocess-format", _PREPROCESS_FORMAT, bdl["input"].path],
                 executable = ctx.attr._bdl.files_to_run,
             )
 

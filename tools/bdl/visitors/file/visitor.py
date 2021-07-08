@@ -4,16 +4,14 @@ from pathlib import Path
 from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.error import Error
 
-from tools.bdl.result import ResultType, SymbolType
-from tools.bdl.visitors.map import MapType
 from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.object import Object
-
-from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use
+from tools.bdl.visitors.file.result import ResultType
+from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, SymbolType
 from tools.bdl.entities.impl.fragment.type import Type
 
 
-class Result(VisitorBase[ResultType]):
+class Visitor(VisitorBase[ResultType]):
 
 	def __init__(self, bdl: Object, resolve: bool = False, include: bool = False) -> None:
 		"""
@@ -30,7 +28,7 @@ class Result(VisitorBase[ResultType]):
 		self.isResolve = resolve
 		self.isInclude = include
 
-		self.bdl.registerSymbols({
+		self.bdl.registerBuiltins({
 			"Integer": self.makeEntity("builtin", values={"name": "Integer"}),
 			"Float": self.makeEntity("builtin", values={"name": "Float"}),
 			"Result": self.makeEntity("builtin", values={"name": "Result"}),
@@ -92,6 +90,3 @@ class Result(VisitorBase[ResultType]):
 
 	def visitUse(self, entity: Use, result: ResultType) -> None:
 		result.registerUse(entity=entity)
-		if self.isInclude:
-			# TODO: handle transitive inclusions.
-			self.bdl.registerUse(entity)

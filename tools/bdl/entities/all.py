@@ -20,3 +20,4 @@ Using = _Using
 Expression = _Expression
 
 EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Namespace, Use, Builtin]
+SymbolType = typing.Union[Expression, Nested, Method, Using, Enum]
