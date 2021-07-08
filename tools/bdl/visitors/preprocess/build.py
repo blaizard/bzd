@@ -8,6 +8,7 @@ from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
 SymbolList = typing.List[SymbolType]
 
+
 class Build(Visitor[SymbolList]):
 
 	def __init__(self, objectContext: typing.Any) -> None:
@@ -28,7 +29,8 @@ class Build(Visitor[SymbolList]):
 			return
 
 		# Resolve the symbol
-		entity.resolve(symbols=self.symbols, namespace=self.namespace)
+		if self.objectContext.includeDeps:
+			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
 		# Build the symbol name and ensure it is unique
 		symbol = SymbolMap.makeFQN(name=entity.name, namespace=self.namespace)
@@ -43,8 +45,11 @@ class Build(Visitor[SymbolList]):
 				nested = element.getNestedSequence(category)
 				if nested:
 					references = [
-						self.makeEntity("reference", values={"name": SymbolMap.makeFQN(name=element.getAttr("name").value, namespace=nestedNamespace)})
-						for element in nested if element.isAttr("name")
+						self.makeEntity("reference",
+						values={
+						"name":
+						SymbolMap.makeFQN(name=element.getAttr("name").value, namespace=nestedNamespace)
+						}) for element in nested if element.isAttr("name")
 					]
 					sequence = Sequence.fromSerialize(references)
 					preparedElement.setNestedSequence(category, sequence)

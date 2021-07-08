@@ -30,8 +30,9 @@ class Method(Entity):
 		"""
 		Resolve entities.
 		"""
-		if self.isType:
-			self.type.resolve(symbols=symbols, namespace=namespace)
+		maybeType = self.type
+		if maybeType is not None:
+			maybeType.resolve(symbols=symbols, namespace=namespace)
 		for arg in self.args:
 			arg.type.resolve(symbols=symbols, namespace=namespace)
 

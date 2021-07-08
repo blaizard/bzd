@@ -29,8 +29,7 @@ class ObjectContext:
 		"""
 		# Check for circular dependencies
 		if path in self.sources:
-			raise Exception("Circular dependency detected:\n{}".format("\n".join(
-				[f.as_posix() for f in self.sources])))
+			raise Exception("Circular dependency detected:\n{}".format("\n".join([f.as_posix() for f in self.sources])))
 		self.sources.append(path)
 
 	def popSource(self) -> None:
@@ -164,7 +163,10 @@ class Object:
 			},
 			separators=(",", ":"))
 
-	def getElementFromType(self, entity: Type, namespace: typing.List[str], category: typing.Optional[str] = None) -> typing.Optional[Element]:
+	def getElementFromType(self,
+		entity: Type,
+		namespace: typing.List[str],
+		category: typing.Optional[str] = None) -> typing.Optional[Element]:
 
 		if entity.isFQN:
 			return self.symbols.getElement(fqn=entity.kind, category=category)

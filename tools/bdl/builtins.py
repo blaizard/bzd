@@ -1,4 +1,4 @@
-from python.bzd.parser.element import Element
+from bzd.parser.element import Element
 from tools.bdl.visitor import Visitor
 from tools.bdl.entities.impl.builtin import Builtin
 
