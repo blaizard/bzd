@@ -18,7 +18,9 @@ class Type:
 
 	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace)
-		Error.assertTrue(element=self.element, condition=(fqn is not None), message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
+		Error.assertTrue(element=self.element,
+			condition=(fqn is not None),
+			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
 	@property

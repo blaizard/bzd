@@ -18,6 +18,7 @@ CATEGORY_NESTED = "nested"
 CATEGORY_GLOBAL = "global"
 CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL]
 
+
 class Parent:
 
 	def __init__(self, entity: typing.Union[Nested, Namespace], category: typing.Optional[str] = None) -> None:
@@ -34,6 +35,8 @@ class Parent:
 			return [self.entity.name] if self.entity.isName else []
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
+		return []
+
 
 class Visitor(VisitorBase[T, T]):
 
@@ -62,8 +65,10 @@ class Visitor(VisitorBase[T, T]):
 		for parent in reversed(self.parents):
 			if parent.category in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
 				return parent.category
-			if parent.isNested and parent.entity.type in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
-				return parent.entity.type
+			if parent.isNested:
+				assert isinstance(parent.entity, Nested)
+				if parent.entity.type in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
+					return parent.entity.type
 		return CATEGORY_GLOBAL
 
 	@staticmethod

@@ -34,28 +34,6 @@ class Visitor(VisitorBase[ResultType]):
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return ResultType(level=self.level)
 
-	def resolveTypeIfAny(self, entity: typing.Optional[Type]) -> None:
-		"""
-		Resolve a symbol looking at the symbol map going up into the namespaces.
-		"""
-		if not self.isResolve or entity is None:
-			return
-
-		# Look for a match
-		maybeElement = self.bdl.getElementFromType(entity=entity, namespace=self.namespace)
-		if not maybeElement:
-			# Silently return if include is disabled
-			if not self.isInclude:
-				return
-			# Failed to match any symbol from the map
-			Error.handleFromElement(element=entity.element,
-				message="Symbol '{}' in namespace '{}' could not be resolved.".format(
-				entity.kind, ".".join(self.namespace)))
-
-		# Save the underlying element
-		assert maybeElement
-		entity.setUnderlying(self.elementToEntity(maybeElement))
-
 	def visitNestedEntities(self, entity: Nested, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
 

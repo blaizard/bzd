@@ -8,9 +8,10 @@ from bzd.parser.context import Context
 from tools.bdl.visitor import Visitor
 from tools.bdl.builtins import Builtins
 
+
 class SymbolMap:
 
-	def __init__(self):
+	def __init__(self) -> None:
 		self.map: typing.Dict[str, typing.Any] = {}
 		self.builtins: typing.Dict[str, typing.Any] = {}
 		# Memoized elements
@@ -45,7 +46,9 @@ class SymbolMap:
 			element: Element to be registered.
 			category: Category associated with the element, will be used for filtering.
 		"""
-		Error.assertTrue(element=element, condition=(not self._contains(fqn)), message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
+		Error.assertTrue(element=element,
+			condition=(not self._contains(fqn)),
+			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
 		self.map[fqn] = {"c": category, "p": path.as_posix(), "e": element.serialize()}
 
 	def update(self, symbols: "SymbolMap") -> None:
@@ -102,7 +105,10 @@ class SymbolMap:
 		# Return the element
 		return self.elements[fqn]
 
-	def getElementFromName(self, name: str, namespace: typing.List[str], category: typing.Optional[str] = None) -> typing.Optional[Element]:
+	def getElementFromName(self,
+		name: str,
+		namespace: typing.List[str],
+		category: typing.Optional[str] = None) -> typing.Optional[Element]:
 		"""
 		Return an element from an unqualified name.
 		"""

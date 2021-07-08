@@ -6,6 +6,7 @@ from bzd.parser.element import Element
 
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Enum, Namespace, Use, SymbolType
 
+
 class ResultType:
 
 	def __init__(self, level: int) -> None:
