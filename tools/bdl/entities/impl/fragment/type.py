@@ -16,12 +16,34 @@ class Type:
 		self.kindAttr = kind
 		self.templateAttr = template
 
-	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
-		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace)
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
+		"""
+		Resolve the types and nested templates by updating their symbol to fqn.
+		"""
+
+		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude)
 		Error.assertTrue(element=self.element,
 			condition=(fqn is not None),
 			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
+
+		# Get the validation schema if any
+		entity = symbols.getEntity(fqn=fqn)
+		# TODO Implement some kind of validation
+		#entity.validate(self.kind)
+
+		# Loop through the nested templates.
+		if self.templateAttr:
+			nested = self.element.getNestedSequence(self.templateAttr)
+			if nested:
+				for element in nested:
+					# Recursively resolve nested types.
+					# Note the "kind" here is always type for sub-elements.
+					subType = Type(element=element, kind="type", template=self.templateAttr)
+					subType.resolve(symbols=symbols, namespace=namespace)
 
 	@property
 	def kind(self) -> str:

@@ -11,6 +11,7 @@ from tools.bdl.visitors.preprocess.process_inclusions import ProcessInclusions
 from tools.bdl.visitors.preprocess.build import Build
 from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 from tools.bdl.visitors.preprocess.validation import Validation
+from tools.bdl.entities.all import EntityType
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.use import Use
 
@@ -163,14 +164,14 @@ class Object:
 			},
 			separators=(",", ":"))
 
-	def getElementFromType(self,
+	def getEntityFromType(self,
 		entity: Type,
 		namespace: typing.List[str],
-		category: typing.Optional[str] = None) -> typing.Optional[Element]:
+		category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
 
 		if entity.isFQN:
-			return self.symbols.getElement(fqn=entity.kind, category=category)
-		return self.symbols.getElementFromName(name=entity.kind, namespace=namespace, category=category)
+			return self.symbols.getEntity(fqn=entity.kind, category=category)
+		return self.symbols.getEntityFromName(name=entity.kind, namespace=namespace, category=category)
 
 	def __repr__(self) -> str:
 		"""

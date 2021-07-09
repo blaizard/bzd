@@ -28,6 +28,15 @@ class Using(Entity):
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
+		"""
+		Resolve entities.
+		"""
+		self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")

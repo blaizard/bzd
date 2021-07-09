@@ -2,10 +2,37 @@ from bzd.parser.element import Element
 from tools.bdl.visitor import Visitor
 from tools.bdl.entities.impl.builtin import Builtin
 
-BuiltinInteger = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Integer"})))
-BuiltinFloat = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Float"})))
-BuiltinResult = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Result"})))
-BuiltinList = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "List"})))
+BuiltinVoid = Builtin(
+	Element.fromSerialize(Visitor.makeEntity("builtin", values={
+	"name": "Void",
+	"validation": "none"
+	})))
+BuiltinInteger = Builtin(
+	Element.fromSerialize(Visitor.makeEntity("builtin", values={
+	"name": "Integer",
+	"validation": "integer"
+	})))
+BuiltinFloat = Builtin(
+	Element.fromSerialize(Visitor.makeEntity("builtin", values={
+	"name": "Float",
+	"validation": "float"
+	})))
+BuiltinResult = Builtin(
+	Element.fromSerialize(
+	Visitor.makeEntity("builtin",
+	values={"name": "Result"},
+	sequences={"templates": [{
+	"validation": "mandatory"
+	}, {
+	"validation": "mandatory"
+	}]})))
+BuiltinList = Builtin(
+	Element.fromSerialize(
+	Visitor.makeEntity("builtin",
+	values={"name": "List"},
+	sequences={"templates": [{
+	"validation": "mandatory integer"
+	}]})))
 BuiltinCallable = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Callable"})))
 
-Builtins = [BuiltinInteger, BuiltinFloat, BuiltinResult, BuiltinList, BuiltinCallable]
+Builtins = [BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinResult, BuiltinList, BuiltinCallable]
