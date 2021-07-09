@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.fragments import Attribute
 
-from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
+from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType, elementToEntity
 
 NamespaceType = typing.List[str]
 
@@ -72,23 +72,34 @@ class Visitor(VisitorBase[T, T]):
 		return CATEGORY_GLOBAL
 
 	@staticmethod
-	def makeEntity(category: str,
+	def makeEntity(
+		category: str,
 		attrs: typing.MutableMapping[str, Attribute] = {},
-		values: typing.MutableMapping[str, str] = {}) -> ElementSerialize:
+		values: typing.MutableMapping[str, str] = {},
+		sequences: typing.MutableMapping[str, typing.Sequence[typing.MutableMapping[str,
+		str]]] = {}) -> ElementSerialize:
 		"""
 		Create an entity from a dictionary of attributes
 		"""
 		updatedAttrs = {key: value.serialize() for key, value in attrs.items()}
 		updatedAttrs.update({key: {"v": value, "i": 0} for key, value in values.items()})
 		updatedAttrs["category"] = {"v": category, "i": 0}
-		return {"@": updatedAttrs}
+		entity = {"@": updatedAttrs}
+
+		# Fill in sequences
+		entity.update({name: [] for name in sequences.keys()})  # type: ignore
+		for name, sequence in sequences.items():
+			for values in sequence:
+				entity[name].append({"@": {key: {"v": value, "i": 0} for key, value in values.items()}})  # type: ignore
+
+		return entity  # type: ignore
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
 		Main visitor, called each time a new element is discovered.
 		"""
 
-		entity = self.elementToEntity(element=element)
+		entity = elementToEntity(element=element)
 
 		# Handle nested object
 		if isinstance(entity, Nested):
@@ -151,30 +162,6 @@ class Visitor(VisitorBase[T, T]):
 			Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
 
 		return result
-
-	def elementToEntity(self, element: Element) -> EntityType:
-		"""
-		Instantiate an entity from an element.
-		"""
-
-		categoryToEntity: typing.Dict[str, typing.Type[EntityType]] = {
-			"nested": Nested,
-			"builtin": Builtin,
-			"expression": Expression,
-			"method": Method,
-			"using": Using,
-			"enum": Enum,
-			"namespace": Namespace,
-			"use": Use
-		}
-
-		Error.assertHasAttr(element=element, attr="category")
-		category = element.getAttr("category").value
-
-		if category not in categoryToEntity:
-			Error.handleFromElement(element=element, message="Unexpected element category: {}".format(category))
-
-		return categoryToEntity[category](element=element)
 
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""

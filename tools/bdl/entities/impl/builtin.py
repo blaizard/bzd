@@ -1,3 +1,5 @@
+import typing
+
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 

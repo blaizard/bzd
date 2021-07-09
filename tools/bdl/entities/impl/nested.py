@@ -77,12 +77,15 @@ class Nested(Entity):
 			return []
 		return _VisitorInheritance().visit(sequence=sequence)
 
-	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
 		"""
 		Resolve entities.
 		"""
 		for inheritance in self.inheritanceList:
-			inheritance.resolve(symbols=symbols, namespace=namespace)
+			inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 	def __repr__(self) -> str:
 		content = self.toString({

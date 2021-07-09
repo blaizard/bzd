@@ -7,6 +7,7 @@ from bzd.parser.context import Context
 
 from tools.bdl.visitor import Visitor
 from tools.bdl.builtins import Builtins
+from tools.bdl.entities.all import elementToEntity, EntityType
 
 
 class SymbolMap:
@@ -14,18 +15,23 @@ class SymbolMap:
 	def __init__(self) -> None:
 		self.map: typing.Dict[str, typing.Any] = {}
 		self.builtins: typing.Dict[str, typing.Any] = {}
-		# Memoized elements
-		self.elements: typing.Dict[str, Element] = {}
+		# Memoized entities
+		self.entities: typing.Dict[str, EntityType] = {}
 
 		# Register builtins
 		for builtin in Builtins:
 			self.builtins[builtin.name] = {"c": "builtin", "p": "", "e": builtin.element.serialize()}
 
-	def _contains(self, fqn: str) -> bool:
+	def _contains(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> bool:
 		"""
 		Check if the fqn is registered.
 		"""
-		return self._get(fqn) is not None
+		maybeData = self._get(fqn=fqn)
+		if maybeData is None:
+			return False
+		if exclude:
+			return maybeData["c"] not in exclude
+		return True
 
 	def _get(self, fqn: str) -> typing.Optional[typing.Any]:
 		"""
@@ -47,7 +53,7 @@ class SymbolMap:
 			category: Category associated with the element, will be used for filtering.
 		"""
 		Error.assertTrue(element=element,
-			condition=(not self._contains(fqn)),
+			condition=(not self._contains(fqn=fqn)),
 			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
 		self.map[fqn] = {"c": category, "p": path.as_posix(), "e": element.serialize()}
 
@@ -56,7 +62,7 @@ class SymbolMap:
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
-			assert not self._contains(fqn), "Symbol '{}' already defined.".format(fqn)
+			assert not self._contains(fqn=fqn), "Symbol '{}' already defined.".format(fqn)
 			self.map[fqn] = element
 
 	def serialize(self) -> typing.Dict[str, typing.Any]:
@@ -72,7 +78,10 @@ class SymbolMap:
 		"""
 		return ".".join(namespace + [name])
 
-	def resolveFQN(self, name: str, namespace: typing.List[str]) -> typing.Optional[str]:
+	def resolveFQN(self,
+		name: str,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> typing.Optional[str]:
 		"""
 		Find the fully qualified name of a given a name and a namespace.
 		"""
@@ -80,7 +89,7 @@ class SymbolMap:
 		namespace = namespace.copy()
 		while True:
 			fqn = SymbolMap.makeFQN(name=name, namespace=namespace)
-			if self._contains(fqn):
+			if self._contains(fqn=fqn, exclude=exclude):
 				break
 			if not namespace:
 				return None
@@ -88,7 +97,7 @@ class SymbolMap:
 
 		return fqn
 
-	def getElement(self, fqn: str, category: typing.Optional[str] = None) -> typing.Optional[Element]:
+	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
 		"""
 		Return an element from the symbol map.
 		"""
@@ -98,17 +107,18 @@ class SymbolMap:
 			return None
 
 		# Not memoized
-		if fqn not in self.elements:
+		if fqn not in self.entities:
 			element = Element.fromSerialize(element=data["e"], context=Context(path=Path(data["p"])))
-			self.elements[fqn] = element
+			entity = elementToEntity(element=element)
+			self.entities[fqn] = entity
 
 		# Return the element
-		return self.elements[fqn]
+		return self.entities[fqn]
 
-	def getElementFromName(self,
+	def getEntityFromName(self,
 		name: str,
 		namespace: typing.List[str],
-		category: typing.Optional[str] = None) -> typing.Optional[Element]:
+		category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
 		"""
 		Return an element from an unqualified name.
 		"""
@@ -119,7 +129,7 @@ class SymbolMap:
 			return None
 
 		# Match found
-		return self.getElement(fqn=fqn, category=category)
+		return self.getEntity(fqn=fqn, category=category)
 
 	@staticmethod
 	def fromSerialize(data: typing.Dict[str, typing.Any]) -> "SymbolMap":

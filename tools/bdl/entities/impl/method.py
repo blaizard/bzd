@@ -26,15 +26,18 @@ class Method(Entity):
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element, kind="type", template="template") if self.isType else None
 
-	def resolve(self, symbols: typing.Any, namespace: typing.List[str]) -> None:
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
 		"""
 		Resolve entities.
 		"""
 		maybeType = self.type
 		if maybeType is not None:
-			maybeType.resolve(symbols=symbols, namespace=namespace)
+			maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		for arg in self.args:
-			arg.type.resolve(symbols=symbols, namespace=namespace)
+			arg.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 	@property
 	def comment(self) -> typing.Optional[str]:
