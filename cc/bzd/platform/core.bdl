@@ -17,9 +17,9 @@ interface Core{
 	}
 	
 	// Start a workload on the core and return immediatly.
-	method start(workload = Callable) -> Result<void, Error>;
+	method start(workload = Callable) -> Result<Void, Error>;
 	// Initialize the core.
-	method stop() -> Result<void, Error>;
+	method stop() -> Result<Void, Error>;
 	// Get the current stack usage.
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
