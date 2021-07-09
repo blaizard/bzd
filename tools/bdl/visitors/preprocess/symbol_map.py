@@ -43,7 +43,7 @@ class SymbolMap:
 			return self.builtins[fqn]
 		return None
 
-	def insert(self, fqn: str, path: Path, element: Element, category: str) -> None:
+	def insert(self, fqn: str, path: typing.Optional[Path], element: Element, category: str) -> None:
 		"""
 		Insert a new element into the symbol map.
 		Args:
@@ -55,7 +55,7 @@ class SymbolMap:
 		Error.assertTrue(element=element,
 			condition=(not self._contains(fqn=fqn)),
 			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
-		self.map[fqn] = {"c": category, "p": path.as_posix(), "e": element.serialize()}
+		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else Path(), "e": element.serialize()}
 
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
