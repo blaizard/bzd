@@ -58,6 +58,10 @@ class ObjectContext:
 
 		preprocessed = self.getPreprocessedPath(path=path)
 		if preprocessed.is_file():
+			# If the source file is present, compare its modification time with the preprocessed.
+			if path.is_file():
+				if path.stat().st_mtime > preprocessed.stat().st_mtime:
+					return False
 			return True
 		return False
 
