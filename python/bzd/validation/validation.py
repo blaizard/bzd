@@ -1,45 +1,10 @@
 import typing
 import re
 
-Schema = typing.Dict[str, str]
-ValidationCallable = typing.Callable[[str], bool]
+from bzd.validation.schema import Schema, ProcessedSchema
+from bzd.validation.constraints.integer import Integer
 
 PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
-
-
-class Constraint:
-
-	def __init__(self, name: str, args: typing.List[str]) -> None:
-		self.name = name
-		self.args = args
-
-	def install(self, processedSchema: "ProcessedSchema") -> typing.Optional[ValidationCallable]:
-		return None
-
-
-class Integer(Constraint):
-
-	def install(self, processedSchema: "ProcessedSchema") -> typing.Optional[ValidationCallable]:
-		return lambda value: True
-
-
-class ProcessedSchema:
-
-	def __init__(self) -> None:
-		self.mandatory = False
-		self.type = "string"
-		self.constraints: typing.List[Constraint] = []
-		self.validations: typing.List[ValidationCallable] = []
-
-	def append(self, constraint: Constraint) -> None:
-		self.constraints.append(constraint)
-
-	def install(self) -> None:
-		validations: typing.List[ValidationCallable] = []
-		for constraint in self.constraints:
-			maybeValidation = constraint.install(self)
-			if maybeValidation:
-				self.validations.append(maybeValidation)
 
 
 class Validation:
@@ -53,7 +18,7 @@ class Validation:
 		Preprocess the schema.
 		"""
 
-		processed = {}
+		processed: typing.Dict[str, ProcessedSchema] = {}
 
 		for key, constraints in schema.items():
 
