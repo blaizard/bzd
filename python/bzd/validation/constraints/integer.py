@@ -1,6 +1,6 @@
 import typing
 
-from bzd.validation.schema import Args, Result, Context, Constraint, ProcessedSchema
+from bzd.validation.schema import Args, Result, TypeContext, Context, Constraint, ProcessedSchema
 
 
 class Integer(Constraint):
@@ -8,17 +8,15 @@ class Integer(Constraint):
 	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
 		processedSchema.setType(self)
 
-	def toType(self, context: Context) -> typing.Optional[int]:
+	def check(self, context: TypeContext) -> Result:
 		"""
-		Check that the value match the type
-		and return the underlying type.
+		Check that the value match the type and save the underlying type.
 		"""
 		try:
-			converted = float(context.value)
-			assert converted.is_integer()
-			return int(converted)
-		except:
-			return None
+			context.setUnderlying(self._toInteger(context.value))
+		except Exception as e:
+			return str(e)
+		return None
 
 	def min(self, processedSchema: ProcessedSchema, args: Args) -> None:
 		def _process(arg: float, context: Context) -> Result:

@@ -18,6 +18,12 @@ class Context:
 		assert self.underlying_
 		return self.underlying_
 
+class TypeContext(Context):
+
+	def setUnderlying(self, value: typing.Any) -> None:
+		assert self.underlying_ is None
+		self.underlying_ = value
+
 class Constraint:
 
 	def __init__(self, name: str, args: typing.List[str]) -> None:
@@ -30,6 +36,27 @@ class Constraint:
 		"""
 		assert False, "Constraint missing 'install' overload."
 
+	@staticmethod
+	def _toInteger(value: str) -> int:
+		"""
+		Convert to integer or throw.
+		"""
+		try:
+			converted = float(value)
+			assert converted.is_integer()
+			return int(converted)
+		except:
+			raise Exception("Value '{}' is not a valid integer.".format(value))
+
+	@staticmethod
+	def _toFloat(value: str) -> float:
+		"""
+		Convert to integer or throw.
+		"""
+		try:
+			return float(value)
+		except:
+			raise Exception("Value '{}' is not a valid float.".format(value))
 
 class ProcessedSchema:
 
@@ -44,7 +71,7 @@ class ProcessedSchema:
 		"""
 
 		assert self.type is None, "A type for this constraint is already specified."
-		assert hasattr(constraint, "toType"), "A type constraint must have a 'toType' method."
+		assert hasattr(constraint, "check"), "A type constraint must have a 'toType' method."
 		self.type = constraint
 
 	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str, args: Args) -> None:
@@ -76,13 +103,16 @@ class ProcessedSchema:
 		Validate a value.
 		"""
 
-		context = Context(value=value)
+		typeContext = TypeContext(value=value)
 
-		# Process the
+		# Process the type
 		if self.type:
-			context.underlying_ = self.type.toType(context=context)  # type: ignore
-			if context.underlying_ is None:
-				return "Not matching type."
+			resultType: typing.Optional[str] = self.type.check(context=typeContext) # type: ignore
+			if resultType is not None:
+				return resultType
+
+		# Cast down the context to a normal context
+		context = typing.cast(Context, typeContext)
 
 		# Process the validation callables
 		for validation in self.validations:
