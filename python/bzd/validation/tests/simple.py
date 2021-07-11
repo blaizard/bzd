@@ -12,6 +12,10 @@ class TestRun(unittest.TestCase):
 		self.assertTrue(template.validate({"test": "2.0"}))
 		self.assertTrue(template.validate({"test": "-73"}))
 
+	def testMinSubsitution(self) -> None:
+		template = Validation({"test": "integer min(2)"})
+		self.assertTrue(template.validate({"test": "3"}))
+		self.assertFalse(template.validate({"test": "1"}))
 
 if __name__ == '__main__':
 	unittest.main()
