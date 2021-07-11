@@ -1,7 +1,7 @@
 import typing
 import re
 
-from bzd.validation.schema import Schema, ProcessedSchema
+from bzd.validation.schema import Constraint, Schema, ProcessedSchema
 from bzd.validation.constraints.integer import Integer
 
 PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
@@ -10,7 +10,7 @@ PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
 class Validation:
 
 	def __init__(self, schema: Schema) -> None:
-		self.availableConstraints = {"integer": Integer}
+		self.availableConstraints: typing.Dict[str, typing.Type[Constraint]] = {"integer": Integer}
 		self.processed = self._prepocessSchema(schema)
 
 	def _prepocessSchema(self, schema: Schema) -> typing.Dict[str, ProcessedSchema]:
@@ -33,18 +33,17 @@ class Validation:
 				name = m.group(1)
 				args = [arg for arg in (m.group(2) if m.group(2) else "").split(",") if arg]
 
-				# Register the constraint
-				assert name in self.availableConstraints, "Constraint of type '{}' is undefined.".format(name)
-				processed[key].append(self.availableConstraints[name](name=name, args=args))
-
-		# Install the various constaints
-		processed[key].install()
+				# Install the constraint
+				processed[key].install(constraints=self.availableConstraints, name=name, args=args)
 
 		return processed
 
 	def validate(self, values: typing.Dict[str, typing.Any]) -> bool:
 
+		results = []
 		for key, value in values.items():
-			pass
+			result = self.processed[key].validate(value=value)
+			if result is not None:
+				results.append(result)
 
-		return True
+		return len(results) == 0
