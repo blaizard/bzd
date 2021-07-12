@@ -2,20 +2,16 @@ from bzd.parser.element import Element
 from tools.bdl.visitor import Visitor
 from tools.bdl.entities.impl.builtin import Builtin
 
-BuiltinVoid = Builtin(
-	Element.fromSerialize(Visitor.makeEntity("builtin", values={
-	"name": "Void",
-	"validation": "none"
-	})))
+BuiltinVoid = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Void", "validation": '{}'})))
 BuiltinInteger = Builtin(
 	Element.fromSerialize(Visitor.makeEntity("builtin", values={
 	"name": "Integer",
-	"validation": "integer"
+	"validation": '{"0": "integer"}'
 	})))
 BuiltinFloat = Builtin(
 	Element.fromSerialize(Visitor.makeEntity("builtin", values={
 	"name": "Float",
-	"validation": "float"
+	"validation": '{"0": "float"}'
 	})))
 BuiltinResult = Builtin(
 	Element.fromSerialize(

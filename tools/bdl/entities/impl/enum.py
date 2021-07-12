@@ -1,5 +1,6 @@
 import typing
 
+from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
@@ -13,7 +14,7 @@ class EnumValue(Entity):
 		super().__init__(element)
 		Error.assertHasAttr(element=element, attr="name")
 
-	@property
+	@memoized_property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
@@ -46,7 +47,7 @@ class Enum(Entity):
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
-	@property
+	@memoized_property
 	def values(self) -> typing.Iterable[EnumValue]:
 		sequence = self.element.getNestedSequence("values")
 		assert sequence is not None

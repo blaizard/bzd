@@ -1,5 +1,6 @@
 import typing
 
+from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
@@ -20,11 +21,11 @@ class Using(Entity):
 	def category(self) -> str:
 		return "using"
 
-	@property
+	@memoized_property
 	def contracts(self) -> Contracts:
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
-	@property
+	@memoized_property
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 

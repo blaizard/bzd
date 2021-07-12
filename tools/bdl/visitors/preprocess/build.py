@@ -29,7 +29,7 @@ class Build(Visitor[SymbolList]):
 			return
 
 		# Resolve the symbol
-		if self.objectContext.includeDeps:
+		if self.objectContext.resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
 		# Build the symbol name and ensure it is unique
@@ -81,7 +81,7 @@ class Build(Visitor[SymbolList]):
 		self.registerSymbol(entity=entity)
 
 	def visitUse(self, entity: Use, result: SymbolList) -> None:
-		if self.objectContext.includeDeps:
+		if self.objectContext.resolve:
 			entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path),
 				message="Cannot find preprocessed entity for '{}'.".format(entity.path))
 

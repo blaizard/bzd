@@ -18,11 +18,11 @@ from tools.bdl.entities.impl.use import Use
 
 class ObjectContext:
 
-	def __init__(self, preprocessFormat: typing.Optional[str] = None, includeDeps: bool = False) -> None:
+	def __init__(self, preprocessFormat: typing.Optional[str] = None, resolve: bool = False) -> None:
 
 		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
 		self.sources: typing.List[Path] = []
-		self.includeDeps = includeDeps
+		self.resolve = resolve
 
 	def pushSource(self, path: Path) -> None:
 		"""
@@ -105,7 +105,7 @@ class ObjectContext:
 
 		# Save the preprocessed payload to a file.
 		# Do not save when ignoring dependencies, as this creates un-complete views.
-		if self.includeDeps:
+		if self.resolve:
 			self.savePreprocess(path=path, object=bdl)
 
 		# Pop dependency
@@ -132,7 +132,7 @@ class Object:
 		data = parser.parse()
 
 		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
-		if objectContext.includeDeps:
+		if objectContext.resolve:
 			ProcessInclusions(objectContext=objectContext).visit(data)
 
 		# Validation step
@@ -146,14 +146,14 @@ class Object:
 		return Object(context=parser.context, parsed=data, symbols=symbols)
 
 	@staticmethod
-	def fromContent(content: str) -> "Object":
+	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
 		"""
 		Make an object from a the content of a bdl file.
 		This is mainly used for testing purpose.
 		"""
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser, objectContext=ObjectContext())
+		return Object._makeObject(parser=parser, objectContext=objectContext if objectContext else ObjectContext())
 
 	def serialize(self) -> str:
 		"""

@@ -4,7 +4,7 @@ py_library(
     name = "validation",
     srcs = glob([
         "*.py",
-        "constraints/*.py",
+        "constraints/**/*.py",
     ]),
     visibility = ["//visibility:public"],
     deps = [
