@@ -9,6 +9,7 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 if typing.TYPE_CHECKING:
 	from bdl.entities.all import Entity
 
+
 class Type:
 
 	def __init__(self, element: Element, kind: str, template: typing.Optional[str] = None) -> None:
@@ -33,17 +34,35 @@ class Type:
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
 		# Loop through the nested templates.
+		templates = {}
 		if self.templateAttr:
 			nested = self.element.getNestedSequence(self.templateAttr)
 			if nested:
-				for element in nested:
+				for i, element in enumerate(nested):
 					# Recursively resolve nested types.
 					# Note the "kind" here is always type for sub-elements.
 					subType = Type(element=element, kind="type", template=self.templateAttr)
 					subType.resolve(symbols=symbols, namespace=namespace)
+					# Only keep the kind, as nested template arguments will be deducted by recursion.
+					templates[str(i)] = subType.kind
 
 		# Get the validation schema if any
 		entity = symbols.getEntity(fqn=fqn)
+
+		# Validate template arguments
+		validation = entity.validationTemplate
+		if validation is None:
+			Error.assertTrue(element=self.element,
+				condition=(not bool(templates)),
+				message="Type '{}' does not support template arguments.".format(self.kind))
+		else:
+			Error.assertTrue(element=self.element,
+				condition=bool(templates),
+				message="Type '{}' requires template arguments.".format(self.kind))
+			result = validation.validate(templates, output="return")
+			print(templates)
+			Error.assertTrue(element=self.element, condition=result, message=str(result))
+
 		return entity
 
 	@property

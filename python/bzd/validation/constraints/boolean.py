@@ -2,6 +2,7 @@ import typing
 
 from bzd.validation.schema import Args, Result, TypeContext, Constraint, ProcessedSchema
 
+
 class Boolean(Constraint):
 
 	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:

@@ -6,6 +6,7 @@ from bzd.validation.constraints.boolean import Boolean
 from bzd.validation.constraints.integer import Integer
 from bzd.validation.constraints.float import Float
 from bzd.validation.constraints.string import String
+from bzd.validation.constraints.mandatory import Mandatory
 
 PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
 
@@ -42,7 +43,8 @@ class Validation:
 			"boolean": Boolean,
 			"integer": Integer,
 			"float": Float,
-			"string": String
+			"string": String,
+			"mandatory": Mandatory
 		}
 		self.processed = self._prepocessSchema(schema)
 
@@ -84,6 +86,11 @@ class Validation:
 					results.add(key, result)
 			else:
 				results.add(key, ["value not expected"])
+
+		# Check for mandatory values
+		for key, constraints in self.processed.items():
+			if constraints.isMandatory and key not in values:
+				results.add(key, ["Missing mandatory value."])
 
 		# If some errors are detected.
 		if output == "throw":

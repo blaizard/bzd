@@ -64,9 +64,20 @@ class Constraint:
 class ProcessedSchema:
 
 	def __init__(self) -> None:
-		self.mandatory = False
+		self.mandatory_ = False
 		self.type: typing.Optional[Constraint] = None
 		self.validations: typing.List[typing.Callable[[Context], Result]] = []
+
+	@property
+	def isMandatory(self) -> bool:
+		return self.mandatory_
+
+	def setMandatory(self) -> None:
+		"""
+		Set this constraint as mandatory.
+		"""
+		assert self.mandatory_ == False, "Mandatory constraint already set."
+		self.mandatory_ = True
 
 	def setType(self, constraint: Constraint) -> None:
 		"""
