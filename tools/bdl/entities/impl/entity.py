@@ -1,7 +1,10 @@
 import typing
+import json
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
+from bzd.validation.validation import Validation
+from bzd.utils.memoized_property import memoized_property
 
 
 class Entity:
@@ -16,6 +19,13 @@ class Entity:
 	@property
 	def name(self) -> str:
 		return self.element.getAttr("name").value
+
+	@memoized_property
+	def validation(self) -> typing.Optional[Validation]:
+		schema = self.element.getAttrValue("validation")
+		if schema is None:
+			return None
+		return Validation(schema=json.loads(schema))
 
 	def resolve(self,
 		symbols: typing.Any,

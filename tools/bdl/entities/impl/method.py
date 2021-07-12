@@ -2,6 +2,7 @@ import typing
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
+from bzd.utils.memoized_property import memoized_property
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.expression import Expression
@@ -22,7 +23,7 @@ class Method(Entity):
 	def isType(self) -> bool:
 		return self.element.isAttr("type")
 
-	@property
+	@memoized_property
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element, kind="type", template="template") if self.isType else None
 
@@ -43,7 +44,7 @@ class Method(Entity):
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
-	@property
+	@memoized_property
 	def args(self) -> typing.List[Expression]:
 		if self.element.isNestedSequence("argument"):
 			sequence = self.element.getNestedSequence("argument")

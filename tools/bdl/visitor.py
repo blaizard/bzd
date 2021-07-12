@@ -34,7 +34,7 @@ class Parent:
 		if self.isNested:
 			return [self.entity.name] if self.entity.isName else []
 		if isinstance(self.entity, Namespace):
-			return self.entity.nameList
+			return self.entity.nameList  # type: ignore
 		return []
 
 

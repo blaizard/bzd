@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 	config = parser.parse_args()
 
-	objectContext = ObjectContext(preprocessFormat=config.preprocess_format, includeDeps=True)
+	objectContext = ObjectContext(preprocessFormat=config.preprocess_format, resolve=True)
 
 	for inputPath in config.inputs:
 

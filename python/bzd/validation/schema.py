@@ -18,11 +18,13 @@ class Context:
 		assert self.underlying_
 		return self.underlying_
 
+
 class TypeContext(Context):
 
 	def setUnderlying(self, value: typing.Any) -> None:
 		assert self.underlying_ is None
 		self.underlying_ = value
+
 
 class Constraint:
 
@@ -46,7 +48,7 @@ class Constraint:
 			assert converted.is_integer()
 			return int(converted)
 		except:
-			raise Exception("Value '{}' is not a valid integer.".format(value))
+			raise Exception("The value '{}' is not a valid integer.".format(value))
 
 	@staticmethod
 	def _toFloat(value: str) -> float:
@@ -56,7 +58,8 @@ class Constraint:
 		try:
 			return float(value)
 		except:
-			raise Exception("Value '{}' is not a valid float.".format(value))
+			raise Exception("The value '{}' is not a valid floating point number.".format(value))
+
 
 class ProcessedSchema:
 
@@ -98,7 +101,7 @@ class ProcessedSchema:
 		bound = partial(validation, args)
 		self.validations.append(bound)
 
-	def validate(self, value: str) -> Result:
+	def validate(self, value: str) -> typing.Optional[typing.List[str]]:
 		"""
 		Validate a value.
 		"""
@@ -107,17 +110,18 @@ class ProcessedSchema:
 
 		# Process the type
 		if self.type:
-			resultType: typing.Optional[str] = self.type.check(context=typeContext) # type: ignore
+			resultType: typing.Optional[str] = self.type.check(context=typeContext)  # type: ignore
 			if resultType is not None:
-				return resultType
+				return [resultType]
 
 		# Cast down the context to a normal context
 		context = typing.cast(Context, typeContext)
 
 		# Process the validation callables
+		result = []
 		for validation in self.validations:
-			result = validation(context)
-			if result is not None:
-				return result
+			resultCurrent = validation(context)
+			if resultCurrent is not None:
+				result.append(resultCurrent)
 
-		return None
+		return result if result else None

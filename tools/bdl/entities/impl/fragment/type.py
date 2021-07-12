@@ -1,5 +1,6 @@
 import typing
 
+from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
@@ -33,6 +34,16 @@ class Type:
 		# Get the validation schema if any
 		entity = symbols.getEntity(fqn=fqn)
 		# TODO Implement some kind of validation
+		if self.element.isNestedSequence("argument"):
+			arguments = {(arg.getAttr("key").value if arg.isAttr("key") else str(i)): arg.getAttr("value").value
+				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
+			validation = entity.validation
+			if validation is not None:
+				print(validation)
+				print(arguments)
+				result = validation.validate(arguments, output="return")
+				Error.assertTrue(element=self.element, condition=result, message=str(result))
+
 		#entity.validate(self.kind)
 
 		# Loop through the nested templates.
@@ -49,7 +60,7 @@ class Type:
 	def kind(self) -> str:
 		return self.element.getAttr(self.kindAttr).value
 
-	@property
+	@memoized_property
 	def name(self) -> str:
 		return Visitor(entity=self).result
 
@@ -61,7 +72,7 @@ class Type:
 		return "." in self.kind
 
 	def __repr__(self) -> str:
-		return self.name
+		return self.name  # type: ignore
 
 
 class Visitor(VisitorBase[str, str]):

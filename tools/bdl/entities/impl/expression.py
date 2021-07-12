@@ -2,6 +2,7 @@ import typing
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
+from bzd.utils.memoized_property import memoized_property
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
@@ -47,7 +48,7 @@ class Expression(Entity):
 	def const(self) -> bool:
 		return self.element.isAttr("const")
 
-	@property
+	@memoized_property
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 
@@ -60,7 +61,7 @@ class Expression(Entity):
 		"""
 		self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-	@property
+	@memoized_property
 	def args(self) -> typing.List[Argument]:
 		arguments = self.element.getNestedSequence("argument")
 		return [] if arguments is None else [Argument(arg) for arg in arguments]
@@ -73,7 +74,7 @@ class Expression(Entity):
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
-	@property
+	@memoized_property
 	def contracts(self) -> Contracts:
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
