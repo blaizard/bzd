@@ -15,8 +15,8 @@ _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 _regexprType = r"(?P<type>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match a symbol
 _regexprSymbol = r"(?P<symbol>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
-# Match: "string", 12, -45, 5.1854
-_regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?)"
+# Match: "string", 12, -45, 5.1854, true, false
+_regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 # Match string
 _regexprString = r"\"(?P<value>.*?)\""
 

@@ -69,7 +69,6 @@ class Expression(Entity):
 			if validation is not None:
 				result = validation.validate(arguments, output="return")
 				Error.assertTrue(element=self.element, condition=result, message=str(result))
-		
 
 	@memoized_property
 	def args(self) -> typing.List[Argument]:
