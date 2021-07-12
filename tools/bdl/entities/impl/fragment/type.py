@@ -6,7 +6,8 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
-
+if typing.TYPE_CHECKING:
+	from bdl.entities.all import Entity
 
 class Type:
 
@@ -20,7 +21,7 @@ class Type:
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+		exclude: typing.Optional[typing.List[str]] = None) -> "Entity":
 		"""
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
@@ -31,21 +32,6 @@ class Type:
 			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
-		# Get the validation schema if any
-		entity = symbols.getEntity(fqn=fqn)
-		# TODO Implement some kind of validation
-		if self.element.isNestedSequence("argument"):
-			arguments = {(arg.getAttr("key").value if arg.isAttr("key") else str(i)): arg.getAttr("value").value
-				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
-			validation = entity.validation
-			if validation is not None:
-				print(validation)
-				print(arguments)
-				result = validation.validate(arguments, output="return")
-				Error.assertTrue(element=self.element, condition=result, message=str(result))
-
-		#entity.validate(self.kind)
-
 		# Loop through the nested templates.
 		if self.templateAttr:
 			nested = self.element.getNestedSequence(self.templateAttr)
@@ -55,6 +41,10 @@ class Type:
 					# Note the "kind" here is always type for sub-elements.
 					subType = Type(element=element, kind="type", template=self.templateAttr)
 					subType.resolve(symbols=symbols, namespace=namespace)
+
+		# Get the validation schema if any
+		entity = symbols.getEntity(fqn=fqn)
+		return entity
 
 	@property
 	def kind(self) -> str:

@@ -59,7 +59,17 @@ class Expression(Entity):
 		"""
 		Resolve entities.
 		"""
-		self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+
+		# Validate arguments
+		if self.element.isNestedSequence("argument"):
+			arguments = {(arg.getAttr("key").value if arg.isAttr("key") else str(i)): arg.getAttr("value").value
+				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
+			validation = entity.validation
+			if validation is not None:
+				result = validation.validate(arguments, output="return")
+				Error.assertTrue(element=self.element, condition=result, message=str(result))
+		
 
 	@memoized_property
 	def args(self) -> typing.List[Argument]:
