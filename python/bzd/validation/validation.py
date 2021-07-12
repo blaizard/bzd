@@ -2,6 +2,7 @@ import typing
 import re
 
 from bzd.validation.schema import Constraint, Schema, ProcessedSchema
+from bzd.validation.constraints.boolean import Boolean
 from bzd.validation.constraints.integer import Integer
 from bzd.validation.constraints.float import Float
 from bzd.validation.constraints.string import String
@@ -38,6 +39,7 @@ class Validation:
 
 	def __init__(self, schema: Schema) -> None:
 		self.availableConstraints: typing.Dict[str, typing.Type[Constraint]] = {
+			"boolean": Boolean,
 			"integer": Integer,
 			"float": Float,
 			"string": String

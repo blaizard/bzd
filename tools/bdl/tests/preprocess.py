@@ -17,6 +17,21 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="struct temp { var = Void(12); }", objectContext=ObjectContext(resolve=True))
 
+	def testBoolean(self) -> None:
+
+		# No arguments
+		Object.fromContent(content="struct temp { var = Boolean; }", objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Boolean(); }", objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Boolean(true); }", objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Boolean(false); }", objectContext=ObjectContext(resolve=True))
+		# With a value
+		with self.assertRaisesRegex(Exception, r"valid boolean"):
+			Object.fromContent(content="struct temp { var = Boolean(12); }", objectContext=ObjectContext(resolve=True))
+		# With wrong number of arguments
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="struct temp { var = Boolean(1, 2 ,3); }",
+				objectContext=ObjectContext(resolve=True))
+
 	def testInteger(self) -> None:
 
 		# No arguments

@@ -13,6 +13,11 @@ BuiltinFloat = Builtin(
 	"name": "Float",
 	"validation": '{"0": "float"}'
 	})))
+BuiltinBoolean = Builtin(
+	Element.fromSerialize(Visitor.makeEntity("builtin", values={
+	"name": "Boolean",
+	"validation": '{"0": "boolean"}'
+	})))
 BuiltinResult = Builtin(
 	Element.fromSerialize(
 	Visitor.makeEntity("builtin",
@@ -31,4 +36,4 @@ BuiltinList = Builtin(
 	}]})))
 BuiltinCallable = Builtin(Element.fromSerialize(Visitor.makeEntity("builtin", values={"name": "Callable"})))
 
-Builtins = [BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinResult, BuiltinList, BuiltinCallable]
+Builtins = [BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinResult, BuiltinList, BuiltinCallable]
