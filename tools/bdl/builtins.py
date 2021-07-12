@@ -21,12 +21,10 @@ BuiltinBoolean = Builtin(
 BuiltinResult = Builtin(
 	Element.fromSerialize(
 	Visitor.makeEntity("builtin",
-	values={"name": "Result"},
-	sequences={"templates": [{
-	"validation": "mandatory"
-	}, {
-	"validation": "mandatory"
-	}]})))
+	values={
+	"name": "Result",
+	"validation_template": '{"0": "mandatory", "1": "mandatory"}'
+	})))
 BuiltinList = Builtin(
 	Element.fromSerialize(
 	Visitor.makeEntity("builtin",

@@ -27,6 +27,13 @@ class Entity:
 			return None
 		return Validation(schema=json.loads(schema))
 
+	@memoized_property
+	def validationTemplate(self) -> typing.Optional[Validation]:
+		schema = self.element.getAttrValue("validation_template")
+		if schema is None:
+			return None
+		return Validation(schema=json.loads(schema))
+
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],
