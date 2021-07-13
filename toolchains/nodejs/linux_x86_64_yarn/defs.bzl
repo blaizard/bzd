@@ -5,10 +5,10 @@ def load_linux_x86_64_yarn():
         name = "yarn",
         build_file = "//toolchains/nodejs/linux_x86_64_yarn:yarn.BUILD",
         urls = [
-            "https://github.com/yarnpkg/yarn/releases/download/v1.22.4/yarn-v1.22.4.tar.gz",
+            "https://github.com/yarnpkg/yarn/releases/download/v1.22.10/yarn-v1.22.10.tar.gz",
         ],
-        strip_prefix = "yarn-v1.22.4",
-        sha256 = "bc5316aa110b2f564a71a3d6e235be55b98714660870c5b6b2d2d3f12587fb58",
+        strip_prefix = "yarn-v1.22.10",
+        sha256 = "7e433d4a77e2c79e6a7ae4866782608a8e8bcad3ec6783580577c59538381a6e",
     )
 
     http_archive(
