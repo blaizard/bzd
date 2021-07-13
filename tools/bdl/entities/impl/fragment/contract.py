@@ -4,6 +4,8 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor
 from bzd.parser.error import Error
 
+from bzd.validation.validation import Validation
+
 
 class Contract:
 
@@ -85,6 +87,20 @@ class Contracts:
 			if contract.type == kind:
 				return contract
 		return None
+
+	@property
+	def validationValue(self) -> str:
+		"""
+		Generate a validation object for a value out of the current contracts
+		"""
+		content = []
+		maybeMin = self.get("min")
+		if maybeMin:
+			content.append("min({})".format(maybeMin.valueString))
+		maybeMax = self.get("max")
+		if maybeMax:
+			content.append("max({})".format(maybeMax.valueString))
+		return " ".join(content)
 
 	@property
 	def empty(self) -> bool:

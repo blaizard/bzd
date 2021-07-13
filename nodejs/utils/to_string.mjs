@@ -30,7 +30,7 @@ export function bytesToString(value, decimalPoints = 1) {
 			["KiB", "KiB", 1024],
 			["MiB", "MiB", 1024],
 			["GiB", "GiB", 1024],
-			["TiB", "TiB", 1024],
+			["TiB", "TiB", 1024]
 		],
 		value,
 		/*maxNbUnits*/ 1,
@@ -45,7 +45,7 @@ export function timeMsToString(value, maxNbUnits = 1) {
 			["s", "s", 60],
 			[" min", " min", 60],
 			["h", "h", 24],
-			[" day", " days", 30],
+			[" day", " days", 30]
 		],
 		value,
 		maxNbUnits,
@@ -62,7 +62,7 @@ export function dateToString(format, timestamp) {
 		h: date.getHours(),
 		d: date.getDate(),
 		m: date.getMonth() + 1,
-		y: date.getFullYear(),
+		y: date.getFullYear()
 	});
 }
 

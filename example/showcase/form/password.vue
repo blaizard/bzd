@@ -3,11 +3,11 @@
 
 	export default {
 		mixins: [Template],
-		data: function () {
+		data: function() {
 			return {
 				value: {
-					password: "hello",
-				},
+					password: "hello"
+				}
 			};
 		},
 		computed: {
@@ -16,9 +16,9 @@
 					{ type: "Password", caption: "Password" },
 					{ type: "Password", name: "password", caption: "Password (value)" },
 					{ type: "Password", caption: "Password (pre & post)", pre: "-->", post: "<--" },
-					{ type: "Password", caption: "Password (placeholder)", placeholder: "Type Password..." },
+					{ type: "Password", caption: "Password (placeholder)", placeholder: "Type Password..." }
 				];
-			},
-		},
+			}
+		}
 	};
 </script>

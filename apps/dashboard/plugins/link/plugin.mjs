@@ -7,7 +7,7 @@ export default {
 			type: "Input",
 			name: "link.url",
 			caption: "URL",
-			placeholder: "https://www.google.com",
-		},
-	],
+			placeholder: "https://www.google.com"
+		}
+	]
 };

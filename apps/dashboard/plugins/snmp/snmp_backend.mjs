@@ -10,11 +10,11 @@ class Snmp {
 		const versionMapping = {
 			1: SnmpNative.Version1,
 			"2c": SnmpNative.Version2c,
-			3: SnmpNative.Version3,
+			3: SnmpNative.Version3
 		};
 		Exception.assert(version in versionMapping, "Unsupported version '{}'", version);
 		this.session = new SnmpNative.createSession(host, community, {
-			version: versionMapping[version],
+			version: versionMapping[version]
 		});
 	}
 
@@ -114,8 +114,8 @@ export default {
 				// Get the data
 				const snmp = new Snmp(host, version, community);
 				return await snmp.getAndClose(oids);
-			},
-		},
+			}
+		}
 	],
 	constructor: async (data) => {
 		const updateObj = (obj, oid, ttl) => {
@@ -163,7 +163,7 @@ export default {
 			const oid = Snmp.normalizeOid(item.oid);
 			let result = {
 				id: item.id || "unknown",
-				value: values[oid],
+				value: values[oid]
 			};
 
 			(item.ops || []).forEach((operation) => {
@@ -190,5 +190,5 @@ export default {
 		});
 
 		return results;
-	},
+	}
 };

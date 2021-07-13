@@ -46,7 +46,7 @@ class Type:
 		self.underlying = symbols.getEntity(fqn=fqn)
 
 		# Validate template arguments
-		validation = self.underlying.validationTemplate # type: ignore
+		validation = self.underlying.validationTemplate  # type: ignore
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),

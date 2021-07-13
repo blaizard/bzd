@@ -18,25 +18,25 @@
 	export default {
 		mixins: [Element],
 		props: {
-			value: { type: Boolean, required: false, default: false },
+			value: { type: Boolean, required: false, default: false }
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-checkbox": true,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
 			},
 			text() {
 				return this.getOption("text", "");
-			},
+			}
 		},
 		methods: {
 			handleClick() {
 				this.$el.firstChild.focus();
 				this.set(!this.get());
-			},
-		},
+			}
+		}
 	};
 </script>
 
