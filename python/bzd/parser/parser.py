@@ -102,7 +102,7 @@ class Parser:
 
 			# Uncomment for debug
 			print("**** debug ****\n", root)
-			for item in self.iterateGrammar(element.getGrammar()):
+			for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() + self.defaultGrammarPost):
 				print(item.regexpr)
 
 			Error.handle(context=self.context, index=index, message=str(e))

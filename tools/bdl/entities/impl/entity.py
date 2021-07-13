@@ -6,6 +6,8 @@ from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 from bzd.utils.memoized_property import memoized_property
 
+from tools.bdl.entities.impl.fragment.contract import Contracts
+
 
 class Entity:
 
@@ -19,6 +21,10 @@ class Entity:
 	@property
 	def name(self) -> str:
 		return self.element.getAttr("name").value
+
+	@property
+	def contracts(self) -> Contracts:
+		return Contracts(sequence = None)
 
 	@memoized_property
 	def validation(self) -> typing.Optional[Validation]:

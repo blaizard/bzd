@@ -21,9 +21,9 @@ class Using(Entity):
 	def category(self) -> str:
 		return "using"
 
-	@memoized_property
+	@property
 	def contracts(self) -> Contracts:
-		return Contracts(sequence=self.element.getNestedSequence("contract"))
+		return self.type.contracts # type: ignore
 
 	@memoized_property
 	def type(self) -> Type:

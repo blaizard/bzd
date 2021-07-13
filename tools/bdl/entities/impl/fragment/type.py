@@ -7,7 +7,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
 if typing.TYPE_CHECKING:
-	from bdl.entities.all import Entity
+	from bdl.entities.all import EntityType
 
 
 class Type:
@@ -18,11 +18,12 @@ class Type:
 		self.element = element
 		self.kindAttr = kind
 		self.templateAttr = template
+		self.underlying = typing.Optional["EntityType"]
 
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> "Entity":
+		exclude: typing.Optional[typing.List[str]] = None) -> "EntityType":
 		"""
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
@@ -35,22 +36,17 @@ class Type:
 
 		# Loop through the nested templates.
 		templates = {}
-		if self.templateAttr:
-			nested = self.element.getNestedSequence(self.templateAttr)
-			if nested:
-				for i, element in enumerate(nested):
-					# Recursively resolve nested types.
-					# Note the "kind" here is always type for sub-elements.
-					subType = Type(element=element, kind="type", template=self.templateAttr)
-					subType.resolve(symbols=symbols, namespace=namespace)
-					# Only keep the kind, as nested template arguments will be deducted by recursion.
-					templates[str(i)] = subType.kind
+		for i, subType in enumerate(self.templates):
+			# Recursively resolve nested types.
+			subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			# Only keep the kind, as nested template arguments will be deducted by recursion.
+			templates[str(i)] = subType.kind
 
-		# Get the validation schema if any
-		entity = symbols.getEntity(fqn=fqn)
+		# Get and save the underlying type
+		self.underlying = symbols.getEntity(fqn=fqn)
 
 		# Validate template arguments
-		validation = entity.validationTemplate
+		validation = self.underlying.validationTemplate # type: ignore
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),
@@ -60,10 +56,34 @@ class Type:
 				condition=bool(templates),
 				message="Type '{}' requires template arguments.".format(self.kind))
 			result = validation.validate(templates, output="return")
-			print(templates)
 			Error.assertTrue(element=self.element, condition=result, message=str(result))
 
-		return entity
+		return self.underlying
+
+	@property
+	def contracts(self) -> Contracts:
+		#if self.underlying is None:
+		return Contracts(sequence=self.element.getNestedSequence("contract"))
+		#return self.resolved_contracts
+
+	@memoized_property
+	def resolved_contracts(self) -> Contracts:
+		assert self.underlying is not None, "The 'resolve' method must be callied prior to calling 'resolved_contracts'."
+		# TODO merge contracts
+		return self.contracts
+
+	@property
+	def isTemplate(self) -> bool:
+		return len(self.templates) > 0
+
+	@memoized_property
+	def templates(self) -> typing.List["Type"]:
+		if self.templateAttr:
+			nested = self.element.getNestedSequence(self.templateAttr)
+			if nested:
+				# Note the "kind" here is always type for sub-elements.
+				return [Type(element=element, kind="type", template=self.templateAttr) for element in nested]
+		return []
 
 	@property
 	def kind(self) -> str:

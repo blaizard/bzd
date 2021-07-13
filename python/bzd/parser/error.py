@@ -1,6 +1,7 @@
 import typing
 import logging
 import sys
+import re
 
 from pathlib import Path
 from bzd.parser.element import Element
@@ -46,8 +47,10 @@ class Error:
 			line += 1
 		column = len(contentByLine[line]) - (current - index) + 1
 
-		# Position the cursor
-		contentByLine.insert(line + 1, "{}^".format(" " * column))
+		# Position the cursor.
+		# A padding must be created to correctly print special spaces such as tabs for example.
+		paddingLine = re.sub(r"[^\s]", " ", contentByLine[line])
+		contentByLine.insert(line + 1, "{}^".format(paddingLine[0:column]))
 		contentByLine.insert(
 			line + 2, "{}:{}:{}: error: {}".format("<string>" if context.path is None else context.path, line + 1,
 			column + 1, message))

@@ -1,9 +1,7 @@
-import sys
 import unittest
 import typing
 
 from tools.bdl.object import Object, ObjectContext
-from tools.bdl.generators.bdl.visitor import formatBdl
 
 
 class TestRun(unittest.TestCase):
@@ -85,6 +83,8 @@ class TestRun(unittest.TestCase):
 		# No template
 		with self.assertRaisesRegex(Exception, r"requires template"):
 			Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
+
+		# Template
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="struct temp { var = Result<Integer>; }",
 				objectContext=ObjectContext(resolve=True))
@@ -100,6 +100,18 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
 			objectContext=ObjectContext(resolve=True))
+
+	def testList(self) -> None:
+
+		# No template
+		with self.assertRaisesRegex(Exception, r"requires template"):
+			Object.fromContent(content="struct temp { var = List; }", objectContext=ObjectContext(resolve=True))
+
+		# Template
+		Object.fromContent(content="struct temp { var = List<Integer>; }", objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="struct temp { var = List<Integer, Void>; }",
+				objectContext=ObjectContext(resolve=True))
 
 
 if __name__ == '__main__':
