@@ -3,6 +3,7 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 from bzd.utils.memoized_property import memoized_property
+from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.expression import Expression
@@ -26,6 +27,20 @@ class Method(Entity):
 	@memoized_property
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element, kind="type", template="template") if self.isType else None
+
+	@memoized_property
+	def validation(self) -> typing.Optional[Validation]:
+		"""
+		Generate a validation based on the argument list.
+		"""
+		schema = {}
+		for arg in self.args:
+			validation = []
+			# Arguments declared with no value are mandatory, others are just optional.
+			if not arg.isArg:
+				validation.append("mandatory")
+			schema[arg.name] = " ".join(validation)
+		return Validation(schema=schema)
 
 	def resolve(self,
 		symbols: typing.Any,

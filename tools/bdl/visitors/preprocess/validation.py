@@ -29,3 +29,13 @@ class Validation(VisitorBase[None]):
 
 		else:
 			entity.assertTrue(condition=False, message="Unsupported nested type: '{}'.".format(entity.type))
+
+	def visitMethod(self, entity: Method, result: None) -> None:
+
+		# Arguments
+		argumentNames = set()
+		for arg in entity.args:
+			arg.assertTrue(condition=arg.isName, message="Argument is missing a name.")
+			arg.assertTrue(condition=(arg.name not in argumentNames),
+				message="Argument name '{}' is already defined.".format(arg.name))
+			argumentNames.add(arg.name)

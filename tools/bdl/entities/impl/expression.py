@@ -63,7 +63,7 @@ class Expression(Entity):
 
 		# Validate arguments
 		if self.element.isNestedSequence("argument"):
-			arguments = {(arg.getAttr("key").value if arg.isAttr("key") else str(i)): arg.getAttr("value").value
+			arguments = {(arg.getAttr("name").value if arg.isAttr("name") else str(i)): arg.getAttr("value").value
 				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
 			validation = entity.validation
 			if validation is not None:
@@ -84,7 +84,7 @@ class Expression(Entity):
 		return self.element.getAttrValue("comment")
 
 	@memoized_property
-	def contracts(self) -> Contracts:
+	def contracts(self) -> Contracts: # type: ignore
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
 	def __repr__(self) -> str:
