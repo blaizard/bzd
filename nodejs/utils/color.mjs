@@ -21,7 +21,7 @@ export default class Color {
 				r: parseInt("0x" + normalizedStr[1] + normalizedStr[1]),
 				g: parseInt("0x" + normalizedStr[2] + normalizedStr[2]),
 				b: parseInt("0x" + normalizedStr[3] + normalizedStr[3]),
-				a: 1,
+				a: 1
 			};
 		}
 		else if (normalizedStr.length == 7) {
@@ -29,7 +29,7 @@ export default class Color {
 				r: parseInt("0x" + normalizedStr[1] + normalizedStr[2]),
 				g: parseInt("0x" + normalizedStr[3] + normalizedStr[4]),
 				b: parseInt("0x" + normalizedStr[5] + normalizedStr[6]),
-				a: 1,
+				a: 1
 			};
 		}
 		Exception.unreachable("Unsupported color format: '{}'", normalizedStr);

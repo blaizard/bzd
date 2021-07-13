@@ -3,6 +3,7 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 from bzd.utils.memoized_property import memoized_property
+from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
@@ -65,10 +66,33 @@ class Expression(Entity):
 		if self.element.isNestedSequence("argument"):
 			arguments = {(arg.getAttr("name").value if arg.isAttr("name") else str(i)): arg.getAttr("value").value
 				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
-			validation = entity.validation
+
+			# Read the validation for the value
+			validation = self._makeValueValidation(entity=entity)
 			if validation is not None:
 				result = validation.validate(arguments, output="return")
-				Error.assertTrue(element=self.element, condition=result, message=str(result))
+				Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
+
+	def _makeValueValidation(self, entity: Entity) -> typing.Optional[Validation]:
+		"""
+		Generate the validation for the value by combining the type validation
+		and the contract validation.
+		"""
+
+		# Read the validation coming from the type if any
+		validationType: typing.Optional[Validation] = entity.validation
+		#validation = validationType if validationType else Validation({})
+
+		# Check if there is a validation for the value
+		#validationValue = self.contracts.validationValue
+		#if validationValue:
+		# Assert this is a single value
+		#	try:
+		#		validation.mergeSchema({"0": validationValue})
+		#	except Exception as e:
+		#		self.error(message=str(e))
+
+		return validationType
 
 	@memoized_property
 	def args(self) -> typing.List[Argument]:
@@ -84,7 +108,7 @@ class Expression(Entity):
 		return self.element.getAttrValue("comment")
 
 	@memoized_property
-	def contracts(self) -> Contracts: # type: ignore
+	def contracts(self) -> Contracts:  # type: ignore
 		return Contracts(sequence=self.element.getNestedSequence("contract"))
 
 	def __repr__(self) -> str:

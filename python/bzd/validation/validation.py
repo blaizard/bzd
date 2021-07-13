@@ -46,18 +46,24 @@ class Validation:
 			"string": String,
 			"mandatory": Mandatory
 		}
-		self.processed = self._prepocessSchema(schema)
+		self.processed: typing.Dict[str, ProcessedSchema] = {}
+		self._prepocessSchema(schema)
 
-	def _prepocessSchema(self, schema: Schema) -> typing.Dict[str, ProcessedSchema]:
+	def mergeSchema(self, schema: Schema) -> None:
+		"""
+		Merge a schema with the existing validation.
+		"""
+		self._prepocessSchema(schema)
+
+	def _prepocessSchema(self, schema: Schema) -> None:
 		"""
 		Preprocess the schema.
 		"""
 
-		processed: typing.Dict[str, ProcessedSchema] = {}
-
 		for key, constraints in schema.items():
 
-			processed[key] = ProcessedSchema()
+			if key not in self.processed:
+				self.processed[key] = ProcessedSchema()
 
 			# Parse each constraints strings
 			assert isinstance(constraints, str), "Constraint must be a string."
@@ -69,9 +75,13 @@ class Validation:
 				args = [arg for arg in (m.group(2) if m.group(2) else "").split(",") if arg]
 
 				# Install the constraint
-				processed[key].install(constraints=self.availableConstraints, name=name, args=args)
+				self.processed[key].install(constraints=self.availableConstraints, name=name, args=args)
 
-		return processed
+	def __len__(self) -> int:
+		"""
+		Get the number of entries.
+		"""
+		return len(self.processed.keys())
 
 	def validate(self, values: typing.Dict[str, typing.Any], output: str = "throw") -> Result:
 		"""

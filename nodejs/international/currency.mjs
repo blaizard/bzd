@@ -122,7 +122,7 @@ class Currency {
 			xof: { symbol: "CFA", name: "CFA Franc BCEAO", format: "{} CFA" },
 			yer: { symbol: "ر.ي.‏", name: "Yemeni Rial", format: "{} ر.ي.‏" },
 			zar: { symbol: "R", name: "South African Rand", format: "{} R" },
-			zmk: { symbol: "ZK", name: "Zambian Kwacha", format: "{} ZK" },
+			zmk: { symbol: "ZK", name: "Zambian Kwacha", format: "{} ZK" }
 		});
 	}
 

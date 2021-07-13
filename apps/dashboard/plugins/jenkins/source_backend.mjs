@@ -24,7 +24,7 @@ export default {
 				// Build the URL
 				const baseUrl = url + "/job/" + build + "/job/" + branch;
 				let options = {
-					expect: "json",
+					expect: "json"
 				};
 
 				// If authentication
@@ -32,7 +32,7 @@ export default {
 					options.authentication = {
 						type: "basic",
 						username: user,
-						password: token,
+						password: token
 					};
 				}
 
@@ -47,12 +47,12 @@ export default {
 						duration: status == "processing" ? item.estimatedDuration : item.duration,
 						timestamp: item.timestamp,
 						status: status,
-						link: baseUrl + "/" + item.id,
+						link: baseUrl + "/" + item.id
 					};
 				});
 			},
-			timeout: 10 * 1000,
-		},
+			timeout: 10 * 1000
+		}
 	],
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
@@ -64,7 +64,7 @@ export default {
 			data["jenkins.token"]
 		);
 		return {
-			builds: builds,
+			builds: builds
 		};
-	},
+	}
 };

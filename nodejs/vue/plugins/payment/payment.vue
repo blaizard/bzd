@@ -15,11 +15,11 @@
 	export default {
 		props: {
 			amount: { type: Number, mandatory: true },
-			metadata: { type: Object, mandatory: false, default: () => ({}) },
+			metadata: { type: Object, mandatory: false, default: () => ({}) }
 		},
 		data() {
 			return {
-				componentList: [],
+				componentList: []
 			};
 		},
 		mounted() {
@@ -39,8 +39,8 @@
 							this.$notification.error({ "bzd-payment": message });
 						}
 					);
-			},
-		},
+			}
+		}
 	};
 </script>
 

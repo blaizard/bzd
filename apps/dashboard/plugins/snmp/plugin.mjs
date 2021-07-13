@@ -8,7 +8,7 @@ export default {
 			caption: "Host",
 			name: "snmp.host",
 			validation: "mandatory",
-			width: 0.4,
+			width: 0.4
 		},
 		{
 			type: "Dropdown",
@@ -16,7 +16,7 @@ export default {
 			name: "snmp.version",
 			validation: "mandatory",
 			list: ["1", "2c", "3"],
-			width: 0.3,
+			width: 0.3
 		},
 		{
 			type: "Input",
@@ -24,7 +24,7 @@ export default {
 			name: "snmp.community",
 			validation: "mandatory",
 			placeholder: "public",
-			width: 0.3,
+			width: 0.3
 		},
 		{
 			type: "Array",
@@ -41,9 +41,9 @@ export default {
 					width: 0.4,
 					template: [
 						{ type: "Dropdown", name: "type", list: { mul: "*", div: "/", add: "+", sub: "-" }, width: 0.1 },
-						{ type: "Input", name: "value", width: 0.9 },
-					],
-				},
+						{ type: "Input", name: "value", width: 0.9 }
+					]
+				}
 			],
 			templateAdd: [
 				{
@@ -51,9 +51,9 @@ export default {
 					name: "preset",
 					caption: "Preset",
 					list: {
-						synology: "Synology",
+						synology: "Synology"
 					},
-					width: 0.4,
+					width: 0.4
 				},
 				{
 					type: "Dropdown",
@@ -88,11 +88,11 @@ export default {
 						"network.total.in.eth0:1.3.6.1.2.1.31.1.1.1.6.3:10": "eth0 Total Received (bytes)",
 						"network.total.in.eth1:1.3.6.1.2.1.31.1.1.1.6.4:10": "eth1 Total Received (bytes)",
 						"network.total.out.eth0:1.3.6.1.2.1.31.1.1.1.10.3:10": "eth0 Total Sent (bytes)",
-						"network.total.out.eth1:1.3.6.1.2.1.31.1.1.1.10.4:10": "eth1 Total Sent (bytes)",
+						"network.total.out.eth1:1.3.6.1.2.1.31.1.1.1.10.4:10": "eth1 Total Sent (bytes)"
 					},
-					width: 0.4,
+					width: 0.4
 				},
-				{ type: "Button", content: "Add", action: "approve", width: 0.2, align: "bottom" },
+				{ type: "Button", content: "Add", action: "approve", width: 0.2, align: "bottom" }
 			],
 			toValues: (values) => {
 				const splittedValues = (values["oid"] || "").split(":");
@@ -100,17 +100,17 @@ export default {
 				for (let i = 3; i < splittedValues.length; i += 2) {
 					operations.push({
 						type: splittedValues[i],
-						value: splittedValues[i + 1],
+						value: splittedValues[i + 1]
 					});
 				}
 				return {
 					id: splittedValues[0],
 					oid: splittedValues[1],
 					ttl: splittedValues[2],
-					ops: operations,
+					ops: operations
 				};
-			},
-		},
+			}
+		}
 	],
-	timeout: 2000, // ms
+	timeout: 2000 // ms
 };

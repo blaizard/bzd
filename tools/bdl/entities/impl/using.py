@@ -23,7 +23,7 @@ class Using(Entity):
 
 	@property
 	def contracts(self) -> Contracts:
-		return self.type.contracts # type: ignore
+		return self.type.contracts  # type: ignore
 
 	@memoized_property
 	def type(self) -> Type:

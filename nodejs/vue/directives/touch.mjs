@@ -101,7 +101,7 @@ function getEltCoordinates(elt) {
 	const relativePos = elt.getBoundingClientRect();
 	return {
 		x: relativePos.left + scrollOffsetX(),
-		y: relativePos.top + scrollOffsetY(),
+		y: relativePos.top + scrollOffsetY()
 	};
 }
 
@@ -145,7 +145,7 @@ async function dragStart(e) {
 
 	if (curConfig.disablePointerEvents) {
 		Object.assign(document.body.style, {
-			"pointer-events": "none",
+			"pointer-events": "none"
 		});
 	}
 
@@ -169,7 +169,7 @@ async function dragStart(e) {
 				const coordIFrameViewPort = iframe.getBoundingClientRect();
 				receiverCoordOffset = {
 					x: coordIFrameViewPort.left,
-					y: coordIFrameViewPort.top,
+					y: coordIFrameViewPort.top
 				};
 				receiverDocument = iframe.contentWindow.document;
 			}
@@ -238,7 +238,7 @@ async function dragStart(e) {
 					"pointer-events": "none",
 					"z-index": 99999999,
 					"margin-left": 0,
-					"margin-top": 0,
+					"margin-top": 0
 				},
 				curConfig.dragEltCss
 			);
@@ -259,13 +259,13 @@ async function dragStart(e) {
 
 				coordOffset = {
 					x: coord.x - pos.x,
-					y: coord.y - pos.y,
+					y: coord.y - pos.y
 				};
 			}
 			else {
 				coordOffset = {
 					x: dragElt.offsetWidth / 2,
-					y: dragElt.offsetHeight / 2,
+					y: dragElt.offsetHeight / 2
 				};
 			}
 		}
@@ -302,7 +302,7 @@ async function dragStart(e) {
 
 	if (curConfig.drag) {
 		// Run the interval function to detect drop location
-		const detectDropZoneCallback = function () {
+		const detectDropZoneCallback = function() {
 			//const startTime = performance.now();
 			detectDropZone();
 			//console.log("detectDropZone took " + Math.round(performance.now() - startTime) + "ms");
@@ -333,7 +333,7 @@ function detectDropZone() {
 	const coordDragEltViewPort = dragElt.getBoundingClientRect();
 	const coordViewPort = {
 		x: coordDragEltViewPort.left + coordOffset.x - receiverCoordOffset.x,
-		y: coordDragEltViewPort.top + coordOffset.y - receiverCoordOffset.y,
+		y: coordDragEltViewPort.top + coordOffset.y - receiverCoordOffset.y
 	};
 
 	if (receiverEltList) {
@@ -392,7 +392,7 @@ function detectDropZone() {
 				/**
 				 * List of indexes to be ignored
 				 */
-				ignore: [],
+				ignore: []
 			},
 			activeReceiverElt.hasAttribute(DRAG_RECEIVER_CONFIG)
 				? JSON.parse(activeReceiverElt.getAttribute(DRAG_RECEIVER_CONFIG))
@@ -510,7 +510,7 @@ function dragMove(e) {
 			// Calculate coordinate of the element according to the viewPort
 			const coordViewPort = {
 				x: currentCoord.x - scrollOffsetX(),
-				y: currentCoord.y - scrollOffsetY(),
+				y: currentCoord.y - scrollOffsetY()
 			};
 			dragElt.style.left = coordViewPort.x - coordOffset.x + "px";
 			dragElt.style.top = coordViewPort.y - coordOffset.y + "px";
@@ -535,7 +535,7 @@ function reset() {
 	// Reset the user selection
 	if (curConfig.disablePointerEvents) {
 		Object.assign(document.body.style, {
-			"pointer-events": "auto",
+			"pointer-events": "auto"
 		});
 	}
 
@@ -584,7 +584,7 @@ function reset() {
 				const eventData = {
 					index: elementIndex,
 					container: placeholderElt.parentNode,
-					args: curConfig.args,
+					args: curConfig.args
 				};
 
 				// call the ondrop callback if defined
@@ -595,7 +595,7 @@ function reset() {
 				// Trigger the event
 				if (curConfig.triggerEvent) {
 					const event = new CustomEvent(curConfig.triggerEvent, {
-						detail: eventData,
+						detail: eventData
 					});
 					placeholderElt.parentNode.dispatchEvent(event);
 				}
@@ -675,7 +675,7 @@ function Touch(el, config) {
 	this.el = el;
 }
 
-Touch.prototype.setConfig = function (config) {
+Touch.prototype.setConfig = function(config) {
 	this.config = Object.assign(
 		{
 			/**
@@ -786,17 +786,17 @@ Touch.prototype.setConfig = function (config) {
 			/**
 			 * Will be called at the end of the drag operation
 			 */
-			onstopdrag: null,
+			onstopdrag: null
 		},
 		config
 	);
 };
 
-Touch.prototype.handleEvent = function (e) {
+Touch.prototype.handleEvent = function(e) {
 	activateTouch(e, this.el, this.config);
 };
 
-export default function (el, binding) {
+export default function(el, binding) {
 	const config = binding && binding.value ? binding.value : binding;
 
 	if (!el.directiveTouchInstance) {
