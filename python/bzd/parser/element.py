@@ -7,7 +7,6 @@ from bzd.parser.context import Context
 ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
 SequenceSerialize = typing.List[ElementSerialize]
 
-
 class Sequence:
 
 	def __init__(self, context: typing.Optional[Context] = None) -> None:
@@ -49,20 +48,27 @@ class Sequence:
 		s.list = [Element.fromSerialize(e, context) for e in sequence]
 		return s
 
-
+T = typing.TypeVar("T",  bound="SequenceBuilder")
 class SequenceBuilder(Sequence):
 	"""
 	Represents a sequence that can be built.
 	"""
 
-	def merge(self, sequence: "Sequence") -> None:
-		self.list += sequence.list
+	@staticmethod
+	def cast(sequence: Sequence) -> "SequenceBuilder":
+		sequence.__class__ = SequenceBuilder
+		return typing.cast(SequenceBuilder, sequence)
 
-	def addElement(self, element: "Element") -> None:
+	def merge(self: T, sequence: "Sequence") -> T:
+		self.list += sequence.list
+		return self
+
+	def addElement(self: T, element: "Element") -> T:
 		"""
 		Add an element to the sequence.
 		"""
 		self.list.append(element)
+		return self
 
 
 class SequenceParser(Sequence):
@@ -209,27 +215,46 @@ class Element:
 
 		return content
 
-
+U = typing.TypeVar("U",  bound="ElementBuilder")
 class ElementBuilder(Element):
 
-	def addAttr(self, key: str, value: str) -> None:
+	@staticmethod
+	def cast(element: Element) -> "ElementBuilder":
+		element.__class__ = ElementBuilder
+		return typing.cast(ElementBuilder, element)
+
+	def addAttr(self: U, key: str, value: str) -> U:
 		"""
 		Add an attribute to the element.
 		"""
 		self.attrs[key] = AttributeParser(index=0, value=value)
+		return self
 
-	def addAttrs(self, data: typing.Dict[str, str]) -> None:
+	def addAttrs(self: U, data: typing.Dict[str, str]) -> U:
 		"""
 		Add multiple attributes to an element.
 		"""
 		for key, value in data.items():
 			self.addAttr(key, value)
+		return self
 
-	def setNestedSequence(self, kind: str, sequence: Sequence) -> None:
+	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:
 		"""
 		Set a nested sequence and overwrite exsiting one.
 		"""
 		self.sequences[kind] = sequence
+		return self
+
+	def addElementToNestedSequence(self: U, kind: str, element: Element) -> U:
+		"""
+		Add an element to a new or existing nested sequence.
+		"""
+		if kind not in self.sequences:
+			self.sequences[kind] = Sequence()
+		savedClass = self.__class__
+		SequenceBuilder.cast(self.sequences[kind]).addElement(element)
+		self.__class__ = savedClass
+		return self
 
 
 class ElementParser(Element):
