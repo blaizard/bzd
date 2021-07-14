@@ -5,6 +5,7 @@ from bzd.parser.element import Sequence
 from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL, CATEGORIES
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType
 from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+from tools.bdl.entities.builder import ElementBuilder, SequenceBuilder
 
 SymbolList = typing.List[SymbolType]
 
@@ -44,14 +45,13 @@ class Build(Visitor[SymbolList]):
 			for category in CATEGORIES:
 				nested = element.getNestedSequence(category)
 				if nested:
-					references = [
-						self.makeEntity("reference",
-						values={
-						"name":
-						SymbolMap.makeFQN(name=element.getAttr("name").value, namespace=nestedNamespace)
-						}) for element in nested if element.isAttr("name")
-					]
-					sequence = Sequence.fromSerialize(references)
+					sequence = SequenceBuilder()
+					for element in nested:
+						if element.isAttr("name"):
+							sequence.addElement(
+								ElementBuilder("reference").addAttr(
+								"name", SymbolMap.makeFQN(name=element.getAttr("name").value,
+								namespace=nestedNamespace)))
 					preparedElement.setNestedSequence(category, sequence)
 
 			element = preparedElement
