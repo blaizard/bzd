@@ -1,6 +1,6 @@
 import typing
 
-from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributesSerialize
+from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize
 from bzd.parser.grammar import Grammar
 from bzd.parser.context import Context
 
@@ -22,11 +22,8 @@ class Sequence:
 	def __len__(self) -> int:
 		return len([e for e in self.list if not e.isEmpty()])
 
-	def merge(self, sequence: "Sequence") -> None:
-		self.list += sequence.list
-
-	def copy(self) -> "Sequence":
-		sequence = Sequence()
+	def copy(self) -> "SequenceBuilder":
+		sequence = SequenceBuilder()
 		sequence.list = self.list.copy()
 		return sequence
 
@@ -51,6 +48,21 @@ class Sequence:
 		s = Sequence(context)
 		s.list = [Element.fromSerialize(e, context) for e in sequence]
 		return s
+
+
+class SequenceBuilder(Sequence):
+	"""
+	Represents a sequence that can be built.
+	"""
+
+	def merge(self, sequence: "Sequence") -> None:
+		self.list += sequence.list
+
+	def addElement(self, element: "Element") -> None:
+		"""
+		Add an element to the sequence.
+		"""
+		self.list.append(element)
 
 
 class SequenceParser(Sequence):
@@ -164,12 +176,6 @@ class Element:
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
 
-	def setNestedSequence(self, kind: str, sequence: Sequence) -> None:
-		"""
-		Set a nested sequence and overwrite exsiting one.
-		"""
-		self.sequences[kind] = sequence
-
 	def serialize(self) -> ElementSerialize:
 		"""
 		Serialize an element.
@@ -179,11 +185,11 @@ class Element:
 			data[kind] = sequence.serialize()
 		return data
 
-	def copy(self, ignoreNested: typing.List[str] = []) -> "Element":
+	def copy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
 		"""
 		Copy an element to create a new element object.
 		"""
-		element = Element()
+		element = ElementBuilder()
 		element.attrs = self.attrs.copy()
 		element.sequences = {
 			kind: sequence.copy()
@@ -202,6 +208,28 @@ class Element:
 			content += "\n{}:\n{}".format(kind, repr(sequence))
 
 		return content
+
+
+class ElementBuilder(Element):
+
+	def addAttr(self, key: str, value: str) -> None:
+		"""
+		Add an attribute to the element.
+		"""
+		self.attrs[key] = AttributeParser(index=0, value=value)
+
+	def addAttrs(self, data: typing.Dict[str, str]) -> None:
+		"""
+		Add multiple attributes to an element.
+		"""
+		for key, value in data.items():
+			self.addAttr(key, value)
+
+	def setNestedSequence(self, kind: str, sequence: Sequence) -> None:
+		"""
+		Set a nested sequence and overwrite exsiting one.
+		"""
+		self.sequences[kind] = sequence
 
 
 class ElementParser(Element):
