@@ -31,24 +31,24 @@
 	export default {
 		components: {
 			Form,
-			Button
+			Button,
 		},
 		directives: {
-			loading: DirectiveLoading
+			loading: DirectiveLoading,
 		},
 		props: {
-			uid: { type: String, mandatory: false, default: null }
+			uid: { type: String, mandatory: false, default: null },
 		},
 		mixins: [Component],
-		data: function() {
+		data: function () {
 			return {
 				value: {
-					"visualization.color": "auto"
+					"visualization.color": "auto",
 				},
 				plugins: {
 					visualization: {},
-					source: {}
-				}
+					source: {},
+				},
 			};
 		},
 		mounted() {
@@ -79,8 +79,8 @@
 						caption: "Color",
 						width: 0.5,
 						list: this.dropdownColorList,
-						html: true
-					}
+						html: true,
+					},
 				];
 			},
 			formSourceDescription() {
@@ -94,8 +94,8 @@
 						html: true,
 						onchange: () => {
 							this.value = Object.assign({}, this.value, this.metadataSource.defaultValue);
-						}
-					}
+						},
+					},
 				];
 			},
 			formVisualizationDescription() {
@@ -106,8 +106,8 @@
 						caption: "Type",
 						width: 0.5,
 						list: this.dropdownPluginList(this.plugins.visualization, "*"),
-						html: true
-					}
+						html: true,
+					},
 				].concat(...(this.metadataVisualization["form"] || []));
 			},
 			metadataSource() {
@@ -132,7 +132,7 @@
 								"; border-color: " +
 								Colors.black +
 								";\"></span> " +
-								name
+								name,
 						];
 					})
 					.reduce(
@@ -141,10 +141,10 @@
 							return acc;
 						},
 						{
-							auto: "Auto"
+							auto: "Auto",
 						}
 					);
-			}
+			},
 		},
 		methods: {
 			async fetchValue() {
@@ -184,7 +184,7 @@
 			async fetchPlugins() {
 				let plugins = {
 					source: {},
-					visualization: {}
+					visualization: {},
 				};
 				for (const [name, data] of Object.entries(Plugins)) {
 					Exception.assert("metadata" in data && "type" in data.metadata, "Missing type for plugin: '{}'", name);
@@ -214,7 +214,7 @@
 								"<i class=\"" +
 								plugins[type].metadata.icon +
 								"\"></i> " +
-								decodeURIComponent(plugins[type].metadata.name || type)
+								decodeURIComponent(plugins[type].metadata.name || type),
 						};
 					});
 
@@ -222,8 +222,8 @@
 					result[data.key] = data.html;
 					return result;
 				}, {});
-			}
-		}
+			},
+		},
 	};
 </script>
 

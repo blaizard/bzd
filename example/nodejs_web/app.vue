@@ -22,8 +22,8 @@
 			return {
 				count,
 				double,
-				increment
+				increment,
 			};
-		}
+		},
 	};
 </script>

@@ -13,18 +13,18 @@
 
 	export default {
 		components: {
-			Form
+			Form,
 		},
-		data: function() {
+		data: function () {
 			return {
 				value: {},
-				submitted: false
+				submitted: false,
 			};
 		},
 		computed: {
 			formDescription() {
 				return [];
-			}
+			},
 		},
 		methods: {
 			handleSumbit() {
@@ -32,8 +32,8 @@
 			},
 			handleInput() {
 				this.submitted = false;
-			}
-		}
+			},
+		},
 	};
 </script>
 

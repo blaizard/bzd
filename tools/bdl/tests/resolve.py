@@ -9,7 +9,7 @@ class TestRun(unittest.TestCase):
 	def testContracts(self) -> None:
 
 		Object.fromContent(content="""
-		using NewType = Integer [min = 1, max = 4];
+		using NewType = Integer [min(1) max(4)];
 		struct temp {
 			var = NewType(0);
 		}
@@ -18,8 +18,8 @@ class TestRun(unittest.TestCase):
 
 		# This should fail
 		Object.fromContent(content="""
-		using NewType = Integer [min = 1, max = 4];
-		using InterType = NewType [min = 2];
+		using NewType = Integer [min(1) max(4)];
+		using InterType = NewType [min(2)];
 		using InterfaceType = NewType;
 		struct temp {
 			var = InterfaceType(1);

@@ -24,7 +24,7 @@ class Entity:
 
 	@property
 	def contracts(self) -> Contracts:
-		return Contracts(sequence=None)
+		return Contracts(element=self.element)
 
 	@memoized_property
 	def validation(self) -> typing.Optional[Validation]:

@@ -176,7 +176,7 @@ class TestRun(unittest.TestCase):
 			}]
 		}])
 
-		parser = Parser(content="var1 = const Float(-2.5) [test = 1];")
+		parser = Parser(content="var1 = const Float(-2.5) [test(1)];")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
@@ -190,10 +190,14 @@ class TestRun(unittest.TestCase):
 			}
 			}],
 			"contract": [{
+			'@': {
+			"type": "test"
+			},
+			"values": [{
 			"@": {
-			"type": "test",
 			"value": "1"
 			}
+			}]
 			}]
 		}])
 

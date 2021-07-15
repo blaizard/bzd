@@ -63,7 +63,7 @@ class Type:
 	@property
 	def contracts(self) -> Contracts:
 		#if self.underlying is None:
-		return Contracts(sequence=self.element.getNestedSequence("contract"))
+		return Contracts(element=self.element)
 		#return self.resolved_contracts
 
 	@memoized_property

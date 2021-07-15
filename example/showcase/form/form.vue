@@ -3,15 +3,15 @@
 
 	export default {
 		mixins: [Template],
-		data: function() {
+		data: function () {
 			return {
 				value: {
 					table: [
 						{ value: 12, key: "Hello", price: 42 },
 						{ value: 8, key: "World", price: 4.54 },
-						{ value: -8, key: "Great", price: 0.2 }
-					]
-				}
+						{ value: -8, key: "Great", price: 0.2 },
+					],
+				},
 			};
 		},
 		computed: {
@@ -32,7 +32,7 @@
 									resolve(["You typed '" + text + "'", "delay 1000ms"]);
 								}, 1000);
 							});
-						}
+						},
 					},
 					{ type: "Array", name: "array", caption: "Array" },
 					{
@@ -42,14 +42,14 @@
 						template: [
 							{ type: "Input", caption: "Value", name: "value" },
 							{ type: "Input", caption: "Key", name: "key" },
-							{ type: "Input", caption: "Price", name: "price" }
-						]
+							{ type: "Input", caption: "Price", name: "price" },
+						],
 					},
 					{ type: "File", caption: "File", name: "file", upload: "/dummy" },
 					{ type: "Carousel", caption: "Carousel", name: "carousel", list: ["Hello", "World", "Great"] },
-					{ type: "Editor", name: "editor", caption: "Editor" }
+					{ type: "Editor", name: "editor", caption: "Editor" },
 				];
-			}
-		}
+			},
+		},
 	};
 </script>

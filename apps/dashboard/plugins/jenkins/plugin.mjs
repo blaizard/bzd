@@ -9,7 +9,7 @@ export default {
 			name: "jenkins.url",
 			caption: "Jenkins URL",
 			placeholder: "http://localhost:8080",
-			width: 1
+			width: 1,
 		},
 		{ type: "Input", name: "jenkins.user", caption: "User", width: 0.5 },
 		{ type: "Input", name: "jenkins.token", caption: "Token", width: 0.5 },
@@ -17,7 +17,7 @@ export default {
 			type: "Input",
 			name: "jenkins.build",
 			caption: "Build name",
-			width: 0.5
+			width: 0.5,
 		},
 		{
 			type: "Dropdown",
@@ -26,11 +26,11 @@ export default {
 			placeholder: "master",
 			list: ["master"],
 			editable: true,
-			width: 0.5
-		}
+			width: 0.5,
+		},
 	],
 	defaultValue: {
-		"jenkins.branch": "master"
+		"jenkins.branch": "master",
 	},
-	timeout: 60 * 1000 // ms
+	timeout: 60 * 1000, // ms
 };

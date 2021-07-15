@@ -16,7 +16,7 @@ class TestRun(unittest.TestCase):
 
 struct   ab {
 // Contracts
-defaultConstant = const int32 [min = -1 , max = 35 ];
+defaultConstant = const int32 [min(-1)   max(35) ];
 
 complex = int32<Int, List<T<A/*Variable A*/, B, C<45>>>>;
 }

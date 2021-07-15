@@ -1,9 +1,9 @@
 namespace bzd.platform;
 
 // Type describing the size of a stack.
-using StackSize = Integer [min = 0, max = 8000000];
+using StackSize = Integer [min(0) max(8000000)];
 // Type describing the identifier of a core.
-using CoreId = Integer [min = 0, max = 64];
+using CoreId = Integer [min(0) max(64)];
 // A core is a processing unit that accepts a single scheduler.
 interface Core{
 	// Error codes for core-related functionality.

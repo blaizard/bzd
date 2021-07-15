@@ -31,9 +31,9 @@
 	export default {
 		components: {
 			Layout,
-			MenuEntry
+			MenuEntry,
 		},
-		data: function() {
+		data: function () {
 			return {};
 		},
 		mounted() {
@@ -51,10 +51,10 @@
 					{ path: "/form/dropdown", component: () => import("./form/dropdown.vue") },
 					{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
 					{ path: "/form/validation", component: () => import("./form/validation.vue") },
-					{ path: "/form/output", component: () => import("./form/output.vue") }
-				]
+					{ path: "/form/output", component: () => import("./form/output.vue") },
+				],
 			});
-		}
+		},
 	};
 </script>
 
