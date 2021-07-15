@@ -11,7 +11,7 @@
 		mixins: [Item],
 		props: {
 			active: { type: Boolean, required: false, default: false },
-			disable: { type: Boolean, default: false, required: false }
+			disable: { type: Boolean, default: false, required: false },
 		},
 		computed: {
 			cellClass() {
@@ -19,9 +19,9 @@
 					"irform-table-cell": true,
 					"irform-disable": this.disable,
 					"irform-error": this.isError,
-					"irform-active": this.active
+					"irform-active": this.active,
 				};
-			}
+			},
 		},
 		methods: {
 			selectItem() {
@@ -29,7 +29,7 @@
 				if (item) {
 					item.focus();
 				}
-			}
-		}
+			},
+		},
 	};
 </script>

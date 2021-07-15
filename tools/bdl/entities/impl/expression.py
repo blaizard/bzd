@@ -83,6 +83,9 @@ class Expression(Entity):
 		validationType: typing.Optional[Validation] = entity.validation
 		#validation = validationType if validationType else Validation({})
 
+		contracts = entity.contracts
+		print(contracts)
+
 		# Check if there is a validation for the value
 		#validationValue = self.contracts.validationValue
 		#if validationValue:
@@ -109,7 +112,7 @@ class Expression(Entity):
 
 	@memoized_property
 	def contracts(self) -> Contracts:  # type: ignore
-		return Contracts(sequence=self.element.getNestedSequence("contract"))
+		return Contracts(element=self.element)
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name if self.isName else "", "type": str(self.type)})

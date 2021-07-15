@@ -7,6 +7,7 @@ from bzd.parser.context import Context
 ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
 SequenceSerialize = typing.List[ElementSerialize]
 
+
 class Sequence:
 
 	def __init__(self, context: typing.Optional[Context] = None) -> None:
@@ -17,6 +18,12 @@ class Sequence:
 		for element in self.list:
 			if not element.isEmpty():
 				yield element
+
+	def __getitem__(self, index: int) -> "Element":
+		for i, element in enumerate(self):
+			if i == index:
+				return element
+		raise IndexError("Index ({}) out of bound".format(index))
 
 	def __len__(self) -> int:
 		return len([e for e in self.list if not e.isEmpty()])
@@ -48,16 +55,21 @@ class Sequence:
 		s.list = [Element.fromSerialize(e, context) for e in sequence]
 		return s
 
-T = typing.TypeVar("T",  bound="SequenceBuilder")
+
+T = typing.TypeVar("T", bound="SequenceBuilder")
+
+
 class SequenceBuilder(Sequence):
 	"""
 	Represents a sequence that can be built.
 	"""
 
 	@staticmethod
-	def cast(sequence: Sequence) -> "SequenceBuilder":
-		sequence.__class__ = SequenceBuilder
-		return typing.cast(SequenceBuilder, sequence)
+	def cast(sequence: Sequence, classType: typing.Type[T]) -> T:
+		assert isinstance(classType, type)
+		assert issubclass(classType, SequenceBuilder)
+		sequence.__class__ = classType
+		return typing.cast(T, sequence)
 
 	def merge(self: T, sequence: "Sequence") -> T:
 		self.list += sequence.list
@@ -215,13 +227,18 @@ class Element:
 
 		return content
 
-U = typing.TypeVar("U",  bound="ElementBuilder")
+
+U = typing.TypeVar("U", bound="ElementBuilder")
+
+
 class ElementBuilder(Element):
 
 	@staticmethod
-	def cast(element: Element) -> "ElementBuilder":
-		element.__class__ = ElementBuilder
-		return typing.cast(ElementBuilder, element)
+	def cast(element: Element, classType: typing.Type[T]) -> T:
+		assert isinstance(classType, type)
+		assert issubclass(classType, ElementBuilder)
+		element.__class__ = classType
+		return typing.cast(T, element)
 
 	def addAttr(self: U, key: str, value: str) -> U:
 		"""
@@ -252,7 +269,7 @@ class ElementBuilder(Element):
 		if kind not in self.sequences:
 			self.sequences[kind] = Sequence()
 		savedClass = self.__class__
-		SequenceBuilder.cast(self.sequences[kind]).addElement(element)
+		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).addElement(element)
 		self.__class__ = savedClass
 		return self
 

@@ -29,22 +29,22 @@
 
 	export default {
 		mixins: [Template],
-		data: function() {
+		data: function () {
 			return {
 				valueDefault: {},
 				valueAll: {},
 				valueDiff: {
-					input: "Hello"
-				}
+					input: "Hello",
+				},
 			};
 		},
 		computed: {
 			formDescription() {
 				return [
 					{ type: "Input", name: "input", caption: "Input (named)" },
-					{ type: "Input", caption: "Input (unmaned)" }
+					{ type: "Input", caption: "Input (unmaned)" },
 				];
-			}
-		}
+			},
+		},
 	};
 </script>

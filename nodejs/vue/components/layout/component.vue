@@ -1,8 +1,8 @@
 <script>
 	export default {
-		data: function() {
+		data: function () {
 			return {
-				loading: false
+				loading: false,
 			};
 		},
 		methods: {
@@ -25,7 +25,7 @@
 				finally {
 					this.loading = false;
 				}
-			}
-		}
+			},
+		},
 	};
 </script>

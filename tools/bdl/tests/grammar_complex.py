@@ -10,8 +10,8 @@ class TestRun(unittest.TestCase):
 	def testParser(self) -> None:
 		parser = Parser(content="""varInit4 = Float(5.12);
 // Contracts
-defaultConstant = const int32 [min = -1, max = 35];
-defaultConstant2 = int32(42) [min = -1, read];
+defaultConstant = const int32 [min(-1) max(35)];
+defaultConstant2 = int32(42) [min(-1) read];
 interface MyFy
 {
 	// Send a message
@@ -74,44 +74,52 @@ interface MyFy
 			'type': {
 			'v': 'min',
 			'i': 68
+			}
 			},
+			'values': [{
+			'@': {
 			'value': {
 			'v': '-1',
-			'i': 74
+			'i': 72
 			}
 			}
+			}]
 			}, {
 			'@': {
 			'type': {
 			'v': 'max',
-			'i': 78
+			'i': 76
+			}
 			},
+			'values': [{
+			'@': {
 			'value': {
 			'v': '35',
-			'i': 84
+			'i': 80
 			}
 			}
+			}]
 			}]
 		}, {
 			'@': {
 			'category': {
 			'v': 'expression',
-			'i': 89
+			'i': 86
 			},
 			'name': {
 			'v': 'defaultConstant2',
-			'i': 89
+			'i': 86
 			},
 			'type': {
 			'v': 'int32',
-			'i': 108
+			'i': 105
 			}
 			},
 			'argument': [{
 			'@': {
 			'value': {
 			'v': '42',
-			'i': 114
+			'i': 111
 			}
 			}
 			}],
@@ -119,18 +127,22 @@ interface MyFy
 			'@': {
 			'type': {
 			'v': 'min',
-			'i': 119
+			'i': 116
+			}
 			},
+			'values': [{
+			'@': {
 			'value': {
 			'v': '-1',
-			'i': 125
+			'i': 120
 			}
 			}
+			}]
 			}, {
 			'@': {
 			'type': {
 			'v': 'read',
-			'i': 129
+			'i': 124
 			}
 			}
 			}]
@@ -138,56 +150,56 @@ interface MyFy
 			'@': {
 			'category': {
 			'v': 'nested',
-			'i': 136
+			'i': 131
 			},
 			'type': {
 			'v': 'interface',
-			'i': 136
+			'i': 131
 			},
 			'name': {
 			'v': 'MyFy',
-			'i': 146
+			'i': 141
 			}
 			},
 			'nested': [{
 			'@': {
 			'comment': {
 			'v': 'Send a message',
-			'i': 154
+			'i': 149
 			},
 			'category': {
 			'v': 'method',
-			'i': 173
+			'i': 168
 			},
 			'name': {
 			'v': 'send',
-			'i': 180
+			'i': 175
 			},
 			'type': {
 			'v': 'Result',
-			'i': 214
+			'i': 209
 			}
 			},
 			'argument': [{
 			'@': {
 			'category': {
 			'v': 'expression',
-			'i': 185
+			'i': 180
 			},
 			'name': {
 			'v': 'message',
-			'i': 185
+			'i': 180
 			},
 			'type': {
 			'v': 'Sequence',
-			'i': 195
+			'i': 190
 			}
 			},
 			'template': [{
 			'@': {
 			'type': {
 			'v': 'char',
-			'i': 204
+			'i': 199
 			}
 			}
 			}]
@@ -196,7 +208,7 @@ interface MyFy
 			'@': {
 			'type': {
 			'v': 'int',
-			'i': 221
+			'i': 216
 			}
 			}
 			}]
@@ -204,41 +216,41 @@ interface MyFy
 			'@': {
 			'category': {
 			'v': 'expression',
-			'i': 228
+			'i': 223
 			},
 			'name': {
 			'v': 'var',
-			'i': 228
+			'i': 223
 			},
 			'type': {
 			'v': 'MyType',
-			'i': 234
+			'i': 229
 			}
 			}
 			}, {
 			'@': {
 			'category': {
 			'v': 'expression',
-			'i': 243
+			'i': 238
 			},
 			'name': {
 			'v': 'varConst',
-			'i': 243
+			'i': 238
 			},
 			'const': {
 			'v': '',
-			'i': 254
+			'i': 249
 			},
 			'type': {
 			'v': 'MyType',
-			'i': 260
+			'i': 255
 			}
 			},
 			'contract': [{
 			'@': {
 			'type': {
 			'v': 'always',
-			'i': 268
+			'i': 263
 			}
 			}
 			}]
@@ -246,22 +258,22 @@ interface MyFy
 			'@': {
 			'category': {
 			'v': 'expression',
-			'i': 278
+			'i': 273
 			},
 			'name': {
 			'v': 'varInitialized',
-			'i': 278
+			'i': 273
 			},
 			'type': {
 			'v': 'MyType',
-			'i': 295
+			'i': 290
 			}
 			},
 			'argument': [{
 			'@': {
 			'value': {
 			'v': '42',
-			'i': 302
+			'i': 297
 			}
 			}
 			}]

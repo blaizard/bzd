@@ -1,6 +1,6 @@
 import typing
 
-from bzd.parser.element import Element, Sequence
+from bzd.parser.element import Element
 from bzd.parser.visitor import Visitor
 from bzd.parser.error import Error
 
@@ -19,8 +19,18 @@ class Contract:
 		return self.element.getAttr("type").value
 
 	@property
+	def values(self) -> typing.List[str]:
+		values = self.element.getNestedSequence("values")
+		if values:
+			return [e.getAttr("value").value for e in values]
+		return []
+
+	@property
 	def value(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("value")
+		values = self.element.getNestedSequence("values")
+		if values:
+			return values[0].getAttr("value").value
+		return None
 
 	@property
 	def valueNumber(self) -> float:
@@ -40,7 +50,7 @@ class Contract:
 
 	@property
 	def isValue(self) -> bool:
-		return self.element.isAttr("value")
+		return self.element.isNestedSequence("values")
 
 	@property
 	def comment(self) -> typing.Optional[str]:
@@ -76,14 +86,15 @@ class Contracts:
 	A contract is an unsorted sequence of types associated with an optional value and/or commment.
 	"""
 
-	def __init__(self, sequence: typing.Optional[Sequence]) -> None:
-		self.data = _VisitorContract().visit(sequence) if sequence else []
+	def __init__(self, element: Element, sequenceKind: str = "contract") -> None:
+		self.element = element
+		self.sequenceKind = sequenceKind
 
 	def get(self, kind: str) -> typing.Optional[Contract]:
 		"""
 		Get a specific contract type if present.
 		"""
-		for contract in self.data:
+		for contract in self:
 			if contract.type == kind:
 				return contract
 		return None
@@ -104,7 +115,29 @@ class Contracts:
 
 	@property
 	def empty(self) -> bool:
-		return not bool(self.data)
+		sequence = self.element.getNestedSequence(self.sequenceKind)
+		if sequence is None:
+			return True
+		return (len(sequence) == 0)
+
+	def merge(self, contracts: "Contracts") -> None:
+		"""
+		Merge a new contract with this one.
+		"""
+		sequence = self.element.getNestedSequence(self.sequenceKind)
+		#if sequence is None:
+		#	contracts.element.getNestedSequence(self.sequenceKind)
+		#self.sequence.merge(contracts.sequence)
+		pass
 
 	def __iter__(self) -> typing.Iterator[Contract]:
-		return self.data.__iter__()
+		sequence = self.element.getNestedSequence(self.sequenceKind)
+		if sequence:
+			for element in sequence:
+				yield Contract(element)
+
+	def __repr__(self) -> str:
+		content = []
+		for contract in self:
+			content.append("{}({})".format(contract.type, ",".join(contract.values)))
+		return " ".join(content)

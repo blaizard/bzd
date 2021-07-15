@@ -18,7 +18,7 @@ export default {
 
 		Vue.prototype.$cache = new Vue({
 			data: {
-				content: {}
+				content: {},
 			},
 			methods: {
 				getReactive(collection, ...ids) {
@@ -47,8 +47,8 @@ export default {
 					if (collection in this.content) {
 						this.content[collection][id] = options[collection].loading || "";
 					}
-				}
-			}
+				},
+			},
 		});
-	}
+	},
 };

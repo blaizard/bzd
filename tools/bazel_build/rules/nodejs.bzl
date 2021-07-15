@@ -130,7 +130,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Fetch and install the packages
 
-    manager_args = ["--cwd", package_json.dirname, "install", "--silent", "--non-interactive", "--ignore-optional", "--ignore-engines", "--prefer-offline"]
+    manager_args = ["--cwd", package_json.dirname, "install", "--network-timeout=300000000", "--silent", "--non-interactive", "--ignore-optional", "--ignore-engines", "--prefer-offline"]
 
     # Set the cache directory
     cache_path = ctx.attr._cache[BzdSettingCacheProvider].path

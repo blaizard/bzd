@@ -61,15 +61,15 @@ export default class HttpServer {
 							res.header("Expires", "-1");
 							res.header("Pragma", "no-cache");
 						}
-					}
-				}
+					},
+				},
 			},
 			config
 		);
 
 		this.event = new Event({
 			ready: { proactive: true },
-			error: { proactive: true }
+			error: { proactive: true },
 		});
 
 		this._initialize(port).catch((e) => {
@@ -96,7 +96,7 @@ export default class HttpServer {
 				// Only use Strict-Transport-Security if SSL is enabled
 				hsts: this._isSSL(),
 				// and Content-Security-Policy
-				contentSecurityPolicy: this._isSSL()
+				contentSecurityPolicy: this._isSSL(),
 			})
 		);
 
@@ -111,7 +111,7 @@ export default class HttpServer {
 			this.app.use(Compression());
 			this.app.use(
 				Minify({
-					cache: false // use memory cache
+					cache: false, // use memory cache
 				})
 			);
 		}
@@ -122,7 +122,7 @@ export default class HttpServer {
 				filename: (req, file, cb) => {
 					this._initialize.uid = this._initialize.uid || 0;
 					cb(null, Date.now() + "-" + String(this._initialize.uid++) + "-" + file.originalname);
-				}
+				},
 			};
 			if (this.config.uploadDir) {
 				// Create the directory if it does not exists
@@ -223,14 +223,17 @@ export default class HttpServer {
 		if (fallback) {
 			this.app.use(
 				uri,
-				((...args) => (req, res, next) => {
-					if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-						(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
-					}
-					else {
-						next();
-					}
-				})(fallback, { root: absolutePath })
+				(
+					(...args) =>
+						(req, res, next) => {
+							if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+								(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
+							}
+							else {
+								next();
+							}
+						}
+				)(fallback, { root: absolutePath })
 			);
 		}
 	}
@@ -257,7 +260,7 @@ export default class HttpServer {
 				/**
 				 * Add guards to unhandled exceptions. This adds a callstack layer.
 				 */
-				exceptionGuard: false
+				exceptionGuard: false,
 			},
 			options
 		);
@@ -265,7 +268,7 @@ export default class HttpServer {
 		let callbackList = [middlewareErrorHandler];
 
 		if (options.exceptionGuard) {
-			callbackList.unshift(async function(request, response) {
+			callbackList.unshift(async function (request, response) {
 				try {
 					await callback.call(this, request, response);
 				}
@@ -291,7 +294,7 @@ export default class HttpServer {
 		if (options.type.indexOf("upload") != -1) {
 			let upload = Multer({
 				storage: this.storage,
-				limits: { fileSize: options.limit }
+				limits: { fileSize: options.limit },
 			});
 			callbackList.unshift(upload.any());
 		}
