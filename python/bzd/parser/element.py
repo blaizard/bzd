@@ -1,4 +1,5 @@
 import typing
+import copy
 
 from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize
 from bzd.parser.grammar import Grammar
@@ -66,20 +67,32 @@ class SequenceBuilder(Sequence):
 
 	@staticmethod
 	def cast(sequence: Sequence, classType: typing.Type[T]) -> T:
+		"""
+		Return a copy of the sequence casted to a given type.
+		"""
+		assert isinstance(sequence, Sequence)
 		assert isinstance(classType, type)
 		assert issubclass(classType, SequenceBuilder)
-		sequence.__class__ = classType
-		return typing.cast(T, sequence)
+		copiedSequence = copy.copy(sequence)
+		copiedSequence.__class__ = classType
+		return typing.cast(T, copiedSequence)
 
 	def merge(self: T, sequence: "Sequence") -> T:
 		self.list += sequence.list
 		return self
 
-	def addElement(self: T, element: "Element") -> T:
+	def pushBackElement(self: T, element: "Element") -> T:
 		"""
-		Add an element to the sequence.
+		Add an element to the sequence at the end of the list.
 		"""
 		self.list.append(element)
+		return self
+
+	def pushFrontElement(self: T, element: "Element") -> T:
+		"""
+		Add an element to the sequence at the begining of the list.
+		"""
+		self.list.insert(0, element)
 		return self
 
 
@@ -234,11 +247,16 @@ U = typing.TypeVar("U", bound="ElementBuilder")
 class ElementBuilder(Element):
 
 	@staticmethod
-	def cast(element: Element, classType: typing.Type[T]) -> T:
+	def cast(element: Element, classType: typing.Type[U]) -> U:
+		"""
+		Return a copy of the element casted to a given type.
+		"""
+		assert isinstance(element, Element)
 		assert isinstance(classType, type)
 		assert issubclass(classType, ElementBuilder)
-		element.__class__ = classType
-		return typing.cast(T, element)
+		copiedElement = copy.copy(element)
+		copiedElement.__class__ = classType
+		return typing.cast(U, copiedElement)
 
 	def addAttr(self: U, key: str, value: str) -> U:
 		"""
@@ -262,15 +280,22 @@ class ElementBuilder(Element):
 		self.sequences[kind] = sequence
 		return self
 
-	def addElementToNestedSequence(self: U, kind: str, element: Element) -> U:
+	def pushBackElementToNestedSequence(self: U, kind: str, element: Element) -> U:
 		"""
 		Add an element to a new or existing nested sequence.
 		"""
 		if kind not in self.sequences:
 			self.sequences[kind] = Sequence()
-		savedClass = self.__class__
-		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).addElement(element)
-		self.__class__ = savedClass
+		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushBackElement(element)
+		return self
+
+	def pushFrontElementToNestedSequence(self: U, kind: str, element: Element) -> U:
+		"""
+		Add an element to a new or existing nested sequence.
+		"""
+		if kind not in self.sequences:
+			self.sequences[kind] = Sequence()
+		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
 		return self
 
 

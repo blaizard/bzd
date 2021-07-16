@@ -18,7 +18,7 @@ class ElementBuilder(Element):
 			element.addAttr("type", name)
 		else:
 			element.addAttrs({"type": name, "value": value})
-		self.addElementToNestedSequence(kind="contracts", element=element)
+		self.pushBackElementToNestedSequence(kind="contract", element=element)
 		return self
 
 

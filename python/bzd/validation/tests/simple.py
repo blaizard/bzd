@@ -29,17 +29,17 @@ class TestRun(unittest.TestCase):
 
 	def testMinMax(self) -> None:
 		template = Validation({"test": "integer min(2) max(10)"})
-		template.validate({"test": "3"})
+		self.assertDictEqual(template.validate({"test": "3"}).values, {"test": 3})
 		with self.assertRaisesRegex(ExceptionValidation, r"lower than"):
 			template.validate({"test": "1"})
 		with self.assertRaisesRegex(ExceptionValidation, r"higher than"):
 			template.validate({"test": "11"})
-		template.validate({"test": "10"})
-		template.validate({"test": "2"})
+		self.assertDictEqual(template.validate({"test": "10"}).values, {"test": 10})
+		self.assertDictEqual(template.validate({"test": "2"}).values, {"test": 2})
 
 	def testMinMaxLength(self) -> None:
 		template = Validation({"test": "string min(2) max(10)"})
-		template.validate({"test": "hello"})
+		self.assertDictEqual(template.validate({"test": "hello"}).values, {"test": "hello"})
 		with self.assertRaisesRegex(ExceptionValidation, r"shorter than"):
 			template.validate({"test": "h"})
 		with self.assertRaisesRegex(ExceptionValidation, r"longer than"):

@@ -1,10 +1,12 @@
 import typing
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.visitor import Visitor
 from bzd.parser.error import Error
 
 from bzd.validation.validation import Validation
+
+_CONTRACT_VALUE_TYPES = {"min", "max", "integer", "float", "string", "boolean"}
 
 
 class Contract:
@@ -42,7 +44,7 @@ class Contract:
 
 	@property
 	def valueString(self) -> str:
-		value = self.element.getAttrValue("value")
+		value = self.value
 		if value is None:
 			Error.handleFromElement(element=self.element, message="A value must be present.")
 		assert value is not None
@@ -55,30 +57,6 @@ class Contract:
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
-
-
-class _VisitorContract(Visitor[Contract, typing.List[Contract]]):
-
-	nestedKind = None
-
-	def __init__(self) -> None:
-		self.uniqueTypes: typing.Set[str] = set()
-
-	def visitBegin(self, result: typing.Any) -> typing.List[Contract]:
-		return []
-
-	def visitElement(self, element: Element, result: typing.List[Contract]) -> typing.List[Contract]:
-
-		contract = Contract(element=element)
-
-		if contract.type in self.uniqueTypes:
-			Error.handleFromElement(element=element,
-				message="The contract type '{}' is set twice.".format(contract.type))
-		self.uniqueTypes.add(contract.type)
-
-		result.append(contract)
-
-		return result
 
 
 class Contracts:
@@ -100,18 +78,15 @@ class Contracts:
 		return None
 
 	@property
-	def validationValue(self) -> str:
+	def validationValue(self) -> typing.Optional[str]:
 		"""
 		Generate a validation object for a value out of the current contracts
 		"""
 		content = []
-		maybeMin = self.get("min")
-		if maybeMin:
-			content.append("min({})".format(maybeMin.valueString))
-		maybeMax = self.get("max")
-		if maybeMax:
-			content.append("max({})".format(maybeMax.valueString))
-		return " ".join(content)
+		for contract in self:
+			if contract.type in _CONTRACT_VALUE_TYPES:
+				content.append("{}({})".format(contract.type, ",".join(contract.values)))
+		return " ".join(content) if content else None
 
 	@property
 	def empty(self) -> bool:
@@ -120,15 +95,14 @@ class Contracts:
 			return True
 		return (len(sequence) == 0)
 
-	def merge(self, contracts: "Contracts") -> None:
+	def mergeBase(self, contracts: "Contracts") -> None:
 		"""
-		Merge a new contract with this one.
+		Merge a base contract into this one. The order is important, as type are inherited from the deepest base.
 		"""
-		sequence = self.element.getNestedSequence(self.sequenceKind)
-		#if sequence is None:
-		#	contracts.element.getNestedSequence(self.sequenceKind)
-		#self.sequence.merge(contracts.sequence)
-		pass
+
+		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
+		for contract in reversed([*contracts]):
+			elementBuilder.pushFrontElementToNestedSequence(self.sequenceKind, contract.element)
 
 	def __iter__(self) -> typing.Iterator[Contract]:
 		sequence = self.element.getNestedSequence(self.sequenceKind)
