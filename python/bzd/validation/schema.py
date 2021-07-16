@@ -15,8 +15,16 @@ class Context:
 
 	@property
 	def underlying(self) -> typing.Any:
-		assert self.underlying_
+		assert self.underlying_ is not None, "Underlying value is used but not set."
 		return self.underlying_
+
+	@property
+	def resolvedValue(self) -> typing.Any:
+		"""
+		Return the value resolved, which is either the underlying value or the actual value,
+		depending on whether the underlying exists.
+		"""
+		return self.value if self.underlying_ is None else self.underlying_
 
 
 class TypeContext(Context):
@@ -59,6 +67,23 @@ class Constraint:
 			return float(value)
 		except:
 			raise Exception("The value '{}' is not a valid floating point number.".format(value))
+
+
+class ProcessedResult:
+
+	def __init__(self) -> None:
+		self.value: typing.Optional[typing.Any] = None
+		self.errors: typing.List[str] = []
+
+	def addError(self, error: str) -> None:
+		self.errors.append(error)
+
+	def setValue(self, value: typing.Any) -> None:
+		assert self.value is None, "Value already set."
+		self.value = value
+
+	def __bool__(self) -> bool:
+		return not bool(self.errors)
 
 
 class ProcessedSchema:
@@ -112,27 +137,32 @@ class ProcessedSchema:
 		bound = partial(validation, args)
 		self.validations.append(bound)
 
-	def validate(self, value: str) -> typing.Optional[typing.List[str]]:
+	def validate(self, value: str) -> ProcessedResult:
 		"""
 		Validate a value.
 		"""
 
+		result = ProcessedResult()
 		typeContext = TypeContext(value=value)
 
 		# Process the type
 		if self.type:
 			resultType: typing.Optional[str] = self.type.check(context=typeContext)  # type: ignore
 			if resultType is not None:
-				return [resultType]
+				result.addError(resultType)
+				return result
 
 		# Cast down the context to a normal context
 		context = typing.cast(Context, typeContext)
 
 		# Process the validation callables
-		result = []
 		for validation in self.validations:
-			resultCurrent = validation(context)
-			if resultCurrent is not None:
-				result.append(resultCurrent)
+			maybeError = validation(context)
+			if maybeError is not None:
+				result.addError(maybeError)
 
-		return result if result else None
+		# If no error, set the value
+		if result:
+			result.setValue(context.resolvedValue)
+
+		return result

@@ -8,13 +8,14 @@ class TestRun(unittest.TestCase):
 
 	def testContracts(self) -> None:
 
-		Object.fromContent(content="""
-		using NewType = Integer [min(1) max(4)];
-		struct temp {
-			var = NewType(0);
-		}
-		""",
-			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"lower than"):
+			Object.fromContent(content="""
+			using NewType = Integer [min(1) max(4)];
+			struct temp {
+				var = NewType(0);
+			}
+			""",
+				objectContext=ObjectContext(resolve=True))
 
 		# This should fail
 		Object.fromContent(content="""

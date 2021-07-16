@@ -62,6 +62,11 @@ class Expression(Entity):
 		"""
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
+		# Resolve contract
+		self.contracts.mergeBase(entity.contracts)
+
+		print("expression", self.name, self.contracts)
+
 		# Validate arguments
 		if self.element.isNestedSequence("argument"):
 			arguments = {(arg.getAttr("name").value if arg.isAttr("name") else str(i)): arg.getAttr("value").value
@@ -79,23 +84,20 @@ class Expression(Entity):
 		and the contract validation.
 		"""
 
-		# Read the validation coming from the type if any
-		validationType: typing.Optional[Validation] = entity.validation
-		#validation = validationType if validationType else Validation({})
+		validationValue = self.contracts.validationValue
+		# If evaluates to true, meaning there is a contract for values,
+		# it means there must be a single value.
+		if validationValue:
+			try:
+				return Validation({"0": validationValue})
+			except Exception as e:
+				self.error(message=str(e))
 
-		contracts = entity.contracts
-		print(contracts)
+		# Hack, need to resolve also this information
+		if entity.element.isNestedSequence("config"):
+			return None
 
-		# Check if there is a validation for the value
-		#validationValue = self.contracts.validationValue
-		#if validationValue:
-		# Assert this is a single value
-		#	try:
-		#		validation.mergeSchema({"0": validationValue})
-		#	except Exception as e:
-		#		self.error(message=str(e))
-
-		return validationType
+		return Validation({})
 
 	@memoized_property
 	def args(self) -> typing.List[Argument]:
@@ -109,10 +111,6 @@ class Expression(Entity):
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
-
-	@memoized_property
-	def contracts(self) -> Contracts:  # type: ignore
-		return Contracts(element=self.element)
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name if self.isName else "", "type": str(self.type)})

@@ -36,7 +36,12 @@ class Using(Entity):
 		"""
 		Resolve entities.
 		"""
-		self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+
+		# Resolve contract
+		self.contracts.mergeBase(entity.contracts)
+
+		print("using", self.name, self.contracts)
 
 	@property
 	def comment(self) -> typing.Optional[str]:

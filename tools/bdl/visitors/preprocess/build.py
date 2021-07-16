@@ -48,7 +48,7 @@ class Build(Visitor[SymbolList]):
 					sequence = SequenceBuilder()
 					for element in nested:
 						if element.isAttr("name"):
-							sequence.addElement(
+							sequence.pushBackElement(
 								ElementBuilder("reference").addAttr(
 								"name", SymbolMap.makeFQN(name=element.getAttr("name").value,
 								namespace=nestedNamespace)))

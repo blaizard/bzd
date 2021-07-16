@@ -1,7 +1,7 @@
 import typing
 import re
 
-from bzd.validation.schema import Constraint, Schema, ProcessedSchema
+from bzd.validation.schema import Constraint, Schema, ProcessedSchema, ProcessedResult
 from bzd.validation.constraints.boolean import Boolean
 from bzd.validation.constraints.integer import Integer
 from bzd.validation.constraints.float import Float
@@ -19,10 +19,18 @@ class Result:
 
 	def __init__(self) -> None:
 		self.errors: typing.Dict[str, typing.List[str]] = {}
+		self.values: typing.Dict[str, typing.Any] = {}
 
-	def add(self, key: str, errors: typing.List[str]) -> None:
+	def addError(self, key: str, errors: typing.List[str]) -> None:
 		assert key not in self.errors, "Key '{}' already assigned.".format(key)
 		self.errors[key] = errors
+
+	def addResult(self, key: str, result: ProcessedResult) -> None:
+		if result:
+			assert key not in self.values, "Value already set."
+			self.values[key] = result.value
+		else:
+			self.addError(key, result.errors)
 
 	def __bool__(self) -> bool:
 		return not bool(self.errors)
@@ -92,15 +100,14 @@ class Validation:
 		for key, value in values.items():
 			if key in self.processed:
 				result = self.processed[key].validate(value=value)
-				if result is not None:
-					results.add(key, result)
+				results.addResult(key, result)
 			else:
-				results.add(key, ["value not expected"])
+				results.addError(key, ["value not expected"])
 
 		# Check for mandatory values
 		for key, constraints in self.processed.items():
 			if constraints.isMandatory and key not in values:
-				results.add(key, ["Missing mandatory value."])
+				results.addError(key, ["Missing mandatory value."])
 
 		# If some errors are detected.
 		if output == "throw":
