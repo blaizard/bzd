@@ -13,7 +13,7 @@ pipeline
 		{
 			filename "tools/ci/jenkins/debian.dockerfile"
 			// Only a single args argument can be used
-			args "-v /cache:/cache -v /etc/localtime:/etc/localtime:ro -e DOCKER_HOST=tcp://localhost:2375 --network host"
+			args "-v /cache:/cache -e DOCKER_HOST=tcp://localhost:2375 --network host"
 		}
 	}
 	stages
