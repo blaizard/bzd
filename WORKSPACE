@@ -41,9 +41,3 @@ coverage_load()
 load("//tools/sanitizer:dependencies.bzl", "sanitizer_load")
 
 sanitizer_load()
-
-# Install python pip repository
-
-load("@python_deps//:requirements.bzl", "pip_install")
-
-pip_install()

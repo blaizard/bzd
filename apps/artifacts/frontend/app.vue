@@ -28,15 +28,15 @@
 		components: {
 			Layout,
 			Tree,
-			MenuEntry,
+			MenuEntry
 		},
 		directives: {
-			tooltip: DirectiveTooltip,
+			tooltip: DirectiveTooltip
 		},
-		data: function () {
+		data: function() {
 			return {
 				refreshCounter: 0,
-				path: [],
+				path: []
 			};
 		},
 		mounted() {
@@ -49,21 +49,21 @@
 						handler: () => {
 							++this.refreshCounter;
 							this.$routerDispatch("/");
-						},
+						}
 					},
 					{ path: "/config/{volume}", component: () => import("./config.vue") },
 					{ path: "/config", component: () => import("./config.vue") },
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
-					{ path: "/services", component: () => import("./services.vue") },
-				],
+					{ path: "/services", component: () => import("./services.vue") }
+				]
 			});
 		},
 		methods: {
 			handleItem(item) {
 				this.path = item.path.concat([item.item.name]);
 				this.$routerDispatch("/view/" + this.path.map((c) => encodeURIComponent(c)).join("/"));
-			},
-		},
+			}
+		}
 	};
 </script>
 

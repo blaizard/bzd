@@ -87,13 +87,14 @@ build:sanitizer --keep_going
 build:sanitizer --copt -O1
 build:sanitizer --copt -g
 build:sanitizer --copt -fno-optimize-sibling-calls
+build:sanitizer --copt -fno-omit-frame-pointer
 build:sanitizer --strip never
 
 # Address Sanitizer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
 
-# Leak Sanitizer
+# Leak Sanitizer`
 build:lsan --copt -fsanitize=leak
 build:lsan --copt -DLEAK_SANITIZER
 build:lsan --linkopt -fsanitize=leak

@@ -3,9 +3,9 @@
 
 	export default {
 		mixins: [Template],
-		data: function () {
+		data: function() {
 			return {
-				value: {},
+				value: {}
 			};
 		},
 		computed: {
@@ -15,13 +15,13 @@
 						type: "Input",
 						name: "input",
 						caption: "Input (positive integer)",
-						validation: "mandatory type(integer) min(0)",
+						validation: "mandatory type(integer) min(0)"
 					},
 					{ type: "Input", name: "email", caption: "Input (email)", validation: "mandatory email" },
 					{ type: "Input", caption: "Input (same(email))", validation: "mandatory same(email)" },
-					{ type: "Button", action: "approve" },
+					{ type: "Button", action: "approve" }
 				];
-			},
-		},
+			}
+		}
 	};
 </script>

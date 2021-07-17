@@ -8,7 +8,7 @@ export default {
 		Vue.prototype.$lang = new Vue({
 			data: {
 				lang: null,
-				dictionary: {},
+				dictionary: {}
 			},
 			methods: {
 				getLang() {
@@ -29,9 +29,9 @@ export default {
 				getCapitalized(id) {
 					const str = this.get(id);
 					return str.charAt(0).toUpperCase() + str.slice(1);
-				},
-			},
+				}
+			}
 		});
 		Vue.prototype.$lang.setLang(LocalStorage.get("bzd-lang", "gb"));
-	},
+	}
 };

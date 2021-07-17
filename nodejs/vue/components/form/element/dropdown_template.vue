@@ -23,19 +23,19 @@
 	export default {
 		mixins: [Element],
 		components: {
-			ElementInput,
+			ElementInput
 		},
 		props: {
-			value: { type: String | Array, required: true },
+			value: { type: String | Array, required: true }
 		},
-		data: function () {
+		data: function() {
 			return {
 				// Value that is typed in the control
 				directValue: "",
 				// Flag set when the item is loading
 				loading: false,
 				// Timeout when the processList is called
-				processTimeout: null,
+				processTimeout: null
 			};
 		},
 		computed: {
@@ -44,7 +44,7 @@
 					"irform-dropdown": true,
 					"irform-loading": this.loading,
 					"irform-empty": !this.$slots.default,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
 			},
 			delay() {
@@ -58,17 +58,17 @@
 			},
 			inputDescription() {
 				return Object.assign({}, this.description, {
-					post: { html: "<span class=\"irform-dropdown-arrow\">&nbsp;</span>" },
+					post: { html: "<span class=\"irform-dropdown-arrow\">&nbsp;</span>" }
 				});
 			},
 			process() {
 				return this.getOption("process", () => {});
-			},
+			}
 		},
 		watch: {
 			directValue: {
 				immediate: true,
-				handler: function (value) {
+				handler: function(value) {
 					// Kill any previous loading update
 					if (this.processTimeout) {
 						clearTimeout(this.processTimeout);
@@ -81,8 +81,8 @@
 							this.processInput(value);
 						}, this.delay);
 					}
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			async processInput(value) {
@@ -118,8 +118,8 @@
 			handleDirectInput(value) {
 				this.directValue = value;
 				this.$emit("directInput", value);
-			},
-		},
+			}
+		}
 	};
 </script>
 
