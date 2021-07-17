@@ -4,5 +4,5 @@ export default {
 	icon: "bzd-icon-sonos",
 	visualization: ["media_player"],
 	form: [],
-	timeout: 2000, // ms
+	timeout: 2000 // ms
 };

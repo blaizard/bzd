@@ -16,7 +16,7 @@ export default class Router {
 				 */
 				fallback: (path) => {
 					throw new Exception("Route not found for '{}'.", path);
-				},
+				}
 			},
 			config
 		);
@@ -38,7 +38,7 @@ export default class Router {
 
 		this.routes.set(path, {
 			handler: handler,
-			args: args,
+			args: args
 		});
 		this.dirty = true;
 	}
@@ -80,7 +80,7 @@ export default class Router {
 		return {
 			route: route,
 			args: route.args,
-			vars: vars,
+			vars: vars
 		};
 	}
 
@@ -94,7 +94,7 @@ export default class Router {
 			return {
 				matched: true,
 				path: path,
-				vars: match.vars,
+				vars: match.vars
 			};
 		}
 
@@ -102,7 +102,7 @@ export default class Router {
 		return {
 			matched: false,
 			path: path,
-			vars: {},
+			vars: {}
 		};
 	}
 }
@@ -149,7 +149,7 @@ function compileRoutes(routes, config) {
 			// Add the variable to the list
 			varList.push({
 				cast: castType,
-				name: pathList[i],
+				name: pathList[i]
 			});
 
 			// Add the follow-up of the path if any
@@ -165,7 +165,7 @@ function compileRoutes(routes, config) {
 			args: config.args,
 			handler: config.handler,
 			varList: varList,
-			pathRegexpr: pathRegexpr,
+			pathRegexpr: pathRegexpr
 		});
 	}
 
@@ -180,6 +180,6 @@ function compileRoutes(routes, config) {
 	return {
 		regexpr: new RegExp("^(?:|" + regexprList.join("|") + ")$", config.caseSensitive ? undefined : "i"),
 		routes: routeData,
-		maxVars: maxVars + 1,
+		maxVars: maxVars + 1
 	};
 }

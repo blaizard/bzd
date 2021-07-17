@@ -1,6 +1,4 @@
-FROM ubuntu:bionic
-# Note updating to ubuntu:20 brings this error message with python:
-# ImportError: libffi.so.6: cannot open shared object file: No such file or directory
+FROM ubuntu:20.04
 
 # Needed for dependencies like "tzdata" which might ask for some interactive input (besides yes and no)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,7 +9,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 #            to run a script using this python toolchain, a startup python script needs
 #            to be executed to discover binaries.
 # - gpgv - needed add the key to apt.
-# - libxml2-dev - needed for LLVM (need to be removed).
 # - openjdk-11-jdk, unzip, zip are used by bazel
 RUN apt-get update && apt-get install -y git \
 	sudo \
@@ -24,7 +21,6 @@ RUN apt-get update && apt-get install -y git \
 	gpgv \
 	gnupg \
 	python \
-	libxml2-dev \
 	openjdk-11-jdk \
 	apt-transport-https \
 	ca-certificates \

@@ -13,4 +13,6 @@ bzd_nodejs_binary(
         "jimp": "",
         "svg2img": "",
     },
+    # Somehow this fails from time to time in CI.
+    tags = ["manual"],
 )

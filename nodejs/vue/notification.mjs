@@ -7,12 +7,12 @@ export default {
 		Vue.prototype.$notification = new Vue({
 			data: {
 				entries: [],
-				_uid: 0,
+				_uid: 0
 			},
 			computed: {
 				defaultActions() {
 					return [{ id: "close", callback: (entry) => this.close(entry) }];
-				},
+				}
 			},
 			methods: {
 				_tryToString(message) {
@@ -54,7 +54,7 @@ export default {
 							 * An action is an html key (which represents the text associated with this action)
 							 * and a callback.
 							 */
-							actions: [...this.defaultActions],
+							actions: [...this.defaultActions]
 						});
 						index = this.entries.length - 1;
 					}
@@ -64,7 +64,7 @@ export default {
 						type: type,
 						message: messageStr,
 						raw: message,
-						key: key,
+						key: key
 					});
 					this.entries.splice(index, 1, entry);
 
@@ -98,7 +98,7 @@ export default {
 						message,
 						Object.assign(
 							{
-								timeOnScreen: 0,
+								timeOnScreen: 0
 							},
 							options
 						)
@@ -112,8 +112,8 @@ export default {
 					if (index != -1) {
 						this.entries.splice(index, 1);
 					}
-				},
-			},
+				}
+			}
 		});
-	},
+	}
 };

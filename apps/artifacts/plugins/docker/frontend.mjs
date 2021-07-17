@@ -8,9 +8,9 @@ export default {
 			caption: "Registry Type",
 			list: {
 				v2: "Docker V2",
-				gcr: "Google Container Registry",
+				gcr: "Google Container Registry"
 			},
-			validation: "mandatory",
+			validation: "mandatory"
 		},
 		{ type: "Input", name: "docker.url", caption: "Registry URL", condition: { "docker.type": "values(v2)" } },
 		{
@@ -20,14 +20,14 @@ export default {
 			caption: "Service",
 			list: ["gcr.io", "us.gcr.io", "eu.gcr.io", "asia.gcr.io"],
 			validation: "mandatory",
-			condition: { "docker.type": "values(gcr)" },
+			condition: { "docker.type": "values(gcr)" }
 		},
 		{
 			type: "Textarea",
 			name: "docker.key",
 			caption: "JSON key",
 			validation: "mandatory",
-			condition: { "docker.type": "values(gcr)" },
+			condition: { "docker.type": "values(gcr)" }
 		},
 		{ type: "Checkbox", name: "docker.proxy", caption: "Proxy" },
 		{
@@ -37,7 +37,7 @@ export default {
 			width: 0.5,
 			validation: "mandatory",
 			placeholder: "https://docker.blaizard.com",
-			condition: (v) => v["docker.proxy"],
+			condition: (v) => v["docker.proxy"]
 		},
 		{
 			type: "Input",
@@ -46,8 +46,8 @@ export default {
 			width: 0.5,
 			validation: "mandatory type(integer)",
 			placeholder: 8000,
-			condition: (v) => v["docker.proxy"],
-		},
+			condition: (v) => v["docker.proxy"]
+		}
 	],
-	view: () => import("../default.vue"),
+	view: () => import("../default.vue")
 };

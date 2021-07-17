@@ -16,7 +16,7 @@ class Flags {
 				alt: ["AD", "Principat d'Andorra", "AND"],
 				callingCode: ["376"],
 				currency: ["EUR"],
-				lang: ["cat"],
+				lang: ["cat"]
 			},
 			ae: {
 				name: "United Arab Emirates",
@@ -26,7 +26,7 @@ class Flags {
 				callingCode: ["971"],
 				currency: ["AED"],
 				lang: ["ara"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			af: {
 				name: "Afghanistan",
@@ -36,7 +36,7 @@ class Flags {
 				callingCode: ["93"],
 				currency: ["AFN"],
 				lang: ["prs", "pus", "tuk"],
-				timezone: ["UTC+04:30"],
+				timezone: ["UTC+04:30"]
 			},
 			ag: {
 				name: "Antigua and Barbuda",
@@ -45,7 +45,7 @@ class Flags {
 				alt: ["AG", "ATG"],
 				callingCode: ["1268"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			ai: {
 				name: "Anguilla",
@@ -54,7 +54,7 @@ class Flags {
 				alt: ["AI", "AIA"],
 				callingCode: ["1264"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			al: {
 				name: "Albania",
@@ -64,7 +64,7 @@ class Flags {
 				callingCode: ["355"],
 				currency: ["ALL"],
 				lang: ["sqi"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			am: {
 				name: "Armenia",
@@ -74,7 +74,7 @@ class Flags {
 				callingCode: ["374"],
 				currency: ["AMD"],
 				lang: ["hye"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			ao: {
 				name: "Angola",
@@ -83,7 +83,7 @@ class Flags {
 				alt: ["AO", "República de Angola", "ʁɛpublika de an'ɡɔla", "AGO"],
 				callingCode: ["244"],
 				currency: ["AOA"],
-				lang: ["por"],
+				lang: ["por"]
 			},
 			aq: {
 				name: "Antarctica",
@@ -92,7 +92,7 @@ class Flags {
 				alt: ["AQ", "ATA"],
 				callingCode: [],
 				currency: [],
-				lang: [],
+				lang: []
 			},
 			ar: {
 				name: "Argentina",
@@ -102,7 +102,7 @@ class Flags {
 				callingCode: ["54"],
 				currency: ["ARS"],
 				lang: ["grn", "spa"],
-				timezone: ["UTC-03:00"],
+				timezone: ["UTC-03:00"]
 			},
 			as: {
 				name: "American Samoa",
@@ -111,7 +111,7 @@ class Flags {
 				alt: ["AS", "Amerika Sāmoa", "Amelika Sāmoa", "Sāmoa Amelika", "ASM"],
 				callingCode: ["1684"],
 				currency: ["USD"],
-				lang: ["eng", "smo"],
+				lang: ["eng", "smo"]
 			},
 			at: {
 				name: "Austria",
@@ -121,7 +121,7 @@ class Flags {
 				callingCode: ["43"],
 				currency: ["EUR"],
 				lang: ["bar"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			au: {
 				name: "Australia",
@@ -131,7 +131,7 @@ class Flags {
 				callingCode: ["61"],
 				currency: ["AUD"],
 				lang: ["eng"],
-				timezone: ["UTC+11:00", "UTC+10:00", "UTC+09:30", "UTC+08:00"],
+				timezone: ["UTC+11:00", "UTC+10:00", "UTC+09:30", "UTC+08:00"]
 			},
 			aw: {
 				name: "Aruba",
@@ -140,7 +140,7 @@ class Flags {
 				alt: ["AW", "ABW"],
 				callingCode: ["297"],
 				currency: ["AWG"],
-				lang: ["nld", "pap"],
+				lang: ["nld", "pap"]
 			},
 			ax: {
 				name: "Åland Islands",
@@ -149,7 +149,7 @@ class Flags {
 				alt: ["AX", "Aaland", "Aland", "Ahvenanmaa", "ALA"],
 				callingCode: ["358"],
 				currency: ["EUR"],
-				lang: ["swe"],
+				lang: ["swe"]
 			},
 			az: {
 				name: "Azerbaijan",
@@ -159,7 +159,7 @@ class Flags {
 				callingCode: ["994"],
 				currency: ["AZN"],
 				lang: ["aze", "rus"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			ba: {
 				name: "Bosnia and Herzegovina",
@@ -169,7 +169,7 @@ class Flags {
 				callingCode: ["387"],
 				currency: ["BAM"],
 				lang: ["bos", "hrv", "srp"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			bb: {
 				name: "Barbados",
@@ -178,7 +178,7 @@ class Flags {
 				alt: ["BB", "BRB"],
 				callingCode: ["1246"],
 				currency: ["BBD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			bd: {
 				name: "Bangladesh",
@@ -188,7 +188,7 @@ class Flags {
 				callingCode: ["880"],
 				currency: ["BDT"],
 				lang: ["ben"],
-				timezone: ["UTC+06:00"],
+				timezone: ["UTC+06:00"]
 			},
 			be: {
 				name: "Belgium",
@@ -203,12 +203,12 @@ class Flags {
 					"Koninkrijk België",
 					"Royaume de Belgique",
 					"Königreich Belgien",
-					"BEL",
+					"BEL"
 				],
 				callingCode: ["32"],
 				currency: ["EUR"],
 				lang: ["deu", "fra", "nld"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			bf: {
 				name: "Burkina Faso",
@@ -217,7 +217,7 @@ class Flags {
 				alt: ["BF", "BFA"],
 				callingCode: ["226"],
 				currency: ["XOF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			bg: {
 				name: "Bulgaria",
@@ -227,7 +227,7 @@ class Flags {
 				callingCode: ["359"],
 				currency: ["BGN"],
 				lang: ["bul"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			bh: {
 				name: "Bahrain",
@@ -237,7 +237,7 @@ class Flags {
 				callingCode: ["973"],
 				currency: ["BHD"],
 				lang: ["ara"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			bi: {
 				name: "Burundi",
@@ -246,7 +246,7 @@ class Flags {
 				alt: ["BI", "Republika y'Uburundi", "République du Burundi", "BDI"],
 				callingCode: ["257"],
 				currency: ["BIF"],
-				lang: ["fra", "run"],
+				lang: ["fra", "run"]
 			},
 			bj: {
 				name: "Benin",
@@ -255,7 +255,7 @@ class Flags {
 				alt: ["BJ", "République du Bénin", "BEN"],
 				callingCode: ["229"],
 				currency: ["XOF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			bl: {
 				name: "Saint Barthélemy",
@@ -264,7 +264,7 @@ class Flags {
 				alt: ["BL", "St. Barthelemy", "Collectivité de Saint-Barthélemy", "BLM"],
 				callingCode: ["590"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			bm: {
 				name: "Bermuda",
@@ -273,7 +273,7 @@ class Flags {
 				alt: ["BM", "The Islands of Bermuda", "The Bermudas", "Somers Isles", "BMU"],
 				callingCode: ["1441"],
 				currency: ["BMD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			bn: {
 				name: "Brunei",
@@ -283,7 +283,7 @@ class Flags {
 				callingCode: ["673"],
 				currency: ["BND"],
 				lang: ["msa"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			bo: {
 				name: "Bolivia",
@@ -298,12 +298,12 @@ class Flags {
 					"Buliwya Mamallaqta",
 					"Wuliwya Suyu",
 					"Tetã Volívia",
-					"BOL",
+					"BOL"
 				],
 				callingCode: ["591"],
 				currency: ["BOB"],
 				lang: ["aym", "grn", "que", "spa"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			bq: {
 				name: "Caribbean Netherlands",
@@ -312,7 +312,7 @@ class Flags {
 				alt: ["BES islands", "BES"],
 				callingCode: ["599"],
 				currency: ["USD"],
-				lang: ["eng", "nld", "pap"],
+				lang: ["eng", "nld", "pap"]
 			},
 			br: {
 				name: "Brazil",
@@ -322,7 +322,7 @@ class Flags {
 				callingCode: ["55"],
 				currency: ["BRL"],
 				lang: ["por"],
-				timezone: ["UTC-02:00", "UTC-03:00", "UTC-04:00", "UTC-05:00"],
+				timezone: ["UTC-02:00", "UTC-03:00", "UTC-04:00", "UTC-05:00"]
 			},
 			bs: {
 				name: "Bahamas",
@@ -331,7 +331,7 @@ class Flags {
 				alt: ["BS", "BHS"],
 				callingCode: ["1242"],
 				currency: ["BSD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			bt: {
 				name: "Bhutan",
@@ -341,7 +341,7 @@ class Flags {
 				callingCode: ["975"],
 				currency: ["BTN", "INR"],
 				lang: ["dzo"],
-				timezone: ["UTC+06:00"],
+				timezone: ["UTC+06:00"]
 			},
 			bv: {
 				name: "Bouvet Island",
@@ -350,7 +350,7 @@ class Flags {
 				alt: ["BV", "Bouvetøya", "Bouvet-øya", "BVT"],
 				callingCode: [],
 				currency: ["NOK"],
-				lang: ["nor"],
+				lang: ["nor"]
 			},
 			bw: {
 				name: "Botswana",
@@ -360,7 +360,7 @@ class Flags {
 				callingCode: ["267"],
 				currency: ["BWP"],
 				lang: ["eng", "tsn"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			by: {
 				name: "Belarus",
@@ -370,7 +370,7 @@ class Flags {
 				callingCode: ["375"],
 				currency: ["BYN"],
 				lang: ["bel", "rus"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			bz: {
 				name: "Belize",
@@ -380,7 +380,7 @@ class Flags {
 				callingCode: ["501"],
 				currency: ["BZD"],
 				lang: ["bjz", "eng", "spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			ca: {
 				name: "Canada",
@@ -390,7 +390,7 @@ class Flags {
 				callingCode: ["1"],
 				currency: ["CAD"],
 				lang: ["eng", "fra"],
-				timezone: ["UTC-03:30", "UTC-04:00", "UTC-05:00", "UTC-06:00", "UTC-07:00", "UTC-08:00"],
+				timezone: ["UTC-03:30", "UTC-04:00", "UTC-05:00", "UTC-06:00", "UTC-07:00", "UTC-08:00"]
 			},
 			cc: {
 				name: "Cocos (Keeling) Islands",
@@ -399,7 +399,7 @@ class Flags {
 				alt: ["CC", "Keeling Islands", "Cocos Islands", "CCK"],
 				callingCode: ["61"],
 				currency: ["AUD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			cd: {
 				name: "DR Congo",
@@ -409,13 +409,13 @@ class Flags {
 					"Repubilika ya Kongo Demokratiki",
 					"Republiki ya Kongó Demokratiki",
 					"Ditunga dia Kongu wa Mungalaata",
-					"Jamhuri ya Kidemokrasia ya Kongo",
+					"Jamhuri ya Kidemokrasia ya Kongo"
 				],
 				alt: ["CD", "Congo-Kinshasa", "Congo, the Democratic Republic of the", "DRC", "COD"],
 				callingCode: ["243"],
 				currency: ["CDF"],
 				lang: ["fra", "kon", "lin", "lua", "swa"],
-				timezone: ["UTC+01:00", "UTC+02:00"],
+				timezone: ["UTC+01:00", "UTC+02:00"]
 			},
 			cf: {
 				name: "Central African Republic",
@@ -424,7 +424,7 @@ class Flags {
 				alt: ["CF", "République centrafricaine", "CAF"],
 				callingCode: ["236"],
 				currency: ["XAF"],
-				lang: ["fra", "sag"],
+				lang: ["fra", "sag"]
 			},
 			cg: {
 				name: "Republic of the Congo",
@@ -433,7 +433,7 @@ class Flags {
 				alt: ["CG", "Congo", "Congo-Brazzaville", "COG"],
 				callingCode: ["242"],
 				currency: ["XAF"],
-				lang: ["fra", "kon", "lin"],
+				lang: ["fra", "kon", "lin"]
 			},
 			ch: {
 				name: "Switzerland",
@@ -443,7 +443,7 @@ class Flags {
 				callingCode: ["41"],
 				currency: ["CHF"],
 				lang: ["fra", "gsw", "ita", "roh"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ci: {
 				name: "Ivory Coast",
@@ -453,7 +453,7 @@ class Flags {
 				callingCode: ["225"],
 				currency: ["XOF"],
 				lang: ["fra"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			ck: {
 				name: "Cook Islands",
@@ -462,7 +462,7 @@ class Flags {
 				alt: ["CK", "Kūki 'Āirani", "COK"],
 				callingCode: ["682"],
 				currency: ["NZD", "CKD"],
-				lang: ["eng", "rar"],
+				lang: ["eng", "rar"]
 			},
 			cl: {
 				name: "Chile",
@@ -472,7 +472,7 @@ class Flags {
 				callingCode: ["56"],
 				currency: ["CLP"],
 				lang: ["spa"],
-				timezone: ["UTC-04:00", "UTC-05:00"],
+				timezone: ["UTC-04:00", "UTC-05:00"]
 			},
 			cm: {
 				name: "Cameroon",
@@ -482,7 +482,7 @@ class Flags {
 				callingCode: ["237"],
 				currency: ["XAF"],
 				lang: ["eng", "fra"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			cn: {
 				name: "China",
@@ -492,7 +492,7 @@ class Flags {
 				callingCode: ["86"],
 				currency: ["CNY"],
 				lang: ["zho"],
-				timezone: ["UTC+08:00", "UTC+06:00"],
+				timezone: ["UTC+08:00", "UTC+06:00"]
 			},
 			co: {
 				name: "Colombia",
@@ -502,7 +502,7 @@ class Flags {
 				callingCode: ["57"],
 				currency: ["COP"],
 				lang: ["spa"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			cr: {
 				name: "Costa Rica",
@@ -512,7 +512,7 @@ class Flags {
 				callingCode: ["506"],
 				currency: ["CRC"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			cu: {
 				name: "Cuba",
@@ -522,7 +522,7 @@ class Flags {
 				callingCode: ["53"],
 				currency: ["CUC", "CUP"],
 				lang: ["spa"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			cv: {
 				name: "Cape Verde",
@@ -531,7 +531,7 @@ class Flags {
 				alt: ["CV", "República de Cabo Verde", "CPV"],
 				callingCode: ["238"],
 				currency: ["CVE"],
-				lang: ["por"],
+				lang: ["por"]
 			},
 			cw: {
 				name: "Curaçao",
@@ -540,7 +540,7 @@ class Flags {
 				alt: ["CW", "Curacao", "Kòrsou", "Land Curaçao", "Pais Kòrsou", "CUW"],
 				callingCode: ["5999"],
 				currency: ["ANG"],
-				lang: ["eng", "nld", "pap"],
+				lang: ["eng", "nld", "pap"]
 			},
 			cx: {
 				name: "Christmas Island",
@@ -549,7 +549,7 @@ class Flags {
 				alt: ["CX", "CXR"],
 				callingCode: ["61"],
 				currency: ["AUD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			cy: {
 				name: "Cyprus",
@@ -558,7 +558,7 @@ class Flags {
 				alt: ["CY", "Kýpros", "Kıbrıs", "Κυπριακή Δημοκρατία", "Kıbrıs Cumhuriyeti", "CYP"],
 				callingCode: ["357"],
 				currency: ["EUR"],
-				lang: ["ell", "tur"],
+				lang: ["ell", "tur"]
 			},
 			cz: {
 				name: "Czechia",
@@ -568,7 +568,7 @@ class Flags {
 				callingCode: ["420"],
 				currency: ["CZK"],
 				lang: ["ces", "slk"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			de: {
 				name: "Germany",
@@ -578,7 +578,7 @@ class Flags {
 				callingCode: ["49"],
 				currency: ["EUR"],
 				lang: ["deu"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			dj: {
 				name: "Djibouti",
@@ -588,7 +588,7 @@ class Flags {
 				callingCode: ["253"],
 				currency: ["DJF"],
 				lang: ["ara", "fra"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			dk: {
 				name: "Denmark",
@@ -598,7 +598,7 @@ class Flags {
 				callingCode: ["45"],
 				currency: ["DKK"],
 				lang: ["dan"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			dm: {
 				name: "Dominica",
@@ -607,7 +607,7 @@ class Flags {
 				alt: ["DM", "Dominique", "Wai‘tu kubuli", "DMA"],
 				callingCode: ["1767"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			do: {
 				name: "Dominican Republic",
@@ -617,7 +617,7 @@ class Flags {
 				callingCode: ["1809", "1829", "1849"],
 				currency: ["DOP"],
 				lang: ["spa"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			dz: {
 				name: "Algeria",
@@ -627,7 +627,7 @@ class Flags {
 				callingCode: ["213"],
 				currency: ["DZD"],
 				lang: ["ara"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ec: {
 				name: "Ecuador",
@@ -637,7 +637,7 @@ class Flags {
 				callingCode: ["593"],
 				currency: ["USD"],
 				lang: ["spa"],
-				timezone: ["UTC-05:00", "UTC-06:00"],
+				timezone: ["UTC-05:00", "UTC-06:00"]
 			},
 			ee: {
 				name: "Estonia",
@@ -647,7 +647,7 @@ class Flags {
 				callingCode: ["372"],
 				currency: ["EUR"],
 				lang: ["est"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			eg: {
 				name: "Egypt",
@@ -657,7 +657,7 @@ class Flags {
 				callingCode: ["20"],
 				currency: ["EGP"],
 				lang: ["ara"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			eh: {
 				name: "Western Sahara",
@@ -666,7 +666,7 @@ class Flags {
 				alt: ["EH", "Taneẓroft Tutrimt", "ESH"],
 				callingCode: ["212"],
 				currency: ["MAD", "DZD", "MRO"],
-				lang: ["ber", "mey", "spa"],
+				lang: ["ber", "mey", "spa"]
 			},
 			er: {
 				name: "Eritrea",
@@ -676,7 +676,7 @@ class Flags {
 				callingCode: ["291"],
 				currency: ["ERN"],
 				lang: ["ara", "eng", "tir"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			es: {
 				name: "Spain",
@@ -686,7 +686,7 @@ class Flags {
 				callingCode: ["34"],
 				currency: ["EUR"],
 				lang: ["spa"],
-				timezone: ["UTC+01:00", "UTC+00:00"],
+				timezone: ["UTC+01:00", "UTC+00:00"]
 			},
 			et: {
 				name: "Ethiopia",
@@ -696,7 +696,7 @@ class Flags {
 				callingCode: ["251"],
 				currency: ["ETB"],
 				lang: ["amh"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			fi: {
 				name: "Finland",
@@ -706,7 +706,7 @@ class Flags {
 				callingCode: ["358"],
 				currency: ["EUR"],
 				lang: ["fin", "swe"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			fj: {
 				name: "Fiji",
@@ -715,7 +715,7 @@ class Flags {
 				alt: ["FJ", "Viti", "Matanitu ko Viti", "Fijī Gaṇarājya", "FJI"],
 				callingCode: ["679"],
 				currency: ["FJD"],
-				lang: ["eng", "fij", "hif"],
+				lang: ["eng", "fij", "hif"]
 			},
 			fk: {
 				name: "Falkland Islands",
@@ -724,7 +724,7 @@ class Flags {
 				alt: ["FK", "Islas Malvinas", "Falkland Islands (Malvinas)", "FLK"],
 				callingCode: ["500"],
 				currency: ["FKP"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			fm: {
 				name: "Micronesia",
@@ -733,7 +733,7 @@ class Flags {
 				alt: ["FM", "Micronesia, Federated States of", "FSM"],
 				callingCode: ["691"],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			fo: {
 				name: "Faroe Islands",
@@ -743,7 +743,7 @@ class Flags {
 				callingCode: ["298"],
 				currency: ["DKK"],
 				lang: ["dan", "fao"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			fr: {
 				name: "France",
@@ -753,7 +753,7 @@ class Flags {
 				callingCode: ["33"],
 				currency: ["EUR"],
 				lang: ["fra"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ga: {
 				name: "Gabon",
@@ -762,7 +762,7 @@ class Flags {
 				alt: ["GA", "République Gabonaise", "GAB"],
 				callingCode: ["241"],
 				currency: ["XAF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			gb: {
 				name: "United Kingdom",
@@ -772,7 +772,7 @@ class Flags {
 				callingCode: ["44"],
 				currency: ["GBP"],
 				lang: ["eng"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			gd: {
 				name: "Grenada",
@@ -781,7 +781,7 @@ class Flags {
 				alt: ["GD", "GRD"],
 				callingCode: ["1473"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			ge: {
 				name: "Georgia",
@@ -791,7 +791,7 @@ class Flags {
 				callingCode: ["995"],
 				currency: ["GEL"],
 				lang: ["kat"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			gf: {
 				name: "French Guiana",
@@ -800,7 +800,7 @@ class Flags {
 				alt: ["GF", "Guyane", "GUF"],
 				callingCode: ["594"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			gg: {
 				name: "Guernsey",
@@ -809,7 +809,7 @@ class Flags {
 				alt: ["GG", "Bailliage de Guernesey", "GGY"],
 				callingCode: ["44"],
 				currency: ["GBP"],
-				lang: ["eng", "fra", "nfr"],
+				lang: ["eng", "fra", "nfr"]
 			},
 			gh: {
 				name: "Ghana",
@@ -818,7 +818,7 @@ class Flags {
 				alt: ["GH", "GHA"],
 				callingCode: ["233"],
 				currency: ["GHS"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			gi: {
 				name: "Gibraltar",
@@ -827,7 +827,7 @@ class Flags {
 				alt: ["GI", "GIB"],
 				callingCode: ["350"],
 				currency: ["GIP"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			gl: {
 				name: "Greenland",
@@ -837,7 +837,7 @@ class Flags {
 				callingCode: ["299"],
 				currency: ["DKK"],
 				lang: ["kal"],
-				timezone: ["UTC-03:00", "UTC", "UTC-01:00", "UTC-04:00"],
+				timezone: ["UTC-03:00", "UTC", "UTC-01:00", "UTC-04:00"]
 			},
 			gm: {
 				name: "Gambia",
@@ -846,7 +846,7 @@ class Flags {
 				alt: ["GM", "GMB"],
 				callingCode: ["220"],
 				currency: ["GMD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			gn: {
 				name: "Guinea",
@@ -855,7 +855,7 @@ class Flags {
 				alt: ["GN", "République de Guinée", "GIN"],
 				callingCode: ["224"],
 				currency: ["GNF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			gp: {
 				name: "Guadeloupe",
@@ -864,7 +864,7 @@ class Flags {
 				alt: ["GP", "Gwadloup", "GLP"],
 				callingCode: ["590"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			gq: {
 				name: "Equatorial Guinea",
@@ -875,11 +875,11 @@ class Flags {
 					"República de Guinea Ecuatorial",
 					"République de Guinée équatoriale",
 					"República da Guiné Equatorial",
-					"GNQ",
+					"GNQ"
 				],
 				callingCode: ["240"],
 				currency: ["XAF"],
-				lang: ["fra", "por", "spa"],
+				lang: ["fra", "por", "spa"]
 			},
 			gr: {
 				name: "Greece",
@@ -889,7 +889,7 @@ class Flags {
 				callingCode: ["30"],
 				currency: ["EUR"],
 				lang: ["ell"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			gs: {
 				name: "South Georgia",
@@ -898,7 +898,7 @@ class Flags {
 				alt: ["GS", "SGS"],
 				callingCode: ["500"],
 				currency: ["GBP"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			gt: {
 				name: "Guatemala",
@@ -908,7 +908,7 @@ class Flags {
 				callingCode: ["502"],
 				currency: ["GTQ"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			gu: {
 				name: "Guam",
@@ -917,7 +917,7 @@ class Flags {
 				alt: ["GU", "Guåhån", "GUM"],
 				callingCode: ["1671"],
 				currency: ["USD"],
-				lang: ["cha", "eng", "spa"],
+				lang: ["cha", "eng", "spa"]
 			},
 			gw: {
 				name: "Guinea-Bissau",
@@ -926,7 +926,7 @@ class Flags {
 				alt: ["GW", "República da Guiné-Bissau", "GNB"],
 				callingCode: ["245"],
 				currency: ["XOF"],
-				lang: ["por", "pov"],
+				lang: ["por", "pov"]
 			},
 			gy: {
 				name: "Guyana",
@@ -935,7 +935,7 @@ class Flags {
 				alt: ["GY", "GUY"],
 				callingCode: ["592"],
 				currency: ["GYD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			hk: {
 				name: "Hong Kong",
@@ -945,7 +945,7 @@ class Flags {
 				callingCode: ["852"],
 				currency: ["HKD"],
 				lang: ["eng", "zho"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			hm: {
 				name: "Heard Island and McDonald Islands",
@@ -954,7 +954,7 @@ class Flags {
 				alt: ["HM", "HMD"],
 				callingCode: [],
 				currency: ["AUD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			hn: {
 				name: "Honduras",
@@ -964,7 +964,7 @@ class Flags {
 				callingCode: ["504"],
 				currency: ["HNL"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			hr: {
 				name: "Croatia",
@@ -974,7 +974,7 @@ class Flags {
 				callingCode: ["385"],
 				currency: ["HRK"],
 				lang: ["hrv"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ht: {
 				name: "Haiti",
@@ -984,7 +984,7 @@ class Flags {
 				callingCode: ["509"],
 				currency: ["HTG", "USD"],
 				lang: ["fra", "hat"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			hu: {
 				name: "Hungary",
@@ -994,7 +994,7 @@ class Flags {
 				callingCode: ["36"],
 				currency: ["HUF"],
 				lang: ["hun"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			id: {
 				name: "Indonesia",
@@ -1004,7 +1004,7 @@ class Flags {
 				callingCode: ["62"],
 				currency: ["IDR"],
 				lang: ["ind"],
-				timezone: ["UTC+07:00", "UTC+08:00", "UTC+09:00"],
+				timezone: ["UTC+07:00", "UTC+08:00", "UTC+09:00"]
 			},
 			ie: {
 				name: "Ireland",
@@ -1014,7 +1014,7 @@ class Flags {
 				callingCode: ["353"],
 				currency: ["EUR"],
 				lang: ["eng", "gle"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			il: {
 				name: "Israel",
@@ -1024,7 +1024,7 @@ class Flags {
 				callingCode: ["972"],
 				currency: ["ILS"],
 				lang: ["ara", "heb"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			im: {
 				name: "Isle of Man",
@@ -1033,7 +1033,7 @@ class Flags {
 				alt: ["IM", "Ellan Vannin", "Mann", "Mannin", "IMN"],
 				callingCode: ["44"],
 				currency: ["GBP"],
-				lang: ["eng", "glv"],
+				lang: ["eng", "glv"]
 			},
 			in: {
 				name: "India",
@@ -1043,7 +1043,7 @@ class Flags {
 				callingCode: ["91"],
 				currency: ["INR"],
 				lang: ["eng", "hin", "tam"],
-				timezone: ["UTC+05:30"],
+				timezone: ["UTC+05:30"]
 			},
 			io: {
 				name: "British Indian Ocean Territory",
@@ -1052,7 +1052,7 @@ class Flags {
 				alt: ["IO", "IOT"],
 				callingCode: ["246"],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			iq: {
 				name: "Iraq",
@@ -1062,7 +1062,7 @@ class Flags {
 				callingCode: ["964"],
 				currency: ["IQD"],
 				lang: ["ara", "arc", "ckb"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			ir: {
 				name: "Iran",
@@ -1072,7 +1072,7 @@ class Flags {
 				callingCode: ["98"],
 				currency: ["IRR"],
 				lang: ["fas"],
-				timezone: ["UTC+03:30"],
+				timezone: ["UTC+03:30"]
 			},
 			is: {
 				name: "Iceland",
@@ -1082,7 +1082,7 @@ class Flags {
 				callingCode: ["354"],
 				currency: ["ISK"],
 				lang: ["isl"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			it: {
 				name: "Italy",
@@ -1092,7 +1092,7 @@ class Flags {
 				callingCode: ["39"],
 				currency: ["EUR"],
 				lang: ["ita"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			je: {
 				name: "Jersey",
@@ -1101,7 +1101,7 @@ class Flags {
 				alt: ["JE", "Bailliage de Jersey", "Bailliage dé Jèrri", "JEY"],
 				callingCode: ["44"],
 				currency: ["GBP"],
-				lang: ["eng", "fra", "nrf"],
+				lang: ["eng", "fra", "nrf"]
 			},
 			jm: {
 				name: "Jamaica",
@@ -1111,7 +1111,7 @@ class Flags {
 				callingCode: ["1876"],
 				currency: ["JMD"],
 				lang: ["eng", "jam"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			jo: {
 				name: "Jordan",
@@ -1121,7 +1121,7 @@ class Flags {
 				callingCode: ["962"],
 				currency: ["JOD"],
 				lang: ["ara"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			jp: {
 				name: "Japan",
@@ -1131,7 +1131,7 @@ class Flags {
 				callingCode: ["81"],
 				currency: ["JPY"],
 				lang: ["jpn"],
-				timezone: ["UTC+09:00"],
+				timezone: ["UTC+09:00"]
 			},
 			ke: {
 				name: "Kenya",
@@ -1141,7 +1141,7 @@ class Flags {
 				callingCode: ["254"],
 				currency: ["KES"],
 				lang: ["eng", "swa"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			kg: {
 				name: "Kyrgyzstan",
@@ -1151,7 +1151,7 @@ class Flags {
 				callingCode: ["996"],
 				currency: ["KGS"],
 				lang: ["kir", "rus"],
-				timezone: ["UTC+06:00"],
+				timezone: ["UTC+06:00"]
 			},
 			kh: {
 				name: "Cambodia",
@@ -1161,7 +1161,7 @@ class Flags {
 				callingCode: ["855"],
 				currency: ["KHR"],
 				lang: ["khm"],
-				timezone: ["UTC+07:00"],
+				timezone: ["UTC+07:00"]
 			},
 			ki: {
 				name: "Kiribati",
@@ -1170,7 +1170,7 @@ class Flags {
 				alt: ["KI", "Republic of Kiribati", "Ribaberiki Kiribati", "KIR"],
 				callingCode: ["686"],
 				currency: ["AUD"],
-				lang: ["eng", "gil"],
+				lang: ["eng", "gil"]
 			},
 			km: {
 				name: "Comoros",
@@ -1179,7 +1179,7 @@ class Flags {
 				alt: ["KM", "Union des Comores", "Udzima wa Komori", "al-Ittiḥād al-Qumurī", "COM"],
 				callingCode: ["269"],
 				currency: ["KMF"],
-				lang: ["ara", "fra", "zdj"],
+				lang: ["ara", "fra", "zdj"]
 			},
 			kn: {
 				name: "Saint Kitts and Nevis",
@@ -1188,7 +1188,7 @@ class Flags {
 				alt: ["KN", "Federation of Saint Christopher and Nevis", "KNA"],
 				callingCode: ["1869"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			kp: {
 				name: "North Korea",
@@ -1201,11 +1201,11 @@ class Flags {
 					"Korea, Democratic People's Republic of",
 					"북한",
 					"북조선",
-					"PRK",
+					"PRK"
 				],
 				callingCode: ["850"],
 				currency: ["KPW"],
-				lang: ["kor"],
+				lang: ["kor"]
 			},
 			kr: {
 				name: "South Korea",
@@ -1215,7 +1215,7 @@ class Flags {
 				callingCode: ["82"],
 				currency: ["KRW"],
 				lang: ["kor"],
-				timezone: ["UTC+09:00"],
+				timezone: ["UTC+09:00"]
 			},
 			kw: {
 				name: "Kuwait",
@@ -1225,7 +1225,7 @@ class Flags {
 				callingCode: ["965"],
 				currency: ["KWD"],
 				lang: ["ara"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			ky: {
 				name: "Cayman Islands",
@@ -1234,7 +1234,7 @@ class Flags {
 				alt: ["KY", "CYM"],
 				callingCode: ["1345"],
 				currency: ["KYD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			kz: {
 				name: "Kazakhstan",
@@ -1248,12 +1248,12 @@ class Flags {
 					"Qazaqstan Respublïkası",
 					"Республика Казахстан",
 					"Respublika Kazakhstan",
-					"KAZ",
+					"KAZ"
 				],
 				callingCode: ["7"],
 				currency: ["KZT"],
 				lang: ["kaz", "rus"],
-				timezone: ["UTC+06:00", "UTC+05:00"],
+				timezone: ["UTC+06:00", "UTC+05:00"]
 			},
 			la: {
 				name: "Laos",
@@ -1263,7 +1263,7 @@ class Flags {
 				callingCode: ["856"],
 				currency: ["LAK"],
 				lang: ["lao"],
-				timezone: ["UTC+07:00"],
+				timezone: ["UTC+07:00"]
 			},
 			lb: {
 				name: "Lebanon",
@@ -1273,7 +1273,7 @@ class Flags {
 				callingCode: ["961"],
 				currency: ["LBP"],
 				lang: ["ara", "fra"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			lc: {
 				name: "Saint Lucia",
@@ -1282,7 +1282,7 @@ class Flags {
 				alt: ["LC", "LCA"],
 				callingCode: ["1758"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			li: {
 				name: "Liechtenstein",
@@ -1292,7 +1292,7 @@ class Flags {
 				callingCode: ["423"],
 				currency: ["CHF"],
 				lang: ["deu"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			lk: {
 				name: "Sri Lanka",
@@ -1302,7 +1302,7 @@ class Flags {
 				callingCode: ["94"],
 				currency: ["LKR"],
 				lang: ["sin", "tam"],
-				timezone: ["UTC+05:30"],
+				timezone: ["UTC+05:30"]
 			},
 			lr: {
 				name: "Liberia",
@@ -1311,7 +1311,7 @@ class Flags {
 				alt: ["LR", "LBR"],
 				callingCode: ["231"],
 				currency: ["LRD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			ls: {
 				name: "Lesotho",
@@ -1320,7 +1320,7 @@ class Flags {
 				alt: ["LS", "Muso oa Lesotho", "LSO"],
 				callingCode: ["266"],
 				currency: ["LSL", "ZAR"],
-				lang: ["eng", "sot"],
+				lang: ["eng", "sot"]
 			},
 			lt: {
 				name: "Lithuania",
@@ -1330,7 +1330,7 @@ class Flags {
 				callingCode: ["370"],
 				currency: ["EUR"],
 				lang: ["lit"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			lu: {
 				name: "Luxembourg",
@@ -1340,7 +1340,7 @@ class Flags {
 				callingCode: ["352"],
 				currency: ["EUR"],
 				lang: ["deu", "fra", "ltz"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			lv: {
 				name: "Latvia",
@@ -1350,7 +1350,7 @@ class Flags {
 				callingCode: ["371"],
 				currency: ["EUR"],
 				lang: ["lav"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			ly: {
 				name: "Libya",
@@ -1360,7 +1360,7 @@ class Flags {
 				callingCode: ["218"],
 				currency: ["LYD"],
 				lang: ["ara"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			ma: {
 				name: "Morocco",
@@ -1370,7 +1370,7 @@ class Flags {
 				callingCode: ["212"],
 				currency: ["MAD"],
 				lang: ["ara", "ber"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			mc: {
 				name: "Monaco",
@@ -1380,7 +1380,7 @@ class Flags {
 				callingCode: ["377"],
 				currency: ["EUR"],
 				lang: ["fra"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			md: {
 				name: "Moldova",
@@ -1390,7 +1390,7 @@ class Flags {
 				callingCode: ["373"],
 				currency: ["MDL"],
 				lang: ["ron"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			me: {
 				name: "Montenegro",
@@ -1400,7 +1400,7 @@ class Flags {
 				callingCode: ["382"],
 				currency: ["EUR"],
 				lang: ["srp"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			mf: {
 				name: "Saint Martin",
@@ -1411,11 +1411,11 @@ class Flags {
 					"Collectivity of Saint Martin",
 					"Collectivité de Saint-Martin",
 					"Saint Martin (French part)",
-					"MAF",
+					"MAF"
 				],
 				callingCode: ["590"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			mg: {
 				name: "Madagascar",
@@ -1424,7 +1424,7 @@ class Flags {
 				alt: ["MG", "Repoblikan'i Madagasikara", "République de Madagascar", "MDG"],
 				callingCode: ["261"],
 				currency: ["MGA"],
-				lang: ["fra", "mlg"],
+				lang: ["fra", "mlg"]
 			},
 			mh: {
 				name: "Marshall Islands",
@@ -1433,7 +1433,7 @@ class Flags {
 				alt: ["MH", "Aolepān Aorōkin M̧ajeļ", "MHL"],
 				callingCode: ["692"],
 				currency: ["USD"],
-				lang: ["eng", "mah"],
+				lang: ["eng", "mah"]
 			},
 			mk: {
 				name: "Macedonia",
@@ -1443,7 +1443,7 @@ class Flags {
 				callingCode: ["389"],
 				currency: ["MKD"],
 				lang: ["mkd"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ml: {
 				name: "Mali",
@@ -1453,7 +1453,7 @@ class Flags {
 				callingCode: ["223"],
 				currency: ["XOF"],
 				lang: ["fra"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			mm: {
 				name: "Myanmar",
@@ -1463,7 +1463,7 @@ class Flags {
 				callingCode: ["95"],
 				currency: ["MMK"],
 				lang: ["mya"],
-				timezone: ["UTC+06:30"],
+				timezone: ["UTC+06:30"]
 			},
 			mn: {
 				name: "Mongolia",
@@ -1473,7 +1473,7 @@ class Flags {
 				callingCode: ["976"],
 				currency: ["MNT"],
 				lang: ["mon"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			mo: {
 				name: "Macau",
@@ -1485,12 +1485,12 @@ class Flags {
 					"Macao",
 					"中華人民共和國澳門特別行政區",
 					"Região Administrativa Especial de Macau da República Popular da China",
-					"MAC",
+					"MAC"
 				],
 				callingCode: ["853"],
 				currency: ["MOP"],
 				lang: ["por", "zho"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			mp: {
 				name: "Northern Mariana Islands",
@@ -1499,7 +1499,7 @@ class Flags {
 				alt: ["MP", "Sankattan Siha Na Islas Mariånas", "MNP"],
 				callingCode: ["1670"],
 				currency: ["USD"],
-				lang: ["cal", "cha", "eng"],
+				lang: ["cal", "cha", "eng"]
 			},
 			mq: {
 				name: "Martinique",
@@ -1508,7 +1508,7 @@ class Flags {
 				alt: ["MQ", "MTQ"],
 				callingCode: ["596"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			mr: {
 				name: "Mauritania",
@@ -1517,7 +1517,7 @@ class Flags {
 				alt: ["MR", "al-Jumhūriyyah al-ʾIslāmiyyah al-Mūrītāniyyah", "MRT"],
 				callingCode: ["222"],
 				currency: ["MRO"],
-				lang: ["ara"],
+				lang: ["ara"]
 			},
 			ms: {
 				name: "Montserrat",
@@ -1526,7 +1526,7 @@ class Flags {
 				alt: ["MS", "MSR"],
 				callingCode: ["1664"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			mt: {
 				name: "Malta",
@@ -1536,7 +1536,7 @@ class Flags {
 				callingCode: ["356"],
 				currency: ["EUR"],
 				lang: ["eng", "mlt"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			mu: {
 				name: "Mauritius",
@@ -1545,7 +1545,7 @@ class Flags {
 				alt: ["MU", "République de Maurice", "MUS"],
 				callingCode: ["230"],
 				currency: ["MUR"],
-				lang: ["eng", "fra", "mfe"],
+				lang: ["eng", "fra", "mfe"]
 			},
 			mv: {
 				name: "Maldives",
@@ -1555,7 +1555,7 @@ class Flags {
 				callingCode: ["960"],
 				currency: ["MVR"],
 				lang: ["div"],
-				timezone: ["UTC+05:00"],
+				timezone: ["UTC+05:00"]
 			},
 			mw: {
 				name: "Malawi",
@@ -1564,7 +1564,7 @@ class Flags {
 				alt: ["MW", "MWI"],
 				callingCode: ["265"],
 				currency: ["MWK"],
-				lang: ["eng", "nya"],
+				lang: ["eng", "nya"]
 			},
 			mx: {
 				name: "Mexico",
@@ -1574,7 +1574,7 @@ class Flags {
 				callingCode: ["52"],
 				currency: ["MXN"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00", "UTC-05:00", "UTC-07:00", "UTC-08:00"],
+				timezone: ["UTC-06:00", "UTC-05:00", "UTC-07:00", "UTC-08:00"]
 			},
 			my: {
 				name: "Malaysia",
@@ -1584,7 +1584,7 @@ class Flags {
 				callingCode: ["60"],
 				currency: ["MYR"],
 				lang: ["eng", "msa"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			mz: {
 				name: "Mozambique",
@@ -1593,7 +1593,7 @@ class Flags {
 				alt: ["MZ", "República de Moçambique", "MOZ"],
 				callingCode: ["258"],
 				currency: ["MZN"],
-				lang: ["por"],
+				lang: ["por"]
 			},
 			na: {
 				name: "Namibia",
@@ -1602,7 +1602,7 @@ class Flags {
 				alt: ["NA", "Namibië", "NAM"],
 				callingCode: ["264"],
 				currency: ["NAD", "ZAR"],
-				lang: ["afr", "deu", "eng", "her", "hgm", "kwn", "loz", "ndo", "tsn"],
+				lang: ["afr", "deu", "eng", "her", "hgm", "kwn", "loz", "ndo", "tsn"]
 			},
 			nc: {
 				name: "New Caledonia",
@@ -1611,7 +1611,7 @@ class Flags {
 				alt: ["NC", "NCL"],
 				callingCode: ["687"],
 				currency: ["XPF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			ne: {
 				name: "Niger",
@@ -1620,7 +1620,7 @@ class Flags {
 				alt: ["NE", "Nijar", "NER"],
 				callingCode: ["227"],
 				currency: ["XOF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			nf: {
 				name: "Norfolk Island",
@@ -1629,7 +1629,7 @@ class Flags {
 				alt: ["NF", "Teratri of Norf'k Ailen", "NFK"],
 				callingCode: ["672"],
 				currency: ["AUD"],
-				lang: ["eng", "pih"],
+				lang: ["eng", "pih"]
 			},
 			ng: {
 				name: "Nigeria",
@@ -1639,7 +1639,7 @@ class Flags {
 				callingCode: ["234"],
 				currency: ["NGN"],
 				lang: ["eng"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ni: {
 				name: "Nicaragua",
@@ -1649,7 +1649,7 @@ class Flags {
 				callingCode: ["505"],
 				currency: ["NIO"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			nl: {
 				name: "Netherlands",
@@ -1659,7 +1659,7 @@ class Flags {
 				callingCode: ["31"],
 				currency: ["EUR"],
 				lang: ["nld"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			no: {
 				name: "Norway",
@@ -1669,7 +1669,7 @@ class Flags {
 				callingCode: ["47"],
 				currency: ["NOK"],
 				lang: ["nno", "nob", "smi"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			np: {
 				name: "Nepal",
@@ -1679,7 +1679,7 @@ class Flags {
 				callingCode: ["977"],
 				currency: ["NPR"],
 				lang: ["nep"],
-				timezone: ["UTC+05:45"],
+				timezone: ["UTC+05:45"]
 			},
 			nr: {
 				name: "Nauru",
@@ -1688,7 +1688,7 @@ class Flags {
 				alt: ["NR", "Naoero", "Pleasant Island", "Ripublik Naoero", "NRU"],
 				callingCode: ["674"],
 				currency: ["AUD"],
-				lang: ["eng", "nau"],
+				lang: ["eng", "nau"]
 			},
 			nu: {
 				name: "Niue",
@@ -1697,7 +1697,7 @@ class Flags {
 				alt: ["NU", "NIU"],
 				callingCode: ["683"],
 				currency: ["NZD"],
-				lang: ["eng", "niu"],
+				lang: ["eng", "niu"]
 			},
 			nz: {
 				name: "New Zealand",
@@ -1707,7 +1707,7 @@ class Flags {
 				callingCode: ["64"],
 				currency: ["NZD"],
 				lang: ["eng", "mri", "nzs"],
-				timezone: ["UTC+12:00"],
+				timezone: ["UTC+12:00"]
 			},
 			om: {
 				name: "Oman",
@@ -1717,7 +1717,7 @@ class Flags {
 				callingCode: ["968"],
 				currency: ["OMR"],
 				lang: ["ara"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			pa: {
 				name: "Panama",
@@ -1727,7 +1727,7 @@ class Flags {
 				callingCode: ["507"],
 				currency: ["PAB", "USD"],
 				lang: ["spa"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			pe: {
 				name: "Peru",
@@ -1737,7 +1737,7 @@ class Flags {
 				callingCode: ["51"],
 				currency: ["PEN"],
 				lang: ["aym", "que", "spa"],
-				timezone: ["UTC-05:00"],
+				timezone: ["UTC-05:00"]
 			},
 			pf: {
 				name: "French Polynesia",
@@ -1746,7 +1746,7 @@ class Flags {
 				alt: ["PF", "Polynésie française", "Pōrīnetia Farāni", "PYF"],
 				callingCode: ["689"],
 				currency: ["XPF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			pg: {
 				name: "Papua New Guinea",
@@ -1755,7 +1755,7 @@ class Flags {
 				alt: ["PG", "Independen Stet bilong Papua Niugini", "PNG"],
 				callingCode: ["675"],
 				currency: ["PGK"],
-				lang: ["eng", "hmo", "tpi"],
+				lang: ["eng", "hmo", "tpi"]
 			},
 			ph: {
 				name: "Philippines",
@@ -1765,7 +1765,7 @@ class Flags {
 				callingCode: ["63"],
 				currency: ["PHP"],
 				lang: ["eng", "fil"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			pk: {
 				name: "Pakistan",
@@ -1775,7 +1775,7 @@ class Flags {
 				callingCode: ["92"],
 				currency: ["PKR"],
 				lang: ["eng", "urd"],
-				timezone: ["UTC+05:00"],
+				timezone: ["UTC+05:00"]
 			},
 			pl: {
 				name: "Poland",
@@ -1785,7 +1785,7 @@ class Flags {
 				callingCode: ["48"],
 				currency: ["PLN"],
 				lang: ["pol"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			pm: {
 				name: "Saint Pierre and Miquelon",
@@ -1794,7 +1794,7 @@ class Flags {
 				alt: ["PM", "Collectivité territoriale de Saint-Pierre-et-Miquelon", "SPM"],
 				callingCode: ["508"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			pn: {
 				name: "Pitcairn Islands",
@@ -1803,7 +1803,7 @@ class Flags {
 				alt: ["PN", "Pitcairn", "Pitcairn Henderson Ducie and Oeno Islands", "PCN"],
 				callingCode: ["64"],
 				currency: ["NZD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			pr: {
 				name: "Puerto Rico",
@@ -1813,7 +1813,7 @@ class Flags {
 				callingCode: ["1787", "1939"],
 				currency: ["USD"],
 				lang: ["eng", "spa"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			ps: {
 				name: "Palestine",
@@ -1822,7 +1822,7 @@ class Flags {
 				alt: ["PS", "Palestine, State of", "Dawlat Filasṭin", "PSE"],
 				callingCode: ["970"],
 				currency: ["ILS"],
-				lang: ["ara"],
+				lang: ["ara"]
 			},
 			pt: {
 				name: "Portugal",
@@ -1832,7 +1832,7 @@ class Flags {
 				callingCode: ["351"],
 				currency: ["EUR"],
 				lang: ["por"],
-				timezone: ["UTC+00:00", "UTC-01:00"],
+				timezone: ["UTC+00:00", "UTC-01:00"]
 			},
 			pw: {
 				name: "Palau",
@@ -1841,7 +1841,7 @@ class Flags {
 				alt: ["PW", "Beluu er a Belau", "PLW"],
 				callingCode: ["680"],
 				currency: ["USD"],
-				lang: ["eng", "pau"],
+				lang: ["eng", "pau"]
 			},
 			py: {
 				name: "Paraguay",
@@ -1851,7 +1851,7 @@ class Flags {
 				callingCode: ["595"],
 				currency: ["PYG"],
 				lang: ["grn", "spa"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			qa: {
 				name: "Qatar",
@@ -1861,7 +1861,7 @@ class Flags {
 				callingCode: ["974"],
 				currency: ["QAR"],
 				lang: ["ara"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			re: {
 				name: "Réunion",
@@ -1871,7 +1871,7 @@ class Flags {
 				callingCode: ["262"],
 				currency: ["EUR"],
 				lang: ["fra"],
-				timezone: ["UTC+04:00"],
+				timezone: ["UTC+04:00"]
 			},
 			ro: {
 				name: "Romania",
@@ -1881,7 +1881,7 @@ class Flags {
 				callingCode: ["40"],
 				currency: ["RON"],
 				lang: ["ron"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			rs: {
 				name: "Serbia",
@@ -1891,7 +1891,7 @@ class Flags {
 				callingCode: ["381"],
 				currency: ["RSD"],
 				lang: ["srp"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			ru: {
 				name: "Russia",
@@ -1911,8 +1911,8 @@ class Flags {
 					"UTC+09:00",
 					"UTC+10:00",
 					"UTC+11:00",
-					"UTC+12:00",
-				],
+					"UTC+12:00"
+				]
 			},
 			rw: {
 				name: "Rwanda",
@@ -1922,7 +1922,7 @@ class Flags {
 				callingCode: ["250"],
 				currency: ["RWF"],
 				lang: ["eng", "fra", "kin"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			sa: {
 				name: "Saudi Arabia",
@@ -1932,7 +1932,7 @@ class Flags {
 				callingCode: ["966"],
 				currency: ["SAR"],
 				lang: ["ara"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			sb: {
 				name: "Solomon Islands",
@@ -1941,7 +1941,7 @@ class Flags {
 				alt: ["SB", "SLB"],
 				callingCode: ["677"],
 				currency: ["SBD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			sc: {
 				name: "Seychelles",
@@ -1950,7 +1950,7 @@ class Flags {
 				alt: ["SC", "Repiblik Sesel", "République des Seychelles", "SYC"],
 				callingCode: ["248"],
 				currency: ["SCR"],
-				lang: ["crs", "eng", "fra"],
+				lang: ["crs", "eng", "fra"]
 			},
 			sd: {
 				name: "Sudan",
@@ -1959,7 +1959,7 @@ class Flags {
 				alt: ["SD", "Jumhūrīyat as-Sūdān", "SDN"],
 				callingCode: ["249"],
 				currency: ["SDG"],
-				lang: ["ara", "eng"],
+				lang: ["ara", "eng"]
 			},
 			se: {
 				name: "Sweden",
@@ -1969,7 +1969,7 @@ class Flags {
 				callingCode: ["46"],
 				currency: ["SEK"],
 				lang: ["swe"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			sg: {
 				name: "Singapore",
@@ -1979,7 +1979,7 @@ class Flags {
 				callingCode: ["65"],
 				currency: ["SGD"],
 				lang: ["zho", "eng", "msa", "tam"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			sh: {
 				name: "Saint Helena, Ascension and Tristan da Cunha",
@@ -1988,7 +1988,7 @@ class Flags {
 				alt: ["Saint Helena", "St. Helena, Ascension and Tristan da Cunha", "SHN"],
 				callingCode: ["290", "247"],
 				currency: ["SHP", "GBP"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			si: {
 				name: "Slovenia",
@@ -1998,7 +1998,7 @@ class Flags {
 				callingCode: ["386"],
 				currency: ["EUR"],
 				lang: ["slv"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			sj: {
 				name: "Svalbard and Jan Mayen",
@@ -2007,7 +2007,7 @@ class Flags {
 				alt: ["SJ", "Svalbard and Jan Mayen Islands", "SJM"],
 				callingCode: ["4779"],
 				currency: ["NOK"],
-				lang: ["nor"],
+				lang: ["nor"]
 			},
 			sk: {
 				name: "Slovakia",
@@ -2017,7 +2017,7 @@ class Flags {
 				callingCode: ["421"],
 				currency: ["EUR"],
 				lang: ["slk"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			sl: {
 				name: "Sierra Leone",
@@ -2026,7 +2026,7 @@ class Flags {
 				alt: ["SL", "SLE"],
 				callingCode: ["232"],
 				currency: ["SLL"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			sm: {
 				name: "San Marino",
@@ -2035,7 +2035,7 @@ class Flags {
 				alt: ["SM", "Republic of San Marino", "Repubblica di San Marino", "SMR"],
 				callingCode: ["378"],
 				currency: ["EUR"],
-				lang: ["ita"],
+				lang: ["ita"]
 			},
 			sn: {
 				name: "Senegal",
@@ -2045,7 +2045,7 @@ class Flags {
 				callingCode: ["221"],
 				currency: ["XOF"],
 				lang: ["fra"],
-				timezone: ["UTC+00:00"],
+				timezone: ["UTC+00:00"]
 			},
 			so: {
 				name: "Somalia",
@@ -2055,7 +2055,7 @@ class Flags {
 				callingCode: ["252"],
 				currency: ["SOS"],
 				lang: ["ara", "som"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			sr: {
 				name: "Suriname",
@@ -2064,7 +2064,7 @@ class Flags {
 				alt: ["SR", "Sarnam", "Sranangron", "Republiek Suriname", "SUR"],
 				callingCode: ["597"],
 				currency: ["SRD"],
-				lang: ["nld"],
+				lang: ["nld"]
 			},
 			ss: {
 				name: "South Sudan",
@@ -2073,7 +2073,7 @@ class Flags {
 				alt: ["SS", "SSD"],
 				callingCode: ["211"],
 				currency: ["SSP"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			st: {
 				name: "São Tomé and Príncipe",
@@ -2082,7 +2082,7 @@ class Flags {
 				alt: ["ST", "Sao Tome and Principe", "República Democrática de São Tomé e Príncipe", "STP"],
 				callingCode: ["239"],
 				currency: ["STD"],
-				lang: ["por"],
+				lang: ["por"]
 			},
 			sv: {
 				name: "El Salvador",
@@ -2092,7 +2092,7 @@ class Flags {
 				callingCode: ["503"],
 				currency: ["SVC", "USD"],
 				lang: ["spa"],
-				timezone: ["UTC-06:00"],
+				timezone: ["UTC-06:00"]
 			},
 			sx: {
 				name: "Sint Maarten",
@@ -2101,7 +2101,7 @@ class Flags {
 				alt: ["SX", "Sint Maarten (Dutch part)", "SXM"],
 				callingCode: ["1721"],
 				currency: ["ANG"],
-				lang: ["eng", "fra", "nld"],
+				lang: ["eng", "fra", "nld"]
 			},
 			sy: {
 				name: "Syria",
@@ -2111,7 +2111,7 @@ class Flags {
 				callingCode: ["963"],
 				currency: ["SYP"],
 				lang: ["ara"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			sz: {
 				name: "Eswatini",
@@ -2120,7 +2120,7 @@ class Flags {
 				alt: ["SZ", "Swaziland", "weSwatini", "Swatini", "Ngwane", "Umbuso weSwatini", "SWZ"],
 				callingCode: ["268"],
 				currency: ["SZL"],
-				lang: ["eng", "ssw"],
+				lang: ["eng", "ssw"]
 			},
 			tc: {
 				name: "Turks and Caicos Islands",
@@ -2129,7 +2129,7 @@ class Flags {
 				alt: ["TC", "TCA"],
 				callingCode: ["1649"],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			td: {
 				name: "Chad",
@@ -2138,7 +2138,7 @@ class Flags {
 				alt: ["TD", "Tchad", "République du Tchad", "TCD"],
 				callingCode: ["235"],
 				currency: ["XAF"],
-				lang: ["ara", "fra"],
+				lang: ["ara", "fra"]
 			},
 			tf: {
 				name: "French Southern and Antarctic Lands",
@@ -2147,7 +2147,7 @@ class Flags {
 				alt: ["TF", "French Southern Territories", "ATF"],
 				callingCode: [],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			tg: {
 				name: "Togo",
@@ -2156,7 +2156,7 @@ class Flags {
 				alt: ["TG", "Togolese", "République Togolaise", "TGO"],
 				callingCode: ["228"],
 				currency: ["XOF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			th: {
 				name: "Thailand",
@@ -2166,7 +2166,7 @@ class Flags {
 				callingCode: ["66"],
 				currency: ["THB"],
 				lang: ["tha"],
-				timezone: ["UTC+07:00"],
+				timezone: ["UTC+07:00"]
 			},
 			tj: {
 				name: "Tajikistan",
@@ -2176,7 +2176,7 @@ class Flags {
 				callingCode: ["992"],
 				currency: ["TJS"],
 				lang: ["rus", "tgk"],
-				timezone: ["UTC+05:00"],
+				timezone: ["UTC+05:00"]
 			},
 			tk: {
 				name: "Tokelau",
@@ -2185,7 +2185,7 @@ class Flags {
 				alt: ["TK", "TKL"],
 				callingCode: ["690"],
 				currency: ["NZD"],
-				lang: ["eng", "smo", "tkl"],
+				lang: ["eng", "smo", "tkl"]
 			},
 			tl: {
 				name: "Timor-Leste",
@@ -2198,11 +2198,11 @@ class Flags {
 					"Repúblika Demokrátika Timór-Leste",
 					"Timór Lorosa'e",
 					"Timor Lorosae",
-					"TLS",
+					"TLS"
 				],
 				callingCode: ["670"],
 				currency: ["USD"],
-				lang: ["por", "tet"],
+				lang: ["por", "tet"]
 			},
 			tm: {
 				name: "Turkmenistan",
@@ -2212,7 +2212,7 @@ class Flags {
 				callingCode: ["993"],
 				currency: ["TMT"],
 				lang: ["rus", "tuk"],
-				timezone: ["UTC+05:00"],
+				timezone: ["UTC+05:00"]
 			},
 			tn: {
 				name: "Tunisia",
@@ -2222,7 +2222,7 @@ class Flags {
 				callingCode: ["216"],
 				currency: ["TND"],
 				lang: ["ara"],
-				timezone: ["UTC+01:00"],
+				timezone: ["UTC+01:00"]
 			},
 			to: {
 				name: "Tonga",
@@ -2231,7 +2231,7 @@ class Flags {
 				alt: ["TO", "TON"],
 				callingCode: ["676"],
 				currency: ["TOP"],
-				lang: ["eng", "ton"],
+				lang: ["eng", "ton"]
 			},
 			tr: {
 				name: "Turkey",
@@ -2241,7 +2241,7 @@ class Flags {
 				callingCode: ["90"],
 				currency: ["TRY"],
 				lang: ["tur"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			tt: {
 				name: "Trinidad and Tobago",
@@ -2251,7 +2251,7 @@ class Flags {
 				callingCode: ["1868"],
 				currency: ["TTD"],
 				lang: ["eng"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			tv: {
 				name: "Tuvalu",
@@ -2260,7 +2260,7 @@ class Flags {
 				alt: ["TV", "TUV"],
 				callingCode: ["688"],
 				currency: ["AUD"],
-				lang: ["eng", "tvl"],
+				lang: ["eng", "tvl"]
 			},
 			tw: {
 				name: "Taiwan",
@@ -2270,7 +2270,7 @@ class Flags {
 				callingCode: ["886"],
 				currency: ["TWD"],
 				lang: ["zho"],
-				timezone: ["UTC+08:00"],
+				timezone: ["UTC+08:00"]
 			},
 			tz: {
 				name: "Tanzania",
@@ -2279,7 +2279,7 @@ class Flags {
 				alt: ["TZ", "Tanzania, United Republic of", "Jamhuri ya Muungano wa Tanzania", "TZA"],
 				callingCode: ["255"],
 				currency: ["TZS"],
-				lang: ["eng", "swa"],
+				lang: ["eng", "swa"]
 			},
 			ua: {
 				name: "Ukraine",
@@ -2289,7 +2289,7 @@ class Flags {
 				callingCode: ["380"],
 				currency: ["UAH"],
 				lang: ["ukr"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			ug: {
 				name: "Uganda",
@@ -2298,7 +2298,7 @@ class Flags {
 				alt: ["UG", "Jamhuri ya Uganda", "UGA"],
 				callingCode: ["256"],
 				currency: ["UGX"],
-				lang: ["eng", "swa"],
+				lang: ["eng", "swa"]
 			},
 			um: {
 				name: "United States Minor Outlying Islands",
@@ -2307,7 +2307,7 @@ class Flags {
 				alt: ["UM", "UMI"],
 				callingCode: [],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			us: {
 				name: "United States",
@@ -2317,7 +2317,7 @@ class Flags {
 				callingCode: ["1"],
 				currency: ["USD"],
 				lang: ["eng"],
-				timezone: ["UTC-05:00", "UTC-06:00", "UTC-07:00", "UTC-08:00", "UTC-09:00", "UTC-10:00"],
+				timezone: ["UTC-05:00", "UTC-06:00", "UTC-07:00", "UTC-08:00", "UTC-09:00", "UTC-10:00"]
 			},
 			uy: {
 				name: "Uruguay",
@@ -2327,7 +2327,7 @@ class Flags {
 				callingCode: ["598"],
 				currency: ["UYU"],
 				lang: ["spa"],
-				timezone: ["UTC-03:00"],
+				timezone: ["UTC-03:00"]
 			},
 			uz: {
 				name: "Uzbekistan",
@@ -2337,7 +2337,7 @@ class Flags {
 				callingCode: ["998"],
 				currency: ["UZS"],
 				lang: ["rus", "uzb"],
-				timezone: ["UTC+05:00"],
+				timezone: ["UTC+05:00"]
 			},
 			va: {
 				name: "Vatican City",
@@ -2346,7 +2346,7 @@ class Flags {
 				alt: ["VA", "Holy See (Vatican City State)", "Stato della Città del Vaticano", "VAT"],
 				callingCode: ["3906698", "379"],
 				currency: ["EUR"],
-				lang: ["ita", "lat"],
+				lang: ["ita", "lat"]
 			},
 			vc: {
 				name: "Saint Vincent and the Grenadines",
@@ -2355,7 +2355,7 @@ class Flags {
 				alt: ["VC", "VCT"],
 				callingCode: ["1784"],
 				currency: ["XCD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			ve: {
 				name: "Venezuela",
@@ -2365,7 +2365,7 @@ class Flags {
 				callingCode: ["58"],
 				currency: ["VEF"],
 				lang: ["spa"],
-				timezone: ["UTC-04:00"],
+				timezone: ["UTC-04:00"]
 			},
 			vg: {
 				name: "British Virgin Islands",
@@ -2374,7 +2374,7 @@ class Flags {
 				alt: ["VG", "Virgin Islands, British", "VGB"],
 				callingCode: ["1284"],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			vi: {
 				name: "United States Virgin Islands",
@@ -2383,7 +2383,7 @@ class Flags {
 				alt: ["VI", "Virgin Islands, U.S.", "VIR"],
 				callingCode: ["1340"],
 				currency: ["USD"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			vn: {
 				name: "Vietnam",
@@ -2393,7 +2393,7 @@ class Flags {
 				callingCode: ["84"],
 				currency: ["VND"],
 				lang: ["vie"],
-				timezone: ["UTC+07:00"],
+				timezone: ["UTC+07:00"]
 			},
 			vu: {
 				name: "Vanuatu",
@@ -2402,7 +2402,7 @@ class Flags {
 				alt: ["VU", "Ripablik blong Vanuatu", "République de Vanuatu", "VUT"],
 				callingCode: ["678"],
 				currency: ["VUV"],
-				lang: ["bis", "eng", "fra"],
+				lang: ["bis", "eng", "fra"]
 			},
 			wf: {
 				name: "Wallis and Futuna",
@@ -2411,7 +2411,7 @@ class Flags {
 				alt: ["WF", "Territoire des îles Wallis et Futuna", "WLF"],
 				callingCode: ["681"],
 				currency: ["XPF"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			ws: {
 				name: "Samoa",
@@ -2420,7 +2420,7 @@ class Flags {
 				alt: ["WS", "Malo Saʻoloto Tutoʻatasi o Sāmoa", "WSM"],
 				callingCode: ["685"],
 				currency: ["WST"],
-				lang: ["eng", "smo"],
+				lang: ["eng", "smo"]
 			},
 			ye: {
 				name: "Yemen",
@@ -2430,7 +2430,7 @@ class Flags {
 				callingCode: ["967"],
 				currency: ["YER"],
 				lang: ["ara"],
-				timezone: ["UTC+03:00"],
+				timezone: ["UTC+03:00"]
 			},
 			yt: {
 				name: "Mayotte",
@@ -2439,7 +2439,7 @@ class Flags {
 				alt: ["YT", "Département de Mayotte", "MYT"],
 				callingCode: ["262"],
 				currency: ["EUR"],
-				lang: ["fra"],
+				lang: ["fra"]
 			},
 			za: {
 				name: "South Africa",
@@ -2453,13 +2453,13 @@ class Flags {
 					"Aforika Borwa",
 					"Afrika Dzonga",
 					"Afurika Tshipembe",
-					"Mzantsi Afrika",
+					"Mzantsi Afrika"
 				],
 				alt: ["ZA", "RSA", "Suid-Afrika", "ZAF"],
 				callingCode: ["27"],
 				currency: ["ZAR"],
 				lang: ["afr", "eng", "nbl", "nso", "sot", "ssw", "tsn", "tso", "ven", "xho", "zul"],
-				timezone: ["UTC+02:00"],
+				timezone: ["UTC+02:00"]
 			},
 			zm: {
 				name: "Zambia",
@@ -2468,7 +2468,7 @@ class Flags {
 				alt: ["ZM", "ZMB"],
 				callingCode: ["260"],
 				currency: ["ZMW"],
-				lang: ["eng"],
+				lang: ["eng"]
 			},
 			zw: {
 				name: "Zimbabwe",
@@ -2478,8 +2478,8 @@ class Flags {
 				callingCode: ["263"],
 				currency: ["ZWL"],
 				lang: ["bwg", "eng", "kck", "khi", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"],
-				timezone: ["UTC+02:00"],
-			},
+				timezone: ["UTC+02:00"]
+			}
 		});
 	}
 
@@ -2502,7 +2502,9 @@ class Flags {
 				if (e) {
 					return reject(e);
 				}
-				Jimp.read(buffer).then(resolve).catch(reject);
+				Jimp.read(buffer)
+					.then(resolve)
+					.catch(reject);
 			});
 		});
 	}
@@ -2518,7 +2520,7 @@ class Flags {
 				outputImage: "flags.output.png",
 				outputJs: "flags.output.js",
 				outputCss: "flags.output.css",
-				maxFlagsPerWidth: 16,
+				maxFlagsPerWidth: 16
 			},
 			config
 		);
@@ -2551,7 +2553,7 @@ class Flags {
 				config.width +
 				"px;height:" +
 				config.height +
-				"px;}",
+				"px;}"
 		];
 		for (const code in countries) {
 			try {
@@ -2624,7 +2626,7 @@ class Flags {
 					search: searchList,
 					call: callList,
 					currency: currencyList,
-					lang: langList,
+					lang: langList
 				};
 			}
 			catch (e) {
@@ -2675,7 +2677,7 @@ const ouptutPath = Path.join(process.env["BUILD_WORKSPACE_DIRECTORY"] || __dirna
 	const sizeList = [
 		{ width: 24, height: 16 },
 		{ width: 32, height: 24 },
-		{ width: 48, height: 32 },
+		{ width: 48, height: 32 }
 	];
 	for (const i in sizeList) {
 		console.log("Generating flags for " + sizeList[i].width + "x" + sizeList[i].height);
@@ -2685,7 +2687,7 @@ const ouptutPath = Path.join(process.env["BUILD_WORKSPACE_DIRECTORY"] || __dirna
 			importOutputPath: "~bzd/international",
 			outputJs: Path.join(ouptutPath, "countries.mjs"),
 			outputImage: Path.join(ouptutPath, "flags_" + sizeList[i].width + "x" + sizeList[i].height + ".png"),
-			outputCss: Path.join(ouptutPath, "flags_" + sizeList[i].width + "x" + sizeList[i].height + ".scss"),
+			outputCss: Path.join(ouptutPath, "flags_" + sizeList[i].width + "x" + sizeList[i].height + ".scss")
 		});
 	}
 })();

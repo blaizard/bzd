@@ -3,3 +3,4 @@ mypy
 yapf
 gitignore_parser
 toml
+typed-ast

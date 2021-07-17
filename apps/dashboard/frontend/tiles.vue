@@ -9,15 +9,15 @@
 
 	export default {
 		components: {
-			Tile,
+			Tile
 		},
 		props: {
 			edit: { type: Boolean, mandatory: false, default: false },
-			another: { type: String, mandatory: false, default: null },
+			another: { type: String, mandatory: false, default: null }
 		},
-		data: function () {
+		data: function() {
 			return {
-				tiles: {},
+				tiles: {}
 			};
 		},
 		mounted() {
@@ -26,8 +26,8 @@
 		methods: {
 			async getTiles() {
 				this.tiles = await this.$api.request("get", "/tiles");
-			},
-		},
+			}
+		}
 	};
 </script>
 

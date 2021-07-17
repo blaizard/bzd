@@ -367,8 +367,8 @@ public:
 	using FormatterType = decltype(toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>()));
 
 	template <class T>
-	using FormatterWithMetadataType = decltype(
-		toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+	using FormatterWithMetadataType = decltype(toStream(
+		bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
 	using FormatterTransportType = bzd::OChannel;
 
