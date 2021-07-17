@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y git \
 	curl \
 	gpgv \
 	gnupg \
+	python \
 	python3 \
 	python3-distutils \
 	openjdk-11-jdk \
