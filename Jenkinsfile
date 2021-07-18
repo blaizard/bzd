@@ -11,7 +11,7 @@ pipeline
 	{
 		dockerfile
 		{
-			filename "tools/ci/jenkins/debian.dockerfile"
+			filename "tools/ci/jenkins/Dockerfile"
 			// Only a single args argument can be used
 			args "-v /cache:/cache -e DOCKER_HOST=tcp://localhost:2375 --network host"
 		}
