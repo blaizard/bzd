@@ -233,7 +233,7 @@ class Element:
 		Human readable string representation of the element.
 		"""
 		content = "<Element {}/>".format(" ".join(
-			["{}:{}=\"{}\"".format(key, attr.index, attr.value) for key, attr in self.attrs.items()]))
+			["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value) for key, attr in self.attrs.items()]))
 
 		for kind, sequence in self.sequences.items():
 			content += "\n{}:\n{}".format(kind, repr(sequence))
@@ -262,7 +262,7 @@ class ElementBuilder(Element):
 		"""
 		Add an attribute to the element.
 		"""
-		self.attrs[key] = AttributeParser(index=0, value=value)
+		self.attrs[key] = AttributeParser(index=0, end=0, value=value)
 		return self
 
 	def addAttrs(self: U, data: typing.Dict[str, str]) -> U:

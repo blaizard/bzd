@@ -1,4 +1,4 @@
-import Commander from "commander";
+import { Command } from "commander/esm.mjs";
 import Path from "path";
 
 import API from "bzd/core/api/server.mjs";
@@ -17,7 +17,9 @@ import Permissions from "bzd/db/storage/permissions.mjs";
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
 
-Commander.version("1.0.0", "-v, --version")
+const program = new Command();
+program
+	.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option(
 		"-p, --port <number>",
@@ -36,9 +38,9 @@ Commander.version("1.0.0", "-v, --version")
 
 (async () => {
 	// Read arguments
-	const PORT = process.env.BZD_PORT || Commander.port;
-	const PATH_STATIC = Commander.static;
-	const PATH_DATA = process.env.BZD_PATH_DATA || Commander.data;
+	const PORT = process.env.BZD_PORT || program.opts().port;
+	const PATH_STATIC = program.opts().static;
+	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
@@ -47,7 +49,7 @@ Commander.version("1.0.0", "-v, --version")
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	// Test data
-	if (Commander.test) {
+	if (program.opts().test) {
 		await keyValueStore.set("volume", "disk", {
 			type: "fs",
 			"fs.root": "/"

@@ -72,10 +72,13 @@ class Files:
 					d for d in dirnames if not Path(dirpath).joinpath(d).is_symlink()
 					and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
 				]
+				filenames[:] = [
+					d for d in filenames if not Path(dirpath).joinpath(d).is_symlink()
+					and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
+				]
 			for filename in filenames:
 				path = Path(dirpath).joinpath(filename)
-				if self.gitignoreMatches is None or not self.gitignoreMatches(path.as_posix()):
-					relativePath = path.relative_to(self.workspace)
-					if self.include.match(relativePath):
-						if not self.isExcluded(relativePath):
-							yield relativePath if relative else path
+				relativePath = path.relative_to(self.workspace)
+				if self.include.match(relativePath):
+					if not self.isExcluded(relativePath):
+						yield relativePath if relative else path

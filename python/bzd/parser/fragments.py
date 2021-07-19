@@ -19,6 +19,10 @@ class Attribute:
 		return cast(int, self.data["i"])
 
 	@property
+	def end(self) -> int:
+		return cast(int, self.data["e"])
+
+	@property
 	def value(self) -> str:
 		return cast(str, self.data["v"])
 
@@ -38,8 +42,8 @@ class Attribute:
 
 class AttributeParser(Attribute):
 
-	def __init__(self, index: int, value: str) -> None:
-		super().__init__({"v": value, "i": index})
+	def __init__(self, index: int, end: int, value: str) -> None:
+		super().__init__({"v": value, "i": index, "e": end})
 
 
 Attributes = Dict[str, Attribute]
@@ -53,8 +57,9 @@ class Fragment:
 
 	default: Dict[str, str] = {}
 
-	def __init__(self, index: int, attrs: Mapping[str, str]) -> None:
+	def __init__(self, index: int, end: int, attrs: Mapping[str, str]) -> None:
 		self.index = index
+		self.end = end
 		self.attrs = self.default.copy()
 		self.attrs.update(attrs)
 		self.process()
@@ -65,7 +70,7 @@ class Fragment:
 		"""
 		for key, value in self.attrs.items():
 			assert key not in attrs, "Attribute '{}' already set".format(key)
-			attrs[key] = AttributeParser(index=self.index, value=value)
+			attrs[key] = AttributeParser(index=self.index, end=self.end, value=value)
 
 	def process(self) -> None:
 		"""
@@ -83,7 +88,7 @@ class Fragment:
 		return element
 
 	def __repr__(self) -> str:
-		return "<{}:{} {}/>".format(self.__class__.__name__, self.index,
+		return "<{}:{}:{} {}/>".format(self.__class__.__name__, self.index, self.end,
 			" ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
 
 
@@ -106,9 +111,10 @@ class FragmentComment(Fragment):
 			# Append the comments
 			if key in attrs:
 				attrs[key] = AttributeParser(index=attrs[key].index,
+					end=attrs[key].end,
 					value=attrs[key].value + "\n\n{}".format(updatedValue))
 			else:
-				attrs[key] = AttributeParser(index=self.index, value=updatedValue)
+				attrs[key] = AttributeParser(index=self.index, end=self.end, value=updatedValue)
 
 
 class FragmentNewElement(Fragment):

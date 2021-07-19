@@ -88,7 +88,7 @@ class Parser:
 					m = re.match(item.regexpr, content[index:])
 					if m:
 						if item.fragment:
-							fragment = item.fragment(index, attrs=m.groupdict())
+							fragment = item.fragment(index, index + m.end(), attrs=m.groupdict())
 							element.add(fragment)
 							grammar = self.getGrammar(checkpoints=checkpoints, item=item)
 							element = fragment.next(element, grammar)
@@ -105,6 +105,6 @@ class Parser:
 			for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() + self.defaultGrammarPost):
 				print(item.regexpr)
 
-			Error.handle(context=self.context, index=index, message=str(e))
+			Error.handle(context=self.context, index=index, end=index, message=str(e))
 
 		return root
