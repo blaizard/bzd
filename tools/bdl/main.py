@@ -1,6 +1,8 @@
 import argparse
+import sys
 from pathlib import Path
 
+import bzd.parser.error
 from tools.bdl.object import Object, ObjectContext
 from tools.bdl.lib import formatters, main, preprocess, generate
 
@@ -9,6 +11,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")
 	parser.add_argument("-o", "--output", default=None, type=Path, help="Output path of generated file.")
 	parser.add_argument("--format", default="bdl", type=str, choices=formatters.keys(), help="Formatting type.")
+	parser.add_argument("--no-color", action="store_true", help="Don't use colors.")
 	parser.add_argument("--preprocess-format",
 		default=None,
 		type=str,
@@ -23,6 +26,9 @@ if __name__ == "__main__":
 	config = parser.parse_args()
 
 	objectContext = ObjectContext(preprocessFormat=config.preprocess_format, resolve=True)
+
+	# Set colors if running on a terminal
+	bzd.parser.error.useColors = not config.no_color
 
 	for inputPath in config.inputs:
 

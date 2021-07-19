@@ -1,4 +1,4 @@
-import Commander from "commander";
+import { Command } from "commander/esm.mjs";
 import Path from "path";
 
 import API from "bzd/core/api/server.mjs";
@@ -13,7 +13,9 @@ import Plugins from "../plugins/plugins.backend.index.mjs";
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
 
-Commander.version("1.0.0", "-v, --version")
+const program = new Command();
+program
+	.version("1.0.0", "-v, --version")
 	.usage("[OPTIONS]...")
 	.option(
 		"-p, --port <number>",
@@ -39,9 +41,9 @@ async function getData(type, uid, cache) {
 
 (async () => {
 	// Read arguments
-	const PORT = process.env.BZD_PORT || Commander.port;
-	const PATH_STATIC = Commander.static;
-	const PATH_DATA = process.env.BZD_PATH_DATA || Commander.data;
+	const PORT = process.env.BZD_PORT || program.opts().port;
+	const PATH_STATIC = program.opts().static;
+	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);

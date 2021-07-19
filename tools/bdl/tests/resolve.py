@@ -17,15 +17,16 @@ class TestRun(unittest.TestCase):
 			""",
 				objectContext=ObjectContext(resolve=True))
 
-		# This should fail
+		#with self.assertRaisesRegex(Exception, r"lower than"):
 		Object.fromContent(content="""
-		using NewType = Integer [min(1) max(4)];
-		using InterType = NewType [min(2)];
-		using InterfaceType = NewType;
-		struct temp {
-			var = InterfaceType(1);
-		}
-		""",
+			using NewType = Integer [min(1) max(4)];
+			using InterType = NewType [min(2)];
+			using InterfaceType = InterType;
+			struct temp {
+				// Hello
+				var = InterfaceType(1);
+			}
+			""",
 			objectContext=ObjectContext(resolve=True))
 
 

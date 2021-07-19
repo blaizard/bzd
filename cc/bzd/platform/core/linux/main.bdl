@@ -1,7 +1,7 @@
 use "cc/bzd/platform/core/linux/linux.bdl"
 
 composition {
-	defaultStackSize = bzd.platform.StackSize(10000);
+	defaultStackSize = bzd.platform.StackSize("10000");
 	core1 = bzd.platform.linux.Core(10000);
 	
 }
