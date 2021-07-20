@@ -14,6 +14,7 @@ py_library(
 py_library(
     name = "visitor",
     srcs = glob([
+        "contracts/**/*.py",
         "entities/**/*.py",
         "visitors/**/*.py",
     ]) + [
@@ -24,6 +25,7 @@ py_library(
     visibility = [":__subpackages__"],
     deps = [
         "//python/bzd/parser",
+        "//python/bzd/utils:classproperty",
         "//python/bzd/utils:memoized_property",
         "//python/bzd/validation",
     ],

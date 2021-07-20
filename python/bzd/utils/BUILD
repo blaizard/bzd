@@ -23,3 +23,9 @@ py_library(
     srcs = ["memoized_property.py"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "classproperty",
+    srcs = ["classproperty.py"],
+    visibility = ["//visibility:public"],
+)

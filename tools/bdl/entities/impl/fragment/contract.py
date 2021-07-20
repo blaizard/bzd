@@ -1,62 +1,13 @@
 import typing
 
-from bzd.parser.element import Element, ElementBuilder
-from bzd.parser.visitor import Visitor
+from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
+from bzd.validation.validation import Validation
 from bzd.parser.error import Error
 
-from bzd.validation.validation import Validation
+from tools.bdl.contracts.contract import Contract
+from tools.bdl.contracts.all import AllContracts
 
 _CONTRACT_VALUE_TYPES = {"min", "max", "integer", "float", "string", "boolean"}
-
-
-class Contract:
-
-	def __init__(self, element: Element) -> None:
-
-		Error.assertHasAttr(element=element, attr="type")
-		self.element = element
-
-	@property
-	def type(self) -> str:
-		return self.element.getAttr("type").value
-
-	@property
-	def values(self) -> typing.List[str]:
-		values = self.element.getNestedSequence("values")
-		if values:
-			return [e.getAttr("value").value for e in values]
-		return []
-
-	@property
-	def value(self) -> typing.Optional[str]:
-		values = self.element.getNestedSequence("values")
-		if values:
-			return values[0].getAttr("value").value
-		return None
-
-	@property
-	def valueNumber(self) -> float:
-		try:
-			return float(self.valueString)
-		except:
-			Error.handleFromElement(element=self.element, message="Expected a valid number.")
-		return 0.0  # To make mypy happy
-
-	@property
-	def valueString(self) -> str:
-		value = self.value
-		if value is None:
-			Error.handleFromElement(element=self.element, message="A value must be present.")
-		assert value is not None
-		return value
-
-	@property
-	def isValue(self) -> bool:
-		return self.element.isNestedSequence("values")
-
-	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
 
 
 class Contracts:
@@ -95,6 +46,21 @@ class Contracts:
 			return True
 		return (len(sequence) == 0)
 
+	def validate(self) -> None:
+		"""
+		Validate the contract.
+		"""
+
+		for contract in self:
+			contractTraits = AllContracts.all.get(contract.type)
+			if contractTraits is None:
+				Error.handleFromElement(element=self.element,
+					message="Contract of type '{}' is not supported.".format(contract.type))
+			try:
+				contractTraits.validate(contract)
+			except Exception as e:
+				Error.handleFromElement(element=self.element, message=str(e))
+
 	def mergeBase(self, contracts: "Contracts") -> None:
 		"""
 		Merge a base contract into this one. The order is important, as type are inherited from the deepest base.
@@ -102,7 +68,31 @@ class Contracts:
 
 		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
 		for contract in reversed([*contracts]):
-			elementBuilder.pushFrontElementToNestedSequence(self.sequenceKind, contract.element)
+			# Check if the type already exists, if so the 2 types.
+			existing = self.get(contract.type)
+			if existing is not None:
+				contractTraits = AllContracts.all.get(contract.type)
+				assert contractTraits, "All contracts should have been validated already."
+				try:
+					contract = contractTraits.resolveConflict(base=contract, derived=existing)
+				except Exception as e:
+					Error.handleFromElement(element=self.element, message=str(e))
+				# Remove the existing contract if resolved into a new contract
+				if contract is not None:
+					self.removeContracts(contract.type)
+
+			if contract is not None:
+				elementBuilder.pushFrontElementToNestedSequence(self.sequenceKind, contract.element)
+
+	def removeContracts(self, kind: str) -> None:
+		"""
+		Remove contracts of a specified type.
+		"""
+		sequence = self.element.getNestedSequence(self.sequenceKind)
+		if sequence:
+			for element in sequence:
+				if Contract(element).type == kind:
+					SequenceBuilder.cast(sequence, SequenceBuilder).removeElement(element)
 
 	def __iter__(self) -> typing.Iterator[Contract]:
 		sequence = self.element.getNestedSequence(self.sequenceKind)
@@ -111,7 +101,4 @@ class Contracts:
 				yield Contract(element)
 
 	def __repr__(self) -> str:
-		content = []
-		for contract in self:
-			content.append("{}({})".format(contract.type, ",".join(contract.values)))
-		return " ".join(content)
+		return " ".join([str(contract) for contract in self])

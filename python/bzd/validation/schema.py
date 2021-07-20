@@ -1,7 +1,6 @@
 import typing
 from functools import partial
 
-Schema = typing.Dict[str, str]
 Result = typing.Optional[str]
 Args = typing.List[str]
 ValidationCallable = typing.Callable[[typing.Any, "Context"], Result]

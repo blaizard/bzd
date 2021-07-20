@@ -68,13 +68,13 @@ class Error:
 		# Position the cursor.
 		# A padding must be created to correctly print special spaces such as tabs for example.
 		paddingLine = re.sub(r"[^\s]", " ", contentByLine[line])
-		contentByLine.insert(line + 1, "{padding}{colorBegin}^".format(padding=paddingLine[0:column],
-			colorBegin=colorBegin))
+		contentByLine.insert(line + 1, "{padding}^".format(padding=paddingLine[0:column]))
 		contentByLine.insert(
-			line + 2, "{path}:{line}:{column}: error: {message}{colorEnd}".format(
+			line + 2, "{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
 			path="<string>" if context.path is None else context.path,
 			line=line + 1,
 			column=column + 1,
+			colorBegin=colorBegin,
 			message=message,
 			colorEnd=colorEnd))
 
