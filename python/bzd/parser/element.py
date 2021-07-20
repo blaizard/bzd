@@ -95,6 +95,13 @@ class SequenceBuilder(Sequence):
 		self.list.insert(0, element)
 		return self
 
+	def removeElement(self: T, element: "Element") -> T:
+		"""
+		Remove an element from the sequence.
+		"""
+		self.list.remove(element)
+		return self
+
 
 class SequenceParser(Sequence):
 	"""
@@ -296,6 +303,14 @@ class ElementBuilder(Element):
 		if kind not in self.sequences:
 			self.sequences[kind] = Sequence()
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
+		return self
+
+	def removeElementFromNestedSequence(self: U, kind: str, element: Element) -> U:
+		"""
+		Remove an element from a nested sequence.
+		"""
+		if kind in self.sequences:
+			SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).removeElement(element)
 		return self
 
 
