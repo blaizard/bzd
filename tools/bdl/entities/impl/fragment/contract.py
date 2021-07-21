@@ -7,8 +7,6 @@ from bzd.parser.error import Error
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.contracts.all import AllContracts
 
-_CONTRACT_VALUE_TYPES = {"min", "max", "integer", "float", "string", "boolean"}
-
 
 class Contracts:
 	"""
@@ -29,14 +27,11 @@ class Contracts:
 		return None
 
 	@property
-	def validationValue(self) -> typing.Optional[str]:
+	def validationForValue(self) -> typing.Optional[str]:
 		"""
-		Generate a validation object for a value out of the current contracts
+		Generate a validation string for a value out of the current contracts
 		"""
-		content = []
-		for contract in self:
-			if contract.type in _CONTRACT_VALUE_TYPES:
-				content.append("{}({})".format(contract.type, ",".join(contract.values)))
+		content = [str(contract) for contract in self if contract.type in AllContracts.forValues]
 		return " ".join(content) if content else None
 
 	@property
@@ -48,7 +43,9 @@ class Contracts:
 
 	def validate(self) -> None:
 		"""
-		Validate the contract.
+		Validate the contracts. it checks the follow:
+			- Valid contract types.
+			- Arguments are correct.
 		"""
 
 		for contract in self:
@@ -68,7 +65,7 @@ class Contracts:
 
 		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
 		for contract in reversed([*contracts]):
-			# Check if the type already exists, if so the 2 types.
+			# Check if the type already exists, if so attempt to merge the 2 types.
 			existing = self.get(contract.type)
 			if existing is not None:
 				contractTraits = AllContracts.all.get(contract.type)

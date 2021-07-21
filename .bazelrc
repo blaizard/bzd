@@ -22,7 +22,9 @@ test --define=panic=throw
 # Coverage specific options
 coverage --combined_report=lcov
 coverage --nobuild_tests_only
+coverage --nocache_test_results
 coverage --instrument_test_targets
+coverage --collect_code_coverage
 
 # Docker sandbox
 build:cc-docker-sandbox --experimental_docker_verbose

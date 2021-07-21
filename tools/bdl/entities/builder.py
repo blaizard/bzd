@@ -1,6 +1,7 @@
 import typing
 
 from bzd.parser.element import ElementBuilder as Element, SequenceBuilder as Sequence
+from bzd.validation.validation import Validation
 
 
 class ElementBuilder(Element):
@@ -9,16 +10,33 @@ class ElementBuilder(Element):
 		super().__init__()
 		self.addAttr("category", category)
 
-	def addContract(self, name: str, value: typing.Optional[str] = None) -> "ElementBuilder":
+	def addContract(self, contract: str) -> "ElementBuilder":
 		"""
 		Add a contract to the element.
 		"""
-		element = Element()
-		if value is None:
-			element.addAttr("type", name)
-		else:
-			element.addAttrs({"type": name, "value": value})
-		self.pushBackElementToNestedSequence(kind="contract", element=element)
+		parsed = Validation.parse(contract)
+		for name, args in parsed.items():
+			element = Element().addAttr("type", name)
+			for arg in args:
+				value = Element().addAttr("value", arg)
+				element.pushBackElementToNestedSequence(kind="values", element=value)
+			self.pushBackElementToNestedSequence(kind="contract", element=element)
+		return self
+
+	def addConfig(
+			self,
+			kind: str,
+			name: typing.Optional[str] = None,
+			contract: typing.Optional[str] = None) -> "ElementBuilder":
+		"""
+		Create a configuration entry
+		"""
+		element = ElementBuilder(category="expression").addAttr("type", kind)
+		if name is not None:
+			element.addAttr("name", name)
+		if contract is not None:
+			element.addContract(contract)
+		self.pushBackElementToNestedSequence(kind="config", element=element)
 		return self
 
 

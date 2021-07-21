@@ -54,8 +54,8 @@ interface MyFy
 			'@': {
 			'comment': {
 			'v': 'Contracts',
-			'i': 24,
-			'e': 36
+			'i': -1,
+			'e': 0
 			},
 			'category': {
 			'v': 'expression',
@@ -188,8 +188,8 @@ interface MyFy
 			'@': {
 			'comment': {
 			'v': 'Send a message',
-			'i': 149,
-			'e': 166
+			'i': -1,
+			'e': 0
 			},
 			'category': {
 			'v': 'method',

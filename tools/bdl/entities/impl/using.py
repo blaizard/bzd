@@ -1,6 +1,6 @@
 import typing
+from functools import cached_property
 
-from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
@@ -23,9 +23,9 @@ class Using(Entity):
 
 	@property
 	def contracts(self) -> Contracts:
-		return self.type.contracts  # type: ignore
+		return self.type.contracts
 
-	@memoized_property
+	@cached_property
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 

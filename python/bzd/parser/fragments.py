@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 AttributeSerialize = MutableMapping[str, Union[int, str]]
 AttributesSerialize = Dict[str, AttributeSerialize]
 
+IGNORE_INDEX_VALUE = -1
+
 
 class Attribute:
 
@@ -110,11 +112,11 @@ class FragmentComment(Fragment):
 
 			# Append the comments
 			if key in attrs:
-				attrs[key] = AttributeParser(index=attrs[key].index,
-					end=attrs[key].end,
+				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE,
+					end=0,
 					value=attrs[key].value + "\n\n{}".format(updatedValue))
 			else:
-				attrs[key] = AttributeParser(index=self.index, end=self.end, value=updatedValue)
+				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE, end=0, value=updatedValue)
 
 
 class FragmentNewElement(Fragment):
