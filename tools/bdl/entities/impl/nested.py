@@ -1,6 +1,6 @@
 import typing
+from functools import cached_property
 
-from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor
@@ -71,7 +71,7 @@ class Nested(Entity):
 	def hasInheritance(self) -> bool:
 		return self.element.isNestedSequence("inheritance")
 
-	@memoized_property
+	@cached_property
 	def inheritanceList(self) -> typing.List[Type]:
 		sequence = self.element.getNestedSequence("inheritance")
 		if sequence is None:

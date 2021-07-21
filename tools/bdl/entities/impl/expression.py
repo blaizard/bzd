@@ -1,8 +1,8 @@
 import typing
+from functools import cached_property
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
-from bzd.utils.memoized_property import memoized_property
 from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
@@ -49,7 +49,7 @@ class Expression(Entity):
 	def const(self) -> bool:
 		return self.element.isAttr("const")
 
-	@memoized_property
+	@cached_property
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", template="template")
 
@@ -67,16 +67,14 @@ class Expression(Entity):
 
 		print("expression", self.name, self.contracts)
 
-		# Validate arguments
-		if self.element.isNestedSequence("argument"):
-			arguments = {(arg.getAttr("name").value if arg.isAttr("name") else str(i)): arg.getAttr("value").value
-				for i, arg in enumerate(self.element.getNestedSequence("argument"))}  # type: ignore
+		# Generate the argument list
+		arguments = {(str(i) if arg.key is None else arg.key): arg.value for i, arg in enumerate(self.args)}
 
-			# Read the validation for the value
-			validation = self._makeValueValidation(entity=entity)
-			if validation is not None:
-				result = validation.validate(arguments, output="return")
-				Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
+		# Read the validation for the value
+		validation = self._makeValueValidation(entity=entity)
+		if validation is not None:
+			result = validation.validate(arguments, output="return")
+			Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
 
 	def _makeValueValidation(self, entity: Entity) -> typing.Optional[Validation]:
 		"""
@@ -84,7 +82,7 @@ class Expression(Entity):
 		and the contract validation.
 		"""
 
-		validationValue = self.contracts.validationValue
+		validationValue = self.contracts.validationForValue
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.
 		if validationValue:
@@ -99,7 +97,7 @@ class Expression(Entity):
 
 		return Validation({})
 
-	@memoized_property
+	@cached_property
 	def args(self) -> typing.List[Argument]:
 		arguments = self.element.getNestedSequence("argument")
 		return [] if arguments is None else [Argument(arg) for arg in arguments]

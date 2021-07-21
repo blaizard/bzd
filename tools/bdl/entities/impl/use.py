@@ -1,7 +1,7 @@
 import typing
 from pathlib import Path
+from functools import cached_property
 
-from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
@@ -19,7 +19,7 @@ class Use(Entity):
 	def category(self) -> str:
 		return "use"
 
-	@memoized_property
+	@cached_property
 	def path(self) -> Path:
 		return Path(self.element.getAttr("value").value)
 

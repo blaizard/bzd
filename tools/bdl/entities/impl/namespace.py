@@ -1,6 +1,6 @@
 import typing
+from functools import cached_property
 
-from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
@@ -31,7 +31,7 @@ class Namespace(Entity):
 	def category(self) -> str:
 		return "namespace"
 
-	@memoized_property
+	@cached_property
 	def nameList(self) -> typing.List[str]:
 		sequence = self.element.getNestedSequence("name")
 		assert sequence is not None

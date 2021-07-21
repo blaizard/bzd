@@ -25,8 +25,7 @@ py_library(
     visibility = [":__subpackages__"],
     deps = [
         "//python/bzd/parser",
-        "//python/bzd/utils:classproperty",
-        "//python/bzd/utils:memoized_property",
+        "//python/bzd/utils:decorators",
         "//python/bzd/validation",
     ],
 )

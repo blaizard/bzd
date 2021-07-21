@@ -1,6 +1,6 @@
 import typing
+from functools import cached_property
 
-from bzd.utils.memoized_property import memoized_property
 from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
@@ -18,7 +18,7 @@ class Type:
 		self.element = element
 		self.kindAttr = kind
 		self.templateAttr = template
-		self.underlying = typing.Optional["EntityType"]
+		self.underlying: typing.Optional["EntityType"] = None
 
 	def resolve(self,
 		symbols: typing.Any,
@@ -35,18 +35,19 @@ class Type:
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
 		# Loop through the nested templates.
-		templates = {}
+		templates = []
 		for i, subType in enumerate(self.templates):
 			# Recursively resolve nested types.
 			subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 			# Only keep the kind, as nested template arguments will be deducted by recursion.
-			templates[str(i)] = subType.kind
+			templates.append(subType.kind)
 
 		# Get and save the underlying type
+		# TODO: save is as part of the element itself so it is persisted.
 		self.underlying = symbols.getEntity(fqn=fqn)
 
 		# Validate template arguments
-		validation = self.underlying.validationTemplate  # type: ignore
+		validation = self.underlying.validationTemplate
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),
@@ -66,7 +67,7 @@ class Type:
 		return Contracts(element=self.element)
 		#return self.resolved_contracts
 
-	@memoized_property
+	@cached_property
 	def resolved_contracts(self) -> Contracts:
 		assert self.underlying is not None, "The 'resolve' method must be callied prior to calling 'resolved_contracts'."
 		# TODO merge contracts
@@ -76,7 +77,7 @@ class Type:
 	def isTemplate(self) -> bool:
 		return len(self.templates) > 0
 
-	@memoized_property
+	@cached_property
 	def templates(self) -> typing.List["Type"]:
 		if self.templateAttr:
 			nested = self.element.getNestedSequence(self.templateAttr)
@@ -89,7 +90,7 @@ class Type:
 	def kind(self) -> str:
 		return self.element.getAttr(self.kindAttr).value
 
-	@memoized_property
+	@cached_property
 	def name(self) -> str:
 		return Visitor(entity=self).result
 
@@ -101,7 +102,7 @@ class Type:
 		return "." in self.kind
 
 	def __repr__(self) -> str:
-		return self.name  # type: ignore
+		return self.name
 
 
 class Visitor(VisitorBase[str, str]):

@@ -72,14 +72,15 @@ class Result:
 
 class Validation:
 
+	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
+		"boolean": Boolean,
+		"integer": Integer,
+		"float": Float,
+		"string": String,
+		"mandatory": Mandatory
+	}
+
 	def __init__(self, schema: Schema) -> None:
-		self.availableConstraints: typing.Dict[str, typing.Type[Constraint]] = {
-			"boolean": Boolean,
-			"integer": Integer,
-			"float": Float,
-			"string": String,
-			"mandatory": Mandatory
-		}
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
 		self._prepocessSchema(self._inputToInternal(schema))
@@ -98,6 +99,25 @@ class Validation:
 			return {str(i): value for i, value in enumerate(schema)}
 		return schema
 
+	@staticmethod
+	def parse(constraints: str) -> typing.Dict[str, typing.List[str]]:
+		"""
+		Parse string formatted contract and return the parsed data structure.
+		Note, it is ok to use a dictionary as dicts preserve insertion order in Python 3.7+
+		"""
+		assert isinstance(constraints, str), "Constraint must be a string."
+		constraintList = [constraint for constraint in constraints.split() if constraint]
+		result = {}
+		for constraint in constraintList:
+			m = PATTERN_CONSTRAINT_.match(constraint)
+			assert m, "Constraint format error: '{}'.".format(constraint)
+			name = m.group(1)
+			args = [arg for arg in (m.group(2) if m.group(2) else "").split(",") if arg]
+			assert name not in result, "Constraint '{}' has been set twice.".format(name)
+			result[name] = args
+
+		return result
+
 	def _prepocessSchema(self, schema: SchemaDict) -> None:
 		"""
 		Preprocess the schema.
@@ -109,16 +129,10 @@ class Validation:
 				self.processed[key] = ProcessedSchema()
 
 			# Parse each constraints strings
-			assert isinstance(constraints, str), "Constraint must be a string."
-			constraintList = [constraint for constraint in constraints.split() if constraint]
-			for constraint in constraintList:
-				m = PATTERN_CONSTRAINT_.match(constraint)
-				assert m, "Constraint format error: '{}'.".format(constraint)
-				name = m.group(1)
-				args = [arg for arg in (m.group(2) if m.group(2) else "").split(",") if arg]
-
-				# Install the constraint
-				self.processed[key].install(constraints=self.availableConstraints, name=name, args=args)
+			parsed = Validation.parse(constraints)
+			# Install the constraint
+			for name, args in parsed.items():
+				self.processed[key].install(constraints=self.AVAILABLE_CONSTRAINTS, name=name, args=args)
 
 	def __len__(self) -> int:
 		"""

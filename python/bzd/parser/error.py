@@ -5,6 +5,7 @@ import re
 
 from pathlib import Path
 from bzd.parser.element import Element
+from bzd.parser.fragments import IGNORE_INDEX_VALUE
 from bzd.parser.context import Context
 
 useColors: bool = False
@@ -95,6 +96,9 @@ class Error:
 			startIndex = sys.maxsize
 			endIndex = 0
 			for key, attrObj in element.getAttrs().items():
+				# Ignore some attributes
+				if attrObj.index == IGNORE_INDEX_VALUE:
+					continue
 				startIndex = min(startIndex, attrObj.index)
 				endIndex = max(endIndex, attrObj.end)
 			if startIndex < sys.maxsize:

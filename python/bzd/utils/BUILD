@@ -19,13 +19,7 @@ py_library(
 )
 
 py_library(
-    name = "memoized_property",
-    srcs = ["memoized_property.py"],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
-    name = "classproperty",
-    srcs = ["classproperty.py"],
+    name = "decorators",
+    srcs = ["decorators.py"],
     visibility = ["//visibility:public"],
 )

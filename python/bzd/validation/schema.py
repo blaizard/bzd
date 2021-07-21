@@ -1,6 +1,8 @@
 import typing
 from functools import partial
 
+from bzd.utils.decorators import cached_classproperty
+
 Result = typing.Optional[str]
 Args = typing.List[str]
 ValidationCallable = typing.Callable[[typing.Any, "Context"], Result]
@@ -44,6 +46,10 @@ class Constraint:
 		Install a contraint.
 		"""
 		assert False, "Constraint missing 'install' overload."
+
+	@cached_classproperty
+	def isTypeConstraint(cls) -> bool:
+		return hasattr(cls, "check")
 
 	@staticmethod
 	def _toInteger(value: str) -> int:
@@ -109,7 +115,7 @@ class ProcessedSchema:
 		"""
 
 		assert self.type is None, "A type for this constraint is already specified."
-		assert hasattr(constraint, "check"), "A type constraint must have a 'toType' method."
+		assert constraint.isTypeConstraint, "This is not a valid type constraint."
 		self.type = constraint
 
 	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str, args: Args) -> None:

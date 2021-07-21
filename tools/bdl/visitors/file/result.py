@@ -125,7 +125,7 @@ class ResultType:
 
 	@property
 	def useList(self) -> typing.List[Use]:
-		return sorted(self.useDict.values(), key=lambda x: x.path)  # type:  ignore
+		return sorted(self.useDict.values(), key=lambda x: x.path)
 
 	def __repr__(self) -> str:
 		"""

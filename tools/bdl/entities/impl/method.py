@@ -1,8 +1,8 @@
 import typing
+from functools import cached_property
 
 from bzd.parser.element import Element
 from bzd.parser.error import Error
-from bzd.utils.memoized_property import memoized_property
 from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
@@ -24,11 +24,11 @@ class Method(Entity):
 	def isType(self) -> bool:
 		return self.element.isAttr("type")
 
-	@memoized_property
+	@cached_property
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element, kind="type", template="template") if self.isType else None
 
-	@memoized_property
+	@cached_property
 	def validation(self) -> typing.Optional[Validation]:
 		"""
 		Generate a validation based on the argument list.
@@ -59,7 +59,7 @@ class Method(Entity):
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
-	@memoized_property
+	@cached_property
 	def args(self) -> typing.List[Expression]:
 		if self.element.isNestedSequence("argument"):
 			sequence = self.element.getNestedSequence("argument")
