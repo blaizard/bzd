@@ -42,9 +42,11 @@ class Visitor(VisitorBase[T, T]):
 
 	nestedKind = None
 
-	def __init__(self) -> None:
+	def __init__(self,
+		elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
 		self.level = 0
 		self.parents: typing.List[Parent] = []
+		self.elementToEntityExtenstion = elementToEntityExtenstion
 
 	@property
 	def parent(self) -> typing.Optional[Parent]:
@@ -76,7 +78,7 @@ class Visitor(VisitorBase[T, T]):
 		Main visitor, called each time a new element is discovered.
 		"""
 
-		entity = elementToEntity(element=element)
+		entity = elementToEntity(element=element, extension=self.elementToEntityExtenstion)
 
 		# Handle nested object
 		if isinstance(entity, Nested):
@@ -90,12 +92,14 @@ class Visitor(VisitorBase[T, T]):
 				if sequence is not None:
 					self.parents.append(Parent(entity=entity, category=category))
 					nestedResult = self._visit(sequence)
-					entity.setNested(category=category, nested=typing.cast(typing.List[typing.Any], nestedResult))
+					self.entityToNested(category=category, entity=entity, nested=nestedResult)
 					self.parents.pop()
 
 			self.level -= 1
 
 			self.visitNestedEntities(entity=entity, result=result)
+
+			print(entity)
 
 		# Handle expression
 		elif isinstance(entity, Expression):
@@ -139,6 +143,12 @@ class Visitor(VisitorBase[T, T]):
 			Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
 
 		return result
+
+	def entityToNested(self, category: str, entity: Nested, nested: T) -> None:
+		"""
+		Associate a nested result with its entity.
+		"""
+		pass
 
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""

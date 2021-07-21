@@ -25,27 +25,31 @@ Expression = _Expression
 EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Namespace, Use, Builtin]
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum]
 
+CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
+	"nested": Nested,
+	"builtin": Builtin,
+	"expression": Expression,
+	"method": Method,
+	"using": Using,
+	"enum": Enum,
+	"namespace": Namespace,
+	"use": Use
+}
 
-def elementToEntity(element: Element) -> EntityType:
+
+def elementToEntity(element: Element,
+	extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> EntityType:
 	"""
 	Instantiate an entity from an element.
 	"""
 
-	categoryToEntity: typing.Dict[str, typing.Type[EntityType]] = {
-		"nested": Nested,
-		"builtin": Builtin,
-		"expression": Expression,
-		"method": Method,
-		"using": Using,
-		"enum": Enum,
-		"namespace": Namespace,
-		"use": Use
-	}
-
 	Error.assertHasAttr(element=element, attr="category")
 	category = element.getAttr("category").value
 
-	if category not in categoryToEntity:
+	if extension and category in extension:
+		return extension[category](element=element)
+
+	if category not in CATEGORY_TO_ENTITY:
 		Error.handleFromElement(element=element, message="Unexpected element category: {}".format(category))
 
-	return categoryToEntity[category](element=element)
+	return CATEGORY_TO_ENTITY[category](element=element)

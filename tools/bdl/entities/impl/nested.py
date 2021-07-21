@@ -27,33 +27,26 @@ class Nested(Entity):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element)
-
 		Error.assertHasAttr(element=element, attr="type")
 
-		self.nestedCategories: typing.Dict[str, typing.Any] = {}
-
-	def setNested(self, category: str, nested: typing.Any) -> None:
-		self.nestedCategories[category] = nested
+	def _getNestedByCategory(self, category: str) -> typing.Any:
+		sequence = self.element.getNestedSequence(category)
+		if sequence:
+			from tools.bdl.entities.all import elementToEntity
+			return [elementToEntity(element) for element in sequence]
+		return []
 
 	@property
 	def nested(self) -> typing.Any:
-		return self.nestedCategories.get("nested", [])
-
-	@property
-	def isConfig(self) -> bool:
-		return "config" in self.nestedCategories
+		return self._getNestedByCategory("nested")
 
 	@property
 	def config(self) -> typing.Any:
-		return self.nestedCategories["config"]
-
-	@property
-	def isComposition(self) -> bool:
-		return "composition" in self.nestedCategories
+		return self._getNestedByCategory("config")
 
 	@property
 	def composition(self) -> typing.Any:
-		return self.nestedCategories["composition"]
+		return self._getNestedByCategory("composition")
 
 	@property
 	def category(self) -> str:
@@ -94,8 +87,11 @@ class Nested(Entity):
 			"type": self.type,
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
-		for category, nested in self.nestedCategories.items():
+
+		for category in ["config", "nested", "composition"]:
+			nested = self._getNestedByCategory(category)
 			if nested:
-				content += category + ":\n"
-				content += "\n  ".join([""] + repr(nested).split("\n"))
+				content += "\n{}:".format(category)
+				content += "\n  ".join([""] + "\n".join([str(entity) for entity in nested]).split("\n"))
+
 		return content
