@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.object import Object
+from tools.bdl.visitors.file.nested_result import NestedResult
 from tools.bdl.visitors.file.result import ResultType
 from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, SymbolType
 from tools.bdl.entities.impl.fragment.type import Type
@@ -21,7 +22,7 @@ class Visitor(VisitorBase[ResultType]):
 			include: Follow use statement.
 		"""
 
-		super().__init__()
+		super().__init__(elementToEntityExtenstion={"nested": NestedResult})
 		self.bdl = bdl
 
 		# Options
@@ -33,6 +34,10 @@ class Visitor(VisitorBase[ResultType]):
 
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return ResultType(level=self.level)
+
+	def entityToNested(self, category: str, entity: Nested, nested: ResultType) -> None:
+		nestedResult = typing.cast(NestedResult, entity)
+		nestedResult.setNested(category=category, nested=typing.cast(typing.List[typing.Any], nested))
 
 	def visitNestedEntities(self, entity: Nested, result: ResultType) -> None:
 		result.registerSymbol(entity=entity)
