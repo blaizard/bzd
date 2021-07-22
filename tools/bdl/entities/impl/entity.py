@@ -63,7 +63,6 @@ class Entity:
 			if config.contracts.get("template")
 		]
 		if schema:
-			print(schema)
 			return Validation(schema=["" if e is None else e for e in schema])
 		return None
 
