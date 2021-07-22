@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor
 
 from tools.bdl.entities.impl.fragment.type import Type
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class _VisitorInheritance(Visitor[Type, typing.List[Type]]):
@@ -26,15 +26,8 @@ class Nested(Entity):
 
 	def __init__(self, element: Element) -> None:
 
-		super().__init__(element)
+		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="type")
-
-	def _getNestedByCategory(self, category: str) -> typing.Any:
-		sequence = self.element.getNestedSequence(category)
-		if sequence:
-			from tools.bdl.entities.all import elementToEntity
-			return [elementToEntity(element) for element in sequence]
-		return []
 
 	@property
 	def nested(self) -> typing.Any:

@@ -82,12 +82,13 @@ def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 		nestedName = "template"
 
 	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
-	grammar.append(
-		GrammarItem(_regexprType, Fragment, [
+	followUpGrammar: Grammar = [
 		GrammarItem(r"<", TemplateStart, [grammar]),
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r">", FragmentParentElement), nextGrammar
-		]))
+	]
+	grammar.append(GrammarItem(_regexprValue, Fragment, followUpGrammar))
+	grammar.append(GrammarItem(_regexprType, Fragment, followUpGrammar))
 	return grammar
 
 

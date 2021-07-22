@@ -32,5 +32,9 @@ class AllContracts:
 		return {contract.name: contract for contract in _Contracts}
 
 	@cached_classproperty
-	def forValues(cls) -> typing.Mapping[str, ContractTraits]:
-		return {contract.name: contract for contract in _Contracts if contract.isValue}
+	def forValue(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleValue}
+
+	@cached_classproperty
+	def forTemplate(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleTemplate}

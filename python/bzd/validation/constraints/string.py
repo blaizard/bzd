@@ -15,7 +15,7 @@ class String(Constraint):
 
 		def _process(arg: int, context: Context) -> Result:
 			if len(context.value) < arg:
-				return "The string '{}' is shorter than its required minimum size: {}".format(context.value, arg)
+				return "the string '{}' is shorter than its required minimum size: {}".format(context.value, arg)
 			return None
 
 		assert len(args) == 1, "Requires a single argument."
@@ -25,7 +25,7 @@ class String(Constraint):
 
 		def _process(arg: int, context: Context) -> Result:
 			if len(context.value) > arg:
-				return "The string '{}' is longer than its required maximum size: {}".format(context.value, arg)
+				return "the string '{}' is longer than its required maximum size: {}".format(context.value, arg)
 			return None
 
 		assert len(args) == 1, "Requires a single argument."

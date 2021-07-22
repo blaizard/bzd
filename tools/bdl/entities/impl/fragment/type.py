@@ -6,6 +6,7 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
+from tools.bdl.entities.impl.fragment.value import Value
 if typing.TYPE_CHECKING:
 	from bdl.entities.all import EntityType
 
@@ -18,7 +19,6 @@ class Type:
 		self.element = element
 		self.kindAttr = kind
 		self.templateAttr = template
-		self.underlying: typing.Optional["EntityType"] = None
 
 	def resolve(self,
 		symbols: typing.Any,
@@ -36,54 +36,54 @@ class Type:
 
 		# Loop through the nested templates.
 		templates = []
-		for i, subType in enumerate(self.templates):
-			# Recursively resolve nested types.
-			subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-			# Only keep the kind, as nested template arguments will be deducted by recursion.
-			templates.append(subType.kind)
+		for subType in self.templates:
+			if isinstance(subType, Type):
+				# Recursively resolve nested types.
+				underlyingSubType = subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+				# Only keep the kind, as nested template arguments will be deducted by recursion.
+				templates.append(subType.kind)
+			elif isinstance(subType, Value):
+				templates.append(subType.value)
+			else:
+				Error.handleFromElement(element=self.element,
+					message="Unexpected type '{}' for template parameter.".format(type(subType)))
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
-		self.underlying = symbols.getEntity(fqn=fqn)
+		underlying = symbols.getEntityAssert(fqn=fqn, element=self.element)
 
 		# Validate template arguments
-		validation = self.underlying.validationTemplate
+		validation = underlying.validationTemplate
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
-			Error.assertTrue(element=self.element,
-				condition=bool(templates),
-				message="Type '{}' requires template arguments.".format(self.kind))
 			result = validation.validate(templates, output="return")
 			Error.assertTrue(element=self.element, condition=result, message=str(result))
 
-		return self.underlying
+		return underlying
 
 	@property
 	def contracts(self) -> Contracts:
-		#if self.underlying is None:
 		return Contracts(element=self.element)
-		#return self.resolved_contracts
-
-	@cached_property
-	def resolved_contracts(self) -> Contracts:
-		assert self.underlying is not None, "The 'resolve' method must be callied prior to calling 'resolved_contracts'."
-		# TODO merge contracts
-		return self.contracts
 
 	@property
 	def isTemplate(self) -> bool:
 		return len(self.templates) > 0
 
 	@cached_property
-	def templates(self) -> typing.List["Type"]:
+	def templates(self) -> typing.List[typing.Union["Type", Value]]:
 		if self.templateAttr:
 			nested = self.element.getNestedSequence(self.templateAttr)
 			if nested:
-				# Note the "kind" here is always type for sub-elements.
-				return [Type(element=element, kind="type", template=self.templateAttr) for element in nested]
+				templates: typing.List[typing.Union["Type", Value]] = []
+				for element in nested:
+					# Note the "kind" here is always type for sub-elements.
+					templates.append(
+						Type(element=element, kind="type", template=self.templateAttr) if element.
+						isAttr("type") else Value(element=element, kind="value"))
+				return templates
 		return []
 
 	@property
@@ -132,8 +132,13 @@ class Visitor(VisitorBase[str, str]):
 		return self.visitTemplateItems(items=result)
 
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
-		Error.assertHasAttr(element=element, attr="type")
-		result.append(self.visitType(kind=element.getAttr("type").value, comment=element.getAttrValue("comment")))
+		if element.isAttr("type"):
+			result.append(self.visitType(kind=element.getAttr("type").value, comment=element.getAttrValue("comment")))
+		else:
+			Error.assertHasAttr(element=element, attr="value")
+			result.append(self.visitValue(value=element.getAttr("value").value,
+				comment=element.getAttrValue("comment")))
+
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.List[str]) -> typing.List[str]:
@@ -147,6 +152,13 @@ class Visitor(VisitorBase[str, str]):
 		"""
 
 		return kind
+
+	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
+		"""
+		Called when an element needs to be formatted.
+		"""
+
+		return value
 
 	def visitTemplateItems(self, items: typing.List[str]) -> str:
 		"""

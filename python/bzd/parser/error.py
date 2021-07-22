@@ -105,7 +105,7 @@ class Error:
 				index = startIndex
 				end = endIndex
 
-		return Error.toString(context=element.context, index=index, end=end, message=message)
+		return Error.toString(context=element.context, index=index, end=end if end > index else index, message=message)
 
 	@staticmethod
 	def handle(context: Context, index: int, end: int, message: str) -> None:

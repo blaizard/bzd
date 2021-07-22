@@ -5,14 +5,14 @@ from functools import cached_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Use(Entity):
 
 	def __init__(self, element: Element) -> None:
 
-		super().__init__(element)
+		super().__init__(element, Role.Meta)
 		Error.assertHasAttr(element=element, attr="value")
 
 	@property

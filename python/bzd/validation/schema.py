@@ -61,7 +61,7 @@ class Constraint:
 			assert converted.is_integer()
 			return int(converted)
 		except:
-			raise Exception("The value '{}' is not a valid integer.".format(value))
+			raise Exception("expects an integer, received: '{}'.".format(value))
 
 	@staticmethod
 	def _toFloat(value: str) -> float:
@@ -71,7 +71,7 @@ class Constraint:
 		try:
 			return float(value)
 		except:
-			raise Exception("The value '{}' is not a valid floating point number.".format(value))
+			raise Exception("expects a floating point number, received: '{}'.".format(value))
 
 
 class ProcessedResult:

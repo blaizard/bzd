@@ -5,13 +5,13 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class EnumValue(Entity):
 
 	def __init__(self, element: Element) -> None:
-		super().__init__(element)
+		super().__init__(element, Role.Value)
 		Error.assertHasAttr(element=element, attr="name")
 
 	@cached_property
@@ -35,7 +35,7 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 class Enum(Entity):
 
 	def __init__(self, element: Element) -> None:
-		super().__init__(element)
+		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasSequence(element=element, sequence="values")
 

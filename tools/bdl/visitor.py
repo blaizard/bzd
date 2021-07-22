@@ -99,8 +99,6 @@ class Visitor(VisitorBase[T, T]):
 
 			self.visitNestedEntities(entity=entity, result=result)
 
-			print(entity)
-
 		# Handle expression
 		elif isinstance(entity, Expression):
 

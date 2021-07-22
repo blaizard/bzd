@@ -8,7 +8,7 @@ class TestRun(unittest.TestCase):
 	def testInteger(self) -> None:
 		template = Validation({"test": "integer"})
 		template.validate({"test": "2"})
-		with self.assertRaisesRegex(ExceptionValidation, r"valid integer"):
+		with self.assertRaisesRegex(ExceptionValidation, r"expects.*integer"):
 			template.validate({"test": "2.1"})
 		template.validate({"test": "2.0"})
 		template.validate({"test": "-73"})
@@ -19,7 +19,7 @@ class TestRun(unittest.TestCase):
 		template.validate({"test": "2.1"})
 		template.validate({"test": "2.0"})
 		template.validate({"test": "-73"})
-		with self.assertRaisesRegex(ExceptionValidation, r"valid float"):
+		with self.assertRaisesRegex(ExceptionValidation, r"expects.*float"):
 			template.validate({"test": "hsi"})
 
 	def testString(self) -> None:

@@ -5,7 +5,7 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
@@ -24,7 +24,7 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 class Namespace(Entity):
 
 	def __init__(self, element: Element) -> None:
-		super().__init__(element)
+		super().__init__(element, Role.Type)
 		Error.assertHasSequence(element=element, sequence="name")
 
 	@property

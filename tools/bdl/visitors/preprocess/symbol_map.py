@@ -2,10 +2,10 @@ import typing
 from pathlib import Path
 
 from bzd.parser.error import Error
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
 from bzd.parser.context import Context
 
-from tools.bdl.visitor import Visitor
+from tools.bdl.visitor import Visitor, CATEGORIES
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
 
@@ -21,6 +21,7 @@ class SymbolMap:
 		# Register builtins
 		for builtin in Builtins:
 			self.builtins[builtin.name] = {"c": "builtin", "p": "", "e": builtin.element.serialize()}
+			self.entities[builtin.name] = builtin
 
 	def _contains(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> bool:
 		"""
@@ -55,6 +56,26 @@ class SymbolMap:
 		Error.assertTrue(element=element,
 			condition=(not self._contains(fqn=fqn)),
 			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
+
+		# Remove nested element and change them to references
+		if any([element.isNestedSequence(category) for category in CATEGORIES]):
+
+			preparedElement = element.copy(ignoreNested=CATEGORIES)
+			for category in CATEGORIES:
+				nested = element.getNestedSequence(category)
+				if nested:
+					sequence = SequenceBuilder()
+					for element in nested:
+						if element.isAttr("name"):
+							sequence.pushBackElement(ElementBuilder().addAttr("category",
+								"reference").addAttr(key="name",
+								value=SymbolMap.makeFQN(name=element.getAttr("name").value,
+								namespace=SymbolMap.fqnToNamespace(fqn)),
+								index=element.getAttr("name").index))
+					preparedElement.setNestedSequence(category, sequence)
+
+			element = preparedElement
+
 		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else Path(), "e": element.serialize()}
 
 	def update(self, symbols: "SymbolMap") -> None:
@@ -78,6 +99,13 @@ class SymbolMap:
 		"""
 		return ".".join(namespace + [name])
 
+	@staticmethod
+	def fqnToNamespace(fqn: str) -> typing.List[str]:
+		"""
+		Convert a FQN string into a namespace.
+		"""
+		return fqn.split(".")
+
 	def resolveFQN(self,
 		name: str,
 		namespace: typing.List[str],
@@ -100,6 +128,7 @@ class SymbolMap:
 	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
 		"""
 		Return an element from the symbol map.
+		Additionally, resolves all references depending on this FQN.
 		"""
 
 		data = self._get(fqn)
@@ -111,9 +140,39 @@ class SymbolMap:
 			element = Element.fromSerialize(element=data["e"], context=Context(path=Path(data["p"])))
 			entity = elementToEntity(element=element)
 			self.entities[fqn] = entity
+			# Resolve dependencies
+			for category in CATEGORIES:
+				if element.isNestedSequence(category):
+					updatedSequence = SequenceBuilder()
+					for nested in element.getNestedSequenceAssert(category):
+						# There should be only references
+						Error.assertTrue(element=nested,
+							condition=nested.isAttr("category"),
+							message="All sub-elements must have a category.")
+						Error.assertTrue(element=nested,
+							condition=(nested.getAttr("category").value == "reference"),
+							message="All sub-elements must be of type 'reference'.")
+						Error.assertTrue(element=nested,
+							condition=nested.isAttr("name"),
+							message="Reference is missing attribute 'name'.")
+						nestedEntity = self.getEntityAssert(fqn=nested.getAttr("name").value, element=nested)
+						updatedSequence.pushBackElement(nestedEntity.element)
+					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
+						sequence=updatedSequence)
 
 		# Return the element
 		return self.entities[fqn]
+
+	def getEntityAssert(self, fqn: str, element: Element, category: typing.Optional[str] = None) -> EntityType:
+		"""
+		Get an element and assert it exists.
+		"""
+		maybeEntity = self.getEntity(fqn=fqn, category=category)
+		Error.assertTrue(element=element,
+			condition=maybeEntity is not None,
+			message="Unable to find symbol '{}'.".format(fqn))
+		assert maybeEntity is not None
+		return maybeEntity
 
 	def getEntityFromName(self,
 		name: str,

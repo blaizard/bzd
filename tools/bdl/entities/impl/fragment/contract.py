@@ -31,7 +31,15 @@ class Contracts:
 		"""
 		Generate a validation string for a value out of the current contracts
 		"""
-		content = [str(contract) for contract in self if contract.type in AllContracts.forValues]
+		content = [str(contract) for contract in self if contract.type in AllContracts.forValue]
+		return " ".join(content) if content else None
+
+	@property
+	def validationForTemplate(self) -> typing.Optional[str]:
+		"""
+		Generate a validation string for a template out of the current contracts
+		"""
+		content = [str(contract) for contract in self if contract.type in AllContracts.forTemplate]
 		return " ".join(content) if content else None
 
 	@property
