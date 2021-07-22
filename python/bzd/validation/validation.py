@@ -50,11 +50,11 @@ class Result:
 	def __repr__(self) -> str:
 
 		if self.isList:
-			FORMAT_NOT_VALIDATE_SINGLE = "position {} does not validate: \"{}\""
-			FORMAT_NOT_VALIDATE_MULTI = "Some positional values do not validate: {}"
+			FORMAT_NOT_VALIDATE_SINGLE = "position {key} does not validate: {message}"
+			FORMAT_NOT_VALIDATE_MULTI = "Some positional values do not validate: {message}"
 		else:
-			FORMAT_NOT_VALIDATE_SINGLE = "'{}' does not validate: \"{}\""
-			FORMAT_NOT_VALIDATE_MULTI = "Some values do not validate: {}"
+			FORMAT_NOT_VALIDATE_SINGLE = "'{key}' does not validate: {message}"
+			FORMAT_NOT_VALIDATE_MULTI = "Some values do not validate: {message}"
 
 		content = []
 		if len(self.globalErrors):
@@ -62,10 +62,10 @@ class Result:
 
 		if len(self.errors.keys()) == 1:
 			for key, result in self.errors.items():
-				content.append(FORMAT_NOT_VALIDATE_SINGLE.format(key, ", ".join(result)))
+				content.append(FORMAT_NOT_VALIDATE_SINGLE.format(key=key, message=", ".join(result)))
 		else:
 			messages = ["{}: \"{}\"".format(key, ", ".join(result)) for key, result in self.errors.items()]
-			content.append(FORMAT_NOT_VALIDATE_MULTI.format("; ".join(messages)))
+			content.append(FORMAT_NOT_VALIDATE_MULTI.format(message="; ".join(messages)))
 
 		return "; ".join(content) if content else "no errors"
 
@@ -161,12 +161,12 @@ class Validation:
 					result = self.processed[key].validate(value=value)
 					results.addResult(key, result)
 				else:
-					results.addError(key, ["Value not expected."])
+					results.addError(key, ["value not expected."])
 
 			# Check for mandatory values
 			for key, constraints in self.processed.items():
 				if constraints.isMandatory and key not in internals:
-					results.addError(key, ["Missing mandatory value."])
+					results.addError(key, ["missing mandatory value."])
 
 		# If some errors are detected.
 		if output == "throw":

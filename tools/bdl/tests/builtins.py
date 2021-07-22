@@ -26,7 +26,7 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Boolean(true); }", objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Boolean(false); }", objectContext=ObjectContext(resolve=True))
 		# With a value
-		with self.assertRaisesRegex(Exception, r"valid boolean"):
+		with self.assertRaisesRegex(Exception, r"expects.*boolean"):
 			Object.fromContent(content="struct temp { var = Boolean(12); }", objectContext=ObjectContext(resolve=True))
 		# With wrong number of arguments
 		with self.assertRaisesRegex(Exception, r"not expected"):
@@ -45,7 +45,7 @@ class TestRun(unittest.TestCase):
 		# With value
 		Object.fromContent(content="struct temp { var = Integer(12); }", objectContext=ObjectContext(resolve=True))
 		# With non-integer value
-		with self.assertRaisesRegex(Exception, r"valid integer"):
+		with self.assertRaisesRegex(Exception, r"expects.*integer"):
 			Object.fromContent(content="struct temp { var = Integer(32.54); }",
 				objectContext=ObjectContext(resolve=True))
 		# With wrong number of arguments
@@ -66,7 +66,7 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Float(12); }", objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Float(-1.23); }", objectContext=ObjectContext(resolve=True))
 		# With non-integer value
-		with self.assertRaisesRegex(Exception, r"valid float"):
+		with self.assertRaisesRegex(Exception, r"expects.*float"):
 			Object.fromContent(content="struct temp { var = Float(\"hello\"); }",
 				objectContext=ObjectContext(resolve=True))
 		# With wrong number of arguments
@@ -81,7 +81,7 @@ class TestRun(unittest.TestCase):
 	def testResult(self) -> None:
 
 		# No template
-		with self.assertRaisesRegex(Exception, r"requires template"):
+		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
 
 		# Template
@@ -95,7 +95,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 
 		# Template of template
-		with self.assertRaisesRegex(Exception, r"requires template"):
+		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
 				objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
@@ -104,7 +104,7 @@ class TestRun(unittest.TestCase):
 	def testList(self) -> None:
 
 		# No template
-		with self.assertRaisesRegex(Exception, r"requires template"):
+		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="struct temp { var = List; }", objectContext=ObjectContext(resolve=True))
 
 		# Template

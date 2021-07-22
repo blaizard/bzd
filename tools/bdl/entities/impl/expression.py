@@ -7,14 +7,14 @@ from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Argument(Entity):
 
 	def __init__(self, element: Element) -> None:
 
-		super().__init__(element)
+		super().__init__(element, Role.Value)
 		Error.assertHasAttr(element=element, attr="value")
 
 	@property
@@ -34,7 +34,7 @@ class Expression(Entity):
 
 	def __init__(self, element: Element) -> None:
 
-		super().__init__(element)
+		super().__init__(element, Role.Value)
 		Error.assertHasAttr(element=element, attr="type")
 
 	@property
@@ -82,7 +82,9 @@ class Expression(Entity):
 		and the contract validation.
 		"""
 
-		validationValue = self.contracts.validationForValue
+		# The validation comes from the underlying type, all contract information for this expression
+		# do not apply to the current validation.
+		validationValue = entity.contracts.validationForValue
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.
 		if validationValue:

@@ -9,10 +9,40 @@ from bzd.validation.validation import Validation
 from tools.bdl.entities.impl.fragment.contract import Contracts
 
 
+class Role:
+	Undefined: int = 0
+	# Represents a value.
+	Value: int = 1
+	# Represents a type.
+	Type: int = 2
+	# Represents a meta expression, something used only during the build phase.
+	Meta: int = 4
+
+
 class Entity:
 
-	def __init__(self, element: Element) -> None:
+	def __init__(self, element: Element, role: int) -> None:
 		self.element = element
+		self.role = role
+
+	def _getNestedByCategory(self, category: str) -> typing.Any:
+		sequence = self.element.getNestedSequence(category)
+		if sequence:
+			from tools.bdl.entities.all import elementToEntity
+			return [elementToEntity(element) for element in sequence]
+		return []
+
+	@property
+	def isRoleValue(self) -> bool:
+		return bool(self.role & Role.Value)
+
+	@property
+	def isRoleType(self) -> bool:
+		return bool(self.role & Role.Type)
+
+	@property
+	def isRoleMeta(self) -> bool:
+		return bool(self.role & Role.Meta)
 
 	@property
 	def isName(self) -> bool:
@@ -27,24 +57,10 @@ class Entity:
 		return Contracts(element=self.element)
 
 	@cached_property
-	def configActual(self) -> typing.List[typing.Any]:
-		# TODO should be merged with config
-		from tools.bdl.entities.impl.expression import Expression
-		sequence = self.element.getNestedSequence("config")
-		if sequence:
-			config = []
-			for element in sequence:
-				if element.getAttr("category").value == "expression":
-					config.append(Expression(element))
-			return config
-			#print(sequence)
-			#return [Expression(element=element) for element in sequence]
-		return []
-
-	@cached_property
 	def validationTemplate(self) -> typing.Optional[Validation]:
 		schema = [
-			config.contracts.validationForValue for config in self.configActual if config.contracts.get("template")
+			config.contracts.validationForTemplate for config in self._getNestedByCategory("config")
+			if config.contracts.get("template")
 		]
 		if schema:
 			print(schema)

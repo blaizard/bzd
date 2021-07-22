@@ -6,14 +6,14 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Using(Entity):
 
 	def __init__(self, element: Element) -> None:
 
-		super().__init__(element)
+		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasAttr(element=element, attr="type")
 

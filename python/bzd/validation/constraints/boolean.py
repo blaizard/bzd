@@ -14,5 +14,5 @@ class Boolean(Constraint):
 		elif context.value in {"false", "False"}:
 			context.setUnderlying(False)
 		else:
-			return "The value '{}' is not a valid boolean.".format(context.value)
+			return "expects a boolean, received: '{}'.".format(context.value)
 		return None

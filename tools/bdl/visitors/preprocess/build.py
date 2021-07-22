@@ -2,10 +2,9 @@ import typing
 
 from bzd.parser.element import Sequence
 
-from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL, CATEGORIES
+from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType
 from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
-from tools.bdl.entities.builder import ElementBuilder, SequenceBuilder
 
 SymbolList = typing.List[SymbolType]
 
@@ -36,27 +35,11 @@ class Build(Visitor[SymbolList]):
 		# Build the symbol name and ensure it is unique
 		symbol = SymbolMap.makeFQN(name=entity.name, namespace=self.namespace)
 
-		# Save the serialized payload and convert nested dependencies and make them links
-		element = entity.element
-		if isinstance(entity, Nested):
-
-			nestedNamespace = self.namespace + [entity.name]
-			preparedElement = element.copy(ignoreNested=CATEGORIES)
-			for category in CATEGORIES:
-				nested = element.getNestedSequence(category)
-				if nested:
-					sequence = SequenceBuilder()
-					for element in nested:
-						if element.isAttr("name"):
-							sequence.pushBackElement(
-								ElementBuilder("reference").addAttr(
-								"name", SymbolMap.makeFQN(name=element.getAttr("name").value,
-								namespace=nestedNamespace)))
-					preparedElement.setNestedSequence(category, sequence)
-
-			element = preparedElement
-
-		self.symbols.insert(fqn=symbol, element=element, path=self.objectContext.getSource(), category=self.category)
+		# Save the serialized payload
+		self.symbols.insert(fqn=symbol,
+			element=entity.element,
+			path=self.objectContext.getSource(),
+			category=self.category)
 
 	def visitNestedEntities(self, entity: Nested, result: SymbolList) -> None:
 		if entity.type in ["struct", "interface", "component"]:

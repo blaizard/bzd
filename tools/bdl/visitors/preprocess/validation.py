@@ -12,7 +12,8 @@ class Validation(VisitorBase[None]):
 		if not entity.isName:
 			assert self.parent
 			entity.assertTrue(condition=self.parent.category == "composition",
-				message="Unamed expressions can only be in a composition context.")
+				message="Unamed expressions can only be in a composition context, not a '{}' context.".format(
+				self.parent.category))
 
 	def visitNestedEntities(self, entity: Nested, result: None) -> None:
 

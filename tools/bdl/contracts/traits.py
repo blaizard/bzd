@@ -4,18 +4,36 @@ from bzd.validation.validation import Validation, SchemaList
 from tools.bdl.contracts.contract import Contract
 
 
+class Role:
+	Value: int = 1
+	Template: int = 2
+	Meta: int = 4
+
+
 class ContractTraits:
 	"""
     Base class to define a contract.
     """
 
-	def __init__(self, name: str, isValue: bool, validationSchema: SchemaList) -> None:
+	def __init__(self, name: str, role: int, validationSchema: SchemaList) -> None:
 		# Name of the contract
 		self.name = name
-		# Defines contract targeting values
-		self.isValue = isValue
+		# Defines contract role
+		self.role = role
 		# Validation object for the ccontract inputs
 		self.validation = Validation(validationSchema)
+
+	@property
+	def isRoleValue(self) -> bool:
+		return bool(self.role & Role.Value)
+
+	@property
+	def isRoleTemplate(self) -> bool:
+		return bool(self.role & Role.Template)
+
+	@property
+	def isRoleMeta(self) -> bool:
+		return bool(self.role & Role.Meta)
 
 	def validate(self, contract: Contract) -> None:
 		"""

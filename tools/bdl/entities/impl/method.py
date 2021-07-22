@@ -7,13 +7,13 @@ from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.expression import Expression
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Method(Entity):
 
 	def __init__(self, element: Element) -> None:
-		super().__init__(element)
+		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property

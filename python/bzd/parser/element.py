@@ -1,7 +1,7 @@
 import typing
 import copy
 
-from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize
+from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize, IGNORE_INDEX_VALUE
 from bzd.parser.grammar import Grammar
 from bzd.parser.context import Context
 
@@ -207,6 +207,14 @@ class Element:
 		assert kind != "@", "Nested sequence name '@' cannot be used."
 		return self.sequences.get(kind, None)
 
+	def getNestedSequenceAssert(self, kind: str) -> Sequence:
+		"""
+		Get a current sequence of None if it does not exists.
+		"""
+		maybeSequence = self.getNestedSequence(kind)
+		assert maybeSequence, "Sequence must be non-null."
+		return maybeSequence
+
 	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
 		"""
 		Generator going through all sequences.
@@ -265,11 +273,11 @@ class ElementBuilder(Element):
 		copiedElement.__class__ = classType
 		return typing.cast(U, copiedElement)
 
-	def addAttr(self: U, key: str, value: str) -> U:
+	def addAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
 		"""
 		Add an attribute to the element.
 		"""
-		self.attrs[key] = AttributeParser(index=0, end=0, value=value)
+		self.attrs[key] = AttributeParser(index=index, end=end, value=value)
 		return self
 
 	def addAttrs(self: U, data: typing.Dict[str, str]) -> U:

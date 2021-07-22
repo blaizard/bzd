@@ -1,9 +1,9 @@
 import typing
 
-from tools.bdl.contracts.traits import ContractTraits
+from tools.bdl.contracts.traits import ContractTraits, Role
 
 
 class ContractTemplate(ContractTraits):
 
 	def __init__(self) -> None:
-		super().__init__(name="template", isValue=False, validationSchema=[])
+		super().__init__(name="template", role=Role.Meta, validationSchema=[])

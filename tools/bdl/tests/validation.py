@@ -16,7 +16,7 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="using MyType = Integer [you];")
 		with self.assertRaisesRegex(Exception, r"'hello'.*not supported"):
 			Object.fromContent(content="method hello(a = Integer() [hello]);")
-		with self.assertRaisesRegex(Exception, r"Missing mandatory"):
+		with self.assertRaisesRegex(Exception, r"missing mandatory"):
 			Object.fromContent(content="using MyType = Integer [min];")
 		Object.fromContent(content="using MyType = Integer [min(2)];")
 		with self.assertRaisesRegex(Exception, r"not expected"):
