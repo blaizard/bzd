@@ -29,7 +29,7 @@ interface MyFy {
          */
 
         varConst = const MyType<T> [ /*    Immer */
-        template ];
+        integer ];
 varInitialized= MyType(   42 );    
 
 

@@ -10,6 +10,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"already defined"):
 			Object.fromContent(content="method hello(a = Integer(), a = Interger());")
+		Object.fromContent(content="method hello(a = Integer(), b = Interger());")
 
 	def testContracts(self) -> None:
 		with self.assertRaisesRegex(Exception, r"'you'.*not supported"):
@@ -22,6 +23,12 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="using MyType = Integer [min(2, 32)];")
 
+		# template only in config context
+		with self.assertRaisesRegex(Exception, r"template.*config"):
+			Object.fromContent(content="struct temp { var = Integer [template]; }")
+		with self.assertRaisesRegex(Exception, r"template.*config"):
+			Object.fromContent(content="using MyType = Integer [template];")
+		Object.fromContent(content="interface temp { config: var = Integer [template]; }")
 
 if __name__ == '__main__':
 	unittest.main()
