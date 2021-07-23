@@ -80,6 +80,8 @@ pipeline
 						//archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
+						sh "./tools/bazel coverage ... --config=py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py"
+						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
 					}
 				}
 				stage("Sanitize")

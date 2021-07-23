@@ -3,6 +3,7 @@ import subprocess
 import sys
 import threading
 from typing import Any, List, Dict, Optional, Tuple
+from pathlib import Path
 import selectors
 
 
@@ -47,12 +48,18 @@ Run a process locally.
 def localCommand(cmds: List[str],
 	inputs: bytes = b"",
 	ignoreFailure: bool = False,
+	cwd: Optional[Path] = None,
 	env: Optional[Dict[str, str]] = None,
 	timeoutS: float = 60.) -> _ExecuteResult:
 
 	sel = selectors.DefaultSelector()
 	stream = _ExecuteResultStreamWriter()
-	proc = subprocess.Popen(cmds, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+	proc = subprocess.Popen(cmds,
+		cwd=cwd,
+		stdout=subprocess.PIPE,
+		stdin=subprocess.PIPE,
+		stderr=subprocess.PIPE,
+		env=env)
 	timer = threading.Timer(timeoutS, proc.kill)
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore

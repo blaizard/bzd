@@ -30,18 +30,6 @@ class Nested(Entity):
 		Error.assertHasAttr(element=element, attr="type")
 
 	@property
-	def nested(self) -> typing.Any:
-		return self._getNestedByCategory("nested")
-
-	@property
-	def config(self) -> typing.Any:
-		return self._getNestedByCategory("config")
-
-	@property
-	def composition(self) -> typing.Any:
-		return self._getNestedByCategory("composition")
-
-	@property
 	def category(self) -> str:
 		return "nested"
 

@@ -11,9 +11,6 @@ build --verbose_failures
 # Set default options used by the default run
 build "--strip=never"
 
-# Use default platform
-#build --config=linux_x86_64_clang
-
 # Test specific options
 test --test_output=errors
 test --verbose_failures
@@ -35,12 +32,13 @@ build:cc-docker-sandbox --strategy_regexp=Compiling=docker
 build:cc-docker-sandbox --strategy_regexp=Linking=docker
 
 # Select only C++ targets
-build:cc --build_tag_filters="cc"
+build:cc --build_tag_filters=cc
 test:cc --test_tag_filters=cc
 
 # Select only Python targets
-build:py --build_tag_filters="-nodejs,-docker"
+build:py --build_tests_only
 test:py --test_lang_filters=py
+coverage:py --test_env=PYTHON_COVERAGE=external/coveragepy/coverage/__main__.py
 
 # Select only NodeJs targets
 build:nodejs --build_tag_filters=nodejs

@@ -11,4 +11,7 @@ py_binary(
         "@lcov//:genhtml",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//python/bzd/utils:run",
+    ],
 )

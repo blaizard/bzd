@@ -1,7 +1,7 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type
@@ -40,6 +40,15 @@ class Using(Entity):
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
+
+		# Resolve config if any
+		#if entity.isConfig:
+		#	config = entity.element.getNestedSequenceAssert("config")
+		#	self.assertTrue(condition=not self.isConfig or self.element.getNestedSequence("config") == config, message="Conflict with exsiting configuration.")
+		#	ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("config", config)
+		# TODO: add the new symbols to the symbol map
+		# and use reference to refer to it.
+		# Example: MyNewType.value: <sequence config><element ref="OriginalType.value">
 
 		print("using", self.name, self.contracts)
 

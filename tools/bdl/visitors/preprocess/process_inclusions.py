@@ -6,7 +6,7 @@ from tools.bdl.entities.all import Use
 
 class ProcessInclusions(VisitorBase[None]):
 	"""
-	Preprocess stage, look for all inclusion and make pre-process them.
+	Preprocess stage, look for all inclusion and pre-process them.
 	"""
 
 	def __init__(self, objectContext: typing.Any) -> None:

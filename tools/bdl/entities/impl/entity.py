@@ -33,6 +33,30 @@ class Entity:
 		return []
 
 	@property
+	def isNested(self) -> bool:
+		return self.element.isNestedSequence("nested")
+
+	@property
+	def isConfig(self) -> bool:
+		return self.element.isNestedSequence("config")
+
+	@property
+	def isComposition(self) -> bool:
+		return self.element.isNestedSequence("composition")
+
+	@property
+	def nested(self) -> typing.Any:
+		return self._getNestedByCategory("nested")
+
+	@property
+	def config(self) -> typing.Any:
+		return self._getNestedByCategory("config")
+
+	@property
+	def composition(self) -> typing.Any:
+		return self._getNestedByCategory("composition")
+
+	@property
 	def isRoleValue(self) -> bool:
 		return bool(self.role & Role.Value)
 
