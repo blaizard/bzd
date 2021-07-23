@@ -44,6 +44,8 @@ class SymbolMap:
 			return self.builtins[fqn]
 		return None
 
+	#def insertAlias(self, fqn: str, path: typing.Optional[Path], )
+
 	def insert(self, fqn: str, path: typing.Optional[Path], element: Element, category: str) -> None:
 		"""
 		Insert a new element into the symbol map.
@@ -57,26 +59,10 @@ class SymbolMap:
 			condition=(not self._contains(fqn=fqn)),
 			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
 
-		# Remove nested element and change them to references
-		if any([element.isNestedSequence(category) for category in CATEGORIES]):
-
-			preparedElement = element.copy(ignoreNested=CATEGORIES)
-			for category in CATEGORIES:
-				nested = element.getNestedSequence(category)
-				if nested:
-					sequence = SequenceBuilder()
-					for element in nested:
-						if element.isAttr("name"):
-							sequence.pushBackElement(ElementBuilder().addAttr("category",
-								"reference").addAttr(key="name",
-								value=SymbolMap.makeFQN(name=element.getAttr("name").value,
-								namespace=SymbolMap.fqnToNamespace(fqn)),
-								index=element.getAttr("name").index))
-					preparedElement.setNestedSequence(category, sequence)
-
-			element = preparedElement
-
-		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else Path(), "e": element.serialize()}
+		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else Path(), "e": None}
+		# The element is also added to the entity map, to allow further modification that will
+		# be written when serialize is called.
+		self.entities[fqn] = elementToEntity(element=element)
 
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
@@ -90,6 +76,44 @@ class SymbolMap:
 		"""
 		Return a serialized version of this map.
 		"""
+
+		# Create serialized blobs for elements present in the entities map.
+		for fqn, entity in self.entities.items():
+
+			# Ignore builtins
+			if fqn in self.builtins:
+				continue
+
+			entity.assertTrue(condition=fqn in self.map, message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
+			element = entity.element
+
+			# Remove nested element and change them to references.
+			if any([element.isNestedSequence(category) for category in CATEGORIES]):
+
+				preparedElement = element.copy(ignoreNested=CATEGORIES)
+				for category in CATEGORIES:
+					nested = element.getNestedSequence(category)
+					if nested:
+						sequence = SequenceBuilder()
+						for element in nested:
+							if element.isAttr("name"):
+								sequence.pushBackElement(ElementBuilder().addAttr("category",
+									"reference").addAttr(key="name",
+									value=SymbolMap.makeFQN(name=element.getAttr("name").value,
+									namespace=SymbolMap.FQNToNamespace(fqn)),
+									index=element.getAttr("name").index))
+						preparedElement.setNestedSequence(category, sequence)
+				element = preparedElement
+
+			# Serialize the element to the map.
+			self.map[fqn]["e"] = element.serialize()
+
+		# Sanity check to ensure that all entries in the map are valid.
+		for fqn, entry in self.map.items():
+			assert "e" in entry and entry["e"], "Invalid element in the map: {}.".format(entry)
+			assert "c" in entry and entry["c"], "Invalid category in the map: {}.".format(entry)
+			assert "p" in entry, "Missing path in the map: {}.".format(entry)
+
 		return self.map
 
 	@staticmethod
@@ -100,7 +124,7 @@ class SymbolMap:
 		return ".".join(namespace + [name])
 
 	@staticmethod
-	def fqnToNamespace(fqn: str) -> typing.List[str]:
+	def FQNToNamespace(fqn: str) -> typing.List[str]:
 		"""
 		Convert a FQN string into a namespace.
 		"""
@@ -202,5 +226,5 @@ class SymbolMap:
 	def __repr__(self) -> str:
 		content = []
 		for key, data in {**self.map, **self.builtins}.items():
-			content.append("[{}] {}".format(data["c"], key))
+			content.append("[{}] {}: {}".format(data["c"], key, data["e"]))
 		return "\n".join(content)

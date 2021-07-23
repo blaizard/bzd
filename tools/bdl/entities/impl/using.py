@@ -10,6 +10,12 @@ from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Using(Entity):
+	"""
+	Using statement are defining a type based on an underlying type.
+	- Attributes:
+		- name: The name of the new type, the one created by this entity.
+		- type: The underlying type.
+	"""
 
 	def __init__(self, element: Element) -> None:
 
@@ -41,14 +47,8 @@ class Using(Entity):
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
 
-		# Resolve config if any
-		#if entity.isConfig:
-		#	config = entity.element.getNestedSequenceAssert("config")
-		#	self.assertTrue(condition=not self.isConfig or self.element.getNestedSequence("config") == config, message="Conflict with exsiting configuration.")
-		#	ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("config", config)
-		# TODO: add the new symbols to the symbol map
-		# and use reference to refer to it.
-		# Example: MyNewType.value: <sequence config><element ref="OriginalType.value">
+		# Set the underlying
+		self._setUnderlying(entity.underlying)
 
 		print("using", self.name, self.contracts)
 
