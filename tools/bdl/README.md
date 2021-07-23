@@ -1,6 +1,6 @@
 # BDL
 
-BDL stands for Blaizard Description Language and is the high level abstract language for this framework.
+BDL stands for Bzd Description Language and is the high level abstract language for this framework.
 
 This document describes the tool behind the language, which role is to parse, validate and generate artifacts from bdl files.
 
@@ -9,12 +9,11 @@ This document describes the tool behind the language, which role is to parse, va
 The process consists of the following:
 
 ```
-
-[                   Preprocess              ] -> [                        Generation                       ]
-
-[ parser ] -> [ validator ] -> [ Bdl Object ] -> [ symbol resolution ] -> [ generator ] and/or [ validator ]
-                                    |                                         |
-                                  output                                    output
+  [ parser ]
+[ validator ]
+[ symbol resolution ]
+  [ Bdl Object ]
+  [ generator ]
 ```
 
 ## Purpose
@@ -42,6 +41,19 @@ Part of this process, the parser also goes through a basic validation step and a
 
 The build step hhas for responsibility to gather dependencies and resolve symbols if the dependency flag is set.
 
+#### Symbol Map
+
+The symbol map object is created during the symbol resolution process. There is a ont to one relationship with a .bdl file and a symbol map.
+It consists of the following:
+- symbols: a symbols to element map. Elements in the symbol map contains all the information discovered after resolution.
+- parsed: the raw parsed elements output of the file.
+
+With the symbol map, one link symbols with their actual definition.
+
+##### In-Memory Representation
+
+
+
 #### Bdl Object
 
 The bdl object stage creates a symbol map of the current compilation unit and serializes the output to a file (for re-use purpose).
@@ -49,7 +61,7 @@ This stage generates the preprocessed artifact that can be consumed by other com
 
 ### Serialization
 
-The preprocessed artifacts is serialized and written to disk if and only if, it aslo includes dependencies.
+The preprocessed artifacts is serialized and written to disk if it aslo includes the resolution stage.
 
 ## Generators
 

@@ -28,6 +28,17 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+		# To be updated, this should fail.
+		#with self.assertRaisesRegex(Exception, r"expects.*integer"):
+		Object.fromContent(content="""
+			interface Test { config: value = Integer; }
+			using MyType = Test [integer];
+			struct temp {
+				var = MyType(1);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+
 	def testMandatory(self) -> None:
 
 		# Not mandatory

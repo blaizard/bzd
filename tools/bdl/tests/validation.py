@@ -30,5 +30,6 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="using MyType = Integer [template];")
 		Object.fromContent(content="interface temp { config: var = Integer [template]; }")
 
+
 if __name__ == '__main__':
 	unittest.main()

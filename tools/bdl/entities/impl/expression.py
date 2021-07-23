@@ -88,14 +88,17 @@ class Expression(Entity):
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.
 		if validationValue:
+			self.assertTrue(condition=not entity.isConfig,
+				message="Value-specific contracts cannot be associated with a configuration.")
 			try:
 				return Validation({"0": validationValue})
 			except Exception as e:
 				self.error(message=str(e))
 
+		# TODO fix this
 		# Hack, need to resolve also this information
-		if entity.element.isNestedSequence("config"):
-			return None
+		#if entity.element.isNestedSequence("config"):
+		#	return None
 
 		return Validation({})
 
