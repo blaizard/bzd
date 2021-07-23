@@ -47,6 +47,17 @@ class Enum(Entity):
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
+		"""
+		Resolve entities.
+		"""
+		# Generate this symbol FQN
+		fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+		self._setUnderlying(fqn)
+
 	@cached_property
 	def values(self) -> typing.Iterable[EnumValue]:
 		sequence = self.element.getNestedSequence("values")

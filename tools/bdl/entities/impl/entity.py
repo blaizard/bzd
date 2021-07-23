@@ -2,7 +2,7 @@ import typing
 import json
 from functools import cached_property
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 
@@ -31,6 +31,16 @@ class Entity:
 			from tools.bdl.entities.all import elementToEntity
 			return [elementToEntity(element) for element in sequence]
 		return []
+
+	def _setUnderlying(self, underlying: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).addAttr("underlying", underlying)
+
+	@property
+	def underlying(self) -> typing.Optional[str]:
+		"""
+		Get the underlying element FQN if available.
+		"""
+		return self.element.getAttrValue("underlying")
 
 	@property
 	def isNested(self) -> bool:

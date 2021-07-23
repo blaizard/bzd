@@ -23,6 +23,18 @@ class _VisitorInheritance(Visitor[Type, typing.List[Type]]):
 
 
 class Nested(Entity):
+	"""
+	Defines a nested entity such as a struct, a component or an interface.
+	Nested entities have the following underlying elements:
+	- Attributes:
+		- type: struct, component, interface...
+		- [name]: The name of this entity, for example `struct MyType` would have the name MyType.
+	- Sequences:
+		- [inheritance]: In case the the struct have one or multiple base class.
+		- [config]
+		- [nested]
+		- [composition]
+	"""
 
 	def __init__(self, element: Element) -> None:
 
@@ -59,6 +71,11 @@ class Nested(Entity):
 		"""
 		Resolve entities.
 		"""
+		# Generate this symbol FQN
+		if self.isName:
+			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+			self._setUnderlying(fqn)
+
 		for inheritance in self.inheritanceList:
 			inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 

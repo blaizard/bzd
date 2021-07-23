@@ -11,6 +11,14 @@ from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class Method(Entity):
+	"""
+	A method is a definition of a functional object.
+	- Attributes:
+		- name: The name of the method.
+		- [type]: The return type if any.
+	- Sequence:
+		- argument: The list of arguments to this method.
+	"""
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)
@@ -49,6 +57,10 @@ class Method(Entity):
 		"""
 		Resolve entities.
 		"""
+		# Generate this symbol FQN
+		fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+		self._setUnderlying(fqn)
+
 		maybeType = self.type
 		if maybeType is not None:
 			maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)

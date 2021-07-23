@@ -62,6 +62,9 @@ class Expression(Entity):
 		"""
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
+		# Generate this symbol FQN
+		self._setUnderlying(entity.underlying)
+
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
 

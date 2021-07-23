@@ -22,6 +22,11 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 
 
 class Namespace(Entity):
+	"""
+	A namespace defines a scope in which entities are available.
+	- Sequence:
+		- name: The list of names constituing the namespace.
+	"""
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)

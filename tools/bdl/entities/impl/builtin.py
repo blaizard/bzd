@@ -13,6 +13,10 @@ class Builtin(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
+	def underlying(self) -> str:
+		return self.name
+
+	@property
 	def category(self) -> str:
 		return "builtin"
 
