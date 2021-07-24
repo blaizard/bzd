@@ -80,18 +80,17 @@ class Expression(Entity):
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
 
-		print("expression", self.name, self.contracts)
-
 		# Generate the argument list
 		arguments = {(str(i) if arg.key is None else arg.key): arg.value for i, arg in enumerate(self.args)}
 
-		# Read the validation for the value
-		validation = self._makeValueValidation(symbols=symbols, entity=entity)
+		# Read the validation for the value. it comes in part from the direct underlying type, contract information
+		# directly associated with this expression do not apply to the current validation.
+		validation = self._makeValueValidation(symbols=symbols, contracts=entity.contracts)
 		if validation is not None:
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
 
-	def _makeValueValidation(self, symbols: typing.Any, entity: Entity) -> typing.Optional[Validation]:
+	def _makeValueValidation(self, symbols: typing.Any, contracts: Contracts) -> typing.Optional[Validation]:
 		"""
 		Generate the validation for the value by combining the type validation
 		and the contract validation.
@@ -99,7 +98,7 @@ class Expression(Entity):
 
 		# The validation comes from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validationValue = entity.contracts.validationForValue
+		validationValue = contracts.validationForValue
 
 		# Get the configuration value if any.
 		if self.underlying is not None:
