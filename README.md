@@ -50,8 +50,8 @@ This is a non-exhaustive list of languages and their supported tools. In additio
 formater and linters for YAML, json and markdown are also available.
 |Language|Formatters|Code Analyzers|Code Coverage|Test Framework|Documentation|
 |--|--|--|--|--|--|
-|C++|clang-format|asan, lsan|Yes|Yes|doxygen-based|
-|Python|yapf|mypy||Yes||
+|C++|clang-format|asan, lsan|Broken|Yes|doxygen-based|
+|Python|yapf|mypy|Yes|Yes||
 |Node|prettier|eslint|Yes|Yes||
 |Skylark|buildifier|buildifier|||stardoc|
 
