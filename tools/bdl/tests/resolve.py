@@ -54,20 +54,15 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		# Mandatory in that case is not applied to this value.
-		Object.fromContent(content="""
-			using NewType = Integer;
-			struct temp { var = NewType [mandatory]; }
-			""",
-			objectContext=ObjectContext(resolve=True))
-
 	def testValues(self) -> None:
 
-		Object.fromContent(content="""
-				interface Test { config: value = Integer; }
-				composition MyComposition { val1 = Test; }
-				""",
-			objectContext=ObjectContext(resolve=True))
+		# Implicitly mandatory because there is no default value specified
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(content="""
+					interface Test { config: value = Integer; }
+					composition MyComposition { val1 = Test; }
+					""",
+				objectContext=ObjectContext(resolve=True))
 
 		Object.fromContent(content="""
 				interface Test { config: value = Integer; }
@@ -80,13 +75,6 @@ class TestRun(unittest.TestCase):
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
-				objectContext=ObjectContext(resolve=True))
-
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="""
-				interface Test { config: value = Integer [mandatory]; }
-				composition MyComposition { val1 = Test; }
-				""",
 				objectContext=ObjectContext(resolve=True))
 
 		# Mispelled value key
@@ -107,16 +95,10 @@ class TestRun(unittest.TestCase):
 
 	def testTemplates(self) -> None:
 
-		# Non mandatory template
-		Object.fromContent(content="""
-			interface Test { config: value = Integer [template]; }
-			composition MyComposition { val1 = Test; }
-			""",
-			objectContext=ObjectContext(resolve=True))
-
+		# Implicitly mandatory template, because there is no default value.
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer [template mandatory]; }
+				interface Test { config: value = Integer [template]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True))
@@ -150,7 +132,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: a = Integer [template min(10) max(32)]; b = Integer [template mandatory]; }
+				interface Test { config: a = Integer [template min(10) max(32)]; b = Integer [template]; }
 				composition MyComposition { val1 = Test<23>; }
 				""",
 				objectContext=ObjectContext(resolve=True))

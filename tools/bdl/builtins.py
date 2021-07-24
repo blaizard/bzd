@@ -3,9 +3,11 @@ from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.builder import ElementBuilder
 
 BuiltinVoid = Builtin(ElementBuilder("builtin").addAttr("name", "Void"))
-BuiltinInteger = Builtin(ElementBuilder("builtin").addAttr("name", "Integer").addContract("integer"))
-BuiltinFloat = Builtin(ElementBuilder("builtin").addAttr("name", "Float").addContract("float"))
-BuiltinBoolean = Builtin(ElementBuilder("builtin").addAttr("name", "Boolean").addContract("boolean"))
+BuiltinInteger = Builtin(
+	ElementBuilder("builtin").addAttr("name", "Integer").addAttr("value", "0").addContract("integer"))
+BuiltinFloat = Builtin(ElementBuilder("builtin").addAttr("name", "Float").addAttr("value", "0").addContract("float"))
+BuiltinBoolean = Builtin(
+	ElementBuilder("builtin").addAttr("name", "Boolean").addAttr("value", "false").addContract("boolean"))
 BuiltinResult = Builtin(
 	ElementBuilder("builtin").addAttr("name", "Result").addConfig(kind="Any",
 	contract="template mandatory").addConfig(kind="Any", contract="template mandatory"))

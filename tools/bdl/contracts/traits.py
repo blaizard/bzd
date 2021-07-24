@@ -8,6 +8,7 @@ class Role:
 	Value: int = 1
 	Template: int = 2
 	Meta: int = 4
+	Public: int = 8
 
 
 class ContractTraits:
@@ -34,6 +35,10 @@ class ContractTraits:
 	@property
 	def isRoleMeta(self) -> bool:
 		return bool(self.role & Role.Meta)
+
+	@property
+	def isRolePublic(self) -> bool:
+		return bool(self.role & Role.Public)
 
 	def validate(self, contract: Contract) -> None:
 		"""
