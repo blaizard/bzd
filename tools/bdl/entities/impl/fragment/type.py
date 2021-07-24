@@ -53,7 +53,7 @@ class Type:
 		underlying = symbols.getEntityAssert(fqn=fqn, element=self.element)
 
 		# Validate template arguments
-		validation = underlying.validationTemplate
+		validation = underlying.makeValidationForTemplate(symbols=symbols)
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),
