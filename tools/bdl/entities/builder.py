@@ -2,6 +2,7 @@ import typing
 
 from bzd.parser.element import ElementBuilder as Element, SequenceBuilder as Sequence
 from bzd.validation.validation import Validation
+from tools.bdl.contracts.contract import Contract
 
 
 class ElementBuilder(Element):
@@ -15,12 +16,8 @@ class ElementBuilder(Element):
 		Add a contract to the element.
 		"""
 		parsed = Validation.parse(contract)
-		for name, args in parsed.items():
-			element = Element().addAttr("type", name)
-			for arg in args:
-				value = Element().addAttr("value", arg)
-				element.pushBackElementToNestedSequence(kind="values", element=value)
-			self.pushBackElementToNestedSequence(kind="contract", element=element)
+		for kind, values in parsed.items():
+			Contract.add(element=self, kind=kind, values=values)
 		return self
 
 	def addConfig(

@@ -1,6 +1,6 @@
 import typing
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
 
@@ -10,6 +10,19 @@ class Contract:
 
 		Error.assertHasAttr(element=element, attr="type")
 		self.element = element
+
+	@staticmethod
+	def add(element: Element, kind: str, values: typing.Optional[typing.List[str]] = None) -> None:
+		"""
+		Add a contract to the element.
+		"""
+		contractElement = ElementBuilder().addAttr("type", kind)
+		if values is not None:
+			for value in values:
+				valueElement = ElementBuilder().addAttr("value", value)
+				contractElement.pushBackElementToNestedSequence(kind="values", element=valueElement)
+		ElementBuilder.cast(element, ElementBuilder).pushBackElementToNestedSequence(kind="contract",
+			element=contractElement)
 
 	@property
 	def type(self) -> str:

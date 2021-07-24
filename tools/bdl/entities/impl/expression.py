@@ -5,6 +5,7 @@ from bzd.parser.element import Element
 from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 
+from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import Entity, Role
@@ -79,6 +80,9 @@ class Expression(Entity):
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
+		# Add mandatory contract if the expression does not have default value.
+		if not self.isArg:
+			Contract.add(element=self.element, kind="mandatory")
 
 		# Generate the argument list
 		arguments = {(str(i) if arg.key is None else arg.key): arg.value for i, arg in enumerate(self.args)}

@@ -108,6 +108,19 @@ class Entity:
 					self.error(message=str(e))
 		return None
 
+	def getDefaultsForTemplate(self, symbols: typing.Any) -> typing.List[typing.Optional[str]]:
+		"""
+		Get the default values for the template.
+		"""
+		# TODO: implement this function
+		#if self.underlying:
+		#	underlying = symbols.getEntity(self.underlying)
+		#	return [
+		#		config.isValue for config in underlying.config
+		#		if config.contracts.get("template")
+		#	]
+		return []
+
 	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.

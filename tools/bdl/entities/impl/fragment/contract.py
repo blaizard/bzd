@@ -57,7 +57,7 @@ class Contracts:
 		"""
 
 		for contract in self:
-			contractTraits = AllContracts.all.get(contract.type)
+			contractTraits = AllContracts.allPublic.get(contract.type)
 			if contractTraits is None:
 				Error.handleFromElement(element=self.element,
 					message="Contract of type '{}' is not supported.".format(contract.type))
@@ -84,12 +84,12 @@ class Contracts:
 					Error.handleFromElement(element=self.element, message=str(e))
 				# Remove the existing contract if resolved into a new contract
 				if contract is not None:
-					self.removeContracts(contract.type)
+					self.remove(contract.type)
 
 			if contract is not None:
 				elementBuilder.pushFrontElementToNestedSequence(self.sequenceKind, contract.element)
 
-	def removeContracts(self, kind: str) -> None:
+	def remove(self, kind: str) -> None:
 		"""
 		Remove contracts of a specified type.
 		"""
