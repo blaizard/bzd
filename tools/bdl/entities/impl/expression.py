@@ -31,6 +31,18 @@ class Argument(Entity):
 
 
 class Expression(Entity):
+	"""
+	An expression can be:
+		- a variable declaration.
+		- a variable definition.
+		- a method call.
+	- Attributes:
+		- type: The method name or variable type to be used.
+		- [name]: The resulting symbol name.
+		- [const]: If the expression is constant.
+	- Sequence:
+		- argument: The list of arguments to pass to the instanciation or method call.
+	"""
 
 	def __init__(self, element: Element) -> None:
 

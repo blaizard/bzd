@@ -84,7 +84,8 @@ class SymbolMap:
 			if fqn in self.builtins:
 				continue
 
-			entity.assertTrue(condition=fqn in self.map, message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
+			entity.assertTrue(condition=fqn in self.map,
+				message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
 			element = entity.element
 
 			# Remove nested element and change them to references.

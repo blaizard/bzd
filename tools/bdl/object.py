@@ -159,8 +159,7 @@ class Object:
 		"""
 		Serialize the current object.
 		"""
-		
-		print(self.symbols)
+
 		return json.dumps(
 			{
 			"context": self.context.serialize(),
