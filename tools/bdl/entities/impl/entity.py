@@ -102,7 +102,10 @@ class Entity:
 				if config.contracts.get("template")
 			]
 			if schema:
-				return Validation(schema=["" if e is None else e for e in schema])
+				try:
+					return Validation(schema=["" if e is None else e for e in schema])
+				except Exception as e:
+					self.error(message=str(e))
 		return None
 
 	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
@@ -119,7 +122,10 @@ class Entity:
 					schema[config.name if config.isName else str(index)] = config.contracts.validationForValue
 					index += 1
 			if schema:
-				return Validation(schema=schema)
+				try:
+					return Validation(schema=schema)
+				except Exception as e:
+					self.error(message=str(e))
 		return None
 
 	def resolve(self,
