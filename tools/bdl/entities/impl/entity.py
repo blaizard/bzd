@@ -90,14 +90,36 @@ class Entity:
 	def contracts(self) -> Contracts:
 		return Contracts(element=self.element)
 
-	@cached_property
-	def validationTemplate(self) -> typing.Optional[Validation]:
-		schema = [
-			config.contracts.validationForTemplate for config in self._getNestedByCategory("config")
-			if config.contracts.get("template")
-		]
-		if schema:
-			return Validation(schema=["" if e is None else e for e in schema])
+	def makeValidationForTemplate(self, symbols: typing.Any) -> typing.Optional[Validation]:
+		"""
+		Generate the validation object for template parameters.
+		"""
+
+		if self.underlying:
+			underlying = symbols.getEntity(self.underlying)
+			schema = [
+				config.contracts.validationForTemplate for config in underlying.config
+				if config.contracts.get("template")
+			]
+			if schema:
+				return Validation(schema=["" if e is None else e for e in schema])
+		return None
+
+	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
+		"""
+		Generate the validation object for value parameters.
+		"""
+
+		if self.underlying:
+			underlying = symbols.getEntity(self.underlying)
+			index = 0
+			schema = {}
+			for config in underlying.config:
+				if not config.contracts.get("template"):
+					schema[config.name if config.isName else str(index)] = config.contracts.validationForValue
+					index += 1
+			if schema:
+				return Validation(schema=schema)
 		return None
 
 	def resolve(self,

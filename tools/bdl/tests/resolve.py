@@ -28,16 +28,15 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		# To be updated, this should fail.
-		#with self.assertRaisesRegex(Exception, r"expects.*integer"):
-		Object.fromContent(content="""
-			interface Test { config: value = Integer; }
-			using MyType = Test [integer];
-			struct temp {
-				var = MyType(1);
-			}
-			""",
-			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"associated.*configuration"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				using MyType = Test [integer];
+				struct temp {
+					var = MyType(1);
+				}
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 	def testMandatory(self) -> None:
 
@@ -61,6 +60,50 @@ class TestRun(unittest.TestCase):
 			struct temp { var = NewType [mandatory]; }
 			""",
 			objectContext=ObjectContext(resolve=True))
+
+	def testValues(self) -> None:
+
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test; }
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test(value=12); }
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"not.*expected"):
+			Object.fromContent(content="""
+					interface Test { config: value = Integer; }
+					composition MyComposition { val1 = Test(12); }
+					""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer [mandatory]; }
+				composition MyComposition { val1 = Test; }
+				""",
+				objectContext=ObjectContext(resolve=True))
+
+		# Mispelled value key
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test(vaue=1); }
+				""",
+				objectContext=ObjectContext(resolve=True))
+
+		# Multiple arguments
+		with self.assertRaisesRegex(Exception, r"integer"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test(value="dsdsd"); }
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 	def testTemplates(self) -> None:
 

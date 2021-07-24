@@ -86,35 +86,38 @@ class Expression(Entity):
 		arguments = {(str(i) if arg.key is None else arg.key): arg.value for i, arg in enumerate(self.args)}
 
 		# Read the validation for the value
-		validation = self._makeValueValidation(entity=entity)
+		validation = self._makeValueValidation(symbols=symbols, entity=entity)
 		if validation is not None:
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
 
-	def _makeValueValidation(self, entity: Entity) -> typing.Optional[Validation]:
+	def _makeValueValidation(self, symbols: typing.Any, entity: Entity) -> typing.Optional[Validation]:
 		"""
 		Generate the validation for the value by combining the type validation
 		and the contract validation.
 		"""
 
-		# The validation comes from the underlying type, all contract information for this expression
-		# do not apply to the current validation.
+		# The validation comes from the direct underlying type, contract information
+		# directly associated with this expression do not apply to the current validation.
 		validationValue = entity.contracts.validationForValue
+
+		# Get the configuration value if any.
+		if self.underlying is not None:
+			underlying = symbols.getEntity(self.underlying)
+			if underlying.isConfig:
+				self.assertTrue(condition=not validationValue,
+					message="Value-specific contracts cannot be associated with a configuration.")
+				return self.makeValidationForValue(symbols=symbols)
+
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.
 		if validationValue:
-			self.assertTrue(condition=not entity.isConfig,
-				message="Value-specific contracts cannot be associated with a configuration.")
 			try:
 				return Validation({"0": validationValue})
 			except Exception as e:
 				self.error(message=str(e))
 
-		# TODO fix this
-		# Hack, need to resolve also this information
-		#if entity.element.isNestedSequence("config"):
-		#	return None
-
+		# Validation is empty
 		return Validation({})
 
 	@cached_property
