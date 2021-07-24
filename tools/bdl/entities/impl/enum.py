@@ -33,6 +33,13 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 
 
 class Enum(Entity):
+	"""
+	Enumerates available values for a type.
+	- Attributes:
+		- name: The name of the enum.
+	- Sequence:
+		- values: The different values.
+	"""
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)

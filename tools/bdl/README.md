@@ -45,14 +45,13 @@ The build step hhas for responsibility to gather dependencies and resolve symbol
 
 The symbol map object is created during the symbol resolution process. There is a ont to one relationship with a .bdl file and a symbol map.
 It consists of the following:
+
 - symbols: a symbols to element map. Elements in the symbol map contains all the information discovered after resolution.
 - parsed: the raw parsed elements output of the file.
 
 With the symbol map, one link symbols with their actual definition.
 
 ##### In-Memory Representation
-
-
 
 #### Bdl Object
 

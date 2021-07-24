@@ -50,7 +50,7 @@ if __name__ == "__main__":
 		cwd=args.workspace)
 
 	m = re.search(r"(\d+)\s+of\s+(\d+)\s+lines", result.getStdout())
-	assert m, "Something went wrong in the report generation: {}".format(result.output())
+	assert m, "Something went wrong in the report generation: {}".format(result.getOutput())
 	data["lines"] = int(m.group(2))
 	data["coverage"] = float(int(m.group(1)) / int(m.group(2)))
 
@@ -58,6 +58,5 @@ if __name__ == "__main__":
 	(args.workspace / args.output / "report.json").write_text(json.dumps(data))
 
 	print("Includes: {} files, {} lines".format(data["files"], data["lines"]))
-	print("Coverage: {coverage:.2%}".  # type: ignore
-		format(coverage=data["coverage"]))
+	print("Coverage: {coverage:.2%}".format(coverage=data["coverage"]))
 	print("Report: {}".format(data["path"]))
