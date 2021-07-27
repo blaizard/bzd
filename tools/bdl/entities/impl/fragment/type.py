@@ -30,6 +30,7 @@ class Type:
 
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude)
 		Error.assertTrue(element=self.element,
+			attr=self.kindAttr,
 			condition=(fqn is not None),
 			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
@@ -42,10 +43,12 @@ class Type:
 				underlyingSubType = subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 				# Only keep the kind, as nested template arguments will be deducted by recursion.
 				templates.append(subType.kind)
+				# Need to check that the type matches
 			elif isinstance(subType, Value):
 				templates.append(subType.value)
 			else:
 				Error.handleFromElement(element=self.element,
+					attr=self.kindAttr,
 					message="Unexpected type '{}' for template parameter.".format(type(subType)))
 
 		# Get and save the underlying type
@@ -57,10 +60,11 @@ class Type:
 		if validation is None:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(templates)),
+				attr=self.kindAttr,
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
 			result = validation.validate(templates, output="return")
-			Error.assertTrue(element=self.element, condition=result, message=str(result))
+			Error.assertTrue(element=self.element, attr=self.kindAttr, condition=result, message=str(result))
 
 		return underlying
 

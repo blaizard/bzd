@@ -8,6 +8,9 @@ from bzd.validation.validation import Validation
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
 
+if typing.TYPE_CHECKING:
+	from bdl.entities.impl.expression import Expression
+
 
 class Role:
 	Undefined: int = 0
@@ -32,8 +35,8 @@ class Entity:
 			return [elementToEntity(element) for element in sequence]
 		return []
 
-	def _setUnderlying(self, underlying: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).addAttr("underlying", underlying)
+	def _setUnderlying(self, fqn: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).addAttr("underlying", fqn)
 
 	@property
 	def underlying(self) -> typing.Optional[str]:
@@ -90,27 +93,69 @@ class Entity:
 	def contracts(self) -> Contracts:
 		return Contracts(element=self.element)
 
+	def getConfigTemplates(self, symbols: typing.Any) -> typing.List["Expression"]:
+		"""
+		Get the list of expressions that forms the template.
+		"""
+
+		if self.underlying:
+			underlying = symbols.getEntity(self.underlying)
+			return [config for config in underlying.config if config.contracts.get("template")]
+		return []
+
+	def getConfigValues(self, symbols: typing.Any) -> typing.List["Expression"]:
+		"""
+		Get the list of expressions that forms the values.
+		"""
+
+		if self.underlying:
+			underlying = symbols.getEntity(self.underlying)
+			return [config for config in underlying.config if not config.contracts.get("template")]
+		return []
+
 	def makeValidationForTemplate(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for template parameters.
 		"""
 
-		if self.underlying:
-			underlying = symbols.getEntity(self.underlying)
-			schema = [
-				config.contracts.validationForTemplate for config in underlying.config
-				if config.contracts.get("template")
-			]
-			if schema:
-				try:
-					return Validation(schema=["" if e is None else e for e in schema])
-				except Exception as e:
-					self.error(message=str(e))
+		schema = self.getConfigTemplates(symbols=symbols)
+		if schema:
+			try:
+				return Validation(schema=[
+					"" if e.contracts.validationForTemplate is None else e.contracts.validationForTemplate
+					for e in schema
+				])
+			except Exception as e:
+				self.error(message=str(e))
 		return None
 
 	def getDefaultsForTemplate(self, symbols: typing.Any) -> typing.List[typing.Optional[str]]:
 		"""
 		Get the default values for the template.
+		"""
+		"""
+		Use case 1
+
+		# Direct
+		new = myType<1>;
+
+		# Full substitution (pod)
+		value = Integer(1);
+		new = myType<value>;
+
+		# 
+		value1 = Integer(1)
+		value2 = value1;
+		new = myType<value2>;
+
+		# Partial
+		interface myType
+		{
+		config:
+			a = Integer [template];
+			b = Integer(1000) [template];
+		}
+		new =  myType<a>
 		"""
 		# TODO: implement this function
 		#if self.underlying:
@@ -126,19 +171,14 @@ class Entity:
 		Generate the validation object for value parameters.
 		"""
 
-		if self.underlying:
-			underlying = symbols.getEntity(self.underlying)
-			index = 0
-			schema = {}
-			for config in underlying.config:
-				if not config.contracts.get("template"):
-					schema[config.name if config.isName else str(index)] = config.contracts.validationForValue
-					index += 1
-			if schema:
-				try:
-					return Validation(schema=schema)
-				except Exception as e:
-					self.error(message=str(e))
+		schema = {}
+		for index, expression in enumerate(self.getConfigValues(symbols=symbols)):
+			schema[expression.name if expression.isName else str(index)] = expression.contracts.validationForValue
+		if schema:
+			try:
+				return Validation(schema=schema)
+			except Exception as e:
+				self.error(message=str(e))
 		return None
 
 	def resolve(self,
