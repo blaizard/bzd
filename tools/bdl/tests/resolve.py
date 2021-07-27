@@ -93,6 +93,19 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+		with self.assertRaisesRegex(Exception, r"Expression.*resolved"):
+			Object.fromContent(content="""
+				interface Test { config: value = Callable; }
+				composition MyComposition { val2 = Test(value=val1); }
+				""",
+				objectContext=ObjectContext(resolve=True))
+
+		Object.fromContent(content="""
+			interface Test { config: value = Callable; }
+			composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
+			""",
+			objectContext=ObjectContext(resolve=True))
+
 	def testTemplates(self) -> None:
 
 		# Implicitly mandatory template, because there is no default value.
@@ -136,6 +149,21 @@ class TestRun(unittest.TestCase):
 				composition MyComposition { val1 = Test<23>; }
 				""",
 				objectContext=ObjectContext(resolve=True))
+
+		#Object.fromContent(content="""
+		#	interface Test { config: value = Integer [min(10) max(32)]; }
+		#	composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
+		#	""",
+		#	objectContext=ObjectContext(resolve=True))
+
+	def testDefaultValues(self) -> None:
+
+		# Should fail
+		Object.fromContent(content="""
+			interface Test { config: value = Integer(1) [template min(10) max(32)]; }
+			composition MyComposition { val1 = Test; }
+			""",
+			objectContext=ObjectContext(resolve=True))
 
 
 if __name__ == '__main__':

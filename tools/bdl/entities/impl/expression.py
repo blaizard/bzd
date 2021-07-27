@@ -16,15 +16,29 @@ class Argument(Entity):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Value)
-		Error.assertHasAttr(element=element, attr="value")
+		Error.assertTrue(element=element,
+			condition=element.isAttr("value") or element.isAttr("symbol"),
+			message="Argument is missing value or symbol.")
 
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
 	@property
+	def isValue(self) -> bool:
+		return self.element.isAttr("value")
+
+	@property
+	def isSymbol(self) -> bool:
+		return self.element.isAttr("symbol")
+
+	@property
 	def value(self) -> str:
 		return self.element.getAttr("value").value
+
+	@property
+	def symbol(self) -> str:
+		return self.element.getAttr("symbol").value
 
 	@property
 	def key(self) -> typing.Optional[str]:
@@ -80,19 +94,37 @@ class Expression(Entity):
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
+
 		# Add mandatory contract if the expression does not have default value.
 		if not self.isArg:
 			Contract.add(element=self.element, kind="mandatory")
 
 		# Generate the argument list
-		arguments = {(str(i) if arg.key is None else arg.key): arg.value for i, arg in enumerate(self.args)}
+		arguments = {}
+		for i, arg in enumerate(self.args):
+			key = str(i) if arg.key is None else arg.key
+			if arg.isValue:
+				arguments[key] = arg.value
+			elif arg.isSymbol:
+				# TODO: need to handle symbols, should be resolved into their value if it is a simple type,
+				# otherwise to they symbol name.
+				fqn = symbols.resolveFQN(name=arg.symbol, namespace=namespace, exclude=exclude)
+				Error.assertTrue(element=self.element,
+					condition=(fqn is not None),
+					message="Expression '{}' in namespace '{}' could not be resolved.".format(
+					arg.symbol, ".".join(namespace)))
+				arguments[key] = fqn
+			else:
+				assert False, "Unhandled argument type."
+
+		print("arguments", arguments)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, contracts=entity.contracts)
 		if validation is not None:
 			result = validation.validate(arguments, output="return")
-			Error.assertTrue(element=self.element, condition=bool(result), message=str(result))
+			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 	def _makeValueValidation(self, symbols: typing.Any, contracts: Contracts) -> typing.Optional[Validation]:
 		"""
