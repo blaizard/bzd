@@ -8,6 +8,7 @@ from bzd.validation.validation import Validation
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
+from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.entity import Entity, Role
 
 
@@ -17,7 +18,7 @@ class Argument(Entity):
 
 		super().__init__(element, Role.Value)
 		Error.assertTrue(element=element,
-			condition=element.isAttr("value") or element.isAttr("symbol"),
+			condition=element.isAttr("value") or element.isAttr("type"),
 			message="Argument is missing value or symbol.")
 
 	@property
@@ -30,7 +31,7 @@ class Argument(Entity):
 
 	@property
 	def isSymbol(self) -> bool:
-		return self.element.isAttr("symbol")
+		return self.element.isAttr("type")
 
 	@property
 	def value(self) -> str:
@@ -38,7 +39,7 @@ class Argument(Entity):
 
 	@property
 	def symbol(self) -> str:
-		return self.element.getAttr("symbol").value
+		return self.element.getAttr("type").value
 
 	@property
 	def key(self) -> typing.Optional[str]:
@@ -100,23 +101,10 @@ class Expression(Entity):
 			Contract.add(element=self.element, kind="mandatory")
 
 		# Generate the argument list
-		arguments = {}
-		for i, arg in enumerate(self.args):
-			key = str(i) if arg.key is None else arg.key
-			if arg.isValue:
-				arguments[key] = arg.value
-			elif arg.isSymbol:
-				# TODO: need to handle symbols, should be resolved into their value if it is a simple type,
-				# otherwise to they symbol name.
-				fqn = symbols.resolveFQN(name=arg.symbol, namespace=namespace, exclude=exclude)
-				Error.assertTrue(element=self.element,
-					condition=(fqn is not None),
-					message="Expression '{}' in namespace '{}' could not be resolved.".format(
-					arg.symbol, ".".join(namespace)))
-				arguments[key] = fqn
-			else:
-				assert False, "Unhandled argument type."
+		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		arguments = self.args.values
 
+		#print(self.element)
 		print("arguments", arguments)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
@@ -156,13 +144,12 @@ class Expression(Entity):
 		return Validation({})
 
 	@cached_property
-	def args(self) -> typing.List[Argument]:
-		arguments = self.element.getNestedSequence("argument")
-		return [] if arguments is None else [Argument(arg) for arg in arguments]
+	def args(self) -> Parameters:
+		return Parameters(element=self.element, nestedKind="argument")
 
 	@property
 	def isArg(self) -> bool:
-		return len(self.args) > 0
+		return bool(self.args)
 
 	@property
 	def comment(self) -> typing.Optional[str]:

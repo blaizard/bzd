@@ -244,7 +244,7 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"name": "key",
-			"symbol": "my.symbol"
+			"type": "my.symbol"
 			}
 			}]
 		}])
