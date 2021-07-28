@@ -48,14 +48,15 @@ class Parameters:
     Describes the whole parameter list, a collection of parameter.
     """
 
-	def __init__(self, element: Element, nestedKind: str) -> None:
+	def __init__(self, element: Element, nestedKind: typing.Optional[str]) -> None:
 		self.element = element
 
 		# Build the parameter list
 		self.list = []
-		sequence = self.element.getNestedSequence(nestedKind)
-		if sequence:
-			self.list = [Parameter(elementParameter) for elementParameter in sequence]
+		if nestedKind:
+			sequence = self.element.getNestedSequence(nestedKind)
+			if sequence:
+				self.list = [Parameter(elementParameter) for elementParameter in sequence]
 
 	def __iter__(self) -> typing.Iterator[Parameter]:
 		for parameter in self.list:
@@ -96,7 +97,7 @@ class Parameters:
 				# TODO: resolve underlying value
 
 	@cached_property
-	def values(self) -> typing.Dict[str, str]:
+	def valuesAsDict(self) -> typing.Dict[str, str]:
 		"""
         Get the values as a dictionary.
         """
@@ -108,5 +109,21 @@ class Parameters:
 			else:
 				assert parameter.isType
 				values[name] = parameter.type.kind
+
+		return values
+
+	@cached_property
+	def valuesAsList(self) -> typing.List[str]:
+		"""
+        Get the values as a list.
+        """
+		values = []
+		for parameter in self:
+			if parameter.isValue:
+				values.append(parameter.value)
+
+			else:
+				assert parameter.isType
+				values.append(parameter.type.kind)
 
 		return values

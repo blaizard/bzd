@@ -8,7 +8,9 @@ from bzd.parser.error import Error
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.value import Value
 if typing.TYPE_CHECKING:
-	from bdl.entities.all import EntityType
+	from tools.bdl.entities.all import EntityType
+	from tools.bdl.entities.impl.fragment.parameters import Parameters
+	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
 
 class Type:
@@ -21,7 +23,7 @@ class Type:
 		self.templateAttr = template
 
 	def resolve(self,
-		symbols: typing.Any,
+		symbols: "SymbolMap",
 		namespace: typing.List[str],
 		exclude: typing.Optional[typing.List[str]] = None) -> "EntityType":
 		"""
@@ -33,23 +35,12 @@ class Type:
 			attr=self.kindAttr,
 			condition=(fqn is not None),
 			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
+		assert fqn is not None
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
-		# Loop through the nested templates.
-		templates = []
-		for subType in self.templates:
-			if isinstance(subType, Type):
-				# Recursively resolve nested types.
-				underlyingSubType = subType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-				# Only keep the kind, as nested template arguments will be deducted by recursion.
-				templates.append(subType.kind)
-				# Need to check that the type matches
-			elif isinstance(subType, Value):
-				templates.append(subType.value)
-			else:
-				Error.handleFromElement(element=self.element,
-					attr=self.kindAttr,
-					message="Unexpected type '{}' for template parameter.".format(type(subType)))
+		# Resolve the templates if available
+		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		templates = self.templates.valuesAsList
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
@@ -64,7 +55,7 @@ class Type:
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
 			result = validation.validate(templates, output="return")
-			Error.assertTrue(element=self.element, attr=self.kindAttr, condition=result, message=str(result))
+			Error.assertTrue(element=self.element, attr=self.kindAttr, condition=bool(result), message=str(result))
 
 		return underlying
 
@@ -74,21 +65,12 @@ class Type:
 
 	@property
 	def isTemplate(self) -> bool:
-		return len(self.templates) > 0
+		return bool(self.templates)
 
 	@cached_property
-	def templates(self) -> typing.List[typing.Union["Type", Value]]:
-		if self.templateAttr:
-			nested = self.element.getNestedSequence(self.templateAttr)
-			if nested:
-				templates: typing.List[typing.Union["Type", Value]] = []
-				for element in nested:
-					# Note the "kind" here is always type for sub-elements.
-					templates.append(
-						Type(element=element, kind="type", template=self.templateAttr) if element.
-						isAttr("type") else Value(element=element, kind="value"))
-				return templates
-		return []
+	def templates(self) -> "Parameters":
+		from tools.bdl.entities.impl.fragment.parameters import Parameters
+		return Parameters(element=self.element, nestedKind=self.templateAttr)
 
 	@property
 	def kind(self) -> str:
