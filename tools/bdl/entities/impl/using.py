@@ -48,7 +48,8 @@ class Using(Entity):
 		self.contracts.mergeBase(entity.contracts)
 
 		# Set the underlying
-		self._setUnderlying(entity.underlying)
+		if entity.underlying is not None:
+			self._setUnderlying(entity.underlying)
 
 		print("using", self.name, self.contracts)
 

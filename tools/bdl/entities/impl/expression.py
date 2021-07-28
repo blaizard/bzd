@@ -91,7 +91,8 @@ class Expression(Entity):
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 		# Generate this symbol FQN
-		self._setUnderlying(entity.underlying)
+		if entity.underlying is not None:
+			self._setUnderlying(entity.underlying)
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
@@ -102,9 +103,8 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		arguments = self.args.values
+		arguments = self.args.valuesAsDict
 
-		#print(self.element)
 		print("arguments", arguments)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
