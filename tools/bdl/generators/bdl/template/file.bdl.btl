@@ -8,7 +8,7 @@
 {{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }}{{ declareContract(data.contracts) }};{% end -%}
 
 {%- macro declareMethod(data) %}
-{{ data.comment | normalComment }}method {{ data.name }}({% for i, var in data.args %}{{ var.name }} = {% if var.const %}const {% end %}{{ var.type | typeToStr }}{% for i, arg in var.args %}({%if i %}, {% end %}{{ arg.value }}){% end %}{% if i %},{% end %}{% end %}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
+{{ data.comment | normalComment }}method {{ data.name }}({% for i, var in data.args %}{{ var.name }} = {% if var.const %}const {% end %}{{ var.type | typeToStr }}{% for i, arg in var.args %}({%if i %}, {% end %}{{ arg.raw }}){% end %}{% if i %},{% end %}{% end %}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
 
 {%- macro declareEnum(data) %}
 {{ data.comment | normalComment }}enum {{ data.name }}

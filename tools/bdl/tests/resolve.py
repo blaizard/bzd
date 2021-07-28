@@ -93,7 +93,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"Expression.*resolved"):
+		with self.assertRaisesRegex(Exception, r"Symbol.*resolved"):
 			Object.fromContent(content="""
 				interface Test { config: value = Callable; }
 				composition MyComposition { val2 = Test(value=val1); }
