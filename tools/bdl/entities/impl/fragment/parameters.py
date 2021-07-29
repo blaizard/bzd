@@ -53,17 +53,10 @@ class Parameters:
         Resolve all parameters.
         """
 
-		for name, parameter in self.iterate():
-			if parameter.isValue:
-				pass
+		for parameter in self:
+			parameter.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-			else:
-				assert parameter.isType
-				parameter.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-				# TODO: resolve underlying value
-
-	@cached_property
-	def valuesAsDict(self) -> typing.Dict[str, str]:
+	def getValuesAsDict(self, symbols: "SymbolMap") -> typing.Dict[str, str]:
 		"""
         Get the values as a dictionary.
         """
@@ -73,8 +66,11 @@ class Parameters:
 				values[name] = parameter.value
 
 			else:
-				assert parameter.isType
+				if parameter.underlyingValue is not None:
+					entity = symbols.getEntityAssert(fqn=parameter.underlyingValue, element=parameter.element)
+					print(entity.element)
 				values[name] = parameter.type.kind
+				print("UPDTAE", parameter.underlyingValue)
 
 		return values
 

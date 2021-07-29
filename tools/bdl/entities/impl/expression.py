@@ -1,7 +1,7 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 
@@ -24,6 +24,7 @@ class Expression(Entity):
 		- [value]: The value this expression represents.
 		- [name]: The resulting symbol name.
 		- [const]: If the expression is constant.
+		- [underlyingValue]: The actual value discovered after resolution.
 	- Sequence:
 		- argument: The list of arguments to pass to the instanciation or method call.
 	"""
@@ -65,6 +66,17 @@ class Expression(Entity):
 	def raw(self) -> str:
 		return self.value if self.isValue else self.type.kind
 
+	@property
+	def literal(self) -> typing.Optional[str]:
+		"""
+		A literal type is type that can be described as a string.
+		"""
+		if self.isValue:
+			return self.value
+		if len(self.args) == 1 and self.args[0].isValue:
+			return self.args[0].value
+		return super().literal
+
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],
@@ -72,11 +84,24 @@ class Expression(Entity):
 		"""
 		Resolve entities.
 		"""
+		if self.isValue:
+			return
+
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-		# Generate this symbol FQN
-		if entity.underlying is not None:
-			self._setUnderlying(entity.underlying)
+		# Set the underlying value
+		if self.isArg:
+			# Generate this symbol FQN
+			# TODO: need to handle when the expression has no name
+			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+			self._setUnderlyingValue(fqn=fqn)
+
+		elif entity.underlyingValue is not None:
+			self._setUnderlyingValue(fqn=entity.underlyingValue)
+
+		# Set the underlying type
+		if entity.underlyingType is not None:
+			self._setUnderlyingType(fqn=entity.underlyingType)
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
@@ -87,9 +112,10 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		arguments = self.args.valuesAsDict
+		arguments = self.args.getValuesAsDict(symbols=symbols)
 
 		print("arguments", arguments)
+		print(self.underlyingValue)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
@@ -109,9 +135,9 @@ class Expression(Entity):
 		validationValue = contracts.validationForValue
 
 		# Get the configuration value if any.
-		if self.underlying is not None:
-			underlying = symbols.getEntity(self.underlying)
-			if underlying.isConfig:
+		if self.underlyingType is not None:
+			underlyingType = symbols.getEntity(self.underlyingType)
+			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="Value-specific contracts cannot be associated with a configuration.")
 				return self.makeValidationForValue(symbols=symbols)

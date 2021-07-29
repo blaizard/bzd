@@ -21,7 +21,6 @@ class Role:
 	# Represents a meta expression, something used only during the build phase.
 	Meta: int = 4
 
-
 class Entity:
 
 	def __init__(self, element: Element, role: int) -> None:
@@ -35,15 +34,35 @@ class Entity:
 			return [elementToEntity(element) for element in sequence]
 		return []
 
-	def _setUnderlying(self, fqn: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).addAttr("underlying", fqn)
+	def _setUnderlyingType(self, fqn: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).addAttr("fqn_type", fqn)
 
 	@property
-	def underlying(self) -> typing.Optional[str]:
+	def underlyingType(self) -> typing.Optional[str]:
 		"""
 		Get the underlying element FQN if available.
 		"""
-		return self.element.getAttrValue("underlying")
+		return self.element.getAttrValue("fqn_type")
+
+	def _setUnderlyingValue(self, fqn: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).addAttr("fqn_value", fqn)
+
+	@property
+	def underlyingValue(self) -> typing.Optional[str]:
+		"""
+		Get the underlying element FQN that contains the value.
+		"""
+		return self.element.getAttrValue("fqn_value")
+
+	def _setLiteral(self, literal: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).addAttr("literal", literal)
+
+	@property
+	def literal(self) -> typing.Optional[str]:
+		"""
+		Get the underlying literal value if any.
+		"""
+		return self.element.getAttrValue("literal")
 
 	@property
 	def isNested(self) -> bool:
@@ -98,9 +117,9 @@ class Entity:
 		Get the list of expressions that forms the template.
 		"""
 
-		if self.underlying:
-			underlying = symbols.getEntity(self.underlying)
-			return [config for config in underlying.config if config.contracts.get("template")]
+		if self.underlyingType:
+			underlyingType = symbols.getEntity(self.underlyingType)
+			return [config for config in underlyingType.config if config.contracts.get("template")]
 		return []
 
 	def getConfigValues(self, symbols: typing.Any) -> typing.List["Expression"]:
@@ -108,9 +127,9 @@ class Entity:
 		Get the list of expressions that forms the values.
 		"""
 
-		if self.underlying:
-			underlying = symbols.getEntity(self.underlying)
-			return [config for config in underlying.config if not config.contracts.get("template")]
+		if self.underlyingType:
+			underlyingType = symbols.getEntity(self.underlyingType)
+			return [config for config in underlyingType.config if not config.contracts.get("template")]
 		return []
 
 	def makeValidationForTemplate(self, symbols: typing.Any) -> typing.Optional[Validation]:
@@ -158,10 +177,10 @@ class Entity:
 		new =  myType<a>
 		"""
 		# TODO: implement this function
-		#if self.underlying:
-		#	underlying = symbols.getEntity(self.underlying)
+		#if self.underlyingType:
+		#	underlyingType = symbols.getEntity(self.underlyingType)
 		#	return [
-		#		config.isValue for config in underlying.config
+		#		config.isValue for config in underlyingType.config
 		#		if config.contracts.get("template")
 		#	]
 		return []

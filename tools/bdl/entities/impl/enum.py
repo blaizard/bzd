@@ -63,7 +63,7 @@ class Enum(Entity):
 		"""
 		# Generate this symbol FQN
 		fqn = symbols.makeFQN(name=self.name, namespace=namespace)
-		self._setUnderlying(fqn)
+		self._setUnderlyingType(fqn)
 
 	@cached_property
 	def values(self) -> typing.Iterable[EnumValue]:

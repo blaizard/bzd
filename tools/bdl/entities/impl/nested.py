@@ -74,7 +74,7 @@ class Nested(Entity):
 		# Generate this symbol FQN
 		if self.isName:
 			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
-			self._setUnderlying(fqn)
+			self._setUnderlyingType(fqn)
 
 		for inheritance in self.inheritanceList:
 			inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)

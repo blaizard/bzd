@@ -20,7 +20,7 @@ class Builtin(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
-	def underlying(self) -> str:
+	def underlyingType(self) -> str:
 		return self.name
 
 	@property
