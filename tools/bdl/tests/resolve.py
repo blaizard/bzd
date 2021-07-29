@@ -100,11 +100,11 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		Object.fromContent(content="""
-			interface Test { config: value = Callable; }
-			composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
-			""",
-			objectContext=ObjectContext(resolve=True))
+		#Object.fromContent(content="""g
+		#	interface Test { config: value = Callable; }
+		#	composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
+		#	""",
+		#	objectContext=ObjectContext(resolve=True))
 
 	def testTemplates(self) -> None:
 
@@ -150,11 +150,15 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+		# Should fail
+		print("*****************HEERRRRR")
 		#Object.fromContent(content="""
 		#	interface Test { config: value = Integer [min(10) max(32)]; }
 		#	composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
 		#	""",
 		#	objectContext=ObjectContext(resolve=True))
+
+		#self.assertTrue(False)
 
 	def testDefaultValues(self) -> None:
 

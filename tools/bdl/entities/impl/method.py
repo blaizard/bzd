@@ -59,7 +59,7 @@ class Method(Entity):
 		"""
 		# Generate this symbol FQN
 		fqn = symbols.makeFQN(name=self.name, namespace=namespace)
-		self._setUnderlying(fqn)
+		self._setUnderlyingType(fqn)
 
 		maybeType = self.type
 		if maybeType is not None:
