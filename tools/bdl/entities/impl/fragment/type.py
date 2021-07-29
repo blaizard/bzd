@@ -6,10 +6,10 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.fragment.value import Value
+from tools.bdl.entities.impl.fragment.parameters import Parameters
+
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.entities.impl.fragment.parameters import Parameters
 	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
 
@@ -69,7 +69,6 @@ class Type:
 
 	@cached_property
 	def templates(self) -> "Parameters":
-		from tools.bdl.entities.impl.fragment.parameters import Parameters
 		return Parameters(element=self.element, nestedKind=self.templateAttr)
 
 	@property
