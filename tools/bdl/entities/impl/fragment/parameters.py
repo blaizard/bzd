@@ -3,49 +3,14 @@ from functools import cached_property
 
 from bzd.parser.element import Element
 
-from tools.bdl.entities.impl.fragment.type import Type
-
-
-class Parameter:
-	"""
-    Describes a single parameter.
-    """
-
-	def __init__(self, element: Element) -> None:
-		self.element = element
-
-	@property
-	def isName(self) -> bool:
-		return self.element.isAttr("name")
-
-	@property
-	def name(self) -> str:
-		return self.element.getAttr("name").value
-
-	@property
-	def isType(self) -> bool:
-		return self.element.isAttr("type")
-
-	@property
-	def type(self) -> Type:
-		return Type(element=self.element, kind="type", template="template")
-
-	@property
-	def isValue(self) -> bool:
-		return self.element.isAttr("value")
-
-	@property
-	def value(self) -> str:
-		return self.element.getAttr("value").value
-
-	@property
-	def raw(self) -> str:
-		return self.value if self.isValue else self.type.kind
+if typing.TYPE_CHECKING:
+	from tools.bdl.entities.impl.expression import Expression
+	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
 
 class Parameters:
 	"""
-    Describes the whole parameter list, a collection of parameter.
+    Describes the parameter list, a collection of expression.
     """
 
 	def __init__(self, element: Element, nestedKind: typing.Optional[str]) -> None:
@@ -56,13 +21,14 @@ class Parameters:
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
-				self.list = [Parameter(elementParameter) for elementParameter in sequence]
+				from tools.bdl.entities.impl.expression import Expression
+				self.list = [Expression(elementParameter) for elementParameter in sequence]
 
-	def __iter__(self) -> typing.Iterator[Parameter]:
+	def __iter__(self) -> typing.Iterator["Expression"]:
 		for parameter in self.list:
 			yield parameter
 
-	def __getitem__(self, index: int) -> Parameter:
+	def __getitem__(self, index: int) -> "Expression":
 		return self.list[index]
 
 	def __len__(self) -> int:
@@ -74,13 +40,13 @@ class Parameters:
 	def empty(self) -> bool:
 		return not bool(self.list)
 
-	def iterate(self) -> typing.Iterator[typing.Tuple[str, Parameter]]:
+	def iterate(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
 		for index, parameter in enumerate(self.list):
 			name = parameter.name if parameter.isName else str(index)
 			yield name, parameter
 
 	def resolve(self,
-		symbols: typing.Any,
+		symbols: "SymbolMap",
 		namespace: typing.List[str],
 		exclude: typing.Optional[typing.List[str]] = None) -> None:
 		"""
