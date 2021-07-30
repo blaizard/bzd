@@ -21,6 +21,7 @@ class Role:
 	# Represents a meta expression, something used only during the build phase.
 	Meta: int = 4
 
+
 class Entity:
 
 	def __init__(self, element: Element, role: int) -> None:
