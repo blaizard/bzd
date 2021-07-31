@@ -40,7 +40,7 @@ class Type:
 
 		# Resolve the templates if available
 		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		templates = self.templates.valuesAsList
+		templates = self.templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.

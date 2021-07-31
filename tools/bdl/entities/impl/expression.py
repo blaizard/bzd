@@ -94,10 +94,10 @@ class Expression(Entity):
 			# Generate this symbol FQN
 			# TODO: need to handle when the expression has no name
 			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
-			self._setUnderlyingValue(fqn=fqn)
+			self._setUnderlyingValue(entity=self, fqn=fqn)
 
 		elif entity.underlyingValue is not None:
-			self._setUnderlyingValue(fqn=entity.underlyingValue)
+			self._setUnderlyingValue(entity=entity)
 
 		# Set the underlying type
 		if entity.underlyingType is not None:
@@ -112,10 +112,7 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		arguments = self.args.getValuesAsDict(symbols=symbols)
-
-		print("arguments", arguments)
-		print(self.underlyingValue)
+		arguments = self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.

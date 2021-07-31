@@ -6,6 +6,10 @@ from bzd.parser.element import Element
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+	from tools.bdl.entities.impl.fragment.type import Type
+	from tools.bdl.entities.impl.entity import Entity
+
+ResolvedType = typing.Union[str, "Entity", "Type"]
 
 
 class Parameters:
@@ -56,36 +60,35 @@ class Parameters:
 		for parameter in self:
 			parameter.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-	def getValuesAsDict(self, symbols: "SymbolMap") -> typing.Dict[str, str]:
+	def getValuesOrTypesAsDict(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> typing.Dict[
+		str, ResolvedType]:
 		"""
         Get the values as a dictionary.
         """
+		valuesAsList = self.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
 		values = {}
-		for name, parameter in self.iterate():
-			if parameter.isValue:
-				values[name] = parameter.value
-
-			else:
-				if parameter.underlyingValue is not None:
-					entity = symbols.getEntityAssert(fqn=parameter.underlyingValue, element=parameter.element)
-					print(entity.element)
-				values[name] = parameter.type.kind
-				print("UPDTAE", parameter.underlyingValue)
+		index = 0
+		for name, entity in self.iterate():
+			values[name] = valuesAsList[index]
+			index += 1
 
 		return values
 
-	@cached_property
-	def valuesAsList(self) -> typing.List[str]:
+	def getValuesOrTypesAsList(self, symbols: "SymbolMap",
+		exclude: typing.Optional[typing.List[str]]) -> typing.List[ResolvedType]:
 		"""
         Get the values as a list.
         """
-		values = []
-		for parameter in self:
-			if parameter.isValue:
-				values.append(parameter.value)
+		values: typing.List[ResolvedType] = []
+		for entity in self:
+			if entity.literal is not None:
+				values.append(entity.literal)
+
+			elif entity.underlyingValue is not None:
+				value = symbols.getEntityAssert(fqn=entity.underlyingValue, element=entity.element)
+				values.append(value)
 
 			else:
-				assert parameter.isType
-				values.append(parameter.type.kind)
+				values.append(entity.type)
 
 		return values

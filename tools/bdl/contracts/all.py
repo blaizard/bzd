@@ -11,6 +11,7 @@ from tools.bdl.contracts.float import ContractFloat
 from tools.bdl.contracts.string import ContractString
 from tools.bdl.contracts.boolean import ContractBoolean
 from tools.bdl.contracts.mandatory import ContractMandatory
+from tools.bdl.contracts.type import ContractType
 
 _Contracts = [
 	ContractInteger(),
@@ -20,7 +21,8 @@ _Contracts = [
 	ContractMin(),
 	ContractMax(),
 	ContractTemplate(),
-	ContractMandatory()
+	ContractMandatory(),
+	ContractType()
 ]
 
 
