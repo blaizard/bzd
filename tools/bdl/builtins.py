@@ -10,7 +10,7 @@ BuiltinBoolean = Builtin(
 	ElementBuilder("builtin").addAttr("name", "Boolean").addAttr("value", "false").addContract("boolean"))
 BuiltinResult = Builtin(
 	ElementBuilder("builtin").addAttr("name", "Result").addConfig(kind="Any",
-	contract="template mandatory").addConfig(kind="Any", contract="template mandatory"))
+	contract="template mandatory type").addConfig(kind="Any", contract="template mandatory type"))
 BuiltinList = Builtin(
 	ElementBuilder("builtin").addAttr("name", "List").addConfig(kind="Any", contract="template mandatory"))
 BuiltinCallable = Builtin(ElementBuilder("builtin").addAttr("name", "Callable"))

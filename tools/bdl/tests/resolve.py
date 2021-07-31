@@ -150,24 +150,25 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		# Should fail
-		print("*****************HEERRRRR")
-		#Object.fromContent(content="""
-		#	interface Test { config: value = Integer [min(10) max(32)]; }
-		#	composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
-		#	""",
-		#	objectContext=ObjectContext(resolve=True))
-
-		#self.assertTrue(False)
+		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer [min(10) max(32)]; }
+				composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 	def testDefaultValues(self) -> None:
 
 		# Should fail
+		# TODO: implement default values
+		#print("**************************************")
 		Object.fromContent(content="""
-			interface Test { config: value = Integer(1) [template min(10) max(32)]; }
+			interface Test { config: value = Integer(1) [min(10) max(32)]; }
 			composition MyComposition { val1 = Test; }
 			""",
 			objectContext=ObjectContext(resolve=True))
+
+		#self.assertTrue(False)
 
 
 if __name__ == '__main__':

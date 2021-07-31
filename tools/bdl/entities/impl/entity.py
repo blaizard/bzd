@@ -4,8 +4,8 @@ from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
-from bzd.validation.validation import Validation
 
+from tools.bdl.contracts.validation import Validation
 from tools.bdl.entities.impl.fragment.contract import Contracts
 
 if typing.TYPE_CHECKING:
@@ -45,8 +45,14 @@ class Entity:
 		"""
 		return self.element.getAttrValue("fqn_type")
 
-	def _setUnderlyingValue(self, fqn: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).addAttr("fqn_value", fqn)
+	def _setUnderlyingValue(self, entity: "Entity", fqn: typing.Optional[str] = None) -> None:
+		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
+		if fqn is not None:
+			elementBuilder.addAttr("fqn_value", fqn)
+		elif entity.underlyingValue is not None:
+			elementBuilder.addAttr("fqn_value", entity.underlyingValue)
+		if entity.literal is not None:
+			elementBuilder.addAttr("literal", entity.literal)
 
 	@property
 	def underlyingValue(self) -> typing.Optional[str]:
@@ -54,9 +60,6 @@ class Entity:
 		Get the underlying element FQN that contains the value.
 		"""
 		return self.element.getAttrValue("fqn_value")
-
-	def _setLiteral(self, literal: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).addAttr("literal", literal)
 
 	@property
 	def literal(self) -> typing.Optional[str]:
@@ -141,6 +144,7 @@ class Entity:
 		schema = self.getConfigTemplates(symbols=symbols)
 		if schema:
 			try:
+				print([e.contracts.validationForTemplate for e in schema])
 				return Validation(schema=[
 					"" if e.contracts.validationForTemplate is None else e.contracts.validationForTemplate
 					for e in schema
