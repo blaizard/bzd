@@ -29,17 +29,25 @@ class TestRun(unittest.TestCase):
 
 	def testMinMax(self) -> None:
 		template = Validation({"test": "integer min(2) max(10)"})
-		self.assertDictEqual(template.validate({"test": "3"}).values, {"test": 3})
+		self.assertDictEqual(template.validate({"test": "3"}).valuesAsDict, {"test": 3})
 		with self.assertRaisesRegex(ExceptionValidation, r"lower than"):
 			template.validate({"test": "1"})
 		with self.assertRaisesRegex(ExceptionValidation, r"higher than"):
 			template.validate({"test": "11"})
-		self.assertDictEqual(template.validate({"test": "10"}).values, {"test": 10})
-		self.assertDictEqual(template.validate({"test": "2"}).values, {"test": 2})
+		self.assertDictEqual(template.validate({"test": "10"}).valuesAsDict, {"test": 10})
+		self.assertDictEqual(template.validate({"test": "2"}).valuesAsDict, {"test": 2})
+
+	def testMinMaxWrongArgs(self) -> None:
+		with self.assertRaisesRegex(ExceptionValidation, r"missing mandatory"):
+			Validation({"test": "integer min"})
+		with self.assertRaisesRegex(ExceptionValidation, r"expects.*float"):
+			Validation({"test": "integer min(str)"})
+		with self.assertRaisesRegex(ExceptionValidation, r"value not expected"):
+			Validation({"test": "integer min(1,2)"})
 
 	def testMinMaxLength(self) -> None:
 		template = Validation({"test": "string min(2) max(10)"})
-		self.assertDictEqual(template.validate({"test": "hello"}).values, {"test": "hello"})
+		self.assertDictEqual(template.validate({"test": "hello"}).valuesAsDict, {"test": "hello"})
 		with self.assertRaisesRegex(ExceptionValidation, r"shorter than"):
 			template.validate({"test": "h"})
 		with self.assertRaisesRegex(ExceptionValidation, r"longer than"):

@@ -1,24 +1,13 @@
 import typing
 
 from bzd.validation.validation import Validation as ValidationBase
-from bzd.validation.schema import Args, Constraint, ProcessedSchema, TypeContext, Result
+from bzd.validation.schema import Constraint
 
-
-# TODO: to incorporate within type.py
-class TypeConstraint(Constraint):
-
-	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
-		processedSchema.setType(self)
-
-	def check(self, context: TypeContext) -> Result:
-		if "fragment.type.Type" in str(type(context.value)):
-			return None
-		return "'{}' is not a type.".format(context.value)
+from tools.bdl.contracts.all import _Contracts
 
 
 class Validation(ValidationBase):
-
 	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
-		"type": TypeConstraint,
-		**ValidationBase.AVAILABLE_CONSTRAINTS
+		contract.name: contract.constraint
+		for contract in _Contracts if contract.constraint
 	}

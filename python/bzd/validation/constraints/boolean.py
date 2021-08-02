@@ -1,11 +1,13 @@
 import typing
 
 from bzd.validation.schema import Args, Result, TypeContext, Constraint, ProcessedSchema
+import bzd.validation.validation
 
 
 class Boolean(Constraint):
 
 	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
+		bzd.validation.validation.Validation(schema=[]).validate(args)
 		processedSchema.setType(self)
 
 	def check(self, context: TypeContext) -> Result:

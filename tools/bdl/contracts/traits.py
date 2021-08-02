@@ -1,6 +1,8 @@
 import typing
 
 from bzd.validation.validation import Validation, SchemaList
+from bzd.validation.schema import Constraint
+
 from tools.bdl.contracts.contract import Contract
 
 
@@ -16,12 +18,18 @@ class ContractTraits:
     Base class to define a contract.
     """
 
-	def __init__(self, name: str, role: int, validationSchema: SchemaList) -> None:
+	def __init__(self,
+		name: str,
+		role: int,
+		validationSchema: SchemaList,
+		constraint: typing.Optional[typing.Type[Constraint]] = None) -> None:
 		# Name of the contract
 		self.name = name
 		# Defines contract role
 		self.role = role
-		# Validation object for the ccontract inputs
+		# Underlying constraint if any
+		self.constraint = constraint
+		# Validation object for the contract inputs
 		self.validation = Validation(validationSchema)
 
 	@property
@@ -42,7 +50,9 @@ class ContractTraits:
 
 	def validate(self, contract: Contract) -> None:
 		"""
-        Validate the inputs of a contract.
+        Validate the inputs of a contract. For example, validates that min(1) contains a single argument "1"
+		and that it is a number.
+		TODO: remove this check from here, it should be checked within the validation constraint.
         """
 		self.validation.validate(contract.values)
 
