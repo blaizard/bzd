@@ -21,7 +21,6 @@ class ContractTraits:
 	def __init__(self,
 		name: str,
 		role: int,
-		validationSchema: SchemaList,
 		constraint: typing.Optional[typing.Type[Constraint]] = None) -> None:
 		# Name of the contract
 		self.name = name
@@ -29,8 +28,6 @@ class ContractTraits:
 		self.role = role
 		# Underlying constraint if any
 		self.constraint = constraint
-		# Validation object for the contract inputs
-		self.validation = Validation(validationSchema)
 
 	@property
 	def isRoleValue(self) -> bool:
@@ -47,14 +44,6 @@ class ContractTraits:
 	@property
 	def isRolePublic(self) -> bool:
 		return bool(self.role & Role.Public)
-
-	def validate(self, contract: Contract) -> None:
-		"""
-        Validate the inputs of a contract. For example, validates that min(1) contains a single argument "1"
-		and that it is a number.
-		TODO: remove this check from here, it should be checked within the validation constraint.
-        """
-		self.validation.validate(contract.values)
 
 	def resolveConflict(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
 		"""

@@ -10,5 +10,4 @@ class ContractFloat(ContractTraits):
 	def __init__(self) -> None:
 		super().__init__(name="float",
 			role=Role.Value | Role.Template | Role.Public,
-			constraint=Float,
-			validationSchema=[])
+			constraint=Float)
