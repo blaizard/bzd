@@ -18,10 +18,12 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"'hello'.*not supported"):
 			Object.fromContent(content="method hello(a = Integer() [hello]);")
 		with self.assertRaisesRegex(Exception, r"missing mandatory"):
-			Object.fromContent(content="using MyType = Integer [min];")
-		Object.fromContent(content="using MyType = Integer [min(2)];")
-		with self.assertRaisesRegex(Exception, r"not expected"):
-			Object.fromContent(content="using MyType = Integer [min(2, 32)];")
+			Object.fromContent(content="using MyType = Integer [min]; struct A { temp = MyType; }",
+			objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="using MyType = Integer [min(2)]; struct A { temp = MyType; }")
+		with self.assertRaisesRegex(Exception, r"missing mandatory"):
+			Object.fromContent(content="using MyType = Integer [min(2,3)]; struct A { temp = MyType; }",
+			objectContext=ObjectContext(resolve=True))
 
 		# template only in config context
 		with self.assertRaisesRegex(Exception, r"template.*config"):

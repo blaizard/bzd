@@ -1,9 +1,9 @@
 import typing
 
 from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
-from bzd.validation.validation import Validation
 from bzd.parser.error import Error
 
+from tools.bdl.contracts.validation import Validation
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.contracts.all import AllContracts
 
@@ -53,7 +53,6 @@ class Contracts:
 		"""
 		Validate the contracts. it checks the follow:
 			- Valid contract types.
-			- Arguments are correct.
 		"""
 
 		for contract in self:
@@ -61,10 +60,6 @@ class Contracts:
 			if contractTraits is None:
 				Error.handleFromElement(element=self.element,
 					message="Contract of type '{}' is not supported.".format(contract.type))
-			try:
-				contractTraits.validate(contract)
-			except Exception as e:
-				Error.handleFromElement(element=self.element, message=str(e))
 
 	def mergeBase(self, contracts: "Contracts") -> None:
 		"""
