@@ -37,9 +37,8 @@ class TypeContext(Context):
 
 class Constraint:
 
-	def __init__(self, name: str, args: typing.List[str]) -> None:
+	def __init__(self, name: str) -> None:
 		self.name = name
-		self.args = args
 
 	def install(self, processedSchema: "ProcessedSchema", args: Args) -> None:
 		"""
@@ -124,15 +123,15 @@ class ProcessedSchema:
 		"""
 
 		# Check if the constraint is a type specialization.
-		if self.type is not None:
-			if hasattr(self.type, name):
-				getattr(self.type, name)(self, args)
-				return
+		if self.type is not None and hasattr(self.type, name):
+			constraintInstaller = getattr(self.type, name)
+		else:
+			assert name in constraints, "Constraint of type '{}' is undefined.".format(name)
+			constraint = constraints[name](name=name)
+			constraintInstaller = constraint.install
 
-		assert name in constraints, "Constraint of type '{}' is undefined.".format(name)
-
-		constraint = constraints[name](name=name, args=args)
-		constraint.install(self, args)
+		# Install
+		argumentValidatorSchema = constraintInstaller(self, args)
 
 	def installValidation(self, validation: ValidationCallable, args: typing.Any) -> None:
 		"""

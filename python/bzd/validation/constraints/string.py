@@ -1,11 +1,13 @@
 import typing
 
 from bzd.validation.schema import Args, Result, TypeContext, Context, Constraint, ProcessedSchema
+import bzd.validation.validation
 
 
 class String(Constraint):
 
 	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
+		bzd.validation.validation.Validation(schema=[]).validate(args)
 		processedSchema.setType(self)
 
 	def check(self, context: TypeContext) -> Result:
@@ -18,8 +20,8 @@ class String(Constraint):
 				return "the string '{}' is shorter than its required minimum size: {}".format(context.value, arg)
 			return None
 
-		assert len(args) == 1, "Requires a single argument."
-		processedSchema.installValidation(_process, int(args[0]))
+		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory integer"]).validate(args).valuesAsList
+		processedSchema.installValidation(_process, updatedArgs[0])
 
 	def max(self, processedSchema: ProcessedSchema, args: Args) -> None:
 
@@ -28,5 +30,5 @@ class String(Constraint):
 				return "the string '{}' is longer than its required maximum size: {}".format(context.value, arg)
 			return None
 
-		assert len(args) == 1, "Requires a single argument."
-		processedSchema.installValidation(_process, int(args[0]))
+		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory integer"]).validate(args).valuesAsList
+		processedSchema.installValidation(_process, updatedArgs[0])

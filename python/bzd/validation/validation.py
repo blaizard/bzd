@@ -28,7 +28,7 @@ class Result:
 		self.isList = isList
 		self.globalErrors: typing.List[str] = []
 		self.errors: typing.Dict[str, typing.List[str]] = {}
-		self.values: typing.Dict[str, typing.Any] = {}
+		self.values_: Values = [] if self.isList else {}
 
 	def addGlobalError(self, error: str) -> None:
 		self.globalErrors.append(error)
@@ -39,15 +39,33 @@ class Result:
 
 	def addResult(self, key: str, result: ProcessedResult) -> None:
 		if result:
-			assert key not in self.values, "Value already set."
-			self.values[key] = result.value
+			if self.isList:
+				self.values_.append(result.value)  # type: ignore
+			else:
+				assert key not in self.values_, "Value already set."
+				self.values_[key] = result.value  # type: ignore
 		else:
 			self.addError(key, result.errors)
+
+	@property
+	def valuesAsList(self) -> ValuesList:
+		assert bool(self), "Invalid result."
+		assert self.isList, "Values do not contain a list."
+		return self.values_  # type: ignore
+
+	@property
+	def valuesAsDict(self) -> ValuesDict:
+		assert bool(self), "Invalid result."
+		assert not self.isList, "Values do not contain a dictionary."
+		return self.values_  # type: ignore
 
 	def __bool__(self) -> bool:
 		return not bool(self.errors) and not bool(self.globalErrors)
 
 	def __repr__(self) -> str:
+
+		if bool(self):
+			return str(self.values_)
 
 		if self.isList:
 			FORMAT_NOT_VALIDATE_SINGLE = "position {key} does not validate: {message}"
@@ -80,15 +98,11 @@ class Validation:
 		"mandatory": Mandatory
 	}
 
+	memoizedProcessedSchema_: typing.Dict[str, ProcessedSchema] = {}
+
 	def __init__(self, schema: Schema) -> None:
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
-		self._prepocessSchema(self._inputToInternal(schema))
-
-	def mergeSchema(self, schema: Schema) -> None:
-		"""
-		Merge a schema with the existing validation.
-		"""
 		self._prepocessSchema(self._inputToInternal(schema))
 
 	def _inputToInternal(self, schema: Values) -> ValuesDict:
@@ -125,14 +139,20 @@ class Validation:
 
 		for key, constraints in schema.items():
 
-			if key not in self.processed:
+			if constraints in Validation.memoizedProcessedSchema_:
+				self.processed[key] = Validation.memoizedProcessedSchema_[constraints]
+
+			else:
 				self.processed[key] = ProcessedSchema()
 
-			# Parse each constraints strings
-			parsed = Validation.parse(constraints)
-			# Install the constraint
-			for name, args in parsed.items():
-				self.processed[key].install(constraints=self.AVAILABLE_CONSTRAINTS, name=name, args=args)
+				# Parse each constraints strings
+				parsed = Validation.parse(constraints)
+				# Install the constraint
+				for name, args in parsed.items():
+					self.processed[key].install(constraints=self.AVAILABLE_CONSTRAINTS, name=name, args=args)
+
+				# Save the processed schema
+				Validation.memoizedProcessedSchema_[constraints] = self.processed[key]
 
 	def __len__(self) -> int:
 		"""
