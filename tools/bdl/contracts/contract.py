@@ -68,5 +68,5 @@ class Contract:
 
 	def __repr__(self) -> str:
 		if self.isValue:
-			return "{}({})".format(self.type, ", ".join(self.values))
+			return "{}({})".format(self.type, ",".join(self.values))
 		return self.type

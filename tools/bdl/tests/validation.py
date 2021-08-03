@@ -19,11 +19,11 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="method hello(a = Integer() [hello]);")
 		with self.assertRaisesRegex(Exception, r"missing mandatory"):
 			Object.fromContent(content="using MyType = Integer [min]; struct A { temp = MyType; }",
-			objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="using MyType = Integer [min(2)]; struct A { temp = MyType; }")
-		with self.assertRaisesRegex(Exception, r"missing mandatory"):
+		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="using MyType = Integer [min(2,3)]; struct A { temp = MyType; }",
-			objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True))
 
 		# template only in config context
 		with self.assertRaisesRegex(Exception, r"template.*config"):
