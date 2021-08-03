@@ -35,10 +35,6 @@ class Expression(Entity):
 		self.assertTrue(condition=(self.isValue or self.isType), message="Expression must represent a type or a value.")
 
 	@property
-	def isName(self) -> bool:
-		return self.element.isAttr("name")
-
-	@property
 	def category(self) -> str:
 		return "expression"
 
@@ -89,6 +85,10 @@ class Expression(Entity):
 
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
+		# Set the underlying type
+		if entity.underlyingType is not None:
+			self._setUnderlyingType(fqn=entity.underlyingType)
+
 		# Set the underlying value
 		if self.isArg:
 			# Generate this symbol FQN
@@ -96,12 +96,8 @@ class Expression(Entity):
 			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
 			self._setUnderlyingValue(entity=self, fqn=fqn)
 
-		elif entity.underlyingValue is not None:
+		else:
 			self._setUnderlyingValue(entity=entity)
-
-		# Set the underlying type
-		if entity.underlyingType is not None:
-			self._setUnderlyingType(fqn=entity.underlyingType)
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
@@ -112,10 +108,12 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		arguments = self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+		arguments = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
+		arguments.update(self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude))
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
+		# TODO: check if it actually make sense to use entity.contracts instead of self.contracts
 		validation = self._makeValueValidation(symbols=symbols, contracts=entity.contracts)
 		if validation is not None:
 			result = validation.validate(arguments, output="return")

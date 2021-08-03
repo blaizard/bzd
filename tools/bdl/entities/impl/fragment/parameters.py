@@ -2,6 +2,7 @@ import typing
 from functools import cached_property
 
 from bzd.parser.element import Element
+from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -26,7 +27,8 @@ class Parameters:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
 				from tools.bdl.entities.impl.expression import Expression
-				self.list = [Expression(elementParameter) for elementParameter in sequence]
+				for e in sequence:
+					self.list.append(Expression(e))
 
 	def __iter__(self) -> typing.Iterator["Expression"]:
 		for parameter in self.list:
@@ -44,10 +46,21 @@ class Parameters:
 	def empty(self) -> bool:
 		return not bool(self.list)
 
-	def iterate(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
-		for index, parameter in enumerate(self.list):
-			name = parameter.name if parameter.isName else str(index)
-			yield name, parameter
+	def iterate(
+		self, filterFct: typing.Optional[typing.Callable[["Entity"],
+		bool]]) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
+		isNamed: typing.Optional[bool] = None
+		for index, entity in enumerate(self.list):
+			if filterFct is not None and not filterFct(entity):
+				continue
+			if isNamed is not None:
+				Error.assertTrue(element=self.element,
+					condition=isNamed == entity.isName,
+					message="Cannot mix named and unmaed parameters.")
+			else:
+				isNamed = entity.isName
+			name = entity.name if entity.isName else str(index)
+			yield name, entity
 
 	def resolve(self,
 		symbols: "SymbolMap",
@@ -60,35 +73,50 @@ class Parameters:
 		for parameter in self:
 			parameter.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-	def getValuesOrTypesAsDict(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> typing.Dict[
-		str, ResolvedType]:
+	def iterateValuesOrTypes(
+		self,
+		symbols: "SymbolMap",
+		exclude: typing.Optional[typing.List[str]],
+		filterFct: typing.Optional[typing.Callable[["Entity"], bool]] = None
+	) -> typing.List[typing.Tuple[str, ResolvedType]]:
 		"""
-        Get the values as a dictionary.
+        Iterate through the list and return values or types.
         """
-		valuesAsList = self.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
-		values = {}
-		index = 0
-		for name, entity in self.iterate():
-			values[name] = valuesAsList[index]
-			index += 1
 
-		return values
+		values: typing.List[typing.Tuple[str, ResolvedType]] = []
 
-	def getValuesOrTypesAsList(self, symbols: "SymbolMap",
-		exclude: typing.Optional[typing.List[str]]) -> typing.List[ResolvedType]:
-		"""
-        Get the values as a list.
-        """
-		values: typing.List[ResolvedType] = []
-		for entity in self:
+		for key, entity in self.iterate(filterFct=filterFct):
+
 			if entity.literal is not None:
-				values.append(entity.literal)
+				values.append((key, entity.literal))
 
 			elif entity.underlyingValue is not None:
 				value = symbols.getEntityAssert(fqn=entity.underlyingValue, element=entity.element)
-				values.append(value)
+				values.append((key, value))
 
 			else:
-				values.append(entity.type)
+				values.append((key, entity.type))
 
 		return values
+
+	def getValuesOrTypesAsDict(
+			self,
+			symbols: "SymbolMap",
+			exclude: typing.Optional[typing.List[str]],
+			filterFct: typing.Optional[typing.Callable[["Entity"], bool]] = None) -> typing.Dict[str, ResolvedType]:
+		"""
+        Get the values as a dictionary.
+        """
+		values = self.iterateValuesOrTypes(symbols=symbols, exclude=exclude, filterFct=filterFct)
+		return {entry[0]: entry[1] for entry in values}
+
+	def getValuesOrTypesAsList(
+			self,
+			symbols: "SymbolMap",
+			exclude: typing.Optional[typing.List[str]],
+			filterFct: typing.Optional[typing.Callable[["Entity"], bool]] = None) -> typing.List[ResolvedType]:
+		"""
+        Get the values as a list.
+        """
+		values = self.iterateValuesOrTypes(symbols=symbols, exclude=exclude, filterFct=filterFct)
+		return [entry[1] for entry in values]
