@@ -164,7 +164,6 @@ class Validation:
 		"""
 		Validates the values passed into argument.
 		"""
-
 		results = Result(self.isList)
 
 		if self.isList and not isinstance(values, list):
