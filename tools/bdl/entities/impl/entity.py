@@ -7,6 +7,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.contracts.validation import Validation
 from tools.bdl.entities.impl.fragment.contract import Contracts
+from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 
 if typing.TYPE_CHECKING:
 	from bdl.entities.impl.expression import Expression
@@ -140,11 +141,9 @@ class Entity:
 		"""
 		Generate the validation object for template parameters.
 		"""
-
 		schema = self.getConfigTemplates(symbols=symbols)
 		if schema:
 			try:
-				print([e.contracts.validationForTemplate for e in schema])
 				return Validation(schema=[
 					"" if e.contracts.validationForTemplate is None else e.contracts.validationForTemplate
 					for e in schema
@@ -153,48 +152,10 @@ class Entity:
 				self.error(message=str(e))
 		return None
 
-	def getDefaultsForTemplate(self, symbols: typing.Any) -> typing.List[typing.Optional[str]]:
-		"""
-		Get the default values for the template.
-		"""
-		"""
-		Use case 1
-
-		# Direct
-		new = myType<1>;
-
-		# Full substitution (pod)
-		value = Integer(1);
-		new = myType<value>;
-
-		# 
-		value1 = Integer(1)
-		value2 = value1;
-		new = myType<value2>;
-
-		# Partial
-		interface myType
-		{
-		config:
-			a = Integer [template];
-			b = Integer(1000) [template];
-		}
-		new =  myType<a>
-		"""
-		# TODO: implement this function
-		#if self.underlyingType:
-		#	underlyingType = symbols.getEntity(self.underlyingType)
-		#	return [
-		#		config.isValue for config in underlyingType.config
-		#		if config.contracts.get("template")
-		#	]
-		return []
-
 	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.
 		"""
-
 		schema = {}
 		for index, expression in enumerate(self.getConfigValues(symbols=symbols)):
 			schema[expression.name if expression.isName else str(index)] = expression.contracts.validationForValue
@@ -204,6 +165,19 @@ class Entity:
 			except Exception as e:
 				self.error(message=str(e))
 		return None
+
+	def getDefaultsForValues(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> typing.Dict[str,
+		ResolvedType]:
+		"""
+		Get the default values for the values.
+		"""
+		if self.underlyingType:
+			underlyingType = symbols.getEntityAssert(fqn=self.underlyingType, element=self.element)
+			parameters = Parameters(element=underlyingType.element, nestedKind="config")
+			return parameters.getValuesOrTypesAsDict(symbols=symbols,
+				exclude=exclude,
+				filterFct=lambda entity: not entity.contracts.get("template"))
+		return {}
 
 	def resolve(self,
 		symbols: typing.Any,

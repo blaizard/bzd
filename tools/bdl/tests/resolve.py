@@ -56,14 +56,6 @@ class TestRun(unittest.TestCase):
 
 	def testValues(self) -> None:
 
-		# Implicitly mandatory because there is no default value specified
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="""
-					interface Test { config: value = Integer; }
-					composition MyComposition { val1 = Test; }
-					""",
-				objectContext=ObjectContext(resolve=True))
-
 		Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=12); }
@@ -159,16 +151,18 @@ class TestRun(unittest.TestCase):
 
 	def testDefaultValues(self) -> None:
 
-		# Should fail
-		# TODO: implement default values
-		#print("**************************************")
 		Object.fromContent(content="""
-			interface Test { config: value = Integer(1) [min(10) max(32)]; }
+			interface Test { config: value = Integer; }
 			composition MyComposition { val1 = Test; }
 			""",
 			objectContext=ObjectContext(resolve=True))
 
-		#self.assertTrue(False)
+		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer(1) [min(10) max(32)]; }
+				composition MyComposition { val1 = Test; }
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 
 if __name__ == '__main__':
