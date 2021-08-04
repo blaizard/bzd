@@ -108,8 +108,11 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		arguments = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
-		arguments.update(self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude))
+		#arguments = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
+		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
+		self.args.mergeDefaults(defaults)
+		#arguments.update(self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude))
+		arguments = self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.

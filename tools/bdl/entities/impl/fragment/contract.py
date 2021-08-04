@@ -26,6 +26,12 @@ class Contracts:
 				return contract
 		return None
 
+	def has(self, kind: str) -> bool:
+		for contract in self:
+			if contract.type == kind:
+				return True
+		return False
+
 	@property
 	def validationForValue(self) -> typing.Optional[str]:
 		"""

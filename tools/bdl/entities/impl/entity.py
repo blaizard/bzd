@@ -152,6 +152,17 @@ class Entity:
 				self.error(message=str(e))
 		return None
 
+	def getDefaultsForTemplate(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
+		"""
+		Get the default values for the template.
+		"""
+		if self.underlyingType:
+			underlyingType = symbols.getEntityAssert(fqn=self.underlyingType, element=self.element)
+			return Parameters(element=underlyingType.element,
+				nestedKind="config",
+				filterFct=lambda entity: entity.contracts.has("template"))
+		return Parameters(element=self.element)
+
 	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.
@@ -166,18 +177,16 @@ class Entity:
 				self.error(message=str(e))
 		return None
 
-	def getDefaultsForValues(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> typing.Dict[str,
-		ResolvedType]:
+	def getDefaultsForValues(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
 		"""
 		Get the default values for the values.
 		"""
 		if self.underlyingType:
 			underlyingType = symbols.getEntityAssert(fqn=self.underlyingType, element=self.element)
-			parameters = Parameters(element=underlyingType.element, nestedKind="config")
-			return parameters.getValuesOrTypesAsDict(symbols=symbols,
-				exclude=exclude,
-				filterFct=lambda entity: not entity.contracts.get("template"))
-		return {}
+			return Parameters(element=underlyingType.element,
+				nestedKind="config",
+				filterFct=lambda entity: not entity.contracts.has("template"))
+		return Parameters(element=self.element)
 
 	def resolve(self,
 		symbols: typing.Any,
