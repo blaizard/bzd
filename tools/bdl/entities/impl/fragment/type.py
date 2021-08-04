@@ -40,7 +40,7 @@ class Type:
 
 		# Resolve the templates if available
 		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		templates = self.templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
+		templates = self.templates
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
@@ -50,11 +50,16 @@ class Type:
 		validation = underlying.makeValidationForTemplate(symbols=symbols)
 		if validation is None:
 			Error.assertTrue(element=self.element,
-				condition=(not bool(templates)),
+				condition=(not bool(self.templates)),
 				attr=self.kindAttr,
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
-			result = validation.validate(templates, output="return")
+			defaults = underlying.getDefaultsForTemplate(symbols=symbols, exclude=exclude)
+			#templates.mergeDefaults(defaults)
+
+			values = templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
+			# Merge the lists
+			result = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element, attr=self.kindAttr, condition=bool(result), message=str(result))
 
 		return underlying

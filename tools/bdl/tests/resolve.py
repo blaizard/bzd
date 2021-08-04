@@ -33,7 +33,7 @@ class TestRun(unittest.TestCase):
 				interface Test { config: value = Integer; }
 				using MyType = Test [integer];
 				struct temp {
-					var = MyType(1);
+					var = MyType(value=1);
 				}
 				""",
 				objectContext=ObjectContext(resolve=True))
@@ -62,7 +62,7 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"not.*expected"):
+		with self.assertRaisesRegex(Exception, r"Cannot merge named"):
 			Object.fromContent(content="""
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
@@ -151,11 +151,12 @@ class TestRun(unittest.TestCase):
 
 	def testDefaultValues(self) -> None:
 
-		Object.fromContent(content="""
-			interface Test { config: value = Integer; }
-			composition MyComposition { val1 = Test; }
-			""",
-			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):
+			Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test; }
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
