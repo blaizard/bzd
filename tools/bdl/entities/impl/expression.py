@@ -11,6 +11,9 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.entity import Entity, Role
 
+if typing.TYPE_CHECKING:
+	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+
 
 class Expression(Entity):
 	"""
@@ -57,6 +60,22 @@ class Expression(Entity):
 	@property
 	def value(self) -> str:
 		return self.element.getAttr("value").value
+
+	def getUnderlyingValue(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> typing.Union[str,
+		Entity]:
+		"""
+		Get the underlying value of this element or throw if does not exists.
+		"""
+
+		if self.literal is not None:
+			return self.literal
+
+		elif self.underlyingValue is not None:
+			value = symbols.getEntityAssert(fqn=self.underlyingValue, element=self.element)
+			return value
+
+		self.error(message="Cannot identify the underlying value.")
+		return ""  # To please mypy
 
 	@property
 	def raw(self) -> str:
@@ -108,10 +127,8 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		#arguments = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
 		self.args.mergeDefaults(defaults)
-		#arguments.update(self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude))
 		arguments = self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
@@ -164,4 +181,8 @@ class Expression(Entity):
 		return self.element.getAttrValue("comment")
 
 	def __repr__(self) -> str:
-		return self.toString({"name": self.name if self.isName else "", "type": str(self.type)})
+		return self.toString({
+			"name": self.name if self.isName else "",
+			"type": str(self.type) if self.isType else None,
+			"value": str(self.value) if self.isValue else None
+		})

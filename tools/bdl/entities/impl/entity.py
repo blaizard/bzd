@@ -204,7 +204,7 @@ class Entity:
 		if not condition:
 			self.error(message=message)
 
-	def toString(self, attrs: typing.MutableMapping[str, str] = {}) -> str:
+	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
