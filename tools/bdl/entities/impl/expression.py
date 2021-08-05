@@ -61,22 +61,6 @@ class Expression(Entity):
 	def value(self) -> str:
 		return self.element.getAttr("value").value
 
-	def getUnderlyingValue(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> typing.Union[str,
-		Entity]:
-		"""
-		Get the underlying value of this element or throw if does not exists.
-		"""
-
-		if self.literal is not None:
-			return self.literal
-
-		elif self.underlyingValue is not None:
-			value = symbols.getEntityAssert(fqn=self.underlyingValue, element=self.element)
-			return value
-
-		self.error(message="Cannot identify the underlying value.")
-		return ""  # To please mypy
-
 	@property
 	def raw(self) -> str:
 		return self.value if self.isValue else self.type.kind
@@ -91,6 +75,14 @@ class Expression(Entity):
 		if len(self.args) == 1 and self.args[0].isValue:
 			return self.args[0].value
 		return super().literal
+
+	@property
+	def isRoleValue(self) -> bool:
+		return self.literal is not None or self.underlyingValue is not None
+
+	@property
+	def isRoleType(self) -> bool:
+		return not bool(self.isRoleValue)
 
 	def resolve(self,
 		symbols: typing.Any,
@@ -110,6 +102,10 @@ class Expression(Entity):
 
 		# Set the underlying value
 		if self.isArg:
+
+			# The type must represent a type (not a value)
+			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
+
 			# Generate this symbol FQN
 			# TODO: need to handle when the expression has no name
 			fqn = symbols.makeFQN(name=self.name, namespace=namespace)

@@ -92,6 +92,12 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+		with self.assertRaisesRegex(Exception, r"instantiate.*value"):
+			Object.fromContent(content="""
+				composition MyComposition { val1 = Integer(12); val2 = val1(12); }
+				""",
+				objectContext=ObjectContext(resolve=True))
+
 		#Object.fromContent(content="""
 		#	interface Test { config: value = Callable; }
 		#	composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
