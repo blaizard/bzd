@@ -19,4 +19,4 @@ class TypeConstraint(Constraint):
 class ContractType(ContractTraits):
 
 	def __init__(self) -> None:
-		super().__init__(name="type", role=Role.Template, constraint=TypeConstraint)
+		super().__init__(name="type", role=Role.Template | Role.Public, constraint=TypeConstraint)

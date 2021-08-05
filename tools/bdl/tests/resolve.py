@@ -92,7 +92,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		#Object.fromContent(content="""g
+		#Object.fromContent(content="""
 		#	interface Test { config: value = Callable; }
 		#	composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
 		#	""",
@@ -100,10 +100,10 @@ class TestRun(unittest.TestCase):
 
 	def testTemplates(self) -> None:
 
-		# Implicitly mandatory template, because there is no default value.
+		# Mandatory template.
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: Integer [template]; }
+				interface Test { config: Integer [template mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True))
@@ -145,7 +145,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: Integer [template min(10) max(32)]; Integer [template]; }
+				interface Test { config: Integer [template min(10) max(32)]; Integer [template mandatory]; }
 				composition MyComposition { val1 = Test<23>; }
 				""",
 				objectContext=ObjectContext(resolve=True))
@@ -161,7 +161,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				interface Test { config: value = Integer [mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True))
