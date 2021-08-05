@@ -128,20 +128,15 @@ class Parameters:
 
 		for key, expression in self.items():
 
-			# If isValue or direct constuctor: "12" or "Integer(12)" or "Complex(12, 3, "i")"
-			if expression.isValue or expression.isArg:
-				values.append((key, expression.getUnderlyingValue(symbols=symbols, exclude=exclude)))
+			if expression.literal is not None:
+				values.append((key, expression.literal))
+
+			elif expression.underlyingValue is not None:
+				value = symbols.getEntityAssert(fqn=expression.underlyingValue, element=expression.element)
+				values.append((key, value))
 
 			else:
-				entity = symbols.getEntityAssert(fqn=expression.type.kind, element=expression.element)
-
-				# If the symbols points to a value: "my.value1"
-				if entity.isRoleValue:
-					values.append((key, expression.getUnderlyingValue(symbols=symbols, exclude=exclude)))
-
-				# Else it must be a type
-				else:
-					values.append((key, expression.type))
+				values.append((key, expression.type))
 
 		return values
 
