@@ -89,9 +89,8 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="struct temp { var = Result<Integer>; }",
 				objectContext=ObjectContext(resolve=True))
 
-		# TODO: TO BE FIXED!
-		#Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
-		#	objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
+			objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"not a type"):
 			Object.fromContent(content="struct temp { var = Result<12, Void>; }",
