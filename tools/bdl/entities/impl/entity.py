@@ -169,7 +169,9 @@ class Entity:
 		"""
 		schema = {}
 		for index, expression in enumerate(self.getConfigValues(symbols=symbols)):
-			schema[expression.name if expression.isName else str(index)] = expression.contracts.validationForValue
+			schema[expression.name if expression.isName else str(
+				index
+			)] = expression.contracts.validationForValue if expression.contracts.validationForValue is not None else ""
 		if schema:
 			try:
 				return Validation(schema=schema)

@@ -98,11 +98,11 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		#Object.fromContent(content="""
-		#	interface Test { config: value = Callable; }
-		#	composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
-		#	""",
-		#	objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="""
+			interface Test { config: value = Callable; }
+			composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
+			""",
+			objectContext=ObjectContext(resolve=True))
 
 	def testTemplates(self) -> None:
 
