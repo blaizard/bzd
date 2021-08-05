@@ -25,7 +25,7 @@ class Parameters:
 		self.element = element
 
 		# Build the parameter list
-		self.list = []
+		self.list: typing.List["Expression"] = []
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
@@ -126,17 +126,22 @@ class Parameters:
 
 		values: typing.List[typing.Tuple[str, ResolvedType]] = []
 
-		for key, entity in self.items():
+		for key, expression in self.items():
 
-			if entity.literal is not None:
-				values.append((key, entity.literal))
-
-			elif entity.underlyingValue is not None:
-				value = symbols.getEntityAssert(fqn=entity.underlyingValue, element=entity.element)
-				values.append((key, value))
+			# If isValue or direct constuctor: "12" or "Integer(12)" or "Complex(12, 3, "i")"
+			if expression.isValue or expression.isArg:
+				values.append((key, expression.getUnderlyingValue(symbols=symbols, exclude=exclude)))
 
 			else:
-				values.append((key, entity.type))
+				entity = symbols.getEntityAssert(fqn=expression.type.kind, element=expression.element)
+
+				# If the symbols points to a value: "my.value1"
+				if entity.isRoleValue:
+					values.append((key, expression.getUnderlyingValue(symbols=symbols, exclude=exclude)))
+
+				# Else it must be a type
+				else:
+					values.append((key, expression.type))
 
 		return values
 
