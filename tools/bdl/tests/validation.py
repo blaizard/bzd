@@ -32,10 +32,6 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="using MyType = Integer [template];")
 		Object.fromContent(content="interface temp { config: var = Integer [template]; }")
 
-		# mandatory is not public
-		with self.assertRaisesRegex(Exception, r"not.*supported"):
-			Object.fromContent(content="using MyType = Integer [mandatory];")
-
 
 if __name__ == '__main__':
 	unittest.main()

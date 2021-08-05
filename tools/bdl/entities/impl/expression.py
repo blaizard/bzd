@@ -121,10 +121,6 @@ class Expression(Entity):
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
 
-		# Add mandatory contract if the expression does not have default value.
-		if not self.isArg:
-			Contract.add(element=self.element, kind="mandatory")
-
 		# Generate the argument list
 		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
