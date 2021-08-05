@@ -103,41 +103,49 @@ class TestRun(unittest.TestCase):
 		# Implicitly mandatory template, because there is no default value.
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer [template]; }
+				interface Test { config: Integer [template]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"expects.*integer"):
+		with self.assertRaisesRegex(Exception, r"Cannot merge named"):
 			Object.fromContent(content="""
-			interface Test { config: value = Integer [template]; }
+				interface Test { config: value = Integer [template]; }
+				composition MyComposition { val1 = Test<12>; }
+				""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"expects.*integer"):
+			bdl = Object.fromContent(content="""
+			interface Test { config: Integer [template]; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
 				objectContext=ObjectContext(resolve=True))
+			print(bdl)
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
-			interface Test { config: value = Integer [template min(10)]; }
+			interface Test { config: Integer [template min(10)]; }
 			composition MyComposition { val1 = Test<2>; }
 			""",
 				objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"higher than"):
 			Object.fromContent(content="""
-			interface Test { config: value = Integer [template max(10)]; }
+			interface Test { config: Integer [template max(10)]; }
 			composition MyComposition { val1 = Test<20>; }
 			""",
 				objectContext=ObjectContext(resolve=True))
 
 		Object.fromContent(content="""
-			interface Test { config: value = Integer [template min(10) max(32)]; }
+			interface Test { config: Integer [template min(10) max(32)]; }
 			composition MyComposition { val1 = Test<23>; }
 			""",
 			objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: a = Integer [template min(10) max(32)]; b = Integer [template]; }
+				interface Test { config: Integer [template min(10) max(32)]; Integer [template]; }
 				composition MyComposition { val1 = Test<23>; }
 				""",
 				objectContext=ObjectContext(resolve=True))

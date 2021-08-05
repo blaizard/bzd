@@ -24,13 +24,13 @@ class Build(Visitor[SymbolList]):
 
 	def registerSymbol(self, entity: SymbolType) -> None:
 
-		# Map an entity only if the name is available.
-		if not entity.isName:
-			return
-
 		# Resolve the symbol
 		if self.objectContext.resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
+
+		# Map an entity only if the name is available.
+		if not entity.isName:
+			return
 
 		# Build the symbol name and ensure it is unique
 		symbol = SymbolMap.makeFQN(name=entity.name, namespace=self.namespace)

@@ -55,7 +55,7 @@ class Type:
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
 			defaults = underlying.getDefaultsForTemplate(symbols=symbols, exclude=exclude)
-			#templates.mergeDefaults(defaults)
+			templates.mergeDefaults(defaults)
 
 			values = templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
 			# Merge the lists
