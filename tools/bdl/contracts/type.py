@@ -11,7 +11,8 @@ class TypeConstraint(Constraint):
 		processedSchema.setType(self)
 
 	def check(self, context: TypeContext) -> Result:
-		if "fragment.type.Type" in str(type(context.value)):
+		from tools.bdl.entities.impl.fragment.type import Type
+		if isinstance(context.value, Type):
 			return None
 		return "'{}' is not a type.".format(context.value)
 
