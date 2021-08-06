@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_test", original_cc_library = "cc_library")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
+load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest_binary")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:find_cc_toolchain.bzl", original_find_cc_toolchain = "find_cc_toolchain")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
@@ -68,42 +69,6 @@ def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwar
         ),
         **kwargs
     )
-
-def _cc_linker_wiath_for_bazel_401(ctx, cc_info_providers, map_analyzer):
-    cc_toolchain = find_cc_toolchain(ctx)
-    feature_configuration = cc_common.configure_features(
-        ctx = ctx,
-        cc_toolchain = cc_toolchain,
-        requested_features = ctx.features,
-        unsupported_features = ctx.disabled_features,
-    )
-
-    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
-    (linking_context, linking_outputs) = cc_common.link(
-        actions = ctx.actions,
-        feature_configuration = feature_configuration,
-        cc_toolchain = cc_toolchain,
-        #compilation_outputs = cc_info_providers.compilation_outputs,
-        linking_contexts = [cc_info_providers.linking_context],
-        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
-        additional_outputs = [map_file],
-        link_deps_statically = True,
-        stamp = 1,
-    )
-
-    binary_file = linking_outputs.executable
-
-    metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
-    ctx.actions.run(
-        inputs = [map_file, binary_file],
-        outputs = [metadata_file],
-        progress_message = "Generating metadata for {}".format(ctx.attr.name),
-        arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
-        tools = map_analyzer.data_runfiles.files,
-        executable = map_analyzer.files_to_run,
-    )
-
-    return binary_file, [metadata_file]
 
 def _cc_linker(ctx, cc_info_providers, map_analyzer):
     """
@@ -314,42 +279,47 @@ def _bzd_cc_generic(is_test):
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
 _bzd_cc_test = _bzd_cc_generic(is_test = True)
 
-"""
-Rule to define a bzd C++ library.
-"""
-
 def cc_library(deps = [], **kwargs):
+    """
+    Rule to define a bzd C++ library.
+    """
     original_cc_library(
         deps = deps + ["//cc:includes"],
         **kwargs
     )
 
-"""
-Rule to define a bzd C++ binary.
-"""
-
-def bzd_cc_binary(name, tags = [], **kwags):
+def bzd_cc_binary(name, tags = [], deps = [], **kwags):
+    """
+    Rule to define a bzd C++ binary.
+    """
+    bzd_manifest_binary(
+        name = name + ".main",
+        tags = tags + ["cc"],
+        deps = deps,
+    )
     cc_library(
         name = name + ".library",
         tags = tags + ["cc"],
+        deps = deps,
         **kwags
     )
     _bzd_cc_binary(
         name = name,
         tags = tags + ["cc"],
-        deps = [name + ".library"],
+        deps = [name + ".library", name + ".main"],
     )
 
-"""
-Rule to define a bzd C++ test.
-"""
-
 def bzd_cc_test(name, tags = [], **kwags):
+    """
+    Rule to define a bzd C++ test.
+    """
     cc_test(
         name = name,
         tags = tags + ["cc"],
         **kwags
     )
+
+# ---- Thing below this line should be deleted -----
 
 def _bzd_genmanifest_impl(ctx):
     # Create the manifest content

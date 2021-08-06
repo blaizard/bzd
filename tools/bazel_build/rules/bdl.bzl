@@ -1,6 +1,21 @@
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
-BdlProvider = provider(fields = ["outputs", "bdls"])
+BdlProvider = provider(fields = ["outputs"])
+
+def _bzd_manifest_aspect_impl(target, ctx):
+    """
+    Aspects to gather all bdl depedency outputs.
+    """
+    if BdlProvider not in target:
+        return [BdlProvider(
+            outputs = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+        )]
+    return []
+
+_bzd_manifest_aspect = aspect(
+    implementation = _bzd_manifest_aspect_impl,
+    attr_aspects = ["deps"],
+)
 
 def _bzd_manifest_impl_cc(ctx, inputs):
     """
@@ -57,7 +72,7 @@ def _bzd_manifest_impl(ctx):
             "relative_name": relative_name,
         })
 
-    # Preprocess all input files at once
+    # Preprocess all input files at once, this stage is language agnostic.
     ctx.actions.run(
         inputs = ctx.files.srcs + bdl_deps,
         outputs = [bdl["output"] for bdl in metadata],
@@ -94,9 +109,6 @@ def _bzd_manifest_impl(ctx):
         cc_info_providers,
     ]
 
-"""
-Bzd description language rule_bzd_manifest_impl_cc
-"""
 bzd_manifest = rule(
     implementation = _bzd_manifest_impl,
     doc = """Bzd Description Language generator rule.
@@ -121,6 +133,26 @@ bzd_manifest = rule(
         "_deps_cc": attr.label_list(
             default = [Label("//tools/bdl/generators/cc/adapter:types")],
             cfg = "host",
+        ),
+    },
+)
+
+def _bzd_manifest_binary_impl(ctx):
+    bdls = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps if BdlProvider in dep])
+    print(bdls)
+
+    return [CcInfo()]
+
+bzd_manifest_binary = rule(
+    implementation = _bzd_manifest_binary_impl,
+    doc = """Bzd Description Language generator rule for binaries.
+    This generates all the glue to pull in bdl pieces together in a final binary.
+    """,
+    attrs = {
+        "deps": attr.label_list(
+            mandatory = True,
+            aspects = [_bzd_manifest_aspect],
+            doc = "List of dependencies.",
         ),
     },
 )
