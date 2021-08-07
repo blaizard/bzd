@@ -78,9 +78,13 @@ class Parameters:
 		if not bool(parameters):
 			return
 		if bool(self):
-			Error.assertTrue(element=self.element,
-				condition=self.isNamed == parameters.isNamed,
-				message="Cannot merge named with unnamed parameters.")
+			if self.isNamed != parameters.isNamed:
+				Error.assertTrue(element=self.element,
+					condition=self.isNamed,
+					message="Requires named parameters.")
+				Error.assertTrue(element=self.element,
+					condition=not self.isNamed,
+					message="Requires unnamed parameters.")
 
 		# Merge
 		if parameters.isNamed:
