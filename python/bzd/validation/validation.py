@@ -180,7 +180,7 @@ class Validation:
 					result = self.processed[key].validate(value=value)
 					results.addResult(key, result)
 				else:
-					results.addError(key, ["value not expected."])
+					results.addError(key, ["value not expected, choices are: {}".format(", ".join(["'{}'".format(x) for x in self.processed.keys()]))])
 
 			# Check for mandatory values
 			for key, constraints in self.processed.items():

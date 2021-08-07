@@ -9,6 +9,7 @@ config:
 	// Stack size for the current core.
 	stackSize = StackSize(10000) [template];
 	priority = Integer(0) [min(0) max(100)];
+	name = Float(0) [min(0) max(100)];
 	
 }
 
