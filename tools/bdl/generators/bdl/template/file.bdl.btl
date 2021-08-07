@@ -8,7 +8,7 @@
 {{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }}{{ declareContract(data.contracts) }};{% end -%}
 
 {%- macro declareMethod(data) %}
-{{ data.comment | normalComment }}method {{ data.name }}({{ printParameters(data.args) }}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
+{{ data.comment | normalComment }}method {{ data.name }}({{ printParameters(data.parameters) }}){% if data.isType %} -> {{ data.type | typeToStr }}{% end %};{% end -%}
 
 {%- macro declareEnum(data) %}
 {{ data.comment | normalComment }}enum {{ data.name }}
@@ -37,7 +37,7 @@ composition:
 {% end -%}
 
 {%- macro declareExpression(data) -%}
-	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }} = {% end %}{% if data.const %}const {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.type | typeToStr }}{% if data.args.size > 0 %}({{ printParameters(data.args) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
+	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }} = {% end %}{% if data.const %}const {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.type | typeToStr }}{% if data.parameters.size > 0 %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
 {%- end -%}
 
 {%- macro printParameters(parameters) -%}

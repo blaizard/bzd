@@ -11,7 +11,7 @@
 
 {#- Expressions -#}
 {%- macro declareExpression(element, prepend) %}
-{{ element.comment | normalComment }}{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- for i, arg in element.args %}{% if i %}, {% end %}{{ arg.value }}{% end -%} };
+{{ element.comment | normalComment }}{{ element.type | typeToStr }} {{ element.name }}{{ prepend }}{ {%- for i, arg in element.parameters %}{% if i %}, {% end %}{{ arg.value }}{% end -%} };
 {% end -%}
 
 {#- Nested structure -#}

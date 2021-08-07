@@ -48,7 +48,7 @@ class Validation(VisitorBase[None]):
 
 		# Arguments
 		argumentNames = set()
-		for arg in entity.args:
+		for arg in entity.parameters:
 			arg.assertTrue(condition=arg.isName, message="Argument is missing a name.")
 			arg.assertTrue(condition=(arg.name not in argumentNames),
 				message="Argument name '{}' is already defined.".format(arg.name))
