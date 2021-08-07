@@ -102,6 +102,9 @@ class Parameters:
 	def empty(self) -> bool:
 		return not bool(self.list)
 
+	def size(self) -> int:
+		return len(self.list)
+
 	def items(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
 		for index, entity in enumerate(self.list):
 			name = entity.name if entity.isName else str(index)
