@@ -6,8 +6,7 @@
 			:description="formDescriptionTyped || []"
 			v-model="config"
 			@submit="handleSubmitConfig"
-			@error="handleError"
-		></Form>
+			@error="handleError"></Form>
 	</div>
 </template>
 

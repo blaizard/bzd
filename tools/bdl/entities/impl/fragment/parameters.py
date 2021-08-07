@@ -80,10 +80,10 @@ class Parameters:
 		if bool(self):
 			if self.isNamed != parameters.isNamed:
 				Error.assertTrue(element=self.element,
-					condition=self.isNamed,
+					condition=bool(self.isNamed),
 					message="Requires named parameters.")
 				Error.assertTrue(element=self.element,
-					condition=not self.isNamed,
+					condition=not bool(self.isNamed),
 					message="Requires unnamed parameters.")
 
 		# Merge

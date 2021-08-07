@@ -59,6 +59,18 @@ class TestRun(unittest.TestCase):
 		result = template.render({"value": False})
 		self.assertEqual("goodbye", result)
 
+	def testElseNestedComplexCondition(self) -> None:
+
+		template = Template(
+			"{% if value %}hello{% if not value %}never{% end %}{% else %}{% if not value %}good{% else %}never{% end %}bye{% end %}"
+		)
+
+		result = template.render({"value": True})
+		self.assertEqual("hello", result)
+
+		result = template.render({"value": False})
+		self.assertEqual("goodbye", result)
+
 	def testElIfCondition(self) -> None:
 		template = Template("{% if value1 %}hello{% elif value2 %}goodbye{% else %}what?!{% end %}")
 

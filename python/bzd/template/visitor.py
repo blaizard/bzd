@@ -308,7 +308,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 			# End statement
 			elif category == "end":
-				pass
+				# Reset the else flag here to make sure nested if without else do not trigger.
+				self.followElse = False
 
 			# For loop block
 			elif category == "for":

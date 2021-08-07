@@ -20,7 +20,8 @@ async function _next(data, cache, increment) {
 			let index = (device.playlist.indexOf(device.track.uid) + increment) % device.playlist.length;
 			index = index < 0 ? device.playlist.length + index : index;
 			device.track.uid = device.playlist[index];
-		} else {
+		}
+		else {
 			const uid = device.playlist[0] || null;
 			device.track.uid = uid;
 		}
@@ -28,7 +29,8 @@ async function _next(data, cache, increment) {
 		try {
 			await device.instance.setAVTransportURI(device.track.uid);
 			break;
-		} catch (e) {
+		}
+		catch (e) {
 			if (counter == 0) {
 				throw e;
 			}
@@ -70,7 +72,8 @@ export default {
 				instance.on("CurrentTrack", (currentTrack) => {
 					if (String(currentTrack.title).startsWith("x-")) {
 						track.uid = currentTrack.title;
-					} else {
+					}
+					else {
 						track.title = currentTrack.title;
 						track.artist = currentTrack.artist;
 						track.art = currentTrack.albumArtURI;

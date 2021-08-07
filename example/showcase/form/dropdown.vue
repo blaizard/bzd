@@ -39,13 +39,13 @@
 					{
 						type: "Dropdown",
 						caption: "Dropdown (html)",
-						list: { hello: "<b>Hel</b><i>lo</i>", world: '<span style="color: red;">World</span>' },
+						list: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
 						html: true
 					},
 					{
 						type: "Dropdown",
 						caption: "Dropdown (html, multi)",
-						list: { hello: "<b>Hel</b><i>lo</i>", world: '<span style="color: red;">World</span>' },
+						list: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
 						html: true,
 						multi: true
 					},
