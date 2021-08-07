@@ -8,6 +8,7 @@ from bzd.validation.validation import Validation
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.fragment.parameters import Parameters
 
 
 class Method(Entity):
@@ -64,20 +65,16 @@ class Method(Entity):
 		maybeType = self.type
 		if maybeType is not None:
 			maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		for arg in self.args:
-			arg.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+
+		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
 	@cached_property
-	def args(self) -> typing.List[Expression]:
-		if self.element.isNestedSequence("argument"):
-			sequence = self.element.getNestedSequence("argument")
-			assert sequence is not None
-			return [Expression(element=arg) for arg in sequence]
-		return []
+	def args(self) -> Parameters:
+		return Parameters(element=self.element, nestedKind="argument")
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})
