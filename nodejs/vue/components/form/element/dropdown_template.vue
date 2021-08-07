@@ -8,7 +8,8 @@
 			@input="set"
 			@directInput="handleDirectInput"
 			@active="handleActive"
-			@key="handleKey">
+			@key="handleKey"
+		>
 		</ElementInput>
 		<div :class="{ 'irform-dropdown-menu': true, 'irform-dropdown-menu-loading': loading }" ref="menu">
 			<slot></slot>
@@ -58,7 +59,7 @@
 			},
 			inputDescription() {
 				return Object.assign({}, this.description, {
-					post: { html: "<span class=\"irform-dropdown-arrow\">&nbsp;</span>" }
+					post: { html: '<span class="irform-dropdown-arrow">&nbsp;</span>' }
 				});
 			},
 			process() {
@@ -89,8 +90,7 @@
 				try {
 					this.processTimeout = null;
 					await this.process(value);
-				}
-				finally {
+				} finally {
 					this.loading = false;
 					// Set the list to the top
 					if (this.$refs.menu) {

@@ -20,38 +20,38 @@ class Snmp {
 
 	static _castValue(data) {
 		switch (data.type) {
-		case SnmpNative.ObjectType.OctetString:
-			return data.value.toString();
-		case SnmpNative.ObjectType.Integer:
-			return data.value;
-		case SnmpNative.ObjectType.Counter:
-			return data.value;
-		case SnmpNative.ObjectType.Counter64: {
-			let view = new DataView(new ArrayBuffer(8));
-			const length = data.value.length;
-			for (let i = 0; i < length; i++) {
-				view.setInt8(length - i - 1, data.value[i]);
-			}
-			return view.getBigUint64(0, /*littleEndian*/ true).toString();
-		}
-		case SnmpNative.ObjectType.Opaque:
-			/*
-			 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
-			 * BER-encoded data / type / length / value
-			 * Float type
-			 */
-			if (data.value[0] == 0x9f && data.value[1] == 0x78) {
-				const length = data.value[2];
-				let view = new DataView(new ArrayBuffer(length));
+			case SnmpNative.ObjectType.OctetString:
+				return data.value.toString();
+			case SnmpNative.ObjectType.Integer:
+				return data.value;
+			case SnmpNative.ObjectType.Counter:
+				return data.value;
+			case SnmpNative.ObjectType.Counter64: {
+				let view = new DataView(new ArrayBuffer(8));
+				const length = data.value.length;
 				for (let i = 0; i < length; i++) {
-					view.setInt8(i, data.value[3 + i]);
+					view.setInt8(length - i - 1, data.value[i]);
 				}
-				switch (length) {
-				case 4:
-					return view.getFloat32(0);
-				}
+				return view.getBigUint64(0, /*littleEndian*/ true).toString();
 			}
-			break;
+			case SnmpNative.ObjectType.Opaque:
+				/*
+				 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
+				 * BER-encoded data / type / length / value
+				 * Float type
+				 */
+				if (data.value[0] == 0x9f && data.value[1] == 0x78) {
+					const length = data.value[2];
+					let view = new DataView(new ArrayBuffer(length));
+					for (let i = 0; i < length; i++) {
+						view.setInt8(i, data.value[3 + i]);
+					}
+					switch (length) {
+						case 4:
+							return view.getFloat32(0);
+					}
+				}
+				break;
 		}
 		Log.error("Unsupported value type '{}': {:j}", data.type, data);
 		return "unsupported";
@@ -73,8 +73,7 @@ class Snmp {
 			this.session.get(oids, (error, varbinds) => {
 				if (error) {
 					reject(new Exception(error));
-				}
-				else {
+				} else {
 					let result = {};
 					for (const i in varbinds) {
 						if (SnmpNative.isVarbindError(varbinds[i])) {
@@ -92,8 +91,7 @@ class Snmp {
 	async getAndClose(oids) {
 		try {
 			return await this.get(oids);
-		}
-		finally {
+		} finally {
 			this.close();
 		}
 	}
@@ -169,20 +167,20 @@ export default {
 			(item.ops || []).forEach((operation) => {
 				const opValue = Snmp.isOid(operation.value) ? values[Snmp.normalizeOid(operation.value)] : operation.value;
 				switch (operation.type) {
-				case "mul":
-					result.value *= opValue;
-					break;
-				case "div":
-					result.value /= opValue;
-					break;
-				case "add":
-					result.value += opValue;
-					break;
-				case "sub":
-					result.value -= opValue;
-					break;
-				default:
-					Exception.unreachable("Unsupported operation type: '{}'", operation.type);
+					case "mul":
+						result.value *= opValue;
+						break;
+					case "div":
+						result.value /= opValue;
+						break;
+					case "add":
+						result.value += opValue;
+						break;
+					case "sub":
+						result.value -= opValue;
+						break;
+					default:
+						Exception.unreachable("Unsupported operation type: '{}'", operation.type);
 				}
 			});
 

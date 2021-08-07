@@ -23,7 +23,7 @@
 						caption: "Input (multi + format)",
 						placeholder: "Type hello...",
 						multi: true,
-						format: { hello: "<b>Hel</b><i>lo</i>", world: "<span style=\"color: red;\">World</span>" },
+						format: { hello: "<b>Hel</b><i>lo</i>", world: '<span style="color: red;">World</span>' },
 						html: true
 					}
 				];

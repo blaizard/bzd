@@ -62,7 +62,7 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"Cannot merge named"):
+		with self.assertRaisesRegex(Exception, r"named parameters"):
 			Object.fromContent(content="""
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
@@ -114,7 +114,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"Cannot merge named"):
+		with self.assertRaisesRegex(Exception, r"named parameter"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [template]; }
 				composition MyComposition { val1 = Test<12>; }

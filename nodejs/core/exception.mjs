@@ -12,8 +12,7 @@ class ExceptionCombine {
 	add(str, ...args) {
 		if (str instanceof ExceptionCombine) {
 			this.list = this.list.concat(str.list);
-		}
-		else {
+		} else {
 			this.list.push([str, ...args]);
 		}
 	}
@@ -40,8 +39,7 @@ const ExceptionFactory = (...topics) => {
 					messageList.push(this._init(a[0], ...a.slice(1)));
 				}
 				this.message = messageList.filter((item) => item).join("; ");
-			}
-			else {
+			} else {
 				this.message = this._init(str, ...args);
 			}
 		}
@@ -111,15 +109,13 @@ const ExceptionFactory = (...topics) => {
 						value1.forEach((subValue1, index) => {
 							assertEqualInternal(subValue1, value2[index], combine);
 						});
-					}
-					else {
+					} else {
 						assertEqualInternal(Object.keys(value1), Object.keys(value2), combine);
 						Object.keys(value1).forEach((key) => {
 							assertEqualInternal(value1[key], value2[key], combine);
 						});
 					}
-				}
-				else {
+				} else {
 					Exception.assert(value1 == value2, combine);
 				}
 			};
@@ -137,11 +133,9 @@ const ExceptionFactory = (...topics) => {
 
 			try {
 				await block();
-			}
-			catch (e) {
+			} catch (e) {
 				hasThrown = true;
-			}
-			finally {
+			} finally {
 				let combine = new ExceptionCombine("Code block did not throw");
 				combine.add(str, ...args);
 				Exception.assert(hasThrown, combine);
@@ -194,9 +188,9 @@ const ExceptionFactory = (...topics) => {
 				(this.stack
 					? "; Callstack:\n" +
 					  String(this.stack)
-					  	.split("\n")
-					  	.slice(1)
-					  	.join("\n")
+							.split("\n")
+							.slice(1)
+							.join("\n")
 					: "");
 			message += this.nestedErrorList.map((e) => "\nFrom: " + String(e));
 			return message;
@@ -212,8 +206,7 @@ if (process.env.BZD_RULE === "nodejs_web") {
 		E.fromError(e).print();
 		return false;
 	});
-}
-else {
+} else {
 	process.on("uncaughtException", (e) => {
 		E.fromError(e).print("Exception: uncaughtException");
 		process.exit(1);

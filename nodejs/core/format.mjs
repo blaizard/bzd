@@ -23,14 +23,14 @@ export default function(str, ...args) {
 			const value = typeof format.index == "string" ? args[0][format.index] : args[format.index];
 
 			switch (format.type || "") {
-			case "j":
-				output += JSON.stringify(value);
-				break;
-			case "":
-				output += String(value);
-				break;
-			default:
-				throw new Error("Unsupported formatting type: " + format.type);
+				case "j":
+					output += JSON.stringify(value);
+					break;
+				case "":
+					output += String(value);
+					break;
+				default:
+					throw new Error("Unsupported formatting type: " + format.type);
 			}
 
 			++substitutionIndex;

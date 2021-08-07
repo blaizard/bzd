@@ -70,8 +70,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 					this.setToken(result.token, result.timeout);
 					return true;
 				}
-			}
-			catch (e) {
+			} catch (e) {
 				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}
