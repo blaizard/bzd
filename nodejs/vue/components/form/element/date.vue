@@ -6,8 +6,7 @@
 		@input="set"
 		@key="handleKey"
 		:disable="disable"
-		:description="descriptionDropdown"
-	>
+		:description="descriptionDropdown">
 		<div class="irform-date-header" @mousedown.stop.prevent="" @mouseup.stop.prevent="">
 			<div class="irform-date-previous" @click.stop="set(Number(get()) - decrementStep)"></div>
 			<div class="irform-date-select">
@@ -32,8 +31,7 @@
 						'irform-date-item-current': day.current,
 						'irform-date-item-selected': day.selected
 					}"
-					@mousedown.stop="selectDate($event, day.date || null)"
-				>
+					@mousedown.stop="selectDate($event, day.date || null)">
 					{{ day.text }}
 				</div>
 			</div>
@@ -49,8 +47,7 @@
 						'irform-date-item-current': month.current,
 						'irform-date-item-selected': month.selected
 					}"
-					@mousedown.stop="selectDate($event, month.date || null, 'day')"
-				>
+					@mousedown.stop="selectDate($event, month.date || null, 'day')">
 					{{ month.text }}
 				</div>
 			</div>
@@ -66,8 +63,7 @@
 						'irform-date-item-current': month.current,
 						'irform-date-item-selected': month.selected
 					}"
-					@mousedown.stop="selectDate($event, month.date || null, 'month')"
-				>
+					@mousedown.stop="selectDate($event, month.date || null, 'month')">
 					{{ month.text }}
 				</div>
 			</div>
@@ -101,19 +97,19 @@
 			},
 			incrementStep() {
 				switch (this.select) {
-					case "day":
-						return this.nbDaysCurMonth * 24 * 60 * 60 * 1000;
-					case "month":
-						return 365.25 * 24 * 60 * 60 * 1000;
-					case "year":
-						return 9 * 365.25 * 24 * 60 * 60 * 1000;
+				case "day":
+					return this.nbDaysCurMonth * 24 * 60 * 60 * 1000;
+				case "month":
+					return 365.25 * 24 * 60 * 60 * 1000;
+				case "year":
+					return 9 * 365.25 * 24 * 60 * 60 * 1000;
 				}
 				return null;
 			},
 			decrementStep() {
 				switch (this.select) {
-					case "day":
-						return this.nbDaysPrevMonth * 24 * 60 * 60 * 1000;
+				case "day":
+					return this.nbDaysPrevMonth * 24 * 60 * 60 * 1000;
 				}
 				return this.incrementStep;
 			},

@@ -33,19 +33,19 @@
 			},
 			externalValue() {
 				switch (this.valueType) {
-					case "list": {
-						let list = this.value || [];
-						if (!(list instanceof Array)) {
-							this.setError("The value must be an Array");
-							list = [];
-						}
-						return list;
+				case "list": {
+					let list = this.value || [];
+					if (!(list instanceof Array)) {
+						this.setError("The value must be an Array");
+						list = [];
 					}
-					case "number":
-					case "any":
-						break;
-					default:
-						this.setError('Unknown value type "' + this.valueType + '"');
+					return list;
+				}
+				case "number":
+				case "any":
+					break;
+				default:
+					this.setError("Unknown value type \"" + this.valueType + "\"");
 				}
 
 				return this.value;
@@ -100,9 +100,11 @@
 					this.internalIsValueFrozen = true;
 					if (this.externalValue instanceof Array) {
 						this.internalFrozenValue = this.externalValue.slice(0);
-					} else if (typeof this.externalValue === "object") {
+					}
+					else if (typeof this.externalValue === "object") {
 						this.internalFrozenValue = Object.assign({}, this.externalValue);
-					} else {
+					}
+					else {
 						this.internalFrozenValue = this.externalValue;
 					}
 
@@ -123,7 +125,8 @@
 			handleActive(context) {
 				if (context) {
 					this.setActive();
-				} else {
+				}
+				else {
 					this.setInactive();
 				}
 			},
@@ -172,7 +175,8 @@
 						this.getOption("onchange", () => {})(value);
 
 						await this.$nextTick();
-					} else {
+					}
+					else {
 						this.setError(errorList);
 					}
 				}
@@ -231,7 +235,8 @@
 					}
 
 					return multiValueList;
-				} catch (e) {
+				}
+				catch (e) {
 					this.setError(e.message);
 				}
 				return [];

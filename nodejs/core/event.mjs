@@ -88,7 +88,8 @@ export default class Event {
 		if (typeof id === "undefined") {
 			this.proactive = {};
 			this.list = {};
-		} else {
+		}
+		else {
 			delete this.proactive[id];
 			if (!onlyProactive) {
 				delete this.list[id];
