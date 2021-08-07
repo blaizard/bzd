@@ -72,8 +72,8 @@ class Expression(Entity):
 		"""
 		if self.isValue:
 			return self.value
-		if len(self.args) == 1 and self.args[0].isValue:
-			return self.args[0].value
+		if len(self.parameters) == 1 and self.parameters[0].isValue:
+			return self.parameters[0].value
 		return super().literal
 
 	@property
@@ -101,7 +101,7 @@ class Expression(Entity):
 			self._setUnderlyingType(fqn=entity.underlyingType)
 
 		# Set the underlying value
-		if self.isArg:
+		if bool(self.parameters):
 
 			# The type must represent a type (not a value)
 			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
@@ -118,10 +118,10 @@ class Expression(Entity):
 		self.contracts.mergeBase(entity.contracts)
 
 		# Generate the argument list
-		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
-		self.args.mergeDefaults(defaults)
-		arguments = self.args.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+		self.parameters.mergeDefaults(defaults)
+		arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
@@ -161,12 +161,8 @@ class Expression(Entity):
 		return Validation({})
 
 	@cached_property
-	def args(self) -> Parameters:
+	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")
-
-	@property
-	def isArg(self) -> bool:
-		return bool(self.args)
 
 	@property
 	def comment(self) -> typing.Optional[str]:

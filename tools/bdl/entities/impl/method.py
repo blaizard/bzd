@@ -43,10 +43,10 @@ class Method(Entity):
 		Generate a validation based on the argument list.
 		"""
 		schema = {}
-		for arg in self.args:
+		for arg in self.parameters:
 			validation = []
 			# Arguments declared with no value are mandatory, others are just optional.
-			if not arg.isArg:
+			if arg.parameters.empty():
 				validation.append("mandatory")
 			schema[arg.name] = " ".join(validation)
 		return Validation(schema=schema)
@@ -66,14 +66,14 @@ class Method(Entity):
 		if maybeType is not None:
 			maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-		self.args.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
 	@cached_property
-	def args(self) -> Parameters:
+	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")
 
 	def __repr__(self) -> str:
