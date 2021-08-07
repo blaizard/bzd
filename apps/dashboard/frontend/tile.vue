@@ -16,7 +16,8 @@
 				@clickable="handleClickable"
 				@event="handleEvent"
 				@name="handleName"
-				@image="handleImage">
+				@image="handleImage"
+			>
 			</component>
 			<div v-else-if="isError" class="content">Fatal error</div>
 			<div class="name"><i :class="icon"></i> {{ name }}</div>
@@ -136,7 +137,7 @@
 				};
 			},
 			tileStyle() {
-				return "background-image: url(\"" + this.image + "\");";
+				return 'background-image: url("' + this.image + '");';
 			},
 			containerStyle() {
 				let color = new Color(Colors[this.colorBackground]);
@@ -168,12 +169,10 @@
 					});
 					this.showComponent = true;
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
-				}
-				catch (e) {
+				} catch (e) {
 					this.handleError("Error while fetching data: " + String(e));
 					this.handleColor("red");
-				}
-				finally {
+				} finally {
 					this.initialized = true;
 				}
 			},
@@ -187,8 +186,7 @@
 			handleClick() {
 				if (this.edit) {
 					this.$routerDispatch("/update/" + this.uid);
-				}
-				else if (this.link) {
+				} else if (this.link) {
 					window.open(this.link);
 				}
 			},
@@ -214,8 +212,7 @@
 						type: this.sourceType,
 						event: type
 					});
-				}
-				catch (e) {
+				} catch (e) {
 					this.handleError("Error while triggering event: " + String(e));
 					this.handleColor("red");
 				}

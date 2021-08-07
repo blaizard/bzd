@@ -87,14 +87,11 @@ export default {
 					const jobStatus = _getStatus(job);
 					if (jobStatus == "in-progress") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "failure") {
+					} else if (jobStatus == "failure") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "success" && status == "unknown") {
+					} else if (jobStatus == "success" && status == "unknown") {
 						status = jobStatus;
-					}
-					else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
+					} else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
 						status = jobStatus;
 					}
 					link = job.html_url;

@@ -92,7 +92,7 @@ protected: // Protected variable accessors.
 
 private: // Variables.
 	{% for var in data.nested.expressionList %}
-	{{ declareExpression(var, "_") }}
+	{{ declareExpression(var, "_") }};
 	{% end %}
 };
 

@@ -75,8 +75,7 @@ export default class HttpClient {
 		if ("json" in options) {
 			headers["Content-Type"] = "application/json";
 			data = JSON.stringify(options.json);
-		}
-		else if (typeof options.data != "undefined") {
+		} else if (typeof options.data != "undefined") {
 			data = options.data;
 		}
 
@@ -89,23 +88,23 @@ export default class HttpClient {
 		if ("authentication" in options) {
 			const auth = options.authentication;
 			switch (auth.type) {
-			// base64-encoded credentials - RFC 7617
-			case "basic":
-				{
-					// Big 'B' for Basic is important for at least Google GCR
-					const base64 = await base64Encode(auth.username + ":" + auth.password);
-					headers["Authorization"] = "Basic " + base64;
-				}
-				break;
+				// base64-encoded credentials - RFC 7617
+				case "basic":
+					{
+						// Big 'B' for Basic is important for at least Google GCR
+						const base64 = await base64Encode(auth.username + ":" + auth.password);
+						headers["Authorization"] = "Basic " + base64;
+					}
+					break;
 				// bearer tokens to access OAuth 2.0-protected resources - RFC 6750
-			case "bearer":
-				headers["Authorization"] = "Bearer " + auth.token;
-				break;
-			case "token":
-				headers["Authorization"] = "token " + auth.token;
-				break;
-			default:
-				Exception.unreachable("Unsupported authentication type '{}'", auth.type);
+				case "bearer":
+					headers["Authorization"] = "Bearer " + auth.token;
+					break;
+				case "token":
+					headers["Authorization"] = "token " + auth.token;
+					break;
+				default:
+					Exception.unreachable("Unsupported authentication type '{}'", auth.type);
 			}
 		}
 
@@ -130,9 +129,9 @@ export default class HttpClient {
 
 		// Handle expected type
 		switch (options.expect) {
-		case "json":
-			headers["Accept"] = "application/json";
-			break;
+			case "json":
+				headers["Accept"] = "application/json";
+				break;
 		}
 
 		Object.assign(headers, options.headers);
@@ -140,8 +139,7 @@ export default class HttpClient {
 		let request = null;
 		if (process.env.BZD_RULE === "nodejs_web") {
 			request = (await import(/* webpackMode: "eager" */ "./client/window.fetch.mjs")).default;
-		}
-		else {
+		} else {
 			request = (await import(/* webpackMode: "eager" */ "./client/node.http.mjs")).default;
 		}
 
@@ -169,10 +167,10 @@ export default class HttpClient {
 
 		const dataParsed = ((data) => {
 			switch (options.expect) {
-			case "json":
-				return data ? JSON.parse(data) : {};
-			default:
-				return data;
+				case "json":
+					return data ? JSON.parse(data) : {};
+				default:
+					return data;
 			}
 		})(result.data);
 
