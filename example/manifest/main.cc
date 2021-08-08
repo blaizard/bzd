@@ -8,10 +8,6 @@ public:
 	bzd::manifest::Test start(int a) override { return (a > 10) ? bzd::manifest::Test::FIRST : bzd::manifest::Test::SECOND; }
 };
 
-struct PlaceHolder
-{
-};
-
 // Non virtual
 
 template <class Impl>
