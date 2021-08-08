@@ -46,7 +46,7 @@ public: // Types
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
-	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]]{% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.parameters %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.parameters.size > 0 %} = {{var.type | typeToStr }}({% for i, arg in var.parameters %}{% if i %}, {% end %}{{ arg.raw }}{% end %}){% end %}{% if i %},{% end %}{% end %}) = 0;
+	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.parameters %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.parameters.size > 0 %} = {{var.type | typeToStr }}({% for i, arg in var.parameters %}{% if i %}, {% end %}{{ arg.raw }}{% end %}){% end %}{% if i %},{% end %}{% end %}) = 0;
 	{% end %}
 
 public: // Variable accessors.
