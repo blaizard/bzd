@@ -50,6 +50,7 @@ bzd_cc_binary(
         "main.cc",
         "pi.h",
     ],
+    tags = ["manual"],
     deps = [
         ":linux",
         "//cc/bzd/core:async",
