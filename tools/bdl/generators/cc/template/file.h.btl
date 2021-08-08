@@ -39,12 +39,18 @@ namespace {{ namespace | namespaceToStr }} {
 template <class Impl>
 {{ data.comment | normalComment }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
+public: // Internal
+	[[nodiscard]] constexpr {{ data.name }}<Impl>& base() noexcept { return *this; }
+
 public: // Types
 	{{ declareTrivialTypes(data.nested.symbols) }}
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
-	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({% for i, var in method.parameters %}{% if var.const %}const {% end %}{{var.type | typeToStr }} {{ var.name }}{% if var.parameters.size > 0 %} = {{var.type | typeToStr }}({% for i, arg in var.parameters %}{% if i %}, {% end %}{{ arg.raw }}{% end %}){% end %}{% if i %},{% end %}{% end %}) = 0;
+	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, 1) }})
+	{
+		{% if method.isType %}return {% end %}static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
+	}
 	{% end %}
 
 public: // Variable accessors.
@@ -90,7 +96,7 @@ protected: // Protected variable accessors.
 
 private: // Variables.
 	{% for var in data.nested.expressionList %}
-	{{ declareExpression(var, "_") }};
+	{{ declareExpression(var, "_", 0) }};
 	{% end %}
 };
 
