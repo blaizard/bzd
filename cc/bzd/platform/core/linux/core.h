@@ -16,10 +16,12 @@
 namespace bzd::platform::linux {
 
 template <SizeType N>
-class Core : public bzd::platform::Core
+class Core : public bzd::platform::Core<Core<N>>
 {
 private:
 	using Self = Core<N>;
+	using Parent = bzd::platform::Core<Self>;
+	using Error = typename Parent::Error;
 
 public:
 	explicit Core(const CoreId coreId) noexcept : id_{coreId} {}
