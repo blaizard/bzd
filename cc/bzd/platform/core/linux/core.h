@@ -16,7 +16,7 @@
 namespace bzd::platform::linux {
 
 template <SizeType N>
-class Core : public bzd::platform::linux::impl::Core
+class Core : public bzd::platform::Core
 {
 private:
 	using Self = Core<N>;
