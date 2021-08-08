@@ -38,6 +38,10 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": lambda x, y: x + y})
 		self.assertEqual("Hello agent 007", result)
 
+		template = Template("{{a(true, false)}}")
+		result = template.render({"a": lambda x, y: str(x) + str(y)})
+		self.assertEqual("TrueFalse", result)
+
 	def testCallableNestedSubsitution(self) -> None:
 		template = Template("Hello {{a.b}}")
 		result = template.render({"a": lambda: {"b": lambda: "Me!"}})

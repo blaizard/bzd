@@ -83,6 +83,11 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			return float(value)
 		elif valueType == "string":
 			return value
+		elif valueType == "true":
+			return True
+		elif valueType == "false":
+			return False
+		Error.handleFromElement(element=element, message="Unsupported value type.")
 
 	def visitSubstitution(self, element: Element, result: ResultType) -> None:
 		"""
