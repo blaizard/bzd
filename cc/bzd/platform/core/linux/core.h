@@ -26,7 +26,7 @@ private:
 public:
 	explicit Core(const CoreId coreId) noexcept : id_{coreId} {}
 
-	Result<void, Error> stop() noexcept final
+	Result<void, Error> stop() noexcept
 	{
 		{
 			const auto result = pthread_join(thread_, nullptr);
@@ -47,7 +47,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	bzd::Result<void, Error> start(Callable workload) noexcept final
+	bzd::Result<void, Error> start(Callable workload) noexcept
 	{
 		const auto nbCores = sysconf(_SC_NPROCESSORS_ONLN);
 		if (id_ >= nbCores)
@@ -83,7 +83,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	StackSize getStackUsage() noexcept final { return stack_.estimateMaxUsage(); }
+	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(); }
 
 	bzd::SizeType startUsageMonitoring() noexcept
 	{
@@ -106,7 +106,7 @@ public:
 
 	void getUsage() noexcept {}
 
-	CoreId getId() noexcept final { return id_; }
+	CoreId getId() noexcept { return id_; }
 
 private:
 	static void* workloadWrapper(void* object)

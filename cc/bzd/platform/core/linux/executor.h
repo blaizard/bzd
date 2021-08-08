@@ -26,7 +26,7 @@ public:
 	/**
 	 * Start the executor.
 	 */
-	void start() noexcept override
+	void start() noexcept
 	{
 		constexprForContainerInc(cores_, [&](auto item) { item->start(start_); });
 	}
@@ -34,9 +34,9 @@ public:
 	/**
 	 * Stop the executor.
 	 */
-	void stop() noexcept override
+	void stop() noexcept
 	{
-		constexprForContainerDec(cores_, [&](auto item) { item->stop(); });
+		constexprForContainerDec(cores_, [](auto item) { item->stop(); });
 	}
 
 private:

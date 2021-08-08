@@ -9,19 +9,30 @@
 };
 {% end -%}
 
-{#- Expressions -#}
-{%- macro declareExpression(element, prepend) -%}
+{#- Expressions
+	normal           -> /* comment */ int myvar = int{value}
+	no default value -> /* comment */ int myvar
+	unamed           -> /* comment */ int{value}
+	unamed literal   -> /* comment */ 12
+	literal          -> /* comment */ myvar = 12
+-#}
+{%- macro declareExpression(element, prepend, reference) -%}
 	{{ element.comment | normalComment }}
 	{%- if element.isType -%}
-	{{- element.type | typeToStr }}{% if element.isName %} {{ element.name }}{{ prepend }}{% end %}{ {{- declareParameters(element.parameters) -}} }
+	{% if element.isName %}{{- element.type | typeToStr }}{% if reference %}&{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, 0) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
 {%- end -%}
 
 {#- Parameters -#}
-{%- macro declareParameters(parameters) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, "") }}{% end -%}
+{%- macro declareParameters(parameters, reference) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, "", reference) }}{% end -%}
+{% end -%}
+
+{#- Parameters for call -#}
+{%- macro declareParametersCall(parameters) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ expression.name }}{% end -%}
 {% end -%}
 
 {#- Nested structure -#}
@@ -30,7 +41,7 @@
 {
 	{{ declareTrivialTypes(element.nested.symbols) }}
 	{% for element in element.nested.expressionList %}
-	{{ declareExpression(element, "") }};
+	{{ declareExpression(element, "", 0) }};
 	{% end %}
 };
 {% end -%}
