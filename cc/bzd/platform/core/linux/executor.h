@@ -9,7 +9,7 @@
 namespace bzd::platform::core {
 
 template <class... Cores>
-class Executor : public bzd::platform::Executor
+class Executor : public bzd::platform::Executor<Executor<Cores...>>
 {
 public:
 	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::Executor::run} {}
