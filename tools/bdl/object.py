@@ -1,5 +1,6 @@
 import json
 import typing
+import copy
 from pathlib import Path
 
 from bzd.parser.parser import Parser as BaseParser
@@ -138,12 +139,15 @@ class Object:
 		# Validation step
 		Validation().visit(data)
 
+		# Deep copy the parsed data
+		parsed = copy.deepcopy(data)
+
 		# Generate the symbol map
 		resolve = Build(objectContext=objectContext)
 		resolve.visit(data)
 		symbols = resolve.getSymbolMap()
 
-		return Object(context=parser.context, parsed=data, symbols=symbols)
+		return Object(context=parser.context, parsed=parsed, symbols=symbols)
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
