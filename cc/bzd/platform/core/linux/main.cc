@@ -7,11 +7,21 @@
 #include <iostream>
 
 // registry.h
-struct
+struct Registry
 {
 	bzd::platform::linux::Core<100000> linux0{0};
 	bzd::platform::linux::Core<100000> linux1{1};
-} registry;
+	bzd::platform::core::Executor<bzd::platform::linux::Core<100000>, bzd::platform::linux::Core<100000>> executor{linux0, linux1};
+
+	struct Nested
+	{
+		int a;
+		int b;
+	};
+};
+
+Registry registry;
+// registry;
 
 /*
 // linux 4 cores composition file.
@@ -105,16 +115,14 @@ void payload(bzd::core::Executor& executor)
 
 int main()
 {
-	bzd::platform::core::Executor executor{registry.linux0, registry.linux1};
-
 	// auto promise = task1();
 
 	auto promise = calculatePi<2>();
-	executor.enqueue(promise);
+	registry.executor.enqueue(promise);
 
-	executor.start();
+	registry.executor.start();
 
-	executor.stop();
+	registry.executor.stop();
 
 	/*
 		auto workload = [&executor]() { executor.run(); };
@@ -124,8 +132,8 @@ int main()
 		registry.linux1.stop();
 		registry.linux0.stop();
 	*/
-	std::cout << registry.linux0.getStackUsage() << std::endl;
-	std::cout << registry.linux1.getStackUsage() << std::endl;
+	std::cout << registry.linux0.getId() << ": " << registry.linux0.base().getStackUsage() << std::endl;
+	std::cout << registry.linux1.getId() << ": " << registry.linux1.base().getStackUsage() << std::endl;
 
 	// bzd::core::Executor
 
