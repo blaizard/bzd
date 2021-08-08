@@ -47,7 +47,7 @@ public: // Types
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
-	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, 1) }})
+	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }})
 	{
 		{% if method.isType %}return {% end %}static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
 	}
@@ -96,7 +96,7 @@ protected: // Protected variable accessors.
 
 private: // Variables.
 	{% for var in data.nested.expressionList %}
-	{{ declareExpression(var, "_", 0) }};
+	{{ declareExpression(var, "_", false) }};
 	{% end %}
 };
 

@@ -68,6 +68,14 @@
         "expression": {
             "patterns": [
                 {
+                    "match": "true",
+                    "name": "constant.language.true.btl"
+                },
+                {
+                    "match": "false",
+                    "name": "constant.language.false.btl"
+                },
+                {
                     "captures": {
                         "1": {
                             "name": "keyword.control.btl"

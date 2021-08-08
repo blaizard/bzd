@@ -19,7 +19,7 @@
 {%- macro declareExpression(element, prepend, reference) -%}
 	{{ element.comment | normalComment }}
 	{%- if element.isType -%}
-	{% if element.isName %}{{- element.type | typeToStr }}{% if reference %}&{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, 0) -}} }{% end %}
+	{% if element.isName %}{{- element.type | typeToStr }}{% if reference %}&{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -41,7 +41,7 @@
 {
 	{{ declareTrivialTypes(element.nested.symbols) }}
 	{% for element in element.nested.expressionList %}
-	{{ declareExpression(element, "", 0) }};
+	{{ declareExpression(element, "", false) }};
 	{% end %}
 };
 {% end -%}

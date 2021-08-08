@@ -23,6 +23,10 @@ _regexprComment = r"(?P<comment>(.+?(?=-?#})))"
 _regexprNumber = r"(?P<value>-?[0-9]+(?:\.[0-9]*)?)"
 # String
 _regexprString = r"\"(?P<value>.*?(?<!\\))\""
+# Boolean true
+_regexprBooleanTrue = r"(?P<value>true)"
+# Boolean false
+_regexprBooleanFalse = r"(?P<value>false)"
 
 
 def makeRegexprName(name: str) -> str:
@@ -95,6 +99,8 @@ def makeGrammarValue(fragment: typing.Dict[str, str], grammar: Grammar) -> Gramm
 	return [
 		GrammarItem(_regexprNumber, dict(fragment, type="number"), grammar),
 		GrammarItem(_regexprString, dict(fragment, type="string"), grammar),
+		GrammarItem(_regexprBooleanTrue, dict(fragment, type="true"), grammar),
+		GrammarItem(_regexprBooleanFalse, dict(fragment, type="false"), grammar),
 		GrammarItem(makeRegexprName("value"), dict(fragment, type="name"), grammar),
 	]
 

@@ -15,10 +15,11 @@ Syntax:
   - The first newline after a block and trailing spaces are stripped (for all control and comment blocks).
 
 - Substitutions:
+
   - Direct and nested, ex: `{{ my.nested.var }}`.
   - Resolution from mapping, sequences or callable.
   - Support piping to a callable, ex: `{{ var | lower | capitalize }}`.
-  - Support argument injection, ex: `{{ callable(my.var, 12, "hello") }}`
+  - Support argument injection, ex: `{{ callable(my.var, 12, "hello", false) }}`
 
 Piped data can be of arbitrary type but the final substitued value must be either a number or a string.
 
@@ -42,4 +43,5 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
   - Symbol substitution, ex: `{% macro my_block(a) %} ... {% end %}` -> `{{ my_block(b) }}`
 
 - Inclusion blocks:
+
   - Include another btl file as if it was part of the document, ex: `{% include "my/path.btl" %}`
