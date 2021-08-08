@@ -179,9 +179,11 @@ class Validation:
 				if key in self.processed:
 					result = self.processed[key].validate(value=value)
 					results.addResult(key, result)
+				elif not self.processed:
+					results.addError(key, ["no value expected."])
 				else:
 					results.addError(key, [
-						"value not expected, choices are: {}".format(", ".join(
+						"value not expected, valid choices are: {}.".format(", ".join(
 						["'{}'".format(x) for x in self.processed.keys()]))
 					])
 

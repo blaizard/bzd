@@ -12,7 +12,7 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Void; }", objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Void(); }", objectContext=ObjectContext(resolve=True))
 		# With a value
-		with self.assertRaisesRegex(Exception, r"not expected"):
+		with self.assertRaisesRegex(Exception, r"no value.*expected"):
 			Object.fromContent(content="struct temp { var = Void(12); }", objectContext=ObjectContext(resolve=True))
 		# With template
 		with self.assertRaisesRegex(Exception, r"not support template"):
