@@ -54,6 +54,31 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+	def testNamespaces(self) -> None:
+
+		Object.fromContent(content="""
+				namespace bzd.test.nested;
+				struct Test { }
+				composition MyComposition { test = bzd.test.nested.Test; }
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+	def testMethods(self) -> None:
+
+		# TODO: enable this
+		# Can only refer to methods from an instance.
+		Object.fromContent(content="""
+				interface Test { method hello(); }
+				composition MyComposition { test = Test; hello = Test.hello(); }
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		#Object.fromContent(content="""
+		#		interface Test { method hello(); }
+		#		composition MyComposition { test = Test; hello = test.hello(); }
+		#		""",
+		#	objectContext=ObjectContext(resolve=True))
+
 	def testValues(self) -> None:
 
 		Object.fromContent(content="""
@@ -127,7 +152,6 @@ class TestRun(unittest.TestCase):
 			composition MyComposition { val1 = Test<Void>; }
 			""",
 				objectContext=ObjectContext(resolve=True))
-			print(bdl)
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""

@@ -2,13 +2,28 @@ import typing
 import logging
 import sys
 import re
-
 from pathlib import Path
+
+from bzd.utils.result import Result as ResultBase
+
 from bzd.parser.element import Element
 from bzd.parser.fragments import IGNORE_INDEX_VALUE
 from bzd.parser.context import Context
 
 useColors: bool = False
+
+V = typing.TypeVar("V")
+
+
+class Result(ResultBase[V, str]):
+
+	def assertValue(self, element: Element, attr: typing.Optional[str] = None) -> V:
+		"""
+		Ensure the result holds a value, else print the error and throw.
+		"""
+		if not bool(self):
+			Error.handleFromElement(element=element, attr=attr, message=self.error)
+		return self.value
 
 
 class ExceptionParser(Exception):

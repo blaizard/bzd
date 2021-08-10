@@ -1,6 +1,8 @@
 import typing
 import copy
 
+from bzd.utils.dict import isEqual
+
 from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize, IGNORE_INDEX_VALUE
 from bzd.parser.grammar import Grammar
 from bzd.parser.context import Context
@@ -41,11 +43,11 @@ class Sequence:
 			listStr.append(formattedStr)
 		return "\n".join(listStr)
 
-	def serialize(self) -> SequenceSerialize:
+	def serialize(self, ignoreContext: bool = False) -> SequenceSerialize:
 		"""
 		Serialize a sequence.
 		"""
-		return [element.serialize() for element in self]
+		return [element.serialize(ignoreContext=ignoreContext) for element in self]
 
 	@staticmethod
 	def fromSerialize(sequence: SequenceSerialize, context: typing.Optional[Context] = None) -> "Sequence":
@@ -222,13 +224,16 @@ class Element:
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
 
-	def serialize(self) -> ElementSerialize:
+	def serialize(self, ignoreContext: bool = False) -> ElementSerialize:
 		"""
 		Serialize an element.
 		"""
-		data: ElementSerialize = {"@": {key: attr.serialize() for key, attr in self.getAttrs().items()}}
+		data: ElementSerialize = {
+			"@": {key: attr.serialize(ignoreContext=ignoreContext)
+			for key, attr in self.getAttrs().items()}
+		}
 		for kind, sequence in self.getNestedSequences():
-			data[kind] = sequence.serialize()
+			data[kind] = sequence.serialize(ignoreContext=ignoreContext)
 		return data
 
 	def copy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
@@ -242,6 +247,14 @@ class Element:
 			for kind, sequence in self.sequences.items() if kind not in ignoreNested
 		}
 		return element
+
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Element):
+			return False
+		return isEqual(self.serialize(ignoreContext=False), other.serialize(ignoreContext=False))
+
+	def __ne__(self, other: object) -> bool:
+		return not (self == other)
 
 	def __repr__(self) -> str:
 		"""

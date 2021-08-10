@@ -140,14 +140,12 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		GrammarItem(r"\)", FragmentParentElement)])
 	]
 
-	grammar = makeGrammarType([
+	return makeGrammarType([
 		GrammarItem(r"\(", ArgumentStart,
 		[GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
 		GrammarItem(r"\)", FragmentParentElement)] + grammarValue),
 		makeGrammarContracts(), finalGrammar
 	])
-
-	return grammar
 
 
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:

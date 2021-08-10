@@ -43,8 +43,8 @@ config:
 	width2 = Integer;
 
 composition:
-	square1  = Square(width = width1);
-	square2  = Square(width = width2);
+	square1 = Square(width = width1);
+	square2 = Square(width = width2);
 }
 ```
 
@@ -53,5 +53,22 @@ The C++ implementation of the complex component could be something like:
 Area ComplexShape::surface()
 {
 	return square1.surface() + square2.surface();
+}
+```
+
+Sub-components helps for encapsulation and hence reduce the complexity during component re-use and composition. For example, imagine a complex sub-system:
+```bdl
+component RobotLeg : Kinematics
+{
+config:
+	actuator1 = Actuator;
+	actuator2 = Actuator;
+	actuator3 = Actuator;
+	logger = Logger;
+
+composition:
+	connect(actuator1.error, logger);
+	connect(actuator2.error, logger);
+	connect(actuator3.error, logger);
 }
 ```
