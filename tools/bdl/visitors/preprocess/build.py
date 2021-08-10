@@ -1,9 +1,10 @@
 import typing
 
-from bzd.parser.element import Sequence
+from bzd.parser.element import Sequence, ElementBuilder
 
 from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL
-from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType, Namespace
+from tools.bdl.entities.builder import NamespaceBuilder
 from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 
 SymbolList = typing.List[SymbolType]
@@ -33,7 +34,7 @@ class Build(Visitor[SymbolList]):
 			return
 
 		# Build the symbol name and ensure it is unique
-		symbol = SymbolMap.makeFQN(name=entity.name, namespace=self.namespace)
+		symbol = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
 
 		# Save the serialized payload
 		self.symbols.insert(fqn=symbol,
@@ -70,3 +71,14 @@ class Build(Visitor[SymbolList]):
 
 			bdl = self.objectContext.loadPreprocess(path=entity.path)
 			self.symbols.update(bdl.symbols)
+
+	def visitNamespace(self, entity: Namespace, result: SymbolList) -> None:
+		namespace = []
+		for name in entity.nameList:
+			namespace.append(name)
+			fqn = SymbolMap.namespaceToFQN(namespace=namespace)
+			self.symbols.insert(fqn=fqn,
+				element=NamespaceBuilder(namespace),
+				path=None,
+				category=self.category,
+				conflicts=True)

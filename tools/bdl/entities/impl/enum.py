@@ -62,7 +62,7 @@ class Enum(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+		fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
 		self._setUnderlyingType(fqn)
 
 	@cached_property

@@ -1,29 +1,14 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
-py_test(
-    name = "grammar",
+[py_test(
+    name = path.replace(".py", ""),
     srcs = [
-        "grammar.py",
-    ],
-    args = [
-        "$(location grammar.txt)",
-    ],
-    data = [
-        "grammar.txt",
+        path,
     ],
     deps = [
         "//python/bzd/parser",
         "//python/bzd/parser/tests/support",
     ],
-)
-
-py_test(
-    name = "serialize",
-    srcs = [
-        "serialize.py",
-    ],
-    deps = [
-        "//python/bzd/parser",
-        "//python/bzd/parser/tests/support",
-    ],
-)
+) for path in glob([
+    "*.py",
+])]

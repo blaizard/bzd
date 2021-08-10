@@ -1,7 +1,7 @@
 import typing
 from pathlib import Path
 
-from bzd.parser.error import Error
+from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
 from bzd.parser.context import Context
 
@@ -46,7 +46,13 @@ class SymbolMap:
 
 	#def insertAlias(self, fqn: str, path: typing.Optional[Path], )
 
-	def insert(self, fqn: str, path: typing.Optional[Path], element: Element, category: str) -> None:
+	def insert(
+			self,
+			fqn: str,
+			path: typing.Optional[Path],
+			element: Element,
+			category: str,
+			conflicts: bool = False) -> None:
 		"""
 		Insert a new element into the symbol map.
 		Args:
@@ -54,12 +60,14 @@ class SymbolMap:
 			path: Path associated with the element.
 			element: Element to be registered.
 			category: Category associated with the element, will be used for filtering.
+			conflicts: Handle symbol FQN conflicts.
 		"""
-		Error.assertTrue(element=element,
-			condition=(not self._contains(fqn=fqn)),
-			message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
+		if self._contains(fqn=fqn):
+			if not conflicts or element != self.getEntity(fqn=fqn).assertValue(element=element).element:
+				Error.handleFromElement(element=element,
+					message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
 
-		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else Path(), "e": None}
+		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else "", "e": None}
 		# The element is also added to the entity map, to allow further modification that will
 		# be written when serialize is called.
 		self.entities[fqn] = elementToEntity(element=element)
@@ -100,7 +108,7 @@ class SymbolMap:
 							if element.isAttr("name"):
 								sequence.pushBackElement(ElementBuilder().addAttr("category",
 									"reference").addAttr(key="name",
-									value=SymbolMap.makeFQN(name=element.getAttr("name").value,
+									value=SymbolMap.namespaceToFQN(name=element.getAttr("name").value,
 									namespace=SymbolMap.FQNToNamespace(fqn)),
 									index=element.getAttr("name").index))
 						preparedElement.setNestedSequence(category, sequence)
@@ -118,10 +126,12 @@ class SymbolMap:
 		return self.map
 
 	@staticmethod
-	def makeFQN(name: str, namespace: typing.List[str]) -> str:
+	def namespaceToFQN(namespace: typing.List[str], name: typing.Optional[str] = None) -> str:
 		"""
 		Make the fully qualified name from a symbol name
 		"""
+		if name is None:
+			return ".".join(namespace)
 		return ".".join(namespace + [name])
 
 	@staticmethod
@@ -131,34 +141,42 @@ class SymbolMap:
 		"""
 		return fqn.split(".")
 
-	def resolveFQN(self,
-		name: str,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> typing.Optional[str]:
+	def resolveFQN(
+			self,
+			name: str,
+			namespace: typing.List[str],
+			exclude: typing.Optional[typing.List[str]] = None) -> Result[str]:
 		"""
 		Find the fully qualified name of a given a name and a namespace.
+		Note, name can be a partial fqn.
 		"""
-		# Look for a symbol match
+		nameFirst = SymbolMap.FQNToNamespace(name)[0]
+
+		# Look for a symbol match of the first part of the name.
 		namespace = namespace.copy()
 		while True:
-			fqn = SymbolMap.makeFQN(name=name, namespace=namespace)
+			fqn = SymbolMap.namespaceToFQN(name=nameFirst, namespace=namespace)
 			if self._contains(fqn=fqn, exclude=exclude):
 				break
 			if not namespace:
-				return None
+				return Result[str].makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(
+					name, ".".join(namespace)) if namespace else "Symbol '{}' could not be resolved.".format(name))
 			namespace.pop()
 
-		return fqn
+		# If match, ensure that the rest of the name also matches with the namespace identified.
+		if name != nameFirst:
+			fqn = SymbolMap.namespaceToFQN(name=name, namespace=namespace)
 
-	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
+		return Result[str](fqn)
+
+	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
 		Additionally, resolves all references depending on this FQN.
 		"""
-
 		data = self._get(fqn)
 		if data is None:
-			return None
+			return Result[EntityType].makeError("Unable to find symbol '{}'.".format(fqn))
 
 		# Not memoized
 		if fqn not in self.entities:
@@ -180,40 +198,13 @@ class SymbolMap:
 						Error.assertTrue(element=nested,
 							condition=nested.isAttr("name"),
 							message="Reference is missing attribute 'name'.")
-						nestedEntity = self.getEntityAssert(fqn=nested.getAttr("name").value, element=nested)
+						nestedEntity = self.getEntity(fqn=nested.getAttr("name").value).assertValue(element=nested)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
 						sequence=updatedSequence)
 
 		# Return the element
-		return self.entities[fqn]
-
-	def getEntityAssert(self, fqn: str, element: Element, category: typing.Optional[str] = None) -> EntityType:
-		"""
-		Get an element and assert it exists.
-		"""
-		maybeEntity = self.getEntity(fqn=fqn, category=category)
-		Error.assertTrue(element=element,
-			condition=maybeEntity is not None,
-			message="Unable to find symbol '{}'.".format(fqn))
-		assert maybeEntity is not None
-		return maybeEntity
-
-	def getEntityFromName(self,
-		name: str,
-		namespace: typing.List[str],
-		category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
-		"""
-		Return an element from an unqualified name.
-		"""
-
-		# Look for a symbol match
-		fqn = self.resolveFQN(name=name, namespace=namespace)
-		if fqn is None:
-			return None
-
-		# Match found
-		return self.getEntity(fqn=fqn, category=category)
+		return Result[EntityType](self.entities[fqn])
 
 	@staticmethod
 	def fromSerialize(data: typing.Dict[str, typing.Any]) -> "SymbolMap":

@@ -30,12 +30,9 @@ class Type:
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
 
-		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude)
-		Error.assertTrue(element=self.element,
-			attr=self.kindAttr,
-			condition=(fqn is not None),
-			message="Symbol '{}' in namespace '{}' could not be resolved.".format(self.kind, ".".join(namespace)))
-		assert fqn is not None
+		result = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude)
+		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
+			attr=self.kindAttr)
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
 
 		# Resolve the templates if available
@@ -44,7 +41,7 @@ class Type:
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
-		underlying = symbols.getEntityAssert(fqn=fqn, element=self.element)
+		underlying = symbols.getEntity(fqn=fqn).assertValue(element=self.element, attr=self.kindAttr)
 
 		# Validate template arguments
 		validation = underlying.makeValidationForTemplate(symbols=symbols)
@@ -59,8 +56,11 @@ class Type:
 
 			values = templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
 			# Merge the lists
-			result = validation.validate(values, output="return")
-			Error.assertTrue(element=self.element, attr=self.kindAttr, condition=bool(result), message=str(result))
+			resultValidate = validation.validate(values, output="return")
+			Error.assertTrue(element=self.element,
+				attr=self.kindAttr,
+				condition=bool(resultValidate),
+				message=str(resultValidate))
 
 		return underlying
 

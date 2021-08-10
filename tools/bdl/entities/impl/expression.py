@@ -108,7 +108,7 @@ class Expression(Entity):
 
 			# Generate this symbol FQN
 			# TODO: need to handle when the expression has no name
-			fqn = symbols.makeFQN(name=self.name, namespace=namespace)
+			fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
 			self._setUnderlyingValue(entity=self, fqn=fqn)
 
 		else:
@@ -125,8 +125,7 @@ class Expression(Entity):
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		# TODO: check if it actually make sense to use entity.contracts instead of self.contracts
-		validation = self._makeValueValidation(symbols=symbols, contracts=entity.contracts)
+		validation = self._makeValueValidation(symbols=symbols, contracts=self.contracts)
 		if validation is not None:
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
@@ -143,7 +142,7 @@ class Expression(Entity):
 
 		# Get the configuration value if any.
 		if self.underlyingType is not None:
-			underlyingType = symbols.getEntity(self.underlyingType)
+			underlyingType = symbols.getEntity(self.underlyingType).assertValue(element=self.element)
 			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="Value-specific contracts cannot be associated with a configuration.")

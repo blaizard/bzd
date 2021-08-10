@@ -172,15 +172,6 @@ class Object:
 			},
 			separators=(",", ":"))
 
-	def getEntityFromType(self,
-		entity: Type,
-		namespace: typing.List[str],
-		category: typing.Optional[str] = None) -> typing.Optional[EntityType]:
-
-		if entity.isFQN:
-			return self.symbols.getEntity(fqn=entity.kind, category=category)
-		return self.symbols.getEntityFromName(name=entity.kind, namespace=namespace, category=category)
-
 	def __repr__(self) -> str:
 		"""
 		Print an object (for debug purpose only).

@@ -23,3 +23,15 @@ py_library(
     srcs = ["decorators.py"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "dict",
+    srcs = ["dict.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "result",
+    srcs = ["result.py"],
+    visibility = ["//visibility:public"],
+)

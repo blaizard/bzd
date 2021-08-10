@@ -18,11 +18,11 @@ class Attribute:
 
 	@property
 	def index(self) -> int:
-		return cast(int, self.data["i"])
+		return cast(int, self.data.get("i", IGNORE_INDEX_VALUE))
 
 	@property
 	def end(self) -> int:
-		return cast(int, self.data["e"])
+		return cast(int, self.data.get("e", 0))
 
 	@property
 	def value(self) -> str:
@@ -31,7 +31,9 @@ class Attribute:
 	def setValue(self, value: str) -> None:
 		self.data["v"] = value
 
-	def serialize(self) -> AttributeSerialize:
+	def serialize(self, ignoreContext: bool = False) -> AttributeSerialize:
+		if ignoreContext:
+			return {"v": self.data["v"]}
 		return self.data
 
 	@staticmethod

@@ -8,11 +8,15 @@ from bzd.parser.tests.support.parser import TestParser
 
 class TestRun(unittest.TestCase):
 
-	filePath: typing.Optional[Path] = None
-
 	def testFromPath(self) -> None:
-		assert self.filePath is not None
-		parser = TestParser.fromPath(self.filePath)
+		parser = TestParser("""// I am a comment
+const int myVar = 42;
+void hello()
+{
+        // I am a nested comment
+        float nestedVar = 2;
+}
+""")
 		data = parser.parse()
 
 		result = data.serialize()
@@ -134,5 +138,4 @@ class TestRun(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	TestRun.filePath = Path(sys.argv.pop())
 	unittest.main()

@@ -37,5 +37,14 @@ class ElementBuilder(Element):
 		return self
 
 
+class NamespaceBuilder(ElementBuilder):
+
+	def __init__(self, namespace: typing.List[str]) -> None:
+		super().__init__("namespace")
+		for name in namespace:
+			element = Element().addAttr("name", name)
+			self.pushBackElementToNestedSequence(kind="name", element=element)
+
+
 class SequenceBuilder(Sequence):
 	pass

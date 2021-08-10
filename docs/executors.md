@@ -10,11 +10,11 @@ Cores can be assigned with a maximum load or other specific atrtibutes.
 
 ```bdl
 // A workload will run on either core0 or core1.
-composition esp32
+composition
 {
-   core0 = FreeRTOS(4000, 0) [load = 20%];
-   core1  = FreeRTOS(10000, 1);
-   executor = Executor(core0, core1);
+   core0 = FreeRTOS(stackSize = 4000, load = 20%);
+   core1 = FreeRTOS(stackSize = 10000);
+   esp32 = Executor(core0, core1);
 }
 ```
 
@@ -22,27 +22,22 @@ Sometimes, for portability purpose, you might want to inject the knowledge of co
 To do so, a platform specific executor can be made, abstracting the notion of cores.
 For example, a linux machine can be composed as follow:
 ```bdl
-composition linux
-{
-   executor = LinuxExecutor;
-}
-```
-## Association
-
-To associate a group of entities to an executor, this can be done at the composition level, as such:
-
-```bdl
-composition [executor = esp32]
-{
-   comp1 = Component;
-}
-```
-
-or for a single entity, with the `map` keyword:
-
-```bdl
 composition
 {
-   map(comp1) [executor = esp32];
+   linux = LinuxExecutor;
+}
+```
+
+Multiple executors can be created and deployed on the same process/binary, this can be usefull to have different task priorities for example.
+
+## Association
+
+To associate a group of entities to an executor, this can be done at the composition level.
+For example, to instanciate a component and execute it on the `esp32` executor, it can be done as follow:
+
+```bdl
+composition [executor(esp32)]
+{
+   comp1 = Component;
 }
 ```
