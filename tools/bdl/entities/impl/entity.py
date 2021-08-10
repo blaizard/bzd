@@ -123,7 +123,7 @@ class Entity:
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntity(self.underlyingType).assertValue(element=self.element)
+			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
 			return [config for config in underlyingType.config if config.contracts.get("template")]
 		return []
 
@@ -133,7 +133,7 @@ class Entity:
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntity(self.underlyingType).assertValue(element=self.element)
+			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
 			return [config for config in underlyingType.config if not config.contracts.get("template")]
 		return []
 
@@ -157,7 +157,7 @@ class Entity:
 		Get the default values for the template.
 		"""
 		if self.underlyingType:
-			underlyingType = symbols.getEntity(fqn=self.underlyingType).assertValue(element=self.element)
+			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind="config",
 				filterFct=lambda entity: entity.contracts.has("template"))
@@ -184,7 +184,7 @@ class Entity:
 		Get the default values for the values.
 		"""
 		if self.underlyingType:
-			underlyingType = symbols.getEntity(fqn=self.underlyingType).assertValue(element=self.element)
+			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind="config",
 				filterFct=lambda entity: not entity.contracts.has("template"))

@@ -142,7 +142,7 @@ class Expression(Entity):
 
 		# Get the configuration value if any.
 		if self.underlyingType is not None:
-			underlyingType = symbols.getEntity(self.underlyingType).assertValue(element=self.element)
+			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
 			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="Value-specific contracts cannot be associated with a configuration.")

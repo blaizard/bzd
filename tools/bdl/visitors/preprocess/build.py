@@ -44,6 +44,8 @@ class Build(Visitor[SymbolList]):
 
 	def visitNestedEntities(self, entity: Nested, result: SymbolList) -> None:
 		if entity.type in ["struct", "interface", "component"]:
+			# TODO: create a new entry by merging inheritance,
+			# so that the underlying type will contain all the members.
 			self.registerSymbol(entity=entity)
 		# Composition acts as a namespace, so we don't want to register the symbol.
 		elif entity.type == "composition":

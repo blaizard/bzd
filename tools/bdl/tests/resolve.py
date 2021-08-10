@@ -73,11 +73,11 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True))
 
-		#Object.fromContent(content="""
-		#		interface Test { method hello(); }
-		#		composition MyComposition { test = Test; hello = test.hello(); }
-		#		""",
-		#	objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="""
+				interface Test { method hello(); }
+				composition MyComposition { test = Test; hello = test.hello(); }
+				""",
+			objectContext=ObjectContext(resolve=True))
 
 	def testValues(self) -> None:
 
