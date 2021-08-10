@@ -44,8 +44,6 @@ class SymbolMap:
 			return self.builtins[fqn]
 		return None
 
-	#def insertAlias(self, fqn: str, path: typing.Optional[Path], )
-
 	def insert(
 			self,
 			fqn: str,
@@ -63,7 +61,7 @@ class SymbolMap:
 			conflicts: Handle symbol FQN conflicts.
 		"""
 		if self._contains(fqn=fqn):
-			if not conflicts or element != self.getEntity(fqn=fqn).assertValue(element=element).element:
+			if not conflicts or element != self.getEntityResolved(fqn=fqn).assertValue(element=element).element:
 				Error.handleFromElement(element=element,
 					message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
 
@@ -169,10 +167,10 @@ class SymbolMap:
 
 		return Result[str](fqn)
 
-	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
+	def getEntityResolved(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
-		Additionally, resolves all references depending on this FQN.
+		This call assumes that FQN is already resolved.
 		"""
 		data = self._get(fqn)
 		if data is None:
@@ -198,13 +196,34 @@ class SymbolMap:
 						Error.assertTrue(element=nested,
 							condition=nested.isAttr("name"),
 							message="Reference is missing attribute 'name'.")
-						nestedEntity = self.getEntity(fqn=nested.getAttr("name").value).assertValue(element=nested)
+						nestedEntity = self.getEntityResolved(fqn=nested.getAttr("name").value).assertValue(
+							element=nested)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
 						sequence=updatedSequence)
 
 		# Return the element
 		return Result[EntityType](self.entities[fqn])
+
+	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
+		"""
+		Return an element from the symbol map and resolves underlying types if needed.
+		"""
+
+		namespace = []
+		result = None
+		for name in SymbolMap.FQNToNamespace(fqn):
+			namespace.append(name)
+			result = self.getEntityResolved(fqn=SymbolMap.namespaceToFQN(namespace=namespace), category=category)
+			if not result:
+				continue
+			if result.value.underlyingType is not None:
+				namespace = SymbolMap.FQNToNamespace(result.value.underlyingType)
+
+		if not result:
+			return Result.makeError("Could not resolve symbol '{}'.".format(fqn))
+
+		return Result(result.value)
 
 	@staticmethod
 	def fromSerialize(data: typing.Dict[str, typing.Any]) -> "SymbolMap":

@@ -139,7 +139,8 @@ class Parameters:
 				values.append((key, expression.literal))
 
 			elif expression.underlyingValue is not None:
-				value = symbols.getEntity(fqn=expression.underlyingValue).assertValue(element=expression.element)
+				value = symbols.getEntityResolved(fqn=expression.underlyingValue).assertValue(
+					element=expression.element)
 				values.append((key, value))
 
 			else:
