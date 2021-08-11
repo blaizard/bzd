@@ -54,6 +54,44 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
+	def testNestedInheritance(self) -> None:
+
+		Object.fromContent(content="""
+				struct A { a = Integer; }
+				struct B { b = Integer; }
+				struct C : A, B {}
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		# Overload
+		Object.fromContent(content="""
+				struct A { a = Float; }
+				struct B { a = Integer; }
+				struct C : A, B { a = Float; }
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"nested class"):
+			Object.fromContent(content="""
+					struct A { a = Integer; }
+					struct C : A, Integer {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
+		Object.fromContent(content="""
+				struct A { a = Integer; }
+				using B = A;
+				struct C : B {}
+				""",
+			objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"nested class"):
+			Object.fromContent(content="""
+					using B = Float;
+					struct C : B {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
 	def testNamespaces(self) -> None:
 
 		Object.fromContent(content="""
@@ -61,7 +99,25 @@ class TestRun(unittest.TestCase):
 				struct Test { }
 				composition MyComposition { test = bzd.test.nested.Test; }
 				""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+				namespace bzd.test.nested;
+				struct Test { a = Integer; }
+				using Other = Test;
+				composition MyComposition { test = bzd.test.nested.Other.a; }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		# Inheritance
+		Object.fromContent(content="""
+				namespace bzd.test.nested;
+				struct A { a = Integer; }
+				struct B { b = Integer; }
+				struct C : A, B {}
+				composition MyComposition { test = C.a; }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testMethods(self) -> None:
 
@@ -71,13 +127,13 @@ class TestRun(unittest.TestCase):
 				interface Test { method hello(); }
 				composition MyComposition { test = Test; hello = Test.hello(); }
 				""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
 				interface Test { method hello(); }
 				composition MyComposition { test = Test; hello = test.hello(); }
 				""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testValues(self) -> None:
 
@@ -85,14 +141,14 @@ class TestRun(unittest.TestCase):
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=12); }
 				""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"named parameters"):
 			Object.fromContent(content="""
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		# Mispelled value key
 		with self.assertRaisesRegex(Exception, r"not expected"):
@@ -100,7 +156,7 @@ class TestRun(unittest.TestCase):
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(vaue=1); }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		# Multiple arguments
 		with self.assertRaisesRegex(Exception, r"integer"):
@@ -108,26 +164,26 @@ class TestRun(unittest.TestCase):
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value="dsdsd"); }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"Symbol.*resolved"):
 			Object.fromContent(content="""
 				interface Test { config: value = Callable; }
 				composition MyComposition { val2 = Test(value=val1); }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"instantiate.*value"):
 			Object.fromContent(content="""
 				composition MyComposition { val1 = Integer(12); val2 = val1(12); }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
 			interface Test { config: value = Callable; }
 			composition MyComposition { val1 = Callable; val2 = Test(value=val1); }
 			""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testTemplates(self) -> None:
 
@@ -137,55 +193,55 @@ class TestRun(unittest.TestCase):
 				interface Test { config: Integer [template mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"named parameter"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [template]; }
 				composition MyComposition { val1 = Test<12>; }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"expects.*integer"):
 			bdl = Object.fromContent(content="""
 			interface Test { config: Integer [template]; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
 			interface Test { config: Integer [template min(10)]; }
 			composition MyComposition { val1 = Test<2>; }
 			""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"higher than"):
 			Object.fromContent(content="""
 			interface Test { config: Integer [template max(10)]; }
 			composition MyComposition { val1 = Test<20>; }
 			""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
 			interface Test { config: Integer [template min(10) max(32)]; }
 			composition MyComposition { val1 = Test<23>; }
 			""",
-			objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
 				interface Test { config: Integer [template min(10) max(32)]; Integer [template mandatory]; }
 				composition MyComposition { val1 = Test<23>; }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [min(10) max(32)]; }
 				composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testDefaultValues(self) -> None:
 
@@ -194,14 +250,14 @@ class TestRun(unittest.TestCase):
 				interface Test { config: value = Integer [mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer(1) [min(10) max(32)]; }
 				composition MyComposition { val1 = Test; }
 				""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 
 if __name__ == '__main__':

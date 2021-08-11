@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import SymbolMap
 
 
 class Type:
@@ -41,7 +41,7 @@ class Type:
 
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
-		underlying = symbols.getEntity(fqn=fqn).assertValue(element=self.element, attr=self.kindAttr)
+		underlying = self.getEntityResolved(symbols=symbols)
 
 		# Validate template arguments
 		validation = underlying.makeValidationForTemplate(symbols=symbols)
@@ -63,6 +63,19 @@ class Type:
 				message=str(resultValidate))
 
 		return underlying
+
+	def getEntityResolved(self, symbols: "SymbolMap") -> "EntityType":
+		"""
+		Get the entity related to type after resolve.
+		"""
+		return symbols.getEntity(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
+
+	def getEntityUnderlyingTypeResolved(self, symbols: "SymbolMap") -> "EntityType":
+		"""
+		Get the entity related to type after resolve.
+		"""
+		entity = self.getEntityResolved(symbols=symbols)
+		return entity.getEntityUnderlyingTypeResolved(symbols=symbols)
 
 	@property
 	def contracts(self) -> Contracts:

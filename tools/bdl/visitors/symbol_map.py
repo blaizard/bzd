@@ -2,15 +2,32 @@ import typing
 from pathlib import Path
 
 from bzd.parser.error import Error, Result
-from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
+from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
 
 from tools.bdl.visitor import Visitor, CATEGORIES
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
+from tools.bdl.entities.builder import ElementBuilder
+from tools.bdl.entities.impl.reference import Reference
 
 
 class SymbolMap:
+	"""
+	Symbol map looks like this:
+	 - bzd: <namespace "bzd">                         <- Created implicitly by "bzd.nested" namespace
+	 - bzd.nested: <namespace "bzd.nested">
+	 - bzd.nested.Struct: <nested>
+	                          <reference "bzd.nested.Struct.a">
+	                          <reference "bzd.nested.Struct.b">
+	 - bzd.nested.Struct.a: <expression "a">
+	 - bzd.nested.Struct.b: <expression "b">
+     - bzd.Child: <nested>
+	                 <reference "bzd.Child.c">
+	 - bzd.Child.c: <expression "c">
+	 - bzd.Child.a: <reference "bzd.nested.Struct.a"> <- duplicated entries as Child inherits from Struct. Maybe this should be a reference also?
+	 - bzd.Child.b: <reference "bzd.nested.Struct.b">
+	"""
 
 	def __init__(self) -> None:
 		self.map: typing.Dict[str, typing.Any] = {}
@@ -44,13 +61,13 @@ class SymbolMap:
 			return self.builtins[fqn]
 		return None
 
-	def insert(
-			self,
-			fqn: str,
-			path: typing.Optional[Path],
-			element: Element,
-			category: str,
-			conflicts: bool = False) -> None:
+	def insert(self,
+		fqn: str,
+		path: typing.Optional[Path],
+		element: Element,
+		category: str,
+		conflicts: bool = False,
+		ignore: bool = False) -> None:
 		"""
 		Insert a new element into the symbol map.
 		Args:
@@ -59,8 +76,11 @@ class SymbolMap:
 			element: Element to be registered.
 			category: Category associated with the element, will be used for filtering.
 			conflicts: Handle symbol FQN conflicts.
+			ignore: Ignore duplicates.
 		"""
 		if self._contains(fqn=fqn):
+			if ignore:
+				return
 			if not conflicts or element != self.getEntityResolved(fqn=fqn).assertValue(element=element).element:
 				Error.handleFromElement(element=element,
 					message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
@@ -70,6 +90,22 @@ class SymbolMap:
 		# be written when serialize is called.
 		self.entities[fqn] = elementToEntity(element=element)
 
+	def insertInheritance(self, fqn: str, fqnInheritance: str, category: str) -> None:
+		"""
+		Copy all nested references from the inheritance to the passed fqn.
+		"""
+		inheritance = self.getEntityResolved(fqn=fqnInheritance).value
+		namespaceInheritance = SymbolMap.FQNToNamespace(fqnInheritance)
+		namespace = SymbolMap.FQNToNamespace(fqn)
+		for nested in inheritance.nested:
+			if nested.isName:
+				fqnNested = SymbolMap.namespaceToFQN(name=nested.name, namespace=namespaceInheritance)
+				self.insert(fqn=SymbolMap.namespaceToFQN(name=nested.name, namespace=namespace),
+					path=None,
+					element=self.makeReference(fqn=fqnNested),
+					category=category,
+					ignore=True)
+
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
 		Register multiple symbols.
@@ -77,6 +113,13 @@ class SymbolMap:
 		for fqn, element in symbols.map.items():
 			assert not self._contains(fqn=fqn), "Symbol '{}' already defined.".format(fqn)
 			self.map[fqn] = element
+
+	def makeReference(self, fqn: str, category: typing.Optional[str] = None) -> Element:
+		"""
+		Create a reference from an existing FQN.
+		"""
+		assert self._contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
+		return ElementBuilder("reference").addAttr(key="name", value=fqn)
 
 	def serialize(self) -> typing.Dict[str, typing.Any]:
 		"""
@@ -104,11 +147,9 @@ class SymbolMap:
 						sequence = SequenceBuilder()
 						for element in nested:
 							if element.isAttr("name"):
-								sequence.pushBackElement(ElementBuilder().addAttr("category",
-									"reference").addAttr(key="name",
-									value=SymbolMap.namespaceToFQN(name=element.getAttr("name").value,
-									namespace=SymbolMap.FQNToNamespace(fqn)),
-									index=element.getAttr("name").index))
+								fqnNested = SymbolMap.namespaceToFQN(name=element.getAttr("name").value,
+									namespace=SymbolMap.FQNToNamespace(fqn))
+								sequence.pushBackElement(self.makeReference(fqnNested))
 						preparedElement.setNestedSequence(category, sequence)
 				element = preparedElement
 
@@ -180,29 +221,28 @@ class SymbolMap:
 		if fqn not in self.entities:
 			element = Element.fromSerialize(element=data["e"], context=Context(path=Path(data["p"])))
 			entity = elementToEntity(element=element)
-			self.entities[fqn] = entity
 			# Resolve dependencies
 			for category in CATEGORIES:
 				if element.isNestedSequence(category):
 					updatedSequence = SequenceBuilder()
 					for nested in element.getNestedSequenceAssert(category):
-						# There should be only references
-						Error.assertTrue(element=nested,
-							condition=nested.isAttr("category"),
-							message="All sub-elements must have a category.")
-						Error.assertTrue(element=nested,
-							condition=(nested.getAttr("category").value == "reference"),
-							message="All sub-elements must be of type 'reference'.")
-						Error.assertTrue(element=nested,
-							condition=nested.isAttr("name"),
-							message="Reference is missing attribute 'name'.")
-						nestedEntity = self.getEntityResolved(fqn=nested.getAttr("name").value).assertValue(
-							element=nested)
+						# There must be only references
+						entityReference = elementToEntity(nested)
+						Error.assertTrue(element=element,
+							condition=isinstance(entityReference, Reference),
+							message="Nested elements must be reference.")
+						nestedEntity = self.getEntityResolved(fqn=entityReference.name,
+							category=category).assertValue(element=element)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
 						sequence=updatedSequence)
+			self.entities[fqn] = entity
 
-		# Return the element
+		# Return the referenced type in case of reference.
+		if isinstance(self.entities[fqn], Reference):
+			return self.getEntityResolved(fqn=self.entities[fqn].name, category=category)
+
+		# Return the entity.
 		return Result[EntityType](self.entities[fqn])
 
 	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:

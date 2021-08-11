@@ -98,4 +98,5 @@ def formatCc(bdl: Object) -> str:
 	})
 
 	output = template.render(result)  # type: ignore
+
 	return output
