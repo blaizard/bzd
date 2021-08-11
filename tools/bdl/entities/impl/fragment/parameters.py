@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
-	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import SymbolMap
 	from tools.bdl.entities.impl.fragment.type import Type
 	from tools.bdl.entities.impl.entity import Entity
 

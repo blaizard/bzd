@@ -71,13 +71,17 @@ class Nested(Entity):
 		"""
 		Resolve entities.
 		"""
-		# Generate this symbol FQN
+		# Generate this symbol FQN.
 		if self.isName:
 			fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
 			self._setUnderlyingType(fqn)
 
+		# Resolve and make sure the inheritance is correct.
 		for inheritance in self.inheritanceList:
-			inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			entity = inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=symbols)
+			self.assertTrue(condition=underlyingType.category in ["nested"],
+				message="Inheritance can only be done from a nested class, not '{}'.".format(entity.underlyingType))
 
 	def __repr__(self) -> str:
 		content = self.toString({

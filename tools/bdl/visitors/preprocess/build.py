@@ -5,7 +5,7 @@ from bzd.parser.element import Sequence, ElementBuilder
 from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType, Namespace
 from tools.bdl.entities.builder import NamespaceBuilder
-from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+from tools.bdl.visitors.symbol_map import SymbolMap
 
 SymbolList = typing.List[SymbolType]
 
@@ -23,7 +23,11 @@ class Build(Visitor[SymbolList]):
 	def visitBegin(self, result: SymbolList) -> SymbolList:
 		return []
 
-	def registerSymbol(self, entity: SymbolType) -> None:
+	def registerSymbol(self, entity: SymbolType) -> typing.Optional[str]:
+
+		# Ignore if composition
+		if self.category == CATEGORY_COMPOSITION and not self.objectContext.composition:
+			return None
 
 		# Resolve the symbol
 		if self.objectContext.resolve:
@@ -31,27 +35,31 @@ class Build(Visitor[SymbolList]):
 
 		# Map an entity only if the name is available.
 		if not entity.isName:
-			return
+			return None
 
 		# Build the symbol name and ensure it is unique
-		symbol = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
+		fqn = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
 
 		# Save the serialized payload
-		self.symbols.insert(fqn=symbol,
+		self.symbols.insert(fqn=fqn,
 			element=entity.element,
 			path=self.objectContext.getSource(),
 			category=self.category)
 
+		return fqn
+
 	def visitNestedEntities(self, entity: Nested, result: SymbolList) -> None:
-		if entity.type in ["struct", "interface", "component"]:
-			# TODO: create a new entry by merging inheritance,
-			# so that the underlying type will contain all the members.
-			self.registerSymbol(entity=entity)
-		# Composition acts as a namespace, so we don't want to register the symbol.
-		elif entity.type == "composition":
-			pass
-		else:
-			entity.error(message="Unsupported entity type: '{}'.".format(entity.type))
+		fqn = self.registerSymbol(entity=entity)
+
+		if fqn and self.objectContext.resolve:
+			assert fqn is not None
+			# Need to map inheritance members to ths new entity
+			for inheritanceType in entity.inheritanceList:
+				underlyingType = inheritanceType.getEntityResolved(symbols=self.symbols).underlyingType
+				entity.assertTrue(condition=underlyingType is not None, message="Inheritance type was not resolved.")
+				assert underlyingType is not None
+				# Need to copy all references from underlyingType to new symbols with namespace "fqn"
+				self.symbols.insertInheritance(fqn=fqn, fqnInheritance=underlyingType, category=self.category)
 
 	def visitExpression(self, entity: Expression, result: SymbolList) -> None:
 		self.registerSymbol(entity=entity)

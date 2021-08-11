@@ -8,9 +8,9 @@ from bzd.parser.context import Context
 from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
+from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.preprocess.process_inclusions import ProcessInclusions
 from tools.bdl.visitors.preprocess.build import Build
-from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
 from tools.bdl.visitors.preprocess.validation import Validation
 from tools.bdl.entities.all import EntityType
 from tools.bdl.entities.impl.fragment.type import Type
@@ -19,11 +19,21 @@ from tools.bdl.entities.impl.use import Use
 
 class ObjectContext:
 
-	def __init__(self, preprocessFormat: typing.Optional[str] = None, resolve: bool = False) -> None:
+	def __init__(
+			self,
+			preprocessFormat: typing.Optional[str] = None,
+			resolve: bool = False,
+			composition: bool = False) -> None:
+		"""
+		Args:
+			resolve: Resolve all symbols.
+			composition: Include composition stage (for testing purpose only).
+		"""
 
 		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
 		self.sources: typing.List[Path] = []
 		self.resolve = resolve
+		self.composition = composition
 
 	def pushSource(self, path: Path) -> None:
 		"""

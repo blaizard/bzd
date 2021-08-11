@@ -10,7 +10,9 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 
 if typing.TYPE_CHECKING:
-	from bdl.entities.impl.expression import Expression
+	from tools.bdl.entities.impl.expression import Expression
+	from tools.bdl.entities.all import EntityType
+	from tools.bdl.visitors.symbol_map import SymbolMap
 
 
 class Role:
@@ -68,6 +70,14 @@ class Entity:
 		Get the underlying literal value if any.
 		"""
 		return self.element.getAttrValue("literal")
+
+	def getEntityUnderlyingTypeResolved(self, symbols: "SymbolMap") -> "EntityType":
+		"""
+		Get the entity related to type after resolve.
+		"""
+		self.assertTrue(condition=self.underlyingType is not None, message="Underlying type is not available.")
+		assert self.underlyingType is not None
+		return symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 
 	@property
 	def isNested(self) -> bool:

@@ -12,7 +12,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.entity import Entity, Role
 
 if typing.TYPE_CHECKING:
-	from tools.bdl.visitors.preprocess.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import SymbolMap
 
 
 class Expression(Entity):
