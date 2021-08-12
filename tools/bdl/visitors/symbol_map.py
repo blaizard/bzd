@@ -98,8 +98,7 @@ class SymbolMap:
 			if ignore:
 				return
 			if not conflicts or element != self.getEntityResolved(fqn=fqn).assertValue(element=element).element:
-				Error.handleFromElement(element=element,
-					message="Symbol name is in conflict with a previous one: '{}'.".format(fqn))
+				SymbolMap.errorSymbolConflict_(element, self._get(fqn=fqn))  # type: ignore
 
 		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else "", "e": None}
 		# The element is also added to the entity map, to allow further modification that will
@@ -122,15 +121,21 @@ class SymbolMap:
 					category=category,
 					ignore=True)
 
+	@staticmethod
+	def errorSymbolConflict_(element1: Element, element2: Element) -> None:
+		message = Error.handleFromElement(element=element1, message="Symbol name is in conflict...", throw=False)
+		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
+		raise Exception(message)
+
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
 			existingElement = self._get(fqn=fqn)
-			if existingElement is not None:
-				assert element["p"] == existingElement["p"], "Symbol '{}' already defined in '{}'.".format(
-					fqn, existingElement["p"])
+			if existingElement is not None and element["p"] != existingElement["p"]:
+				SymbolMap.errorSymbolConflict_(SymbolMap.metaToElement(element),
+					SymbolMap.metaToElement(existingElement))
 			self.map[fqn] = element
 
 	def makeReference(self, fqn: str, category: typing.Optional[str] = None) -> Element:
@@ -227,6 +232,10 @@ class SymbolMap:
 
 		return Result[str](fqn)
 
+	@staticmethod
+	def metaToElement(meta: typing.Any) -> Element:
+		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
+
 	def getEntityResolved(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
@@ -238,7 +247,7 @@ class SymbolMap:
 
 		# Not memoized
 		if fqn not in self.entities:
-			element = Element.fromSerialize(element=data["e"], context=Context(path=Path(data["p"])))
+			element = SymbolMap.metaToElement(data)
 			entity = elementToEntity(element=element)
 			# Resolve dependencies
 			for category in CATEGORIES:
