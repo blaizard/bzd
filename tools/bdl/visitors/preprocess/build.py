@@ -25,12 +25,11 @@ class Build(Visitor[SymbolList]):
 
 	def registerSymbol(self, entity: SymbolType) -> typing.Optional[str]:
 
-		# Ignore if composition
-		if self.category == CATEGORY_COMPOSITION and not self.objectContext.composition:
-			return None
+		resolve = self.objectContext.resolve
+		resolve &= (self.category != CATEGORY_COMPOSITION) or self.objectContext.composition
 
 		# Resolve the symbol
-		if self.objectContext.resolve:
+		if resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
 		# Map an entity only if the name is available.

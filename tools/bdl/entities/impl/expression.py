@@ -84,6 +84,19 @@ class Expression(Entity):
 	def isRoleType(self) -> bool:
 		return not bool(self.isRoleValue)
 
+	@property
+	def dependencies(self) -> typing.Set[str]:
+		"""
+		Output the dependency list for this entity.
+		"""
+		dependencies = set()
+		if self.isType:
+			dependencies.update(self.type.dependencies)
+		for params in self.parameters:
+			dependencies.update(params.dependencies)
+
+		return dependencies
+
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],

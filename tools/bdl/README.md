@@ -9,11 +9,15 @@ This document describes the tool behind the language, which role is to parse, va
 The process consists of the following:
 
 ```
-  [ parser ]
-[ validator ]
-[ symbol resolution ]
-  [ Bdl Object ]
-  [ generator ]
+Preprocess:
+  [ parser ] - Parse the grammar from a bdl file and create a structured view.
+  [ validator ] - Validates what can be validated at that point, this is to identify error at early level.
+  [ build ] - Build the bdl object by creating a symbol map and resolving dependencies except for the composition elements.
+  -> save bld object to the disk, this step is language agnostic.
+
+The bdl file can be then used for:
+[ File ] - file specific code generator.
+[ Composition ] - Generate the composition step.
 ```
 
 ## Purpose

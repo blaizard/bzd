@@ -25,7 +25,7 @@ for complex schemes.
 ## Declaration
 
 ```
-registry {
+composition {
 	// Register an I2C bus driver. This has an unique instance withinI2CTransport the application.
 	// This is to ensure unique access if needed and avoid code duplication.
 	// A communication driver must have a transport interface.
@@ -40,8 +40,8 @@ interface I2CTransport
 
 using I2CDevice = Adapter<Buffer, I2CTransport>;
 
-registry {
-	I2CDevice tempSensor(address = 12, addressing = 10/*bit*/, transport = &i2c); 
+composition {
+	tempSensor = I2CDevice(address = 12, addressing = 10/*bit*/, transport = &i2c); 
 }
 ```
 
