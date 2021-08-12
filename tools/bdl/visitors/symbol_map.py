@@ -40,7 +40,10 @@ class SymbolMap:
 			self.builtins[builtin.name] = {"c": "builtin", "p": "", "e": builtin.element.serialize()}
 			self.entities[builtin.name] = builtin
 
-	def _contains(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> bool:
+	def contains(self,
+		fqn: str,
+		exclude: typing.Optional[typing.List[str]] = None,
+		categories: typing.Optional[typing.Set[str]] = None) -> bool:
 		"""
 		Check if the fqn is registered.
 		"""
@@ -49,6 +52,8 @@ class SymbolMap:
 			return False
 		if exclude:
 			return maybeData["c"] not in exclude
+		if categories:
+			return maybeData["c"] in categories
 		return True
 
 	def _get(self, fqn: str) -> typing.Optional[typing.Any]:
@@ -60,6 +65,17 @@ class SymbolMap:
 		if fqn in self.builtins:
 			return self.builtins[fqn]
 		return None
+
+	def items(self, categories: typing.Set[str] = set()) -> typing.Iterator[typing.Tuple[str, EntityType]]:
+		"""
+		Iterate through entities optionaly filtered by their categories.
+		"""
+
+		for fqn, meta in self.map.items():
+			if meta["c"] in categories:
+				entity = self.getEntityResolved(fqn=fqn).value
+				print(meta["p"], entity)
+				yield fqn, entity
 
 	def insert(self,
 		fqn: str,
@@ -78,7 +94,7 @@ class SymbolMap:
 			conflicts: Handle symbol FQN conflicts.
 			ignore: Ignore duplicates.
 		"""
-		if self._contains(fqn=fqn):
+		if self.contains(fqn=fqn):
 			if ignore:
 				return
 			if not conflicts or element != self.getEntityResolved(fqn=fqn).assertValue(element=element).element:
@@ -111,14 +127,17 @@ class SymbolMap:
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
-			assert not self._contains(fqn=fqn), "Symbol '{}' already defined.".format(fqn)
+			existingElement = self._get(fqn=fqn)
+			if existingElement is not None:
+				assert element["p"] == existingElement["p"], "Symbol '{}' already defined in '{}'.".format(
+					fqn, existingElement["p"])
 			self.map[fqn] = element
 
 	def makeReference(self, fqn: str, category: typing.Optional[str] = None) -> Element:
 		"""
 		Create a reference from an existing FQN.
 		"""
-		assert self._contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
+		assert self.contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
 		return ElementBuilder("reference").addAttr(key="name", value=fqn)
 
 	def serialize(self) -> typing.Dict[str, typing.Any]:
@@ -195,7 +214,7 @@ class SymbolMap:
 		namespace = namespace.copy()
 		while True:
 			fqn = SymbolMap.namespaceToFQN(name=nameFirst, namespace=namespace)
-			if self._contains(fqn=fqn, exclude=exclude):
+			if self.contains(fqn=fqn, exclude=exclude):
 				break
 			if not namespace:
 				return Result[str].makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(

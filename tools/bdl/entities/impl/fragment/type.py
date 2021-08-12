@@ -22,6 +22,17 @@ class Type:
 		self.kindAttr = kind
 		self.templateAttr = template
 
+	@property
+	def dependencies(self) -> typing.Set[str]:
+		"""
+		Output the dependency list for this type.
+		"""
+		dependencies = set(self.kind)
+		for params in self.templates:
+			dependencies.update(params.dependencies)
+
+		return dependencies
+
 	def resolve(self,
 		symbols: "SymbolMap",
 		namespace: typing.List[str],
@@ -30,7 +41,6 @@ class Type:
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
 
-		result = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude)
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
 			attr=self.kindAttr)
 		self.element.updateAttrValue(name=self.kindAttr, value=fqn)

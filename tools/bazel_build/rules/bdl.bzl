@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
-BdlProvider = provider(fields = ["outputs"])
+BdlProvider = provider(fields = ["bdls", "files"])
 
 def _bzd_manifest_aspect_impl(target, ctx):
     """
@@ -8,7 +8,8 @@ def _bzd_manifest_aspect_impl(target, ctx):
     """
     if BdlProvider not in target:
         return [BdlProvider(
-            outputs = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+            files = depset(transitive = [dep[BdlProvider].files for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+            bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.rule.attr.deps if BdlProvider in dep]),
         )]
     return []
 
@@ -37,6 +38,10 @@ def _bzd_manifest_impl_cc(ctx, inputs):
 
     return cc_info_providers
 
+def _make_bdl_arguments(ctx, stage, args):
+    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
+    return ["--stage", stage, "--preprocess-format", _PREPROCESS_FORMAT] + args
+
 def _bzd_manifest_impl(ctx):
     _FORMATS = {
         "cc": {
@@ -45,10 +50,9 @@ def _bzd_manifest_impl(ctx):
         },
     }
 
-    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
-
-    # Input bdl files
-    bdl_deps = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps]).to_list()
+    # Input files and bdls
+    files = depset(ctx.files.srcs, transitive = [dep[BdlProvider].files for dep in ctx.attr.deps])
+    bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.attr.deps])
 
     # Output files
     metadata = []
@@ -74,15 +78,15 @@ def _bzd_manifest_impl(ctx):
 
     # Preprocess all input files at once, this stage is language agnostic.
     ctx.actions.run(
-        inputs = ctx.files.srcs + bdl_deps,
+        inputs = depset(transitive = [files, bdls]),
         outputs = [bdl["output"] for bdl in metadata],
         progress_message = "Preprocess BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
-        arguments = ["--stage", "preprocess", "--preprocess-format", _PREPROCESS_FORMAT] + [bdl["input"].path for bdl in metadata],
+        arguments = _make_bdl_arguments(ctx, "preprocess", [bdl["input"].path for bdl in metadata]),
         executable = ctx.attr._bdl.files_to_run,
     )
 
     # Combine the output with the exsitng deps
-    bdl_deps += [bdl["output"] for bdl in metadata]
+    bdls = depset([bdl["output"] for bdl in metadata], transitive = [bdls])
 
     # Generate the format specific outputs
     for bdl in metadata:
@@ -90,10 +94,10 @@ def _bzd_manifest_impl(ctx):
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(
-                inputs = bdl_deps,
+                inputs = depset(transitive = [files, bdls]),
                 outputs = outputs,
                 progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                arguments = ["--stage", "generate", "--format", fmt, "--output", outputs[0].path, "--preprocess-format", _PREPROCESS_FORMAT, bdl["input"].path],
+                arguments = _make_bdl_arguments(ctx, "generate", ["--format", fmt, "--output", outputs[0].path, bdl["input"].path]),
                 executable = ctx.attr._bdl.files_to_run,
             )
 
@@ -105,7 +109,7 @@ def _bzd_manifest_impl(ctx):
     cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
 
     return [
-        BdlProvider(outputs = depset(bdl_deps)),
+        BdlProvider(bdls = bdls, files = files),
         cc_info_providers,
     ]
 
@@ -138,10 +142,29 @@ bzd_manifest = rule(
 )
 
 def _bzd_manifest_binary_impl(ctx):
-    bdls = depset(transitive = [dep[BdlProvider].outputs for dep in ctx.attr.deps if BdlProvider in dep])
-    print(bdls)
+    files = depset(transitive = [dep[BdlProvider].files for dep in ctx.attr.deps if BdlProvider in dep])
+    bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.attr.deps if BdlProvider in dep])
 
-    return [CcInfo()]
+    # If there is no files to process, ignore.
+    if not files:
+        return [CcInfo()]
+
+    # Generate the output
+    output = ctx.actions.declare_file("output.h")
+    ctx.actions.run(
+        # files needs to be passed into argument for debugging purpose, in order to display a nice error message.
+        inputs = depset(transitive = [files, bdls]),
+        outputs = [output],
+        progress_message = "Generating C++ composition",
+        arguments = _make_bdl_arguments(ctx, "compose", ["--format", "cc", "--output", output.path] + [bdl.path for bdl in files.to_list()]),
+        executable = ctx.attr._bdl.files_to_run,
+    )
+
+    compilation_context = cc_common.create_compilation_context(
+        headers = depset([output]),
+    )
+
+    return [CcInfo(compilation_context = compilation_context), DefaultInfo(files = depset([output]))]
 
 bzd_manifest_binary = rule(
     implementation = _bzd_manifest_binary_impl,
@@ -153,6 +176,11 @@ bzd_manifest_binary = rule(
             mandatory = True,
             aspects = [_bzd_manifest_aspect],
             doc = "List of dependencies.",
+        ),
+        "_bdl": attr.label(
+            default = Label("//tools/bdl"),
+            cfg = "host",
+            executable = True,
         ),
     },
 )

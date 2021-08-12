@@ -80,6 +80,10 @@ class Entity:
 		return symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 
 	@property
+	def dependencies(self) -> typing.Set[str]:
+		return set()
+
+	@property
 	def isNested(self) -> bool:
 		return self.element.isNestedSequence("nested")
 
@@ -209,12 +213,11 @@ class Entity:
 		"""
 		pass
 
-	def error(self, message: str) -> None:
-		Error.handleFromElement(element=self.element, message=message)
+	def error(self, message: str, throw: bool = True) -> str:
+		return Error.handleFromElement(element=self.element, message=message, throw=throw)
 
-	def assertTrue(self, condition: bool, message: str) -> None:
-		if not condition:
-			self.error(message=message)
+	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition, element=self.element, message=message, throw=throw)
 
 	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]

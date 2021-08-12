@@ -3,6 +3,7 @@ from pathlib import Path
 
 from bzd.parser.error import Error
 
+from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.generators.bdl.visitor import formatBdl
 from tools.bdl.generators.cc.visitor import formatCc
 from tools.bdl.object import Object, ObjectContext
@@ -25,6 +26,16 @@ def generate(formatType: str, bdl: Object) -> str:
 
 	# Format using a specific formatter
 	return formatters[formatType](bdl=bdl)
+
+
+def compose(formatType: str, bdls: typing.Sequence[Object], output: Path) -> None:
+
+	composition = Composition()
+	for bdl in bdls:
+		composition.visit(bdl)
+	composition.process()
+
+	output.write_text("")
 
 
 def main(formatType: str, path: Path, objectContext: typing.Optional[ObjectContext] = None) -> str:

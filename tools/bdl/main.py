@@ -4,7 +4,7 @@ from pathlib import Path
 
 import bzd.parser.error
 from tools.bdl.object import Object, ObjectContext
-from tools.bdl.lib import formatters, main, preprocess, generate
+from tools.bdl.lib import formatters, main, preprocess, generate, compose
 
 if __name__ == "__main__":
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 		"This is how is named a preprocessed file, used for auto-discovering preprocessed files instead of re-generating them."
 						)
 	parser.add_argument("--stage",
-		choices=["preprocess", "generate"],
+		choices=["preprocess", "generate", "compose"],
 		help="Only perform a specific stage of the full process.")
 	parser.add_argument("inputs", type=Path, nargs="+", help="Input file to be passed to the parser.")
 
@@ -30,22 +30,29 @@ if __name__ == "__main__":
 	# Set colors if running on a terminal
 	bzd.parser.error.useColors = not config.no_color
 
-	for inputPath in config.inputs:
+	if config.stage == "compose":
 
-		if config.stage == "preprocess":
+		bdls = [objectContext.loadPreprocess(path=inputPath) for inputPath in config.inputs]
+		compose(formatType=config.format, bdls=bdls, output=config.output)
 
-			preprocess(path=inputPath, objectContext=objectContext)
+	else:
 
-		else:
-			if config.stage == "generate":
+		for inputPath in config.inputs:
 
-				bdl = objectContext.loadPreprocess(path=inputPath)
-				output = generate(formatType=config.format, bdl=bdl)
+			if config.stage == "preprocess":
+
+				preprocess(path=inputPath, objectContext=objectContext)
 
 			else:
-				output = main(formatType=config.format, path=inputPath, objectContext=objectContext)
+				if config.stage == "generate":
 
-			if config.output is None:
-				print(output)
-			else:
-				config.output.write_text(output, encoding="ascii")
+					bdl = objectContext.loadPreprocess(path=inputPath)
+					output = generate(formatType=config.format, bdl=bdl)
+
+				else:
+					output = main(formatType=config.format, path=inputPath, objectContext=objectContext)
+
+				if config.output is None:
+					print(output)
+				else:
+					config.output.write_text(output, encoding="ascii")

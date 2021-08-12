@@ -123,38 +123,58 @@ class Error:
 		return Error.toString(context=element.context, index=index, end=end if end > index else index, message=message)
 
 	@staticmethod
-	def handle(context: Context, index: int, end: int, message: str) -> None:
-		raise ExceptionParser(message=Error.toString(context=context, index=index, end=end, message=message))
+	def handle(context: Context, index: int, end: int, message: str, throw: bool = True) -> str:
+		message = Error.toString(context=context, index=index, end=end, message=message)
+		if throw:
+			raise ExceptionParser(message=message)
+		return message
 
 	@staticmethod
-	def handleFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> None:
-		raise ExceptionParser(message=Error.toStringFromElement(element=element, attr=attr, message=message))
+	def handleFromElement(element: Element,
+		attr: typing.Optional[str] = None,
+		message: str = "Error",
+		throw: bool = True) -> str:
+		message = Error.toStringFromElement(element=element, attr=attr, message=message)
+		if throw:
+			raise ExceptionParser(message=message)
+		return message
 
 	@staticmethod
-	def assertTrue(element: Element, condition: bool, message: str, attr: typing.Optional[str] = None) -> None:
+	def assertTrue(element: Element,
+		condition: bool,
+		message: str,
+		attr: typing.Optional[str] = None,
+		throw: bool = True) -> typing.Optional[str]:
 		"""
 		Ensures a specific condition evaluates to True.
 		"""
 
 		if not condition:
-			Error.handleFromElement(element=element, attr=attr, message=message)
+			return Error.handleFromElement(element=element, attr=attr, message=message, throw=throw)
+		return None
 
 	@staticmethod
-	def assertHasAttr(element: Element, attr: str) -> None:
+	def assertHasAttr(element: Element, attr: str, throw: bool = True) -> typing.Optional[str]:
 		"""
 		Ensures an element has a specific attribute.
 		"""
 
 		if not element.isAttr(attr):
-			Error.handleFromElement(element=element, attr=None, message="Mising mandatory attribute '{}'.".format(attr))
+			return Error.handleFromElement(element=element,
+				attr=None,
+				message="Mising mandatory attribute '{}'.".format(attr),
+				throw=throw)
+		return None
 
 	@staticmethod
-	def assertHasSequence(element: Element, sequence: str) -> None:
+	def assertHasSequence(element: Element, sequence: str, throw: bool = True) -> typing.Optional[str]:
 		"""
 		Ensures an element has a specific sequence.
 		"""
 
 		if not element.isNestedSequence(sequence):
-			Error.handleFromElement(element=element,
+			return Error.handleFromElement(element=element,
 				attr=None,
-				message="Mising mandatory sequence '{}'.".format(sequence))
+				message="Mising mandatory sequence '{}'.".format(sequence),
+				throw=throw)
+		return None
