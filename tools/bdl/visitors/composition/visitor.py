@@ -53,8 +53,7 @@ class Composition:
 			entity.assertTrue(condition=isinstance(entity, Expression),
 				message="Composition only supports expressions, got '{}' instead.".format(entity.category))
 			# Resolve the expression
-			# TODO sort out the namespace
-			entity.resolve(symbols=self.symbols, namespace=[])
+			entity.resolve(symbols=self.symbols, namespace=SymbolMap.FQNToNamespace(fqn)[:-1])
 			# Create the dependency map and keep only dependencies from composition
 			dependencies[fqn] = {
 				dep
