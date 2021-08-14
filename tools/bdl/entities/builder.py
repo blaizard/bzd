@@ -9,7 +9,7 @@ class ElementBuilder(Element):
 
 	def __init__(self, category: str) -> None:
 		super().__init__()
-		self.addAttr("category", category)
+		self.setAttr("category", category)
 
 	def addContract(self, contract: str) -> "ElementBuilder":
 		"""
@@ -28,9 +28,9 @@ class ElementBuilder(Element):
 		"""
 		Create a configuration entry
 		"""
-		element = ElementBuilder(category="expression").addAttr("type", kind)
+		element = ElementBuilder(category="expression").setAttr("type", kind)
 		if name is not None:
-			element.addAttr("name", name)
+			element.setAttr("name", name)
 		if contract is not None:
 			element.addContract(contract)
 		self.pushBackElementToNestedSequence(kind="config", element=element)
@@ -42,7 +42,7 @@ class NamespaceBuilder(ElementBuilder):
 	def __init__(self, namespace: typing.List[str]) -> None:
 		super().__init__("namespace")
 		for name in namespace:
-			element = Element().addAttr("name", name)
+			element = Element().setAttr("name", name)
 			self.pushBackElementToNestedSequence(kind="name", element=element)
 
 

@@ -39,7 +39,7 @@ class Entity:
 		return []
 
 	def _setUnderlyingType(self, fqn: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).addAttr("fqn_type", fqn)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", fqn)
 
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
@@ -51,11 +51,11 @@ class Entity:
 	def _setUnderlyingValue(self, entity: "Entity", fqn: typing.Optional[str] = None) -> None:
 		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
 		if fqn is not None:
-			elementBuilder.addAttr("fqn_value", fqn)
+			elementBuilder.setAttr("fqn_value", fqn)
 		elif entity.underlyingValue is not None:
-			elementBuilder.addAttr("fqn_value", entity.underlyingValue)
+			elementBuilder.setAttr("fqn_value", entity.underlyingValue)
 		if entity.literal is not None:
-			elementBuilder.addAttr("literal", entity.literal)
+			elementBuilder.setAttr("literal", entity.literal)
 
 	@property
 	def underlyingValue(self) -> typing.Optional[str]:
@@ -130,6 +130,10 @@ class Entity:
 	@property
 	def contracts(self) -> Contracts:
 		return Contracts(element=self.element)
+
+	@property
+	def comment(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("comment")
 
 	def getConfigTemplates(self, symbols: typing.Any) -> typing.List["Expression"]:
 		"""

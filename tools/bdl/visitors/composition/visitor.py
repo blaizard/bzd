@@ -64,4 +64,4 @@ class Composition:
 		orderFQNs: typing.List[str] = []
 		for fqn in dependencies.keys():
 			self.resolveDependency(dependencies, fqn, orderFQNs)
-		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs] # type: ignore
+		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs]  # type: ignore

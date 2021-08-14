@@ -51,7 +51,7 @@ class Expression(Entity):
 
 	@cached_property
 	def type(self) -> Type:
-		return Type(element=self.element, kind="type", template="template")
+		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template")
 
 	@property
 	def isValue(self) -> bool:
@@ -108,10 +108,6 @@ class Expression(Entity):
 			return
 
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-
-		# Set the underlying type
-		if entity.underlyingType is not None:
-			self._setUnderlyingType(fqn=entity.underlyingType)
 
 		# Set the underlying value
 		if bool(self.parameters):
@@ -175,10 +171,6 @@ class Expression(Entity):
 	@cached_property
 	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")
-
-	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
 
 	def __repr__(self) -> str:
 		return self.toString({

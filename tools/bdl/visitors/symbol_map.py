@@ -143,7 +143,7 @@ class SymbolMap:
 		Create a reference from an existing FQN.
 		"""
 		assert self.contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
-		return ElementBuilder("reference").addAttr(key="name", value=fqn)
+		return ElementBuilder("reference").setAttr(key="name", value=fqn)
 
 	def serialize(self) -> typing.Dict[str, typing.Any]:
 		"""

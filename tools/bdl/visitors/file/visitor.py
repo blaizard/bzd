@@ -14,20 +14,13 @@ from tools.bdl.entities.impl.fragment.type import Type
 
 class Visitor(VisitorBase[ResultType]):
 
-	def __init__(self, bdl: Object, resolve: bool = False, include: bool = False) -> None:
+	def __init__(self, bdl: Object) -> None:
 		"""
 		Create a result object.
-		- Params:
-			resolve: Resolve symbols.
-			include: Follow use statement.
 		"""
 
 		super().__init__(elementToEntityExtenstion={"nested": NestedResult})
 		self.bdl = bdl
-
-		# Options
-		self.isResolve = resolve
-		self.isInclude = include
 
 	def process(self) -> ResultType:
 		return self.visit(self.bdl.parsed)

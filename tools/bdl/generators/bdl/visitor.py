@@ -19,10 +19,10 @@ class _VisitorType(VisitorType):
 			return kind
 		return "{}{}".format(kind, template)
 
-	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
-		if comment is None:
-			return kind
-		return "/*{comment}*/ {kind}".format(comment=comment, kind=kind)
+	def visitType(self, entity: Type, template: bool) -> str:
+		if entity.comment is None or not template:
+			return entity.kind
+		return "/*{comment}*/ {kind}".format(comment=entity.comment, kind=entity.kind)
 
 
 def _namespaceToStr(entity: Namespace) -> str:

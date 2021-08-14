@@ -1,7 +1,7 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element, Sequence
+from bzd.parser.element import Element, Sequence, ElementBuilder
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error
 
@@ -15,12 +15,23 @@ if typing.TYPE_CHECKING:
 
 class Type:
 
-	def __init__(self, element: Element, kind: str, template: typing.Optional[str] = None) -> None:
+	def __init__(self,
+		element: Element,
+		kind: str,
+		underlyingType: typing.Optional[str] = None,
+		template: typing.Optional[str] = None) -> None:
 
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
 		self.kindAttr = kind
+		self.underlyingTypeAttr = underlyingType
 		self.templateAttr = template
+
+	@property
+	def underlyingType(self) -> typing.Optional[str]:
+		if self.underlyingTypeAttr is None:
+			return None
+		return self.element.getAttrValue(self.underlyingTypeAttr)
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
@@ -43,7 +54,7 @@ class Type:
 
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
 			attr=self.kindAttr)
-		self.element.updateAttrValue(name=self.kindAttr, value=fqn)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.kindAttr, fqn)
 
 		# Resolve the templates if available
 		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
@@ -52,6 +63,9 @@ class Type:
 		# Get and save the underlying type
 		# TODO: save is as part of the element itself so it is persisted.
 		underlying = self.getEntityResolved(symbols=symbols)
+		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
+			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
+				underlying.underlyingType)
 
 		# Validate template arguments
 		validation = underlying.makeValidationForTemplate(symbols=symbols)
@@ -103,16 +117,13 @@ class Type:
 	def kind(self) -> str:
 		return self.element.getAttr(self.kindAttr).value
 
+	@property
+	def comment(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("comment")
+
 	@cached_property
 	def name(self) -> str:
 		return Visitor(entity=self).result
-
-	@property
-	def isFQN(self) -> bool:
-		"""
-		Return True if this contains a fully qualified name already, False otherwise.
-		"""
-		return "." in self.kind
 
 	def __repr__(self) -> str:
 		return self.name
@@ -126,7 +137,7 @@ class Visitor(VisitorBase[str, str]):
 
 		# Deal with the main type, do not include the comment as
 		# it is taken care by the upper level block.
-		kind = self.visitType(kind=entity.kind, comment=None)
+		kind = self.visitType(entity=entity, template=False)
 
 		# Construct the template if any.
 		if entity.templateAttr is not None:
@@ -146,7 +157,10 @@ class Visitor(VisitorBase[str, str]):
 
 	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
 		if element.isAttr("type"):
-			result.append(self.visitType(kind=element.getAttr("type").value, comment=element.getAttrValue("comment")))
+			result.append(
+				self.visitType(entity=Type(element=element, kind="type", underlyingType="fqn_type",
+				template="template"),
+				template=True))
 		else:
 			Error.assertHasAttr(element=element, attr="value")
 			result.append(self.visitValue(value=element.getAttr("value").value,
@@ -159,12 +173,12 @@ class Visitor(VisitorBase[str, str]):
 		result[-1] = self.visitTypeTemplate(kind=result[-1], template=nestedResult)
 		return result
 
-	def visitType(self, kind: str, comment: typing.Optional[str]) -> str:
+	def visitType(self, entity: Type, template: bool) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
 
-		return kind
+		return entity.kind
 
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
 		"""

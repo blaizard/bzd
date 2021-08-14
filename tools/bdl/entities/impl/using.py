@@ -33,7 +33,7 @@ class Using(Entity):
 
 	@cached_property
 	def type(self) -> Type:
-		return Type(element=self.element, kind="type", template="template")
+		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template")
 
 	def resolve(self,
 		symbols: typing.Any,
@@ -46,16 +46,6 @@ class Using(Entity):
 
 		# Resolve contract
 		self.contracts.mergeBase(entity.contracts)
-
-		# Set the underlying
-		if entity.underlyingType is not None:
-			self._setUnderlyingType(entity.underlyingType)
-
-		print("using", self.name, self.contracts)
-
-	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

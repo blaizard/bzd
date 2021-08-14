@@ -16,10 +16,10 @@ class Contract:
 		"""
 		Add a contract to the element.
 		"""
-		contractElement = ElementBuilder().addAttr("type", kind)
+		contractElement = ElementBuilder().setAttr("type", kind)
 		if values is not None:
 			for value in values:
-				valueElement = ElementBuilder().addAttr("value", value)
+				valueElement = ElementBuilder().setAttr("value", value)
 				contractElement.pushBackElementToNestedSequence(kind="values", element=valueElement)
 		ElementBuilder.cast(element, ElementBuilder).pushBackElementToNestedSequence(kind="contract",
 			element=contractElement)
