@@ -12,7 +12,7 @@ class Composition:
 
 	def __init__(self) -> None:
 		self.symbols = SymbolMap()
-		self.registry: typing.List[str] = []
+		self.registry: typing.List[Expression] = []
 
 	def visit(self, bdl: Object) -> None:
 
@@ -51,7 +51,7 @@ class Composition:
 
 			# Resolve the entities, they must all be expressions
 			entity.assertTrue(condition=isinstance(entity, Expression),
-				message="Composition only supports expressions, got '{}' instead.".format(entity.category))
+				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
 			# Resolve the expression
 			entity.resolve(symbols=self.symbols, namespace=SymbolMap.FQNToNamespace(fqn)[:-1])
 			# Create the dependency map and keep only dependencies from composition
@@ -61,7 +61,7 @@ class Composition:
 			}
 
 		# Compute the dependency orders and identify circular dependencies.
-		self.registry = []
+		orderFQNs: typing.List[str] = []
 		for fqn in dependencies.keys():
-			self.resolveDependency(dependencies, fqn, self.registry)
-		print(self.registry)
+			self.resolveDependency(dependencies, fqn, orderFQNs)
+		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs] # type: ignore

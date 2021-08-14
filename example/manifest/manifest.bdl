@@ -8,13 +8,13 @@ enum Test
 ,	SECOND
 }
 
-struct MyType{
+struct MyType {
 	test = Test;
 	type1 = NextType;
 	
 }
 
-interface MyInterface{
+interface MyInterface {
 	method start(a = NextType) -> Test;
 	// Magic number for demo purpose
 	magic = Integer(42) [min(1) max(100)];

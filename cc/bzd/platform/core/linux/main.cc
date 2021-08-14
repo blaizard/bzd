@@ -6,21 +6,25 @@
 
 #include <iostream>
 
-// registry.h
-struct Registry
+auto makeRegistry()
 {
-	bzd::platform::linux::Core<100000> linux0{0};
-	bzd::platform::linux::Core<100000> linux1{1};
-	bzd::platform::core::Executor<bzd::platform::linux::Core<100000>, bzd::platform::linux::Core<100000>> executor{linux0, linux1};
+	// Definition for all registry entries.
+	static bzd::platform::linux::Core<100000> bzd_linux0{0};
+	static bzd::platform::linux::Core<100000> bzd_linux1{1};
+	static bzd::platform::core::Executor executor{bzd_linux0, bzd_linux1};
 
-	struct Nested
+	// Registry structure containing a reference of all entries.
+	struct Registry
 	{
-		int a;
-		int b;
+		decltype(bzd_linux0)& bzd_linux0;
+		decltype(bzd_linux1)& bzd_linux1;
+		decltype(executor)& executor;
 	};
-};
+	static Registry registry{bzd_linux0, bzd_linux1, executor};
 
-Registry registry;
+	return registry;
+}
+
 // registry;
 
 /*
@@ -115,6 +119,8 @@ void payload(bzd::core::Executor& executor)
 
 int main()
 {
+	auto registry = makeRegistry();
+
 	// auto promise = task1();
 
 	auto promise = calculatePi<2>();
@@ -132,8 +138,8 @@ int main()
 		registry.linux1.stop();
 		registry.linux0.stop();
 	*/
-	std::cout << registry.linux0.getId() << ": " << registry.linux0.base().getStackUsage() << std::endl;
-	std::cout << registry.linux1.getId() << ": " << registry.linux1.base().getStackUsage() << std::endl;
+	std::cout << registry.bzd_linux0.getId() << ": " << registry.bzd_linux0.base().getStackUsage() << std::endl;
+	std::cout << registry.bzd_linux1.getId() << ": " << registry.bzd_linux1.base().getStackUsage() << std::endl;
 
 	// bzd::core::Executor
 

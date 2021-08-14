@@ -21,9 +21,8 @@
 {% end -%}
 
 {%- macro declareNested(data) %}
-{{ data.comment | normalComment }}{{ data.type }} {% if data.isName %}{{ data.name }}{% end %}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
-{% end %}
-{
+{{ data.comment | normalComment }}{{ data.type }}{% if data.isName %} {{ data.name }}{% end %}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
+{%- end %} {
 	{{ declareSymbols(data.nested.symbols) }}
 	{% if data.isConfig %}
 config:
