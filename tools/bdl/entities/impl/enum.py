@@ -50,10 +50,6 @@ class Enum(Entity):
 	def category(self) -> str:
 		return "enum"
 
-	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
-
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],

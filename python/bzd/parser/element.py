@@ -182,12 +182,6 @@ class Element:
 			return self.attrs[name].value
 		return default
 
-	def updateAttrValue(self, name: str, value: str) -> None:
-		"""
-		Update the value of an existing attribute.
-		"""
-		self.attrs[name].setValue(value)
-
 	def isAttr(self, name: str) -> bool:
 		"""
 		Check if an attribute is present
@@ -286,19 +280,19 @@ class ElementBuilder(Element):
 		copiedElement.__class__ = classType
 		return typing.cast(U, copiedElement)
 
-	def addAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
+	def setAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
 		"""
 		Add an attribute to the element.
 		"""
 		self.attrs[key] = AttributeParser(index=index, end=end, value=value)
 		return self
 
-	def addAttrs(self: U, data: typing.Dict[str, str]) -> U:
+	def setAttrs(self: U, data: typing.Dict[str, str]) -> U:
 		"""
 		Add multiple attributes to an element.
 		"""
 		for key, value in data.items():
-			self.addAttr(key, value)
+			self.setAttr(key, value)
 		return self
 
 	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:

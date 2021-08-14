@@ -50,10 +50,6 @@ class Nested(Entity):
 		return self.element.getAttr("type").value
 
 	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
-
-	@property
 	def hasInheritance(self) -> bool:
 		return self.element.isNestedSequence("inheritance")
 

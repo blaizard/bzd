@@ -1,7 +1,7 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 
@@ -35,7 +35,8 @@ class Method(Entity):
 
 	@cached_property
 	def type(self) -> typing.Optional[Type]:
-		return Type(element=self.element, kind="type", template="template") if self.isType else None
+		return Type(element=self.element, kind="type", underlyingType="fqn_return_type",
+			template="template") if self.isType else None
 
 	@cached_property
 	def validation(self) -> typing.Optional[Validation]:
@@ -64,13 +65,9 @@ class Method(Entity):
 
 		maybeType = self.type
 		if maybeType is not None:
-			maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			entity = maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-
-	@property
-	def comment(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("comment")
 
 	@cached_property
 	def parameters(self) -> Parameters:
