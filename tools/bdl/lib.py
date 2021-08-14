@@ -7,8 +7,10 @@ from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.generators.bdl.visitor import formatBdl
 from tools.bdl.generators.cc.visitor import formatCc
 from tools.bdl.object import Object, ObjectContext
+from tools.bdl.generators.cc.composition import compositionCc
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
+compositions = {"cc": compositionCc}
 
 
 def preprocess(path: Path, objectContext: typing.Optional[ObjectContext] = None) -> Object:
@@ -34,6 +36,9 @@ def compose(formatType: str, bdls: typing.Sequence[Object], output: Path) -> Non
 	for bdl in bdls:
 		composition.visit(bdl)
 	composition.process()
+
+	# Generate the composition using a specific formatter
+	compositions[formatType](composition=composition)
 
 	output.write_text("")
 

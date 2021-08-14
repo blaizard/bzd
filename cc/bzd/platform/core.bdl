@@ -5,7 +5,7 @@ using StackSize = Integer [min(100) max(8000000)];
 // Type describing the identifier of a core.
 using CoreId = Integer [min(0) max(64)];
 // A core is a processing unit that accepts a single scheduler.
-interface Core{
+interface Core {
 	// Error codes for core-related functionality.
 	enum Error
 	{
@@ -27,7 +27,7 @@ interface Core{
 	
 }
 
-interface Executor{
+interface Executor {
 	// Start the executor and starts all cores previously initialized.
 	method start();
 	method stop();

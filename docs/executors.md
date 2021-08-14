@@ -30,7 +30,20 @@ composition
 
 Multiple executors can be created and deployed on the same process/binary, this can be usefull to have different task priorities for example.
 
+## Default executor
+
+For each supported platform a default executor is available, it's full qualified name is `executor` and resides at the top level.
+
 ## Association
+
+A component instanciation defines where the components resides and run. This is done with the `executor` contract.
+```bdl
+composition
+{
+   comp1 = Component [executor(linux)];
+}
+```
+If omitted, the component will run on the default executor.
 
 To associate a group of entities to an executor, this can be done at the composition level.
 For example, to instanciate a component and execute it on the `esp32` executor, it can be done as follow:
