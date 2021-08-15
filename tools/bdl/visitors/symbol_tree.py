@@ -9,20 +9,33 @@ class SymbolTree(EntitySequence):
 
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
-		self.entites: typing.List[EntityType] = []
-		super().__init__(self.entites)
+		self.entities_: typing.List[EntityType] = []
+		self.fqns_: typing.List[str] = []
+		super().__init__(self.entities)
+
+	@property
+	def entities(self) -> typing.List[EntityType]:
+		"""
+		Used to enable lazy loading of entities. Only when used they will be resolved.
+		This should speed-up the bdl object merge as the symbol tree is not touch during this process.
+		"""
+		if len(self.fqns_) > len(self.entities_):
+			self.entities_ = []
+			for fqn in self.fqns_:
+				self.addEntity(entity=self.symbols.getEntityResolved(fqn=fqn).value)
+		return self.entities_
 
 	def addEntity(self, entity: EntityType) -> None:
 		entity.assertTrue(condition=entity.isFQN, message="Entity is missing FQN attribute.")
 		assert self.symbols.contains(entity.fqn), "This FQN '{}' is not registered in the symbol map.".format(
 			entity.fqn)
-		self.entites.append(entity)
+		self.entities_.append(entity)
 
 	def serialize(self) -> typing.List[str]:
 		"""
 		Return a serialized version of this tree.
 		"""
-		return [entity.fqn for entity in self.entites]
+		return [entity.fqn for entity in self.entities]
 
 	@staticmethod
 	def fromSerialize(data: typing.List[str], symbols: SymbolMap) -> "SymbolTree":
@@ -30,8 +43,9 @@ class SymbolTree(EntitySequence):
 		Create a symbol map from a serialized object.
 		"""
 		tree = SymbolTree(symbols=symbols)
+		# Checks
 		for fqn in data:
-			result = symbols.getEntityResolved(fqn=fqn)
-			assert result, "FQN '{}' not found in the symbol map.".format(fqn)
-			tree.addEntity(entity=result.value)
+			assert symbols.contains(fqn=fqn), "FQN '{}' not found in the symbol map.".format(fqn)
+		# Lazy conversion from FQN to symbols
+		tree.fqns_ = data
 		return tree
