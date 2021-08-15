@@ -23,7 +23,7 @@ class Build(Visitor[None]):
 	def getSymbolTree(self) -> SymbolTree:
 		return self.tree
 
-	def registerEntity(self, entity: EntityType) -> typing.Optional[str]:
+	def registerEntity(self, entity: EntityType) -> str:
 
 		resolve = self.objectContext.resolve
 		resolve &= (self.category != CATEGORY_COMPOSITION) or self.objectContext.composition
@@ -32,13 +32,9 @@ class Build(Visitor[None]):
 		if resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
-		fqn: typing.Optional[str]
-		if entity.isName:
-			# Build the symbol name
-			fqn = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
-		else:
-			# If not, the entry iis considered private.
-			fqn = None
+		# Build the symbol name or autogenerate it if no name is present.
+		fqn: typing.Optional[str] = SymbolMap.namespaceToFQN(name=entity.name,
+			namespace=self.namespace) if entity.isName else None
 
 		# Save the serialized payload
 		fqn = self.symbols.insert(fqn=fqn,
@@ -50,6 +46,7 @@ class Build(Visitor[None]):
 		if self.level == 0:
 			self.tree.addEntity(entity=entity)
 
+		assert fqn
 		return fqn
 
 	def visitNestedEntities(self, entity: Nested, result: None) -> None:
