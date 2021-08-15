@@ -250,17 +250,21 @@ class Element:
 	def __ne__(self, other: object) -> bool:
 		return not (self == other)
 
-	def __repr__(self) -> str:
+	def toString(self, nested: bool = True) -> str:
 		"""
 		Human readable string representation of the element.
 		"""
 		content = "<Element {}/>".format(" ".join(
 			["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value) for key, attr in self.attrs.items()]))
 
-		for kind, sequence in self.sequences.items():
-			content += "\n{}:\n{}".format(kind, repr(sequence))
+		if nested:
+			for kind, sequence in self.sequences.items():
+				content += "\n{}:\n{}".format(kind, repr(sequence))
 
 		return content
+
+	def __repr__(self) -> str:
+		return self.toString()
 
 
 U = typing.TypeVar("U", bound="ElementBuilder")
@@ -293,6 +297,13 @@ class ElementBuilder(Element):
 		"""
 		for key, value in data.items():
 			self.setAttr(key, value)
+		return self
+
+	def updateAttr(self: U, key: str, value: str) -> U:
+		"""
+		Update the value of an exsiting attribute.
+		"""
+		self.attrs[key].setValue(value)
 		return self
 
 	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:

@@ -54,7 +54,7 @@ class Type:
 
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
 			attr=self.kindAttr)
-		ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.kindAttr, fqn)
+		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, fqn)
 
 		# Resolve the templates if available
 		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)

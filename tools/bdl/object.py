@@ -9,6 +9,7 @@ from bzd.parser.element import Element, Sequence
 
 from tools.bdl.grammar import Parser
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.visitors.symbol_tree import SymbolTree
 from tools.bdl.visitors.preprocess.process_inclusions import ProcessInclusions
 from tools.bdl.visitors.preprocess.build import Build
 from tools.bdl.visitors.preprocess.validation import Validation
@@ -95,9 +96,11 @@ class ObjectContext:
 		# Unserialize the data
 		payload = json.loads(data)
 		context = Context.fromSerialize(payload["context"])
+		symbols = SymbolMap.fromSerialize(payload["symbols"])
 		return Object(context=context,
 			parsed=Sequence.fromSerialize(payload["parsed"], context),
-			symbols=SymbolMap.fromSerialize(payload["symbols"]))
+			symbols=symbols,
+			tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
 	def preprocess(self, path: Path) -> "Object":
 		"""
@@ -130,10 +133,11 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: SymbolMap) -> None:
+	def __init__(self, context: Context, parsed: Sequence, symbols: SymbolMap, tree: SymbolTree) -> None:
 		self.context = context
 		self.parsed = parsed
 		self.symbols = symbols
+		self.tree = tree
 
 	@staticmethod
 	def _makeObject(parser: BaseParser, objectContext: ObjectContext) -> "Object":
@@ -153,11 +157,13 @@ class Object:
 		parsed = copy.deepcopy(data)
 
 		# Generate the symbol map
-		resolve = Build(objectContext=objectContext)
-		resolve.visit(data)
-		symbols = resolve.getSymbolMap()
+		build = Build(objectContext=objectContext)
+		build.visit(data)
+		symbols = build.getSymbolMap()
+		tree = build.getSymbolTree()
+		print(tree)
 
-		return Object(context=parser.context, parsed=parsed, symbols=symbols)
+		return Object(context=parser.context, parsed=parsed, symbols=symbols, tree=tree)
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
@@ -178,7 +184,8 @@ class Object:
 			{
 			"context": self.context.serialize(),
 			"parsed": self.parsed.serialize(),
-			"symbols": self.symbols.serialize()
+			"symbols": self.symbols.serialize(),
+			"tree": self.tree.serialize()
 			},
 			separators=(",", ":"))
 
@@ -191,5 +198,7 @@ class Object:
 		content += "".join(["\t{}\n".format(line) for line in str(self.symbols).split("\n")])
 		content += "--- Parsed\n"
 		content += "".join(["\t{}\n".format(line) for line in str(self.parsed).split("\n")])
+		content += "--- Tree\n"
+		content += "".join(["\t{}\n".format(line) for line in str(self.tree).split("\n")])
 
 		return content
