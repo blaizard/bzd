@@ -28,7 +28,7 @@ class Visitor(VisitorBase[ResultType]):
 	def visitBegin(self, result: typing.Any) -> ResultType:
 		return ResultType(level=self.level)
 
-	def entityToNested(self, category: str, entity: Nested, nested: ResultType) -> None:
+	def entityToNested(self, category: str, entity: Nested, nested: ResultType, result: ResultType) -> None:
 		nestedResult = typing.cast(NestedResult, entity)
 		nestedResult.setNested(category=category, nested=typing.cast(typing.List[typing.Any], nested))
 

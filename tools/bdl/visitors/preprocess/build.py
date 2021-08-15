@@ -1,29 +1,29 @@
 import typing
 
-from bzd.parser.element import Sequence, ElementBuilder
+from bzd.parser.element import Element, Sequence, ElementBuilder
 
 from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL
-from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, SymbolType, Namespace
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, EntityType, Namespace
 from tools.bdl.entities.builder import NamespaceBuilder
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.visitors.symbol_tree import SymbolTree
 
-SymbolList = typing.List[SymbolType]
 
-
-class Build(Visitor[SymbolList]):
+class Build(Visitor[None]):
 
 	def __init__(self, objectContext: typing.Any) -> None:
 		super().__init__()
 		self.objectContext = objectContext
 		self.symbols = SymbolMap()
+		self.tree = SymbolTree(symbols=self.symbols)
 
 	def getSymbolMap(self) -> SymbolMap:
 		return self.symbols
 
-	def visitBegin(self, result: SymbolList) -> SymbolList:
-		return []
+	def getSymbolTree(self) -> SymbolTree:
+		return self.tree
 
-	def registerSymbol(self, entity: SymbolType) -> typing.Optional[str]:
+	def registerEntity(self, entity: EntityType) -> typing.Optional[str]:
 
 		resolve = self.objectContext.resolve
 		resolve &= (self.category != CATEGORY_COMPOSITION) or self.objectContext.composition
@@ -32,23 +32,28 @@ class Build(Visitor[SymbolList]):
 		if resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
-		# Map an entity only if the name is available.
-		if not entity.isName:
-			return None
-
-		# Build the symbol name and ensure it is unique
-		fqn = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
+		fqn: typing.Optional[str]
+		if entity.isName:
+			# Build the symbol name
+			fqn = SymbolMap.namespaceToFQN(name=entity.name, namespace=self.namespace)
+		else:
+			# If not, the entry iis considered private.
+			fqn = None
 
 		# Save the serialized payload
-		self.symbols.insert(fqn=fqn,
+		fqn = self.symbols.insert(fqn=fqn,
 			element=entity.element,
 			path=self.objectContext.getSource(),
 			category=self.category)
 
+		# Register only top level entities
+		if self.level == 0:
+			self.tree.addEntity(entity=entity)
+
 		return fqn
 
-	def visitNestedEntities(self, entity: Nested, result: SymbolList) -> None:
-		fqn = self.registerSymbol(entity=entity)
+	def visitNestedEntities(self, entity: Nested, result: None) -> None:
+		fqn = self.registerEntity(entity=entity)
 
 		if fqn and self.objectContext.resolve:
 			assert fqn is not None
@@ -60,20 +65,19 @@ class Build(Visitor[SymbolList]):
 				# Need to copy all references from underlyingType to new symbols with namespace "fqn"
 				self.symbols.insertInheritance(fqn=fqn, fqnInheritance=underlyingType, category=self.category)
 
-	def visitExpression(self, entity: Expression, result: SymbolList) -> None:
-		self.registerSymbol(entity=entity)
-		result.append(entity)
+	def visitExpression(self, entity: Expression, result: None) -> None:
+		self.registerEntity(entity=entity)
 
-	def visitMethod(self, entity: Method, result: SymbolList) -> None:
-		self.registerSymbol(entity=entity)
+	def visitMethod(self, entity: Method, result: None) -> None:
+		self.registerEntity(entity=entity)
 
-	def visitUsing(self, entity: Using, result: SymbolList) -> None:
-		self.registerSymbol(entity=entity)
+	def visitUsing(self, entity: Using, result: None) -> None:
+		self.registerEntity(entity=entity)
 
-	def visitEnum(self, entity: Enum, result: SymbolList) -> None:
-		self.registerSymbol(entity=entity)
+	def visitEnum(self, entity: Enum, result: None) -> None:
+		self.registerEntity(entity=entity)
 
-	def visitUse(self, entity: Use, result: SymbolList) -> None:
+	def visitUse(self, entity: Use, result: None) -> None:
 		if self.objectContext.resolve:
 			entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path),
 				message="Cannot find preprocessed entity for '{}'.".format(entity.path))
@@ -81,7 +85,9 @@ class Build(Visitor[SymbolList]):
 			bdl = self.objectContext.loadPreprocess(path=entity.path)
 			self.symbols.update(bdl.symbols)
 
-	def visitNamespace(self, entity: Namespace, result: SymbolList) -> None:
+		self.registerEntity(entity=entity)
+
+	def visitNamespace(self, entity: Namespace, result: None) -> None:
 		namespace = []
 		for name in entity.nameList:
 			namespace.append(name)
@@ -91,3 +97,5 @@ class Build(Visitor[SymbolList]):
 				path=None,
 				category=self.category,
 				conflicts=True)
+
+		self.registerEntity(entity=entity)

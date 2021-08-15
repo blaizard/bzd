@@ -91,33 +91,33 @@ class Visitor(VisitorBase[T, T]):
 				sequence = element.getNestedSequence(category)
 				if sequence is not None:
 					self.parents.append(Parent(entity=entity, category=category))
-					nestedResult = self._visit(sequence)
-					self.entityToNested(category=category, entity=entity, nested=nestedResult)
+					nestedResult = self._visit(sequence, result)
+					self.entityToNested(category, entity, nestedResult, result)
 					self.parents.pop()
 
 			self.level -= 1
 
-			self.visitNestedEntities(entity=entity, result=result)
+			self.visitNestedEntities(entity, result)
 
 		# Handle expression
 		elif isinstance(entity, Expression):
 
-			self.visitExpression(entity=entity, result=result)
+			self.visitExpression(entity, result)
 
 		# Handle method
 		elif isinstance(entity, Method):
 
-			self.visitMethod(entity=entity, result=result)
+			self.visitMethod(entity, result)
 
 		# Handle using
 		elif isinstance(entity, Using):
 
-			self.visitUsing(entity=entity, result=result)
+			self.visitUsing(entity, result)
 
 		# Handle using
 		elif isinstance(entity, Enum):
 
-			self.visitEnum(entity=entity, result=result)
+			self.visitEnum(entity, result)
 
 		# Handle namespace
 		elif isinstance(entity, Namespace):
@@ -126,7 +126,7 @@ class Visitor(VisitorBase[T, T]):
 				condition=(self.level == 0),
 				message="Namespaces can only be declared at top level.")
 
-			self.visitNamespace(entity=entity, result=result)
+			self.visitNamespace(entity, result)
 
 			# Update the current namespace
 			self.parents.append(Parent(entity=entity))
@@ -134,7 +134,7 @@ class Visitor(VisitorBase[T, T]):
 		# Handle use
 		elif isinstance(entity, Use):
 
-			self.visitUse(entity=entity, result=result)
+			self.visitUse(entity, result)
 
 		# Should never go here
 		else:
@@ -142,7 +142,7 @@ class Visitor(VisitorBase[T, T]):
 
 		return result
 
-	def entityToNested(self, category: str, entity: Nested, nested: T) -> None:
+	def entityToNested(self, category: str, entity: Nested, nested: T, result: T) -> None:
 		"""
 		Associate a nested result with its entity.
 		"""

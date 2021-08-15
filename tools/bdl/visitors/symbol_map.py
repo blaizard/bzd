@@ -30,6 +30,7 @@ class SymbolMap:
 	"""
 
 	def __init__(self) -> None:
+		self.staticUid: int = 0
 		self.map: typing.Dict[str, typing.Any] = {}
 		self.builtins: typing.Dict[str, typing.Any] = {}
 		# Memoized entities
@@ -74,16 +75,14 @@ class SymbolMap:
 		for fqn, meta in self.map.items():
 			if meta["c"] in categories:
 				entity = self.getEntityResolved(fqn=fqn).value
-				print(meta["p"], entity)
 				yield fqn, entity
 
 	def insert(self,
-		fqn: str,
+		fqn: typing.Optional[str],
 		path: typing.Optional[Path],
 		element: Element,
 		category: str,
-		conflicts: bool = False,
-		ignore: bool = False) -> None:
+		conflicts: bool = False) -> str:
 		"""
 		Insert a new element into the symbol map.
 		Args:
@@ -92,18 +91,28 @@ class SymbolMap:
 			element: Element to be registered.
 			category: Category associated with the element, will be used for filtering.
 			conflicts: Handle symbol FQN conflicts.
-			ignore: Ignore duplicates.
 		"""
+		if fqn is None:
+			# The '_' is to tell that the visibility of this object is limited to this file,
+			# while the '~' is to ensure no name collision with what the user can define.
+			fqn = "_{:d}~".format(self.staticUid)
+			self.staticUid += 1
+		assert fqn is not None
+
+		# Save the FQN to the element, so that it can be found during [de]serialization
+		ElementBuilder.cast(element, ElementBuilder).setAttr("fqn", fqn)
+
 		if self.contains(fqn=fqn):
-			if ignore:
-				return
-			if not conflicts or element != self.getEntityResolved(fqn=fqn).assertValue(element=element).element:
-				SymbolMap.errorSymbolConflict_(element, self._get(fqn=fqn))  # type: ignore
+			originalElement = self.getEntityResolved(fqn=fqn).assertValue(element=element).element
+			if not conflicts or element != originalElement:
+				SymbolMap.errorSymbolConflict_(element, originalElement)
 
 		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else "", "e": None}
 		# The element is also added to the entity map, to allow further modification that will
 		# be written when serialize is called.
 		self.entities[fqn] = elementToEntity(element=element)
+
+		return fqn
 
 	def insertInheritance(self, fqn: str, fqnInheritance: str, category: str) -> None:
 		"""
@@ -115,11 +124,9 @@ class SymbolMap:
 		for nested in inheritance.nested:
 			if nested.isName:
 				fqnNested = SymbolMap.namespaceToFQN(name=nested.name, namespace=namespaceInheritance)
-				self.insert(fqn=SymbolMap.namespaceToFQN(name=nested.name, namespace=namespace),
-					path=None,
-					element=self.makeReference(fqn=fqnNested),
-					category=category,
-					ignore=True)
+				fqnTarget = SymbolMap.namespaceToFQN(name=nested.name, namespace=namespace)
+				if not self.contains(fqn=fqnTarget):
+					self.insert(fqn=fqnTarget, path=None, element=self.makeReference(fqn=fqnNested), category=category)
 
 	@staticmethod
 	def errorSymbolConflict_(element1: Element, element2: Element) -> None:
@@ -132,6 +139,9 @@ class SymbolMap:
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
+			# Ignore private entries
+			if fqn.startswith("_"):
+				continue
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
 				SymbolMap.errorSymbolConflict_(SymbolMap.metaToElement(element),
@@ -170,10 +180,9 @@ class SymbolMap:
 					if nested:
 						sequence = SequenceBuilder()
 						for element in nested:
-							if element.isAttr("name"):
-								fqnNested = SymbolMap.namespaceToFQN(name=element.getAttr("name").value,
-									namespace=SymbolMap.FQNToNamespace(fqn))
-								sequence.pushBackElement(self.makeReference(fqnNested))
+							Error.assertHasAttr(element=element, attr="fqn")
+							fqnNested = element.getAttr("fqn").value
+							sequence.pushBackElement(self.makeReference(fqnNested))
 						preparedElement.setNestedSequence(category, sequence)
 				element = preparedElement
 

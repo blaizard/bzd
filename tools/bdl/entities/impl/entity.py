@@ -8,6 +8,7 @@ from bzd.parser.error import Error
 from tools.bdl.contracts.validation import Validation
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
+from tools.bdl.entities.impl.fragment.sequence import EntitySequence
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -31,12 +32,12 @@ class Entity:
 		self.element = element
 		self.role = role
 
-	def _getNestedByCategory(self, category: str) -> typing.Any:
+	def _getNestedByCategory(self, category: str) -> EntitySequence:
 		sequence = self.element.getNestedSequence(category)
 		if sequence:
 			from tools.bdl.entities.all import elementToEntity
-			return [elementToEntity(element) for element in sequence]
-		return []
+			return EntitySequence([elementToEntity(element) for element in sequence])
+		return EntitySequence([])
 
 	def _setUnderlyingType(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", fqn)
@@ -96,15 +97,15 @@ class Entity:
 		return self.element.isNestedSequence("composition")
 
 	@property
-	def nested(self) -> typing.Any:
+	def nested(self) -> EntitySequence:
 		return self._getNestedByCategory("nested")
 
 	@property
-	def config(self) -> typing.Any:
+	def config(self) -> EntitySequence:
 		return self._getNestedByCategory("config")
 
 	@property
-	def composition(self) -> typing.Any:
+	def composition(self) -> EntitySequence:
 		return self._getNestedByCategory("composition")
 
 	@property
@@ -134,6 +135,14 @@ class Entity:
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
+
+	@property
+	def isFQN(self) -> bool:
+		return self.element.isAttr("fqn")
+
+	@property
+	def fqn(self) -> str:
+		return self.element.getAttr("fqn").value
 
 	def getConfigTemplates(self, symbols: typing.Any) -> typing.List["Expression"]:
 		"""
