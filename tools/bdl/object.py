@@ -97,10 +97,7 @@ class ObjectContext:
 		payload = json.loads(data)
 		context = Context.fromSerialize(payload["context"])
 		symbols = SymbolMap.fromSerialize(payload["symbols"])
-		return Object(context=context,
-			parsed=Sequence.fromSerialize(payload["parsed"], context),
-			symbols=symbols,
-			tree=SymbolTree.fromSerialize(payload["tree"], symbols))
+		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
 	def preprocess(self, path: Path) -> "Object":
 		"""
@@ -133,9 +130,8 @@ class Object:
 	BDL object representation.
 	"""
 
-	def __init__(self, context: Context, parsed: Sequence, symbols: SymbolMap, tree: SymbolTree) -> None:
+	def __init__(self, context: Context, symbols: SymbolMap, tree: SymbolTree) -> None:
 		self.context = context
-		self.parsed = parsed
 		self.symbols = symbols
 		self.tree = tree
 
@@ -153,17 +149,11 @@ class Object:
 		# Validation step
 		Validation().visit(data)
 
-		# Deep copy the parsed data
-		parsed = copy.deepcopy(data)
-
 		# Generate the symbol map
 		build = Build(objectContext=objectContext)
 		build.visit(data)
-		symbols = build.getSymbolMap()
-		tree = build.getSymbolTree()
-		print(tree)
 
-		return Object(context=parser.context, parsed=parsed, symbols=symbols, tree=tree)
+		return Object(context=parser.context, symbols=build.getSymbolMap(), tree=build.getSymbolTree())
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
@@ -183,7 +173,6 @@ class Object:
 		return json.dumps(
 			{
 			"context": self.context.serialize(),
-			"parsed": self.parsed.serialize(),
 			"symbols": self.symbols.serialize(),
 			"tree": self.tree.serialize()
 			},
@@ -196,8 +185,6 @@ class Object:
 		content = ""
 		content += "--- Symbols\n"
 		content += "".join(["\t{}\n".format(line) for line in str(self.symbols).split("\n")])
-		content += "--- Parsed\n"
-		content += "".join(["\t{}\n".format(line) for line in str(self.parsed).split("\n")])
 		content += "--- Tree\n"
 		content += "".join(["\t{}\n".format(line) for line in str(self.tree).split("\n")])
 
