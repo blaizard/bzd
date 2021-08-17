@@ -9,33 +9,51 @@ class SymbolTree(EntitySequence):
 
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
-		self.entities_: typing.List[EntityType] = []
 		self.fqns_: typing.List[str] = []
-		super().__init__(self.entities)
+		self.ext: typing.Dict[str, typing.Any] = {}
+		super().__init__([])
+
+	def __setitem__(self, key: str, value: typing.Any) -> None:
+		self.ext[key] = value
+
+	def __getitem__(self, key: str) -> typing.Any:
+		return self.ext[key]
+
+	def __delitem__(self, key: str) -> None:
+		del self.ext[key]
+
+	def __contains__(self, key: str) -> bool:
+		return key in self.ext
+
+	def update(self, ext: typing.Any) -> None:
+		"""
+		Set extensions.
+		"""
+		self.ext.update(ext)
 
 	@property
-	def entities(self) -> typing.List[EntityType]:
+	def sequence(self) -> typing.List[EntityType]:
 		"""
 		Used to enable lazy loading of entities. Only when used they will be resolved.
 		This should speed-up the bdl object merge as the symbol tree is not touch during this process.
 		"""
-		if len(self.fqns_) > len(self.entities_):
-			self.entities_ = []
+		if len(self.fqns_) > len(self.sequence_):
+			self.sequence_ = []
 			for fqn in self.fqns_:
 				self.addEntity(entity=self.symbols.getEntityResolved(fqn=fqn).value)
-		return self.entities_
+		return self.sequence_
 
 	def addEntity(self, entity: EntityType) -> None:
 		entity.assertTrue(condition=entity.isFQN, message="Entity is missing FQN attribute.")
 		assert self.symbols.contains(entity.fqn), "This FQN '{}' is not registered in the symbol map.".format(
 			entity.fqn)
-		self.entities_.append(entity)
+		self.sequence_.append(entity)
 
 	def serialize(self) -> typing.List[str]:
 		"""
 		Return a serialized version of this tree.
 		"""
-		return [entity.fqn for entity in self.entities]
+		return [entity.fqn for entity in self.sequence]
 
 	@staticmethod
 	def fromSerialize(data: typing.List[str], symbols: SymbolMap) -> "SymbolTree":

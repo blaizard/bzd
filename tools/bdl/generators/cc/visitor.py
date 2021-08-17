@@ -1,12 +1,12 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitors.file.visitor import Visitor
-from tools.bdl.visitors.file.result import ResultType
+from bzd.template.template import Template
+
+from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using
-from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
-from bzd.template.template import Template
+from tools.bdl.entities.impl.fragment.type import Type
 
 from tools.bdl.generators.cc.types import typeToStr
 
@@ -36,22 +36,24 @@ def _bdlPathToHeader(path: Path) -> str:
 	return path.as_posix().replace(".bdl", ".h")
 
 
-def formatCc(bdl: Object) -> str:
+def fqnToStr(fqn: str) -> str:
+	return "::".join(SymbolMap.FQNToNamespace(fqn))
 
-	# Process the result
-	result = Visitor(bdl=bdl).process()
+
+def formatCc(bdl: Object) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
 
-	result.update({
+	bdl.tree.update({
 		"camelCase": _toCamelCase,
 		"typeToStr": typeToStr,
 		"namespaceToStr": _namespaceToStr,
 		"normalComment": _normalComment,
 		"inheritanceToStr": _inheritanceToStr,
-		"bdlPathToHeader": _bdlPathToHeader
+		"bdlPathToHeader": _bdlPathToHeader,
+		"fqnToStr": fqnToStr
 	})
 
-	output = template.render(result)  # type: ignore
+	output = template.render(bdl.tree)  # type: ignore
 
 	return output

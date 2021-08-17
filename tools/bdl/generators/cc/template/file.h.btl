@@ -2,8 +2,8 @@
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 {#- Contract assertion -#}
-{%- macro makeContractAssertions(sequence) %}
-	{% for contract in sequence %}
+{%- macro makeContractAssertions(contracts) %}
+	{% for contract in contracts %}
 		{% if contract.type == "min" %}
 // Minimum contract
 assert(value >= {{ contract.value }});
@@ -32,18 +32,28 @@ assert(value <= {{ contract.value }});
 namespace {{ namespace | namespaceToStr }} {
 {% end %}
 
-{{- declareTrivialTypes(symbols) -}}
+{{- declareTrivialTypes(sequence) -}}
 
 {% for data in nestedList %}
 	{% if data.type in ["interface"] %}
-template <class Impl>
-{{ data.comment | normalComment }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
-{
-public: // Internal
-	[[nodiscard]] constexpr {{ data.name }}<Impl>& base() noexcept { return *this; }
 
+// Specialization for trivial types
+class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
+{
 public: // Types
-	{{ declareTrivialTypes(data.nested.symbols) }}
+	{{ declareTrivialTypes(data.nested.sequence) }}
+};
+
+namespace adapter {
+
+template <class Impl>
+{{ data.comment | normalComment }}class {{ data.name }} : public {{ data.fqn | fqnToStr }}{% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceToStr }}{% end %}
+{
+public: // Traits
+	using Self = {{ data.name }}<Impl>;
+
+public: // Internal
+	[[nodiscard]] constexpr Self& base() noexcept { return *this; }
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
@@ -99,6 +109,8 @@ private: // Variables.
 	{{ declareExpression(var, "_", false) }};
 	{% end %}
 };
+
+}
 
 {%- end -%}
 

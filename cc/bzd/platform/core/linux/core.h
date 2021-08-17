@@ -16,11 +16,11 @@
 namespace bzd::platform::linux {
 
 template <SizeType N>
-class Core : public bzd::platform::Core<Core<N>>
+class Core : public bzd::platform::adapter::Core<Core<N>>
 {
 private:
 	using Self = Core<N>;
-	using Parent = bzd::platform::Core<Self>;
+	using Parent = bzd::platform::adapter::Core<Self>;
 	using Error = typename Parent::Error;
 
 public:
