@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-class MyType : public bzd::manifest::MyInterface<MyType>
+class MyType : public bzd::manifest::adapter::MyInterface<MyType>
 {
 public:
 	bzd::manifest::Test start(int a) { return (a > 10) ? bzd::manifest::Test::FIRST : bzd::manifest::Test::SECOND; }
@@ -10,8 +10,20 @@ public:
 
 // Non virtual
 
-template <class Impl>
 class Interface
+{
+public:
+	enum class MyType
+	{
+		HELLO,
+		ME
+	};
+};
+
+namespace adapter {
+
+template <class Impl>
+class Interface : public ::Interface
 {
 public:
 	static constexpr bool isBaseVirtual = false;
@@ -27,7 +39,12 @@ public:
 		std::cout << "non-virtual" << std::endl;
 		return static_cast<Impl*>(this)->hello(a);
 	}
+
+private:
+	Interface::MyType a;
 };
+
+} // namespace adapter
 
 // Virtual
 
@@ -77,7 +94,7 @@ private:
 
 // Implementation
 
-class User : public InterfaceVirtual<User>
+class User : public adapter::Interface<User>
 {
 public:
 	constexpr int hello(int a) noexcept { return a; }

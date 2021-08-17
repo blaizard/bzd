@@ -39,7 +39,7 @@
 {%- macro declareStruct(element) %}
 {{ element.comment | normalComment }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
-	{{ declareTrivialTypes(element.nested.symbols) }}
+	{{ declareTrivialTypes(element.nested.sequence) }}
 	{% for element in element.nested.expressionList %}
 	{{ declareExpression(element, "", false) }};
 	{% end %}
@@ -47,8 +47,8 @@
 {% end -%}
 
 {#- Build types -#}
-{%- macro declareTrivialTypes(sequence) %}
-	{% for data in sequence %}
+{%- macro declareTrivialTypes(trivialTypes) %}
+	{% for data in trivialTypes %}
 		{% if data.category == "using" %}
 {{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }};
 		{% elif data.category == "enum" %}

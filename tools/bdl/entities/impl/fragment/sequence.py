@@ -12,26 +12,30 @@ class EntitySequence:
 	"""
 
 	def __init__(self, sequence: typing.List["EntityType"]) -> None:
-		self.list = sequence
+		self.sequence_ = sequence
 		self.processed: typing.Optional[typing.Dict[str, typing.List["EntityType"]]] = None
 
+	@property
+	def sequence(self) -> typing.List["EntityType"]:
+		"""
+		Used for customization.
+		"""
+		return self.sequence_
+
 	def __iter__(self) -> typing.Iterator["EntityType"]:
-		for entity in self.list:
+		for entity in self.sequence:
 			yield entity
 
-	def __getitem__(self, index: int) -> "EntityType":
-		return self.list[index]
-
 	def __len__(self) -> int:
-		return len(self.list)
+		return len(self.sequence)
 
 	def __repr__(self) -> str:
-		return "\n".join([str(entity) for entity in self.list])
+		return "\n".join([str(entity) for entity in self.sequence])
 
 	def _filteredList(self, category: str) -> typing.List["EntityType"]:
 		if not self.processed:
 			self.processed = defaultdict(list)
-			for entity in self.list:
+			for entity in self.sequence:
 				self.processed[entity.category].append(entity)
 		return self.processed.get(category, [])
 
@@ -81,6 +85,10 @@ class EntitySequence:
 	@property
 	def isNamespace(self) -> bool:
 		return self._is("namespace")
+
+	@property
+	def namespace(self) -> "Namespace":
+		return typing.cast("Namespace", self._filteredList("namespace")[0])
 
 	@property
 	def namespaceList(self) -> typing.List["Namespace"]:
