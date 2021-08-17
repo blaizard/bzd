@@ -273,8 +273,11 @@ _grammarComments = [
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
+
+		withinNested = makeGrammarUsing() + makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()
+		nested = makeGrammarNested(withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested +
+			makeGrammarNested(withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested))))))
+
 		super().__init__(content,
-			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarUsing() + makeGrammarEnum() +
-			makeGrammarExpression() + makeGrammarMethod() +
-			makeGrammarNested(makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()),
+			grammar=makeGrammarNamespace() + makeGrammarUse() + withinNested + nested,
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

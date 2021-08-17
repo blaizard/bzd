@@ -31,6 +31,12 @@
 		failFct("Failure\nTest: " #expression1 " == " #expression2, expression1, expression2); \
 	}
 
+#define BZDTEST_TEST_NE_(expression1, expression2, failFct)                                    \
+	if (!((expression1) != (expression2)))                                                     \
+	{                                                                                          \
+		failFct("Failure\nTest: " #expression1 " != " #expression2, expression1, expression2); \
+	}
+
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                        \
 	if (!bzd::test::impl::near(number1, number2, absError))                                            \
 	{                                                                                                  \
