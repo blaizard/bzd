@@ -1,8 +1,6 @@
 import typing
 from pathlib import Path
 
-from tools.bdl.visitors.file.visitor import Visitor
-from tools.bdl.visitors.file.result import ResultType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
