@@ -1,4 +1,5 @@
 use "cc/bzd/platform/core.bdl"
+
 namespace bzd.platform.linux;
 
 // Core abstraction on Linux operating system.

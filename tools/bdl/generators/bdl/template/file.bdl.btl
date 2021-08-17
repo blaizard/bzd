@@ -23,14 +23,14 @@
 {%- macro declareNested(data) %}
 {{ data.comment | normalComment }}{{ data.type }}{% if data.isName %} {{ data.name }}{% end %}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
 {%- end %} {
-	{{ declareSymbols(data.nested.symbols) }}
+	{{ declareSymbols(data.nested.sequence) }}
 	{% if data.isConfig %}
 config:
-	{{ declareSymbols(data.config.symbols) }}
+	{{ declareSymbols(data.config.sequence) }}
 	{% end %}
 	{% if data.isComposition %}
 composition:
-	{{ declareSymbols(data.composition.symbols) }}
+	{{ declareSymbols(data.composition.sequence) }}
 	{% end %}
 }
 {% end -%}
@@ -43,18 +43,18 @@ composition:
 	{% for i, expression in parameters %}{%if i %}, {% end %}{{ declareExpression(expression) }}{% end %}
 {%- end -%}
 
-{%- macro declareSymbols(sequence) %}
-	{% for data in sequence %}
-		{% if data.category == "using" %}
-{{ declareUsing(data) }}
-		{% elif data.category == "enum" %}
-{{ declareEnum(data) }}
-		{% elif data.category == "method" %}
-{{ declareMethod(data) }}
-		{% elif data.category == "nested" %}
-{{ declareNested(data) }}
-		{% elif data.category == "expression" %}
-{{ declareExpression(data) }};
+{%- macro declareSymbols(data) %}
+	{% for entity in data %}
+		{% if entity.category == "using" %}
+{{ declareUsing(entity) }}
+		{% elif entity.category == "enum" %}
+{{ declareEnum(entity) }}
+		{% elif entity.category == "method" %}
+{{ declareMethod(entity) }}
+		{% elif entity.category == "nested" %}
+{{ declareNested(entity) }}
+		{% elif entity.category == "expression" %}
+{{ declareExpression(entity) }};
 		{% end %}
 	{% end %}
 {% end -%}
@@ -65,8 +65,8 @@ composition:
 use "{{ use.path }}"
 {% end %}
 
-{%- if isNamespace %}
-namespace {{ namespace | namespaceToStr }};
+{% for entity in namespaceList %}
+namespace {{ entity | namespaceToStr }};
 {% end %}
 
-{{ declareSymbols(symbols) }}
+{{ declareSymbols(sequence) }}
