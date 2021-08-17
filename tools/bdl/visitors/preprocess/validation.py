@@ -27,7 +27,8 @@ class Validation(VisitorBase[None]):
 		self.validateContract(entity=entity)
 
 		if entity.type == "interface":
-			entity.assertTrue(condition=not entity.hasInheritance, message="Interfaces cannot have inheritance.")
+			# No need for this, however, must only inherit from interfaces.
+			#entity.assertTrue(condition=not entity.hasInheritance, message="Interfaces cannot have inheritance.")
 			entity.assertTrue(condition=entity.isName, message="Interfaces must have a valid name.")
 
 		elif entity.type == "struct":

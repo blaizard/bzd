@@ -10,6 +10,8 @@
 
 #define EXPECT_EQ(expression1, expression2) BZDTEST_TEST_EQ_(expression1, expression2, BZDTEST_FAIL_NONFATAL_)
 
+#define EXPECT_NE(expression1, expression2) BZDTEST_TEST_NE_(expression1, expression2, BZDTEST_FAIL_NONFATAL_)
+
 #define EXPECT_NEAR(number1, number2, absError) BZDTEST_TEST_NEAR_(number1, number2, absError, BZDTEST_FAIL_NONFATAL_)
 
 #define EXPECT_STREQ(str1, str2) BZDTEST_TEST_STREQ_(str1, str2, BZDTEST_FAIL_NONFATAL_)
@@ -21,6 +23,8 @@
 #define ASSERT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_FATAL_)
 
 #define ASSERT_EQ(expression1, expression2) BZDTEST_TEST_EQ_(expression1, expression2, BZDTEST_FAIL_FATAL_)
+
+#define ASSERT_NE(expression1, expression2) BZDTEST_TEST_NE_(expression1, expression2, BZDTEST_FAIL_FATAL_)
 
 #define ASSERT_NEAR(number1, number2, absError) BZDTEST_TEST_NEAR_(number1, number2, absError, BZDTEST_FAIL_FATAL_)
 

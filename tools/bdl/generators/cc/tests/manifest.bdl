@@ -1,0 +1,39 @@
+
+namespace bzd.test;
+
+// Simple enum
+enum Error
+{
+	A
+,	B
+,	C
+}
+
+// Simple structure
+struct MyStruct {
+	a = Integer [min(0) max(12)];
+	b = Result<Float, Error>;
+	
+}
+
+// Simple interface
+interface MyInterfaceA {
+	struct NestedA {
+		a = Integer;
+		
+	}
+	
+	
+}
+
+// Test interface with inheritance
+interface MyInterfaceB : MyInterfaceA {
+	struct NestedB {
+		b = Integer;
+		
+	}
+	
+	
+}
+
+

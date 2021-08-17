@@ -47,7 +47,7 @@ public: // Types
 namespace adapter {
 
 template <class Impl>
-{{ data.comment | normalComment }}class {{ data.name }} : public {{ data.fqn | fqnToStr }}{% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceToStr }}{% end %}
+{{ data.comment | normalComment }}class {{ data.name }} : public {{ data.fqn | fqnToStr }}{# Must use adapter class here {% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceToStr }}{% end %}#}
 {
 public: // Traits
 	using Self = {{ data.name }}<Impl>;
