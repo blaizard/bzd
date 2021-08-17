@@ -1,5 +1,6 @@
 use "cc/bzd/platform/core/linux/linux.bdl"
 
+
 composition Hello {
 	core1 = bzd.platform.linux.Core(name = 32.3, priority = 100);
 	core2 = bzd.platform.linux.Core(priority = 20);

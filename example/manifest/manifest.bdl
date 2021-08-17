@@ -1,3 +1,4 @@
+
 namespace bzd.manifest;
 
 using NextType = Integer;

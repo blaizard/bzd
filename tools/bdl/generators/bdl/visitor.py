@@ -55,17 +55,14 @@ def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 
 def formatBdl(bdl: Object) -> str:
 
-	# Process the result
-	result = Visitor(bdl=bdl).process()
-
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
-	result.update({
+	bdl.tree.update({
 		"typeToStr": _typeToStr,
 		"namespaceToStr": _namespaceToStr,
 		"inlineComment": _inlineComment,
 		"normalComment": _normalComment,
 		"inheritanceToStr": _inheritanceToStr
 	})
-	output = template.render(result)  # type: ignore
+	output = template.render(bdl.tree)  # type: ignore
 
 	return output
