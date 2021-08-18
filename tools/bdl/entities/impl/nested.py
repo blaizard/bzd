@@ -8,18 +8,11 @@ from bzd.parser.visitor import Visitor
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
 
-
-class _VisitorInheritance(Visitor[Type, typing.List[Type]]):
-
-	nestedKind = None
-
-	def visitBegin(self, result: typing.Any) -> typing.List[Type]:
-		return []
-
-	def visitElement(self, element: Element, result: typing.List[Type]) -> typing.List[Type]:
-		Error.assertHasAttr(element=element, attr="symbol")
-		result.append(Type(element=element, kind="symbol"))
-		return result
+TYPE_STRUCT = "struct"
+TYPE_COMPONENT = "component"
+TYPE_INTERFACE = "interface"
+TYPE_COMPOSITION = "composition"
+TYPES = [TYPE_STRUCT, TYPE_COMPONENT, TYPE_INTERFACE, TYPE_COMPOSITION]
 
 
 class Nested(Entity):
@@ -40,6 +33,7 @@ class Nested(Entity):
 
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="type")
+		self.assertTrue(condition=self.type in TYPES, message="Unsupported nested type: '{}'.".format(self.type))
 
 	@property
 	def category(self) -> str:
@@ -58,7 +52,11 @@ class Nested(Entity):
 		sequence = self.element.getNestedSequence("inheritance")
 		if sequence is None:
 			return []
-		return _VisitorInheritance().visit(sequence=sequence)
+		inheritanceList: typing.List[Type] = []
+		for element in sequence:
+			Error.assertHasAttr(element=element, attr="symbol")
+			inheritanceList.append(Type(element=element, kind="symbol"))
+		return inheritanceList
 
 	def resolve(self,
 		symbols: typing.Any,
@@ -74,10 +72,26 @@ class Nested(Entity):
 
 		# Resolve and make sure the inheritance is correct.
 		for inheritance in self.inheritanceList:
+
+			# Resolve the inheritance.
 			entity = inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+
+			# Validates that the inheritance type is correct.
 			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=symbols)
-			self.assertTrue(condition=underlyingType.category in ["nested"],
+			self.assertTrue(condition=underlyingType.category == "nested",
 				message="Inheritance can only be done from a nested class, not '{}'.".format(entity.underlyingType))
+			nestedType = typing.cast("Nested", underlyingType)
+			if self.type == TYPE_STRUCT:
+				self.assertTrue(condition=nestedType.type == TYPE_STRUCT,
+					message="A struct can only inherits from another struct, not '{}'.".format(nestedType.type))
+			elif self.type == TYPE_INTERFACE:
+				self.assertTrue(condition=nestedType.type == TYPE_INTERFACE,
+					message="An interface can only inherits from another interface, not '{}'.".format(nestedType.type))
+			elif self.type == TYPE_COMPONENT:
+				self.assertTrue(condition=nestedType.type == TYPE_INTERFACE,
+					message="A component can only inherits from interface(s), not '{}'.".format(nestedType.type))
+			else:
+				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
 
 	def __repr__(self) -> str:
 		content = self.toString({
