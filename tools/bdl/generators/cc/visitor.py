@@ -32,12 +32,23 @@ def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 	return ", ".join(["public {}".format(str(typeToStr(inheritance))) for inheritance in inheritanceList])
 
 
+def _inheritanceAdapterToStr(inheritanceList: typing.List[Type]) -> str:
+	return ", ".join(
+		["public {}<Impl>".format(str(typeToStr(inheritance, adapter=True))) for inheritance in inheritanceList])
+
+
 def _bdlPathToHeader(path: Path) -> str:
 	return path.as_posix().replace(".bdl", ".h")
 
 
 def fqnToStr(fqn: str) -> str:
 	return "::".join(SymbolMap.FQNToNamespace(fqn))
+
+
+def fqnToAdapterStr(fqn: str) -> str:
+	split = SymbolMap.FQNToNamespace(fqn)
+	split.insert(-1, "adapter")
+	return "::".join(split)
 
 
 def formatCc(bdl: Object) -> str:
@@ -50,8 +61,10 @@ def formatCc(bdl: Object) -> str:
 		"namespaceToStr": _namespaceToStr,
 		"normalComment": _normalComment,
 		"inheritanceToStr": _inheritanceToStr,
+		"inheritanceAdapterToStr": _inheritanceAdapterToStr,
 		"bdlPathToHeader": _bdlPathToHeader,
-		"fqnToStr": fqnToStr
+		"fqnToStr": fqnToStr,
+		"fqnToAdapterStr": fqnToAdapterStr
 	})
 
 	output = template.render(bdl.tree)  # type: ignore

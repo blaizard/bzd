@@ -32,6 +32,13 @@ class _VisitorType(Visitor):
 	Visitor to print a type.
 	"""
 
+	def __init__(
+			self,
+			entity: Type,
+			updateNamespace: typing.Optional[typing.Callable[[typing.List[str]], typing.List[str]]] = None) -> None:
+		self.updateNamespace = updateNamespace
+		super().__init__(entity)
+
 	def visitTemplateItems(self, items: typing.List[str]) -> str:
 		return "<{}>".format(", ".join(items))
 
@@ -42,7 +49,10 @@ class _VisitorType(Visitor):
 
 	def visitType(self, entity: Type, template: bool) -> str:
 
-		output = "::".join(SymbolMap.FQNToNamespace(entity.kind))
+		namespace = SymbolMap.FQNToNamespace(entity.kind)
+		if not template and self.updateNamespace is not None:
+			namespace = self.updateNamespace(namespace)
+		output = "::".join(namespace)
 
 		if template and entity.comment is not None:
 			output = commentEmbeddedToStr(comment=entity.comment) + " " + output
@@ -57,11 +67,15 @@ class _VisitorType(Visitor):
 		return value
 
 
-def typeToStr(entity: typing.Optional[Type]) -> str:
+def typeToStr(entity: typing.Optional[Type], adapter: bool = False) -> str:
 	"""
 	Convert a type object into a C++ string.
+	Args:
+		entity: The Type entity to be converted.
+		adapter: If the type should be converted into its adapter.
 	"""
 
 	if entity is None:
 		return "void"
-	return _VisitorType(entity=entity).result
+	updateNamespace = (lambda x: x[0:-1] + ["adapter"] + x[-1:]) if adapter else None
+	return _VisitorType(entity=entity, updateNamespace=updateNamespace).result

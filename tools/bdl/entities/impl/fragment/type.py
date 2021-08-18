@@ -61,7 +61,6 @@ class Type:
 		templates = self.templates
 
 		# Get and save the underlying type
-		# TODO: save is as part of the element itself so it is persisted.
 		underlying = self.getEntityResolved(symbols=symbols)
 		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,

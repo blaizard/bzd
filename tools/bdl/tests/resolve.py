@@ -92,6 +92,34 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True))
 
+		with self.assertRaisesRegex(Exception, r"struct.*inherits.*struct"):
+			Object.fromContent(content="""
+					interface A {}
+					struct B : A {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"interface.*inherits.*interface"):
+			Object.fromContent(content="""
+					struct A {}
+					interface B : A {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"component.*inherits.*interface"):
+			Object.fromContent(content="""
+					struct A {}
+					component B : A {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"Composition.*cannot.*inheritance"):
+			Object.fromContent(content="""
+					struct A {}
+					composition B : A {}
+					""",
+				objectContext=ObjectContext(resolve=True))
+
 	def testNamespaces(self) -> None:
 
 		Object.fromContent(content="""
