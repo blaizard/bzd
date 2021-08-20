@@ -15,6 +15,9 @@ config:
 
 component Executor : bzd.platform.Executor {
 	
+config:
+	Core;
+	
 }
 
 
