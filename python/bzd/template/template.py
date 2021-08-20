@@ -4,7 +4,7 @@ import pathlib
 from bzd.parser.error import Error
 
 from bzd.template.parser import Parser
-from bzd.template.substitution import SubstitutionsType, SubstitutionWrapper
+from bzd.template.substitution import SubstitutionsType, SubstitutionWrapper, SubstitutionsAccessor
 from bzd.template.visitor import Visitor, ResultType
 
 
@@ -21,12 +21,13 @@ class Template:
 		template.parser = Parser.fromPath(path)  # type: ignore
 		return template
 
-	def render(self, substitutions: SubstitutionsType) -> str:
+	def render(self, *args: SubstitutionsType) -> str:
+		substitutions = SubstitutionsAccessor(*args)
 		output, _ = self._render(substitutions=substitutions)
 		return "".join(output)
 
 	def _render(
-		self, substitutions: typing.Union[SubstitutionsType, SubstitutionWrapper]
+		self, substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper]
 	) -> typing.Tuple[ResultType, SubstitutionWrapper]:
 
 		sequence = self.parser.parse()

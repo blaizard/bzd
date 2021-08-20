@@ -1,3 +1,17 @@
+{#- Re-usable macros -#}
+{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
+
+struct Registry
+{
+{% for expresssion in registry %}
+	{{ expresssion.typeResolved | typeReferenceToStr }} {{ expresssion.name }};
+{% end %}
+};
+
+{% for expresssion in registry %}
+	{{ expresssion.typeResolved | typeToStr }} {{ expresssion.name }}{ {{- declareParameters(expresssion.parametersResolved, false) -}} };
+{% end %}
+
 /**
  * Registry
  */

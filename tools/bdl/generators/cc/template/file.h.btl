@@ -47,7 +47,7 @@ public: // Types
 namespace adapter {
 
 template <class Impl>
-{{ data.comment | normalComment }}class {{ data.name }} : public {{ data.fqn | fqnToStr }}{% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceAdapterToStr }}{% end %}
+{{ data.comment | commentBlockToStr }}class {{ data.name }} : public {{ data.fqn | fqnToStr }}{% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceAdapterToStr }}{% end %}
 {
 public: // Traits
 	using Self = {{ data.name }}<Impl>;
@@ -57,7 +57,7 @@ public: // Internal
 
 public: // Methods.
 	{% for method in data.nested.methodList %}
-	{{ method.comment | normalComment }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }})
+	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }})
 	{
 		{% if method.isType %}return {% end %}static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
 	}
@@ -70,7 +70,7 @@ public: // Variable accessors.
 	 * Getter for the variable '{{ var.name }}'.
 	 * \return The value of '{{ var.name }}'.
 	 */
-	[[nodiscard]] constexpr const {{ var.type | typeToStr }}& get{{ var.name | camelCase }}() const noexcept
+	[[nodiscard]] constexpr const {{ var.type | typeReferenceToStr }} get{{ var.name | toCamelCase }}() const noexcept
 	{
 		return {{ var.name }}_;
 	}
@@ -80,7 +80,7 @@ public: // Variable accessors.
 	 * Setter for the variable '{{ var.name }}'.
 	 * \param value The new value to be set.
 	 */
-	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
+	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }}& value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
@@ -96,7 +96,7 @@ protected: // Protected variable accessors.
 	 * Setter for the constant variable '{{ var.name }}'.
 	 * \param value The new value to be set.
 	 */
-	constexpr void set{{ var.name | camelCase }}(const {{ var.type | typeToStr }}& value)
+	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }}& value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;

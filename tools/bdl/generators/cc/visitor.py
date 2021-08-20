@@ -4,41 +4,49 @@ from pathlib import Path
 from bzd.template.template import Template
 
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type
 
 from tools.bdl.generators.cc.types import typeToStr
+from tools.bdl.generators.cc.comments import commentBlockToStr
+
+# String related
 
 
-def _toCamelCase(string: str) -> str:
+def toCamelCase(string: str) -> str:
 	assert len(string), "String cannot be empty."
 	return string[0].upper() + string[1:]
 
 
-def _namespaceToStr(entity: Namespace) -> str:
-	return "::".join(entity.nameList)
+# Inheritance related
 
 
-def _normalComment(comment: typing.Optional[str]) -> str:
-	if comment is None:
-		return ""
-	if len(comment.split("\n")) > 1:
-		return "/*\n{comment}\n */\n".format(comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
-	return "// {comment}\n".format(comment=comment)
-
-
-def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
+def inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 	return ", ".join(["public {}".format(str(typeToStr(inheritance))) for inheritance in inheritanceList])
 
 
-def _inheritanceAdapterToStr(inheritanceList: typing.List[Type]) -> str:
+def inheritanceAdapterToStr(inheritanceList: typing.List[Type]) -> str:
 	return ", ".join(
 		["public {}<Impl>".format(str(typeToStr(inheritance, adapter=True))) for inheritance in inheritanceList])
 
 
-def _bdlPathToHeader(path: Path) -> str:
+# Path related
+
+
+def bdlPathToHeader(path: Path) -> str:
 	return path.as_posix().replace(".bdl", ".h")
+
+
+# Namespace related
+
+
+def namespaceToStr(entity: Namespace) -> str:
+	return "::".join(entity.nameList)
+
+
+# FQN related
 
 
 def fqnToStr(fqn: str) -> str:
@@ -51,22 +59,41 @@ def fqnToAdapterStr(fqn: str) -> str:
 	return "::".join(split)
 
 
+def typeReferenceToStr(entity: Type) -> str:
+	return typeToStr(entity=entity, reference=True)
+
+
+transforms = {
+	"toCamelCase": toCamelCase,
+	"typeToStr": typeToStr,
+	"typeReferenceToStr": typeReferenceToStr,
+	"namespaceToStr": namespaceToStr,
+	"commentBlockToStr": commentBlockToStr,
+	"inheritanceToStr": inheritanceToStr,
+	"inheritanceAdapterToStr": inheritanceAdapterToStr,
+	"bdlPathToHeader": bdlPathToHeader,
+	"fqnToStr": fqnToStr,
+	"fqnToAdapterStr": fqnToAdapterStr
+}
+
+
 def formatCc(bdl: Object) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
 
-	bdl.tree.update({
-		"camelCase": _toCamelCase,
-		"typeToStr": typeToStr,
-		"namespaceToStr": _namespaceToStr,
-		"normalComment": _normalComment,
-		"inheritanceToStr": _inheritanceToStr,
-		"inheritanceAdapterToStr": _inheritanceAdapterToStr,
-		"bdlPathToHeader": _bdlPathToHeader,
-		"fqnToStr": fqnToStr,
-		"fqnToAdapterStr": fqnToAdapterStr
-	})
+	output = template.render(bdl.tree, transforms)
 
-	output = template.render(bdl.tree)  # type: ignore
+	return output
+
+
+def compositionCc(composition: Composition) -> str:
+
+	template = Template.fromPath(Path(__file__).parent / "template/registry.h.btl", indent=True)
+
+	print(composition.registry)
+	for expr in composition.registry:
+		print(expr.element)
+
+	output = template.render(composition, transforms)
 
 	return output

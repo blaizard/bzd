@@ -10,26 +10,7 @@ class SymbolTree(EntitySequence):
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		self.fqns_: typing.List[str] = []
-		self.ext: typing.Dict[str, typing.Any] = {}
 		super().__init__([])
-
-	def __setitem__(self, key: str, value: typing.Any) -> None:
-		self.ext[key] = value
-
-	def __getitem__(self, key: str) -> typing.Any:
-		return self.ext[key]
-
-	def __delitem__(self, key: str) -> None:
-		del self.ext[key]
-
-	def __contains__(self, key: str) -> bool:
-		return key in self.ext
-
-	def update(self, ext: typing.Any) -> None:
-		"""
-		Set extensions.
-		"""
-		self.ext.update(ext)
 
 	@property
 	def sequence(self) -> typing.List[EntityType]:

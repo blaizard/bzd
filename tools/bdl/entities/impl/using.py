@@ -44,8 +44,5 @@ class Using(Entity):
 		"""
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
-		# Resolve contract
-		self.contracts.mergeBase(entity.contracts)
-
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

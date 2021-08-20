@@ -36,7 +36,7 @@ public:
 
 	constexpr SizeType size() const noexcept { return stack_.size(); }
 
-	Integer estimateMaxUsage(UInt8Type pattern = 0xaa) const noexcept
+	bzd::SizeType estimateMaxUsage(UInt8Type pattern = 0xaa) const noexcept
 	{
 		if constexpr (direction == StackDirection::DOWNWARD)
 		{

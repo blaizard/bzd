@@ -66,6 +66,14 @@ class Contract:
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Contract):
+			return False
+		return self.element == other.element
+
+	def __ne__(self, other: object) -> bool:
+		return not (self == other)
+
 	def __repr__(self) -> str:
 		if self.isValue:
 			return "{}({})".format(self.type, ",".join(self.values))

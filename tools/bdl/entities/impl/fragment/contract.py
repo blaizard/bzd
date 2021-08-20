@@ -33,6 +33,14 @@ class Contracts:
 		return False
 
 	@property
+	def validationForAll(self) -> typing.Optional[str]:
+		"""
+		Generate a validation string for all contracts
+		"""
+		content = [str(contract) for contract in self]
+		return " ".join(content) if content else None
+
+	@property
 	def validationForValue(self) -> typing.Optional[str]:
 		"""
 		Generate a validation string for a value out of the current contracts
@@ -67,7 +75,7 @@ class Contracts:
 				Error.handleFromElement(element=self.element,
 					message="Contract of type '{}' is not supported.".format(contract.type))
 
-	def mergeBase(self, contracts: "Contracts") -> None:
+	def resolve(self, contracts: "Contracts") -> None:
 		"""
 		Merge a base contract into this one. The order is important, as type are inherited from the deepest base.
 		"""
@@ -89,6 +97,11 @@ class Contracts:
 
 			if contract is not None:
 				elementBuilder.pushFrontElementToNestedSequence(self.sequenceKind, contract.element)
+
+		# Construct a dummy Validation to check the arguments
+		maybeSchema = self.validationForAll
+		if maybeSchema:
+			Validation(schema=[maybeSchema])
 
 	def remove(self, kind: str) -> None:
 		"""

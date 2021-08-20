@@ -1,8 +1,8 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element, Sequence, ElementBuilder
-from bzd.parser.visitor import Visitor as VisitorBase
+from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
+from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
@@ -77,13 +77,21 @@ class Type:
 			defaults = underlying.getDefaultsForTemplate(symbols=symbols, exclude=exclude)
 			templates.mergeDefaults(defaults)
 
+			# Save the resolved template
+			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude)
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
+				sequence)
+
+			# Validate the template arguments
 			values = templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
-			# Merge the lists
 			resultValidate = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element,
 				attr=self.kindAttr,
 				condition=bool(resultValidate),
 				message=str(resultValidate))
+
+		# Resolve contract
+		self.contracts.resolve(underlying.contracts)
 
 		return underlying
 
@@ -128,56 +136,53 @@ class Type:
 		return self.name
 
 
-class Visitor(VisitorBase[str, str]):
+class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	nestedKind = "template"
 
 	def __init__(self, entity: Type) -> None:
 
-		# Deal with the main type, do not include the comment as
-		# it is taken care by the upper level block.
-		kind = self.visitType(entity=entity, template=False)
+		# Nested level
+		self.level = 0
 
 		# Construct the template if any.
 		if entity.templateAttr is not None:
 			self.nestedKind = entity.templateAttr
 			nested = entity.element.getNestedSequence(self.nestedKind)
-			template = None if nested is None else self._visit(sequence=nested)
+			template = [] if nested is None else self._visit(sequence=nested)
 		else:
-			template = None
+			template = []
 
-		self.result = self.visitTypeTemplate(kind=kind, template=template)
+		self.result = self.visitType(entity=entity, nested=template)
 
-	def visitBegin(self, result: typing.Any) -> typing.List[str]:
+	@property
+	def isTopLevel(self) -> bool:
+		return self.level == 0
+
+	def _visit(self, sequence: Sequence) -> typing.List[str]:
+		self.level += 1
+		result = super()._visit(sequence=sequence)
+		self.level -= 1
+		return result
+
+	def visitBegin(self) -> typing.List[str]:
 		return []
 
-	def visitEnd(self, result: typing.List[str]) -> str:
-		return self.visitTemplateItems(items=result)
+	def visitElement(self, element: Element, result: typing.List[str], nested: typing.List[str]) -> typing.List[str]:
 
-	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
 		if element.isAttr("type"):
-			result.append(
-				self.visitType(entity=Type(element=element, kind="type", underlyingType="fqn_type",
-				template="template"),
-				template=True))
+
+			entity = Type(element=element, kind="type", underlyingType="fqn_type", template="template")
+			output = self.visitType(entity=entity, nested=nested)
+
 		else:
 			Error.assertHasAttr(element=element, attr="value")
-			result.append(self.visitValue(value=element.getAttr("value").value,
-				comment=element.getAttrValue("comment")))
+			Error.assertTrue(element=element, condition=not nested, message="Value cannot have nested entities.")
+			output = self.visitValue(value=element.getAttr("value").value, comment=element.getAttrValue("comment"))
+
+		result.append(output)
 
 		return result
-
-	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.List[str]) -> typing.List[str]:
-		nestedResult = self._visit(nestedSequence)
-		result[-1] = self.visitTypeTemplate(kind=result[-1], template=nestedResult)
-		return result
-
-	def visitType(self, entity: Type, template: bool) -> str:
-		"""
-		Called when an element needs to be formatted.
-		"""
-
-		return entity.kind
 
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
 		"""
@@ -186,19 +191,11 @@ class Visitor(VisitorBase[str, str]):
 
 		return value
 
-	def visitTemplateItems(self, items: typing.List[str]) -> str:
+	def visitType(self, entity: Type, nested: typing.List[str]) -> str:
 		"""
-		Called once all template elements have been discovered.
-		This function should assemble the elements together.
-		"""
-
-		return "<{}>".format(",".join(items))
-
-	def visitTypeTemplate(self, kind: str, template: typing.Optional[str]) -> str:
-		"""
-		Called to assemble a type with its template.
+		Called when an element needs to be formatted.
 		"""
 
-		if template is None:
-			return kind
-		return "{}{}".format(kind, template)
+		if nested:
+			return "{}<{}>".format(entity.kind, ",".join(nested))
+		return entity.kind
