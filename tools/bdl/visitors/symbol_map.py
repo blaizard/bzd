@@ -20,13 +20,15 @@ class SymbolMap:
 	 - bzd.nested.Struct: <nested>
 	                          <reference "bzd.nested.Struct.a">
 	                          <reference "bzd.nested.Struct.b">
+	                          <expression> <- unamed expression
 	 - bzd.nested.Struct.a: <expression "a">
 	 - bzd.nested.Struct.b: <expression "b">
-     - bzd.Child: <nested>
+	 - bzd.Child: <nested>
 	                 <reference "bzd.Child.c">
 	 - bzd.Child.c: <expression "c">
-	 - bzd.Child.a: <reference "bzd.nested.Struct.a"> <- duplicated entries as Child inherits from Struct. Maybe this should be a reference also?
+	 - bzd.Child.a: <reference "bzd.nested.Struct.a">
 	 - bzd.Child.b: <reference "bzd.nested.Struct.b">
+	 - _0~: <nested>                                <- unamed top level element
 	"""
 
 	def __init__(self) -> None:
@@ -134,13 +136,17 @@ class SymbolMap:
 		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
 		raise Exception(message)
 
+	@staticmethod
+	def isPrivate(fqn: str) -> bool:
+		return fqn.startswith("_")
+
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
 			# Ignore private entries
-			if fqn.startswith("_"):
+			if SymbolMap.isPrivate(fqn):
 				continue
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
@@ -161,6 +167,7 @@ class SymbolMap:
 		"""
 
 		# Create serialized blobs for elements present in the entities map.
+		removeFQNs: typing.Set[str] = set()
 		for fqn, entity in self.entities.items():
 
 			# Ignore builtins
@@ -182,12 +189,21 @@ class SymbolMap:
 						for element in nested:
 							Error.assertHasAttr(element=element, attr="fqn")
 							fqnNested = element.getAttr("fqn").value
-							sequence.pushBackElement(self.makeReference(fqnNested))
+							# Remove private FQNs and keep them nested
+							if SymbolMap.isPrivate(fqnNested):
+								removeFQNs.add(fqnNested)
+								sequence.pushBackElement(element)
+							else:
+								sequence.pushBackElement(self.makeReference(fqnNested))
 						preparedElement.setNestedSequence(category, sequence)
 				element = preparedElement
 
 			# Serialize the element to the map.
 			self.map[fqn]["e"] = element.serialize()
+
+		# Remove some of the FQNs that have been copied.
+		for fqn in removeFQNs:
+			del self.map[fqn]
 
 		# Sanity check to ensure that all entries in the map are valid.
 		for fqn, entry in self.map.items():
@@ -250,6 +266,7 @@ class SymbolMap:
 		Return an element from the symbol map.
 		This call assumes that FQN is already resolved.
 		"""
+
 		data = self._get(fqn)
 		if data is None:
 			return Result[EntityType].makeError("Unable to find symbol '{}'.".format(fqn))
@@ -263,13 +280,11 @@ class SymbolMap:
 				if element.isNestedSequence(category):
 					updatedSequence = SequenceBuilder()
 					for nested in element.getNestedSequenceAssert(category):
-						# There must be only references
-						entityReference = elementToEntity(nested)
-						Error.assertTrue(element=element,
-							condition=isinstance(entityReference, Reference),
-							message="Nested elements must be reference.")
-						nestedEntity = self.getEntityResolved(fqn=entityReference.name,
-							category=category).assertValue(element=element)
+						nestedEntity = elementToEntity(nested)
+						# Resolve the reference if any
+						if isinstance(nestedEntity, Reference):
+							nestedEntity = self.getEntityResolved(fqn=nestedEntity.name,
+								category=category).assertValue(element=element)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
 						sequence=updatedSequence)
