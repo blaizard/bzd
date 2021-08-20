@@ -8,7 +8,7 @@ from bzd.parser.error import Error, ExceptionParser
 
 # Needed by the include method
 import bzd.template.template
-from bzd.template.substitution import SubstitutionsType, SubstitutionWrapper
+from bzd.template.substitution import SubstitutionsAccessor, SubstitutionWrapper
 
 ResultType = typing.List[str]
 
@@ -17,7 +17,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	nestedKind = None
 
 	def __init__(self,
-		substitutions: typing.Union[SubstitutionsType, SubstitutionWrapper],
+		substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
 		includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
 		indent: bool = False) -> None:
 		# Re-use directly substitution wrapper if provided.
@@ -201,6 +201,11 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		for arg in argument:
 			Error.assertHasAttr(element=arg, attr="name")
 			argList.append(arg.getAttr("name").value)
+
+		# Sanity check
+		Error.assertTrue(element=element,
+			condition=len(argList) == len(args),
+			message="Wrong number of argument(s), expected {}: {}".format(len(argList), ", ".join(argList)))
 
 		for i, name in enumerate(argList):
 			self.substitutions.register(element=element, key=name, value=args[i])

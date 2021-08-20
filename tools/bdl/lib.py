@@ -5,9 +5,8 @@ from bzd.parser.error import Error
 
 from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.generators.bdl.visitor import formatBdl
-from tools.bdl.generators.cc.visitor import formatCc
+from tools.bdl.generators.cc.visitor import formatCc, compositionCc
 from tools.bdl.object import Object, ObjectContext
-from tools.bdl.generators.cc.composition import compositionCc
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
 compositions = {"cc": compositionCc}
@@ -38,9 +37,9 @@ def compose(formatType: str, bdls: typing.Sequence[Object], output: Path) -> Non
 	composition.process()
 
 	# Generate the composition using a specific formatter
-	compositions[formatType](composition=composition)
+	data = compositions[formatType](composition=composition)
 
-	output.write_text("")
+	output.write_text(data)
 
 
 def main(formatType: str, path: Path, objectContext: typing.Optional[ObjectContext] = None) -> str:

@@ -1,10 +1,10 @@
 {#- Enum -#}
 {%- macro declareEnum(element) %}
-{{ element.comment | normalComment }}enum class {{ element.name }} : bzd::UInt8Type
+{{ element.comment | commentBlockToStr }}enum class {{ element.name }} : bzd::UInt8Type
 {
 	{% for i, value in element.values %}
 		{% if i %},{% end %}
-	{{ value.comment | normalComment }}{{ value.name }}
+	{{ value.comment | commentBlockToStr }}{{ value.name }}
 	{% end %}
 };
 {% end -%}
@@ -17,9 +17,9 @@
 	literal          -> /* comment */ myvar = 12
 -#}
 {%- macro declareExpression(element, prepend, reference) -%}
-	{{ element.comment | normalComment }}
+	{{ element.comment | commentBlockToStr }}
 	{%- if element.isType -%}
-	{% if element.isName %}{{- element.type | typeToStr }}{% if reference %}&{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, false) -}} }{% end %}
+	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -37,7 +37,7 @@
 
 {#- Nested structure -#}
 {%- macro declareStruct(element) %}
-{{ element.comment | normalComment }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
+{{ element.comment | commentBlockToStr }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
 	{{ declareTrivialTypes(element.nested.sequence) }}
 	{% for element in element.nested.expressionList %}
@@ -50,7 +50,7 @@
 {%- macro declareTrivialTypes(trivialTypes) %}
 	{% for data in trivialTypes %}
 		{% if data.category == "using" %}
-{{ data.comment | normalComment }}using {{ data.name }} = {{ data.type | typeToStr }};
+{{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.type | typeToStr }};
 		{% elif data.category == "enum" %}
 {{ declareEnum(data) }}
 		{% elif data.category == "nested" %}

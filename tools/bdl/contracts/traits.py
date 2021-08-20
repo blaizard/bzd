@@ -56,4 +56,6 @@ class ContractTraits:
 		"""
         Overload to resolve conflicts.
         """
+		if base == derived:
+			return base
 		raise Exception("cannot be merged.")

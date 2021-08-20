@@ -1,7 +1,7 @@
 import typing
 from functools import cached_property
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
@@ -26,6 +26,9 @@ class Parameters:
 
 		# Build the parameter list
 		self.list: typing.List["Expression"] = []
+		# Sorted list of keys from defaults
+		self.keysSorted: typing.Optional[typing.List[str]] = None
+
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
@@ -88,7 +91,9 @@ class Parameters:
 
 		# Merge
 		if parameters.isNamed:
+			self.keysSorted = []
 			for name, expression in parameters.items():
+				self.keysSorted.append(name)
 				if not self.contains(name) and not expression.contracts.has("mandatory"):
 					self.list.append(expression)
 
@@ -163,3 +168,25 @@ class Parameters:
         """
 		values = self.itemsValuesOrTypes(symbols=symbols, exclude=exclude)
 		return [entry[1] for entry in values]
+
+	def toResolvedSequence(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> Sequence:
+		"""
+		Build the resolved sequence of those parameters.
+		Must be called after mergeDefaults.
+		"""
+		sequence = SequenceBuilder()
+
+		if self.isNamed:
+			itemsDict = self.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+			items = [itemsDict[name] for name in self.keysSorted] if self.keysSorted else []
+		else:
+			items = self.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
+
+		# Build the sequence
+		for item in items:
+			if isinstance(item, str):
+				sequence.pushBackElement(ElementBuilder().setAttr(key="value", value=item))
+			else:
+				sequence.pushBackElement(item.element)
+
+		return sequence

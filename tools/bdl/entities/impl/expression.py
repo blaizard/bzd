@@ -53,6 +53,10 @@ class Expression(Entity):
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template")
 
+	@cached_property
+	def typeResolved(self) -> Type:
+		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template_resolved")
+
 	@property
 	def isValue(self) -> bool:
 		return self.element.isAttr("value")
@@ -123,19 +127,20 @@ class Expression(Entity):
 		else:
 			self._setUnderlyingValue(entity=entity)
 
-		# Resolve contract
-		self.contracts.mergeBase(entity.contracts)
-
 		# Generate the argument list
 		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
 		self.parameters.mergeDefaults(defaults)
-		arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+
+		# Save the resolved parameters
+		sequence = self.parameters.toResolvedSequence(symbols=symbols, exclude=exclude)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, contracts=self.contracts)
 		if validation is not None:
+			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
@@ -171,6 +176,10 @@ class Expression(Entity):
 	@cached_property
 	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")
+
+	@cached_property
+	def parametersResolved(self) -> Parameters:
+		return Parameters(element=self.element, nestedKind="argument_resolved")
 
 	def __repr__(self) -> str:
 		return self.toString({

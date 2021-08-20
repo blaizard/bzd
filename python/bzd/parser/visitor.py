@@ -8,7 +8,23 @@ T = typing.TypeVar("T")
 U = typing.TypeVar("U")
 
 
-class Visitor(typing.Generic[T, U]):
+class _VisitorCommon(typing.Generic[T, U]):
+
+	nestedKind: typing.Optional[str] = "nested"
+
+	def visit(self, sequence: Sequence) -> U:
+
+		result = self._visit(sequence=sequence)  # type: ignore
+		return self.visitFinal(result=result)
+
+	def visitEnd(self, result: typing.Any) -> T:
+		return typing.cast(T, result)
+
+	def visitFinal(self, result: typing.Any) -> U:
+		return typing.cast(U, result)
+
+
+class Visitor(_VisitorCommon[T, U]):
 	"""
 	Visitor for parsed sequence.
 
@@ -19,13 +35,6 @@ class Visitor(typing.Generic[T, U]):
 	printer = Print()
 	printer.visit(data)
 	"""
-
-	nestedKind: typing.Optional[str] = "nested"
-
-	def visit(self, sequence: Sequence) -> U:
-
-		result = self._visit(sequence=sequence)
-		return self.visitFinal(result=result)
 
 	def _visit(self, sequence: Sequence, result: typing.Any = None) -> T:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
@@ -44,14 +53,38 @@ class Visitor(typing.Generic[T, U]):
 	def visitBegin(self, result: typing.Any) -> typing.Any:
 		return result
 
-	def visitEnd(self, result: typing.Any) -> T:
-		return typing.cast(T, result)
-
-	def visitFinal(self, result: typing.Any) -> U:
-		return typing.cast(U, result)
-
 	def visitElement(self, element: Element, result: typing.Any) -> typing.Any:
 		return result
 
 	def visitNested(self, element: Element, nestedSequence: Sequence, result: typing.Any) -> typing.Any:
 		return self._visit(sequence=nestedSequence, result=result)
+
+
+class VisitorDepthFirst(_VisitorCommon[T, U]):
+	"""
+	Visitor for parsed sequence.
+	"""
+
+	def _visit(self, sequence: Sequence) -> T:
+		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
+
+		result = self.visitBegin()
+
+		for element in sequence:
+			nestedResult: typing.Optional[typing.Any] = None
+			if self.nestedKind is not None:
+				nestedSequence = element.getNestedSequence(kind=self.nestedKind)
+				if nestedSequence is not None:
+					nestedResult = self.visitNested(element, nestedSequence)
+			result = self.visitElement(element, result, nestedResult)
+
+		return self.visitEnd(result)
+
+	def visitBegin(self) -> typing.Any:
+		return None
+
+	def visitNested(self, element: Element, nestedSequence: Sequence) -> typing.Any:
+		return self._visit(sequence=nestedSequence)
+
+	def visitElement(self, element: Element, result: typing.Any, nestedResult: typing.Any) -> typing.Any:
+		return result

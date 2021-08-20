@@ -73,6 +73,12 @@ class Constraint:
 			raise Exception("expects a floating point number, received: '{}'.".format(value))
 
 
+class NoopConstraint(Constraint):
+
+	def install(self, processedSchema: "ProcessedSchema", args: Args) -> None:
+		pass
+
+
 class ProcessedResult:
 
 	def __init__(self) -> None:

@@ -32,6 +32,17 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="using MyType = Integer [template];")
 		Object.fromContent(content="interface temp { config: var = Integer [template]; }")
 
+		# Capacity
+		with self.assertRaisesRegex(Exception, r"missing mandatory"):
+			Object.fromContent(content="using MyType = Integer [capacity];", objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="using MyType = Integer [capacity(1,2)];",
+				objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r".*lower.*"):
+			Object.fromContent(content="using MyType = Integer [capacity(0)];",
+				objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="using MyType = Integer [capacity(10)];", objectContext=ObjectContext(resolve=True))
+
 
 if __name__ == '__main__':
 	unittest.main()
