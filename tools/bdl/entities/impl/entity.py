@@ -164,20 +164,39 @@ class Entity:
 			return [config for config in underlyingType.config if not config.contracts.get("template")]
 		return []
 
+	def makeValidation(self, symbols: typing.Any, forTemplate: bool) -> typing.Optional[Validation]:
+		"""
+		Generate the validation object.
+		"""
+
+		config = self.getConfigTemplates(symbols=symbols) if forTemplate else self.getConfigValues(symbols=symbols)
+
+		schema = {}
+		for index, expression in enumerate(config):
+			if expression.isName:
+				key = expression.name
+			elif expression.isVarArgs:
+				expression.assertTrue(condition=index == len(config) - 1,
+					message="Variable arguments can only be present at the end of the parameter list.")
+				key = "*"
+			else:
+				key = str(index)
+
+			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
+			schema[key] = maybeContracts if maybeContracts is not None else ""
+
+		if schema:
+			try:
+				return Validation(schema=schema)
+			except Exception as e:
+				self.error(message=str(e))
+		return None
+
 	def makeValidationForTemplate(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for template parameters.
 		"""
-		schema = self.getConfigTemplates(symbols=symbols)
-		if schema:
-			try:
-				return Validation(schema=[
-					"" if e.contracts.validationForTemplate is None else e.contracts.validationForTemplate
-					for e in schema
-				])
-			except Exception as e:
-				self.error(message=str(e))
-		return None
+		return self.makeValidation(symbols=symbols, forTemplate=True)
 
 	def getDefaultsForTemplate(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
 		"""
@@ -194,17 +213,7 @@ class Entity:
 		"""
 		Generate the validation object for value parameters.
 		"""
-		schema = {}
-		for index, expression in enumerate(self.getConfigValues(symbols=symbols)):
-			schema[expression.name if expression.isName else str(
-				index
-			)] = expression.contracts.validationForValue if expression.contracts.validationForValue is not None else ""
-		if schema:
-			try:
-				return Validation(schema=schema)
-			except Exception as e:
-				self.error(message=str(e))
-		return None
+		return self.makeValidation(symbols=symbols, forTemplate=False)
 
 	def getDefaultsForValues(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
 		"""
