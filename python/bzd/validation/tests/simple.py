@@ -58,6 +58,12 @@ class TestRun(unittest.TestCase):
 		self.assertTrue(template.validate({"test": "2"}, output="return"))
 		self.assertFalse(template.validate({"test": "2.1"}, output="return"))
 
+	def testWildcard(self) -> None:
+		template = Validation({"*": "float", "hello": "integer"})
+		self.assertDictEqual(template.validate({"test": "3.14"}).valuesAsDict, {"test": 3.14})
+		with self.assertRaisesRegex(ExceptionValidation, r"expects.*integer"):
+			template.validate({"hello": "3.14"})
+
 
 if __name__ == '__main__':
 	unittest.main()

@@ -179,6 +179,9 @@ class Validation:
 				if key in self.processed:
 					result = self.processed[key].validate(value=value)
 					results.addResult(key, result)
+				elif "*" in self.processed:
+					result = self.processed["*"].validate(value=value)
+					results.addResult(key, result)
 				elif not self.processed:
 					results.addError(key, ["no value expected."])
 				else:

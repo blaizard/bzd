@@ -83,7 +83,7 @@ class Type:
 				sequence)
 
 			# Validate the template arguments
-			values = templates.getValuesOrTypesAsList(symbols=symbols, exclude=exclude)
+			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			resultValidate = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element,
 				attr=self.kindAttr,
