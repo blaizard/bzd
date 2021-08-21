@@ -1,35 +1,31 @@
 {#- Re-usable macros -#}
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
+#pragma once
+
+// Declaration of the registry type.
 struct Registry
 {
+	/**
+	 * Get the registry instance.
+	 */
+	static [[nodiscard]] Registry& get() noexcept;
+
+	// Registry members.
 {% for expresssion in registry %}
-	{{ expresssion.typeResolved | typeReferenceToStr }} {{ expresssion.name }};
+	{{ expresssion.typeResolved | typeReferenceToStr }} {{ expresssion.fqn | fqnToNameStr }};
 {% end %}
 };
 
-{% for expresssion in registry %}
-	{{ expresssion.typeResolved | typeToStr }} {{ expresssion.name }}{ {{- declareParameters(expresssion.parametersResolved, false) -}} };
-{% end %}
-
-/**
- * Registry
- */
-class Registry
+Registry& Registry::get() noexcept
 {
-	// Definition for all registry entries.
-	static bzd::platform::linux::Core<100000> bzd_linux0{0};
-	static bzd::platform::linux::Core<100000> bzd_linux1{1};
-	static bzd::platform::core::Executor executor{bzd_linux0, bzd_linux1};
+	// Definition of all registry members.
+	{% for expresssion in registry %}
+	static {{ expresssion.typeResolved | typeToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersValues(expresssion.parametersResolved, true) -}} };
+	{% end %}
 
-	// Registry structure containing a reference of all entries.
-	struct Registry
-	{
-		decltype(bzd_linux0)& bzd_linux0;
-		decltype(bzd_linux1)& bzd_linux1;
-		decltype(executor)& executor;
-	};
-	static Registry registry{bzd_linux0, bzd_linux1, executor};
+	// Definition of the registry.
+	static Registry registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
 
 	return registry;
 }

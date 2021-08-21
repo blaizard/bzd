@@ -10,7 +10,7 @@ from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type
 
 from tools.bdl.generators.cc.types import typeToStr
-from tools.bdl.generators.cc.comments import commentBlockToStr
+from tools.bdl.generators.cc.comments import commentBlockToStr, commentEmbeddedToStr
 
 # String related
 
@@ -59,6 +59,14 @@ def fqnToAdapterStr(fqn: str) -> str:
 	return "::".join(split)
 
 
+def fqnToNameStr(fqn: str) -> str:
+	split = SymbolMap.FQNToNamespace(fqn)
+	return "_".join(split)
+
+
+# Type related
+
+
 def typeReferenceToStr(entity: Type) -> str:
 	return typeToStr(entity=entity, reference=True)
 
@@ -69,11 +77,13 @@ transforms = {
 	"typeReferenceToStr": typeReferenceToStr,
 	"namespaceToStr": namespaceToStr,
 	"commentBlockToStr": commentBlockToStr,
+	"commentEmbeddedToStr": commentEmbeddedToStr,
 	"inheritanceToStr": inheritanceToStr,
 	"inheritanceAdapterToStr": inheritanceAdapterToStr,
 	"bdlPathToHeader": bdlPathToHeader,
 	"fqnToStr": fqnToStr,
-	"fqnToAdapterStr": fqnToAdapterStr
+	"fqnToAdapterStr": fqnToAdapterStr,
+	"fqnToNameStr": fqnToNameStr
 }
 
 
