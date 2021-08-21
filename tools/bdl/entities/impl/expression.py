@@ -30,6 +30,7 @@ class Expression(Entity):
 		- [underlyingValue]: The actual value discovered after resolution.
 	- Sequence:
 		- argument: The list of arguments to pass to the instanciation or method call.
+		- argument_resolved: List of resolved arguments.
 	"""
 
 	def __init__(self, element: Element) -> None:
@@ -44,6 +45,14 @@ class Expression(Entity):
 	@property
 	def const(self) -> bool:
 		return self.element.isAttr("const")
+
+	@property
+	def isName(self) -> bool:
+		return self.element.isAttr("name") and not self.name == "..."
+
+	@property
+	def isVarArgs(self) -> bool:
+		return self.element.isAttr("name") and self.name == "..."
 
 	@property
 	def isType(self) -> bool:

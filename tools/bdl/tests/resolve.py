@@ -213,6 +213,14 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
+		# Variable arguments
+		with self.assertRaisesRegex(Exception, r"Variable arguments.*end"):
+			Object.fromContent(content="""
+					interface Test { config: ... = Integer; i = Integer; }
+					composition MyComposition { val1 = Test(12); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testTemplates(self) -> None:
 
 		# Mandatory template.

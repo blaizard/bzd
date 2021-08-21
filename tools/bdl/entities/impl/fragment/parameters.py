@@ -33,14 +33,19 @@ class Parameters:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
 				from tools.bdl.entities.impl.expression import Expression
-				for e in sequence:
+				for index, e in enumerate(sequence):
 					expression = Expression(e)
 					if filterFct is not None and not filterFct(expression):
 						continue
 					self.list.append(expression)
-					Error.assertTrue(element=self.element,
-						condition=self.isNamed == expression.isName,
+					expression.assertTrue(condition=self.isNamed == expression.isName,
 						message="Cannot mix named and unnamed parameters.")
+					expression.assertTrue(condition=not expression.isVarArgs or index == len(sequence) - 1,
+						message="Variable arguments can only be present at the end of the parameter list.")
+
+		# Sanity check.
+		if self.list and self.isNamed:
+			assert not self.isVarArgs, "Cannot have named and varargs."
 
 	def __iter__(self) -> typing.Iterator["Expression"]:
 		for parameter in self.list:
@@ -63,6 +68,15 @@ class Parameters:
 		"""
 		if self.list:
 			return self.list[0].isName
+		return None
+
+	@property
+	def isVarArgs(self) -> typing.Optional[bool]:
+		"""
+		Wether or not the last parameter is a var args.
+		"""
+		if self.list:
+			return self.list[-1].isVarArgs
 		return None
 
 	def contains(self, name: str) -> bool:
@@ -98,6 +112,9 @@ class Parameters:
 					self.list.append(expression)
 
 		elif len(self) < len(parameters):
+			Error.assertTrue(element=self.element,
+				condition=not self.isVarArgs,
+				message="Variable arguments must be at the end.")
 			hasSkipped = False
 			for expression in parameters.list[len(self.list):]:
 				if not expression.contracts.has("mandatory"):
