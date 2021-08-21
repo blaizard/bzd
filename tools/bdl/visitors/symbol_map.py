@@ -28,7 +28,7 @@ class SymbolMap:
 	 - bzd.Child.c: <expression "c">
 	 - bzd.Child.a: <reference "bzd.nested.Struct.a">
 	 - bzd.Child.b: <reference "bzd.nested.Struct.b">
-	 - _0~: <nested>                                <- unamed top level element
+	 - _0~: <nested>                                  <- unamed top level element
 	"""
 
 	def __init__(self) -> None:

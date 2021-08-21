@@ -15,15 +15,34 @@
 	unamed           -> /* comment */ int{value}
 	unamed literal   -> /* comment */ 12
 	literal          -> /* comment */ myvar = 12
+
+	Used when:
+	- Define a variable.
+	- Define parameter list of a function.
 -#}
 {%- macro declareExpression(element, prepend, reference) -%}
-	{{ element.comment | commentBlockToStr }}
+	{{ element.comment | commentEmbeddedToStr }}
 	{%- if element.isType -%}
-	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParameters(element.parameters, false) -}} }{% end %}
+	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parameters.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersValues(element.parametersResolved, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
 {%- end -%}
+
+{#- Parameters values -#}
+{%- macro declareParametersValues(parameters, useFqn) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end %}
+		{%- if expression.isType -%}
+			{%- if expression.isName %}
+				{%- if useFqn %}{{- expression.fqn | fqnToNameStr }}{% else %}{{- expression.name }}{% end %}
+			{%- else %}
+				{{- expression.type | typeToStr }}
+			{%- end %}
+		{%- else %}
+			{{- expression.value -}}
+		{%- end -%}
+	{% end -%}
+{% end -%}
 
 {#- Parameters -#}
 {%- macro declareParameters(parameters, reference) -%}
