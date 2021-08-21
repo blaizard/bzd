@@ -11,6 +11,8 @@ _regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|us
 _regexprNested = r"(?P<type>(:?interface|struct|component|composition))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
+# Match name or varargs
+_regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"|\.\.\.)"
 # Match: any type expect protected types
 _regexprType = r"(?P<type>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match a symbol
@@ -155,7 +157,8 @@ def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewEl
 	"""
 
 	return [
-		GrammarItem(_regexprName + r"\s*=", {"category": "expression"}, makeGrammarExpressionFragment(finalGrammar))
+		GrammarItem(_regexprNameOrVarArgs + r"\s*=", {"category": "expression"},
+		makeGrammarExpressionFragment(finalGrammar))
 	]
 
 
