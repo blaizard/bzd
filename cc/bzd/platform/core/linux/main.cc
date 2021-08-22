@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-auto makeRegistry()
+auto& Registry()
 {
 	// Definition for all registry entries.
 	static bzd::platform::linux::Core<100000> bzd_linux0{0};
@@ -119,7 +119,7 @@ void payload(bzd::core::Executor& executor)
 
 int main()
 {
-	auto registry = makeRegistry();
+	auto& registry = Registry();
 
 	// auto promise = task1();
 
