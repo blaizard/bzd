@@ -3,26 +3,23 @@
 
 #pragma once
 
-// Declaration of the registry type.
-struct Registry
+/**
+ * Auto-generated application registry.
+ */
+[[nodsicard]] auto& Registry() noexcept
 {
-	/**
-	 * Get the registry instance.
-	 */
-	static [[nodiscard]] Registry& get() noexcept;
-
-	// Registry members.
-{% for expresssion in registry %}
-	{{ expresssion.typeResolved | typeReferenceToStr }} {{ expresssion.fqn | fqnToNameStr }};
-{% end %}
-};
-
-Registry& Registry::get() noexcept
-{
-	// Definition of all registry members.
+	// Definition of all registry entries.
 	{% for expresssion in registry %}
 	static {{ expresssion.typeResolved | typeToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersValues(expresssion.parametersResolved, true) -}} };
 	{% end %}
+
+	// Declaration of the registry.
+	struct Registry
+	{
+		{% for expresssion in registry %}
+		decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }};
+		{% end %}
+	};
 
 	// Definition of the registry.
 	static Registry registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
