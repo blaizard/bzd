@@ -85,8 +85,6 @@ class Expression(Entity):
 		"""
 		if self.isValue:
 			return self.value
-		if len(self.parameters) == 1 and self.parameters[0].isValue:
-			return self.parameters[0].value
 		return super().literal
 
 	@property
@@ -140,6 +138,15 @@ class Expression(Entity):
 		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
 		self.parameters.mergeDefaults(defaults)
+		arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+
+		# TODO: this is a hack, it should use underlying value and type to determine the literal.
+		# Those types are literals
+		if self.underlyingType in ["Integer", "Float", "String", "Boolean"]:
+			if len(arguments.keys()) == 1:
+				key = list(arguments.keys())[0]
+				if isinstance(arguments[key], str):
+					self._setLiteral(literal=arguments[key])  # type: ignore
 
 		# Save the resolved parameters
 		sequence = self.parameters.toResolvedSequence(symbols=symbols, exclude=exclude)
@@ -149,7 +156,6 @@ class Expression(Entity):
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, contracts=self.contracts)
 		if validation is not None:
-			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 

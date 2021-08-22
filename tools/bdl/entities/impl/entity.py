@@ -56,7 +56,10 @@ class Entity:
 		elif entity.underlyingValue is not None:
 			elementBuilder.setAttr("fqn_value", entity.underlyingValue)
 		if entity.literal is not None:
-			elementBuilder.setAttr("literal", entity.literal)
+			self._setLiteral(entity.literal)
+
+	def _setLiteral(self, literal: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("literal", literal)
 
 	@property
 	def underlyingValue(self) -> typing.Optional[str]:
