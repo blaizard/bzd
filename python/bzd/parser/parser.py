@@ -31,7 +31,7 @@ class Parser:
 
 		content = path.read_text()
 		parser = cls(content, *args, **kwargs)
-		parser.context.path = path
+		parser.context.setPath(path)
 
 		return parser
 
