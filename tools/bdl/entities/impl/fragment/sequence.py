@@ -30,7 +30,7 @@ class EntitySequence:
 		return len(self.sequence)
 
 	def __repr__(self) -> str:
-		return "\n".join([str(entity) for entity in self.sequence])
+		return "\n".join([str(entity.element) for entity in self.sequence])
 
 	def _filteredList(self, category: str) -> typing.List["EntityType"]:
 		if not self.processed:

@@ -98,29 +98,8 @@ class Error:
 
 	@staticmethod
 	def toStringFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> str:
-
-		# Look for the index
-		index = 0
-		end = 0
-		if attr is not None and element.isAttr(attr):
-			index = element.getAttr(attr).index
-			end = element.getAttr(attr).end
-
-		# Use the begining of the element
-		else:
-			startIndex = sys.maxsize
-			endIndex = 0
-			for key, attrObj in element.getAttrs().items():
-				# Ignore some attributes
-				if attrObj.index == IGNORE_INDEX_VALUE:
-					continue
-				startIndex = min(startIndex, attrObj.index)
-				endIndex = max(endIndex, attrObj.end)
-			if startIndex < sys.maxsize:
-				index = startIndex
-				end = endIndex
-
-		return Error.toString(context=element.context, index=index, end=end if end > index else index, message=message)
+		context, start, end = element.makeContext(attr=attr)
+		return Error.toString(context=context, index=start, end=end, message=message)
 
 	@staticmethod
 	def handle(context: Context, index: int, end: int, message: str, throw: bool = True) -> str:

@@ -110,6 +110,11 @@ class SymbolMap:
 				SymbolMap.errorSymbolConflict_(element, originalElement)
 
 		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else "", "e": None}
+
+		# Resolve context
+		context, _, _ = element.context.resolve()
+		element.context = context
+
 		# The element is also added to the entity map, to allow further modification that will
 		# be written when serialize is called.
 		self.entities[fqn] = elementToEntity(element=element)

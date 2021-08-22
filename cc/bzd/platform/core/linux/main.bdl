@@ -5,7 +5,7 @@ namespace bzd.test;
 composition {
 	core1 = bzd.platform.linux.Core(name = 32.3, priority = 100);
 	core2 = bzd.platform.linux.Core(priority = 20);
-	executor = bzd.platform.linux.Executor(core1);
+	executor = bzd.platform.linux.Executor(core1, core2);
 	
 }
 

@@ -1,5 +1,7 @@
 import typing
 import copy
+import sys
+from dataclasses import dataclass
 
 from bzd.utils.dict import isEqual
 
@@ -14,7 +16,7 @@ SequenceSerialize = typing.List[ElementSerialize]
 class Sequence:
 
 	def __init__(self, context: typing.Optional[Context] = None) -> None:
-		self.context = context
+		self.context = Context() if context is None else context
 		self.list: typing.List["Element"] = []
 
 	def __iter__(self) -> typing.Iterator["Element"]:
@@ -30,11 +32,6 @@ class Sequence:
 
 	def __len__(self) -> int:
 		return len([e for e in self.list if not e.isEmpty()])
-
-	def copy(self) -> "SequenceBuilder":
-		sequence = SequenceBuilder()
-		sequence.list = self.list.copy()
-		return sequence
 
 	def __repr__(self) -> str:
 		listStr = []
@@ -54,8 +51,9 @@ class Sequence:
 		"""
 		Create a sequence from a serialized sequence.
 		"""
-		s = Sequence(context)
-		s.list = [Element.fromSerialize(e, context) for e in sequence]
+		s = SequenceBuilder(context)
+		for e in sequence:
+			s.pushBackElement(Element.fromSerialize(e))
 		return s
 
 
@@ -80,13 +78,15 @@ class SequenceBuilder(Sequence):
 		return typing.cast(T, copiedSequence)
 
 	def merge(self: T, sequence: "Sequence") -> T:
-		self.list += sequence.list
+		for element in sequence.list:
+			self.pushBackElement(element)
 		return self
 
 	def pushBackElement(self: T, element: "Element") -> T:
 		"""
 		Add an element to the sequence at the end of the list.
 		"""
+		element.context.setParent(self)
 		self.list.append(element)
 		return self
 
@@ -94,6 +94,7 @@ class SequenceBuilder(Sequence):
 		"""
 		Add an element to the sequence at the begining of the list.
 		"""
+		element.context.setParent(self)
 		self.list.insert(0, element)
 		return self
 
@@ -101,6 +102,7 @@ class SequenceBuilder(Sequence):
 		"""
 		Remove an element from the sequence.
 		"""
+		element.context.clear()
 		self.list.remove(element)
 		return self
 
@@ -122,7 +124,9 @@ class SequenceParser(Sequence):
 		Params:
 		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
 		"""
-		element = ElementParser(context=self.context, grammar=self.grammar if grammar is None else grammar, parent=self)
+		element = ElementParser(context=Context(parent=self),
+			grammar=self.grammar if grammar is None else grammar,
+			parent=self)
 		self.list.append(element)
 		return element
 
@@ -137,7 +141,7 @@ class SequenceParser(Sequence):
 class Element:
 
 	def __init__(self, context: typing.Optional[Context] = None) -> None:
-		self.context = context
+		self.context = Context() if context is None else context
 		self.attrs: Attributes = {}
 		self.sequences: typing.Dict[str, Sequence] = {}
 
@@ -150,7 +154,7 @@ class Element:
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
 		e.sequences = {
-			key: Sequence.fromSerialize(sequence, context)  # type: ignore
+			key: Sequence.fromSerialize(sequence, Context(parent=e))  # type: ignore
 			for key, sequence in element.items() if key != "@"
 		}
 		return e
@@ -232,15 +236,37 @@ class Element:
 
 	def copy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
 		"""
-		Copy an element to create a new element object.
+		Shallow copy an element to create a new element object.
 		"""
-		element = ElementBuilder()
+		element = ElementBuilder(context=self.context)
 		element.attrs = self.attrs.copy()
-		element.sequences = {
-			kind: sequence.copy()
-			for kind, sequence in self.sequences.items() if kind not in ignoreNested
-		}
+		element.sequences = {kind: sequence for kind, sequence in self.sequences.items() if kind not in ignoreNested}
 		return element
+
+	def getIndexes(self, attr: typing.Optional[str] = None) -> typing.Tuple[int, int]:
+		"""
+		Calculate the index of this element.
+		"""
+		if attr is not None and self.isAttr(attr):
+			return self.getAttr(attr).index, self.getAttr(attr).end
+
+		# Use the begining and the end of the element.
+		start = sys.maxsize
+		end = 0
+		for key, attrObj in self.getAttrs().items():
+			# Ignore some attributes
+			if attrObj.index == IGNORE_INDEX_VALUE:
+				continue
+			start = min(start, attrObj.index)
+			end = max(end, attrObj.end)
+		if start < sys.maxsize:
+			return start, end
+
+		# Invalid span.
+		return IGNORE_INDEX_VALUE, 0
+
+	def makeContext(self, attr: typing.Optional[str] = None) -> typing.Tuple[Context, int, int]:
+		return self.context.resolve(element=self, attr=attr)
 
 	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Element):
@@ -254,8 +280,11 @@ class Element:
 		"""
 		Human readable string representation of the element.
 		"""
+
+		contentContext = ["context=\"{}\"".format(self.context)] if self.context is not None else []
 		content = "<Element {}/>".format(" ".join(
-			["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value) for key, attr in self.attrs.items()]))
+			["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value)
+			for key, attr in self.attrs.items()] + contentContext))
 
 		if nested:
 			for kind, sequence in self.sequences.items():
@@ -310,6 +339,7 @@ class ElementBuilder(Element):
 		"""
 		Set a nested sequence and overwrite exsiting one.
 		"""
+		sequence.context.setParent(self)
 		self.sequences[kind] = sequence
 		return self
 
@@ -318,7 +348,7 @@ class ElementBuilder(Element):
 		Add an element to a new or existing nested sequence.
 		"""
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence()
+			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushBackElement(element)
 		return self
 
@@ -327,7 +357,7 @@ class ElementBuilder(Element):
 		Add an element to a new or existing nested sequence.
 		"""
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence()
+			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
 		return self
 
@@ -371,7 +401,7 @@ class ElementParser(Element):
 
 	def makeElement(self, kind: str, grammar: Grammar) -> "ElementParser":
 		if kind not in self.sequences:
-			self.sequences[kind] = SequenceParser(context=self.context, grammar=grammar, parent=self)
+			self.sequences[kind] = SequenceParser(context=Context(parent=self), grammar=grammar, parent=self)
 		return typing.cast(SequenceParser, self.sequences[kind]).makeElement()
 
 	def getSequence(self) -> SequenceParser:
