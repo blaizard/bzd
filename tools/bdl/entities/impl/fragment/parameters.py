@@ -39,7 +39,8 @@ class Parameters:
 						continue
 					self.list.append(expression)
 					expression.assertTrue(condition=self.isNamed == expression.isName,
-						message="Cannot mix named and unnamed parameters.")
+						message="Cannot mix named and unnamed parameters: '{}' and '{}'.".format(
+						self.list[0], expression))
 					expression.assertTrue(condition=not expression.isVarArgs or index == len(sequence) - 1,
 						message="Variable arguments can only be present at the end of the parameter list.")
 

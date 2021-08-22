@@ -279,6 +279,14 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
+		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
+			Object.fromContent(content="""
+				using MyInteger = Integer;
+				interface Test { config: value = MyInteger [min(10) max(32)]; }
+				composition MyComposition { val1 = MyInteger(1); val2 = Test(value = val1); }
+				""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testDefaultValues(self) -> None:
 
 		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):

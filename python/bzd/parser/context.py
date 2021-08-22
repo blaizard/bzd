@@ -24,6 +24,10 @@ class Context:
 			self.setParent(parent)
 
 	@property
+	def hasPathOrContent(self) -> bool:
+		return self.path is not None or self.content is not None
+
+	@property
 	def path(self) -> typing.Optional[pathlib.Path]:
 		if isinstance(self.data, pathlib.Path):
 			return self.data
@@ -44,7 +48,7 @@ class Context:
 
 	@property
 	def parent(self) -> typing.Optional[typing.Any]:
-		if not isinstance(self.data, pathlib.Path):
+		if not self.hasPathOrContent and self.data is not None:
 			return self.data
 		return None
 
@@ -90,8 +94,6 @@ class Context:
 				start, end = element.getIndexes(attr=attr)
 			attr = None
 			if context.parent is None:
-				break
-			if context.path is not None or context.content is not None:
 				break
 			element = context.parent
 			assert element
