@@ -10,7 +10,8 @@ BuiltinResult = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Result").addConfig(kind="Any",
 	contract="template mandatory type").addConfig(kind="Any", contract="template mandatory type"))
 BuiltinList = Builtin(
-	ElementBuilder("builtin").setAttr("name", "List").addConfig(kind="Any", contract="template mandatory"))
+	ElementBuilder("builtin").setAttr("name", "List").addConfig(kind="Any",
+	contract="template mandatory").addConfig(name="...", kind="Any"))
 BuiltinCallable = Builtin(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinResult, BuiltinList, BuiltinCallable]
