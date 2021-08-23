@@ -287,6 +287,21 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
+		Object.fromContent(content="""
+				using MyInteger1 = Integer;
+				using MyInteger2 = MyInteger1;
+				using MyInteger3 = MyInteger2;
+				interface Test { config: value = MyInteger3(20) [min(10) max(32)]; }
+				composition MyComposition { val1 = Test(); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+				interface Test { config: val1 = Integer(23); val2 = Integer;}
+				composition MyComposition { value = Test(val2 = 3); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testDefaultValues(self) -> None:
 
 		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):
