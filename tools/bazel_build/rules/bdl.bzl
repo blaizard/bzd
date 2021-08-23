@@ -1,4 +1,4 @@
-load("@bazel_skylib//lib:new_sets.bzl", "sets")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile")
 
 BdlProvider = provider(fields = ["bdls", "files"])
 
@@ -17,26 +17,6 @@ _bzd_manifest_aspect = aspect(
     implementation = _bzd_manifest_aspect_impl,
     attr_aspects = ["deps"],
 )
-
-def _bzd_manifest_impl_cc(ctx, inputs):
-    """
-    C++ specific provider
-    """
-
-    compilation_context = cc_common.create_compilation_context(
-        headers = depset(inputs),
-        includes = depset([ctx.bin_dir.path]),
-    )
-
-    cc_info_providers = sets.make()
-    sets.insert(cc_info_providers, CcInfo(compilation_context = compilation_context))
-
-    # Merge providers from deps rules
-    for dep in ctx.attr._deps_cc:
-        sets.insert(cc_info_providers, dep[CcInfo])
-    cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
-
-    return cc_info_providers
 
 def _make_bdl_arguments(ctx, stage, args):
     _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
@@ -105,12 +85,11 @@ def _bzd_manifest_impl(ctx):
             generated[fmt] += outputs
 
     # Generate the various providers
-    cc_info_provider = _bzd_manifest_impl_cc(ctx = ctx, inputs = generated["cc"])
-    cc_info_providers = cc_common.merge_cc_infos(cc_infos = [cc_info_provider] + [dep[CcInfo] for dep in ctx.attr.deps])
+    cc_info_provider = cc_compile(ctx = ctx, hdrs = generated["cc"], deps = ctx.attr._deps_cc + ctx.attr.deps)
 
     return [
         BdlProvider(bdls = bdls, files = files),
-        cc_info_providers,
+        cc_info_provider,
     ]
 
 bzd_manifest = rule(
@@ -138,7 +117,14 @@ bzd_manifest = rule(
             default = [Label("//tools/bdl/generators/cc/adapter:types")],
             cfg = "host",
         ),
+        "_cc_toolchain": attr.label(
+            default = Label("@rules_cc//cc:current_cc_toolchain"),
+        ),
     },
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+    ],
+    fragments = ["cpp"],
 )
 
 def _bzd_manifest_binary_impl(ctx):

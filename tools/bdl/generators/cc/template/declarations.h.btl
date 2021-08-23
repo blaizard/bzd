@@ -36,7 +36,7 @@
 			{%- if expression.isName %}
 				{%- if useFqn %}{{- expression.fqn | fqnToNameStr }}{% else %}{{- expression.name }}{% end %}
 			{%- else %}
-				{{- expression.type | typeToStr }}
+				{{- expression.type | typeToStr }}{ {{- declareParametersValues(expression.parametersResolved, false) -}} }
 			{%- end %}
 		{%- else %}
 			{{- expression.value -}}

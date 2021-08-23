@@ -313,6 +313,13 @@ class ElementBuilder(Element):
 		copiedElement.__class__ = classType
 		return typing.cast(U, copiedElement)
 
+	def removeAttr(self: U, key: str) -> U:
+		"""
+		Remove an attribute from the element.
+		"""
+		del self.attrs[key]
+		return self
+
 	def setAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
 		"""
 		Add an attribute to the element.

@@ -98,11 +98,15 @@ class Validation:
 		"mandatory": Mandatory
 	}
 
-	memoizedProcessedSchema_: typing.Dict[str, ProcessedSchema] = {}
+	memoizedProcessedSchema_: typing.Dict[typing.Tuple[str, int], ProcessedSchema] = {}
 
-	def __init__(self, schema: Schema) -> None:
+	def __init__(self, schema: Schema, args: typing.Any = None) -> None:
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
+		# Arguments to be passed the the check and process functions.
+		# It should not be passed into the install function, otherwise this would
+		# make memoization invalid.
+		self.args = args
 		self._prepocessSchema(self._inputToInternal(schema))
 
 	def _inputToInternal(self, schema: Values) -> ValuesDict:
@@ -139,8 +143,11 @@ class Validation:
 
 		for key, constraints in schema.items():
 
-			if constraints in Validation.memoizedProcessedSchema_:
-				self.processed[key] = Validation.memoizedProcessedSchema_[constraints]
+			# The key must include all variability to generate the processed schema.
+			memoizedKey = (constraints, id(self.AVAILABLE_CONSTRAINTS))
+
+			if memoizedKey in Validation.memoizedProcessedSchema_ and False:
+				self.processed[key] = Validation.memoizedProcessedSchema_[memoizedKey]
 
 			else:
 				self.processed[key] = ProcessedSchema()
@@ -152,7 +159,7 @@ class Validation:
 					self.processed[key].install(constraints=self.AVAILABLE_CONSTRAINTS, name=name, args=args)
 
 				# Save the processed schema
-				Validation.memoizedProcessedSchema_[constraints] = self.processed[key]
+				Validation.memoizedProcessedSchema_[memoizedKey] = self.processed[key]
 
 	def __len__(self) -> int:
 		"""
@@ -177,10 +184,10 @@ class Validation:
 		if results:
 			for key, value in internals.items():
 				if key in self.processed:
-					result = self.processed[key].validate(value=value)
+					result = self.processed[key].validate(value=value, args=self.args)
 					results.addResult(key, result)
 				elif "*" in self.processed:
-					result = self.processed["*"].validate(value=value)
+					result = self.processed["*"].validate(value=value, args=self.args)
 					results.addResult(key, result)
 				elif not self.processed:
 					results.addError(key, ["no value expected."])

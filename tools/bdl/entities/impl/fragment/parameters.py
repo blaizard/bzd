@@ -13,7 +13,51 @@ if typing.TYPE_CHECKING:
 ResolvedType = typing.Union[str, "Entity", "Type"]
 
 
-class Parameters:
+class ParametersCommon:
+
+	def __init__(self, element: Element) -> None:
+		self.element = element
+		self.list: typing.List["Expression"] = []
+
+	def __iter__(self) -> typing.Iterator["Expression"]:
+		for parameter in self.list:
+			yield parameter
+
+	def __getitem__(self, index: int) -> "Expression":
+		return self.list[index]
+
+	def __len__(self) -> int:
+		return len(self.list)
+
+	def __bool__(self) -> bool:
+		return bool(self.list)
+
+	def empty(self) -> bool:
+		return not bool(self.list)
+
+	def size(self) -> int:
+		return len(self.list)
+
+	@staticmethod
+	def makeKey(entity: "Expression", index: int) -> str:
+		return entity.name if entity.isName else str(index)
+
+	def items(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
+		for index, entity in enumerate(self.list):
+			name = ParametersCommon.makeKey(entity, index)
+			yield name, entity
+
+	def contains(self, name: str) -> bool:
+		"""
+		Wether or not a named parameters contains the entry.
+		"""
+		for key, _ in self.items():
+			if key == name:
+				return True
+		return False
+
+
+class Parameters(ParametersCommon):
 	"""
     Describes the parameter list, a collection of expression.
     """
@@ -22,12 +66,13 @@ class Parameters:
 		element: Element,
 		nestedKind: typing.Optional[str] = None,
 		filterFct: typing.Optional[typing.Callable[["Expression"], bool]] = None) -> None:
-		self.element = element
 
-		# Build the parameter list
-		self.list: typing.List["Expression"] = []
+		super().__init__(element=element)
+
 		# Sorted list of keys from defaults
 		self.keysSorted: typing.Optional[typing.List[str]] = None
+		# Keys of default values
+		self.defaults: typing.Set[str] = set()
 
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
@@ -48,19 +93,6 @@ class Parameters:
 		if self.list and self.isNamed:
 			assert not self.isVarArgs, "Cannot have named and varargs."
 
-	def __iter__(self) -> typing.Iterator["Expression"]:
-		for parameter in self.list:
-			yield parameter
-
-	def __getitem__(self, index: int) -> "Expression":
-		return self.list[index]
-
-	def __len__(self) -> int:
-		return len(self.list)
-
-	def __bool__(self) -> bool:
-		return bool(self.list)
-
 	@property
 	def isNamed(self) -> typing.Optional[bool]:
 		"""
@@ -79,15 +111,6 @@ class Parameters:
 		if self.list:
 			return self.list[-1].isVarArgs
 		return None
-
-	def contains(self, name: str) -> bool:
-		"""
-		Wether or not a named parameters contains the entry.
-		"""
-		for key, _ in self.items():
-			if key == name:
-				return True
-		return False
 
 	def mergeDefaults(self, parameters: "Parameters") -> None:
 		"""
@@ -110,6 +133,7 @@ class Parameters:
 			for name, expression in parameters.items():
 				self.keysSorted.append(name)
 				if not self.contains(name) and not expression.contracts.has("mandatory"):
+					self.defaults.add(ParametersCommon.makeKey(expression, len(self.list)))
 					self.list.append(expression)
 
 		elif len(self) < len(parameters):
@@ -122,20 +146,10 @@ class Parameters:
 					Error.assertTrue(element=self.element,
 						condition=not hasSkipped,
 						message="Mandatory positional parameters must be at the end.")
+					self.defaults.add(ParametersCommon.makeKey(expression, len(self.list)))
 					self.list.append(expression)
 				else:
 					hasSkipped = True
-
-	def empty(self) -> bool:
-		return not bool(self.list)
-
-	def size(self) -> int:
-		return len(self.list)
-
-	def items(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
-		for index, entity in enumerate(self.list):
-			name = entity.name if entity.isName else str(index)
-			yield name, entity
 
 	def resolve(self,
 		symbols: "SymbolMap",
@@ -162,8 +176,21 @@ class Parameters:
 				values.append((key, expression.literal))
 
 			elif expression.underlyingValue is not None:
-				value = symbols.getEntityResolved(fqn=expression.underlyingValue).assertValue(
+				value: ResolvedType = symbols.getEntityResolved(fqn=expression.underlyingValue).assertValue(
 					element=expression.element)
+
+				# If these are default arguments, use the default value.
+				if key in self.defaults:
+					from tools.bdl.entities.impl.expression import Expression
+					assert isinstance(value, Expression)
+					if value.literal:
+						# I beleive that this code path is never used.
+						value = value.literal
+					elif value.isName:
+						# Create an unamed value
+						element = ElementBuilder.cast(value.element.copy(), ElementBuilder).removeAttr(key="name")
+						value = Expression(element)
+
 				values.append((key, value))
 
 			else:
@@ -208,3 +235,23 @@ class Parameters:
 				sequence.pushBackElement(item.element)
 
 		return sequence
+
+
+class ResolvedParameters(ParametersCommon):
+
+	def __init__(self, element: Element, nestedKind: str) -> None:
+
+		super().__init__(element=element)
+
+		sequence = self.element.getNestedSequence(nestedKind)
+		if sequence:
+			from tools.bdl.entities.impl.expression import Expression
+			self.list = [Expression(e) for index, e in enumerate(sequence)]
+
+	@property
+	def isNamed(self) -> typing.Optional[bool]:
+		return False
+
+	@property
+	def isVarArgs(self) -> typing.Optional[bool]:
+		return False

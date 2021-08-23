@@ -101,9 +101,6 @@ def compositionCc(composition: Composition) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/registry.h.btl", indent=True)
 
 	print(composition.registry)
-	for expr in composition.registry:
-		print(expr.element)
-
 	output = template.render(composition, transforms)
 
 	return output
