@@ -38,20 +38,6 @@ class Method(Entity):
 		return Type(element=self.element, kind="type", underlyingType="fqn_return_type",
 			template="template") if self.isType else None
 
-	@cached_property
-	def validation(self) -> typing.Optional[Validation]:
-		"""
-		Generate a validation based on the argument list.
-		"""
-		schema = {}
-		for arg in self.parameters:
-			validation = []
-			# Arguments declared with no value are mandatory, others are just optional.
-			if arg.parameters.empty():
-				validation.append("mandatory")
-			schema[arg.name] = " ".join(validation)
-		return Validation(schema=schema)
-
 	def resolve(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],

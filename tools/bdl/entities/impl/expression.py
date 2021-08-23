@@ -8,7 +8,7 @@ from bzd.validation.validation import Validation
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.fragment.parameters import Parameters
+from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
 from tools.bdl.entities.impl.entity import Entity, Role
 
 if typing.TYPE_CHECKING:
@@ -138,15 +138,6 @@ class Expression(Entity):
 		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
 		self.parameters.mergeDefaults(defaults)
-		arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
-
-		# TODO: this is a hack, it should use underlying value and type to determine the literal.
-		# Those types are literals
-		if self.underlyingType in ["Integer", "Float", "String", "Boolean"]:
-			if len(arguments.keys()) == 1:
-				key = list(arguments.keys())[0]
-				if isinstance(arguments[key], str):
-					self._setLiteral(literal=arguments[key])  # type: ignore
 
 		# Save the resolved parameters
 		sequence = self.parameters.toResolvedSequence(symbols=symbols, exclude=exclude)
@@ -156,6 +147,7 @@ class Expression(Entity):
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, contracts=self.contracts)
 		if validation is not None:
+			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
@@ -181,20 +173,20 @@ class Expression(Entity):
 		# it means there must be a single value.
 		if validationValue:
 			try:
-				return Validation({"0": validationValue})
+				return Validation(schema={"0": validationValue}, args={"symbols": symbols})
 			except Exception as e:
 				self.error(message=str(e))
 
 		# Validation is empty
-		return Validation({})
+		return Validation(schema={}, args={"symbols": symbols})
 
 	@cached_property
 	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")
 
 	@cached_property
-	def parametersResolved(self) -> Parameters:
-		return Parameters(element=self.element, nestedKind="argument_resolved")
+	def parametersResolved(self) -> ResolvedParameters:
+		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
 
 	def __repr__(self) -> str:
 		return self.toString({

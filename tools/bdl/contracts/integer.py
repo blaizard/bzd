@@ -9,6 +9,16 @@ from tools.bdl.contracts.traits import ContractTraits, Role
 class Integer(IntegerBase):
 
 	def check(self, context: TypeContext) -> Result:
+
+		assert "symbols" in context.args
+
+		from tools.bdl.entities.impl.entity import Entity
+		if isinstance(context.value, Entity):
+			if context.value.underlyingType == "Integer":
+				value = context.args["symbols"].getEntityResolved(context.value.underlyingValue).value
+				assert len(value.parametersResolved) == 1
+				context.value = value.parametersResolved[0].value
+
 		return super().check(context)
 
 

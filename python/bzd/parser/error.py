@@ -66,6 +66,7 @@ class Error:
 			if current > index:
 				break
 			line += 1
+		line = min(len(contentByLine) - 1, line)
 		column = len(contentByLine[line]) - (current - index) + 1
 
 		# Look for the line where the error ends

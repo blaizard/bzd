@@ -10,8 +10,9 @@ ValidationCallable = typing.Callable[[typing.Any, "Context"], Result]
 
 class Context:
 
-	def __init__(self, value: str) -> None:
+	def __init__(self, value: str, args: typing.Any) -> None:
 		self.value = value
+		self.args = args
 		self.underlying_: typing.Optional[typing.Any] = None
 
 	@property
@@ -147,13 +148,13 @@ class ProcessedSchema:
 		bound = partial(validation, args)
 		self.validations.append(bound)
 
-	def validate(self, value: str) -> ProcessedResult:
+	def validate(self, value: str, args: typing.Any) -> ProcessedResult:
 		"""
 		Validate a value.
 		"""
 
 		result = ProcessedResult()
-		typeContext = TypeContext(value=value)
+		typeContext = TypeContext(value=value, args=args)
 
 		# Process the type
 		if self.type:

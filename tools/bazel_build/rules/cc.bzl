@@ -4,16 +4,8 @@ load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest_binary")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
-load("@rules_cc//cc:find_cc_toolchain.bzl", original_find_cc_toolchain = "find_cc_toolchain")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-
-def find_cc_toolchain(ctx):
-    # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.
-    # See this related issue: https://github.com/bazelbuild/rules_cc/issues/74
-    cc_toolchain = ctx.toolchains["@rules_cc//cc:toolchain_type"]
-    if not hasattr(cc_toolchain, "all_files"):
-        cc_toolchain = original_find_cc_toolchain(ctx)
-    return cc_toolchain
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "find_cc_toolchain")
 
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
     """
