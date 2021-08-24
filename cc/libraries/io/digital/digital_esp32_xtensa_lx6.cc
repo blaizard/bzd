@@ -1,4 +1,4 @@
-#include "libraries/io/digital/digital_esp32_xtensa_lx6.h"
+#include "cc/libraries/io/digital/digital_esp32_xtensa_lx6.h"
 
 namespace bzd::io::impl {
 

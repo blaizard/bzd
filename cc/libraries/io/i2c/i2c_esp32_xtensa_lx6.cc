@@ -1,4 +1,4 @@
-#include "libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
+#include "cc/libraries/io/i2c/i2c_esp32_xtensa_lx6.h"
 
 #include "driver/i2c.h"
 namespace bzd::io::impl {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "driver/gpio.h"
-#include "libraries/io/digital/digital.h"
+#include "cc/libraries/io/digital/digital.h"
 
 namespace bzd::io::impl {
 class DigitalOutputEsp32XtensaLx6 : public bzd::io::DigitalOutput
