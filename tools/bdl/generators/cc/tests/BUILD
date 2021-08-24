@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
-load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
-bzd_manifest(
+bdl_library(
     name = "interface",
     srcs = [
         "manifest.bdl",

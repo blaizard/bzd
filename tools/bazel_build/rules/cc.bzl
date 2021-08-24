@@ -2,7 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_test", original_cc_library = "cc_library")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:manifest.bzl", "bzd_manifest")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
-load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest_binary")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "find_cc_toolchain")
@@ -227,14 +227,18 @@ def _bzd_cc_generic_impl(ctx):
     # Make the executor from the binary toolchain
     default_info, binary_metadata_files = _cc_binary(ctx, binary_file)
 
+    # Manifests to be exported.
+    manifests = ctx.files._default_metadata_files + link_metadata_files + binary_metadata_files
+
     return [
         default_info,
         BzdPackageFragment(
             files = [binary_file],
         ),
         BzdPackageMetadataFragment(
-            manifests = ctx.files._default_metadata_files + link_metadata_files + binary_metadata_files,
+            manifests = manifests,
         ),
+        OutputGroupInfo(metadata = manifests),
     ]
 
 def _bzd_cc_generic(is_test):
@@ -284,8 +288,8 @@ def bzd_cc_binary(name, tags = [], deps = [], **kwags):
     """
     Rule to define a bzd C++ binary.
     """
-    bzd_manifest_binary(
-        name = name + ".main",
+    bdl_composition(
+        name = name + ".composition",
         tags = tags + ["cc"],
         deps = deps,
     )
@@ -298,7 +302,7 @@ def bzd_cc_binary(name, tags = [], deps = [], **kwags):
     _bzd_cc_binary(
         name = name,
         tags = tags + ["cc"],
-        deps = [name + ".library", name + ".main"],
+        deps = [name + ".library", name + ".composition"],
     )
 
 def bzd_cc_test(name, tags = [], **kwags):

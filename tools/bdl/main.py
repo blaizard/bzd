@@ -21,6 +21,7 @@ if __name__ == "__main__":
 	parser.add_argument("--stage",
 		choices=["preprocess", "generate", "compose"],
 		help="Only perform a specific stage of the full process.")
+	parser.add_argument("--include", type=Path, action="append", help="List of input path to be included.")
 	parser.add_argument("inputs", type=Path, nargs="+", help="Input file to be passed to the parser.")
 
 	config = parser.parse_args()
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 	if config.stage == "compose":
 
 		bdls = [objectContext.loadPreprocess(path=inputPath) for inputPath in config.inputs]
-		compose(formatType=config.format, bdls=bdls, output=config.output)
+		compose(formatType=config.format, bdls=bdls, output=config.output, includes=config.include)
 
 	else:
 

@@ -1,4 +1,5 @@
 import typing
+import pathlib
 
 from bzd.parser.error import Error
 
@@ -10,7 +11,8 @@ from tools.bdl.entities.impl.expression import Expression
 
 class Composition:
 
-	def __init__(self) -> None:
+	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
+		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
 

@@ -110,6 +110,11 @@ class _VisitorType(Visitor):
 		if nested:
 			output += "<{}>".format(", ".join(nested))
 
+		if not self.isTopLevel:
+			# TODO: support if there is no value
+			if entity.parametersResolved:
+				output += "{{{}}}".format(", ".join([expression.value for expression in entity.parametersResolved]))
+
 		# Apply the reference if any
 		if self.isReference:
 			output += "&"
