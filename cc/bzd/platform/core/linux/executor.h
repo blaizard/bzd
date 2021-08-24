@@ -2,11 +2,12 @@
 
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/container/result.h"
+#include "cc/bzd/core/async.h"
 #include "cc/bzd/platform/core.h"
 #include "cc/bzd/platform/core/stack.h"
 #include "cc/bzd/utility/constexpr_for.h"
 
-namespace bzd::platform::core {
+namespace bzd::platform::linux {
 
 template <class... Cores>
 class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
@@ -47,4 +48,4 @@ private:
 	bzd::FunctionView<void(void)> start_;
 };
 
-} // namespace bzd::platform::core
+} // namespace bzd::platform::linux

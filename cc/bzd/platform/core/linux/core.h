@@ -24,7 +24,7 @@ private:
 	using Error = typename Parent::Error;
 
 public:
-	explicit Core(const CoreId coreId) noexcept : id_{coreId} {}
+	explicit Core(const CoreId coreId, const float) noexcept : id_{coreId} {}
 
 	Result<void, Error> stop() noexcept
 	{

@@ -16,7 +16,6 @@ class Float(FloatBase):
 		if isinstance(context.value, Entity):
 			if context.value.underlyingType == "Float":
 				value = context.args["symbols"].getEntityResolved(context.value.underlyingValue).value
-				assert len(value.parametersResolved) == 1
 				context.value = value.parametersResolved[0].value
 
 		return super().check(context)

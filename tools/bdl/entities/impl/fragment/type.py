@@ -6,7 +6,7 @@ from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.fragment.parameters import Parameters
+from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
@@ -131,6 +131,10 @@ class Type:
 	@cached_property
 	def name(self) -> str:
 		return Visitor(entity=self).result
+
+	@cached_property
+	def parametersResolved(self) -> ResolvedParameters:
+		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
 
 	def __repr__(self) -> str:
 		return self.name

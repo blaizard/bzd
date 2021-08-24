@@ -1,7 +1,7 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", original_find_cc_toolchain = "find_cc_toolchain")
 
-_CC_SRCS_EXTENSIONS = [".c", ".cc", ".cpp", ".cxx", ".c++", ".C"]
-_CC_HDRS_EXTENSIONS = [".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H"]
+_CC_SRCS_EXTENSIONS = (".c", ".cc", ".cpp", ".cxx", ".c++", ".C")
+_CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
 
 def find_cc_toolchain(ctx):
     # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.

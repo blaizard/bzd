@@ -1,20 +1,36 @@
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile")
 
+BdlTagProvider = provider(fields = [])
 BdlProvider = provider(fields = ["bdls", "files"])
+CcCompositionProvider = provider(fields = ["hdrs"])
 
-def _bzd_manifest_aspect_impl(target, ctx):
+def _bdl_aspect_impl(target, ctx):
     """
     Aspects to gather all bdl depedency outputs.
     """
-    if BdlProvider not in target:
-        return [BdlProvider(
-            files = depset(transitive = [dep[BdlProvider].files for dep in ctx.rule.attr.deps if BdlProvider in dep]),
-            bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.rule.attr.deps if BdlProvider in dep]),
-        )]
-    return []
 
-_bzd_manifest_aspect = aspect(
-    implementation = _bzd_manifest_aspect_impl,
+    # Are considered composition public headers when a dependency is a bdl library.
+    hdrs = []
+    if any([dep for dep in ctx.rule.attr.deps if BdlTagProvider in dep]):
+        if CcInfo in target:
+            # Discard auto-generated files as all components must have their own headers.
+            hdrs = [f for f in target[CcInfo].compilation_context.direct_public_headers if not f.path.startswith("bazel-out")]
+
+    cc_composition_provider = CcCompositionProvider(hdrs = depset(hdrs, transitive = [dep[CcCompositionProvider].hdrs for dep in ctx.rule.attr.deps if CcCompositionProvider in dep]))
+
+    if BdlProvider not in target:
+        return [
+            BdlProvider(
+                files = depset(transitive = [dep[BdlProvider].files for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+                bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+            ),
+            cc_composition_provider,
+        ]
+
+    return [cc_composition_provider]
+
+_bdl_aspect = aspect(
+    implementation = _bdl_aspect_impl,
     attr_aspects = ["deps"],
 )
 
@@ -22,7 +38,7 @@ def _make_bdl_arguments(ctx, stage, args):
     _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
     return ["--stage", stage, "--preprocess-format", _PREPROCESS_FORMAT] + args
 
-def _bzd_manifest_impl(ctx):
+def _bdl_library_impl(ctx):
     _FORMATS = {
         "cc": {
             "display": "C++",
@@ -89,11 +105,12 @@ def _bzd_manifest_impl(ctx):
 
     return [
         BdlProvider(bdls = bdls, files = files),
+        BdlTagProvider(),
         cc_info_provider,
     ]
 
-bzd_manifest = rule(
-    implementation = _bzd_manifest_impl,
+bdl_library = rule(
+    implementation = _bdl_library_impl,
     doc = """Bzd Description Language generator rule.
     It generates language provider from a .bdl file.
     The files are generated at the same path of the target, with the name of the target appended with a language specific file extension.
@@ -127,40 +144,43 @@ bzd_manifest = rule(
     fragments = ["cpp"],
 )
 
-def _bzd_manifest_binary_impl(ctx):
+def _bdl_composition_impl(ctx):
     files = depset(transitive = [dep[BdlProvider].files for dep in ctx.attr.deps if BdlProvider in dep])
     bdls = depset(transitive = [dep[BdlProvider].bdls for dep in ctx.attr.deps if BdlProvider in dep])
+
+    cc_composition_hdrs = depset(transitive = [dep[CcCompositionProvider].hdrs for dep in ctx.attr.deps if CcCompositionProvider in dep])
 
     # If there is no files to process, ignore.
     if not files:
         return [CcInfo()]
 
+    # Generate the list of files to be includes.
+    arguments_includes = ["--include={}".format(hdrs.path) for hdrs in cc_composition_hdrs.to_list()]
+
     # Generate the output
-    output = ctx.actions.declare_file("output.h")
+    output = ctx.actions.declare_file("{}.main.cc".format(ctx.attr.name))
     ctx.actions.run(
-        # files needs to be passed into argument for debugging purpose, in order to display a nice error message.
+        # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
         inputs = depset(transitive = [files, bdls]),
         outputs = [output],
         progress_message = "Generating C++ composition",
-        arguments = _make_bdl_arguments(ctx, "compose", ["--format", "cc", "--output", output.path] + [bdl.path for bdl in files.to_list()]),
+        arguments = _make_bdl_arguments(ctx, "compose", ["--format", "cc", "--output", output.path] + arguments_includes + [bdl.path for bdl in files.to_list()]),
         executable = ctx.attr._bdl.files_to_run,
     )
 
-    compilation_context = cc_common.create_compilation_context(
-        headers = depset([output]),
-    )
+    cc_info_provider = cc_compile(ctx = ctx, srcs = [output], deps = ctx.attr.deps)
 
-    return [CcInfo(compilation_context = compilation_context), DefaultInfo(files = depset([output]))]
+    return [cc_info_provider, DefaultInfo(files = depset([output]))]
 
-bzd_manifest_binary = rule(
-    implementation = _bzd_manifest_binary_impl,
+bdl_composition = rule(
+    implementation = _bdl_composition_impl,
     doc = """Bzd Description Language generator rule for binaries.
     This generates all the glue to pull in bdl pieces together in a final binary.
     """,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            aspects = [_bzd_manifest_aspect],
+            aspects = [_bdl_aspect],
             doc = "List of dependencies.",
         ),
         "_bdl": attr.label(
@@ -168,5 +188,12 @@ bzd_manifest_binary = rule(
             cfg = "host",
             executable = True,
         ),
+        "_cc_toolchain": attr.label(
+            default = Label("@rules_cc//cc:current_cc_toolchain"),
+        ),
     },
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+    ],
+    fragments = ["cpp"],
 )

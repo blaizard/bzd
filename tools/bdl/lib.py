@@ -29,9 +29,9 @@ def generate(formatType: str, bdl: Object) -> str:
 	return formatters[formatType](bdl=bdl)
 
 
-def compose(formatType: str, bdls: typing.Sequence[Object], output: Path) -> None:
+def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includes: typing.List[Path]) -> None:
 
-	composition = Composition()
+	composition = Composition(includes=includes)
 	for bdl in bdls:
 		composition.visit(bdl)
 	composition.process()

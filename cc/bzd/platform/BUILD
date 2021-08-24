@@ -1,7 +1,7 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bzd_manifest")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
-bzd_manifest(
+bdl_library(
     name = "core",
     srcs = [
         "core.bdl",

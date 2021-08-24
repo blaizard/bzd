@@ -98,7 +98,7 @@ def formatCc(bdl: Object) -> str:
 
 def compositionCc(composition: Composition) -> str:
 
-	template = Template.fromPath(Path(__file__).parent / "template/registry.h.btl", indent=True)
+	template = Template.fromPath(Path(__file__).parent / "template/main.cc.btl", indent=True)
 
 	print(composition.registry)
 	output = template.render(composition, transforms)

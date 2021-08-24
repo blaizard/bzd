@@ -1,12 +1,14 @@
 {#- Re-usable macros -#}
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
-#pragma once
+{% for path in includes %}
+#include "{{ path }}"
+{% end %}
 
 /**
  * Auto-generated application registry.
  */
-[[nodsicard]] auto& Registry() noexcept
+[[nodiscard]] auto& getOrMakeRegistry() noexcept
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
