@@ -255,3 +255,6 @@ class ResolvedParameters(ParametersCommon):
 	@property
 	def isVarArgs(self) -> typing.Optional[bool]:
 		return False
+
+	def concatenate(self, parameters: "ResolvedParameters") -> None:
+		self.list += parameters.list
