@@ -136,7 +136,7 @@ class Expression(Entity):
 
 		# Generate the argument list
 		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-		defaults = self.getDefaultsForValues(symbols=symbols, exclude=exclude)
+		defaults = self.getConfigValues(symbols=symbols)
 		self.parameters.mergeDefaults(defaults)
 
 		# Save the resolved parameters

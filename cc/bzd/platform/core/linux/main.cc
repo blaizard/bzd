@@ -16,9 +16,9 @@ auto& Registry()
 	// Registry structure containing a reference of all entries.
 	struct Registry
 	{
-		decltype(bzd_linux0)& bzd_linux0;
-		decltype(bzd_linux1)& bzd_linux1;
-		decltype(executor)& executor;
+		decltype(bzd_linux0)& bzd_linux0_;
+		decltype(bzd_linux1)& bzd_linux1_;
+		decltype(executor)& executor_;
 	};
 	static Registry registry{bzd_linux0, bzd_linux1, executor};
 
@@ -124,11 +124,11 @@ int main()
 	// auto promise = task1();
 
 	auto promise = calculatePi<2>();
-	registry.executor.enqueue(promise);
+	registry.executor_.enqueue(promise);
 
-	registry.executor.start();
+	registry.executor_.start();
 
-	registry.executor.stop();
+	registry.executor_.stop();
 
 	/*
 		auto workload = [&executor]() { executor.run(); };
@@ -138,8 +138,8 @@ int main()
 		registry.linux1.stop();
 		registry.linux0.stop();
 	*/
-	std::cout << registry.bzd_linux0.getId() << ": " << registry.bzd_linux0.base().getStackUsage() << std::endl;
-	std::cout << registry.bzd_linux1.getId() << ": " << registry.bzd_linux1.base().getStackUsage() << std::endl;
+	std::cout << registry.bzd_linux0_.getId() << ": " << registry.bzd_linux0_.base().getStackUsage() << std::endl;
+	std::cout << registry.bzd_linux1_.getId() << ": " << registry.bzd_linux1_.base().getStackUsage() << std::endl;
 
 	// bzd::core::Executor
 
