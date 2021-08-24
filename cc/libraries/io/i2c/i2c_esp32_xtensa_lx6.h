@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libraries/io/i2c/i2c.h"
+#include "cc/libraries/io/i2c/i2c.h"
 
 namespace bzd::io::impl {
 class I2CEsp32XtensaLx6 : public bzd::io::I2C
