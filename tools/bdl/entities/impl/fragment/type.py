@@ -74,7 +74,7 @@ class Type:
 				attr=self.kindAttr,
 				message="Type '{}' does not support template arguments.".format(self.kind))
 		else:
-			defaults = underlying.getDefaultsForTemplate(symbols=symbols, exclude=exclude)
+			defaults = underlying.getConfigTemplates(symbols=symbols)
 			templates.mergeDefaults(defaults)
 
 			# Save the resolved template

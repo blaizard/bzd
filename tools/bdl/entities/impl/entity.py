@@ -144,25 +144,29 @@ class Entity:
 	def fqn(self) -> str:
 		return self.element.getAttr("fqn").value
 
-	def getConfigTemplates(self, symbols: typing.Any) -> typing.List["Expression"]:
+	def getConfigTemplates(self, symbols: typing.Any) -> Parameters:
 		"""
 		Get the list of expressions that forms the template.
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
-			return [config for config in underlyingType.config if config.contracts.get("template")]
-		return []
+			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+			return Parameters(element=underlyingType.element,
+				nestedKind="config",
+				filterFct=lambda entity: entity.contracts.has("template"))
+		return Parameters(element=self.element)
 
-	def getConfigValues(self, symbols: typing.Any) -> typing.List["Expression"]:
+	def getConfigValues(self, symbols: typing.Any) -> Parameters:
 		"""
 		Get the list of expressions that forms the values.
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
-			return [config for config in underlyingType.config if not config.contracts.get("template")]
-		return []
+			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+			return Parameters(element=underlyingType.element,
+				nestedKind="config",
+				filterFct=lambda entity: not entity.contracts.has("template"))
+		return Parameters(element=self.element)
 
 	def makeValidation(self, symbols: typing.Any, forTemplate: bool) -> typing.Optional[Validation]:
 		"""
@@ -172,15 +176,9 @@ class Entity:
 		config = self.getConfigTemplates(symbols=symbols) if forTemplate else self.getConfigValues(symbols=symbols)
 
 		schema = {}
-		for index, expression in enumerate(config):
-			if expression.isName:
-				key = expression.name
-			elif expression.isVarArgs:
-				expression.assertTrue(condition=index == len(config) - 1,
-					message="Variable arguments can only be present at the end of the parameter list.")
+		for key, expression in config.items():
+			if expression.isVarArgs:
 				key = "*"
-			else:
-				key = str(index)
 
 			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
 			schema[key] = maybeContracts if maybeContracts is not None else ""
@@ -198,33 +196,11 @@ class Entity:
 		"""
 		return self.makeValidation(symbols=symbols, forTemplate=True)
 
-	def getDefaultsForTemplate(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
-		"""
-		Get the default values for the template.
-		"""
-		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
-			return Parameters(element=underlyingType.element,
-				nestedKind="config",
-				filterFct=lambda entity: entity.contracts.has("template"))
-		return Parameters(element=self.element)
-
 	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.
 		"""
 		return self.makeValidation(symbols=symbols, forTemplate=False)
-
-	def getDefaultsForValues(self, symbols: typing.Any, exclude: typing.Optional[typing.List[str]]) -> Parameters:
-		"""
-		Get the default values for the values.
-		"""
-		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
-			return Parameters(element=underlyingType.element,
-				nestedKind="config",
-				filterFct=lambda entity: not entity.contracts.has("template"))
-		return Parameters(element=self.element)
 
 	def resolve(self,
 		symbols: typing.Any,
