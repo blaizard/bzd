@@ -231,44 +231,43 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"named parameter"):
+		with self.assertRaisesRegex(Exception, r"not support template"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [template]; }
 				composition MyComposition { val1 = Test<12>; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"expects.*integer"):
-			bdl = Object.fromContent(content="""
-			interface Test { config: Integer [template]; }
+		Object.fromContent(content="""
+			interface Test { config: Void [template type]; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
-				objectContext=ObjectContext(resolve=True, composition=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
 			interface Test { config: Integer [template min(10)]; }
-			composition MyComposition { val1 = Test<2>; }
+			composition MyComposition { val1 = Test(2); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"higher than"):
 			Object.fromContent(content="""
 			interface Test { config: Integer [template max(10)]; }
-			composition MyComposition { val1 = Test<20>; }
+			composition MyComposition { val1 = Test(20); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
 			interface Test { config: Integer [template min(10) max(32)]; }
-			composition MyComposition { val1 = Test<23>; }
+			composition MyComposition { val1 = Test(23); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
 				interface Test { config: Integer [template min(10) max(32)]; Integer [template mandatory]; }
-				composition MyComposition { val1 = Test<23>; }
+				composition MyComposition { val1 = Test(23); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 

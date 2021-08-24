@@ -145,13 +145,14 @@ class Expression(Entity):
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(symbols=symbols, contracts=self.contracts)
+		validation = self._makeValueValidation(symbols=symbols, parameters=defaults, contracts=self.contracts)
 		if validation is not None:
 			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
-	def _makeValueValidation(self, symbols: typing.Any, contracts: Contracts) -> typing.Optional[Validation]:
+	def _makeValueValidation(self, symbols: typing.Any, parameters: Parameters,
+		contracts: Contracts) -> typing.Optional[Validation]:
 		"""
 		Generate the validation for the value by combining the type validation
 		and the contract validation.
@@ -167,7 +168,7 @@ class Expression(Entity):
 			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="Value-specific contracts cannot be associated with a configuration.")
-				return self.makeValidationForValue(symbols=symbols)
+				return self.makeValidationForValues(symbols=symbols, parameters=parameters)
 
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.

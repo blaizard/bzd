@@ -67,15 +67,15 @@ class Type:
 				underlying.underlyingType)
 
 		# Validate template arguments
-		validation = underlying.makeValidationForTemplate(symbols=symbols)
-		if validation is None:
+		configTypes = underlying.getConfigTemplateTypes(symbols=symbols)
+		if not configTypes:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(self.templates)),
 				attr=self.kindAttr,
-				message="Type '{}' does not support template arguments.".format(self.kind))
+				message="Type '{}' does not support template type arguments.".format(self.kind))
 		else:
-			defaults = underlying.getConfigTemplates(symbols=symbols)
-			templates.mergeDefaults(defaults)
+
+			templates.mergeDefaults(configTypes)
 
 			# Save the resolved template
 			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude)
@@ -84,6 +84,8 @@ class Type:
 
 			# Validate the template arguments
 			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+			validation = underlying.makeValidationForTemplate(symbols=symbols, parameters=configTypes)
+			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element,
 				attr=self.kindAttr,
