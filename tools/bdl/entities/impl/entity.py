@@ -144,16 +144,16 @@ class Entity:
 	def fqn(self) -> str:
 		return self.element.getAttr("fqn").value
 
-	def getConfigTemplates(self, symbols: typing.Any) -> Parameters:
+	def getConfigTemplateTypes(self, symbols: typing.Any) -> Parameters:
 		"""
-		Get the list of expressions that forms the template.
+		Get the list of expressions that forms the template types.
 		"""
 
 		if self.underlyingType:
 			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind="config",
-				filterFct=lambda entity: entity.contracts.has("template"))
+				filterFct=lambda entity: entity.contracts.has("template") and entity.contracts.has("type"))
 		return Parameters(element=self.element)
 
 	def getConfigValues(self, symbols: typing.Any) -> Parameters:
@@ -165,18 +165,16 @@ class Entity:
 			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind="config",
-				filterFct=lambda entity: not entity.contracts.has("template"))
+				filterFct=lambda entity: not (entity.contracts.has("template") and entity.contracts.has("type")))
 		return Parameters(element=self.element)
 
-	def makeValidation(self, symbols: typing.Any, forTemplate: bool) -> typing.Optional[Validation]:
+	def makeValidation(self, symbols: typing.Any, parameters: Parameters,
+		forTemplate: bool) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object.
 		"""
-
-		config = self.getConfigTemplates(symbols=symbols) if forTemplate else self.getConfigValues(symbols=symbols)
-
 		schema = {}
-		for key, expression in config.items():
+		for key, expression in parameters.items():
 			if expression.isVarArgs:
 				key = "*"
 
@@ -190,17 +188,17 @@ class Entity:
 				self.error(message=str(e))
 		return None
 
-	def makeValidationForTemplate(self, symbols: typing.Any) -> typing.Optional[Validation]:
+	def makeValidationForTemplate(self, symbols: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for template parameters.
 		"""
-		return self.makeValidation(symbols=symbols, forTemplate=True)
+		return self.makeValidation(symbols=symbols, parameters=parameters, forTemplate=True)
 
-	def makeValidationForValue(self, symbols: typing.Any) -> typing.Optional[Validation]:
+	def makeValidationForValues(self, symbols: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.
 		"""
-		return self.makeValidation(symbols=symbols, forTemplate=False)
+		return self.makeValidation(symbols=symbols, parameters=parameters, forTemplate=False)
 
 	def resolve(self,
 		symbols: typing.Any,

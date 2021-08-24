@@ -11,7 +11,7 @@ BuiltinResult = Builtin(
 	contract="template mandatory type").addConfig(kind="Any", contract="template mandatory type"))
 BuiltinList = Builtin(
 	ElementBuilder("builtin").setAttr("name", "List").addConfig(kind="Any",
-	contract="template mandatory").addConfig(name="...", kind="Any"))
+	contract="template mandatory type").addConfig(name="...", kind="Any"))
 BuiltinCallable = Builtin(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinResult, BuiltinList, BuiltinCallable]
