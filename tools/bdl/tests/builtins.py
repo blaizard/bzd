@@ -117,7 +117,8 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="struct temp { var = List; }", objectContext=ObjectContext(resolve=True))
 
 		# Template
-		Object.fromContent(content="struct temp { var = List<Integer>; }", objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = List<Integer>(12); }",
+			objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="struct temp { var = List<Integer, Void>; }",
 				objectContext=ObjectContext(resolve=True))

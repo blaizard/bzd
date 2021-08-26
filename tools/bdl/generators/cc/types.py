@@ -3,8 +3,10 @@ import typing
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type, Visitor
+from tools.bdl.entities.impl.fragment.parameters import ResolvedParameters
 from tools.bdl.visitors.symbol_map import SymbolMap
-from tools.bdl.generators.cc.comments import commentEmbeddedToStr
+from tools.bdl.generators.cc.comments import commentEmbeddedToStr, commentParametersResolvedToStr
+from tools.bdl.generators.cc.fqn import fqnToNameStr
 
 TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
 TypeConversionCallable = typing.Callable[[Type, typing.List[str], bool], TypeConversionCallableReturn]
@@ -88,10 +90,36 @@ class _VisitorType(Visitor):
 
 		return value
 
+	@staticmethod
+	def declareParametersResolvedValues(parameters: ResolvedParameters) -> typing.List[str]:
+		"""
+		This is a copy of the one defined in tools/bdl/generators/cc/template/declarations.h.btl
+		"""
+		content: typing.List[str] = []
+		for expression in parameters:
+
+			string = commentParametersResolvedToStr(expression)
+			if expression.isType:
+				if expression.isName:
+					string += fqnToNameStr(expression.fqn)
+				else:
+					string += "{}{{{}}}".format(
+						typeToStr(expression.type),
+						", ".join(_VisitorType.declareParametersResolvedValues(expression.parametersResolved)))
+			else:
+				string += expression.value
+
+			content.append(string)
+
+		return content
+
 	def visitType(self, entity: Type, nested: typing.List[str]) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
+
+		# Add arguments template to the nested mix.
+		nested += self.declareParametersResolvedValues(entity.parametersTemplateResolved)
 
 		fqn = entity.kind
 		if fqn in typeTransform:
@@ -118,10 +146,6 @@ class _VisitorType(Visitor):
 		# Apply the reference if any
 		if self.isReference:
 			output += "&"
-
-		# Add the comment
-		if self.isTopLevel and entity.comment:
-			output = commentEmbeddedToStr(comment=entity.comment) + " " + output
 
 		return output
 

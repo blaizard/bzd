@@ -10,7 +10,8 @@ from tools.bdl.entities.all import Namespace, Using
 from tools.bdl.entities.impl.fragment.type import Type
 
 from tools.bdl.generators.cc.types import typeToStr
-from tools.bdl.generators.cc.comments import commentBlockToStr, commentEmbeddedToStr
+from tools.bdl.generators.cc.comments import commentBlockToStr, commentEmbeddedToStr, commentParametersResolvedToStr
+from tools.bdl.generators.cc.fqn import fqnToStr, fqnToAdapterStr, fqnToNameStr
 
 # String related
 
@@ -46,24 +47,6 @@ def namespaceToStr(entity: Namespace) -> str:
 	return "::".join(entity.nameList)
 
 
-# FQN related
-
-
-def fqnToStr(fqn: str) -> str:
-	return "::".join(SymbolMap.FQNToNamespace(fqn))
-
-
-def fqnToAdapterStr(fqn: str) -> str:
-	split = SymbolMap.FQNToNamespace(fqn)
-	split.insert(-1, "adapter")
-	return "::".join(split)
-
-
-def fqnToNameStr(fqn: str) -> str:
-	split = SymbolMap.FQNToNamespace(fqn)
-	return "_".join(split)
-
-
 # Type related
 
 
@@ -78,6 +61,7 @@ transforms = {
 	"namespaceToStr": namespaceToStr,
 	"commentBlockToStr": commentBlockToStr,
 	"commentEmbeddedToStr": commentEmbeddedToStr,
+	"commentParametersResolvedToStr": commentParametersResolvedToStr,
 	"inheritanceToStr": inheritanceToStr,
 	"inheritanceAdapterToStr": inheritanceAdapterToStr,
 	"bdlPathToHeader": bdlPathToHeader,

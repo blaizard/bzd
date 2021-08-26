@@ -12,7 +12,7 @@
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
-	static {{ expresssion.typeResolved | typeToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersValues(expresssion.parametersResolved, true) -}} };
+	static {{ expresssion.typeResolved | typeToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
 	{% end %}
 
 	// Declaration of the registry.

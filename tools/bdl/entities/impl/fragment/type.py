@@ -19,13 +19,15 @@ class Type:
 		element: Element,
 		kind: str,
 		underlyingType: typing.Optional[str] = None,
-		template: typing.Optional[str] = None) -> None:
+		template: typing.Optional[str] = None,
+		argumentTemplate: typing.Optional[str] = None) -> None:
 
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
 		self.kindAttr = kind
 		self.underlyingTypeAttr = underlyingType
 		self.templateAttr = template
+		self.argumentTemplateAttr = argumentTemplate
 
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
@@ -77,11 +79,6 @@ class Type:
 
 			templates.mergeDefaults(configTypes)
 
-			# Save the resolved template
-			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude)
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
-				sequence)
-
 			# Validate the template arguments
 			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			validation = underlying.makeValidationForTemplate(symbols=symbols, parameters=configTypes)
@@ -91,6 +88,11 @@ class Type:
 				attr=self.kindAttr,
 				condition=bool(resultValidate),
 				message=str(resultValidate))
+
+			# Save the resolved template only after the validation is completed.
+			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude, onlyTypes=True)
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
+				sequence)
 
 		# Resolve contract
 		self.contracts.resolve(underlying.contracts)
@@ -138,6 +140,10 @@ class Type:
 	def parametersResolved(self) -> ResolvedParameters:
 		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
 
+	@cached_property
+	def parametersTemplateResolved(self) -> ResolvedParameters:
+		return ResolvedParameters(element=self.element, nestedKind=self.argumentTemplateAttr)
+
 	def __repr__(self) -> str:
 		return self.name
 
@@ -146,10 +152,11 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	nestedKind = "template"
 
-	def __init__(self, entity: Type) -> None:
+	def __init__(self, entity: Type, resolved: bool = False) -> None:
 
 		# Nested level
 		self.level = 0
+		self.resolved = resolved
 
 		# Construct the template if any.
 		if entity.templateAttr is not None:
@@ -174,12 +181,17 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 	def visitBegin(self) -> typing.List[str]:
 		return []
 
-	def visitElement(self, element: Element, result: typing.List[str], nested: typing.List[str]) -> typing.List[str]:
+	def visitElement(self, element: Element, result: typing.List[str],
+		nested: typing.Optional[typing.List[str]]) -> typing.List[str]:
 
 		if element.isAttr("type"):
 
-			entity = Type(element=element, kind="type", underlyingType="fqn_type", template="template")
-			output = self.visitType(entity=entity, nested=nested)
+			entity = Type(element=element,
+				kind="type",
+				underlyingType="fqn_type",
+				template="template_resolved" if self.resolved else "template",
+				argumentTemplate="argument_template_resolved" if self.resolved else None)
+			output = self.visitType(entity=entity, nested=[] if nested is None else nested)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")
