@@ -64,7 +64,11 @@ class Expression(Entity):
 
 	@cached_property
 	def typeResolved(self) -> Type:
-		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template_resolved")
+		return Type(element=self.element,
+			kind="type",
+			underlyingType="fqn_type",
+			template="template_resolved",
+			argumentTemplate="argument_template_resolved")
 
 	@property
 	def isValue(self) -> bool:
@@ -139,10 +143,6 @@ class Expression(Entity):
 		defaults = self.getConfigValues(symbols=symbols)
 		self.parameters.mergeDefaults(defaults)
 
-		# Save the resolved parameters
-		sequence = self.parameters.toResolvedSequence(symbols=symbols, exclude=exclude)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
-
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, parameters=defaults, contracts=self.contracts)
@@ -150,6 +150,15 @@ class Expression(Entity):
 			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+
+		# Save the resolved parameters (values and templates), only after the validation is completed.
+		argumentValues = self.parameters.copy(filterFct=lambda entity: not entity.contracts.has("template"))
+		sequence = argumentValues.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
+
+		argumentTemplates = self.parameters.copy(filterFct=lambda entity: entity.contracts.has("template"))
+		sequence = argumentTemplates.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
 	def _makeValueValidation(self, symbols: typing.Any, parameters: Parameters,
 		contracts: Contracts) -> typing.Optional[Validation]:

@@ -23,26 +23,41 @@
 {%- macro declareExpression(element, prepend, reference) -%}
 	{{ element.comment | commentEmbeddedToStr }}
 	{%- if element.isType -%}
-	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersValues(element.parametersResolved, false) -}} }{% end %}
+	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
 {%- end -%}
 
-{#- Parameters values -#}
-{%- macro declareParametersValues(parameters, useFqn) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end %}
+{#- Parameters types -#}
+{%- macro declareParametersResolvedTypes(parameters) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end -%}
+		{{- expression | commentParametersResolvedToStr -}}
 		{%- if expression.isType -%}
-			{%- if expression.isName %}
-				{%- if useFqn %}{{- expression.fqn | fqnToNameStr }}{% else %}{{- expression.name }}{% end %}
-			{%- else %}
-				{{- expression.type | typeToStr }}{ {{- declareParametersValues(expression.parametersResolved, false) -}} }
-			{%- end %}
-		{%- else %}
+			{# Must be a type. #}
+			{{- expression.type | typeToStr }}
+		{%- end -%}
+	{%- end -%}
+{%- end -%}
+
+{#- Parameters values -#}
+{%- macro declareParametersResolvedValues(parameters) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end -%}
+		{{- expression | commentParametersResolvedToStr -}}
+		{%- if expression.isType -%}
+			{%- if expression.isName -%}
+				{# On values there must be a FQN available. #}
+				{{- expression.fqn | fqnToNameStr -}}
+			{%- else -%}
+				{# Object instanciation. #}
+				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression.parametersResolved) -}} }
+			{%- end -%}
+		{%- else -%}
+			{# Literal. #}
 			{{- expression.value -}}
 		{%- end -%}
-	{% end -%}
-{% end -%}
+	{%- end -%}
+{%- end -%}
 
 {#- Parameters -#}
 {%- macro declareParameters(parameters, reference) -%}

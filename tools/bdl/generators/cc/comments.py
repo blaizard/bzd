@@ -1,5 +1,7 @@
 import typing
 
+from tools.bdl.entities.all import Expression
+
 
 def commentBlockToStr(comment: typing.Optional[str]) -> str:
 	"""
@@ -23,3 +25,13 @@ def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
 		return ""
 	commentSplit = comment.split("\n")
 	return "/* {comment} */".format(comment=" ".join(commentSplit))
+
+
+def commentParametersResolvedToStr(expression: Expression) -> str:
+	"""
+	Create an inline comment from a parameter resolved entry.
+	"""
+
+	if expression.element.isAttr("key"):
+		return "/*{}*/".format(expression.element.getAttr("key").value)
+	return ""
