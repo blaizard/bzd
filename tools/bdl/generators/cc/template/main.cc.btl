@@ -12,7 +12,7 @@
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
-	static {{ expresssion.typeResolved | typeToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
 	{% end %}
 
 	// Declaration of the registry.
@@ -28,3 +28,12 @@
 
 	return registry;
 }
+
+/*
+int main()
+{
+	auto& registry = getOrMakeRegistry();
+
+	return 0;
+}
+*/

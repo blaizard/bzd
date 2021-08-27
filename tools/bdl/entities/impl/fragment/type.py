@@ -152,11 +152,10 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	nestedKind = "template"
 
-	def __init__(self, entity: Type, resolved: bool = False) -> None:
+	def __init__(self, entity: Type) -> None:
 
 		# Nested level
 		self.level = 0
-		self.resolved = resolved
 
 		# Construct the template if any.
 		if entity.templateAttr is not None:
@@ -166,7 +165,11 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 		else:
 			template = []
 
-		self.result = self.visitType(entity=entity, nested=template)
+		self.result = self.visitType(entity=entity, nested=template, parameters=entity.parametersTemplateResolved)
+
+	@property
+	def isResolved(self) -> bool:
+		return self.nestedKind.endswith("_resolved")
 
 	@property
 	def isTopLevel(self) -> bool:
@@ -189,9 +192,11 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 			entity = Type(element=element,
 				kind="type",
 				underlyingType="fqn_type",
-				template="template_resolved" if self.resolved else "template",
-				argumentTemplate="argument_template_resolved" if self.resolved else None)
-			output = self.visitType(entity=entity, nested=[] if nested is None else nested)
+				template="template_resolved" if self.isResolved else "template",
+				argumentTemplate="argument_template_resolved" if self.isResolved else None)
+			output = self.visitType(entity=entity,
+				nested=[] if nested is None else nested,
+				parameters=entity.parametersTemplateResolved)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")
@@ -209,7 +214,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		return value
 
-	def visitType(self, entity: Type, nested: typing.List[str]) -> str:
+	def visitType(self, entity: Type, nested: typing.List[str], parameters: ResolvedParameters) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""

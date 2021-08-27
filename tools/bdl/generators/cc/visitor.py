@@ -54,10 +54,15 @@ def typeReferenceToStr(entity: Type) -> str:
 	return typeToStr(entity=entity, reference=True)
 
 
+def typeDefinitionToStr(entity: Type) -> str:
+	return typeToStr(entity=entity, definition=True)
+
+
 transforms = {
 	"toCamelCase": toCamelCase,
 	"typeToStr": typeToStr,
 	"typeReferenceToStr": typeReferenceToStr,
+	"typeDefinitionToStr": typeDefinitionToStr,
 	"namespaceToStr": namespaceToStr,
 	"commentBlockToStr": commentBlockToStr,
 	"commentEmbeddedToStr": commentEmbeddedToStr,
