@@ -83,11 +83,18 @@ class ParametersCommon(typing.Generic[T]):
 				return metadata
 		raise KeyError("Missing key '{}'.".format(name))
 
+	def __repr__(self) -> str:
+		content = []
+		for key, expression, metadata in self.itemsMetadata():
+			content.append("{}: {} {}".format(key, str(expression), str(metadata)))
+		return "\n".join(content)
+
 
 @dataclass
 class Metadata:
 	default: bool = False
 	order: int = -1
+	template: bool = False
 
 
 class Parameters(ParametersCommon[Metadata]):
@@ -110,7 +117,7 @@ class Parameters(ParametersCommon[Metadata]):
 					expression = Expression(e)
 					if filterFct is not None and not filterFct(expression):
 						continue
-					self.append(expression, Metadata(order=index))
+					self.append(expression, Metadata(order=index, template=expression.contracts.has("template")))
 					expression.assertTrue(condition=self.isNamed == expression.isName,
 						message="Cannot mix named and unnamed parameters: '{}' and '{}'.".format(
 						self.at(0), expression))
@@ -121,7 +128,7 @@ class Parameters(ParametersCommon[Metadata]):
 		if self.isNamed is True:
 			assert not self.isVarArgs, "Cannot have named and varargs."
 
-	def copy(self, filterFct: typing.Optional[typing.Callable[["Expression"], bool]] = None) -> "Parameters":
+	def copy(self, template: typing.Optional[bool] = None) -> "Parameters":
 		"""
 		Copy the parameter list and optionally filter it.
 		"""
@@ -129,7 +136,7 @@ class Parameters(ParametersCommon[Metadata]):
 
 		# Fill in the list
 		for key, expression, metadata in self.itemsMetadata():
-			if filterFct is not None and not filterFct(expression):
+			if template is not None and template != metadata.template:
 				continue
 			parameters.append(expression, metadata)
 
@@ -169,30 +176,17 @@ class Parameters(ParametersCommon[Metadata]):
 					condition=not bool(self.isNamed),
 					message="Requires unnamed parameters.")
 
-		# Merge
-		if parameters.isNamed:
-			order: int = 0
-			for name, expression in parameters.items():
-				if not self.contains(name):
-					expression.assertTrue(condition=not expression.contracts.has("mandatory"),
-						message="Missing mandatory parameter: '{}'.".format(name))
-					self.append(expression, Metadata(default=True))
-				self.atKeyMetadata(name).order = order
-				order += 1
-
-		elif self.size() < parameters.size():
-			Error.assertTrue(element=self.element,
-				condition=not self.isVarArgs,
-				message="Variable arguments must be at the end.")
-			hasSkipped = False
-			for expression, metadata in parameters.list[self.size():]:
-				if not expression.contracts.has("mandatory"):
-					Error.assertTrue(element=self.element,
-						condition=not hasSkipped,
-						message="Mandatory positional parameters must be at the end.")
-					self.append(expression, metadata)
-				else:
-					hasSkipped = True
+		# Merge the values
+		order: int = 0
+		for name, expression, metadata in parameters.itemsMetadata():
+			if not self.contains(name):
+				expression.assertTrue(condition=not expression.contracts.has("mandatory"),
+					message="Missing mandatory parameter: '{}'.".format(name))
+				self.append(expression, Metadata(default=True))
+			# Merge the metadata
+			self.atKeyMetadata(name).template = metadata.template
+			self.atKeyMetadata(name).order = order
+			order += 1
 
 	def resolve(self,
 		symbols: "SymbolMap",

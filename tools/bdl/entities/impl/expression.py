@@ -152,11 +152,11 @@ class Expression(Entity):
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
-		argumentValues = self.parameters.copy(filterFct=lambda entity: not entity.contracts.has("template"))
+		argumentValues = self.parameters.copy(template=False)
 		sequence = argumentValues.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
 
-		argumentTemplates = self.parameters.copy(filterFct=lambda entity: entity.contracts.has("template"))
+		argumentTemplates = self.parameters.copy(template=True)
 		sequence = argumentTemplates.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
