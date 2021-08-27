@@ -4,6 +4,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type, Visitor
 from tools.bdl.entities.impl.fragment.parameters import ResolvedParameters
+from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.generators.cc.comments import commentEmbeddedToStr, commentParametersResolvedToStr
 from tools.bdl.generators.cc.fqn import fqnToNameStr
@@ -156,7 +157,7 @@ class _VisitorType(Visitor):
 			else:
 				output = knownTypes[fqn].transform
 		else:
-			namespace = SymbolMap.FQNToNamespace(fqn)
+			namespace = FQN.toNamespace(fqn)
 			if self.isUpdateNamespace:
 				assert self.updateNamespace is not None
 				namespace = self.updateNamespace(namespace)

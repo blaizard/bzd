@@ -7,6 +7,7 @@ from bzd.parser.visitor import Visitor
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.fragment.fqn import FQN
 
 TYPE_STRUCT = "struct"
 TYPE_COMPONENT = "component"
@@ -67,7 +68,7 @@ class Nested(Entity):
 		"""
 		# Generate this symbol FQN.
 		if self.isName:
-			fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
+			fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
 			self._setUnderlyingType(fqn)
 
 		# Resolve and make sure the inheritance is correct.

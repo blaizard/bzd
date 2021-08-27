@@ -9,4 +9,10 @@ composition {
 	
 }
 
+method temp(var = const Integer) -> Integer;
+composition {
+	temp(defaultStackSize);
+	
+}
+
 

@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.fragment.fqn import FQN
 
 
 class EnumValue(Entity):
@@ -58,7 +59,7 @@ class Enum(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
+		fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
 		self._setUnderlyingType(fqn)
 
 	@cached_property

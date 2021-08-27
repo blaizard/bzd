@@ -7,6 +7,7 @@ from tools.bdl.visitor import CATEGORY_COMPOSITION
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.expression import Expression
+from tools.bdl.entities.impl.fragment.fqn import FQN
 
 
 class Composition:
@@ -51,11 +52,15 @@ class Composition:
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
 		for fqn, entity in self.symbols.items(categories=categories):
 
+			# Unamed entries should be dealt with later.
+			if not entity.isName:
+				continue
+
 			# Resolve the entities, they must all be expressions
 			entity.assertTrue(condition=isinstance(entity, Expression),
 				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
 			# Resolve the expression
-			entity.resolve(symbols=self.symbols, namespace=SymbolMap.FQNToNamespace(fqn)[:-1])
+			entity.resolve(symbols=self.symbols, namespace=FQN.toNamespace(fqn)[:-1])
 			# Create the dependency map and keep only dependencies from composition
 			dependencies[fqn] = {
 				dep
@@ -67,3 +72,8 @@ class Composition:
 		for fqn in dependencies.keys():
 			self.resolveDependency(dependencies, fqn, orderFQNs)
 		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs]  # type: ignore
+
+		for fqn, entity in self.symbols.items(categories=categories):
+			if entity.isName:
+				continue
+			print(entity)
