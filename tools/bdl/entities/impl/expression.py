@@ -9,6 +9,7 @@ from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
+from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, Role
 
 if typing.TYPE_CHECKING:
@@ -132,7 +133,7 @@ class Expression(Entity):
 
 			# Generate this symbol FQN
 			# TODO: need to handle when the expression has no name
-			fqn = symbols.namespaceToFQN(name=self.name, namespace=namespace)
+			fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
 			self._setUnderlyingValue(entity=self, fqn=fqn)
 
 		else:

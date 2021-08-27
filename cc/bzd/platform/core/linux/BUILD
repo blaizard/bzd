@@ -19,6 +19,7 @@ cc_library(
     hdrs = [
         "core.h",
         "executor.h",
+        "workload.h",
     ],
     linkopts = [
         "-lpthread",

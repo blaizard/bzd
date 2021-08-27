@@ -32,12 +32,9 @@ class Build(Visitor[None]):
 		if resolve:
 			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
-		# Build the symbol name or autogenerate it if no name is present.
-		fqn: typing.Optional[str] = SymbolMap.namespaceToFQN(name=entity.name,
-			namespace=self.namespace) if entity.isName else None
-
 		# Save the serialized payload
-		fqn = self.symbols.insert(fqn=fqn,
+		fqn = self.symbols.insert(name=entity.name if entity.isName else None,
+			namespace=self.namespace,
 			element=entity.element,
 			path=self.objectContext.getSource(),
 			category=self.category)
@@ -88,8 +85,8 @@ class Build(Visitor[None]):
 		namespace = []
 		for name in entity.nameList:
 			namespace.append(name)
-			fqn = SymbolMap.namespaceToFQN(namespace=namespace)
-			self.symbols.insert(fqn=fqn,
+			self.symbols.insert(name=namespace[-1],
+				namespace=namespace[:-1],
 				element=NamespaceBuilder(namespace),
 				path=None,
 				category=self.category,

@@ -137,6 +137,14 @@ class Entity:
 		return self.element.getAttrValue("comment")
 
 	@property
+	def isNamespace(self) -> bool:
+		return self.element.isAttr("namespace")
+
+	@property
+	def namespace(self) -> str:
+		return self.element.getAttr("namespace").value
+
+	@property
 	def isFQN(self) -> bool:
 		return self.element.isAttr("fqn")
 

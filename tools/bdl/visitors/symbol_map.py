@@ -5,11 +5,12 @@ from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
 
-from tools.bdl.visitor import Visitor, CATEGORIES
+from tools.bdl.visitor import Visitor, CATEGORIES, CATEGORY_COMPOSITION
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
 from tools.bdl.entities.builder import ElementBuilder
 from tools.bdl.entities.impl.reference import Reference
+from tools.bdl.entities.impl.fragment.fqn import FQN
 
 
 class SymbolMap:
@@ -35,7 +36,7 @@ class SymbolMap:
 		self.staticUid: int = 0
 		self.map: typing.Dict[str, typing.Any] = {}
 		self.builtins: typing.Dict[str, typing.Any] = {}
-		# Memoized entities
+		# Memoized entities.
 		self.entities: typing.Dict[str, EntityType] = {}
 
 		# Register builtins
@@ -80,7 +81,8 @@ class SymbolMap:
 				yield fqn, entity
 
 	def insert(self,
-		fqn: typing.Optional[str],
+		name: typing.Optional[str],
+		namespace: typing.List[str],
 		path: typing.Optional[Path],
 		element: Element,
 		category: str,
@@ -94,15 +96,23 @@ class SymbolMap:
 			category: Category associated with the element, will be used for filtering.
 			conflicts: Handle symbol FQN conflicts.
 		"""
-		if fqn is None:
-			# The '_' is to tell that the visibility of this object is limited to this file,
-			# while the '~' is to ensure no name collision with what the user can define.
-			fqn = "_{:d}~".format(self.staticUid)
-			self.staticUid += 1
+		if name is None:
+			# These are the unnamed elements that should be progpagated to other translation units.
+			if category in {CATEGORY_COMPOSITION}:
+				fqn = FQN.makeUnique()
+			# If not, they will be kept private.
+			else:
+				fqn = FQN.makeUniquePrivate()
+		else:
+			# Build the symbol name.
+			fqn = FQN.fromNamespace(name=name, namespace=namespace)
 		assert fqn is not None
 
-		# Save the FQN to the element, so that it can be found during [de]serialization
+		# Save the FQN to the element, so that it can be found during [de]serialization.
+		# This is also used to refer to the element with the symbol tree, the top-level ones only.
 		ElementBuilder.cast(element, ElementBuilder).setAttr("fqn", fqn)
+		# Save the Namespace to the element
+		ElementBuilder.cast(element, ElementBuilder).setAttr("namespace", FQN.fromNamespace(namespace=namespace))
 
 		if self.contains(fqn=fqn):
 			originalElement = self.getEntityResolved(fqn=fqn).assertValue(element=element).element
@@ -126,14 +136,18 @@ class SymbolMap:
 		Copy all nested references from the inheritance to the passed fqn.
 		"""
 		inheritance = self.getEntityResolved(fqn=fqnInheritance).value
-		namespaceInheritance = SymbolMap.FQNToNamespace(fqnInheritance)
-		namespace = SymbolMap.FQNToNamespace(fqn)
+		namespaceInheritance = FQN.toNamespace(fqnInheritance)
+		namespace = FQN.toNamespace(fqn)
 		for nested in inheritance.nested:
 			if nested.isName:
-				fqnNested = SymbolMap.namespaceToFQN(name=nested.name, namespace=namespaceInheritance)
-				fqnTarget = SymbolMap.namespaceToFQN(name=nested.name, namespace=namespace)
+				fqnNested = FQN.fromNamespace(name=nested.name, namespace=namespaceInheritance)
+				fqnTarget = FQN.fromNamespace(name=nested.name, namespace=namespace)
 				if not self.contains(fqn=fqnTarget):
-					self.insert(fqn=fqnTarget, path=None, element=self.makeReference(fqn=fqnNested), category=category)
+					self.insert(name=nested.name,
+						namespace=namespace,
+						path=None,
+						element=self.makeReference(fqn=fqnNested),
+						category=category)
 
 	@staticmethod
 	def errorSymbolConflict_(element1: Element, element2: Element) -> None:
@@ -141,18 +155,17 @@ class SymbolMap:
 		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
 		raise Exception(message)
 
-	@staticmethod
-	def isPrivate(fqn: str) -> bool:
-		return fqn.startswith("_")
-
 	def update(self, symbols: "SymbolMap") -> None:
 		"""
 		Register multiple symbols.
 		"""
 		for fqn, element in symbols.map.items():
+
 			# Ignore private entries
-			if SymbolMap.isPrivate(fqn):
+			if FQN.isPrivate(fqn):
 				continue
+			if FQN.isLocal(fqn):
+				fqn = FQN.makeUnique()
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
 				SymbolMap.errorSymbolConflict_(SymbolMap.metaToElement(element),
@@ -192,14 +205,19 @@ class SymbolMap:
 					if nested:
 						sequence = SequenceBuilder()
 						for element in nested:
-							Error.assertHasAttr(element=element, attr="fqn")
-							fqnNested = element.getAttr("fqn").value
-							# Remove private FQNs and keep them nested
-							if SymbolMap.isPrivate(fqnNested):
-								removeFQNs.add(fqnNested)
-								sequence.pushBackElement(element)
+							if element.isAttr("fqn"):
+								fqnNested = element.getAttr("fqn").value
+								# Remove private FQNs and keep them nested.
+								# This is needed because when merging nested structure, some config
+								# for example have unamed elements and need to be copied with the rest.
+								if FQN.isPrivate(fqnNested):
+									removeFQNs.add(fqnNested)
+									ElementBuilder.cast(element, ElementBuilder).removeAttr("fqn")
+									sequence.pushBackElement(element)
+								else:
+									sequence.pushBackElement(self.makeReference(fqnNested))
 							else:
-								sequence.pushBackElement(self.makeReference(fqnNested))
+								sequence.pushBackElement(element)
 						preparedElement.setNestedSequence(category, sequence)
 				element = preparedElement
 
@@ -218,22 +236,6 @@ class SymbolMap:
 
 		return self.map
 
-	@staticmethod
-	def namespaceToFQN(namespace: typing.List[str], name: typing.Optional[str] = None) -> str:
-		"""
-		Make the fully qualified name from a symbol name
-		"""
-		if name is None:
-			return ".".join(namespace)
-		return ".".join(namespace + [name])
-
-	@staticmethod
-	def FQNToNamespace(fqn: str) -> typing.List[str]:
-		"""
-		Convert a FQN string into a namespace.
-		"""
-		return fqn.split(".")
-
 	def resolveFQN(
 			self,
 			name: str,
@@ -243,12 +245,12 @@ class SymbolMap:
 		Find the fully qualified name of a given a name and a namespace.
 		Note, name can be a partial fqn.
 		"""
-		nameFirst = SymbolMap.FQNToNamespace(name)[0]
+		nameFirst = FQN.toNamespace(name)[0]
 
 		# Look for a symbol match of the first part of the name.
 		namespace = namespace.copy()
 		while True:
-			fqn = SymbolMap.namespaceToFQN(name=nameFirst, namespace=namespace)
+			fqn = FQN.fromNamespace(name=nameFirst, namespace=namespace)
 			if self.contains(fqn=fqn, exclude=exclude):
 				break
 			if not namespace:
@@ -258,7 +260,7 @@ class SymbolMap:
 
 		# If match, ensure that the rest of the name also matches with the namespace identified.
 		if name != nameFirst:
-			fqn = SymbolMap.namespaceToFQN(name=name, namespace=namespace)
+			fqn = FQN.fromNamespace(name=name, namespace=namespace)
 
 		return Result[str](fqn)
 
@@ -309,13 +311,13 @@ class SymbolMap:
 
 		namespace = []
 		result = None
-		for name in SymbolMap.FQNToNamespace(fqn):
+		for name in FQN.toNamespace(fqn):
 			namespace.append(name)
-			result = self.getEntityResolved(fqn=SymbolMap.namespaceToFQN(namespace=namespace), category=category)
+			result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), category=category)
 			if not result:
 				continue
 			if result.value.underlyingType is not None:
-				namespace = SymbolMap.FQNToNamespace(result.value.underlyingType)
+				namespace = FQN.toNamespace(result.value.underlyingType)
 
 		if not result:
 			return Result.makeError("Could not resolve symbol '{}'.".format(fqn))
@@ -334,5 +336,5 @@ class SymbolMap:
 	def __repr__(self) -> str:
 		content = []
 		for key, data in {**self.map, **self.builtins}.items():
-			content.append("[{}] {}: {}".format(data["c"], key, data["e"]))
+			content.append("[{}] {}".format(data["c"], key))
 		return "\n".join(content)
