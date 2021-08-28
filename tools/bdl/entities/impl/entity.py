@@ -9,6 +9,7 @@ from tools.bdl.contracts.validation import Validation
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 from tools.bdl.entities.impl.fragment.sequence import EntitySequence
+from tools.bdl.entities.impl.fragment.fqn import FQN
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -138,11 +139,11 @@ class Entity:
 
 	@property
 	def isNamespace(self) -> bool:
-		return self.element.isAttr("namespace")
+		return self.isFQN
 
 	@property
-	def namespace(self) -> str:
-		return self.element.getAttr("namespace").value
+	def namespace(self) -> typing.List[str]:
+		return FQN.toNamespace(self.fqn)[:-1]
 
 	@property
 	def isFQN(self) -> bool:

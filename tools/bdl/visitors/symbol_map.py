@@ -99,7 +99,7 @@ class SymbolMap:
 		if name is None:
 			# These are the unnamed elements that should be progpagated to other translation units.
 			if category in {CATEGORY_COMPOSITION}:
-				fqn = FQN.makeUnique()
+				fqn = FQN.makeUnique(namespace=namespace)
 			# If not, they will be kept private.
 			else:
 				fqn = FQN.makeUniquePrivate()
@@ -110,9 +110,8 @@ class SymbolMap:
 
 		# Save the FQN to the element, so that it can be found during [de]serialization.
 		# This is also used to refer to the element with the symbol tree, the top-level ones only.
+		# In addition, it is assumed that during while resolved any element have a valid FQN.
 		ElementBuilder.cast(element, ElementBuilder).setAttr("fqn", fqn)
-		# Save the Namespace to the element
-		ElementBuilder.cast(element, ElementBuilder).setAttr("namespace", FQN.fromNamespace(namespace=namespace))
 
 		if self.contains(fqn=fqn):
 			originalElement = self.getEntityResolved(fqn=fqn).assertValue(element=element).element
@@ -142,6 +141,7 @@ class SymbolMap:
 			if nested.isName:
 				fqnNested = FQN.fromNamespace(name=nested.name, namespace=namespaceInheritance)
 				fqnTarget = FQN.fromNamespace(name=nested.name, namespace=namespace)
+				# Can be already existant on multi overload.
 				if not self.contains(fqn=fqnTarget):
 					self.insert(name=nested.name,
 						namespace=namespace,
@@ -164,8 +164,6 @@ class SymbolMap:
 			# Ignore private entries
 			if FQN.isPrivate(fqn):
 				continue
-			if FQN.isLocal(fqn):
-				fqn = FQN.makeUnique()
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
 				SymbolMap.errorSymbolConflict_(SymbolMap.metaToElement(element),

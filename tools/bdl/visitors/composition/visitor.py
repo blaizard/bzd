@@ -49,6 +49,16 @@ class Composition:
 	def process(self) -> None:
 
 		categories = {CATEGORY_COMPOSITION}
+
+		# Resolve all.
+		for fqn, entity in self.symbols.items(categories=categories):
+
+			# Resolve the entities, they must all be expressions
+			entity.assertTrue(condition=isinstance(entity, Expression),
+				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
+			# Resolve the expression
+			entity.resolve(symbols=self.symbols, namespace=entity.namespace)
+
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
 		for fqn, entity in self.symbols.items(categories=categories):
 
@@ -56,11 +66,6 @@ class Composition:
 			if not entity.isName:
 				continue
 
-			# Resolve the entities, they must all be expressions
-			entity.assertTrue(condition=isinstance(entity, Expression),
-				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
-			# Resolve the expression
-			entity.resolve(symbols=self.symbols, namespace=FQN.toNamespace(fqn)[:-1])
 			# Create the dependency map and keep only dependencies from composition
 			dependencies[fqn] = {
 				dep
@@ -77,3 +82,4 @@ class Composition:
 			if entity.isName:
 				continue
 			print(entity)
+			print(entity.namespace)
