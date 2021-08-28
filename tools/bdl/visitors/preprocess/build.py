@@ -28,16 +28,16 @@ class Build(Visitor[None]):
 		resolve = self.objectContext.resolve
 		resolve &= (self.category != CATEGORY_COMPOSITION) or self.objectContext.composition
 
-		# Resolve the symbol
-		if resolve:
-			entity.resolve(symbols=self.symbols, namespace=self.namespace)
-
 		# Save the serialized payload
 		fqn = self.symbols.insert(name=entity.name if entity.isName else None,
 			namespace=self.namespace,
 			element=entity.element,
 			path=self.objectContext.getSource(),
 			category=self.category)
+
+		# Resolve the symbol
+		if resolve:
+			entity.resolve(symbols=self.symbols, namespace=self.namespace)
 
 		# Register only top level entities
 		if self.level == 0:

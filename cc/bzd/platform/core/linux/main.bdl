@@ -1,5 +1,6 @@
 use "cc/bzd/platform/core/linux/linux.bdl"
 
+namespace you.here;
 
 composition {
 	defaultStackSize = bzd.platform.StackSize(100);
@@ -9,9 +10,9 @@ composition {
 	
 }
 
-method temp(var = const Integer) -> Integer;
-composition {
-	temp(defaultStackSize);
+method temp(var = Integer) -> Integer;
+composition Hello {
+	temp(12);
 	
 }
 

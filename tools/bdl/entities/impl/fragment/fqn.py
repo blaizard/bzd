@@ -1,4 +1,6 @@
 import typing
+import time
+import random
 
 _staticUid = 0
 
@@ -18,14 +20,14 @@ class FQN:
 		return fqn
 
 	@staticmethod
-	def makeUnique() -> str:
+	def makeUnique(namespace: typing.List[str]) -> str:
 		"""
 		Generate a unique FQN for composition for this translation unit.
 		"""
 		global _staticUid
-		fqn = "{:d}~".format(_staticUid)
+		name = "{:d}-{:d}-{:d}~".format(time.time_ns(), random.randint(0, 1000000), _staticUid)
 		_staticUid += 1
-		return fqn
+		return FQN.fromNamespace(namespace=namespace, name=name)
 
 	@staticmethod
 	def isPrivate(fqn: str) -> bool:

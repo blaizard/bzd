@@ -128,13 +128,10 @@ class Expression(Entity):
 		# Set the underlying value
 		if bool(self.parameters):
 
-			# The type must represent a type (not a value)
+			# The type must represent a type (not a value) and have a valid FQN.
 			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
-
-			# Generate this symbol FQN
-			# TODO: need to handle when the expression has no name
-			fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
-			self._setUnderlyingValue(entity=self, fqn=fqn)
+			self.assertTrue(condition=self.isFQN, message="The value must have a FQN.")
+			self._setUnderlyingValue(entity=self, fqn=self.fqn)
 
 		else:
 			self._setUnderlyingValue(entity=entity)
