@@ -80,6 +80,7 @@ class Nested(Entity):
 
 			# Resolve the inheritance.
 			entity = inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			self.addParents(fqn=inheritance.kind, parents=entity.getParents())
 
 			# Validates that the inheritance type is correct.
 			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=symbols)

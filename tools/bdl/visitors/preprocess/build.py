@@ -52,16 +52,6 @@ class Build(Visitor[None]):
 	def visitNestedEntities(self, entity: Nested, result: None) -> None:
 		fqn = self.registerEntity(entity=entity)
 
-		if fqn and self.objectContext.resolve:
-			assert fqn is not None
-			# Need to map inheritance members to ths new entity
-			for inheritanceType in entity.inheritanceList:
-				underlyingType = inheritanceType.getEntityResolved(symbols=self.symbols).underlyingType
-				entity.assertTrue(condition=underlyingType is not None, message="Inheritance type was not resolved.")
-				assert underlyingType is not None
-				# Need to copy all references from underlyingType to new symbols with namespace "fqn"
-				self.symbols.insertInheritance(fqn=fqn, fqnInheritance=underlyingType, category=self.category)
-
 	def visitExpression(self, entity: Expression, result: None) -> None:
 		self.registerEntity(entity=entity)
 
