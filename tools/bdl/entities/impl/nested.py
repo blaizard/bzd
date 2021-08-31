@@ -21,7 +21,7 @@ class Nested(Entity):
 	Defines a nested entity such as a struct, a component or an interface.
 	Nested entities have the following underlying elements:
 	- Attributes:
-		- type: struct, component, interface...
+		- type: struct, component, interface... see TYPES
 		- [name]: The name of this entity, for example `struct MyType` would have the name MyType.
 	- Sequences:
 		- [inheritance]: In case the the struct have one or multiple base class.
@@ -38,6 +38,7 @@ class Nested(Entity):
 
 	@property
 	def configAttr(self) -> str:
+		# TODO: handle inheritance for "struct"
 		return "nested" if self.type == "struct" else "config"
 
 	@property

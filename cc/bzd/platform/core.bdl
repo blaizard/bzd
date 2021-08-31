@@ -31,8 +31,7 @@ interface Core {
 interface Executor {
 	// Start the executor and starts all cores previously initialized.
 	method start();
-	method stop();
-	
+	method stop();	
 }
 
 

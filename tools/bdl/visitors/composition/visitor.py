@@ -52,15 +52,7 @@ class Composition:
 
 		categories = {CATEGORY_COMPOSITION}
 
-		# Resolve all.
-		for fqn, entity in self.symbols.items(categories=categories):
-
-			# Resolve the entities, they must all be expressions
-			entity.assertTrue(condition=isinstance(entity, Expression),
-				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
-			# Resolve the expression
-			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
-
+		# Make the dependency graph
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
 		for fqn, entity in self.symbols.items(categories=categories):
 
@@ -68,11 +60,14 @@ class Composition:
 			if not entity.isName:
 				continue
 
-			# Create the dependency map and keep only dependencies from composition
 			dependencies[fqn] = {
-				dep
-				for dep in entity.dependencies if self.symbols.contains(fqn=dep, categories=categories)
+				self.symbols.resolveShallowFQN(name=dep,
+				namespace=entity.namespace).assertValue(element=entity.element)[0]
+				for dep in entity.dependencies
 			}
+
+		# Remove dependencies that are irrelevant
+		dependencies = {fqn: deps.intersection(dependencies.keys()) for fqn, deps in dependencies.items()}
 
 		# Compute the dependency orders and identify circular dependencies.
 		orderFQNs: typing.List[str] = []
@@ -80,7 +75,14 @@ class Composition:
 			self.resolveDependency(dependencies, fqn, orderFQNs)
 		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs]  # type: ignore
 
+		# Resolve the Registry and then the un-named
+		for entity in self.registry:
+			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+
+		# resolve the un-named
 		for fqn, entity in self.symbols.items(categories=categories):
 			if entity.isName:
 				continue
+			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+
 			self.compositions.append(entity)  # type: ignore
