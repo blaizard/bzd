@@ -12,6 +12,8 @@ from tools.bdl.entities.builder import ElementBuilder
 from tools.bdl.entities.impl.reference import Reference
 from tools.bdl.entities.impl.fragment.fqn import FQN
 
+ResolveShallowFQNResult = Result[typing.Tuple[str, typing.List[str]]]
+
 
 class SymbolMap:
 	"""
@@ -223,6 +225,39 @@ class SymbolMap:
 		assert self.isClosed, "Can only be serialized after being closed."
 		return self.map
 
+	def resolveShallowFQN(self,
+		name: str,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> ResolveShallowFQNResult:
+		"""
+		Find the fully qualified name of a given a name and a namespace.
+		Note, name can be a partial fqn.
+		"""
+		nameFirst = FQN.toNamespace(name)[0]
+
+		# Look for a symbol match of the first part of the name.
+		potentialNamespace = namespace.copy()
+		while True:
+			fqn = FQN.fromNamespace(name=nameFirst, namespace=potentialNamespace)
+			if self.contains(fqn=fqn, exclude=exclude):
+				break
+			if not potentialNamespace:
+				return ResolveShallowFQNResult.makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(
+					name, ".".join(namespace)) if namespace else "Symbol '{}' could not be resolved.".format(name))
+			potentialNamespace.pop()
+
+		# Attempt to resolve as much as possible.
+		remainingNamespace = FQN.toNamespace(name)[1:]
+		while remainingNamespace:
+			potentialFQN = FQN.fromNamespace(name=remainingNamespace[0], namespace=FQN.toNamespace(fqn))
+			if not self.contains(fqn=potentialFQN, exclude=exclude):
+				break
+			remainingNamespace.pop(0)
+			fqn = potentialFQN
+
+		# Return the FQN and the unresolved rest.
+		return ResolveShallowFQNResult((fqn, remainingNamespace))
+
 	def resolveFQN(
 			self,
 			name: str,
@@ -232,25 +267,18 @@ class SymbolMap:
 		Find the fully qualified name of a given a name and a namespace.
 		Note, name can be a partial fqn.
 		"""
-		nameFirst = FQN.toNamespace(name)[0]
+		maybeFQN = self.resolveShallowFQN(name=name, namespace=namespace, exclude=exclude)
+		if not maybeFQN:
+			return Result[str].makeError(maybeFQN.error)
+
 		fqn: typing.Optional[str]
+		fqn, unresolvedFQN = maybeFQN.value
 
-		# Look for a symbol match of the first part of the name.
-		potentialNamespace = namespace.copy()
-		while True:
-			fqn = FQN.fromNamespace(name=nameFirst, namespace=potentialNamespace)
-			if self.contains(fqn=fqn, exclude=exclude):
-				break
-			if not potentialNamespace:
-				return Result[str].makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(
-					name, ".".join(namespace)) if namespace else "Symbol '{}' could not be resolved.".format(name))
-			potentialNamespace.pop()
-
-		# Liist of matching FQNs
+		# List of matching FQNs
 		fqns: typing.List[str] = [fqn]
 
 		# Re-iterate the process with the next items
-		for nextName in FQN.toNamespace(name)[1:]:
+		for nextName in unresolvedFQN:
 			entity = self.getEntityResolved(fqn=fqn).value
 			potentialNamespaceFQNs = [fqn]
 			# If it has an underlying type, add it to the list as well as its parents (if any).
