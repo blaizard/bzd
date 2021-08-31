@@ -131,6 +131,7 @@ class Expression(Entity):
 			# The type must represent a type (not a value) and have a valid FQN.
 			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
 			self.assertTrue(condition=self.isFQN, message="The value must have a FQN.")
+			# TODO: it is possible that the expression does not have a FQN, in case the expression is resolved through another entity.
 			self._setUnderlyingValue(entity=self, fqn=self.fqn)
 
 		else:
@@ -174,7 +175,7 @@ class Expression(Entity):
 			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
 			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
-					message="Value-specific contracts cannot be associated with a configuration.")
+					message="This expression has both a global contract and a configuration, this is not allowed.")
 				return self.makeValidationForValues(symbols=symbols, parameters=parameters)
 
 		# If evaluates to true, meaning there is a contract for values,

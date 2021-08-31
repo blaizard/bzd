@@ -12,7 +12,7 @@ composition {
 
 method temp(var = Integer) -> Integer;
 composition Hello {
-	temp(12);
+	executor.start;
 	
 }
 

@@ -38,6 +38,7 @@ class SymbolMap:
 		self.builtins: typing.Dict[str, typing.Any] = {}
 		# Memoized entities.
 		self.entities: typing.Dict[str, EntityType] = {}
+		self.isClosed = False
 
 		# Register builtins
 		for builtin in Builtins:
@@ -177,9 +178,9 @@ class SymbolMap:
 		assert self.contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
 		return ElementBuilder("reference").setAttr(key="name", value=fqn)
 
-	def serialize(self) -> typing.Dict[str, typing.Any]:
+	def close(self) -> None:
 		"""
-		Return a serialized version of this map.
+		Close the map to prevent any further editing.
 		"""
 
 		# Create serialized blobs for elements present in the entities map.
@@ -232,6 +233,14 @@ class SymbolMap:
 			assert "c" in entry and entry["c"], "Invalid category in the map: {}.".format(entry)
 			assert "p" in entry, "Missing path in the map: {}.".format(entry)
 
+		# Mark as closed.
+		self.isClosed = True
+
+	def serialize(self) -> typing.Dict[str, typing.Any]:
+		"""
+		Return a serialized version of this map.
+		"""
+		assert self.isClosed, "Can only be serialized after being closed."
 		return self.map
 
 	def resolveFQN(

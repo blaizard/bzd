@@ -28,7 +28,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"associated.*configuration"):
+		with self.assertRaisesRegex(Exception, r"both.*global.*configuration"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				using MyType = Test [integer];
@@ -161,6 +161,48 @@ class TestRun(unittest.TestCase):
 				interface Test { method hello(); }
 				composition MyComposition { test = Test; hello = test.hello(); }
 				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="""
+					interface Test { method hello(var = Integer); }
+					composition MyComposition { test = Test; hello = test.hello(dad = 3); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
+		with self.assertRaisesRegex(Exception, r"higher than"):
+			Object.fromContent(content="""
+					interface Test { method hello(var = Integer [max(2)]); }
+					composition MyComposition { test = Test; hello = test.hello(var = 3); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+				interface Test { method hello(var = Integer [max(10)]); }
+				composition MyComposition { test = Test; hello = test.hello(var = 3); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+	def testStruct(self) -> None:
+
+		with self.assertRaisesRegex(Exception, r"not validate"):
+			Object.fromContent(content="""
+					struct Test { var = Integer; }
+					composition { test = Test(); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
+		with self.assertRaisesRegex(Exception, r"named parameters"):
+			Object.fromContent(content="""
+					struct Test { var = Integer; }
+					composition { test = Test(32); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+					struct Test { var = Integer; }
+					composition { test = Test(var = 32); }
+					""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testValues(self) -> None:

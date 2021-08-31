@@ -9,7 +9,6 @@ import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
-import Filesystem from "bzd/core/filesystem.mjs";
 import Services from "./services.mjs";
 import Plugins from "../plugins/backend.mjs";
 import Permissions from "bzd/db/storage/permissions.mjs";
@@ -64,7 +63,7 @@ program
 		await keyValueStore.set("volume", "docker.gcr", {
 			type: "docker",
 			"docker.type": "gcr",
-			"docker.key": await Filesystem.readFile("/home/blaise/Downloads/blaizard-1295d2680329.json"),
+			"docker.key": "",
 			"docker.service": "gcr.io",
 			"docker.url": "https://docker.blaizard.com",
 			"docker.proxy": true,

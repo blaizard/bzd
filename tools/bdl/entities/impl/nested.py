@@ -37,6 +37,10 @@ class Nested(Entity):
 		self.assertTrue(condition=self.type in TYPES, message="Unsupported nested type: '{}'.".format(self.type))
 
 	@property
+	def configAttr(self) -> str:
+		return "nested" if self.type == "struct" else "config"
+
+	@property
 	def category(self) -> str:
 		return "nested"
 

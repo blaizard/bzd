@@ -1,4 +1,4 @@
-Partlist exported from /home/blaise/projects/cpp-coroutines/apps/homelab_manager/board/motherboard.sch at 03.10.20 10:38
+Partlist exported from /home/dummy1/projects/cpp-coroutines/apps/homelab_manager/board/motherboard.sch at 03.10.20 10:38
 
 Qty Value            Device           Package          Parts                                Description                          MF    MPN        OC_FARNELL OC_NEWARK POPULARITY SPICEPREFIX
 1   0.1              R-EU_R1206       R1206            R3                                   RESISTOR, European symbol                                                  41         R          

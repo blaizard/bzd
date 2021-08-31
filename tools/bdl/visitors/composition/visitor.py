@@ -16,11 +16,13 @@ class Composition:
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
+		self.compositions: typing.List[Expression] = []
 
-	def visit(self, bdl: Object) -> None:
+	def visit(self, bdl: Object) -> "Composition":
 
 		# Build a master symbol list
 		self.symbols.update(bdl.symbols)
+		return self
 
 	def resolveDependency(self,
 		dependencies: typing.Dict[str, typing.Set[str]],
@@ -57,7 +59,7 @@ class Composition:
 			entity.assertTrue(condition=isinstance(entity, Expression),
 				message="Composition only supports 'expression', got '{}' instead.".format(entity.category))
 			# Resolve the expression
-			entity.resolve(symbols=self.symbols, namespace=entity.namespace)
+			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
 
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
 		for fqn, entity in self.symbols.items(categories=categories):
@@ -81,5 +83,4 @@ class Composition:
 		for fqn, entity in self.symbols.items(categories=categories):
 			if entity.isName:
 				continue
-			print(entity)
-			print(entity.namespace)
+			self.compositions.append(entity)  # type: ignore

@@ -24,9 +24,9 @@
 {{ data.comment | normalComment }}{{ data.type }}{% if data.isName %} {{ data.name }}{% end %}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
 {%- end %} {
 	{{ declareSymbols(data.nested.sequence) }}
-	{% if data.isConfig %}
+	{% if data.isConfigRaw %}
 config:
-	{{ declareSymbols(data.config.sequence) }}
+	{{ declareSymbols(data.configRaw.sequence) }}
 	{% end %}
 	{% if data.isComposition %}
 composition:

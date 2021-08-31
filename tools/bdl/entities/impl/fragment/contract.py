@@ -13,9 +13,9 @@ class Contracts:
 	A contract is an unsorted sequence of types associated with an optional value and/or commment.
 	"""
 
-	def __init__(self, element: Element, sequenceKind: str = "contract") -> None:
+	def __init__(self, element: Element, sequenceKind: typing.Optional[str] = None) -> None:
 		self.element = element
-		self.sequenceKind = sequenceKind
+		self.sequenceKind = "contract" if sequenceKind is None else sequenceKind
 
 	def get(self, kind: str) -> typing.Optional[Contract]:
 		"""
