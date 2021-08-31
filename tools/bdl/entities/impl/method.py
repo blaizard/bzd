@@ -27,6 +27,10 @@ class Method(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
+	def configAttr(self) -> str:
+		return "argument"
+
+	@property
 	def category(self) -> str:
 		return "method"
 
@@ -36,8 +40,11 @@ class Method(Entity):
 
 	@cached_property
 	def type(self) -> typing.Optional[Type]:
-		return Type(element=self.element, kind="type", underlyingType="fqn_return_type",
-			template="template") if self.isType else None
+		return Type(element=self.element,
+			kind="type",
+			underlyingType="fqn_return_type",
+			template="template",
+			contract="contract_return") if self.isType else None
 
 	def resolve(self,
 		symbols: typing.Any,

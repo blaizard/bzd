@@ -29,10 +29,23 @@
 	return registry;
 }
 
+/**
+ * Initialize and compose the application.
+ */
+void init() noexcept
+{
+	[[maybe_unused]] auto& registry = getOrMakeRegistry();
+
+	// Compose
+	{% for expresssion in compositions %}
+	registry.{{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
+	{% end %}
+}
+
 /*
 int main()
 {
-	auto& registry = getOrMakeRegistry();
+	init();
 
 	return 0;
 }

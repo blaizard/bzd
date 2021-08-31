@@ -17,6 +17,9 @@ class Build(Visitor[None]):
 		self.symbols = SymbolMap()
 		self.tree = SymbolTree(symbols=self.symbols)
 
+	def visitFinal(self, result: None) -> None:
+		self.symbols.close()
+
 	def getSymbolMap(self) -> SymbolMap:
 		return self.symbols
 
@@ -37,7 +40,7 @@ class Build(Visitor[None]):
 
 		# Resolve the symbol
 		if resolve:
-			entity.resolve(symbols=self.symbols, namespace=self.namespace)
+			entity.resolveMemoized(symbols=self.symbols, namespace=self.namespace)
 
 		# Register only top level entities
 		if self.level == 0:

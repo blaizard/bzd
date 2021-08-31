@@ -1,6 +1,5 @@
 import typing
 import json
-from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
@@ -29,6 +28,8 @@ class Role:
 
 class Entity:
 
+	contractAttr: str = "contract"
+
 	def __init__(self, element: Element, role: int) -> None:
 		self.element = element
 		self.role = role
@@ -42,6 +43,10 @@ class Entity:
 
 	def _setUnderlyingType(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", fqn)
+
+	@property
+	def configAttr(self) -> str:
+		return "config"
 
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
@@ -91,6 +96,10 @@ class Entity:
 
 	@property
 	def isConfig(self) -> bool:
+		return self.element.isNestedSequence(self.configAttr)
+
+	@property
+	def isConfigRaw(self) -> bool:
 		return self.element.isNestedSequence("config")
 
 	@property
@@ -103,6 +112,10 @@ class Entity:
 
 	@property
 	def config(self) -> EntitySequence:
+		return self._getNestedByCategory(self.configAttr)
+
+	@property
+	def configRaw(self) -> EntitySequence:
 		return self._getNestedByCategory("config")
 
 	@property
@@ -131,7 +144,7 @@ class Entity:
 
 	@property
 	def contracts(self) -> Contracts:
-		return Contracts(element=self.element)
+		return Contracts(element=self.element, sequenceKind=self.contractAttr)
 
 	@property
 	def comment(self) -> typing.Optional[str]:
@@ -161,7 +174,7 @@ class Entity:
 		if self.underlyingType:
 			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
-				nestedKind="config",
+				nestedKind=underlyingType.configAttr,
 				filterFct=lambda entity: entity.contracts.has("template") and entity.contracts.has("type"))
 		return Parameters(element=self.element)
 
@@ -173,7 +186,7 @@ class Entity:
 		if self.underlyingType:
 			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
-				nestedKind="config",
+				nestedKind=underlyingType.configAttr,
 				filterFct=lambda entity: not (entity.contracts.has("template") and entity.contracts.has("type")))
 		return Parameters(element=self.element)
 
@@ -209,13 +222,32 @@ class Entity:
 		"""
 		return self.makeValidation(symbols=symbols, parameters=parameters, forTemplate=False)
 
-	def resolve(self,
+	def markAsResolved(self) -> None:
+		"""
+		Mark an entity as resolved.
+		"""
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("resolved", "1")
+
+	@property
+	def isResolved(self) -> bool:
+		return self.element.getAttrValue("resolved") == "1"
+
+	def resolveMemoized(self,
 		symbols: typing.Any,
 		namespace: typing.List[str],
 		exclude: typing.Optional[typing.List[str]] = None) -> None:
 		"""
 		Resolve the current symbol.
 		"""
+		if self.isResolved:
+			return
+		self.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.markAsResolved()
+
+	def resolve(self,
+		symbols: typing.Any,
+		namespace: typing.List[str],
+		exclude: typing.Optional[typing.List[str]] = None) -> None:
 		pass
 
 	def error(self, message: str, throw: bool = True) -> str:

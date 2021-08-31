@@ -94,7 +94,7 @@ def makeGrammarType(nextGrammar: Grammar) -> Grammar:
 	return grammar
 
 
-def makeGrammarContracts() -> Grammar:
+def makeGrammarContracts(name: str = "contract") -> Grammar:
 	"""
 	Generate a grammar for Contracts, it accepts the following format:
 	[Type1[(value1, value2, ...)], Type2[(value1, value2, ...)] ...]
@@ -103,7 +103,7 @@ def makeGrammarContracts() -> Grammar:
 	"""
 
 	class ContractStart(FragmentNestedStart):
-		nestedName = "contract"
+		nestedName = name
 
 	class ValuesStart(FragmentNestedStart):
 		nestedName = "values"
@@ -194,7 +194,8 @@ def makeGrammarMethod() -> Grammar:
 		GrammarItem(r"\)", FragmentParentElement)
 		]),
 		GrammarItem(r"->", Fragment,
-		[makeGrammarType([makeGrammarContracts(), GrammarItem(r";", FragmentNewElement)])]),
+		[makeGrammarType([makeGrammarContracts(name="contract_return"),
+		GrammarItem(r";", FragmentNewElement)])]),
 		GrammarItem(r";", FragmentNewElement)
 		])
 		])

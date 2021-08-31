@@ -20,7 +20,8 @@ class Type:
 		kind: str,
 		underlyingType: typing.Optional[str] = None,
 		template: typing.Optional[str] = None,
-		argumentTemplate: typing.Optional[str] = None) -> None:
+		argumentTemplate: typing.Optional[str] = None,
+		contract: typing.Optional[str] = None) -> None:
 
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
@@ -28,6 +29,7 @@ class Type:
 		self.underlyingTypeAttr = underlyingType
 		self.templateAttr = template
 		self.argumentTemplateAttr = argumentTemplate
+		self.contractAttr = contract
 
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
@@ -40,7 +42,7 @@ class Type:
 		"""
 		Output the dependency list for this type.
 		"""
-		dependencies = set(self.kind)
+		dependencies = {self.kind}
 		for params in self.templates:
 			dependencies.update(params.dependencies)
 
@@ -56,6 +58,7 @@ class Type:
 
 		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
 			attr=self.kindAttr)
+
 		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, fqn)
 
 		# Resolve the templates if available
@@ -64,6 +67,9 @@ class Type:
 
 		# Get and save the underlying type
 		underlying = self.getEntityResolved(symbols=symbols)
+		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
+		underlying.resolveMemoized(symbols=symbols, namespace=underlying.namespace, exclude=exclude)
+
 		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
 				underlying.underlyingType)
@@ -114,7 +120,7 @@ class Type:
 
 	@property
 	def contracts(self) -> Contracts:
-		return Contracts(element=self.element)
+		return Contracts(element=self.element, sequenceKind=self.contractAttr)
 
 	@property
 	def isTemplate(self) -> bool:

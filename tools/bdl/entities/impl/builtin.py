@@ -27,5 +27,13 @@ class Builtin(Entity):
 	def category(self) -> str:
 		return "builtin"
 
+	@property
+	def isFQN(self) -> bool:
+		return True
+
+	@property
+	def fqn(self) -> str:
+		return self.name
+
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

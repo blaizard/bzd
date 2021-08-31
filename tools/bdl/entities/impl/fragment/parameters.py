@@ -86,7 +86,7 @@ class ParametersCommon(typing.Generic[T]):
 	def __repr__(self) -> str:
 		content = []
 		for key, expression, metadata in self.itemsMetadata():
-			content.append("{}: {} {}".format(key, str(expression), str(metadata)))
+			content.append("{}: {} {}".format(key, str(expression.element), str(metadata)))
 		return "\n".join(content)
 
 
@@ -197,7 +197,7 @@ class Parameters(ParametersCommon[Metadata]):
         """
 
 		for parameter in self:
-			parameter.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			parameter.resolveMemoized(symbols=symbols, namespace=namespace, exclude=exclude)
 
 	def itemsValuesOrTypes(
 			self, symbols: "SymbolMap",
