@@ -49,12 +49,29 @@ class Entity:
 		return "config"
 
 	def getParents(self) -> typing.List[str]:
+		"""
+		Get the current entity direct parents.
+		"""
 		if self.element.isAttr("parents"):
 			return self.element.getAttr("parents").value.split(";")
 		return []
 
-	def addParents(self, fqn: str, parents: typing.List[str]) -> None:
-		updatedParents = {*self.getParents(), fqn, *parents}
+	def getUnderlyingTypeParents(self, symbols: "SymbolMap") -> typing.List[str]:
+		"""
+		Get the parents of the underlying type or the current entity if not present.
+		"""
+		if self.underlyingType is None:
+			return self.getParents()
+		return self.getEntityUnderlyingTypeResolved(symbols=symbols).getParents()
+
+	def addParents(self, fqn: typing.Optional[str], parents: typing.List[str]) -> None:
+		"""
+		Add parents to the current entity.
+		"""
+		if fqn is None:
+			updatedParents = {*self.getParents(), *parents}
+		else:
+			updatedParents = {*self.getParents(), fqn, *parents}
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("parents", ";".join(updatedParents))
 
 	@property

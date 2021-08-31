@@ -120,6 +120,15 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True))
 
+		with self.assertRaisesRegex(Exception, r"lower than"):
+			Object.fromContent(content="""
+				struct A { struct X { struct Y { a = Integer [min(13)]; }  } }
+				using B = A;
+				struct C : B {}
+				composition { a = C.X.Y(a = 12); }
+				""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testNamespaces(self) -> None:
 
 		Object.fromContent(content="""
