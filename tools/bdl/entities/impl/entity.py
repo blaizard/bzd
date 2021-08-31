@@ -48,6 +48,15 @@ class Entity:
 	def configAttr(self) -> str:
 		return "config"
 
+	def getParents(self) -> typing.List[str]:
+		if self.element.isAttr("parents"):
+			return self.element.getAttr("parents").value.split(";")
+		return []
+
+	def addParents(self, fqn: str, parents: typing.List[str]) -> None:
+		updatedParents = {*self.getParents(), fqn, *parents}
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("parents", ";".join(updatedParents))
+
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
 		"""

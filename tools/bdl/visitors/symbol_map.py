@@ -27,9 +27,8 @@ class SymbolMap:
 	 - bzd.Child: <nested>
 	                 <reference "bzd.Child.c">
 	 - bzd.Child.c: <expression "c">
-	 - bzd.Child.a: <reference "bzd.nested.Struct.a">
-	 - bzd.Child.b: <reference "bzd.nested.Struct.b">
 	 - _0~: <nested>                                  <- unamed top level element
+	 - 321332-323-3~: <expression>                    <- unamed composition expression
 	"""
 
 	def __init__(self) -> None:
@@ -130,25 +129,6 @@ class SymbolMap:
 		self.entities[fqn] = elementToEntity(element=element)
 
 		return fqn
-
-	def insertInheritance(self, fqn: str, fqnInheritance: str, category: str) -> None:
-		"""
-		Copy all nested references from the inheritance to the passed fqn.
-		"""
-		inheritance = self.getEntityResolved(fqn=fqnInheritance).value
-		namespaceInheritance = FQN.toNamespace(fqnInheritance)
-		namespace = FQN.toNamespace(fqn)
-		for nested in inheritance.nested:
-			if nested.isName:
-				fqnNested = FQN.fromNamespace(name=nested.name, namespace=namespaceInheritance)
-				fqnTarget = FQN.fromNamespace(name=nested.name, namespace=namespace)
-				# Can be already existant on multi overload.
-				if not self.contains(fqn=fqnTarget):
-					self.insert(name=nested.name,
-						namespace=namespace,
-						path=None,
-						element=self.makeReference(fqn=fqnNested),
-						category=category)
 
 	@staticmethod
 	def errorSymbolConflict_(element1: Element, element2: Element) -> None:
@@ -253,22 +233,43 @@ class SymbolMap:
 		Note, name can be a partial fqn.
 		"""
 		nameFirst = FQN.toNamespace(name)[0]
+		fqn: typing.Optional[str]
 
 		# Look for a symbol match of the first part of the name.
-		namespace = namespace.copy()
+		potentialNamespace = namespace.copy()
 		while True:
-			fqn = FQN.fromNamespace(name=nameFirst, namespace=namespace)
+			fqn = FQN.fromNamespace(name=nameFirst, namespace=potentialNamespace)
 			if self.contains(fqn=fqn, exclude=exclude):
 				break
-			if not namespace:
+			if not potentialNamespace:
 				return Result[str].makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(
 					name, ".".join(namespace)) if namespace else "Symbol '{}' could not be resolved.".format(name))
-			namespace.pop()
+			potentialNamespace.pop()
 
-		# If match, ensure that the rest of the name also matches with the namespace identified.
-		if name != nameFirst:
-			fqn = FQN.fromNamespace(name=name, namespace=namespace)
+		# Liist of matching FQNs
+		fqns: typing.List[str] = [fqn]
 
+		# Re-iterate the process with the next items
+		for nextName in FQN.toNamespace(name)[1:]:
+			entity = self.getEntityResolved(fqn=fqn).value
+			potentialNamespaceFQNs = [fqn]
+			# If it has an underlying type, add it to the list as well as its parents (if any).
+			if entity.underlyingType is not None:
+				potentialNamespaceFQNs += [entity.underlyingType
+											] + entity.getEntityUnderlyingTypeResolved(symbols=self).getParents()
+			# Check if there is any match.
+			fqn = None
+			for potentialNamespaceFQN in potentialNamespaceFQNs:
+				potentialFQN = FQN.fromNamespace(name=nextName, namespace=FQN.toNamespace(potentialNamespaceFQN))
+				if self.contains(fqn=potentialFQN, exclude=exclude):
+					fqn = potentialFQN
+					break
+			if fqn is None:
+				return Result[str].makeError("Symbol '{}' in namespace '{}' could not be resolved.".format(
+					name, ".".join(namespace)) if namespace else "Symbol '{}' could not be resolved.".format(name))
+			fqns.append(fqn)
+
+		# Return the final FQN.
 		return Result[str](fqn)
 
 	@staticmethod
