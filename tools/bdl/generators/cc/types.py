@@ -149,19 +149,25 @@ class _VisitorType(Visitor):
 		# Add arguments template to the nested mix.
 		nested += self.declareParametersResolvedValues(parameters)
 
-		fqn = entity.kind
+		outputList: typing.List[str] = []
 		output: str
-		if fqn in knownTypes:
-			if callable(knownTypes[fqn].transform):
-				output, nested = knownTypes[fqn].transform(entity, nested, self.isReference)
+		for index, fqn in enumerate(entity.kinds):
+			if fqn in knownTypes:
+				if callable(knownTypes[fqn].transform):
+					output, nested = knownTypes[fqn].transform(entity, nested, self.isReference)
+				else:
+					output = knownTypes[fqn].transform
 			else:
-				output = knownTypes[fqn].transform
-		else:
-			namespace = FQN.toNamespace(fqn)
-			if self.isUpdateNamespace:
-				assert self.updateNamespace is not None
-				namespace = self.updateNamespace(namespace)
-			output = "::".join(namespace)
+				namespace = FQN.toNamespace(fqn)
+				if index == 0:
+					if self.isUpdateNamespace:
+						assert self.updateNamespace is not None
+						namespace = self.updateNamespace(namespace)
+					output = "::".join(namespace)
+				else:
+					output = namespace[-1]
+			outputList.append(output)
+		output = ".".join(outputList)
 
 		# Apply the nested template if any
 		if nested:
@@ -183,8 +189,11 @@ class _VisitorType(Visitor):
 		return output
 
 
-def typeToStr(entity: typing.Optional[Type], adapter: bool = False, reference: bool = False,
-	definition: bool = False) -> str:
+def typeToStr(entity: typing.Optional[Type],
+	adapter: bool = False,
+	reference: bool = False,
+	definition: bool = False,
+	registry: bool = False) -> str:
 	"""
 	Convert a type object into a C++ string.
 	Args:
@@ -192,10 +201,15 @@ def typeToStr(entity: typing.Optional[Type], adapter: bool = False, reference: b
 		adapter: If the type should be converted into its adapter.
 		reference: If the entity is passed as reference.
 		definition: The type is used for a variable definition.
+		registry: Used from the registry.
 	"""
 
 	if entity is None:
 		return "void"
 	updateNamespace = (lambda x: x[0:-1] + ["adapter"] + x[-1:]) if adapter else None
+
+	if registry:
+		updateNamespace = lambda x: [fqnToNameStr(FQN.fromNamespace(namespace=x)) + "_"]
+
 	return _VisitorType(entity=entity, updateNamespace=updateNamespace, reference=reference,
 		definition=definition).result

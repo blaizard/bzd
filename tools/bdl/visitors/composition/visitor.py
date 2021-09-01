@@ -17,6 +17,7 @@ class Composition:
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
 		self.compositions: typing.List[Expression] = []
+		self.executors: typing.Set[str] = set()
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -80,9 +81,12 @@ class Composition:
 			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
 
 		# resolve the un-named
+		self.executors = set()
 		for fqn, entity in self.symbols.items(categories=categories):
 			if entity.isName:
 				continue
-			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+			assert isinstance(entity, Expression)
 
-			self.compositions.append(entity)  # type: ignore
+			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+			self.executors.add(entity.executor)
+			self.compositions.append(entity)

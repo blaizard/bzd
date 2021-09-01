@@ -56,10 +56,10 @@ class Type:
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
 
-		fqn = symbols.resolveFQN(name=self.kind, namespace=namespace, exclude=exclude).assertValue(element=self.element,
-			attr=self.kindAttr)
+		fqns = symbols.resolveFQN(name=self.kind, namespace=namespace,
+			exclude=exclude).assertValue(element=self.element, attr=self.kindAttr)
 
-		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, fqn)
+		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
 
 		# Resolve the templates if available
 		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
@@ -132,7 +132,11 @@ class Type:
 
 	@property
 	def kind(self) -> str:
-		return self.element.getAttr(self.kindAttr).value
+		return self.kinds[-1]
+
+	@property
+	def kinds(self) -> typing.List[str]:
+		return self.element.getAttr(self.kindAttr).value.split(";")
 
 	@property
 	def comment(self) -> typing.Optional[str]:
