@@ -44,6 +44,15 @@ class Expression(Entity):
 		return "expression"
 
 	@property
+	def executor(self) -> str:
+		maybeContract = self.contracts.get("executor")
+		if maybeContract is not None:
+			maybeExecutor = maybeContract.value
+			if maybeExecutor is not None:
+				return maybeExecutor
+		return "executor"
+
+	@property
 	def const(self) -> bool:
 		return self.element.isAttr("const")
 

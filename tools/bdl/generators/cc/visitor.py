@@ -58,11 +58,16 @@ def typeDefinitionToStr(entity: Type) -> str:
 	return typeToStr(entity=entity, definition=True)
 
 
+def typeRegistryToStr(entity: Type) -> str:
+	return typeToStr(entity=entity, registry=True)
+
+
 transforms = {
 	"toCamelCase": toCamelCase,
 	"typeToStr": typeToStr,
 	"typeReferenceToStr": typeReferenceToStr,
 	"typeDefinitionToStr": typeDefinitionToStr,
+	"typeRegistryToStr": typeRegistryToStr,
 	"namespaceToStr": namespaceToStr,
 	"commentBlockToStr": commentBlockToStr,
 	"commentEmbeddedToStr": commentEmbeddedToStr,

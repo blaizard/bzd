@@ -37,8 +37,19 @@ void init() noexcept
 	[[maybe_unused]] auto& registry = getOrMakeRegistry();
 
 	// Compose
-	{% for expresssion in compositions %}
-	registry.{{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
+	{% for index, expresssion in compositions %}
+	auto promise{{ index }} = registry.{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} );
+	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
+	{% end %}
+
+	// Execute
+	{% for executor in executors %}
+	registry.{{ executor | fqnToNameStr }}_.start();
+	{% end %}
+
+	// Wait until completion
+	{% for executor in executors %}
+	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
 }
 

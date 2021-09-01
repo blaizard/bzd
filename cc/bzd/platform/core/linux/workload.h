@@ -5,4 +5,5 @@
 bzd::Async<int> worload(int var)
 {
 	std::cout << "Number: " << var << std::endl;
+	co_return var;
 }
