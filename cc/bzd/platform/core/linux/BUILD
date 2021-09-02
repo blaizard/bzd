@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 
@@ -32,21 +32,8 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "main",
-    srcs = [
-        "main.cc",
-        "pi.h",
-    ],
-    deps = [
-        ":linux",
-        "//cc/bzd/core:async",
-        "//cc/bzd/core:delay",
-    ],
-)
-
 bzd_cc_binary(
-    name = "app",
+    name = "main",
     srcs = [
         "main.cc",
         "pi.h",

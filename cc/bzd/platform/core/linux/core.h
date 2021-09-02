@@ -24,12 +24,12 @@ private:
 	using Error = typename Parent::Error;
 
 public:
-	explicit Core(const CoreId coreId, const float) noexcept : id_{coreId} {}
+	explicit Core(const CoreId, const float) noexcept {}
 
 	Result<void, Error> stop() noexcept
 	{
 		{
-			const auto result = pthread_join(thread_, nullptr);
+			const auto result = ::pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
 				return bzd::makeError(Error::OTHER);
@@ -37,7 +37,7 @@ public:
 		}
 
 		{
-			const auto result = pthread_attr_destroy(&attr_);
+			const auto result = ::pthread_attr_destroy(&attr_);
 			if (result != 0)
 			{
 				return bzd::makeError(Error::OTHER);
@@ -49,21 +49,15 @@ public:
 
 	bzd::Result<void, Error> start(Callable workload) noexcept
 	{
-		const auto nbCores = sysconf(_SC_NPROCESSORS_ONLN);
-		if (id_ >= nbCores)
-		{
-			return bzd::makeError(Error::OTHER);
-		}
-
 		stack_.taint();
 
-		if (pthread_attr_init(&attr_) == -1)
+		if (::pthread_attr_init(&attr_) == -1)
 		{
 			return bzd::makeError(Error::OTHER);
 		}
 
 		{
-			const auto result = pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
+			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
 				return bzd::makeError(Error::OTHER);
@@ -73,7 +67,7 @@ public:
 		workload_ = workload;
 
 		{
-			const auto result = pthread_create(&thread_, &attr_, &workloadWrapper, this);
+			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
 				return bzd::makeError(Error::OTHER);
@@ -106,21 +100,12 @@ public:
 
 	void getUsage() noexcept {}
 
-	CoreId getId() noexcept { return id_; }
+	CoreId getId() noexcept { return 0; }
 
 private:
 	static void* workloadWrapper(void* object)
 	{
 		auto linux = reinterpret_cast<Self*>(object);
-
-		// Set CPU affinity
-		{
-			cpu_set_t cpuset;
-			CPU_ZERO(&cpuset);
-			CPU_SET(linux->id_, &cpuset);
-			sched_setaffinity(/*current thread*/ 0, sizeof(cpu_set_t), &cpuset);
-		}
-
 		auto& workload = linux->workload_.value();
 		std::cout << "Workload Wrapper Enter" << std::endl;
 		workload();
@@ -131,7 +116,6 @@ private:
 private:
 	Stack<N> stack_{};
 	bzd::Optional<Callable> workload_;
-	CoreId id_;
 	pthread_attr_t attr_;
 	pthread_t thread_;
 };
