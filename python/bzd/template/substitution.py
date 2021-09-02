@@ -35,9 +35,6 @@ class SubstitutionWrapper:
 		self.ext: typing.Dict[str, typing.List[typing.Any]] = {}
 
 	def register(self, element: Element, key: str, value: typing.Any) -> None:
-		Error.assertTrue(element=element,
-			condition=(not self.isInSubstitutions(key)),
-			message="Name conflict, '{}' already exists in the substitution map.".format(key))
 		if key not in self.ext:
 			self.ext[key] = []
 		self.ext[key].append(value)
@@ -57,17 +54,9 @@ class SubstitutionWrapper:
 				self.ext[key].append(value[-1])
 
 	def __getitem__(self, key: str) -> typing.Any:
-		if hasattr(self.substitutions, key):
-			return getattr(self.substitutions, key)
-		elif key in self.substitutions:
-			return self.substitutions[key]
-		return self.ext[key][-1]
-
-	def isInSubstitutions(self, key: str) -> bool:
-		"""
-		If the element is in the original subsitution map.
-		"""
-		return hasattr(self.substitutions, key) or key in self.substitutions
+		if self.ext.get(key):
+			return self.ext[key][-1]
+		return self.substitutions[key]
 
 	def __contains__(self, key: str) -> bool:
-		return self.isInSubstitutions(key) or key in self.ext
+		return key in self.substitutions or key in self.ext
