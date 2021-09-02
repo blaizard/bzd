@@ -23,7 +23,7 @@
 {%- macro declareExpression(element, prepend, reference) -%}
 	{{ element.comment | commentEmbeddedToStr }}
 	{%- if element.isType -%}
-	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved) -}} }{% end %}
+	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -41,16 +41,20 @@
 {%- end -%}
 
 {#- Parameters values -#}
-{%- macro declareParametersResolvedValues(parameters) -%}
+{%- macro declareParametersResolvedValues(parameters, registry) -%}
 	{%- for i, expression in parameters %}{% if i %}, {% end -%}
 		{{- expression | commentParametersResolvedToStr -}}
 		{%- if expression.isType -%}
 			{%- if expression.isName -%}
 				{# On values there must be a FQN available. #}
-				{{- expression.fqnToType | typeToStr -}}
+				{%- if registry -%}
+					{{- expression.fqnToType | typeRegistryToStr -}}
+				{%- else -%}
+					{{- expression.fqnToType | typeToStr -}}
+				{%- end -%}
 			{%- else -%}
 				{# Object instanciation. #}
-				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression.parametersResolved) -}} }
+				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression.parametersResolved, registry) -}} }
 			{%- end -%}
 		{%- else -%}
 			{# Literal. #}

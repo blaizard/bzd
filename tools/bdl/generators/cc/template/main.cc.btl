@@ -14,7 +14,7 @@
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
-	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} };
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved, false) -}} };
 	{% end %}
 
 	// Declaration of the registry.
@@ -40,7 +40,7 @@ void execute() noexcept
 
 	// Compose.
 	{% for index, expresssion in compositions %}
-	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} );
+	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}
 
