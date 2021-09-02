@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 from tools.bdl.visitor import CATEGORY_COMPOSITION
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.object import Object
+from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.fragment.fqn import FQN
 
@@ -49,13 +50,9 @@ class Composition:
 			resolved.append(fqn)
 		unresolved.remove(fqn)
 
-	def process(self) -> None:
-
-		categories = {CATEGORY_COMPOSITION}
-
-		# Make the dependency graph
+	def orderDependencies(self, entities: typing.Iterator[typing.Tuple[str, Entity]]) -> typing.List[str]:
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
-		for fqn, entity in self.symbols.items(categories=categories):
+		for fqn, entity in entities:
 
 			# Unamed entries should be dealt with later.
 			if not entity.isName:
@@ -74,6 +71,15 @@ class Composition:
 		orderFQNs: typing.List[str] = []
 		for fqn in dependencies.keys():
 			self.resolveDependency(dependencies, fqn, orderFQNs)
+
+		return orderFQNs
+
+	def process(self) -> None:
+
+		categories = {CATEGORY_COMPOSITION}
+
+		# Make the dependency graph
+		orderFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
 		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs]  # type: ignore
 
 		# Resolve the Registry and then the un-named
@@ -82,11 +88,15 @@ class Composition:
 
 		# resolve the un-named
 		self.executors = set()
-		for fqn, entity in self.symbols.items(categories=categories):
+		for fqn, entity in self.symbols.items(categories=categories):  # type: ignore
 			if entity.isName:
 				continue
 			assert isinstance(entity, Expression)
 
 			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
-			self.executors.add(entity.executor)
+
+			# Update any variables if part of the registry
 			self.compositions.append(entity)
+
+			# Update the executor list
+			self.executors.add(entity.executor)
