@@ -117,7 +117,7 @@ void payload(bzd::core::Executor& executor)
 }
 */
 
-int main()
+int masin()
 {
 	auto& registry = Registry();
 

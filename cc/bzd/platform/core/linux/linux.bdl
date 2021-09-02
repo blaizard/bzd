@@ -6,8 +6,12 @@ namespace bzd.platform.linux;
 component Core : bzd.platform.Core {
 	
 config:
-	// Stack size for the current core.
-	stackSize = StackSize(10000) [template];
+	/*
+	 * Stack size for the current core.
+	 * 
+	 * Must be at least PTHREAD_STACK_MIN (16384) bytes.
+	 */
+	stackSize = StackSize(16384) [template min(16384)];
 	priority = Integer(0) [min(0) max(100)];
 	name = Float(3.124) [min(0) max(100)];
 	

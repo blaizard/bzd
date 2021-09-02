@@ -57,6 +57,13 @@ void execute() noexcept
 
 // Deployment part
 
+int main()
+{
+	execute();
+
+	return 0;
+}
+
 /*
 { deployment.main.declaration }
 
