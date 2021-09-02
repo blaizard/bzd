@@ -2,6 +2,7 @@ import typing
 
 from bzd.parser.error import Error
 
+from tools.bdl.entities.all import Expression
 from tools.bdl.entities.impl.fragment.type import Type, Visitor
 from tools.bdl.entities.impl.fragment.parameters import ResolvedParameters
 from tools.bdl.entities.impl.fragment.fqn import FQN
@@ -96,9 +97,9 @@ class _VisitorType(Visitor):
 	Visitor to print a type.
 	"""
 
-	def __init__(self, entity: Type, updateNamespace: typing.Optional[typing.Callable[[typing.List[str]],
-		typing.List[str]]], reference: bool, definition: bool) -> None:
-		self.updateNamespace = updateNamespace
+	def __init__(self, entity: Type, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
+		reference: bool, definition: bool) -> None:
+		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition
 		super().__init__(entity)
@@ -108,8 +109,8 @@ class _VisitorType(Visitor):
 		return self.isTopLevel and self.reference
 
 	@property
-	def isUpdateNamespace(self) -> bool:
-		return self.isTopLevel and self.updateNamespace is not None
+	def isNamespaceToFQN(self) -> bool:
+		return self.isTopLevel and self.namespaceToFQN is not None
 
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
 
@@ -160,10 +161,11 @@ class _VisitorType(Visitor):
 			else:
 				namespace = FQN.toNamespace(fqn)
 				if index == 0:
-					if self.isUpdateNamespace:
-						assert self.updateNamespace is not None
-						namespace = self.updateNamespace(namespace)
-					output = "::".join(namespace)
+					if self.isNamespaceToFQN:
+						assert self.namespaceToFQN is not None
+						output = self.namespaceToFQN(namespace)
+					else:
+						output = "::".join(namespace)
 				else:
 					output = namespace[-1]
 			outputList.append(output)
@@ -193,7 +195,7 @@ def typeToStr(entity: typing.Optional[Type],
 	adapter: bool = False,
 	reference: bool = False,
 	definition: bool = False,
-	registry: bool = False) -> str:
+	registry: typing.Optional[typing.Sequence[str]] = None) -> str:
 	"""
 	Convert a type object into a C++ string.
 	Args:
@@ -201,15 +203,25 @@ def typeToStr(entity: typing.Optional[Type],
 		adapter: If the type should be converted into its adapter.
 		reference: If the entity is passed as reference.
 		definition: The type is used for a variable definition.
-		registry: Used from the registry.
+		registry: FQNs that matches a registry entry.
 	"""
 
 	if entity is None:
 		return "void"
-	updateNamespace = (lambda x: x[0:-1] + ["adapter"] + x[-1:]) if adapter else None
 
-	if registry:
-		updateNamespace = lambda x: [fqnToNameStr(FQN.fromNamespace(namespace=x)) + "_"]
+	namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]] = None
+	if adapter:
 
-	return _VisitorType(entity=entity, updateNamespace=updateNamespace, reference=reference,
-		definition=definition).result
+		def namespaceToFQN(namespace: typing.List[str]) -> str:
+			return "::".join(namespace[0:-1] + ["adapter"] + namespace[-1:])
+
+	elif registry is not None:
+
+		def namespaceToFQN(namespace: typing.List[str]) -> str:
+			fqn = FQN.fromNamespace(namespace=namespace)
+			assert registry is not None
+			if fqn in registry:
+				return "registry.{}_".format(fqnToNameStr(fqn))
+			return "::".join(namespace)
+
+	return _VisitorType(entity=entity, namespaceToFQN=namespaceToFQN, reference=reference, definition=definition).result

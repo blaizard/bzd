@@ -9,6 +9,7 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 from tools.bdl.entities.impl.fragment.sequence import EntitySequence
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.impl.fragment.type import Type
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -191,6 +192,10 @@ class Entity:
 	@property
 	def fqn(self) -> str:
 		return self.element.getAttr("fqn").value
+
+	@property
+	def fqnToType(self) -> Type:
+		return Type(element=self.element, kind="fqn")
 
 	def getConfigTemplateTypes(self, symbols: typing.Any) -> Parameters:
 		"""

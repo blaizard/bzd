@@ -14,8 +14,9 @@ composition {
 	
 }
 
+method worload(var = Integer) -> Integer;
 composition Hello {
-	executor.start;
+	worload(var = 12);
 	
 }
 

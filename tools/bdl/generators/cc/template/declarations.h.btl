@@ -47,7 +47,7 @@
 		{%- if expression.isType -%}
 			{%- if expression.isName -%}
 				{# On values there must be a FQN available. #}
-				{{- expression.fqn | fqnToNameStr -}}
+				{{- expression.fqnToType | typeToStr -}}
 			{%- else -%}
 				{# Object instanciation. #}
 				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression.parametersResolved) -}} }

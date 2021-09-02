@@ -5,10 +5,12 @@
 #include "{{ path }}"
 {% end %}
 
+// for deploy in deployments
+
 /**
  * Auto-generated application registry.
  */
-[[nodiscard]] auto& getOrMakeRegistry() noexcept
+[[nodiscard]] auto getOrMakeRegistry() noexcept
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
@@ -22,41 +24,54 @@
 		decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-
-	// Definition of the registry.
-	static Registry registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
-
-	return registry;
+	return Registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
 }
 
 /**
  * Initialize and compose the application.
  */
-void init() noexcept
+void execute() noexcept
 {
-	[[maybe_unused]] auto& registry = getOrMakeRegistry();
+	// Create registry.
+	[[maybe_unused]] auto registry = getOrMakeRegistry();
 
-	// Compose
+	// Initialize.
+	// TODO: implementation.
+
+	// Compose.
 	{% for index, expresssion in compositions %}
-	auto promise{{ index }} = registry.{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} );
+	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}
 
-	// Execute
+	// Execute.
 	{% for executor in executors %}
 	registry.{{ executor | fqnToNameStr }}_.start();
 	{% end %}
 
-	// Wait until completion
+	// Wait until completion.
 	{% for executor in executors %}
 	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
 }
 
+// Deployment part
+
 /*
+{ deployment.main.declaration }
+
 int main()
 {
-	init();
+	{ deploy.main.execution }
+
+	return 0;
+}
+
+{ deployment.core2.declaration }
+
+int main2()
+{
+	{ deploy.core2.execution }
 
 	return 0;
 }
