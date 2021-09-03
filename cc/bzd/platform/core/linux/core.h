@@ -83,7 +83,7 @@ public:
 	{
 		// Get the clock_id associated to the current thread.
 		clockid_t clockId;
-		pthread_getcpuclockid(thread_, &clockId);
+		::pthread_getcpuclockid(thread_, &clockId);
 
 		struct timespec ts;
 		if (::clock_gettime(clockId, &ts))

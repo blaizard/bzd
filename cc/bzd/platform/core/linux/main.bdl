@@ -10,7 +10,7 @@ composition {
 	defaultStackSize = bzd.platform.StackSize(100000);
 	core1 = bzd.platform.linux.Core(name = 32.3, priority = 0);
 	core2 = bzd.platform.linux.Core(priority = 1, stackSize = defaultStackSize);
-	executor = bzd.platform.linux.Executor(core1, core2);
+	executor = bzd.platform.generic.Executor(core1, core2);
 	
 }
 

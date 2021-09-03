@@ -5,7 +5,7 @@ namespace bzd.platform;
 using StackSize = Integer [min(100) max(8000000)];
 // Type describing the identifier of a core.
 using CoreId = Integer [min(0) max(64)];
-// A core is a processing unit that accepts a single scheduler.
+// A logical core is a processing unit that accepts a single scheduler.
 interface Core {
 	// Error codes for core-related functionality.
 	enum Error
@@ -25,13 +25,6 @@ interface Core {
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
 	method getId() -> CoreId;
-	
-}
-
-interface Executor {
-	// Start the executor and starts all cores previously initialized.
-	method start();
-	method stop();
 	
 }
 

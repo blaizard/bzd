@@ -1,0 +1,19 @@
+use "cc/bzd/platform/executor.bdl"
+use "cc/bzd/platform/core.bdl"
+
+namespace bzd.platform.generic;
+
+/*
+ * Generic executor that takes all cores as argument
+ * 
+ * and simply execute them.
+ */
+component Executor : bzd.platform.Executor {
+	
+config:
+	// The cores to be used by this executor.
+	 ... = Core;
+	
+}
+
+

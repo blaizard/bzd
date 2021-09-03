@@ -1,8 +1,8 @@
 #include "cc/bzd/core/delay.h"
 #include "cc/bzd/core/executor.h"
 #include "cc/bzd/platform/core/linux/core.h"
-#include "cc/bzd/platform/core/linux/executor.h"
 #include "cc/bzd/platform/core/linux/pi.h"
+#include "cc/bzd/platform/generic/executor.h"
 
 #include <iostream>
 
@@ -11,7 +11,7 @@ auto& Registry()
 	// Definition for all registry entries.
 	static bzd::platform::linux::Core<100000> bzd_linux0{0, 0};
 	static bzd::platform::linux::Core<100000> bzd_linux1{1, 0};
-	static bzd::platform::linux::Executor executor{bzd_linux0, bzd_linux1};
+	static bzd::platform::generic::Executor executor{bzd_linux0, bzd_linux1};
 
 	// Registry structure containing a reference of all entries.
 	struct Registry

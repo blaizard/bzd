@@ -17,6 +17,7 @@ class Composition:
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
+		self.registryFQNs: typing.Set[str] = set()
 		self.compositions: typing.List[Expression] = []
 		self.executors: typing.Set[str] = set()
 
@@ -79,8 +80,9 @@ class Composition:
 		categories = {CATEGORY_COMPOSITION}
 
 		# Make the dependency graph
-		orderFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
-		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderFQNs]  # type: ignore
+		orderedFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
+		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs]  # type: ignore
+		self.registryFQNs = set(orderedFQNs)
 
 		# Resolve the Registry and then the un-named
 		for entity in self.registry:
@@ -100,3 +102,8 @@ class Composition:
 
 			# Update the executor list
 			self.executors.add(entity.executor)
+
+		# Ensure all executors are declared.
+		executorsIntersection = self.executors.intersection(self.registryFQNs)
+		assert executorsIntersection == self.executors, "Some executors are used but not declared: {}".format(", ".join(
+			self.executors.difference(executorsIntersection)))

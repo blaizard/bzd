@@ -9,6 +9,14 @@ bdl_library(
     visibility = ["//visibility:public"],
 )
 
+bdl_library(
+    name = "executor",
+    srcs = [
+        "executor.bdl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "platform",
     srcs = [
