@@ -1,0 +1,17 @@
+
+namespace bzd;
+
+interface Logger {
+	enum Level
+	{
+		CRITICAL
+	,	ERROR
+	,	WARNING
+	,	INFO
+	,	DEBUG
+	}
+	
+	
+}
+
+
