@@ -18,7 +18,6 @@ cc_library(
     name = "linux",
     hdrs = [
         "core.h",
-        "executor.h",
         "workload.h",
     ],
     linkopts = [
@@ -28,6 +27,7 @@ cc_library(
         ":bdl",
         "//cc/bzd/container:optional",
         "//cc/bzd/platform/core:stack",
+        "//cc/bzd/platform/generic/executor",
         "//cc/bzd/utility:constexpr_for",
     ],
 )
@@ -35,7 +35,6 @@ cc_library(
 bzd_cc_binary(
     name = "main",
     srcs = [
-        "main.cc",
         "pi.h",
     ],
     tags = ["manual"],
