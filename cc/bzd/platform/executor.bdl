@@ -5,7 +5,6 @@ namespace bzd.platform;
 interface Executor {
 	/*
 	 * Start the executor and starts all cores previously initialized.
-	 * 
 	 * This function might return or not, depending on the implementation.
 	 */
 	method start();

@@ -3,7 +3,6 @@ use "cc/bzd/platform/core/linux/linux.bdl"
 
 /*
  * method Hell(var = Integer) -> Integer;
- * 
  * ds = Hell(var = executor.a);
  */
 composition {

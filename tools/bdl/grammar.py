@@ -27,7 +27,7 @@ class FragmentBlockComment(FragmentComment):
 
 	def process(self) -> None:
 		assert "comment" in self.attrs, "Missing comment attribute."
-		self.attrs["comment"] = re.sub(re.compile("^\ {0,2}\*+", re.MULTILINE), "", self.attrs["comment"])
+		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 
 
 def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:

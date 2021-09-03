@@ -7,9 +7,8 @@ component Core : bzd.platform.Core {
 	
 config:
 	/*
-	 * 	 * Stack size for the current core.
-	 * 	 *
-	 * 	 * Must be at least PTHREAD_STACK_MIN (16384) bytes.
+	 * Stack size for the current core.
+	 * Must be at least PTHREAD_STACK_MIN (16384) bytes.
 	 */
 	stackSize = StackSize(16384) [template min(16384)];
 	priority = Integer(0) [min(0) max(100)];

@@ -1,4 +1,5 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 cc_library(
     name = "core",
@@ -11,6 +12,13 @@ cc_library(
         ":log",
         ":registry",
         ":units",
+    ],
+)
+
+bdl_library(
+    name = "logger",
+    srcs = [
+        "logger.bdl",
     ],
 )
 
