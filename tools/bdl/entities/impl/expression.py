@@ -117,8 +117,10 @@ class Expression(Entity):
 		dependencies = set()
 		if self.isType:
 			dependencies.update(self.type.dependencies)
-		for params in self.parameters:
-			dependencies.update(params.dependencies)
+		if self.isParameters:
+			assert self.parameters is not None
+			for params in self.parameters:
+				dependencies.update(params.dependencies)
 
 		return dependencies
 
@@ -135,7 +137,7 @@ class Expression(Entity):
 		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
 
 		# Set the underlying value
-		if bool(self.parameters):
+		if self.isParameters:
 
 			# The type must represent a type (not a value) and have a valid FQN.
 			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
@@ -146,26 +148,36 @@ class Expression(Entity):
 		else:
 			self._setUnderlyingValue(entity=entity)
 
-		# Generate the argument list
-		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		# Generate the argument list and resolve it
+		if self.isParameters:
+			parameters = self.parameters
+			assert parameters is not None
+			parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		else:
+			parameters = Parameters(element=self.element)
+
+		# Merge its default values
 		defaults = self.getConfigValues(symbols=symbols)
-		self.parameters.mergeDefaults(defaults)
+		parameters.mergeDefaults(defaults)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
 		validation = self._makeValueValidation(symbols=symbols, parameters=defaults, contracts=self.contracts)
 		if validation is not None:
-			arguments = self.parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+			arguments = parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
-		argumentValues = self.parameters.copy(template=False)
-		sequence = argumentValues.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
+		argumentValues = parameters.copy(template=False)
+		sequence = argumentValues.toResolvedSequence(symbols=symbols, exclude=exclude, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
 
-		argumentTemplates = self.parameters.copy(template=True)
-		sequence = argumentTemplates.toResolvedSequence(symbols=symbols, exclude=exclude, onlyValues=True)
+		argumentTemplates = parameters.copy(template=True)
+		sequence = argumentTemplates.toResolvedSequence(symbols=symbols,
+			exclude=exclude,
+			varArgs=False,
+			onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
 	def _makeValueValidation(self, symbols: typing.Any, parameters: Parameters,
@@ -199,8 +211,19 @@ class Expression(Entity):
 		return Validation(schema={}, args={"symbols": symbols})
 
 	@cached_property
-	def parameters(self) -> Parameters:
-		return Parameters(element=self.element, nestedKind="argument")
+	def isParameters(self) -> bool:
+		return self.element.isNestedSequence("argument")
+
+	@cached_property
+	def parameters(self) -> typing.Optional[Parameters]:
+		"""
+		Return the Parameters object if there are parameters. In case the expression
+		is declared with empty parenthesis the Parameters object will be empty.
+		In case the expression is defined without parenthesis, it returns None.
+		"""
+		if self.isParameters:
+			return Parameters(element=self.element, nestedKind="argument")
+		return None
 
 	@cached_property
 	def parametersResolved(self) -> ResolvedParameters:

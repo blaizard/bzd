@@ -86,7 +86,7 @@ class Type:
 			templates.mergeDefaults(configTypes)
 
 			# Validate the template arguments
-			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude)
+			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude, varArgs=False)
 			validation = underlying.makeValidationForTemplate(symbols=symbols, parameters=configTypes)
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
@@ -96,7 +96,7 @@ class Type:
 				message=str(resultValidate))
 
 			# Save the resolved template only after the validation is completed.
-			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude, onlyTypes=True)
+			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude, varArgs=False, onlyTypes=True)
 			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
 				sequence)
 

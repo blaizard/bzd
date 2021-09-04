@@ -272,6 +272,13 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
+		# Value with no argument
+		Object.fromContent(content="""
+				interface Test { config: a = List<Integer>(); }
+				composition { val1 = Test(); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testTemplates(self) -> None:
 
 		# Mandatory template.
