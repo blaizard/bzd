@@ -199,9 +199,8 @@ class Parameters(ParametersCommon[Metadata]):
 		for parameter in self:
 			parameter.resolveMemoized(symbols=symbols, namespace=namespace, exclude=exclude)
 
-	def itemsValuesOrTypes(
-			self, symbols: "SymbolMap",
-			exclude: typing.Optional[typing.List[str]]) -> typing.List[typing.Tuple[str, ResolvedType, Metadata]]:
+	def itemsValuesOrTypes(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]],
+		varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType, Metadata]]:
 		"""
         Iterate through the list and return values or types.
         """
@@ -209,6 +208,9 @@ class Parameters(ParametersCommon[Metadata]):
 		values: typing.List[typing.Tuple[str, ResolvedType, Metadata]] = []
 
 		for key, expression, metadata in self.itemsMetadata():
+
+			if expression.isVarArgs and not varArgs:
+				continue
 
 			if expression.literal is not None:
 				values.append((key, expression.literal, metadata))
@@ -236,17 +238,18 @@ class Parameters(ParametersCommon[Metadata]):
 
 		return values
 
-	def getValuesOrTypesAsDict(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]]) -> typing.Dict[
-		str, ResolvedType]:
+	def getValuesOrTypesAsDict(self, symbols: "SymbolMap", exclude: typing.Optional[typing.List[str]],
+		varArgs: bool) -> typing.Dict[str, ResolvedType]:
 		"""
         Get the values as a dictionary.
         """
-		values = self.itemsValuesOrTypes(symbols=symbols, exclude=exclude)
+		values = self.itemsValuesOrTypes(symbols=symbols, exclude=exclude, varArgs=varArgs)
 		return {entry[0]: entry[1] for entry in values}
 
 	def toResolvedSequence(self,
 		symbols: "SymbolMap",
 		exclude: typing.Optional[typing.List[str]],
+		varArgs: bool,
 		onlyTypes: bool = False,
 		onlyValues: bool = False) -> Sequence:
 		"""
@@ -255,7 +258,7 @@ class Parameters(ParametersCommon[Metadata]):
 		"""
 		sequence = SequenceBuilder()
 
-		entries = self.itemsValuesOrTypes(symbols=symbols, exclude=exclude)
+		entries = self.itemsValuesOrTypes(symbols=symbols, exclude=exclude, varArgs=varArgs)
 		if self.isNamed:
 			entries = sorted(entries, key=lambda k: k[2].order)
 

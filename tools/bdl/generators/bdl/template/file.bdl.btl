@@ -36,7 +36,7 @@ composition:
 {% end -%}
 
 {%- macro declareExpression(data) -%}
-	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }} = {% elif data.isVarArgs %} ... = {% end %}{% if data.const %}const {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.type | typeToStr }}{% if data.parameters.size > 0 %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
+	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }} = {% elif data.isVarArgs %} ... = {% end %}{% if data.const %}const {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.type | typeToStr }}{% if data.isParameters %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
 {%- end -%}
 
 {%- macro printParameters(parameters) -%}

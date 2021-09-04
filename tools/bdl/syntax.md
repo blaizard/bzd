@@ -1,5 +1,17 @@
 # BDL Syntax
 
+## Builtins
+
+| Name           | Description                                     |
+| -------------- | ----------------------------------------------- |
+| `Void`         | Represents an empty value.                      |
+| `Integer`      | Any integer value, positive or negative.        |
+| `Float`        | Any floating point value, positive or negative. |
+| `Boolean`      |                                                 |
+| `Byte`         | An 8-bit integer value.                         |
+| `List<T>`      | An owning.                                      |
+| `Result<V, E>` |                                                 |
+
 ## Contracts
 
 ### integer
@@ -12,8 +24,8 @@ ex: `[integer]`
 
 Must be named.
 
-Accepts only `config` nested elements, from which only `expressions` are allowed.
-Components defines the set of input the constructor takes.
+Accepts only `config` nested elements, from which only `expression`(s) are allowed.
+Components define the set of input the constructor takes.
 
 3 kinds of expressions can be defined:
 
@@ -38,4 +50,4 @@ composition
 }
 ```
 
-This element will be trnaslated in C++ to `MyComponent<AType, 23>{3.14}`
+This element will be translated in C++ to `MyComponent<AType, 23>{3.14}`
