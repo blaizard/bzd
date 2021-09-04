@@ -44,7 +44,8 @@ class Method(Entity):
 			kind="type",
 			underlyingType="fqn_return_type",
 			template="template",
-			contract="contract_return") if self.isType else None
+			contract="contract_return",
+			const="const") if self.isType else None
 
 	def resolve(self,
 		symbols: typing.Any,

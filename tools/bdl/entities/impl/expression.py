@@ -54,7 +54,7 @@ class Expression(Entity):
 
 	@property
 	def const(self) -> bool:
-		return self.element.isAttr("const")
+		return self.type.const
 
 	@property
 	def isName(self) -> bool:
@@ -70,7 +70,7 @@ class Expression(Entity):
 
 	@cached_property
 	def type(self) -> Type:
-		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template")
+		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template", const="const")
 
 	@cached_property
 	def typeResolved(self) -> Type:
@@ -78,7 +78,8 @@ class Expression(Entity):
 			kind="type",
 			underlyingType="fqn_type",
 			template="template_resolved",
-			argumentTemplate="argument_template_resolved")
+			argumentTemplate="argument_template_resolved",
+			const="const")
 
 	@property
 	def isValue(self) -> bool:

@@ -33,7 +33,7 @@ class Using(Entity):
 
 	@cached_property
 	def type(self) -> Type:
-		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template")
+		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template", const="const")
 
 	def resolve(self,
 		symbols: typing.Any,

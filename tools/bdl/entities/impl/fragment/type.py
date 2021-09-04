@@ -21,7 +21,8 @@ class Type:
 		underlyingType: typing.Optional[str] = None,
 		template: typing.Optional[str] = None,
 		argumentTemplate: typing.Optional[str] = None,
-		contract: typing.Optional[str] = None) -> None:
+		contract: typing.Optional[str] = None,
+		const: typing.Optional[str] = None) -> None:
 
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
@@ -30,6 +31,7 @@ class Type:
 		self.templateAttr = template
 		self.argumentTemplateAttr = argumentTemplate
 		self.contractAttr = contract
+		self.constAttr = const
 
 	@property
 	def underlyingType(self) -> typing.Optional[str]:
@@ -119,6 +121,12 @@ class Type:
 		return entity.getEntityUnderlyingTypeResolved(symbols=symbols)
 
 	@property
+	def const(self) -> bool:
+		if self.constAttr is None:
+			return False
+		return self.element.isAttr(self.constAttr)
+
+	@property
 	def contracts(self) -> Contracts:
 		return Contracts(element=self.element, sequenceKind=self.contractAttr)
 
@@ -203,7 +211,8 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 				kind="type",
 				underlyingType="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
-				argumentTemplate="argument_template_resolved" if self.isResolved else None)
+				argumentTemplate="argument_template_resolved" if self.isResolved else None,
+				const="const")
 			output = self.visitType(entity=entity,
 				nested=[] if nested is None else nested,
 				parameters=entity.parametersTemplateResolved)

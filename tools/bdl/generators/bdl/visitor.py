@@ -12,6 +12,8 @@ class _VisitorType(VisitorType):
 
 	def visitType(self, entity: Type, nested: typing.List[str], parameters: ResolvedParameters) -> str:
 		output = entity.kind
+		if entity.const:
+			output = "const {}".format(output)
 		# Top level (aka non-template) comments are handled at a higher level.
 		if not self.isTopLevel and entity.comment:
 			output = "/*{comment}*/ {output}".format(comment=entity.comment, output=output)
