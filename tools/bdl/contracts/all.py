@@ -6,6 +6,7 @@ from tools.bdl.contracts.traits import ContractTraits
 from tools.bdl.contracts.min import ContractMin
 from tools.bdl.contracts.max import ContractMax
 from tools.bdl.contracts.template import ContractTemplate
+from tools.bdl.contracts.virtual import ContractVirtual
 from tools.bdl.contracts.integer import ContractInteger
 from tools.bdl.contracts.float import ContractFloat
 from tools.bdl.contracts.string import ContractString
@@ -22,6 +23,7 @@ _Contracts = [
 	ContractMin(),
 	ContractMax(),
 	ContractTemplate(),
+	ContractVirtual(),
 	ContractMandatory(),
 	ContractType(),
 	ContractCapacity()

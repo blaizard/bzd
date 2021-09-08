@@ -33,7 +33,7 @@ class FragmentBlockComment(FragmentComment):
 def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for a nested entity, it accepst the following format:
-	(interface|struct|component|composition) [name] {
+	(interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
 		nestedGrammar
 	}
 
@@ -64,7 +64,7 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		makeNestedCategory("composition"),
 		GrammarItem(r"}", FragmentNestedStopNewElement),
 		]),
-	]
+	] + makeGrammarContracts()
 
 	return [
 		GrammarItem(_regexprNested, {"category": "nested"},
