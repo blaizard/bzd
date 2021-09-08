@@ -42,6 +42,13 @@ class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | in
 {
 public: // Types
 	{{ declareTrivialTypes(data.nested.sequence) }}
+
+{% if data.virtual %}
+public: // Methods
+	{% for method in data.nested.methodList %}
+	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }}) = 0;
+	{% end %}
+{% end %}
 };
 
 namespace adapter {
@@ -55,6 +62,7 @@ public: // Traits
 public: // Internal
 	[[nodiscard]] constexpr Self& base() noexcept { return *this; }
 
+{% if not data.virtual %}
 public: // Methods.
 	{% for method in data.nested.methodList %}
 	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }})
@@ -62,6 +70,7 @@ public: // Methods.
 		{% if method.isType %}return {% end %}static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
 	}
 	{% end %}
+{% end %}
 
 public: // Variable accessors.
 	{% for var in data.nested.expressionList %}

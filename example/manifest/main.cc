@@ -2,23 +2,23 @@
 
 #include <iostream>
 
+#define VIRTUAL_TYPE 1
+
 class MyType : public bzd::manifest::adapter::MyInterface<MyType>
 {
 public:
 	bzd::manifest::Test start(int a) { return (a > 10) ? bzd::manifest::Test::FIRST : bzd::manifest::Test::SECOND; }
 };
 
-// Non virtual
-
 class Interface
 {
+#ifdef VIRTUAL_TYPE
 public:
-	enum class MyType
-	{
-		HELLO,
-		ME
-	};
+	virtual int hello(int a) noexcept = 0;
+#endif
 };
+
+#ifndef VIRTUAL_TYPE
 
 namespace adapter {
 
@@ -26,41 +26,24 @@ template <class Impl>
 class Interface : public ::Interface
 {
 public:
-	static constexpr bool isBaseVirtual = false;
-	static constexpr bool isBaseStatic = true;
-
-public:
 	constexpr Interface<Impl>& base() noexcept { return *this; }
-
-	// static_assert(Impl::hello exsits);
 
 	constexpr int hello(int a) noexcept
 	{
 		std::cout << "non-virtual" << std::endl;
 		return static_cast<Impl*>(this)->hello(a);
 	}
-
-private:
-	Interface::MyType a;
 };
 
 } // namespace adapter
 
 // Virtual
 
-class InterfaceVirtualBase
-{
-public:
-	virtual int hello(int a) noexcept = 0;
-};
+#else
 
 template <class Impl>
-class InterfaceVirtualImpl : public InterfaceVirtualBase
+class InterfaceVirtualImpl : public ::Interface
 {
-public:
-	static constexpr bool isBaseVirtual = true;
-	static constexpr bool isBaseStatic = false;
-
 public:
 	constexpr InterfaceVirtualImpl(Impl& impl) noexcept : impl_{impl} {}
 
@@ -74,23 +57,20 @@ private:
 	Impl& impl_;
 };
 
+namespace adapter {
 template <class Impl>
-class InterfaceVirtual
+class Interface
 {
 public:
-	static constexpr bool isBaseVirtual = true;
-	static constexpr bool isBaseStatic = false;
-
-public:
-	constexpr InterfaceVirtual() noexcept : impl_{static_cast<Impl&>(*this)} {}
+	constexpr Interface() noexcept : impl_{static_cast<Impl&>(*this)} {}
 
 	constexpr InterfaceVirtualImpl<Impl>& base() noexcept { return impl_; }
-
-	// static_assert(Impl::hello exsits);
 
 private:
 	InterfaceVirtualImpl<Impl> impl_;
 };
+} // namespace adapter
+#endif
 
 // Implementation
 

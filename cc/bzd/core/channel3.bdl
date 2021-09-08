@@ -1,0 +1,18 @@
+
+namespace bzd;
+
+interface OChannel {
+	method write(data = const List<const Byte>);
+	
+}
+
+interface IChannel {
+	method read(data = const List<Byte>);
+	
+}
+
+interface Channel : OChannel, IChannel {
+	
+}
+
+

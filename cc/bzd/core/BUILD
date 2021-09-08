@@ -16,10 +16,11 @@ cc_library(
 )
 
 bdl_library(
-    name = "logger",
+    name = "channel3",
     srcs = [
-        "logger.bdl",
+        "channel3.bdl",
     ],
+    visibility = ["//visibility:public"],
 )
 
 # ---- Individual items ----
