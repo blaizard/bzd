@@ -43,12 +43,12 @@ namespace {{ namespace | namespaceToStr }} {
 public: // Types
 	{{ declareTrivialTypes(data.nested.sequence) }}
 
-{% if data.virtual %}
 public: // Methods
 	{% for method in data.nested.methodList %}
+		{% if method.virtual %}
 	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }}) = 0;
+		{% end %}
 	{% end %}
-{% end %}
 
 public: // Variable accessors.
 	{% for var in data.nested.expressionList %}

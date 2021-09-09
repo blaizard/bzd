@@ -179,7 +179,7 @@ def makeGrammarExpression() -> Grammar:
 def makeGrammarMethod() -> Grammar:
 	"""
 	Generate a grammar for methods, it accepts the following format:
-	method name([inputs...]) [-> returntype [contract]];
+	method name([inputs...]) [contract] [-> returntype [contract]];
 	"""
 
 	class ArgumentStart(FragmentNestedStart):
@@ -193,6 +193,7 @@ def makeGrammarMethod() -> Grammar:
 		GrammarItem(r"\)", FragmentParentElement)]),
 		GrammarItem(r"\)", FragmentParentElement)
 		]),
+		makeGrammarContracts(),
 		GrammarItem(r"->", Fragment,
 		[makeGrammarType([makeGrammarContracts(name="contract_return"),
 		GrammarItem(r";", FragmentNewElement)])]),
