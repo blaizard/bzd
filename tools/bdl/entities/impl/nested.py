@@ -50,10 +50,6 @@ class Nested(Entity):
 		return self.element.getAttr("type").value
 
 	@property
-	def virtual(self) -> bool:
-		return self.contracts.has("virtual")
-
-	@property
 	def hasInheritance(self) -> bool:
 		return self.element.isNestedSequence("inheritance")
 
