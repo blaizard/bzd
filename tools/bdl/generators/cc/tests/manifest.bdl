@@ -17,8 +17,8 @@ struct MyStruct {
 }
 
 // Test list
-using MyList = List<Integer>;
-using MyListCapacity = List<Integer> [capacity(23)];
+using MyList = Vector<Integer>;
+using MyListCapacity = Vector<Integer> [capacity(23)];
 // Simple interface
 interface MyInterfaceA {
 	struct NestedA {

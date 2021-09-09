@@ -2,12 +2,10 @@
 
 #include "cc/bzd/container/function_view.h"
 #include "cc/bzd/container/result.h"
+#include "cc/bzd/container/span.h"
 #include "cc/bzd/container/vector.h"
 
 #include <type_traits>
-
-using Callable = bzd::FunctionView<void(void)>;
-using Byte = bzd::UInt8Type;
 
 /*
 #define STATIC_ASSERT_MEMBER_METHOD(class, member, signature)                                       \

@@ -2,15 +2,16 @@
 
 ## Builtins
 
-| Name           | Description                                     |
-| -------------- | ----------------------------------------------- |
-| `Void`         | Represents an empty value.                      |
-| `Integer`      | Any integer value, positive or negative.        |
-| `Float`        | Any floating point value, positive or negative. |
-| `Boolean`      |                                                 |
-| `Byte`         | An 8-bit integer value.                         |
-| `List<T>`      | An owning.                                      |
-| `Result<V, E>` |                                                 |
+| Name           | Description                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `Void`         | Represents an empty value.                                                                   |
+| `Integer`      | Any integer value, positive or negative.                                                     |
+| `Float`        | Any floating point value, positive or negative.                                              |
+| `Boolean`      |                                                                                              |
+| `Byte`         | An 8-bit integer value.                                                                      |
+| `Span<T>`      | A non-owning type that refers to a contiguous sequence of arbitrary data type.               |
+| `Vector<T>`    | An owning type that holds a contiguous variable sequence of elements of arbitrary data type. |
+| `Result<V, E>` |                                                                                              |
 
 ## Contracts
 
