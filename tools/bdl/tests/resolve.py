@@ -274,7 +274,7 @@ class TestRun(unittest.TestCase):
 
 		# Value with no argument
 		Object.fromContent(content="""
-				interface Test { config: a = List<Integer>(); }
+				interface Test { config: a = Vector<Integer>(); }
 				composition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))

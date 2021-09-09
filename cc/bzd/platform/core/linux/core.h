@@ -47,7 +47,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	bzd::Result<void, Error> start(Callable workload) noexcept
+	bzd::Result<void, Error> start(bzd::platform::WorkloadType workload) noexcept
 	{
 		stack_.taint();
 
@@ -115,7 +115,7 @@ private:
 
 private:
 	Stack<N> stack_{};
-	bzd::Optional<Callable> workload_;
+	bzd::Optional<bzd::platform::WorkloadType> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;
 };

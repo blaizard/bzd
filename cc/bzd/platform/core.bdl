@@ -5,6 +5,8 @@ namespace bzd.platform;
 using StackSize = Integer [min(100) max(8000000)];
 // Type describing the identifier of a core.
 using CoreId = Integer [min(0) max(64)];
+// Type used for workloads.
+using WorkloadType = Callable;
 // A logical core is a processing unit that accepts a single scheduler.
 interface Core {
 	// Error codes for core-related functionality.
@@ -18,7 +20,7 @@ interface Core {
 	}
 	
 	// Start a workload on the core and return immediatly.
-	method start(workload = Callable) -> Result<Void, Error>;
+	method start(workload = WorkloadType) -> Result<Void, Error>;
 	// Initialize the core.
 	method stop() -> Result<Void, Error>;
 	// Get the current stack usage.

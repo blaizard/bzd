@@ -52,6 +52,12 @@ class VoidType:
 	transform = "void"
 
 
+class ByteType:
+
+	constexpr = True
+	transform = "bzd::ByteType"
+
+
 class ResultType:
 
 	constexpr = False
@@ -64,7 +70,13 @@ class CallableType:
 	transform = "bzd::FunctionView<void(void)>"
 
 
-class ListType:
+class SpanType:
+
+	constexpr = False
+	transform = "bzd::Span"
+
+
+class VectorType:
 
 	constexpr = False
 
@@ -86,7 +98,9 @@ knownTypes: typing.Dict[str, typing.Any] = {
 	"Integer": IntegerType,
 	"Float": FloatType,
 	"Void": VoidType,
-	"List": ListType,
+	"Byte": ByteType,
+	"Span": SpanType,
+	"Vector": VectorType,
 	"Result": ResultType,
 	"Callable": CallableType
 }

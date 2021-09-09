@@ -1,17 +1,27 @@
 
 namespace bzd;
 
-interface OChannel {
-	method write(data = const List<const Byte>);
+interface OChannel [virtual] {
+	/*
+	 * Write data to an output channel.
+	 * The promise resolves only after all the data is transmitted.
+	 * \param data The data to be sent via this output channel.
+	 */
+	method write(data = const Span<const Byte>);
 	
 }
 
-interface IChannel {
-	method read(data = const List<Byte>);
+interface IChannel [virtual] {
+	/*
+	 * Read data from an input channel.
+	 * The promise resolves only after at least one byte is received.
+	 * \param data The input buffer to store the data received.
+	 */
+	method read(data = const Span<Byte>);
 	
 }
 
-interface Channel : OChannel, IChannel {
+interface Channel [virtual] : OChannel, IChannel {
 	
 }
 
