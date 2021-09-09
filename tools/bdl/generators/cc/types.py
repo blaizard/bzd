@@ -98,10 +98,11 @@ class _VisitorType(Visitor):
 	"""
 
 	def __init__(self, entity: Type, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
-		reference: bool, definition: bool) -> None:
+		reference: bool, definition: bool, nonConst: bool) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition
+		self.nonConst = nonConst
 		super().__init__(entity)
 
 	@property
@@ -171,12 +172,12 @@ class _VisitorType(Visitor):
 			outputList.append(output)
 		output = ".".join(outputList)
 
-		# Apply the nested template if any
+		# Apply the nested template if any.
 		if nested:
 			output += "<{}>".format(", ".join(nested))
 
 		if not self.isTopLevel:
-			# TODO: support if there is no value
+			# TODO: support if there is no value.
 			if entity.parametersResolved:
 				output += "{{{}}}".format(", ".join([expression.value for expression in entity.parametersResolved]))
 		else:
@@ -184,9 +185,13 @@ class _VisitorType(Visitor):
 				if entity.underlyingType in knownTypes and knownTypes[entity.underlyingType].constexpr:
 					output = "constexpr " + output
 
-		# Apply the reference if any
+		# Apply the reference if any.
 		if self.isReference:
 			output += "&"
+
+		# Apply const if needed.
+		if entity.const and (not self.isTopLevel or not self.nonConst):
+			output = "const " + output
 
 		return output
 
@@ -195,6 +200,7 @@ def typeToStr(entity: typing.Optional[Type],
 	adapter: bool = False,
 	reference: bool = False,
 	definition: bool = False,
+	nonConst: bool = False,
 	registry: typing.Optional[typing.Sequence[str]] = None) -> str:
 	"""
 	Convert a type object into a C++ string.
@@ -224,4 +230,8 @@ def typeToStr(entity: typing.Optional[Type],
 				return "registry.{}_".format(fqnToNameStr(fqn))
 			return "::".join(namespace)
 
-	return _VisitorType(entity=entity, namespaceToFQN=namespaceToFQN, reference=reference, definition=definition).result
+	return _VisitorType(entity=entity,
+		namespaceToFQN=namespaceToFQN,
+		reference=reference,
+		definition=definition,
+		nonConst=nonConst).result

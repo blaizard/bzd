@@ -56,6 +56,9 @@ class Transform:
 	def typeDefinitionToStr(self, entity: Type) -> str:
 		return typeToStrOriginal(entity=entity, definition=True)
 
+	def typeNonConstToStr(self, entity: Type) -> str:
+		return typeToStrOriginal(entity=entity, nonConst=True)
+
 	def typeRegistryToStr(self, entity: Type) -> str:
 		return typeToStrOriginal(entity=entity,
 			registry=[entity.fqn for entity in self.composition.registry] if self.composition else None)
