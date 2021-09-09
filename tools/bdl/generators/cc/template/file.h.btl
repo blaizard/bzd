@@ -38,7 +38,7 @@ namespace {{ namespace | namespaceToStr }} {
 	{% if data.type in ["interface"] %}
 
 // Specialization for trivial types
-class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
+{{ data.comment | commentBlockToStr }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
 	{{ declareTrivialTypes(data.nested.sequence) }}
@@ -46,29 +46,7 @@ public: // Types
 {% if data.virtual %}
 public: // Methods
 	{% for method in data.nested.methodList %}
-	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }}) = 0;
-	{% end %}
-{% end %}
-};
-
-namespace adapter {
-
-template <class Impl>
-{{ data.comment | commentBlockToStr }}class {{ data.name }} : public {{ data.fqnToType | typeToStr }}{% if data.hasInheritance %}, {{ data.inheritanceList | inheritanceAdapterToStr }}{% end %}
-{
-public: // Traits
-	using Self = {{ data.name }}<Impl>;
-
-public: // Internal
-	[[nodiscard]] constexpr Self& base() noexcept { return *this; }
-
-{% if not data.virtual %}
-public: // Methods.
-	{% for method in data.nested.methodList %}
-	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}constexpr {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, true) }})
-	{
-		{% if method.isType %}return {% end %}static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
-	}
+	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }}) = 0;
 	{% end %}
 {% end %}
 
@@ -79,7 +57,7 @@ public: // Variable accessors.
 	 * Getter for the variable '{{ var.name }}'.
 	 * \return The value of '{{ var.name }}'.
 	 */
-	[[nodiscard]] constexpr const {{ var.type | typeReferenceToStr }} get{{ var.name | toCamelCase }}() const noexcept
+	[[nodiscard]] constexpr {% if not var.const %}const {% end %}{{ var.type | typeReferenceToStr }} get{{ var.name | toCamelCase }}() const noexcept
 	{
 		return {{ var.name }}_;
 	}
@@ -89,7 +67,7 @@ public: // Variable accessors.
 	 * Setter for the variable '{{ var.name }}'.
 	 * \param value The new value to be set.
 	 */
-	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }}& value)
+	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }} value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
@@ -105,7 +83,7 @@ protected: // Protected variable accessors.
 	 * Setter for the constant variable '{{ var.name }}'.
 	 * \param value The new value to be set.
 	 */
-	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }}& value)
+	constexpr void set{{ var.name | toCamelCase }}({{ var.type | typeReferenceToStr }} value)
 	{
 		{{ makeContractAssertions(var.contracts) }}
 		{{ var.name }}_ = value;
@@ -115,10 +93,18 @@ protected: // Protected variable accessors.
 
 private: // Variables.
 	{% for var in data.nested.expressionList %}
-	{{ declareExpression(var, "_", false) }};
+	{{ declareExpression(var, "_", "nonConst") }};
 	{% end %}
 };
 
+
+namespace adapter
+{
+template <class Impl>
+class {{ data.name }} : public {{ data.fqnToType | typeToStr }}
+{
+	// TODO: perform sanity checks on the implementation class.
+};
 }
 
 {%- end -%}

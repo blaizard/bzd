@@ -19,11 +19,22 @@
 	Used when:
 	- Define a variable.
 	- Define parameter list of a function.
+
+	type can be:
+		"reference"
+		"nonConst"
 -#}
-{%- macro declareExpression(element, prepend, reference) -%}
+{%- macro declareExpression(element, prepend, type) -%}
 	{{ element.comment | commentEmbeddedToStr }}
 	{%- if element.isType -%}
-	{% if element.isName %}{% if reference %}{{- element.type | typeReferenceToStr }}{% else %}{{- element.type | typeToStr }}{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
+	{% if element.isName %}
+		{%- if type == "reference" -%}
+			{{- element.type | typeReferenceToStr }}
+		{%- elif type == "nonConst" -%}
+			{{- element.type | typeNonConstToStr -}}
+		{%- else -%}
+			{{- element.type | typeToStr -}}
+		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -64,8 +75,8 @@
 {%- end -%}
 
 {#- Parameters -#}
-{%- macro declareParameters(parameters, reference) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, "", reference) }}{% end -%}
+{%- macro declareParameters(parameters, type) -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, "", type) }}{% end -%}
 {% end -%}
 
 {#- Parameters for call -#}
@@ -79,7 +90,7 @@
 {
 	{{ declareTrivialTypes(element.nested.sequence) }}
 	{% for element in element.nested.expressionList %}
-	{{ declareExpression(element, "", false) }};
+	{{ declareExpression(element, "", "") }};
 	{% end %}
 };
 {% end -%}

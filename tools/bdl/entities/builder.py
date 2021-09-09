@@ -11,6 +11,22 @@ class ElementBuilder(Element):
 		super().__init__()
 		self.setAttr("category", category)
 
+	@staticmethod
+	def makeFrom(element: Element) -> "ElementBuilder":
+		"""
+		Copy an element from an existing one.
+		"""
+		return ElementBuilder.cast(element, ElementBuilder)
+
+	def setConst(self) -> "ElementBuilder":
+		self.setAttr("const", "")
+		return self
+
+	def removeConst(self) -> "ElementBuilder":
+		if self.isAttr("const"):
+			self.removeAttr("const")
+		return self
+
 	def addContract(self, contract: str) -> "ElementBuilder":
 		"""
 		Add a contract to the element.

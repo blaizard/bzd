@@ -83,9 +83,9 @@ public:
 int main()
 {
 	User user{};
-	std::cout << "Test " << user.base().hello(23) << std::endl;
+	std::cout << "Test " << user.hello(23) << std::endl;
 
 	MyType type{};
-	std::cout << "Magic number: " << type.base().getMagic() << std::endl;
+	std::cout << "Magic number: " << type.getMagic() << std::endl;
 	return 0;
 }
