@@ -3,12 +3,14 @@ import pathlib
 
 from bzd.parser.error import Error
 
-from tools.bdl.visitor import CATEGORY_COMPOSITION
+from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
+from tools.bdl.entities.impl.method import Method
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.builder import MethodBuilder
 
 
 class Composition:
@@ -77,7 +79,7 @@ class Composition:
 
 	def process(self) -> None:
 
-		categories = {CATEGORY_COMPOSITION}
+		categories = {CATEGORY_GLOBAL_COMPOSITION}
 
 		# Make the dependency graph
 		orderedFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
@@ -88,12 +90,21 @@ class Composition:
 		for entity in self.registry:
 			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
 
+			# Identify entity that contains nested composition
+			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(symbols=self.symbols)
+			for compositionEntity in entityUnderlyingType.composition:
+				compositionEntity.assertTrue(condition=not compositionEntity.isName,
+					message="Variable cannot be created within a nested composition.")
+				print("composition", entity.fqn, compositionEntity)
+
 		# resolve the un-named
 		self.executors = set()
 		for fqn, entity in self.symbols.items(categories=categories):  # type: ignore
 			if entity.isName:
 				continue
 			assert isinstance(entity, Expression)
+
+			#self.symbols.insertBuiltin(name="init", entity=Method(MethodBuilder(name="init")))
 
 			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
 

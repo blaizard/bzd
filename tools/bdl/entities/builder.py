@@ -46,5 +46,13 @@ class NamespaceBuilder(ElementBuilder):
 			self.pushBackElementToNestedSequence(kind="name", element=element)
 
 
+class MethodBuilder(ElementBuilder):
+
+	def __init__(self, name: str) -> None:
+		super().__init__("method")
+		self.setAttr("name", name)
+		self.setAttr("fqn", name)
+
+
 class SequenceBuilder(Sequence):
 	pass

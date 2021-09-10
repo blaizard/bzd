@@ -5,7 +5,7 @@ from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
 
-from tools.bdl.visitor import Visitor, CATEGORIES, CATEGORY_COMPOSITION
+from tools.bdl.visitor import Visitor, CATEGORIES, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
 from tools.bdl.entities.builder import ElementBuilder
@@ -44,8 +44,14 @@ class SymbolMap:
 
 		# Register builtins
 		for builtin in Builtins:
-			self.builtins[builtin.name] = {"c": "builtin", "p": "", "e": builtin.element.serialize()}
-			self.entities[builtin.name] = builtin
+			self.insertBuiltin(name=builtin.name, entity=builtin)
+
+	def insertBuiltin(self, name: str, entity: EntityType) -> None:
+		"""
+		Insert a builtin entry to the mix.
+		"""
+		self.builtins[name] = {"c": "builtin", "p": "", "e": entity.element.serialize()}
+		self.entities[name] = entity
 
 	def contains(self,
 		fqn: str,
@@ -101,7 +107,7 @@ class SymbolMap:
 		"""
 		if name is None:
 			# These are the unnamed elements that should be progpagated to other translation units.
-			if category in {CATEGORY_COMPOSITION}:
+			if category in {CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION}:
 				fqn = FQN.makeUnique(namespace=namespace)
 			# If not, they will be kept private.
 			else:
@@ -178,29 +184,32 @@ class SymbolMap:
 				message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
 			element = entity.element
 
+			show = bool(fqn == "bzd.platform.linux.Core")
+
 			# Remove nested element and change them to references.
 			if any([element.isNestedSequence(category) for category in CATEGORIES]):
 
 				preparedElement = element.copy(ignoreNested=CATEGORIES)
 				for category in CATEGORIES:
 					nested = element.getNestedSequence(category)
-					if nested:
+					if nested is not None:
 						sequence = SequenceBuilder()
-						for element in nested:
-							if element.isAttr("fqn"):
-								fqnNested = element.getAttr("fqn").value
+						for nestedElement in nested:
+							if nestedElement.isAttr("fqn"):
+								fqnNested = nestedElement.getAttr("fqn").value
 								# Remove private FQNs and keep them nested.
 								# This is needed because when merging nested structure, some config
 								# for example have unamed elements and need to be copied with the rest.
 								if FQN.isPrivate(fqnNested):
 									removeFQNs.add(fqnNested)
-									ElementBuilder.cast(element, ElementBuilder).removeAttr("fqn")
-									sequence.pushBackElement(element)
+									ElementBuilder.cast(nestedElement, ElementBuilder).removeAttr("fqn")
+									sequence.pushBackElement(nestedElement)
 								else:
 									sequence.pushBackElement(self.makeReference(fqnNested))
 							else:
-								sequence.pushBackElement(element)
-						preparedElement.setNestedSequence(category, sequence)
+								sequence.pushBackElement(nestedElement)
+						if sequence:
+							preparedElement.setNestedSequence(category, sequence)
 				element = preparedElement
 
 			# Serialize the element to the map.
