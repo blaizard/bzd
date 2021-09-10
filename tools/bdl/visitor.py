@@ -16,7 +16,8 @@ CATEGORY_COMPOSITION = "composition"
 CATEGORY_CONFIG = "config"
 CATEGORY_NESTED = "nested"
 CATEGORY_GLOBAL = "global"
-CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL]
+CATEGORY_GLOBAL_COMPOSITION = "globalComposition"
+CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL, CATEGORY_GLOBAL_COMPOSITION]
 
 
 class Parent:
@@ -69,8 +70,8 @@ class Visitor(VisitorBase[T, T]):
 				return parent.category
 			if parent.isNested:
 				assert isinstance(parent.entity, Nested)
-				if parent.entity.type in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
-					return parent.entity.type
+				if parent.entity.type == "composition":
+					return CATEGORY_GLOBAL_COMPOSITION
 		return CATEGORY_GLOBAL
 
 	def visitElement(self, element: Element, result: T) -> T:

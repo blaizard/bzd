@@ -9,6 +9,7 @@ from bzd.parser.element import Element
 _regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition)[0-9a-zA-Z_]+"
 # Match: interface, struct
 _regexprNested = r"(?P<type>(:?interface|struct|component|composition))"
+_regexprNestedTrivial = r"(?P<type>(:?struct))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
@@ -30,7 +31,7 @@ class FragmentBlockComment(FragmentComment):
 		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 
 
-def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
+def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 	"""
 	Generate a grammar for a nested entity, it accepst the following format:
 	(interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
@@ -48,9 +49,7 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		class CategoryFragmentStart(FragmentNestedStart):
 			nestedName = name
 
-		return GrammarItem(name + r"(?=:)", FragmentParentElement, [
-			GrammarItem(r":", CategoryFragmentStart, nestedGrammar + [GrammarItem(r"}", FragmentNestedStopNewElement)])
-		])
+		return GrammarItem(name + r"(?=:)", FragmentParentElement, [GrammarItem(r":", CategoryFragmentStart, "nested")])
 
 	grammarAfterName: Grammar = [
 		GrammarItem(r":", InheritanceStart, [
@@ -63,11 +62,11 @@ def makeGrammarNested(nestedGrammar: Grammar) -> Grammar:
 		makeNestedCategory("config"),
 		makeNestedCategory("composition"),
 		GrammarItem(r"}", FragmentNestedStopNewElement),
-		]),
+		], "nested"),
 	] + makeGrammarContracts()
 
 	return [
-		GrammarItem(_regexprNested, {"category": "nested"},
+		GrammarItem(_regexprNestedTrivial if trivial else _regexprNested, {"category": "nested"},
 		[GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
 	]
 
@@ -280,9 +279,13 @@ class Parser(ParserBase):
 	def __init__(self, content: str) -> None:
 
 		withinNested = makeGrammarUsing() + makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()
-		nested = makeGrammarNested(withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested +
-			makeGrammarNested(withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested))))))
+		nested = withinNested + makeGrammarNested(
+			withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested +
+			makeGrammarNested(withinNested + makeGrammarNested(withinNested, trivial=True), trivial=True),
+			trivial=True),
+			trivial=True),
+			trivial=True)
 
 		super().__init__(content,
-			grammar=makeGrammarNamespace() + makeGrammarUse() + withinNested + nested,
+			grammar=makeGrammarNamespace() + makeGrammarUse() + withinNested + makeGrammarNested(nested, trivial=False),
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)
