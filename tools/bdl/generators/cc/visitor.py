@@ -3,7 +3,6 @@ from pathlib import Path
 
 from bzd.template.template import Template
 
-from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression

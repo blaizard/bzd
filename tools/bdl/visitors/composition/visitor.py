@@ -89,10 +89,12 @@ class Composition:
 
 		# Resolve the Registry and then the un-named
 		for entity in self.registry:
-			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
+			resolver = self.symbols.makeResolver(namespace=entity.namespace)
+
+			entity.resolveMemoized(resolver=resolver)
 
 			# Identify entity that contains nested composition
-			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(symbols=self.symbols)
+			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 			for compositionEntity in entityUnderlyingType.composition:
 				compositionEntity.assertTrue(condition=not compositionEntity.isName,
 					message="Variable cannot be created within a nested composition.")

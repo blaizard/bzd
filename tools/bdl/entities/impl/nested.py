@@ -78,11 +78,10 @@ class Nested(Entity):
 
 			# Resolve the inheritance.
 			entity = inheritance.resolve(resolver=resolver)
-			self.addParents(fqn=entity.underlyingType,
-				parents=entity.getUnderlyingTypeParents(symbols=resolver.symbols))
+			self.addParents(fqn=entity.underlyingType, parents=entity.getUnderlyingTypeParents(resolver=resolver))
 
 			# Validates that the inheritance type is correct.
-			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=resolver.symbols)
+			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 			self.assertTrue(condition=underlyingType.category == "nested",
 				message="Inheritance can only be done from a nested class, not '{}'.".format(entity.underlyingType))
 			nestedType = typing.cast("Nested", underlyingType)

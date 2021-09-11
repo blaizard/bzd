@@ -32,6 +32,12 @@ class Resolver:
 		"""
 		return FQN.fromNamespace(name=name, namespace=self.namespace)
 
+	def getEntity(self, fqn: str) -> Result[EntityType]:
+		return self.symbols.getEntity(fqn=fqn)
+
+	def getEntityResolved(self, fqn: str) -> Result[EntityType]:
+		return self.symbols.getEntityResolved(fqn=fqn)
+
 	def resolveShallowFQN(self, name: str) -> ResolveShallowFQNResult:
 		"""
 		Find the fully qualified name of a given a name and a namespace.
@@ -84,8 +90,8 @@ class Resolver:
 			potentialNamespaceFQNs = [fqn]
 			# If it has an underlying type, add it to the list as well as its parents (if any).
 			if entity.underlyingType is not None:
-				potentialNamespaceFQNs += [entity.underlyingType] + entity.getEntityUnderlyingTypeResolved(
-					symbols=self.symbols).getParents()
+				potentialNamespaceFQNs += [entity.underlyingType
+											] + entity.getEntityUnderlyingTypeResolved(resolver=self).getParents()
 			# Check if there is any match.
 			fqn = None
 			for potentialNamespaceFQN in potentialNamespaceFQNs:
