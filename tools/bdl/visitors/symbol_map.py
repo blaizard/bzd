@@ -33,10 +33,10 @@ class Resolver:
 		return FQN.fromNamespace(name=name, namespace=self.namespace)
 
 	def getEntity(self, fqn: str) -> Result[EntityType]:
-		return self.symbols.getEntity(fqn=fqn)
+		return self.symbols.getEntity(fqn=fqn, exclude=self.exclude)
 
 	def getEntityResolved(self, fqn: str) -> Result[EntityType]:
-		return self.symbols.getEntityResolved(fqn=fqn)
+		return self.symbols.getEntityResolved(fqn=fqn, exclude=self.exclude)
 
 	def resolveShallowFQN(self, name: str) -> ResolveShallowFQNResult:
 		"""
@@ -86,7 +86,7 @@ class Resolver:
 
 		# Re-iterate the process with the next items
 		for nextName in unresolvedFQN:
-			entity = self.symbols.getEntityResolved(fqn=fqn).value
+			entity = self.getEntityResolved(fqn=fqn).value
 			potentialNamespaceFQNs = [fqn]
 			# If it has an underlying type, add it to the list as well as its parents (if any).
 			if entity.underlyingType is not None:
@@ -153,31 +153,25 @@ class SymbolMap:
 		self.builtins[name] = {"c": "builtin", "p": "", "e": entity.element.serialize()}
 		self.entities[name] = entity
 
-	def contains(self,
-		fqn: str,
-		exclude: typing.Optional[typing.List[str]] = None,
-		categories: typing.Optional[typing.Set[str]] = None) -> bool:
+	def contains(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> bool:
 		"""
 		Check if the fqn is registered.
 		"""
-		maybeData = self._get(fqn=fqn)
-		if maybeData is None:
-			return False
-		if exclude:
-			return maybeData["c"] not in exclude
-		if categories:
-			return maybeData["c"] in categories
-		return True
+		return False if self._get(fqn=fqn, exclude=exclude) is None else True
 
-	def _get(self, fqn: str) -> typing.Optional[typing.Any]:
+	def _get(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> typing.Optional[typing.Any]:
 		"""
 		Return the raw data if it exsits.
 		"""
 		if fqn in self.map:
-			return self.map[fqn]
-		if fqn in self.builtins:
-			return self.builtins[fqn]
-		return None
+			data = self.map[fqn]
+		elif fqn in self.builtins:
+			data = self.builtins[fqn]
+		else:
+			return None
+		if exclude and data["c"] in exclude:
+			return None
+		return data
 
 	def items(self, categories: typing.Set[str] = set()) -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
@@ -339,13 +333,13 @@ class SymbolMap:
 	def metaToElement(meta: typing.Any) -> Element:
 		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
 
-	def getEntityResolved(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
+	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
 		This call assumes that FQN is already resolved.
 		"""
 
-		data = self._get(fqn)
+		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:
 			return Result[EntityType].makeError("Unable to find symbol '{}'.".format(fqn))
 
@@ -362,7 +356,7 @@ class SymbolMap:
 						# Resolve the reference if any
 						if isinstance(nestedEntity, Reference):
 							nestedEntity = self.getEntityResolved(fqn=nestedEntity.name,
-								category=category).assertValue(element=element)
+								exclude=exclude).assertValue(element=element)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
 						sequence=updatedSequence)
@@ -370,12 +364,12 @@ class SymbolMap:
 
 		# Return the referenced type in case of reference.
 		if isinstance(self.entities[fqn], Reference):
-			return self.getEntityResolved(fqn=self.entities[fqn].name, category=category)
+			return self.getEntityResolved(fqn=self.entities[fqn].name, exclude=exclude)
 
 		# Return the entity.
 		return Result[EntityType](self.entities[fqn])
 
-	def getEntity(self, fqn: str, category: typing.Optional[str] = None) -> Result[EntityType]:
+	def getEntity(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map and resolves underlying types if needed.
 		"""
@@ -384,7 +378,7 @@ class SymbolMap:
 		result = None
 		for name in FQN.toNamespace(fqn):
 			namespace.append(name)
-			result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), category=category)
+			result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), exclude=exclude)
 			if not result:
 				continue
 			if result.value.underlyingType is not None:
