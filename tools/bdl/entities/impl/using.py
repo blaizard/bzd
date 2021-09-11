@@ -35,14 +35,11 @@ class Using(Entity):
 	def type(self) -> Type:
 		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template", const="const")
 
-	def resolve(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolve(self, resolver: typing.Any) -> None:
 		"""
 		Resolve entities.
 		"""
-		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		entity = self.type.resolve(resolver=resolver)
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

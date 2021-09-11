@@ -27,6 +27,8 @@ interface Core {
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
 	method getId() -> CoreId;
+	// TO BE REMOVED, just for testing.
+	method init() -> Void;
 	
 }
 

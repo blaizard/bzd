@@ -1,5 +1,6 @@
 import typing
 import json
+import copy
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
@@ -14,7 +15,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.visitors.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
 
 
 class Role:
@@ -27,6 +28,9 @@ class Role:
 	Meta: int = 4
 
 
+U = typing.TypeVar("U", bound="Entity")
+
+
 class Entity:
 
 	contractAttr: str = "contract"
@@ -34,6 +38,14 @@ class Entity:
 	def __init__(self, element: Element, role: int) -> None:
 		self.element = element
 		self.role = role
+
+	def copy(self: U) -> U:
+		"""
+		Make a copy of the current entity.
+		"""
+		copySelf = copy.copy(self)
+		copySelf.element = copySelf.element.copy()
+		return copySelf
 
 	def _getNestedByCategory(self, category: str) -> EntitySequence:
 		sequence = self.element.getNestedSequence(category)
@@ -263,22 +275,16 @@ class Entity:
 	def isResolved(self) -> bool:
 		return self.element.getAttrValue("resolved") == "1"
 
-	def resolveMemoized(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolveMemoized(self, resolver: "Resolver") -> None:
 		"""
 		Resolve the current symbol.
 		"""
 		if self.isResolved:
 			return
-		self.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.resolve(resolver=resolver)
 		self.markAsResolved()
 
-	def resolve(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolve(self, resolver: "Resolver") -> None:
 		pass
 
 	def error(self, message: str, throw: bool = True) -> str:

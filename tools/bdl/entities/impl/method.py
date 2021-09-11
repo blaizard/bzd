@@ -51,22 +51,19 @@ class Method(Entity):
 			contract="contract_return",
 			const="const") if self.isType else None
 
-	def resolve(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolve(self, resolver: typing.Any) -> None:
 		"""
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
+		fqn = resolver.makeFQN(name=self.name)
 		self._setUnderlyingType(fqn)
 
 		maybeType = self.type
 		if maybeType is not None:
-			entity = maybeType.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			entity = maybeType.resolve(resolver=resolver)
 
-		self.parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.parameters.resolve(resolver=resolver)
 
 	@cached_property
 	def parameters(self) -> Parameters:

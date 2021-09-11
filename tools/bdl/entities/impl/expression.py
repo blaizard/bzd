@@ -125,17 +125,14 @@ class Expression(Entity):
 
 		return dependencies
 
-	def resolve(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolve(self, resolver: typing.Any) -> None:
 		"""
 		Resolve entities.
 		"""
 		if self.isValue:
 			return
 
-		entity = self.type.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		entity = self.type.resolve(resolver=resolver)
 
 		# Set the underlying value
 		if self.isParameters:
@@ -153,32 +150,29 @@ class Expression(Entity):
 		if self.isParameters:
 			parameters = self.parameters
 			assert parameters is not None
-			parameters.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+			parameters.resolve(resolver=resolver)
 		else:
 			parameters = Parameters(element=self.element)
 
 		# Merge its default values
-		defaults = self.getConfigValues(symbols=symbols)
+		defaults = self.getConfigValues(symbols=resolver.symbols)
 		parameters.mergeDefaults(defaults)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(symbols=symbols, parameters=defaults, contracts=self.contracts)
+		validation = self._makeValueValidation(symbols=resolver.symbols, parameters=defaults, contracts=self.contracts)
 		if validation is not None:
-			arguments = parameters.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude, varArgs=False)
+			arguments = parameters.getValuesOrTypesAsDict(symbols=resolver.symbols, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
 		argumentValues = parameters.copy(template=False)
-		sequence = argumentValues.toResolvedSequence(symbols=symbols, exclude=exclude, varArgs=False, onlyValues=True)
+		sequence = argumentValues.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
 
 		argumentTemplates = parameters.copy(template=True)
-		sequence = argumentTemplates.toResolvedSequence(symbols=symbols,
-			exclude=exclude,
-			varArgs=False,
-			onlyValues=True)
+		sequence = argumentTemplates.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
 	def _makeValueValidation(self, symbols: typing.Any, parameters: Parameters,
