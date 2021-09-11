@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedPara
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.visitors.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
 
 
 class Type:
@@ -50,34 +50,30 @@ class Type:
 
 		return dependencies
 
-	def resolve(self,
-		symbols: "SymbolMap",
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> "EntityType":
+	def resolve(self, resolver: "Resolver") -> "EntityType":
 		"""
 		Resolve the types and nested templates by updating their symbol to fqn.
 		"""
 
-		fqns = symbols.resolveFQN(name=self.kind, namespace=namespace,
-			exclude=exclude).assertValue(element=self.element, attr=self.kindAttr)
+		fqns = resolver.resolveFQN(name=self.kind).assertValue(element=self.element, attr=self.kindAttr)
 
 		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
 
 		# Resolve the templates if available
-		self.templates.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
+		self.templates.resolve(resolver=resolver)
 		templates = self.templates
 
 		# Get and save the underlying type
-		underlying = self.getEntityResolved(symbols=symbols)
+		underlying = self.getEntityResolved(symbols=resolver.symbols)
 		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
-		underlying.resolveMemoized(symbols=symbols, namespace=underlying.namespace, exclude=exclude)
+		underlying.resolveMemoized(resolver=resolver)
 
 		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
 				underlying.underlyingType)
 
 		# Validate template arguments
-		configTypes = underlying.getConfigTemplateTypes(symbols=symbols)
+		configTypes = underlying.getConfigTemplateTypes(symbols=resolver.symbols)
 		if not configTypes:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(self.templates)),
@@ -88,8 +84,8 @@ class Type:
 			templates.mergeDefaults(configTypes)
 
 			# Validate the template arguments
-			values = templates.getValuesOrTypesAsDict(symbols=symbols, exclude=exclude, varArgs=False)
-			validation = underlying.makeValidationForTemplate(symbols=symbols, parameters=configTypes)
+			values = templates.getValuesOrTypesAsDict(symbols=resolver.symbols, varArgs=False)
+			validation = underlying.makeValidationForTemplate(symbols=resolver.symbols, parameters=configTypes)
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element,
@@ -98,7 +94,7 @@ class Type:
 				message=str(resultValidate))
 
 			# Save the resolved template only after the validation is completed.
-			sequence = templates.toResolvedSequence(symbols=symbols, exclude=exclude, varArgs=False, onlyTypes=True)
+			sequence = templates.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyTypes=True)
 			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
 				sequence)
 

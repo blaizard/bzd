@@ -64,27 +64,25 @@ class Nested(Entity):
 			inheritanceList.append(Type(element=element, kind="symbol"))
 		return inheritanceList
 
-	def resolve(self,
-		symbols: typing.Any,
-		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+	def resolve(self, resolver: typing.Any) -> None:
 		"""
 		Resolve entities.
 		"""
 		# Generate this symbol FQN.
 		if self.isName:
-			fqn = FQN.fromNamespace(name=self.name, namespace=namespace)
+			fqn = resolver.makeFQN(name=self.name)
 			self._setUnderlyingType(fqn)
 
 		# Resolve and make sure the inheritance is correct.
 		for inheritance in self.inheritanceList:
 
 			# Resolve the inheritance.
-			entity = inheritance.resolve(symbols=symbols, namespace=namespace, exclude=exclude)
-			self.addParents(fqn=entity.underlyingType, parents=entity.getUnderlyingTypeParents(symbols=symbols))
+			entity = inheritance.resolve(resolver=resolver)
+			self.addParents(fqn=entity.underlyingType,
+				parents=entity.getUnderlyingTypeParents(symbols=resolver.symbols))
 
 			# Validates that the inheritance type is correct.
-			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=symbols)
+			underlyingType = entity.getEntityUnderlyingTypeResolved(symbols=resolver.symbols)
 			self.assertTrue(condition=underlyingType.category == "nested",
 				message="Inheritance can only be done from a nested class, not '{}'.".format(entity.underlyingType))
 			nestedType = typing.cast("Nested", underlyingType)

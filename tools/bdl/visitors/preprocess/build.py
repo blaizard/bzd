@@ -41,7 +41,7 @@ class Build(Visitor[None]):
 
 		# Resolve the symbol
 		if resolve:
-			entity.resolveMemoized(symbols=self.symbols, namespace=self.namespace)
+			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=self.namespace))
 
 		# Register only top level entities
 		if self.level == 0:

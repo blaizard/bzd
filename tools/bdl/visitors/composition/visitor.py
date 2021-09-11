@@ -61,9 +61,10 @@ class Composition:
 			if not entity.isName:
 				continue
 
+			resolver = self.symbols.makeResolver(namespace=entity.namespace)
+
 			dependencies[fqn] = {
-				self.symbols.resolveShallowFQN(name=dep,
-				namespace=entity.namespace).assertValue(element=entity.element)[0]
+				resolver.resolveShallowFQN(name=dep).assertValue(element=entity.element)[0]
 				for dep in entity.dependencies
 			}
 
@@ -88,13 +89,16 @@ class Composition:
 
 		# Resolve the Registry and then the un-named
 		for entity in self.registry:
-			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
 
 			# Identify entity that contains nested composition
 			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(symbols=self.symbols)
 			for compositionEntity in entityUnderlyingType.composition:
 				compositionEntity.assertTrue(condition=not compositionEntity.isName,
 					message="Variable cannot be created within a nested composition.")
+				compositionEntity = compositionEntity.copy()
+
+				compositionEntity.resolve(resolver=self.symbols.makeResolver(namespace=["core1"]))
 				print("composition", entity.fqn, compositionEntity)
 
 		# resolve the un-named
@@ -106,7 +110,7 @@ class Composition:
 
 			#self.symbols.insertBuiltin(name="init", entity=Method(MethodBuilder(name="init")))
 
-			entity.resolveMemoized(symbols=self.symbols, namespace=entity.namespace)
+			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
 
 			# Update any variables if part of the registry
 			self.compositions.append(entity)
