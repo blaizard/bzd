@@ -10,12 +10,12 @@ class Float(FloatBase):
 
 	def check(self, context: TypeContext) -> Result:
 
-		assert "symbols" in context.args
+		assert "resolver" in context.args
 		from tools.bdl.entities.impl.entity import Entity
 
 		if isinstance(context.value, Entity):
 			if context.value.underlyingType == "Float":
-				value = context.args["symbols"].getEntityResolved(context.value.underlyingValue).value
+				value = context.args["resolver"].getEntityResolved(context.value.underlyingValue).value
 				context.value = value.parametersResolved[0].value
 
 		return super().check(context)

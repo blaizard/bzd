@@ -13,7 +13,7 @@ from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, Role
 
 if typing.TYPE_CHECKING:
-	from tools.bdl.visitors.symbol_map import SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver
 
 
 class Expression(Entity):
@@ -125,7 +125,7 @@ class Expression(Entity):
 
 		return dependencies
 
-	def resolve(self, resolver: typing.Any) -> None:
+	def resolve(self, resolver: "Resolver") -> None:
 		"""
 		Resolve entities.
 		"""
@@ -155,27 +155,27 @@ class Expression(Entity):
 			parameters = Parameters(element=self.element)
 
 		# Merge its default values
-		defaults = self.getConfigValues(symbols=resolver.symbols)
+		defaults = self.getConfigValues(resolver=resolver)
 		parameters.mergeDefaults(defaults)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(symbols=resolver.symbols, parameters=defaults, contracts=self.contracts)
+		validation = self._makeValueValidation(resolver=resolver, parameters=defaults, contracts=self.contracts)
 		if validation is not None:
-			arguments = parameters.getValuesOrTypesAsDict(symbols=resolver.symbols, varArgs=False)
+			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
 		argumentValues = parameters.copy(template=False)
-		sequence = argumentValues.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyValues=True)
+		sequence = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
 
 		argumentTemplates = parameters.copy(template=True)
-		sequence = argumentTemplates.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyValues=True)
+		sequence = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
-	def _makeValueValidation(self, symbols: typing.Any, parameters: Parameters,
+	def _makeValueValidation(self, resolver: "Resolver", parameters: Parameters,
 		contracts: Contracts) -> typing.Optional[Validation]:
 		"""
 		Generate the validation for the value by combining the type validation
@@ -188,22 +188,22 @@ class Expression(Entity):
 
 		# Get the configuration value if any.
 		if self.underlyingType is not None:
-			underlyingType = symbols.getEntityResolved(self.underlyingType).assertValue(element=self.element)
+			underlyingType = resolver.getEntityResolved(self.underlyingType).assertValue(element=self.element)
 			if underlyingType.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="This expression has both a global contract and a configuration, this is not allowed.")
-				return self.makeValidationForValues(symbols=symbols, parameters=parameters)
+				return self.makeValidationForValues(resolver=resolver, parameters=parameters)
 
 		# If evaluates to true, meaning there is a contract for values,
 		# it means there must be a single value.
 		if validationValue:
 			try:
-				return Validation(schema={"0": validationValue}, args={"symbols": symbols})
+				return Validation(schema={"0": validationValue}, args={"resolver": resolver})
 			except Exception as e:
 				self.error(message=str(e))
 
 		# Validation is empty
-		return Validation(schema={}, args={"symbols": symbols})
+		return Validation(schema={}, args={"resolver": resolver})
 
 	@cached_property
 	def isParameters(self) -> bool:

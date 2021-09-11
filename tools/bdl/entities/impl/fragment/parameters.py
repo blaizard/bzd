@@ -7,7 +7,7 @@ from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
-	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver
 	from tools.bdl.entities.impl.fragment.type import Type
 	from tools.bdl.entities.impl.entity import Entity
 
@@ -196,7 +196,7 @@ class Parameters(ParametersCommon[Metadata]):
 		for parameter in self:
 			parameter.resolveMemoized(resolver=resolver)
 
-	def itemsValuesOrTypes(self, symbols: "SymbolMap", varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType,
+	def itemsValuesOrTypes(self, resolver: "Resolver", varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType,
 		Metadata]]:
 		"""
         Iterate through the list and return values or types.
@@ -213,7 +213,7 @@ class Parameters(ParametersCommon[Metadata]):
 				values.append((key, expression.literal, metadata))
 
 			elif expression.underlyingValue is not None:
-				value: ResolvedType = symbols.getEntityResolved(fqn=expression.underlyingValue).assertValue(
+				value: ResolvedType = resolver.getEntityResolved(fqn=expression.underlyingValue).assertValue(
 					element=expression.element)
 
 				# If these are default arguments, use the default value.
@@ -235,14 +235,14 @@ class Parameters(ParametersCommon[Metadata]):
 
 		return values
 
-	def getValuesOrTypesAsDict(self, symbols: "SymbolMap", varArgs: bool) -> typing.Dict[str, ResolvedType]:
+	def getValuesOrTypesAsDict(self, resolver: "Resolver", varArgs: bool) -> typing.Dict[str, ResolvedType]:
 		"""
         Get the values as a dictionary.
         """
-		values = self.itemsValuesOrTypes(symbols=symbols, varArgs=varArgs)
+		values = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
 		return {entry[0]: entry[1] for entry in values}
 
-	def toResolvedSequence(self, symbols: "SymbolMap", varArgs: bool, onlyTypes: bool = False,
+	def toResolvedSequence(self, resolver: "Resolver", varArgs: bool, onlyTypes: bool = False,
 		onlyValues: bool = False) -> Sequence:
 		"""
 		Build the resolved sequence of those parameters.
@@ -250,7 +250,7 @@ class Parameters(ParametersCommon[Metadata]):
 		"""
 		sequence = SequenceBuilder()
 
-		entries = self.itemsValuesOrTypes(symbols=symbols, varArgs=varArgs)
+		entries = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
 		if self.isNamed:
 			entries = sorted(entries, key=lambda k: k[2].order)
 

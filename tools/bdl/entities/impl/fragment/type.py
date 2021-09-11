@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedPara
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver
 
 
 class Type:
@@ -64,7 +64,7 @@ class Type:
 		templates = self.templates
 
 		# Get and save the underlying type
-		underlying = self.getEntityResolved(symbols=resolver.symbols)
+		underlying = self.getEntityResolved(resolver=resolver)
 		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
 		underlying.resolveMemoized(resolver=resolver)
 
@@ -73,7 +73,7 @@ class Type:
 				underlying.underlyingType)
 
 		# Validate template arguments
-		configTypes = underlying.getConfigTemplateTypes(symbols=resolver.symbols)
+		configTypes = underlying.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(self.templates)),
@@ -84,8 +84,8 @@ class Type:
 			templates.mergeDefaults(configTypes)
 
 			# Validate the template arguments
-			values = templates.getValuesOrTypesAsDict(symbols=resolver.symbols, varArgs=False)
-			validation = underlying.makeValidationForTemplate(symbols=resolver.symbols, parameters=configTypes)
+			values = templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
 			Error.assertTrue(element=self.element,
@@ -94,7 +94,7 @@ class Type:
 				message=str(resultValidate))
 
 			# Save the resolved template only after the validation is completed.
-			sequence = templates.toResolvedSequence(symbols=resolver.symbols, varArgs=False, onlyTypes=True)
+			sequence = templates.toResolvedSequence(resolver=resolver, varArgs=False, onlyTypes=True)
 			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
 				sequence)
 
@@ -103,18 +103,18 @@ class Type:
 
 		return underlying
 
-	def getEntityResolved(self, symbols: "SymbolMap") -> "EntityType":
+	def getEntityResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
 		Get the entity related to type after resolve.
 		"""
-		return symbols.getEntity(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
+		return resolver.getEntity(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
 
-	def getEntityUnderlyingTypeResolved(self, symbols: "SymbolMap") -> "EntityType":
+	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
 		Get the entity related to type after resolve.
 		"""
-		entity = self.getEntityResolved(symbols=symbols)
-		return entity.getEntityUnderlyingTypeResolved(symbols=symbols)
+		entity = self.getEntityResolved(resolver=resolver)
+		return entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 
 	@property
 	def const(self) -> bool:

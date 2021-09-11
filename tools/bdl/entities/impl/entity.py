@@ -15,7 +15,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.entities.all import EntityType
-	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
+	from tools.bdl.visitors.symbol_map import Resolver
 
 
 class Role:
@@ -69,13 +69,13 @@ class Entity:
 			return self.element.getAttr("parents").value.split(";")
 		return []
 
-	def getUnderlyingTypeParents(self, symbols: "SymbolMap") -> typing.List[str]:
+	def getUnderlyingTypeParents(self, resolver: "Resolver") -> typing.List[str]:
 		"""
 		Get the parents of the underlying type or the current entity if not present.
 		"""
 		if self.underlyingType is None:
 			return self.getParents()
-		return self.getEntityUnderlyingTypeResolved(symbols=symbols).getParents()
+		return self.getEntityUnderlyingTypeResolved(resolver=resolver).getParents()
 
 	def addParents(self, fqn: typing.Optional[str], parents: typing.List[str]) -> None:
 		"""
@@ -117,13 +117,13 @@ class Entity:
 		"""
 		return self.element.getAttrValue("literal")
 
-	def getEntityUnderlyingTypeResolved(self, symbols: "SymbolMap") -> "EntityType":
+	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
 		Get the entity related to type after resolve.
 		"""
 		self.assertTrue(condition=self.underlyingType is not None, message="Underlying type is not available.")
 		assert self.underlyingType is not None
-		return symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+		return resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
@@ -209,31 +209,31 @@ class Entity:
 	def fqnToType(self) -> Type:
 		return Type(element=self.element, kind="fqn")
 
-	def getConfigTemplateTypes(self, symbols: typing.Any) -> Parameters:
+	def getConfigTemplateTypes(self, resolver: typing.Any) -> Parameters:
 		"""
 		Get the list of expressions that forms the template types.
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+			underlyingType = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind=underlyingType.configAttr,
 				filterFct=lambda entity: entity.contracts.has("template") and entity.contracts.has("type"))
 		return Parameters(element=self.element)
 
-	def getConfigValues(self, symbols: typing.Any) -> Parameters:
+	def getConfigValues(self, resolver: typing.Any) -> Parameters:
 		"""
 		Get the list of expressions that forms the values.
 		"""
 
 		if self.underlyingType:
-			underlyingType = symbols.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+			underlyingType = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind=underlyingType.configAttr,
 				filterFct=lambda entity: not (entity.contracts.has("template") and entity.contracts.has("type")))
 		return Parameters(element=self.element)
 
-	def makeValidation(self, symbols: typing.Any, parameters: Parameters,
+	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
 		forTemplate: bool) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object.
@@ -248,22 +248,22 @@ class Entity:
 
 		if schema:
 			try:
-				return Validation(schema=schema, args={"symbols": symbols})
+				return Validation(schema=schema, args={"resolver": resolver})
 			except Exception as e:
 				self.error(message=str(e))
 		return None
 
-	def makeValidationForTemplate(self, symbols: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
+	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for template parameters.
 		"""
-		return self.makeValidation(symbols=symbols, parameters=parameters, forTemplate=True)
+		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=True)
 
-	def makeValidationForValues(self, symbols: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
+	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
 		"""
 		Generate the validation object for value parameters.
 		"""
-		return self.makeValidation(symbols=symbols, parameters=parameters, forTemplate=False)
+		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=False)
 
 	def markAsResolved(self) -> None:
 		"""
