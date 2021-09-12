@@ -100,8 +100,10 @@ class Composition:
 					message="Variable cannot be created within a nested composition.")
 				compositionEntity = compositionEntity.copy()
 
-				compositionEntity.resolve(resolver=self.symbols.makeResolver(namespace=["core1"]))
-				print("composition", entity.fqn, compositionEntity)
+				resolver = self.symbols.makeResolver(namespace=compositionEntity.namespace, this=entity.fqn)
+				print("composition", resolver.namespace, resolver.this)
+
+				compositionEntity.resolve(resolver=resolver)
 
 		# resolve the un-named
 		self.executors = set()

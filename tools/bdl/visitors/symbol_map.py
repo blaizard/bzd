@@ -21,10 +21,12 @@ class Resolver:
 	def __init__(self,
 		symbols: "SymbolMap",
 		namespace: typing.List[str],
-		exclude: typing.Optional[typing.List[str]] = None) -> None:
+		exclude: typing.Optional[typing.List[str]] = None,
+		this: typing.Optional[str] = None) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude
+		self.this = this
 
 	def makeFQN(self, name: str) -> str:
 		"""
@@ -45,6 +47,11 @@ class Resolver:
 		"""
 		nameFirst = FQN.toNamespace(name)[0]
 
+		if nameFirst == "this":
+			if self.this is None:
+				return ResolveShallowFQNResult.makeError("Keyword 'this' must be used in an object context.")
+			nameFirst = self.this
+
 		# Look for a symbol match of the first part of the name.
 		potentialNamespace = self.namespace.copy()
 		while True:
@@ -53,8 +60,8 @@ class Resolver:
 				break
 			if not potentialNamespace:
 				return ResolveShallowFQNResult.makeError(
-					"Symbol '{}' in namespace '{}' could not be resolved.".format(name, ".".join(self.
-					namespace)) if self.namespace else "Symbol '{}' could not be resolved.".format(name))
+					"Symbol '{}' in namespace '{}' could not be resolved.".format(nameFirst, ".".join(self.
+					namespace)) if self.namespace else "Symbol '{}' could not be resolved.".format(nameFirst))
 			potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
@@ -100,9 +107,9 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
-				return resolveFQNResult.makeError(
-					"Symbol '{}' in namespace '{}' could not be resolved.".format(name, ".".join(self.
-					namespace)) if self.namespace else "Symbol '{}' could not be resolved.".format(name))
+				return resolveFQNResult.makeError("Symbol '{}' from '{}' in namespace '{}' could not be resolved.".
+					format(nextName, name, ".".join(self.namespace)) if self.
+					namespace else "Symbol '{}' from '{}' could not be resolved.".format(nextName, name))
 			fqns.append(fqn)
 
 		# Return the final FQN.
