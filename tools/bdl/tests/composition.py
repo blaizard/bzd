@@ -47,6 +47,25 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Composition().visit(interface).visit(compositionWrongOrder).process()
 
+	def testCompositionInit(self) -> None:
+
+		bdl = Object.fromContent(content="""
+			component Hello {
+			composition:
+				this.init();
+			}
+			composition {
+				test1 = Hello();
+				test2 = Hello();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+
+		composition = Composition()
+		composition.visit(bdl).process()
+
+		self.assertEqual(len(composition.compositions["init"]), 2)
+
 
 if __name__ == '__main__':
 	unittest.main()

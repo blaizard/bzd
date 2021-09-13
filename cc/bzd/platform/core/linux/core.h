@@ -26,6 +26,8 @@ private:
 public:
 	explicit Core(const CoreId, const float) noexcept {}
 
+	void init() {}
+
 	Result<void, Error> stop() noexcept
 	{
 		{

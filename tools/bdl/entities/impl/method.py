@@ -56,8 +56,7 @@ class Method(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		fqn = resolver.makeFQN(name=self.name)
-		self._setUnderlyingType(fqn)
+		self._setUnderlyingType(self.fqn)
 
 		maybeType = self.type
 		if maybeType is not None:

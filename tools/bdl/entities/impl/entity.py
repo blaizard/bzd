@@ -44,7 +44,7 @@ class Entity:
 		Make a copy of the current entity.
 		"""
 		copySelf = copy.copy(self)
-		copySelf.element = copySelf.element.copy()
+		copySelf.element = self.element.copy()
 		return copySelf
 
 	def _getNestedByCategory(self, category: str) -> EntitySequence:
