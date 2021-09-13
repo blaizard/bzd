@@ -36,10 +36,12 @@ void execute() noexcept
 	[[maybe_unused]] auto registry = getOrMakeRegistry();
 
 	// Initialize.
-	// TODO: implementation.
+	{% for index, expresssion in compositions.init %}
+	{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
+	{% end %}
 
 	// Compose.
-	{% for index, expresssion in compositions %}
+	{% for index, expresssion in compositions.compose %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}

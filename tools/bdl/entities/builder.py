@@ -37,6 +37,13 @@ class ElementBuilder(Element):
 		return self
 
 
+class NestedBuilder(ElementBuilder):
+
+	def __init__(self, kind: str) -> None:
+		super().__init__("nested")
+		self.setAttr("type", kind)
+
+
 class NamespaceBuilder(ElementBuilder):
 
 	def __init__(self, namespace: typing.List[str]) -> None:

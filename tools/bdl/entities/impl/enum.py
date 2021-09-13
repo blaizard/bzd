@@ -56,8 +56,7 @@ class Enum(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		fqn = resolver.makeFQN(name=self.name)
-		self._setUnderlyingType(fqn)
+		self._setUnderlyingType(self.fqn)
 
 	@cached_property
 	def values(self) -> typing.Iterable[EnumValue]:

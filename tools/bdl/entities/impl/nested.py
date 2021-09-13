@@ -55,11 +55,8 @@ class Nested(Entity):
 
 	@cached_property
 	def inheritanceList(self) -> typing.List[Type]:
-		sequence = self.element.getNestedSequence("inheritance")
-		if sequence is None:
-			return []
 		inheritanceList: typing.List[Type] = []
-		for element in sequence:
+		for element in self.element.getNestedSequenceOrEmpty("inheritance"):
 			Error.assertHasAttr(element=element, attr="symbol")
 			inheritanceList.append(Type(element=element, kind="symbol"))
 		return inheritanceList
@@ -70,8 +67,7 @@ class Nested(Entity):
 		"""
 		# Generate this symbol FQN.
 		if self.isName:
-			fqn = resolver.makeFQN(name=self.name)
-			self._setUnderlyingType(fqn)
+			self._setUnderlyingType(self.fqn)
 
 		# Resolve and make sure the inheritance is correct.
 		for inheritance in self.inheritanceList:
@@ -96,6 +92,10 @@ class Nested(Entity):
 					message="A component can only inherits from interface(s), not '{}'.".format(nestedType.type))
 			else:
 				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
+
+		# Add implicit parent for components
+		if self.type == TYPE_COMPONENT:
+			self.addParents(fqn="Component", parents=[])
 
 	def __repr__(self) -> str:
 		content = self.toString({

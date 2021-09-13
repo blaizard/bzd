@@ -215,6 +215,15 @@ class Element:
 		assert maybeSequence, "Sequence must be non-null."
 		return maybeSequence
 
+	def getNestedSequenceOrEmpty(self, kind: str) -> Sequence:
+		"""
+		Get a current sequence of an empty one if it does not exists.
+		"""
+		maybeSequence = self.getNestedSequence(kind)
+		if maybeSequence is None:
+			return Sequence()
+		return maybeSequence
+
 	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
 		"""
 		Generator going through all sequences.
@@ -239,7 +248,7 @@ class Element:
 		Shallow copy an element to create a new element object.
 		"""
 		element = ElementBuilder(context=self.context)
-		element.attrs = self.attrs.copy()
+		element.attrs = copy.deepcopy(self.attrs)
 		element.sequences = {kind: sequence for kind, sequence in self.sequences.items() if kind not in ignoreNested}
 		return element
 

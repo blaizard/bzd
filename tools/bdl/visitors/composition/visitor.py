@@ -9,8 +9,14 @@ from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.method import Method
+from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.builder import MethodBuilder
+from tools.bdl.entities.builder import MethodBuilder, NestedBuilder
+
+# Add builtins
+MethodComponentInit = Method(MethodBuilder(name="init").get())
+NestedComponent = Nested(
+	NestedBuilder(kind=TYPE_INTERFACE).pushBackElementToNestedSequence("nested", MethodComponentInit.element).get())
 
 
 class Composition:
@@ -20,8 +26,12 @@ class Composition:
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
 		self.registryFQNs: typing.Set[str] = set()
-		self.compositions: typing.List[Expression] = []
+		self.compositions: typing.Dict[str, typing.List[Expression]] = {"init": [], "compose": []}
 		self.executors: typing.Set[str] = set()
+
+		# Add builtins
+		self.symbols.insertBuiltin(name="Component", entity=NestedComponent)
+		self.symbols.insertBuiltin(name="Component.init", entity=MethodComponentInit)
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -78,6 +88,18 @@ class Composition:
 
 		return orderFQNs
 
+	def addComposition(self, entity: Expression) -> None:
+		"""
+		Add a new composition entity to the compisiton list.
+		"""
+		if entity.underlyingType is not None and entity.underlyingType.endswith(".init"):
+			self.compositions["init"].append(entity)
+		else:
+			self.compositions["compose"].append(entity)
+
+		# Update the executor list
+		self.executors.add(entity.executor)
+
 	def process(self) -> None:
 
 		categories = {CATEGORY_GLOBAL_COMPOSITION}
@@ -93,17 +115,19 @@ class Composition:
 
 			entity.resolveMemoized(resolver=resolver)
 
-			# Identify entity that contains nested composition
+			# Identify entities that contains nested composition
 			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 			for compositionEntity in entityUnderlyingType.composition:
 				compositionEntity.assertTrue(condition=not compositionEntity.isName,
 					message="Variable cannot be created within a nested composition.")
-				compositionEntity = compositionEntity.copy()
 
-				resolver = self.symbols.makeResolver(namespace=compositionEntity.namespace, this=entity.fqn)
-				print("composition", resolver.namespace, resolver.this)
+				# Create new entities and associate them with their respective objects.
+				entityCopied = compositionEntity.copy()
+				resolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
+				entityCopied.resolve(resolver=resolver)
 
-				compositionEntity.resolve(resolver=resolver)
+				assert isinstance(entityCopied, Expression)
+				self.addComposition(entityCopied)
 
 		# resolve the un-named
 		self.executors = set()
@@ -112,15 +136,10 @@ class Composition:
 				continue
 			assert isinstance(entity, Expression)
 
-			#self.symbols.insertBuiltin(name="init", entity=Method(MethodBuilder(name="init")))
-
 			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
 
 			# Update any variables if part of the registry
-			self.compositions.append(entity)
-
-			# Update the executor list
-			self.executors.add(entity.executor)
+			self.addComposition(entity)
 
 		# Ensure all executors are declared.
 		executorsIntersection = self.executors.intersection(self.registryFQNs)
