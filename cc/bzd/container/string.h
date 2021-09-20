@@ -4,7 +4,6 @@
 #include "cc/bzd/container/impl/span.h"
 #include "cc/bzd/container/span.h"
 #include "cc/bzd/container/storage/non_owning.h"
-#include "cc/bzd/container/storage/resizeable.h"
 #include "cc/bzd/container/string_view.h"
 #include "cc/bzd/platform/types.h"
 #include "cc/bzd/type_traits/add_const.h"

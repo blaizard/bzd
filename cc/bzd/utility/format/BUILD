@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//cc/bzd/algorithm:reverse",
         "//cc/bzd/container:string",
-        "//cc/bzd/container:string_channel",
         "//cc/bzd/container:vector",
         "//cc/bzd/core:channel",
         "//cc/bzd/type_traits:is_floating_point",
@@ -32,7 +31,6 @@ cc_library(
         "//cc/bzd/container:string",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
-        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/core:channel",
         "//cc/bzd/meta:range",
         "//cc/bzd/type_traits:decay",

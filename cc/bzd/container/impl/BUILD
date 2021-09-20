@@ -21,7 +21,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
-        "//cc/bzd/core:assert",
+        "//cc/bzd/core:assert_minimal_header",
         "//cc/bzd/platform:atomic",
         "//cc/bzd/platform:types",
         "//cc/bzd/test:inject_point",

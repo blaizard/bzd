@@ -49,6 +49,14 @@ cc_library(
 )
 
 cc_library(
+    name = "panic",
+    hdrs = [
+        "panic.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "atomic",
     hdrs = [
         "atomic.h",
@@ -64,12 +72,12 @@ cc_library(
     hdrs = [
         "clock.h",
         "out.h",
-        "panic.h",
         "stack.h",
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
         ":atomic",
+        ":panic",
         ":types",
         "//cc/bzd/algorithm:fill",
         "//cc/bzd/core:channel",

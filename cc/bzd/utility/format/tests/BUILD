@@ -6,7 +6,7 @@ bzd_cc_test(
         "*.cc",
     ]),
     deps = [
-        "//cc/bzd/core:assert_minimal",
+        "//cc/bzd/core:assert",
         "//cc/bzd/utility/format",
         "//tools/cc_test",
     ],

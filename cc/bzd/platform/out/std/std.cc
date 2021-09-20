@@ -6,10 +6,10 @@ namespace {
 class StdoutChannel : public bzd::OChannel
 {
 public:
-	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept override
+	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
 		std::cout.write(reinterpret_cast<const char*>(data.data()), data.size());
-		return data.size();
+		co_return data.size();
 	}
 };
 } // namespace

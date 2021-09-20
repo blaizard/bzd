@@ -2,7 +2,6 @@
 
 #include "cc/bzd/algorithm/reverse.h"
 #include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_channel.h"
 #include "cc/bzd/container/vector.h"
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/type_traits/is_floating_point.h"

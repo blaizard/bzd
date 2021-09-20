@@ -25,7 +25,7 @@ public: // Traits
 	using ResultType = typename PromiseType::ResultType;
 	using Self = Async<T>;
 
-public: // constructor/destructor//assignments
+public: // constructor/destructor/assignments
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
 
 	constexpr Async(const Self&) noexcept = delete;
@@ -128,6 +128,12 @@ public:
 
 		// Return the result.
 		return getResult().value();
+	}
+
+	ResultType sync() noexcept
+	{
+		bzd::Executor executor;
+		return run(executor);
 	}
 
 public: // coroutine specific

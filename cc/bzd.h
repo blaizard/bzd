@@ -20,7 +20,6 @@
 #include "cc/bzd/container/result.h"
 #include "cc/bzd/container/span.h"
 #include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_channel.h"
 #include "cc/bzd/container/string_view.h"
 #include "cc/bzd/container/tuple.h"
 #include "cc/bzd/container/variant.h"
@@ -31,7 +30,6 @@
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/core/delay.h"
 #include "cc/bzd/core/executor.h"
-#include "cc/bzd/core/log.h"
 #include "cc/bzd/core/promise.h"
 #include "cc/bzd/core/registry.h"
 

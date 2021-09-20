@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/container/result.h"
-#include "cc/bzd/core/assert.h"
+#include "cc/bzd/core/assert/minimal.h"
 #include "cc/bzd/platform/atomic.h"
 #include "cc/bzd/platform/types.h"
 #include "cc/bzd/test/inject_point.h"

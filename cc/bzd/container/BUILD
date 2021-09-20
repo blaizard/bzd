@@ -18,12 +18,11 @@ cc_library(
         ":result",
         ":span",
         ":string",
-        ":string_channel",
         ":string_view",
         ":variant",
         ":vector",
         "//cc/bzd/container/impl",
-        "//cc/bzd/core:assert_minimal",
+        "//cc/bzd/core:assert",
     ],
 )
 
@@ -223,19 +222,6 @@ cc_library(
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:remove_const",
         "//cc/bzd/utility:swap",
-    ],
-)
-
-cc_library(
-    name = "string_channel",
-    hdrs = [
-        "string_channel.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":string",
-        ":string_view",
-        "//cc/bzd/core:channel",
     ],
 )
 

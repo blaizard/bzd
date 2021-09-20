@@ -1,6 +1,6 @@
 #include "cc/bzd/utility/format/format.h"
 
-#include "cc/bzd/container/string_channel.h"
+#include "cc/bzd/container/string.h"
 #include "cc/bzd/container/string_view.h"
 #include "cc/bzd/container/vector.h"
 #include "cc_test/test.h"
@@ -159,48 +159,48 @@ TEST(Format_, ParseMetadataPrecision)
 TEST(Format_, StringFormat)
 {
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {:d}"), 12);
-		EXPECT_STREQ(stream.str().data(), "Hello 12");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {:d}"), 12);
+		EXPECT_STREQ(str.data(), "Hello 12");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {1} {0:d}"), 12, -89);
-		EXPECT_STREQ(stream.str().data(), "Hello -89 12");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {1} {0:d}"), 12, -89);
+		EXPECT_STREQ(str.data(), "Hello -89 12");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {:f}"), 12.45);
-		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {:f}"), 12.45);
+		EXPECT_STREQ(str.data(), "Hello 12.45");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {:.3f}"), 12.45);
-		EXPECT_STREQ(stream.str().data(), "Hello 12.45");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {:.3f}"), 12.45);
+		EXPECT_STREQ(str.data(), "Hello 12.45");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {:%}"), 0.15);
-		EXPECT_STREQ(stream.str().data(), "Hello 15.%");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {:%}"), 0.15);
+		EXPECT_STREQ(str.data(), "Hello 15.%");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {}"), "World");
-		EXPECT_STREQ(stream.str().data(), "Hello World");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {}"), "World");
+		EXPECT_STREQ(str.data(), "Hello World");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("Hello {:.2}"), "World");
-		EXPECT_STREQ(stream.str().data(), "Hello Wo");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("Hello {:.2}"), "World");
+		EXPECT_STREQ(str.data(), "Hello Wo");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
-		EXPECT_STREQ(stream.str().data(), "This milk is 3.5%");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
+		EXPECT_STREQ(str.data(), "This milk is 3.5%");
 	}
 	{
-		bzd::StringChannel<256> stream;
-		bzd::format::toStream(stream, CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
-		EXPECT_STREQ(stream.str().data(), "42 == 0b101010 == 0o52 == 0x2a == 0x2A");
+		bzd::String<256> str;
+		bzd::format::toString(str, CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
+		EXPECT_STREQ(str.data(), "42 == 0b101010 == 0o52 == 0x2a == 0x2A");
 	}
 }

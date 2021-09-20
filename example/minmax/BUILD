@@ -1,6 +1,6 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
-bzd_cc_binary(
+cc_binary(
     name = "minmax",
     srcs = [
         "main.cc",

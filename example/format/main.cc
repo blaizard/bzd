@@ -12,22 +12,22 @@ public:
 	bzd::UInt16Type d_;
 };
 
-void toStream(bzd::OChannel& os, const Date& d)
+bzd::Async<void> toStream(bzd::OChannel& os, const Date& d)
 {
-	bzd::format::toStream(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
+	co_await bzd::format::toStream(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
 }
 
-void toStream(bzd::OChannel& os, const bzd::StringView& view)
+bzd::Async<void> toStream(bzd::OChannel& os, const bzd::StringView& view)
 {
-	os.write(view.asBytes());
+	co_await os.write(view.asBytes());
 }
 
 int main()
 {
-	bzd::format::toStream(bzd::platform::getOut(), CSTR("The answer is {}.\n"), 42);
+	bzd::format::toStream(bzd::platform::getOut(), CSTR("The answer is {}.\n"), 42).sync();
 
 	const Date date{2020, 8, 4};
-	bzd::format::toStream(bzd::platform::getOut(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);
+	bzd::format::toStream(bzd::platform::getOut(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv).sync();
 
 	bzd::String<128> str;
 	bzd::format::toString(str, "This date {}.", 12);

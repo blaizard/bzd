@@ -1,7 +1,6 @@
 // std
 #include "cc/bzd/container/array.h"
 #include "cc/bzd/container/optional.h"
-#include "cc/bzd/container/string_channel.h"
 #include "cc/bzd/container/string_view.h"
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/platform/types.h"
@@ -29,10 +28,10 @@ namespace {
 class AsyncSignalSafeChannel : public bzd::OChannel
 {
 public:
-	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept final
+	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept final
 	{
 		constexpr int fd = STDERR_FILENO;
-		return ::write(fd, data.data(), data.size());
+		co_return ::write(fd, data.data(), data.size());
 	}
 };
 
@@ -246,15 +245,15 @@ void callStack() noexcept
 		// Look for improved function/source names with addr2line
 		if (!info.path.empty())
 		{
-			bzd::StringChannel<1024> command;
-			bzd::format::toStream(command,
+			bzd::String<1024> command;
+			bzd::format::toString(command,
 								  CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
 								  info.path.data(),
 								  reinterpret_cast<bzd::IntPtrType>(info.address),
 								  info.offset);
 
 			{
-				const auto result = exec(command.str().data());
+				const auto result = exec(command.data());
 				bzd::SizeType start = 0;
 				const auto line1 = readLine(result, start);
 				const auto line2 = readLine(result, start);
