@@ -64,11 +64,11 @@ private:
 class Transport : public bzd::IOChannel
 {
 public:
-	bzd::Result<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept override
+	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
 		if (data.size() < 2)
 		{
-			return bzd::makeError(false);
+			co_return bzd::makeError(false);
 		}
 		std::cout << "[id=" << static_cast<int>(data[0]) << "] [length=" << static_cast<int>(data[1]) << "] ";
 		for (auto it = data.begin() + 2; it != data.end(); ++it)
@@ -76,10 +76,10 @@ public:
 			std::cout << static_cast<char>(*it);
 		}
 		std::cout << std::endl;
-		return data.size();
+		co_return data.size();
 	}
 
-	bzd::Result<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept override { return data.size(); }
+	bzd::Async<bzd::SizeType> read(const bzd::Span<bzd::ByteType> data) noexcept override { co_return data.size(); }
 };
 
 class Adapter2

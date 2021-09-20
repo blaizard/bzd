@@ -7,6 +7,7 @@
 #include "cc/bzd/container/tuple.h"
 #include "cc/bzd/container/vector.h"
 #include "cc/bzd/core/assert/minimal.h"
+#include "cc/bzd/core/async.h"
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/meta/range.h"
 #include "cc/bzd/type_traits/decay.h"
@@ -371,18 +372,19 @@ public:
 		bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
 	using FormatterTransportType = bzd::OChannel;
+	using FormatterReturnType = Async<void>;
 
 public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static constexpr void process(bzd::OChannel& stream, const T& value, const Metadata&) noexcept
+	static Async<void> process(bzd::OChannel& stream, const T& value, const Metadata&) noexcept
 	{
-		toStream(stream, value);
+		co_await toStream(stream, value);
 	}
 
 	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static constexpr void process(bzd::OChannel& stream, const T& value, const Metadata& metadata) noexcept
+	static Async<void> process(bzd::OChannel& stream, const T& value, const Metadata& metadata) noexcept
 	{
-		toStream(stream, value, metadata);
+		co_await toStream(stream, value, metadata);
 	}
 };
 
@@ -397,6 +399,7 @@ public:
 		bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
 	using FormatterTransportType = bzd::interface::String;
+	using FormatterReturnType = void;
 
 public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
@@ -412,8 +415,27 @@ public:
 	}
 };
 
+constexpr bzd::StringView processCommon(const bzd::StringView stringView, const Metadata& metadata)
+{
+	switch (metadata.format)
+	{
+	case Metadata::Format::AUTO:
+		return ((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
+	case Metadata::Format::FIXED_POINT:
+	case Metadata::Format::FIXED_POINT_PERCENT:
+	case Metadata::Format::DECIMAL:
+	case Metadata::Format::BINARY:
+	case Metadata::Format::HEXADECIMAL_LOWER:
+	case Metadata::Format::HEXADECIMAL_UPPER:
+	case Metadata::Format::OCTAL:
+	case Metadata::Format::POINTER:
+		break;
+	}
+	return {};
+}
+
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -457,7 +479,7 @@ void toString(bzd::interface::String& str, const T& value, const Metadata& metad
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -481,55 +503,45 @@ void toString(bzd::interface::String& str, const T& value, const Metadata& metad
 	}
 }
 
+constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata)
+{
+	str += processCommon(stringView, metadata);
+}
+
 // Specialization of toStream for the native types
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
-	stream.write(str.asBytes());
+	co_await stream.write(str.asBytes());
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-void toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
-	stream.write(str.asBytes());
+	co_await stream.write(str.asBytes());
 }
 
 template <
 	class T,
 	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-void toStream(bzd::OChannel& stream, const T& value, const Metadata&)
+Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata&)
 {
 	bzd::String<80> str{};
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
 	metadata.alternate = true;
 	toString(str, reinterpret_cast<SizeType>(value), metadata);
-	stream.write(str.asBytes());
+	co_await stream.write(str.asBytes());
 }
 
-inline void toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
+inline Async<void> toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
-	switch (metadata.format)
-	{
-	case Metadata::Format::AUTO:
-		stream.write(
-			((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView).asBytes());
-		break;
-	case Metadata::Format::FIXED_POINT:
-	case Metadata::Format::FIXED_POINT_PERCENT:
-	case Metadata::Format::DECIMAL:
-	case Metadata::Format::BINARY:
-	case Metadata::Format::HEXADECIMAL_LOWER:
-	case Metadata::Format::HEXADECIMAL_UPPER:
-	case Metadata::Format::OCTAL:
-	case Metadata::Format::POINTER:
-		break;
-	}
+	co_await stream.write(processCommon(stringView, metadata).asBytes());
 }
 
 /**
@@ -606,6 +618,7 @@ class Formatter
 {
 public:
 	using TransportType = typename Adapter::FormatterTransportType;
+	using ReturnType = typename Adapter::FormatterReturnType;
 
 public:
 	template <class... Args>
@@ -625,16 +638,22 @@ private:
 		{
 		}
 
-		constexpr void process(TransportType& transport, const Metadata& metadata) const noexcept
+		constexpr ReturnType process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			fcts_[index](ptrs_[index], transport, metadata);
 		}
 
+		ReturnType processAsync(TransportType& transport, const Metadata& metadata) const noexcept
+		{
+			const auto index = metadata.index;
+			co_await fcts_[index](ptrs_[index], transport, metadata);
+		}
+
 	private:
 		const Lambdas lambdas_;
 		const LambdasErased typeErasedLambdas_;
-		const bzd::Array<void (*)(const void*, TransportType&, const Metadata&), Lambdas::size()> fcts_;
+		const bzd::Array<ReturnType (*)(const void*, TransportType&, const Metadata&), Lambdas::size()> fcts_;
 		const bzd::Array<const void*, Lambdas::size()> ptrs_;
 	};
 
@@ -643,12 +662,13 @@ private:
 	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas =
-			bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) { Adapter::process(transport, args, metadata); }...);
+		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
+			return Adapter::process(transport, args, metadata);
+		}...);
 		using LambdaTupleType = decltype(lambdas);
 		// Make the lambda with type erasure
-		const auto typeErasedLambdas = bzd::makeTuple([](const void* lambda, TransportType& out, const Metadata& metadata) {
-			(*reinterpret_cast<const typename LambdaTupleType::template ItemType<I>*>(lambda))(out, metadata);
+		const auto typeErasedLambdas = bzd::makeTuple([](const void* lambda, TransportType& out, const Metadata& metadata) -> auto {
+			return (*reinterpret_cast<const typename LambdaTupleType::template ItemType<I>*>(lambda))(out, metadata);
 		}...);
 		using LambdaTypeErasedTupleType = decltype(typeErasedLambdas);
 
@@ -659,6 +679,7 @@ private:
 } // namespace bzd::format::impl
 
 namespace bzd::format {
+
 /**
  * \brief String formating.
  *
@@ -686,61 +707,77 @@ namespace bzd::format {
  * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
-template <class... Args>
-constexpr void toStream(bzd::OChannel& stream, const bzd::StringView& format, Args&&... args)
+template <class ConstexprStringView, class... Args>
+Async<void> toStream(bzd::OChannel& stream, const ConstexprStringView& format, Args&&... args)
 {
-	using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>;
-
-	const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
-	impl::Parser<RuntimeAdapter> parser{format};
-
-	// Run-time call
-	for (const auto& result : parser)
+	if constexpr (!bzd::typeTraits::isConstructible<bzd::StringView, ConstexprStringView>)
 	{
-		if (!result.str.empty())
-		{
-			stream.write(result.str.asBytes());
-		}
-		if (result.metadata.hasValue())
-		{
-			formatter.process(stream, result.metadata.value());
-		}
+		// Compile-time format check
+		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
+		constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
+		// This line enforces compilation time evaluation
+		static_assert(isValid, "Compile-time string format check failed.");
+
+		// Run-time call
+		co_await bzd::format::toStream(stream, ConstexprStringView::value(), bzd::forward<Args>(args)...);
 	}
-}
-
-template <class... Args>
-constexpr void toString(bzd::interface::String& str, const bzd::StringView& format, Args&&... args)
-{
-	using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>;
-
-	const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
-	impl::Parser<RuntimeAdapter> parser{format};
-
-	// Run-time call
-	for (const auto& result : parser)
+	else
 	{
-		if (!result.str.empty())
+		using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>;
+
+		const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
+		impl::Parser<RuntimeAdapter> parser{format};
+
+		// Run-time call
+		for (const auto& result : parser)
 		{
-			str.append(result.str);
-		}
-		if (result.metadata.hasValue())
-		{
-			formatter.process(str, result.metadata.value());
+			if (!result.str.empty())
+			{
+				co_await stream.write(result.str.asBytes());
+			}
+			if (result.metadata.hasValue())
+			{
+				co_await formatter.processAsync(stream, result.metadata.value());
+			}
 		}
 	}
 }
 
 template <class ConstexprStringView, class... Args>
-constexpr void toStream(bzd::OChannel& stream, const ConstexprStringView&, Args&&... args)
+constexpr void toString(bzd::interface::String& str, const ConstexprStringView& format, Args&&... args)
 {
-	// Compile-time format check
-	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
-	// This line enforces compilation time evaluation
-	static_assert(isValid, "Compile-time string format check failed.");
+	if constexpr (!bzd::typeTraits::isConstructible<bzd::StringView, ConstexprStringView>)
+	{
+		// Compile-time format check
+		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
+		constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
+		// This line enforces compilation time evaluation
+		static_assert(isValid, "Compile-time string format check failed.");
 
-	// Run-time call
-	bzd::format::toStream(stream, ConstexprStringView::value(), bzd::forward<Args>(args)...);
+		// Run-time call
+		bzd::format::toString(str, ConstexprStringView::value(), bzd::forward<Args>(args)...);
+		return;
+	}
+	else
+	{
+		using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>;
+
+		const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
+		impl::Parser<RuntimeAdapter> parser{format};
+
+		// Run-time call
+		for (const auto& result : parser)
+		{
+			if (!result.str.empty())
+			{
+				str.append(result.str);
+			}
+			if (result.metadata.hasValue())
+			{
+				formatter.process(str, result.metadata.value());
+			}
+		}
+	}
 }
 
 } // namespace bzd::format

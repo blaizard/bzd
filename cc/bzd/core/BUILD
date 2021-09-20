@@ -1,5 +1,4 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 cc_library(
     name = "core",
@@ -9,18 +8,9 @@ cc_library(
         ":async",
         ":channel",
         ":delay",
-        ":log",
         ":registry",
         ":units",
     ],
-)
-
-bdl_library(
-    name = "channel3",
-    srcs = [
-        "channel3.bdl",
-    ],
-    visibility = ["//visibility:public"],
 )
 
 # ---- Individual items ----
@@ -32,10 +22,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":log",
         "//cc/bzd/container:result",
         "//cc/bzd/core:assert_minimal",
-        "//cc/bzd/platform",
+        "//cc/bzd/core/logger",
     ],
 )
 
@@ -58,11 +47,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":assert_minimal_header",
-        ":channel",
-        ":registry",
+        "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/platform",
-        "//cc/bzd/utility/format:integral",
+        "//cc/bzd/platform:panic",
+        "//cc/bzd/core/logger",
+        #"//cc/bzd/utility/format:integral",
     ],
 )
 
@@ -73,8 +62,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container:result",
         "//cc/bzd/container:span",
+        "//cc/bzd/core:async",
         "//cc/bzd/platform:types",
     ],
 )
@@ -88,22 +77,6 @@ cc_library(
     deps = [
         ":async",
         "//cc/bzd/platform",
-    ],
-)
-
-cc_library(
-    name = "log",
-    hdrs = [
-        "log.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":channel",
-        "//cc/bzd/container:string",
-        "//cc/bzd/container:string_view",
-        "//cc/bzd/platform",
-        "//cc/bzd/utility:forward",
-        "//cc/bzd/utility/format",
     ],
 )
 

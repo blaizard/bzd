@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/impl/non_owning_list.h"
+#include "cc/bzd/core/assert.h"
 #include "cc/bzd/platform/out.h"
 #include "cc/bzd/utility/format/format.h"
 
@@ -116,16 +117,17 @@ public:
 			bzd::format::toStream(bzd::platform::getOut(),
 								  CSTR("{} {}"),
 								  address,
-								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "));
+								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "))
+				.sync();
 		};
 
 		printAddress(node);
 		if (node)
 		{
-			bzd::platform::getOut().write(bzd::StringView{" -> "}.asBytes());
+			bzd::platform::getOut().write(bzd::StringView{" -> "}.asBytes()).sync();
 			printAddress(node->next_.load());
 		}
-		bzd::platform::getOut().write(bzd::StringView{"\n"}.asBytes());
+		bzd::platform::getOut().write(bzd::StringView{"\n"}.asBytes()).sync();
 	}
 };
 } // namespace bzd::test

@@ -1,34 +1,26 @@
 #pragma once
 
-#include "cc/bzd/container/result.h"
 #include "cc/bzd/container/span.h"
+#include "cc/bzd/core/async.h"
 #include "cc/bzd/platform/types.h"
 
-namespace bzd::impl {
+namespace bzd {
 
-class IOChannelCommon
+class OChannel
 {
 public:
-	virtual bzd::Result<> connect() { return bzd::nullresult; }
-	virtual bzd::Result<> disconnect() { return bzd::nullresult; }
+	/*
+	 * Write data to an output channel.
+	 * The promise resolves only after all the data is transmitted.
+	 * \param data The data to be sent via this output channel.
+	 */
+	virtual bzd::Async<SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept = 0;
 };
 
-class OChannel : public IOChannelCommon
+class IChannel
 {
-protected:
-	OChannel() = default;
-
 public:
-	virtual bzd::Result<SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept = 0;
-};
-
-class IChannel : public IOChannelCommon
-{
-protected:
-	IChannel() = default;
-
-public:
-	virtual bzd::Result<SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept = 0;
+	virtual bzd::Async<SizeType> read(const bzd::Span<bzd::ByteType> data) noexcept = 0;
 };
 
 class IOChannel
@@ -36,11 +28,4 @@ class IOChannel
 	, public OChannel
 {
 };
-} // namespace bzd::impl
-
-namespace bzd {
-using OChannel = impl::OChannel;
-using IChannel = impl::IChannel;
-using IOChannel = impl::IOChannel;
-
 } // namespace bzd

@@ -1,9 +1,0 @@
-
-namespace bzd;
-
-interface Logger {
-	method write(data = List<Byte>);
-	
-}
-
-

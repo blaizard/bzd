@@ -1,12 +1,15 @@
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-bdl_library(
+cc_library(
     name = "backend",
     srcs = [
-        "logger.bdl",
+        "logger.cc",
+    ],
+    hdrs = [
+        "logger.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:channel3",
+        "//cc/bzd/core:channel",
     ],
 )

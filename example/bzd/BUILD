@@ -14,6 +14,7 @@ bzd_manifest(
         "@esp32_xtensa_lx6_gcc//:target": ["config_esp32_xtensa_lx6.yml"],
         "//conditions:default": ["config_others.yml"],
     }),
+    tags = ["manual"],
     deps = [],
 )
 
@@ -22,6 +23,7 @@ cc_library(
     srcs = [
         "main.cc",
     ],
+    tags = ["manual"],
     deps = [
         ":config_manifest",
         "//cc/bzd",
@@ -34,6 +36,7 @@ cc_library(
 
 bzd_cc_binary(
     name = "bzd",
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         ":lib",
@@ -43,6 +46,7 @@ bzd_cc_binary(
 bzd_package(
     name = "package",
     include_metadata = True,
+    tags = ["manual"],
     deps = {
         ":bzd": "bzd",
     },

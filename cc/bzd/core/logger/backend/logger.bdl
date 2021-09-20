@@ -1,9 +1,0 @@
-use "cc/bzd/core/channel3.bdl"
-
-namespace bzd.backend;
-
-interface Logger : OChannel {
-	
-}
-
-

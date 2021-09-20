@@ -7,6 +7,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
     ],
     deps = [
         "//cc/bzd/container:function",
+        "//cc/bzd/core:assert",
         "//cc/bzd/type_traits",
         "//tools/cc_test",
     ],

@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/result.h"
 #include "cc/bzd/core/assert/minimal.h"
-#include "cc/bzd/core/log.h"
+#include "cc/bzd/core/logger/minimal.h"
 #include "cc/bzd/platform/panic.h"
 #include "cc/bzd/utility/source_location.h"
 
@@ -12,7 +12,7 @@ constexpr void isTrue(const bool condition, Args&&... args)
 {
 	if (!condition)
 	{
-		bzd::log::print(bzd::forward<Args>(args)...);
+		bzd::minimal::Logger::getDefault().info(bzd::forward<Args>(args)...);
 		bzd::platform::panic();
 	}
 }

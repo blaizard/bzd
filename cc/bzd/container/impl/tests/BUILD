@@ -9,6 +9,7 @@ cc_library(
     visibility = ["//cc/bzd/container/impl/tests:__subpackages__"],
     deps = [
         "//cc/bzd/container/impl:non_owning_list",
+        "//cc/bzd/core:assert",
         "//cc/bzd/platform",
         "//cc/bzd/utility/format",
     ],
