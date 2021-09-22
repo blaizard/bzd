@@ -1,7 +1,6 @@
-#include "cc/bzd/core/assert/minimal.h"
-
 #include "cc/bzd/container/string.h"
 #include "cc/bzd/container/string_view.h"
+#include "cc/bzd/core/assert/minimal.h"
 #include "cc/bzd/core/logger.h"
 #include "cc/bzd/platform/panic.h"
 //#include "cc/bzd/utility/format/integral.h"

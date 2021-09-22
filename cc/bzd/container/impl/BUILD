@@ -21,7 +21,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
-        "//cc/bzd/core:assert_minimal_header",
+        "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:atomic",
         "//cc/bzd/platform:types",
         "//cc/bzd/test:inject_point",
@@ -36,7 +36,7 @@ cc_library(
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
         "//cc/bzd/container:span",
-        "//cc/bzd/core:assert_minimal",
+        "//cc/bzd/core/assert",
         "//cc/bzd/platform:types",
     ],
 )

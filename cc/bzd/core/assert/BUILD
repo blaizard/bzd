@@ -1,18 +1,21 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "logger",
+    name = "assert",
     srcs = [
-        "logger.cc",
+        "assert.cc",
     ],
     hdrs = [
-        "//cc/bzd/core:logger.h",
+        "//cc/bzd/core:assert.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":minimal",
-        "//cc/bzd/core/logger/backend",
-        "//cc/bzd/utility/format",
+        "//cc/bzd/container:result",
+        "//cc/bzd/container:string",
+        "//cc/bzd/container:string_view",
+        "//cc/bzd/core/logger",
+        "//cc/bzd/platform:panic",
     ],
 )
 

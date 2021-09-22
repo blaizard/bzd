@@ -6,7 +6,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         path,
     ],
     deps = [
-        "//cc/bzd/core:assert",
+        "//cc/bzd/core/assert",
         "//cc/bzd/platform",
         "//tools/cc_test",
     ],

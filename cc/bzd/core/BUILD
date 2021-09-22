@@ -4,12 +4,13 @@ cc_library(
     name = "core",
     visibility = ["//visibility:public"],
     deps = [
-        ":assert",
         ":async",
         ":channel",
         ":delay",
         ":registry",
         ":units",
+        "//cc/bzd/core/assert",
+        "//cc/bzd/core/logger",
     ],
 )
 
@@ -17,47 +18,12 @@ cc_library(
 
 exports_files(
     ["logger.h"],
-    visibility = ["//cc/bzd/core/logger:__pkg__"]
+    visibility = ["//cc/bzd/core/logger:__pkg__"],
 )
 
-cc_library(
-    name = "assert",
-    hdrs = [
-        "assert.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:result",
-        "//cc/bzd/core:assert_minimal",
-        "//cc/bzd/core/logger",
-    ],
-)
-
-cc_library(
-    name = "assert_minimal_header",
-    hdrs = [
-        "assert/minimal.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/utility:source_location",
-    ],
-)
-
-cc_library(
-    name = "assert_minimal",
-    srcs = [
-        "assert/minimal.cc",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":assert_minimal_header",
-        "//cc/bzd/container:string",
-        "//cc/bzd/container:string_view",
-        "//cc/bzd/platform:panic",
-        "//cc/bzd/core/logger",
-        #"//cc/bzd/utility/format:integral",
-    ],
+exports_files(
+    ["assert.h"],
+    visibility = ["//cc/bzd/core/assert:__pkg__"],
 )
 
 cc_library(
@@ -112,10 +78,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":assert_minimal_header",
         "//cc/bzd/container:map",
         "//cc/bzd/container:result",
         "//cc/bzd/container:string_view",
+        "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:singleton",
     ],
