@@ -4,8 +4,8 @@
 #include "cc/bzd/container/optional.h"
 #include "cc/bzd/container/result.h"
 #include "cc/bzd/container/tuple.h"
-#include "cc/bzd/core/coroutine.h"
-#include "cc/bzd/core/promise.h"
+#include "cc/bzd/core/async/coroutine.h"
+#include "cc/bzd/core/async/promise.h"
 #include "cc/bzd/type_traits/remove_reference.h"
 #include "cc/bzd/utility/ignore.h"
 

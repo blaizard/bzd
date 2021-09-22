@@ -180,4 +180,5 @@ TEST(Format_, StringFormat)
 	expectStringStreamFormat<256>("Hello Wo", CSTR("Hello {:.2}"), "World");
 	expectStringStreamFormat<256>("This milk is 3.5%", CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
 	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
+	expectStringStreamFormat<256>("Pointer 0x1234", CSTR("Pointer {}"), reinterpret_cast<const void*>(0x1234));
 }

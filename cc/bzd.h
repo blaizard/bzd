@@ -29,8 +29,7 @@
 #include "cc/bzd/core/async.h"
 #include "cc/bzd/core/channel.h"
 #include "cc/bzd/core/delay.h"
-#include "cc/bzd/core/executor.h"
-#include "cc/bzd/core/promise.h"
+#include "cc/bzd/core/logger.h"
 #include "cc/bzd/core/registry.h"
 
 // Meta

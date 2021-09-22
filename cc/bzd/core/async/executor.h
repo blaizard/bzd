@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/impl/non_owning_list.h"
-#include "cc/bzd/core/promise.h"
+#include "cc/bzd/core/async/promise.h"
 #include "cc/bzd/utility/ignore.h"
 
 #include <iostream>

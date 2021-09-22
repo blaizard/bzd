@@ -3,8 +3,8 @@
 #include "cc/bzd/container/function_view.h"
 #include "cc/bzd/container/impl/non_owning_list.h"
 #include "cc/bzd/container/optional.h"
-#include "cc/bzd/core/coroutine.h"
-#include "cc/bzd/core/executor.h"
+#include "cc/bzd/core/async/coroutine.h"
+#include "cc/bzd/core/async/executor.h"
 
 #include <iostream>
 
