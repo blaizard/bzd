@@ -87,6 +87,22 @@ TEST(Coroutine, DeepNested)
 	EXPECT_EQ(trace, "[a3][a1][a0][a2][a4][a3][a1][a0][a2][a4][a3][a1][a0][a2][a4]");
 }
 
+bzd::Async<int> passThrough(bzd::interface::String& trace, bzd::StringView id, int retVal)
+{
+	return nested(trace, id, retVal);
+}
+
+TEST(Coroutine, PassThrough)
+{
+	bzd::Executor executor;
+	bzd::String<32> trace;
+	auto promise = passThrough(trace, "a", 34);
+	const auto result = promise.run(executor);
+	EXPECT_EQ(trace, "[a1][a0][a2]");
+	EXPECT_TRUE(result);
+	EXPECT_EQ(result.value(), 34);
+}
+
 TEST(Coroutine, asyncAll)
 {
 	bzd::Executor executor;
