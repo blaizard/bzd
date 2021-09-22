@@ -1,15 +1,30 @@
-#include "cc/bzd/core/logger/logger.h"
+#include "cc/bzd/core/logger.h"
 
 #include "cc/bzd/core/logger/backend/logger.h"
 
-void bzd::minimal::Logger::setMinimumLevel(const bzd::log::Level level) noexcept
+namespace {
+const char* levelToStr(const bzd::log::Level level)
+{
+	switch (level)
+	{
+	case bzd::log::Level::ERROR:
+		return "[e]";
+	case bzd::log::Level::WARNING:
+		return "[w]";
+	case bzd::log::Level::INFO:
+		return "[i]";
+	case bzd::log::Level::DEBUG:
+		return "[d]";
+	default:
+		bzd::assert::unreachable();
+	}
+	return "";
+}
+} // namespace
+
+void bzd::Logger::setMinimumLevel(const bzd::log::Level level) noexcept
 {
 	minLevel_ = level;
-}
-
-bzd::minimal::Logger& bzd::minimal::Logger::getDefault() noexcept
-{
-	return bzd::Logger::getDefault();
 }
 
 bzd::Logger& bzd::Logger::getDefault() noexcept
@@ -18,63 +33,28 @@ bzd::Logger& bzd::Logger::getDefault() noexcept
 	return logger;
 }
 
-bzd::Async<void> bzd::Logger::printHeader(const bzd::log::Level level) noexcept
+bzd::Async<void> bzd::Logger::printHeader(const bzd::log::Level level, const SourceLocation location) noexcept
 {
-	bzd::StringView str;
-	switch (level)
-	{
-	case bzd::log::Level::CRITICAL:
-		str = "[c] ";
-		break;
-	case bzd::log::Level::ERROR:
-		str = "[e] ";
-		break;
-	case bzd::log::Level::WARNING:
-		str = "[w] ";
-		break;
-	case bzd::log::Level::INFO:
-		str = "[i] ";
-		break;
-	case bzd::log::Level::DEBUG:
-		str = "[d] ";
-		break;
-	default:
-		bzd::assert::unreachable();
-	}
-	auto& backend = bzd::backend::Logger::getDefaultBackend();
-	co_await backend.write(str.asBytes());
+	auto& backend = bzd::backend::Logger::getDefault();
+	co_await bzd::format::toStream(backend, CSTR("{} [{}:{}] "), levelToStr(level), location.getFileName(), location.getLine());
 }
 
-void bzd::minimal::Logger::printHeader(const bzd::log::Level) noexcept
+void bzd::minimal::log::error(const bzd::StringView message, const SourceLocation location) noexcept
 {
-	/*
-		bzd::StringView str;
-		switch (level)
-		{
-		case bzd::log::Level::CRITICAL:
-			str = "[c] ";
-			break;
-		case bzd::log::Level::ERROR:
-			str = "[e] ";
-			break;
-		case bzd::log::Level::WARNING:
-			str = "[w] ";
-			break;
-		case bzd::log::Level::INFO:
-			str = "[i] ";
-			break;
-		case bzd::log::Level::DEBUG:
-			str = "[d] ";
-			break;bzd::Logger::
-		default:
-			bzd::assert::unreachable();
-		}
-		globalBackend->write(str.asBytes());*/
+	bzd::Logger::getDefault().error(message, location).sync();
 }
 
-/*
-void bzd::Logger::print(const bzd::StringView) noexcept
+void bzd::minimal::log::warning(const bzd::StringView message, const SourceLocation location) noexcept
 {
-
+	bzd::Logger::getDefault().warning(message, location).sync();
 }
-*/
+
+void bzd::minimal::log::info(const bzd::StringView message, const SourceLocation location) noexcept
+{
+	bzd::Logger::getDefault().info(message, location).sync();
+}
+
+void bzd::minimal::log::debug(const bzd::StringView message, const SourceLocation location) noexcept
+{
+	bzd::Logger::getDefault().debug(message, location).sync();
+}

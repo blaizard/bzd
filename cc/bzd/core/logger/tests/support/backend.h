@@ -14,6 +14,7 @@ public:
 		for (const auto b : data)
 		{
 			buffer_.at(write_++ % SIZE) = b;
+			std::cout << static_cast<char>(b) << std::flush;
 		}
 		co_return 0;
 	}
@@ -28,12 +29,18 @@ public:
 			return makeError();
 		}
 
-		for (SizeType i = 0; read_ < write_ && i < data.size(); ++read_, ++i)
+		SizeType i = 0;
+		for (; read_ < write_ && i < data.size(); ++read_, ++i)
 		{
 			if (buffer_.at(read_ % SIZE) != data.at(i))
 			{
 				return makeError();
 			}
+		}
+
+		if (i < data.size())
+		{
+			return makeError();
 		}
 
 		return nullresult;

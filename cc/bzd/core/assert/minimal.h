@@ -23,7 +23,7 @@ constexpr void isTrue(const bool condition, const bzd::SourceLocation location =
 {
 	if (!condition)
 	{
-		impl::backend(location, "Assertion failed.\n");
+		impl::backend(location, "Assertion failed.");
 	}
 }
 

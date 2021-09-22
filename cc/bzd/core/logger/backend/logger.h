@@ -15,7 +15,7 @@ public:
 	/**
 	 * Get the default backend logger.
 	 */
-	static bzd::backend::Logger& getDefaultBackend() noexcept;
+	static bzd::backend::Logger& getDefault() noexcept;
 };
 
 } // namespace bzd::backend

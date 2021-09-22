@@ -15,6 +15,11 @@ cc_library(
 
 # ---- Individual items ----
 
+exports_files(
+    ["logger.h"],
+    visibility = ["//cc/bzd/core/logger:__pkg__"]
+)
+
 cc_library(
     name = "assert",
     hdrs = [
