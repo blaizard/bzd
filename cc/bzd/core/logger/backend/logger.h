@@ -4,7 +4,7 @@
 
 namespace bzd::backend {
 
-class Logger : public bzd::OChannel
+class Logger : public bzd::OStream
 {
 public:
 	/**

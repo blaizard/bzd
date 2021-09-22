@@ -61,7 +61,7 @@ private:
 	int address_;
 };
 
-class Transport : public bzd::IOChannel
+class Transport : public bzd::IOStream
 {
 public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
@@ -85,7 +85,7 @@ public:
 class Adapter2
 {
 public:
-	Adapter2(bzd::IOChannel& transport, const uint8_t id) : transport_{transport}, id_{id} {}
+	Adapter2(bzd::IOStream& transport, const uint8_t id) : transport_{transport}, id_{id} {}
 
 	struct Data
 	{
@@ -107,7 +107,7 @@ public:
 	bool filter(const bzd::Span<const bzd::UInt8Type>&) { return true; }
 
 private:
-	bzd::IOChannel& transport_;
+	bzd::IOStream& transport_;
 	const uint8_t id_;
 };
 

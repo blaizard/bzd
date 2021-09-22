@@ -25,7 +25,7 @@
 #include <unistd.h>
 
 namespace {
-class AsyncSignalSafeChannel : public bzd::OChannel
+class AsyncSignalSafeStream : public bzd::OStream
 {
 public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept final
@@ -226,14 +226,14 @@ void callStack() noexcept
 	static void* addresses[MAX_STACK_LEVEL];
 
 	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
-	AsyncSignalSafeChannel channel;
+	AsyncSignalSafeStream stream;
 
 	for (int level = 0; level < nbLevels; ++level)
 	{
 		// Do not print the last stack trace, but ellipsis instead.
 		if (level == MAX_STACK_LEVEL - 1)
 		{
-			bzd::format::toStream(channel, "...\n"_sv);
+			bzd::format::toStream(stream, "...\n"_sv).sync();
 			return;
 		}
 
@@ -276,13 +276,13 @@ void callStack() noexcept
 		}
 
 		// Print stack trace number and memory address
-		bzd::format::toStream(channel,
+		bzd::format::toStream(stream,
 							  CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
 							  level,
 							  reinterpret_cast<uint64_t>(address),
 							  symbol.data(),
 							  info.offset,
-							  path.data());
+							  path.data()).sync();
 	}
 }
 
@@ -295,8 +295,8 @@ void sigHandler(const int sig)
 		return;
 	}
 
-	AsyncSignalSafeChannel channel;
-	bzd::format::toStream(channel, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig);
+	AsyncSignalSafeStream stream;
+	bzd::format::toStream(stream, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig).sync();
 
 	callStack();
 	std::exit(sig);

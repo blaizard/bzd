@@ -6,7 +6,7 @@ bzd_cc_test(
         "*.cc",
     ]),
     deps = [
-        "//cc/bzd/container:string_channel",
+        "//cc/bzd/container:string_stream",
         "//cc/bzd/core/assert",
         "//cc/bzd/utility/format",
         "//tools/cc_test",

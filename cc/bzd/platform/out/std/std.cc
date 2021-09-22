@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace {
-class StdoutChannel : public bzd::OChannel
+class StdoutChannel : public bzd::OStream
 {
 public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
@@ -14,7 +14,7 @@ public:
 };
 } // namespace
 
-bzd::OChannel& bzd::platform::getOut()
+bzd::OStream& bzd::platform::getOut()
 {
 	static StdoutChannel stdout_;
 	return stdout_;

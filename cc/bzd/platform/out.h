@@ -3,5 +3,5 @@
 #include "cc/bzd/core/channel.h"
 
 namespace bzd::platform {
-bzd::OChannel& getOut();
+bzd::OStream& getOut();
 } // namespace bzd::platform

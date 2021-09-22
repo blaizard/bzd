@@ -18,7 +18,7 @@ cc_library(
         ":result",
         ":span",
         ":string",
-        ":string_channel",
+        ":string_stream",
         ":string_view",
         ":variant",
         ":vector",
@@ -227,9 +227,9 @@ cc_library(
 )
 
 cc_library(
-    name = "string_channel",
+    name = "string_stream",
     hdrs = [
-        "string_channel.h",
+        "string_stream.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
