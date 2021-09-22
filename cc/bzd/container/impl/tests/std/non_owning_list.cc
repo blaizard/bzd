@@ -1,7 +1,7 @@
-#include "cc/bzd/container/impl/tests/non_owning_list_for_test.h"
-#include "cc/bzd/test/sync_point.h"
-#include "cc/bzd/utility/ignore.h"
-#include "cc_test/test.h"
+#include "cc/bzd/container/impl/tests/non_owning_list_for_test.hh"
+#include "cc/bzd/test/sync_point.hh"
+#include "cc/bzd/utility/ignore.hh"
+#include "cc_test/test.hh"
 
 #include <iostream>
 #include <mutex>

@@ -1,6 +1,6 @@
-#include "cc/bzd/core/assert.h"
+#include "cc/bzd/core/assert.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(Assert, Base)
 {

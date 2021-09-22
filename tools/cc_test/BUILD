@@ -6,8 +6,8 @@ cc_library(
         "test.cc",
     ],
     hdrs = [
-        "test.h",
-        "test_internal.h",
+        "test.hh",
+        "test_internal.hh",
     ],
     include_prefix = "cc_test",
     includes = ["."],

@@ -1,6 +1,6 @@
-#include "cc/bzd/container/string_view.h"
+#include "cc/bzd/container/string_view.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 /*
 TEST(ContainerStringView, Empty)

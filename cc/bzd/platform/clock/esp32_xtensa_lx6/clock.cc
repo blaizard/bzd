@@ -1,4 +1,4 @@
-#include "cc/bzd/platform/clock.h"
+#include "cc/bzd/platform/clock.hh"
 
 #include "sdkconfig.h"
 #include "xtensa/core-macros.h"

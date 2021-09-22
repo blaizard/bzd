@@ -1,6 +1,6 @@
-#include "cc/bzd/type_traits/is_integral.h"
+#include "cc/bzd/type_traits/is_integral.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(TypeTraits, isIntegral)
 {

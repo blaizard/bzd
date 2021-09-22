@@ -1,7 +1,7 @@
-#include "cc/bzd/meta/union.h"
+#include "cc/bzd/meta/union.hh"
 
-#include "cc/bzd/utility/move.h"
-#include "cc_test/test.h"
+#include "cc/bzd/utility/move.hh"
+#include "cc_test/test.hh"
 
 #include <string>
 

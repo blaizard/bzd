@@ -1,4 +1,4 @@
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 #include <cstring>
 #include <iostream>

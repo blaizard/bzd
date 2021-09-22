@@ -1,6 +1,6 @@
-#include "cc/bzd/container/map.h"
+#include "cc/bzd/container/map.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ContainerMap, single)
 {

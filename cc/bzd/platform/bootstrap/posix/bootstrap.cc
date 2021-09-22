@@ -1,12 +1,12 @@
 // std
-#include "cc/bzd/container/array.h"
-#include "cc/bzd/container/optional.h"
-#include "cc/bzd/container/string_view.h"
-#include "cc/bzd/core/channel.h"
-#include "cc/bzd/platform/types.h"
-#include "cc/bzd/utility/format/format.h"
-#include "cc/bzd/utility/ignore.h"
-#include "cc/bzd/utility/singleton.h"
+#include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/core/channel.hh"
+#include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/ignore.hh"
+#include "cc/bzd/utility/singleton.hh"
 
 #include <array>
 #include <atomic>
@@ -282,7 +282,8 @@ void callStack() noexcept
 							  reinterpret_cast<uint64_t>(address),
 							  symbol.data(),
 							  info.offset,
-							  path.data()).sync();
+							  path.data())
+			.sync();
 	}
 }
 

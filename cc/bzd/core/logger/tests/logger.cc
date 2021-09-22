@@ -1,7 +1,7 @@
-#include "cc/bzd/core/logger.h"
+#include "cc/bzd/core/logger.hh"
 
-#include "cc/bzd/core/logger/tests/support/backend.h"
-#include "cc_test/test.h"
+#include "cc/bzd/core/logger/tests/support/backend.hh"
+#include "cc_test/test.hh"
 
 TEST(Logger, Empty)
 {

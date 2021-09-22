@@ -20,7 +20,7 @@ assert(value <= {{ contract.value }});
 
 #include <cassert>
 
-#include "tools/bdl/generators/cc/adapter/types.h"
+#include "tools/bdl/generators/cc/adapter/types.hh"
 
 // **** Dependencies ****
 {% for use in useList %}

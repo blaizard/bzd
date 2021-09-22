@@ -43,7 +43,7 @@ cc_library(
 cc_library(
     name = "types",
     hdrs = [
-        "types.h",
+        "types.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -51,7 +51,7 @@ cc_library(
 cc_library(
     name = "panic",
     hdrs = [
-        "panic.h",
+        "panic.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -59,7 +59,7 @@ cc_library(
 cc_library(
     name = "atomic",
     hdrs = [
-        "atomic.h",
+        "atomic.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -70,9 +70,9 @@ cc_library(
 cc_library(
     name = "headers",
     hdrs = [
-        "clock.h",
-        "out.h",
-        "stack.h",
+        "clock.hh",
+        "out.hh",
+        "stack.hh",
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [

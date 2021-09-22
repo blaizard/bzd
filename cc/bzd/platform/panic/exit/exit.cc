@@ -1,4 +1,4 @@
-#include "cc/bzd/platform/panic.h"
+#include "cc/bzd/platform/panic.hh"
 
 #include <exception>
 

@@ -15,7 +15,7 @@ cc_library(
 cc_library(
     name = "non_owning_list",
     hdrs = [
-        "non_owning_list.h",
+        "non_owning_list.hh",
     ],
     visibility = ["//cc/bzd:__subpackages__"],
     deps = [
@@ -31,7 +31,7 @@ cc_library(
 cc_library(
     name = "single_linked_pool",
     hdrs = [
-        "single_linked_pool.h",
+        "single_linked_pool.hh",
     ],
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
@@ -44,7 +44,7 @@ cc_library(
 cc_library(
     name = "span",
     hdrs = [
-        "span.h",
+        "span.hh",
     ],
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [

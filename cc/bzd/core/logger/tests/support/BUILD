@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "support",
     hdrs = [
-        "backend.h",
+        "backend.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

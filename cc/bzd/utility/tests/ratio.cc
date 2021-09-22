@@ -1,6 +1,6 @@
-#include "cc/bzd/utility/ratio.h"
+#include "cc/bzd/utility/ratio.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(Ratio, Base)
 {

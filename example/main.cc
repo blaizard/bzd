@@ -1,6 +1,6 @@
-#include "bzd.h"
-#include "example/mutex.h"
-#include "example/terminal.h"
+#include "bzd.hh"
+#include "example/mutex.hh"
+#include "example/terminal.hh"
 
 #include <iostream>
 #include <thread>

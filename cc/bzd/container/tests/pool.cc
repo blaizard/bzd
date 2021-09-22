@@ -1,6 +1,6 @@
-#include "cc/bzd/container/pool.h"
+#include "cc/bzd/container/pool.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ContainerPool, single)
 {

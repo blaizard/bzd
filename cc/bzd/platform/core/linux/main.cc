@@ -1,8 +1,8 @@
-#include "cc/bzd/core/delay.h"
-#include "cc/bzd/core/executor.h"
-#include "cc/bzd/platform/core/linux/core.h"
-#include "cc/bzd/platform/core/linux/pi.h"
-#include "cc/bzd/platform/generic/executor.h"
+#include "cc/bzd/core/delay.hh"
+#include "cc/bzd/core/executor.hh"
+#include "cc/bzd/platform/core/linux/core.hh"
+#include "cc/bzd/platform/core/linux/pi.hh"
+#include "cc/bzd/platform/generic/executor.hh"
 
 #include <iostream>
 

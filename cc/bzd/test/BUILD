@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "sync_point",
     hdrs = [
-        "sync_point.h",
+        "sync_point.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -14,7 +14,7 @@ cc_library(
 cc_library(
     name = "inject_point",
     hdrs = [
-        "inject_point.h",
+        "inject_point.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

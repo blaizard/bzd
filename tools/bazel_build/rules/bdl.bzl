@@ -42,7 +42,7 @@ def _bdl_library_impl(ctx):
     _FORMATS = {
         "cc": {
             "display": "C++",
-            "outputs": ["{}.h"],
+            "outputs": ["{}.hh"],
         },
     }
 

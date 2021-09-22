@@ -1,6 +1,6 @@
-#include "cc/bzd/container/vector.h"
+#include "cc/bzd/container/vector.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ContainerVector, Base)
 {

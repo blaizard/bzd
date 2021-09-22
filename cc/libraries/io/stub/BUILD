@@ -3,10 +3,10 @@ load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
 bzd_cc_library(
     name = "stub",
     hdrs = [
-        "stub.h",
+        "stub.hh",
     ],
     includes = [
-        "libraries/io/stub/stub.h",
+        "libraries/io/stub/stub.hh",
     ],
     interfaces = {
         "bzd::io::Stub": "*",

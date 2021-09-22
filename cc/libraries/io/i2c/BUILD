@@ -7,13 +7,13 @@ bzd_cc_library(
         "//conditions:default": [],
     }),
     hdrs = [
-        "i2c.h",
+        "i2c.hh",
     ] + select({
-        "@esp32_xtensa_lx6_gcc//:target": ["i2c_esp32_xtensa_lx6.h"],
+        "@esp32_xtensa_lx6_gcc//:target": ["i2c_esp32_xtensa_lx6.hh"],
         "//conditions:default": [],
     }),
     includes = select({
-        "@esp32_xtensa_lx6_gcc//:target": ["libraries/io/i2c/i2c_esp32_xtensa_lx6.h"],
+        "@esp32_xtensa_lx6_gcc//:target": ["libraries/io/i2c/i2c_esp32_xtensa_lx6.hh"],
         "//conditions:default": [],
     }),
     interfaces = select({

@@ -1,6 +1,6 @@
-#include "cc/bzd/container/function_view.h"
+#include "cc/bzd/container/function_view.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 namespace {
 class Dummy

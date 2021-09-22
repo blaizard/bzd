@@ -1,7 +1,7 @@
-#include "cc/bzd/container/optional.h"
+#include "cc/bzd/container/optional.hh"
 
-#include "cc/bzd/container/result.h"
-#include "cc_test/test.h"
+#include "cc/bzd/container/result.hh"
+#include "cc_test/test.hh"
 
 TEST(ContainerOptional, simpleData)
 {

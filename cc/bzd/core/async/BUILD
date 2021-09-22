@@ -3,10 +3,10 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 cc_library(
     name = "async",
     hdrs = [
-        "coroutine.h",
-        "executor.h",
-        "promise.h",
-        "//cc/bzd/core:async.h",
+        "coroutine.hh",
+        "executor.hh",
+        "promise.hh",
+        "//cc/bzd/core:async.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

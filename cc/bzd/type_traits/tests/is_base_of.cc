@@ -1,6 +1,6 @@
-#include "cc/bzd/type_traits/is_base_of.h"
+#include "cc/bzd/type_traits/is_base_of.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 struct A
 {

@@ -1,6 +1,6 @@
-#include "cc/bzd/utility/constexpr_for.h"
+#include "cc/bzd/utility/constexpr_for.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ConstexprFor, Base)
 {

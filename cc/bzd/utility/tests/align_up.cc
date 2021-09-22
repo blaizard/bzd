@@ -1,6 +1,6 @@
-#include "cc/bzd/utility/align_up.h"
+#include "cc/bzd/utility/align_up.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(AlignUp, Base)
 {

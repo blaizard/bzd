@@ -1,6 +1,6 @@
-#include "cc/bzd/type_traits/is_constructible.h"
+#include "cc/bzd/type_traits/is_constructible.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 struct Foo
 {

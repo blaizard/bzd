@@ -15,7 +15,7 @@ bdl_library(
 cc_library(
     name = "executor",
     hdrs = [
-        "executor.h",
+        "executor.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
