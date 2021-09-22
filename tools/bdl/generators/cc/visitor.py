@@ -37,7 +37,7 @@ class Transform:
 	# Path related
 
 	def bdlPathToHeader(self, path: Path) -> str:
-		return path.as_posix().replace(".bdl", ".h")
+		return path.as_posix().replace(".bdl", ".hh")
 
 	# Namespace related
 

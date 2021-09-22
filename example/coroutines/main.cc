@@ -1,6 +1,6 @@
-#include "cc/bzd/core/async.h"
-#include "cc/bzd/core/delay.h"
-#include "cc/bzd/platform/clock.h"
+#include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/delay.hh"
+#include "cc/bzd/platform/clock.hh"
 
 #include <iostream>
 

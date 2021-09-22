@@ -1,6 +1,6 @@
-#include "cc/bzd/core/logger.h"
+#include "cc/bzd/core/logger.hh"
 
-#include "cc/bzd/core/logger/backend/logger.h"
+#include "cc/bzd/core/logger/backend/logger.hh"
 
 namespace {
 const char* levelToStr(const bzd::log::Level level)

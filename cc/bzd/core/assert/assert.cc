@@ -1,9 +1,9 @@
-#include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_view.h"
-#include "cc/bzd/core/assert/minimal.h"
-#include "cc/bzd/core/logger.h"
-#include "cc/bzd/platform/panic.h"
-//#include "cc/bzd/utility/format/integral.h"
+#include "cc/bzd/container/string.hh"
+#include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/core/assert/minimal.hh"
+#include "cc/bzd/core/logger.hh"
+#include "cc/bzd/platform/panic.hh"
+//#include "cc/bzd/utility/format/integral.hh"
 
 namespace bzd::assert::impl {
 

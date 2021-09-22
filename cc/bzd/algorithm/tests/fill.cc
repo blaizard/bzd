@@ -1,7 +1,7 @@
-#include "cc/bzd/algorithm/fill.h"
+#include "cc/bzd/algorithm/fill.hh"
 
-#include "cc/bzd/container/array.h"
-#include "cc_test/test.h"
+#include "cc/bzd/container/array.hh"
+#include "cc_test/test.hh"
 
 TEST(Fill, Base)
 {

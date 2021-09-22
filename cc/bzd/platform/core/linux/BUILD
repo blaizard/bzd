@@ -17,8 +17,8 @@ bdl_library(
 cc_library(
     name = "linux",
     hdrs = [
-        "core.h",
-        "workload.h",
+        "core.hh",
+        "workload.hh",
     ],
     linkopts = [
         "-lpthread",
@@ -35,7 +35,7 @@ cc_library(
 bzd_cc_binary(
     name = "main",
     srcs = [
-        "pi.h",
+        "pi.hh",
     ],
     tags = ["manual"],
     deps = [

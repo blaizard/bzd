@@ -1,6 +1,6 @@
-#include "cc/bzd/container/string_stream.h"
+#include "cc/bzd/container/string_stream.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ContainerStringStream, Base)
 {

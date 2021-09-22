@@ -6,7 +6,7 @@ cc_library(
         "logger.cc",
     ],
     hdrs = [
-        "logger.h",
+        "logger.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

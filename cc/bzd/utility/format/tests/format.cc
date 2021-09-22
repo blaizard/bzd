@@ -1,10 +1,10 @@
-#include "cc/bzd/utility/format/format.h"
+#include "cc/bzd/utility/format/format.hh"
 
-#include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_stream.h"
-#include "cc/bzd/container/string_view.h"
-#include "cc/bzd/container/vector.h"
-#include "cc_test/test.h"
+#include "cc/bzd/container/string.hh"
+#include "cc/bzd/container/string_stream.hh"
+#include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/container/vector.hh"
+#include "cc_test/test.hh"
 
 #include <stdexcept>
 

@@ -1,8 +1,8 @@
-#include "cc/bzd/container/tuple.h"
+#include "cc/bzd/container/tuple.hh"
 
-#include "cc/bzd/container/string_view.h"
-#include "cc/bzd/utility/move.h"
-#include "cc_test/test.h"
+#include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/utility/move.hh"
+#include "cc_test/test.hh"
 
 TEST(ContainerTuple, Base)
 {

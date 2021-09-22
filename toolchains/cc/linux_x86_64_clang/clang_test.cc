@@ -1,4 +1,4 @@
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(Toolchain, linux_x86_64_clang)
 {

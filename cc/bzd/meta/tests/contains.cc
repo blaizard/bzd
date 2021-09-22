@@ -1,7 +1,7 @@
-#include "cc/bzd/meta/contains.h"
+#include "cc/bzd/meta/contains.hh"
 
-#include "cc/bzd/meta/type_list.h"
-#include "cc_test/test.h"
+#include "cc/bzd/meta/type_list.hh"
+#include "cc_test/test.hh"
 
 TEST(Meta, Contains)
 {

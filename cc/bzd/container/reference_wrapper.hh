@@ -1,0 +1,22 @@
+#pragma once
+
+#include "cc/bzd/type_traits/remove_reference.hh"
+
+namespace bzd {
+template <class T>
+class ReferenceWrapper
+{
+private:
+	using Value = bzd::typeTraits::RemoveReference<T>;
+
+public:
+	constexpr ReferenceWrapper(Value& value) noexcept : value_(&value) {}
+
+	constexpr operator Value&() const noexcept { return *value_; }
+
+	constexpr Value& get() const noexcept { return *value_; }
+
+private:
+	Value* value_;
+};
+} // namespace bzd

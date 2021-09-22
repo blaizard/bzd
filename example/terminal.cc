@@ -1,6 +1,6 @@
-#include "example/terminal.h"
+#include "example/terminal.hh"
 
-#include "bzd.h"
+#include "bzd.hh"
 
 #include <poll.h>
 #include <stdio.h>

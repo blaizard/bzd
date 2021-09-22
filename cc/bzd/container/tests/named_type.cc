@@ -1,6 +1,6 @@
-#include "cc/bzd/container/named_type.h"
+#include "cc/bzd/container/named_type.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(NamedType, arithmetic)
 {

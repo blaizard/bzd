@@ -55,7 +55,7 @@ cc_library(
 cc_library(
     name = "add_const",
     hdrs = [
-        "add_const.h",
+        "add_const.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -63,7 +63,7 @@ cc_library(
 cc_library(
     name = "add_cv",
     hdrs = [
-        "add_cv.h",
+        "add_cv.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -71,7 +71,7 @@ cc_library(
 cc_library(
     name = "add_lvalue_reference",
     hdrs = [
-        "add_lvalue_reference.h",
+        "add_lvalue_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -82,7 +82,7 @@ cc_library(
 cc_library(
     name = "add_pointer",
     hdrs = [
-        "add_pointer.h",
+        "add_pointer.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -93,7 +93,7 @@ cc_library(
 cc_library(
     name = "add_reference",
     hdrs = [
-        "add_reference.h",
+        "add_reference.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -101,7 +101,7 @@ cc_library(
 cc_library(
     name = "add_rvalue_reference",
     hdrs = [
-        "add_rvalue_reference.h",
+        "add_rvalue_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -113,7 +113,7 @@ cc_library(
 cc_library(
     name = "add_volatile",
     hdrs = [
-        "add_volatile.h",
+        "add_volatile.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -121,7 +121,7 @@ cc_library(
 cc_library(
     name = "conditional",
     hdrs = [
-        "conditional.h",
+        "conditional.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -129,7 +129,7 @@ cc_library(
 cc_library(
     name = "decay",
     hdrs = [
-        "decay.h",
+        "decay.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -146,7 +146,7 @@ cc_library(
 cc_library(
     name = "declval",
     hdrs = [
-        "declval.h",
+        "declval.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -157,7 +157,7 @@ cc_library(
 cc_library(
     name = "enable_if",
     hdrs = [
-        "enable_if.h",
+        "enable_if.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -165,7 +165,7 @@ cc_library(
 cc_library(
     name = "false_type",
     hdrs = [
-        "false_type.h",
+        "false_type.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -176,7 +176,7 @@ cc_library(
 cc_library(
     name = "integral_constant",
     hdrs = [
-        "integral_constant.h",
+        "integral_constant.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -184,7 +184,7 @@ cc_library(
 cc_library(
     name = "invoke_result",
     hdrs = [
-        "invoke_result.h",
+        "invoke_result.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -203,7 +203,7 @@ cc_library(
 cc_library(
     name = "is_arithmetic",
     hdrs = [
-        "is_arithmetic.h",
+        "is_arithmetic.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -216,7 +216,7 @@ cc_library(
 cc_library(
     name = "is_array",
     hdrs = [
-        "is_array.h",
+        "is_array.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -228,7 +228,7 @@ cc_library(
 cc_library(
     name = "is_base_of",
     hdrs = [
-        "is_base_of.h",
+        "is_base_of.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -242,7 +242,7 @@ cc_library(
 cc_library(
     name = "is_class",
     hdrs = [
-        "is_class.h",
+        "is_class.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -255,7 +255,7 @@ cc_library(
 cc_library(
     name = "is_const",
     hdrs = [
-        "is_const.h",
+        "is_const.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -267,7 +267,7 @@ cc_library(
 cc_library(
     name = "is_constructible",
     hdrs = [
-        "is_constructible.h",
+        "is_constructible.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -280,7 +280,7 @@ cc_library(
 cc_library(
     name = "is_default_constructible",
     hdrs = [
-        "is_default_constructible.h",
+        "is_default_constructible.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -293,7 +293,7 @@ cc_library(
 cc_library(
     name = "is_destructible",
     hdrs = [
-        "is_destructible.h",
+        "is_destructible.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -307,7 +307,7 @@ cc_library(
 cc_library(
     name = "is_enum",
     hdrs = [
-        "is_enum.h",
+        "is_enum.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -319,7 +319,7 @@ cc_library(
 cc_library(
     name = "is_floating_point",
     hdrs = [
-        "is_floating_point.h",
+        "is_floating_point.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -332,7 +332,7 @@ cc_library(
 cc_library(
     name = "is_function",
     hdrs = [
-        "is_function.h",
+        "is_function.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -344,7 +344,7 @@ cc_library(
 cc_library(
     name = "is_integral",
     hdrs = [
-        "is_integral.h",
+        "is_integral.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -357,7 +357,7 @@ cc_library(
 cc_library(
     name = "is_lvalue_reference",
     hdrs = [
-        "is_lvalue_reference.h",
+        "is_lvalue_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -369,7 +369,7 @@ cc_library(
 cc_library(
     name = "is_pointer",
     hdrs = [
-        "is_pointer.h",
+        "is_pointer.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -382,7 +382,7 @@ cc_library(
 cc_library(
     name = "is_reference",
     hdrs = [
-        "is_reference.h",
+        "is_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -395,7 +395,7 @@ cc_library(
 cc_library(
     name = "is_rvalue_reference",
     hdrs = [
-        "is_rvalue_reference.h",
+        "is_rvalue_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -407,7 +407,7 @@ cc_library(
 cc_library(
     name = "is_same",
     hdrs = [
-        "is_same.h",
+        "is_same.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -419,7 +419,7 @@ cc_library(
 cc_library(
     name = "is_signed",
     hdrs = [
-        "is_signed.h",
+        "is_signed.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -432,7 +432,7 @@ cc_library(
 cc_library(
     name = "is_trivially_destructible",
     hdrs = [
-        "is_trivially_destructible.h",
+        "is_trivially_destructible.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -444,7 +444,7 @@ cc_library(
 cc_library(
     name = "is_union",
     hdrs = [
-        "is_union.h",
+        "is_union.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -456,7 +456,7 @@ cc_library(
 cc_library(
     name = "is_void",
     hdrs = [
-        "is_void.h",
+        "is_void.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -468,7 +468,7 @@ cc_library(
 cc_library(
     name = "is_volatile",
     hdrs = [
-        "is_volatile.h",
+        "is_volatile.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -480,7 +480,7 @@ cc_library(
 cc_library(
     name = "remove_const",
     hdrs = [
-        "remove_const.h",
+        "remove_const.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -488,7 +488,7 @@ cc_library(
 cc_library(
     name = "remove_cv",
     hdrs = [
-        "remove_cv.h",
+        "remove_cv.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -500,7 +500,7 @@ cc_library(
 cc_library(
     name = "remove_extent",
     hdrs = [
-        "remove_extent.h",
+        "remove_extent.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -508,7 +508,7 @@ cc_library(
 cc_library(
     name = "remove_reference",
     hdrs = [
-        "remove_reference.h",
+        "remove_reference.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -516,7 +516,7 @@ cc_library(
 cc_library(
     name = "remove_volatile",
     hdrs = [
-        "remove_volatile.h",
+        "remove_volatile.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -524,7 +524,7 @@ cc_library(
 cc_library(
     name = "true_type",
     hdrs = [
-        "true_type.h",
+        "true_type.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -535,7 +535,7 @@ cc_library(
 cc_library(
     name = "void_type",
     hdrs = [
-        "void_type.h",
+        "void_type.hh",
     ],
     visibility = ["//visibility:public"],
 )

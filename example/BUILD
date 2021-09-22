@@ -5,7 +5,7 @@ load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 cc_library(
     name = "lib",
     srcs = glob([
-        "*.h",
+        "*.hh",
         "*.cc",
     ]),
     linkopts = [

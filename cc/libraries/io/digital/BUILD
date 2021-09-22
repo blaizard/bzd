@@ -7,13 +7,13 @@ bzd_cc_library(
         "//conditions:default": [],
     }),
     hdrs = [
-        "digital.h",
+        "digital.hh",
     ] + select({
-        "@esp32_xtensa_lx6_gcc//:target": ["digital_esp32_xtensa_lx6.h"],
+        "@esp32_xtensa_lx6_gcc//:target": ["digital_esp32_xtensa_lx6.hh"],
         "//conditions:default": [],
     }),
     includes = select({
-        "@esp32_xtensa_lx6_gcc//:target": ["libraries/io/digital/digital_esp32_xtensa_lx6.h"],
+        "@esp32_xtensa_lx6_gcc//:target": ["libraries/io/digital/digital_esp32_xtensa_lx6.hh"],
         "//conditions:default": [],
     }),
     interfaces = select({

@@ -6,7 +6,7 @@ cc_library(
         "assert.cc",
     ],
     hdrs = [
-        "//cc/bzd/core:assert.h",
+        "//cc/bzd/core:assert.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -22,7 +22,7 @@ cc_library(
 cc_library(
     name = "minimal",
     hdrs = [
-        "minimal.h",
+        "minimal.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

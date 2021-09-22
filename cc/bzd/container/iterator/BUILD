@@ -3,7 +3,7 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 cc_library(
     name = "contiguous",
     hdrs = [
-        "contiguous.h",
+        "contiguous.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

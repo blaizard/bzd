@@ -1,6 +1,6 @@
-#include "cc/bzd/container/result.h"
+#include "cc/bzd/container/result.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 #include <string>
 

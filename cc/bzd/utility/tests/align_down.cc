@@ -1,6 +1,6 @@
-#include "cc/bzd/utility/align_down.h"
+#include "cc/bzd/utility/align_down.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(AlignDown, Base)
 {

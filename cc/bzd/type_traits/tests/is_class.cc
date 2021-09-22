@@ -1,6 +1,6 @@
-#include "cc/bzd/type_traits/is_class.h"
+#include "cc/bzd/type_traits/is_class.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 struct A
 {

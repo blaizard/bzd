@@ -3,7 +3,7 @@ load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 cc_library(
     name = "integral",
     hdrs = [
-        "integral.h",
+        "integral.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -20,7 +20,7 @@ cc_library(
 cc_library(
     name = "format",
     hdrs = [
-        "format.h",
+        "format.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

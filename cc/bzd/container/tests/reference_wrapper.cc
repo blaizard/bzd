@@ -1,6 +1,6 @@
-#include "cc/bzd/container/reference_wrapper.h"
+#include "cc/bzd/container/reference_wrapper.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ReferenceWrapper, simple)
 {

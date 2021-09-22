@@ -1,5 +1,5 @@
-#include "cc_test/test.h"
-#include "tools/bdl/generators/cc/tests/manifest.h"
+#include "cc_test/test.hh"
+#include "tools/bdl/generators/cc/tests/manifest.hh"
 
 TEST(File, Compile)
 {

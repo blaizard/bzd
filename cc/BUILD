@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "includes",
     hdrs = [
-        "bzd.h",
+        "bzd.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -11,7 +11,7 @@ cc_library(
 filegroup(
     name = "documentation",
     srcs = glob([
-        "bzd/**/*.h",
+        "bzd/**/*.hh",
     ]),
     visibility = ["//visibility:public"],
 )

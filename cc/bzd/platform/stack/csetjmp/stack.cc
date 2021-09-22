@@ -1,4 +1,4 @@
-#include "cc/bzd/platform/stack.h"
+#include "cc/bzd/platform/stack.hh"
 
 #include <csetjmp>
 

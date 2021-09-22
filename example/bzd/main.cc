@@ -1,4 +1,4 @@
-#include "cc/bzd.h"
+#include "cc/bzd.hh"
 
 #include <unistd.h>
 
@@ -161,9 +161,9 @@ int main()
 }
 
 /*
-#include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "driver/gpio.hh"
+#include "freertos/FreeRTOS.hh"
+#include "freertos/task.hh"
 
 #define BLINK_GPIO GPIO_NUM_2 //CONFIG_BLINK_GPIO
 

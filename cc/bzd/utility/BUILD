@@ -29,7 +29,7 @@ cc_library(
 cc_library(
     name = "align_down",
     hdrs = [
-        "align_down.h",
+        "align_down.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -40,7 +40,7 @@ cc_library(
 cc_library(
     name = "align_up",
     hdrs = [
-        "align_up.h",
+        "align_up.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -51,7 +51,7 @@ cc_library(
 cc_library(
     name = "aligned_storage",
     hdrs = [
-        "aligned_storage.h",
+        "aligned_storage.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -62,7 +62,7 @@ cc_library(
 cc_library(
     name = "bit",
     hdrs = [
-        "bit.h",
+        "bit.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -70,7 +70,7 @@ cc_library(
 cc_library(
     name = "constexpr_for",
     hdrs = [
-        "constexpr_for.h",
+        "constexpr_for.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -83,7 +83,7 @@ cc_library(
 cc_library(
     name = "container_of",
     hdrs = [
-        "container_of.h",
+        "container_of.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -94,7 +94,7 @@ cc_library(
 cc_library(
     name = "forward",
     hdrs = [
-        "forward.h",
+        "forward.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -106,7 +106,7 @@ cc_library(
 cc_library(
     name = "ignore",
     hdrs = [
-        "ignore.h",
+        "ignore.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -114,7 +114,7 @@ cc_library(
 cc_library(
     name = "max",
     hdrs = [
-        "max.h",
+        "max.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -122,7 +122,7 @@ cc_library(
 cc_library(
     name = "min",
     hdrs = [
-        "min.h",
+        "min.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -130,7 +130,7 @@ cc_library(
 cc_library(
     name = "move",
     hdrs = [
-        "move.h",
+        "move.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -141,7 +141,7 @@ cc_library(
 cc_library(
     name = "offset_of",
     hdrs = [
-        "offset_of.h",
+        "offset_of.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -152,7 +152,7 @@ cc_library(
 cc_library(
     name = "ratio",
     hdrs = [
-        "ratio.h",
+        "ratio.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -163,7 +163,7 @@ cc_library(
 cc_library(
     name = "signal",
     hdrs = [
-        "signal.h",
+        "signal.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -177,7 +177,7 @@ cc_library(
 cc_library(
     name = "singleton",
     hdrs = [
-        "singleton.h",
+        "singleton.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -185,7 +185,7 @@ cc_library(
 cc_library(
     name = "source_location",
     hdrs = [
-        "source_location.h",
+        "source_location.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -196,7 +196,7 @@ cc_library(
 cc_library(
     name = "swap",
     hdrs = [
-        "swap.h",
+        "swap.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

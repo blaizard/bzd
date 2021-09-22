@@ -12,10 +12,10 @@ load("@//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
 bzd_cc_library(
     name = "stdout",
     hdrs = [
-        "stdout.h",
+        "stdout.hh",
     ],
     includes = [
-        "libraries/io/stdout/stdout.h",
+        "libraries/io/stdout/stdout.hh",
     ],
     interfaces = {
         "bzd::io::Stdout": "*",

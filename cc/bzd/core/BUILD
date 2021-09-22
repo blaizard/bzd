@@ -17,24 +17,24 @@ cc_library(
 # ---- Individual items ----
 
 exports_files(
-    ["logger.h"],
+    ["logger.hh"],
     visibility = ["//cc/bzd/core/logger:__pkg__"],
 )
 
 exports_files(
-    ["assert.h"],
+    ["assert.hh"],
     visibility = ["//cc/bzd/core/assert:__pkg__"],
 )
 
 exports_files(
-    ["async.h"],
+    ["async.hh"],
     visibility = ["//cc/bzd/core/async:__pkg__"],
 )
 
 cc_library(
     name = "channel",
     hdrs = [
-        "channel.h",
+        "channel.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -47,7 +47,7 @@ cc_library(
 cc_library(
     name = "delay",
     hdrs = [
-        "delay.h",
+        "delay.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -59,7 +59,7 @@ cc_library(
 cc_library(
     name = "registry",
     hdrs = [
-        "registry.h",
+        "registry.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -75,7 +75,7 @@ cc_library(
 cc_library(
     name = "units",
     hdrs = [
-        "units.h",
+        "units.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

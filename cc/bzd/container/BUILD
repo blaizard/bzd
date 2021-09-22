@@ -32,7 +32,7 @@ cc_library(
 cc_library(
     name = "any_reference",
     hdrs = [
-        "any_reference.h",
+        "any_reference.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -46,7 +46,7 @@ cc_library(
 cc_library(
     name = "array",
     hdrs = [
-        "array.h",
+        "array.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -59,7 +59,7 @@ cc_library(
 cc_library(
     name = "btree",
     hdrs = [
-        "btree.h",
+        "btree.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -73,7 +73,7 @@ cc_library(
 cc_library(
     name = "function",
     hdrs = [
-        "function.h",
+        "function.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -87,7 +87,7 @@ cc_library(
 cc_library(
     name = "function_view",
     hdrs = [
-        "function_view.h",
+        "function_view.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -101,7 +101,7 @@ cc_library(
 cc_library(
     name = "map",
     hdrs = [
-        "map.h",
+        "map.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -115,7 +115,7 @@ cc_library(
 cc_library(
     name = "named_type",
     hdrs = [
-        "named_type.h",
+        "named_type.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -129,7 +129,7 @@ cc_library(
 cc_library(
     name = "optional",
     hdrs = [
-        "optional.h",
+        "optional.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -150,7 +150,7 @@ cc_library(
 cc_library(
     name = "pool",
     hdrs = [
-        "pool.h",
+        "pool.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -164,7 +164,7 @@ cc_library(
 cc_library(
     name = "queue",
     hdrs = [
-        "queue.h",
+        "queue.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -179,7 +179,7 @@ cc_library(
 cc_library(
     name = "reference_wrapper",
     hdrs = [
-        "reference_wrapper.h",
+        "reference_wrapper.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -190,7 +190,7 @@ cc_library(
 cc_library(
     name = "result",
     hdrs = [
-        "result.h",
+        "result.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -212,7 +212,7 @@ cc_library(
 cc_library(
     name = "span",
     hdrs = [
-        "span.h",
+        "span.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -229,7 +229,7 @@ cc_library(
 cc_library(
     name = "string_stream",
     hdrs = [
-        "string_stream.h",
+        "string_stream.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -242,7 +242,7 @@ cc_library(
 cc_library(
     name = "string_view",
     hdrs = [
-        "string_view.h",
+        "string_view.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -255,7 +255,7 @@ cc_library(
 cc_library(
     name = "string",
     hdrs = [
-        "string.h",
+        "string.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -271,7 +271,7 @@ cc_library(
 cc_library(
     name = "tuple",
     hdrs = [
-        "tuple.h",
+        "tuple.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -287,7 +287,7 @@ cc_library(
 cc_library(
     name = "variant",
     hdrs = [
-        "variant.h",
+        "variant.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -303,7 +303,7 @@ cc_library(
 cc_library(
     name = "vector",
     hdrs = [
-        "vector.h",
+        "vector.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -20,7 +20,7 @@ cc_library(
 cc_library(
     name = "choose_nth",
     hdrs = [
-        "choose_nth.h",
+        "choose_nth.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -32,7 +32,7 @@ cc_library(
 cc_library(
     name = "contains",
     hdrs = [
-        "contains.h",
+        "contains.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -43,7 +43,7 @@ cc_library(
 cc_library(
     name = "find_conditional",
     hdrs = [
-        "find_conditional.h",
+        "find_conditional.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -54,7 +54,7 @@ cc_library(
 cc_library(
     name = "find",
     hdrs = [
-        "find.h",
+        "find.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -67,7 +67,7 @@ cc_library(
 cc_library(
     name = "range",
     hdrs = [
-        "range.h",
+        "range.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -78,7 +78,7 @@ cc_library(
 cc_library(
     name = "type_list",
     hdrs = [
-        "type_list.h",
+        "type_list.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -93,7 +93,7 @@ cc_library(
 cc_library(
     name = "type",
     hdrs = [
-        "type.h",
+        "type.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -101,7 +101,7 @@ cc_library(
 cc_library(
     name = "union",
     hdrs = [
-        "union.h",
+        "union.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

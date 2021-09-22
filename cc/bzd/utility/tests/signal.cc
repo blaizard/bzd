@@ -1,7 +1,7 @@
-#include "cc/bzd/utility/signal.h"
+#include "cc/bzd/utility/signal.hh"
 
-#include "cc/bzd/utility/bit.h"
-#include "cc_test/test.h"
+#include "cc/bzd/utility/bit.hh"
+#include "cc_test/test.hh"
 
 TEST(Signal, Base)
 {

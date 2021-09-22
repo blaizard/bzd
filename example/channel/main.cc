@@ -1,7 +1,7 @@
-#include "cc/bzd/container/result.h"
-#include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_view.h"
-#include "cc/bzd/core/channel.h"
+#include "cc/bzd/container/result.hh"
+#include "cc/bzd/container/string.hh"
+#include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/core/channel.hh"
 
 #include <iostream>
 

@@ -4,7 +4,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 cc_library(
     name = "non_owning_list_for_test",
     hdrs = [
-        "non_owning_list_for_test.h",
+        "non_owning_list_for_test.hh",
     ],
     visibility = ["//cc/bzd/container/impl/tests:__subpackages__"],
     deps = [

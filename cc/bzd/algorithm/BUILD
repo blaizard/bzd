@@ -16,7 +16,7 @@ cc_library(
 cc_library(
     name = "copy",
     hdrs = [
-        "copy.h",
+        "copy.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -24,7 +24,7 @@ cc_library(
 cc_library(
     name = "copy_n",
     hdrs = [
-        "copy_n.h",
+        "copy_n.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -32,7 +32,7 @@ cc_library(
 cc_library(
     name = "fill",
     hdrs = [
-        "fill.h",
+        "fill.hh",
     ],
     visibility = ["//visibility:public"],
 )
@@ -40,7 +40,7 @@ cc_library(
 cc_library(
     name = "reverse",
     hdrs = [
-        "reverse.h",
+        "reverse.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -1,6 +1,6 @@
-#include "cc/bzd/type_traits/is_signed.h"
+#include "cc/bzd/type_traits/is_signed.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(TypeTraits, isSigned)
 {

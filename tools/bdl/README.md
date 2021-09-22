@@ -79,7 +79,7 @@ This is to ensure that inclusion can find the correspondiing header file.
 Therefore to include `my/path/core.bdl` functionality in a C++ file, use the following:
 
 ```c++
-#include "my/path/core.h"
+#include "my/path/core.hh"
 ```
 
 #### Interfaces
@@ -105,7 +105,7 @@ interface MyInterface {
 The implementation can access the followings:
 
 ```c++
-#include "bzd/example/interface.h" // Auto-generated from bdl.
+#include "bzd/example/interface.hh" // Auto-generated from bdl.
 
 class Implementation : public bzd::example::adapter::MyInterface<Implementation> // Adapter for the component.
 {

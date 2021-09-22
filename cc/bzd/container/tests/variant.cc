@@ -1,6 +1,6 @@
-#include "cc/bzd/container/variant.h"
+#include "cc/bzd/container/variant.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 #include <iostream>
 

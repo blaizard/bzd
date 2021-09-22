@@ -1,6 +1,6 @@
-#include "cc/bzd/container/string.h"
+#include "cc/bzd/container/string.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 class A
 {

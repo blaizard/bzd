@@ -6,7 +6,7 @@ cc_library(
         "logger.cc",
     ],
     hdrs = [
-        "//cc/bzd/core:logger.h",
+        "//cc/bzd/core:logger.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -19,7 +19,7 @@ cc_library(
 cc_library(
     name = "minimal",
     hdrs = [
-        "minimal.h",
+        "minimal.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

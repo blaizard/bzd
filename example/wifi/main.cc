@@ -7,17 +7,17 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "bzd.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "lwip/err.h"
-#include "lwip/sockets.h"
-#include "lwip/sys.h"
-#include "nvs_flash.h"
+#include "bzd.hh"
+#include "esp_event.hh"
+#include "esp_log.hh"
+#include "esp_system.hh"
+#include "esp_wifi.hh"
+#include "freertos/FreeRTOS.hh"
+#include "freertos/task.hh"
+#include "lwip/err.hh"
+#include "lwip/sockets.hh"
+#include "lwip/sys.hh"
+#include "nvs_flash.hh"
 
 #include <lwip/netdb.h>
 #include <string.h>

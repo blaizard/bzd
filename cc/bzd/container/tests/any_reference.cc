@@ -1,6 +1,6 @@
-#include "cc/bzd/container/any_reference.h"
+#include "cc/bzd/container/any_reference.hh"
 
-#include "cc_test/test.h"
+#include "cc_test/test.hh"
 
 TEST(ContainerAnyReference, simple)
 {

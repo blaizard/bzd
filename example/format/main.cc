@@ -1,4 +1,4 @@
-#include "cc/bzd.h"
+#include "cc/bzd.hh"
 
 class Date
 {
