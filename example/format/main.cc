@@ -12,12 +12,12 @@ public:
 	bzd::UInt16Type d_;
 };
 
-bzd::Async<void> toStream(bzd::OChannel& os, const Date& d)
+bzd::Async<void> toStream(bzd::OStream& os, const Date& d)
 {
 	co_await bzd::format::toStream(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
 }
 
-bzd::Async<void> toStream(bzd::OChannel& os, const bzd::StringView& view)
+bzd::Async<void> toStream(bzd::OStream& os, const bzd::StringView& view)
 {
 	co_await os.write(view.asBytes());
 }

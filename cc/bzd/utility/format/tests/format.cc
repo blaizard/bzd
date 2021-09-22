@@ -1,7 +1,7 @@
 #include "cc/bzd/utility/format/format.h"
 
 #include "cc/bzd/container/string.h"
-#include "cc/bzd/container/string_channel.h"
+#include "cc/bzd/container/string_stream.h"
 #include "cc/bzd/container/string_view.h"
 #include "cc/bzd/container/vector.h"
 #include "cc_test/test.h"
@@ -164,7 +164,7 @@ void expectStringStreamFormat(const char* expected, Args&&... args)
 	bzd::format::toString(str, bzd::forward<Args>(args)...);
 	EXPECT_STREQ(str.data(), expected);
 
-	bzd::StringChannel<N> stream;
+	bzd::StringStream<N> stream;
 	bzd::format::toStream(stream, bzd::forward<Args>(args)...).sync();
 	EXPECT_STREQ(stream.str().data(), expected);
 }

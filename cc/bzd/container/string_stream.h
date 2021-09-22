@@ -5,10 +5,10 @@
 #include "cc/bzd/core/channel.h"
 
 namespace bzd::impl {
-class StringChannel : public bzd::OChannel
+class StringStream : public bzd::OStream
 {
 public:
-	constexpr StringChannel(bzd::interface::String& str) : string_(str) {}
+	constexpr StringStream(bzd::interface::String& str) : string_(str) {}
 
 	bzd::Async<SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
@@ -25,15 +25,15 @@ protected:
 } // namespace bzd::impl
 
 namespace bzd::interface {
-using StringChannel = bzd::impl::StringChannel;
+using StringStream = bzd::impl::StringStream;
 }
 
 namespace bzd {
 template <SizeType N>
-class StringChannel : public bzd::interface::StringChannel
+class StringStream : public bzd::interface::StringStream
 {
 public:
-	constexpr StringChannel() : bzd::interface::StringChannel(container_), container_() {}
+	constexpr StringStream() : bzd::interface::StringStream(container_), container_() {}
 
 private:
 	bzd::String<N> container_;

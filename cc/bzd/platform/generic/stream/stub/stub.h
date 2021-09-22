@@ -3,7 +3,7 @@
 #include "cc/bzd/core/channel.h"
 
 namespace bzd::platform::generic {
-class ChannelStub : public bzd::IOChannel
+class StreamStub : public bzd::IOStream
 {
 public:
 	bzd::Async<SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override { co_return data.size(); }

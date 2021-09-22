@@ -3,7 +3,7 @@
 #include "cc/bzd/core/channel.h"
 
 namespace bzd::io {
-class I2C : public bzd::IOChannel
+class I2C : public bzd::IOStream
 {
 public:
 	struct Configuration

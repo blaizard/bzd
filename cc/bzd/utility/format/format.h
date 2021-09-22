@@ -365,24 +365,24 @@ class StreamFormatter
 {
 public:
 	template <class T>
-	using FormatterType = decltype(toStream(bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>()));
+	using FormatterType = decltype(toStream(bzd::typeTraits::declval<bzd::OStream&>(), bzd::typeTraits::declval<T>()));
 
 	template <class T>
 	using FormatterWithMetadataType = decltype(toStream(
-		bzd::typeTraits::declval<bzd::OChannel&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+		bzd::typeTraits::declval<bzd::OStream&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
-	using FormatterTransportType = bzd::OChannel;
+	using FormatterTransportType = bzd::OStream;
 	using FormatterReturnType = Async<void>;
 
 public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<void> process(bzd::OChannel& stream, const T& value, const Metadata&) noexcept
+	static Async<void> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
 	{
 		co_await toStream(stream, value);
 	}
 
 	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<void> process(bzd::OChannel& stream, const T& value, const Metadata& metadata) noexcept
+	static Async<void> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 	{
 		co_await toStream(stream, value, metadata);
 	}
@@ -525,14 +525,14 @@ template <class T,
 		  bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T> || bzd::typeTraits::isFloatingPoint<T> ||
 										(bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>),
 									void>* = nullptr>
-Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
+Async<void> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
 	co_await stream.write(str.asBytes());
 }
 
-inline Async<void> toStream(bzd::OChannel& stream, const bzd::StringView stringView, const Metadata& metadata)
+inline Async<void> toStream(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	co_await stream.write(processCommon(stringView, metadata).asBytes());
 }
@@ -701,7 +701,7 @@ namespace bzd::format {
  * \param args Arguments to be passed for the format.
  */
 template <class ConstexprStringView, class... Args>
-Async<void> toStream(bzd::OChannel& stream, const ConstexprStringView& format, Args&&... args)
+Async<void> toStream(bzd::OStream& stream, const ConstexprStringView& format, Args&&... args)
 {
 	if constexpr (!bzd::typeTraits::isConstructible<bzd::StringView, ConstexprStringView>)
 	{
