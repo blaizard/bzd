@@ -503,6 +503,17 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 	}
 }
 
+template <
+	class T,
+	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
+constexpr void toString(bzd::interface::String& str, const T& value, const Metadata&)
+{
+	Metadata metadata{};
+	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+	metadata.alternate = true;
+	toString(str, reinterpret_cast<SizeType>(value), metadata);
+}
+
 constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata)
 {
 	str += processCommon(stringView, metadata);
@@ -510,32 +521,14 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 
 // Specialization of toStream for the native types
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
+template <class T,
+		  bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T> || bzd::typeTraits::isFloatingPoint<T> ||
+										(bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>),
+									void>* = nullptr>
 Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
-	co_await stream.write(str.asBytes());
-}
-
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata& metadata)
-{
-	bzd::String<80> str{};
-	toString(str, value, metadata);
-	co_await stream.write(str.asBytes());
-}
-
-template <
-	class T,
-	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-Async<void> toStream(bzd::OChannel& stream, const T& value, const Metadata&)
-{
-	bzd::String<80> str{};
-	Metadata metadata{};
-	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
-	metadata.alternate = true;
-	toString(str, reinterpret_cast<SizeType>(value), metadata);
 	co_await stream.write(str.asBytes());
 }
 

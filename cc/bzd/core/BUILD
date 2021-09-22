@@ -4,12 +4,12 @@ cc_library(
     name = "core",
     visibility = ["//visibility:public"],
     deps = [
-        ":async",
         ":channel",
         ":delay",
         ":registry",
         ":units",
         "//cc/bzd/core/assert",
+        "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
     ],
 )
@@ -26,6 +26,11 @@ exports_files(
     visibility = ["//cc/bzd/core/assert:__pkg__"],
 )
 
+exports_files(
+    ["async.h"],
+    visibility = ["//cc/bzd/core/async:__pkg__"],
+)
+
 cc_library(
     name = "channel",
     hdrs = [
@@ -34,7 +39,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:span",
-        "//cc/bzd/core:async",
+        "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
     ],
 )
@@ -46,28 +51,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":async",
+        "//cc/bzd/core/async",
         "//cc/bzd/platform",
-    ],
-)
-
-cc_library(
-    name = "async",
-    hdrs = [
-        "async.h",
-        "coroutine.h",
-        "executor.h",
-        "promise.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:function_view",
-        "//cc/bzd/container:optional",
-        "//cc/bzd/container:result",
-        "//cc/bzd/container:tuple",
-        "//cc/bzd/container/impl:non_owning_list",
-        "//cc/bzd/type_traits:remove_reference",
-        "//cc/bzd/utility:ignore",
     ],
 )
 
