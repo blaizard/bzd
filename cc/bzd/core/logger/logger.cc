@@ -39,22 +39,22 @@ bzd::Async<void> bzd::Logger::printHeader(const bzd::log::Level level, const Sou
 	co_await bzd::format::toStream(backend, CSTR("{} [{}:{}] "), levelToStr(level), location.getFileName(), location.getLine());
 }
 
-void bzd::minimal::log::error(const bzd::StringView message, const SourceLocation location) noexcept
+void bzd::minimal::log::error(const char* message, const SourceLocation location) noexcept
 {
 	bzd::Logger::getDefault().error(message, location).sync();
 }
 
-void bzd::minimal::log::warning(const bzd::StringView message, const SourceLocation location) noexcept
+void bzd::minimal::log::warning(const char* message, const SourceLocation location) noexcept
 {
 	bzd::Logger::getDefault().warning(message, location).sync();
 }
 
-void bzd::minimal::log::info(const bzd::StringView message, const SourceLocation location) noexcept
+void bzd::minimal::log::info(const char* message, const SourceLocation location) noexcept
 {
 	bzd::Logger::getDefault().info(message, location).sync();
 }
 
-void bzd::minimal::log::debug(const bzd::StringView message, const SourceLocation location) noexcept
+void bzd::minimal::log::debug(const char* message, const SourceLocation location) noexcept
 {
 	bzd::Logger::getDefault().debug(message, location).sync();
 }

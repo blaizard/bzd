@@ -1,5 +1,6 @@
 #include "cc/bzd/core/logger/minimal.h"
 
+#include "cc/bzd/container/string_view.h"
 #include "cc/bzd/core/logger/tests/support/backend.h"
 #include "cc_test/test.h"
 
