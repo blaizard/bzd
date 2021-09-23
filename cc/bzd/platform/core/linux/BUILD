@@ -40,7 +40,7 @@ bzd_cc_binary(
     tags = ["manual"],
     deps = [
         ":linux",
-        "//cc/bzd/core:async",
         "//cc/bzd/core:delay",
+        "//cc/bzd/core/async",
     ],
 )
