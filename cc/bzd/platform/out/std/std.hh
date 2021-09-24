@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace bzd::platform::std {
+namespace bzd::platform::stdlib {
 class Out : public bzd::OStream
 {
 public:
@@ -12,4 +12,4 @@ public:
 		co_return data.size();
 	}
 };
-} // namespace bzd::platform::std
+} // namespace bzd::platform::stdlib

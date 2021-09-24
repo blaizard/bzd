@@ -1,6 +1,8 @@
 {#- Re-usable macros -#}
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
+#include "cc/bzd/core/logger.hh"
+#include "cc/bzd/core/out.hh"
 {% for path in includes %}
 #include "{{ path }}"
 {% end %}
@@ -36,6 +38,7 @@ void execute() noexcept
 	[[maybe_unused]] auto registry = getOrMakeRegistry();
 
 	// Initialize.
+	bzd::log::info(CSTR("Initialization phase.")).sync();
 	{% for index, expresssion in compositions.init %}
 	{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	{% end %}
@@ -43,16 +46,19 @@ void execute() noexcept
 	// Assign special symbols to public registry
 	{% for expresssion in registry %}
 		{% if expresssion.fqn == "out" %}
+	bzd::Out::setDefault(registry.{{ expresssion.fqn | fqnToNameStr }}_);
 		{% end %}
 	{% end %}
 
 	// Compose.
+	bzd::log::info(CSTR("Composition phase.")).sync();
 	{% for index, expresssion in compositions.compose %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}
 
 	// Execute.
+	bzd::log::info(CSTR("Execution phase.")).sync();
 	{% for executor in executors %}
 	registry.{{ executor | fqnToNameStr }}_.start();
 	{% end %}
@@ -61,6 +67,8 @@ void execute() noexcept
 	{% for executor in executors %}
 	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
+
+	bzd::log::info(CSTR("Completion.")).sync();
 }
 
 // Deployment part

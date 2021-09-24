@@ -1,9 +1,0 @@
-use "cc/bzd/platform/core.bdl"
-
-namespace bzd.platform.std;
-
-component Out {
-	
-}
-
-

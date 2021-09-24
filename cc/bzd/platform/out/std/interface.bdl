@@ -1,0 +1,8 @@
+
+namespace bzd.platform.stdlib;
+
+component Out {
+	
+}
+
+
