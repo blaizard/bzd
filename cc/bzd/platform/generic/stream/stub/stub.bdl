@@ -1,0 +1,9 @@
+
+namespace bzd.platform.generic.stream;
+
+// Generic stream stub that does nothing.
+component Stub {
+	
+}
+
+

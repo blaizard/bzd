@@ -31,6 +31,23 @@ struct Enqueue
 /**
  * Awaitable to yield the current execution.
  */
+struct GetExecutor : public bzd::coroutine::impl::suspend_always
+{
+	template <class T>
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+	{
+		executor_ = handle.promise().executor_;
+		return false;
+	}
+
+	constexpr auto await_resume() noexcept { return executor_; }
+
+	bzd::Executor* executor_;
+};
+
+/**
+ * Awaitable to yield the current execution.
+ */
 struct Yield : public bzd::coroutine::impl::suspend_always
 {
 	template <class T>
@@ -97,6 +114,7 @@ public:
 	}
 
 	constexpr auto&& await_transform(bzd::coroutine::impl::Yield&& awaitable) noexcept { return bzd::move(awaitable); }
+	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutor&& awaitable) noexcept { return bzd::move(awaitable); }
 
 	template <class Async>
 	constexpr auto&& await_transform(Async&& async) noexcept

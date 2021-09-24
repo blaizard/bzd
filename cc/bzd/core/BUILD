@@ -31,6 +31,11 @@ exports_files(
     visibility = ["//cc/bzd/core/async:__pkg__"],
 )
 
+exports_files(
+    ["out.hh"],
+    visibility = ["//cc/bzd/core/out:__pkg__"],
+)
+
 cc_library(
     name = "channel",
     hdrs = [
