@@ -8,5 +8,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container",
+        "//cc/bzd/core/logger",
+        "//cc/bzd/core/out",
     ],
 )

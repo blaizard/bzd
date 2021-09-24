@@ -1,9 +1,13 @@
 #include "cc/bzd/core/out.hh"
 
-#include "cc/bzd/platform/generic/stream/stub/stub.hh"
-
 namespace {
-bzd::platform::generic::stream::Stub stub;
+class Stub : public bzd::OStream
+{
+public:
+	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override { co_return data.size(); }
+};
+
+Stub stub;
 bzd::OStream* defaultOut{&stub};
 } // namespace
 

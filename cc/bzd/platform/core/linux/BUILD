@@ -11,7 +11,7 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:core",
-        "//cc/bzd/platform/generic/stream/stub",
+        "//cc/bzd/platform/out/std:std2",
     ],
 )
 
