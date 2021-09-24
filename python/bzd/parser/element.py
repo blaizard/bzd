@@ -212,7 +212,7 @@ class Element:
 		Get a current sequence of None if it does not exists.
 		"""
 		maybeSequence = self.getNestedSequence(kind)
-		assert maybeSequence, "Sequence must be non-null."
+		assert maybeSequence is not None, "Sequence must be non-null."
 		return maybeSequence
 
 	def getNestedSequenceOrEmpty(self, kind: str) -> Sequence:

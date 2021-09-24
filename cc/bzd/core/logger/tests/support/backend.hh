@@ -2,11 +2,10 @@
 #include "cc/bzd/core/logger/backend/logger.hh"
 #include "cc/bzd/platform/types.hh"
 
-#include <iostream>
 namespace bzd::test {
 
 template <bzd::SizeType SIZE>
-class Logger : public bzd::backend::Logger
+class Logger : public bzd::OStream
 {
 public:
 	Async<SizeType> write(const Span<const ByteType> data) noexcept override
@@ -14,7 +13,6 @@ public:
 		for (const auto b : data)
 		{
 			buffer_.at(write_++ % SIZE) = b;
-			std::cout << static_cast<char>(b) << std::flush;
 		}
 		co_return 0;
 	}

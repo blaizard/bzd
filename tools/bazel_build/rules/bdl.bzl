@@ -123,6 +123,7 @@ bdl_library = rule(
         ),
         "deps": attr.label_list(
             providers = [BdlProvider],
+            aspects = [_bdl_aspect],
             doc = "List of bdl dependencies.",
         ),
         "_bdl": attr.label(

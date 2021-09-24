@@ -103,6 +103,21 @@ TEST(Coroutine, PassThrough)
 	EXPECT_EQ(result.value(), 34);
 }
 
+bzd::Async<bzd::Executor*> fetchExecutor()
+{
+	auto exec = co_await bzd::async::getExecutor();
+	co_return exec;
+}
+
+TEST(Coroutine, Executor)
+{
+	bzd::Executor executor;
+	auto promise = fetchExecutor();
+	const auto result = promise.run(executor);
+	EXPECT_TRUE(result);
+	EXPECT_EQ(result.value(), &executor);
+}
+
 TEST(Coroutine, asyncAll)
 {
 	bzd::Executor executor;

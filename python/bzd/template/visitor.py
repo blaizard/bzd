@@ -175,9 +175,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Handle if block.
 		"""
 
-		Error.assertHasSequence(element=element, sequence="nested")
-		sequence = element.getNestedSequence(kind="nested")
-		assert sequence
+		sequence = element.getNestedSequenceAssert(kind="nested")
 
 		condition = self.evaluateCondition(conditionStr=conditionStr)
 		self.followElse = not condition

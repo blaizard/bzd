@@ -1,4 +1,5 @@
 use "cc/bzd/platform/core/linux/linux.bdl"
+use "cc/bzd/platform/generic/stream/stub/stub.bdl"
 
 
 /*
@@ -10,6 +11,7 @@ composition {
 	core1 = bzd.platform.linux.Core(name = 32.3, priority = 0);
 	core2 = bzd.platform.linux.Core(priority = 1, stackSize = defaultStackSize);
 	executor = bzd.platform.generic.Executor(core1, core2);
+	out = bzd.platform.generic.stream.Stub();
 	
 }
 

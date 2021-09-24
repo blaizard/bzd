@@ -198,6 +198,11 @@ constexpr auto yield() noexcept
 	return bzd::coroutine::impl::Yield{};
 }
 
+constexpr auto getExecutor() noexcept
+{
+	return bzd::coroutine::impl::GetExecutor{};
+}
+
 template <class... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
 {

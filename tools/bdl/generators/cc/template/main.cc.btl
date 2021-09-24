@@ -40,6 +40,12 @@ void execute() noexcept
 	{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	{% end %}
 
+	// Assign special symbols to public registry
+	{% for expresssion in registry %}
+		{% if expresssion.fqn == "out" %}
+		{% end %}
+	{% end %}
+
 	// Compose.
 	{% for index, expresssion in compositions.compose %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
