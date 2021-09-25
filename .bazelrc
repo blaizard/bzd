@@ -14,7 +14,7 @@ build "--strip=never"
 # Test specific options
 test --test_output=errors
 test --verbose_failures
-test --define=panic=throw
+#test --define=panic=throw
 
 # Coverage specific options
 coverage --combined_report=lcov

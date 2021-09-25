@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/impl/non_owning_list.hh"
 #include "cc/bzd/core/assert.hh"
-#include "cc/bzd/platform/out.hh"
+#include "cc/bzd/core/out.hh"
 #include "cc/bzd/utility/format/format.hh"
 
 namespace bzd::test {
@@ -114,7 +114,7 @@ public:
 	void printNode(ElementPtrType node)
 	{
 		const auto printAddress = [this](const ElementPtrType address) {
-			bzd::format::toStream(bzd::platform::getOut(),
+			bzd::format::toStream(bzd::Out::getDefault(),
 								  CSTR("{} {}"),
 								  address,
 								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "))
@@ -124,10 +124,10 @@ public:
 		printAddress(node);
 		if (node)
 		{
-			bzd::platform::getOut().write(bzd::StringView{" -> "}.asBytes()).sync();
+			bzd::Out::getDefault().write(bzd::StringView{" -> "}.asBytes()).sync();
 			printAddress(node->next_.load());
 		}
-		bzd::platform::getOut().write(bzd::StringView{"\n"}.asBytes()).sync();
+		bzd::Out::getDefault().write(bzd::StringView{"\n"}.asBytes()).sync();
 	}
 };
 } // namespace bzd::test

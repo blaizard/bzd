@@ -3,7 +3,7 @@
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/platform/panic.hh"
+#include "cc/bzd/core/panic.hh"
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd::assert {
@@ -47,7 +47,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, const bzd::Sourc
 	if (!condition)
 	{
 		bzd::log::error(bzd::forward<A>(a), location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 
@@ -57,7 +57,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, const bzd
 	if (!condition)
 	{
 		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 template <class A, class B, class C>
@@ -66,7 +66,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, co
 	if (!condition)
 	{
 		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 template <class A, class B, class C, class D>
@@ -75,7 +75,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 	if (!condition)
 	{
 		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 template <class A, class B, class C, class D, class E>
@@ -84,7 +84,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 	if (!condition)
 	{
 		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 template <class A, class B, class C, class D, class E, class F>
@@ -99,7 +99,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 						bzd::forward<E>(e),
 						bzd::forward<F>(f),
 						location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 template <class A, class B, class C, class D, class E, class F, class G>
@@ -116,7 +116,7 @@ constexpr void bzd::assert::isTrue(
 						bzd::forward<F>(f),
 						bzd::forward<G>(g),
 						location);
-		bzd::platform::panic();
+		bzd::Panic::trigger();
 	}
 }
 

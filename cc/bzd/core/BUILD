@@ -11,6 +11,8 @@ cc_library(
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
+        "//cc/bzd/core/out",
+        "//cc/bzd/core/panic",
     ],
 )
 
@@ -34,6 +36,11 @@ exports_files(
 exports_files(
     ["out.hh"],
     visibility = ["//cc/bzd/core/out:__pkg__"],
+)
+
+exports_files(
+    ["panic.hh"],
+    visibility = ["//cc/bzd/core/panic:__pkg__"],
 )
 
 cc_library(

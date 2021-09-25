@@ -1,0 +1,9 @@
+
+
+method worload(var = Integer) -> Integer;
+composition Hello {
+	worload(var = 12);
+	
+}
+
+

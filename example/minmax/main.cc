@@ -11,7 +11,7 @@ auto minmax(int i1, int i2, int i3, int i4) noexcept -> bzd::Tuple<int, int>
 int main()
 {
 	const auto result = minmax(4, -8, 6, 10);
-	bzd::format::toStream(bzd::platform::getOut(), CSTR("min: {}, max: {}\n"), result.get<0>(), result.get<1>()).sync();
+	bzd::format::toStream(bzd::Out::getDefault(), CSTR("min: {}, max: {}\n"), result.get<0>(), result.get<1>()).sync();
 
 	return 0;
 }

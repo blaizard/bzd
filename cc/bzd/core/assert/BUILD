@@ -15,7 +15,7 @@ cc_library(
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
         "//cc/bzd/core/logger",
-        "//cc/bzd/platform:panic",
+        "//cc/bzd/core/panic",
     ],
 )
 

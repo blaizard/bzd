@@ -19,23 +19,19 @@ bdl_library(
 
 cc_library(
     name = "platform",
-    srcs = [
-        "stack.cc",
-    ],
     visibility = ["//visibility:public"],
     deps = [":headers"] + select({
         "//tools/bazel_build/config:x86_64": [
             "//cc/bzd/platform/bootstrap/posix",
             "//cc/bzd/platform/clock/std",
-            "//cc/bzd/platform/out/std",
-            "//cc/bzd/platform/panic",
-            "//cc/bzd/platform/stack/x86_64_system_v",
+            #"//cc/bzd/platform/panic",
+            "//cc/bzd/platform/panic/exit",
+            "//cc/bzd/platform/linux:composition",
         ],
         "@esp32_xtensa_lx6_gcc//:target": [
             "//cc/bzd/platform/clock/esp32_xtensa_lx6",
             "//cc/bzd/platform/out/std",
             "//cc/bzd/platform/panic",
-            "//cc/bzd/platform/stack/stub",
         ],
     }),
 )
@@ -72,7 +68,6 @@ cc_library(
     hdrs = [
         "clock.hh",
         "out.hh",
-        "stack.hh",
     ],
     visibility = ["//cc/bzd/platform:__subpackages__"],
     deps = [
