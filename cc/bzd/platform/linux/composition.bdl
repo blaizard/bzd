@@ -1,0 +1,13 @@
+use "cc/bzd/platform/linux/core/interface.bdl"
+use "cc/bzd/platform/out/std/interface.bdl"
+
+
+composition {
+	core1 = bzd.platform.linux.Core(stackSize = 100000);
+	core2 = bzd.platform.linux.Core(stackSize = 100000);
+	executor = bzd.platform.generic.Executor(core1, core2);
+	out = bzd.platform.stdlib.Out();
+	
+}
+
+

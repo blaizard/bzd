@@ -6,16 +6,24 @@ bdl_library(
     srcs = [
         "interface.bdl",
     ],
+    deps = [
+        "//cc/bzd/platform:core",
+    ],
 )
 
 cc_library(
-    name = "stub",
+    name = "core",
     hdrs = [
-        "stub.hh",
+        "core.hh",
+    ],
+    linkopts = [
+        "-lpthread",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//cc/bzd/core:channel",
+        "//cc/bzd/container:optional",
+        "//cc/bzd/container:stack",
+        "//cc/bzd/utility:constexpr_for",
     ],
 )

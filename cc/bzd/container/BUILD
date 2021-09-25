@@ -17,6 +17,7 @@ cc_library(
         ":reference_wrapper",
         ":result",
         ":span",
+        ":stack",
         ":string",
         ":string_stream",
         ":string_view",
@@ -223,6 +224,19 @@ cc_library(
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:remove_const",
         "//cc/bzd/utility:swap",
+    ],
+)
+
+cc_library(
+    name = "stack",
+    hdrs = [
+        "stack.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/algorithm:fill",
+        "//cc/bzd/container:array",
+        "//cc/bzd/platform:types",
     ],
 )
 

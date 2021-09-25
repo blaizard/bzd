@@ -16,13 +16,13 @@ TEST(Minimal, Backend)
 
 	// Simple message
 	bzd::minimal::log::error("hello");
-	EXPECT_TRUE(backend.match("[e] [minimal.cc:18] hello"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[e] [minimal.cc:18] hello\n"_sv.asBytes()));
 	bzd::minimal::log::warning("hello");
-	EXPECT_TRUE(backend.match("[w] [minimal.cc:20] hello"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[w] [minimal.cc:20] hello\n"_sv.asBytes()));
 	bzd::minimal::log::info("hello");
-	EXPECT_TRUE(backend.match("[i] [minimal.cc:22] hello"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[i] [minimal.cc:22] hello\n"_sv.asBytes()));
 
 	// Default level is INFO, this will be hidden
 	bzd::minimal::log::debug("hello");
-	EXPECT_FALSE(backend.match("[d] [minimal.cc:26] hello"_sv.asBytes()));
+	EXPECT_FALSE(backend.match("[d] [minimal.cc:26] hello\n"_sv.asBytes()));
 }

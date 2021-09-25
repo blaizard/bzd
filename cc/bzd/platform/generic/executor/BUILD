@@ -4,7 +4,7 @@ load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 bdl_library(
     name = "bdl",
     srcs = [
-        "executor.bdl",
+        "interface.bdl",
     ],
     deps = [
         "//cc/bzd/platform:core",

@@ -24,10 +24,10 @@ bzd::Async<void> toStream(bzd::OStream& os, const bzd::StringView& view)
 
 int main()
 {
-	bzd::format::toStream(bzd::platform::getOut(), CSTR("The answer is {}.\n"), 42).sync();
+	bzd::format::toStream(bzd::Out::getDefault(), CSTR("The answer is {}.\n"), 42).sync();
 
 	const Date date{2020, 8, 4};
-	bzd::format::toStream(bzd::platform::getOut(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv).sync();
+	bzd::format::toStream(bzd::Out::getDefault(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv).sync();
 
 	bzd::String<128> str;
 	bzd::format::toString(str, "This date {}.", 12);

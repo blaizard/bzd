@@ -509,5 +509,6 @@ bzd::Async<void> bzd::Logger::print(const bzd::log::Level level, const SourceLoc
 		co_await printHeader(level, location);
 		auto& backend = bzd::backend::Logger::getDefault();
 		co_await bzd::format::toStream(backend, bzd::forward<Args>(args)...);
+		co_await backend.write("\n"_sv.asBytes());
 	}
 }

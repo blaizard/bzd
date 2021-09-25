@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 
@@ -11,25 +10,8 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:core",
-        "//cc/bzd/platform/out/std:std2",
-    ],
-)
-
-cc_library(
-    name = "linux",
-    hdrs = [
-        "core.hh",
-        "workload.hh",
-    ],
-    linkopts = [
-        "-lpthread",
-    ],
-    deps = [
-        ":bdl",
-        "//cc/bzd/container:optional",
-        "//cc/bzd/platform/core:stack",
         "//cc/bzd/platform/generic/executor",
-        "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/platform/out/std:std2",
     ],
 )
 
