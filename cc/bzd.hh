@@ -45,8 +45,8 @@
 // Platform
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/platform/clock.hh"
-#include "cc/bzd/platform/out.hh"
 #include "cc/bzd/platform/panic.hh"
+#include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/platform/types.hh"
 
 // Type Traits

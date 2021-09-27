@@ -2,7 +2,7 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/core/panic.hh"
+#include "cc/bzd/platform/panic.hh"
 //#include "cc/bzd/utility/format/integral.hh"
 
 namespace bzd::assert::impl {
@@ -17,7 +17,7 @@ void backend(const bzd::SourceLocation& location, const char* message1, const ch
 	{
 		bzd::log::error(CSTR("{}{}"), message1, message2, location).sync();
 	}
-	bzd::Panic::trigger();
+	bzd::platform::panic();
 }
 } // namespace bzd::assert::impl
 

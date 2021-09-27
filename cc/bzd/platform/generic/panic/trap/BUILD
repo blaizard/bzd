@@ -1,0 +1,13 @@
+load("//tools/bazel_build/rules:cc.bzl", "cc_library")
+
+cc_library(
+    name = "trap",
+    srcs = [
+        "panic.cc",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:panic",
+    ],
+    alwayslink = True,
+)

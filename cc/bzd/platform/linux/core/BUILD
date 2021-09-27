@@ -7,7 +7,7 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
-        "//cc/bzd/platform:core",
+        "//cc/bzd/platform/interfaces:core",
     ],
 )
 
