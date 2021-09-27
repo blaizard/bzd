@@ -1,5 +1,5 @@
-use "cc/bzd/platform/executor.bdl"
-use "cc/bzd/platform/core.bdl"
+use "cc/bzd/platform/interfaces/executor.bdl"
+use "cc/bzd/platform/interfaces/core.bdl"
 
 namespace bzd.platform.generic;
 

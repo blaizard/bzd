@@ -1,39 +1,11 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
-
-bdl_library(
-    name = "core",
-    srcs = [
-        "core.bdl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-bdl_library(
-    name = "executor",
-    srcs = [
-        "executor.bdl",
-    ],
-    visibility = ["//visibility:public"],
-)
 
 cc_library(
     name = "platform",
     visibility = ["//visibility:public"],
-    deps = [":headers"] + select({
-        "//tools/bazel_build/config:x86_64": [
-            "//cc/bzd/platform/bootstrap/posix",
-            "//cc/bzd/platform/clock/std",
-            #"//cc/bzd/platform/panic",
-            "//cc/bzd/platform/panic/exit",
-            "//cc/bzd/platform/linux:composition",
-        ],
-        "@esp32_xtensa_lx6_gcc//:target": [
-            "//cc/bzd/platform/clock/esp32_xtensa_lx6",
-            "//cc/bzd/platform/out/std",
-            "//cc/bzd/platform/panic",
-        ],
-    }),
+    deps = [
+        "//cc/bzd/platform/backend",
+    ],
 )
 
 cc_library(
@@ -50,6 +22,9 @@ cc_library(
         "panic.hh",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":types",
+    ],
 )
 
 cc_library(
@@ -64,20 +39,25 @@ cc_library(
 )
 
 cc_library(
-    name = "headers",
+    name = "stream",
+    hdrs = [
+        "stream.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core:channel",
+    ],
+)
+
+cc_library(
+    name = "clock",
     hdrs = [
         "clock.hh",
-        "out.hh",
     ],
-    visibility = ["//cc/bzd/platform:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
-        ":atomic",
-        ":panic",
         ":types",
-        "//cc/bzd/algorithm:fill",
-        "//cc/bzd/core:channel",
+        "//cc/bzd/container:named_type",
         "//cc/bzd/core:units",
-        "//cc/bzd/utility:align_down",
-        "//cc/bzd/utility:align_up",
     ],
 )

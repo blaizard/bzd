@@ -2,24 +2,21 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 bdl_library(
-    name = "bdl",
+    name = "interface",
     srcs = [
         "interface.bdl",
     ],
-    deps = [
-        "//cc/bzd/platform/interfaces:core",
-        "//cc/bzd/platform/interfaces:executor",
-    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
-    name = "executor",
+    name = "out",
     hdrs = [
-        "executor.hh",
+        "out.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":bdl",
-        "//cc/bzd/utility:constexpr_for",
+        ":interface",
+        "//cc/bzd/core:channel",
     ],
 )

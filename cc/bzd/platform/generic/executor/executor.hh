@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/platform/core.hh"
-#include "cc/bzd/platform/executor.hh"
+#include "cc/bzd/platform/interfaces/core.hh"
+#include "cc/bzd/platform/interfaces/executor.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 
 namespace bzd::platform::generic {

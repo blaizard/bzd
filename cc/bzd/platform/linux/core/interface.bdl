@@ -1,4 +1,4 @@
-use "cc/bzd/platform/core.bdl"
+use "cc/bzd/platform/interfaces/core.bdl"
 
 namespace bzd.platform.linux;
 
