@@ -6,8 +6,6 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
 
-#include <iostream>
-
 // Forward declaration
 namespace bzd::impl {
 template <class T>

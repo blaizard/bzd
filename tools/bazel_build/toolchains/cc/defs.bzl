@@ -62,16 +62,16 @@ def _impl(ctx):
     ctx.template("BUILD", Label("//tools/bazel_build/toolchains/cc:template/BUILD.template"), build_substitutions)
 
     # Set the binary wrappers
-    ctx.template("bin/wrapper_ar", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_ar"), {"%{ar}": ctx.attr.bin_ar})
-    ctx.template("bin/wrapper_as", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_as"), {"%{as}": ctx.attr.bin_as})
-    ctx.template("bin/wrapper_cc", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cc"), {"%{cc}": ctx.attr.bin_cc})
-    ctx.template("bin/wrapper_cpp", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cpp"), {"%{cpp}": ctx.attr.bin_cpp})
-    ctx.template("bin/wrapper_ld", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_ld"), {"%{ld}": ctx.attr.bin_ld})
-    ctx.template("bin/wrapper_cov", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_cov"), {"%{cov}": ctx.attr.bin_cov})
-    ctx.template("bin/wrapper_nm", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_nm"), {"%{nm}": ctx.attr.bin_nm})
-    ctx.template("bin/wrapper_objdump", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_objdump"), {"%{objdump}": ctx.attr.bin_objdump})
-    ctx.template("bin/wrapper_objcopy", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_objcopy"), {"%{objcopy}": ctx.attr.bin_objcopy})
-    ctx.template("bin/wrapper_strip", Label("//tools/bazel_build/toolchains/cc:template/bin/wrapper_strip"), {"%{strip}": ctx.attr.bin_strip})
+    ctx.template("bin/wrapper_ar", ctx.attr.template_bin_ar, {"%{ar}": ctx.attr.bin_ar})
+    ctx.template("bin/wrapper_as", ctx.attr.template_bin_as, {"%{as}": ctx.attr.bin_as})
+    ctx.template("bin/wrapper_cc", ctx.attr.template_bin_cc, {"%{cc}": ctx.attr.bin_cc})
+    ctx.template("bin/wrapper_cpp", ctx.attr.template_bin_cpp, {"%{cpp}": ctx.attr.bin_cpp})
+    ctx.template("bin/wrapper_ld", ctx.attr.template_bin_ld, {"%{ld}": ctx.attr.bin_ld})
+    ctx.template("bin/wrapper_cov", ctx.attr.template_bin_cov, {"%{cov}": ctx.attr.bin_cov})
+    ctx.template("bin/wrapper_nm", ctx.attr.template_bin_nm, {"%{nm}": ctx.attr.bin_nm})
+    ctx.template("bin/wrapper_objdump", ctx.attr.template_bin_objdump, {"%{objdump}": ctx.attr.bin_objdump})
+    ctx.template("bin/wrapper_objcopy", ctx.attr.template_bin_objcopy, {"%{objcopy}": ctx.attr.bin_objcopy})
+    ctx.template("bin/wrapper_strip", ctx.attr.template_bin_strip, {"%{strip}": ctx.attr.bin_strip})
 
 """
 Linux specific implementation of the toolchain
@@ -117,6 +117,17 @@ _toolchain_maker_linux = repository_rule(
         "bin_objdump": attr.string(default = "/usr/bin/objdump"),
         "bin_objcopy": attr.string(default = "/usr/bin/objcopy"),
         "bin_strip": attr.string(default = "/usr/bin/strip"),
+        # Tools wrapper template
+        "template_bin_ar": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_ar"),
+        "template_bin_as": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_as"),
+        "template_bin_cc": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_cc"),
+        "template_bin_cpp": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_cpp"),
+        "template_bin_ld": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_ld"),
+        "template_bin_cov": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_cov"),
+        "template_bin_nm": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_nm"),
+        "template_bin_objdump": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_objdump"),
+        "template_bin_objcopy": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_objcopy"),
+        "template_bin_strip": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_strip"),
         # Execution
         "app_prepare": attr.string(),
         "app_metadatas": attr.string_list(),
@@ -144,6 +155,7 @@ def toolchain_maker(name, implementation, definition):
             "link_flags": LINKOPTS_GCC,
             "coverage_compile_flags": COPTS_GCC_COVERAGE,
             "coverage_link_flags": LINKOPTS_GCC_COVERAGE,
+            "template_bin_cc": "//tools/bazel_build/toolchains/cc:template/bin/wrapper_cc_start_end_group",
         }, definition)
 
         _toolchain_maker_linux(

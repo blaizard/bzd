@@ -8,10 +8,10 @@ cc_library(
         ":delay",
         ":registry",
         ":units",
+        ":clock",
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
-        "//cc/bzd/core/out",
         "//cc/bzd/core/panic",
     ],
 )
@@ -31,11 +31,6 @@ exports_files(
 exports_files(
     ["async.hh"],
     visibility = ["//cc/bzd/core/async:__pkg__"],
-)
-
-exports_files(
-    ["out.hh"],
-    visibility = ["//cc/bzd/core/out:__pkg__"],
 )
 
 exports_files(
@@ -93,5 +88,18 @@ cc_library(
     deps = [
         "//cc/bzd/container:named_type",
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "clock",
+    hdrs = [
+        "clock.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/container:named_type",
+        "//cc/bzd/core:units",
     ],
 )

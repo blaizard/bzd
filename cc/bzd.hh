@@ -30,7 +30,6 @@
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/core/delay.hh"
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/core/out.hh"
 #include "cc/bzd/core/registry.hh"
 
 // Meta

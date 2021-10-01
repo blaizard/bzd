@@ -1,6 +1,6 @@
 #include "cc/bzd/core/logger/backend/logger.hh"
 
-#include "cc/bzd/core/out.hh"
+#include "cc/bzd/platform/stream.hh"
 
 namespace {
 
@@ -9,7 +9,7 @@ class Proxy : public bzd::OStream
 public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
-		const auto size = co_await bzd::Out::getDefault().write(data);
+		const auto size = co_await bzd::platform::out().write(data);
 		co_return size;
 	}
 };

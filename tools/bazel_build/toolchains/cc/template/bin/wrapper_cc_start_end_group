@@ -1,0 +1,7 @@
+#!/bin/bash --norc
+
+# This is a hack to handle circular dependencies introduced by the fact that the platform library is linked
+# separately from the headers.
+# TODO: fix this, an idea would be to introduce a cc_platform rule and to inject this in the compile_files
+# attribute of the toolchain: https://github.com/bazelbuild/bazel/issues/11593
+exec %{cc} -Wl,--start-group "$@" -Wl,--end-group

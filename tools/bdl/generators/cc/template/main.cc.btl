@@ -2,7 +2,7 @@
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/core/out.hh"
+#include "cc/bzd/platform/backend/backend.hh"
 {% for path in includes %}
 #include "{{ path }}"
 {% end %}
@@ -46,7 +46,7 @@ void execute() noexcept
 	// Assign special symbols to public registry
 	{% for expresssion in registry %}
 		{% if expresssion.fqn == "out" %}
-	bzd::Out::setDefault(registry.{{ expresssion.fqn | fqnToNameStr }}_);
+	bzd::platform::backend::setOut(registry.{{ expresssion.fqn | fqnToNameStr }}_);
 		{% end %}
 	{% end %}
 

@@ -9,6 +9,6 @@ cc_library(
     deps = [
         "//cc/bzd/container",
         "//cc/bzd/core/logger",
-        "//cc/bzd/core/out",
+        "//cc/bzd/platform/backend:setter",
     ],
 )

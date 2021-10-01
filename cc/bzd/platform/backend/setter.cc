@@ -7,12 +7,12 @@ extern bzd::OStream* out;
 extern bzd::IStream* in;
 } // namespace bzd::platform::backend
 
-bzd::OStream& bzd::platform::out() noexcept
+void bzd::platform::backend::setOut(bzd::OStream& stream) noexcept
 {
-	return *bzd::platform::backend::out;
+	bzd::platform::backend::out = &stream;
 }
 
-bzd::IStream& bzd::platform::in() noexcept
+void bzd::platform::backend::setIn(bzd::IStream& stream) noexcept
 {
-	return *bzd::platform::backend::in;
+	bzd::platform::backend::in = &stream;
 }
