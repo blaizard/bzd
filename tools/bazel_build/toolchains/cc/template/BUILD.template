@@ -58,6 +58,7 @@ cc_toolchain_config(
         "as": "bin/wrapper_as",
         "objcopy": "bin/wrapper_objcopy",
         "gcov": "bin/wrapper_cov",
+        "llvm-cov": "bin/wrapper_cov",
         "objdump": "bin/wrapper_objdump",
         "strip": "bin/wrapper_strip",
     },

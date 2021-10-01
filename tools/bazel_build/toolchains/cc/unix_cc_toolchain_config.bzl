@@ -14,17 +14,79 @@
 
 """A Starlark cc_toolchain configuration rule"""
 
-load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load(
-    "@rules_cc//cc:cc_toolchain_config_lib.bzl",
+    "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
+    "action_config",
     "feature",
     "feature_set",
     "flag_group",
     "flag_set",
+    "tool",
     "tool_path",
     "variable_with_value",
     "with_feature_set",
 )
+load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
+
+def layering_check_features(compiler):
+    if compiler != "clang":
+        return []
+    return [
+        feature(
+            name = "use_module_maps",
+            requires = [feature_set(features = ["module_maps"])],
+            flag_sets = [
+                flag_set(
+                    actions = [
+                        ACTION_NAMES.c_compile,
+                        ACTION_NAMES.cpp_compile,
+                        ACTION_NAMES.cpp_header_parsing,
+                        ACTION_NAMES.cpp_module_compile,
+                    ],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-fmodule-name=%{module_name}",
+                                "-fmodule-map-file=%{module_map_file}",
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+
+        # Tell blaze we support module maps in general, so they will be generated
+        # for all c/c++ rules.
+        # Note: not all C++ rules support module maps; thus, do not imply this
+        # feature from other features - instead, require it.
+        feature(name = "module_maps", enabled = True),
+        feature(
+            name = "layering_check",
+            implies = ["use_module_maps"],
+            flag_sets = [
+                flag_set(
+                    actions = [
+                        ACTION_NAMES.c_compile,
+                        ACTION_NAMES.cpp_compile,
+                        ACTION_NAMES.cpp_header_parsing,
+                        ACTION_NAMES.cpp_module_compile,
+                    ],
+                    flag_groups = [
+                        flag_group(flags = [
+                            "-fmodules-strict-decluse",
+                            "-Wprivate-header",
+                        ]),
+                        flag_group(
+                            iterate_over = "dependent_module_map_files",
+                            flags = [
+                                "-fmodule-map-file=%{dependent_module_map_files}",
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ]
 
 all_compile_actions = [
     ACTION_NAMES.c_compile,
@@ -86,6 +148,17 @@ def _impl(ctx):
         for name, path in ctx.attr.tool_paths.items()
     ]
     action_configs = []
+
+    llvm_cov_action = action_config(
+        action_name = ACTION_NAMES.llvm_cov,
+        tools = [
+            tool(
+                path = ctx.attr.tool_paths["llvm-cov"],
+            ),
+        ],
+    )
+
+    action_configs.append(llvm_cov_action)
 
     supports_pic_feature = feature(
         name = "supports_pic",
@@ -596,6 +669,32 @@ def _impl(ctx):
         ],
     )
 
+    external_include_paths_feature = feature(
+        name = "external_include_paths",
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.preprocess_assemble,
+                    ACTION_NAMES.linkstamp_compile,
+                    ACTION_NAMES.c_compile,
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.clif_match,
+                    ACTION_NAMES.objc_compile,
+                    ACTION_NAMES.objcpp_compile,
+                ],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-isystem", "%{external_include_paths}"],
+                        iterate_over = "external_include_paths",
+                        expand_if_available = "external_include_paths",
+                    ),
+                ],
+            ),
+        ],
+    )
+
     symbol_counts_feature = feature(
         name = "symbol_counts",
         flag_sets = [
@@ -1082,52 +1181,76 @@ def _impl(ctx):
         ],
     )
 
-    features = [
-        dependency_file_feature,
-        random_seed_feature,
-        pic_feature,
-        per_object_debug_info_feature,
-        preprocessor_defines_feature,
-        includes_feature,
-        include_paths_feature,
-        fdo_instrument_feature,
-        cs_fdo_instrument_feature,
-        cs_fdo_optimize_feature,
-        thinlto_feature,
-        fdo_prefetch_hints_feature,
-        autofdo_feature,
-        build_interface_libraries_feature,
-        dynamic_library_linker_tool_feature,
-        symbol_counts_feature,
-        shared_flag_feature,
-        linkstamps_feature,
-        output_execpath_flags_feature,
-        runtime_library_search_directories_feature,
-        library_search_directories_feature,
-        archiver_flags_feature,
-        force_pic_flags_feature,
-        fission_support_feature,
-        strip_debug_symbols_feature,
-        coverage_feature,
-        supports_pic_feature,
-    ] + (
-        [
-            supports_start_end_lib_feature,
-        ] if ctx.attr.supports_start_end_lib else []
-    ) + [
-        default_compile_flags_feature,
-        default_link_flags_feature,
-        libraries_to_link_feature,
-        user_link_flags_feature,
-        static_libgcc_feature,
-        fdo_optimize_feature,
-        supports_dynamic_linker_feature,
-        dbg_feature,
-        opt_feature,
-        user_compile_flags_feature,
-        sysroot_feature,
-        unfiltered_compile_flags_feature,
-    ]
+    is_linux = ctx.attr.target_libc != "macosx"
+
+    # TODO(#8303): Mac crosstool should also declare every feature.
+    if is_linux:
+        features = [
+            dependency_file_feature,
+            random_seed_feature,
+            pic_feature,
+            per_object_debug_info_feature,
+            preprocessor_defines_feature,
+            includes_feature,
+            include_paths_feature,
+            external_include_paths_feature,
+            fdo_instrument_feature,
+            cs_fdo_instrument_feature,
+            cs_fdo_optimize_feature,
+            thinlto_feature,
+            fdo_prefetch_hints_feature,
+            autofdo_feature,
+            build_interface_libraries_feature,
+            dynamic_library_linker_tool_feature,
+            symbol_counts_feature,
+            shared_flag_feature,
+            linkstamps_feature,
+            output_execpath_flags_feature,
+            runtime_library_search_directories_feature,
+            library_search_directories_feature,
+            archiver_flags_feature,
+            force_pic_flags_feature,
+            fission_support_feature,
+            strip_debug_symbols_feature,
+            coverage_feature,
+            supports_pic_feature,
+        ] + (
+            [
+                supports_start_end_lib_feature,
+            ] if ctx.attr.supports_start_end_lib else []
+        ) + [
+            default_compile_flags_feature,
+            default_link_flags_feature,
+            libraries_to_link_feature,
+            user_link_flags_feature,
+            static_libgcc_feature,
+            fdo_optimize_feature,
+            supports_dynamic_linker_feature,
+            dbg_feature,
+            opt_feature,
+            user_compile_flags_feature,
+            sysroot_feature,
+            unfiltered_compile_flags_feature,
+        ] + layering_check_features(ctx.attr.compiler)
+    else:
+        features = [
+            supports_pic_feature,
+        ] + (
+            [
+                supports_start_end_lib_feature,
+            ] if ctx.attr.supports_start_end_lib else []
+        ) + [
+            coverage_feature,
+            default_compile_flags_feature,
+            default_link_flags_feature,
+            fdo_optimize_feature,
+            supports_dynamic_linker_feature,
+            dbg_feature,
+            opt_feature,
+            user_compile_flags_feature,
+            sysroot_feature,
+            unfiltered_compile_flags_feature,
+        ] + layering_check_features(ctx.attr.compiler)
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
@@ -1143,32 +1266,34 @@ def _impl(ctx):
         abi_version = ctx.attr.abi_version,
         abi_libc_version = ctx.attr.abi_libc_version,
         tool_paths = tool_paths,
+        builtin_sysroot = ctx.attr.builtin_sysroot,
     )
 
 cc_toolchain_config = rule(
     implementation = _impl,
     attrs = {
-        "abi_libc_version": attr.string(mandatory = True),
-        "abi_version": attr.string(mandatory = True),
-        "compile_flags": attr.string_list(),
-        "compiler": attr.string(mandatory = True),
-        "coverage_compile_flags": attr.string_list(),
-        "coverage_link_flags": attr.string_list(),
         "cpu": attr.string(mandatory = True),
-        "cxx_builtin_include_directories": attr.string_list(),
-        "cxx_flags": attr.string_list(),
-        "dbg_compile_flags": attr.string_list(),
+        "compiler": attr.string(mandatory = True),
+        "toolchain_identifier": attr.string(mandatory = True),
         "host_system_name": attr.string(mandatory = True),
+        "target_system_name": attr.string(mandatory = True),
+        "target_libc": attr.string(mandatory = True),
+        "abi_version": attr.string(mandatory = True),
+        "abi_libc_version": attr.string(mandatory = True),
+        "cxx_builtin_include_directories": attr.string_list(),
+        "tool_paths": attr.string_dict(),
+        "compile_flags": attr.string_list(),
+        "dbg_compile_flags": attr.string_list(),
+        "opt_compile_flags": attr.string_list(),
+        "cxx_flags": attr.string_list(),
         "link_flags": attr.string_list(),
         "link_libs": attr.string_list(),
-        "opt_compile_flags": attr.string_list(),
         "opt_link_flags": attr.string_list(),
-        "supports_start_end_lib": attr.bool(),
-        "target_libc": attr.string(mandatory = True),
-        "target_system_name": attr.string(mandatory = True),
-        "tool_paths": attr.string_dict(),
-        "toolchain_identifier": attr.string(mandatory = True),
         "unfiltered_compile_flags": attr.string_list(),
+        "coverage_compile_flags": attr.string_list(),
+        "coverage_link_flags": attr.string_list(),
+        "supports_start_end_lib": attr.bool(),
+        "builtin_sysroot": attr.string(),
     },
     provides = [CcToolchainConfigInfo],
 )

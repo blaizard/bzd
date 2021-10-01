@@ -5,6 +5,7 @@ cc_library(
     srcs = [
         "backend.cc",
     ],
+    tags = ["manual"],
     visibility = [
         "//cc/bzd/platform/backend:__pkg__",
     ],

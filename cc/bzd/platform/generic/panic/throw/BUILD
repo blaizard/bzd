@@ -9,5 +9,4 @@ cc_library(
     deps = [
         "//cc/bzd/platform:panic",
     ],
-    alwayslink = True,
 )

@@ -56,8 +56,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":types",
-        "//cc/bzd/container:named_type",
-        "//cc/bzd/core:units",
+        "//cc/bzd/core:clock"
     ],
 )
