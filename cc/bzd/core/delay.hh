@@ -14,14 +14,15 @@ namespace bzd {
  */
 bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 {
-	auto duration = bzd::platform::getTicks().toDuration();
-	const auto targetDuration = duration + bzd::platform::msToTicks(time);
+	auto& clock = bzd::platform::steadyClock();
+	auto duration = clock.getTicks().toDuration();
+	const auto targetDuration = duration + clock.msToTicks(time);
 
 	do
 	{
 		co_await bzd::async::yield();
 
-		const auto curTicks = bzd::platform::getTicks();
+		const auto curTicks = clock.getTicks();
 
 		// Update the current duration and update the wrapping counter
 		auto details = duration.getDetails();
