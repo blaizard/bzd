@@ -9,6 +9,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:stream",
+        "//cc/bzd/platform:clock",
     ] + select({
         "//tools/bazel_build/config:linux": [
             "//cc/bzd/platform/linux:backend",
