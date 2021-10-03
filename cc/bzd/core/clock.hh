@@ -18,6 +18,9 @@ public:
 	virtual ClockTick getTicks() noexcept = 0;
 	virtual ClockTick msToTicks(const bzd::units::Millisecond time) noexcept = 0;
 	virtual bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept = 0;
+	/**
+	 * Return the number of milliseconds since the Unix epoch (00:00:00 UTC on 1 January 1970).
+	 */
 	bzd::units::Millisecond getMs() noexcept { return ticksToMs(getTicks()); }
 };
 

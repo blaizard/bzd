@@ -30,6 +30,7 @@ build:cc-docker-sandbox --spawn_strategy=sandboxed,docker
 build:cc-docker-sandbox --strategy=CcAction=docker
 build:cc-docker-sandbox --strategy_regexp=Compiling=docker
 build:cc-docker-sandbox --strategy_regexp=Linking=docker
+coverage:cc-docker-sandbox --strategy=TestRunner=docker
 
 # Select only C++ targets
 build:cc --build_tag_filters=cc
@@ -72,6 +73,8 @@ build:linux_x86_64_gcc --extra_execution_platforms="@linux_x86_64_gcc//:host_pla
 build:linux_x86_64_gcc --incompatible_enable_cc_toolchain_resolution
 build:linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc
 build:linux_x86_64_gcc --config=cc-docker-sandbox
+coverage:linux_x86_64_gcc --experimental_split_coverage_postprocessing
+coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
 
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
