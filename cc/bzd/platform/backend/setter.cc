@@ -1,5 +1,4 @@
 #include "cc/bzd/platform/backend/backend.hh"
-
 #include "cc/bzd/platform/stream.hh"
 
 namespace bzd::platform::backend {

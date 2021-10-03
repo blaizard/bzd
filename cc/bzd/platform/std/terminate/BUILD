@@ -8,6 +8,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:panic",
+        "//cc/bzd/platform:types",
     ],
     alwayslink = True,
 )

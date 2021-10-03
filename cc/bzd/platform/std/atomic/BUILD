@@ -1,15 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "steady_clock",
+    name = "atomic",
     srcs = [
-        "steady_clock.cc",
+        "bzd/atomic.hh",
     ],
-    hdrs = [
-        "steady_clock.hh",
+    includes = [
+        ".",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:clock",
+        "//cc/bzd/container:named_type",
     ],
 )

@@ -22,9 +22,6 @@ cc_library(
         "panic.hh",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        ":types",
-    ],
 )
 
 cc_library(
@@ -34,7 +31,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container:named_type",
+        "//cc/bzd/platform/std/atomic",
     ],
 )
 
@@ -56,6 +53,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:clock"
+        "//cc/bzd/core:clock",
     ],
 )

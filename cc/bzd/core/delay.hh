@@ -15,26 +15,13 @@ namespace bzd {
 bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 {
 	auto& clock = bzd::platform::steadyClock();
-	auto duration = clock.getTicks().toDuration();
-	const auto targetDuration = duration + clock.msToTicks(time);
+	const auto targetTicks = clock.getTicks() + clock.msToTicks(time);
 
 	do
 	{
 		co_await bzd::async::yield();
-
-		const auto curTicks = clock.getTicks();
-
-		// Update the current duration and update the wrapping counter
-		auto details = duration.getDetails();
-		if (details.ticks > curTicks.get())
-		{
-			++details.wrappingCounter;
-		}
-		details.ticks = curTicks.get();
-		duration.setFromDetails(details);
-
 		// Check if the duration is reached
-	} while (duration < targetDuration);
+	} while (clock.getTicks() < targetTicks);
 }
 
 } // namespace bzd

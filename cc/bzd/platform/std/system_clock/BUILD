@@ -1,12 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "steady_clock",
+    name = "system_clock",
     srcs = [
-        "steady_clock.cc",
+        "system_clock.cc",
     ],
     hdrs = [
-        "steady_clock.hh",
+        "system_clock.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -26,7 +26,17 @@ cc_library(
         "//cc/bzd/platform/generic/panic/throw",
         "//cc/bzd/platform/generic/stream/stub",
         "//cc/bzd/platform/posix/stack_trace",
+        "//cc/bzd/platform/std/atomic",
         "//cc/bzd/platform/std/steady_clock",
         "//cc/bzd/platform/std/stream/out",
+        "//cc/bzd/platform/std/system_clock",
+    ],
+)
+
+alias(
+    name = "atomic",
+    actual = "//cc/bzd/platform/std/atomic",
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
     ],
 )
