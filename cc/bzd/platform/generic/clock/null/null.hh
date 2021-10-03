@@ -2,9 +2,9 @@
 
 #include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::esp32 {
+namespace bzd::platform::generic::clock {
 
-class XthalClock : public bzd::Clock
+class Null : public bzd::Clock
 {
 public:
 	ClockTick getTicks() noexcept override;
@@ -12,11 +12,6 @@ public:
 	ClockTick msToTicks(const bzd::units::Millisecond time) noexcept override;
 
 	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
-
-	void exec() noexcept;
-
-private:
-	bzd::UInt64Type ticks_{0};
 };
 
-} // namespace bzd::platform::esp32
+} // namespace bzd::platform::generic::clock

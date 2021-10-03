@@ -1,35 +1,40 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
+# Helper to map platform with their backend
+PLATFORM_TO_TARGET = {
+    "//tools/bazel_build/config:linux": "//cc/bzd/platform/linux",
+    "@esp32_xtensa_lx6_gcc//:target": "//cc/bzd/platform/esp32_xtensa_lx6",
+}
+
 cc_library(
     name = "backend",
     srcs = [
-        "backend.hh",
         "backend.cc",
+        "backend.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//cc/bzd/platform:__pkg__"],
     deps = [
         "//cc/bzd/platform:stream",
         "//cc/bzd/platform:clock",
-    ] + select({
-        "//tools/bazel_build/config:linux": [
-            "//cc/bzd/platform/linux:backend",
-        ],
-        "@esp32_xtensa_lx6_gcc//:target": [
-            "//cc/bzd/platform/esp32_xtensa_lx6:backend",
-        ],
-    }),
+    ] + select({platform: [target + ":backend"] for platform, target in PLATFORM_TO_TARGET.items()}),
+)
+
+cc_library(
+    name = "atomic",
+    visibility = ["//cc/bzd/platform:__pkg__"],
+    deps = select({platform: [target + ":atomic"] for platform, target in PLATFORM_TO_TARGET.items()}),
 )
 
 cc_library(
     name = "setter",
-    hdrs = [
-        "backend.hh",
-    ],
     srcs = [
         "setter.cc",
     ],
+    hdrs = [
+        "backend.hh",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:stream",
     ],
-    visibility = ["//visibility:public"],
 )

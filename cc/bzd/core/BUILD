@@ -5,10 +5,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":channel",
+        ":clock",
         ":delay",
         ":registry",
         ":units",
-        ":clock",
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
@@ -98,8 +98,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform:types",
         "//cc/bzd/container:named_type",
         "//cc/bzd/core:units",
+        "//cc/bzd/platform:types",
     ],
 )
