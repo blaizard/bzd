@@ -20,7 +20,8 @@ before(async () => {
 	persistence = await PersistenceDisk.make(persistenceOptions.path, persistenceOptions);
 });
 
-after(async () => {
+after(async function () {
+	this.timeout(120000);
 	await persistence.close();
 	await FileSystem.rmdir(tempDirPath);
 });
