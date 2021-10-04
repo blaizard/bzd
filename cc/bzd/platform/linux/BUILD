@@ -14,13 +14,33 @@ bdl_library(
 )
 
 cc_library(
-    name = "backend",
+    name = "binary",
     srcs = [
-        "backend.cc",
+        "main.cc",
     ],
     visibility = [
         "//cc/bzd/platform/backend:__pkg__",
     ],
+    deps = [
+        ":backend",
+    ],
+)
+
+cc_library(
+    name = "test",
+    srcs = [
+        "test.cc",
+    ],
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
+    ],
+    deps = [
+        ":backend",
+    ],
+)
+
+cc_library(
+    name = "backend",
     deps = [
         ":composition",
         "//cc/bzd/platform/generic/panic/throw",

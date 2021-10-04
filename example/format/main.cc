@@ -22,6 +22,7 @@ bzd::Async<void> toStream(bzd::OStream& os, const bzd::StringView& view)
 	co_await os.write(view.asBytes());
 }
 
+/*
 int main()
 {
 	bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42).sync();
@@ -35,3 +36,4 @@ int main()
 
 	return 0;
 }
+*/

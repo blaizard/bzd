@@ -88,7 +88,6 @@ class Transform:
 def formatCc(bdl: Object) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-
 	output = template.render(bdl.tree, Transform())
 
 	return output
@@ -96,7 +95,7 @@ def formatCc(bdl: Object) -> str:
 
 def compositionCc(composition: Composition) -> str:
 
-	template = Template.fromPath(Path(__file__).parent / "template/main.cc.btl", indent=True)
+	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 
 	print(composition.registry)
 	output = template.render(composition, Transform(composition))

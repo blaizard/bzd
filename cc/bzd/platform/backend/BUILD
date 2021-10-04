@@ -12,11 +12,22 @@ cc_library(
         "backend.cc",
         "backend.hh",
     ],
-    visibility = ["//cc/bzd/platform:__pkg__"],
     deps = [
-        "//cc/bzd/platform:stream",
         "//cc/bzd/platform:clock",
-    ] + select({platform: [target + ":backend"] for platform, target in PLATFORM_TO_TARGET.items()}),
+        "//cc/bzd/platform:stream",
+    ],
+)
+
+cc_library(
+    name = "binary",
+    visibility = ["//cc/bzd/platform:__pkg__"],
+    deps = select({platform: [target + ":binary"] for platform, target in PLATFORM_TO_TARGET.items()}) + [":backend"],
+)
+
+cc_library(
+    name = "test",
+    visibility = ["//cc/bzd/platform:__pkg__"],
+    deps = select({platform: [target + ":test"] for platform, target in PLATFORM_TO_TARGET.items()}) + [":backend"],
 )
 
 cc_library(

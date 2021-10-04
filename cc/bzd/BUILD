@@ -8,7 +8,6 @@ cc_library(
         "//cc/bzd/container",
         "//cc/bzd/core",
         "//cc/bzd/meta",
-        "//cc/bzd/platform",
         "//cc/bzd/type_traits",
         "//cc/bzd/utility",
     ],

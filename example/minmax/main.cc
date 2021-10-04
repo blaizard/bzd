@@ -7,7 +7,7 @@ auto minmax(int i1, int i2, int i3, int i4) noexcept -> bzd::Tuple<int, int>
 
 	return bzd::Tuple<int, int>(min, max);
 }
-
+/*
 int main()
 {
 	const auto result = minmax(4, -8, 6, 10);
@@ -15,3 +15,4 @@ int main()
 
 	return 0;
 }
+*/

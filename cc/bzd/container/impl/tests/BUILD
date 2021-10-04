@@ -10,7 +10,6 @@ cc_library(
     deps = [
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/core/assert",
-        "//cc/bzd/platform",
         "//cc/bzd/utility/format",
     ],
 )

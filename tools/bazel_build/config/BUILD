@@ -44,3 +44,11 @@ config_setting(
     },
     visibility = ["//visibility:public"],
 )
+
+config_setting(
+    name = "test",
+    define_values = {
+        "type": "test",
+    },
+    visibility = ["//visibility:public"],
+)

@@ -59,7 +59,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/async",
-        "//cc/bzd/platform",
     ],
 )
 

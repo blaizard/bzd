@@ -291,7 +291,7 @@ def bzd_cc_binary(name, tags = [], deps = [], **kwags):
     bdl_composition(
         name = name + ".composition",
         tags = tags + ["cc"],
-        deps = deps,
+        deps = deps + ["//cc/bzd/platform:binary"],
     )
     cc_library(
         name = name + ".library",
@@ -302,7 +302,10 @@ def bzd_cc_binary(name, tags = [], deps = [], **kwags):
     _bzd_cc_binary(
         name = name,
         tags = tags + ["cc"],
-        deps = [name + ".library", name + ".composition"],
+        deps = [
+            name + ".library",
+            name + ".composition",
+        ],
     )
 
 def bzd_cc_test(name, tags = [], **kwags):
