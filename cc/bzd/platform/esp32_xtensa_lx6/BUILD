@@ -1,11 +1,33 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "backend",
+    name = "binary",
     srcs = [
-        "backend.cc",
+        "main.cc",
     ],
-    tags = ["manual"],
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
+    ],
+    deps = [
+        ":backend",
+    ],
+)
+
+cc_library(
+    name = "test",
+    srcs = [
+        "test.cc",
+    ],
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
+    ],
+    deps = [
+        ":backend",
+    ],
+)
+
+cc_library(
+    name = "backend",
     target_compatible_with = [
         "@esp32_xtensa_lx6_gcc//:compiler",
     ],

@@ -14,7 +14,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/assert",
-        "//cc/bzd/platform",
+        "//cc/bzd/platform:test",
     ],
     alwayslink = True,
 )

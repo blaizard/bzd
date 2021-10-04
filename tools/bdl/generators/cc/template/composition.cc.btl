@@ -71,6 +71,7 @@ void execute() noexcept
 	bzd::log::info(CSTR("Completion.")).sync();
 }
 
+/*
 // Deployment part
 
 int main()
@@ -79,7 +80,7 @@ int main()
 
 	return 0;
 }
-
+*/
 /*
 { deployment.main.declaration }
 

@@ -122,7 +122,7 @@ bzd::Result<> Adapter2::serialize<Adapter2::Data>(const Data& data) const
 	transport_.write(bzd::Span<const bzd::UInt8Type>{buffer, 2 + data.str.size()}.asBytes());
 	return bzd::nullresult;
 }
-
+/*
 int main()
 {
 	I2CTransport bus{};
@@ -140,3 +140,4 @@ int main()
 
 	return 0;
 }
+*/
