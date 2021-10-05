@@ -11,10 +11,9 @@ cc_library(
     ],
     include_prefix = "cc_test",
     includes = ["."],
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/core/assert",
-        "//cc/bzd/platform:test",
-    ],
-    alwayslink = True,
 )

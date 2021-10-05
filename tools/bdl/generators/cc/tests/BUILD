@@ -1,5 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
 bdl_library(
     name = "interface",
@@ -8,7 +8,7 @@ bdl_library(
     ],
 )
 
-cc_test(
+bzd_cc_test(
     name = "file",
     srcs = [
         "file.cc",

@@ -1,18 +1,10 @@
 load("//tools/bazel_build/rules:cc.bzl", "cc_library")
 
 cc_library(
-    name = "binary",
+    name = "platform",
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform/backend:binary",
-    ],
-)
-
-cc_library(
-    name = "test",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform/backend:test",
+        "//cc/bzd/platform/backend",
     ],
 )
 

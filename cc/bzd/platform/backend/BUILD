@@ -15,19 +15,8 @@ cc_library(
     deps = [
         "//cc/bzd/platform:clock",
         "//cc/bzd/platform:stream",
-    ],
-)
-
-cc_library(
-    name = "binary",
+    ] + select({platform: [target] for platform, target in PLATFORM_TO_TARGET.items()}),
     visibility = ["//cc/bzd/platform:__pkg__"],
-    deps = select({platform: [target + ":binary"] for platform, target in PLATFORM_TO_TARGET.items()}) + [":backend"],
-)
-
-cc_library(
-    name = "test",
-    visibility = ["//cc/bzd/platform:__pkg__"],
-    deps = select({platform: [target + ":test"] for platform, target in PLATFORM_TO_TARGET.items()}) + [":backend"],
 )
 
 cc_library(

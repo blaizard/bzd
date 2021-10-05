@@ -5,9 +5,6 @@ bzd_cc_binary(
     srcs = [
         "main.cc",
     ],
-    copts = [
-        "-Wno-unused-value",
-    ],
     tags = ["manual"],
     deps = [
         "//cc/bzd",

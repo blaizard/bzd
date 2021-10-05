@@ -10,10 +10,8 @@
 		BZDTEST_CLASS_NAME_(testCaseName, testName)() {}                                                           \
 		void test() const override;                                                                                \
 	};                                                                                                             \
-	namespace {                                                                                                    \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
 		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
-	}                                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test() const
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
