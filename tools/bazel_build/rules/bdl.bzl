@@ -164,7 +164,7 @@ def _bdl_composition_impl(ctx):
         # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
         inputs = depset(transitive = [files, bdls]),
         outputs = [output],
-        progress_message = "Generating C++ composition",
+        progress_message = "Generating C++ composition for {}".format(ctx.label),
         arguments = _make_bdl_arguments(ctx, "compose", ["--format", "cc", "--output", output.path] + arguments_includes + [bdl.path for bdl in files.to_list()]),
         executable = ctx.attr._bdl.files_to_run,
     )

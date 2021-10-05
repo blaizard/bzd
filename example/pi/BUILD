@@ -17,6 +17,5 @@ bzd_cc_binary(
     deps = [
         #":composition",
         "//cc/bzd/core/async",
-        "//cc/bzd/platform",
     ],
 )

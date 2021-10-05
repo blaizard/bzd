@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 package(default_visibility = ["//visibility:public"])
 
 config_setting(
@@ -45,10 +47,26 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+# is_test
+
+bool_flag(
+    name = "is_test",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
 config_setting(
     name = "test",
-    define_values = {
-        "type": "test",
+    flag_values = {
+        ":is_test": "True",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "binary",
+    flag_values = {
+        ":is_test": "False",
     },
     visibility = ["//visibility:public"],
 )

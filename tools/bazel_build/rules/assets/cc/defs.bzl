@@ -46,3 +46,27 @@ def cc_compile(ctx, hdrs = [], srcs = [], deps = []):
     )
 
     return CcInfo(compilation_context = compilation_context, linking_context = linking_context)
+
+def cc_link(ctx, cc_info):
+    # Work in progress
+
+    cc_toolchain = find_cc_toolchain(ctx)
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features,
+        unsupported_features = ctx.disabled_features,
+    )
+
+    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
+    linking_outputs = cc_common.link(
+        name = ctx.attr.name,
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        linking_contexts = [cc_info.linking_context],
+        additional_outputs = [map_file],
+        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+    )
+
+    return linking_outputs, map_file

@@ -5,7 +5,20 @@ load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageM
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "find_cc_toolchain")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "find_cc_toolchain")
+
+def _transition_impl(settings, attr):
+    return {
+        "//tools/bazel_build/config:is_test": attr._is_test,
+    }
+
+_transition = transition(
+    implementation = _transition_impl,
+    inputs = [],
+    outputs = [
+        "//tools/bazel_build/config:is_test",
+    ],
+)
 
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
     """
@@ -204,10 +217,7 @@ def _cc_binary(ctx, binary_file):
 
 def _bzd_cc_generic_impl(ctx):
     # Gather all CC providers from all dependencies
-    cc_info_providers = sets.make()
-    for dep in ctx.attr.deps:
-        sets.insert(cc_info_providers, dep[CcInfo])
-    cc_info_providers = cc_common.merge_cc_infos(cc_infos = sets.to_list(cc_info_providers))
+    cc_info_providers = cc_compile(ctx = ctx, srcs = ctx.files.srcs, deps = ctx.attr.deps)
 
     # Link the CcInfo providers and generate metadata.
     binary_file, link_metadata_files = _cc_linker(ctx, cc_info_providers, ctx.attr._map_analyzer_script)
@@ -248,7 +258,10 @@ def _bzd_cc_generic(is_test):
             "deps": attr.label_list(
                 doc = "C++ dependencies",
                 providers = [CcInfo],
-                default = [],
+            ),
+            "srcs": attr.label_list(
+                doc = "C++ source files",
+                allow_files = True,
             ),
             "_map_analyzer_script": attr.label(
                 executable = True,
@@ -261,7 +274,13 @@ def _bzd_cc_generic(is_test):
                 ],
                 allow_files = True,
             ),
+            "_is_test": attr.bool(
+                default = is_test,
+            ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
+            "_allowlist_function_transition": attr.label(
+                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+            ),
         },
         executable = True,
         test = is_test,
@@ -270,6 +289,7 @@ def _bzd_cc_generic(is_test):
             "//tools/bazel_build/toolchains/binary:toolchain_type",
         ],
         fragments = ["cpp"],
+        cfg = _transition,
     )
 
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
@@ -284,37 +304,42 @@ def cc_library(deps = [], **kwargs):
         **kwargs
     )
 
-def bzd_cc_binary(name, tags = [], deps = [], **kwags):
+def bzd_cc_binary(name, tags = [], srcs = [], deps = [], **kwags):
     """
     Rule to define a bzd C++ binary.
     """
     bdl_composition(
         name = name + ".composition",
         tags = tags + ["cc"],
-        deps = deps + ["//cc/bzd/platform:binary"],
-    )
-    cc_library(
-        name = name + ".library",
-        tags = tags + ["cc"],
-        deps = deps,
-        **kwags
+        deps = deps + ["//cc/bzd/platform"],
     )
     _bzd_cc_binary(
         name = name,
         tags = tags + ["cc"],
+        srcs = srcs,
         deps = [
-            name + ".library",
             name + ".composition",
         ],
+        **kwags
     )
 
-def bzd_cc_test(name, tags = [], **kwags):
+def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
     """
     Rule to define a bzd C++ test.
     """
+    bdl_composition(
+        name = name + ".composition",
+        tags = tags + ["cc"],
+        deps = deps + ["//cc/bzd/platform"],
+    )
+    # TODO switch to bzd_cc_test
     cc_test(
         name = name,
         tags = tags + ["cc"],
+        srcs = srcs,
+        deps = [
+            name + ".composition",
+        ],
         **kwags
     )
 

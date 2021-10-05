@@ -1,33 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "binary",
-    srcs = [
-        "main.cc",
-    ],
-    visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
-    ],
-    deps = [
-        ":backend",
-    ],
-)
-
-cc_library(
-    name = "test",
-    srcs = [
-        "test.cc",
-    ],
-    visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
-    ],
-    deps = [
-        ":backend",
-    ],
-)
-
-cc_library(
-    name = "backend",
+    name = "esp32_xtensa_lx6",
+    srcs = select({
+        "//tools/bazel_build/config:test": ["test.cc"],
+        "//tools/bazel_build/config:binary": ["main.cc"],
+    }),
     target_compatible_with = [
         "@esp32_xtensa_lx6_gcc//:compiler",
     ],

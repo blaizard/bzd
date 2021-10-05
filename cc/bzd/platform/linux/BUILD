@@ -14,33 +14,11 @@ bdl_library(
 )
 
 cc_library(
-    name = "binary",
-    srcs = [
-        "main.cc",
-    ],
-    visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
-    ],
-    deps = [
-        ":backend",
-    ],
-)
-
-cc_library(
-    name = "test",
-    srcs = [
-        "test.cc",
-    ],
-    visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
-    ],
-    deps = [
-        ":backend",
-    ],
-)
-
-cc_library(
-    name = "backend",
+    name = "linux",
+    srcs = select({
+        "//tools/bazel_build/config:test": ["test.cc"],
+        "//tools/bazel_build/config:binary": ["main.cc"],
+    }),
     deps = [
         ":composition",
         "//cc/bzd/platform/generic/panic/throw",
@@ -50,6 +28,9 @@ cc_library(
         "//cc/bzd/platform/std/steady_clock",
         "//cc/bzd/platform/std/stream/out",
         "//cc/bzd/platform/std/system_clock",
+    ],
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
     ],
 )
 
