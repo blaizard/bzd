@@ -2,17 +2,28 @@
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/platform/backend/backend.hh"
+#include "cc/bzd/platform/clock.hh"
+#include "cc/bzd/platform/stream.hh"
 {% for path in includes %}
 #include "{{ path }}"
 {% end %}
+
+// Backend platform symbols
+namespace bzd::platform::backend {
+
+bzd::OStream* out{nullptr};
+bzd::IStream* in{nullptr};
+bzd::Clock* steadyClock{nullptr};
+bzd::Clock* systemClock{nullptr};
+
+} // namespace bzd::platform::backend
 
 // for deploy in deployments
 
 /**
  * Auto-generated application registry.
  */
-[[nodiscard]] auto getOrMakeRegistry() noexcept
+[[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries.
 	{% for expresssion in registry %}
@@ -35,19 +46,25 @@
 void execute() noexcept
 {
 	// Create registry.
-	[[maybe_unused]] auto registry = getOrMakeRegistry();
+	[[maybe_unused]] auto registry = makeRegistry();
+
+	// Assign special symbols to public registry.
+	{% for expresssion in registry %}
+		{% if expresssion.fqn == "out" %}
+	bzd::platform::backend::out = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
+		{% elif expresssion.fqn == "in" %}
+	bzd::platform::backend::in = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
+		{% elif expresssion.fqn == "steadyClock" %}
+	bzd::platform::backend::steadyClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
+		{% elif expresssion.fqn == "systemClock" %}
+	bzd::platform::backend::systemClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
+		{% end %}
+	{% end %}
 
 	// Initialize.
 	bzd::log::info(CSTR("Initialization phase.")).sync();
 	{% for index, expresssion in compositions.init %}
 	{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
-	{% end %}
-
-	// Assign special symbols to public registry
-	{% for expresssion in registry %}
-		{% if expresssion.fqn == "out" %}
-	bzd::platform::backend::setOut(registry.{{ expresssion.fqn | fqnToNameStr }}_);
-		{% end %}
 	{% end %}
 
 	// Compose.

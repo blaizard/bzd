@@ -2,9 +2,9 @@
 
 #include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::std {
+namespace bzd::platform::std::clock {
 
-class SystemClock : public bzd::Clock
+class System : public bzd::Clock
 {
 public:
 	ClockTick getTicks() noexcept override;
@@ -14,4 +14,4 @@ public:
 	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
 };
 
-} // namespace bzd::platform::std
+} // namespace bzd::platform::std::clock

@@ -51,8 +51,7 @@ config_setting(
 
 bool_flag(
     name = "is_test",
-    build_setting_default = False,
-    visibility = ["//visibility:public"],
+    build_setting_default = True,
 )
 
 config_setting(
@@ -60,7 +59,6 @@ config_setting(
     flag_values = {
         ":is_test": "True",
     },
-    visibility = ["//visibility:public"],
 )
 
 config_setting(
@@ -68,5 +66,4 @@ config_setting(
     flag_values = {
         ":is_test": "False",
     },
-    visibility = ["//visibility:public"],
 )
