@@ -2,9 +2,9 @@
 
 #include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::std {
+namespace bzd::platform::std::clock {
 
-class SteadyClock : public bzd::Clock
+class Steady : public bzd::Clock
 {
 public:
 	ClockTick getTicks() noexcept override;

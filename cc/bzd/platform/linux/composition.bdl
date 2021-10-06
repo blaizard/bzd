@@ -1,13 +1,15 @@
 use "cc/bzd/platform/linux/core/interface.bdl"
 use "cc/bzd/platform/std/stream/out/interface.bdl"
-
+use "cc/bzd/platform/generic/stream/stub/interface.bdl"
+use "cc/bzd/platform/std/clock/steady/interface.bdl"
+use "cc/bzd/platform/std/clock/system/interface.bdl"
 
 composition {
 	core1 = bzd.platform.linux.Core(stackSize = 100000);
 	core2 = bzd.platform.linux.Core(stackSize = 100000);
 	executor = bzd.platform.generic.Executor(core1, core2);
 	out = bzd.platform.std.Out();
-	
+	in = bzd.platform.generic.stream.Stub();
+	steadyClock = bzd.platform.std.clock.Steady();
+	systemClock = bzd.platform.std.clock.System();
 }
-
-
