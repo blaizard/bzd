@@ -18,7 +18,7 @@ export default class TimeSeries {
 				 * with the same timestamp are found, this function purpose is to merge these entries into one
 				 * and return it.
 				 */
-				uniqueMerge: (a /*b, timestamp*/) => a
+				uniqueMerge: (a /*b, timestamp*/) => a,
 			},
 			options
 		);

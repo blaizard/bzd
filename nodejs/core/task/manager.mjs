@@ -16,7 +16,7 @@ export default class Manager {
 		this.config = Object.assign({}, config);
 
 		this.tasks = {
-			size: 0
+			size: 0,
 		};
 		Exception.assert(Task.PRIORITY_LOWEST === 0, "This assumes that the lowest priority is 0");
 		this.taskQueues = [...Array(Task.PRIORITY_HIGHEST + 1)].map(() => []);
@@ -61,7 +61,7 @@ export default class Manager {
 		// Register
 		Log.info("Registering task '{}' with priority {}", task, task.priority);
 		this.tasks[task.id.namespace] = this.tasks[task.id.namespace] || {
-			size: 0
+			size: 0,
 		};
 		this.tasks[task.id.namespace][task.id.name] = task;
 		this.tasks[task.id.namespace].size += TASK_SIZE;
@@ -281,7 +281,7 @@ export default class Manager {
 					name: name,
 					status: task.status,
 					priority: task.priority,
-					timestampDelta: Math.max(0, task.timestamp - timestamp)
+					timestampDelta: Math.max(0, task.timestamp - timestamp),
 				};
 			});
 	}

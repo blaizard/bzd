@@ -21,14 +21,14 @@
 	export default {
 		components: {
 			Layout,
-			MenuEntry
+			MenuEntry,
 		},
 		directives: {
-			tooltip: DirectiveTooltip
+			tooltip: DirectiveTooltip,
 		},
-		data: function() {
+		data: function () {
 			return {
-				edit: false
+				edit: false,
 			};
 		},
 		mounted() {
@@ -37,16 +37,16 @@
 				routes: [
 					{ path: "/", component: () => import("./tiles.vue") },
 					{ path: "/new", component: () => import("./config.vue") },
-					{ path: "/update/{uid}", component: () => import("./config.vue") }
+					{ path: "/update/{uid}", component: () => import("./config.vue") },
 				],
-				fallback: { component: () => import("./404.vue") }
+				fallback: { component: () => import("./404.vue") },
 			});
 		},
 		methods: {
 			handleEdit() {
 				this.edit = !this.edit;
-			}
-		}
+			},
+		},
 	};
 </script>
 
@@ -55,9 +55,7 @@
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
 
-	@use "bzd/icons.scss" as icons with (
-		$bzdIconNames: edit add check
-	);
+	@use "bzd/icons.scss" as icons with ($bzdIconNames: edit add check);
 
 	.bzd-icon-main {
 		@include icons.defineIcon("icon.svg");

@@ -71,15 +71,15 @@
 	export default {
 		mixins: [Base],
 		directives: {
-			tooltip: DirectiveTooltip
+			tooltip: DirectiveTooltip,
 		},
 		props: {
-			fullPage: { required: false, default: false, type: Boolean }
+			fullPage: { required: false, default: false, type: Boolean },
 		},
-		data: function() {
+		data: function () {
 			return {
 				isDock: Boolean(LocalStorage.get("bzd-layout-dock", false)),
-				isMenuShow: false
+				isMenuShow: false,
 			};
 		},
 		computed: {
@@ -91,12 +91,12 @@
 					"bzd-layout": true,
 					"bzd-mobile": this.isMobile,
 					"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
-					"bzd-full-page": this.fullPage
+					"bzd-full-page": this.fullPage,
 				};
 			},
 			isMenu() {
 				return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
-			}
+			},
 		},
 		methods: {
 			getActionHtml(action) {
@@ -112,7 +112,7 @@
 					"bzd-notification-time": entry.timeOnScreen > 0,
 					"bzd-success": entry.type == "success",
 					"bzd-error": entry.type == "error",
-					"bzd-info": entry.type == "info"
+					"bzd-info": entry.type == "info",
 				};
 			},
 			getNotificationStyle(entry) {
@@ -137,8 +137,8 @@
 			},
 			handleMenuClick() {
 				this.hideMenu();
-			}
-		}
+			},
+		},
 	};
 </script>
 
@@ -167,9 +167,7 @@
 	// ----
 
 	@use "bzd-style/css/clickable.scss";
-	@use "bzd/icons.scss" with (
-        $bzdIconNames: menu dock_on dock_off close
-    );
+	@use "bzd/icons.scss" with ($bzdIconNames: menu dock_on dock_off close);
 
 	html,
 	body {

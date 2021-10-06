@@ -113,12 +113,3 @@ bool bzd::test::Manager::run()
 }
 
 } // namespace bzd::test
-
-int main()
-{
-	if (::bzd::test::Manager::getInstance().run())
-	{
-		return 0;
-	}
-	return 1;
-}

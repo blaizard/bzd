@@ -7,7 +7,7 @@ export default {
 		search: ["principality of andorra", "andorra", "ad", "principat d'andorra", "and"],
 		call: ["376"],
 		currency: ["eur"],
-		lang: ["cat"]
+		lang: ["cat"],
 	},
 	ae: {
 		name: "United Arab Emirates",
@@ -15,7 +15,7 @@ export default {
 		search: ["united arab emirates", "دولة الإمارات العربية المتحدة", "ae", "uae", "emirates", "are"],
 		call: ["971"],
 		currency: ["aed"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	af: {
 		name: "Afghanistan",
@@ -23,7 +23,7 @@ export default {
 		search: ["islamic republic of afghanistan", "افغانستان", "owganystan", "af", "afġānistān", "afg", "afghanistan"],
 		call: ["93"],
 		currency: ["afn"],
-		lang: ["prs", "pus", "tuk"]
+		lang: ["prs", "pus", "tuk"],
 	},
 	ag: {
 		name: "Antigua and Barbuda",
@@ -31,7 +31,7 @@ export default {
 		search: ["antigua and barbuda", "ag", "atg"],
 		call: ["1268"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	ai: {
 		name: "Anguilla",
@@ -39,7 +39,7 @@ export default {
 		search: ["anguilla", "ai", "aia"],
 		call: ["1264"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	al: {
 		name: "Albania",
@@ -47,7 +47,7 @@ export default {
 		search: ["republic of albania", "shqipëria", "al", "shqipëri", "shqipnia", "alb", "albania"],
 		call: ["355"],
 		currency: ["all"],
-		lang: ["sqi"]
+		lang: ["sqi"],
 	},
 	am: {
 		name: "Armenia",
@@ -55,7 +55,7 @@ export default {
 		search: ["republic of armenia", "հայաստան", "am", "hayastan", "հայաստանի հանրապետություն", "arm", "armenia"],
 		call: ["374"],
 		currency: ["amd"],
-		lang: ["hye"]
+		lang: ["hye"],
 	},
 	ao: {
 		name: "Angola",
@@ -63,7 +63,7 @@ export default {
 		search: ["republic of angola", "angola", "ao", "república de angola", "ʁɛpublika de an'ɡɔla", "ago"],
 		call: ["244"],
 		currency: ["aoa"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	aq: { name: "Antarctica", timezone: [], search: ["antarctica", "aq", "ata"], call: [], currency: [], lang: [] },
 	ar: {
@@ -72,7 +72,7 @@ export default {
 		search: ["argentine republic", "argentina", "ar", "república argentina", "arg"],
 		call: ["54"],
 		currency: ["ars"],
-		lang: ["grn", "spa"]
+		lang: ["grn", "spa"],
 	},
 	as: {
 		name: "American Samoa",
@@ -80,7 +80,7 @@ export default {
 		search: ["american samoa", "sāmoa amelika", "as", "amerika sāmoa", "amelika sāmoa", "asm"],
 		call: ["1684"],
 		currency: ["usd"],
-		lang: ["eng", "smo"]
+		lang: ["eng", "smo"],
 	},
 	at: {
 		name: "Austria",
@@ -88,7 +88,7 @@ export default {
 		search: ["republic of austria", "österreich", "at", "osterreich", "oesterreich", "aut", "austria"],
 		call: ["43"],
 		currency: ["eur"],
-		lang: ["bar"]
+		lang: ["bar"],
 	},
 	au: {
 		name: "Australia",
@@ -96,7 +96,7 @@ export default {
 		search: ["commonwealth of australia", "australia", "au", "aus"],
 		call: ["61"],
 		currency: ["aud"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	aw: {
 		name: "Aruba",
@@ -104,7 +104,7 @@ export default {
 		search: ["aruba", "aw", "abw"],
 		call: ["297"],
 		currency: ["awg"],
-		lang: ["nld", "pap"]
+		lang: ["nld", "pap"],
 	},
 	ax: {
 		name: "Åland Islands",
@@ -112,7 +112,7 @@ export default {
 		search: ["åland islands", "åland", "ax", "aaland", "aland", "ahvenanmaa", "ala"],
 		call: ["358"],
 		currency: ["eur"],
-		lang: ["swe"]
+		lang: ["swe"],
 	},
 	az: {
 		name: "Azerbaijan",
@@ -124,11 +124,11 @@ export default {
 			"az",
 			"azərbaycan respublikası",
 			"aze",
-			"azerbaijan"
+			"azerbaijan",
 		],
 		call: ["994"],
 		currency: ["azn"],
-		lang: ["aze", "rus"]
+		lang: ["aze", "rus"],
 	},
 	ba: {
 		name: "Bosnia and Herzegovina",
@@ -140,11 +140,11 @@ export default {
 			"ba",
 			"bosnia-herzegovina",
 			"босна и херцеговина",
-			"bih"
+			"bih",
 		],
 		call: ["387"],
 		currency: ["bam"],
-		lang: ["bos", "hrv", "srp"]
+		lang: ["bos", "hrv", "srp"],
 	},
 	bb: {
 		name: "Barbados",
@@ -152,7 +152,7 @@ export default {
 		search: ["barbados", "bb", "brb"],
 		call: ["1246"],
 		currency: ["bbd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	bd: {
 		name: "Bangladesh",
@@ -160,7 +160,7 @@ export default {
 		search: ["people's republic of bangladesh", "বাংলাদেশ", "bd", "gônôprôjatôntri bangladesh", "bgd", "bangladesh"],
 		call: ["880"],
 		currency: ["bdt"],
-		lang: ["ben"]
+		lang: ["ben"],
 	},
 	be: {
 		name: "Belgium",
@@ -176,11 +176,11 @@ export default {
 			"royaume de belgique",
 			"königreich belgien",
 			"bel",
-			"belgium"
+			"belgium",
 		],
 		call: ["32"],
 		currency: ["eur"],
-		lang: ["deu", "fra", "nld"]
+		lang: ["deu", "fra", "nld"],
 	},
 	bf: {
 		name: "Burkina Faso",
@@ -188,7 +188,7 @@ export default {
 		search: ["burkina faso", "bf", "bfa"],
 		call: ["226"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	bg: {
 		name: "Bulgaria",
@@ -196,7 +196,7 @@ export default {
 		search: ["republic of bulgaria", "българия", "bg", "република българия", "bgr", "bulgaria"],
 		call: ["359"],
 		currency: ["bgn"],
-		lang: ["bul"]
+		lang: ["bul"],
 	},
 	bh: {
 		name: "Bahrain",
@@ -204,7 +204,7 @@ export default {
 		search: ["kingdom of bahrain", "‏البحرين", "bh", "mamlakat al-baḥrayn", "bhr", "bahrain"],
 		call: ["973"],
 		currency: ["bhd"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	bi: {
 		name: "Burundi",
@@ -216,11 +216,11 @@ export default {
 			"bi",
 			"republika y'uburundi",
 			"république du burundi",
-			"bdi"
+			"bdi",
 		],
 		call: ["257"],
 		currency: ["bif"],
-		lang: ["fra", "run"]
+		lang: ["fra", "run"],
 	},
 	bj: {
 		name: "Benin",
@@ -228,7 +228,7 @@ export default {
 		search: ["republic of benin", "bénin", "bj", "république du bénin", "ben", "benin"],
 		call: ["229"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	bl: {
 		name: "Saint Barthélemy",
@@ -240,11 +240,11 @@ export default {
 			"st. barthelemy",
 			"collectivité de saint-barthélemy",
 			"blm",
-			"saint barthélemy"
+			"saint barthélemy",
 		],
 		call: ["590"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	bm: {
 		name: "Bermuda",
@@ -252,7 +252,7 @@ export default {
 		search: ["bermuda", "bm", "the islands of bermuda", "the bermudas", "somers isles", "bmu"],
 		call: ["1441"],
 		currency: ["bmd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	bn: {
 		name: "Brunei",
@@ -265,11 +265,11 @@ export default {
 			"nation of brunei",
 			"the abode of peace",
 			"brn",
-			"brunei"
+			"brunei",
 		],
 		call: ["673"],
 		currency: ["bnd"],
-		lang: ["msa"]
+		lang: ["msa"],
 	},
 	bo: {
 		name: "Bolivia",
@@ -286,11 +286,11 @@ export default {
 			"buliwya mamallaqta",
 			"wuliwya suyu",
 			"tetã volívia",
-			"bol"
+			"bol",
 		],
 		call: ["591"],
 		currency: ["bob"],
-		lang: ["aym", "grn", "que", "spa"]
+		lang: ["aym", "grn", "que", "spa"],
 	},
 	bq: {
 		name: "Caribbean Netherlands",
@@ -301,11 +301,11 @@ export default {
 			"boneiru, sint eustatius y saba",
 			"bes islands",
 			"bes",
-			"caribbean netherlands"
+			"caribbean netherlands",
 		],
 		call: ["599"],
 		currency: ["usd"],
-		lang: ["eng", "nld", "pap"]
+		lang: ["eng", "nld", "pap"],
 	},
 	br: {
 		name: "Brazil",
@@ -313,7 +313,7 @@ export default {
 		search: ["federative republic of brazil", "brasil", "br", "república federativa do brasil", "bra", "brazil"],
 		call: ["55"],
 		currency: ["brl"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	bs: {
 		name: "Bahamas",
@@ -321,7 +321,7 @@ export default {
 		search: ["commonwealth of the bahamas", "bahamas", "bs", "bhs"],
 		call: ["1242"],
 		currency: ["bsd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	bt: {
 		name: "Bhutan",
@@ -329,7 +329,7 @@ export default {
 		search: ["kingdom of bhutan", "འབྲུག་ཡུལ་", "bt", "btn", "bhutan"],
 		call: ["975"],
 		currency: ["btn", "inr"],
-		lang: ["dzo"]
+		lang: ["dzo"],
 	},
 	bv: {
 		name: "Bouvet Island",
@@ -337,7 +337,7 @@ export default {
 		search: ["bouvet island", "bouvetøya", "bv", "bouvet-øya", "bvt"],
 		call: [],
 		currency: ["nok"],
-		lang: ["nor"]
+		lang: ["nor"],
 	},
 	bw: {
 		name: "Botswana",
@@ -345,7 +345,7 @@ export default {
 		search: ["republic of botswana", "botswana", "bw", "lefatshe la botswana", "bwa"],
 		call: ["267"],
 		currency: ["bwp"],
-		lang: ["eng", "tsn"]
+		lang: ["eng", "tsn"],
 	},
 	by: {
 		name: "Belarus",
@@ -359,11 +359,11 @@ export default {
 			"белоруссия",
 			"республика белоруссия",
 			"blr",
-			"belarus"
+			"belarus",
 		],
 		call: ["375"],
 		currency: ["byn"],
-		lang: ["bel", "rus"]
+		lang: ["bel", "rus"],
 	},
 	bz: {
 		name: "Belize",
@@ -371,7 +371,7 @@ export default {
 		search: ["belize", "belice", "bz", "blz"],
 		call: ["501"],
 		currency: ["bzd"],
-		lang: ["bjz", "eng", "spa"]
+		lang: ["bjz", "eng", "spa"],
 	},
 	ca: {
 		name: "Canada",
@@ -379,7 +379,7 @@ export default {
 		search: ["canada", "ca", "can"],
 		call: ["1"],
 		currency: ["cad"],
-		lang: ["eng", "fra"]
+		lang: ["eng", "fra"],
 	},
 	cc: {
 		name: "Cocos (Keeling) Islands",
@@ -390,11 +390,11 @@ export default {
 			"cc",
 			"keeling islands",
 			"cocos islands",
-			"cck"
+			"cck",
 		],
 		call: ["61"],
 		currency: ["aud"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	cd: {
 		name: "DR Congo",
@@ -411,11 +411,11 @@ export default {
 			"congo, the democratic republic of the",
 			"drc",
 			"cod",
-			"dr congo"
+			"dr congo",
 		],
 		call: ["243"],
 		currency: ["cdf"],
-		lang: ["fra", "kon", "lin", "lua", "swa"]
+		lang: ["fra", "kon", "lin", "lua", "swa"],
 	},
 	cf: {
 		name: "Central African Republic",
@@ -423,7 +423,7 @@ export default {
 		search: ["central african republic", "république centrafricaine", "bêafrîka", "cf", "caf"],
 		call: ["236"],
 		currency: ["xaf"],
-		lang: ["fra", "sag"]
+		lang: ["fra", "sag"],
 	},
 	cg: {
 		name: "Republic of the Congo",
@@ -436,11 +436,11 @@ export default {
 			"cg",
 			"congo",
 			"congo-brazzaville",
-			"cog"
+			"cog",
 		],
 		call: ["242"],
 		currency: ["xaf"],
-		lang: ["fra", "kon", "lin"]
+		lang: ["fra", "kon", "lin"],
 	},
 	ch: {
 		name: "Switzerland",
@@ -448,7 +448,7 @@ export default {
 		search: ["swiss confederation", "suisse", "schweiz", "svizzera", "svizra", "ch", "che", "switzerland"],
 		call: ["41"],
 		currency: ["chf"],
-		lang: ["fra", "gsw", "ita", "roh"]
+		lang: ["fra", "gsw", "ita", "roh"],
 	},
 	ci: {
 		name: "Ivory Coast",
@@ -456,7 +456,7 @@ export default {
 		search: ["republic of côte d'ivoire", "côte d'ivoire", "ci", "république de côte d'ivoire", "civ", "ivory coast"],
 		call: ["225"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	ck: {
 		name: "Cook Islands",
@@ -464,7 +464,7 @@ export default {
 		search: ["cook islands", "kūki 'āirani", "ck", "cok"],
 		call: ["682"],
 		currency: ["nzd", "ckd"],
-		lang: ["eng", "rar"]
+		lang: ["eng", "rar"],
 	},
 	cl: {
 		name: "Chile",
@@ -472,7 +472,7 @@ export default {
 		search: ["republic of chile", "chile", "cl", "república de chile", "chl"],
 		call: ["56"],
 		currency: ["clp"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	cm: {
 		name: "Cameroon",
@@ -480,7 +480,7 @@ export default {
 		search: ["republic of cameroon", "cameroon", "cameroun", "cm", "république du cameroun", "cmr"],
 		call: ["237"],
 		currency: ["xaf"],
-		lang: ["eng", "fra"]
+		lang: ["eng", "fra"],
 	},
 	cn: {
 		name: "China",
@@ -495,11 +495,11 @@ export default {
 			"中华人民共和国",
 			"zhōnghuá rénmín gònghéguó",
 			"chn",
-			"china"
+			"china",
 		],
 		call: ["86"],
 		currency: ["cny"],
-		lang: ["zho"]
+		lang: ["zho"],
 	},
 	co: {
 		name: "Colombia",
@@ -507,7 +507,7 @@ export default {
 		search: ["republic of colombia", "colombia", "co", "república de colombia", "col"],
 		call: ["57"],
 		currency: ["cop"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	cr: {
 		name: "Costa Rica",
@@ -515,7 +515,7 @@ export default {
 		search: ["republic of costa rica", "costa rica", "cr", "república de costa rica", "cri"],
 		call: ["506"],
 		currency: ["crc"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	cu: {
 		name: "Cuba",
@@ -523,7 +523,7 @@ export default {
 		search: ["republic of cuba", "cuba", "cu", "república de cuba", "cub"],
 		call: ["53"],
 		currency: ["cuc", "cup"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	cv: {
 		name: "Cape Verde",
@@ -531,7 +531,7 @@ export default {
 		search: ["republic of cabo verde", "cabo verde", "cv", "república de cabo verde", "cpv", "cape verde"],
 		call: ["238"],
 		currency: ["cve"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	cw: {
 		name: "Curaçao",
@@ -539,7 +539,7 @@ export default {
 		search: ["country of curaçao", "curaçao", "pais kòrsou", "cw", "curacao", "kòrsou", "land curaçao", "cuw"],
 		call: ["5999"],
 		currency: ["ang"],
-		lang: ["eng", "nld", "pap"]
+		lang: ["eng", "nld", "pap"],
 	},
 	cx: {
 		name: "Christmas Island",
@@ -547,7 +547,7 @@ export default {
 		search: ["territory of christmas island", "christmas island", "cx", "cxr"],
 		call: ["61"],
 		currency: ["aud"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	cy: {
 		name: "Cyprus",
@@ -561,11 +561,11 @@ export default {
 			"κυπριακή δημοκρατία",
 			"kıbrıs cumhuriyeti",
 			"cyp",
-			"cyprus"
+			"cyprus",
 		],
 		call: ["357"],
 		currency: ["eur"],
-		lang: ["ell", "tur"]
+		lang: ["ell", "tur"],
 	},
 	cz: {
 		name: "Czechia",
@@ -573,7 +573,7 @@ export default {
 		search: ["czech republic", "česko", "cz", "česká republika", "cze", "czechia"],
 		call: ["420"],
 		currency: ["czk"],
-		lang: ["ces", "slk"]
+		lang: ["ces", "slk"],
 	},
 	de: {
 		name: "Germany",
@@ -581,7 +581,7 @@ export default {
 		search: ["federal republic of germany", "deutschland", "de", "bundesrepublik deutschland", "deu", "germany"],
 		call: ["49"],
 		currency: ["eur"],
-		lang: ["deu"]
+		lang: ["deu"],
 	},
 	dj: {
 		name: "Djibouti",
@@ -596,11 +596,11 @@ export default {
 			"république de djibouti",
 			"gabuutih ummuuno",
 			"jamhuuriyadda jabuuti",
-			"dji"
+			"dji",
 		],
 		call: ["253"],
 		currency: ["djf"],
-		lang: ["ara", "fra"]
+		lang: ["ara", "fra"],
 	},
 	dk: {
 		name: "Denmark",
@@ -608,7 +608,7 @@ export default {
 		search: ["kingdom of denmark", "danmark", "dk", "kongeriget danmark", "dnk", "denmark"],
 		call: ["45"],
 		currency: ["dkk"],
-		lang: ["dan"]
+		lang: ["dan"],
 	},
 	dm: {
 		name: "Dominica",
@@ -616,7 +616,7 @@ export default {
 		search: ["commonwealth of dominica", "dominica", "dm", "dominique", "wai‘tu kubuli", "dma"],
 		call: ["1767"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	do: {
 		name: "Dominican Republic",
@@ -624,7 +624,7 @@ export default {
 		search: ["dominican republic", "república dominicana", "do", "dom"],
 		call: ["1809", "1829", "1849"],
 		currency: ["dop"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	dz: {
 		name: "Algeria",
@@ -632,7 +632,7 @@ export default {
 		search: ["people's democratic republic of algeria", "الجزائر", "dz", "dzayer", "algérie", "dza", "algeria"],
 		call: ["213"],
 		currency: ["dzd"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	ec: {
 		name: "Ecuador",
@@ -640,7 +640,7 @@ export default {
 		search: ["republic of ecuador", "ecuador", "ec", "república del ecuador", "ecu"],
 		call: ["593"],
 		currency: ["usd"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	ee: {
 		name: "Estonia",
@@ -648,7 +648,7 @@ export default {
 		search: ["republic of estonia", "eesti", "ee", "eesti vabariik", "est", "estonia"],
 		call: ["372"],
 		currency: ["eur"],
-		lang: ["est"]
+		lang: ["est"],
 	},
 	eg: {
 		name: "Egypt",
@@ -656,7 +656,7 @@ export default {
 		search: ["arab republic of egypt", "مصر", "eg", "egy", "egypt"],
 		call: ["20"],
 		currency: ["egp"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	eh: {
 		name: "Western Sahara",
@@ -668,11 +668,11 @@ export default {
 			"sahara occidental",
 			"eh",
 			"taneẓroft tutrimt",
-			"esh"
+			"esh",
 		],
 		call: ["212"],
 		currency: ["mad", "dzd", "mro"],
-		lang: ["ber", "mey", "spa"]
+		lang: ["ber", "mey", "spa"],
 	},
 	er: {
 		name: "Eritrea",
@@ -687,11 +687,11 @@ export default {
 			"dawlat iritriyá",
 			"ʾertrā",
 			"iritriyā",
-			"eri"
+			"eri",
 		],
 		call: ["291"],
 		currency: ["ern"],
-		lang: ["ara", "eng", "tir"]
+		lang: ["ara", "eng", "tir"],
 	},
 	es: {
 		name: "Spain",
@@ -699,7 +699,7 @@ export default {
 		search: ["kingdom of spain", "españa", "es", "reino de españa", "esp", "spain"],
 		call: ["34"],
 		currency: ["eur"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	et: {
 		name: "Ethiopia",
@@ -711,11 +711,11 @@ export default {
 			"ʾītyōṗṗyā",
 			"የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ",
 			"eth",
-			"ethiopia"
+			"ethiopia",
 		],
 		call: ["251"],
 		currency: ["etb"],
-		lang: ["amh"]
+		lang: ["amh"],
 	},
 	fi: {
 		name: "Finland",
@@ -723,7 +723,7 @@ export default {
 		search: ["republic of finland", "suomi", "finland", "fi", "suomen tasavalta", "republiken finland", "fin"],
 		call: ["358"],
 		currency: ["eur"],
-		lang: ["fin", "swe"]
+		lang: ["fin", "swe"],
 	},
 	fj: {
 		name: "Fiji",
@@ -731,7 +731,7 @@ export default {
 		search: ["republic of fiji", "fiji", "viti", "फिजी", "fj", "matanitu ko viti", "fijī gaṇarājya", "fji"],
 		call: ["679"],
 		currency: ["fjd"],
-		lang: ["eng", "fij", "hif"]
+		lang: ["eng", "fij", "hif"],
 	},
 	fk: {
 		name: "Falkland Islands",
@@ -739,7 +739,7 @@ export default {
 		search: ["falkland islands", "fk", "islas malvinas", "falkland islands (malvinas)", "flk"],
 		call: ["500"],
 		currency: ["fkp"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	fm: {
 		name: "Micronesia",
@@ -747,7 +747,7 @@ export default {
 		search: ["federated states of micronesia", "micronesia", "fm", "micronesia, federated states of", "fsm"],
 		call: ["691"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	fo: {
 		name: "Faroe Islands",
@@ -755,7 +755,7 @@ export default {
 		search: ["faroe islands", "færøerne", "føroyar", "fo", "fro"],
 		call: ["298"],
 		currency: ["dkk"],
-		lang: ["dan", "fao"]
+		lang: ["dan", "fao"],
 	},
 	fr: {
 		name: "France",
@@ -763,7 +763,7 @@ export default {
 		search: ["french republic", "france", "fr", "république française", "fra"],
 		call: ["33"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	ga: {
 		name: "Gabon",
@@ -771,7 +771,7 @@ export default {
 		search: ["gabonese republic", "gabon", "ga", "république gabonaise", "gab"],
 		call: ["241"],
 		currency: ["xaf"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	gb: {
 		name: "United Kingdom",
@@ -783,11 +783,11 @@ export default {
 			"uk",
 			"great britain",
 			"gbr",
-			"england"
+			"england",
 		],
 		call: ["44"],
 		currency: ["gbp"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	gd: {
 		name: "Grenada",
@@ -795,7 +795,7 @@ export default {
 		search: ["grenada", "gd", "grd"],
 		call: ["1473"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	ge: {
 		name: "Georgia",
@@ -803,7 +803,7 @@ export default {
 		search: ["georgia", "საქართველო", "ge", "sakartvelo", "geo"],
 		call: ["995"],
 		currency: ["gel"],
-		lang: ["kat"]
+		lang: ["kat"],
 	},
 	gf: {
 		name: "French Guiana",
@@ -811,7 +811,7 @@ export default {
 		search: ["guiana", "guyane française", "gf", "guyane", "guf", "french guiana"],
 		call: ["594"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	gg: {
 		name: "Guernsey",
@@ -819,7 +819,7 @@ export default {
 		search: ["bailiwick of guernsey", "guernsey", "guernesey", "dgèrnésiais", "gg", "bailliage de guernesey", "ggy"],
 		call: ["44"],
 		currency: ["gbp"],
-		lang: ["eng", "fra", "nfr"]
+		lang: ["eng", "fra", "nfr"],
 	},
 	gh: {
 		name: "Ghana",
@@ -827,7 +827,7 @@ export default {
 		search: ["republic of ghana", "ghana", "gh", "gha"],
 		call: ["233"],
 		currency: ["ghs"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	gi: {
 		name: "Gibraltar",
@@ -835,7 +835,7 @@ export default {
 		search: ["gibraltar", "gi", "gib"],
 		call: ["350"],
 		currency: ["gip"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	gl: {
 		name: "Greenland",
@@ -843,7 +843,7 @@ export default {
 		search: ["greenland", "kalaallit nunaat", "gl", "grønland", "grl"],
 		call: ["299"],
 		currency: ["dkk"],
-		lang: ["kal"]
+		lang: ["kal"],
 	},
 	gm: {
 		name: "Gambia",
@@ -851,7 +851,7 @@ export default {
 		search: ["republic of the gambia", "gambia", "gm", "gmb"],
 		call: ["220"],
 		currency: ["gmd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	gn: {
 		name: "Guinea",
@@ -859,7 +859,7 @@ export default {
 		search: ["republic of guinea", "guinée", "gn", "république de guinée", "gin", "guinea"],
 		call: ["224"],
 		currency: ["gnf"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	gp: {
 		name: "Guadeloupe",
@@ -867,7 +867,7 @@ export default {
 		search: ["guadeloupe", "gp", "gwadloup", "glp"],
 		call: ["590"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	gq: {
 		name: "Equatorial Guinea",
@@ -882,11 +882,11 @@ export default {
 			"république de guinée équatoriale",
 			"república da guiné equatorial",
 			"gnq",
-			"equatorial guinea"
+			"equatorial guinea",
 		],
 		call: ["240"],
 		currency: ["xaf"],
-		lang: ["fra", "por", "spa"]
+		lang: ["fra", "por", "spa"],
 	},
 	gr: {
 		name: "Greece",
@@ -894,7 +894,7 @@ export default {
 		search: ["hellenic republic", "ελλάδα", "gr", "elláda", "ελληνική δημοκρατία", "grc", "greece"],
 		call: ["30"],
 		currency: ["eur"],
-		lang: ["ell"]
+		lang: ["ell"],
 	},
 	gs: {
 		name: "South Georgia",
@@ -902,7 +902,7 @@ export default {
 		search: ["south georgia and the south sandwich islands", "south georgia", "gs", "sgs"],
 		call: ["500"],
 		currency: ["gbp"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	gt: {
 		name: "Guatemala",
@@ -910,7 +910,7 @@ export default {
 		search: ["republic of guatemala", "guatemala", "gt", "gtm"],
 		call: ["502"],
 		currency: ["gtq"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	gu: {
 		name: "Guam",
@@ -918,7 +918,7 @@ export default {
 		search: ["guam", "guåhån", "gu", "gum"],
 		call: ["1671"],
 		currency: ["usd"],
-		lang: ["cha", "eng", "spa"]
+		lang: ["cha", "eng", "spa"],
 	},
 	gw: {
 		name: "Guinea-Bissau",
@@ -926,7 +926,7 @@ export default {
 		search: ["republic of guinea-bissau", "guiné-bissau", "gw", "república da guiné-bissau", "gnb", "guinea-bissau"],
 		call: ["245"],
 		currency: ["xof"],
-		lang: ["por", "pov"]
+		lang: ["por", "pov"],
 	},
 	gy: {
 		name: "Guyana",
@@ -934,7 +934,7 @@ export default {
 		search: ["co-operative republic of guyana", "guyana", "gy", "guy"],
 		call: ["592"],
 		currency: ["gyd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	hk: {
 		name: "Hong Kong",
@@ -944,11 +944,11 @@ export default {
 			"hong kong",
 			"香港",
 			"hk",
-			"hkg"
+			"hkg",
 		],
 		call: ["852"],
 		currency: ["hkd"],
-		lang: ["eng", "zho"]
+		lang: ["eng", "zho"],
 	},
 	hm: {
 		name: "Heard Island and McDonald Islands",
@@ -956,7 +956,7 @@ export default {
 		search: ["heard island and mcdonald islands", "hm", "hmd"],
 		call: [],
 		currency: ["aud"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	hn: {
 		name: "Honduras",
@@ -964,7 +964,7 @@ export default {
 		search: ["republic of honduras", "honduras", "hn", "república de honduras", "hnd"],
 		call: ["504"],
 		currency: ["hnl"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	hr: {
 		name: "Croatia",
@@ -972,7 +972,7 @@ export default {
 		search: ["republic of croatia", "hrvatska", "hr", "republika hrvatska", "hrv", "croatia"],
 		call: ["385"],
 		currency: ["hrk"],
-		lang: ["hrv"]
+		lang: ["hrv"],
 	},
 	ht: {
 		name: "Haiti",
@@ -980,7 +980,7 @@ export default {
 		search: ["republic of haiti", "haïti", "ayiti", "ht", "république d'haïti", "repiblik ayiti", "hti", "haiti"],
 		call: ["509"],
 		currency: ["htg", "usd"],
-		lang: ["fra", "hat"]
+		lang: ["fra", "hat"],
 	},
 	hu: {
 		name: "Hungary",
@@ -988,7 +988,7 @@ export default {
 		search: ["hungary", "magyarország", "hu", "hun"],
 		call: ["36"],
 		currency: ["huf"],
-		lang: ["hun"]
+		lang: ["hun"],
 	},
 	id: {
 		name: "Indonesia",
@@ -996,7 +996,7 @@ export default {
 		search: ["republic of indonesia", "indonesia", "id", "republik indonesia", "idn"],
 		call: ["62"],
 		currency: ["idr"],
-		lang: ["ind"]
+		lang: ["ind"],
 	},
 	ie: {
 		name: "Ireland",
@@ -1004,7 +1004,7 @@ export default {
 		search: ["republic of ireland", "ireland", "éire", "ie", "poblacht na héireann", "irl"],
 		call: ["353"],
 		currency: ["eur"],
-		lang: ["eng", "gle"]
+		lang: ["eng", "gle"],
 	},
 	il: {
 		name: "Israel",
@@ -1012,7 +1012,7 @@ export default {
 		search: ["state of israel", "إسرائيل", "ישראל", "il", "medīnat yisrā'el", "isr", "israel"],
 		call: ["972"],
 		currency: ["ils"],
-		lang: ["ara", "heb"]
+		lang: ["ara", "heb"],
 	},
 	im: {
 		name: "Isle of Man",
@@ -1020,7 +1020,7 @@ export default {
 		search: ["isle of man", "mannin", "im", "ellan vannin", "mann", "imn"],
 		call: ["44"],
 		currency: ["gbp"],
-		lang: ["eng", "glv"]
+		lang: ["eng", "glv"],
 	},
 	in: {
 		name: "India",
@@ -1028,7 +1028,7 @@ export default {
 		search: ["republic of india", "india", "भारत", "இந்தியா", "in", "bhārat", "bharat ganrajya", "ind"],
 		call: ["91"],
 		currency: ["inr"],
-		lang: ["eng", "hin", "tam"]
+		lang: ["eng", "hin", "tam"],
 	},
 	io: {
 		name: "British Indian Ocean Territory",
@@ -1036,7 +1036,7 @@ export default {
 		search: ["british indian ocean territory", "io", "iot"],
 		call: ["246"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	iq: {
 		name: "Iraq",
@@ -1044,7 +1044,7 @@ export default {
 		search: ["republic of iraq", "العراق", "ܩܘܼܛܢܵܐ", "کۆماری", "iq", "jumhūriyyat al-‘irāq", "irq", "iraq"],
 		call: ["964"],
 		currency: ["iqd"],
-		lang: ["ara", "arc", "ckb"]
+		lang: ["ara", "arc", "ckb"],
 	},
 	ir: {
 		name: "Iran",
@@ -1056,11 +1056,11 @@ export default {
 			"iran, islamic republic of",
 			"jomhuri-ye eslāmi-ye irān",
 			"irn",
-			"iran"
+			"iran",
 		],
 		call: ["98"],
 		currency: ["irr"],
-		lang: ["fas"]
+		lang: ["fas"],
 	},
 	is: {
 		name: "Iceland",
@@ -1068,7 +1068,7 @@ export default {
 		search: ["iceland", "ísland", "is", "island", "republic of iceland", "lýðveldið ísland", "isl"],
 		call: ["354"],
 		currency: ["isk"],
-		lang: ["isl"]
+		lang: ["isl"],
 	},
 	it: {
 		name: "Italy",
@@ -1076,7 +1076,7 @@ export default {
 		search: ["italian republic", "italia", "it", "repubblica italiana", "ita", "italy"],
 		call: ["39"],
 		currency: ["eur"],
-		lang: ["ita"]
+		lang: ["ita"],
 	},
 	je: {
 		name: "Jersey",
@@ -1084,7 +1084,7 @@ export default {
 		search: ["bailiwick of jersey", "jersey", "jèrri", "je", "bailliage de jersey", "bailliage dé jèrri", "jey"],
 		call: ["44"],
 		currency: ["gbp"],
-		lang: ["eng", "fra", "nrf"]
+		lang: ["eng", "fra", "nrf"],
 	},
 	jm: {
 		name: "Jamaica",
@@ -1092,7 +1092,7 @@ export default {
 		search: ["jamaica", "jm", "jam"],
 		call: ["1876"],
 		currency: ["jmd"],
-		lang: ["eng", "jam"]
+		lang: ["eng", "jam"],
 	},
 	jo: {
 		name: "Jordan",
@@ -1100,7 +1100,7 @@ export default {
 		search: ["hashemite kingdom of jordan", "الأردن", "jo", "al-mamlakah al-urdunīyah al-hāshimīyah", "jor", "jordan"],
 		call: ["962"],
 		currency: ["jod"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	jp: {
 		name: "Japan",
@@ -1108,7 +1108,7 @@ export default {
 		search: ["japan", "日本", "jp", "nippon", "nihon", "jpn"],
 		call: ["81"],
 		currency: ["jpy"],
-		lang: ["jpn"]
+		lang: ["jpn"],
 	},
 	ke: {
 		name: "Kenya",
@@ -1116,7 +1116,7 @@ export default {
 		search: ["republic of kenya", "kenya", "ke", "jamhuri ya kenya", "ken"],
 		call: ["254"],
 		currency: ["kes"],
-		lang: ["eng", "swa"]
+		lang: ["eng", "swa"],
 	},
 	kg: {
 		name: "Kyrgyzstan",
@@ -1129,11 +1129,11 @@ export default {
 			"кыргыз республикасы",
 			"kyrgyz respublikasy",
 			"kgz",
-			"kyrgyzstan"
+			"kyrgyzstan",
 		],
 		call: ["996"],
 		currency: ["kgs"],
-		lang: ["kir", "rus"]
+		lang: ["kir", "rus"],
 	},
 	kh: {
 		name: "Cambodia",
@@ -1141,7 +1141,7 @@ export default {
 		search: ["kingdom of cambodia", "kâmpŭchéa", "kh", "khm", "cambodia"],
 		call: ["855"],
 		currency: ["khr"],
-		lang: ["khm"]
+		lang: ["khm"],
 	},
 	ki: {
 		name: "Kiribati",
@@ -1152,11 +1152,11 @@ export default {
 			"ki",
 			"republic of kiribati",
 			"ribaberiki kiribati",
-			"kir"
+			"kir",
 		],
 		call: ["686"],
 		currency: ["aud"],
-		lang: ["eng", "gil"]
+		lang: ["eng", "gil"],
 	},
 	km: {
 		name: "Comoros",
@@ -1171,11 +1171,11 @@ export default {
 			"udzima wa komori",
 			"al-ittiḥād al-qumurī",
 			"com",
-			"comoros"
+			"comoros",
 		],
 		call: ["269"],
 		currency: ["kmf"],
-		lang: ["ara", "fra", "zdj"]
+		lang: ["ara", "fra", "zdj"],
 	},
 	kn: {
 		name: "Saint Kitts and Nevis",
@@ -1185,11 +1185,11 @@ export default {
 			"saint kitts and nevis",
 			"kn",
 			"federation of saint christopher and nevis",
-			"kna"
+			"kna",
 		],
 		call: ["1869"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	kp: {
 		name: "North Korea",
@@ -1204,11 +1204,11 @@ export default {
 			"북한",
 			"북조선",
 			"prk",
-			"north korea"
+			"north korea",
 		],
 		call: ["850"],
 		currency: ["kpw"],
-		lang: ["kor"]
+		lang: ["kor"],
 	},
 	kr: {
 		name: "South Korea",
@@ -1216,7 +1216,7 @@ export default {
 		search: ["republic of korea", "한국", "kr", "korea, republic of", "남한", "남조선", "kor", "south korea"],
 		call: ["82"],
 		currency: ["krw"],
-		lang: ["kor"]
+		lang: ["kor"],
 	},
 	kw: {
 		name: "Kuwait",
@@ -1224,7 +1224,7 @@ export default {
 		search: ["state of kuwait", "الكويت", "kw", "dawlat al-kuwait", "kwt", "kuwait"],
 		call: ["965"],
 		currency: ["kwd"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	ky: {
 		name: "Cayman Islands",
@@ -1232,7 +1232,7 @@ export default {
 		search: ["cayman islands", "ky", "cym"],
 		call: ["1345"],
 		currency: ["kyd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	kz: {
 		name: "Kazakhstan",
@@ -1248,11 +1248,11 @@ export default {
 			"республика казахстан",
 			"respublika kazakhstan",
 			"kaz",
-			"kazakhstan"
+			"kazakhstan",
 		],
 		call: ["7"],
 		currency: ["kzt"],
-		lang: ["kaz", "rus"]
+		lang: ["kaz", "rus"],
 	},
 	la: {
 		name: "Laos",
@@ -1263,11 +1263,11 @@ export default {
 			"la",
 			"lao",
 			"sathalanalat paxathipatai paxaxon lao",
-			"laos"
+			"laos",
 		],
 		call: ["856"],
 		currency: ["lak"],
-		lang: ["lao"]
+		lang: ["lao"],
 	},
 	lb: {
 		name: "Lebanon",
@@ -1275,7 +1275,7 @@ export default {
 		search: ["lebanese republic", "لبنان", "liban", "lb", "al-jumhūrīyah al-libnānīyah", "lbn", "lebanon"],
 		call: ["961"],
 		currency: ["lbp"],
-		lang: ["ara", "fra"]
+		lang: ["ara", "fra"],
 	},
 	lc: {
 		name: "Saint Lucia",
@@ -1283,7 +1283,7 @@ export default {
 		search: ["saint lucia", "lc", "lca"],
 		call: ["1758"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	li: {
 		name: "Liechtenstein",
@@ -1291,7 +1291,7 @@ export default {
 		search: ["principality of liechtenstein", "liechtenstein", "li", "fürstentum liechtenstein", "lie"],
 		call: ["423"],
 		currency: ["chf"],
-		lang: ["deu"]
+		lang: ["deu"],
 	},
 	lk: {
 		name: "Sri Lanka",
@@ -1303,11 +1303,11 @@ export default {
 			"lk",
 			"ilaṅkai",
 			"lka",
-			"sri lanka"
+			"sri lanka",
 		],
 		call: ["94"],
 		currency: ["lkr"],
-		lang: ["sin", "tam"]
+		lang: ["sin", "tam"],
 	},
 	lr: {
 		name: "Liberia",
@@ -1315,7 +1315,7 @@ export default {
 		search: ["republic of liberia", "liberia", "lr", "lbr"],
 		call: ["231"],
 		currency: ["lrd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	ls: {
 		name: "Lesotho",
@@ -1323,7 +1323,7 @@ export default {
 		search: ["kingdom of lesotho", "lesotho", "ls", "muso oa lesotho", "lso"],
 		call: ["266"],
 		currency: ["lsl", "zar"],
-		lang: ["eng", "sot"]
+		lang: ["eng", "sot"],
 	},
 	lt: {
 		name: "Lithuania",
@@ -1331,7 +1331,7 @@ export default {
 		search: ["republic of lithuania", "lietuva", "lt", "lietuvos respublika", "ltu", "lithuania"],
 		call: ["370"],
 		currency: ["eur"],
-		lang: ["lit"]
+		lang: ["lit"],
 	},
 	lu: {
 		name: "Luxembourg",
@@ -1345,11 +1345,11 @@ export default {
 			"grand-duché de luxembourg",
 			"großherzogtum luxemburg",
 			"groussherzogtum lëtzebuerg",
-			"lux"
+			"lux",
 		],
 		call: ["352"],
 		currency: ["eur"],
-		lang: ["deu", "fra", "ltz"]
+		lang: ["deu", "fra", "ltz"],
 	},
 	lv: {
 		name: "Latvia",
@@ -1357,7 +1357,7 @@ export default {
 		search: ["republic of latvia", "latvija", "lv", "latvijas republika", "lva", "latvia"],
 		call: ["371"],
 		currency: ["eur"],
-		lang: ["lav"]
+		lang: ["lav"],
 	},
 	ly: {
 		name: "Libya",
@@ -1365,7 +1365,7 @@ export default {
 		search: ["state of libya", "‏ليبيا", "ly", "dawlat libya", "lby", "libya"],
 		call: ["218"],
 		currency: ["lyd"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	ma: {
 		name: "Morocco",
@@ -1373,7 +1373,7 @@ export default {
 		search: ["kingdom of morocco", "المغرب", "ⵍⵎⴰⵖⵔⵉⴱ", "ma", "al-mamlakah al-maġribiyah", "mar", "morocco"],
 		call: ["212"],
 		currency: ["mad"],
-		lang: ["ara", "ber"]
+		lang: ["ara", "ber"],
 	},
 	mc: {
 		name: "Monaco",
@@ -1381,7 +1381,7 @@ export default {
 		search: ["principality of monaco", "monaco", "mc", "principauté de monaco", "mco"],
 		call: ["377"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	md: {
 		name: "Moldova",
@@ -1389,7 +1389,7 @@ export default {
 		search: ["republic of moldova", "moldova", "md", "moldova, republic of", "republica moldova", "mda"],
 		call: ["373"],
 		currency: ["mdl"],
-		lang: ["ron"]
+		lang: ["ron"],
 	},
 	me: {
 		name: "Montenegro",
@@ -1397,7 +1397,7 @@ export default {
 		search: ["montenegro", "црна гора", "me", "crna gora", "mne"],
 		call: ["382"],
 		currency: ["eur"],
-		lang: ["srp"]
+		lang: ["srp"],
 	},
 	mf: {
 		name: "Saint Martin",
@@ -1409,11 +1409,11 @@ export default {
 			"collectivity of saint martin",
 			"collectivité de saint-martin",
 			"saint martin (french part)",
-			"maf"
+			"maf",
 		],
 		call: ["590"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	mg: {
 		name: "Madagascar",
@@ -1425,11 +1425,11 @@ export default {
 			"mg",
 			"repoblikan'i madagasikara",
 			"république de madagascar",
-			"mdg"
+			"mdg",
 		],
 		call: ["261"],
 		currency: ["mga"],
-		lang: ["fra", "mlg"]
+		lang: ["fra", "mlg"],
 	},
 	mh: {
 		name: "Marshall Islands",
@@ -1437,7 +1437,7 @@ export default {
 		search: ["republic of the marshall islands", "marshall islands", "m̧ajeļ", "mh", "aolepān aorōkin m̧ajeļ", "mhl"],
 		call: ["692"],
 		currency: ["usd"],
-		lang: ["eng", "mah"]
+		lang: ["eng", "mah"],
 	},
 	mk: {
 		name: "Macedonia",
@@ -1449,11 +1449,11 @@ export default {
 			"macedonia, the former yugoslav republic of",
 			"република македонија",
 			"mkd",
-			"macedonia"
+			"macedonia",
 		],
 		call: ["389"],
 		currency: ["mkd"],
-		lang: ["mkd"]
+		lang: ["mkd"],
 	},
 	ml: {
 		name: "Mali",
@@ -1461,7 +1461,7 @@ export default {
 		search: ["republic of mali", "mali", "ml", "république du mali", "mli"],
 		call: ["223"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	mm: {
 		name: "Myanmar",
@@ -1473,11 +1473,11 @@ export default {
 			"burma",
 			"pyidaunzu thanmăda myăma nainngandaw",
 			"mmr",
-			"myanmar"
+			"myanmar",
 		],
 		call: ["95"],
 		currency: ["mmk"],
-		lang: ["mya"]
+		lang: ["mya"],
 	},
 	mn: {
 		name: "Mongolia",
@@ -1485,7 +1485,7 @@ export default {
 		search: ["mongolia", "монгол улс", "mn", "mng"],
 		call: ["976"],
 		currency: ["mnt"],
-		lang: ["mon"]
+		lang: ["mon"],
 	},
 	mo: {
 		name: "Macau",
@@ -1498,11 +1498,11 @@ export default {
 			"macao",
 			"中華人民共和國澳門特別行政區",
 			"região administrativa especial de macau da república popular da china",
-			"mac"
+			"mac",
 		],
 		call: ["853"],
 		currency: ["mop"],
-		lang: ["por", "zho"]
+		lang: ["por", "zho"],
 	},
 	mp: {
 		name: "Northern Mariana Islands",
@@ -1513,11 +1513,11 @@ export default {
 			"na islas mariånas",
 			"mp",
 			"sankattan siha na islas mariånas",
-			"mnp"
+			"mnp",
 		],
 		call: ["1670"],
 		currency: ["usd"],
-		lang: ["cal", "cha", "eng"]
+		lang: ["cal", "cha", "eng"],
 	},
 	mq: {
 		name: "Martinique",
@@ -1525,7 +1525,7 @@ export default {
 		search: ["martinique", "mq", "mtq"],
 		call: ["596"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	mr: {
 		name: "Mauritania",
@@ -1536,11 +1536,11 @@ export default {
 			"mr",
 			"al-jumhūriyyah al-ʾislāmiyyah al-mūrītāniyyah",
 			"mrt",
-			"mauritania"
+			"mauritania",
 		],
 		call: ["222"],
 		currency: ["mro"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	ms: {
 		name: "Montserrat",
@@ -1548,7 +1548,7 @@ export default {
 		search: ["montserrat", "ms", "msr"],
 		call: ["1664"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	mt: {
 		name: "Malta",
@@ -1556,7 +1556,7 @@ export default {
 		search: ["republic of malta", "malta", "mt", "repubblika ta' malta", "mlt"],
 		call: ["356"],
 		currency: ["eur"],
-		lang: ["eng", "mlt"]
+		lang: ["eng", "mlt"],
 	},
 	mu: {
 		name: "Mauritius",
@@ -1564,7 +1564,7 @@ export default {
 		search: ["republic of mauritius", "mauritius", "maurice", "moris", "mu", "république de maurice", "mus"],
 		call: ["230"],
 		currency: ["mur"],
-		lang: ["eng", "fra", "mfe"]
+		lang: ["eng", "fra", "mfe"],
 	},
 	mv: {
 		name: "Maldives",
@@ -1576,11 +1576,11 @@ export default {
 			"maldive islands",
 			"dhivehi raajjeyge jumhooriyya",
 			"mdv",
-			"maldives"
+			"maldives",
 		],
 		call: ["960"],
 		currency: ["mvr"],
-		lang: ["div"]
+		lang: ["div"],
 	},
 	mw: {
 		name: "Malawi",
@@ -1588,7 +1588,7 @@ export default {
 		search: ["republic of malawi", "malawi", "malaŵi", "mw", "mwi"],
 		call: ["265"],
 		currency: ["mwk"],
-		lang: ["eng", "nya"]
+		lang: ["eng", "nya"],
 	},
 	mx: {
 		name: "Mexico",
@@ -1596,7 +1596,7 @@ export default {
 		search: ["united mexican states", "méxico", "mx", "mexicanos", "estados unidos mexicanos", "mex", "mexico"],
 		call: ["52"],
 		currency: ["mxn"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	my: {
 		name: "Malaysia",
@@ -1604,7 +1604,7 @@ export default {
 		search: ["malaysia", "مليسيا", "my", "mys"],
 		call: ["60"],
 		currency: ["myr"],
-		lang: ["eng", "msa"]
+		lang: ["eng", "msa"],
 	},
 	mz: {
 		name: "Mozambique",
@@ -1612,7 +1612,7 @@ export default {
 		search: ["republic of mozambique", "moçambique", "mz", "república de moçambique", "moz", "mozambique"],
 		call: ["258"],
 		currency: ["mzn"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	na: {
 		name: "Namibia",
@@ -1620,7 +1620,7 @@ export default {
 		search: ["republic of namibia", "namibië", "namibia", "na", "nam"],
 		call: ["264"],
 		currency: ["nad", "zar"],
-		lang: ["afr", "deu", "eng", "her", "hgm", "kwn", "loz", "ndo", "tsn"]
+		lang: ["afr", "deu", "eng", "her", "hgm", "kwn", "loz", "ndo", "tsn"],
 	},
 	nc: {
 		name: "New Caledonia",
@@ -1628,7 +1628,7 @@ export default {
 		search: ["new caledonia", "nouvelle-calédonie", "nc", "ncl"],
 		call: ["687"],
 		currency: ["xpf"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	ne: {
 		name: "Niger",
@@ -1636,7 +1636,7 @@ export default {
 		search: ["republic of niger", "niger", "ne", "nijar", "ner"],
 		call: ["227"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	nf: {
 		name: "Norfolk Island",
@@ -1644,7 +1644,7 @@ export default {
 		search: ["territory of norfolk island", "norfolk island", "norf'k ailen", "nf", "teratri of norf'k ailen", "nfk"],
 		call: ["672"],
 		currency: ["aud"],
-		lang: ["eng", "pih"]
+		lang: ["eng", "pih"],
 	},
 	ng: {
 		name: "Nigeria",
@@ -1652,7 +1652,7 @@ export default {
 		search: ["federal republic of nigeria", "nigeria", "ng", "nijeriya", "naíjíríà", "nga"],
 		call: ["234"],
 		currency: ["ngn"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	ni: {
 		name: "Nicaragua",
@@ -1660,7 +1660,7 @@ export default {
 		search: ["republic of nicaragua", "nicaragua", "ni", "república de nicaragua", "nic"],
 		call: ["505"],
 		currency: ["nio"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	nl: {
 		name: "Netherlands",
@@ -1668,7 +1668,7 @@ export default {
 		search: ["kingdom of the netherlands", "nederland", "nl", "holland", "the netherlands", "nld", "netherlands"],
 		call: ["31"],
 		currency: ["eur"],
-		lang: ["nld"]
+		lang: ["nld"],
 	},
 	no: {
 		name: "Norway",
@@ -1682,11 +1682,11 @@ export default {
 			"kongeriket norge",
 			"kongeriket noreg",
 			"nor",
-			"norway"
+			"norway",
 		],
 		call: ["47"],
 		currency: ["nok"],
-		lang: ["nno", "nob", "smi"]
+		lang: ["nno", "nob", "smi"],
 	},
 	np: {
 		name: "Nepal",
@@ -1694,7 +1694,7 @@ export default {
 		search: ["federal democratic republic of nepal", "नेपाल", "np", "loktāntrik ganatantra nepāl", "npl", "nepal"],
 		call: ["977"],
 		currency: ["npr"],
-		lang: ["nep"]
+		lang: ["nep"],
 	},
 	nr: {
 		name: "Nauru",
@@ -1702,7 +1702,7 @@ export default {
 		search: ["republic of nauru", "nauru", "nr", "naoero", "pleasant island", "ripublik naoero", "nru"],
 		call: ["674"],
 		currency: ["aud"],
-		lang: ["eng", "nau"]
+		lang: ["eng", "nau"],
 	},
 	nu: {
 		name: "Niue",
@@ -1710,7 +1710,7 @@ export default {
 		search: ["niue", "niuē", "nu", "niu"],
 		call: ["683"],
 		currency: ["nzd"],
-		lang: ["eng", "niu"]
+		lang: ["eng", "niu"],
 	},
 	nz: {
 		name: "New Zealand",
@@ -1718,7 +1718,7 @@ export default {
 		search: ["new zealand", "aotearoa", "nz", "nzl"],
 		call: ["64"],
 		currency: ["nzd"],
-		lang: ["eng", "mri", "nzs"]
+		lang: ["eng", "mri", "nzs"],
 	},
 	om: {
 		name: "Oman",
@@ -1726,7 +1726,7 @@ export default {
 		search: ["sultanate of oman", "عمان", "om", "salṭanat ʻumān", "omn", "oman"],
 		call: ["968"],
 		currency: ["omr"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	pa: {
 		name: "Panama",
@@ -1734,7 +1734,7 @@ export default {
 		search: ["republic of panama", "panamá", "pa", "república de panamá", "pan", "panama"],
 		call: ["507"],
 		currency: ["pab", "usd"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	pe: {
 		name: "Peru",
@@ -1742,7 +1742,7 @@ export default {
 		search: ["republic of peru", "piruw", "perú", "pe", "república del perú", "per", "peru"],
 		call: ["51"],
 		currency: ["pen"],
-		lang: ["aym", "que", "spa"]
+		lang: ["aym", "que", "spa"],
 	},
 	pf: {
 		name: "French Polynesia",
@@ -1750,7 +1750,7 @@ export default {
 		search: ["french polynesia", "polynésie française", "pf", "pōrīnetia farāni", "pyf"],
 		call: ["689"],
 		currency: ["xpf"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	pg: {
 		name: "Papua New Guinea",
@@ -1762,11 +1762,11 @@ export default {
 			"papua niugini",
 			"pg",
 			"independen stet bilong papua niugini",
-			"png"
+			"png",
 		],
 		call: ["675"],
 		currency: ["pgk"],
-		lang: ["eng", "hmo", "tpi"]
+		lang: ["eng", "hmo", "tpi"],
 	},
 	ph: {
 		name: "Philippines",
@@ -1774,7 +1774,7 @@ export default {
 		search: ["republic of the philippines", "philippines", "pilipinas", "ph", "repúblika ng pilipinas", "phl"],
 		call: ["63"],
 		currency: ["php"],
-		lang: ["eng", "fil"]
+		lang: ["eng", "fil"],
 	},
 	pk: {
 		name: "Pakistan",
@@ -1786,11 +1786,11 @@ export default {
 			"pk",
 			"pākistān",
 			"islāmī jumhūriya'eh pākistān",
-			"pak"
+			"pak",
 		],
 		call: ["92"],
 		currency: ["pkr"],
-		lang: ["eng", "urd"]
+		lang: ["eng", "urd"],
 	},
 	pl: {
 		name: "Poland",
@@ -1798,7 +1798,7 @@ export default {
 		search: ["republic of poland", "polska", "pl", "rzeczpospolita polska", "pol", "poland"],
 		call: ["48"],
 		currency: ["pln"],
-		lang: ["pol"]
+		lang: ["pol"],
 	},
 	pm: {
 		name: "Saint Pierre and Miquelon",
@@ -1808,11 +1808,11 @@ export default {
 			"saint-pierre-et-miquelon",
 			"pm",
 			"collectivité territoriale de saint-pierre-et-miquelon",
-			"spm"
+			"spm",
 		],
 		call: ["508"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	pn: {
 		name: "Pitcairn Islands",
@@ -1823,11 +1823,11 @@ export default {
 			"pn",
 			"pitcairn",
 			"pitcairn henderson ducie and oeno islands",
-			"pcn"
+			"pcn",
 		],
 		call: ["64"],
 		currency: ["nzd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	pr: {
 		name: "Puerto Rico",
@@ -1835,7 +1835,7 @@ export default {
 		search: ["commonwealth of puerto rico", "puerto rico", "pr", "estado libre asociado de puerto rico", "pri"],
 		call: ["1787", "1939"],
 		currency: ["usd"],
-		lang: ["eng", "spa"]
+		lang: ["eng", "spa"],
 	},
 	ps: {
 		name: "Palestine",
@@ -1843,7 +1843,7 @@ export default {
 		search: ["state of palestine", "فلسطين", "ps", "palestine, state of", "dawlat filasṭin", "pse", "palestine"],
 		call: ["970"],
 		currency: ["ils"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	pt: {
 		name: "Portugal",
@@ -1851,7 +1851,7 @@ export default {
 		search: ["portuguese republic", "portugal", "pt", "portuguesa", "república portuguesa", "prt"],
 		call: ["351"],
 		currency: ["eur"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	pw: {
 		name: "Palau",
@@ -1859,7 +1859,7 @@ export default {
 		search: ["republic of palau", "palau", "belau", "pw", "beluu er a belau", "plw"],
 		call: ["680"],
 		currency: ["usd"],
-		lang: ["eng", "pau"]
+		lang: ["eng", "pau"],
 	},
 	py: {
 		name: "Paraguay",
@@ -1867,7 +1867,7 @@ export default {
 		search: ["republic of paraguay", "paraguái", "paraguay", "py", "república del paraguay", "tetã paraguái", "pry"],
 		call: ["595"],
 		currency: ["pyg"],
-		lang: ["grn", "spa"]
+		lang: ["grn", "spa"],
 	},
 	qa: {
 		name: "Qatar",
@@ -1875,7 +1875,7 @@ export default {
 		search: ["state of qatar", "قطر", "qa", "dawlat qaṭar", "qat", "qatar"],
 		call: ["974"],
 		currency: ["qar"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	re: {
 		name: "Réunion",
@@ -1883,7 +1883,7 @@ export default {
 		search: ["réunion island", "la réunion", "re", "reunion", "reu", "réunion"],
 		call: ["262"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	ro: {
 		name: "Romania",
@@ -1891,7 +1891,7 @@ export default {
 		search: ["romania", "românia", "ro", "rumania", "roumania", "rou"],
 		call: ["40"],
 		currency: ["ron"],
-		lang: ["ron"]
+		lang: ["ron"],
 	},
 	rs: {
 		name: "Serbia",
@@ -1899,7 +1899,7 @@ export default {
 		search: ["republic of serbia", "србија", "rs", "srbija", "република србија", "republika srbija", "srb", "serbia"],
 		call: ["381"],
 		currency: ["rsd"],
-		lang: ["srp"]
+		lang: ["srp"],
 	},
 	ru: {
 		name: "Russia",
@@ -1907,7 +1907,7 @@ export default {
 		search: ["russian federation", "россия", "ru", "российская федерация", "rus", "russia"],
 		call: ["7"],
 		currency: ["rub"],
-		lang: ["rus"]
+		lang: ["rus"],
 	},
 	rw: {
 		name: "Rwanda",
@@ -1915,7 +1915,7 @@ export default {
 		search: ["republic of rwanda", "rwanda", "rw", "repubulika y'u rwanda", "république du rwanda", "rwa"],
 		call: ["250"],
 		currency: ["rwf"],
-		lang: ["eng", "fra", "kin"]
+		lang: ["eng", "fra", "kin"],
 	},
 	sa: {
 		name: "Saudi Arabia",
@@ -1927,11 +1927,11 @@ export default {
 			"sa",
 			"al-mamlakah al-‘arabiyyah as-su‘ūdiyyah",
 			"sau",
-			"saudi arabia"
+			"saudi arabia",
 		],
 		call: ["966"],
 		currency: ["sar"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	sb: {
 		name: "Solomon Islands",
@@ -1939,7 +1939,7 @@ export default {
 		search: ["solomon islands", "sb", "slb"],
 		call: ["677"],
 		currency: ["sbd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	sc: {
 		name: "Seychelles",
@@ -1951,11 +1951,11 @@ export default {
 			"sc",
 			"repiblik sesel",
 			"république des seychelles",
-			"syc"
+			"syc",
 		],
 		call: ["248"],
 		currency: ["scr"],
-		lang: ["crs", "eng", "fra"]
+		lang: ["crs", "eng", "fra"],
 	},
 	sd: {
 		name: "Sudan",
@@ -1963,7 +1963,7 @@ export default {
 		search: ["republic of the sudan", "السودان", "sudan", "sd", "jumhūrīyat as-sūdān", "sdn"],
 		call: ["249"],
 		currency: ["sdg"],
-		lang: ["ara", "eng"]
+		lang: ["ara", "eng"],
 	},
 	se: {
 		name: "Sweden",
@@ -1971,7 +1971,7 @@ export default {
 		search: ["kingdom of sweden", "sverige", "se", "konungariket sverige", "swe", "sweden"],
 		call: ["46"],
 		currency: ["sek"],
-		lang: ["swe"]
+		lang: ["swe"],
 	},
 	sg: {
 		name: "Singapore",
@@ -1985,11 +1985,11 @@ export default {
 			"sg",
 			"republik singapura",
 			"新加坡共和国",
-			"sgp"
+			"sgp",
 		],
 		call: ["65"],
 		currency: ["sgd"],
-		lang: ["zho", "eng", "msa", "tam"]
+		lang: ["zho", "eng", "msa", "tam"],
 	},
 	sh: {
 		name: "Saint Helena, Ascension and Tristan da Cunha",
@@ -1998,11 +1998,11 @@ export default {
 			"saint helena, ascension and tristan da cunha",
 			"saint helena",
 			"st. helena, ascension and tristan da cunha",
-			"shn"
+			"shn",
 		],
 		call: ["290", "247"],
 		currency: ["shp", "gbp"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	si: {
 		name: "Slovenia",
@@ -2010,7 +2010,7 @@ export default {
 		search: ["republic of slovenia", "slovenija", "si", "republika slovenija", "svn", "slovenia"],
 		call: ["386"],
 		currency: ["eur"],
-		lang: ["slv"]
+		lang: ["slv"],
 	},
 	sj: {
 		name: "Svalbard and Jan Mayen",
@@ -2018,7 +2018,7 @@ export default {
 		search: ["svalbard og jan mayen", "sj", "svalbard and jan mayen islands", "sjm", "svalbard and jan mayen"],
 		call: ["4779"],
 		currency: ["nok"],
-		lang: ["nor"]
+		lang: ["nor"],
 	},
 	sk: {
 		name: "Slovakia",
@@ -2026,7 +2026,7 @@ export default {
 		search: ["slovak republic", "slovensko", "sk", "slovenská republika", "svk", "slovakia"],
 		call: ["421"],
 		currency: ["eur"],
-		lang: ["slk"]
+		lang: ["slk"],
 	},
 	sl: {
 		name: "Sierra Leone",
@@ -2034,7 +2034,7 @@ export default {
 		search: ["republic of sierra leone", "sierra leone", "sl", "sle"],
 		call: ["232"],
 		currency: ["sll"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	sm: {
 		name: "San Marino",
@@ -2045,11 +2045,11 @@ export default {
 			"sm",
 			"republic of san marino",
 			"repubblica di san marino",
-			"smr"
+			"smr",
 		],
 		call: ["378"],
 		currency: ["eur"],
-		lang: ["ita"]
+		lang: ["ita"],
 	},
 	sn: {
 		name: "Senegal",
@@ -2057,7 +2057,7 @@ export default {
 		search: ["republic of senegal", "sénégal", "sn", "république du sénégal", "sen", "senegal"],
 		call: ["221"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	so: {
 		name: "Somalia",
@@ -2071,11 +2071,11 @@ export default {
 			"jamhuuriyadda federaalka soomaaliya",
 			"jumhūriyyat aṣ-ṣūmāl al-fiderāliyya",
 			"som",
-			"somalia"
+			"somalia",
 		],
 		call: ["252"],
 		currency: ["sos"],
-		lang: ["ara", "som"]
+		lang: ["ara", "som"],
 	},
 	sr: {
 		name: "Suriname",
@@ -2083,7 +2083,7 @@ export default {
 		search: ["republic of suriname", "suriname", "sr", "sarnam", "sranangron", "republiek suriname", "sur"],
 		call: ["597"],
 		currency: ["srd"],
-		lang: ["nld"]
+		lang: ["nld"],
 	},
 	ss: {
 		name: "South Sudan",
@@ -2091,7 +2091,7 @@ export default {
 		search: ["republic of south sudan", "south sudan", "ss", "ssd"],
 		call: ["211"],
 		currency: ["ssp"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	st: {
 		name: "São Tomé and Príncipe",
@@ -2103,11 +2103,11 @@ export default {
 			"sao tome and principe",
 			"república democrática de são tomé e príncipe",
 			"stp",
-			"são tomé and príncipe"
+			"são tomé and príncipe",
 		],
 		call: ["239"],
 		currency: ["std"],
-		lang: ["por"]
+		lang: ["por"],
 	},
 	sv: {
 		name: "El Salvador",
@@ -2115,7 +2115,7 @@ export default {
 		search: ["republic of el salvador", "el salvador", "sv", "república de el salvador", "slv"],
 		call: ["503"],
 		currency: ["svc", "usd"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	sx: {
 		name: "Sint Maarten",
@@ -2123,7 +2123,7 @@ export default {
 		search: ["sint maarten", "saint-martin", "sx", "sint maarten (dutch part)", "sxm"],
 		call: ["1721"],
 		currency: ["ang"],
-		lang: ["eng", "fra", "nld"]
+		lang: ["eng", "fra", "nld"],
 	},
 	sy: {
 		name: "Syria",
@@ -2131,7 +2131,7 @@ export default {
 		search: ["syrian arab republic", "سوريا", "sy", "al-jumhūrīyah al-ʻarabīyah as-sūrīyah", "syr", "syria"],
 		call: ["963"],
 		currency: ["syp"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	sz: {
 		name: "Eswatini",
@@ -2145,11 +2145,11 @@ export default {
 			"swatini",
 			"ngwane",
 			"umbuso weswatini",
-			"swz"
+			"swz",
 		],
 		call: ["268"],
 		currency: ["szl"],
-		lang: ["eng", "ssw"]
+		lang: ["eng", "ssw"],
 	},
 	tc: {
 		name: "Turks and Caicos Islands",
@@ -2157,7 +2157,7 @@ export default {
 		search: ["turks and caicos islands", "tc", "tca"],
 		call: ["1649"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	td: {
 		name: "Chad",
@@ -2165,7 +2165,7 @@ export default {
 		search: ["republic of chad", "تشاد‎", "tchad", "td", "république du tchad", "tcd", "chad"],
 		call: ["235"],
 		currency: ["xaf"],
-		lang: ["ara", "fra"]
+		lang: ["ara", "fra"],
 	},
 	tf: {
 		name: "French Southern and Antarctic Lands",
@@ -2176,11 +2176,11 @@ export default {
 			"tf",
 			"french southern territories",
 			"atf",
-			"french southern and antarctic lands"
+			"french southern and antarctic lands",
 		],
 		call: [],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	tg: {
 		name: "Togo",
@@ -2188,7 +2188,7 @@ export default {
 		search: ["togolese republic", "togo", "tg", "togolese", "république togolaise", "tgo"],
 		call: ["228"],
 		currency: ["xof"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	th: {
 		name: "Thailand",
@@ -2202,11 +2202,11 @@ export default {
 			"ราชอาณาจักรไทย",
 			"ratcha anachak thai",
 			"tha",
-			"thailand"
+			"thailand",
 		],
 		call: ["66"],
 		currency: ["thb"],
-		lang: ["tha"]
+		lang: ["tha"],
 	},
 	tj: {
 		name: "Tajikistan",
@@ -2220,11 +2220,11 @@ export default {
 			"ҷумҳурии тоҷикистон",
 			"çumhuriyi toçikiston",
 			"tjk",
-			"tajikistan"
+			"tajikistan",
 		],
 		call: ["992"],
 		currency: ["tjs"],
-		lang: ["rus", "tgk"]
+		lang: ["rus", "tgk"],
 	},
 	tk: {
 		name: "Tokelau",
@@ -2232,7 +2232,7 @@ export default {
 		search: ["tokelau", "tk", "tkl"],
 		call: ["690"],
 		currency: ["nzd"],
-		lang: ["eng", "smo", "tkl"]
+		lang: ["eng", "smo", "tkl"],
 	},
 	tl: {
 		name: "Timor-Leste",
@@ -2247,11 +2247,11 @@ export default {
 			"repúblika demokrátika timór-leste",
 			"timór lorosa'e",
 			"timor lorosae",
-			"tls"
+			"tls",
 		],
 		call: ["670"],
 		currency: ["usd"],
-		lang: ["por", "tet"]
+		lang: ["por", "tet"],
 	},
 	tm: {
 		name: "Turkmenistan",
@@ -2259,7 +2259,7 @@ export default {
 		search: ["turkmenistan", "туркмения", "türkmenistan", "tm", "tkm"],
 		call: ["993"],
 		currency: ["tmt"],
-		lang: ["rus", "tuk"]
+		lang: ["rus", "tuk"],
 	},
 	tn: {
 		name: "Tunisia",
@@ -2271,11 +2271,11 @@ export default {
 			"republic of tunisia",
 			"al-jumhūriyyah at-tūnisiyyah",
 			"tun",
-			"tunisia"
+			"tunisia",
 		],
 		call: ["216"],
 		currency: ["tnd"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	to: {
 		name: "Tonga",
@@ -2283,7 +2283,7 @@ export default {
 		search: ["kingdom of tonga", "tonga", "to", "ton"],
 		call: ["676"],
 		currency: ["top"],
-		lang: ["eng", "ton"]
+		lang: ["eng", "ton"],
 	},
 	tr: {
 		name: "Turkey",
@@ -2291,7 +2291,7 @@ export default {
 		search: ["republic of turkey", "türkiye", "tr", "turkiye", "türkiye cumhuriyeti", "tur", "turkey"],
 		call: ["90"],
 		currency: ["try"],
-		lang: ["tur"]
+		lang: ["tur"],
 	},
 	tt: {
 		name: "Trinidad and Tobago",
@@ -2299,7 +2299,7 @@ export default {
 		search: ["republic of trinidad and tobago", "trinidad and tobago", "tt", "tto"],
 		call: ["1868"],
 		currency: ["ttd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	tv: {
 		name: "Tuvalu",
@@ -2307,7 +2307,7 @@ export default {
 		search: ["tuvalu", "tv", "tuv"],
 		call: ["688"],
 		currency: ["aud"],
-		lang: ["eng", "tvl"]
+		lang: ["eng", "tvl"],
 	},
 	tw: {
 		name: "Taiwan",
@@ -2322,11 +2322,11 @@ export default {
 			"zhōnghuá mínguó",
 			"chinese taipei",
 			"twn",
-			"taiwan"
+			"taiwan",
 		],
 		call: ["886"],
 		currency: ["twd"],
-		lang: ["zho"]
+		lang: ["zho"],
 	},
 	tz: {
 		name: "Tanzania",
@@ -2337,11 +2337,11 @@ export default {
 			"tz",
 			"tanzania, united republic of",
 			"jamhuri ya muungano wa tanzania",
-			"tza"
+			"tza",
 		],
 		call: ["255"],
 		currency: ["tzs"],
-		lang: ["eng", "swa"]
+		lang: ["eng", "swa"],
 	},
 	ua: {
 		name: "Ukraine",
@@ -2349,7 +2349,7 @@ export default {
 		search: ["ukraine", "україна", "ua", "ukrayina", "ukr"],
 		call: ["380"],
 		currency: ["uah"],
-		lang: ["ukr"]
+		lang: ["ukr"],
 	},
 	ug: {
 		name: "Uganda",
@@ -2357,7 +2357,7 @@ export default {
 		search: ["republic of uganda", "uganda", "ug", "jamhuri ya uganda", "uga"],
 		call: ["256"],
 		currency: ["ugx"],
-		lang: ["eng", "swa"]
+		lang: ["eng", "swa"],
 	},
 	um: {
 		name: "United States Minor Outlying Islands",
@@ -2365,7 +2365,7 @@ export default {
 		search: ["united states minor outlying islands", "um", "umi"],
 		call: [],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	us: {
 		name: "United States",
@@ -2373,7 +2373,7 @@ export default {
 		search: ["united states of america", "united states", "us", "usa"],
 		call: ["1"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	uy: {
 		name: "Uruguay",
@@ -2381,7 +2381,7 @@ export default {
 		search: ["oriental republic of uruguay", "uruguay", "uy", "república oriental del uruguay", "ury"],
 		call: ["598"],
 		currency: ["uyu"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	uz: {
 		name: "Uzbekistan",
@@ -2394,11 +2394,11 @@ export default {
 			"o‘zbekiston respublikasi",
 			"ўзбекистон республикаси",
 			"uzb",
-			"uzbekistan"
+			"uzbekistan",
 		],
 		call: ["998"],
 		currency: ["uzs"],
-		lang: ["rus", "uzb"]
+		lang: ["rus", "uzb"],
 	},
 	va: {
 		name: "Vatican City",
@@ -2411,11 +2411,11 @@ export default {
 			"holy see (vatican city state)",
 			"stato della città del vaticano",
 			"vat",
-			"vatican city"
+			"vatican city",
 		],
 		call: ["3906698", "379"],
 		currency: ["eur"],
-		lang: ["ita", "lat"]
+		lang: ["ita", "lat"],
 	},
 	vc: {
 		name: "Saint Vincent and the Grenadines",
@@ -2423,7 +2423,7 @@ export default {
 		search: ["saint vincent and the grenadines", "vc", "vct"],
 		call: ["1784"],
 		currency: ["xcd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	ve: {
 		name: "Venezuela",
@@ -2434,11 +2434,11 @@ export default {
 			"ve",
 			"venezuela, bolivarian republic of",
 			"república bolivariana de venezuela",
-			"ven"
+			"ven",
 		],
 		call: ["58"],
 		currency: ["vef"],
-		lang: ["spa"]
+		lang: ["spa"],
 	},
 	vg: {
 		name: "British Virgin Islands",
@@ -2446,7 +2446,7 @@ export default {
 		search: ["virgin islands", "british virgin islands", "vg", "virgin islands, british", "vgb"],
 		call: ["1284"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	vi: {
 		name: "United States Virgin Islands",
@@ -2456,11 +2456,11 @@ export default {
 			"united states virgin islands",
 			"vi",
 			"virgin islands, u.s.",
-			"vir"
+			"vir",
 		],
 		call: ["1340"],
 		currency: ["usd"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	vn: {
 		name: "Vietnam",
@@ -2472,11 +2472,11 @@ export default {
 			"cộng hòa xã hội chủ nghĩa việt nam",
 			"viet nam",
 			"vnm",
-			"vietnam"
+			"vietnam",
 		],
 		call: ["84"],
 		currency: ["vnd"],
-		lang: ["vie"]
+		lang: ["vie"],
 	},
 	vu: {
 		name: "Vanuatu",
@@ -2484,7 +2484,7 @@ export default {
 		search: ["republic of vanuatu", "vanuatu", "vu", "ripablik blong vanuatu", "république de vanuatu", "vut"],
 		call: ["678"],
 		currency: ["vuv"],
-		lang: ["bis", "eng", "fra"]
+		lang: ["bis", "eng", "fra"],
 	},
 	wf: {
 		name: "Wallis and Futuna",
@@ -2495,11 +2495,11 @@ export default {
 			"wf",
 			"territoire des îles wallis et futuna",
 			"wlf",
-			"wallis and futuna"
+			"wallis and futuna",
 		],
 		call: ["681"],
 		currency: ["xpf"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	ws: {
 		name: "Samoa",
@@ -2507,7 +2507,7 @@ export default {
 		search: ["independent state of samoa", "samoa", "sāmoa", "ws", "malo saʻoloto tutoʻatasi o sāmoa", "wsm"],
 		call: ["685"],
 		currency: ["wst"],
-		lang: ["eng", "smo"]
+		lang: ["eng", "smo"],
 	},
 	ye: {
 		name: "Yemen",
@@ -2515,7 +2515,7 @@ export default {
 		search: ["republic of yemen", "اليَمَن", "ye", "yemeni republic", "al-jumhūriyyah al-yamaniyyah", "yem", "yemen"],
 		call: ["967"],
 		currency: ["yer"],
-		lang: ["ara"]
+		lang: ["ara"],
 	},
 	yt: {
 		name: "Mayotte",
@@ -2523,7 +2523,7 @@ export default {
 		search: ["department of mayotte", "mayotte", "yt", "département de mayotte", "myt"],
 		call: ["262"],
 		currency: ["eur"],
-		lang: ["fra"]
+		lang: ["fra"],
 	},
 	za: {
 		name: "South Africa",
@@ -2542,11 +2542,11 @@ export default {
 			"za",
 			"rsa",
 			"suid-afrika",
-			"zaf"
+			"zaf",
 		],
 		call: ["27"],
 		currency: ["zar"],
-		lang: ["afr", "eng", "nbl", "nso", "sot", "ssw", "tsn", "tso", "ven", "xho", "zul"]
+		lang: ["afr", "eng", "nbl", "nso", "sot", "ssw", "tsn", "tso", "ven", "xho", "zul"],
 	},
 	zm: {
 		name: "Zambia",
@@ -2554,7 +2554,7 @@ export default {
 		search: ["republic of zambia", "zambia", "zm", "zmb"],
 		call: ["260"],
 		currency: ["zmw"],
-		lang: ["eng"]
+		lang: ["eng"],
 	},
 	zw: {
 		name: "Zimbabwe",
@@ -2562,6 +2562,6 @@ export default {
 		search: ["republic of zimbabwe", "zimbabwe", "zw", "zwe"],
 		call: ["263"],
 		currency: ["zwl"],
-		lang: ["bwg", "eng", "kck", "khi", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"]
-	}
+		lang: ["bwg", "eng", "kck", "khi", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"],
+	},
 };

@@ -15,7 +15,7 @@
 		props: {
 			serie: { type: Object, required: true },
 			boundingBox: { type: Object, required: true },
-			selected: { type: Number, required: true }
+			selected: { type: Number, required: true },
 		},
 		watch: {
 			selected: {
@@ -25,8 +25,8 @@
 						const elt = this.$refs.container.childNodes[value];
 						this.serie.tooltip(elt);
 					}
-				}
-			}
+				},
+			},
 		},
 		computed: {
 			barWidth() {
@@ -36,15 +36,15 @@
 					minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
 				}
 				return Math.max(minDiffX - 2, 1);
-			}
+			},
 		},
 		methods: {
 			getPointClass(index) {
 				return {
 					rectangle: true,
-					selected: index == this.selected
+					selected: index == this.selected,
 				};
-			}
-		}
+			},
+		},
 	};
 </script>

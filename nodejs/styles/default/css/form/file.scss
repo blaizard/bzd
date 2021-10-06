@@ -1,8 +1,6 @@
 @use "sass:math";
 @use "index.scss" as base;
-@use "bzd/icons.scss" with (
-	$bzdIconNames: upload
-);
+@use "bzd/icons.scss" with ($bzdIconNames: upload);
 
 $borderWidth: 5;
 $height: 150;

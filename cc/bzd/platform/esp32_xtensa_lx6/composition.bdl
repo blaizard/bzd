@@ -1,0 +1,15 @@
+use "cc/bzd/platform/std/stream/out/interface.bdl"
+use "cc/bzd/platform/generic/stream/stub/interface.bdl"
+use "cc/bzd/platform/esp32_xtensa_lx6/xthal_clock/interface.bdl"
+use "cc/bzd/platform/generic/clock/null/interface.bdl"
+
+
+composition {
+	out = bzd.platform.std.Out();
+	in = bzd.platform.generic.stream.Stub();
+	steadyClock = bzd.platform.esp32.XthalClock();
+	systemClock = bzd.platform.generic.clock.Null();
+	
+}
+
+

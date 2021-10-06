@@ -8,28 +8,29 @@ bdl_library(
     ],
     deps = [
         "//cc/bzd/platform/generic/executor",
+        "//cc/bzd/platform/generic/stream/stub",
         "//cc/bzd/platform/linux/core",
-        "//cc/bzd/platform/std/stream/out",
         "//cc/bzd/platform/std/clock/steady",
         "//cc/bzd/platform/std/clock/system",
-        "//cc/bzd/platform/generic/stream/stub",
+        "//cc/bzd/platform/std/stream/out",
     ],
 )
 
 cc_library(
     name = "linux",
     srcs = select({
-        "//tools/bazel_build/config:test": [],
+        "//tools/bazel_build/config:test": ["test.cc"],
         "//tools/bazel_build/config:binary": ["main.cc"],
     }),
+    visibility = [
+        "//cc/bzd/platform/backend:__pkg__",
+    ],
     deps = [
         ":composition",
         "//cc/bzd/platform/generic/panic/throw",
         "//cc/bzd/platform/posix/stack_trace",
         "//cc/bzd/platform/std/atomic",
-    ],
-    visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
+        "//tools/cc_test",
     ],
 )
 
