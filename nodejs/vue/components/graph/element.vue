@@ -26,14 +26,14 @@
 			name: { type: String, required: true },
 			value: { type: Array, required: false, default: () => [] },
 			config: { type: Object, required: false, default: () => ({}) },
-			selected: { type: Number, required: false, default: -1 }
+			selected: { type: Number, required: false, default: -1 },
 		},
 		directives: {
-			"hover-children": HoverChildren
+			"hover-children": HoverChildren,
 		},
 		data() {
 			return {
-				selectedLegend: -1
+				selectedLegend: -1,
 			};
 		},
 		computed: {
@@ -47,7 +47,7 @@
 						/**
 						 * Position of the legend
 						 */
-						legendPosition: "legend-right" // legend-left
+						legendPosition: "legend-right", // legend-left
 					},
 					this.config
 				);
@@ -56,24 +56,24 @@
 				return {
 					irgraph: true,
 					[this.name]: true,
-					["irgraph-layout-" + this.configProcessed.legendPosition]: true
+					["irgraph-layout-" + this.configProcessed.legendPosition]: true,
 				};
 			},
 			legendClass() {
 				return {
 					"irgraph-legend": true,
-					[this.name + "-legend"]: true
+					[this.name + "-legend"]: true,
 				};
 			},
 			indexSelected() {
 				return this.selected === -1 ? this.selectedLegend : this.selected;
-			}
+			},
 		},
 		methods: {
 			getLegendItemClass(index) {
 				return {
 					"irgraph-legend-item": true,
-					"irgraph-selected": this.indexSelected === index
+					"irgraph-selected": this.indexSelected === index,
 				};
 			},
 			getLegendItemStyle(index, item) {
@@ -81,7 +81,7 @@
 			},
 			tooltipHide() {
 				tooltipHide();
-			}
-		}
+			},
+		},
 	};
 </script>

@@ -14,4 +14,4 @@ public:
 	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
 };
 
-} // namespace bzd::platform::std
+} // namespace bzd::platform::std::clock

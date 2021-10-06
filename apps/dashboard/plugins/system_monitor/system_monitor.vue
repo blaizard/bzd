@@ -81,14 +81,14 @@
 
 	export default {
 		props: {
-			metadata: { type: Object, mandatory: true }
+			metadata: { type: Object, mandatory: true },
 		},
 		directives: {
-			tooltip: DirectiveTooltip
+			tooltip: DirectiveTooltip,
 		},
-		data: function() {
+		data: function () {
 			return {
-				history: {}
+				history: {},
 			};
 		},
 		computed: {
@@ -103,7 +103,7 @@
 			},
 			memoryStyle() {
 				return {
-					width: this.memoryPercent + "%"
+					width: this.memoryPercent + "%",
 				};
 			},
 			memoryTooltip() {
@@ -120,7 +120,7 @@
 			},
 			swapStyle() {
 				return {
-					width: this.swapPercent + "%"
+					width: this.swapPercent + "%",
 				};
 			},
 			swapTooltip() {
@@ -137,7 +137,7 @@
 			},
 			cpuStyle() {
 				return {
-					width: this.cpuPercent + "%"
+					width: this.cpuPercent + "%",
 				};
 			},
 			cpuTooltip() {
@@ -154,7 +154,7 @@
 			},
 			gpuStyle() {
 				return {
-					width: this.gpuPercent + "%"
+					width: this.gpuPercent + "%",
 				};
 			},
 			gpuTooltip() {
@@ -190,7 +190,7 @@
 				return {
 					data: this.getItems("ups.name")
 						.map((item) => item.value)
-						.join(", ")
+						.join(", "),
 				};
 			},
 			// IO
@@ -208,12 +208,12 @@
 			},
 			ioReadStyle() {
 				return {
-					width: this.makeRate(this.ioRateRead / 20000) * 100 + "%"
+					width: this.makeRate(this.ioRateRead / 20000) * 100 + "%",
 				};
 			},
 			ioWriteStyle() {
 				return {
-					width: this.makeRate(this.ioRateWrite / 20000) * 100 + "%"
+					width: this.makeRate(this.ioRateWrite / 20000) * 100 + "%",
 				};
 			},
 			ioTooltip() {
@@ -234,17 +234,17 @@
 			},
 			networkReadStyle() {
 				return {
-					width: this.makeRate(this.networkRateRead / 20000) * 100 + "%"
+					width: this.makeRate(this.networkRateRead / 20000) * 100 + "%",
 				};
 			},
 			networkWriteStyle() {
 				return {
-					width: this.makeRate(this.networkRateWrite / 20000) * 100 + "%"
+					width: this.makeRate(this.networkRateWrite / 20000) * 100 + "%",
 				};
 			},
 			networkTooltip() {
 				return this.makeRateTooltip("Network", this.networkRate, { in: "recv", out: "sent" });
-			}
+			},
 		},
 		methods: {
 			has(id) {
@@ -337,7 +337,7 @@
 				if (Date.now() - lastTimestamp > 6000) {
 					this.history[name].unshift({
 						timestamp: Date.now(),
-						value: JSON.parse(JSON.stringify(map))
+						value: JSON.parse(JSON.stringify(map)),
 					});
 					// Keep max 10 elements (1 min of data)
 					this.history[name] = this.history[name].slice(0, 10);
@@ -393,15 +393,13 @@
 			 */
 			makeRate(x) {
 				return -1 / Math.log(x + Math.exp(1)) + 1;
-			}
-		}
+			},
+		},
 	};
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with (
-        $bzdIconNames: thermometer battery
-    );
+	@use "bzd/icons.scss" with ($bzdIconNames: thermometer battery);
 
 	.system-monitor {
 		.header {

@@ -39,14 +39,7 @@ class Webpack {
 		for (let i = 0; i < path.length; i += path.length / 8) {
 			hashStr += path.charAt(Math.floor(i));
 		}
-		return (
-			Buffer.from(hashStr).toString("base64") +
-			"." +
-			Path.basename(path)
-				.split(".")
-				.slice(0, -1)
-				.join(".")
-		);
+		return Buffer.from(hashStr).toString("base64") + "." + Path.basename(path).split(".").slice(0, -1).join(".");
 	}
 	/**
 	 * Create a directory recursively, if it already exists, do nothing
@@ -85,7 +78,7 @@ class Webpack {
 				 */
 				assets: {
 					css: [],
-					js: []
+					js: [],
 				},
 				/**
 				 * Output path of the generated content.
@@ -113,7 +106,7 @@ class Webpack {
 				 * Path aliases
 				 */
 				alias: {
-					"[lib]": __dirname
+					"[lib]": __dirname,
 				},
 				/**
 				 * List of templates to be generated
@@ -130,7 +123,7 @@ class Webpack {
 					/**
 					 * Called at the end, after the manifest has been written to disk
 					 */
-					end: (/*manifest, config*/) => {}
+					end: (/*manifest, config*/) => {},
 				},
 				/**
 				 * Add custom loaders. For example:
@@ -145,7 +138,7 @@ class Webpack {
 				/**
 				 * List of temporary files associated with this config object
 				 */
-				temp: []
+				temp: [],
 			},
 			config
 		);
@@ -173,7 +166,7 @@ class Webpack {
 						/**
 						 * The current configuration
 						 */
-						config: config
+						config: config,
 					});
 					return createTempFileSync(
 						config,
@@ -202,7 +195,7 @@ class Webpack {
 		switch (config.type) {
 		case "html":
 			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				entry: config.entries
+				entry: config.entries,
 			});
 			break;
 
@@ -212,8 +205,8 @@ class Webpack {
 				output: {
 					filename: "[name].js",
 					library: "[name]",
-					libraryTarget: "umd"
-				}
+					libraryTarget: "umd",
+				},
 			});
 			break;
 
@@ -224,7 +217,7 @@ class Webpack {
 				output: {
 					filename: "[name].js",
 					library: "[name]",
-					libraryTarget: "commonjs2"
+					libraryTarget: "commonjs2",
 				},
 				optimization: {
 					runtimeChunk: false,
@@ -233,9 +226,9 @@ class Webpack {
 						 * This is important, split chunks seems to fail on node library ending up
 						 * not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
 						 */
-						chunks: "async"
-					}
-				}
+						chunks: "async",
+					},
+				},
 			});
 			break;
 
@@ -268,12 +261,12 @@ class Webpack {
 			let webpackConfig = Webpack.merge(getWebpackConfigDefault(isDev, config), {
 				output: {
 					publicPath: config.publicPath,
-					path: config.output
+					path: config.output,
 				},
 				resolve: {
 					alias: config.alias,
-					symlinks: false
-				}
+					symlinks: false,
+				},
 			});
 
 			// Add extra config
@@ -321,14 +314,14 @@ function getWebpackConfigDefault(isDev, config) {
 		assets: false,
 		children: false,
 		chunks: false,
-		chunkModules: false
+		chunkModules: false,
 	};
 
 	const customRules = Object.keys(config.loaders).map((type) => {
 		return {
 			test: new RegExp("\\." + type + "$"),
 			exclude: /node_modules/,
-			loader: config.loaders[type]
+			loader: config.loaders[type],
 		};
 	});
 
@@ -342,15 +335,15 @@ function getWebpackConfigDefault(isDev, config) {
 		bail: true,
 		output: {
 			filename: "[name]-" + stamp + ".js",
-			chunkFilename: "[chunkhash]-" + stamp + ".js"
+			chunkFilename: "[chunkhash]-" + stamp + ".js",
 		},
 		optimization: {
 			minimize: isDev ? false : true,
 			occurrenceOrder: true,
 			runtimeChunk: "single",
 			splitChunks: {
-				chunks: "all"
-			}
+				chunks: "all",
+			},
 		},
 		module: {
 			rules: customRules.concat([
@@ -359,13 +352,13 @@ function getWebpackConfigDefault(isDev, config) {
 					loader: "vue-loader",
 					options: {
 						hotReload: isDev,
-						prettify: false
-					}
+						prettify: false,
+					},
 				},
 				{
 					test: /\.js$/,
 					use: "babel-loader",
-					sideEffects: false
+					sideEffects: false,
 				},
 				{
 					test: /\.(sa|sc|c)ss$/,
@@ -376,29 +369,29 @@ function getWebpackConfigDefault(isDev, config) {
 							: {
 								loader: MiniCssExtractPlugin.loader,
 								options: {
-									publicPath: ""
-								}
+									publicPath: "",
+								},
 							  },
 						{
 							loader: "css-loader",
 							options: {
-								esModule: false
-							}
+								esModule: false,
+							},
 						},
 						{
 							loader: "sass-loader",
 							options: {
 								// Need to use dart-sass as this is the only implementation that supports @use
-								implementation: require("sass")
-							}
-						}
-					]
+								implementation: require("sass"),
+							},
+						},
+					],
 				},
 				{
 					test: /\.svg$/,
 					use: {
-						loader: "url-loader"
-					}
+						loader: "url-loader",
+					},
 				},
 				{
 					test: /\.(png|gif|jpg|woff|woff2|eot|ttf)$/,
@@ -408,10 +401,10 @@ function getWebpackConfigDefault(isDev, config) {
 						outputPath: (url, resourcePath /*, context*/) => {
 							let splitPath = Path.basename(resourcePath).split(".");
 							return splitPath.length > 1 ? "assets/" + splitPath.pop() + "/" + url : "assets/" + url;
-						}
-					}
-				}
-			])
+						},
+					},
+				},
+			]),
 		},
 		devServer: {
 			// Important, so that we can use HMR while serving file statically
@@ -420,7 +413,7 @@ function getWebpackConfigDefault(isDev, config) {
 			stats: verboseStats,
 			host: "localhost",
 			port: 3000,
-			hotOnly: config["hmr"]
+			hotOnly: config["hmr"],
 		},
 		plugins: [
 			new webpack.EnvironmentPlugin(["BZD_RULE"]),
@@ -428,13 +421,13 @@ function getWebpackConfigDefault(isDev, config) {
 				analyzerMode: "static",
 				reportFilename: "./reports/webpack.html",
 				openAnalyzer: false,
-				logLevel: "warn"
+				logLevel: "warn",
 			}),
 			new VueLoaderPlugin(),
 			new MiniCssExtractPlugin({
 				filename: "[name]-" + stamp + ".css",
 				chunkFilename: "[contenthash]-" + stamp + ".css",
-				ignoreOrder: true
+				ignoreOrder: true,
 			}),
 			new WebpackAssetsManifest({
 				entrypoints: true,
@@ -488,7 +481,7 @@ function getWebpackConfigDefault(isDev, config) {
 									"<div id=\"app\"></div>" +
 									"<% html.js %>" +
 									"</body>" +
-									"</html>"
+									"</html>",
 							},
 							config.templates[i]
 						);
@@ -520,7 +513,7 @@ function getWebpackConfigDefault(isDev, config) {
 											.map((/*entry*/) => "..")
 											.join("/") || "/",
 									css: cssList.map((path) => "<link href=\"" + manifest.path + path + "\" rel=\"stylesheet\"/>").join(""),
-									js: jsList.map((path) => "<script src=\"" + manifest.path + path + "\"></script>").join("")
+									js: jsList.map((path) => "<script src=\"" + manifest.path + path + "\"></script>").join(""),
 								};
 							}
 
@@ -535,7 +528,7 @@ function getWebpackConfigDefault(isDev, config) {
 								/**
 								 * HTML specific parameters if needed
 								 */
-								html: html
+								html: html,
 							});
 
 							await writeFileAsync(configTemplate.output, output);
@@ -573,9 +566,9 @@ function getWebpackConfigDefault(isDev, config) {
 					if (typeof config["hmrCounter"] === "number") {
 						config["hmrCounter"]++;
 					}
-				}
-			})
-		]
+				},
+			}),
+		],
 	};
 }
 
@@ -597,9 +590,9 @@ async function manifestCreate(config, entrypoints) {
 		path: config.publicPath,
 		common: {
 			js: [],
-			css: []
+			css: [],
 		},
-		entries: {}
+		entries: {},
 	};
 
 	// Inject the common dependencies
@@ -694,7 +687,7 @@ function manifestToString(config, manifest) {
 						path: path,
 						rawSize: size,
 						size: bytesToString(size),
-						type: type
+						type: type,
 					};
 					maxSizes = maxSizes.map((value) => [value[0], Math.max(value[1], (item[value[0]] || "").toString().length)]);
 					return item;

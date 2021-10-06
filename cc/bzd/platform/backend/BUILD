@@ -12,11 +12,11 @@ cc_library(
         "backend.cc",
         "backend.hh",
     ],
+    visibility = ["//cc/bzd/platform:__pkg__"],
     deps = [
         "//cc/bzd/platform:clock",
         "//cc/bzd/platform:stream",
     ] + select({platform: [target] for platform, target in PLATFORM_TO_TARGET.items()}),
-    visibility = ["//cc/bzd/platform:__pkg__"],
 )
 
 cc_library(

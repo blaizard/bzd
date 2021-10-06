@@ -12,7 +12,7 @@ export default class Workspace {
 		this.options = Object.assign(
 			{
 				include: [],
-				exclude: []
+				exclude: [],
 			},
 			options
 		);
@@ -40,7 +40,7 @@ export default class Workspace {
 			this.memoization = {
 				workspace: await Workspace._findWorkspace(this.path),
 				include: new Filter(this.options.include),
-				exclude: new Filter(this.options.exclude.concat(config.exclude || []))
+				exclude: new Filter(this.options.exclude.concat(config.exclude || [])),
 			};
 		}
 		return this.memoization;

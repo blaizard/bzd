@@ -21,4 +21,4 @@ bzd::units::Millisecond System::ticksToMs(const ClockTick& ticks) noexcept
 	return static_cast<bzd::units::Millisecond>(ticks.get());
 }
 
-} // namespace bzd::platform::std
+} // namespace bzd::platform::std::clock

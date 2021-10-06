@@ -54,7 +54,7 @@ export default class HttpClient {
 				/**
 				 * Maximum request timeout in ms
 				 */
-				timeoutMs: 60 * 1000
+				timeoutMs: 60 * 1000,
 			},
 			options
 		);
@@ -122,7 +122,7 @@ export default class HttpClient {
 					connect: 1,
 					options: 1,
 					trace: 1,
-					patch: 1
+					patch: 1,
 				},
 			"Method '{}' is not supported",
 			method
@@ -153,7 +153,7 @@ export default class HttpClient {
 			headers: headers,
 			data: data,
 			expect: options.expect,
-			timeoutMs: options.timeoutMs
+			timeoutMs: options.timeoutMs,
 		});
 
 		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {

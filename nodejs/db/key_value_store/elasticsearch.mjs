@@ -17,20 +17,20 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			{
 				user: null,
 				key: null,
-				prefix: "kvs_"
+				prefix: "kvs_",
 			},
 			options
 		);
 
 		let fetchOptions = {
-			expect: "json"
+			expect: "json",
 		};
 
 		if (this.options.user !== null) {
 			fetchOptions.authentication = {
 				type: "basic",
 				username: this.options.user,
-				password: this.options.key
+				password: this.options.key,
 			};
 		}
 
@@ -45,7 +45,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async _initialize() {
 		const result = await this.fetch.request("/", {
-			method: "get"
+			method: "get",
 		});
 		Exception.assert("version" in result, "Unexpected response: {:j}", result);
 	}
@@ -62,7 +62,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		const result = await this.fetch.request(endpoint, {
 			method: "post",
 			json: value,
-			query: query
+			query: query,
 		});
 		Exception.assert(["created", "updated"].includes(result.result), "Unexpected result, received: {}", result.result);
 		Exception.assert("_id" in result, "Response is malformed: {:j}", result);
@@ -72,7 +72,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	async _getImpl(bucket, key, defaultValue, includeAll = false) {
 		try {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
-				method: "get"
+				method: "get",
 			});
 			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
 			if (includeAll) {
@@ -129,9 +129,9 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				method: "post",
 				json: {
 					query: {
-						match_all: {}
-					}
-				}
+						match_all: {},
+					},
+				},
 			});
 			Exception.assert("count" in result, "Result malformed: {:j}", result);
 			return result.count;
@@ -154,8 +154,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				{
 					method: "post",
 					json: {
-						query: query
-					}
+						query: query,
+					},
 				}
 			);
 
@@ -182,21 +182,21 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 
 	async _listImpl(bucket, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
-			match_all: {} // eslint-disable-line
+			match_all: {}, // eslint-disable-line
 		});
 	}
 
 	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		return await this._search(bucket, maxOrPaging, {
 			match_phrase: {
-				[subKey]: value
-			}
+				[subKey]: value,
+			},
 		});
 	}
 
 	async _deleteImpl(bucket, key) {
 		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
-			method: "delete"
+			method: "delete",
 		});
 		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
 	}
