@@ -1,5 +1,3 @@
-#include "cc/bzd/platform/backend/backend.hh"
-
 #include "cc/bzd/platform/clock.hh"
 #include "cc/bzd/platform/stream.hh"
 

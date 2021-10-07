@@ -1,8 +1,8 @@
-use "cc/bzd/platform/linux/core/interface.bdl"
-use "cc/bzd/platform/std/stream/out/interface.bdl"
-use "cc/bzd/platform/generic/stream/stub/interface.bdl"
-use "cc/bzd/platform/std/clock/steady/interface.bdl"
-use "cc/bzd/platform/std/clock/system/interface.bdl"
+use "cc/components/linux/core/interface.bdl"
+use "cc/components/std/stream/out/interface.bdl"
+use "cc/components/generic/stream/stub/interface.bdl"
+use "cc/components/std/clock/steady/interface.bdl"
+use "cc/components/std/clock/system/interface.bdl"
 
 
 composition {

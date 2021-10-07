@@ -11,7 +11,7 @@ component Executor : bzd.platform.Executor {
 	
 config:
 	// The cores to be used by this executor.
-	 ... = Core;
+	 ... = bzd.platform.Core;
 	
 }
 

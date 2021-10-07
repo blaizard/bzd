@@ -1,4 +1,4 @@
-#include "cc/bzd/platform/generic/clock/null/null.hh"
+#include "cc/components/generic/clock/null/null.hh"
 
 namespace bzd::platform::generic::clock {
 
