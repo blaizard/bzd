@@ -31,7 +31,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform/std/atomic",
+        "//cc/bzd/platform/backend:atomic",
     ],
 )
 

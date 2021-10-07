@@ -9,12 +9,12 @@ bdl_library(
 )
 
 cc_library(
-    name = "xthal_clock",
+    name = "xthal",
     srcs = [
-        "xthal_clock.cc",
+        "xthal.cc",
     ],
     hdrs = [
-        "xthal_clock.hh",
+        "xthal.hh",
     ],
     target_compatible_with = [
         "@esp32_xtensa_lx6_gcc//:compiler",

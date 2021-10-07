@@ -1,8 +1,0 @@
-
-namespace bzd.platform.esp32;
-
-component XthalClock {
-	
-}
-
-

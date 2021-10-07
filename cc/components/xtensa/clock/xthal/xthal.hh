@@ -2,9 +2,9 @@
 
 #include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::esp32 {
+namespace bzd::platform::esp32::clock {
 
-class XthalClock : public bzd::Clock
+class Xthal : public bzd::Clock
 {
 public:
 	ClockTick getTicks() noexcept override;
@@ -19,4 +19,4 @@ private:
 	bzd::UInt64Type ticks_{0};
 };
 
-} // namespace bzd::platform::esp32
+} // namespace bzd::platform::esp32::clock

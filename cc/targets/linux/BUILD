@@ -7,12 +7,12 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/generic/executor",
-        "//cc/bzd/platform/generic/stream/stub",
-        "//cc/bzd/platform/linux/core",
-        "//cc/bzd/platform/std/clock/steady",
-        "//cc/bzd/platform/std/clock/system",
-        "//cc/bzd/platform/std/stream/out",
+        "//cc/components/generic/executor",
+        "//cc/components/generic/stream/stub",
+        "//cc/components/linux/core",
+        "//cc/components/std/clock/steady",
+        "//cc/components/std/clock/system",
+        "//cc/components/std/stream/out",
     ],
 )
 
@@ -23,21 +23,21 @@ cc_library(
         "//tools/bazel_build/config:binary": ["main.cc"],
     }),
     visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
+        "//cc/targets:__pkg__",
     ],
     deps = [
         ":composition",
-        "//cc/bzd/platform/generic/panic/throw",
-        "//cc/bzd/platform/posix/stack_trace",
-        "//cc/bzd/platform/std/atomic",
+        "//cc/components/generic/panic/throw",
+        "//cc/components/posix/stack_trace",
+        "//cc/components/std/atomic",
         "//tools/cc_test",
     ],
 )
 
 alias(
     name = "atomic",
-    actual = "//cc/bzd/platform/std/atomic",
+    actual = "//cc/components/std/atomic",
     visibility = [
-        "//cc/bzd/platform/backend:__pkg__",
+        "//cc/targets:__pkg__",
     ],
 )
