@@ -51,6 +51,8 @@ class TestRun(unittest.TestCase):
 
 		bdl = Object.fromContent(content="""
 			component Hello {
+			interface:
+				method init();
 			composition:
 				this.init();
 			}

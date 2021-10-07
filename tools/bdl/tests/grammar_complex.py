@@ -184,7 +184,7 @@ interface MyFy
 			'e': 145
 			}
 			},
-			'nested': [{
+			'interface': [{
 			'@': {
 			'comment': {
 			'v': 'Send a message',

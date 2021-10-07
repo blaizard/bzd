@@ -2,6 +2,11 @@
 namespace bzd.platform.esp32.clock;
 
 component Xthal {
+interface:
+	method exec();
+	
+composition:
+	this.exec();
 	
 }
 

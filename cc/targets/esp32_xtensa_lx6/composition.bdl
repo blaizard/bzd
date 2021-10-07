@@ -5,6 +5,7 @@ use "cc/components/generic/clock/null/interface.bdl"
 
 
 composition {
+	executor = bzd.platform.generic.Executor();
 	out = bzd.platform.std.Out();
 	in = bzd.platform.generic.stream.Stub();
 	steadyClock = bzd.platform.esp32.clock.Xthal();

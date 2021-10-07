@@ -44,6 +44,9 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 	class InheritanceStart(FragmentNestedStart):
 		nestedName = "inheritance"
 
+	class NestedInterface(FragmentNestedStart):
+		nestedName = "interface"
+
 	def makeNestedCategory(name: str) -> GrammarItem:
 
 		class CategoryFragmentStart(FragmentNestedStart):
@@ -58,9 +61,10 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 		GrammarItem(r"(?={)", FragmentParentElement)])
 		]),
 		GrammarItem(
-		r"{", FragmentNestedStart, nestedGrammar + [
+		r"{", NestedInterface, nestedGrammar + [
 		makeNestedCategory("config"),
 		makeNestedCategory("composition"),
+		makeNestedCategory("interface"),
 		GrammarItem(r"}", FragmentNestedStopNewElement),
 		], "nested"),
 	] + makeGrammarContracts()

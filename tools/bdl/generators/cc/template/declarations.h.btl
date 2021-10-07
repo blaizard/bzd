@@ -88,8 +88,8 @@
 {%- macro declareStruct(element) %}
 {{ element.comment | commentBlockToStr }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
-	{{ declareTrivialTypes(element.nested.sequence) }}
-	{% for element in element.nested.expressionList %}
+	{{ declareTrivialTypes(element.interface.sequence) }}
+	{% for element in element.interface.expressionList %}
 	{{ declareExpression(element, "", "") }};
 	{% end %}
 };

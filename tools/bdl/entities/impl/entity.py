@@ -130,8 +130,8 @@ class Entity:
 		return set()
 
 	@property
-	def isNested(self) -> bool:
-		return self.element.isNestedSequence("nested")
+	def isInterface(self) -> bool:
+		return self.element.isNestedSequence("interface")
 
 	@property
 	def isConfig(self) -> bool:
@@ -146,8 +146,8 @@ class Entity:
 		return self.element.isNestedSequence("composition")
 
 	@property
-	def nested(self) -> EntitySequence:
-		return self._getNestedByCategory("nested")
+	def interface(self) -> EntitySequence:
+		return self._getNestedByCategory("interface")
 
 	@property
 	def config(self) -> EntitySequence:

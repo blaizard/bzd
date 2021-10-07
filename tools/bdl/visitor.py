@@ -14,10 +14,10 @@ T = typing.TypeVar("T")
 
 CATEGORY_COMPOSITION = "composition"
 CATEGORY_CONFIG = "config"
-CATEGORY_NESTED = "nested"
+CATEGORY_INTERFACE = "interface"
 CATEGORY_GLOBAL = "global"
 CATEGORY_GLOBAL_COMPOSITION = "globalComposition"
-CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL, CATEGORY_GLOBAL_COMPOSITION]
+CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_INTERFACE, CATEGORY_GLOBAL, CATEGORY_GLOBAL_COMPOSITION]
 
 
 class Parent:
@@ -83,8 +83,6 @@ class Visitor(VisitorBase[T, T]):
 
 		# Handle nested object
 		if isinstance(entity, Nested):
-
-			Error.assertHasSequence(element=element, sequence=CATEGORY_NESTED)
 
 			self.level += 1
 

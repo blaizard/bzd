@@ -7,7 +7,7 @@ namespace bzd::platform::esp32::clock {
 
 ClockTick Xthal::getTicks() noexcept
 {
-	exec();
+	exec().sync();
 	return static_cast<ClockTick>(ticks_);
 }
 
@@ -21,7 +21,7 @@ bzd::units::Millisecond Xthal::ticksToMs(const ClockTick& ticks) noexcept
 	return static_cast<bzd::units::Millisecond>(ticks.get() / (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
 }
 
-void Xthal::exec() noexcept
+bzd::Async<void> Xthal::exec() noexcept
 {
 	const bzd::UInt32Type counter = XTHAL_GET_CCOUNT();
 	const bzd::UInt32Type previous_counter = ticks_ & 0xffffffff;
@@ -32,6 +32,7 @@ void Xthal::exec() noexcept
 		++previous_wrapper;
 	}
 	ticks_ = (static_cast<bzd::UInt64Type>(previous_wrapper) << 32) + counter;
+	co_return;
 }
 
 } // namespace bzd::platform::esp32::clock

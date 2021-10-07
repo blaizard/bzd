@@ -23,5 +23,6 @@ cc_library(
     deps = [
         ":bdl",
         "//cc/bzd/core:clock",
+        "//cc/bzd/core/async",
     ],
 )
