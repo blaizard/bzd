@@ -41,17 +41,17 @@ namespace {{ namespace | namespaceToStr }} {
 {{ data.comment | commentBlockToStr }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
 public: // Types
-	{{ declareTrivialTypes(data.nested.sequence) }}
+	{{ declareTrivialTypes(data.interface.sequence) }}
 
 public: // Methods
-	{% for method in data.nested.methodList %}
+	{% for method in data.interface.methodList %}
 		{% if method.virtual %}
 	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }}) = 0;
 		{% end %}
 	{% end %}
 
 public: // Variable accessors.
-	{% for var in data.nested.expressionList %}
+	{% for var in data.interface.expressionList %}
 
 	/**
 	 * Getter for the variable '{{ var.name }}'.
@@ -77,7 +77,7 @@ public: // Variable accessors.
 
 protected: // Protected variable accessors.
 
-	{% for var in data.nested.expressionList %}
+	{% for var in data.interface.expressionList %}
 		{% if var.const %}
 	/**
 	 * Setter for the constant variable '{{ var.name }}'.
@@ -92,7 +92,7 @@ protected: // Protected variable accessors.
 	{% end %}
 
 private: // Variables.
-	{% for var in data.nested.expressionList %}
+	{% for var in data.interface.expressionList %}
 	{{ declareExpression(var, "_", "nonConst") }};
 	{% end %}
 };

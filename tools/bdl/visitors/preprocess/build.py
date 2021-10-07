@@ -2,7 +2,7 @@ import typing
 
 from bzd.parser.element import Element, Sequence, ElementBuilder
 
-from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION, CATEGORY_CONFIG, CATEGORY_NESTED, CATEGORY_GLOBAL
+from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION, CATEGORY_CONFIG, CATEGORY_INTERFACE, CATEGORY_GLOBAL
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, EntityType, Namespace
 from tools.bdl.entities.builder import NamespaceBuilder
 from tools.bdl.visitors.symbol_map import SymbolMap

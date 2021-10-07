@@ -2,6 +2,7 @@
 namespace bzd.platform.std.clock;
 
 component Steady {
+interface:
 	
 }
 

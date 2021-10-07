@@ -8,6 +8,7 @@ namespace bzd.platform.generic;
  * and simply execute them.
  */
 component Executor : bzd.platform.Executor {
+interface:
 	
 config:
 	// The cores to be used by this executor.

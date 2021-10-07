@@ -23,7 +23,12 @@
 {%- macro declareNested(data) %}
 {{ data.comment | normalComment }}{{ data.type }}{% if data.isName %} {{ data.name }}{% end %}{{ declareContract(data.contracts) }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
 {%- end %} {
-	{{ declareSymbols(data.nested.sequence) }}
+	{% if data.isInterface %}
+		{% if data.type == "component" %}
+interface:
+		{% end %}
+	{{ declareSymbols(data.interface.sequence) }}
+	{% end %}
 	{% if data.isConfigRaw %}
 config:
 	{{ declareSymbols(data.configRaw.sequence) }}

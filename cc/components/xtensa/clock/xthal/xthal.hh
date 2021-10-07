@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/clock.hh"
 
 namespace bzd::platform::esp32::clock {
@@ -13,7 +14,7 @@ public:
 
 	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
 
-	void exec() noexcept;
+	bzd::Async<void> exec() noexcept;
 
 private:
 	bzd::UInt64Type ticks_{0};

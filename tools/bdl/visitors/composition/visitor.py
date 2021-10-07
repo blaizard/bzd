@@ -16,7 +16,7 @@ from tools.bdl.entities.builder import MethodBuilder, NestedBuilder
 # Add builtins
 MethodComponentInit = Method(MethodBuilder(name="init").get())
 NestedComponent = Nested(
-	NestedBuilder(kind=TYPE_INTERFACE).pushBackElementToNestedSequence("nested", MethodComponentInit.element).get())
+	NestedBuilder(kind=TYPE_INTERFACE).pushBackElementToNestedSequence("interface", MethodComponentInit.element).get())
 
 
 class Composition:
@@ -28,10 +28,6 @@ class Composition:
 		self.registryFQNs: typing.Set[str] = set()
 		self.compositions: typing.Dict[str, typing.List[Expression]] = {"init": [], "compose": []}
 		self.executors: typing.Set[str] = set()
-
-		# Add builtins
-		self.symbols.insertBuiltin(name="Component", entity=NestedComponent)
-		self.symbols.insertBuiltin(name="Component.init", entity=MethodComponentInit)
 
 	def visit(self, bdl: Object) -> "Composition":
 

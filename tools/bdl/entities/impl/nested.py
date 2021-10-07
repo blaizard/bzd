@@ -26,7 +26,7 @@ class Nested(Entity):
 	- Sequences:
 		- [inheritance]: In case the the struct have one or multiple base class.
 		- [config]
-		- [nested]
+		- [interface]
 		- [composition]
 	"""
 
@@ -39,7 +39,7 @@ class Nested(Entity):
 	@property
 	def configAttr(self) -> str:
 		# TODO: handle inheritance for "struct"
-		return "nested" if self.type == "struct" else "config"
+		return "interface" if self.type == "struct" else "config"
 
 	@property
 	def category(self) -> str:
@@ -93,10 +93,6 @@ class Nested(Entity):
 			else:
 				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
 
-		# Add implicit parent for components
-		if self.type == TYPE_COMPONENT:
-			self.addParents(fqn="Component", parents=[])
-
 	def __repr__(self) -> str:
 		content = self.toString({
 			"name": self.name if self.isName else "",
@@ -104,7 +100,7 @@ class Nested(Entity):
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
 
-		for category in ["config", "nested", "composition"]:
+		for category in ["config", "interface", "composition"]:
 			nested = self._getNestedByCategory(category)
 			if nested:
 				content += "\n{}:".format(category)

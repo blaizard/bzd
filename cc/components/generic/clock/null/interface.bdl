@@ -2,6 +2,7 @@
 namespace bzd.platform.generic.clock;
 
 component Null {
+interface:
 	
 }
 

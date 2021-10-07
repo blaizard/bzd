@@ -7,6 +7,7 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
+        "//cc/components/generic/executor",
         "//cc/components/generic/clock/null",
         "//cc/components/generic/stream/stub",
         "//cc/components/std/stream/out",
