@@ -7,75 +7,75 @@ describe("Validation", () => {
 	describe("min", () => {
 		it("mandatory min", () => {
 			const validator = new Validation({
-				test: "mandatory min(5)",
+				test: "mandatory min(5)"
 			});
 			validator.validate({
-				test: "Hello",
+				test: "Hello"
 			});
 			Exception.assertThrows(() => {
 				validator.validate({
-					test: "Me",
+					test: "Me"
 				});
 			});
 			Exception.assertThrows(() => {
 				validator.validate({
-					hello: "Me",
+					hello: "Me"
 				});
 			});
 		});
 		it("integer min", () => {
 			const validator = new Validation({
-				test: "type(integer) min(5)",
+				test: "type(integer) min(5)"
 			});
 			validator.validate({
-				test: 6,
+				test: 6
 			});
 			Exception.assertThrows(() => {
 				validator.validate({
-					test: "Me",
+					test: "Me"
 				});
 			});
 		});
 		it("float min", () => {
 			const validator = new Validation({
-				test: "type(float) min(-5.78)",
+				test: "type(float) min(-5.78)"
 			});
 			validator.validate({
-				test: -5.77,
+				test: -5.77
 			});
 			Exception.assertThrows(() => {
 				validator.validate({
-					test: -5.79,
+					test: -5.79
 				});
 			});
 		});
 		it("wrong number of arguments", () => {
 			Exception.assertThrows(() => {
 				new Validation({
-					test: "type",
+					test: "type"
 				});
 			});
 			Exception.assertThrows(() => {
 				new Validation({
-					test: "type()",
+					test: "type()"
 				});
 			});
 			Exception.assertThrows(() => {
 				new Validation({
-					test: "type(float,integer)",
+					test: "type(float,integer)"
 				});
 			});
 		});
 		it("values", () => {
 			const validator = new Validation({
-				test: "values(hello,world)",
+				test: "values(hello,world)"
 			});
 			validator.validate({
-				test: "world",
+				test: "world"
 			});
 			Exception.assertThrows(() => {
 				validator.validate({
-					test: "me",
+					test: "me"
 				});
 			});
 		});

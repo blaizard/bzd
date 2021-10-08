@@ -6,7 +6,7 @@ namespace bzd.platform.linux;
 component Core : bzd.platform.Core {
 interface:
 	method init();
-
+	
 config:
 	/*
 	 * Stack size for the current core.

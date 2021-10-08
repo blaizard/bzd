@@ -40,9 +40,9 @@
 		mixins: [Element],
 		components: {
 			// Load asynchronously the form to avoid any circular dependencies
-			Form: () => import("../form.vue"),
+			Form: () => import("../form.vue")
 		},
-		data: function () {
+		data: function() {
 			return {
 				/**
 				 * Sort the table by the columns name
@@ -55,7 +55,7 @@
 				/**
 				 * Return whether or not a row should be disabled
 				 */
-				rowDisable: this.getOption("rowDisable", (/*value*/) => false),
+				rowDisable: this.getOption("rowDisable", (/*value*/) => false)
 				/**
 				 * The columns to be displayed
 				 */
@@ -63,13 +63,13 @@
 			};
 		},
 		props: {
-			value: { type: Array, required: false, default: () => [] },
+			value: { type: Array, required: false, default: () => [] }
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-table": true,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
 			},
 			valueType() {
@@ -96,7 +96,7 @@
 				return this.get().map((value, index) => ({
 					index: index,
 					value: value,
-					disable: this.rowDisable(value) || this.disable,
+					disable: this.rowDisable(value) || this.disable
 				}));
 			},
 			sortingList() {
@@ -133,7 +133,7 @@
 									return compare ? result : -result;
 								},
 						key: key,
-						order: typeof compare === "function" ? "unknown" : compare ? "descending" : "ascending",
+						order: typeof compare === "function" ? "unknown" : compare ? "descending" : "ascending"
 					};
 				});
 			},
@@ -159,7 +159,7 @@
 			},
 			itemTemplate() {
 				return TableItem;
-			},
+			}
 		},
 		methods: {
 			isConditionSatisfied(description) {
@@ -174,7 +174,7 @@
 					"irform-table-header": true,
 					"irform-table-header-order-unknown": sort && sort.order == "unknown",
 					"irform-table-header-order-ascending": sort && sort.order == "ascending",
-					"irform-table-header-order-descending": sort && sort.order == "descending",
+					"irform-table-header-order-descending": sort && sort.order == "descending"
 				};
 			},
 			handleHeaderClick(description) {
@@ -188,8 +188,8 @@
 				let valueList = this.get().slice(0);
 				valueList[index] = value;
 				this.set(valueList);
-			},
-		},
+			}
+		}
 	};
 </script>
 

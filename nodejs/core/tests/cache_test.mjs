@@ -7,7 +7,7 @@ describe("Cache", () => {
 	describe("Simple", () => {
 		it("Base", async () => {
 			let cache = new Cache({
-				garbageCollector: false,
+				garbageCollector: false
 			});
 			let argRead = 0;
 			cache.register("test", (arg) => {
@@ -41,7 +41,7 @@ describe("Cache", () => {
 	it("Stress", async () => {
 		let cache = new Cache({
 			garbageCollector: false,
-			timeoutMs: 20 * 1000,
+			timeoutMs: 20 * 1000
 		});
 
 		let sum = 0;
@@ -56,7 +56,7 @@ describe("Cache", () => {
 				});
 			},
 			{
-				timeout: 10,
+				timeout: 10
 			}
 		);
 

@@ -22,5 +22,5 @@ export default {
 	},
 	toJson(namespace) {
 		return manager.toJson(namespace);
-	},
+	}
 };

@@ -1,10 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_test", original_cc_library = "cc_library")
+load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "find_cc_toolchain")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_link", "find_cc_toolchain")
 
 def _transition_impl(settings, attr):
     return {
@@ -74,23 +74,23 @@ def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwar
         **kwargs
     )
 
-def _cc_linker(ctx, cc_info_providers, map_analyzer):
+def _cc_linker(ctx, cc_info, map_analyzer):
     """
     Link cc providers and generate metadata from the linker map.
 
     Args:
         ctx: Rule context.
-        cc_info_providers: CcInfo providers.
+        cc_info: CcInfo providers.
         map_analyzer: Map analyzer metadata generator.
 
     Returns:
         A tuple containing the binary file and the metadatas.
     """
 
-    # Build the list of libraries and linker flags from the cc_info_providers
+    # Build the list of libraries and linker flags from the cc_info
     library_files = sets.make()
     linker_flags = sets.make()
-    for li in cc_info_providers.linking_context.linker_inputs.to_list():
+    for li in cc_info.linking_context.linker_inputs.to_list():
         for flag in li.user_link_flags:
             sets.insert(linker_flags, flag)
         for library_to_link in li.libraries:
@@ -215,11 +215,10 @@ def _cc_binary(ctx, binary_file):
     return default_info, []
 
 def _bzd_cc_generic_impl(ctx):
-    # Gather all CC providers from all dependencies
-    cc_info_providers = cc_compile(ctx = ctx, srcs = ctx.files.srcs, deps = ctx.attr.deps)
-
     # Link the CcInfo providers and generate metadata.
-    binary_file, link_metadata_files = _cc_linker(ctx, cc_info_providers, ctx.attr._map_analyzer_script)
+    #binary_file, link_metadata_files = _cc_linker(ctx = ctx, cc_info = cc_info, map_analyzer = ctx.attr._map_analyzer_script)
+
+    binary_file = cc_link(ctx = ctx, srcs = ctx.files.srcs, deps = ctx.attr.deps)
 
     # Strip the binary.
     """
@@ -237,7 +236,7 @@ def _bzd_cc_generic_impl(ctx):
     default_info, binary_metadata_files = _cc_binary(ctx, binary_file)
 
     # Manifests to be exported.
-    manifests = ctx.files._default_metadata_files + link_metadata_files + binary_metadata_files
+    manifests = ctx.files._default_metadata_files + binary_metadata_files
 
     return [
         default_info,
@@ -331,9 +330,7 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
         tags = tags + ["cc"],
         deps = deps + ["//cc/bzd/platform"],
     )
-
-    # TODO switch to bzd_cc_test
-    cc_test(
+    _bzd_cc_test(
         name = name,
         tags = tags + ["cc"],
         srcs = srcs,
