@@ -51,13 +51,13 @@ program
 	if (program.opts().test) {
 		await keyValueStore.set("volume", "disk", {
 			type: "fs",
-			"fs.root": "/",
+			"fs.root": "/"
 		});
 
 		await keyValueStore.set("volume", "docker.blaizard.com", {
 			type: "docker",
 			"docker.type": "v2",
-			"docker.url": "https://docker.blaizard.com",
+			"docker.url": "https://docker.blaizard.com"
 		});
 
 		await keyValueStore.set("volume", "docker.gcr", {
@@ -68,7 +68,7 @@ program
 			"docker.url": "https://docker.blaizard.com",
 			"docker.proxy": true,
 			"docker.proxy.url": "http://127.0.0.1:5050",
-			"docker.proxy.port": 5051,
+			"docker.proxy.port": 5051
 		});
 	}
 	// Set the cache
@@ -92,9 +92,9 @@ program
 			return {
 				async getVolume() {
 					return await cache.get("volume", volume);
-				},
+				}
 			};
-		},
+		}
 	});
 
 	// Register all plugns
@@ -117,7 +117,7 @@ program
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web,
+		channel: web
 	});
 
 	function getInternalPath(pathList) {
@@ -138,7 +138,7 @@ program
 		// Delete all keys that do not start with <inputs.config.type>.
 		Exception.assert("type" in inputs.config, "Configuration type is missing.");
 		let params = {
-			type: inputs.config.type,
+			type: inputs.config.type
 		};
 		for (const name in inputs.config) {
 			if (name.startsWith(params.type + ".")) {
@@ -179,16 +179,16 @@ program
 					{
 						name: item[0],
 						type: "bucket",
-						plugin: item[1].type,
+						plugin: item[1].type
 					},
 					{
-						list: true,
+						list: true
 					}
 				);
 			});
 			return {
 				data: result.data(),
-				next: volumes.getNextPaging(),
+				next: volumes.getNextPaging()
 			};
 		}
 
@@ -197,7 +197,7 @@ program
 
 		return {
 			data: result.data(),
-			next: result.getNextPaging(),
+			next: result.getNextPaging()
 		};
 	});
 

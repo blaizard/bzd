@@ -18,7 +18,7 @@ export default class StorageDockerV2 extends Storage {
 
 		this.options = Object.assign(
 			{
-				authentication: null,
+				authentication: null
 			},
 			options
 		);
@@ -46,14 +46,14 @@ export default class StorageDockerV2 extends Storage {
 				options = {
 					authentication: {
 						type: "bearer",
-						token: await this.cache.get("token", scope),
-					},
+						token: await this.cache.get("token", scope)
+					}
 				};
 			}
 
 			return Object.assign(
 				{
-					expect: "json",
+					expect: "json"
 				},
 				options
 			);
@@ -65,15 +65,15 @@ export default class StorageDockerV2 extends Storage {
 	static async makeFromGcr(keyContent, service = "gcr.io") {
 		Exception.assert(typeof keyContent == "string", "keyContent must be a string: {:j}", keyContent);
 		return await StorageDockerV2.make("https://" + service, {
-			authentication: async function (scope) {
+			authentication: async function(scope) {
 				return await this.authenticationScope(service, scope, {
 					authentication: {
 						type: "basic",
 						username: "_json_key",
-						password: keyContent,
-					},
+						password: keyContent
+					}
 				});
-			},
+			}
 		});
 	}
 
@@ -84,8 +84,8 @@ export default class StorageDockerV2 extends Storage {
 				{
 					query: {
 						service: service,
-						scope: scope,
-					},
+						scope: scope
+					}
 				},
 				fetchOptions
 			)
@@ -95,7 +95,7 @@ export default class StorageDockerV2 extends Storage {
 	async _initialize() {
 		await this.fetch.request("/v2/", {
 			args: "registry:catalog:*",
-			method: "get",
+			method: "get"
 		});
 	}
 
@@ -106,9 +106,9 @@ export default class StorageDockerV2 extends Storage {
 			method: "get",
 			query: {
 				n: paging.max,
-				last: paging.page === 0 ? undefined : paging.page,
+				last: paging.page === 0 ? undefined : paging.page
 			},
-			includeAll: true,
+			includeAll: true
 		});
 		const data = callback(result);
 		return new CollectionPaging(data, "link" in headers ? { page: data[data.length - 1].name, max: paging.max } : null);
@@ -120,10 +120,10 @@ export default class StorageDockerV2 extends Storage {
 				Permissions.makeEntry(
 					{
 						name: item,
-						type: "directory",
+						type: "directory"
 					},
 					{
-						list: true,
+						list: true
 					}
 				)
 			);
@@ -140,10 +140,10 @@ export default class StorageDockerV2 extends Storage {
 					Permissions.makeEntry(
 						{
 							name: item,
-							type: "directory",
+							type: "directory"
 						},
 						{
-							list: true,
+							list: true
 						}
 					)
 				);
@@ -155,9 +155,9 @@ export default class StorageDockerV2 extends Storage {
 		const [result, headers] = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
 			args: "repository:" + imageName + ":pull",
 			headers: {
-				Accept: "application/vnd.docker.distribution.manifest.v2+json",
+				Accept: "application/vnd.docker.distribution.manifest.v2+json"
 			},
-			includeAll: true,
+			includeAll: true
 		});
 		let data = result.layers.map((layer) => {
 			return Permissions.makeEntry(
@@ -165,16 +165,16 @@ export default class StorageDockerV2 extends Storage {
 					name: layer.digest.replace(/^.*:/, ""),
 					size: layer.size,
 					type: "layer",
-					digest: layer.digest,
+					digest: layer.digest
 				},
 				{
-					read: true,
+					read: true
 				}
 			);
 		});
 
 		const resultDigest = await this.fetch.get("/v2/" + imageName + "/blobs/" + result.config.digest, {
-			args: "repository:" + imageName + ":pull",
+			args: "repository:" + imageName + ":pull"
 		});
 		data.unshift(
 			Permissions.makeEntry(
@@ -186,10 +186,10 @@ export default class StorageDockerV2 extends Storage {
 					architecture: resultDigest.architecture,
 					os: resultDigest.os,
 					created: resultDigest.created,
-					author: resultDigest.author,
+					author: resultDigest.author
 				},
 				{
-					read: true,
+					read: true
 				}
 			)
 		);
@@ -198,7 +198,7 @@ export default class StorageDockerV2 extends Storage {
 			Permissions.makeEntry({
 				name: ".metadata",
 				type: "metadata",
-				digest: headers["docker-content-digest"],
+				digest: headers["docker-content-digest"]
 			})
 		);
 

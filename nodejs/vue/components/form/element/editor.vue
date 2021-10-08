@@ -26,12 +26,12 @@
 		mixins: [Element],
 		components: {
 			ElementCarousel,
-			ElementTextarea,
+			ElementTextarea
 		},
 		props: {
-			value: { type: String, required: false, default: "" },
+			value: { type: String, required: false, default: "" }
 		},
-		data: function () {
+		data: function() {
 			return {
 				placeholder: this.getOption("placeholder", ""),
 				toolbar: [
@@ -53,43 +53,43 @@
 					"unorderedList",
 					"quote",
 					"separator",
-					"clearFormat",
+					"clearFormat"
 				],
 				history: [],
-				historyMax: 20,
+				historyMax: 20
 			};
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-editor": true,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
 			},
 			toolbarElements() {
 				const supportedElements = {
 					separator: {
-						html: "<div class=\"irform-editor-toolbar-separator\"></div>",
+						html: "<div class=\"irform-editor-toolbar-separator\"></div>"
 					},
 					bold: {
 						html: "<i class=\"bzd-icon-bold\"></i>",
 						type: "button",
-						click: () => this.actionOnSelection("bold"),
+						click: () => this.actionOnSelection("bold")
 					},
 					italic: {
 						html: "<i class=\"bzd-icon-italic\"></i>",
 						type: "button",
-						click: () => this.actionOnSelection("italic"),
+						click: () => this.actionOnSelection("italic")
 					},
 					underline: {
 						html: "<i class=\"bzd-icon-underline\"></i>",
 						type: "button",
-						click: () => this.actionOnSelection("underline"),
+						click: () => this.actionOnSelection("underline")
 					},
 					strike: {
 						html: "<i class=\"bzd-icon-strike_through\"></i>",
 						type: "button",
-						click: () => this.actionOnSelection("strikeThrough"),
+						click: () => this.actionOnSelection("strikeThrough")
 					},
 					undo: {
 						html: "<i class=\"bzd-icon-undo\"></i>",
@@ -98,58 +98,58 @@
 							if (this.history.length) {
 								this.set(this.history.shift());
 							}
-						},
+						}
 					},
 					justifyLeft: {
 						html: "<i class=\"bzd-icon-justify_left\"></i>",
 						type: "button",
-						click: () => this.action("justifyLeft"),
+						click: () => this.action("justifyLeft")
 					},
 					justifyCenter: {
 						html: "<i class=\"bzd-icon-justify_center\"></i>",
 						type: "button",
-						click: () => this.action("justifyCenter"),
+						click: () => this.action("justifyCenter")
 					},
 					justifyRight: {
 						html: "<i class=\"bzd-icon-justify_right\"></i>",
 						type: "button",
-						click: () => this.action("justifyRight"),
+						click: () => this.action("justifyRight")
 					},
 					justify: {
 						html: "<i class=\"bzd-icon-justify\"></i>",
 						type: "button",
-						click: () => this.action("justifyFull"),
+						click: () => this.action("justifyFull")
 					},
 					indent: {
 						html: "<i class=\"bzd-icon-indent\"></i>",
 						type: "button",
-						click: () => this.action("indent"),
+						click: () => this.action("indent")
 					},
 					unindent: {
 						html: "<i class=\"bzd-icon-unindent\"></i>",
 						type: "button",
-						click: () => this.action("outdent"),
+						click: () => this.action("outdent")
 					},
 					orderedList: {
 						html: "<i class=\"bzd-icon-ordered_list\"></i>",
 						type: "button",
-						click: () => this.action("insertOrderedList"),
+						click: () => this.action("insertOrderedList")
 					},
 					unorderedList: {
 						html: "<i class=\"bzd-icon-unordered_list\"></i>",
 						type: "button",
-						click: () => this.action("insertUnorderedList"),
+						click: () => this.action("insertUnorderedList")
 					},
 					quote: {
 						html: "<i class=\"bzd-icon-quote\"></i>",
 						type: "button",
-						click: () => this.action("formatBlock", "blockquote"),
+						click: () => this.action("formatBlock", "blockquote")
 					},
 					clearFormat: {
 						html: "<i class=\"bzd-icon-clear_format\"></i>",
 						type: "button",
-						click: () => this.actionRemoveFormat(),
-					},
+						click: () => this.actionRemoveFormat()
+					}
 				};
 
 				return this.toolbar.map((element) => supportedElements[element]);
@@ -163,7 +163,7 @@
 					},
 					controls: "none",
 					alignSelection: false,
-					list: this.toolbarElements.map((element) => this.generateToolbarElement(element)),
+					list: this.toolbarElements.map((element) => this.generateToolbarElement(element))
 				};
 			},
 			contentDescription() {
@@ -171,7 +171,7 @@
 			},
 			contentElement() {
 				return this.$refs.content.$el;
-			},
+			}
 		},
 		methods: {
 			generateToolbarElement(element) {
@@ -227,8 +227,8 @@
 				this.pushToHistory(this.get());
 				// Save the value
 				this.set(value);
-			},
-		},
+			}
+		}
 	};
 </script>
 

@@ -21,15 +21,15 @@ function getFetchOptions(username, token) {
 		expect: "json",
 		headers: {
 			"Content-Type": "application/vnd.github.v3+json",
-			"User-Agent": "curl",
-		},
+			"User-Agent": "curl"
+		}
 	};
 
 	if (token) {
 		options.authentication = {
 			type: "basic",
 			username: username,
-			password: token,
+			password: token
 		};
 	}
 
@@ -40,7 +40,7 @@ export default {
 	cache: [
 		{
 			collection: "github.builds",
-			fetch: async function (username, repository, workflowId, token) {
+			fetch: async function(username, repository, workflowId, token) {
 				// Build the URL
 				const baseUrl =
 					"https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
@@ -65,7 +65,7 @@ export default {
 				await Promise.all(promises);
 				return builds;
 			},
-			timeout: 60 * 1000,
+			timeout: 60 * 1000
 		},
 		{
 			collection: "github.jobs",
@@ -108,10 +108,10 @@ export default {
 					duration: dateEnd - dateStart || 0,
 					timestamp: dateStart || Date.now(),
 					status: status,
-					link: link,
+					link: link
 				};
-			},
-		},
+			}
+		}
 	],
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
@@ -122,7 +122,7 @@ export default {
 			data["github.token"]
 		);
 		return {
-			builds: builds,
+			builds: builds
 		};
-	},
+	}
 };

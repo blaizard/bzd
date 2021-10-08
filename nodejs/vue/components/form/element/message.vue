@@ -11,9 +11,9 @@
 			containerClass() {
 				return {
 					"irform-message": true,
-					[this.getOption("class")]: true,
+					[this.getOption("class")]: true
 				};
-			},
-		},
+			}
+		}
 	};
 </script>

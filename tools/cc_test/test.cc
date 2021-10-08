@@ -9,8 +9,12 @@
 
 // Empty namespace to hold all the registered tests
 namespace {
-static ::std::map<const char*, ::std::map<const char*, bzd::test::Manager::TestInfo>> tests_;
+[[nodiscard]] auto& getTestsSingleton()
+{
+	static ::std::map<const char*, ::std::map<const char*, bzd::test::Manager::TestInfo>> tests;
+	return tests;
 }
+} // namespace
 
 namespace bzd::test::impl {
 bool strcmp(const char* str1, const char* str2)
@@ -49,20 +53,21 @@ void Manager::failInternals(const char* const file, const int line, const char* 
 
 bool Manager::registerTest(Manager::TestInfo&& info)
 {
+	auto& tests = getTestsSingleton();
 	{
-		auto it = tests_.find(info.testCaseName_);
-		if (it == tests_.end())
+		auto it = tests.find(info.testCaseName_);
+		if (it == tests.end())
 		{
-			tests_.emplace(info.testCaseName_, std::map<const char*, bzd::test::Manager::TestInfo>{});
+			tests.emplace(info.testCaseName_, std::map<const char*, bzd::test::Manager::TestInfo>{});
 		}
 	}
 	{
-		auto it = tests_[info.testCaseName_].find(info.testName_);
-		if (it != tests_[info.testCaseName_].end())
+		auto it = tests[info.testCaseName_].find(info.testName_);
+		if (it != tests[info.testCaseName_].end())
 		{
 			throw 42;
 		}
-		tests_[info.testCaseName_].emplace(info.testName_, std::move(info));
+		tests[info.testCaseName_].emplace(info.testName_, std::move(info));
 	}
 	return true;
 }
@@ -70,10 +75,11 @@ bool Manager::registerTest(Manager::TestInfo&& info)
 bool bzd::test::Manager::run()
 {
 	::std::vector<const TestInfo*> failedTests;
+	auto& tests = getTestsSingleton();
 
-	::std::cout << "[==========] Running test(s) from " << std::dec << tests_.size() << " test case(s)" << ::std::endl;
+	::std::cout << "[==========] Running test(s) from " << std::dec << tests.size() << " test case(s)" << ::std::endl;
 
-	for (const auto& it1 : tests_)
+	for (const auto& it1 : tests)
 	{
 		const auto testCaseName = it1.first;
 		const auto nbTests = it1.second.size();

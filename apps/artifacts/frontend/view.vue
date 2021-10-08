@@ -24,15 +24,15 @@
 	export default {
 		mixins: [Component],
 		props: {
-			path: { mandatory: true, type: String },
+			path: { mandatory: true, type: String }
 		},
 		directives: {
-			loading: DirectiveLoading,
+			loading: DirectiveLoading
 		},
-		data: function () {
+		data: function() {
 			return {
 				volumes: [],
-				itemList: [],
+				itemList: []
 			};
 		},
 		mounted() {
@@ -58,7 +58,7 @@
 				if (this.plugin !== null) {
 					return this.plugin.view;
 				}
-			},
+			}
 		},
 		methods: {
 			async fetchConfig() {
@@ -74,8 +74,8 @@
 						.map((segment) => encodeURIComponent(segment))
 						.join("/")
 				);
-			},
-		},
+			}
+		}
 	};
 </script>
 

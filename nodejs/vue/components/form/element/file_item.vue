@@ -39,12 +39,12 @@
 		props: {
 			value: { type: Object | String, required: true, default: () => ({}) },
 			disable: { type: Boolean, required: false, default: false },
-			config: { type: Object, required: true, default: () => ({}) },
+			config: { type: Object, required: true, default: () => ({}) }
 		},
 		directives: {
-			touch: Touch,
+			touch: Touch
 		},
-		data: function () {
+		data: function() {
 			return {
 				allowDelete: true,
 				error: null,
@@ -60,12 +60,12 @@
 					x: 0,
 					y: 0,
 					width: 0,
-					height: 0,
+					height: 0
 				},
 				current: {
 					x: 0,
-					y: 0,
-				},
+					y: 0
+				}
 			};
 		},
 		updated() {
@@ -81,7 +81,7 @@
 					"irform-file-file": this.isFile,
 					"irform-file-upload": this.isUpload,
 					"irform-error": this.isError,
-					[this.templateClass]: true,
+					[this.templateClass]: true
 				};
 			},
 			touchDirective() {
@@ -98,7 +98,7 @@
 						this.current.x = 0;
 						this.current.y = 0;
 						this.updateValue();
-					},
+					}
 				};
 			},
 			styleImage() {
@@ -157,7 +157,7 @@
 			fileName() {
 				const path = this.isAvailable ? this.path : this.value.item.fileName;
 				return path.split("/").pop();
-			},
+			}
 		},
 		watch: {
 			isImage: {
@@ -166,15 +166,15 @@
 				 * (is already set to true at the begining)
 				 */
 				immediate: true,
-				handler: function () {
+				handler: function() {
 					if (this.isImage) {
 						this.imagePreload(this.imageUrl);
 					}
-				},
+				}
 			},
 			value: {
 				immediate: true,
-				handler: async function () {
+				handler: async function() {
 					this.imageUrl = null;
 					if (this.isAvailable) {
 						if (typeof this.config.imageToUrl === "function") {
@@ -184,8 +184,8 @@
 							this.imageUrl = this.config.imageToUrl;
 						}
 					}
-				},
-			},
+				}
+			}
 		},
 		methods: {
 			handleZoomIn() {
@@ -234,13 +234,13 @@
 			updateValue() {
 				const value = Object.assign(
 					{
-						path: this.path,
+						path: this.path
 					},
 					this.imageEdit
 				);
 				this.$emit("input", value);
-			},
-		},
+			}
+		}
 	};
 </script>
 
