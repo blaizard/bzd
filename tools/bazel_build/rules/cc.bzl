@@ -6,19 +6,6 @@ load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_link", "find_cc_toolchain")
 
-def _transition_impl(settings, attr):
-    return {
-        "//tools/bazel_build/config:is_test": attr._is_test,
-    }
-
-_transition = transition(
-    implementation = _transition_impl,
-    inputs = [],
-    outputs = [
-        "//tools/bazel_build/config:is_test",
-    ],
-)
-
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
     """
     Execute an action from the current C++ toolchain.
@@ -276,9 +263,6 @@ def _bzd_cc_generic(is_test):
                 default = is_test,
             ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
-            "_allowlist_function_transition": attr.label(
-                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-            ),
         },
         executable = True,
         test = is_test,
@@ -287,7 +271,6 @@ def _bzd_cc_generic(is_test):
             "//tools/bazel_build/toolchains/binary:toolchain_type",
         ],
         fragments = ["cpp"],
-        cfg = _transition,
     )
 
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
