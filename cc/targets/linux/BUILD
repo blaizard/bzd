@@ -18,10 +18,7 @@ bdl_library(
 
 cc_library(
     name = "linux",
-    srcs = select({
-        "//tools/bazel_build/config:test": ["test.cc"],
-        "//tools/bazel_build/config:binary": ["main.cc"],
-    }),
+    srcs = ["main.cc"],
     visibility = [
         "//cc/targets:__pkg__",
     ],

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/core/async.hh"
+
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 
@@ -296,5 +298,7 @@ private:
 	Manager() = default;
 	bool currentTestFailed_ = false;
 };
+
+bzd::Async<bool> run();
 
 } // namespace bzd::test

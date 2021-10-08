@@ -118,4 +118,13 @@ bool bzd::test::Manager::run()
 	return (failedTests.empty()) ? true : false;
 }
 
+bzd::Async<bool> run()
+{
+	if (::bzd::test::Manager::getInstance().run())
+	{
+		co_return true;
+	}
+	co_return ::bzd::makeError();
+}
+
 } // namespace bzd::test

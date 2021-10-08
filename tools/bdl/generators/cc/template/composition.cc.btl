@@ -43,7 +43,7 @@ bzd::Clock* systemClock{nullptr};
 /**
  * Initialize and compose the application.
  */
-void execute() noexcept
+bool execute() noexcept
 {
 	// Create registry.
 	[[maybe_unused]] auto registry = makeRegistry();
@@ -86,6 +86,13 @@ void execute() noexcept
 	{% end %}
 
 	bzd::log::info(CSTR("Completion.")).sync();
+
+	bool isSuccess{true};
+	{% for index, expresssion in compositions.compose %}
+	isSuccess &= promise{{ index }}.getResult()->hasValue();
+	{% end %}
+
+	return isSuccess;
 }
 
 /*
