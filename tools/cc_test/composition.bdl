@@ -1,0 +1,10 @@
+
+namespace bzd.test;
+
+method run();
+composition {
+	run();
+	
+}
+
+

@@ -1,6 +1,6 @@
 int main()
 {
-	extern void execute() noexcept;
+	extern bool execute() noexcept;
 	execute();
 
 	return 0;

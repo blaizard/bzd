@@ -1,8 +1,9 @@
 int main()
 {
-	extern void execute() noexcept;
-
-	execute();
-
-	return 0;
+	extern bool execute() noexcept;
+	if (execute())
+	{
+		return 0;
+	}
+	return 1;
 }

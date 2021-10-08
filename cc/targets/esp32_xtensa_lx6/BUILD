@@ -17,10 +17,7 @@ bdl_library(
 
 cc_library(
     name = "esp32_xtensa_lx6",
-    srcs = select({
-        "//tools/bazel_build/config:test": [],
-        "//tools/bazel_build/config:binary": ["main.cc"],
-    }),
+    srcs = ["main.cc"],
     target_compatible_with = [
         "@esp32_xtensa_lx6_gcc//:compiler",
     ],
