@@ -43,7 +43,7 @@ export default {
 						timestamp:
 							Date.parse(item.started_at) || Date.parse(item.finished_at) || Date.parse(item.updated_at) || Date.now(),
 						status: status,
-						link: "https://" + endpoint + "/" + repositorySlug + "/builds/" + item.id
+						link: "https://app." + endpoint + "/" + repositorySlug + "/builds/" + item.id
 					};
 				});
 			},
