@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/channel.hh"
+#include "cc/bzd/container/optional.hh"
 
 namespace bzd::backend {
 
@@ -9,8 +10,9 @@ class Logger
 public:
 	/**
 	 * Set the default logger backend, by default a stub is in place.
+	 * Return the previous backend if any.
 	 */
-	static void setDefault(bzd::OStream& backend) noexcept;
+	static bzd::Optional<bzd::OStream&> setDefault(bzd::OStream& backend) noexcept;
 
 	/**
 	 * Get the default backend logger.

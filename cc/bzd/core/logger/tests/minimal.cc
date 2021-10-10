@@ -12,7 +12,7 @@ TEST(Minimal, Empty)
 TEST(Minimal, Backend)
 {
 	bzd::test::Logger<1024> backend;
-	bzd::backend::Logger::setDefault(backend);
+	auto maybePrevious = bzd::backend::Logger::setDefault(backend);
 
 	// Simple message
 	bzd::minimal::log::error("hello");
@@ -25,4 +25,9 @@ TEST(Minimal, Backend)
 	// Default level is INFO, this will be hidden
 	bzd::minimal::log::debug("hello");
 	EXPECT_FALSE(backend.match("[d] [minimal.cc:26] hello\n"_sv.asBytes()));
+
+	if (maybePrevious)
+	{
+		bzd::backend::Logger::setDefault(maybePrevious.valueMutable());
+	}
 }

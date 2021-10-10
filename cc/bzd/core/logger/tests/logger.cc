@@ -11,7 +11,7 @@ TEST(Logger, Empty)
 TEST(Logger, Backend)
 {
 	bzd::test::Logger<1024> backend;
-	bzd::backend::Logger::setDefault(backend);
+	auto maybePrevious = bzd::backend::Logger::setDefault(backend);
 	bzd::Logger::getDefault().setMinimumLevel(bzd::log::Level::DEBUG);
 
 	// Simple message
@@ -33,4 +33,9 @@ TEST(Logger, Backend)
 	EXPECT_TRUE(backend.match("[i] [logger.cc:32] hello world\n"_sv.asBytes()));
 	bzd::log::debug(CSTR("hello {}"), "world").sync();
 	EXPECT_TRUE(backend.match("[d] [logger.cc:34] hello world\n"_sv.asBytes()));
+
+	if (maybePrevious)
+	{
+		bzd::backend::Logger::setDefault(maybePrevious.valueMutable());
+	}
 }
