@@ -17,6 +17,7 @@ cc_library(
         ":move",
         ":offset_of",
         ":ratio",
+        ":scope_guard",
         ":signal",
         ":singleton",
         ":source_location",
@@ -157,6 +158,18 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "scope_guard",
+    hdrs = [
+        "scope_guard.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":move",
+        "//cc/bzd/container:optional",
     ],
 )
 
