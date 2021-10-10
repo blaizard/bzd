@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/logger/tests/support/backend.hh"
+#include "cc/bzd/utility/scope_guard.hh"
 #include "cc_test/test.hh"
 
 TEST(Minimal, Empty)
@@ -11,23 +12,24 @@ TEST(Minimal, Empty)
 
 TEST(Minimal, Backend)
 {
-	bzd::test::Logger<1024> backend;
+	static bzd::test::Logger<1024> backend;
 	auto maybePrevious = bzd::backend::Logger::setDefault(backend);
+	const bzd::ScopeGuard scope{[&maybePrevious]() {
+		if (maybePrevious)
+		{
+			bzd::backend::Logger::setDefault(maybePrevious.valueMutable());
+		}
+	}};
 
 	// Simple message
 	bzd::minimal::log::error("hello");
-	EXPECT_TRUE(backend.match("[e] [minimal.cc:18] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[e] [minimal.cc:25] hello\n"_sv.asBytes()));
 	bzd::minimal::log::warning("hello");
-	EXPECT_TRUE(backend.match("[w] [minimal.cc:20] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[w] [minimal.cc:27] hello\n"_sv.asBytes()));
 	bzd::minimal::log::info("hello");
-	EXPECT_TRUE(backend.match("[i] [minimal.cc:22] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[i] [minimal.cc:29] hello\n"_sv.asBytes()));
 
 	// Default level is INFO, this will be hidden
 	bzd::minimal::log::debug("hello");
-	EXPECT_FALSE(backend.match("[d] [minimal.cc:26] hello\n"_sv.asBytes()));
-
-	if (maybePrevious)
-	{
-		bzd::backend::Logger::setDefault(maybePrevious.valueMutable());
-	}
+	EXPECT_FALSE(backend.match("[d] [minimal.cc:33] hello\n"_sv.asBytes()));
 }

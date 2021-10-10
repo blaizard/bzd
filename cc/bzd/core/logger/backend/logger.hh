@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/core/channel.hh"
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/core/channel.hh"
 
 namespace bzd::backend {
 

@@ -10,8 +10,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container:optional",
         "//cc/bzd/core:channel",
         "//cc/bzd/platform:stream",
-        "//cc/bzd/container:optional",
     ],
 )
