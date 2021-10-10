@@ -12,5 +12,6 @@ cc_library(
     deps = [
         "//cc/bzd/core:channel",
         "//cc/bzd/platform:stream",
+        "//cc/bzd/container:optional",
     ],
 )

@@ -85,6 +85,9 @@ bool execute() noexcept
 	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
 
+
+	std::cout << "end!" << std::endl;
+
 	bzd::log::info(CSTR("Completion.")).sync();
 
 	bool isSuccess{true};
