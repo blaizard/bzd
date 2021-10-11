@@ -57,6 +57,13 @@ class Expression(Entity):
 		return self.type.const
 
 	@property
+	def isInit(self) -> bool:
+		"""
+		Whether or not this entry is an initializer or not.
+		"""
+		return self.underlyingType is not None and self.underlyingType.endswith(".init")
+
+	@property
 	def isName(self) -> bool:
 		return self.element.isAttr("name") and not self.name == "..."
 

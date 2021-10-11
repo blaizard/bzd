@@ -48,23 +48,22 @@ bool execute() noexcept
 	// Create registry.
 	[[maybe_unused]] auto registry = makeRegistry();
 
-	// Assign special symbols to public registry.
-	{% for expresssion in registry %}
-		{% if expresssion.fqn == "out" %}
-	bzd::platform::backend::out = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
-		{% elif expresssion.fqn == "in" %}
-	bzd::platform::backend::in = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
-		{% elif expresssion.fqn == "steadyClock" %}
-	bzd::platform::backend::steadyClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
-		{% elif expresssion.fqn == "systemClock" %}
-	bzd::platform::backend::systemClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_;
+	// Initialize registry if needed and assign special symbols
+	// to their platform backend if applicable.
+	//bzd::log::info(CSTR("Initialization phase.")).sync();
+	{% for init in compositions.init %}
+		{% if init.isCall %}
+	{{ init.call.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(init.call.parametersResolved, true) -}} );
 		{% end %}
-	{% end %}
-
-	// Initialize.
-	bzd::log::info(CSTR("Initialization phase.")).sync();
-	{% for index, expresssion in compositions.init %}
-	{{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
+		{% if init.fqn == "out" %}
+	bzd::platform::backend::out = &registry.{{ init.fqn | fqnToNameStr }}_;
+		{% elif init.fqn == "in" %}
+	bzd::platform::backend::in = &registry.{{ init.fqn | fqnToNameStr }}_;
+		{% elif init.fqn == "steadyClock" %}
+	bzd::platform::backend::steadyClock = &registry.{{ init.fqn | fqnToNameStr }}_;
+		{% elif init.fqn == "systemClock" %}
+	bzd::platform::backend::systemClock = &registry.{{ init.fqn | fqnToNameStr }}_;
+		{% end %}
 	{% end %}
 
 	// Compose.
@@ -85,9 +84,6 @@ bool execute() noexcept
 	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
 
-
-	std::cout << "end!" << std::endl;
-
 	bzd::log::info(CSTR("Completion.")).sync();
 
 	bool isSuccess{true};
@@ -97,33 +93,3 @@ bool execute() noexcept
 
 	return isSuccess;
 }
-
-/*
-// Deployment part
-
-int main()
-{
-	execute();
-
-	return 0;
-}
-*/
-/*
-{ deployment.main.declaration }
-
-int main()
-{
-	{ deploy.main.execution }
-
-	return 0;
-}
-
-{ deployment.core2.declaration }
-
-int main2()
-{
-	{ deploy.core2.execution }
-
-	return 0;
-}
-*/

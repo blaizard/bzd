@@ -12,7 +12,7 @@ namespace bzd {
  *
  * \return A promise object.
  */
-bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
+inline bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 {
 	auto& clock = bzd::platform::steadyClock();
 	const auto targetTicks = clock.getTicks() + clock.msToTicks(time);

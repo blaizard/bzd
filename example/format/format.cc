@@ -1,4 +1,4 @@
-#include "cc/bzd.hh"
+#include "example/format/format.hh"
 
 class Date
 {
@@ -22,18 +22,21 @@ bzd::Async<void> toStream(bzd::OStream& os, const bzd::StringView& view)
 	co_await os.write(view.asBytes());
 }
 
-/*
-int main()
+namespace Example
 {
-	bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42).sync();
+
+bzd::Async<bool> run()
+{
+	co_await bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42);
 
 	const Date date{2020, 8, 4};
-	bzd::format::toStream(bzd::platform::out(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv).sync();
+	co_await bzd::format::toStream(bzd::platform::out(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);
 
 	bzd::String<128> str;
 	bzd::format::toString(str, "This date {}.", 12);
 	std::cout << str.data() << std::endl;
 
-	return 0;
+	co_return true;
 }
-*/
+
+}

@@ -27,7 +27,6 @@ cc_library(
         "//cc/components/generic/panic/throw",
         "//cc/components/posix/stack_trace",
         "//cc/components/std/atomic",
-        "//tools/cc_test",
     ],
 )
 
