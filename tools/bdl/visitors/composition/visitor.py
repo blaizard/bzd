@@ -18,6 +18,10 @@ MethodComponentInit = Method(MethodBuilder(name="init").get())
 NestedComponent = Nested(
 	NestedBuilder(kind=TYPE_INTERFACE).pushBackElementToNestedSequence("interface", MethodComponentInit.element).get())
 
+GLOBAL_FQN_OUT = "out"
+GLOBAL_FQN_IN = "in"
+GLOBAL_FQN_STEADY_CLOCK = "steadyClock"
+GLOBAL_FQN_SYSTEM_CLOCK = "systemClock"
 
 class Composition:
 
@@ -79,7 +83,8 @@ class Composition:
 
 		# Compute the dependency orders and identify circular dependencies.
 		orderFQNs: typing.List[str] = []
-		for fqn in dependencies.keys():
+		orderKeys = sorted(dependencies.keys(), key=lambda key: {GLOBAL_FQN_OUT: 1, GLOBAL_FQN_IN: 2, GLOBAL_FQN_STEADY_CLOCK: 3, GLOBAL_FQN_SYSTEM_CLOCK: 4}.get(key, 999))
+		for fqn in orderKeys:
 			self.resolveDependency(dependencies, fqn, orderFQNs)
 
 		return orderFQNs
@@ -88,13 +93,24 @@ class Composition:
 		"""
 		Add a new composition entity to the compisiton list.
 		"""
-		if entity.underlyingType is not None and entity.underlyingType.endswith(".init"):
-			self.compositions["init"].append(entity)
-		else:
-			self.compositions["compose"].append(entity)
+		self.compositions["compose"].append(entity)
 
 		# Update the executor list
 		self.executors.add(entity.executor)
+
+	def addInit(self, fqn: str, entity: typing.Optional[Expression] = None) -> None:
+		"""
+		Add a new composition initializer entry.
+		"""
+		self.compositions["init"].append({
+			"fqn": fqn,
+			"isCall": entity is not None,
+			"call": entity
+		})
+
+		# Update the executor list
+		if entity:
+			self.executors.add(entity.executor)
 
 	def process(self) -> None:
 
@@ -113,17 +129,21 @@ class Composition:
 
 			# Identify entities that contains nested composition
 			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			for compositionEntity in entityUnderlyingType.composition:
-				compositionEntity.assertTrue(condition=not compositionEntity.isName,
-					message="Variable cannot be created within a nested composition.")
+			if entityUnderlyingType.isComposition:
+				for compositionEntity in entityUnderlyingType.composition:
+					compositionEntity.assertTrue(condition=not compositionEntity.isName,
+						message="Variable cannot be created within a nested composition.")
 
-				# Create new entities and associate them with their respective objects.
-				entityCopied = compositionEntity.copy()
-				resolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
-				entityCopied.resolve(resolver=resolver)
+					# Create new entities and associate them with their respective objects.
+					entityCopied = compositionEntity.copy()
+					resolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
+					entityCopied.resolve(resolver=resolver)
 
-				assert isinstance(entityCopied, Expression)
-				self.addComposition(entityCopied)
+					assert isinstance(entityCopied, Expression)
+					self.addInit(fqn=entity.fqn, entity=entityCopied)
+
+			else:
+				self.addInit(fqn=entity.fqn)
 
 		# resolve the un-named
 		self.executors = set()
@@ -135,7 +155,10 @@ class Composition:
 			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
 
 			# Update any variables if part of the registry
-			self.addComposition(entity)
+			if entity.isInit:
+				self.addInit(fqn=entity.fqn, entity=entity)
+			else:
+				self.addComposition(entity=entity)
 
 		# Ensure all executors are declared.
 		executorsIntersection = self.executors.intersection(self.registryFQNs)

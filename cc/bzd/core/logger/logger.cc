@@ -35,10 +35,13 @@ bzd::Logger& bzd::Logger::getDefault() noexcept
 	return logger;
 }
 
+/*
+namespace {
 struct Date
 {
 	bzd::units::Millisecond ms_;
 };
+}
 
 bzd::Async<void> toStream(bzd::OStream& os, const Date& d)
 {
@@ -51,6 +54,7 @@ bzd::Async<void> toStream(bzd::OStream& os, const Date& d)
 	// const auto y = bzd::units::Hour{d.ms_}.get() % 24;
 	co_await bzd::format::toStream(os, CSTR("{:.2}:{:.2}:{:.2}.{:.4}"), int(h), int(min), int(s), int(ms));
 }
+*/
 
 bzd::Async<void> bzd::Logger::printHeader(const bzd::log::Level level, const SourceLocation location) noexcept
 {
