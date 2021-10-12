@@ -7,6 +7,7 @@ cc_library(
         ":channel",
         ":clock",
         ":delay",
+        ":mutex",
         ":registry",
         ":units",
         "//cc/bzd/core/assert",
@@ -48,6 +49,7 @@ cc_library(
         "//cc/bzd/container:span",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
+        ":mutex"
     ],
 )
 
@@ -59,6 +61,18 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/async",
+    ],
+)
+
+cc_library(
+    name = "mutex",
+    hdrs = [
+        "mutex.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:atomic",
     ],
 )
 

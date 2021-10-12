@@ -11,11 +11,11 @@ bdl_library(
 
 cc_library(
     name = "lib",
-    hdrs = [
-        "format.hh",
-    ],
     srcs = [
         "format.cc",
+    ],
+    hdrs = [
+        "format.hh",
     ],
     deps = [
         ":composition",

@@ -3,6 +3,7 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/core/mutex.hh"
 
 namespace bzd {
 
@@ -16,6 +17,9 @@ public:
 	 * \param data The data to be sent via this output channel.
 	 */
 	virtual bzd::Async<SizeType> write(const bzd::Span<const T> data) noexcept = 0;
+
+public:
+	bzd::Mutex mutex_{};
 };
 
 template <class T>

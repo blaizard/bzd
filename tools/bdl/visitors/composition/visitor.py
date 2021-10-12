@@ -23,6 +23,7 @@ GLOBAL_FQN_IN = "in"
 GLOBAL_FQN_STEADY_CLOCK = "steadyClock"
 GLOBAL_FQN_SYSTEM_CLOCK = "systemClock"
 
+
 class Composition:
 
 	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
@@ -30,7 +31,8 @@ class Composition:
 		self.symbols = SymbolMap()
 		self.registry: typing.List[Expression] = []
 		self.registryFQNs: typing.Set[str] = set()
-		self.compositions: typing.Dict[str, typing.List[Expression]] = {"init": [], "compose": []}
+		self.initialization: typing.List[typing.Dict[str, typing.Any]] = []
+		self.composition: typing.List[Expression] = []
 		self.executors: typing.Set[str] = set()
 
 	def visit(self, bdl: Object) -> "Composition":
@@ -83,7 +85,13 @@ class Composition:
 
 		# Compute the dependency orders and identify circular dependencies.
 		orderFQNs: typing.List[str] = []
-		orderKeys = sorted(dependencies.keys(), key=lambda key: {GLOBAL_FQN_OUT: 1, GLOBAL_FQN_IN: 2, GLOBAL_FQN_STEADY_CLOCK: 3, GLOBAL_FQN_SYSTEM_CLOCK: 4}.get(key, 999))
+		orderKeys = sorted(dependencies.keys(),
+			key=lambda key: {
+			GLOBAL_FQN_OUT: 1,
+			GLOBAL_FQN_IN: 2,
+			GLOBAL_FQN_STEADY_CLOCK: 3,
+			GLOBAL_FQN_SYSTEM_CLOCK: 4
+			}.get(key, 999))
 		for fqn in orderKeys:
 			self.resolveDependency(dependencies, fqn, orderFQNs)
 
@@ -93,7 +101,7 @@ class Composition:
 		"""
 		Add a new composition entity to the compisiton list.
 		"""
-		self.compositions["compose"].append(entity)
+		self.composition.append(entity)
 
 		# Update the executor list
 		self.executors.add(entity.executor)
@@ -102,11 +110,7 @@ class Composition:
 		"""
 		Add a new composition initializer entry.
 		"""
-		self.compositions["init"].append({
-			"fqn": fqn,
-			"isCall": entity is not None,
-			"call": entity
-		})
+		self.initialization.append({"fqn": fqn, "isCall": entity is not None, "call": entity})
 
 		# Update the executor list
 		if entity:
