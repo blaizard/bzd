@@ -1,8 +1,12 @@
+
 namespace Example;
 
 method run();
-
-composition
-{
-    run();
+composition {
+	run();
+	run();
+	run();
+	
 }
+
+

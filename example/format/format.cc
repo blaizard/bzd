@@ -22,11 +22,11 @@ bzd::Async<void> toStream(bzd::OStream& os, const bzd::StringView& view)
 	co_await os.write(view.asBytes());
 }
 
-namespace Example
-{
+namespace Example {
 
 bzd::Async<bool> run()
 {
+	co_await bzd::platform::out().mutex_.lock();
 	co_await bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42);
 
 	const Date date{2020, 8, 4};
@@ -36,7 +36,9 @@ bzd::Async<bool> run()
 	bzd::format::toString(str, "This date {}.", 12);
 	std::cout << str.data() << std::endl;
 
+	bzd::platform::out().mutex_.unlock();
+
 	co_return true;
 }
 
-}
+} // namespace Example

@@ -78,6 +78,11 @@ bool bzd::test::Manager::run()
 	auto& tests = getTestsSingleton();
 
 	::std::cout << "[==========] Running test(s) from " << std::dec << tests.size() << " test case(s)" << ::std::endl;
+	if (tests.empty())
+	{
+		::std::cout << "[   FAILED ] Empty test suite is considered as a failed test." << ::std::endl;
+		return false;
+	}
 
 	for (const auto& it1 : tests)
 	{

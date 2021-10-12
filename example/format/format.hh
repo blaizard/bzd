@@ -2,8 +2,7 @@
 
 #include "cc/bzd.hh"
 
-namespace Example
-{
+namespace Example {
 
 bzd::Async<bool> run();
 

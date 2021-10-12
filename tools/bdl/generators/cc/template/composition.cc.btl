@@ -51,24 +51,24 @@ bool execute() noexcept
 	// Initialize registry if needed and assign special symbols
 	// to their platform backend if applicable.
 	//bzd::log::info(CSTR("Initialization phase.")).sync();
-	{% for init in compositions.init %}
-		{% if init.isCall %}
-	{{ init.call.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(init.call.parametersResolved, true) -}} );
+	{% for item in initialization %}
+		{% if item.isCall %}
+	{{ item.call.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(item.call.parametersResolved, true) -}} );
 		{% end %}
-		{% if init.fqn == "out" %}
-	bzd::platform::backend::out = &registry.{{ init.fqn | fqnToNameStr }}_;
-		{% elif init.fqn == "in" %}
-	bzd::platform::backend::in = &registry.{{ init.fqn | fqnToNameStr }}_;
-		{% elif init.fqn == "steadyClock" %}
-	bzd::platform::backend::steadyClock = &registry.{{ init.fqn | fqnToNameStr }}_;
-		{% elif init.fqn == "systemClock" %}
-	bzd::platform::backend::systemClock = &registry.{{ init.fqn | fqnToNameStr }}_;
+		{% if item.fqn == "out" %}
+	bzd::platform::backend::out = &registry.{{ item.fqn | fqnToNameStr }}_;
+		{% elif item.fqn == "in" %}
+	bzd::platform::backend::in = &registry.{{ item.fqn | fqnToNameStr }}_;
+		{% elif item.fqn == "steadyClock" %}
+	bzd::platform::backend::steadyClock = &registry.{{ item.fqn | fqnToNameStr }}_;
+		{% elif item.fqn == "systemClock" %}
+	bzd::platform::backend::systemClock = &registry.{{ item.fqn | fqnToNameStr }}_;
 		{% end %}
 	{% end %}
 
 	// Compose.
 	bzd::log::info(CSTR("Composition phase.")).sync();
-	{% for index, expresssion in compositions.compose %}
+	{% for index, expresssion in composition %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}
@@ -87,7 +87,7 @@ bool execute() noexcept
 	bzd::log::info(CSTR("Completion.")).sync();
 
 	bool isSuccess{true};
-	{% for index, expresssion in compositions.compose %}
+	{% for index, expresssion in composition %}
 	isSuccess &= promise{{ index }}.getResult()->hasValue();
 	{% end %}
 

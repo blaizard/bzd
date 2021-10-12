@@ -66,7 +66,7 @@ class TestRun(unittest.TestCase):
 		composition = Composition()
 		composition.visit(bdl).process()
 
-		self.assertEqual(len(composition.compositions["init"]), 2)
+		self.assertEqual(len(composition.initialization), 2)
 
 
 if __name__ == '__main__':
