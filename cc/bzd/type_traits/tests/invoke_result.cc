@@ -40,6 +40,12 @@ int complexFctWithArgs(double, char*)
 	return 0;
 }
 
+template <class T>
+auto temmplateFct(const T& a)
+{
+	return a;
+}
+
 TEST(InvokeResult, rawFunctions)
 {
 	{
@@ -72,6 +78,10 @@ TEST(InvokeResult, rawFunctions)
 	}
 	{
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(complexFctWithArgs), double, char*>, int>;
+		EXPECT_TRUE(result);
+	}
+	{
+		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(temmplateFct<float>), float>, float>;
 		EXPECT_TRUE(result);
 	}
 }

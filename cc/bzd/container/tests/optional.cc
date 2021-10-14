@@ -1,6 +1,7 @@
 #include "cc/bzd/container/optional.hh"
 
 #include "cc/bzd/container/result.hh"
+#include "cc/bzd/container/tests/support/support.hh"
 #include "cc_test/test.hh"
 
 TEST(ContainerOptional, simpleData)
@@ -36,6 +37,22 @@ TEST(ContainerOptional, simpleData)
 
 	v.reset();
 	EXPECT_FALSE(v);
+}
+
+TEST(ContainerOptional, move)
+{
+	bzd::Optional<bzd::test::MoveOnly> v{bzd::test::MoveOnly()};
+	EXPECT_TRUE(v);
+	EXPECT_FALSE(v->hasBeenMoved());
+	EXPECT_EQ(v->getMovedCounter(), 1);
+
+	// Move assignment
+	/*	auto vMoved = bzd::move(v);
+		EXPECT_TRUE(v);
+		EXPECT_TRUE(v->hasBeenMoved());
+		EXPECT_TRUE(vMoved);
+		EXPECT_FALSE(vMoved->hasBeenMoved());
+		EXPECT_EQ(vMoved->getMovedCounter(), 2);*/
 }
 
 TEST(ContainerOptional, simpleNoData)

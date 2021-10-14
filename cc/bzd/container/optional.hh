@@ -38,13 +38,13 @@ struct OptionalNonTrivialStorage
 	constexpr OptionalNonTrivialStorage() noexcept : isValue_{false}, empty_{} {}
 
 	template <class U>
-	constexpr OptionalNonTrivialStorage(U&& value) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
+	constexpr OptionalNonTrivialStorage(U&& value, const bool) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
 	}
 
-	constexpr OptionalNonTrivialStorage(const Self& value) noexcept = default;
+	constexpr OptionalNonTrivialStorage(const Self& optional) noexcept = default;
 	constexpr Self& operator=(const Self& optional) noexcept = default;
-	constexpr OptionalNonTrivialStorage(Self&& value) noexcept = default;
+	constexpr OptionalNonTrivialStorage(Self&& optional) noexcept = default;
 	constexpr Self& operator=(Self&& optional) noexcept = default;
 
 	~OptionalNonTrivialStorage() noexcept
@@ -68,15 +68,15 @@ struct OptionalTrivialStorage
 	constexpr OptionalTrivialStorage() noexcept : isValue_{false}, empty_{} {}
 
 	template <class U>
-	constexpr OptionalTrivialStorage(U&& value) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
+	constexpr OptionalTrivialStorage(U&& value, const bool) noexcept : isValue_{true}, value_{bzd::forward<U>(value)}
 	{
 	}
 
-	constexpr OptionalTrivialStorage(const Self& value) noexcept = default;
+	constexpr OptionalTrivialStorage(const Self& optional) noexcept = default;
 	constexpr Self& operator=(const Self& optional) noexcept = default;
-	constexpr OptionalTrivialStorage(Self&& value) noexcept = default;
+	constexpr OptionalTrivialStorage(Self&& optional) noexcept = default;
 	constexpr Self& operator=(Self&& optional) noexcept = default;
-	~OptionalTrivialStorage() noexcept = default;
+	//~OptionalTrivialStorage() noexcept = default;
 
 	bool isValue_{false};
 	union {
@@ -105,7 +105,7 @@ public: // Constructors
 	// Copy/move constructor/assignment
 	constexpr Optional(const Self& optional) noexcept = default;
 	constexpr Self& operator=(const Self& optional) noexcept = default;
-	constexpr Optional(Self&& optional) noexcept = default;
+	constexpr Optional(Self&& optional) noexcept : storage_{bzd::move(optional.storage_)} {}
 	constexpr Self& operator=(Self&& optional) noexcept = default;
 
 	// Support for bzd::nullopt
@@ -113,7 +113,7 @@ public: // Constructors
 
 	// Forward constructor to storage type for all non-self typed
 	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value>>
-	constexpr Optional(U&& value) : storage_{bzd::forward<U>(value)}
+	constexpr Optional(U&& value) : storage_{bzd::forward<U>(value), true}
 	{
 	}
 
