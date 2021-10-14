@@ -29,7 +29,8 @@ TEST(MetaUnion, Constructor)
 
 TEST(MetaUnionConstexpr, Constructor)
 {
-	constexpr bzd::meta::UnionConstexpr<int, bool, float> constexprTest(static_cast<float>(32.5));
+	// Trivial types can be constexpr
+	constexpr bzd::meta::Union<int, bool, float> constexprTest(static_cast<float>(32.5));
 	EXPECT_NEAR(constexprTest.get<float>(), 32.5, 0.001);
 
 	// Constexpr Copy Constructor
@@ -37,7 +38,7 @@ TEST(MetaUnionConstexpr, Constructor)
 	constexpr auto constexprTest3 = constexprTest2;
 	EXPECT_NEAR(constexprTest3.get<float>(), 32.5, 0.001);
 
-	// Complex types
+	// Complex types, it cannot be constexpr
 	bzd::meta::Union<bool, std::string> testComplex(std::string("Hello"));
 	EXPECT_STREQ(testComplex.get<std::string>().c_str(), "Hello");
 }

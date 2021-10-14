@@ -1,119 +1,125 @@
 #pragma once
 
+#include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
+#include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::meta::impl {
 template <class T, class... Ts>
-union UnionConstexpr {
+union UnionTrivial {
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
-	constexpr UnionConstexpr() : next_{} {}
+	constexpr UnionTrivial() : next_{} {}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionConstexpr(U&& value) : next_{bzd::forward<U>(value)}
+	constexpr UnionTrivial(U&& value) : next_{bzd::forward<U>(value)}
 	{
 	}
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionConstexpr(const U& value) : value_{value}
+	constexpr UnionTrivial(U&& value) : value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return next_.template get<U>();
 	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return next_.template get<U>();
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return value_;
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return value_;
 	}
 
 protected:
 	T value_;
-	UnionConstexpr<Ts...> next_;
+	UnionTrivial<Ts...> next_;
 };
 
 template <class T, class... Ts>
-union Union {
+union UnionNonTrivial {
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
-	constexpr Union() : next_{} {}
-	~Union() {} // This is the only difference with a constexpr Union
+	constexpr UnionNonTrivial() : next_{} {}
+
+	// User-provided destructor is needed when T has non-trivial dtor.
+	// This is the only difference with a UnionTrivial
+	~UnionNonTrivial() {}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr Union(U&& value) : next_{bzd::forward<U>(value)}
+	constexpr UnionNonTrivial(U&& value) : next_{bzd::forward<U>(value)}
 	{
 	}
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr Union(const U& value) : value_{value}
+	constexpr UnionNonTrivial(U&& value) : value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return next_.template get<U>();
 	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return next_.template get<U>();
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return value_;
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return value_;
 	}
 
 protected:
 	T value_;
-	Union<Ts...> next_;
+	UnionNonTrivial<Ts...> next_;
 };
 
 template <class T>
-union UnionConstexpr<T> {
+union UnionTrivial<T> {
 public:
-	constexpr UnionConstexpr() : dummy_{} {}
+	constexpr UnionTrivial() : dummy_{} {}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionConstexpr(const U& value) : value_{value}
+	constexpr UnionTrivial(const U& value) : value_{value}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return value_;
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return value_;
 	}
@@ -126,24 +132,24 @@ protected:
 };
 
 template <class T>
-union Union<T> {
+union UnionNonTrivial<T> {
 public:
-	constexpr Union() : dummy_{} {}
-	~Union() {}
+	constexpr UnionNonTrivial() : dummy_{} {}
+	~UnionNonTrivial() {}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr Union(const U& value) : value_{value}
+	constexpr UnionNonTrivial(const U& value) : value_{value}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline U& get()
+	constexpr U& get()
 	{
 		return value_;
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr inline const U& get() const
+	constexpr const U& get() const
 	{
 		return value_;
 	}
@@ -157,8 +163,8 @@ protected:
 } // namespace bzd::meta::impl
 
 namespace bzd::meta {
+
 template <class... Ts>
-using Union = impl::Union<Ts...>;
-template <class... Ts>
-using UnionConstexpr = impl::UnionConstexpr<Ts...>;
+using Union = bzd::typeTraits::
+	Conditional<(bzd::typeTraits::isTriviallyDestructible<Ts> && ...), impl::UnionTrivial<Ts...>, impl::UnionNonTrivial<Ts...>>;
 } // namespace bzd::meta

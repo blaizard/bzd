@@ -6,10 +6,10 @@
 
 TEST(ContainerVariant, Constructor)
 {
-	bzd::Variant<int, bool, double> variant;
-	bzd::Variant<int, bool, double> variantInt{static_cast<int>(45)};
-	bzd::Variant<int, bool, double> variantBool{static_cast<bool>(true)};
-	bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
+	[[maybe_unused]] bzd::Variant<int, bool, double> variant;
+	[[maybe_unused]] bzd::Variant<int, bool, double> variantInt{static_cast<int>(45)};
+	[[maybe_unused]] bzd::Variant<int, bool, double> variantBool{static_cast<bool>(true)};
+	[[maybe_unused]] bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
 }
 
 TEST(ContainerVariant, ImplicitConstructor)
@@ -128,16 +128,16 @@ TEST(ContainerVariant, Match)
 
 TEST(ContainerVariant, Constexpr)
 {
-	constexpr bzd::VariantConstexpr<int, bool, double> variant;
+	constexpr bzd::Variant<int, bool, double> variant;
 	EXPECT_FALSE(variant.is<int>());
 	EXPECT_FALSE(variant.is<bool>());
 	EXPECT_FALSE(variant.is<double>());
 
-	constexpr bzd::VariantConstexpr<int, bool, double> variantInt(static_cast<int>(45));
+	constexpr bzd::Variant<int, bool, double> variantInt(static_cast<int>(45));
 	EXPECT_TRUE(variantInt.is<int>());
-	constexpr bzd::VariantConstexpr<int, bool, double> variantBool(static_cast<bool>(true));
+	constexpr bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
 	EXPECT_TRUE(variantBool.is<bool>());
-	constexpr bzd::VariantConstexpr<int, bool, double> variantDouble(static_cast<double>(5.4));
+	constexpr bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
 	EXPECT_TRUE(variantDouble.is<double>());
 
 	const auto ret = variantDouble.get<double>();
@@ -145,7 +145,7 @@ TEST(ContainerVariant, Constexpr)
 	EXPECT_NEAR(ret.value(), 5.4, 0.01);
 
 	{
-		constexpr bzd::VariantConstexpr<int, bool, double> variant(static_cast<double>(5.6));
+		constexpr bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;
 		variant.match([](const int) {}, [](const bool) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);

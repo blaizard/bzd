@@ -16,6 +16,7 @@ cc_library(
         ":declval",
         ":enable_if",
         ":false_type",
+        ":first_type",
         ":integral_constant",
         ":invoke_result",
         ":is_arithmetic",
@@ -171,6 +172,14 @@ cc_library(
     deps = [
         ":integral_constant",
     ],
+)
+
+cc_library(
+    name = "first_type",
+    hdrs = [
+        "first_type.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

@@ -8,11 +8,11 @@
 #include "cc/bzd/type_traits/is_constructible.hh"
 
 namespace bzd::impl {
-template <class StorageType, class... Ts>
-class Variant
+template <class... Ts>
+class VariantBase
 {
 protected:
-	using Self = Variant<StorageType, Ts...>;
+	using Self = VariantBase<Ts...>;
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
 	// Choose the Nth element out of the list
@@ -94,7 +94,7 @@ protected:
 	// Copy visitor
 	struct CopyVisitor
 	{
-		constexpr CopyVisitor(const Variant<StorageType, Ts...>& variant) : variant_{variant} {}
+		constexpr CopyVisitor(const VariantBase<Ts...>& variant) : variant_{variant} {}
 		template <class T>
 		constexpr void operator()(T& value)
 		{
@@ -102,20 +102,20 @@ protected:
 		}
 
 	private:
-		const Variant<StorageType, Ts...>& variant_;
+		const VariantBase<Ts...>& variant_;
 	};
 
 public:
 	/**
 	 * Default constructor
 	 */
-	constexpr Variant() = default;
+	constexpr VariantBase() = default;
 
 	/**
 	 * Value constructor (exact type match)
 	 */
 	template <class T, int Index = Find<T>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
-	constexpr Variant(T&& value) : id_{Index}, data_{bzd::forward<T>(value)}
+	constexpr VariantBase(T&& value) : id_{Index}, data_{bzd::forward<T>(value)}
 	{
 	}
 
@@ -123,14 +123,14 @@ public:
 	 * Value constructor (lazy, if constructible)
 	 */
 	template <class T, int Index = FindConstructible<T>::value, bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr>
-	constexpr Variant(T&& value) : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
+	constexpr VariantBase(T&& value) : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
 	{
 	}
 
 	/**
 	 * Copy constructor
 	 */
-	constexpr Variant(const Variant<StorageType, Ts...>& variant) : id_{variant.id_}
+	constexpr VariantBase(const VariantBase<Ts...>& variant) : id_{variant.id_}
 	{
 		CopyVisitor visitor{variant};
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
@@ -173,32 +173,29 @@ public:
 
 protected:
 	int id_ = -1;
-	StorageType data_ = {};
+	bzd::meta::Union<Ts...> data_ = {};
 };
-} // namespace bzd::impl
 
-namespace bzd {
 template <class... Ts>
-class VariantConstexpr : public bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts...>, Ts...>
+class VariantTrivial : public VariantBase<Ts...>
 {
 protected:
-	using Self = VariantConstexpr<Ts...>;
-	using Parent = bzd::impl::Variant<bzd::meta::UnionConstexpr<Ts...>, Ts...>;
+	using Parent = VariantBase<Ts...>;
 
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr VariantConstexpr(Args&&... args) : Parent::Variant{bzd::forward<Args>(args)...}
+	constexpr VariantTrivial(Args&&... args) : Parent::VariantBase{bzd::forward<Args>(args)...}
 	{
 	}
 };
 
 template <class... Ts>
-class Variant : public bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>
+class VariantNonTrivial : public VariantBase<Ts...>
 {
 protected:
-	using Self = Variant<Ts...>;
-	using Parent = bzd::impl::Variant<bzd::meta::Union<Ts...>, Ts...>;
+	using Self = VariantNonTrivial<Ts...>;
+	using Parent = VariantBase<Ts...>;
 
 	// Choose the Nth element out of the list
 	template <SizeType N>
@@ -248,7 +245,7 @@ private:
 public:
 	// Forward constructor to the main class
 	template <class... Args>
-	constexpr Variant(Args&&... args) : Parent::Variant{bzd::forward<Args>(args)...}
+	constexpr VariantNonTrivial(Args&&... args) : Parent::VariantBase{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -259,6 +256,12 @@ public:
 		construct<T>(bzd::forward<Args>(args)...);
 	}
 
-	~Variant() { destructIfNeeded(); }
+	~VariantNonTrivial() { destructIfNeeded(); }
 };
+} // namespace bzd::impl
+
+namespace bzd {
+template <class... Ts>
+using Variant = bzd::typeTraits::
+	Conditional<(bzd::typeTraits::isTriviallyDestructible<Ts> && ...), impl::VariantTrivial<Ts...>, impl::VariantNonTrivial<Ts...>>;
 } // namespace bzd

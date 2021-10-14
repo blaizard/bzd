@@ -135,6 +135,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":reference_wrapper",
+        ":variant",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
