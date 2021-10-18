@@ -8,17 +8,13 @@
 TEST(ContainerVariant, Constructor)
 {
 	[[maybe_unused]] bzd::Variant<int, bool, double> variant;
+	EXPECT_EQ(variant.index(), -1);
 	[[maybe_unused]] bzd::Variant<int, bool, double> variantInt{static_cast<int>(45)};
+	EXPECT_EQ(variantInt.index(), 0);
 	[[maybe_unused]] bzd::Variant<int, bool, double> variantBool{static_cast<bool>(true)};
+	EXPECT_EQ(variantBool.index(), 1);
 	[[maybe_unused]] bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
-}
-
-TEST(ContainerVariant, ImplicitConstructor)
-{
-	bzd::Variant<void*, bool, double> variantExplicit(static_cast<double>(45.2));
-	EXPECT_EQ(variantExplicit.index(), 2);
-	bzd::Variant<void*, bool, double> variantImplicit(static_cast<float>(45.2));
-	EXPECT_EQ(variantImplicit.index(), 1);
+	EXPECT_EQ(variantDouble.index(), 2);
 }
 
 TEST(ContainerVariant, CopyConstructor)
@@ -38,10 +34,28 @@ TEST(ContainerVariant, CopyConstructor)
 		bzd::Variant<LifetimeCounter, int> variant3{value};
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 1);
-		EXPECT_EQ(LifetimeCounter::move_, 1);
-		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 3);
+	EXPECT_EQ(LifetimeCounter::destructor_, 2);
+}
+
+TEST(ContainerVariant, MoveConstructor)
+{
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		LifetimeCounter value{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		bzd::Variant<LifetimeCounter, int> variant{bzd::move(value)};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 2);
 }
 
 TEST(ContainerVariant, Destructor)

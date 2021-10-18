@@ -1,8 +1,8 @@
 #include "cc/bzd/meta/union.hh"
 
+#include "cc/bzd/test/types.hh"
 #include "cc/bzd/utility/move.hh"
 #include "cc_test/test.hh"
-#include "cc/bzd/test/types.hh"
 
 #include <string>
 

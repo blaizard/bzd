@@ -8,9 +8,9 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
     deps = [
         "//cc/bzd/core/assert",
         "//cc/bzd/meta",
+        "//cc/bzd/test:types",
         "//cc/bzd/utility:move",
         "//tools/cc_test",
-        "//cc/bzd/test:types",
     ],
 ) for path in glob([
     "*.cc",
