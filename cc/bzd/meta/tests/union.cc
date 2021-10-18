@@ -2,6 +2,7 @@
 
 #include "cc/bzd/utility/move.hh"
 #include "cc_test/test.hh"
+#include "cc/bzd/test/types.hh"
 
 #include <string>
 
@@ -41,4 +42,53 @@ TEST(MetaUnionConstexpr, Constructor)
 	// Complex types, it cannot be constexpr
 	bzd::meta::Union<bool, std::string> testComplex(std::string("Hello"));
 	EXPECT_STREQ(testComplex.get<std::string>().c_str(), "Hello");
+}
+
+TEST(MetaUnion, Empty)
+{
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		bzd::meta::Union<LifetimeCounter> u{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 0);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 0);
+}
+
+TEST(MetaUnion, CopyConstructor)
+{
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		LifetimeCounter value{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		bzd::meta::Union<LifetimeCounter> u{value};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 1);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 1);
+}
+
+TEST(MetaUnion, MoveConstructor)
+{
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		LifetimeCounter value{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		bzd::meta::Union<LifetimeCounter> u{bzd::move(value)};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 1);
 }
