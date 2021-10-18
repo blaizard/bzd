@@ -65,7 +65,8 @@ protected:
 		: F0
 		, Overload<Frest...>
 	{
-		constexpr Overload(F0&& f0, Frest&&... rest) noexcept : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...)
+		template <class T>
+		constexpr Overload(T&& f0, Frest&&... rest) noexcept : F0{bzd::forward<T>(f0)}, Overload<Frest...>{bzd::forward<Frest>(rest)...}
 		{
 		}
 		using F0::operator();
@@ -75,7 +76,8 @@ protected:
 	template <class F0>
 	struct Overload<F0> : F0
 	{
-		constexpr Overload(F0&& f0) noexcept : F0{bzd::forward<F0>(f0)} {}
+		template <class T>
+		constexpr Overload(T&& f0) noexcept : F0{bzd::forward<T>(f0)} {}
 		using F0::operator();
 	};
 

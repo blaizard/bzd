@@ -1,7 +1,7 @@
 #include "cc/bzd/container/optional.hh"
 
 #include "cc/bzd/container/result.hh"
-#include "cc/bzd/container/tests/support/support.hh"
+#include "cc/bzd/test/types.hh"
 #include "cc_test/test.hh"
 
 TEST(ContainerOptional, simpleData)

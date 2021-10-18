@@ -5,9 +5,8 @@
 #include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/forward.hh"
-
-#include <type_traits>
 
 namespace bzd::meta::impl {
 
@@ -22,12 +21,12 @@ public:
 	// initialize something
 	constexpr UnionTrivial() noexcept : next_{} {}
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
@@ -72,11 +71,11 @@ public:
 	// This is the only difference with a UnionTrivial
 	~UnionNonTrivial() noexcept {}
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionNonTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}

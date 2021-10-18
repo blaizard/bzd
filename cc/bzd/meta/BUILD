@@ -110,6 +110,7 @@ cc_library(
         "//cc/bzd/type_traits:first_type",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:is_trivially_destructible",
+        "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:forward",
     ],
 )

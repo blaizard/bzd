@@ -1,6 +1,6 @@
 #include "cc/bzd/container/variant.hh"
 
-#include "cc/bzd/container/tests/support/support.hh"
+#include "cc/bzd/test/types.hh"
 #include "cc_test/test.hh"
 
 #include <iostream>
@@ -41,6 +41,7 @@ TEST(ContainerVariant, CopyConstructor)
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 3);
 }
 
 TEST(ContainerVariant, Destructor)

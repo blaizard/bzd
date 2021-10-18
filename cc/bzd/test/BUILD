@@ -20,3 +20,15 @@ cc_library(
         "//cc/bzd/utility:forward",
     ],
 )
+
+cc_library(
+    name = "types",
+    hdrs = [
+        "types.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/utility:move",
+    ],
+)
