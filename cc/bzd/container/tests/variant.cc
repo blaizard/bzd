@@ -1,5 +1,6 @@
 #include "cc/bzd/container/variant.hh"
 
+#include "cc/bzd/container/tests/support/support.hh"
 #include "cc_test/test.hh"
 
 #include <iostream>
@@ -23,59 +24,61 @@ TEST(ContainerVariant, ImplicitConstructor)
 TEST(ContainerVariant, CopyConstructor)
 {
 	bzd::Variant<int, bool, double> variant1{static_cast<double>(3.1415)};
-	EXPECT_NEAR(variant1.get<double>().value(), 3.1415, 0.0001);
+	EXPECT_NEAR(variant1.get<double>(), 3.1415, 0.0001);
 	bzd::Variant<int, bool, double> variant2{variant1};
-	EXPECT_NEAR(variant2.get<double>().value(), 3.1415, 0.0001);
+	EXPECT_NEAR(variant2.get<double>(), 3.1415, 0.0001);
+
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		LifetimeCounter value{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		bzd::Variant<LifetimeCounter, int> variant3{value};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 1);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+	}
 }
 
 TEST(ContainerVariant, Destructor)
 {
-	static int constructorA = 0;
-	static int destructorA = 0;
-	static int constructorB = 0;
-	static int destructorB = 0;
+	using LifetimeCounterA = bzd::test::LifetimeCounter<struct a>;
+	using LifetimeCounterB = bzd::test::LifetimeCounter<struct b>;
 
-	class TypeA
-	{
-	public:
-		TypeA() { ++constructorA; }
-		TypeA(const TypeA&) { ++constructorA; }
-		~TypeA() { ++destructorA; }
-	};
-
-	class TypeB
-	{
-	public:
-		TypeB() { ++constructorB; }
-		TypeB(const TypeB&) { ++constructorB; }
-		~TypeB() { ++destructorB; }
-	};
-
-	bzd::Variant<TypeA, TypeB> variant1;
-	EXPECT_EQ(constructorA, 0);
-	EXPECT_EQ(destructorA, 0);
-	EXPECT_EQ(constructorB, 0);
-	EXPECT_EQ(destructorB, 0);
+	bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant1;
+	EXPECT_EQ(LifetimeCounterA::constructor_, 0);
+	EXPECT_EQ(LifetimeCounterA::destructor_, 0);
+	EXPECT_EQ(LifetimeCounterB::constructor_, 0);
+	EXPECT_EQ(LifetimeCounterB::destructor_, 0);
 
 	{
-		TypeB b;
-		bzd::Variant<TypeA, TypeB> variant(bzd::move(b));
-		EXPECT_EQ(constructorA, 0);
-		EXPECT_EQ(destructorA, 0);
-		EXPECT_EQ(constructorB, 2);
-		EXPECT_EQ(destructorB, 0);
+		bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant(LifetimeCounterB{});
+		EXPECT_EQ(LifetimeCounterA::constructor_, 0);
+		EXPECT_EQ(LifetimeCounterA::destructor_, 0);
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 0);
+		EXPECT_EQ(LifetimeCounterB::move_, 1);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 1);
 	}
-	EXPECT_EQ(destructorB, 2);
+	EXPECT_EQ(LifetimeCounterA::destructor_, 0);
+	EXPECT_EQ(LifetimeCounterB::destructor_, 2);
 
 	{
-		TypeA a;
-		bzd::Variant<TypeA, TypeB> variant(bzd::move(a));
-		EXPECT_EQ(constructorA, 2);
-		EXPECT_EQ(destructorA, 0);
-		EXPECT_EQ(constructorB, 2);
-		EXPECT_EQ(destructorB, 2);
+		bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant(LifetimeCounterA{});
+		EXPECT_EQ(LifetimeCounterA::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterA::copy_, 0);
+		EXPECT_EQ(LifetimeCounterA::move_, 1);
+		EXPECT_EQ(LifetimeCounterA::destructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 0);
+		EXPECT_EQ(LifetimeCounterB::move_, 1);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 2);
 	}
-	EXPECT_EQ(destructorA, 2);
+	EXPECT_EQ(LifetimeCounterA::destructor_, 2);
+	EXPECT_EQ(LifetimeCounterB::destructor_, 2);
 }
 
 TEST(ContainerVariant, Is)
@@ -94,14 +97,13 @@ TEST(ContainerVariant, Get)
 {
 	bzd::Variant<bool, int, double> variantInt(static_cast<int>(-12));
 
-	auto retBool = variantInt.get<bool>();
-	EXPECT_FALSE(retBool);
-
-	auto retInt = variantInt.get<int>();
-	EXPECT_TRUE(retInt);
-	EXPECT_EQ(retInt.value(), -12);
-	retInt.valueMutable() = 42;
-	EXPECT_EQ(variantInt.get<int>().value(), 42);
+	auto isBool = variantInt.is<bool>();
+	EXPECT_FALSE(isBool);
+	auto isInt = variantInt.is<int>();
+	EXPECT_TRUE(isInt);
+	EXPECT_EQ(variantInt.get<int>(), -12);
+	variantInt.get<int>() = 42;
+	EXPECT_EQ(variantInt.get<int>(), 42);
 }
 
 TEST(ContainerVariant, Match)
@@ -140,9 +142,9 @@ TEST(ContainerVariant, Constexpr)
 	constexpr bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
 	EXPECT_TRUE(variantDouble.is<double>());
 
-	const auto ret = variantDouble.get<double>();
-	EXPECT_TRUE(ret);
-	EXPECT_NEAR(ret.value(), 5.4, 0.01);
+	const auto isDouble = variantDouble.is<double>();
+	EXPECT_TRUE(isDouble);
+	EXPECT_NEAR(variantDouble.get<double>(), 5.4, 0.01);
 
 	{
 		constexpr bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
