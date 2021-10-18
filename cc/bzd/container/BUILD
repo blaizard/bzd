@@ -306,7 +306,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":result",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/meta:type_list",
         "//cc/bzd/meta:union",

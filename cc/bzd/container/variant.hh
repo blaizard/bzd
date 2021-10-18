@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/container/result.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
@@ -32,7 +31,7 @@ protected:
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
 	struct HelperT
 	{
-		static constexpr auto call(const SizeType index, Args&&... args)
+		static constexpr auto call(const SizeType index, Args&&... args) noexcept
 		{
 			using T = ChooseNth<N>;
 			if (index == N)
@@ -46,7 +45,7 @@ protected:
 	template <SizeType N, template <class> class F, class... Args>
 	struct HelperT<N, N, F, Args...>
 	{
-		static constexpr auto call(const SizeType index, Args&&... args)
+		static constexpr auto call(const SizeType index, Args&&... args) noexcept
 		{
 			using T = ChooseNth<N>;
 			bzd::assert::isTrue(index == N, "Inconsistent variant state, should never happen");
@@ -66,7 +65,9 @@ protected:
 		: F0
 		, Overload<Frest...>
 	{
-		constexpr Overload(F0&& f0, Frest&&... rest) : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...) {}
+		constexpr Overload(F0&& f0, Frest&&... rest) noexcept : F0{bzd::forward<F0>(f0)}, Overload<Frest...>(bzd::forward<Frest>(rest)...)
+		{
+		}
 		using F0::operator();
 		using Overload<Frest...>::operator();
 	};
@@ -74,7 +75,7 @@ protected:
 	template <class F0>
 	struct Overload<F0> : F0
 	{
-		constexpr Overload(F0&& f0) : F0{bzd::forward<F0>(f0)} {}
+		constexpr Overload(F0&& f0) noexcept : F0{bzd::forward<F0>(f0)} {}
 		using F0::operator();
 	};
 
@@ -83,7 +84,7 @@ protected:
 	struct VariantMatch
 	{
 		template <class SelfType, class V>
-		static constexpr void call(SelfType& self, V& visitor)
+		static constexpr void call(SelfType& self, V& visitor) noexcept
 		{
 			visitor(self.data_.template get<T>());
 		}
@@ -94,11 +95,11 @@ protected:
 	// Copy visitor
 	struct CopyVisitor
 	{
-		constexpr CopyVisitor(const VariantBase<Ts...>& variant) : variant_{variant} {}
+		constexpr CopyVisitor(const VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
 		template <class T>
-		constexpr void operator()(T& value)
+		constexpr void operator()(T& value) noexcept
 		{
-			value = variant_.get<T>().value();
+			value = variant_.get<T>();
 		}
 
 	private:
@@ -109,13 +110,13 @@ public:
 	/**
 	 * Default constructor
 	 */
-	constexpr VariantBase() = default;
+	constexpr VariantBase() noexcept = default;
 
 	/**
 	 * Value constructor (exact type match)
 	 */
 	template <class T, int Index = Find<T>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
-	constexpr VariantBase(T&& value) : id_{Index}, data_{bzd::forward<T>(value)}
+	constexpr VariantBase(T&& value) noexcept : id_{Index}, data_{bzd::forward<T>(value)}
 	{
 	}
 
@@ -123,14 +124,14 @@ public:
 	 * Value constructor (lazy, if constructible)
 	 */
 	template <class T, int Index = FindConstructible<T>::value, bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr>
-	constexpr VariantBase(T&& value) : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
+	constexpr VariantBase(T&& value) noexcept : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
 	{
 	}
 
 	/**
 	 * Copy constructor
 	 */
-	constexpr VariantBase(const VariantBase<Ts...>& variant) : id_{variant.id_}
+	constexpr VariantBase(const VariantBase<Ts...>& variant) noexcept : id_{variant.id_}
 	{
 		CopyVisitor visitor{variant};
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
@@ -139,55 +140,41 @@ public:
 	constexpr bzd::SizeType index() const noexcept { return id_; }
 
 	template <class T>
-	constexpr bool is() const noexcept
+	constexpr bzd::BoolType is() const noexcept
 	{
 		return (id_ != -1 && id_ == Find<T>::value);
 	}
 
 	template <class T>
-	constexpr bzd::Result<const T&, bool> get() const
+	constexpr const T& get() const noexcept
 	{
-		if (is<T>())
-		{
-			return data_.template get<T>();
-		}
-		return bzd::makeError(false);
+		return data_.template get<T>();
 	}
 
 	template <class T>
-	constexpr bzd::Result<T&, bool> get()
+	constexpr T& get() noexcept
 	{
-		if (is<T>())
-		{
-			return data_.template get<T>();
-		}
-		return bzd::makeError(false);
+		return data_.template get<T>();
 	}
 
 	template <class... Functors>
-	constexpr void match(Functors&&... funcs) const
+	constexpr void match(Functors&&... funcs) const noexcept
 	{
 		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
 		Match<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 protected:
-	int id_ = -1;
-	bzd::meta::Union<Ts...> data_ = {};
+	bzd::Int16Type id_{-1};
+	bzd::meta::Union<Ts...> data_{};
 };
 
 template <class... Ts>
 class VariantTrivial : public VariantBase<Ts...>
 {
-protected:
-	using Parent = VariantBase<Ts...>;
-
 public:
-	// Forward constructor to the main class
-	template <class... Args>
-	constexpr VariantTrivial(Args&&... args) : Parent::VariantBase{bzd::forward<Args>(args)...}
-	{
-	}
+	using Parent = VariantBase<Ts...>;
+	using Parent::VariantBase;
 };
 
 template <class... Ts>
@@ -219,13 +206,13 @@ protected:
 	template <class T>
 	struct VariantDestructor
 	{
-		static void call(Self* self) { self->data_.template get<T>().~T(); }
+		static void call(Self* self) noexcept { self->data_.template get<T>().~T(); }
 	};
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr void construct(Args&&... args)
+	constexpr void construct(Args&&... args) noexcept
 	{
 		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
 		// Using inplace operator new
@@ -234,7 +221,7 @@ private:
 		id_ = Find<T>::value;
 	}
 
-	constexpr void destructIfNeeded()
+	constexpr void destructIfNeeded() noexcept
 	{
 		if (id_ != -1)
 		{
@@ -243,20 +230,16 @@ private:
 	}
 
 public:
-	// Forward constructor to the main class
-	template <class... Args>
-	constexpr VariantNonTrivial(Args&&... args) : Parent::VariantBase{bzd::forward<Args>(args)...}
-	{
-	}
+	using Parent::VariantBase;
 
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr void emplace(Args&&... args)
+	constexpr void emplace(Args&&... args) noexcept
 	{
 		destructIfNeeded();
 		construct<T>(bzd::forward<Args>(args)...);
 	}
 
-	~VariantNonTrivial() { destructIfNeeded(); }
+	~VariantNonTrivial() noexcept { destructIfNeeded(); }
 };
 } // namespace bzd::impl
 
