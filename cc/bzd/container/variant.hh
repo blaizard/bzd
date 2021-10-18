@@ -5,6 +5,7 @@
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_constructible.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 
 namespace bzd::impl {
 template <class... Ts>
@@ -77,7 +78,9 @@ protected:
 	struct Overload<F0> : F0
 	{
 		template <class T>
-		constexpr Overload(T&& f0) noexcept : F0{bzd::forward<T>(f0)} {}
+		constexpr Overload(T&& f0) noexcept : F0{bzd::forward<T>(f0)}
+		{
+		}
 		using F0::operator();
 	};
 
@@ -117,7 +120,7 @@ public:
 	/**
 	 * Value constructor (exact type match)
 	 */
-	template <class T, int Index = Find<T>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
+	template <class T, int Index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
 	constexpr VariantBase(T&& value) noexcept : id_{Index}, data_{bzd::forward<T>(value)}
 	{
 	}
@@ -125,11 +128,12 @@ public:
 	/**
 	 * Value constructor (lazy, if constructible)
 	 */
-	template <class T, int Index = FindConstructible<T>::value, bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr>
-	constexpr VariantBase(T&& value) noexcept : id_{Index}, data_{static_cast<ChooseNth<Index>>(value)}
-	{
-	}
-
+	/*	template <class T, int Index = FindConstructible<bzd::typeTraits::RemoveReference<T>>::value,
+	   bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr> constexpr VariantBase(T&& value) noexcept : id_{Index},
+	   data_{static_cast<ChooseNth<Index>>(value)}
+		{
+		}
+	*/
 	/**
 	 * Copy constructor
 	 */
@@ -139,7 +143,7 @@ public:
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
 	}
 
-	constexpr bzd::SizeType index() const noexcept { return id_; }
+	constexpr bzd::Int16Type index() const noexcept { return id_; }
 
 	template <class T>
 	constexpr bzd::BoolType is() const noexcept
