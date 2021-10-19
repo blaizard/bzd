@@ -66,7 +66,7 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 public:
-	[[nodiscard]] constexpr bzd::SizeType getCopiedCounter() noexcept { return copiedCounter_; }
+	[[nodiscard]] constexpr bzd::SizeType getCopiedCounter() const noexcept { return copiedCounter_; }
 
 private:
 	bzd::SizeType copiedCounter_{0};
@@ -90,8 +90,8 @@ public:
 	}
 
 public:
-	[[nodiscard]] constexpr bzd::SizeType getMovedCounter() noexcept { return movedCounter_; }
-	[[nodiscard]] constexpr bzd::BoolType hasBeenMoved() noexcept { return hasBeenMoved_; }
+	[[nodiscard]] constexpr bzd::SizeType getMovedCounter() const noexcept { return movedCounter_; }
+	[[nodiscard]] constexpr bzd::BoolType hasBeenMoved() const noexcept { return hasBeenMoved_; }
 
 private:
 	bzd::SizeType movedCounter_{0};

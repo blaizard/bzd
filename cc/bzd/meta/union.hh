@@ -16,6 +16,9 @@ class UnionTag
 
 template <class T, class... Ts>
 union UnionTrivial {
+public: // Traits
+	using Self = UnionTrivial<T, Ts...>;
+
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
@@ -30,6 +33,10 @@ public:
 	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
+
+	// Disallow copy/move assignments.
+	//	constexpr Self& operator=(const Self&) noexcept = delete;
+	//	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
 	constexpr U& get() noexcept
@@ -62,6 +69,9 @@ protected:
 
 template <class T, class... Ts>
 union UnionNonTrivial {
+public: // Traits
+	using Self = UnionNonTrivial<T, Ts...>;
+
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
 	// initialize something
@@ -79,6 +89,10 @@ public:
 	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
+
+	// Disallow copy/move assignments.
+	//	constexpr Self& operator=(const Self&) noexcept = delete;
+	//	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
 	constexpr U& get() noexcept

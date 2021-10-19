@@ -134,13 +134,19 @@ public:
 		{
 		}
 	*/
+
 	/**
 	 * Copy constructor
 	 */
-	constexpr VariantBase(const VariantBase<Ts...>& variant) noexcept : id_{variant.id_}
+	constexpr VariantBase(const Self& variant) noexcept { *this = variant; }
+
+	constexpr Self& operator=(const Self& variant) noexcept
 	{
 		CopyVisitor visitor{variant};
+		id_ = variant.id_;
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
+
+		return *this;
 	}
 
 	constexpr bzd::Int16Type index() const noexcept { return id_; }
@@ -179,6 +185,7 @@ template <class... Ts>
 class VariantTrivial : public VariantBase<Ts...>
 {
 public:
+	using Self = VariantTrivial<Ts...>;
 	using Parent = VariantBase<Ts...>;
 	using Parent::VariantBase;
 };
@@ -238,6 +245,19 @@ private:
 public:
 	using Parent::VariantBase;
 
+	constexpr Self& operator=(const Self& other) noexcept
+	{
+		destructIfNeeded();
+		Parent::operator=(other);
+		return *this;
+	}
+	/*
+		constexpr Self& operator=(Self&& other) noexcept
+		{
+			destructIfNeeded();
+			return Parent::operator=(other);
+		}
+	*/
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args) noexcept
 	{

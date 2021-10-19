@@ -26,6 +26,9 @@ TEST(MetaUnion, Constructor)
 
 	bzd::meta::Union<int, double> a{static_cast<double>(3.1415)};
 	EXPECT_NEAR(a.get<double>(), 3.1415, 0.0001);
+
+	bzd::meta::Union<char, void*> pointer{static_cast<void*>(nullptr)};
+	EXPECT_EQ(pointer.get<void*>(), nullptr);
 }
 
 TEST(MetaUnionConstexpr, Constructor)
@@ -73,6 +76,15 @@ TEST(MetaUnion, CopyConstructor)
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 	}
 	EXPECT_EQ(LifetimeCounter::destructor_, 1);
+
+	{
+		bzd::test::CopyOnly value{};
+		bzd::meta::Union<bzd::test::CopyOnly> u{value};
+		EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
+		bzd::meta::Union<bzd::test::CopyOnly> u2;
+		u2.get<bzd::test::CopyOnly>() = u.get<bzd::test::CopyOnly>();
+		EXPECT_EQ(u2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
+	}
 }
 
 TEST(MetaUnion, MoveConstructor)
@@ -91,4 +103,15 @@ TEST(MetaUnion, MoveConstructor)
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 	}
 	EXPECT_EQ(LifetimeCounter::destructor_, 1);
+
+	{
+		bzd::test::MoveOnly value{};
+		bzd::meta::Union<bzd::test::MoveOnly> u{bzd::move(value)};
+		EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+		bzd::meta::Union<bzd::test::MoveOnly> u2;
+		u2.get<bzd::test::MoveOnly>() = bzd::move(u.get<bzd::test::MoveOnly>());
+		EXPECT_EQ(u2.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+		bzd::meta::Union<bzd::test::MoveOnly> u3{bzd::test::MoveOnly{}};
+		EXPECT_EQ(u3.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+	}
 }
