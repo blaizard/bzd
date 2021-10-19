@@ -311,6 +311,7 @@ cc_library(
         "//cc/bzd/meta:union",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_constructible",
+        "//cc/bzd/utility:move"
     ],
 )
 
