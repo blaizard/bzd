@@ -73,9 +73,25 @@ struct OptionalTrivialStorage
 	}
 
 	constexpr OptionalTrivialStorage(const Self& optional) noexcept = default;
-	constexpr Self& operator=(const Self& optional) noexcept = default;
+	constexpr Self& operator=(const Self& optional) noexcept
+	{
+		isValue_ = optional.isValue_;
+		if (isValue_)
+		{
+			value_ = optional.value_;
+		}
+		return *this;
+	}
 	constexpr OptionalTrivialStorage(Self&& optional) noexcept = default;
-	constexpr Self& operator=(Self&& optional) noexcept = default;
+	constexpr Self& operator=(Self&& optional) noexcept
+	{
+		isValue_ = optional.isValue_;
+		if (isValue_)
+		{
+			value_ = bzd::move(optional.value_);
+		}
+		return *this;
+	}
 	//~OptionalTrivialStorage() noexcept = default;
 
 	bool isValue_{false};

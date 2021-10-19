@@ -58,6 +58,54 @@ TEST(ContainerVariant, MoveConstructor)
 	EXPECT_EQ(LifetimeCounter::destructor_, 2);
 }
 
+TEST(ContainerVariantTrivial, CopyAssignment)
+{
+	{
+		constexpr bzd::Variant<bool, int> variant1{static_cast<int>(42)};
+		EXPECT_EQ(variant1.index(), 1);
+		bzd::Variant<bool, int> variant2{static_cast<bool>(true)};
+		EXPECT_EQ(variant2.index(), 0);
+		variant2 = variant1;
+		EXPECT_EQ(variant2.index(), 1);
+	}
+
+	{
+		bzd::test::CopyOnly value{};
+		bzd::Variant<int, bzd::test::CopyOnly> variant1{value};
+		EXPECT_EQ(variant1.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
+		bzd::Variant<int, bzd::test::CopyOnly> variant2;
+		variant2 = variant1;
+		EXPECT_EQ(variant2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
+	}
+}
+
+TEST(ContainerVariantNonTrivial, CopyAssignment)
+{
+	{
+		using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+		bzd::Variant<LifetimeCounter, int> variant1{LifetimeCounter{}};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		bzd::Variant<LifetimeCounter, int> variant2{static_cast<int>(1)};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		variant2 = variant1;
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 1);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		variant1 = variant2;
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 2);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 2);
+	}
+}
+
 TEST(ContainerVariant, Destructor)
 {
 	using LifetimeCounterA = bzd::test::LifetimeCounter<struct a>;
