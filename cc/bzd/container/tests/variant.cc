@@ -42,6 +42,9 @@ TEST(ContainerVariant, CopyConstructor)
 
 TEST(ContainerVariant, MoveConstructor)
 {
+	bzd::Variant<int, bool, double> variant{bzd::Variant<int, bool, double>{static_cast<double>(3.1415)}};
+	EXPECT_NEAR(variant.get<double>(), 3.1415, 0.0001);
+
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		LifetimeCounter value{};
@@ -102,6 +105,54 @@ TEST(ContainerVariantNonTrivial, CopyAssignment)
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 2);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 2);
+	}
+}
+
+TEST(ContainerVariantTrivial, MoveAssignment)
+{
+	{
+		constexpr bzd::Variant<bool, int> variant1{static_cast<int>(42)};
+		EXPECT_EQ(variant1.index(), 1);
+		bzd::Variant<bool, int> variant2{static_cast<bool>(true)};
+		EXPECT_EQ(variant2.index(), 0);
+		variant2 = bzd::move(variant1);
+		EXPECT_EQ(variant2.index(), 1);
+	}
+
+	{
+		bzd::test::MoveOnly value{};
+		bzd::Variant<int, bzd::test::MoveOnly> variant1{bzd::move(value)};
+		EXPECT_EQ(variant1.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+		bzd::Variant<int, bzd::test::MoveOnly> variant2;
+		variant2 = bzd::move(variant1);
+		EXPECT_EQ(variant2.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+	}
+}
+
+TEST(ContainerVariantNonTrivial, MoveAssignment)
+{
+	{
+		using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+		bzd::Variant<LifetimeCounter, int> variant1{LifetimeCounter{}};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		bzd::Variant<LifetimeCounter, int> variant2{static_cast<int>(1)};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		variant2 = bzd::move(variant1);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 2);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
+		variant1 = bzd::move(variant2);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 3);
 		EXPECT_EQ(LifetimeCounter::destructor_, 2);
 	}
 }

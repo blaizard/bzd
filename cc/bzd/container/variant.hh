@@ -6,6 +6,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {
 template <class... Ts>
@@ -111,6 +112,20 @@ protected:
 		const VariantBase<Ts...>& variant_;
 	};
 
+	// Move visitor
+	struct MoveVisitor
+	{
+		constexpr MoveVisitor(VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
+		template <class T>
+		constexpr void operator()(T& value) noexcept
+		{
+			value = bzd::move(variant_.get<T>());
+		}
+
+	private:
+		VariantBase<Ts...>& variant_;
+	};
+
 public:
 	/**
 	 * Default constructor
@@ -126,25 +141,35 @@ public:
 	}
 
 	/**
-	 * Value constructor (lazy, if constructible)
-	 */
-	/*	template <class T, int Index = FindConstructible<bzd::typeTraits::RemoveReference<T>>::value,
-	   bzd::typeTraits::EnableIf<Find<T>::value == -1 && Index != -1>* = nullptr> constexpr VariantBase(T&& value) noexcept : id_{Index},
-	   data_{static_cast<ChooseNth<Index>>(value)}
-		{
-		}
-	*/
-
-	/**
-	 * Copy constructor
+	 * Copy constructor.
 	 */
 	constexpr VariantBase(const Self& variant) noexcept { *this = variant; }
 
+	/**
+	 * Copy assignment.
+	 */
 	constexpr Self& operator=(const Self& variant) noexcept
 	{
-		CopyVisitor visitor{variant};
 		id_ = variant.id_;
+		CopyVisitor visitor{variant};
 		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
+
+		return *this;
+	}
+
+	/**
+	 * Move constructor.
+	 */
+	constexpr VariantBase(Self&& variant) noexcept { *this = bzd::move(variant); }
+
+	/**
+	 * Move assignment.
+	 */
+	constexpr Self& operator=(Self&& variant) noexcept
+	{
+		id_ = variant.id_;
+		MoveVisitor visitor{variant};
+		Match<MoveVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
 	}
@@ -184,7 +209,7 @@ protected:
 template <class... Ts>
 class VariantTrivial : public VariantBase<Ts...>
 {
-public:
+public: // Traits
 	using Self = VariantTrivial<Ts...>;
 	using Parent = VariantBase<Ts...>;
 	using Parent::VariantBase;
@@ -193,10 +218,11 @@ public:
 template <class... Ts>
 class VariantNonTrivial : public VariantBase<Ts...>
 {
-protected:
+public: // Traits
 	using Self = VariantNonTrivial<Ts...>;
 	using Parent = VariantBase<Ts...>;
 
+protected:
 	// Choose the Nth element out of the list
 	template <SizeType N>
 	using ChooseNth = typename Parent::template ChooseNth<N>;
@@ -245,19 +271,14 @@ private:
 public:
 	using Parent::VariantBase;
 
-	constexpr Self& operator=(const Self& other) noexcept
+	template <class T>
+	constexpr Self& operator=(T&& other) noexcept
 	{
 		destructIfNeeded();
-		Parent::operator=(other);
+		Parent::operator=(bzd::forward<T>(other));
 		return *this;
 	}
-	/*
-		constexpr Self& operator=(Self&& other) noexcept
-		{
-			destructIfNeeded();
-			return Parent::operator=(other);
-		}
-	*/
+
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args) noexcept
 	{
