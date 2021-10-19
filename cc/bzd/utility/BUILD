@@ -12,6 +12,7 @@ cc_library(
         ":container_of",
         ":forward",
         ":ignore",
+        ":lock_guard",
         ":max",
         ":min",
         ":move",
@@ -110,6 +111,19 @@ cc_library(
         "ignore.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "lock_guard",
+    hdrs = [
+        "lock_guard.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":scope_guard",
+        "//cc/bzd/core/async",
+        "//cc/bzd/type_traits:invoke_result",
+    ],
 )
 
 cc_library(

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/atomic.hh"
@@ -486,44 +487,44 @@ class NonOwningList : public bzd::impl::NonOwningList<bzd::NonOwningListElement<
 public:
 	using bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>::NonOwningList;
 
-	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
+	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<T&>> front() noexcept
 	{
 		auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<T&>(*ptr);
+		return bzd::ReferenceWrapper<T&>{static_cast<T&>(*ptr)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<const T&>> front() const noexcept
 	{
 		const auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<const T&>(*ptr);
+		return bzd::ReferenceWrapper<const T&>{static_cast<const T&>(*ptr)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
+	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<T&>> back() noexcept
 	{
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<T&>(*previous->node);
+		return bzd::ReferenceWrapper<T&>{static_cast<T&>(*previous->node)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<const T&>> back() const noexcept
 	{
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<const T&>(*previous->node);
+		return bzd::ReferenceWrapper<const T&>{static_cast<const T&>(*previous->node)};
 	}
 };
 } // namespace bzd

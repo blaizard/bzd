@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/tuple.hh"
@@ -276,7 +277,7 @@ public:
 	public:
 		struct Result
 		{
-			const bzd::Optional<const Metadata&> metadata;
+			const bzd::Optional<const Metadata> metadata;
 			const StringView& str;
 		};
 

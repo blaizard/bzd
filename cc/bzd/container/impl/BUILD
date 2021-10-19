@@ -20,6 +20,7 @@ cc_library(
     visibility = ["//cc/bzd:__subpackages__"],
     deps = [
         "//cc/bzd/container:optional",
+        "//cc/bzd/container:reference_wrapper",
         "//cc/bzd/container:result",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:atomic",
