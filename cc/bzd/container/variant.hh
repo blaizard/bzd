@@ -126,6 +126,16 @@ protected:
 		VariantBase<Ts...>& variant_;
 	};
 
+	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
+	constexpr void emplace(Args&&... args) noexcept
+	{
+		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
+		// Using inplace operator new
+		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
+		// Sets the ID only if the constructor succeeded
+		id_ = Find<T>::value;
+	}
+
 public:
 	/**
 	 * Default constructor
@@ -250,16 +260,6 @@ protected:
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr void construct(Args&&... args) noexcept
-	{
-		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
-		// Using inplace operator new
-		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
-		// Sets the ID only if the constructor succeeded
-		id_ = Find<T>::value;
-	}
-
 	constexpr void destructIfNeeded() noexcept
 	{
 		if (id_ != -1)
@@ -279,11 +279,11 @@ public:
 		return *this;
 	}
 
-	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
+	template <class T, class... Args>
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		destructIfNeeded();
-		construct<T>(bzd::forward<Args>(args)...);
+		Parent::template emplace<T>(bzd::forward<Args>(args)...);
 	}
 
 	~VariantNonTrivial() noexcept { destructIfNeeded(); }
