@@ -126,16 +126,6 @@ protected:
 		VariantBase<Ts...>& variant_;
 	};
 
-	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr void emplace(Args&&... args) noexcept
-	{
-		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
-		// Using inplace operator new
-		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
-		// Sets the ID only if the constructor succeeded
-		id_ = Find<T>::value;
-	}
-
 public:
 	/**
 	 * Default constructor
@@ -153,7 +143,7 @@ public:
 	/**
 	 * Copy constructor.
 	 */
-	constexpr VariantBase(const Self& variant) noexcept { *this = variant; }
+	constexpr VariantBase(const Self& variant) noexcept : id_{variant.id_}, data_{variant.data_} {}
 
 	/**
 	 * Copy assignment.
@@ -170,7 +160,7 @@ public:
 	/**
 	 * Move constructor.
 	 */
-	constexpr VariantBase(Self&& variant) noexcept { *this = bzd::move(variant); }
+	constexpr VariantBase(Self&& variant) noexcept : id_{variant.id_}, data_{bzd::move(variant.data_)} {}
 
 	/**
 	 * Move assignment.
@@ -182,6 +172,16 @@ public:
 		Match<MoveVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
+	}
+
+	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
+	constexpr void emplace(Args&&... args) noexcept
+	{
+		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
+		// Using inplace operator new
+		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
+		// Sets the ID only if the constructor succeeded
+		id_ = Find<T>::value;
 	}
 
 	constexpr bzd::Int16Type index() const noexcept { return id_; }

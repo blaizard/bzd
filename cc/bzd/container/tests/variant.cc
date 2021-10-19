@@ -260,6 +260,9 @@ TEST(ContainerVariant, Constexpr)
 	EXPECT_TRUE(isDouble);
 	EXPECT_NEAR(variantDouble.get<double>(), 5.4, 0.01);
 
+	constexpr bzd::Variant<int, bool, double> variantCopy(variantBool);
+	EXPECT_TRUE(variantCopy.is<bool>());
+
 	{
 		constexpr bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
 		double b = 0;

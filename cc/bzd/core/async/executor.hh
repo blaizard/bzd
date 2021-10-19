@@ -62,7 +62,7 @@ private:
 				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
 				// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
 
-				return handle;
+				return static_cast<bzd::coroutine::impl::coroutine_handle<>>(handle);
 			}
 		}
 

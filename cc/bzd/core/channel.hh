@@ -2,8 +2,8 @@
 
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/platform/types.hh"
 #include "cc/bzd/core/mutex.hh"
+#include "cc/bzd/platform/types.hh"
 
 namespace bzd {
 
