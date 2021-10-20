@@ -258,23 +258,23 @@ public: // Constructors
 	}
 
 public: // API
-	constexpr bool hasValue() const noexcept { return isValue_; }
+	constexpr bool hasValue() const noexcept { return data_.template is<ValueContainer>(); }
 	constexpr explicit operator bool() const noexcept { return hasValue(); }
 
 	constexpr const Value& valueOr(const Value& defaultValue) const noexcept
 	{
-		return (isValue_) ? data_.template get<ValueContainer>() : defaultValue;
+		return (hasValue()) ? data_.template get<ValueContainer>() : defaultValue;
 	}
 
 	constexpr const Value& value() const
 	{
-		bzd::assert::isTrue(isValue_);
+		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
 	}
 
 	constexpr Value& valueMutable()
 	{
-		bzd::assert::isTrue(isValue_);
+		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
 	}
 
@@ -288,20 +288,17 @@ public: // API
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		data_.template emplace<ValueContainer>(bzd::forward<Args>(args)...);
-		isValue_ = true;
 	}
 
 	constexpr void reset() noexcept
 	{
-		if (isValue_)
+		if (hasValue())
 		{
 			data_ = OptionalNull::make();
-			isValue_ = false;
 		}
 	}
 
 private:
-	bzd::BoolType isValue_{false};
 	bzd::Variant<OptionalNull, ValueContainer> data_{};
 };
 

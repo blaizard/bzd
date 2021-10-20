@@ -1,12 +1,11 @@
-#include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/optional2.hh"
 
-#include "cc/bzd/container/result.hh"
 #include "cc/bzd/test/types.hh"
 #include "cc_test/test.hh"
 
-TEST(ContainerOptional, simpleData)
+TEST(ContainerOptional2, simpleData)
 {
-	bzd::Optional<int> v(42);
+	bzd::Optional2<int> v(42);
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.value(), 42);
@@ -39,58 +38,78 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_FALSE(v);
 }
 
-TEST(ContainerOptional, move)
+TEST(ContainerOptional2, copy)
 {
-	bzd::Optional<bzd::test::MoveOnly> v{bzd::test::MoveOnly()};
+	// Copy value
+	bzd::test::CopyOnly value{};
+	bzd::Optional2<bzd::test::CopyOnly> v{value};
+	EXPECT_TRUE(v);
+	EXPECT_EQ(v->getCopiedCounter(), 1);
+
+	// Copy constructor
+	bzd::Optional2<bzd::test::CopyOnly> vCopied{v};
+	EXPECT_TRUE(vCopied);
+	EXPECT_EQ(vCopied->getCopiedCounter(), 2);
+
+	// Copy assignment
+	bzd::Optional2<bzd::test::CopyOnly> vAssingnment;
+	EXPECT_FALSE(vAssingnment);
+	vAssingnment = vCopied;
+	EXPECT_TRUE(vAssingnment);
+	EXPECT_EQ(vAssingnment->getCopiedCounter(), 3);
+}
+
+TEST(ContainerOptional2, move)
+{
+	// Move value
+	bzd::Optional2<bzd::test::MoveOnly> v{bzd::test::MoveOnly()};
 	EXPECT_TRUE(v);
 	EXPECT_FALSE(v->hasBeenMoved());
 	EXPECT_EQ(v->getMovedCounter(), 1);
 
+	// Move constructor
+	bzd::Optional2<bzd::test::MoveOnly> vMoved{bzd::move(v)};
+	EXPECT_TRUE(vMoved);
+	EXPECT_FALSE(vMoved->hasBeenMoved());
+	EXPECT_EQ(vMoved->getMovedCounter(), 2);
+
 	// Move assignment
-	/*	auto vMoved = bzd::move(v);
-		EXPECT_TRUE(v);
-		EXPECT_TRUE(v->hasBeenMoved());
-		EXPECT_TRUE(vMoved);
-		EXPECT_FALSE(vMoved->hasBeenMoved());
-		EXPECT_EQ(vMoved->getMovedCounter(), 2);*/
+	bzd::Optional2<bzd::test::MoveOnly> vAssingnment;
+	EXPECT_FALSE(vAssingnment);
+	vAssingnment = bzd::move(vMoved);
+	EXPECT_TRUE(vAssingnment);
+	EXPECT_FALSE(vAssingnment->hasBeenMoved());
+	EXPECT_EQ(vAssingnment->getMovedCounter(), 3);
 }
 
-TEST(ContainerOptional, simpleNoData)
+TEST(ContainerOptional2, simpleNoData)
 {
-	bzd::Optional<int> v;
+	bzd::Optional2<int> v;
 
 	EXPECT_FALSE(v);
 	EXPECT_EQ(v.valueOr(10), 10);
 }
 
-TEST(ContainerOptional, constexprType)
+TEST(ContainerOptional2, constexprType)
 {
-	constexpr bzd::Optional<int> v;
+	constexpr bzd::Optional2<int> v;
 
 	EXPECT_FALSE(v);
 	EXPECT_EQ(v.valueOr(10), 10);
 
-	constexpr bzd::Optional<int> u{23};
+	constexpr bzd::Optional2<int> u{23};
 
 	EXPECT_TRUE(u);
 	EXPECT_EQ(u.valueOr(10), 23);
-
-	constexpr auto vCopy{u};
-	EXPECT_TRUE(vCopy);
-	EXPECT_EQ(vCopy.value(), 23);
-
-	constexpr auto vMove{bzd::move(vCopy)};
-	EXPECT_TRUE(vMove);
-	EXPECT_EQ(vMove.value(), 23);
 }
 
-TEST(ContainerOptional, complexData)
+TEST(ContainerOptional2, complexData)
 {
 	struct Value
 	{
 		int a;
 	};
-	bzd::Optional<Value> v{Value{45}};
+	bzd::Optional2<Value> v{Value{45}};
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.valueOr({12}).a, 45);
@@ -111,8 +130,9 @@ TEST(ContainerOptional, complexData)
 	v.reset();
 	EXPECT_FALSE(v);
 }
+
 /*
-TEST(ContainerOptional, reference)
+TEST(ContainerOptional2, reference)
 {
 	int a = 42;
 	bzd::Optional<int&> v(a);
@@ -142,10 +162,11 @@ TEST(ContainerOptional, reference)
 	EXPECT_EQ(vMove.value(), 7);
 }
 */
-TEST(ContainerOptional, pointer)
+
+TEST(ContainerOptional2, pointer)
 {
 	int a = 42;
-	bzd::Optional<int*> v(&a);
+	bzd::Optional2<int*> v(&a);
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(*(v.value()), 42);
@@ -164,39 +185,3 @@ TEST(ContainerOptional, pointer)
 	a = 7;
 	EXPECT_EQ(*(vMove.value()), 7);
 }
-/*
-TEST(ContainerOptional, result)
-{
-	{
-		bzd::Optional<bzd::Result<int, bool>> v(45);
-
-		EXPECT_TRUE(v);
-		EXPECT_EQ(v.valueOr({12}).value(), 45);
-
-		auto vCopy{v};
-		EXPECT_TRUE(vCopy);
-		EXPECT_EQ(vCopy.value().value(), 45);
-
-		auto vMove{bzd::move(vCopy)};
-		EXPECT_TRUE(vMove);
-		EXPECT_EQ(vMove.value().value(), 45);
-	}
-
-	{
-		bzd::Optional<bzd::Result<int, bool>> v{};
-
-		EXPECT_FALSE(v);
-		EXPECT_EQ(v.valueOr({12}).value(), 12);
-
-		v.emplace(43);
-		EXPECT_TRUE(v);
-		EXPECT_TRUE(v.value());
-		EXPECT_EQ(v.valueOr({12}).value(), 43);
-
-		v.emplace(bzd::makeError(false));
-		EXPECT_TRUE(v);
-		EXPECT_FALSE(v.value());
-		EXPECT_FALSE((v.value()).error());
-	}
-}
-*/
