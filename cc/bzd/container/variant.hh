@@ -135,15 +135,26 @@ public:
 	/**
 	 * Value constructor (exact type match)
 	 */
-	template <class T, int Index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<Index != -1>* = nullptr>
-	constexpr VariantBase(T&& value) noexcept : id_{Index}, data_{bzd::forward<T>(value)}
+	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
+	constexpr VariantBase(T&& value) noexcept : id_{index}, data_{bzd::forward<T>(value)}
 	{
+	}
+
+	/**
+	 * Value assignment (copy/move)
+	 */
+	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
+	constexpr Self& operator=(T& value) noexcept
+	{
+		id_ = index;
+		data_ = bzd::forward<T>(value);
+		return *this;
 	}
 
 	/**
 	 * Copy constructor.
 	 */
-	constexpr VariantBase(const Self& variant) noexcept : id_{variant.id_}, data_{variant.data_} {}
+	constexpr VariantBase(const Self& variant) noexcept { *this = variant; }
 
 	/**
 	 * Copy assignment.
@@ -160,7 +171,7 @@ public:
 	/**
 	 * Move constructor.
 	 */
-	constexpr VariantBase(Self&& variant) noexcept : id_{variant.id_}, data_{bzd::move(variant.data_)} {}
+	constexpr VariantBase(Self&& variant) noexcept { *this = bzd::move(variant); }
 
 	/**
 	 * Move assignment.
@@ -270,6 +281,18 @@ private:
 
 public:
 	using Parent::VariantBase;
+
+	constexpr VariantNonTrivial(const Self& variant) noexcept : Parent{}
+	{
+		destructIfNeeded();
+		Parent::operator=(variant);
+	}
+
+	constexpr VariantNonTrivial(Self&& variant) noexcept : Parent{}
+	{
+		destructIfNeeded();
+		Parent::operator=(bzd::move(variant));
+	}
 
 	template <class T>
 	constexpr Self& operator=(T&& other) noexcept

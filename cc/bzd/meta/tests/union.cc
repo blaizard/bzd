@@ -115,3 +115,27 @@ TEST(MetaUnion, MoveConstructor)
 		EXPECT_EQ(u3.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
 	}
 }
+
+TEST(MetaUnion, CopyAssignment)
+{
+	bzd::test::CopyOnly value{};
+	bzd::meta::Union<bzd::test::CopyOnly> u{};
+	EXPECT_EQ(value.getCopiedCounter(), 0);
+	u = value;
+	EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
+	bzd::meta::Union<int, bool, bzd::test::CopyOnly> v{};
+	v = u.get<bzd::test::CopyOnly>();
+	EXPECT_EQ(v.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
+}
+
+TEST(MetaUnion, MoveAssignment)
+{
+	bzd::test::MoveOnly value{};
+	bzd::meta::Union<bzd::test::MoveOnly> u{};
+	EXPECT_EQ(value.getMovedCounter(), 0);
+	u = bzd::move(value);
+	EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+	bzd::meta::Union<int, bool, bzd::test::MoveOnly> v{};
+	v = bzd::move(u.get<bzd::test::MoveOnly>());
+	EXPECT_EQ(v.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+}

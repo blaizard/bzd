@@ -24,6 +24,7 @@ public:
 	// initialize something
 	constexpr UnionTrivial() noexcept : next_{} {}
 
+	// Value constructor (copy/move)
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
@@ -34,9 +35,20 @@ public:
 	{
 	}
 
-	// Disallow copy/move assignments.
-	//	constexpr Self& operator=(const Self&) noexcept = delete;
-	//	constexpr Self& operator=(Self&&) noexcept = delete;
+	// Value assignments (copy/move).
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	constexpr Self& operator=(U&& value) noexcept
+	{
+		next_ = bzd::forward<U>(value);
+		return *this;
+	}
+
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	constexpr Self& operator=(U&& value) noexcept
+	{
+		value_ = bzd::forward<U>(value);
+		return *this;
+	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
 	constexpr U& get() noexcept
@@ -81,18 +93,31 @@ public:
 	// This is the only difference with a UnionTrivial
 	~UnionNonTrivial() noexcept {}
 
+	// Value constructor (copy/move)
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionNonTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
+
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
 
-	// Disallow copy/move assignments.
-	//	constexpr Self& operator=(const Self&) noexcept = delete;
-	//	constexpr Self& operator=(Self&&) noexcept = delete;
+	// Value assignments (copy/move).
+	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	constexpr Self& operator=(U&& value) noexcept
+	{
+		next_ = bzd::forward<U>(value);
+		return *this;
+	}
+
+	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	constexpr Self& operator=(U&& value) noexcept
+	{
+		value_ = bzd::forward<U>(value);
+		return *this;
+	}
 
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
 	constexpr U& get() noexcept
@@ -125,10 +150,22 @@ protected:
 
 template <>
 union UnionTrivial<UnionTag> {
+	constexpr UnionTrivial() noexcept = default;
+	// This helps for troubleshooting.
+	template <class T>
+	explicit constexpr UnionTrivial(T) noexcept = delete;
+	template <class T>
+	constexpr UnionTrivial<UnionTag>& operator=(T) noexcept = delete;
 };
 
 template <>
 union UnionNonTrivial<UnionTag> {
+	constexpr UnionNonTrivial() noexcept = default;
+	// This helps for troubleshooting.
+	template <class T>
+	explicit constexpr UnionNonTrivial(T) noexcept = delete;
+	template <class T>
+	constexpr UnionNonTrivial<UnionTag>& operator=(T) noexcept = delete;
 };
 } // namespace bzd::meta::impl
 

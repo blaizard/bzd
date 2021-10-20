@@ -19,6 +19,8 @@ TEST(ContainerVariant, Constructor)
 
 TEST(ContainerVariant, CopyConstructor)
 {
+	// Value
+
 	bzd::Variant<int, bool, double> variant1{static_cast<double>(3.1415)};
 	EXPECT_NEAR(variant1.get<double>(), 3.1415, 0.0001);
 	bzd::Variant<int, bool, double> variant2{variant1};
@@ -36,29 +38,33 @@ TEST(ContainerVariant, CopyConstructor)
 		EXPECT_EQ(LifetimeCounter::copy_, 1);
 		EXPECT_EQ(LifetimeCounter::move_, 0);
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
-	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 2);
-}
-
-TEST(ContainerVariant, MoveConstructor)
-{
-	bzd::Variant<int, bool, double> variant{bzd::Variant<int, bool, double>{static_cast<double>(3.1415)}};
-	EXPECT_NEAR(variant.get<double>(), 3.1415, 0.0001);
-
-	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
-	{
-		LifetimeCounter value{};
+		variant3 = static_cast<int>(12);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::copy_, 1);
 		EXPECT_EQ(LifetimeCounter::move_, 0);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
-		bzd::Variant<LifetimeCounter, int> variant{bzd::move(value)};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
-		EXPECT_EQ(LifetimeCounter::move_, 1);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 	}
 	EXPECT_EQ(LifetimeCounter::destructor_, 2);
+
+	// Variant
+	using LifetimeCounterB = bzd::test::LifetimeCounter<struct b>;
+	{
+		LifetimeCounterB value{};
+		bzd::Variant<LifetimeCounterB, int> variant1{value};
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 1);
+		EXPECT_EQ(LifetimeCounterB::move_, 0);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 0);
+		bzd::Variant<LifetimeCounterB, int> variant2{variant1};
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 2);
+		EXPECT_EQ(LifetimeCounterB::move_, 0);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+	EXPECT_EQ(LifetimeCounterB::copy_, 2);
+	EXPECT_EQ(LifetimeCounterB::move_, 0);
+	EXPECT_EQ(LifetimeCounterB::destructor_, 3);
 }
 
 TEST(ContainerVariantTrivial, CopyAssignment)
@@ -107,6 +113,48 @@ TEST(ContainerVariantNonTrivial, CopyAssignment)
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 2);
 	}
+}
+
+TEST(ContainerVariant, MoveConstructor)
+{
+	// Value
+
+	bzd::Variant<int, bool, double> variant{bzd::Variant<int, bool, double>{static_cast<double>(3.1415)}};
+	EXPECT_NEAR(variant.get<double>(), 3.1415, 0.0001);
+
+	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
+	{
+		LifetimeCounter value{};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 0);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		bzd::Variant<LifetimeCounter, int> variant1{bzd::move(value)};
+		EXPECT_EQ(LifetimeCounter::constructor_, 1);
+		EXPECT_EQ(LifetimeCounter::copy_, 0);
+		EXPECT_EQ(LifetimeCounter::move_, 1);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounter::destructor_, 2);
+
+	// Variant
+	using LifetimeCounterB = bzd::test::LifetimeCounter<struct b>;
+	{
+		bzd::Variant<LifetimeCounterB, int> variant1{LifetimeCounterB{}};
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 0);
+		EXPECT_EQ(LifetimeCounterB::move_, 1);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 1);
+		bzd::Variant<LifetimeCounterB, int> variant2{bzd::move(variant1)};
+		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+		EXPECT_EQ(LifetimeCounterB::copy_, 0);
+		EXPECT_EQ(LifetimeCounterB::move_, 2);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 1);
+	}
+	EXPECT_EQ(LifetimeCounterB::constructor_, 1);
+	EXPECT_EQ(LifetimeCounterB::copy_, 0);
+	EXPECT_EQ(LifetimeCounterB::move_, 2);
+	EXPECT_EQ(LifetimeCounterB::destructor_, 3);
 }
 
 TEST(ContainerVariantTrivial, MoveAssignment)
@@ -259,9 +307,6 @@ TEST(ContainerVariant, Constexpr)
 	const auto isDouble = variantDouble.is<double>();
 	EXPECT_TRUE(isDouble);
 	EXPECT_NEAR(variantDouble.get<double>(), 5.4, 0.01);
-
-	constexpr bzd::Variant<int, bool, double> variantCopy(variantBool);
-	EXPECT_TRUE(variantCopy.is<bool>());
 
 	{
 		constexpr bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));

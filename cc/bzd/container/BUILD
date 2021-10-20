@@ -150,6 +150,28 @@ cc_library(
 )
 
 cc_library(
+    name = "optional2",
+    hdrs = [
+        "optional2.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reference_wrapper",
+        ":variant",
+        "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:conditional",
+        "//cc/bzd/type_traits:decay",
+        "//cc/bzd/type_traits:enable_if",
+        "//cc/bzd/type_traits:is_reference",
+        "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/type_traits:is_trivially_destructible",
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
     name = "pool",
     hdrs = [
         "pool.hh",
