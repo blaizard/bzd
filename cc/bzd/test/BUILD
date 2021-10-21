@@ -32,3 +32,11 @@ cc_library(
         "//cc/bzd/utility:move",
     ],
 )
+
+cc_library(
+    name = "utility",
+    hdrs = [
+        "utility.hh",
+    ],
+    visibility = ["//visibility:public"],
+)

@@ -4,7 +4,8 @@ BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-warning,-stdout,-stderr -
 
 echo "---- environment --------------------------------------------------------"
 echo -n "id: `id`"
-printenv
+printenv | sort
+df -h
 echo "---- docker -------------------------------------------------------------"
 docker info
 echo "---- local python -------------------------------------------------------"
