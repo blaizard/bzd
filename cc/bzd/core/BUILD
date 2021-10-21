@@ -46,10 +46,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":mutex",
         "//cc/bzd/container:span",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
-        ":mutex"
     ],
 )
 

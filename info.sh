@@ -2,10 +2,12 @@
 
 BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-warning,-stdout,-stderr --noshow_progress'
 
-echo "---- environment --------------------------------------------------------"
+echo "---- user ---------------------------------------------------------------"
 echo -n "id: `id`"
-printenv | sort
+echo "---- disk ---------------------------------------------------------------"
 df -h
+echo "---- environment --------------------------------------------------------"
+printenv | sort
 echo "---- docker -------------------------------------------------------------"
 docker info
 echo "---- local python -------------------------------------------------------"
@@ -15,7 +17,8 @@ java --version
 echo "---- bazel --------------------------------------------------------------"
 ./tools/bazel version
 echo "---- node ---------------------------------------------------------------"
-${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:node -- --version
+echo "version: $(${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:node -- --version)"
 echo "---- yarn ---------------------------------------------------------------"
-${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:yarn -- --version
+echo "version: $(${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:yarn -- --version)"
+echo "cache:"
 ${BAZEL_RUN} toolchains/nodejs/linux_x86_64_yarn:yarn -- cache dir

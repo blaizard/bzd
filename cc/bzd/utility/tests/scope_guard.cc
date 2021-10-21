@@ -5,7 +5,7 @@
 template <class T>
 void changeScope(T&& s)
 {
-	[[maybe_unused]] T scope{bzd::move(s)};
+	[[maybe_unused]] T scope{bzd::forward<T>(s)};
 }
 
 TEST(ScopeGuard, Base)

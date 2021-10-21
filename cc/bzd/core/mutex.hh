@@ -3,8 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/atomic.hh"
 
-namespace bzd
-{
+namespace bzd {
 
 class Mutex
 {
@@ -23,18 +22,15 @@ public:
 		bzd::BoolType expected{false};
 		while (!acquired_.compareExchange(expected, true))
 		{
-            co_await bzd::async::yield();
-            expected = false;
+			co_await bzd::async::yield();
+			expected = false;
 		}
 	}
 
-	constexpr void unlock() noexcept
-	{
-		acquired_.store(false);
-	}
+	constexpr void unlock() noexcept { acquired_.store(false); }
 
 private:
 	bzd::Atomic<bzd::BoolType> acquired_{false};
 };
 
-}
+} // namespace bzd
