@@ -23,8 +23,10 @@ TEST(ContainerVariant, CopyConstructor)
 
 	bzd::Variant<int, bool, double> variant1{static_cast<double>(3.1415)};
 	EXPECT_NEAR(variant1.get<double>(), 3.1415, 0.0001);
+	EXPECT_EQ(variant1.index(), 2);
 	bzd::Variant<int, bool, double> variant2{variant1};
 	EXPECT_NEAR(variant2.get<double>(), 3.1415, 0.0001);
+	EXPECT_EQ(variant2.index(), 2);
 
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
@@ -34,11 +36,13 @@ TEST(ContainerVariant, CopyConstructor)
 		EXPECT_EQ(LifetimeCounter::move_, 0);
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 		bzd::Variant<LifetimeCounter, int> variant3{value};
+		EXPECT_EQ(variant3.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 1);
 		EXPECT_EQ(LifetimeCounter::move_, 0);
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 		variant3 = static_cast<int>(12);
+		EXPECT_EQ(variant3.index(), 1);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 1);
 		EXPECT_EQ(LifetimeCounter::move_, 0);
@@ -51,11 +55,13 @@ TEST(ContainerVariant, CopyConstructor)
 	{
 		LifetimeCounterB value{};
 		bzd::Variant<LifetimeCounterB, int> variant1{value};
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
 		EXPECT_EQ(LifetimeCounterB::copy_, 1);
 		EXPECT_EQ(LifetimeCounterB::move_, 0);
 		EXPECT_EQ(LifetimeCounterB::destructor_, 0);
 		bzd::Variant<LifetimeCounterB, int> variant2{variant1};
+		EXPECT_EQ(variant2.index(), 0);
 		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
 		EXPECT_EQ(LifetimeCounterB::copy_, 2);
 		EXPECT_EQ(LifetimeCounterB::move_, 0);
@@ -81,9 +87,12 @@ TEST(ContainerVariantTrivial, CopyAssignment)
 	{
 		bzd::test::CopyOnly value{};
 		bzd::Variant<int, bzd::test::CopyOnly> variant1{value};
+		EXPECT_EQ(variant1.index(), 1);
 		EXPECT_EQ(variant1.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
 		bzd::Variant<int, bzd::test::CopyOnly> variant2;
+		EXPECT_EQ(variant2.index(), -1);
 		variant2 = variant1;
+		EXPECT_EQ(variant2.index(), 1);
 		EXPECT_EQ(variant2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
 	}
 }
@@ -93,21 +102,25 @@ TEST(ContainerVariantNonTrivial, CopyAssignment)
 	{
 		using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 		bzd::Variant<LifetimeCounter, int> variant1{LifetimeCounter{}};
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		bzd::Variant<LifetimeCounter, int> variant2{static_cast<int>(1)};
+		EXPECT_EQ(variant2.index(), 1);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		variant2 = variant1;
+		EXPECT_EQ(variant2.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 1);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		variant1 = variant2;
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 2);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
@@ -120,6 +133,7 @@ TEST(ContainerVariant, MoveConstructor)
 	// Value
 
 	bzd::Variant<int, bool, double> variant{bzd::Variant<int, bool, double>{static_cast<double>(3.1415)}};
+	EXPECT_EQ(variant.index(), 2);
 	EXPECT_NEAR(variant.get<double>(), 3.1415, 0.0001);
 
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
@@ -130,6 +144,7 @@ TEST(ContainerVariant, MoveConstructor)
 		EXPECT_EQ(LifetimeCounter::move_, 0);
 		EXPECT_EQ(LifetimeCounter::destructor_, 0);
 		bzd::Variant<LifetimeCounter, int> variant1{bzd::move(value)};
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
@@ -141,11 +156,13 @@ TEST(ContainerVariant, MoveConstructor)
 	using LifetimeCounterB = bzd::test::LifetimeCounter<struct b>;
 	{
 		bzd::Variant<LifetimeCounterB, int> variant1{LifetimeCounterB{}};
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
 		EXPECT_EQ(LifetimeCounterB::copy_, 0);
 		EXPECT_EQ(LifetimeCounterB::move_, 1);
 		EXPECT_EQ(LifetimeCounterB::destructor_, 1);
 		bzd::Variant<LifetimeCounterB, int> variant2{bzd::move(variant1)};
+		EXPECT_EQ(variant2.index(), 0);
 		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
 		EXPECT_EQ(LifetimeCounterB::copy_, 0);
 		EXPECT_EQ(LifetimeCounterB::move_, 2);
@@ -171,10 +188,17 @@ TEST(ContainerVariantTrivial, MoveAssignment)
 	{
 		bzd::test::MoveOnly value{};
 		bzd::Variant<int, bzd::test::MoveOnly> variant1{bzd::move(value)};
+		EXPECT_EQ(variant1.index(), 1);
 		EXPECT_EQ(variant1.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
 		bzd::Variant<int, bzd::test::MoveOnly> variant2;
+		EXPECT_EQ(variant2.index(), -1);
 		variant2 = bzd::move(variant1);
+		EXPECT_EQ(variant2.index(), 1);
 		EXPECT_EQ(variant2.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+		variant1 = static_cast<int>(42);
+		variant2 = bzd::move(variant1);
+		EXPECT_EQ(variant2.index(), 0);
+		EXPECT_EQ(variant2.get<int>(), 42);
 	}
 }
 
@@ -183,21 +207,25 @@ TEST(ContainerVariantNonTrivial, MoveAssignment)
 	{
 		using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 		bzd::Variant<LifetimeCounter, int> variant1{LifetimeCounter{}};
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		bzd::Variant<LifetimeCounter, int> variant2{static_cast<int>(1)};
+		EXPECT_EQ(variant2.index(), 1);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 1);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		variant2 = bzd::move(variant1);
+		EXPECT_EQ(variant2.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 2);
 		EXPECT_EQ(LifetimeCounter::destructor_, 1);
 		variant1 = bzd::move(variant2);
+		EXPECT_EQ(variant1.index(), 0);
 		EXPECT_EQ(LifetimeCounter::constructor_, 1);
 		EXPECT_EQ(LifetimeCounter::copy_, 0);
 		EXPECT_EQ(LifetimeCounter::move_, 3);
@@ -210,7 +238,14 @@ TEST(ContainerVariant, Destructor)
 	using LifetimeCounterA = bzd::test::LifetimeCounter<struct a>;
 	using LifetimeCounterB = bzd::test::LifetimeCounter<struct b>;
 
-	bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant1;
+	{
+		bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant1;
+		EXPECT_EQ(variant1.index(), -1);
+		EXPECT_EQ(LifetimeCounterA::constructor_, 0);
+		EXPECT_EQ(LifetimeCounterA::destructor_, 0);
+		EXPECT_EQ(LifetimeCounterB::constructor_, 0);
+		EXPECT_EQ(LifetimeCounterB::destructor_, 0);
+	}
 	EXPECT_EQ(LifetimeCounterA::constructor_, 0);
 	EXPECT_EQ(LifetimeCounterA::destructor_, 0);
 	EXPECT_EQ(LifetimeCounterB::constructor_, 0);
@@ -218,6 +253,7 @@ TEST(ContainerVariant, Destructor)
 
 	{
 		bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant(LifetimeCounterB{});
+		EXPECT_EQ(variant.index(), 1);
 		EXPECT_EQ(LifetimeCounterA::constructor_, 0);
 		EXPECT_EQ(LifetimeCounterA::destructor_, 0);
 		EXPECT_EQ(LifetimeCounterB::constructor_, 1);
@@ -230,6 +266,7 @@ TEST(ContainerVariant, Destructor)
 
 	{
 		bzd::Variant<LifetimeCounterA, LifetimeCounterB> variant(LifetimeCounterA{});
+		EXPECT_EQ(variant.index(), 0);
 		EXPECT_EQ(LifetimeCounterA::constructor_, 1);
 		EXPECT_EQ(LifetimeCounterA::copy_, 0);
 		EXPECT_EQ(LifetimeCounterA::move_, 1);
@@ -246,18 +283,21 @@ TEST(ContainerVariant, Destructor)
 TEST(ContainerVariant, Is)
 {
 	bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
+	EXPECT_EQ(variantBool.index(), 1);
 	EXPECT_TRUE(variantBool.is<bool>());
 	EXPECT_FALSE(variantBool.is<int>());
 	EXPECT_FALSE(variantBool.is<double>());
 	EXPECT_FALSE(variantBool.is<char>());
 
 	bzd::Variant<int, bool, double> variantEmpty;
+	EXPECT_EQ(variantEmpty.index(), -1);
 	EXPECT_FALSE(variantEmpty.is<bool>());
 }
 
 TEST(ContainerVariant, Get)
 {
 	bzd::Variant<bool, int, double> variantInt(static_cast<int>(-12));
+	EXPECT_EQ(variantInt.index(), 1);
 
 	auto isBool = variantInt.is<bool>();
 	EXPECT_FALSE(isBool);
@@ -293,15 +333,19 @@ TEST(ContainerVariant, Match)
 TEST(ContainerVariant, Constexpr)
 {
 	constexpr bzd::Variant<int, bool, double> variant;
+	EXPECT_EQ(variant.index(), -1);
 	EXPECT_FALSE(variant.is<int>());
 	EXPECT_FALSE(variant.is<bool>());
 	EXPECT_FALSE(variant.is<double>());
 
 	constexpr bzd::Variant<int, bool, double> variantInt(static_cast<int>(45));
+	EXPECT_EQ(variantInt.index(), 0);
 	EXPECT_TRUE(variantInt.is<int>());
 	constexpr bzd::Variant<int, bool, double> variantBool(static_cast<bool>(true));
+	EXPECT_EQ(variantBool.index(), 1);
 	EXPECT_TRUE(variantBool.is<bool>());
 	constexpr bzd::Variant<int, bool, double> variantDouble(static_cast<double>(5.4));
+	EXPECT_EQ(variantDouble.index(), 2);
 	EXPECT_TRUE(variantDouble.is<double>());
 
 	const auto isDouble = variantDouble.is<double>();

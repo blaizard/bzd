@@ -85,9 +85,9 @@ protected:
 		using F0::operator();
 	};
 
-	// Match
+	// MatchValue
 	template <class T>
-	struct VariantMatch
+	struct VariantMatchValue
 	{
 		template <class SelfType, class V>
 		static constexpr void call(SelfType& self, V& visitor) noexcept
@@ -96,30 +96,43 @@ protected:
 		}
 	};
 	template <class V, class SelfType>
+	using MatchValue = Helper<VariantMatchValue, SelfType&, V&>;
+
+	// Match
+	template <class T>
+	struct VariantMatch
+	{
+		template <class SelfType, class V>
+		static constexpr void call(SelfType& self, V& visitor) noexcept
+		{
+			visitor.template operator()<T>(self);
+		}
+	};
+	template <class V, class SelfType>
 	using Match = Helper<VariantMatch, SelfType&, V&>;
 
-	// Copy visitor
-	struct CopyVisitor
+	// Copy constructor visitor
+	struct CopyConstructorVisitor
 	{
-		constexpr CopyVisitor(const VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
-		template <class T>
-		constexpr void operator()(T& value) noexcept
+		constexpr CopyConstructorVisitor(const VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
+		template <class T, class SelfType>
+		constexpr void operator()(SelfType& self) noexcept
 		{
-			value = variant_.get<T>();
+			self.template emplace<T>(variant_.get<T>());
 		}
 
 	private:
 		const VariantBase<Ts...>& variant_;
 	};
 
-	// Move visitor
-	struct MoveVisitor
+	// Move constructor visitor
+	struct MoveConstructorVisitor
 	{
-		constexpr MoveVisitor(VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
-		template <class T>
-		constexpr void operator()(T& value) noexcept
+		constexpr MoveConstructorVisitor(VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
+		template <class T, class SelfType>
+		constexpr void operator()(SelfType& self) noexcept
 		{
-			value = bzd::move(variant_.get<T>());
+			self.template emplace<T>(bzd::move(variant_.get<T>()));
 		}
 
 	private:
@@ -162,8 +175,8 @@ public:
 	constexpr Self& operator=(const Self& variant) noexcept
 	{
 		id_ = variant.id_;
-		CopyVisitor visitor{variant};
-		Match<CopyVisitor, decltype(*this)>::call(id_, *this, visitor);
+		CopyConstructorVisitor visitor{variant};
+		Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
 	}
@@ -179,8 +192,8 @@ public:
 	constexpr Self& operator=(Self&& variant) noexcept
 	{
 		id_ = variant.id_;
-		MoveVisitor visitor{variant};
-		Match<MoveVisitor, decltype(*this)>::call(id_, *this, visitor);
+		MoveConstructorVisitor visitor{variant};
+		Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
 	}
@@ -219,7 +232,7 @@ public:
 	constexpr void match(Functors&&... funcs) const noexcept
 	{
 		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-		Match<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 protected:

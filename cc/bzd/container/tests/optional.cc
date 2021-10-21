@@ -74,14 +74,14 @@ TEST(ContainerOptional, constexprType)
 
 	EXPECT_TRUE(u);
 	EXPECT_EQ(u.valueOr(10), 23);
+	/*
+		constexpr auto vCopy{u};
+		EXPECT_TRUE(vCopy);
+		EXPECT_EQ(vCopy.value(), 23);
 
-	constexpr auto vCopy{u};
-	EXPECT_TRUE(vCopy);
-	EXPECT_EQ(vCopy.value(), 23);
-
-	constexpr auto vMove{bzd::move(vCopy)};
-	EXPECT_TRUE(vMove);
-	EXPECT_EQ(vMove.value(), 23);
+		constexpr auto vMove{bzd::move(vCopy)};
+		EXPECT_TRUE(vMove);
+		EXPECT_EQ(vMove.value(), 23);*/
 }
 
 TEST(ContainerOptional, complexData)

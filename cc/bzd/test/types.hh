@@ -3,6 +3,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/move.hh"
 
+#include <iostream>
 namespace bzd::test {
 template <class T>
 class LifetimeCounter
@@ -82,10 +83,12 @@ public:
 	constexpr MoveOnly(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
 	constexpr MoveOnly(Self&& move) noexcept { *this = bzd::move(move); }
-	constexpr Self& operator=(Self&& move) noexcept
+	Self& operator=(Self&& move) noexcept
 	{
+		std::cout << "HERE hasBeenMoved_" << hasBeenMoved_ << std::endl;
+		// hasBeenMoved_ = false;
 		movedCounter_ = move.movedCounter_ + 1;
-		move.hasBeenMoved_ = true;
+		move.hasBeenMoved_ = 1;
 		return *this;
 	}
 
