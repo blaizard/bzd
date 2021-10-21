@@ -26,10 +26,7 @@ private:
 public:
 	explicit Core(const CoreId, const float) noexcept {}
 
-	~Core() noexcept
-	{
-		::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl;
-	}
+	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
 
 	void init() {}
 

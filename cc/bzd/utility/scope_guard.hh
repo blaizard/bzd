@@ -11,7 +11,7 @@ public: // Traits
 	using Self = ScopeGuard<T>;
 
 public: // Constructors
-	explicit constexpr ScopeGuard(const T& cleanup) noexcept : cleanup_{cleanup} {}
+	explicit constexpr ScopeGuard(const T& cleanup) noexcept : cleanup_{static_cast<T>(cleanup)} {}
 
 	// Copy constructor/assignment
 	constexpr ScopeGuard(const Self& scope) noexcept = delete;
