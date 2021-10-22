@@ -4,9 +4,9 @@
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {
@@ -15,10 +15,10 @@ class VariantBase
 {
 protected:
 	using Self = VariantBase<Ts...>;
-	// First type available in the variant.
-	using FirstType = bzd::typeTraits::FirstType<Ts...>;
 	// Type use to define the index of the variant type.
 	using IndexType = bzd::Int16Type;
+	// Position of the variant representing an invalid state.
+	static constexpr const IndexType npos = static_cast<IndexType>(-1);
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
 	// Choose the Nth element out of the list
@@ -145,26 +145,41 @@ protected:
 	};
 
 	// A protected tag to select a special constructor to create an empty variant.
-	// After this call the variant will have a non-proper state.
+	// After this call the variant will be in an invalid state.
 	struct EmptyConstructorTagType
 	{
 	};
-	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{0}, data_{} {}
+	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{npos}, data_{} {}
 
 public:
 	/**
 	 * Default constructor.
 	 * The first type is selected, this is compatible with std::variant behavior.
 	 */
-	// Note this implies a move and destructor of the FirstType object.
-	// TODO: use index placement here.
-	constexpr VariantBase() noexcept : id_{0}, data_{FirstType{}} {}
+	constexpr VariantBase() noexcept : id_{0}, data_{InPlaceIndex<0>{}} {}
 
 	/**
 	 * Value constructor (exact type match)
 	 */
-	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
-	constexpr VariantBase(T&& value) noexcept : id_{index}, data_{bzd::forward<T>(value)}
+	template <class T>
+	constexpr VariantBase(T&& value) noexcept : id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{bzd::forward<T>(value)}
+	{
+	}
+
+	/**
+	 * Value constructor, in place index constructor.
+	 */
+	template <SizeType I, class... Args>
+	constexpr VariantBase(InPlaceIndex<I>, Args&&... args) noexcept : id_{I}, data_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	/**
+	 * Value constructor, in place type constructor.
+	 */
+	template <class T, class... Args>
+	constexpr VariantBase(InPlaceType<T>, Args&&... args) noexcept :
+		id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{inPlaceType<T>, bzd::forward<Args>(args)...}
 	{
 	}
 

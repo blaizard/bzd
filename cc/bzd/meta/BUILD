@@ -105,6 +105,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:first_type",
@@ -112,5 +113,6 @@ cc_library(
         "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:in_place",
     ],
 )
