@@ -310,8 +310,8 @@ cc_library(
         "//cc/bzd/meta:type_list",
         "//cc/bzd/meta:union",
         "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits:first_type",
         "//cc/bzd/type_traits:is_constructible",
+        "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",
     ],
 )

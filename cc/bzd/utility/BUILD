@@ -12,6 +12,7 @@ cc_library(
         ":container_of",
         ":forward",
         ":ignore",
+        ":in_place",
         ":lock_guard",
         ":max",
         ":min",
@@ -111,6 +112,17 @@ cc_library(
         "ignore.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "in_place",
+    hdrs = [
+        "in_place.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
 )
 
 cc_library(

@@ -99,8 +99,6 @@ public:
 	constexpr MoveOnly(Self&& move) noexcept { *this = bzd::move(move); }
 	Self& operator=(Self&& move) noexcept
 	{
-		std::cout << "HERE hasBeenMoved_" << hasBeenMoved_ << std::endl;
-		// hasBeenMoved_ = false;
 		movedCounter_ = move.movedCounter_ + 1;
 		move.hasBeenMoved_ = 1;
 		return *this;

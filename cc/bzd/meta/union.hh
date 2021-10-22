@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/first_type.hh"
@@ -7,6 +8,7 @@
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/in_place.hh"
 
 namespace bzd::meta::impl {
 
@@ -14,10 +16,10 @@ class UnionTag
 {
 };
 
-template <class T, class... Ts>
+template <SizeType Index, class T, class... Ts>
 union UnionTrivial {
 public: // Traits
-	using Self = UnionTrivial<T, Ts...>;
+	using Self = UnionTrivial<Index, T, Ts...>;
 
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
@@ -32,6 +34,26 @@ public:
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
+	{
+	}
+
+	template <SizeType I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
+	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <SizeType I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
+	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -76,13 +98,13 @@ public:
 
 protected:
 	T value_;
-	UnionTrivial<Ts...> next_;
+	UnionTrivial<Index + 1, Ts...> next_;
 };
 
-template <class T, class... Ts>
+template <SizeType Index, class T, class... Ts>
 union UnionNonTrivial {
 public: // Traits
-	using Self = UnionNonTrivial<T, Ts...>;
+	using Self = UnionNonTrivial<Index, T, Ts...>;
 
 public:
 	// By default initialize the dummy element only, a constexpr constructor must
@@ -104,6 +126,26 @@ public:
 	{
 	}
 
+	template <SizeType I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
+	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <SizeType I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
+	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	{
+	}
+
 	// Value assignments (copy/move).
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
 	constexpr Self& operator=(U&& value) noexcept
@@ -145,27 +187,27 @@ public:
 
 protected:
 	T value_;
-	UnionNonTrivial<Ts...> next_;
+	UnionNonTrivial<Index + 1, Ts...> next_;
 };
 
-template <>
-union UnionTrivial<UnionTag> {
+template <SizeType Index>
+union UnionTrivial<Index, UnionTag> {
 	constexpr UnionTrivial() noexcept = default;
 	// This helps for troubleshooting.
 	template <class T>
 	explicit constexpr UnionTrivial(T) noexcept = delete;
 	template <class T>
-	constexpr UnionTrivial<UnionTag>& operator=(T) noexcept = delete;
+	constexpr UnionTrivial<Index, UnionTag>& operator=(T) noexcept = delete;
 };
 
-template <>
-union UnionNonTrivial<UnionTag> {
+template <SizeType Index>
+union UnionNonTrivial<Index, UnionTag> {
 	constexpr UnionNonTrivial() noexcept = default;
 	// This helps for troubleshooting.
 	template <class T>
 	explicit constexpr UnionNonTrivial(T) noexcept = delete;
 	template <class T>
-	constexpr UnionNonTrivial<UnionTag>& operator=(T) noexcept = delete;
+	constexpr UnionNonTrivial<Index, UnionTag>& operator=(T) noexcept = delete;
 };
 } // namespace bzd::meta::impl
 
@@ -173,6 +215,6 @@ namespace bzd::meta {
 
 template <class... Ts>
 using Union = bzd::typeTraits::Conditional<(bzd::typeTraits::isTriviallyDestructible<Ts> && ...),
-										   impl::UnionTrivial<Ts..., impl::UnionTag>,
-										   impl::UnionNonTrivial<Ts..., impl::UnionTag>>;
+										   impl::UnionTrivial<0, Ts..., impl::UnionTag>,
+										   impl::UnionNonTrivial<0, Ts..., impl::UnionTag>>;
 } // namespace bzd::meta
