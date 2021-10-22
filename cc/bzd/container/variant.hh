@@ -4,6 +4,7 @@
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/move.hh"
@@ -14,6 +15,8 @@ class VariantBase
 {
 protected:
 	using Self = VariantBase<Ts...>;
+	// First type available in the variant.
+	using FirstType = bzd::typeTraits::FirstType<Ts...>;
 	// Type use to define the index of the variant type.
 	using IndexType = bzd::Int16Type;
 	// Metaprogramming list type
@@ -141,11 +144,21 @@ protected:
 		VariantBase<Ts...>& variant_;
 	};
 
+	// A protected tag to select a special constructor to create an empty variant.
+	// After this call the variant will have a non-proper state.
+	struct EmptyConstructorTagType
+	{
+	};
+	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{0}, data_{} {}
+
 public:
 	/**
-	 * Default constructor
+	 * Default constructor.
+	 * The first type is selected, this is compatible with std::variant behavior.
 	 */
-	constexpr VariantBase() noexcept = default;
+	// Note this implies a move and destructor of the FirstType object.
+	// TODO: use index placement here.
+	constexpr VariantBase() noexcept : id_{0}, data_{FirstType{}} {}
 
 	/**
 	 * Value constructor (exact type match)
@@ -177,11 +190,8 @@ public:
 	constexpr Self& operator=(const Self& variant) noexcept
 	{
 		id_ = variant.id_;
-		if (id_ != -1)
-		{
-			CopyConstructorVisitor visitor{variant};
-			Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
-		}
+		CopyConstructorVisitor visitor{variant};
+		Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
 	}
@@ -197,11 +207,8 @@ public:
 	constexpr Self& operator=(Self&& variant) noexcept
 	{
 		id_ = variant.id_;
-		if (id_ != -1)
-		{
-			MoveConstructorVisitor visitor{variant};
-			Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
-		}
+		MoveConstructorVisitor visitor{variant};
+		Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
 
 		return *this;
 	}
@@ -221,7 +228,7 @@ public:
 	template <class T>
 	constexpr bzd::BoolType is() const noexcept
 	{
-		return (id_ != -1 && id_ == Find<T>::value);
+		return (id_ == Find<T>::value);
 	}
 
 	template <class T>
@@ -239,15 +246,12 @@ public:
 	template <class... Functors>
 	constexpr void match(Functors&&... funcs) const noexcept
 	{
-		if (id_ != -1)
-		{
-			const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-			MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
-		}
+		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
+		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 protected:
-	IndexType id_{-1};
+	IndexType id_;
 	// In order to be constexpr compatible, the use of union here is a must because constexpr functions
 	// cannot use new nor reinterpret_cast.
 	bzd::meta::Union<Ts...> data_{};
@@ -297,26 +301,18 @@ protected:
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	constexpr void destructIfNeeded() noexcept
-	{
-		if (id_ != -1)
-		{
-			Destructor::call(id_, this);
-		}
-	}
+	constexpr void destructIfNeeded() noexcept { Destructor::call(id_, this); }
 
 public:
 	using Parent::VariantBase;
 
-	constexpr VariantNonTrivial(const Self& variant) noexcept : Parent{}
+	constexpr VariantNonTrivial(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
 	{
-		destructIfNeeded();
 		Parent::operator=(variant);
 	}
 
-	constexpr VariantNonTrivial(Self&& variant) noexcept : Parent{}
+	constexpr VariantNonTrivial(Self&& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
 	{
-		destructIfNeeded();
 		Parent::operator=(bzd::move(variant));
 	}
 
