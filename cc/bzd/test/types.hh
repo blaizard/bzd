@@ -50,6 +50,20 @@ bzd::SizeType LifetimeCounter<T>::move_{0};
 template <class T>
 bzd::SizeType LifetimeCounter<T>::destructor_{0};
 
+class NoDefaultConstructor
+{
+protected:
+	using Self = NoDefaultConstructor;
+
+public:
+	constexpr NoDefaultConstructor() noexcept = delete;
+	constexpr NoDefaultConstructor(int) noexcept {}
+	constexpr NoDefaultConstructor(const Self& copy) noexcept = default;
+	constexpr Self& operator=(const Self& copy) noexcept = default;
+	constexpr NoDefaultConstructor(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
+};
+
 class CopyOnly
 {
 protected:

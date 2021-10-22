@@ -38,6 +38,11 @@ public:
 	template <class U>
 	using IsSelf = bzd::typeTraits::IsSame<bzd::typeTraits::Decay<U>, Self>;
 
+private:
+	struct OptionalEmptyType
+	{
+	};
+
 public: // Constructors
 	// Default constructor
 	explicit constexpr Optional() noexcept = default;
@@ -94,12 +99,12 @@ public: // API
 	{
 		if (hasValue())
 		{
-			data_ = OptionalNull::make();
+			data_ = OptionalEmptyType{};
 		}
 	}
 
 private:
-	bzd::Variant<OptionalNull, ValueContainer> data_{};
+	bzd::Variant<OptionalEmptyType, ValueContainer> data_{};
 };
 
 } // namespace bzd::impl

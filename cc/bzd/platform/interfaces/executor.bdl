@@ -17,3 +17,5 @@ interface Executor {
 	method getCores();
 	
 }
+
+
