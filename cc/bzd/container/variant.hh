@@ -14,6 +14,8 @@ class VariantBase
 {
 protected:
 	using Self = VariantBase<Ts...>;
+	// Type use to define the index of the variant type.
+	using IndexType = bzd::Int16Type;
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
 	// Choose the Nth element out of the list
@@ -175,8 +177,11 @@ public:
 	constexpr Self& operator=(const Self& variant) noexcept
 	{
 		id_ = variant.id_;
-		CopyConstructorVisitor visitor{variant};
-		Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
+		if (id_ != -1)
+		{
+			CopyConstructorVisitor visitor{variant};
+			Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
+		}
 
 		return *this;
 	}
@@ -192,8 +197,11 @@ public:
 	constexpr Self& operator=(Self&& variant) noexcept
 	{
 		id_ = variant.id_;
-		MoveConstructorVisitor visitor{variant};
-		Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
+		if (id_ != -1)
+		{
+			MoveConstructorVisitor visitor{variant};
+			Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
+		}
 
 		return *this;
 	}
@@ -208,7 +216,7 @@ public:
 		id_ = Find<T>::value;
 	}
 
-	constexpr bzd::Int16Type index() const noexcept { return id_; }
+	constexpr IndexType index() const noexcept { return id_; }
 
 	template <class T>
 	constexpr bzd::BoolType is() const noexcept
@@ -231,12 +239,17 @@ public:
 	template <class... Functors>
 	constexpr void match(Functors&&... funcs) const noexcept
 	{
-		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+		if (id_ != -1)
+		{
+			const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
+			MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+		}
 	}
 
 protected:
-	bzd::Int16Type id_{-1};
+	IndexType id_{-1};
+	// In order to be constexpr compatible, the use of union here is a must because constexpr functions
+	// cannot use new nor reinterpret_cast.
 	bzd::meta::Union<Ts...> data_{};
 };
 

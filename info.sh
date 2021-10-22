@@ -3,7 +3,7 @@
 BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-warning,-stdout,-stderr --noshow_progress'
 
 echo "---- user ---------------------------------------------------------------"
-echo -n "id: `id`"
+echo "id: `id`"
 echo "---- disk ---------------------------------------------------------------"
 df -h
 echo "---- environment --------------------------------------------------------"
