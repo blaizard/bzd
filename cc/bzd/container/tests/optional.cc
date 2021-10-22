@@ -39,20 +39,48 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_FALSE(v);
 }
 
+TEST(ContainerOptional, copy)
+{
+	// Copy value
+	bzd::test::CopyOnly value{};
+	bzd::Optional<bzd::test::CopyOnly> v{value};
+	EXPECT_TRUE(v);
+	EXPECT_EQ(v->getCopiedCounter(), 1);
+
+	// Copy constructor
+	bzd::Optional<bzd::test::CopyOnly> vCopied{v};
+	EXPECT_TRUE(vCopied);
+	EXPECT_EQ(vCopied->getCopiedCounter(), 2);
+
+	// Copy assignment
+	bzd::Optional<bzd::test::CopyOnly> vAssingnment;
+	EXPECT_FALSE(vAssingnment);
+	vAssingnment = vCopied;
+	EXPECT_TRUE(vAssingnment);
+	EXPECT_EQ(vAssingnment->getCopiedCounter(), 3);
+}
+
 TEST(ContainerOptional, move)
 {
+	// Move value
 	bzd::Optional<bzd::test::MoveOnly> v{bzd::test::MoveOnly()};
 	EXPECT_TRUE(v);
 	EXPECT_FALSE(v->hasBeenMoved());
 	EXPECT_EQ(v->getMovedCounter(), 1);
 
+	// Move constructor
+	bzd::Optional<bzd::test::MoveOnly> vMoved{bzd::move(v)};
+	EXPECT_TRUE(vMoved);
+	EXPECT_FALSE(vMoved->hasBeenMoved());
+	EXPECT_EQ(vMoved->getMovedCounter(), 2);
+
 	// Move assignment
-	/*	auto vMoved = bzd::move(v);
-		EXPECT_TRUE(v);
-		EXPECT_TRUE(v->hasBeenMoved());
-		EXPECT_TRUE(vMoved);
-		EXPECT_FALSE(vMoved->hasBeenMoved());
-		EXPECT_EQ(vMoved->getMovedCounter(), 2);*/
+	bzd::Optional<bzd::test::MoveOnly> vAssingnment;
+	EXPECT_FALSE(vAssingnment);
+	vAssingnment = bzd::move(vMoved);
+	EXPECT_TRUE(vAssingnment);
+	EXPECT_FALSE(vAssingnment->hasBeenMoved());
+	EXPECT_EQ(vAssingnment->getMovedCounter(), 3);
 }
 
 TEST(ContainerOptional, simpleNoData)

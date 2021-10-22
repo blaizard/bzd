@@ -71,6 +71,23 @@ TEST(ContainerVariant, CopyConstructor)
 	EXPECT_EQ(LifetimeCounterB::copy_, 2);
 	EXPECT_EQ(LifetimeCounterB::move_, 0);
 	EXPECT_EQ(LifetimeCounterB::destructor_, 3);
+
+	// Empty variant
+	using LifetimeCounterC = bzd::test::LifetimeCounter<struct c>;
+	{
+		bzd::Variant<LifetimeCounterC, int> variant1{};
+		EXPECT_EQ(variant1.index(), -1);
+		bzd::Variant<LifetimeCounterC, int> variant2{variant1};
+		EXPECT_EQ(variant2.index(), -1);
+		EXPECT_EQ(LifetimeCounterC::constructor_, 0);
+		EXPECT_EQ(LifetimeCounterC::copy_, 0);
+		EXPECT_EQ(LifetimeCounterC::move_, 0);
+		EXPECT_EQ(LifetimeCounterC::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounterC::constructor_, 0);
+	EXPECT_EQ(LifetimeCounterC::copy_, 0);
+	EXPECT_EQ(LifetimeCounterC::move_, 0);
+	EXPECT_EQ(LifetimeCounterC::destructor_, 0);
 }
 
 TEST(ContainerVariantTrivial, CopyAssignment)
@@ -172,6 +189,23 @@ TEST(ContainerVariant, MoveConstructor)
 	EXPECT_EQ(LifetimeCounterB::copy_, 0);
 	EXPECT_EQ(LifetimeCounterB::move_, 2);
 	EXPECT_EQ(LifetimeCounterB::destructor_, 3);
+
+	// Empty variant
+	using LifetimeCounterC = bzd::test::LifetimeCounter<struct c>;
+	{
+		bzd::Variant<LifetimeCounterC, int> variant1{};
+		EXPECT_EQ(variant1.index(), -1);
+		bzd::Variant<LifetimeCounterC, int> variant2{bzd::move(variant1)};
+		EXPECT_EQ(variant2.index(), -1);
+		EXPECT_EQ(LifetimeCounterC::constructor_, 0);
+		EXPECT_EQ(LifetimeCounterC::copy_, 0);
+		EXPECT_EQ(LifetimeCounterC::move_, 0);
+		EXPECT_EQ(LifetimeCounterC::destructor_, 0);
+	}
+	EXPECT_EQ(LifetimeCounterC::constructor_, 0);
+	EXPECT_EQ(LifetimeCounterC::copy_, 0);
+	EXPECT_EQ(LifetimeCounterC::move_, 0);
+	EXPECT_EQ(LifetimeCounterC::destructor_, 0);
 }
 
 TEST(ContainerVariantTrivial, MoveAssignment)
@@ -322,11 +356,19 @@ TEST(ContainerVariant, Match)
 		variant.match([&](const int a) { b = a; }, [](const bool) {}, [](const double) {});
 		EXPECT_EQ(b, 5);
 	}
+	// Match all
 	{
 		bzd::Variant<int, bool, double> variant(static_cast<int>(5));
 		bool isHandled = false;
 		variant.match([&](auto&&) { isHandled = true; });
 		EXPECT_TRUE(isHandled);
+	}
+	// On empty variant
+	{
+		bzd::Variant<int, bool, double> variant{};
+		bool isHandled = false;
+		variant.match([&](auto&&) { isHandled = true; });
+		EXPECT_FALSE(isHandled);
 	}
 }
 
