@@ -9,6 +9,8 @@
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
 
+#include <type_traits>
+
 namespace bzd::impl {
 template <class... Ts>
 class VariantBase
@@ -197,7 +199,7 @@ public:
 	/**
 	 * Copy constructor.
 	 */
-	constexpr VariantBase(const Self& variant) noexcept { *this = variant; }
+	constexpr VariantBase(const Self& variant) noexcept = default;
 
 	/**
 	 * Copy assignment.
@@ -214,7 +216,7 @@ public:
 	/**
 	 * Move constructor.
 	 */
-	constexpr VariantBase(Self&& variant) noexcept { *this = bzd::move(variant); }
+	constexpr VariantBase(Self&& variant) noexcept = default;
 
 	/**
 	 * Move assignment.
@@ -269,24 +271,88 @@ protected:
 	IndexType id_;
 	// In order to be constexpr compatible, the use of union here is a must because constexpr functions
 	// cannot use new nor reinterpret_cast.
+	// ... [ Note: If any non-static data member of a union has a non-trivial default constructor (12.1),
+	// copy constructor (12.8), move constructor (12.8), copy assignment operator (12.8), move assignment
+	// operator (12.8), or destructor (12.4), the corresponding member function of the union must be user-provided
+	// or it will be implicitly deleted (8.4.3) for the union. —end note ]
 	bzd::meta::Union<Ts...> data_{};
 };
 
+// Copy constructible ---------------------------------------------------------
+
 template <class... Ts>
-class VariantTrivial : public VariantBase<Ts...>
+class VariantTriviallyCopyConstructible : public VariantBase<Ts...>
 {
-public: // Traits
-	using Self = VariantTrivial<Ts...>;
+public: // Traits / Constructors
+	using Self = VariantTriviallyCopyConstructible<Ts...>;
 	using Parent = VariantBase<Ts...>;
-	using Parent::VariantBase;
+	using Parent::Parent;
 };
 
 template <class... Ts>
-class VariantNonTrivial : public VariantBase<Ts...>
+class VariantNonTriviallyCopyConstructible : public VariantBase<Ts...>
+{
+public: // Traits / Constructors
+	using Self = VariantNonTriviallyCopyConstructible<Ts...>;
+	using Parent = VariantBase<Ts...>;
+	using Parent::Parent;
+
+	constexpr VariantNonTriviallyCopyConstructible(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}} { Parent::operator=(variant); }
+	constexpr Self& operator=(const Self& variant) noexcept = default;
+	constexpr VariantNonTriviallyCopyConstructible(Self&& variant) noexcept = default;
+	constexpr Self& operator=(Self&& variant) noexcept = default;
+};
+
+template <class... Ts>
+using VariantCopyConstructible = bzd::typeTraits::
+	Conditional<(::std::is_trivially_copy_constructible_v<Ts> && ...), VariantTriviallyCopyConstructible<Ts...>, VariantNonTriviallyCopyConstructible<Ts...>>;
+
+// Move constructible ---------------------------------------------------------
+
+template <class... Ts>
+class VariantTriviallyMoveConstructible : public VariantCopyConstructible<Ts...>
+{
+public: // Traits / Constructors
+	using Self = VariantTriviallyMoveConstructible<Ts...>;
+	using Parent = VariantCopyConstructible<Ts...>;
+	using Parent::Parent;
+};
+
+template <class... Ts>
+class VariantNonTriviallyMoveConstructible : public VariantCopyConstructible<Ts...>
+{
+public: // Traits / Constructors
+	using Self = VariantNonTriviallyMoveConstructible<Ts...>;
+	using Parent = VariantCopyConstructible<Ts...>;
+	using Parent::Parent;
+
+	constexpr VariantNonTriviallyMoveConstructible(const Self& variant) noexcept = default;
+	constexpr Self& operator=(const Self& variant) noexcept = default;
+	constexpr VariantNonTriviallyMoveConstructible(Self&& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}} { Parent::operator=(bzd::move(variant)); }
+	constexpr Self& operator=(Self&& variant) noexcept = default;
+};
+
+template <class... Ts>
+using VariantMoveConstructible = bzd::typeTraits::
+	Conditional<(::std::is_trivially_move_constructible_v<Ts> && ...), VariantTriviallyMoveConstructible<Ts...>, VariantNonTriviallyMoveConstructible<Ts...>>;
+
+// Variant --------------------------------------------------------------------
+
+template <class... Ts>
+class VariantTrivial : public VariantMoveConstructible<Ts...>
+{
+public: // Traits
+	using Self = VariantTrivial<Ts...>;
+	using Parent = VariantMoveConstructible<Ts...>;
+	using Parent::Parent;
+};
+
+template <class... Ts>
+class VariantNonTrivial : public VariantMoveConstructible<Ts...>
 {
 public: // Traits
 	using Self = VariantNonTrivial<Ts...>;
-	using Parent = VariantBase<Ts...>;
+	using Parent = VariantMoveConstructible<Ts...>;
 
 protected:
 	// Choose the Nth element out of the list
@@ -319,7 +385,7 @@ private:
 	constexpr void destructIfNeeded() noexcept { Destructor::call(id_, this); }
 
 public:
-	using Parent::VariantBase;
+	using Parent::Parent;
 
 	constexpr VariantNonTrivial(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
 	{

@@ -408,4 +408,16 @@ TEST(ContainerVariant, Constexpr)
 		variant.match([](const int) {}, [](const bool) {}, [&](const double a) { b = a; });
 		EXPECT_NEAR(b, 5.6, 0.001);
 	}
+
+	{
+		constexpr bzd::Variant<int, bool, double> variantCopied{variantDouble};
+		EXPECT_EQ(variantCopied.index(), 2);
+		EXPECT_TRUE(variantCopied.is<double>());
+		EXPECT_NEAR(variantCopied.get<double>(), 5.4, 0.01);
+
+		constexpr bzd::Variant<int, bool, double> variantMoved{bzd::move(variantCopied)};
+		EXPECT_EQ(variantMoved.index(), 2);
+		EXPECT_TRUE(variantMoved.is<double>());
+		EXPECT_NEAR(variantMoved.get<double>(), 5.4, 0.01);
+	}
 }
