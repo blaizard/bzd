@@ -118,34 +118,6 @@ protected:
 	template <class V, class SelfType>
 	using Match = Helper<VariantMatch, SelfType&, V&>;
 
-	// Copy constructor visitor
-	struct CopyConstructorVisitor
-	{
-		constexpr CopyConstructorVisitor(const VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
-		template <class T, class SelfType>
-		constexpr void operator()(SelfType& self) noexcept
-		{
-			self.template emplace<T>(variant_.get<T>());
-		}
-
-	private:
-		const VariantBase<Ts...>& variant_;
-	};
-
-	// Move constructor visitor
-	struct MoveConstructorVisitor
-	{
-		constexpr MoveConstructorVisitor(VariantBase<Ts...>& variant) noexcept : variant_{variant} {}
-		template <class T, class SelfType>
-		constexpr void operator()(SelfType& self) noexcept
-		{
-			self.template emplace<T>(bzd::move(variant_.get<T>()));
-		}
-
-	private:
-		VariantBase<Ts...>& variant_;
-	};
-
 	// A protected tag to select a special constructor to create an empty variant.
 	// After this call the variant will be in an invalid state.
 	struct EmptyConstructorTagType
@@ -153,7 +125,7 @@ protected:
 	};
 	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{npos}, data_{} {}
 
-public:
+public: // Constructors
 	/**
 	 * Default constructor.
 	 * The first type is selected, this is compatible with std::variant behavior.
@@ -185,51 +157,13 @@ public:
 	{
 	}
 
-	/**
-	 * Value assignment (copy/move)
-	 */
-	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
-	constexpr Self& operator=(T& value) noexcept
-	{
-		id_ = index;
-		data_ = bzd::forward<T>(value);
-		return *this;
-	}
-
-	/**
-	 * Copy constructor.
-	 */
+	// Default copy/move constructors/assignments
 	constexpr VariantBase(const Self& variant) noexcept = default;
-
-	/**
-	 * Copy assignment.
-	 */
-	constexpr Self& operator=(const Self& variant) noexcept
-	{
-		id_ = variant.id_;
-		CopyConstructorVisitor visitor{variant};
-		Match<CopyConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
-
-		return *this;
-	}
-
-	/**
-	 * Move constructor.
-	 */
+	constexpr Self& operator=(const Self& variant) noexcept = default;
 	constexpr VariantBase(Self&& variant) noexcept = default;
+	constexpr Self& operator=(Self&& variant) noexcept = default;
 
-	/**
-	 * Move assignment.
-	 */
-	constexpr Self& operator=(Self&& variant) noexcept
-	{
-		id_ = variant.id_;
-		MoveConstructorVisitor visitor{variant};
-		Match<MoveConstructorVisitor, decltype(*this)>::call(id_, *this, visitor);
-
-		return *this;
-	}
-
+public: // Functions
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args) noexcept
 	{
@@ -258,6 +192,13 @@ public:
 	constexpr T& get() noexcept
 	{
 		return data_.template get<T>();
+	}
+
+	template <class T>
+	constexpr void set(T&& value) noexcept
+	{
+		id_ = Find<bzd::typeTraits::RemoveReference<T>>::value;
+		data_ = bzd::forward<T>(value);
 	}
 
 	template <class... Functors>
@@ -292,20 +233,53 @@ public: // Traits / Constructors
 template <class... Ts>
 class VariantNonTriviallyCopyConstructible : public VariantBase<Ts...>
 {
-public: // Traits / Constructors
+public: // Traits
 	using Self = VariantNonTriviallyCopyConstructible<Ts...>;
 	using Parent = VariantBase<Ts...>;
+
+protected:
+	// Copy constructor visitor
+	struct CopyConstructorVisitor
+	{
+		constexpr CopyConstructorVisitor(const VariantNonTriviallyCopyConstructible<Ts...>& variant) noexcept : variant_{variant} {}
+		template <class T, class SelfType>
+		constexpr void operator()(SelfType& self) noexcept
+		{
+			self.template emplace<T>(variant_.template get<T>());
+		}
+
+	private:
+		const VariantNonTriviallyCopyConstructible<Ts...>& variant_;
+	};
+
+	template <class V, class SelfType>
+	using Match = typename Parent::template Match<V, SelfType>;
+	template <class T>
+	using Find = typename Parent::template Find<T>;
+
+public: // Constructors / Assignments
 	using Parent::Parent;
 
-	constexpr VariantNonTriviallyCopyConstructible(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}} { Parent::operator=(variant); }
-	constexpr Self& operator=(const Self& variant) noexcept = default;
+	constexpr VariantNonTriviallyCopyConstructible(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
+	{
+		*this = variant;
+	}
+	constexpr Self& operator=(const Self& variant) noexcept
+	{
+		this->id_ = variant.id_;
+		CopyConstructorVisitor visitor{variant};
+		Match<CopyConstructorVisitor, decltype(*this)>::call(this->id_, *this, visitor);
+
+		return *this;
+	}
 	constexpr VariantNonTriviallyCopyConstructible(Self&& variant) noexcept = default;
 	constexpr Self& operator=(Self&& variant) noexcept = default;
 };
 
 template <class... Ts>
-using VariantCopyConstructible = bzd::typeTraits::
-	Conditional<(::std::is_trivially_copy_constructible_v<Ts> && ...), VariantTriviallyCopyConstructible<Ts...>, VariantNonTriviallyCopyConstructible<Ts...>>;
+using VariantCopyConstructible = bzd::typeTraits::Conditional<(::std::is_trivially_copy_constructible_v<Ts> && ...),
+															  VariantTriviallyCopyConstructible<Ts...>,
+															  VariantNonTriviallyCopyConstructible<Ts...>>;
 
 // Move constructible ---------------------------------------------------------
 
@@ -321,20 +295,53 @@ public: // Traits / Constructors
 template <class... Ts>
 class VariantNonTriviallyMoveConstructible : public VariantCopyConstructible<Ts...>
 {
-public: // Traits / Constructors
+public: // Traits
 	using Self = VariantNonTriviallyMoveConstructible<Ts...>;
 	using Parent = VariantCopyConstructible<Ts...>;
+
+protected:
+	// Move constructor visitor
+	struct MoveConstructorVisitor
+	{
+		constexpr MoveConstructorVisitor(VariantNonTriviallyMoveConstructible<Ts...>& variant) noexcept : variant_{variant} {}
+		template <class T, class SelfType>
+		constexpr void operator()(SelfType& self) noexcept
+		{
+			self.template emplace<T>(bzd::move(variant_.template get<T>()));
+		}
+
+	private:
+		VariantNonTriviallyMoveConstructible<Ts...>& variant_;
+	};
+
+	template <class V, class SelfType>
+	using Match = typename Parent::template Match<V, SelfType>;
+	template <class T>
+	using Find = typename Parent::template Find<T>;
+
+public: // Constructors / Assignments
 	using Parent::Parent;
 
 	constexpr VariantNonTriviallyMoveConstructible(const Self& variant) noexcept = default;
 	constexpr Self& operator=(const Self& variant) noexcept = default;
-	constexpr VariantNonTriviallyMoveConstructible(Self&& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}} { Parent::operator=(bzd::move(variant)); }
-	constexpr Self& operator=(Self&& variant) noexcept = default;
+	constexpr VariantNonTriviallyMoveConstructible(Self&& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
+	{
+		*this = bzd::move(variant);
+	}
+	constexpr Self& operator=(Self&& variant) noexcept
+	{
+		this->id_ = variant.id_;
+		MoveConstructorVisitor visitor{variant};
+		Match<MoveConstructorVisitor, decltype(*this)>::call(this->id_, *this, visitor);
+
+		return *this;
+	}
 };
 
 template <class... Ts>
-using VariantMoveConstructible = bzd::typeTraits::
-	Conditional<(::std::is_trivially_move_constructible_v<Ts> && ...), VariantTriviallyMoveConstructible<Ts...>, VariantNonTriviallyMoveConstructible<Ts...>>;
+using VariantMoveConstructible = bzd::typeTraits::Conditional<(::std::is_trivially_move_constructible_v<Ts> && ...),
+															  VariantTriviallyMoveConstructible<Ts...>,
+															  VariantNonTriviallyMoveConstructible<Ts...>>;
 
 // Variant --------------------------------------------------------------------
 
@@ -345,6 +352,17 @@ public: // Traits
 	using Self = VariantTrivial<Ts...>;
 	using Parent = VariantMoveConstructible<Ts...>;
 	using Parent::Parent;
+	using Parent::operator=;
+
+	template <class T>
+	using Find = typename Parent::template Find<T>;
+
+	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
+	constexpr Self& operator=(T&& value) noexcept
+	{
+		this->set(bzd::forward<T>(value));
+		return *this;
+	}
 };
 
 template <class... Ts>
@@ -387,21 +405,21 @@ private:
 public:
 	using Parent::Parent;
 
-	constexpr VariantNonTrivial(const Self& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
-	{
-		Parent::operator=(variant);
-	}
-
-	constexpr VariantNonTrivial(Self&& variant) noexcept : Parent{typename Parent::EmptyConstructorTagType{}}
-	{
-		Parent::operator=(bzd::move(variant));
-	}
+	constexpr VariantNonTrivial(const Self& variant) noexcept = default;
+	constexpr VariantNonTrivial(Self&& variant) noexcept = default;
 
 	template <class T>
 	constexpr Self& operator=(T&& other) noexcept
 	{
 		destructIfNeeded();
-		Parent::operator=(bzd::forward<T>(other));
+		if constexpr (Find<bzd::typeTraits::RemoveReference<T>>::value == -1)
+		{
+			Parent::operator=(bzd::forward<T>(other));
+		}
+		else
+		{
+			this->set(bzd::forward<T>(other));
+		}
 		return *this;
 	}
 
