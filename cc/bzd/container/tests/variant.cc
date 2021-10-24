@@ -120,6 +120,18 @@ TEST(ContainerVariantTrivial, CopyAssignment)
 		EXPECT_EQ(variant2.index(), 1);
 		EXPECT_EQ(variant2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
 	}
+
+	{
+		struct Temp
+		{
+		};
+		bzd::test::CopyOnly value1{};
+		bzd::Variant<Temp, bzd::test::CopyOnly> variant1{value1};
+		EXPECT_EQ(variant1.index(), 1);
+		Temp value2{};
+		variant1 = value2;
+		EXPECT_EQ(variant1.index(), 0);
+	}
 }
 
 TEST(ContainerVariantNonTrivial, CopyAssignment)
@@ -241,6 +253,16 @@ TEST(ContainerVariantTrivial, MoveAssignment)
 		variant2 = bzd::move(variant1);
 		EXPECT_EQ(variant2.index(), 0);
 		EXPECT_EQ(variant2.get<int>(), 42);
+	}
+
+	{
+		struct Temp
+		{
+		};
+		bzd::Variant<Temp, bzd::test::MoveOnly> variant1{bzd::test::MoveOnly{}};
+		EXPECT_EQ(variant1.index(), 1);
+		variant1 = Temp{};
+		EXPECT_EQ(variant1.index(), 0);
 	}
 }
 

@@ -191,10 +191,12 @@ protected:
 };
 
 template <SizeType Index>
-union UnionTrivial<Index, UnionTag> {};
+union UnionTrivial<Index, UnionTag> {
+};
 
 template <SizeType Index>
-union UnionNonTrivial<Index, UnionTag> {};
+union UnionNonTrivial<Index, UnionTag> {
+};
 } // namespace bzd::meta::impl
 
 namespace bzd::meta {
