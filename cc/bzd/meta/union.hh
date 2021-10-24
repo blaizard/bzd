@@ -191,24 +191,10 @@ protected:
 };
 
 template <SizeType Index>
-union UnionTrivial<Index, UnionTag> {
-	constexpr UnionTrivial() noexcept = default;
-	// This helps for troubleshooting.
-	template <class T>
-	explicit constexpr UnionTrivial(T) noexcept = delete;
-	template <class T>
-	constexpr UnionTrivial<Index, UnionTag>& operator=(T) noexcept = delete;
-};
+union UnionTrivial<Index, UnionTag> {};
 
 template <SizeType Index>
-union UnionNonTrivial<Index, UnionTag> {
-	constexpr UnionNonTrivial() noexcept = default;
-	// This helps for troubleshooting.
-	template <class T>
-	explicit constexpr UnionNonTrivial(T) noexcept = delete;
-	template <class T>
-	constexpr UnionNonTrivial<Index, UnionTag>& operator=(T) noexcept = delete;
-};
+union UnionNonTrivial<Index, UnionTag> {};
 } // namespace bzd::meta::impl
 
 namespace bzd::meta {
