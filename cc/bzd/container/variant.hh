@@ -4,12 +4,15 @@
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/move.hh"
-
-#include <type_traits>
+#include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
+#include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
+#include "cc/bzd/type_traits/is_trivially_destructible.hh"
+#include "cc/bzd/type_traits/is_trivially_move_assignable.hh"
+#include "cc/bzd/type_traits/is_trivially_move_constructible.hh"
 
 namespace bzd::impl {
 template <class... Ts>
@@ -32,9 +35,6 @@ protected:
 	// Search for T in the list
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
-	// Search for constructible element from T
-	template <class T>
-	using FindConstructible = typename TypeList::template FindConditional<T, bzd::typeTraits::IsConstructible1>;
 
 	// Helper
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
@@ -126,31 +126,23 @@ protected:
 	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{npos}, data_{} {}
 
 public: // Constructors
-	/**
-	 * Default constructor.
-	 * The first type is selected, this is compatible with std::variant behavior.
-	 */
+	/// Default constructor.
+	/// The first type is selected, this is compatible with std::variant behavior.
 	constexpr VariantBase() noexcept : id_{0}, data_{InPlaceIndex<0>{}} {}
 
-	/**
-	 * Value constructor (exact type match)
-	 */
+	/// Value constructor (exact type match)
 	template <class T>
 	constexpr VariantBase(T&& value) noexcept : id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{bzd::forward<T>(value)}
 	{
 	}
 
-	/**
-	 * Value constructor, in place index constructor.
-	 */
+	/// Value constructor, in place index constructor.
 	template <SizeType I, class... Args>
 	constexpr VariantBase(InPlaceIndex<I>, Args&&... args) noexcept : id_{I}, data_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	/**
-	 * Value constructor, in place type constructor.
-	 */
+	/// Value constructor, in place type constructor.
 	template <class T, class... Args>
 	constexpr VariantBase(InPlaceType<T>, Args&&... args) noexcept :
 		id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{inPlaceType<T>, bzd::forward<Args>(args)...}
@@ -277,7 +269,7 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantCopyConstructible = bzd::typeTraits::Conditional<(::std::is_trivially_copy_constructible_v<Ts> && ...),
+using VariantCopyConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyCopyConstructible<Ts> && ...) && (typeTraits::isTriviallyCopyAssignable<Ts> && ...),
 															  VariantTriviallyCopyConstructible<Ts...>,
 															  VariantNonTriviallyCopyConstructible<Ts...>>;
 
@@ -339,7 +331,7 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantMoveConstructible = bzd::typeTraits::Conditional<(::std::is_trivially_move_constructible_v<Ts> && ...),
+using VariantMoveConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyMoveConstructible<Ts> && ...) && (typeTraits::isTriviallyMoveAssignable<Ts> && ...),
 															  VariantTriviallyMoveConstructible<Ts...>,
 															  VariantNonTriviallyMoveConstructible<Ts...>>;
 
@@ -386,10 +378,6 @@ protected:
 	template <template <class> class F, class... Args>
 	using Helper = typename Parent::template Helper<F, Args...>;
 
-	// Data types
-	using Parent::data_;
-	using Parent::id_;
-
 protected:
 	// Destructor
 	template <class T>
@@ -400,7 +388,7 @@ protected:
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	constexpr void destructIfNeeded() noexcept { Destructor::call(id_, this); }
+	constexpr void destructIfNeeded() noexcept { Destructor::call(this->id_, this); }
 
 public:
 	using Parent::Parent;
