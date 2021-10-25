@@ -16,14 +16,12 @@ class Span;
 }
 
 namespace bzd::impl {
-/**
- * \brief The class template span describes an object that can refer to a
- * contiguous sequence of objects with the first element of the sequence at
- * position zero.
- *
- * \tparam T Element type, must be a complete type that is not an abstract class
- * type.
- */
+/// \brief The class template span describes an object that can refer to a
+/// contiguous sequence of objects with the first element of the sequence at
+/// position zero.
+///
+/// \tparam T Element type, must be a complete type that is not an abstract class
+/// type.
 template <class T, class Storage>
 class Span
 {

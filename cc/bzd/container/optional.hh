@@ -8,9 +8,7 @@
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/utility/forward.hh"
-#include "cc/bzd/utility/move.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/utility/in_place.hh"
 
@@ -71,16 +69,16 @@ public: // API
 	/// Checks whether the optional contains a value.
 	///
 	/// \return true if *this contains a value, false if *this does not contain a value.
-	constexpr bool hasValue() const noexcept { return data_.template is<ValueContainer>(); }
+	[[nodiscard]] constexpr bool hasValue() const noexcept { return data_.template is<ValueContainer>(); }
 
 	/// \copydoc hasValue
-	constexpr explicit operator bool() const noexcept { return hasValue(); }
+	[[nodiscard]] constexpr explicit operator bool() const noexcept { return hasValue(); }
 
 	/// Returns the contained value if the optional has a value, otherwise returns defaultValue.
 	///
 	/// \param defaultValue The value to use in case *this is empty.
 	/// \return The current value if *this has a value, or default_value otherwise.
-	constexpr const Value& valueOr(const Value& defaultValue) const noexcept
+	[[nodiscard]] constexpr const Value& valueOr(const Value& defaultValue) const noexcept
 	{
 		return (hasValue()) ? data_.template get<ValueContainer>() : defaultValue;
 	}	
@@ -88,7 +86,7 @@ public: // API
 	/// If *this contains a value, returns a const reference to the contained value otherwise, asserts.
 	///
 	/// \return A const reference to the contained value.
-	constexpr const Value& value() const
+	[[nodiscard]] constexpr const Value& value() const
 	{
 		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
@@ -97,7 +95,7 @@ public: // API
 	/// If *this contains a value, returns a reference to the contained value otherwise, asserts.
 	///
 	/// \return A reference to the contained value.
-	constexpr Value& valueMutable()
+	[[nodiscard]] constexpr Value& valueMutable()
 	{
 		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
@@ -106,12 +104,12 @@ public: // API
 	/// Accesses the contained value.
 	///
 	/// \return Returns a pointer to the contained value.
-	constexpr const Value* operator->() const { return &value(); }
+	[[nodiscard]] constexpr const Value* operator->() const { return &value(); }
 
 	/// Accesses the contained value.
 	///
 	/// \return Returns a pointer to the contained value.
-	constexpr Value* operator->() { return &valueMutable(); }
+	[[nodiscard]] constexpr Value* operator->() { return &valueMutable(); }
 
 	/// Constructs the contained value in-place.
 	///

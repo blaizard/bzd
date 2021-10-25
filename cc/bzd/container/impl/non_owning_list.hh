@@ -20,16 +20,15 @@ enum class ListErrorType
 
 namespace bzd::impl {
 
-/**
- * Implementation of a non-owning linked list.
- *
- * Lock-free, multi-producer, multi-consumer.
- * In addition it supports insertion and deletion from preemptive OS
- * within a critical section.
- * Elements can be moved from one list instance to another.
- *
- * \tparam T Element type.
- */
+
+/// Implementation of a non-owning linked list.
+///
+/// Lock-free, multi-producer, multi-consumer.
+/// In addition it supports insertion and deletion from preemptive OS
+/// within a critical section.
+/// Elements can be moved from one list instance to another.
+///
+/// \tparam T Element type.
 template <class T>
 class NonOwningList
 {
@@ -43,39 +42,32 @@ public:
 public:
 	constexpr NonOwningList() noexcept { front_.next_.store(&back_); }
 
-	/**
-	 * Get the number of elements currently held by this container.
-	 *
-	 * \return The number of elments.
-	 */
+	/// Get the number of elements currently held by this container.
+	///
+	/// \return The number of elments.
 	[[nodiscard]] constexpr SizeType size() const noexcept { return size_.load(); }
 
-	/**
-	 * Tells if the list is empty.
-	 *
-	 * \return True if the list is empty, false otherwise.
-	 */
+	/// Tells if the list is empty.
+	///
+	/// \return True if the list is empty, false otherwise.
 	[[nodiscard]] constexpr bool empty() const noexcept { return size_.load() == 0; }
 
-	/**
-	 * Insert an element into the list from the root element.
-	 * The idea is to ensure that the last operation is the one that make the element discoverable,
-	 * this ensures that any element is consistent.
-	 *
-	 * Given the following:
-	 * | R | -> | A |
-	 *
-	 * To insert element B, first set the next pointer of this element:
-	 * | R | --------> | A |
-	 * |   |  | B | -> |   |
-	 *
-	 * Then update R next pointer to B, if it fails restart from the begining.
-	 * | R | -> | B | -> | A |
-	 *
-	 * \param element Element to be inserted.
-	 *
-	 * \return An error in case of failure, void otherwise.
-	 */
+	/// Insert an element into the list from the root element.
+	/// The idea is to ensure that the last operation is the one that make the element discoverable,
+	/// this ensures that any element is consistent.
+	///
+	/// Given the following:
+	/// | R | -> | A |
+	///
+	/// To insert element B, first set the next pointer of this element:
+	/// | R | --------> | A |
+	/// |   |  | B | -> |   |
+	///
+	/// Then update R next pointer to B, if it fails restart from the begining.
+	/// | R | -> | B | -> | A |
+	///
+	/// \param element Element to be inserted.
+	/// \return An error in case of failure, void otherwise.
 	template <class... Args>
 	[[nodiscard]] constexpr Result<void> pushFront(ElementType& element) noexcept
 	{
@@ -148,13 +140,10 @@ public:
 		return nullresult;
 	}
 
-	/**
-	 * Remove an element from the queue.
-	 *
-	 * \param element Element to be inserted.
-	 *
-	 * \return An error in case of failure, void otherwise.
-	 */
+	/// Remove an element from the queue.
+	///
+	/// \param element Element to be inserted.
+	/// \return An error in case of failure, void otherwise.
 	template <class... Args>
 	[[nodiscard]] constexpr Result<void> pop(ElementType& element) noexcept
 	{
@@ -313,31 +302,22 @@ public:
 	}
 
 protected:
-	/**
-	 * Structure to return node information when found.
-	 */
+	/// Structure to return node information when found.
 	struct NodeFound
 	{
-		/**
-		 * Pointer of the previous node.
-		 */
+		/// Pointer of the previous node.
 		ElementPtrType node;
-		/**
-		 * Raw pointer of the next pointer of the previous node.
-		 * Raw means without removing deletion mark.
-		 */
+		/// Raw pointer of the next pointer of the previous node.
+		/// Raw means without removing deletion mark.
 		ElementPtrType nextRaw;
 	};
 
-	/**
-	 * Look for the previous node of the one passed into argument.
-	 * In case of concurrent insertion, the previous node might not be the
-	 * actual one, therefore we need to go down the chain to find the actual one.
-	 *
-	 * \param node We are looking for the previous node of this node.
-	 *
-	 * \return A structure containing the previous node and the raw pointer its next node.
-	 */
+	/// Look for the previous node of the one passed into argument.
+	/// In case of concurrent insertion, the previous node might not be the
+	/// actual one, therefore we need to go down the chain to find the actual one.
+	///
+	/// \param node We are looking for the previous node of this node.
+	/// \return A structure containing the previous node and the raw pointer its next node.
 	[[nodiscard]] constexpr Optional<NodeFound> findPreviousNode(ElementPtrType node) noexcept
 	{
 		NodeFound result{&front_, nullptr};
@@ -437,10 +417,8 @@ public:
 	constexpr NonOwningListElement() = default;
 	constexpr NonOwningListElement(Self&& elt) : next_{elt.next_.load()} {}
 
-	/**
-	 * Pop the current element from the list. This is available only if
-	 * MultiContainer is enabled, as it has the knowledge of the parent container.
-	 */
+	/// Pop the current element from the list. This is available only if
+	/// MultiContainer is enabled, as it has the knowledge of the parent container.
 	template <bzd::BoolType T = MultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> pop() noexcept
 	{
@@ -459,72 +437,68 @@ public:
 
 namespace bzd {
 
-/**
- * Element for the non-owning list.
- *
- * \tparam MultiContainer Whether multicontainer should be supported or not.
- *         This means that an element can pop from one list and push a different one.
- */
+/// Element for the non-owning list.
+///
+/// \tparam MultiContainer Whether multicontainer should be supported or not.
+///        This means that an element can pop from one list and push a different one.
 template <bzd::BoolType MultiContainer>
 using NonOwningListElement = impl::NonOwningListElement<MultiContainer>;
 
-/**
- * Implementation of a non-owning linked list.
- *
- * The implementation is based on a single linked list, which should be efficient
- * enough for insertion and removal for small lists.
- *
- * Lock-free, multi-producer, multi-consumer.
- * In addition it supports lock-free insertion and deletion from critical section,
- * meaning that a call will always return without the need of task preemption.
- * Elements can be moved from one list instance to another.
- *
- * \tparam T Element type.
- */
+/// Implementation of a non-owning linked list.
+///
+/// The implementation is based on a single linked list, which should be efficient
+/// enough for insertion and removal for small lists.
+///
+/// Lock-free, multi-producer, multi-consumer.
+/// In addition it supports lock-free insertion and deletion from critical section,
+/// meaning that a call will always return without the need of task preemption.
+/// Elements can be moved from one list instance to another.
+///
+/// \tparam T Element type.
 template <class T>
 class NonOwningList : public bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>
 {
 public:
 	using bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>::NonOwningList;
 
-	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<T&>> front() noexcept
+	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
 	{
 		auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return bzd::ReferenceWrapper<T&>{static_cast<T&>(*ptr)};
+		return static_cast<T&>(*ptr);
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<const T&>> front() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
 	{
 		const auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return bzd::ReferenceWrapper<const T&>{static_cast<const T&>(*ptr)};
+		return static_cast<const T&>(*ptr);
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<T&>> back() noexcept
+	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
 	{
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return bzd::ReferenceWrapper<T&>{static_cast<T&>(*previous->node)};
+		return static_cast<T&>(*previous->node);
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<bzd::ReferenceWrapper<const T&>> back() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
 	{
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return bzd::ReferenceWrapper<const T&>{static_cast<const T&>(*previous->node)};
+		return static_cast<const T&>(*previous->node);
 	}
 };
 } // namespace bzd

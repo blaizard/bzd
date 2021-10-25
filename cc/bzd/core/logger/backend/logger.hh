@@ -13,7 +13,7 @@ public:
 	 * Set the default logger backend, by default a stub is in place.
 	 * Return the previous backend if any.
 	 */
-	static bzd::Optional<bzd::ReferenceWrapper<bzd::OStream&>> setDefault(bzd::OStream& backend) noexcept;
+	static bzd::Optional<bzd::OStream&> setDefault(bzd::OStream& backend) noexcept;
 
 	/**
 	 * Get the default backend logger.
