@@ -159,29 +159,28 @@ public: // Functions
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args) noexcept
 	{
-		static_assert(Find<T>::value != -1, "Inconsistent variant state, should never happen");
 		// Using inplace operator new
 		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
 	}
 
-	constexpr IndexType index() const noexcept { return id_; }
+	[[nodiscard]] constexpr IndexType index() const noexcept { return id_; }
 
 	template <class T>
-	constexpr bzd::BoolType is() const noexcept
+	[[nodiscard]] constexpr bzd::BoolType is() const noexcept
 	{
 		return (id_ == Find<T>::value);
 	}
 
 	template <class T>
-	constexpr const T& get() const noexcept
+	[[nodiscard]] constexpr const T& get() const noexcept
 	{
 		return data_.template get<T>();
 	}
 
 	template <class T>
-	constexpr T& get() noexcept
+	[[nodiscard]] constexpr T& get() noexcept
 	{
 		return data_.template get<T>();
 	}

@@ -18,7 +18,7 @@ Proxy proxy;
 bzd::OStream* defaultBackend{&proxy};
 } // namespace
 
-bzd::Optional<bzd::ReferenceWrapper<bzd::OStream&>> bzd::backend::Logger::setDefault(bzd::OStream& backend) noexcept
+bzd::Optional<bzd::OStream&> bzd::backend::Logger::setDefault(bzd::OStream& backend) noexcept
 {
 	auto previous = defaultBackend;
 	defaultBackend = &backend;
@@ -26,7 +26,7 @@ bzd::Optional<bzd::ReferenceWrapper<bzd::OStream&>> bzd::backend::Logger::setDef
 	{
 		return bzd::nullopt;
 	}
-	return bzd::ReferenceWrapper<bzd::OStream&>{*previous};
+	return *previous;
 }
 
 bzd::OStream& bzd::backend::Logger::getDefault() noexcept
