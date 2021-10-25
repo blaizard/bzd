@@ -20,7 +20,6 @@ enum class ListErrorType
 
 namespace bzd::impl {
 
-
 /// Implementation of a non-owning linked list.
 ///
 /// Lock-free, multi-producer, multi-consumer.
