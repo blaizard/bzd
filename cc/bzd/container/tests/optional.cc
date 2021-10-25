@@ -102,14 +102,14 @@ TEST(ContainerOptional, constexprType)
 
 	EXPECT_TRUE(u);
 	EXPECT_EQ(u.valueOr(10), 23);
-	/*
-		constexpr auto vCopy{u};
-		EXPECT_TRUE(vCopy);
-		EXPECT_EQ(vCopy.value(), 23);
 
-		constexpr auto vMove{bzd::move(vCopy)};
-		EXPECT_TRUE(vMove);
-		EXPECT_EQ(vMove.value(), 23);*/
+	constexpr auto vCopy{u};
+	EXPECT_TRUE(vCopy);
+	EXPECT_EQ(vCopy.value(), 23);
+
+	constexpr auto vMove{bzd::move(vCopy)};
+	EXPECT_TRUE(vMove);
+	EXPECT_EQ(vMove.value(), 23);
 }
 
 TEST(ContainerOptional, complexData)
@@ -139,7 +139,7 @@ TEST(ContainerOptional, complexData)
 	v.reset();
 	EXPECT_FALSE(v);
 }
-/*
+
 TEST(ContainerOptional, reference)
 {
 	int a = 42;
@@ -169,7 +169,7 @@ TEST(ContainerOptional, reference)
 	b = 7;
 	EXPECT_EQ(vMove.value(), 7);
 }
-*/
+
 TEST(ContainerOptional, pointer)
 {
 	int a = 42;
@@ -192,7 +192,7 @@ TEST(ContainerOptional, pointer)
 	a = 7;
 	EXPECT_EQ(*(vMove.value()), 7);
 }
-/*
+
 TEST(ContainerOptional, result)
 {
 	{
@@ -227,4 +227,3 @@ TEST(ContainerOptional, result)
 		EXPECT_FALSE((v.value()).error());
 	}
 }
-*/
