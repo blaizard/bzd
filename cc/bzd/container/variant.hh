@@ -4,15 +4,15 @@
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/remove_reference.hh"
-#include "cc/bzd/utility/in_place.hh"
-#include "cc/bzd/utility/forward.hh"
-#include "cc/bzd/utility/move.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/is_trivially_move_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_move_constructible.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {
 template <class... Ts>
@@ -268,7 +268,8 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantCopyConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyCopyConstructible<Ts> && ...) && (typeTraits::isTriviallyCopyAssignable<Ts> && ...),
+using VariantCopyConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyCopyConstructible<Ts> && ...) &&
+																  (typeTraits::isTriviallyCopyAssignable<Ts> && ...),
 															  VariantTriviallyCopyConstructible<Ts...>,
 															  VariantNonTriviallyCopyConstructible<Ts...>>;
 
@@ -330,7 +331,8 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantMoveConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyMoveConstructible<Ts> && ...) && (typeTraits::isTriviallyMoveAssignable<Ts> && ...),
+using VariantMoveConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyMoveConstructible<Ts> && ...) &&
+																  (typeTraits::isTriviallyMoveAssignable<Ts> && ...),
 															  VariantTriviallyMoveConstructible<Ts...>,
 															  VariantNonTriviallyMoveConstructible<Ts...>>;
 

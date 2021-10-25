@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
@@ -9,7 +10,6 @@
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/forward.hh"
-#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/utility/in_place.hh"
 
 namespace bzd::impl {
@@ -60,12 +60,11 @@ public: // Constructors
 	}
 
 	// Value assignment is forbidden on reference type. This is because it is confusing whether the
-	// existing reference updates its value or the reference gets re-assigned. 
+	// existing reference updates its value or the reference gets re-assigned.
 	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value && bzd::typeTraits::isReference<T>>>
 	constexpr Self& operator=(U) noexcept = delete;
 
 public: // API
-
 	/// Checks whether the optional contains a value.
 	///
 	/// \return true if *this contains a value, false if *this does not contain a value.
@@ -81,7 +80,7 @@ public: // API
 	[[nodiscard]] constexpr const Value& valueOr(const Value& defaultValue) const noexcept
 	{
 		return (hasValue()) ? data_.template get<ValueContainer>() : defaultValue;
-	}	
+	}
 
 	/// If *this contains a value, returns a const reference to the contained value otherwise, asserts.
 	///

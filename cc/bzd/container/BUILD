@@ -315,8 +315,8 @@ cc_library(
         "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/type_traits:is_trivially_move_assignable",
         "//cc/bzd/type_traits:is_trivially_move_constructible",
-        "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",
     ],
 )
