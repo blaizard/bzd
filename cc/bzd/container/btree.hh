@@ -6,18 +6,16 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd::impl {
-/**
- * Implementation of a B-tree.
- *
- * A B-Tree of order M has the following properties:
- * - Every nodes has at most *M* children.
- * - A non-leaf node with k children contains k-1 keys.
- * - The root has at least 2 children if it is not a leaf node.
- * - Every non-leaf node (except root) has at least M / 2 children.
- * - All leaves appear in the same level.
- *
- * Non-leaf nodes are implemented as non-sorted arrays.
- */
+/// Implementation of a B-tree.
+///
+/// A B-Tree of order M has the following properties:
+/// - Every nodes has at most *M* children.
+/// - A non-leaf node with k children contains k-1 keys.
+/// - The root has at least 2 children if it is not a leaf node.
+/// - Every non-leaf node (except root) has at least M / 2 children.
+/// - All leaves appear in the same level.
+///
+/// Non-leaf nodes are implemented as non-sorted arrays.
 template <class K, class V, SizeType Order>
 class BTree
 {
@@ -108,8 +106,3 @@ protected:
 	V data_[N];
 };
 } // namespace bzd
-
-/*              14546
-		45454      5444     5545
-5445   4545  45454   4554   545454
-*/

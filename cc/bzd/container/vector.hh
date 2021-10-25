@@ -20,12 +20,11 @@ public:
 	{
 	}
 
-	/**
-	 * \brief Adds a new element at the end of the vector, after its current last
-	 * element.
-	 * The content of val is copied (or moved) to the new element.
-	 * \param value Value to be copied (or moved) to the new element.
-	 */
+	/// \brief Adds a new element at the end of the vector, after its current last
+	/// element.
+	/// The content of val is copied (or moved) to the new element.
+	///
+	/// \param value Value to be copied (or moved) to the new element.
 	constexpr void pushBack(const T& value)
 	{
 		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
@@ -33,11 +32,10 @@ public:
 		this->at(this->size() - 1) = value;
 	}
 
-	/**
-	 * Appends a new element to the end of the container.
-	 * The element is constructed through using placement-new in-place at the location provided by the iterator.
-	 * \param args... Arguments forwarded to the constructor.
-	 */
+	/// Appends a new element to the end of the container.
+	/// The element is constructed through using placement-new in-place at the location provided by the iterator.
+	///
+	/// \param args... Arguments forwarded to the constructor.
 	template <class... Args>
 	constexpr void emplaceBack(Args&&... args)
 	{
@@ -47,23 +45,17 @@ public:
 		++this->storage_.sizeMutable();
 	}
 
-	/**
-	 * \brief Returns the maximum number of elements the vector can hold.
-	 *
-	 * \return Maximum number of element this vector can hold.
-	 */
+	/// \brief Returns the maximum number of elements the vector can hold.
+	///
+	/// \return Maximum number of element this vector can hold.
 	constexpr SizeType capacity() const noexcept { return capacity_; }
 
-	/**
-	 * \brief Removes all elements.
-	 */
+	/// \brief Removes all elements.
 	constexpr void clear() noexcept { resize(0); }
 
-	/**
-	 * \brief Change the size of the vector.
-	 *
-	 * \param n The new size. Note, it must a be lower or equal to the capacity.
-	 */
+	/// \brief Change the size of the vector.
+	///
+	/// \param n The new size. Note, it must a be lower or equal to the capacity.
 	constexpr void resize(const bzd::SizeType n) noexcept { this->storage_.sizeMutable() = (n < capacity_) ? n : capacity_; }
 
 protected:

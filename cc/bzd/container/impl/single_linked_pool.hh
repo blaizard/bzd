@@ -39,9 +39,7 @@ public:
 
 	constexpr bool empty() const noexcept { return (free_ == npos); }
 
-	/**
-	 * Release an element from the pool
-	 */
+	/// Release an element from the pool
 	constexpr void release(Element& element) noexcept
 	{
 		const auto index = getIndex(element);
@@ -49,9 +47,7 @@ public:
 		free_ = index;
 	}
 
-	/**
-	 * Reserve an element from the free list (if any)
-	 */
+	/// Reserve an element from the free list (if any)
 	constexpr Element& reserve() noexcept
 	{
 		bzd::assert::isTrue(!empty());

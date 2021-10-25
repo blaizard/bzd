@@ -86,8 +86,6 @@ using Queue = impl::Queue<T, CapacityType>;
 }
 
 namespace bzd {
-/**
- */
 template <class T, SizeType N, class CapacityType = SizeType>
 class Queue : public interface::Queue<T, CapacityType>
 {

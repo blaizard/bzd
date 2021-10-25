@@ -4,9 +4,7 @@
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::impl {
-/**
- * \brief Fixed storage type.
- */
+/// \brief Fixed storage type.
 template <class T, bzd::SizeType N>
 class FixedStorage
 {

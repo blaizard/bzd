@@ -16,9 +16,7 @@ protected:
 	using BzdFctPtrType = bzd::Function<ReturnType(Args...)>;
 
 public: // Constructor/Assignment
-	/**
-	 * Constructor from member function.
-	 */
+	/// Constructor from member function.
 	template <class Object, class Member>
 	constexpr FunctionView(Object& obj, Member memberPtr) noexcept :
 		storage_{FunctionMember{&obj,
@@ -30,19 +28,13 @@ public: // Constructor/Assignment
 {
 }
 
-/**
- * Constructor from function pointer.
- */
+/// Constructor from function pointer.
 constexpr explicit FunctionView(RawFctPtrType function) noexcept : storage_{function} {}
 
-/**
- * Constructor from bzd::Function object.
- */
+/// Constructor from bzd::Function object.
 constexpr explicit FunctionView(BzdFctPtrType& function) noexcept : FunctionView{function.callable_} {}
 
-/**
- * Constructor from lambda.
- */
+/// Constructor from lambda.
 template <class T>
 constexpr explicit FunctionView(T& function) noexcept : FunctionView{function, &T::operator()}
 {

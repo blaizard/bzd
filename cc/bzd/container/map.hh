@@ -6,9 +6,7 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd::impl {
-/**
- * \brief Flat map implementation.
- */
+/// \brief Flat map implementation.
 template <class K, class V>
 class Map
 {
@@ -23,9 +21,7 @@ public:
 public:
 	constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept : data_(data) {}
 
-	/**
-	 * Search for a specific element in the map.
-	 */
+	/// Search for a specific element in the map.
 	constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
 	{
 		for (auto it = data_.begin(); it != data_.end(); ++it)
@@ -47,9 +43,7 @@ public:
 
 	constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
 
-	/**
-	 * Insert a new element or replace the existing one
-	 */
+	/// Insert a new element or replace the existing one
 	constexpr void insert(const K& key, V&& value)
 	{
 		auto result = find(key);
