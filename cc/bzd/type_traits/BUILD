@@ -37,7 +37,11 @@ cc_library(
         ":is_rvalue_reference",
         ":is_same",
         ":is_signed",
+        ":is_trivially_copy_assignable",
+        ":is_trivially_copy_constructible",
         ":is_trivially_destructible",
+        ":is_trivially_move_assignable",
+        ":is_trivially_move_constructible",
         ":is_union",
         ":is_void",
         ":is_volatile",
@@ -439,6 +443,22 @@ cc_library(
 )
 
 cc_library(
+    name = "is_trivially_copy_assignable",
+    hdrs = [
+        "is_trivially_copy_assignable.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "is_trivially_copy_constructible",
+    hdrs = [
+        "is_trivially_copy_constructible.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "is_trivially_destructible",
     hdrs = [
         "is_trivially_destructible.hh",
@@ -448,6 +468,22 @@ cc_library(
         ":integral_constant",
         ":is_destructible",
     ],
+)
+
+cc_library(
+    name = "is_trivially_move_assignable",
+    hdrs = [
+        "is_trivially_move_assignable.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "is_trivially_move_constructible",
+    hdrs = [
+        "is_trivially_move_constructible.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
