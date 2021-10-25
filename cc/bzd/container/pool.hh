@@ -15,18 +15,14 @@ protected:
 public:
 	constexpr explicit Pool(const bzd::Span<Element> data) noexcept : SingleLinkedPool<T, CapacityType>(data) {}
 
-	/**
-	 * Release an element from the pool
-	 */
+	/// Release an element from the pool
 	constexpr void release(T& container) noexcept
 	{
 		auto* item = containerOf(&container, &Element::container_);
 		SingleLinkedPool<T, CapacityType>::release(*item);
 	}
 
-	/**
-	 * Reserve an element from the free list (if any)
-	 */
+	/// Reserve an element from the free list (if any)
 	constexpr T& reserve() noexcept { return SingleLinkedPool<T, CapacityType>::reserve().container_; }
 };
 } // namespace bzd::impl
@@ -38,10 +34,8 @@ using Pool = impl::Pool<T, CapacityType>;
 
 namespace bzd {
 
-/**
- * A Pool is a fixed memory buffer containing fixed size elements that can be
- * taken or released.
- */
+/// A Pool is a fixed memory buffer containing fixed size elements that can be
+/// taken or released.
 template <class T, SizeType N, class CapacityType = SizeType>
 class Pool : public interface::Pool<T, CapacityType>
 {

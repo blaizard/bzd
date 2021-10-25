@@ -6,9 +6,7 @@
 #include "cc/bzd/utility/ratio.hh"
 
 namespace bzd::impl {
-/**
- * Curiously Recuring Template Pattern
- */
+/// Curiously Recuring Template Pattern
 template <typename T, template <class> class crtpType>
 class NamedTypeCRTP
 {
@@ -45,9 +43,7 @@ private:
 
 namespace bzd {
 
-/**
- * Strong type.
- */
+/// Strong type.
 template <class T, typename PhantomType, template <class> class... Skills>
 class NamedType
 	: public impl::NamedType<T, PhantomType, bzd::Ratio<1>>
@@ -61,9 +57,7 @@ public:
 	using impl::NamedType<T, PhantomType, bzd::Ratio<1>>::NamedType;
 };
 
-/**
- * Creates a multiple of an existing NamedType.
- */
+/// Creates a multiple of an existing NamedType.
 template <class T, class Ratio, template <class> class... Skills>
 class MultipleOf
 	: public impl::NamedType<typename T::UnderlyingType, typename T::Tag, Ratio>

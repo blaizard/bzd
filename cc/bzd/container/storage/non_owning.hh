@@ -5,9 +5,7 @@
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::impl {
-/**
- * \brief Non-owning storage type.
- */
+/// \brief Non-owning storage type.
 template <class T>
 class NonOwningStorage
 {

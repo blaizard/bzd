@@ -4,9 +4,7 @@
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::impl {
-/**
- * \brief Resizeable storage type.
- */
+/// \brief Resizeable storage type.
 template <class T, bzd::SizeType N>
 class ResizeableStorage
 {

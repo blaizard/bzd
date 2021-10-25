@@ -28,9 +28,7 @@ private:
 template <class T, class E>
 class Result;
 
-/**
- * Internal class used to create an unexpected result object type.
- */
+/// Internal class used to create an unexpected result object type.
 template <class E>
 class Error
 {
@@ -178,12 +176,10 @@ protected:
 } // namespace bzd::impl
 
 namespace bzd {
-/**
- * \brief This is the type used for returning and propagating errors.
- *
- * It is a variants with 2 states, valid, representing success and containing a
- * value, and error, representing error and containing an error value.
- */
+/// \brief This is the type used for returning and propagating errors.
+///
+/// It is a variants with 2 states, valid, representing success and containing a
+/// value, and error, representing error and containing an error value.
 template <class T = void, class E = bzd::BoolType>
 using Result = impl::Result<T, E>;
 
