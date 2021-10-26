@@ -31,7 +31,7 @@ public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept final
 	{
 		constexpr int fd = STDERR_FILENO;
-		co_return ::write(fd, data.data(), data.size());
+		co_return static_cast<bzd::SizeType>(::write(fd, data.data(), data.size()));
 	}
 };
 

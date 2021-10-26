@@ -14,7 +14,7 @@ public:
 		{
 			buffer_.at(write_++ % SIZE) = b;
 		}
-		co_return 0;
+		co_return 0U;
 	}
 
 	/**
