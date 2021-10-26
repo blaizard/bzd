@@ -36,7 +36,7 @@ public:
 			const auto result = ::pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
-				return bzd::makeError(Error::OTHER);
+				return bzd::error(Error::OTHER);
 			}
 		}
 
@@ -44,7 +44,7 @@ public:
 			const auto result = ::pthread_attr_destroy(&attr_);
 			if (result != 0)
 			{
-				return bzd::makeError(Error::OTHER);
+				return bzd::error(Error::OTHER);
 			}
 		}
 
@@ -57,14 +57,14 @@ public:
 
 		if (::pthread_attr_init(&attr_) == -1)
 		{
-			return bzd::makeError(Error::OTHER);
+			return bzd::error(Error::OTHER);
 		}
 
 		{
 			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
-				return bzd::makeError(Error::OTHER);
+				return bzd::error(Error::OTHER);
 			}
 		}
 
@@ -74,7 +74,7 @@ public:
 			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
-				return bzd::makeError(Error::OTHER);
+				return bzd::error(Error::OTHER);
 			}
 		}
 

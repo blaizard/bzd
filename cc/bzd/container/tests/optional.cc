@@ -140,6 +140,21 @@ TEST(ContainerOptional, complexData)
 	EXPECT_FALSE(v);
 }
 
+TEST(ContainerOptional, multiArgsData)
+{
+	struct Value
+	{
+		Value(int a, int b) : a_{a}, b_{b} {}
+		int a_;
+		int b_;
+	};
+
+	bzd::Optional<Value> v{23, 45};
+	EXPECT_TRUE(v);
+	EXPECT_EQ(v.value().a_, 23);
+	EXPECT_EQ(v.value().b_, 45);
+}
+
 TEST(ContainerOptional, reference)
 {
 	int a = 42;
@@ -221,7 +236,7 @@ TEST(ContainerOptional, result)
 		EXPECT_TRUE(v.value());
 		EXPECT_EQ(v.valueOr({12}).value(), 43);
 
-		v.emplace(bzd::makeError(false));
+		v.emplace(bzd::error(false));
 		EXPECT_TRUE(v);
 		EXPECT_FALSE(v.value());
 		EXPECT_FALSE((v.value()).error());

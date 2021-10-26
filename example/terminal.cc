@@ -31,7 +31,7 @@ public:
 		const auto ret = ::poll(&fd, 1, 0);
 		if (ret < 0)
 		{
-			return bzd::makeError();
+			return bzd::error();
 		}
 		if (ret > 0 && (fd.revents & POLLIN) != 0)
 		{
