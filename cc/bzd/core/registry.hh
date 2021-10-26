@@ -27,7 +27,7 @@ private:
 		static MapType* instance = registry;
 		if (instance == nullptr)
 		{
-			return bzd::makeError("Registry was not initialized");
+			return bzd::error("Registry was not initialized");
 		}
 		return *instance;
 	}

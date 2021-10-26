@@ -186,7 +186,7 @@ using Result = impl::Result<T, E>;
 constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
 template <class E = bzd::BoolType>
-constexpr impl::Error<bzd::typeTraits::Decay<E>> makeError(E&& e = true)
+constexpr impl::Error<bzd::typeTraits::Decay<E>> error(E&& e = true)
 {
 	return impl::Error<bzd::typeTraits::Decay<E>>(bzd::forward<E>(e));
 }

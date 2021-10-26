@@ -129,7 +129,7 @@ bzd::Async<bool> run()
 	{
 		co_return true;
 	}
-	co_return ::bzd::makeError();
+	co_return ::bzd::error();
 }
 
 } // namespace bzd::test

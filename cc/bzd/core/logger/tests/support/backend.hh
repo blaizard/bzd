@@ -24,7 +24,7 @@ public:
 	{
 		if (write_ - read_ > SIZE)
 		{
-			return makeError();
+			return error();
 		}
 
 		SizeType i = 0;
@@ -32,13 +32,13 @@ public:
 		{
 			if (buffer_.at(read_ % SIZE) != data.at(i))
 			{
-				return makeError();
+				return error();
 			}
 		}
 
 		if (i < data.size())
 		{
-			return makeError();
+			return error();
 		}
 
 		return nullresult;

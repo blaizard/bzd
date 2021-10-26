@@ -90,7 +90,7 @@ public:
 				ElementPtrType expected{nullptr};
 				if (!element.next_.compareExchange(expected, setInsertionMark(nodeNext)))
 				{
-					return makeError(ListErrorType::elementAlreadyInserted);
+					return error(ListErrorType::elementAlreadyInserted);
 				}
 			}
 
@@ -157,7 +157,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return makeError(ListErrorType::elementAlreadyRemoved);
+					return error(ListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setInsertionMark(expected)));
 
@@ -170,7 +170,7 @@ public:
 				{
 				}
 
-				return makeError(ListErrorType::notFound);
+				return error(ListErrorType::notFound);
 			}
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
@@ -187,7 +187,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return makeError(ListErrorType::elementAlreadyRemoved);
+					return error(ListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setDeletionMark(expected)));
 		}
@@ -426,7 +426,7 @@ public:
 		{
 			return container->pop(*this);
 		}
-		return bzd::makeError(ListErrorType::elementAlreadyRemoved);
+		return bzd::error(ListErrorType::elementAlreadyRemoved);
 	}
 
 	// Pointer to the next element from the list.

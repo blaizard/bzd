@@ -7,6 +7,7 @@
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/decay.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
+#include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -54,8 +55,8 @@ public: // Constructors
 	constexpr Optional(const OptionalNull&) noexcept : Optional{} {}
 
 	// Forward constructor to storage type for all non-self typed
-	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value>>
-	constexpr Optional(U&& value) : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<U>(value)}
+	template <class... Args, typename = typeTraits::EnableIf<!IsSelf<typeTraits::FirstType<Args...>>::value>>
+	constexpr Optional(Args&&... args) noexcept : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -85,7 +86,7 @@ public: // API
 	/// If *this contains a value, returns a const reference to the contained value otherwise, asserts.
 	///
 	/// \return A const reference to the contained value.
-	[[nodiscard]] constexpr const Value& value() const
+	[[nodiscard]] constexpr const Value& value() const noexcept
 	{
 		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
@@ -94,7 +95,7 @@ public: // API
 	/// If *this contains a value, returns a reference to the contained value otherwise, asserts.
 	///
 	/// \return A reference to the contained value.
-	[[nodiscard]] constexpr Value& valueMutable()
+	[[nodiscard]] constexpr Value& valueMutable() noexcept
 	{
 		bzd::assert::isTrue(hasValue());
 		return data_.template get<ValueContainer>();
@@ -103,12 +104,12 @@ public: // API
 	/// Accesses the contained value.
 	///
 	/// \return Returns a pointer to the contained value.
-	[[nodiscard]] constexpr const Value* operator->() const { return &value(); }
+	[[nodiscard]] constexpr const Value* operator->() const noexcept { return &value(); }
 
 	/// Accesses the contained value.
 	///
 	/// \return Returns a pointer to the contained value.
-	[[nodiscard]] constexpr Value* operator->() { return &valueMutable(); }
+	[[nodiscard]] constexpr Value* operator->() noexcept { return &valueMutable(); }
 
 	/// Constructs the contained value in-place.
 	///
