@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y software-properties-common
 
 # GCC 10.2.0
 RUN add-apt-repository ppa:ubuntu-toolchain-r/ppa
-RUN apt-get install -y g++-10
+RUN apt-get update && apt-get install -y g++-10 clang-11 libc++-dev
 RUN apt-get install -y npm git make xz-utils wget python3
 
 # Install node
@@ -21,4 +21,4 @@ RUN cd compiler-explorer && make dist
 WORKDIR /compiler-explorer
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["make", "EXTRA_ARGS='--language c++ --noCache'"]
+CMD ["make", "EXTRA_ARGS='--noCache --language c++'"]

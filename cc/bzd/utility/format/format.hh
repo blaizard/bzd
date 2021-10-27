@@ -19,6 +19,7 @@
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/utility/format/integral.hh"
+#include "cc/bzd/utility/constexpr_for.hh"
 
 namespace bzd::format::impl {
 
@@ -589,10 +590,10 @@ constexpr bool contextCheck(const MetadataList&, const T&)
 	return true;
 }
 
-template <class T>
+template <class Formatter, class T>
 constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
 {
-	using ConstexprAdapter = Adapter<ConstexprAssert, StreamFormatter>;
+	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter>;
 	bzd::VectorConstexpr<Metadata, 128> metadataList{};
 	Parser<ConstexprAdapter> parser{format};
 
@@ -635,9 +636,11 @@ private:
 		constexpr ReturnType process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
-			fcts_[index](ptrs_[index], transport, metadata);
+			SizeType counter = 0;
+			constexprForContainerInc(lambdas_, [&](auto lambda) { if (counter++ == index) { lambda(transport, metadata); } });
 		}
 
+		// TODO: clean this, get rid of the lambda with erased type, so that there is no pointer + reinterpret_cast anymore.
 		ReturnType processAsync(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
@@ -656,7 +659,7 @@ private:
 	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
+		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) -> auto {
 			return Adapter::process(transport, args, metadata);
 		}...);
 		using LambdaTupleType = decltype(lambdas);
@@ -708,7 +711,7 @@ Async<void> toStream(bzd::OStream& stream, const ConstexprStringView& format, Ar
 	{
 		// Compile-time format check
 		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-		constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
+		constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StreamFormatter>(ConstexprStringView::value(), tuple);
 		// This line enforces compilation time evaluation
 		static_assert(isValid, "Compile-time string format check failed.");
 
@@ -744,7 +747,7 @@ constexpr void toString(bzd::interface::String& str, const ConstexprStringView& 
 	{
 		// Compile-time format check
 		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-		constexpr const bool isValid = bzd::format::impl::contextValidate(ConstexprStringView::value(), tuple);
+		constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StringFormatter>(ConstexprStringView::value(), tuple);
 		// This line enforces compilation time evaluation
 		static_assert(isValid, "Compile-time string format check failed.");
 
@@ -755,7 +758,6 @@ constexpr void toString(bzd::interface::String& str, const ConstexprStringView& 
 	else
 	{
 		using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>;
-
 		const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
 		impl::Parser<RuntimeAdapter> parser{format};
 
