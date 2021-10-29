@@ -326,9 +326,9 @@ public:
 		bool end_ = false;
 	};
 
-	constexpr Iterator begin() noexcept { return iteratorBegin_; }
+	constexpr Iterator begin() const noexcept { return iteratorBegin_; }
 
-	constexpr bool end() noexcept { return true; }
+	constexpr bool end() const noexcept { return true; }
 
 private:
 	const Iterator iteratorBegin_;
@@ -361,6 +361,12 @@ class RuntimeAssert
 {
 public:
 	static constexpr void onError(const bzd::StringView& view) { bzd::assert::isTrue(false, view.data()); }
+};
+
+class NoAssert
+{
+public:
+	static constexpr void onError(const bzd::StringView&) {}
 };
 
 class StreamFormatter
@@ -704,74 +710,61 @@ namespace bzd::format {
  * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
+
 template <class ConstexprStringView, class... Args>
-Async<void> toStream(bzd::OStream& stream, const ConstexprStringView& format, Args&&... args)
+typeTraits::EnableIf<!typeTraits::isConstructible<bzd::StringView, ConstexprStringView>, Async<void>> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&... args)
 {
-	if constexpr (!bzd::typeTraits::isConstructible<bzd::StringView, ConstexprStringView>)
+	// Compile-time format check
+	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
+	constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StreamFormatter>(ConstexprStringView::value(), tuple);
+	// This line enforces compilation time evaluation
+	static_assert(isValid, "Compile-time string format check failed.");
+
+	const auto formatter = impl::Formatter<impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>>::make(bzd::forward<Args>(args)...);
+	constexpr impl::Parser<impl::Adapter<impl::NoAssert, impl::StreamFormatter>> parser{ConstexprStringView::value()};
+
+	// Run-time call
+	for (const auto& result : parser)
 	{
-		// Compile-time format check
-		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-		constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StreamFormatter>(ConstexprStringView::value(), tuple);
-		// This line enforces compilation time evaluation
-		static_assert(isValid, "Compile-time string format check failed.");
-
-		// Run-time call
-		co_await bzd::format::toStream(stream, ConstexprStringView::value(), bzd::forward<Args>(args)...);
-	}
-	else
-	{
-		using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>;
-
-		const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
-		impl::Parser<RuntimeAdapter> parser{format};
-
-		// Run-time call
-		for (const auto& result : parser)
+		if (!result.str.empty())
 		{
-			if (!result.str.empty())
-			{
-				co_await stream.write(result.str.asBytes());
-			}
-			if (result.metadata.hasValue())
-			{
-				co_await formatter.processAsync(stream, result.metadata.value());
-			}
+			co_await stream.write(result.str.asBytes());
+		}
+		if (result.metadata.hasValue())
+		{
+			co_await formatter.processAsync(stream, result.metadata.value());
 		}
 	}
 }
 
-template <class ConstexprStringView, class... Args>
-constexpr void toString(bzd::interface::String& str, const ConstexprStringView& format, Args&&... args)
+// TODO: remove this
+inline Async<void> toStream(bzd::OStream& stream, const StringView& str)
 {
-	if constexpr (!bzd::typeTraits::isConstructible<bzd::StringView, ConstexprStringView>)
-	{
-		// Compile-time format check
-		constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-		constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StringFormatter>(ConstexprStringView::value(), tuple);
-		// This line enforces compilation time evaluation
-		static_assert(isValid, "Compile-time string format check failed.");
+	co_await stream.write(str.asBytes());
+}
 
-		// Run-time call
-		bzd::format::toString(str, ConstexprStringView::value(), bzd::forward<Args>(args)...);
-		return;
-	}
-	else
-	{
-		using RuntimeAdapter = impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>;
-		const auto formatter = impl::Formatter<RuntimeAdapter>::make(bzd::forward<Args>(args)...);
-		impl::Parser<RuntimeAdapter> parser{format};
+template <class ConstexprStringView, class... Args>
+constexpr void toString(bzd::interface::String& str, const ConstexprStringView&, Args&&... args)
+{
+	// Compile-time format check
+	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
+	constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StringFormatter>(ConstexprStringView::value(), tuple);
+	// This line enforces compilation time evaluation
+	static_assert(isValid, "Compile-time string format check failed.");
 
-		// Run-time call
-		for (const auto& result : parser)
+	const auto formatter = impl::Formatter<impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>>::make(bzd::forward<Args>(args)...);
+	constexpr impl::Parser<impl::Adapter<impl::NoAssert, impl::StringFormatter>> parser{ConstexprStringView::value()};
+
+	// Run-time call
+	for (const auto& result : parser)
+	{
+		if (!result.str.empty())
 		{
-			if (!result.str.empty())
-			{
-				str.append(result.str);
-			}
-			if (result.metadata.hasValue())
-			{
-				formatter.process(str, result.metadata.value());
-			}
+			str.append(result.str);
+		}
+		if (result.metadata.hasValue())
+		{
+			formatter.process(str, result.metadata.value());
 		}
 	}
 }

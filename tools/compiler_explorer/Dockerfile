@@ -3,18 +3,50 @@ FROM ubuntu:20.04
 EXPOSE 10240
 
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y software-properties-common
 
-# GCC 10.2.0
-RUN add-apt-repository ppa:ubuntu-toolchain-r/ppa
-RUN apt-get update && apt-get install -y g++-10 clang-11 libc++-dev
-RUN apt-get install -y npm git make xz-utils wget python3
+# GCC
 
-# Install node
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    build-essential \
+    g++-multilib \
+    xz-utils \
+    libgmp-dev \
+    libmpfr-dev \
+    libmpc-dev \
+    libisl-dev
+
+COPY build_install_gcc.sh /build_install_gcc.sh
+RUN /build_install_gcc.sh 10.2.0
+
+# Clang
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    xz-utils \
+    python3 \
+    build-essential \
+    cmake
+
+COPY build_install_clang.sh /build_install_clang.sh
+RUN /build_install_clang.sh 12.0.0
+
+# Install node + compiler-explorer
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    npm \
+    git \
+    make \
+    xz-utils \
+    wget \
+    python3
+
 RUN wget https://nodejs.org/dist/v14.0.0/node-v14.0.0-linux-x64.tar.xz
 RUN tar -C /usr/local --strip-components 1 -xJf node-v14.0.0-linux-x64.tar.xz
-
-# Install compiler-explorer dependencies
 RUN git clone https://github.com/compiler-explorer/compiler-explorer.git
 RUN cd compiler-explorer && make dist
 
