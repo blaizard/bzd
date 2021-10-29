@@ -1,5 +1,7 @@
 #include "example/format/format.hh"
 
+#include "cc/bzd/utility/lock_guard.hh"
+
 class Date
 {
 public:
@@ -27,13 +29,14 @@ namespace Example {
 bzd::Async<bool> run()
 {
 	co_await bzd::platform::out().mutex_.lock();
+	// auto scope = co_await bzd::makeLockGuard(bzd::platform::out().mutex_);
 	co_await bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42);
 
 	const Date date{2020, 8, 4};
 	co_await bzd::format::toStream(bzd::platform::out(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);
 
 	bzd::String<128> str;
-	bzd::format::toString(str, "This date {}.", 12);
+	bzd::format::toString(str, CSTR("This date {}."), 12);
 	std::cout << str.data() << std::endl;
 
 	bzd::platform::out().mutex_.unlock();
