@@ -3,6 +3,7 @@
 // Algorithm
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/algorithm/copy_n.hh"
+#include "cc/bzd/algorithm/fill.hh"
 #include "cc/bzd/algorithm/reverse.hh"
 
 // Container

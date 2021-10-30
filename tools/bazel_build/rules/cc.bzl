@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", original_cc_library = "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
@@ -276,15 +276,6 @@ def _bzd_cc_generic(is_test):
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
 _bzd_cc_test = _bzd_cc_generic(is_test = True)
 
-def cc_library(deps = [], **kwargs):
-    """
-    Rule to define a bzd C++ library.
-    """
-    original_cc_library(
-        deps = deps + ["//cc:includes"],
-        **kwargs
-    )
-
 def bzd_cc_binary(name, tags = [], srcs = [], deps = [], **kwags):
     """
     Rule to define a bzd C++ binary.
@@ -313,7 +304,7 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
         tags = tags + ["cc"],
         deps = deps + ["//cc/bzd/platform"],
     )
-    _bzd_cc_test(
+    cc_test(
         name = name,
         tags = tags + ["cc"],
         srcs = srcs,

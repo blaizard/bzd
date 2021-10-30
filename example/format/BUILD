@@ -1,4 +1,5 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 load("//tools/bazel_build/rules:package.bzl", "bzd_package")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
@@ -19,7 +20,7 @@ cc_library(
     ],
     deps = [
         ":composition",
-        "//cc/bzd",
+        "//cc:bzd",
     ],
 )
 

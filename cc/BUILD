@@ -1,9 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "includes",
+    name = "bzd",
     hdrs = [
         "bzd.hh",
+    ],
+    deps = [
+        "//cc/bzd"
     ],
     visibility = ["//visibility:public"],
 )
