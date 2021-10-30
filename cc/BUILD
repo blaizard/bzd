@@ -5,10 +5,10 @@ cc_library(
     hdrs = [
         "bzd.hh",
     ],
-    deps = [
-        "//cc/bzd"
-    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd",
+    ],
 )
 
 filegroup(
