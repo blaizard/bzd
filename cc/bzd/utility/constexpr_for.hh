@@ -27,7 +27,8 @@ constexpr void constexprForContainerInc(Container&& container, F&& f) noexcept
 template <class Container, class F>
 constexpr void constexprForContainerDec(Container&& container, F&& f) noexcept
 {
-	constexprFor<static_cast<Int32Type>(typeTraits::Decay<Container>::size()) - 1, -1, -1>([&](auto i) { f(container.template get<i.value>()); });
+	constexprFor<static_cast<Int32Type>(typeTraits::Decay<Container>::size()) - 1, -1, -1>(
+		[&](auto i) { f(container.template get<i.value>()); });
 }
 
 } // namespace bzd

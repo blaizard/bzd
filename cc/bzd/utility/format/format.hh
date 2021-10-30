@@ -18,8 +18,8 @@
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
-#include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
+#include "cc/bzd/utility/format/integral.hh"
 
 namespace bzd::format::impl {
 
@@ -643,7 +643,12 @@ private:
 		{
 			const auto index = metadata.index;
 			SizeType counter = 0;
-			constexprForContainerInc(lambdas_, [&](auto lambda) { if (counter++ == index) { lambda(transport, metadata); } });
+			constexprForContainerInc(lambdas_, [&](auto lambda) {
+				if (counter++ == index)
+				{
+					lambda(transport, metadata);
+				}
+			});
 		}
 
 		// TODO: clean this, get rid of the lambda with erased type, so that there is no pointer + reinterpret_cast anymore.
@@ -665,7 +670,7 @@ private:
 	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) -> auto {
+		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
 			return Adapter::process(transport, args, metadata);
 		}...);
 		using LambdaTupleType = decltype(lambdas);
@@ -712,7 +717,9 @@ namespace bzd::format {
  */
 
 template <class ConstexprStringView, class... Args>
-typeTraits::EnableIf<!typeTraits::isConstructible<bzd::StringView, ConstexprStringView>, Async<void>> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&... args)
+typeTraits::EnableIf<!typeTraits::isConstructible<bzd::StringView, ConstexprStringView>, Async<void>> toStream(bzd::OStream& stream,
+																											   const ConstexprStringView&,
+																											   Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
