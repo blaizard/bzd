@@ -26,7 +26,7 @@ cc_library(
     tags = ["manual"],
     deps = [
         ":config_manifest",
-        "//cc/bzd",
+        "//cc:bzd",
         "//cc/libraries/io/digital",
         "//cc/libraries/io/i2c",
         "//cc/libraries/io/stdout",

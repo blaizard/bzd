@@ -13,7 +13,7 @@ cc_library(
     ],
     tags = ["manual"],
     deps = [
-        "//cc/bzd",
+        "//cc:bzd",
     ],
 )
 
