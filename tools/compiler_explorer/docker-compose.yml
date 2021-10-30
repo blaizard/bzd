@@ -1,6 +1,6 @@
 services:
     compiler-explorer:
-        build: .
+        image: blaizard/compiler_explorer:latest
         ports:
         - 10240:10240
         volumes:
