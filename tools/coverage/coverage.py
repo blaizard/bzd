@@ -56,9 +56,6 @@ if __name__ == "__main__":
 			data[tag] = int(m.group(2))
 			data["coverage_" + tag] = float(int(m.group(1)) / int(m.group(2)))
 
-	# Overall coverage only includes line coverage.
-	data["coverage"] = data["coverage_lines"]
-
 	# Save the report.
 	(args.workspace / args.output / "report.json").write_text(json.dumps(data))
 
