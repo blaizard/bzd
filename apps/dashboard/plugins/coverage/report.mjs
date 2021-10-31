@@ -11,11 +11,11 @@ export default {
 			caption: "Authentication Type",
 			list: {
 				none: "None",
-				basic: "Basic"
-			}
+				basic: "Basic",
+			},
 		},
 		{ type: "Input", name: "coverage.user", caption: "Username", width: 0.5 },
-		{ type: "Input", name: "coverage.token", caption: "Token", width: 0.5 }
+		{ type: "Input", name: "coverage.token", caption: "Token", width: 0.5 },
 	],
-	timeout: 60 * 1000 // ms
+	timeout: 60 * 1000, // ms
 };

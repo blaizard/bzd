@@ -54,7 +54,7 @@ function registerObserver(el, callback) {
 			}),
 			callback: callback,
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 		observers[uid].obj.observe(el);
 	}
@@ -65,7 +65,7 @@ function registerObserver(el, callback) {
 			}, 1000),
 			callback: callback,
 			hash: -1,
-			instance: null
+			instance: null,
 		};
 	}
 
@@ -96,14 +96,14 @@ function setElementId(el) {
 }
 
 export default {
-	inserted: function(el, binding) {
+	inserted: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
-	componentUpdated: function(el, binding) {
+	componentUpdated: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
-	unbind: function(el) {
+	unbind: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
-	}
+	},
 };

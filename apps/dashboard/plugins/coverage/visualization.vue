@@ -24,13 +24,13 @@
 	export default {
 		props: {
 			metadata: { type: Object, mandatory: true },
-			description: { type: Object, mandatory: true }
+			description: { type: Object, mandatory: true },
 		},
 		directives: {
-			tooltip: DirectiveTooltip
+			tooltip: DirectiveTooltip,
 		},
 		mounted() {},
-		data: function() {
+		data: function () {
 			return {};
 		},
 		watch: {
@@ -41,8 +41,8 @@
 						const url = new URL(this.metadata.link, this.description["coverage.url"]);
 						this.$emit("link", String(url));
 					}
-				}
-			}
+				},
+			},
 		},
 		computed: {
 			hasCoverageFunctions() {
@@ -52,15 +52,15 @@
 				return "coverage_functions" in this.metadata;
 			},
 			tooltipCoverageLines() {
-				return { data: "Line coverage over " + this.metadata.lines + " lines."};
+				return { data: "Line coverage over " + this.metadata.lines + " lines." };
 			},
 			tooltipCoverageFunctions() {
-				return { data: "Function coverage over " + this.metadata.functions + " functions."};
+				return { data: "Function coverage over " + this.metadata.functions + " functions." };
 			},
 			tooltipCoverageBranches() {
-				return { data: "Branch coverage over " + this.metadata.branches + " branches."};
+				return { data: "Branch coverage over " + this.metadata.branches + " branches." };
 			},
-		}
+		},
 	};
 </script>
 
@@ -94,7 +94,8 @@
 			font-size: 48px;
 		}
 
-		.functions, .branches {
+		.functions,
+		.branches {
 			font-size: 24px;
 		}
 	}
