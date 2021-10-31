@@ -76,7 +76,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
 						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
