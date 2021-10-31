@@ -49,14 +49,21 @@ if __name__ == "__main__":
 	],
 		cwd=args.workspace)
 
-	m = re.search(r"(\d+)\s+of\s+(\d+)\s+lines", result.getStdout())
-	assert m, "Something went wrong in the report generation: {}".format(result.getOutput())
-	data["lines"] = int(m.group(2))
-	data["coverage"] = float(int(m.group(1)) / int(m.group(2)))
+	for search_str, tag, required in [("lines", "lines", True), ("functions", "functions", False), ("branches", "branches", False)]:
+		m = re.search(r"(\d+)\s+of\s+(\d+)\s+" + search_str, result.getStdout())
+		if m or required:
+			assert m, "Something went wrong in the report generation: {}".format(result.getOutput())
+			data[tag] = int(m.group(2))
+			data["coverage_" + tag] = float(int(m.group(1)) / int(m.group(2)))
 
-	# Save the report
+	# Overall coverage only includes line coverage.
+	data["coverage"] = data["coverage_lines"]
+
+	# Save the report.
 	(args.workspace / args.output / "report.json").write_text(json.dumps(data))
 
-	print("Includes: {} files, {} lines".format(data["files"], data["lines"]))
-	print("Coverage: {coverage:.2%}".format(coverage=data["coverage"]))
+	print("Includes: {}".format(", ".join(["{} {}".format(data[tag], tag) for tag in ["files", "lines", "functions", "branches"] if tag in data])))
+	for tag, text in [("lines", "Line"), ("functions", "Function"), ("branches", "Branch")]:
+		if tag in data:
+			print("{text} Coverage: {coverage:.2%}".format(text=text, coverage=data["coverage_" + tag]))
 	print("Report: {}".format(data["path"]))
