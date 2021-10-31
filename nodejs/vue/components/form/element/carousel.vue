@@ -32,10 +32,10 @@
 	export default {
 		mixins: [Element],
 		directives: {
-			touch: Touch
+			touch: Touch,
 		},
 		props: {
-			value: { type: String | Number, required: false, default: "" }
+			value: { type: String | Number, required: false, default: "" },
 		},
 		mounted() {
 			this.fetchList(this.getOption("list", []));
@@ -60,7 +60,7 @@
 				clearInterval(this.interval);
 			}
 		},
-		data: function() {
+		data: function () {
 			return {
 				/**
 				 * Defines how the selected items aligns with the slider.
@@ -95,19 +95,19 @@
 				slidePosition: 0,
 				offsetX: 0,
 				isDrag: false,
-				list: []
+				list: [],
 			};
 		},
 		watch: {
-			value: function(value) {
+			value: function (value) {
 				this.slideSelectByValue(value);
-			}
+			},
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-carousel": true,
-					[this.getOption("class")]: true
+					[this.getOption("class")]: true,
 				};
 			},
 			touchDirective() {
@@ -117,7 +117,7 @@
 						onswipe: this.onSwipe,
 						ondrag: this.onDrag,
 						onstopdrag: this.onStopDrag,
-						allowClickThrough: true
+						allowClickThrough: true,
 					};
 			},
 			slidesStyle() {
@@ -126,13 +126,13 @@
 					transform: "translate(" + (this.slidePosition + this.offsetX) + "px)",
 					marginLeft: this.alignSelection == "center" ? "50%" : this.alignSelection == "right" ? "100%" : 0,
 					// Disable transitions while dragging
-					transition: this.isDrag ? "none" : undefined
+					transition: this.isDrag ? "none" : undefined,
 				};
 			},
 			slideStyle() {
 				return {
 					margin: this.margin,
-					minWidth: this.maxVisible ? Math.round(100 / this.maxVisible) + "%" : "auto"
+					minWidth: this.maxVisible ? Math.round(100 / this.maxVisible) + "%" : "auto",
 				};
 			},
 			isControlPrevious() {
@@ -152,7 +152,7 @@
 					return false;
 				}
 				return this.index + 1 < this.list.length;
-			}
+			},
 		},
 		methods: {
 			onSwipe(direction, speedPixelPerSecond) {
@@ -207,7 +207,7 @@
 			getSlideClass(index) {
 				return {
 					"irform-carousel-slide": true,
-					"irform-carousel-slide-selected": index == this.index
+					"irform-carousel-slide-selected": index == this.index,
 				};
 			},
 			slidePrevious() {
@@ -295,8 +295,8 @@
 				else if (e.keyCode == /*arrow right*/ 39) {
 					this.slideNext();
 				}
-			}
-		}
+			},
+		},
 	};
 </script>
 

@@ -12,7 +12,7 @@ export default class AuthenticationServer {
 				 * Otherwise, false should be returned.
 				 */
 				verifyIdentityCallback: null,
-				verifyRefreshCallback: null
+				verifyRefreshCallback: null,
 			},
 			defaultOptions,
 			options

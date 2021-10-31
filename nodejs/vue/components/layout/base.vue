@@ -7,10 +7,10 @@
 		beforeDestroy() {
 			window.removeEventListener("resize", this.handleResize, false);
 		},
-		data: function() {
+		data: function () {
 			return {
 				mobileMaxWidth: 800,
-				resizeChangeCounter: 1
+				resizeChangeCounter: 1,
 			};
 		},
 		computed: {
@@ -18,12 +18,12 @@
 				const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
 				const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 				return this.resizeChangeCounter > 0 && (vw <= this.mobileMaxWidth || /mobi/i.test(userAgent));
-			}
+			},
 		},
 		methods: {
 			handleResize() {
 				++this.resizeChangeCounter;
-			}
-		}
+			},
+		},
 	};
 </script>

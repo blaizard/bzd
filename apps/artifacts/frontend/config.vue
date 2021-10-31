@@ -18,13 +18,13 @@
 
 	export default {
 		props: {
-			volume: { mandatory: false, type: String, default: null }
+			volume: { mandatory: false, type: String, default: null },
 		},
 		directives: {
-			loading: DirectiveLoading
+			loading: DirectiveLoading,
 		},
 		components: {
-			Form
+			Form,
 		},
 		mixins: [Component],
 		mounted() {
@@ -32,9 +32,9 @@
 				this.fetchConfig();
 			}
 		},
-		data: function() {
+		data: function () {
 			return {
-				config: {}
+				config: {},
 			};
 		},
 		computed: {
@@ -44,7 +44,7 @@
 						type: "Input",
 						name: "volume",
 						caption: "Name",
-						validation: "mandatory"
+						validation: "mandatory",
 					},
 					{
 						type: "Dropdown",
@@ -54,10 +54,10 @@
 						list: Object.keys(Plugins).reduce((obj, key) => {
 							obj[key] = Plugins[key].name;
 							return obj;
-						}, {})
-					}
+						}, {}),
+					},
 				];
-			}
+			},
 		},
 		asyncComputed: {
 			async formDescriptionTyped() {
@@ -66,7 +66,7 @@
 					return description.concat([
 						{
 							type: "Button",
-							action: "approve"
+							action: "approve",
 						},
 						{
 							type: "Button",
@@ -74,17 +74,17 @@
 							content: "Delete",
 							click: () => {
 								this.handleDelete();
-							}
-						}
+							},
+						},
 					]);
 				}
-			}
+			},
 		},
 		methods: {
 			async fetchConfig() {
 				await this.handleSubmit(async () => {
 					this.config = await this.$api.request("get", "/config", {
-						volume: this.volume
+						volume: this.volume,
 					});
 					this.config.volume = this.volume;
 				});
@@ -93,7 +93,7 @@
 				await this.handleSubmit(async () => {
 					await this.$api.request("post", "/config", {
 						volume: this.volume,
-						config: this.config
+						config: this.config,
 					});
 					this.$routerDispatch("/refresh");
 				});
@@ -101,11 +101,11 @@
 			async handleDelete() {
 				await this.handleSubmit(async () => {
 					await this.$api.request("delete", "/config", {
-						volume: this.volume
+						volume: this.volume,
 					});
 					this.$routerDispatch("/refresh");
 				});
-			}
-		}
+			},
+		},
 	};
 </script>

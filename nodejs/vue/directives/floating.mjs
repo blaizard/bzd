@@ -17,7 +17,7 @@ function update(el, config) {
 			/**
 			 * If set, change the zIndex
 			 */
-			zIndex: 0
+			zIndex: 0,
 		},
 		config
 	);
@@ -182,5 +182,5 @@ export default {
 	},
 	update(el, binding) {
 		update(el, binding.value);
-	}
+	},
 };

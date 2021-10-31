@@ -73,7 +73,7 @@ async function getData(type, uid, cache) {
 			return data;
 		},
 		{
-			timeout: 60 * 60 * 1000 // 1h
+			timeout: 60 * 60 * 1000, // 1h
 		}
 	);
 
@@ -120,7 +120,7 @@ async function getData(type, uid, cache) {
 	// Install the APIs
 
 	let api = new API(APIv1, {
-		channel: web
+		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {
 		const result = await keyValueStore.list("tiles");

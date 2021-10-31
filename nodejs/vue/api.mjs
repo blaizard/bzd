@@ -4,5 +4,5 @@ export default {
 	install(Vue, args) {
 		const api = new API(args.schema, args);
 		Vue.prototype.$api = api;
-	}
+	},
 };
