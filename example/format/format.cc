@@ -28,8 +28,7 @@ namespace Example {
 
 bzd::Async<bool> run()
 {
-	co_await bzd::platform::out().mutex_.lock();
-	// auto scope = co_await bzd::makeLockGuard(bzd::platform::out().mutex_);
+	auto scope = co_await bzd::makeLockGuard(bzd::platform::out().mutex_);
 	co_await bzd::format::toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42);
 
 	const Date date{2020, 8, 4};
@@ -38,8 +37,6 @@ bzd::Async<bool> run()
 	bzd::String<128> str;
 	bzd::format::toString(str, CSTR("This date {}."), 12);
 	std::cout << str.data() << std::endl;
-
-	bzd::platform::out().mutex_.unlock();
 
 	co_return true;
 }
