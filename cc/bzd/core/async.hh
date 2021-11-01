@@ -64,12 +64,12 @@ public:
 	/**
 	 * Notifies if the async is completed.
 	 */
-	constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
+	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
 	/**
 	 * Get the current result. If the async is not terminated, an empty value is returned.
 	 */
-	constexpr bzd::Optional<ResultType> getResult() noexcept
+	[[nodiscard]] constexpr bzd::Optional<ResultType> getResult() noexcept
 	{
 		if (handle_)
 		{
@@ -77,6 +77,8 @@ public:
 		}
 		return nullopt;
 	}
+
+	[[nodiscard]] constexpr ResultType&& moveResultOut() noexcept { return bzd::move(handle_.promise().result_.valueMutable()); }
 
 	void onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)> callback) noexcept
 	{
@@ -118,7 +120,7 @@ public:
 	 * \param executor The executor to run on.
 	 * \return The result of the async.
 	 */
-	ResultType run(bzd::Executor& executor) noexcept
+	ResultType&& run(bzd::Executor& executor) noexcept
 	{
 		// Associate the executor with this async and enqueue it.
 		enqueue(executor);
@@ -127,10 +129,10 @@ public:
 		executor.run();
 
 		// Return the result.
-		return getResult().value();
+		return moveResultOut();
 	}
 
-	ResultType sync() noexcept
+	ResultType&& sync() noexcept
 	{
 		bzd::Executor executor;
 		return run(executor);
@@ -157,7 +159,7 @@ public: // coroutine specific
 		return true;
 	}
 
-	constexpr ResultType await_resume() noexcept { return getResult().value(); }
+	constexpr ResultType&& await_resume() noexcept { return moveResultOut(); }
 
 private:
 	friend bzd::coroutine::impl::Enqueue;
@@ -218,7 +220,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	}
 
 	// Build the result and return it.
-	ResultType result{asyncs.getResult().value()...};
+	ResultType result{asyncs.moveResultOut()...};
 	co_return result;
 }
 

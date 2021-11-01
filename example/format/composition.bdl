@@ -4,6 +4,8 @@ namespace Example;
 method run();
 composition {
 	run();
+	run();
+	run();
 	
 }
 
