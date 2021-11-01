@@ -13,8 +13,6 @@ bzd_plugin(
     ],
     frontend_entry_point = "visualization.vue",
     frontend_srcs = [
-        "branches.svg",
-        "functions.svg",
         "lines.svg",
     ],
     metadata = "coverage.mjs",

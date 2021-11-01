@@ -6,11 +6,11 @@
 				{{ (metadata.coverage_lines * 100).toFixed(1) }}<small>%</small>
 			</div>
 			<div class="functions" v-if="hasCoverageFunctions" v-tooltip="tooltipCoverageFunctions">
-				<span class="bzd-icon-functions"></span>
+				<small>Fct</small>
 				{{ (metadata.coverage_functions * 100).toFixed(1) }}<small>%</small>
 			</div>
 			<div class="branches" v-if="hasCoverageBranches" v-tooltip="tooltipCoverageBranches">
-				<span class="bzd-icon-branches"></span>
+				<small>Bch</small>
 				{{ (metadata.coverage_branches * 100).toFixed(1) }}<small>%</small>
 			</div>
 		</div>
@@ -67,16 +67,8 @@
 <style lang="scss">
 	@use "bzd/icons.scss" as icons with ($bzdIconNames: link);
 
-	.bzd-icon-branches {
-		@include icons.defineIcon("branches.svg");
-	}
-
 	.bzd-icon-lines {
 		@include icons.defineIcon("lines.svg");
-	}
-
-	.bzd-icon-functions {
-		@include icons.defineIcon("functions.svg");
 	}
 </style>
 
@@ -97,6 +89,7 @@
 		.functions,
 		.branches {
 			font-size: 24px;
+			font-variant: small-caps;
 		}
 	}
 	.metrics {

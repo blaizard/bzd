@@ -18,7 +18,7 @@ def load_linux_x86_64_python():
         sha256 = "47c5b0ce92eaaa3c66086490319987061538b8eedf02d4ef12857fa4c50f284c",
         build_file = "//toolchains/python/linux_x86_64:coveragepy.BUILD",
         strip_prefix = "coveragepy-4e3cc882db3700912fce5683af37afb11c040768",
-        url = "https://github.com/ulfjack/coveragepy/archive/4e3cc882db3700912fce5683af37afb11c040768.zip",
+        url = "https://github.com/ulfjack/coveragepy/archive/4e3cc882db3700912fce5683af37afb11c040768.zip"
     )
 
     native.register_toolchains("//toolchains/python/linux_x86_64:toolchain")
