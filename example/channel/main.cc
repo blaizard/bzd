@@ -79,7 +79,7 @@ public:
 		co_return data.size();
 	}
 
-	bzd::Async<bzd::SizeType> read(const bzd::Span<bzd::ByteType> data) noexcept override { co_return data.size(); }
+	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override { co_return data; }
 };
 
 class Adapter2

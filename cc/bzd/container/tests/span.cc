@@ -235,7 +235,7 @@ TEST(ContainerSpan, AsBytes)
 	EXPECT_EQ(buffer.size(), 20);
 	EXPECT_EQ(buffer.sizeBytes(), 20);
 
-	const auto writableBuffer = span.asWritableBytes();
+	const auto writableBuffer = span.asBytesMutable();
 	EXPECT_EQ(writableBuffer.size(), 20);
 	EXPECT_EQ(writableBuffer.sizeBytes(), 20);
 }

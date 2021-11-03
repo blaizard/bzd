@@ -36,6 +36,19 @@ public: // Constructors
 // Implementation of Span specific impl::Span functions.
 namespace bzd::impl {
 template <class T, class Storage>
+constexpr auto Span<T, Storage>::asSpan() const noexcept
+{
+	return bzd::Span<StorageDataType>{data(), size()};
+}
+
+template <class T, class Storage>
+constexpr auto Span<T, Storage>::asSpan() noexcept
+{
+	return bzd::Span<StorageDataMutableType>{data(), size()};
+}
+
+
+template <class T, class Storage>
 constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) const noexcept
 {
 	bzd::assert::isTrue(offset < size());
@@ -84,7 +97,7 @@ constexpr auto Span<T, Storage>::asBytes() const noexcept
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::asWritableBytes() noexcept
+constexpr auto Span<T, Storage>::asBytesMutable() noexcept
 {
 	return bzd::Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data()), sizeBytes()};
 }
