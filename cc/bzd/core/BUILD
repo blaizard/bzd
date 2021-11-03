@@ -50,6 +50,7 @@ cc_library(
         "//cc/bzd/container:span",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:lock_guard",
     ],
 )
 

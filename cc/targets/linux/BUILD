@@ -8,10 +8,10 @@ bdl_library(
     ],
     deps = [
         "//cc/components/generic/executor",
-        "//cc/components/generic/stream/stub",
         "//cc/components/linux/core",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
+        "//cc/components/std/stream/in",
         "//cc/components/std/stream/out",
     ],
 )

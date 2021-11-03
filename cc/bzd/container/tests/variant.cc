@@ -19,10 +19,12 @@ TEST(ContainerVariant, Constructor)
 	EXPECT_EQ(variantNoDefault.index(), 2);
 
 	// In place constructors
-	bzd::Variant<int, bool, double> variantInPlaceIndex1{bzd::inPlaceIndex<2>, 3.2};
-	EXPECT_EQ(variantInPlaceIndex1.index(), 2);
-	bzd::Variant<int, bool, double> variantInPlaceType1{bzd::inPlaceType<int>, 3};
-	EXPECT_EQ(variantInPlaceType1.index(), 0);
+	{
+		bzd::Variant<int, bool, double> variantInPlaceIndex1{bzd::inPlaceIndex<2>, 3.2};
+		EXPECT_EQ(variantInPlaceIndex1.index(), 2);
+		bzd::Variant<int, bool, double> variantInPlaceType1{bzd::inPlaceType<int>, 3};
+		EXPECT_EQ(variantInPlaceType1.index(), 0);
+	}
 }
 
 TEST(ContainerVariant, CopyConstructor)

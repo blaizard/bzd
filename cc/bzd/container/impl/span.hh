@@ -121,6 +121,8 @@ public: // Find
 	}
 
 public: // Subviews. Their definition is in bzd::Span
+	constexpr auto asSpan() const noexcept;
+	constexpr auto asSpan() noexcept;
 	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
 	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) noexcept;
 	constexpr auto first(const SizeType count) const noexcept;
@@ -130,7 +132,7 @@ public: // Subviews. Their definition is in bzd::Span
 
 public: // Convert to bytes
 	constexpr auto asBytes() const noexcept;
-	constexpr auto asWritableBytes() noexcept;
+	constexpr auto asBytesMutable() noexcept;
 
 protected:
 	template <class U, class V>

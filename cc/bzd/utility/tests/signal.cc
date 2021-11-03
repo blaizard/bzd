@@ -16,12 +16,12 @@ TEST(Signal, Base)
 	bzd::Signal<char, 40, 8> charSignal5;
 	EXPECT_EQ(charSignal5.get(buffer.asBytes()), 'W');
 
-	charSignal5.set(buffer.asWritableBytes(), 'N');
+	charSignal5.set(buffer.asBytesMutable(), 'N');
 	EXPECT_EQ(charSignal5.get(buffer.asBytes()), 'N');
 
 	bzd::Signal<char, 4, 8> charSignalShift;
 	EXPECT_EQ(charSignalShift.get(buffer.asBytes()), 0x54);
 
-	charSignalShift.set(buffer.asWritableBytes(), 0x42);
+	charSignalShift.set(buffer.asBytesMutable(), 0x42);
 	EXPECT_EQ(charSignalShift.get(buffer.asBytes()), 0x42);
 }

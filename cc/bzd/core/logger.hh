@@ -20,9 +20,7 @@ namespace bzd {
 class Logger
 {
 public:
-	/**
-	 * Set an error log entry.
-	 */
+	/// Set an error log entry.
 	template <class A>
 	Async<void> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
@@ -80,9 +78,7 @@ public:
 					   bzd::forward<G>(g));
 	}
 
-	/**
-	 * Set a warning log entry.
-	 */
+	/// Set a warning log entry.
 	template <class A>
 	Async<void> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
@@ -140,9 +136,7 @@ public:
 					   bzd::forward<G>(g));
 	}
 
-	/**
-	 * Set an informative log entry.
-	 */
+	/// Set an informative log entry.
 	template <class A>
 	Async<void> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
@@ -200,9 +194,7 @@ public:
 					   bzd::forward<G>(g));
 	}
 
-	/**
-	 * Set a debug log entry.
-	 */
+	/// Set a debug log entry.
 	template <class A>
 	Async<void> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
@@ -260,14 +252,10 @@ public:
 					   bzd::forward<G>(g));
 	}
 
-	/**
-	 * Set the minimum logging level to be displayed.
-	 */
+	/// Set the minimum logging level to be displayed.
 	void setMinimumLevel(const bzd::log::Level level) noexcept;
 
-	/**
-	 * Get the default Logger.
-	 */
+	/// Get the default Logger.
 	[[nodiscard]] static Logger& getDefault() noexcept;
 
 private:
@@ -284,9 +272,7 @@ protected:
 
 namespace bzd::log {
 
-/**
- * Set an error log entry using the default logger.
- */
+/// Set an error log entry using the default logger.
 template <class A>
 Async<void> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
@@ -337,9 +323,7 @@ Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceL
 											 location);
 }
 
-/**
- * Set a warning log entry using the default logger.
- */
+/// Set a warning log entry using the default logger.
 template <class A>
 Async<void> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
@@ -390,9 +374,7 @@ Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const Sourc
 											   location);
 }
 
-/**
- * Set an informative log entry using the default logger.
- */
+/// Set an informative log entry using the default logger.
 template <class A>
 Async<void> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
@@ -443,9 +425,7 @@ Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLo
 											location);
 }
 
-/**
- * Set a debug log entry using the default logger.
- */
+/// Set a debug log entry using the default logger.
 template <class A>
 Async<void> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
@@ -507,6 +487,7 @@ bzd::Async<void> bzd::Logger::print(const bzd::log::Level level, const SourceLoc
 	if (level <= minLevel_)
 	{
 		auto& backend = bzd::backend::Logger::getDefault();
+		auto scope = co_await backend.getLock();
 		co_await printHeader(level, location);
 		co_await bzd::format::toStream(backend, bzd::forward<Args>(args)...);
 		co_await backend.write("\n"_sv.asBytes());
