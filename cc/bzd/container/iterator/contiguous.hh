@@ -1,79 +1,25 @@
 #pragma once
 
-#include "cc/bzd/platform/types.hh"
+#include "cc/bzd/container/iterator/random_access.hh"
 
 namespace bzd::iterator {
+
 template <class DataType>
-class Contiguous
+class Contiguous : public RandomAccess<DataType, Contiguous<DataType>>
 {
-public:
+public: // Traits
 	using Self = Contiguous<DataType>;
+	using Parent = RandomAccess<DataType, Self>;
+	using Category = ContiguousTag;
 
-public:
-	constexpr Contiguous(DataType* const data, const SizeType index) : data_{data}, index_{index} {}
+public: // Constructors
+	using Parent::Parent;
 
-	constexpr Self& operator++() noexcept
-	{
-		++index_;
-		return *this;
-	}
-
-	constexpr Self operator++(int) noexcept
-	{
-		auto it = *this;
-		++index_;
-		return it;
-	}
-
-	constexpr Self& operator--() noexcept
-	{
-		--index_;
-		return *this;
-	}
-
-	constexpr Self operator--(int) noexcept
-	{
-		auto it = *this;
-		--index_;
-		return it;
-	}
-
-	constexpr Self operator-(const int n) const noexcept
-	{
-		Self it(*this);
-		it.index_ -= n;
-		return it;
-	}
-
-	constexpr Self operator+(const int n) const noexcept
-	{
-		Self it(*this);
-		it.index_ += n;
-		return it;
-	}
-
-	constexpr Self& operator-=(const int n) noexcept
-	{
-		index_ -= n;
-		return *this;
-	}
-
-	constexpr Self& operator+=(const int n) noexcept
-	{
-		index_ += n;
-		return *this;
-	}
-
-	constexpr bool operator==(const Self& it) const noexcept { return it.index_ == index_; }
-
-	constexpr bool operator!=(const Self& it) const noexcept { return !(it == *this); }
-
-	constexpr DataType& operator*() const { return data_[index_]; }
-
-	constexpr DataType* operator->() const { return &data_[index_]; }
-
-private:
-	DataType* const data_;
-	SizeType index_;
+public: // Copy/move constructors/assignments
+	constexpr Contiguous(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = default;
+	constexpr Contiguous(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
 };
+
 } // namespace bzd::iterator

@@ -24,6 +24,7 @@ cc_library(
         ":variant",
         ":vector",
         "//cc/bzd/container/impl",
+        "//cc/bzd/container/iterator:distance",
         "//cc/bzd/core/assert",
     ],
 )

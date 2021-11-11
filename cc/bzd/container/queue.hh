@@ -15,11 +15,11 @@ protected:
 	using Element = typename PoolType::Element;
 
 public:
-	constexpr explicit Queue(const bzd::Span<Element> data) noexcept : pool_{data}, first_{PoolType::npos}, last_{PoolType::npos} {}
+	constexpr explicit Queue(const bzd::Span<Element> data) noexcept : pool_{data}, first_{npos}, last_{npos} {}
 
 	constexpr CapacityType capacity() const noexcept { return pool_.capacity(); }
 
-	constexpr bool empty() const noexcept { return (first_ == PoolType::npos); }
+	constexpr bool empty() const noexcept { return (first_ == npos); }
 
 	constexpr T& front() noexcept
 	{
@@ -49,7 +49,7 @@ public:
 	{
 		auto& item = pool_.reserve();
 		const auto index = pool_.getIndex(item);
-		if (first_ == PoolType::npos)
+		if (first_ == npos)
 		{
 			first_ = index;
 			last_ = index;
@@ -69,7 +69,7 @@ public:
 		bzd::assert::isTrue(!empty());
 
 		auto& item = pool_[first_];
-		first_ = (first_ == last_) ? PoolType::npos : item.next_;
+		first_ = (first_ == last_) ? npos : item.next_;
 		pool_.release(item);
 	}
 
