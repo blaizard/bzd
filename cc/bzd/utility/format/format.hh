@@ -154,7 +154,7 @@ template <class Adapter>
 constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current)
 {
 	const auto endIndex = format.find('}');
-	Adapter::assertTrue(endIndex != bzd::StringView::npos, "Missing closing '}' for the replacement field");
+	Adapter::assertTrue(endIndex != bzd::npos, "Missing closing '}' for the replacement field");
 	auto metadataStr = format.subStr(0, endIndex + 1);
 
 	Metadata metadata;

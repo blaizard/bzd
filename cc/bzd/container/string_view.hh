@@ -34,9 +34,9 @@ public:
 	constexpr StringView(const T* const str, const SizeType size) noexcept : Parent{StorageType{str, size}} {}
 	constexpr StringView(const bzd::Span<char>& span) noexcept : Parent{StorageType{span.data(), span.size()}} {}
 
-	constexpr StringView subStr(const SizeType pos, const SizeType count = StringView::npos) const noexcept
+	constexpr StringView subStr(const SizeType pos, const SizeType count = npos) const noexcept
 	{
-		return StringView(&this->at(pos), (count == StringView::npos) ? (this->size() - pos) : count);
+		return StringView(&this->at(pos), (count == npos) ? (this->size() - pos) : count);
 	}
 
 	constexpr void removePrefix(const SizeType n) noexcept

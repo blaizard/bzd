@@ -29,6 +29,10 @@ public: // Constructors
 public: // API
 	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override
 	{
+		if (data.size() == 0)
+		{
+			co_return bzd::error();
+		}
 		while (true)
 		{
 			::pollfd fd{};
@@ -42,6 +46,10 @@ public: // API
 			if (ret > 0 && (fd.revents & POLLIN) != 0)
 			{
 				const auto size = ::read(STDIN_FILENO, data.data(), data.size());
+				if (size == -1)
+				{
+					co_return bzd::error();
+				}
 				co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 			}
 			co_await bzd::async::yield();

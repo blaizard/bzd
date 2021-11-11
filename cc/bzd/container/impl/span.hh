@@ -37,8 +37,6 @@ public:
 	using ConstIterator = bzd::iterator::Contiguous<StorageDataType>;
 	using Iterator = bzd::iterator::Contiguous<StorageDataMutableType>;
 
-	static constexpr const SizeType npos = static_cast<SizeType>(-1);
-
 public: // Constructor/assignment
 	// Default/copy/move constructor/assignment.
 	constexpr Span() noexcept = default;
@@ -56,10 +54,10 @@ public: // Constructor/assignment
 	}
 
 public: // Iterators
-	constexpr auto begin() noexcept { return Iterator{data(), 0}; }
-	constexpr auto begin() const noexcept { return ConstIterator{data(), 0}; }
-	constexpr auto end() noexcept { return Iterator{data(), size()}; }
-	constexpr auto end() const noexcept { return ConstIterator{data(), size()}; }
+	constexpr auto begin() noexcept { return Iterator{data()}; }
+	constexpr auto begin() const noexcept { return ConstIterator{data()}; }
+	constexpr auto end() noexcept { return Iterator{&data()[size()]}; }
+	constexpr auto end() const noexcept { return ConstIterator{&data()[size()]}; }
 
 public: // Size
 	constexpr SizeType size() const noexcept { return storage_.size(); }

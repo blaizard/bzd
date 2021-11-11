@@ -20,7 +20,6 @@ class SingleLinkedPool : public bzd::Span<SingleLinkedPoolElement<T, CapacityTyp
 public:
 	using Element = SingleLinkedPoolElement<T, CapacityType>;
 	using Parent = bzd::Span<Element>;
-	static constexpr const CapacityType npos = static_cast<CapacityType>(-1);
 
 public:
 	constexpr explicit SingleLinkedPool(const bzd::Span<Element> data) noexcept : Parent(data), free_(0)

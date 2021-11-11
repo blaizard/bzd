@@ -125,7 +125,7 @@ bzd::StringView exec(const char* cmd)
 bzd::StringView readLine(bzd::StringView str, bzd::SizeType& start)
 {
 	const auto end = str.find('\n', start);
-	if (end != bzd::StringView::npos)
+	if (end != bzd::npos)
 	{
 		const auto line = str.subStr(start, end - start);
 		// Needs to be modified

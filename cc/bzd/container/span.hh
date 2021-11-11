@@ -47,11 +47,10 @@ constexpr auto Span<T, Storage>::asSpan() noexcept
 	return bzd::Span<StorageDataMutableType>{data(), size()};
 }
 
-
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) const noexcept
 {
-	bzd::assert::isTrue(offset < size());
+	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
 	bzd::assert::isTrue(offset + actualCount <= size());
 	return bzd::Span<StorageDataType>{data() + offset, actualCount};
@@ -60,7 +59,7 @@ constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType c
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) noexcept
 {
-	bzd::assert::isTrue(offset < size());
+	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
 	bzd::assert::isTrue(offset + actualCount <= size());
 	return bzd::Span<StorageDataMutableType>{data() + offset, actualCount};

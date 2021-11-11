@@ -22,8 +22,6 @@ protected:
 	using Self = VariantBase<Ts...>;
 	// Type use to define the index of the variant type.
 	using IndexType = bzd::Int16Type;
-	// Position of the variant representing an invalid state.
-	static constexpr const IndexType npos = static_cast<IndexType>(-1);
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
 	// Choose the Nth element out of the list
@@ -123,7 +121,7 @@ protected:
 	struct EmptyConstructorTagType
 	{
 	};
-	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{npos}, data_{} {}
+	constexpr VariantBase(EmptyConstructorTagType) noexcept : id_{static_cast<IndexType>(npos)}, data_{} {}
 
 public: // Constructors
 	/// Default constructor.
