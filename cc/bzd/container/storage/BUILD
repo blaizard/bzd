@@ -8,6 +8,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:enable_if",
+        "//cc/bzd/type_traits:is_const",
+        "//cc/bzd/type_traits:remove_const",
     ],
 )
 
