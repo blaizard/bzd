@@ -29,11 +29,10 @@ public: // Constructors
 public: // Accessors
 	constexpr DataType* data() const noexcept { return data_; }
 	constexpr DataMutableType* dataMutable() noexcept { return data_; }
-	constexpr bzd::SizeType size() const noexcept { return size_; }
-	constexpr bzd::SizeType sizeMutable() noexcept { return size_; }
+	constexpr bzd::SizeType size() const noexcept { return N; }
 
 private:
 	T data_[(N == 0) ? 1 : N]{};
-	bzd::SizeType size_{N};
+	const bzd::SizeType size_{N};
 };
 } // namespace bzd::impl

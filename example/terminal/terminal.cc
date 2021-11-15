@@ -9,40 +9,49 @@ public: // Constructor.
 	constexpr Reader(bzd::IStream& in, bzd::OStream& out) noexcept : in_{in}, out_{out} {}
 
 public: // API.
-	/// Read a sequence of bytes until a certain byte and return what has been read.
-	/// This function is statefull and if additional bytes have been read, they will not be lost
+	/// Read a sequence of bytes until the specified stop byte and return what has been read.
+	/// This function is statefull and if additional bytes are read, they will not be lost
 	/// and re-used for the next call.
 	///
 	/// \param stop The special byte until which the read will stop.
+	///
+	/// \return A span containing the result including the stop character.
 	[[nodiscard]] bzd::Async<bzd::Span<bzd::ByteType>> readUntil(const bzd::ByteType stop) noexcept
 	{
 		auto readSpan = buffer_.asSpan();
 
-		// If there was a previous read, move the last position not to loose previously read bytes.
-		if (!left_.empty())
-		{
-			bzd::algorithm::copy(left_.begin(), left_.end(), buffer_.begin());
-			readSpan = readSpan.subSpan(left_.size());
-		}
-
 		while (true)
 		{
-			const auto result = co_await in_.read(readSpan);
-			if (!result)
+			bzd::Span<bzd::ByteType> result;
+
+			if (left_.empty())
 			{
-				co_return bzd::error();
+				const auto maybeResult = co_await in_.read(readSpan);
+				if (!maybeResult)
+				{
+					co_return bzd::error();
+				}
+				result = bzd::move(maybeResult.value());
+				// Echo what is being typed
+				co_await out_.write(result);
 			}
-			// Echo what is being typed
-			co_await out_.write(result.value());
+			// If there was a previous read, move the last position not to loose previously read bytes.
+			else
+			{
+				bzd::algorithm::copy(left_.begin(), left_.end(), buffer_.begin());
+				left_ = bzd::Span<bzd::ByteType>();
+				result = buffer_.subSpan(0, left_.size());
+			}
+
 			// Check if the special byte appear.
-			if (const auto pos = result->find(stop); pos != bzd::npos)
+			if (const auto pos = result.find(stop); pos != bzd::npos)
 			{
 				const auto size = bzd::iterator::distance(buffer_.begin(), readSpan.begin() + pos) + 1;
-				left_ = buffer_.subSpan(size, result->size() - pos);
+				left_ = buffer_.subSpan(size, result.size() - pos);
 				co_return buffer_.subSpan(0, size);
 			}
 			// Move the read span forward
-			readSpan = readSpan.subSpan(result->size());
+			readSpan = readSpan.subSpan(result.size());
 		}
 	}
 

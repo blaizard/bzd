@@ -16,6 +16,7 @@ cc_library(
         ":queue",
         ":reference_wrapper",
         ":result",
+        ":ring_buffer",
         ":span",
         ":stack",
         ":string",
@@ -210,6 +211,19 @@ cc_library(
         "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
+    name = "ring_buffer",
+    hdrs = [
+        "ring_buffer.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container/storage:fixed",
+        "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/platform:types",
     ],
 )
 

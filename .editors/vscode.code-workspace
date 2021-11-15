@@ -1,5 +1,29 @@
 {
     "folders": [
         {"path": ".."}
-    ]
+    ],
+    "settings": {
+        "editor.tabSize": 4,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true
+        },
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "search.exclude": {
+            "**/.git": true,
+            "bazel-*": true,
+            "**/node_modules": true,
+            "**/bower_components": true,
+            "**/*.code-search": true
+        },
+        "files.watcherExclude": {
+            "**/.git/**": true,
+            "bazel-*/**": true
+        },
+        "editor.rulers": [120]
+    }
 }
