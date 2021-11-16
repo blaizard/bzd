@@ -26,3 +26,6 @@ bazel-*
 *.d#*
 *.b#*
 *.s#*
+
+# OpenSCAD
+*.stl
