@@ -28,9 +28,9 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 public: // Size.
-	[[nodiscard]] constexpr bzd::BoolType empty() const noexcept { return (write_ - read_) == 0; }
-	[[nodiscard]] constexpr bzd::BoolType full() const noexcept { return (write_ - read_) >= capacity(); }
-	[[nodiscard]] constexpr bzd::SizeType size() const noexcept { return (full()) ? capacity() : (write_ - read_); }
+	[[nodiscard]] constexpr bzd::BoolType empty() const noexcept { return size() == 0; }
+	[[nodiscard]] constexpr bzd::BoolType full() const noexcept { return size() >= capacity(); }
+	[[nodiscard]] constexpr bzd::SizeType size() const noexcept { return (write_ - read_); }
 	[[nodiscard]] constexpr bzd::SizeType capacity() const noexcept { return storage_.size(); }
 
 public: // Accessors.
@@ -41,6 +41,8 @@ public: // Accessors.
 
 	/// Get the span of contiguous memory containing data starting from the tail.
 	/// In other word, this represents the first half of contiguous data to be read.
+	///
+	/// \return A span containing the contiguous memory region.
 	[[nodiscard]] constexpr bzd::Span<DataType> asSpanForReading() const noexcept
 	{
 		if (empty())
@@ -51,11 +53,11 @@ public: // Accessors.
 		const auto end = write_ % capacity();
 		if (end > start)
 		{
-			return bzd::Span<DataType>{start, end - start};
+			return bzd::Span<DataType>{&storage_.data()[start], end - start};
 		}
 		else
 		{
-			return bzd::Span<DataType>{start, capacity() - start};
+			return bzd::Span<DataType>{&storage_.data()[start], capacity() - start};
 		}
 	}
 /*
