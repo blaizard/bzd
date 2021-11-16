@@ -38,3 +38,65 @@ TEST(RingBuffer, single)
 	EXPECT_TRUE(ring.empty());
 	EXPECT_FALSE(ring.full());
 }
+
+TEST(RingBuffer, asSpanForReading)
+{
+	bzd::RingBuffer<int, 16> ring;
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 0);
+	}
+
+	ring.pushBack(42);
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 42);
+	}
+
+	ring.pushBack(34);
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 2);
+		EXPECT_EQ(span[0], 42);
+		EXPECT_EQ(span[1], 34);
+	}
+
+	ring.consume(1);
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 34);
+	}
+
+	for (int i = 0; i<15; ++i)
+	{
+		ring.pushBack(i);
+	}
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 15);
+		EXPECT_EQ(span[0], 34);
+		EXPECT_EQ(span[14], 13);
+	}
+
+	ring.consume(15);
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 14);
+	}
+
+	ring.consume(1);
+
+	{
+		const auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 0);
+	}
+}
