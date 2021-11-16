@@ -31,16 +31,6 @@ TEST(RingBuffer, single)
 	EXPECT_FALSE(ring.empty());
 	EXPECT_TRUE(ring.full());
 
-	for (int i = 0; i < 15; ++i)
-	{
-		ring.pushBack(i);
-	}
-
-	EXPECT_EQ(ring.size(), 16);
-	EXPECT_EQ(ring.capacity(), 16);
-	EXPECT_FALSE(ring.empty());
-	EXPECT_TRUE(ring.full());
-
 	ring.clear();
 
 	EXPECT_EQ(ring.size(), 0);

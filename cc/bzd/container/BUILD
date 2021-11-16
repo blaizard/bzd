@@ -224,6 +224,7 @@ cc_library(
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
+        ":span"
     ],
 )
 

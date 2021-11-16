@@ -33,6 +33,5 @@ public: // Accessors
 
 private:
 	T data_[(N == 0) ? 1 : N]{};
-	const bzd::SizeType size_{N};
 };
 } // namespace bzd::impl

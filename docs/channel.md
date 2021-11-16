@@ -1,7 +1,7 @@
 # Channels
 
 Channels are ways to communicate to the external world.
-It can be used as a communication mean through local buses (I2C, UART...), shared memory or more widely via ethernet or internet.
+It can be used as a communication mean through local buses (I2C, UART...), shared memory or more widely via internet.
 
 A channel consists of 2 layers, the adapter and the transport layer.
 The adapter layer has the role to serialize/deserialize the data as well as consistency/errors checks at the data level.
