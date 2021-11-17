@@ -20,116 +20,116 @@ public:
 
 TEST(ContainerString, Empty)
 {
-	bzd::String<10> test;
-	bzd::interface::String& iTest = test;
+	bzd::String<10> string;
+	bzd::interface::String& iString = string;
 
-	EXPECT_EQ(iTest.capacity(), 10);
-	EXPECT_EQ(iTest.size(), 0);
+	EXPECT_EQ(iString.capacity(), 10);
+	EXPECT_EQ(iString.size(), 0);
 }
 
 TEST(ContainerString, Base)
 {
-	bzd::String<10> test("Hello");
-	bzd::interface::String& iTest = test;
+	bzd::String<10> string("Hello");
+	bzd::interface::String& iString = string;
 
-	EXPECT_EQ(iTest.capacity(), 10);
-	EXPECT_EQ(iTest.size(), 5);
-	EXPECT_STREQ(iTest.data(), "Hello");
-	EXPECT_EQ(iTest[0], 'H');
+	EXPECT_EQ(iString.capacity(), 10);
+	EXPECT_EQ(iString.size(), 5);
+	EXPECT_STREQ(iString.data(), "Hello");
+	EXPECT_EQ(iString[0], 'H');
 
-	iTest.append(" You");
-	EXPECT_EQ(iTest.size(), 9);
-	EXPECT_STREQ(iTest.data(), "Hello You");
+	iString.append(" You");
+	EXPECT_EQ(iString.size(), 9);
+	EXPECT_STREQ(iString.data(), "Hello You");
 
-	iTest.append("!OVERFLOW");
-	EXPECT_EQ(iTest.size(), 10);
-	EXPECT_STREQ(iTest.data(), "Hello You!");
+	iString.append("!OVERFLOW");
+	EXPECT_EQ(iString.size(), 10);
+	EXPECT_STREQ(iString.data(), "Hello You!");
 
-	iTest.data()[0] = 'W';
-	EXPECT_STREQ(iTest.data(), "Wello You!");
+	iString.data()[0] = 'W';
+	EXPECT_STREQ(iString.data(), "Wello You!");
 
-	iTest[1] = 'i';
-	EXPECT_STREQ(iTest.data(), "Willo You!");
+	iString[1] = 'i';
+	EXPECT_STREQ(iString.data(), "Willo You!");
 }
 
 TEST(ContainerString, BaseConst)
 {
-	const bzd::String<10> test("Hello");
+	const bzd::String<10> string("Hello");
 
-	EXPECT_EQ(test.capacity(), 10);
-	EXPECT_EQ(test.size(), 5);
-	EXPECT_STREQ(test.data(), "Hello");
-	EXPECT_EQ(test[0], 'H');
+	EXPECT_EQ(string.capacity(), 10);
+	EXPECT_EQ(string.size(), 5);
+	EXPECT_STREQ(string.data(), "Hello");
+	EXPECT_EQ(string[0], 'H');
 }
 
 TEST(ContainerString, Resize)
 {
-	bzd::String<11> test("Hello World");
+	bzd::String<11> string("Hello World");
 
-	EXPECT_EQ(test.capacity(), 11);
-	EXPECT_EQ(test.size(), 11);
-	EXPECT_STREQ(test.data(), "Hello World");
+	EXPECT_EQ(string.capacity(), 11);
+	EXPECT_EQ(string.size(), 11);
+	EXPECT_STREQ(string.data(), "Hello World");
 
-	test.resize(5);
-	EXPECT_EQ(test.size(), 5);
-	EXPECT_STREQ(test.data(), "Hello");
+	string.resize(5);
+	EXPECT_EQ(string.size(), 5);
+	EXPECT_STREQ(string.data(), "Hello");
 
-	test.resize(0);
-	EXPECT_EQ(test.size(), 0);
-	EXPECT_STREQ(test.data(), "");
+	string.resize(0);
+	EXPECT_EQ(string.size(), 0);
+	EXPECT_STREQ(string.data(), "");
 }
 
 TEST(ContainerString, OperatorsEqual)
 {
-	bzd::String<6> test;
+	bzd::String<6> string;
 
-	EXPECT_EQ(test.size(), 0);
-	EXPECT_STREQ(test.data(), "");
+	EXPECT_EQ(string.size(), 0);
+	EXPECT_STREQ(string.data(), "");
 
-	test = "Hello";
-	EXPECT_EQ(test.size(), 5);
-	EXPECT_STREQ(test.data(), "Hello");
+	string = "Hello";
+	EXPECT_EQ(string.size(), 5);
+	EXPECT_STREQ(string.data(), "Hello");
 
-	test = "Hello World";
-	EXPECT_EQ(test.size(), 6);
-	EXPECT_STREQ(test.data(), "Hello ");
+	string = "Hello World";
+	EXPECT_EQ(string.size(), 6);
+	EXPECT_STREQ(string.data(), "Hello ");
 }
 
 TEST(ContainerString, OperatorsPlusEqual)
 {
-	bzd::String<9> test;
+	bzd::String<9> string;
 
-	test += "Hello";
-	EXPECT_STREQ(test.data(), "Hello");
+	string += "Hello";
+	EXPECT_STREQ(string.data(), "Hello");
 
-	test += " Me";
-	EXPECT_STREQ(test.data(), "Hello Me");
+	string += " Me";
+	EXPECT_STREQ(string.data(), "Hello Me");
 
-	test += "!OVERFLOW";
-	EXPECT_STREQ(test.data(), "Hello Me!");
+	string += "!OVERFLOW";
+	EXPECT_STREQ(string.data(), "Hello Me!");
 }
 
 TEST(ContainerString, Constexpr)
 {
-	static constexpr bzd::String<6> test("Hello");
-	EXPECT_STREQ(test.data(), "Hello");
+	static constexpr bzd::String<6> string("Hello");
+	EXPECT_STREQ(string.data(), "Hello");
 }
 
 TEST(ContainerString, Construct)
 {
 	bzd::StringView str = "xyzzy";
-	bzd::String<6> test(str);
-	EXPECT_STREQ(test.data(), "xyzzy");
+	bzd::String<6> string(str);
+	EXPECT_STREQ(string.data(), "xyzzy");
 }
 
 TEST(ContainerString, Copy)
 {
-	bzd::String<6> test("Hello");
-	EXPECT_STREQ(test.data(), "Hello");
+	bzd::String<6> string("Hello");
+	EXPECT_STREQ(string.data(), "Hello");
 
-	bzd::String<6> copy(test);
+	bzd::String<6> copy(string);
 	EXPECT_STREQ(copy.data(), "Hello");
 
-	bzd::String<6> copy2 = test;
+	bzd::String<6> copy2 = string;
 	EXPECT_STREQ(copy2.data(), "Hello");
 }

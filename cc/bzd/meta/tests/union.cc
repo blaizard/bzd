@@ -8,14 +8,14 @@
 
 TEST(MetaUnion, Constructor)
 {
-	bzd::meta::Union<int, bool, float> test;
+	bzd::meta::Union<int, bool, float> u;
 
-	test.get<int>() = 21;
-	EXPECT_EQ(test.get<int>(), 21);
-	test.get<bool>() = true;
-	EXPECT_TRUE(test.get<bool>());
-	test.get<float>() = 3.435;
-	EXPECT_NEAR(test.get<float>(), 3.435, 0.0001);
+	u.get<int>() = 21;
+	EXPECT_EQ(u.get<int>(), 21);
+	u.get<bool>() = true;
+	EXPECT_TRUE(u.get<bool>());
+	u.get<float>() = 3.435;
+	EXPECT_NEAR(u.get<float>(), 3.435, 0.0001);
 
 	// Constructor
 	bzd::meta::Union<int, bool, float> testInt(static_cast<int>(42));

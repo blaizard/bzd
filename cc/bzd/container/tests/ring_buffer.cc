@@ -1,6 +1,6 @@
 #include "cc/bzd/container/ring_buffer.hh"
-#include "cc/bzd/utility/min.hh"
 
+#include "cc/bzd/utility/min.hh"
 #include "cc_test/test.hh"
 
 TEST(RingBuffer, single)
@@ -195,10 +195,10 @@ TEST(RingBuffer, stress)
 
 	for (int iteration = 0; iteration < 10000; ++iteration)
 	{
-		bzd::SizeType random = randInt(0, 16);
+		bzd::SizeType random = test.randInt(0, 16);
 
 		// Write X entries.
-		if (randBool())
+		if (test.randBool())
 		{
 			auto span = ring.asSpanForWriting();
 			int count = bzd::min(random, span.size());

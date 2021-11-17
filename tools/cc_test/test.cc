@@ -94,11 +94,13 @@ bool bzd::test::Manager::run()
 		{
 			const auto testName = it2.first;
 			const auto& info = it2.second;
-			::std::cout << "[ RUN      ] " << testCaseName << "." << testName << ::std::endl;
+			bzd::test::Context context{};
+
+			::std::cout << "[ RUN      ] " << testCaseName << "." << testName << " (seed=" << context.getSeed() << ")" << ::std::endl;
 			currentTestFailed_ = false;
 			try
 			{
-				info.test_->test();
+				info.test_->test(context);
 			}
 			catch (...)
 			{
