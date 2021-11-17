@@ -2,6 +2,8 @@
 
 #include "cc/bzd/core/async.hh"
 
+#include <random>
+
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 
@@ -226,6 +228,18 @@ public:
 	Test() = default;
 	virtual ~Test() {}
 	virtual void test() const = 0;
+	template <class T>
+	T randInt(const T min, const T max) const noexcept
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<T> distribution(min, max);
+		return distribution(gen);
+	}
+	bool randBool() const noexcept
+	{
+		return (randInt(0, 1) == 1);
+	}
 };
 
 class Manager

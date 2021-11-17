@@ -1,4 +1,5 @@
 #include "cc/bzd/container/ring_buffer.hh"
+#include "cc/bzd/utility/min.hh"
 
 #include "cc_test/test.hh"
 
@@ -183,5 +184,40 @@ TEST(RingBuffer, asSpanForWriting)
 		EXPECT_EQ(span.size(), 14);
 		EXPECT_EQ(span[0], 2);
 		EXPECT_EQ(span[13], 15);
+	}
+}
+
+TEST(RingBuffer, stress)
+{
+	bzd::RingBuffer<int, 16> ring;
+	int counter = 0;
+	int counterRead = 0;
+
+	for (int iteration = 0; iteration < 10000; ++iteration)
+	{
+		bzd::SizeType random = randInt(0, 16);
+
+		// Write X entries.
+		if (randBool())
+		{
+			auto span = ring.asSpanForWriting();
+			int count = bzd::min(random, span.size());
+			for (int i = 0; i < count; ++i)
+			{
+				span[i] = counter++;
+			}
+			ring.produce(count);
+		}
+		// Read X entries.
+		else
+		{
+			auto span = ring.asSpanForReading();
+			int count = bzd::min(random, span.size());
+			for (int i = 0; i < count; ++i)
+			{
+				EXPECT_EQ(span[i], counterRead++);
+			}
+			ring.consume(count);
+		}
 	}
 }
