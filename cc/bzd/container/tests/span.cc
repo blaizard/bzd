@@ -4,17 +4,17 @@
 
 TEST(ContainerSpan, Base)
 {
-	int test[5];
-	bzd::Span<int> span(test, 5);
+	int array[5];
+	bzd::Span<int> span(array, 5);
 
 	EXPECT_EQ(span.size(), 5);
 }
 
 TEST(ContainerSpan, Constructor)
 {
-	int test[5];
-	bzd::Span<int> span(test, 5);
-	bzd::Span<int> spanArray(test);
+	int array[5];
+	bzd::Span<int> span(array, 5);
+	bzd::Span<int> spanArray(array);
 
 	// Copy
 	bzd::Span<int> spanCopy(span);
@@ -34,8 +34,8 @@ TEST(ContainerSpan, Constructor)
 
 TEST(ContainerSpan, Iterator)
 {
-	int test[5] = {0, 1, 2, 3, 4};
-	bzd::Span<int> span(test, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<int> span(array, 5);
 
 	{
 		auto it = span.begin();
@@ -60,8 +60,8 @@ TEST(ContainerSpan, Iterator)
 
 TEST(ContainerSpan, ConstIterator)
 {
-	int test[5] = {0, 1, 2, 3, 4};
-	const bzd::Span<int> span(test, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	const bzd::Span<int> span(array, 5);
 
 	{
 		auto it = span.begin();
@@ -86,8 +86,8 @@ TEST(ContainerSpan, ConstIterator)
 
 TEST(ContainerSpan, ConstConstIterator)
 {
-	int test[5] = {0, 1, 2, 3, 4};
-	const bzd::Span<const int> span(test, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	const bzd::Span<const int> span(array, 5);
 
 	{
 		auto it = span.begin();
@@ -102,8 +102,8 @@ TEST(ContainerSpan, ConstConstIterator)
 
 TEST(ContainerSpan, Constexpr)
 {
-	static constexpr int test[5] = {0, 1, 2, 3, 4};
-	constexpr bzd::Span<const int> span(test, 5);
+	static constexpr int array[5] = {0, 1, 2, 3, 4};
+	constexpr bzd::Span<const int> span(array, 5);
 
 	{
 		auto it = span.begin();
@@ -118,8 +118,8 @@ TEST(ContainerSpan, Constexpr)
 
 TEST(ContainerSpan, Copy)
 {
-	int test[5] = {0, 1, 2, 3, 4};
-	bzd::Span<int> span(test, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<int> span(array, 5);
 
 	// Copy constructor
 	bzd::Span<int> copySpan(span);
@@ -152,27 +152,27 @@ TEST(ContainerSpan, ConstNonConst)
 {
 	// Both the span and the content can be modified.
 	{
-		int test[5] = {0, 1, 2, 3, 4};
-		bzd::Span<int> spanNonNon{test, 5};
+		int array[5] = {0, 1, 2, 3, 4};
+		bzd::Span<int> spanNonNon{array, 5};
 		spanNonNon[1] = 45;
 		EXPECT_EQ(spanNonNon[1], 45);
 	}
 	{
-		int test[5] = {0, 1, 2, 3, 4};
-		const bzd::Span<int> spanConstNon{test, 5};
+		int array[5] = {0, 1, 2, 3, 4};
+		const bzd::Span<int> spanConstNon{array, 5};
 		spanConstNon[1] = 45;
 		EXPECT_EQ(spanConstNon[1], 45);
 	}
 	{
-		int test[5] = {0, 1, 2, 3, 4};
-		bzd::Span<const int> spanNonConst{test, 5};
+		int array[5] = {0, 1, 2, 3, 4};
+		bzd::Span<const int> spanNonConst{array, 5};
 		// Not possible
 		// spanNonConst[1] = 45;
 		EXPECT_EQ(spanNonConst[1], 1);
 	}
 	{
-		int test[5] = {0, 1, 2, 3, 4};
-		const bzd::Span<const int> spanConstConst{test, 5};
+		int array[5] = {0, 1, 2, 3, 4};
+		const bzd::Span<const int> spanConstConst{array, 5};
 		// Not possible
 		// spanConstConst[1] = 45;
 		EXPECT_EQ(spanConstConst[1], 1);
@@ -181,8 +181,8 @@ TEST(ContainerSpan, ConstNonConst)
 
 TEST(ContainerSpan, Subspan)
 {
-	int test[5] = {0, 1, 2, 3, 4};
-	bzd::Span<int> span(test, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<int> span(array, 5);
 
 	{
 		const auto subSpan = span.subSpan();
@@ -225,8 +225,8 @@ TEST(ContainerSpan, Subspan)
 
 TEST(ContainerSpan, AsBytes)
 {
-	bzd::UInt32Type test[5] = {0, 1, 2, 3, 4};
-	bzd::Span<bzd::UInt32Type> span(test, 5);
+	bzd::UInt32Type array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<bzd::UInt32Type> span(array, 5);
 
 	EXPECT_EQ(span.size(), 5);
 	EXPECT_EQ(span.sizeBytes(), 20);

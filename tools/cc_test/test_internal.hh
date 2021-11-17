@@ -12,11 +12,11 @@
 	{                                                                                                              \
 	public:                                                                                                        \
 		BZDTEST_CLASS_NAME_(testCaseName, testName)() {}                                                           \
-		void test() const override;                                                                                \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                     \
 	};                                                                                                             \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
 		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test() const
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
@@ -222,24 +222,33 @@ private:
 } // namespace bzd::test::impl
 
 namespace bzd::test {
+class Context
+{
+public:
+	Context() : seed_{::std::random_device{}()}, gen_{seed_} {}
+
+	template <class T>
+	[[nodiscard]] T randInt(const T min, const T max) noexcept
+	{
+		::std::uniform_int_distribution<T> distribution(min, max);
+		return distribution(gen_);
+	}
+
+	[[nodiscard]] bool randBool() noexcept { return (randInt(0, 1) == 1); }
+
+	[[nodiscard]] auto getSeed() const noexcept { return seed_; }
+
+private:
+	unsigned int seed_;
+	::std::mt19937 gen_;
+};
+
 class Test
 {
 public:
 	Test() = default;
 	virtual ~Test() {}
-	virtual void test() const = 0;
-	template <class T>
-	T randInt(const T min, const T max) const noexcept
-	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<T> distribution(min, max);
-		return distribution(gen);
-	}
-	bool randBool() const noexcept
-	{
-		return (randInt(0, 1) == 1);
-	}
+	virtual void test(Context& test) const = 0;
 };
 
 class Manager

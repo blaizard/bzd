@@ -4,16 +4,16 @@
 
 TEST(ContainerArray, Base)
 {
-	bzd::Array<int, 5> test;
-	EXPECT_EQ(test.capacity(), 5);
-	EXPECT_EQ(test.size(), 5);
-	test[2] = 4;
-	EXPECT_EQ(test[2], 4);
+	bzd::Array<int, 5> array;
+	EXPECT_EQ(array.capacity(), 5);
+	EXPECT_EQ(array.size(), 5);
+	array[2] = 4;
+	EXPECT_EQ(array[2], 4);
 }
 
 TEST(ContainerArray, Constexpr)
 {
-	constexpr bzd::Array<int, 5> test{};
-	EXPECT_EQ(test.capacity(), 5);
-	EXPECT_EQ(test.size(), 5);
+	constexpr bzd::Array<int, 5> array{};
+	EXPECT_EQ(array.capacity(), 5);
+	EXPECT_EQ(array.size(), 5);
 }
