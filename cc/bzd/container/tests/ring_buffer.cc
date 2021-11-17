@@ -30,6 +30,15 @@ TEST(RingBuffer, single)
 	EXPECT_EQ(ring.capacity(), 16);
 	EXPECT_FALSE(ring.empty());
 	EXPECT_TRUE(ring.full());
+	EXPECT_FALSE(ring.overrun());
+
+	ring.pushBack(12);
+
+	EXPECT_EQ(ring.size(), 16);
+	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_FALSE(ring.empty());
+	EXPECT_TRUE(ring.full());
+	EXPECT_TRUE(ring.overrun());
 
 	ring.clear();
 
@@ -37,6 +46,7 @@ TEST(RingBuffer, single)
 	EXPECT_EQ(ring.capacity(), 16);
 	EXPECT_TRUE(ring.empty());
 	EXPECT_FALSE(ring.full());
+	EXPECT_FALSE(ring.overrun());
 }
 
 TEST(RingBuffer, asSpanForReading)
@@ -73,7 +83,7 @@ TEST(RingBuffer, asSpanForReading)
 		EXPECT_EQ(span[0], 34);
 	}
 
-	for (int i = 0; i<15; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
 		ring.pushBack(i);
 	}
@@ -98,5 +108,80 @@ TEST(RingBuffer, asSpanForReading)
 	{
 		const auto span = ring.asSpanForReading();
 		EXPECT_EQ(span.size(), 0);
+	}
+}
+
+TEST(RingBuffer, asSpanForWriting)
+{
+	bzd::RingBuffer<int, 16> ring;
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 16);
+		int counter = 0;
+		for (auto& i : span)
+		{
+			i = counter++;
+		}
+	}
+
+	ring.produce(1);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 15);
+		EXPECT_EQ(span[0], 1);
+		EXPECT_EQ(span[14], 15);
+	}
+
+	ring.produce(14);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 15);
+	}
+
+	ring.produce(1);
+
+	{
+		EXPECT_TRUE(ring.full());
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 0);
+	}
+
+	ring.consume(1);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 0);
+	}
+
+	ring.consume(1);
+	ring.produce(1);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 1);
+	}
+
+	ring.consume(1);
+	ring.produce(1);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span[0], 2);
+	}
+
+	ring.consume(15);
+
+	{
+		auto span = ring.asSpanForWriting();
+		EXPECT_EQ(span.size(), 14);
+		EXPECT_EQ(span[0], 2);
+		EXPECT_EQ(span[13], 15);
 	}
 }
