@@ -221,10 +221,11 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":span",
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
-        ":span"
+        "//cc/bzd/utility:move",
     ],
 )
 

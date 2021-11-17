@@ -1,9 +1,10 @@
 #pragma once
 
+#include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/container/span.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {
 /// Ring buffer implementation.
@@ -32,6 +33,7 @@ public: // Size.
 	[[nodiscard]] constexpr bzd::BoolType full() const noexcept { return size() >= capacity(); }
 	[[nodiscard]] constexpr bzd::SizeType size() const noexcept { return (write_ - read_); }
 	[[nodiscard]] constexpr bzd::SizeType capacity() const noexcept { return storage_.size(); }
+	[[nodiscard]] constexpr bzd::BoolType overrun() const noexcept { return overrun_; }
 
 public: // Accessors.
 	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
@@ -60,13 +62,27 @@ public: // Accessors.
 			return bzd::Span<DataType>{&storage_.data()[start], capacity() - start};
 		}
 	}
-/*
+
 	/// Get the span of contiguous memory containing free slots starting from the head.
 	/// In other word, this represents the first half of contiguous free slots.
 	[[nodiscard]] constexpr bzd::Span<DataMutableType> asSpanForWriting() noexcept
 	{
+		if (full())
+		{
+			return bzd::Span<DataMutableType>{};
+		}
+		const auto start = write_ % capacity();
+		const auto end = read_ % capacity();
+		if (end > start)
+		{
+			return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], end - start};
+		}
+		else
+		{
+			return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], capacity() - start};
+		}
 	}
-*/
+
 public: // Modifiers.
 	/// Consume the ring buffer from the tail.
 	constexpr void consume(const bzd::SizeType n) noexcept
@@ -78,8 +94,12 @@ public: // Modifiers.
 	/// Produce new data in the ring buffer.
 	constexpr void produce(const bzd::SizeType n) noexcept
 	{
-		bzd::assert::isTrue(write_ + n - read_ <= capacity(), "Producer overruns consumer.");
 		write_ += n;
+		if (size() > capacity())
+		{
+			read_ = write_ - capacity();
+			overrun_ = true;
+		}
 	}
 
 	constexpr void pushBack(const T& value) noexcept
@@ -88,16 +108,27 @@ public: // Modifiers.
 		produce(1);
 	}
 
+	constexpr auto&& popFront() noexcept
+	{
+		auto& data = at(0);
+		consume(1);
+		return bzd::move(data);
+	}
+
 	constexpr void clear() noexcept
 	{
 		write_ = 0;
 		read_ = 0;
+		clearOverrun();
 	}
+
+	constexpr void clearOverrun() noexcept { overrun_ = false; }
 
 private: // Variables.
 	StorageType storage_{};
 	bzd::SizeType write_{0};
 	bzd::SizeType read_{0};
+	bzd::BoolType overrun_{false};
 };
 } // namespace bzd::impl
 
