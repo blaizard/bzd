@@ -12,7 +12,8 @@ namespace bzd::impl {
 template <class T, class Storage>
 class Vector : public impl::Span<T, Storage>
 {
-protected:
+public: // Traits.
+	using Self = Vector<T, Storage>;
 	using Parent = impl::Span<T, Storage>;
 	using StorageType = typename Parent::StorageType;
 
@@ -73,15 +74,20 @@ namespace bzd {
 template <class T, SizeType N>
 class Vector : public interface::Vector<T>
 {
-protected:
+public: // Traits.
+	using Self = Vector<T, N>;
 	using Parent = interface::Vector<T>;
 	using StorageType = typename Parent::StorageType;
 
-public:
+public: // Constructors/assignments.
 	constexpr Vector() noexcept : Parent{StorageType{data_, 0}, N} {}
+	constexpr Vector(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = default;
+	constexpr Vector(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr explicit Vector(Args&&... args) noexcept : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{bzd::forward<Args>(args)...}
+	constexpr Vector(InPlace, Args&&... args) noexcept : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -92,15 +98,20 @@ private:
 template <class T, SizeType N>
 class VectorConstexpr : public impl::Vector<T, impl::ResizeableStorage<T, N>>
 {
-protected:
+public: // Traits.
+	using Self = VectorConstexpr<T, N>;
 	using Parent = impl::Vector<T, impl::ResizeableStorage<T, N>>;
 	using StorageType = typename Parent::StorageType;
 
-public:
+public: // Constructors/assignments.
 	constexpr VectorConstexpr() noexcept : Parent{StorageType{}, N} {}
+	constexpr VectorConstexpr(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = default;
+	constexpr VectorConstexpr(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr explicit VectorConstexpr(Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}, N}
+	constexpr VectorConstexpr(InPlace, Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}, N}
 	{
 	}
 };

@@ -1,15 +1,14 @@
 #pragma once
 
-#include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/span.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
-#include "cc/bzd/utility/min.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/min.hh"
 
 #include <iostream>
 
-namespace bzd
-{
+namespace bzd {
 
 /// Spans is a container for span(s), representing data from multiple contiguous memory
 /// sections.
@@ -35,11 +34,8 @@ public: // Constructors/assignments.
 	}
 
 public:
-	/// Get the underlying container. 
-	[[nodiscard]] constexpr auto& array() const noexcept
-	{
-		return spans_;
-	}
+	/// Get the underlying container.
+	[[nodiscard]] constexpr auto& array() const noexcept { return spans_; }
 
 	/// Get the size of the memory sequence.
 	/// This is adding all span sizes and returning the sum.
@@ -98,4 +94,4 @@ private:
 	Array<Span<T>, N> spans_{};
 };
 
-}
+} // namespace bzd

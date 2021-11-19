@@ -18,10 +18,9 @@ public: // API.
 	/// \return A span containing the result including the stop character.
 	[[nodiscard]] bzd::Async<bzd::Spans<const bzd::ByteType, 2>> readUntil(const bzd::ByteType stop) noexcept
 	{
-		auto span = buffer_.asSpanForWriting();
-
 		while (true)
 		{
+			auto span = buffer_.asSpanForWriting();
 			const auto maybeResult = co_await in_.read(span);
 			if (!maybeResult)
 			{
@@ -41,42 +40,6 @@ public: // API.
 				co_return sub;
 			}
 		}
-
-/*
-		while (true)
-		{
-			bzd::Span<bzd::ByteType> result;
-
-			if (left_.empty())
-			{
-				const auto maybeResult = co_await in_.read(readSpan);
-				if (!maybeResult)
-				{
-					co_return bzd::error();
-				}
-				result = bzd::move(maybeResult.value());
-				// Echo what is being typed
-				co_await out_.write(result);
-			}
-			// If there was a previous read, move the last position not to loose previously read bytes.
-			else
-			{
-				bzd::algorithm::copy(left_.begin(), left_.end(), buffer_.begin());
-				left_ = bzd::Span<bzd::ByteType>();
-				result = buffer_.subSpan(0, left_.size());
-			}
-
-			// Check if the special byte appear.
-			if (const auto pos = result.find(stop); pos != bzd::npos)
-			{
-				const auto size = bzd::iterator::distance(buffer_.begin(), readSpan.begin() + pos) + 1;
-				left_ = buffer_.subSpan(size, result.size() - pos);
-				co_return buffer_.subSpan(0, size);
-			}
-			// Move the read span forward
-			readSpan = readSpan.subSpan(result.size());
-		}
-		*/
 	}
 
 private: // Variables.

@@ -81,7 +81,7 @@ cc_library(
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:integral_constant",
         "//cc/bzd/type_traits:invoke_result",
-        "//cc/bzd/type_traits:is_same"
+        "//cc/bzd/type_traits:is_same",
     ],
 )
 

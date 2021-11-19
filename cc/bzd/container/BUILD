@@ -256,10 +256,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":span",
         ":array",
+        ":span",
         "//cc/bzd/utility:constexpr_for",
-        "//cc/bzd/utility:min"
+        "//cc/bzd/utility:min",
     ],
 )
 
@@ -369,6 +369,6 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
-        "//cc/bzd/utility:in_place"
+        "//cc/bzd/utility:in_place",
     ],
 )

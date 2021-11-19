@@ -104,9 +104,15 @@ public: // Accessors
 	constexpr auto data() const noexcept { return storage_.data(); }
 	constexpr auto data() noexcept { return storage_.dataMutable(); }
 	template <SizeType N>
-	constexpr auto& get() const noexcept { return at(N); }
+	constexpr auto& get() const noexcept
+	{
+		return at(N);
+	}
 	template <SizeType N>
-	constexpr auto& get() noexcept { return at(N); }
+	constexpr auto& get() noexcept
+	{
+		return at(N);
+	}
 
 public: // Emplace
 	template <class... Args>

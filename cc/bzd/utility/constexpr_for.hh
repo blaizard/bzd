@@ -28,7 +28,7 @@ constexpr Int32Type constexprFor(F&& f) noexcept
 		else
 		{
 			f(argument);
-			return constexprFor<Start + Inc, End, Inc>(f);	
+			return constexprFor<Start + Inc, End, Inc>(f);
 		}
 	}
 
