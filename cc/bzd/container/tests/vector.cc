@@ -26,7 +26,7 @@ TEST(ContainerVector, Base)
 
 TEST(ContainerVector, Constexpr)
 {
-	static constexpr bzd::Vector<const int, 5> vector{1, 2, 5, 4, 6};
+	static constexpr bzd::Vector<const int, 5> vector{bzd::inPlace, 1, 2, 5, 4, 6};
 	constexpr const bzd::interface::Vector<const int>& iVector = vector;
 
 	EXPECT_EQ(iVector.capacity(), 5);
@@ -39,7 +39,7 @@ TEST(ContainerVector, Constexpr)
 
 TEST(ContainerVector, NonStaticConstexpr)
 {
-	constexpr bzd::VectorConstexpr<const int, 5> vector{1, 2, 5, 4, 6};
+	constexpr bzd::VectorConstexpr<const int, 5> vector{bzd::inPlace, 1, 2, 5, 4, 6};
 
 	EXPECT_EQ(vector.capacity(), 5);
 	EXPECT_EQ(vector.size(), 5);
