@@ -5,6 +5,8 @@
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/move.hh"
+#include "cc/bzd/container/spans.hh"
+#include "cc/bzd/utility/in_place.hh"
 
 namespace bzd::impl {
 /// Ring buffer implementation.
@@ -13,14 +15,14 @@ namespace bzd::impl {
 template <class T, class Storage>
 class RingBuffer
 {
-protected:
+public: // Traits.
 	using Self = RingBuffer<T, Storage>;
 	using StorageType = Storage;
 	using DataType = typename StorageType::DataType;
 	using DataMutableType = typename StorageType::DataMutableType;
 
-public:
-	constexpr explicit RingBuffer() noexcept = default;
+public: // Constructors/assignments.
+	constexpr RingBuffer() noexcept = default;
 
 	// Cannot be copied nor moved, the ring buffer should be passed by reference instead.
 	constexpr RingBuffer(const Self&) noexcept = delete;
@@ -41,11 +43,23 @@ public: // Accessors.
 	[[nodiscard]] constexpr auto& at(const SizeType index) noexcept { return storage_.dataMutable()[(read_ + index) % capacity()]; }
 	[[nodiscard]] constexpr auto& at(const SizeType index) const noexcept { return storage_.data()[(read_ + index) % capacity()]; }
 
+	/// Get the spans container over the reading memory region.
+	///
+	/// \return The spans container.
+	[[nodiscard]] constexpr auto asSpans() const noexcept
+	{
+		const auto start = read_ % capacity();
+		const auto end = write_ % capacity();
+		const auto secondSpan = (!empty() && (end <= start)) ? bzd::Span<DataType>{storage_.data(), end} : bzd::Span<DataType>{};
+
+		return bzd::Spans<DataType, 2>{inPlace, asSpanForReading(), secondSpan};
+	}
+
 	/// Get the span of contiguous memory containing data starting from the tail.
 	/// In other word, this represents the first half of contiguous data to be read.
 	///
 	/// \return A span containing the contiguous memory region.
-	[[nodiscard]] constexpr bzd::Span<DataType> asSpanForReading() const noexcept
+	[[nodiscard]] constexpr auto asSpanForReading() const noexcept
 	{
 		if (empty())
 		{
@@ -53,19 +67,14 @@ public: // Accessors.
 		}
 		const auto start = read_ % capacity();
 		const auto end = write_ % capacity();
-		if (end > start)
-		{
-			return bzd::Span<DataType>{&storage_.data()[start], end - start};
-		}
-		else
-		{
-			return bzd::Span<DataType>{&storage_.data()[start], capacity() - start};
-		}
+		return bzd::Span<DataType>{&storage_.data()[start], (end > start) ? (end - start) : (capacity() - start)};
 	}
 
 	/// Get the span of contiguous memory containing free slots starting from the head.
 	/// In other word, this represents the first half of contiguous free slots.
-	[[nodiscard]] constexpr bzd::Span<DataMutableType> asSpanForWriting() noexcept
+	///
+	/// \return A span containing the contiguous memory region.
+	[[nodiscard]] constexpr auto asSpanForWriting() noexcept
 	{
 		if (full())
 		{
@@ -73,14 +82,7 @@ public: // Accessors.
 		}
 		const auto start = write_ % capacity();
 		const auto end = read_ % capacity();
-		if (end > start)
-		{
-			return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], end - start};
-		}
-		else
-		{
-			return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], capacity() - start};
-		}
+		return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], (end > start) ? (end - start) : (capacity() - start)};
 	}
 
 public: // Modifiers.

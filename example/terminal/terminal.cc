@@ -16,10 +16,33 @@ public: // API.
 	/// \param stop The special byte until which the read will stop.
 	///
 	/// \return A span containing the result including the stop character.
-	[[nodiscard]] bzd::Async<bzd::Span<bzd::ByteType>> readUntil(const bzd::ByteType stop) noexcept
+	[[nodiscard]] bzd::Async<bzd::Spans<const bzd::ByteType, 2>> readUntil(const bzd::ByteType stop) noexcept
 	{
-		auto readSpan = buffer_.asSpan();
+		auto span = buffer_.asSpanForWriting();
 
+		while (true)
+		{
+			const auto maybeResult = co_await in_.read(span);
+			if (!maybeResult)
+			{
+				co_return bzd::error();
+			}
+			auto result = bzd::move(maybeResult.value());
+			buffer_.produce(result.size());
+
+			// Echo what is being typed
+			co_await out_.write(result);
+
+			// Check if the special byte appear.
+			if (const auto pos = result.find(stop); pos != bzd::npos)
+			{
+				auto sub = buffer_.asSpans().subSpans(0, buffer_.size() - (result.size() - pos));
+				buffer_.consume(sub.size());
+				co_return sub;
+			}
+		}
+
+/*
 		while (true)
 		{
 			bzd::Span<bzd::ByteType> result;
@@ -53,18 +76,18 @@ public: // API.
 			// Move the read span forward
 			readSpan = readSpan.subSpan(result.size());
 		}
+		*/
 	}
 
 private: // Variables.
 	bzd::IStream& in_;
 	bzd::OStream& out_;
-	bzd::Span<bzd::ByteType> left_{};
-	bzd::Array<bzd::ByteType, N> buffer_{};
+	bzd::RingBuffer<bzd::ByteType, N> buffer_{};
 };
 
 bzd::Async<bool> run()
 {
-	Reader<10> reader{bzd::platform::in(), bzd::platform::out()};
+	Reader<16> reader{bzd::platform::in(), bzd::platform::out()};
 
 	for (int i = 0; i < 5; ++i)
 	{

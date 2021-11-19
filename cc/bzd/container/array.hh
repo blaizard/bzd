@@ -4,6 +4,7 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/in_place.hh"
 
 namespace bzd {
 /// \brief A container that encapsulates fixed size arrays.
@@ -15,21 +16,28 @@ namespace bzd {
 template <class T, SizeType N>
 class Array : public impl::Span<T, impl::FixedStorage<T, N>>
 {
-protected:
+public: // Traits.
+	using Self = Array<T, N>;
 	using Parent = impl::Span<T, impl::FixedStorage<T, N>>;
 	using StorageType = typename Parent::StorageType;
 
-public:
+public: // Constructors/assignments.
+	constexpr Array() noexcept = default;
+	constexpr Array(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = default;
+	constexpr Array(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
+
 	template <class... Args>
-	constexpr explicit Array(Args&&... args) noexcept : Parent{StorageType{args...}}
+	constexpr Array(InPlace, Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}}
 	{
 	}
 
-	constexpr Array() noexcept = default;
-
+public:
 	/// \brief Returns the number of elements that the array can hold.
 	///
 	/// \return Maximum number of element this array can hold.
-	constexpr SizeType capacity() const noexcept { return N; }
+	static constexpr SizeType capacity() noexcept { return N; }
+	static constexpr SizeType size() noexcept { return N; }
 };
 } // namespace bzd

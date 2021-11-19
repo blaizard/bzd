@@ -6,6 +6,7 @@
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/in_place.hh"
 
 namespace bzd::impl {
 template <class T, class Storage>

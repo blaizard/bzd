@@ -7,6 +7,7 @@
 #include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/remove_const.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/move.hh"
 
 #include <new> // operator new for "placement new"
 
@@ -47,9 +48,15 @@ public: // Constructor/assignment
 
 	constexpr Span(const Storage& storage) noexcept : storage_{storage} {}
 
-	// Forward the copy constraint to the storage type.
+	// Forward copy constraint to the storage type.
 	template <class U, class V>
 	constexpr Span(const Span<U, V>& span) noexcept : storage_(span.storage_)
+	{
+	}
+
+	// Forward move constraint to the storage type.
+	template <class U, class V>
+	constexpr Span(Span<U, V>&& span) noexcept : storage_(bzd::move(span.storage_))
 	{
 	}
 
@@ -96,6 +103,10 @@ public: // Accessors
 	constexpr auto& back() noexcept { return at(size() - 1); }
 	constexpr auto data() const noexcept { return storage_.data(); }
 	constexpr auto data() noexcept { return storage_.dataMutable(); }
+	template <SizeType N>
+	constexpr auto& get() const noexcept { return at(N); }
+	template <SizeType N>
+	constexpr auto& get() noexcept { return at(N); }
 
 public: // Emplace
 	template <class... Args>

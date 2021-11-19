@@ -634,8 +634,8 @@ private:
 	{
 	public:
 		constexpr FormatterType(Lambdas& lambdas, const LambdasErased& typeErasedLambdas) noexcept :
-			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas}, fcts_{(typeErasedLambdas_.template get<I>())...},
-			ptrs_{(reinterpret_cast<const void*>(&lambdas_.template get<I>()))...}
+			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas}, fcts_{inPlace, (typeErasedLambdas_.template get<I>())...},
+			ptrs_{inPlace, (reinterpret_cast<const void*>(&lambdas_.template get<I>()))...}
 		{
 		}
 

@@ -51,5 +51,6 @@ cc_library(
     deps = [
         "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:move",
     ],
 )

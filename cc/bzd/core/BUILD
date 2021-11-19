@@ -48,6 +48,7 @@ cc_library(
     deps = [
         ":mutex",
         "//cc/bzd/container:span",
+        "//cc/bzd/container:spans",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:lock_guard",

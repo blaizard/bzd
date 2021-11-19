@@ -5,7 +5,7 @@
 
 TEST(Copy, Base)
 {
-	bzd::Array<int, 10> arraySrc{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	bzd::Array<int, 10> arraySrc{bzd::inPlace, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	bzd::Array<int, 10> arrayDst;
 
 	bzd::algorithm::copy(arraySrc.begin(), arraySrc.end(), arrayDst.begin());
