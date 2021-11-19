@@ -18,6 +18,7 @@ cc_library(
         ":result",
         ":ring_buffer",
         ":span",
+        ":spans",
         ":stack",
         ":string",
         ":string_stream",
@@ -56,6 +57,8 @@ cc_library(
         ":span",
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:in_place",
     ],
 )
 
@@ -247,6 +250,20 @@ cc_library(
 )
 
 cc_library(
+    name = "spans",
+    hdrs = [
+        "spans.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":span",
+        ":array",
+        "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/utility:min"
+    ],
+)
+
+cc_library(
     name = "stack",
     hdrs = [
         "stack.hh",
@@ -352,5 +369,6 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:in_place"
     ],
 )

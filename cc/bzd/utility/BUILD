@@ -80,6 +80,8 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:integral_constant",
+        "//cc/bzd/type_traits:invoke_result",
+        "//cc/bzd/type_traits:is_same"
     ],
 )
 

@@ -16,4 +16,9 @@ struct InPlaceType
 };
 template <class T>
 constexpr InPlaceType<T> inPlaceType{};
+
+struct InPlace
+{
+};
+constexpr InPlace inPlace{};
 } // namespace bzd

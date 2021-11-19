@@ -24,6 +24,12 @@
             "**/.git/**": true,
             "bazel-*/**": true
         },
-        "editor.rulers": [120]
+        "editor.rulers": [
+            120
+        ],
+        "editor.autoClosingBrackets": "never",
+        "editor.autoClosingDelete": "never",
+        "editor.autoClosingOvertype": "never",
+        "editor.autoClosingQuotes": "never"
     }
 }
