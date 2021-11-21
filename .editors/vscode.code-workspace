@@ -30,6 +30,7 @@
         "editor.autoClosingBrackets": "never",
         "editor.autoClosingDelete": "never",
         "editor.autoClosingOvertype": "never",
-        "editor.autoClosingQuotes": "never"
+        "editor.autoClosingQuotes": "never",
+        "editor.acceptSuggestionOnEnter": "off",
     }
 }

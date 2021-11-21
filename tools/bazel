@@ -37,13 +37,19 @@ if __name__== "__main__":
 		st = os.stat(bazeliskPath)
 		os.chmod(bazeliskPath, st.st_mode | stat.S_IEXEC)
 
-	# Forward commands to the real bazel
-	processRun([bazeliskPath] + sys.argv[1:])
+	try:
+		# Forward commands to the real bazel
+		processRun([bazeliskPath] + sys.argv[1:])
 
-	# If this script is called by the wrapper, ignore
-	if "BAZELISK_SKIP_WRAPPER" in os.environ:
-		sys.exit(0)
+		# If this script is called by the wrapper, ignore
+		if "BAZELISK_SKIP_WRAPPER" in os.environ:
+			sys.exit(0)
 
-	# Generate the coverage report
-	if args.command == "coverage":
-		processRun([bazeliskPath, "run", "//tools/coverage"])
+		# Generate the coverage report
+		if args.command == "coverage":
+			processRun([bazeliskPath, "run", "//tools/coverage"])
+
+	# Gracefully handle keyboard interrupts.
+	except KeyboardInterrupt:
+		print("<<< Keyboard Interrupt >>> ", file=sys.stderr)
+		pass

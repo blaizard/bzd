@@ -13,7 +13,7 @@ public: // API.
 	/// This function is statefull and if additional bytes are read, they will not be lost
 	/// and re-used for the next call.
 	///
-	/// \param stop The special byte until which the read will stop.
+	/// \param stop The special byte until which the read operation will stop.
 	///
 	/// \return A span containing the result including the stop character.
 	[[nodiscard]] bzd::Async<bzd::Spans<const bzd::ByteType, 2>> readUntil(const bzd::ByteType stop) noexcept
@@ -21,26 +21,33 @@ public: // API.
 		while (true)
 		{
 			auto span = buffer_.asSpanForWriting();
-			const auto maybeResult = co_await in_.read(span);
+			auto maybeResult = co_await in_.read(span);
 			if (!maybeResult)
 			{
-				co_return bzd::error();
+				co_return maybeResult.propagate();
 			}
 			auto result = bzd::move(maybeResult.value());
 			buffer_.produce(result.size());
 
+			// Replace 'del' == 0x7f with '\b' <- back one char.
 			// Echo what is being typed
 			co_await out_.write(result);
 
 			// Check if the special byte appear.
 			if (const auto pos = result.find(stop); pos != bzd::npos)
 			{
-				auto sub = buffer_.asSpans().subSpans(0, buffer_.size() - (result.size() - pos));
+				auto sub = buffer_.asSpans().subSpans(0, buffer_.size() - (result.size() - pos) + 1);
 				buffer_.consume(sub.size());
 				co_return sub;
 			}
 		}
 	}
+
+	/// Read any of the given string, if no match, return an error.
+	[[nodiscard]] bzd::Async<bzd::SizeType> readAnyOf() noexcept { co_return 0; }
+
+	/// Reset the internal buffer, loosing the currently stored data if any.
+	constexpr void clear() noexcept { buffer_.clear(); }
 
 private: // Variables.
 	bzd::IStream& in_;
@@ -61,7 +68,8 @@ bzd::Async<bool> run()
 		}
 		else
 		{
-			co_await bzd::log::error(CSTR("Error while reading."));
+			co_await bzd::log::error(CSTR("Error while reading, reseting state."));
+			reader.clear();
 		}
 	}
 
