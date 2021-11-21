@@ -87,6 +87,8 @@ public:
 
 	constexpr void cancelIfDifferent(const bzd::Executor::Executable& promise) noexcept
 	{
+		// TODO: fix potential bug if some of the coroutines are executed concurrently,
+		// calling cancel on the one running will probably create an UB.
 		if (handle_ && static_cast<bzd::Executor::Executable*>(&handle_.promise()) != &promise)
 		{
 			cancel();
