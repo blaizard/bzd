@@ -7,6 +7,7 @@ cc_library(
         ":channel",
         ":clock",
         ":delay",
+        ":error",
         ":mutex",
         ":registry",
         ":units",
@@ -63,6 +64,25 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/async",
+    ],
+)
+
+cc_library(
+    name = "error",
+    srcs = [
+        "error.cc",
+    ],
+    hdrs = [
+        "error.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+        "//cc/bzd/container:pool",
+        "//cc/bzd/container:string",
+        "//cc/bzd/container:variant",
+        "//cc/bzd/utility:source_location",
+        "//cc/bzd/utility/format",
     ],
 )
 
