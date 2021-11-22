@@ -7,21 +7,24 @@ namespace bzd {
 class SourceLocation
 {
 public:
+	using LineType = UInt32Type;
+
+public:
 	static constexpr SourceLocation current(const char* file = __builtin_FILE(),
 											const char* fileName = toFileName(__builtin_FILE()),
 											const char* function = __builtin_FUNCTION(),
-											UInt32Type line = __builtin_LINE()) noexcept
+											LineType line = __builtin_LINE()) noexcept
 	{
 		return SourceLocation{file, fileName, function, line};
 	}
 
-	constexpr UInt32Type getLine() const noexcept { return line_; }
+	constexpr LineType getLine() const noexcept { return line_; }
 	constexpr const char* getFile() const noexcept { return file_; }
 	constexpr const char* getFileName() const noexcept { return fileName_; }
 	constexpr const char* getFunction() const noexcept { return function_; }
 
 private:
-	constexpr SourceLocation(const char* file, const char* fileName, const char* function, UInt32Type line) :
+	constexpr SourceLocation(const char* file, const char* fileName, const char* function, LineType line) :
 		file_{file}, fileName_{fileName}, function_{function}, line_{line}
 	{
 	}
@@ -47,6 +50,6 @@ private:
 	const char* const file_;
 	const char* const fileName_;
 	const char* const function_;
-	UInt32Type line_;
+	LineType line_;
 };
 } // namespace bzd
