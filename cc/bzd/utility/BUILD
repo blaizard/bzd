@@ -24,6 +24,9 @@ cc_library(
         ":singleton",
         ":source_location",
         ":swap",
+        "//cc/bzd/utility/format",
+        "//cc/bzd/utility/format:stream",
+        "//cc/bzd/utility/format:integral"
     ],
 )
 

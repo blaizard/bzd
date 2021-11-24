@@ -10,7 +10,6 @@ cc_library(
         "//cc/bzd/algorithm:reverse",
         "//cc/bzd/container:string",
         "//cc/bzd/container:vector",
-        "//cc/bzd/core:channel",
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
@@ -31,7 +30,6 @@ cc_library(
         "//cc/bzd/container:string",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
-        "//cc/bzd/core:channel",
         "//cc/bzd/meta:range",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:declval",
@@ -41,5 +39,18 @@ cc_library(
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_pointer",
         "//cc/bzd/utility:constexpr_for",
+    ],
+)
+
+cc_library(
+    name = "stream",
+    hdrs = [
+        "stream.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":format",
+        "//cc/bzd/core/async",
+        "//cc/bzd/core:channel",
     ],
 )

@@ -17,5 +17,6 @@ cc_library(
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:ignore",
+        "//cc/bzd/core:error",
     ],
 )

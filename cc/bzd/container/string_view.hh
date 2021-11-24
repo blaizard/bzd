@@ -51,6 +51,9 @@ public:
 
 namespace bzd {
 using StringView = impl::StringView<const char>;
+
+/// Base class for constant StringView from CSTR(...)
+struct ConstexprStringView {};
 } // namespace bzd
 
 constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept
@@ -60,7 +63,7 @@ constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noe
 
 #define CSTR(strLiteral)                                                                                  \
 	[] {                                                                                                  \
-		using StrView = struct                                                                            \
+		struct StrView : ::bzd::ConstexprStringView                                                       \
 		{                                                                                                 \
 			static constexpr auto value() { return bzd::StringView(strLiteral, sizeof(strLiteral) - 1); } \
 		};                                                                                                \

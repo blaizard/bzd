@@ -9,7 +9,7 @@ class Proxy : public bzd::OStream
 public:
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
-		const auto size = co_await bzd::platform::out().write(data);
+		auto size = co_await bzd::platform::out().write(data);
 		co_return size;
 	}
 };

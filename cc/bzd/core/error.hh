@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/utility/format/format.hh"
@@ -32,6 +33,7 @@ class [[nodiscard]] Error
 {
 public: // Traits.
 	using LineType = SourceLocation::LineType;
+	using Self = Error;
 
 public:
 	template <class ConstString>
@@ -49,6 +51,21 @@ public:
 		{
 			format::toString(maybeString.valueMutable(), bzd::forward<Args>(args)...);
 		}
+	}
+
+	constexpr Error(const Self&) noexcept = delete;
+	constexpr Self& operator=(const Self&) noexcept = delete;
+	constexpr Error(Self&& other) noexcept
+			: source_{other.source_}, line_{other.line_}, type_{other.type_}, message_{}
+	{
+	}
+	constexpr Self& operator=(Self&& other) noexcept
+	{
+		source_ = other.source_;
+		line_ = other.line_;
+		type_ = other.type_;
+		//source_ = other.source_;
+		return *this;
 	}
 
 	~Error() noexcept;
@@ -81,7 +98,11 @@ private:
 	Variant<const StringView, Optional<interface::String&>> message_;
 };
 
-// void error() {}
+template <class A>
+constexpr auto error(const ErrorType type, A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location, type, bzd::forward<A>(a)});
+}
 } // namespace bzd
 
 /// Helper to propagate an error on an asynchronous call.
