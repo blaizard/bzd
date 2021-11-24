@@ -3,7 +3,6 @@
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
-#include "cc/bzd/core/channel.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"

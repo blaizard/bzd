@@ -35,6 +35,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/core/delay.hh"
+#include "cc/bzd/core/error.hh"
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/core/registry.hh"
 
@@ -104,6 +105,7 @@
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/container_of.hh"
 #include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/ignore.hh"

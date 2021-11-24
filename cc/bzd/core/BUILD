@@ -83,6 +83,7 @@ cc_library(
         "//cc/bzd/container:variant",
         "//cc/bzd/utility:source_location",
         "//cc/bzd/utility/format",
+        "//cc/bzd/container:result",
     ],
 )
 

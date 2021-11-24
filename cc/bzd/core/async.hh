@@ -6,6 +6,7 @@
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
+#include "cc/bzd/core/error.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
 
@@ -79,6 +80,15 @@ public:
 	}
 
 	[[nodiscard]] constexpr ResultType&& moveResultOut() noexcept { return bzd::move(handle_.promise().result_.valueMutable()); }
+
+	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOutBis() noexcept
+	{
+		if (handle_)
+		{
+			return bzd::move(handle_.promise().result_.valueMutable());
+		}
+		return nullopt;
+	}
 
 	void onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)> callback) noexcept
 	{
@@ -179,7 +189,7 @@ private:
 
 namespace bzd {
 
-template <class V, class E = bzd::BoolType>
+template <class V, class E = bzd::Error>
 class Async : public impl::Async<bzd::Result<V, E>>
 {
 public:
@@ -248,7 +258,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	}
 
 	// Build the result and return it.
-	ResultType result{asyncs.getResult()...};
+	ResultType result{asyncs.moveResultOutBis()...};
 	co_return result;
 }
 

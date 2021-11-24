@@ -32,14 +32,14 @@ public:
 		SizeType size = 0;
 		for (const auto& span : data.array())
 		{
-			const auto result = co_await write(span);
+			auto result = co_await write(span);
 			if (result)
 			{
 				size += result.value();
 			}
 			else
 			{
-				co_return result.error();
+				co_return result.propagate();
 			}
 		}
 		co_return size;

@@ -3,7 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/logger/backend/logger.hh"
 #include "cc/bzd/core/logger/minimal.hh"
-#include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd::log {

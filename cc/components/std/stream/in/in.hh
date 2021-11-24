@@ -31,7 +31,7 @@ public: // API
 	{
 		if (data.size() == 0)
 		{
-			co_return bzd::error();
+			co_return bzd::error(ErrorType::failure, CSTR("Empty buffer passed to read(...)."));
 		}
 		while (true)
 		{
@@ -41,14 +41,14 @@ public: // API
 			const auto ret = ::poll(&fd, 1, 0);
 			if (ret < 0)
 			{
-				co_return bzd::error();
+				co_return bzd::error(ErrorType::failure, CSTR("Failed ::poll(...)."));
 			}
 			if (ret > 0 && (fd.revents & POLLIN) != 0)
 			{
 				const auto size = ::read(STDIN_FILENO, data.data(), data.size());
 				if (size == -1)
 				{
-					co_return bzd::error();
+					co_return bzd::error(ErrorType::failure, CSTR("Failed ::read(...)."));
 				}
 				co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 			}

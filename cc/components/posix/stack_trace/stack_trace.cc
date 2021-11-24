@@ -4,7 +4,7 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/singleton.hh"
 

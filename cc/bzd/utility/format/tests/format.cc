@@ -1,4 +1,5 @@
 #include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/stream.hh"
 
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_stream.hh"
@@ -169,7 +170,7 @@ void expectStringStreamFormat(const char* expected, Args&&... args)
 	EXPECT_STREQ(stream.str().data(), expected);
 }
 
-TEST(Format_, StringFormat)
+TEST(Format_, StreamStringFormat)
 {
 	expectStringStreamFormat<256>("Hello 12", CSTR("Hello {:d}"), 12);
 	expectStringStreamFormat<256>("Hello -89 12", CSTR("Hello {1} {0:d}"), 12, -89);

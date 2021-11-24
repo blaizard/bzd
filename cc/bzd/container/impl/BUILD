@@ -37,7 +37,7 @@ cc_library(
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
         "//cc/bzd/container:span",
-        "//cc/bzd/core/assert",
+        "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
     ],
 )
