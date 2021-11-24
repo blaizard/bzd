@@ -52,4 +52,4 @@ if __name__== "__main__":
 	# Gracefully handle keyboard interrupts.
 	except KeyboardInterrupt:
 		print("<<< Keyboard Interrupt >>> ", file=sys.stderr)
-		pass
+		sys.exit(1)

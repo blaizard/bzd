@@ -51,11 +51,13 @@ inline Async<void> toStream(bzd::OStream& stream, const bzd::StringView stringVi
 	co_await stream.write(processCommon(stringView, metadata).asBytes());
 }
 
-}
+} // namespace bzd::format::impl
 
 namespace bzd::format {
 
-template <class ConstexprStringView, class... Args, typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
+template <class ConstexprStringView,
+		  class... Args,
+		  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
 Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&... args)
 {
 	// Compile-time format check
@@ -86,4 +88,4 @@ inline Async<void> toStream(bzd::OStream& stream, const StringView& str)
 	co_await stream.write(str.asBytes());
 }
 
-}
+} // namespace bzd::format
