@@ -668,7 +668,9 @@ namespace bzd::format {
  * \param str run-time or compile-time string containing the format.
  * \param args Arguments to be passed for the format.
  */
-template <class ConstexprStringView, class... Args, typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
+template <class ConstexprStringView,
+		  class... Args,
+		  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
 constexpr void toString(bzd::interface::String& str, const ConstexprStringView&, Args&&... args)
 {
 	// Compile-time format check

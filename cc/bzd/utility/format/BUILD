@@ -50,7 +50,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":format",
-        "//cc/bzd/core/async",
         "//cc/bzd/core:channel",
+        "//cc/bzd/core/async",
     ],
 )

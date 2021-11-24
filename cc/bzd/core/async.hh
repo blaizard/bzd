@@ -79,9 +79,7 @@ public:
 		return nullopt;
 	}
 
-	[[nodiscard]] constexpr ResultType&& moveResultOut() noexcept { return bzd::move(handle_.promise().result_.valueMutable()); }
-
-	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOutBis() noexcept
+	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOut() noexcept
 	{
 		if (handle_)
 		{
@@ -132,7 +130,7 @@ public:
 	 * \param executor The executor to run on.
 	 * \return The result of the async.
 	 */
-	ResultType&& run(bzd::Executor& executor) noexcept
+	constexpr ResultType run(bzd::Executor& executor) noexcept
 	{
 		// Associate the executor with this async and enqueue it.
 		enqueue(executor);
@@ -141,10 +139,10 @@ public:
 		executor.run();
 
 		// Return the result.
-		return moveResultOut();
+		return await_resume();
 	}
 
-	ResultType&& sync() noexcept
+	constexpr ResultType sync() noexcept
 	{
 		bzd::Executor executor;
 		return run(executor);
@@ -171,7 +169,7 @@ public: // coroutine specific
 		return true;
 	}
 
-	constexpr ResultType&& await_resume() noexcept { return moveResultOut(); }
+	constexpr ResultType await_resume() noexcept { return bzd::move(moveResultOut().valueMutable()); }
 
 private:
 	friend bzd::coroutine::impl::Enqueue;
@@ -232,7 +230,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	}
 
 	// Build the result and return it.
-	ResultType result{asyncs.moveResultOut()...};
+	ResultType result{asyncs.await_resume()...};
 	co_return result;
 }
 
@@ -258,7 +256,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	}
 
 	// Build the result and return it.
-	ResultType result{asyncs.moveResultOutBis()...};
+	ResultType result{asyncs.moveResultOut()...};
 	co_return result;
 }
 

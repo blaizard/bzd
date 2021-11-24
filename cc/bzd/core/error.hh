@@ -55,16 +55,13 @@ public:
 
 	constexpr Error(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
-	constexpr Error(Self&& other) noexcept
-			: source_{other.source_}, line_{other.line_}, type_{other.type_}, message_{}
-	{
-	}
+	constexpr Error(Self&& other) noexcept : source_{other.source_}, line_{other.line_}, type_{other.type_}, message_{} {}
 	constexpr Self& operator=(Self&& other) noexcept
 	{
 		source_ = other.source_;
 		line_ = other.line_;
 		type_ = other.type_;
-		//source_ = other.source_;
+		// source_ = other.source_;
 		return *this;
 	}
 

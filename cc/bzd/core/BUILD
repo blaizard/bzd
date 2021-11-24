@@ -79,11 +79,11 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:pool",
+        "//cc/bzd/container:result",
         "//cc/bzd/container:string",
         "//cc/bzd/container:variant",
         "//cc/bzd/utility:source_location",
         "//cc/bzd/utility/format",
-        "//cc/bzd/container:result",
     ],
 )
 
