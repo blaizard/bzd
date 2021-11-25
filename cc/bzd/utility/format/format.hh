@@ -420,7 +420,7 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toString(str, value);
+		::toString(str, value);
 		break;
 	case Metadata::Format::BINARY:
 		if (metadata.alternate)
@@ -464,13 +464,13 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 	{
 	case Metadata::Format::AUTO:
 	case Metadata::Format::DECIMAL:
-		bzd::format::toString(str, value);
+		::toString(str, value);
 		break;
 	case Metadata::Format::FIXED_POINT:
-		bzd::format::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
+		::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
 		break;
 	case Metadata::Format::FIXED_POINT_PERCENT:
-		bzd::format::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 		str += "%"_sv;
 		break;
 	case Metadata::Format::BINARY:
@@ -639,8 +639,6 @@ private:
 
 } // namespace bzd::format::impl
 
-namespace bzd::format {
-
 /**
  * \brief String formating.
  *
@@ -670,17 +668,21 @@ namespace bzd::format {
  */
 template <class ConstexprStringView,
 		  class... Args,
-		  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
+		  typename bzd::typeTraits::EnableIf<bzd::typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
 constexpr void toString(bzd::interface::String& str, const ConstexprStringView&, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StringFormatter>(ConstexprStringView::value(), tuple);
+	constexpr const bool isValid =
+		bzd::format::impl::contextValidate<bzd::format::impl::StringFormatter>(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
-	const auto formatter = impl::Formatter<impl::Adapter<impl::RuntimeAssert, impl::StringFormatter>>::make(bzd::forward<Args>(args)...);
-	constexpr impl::Parser<impl::Adapter<impl::NoAssert, impl::StringFormatter>> parser{ConstexprStringView::value()};
+	const auto formatter =
+		bzd::format::impl::Formatter<bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert,
+																bzd::format::impl::StringFormatter>>::make(bzd::forward<Args>(args)...);
+	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StringFormatter>> parser{
+		ConstexprStringView::value()};
 
 	// Run-time call
 	for (const auto& result : parser)
@@ -695,5 +697,3 @@ constexpr void toString(bzd::interface::String& str, const ConstexprStringView&,
 		}
 	}
 }
-
-} // namespace bzd::format

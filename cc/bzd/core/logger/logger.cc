@@ -62,7 +62,7 @@ bzd::Async<void> bzd::Logger::printHeader(const bzd::log::Level level, const Sou
 	/*	const auto ms = bzd::platform::systemClock().getMs();
 
 		const Date date{ms};*/
-	co_await bzd::format::toStream(backend, CSTR("{} [{}:{}] "), levelToStr(level), location.getFileName(), location.getLine());
+	co_await toStream(backend, CSTR("{} [{}:{}] "), levelToStr(level), location.getFileName(), location.getLine());
 }
 
 void bzd::minimal::log::error(const char* message, const SourceLocation location) noexcept

@@ -87,34 +87,35 @@ constexpr void fixedPoint(interface::String& str, const T& n, const SizeType max
 
 namespace bzd::format {
 
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& data)
-{
-	bzd::format::impl::integer(str, data);
-}
-
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isFloatingPoint<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& data, const SizeType maxPrecision = 6)
-{
-	bzd::format::impl::fixedPoint(str, data, maxPrecision);
-}
-
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, void>* = nullptr>
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
 constexpr void toStringHex(bzd::interface::String& str, const T& data, const char* const digits = bzd::format::impl::digits)
 {
 	bzd::format::impl::integer<16>(str, data, digits);
 }
 
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toStringOct(bzd::interface::String& str, const T& data)
 {
 	bzd::format::impl::integer<8>(str, data);
 }
 
-template <class T, bzd::typeTraits::EnableIf<typeTraits::isIntegral<T>, T>* = nullptr>
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toStringBin(bzd::interface::String& str, const T& data)
 {
 	bzd::format::impl::integer<2>(str, data);
+}
+} // namespace bzd::format
+
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
+constexpr void toString(bzd::interface::String& str, const T& data)
+{
+	bzd::format::impl::integer(str, data);
+}
+
+template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
+constexpr void toString(bzd::interface::String& str, const T& data, const bzd::SizeType maxPrecision = 6)
+{
+	bzd::format::impl::fixedPoint(str, data, maxPrecision);
 }
 
 constexpr void toString(bzd::interface::String& str, const bzd::StringView& data)
@@ -126,5 +127,3 @@ constexpr void toString(bzd::interface::String& str, const char c)
 {
 	str.append(c);
 }
-
-} // namespace bzd::format

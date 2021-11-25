@@ -21,11 +21,13 @@ public: // API.
 		while (true)
 		{
 			auto span = buffer_.asSpanForWriting();
-			auto maybeResult = co_await in_.read(span);
-			if (!maybeResult)
+			if (span.empty())
 			{
-				co_return maybeResult.propagate();
+				co_return bzd::error(bzd::ErrorType::failure, CSTR("Ring buffer of {} bytes is full."), buffer_.size());
 			}
+			auto maybeResult = co_await in_.read(span);
+			ASSERT_ASYNC_RESULT(maybeResult);
+
 			auto result = bzd::move(maybeResult.value());
 			buffer_.produce(result.size());
 
@@ -68,7 +70,7 @@ bzd::Async<bool> run()
 		}
 		else
 		{
-			co_await bzd::log::error(CSTR("Error while reading, reseting state."));
+			co_await bzd::log::error(result.error());
 			reader.clear();
 		}
 	}

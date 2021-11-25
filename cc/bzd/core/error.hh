@@ -4,6 +4,7 @@
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/variant.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/format/format.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/source_location.hh"
@@ -36,9 +37,10 @@ public: // Traits.
 	using Self = Error;
 
 public:
-	template <class ConstString>
-	constexpr Error(const SourceLocation& location, const ErrorType type, const ConstString) noexcept :
-		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, ConstString::value()}
+	template <class ConstexprStringView,
+			  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
+	constexpr Error(const SourceLocation& location, const ErrorType type, const ConstexprStringView) noexcept :
+		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, ConstexprStringView::value()}
 	{
 	}
 
@@ -49,21 +51,24 @@ public:
 		auto& maybeString = message_.template get<Optional<interface::String&>>();
 		if (maybeString)
 		{
-			format::toString(maybeString.valueMutable(), bzd::forward<Args>(args)...);
+			::toString(maybeString.valueMutable(), bzd::forward<Args>(args)...);
 		}
 	}
 
 	constexpr Error(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
-	constexpr Error(Self&& other) noexcept : source_{other.source_}, line_{other.line_}, type_{other.type_}, message_{} {}
-	constexpr Self& operator=(Self&& other) noexcept
+
+	// Only move constructor is allowed.
+	constexpr Error(Self&& other) noexcept : source_{other.source_}, line_{other.line_}, type_{other.type_}
 	{
-		source_ = other.source_;
-		line_ = other.line_;
-		type_ = other.type_;
-		// source_ = other.source_;
-		return *this;
+		other.message_.match(
+			[this](Optional<interface::String&>& value) {
+				message_.emplace<Optional<interface::String&>>(bzd::move(value));
+				value.reset();
+			},
+			[this](StringView& value) { message_.emplace<StringView>(bzd::move(value)); });
 	}
+	constexpr Self& operator=(Self&& other) noexcept = delete;
 
 	~Error() noexcept;
 
@@ -71,11 +76,23 @@ public: // Accessors.
 	[[nodiscard]] StringView getSource() const noexcept { return source_; }
 	[[nodiscard]] LineType getLine() const noexcept { return line_; }
 	[[nodiscard]] ErrorType getType() const noexcept { return type_; }
+	[[nodiscard]] StringView getTypeAsString() const noexcept
+	{
+		switch (type_)
+		{
+		case ErrorType::failure:
+			return "failure"_sv;
+		case ErrorType::timeout:
+			return "timeout"_sv;
+		case ErrorType::busy:
+			return "busy"_sv;
+		}
+	}
 	[[nodiscard]] StringView getMessage() const noexcept
 	{
-		if (message_.template is<const StringView>())
+		if (message_.template is<StringView>())
 		{
-			return message_.template get<const StringView>();
+			return message_.template get<StringView>();
 		}
 		auto& maybeString = message_.template get<Optional<interface::String&>>();
 		if (maybeString)
@@ -92,7 +109,7 @@ private:
 	StringView source_;
 	LineType line_;
 	ErrorType type_;
-	Variant<const StringView, Optional<interface::String&>> message_;
+	Variant<StringView, Optional<interface::String&>> message_;
 };
 
 template <class A>
@@ -100,6 +117,63 @@ constexpr auto error(const ErrorType type, A&& a, const SourceLocation location 
 {
 	return bzd::error(Error{location, type, bzd::forward<A>(a)});
 }
+template <class A, class B>
+constexpr auto error(const ErrorType type, A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b)});
+}
+template <class A, class B, class C>
+constexpr auto error(const ErrorType type, A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c)});
+}
+template <class A, class B, class C, class D>
+constexpr auto error(const ErrorType type, A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d)});
+}
+template <class A, class B, class C, class D, class E>
+constexpr auto error(
+	const ErrorType type, A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(
+		Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e)});
+}
+template <class A, class B, class C, class D, class E, class F>
+constexpr auto error(
+	const ErrorType type, A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location,
+							type,
+							bzd::forward<A>(a),
+							bzd::forward<B>(b),
+							bzd::forward<C>(c),
+							bzd::forward<D>(d),
+							bzd::forward<E>(e),
+							bzd::forward<F>(f)});
+}
+template <class A, class B, class C, class D, class E, class F, class G>
+constexpr auto error(const ErrorType type,
+					 A&& a,
+					 B&& b,
+					 C&& c,
+					 D&& d,
+					 E&& e,
+					 F&& f,
+					 G&& g,
+					 const SourceLocation location = SourceLocation::current()) noexcept
+{
+	return bzd::error(Error{location,
+							type,
+							bzd::forward<A>(a),
+							bzd::forward<B>(b),
+							bzd::forward<C>(c),
+							bzd::forward<D>(d),
+							bzd::forward<E>(e),
+							bzd::forward<F>(f),
+							bzd::forward<G>(g)});
+}
+
 } // namespace bzd
 
 /// Helper to propagate an error on an asynchronous call.

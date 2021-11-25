@@ -114,7 +114,7 @@ public:
 	void printNode(ElementPtrType node)
 	{
 		const auto printAddress = [this](const ElementPtrType address) {
-			bzd::format::toStream(bzd::platform::out(),
+			toStream(bzd::platform::out(),
 								  CSTR("{} {}"),
 								  address,
 								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "))

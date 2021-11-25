@@ -17,7 +17,7 @@ bzd::Error::~Error() noexcept
 				bufferPool.release(reinterpret_cast<StringType&>(maybeBuffer.valueMutable()));
 			}
 		},
-		[](const bzd::StringView) {});
+		[](bzd::StringView) {});
 }
 
 bzd::Optional<bzd::interface::String&> bzd::Error::reserveBuffer() noexcept

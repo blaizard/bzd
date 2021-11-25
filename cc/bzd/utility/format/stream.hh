@@ -53,21 +53,23 @@ inline Async<void> toStream(bzd::OStream& stream, const bzd::StringView stringVi
 
 } // namespace bzd::format::impl
 
-namespace bzd::format {
-
 template <class ConstexprStringView,
 		  class... Args,
-		  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
-Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&... args)
+		  typename bzd::typeTraits::EnableIf<bzd::typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
+bzd::Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&... args)
 {
 	// Compile-time format check
 	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<impl::StreamFormatter>(ConstexprStringView::value(), tuple);
+	constexpr const bool isValid =
+		bzd::format::impl::contextValidate<bzd::format::impl::StreamFormatter>(ConstexprStringView::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
-	const auto formatter = impl::Formatter<impl::Adapter<impl::RuntimeAssert, impl::StreamFormatter>>::make(bzd::forward<Args>(args)...);
-	constexpr impl::Parser<impl::Adapter<impl::NoAssert, impl::StreamFormatter>> parser{ConstexprStringView::value()};
+	const auto formatter =
+		bzd::format::impl::Formatter<bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert,
+																bzd::format::impl::StreamFormatter>>::make(bzd::forward<Args>(args)...);
+	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StreamFormatter>> parser{
+		ConstexprStringView::value()};
 
 	// Run-time call
 	for (const auto& result : parser)
@@ -83,9 +85,7 @@ Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args&&...
 	}
 }
 
-inline Async<void> toStream(bzd::OStream& stream, const StringView& str)
+inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::StringView& str)
 {
 	co_await stream.write(str.asBytes());
 }
-
-} // namespace bzd::format
