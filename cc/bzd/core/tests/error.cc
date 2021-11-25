@@ -21,3 +21,20 @@ TEST(Error, Constructor)
 		EXPECT_STREQ(error.getMessage().data(), "fixed, 12, -1, 1, string");
 	}
 }
+
+TEST(Error, MoveConstructor)
+{
+	{
+		auto error = bzd::Error{bzd::SourceLocation::current(), bzd::ErrorType::failure, CSTR("This is a test error")};
+		EXPECT_STREQ(error.getMessage().data(), "This is a test error");
+		const auto dest{bzd::move(error)};
+		EXPECT_STREQ(dest.getMessage().data(), "This is a test error");
+	}
+
+	{
+		auto error = bzd::Error{bzd::SourceLocation::current(), bzd::ErrorType::failure, CSTR("Hello {}"), "world"};
+		EXPECT_STREQ(error.getMessage().data(), "Hello world");
+		const auto dest{bzd::move(error)};
+		EXPECT_STREQ(dest.getMessage().data(), "Hello world");
+	}
+}

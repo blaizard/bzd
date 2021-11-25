@@ -197,6 +197,13 @@ public: // Functions
 		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
+	template <class... Functors>
+	constexpr void match(Functors&&... funcs) noexcept
+	{
+		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
+		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+	}
+
 protected:
 	IndexType id_;
 	// In order to be constexpr compatible, the use of union here is a must because constexpr functions

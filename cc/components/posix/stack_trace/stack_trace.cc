@@ -233,7 +233,7 @@ void callStack() noexcept
 		// Do not print the last stack trace, but ellipsis instead.
 		if (level == MAX_STACK_LEVEL - 1)
 		{
-			bzd::format::toStream(stream, "...\n"_sv).sync();
+			toStream(stream, "...\n"_sv).sync();
 			return;
 		}
 
@@ -246,11 +246,11 @@ void callStack() noexcept
 		if (!info.path.empty())
 		{
 			bzd::String<1024> command;
-			bzd::format::toString(command,
-								  CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
-								  info.path.data(),
-								  reinterpret_cast<bzd::IntPtrType>(info.address),
-								  info.offset);
+			toString(command,
+					 CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
+					 info.path.data(),
+					 reinterpret_cast<bzd::IntPtrType>(info.address),
+					 info.offset);
 
 			{
 				const auto result = exec(command.data());
@@ -276,13 +276,13 @@ void callStack() noexcept
 		}
 
 		// Print stack trace number and memory address
-		bzd::format::toStream(stream,
-							  CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
-							  level,
-							  reinterpret_cast<uint64_t>(address),
-							  symbol.data(),
-							  info.offset,
-							  path.data())
+		toStream(stream,
+				 CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
+				 level,
+				 reinterpret_cast<uint64_t>(address),
+				 symbol.data(),
+				 info.offset,
+				 path.data())
 			.sync();
 	}
 }
@@ -297,7 +297,7 @@ void sigHandler(const int sig)
 	}
 
 	AsyncSignalSafeStream stream;
-	bzd::format::toStream(stream, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig).sync();
+	toStream(stream, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig).sync();
 
 	callStack();
 	std::exit(sig);

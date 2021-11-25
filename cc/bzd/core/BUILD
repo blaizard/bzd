@@ -82,6 +82,7 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container:string",
         "//cc/bzd/container:variant",
+        "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:source_location",
         "//cc/bzd/utility/format",
     ],

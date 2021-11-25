@@ -7,22 +7,22 @@ TEST(ToString, Integer)
 	bzd::String<10> str;
 
 	str.clear();
-	bzd::format::toString(str, 12);
+	toString(str, 12);
 	EXPECT_EQ(str.size(), 2);
 	EXPECT_STREQ(str.data(), "12");
 
 	str.clear();
-	bzd::format::toString(str, -426);
+	toString(str, -426);
 	EXPECT_EQ(str.size(), 4);
 	EXPECT_STREQ(str.data(), "-426");
 
 	str.clear();
-	bzd::format::toString(str, 0);
+	toString(str, 0);
 	EXPECT_EQ(str.size(), 1);
 	EXPECT_STREQ(str.data(), "0");
 
 	str.clear();
-	bzd::format::toString(str, static_cast<long long int>(1234567890));
+	toString(str, static_cast<long long int>(1234567890));
 	EXPECT_EQ(str.size(), 10);
 	EXPECT_STREQ(str.data(), "1234567890");
 }
@@ -32,31 +32,31 @@ TEST(ToString, Float)
 	bzd::String<10> str;
 
 	str.clear();
-	bzd::format::toString(str, 12.45);
+	toString(str, 12.45);
 	EXPECT_STREQ(str.data(), "12.45");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 5);
+	toString(str, 12.50049, 5);
 	EXPECT_STREQ(str.data(), "12.50049");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 4);
+	toString(str, 12.50049, 4);
 	EXPECT_STREQ(str.data(), "12.5005");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 3);
+	toString(str, 12.50049, 3);
 	EXPECT_STREQ(str.data(), "12.5");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 2);
+	toString(str, 12.50049, 2);
 	EXPECT_STREQ(str.data(), "12.5");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 1);
+	toString(str, 12.50049, 1);
 	EXPECT_STREQ(str.data(), "12.5");
 
 	str.clear();
-	bzd::format::toString(str, 12.50049, 0);
+	toString(str, 12.50049, 0);
 	EXPECT_STREQ(str.data(), "13.");
 }
 
@@ -81,9 +81,9 @@ TEST(ToString, Overflow)
 {
 	{
 		bzd::String<0> str;
-		bzd::format::toString(str, 12);
+		toString(str, 12);
 		EXPECT_EQ(str.size(), 0);
-		bzd::format::toString(str, -12);
+		toString(str, -12);
 		EXPECT_EQ(str.size(), 0);
 	}
 
@@ -91,12 +91,12 @@ TEST(ToString, Overflow)
 		bzd::String<1> str;
 
 		str.clear();
-		bzd::format::toString(str, 12);
+		toString(str, 12);
 		EXPECT_EQ(str.size(), 1);
 		EXPECT_STREQ(str.data(), "2");
 
 		str.clear();
-		bzd::format::toString(str, -12);
+		toString(str, -12);
 		EXPECT_EQ(str.size(), 1);
 		EXPECT_STREQ(str.data(), "2");
 	}

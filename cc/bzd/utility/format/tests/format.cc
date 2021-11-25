@@ -162,11 +162,11 @@ template <bzd::SizeType N, class... Args>
 void expectStringStreamFormat(const char* expected, Args&&... args)
 {
 	bzd::String<N> str;
-	bzd::format::toString(str, bzd::forward<Args>(args)...);
+	toString(str, bzd::forward<Args>(args)...);
 	EXPECT_STREQ(str.data(), expected);
 
 	bzd::StringStream<N> stream;
-	bzd::format::toStream(stream, bzd::forward<Args>(args)...).sync();
+	toStream(stream, bzd::forward<Args>(args)...).sync();
 	EXPECT_STREQ(stream.str().data(), expected);
 }
 

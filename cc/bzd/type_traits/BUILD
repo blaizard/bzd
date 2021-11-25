@@ -47,6 +47,7 @@ cc_library(
         ":is_volatile",
         ":remove_const",
         ":remove_cv",
+        ":remove_cvref",
         ":remove_extent",
         ":remove_reference",
         ":remove_volatile",
@@ -539,6 +540,18 @@ cc_library(
     deps = [
         ":remove_const",
         ":remove_volatile",
+    ],
+)
+
+cc_library(
+    name = "remove_cvref",
+    hdrs = [
+        "remove_cvref.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":remove_cv",
+        ":remove_reference",
     ],
 )
 

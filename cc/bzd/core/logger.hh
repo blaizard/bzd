@@ -478,6 +478,12 @@ Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceL
 
 } // namespace bzd::log
 
+// Specialization for bzd::Error type.
+inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::Error& e)
+{
+	co_await toStream(stream, CSTR("[origin:{}:{}] [{}] {}"), e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+}
+
 // ----------------------------------------------------------------------------
 // Implementation
 
@@ -489,7 +495,7 @@ bzd::Async<void> bzd::Logger::print(const bzd::log::Level level, const SourceLoc
 		auto& backend = bzd::backend::Logger::getDefault();
 		auto scope = co_await backend.getLock();
 		co_await printHeader(level, location);
-		co_await bzd::format::toStream(backend, bzd::forward<Args>(args)...);
+		co_await toStream(backend, bzd::forward<Args>(args)...);
 		co_await backend.write("\n"_sv.asBytes());
 	}
 }
