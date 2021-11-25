@@ -41,14 +41,14 @@ public: // API
 			const auto ret = ::poll(&fd, 1, 0);
 			if (ret < 0)
 			{
-				co_return bzd::error(ErrorType::failure, CSTR("Failed ::poll(...)."));
+				co_return bzd::error(ErrorType::failure, CSTR("Failed ::poll(...) with errno {}."), errno);
 			}
 			if (ret > 0 && (fd.revents & POLLIN) != 0)
 			{
 				const auto size = ::read(STDIN_FILENO, data.data(), data.size());
-				if (size == -1)
+				if (size < 0)
 				{
-					co_return bzd::error(ErrorType::failure, CSTR("Failed ::read(...)."));
+					co_return bzd::error(ErrorType::failure, CSTR("Failed ::read(...) with errno {}."), errno);
 				}
 				co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 			}
