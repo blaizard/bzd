@@ -87,6 +87,7 @@ public: // Accessors.
 		case ErrorType::busy:
 			return "busy"_sv;
 		}
+		return "unknown"_sv;
 	}
 	[[nodiscard]] StringView getMessage() const noexcept
 	{
