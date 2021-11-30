@@ -115,9 +115,9 @@ public:
 	{
 		const auto printAddress = [this](const ElementPtrType address) {
 			toStream(bzd::platform::out(),
-								  CSTR("{} {}"),
-								  address,
-								  (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "))
+					 CSTR("{} {}"),
+					 address,
+					 (address == &this->front_) ? " (F)" : ((address == &this->back_) ? " (B)" : "    "))
 				.sync();
 		};
 

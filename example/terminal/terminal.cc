@@ -33,7 +33,8 @@ public: // API.
 
 			// Replace 'del' == 0x7f with '\b' <- back one char.
 			// Echo what is being typed
-			co_await out_.write(result);
+			auto writeResult = co_await out_.write(result);
+			ASSERT_ASYNC_RESULT(writeResult);
 
 			// Check if the special byte appear.
 			if (const auto pos = result.find(stop); pos != bzd::npos)

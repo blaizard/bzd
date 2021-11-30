@@ -73,10 +73,10 @@ public:
 	~Error() noexcept;
 
 public: // Accessors.
-	[[nodiscard]] StringView getSource() const noexcept { return source_; }
-	[[nodiscard]] LineType getLine() const noexcept { return line_; }
-	[[nodiscard]] ErrorType getType() const noexcept { return type_; }
-	[[nodiscard]] StringView getTypeAsString() const noexcept
+	[[nodiscard]] constexpr StringView getSource() const noexcept { return source_; }
+	[[nodiscard]] constexpr LineType getLine() const noexcept { return line_; }
+	[[nodiscard]] constexpr ErrorType getType() const noexcept { return type_; }
+	[[nodiscard]] constexpr StringView getTypeAsString() const noexcept
 	{
 		switch (type_)
 		{
@@ -89,7 +89,7 @@ public: // Accessors.
 		}
 		return "unknown"_sv;
 	}
-	[[nodiscard]] StringView getMessage() const noexcept
+	[[nodiscard]] constexpr StringView getMessage() const noexcept
 	{
 		if (message_.template is<StringView>())
 		{

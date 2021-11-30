@@ -4,6 +4,7 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/forward_cast.hh"
 #include "cc/bzd/utility/in_place.hh"
 
 namespace bzd {
