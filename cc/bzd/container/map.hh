@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
@@ -22,7 +23,7 @@ public:
 	constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept : data_(data) {}
 
 	/// Search for a specific element in the map.
-	constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
+	[[nodiscard]] constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
 	{
 		for (auto it = data_.begin(); it != data_.end(); ++it)
 		{
@@ -34,30 +35,38 @@ public:
 		return bzd::nullopt;
 	}
 
-	constexpr V& operator[](const K& key) const
+	[[nodiscard]] constexpr V& operator[](const K& key) const
 	{
 		auto result = find(key);
 		bzd::assert::isTrue(result.hasValue(), "Key does not exists");
 		return result.valueMutable()->second;
 	}
 
-	constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
+	[[nodiscard]] constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
+
+	/// Wether or not the map contains elements.
+	[[nodiscard]] constexpr bool empty() const noexcept { return data_.empty(); }
 
 	/// Insert a new element or replace the existing one
-	constexpr void insert(const K& key, V&& value)
+	template <class U>
+	constexpr void insert(const K& key, U&& value)
 	{
 		auto result = find(key);
 		if (result)
 		{
-			insert(result.value(), bzd::forward<V>(value));
+			insert(result.value(), bzd::forward<U>(value));
 		}
 		else
 		{
-			data_.pushBack({key, bzd::forward<V>(value)});
+			data_.pushBack({key, bzd::forward<U>(value)});
 		}
 	}
 
-	constexpr void insert(const Iterator& it, V&& value) { it->second = bzd::forward<V>(value); }
+	template <class U>
+	constexpr void insert(const Iterator& it, U&& value)
+	{
+		it->second = bzd::forward<U>(value);
+	}
 
 protected:
 	bzd::interface::Vector<Element>& data_;
@@ -79,6 +88,7 @@ private:
 
 public:
 	constexpr Map() : interface::Map<K, V>(data_) {}
+	constexpr Map(const Tuple<Element>&) : interface::Map<K, V>(data_) {}
 
 protected:
 	bzd::Vector<Element, N> data_;

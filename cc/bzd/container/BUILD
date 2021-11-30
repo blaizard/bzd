@@ -58,6 +58,7 @@ cc_library(
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:forward_cast",
         "//cc/bzd/utility:in_place",
     ],
 )
@@ -112,6 +113,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":optional",
+        ":tuple",
         ":vector",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",

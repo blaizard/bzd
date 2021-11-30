@@ -578,19 +578,20 @@ public:
 	template <class... Args>
 	static constexpr auto make(Args&&... args) noexcept
 	{
-		return makeInternal(bzd::meta::Range<0, sizeof...(Args)>{}, bzd::forward<Args>(args)...);
+		// Make the actual lambda
+		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
+			return Adapter::process(transport, args, metadata);
+		}...);
+
+		return FormatterType<decltype(lambdas)>{lambdas};
 	}
 
 private:
-	template <class Lambdas, class LambdasErased, SizeType... I>
+	template <class Lambdas>
 	class FormatterType
 	{
 	public:
-		constexpr FormatterType(Lambdas& lambdas, const LambdasErased& typeErasedLambdas) noexcept :
-			lambdas_{lambdas}, typeErasedLambdas_{typeErasedLambdas}, fcts_{inPlace, (typeErasedLambdas_.template get<I>())...},
-			ptrs_{inPlace, (reinterpret_cast<const void*>(&lambdas_.template get<I>()))...}
-		{
-		}
+		constexpr FormatterType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
 		constexpr ReturnType process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
@@ -604,37 +605,85 @@ private:
 			});
 		}
 
-		// TODO: clean this, get rid of the lambda with erased type, so that there is no pointer + reinterpret_cast anymore.
 		ReturnType processAsync(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
-			co_await fcts_[index](ptrs_[index], transport, metadata);
+			if constexpr (Lambdas::size() > 0)
+			{
+				if (index == 0)
+				{
+					co_await lambdas_.template get<0>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 1)
+			{
+				if (index == 1)
+				{
+					co_await lambdas_.template get<1>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 2)
+			{
+				if (index == 2)
+				{
+					co_await lambdas_.template get<2>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 3)
+			{
+				if (index == 3)
+				{
+					co_await lambdas_.template get<3>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 4)
+			{
+				if (index == 4)
+				{
+					co_await lambdas_.template get<4>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 5)
+			{
+				if (index == 5)
+				{
+					co_await lambdas_.template get<5>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 6)
+			{
+				if (index == 6)
+				{
+					co_await lambdas_.template get<6>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 7)
+			{
+				if (index == 7)
+				{
+					co_await lambdas_.template get<7>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 8)
+			{
+				if (index == 8)
+				{
+					co_await lambdas_.template get<8>()(transport, metadata);
+				}
+			}
+			if constexpr (Lambdas::size() > 9)
+			{
+				if (index == 9)
+				{
+					co_await lambdas_.template get<9>()(transport, metadata);
+				}
+			}
+			static_assert(Lambdas::size() <= 10, "Too many arguments passed to format, not supported.");
 		}
 
 	private:
 		const Lambdas lambdas_;
-		const LambdasErased typeErasedLambdas_;
-		const bzd::Array<ReturnType (*)(const void*, TransportType&, const Metadata&), Lambdas::size()> fcts_;
-		const bzd::Array<const void*, Lambdas::size()> ptrs_;
 	};
-
-private:
-	template <SizeType... I, class... Args>
-	static constexpr auto makeInternal(bzd::meta::range::Type<I...>, Args&&... args) noexcept
-	{
-		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
-			return Adapter::process(transport, args, metadata);
-		}...);
-		using LambdaTupleType = decltype(lambdas);
-		// Make the lambda with type erasure
-		const auto typeErasedLambdas = bzd::makeTuple([](const void* lambda, TransportType& out, const Metadata& metadata) -> auto {
-			return (*reinterpret_cast<const typename LambdaTupleType::template ItemType<I>*>(lambda))(out, metadata);
-		}...);
-		using LambdaTypeErasedTupleType = decltype(typeErasedLambdas);
-
-		return FormatterType<LambdaTupleType, LambdaTypeErasedTupleType, I...>{lambdas, typeErasedLambdas};
-	}
 };
 
 } // namespace bzd::format::impl
