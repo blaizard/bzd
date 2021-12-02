@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 

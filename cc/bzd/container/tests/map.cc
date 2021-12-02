@@ -25,9 +25,11 @@ TEST(ContainerMap, Constructor)
 	bzd::Map<int, int, 12> emptyMap{};
 	EXPECT_TRUE(emptyMap.empty());
 
-	/*	struct Templ {int x; int y;};
+	struct Templ
+	{
+		int x;
+		int y;
+	};
 
-		bzd::Array<Templ, 2> map{bzd::inPlace,
-			{12, 23}, {12, 23}
-		};*/
+	[[maybe_unused]] bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
 }

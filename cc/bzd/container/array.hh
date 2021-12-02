@@ -4,8 +4,9 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/utility/forward_cast.hh"
 #include "cc/bzd/utility/in_place.hh"
+
+#include <initializer_list>
 
 namespace bzd {
 /// \brief A container that encapsulates fixed size arrays.
@@ -30,9 +31,11 @@ public: // Constructors/assignments.
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr Array(InPlace, Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}}
+	constexpr Array(InPlace, Args&&... args) noexcept : Parent{StorageType{inPlace, bzd::forward<Args>(args)...}}
 	{
 	}
+
+	constexpr explicit Array(std::initializer_list<T> list) noexcept : Parent{StorageType{list.begin(), list.end()}} {}
 
 public:
 	/// \brief Returns the number of elements that the array can hold.

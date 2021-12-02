@@ -32,6 +32,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/algorithm:copy_n",
+        "//cc/bzd/container/iterator:distance",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:in_place",
+        "//cc/bzd/utility:min",
     ],
 )
