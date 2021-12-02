@@ -11,7 +11,6 @@ cc_library(
         ":constexpr_for",
         ":container_of",
         ":forward",
-        ":forward_cast",
         ":ignore",
         ":in_place",
         ":lock_guard",
@@ -109,23 +108,6 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:remove_reference",
-    ],
-)
-
-cc_library(
-    name = "forward_cast",
-    hdrs = [
-        "forward_cast.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":forward",
-        "//cc/bzd/type_traits:conditional",
-        "//cc/bzd/type_traits:is_const",
-        "//cc/bzd/type_traits:is_lvalue_reference",
-        "//cc/bzd/type_traits:is_rvalue_reference",
-        "//cc/bzd/type_traits:is_volatile",
-        "//cc/bzd/type_traits:remove_cvref",
     ],
 )
 
