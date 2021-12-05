@@ -4,10 +4,12 @@
 
 #include <random>
 
+#define BZDTEST_FCT_NAME_(testCaseName, testName) functionBzdTest_##testCaseName##_##testName
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
+#define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_(testCaseName, testName)                                                                           \
+#define BZDTEST_(testCaseName, testName, decorator)                                                                \
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                   \
 	{                                                                                                              \
 	public:                                                                                                        \
@@ -16,7 +18,23 @@
 	};                                                                                                             \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
 		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
+	decorator void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test);   \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const                       \
+	{                                                                                                              \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                           \
+	}                                                                                                              \
+	decorator void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+
+#define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                         \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)()    \
+	{                                                                          \
+		constexpr auto constexprFct = []() -> bool {                           \
+			constexpr ::bzd::test::Context context{};                          \
+			BZDTEST_FCT_NAME_(testCaseName, testName)(context);                \
+			return true;                                                       \
+		};                                                                     \
+		static_assert(constexprFct(), "Compile time expression evalulation."); \
+	}
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
@@ -37,6 +55,30 @@
 	if (!((expression1) != (expression2)))                                                     \
 	{                                                                                          \
 		failFct("Failure\nTest: " #expression1 " != " #expression2, expression1, expression2); \
+	}
+
+#define BZDTEST_TEST_LT_(expression1, expression2, failFct)                                   \
+	if (!((expression1) < (expression2)))                                                     \
+	{                                                                                         \
+		failFct("Failure\nTest: " #expression1 " < " #expression2, expression1, expression2); \
+	}
+
+#define BZDTEST_TEST_LE_(expression1, expression2, failFct)                                    \
+	if (!((expression1) <= (expression2)))                                                     \
+	{                                                                                          \
+		failFct("Failure\nTest: " #expression1 " <= " #expression2, expression1, expression2); \
+	}
+
+#define BZDTEST_TEST_GT_(expression1, expression2, failFct)                                   \
+	if (!((expression1) > (expression2)))                                                     \
+	{                                                                                         \
+		failFct("Failure\nTest: " #expression1 " > " #expression2, expression1, expression2); \
+	}
+
+#define BZDTEST_TEST_GE_(expression1, expression2, failFct)                                    \
+	if (!((expression1) >= (expression2)))                                                     \
+	{                                                                                          \
+		failFct("Failure\nTest: " #expression1 " >= " #expression2, expression1, expression2); \
 	}
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                        \
@@ -225,22 +267,22 @@ namespace bzd::test {
 class Context
 {
 public:
-	Context() : seed_{::std::random_device{}()}, gen_{seed_} {}
+	constexpr Context() : seed_{53267} {}
 
 	template <class T>
-	[[nodiscard]] T randInt(const T min, const T max) noexcept
+	[[nodiscard]] T randInt(const T min, const T max) const noexcept
 	{
+		static ::std::mt19937 gen{seed_};
 		::std::uniform_int_distribution<T> distribution(min, max);
-		return distribution(gen_);
+		return distribution(gen);
 	}
 
-	[[nodiscard]] bool randBool() noexcept { return (randInt(0, 1) == 1); }
+	[[nodiscard]] bool randBool() const noexcept { return (randInt(0, 1) == 1); }
 
 	[[nodiscard]] auto getSeed() const noexcept { return seed_; }
 
 private:
 	unsigned int seed_;
-	::std::mt19937 gen_;
 };
 
 class Test

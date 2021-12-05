@@ -89,6 +89,9 @@ public: // API
 
 	constexpr DataType* operator->() const { return data_; }
 
+	constexpr auto& operator[](const SizeType index) noexcept { return data_[index]; }
+	constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
+
 private:
 	DataType* data_;
 };
