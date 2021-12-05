@@ -31,5 +31,8 @@ TEST(ContainerMap, Constructor)
 		int y;
 	};
 
-	[[maybe_unused]] bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
+	[[maybe_unused]] constexpr bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
+
+	static constexpr bzd::Map<int, int, 12> dataMap{{12, 32}, {1, 2}};
+	EXPECT_EQ(dataMap.size(), 2);
 }

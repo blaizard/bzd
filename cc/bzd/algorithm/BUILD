@@ -8,6 +8,7 @@ cc_library(
         ":copy_n",
         ":fill",
         ":reverse",
+        ":sort",
     ],
 )
 
@@ -44,6 +45,19 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/utility:swap",
+    ],
+)
+
+cc_library(
+    name = "sort",
+    hdrs = [
+        "sort.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container/iterator:distance",
+        "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:swap",
     ],
 )

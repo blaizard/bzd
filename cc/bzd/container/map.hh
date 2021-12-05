@@ -6,6 +6,8 @@
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
 
+#include <initializer_list>
+
 namespace bzd::impl {
 /// \brief Flat map implementation.
 template <class K, class V>
@@ -44,8 +46,11 @@ public:
 
 	[[nodiscard]] constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
 
-	/// Wether or not the map contains elements.
+	/// Whether or not the map contains elements.
 	[[nodiscard]] constexpr bool empty() const noexcept { return data_.empty(); }
+
+	/// Get the number of elements in the map.
+	[[nodiscard]] constexpr SizeType size() const noexcept { return data_.size(); }
 
 	/// Insert a new element or replace the existing one
 	template <class U>
@@ -87,8 +92,14 @@ private:
 	using typename interface::Map<K, V>::Element;
 
 public:
-	constexpr Map() : interface::Map<K, V>(data_) {}
-	constexpr Map(const Tuple<Element>&) : interface::Map<K, V>(data_) {}
+	constexpr Map() : interface::Map<K, V>{data_} {}
+	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V>{data_}
+	{
+		for (const auto& [key, value] : list)
+		{
+			this->insert(key, value);
+		}
+	}
 
 protected:
 	bzd::Vector<Element, N> data_;
