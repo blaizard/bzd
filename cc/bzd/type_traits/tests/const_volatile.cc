@@ -1,6 +1,6 @@
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/remove_cv.hh"
-#include "cc_test/test.hh"
 
 TEST(TypeTraits, removeCV)
 {

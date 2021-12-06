@@ -7,6 +7,6 @@ bzd_cc_test(
         "@linux_x86_64_clang//:compiler",
     ],
     deps = [
-        "//tools/cc_test",
+        "//cc/bzd/test",
     ],
 )

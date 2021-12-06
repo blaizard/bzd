@@ -1,9 +1,9 @@
 #include "cc/bzd/algorithm/fill.hh"
 
 #include "cc/bzd/container/array.hh"
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
-TEST(Fill, Base)
+TEST_CONSTEXPR_BEGIN(Fill, Constexpr)
 {
 	bzd::Array<int, 10> array;
 
@@ -14,3 +14,4 @@ TEST(Fill, Base)
 		EXPECT_EQ(value, 42);
 	}
 }
+TEST_CONSTEXPR_END(Fill, Constexpr)

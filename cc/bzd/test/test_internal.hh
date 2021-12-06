@@ -9,7 +9,7 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_(testCaseName, testName, decorator)                                                                \
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                   \
 	{                                                                                                              \
 	public:                                                                                                        \
@@ -17,23 +17,32 @@
 		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                     \
 	};                                                                                                             \
 	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
-		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});                    \
-	decorator void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test);   \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const                       \
-	{                                                                                                              \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                           \
-	}                                                                                                              \
-	decorator void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});
 
-#define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                         \
-	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)()    \
-	{                                                                          \
-		constexpr auto constexprFct = []() -> bool {                           \
-			constexpr ::bzd::test::Context context{};                          \
-			BZDTEST_FCT_NAME_(testCaseName, testName)(context);                \
-			return true;                                                       \
-		};                                                                     \
-		static_assert(constexprFct(), "Compile time expression evalulation."); \
+#define BZDTEST_(testCaseName, testName)      \
+	BZDTEST_REGISTER_(testCaseName, testName) \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
+
+#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                     \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                \
+	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);   \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                 \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
+	{                                                                                        \
+		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                            \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                     \
+	}                                                                                        \
+	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+
+#define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                               \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)()          \
+	{                                                                                \
+		constexpr auto constexprFct = []() -> bool {                                 \
+			constexpr ::bzd::test::Context context{};                                \
+			BZDTEST_FCT_NAME_(testCaseName, testName)(context);                      \
+			return true;                                                             \
+		};                                                                           \
+		static_assert(constexprFct(), "Compile time expression evaluation failed."); \
 	}
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
@@ -112,7 +121,11 @@
 
 namespace bzd::test::impl {
 bool strcmp(const char* str1, const char* str2);
-bool near(const double number1, const double number2, const double absError);
+constexpr bool near(const double number1, const double number2, const double absError)
+{
+	const double diff = (number1 > number2) ? (number1 - number2) : (number2 - number1);
+	return (diff <= absError);
+}
 
 template <class T>
 class Value

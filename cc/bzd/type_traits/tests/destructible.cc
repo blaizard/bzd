@@ -1,5 +1,5 @@
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/type_traits/is_destructible.hh"
-#include "cc_test/test.hh"
 
 TEST(TypeTraits, isDestructible)
 {

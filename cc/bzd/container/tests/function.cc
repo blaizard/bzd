@@ -1,7 +1,7 @@
 #include "cc/bzd/container/function.hh"
 
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc_test/test.hh"
 
 TEST(ContainerFunction, nonCapturingLambda)
 {

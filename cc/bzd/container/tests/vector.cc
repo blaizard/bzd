@@ -1,6 +1,6 @@
 #include "cc/bzd/container/vector.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ContainerVector, Base)
 {
@@ -24,18 +24,19 @@ TEST(ContainerVector, Base)
 	EXPECT_EQ(iVector[2], -2);
 }
 
-TEST(ContainerVector, Constexpr)
+TEST_CONSTEXPR_BEGIN(ContainerVector, Constexpr)
 {
-	static constexpr bzd::Vector<const int, 5> vector{bzd::inPlace, 1, 2, 5, 4, 6};
-	constexpr const bzd::interface::Vector<const int>& iVector = vector;
+	bzd::Vector<const int, 5> vector{bzd::inPlace, 1, 2, 5, 4, 6};
+	const bzd::interface::Vector<const int>& iVector = vector;
 
 	EXPECT_EQ(iVector.capacity(), 5);
 	EXPECT_EQ(iVector.size(), 5);
 
-	static constexpr bzd::Vector<const int, 3> testDefault{};
+	bzd::Vector<const int, 3> testDefault{};
 	EXPECT_EQ(testDefault.capacity(), 3);
 	EXPECT_EQ(testDefault.size(), 0);
 }
+TEST_CONSTEXPR_END(ContainerVector, Constexpr)
 
 TEST(ContainerVector, NonStaticConstexpr)
 {

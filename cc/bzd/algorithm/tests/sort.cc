@@ -1,7 +1,7 @@
 #include "cc/bzd/algorithm/sort.hh"
 
 #include "cc/bzd/container/array.hh"
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(Sort, Base)
 {

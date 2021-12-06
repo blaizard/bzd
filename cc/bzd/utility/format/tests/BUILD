@@ -8,7 +8,7 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/container:string_stream",
         "//cc/bzd/core/assert",
+        "//cc/bzd/test",
         "//cc/bzd/utility/format",
-        "//tools/cc_test",
     ],
 )

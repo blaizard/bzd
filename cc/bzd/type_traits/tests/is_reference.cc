@@ -1,6 +1,6 @@
 #include "cc/bzd/type_traits/is_reference.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(TypeTraits, isReference)
 {

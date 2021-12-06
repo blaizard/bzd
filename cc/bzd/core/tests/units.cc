@@ -1,6 +1,6 @@
 #include "cc/bzd/core/units.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 #include <iostream>
 

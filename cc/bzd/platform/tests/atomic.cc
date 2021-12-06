@@ -1,7 +1,7 @@
 #include "cc/bzd/platform/atomic.hh"
 
 #include "cc/bzd/platform/types.hh"
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 template <class T>
 void baseTypeUnitTest()

@@ -1,4 +1,4 @@
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 #include <cstring>
 #include <iostream>
@@ -20,11 +20,6 @@ namespace bzd::test::impl {
 bool strcmp(const char* str1, const char* str2)
 {
 	return (::std::strcmp(str1, str2) == 0);
-}
-bool near(const double number1, const double number2, const double absError)
-{
-	const double diff = ::fabs(number1 - number2);
-	return (diff <= absError);
 }
 } // namespace bzd::test::impl
 

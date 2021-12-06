@@ -10,7 +10,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         "//cc/bzd/container:array",
         "//cc/bzd/container:string",
         "//cc/bzd/core/assert",
-        "//tools/cc_test",
+        "//cc/bzd/test",
     ],
 ) for path in glob([
     "*.cc",
