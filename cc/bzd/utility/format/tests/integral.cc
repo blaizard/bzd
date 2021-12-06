@@ -1,6 +1,6 @@
 #include "cc/bzd/utility/format/integral.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ToString, Integer)
 {

@@ -1,6 +1,6 @@
 #include "cc/bzd/container/array.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ContainerArray, Base)
 {
@@ -11,9 +11,10 @@ TEST(ContainerArray, Base)
 	EXPECT_EQ(array[2], 4);
 }
 
-TEST(ContainerArray, Constexpr)
+TEST_CONSTEXPR_BEGIN(ContainerArray, Constexpr)
 {
 	constexpr bzd::Array<int, 5> array{};
 	EXPECT_EQ(array.capacity(), 5);
 	EXPECT_EQ(array.size(), 5);
 }
+TEST_CONSTEXPR_END(ContainerArray, Constexpr)

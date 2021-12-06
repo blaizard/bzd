@@ -1,7 +1,7 @@
 #include "cc/bzd/algorithm/reverse.hh"
 
 #include "cc/bzd/container/string.hh"
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(Reverse, Base)
 {

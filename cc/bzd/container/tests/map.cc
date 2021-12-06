@@ -1,6 +1,6 @@
 #include "cc/bzd/container/map.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ContainerMap, single)
 {
@@ -20,7 +20,7 @@ TEST(ContainerMap, single)
 	}
 }
 
-TEST(ContainerMap, Constructor)
+TEST_CONSTEXPR_BEGIN(ContainerMap, Constexpr)
 {
 	bzd::Map<int, int, 12> emptyMap{};
 	EXPECT_TRUE(emptyMap.empty());
@@ -31,8 +31,9 @@ TEST(ContainerMap, Constructor)
 		int y;
 	};
 
-	[[maybe_unused]] constexpr bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
+	[[maybe_unused]] bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
 
-	static constexpr bzd::Map<int, int, 12> dataMap{{12, 32}, {1, 2}};
+	bzd::Map<int, int, 12> dataMap{{12, 32}, {1, 2}};
 	EXPECT_EQ(dataMap.size(), 2);
 }
+TEST_CONSTEXPR_END(ContainerMap, Constexpr)

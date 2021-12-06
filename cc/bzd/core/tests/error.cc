@@ -1,6 +1,6 @@
 #include "cc/bzd/core/error.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(Error, Constructor)
 {

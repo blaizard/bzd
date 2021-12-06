@@ -1,6 +1,6 @@
 #include "cc/bzd/utility/constexpr_for.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ConstexprFor, Base)
 {

@@ -1,6 +1,6 @@
 #include "cc/bzd/container/span.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ContainerSpan, Base)
 {
@@ -100,10 +100,10 @@ TEST(ContainerSpan, ConstConstIterator)
 	}
 }
 
-TEST(ContainerSpan, Constexpr)
+TEST_CONSTEXPR_BEGIN(ContainerSpan, Constexpr)
 {
-	static constexpr int array[5] = {0, 1, 2, 3, 4};
-	constexpr bzd::Span<const int> span(array, 5);
+	int array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<const int> span(array, 5);
 
 	{
 		auto it = span.begin();
@@ -115,6 +115,7 @@ TEST(ContainerSpan, Constexpr)
 		EXPECT_EQ(++it, span.end());
 	}
 }
+TEST_CONSTEXPR_END(ContainerSpan, Constexpr)
 
 TEST(ContainerSpan, Copy)
 {

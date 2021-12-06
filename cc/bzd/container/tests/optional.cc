@@ -1,8 +1,8 @@
 #include "cc/bzd/container/optional.hh"
 
 #include "cc/bzd/container/result.hh"
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types.hh"
-#include "cc_test/test.hh"
 
 TEST(ContainerOptional, simpleData)
 {
@@ -91,7 +91,7 @@ TEST(ContainerOptional, simpleNoData)
 	EXPECT_EQ(v.valueOr(10), 10);
 }
 
-TEST(ContainerOptional, constexprType)
+TEST_CONSTEXPR_BEGIN(ContainerOptional, Constexpr)
 {
 	constexpr bzd::Optional<int> v;
 
@@ -111,6 +111,7 @@ TEST(ContainerOptional, constexprType)
 	EXPECT_TRUE(vMove);
 	EXPECT_EQ(vMove.value(), 23);
 }
+TEST_CONSTEXPR_END(ContainerOptional, Constexpr)
 
 TEST(ContainerOptional, complexData)
 {

@@ -1,7 +1,7 @@
 #include "cc/bzd/container/ring_buffer.hh"
 
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/min.hh"
-#include "cc_test/test.hh"
 
 TEST(RingBuffer, single)
 {

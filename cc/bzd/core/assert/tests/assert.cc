@@ -1,6 +1,6 @@
 #include "cc/bzd/core/assert.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(Assert, Base)
 {

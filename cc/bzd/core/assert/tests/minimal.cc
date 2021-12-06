@@ -1,6 +1,6 @@
 #include "cc/bzd/core/assert/minimal.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(AssertMinimal, Base)
 {

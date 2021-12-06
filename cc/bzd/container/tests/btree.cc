@@ -1,6 +1,6 @@
 #include "cc/bzd/container/btree.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(ContainerBTree, base)
 {

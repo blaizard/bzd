@@ -1,6 +1,6 @@
 #include "cc/bzd/core/registry.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(Registry, Base)
 {

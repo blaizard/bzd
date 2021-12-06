@@ -1,14 +1,16 @@
 #pragma once
 
-#include "cc_test/test_internal.hh"
+#include "cc/bzd/test/test_internal.hh"
 
 /// Defines an individual test named testCaseName in the test suite testName, consisting of the given statements.
 /// The statements within the test body can be any code under test. Assertions used within the test body determine the outcome of the test.
-#define TEST(testCaseName, testName) BZDTEST_(testCaseName, testName, )
+#define TEST(testCaseName, testName) BZDTEST_(testCaseName, testName)
 
 /// Executes a test case at compile time.
-#define TEST_CONSTEXPR_BEGIN(testCaseName, testName) BZDTEST_(testCaseName, testName, constexpr)
+/// \{
+#define TEST_CONSTEXPR_BEGIN(testCaseName, testName) BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)
 #define TEST_CONSTEXPR_END(testCaseName, testName) BZDTEST_CONSTEXPR_END_(testCaseName, testName)
+/// \}
 
 /// Verifies that condition is true.
 /// \{

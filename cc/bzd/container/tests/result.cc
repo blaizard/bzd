@@ -1,6 +1,6 @@
 #include "cc/bzd/container/result.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 #include <string>
 
@@ -13,12 +13,13 @@ constexpr bzd::Result<void, int> constexprResultFct(const bool makeError)
 	return bzd::nullresult;
 }
 
-TEST(ContainerResult, constexprType)
+TEST_CONSTEXPR_BEGIN(ContainerResult, Constexpr)
 {
 	constexpr auto ret = constexprResultFct(true); // makeError
 	EXPECT_FALSE(ret);
 	EXPECT_EQ(ret.error(), 42);
 }
+TEST_CONSTEXPR_END(ContainerResult, Constexpr)
 
 TEST(ContainerResult, returnVoid)
 {

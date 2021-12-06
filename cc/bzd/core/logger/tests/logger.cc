@@ -1,8 +1,8 @@
 #include "cc/bzd/core/logger.hh"
 
 #include "cc/bzd/core/logger/tests/support/backend.hh"
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/scope_guard.hh"
-#include "cc_test/test.hh"
 
 TEST(Logger, Empty)
 {

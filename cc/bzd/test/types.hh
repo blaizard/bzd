@@ -3,7 +3,6 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/move.hh"
 
-#include <iostream>
 namespace bzd::test {
 template <class T>
 class LifetimeCounter

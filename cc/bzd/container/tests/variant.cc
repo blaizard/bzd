@@ -1,7 +1,7 @@
 #include "cc/bzd/container/variant.hh"
 
+#include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types.hh"
-#include "cc_test/test.hh"
 
 #include <iostream>
 
@@ -404,7 +404,7 @@ TEST(ContainerVariant, Match)
 	}
 }
 
-TEST(ContainerVariant, Constexpr)
+TEST_CONSTEXPR_BEGIN(ContainerVariant, Constexpr)
 {
 	constexpr bzd::Variant<int, bool, double> variant;
 	EXPECT_EQ(variant.index(), 0);
@@ -445,3 +445,4 @@ TEST(ContainerVariant, Constexpr)
 		EXPECT_NEAR(variantMoved.get<double>(), 5.4, 0.01);
 	}
 }
+TEST_CONSTEXPR_END(ContainerVariant, Constexpr)

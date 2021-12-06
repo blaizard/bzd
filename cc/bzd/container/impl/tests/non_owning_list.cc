@@ -1,5 +1,5 @@
 #include "cc/bzd/container/impl/tests/non_owning_list_for_test.hh"
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 TEST(NonOwningList, simple)
 {

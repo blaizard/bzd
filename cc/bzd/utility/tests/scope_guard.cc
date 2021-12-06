@@ -1,6 +1,6 @@
 #include "cc/bzd/utility/scope_guard.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 template <class T>
 void changeScope(T&& s)

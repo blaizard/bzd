@@ -21,7 +21,7 @@ bzd_cc_test(
     ],
     tags = ["stress"],
     deps = [
-        "//tools/cc_test",
+        "//cc/bzd/test",
         ":non_owning_list_for_test",
     ] + select({
         "//tools/bazel_build/config:x86_64": [

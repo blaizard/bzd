@@ -1,6 +1,6 @@
 #include "cc/bzd/utility/source_location.hh"
 
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 
 void myTest()
 {

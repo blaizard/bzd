@@ -1,4 +1,4 @@
-#include "cc_test/test.hh"
+#include "cc/bzd/test/test.hh"
 #include "tools/bdl/generators/cc/tests/manifest.hh"
 
 TEST(File, Compile)

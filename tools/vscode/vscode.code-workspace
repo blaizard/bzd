@@ -1,6 +1,6 @@
 {
     "folders": [
-        {"path": ".."}
+        {"path": "../.."}
     ],
     "settings": {
         "editor.tabSize": 4,

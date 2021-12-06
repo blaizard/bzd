@@ -15,6 +15,6 @@ bzd_cc_test(
     ],
     deps = [
         ":interface",
-        "//tools/cc_test",
+        "//cc/bzd/test",
     ],
 )
