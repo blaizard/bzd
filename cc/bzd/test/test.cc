@@ -16,13 +16,6 @@ namespace {
 }
 } // namespace
 
-namespace bzd::test::impl {
-bool strcmp(const char* str1, const char* str2)
-{
-	return (::std::strcmp(str1, str2) == 0);
-}
-} // namespace bzd::test::impl
-
 namespace bzd::test {
 void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {

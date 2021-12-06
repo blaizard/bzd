@@ -120,8 +120,16 @@
 	}
 
 namespace bzd::test::impl {
-bool strcmp(const char* str1, const char* str2);
-constexpr bool near(const double number1, const double number2, const double absError)
+constexpr bool strcmp(const char* it1, const char* it2) noexcept
+{
+	while (*it1 && *it2 && *it1 == *it2)
+	{
+		++it1;
+		++it2;
+	}
+	return !(*it1 || *it2);
+}
+constexpr bool near(const double number1, const double number2, const double absError) noexcept
 {
 	const double diff = (number1 > number2) ? (number1 - number2) : (number2 - number1);
 	return (diff <= absError);
