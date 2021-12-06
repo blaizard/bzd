@@ -109,11 +109,12 @@ TEST(ContainerString, OperatorsPlusEqual)
 	EXPECT_STREQ(string.data(), "Hello Me!");
 }
 
-TEST(ContainerString, Constexpr)
+TEST_CONSTEXPR_BEGIN(ContainerString, Constexpr)
 {
-	static constexpr bzd::String<6> string("Hello");
+	bzd::String<6> string("Hello");
 	EXPECT_STREQ(string.data(), "Hello");
 }
+TEST_CONSTEXPR_END(ContainerString, Constexpr)
 
 TEST(ContainerString, Construct)
 {
