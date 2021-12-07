@@ -58,25 +58,28 @@ struct TestID
 namespace bzd::test {
 void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {
+	auto& out = ::bzd::platform::out();
+	auto scope = out.getLock().sync();
+
 	currentTestFailed_ = true;
-	::bzd::print(file).sync();
+	::bzd::printNoLock(file).sync();
 
 	if (line > -1)
 	{
-		::bzd::print(CSTR(":{}"), line).sync();
+		::bzd::printNoLock(CSTR(":{}"), line).sync();
 	}
 
-	::bzd::print(CSTR(": {}\n"), message).sync();
+	::bzd::printNoLock(CSTR(": {}\n"), message).sync();
 	if (actual)
 	{
-		::bzd::print(CSTR("Actual: {}\n"), actual).sync();
+		::bzd::printNoLock(CSTR("Actual: {}\n"), actual).sync();
 	}
 	if (expected)
 	{
-		::bzd::print(CSTR("Expected: {}\n"), expected).sync();
+		::bzd::printNoLock(CSTR("Expected: {}\n"), expected).sync();
 	}
 
-	::bzd::print("Assertion failed.\n").sync();
+	::bzd::printNoLock("Assertion failed.\n").sync();
 }
 
 bool Manager::registerTest(Manager::TestInfo&& info)

@@ -10,6 +10,12 @@ namespace bzd {
 /// \param[in] args... All arguments are forwarded to the toStream function.
 template <class... Args>
 bzd::Async<void> print(Args&&... args) noexcept;
+
+/// Helper to print a message on the standard output without holding the lock.
+///
+/// \param[in] args... All arguments are forwarded to the toStream function.
+template <class... Args>
+bzd::Async<void> printNoLock(Args&&... args) noexcept;
 } // namespace bzd
 
 template <class... Args>
@@ -17,5 +23,12 @@ bzd::Async<void> bzd::print(Args&&... args) noexcept
 {
 	auto& out = bzd::platform::out();
 	auto scope = co_await out.getLock();
+	co_await toStream(out, bzd::forward<Args>(args)...);
+}
+
+template <class... Args>
+bzd::Async<void> bzd::printNoLock(Args&&... args) noexcept
+{
+	auto& out = bzd::platform::out();
 	co_await toStream(out, bzd::forward<Args>(args)...);
 }
