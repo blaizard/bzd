@@ -101,6 +101,19 @@ cc_library(
 )
 
 cc_library(
+    name = "print",
+    hdrs = [
+        "print.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:stream",
+        "//cc/bzd/utility/format:stream",
+    ],
+)
+
+cc_library(
     name = "registry",
     hdrs = [
         "registry.hh",

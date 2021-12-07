@@ -97,7 +97,7 @@
 	}
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct)                            \
-	if (!bzd::test::impl::strcmp(str1, str2))                               \
+	if (bzd::test::impl::strcmp(str1, str2) != 0)                           \
 	{                                                                       \
 		failFct("Failure\nTest [string]: " #str1 " == " #str2, str1, str2); \
 	}
@@ -120,14 +120,18 @@
 	}
 
 namespace bzd::test::impl {
-constexpr bool strcmp(const char* it1, const char* it2) noexcept
+constexpr int strcmp(const char* it1, const char* it2) noexcept
 {
 	while (*it1 && *it2 && *it1 == *it2)
 	{
 		++it1;
 		++it2;
 	}
-	return !(*it1 || *it2);
+	if (!(*it1 || *it2))
+	{
+		return 0;
+	}
+	return (*it1 < *it2) ? -1 : 1;
 }
 constexpr bool near(const double number1, const double number2, const double absError) noexcept
 {
@@ -288,7 +292,10 @@ namespace bzd::test {
 class Context
 {
 public:
-	constexpr Context() : seed_{53267} {}
+	using SeedType = bzd::UInt32Type;
+
+public:
+	constexpr Context(const SeedType seed = 53267) : seed_{seed} {}
 
 	template <class T>
 	[[nodiscard]] T randInt(const T min, const T max) const noexcept
@@ -300,10 +307,8 @@ public:
 
 	[[nodiscard]] bool randBool() const noexcept { return (randInt(0, 1) == 1); }
 
-	[[nodiscard]] auto getSeed() const noexcept { return seed_; }
-
 private:
-	unsigned int seed_;
+	const SeedType seed_;
 };
 
 class Test

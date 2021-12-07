@@ -183,3 +183,25 @@ TEST(Format_, StreamStringFormat)
 	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
 	expectStringStreamFormat<256>("Pointer 0x1234", CSTR("Pointer {}"), reinterpret_cast<const void*>(0x1234));
 }
+
+TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
+{
+	{
+		bzd::String<128> str;
+		toString(str, CSTR("Hello World"));
+		EXPECT_STREQ(str.data(), "Hello World");
+	}
+
+	{
+		bzd::String<128> str;
+		toString(str, CSTR("Hello {}"), "World");
+		EXPECT_STREQ(str.data(), "Hello World");
+	}
+
+	{
+		bzd::String<128> str;
+		toString(str, CSTR("Hello {}"), 12);
+		EXPECT_STREQ(str.data(), "Hello 12");
+	}
+}
+TEST_CONSTEXPR_END(Format_, Constexpr)

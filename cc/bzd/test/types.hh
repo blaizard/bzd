@@ -4,6 +4,9 @@
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::test {
+/// Type that contains lifetime counters, that could be used for monitoring
+/// proper handling of the object through copy and move constructors and assignments
+/// or within the object scope.
 template <class T>
 class LifetimeCounter
 {
@@ -49,6 +52,7 @@ bzd::SizeType LifetimeCounter<T>::move_{0};
 template <class T>
 bzd::SizeType LifetimeCounter<T>::destructor_{0};
 
+/// Type that implements a deleted default constructor.
 class NoDefaultConstructor
 {
 protected:
@@ -63,6 +67,8 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = default;
 };
 
+/// Type that implements only a copy constructor and copy assignment operator.
+/// In other word, the move constructor and move assignment operator is deleted.
 class CopyOnly
 {
 protected:
@@ -86,6 +92,8 @@ private:
 	bzd::SizeType copiedCounter_{0};
 };
 
+/// Type that implements only a move constructor and move assignment operator.
+/// In other word, the copy constructor and copy assignment operator is deleted.
 class MoveOnly
 {
 protected:

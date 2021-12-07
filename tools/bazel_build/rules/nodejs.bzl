@@ -409,7 +409,7 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker_nodejs//image", include_m
         env = {
             "NODE_ENV": "production",
         },
-        stamp = True,
+        stamp = "@io_bazel_rules_docker//stamp:always",
         tags = ["nodejs"],
         tars = [
             "{}.package".format(name),
