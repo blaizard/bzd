@@ -1,17 +1,56 @@
 #include "cc/bzd/test/test.hh"
 
-#include <cstring>
-#include <iostream>
+#include "cc/bzd/core/print.hh"
+
 #include <map>
-#include <math.h>
-#include <sstream>
 #include <vector>
 
 // Empty namespace to hold all the registered tests
 namespace {
+
+struct TestID
+{
+	const char* testCaseName;
+	const char* testName;
+
+	constexpr bool operator<(const TestID& other) const noexcept
+	{
+		auto result = bzd::test::impl::strcmp(testCaseName, other.testCaseName);
+		if (result == 0)
+		{
+			result = bzd::test::impl::strcmp(testName, other.testName);
+		}
+		return (result == -1);
+	}
+
+	/// Generates a deterministic seed from the test identifier.
+	constexpr auto getSeed() const noexcept
+	{
+		::bzd::test::Context::SeedType seed{362437};
+
+		for (auto* it : {testCaseName, testName})
+		{
+			while (*it)
+			{
+				seed += *it;
+
+				// Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"
+				// See: https://en.wikipedia.org/wiki/Xorshift
+				seed ^= seed << 13;
+				seed ^= seed >> 17;
+				seed ^= seed << 5;
+
+				++it;
+			}
+		}
+
+		return seed;
+	}
+};
+
 [[nodiscard]] auto& getTestsSingleton()
 {
-	static ::std::map<const char*, ::std::map<const char*, bzd::test::Manager::TestInfo>> tests;
+	static ::std::map<::TestID, bzd::test::Manager::TestInfo> tests;
 	return tests;
 }
 } // namespace
@@ -20,43 +59,38 @@ namespace bzd::test {
 void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
 {
 	currentTestFailed_ = true;
-	::std::cout << file;
+	::bzd::print(file).sync();
+
 	if (line > -1)
 	{
-		::std::cout << ":" << std::dec << line;
+		::bzd::print(CSTR(":{}"), line).sync();
 	}
 
-	::std::cout << ": " << message << "\n";
+	::bzd::print(CSTR(": {}\n"), message).sync();
 	if (actual)
 	{
-		::std::cout << "Actual: " << actual << "\n";
+		::bzd::print(CSTR("Actual: {}\n"), actual).sync();
 	}
 	if (expected)
 	{
-		::std::cout << "Expected: " << expected << "\n";
+		::bzd::print(CSTR("Expected: {}\n"), expected).sync();
 	}
 
-	::std::cout << "Assertion failed.\n" << ::std::endl;
+	::bzd::print("Assertion failed.\n").sync();
 }
 
 bool Manager::registerTest(Manager::TestInfo&& info)
 {
 	auto& tests = getTestsSingleton();
+	::TestID id{info.testCaseName_, info.testName_};
+
+	auto it = tests.find(id);
+	if (it != tests.end())
 	{
-		auto it = tests.find(info.testCaseName_);
-		if (it == tests.end())
-		{
-			tests.emplace(info.testCaseName_, std::map<const char*, bzd::test::Manager::TestInfo>{});
-		}
+		throw 42;
 	}
-	{
-		auto it = tests[info.testCaseName_].find(info.testName_);
-		if (it != tests[info.testCaseName_].end())
-		{
-			throw 42;
-		}
-		tests[info.testCaseName_].emplace(info.testName_, std::move(info));
-	}
+	tests.emplace(id, std::move(info));
+
 	return true;
 }
 
@@ -65,49 +99,42 @@ bool bzd::test::Manager::run()
 	::std::vector<const TestInfo*> failedTests;
 	auto& tests = getTestsSingleton();
 
-	::std::cout << "[==========] Running test(s) from " << std::dec << tests.size() << " test case(s)" << ::std::endl;
+	::bzd::print(CSTR("[==========] Running test(s) from {} test case(s)\n"), tests.size()).sync();
 	if (tests.empty())
 	{
-		::std::cout << "[   FAILED ] Empty test suite is considered as a failed test." << ::std::endl;
+		::bzd::print(CSTR("[   FAILED ] Empty test suite is considered as a failed test.\n")).sync();
 		return false;
 	}
 
-	for (const auto& it1 : tests)
+	for (const auto& it : tests)
 	{
-		const auto testCaseName = it1.first;
-		const auto nbTests = it1.second.size();
-		::std::cout << "[----------] " << nbTests << " test(s) from " << testCaseName << ::std::endl;
+		const auto testCaseName = it.first.testCaseName;
+		const auto testName = it.first.testName;
+		const auto seed = it.first.getSeed();
+		const auto& info = it.second;
+		bzd::test::Context context{seed};
 
-		for (const auto& it2 : it1.second)
+		::bzd::print(CSTR("[ RUN      ] {}.{} (seed={})\n"), testCaseName, testName, seed).sync();
+		currentTestFailed_ = false;
+		try
 		{
-			const auto testName = it2.first;
-			const auto& info = it2.second;
-			bzd::test::Context context{};
-
-			::std::cout << "[ RUN      ] " << testCaseName << "." << testName << " (seed=" << context.getSeed() << ")" << ::std::endl;
-			currentTestFailed_ = false;
-			try
-			{
-				info.test_->test(context);
-			}
-			catch (...)
-			{
-				fail(info.file_, -1, "Unknown C++ exception thrown in the test body.");
-			}
-
-			// Print the test status
-			if (currentTestFailed_)
-			{
-				failedTests.push_back(&info);
-				::std::cout << "[   FAILED ] " << ::std::endl;
-			}
-			else
-			{
-				::std::cout << "[       OK ] " << ::std::endl;
-			}
+			info.test_->test(context);
+		}
+		catch (...)
+		{
+			fail(info.file_, -1, "Unknown C++ exception thrown in the test body.");
 		}
 
-		::std::cout << "[----------] " << ::std::endl;
+		// Print the test status
+		if (currentTestFailed_)
+		{
+			failedTests.push_back(&info);
+			::bzd::print(CSTR("[   FAILED ]\n")).sync();
+		}
+		else
+		{
+			::bzd::print(CSTR("[       OK ]\n")).sync();
+		}
 	}
 
 	return (failedTests.empty()) ? true : false;
