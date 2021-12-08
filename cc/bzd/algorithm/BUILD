@@ -59,5 +59,6 @@ cc_library(
         "//cc/bzd/container/iterator:distance",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:swap",
+        "//cc/bzd/utility/comparison",
     ],
 )

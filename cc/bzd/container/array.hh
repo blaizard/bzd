@@ -22,6 +22,7 @@ public: // Traits.
 	using Self = Array<T, N>;
 	using Parent = impl::Span<T, impl::FixedStorage<T, N>>;
 	using StorageType = typename Parent::StorageType;
+	using ValueType = T;
 
 public: // Constructors/assignments.
 	constexpr Array() noexcept = default;

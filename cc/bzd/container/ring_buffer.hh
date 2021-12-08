@@ -18,8 +18,8 @@ class RingBuffer
 public: // Traits.
 	using Self = RingBuffer<T, Storage>;
 	using StorageType = Storage;
-	using DataType = typename StorageType::DataType;
-	using DataMutableType = typename StorageType::DataMutableType;
+	using ValueType = typename StorageType::ValueType;
+	using ValueMutableType = typename StorageType::ValueMutableType;
 
 public: // Constructors/assignments.
 	constexpr RingBuffer() noexcept = default;
@@ -50,9 +50,9 @@ public: // Accessors.
 	{
 		const auto start = read_ % capacity();
 		const auto end = write_ % capacity();
-		const auto secondSpan = (!empty() && (end <= start)) ? bzd::Span<DataType>{storage_.data(), end} : bzd::Span<DataType>{};
+		const auto secondSpan = (!empty() && (end <= start)) ? bzd::Span<ValueType>{storage_.data(), end} : bzd::Span<ValueType>{};
 
-		return bzd::Spans<DataType, 2>{inPlace, asSpanForReading(), secondSpan};
+		return bzd::Spans<ValueType, 2>{inPlace, asSpanForReading(), secondSpan};
 	}
 
 	/// Get the span of contiguous memory containing data starting from the tail.
@@ -63,11 +63,11 @@ public: // Accessors.
 	{
 		if (empty())
 		{
-			return bzd::Span<DataType>{};
+			return bzd::Span<ValueType>{};
 		}
 		const auto start = read_ % capacity();
 		const auto end = write_ % capacity();
-		return bzd::Span<DataType>{&storage_.data()[start], (end > start) ? (end - start) : (capacity() - start)};
+		return bzd::Span<ValueType>{&storage_.data()[start], (end > start) ? (end - start) : (capacity() - start)};
 	}
 
 	/// Get the span of contiguous memory containing free slots starting from the head.
@@ -78,11 +78,11 @@ public: // Accessors.
 	{
 		if (full())
 		{
-			return bzd::Span<DataMutableType>{};
+			return bzd::Span<ValueMutableType>{};
 		}
 		const auto start = write_ % capacity();
 		const auto end = read_ % capacity();
-		return bzd::Span<DataMutableType>{&storage_.dataMutable()[start], (end > start) ? (end - start) : (capacity() - start)};
+		return bzd::Span<ValueMutableType>{&storage_.dataMutable()[start], (end > start) ? (end - start) : (capacity() - start)};
 	}
 
 public: // Modifiers.

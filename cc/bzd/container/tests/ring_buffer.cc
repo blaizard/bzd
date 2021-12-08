@@ -195,10 +195,10 @@ TEST(RingBuffer, stress)
 
 	for (int iteration = 0; iteration < 10000; ++iteration)
 	{
-		bzd::SizeType random = test.randInt(0, 16);
+		bzd::SizeType random = test.random(0, 16);
 
 		// Write X entries.
-		if (test.randBool())
+		if (test.random<bzd::BoolType>())
 		{
 			auto span = ring.asSpanForWriting();
 			int count = bzd::min(random, span.size());

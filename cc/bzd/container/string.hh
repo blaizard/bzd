@@ -17,7 +17,7 @@ protected:
 	using Self = String;
 	using Parent = impl::Span<T, Storage>;
 	using StorageType = typename Parent::StorageType;
-	using DataType = typename Parent::DataType;
+	using ValueType = typename Parent::ValueType;
 	using StringView = bzd::impl::StringView<bzd::typeTraits::AddConst<T>>;
 
 public:
@@ -107,7 +107,7 @@ protected:
 	using Self = String;
 	using Parent = interface::String;
 	using StorageType = typename Parent::StorageType;
-	using DataType = typename interface::String::DataType;
+	using ValueType = typename interface::String::ValueType;
 
 public:
 	constexpr String() noexcept : Parent{StorageType{data_, 0}, N + 1} { data_[0] = '\0'; }
@@ -128,7 +128,7 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 protected:
-	DataType data_[N + 1]{}; // needed for constexpr
+	ValueType data_[N + 1]{}; // needed for constexpr
 };
 
 // Comparison to char*

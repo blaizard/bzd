@@ -17,16 +17,16 @@ class Span : public impl::Span<T, impl::NonOwningStorage<T>>
 {
 private:
 	using Parent = impl::Span<T, impl::NonOwningStorage<T>>;
-	using DataType = typename Parent::DataType;
+	using ValueType = typename Parent::ValueType;
 	using StorageType = typename Parent::StorageType;
 
 public: // Constructors
 	using impl::Span<T, impl::NonOwningStorage<T>>::Span;
 
-	constexpr Span(DataType* const data, const SizeType size) noexcept : Parent{StorageType{data, size}} {}
+	constexpr Span(ValueType* const data, const SizeType size) noexcept : Parent{StorageType{data, size}} {}
 
 	template <bzd::SizeType N>
-	constexpr Span(DataType (&data)[N]) noexcept : Parent{StorageType{data, N}}
+	constexpr Span(ValueType (&data)[N]) noexcept : Parent{StorageType{data, N}}
 	{
 	}
 };
@@ -38,13 +38,13 @@ namespace bzd::impl {
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asSpan() const noexcept
 {
-	return bzd::Span<StorageDataType>{data(), size()};
+	return bzd::Span<StorageValueType>{data(), size()};
 }
 
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asSpan() noexcept
 {
-	return bzd::Span<StorageDataMutableType>{data(), size()};
+	return bzd::Span<StorageValueMutableType>{data(), size()};
 }
 
 template <class T, class Storage>
@@ -53,7 +53,7 @@ constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType c
 	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
 	bzd::assert::isTrue(offset + actualCount <= size());
-	return bzd::Span<StorageDataType>{data() + offset, actualCount};
+	return bzd::Span<StorageValueType>{data() + offset, actualCount};
 }
 
 template <class T, class Storage>
@@ -62,7 +62,7 @@ constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType c
 	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
 	bzd::assert::isTrue(offset + actualCount <= size());
-	return bzd::Span<StorageDataMutableType>{data() + offset, actualCount};
+	return bzd::Span<StorageValueMutableType>{data() + offset, actualCount};
 }
 
 template <class T, class Storage>

@@ -27,16 +27,16 @@ template <class T, class Storage>
 class Span
 {
 protected:
-	using DataType = T;
+	using ValueType = T;
 	using StorageType = Storage;
-	using Self = Span<DataType, StorageType>;
-	using IsDataConst = bzd::typeTraits::IsConst<DataType>;
-	using StorageDataType = typename StorageType::DataType;
-	using StorageDataMutableType = typename StorageType::DataMutableType;
+	using Self = Span<ValueType, StorageType>;
+	using IsDataConst = bzd::typeTraits::IsConst<ValueType>;
+	using StorageValueType = typename StorageType::ValueType;
+	using StorageValueMutableType = typename StorageType::ValueMutableType;
 
 public:
-	using ConstIterator = bzd::iterator::Contiguous<StorageDataType>;
-	using Iterator = bzd::iterator::Contiguous<StorageDataMutableType>;
+	using ConstIterator = bzd::iterator::Contiguous<StorageValueType>;
+	using Iterator = bzd::iterator::Contiguous<StorageValueMutableType>;
 
 public: // Constructor/assignment
 	// Default/copy/move constructor/assignment.
@@ -68,7 +68,7 @@ public: // Iterators
 
 public: // Size
 	constexpr SizeType size() const noexcept { return storage_.size(); }
-	constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(DataType); }
+	constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(ValueType); }
 	constexpr bool empty() const noexcept { return (size() == 0); }
 
 public: // Operators
@@ -116,14 +116,14 @@ public: // Accessors
 
 public: // Emplace
 	template <class... Args>
-	constexpr void emplace(bzd::iterator::Contiguous<DataType> pos, Args&&... args) noexcept
+	constexpr void emplace(bzd::iterator::Contiguous<ValueType> pos, Args&&... args) noexcept
 	{
-		pos->~DataType();
-		::new (&(*pos)) DataType{bzd::forward<Args>(args)...};
+		pos->~ValueType();
+		::new (&(*pos)) ValueType{bzd::forward<Args>(args)...};
 	}
 
 public: // Find
-	constexpr SizeType find(const DataType& item, const SizeType start = 0) const noexcept
+	constexpr SizeType find(const ValueType& item, const SizeType start = 0) const noexcept
 	{
 		for (SizeType i = start; i < size(); ++i)
 		{

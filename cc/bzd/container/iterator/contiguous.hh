@@ -4,12 +4,12 @@
 
 namespace bzd::iterator {
 
-template <class DataType>
-class Contiguous : public RandomAccess<DataType, Contiguous<DataType>>
+template <class ValueType>
+class Contiguous : public RandomAccess<ValueType, Contiguous<ValueType>>
 {
 public: // Traits
-	using Self = Contiguous<DataType>;
-	using Parent = RandomAccess<DataType, Self>;
+	using Self = Contiguous<ValueType>;
+	using Parent = RandomAccess<ValueType, Self>;
 	using Category = ContiguousTag;
 
 public: // Constructors
