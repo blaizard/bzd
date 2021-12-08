@@ -24,9 +24,9 @@
 	BZDTEST_REGISTER_(testCaseName, testName) \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
 
-#define BZDTEST_ASYNC_(testCaseName, testName)      \
-	BZDTEST_REGISTER_(testCaseName, testName) \
-	bzd::Async<void> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);   \
+#define BZDTEST_ASYNC_(testCaseName, testName)                                               \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                \
+	bzd::Async<void> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&); \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
 	{                                                                                        \
 		BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                              \

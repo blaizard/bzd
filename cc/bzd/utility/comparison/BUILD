@@ -4,10 +4,10 @@ cc_library(
     name = "comparison",
     hdrs = [
         "equal_to.hh",
-        "greater_equal.hh",
         "greater.hh",
-        "less_equal.hh",
+        "greater_equal.hh",
         "less.hh",
+        "less_equal.hh",
         "not_equal_to.hh",
     ],
     visibility = ["//visibility:public"],
