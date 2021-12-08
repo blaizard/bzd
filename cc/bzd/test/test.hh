@@ -6,6 +6,9 @@
 /// The statements within the test body can be any code under test. Assertions used within the test body determine the outcome of the test.
 #define TEST(testCaseName, testName) BZDTEST_(testCaseName, testName)
 
+/// Run a coroutine-based test in an asynchronous context.
+#define TEST_ASYNC(testCaseName, testName) BZDTEST_ASYNC_(testCaseName, testName)
+
 /// Executes a test case at compile time.
 /// \{
 #define TEST_CONSTEXPR_BEGIN(testCaseName, testName) BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)
