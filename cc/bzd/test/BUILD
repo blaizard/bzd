@@ -26,6 +26,7 @@ cc_library(
         ":composition",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
+        "//cc/bzd/utility:numeric_limits"
     ],
 )
 

@@ -16,6 +16,7 @@ public: // Traits.
 	using Self = Vector<T, Storage>;
 	using Parent = impl::Span<T, Storage>;
 	using StorageType = typename Parent::StorageType;
+	using ValueType = T;
 
 public:
 	constexpr explicit Vector(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}

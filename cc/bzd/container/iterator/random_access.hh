@@ -7,18 +7,19 @@
 
 namespace bzd::iterator {
 
-template <class DataType, class CRTP = void>
+template <class T, class CRTP = void>
 class RandomAccess : public Iterator
 {
 public: // Traits
-	using Self = RandomAccess<DataType, CRTP>;
+	using Self = RandomAccess<T, CRTP>;
 	using ActualSelf = typeTraits::Conditional<typeTraits::isSame<CRTP, void>, Self, CRTP>;
 	using Category = RandomAccessTag;
 	using IndexType = bzd::SizeType;
 	using DifferenceType = bzd::Int32Type;
+	using ValueType = T;
 
 public: // Constructors
-	constexpr RandomAccess(DataType* data) : data_{data} {}
+	constexpr RandomAccess(ValueType* data) : data_{data} {}
 
 public: // Copy/move constructors/assignments
 	constexpr RandomAccess(const Self&) noexcept = default;
@@ -85,14 +86,14 @@ public: // API
 
 	constexpr bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
-	constexpr DataType& operator*() const { return *data_; }
+	constexpr ValueType& operator*() const { return *data_; }
 
-	constexpr DataType* operator->() const { return data_; }
+	constexpr ValueType* operator->() const { return data_; }
 
 	constexpr auto& operator[](const SizeType index) noexcept { return data_[index]; }
 	constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
 
 private:
-	DataType* data_;
+	ValueType* data_;
 };
 } // namespace bzd::iterator

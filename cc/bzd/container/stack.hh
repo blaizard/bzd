@@ -19,14 +19,14 @@ template <bzd::SizeType stackSize, StackDirection direction = StackDirection::DO
 class Stack
 {
 public: // Type.
-	using DataType = bzd::UInt8Type;
+	using ValueType = bzd::UInt8Type;
 
 public:
 	constexpr Stack() noexcept = default;
 
 	constexpr void taint(UInt8Type pattern = 0xaa) noexcept { bzd::algorithm::fill(stack_.begin(), stack_.end(), pattern); }
 
-	constexpr DataType* data() noexcept { return stack_.data(); }
+	constexpr ValueType* data() noexcept { return stack_.data(); }
 
 	constexpr SizeType size() const noexcept { return stack_.size(); }
 
@@ -51,7 +51,7 @@ public:
 	}
 
 private:
-	bzd::Array<DataType, stackSize> stack_{};
+	bzd::Array<ValueType, stackSize> stack_{};
 };
 
 } // namespace bzd

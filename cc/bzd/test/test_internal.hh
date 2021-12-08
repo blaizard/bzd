@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/utility/numeric_limits.hh"
 
 #include <random>
 
@@ -295,17 +296,36 @@ public:
 	using SeedType = bzd::UInt32Type;
 
 public:
-	constexpr Context(const SeedType seed = 53267) : seed_{seed} {}
+	constexpr explicit Context(const SeedType seed = 53267) noexcept : seed_{seed} {}
 
-	template <class T>
-	[[nodiscard]] T randInt(const T min, const T max) const noexcept
+	template <class T, typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, BoolType>, void>* = nullptr>
+	[[nodiscard]] T random(const T min = NumericLimits<T>::min(), const T max = NumericLimits<T>::max()) const noexcept
 	{
-		static ::std::mt19937 gen{seed_};
 		::std::uniform_int_distribution<T> distribution(min, max);
-		return distribution(gen);
+		return distribution(getGenerator());
 	}
 
-	[[nodiscard]] bool randBool() const noexcept { return (randInt(0, 1) == 1); }
+	template <class T, typename typeTraits::EnableIf<typeTraits::isSame<T, BoolType>, void>* = nullptr>
+	[[nodiscard]] T random() const noexcept
+	{
+		return static_cast<BoolType>(random(0, 1) == 1);
+	}
+
+	template <class T>
+	void fillRandom(T& container) const noexcept
+	{
+		for (auto& value : container)
+		{
+			value = random<typename T::ValueType>();
+		}
+	}
+
+private:
+	::std::mt19937& getGenerator() const
+	{
+		static ::std::mt19937 gen{seed_};
+		return gen;
+	}
 
 private:
 	const SeedType seed_;

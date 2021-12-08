@@ -17,6 +17,7 @@ cc_library(
         ":max",
         ":min",
         ":move",
+        ":numeric_limits",
         ":offset_of",
         ":ratio",
         ":scope_guard",
@@ -167,6 +168,17 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:remove_reference",
+    ],
+)
+
+cc_library(
+    name = "numeric_limits",
+    hdrs = [
+        "numeric_limits.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
     ],
 )
 

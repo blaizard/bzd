@@ -5,6 +5,7 @@
 #include "cc/bzd/algorithm/copy_n.hh"
 #include "cc/bzd/algorithm/fill.hh"
 #include "cc/bzd/algorithm/reverse.hh"
+#include "cc/bzd/algorithm/sort.hh"
 
 // Container
 #include "cc/bzd/container/any_reference.hh"
@@ -112,6 +113,7 @@
 #include "cc/bzd/utility/max.hh"
 #include "cc/bzd/utility/min.hh"
 #include "cc/bzd/utility/move.hh"
+#include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/offset_of.hh"
 #include "cc/bzd/utility/ratio.hh"
 #include "cc/bzd/utility/singleton.hh"

@@ -10,8 +10,8 @@ class ResizeableStorage
 {
 public:
 	using Self = ResizeableStorage<T, N>;
-	using DataType = const T;
-	using DataMutableType = T;
+	using ValueType = const T;
+	using ValueMutableType = T;
 
 public: // Constructors
 	// Default/copy/move constructor/assignment.
@@ -27,8 +27,8 @@ public: // Constructors
 	}
 
 public: // Accessors
-	constexpr DataType* data() const noexcept { return data_; }
-	constexpr DataMutableType* dataMutable() noexcept { return data_; }
+	constexpr ValueType* data() const noexcept { return data_; }
+	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
 	constexpr bzd::SizeType size() const noexcept { return size_; }
 	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
 
