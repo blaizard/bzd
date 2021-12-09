@@ -80,11 +80,11 @@ cc_library(
     hdrs = [
         "concept.hh",
     ],
-    deps = [
-        "//cc/bzd/type_traits:enable_if",
-        "//cc/bzd/platform:types"
-    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:enable_if",
+    ],
 )
 
 cc_library(

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/utility/swap.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {
 template <class Iterator>

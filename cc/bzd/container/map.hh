@@ -1,11 +1,11 @@
 #pragma once
 
+#include "cc/bzd/algorithm/sort.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/algorithm/sort.hh"
 
 #include <initializer_list>
 
@@ -20,10 +20,7 @@ public:
 		K first;
 		V second;
 
-		constexpr BoolType operator<(const Element& other) const
-		{
-			return first < other.first;
-		}
+		constexpr BoolType operator<(const Element& other) const { return first < other.first; }
 	};
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
