@@ -115,6 +115,8 @@ cc_library(
         ":tuple",
         ":vector",
         "//cc/bzd/algorithm:sort",
+        "//cc/bzd/algorithm:lower_bound",
+        "//cc/bzd/algorithm:copy",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
     ],

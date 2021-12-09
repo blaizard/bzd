@@ -153,6 +153,9 @@ protected:
 	template <class U, class V>
 	friend class Span;
 
+	template <class K, class V>
+	friend class Map;
+
 	StorageType storage_{};
 };
 } // namespace bzd::impl
