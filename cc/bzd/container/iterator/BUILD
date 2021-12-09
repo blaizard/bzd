@@ -9,8 +9,8 @@ cc_library(
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_pointer",
         "//cc/bzd/type_traits:remove_pointer",
-        "//cc/bzd/utility:concept"
-    ]
+        "//cc/bzd/utility:concept",
+    ],
 )
 
 cc_library(
@@ -20,10 +20,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":traits",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_same",
-        ":traits"
     ],
 )
 
@@ -46,7 +46,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":traits",
-        "//cc/bzd/type_traits:is_iterator"
+        "//cc/bzd/type_traits:is_iterator",
     ],
 )
 
@@ -58,6 +58,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":traits",
-        "//cc/bzd/type_traits:is_iterator"
+        "//cc/bzd/type_traits:is_iterator",
     ],
 )

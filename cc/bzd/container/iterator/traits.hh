@@ -51,17 +51,17 @@ struct Traits;
 template <class T>
 struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isBaseOf<Iterator, T>)>
 {
-    using Category = typename T::Category;
-    using DifferenceType = typename T::DifferenceType;
-    using ValueType = typename T::ValueType;
+	using Category = typename T::Category;
+	using DifferenceType = typename T::DifferenceType;
+	using ValueType = typename T::ValueType;
 };
 
 template <class T>
 struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isPointer<T>)>
 {
-    using Category = ContiguousTag;
-    using DifferenceType = bzd::Int32Type;
-    using ValueType = typeTraits::RemovePointer<T>;
+	using Category = ContiguousTag;
+	using DifferenceType = bzd::Int32Type;
+	using ValueType = typeTraits::RemovePointer<T>;
 };
 
 template <class T, class Category>

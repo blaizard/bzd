@@ -1,10 +1,10 @@
 #pragma once
 
 #include "cc/bzd/container/iterator/distance.hh"
+#include "cc/bzd/type_traits/is_iterator.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/swap.hh"
-#include "cc/bzd/type_traits/is_iterator.hh"
 
 /// This implementation uses heap sort (n*log(n) complexity), sort elements in-place,
 /// and do not require extra memory (stack or other) to process.

@@ -380,7 +380,7 @@ cc_library(
         ":false_type",
         ":true_type",
         ":void_type",
-        "//cc/bzd/utility:concept"
+        "//cc/bzd/utility:concept",
     ],
 )
 

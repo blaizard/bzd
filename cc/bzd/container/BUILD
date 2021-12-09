@@ -114,9 +114,9 @@ cc_library(
         ":optional",
         ":tuple",
         ":vector",
+        "//cc/bzd/algorithm:sort",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
-        "//cc/bzd/algorithm:sort"
     ],
 )
 
