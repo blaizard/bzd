@@ -19,6 +19,7 @@ public: // Traits
 	using ValueType = T;
 
 public: // Constructors
+	constexpr RandomAccess() = default;
 	constexpr RandomAccess(ValueType* data) : data_{data} {}
 
 public: // Copy/move constructors/assignments
@@ -94,6 +95,6 @@ public: // API
 	constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
 
 private:
-	ValueType* data_;
+	ValueType* data_{nullptr};
 };
 } // namespace bzd::iterator

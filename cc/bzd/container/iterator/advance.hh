@@ -25,7 +25,7 @@ constexpr void advance(Iterator& it, const Distance n) noexcept
 			--dist;
 			++it;
 		}
-		if constexpr (isCategory<Iterator, BiDirectionalTag>)
+		if constexpr (isCategory<Iterator, BidirectionalTag>)
 		{
 			while (dist < 0)
 			{
