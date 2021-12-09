@@ -62,7 +62,7 @@ void Manager::failInternals(const char* const file, const int line, const char* 
 	auto scope = out.getLock().sync();
 
 	currentTestFailed_ = true;
-	::bzd::printNoLock(file).sync();
+	::bzd::printNoLock(CSTR("[----------] {}"), file).sync();
 
 	if (line > -1)
 	{

@@ -7,6 +7,7 @@ cc_library(
         ":copy",
         ":copy_n",
         ":fill",
+        ":lower_bound",
         ":reverse",
         ":sort",
     ],
@@ -19,6 +20,9 @@ cc_library(
     hdrs = [
         "copy.hh",
     ],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -27,6 +31,9 @@ cc_library(
     hdrs = [
         "copy_n.hh",
     ],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -34,6 +41,22 @@ cc_library(
     name = "fill",
     hdrs = [
         "fill.hh",
+    ],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "lower_bound",
+    hdrs = [
+        "lower_bound.hh",
+    ],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/container/iterator:distance",
+        "//cc/bzd/container/iterator:advance"
     ],
     visibility = ["//visibility:public"],
 )
@@ -46,6 +69,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility:swap",
+        "//cc/bzd/type_traits:is_iterator",
     ],
 )
 
@@ -60,5 +84,6 @@ cc_library(
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
+        "//cc/bzd/type_traits:is_iterator",
     ],
 )

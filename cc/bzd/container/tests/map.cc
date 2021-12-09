@@ -25,14 +25,6 @@ TEST_CONSTEXPR_BEGIN(ContainerMap, Constexpr)
 	bzd::Map<int, int, 12> emptyMap{};
 	EXPECT_TRUE(emptyMap.empty());
 
-	struct Templ
-	{
-		int x;
-		int y;
-	};
-
-	[[maybe_unused]] bzd::Array<Templ, 2> map{{12, 23}, {12, 23}};
-
 	bzd::Map<int, int, 12> dataMap{{12, 32}, {1, 2}};
 	EXPECT_EQ(dataMap.size(), 2);
 }

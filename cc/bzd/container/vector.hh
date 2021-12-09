@@ -8,6 +8,8 @@
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 
+#include <initializer_list>
+
 namespace bzd::impl {
 template <class T, class Storage>
 class Vector : public impl::Span<T, Storage>
@@ -79,6 +81,7 @@ public: // Traits.
 	using Self = Vector<T, N>;
 	using Parent = interface::Vector<T>;
 	using StorageType = typename Parent::StorageType;
+	using ValueType = typename Parent::ValueType;
 
 public: // Constructors/assignments.
 	constexpr Vector() noexcept : Parent{StorageType{data_, 0}, N} {}
@@ -90,6 +93,15 @@ public: // Constructors/assignments.
 	template <class... Args>
 	constexpr Vector(InPlace, Args&&... args) noexcept : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{bzd::forward<Args>(args)...}
 	{
+	}
+
+	template <class... Args>
+	constexpr Vector(std::initializer_list<ValueType> list) : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{}
+	{
+		for (const auto& value : list)
+		{
+			this->pushBack(value);
+		}
 	}
 
 private:

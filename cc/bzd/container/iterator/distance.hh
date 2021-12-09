@@ -2,21 +2,24 @@
 
 #include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/is_base_of.hh"
+#include "cc/bzd/type_traits/is_iterator.hh"
 
 namespace bzd::iterator {
-template <class It>
-[[nodiscard]] constexpr typename It::DifferenceType distance(It first, It last) noexcept
+template <class Iterator>
+[[nodiscard]] constexpr auto distance(Iterator first, Iterator last) noexcept
 {
-	static_assert(bzd::typeTraits::isBaseOf<Iterator, It>, "Only iterators can be used with distance.");
+	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with distance.");
+	static_assert(isCategory<Iterator, ForwardTag>, "The iterator must be a forward iterator.");
 
-	if constexpr (bzd::typeTraits::isBaseOf<RandomAccessTag, typename It::Category>)
+	using DifferenceType = typename Traits<Iterator>::DifferenceType;
+
+	if constexpr (isCategory<Iterator, RandomAccessTag>)
 	{
-		return last - first;
+		return static_cast<DifferenceType>(last - first);
 	}
 	else
 	{
-		typename It::DifferenceType result = 0;
+		DifferenceType result = 0;
 		while (first != last)
 		{
 			++first;

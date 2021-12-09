@@ -1,5 +1,10 @@
 #pragma once
 
+#include "cc/bzd/type_traits/is_base_of.hh"
+#include "cc/bzd/type_traits/is_pointer.hh"
+#include "cc/bzd/type_traits/remove_pointer.hh"
+#include "cc/bzd/utility/concept.hh"
+
 namespace bzd::iterator {
 
 /// Base class for all iterators.
@@ -39,5 +44,27 @@ struct RandomAccessTag : public BidirectionalTag
 struct ContiguousTag : public RandomAccessTag
 {
 };
+
+template <class T, class = void>
+struct Traits;
+
+template <class T>
+struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isBaseOf<Iterator, T>)>
+{
+    using Category = typename T::Category;
+    using DifferenceType = typename T::DifferenceType;
+    using ValueType = typename T::ValueType;
+};
+
+template <class T>
+struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isPointer<T>)>
+{
+    using Category = ContiguousTag;
+    using DifferenceType = bzd::Int32Type;
+    using ValueType = typeTraits::RemovePointer<T>;
+};
+
+template <class T, class Category>
+CONCEPT isCategory = typeTraits::isBaseOf<Category, typename Traits<T>::Category>;
 
 } // namespace bzd::iterator

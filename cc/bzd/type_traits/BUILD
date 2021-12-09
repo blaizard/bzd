@@ -31,6 +31,7 @@ cc_library(
         ":is_floating_point",
         ":is_function",
         ":is_integral",
+        ":is_iterator",
         ":is_lvalue_reference",
         ":is_pointer",
         ":is_reference",
@@ -49,6 +50,7 @@ cc_library(
         ":remove_cv",
         ":remove_cvref",
         ":remove_extent",
+        ":remove_pointer",
         ":remove_reference",
         ":remove_volatile",
         ":true_type",
@@ -369,6 +371,20 @@ cc_library(
 )
 
 cc_library(
+    name = "is_iterator",
+    hdrs = [
+        "is_iterator.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":true_type",
+        ":void_type",
+        "//cc/bzd/utility:concept"
+    ],
+)
+
+cc_library(
     name = "is_lvalue_reference",
     hdrs = [
         "is_lvalue_reference.hh",
@@ -559,6 +575,14 @@ cc_library(
     name = "remove_extent",
     hdrs = [
         "remove_extent.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "remove_pointer",
+    hdrs = [
+        "remove_pointer.hh",
     ],
     visibility = ["//visibility:public"],
 )

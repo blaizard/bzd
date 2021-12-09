@@ -5,6 +5,7 @@
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/algorithm/sort.hh"
 
 #include <initializer_list>
 
@@ -18,6 +19,11 @@ public:
 	{
 		K first;
 		V second;
+
+		constexpr BoolType operator<(const Element& other) const
+		{
+			return first < other.first;
+		}
 	};
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
@@ -93,11 +99,18 @@ private:
 
 public:
 	constexpr Map() : interface::Map<K, V>{data_} {}
-	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V>{data_}
+	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V>{data_}, data_{list}
 	{
-		for (const auto& [key, value] : list)
+		bzd::algorithm::sort(data_.begin(), data_.end());
+		// Ensure there is no duplicated keys
+		if (data_.size() > 1)
 		{
-			this->insert(key, value);
+			auto it = data_.begin();
+			for (const Element* previous = &(*it++); it != data_.end(); ++it)
+			{
+				bzd::assert::isTrue(previous->first != it->first, "Duplicated keys");
+				previous = &(*it);
+			}
 		}
 	}
 

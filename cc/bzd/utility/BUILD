@@ -8,6 +8,7 @@ cc_library(
         ":align_up",
         ":aligned_storage",
         ":bit",
+        ":concept",
         ":constexpr_for",
         ":container_of",
         ":forward",
@@ -70,6 +71,18 @@ cc_library(
     name = "bit",
     hdrs = [
         "bit.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "concept",
+    hdrs = [
+        "concept.hh",
+    ],
+    deps = [
+        "//cc/bzd/type_traits:enable_if",
+        "//cc/bzd/platform:types"
     ],
     visibility = ["//visibility:public"],
 )

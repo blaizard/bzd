@@ -116,6 +116,7 @@ cc_library(
         ":vector",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
+        "//cc/bzd/algorithm:sort"
     ],
 )
 
