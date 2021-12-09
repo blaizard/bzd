@@ -4,6 +4,7 @@
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/swap.hh"
+#include "cc/bzd/type_traits/is_iterator.hh"
 
 /// This implementation uses heap sort (n*log(n) complexity), sort elements in-place,
 /// and do not require extra memory (stack or other) to process.
@@ -15,7 +16,7 @@ namespace impl {
 /// Build a max heap where value of each child is always smaller
 /// than value of their parent.
 template <class Iterator, class Compare>
-constexpr void makeHeap(Iterator begin, Iterator end, const Compare& comparison) noexcept
+constexpr void makeHeap(Iterator begin, Iterator end, Compare& comparison) noexcept
 {
 	const auto size = bzd::iterator::distance(begin, end);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
@@ -39,8 +40,11 @@ constexpr void makeHeap(Iterator begin, Iterator end, const Compare& comparison)
 } // namespace impl
 
 template <class Iterator, class Compare = bzd::Less<typename Iterator::ValueType>>
-constexpr void sort(Iterator begin, Iterator end, const Compare comparison = Compare{}) noexcept
+constexpr void sort(Iterator begin, Iterator end, Compare comparison = Compare{}) noexcept
 {
+	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with sort.");
+	static_assert(iterator::isCategory<Iterator, iterator::RandomAccessTag>, "The iterator must be a random access iterator.");
+
 	const auto size = bzd::iterator::distance(begin, end);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
 
