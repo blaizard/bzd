@@ -1,6 +1,8 @@
 #pragma once
 
+#include "cc/bzd/algorithm/lower_bound.hh"
 #include "cc/bzd/algorithm/sort.hh"
+#include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
@@ -24,18 +26,23 @@ public:
 	};
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
-public:
+protected:
 	constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept : data_(data) {}
+
+public:
+	/// Lower bound in the map.
+	[[nodiscard]] constexpr Iterator lowerBound(const K& key) const noexcept
+	{
+		return algorithm::lowerBound(data_.begin(), data_.end(), key, [](const Element& elt, const K& value) { return elt.first < value; });
+	}
 
 	/// Search for a specific element in the map.
 	[[nodiscard]] constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
 	{
-		for (auto it = data_.begin(); it != data_.end(); ++it)
+		const auto it = lowerBound(key);
+		if ((it != data_.end()) && (it->first == key))
 		{
-			if (it->first == key)
-			{
-				return it;
-			}
+			return it;
 		}
 		return bzd::nullopt;
 	}
@@ -55,24 +62,29 @@ public:
 	/// Get the number of elements in the map.
 	[[nodiscard]] constexpr SizeType size() const noexcept { return data_.size(); }
 
+	/// \brief Returns the maximum number of elements the vector can hold.
+	///
+	/// \return Maximum number of element this vector can hold.
+	constexpr SizeType capacity() const noexcept { return data_.capacity(); }
+
 	/// Insert a new element or replace the existing one
 	template <class U>
 	constexpr void insert(const K& key, U&& value)
 	{
-		auto result = find(key);
-		if (result)
-		{
-			insert(result.value(), bzd::forward<U>(value));
-		}
-		else
+		const auto it = lowerBound(key);
+		if (it == data_.end())
 		{
 			data_.pushBack({key, bzd::forward<U>(value)});
+			return;
 		}
-	}
+		else if (it->first != key)
+		{
+			bzd::assert::isTrue(this->size() < capacity(), "Out of bound");
+			++data_.storage_.sizeMutable();
+			bzd::algorithm::copy(it, data_.end(), it + 1);
+		}
 
-	template <class U>
-	constexpr void insert(const Iterator& it, U&& value)
-	{
+		it->first = key;
 		it->second = bzd::forward<U>(value);
 	}
 
