@@ -7,42 +7,42 @@ TEST(BinarySearch, Base)
 {
 	bzd::Array<int, 5> array{0, 1, 2, 3, 5};
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 1);
-        EXPECT_TRUE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 1);
+		EXPECT_EQ(*it, 1);
+	}
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
-        EXPECT_TRUE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
+		EXPECT_EQ(*it, 0);
+	}
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 4);
-        EXPECT_FALSE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 4);
+		EXPECT_EQ(it, array.end());
+	}
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 5);
-        EXPECT_TRUE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 5);
+		EXPECT_EQ(*it, 5);
+	}
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), -23);
-        EXPECT_FALSE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), -23);
+		EXPECT_EQ(it, array.end());
+	}
 
-    {
-        const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 35);
-        EXPECT_FALSE(result);
-    }
+	{
+		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 35);
+		EXPECT_EQ(it, array.end());
+	}
 }
 
 TEST_CONSTEXPR_BEGIN(BinarySearch, Constexpr)
 {
 	bzd::Array<int, 5> array{0, 1, 2, 3, 5};
 
-    const auto result = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
-    EXPECT_TRUE(result);
+	const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
+	EXPECT_EQ(*it, 0);
 }
 TEST_CONSTEXPR_END(BinarySearch, Constexpr)

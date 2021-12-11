@@ -49,6 +49,8 @@ cc_library(
     ],
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
+        "//cc/bzd/algorithm:equal",
+        "//cc/bzd/algorithm:lexicographical_compare",
         "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",

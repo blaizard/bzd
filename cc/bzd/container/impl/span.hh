@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/algorithm/equal.hh"
+#include "cc/bzd/algorithm/lexicographical_compare.hh"
 #include "cc/bzd/container/iterator/contiguous.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
@@ -61,55 +63,57 @@ public: // Constructor/assignment
 	}
 
 public: // Iterators
-	constexpr auto begin() noexcept { return Iterator{data()}; }
-	constexpr auto begin() const noexcept { return ConstIterator{data()}; }
-	constexpr auto end() noexcept { return Iterator{&data()[size()]}; }
-	constexpr auto end() const noexcept { return ConstIterator{&data()[size()]}; }
+	[[nodiscard]] constexpr auto begin() noexcept { return Iterator{data()}; }
+	[[nodiscard]] constexpr auto begin() const noexcept { return ConstIterator{data()}; }
+	[[nodiscard]] constexpr auto end() noexcept { return Iterator{&data()[size()]}; }
+	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{&data()[size()]}; }
 
 public: // Size
-	constexpr SizeType size() const noexcept { return storage_.size(); }
-	constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(ValueType); }
-	constexpr bool empty() const noexcept { return (size() == 0); }
+	[[nodiscard]] constexpr SizeType size() const noexcept { return storage_.size(); }
+	[[nodiscard]] constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(ValueType); }
+	[[nodiscard]] constexpr BoolType empty() const noexcept { return (size() == 0); }
 
-public: // Operators
-	constexpr bool operator==(const Self& rhs) const noexcept
+public: // Comparison operators
+	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept
 	{
-		if (size() != rhs.size())
+		if (size() == other.size())
 		{
-			return false;
+			return bzd::algorithm::equal(begin(), end(), other.begin());
 		}
-
-		for (bzd::SizeType index = 0; index < size(); ++index)
-		{
-			if (at(index) != rhs.at(index))
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return false;
 	}
 
-	constexpr bool operator!=(const Self& rhs) const noexcept { return !(*this == rhs); }
+	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
+
+	[[nodiscard]] constexpr BoolType operator<(const Self& other) const noexcept
+	{
+		return bzd::algorithm::lexicographicalCompare(begin(), end(), other.begin(), other.end());
+	}
+
+	[[nodiscard]] constexpr BoolType operator>(const Self& other) const noexcept { return (other < *this); }
+
+	[[nodiscard]] constexpr BoolType operator<=(const Self& other) const noexcept { return !(*this > other); }
+
+	[[nodiscard]] constexpr BoolType operator>=(const Self& other) const noexcept { return !(*this < other); }
 
 public: // Accessors
-	constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
-	constexpr auto& operator[](const SizeType index) const noexcept { return at(index); }
-	constexpr auto& at(const SizeType index) noexcept { return data()[index]; }
-	constexpr auto& at(const SizeType index) const noexcept { return data()[index]; }
-	constexpr auto& front() const noexcept { return at(0); }
-	constexpr auto& front() noexcept { return at(0); }
-	constexpr auto& back() const noexcept { return at(size() - 1); }
-	constexpr auto& back() noexcept { return at(size() - 1); }
-	constexpr auto data() const noexcept { return storage_.data(); }
-	constexpr auto data() noexcept { return storage_.dataMutable(); }
+	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& at(const SizeType index) noexcept { return data()[index]; }
+	[[nodiscard]] constexpr auto& at(const SizeType index) const noexcept { return data()[index]; }
+	[[nodiscard]] constexpr auto& front() const noexcept { return at(0); }
+	[[nodiscard]] constexpr auto& front() noexcept { return at(0); }
+	[[nodiscard]] constexpr auto& back() const noexcept { return at(size() - 1); }
+	[[nodiscard]] constexpr auto& back() noexcept { return at(size() - 1); }
+	[[nodiscard]] constexpr auto data() const noexcept { return storage_.data(); }
+	[[nodiscard]] constexpr auto data() noexcept { return storage_.dataMutable(); }
 	template <SizeType N>
-	constexpr auto& get() const noexcept
+	[[nodiscard]] constexpr auto& get() const noexcept
 	{
 		return at(N);
 	}
 	template <SizeType N>
-	constexpr auto& get() noexcept
+	[[nodiscard]] constexpr auto& get() noexcept
 	{
 		return at(N);
 	}
@@ -123,7 +127,7 @@ public: // Emplace
 	}
 
 public: // Find
-	constexpr SizeType find(const ValueType& item, const SizeType start = 0) const noexcept
+	[[nodiscard]] constexpr SizeType find(const ValueType& item, const SizeType start = 0) const noexcept
 	{
 		for (SizeType i = start; i < size(); ++i)
 		{
@@ -136,18 +140,18 @@ public: // Find
 	}
 
 public: // Subviews. Their definition is in bzd::Span
-	constexpr auto asSpan() const noexcept;
-	constexpr auto asSpan() noexcept;
-	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
-	constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) noexcept;
-	constexpr auto first(const SizeType count) const noexcept;
-	constexpr auto first(const SizeType count) noexcept;
-	constexpr auto last(const SizeType count) const noexcept;
-	constexpr auto last(const SizeType count) noexcept;
+	[[nodiscard]] constexpr auto asSpan() const noexcept;
+	[[nodiscard]] constexpr auto asSpan() noexcept;
+	[[nodiscard]] constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
+	[[nodiscard]] constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) noexcept;
+	[[nodiscard]] constexpr auto first(const SizeType count) const noexcept;
+	[[nodiscard]] constexpr auto first(const SizeType count) noexcept;
+	[[nodiscard]] constexpr auto last(const SizeType count) const noexcept;
+	[[nodiscard]] constexpr auto last(const SizeType count) noexcept;
 
 public: // Convert to bytes
-	constexpr auto asBytes() const noexcept;
-	constexpr auto asBytesMutable() noexcept;
+	[[nodiscard]] constexpr auto asBytes() const noexcept;
+	[[nodiscard]] constexpr auto asBytesMutable() noexcept;
 
 protected:
 	template <class U, class V>

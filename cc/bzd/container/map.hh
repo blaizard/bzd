@@ -1,8 +1,9 @@
 #pragma once
 
 #include "cc/bzd/algorithm/lower_bound.hh"
+#include "cc/bzd/algorithm/move_backward.hh"
 #include "cc/bzd/algorithm/sort.hh"
-#include "cc/bzd/algorithm/copy.hh"
+#include "cc/bzd/algorithm/upper_bound.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
@@ -29,11 +30,26 @@ public:
 protected:
 	constexpr explicit Map(bzd::interface::Vector<Element>& data) noexcept : data_(data) {}
 
+public: // Iterators
+	[[nodiscard]] constexpr auto begin() noexcept { return data_.begin(); }
+	[[nodiscard]] constexpr auto begin() const noexcept { return data_.begin(); }
+	[[nodiscard]] constexpr auto end() noexcept { return data_.end(); }
+	[[nodiscard]] constexpr auto end() const noexcept { return data_.end(); }
+
 public:
+	/// Equal range in the map.
+	[[nodiscard]] constexpr auto equalRange(const K& key) const noexcept { return bzd::makeTuple(lowerBound(key), upperBound(key)); }
+
 	/// Lower bound in the map.
 	[[nodiscard]] constexpr Iterator lowerBound(const K& key) const noexcept
 	{
 		return algorithm::lowerBound(data_.begin(), data_.end(), key, [](const Element& elt, const K& value) { return elt.first < value; });
+	}
+
+	/// Upper bound in the map.
+	[[nodiscard]] constexpr Iterator upperBound(const K& key) const noexcept
+	{
+		return algorithm::upperBound(data_.begin(), data_.end(), key, [](const K& value, const Element& elt) { return value < elt.first; });
 	}
 
 	/// Search for a specific element in the map.
@@ -62,10 +78,10 @@ public:
 	/// Get the number of elements in the map.
 	[[nodiscard]] constexpr SizeType size() const noexcept { return data_.size(); }
 
-	/// \brief Returns the maximum number of elements the vector can hold.
+	/// \brief Returns the maximum number of elements the map can hold.
 	///
-	/// \return Maximum number of element this vector can hold.
-	constexpr SizeType capacity() const noexcept { return data_.capacity(); }
+	/// \return Maximum number of element this map can hold.
+	[[nodiscard]] constexpr SizeType capacity() const noexcept { return data_.capacity(); }
 
 	/// Insert a new element or replace the existing one
 	template <class U>
@@ -81,7 +97,7 @@ public:
 		{
 			bzd::assert::isTrue(this->size() < capacity(), "Out of bound");
 			++data_.storage_.sizeMutable();
-			bzd::algorithm::copy(it, data_.end(), it + 1);
+			bzd::algorithm::moveBackward(it, data_.end() - 1, data_.end());
 		}
 
 		it->first = key;

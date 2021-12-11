@@ -3,6 +3,7 @@
 // Algorithm
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/algorithm/copy_n.hh"
+#include "cc/bzd/algorithm/equal_range.hh"
 #include "cc/bzd/algorithm/fill.hh"
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/algorithm/sort.hh"
@@ -38,7 +39,7 @@
 #include "cc/bzd/core/delay.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/core/registry.hh"
+#include "cc/bzd/core/print.hh"
 
 // Meta
 #include "cc/bzd/meta/choose_nth.hh"
