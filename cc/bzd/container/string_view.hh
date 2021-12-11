@@ -9,6 +9,7 @@ template <class T>
 class StringView : public impl::Span<T, impl::NonOwningStorage<T>>
 {
 protected:
+	using Self = StringView<T>;
 	using Parent = impl::Span<T, impl::NonOwningStorage<T>>;
 	using StorageType = typename Parent::StorageType;
 

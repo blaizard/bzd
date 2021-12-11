@@ -9,7 +9,7 @@ cc_library(
         ":delay",
         ":error",
         ":mutex",
-        ":registry",
+        ":print",
         ":units",
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
@@ -110,22 +110,6 @@ cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/platform:stream",
         "//cc/bzd/utility/format:stream",
-    ],
-)
-
-cc_library(
-    name = "registry",
-    hdrs = [
-        "registry.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:map",
-        "//cc/bzd/container:result",
-        "//cc/bzd/container:string_view",
-        "//cc/bzd/core/assert:minimal",
-        "//cc/bzd/platform:types",
-        "//cc/bzd/utility:singleton",
     ],
 )
 

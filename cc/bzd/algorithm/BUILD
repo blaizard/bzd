@@ -7,11 +7,16 @@ cc_library(
         ":binary_search",
         ":copy",
         ":copy_n",
+        ":equal",
+        ":equal_range",
         ":fill",
+        ":lexicographical_compare",
         ":lower_bound",
+        ":move",
+        ":move_backward",
         ":reverse",
         ":sort",
-        ":upper_bound"
+        ":upper_bound",
     ],
 )
 
@@ -24,8 +29,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits:is_iterator",
         ":lower_bound",
+        "//cc/bzd/type_traits:is_iterator",
     ],
 )
 
@@ -33,6 +38,17 @@ cc_library(
     name = "copy",
     hdrs = [
         "copy.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+    ],
+)
+
+cc_library(
+    name = "copy_backward",
+    hdrs = [
+        "copy_backward.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -52,6 +68,34 @@ cc_library(
 )
 
 cc_library(
+    name = "equal",
+    hdrs = [
+        "equal.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/utility/comparison",
+    ],
+)
+
+cc_library(
+    name = "equal_range",
+    hdrs = [
+        "equal_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":lower_bound",
+        ":upper_bound",
+        "//cc/bzd/container:tuple",
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/utility/comparison",
+    ],
+)
+
+cc_library(
     name = "fill",
     hdrs = [
         "fill.hh",
@@ -59,6 +103,19 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:is_iterator",
+    ],
+)
+
+cc_library(
+    name = "lexicographical_compare",
+    hdrs = [
+        "lexicographical_compare.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/utility/comparison",
     ],
 )
 
@@ -72,7 +129,31 @@ cc_library(
         "//cc/bzd/container/iterator:advance",
         "//cc/bzd/container/iterator:distance",
         "//cc/bzd/type_traits:is_iterator",
-        "//cc/bzd/utility/comparison"
+        "//cc/bzd/utility/comparison",
+    ],
+)
+
+cc_library(
+    name = "move",
+    hdrs = [
+        "move.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
+    name = "move_backward",
+    hdrs = [
+        "move_backward.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_iterator",
+        "//cc/bzd/utility:move",
     ],
 )
 
@@ -113,6 +194,6 @@ cc_library(
         "//cc/bzd/container/iterator:advance",
         "//cc/bzd/container/iterator:distance",
         "//cc/bzd/type_traits:is_iterator",
-        "//cc/bzd/utility/comparison"
+        "//cc/bzd/utility/comparison",
     ],
 )
