@@ -1,8 +1,10 @@
 #pragma once
 
 #include "cc/bzd/algorithm/equal.hh"
+#include "cc/bzd/algorithm/find.hh"
 #include "cc/bzd/algorithm/lexicographical_compare.hh"
 #include "cc/bzd/container/iterator/contiguous.hh"
+#include "cc/bzd/container/iterator/distance.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
@@ -129,11 +131,12 @@ public: // Emplace
 public: // Find
 	[[nodiscard]] constexpr SizeType find(const ValueType& item, const SizeType start = 0) const noexcept
 	{
-		for (SizeType i = start; i < size(); ++i)
+		if (start < size())
 		{
-			if (at(i) == item)
+			const auto it = bzd::algorithm::find(begin() + start, end(), item);
+			if (it != end())
 			{
-				return i;
+				return bzd::iterator::distance(begin(), it);
 			}
 		}
 		return npos;

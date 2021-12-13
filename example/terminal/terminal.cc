@@ -6,7 +6,10 @@ template <bzd::SizeType N>
 class Reader
 {
 public: // Constructor.
-	constexpr Reader(bzd::IStream& in, bzd::OStream& out) noexcept : in_{in}, out_{out} {}
+	constexpr Reader(bzd::IStream& in, bzd::OStream& out, bzd::Span<const bzd::ByteType> separators) noexcept :
+		in_{in}, out_{out}, separators_{separators}
+	{
+	}
 
 public: // API.
 	/// Read a sequence of bytes until the specified stop byte and return what has been read.
@@ -54,6 +57,22 @@ public: // API.
 
 			for (const auto c : result)
 			{
+				if (bzd::algorithm::find(separators_.begin(), separators_.end(), c) != separators_.end())
+				{
+					// Ignore separators at the begining of the data.
+					if (!index)
+					{
+						buffer_.consume(1);
+						continue;
+					}
+					std::cout << "herr" << std::endl;
+				}
+				/*	if (c == ' ')
+					{
+						// Check if element == size
+						// co_return match if any
+					}*/
+
 				first = bzd::algorithm::lowerBound(first, last, c, [&](const Element& elt, const bzd::ByteType c) {
 					return index >= elt.first.size() || elt.first.at(index) < static_cast<char>(c);
 				});
@@ -115,12 +134,14 @@ private:
 private: // Variables.
 	bzd::IStream& in_;
 	bzd::OStream& out_;
+	bzd::Span<const bzd::ByteType> separators_;
 	bzd::RingBuffer<bzd::ByteType, N> buffer_{};
 };
 
 bzd::Async<bool> run()
 {
-	Reader<16> reader{bzd::platform::in(), bzd::platform::out()};
+	bzd::Array<bzd::ByteType, 2> separators{bzd::ByteType{' '}, bzd::ByteType{'\t'}};
+	Reader<16> reader{bzd::platform::in(), bzd::platform::out(), separators.asSpan()};
 
 	bzd::Map<bzd::StringView, int, 12> keywords{
 		{"info"_sv, 0},

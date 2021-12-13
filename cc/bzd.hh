@@ -1,10 +1,18 @@
 #pragma once
 
 // Algorithm
+#include "cc/bzd/algorithm/all_of.hh"
+#include "cc/bzd/algorithm/any_of.hh"
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/algorithm/copy_n.hh"
 #include "cc/bzd/algorithm/equal_range.hh"
 #include "cc/bzd/algorithm/fill.hh"
+#include "cc/bzd/algorithm/find.hh"
+#include "cc/bzd/algorithm/find_if.hh"
+#include "cc/bzd/algorithm/find_if_not.hh"
+#include "cc/bzd/algorithm/move.hh"
+#include "cc/bzd/algorithm/move_backward.hh"
+#include "cc/bzd/algorithm/none_of.hh"
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/algorithm/sort.hh"
 
