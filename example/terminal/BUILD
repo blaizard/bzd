@@ -10,6 +10,16 @@ bdl_library(
 )
 
 cc_library(
+    name = "reader",
+    hdrs = [
+        "reader.hh",
+    ],
+    visibility = [
+        "//example/terminal/tests:__pkg__",
+    ],
+)
+
+cc_library(
     name = "lib",
     srcs = [
         "terminal.cc",
@@ -19,6 +29,7 @@ cc_library(
     ],
     deps = [
         ":composition",
+        ":reader",
         "//cc:bzd",
     ],
 )

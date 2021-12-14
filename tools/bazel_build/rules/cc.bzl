@@ -4,7 +4,7 @@ load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageM
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_link", "find_cc_toolchain")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link", "find_cc_toolchain")
 
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
     """
@@ -313,3 +313,54 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
         ],
         **kwags
     )
+
+def _bzd_cc_library_impl(ctx):
+    # Build the list of public headers
+    hdrs = sets.make(ctx.files.hdrs)
+    for dep in ctx.attr.deps:
+        for f in dep[CcInfo].compilation_context.direct_public_headers:
+            sets.insert(hdrs, f)
+
+    # Build the public header file
+    hdrs_file = ctx.actions.declare_file("{}.hh".format(ctx.attr.name))
+    ctx.actions.write(
+        output = hdrs_file,
+        content = "#pragma once\n\n{content}".format(content = "\n".join(["#include \"{}\"".format(f.path) for f in sets.to_list(hdrs)])),
+    )
+
+    info_provider = cc_compile(
+        ctx = ctx,
+        hdrs = ctx.files.hdrs + [hdrs_file],
+        srcs = ctx.files.srcs,
+        deps = ctx.attr.deps,
+    )
+
+    return info_provider
+
+bzd_cc_library = rule(
+    doc = """
+    Provide a replacement to cc_library with additional functionalities:
+    - Generates a header file containing all hdrs and the ones from the direct deps.
+    """,
+    implementation = _bzd_cc_library_impl,
+    attrs = {
+        "deps": attr.label_list(
+            doc = "C++ dependencies",
+            providers = [CcInfo],
+        ),
+        "hdrs": attr.label_list(
+            doc = "C++ header files",
+            allow_files = True,
+        ),
+        "srcs": attr.label_list(
+            doc = "C++ source files",
+            allow_files = True,
+        ),
+        "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
+    },
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+        "//tools/bazel_build/toolchains/binary:toolchain_type",
+    ],
+    fragments = ["cpp"],
+)
