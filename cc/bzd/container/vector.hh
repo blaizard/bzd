@@ -30,11 +30,12 @@ public:
 	/// The content of val is copied (or moved) to the new element.
 	///
 	/// \param value Value to be copied (or moved) to the new element.
-	constexpr void pushBack(const T& value)
+	template <class U>
+	constexpr void pushBack(U&& value)
 	{
 		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
 		++this->storage_.sizeMutable();
-		this->at(this->size() - 1) = value;
+		this->at(this->size() - 1) = bzd::forward<U>(value);
 	}
 
 	/// Appends a new element to the end of the container.

@@ -121,6 +121,7 @@ cc_library(
         "//cc/bzd/algorithm:upper_bound",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility/comparison"
     ],
 )
 

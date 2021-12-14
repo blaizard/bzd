@@ -1,12 +1,14 @@
 #include "cc/bzd/test/test.hh"
 
 #include "cc/bzd/core/print.hh"
-
-#include <map>
-#include <vector>
+#include "cc/bzd/container/map.hh"
+#include "cc/bzd/container/vector.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {
+
+// Maximum number of test cases supported, over this number, the application will assert.
+constexpr ::bzd::SizeType maxTestCases = 100U;
 
 struct TestID
 {
@@ -50,7 +52,7 @@ struct TestID
 
 [[nodiscard]] auto& getTestsSingleton()
 {
-	static ::std::map<::TestID, bzd::test::Manager::TestInfo> tests;
+	static ::bzd::Map<::TestID, bzd::test::Manager::TestInfo, maxTestCases> tests;
 	return tests;
 }
 } // namespace
@@ -92,14 +94,14 @@ bool Manager::registerTest(Manager::TestInfo&& info)
 	{
 		throw 42;
 	}
-	tests.emplace(id, std::move(info));
+	tests.insert(id, std::move(info));
 
 	return true;
 }
 
 bool bzd::test::Manager::run()
 {
-	::std::vector<const TestInfo*> failedTests;
+	::bzd::Vector<const TestInfo*, maxTestCases> failedTests;
 	auto& tests = getTestsSingleton();
 
 	::bzd::print(CSTR("[==========] Running test(s) from {} test case(s)\n"), tests.size()).sync();
@@ -131,7 +133,7 @@ bool bzd::test::Manager::run()
 		// Print the test status
 		if (currentTestFailed_)
 		{
-			failedTests.push_back(&info);
+			failedTests.pushBack(&info);
 			::bzd::print(CSTR("[   FAILED ]\n")).sync();
 		}
 		else

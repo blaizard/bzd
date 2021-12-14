@@ -27,6 +27,8 @@ cc_library(
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/utility:numeric_limits",
+        "//cc/bzd/container:map",
+        "//cc/bzd/container:vector"
     ],
 )
 

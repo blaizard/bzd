@@ -9,14 +9,86 @@ TEST(ContainerMap, single)
 	map.insert(12, 5);
 
 	{
-		const auto result = map.find(42);
-		EXPECT_FALSE(result);
+		const auto it = map.find(42);
+		EXPECT_EQ(it, map.end());
 	}
 	{
-		const auto result = map.find(12);
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value()->second, 5);
+		const auto it = map.find(12);
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->second, 5);
 		EXPECT_EQ(map[12], 5);
+	}
+}
+
+TEST(ContainerMap, find)
+{
+	bzd::Map<int, int, 12> map{
+		{0, 0},
+		{1, 0},
+		{3, 0},
+		{4, 0},
+		{5, 0},
+		{10, 0},
+	};
+
+	{
+		const auto it = map.find(-1);
+		EXPECT_EQ(it, map.end());
+	}
+	{
+		const auto it = map.find(0);
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->first, 0);
+	}
+	{
+		const auto it = map.find(1);
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->first, 1);
+	}
+	{
+		const auto it = map.find(2);
+		EXPECT_EQ(it, map.end());
+	}
+	{
+		const auto it = map.find(3);
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->first, 3);
+	}
+	{
+		const auto it = map.find(10);
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->first, 10);
+	}
+	{
+		const auto it = map.find(11);
+		EXPECT_EQ(it, map.end());
+	}
+}
+
+TEST(ContainerMap, lessCompare)
+{
+	struct KeyTest
+	{
+		bool operator<(const KeyTest& other) const noexcept
+		{
+			return a < other.a;
+		}
+		int a;
+	};
+	bzd::Map<KeyTest, int, 4> map{
+		{KeyTest{0}, 0},
+		{KeyTest{1}, 0},
+	};
+	{
+		const auto it = map.find(KeyTest{42});
+		EXPECT_EQ(it, map.end());
+	}
+	map.insert(KeyTest{42}, 4);
+	{
+		const auto it = map.find(KeyTest{42});
+		EXPECT_NE(it, map.end());
+		EXPECT_EQ(it->first.a, 42);
+		EXPECT_EQ(it->second, 4);
 	}
 }
 

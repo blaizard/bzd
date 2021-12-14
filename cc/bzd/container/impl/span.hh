@@ -160,7 +160,7 @@ protected:
 	template <class U, class V>
 	friend class Span;
 
-	template <class K, class V>
+	template <class K, class V, class Compare>
 	friend class Map;
 
 	StorageType storage_{};
