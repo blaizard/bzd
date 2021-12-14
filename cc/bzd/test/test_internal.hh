@@ -354,9 +354,10 @@ public:
 	class TestPtr
 	{
 	public:
+		TestPtr() = default;
 		TestPtr(const Test* test) : test_(test) {}
 		TestPtr(TestPtr&& other) : test_(other.test_) { other.test_ = nullptr; }
-		TestPtr& operator=(TestPtr&& other)
+		TestPtr& operator=(TestPtr&& other) noexcept
 		{
 			test_ = other.test_;
 			other.test_ = nullptr;
@@ -377,7 +378,7 @@ public:
 	{
 		const char* testCaseName_;
 		const char* testName_;
-		const char* const file_;
+		const char* file_;
 		TestPtr test_;
 	};
 

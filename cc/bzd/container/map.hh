@@ -9,12 +9,13 @@
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/comparison/less.hh"
 
 #include <initializer_list>
 
 namespace bzd::impl {
 /// \brief Flat map implementation.
-template <class K, class V>
+template <class K, class V, class Compare>
 class Map
 {
 public:
@@ -43,34 +44,37 @@ public:
 	/// Lower bound in the map.
 	[[nodiscard]] constexpr Iterator lowerBound(const K& key) const noexcept
 	{
-		return algorithm::lowerBound(data_.begin(), data_.end(), key, [](const Element& elt, const K& value) { return elt.first < value; });
+		return algorithm::lowerBound(data_.begin(), data_.end(), key, [this](const Element& elt, const K& value) { return compare_(elt.first, value); });
 	}
 
 	/// Upper bound in the map.
 	[[nodiscard]] constexpr Iterator upperBound(const K& key) const noexcept
 	{
-		return algorithm::upperBound(data_.begin(), data_.end(), key, [](const K& value, const Element& elt) { return value < elt.first; });
+		return algorithm::upperBound(data_.begin(), data_.end(), key, [this](const K& value, const Element& elt) { return compare_(value, elt.first); });
 	}
 
 	/// Search for a specific element in the map.
-	[[nodiscard]] constexpr bzd::Optional<Iterator> find(const K& key) const noexcept
+	[[nodiscard]] constexpr Iterator find(const K& key) const noexcept
 	{
 		const auto it = lowerBound(key);
-		if ((it != data_.end()) && (it->first == key))
+		if (it != data_.end())
 		{
-			return it;
+			if (!compare_(key, it->first))
+			{
+				return it;
+			}
 		}
-		return bzd::nullopt;
+		return data_.end();
 	}
 
 	[[nodiscard]] constexpr V& operator[](const K& key) const
 	{
-		auto result = find(key);
-		bzd::assert::isTrue(result.hasValue(), "Key does not exists");
-		return result.valueMutable()->second;
+		auto it = find(key);
+		bzd::assert::isTrue(it != data_.end(), "Key does not exists");
+		return it->second;
 	}
 
-	[[nodiscard]] constexpr bool contains(const K& key) const noexcept { return find(key).hasValue(); }
+	[[nodiscard]] constexpr bool contains(const K& key) const noexcept { return (find(key) != data_.end()); }
 
 	/// Whether or not the map contains elements.
 	[[nodiscard]] constexpr bool empty() const noexcept { return data_.empty(); }
@@ -90,10 +94,10 @@ public:
 		const auto it = lowerBound(key);
 		if (it == data_.end())
 		{
-			data_.pushBack({key, bzd::forward<U>(value)});
+			data_.pushBack(Element{key, bzd::forward<U>(value)});
 			return;
 		}
-		else if (it->first != key)
+		else if (compare_(key, it->first))
 		{
 			bzd::assert::isTrue(this->size() < capacity(), "Out of bound");
 			++data_.storage_.sizeMutable();
@@ -106,25 +110,26 @@ public:
 
 protected:
 	bzd::interface::Vector<Element>& data_;
+	Compare compare_{};
 };
 } // namespace bzd::impl
 
 namespace bzd::interface {
-template <class K, class V>
-using Map = impl::Map<K, V>;
+template <class K, class V, class Compare = bzd::Less<K>>
+using Map = impl::Map<K, V, Compare>;
 }
 
 namespace bzd {
 
-template <class K, class V, SizeType N>
-class Map : public interface::Map<K, V>
+template <class K, class V, SizeType N, class Compare = bzd::Less<K>>
+class Map : public interface::Map<K, V, Compare>
 {
 private:
-	using typename interface::Map<K, V>::Element;
+	using typename interface::Map<K, V, Compare>::Element;
 
 public:
-	constexpr Map() : interface::Map<K, V>{data_} {}
-	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V>{data_}, data_{list}
+	constexpr Map() : interface::Map<K, V, Compare>{data_} {}
+	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V, Compare>{data_}, data_{list}
 	{
 		bzd::algorithm::sort(data_.begin(), data_.end());
 		// Ensure there is no duplicated keys
@@ -133,7 +138,8 @@ public:
 			auto it = data_.begin();
 			for (const Element* previous = &(*it++); it != data_.end(); ++it)
 			{
-				bzd::assert::isTrue(previous->first != it->first, "Duplicated keys");
+				// Ensure these 2 keys are different.
+				bzd::assert::isTrue(this->compare_(previous->first, it->first) || this->compare_(it->first, previous->first), "Duplicated keys");
 				previous = &(*it);
 			}
 		}
