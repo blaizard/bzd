@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
 
-cc_library(
+bzd_cc_library(
     name = "algorithm",
     visibility = ["//visibility:public"],
     deps = [

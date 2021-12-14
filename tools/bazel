@@ -11,7 +11,7 @@ import shutil
 """
 Execute a process and exit if it fails
 """
-def processRun(args):
+def processRun(args) -> None:
 	result = subprocess.run(args)
 	if result.returncode != 0:
 		sys.exit(result.returncode)
