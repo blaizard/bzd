@@ -8,22 +8,22 @@ TEST(ToString, Integer)
 
 	str.clear();
 	toString(str, 12);
-	EXPECT_EQ(str.size(), 2);
+	EXPECT_EQ(str.size(), 2U);
 	EXPECT_STREQ(str.data(), "12");
 
 	str.clear();
 	toString(str, -426);
-	EXPECT_EQ(str.size(), 4);
+	EXPECT_EQ(str.size(), 4U);
 	EXPECT_STREQ(str.data(), "-426");
 
 	str.clear();
 	toString(str, 0);
-	EXPECT_EQ(str.size(), 1);
+	EXPECT_EQ(str.size(), 1U);
 	EXPECT_STREQ(str.data(), "0");
 
 	str.clear();
 	toString(str, static_cast<long long int>(1234567890));
-	EXPECT_EQ(str.size(), 10);
+	EXPECT_EQ(str.size(), 10U);
 	EXPECT_STREQ(str.data(), "1234567890");
 }
 
@@ -82,9 +82,9 @@ TEST(ToString, Overflow)
 	{
 		bzd::String<0> str;
 		toString(str, 12);
-		EXPECT_EQ(str.size(), 0);
+		EXPECT_EQ(str.size(), 0U);
 		toString(str, -12);
-		EXPECT_EQ(str.size(), 0);
+		EXPECT_EQ(str.size(), 0U);
 	}
 
 	{
@@ -92,12 +92,12 @@ TEST(ToString, Overflow)
 
 		str.clear();
 		toString(str, 12);
-		EXPECT_EQ(str.size(), 1);
+		EXPECT_EQ(str.size(), 1U);
 		EXPECT_STREQ(str.data(), "2");
 
 		str.clear();
 		toString(str, -12);
-		EXPECT_EQ(str.size(), 1);
+		EXPECT_EQ(str.size(), 1U);
 		EXPECT_STREQ(str.data(), "2");
 	}
 }

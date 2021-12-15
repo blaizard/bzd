@@ -5,7 +5,7 @@
 TEST(ContainerPool, single)
 {
 	bzd::Pool<int, 1> pool;
-	EXPECT_EQ(pool.capacity(), 1);
+	EXPECT_EQ(pool.capacity(), 1U);
 
 	pool.toStream(std::cout);
 	std::cout << std::endl;
@@ -32,7 +32,7 @@ TEST(ContainerPool, single)
 TEST(ContainerPool, multi)
 {
 	bzd::Pool<int, 3> pool;
-	EXPECT_EQ(pool.capacity(), 3);
+	EXPECT_EQ(pool.capacity(), 3U);
 
 	auto& item1 = pool.reserve();
 	EXPECT_FALSE(pool.empty());

@@ -23,8 +23,8 @@ TEST(ContainerString, Empty)
 	bzd::String<10> string;
 	bzd::interface::String& iString = string;
 
-	EXPECT_EQ(iString.capacity(), 10);
-	EXPECT_EQ(iString.size(), 0);
+	EXPECT_EQ(iString.capacity(), 10U);
+	EXPECT_EQ(iString.size(), 0U);
 }
 
 TEST(ContainerString, Base)
@@ -32,17 +32,17 @@ TEST(ContainerString, Base)
 	bzd::String<10> string("Hello");
 	bzd::interface::String& iString = string;
 
-	EXPECT_EQ(iString.capacity(), 10);
-	EXPECT_EQ(iString.size(), 5);
+	EXPECT_EQ(iString.capacity(), 10U);
+	EXPECT_EQ(iString.size(), 5U);
 	EXPECT_STREQ(iString.data(), "Hello");
 	EXPECT_EQ(iString[0], 'H');
 
 	iString.append(" You");
-	EXPECT_EQ(iString.size(), 9);
+	EXPECT_EQ(iString.size(), 9U);
 	EXPECT_STREQ(iString.data(), "Hello You");
 
 	iString.append("!OVERFLOW");
-	EXPECT_EQ(iString.size(), 10);
+	EXPECT_EQ(iString.size(), 10U);
 	EXPECT_STREQ(iString.data(), "Hello You!");
 
 	iString.data()[0] = 'W';
@@ -56,8 +56,8 @@ TEST(ContainerString, BaseConst)
 {
 	const bzd::String<10> string("Hello");
 
-	EXPECT_EQ(string.capacity(), 10);
-	EXPECT_EQ(string.size(), 5);
+	EXPECT_EQ(string.capacity(), 10U);
+	EXPECT_EQ(string.size(), 5U);
 	EXPECT_STREQ(string.data(), "Hello");
 	EXPECT_EQ(string[0], 'H');
 }
@@ -66,16 +66,16 @@ TEST(ContainerString, Resize)
 {
 	bzd::String<11> string("Hello World");
 
-	EXPECT_EQ(string.capacity(), 11);
-	EXPECT_EQ(string.size(), 11);
+	EXPECT_EQ(string.capacity(), 11U);
+	EXPECT_EQ(string.size(), 11U);
 	EXPECT_STREQ(string.data(), "Hello World");
 
 	string.resize(5);
-	EXPECT_EQ(string.size(), 5);
+	EXPECT_EQ(string.size(), 5U);
 	EXPECT_STREQ(string.data(), "Hello");
 
 	string.resize(0);
-	EXPECT_EQ(string.size(), 0);
+	EXPECT_EQ(string.size(), 0U);
 	EXPECT_STREQ(string.data(), "");
 }
 
@@ -83,15 +83,15 @@ TEST(ContainerString, OperatorsEqual)
 {
 	bzd::String<6> string;
 
-	EXPECT_EQ(string.size(), 0);
+	EXPECT_EQ(string.size(), 0U);
 	EXPECT_STREQ(string.data(), "");
 
 	string = "Hello";
-	EXPECT_EQ(string.size(), 5);
+	EXPECT_EQ(string.size(), 5U);
 	EXPECT_STREQ(string.data(), "Hello");
 
 	string = "Hello World";
-	EXPECT_EQ(string.size(), 6);
+	EXPECT_EQ(string.size(), 6U);
 	EXPECT_STREQ(string.data(), "Hello ");
 }
 

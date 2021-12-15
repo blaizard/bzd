@@ -69,10 +69,7 @@ TEST(ContainerMap, lessCompare)
 {
 	struct KeyTest
 	{
-		bool operator<(const KeyTest& other) const noexcept
-		{
-			return a < other.a;
-		}
+		bool operator<(const KeyTest& other) const noexcept { return a < other.a; }
 		int a;
 	};
 	bzd::Map<KeyTest, int, 4> map{
@@ -124,7 +121,7 @@ TEST_CONSTEXPR_BEGIN(ContainerMap, Constexpr)
 	EXPECT_TRUE(emptyMap.empty());
 
 	bzd::Map<int, int, 12> dataMap{{12, 32}, {1, 2}, {4, 8}, {-31, 4}, {122, 0}};
-	EXPECT_EQ(dataMap.size(), 5);
+	EXPECT_EQ(dataMap.size(), 5U);
 
 	EXPECT_EQ(dataMap[4], 8);
 }

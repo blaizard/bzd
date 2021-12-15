@@ -5,14 +5,14 @@ TEST(NonOwningList, simple)
 {
 	bzd::test::ListElementMultiContainer elements[10]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
-	EXPECT_EQ(list.size(), 0);
+	EXPECT_EQ(list.size(), 0U);
 	EXPECT_FALSE(list.front());
 	EXPECT_FALSE(list.back());
 
 	{
 		const auto result = list.pushFront(elements[0]);
 		EXPECT_TRUE(result);
-		EXPECT_EQ(list.size(), 1);
+		EXPECT_EQ(list.size(), 1U);
 	}
 
 	{
@@ -24,7 +24,7 @@ TEST(NonOwningList, simple)
 	{
 		const auto result = list.pop(elements[0]);
 		EXPECT_TRUE(result);
-		EXPECT_EQ(list.size(), 0);
+		EXPECT_EQ(list.size(), 0U);
 		const auto result2 = list.pop(elements[0]);
 		EXPECT_FALSE(result2);
 		EXPECT_EQ(result2.error(), bzd::ListErrorType::elementAlreadyRemoved);
@@ -33,14 +33,14 @@ TEST(NonOwningList, simple)
 	{
 		const auto result = list.pushFront(elements[2]);
 		EXPECT_TRUE(result);
-		EXPECT_EQ(list.size(), 1);
+		EXPECT_EQ(list.size(), 1U);
 
 		const auto result2 = elements[2].pop();
 		EXPECT_TRUE(result2);
-		EXPECT_EQ(list.size(), 0);
+		EXPECT_EQ(list.size(), 0U);
 
 		const auto result3 = elements[2].pop();
 		EXPECT_FALSE(result3);
-		EXPECT_EQ(list.size(), 0);
+		EXPECT_EQ(list.size(), 0U);
 	}
 }

@@ -24,11 +24,13 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":composition",
+        "//cc/bzd/container:map",
+        "//cc/bzd/container:vector",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/utility:numeric_limits",
-        "//cc/bzd/container:map",
-        "//cc/bzd/container:vector"
+        "//cc/bzd/utility/random:uniform_int_distribution",
+        "//cc/bzd/utility/random:xorwow_engine",
     ],
 )
 

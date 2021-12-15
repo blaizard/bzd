@@ -30,6 +30,7 @@ bzd_cc_library(
         "//cc/bzd/utility/format",
         "//cc/bzd/utility/format:integral",
         "//cc/bzd/utility/format:stream",
+        "//cc/bzd/utility/random",
     ],
 )
 

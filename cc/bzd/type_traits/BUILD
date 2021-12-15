@@ -26,6 +26,7 @@ bzd_cc_library(
         ":is_class",
         ":is_const",
         ":is_constructible",
+        ":is_convertible",
         ":is_default_constructible",
         ":is_destructible",
         ":is_enum",
@@ -285,6 +286,19 @@ cc_library(
     name = "is_constructible",
     hdrs = [
         "is_constructible.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":declval",
+        ":integral_constant",
+        ":void_type",
+    ],
+)
+
+cc_library(
+    name = "is_convertible",
+    hdrs = [
+        "is_convertible.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

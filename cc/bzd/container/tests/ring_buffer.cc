@@ -7,8 +7,8 @@ TEST(RingBuffer, single)
 {
 	bzd::RingBuffer<int, 16> ring;
 
-	EXPECT_EQ(ring.size(), 0);
-	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_EQ(ring.size(), 0U);
+	EXPECT_EQ(ring.capacity(), 16U);
 	EXPECT_TRUE(ring.empty());
 	EXPECT_FALSE(ring.full());
 
@@ -17,8 +17,8 @@ TEST(RingBuffer, single)
 		ring.pushBack(i);
 	}
 
-	EXPECT_EQ(ring.size(), 15);
-	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_EQ(ring.size(), 15U);
+	EXPECT_EQ(ring.capacity(), 16U);
 	EXPECT_FALSE(ring.empty());
 	EXPECT_FALSE(ring.full());
 	EXPECT_EQ(ring.at(0), 0);
@@ -27,24 +27,24 @@ TEST(RingBuffer, single)
 
 	ring.pushBack(11);
 
-	EXPECT_EQ(ring.size(), 16);
-	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_EQ(ring.size(), 16U);
+	EXPECT_EQ(ring.capacity(), 16U);
 	EXPECT_FALSE(ring.empty());
 	EXPECT_TRUE(ring.full());
 	EXPECT_FALSE(ring.overrun());
 
 	ring.pushBack(12);
 
-	EXPECT_EQ(ring.size(), 16);
-	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_EQ(ring.size(), 16U);
+	EXPECT_EQ(ring.capacity(), 16U);
 	EXPECT_FALSE(ring.empty());
 	EXPECT_TRUE(ring.full());
 	EXPECT_TRUE(ring.overrun());
 
 	ring.clear();
 
-	EXPECT_EQ(ring.size(), 0);
-	EXPECT_EQ(ring.capacity(), 16);
+	EXPECT_EQ(ring.size(), 0U);
+	EXPECT_EQ(ring.capacity(), 16U);
 	EXPECT_TRUE(ring.empty());
 	EXPECT_FALSE(ring.full());
 	EXPECT_FALSE(ring.overrun());
@@ -56,14 +56,14 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 0);
+		EXPECT_EQ(span.size(), 0U);
 	}
 
 	ring.pushBack(42);
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 42);
 	}
 
@@ -71,7 +71,7 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 2);
+		EXPECT_EQ(span.size(), 2U);
 		EXPECT_EQ(span[0], 42);
 		EXPECT_EQ(span[1], 34);
 	}
@@ -80,7 +80,7 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 34);
 	}
 
@@ -91,7 +91,7 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 15);
+		EXPECT_EQ(span.size(), 15U);
 		EXPECT_EQ(span[0], 34);
 		EXPECT_EQ(span[14], 13);
 	}
@@ -100,7 +100,7 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 14);
 	}
 
@@ -108,7 +108,7 @@ TEST(RingBuffer, asSpanForReading)
 
 	{
 		const auto span = ring.asSpanForReading();
-		EXPECT_EQ(span.size(), 0);
+		EXPECT_EQ(span.size(), 0U);
 	}
 }
 
@@ -118,7 +118,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 16);
+		EXPECT_EQ(span.size(), 16U);
 		int counter = 0;
 		for (auto& i : span)
 		{
@@ -130,7 +130,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 15);
+		EXPECT_EQ(span.size(), 15U);
 		EXPECT_EQ(span[0], 1);
 		EXPECT_EQ(span[14], 15);
 	}
@@ -139,7 +139,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 15);
 	}
 
@@ -148,14 +148,14 @@ TEST(RingBuffer, asSpanForWriting)
 	{
 		EXPECT_TRUE(ring.full());
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 0);
+		EXPECT_EQ(span.size(), 0U);
 	}
 
 	ring.consume(1);
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 0);
 	}
 
@@ -164,7 +164,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 1);
 	}
 
@@ -173,7 +173,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 1);
+		EXPECT_EQ(span.size(), 1U);
 		EXPECT_EQ(span[0], 2);
 	}
 
@@ -181,7 +181,7 @@ TEST(RingBuffer, asSpanForWriting)
 
 	{
 		auto span = ring.asSpanForWriting();
-		EXPECT_EQ(span.size(), 14);
+		EXPECT_EQ(span.size(), 14U);
 		EXPECT_EQ(span[0], 2);
 		EXPECT_EQ(span[13], 15);
 	}
@@ -195,7 +195,7 @@ TEST(RingBuffer, stress)
 
 	for (int iteration = 0; iteration < 10000; ++iteration)
 	{
-		bzd::SizeType random = test.random(0, 16);
+		bzd::SizeType random = test.random<bzd::SizeType, 0, 16>();
 
 		// Write X entries.
 		if (test.random<bzd::BoolType>())
