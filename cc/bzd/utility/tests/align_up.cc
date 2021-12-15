@@ -22,15 +22,15 @@ TEST(AlignUp, TypeIntegrals)
 {
 	{
 		const auto result = bzd::alignUp<2>(static_cast<bzd::UInt8Type>(13));
-		EXPECT_EQ(result, 14);
+		EXPECT_EQ(result, 14U);
 	}
 	{
 		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt16Type>(13));
-		EXPECT_EQ(result, 16);
+		EXPECT_EQ(result, 16U);
 	}
 	{
 		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt64Type>(13));
-		EXPECT_EQ(result, 16);
+		EXPECT_EQ(result, 16U);
 	}
 }
 

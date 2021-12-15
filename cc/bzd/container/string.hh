@@ -132,7 +132,7 @@ protected:
 };
 
 // Comparison to char*
-constexpr bool operator==(interface::String& lhs, const char* const rhs) noexcept
+constexpr bool operator==(const interface::String& lhs, const char* const rhs) noexcept
 {
 	return (StringView{lhs.data(), lhs.size()} == StringView{rhs});
 }

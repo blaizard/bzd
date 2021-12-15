@@ -30,8 +30,8 @@ TEST(File, Compile)
 
 	{
 		bzd::test::MyList listA;
-		ASSERT_EQ(listA.capacity(), 1);
+		ASSERT_EQ(listA.capacity(), 1U);
 		bzd::test::MyListCapacity listB;
-		ASSERT_EQ(listB.capacity(), 23);
+		ASSERT_EQ(listB.capacity(), 23U);
 	}
 }

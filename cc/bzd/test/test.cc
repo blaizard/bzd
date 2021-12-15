@@ -1,8 +1,8 @@
 #include "cc/bzd/test/test.hh"
 
-#include "cc/bzd/core/print.hh"
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/vector.hh"
+#include "cc/bzd/core/print.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {

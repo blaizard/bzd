@@ -25,7 +25,7 @@ TEST(ContainerTuple, Constructor)
 {
 	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{12u, true, 5.32, -21, "Hello"};
 
-	EXPECT_EQ(tuple.get<0>(), 12);
+	EXPECT_EQ(tuple.get<0>(), 12U);
 	EXPECT_EQ(tuple.get<1>(), true);
 	EXPECT_NEAR(tuple.get<2>(), 5.32, 0.0001);
 	EXPECT_EQ(tuple.get<3>(), -21);
@@ -36,7 +36,7 @@ TEST(ContainerTuple, ConstructorPartial)
 {
 	bzd::Tuple<unsigned int, bool, double, int> tuple{12u, true};
 
-	EXPECT_EQ(tuple.get<0>(), 12);
+	EXPECT_EQ(tuple.get<0>(), 12U);
 	EXPECT_EQ(tuple.get<1>(), true);
 }
 

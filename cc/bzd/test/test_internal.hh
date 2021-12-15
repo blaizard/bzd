@@ -2,8 +2,8 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
-
-#include <random>
+#include "cc/bzd/utility/random/uniform_int_distribution.hh"
+#include "cc/bzd/utility/random/xorwow_engine.hh"
 
 #define BZDTEST_FCT_NAME_(testCaseName, testName) functionBzdTest_##testCaseName##_##testName
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
@@ -64,53 +64,69 @@
 		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected)); \
 	}
 
-#define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                    \
-	if (!((expression1) == (expression2)))                                                     \
-	{                                                                                          \
-		failFct("Failure\nTest: " #expression1 " == " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                    \
+	[](const auto& a, const auto& b) {                                         \
+		if (!(a == b))                                                         \
+		{                                                                      \
+			failFct("Failure\nTest: " #expression1 " == " #expression2, a, b); \
+		}                                                                      \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_NE_(expression1, expression2, failFct)                                    \
-	if (!((expression1) != (expression2)))                                                     \
-	{                                                                                          \
-		failFct("Failure\nTest: " #expression1 " != " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_NE_(expression1, expression2, failFct)                    \
+	[](const auto& a, const auto& b) {                                         \
+		if (!(a != b))                                                         \
+		{                                                                      \
+			failFct("Failure\nTest: " #expression1 " != " #expression2, a, b); \
+		}                                                                      \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_LT_(expression1, expression2, failFct)                                   \
-	if (!((expression1) < (expression2)))                                                     \
-	{                                                                                         \
-		failFct("Failure\nTest: " #expression1 " < " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_LT_(expression1, expression2, failFct)                   \
+	[](const auto& a, const auto& b) {                                        \
+		if (!(a < b))                                                         \
+		{                                                                     \
+			failFct("Failure\nTest: " #expression1 " < " #expression2, a, b); \
+		}                                                                     \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_LE_(expression1, expression2, failFct)                                    \
-	if (!((expression1) <= (expression2)))                                                     \
-	{                                                                                          \
-		failFct("Failure\nTest: " #expression1 " <= " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_LE_(expression1, expression2, failFct)                    \
+	[](const auto& a, const auto& b) {                                         \
+		if (!(a <= b))                                                         \
+		{                                                                      \
+			failFct("Failure\nTest: " #expression1 " <= " #expression2, a, b); \
+		}                                                                      \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_GT_(expression1, expression2, failFct)                                   \
-	if (!((expression1) > (expression2)))                                                     \
-	{                                                                                         \
-		failFct("Failure\nTest: " #expression1 " > " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_GT_(expression1, expression2, failFct)                   \
+	[](const auto& a, const auto& b) {                                        \
+		if (!(a > b))                                                         \
+		{                                                                     \
+			failFct("Failure\nTest: " #expression1 " > " #expression2, a, b); \
+		}                                                                     \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_GE_(expression1, expression2, failFct)                                    \
-	if (!((expression1) >= (expression2)))                                                     \
-	{                                                                                          \
-		failFct("Failure\nTest: " #expression1 " >= " #expression2, expression1, expression2); \
-	}
+#define BZDTEST_TEST_GE_(expression1, expression2, failFct)                    \
+	[](const auto& a, const auto& b) {                                         \
+		if (!(a >= b))                                                         \
+		{                                                                      \
+			failFct("Failure\nTest: " #expression1 " >= " #expression2, a, b); \
+		}                                                                      \
+	}((expression1), (expression2));
 
-#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                        \
-	if (!bzd::test::impl::near(number1, number2, absError))                                            \
-	{                                                                                                  \
-		failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", number1, number2); \
-	}
+#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                \
+	[](const auto& a, const auto& b, const auto& err) {                                        \
+		if (!bzd::test::impl::near(a, b, err))                                                 \
+		{                                                                                      \
+			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", a, b); \
+		}                                                                                      \
+	}((number1), (number2), (absError));
 
-#define BZDTEST_TEST_STREQ_(str1, str2, failFct)                            \
-	if (bzd::test::impl::strcmp(str1, str2) != 0)                           \
-	{                                                                       \
-		failFct("Failure\nTest [string]: " #str1 " == " #str2, str1, str2); \
-	}
+#define BZDTEST_TEST_STREQ_(str1, str2, failFct)                          \
+	[](const auto& a, const auto& b) {                                    \
+		if (bzd::test::impl::strcmp(a, b) != 0)                           \
+		{                                                                 \
+			failFct("Failure\nTest [string]: " #str1 " == " #str2, a, b); \
+		}                                                                 \
+	}((str1), (str2));
 
 #define BZDTEST_TEST_ANY_THROW_(expression, failFct)           \
 	{                                                          \
@@ -305,19 +321,22 @@ public:
 	using SeedType = bzd::UInt32Type;
 
 public:
-	constexpr explicit Context(const SeedType seed = 53267) noexcept : seed_{seed} {}
+	constexpr explicit Context(const SeedType seed = 53267) noexcept : generator_{seed} {}
 
-	template <class T, typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, BoolType>, void>* = nullptr>
-	[[nodiscard]] T random(const T min = NumericLimits<T>::min(), const T max = NumericLimits<T>::max()) const noexcept
+	template <class T,
+			  T min = NumericLimits<T>::min(),
+			  T max = NumericLimits<T>::max(),
+			  typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, BoolType>, void>* = nullptr>
+	[[nodiscard]] T random() const noexcept
 	{
-		::std::uniform_int_distribution<T> distribution(min, max);
-		return distribution(getGenerator());
+		UniformIntDistribution<T, min, max> distribution{};
+		return distribution(generator_);
 	}
 
 	template <class T, typename typeTraits::EnableIf<typeTraits::isSame<T, BoolType>, void>* = nullptr>
 	[[nodiscard]] T random() const noexcept
 	{
-		return static_cast<BoolType>(random(0, 1) == 1);
+		return static_cast<BoolType>(random<bzd::UInt32Type, 0, 1>() == 1);
 	}
 
 	template <class T>
@@ -330,14 +349,7 @@ public:
 	}
 
 private:
-	::std::mt19937& getGenerator() const
-	{
-		static ::std::mt19937 gen{seed_};
-		return gen;
-	}
-
-private:
-	const SeedType seed_;
+	mutable bzd::XorwowEngine generator_;
 };
 
 class Test

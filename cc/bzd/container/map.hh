@@ -44,13 +44,17 @@ public:
 	/// Lower bound in the map.
 	[[nodiscard]] constexpr Iterator lowerBound(const K& key) const noexcept
 	{
-		return algorithm::lowerBound(data_.begin(), data_.end(), key, [this](const Element& elt, const K& value) { return compare_(elt.first, value); });
+		return algorithm::lowerBound(data_.begin(), data_.end(), key, [this](const Element& elt, const K& value) {
+			return compare_(elt.first, value);
+		});
 	}
 
 	/// Upper bound in the map.
 	[[nodiscard]] constexpr Iterator upperBound(const K& key) const noexcept
 	{
-		return algorithm::upperBound(data_.begin(), data_.end(), key, [this](const K& value, const Element& elt) { return compare_(value, elt.first); });
+		return algorithm::upperBound(data_.begin(), data_.end(), key, [this](const K& value, const Element& elt) {
+			return compare_(value, elt.first);
+		});
 	}
 
 	/// Search for a specific element in the map.
@@ -139,7 +143,8 @@ public:
 			for (const Element* previous = &(*it++); it != data_.end(); ++it)
 			{
 				// Ensure these 2 keys are different.
-				bzd::assert::isTrue(this->compare_(previous->first, it->first) || this->compare_(it->first, previous->first), "Duplicated keys");
+				bzd::assert::isTrue(this->compare_(previous->first, it->first) || this->compare_(it->first, previous->first),
+									"Duplicated keys");
 				previous = &(*it);
 			}
 		}

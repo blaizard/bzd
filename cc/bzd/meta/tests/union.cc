@@ -52,12 +52,12 @@ TEST(MetaUnion, Empty)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		bzd::meta::Union<LifetimeCounter> u{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 0);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
-		EXPECT_EQ(LifetimeCounter::move_, 0);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::constructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::copy_, 0U);
+		EXPECT_EQ(LifetimeCounter::move_, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 0);
+	EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 }
 
 TEST(MetaUnion, CopyConstructor)
@@ -65,25 +65,25 @@ TEST(MetaUnion, CopyConstructor)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		LifetimeCounter value{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
-		EXPECT_EQ(LifetimeCounter::move_, 0);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
+		EXPECT_EQ(LifetimeCounter::copy_, 0U);
+		EXPECT_EQ(LifetimeCounter::move_, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 		bzd::meta::Union<LifetimeCounter> u{value};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 1);
-		EXPECT_EQ(LifetimeCounter::move_, 0);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
+		EXPECT_EQ(LifetimeCounter::copy_, 1U);
+		EXPECT_EQ(LifetimeCounter::move_, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 1);
+	EXPECT_EQ(LifetimeCounter::destructor_, 1U);
 
 	{
 		bzd::test::CopyOnly value{};
 		bzd::meta::Union<bzd::test::CopyOnly> u{value};
-		EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
+		EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1U);
 		bzd::meta::Union<bzd::test::CopyOnly> u2;
 		u2.get<bzd::test::CopyOnly>() = u.get<bzd::test::CopyOnly>();
-		EXPECT_EQ(u2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
+		EXPECT_EQ(u2.get<bzd::test::CopyOnly>().getCopiedCounter(), 2U);
 	}
 }
 
@@ -92,27 +92,27 @@ TEST(MetaUnion, MoveConstructor)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		LifetimeCounter value{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
-		EXPECT_EQ(LifetimeCounter::move_, 0);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
+		EXPECT_EQ(LifetimeCounter::copy_, 0U);
+		EXPECT_EQ(LifetimeCounter::move_, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 		bzd::meta::Union<LifetimeCounter> u{bzd::move(value)};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1);
-		EXPECT_EQ(LifetimeCounter::copy_, 0);
-		EXPECT_EQ(LifetimeCounter::move_, 1);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0);
+		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
+		EXPECT_EQ(LifetimeCounter::copy_, 0U);
+		EXPECT_EQ(LifetimeCounter::move_, 1U);
+		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 1);
+	EXPECT_EQ(LifetimeCounter::destructor_, 1U);
 
 	{
 		bzd::test::MoveOnly value{};
 		bzd::meta::Union<bzd::test::MoveOnly> u{bzd::move(value)};
-		EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+		EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1U);
 		bzd::meta::Union<bzd::test::MoveOnly> u2;
 		u2.get<bzd::test::MoveOnly>() = bzd::move(u.get<bzd::test::MoveOnly>());
-		EXPECT_EQ(u2.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+		EXPECT_EQ(u2.get<bzd::test::MoveOnly>().getMovedCounter(), 2U);
 		bzd::meta::Union<bzd::test::MoveOnly> u3{bzd::test::MoveOnly{}};
-		EXPECT_EQ(u3.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+		EXPECT_EQ(u3.get<bzd::test::MoveOnly>().getMovedCounter(), 1U);
 	}
 }
 
@@ -120,22 +120,22 @@ TEST(MetaUnion, CopyAssignment)
 {
 	bzd::test::CopyOnly value{};
 	bzd::meta::Union<bzd::test::CopyOnly> u{};
-	EXPECT_EQ(value.getCopiedCounter(), 0);
+	EXPECT_EQ(value.getCopiedCounter(), 0U);
 	u = value;
-	EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1);
+	EXPECT_EQ(u.get<bzd::test::CopyOnly>().getCopiedCounter(), 1U);
 	bzd::meta::Union<int, bool, bzd::test::CopyOnly> v{};
 	v = u.get<bzd::test::CopyOnly>();
-	EXPECT_EQ(v.get<bzd::test::CopyOnly>().getCopiedCounter(), 2);
+	EXPECT_EQ(v.get<bzd::test::CopyOnly>().getCopiedCounter(), 2U);
 }
 
 TEST(MetaUnion, MoveAssignment)
 {
 	bzd::test::MoveOnly value{};
 	bzd::meta::Union<bzd::test::MoveOnly> u{};
-	EXPECT_EQ(value.getMovedCounter(), 0);
+	EXPECT_EQ(value.getMovedCounter(), 0U);
 	u = bzd::move(value);
-	EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1);
+	EXPECT_EQ(u.get<bzd::test::MoveOnly>().getMovedCounter(), 1U);
 	bzd::meta::Union<int, bool, bzd::test::MoveOnly> v{};
 	v = bzd::move(u.get<bzd::test::MoveOnly>());
-	EXPECT_EQ(v.get<bzd::test::MoveOnly>().getMovedCounter(), 2);
+	EXPECT_EQ(v.get<bzd::test::MoveOnly>().getMovedCounter(), 2U);
 }

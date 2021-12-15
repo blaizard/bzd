@@ -34,8 +34,8 @@ void insertWhileInsertDoWork()
 	workerInsertC.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_EQ(result, 3);
-	EXPECT_EQ(list.size(), 3);
+	EXPECT_EQ(result, 3U);
+	EXPECT_EQ(list.size(), 3U);
 }
 
 TEST(NonOwningList, insertWhileInsert)
@@ -71,8 +71,8 @@ void removeWhileInsertDoWork()
 	workerRemove.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_EQ(result, 1);
-	EXPECT_EQ(list.size(), 1);
+	EXPECT_EQ(result, 1U);
+	EXPECT_EQ(list.size(), 1U);
 }
 
 TEST(NonOwningList, removeWhileInsert)
@@ -108,8 +108,8 @@ void insertWhileRemoveDoWork()
 	workerRemove.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_EQ(result, 1);
-	EXPECT_EQ(list.size(), 1);
+	EXPECT_EQ(result, 1U);
+	EXPECT_EQ(list.size(), 1U);
 }
 
 TEST(NonOwningList, insertWhileRemove)
@@ -147,8 +147,8 @@ void removeWhileRemoveLeftDoWork()
 	workerRemove2.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_EQ(result, 0);
-	EXPECT_EQ(list.size(), 0);
+	EXPECT_EQ(result, 0U);
+	EXPECT_EQ(list.size(), 0U);
 }
 
 TEST(NonOwningList, removeWhileRemoveLeft)
@@ -186,8 +186,8 @@ void removeWhileRemoveRightDoWork()
 	workerRemove2.join();
 
 	const auto result = list.sanityCheck([](const auto&) -> bool { return true; });
-	EXPECT_EQ(result, 0);
-	EXPECT_EQ(list.size(), 0);
+	EXPECT_EQ(result, 0U);
+	EXPECT_EQ(list.size(), 0U);
 }
 
 TEST(NonOwningList, removeWhileRemoveRight)

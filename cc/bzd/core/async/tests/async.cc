@@ -115,7 +115,7 @@ TEST_ASYNC(Coroutine, asyncAll)
 	auto promiseB = nested(trace, "b", -4);
 	const auto result = co_await bzd::async::all(promiseA, promiseB);
 	EXPECT_EQ(trace, "[a1][b1][a0][a2][b0][b2]");
-	EXPECT_EQ(result.size(), 2);
+	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
 	EXPECT_EQ(result.get<0>().value(), 10);
 	EXPECT_EQ(result.get<1>().value(), -4);
@@ -168,7 +168,7 @@ TEST_ASYNC(Coroutine, asyncAny)
 	auto promiseB = deepNested(trace, "b");
 	const auto result = co_await bzd::async::any(promiseA, promiseB);
 	EXPECT_EQ(trace, "[a1][b3][a0][a2]");
-	EXPECT_EQ(result.size(), 2);
+	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
 	EXPECT_FALSE(result.get<1>());
 	EXPECT_EQ(result.get<0>().value().value(), 42);
@@ -183,7 +183,7 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	auto promiseD = deepNested(trace, "d");
 	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB), bzd::move(promiseC), bzd::move(promiseD));
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][c2]");
-	EXPECT_EQ(result.size(), 4);
+	EXPECT_EQ(result.size(), 4U);
 	EXPECT_FALSE(result.get<0>());
 	EXPECT_FALSE(result.get<1>());
 	EXPECT_TRUE(result.get<2>());
@@ -221,7 +221,7 @@ TEST_ASYNC(Coroutine, fibonacci)
 	auto fibonacci3 = asyncFibonacci(18);
 	auto fibonacci4 = asyncFibonacci(20);
 	const auto result = co_await bzd::async::all(fibonacci1, fibonacci2, fibonacci3, fibonacci4);
-	EXPECT_EQ(result.size(), 4);
+	EXPECT_EQ(result.size(), 4U);
 	EXPECT_EQ(result.get<0>().value(), 144);
 	EXPECT_EQ(result.get<1>().value(), 987);
 	EXPECT_EQ(result.get<2>().value(), 2584);
