@@ -5,14 +5,22 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <iostream>
+
 namespace bzd::platform::std {
 class In : public bzd::IStream
 {
 public: // Constructors
 	constexpr In() noexcept
 	{
+		// Check if the terminal is available from this process
+		if (::tcgetpgrp(STDIN_FILENO) != ::getpgrp())
+		{
+			return;
+		}
+
 		// Save the old context.
-		::tcgetattr(0, &old_);
+		::tcgetattr(STDIN_FILENO, &old_);
 		old_.c_lflag |= ECHO;
 
 		// Create the new one.
@@ -21,14 +29,26 @@ public: // Constructors
 		current_.c_lflag &= ~ICANON;
 		// Set no echo mode.
 		current_.c_lflag &= ~ECHO;
-		::tcsetattr(0, TCSANOW, &current_);
+		::tcsetattr(STDIN_FILENO, TCSANOW, &current_);
+
+		// Stream properly initalized.
+		init_ = true;
 	}
 
-	~In() { ::tcsetattr(0, TCSANOW, &old_); }
+	~In() {
+		if (init_)
+		{
+			::tcsetattr(STDIN_FILENO, TCSANOW, &old_);
+		}
+	}
 
 public: // API
 	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override
 	{
+		if (!init_)
+		{
+			co_return bzd::error(ErrorType::failure, CSTR("No terminal."));
+		}
 		if (data.size() == 0)
 		{
 			co_return bzd::error(ErrorType::failure, CSTR("Empty buffer passed to read(...)."));
@@ -57,6 +77,7 @@ public: // API
 	}
 
 private:
+	bzd::BoolType init_{false};
 	termios old_{};
 	termios current_{};
 };
