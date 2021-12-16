@@ -10,15 +10,17 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                   \
-	{                                                                                                              \
-	public:                                                                                                        \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() {}                                                           \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                     \
-	};                                                                                                             \
-	static auto BZDTEST_REGISTER_NAME_(testCaseName, testName) = ::bzd::test::Manager::getInstance().registerTest( \
-		{#testCaseName, #testName, __FILE__, new BZDTEST_CLASS_NAME_(testCaseName, testName)});
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                                            \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                             \
+	{                                                                                                                        \
+	public:                                                                                                                  \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)                                                                          \
+		(const char* testCaseName, const char* testName, const char* file) : ::bzd::test::Test{testCaseName, testName, file} \
+		{                                                                                                                    \
+		}                                                                                                                    \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                               \
+	};                                                                                                                       \
+	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){#testCaseName, #testName, __FILE__};
 
 #define BZDTEST_(testCaseName, testName)      \
 	BZDTEST_REGISTER_(testCaseName, testName) \
@@ -355,45 +357,56 @@ private:
 class Test
 {
 public:
-	Test() = default;
+	Test(const char* testCaseName, const char* testName, const char* file);
 	virtual ~Test() {}
 	virtual void test(Context& test) const = 0;
+
+private:
+	/// Generates a deterministic seed from the test identifier.
+	constexpr auto getSeed() const noexcept
+	{
+		Context::SeedType seed{362437};
+
+		for (auto* it : {testCaseName_, testName_, file_})
+		{
+			while (*it)
+			{
+				seed += *it;
+
+				// Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"
+				// See: https://en.wikipedia.org/wiki/Xorshift
+				seed ^= seed << 13;
+				seed ^= seed >> 17;
+				seed ^= seed << 5;
+
+				++it;
+			}
+		}
+
+		return seed;
+	}
+
+	constexpr bool operator<(const Test& other) const noexcept
+	{
+		auto result = bzd::test::impl::strcmp(testCaseName_, other.testCaseName_);
+		if (result == 0)
+		{
+			result = bzd::test::impl::strcmp(testName_, other.testName_);
+		}
+		return (result == -1);
+	}
+
+private:
+	friend class Manager;
+
+	const char* testCaseName_;
+	const char* testName_;
+	const char* file_;
+	Test* next_{nullptr};
 };
 
 class Manager
 {
-public:
-	class TestPtr
-	{
-	public:
-		TestPtr() = default;
-		TestPtr(const Test* test) : test_(test) {}
-		TestPtr(TestPtr&& other) : test_(other.test_) { other.test_ = nullptr; }
-		TestPtr& operator=(TestPtr&& other) noexcept
-		{
-			test_ = other.test_;
-			other.test_ = nullptr;
-			return *this;
-		}
-
-		~TestPtr()
-		{
-			if (test_) delete test_;
-		}
-		const Test* operator->() const { return test_; }
-
-	private:
-		const Test* test_;
-	};
-
-	struct TestInfo
-	{
-		const char* testCaseName_;
-		const char* testName_;
-		const char* file_;
-		TestPtr test_;
-	};
-
 public:
 	static Manager& getInstance()
 	{
@@ -403,7 +416,6 @@ public:
 	Manager(Manager const&) = delete;
 	void operator=(Manager const&) = delete;
 
-	bool registerTest(TestInfo&& test);
 	bool run();
 
 	template <class Value1, class Value2>

@@ -24,8 +24,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":composition",
-        "//cc/bzd/container:map",
-        "//cc/bzd/container:vector",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/utility:numeric_limits",
