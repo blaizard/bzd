@@ -41,28 +41,28 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_linux_x86_64_clang_dev" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_linux_x86_64_clang_dev" 
 					}
 				}
 				stage("linux_x86_64_clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod" 
 					}
 				}
 				stage("linux_x86_64_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=default,metadata --config=cc --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=cc --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
 					}
 				}
 				stage("esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel build ... --output_groups=default,metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+						sh "./tools/bazel build ... --output_groups=+metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
 				stage("Static analyzers")
