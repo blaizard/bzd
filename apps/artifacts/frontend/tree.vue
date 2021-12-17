@@ -108,7 +108,9 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with ($bzdIconNames: configuration);
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: configuration
+	);
 </style>
 
 <style lang="scss" scoped>

@@ -65,7 +65,9 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with ($bzdIconNames: link);
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: link
+	);
 
 	.bzd-icon-lines {
 		@include icons.defineIcon("lines.svg");

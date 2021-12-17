@@ -167,7 +167,9 @@
 	// ----
 
 	@use "bzd-style/css/clickable.scss";
-	@use "bzd/icons.scss" with ($bzdIconNames: menu dock_on dock_off close);
+	@use "bzd/icons.scss" with (
+		$bzdIconNames: menu dock_on dock_off close
+	);
 
 	html,
 	body {

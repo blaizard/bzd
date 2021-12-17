@@ -3,6 +3,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
 cc_library(
     name = "non_owning_list_for_test",
+    testonly = True,
     hdrs = [
         "non_owning_list_for_test.hh",
     ],

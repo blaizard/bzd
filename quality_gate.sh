@@ -2,18 +2,17 @@
 
 set -e
 
-#EXTRA_FLAGS="--sandbox_writable_path=$HOME/.cache/yarn --sandbox_writable_path=$HOME/.yarn $@"
 EXTRA_FLAGS="$@"
 
 # Compile and test the different configurations
 echo  "==== linux_x86_64_clang dev ============================================"
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_dev
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_dev
 echo  "==== linux_x86_64_clang prod ==========================================="
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod
 echo  "==== linux_x86_64_gcc =================================================="
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=default,metadata --config=linux_x86_64_gcc --config=cc
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_gcc --config=cc
 echo  "==== esp32_xtensa_lx6_gcc =============================================="
-./tools/bazel build ...  $EXTRA_FLAGS --output_groups=default,metadata --config=esp32_xtensa_lx6_gcc --config=cc
+./tools/bazel build ...  $EXTRA_FLAGS --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc
 
 # Stress tests
 echo  "==== stress dev ========================================================"
