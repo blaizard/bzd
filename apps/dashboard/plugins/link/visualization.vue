@@ -3,5 +3,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with ($bzdIconNames: link);
+	@use "bzd/icons.scss" with (
+		$bzdIconNames: link
+	);
 </style>

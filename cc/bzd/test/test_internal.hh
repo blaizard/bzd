@@ -10,16 +10,14 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                            \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                             \
-	{                                                                                                                        \
-	public:                                                                                                                  \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)                                                                          \
-		(const char* testCaseName, const char* testName, const char* file) : ::bzd::test::Test{testCaseName, testName, file} \
-		{                                                                                                                    \
-		}                                                                                                                    \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                               \
-	};                                                                                                                       \
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                                               \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                                \
+	{                                                                                                                           \
+	public:                                                                                                                     \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)                                                                             \
+		(const char* testCaseName, const char* testName, const char* file) : ::bzd::test::Test{testCaseName, testName, file} {} \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                                  \
+	};                                                                                                                          \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){#testCaseName, #testName, __FILE__};
 
 #define BZDTEST_(testCaseName, testName)      \

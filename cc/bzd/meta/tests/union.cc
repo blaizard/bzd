@@ -1,7 +1,9 @@
 #include "cc/bzd/meta/union.hh"
 
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/test/types.hh"
+#include "cc/bzd/test/types/copy_only.hh"
+#include "cc/bzd/test/types/lifetime_counter.hh"
+#include "cc/bzd/test/types/move_only.hh"
 #include "cc/bzd/utility/move.hh"
 
 #include <string>

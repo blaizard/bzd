@@ -55,7 +55,9 @@
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
 
-	@use "bzd/icons.scss" as icons with ($bzdIconNames: edit add check);
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: edit add check
+	);
 
 	.bzd-icon-main {
 		@include icons.defineIcon("icon.svg");

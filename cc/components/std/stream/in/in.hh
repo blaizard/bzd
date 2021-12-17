@@ -1,11 +1,10 @@
 #include "cc/bzd/core/channel.hh"
 
+#include <iostream>
 #include <poll.h>
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
-
-#include <iostream>
 
 namespace bzd::platform::std {
 class In : public bzd::IStream
@@ -35,7 +34,8 @@ public: // Constructors
 		init_ = true;
 	}
 
-	~In() {
+	~In()
+	{
 		if (init_)
 		{
 			::tcsetattr(STDIN_FILENO, TCSANOW, &old_);

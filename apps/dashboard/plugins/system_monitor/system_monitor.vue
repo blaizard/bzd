@@ -399,7 +399,9 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with ($bzdIconNames: thermometer battery);
+	@use "bzd/icons.scss" with (
+		$bzdIconNames: thermometer battery
+	);
 
 	.system-monitor {
 		.header {

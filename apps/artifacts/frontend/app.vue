@@ -72,7 +72,9 @@
 	@use "bzd-style/css/tooltip.scss";
 	@use "bzd-style/css/loading.scss";
 
-	@use "bzd/icons.scss" as icons with ($bzdIconNames: add tile);
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: add tile
+	);
 
 	.bzd-content {
 		margin: 10px;

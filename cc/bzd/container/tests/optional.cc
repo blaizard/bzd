@@ -2,7 +2,8 @@
 
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/test/types.hh"
+#include "cc/bzd/test/types/copy_only.hh"
+#include "cc/bzd/test/types/move_only.hh"
 
 TEST(ContainerOptional, simpleData)
 {

@@ -1,9 +1,10 @@
 #include "cc/bzd/container/variant.hh"
 
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/test/types.hh"
-
-#include <iostream>
+#include "cc/bzd/test/types/copy_only.hh"
+#include "cc/bzd/test/types/lifetime_counter.hh"
+#include "cc/bzd/test/types/move_only.hh"
+#include "cc/bzd/test/types/no_default_constructor.hh"
 
 TEST(ContainerVariant, Constructor)
 {

@@ -245,8 +245,9 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with
-		($bzdIconNames: status_success status_failure status_in_progress status_abort clock);
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: status_success status_failure status_in_progress status_abort clock
+	);
 
 	.bzd-icon-continuous_integration {
 		@include icons.defineIcon("continuous_integration.svg");

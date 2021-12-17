@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
@@ -303,8 +302,9 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
         name = name + ".composition",
         tags = tags + ["cc"],
         deps = deps + ["//cc/bzd/platform"],
+        testonly = True,
     )
-    cc_test(
+    _bzd_cc_test(
         name = name,
         tags = tags + ["cc"],
         srcs = srcs,
@@ -337,7 +337,7 @@ def _bzd_cc_library_impl(ctx):
 
     return info_provider
 
-bzd_cc_library = rule(
+_bzd_cc_library = rule(
     doc = """
     Provide a replacement to cc_library with additional functionalities:
     - Generates a header file containing all hdrs and the ones from the direct deps.
@@ -364,3 +364,12 @@ bzd_cc_library = rule(
     ],
     fragments = ["cpp"],
 )
+
+def bzd_cc_library(tags = [], **kwags):
+    """
+    Rule to define a bzd C++ library.
+    """
+    _bzd_cc_library(
+        tags = tags + ["cc"],
+        **kwags
+    )

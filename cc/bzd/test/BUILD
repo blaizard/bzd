@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
+package(default_testonly = True)
+
 bdl_library(
     name = "composition",
     srcs = [
@@ -17,10 +19,6 @@ cc_library(
         "test.hh",
         "test_internal.hh",
     ],
-    target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
     visibility = ["//visibility:public"],
     deps = [
         ":composition",
@@ -42,6 +40,7 @@ cc_library(
 
 cc_library(
     name = "inject_point",
+    testonly = False,
     hdrs = [
         "inject_point.hh",
     ],
@@ -50,18 +49,6 @@ cc_library(
         "//cc/bzd/type_traits:is_default_constructible",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/utility:forward",
-    ],
-)
-
-cc_library(
-    name = "types",
-    hdrs = [
-        "types.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
-        "//cc/bzd/utility:move",
     ],
 )
 

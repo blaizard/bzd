@@ -9,7 +9,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         "//cc/bzd/core/assert",
         "//cc/bzd/meta",
         "//cc/bzd/test",
-        "//cc/bzd/test:types",
+        "//cc/bzd/test/types",
         "//cc/bzd/utility:move",
     ],
 ) for path in glob([

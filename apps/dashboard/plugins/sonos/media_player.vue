@@ -94,7 +94,9 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with ($bzdIconNames: play pause stop next previous);
+	@use "bzd/icons.scss" with (
+		$bzdIconNames: play pause stop next previous
+	);
 
 	.media-player {
 		--title-scroll-start: 0;

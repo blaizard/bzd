@@ -36,7 +36,7 @@ coverage:cc-docker-sandbox --strategy=TestRunner=docker
 
 # Select only C++ targets
 build:cc --build_tag_filters=cc
-test:cc --test_lang_filters=cc
+test:cc --test_tag_filters=cc
 coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
 
 # Select only Python targets
