@@ -95,9 +95,9 @@ protected:
 	struct VariantMatchValue
 	{
 		template <class SelfType, class V>
-		static constexpr void call(SelfType& self, V& visitor) noexcept
+		static constexpr auto call(SelfType& self, V& visitor) noexcept
 		{
-			visitor(self.data_.template get<T>());
+			return visitor(self.data_.template get<T>());
 		}
 	};
 	template <class V, class SelfType>
@@ -108,13 +108,27 @@ protected:
 	struct VariantMatch
 	{
 		template <class SelfType, class V>
-		static constexpr void call(SelfType& self, V& visitor) noexcept
+		static constexpr auto call(SelfType& self, V& visitor) noexcept
 		{
-			visitor.template operator()<T>(self);
+			return visitor.template operator()<T>(self);
 		}
 	};
 	template <class V, class SelfType>
 	using Match = Helper<VariantMatch, SelfType&, V&>;
+
+	// Equality visitor
+	struct EqualityVisitor
+	{
+		constexpr EqualityVisitor(const Self& other) noexcept : other_{other} {}
+		template <class T>
+		constexpr auto operator()(const Self& self) const noexcept
+		{
+			return (other_.id_ == self.id_) && (other_.template get<T>() == self.template get<T>());
+		}
+
+	private:
+		const Self& other_;
+	};
 
 	// A protected tag to select a special constructor to create an empty variant.
 	// After this call the variant will be in an invalid state.
@@ -152,6 +166,15 @@ public: // Constructors
 	constexpr Self& operator=(const Self& variant) noexcept = default;
 	constexpr VariantBase(Self&& variant) noexcept = default;
 	constexpr Self& operator=(Self&& variant) noexcept = default;
+
+public: // Comparators.
+	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept
+	{
+		const EqualityVisitor visitor{other};
+		return Match<const EqualityVisitor, decltype(*this)>::call(this->id_, *this, visitor);
+	}
+
+	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 public: // Functions
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
@@ -191,17 +214,17 @@ public: // Functions
 	}
 
 	template <class... Functors>
-	constexpr void match(Functors&&... funcs) const noexcept
+	constexpr auto match(Functors&&... funcs) const noexcept
 	{
 		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+		return MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 	template <class... Functors>
-	constexpr void match(Functors&&... funcs) noexcept
+	constexpr auto match(Functors&&... funcs) noexcept
 	{
 		const Overload<bzd::typeTraits::RemoveReference<Functors>...> visitor{bzd::forward<Functors>(funcs)...};
-		MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
+		return MatchValue<decltype(visitor), decltype(*this)>::call(id_, *this, visitor);
 	}
 
 protected:

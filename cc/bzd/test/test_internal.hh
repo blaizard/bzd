@@ -145,6 +145,26 @@
 		}                                                      \
 	}
 
+#define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                            \
+	[](const auto& a, const auto& b) {                                                                      \
+		if (!(a.size() == b.size()))                                                                        \
+		{                                                                                                   \
+			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", a.size(), b.size()); \
+		}                                                                                                   \
+		else                                                                                                \
+		{                                                                                                   \
+			auto it = b.begin();                                                                            \
+			for (const auto& value : a)                                                                     \
+			{                                                                                               \
+				if (!(value == *it))                                                                        \
+				{                                                                                           \
+					failFct("Failure\nTest: " #container1 " == " #container2 " at index ", value, *it);     \
+				}                                                                                           \
+				++it;                                                                                       \
+			}                                                                                               \
+		}                                                                                                   \
+	}((container1), (container2));
+
 namespace bzd::test::impl {
 constexpr int strcmp(const char* it1, const char* it2) noexcept
 {

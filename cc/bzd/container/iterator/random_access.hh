@@ -55,21 +55,24 @@ public: // API
 		return it;
 	}
 
-	constexpr ActualSelf operator-(const int n) const noexcept
+	[[nodiscard]] constexpr ActualSelf operator-(const int n) const noexcept
 	{
 		ActualSelf it(static_cast<const ActualSelf&>(*this));
 		it.data_ -= n;
 		return it;
 	}
 
-	constexpr ActualSelf operator+(const int n) const noexcept
+	[[nodiscard]] constexpr ActualSelf operator+(const int n) const noexcept
 	{
 		ActualSelf it{static_cast<const ActualSelf&>(*this)};
 		it.data_ += n;
 		return it;
 	}
 
-	constexpr DifferenceType operator-(const Self& other) const noexcept { return static_cast<DifferenceType>(&(operator*()) - &(*other)); }
+	[[nodiscard]] constexpr DifferenceType operator-(const Self& other) const noexcept
+	{
+		return static_cast<DifferenceType>(&(operator*()) - &(*other));
+	}
 
 	constexpr ActualSelf& operator-=(const int n) noexcept
 	{
@@ -83,16 +86,16 @@ public: // API
 		return static_cast<ActualSelf&>(*this);
 	}
 
-	constexpr bool operator==(const Self& it) const noexcept { return it.data_ == data_; }
+	[[nodiscard]] constexpr BoolType operator==(const Self& it) const noexcept { return it.data_ == data_; }
 
-	constexpr bool operator!=(const Self& it) const noexcept { return !(it == *this); }
+	[[nodiscard]] constexpr BoolType operator!=(const Self& it) const noexcept { return !(it == *this); }
 
-	constexpr ValueType& operator*() const { return *data_; }
+	[[nodiscard]] constexpr ValueType& operator*() const { return *data_; }
 
-	constexpr ValueType* operator->() const { return data_; }
+	[[nodiscard]] constexpr ValueType* operator->() const { return data_; }
 
-	constexpr auto& operator[](const SizeType index) noexcept { return data_[index]; }
-	constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
+	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return data_[index]; }
+	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
 
 private:
 	ValueType* data_{nullptr};

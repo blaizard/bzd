@@ -28,6 +28,19 @@ cc_library(
 )
 
 cc_library(
+    name = "container_of_iterables",
+    hdrs = [
+        "container_of_iterables.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":traits",
+        "//cc/bzd/container:optional",
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
     name = "contiguous",
     hdrs = [
         "contiguous.hh",

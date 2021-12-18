@@ -28,6 +28,19 @@ TEST(ContainerVariant, Constructor)
 	}
 }
 
+TEST(ContainerVariant, Comparators)
+{
+	const bzd::Variant<int, bool, double> variantInt1{static_cast<int>(45)};
+	const bzd::Variant<int, bool, double> variantInt2{static_cast<int>(12)};
+	EXPECT_NE(variantInt1, variantInt2);
+	const bzd::Variant<int, bool, double> variantInt3{static_cast<int>(45)};
+	EXPECT_EQ(variantInt1, variantInt3);
+	const bzd::Variant<int, bool, double> variantInt4{static_cast<double>(4.5)};
+	EXPECT_NE(variantInt1, variantInt4);
+	const bzd::Variant<int, bool, double> variantInt5{static_cast<double>(4.5)};
+	EXPECT_EQ(variantInt5, variantInt4);
+}
+
 TEST(ContainerVariant, CopyConstructor)
 {
 	// Value
