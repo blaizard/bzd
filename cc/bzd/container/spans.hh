@@ -1,12 +1,11 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/iterator/container_of_iterables.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/min.hh"
-
-#include <iostream>
 
 namespace bzd {
 
@@ -20,6 +19,8 @@ class Spans
 public: // Traits.
 	static constexpr SizeType nbSpans = N;
 	using Self = Spans<T, N>;
+	using Iterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::Iterator>;
+	using ConstIterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::ConstIterator>;
 
 public: // Constructors/assignments.
 	constexpr Spans() noexcept = default;
@@ -49,16 +50,15 @@ public:
 	}
 
 	/// Create a sub view of this spans.
-	constexpr auto subSpans(const SizeType offset = 0, const SizeType count = npos) const noexcept
+	///
+	/// \param[in] offset From where to start to copy.
+	/// \param[in] count The number of elements to copy.
+	/// \return A sub view of the current object.
+	constexpr auto subSpans(const SizeType offset, const SizeType count = npos) const noexcept
 	{
 		Spans<T, N> sub{};
 
-		SizeType currentOffset = offset;
-		SizeType currentCount = count;
-		SizeType index = 0;
-
-		// Fill the first part of the span
-		while (index < spans_.size() && currentCount)
+		for (SizeType index = 0, currentCount = count, currentOffset = offset; index < spans_.size() && currentCount; ++index)
 		{
 			const auto& span = spans_[index];
 			// Ignore spans that are before offset.
@@ -81,11 +81,16 @@ public:
 				sub.spans_[index] = span.subSpan(0, spanCount);
 				currentCount -= (currentCount == npos) ? 0 : spanCount;
 			}
-			++index;
 		}
 
 		return sub;
 	}
+
+public: // Iterators
+	[[nodiscard]] constexpr auto begin() noexcept { return Iterator{spans_.begin(), spans_.end()}; }
+	[[nodiscard]] constexpr auto begin() const noexcept { return ConstIterator{spans_.begin(), spans_.end()}; }
+	[[nodiscard]] constexpr auto end() noexcept { return Iterator{spans_.end()}; }
+	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{spans_.end()}; }
 
 private:
 	template <class U, SizeType M>

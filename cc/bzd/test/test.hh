@@ -80,3 +80,9 @@
 #define EXPECT_ANY_THROW(expression) BZDTEST_TEST_ANY_THROW_(expression, BZDTEST_FAIL_NONFATAL_)
 #define ASSERT_ANY_THROW(expression) BZDTEST_TEST_ANY_THROW_(expression, BZDTEST_FAIL_FATAL_)
 /// \}
+
+/// Verifies that values of container1 == values of container2.
+/// \{
+#define EXPECT_EQ_VALUES(container1, container2) BZDTEST_TEST_EQ_VALUES_(container1, container2, BZDTEST_FAIL_NONFATAL_)
+#define ASSERT_EQ_VALUES(container1, container2) BZDTEST_TEST_EQ_VALUES_(container1, container2, BZDTEST_FAIL_FATAL_)
+/// \}

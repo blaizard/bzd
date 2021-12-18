@@ -265,6 +265,7 @@ cc_library(
     deps = [
         ":array",
         ":span",
+        "//cc/bzd/container/iterator:container_of_iterables",
         "//cc/bzd/utility:constexpr_for",
         "//cc/bzd/utility:min",
     ],

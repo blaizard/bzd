@@ -39,6 +39,7 @@ public:
 private:
 	struct OptionalEmptyType
 	{
+		[[nodiscard]] constexpr BoolType operator==(const OptionalEmptyType&) const noexcept { return true; }
 	};
 
 public: // Constructors
@@ -64,6 +65,10 @@ public: // Constructors
 	// existing reference updates its value or the reference gets re-assigned.
 	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value && bzd::typeTraits::isReference<T>>>
 	constexpr Self& operator=(U) noexcept = delete;
+
+public: // Comparators.
+	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept { return (data_ == other.data_); }
+	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 public: // API
 	/// Checks whether the optional contains a value.

@@ -40,6 +40,19 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_FALSE(v);
 }
 
+TEST(ContainerOptional, Comparison)
+{
+	bzd::Optional<int> v1{};
+	bzd::Optional<int> v2{};
+	EXPECT_EQ(v1, v2);
+	bzd::Optional<int> v3{45};
+	EXPECT_NE(v1, v3);
+	bzd::Optional<int> v4{4};
+	EXPECT_NE(v3, v4);
+	bzd::Optional<int> v5{45};
+	EXPECT_EQ(v3, v5);
+}
+
 TEST(ContainerOptional, copy)
 {
 	// Copy value
