@@ -50,13 +50,13 @@ bool execute() noexcept
 
 	// Initialize registry if needed and assign special symbols
 	// to their platform backend if applicable.
-	//bzd::log::info(CSTR("Initialization phase.")).sync();
 	{% for item in initialization %}
 		{% if item.isCall %}
 	{{ item.call.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(item.call.parametersResolved, true) -}} );
 		{% end %}
 		{% if item.fqn == "out" %}
 	bzd::platform::backend::out = &registry.{{ item.fqn | fqnToNameStr }}_;
+	bzd::log::info(CSTR("Initialization phase.")).sync();
 		{% elif item.fqn == "in" %}
 	bzd::platform::backend::in = &registry.{{ item.fqn | fqnToNameStr }}_;
 		{% elif item.fqn == "steadyClock" %}
@@ -85,10 +85,16 @@ bool execute() noexcept
 	{% end %}
 
 	bzd::log::info(CSTR("Completion.")).sync();
-
 	bool isSuccess{true};
 	{% for index, expresssion in composition %}
-	isSuccess &= promise{{ index }}.moveResultOut()->hasValue();
+	if (promise{{ index }}.isReady())
+	{
+		isSuccess &= promise{{ index }}.moveResultOut()->hasValue();
+	}
+	else
+	{
+		bzd::log::error(CSTR("Task '{{ expresssion.type | typeRegistryToStr }}' not terminated correctly.")).sync();
+	}
 	{% end %}
 
 	return isSuccess;

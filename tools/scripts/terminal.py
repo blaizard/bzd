@@ -2,12 +2,12 @@
 
 import argparse
 import serial
+import serial.tools.list_ports
 import sys
 from typing import Any
 """
 Configure and return an instance of a Serial interface.
 """
-
 
 def configureSerial(args: argparse.Namespace) -> serial.Serial:
 
@@ -47,8 +47,13 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	ports = serial.tools.list_ports.comports()
+	print("Available ports:")
+	for info in sorted(ports):
+		print("{}: {} [{}:{}]".format(info.device, info.description, info.vid, info.pid))
+
 	with configureSerial(args) as serialInstance:
 		while True:
 			line = serialInstance.readline()
 			if line:
-				sys.stdout.write(line.decode("ascii"))
+				sys.stdout.write(line.decode("ascii", errors="ignore"))

@@ -2,15 +2,15 @@ use "cc/components/std/stream/out/interface.bdl"
 use "cc/components/generic/stream/stub/interface.bdl"
 use "cc/components/xtensa/clock/xthal/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
+use "cc/components/generic/core/interface.bdl"
 
 
 composition {
-	executor = bzd.platform.generic.Executor();
+	core = bzd.platform.generic.Core();
+	executor = bzd.platform.generic.Executor(core);
 	out = bzd.platform.std.Out();
 	in = bzd.platform.generic.stream.Stub();
 	steadyClock = bzd.platform.esp32.clock.Xthal();
 	systemClock = bzd.platform.generic.clock.Null();
 	
 }
-
-

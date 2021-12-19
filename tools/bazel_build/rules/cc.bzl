@@ -4,6 +4,7 @@ load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link", "find_cc_toolchain")
+load("@rules_cc//cc:defs.bzl", "cc_test")
 
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
     """
@@ -233,6 +234,11 @@ def _bzd_cc_generic_impl(ctx):
             manifests = manifests,
         ),
         OutputGroupInfo(metadata = manifests),
+        coverage_common.instrumented_files_info(
+            ctx,
+            source_attributes = ["srcs"],
+            dependency_attributes = ["deps"],
+        )
     ]
 
 def _bzd_cc_generic(is_test):
@@ -307,6 +313,17 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
     _bzd_cc_test(
         name = name,
         tags = tags + ["cc"],
+        srcs = srcs,
+        deps = [
+            name + ".composition",
+        ],
+        **kwags
+    )
+    # Use a specific rule for coverage, I am not able to make _bzd_cc_test
+    # compatible with coverage, to be investigated.
+    cc_test(
+        name = "{}.coverage".format(name),
+        tags = tags + ["cc-coverage"],
         srcs = srcs,
         deps = [
             name + ".composition",

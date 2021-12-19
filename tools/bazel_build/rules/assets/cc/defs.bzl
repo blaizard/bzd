@@ -6,6 +6,7 @@ _CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
 def find_cc_toolchain(ctx):
     # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.
     # See this related issue: https://github.com/bazelbuild/rules_cc/issues/74
+    #return ctx.attr._cc_toolchain[cc_common.CcToolchainInfo]
     cc_toolchain = ctx.toolchains["@rules_cc//cc:toolchain_type"]
     if not hasattr(cc_toolchain, "all_files"):
         cc_toolchain = original_find_cc_toolchain(ctx)
