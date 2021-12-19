@@ -17,6 +17,8 @@ bzd::Async<bool> run()
 		{"--help"_sv, 5},
 	};
 
+	co_await bzd::print(CSTR("Please type something...\n"));
+
 	{
 		const auto result = co_await reader.readAnyOf(keywords);
 		if (result)
