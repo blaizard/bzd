@@ -9,16 +9,24 @@ import selectors
 
 class _ExecuteResultStreamWriter:
 
-	def __init__(self) -> None:
+	def __init__(self, stdout: bool, stderr: bool) -> None:
 		self.output: List[Tuple[bool, bytes]] = []
+		self.stdout = stdout
+		self.stderr = stderr
 
 	def addStdout(self, data: bytes) -> None:
 		if data != b"":
 			self.output.append((True, data))
+			if self.stdout:
+				sys.stdout.write(data.decode(errors="ignore"))
+				sys.stdout.flush()
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
 			self.output.append((False, data))
+			if self.stderr:
+				sys.stderr.write(data.decode(errors="ignore"))
+				sys.stderr.flush()
 
 
 class _ExecuteResult:
@@ -40,20 +48,18 @@ class _ExecuteResult:
 		return self.returncode
 
 
-"""
-Run a process locally.
-"""
-
-
 def localCommand(cmds: List[str],
 	inputs: bytes = b"",
 	ignoreFailure: bool = False,
 	cwd: Optional[Path] = None,
 	env: Optional[Dict[str, str]] = None,
-	timeoutS: float = 60.) -> _ExecuteResult:
+	timeoutS: float = 60.,
+	stdout: bool = False,
+	stderr: bool = False) -> _ExecuteResult:
+	"""Run a process locally."""
 
 	sel = selectors.DefaultSelector()
-	stream = _ExecuteResultStreamWriter()
+	stream = _ExecuteResultStreamWriter(stdout, stderr)
 	proc = subprocess.Popen(cmds,
 		cwd=cwd,
 		stdout=subprocess.PIPE,
@@ -73,9 +79,9 @@ def localCommand(cmds: List[str],
 				if not data:
 					isRunning = False
 				(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
-		stdout, stderr = proc.communicate()
-		stream.addStdout(stdout)
-		stream.addStderr(stderr)
+		remainingStdout, remainingStderr = proc.communicate()
+		stream.addStdout(remainingStdout)
+		stream.addStderr(remainingStderr)
 		if not timer.is_alive():
 			stream.addStderr("Execution of '{}' timed out after {}s, terminating process.\n".format(
 				" ".join(cmds), timeoutS).encode())
