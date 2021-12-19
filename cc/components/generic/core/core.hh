@@ -19,10 +19,7 @@ public:
 
 	void init() {}
 
-	Result<void, Error> stop() noexcept
-	{
-		return bzd::nullresult;
-	}
+	Result<void, Error> stop() noexcept { return bzd::nullresult; }
 
 	bzd::Result<void, Error> start(bzd::platform::WorkloadType workload) noexcept
 	{
@@ -32,10 +29,7 @@ public:
 
 	StackSize getStackUsage() noexcept { return 0; }
 
-	bzd::SizeType startUsageMonitoring() noexcept
-	{
-		return 0;
-	}
+	bzd::SizeType startUsageMonitoring() noexcept { return 0; }
 
 	void getUsage() noexcept {}
 

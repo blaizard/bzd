@@ -4,7 +4,9 @@ int main()
 	execute();
 
 	// Prevent the program to exit.
-	while (true) {};
+	while (true)
+	{
+	};
 
 	return 0;
 }
