@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:defs.bzl", "py_library")
 load("@python_deps//:requirements.bzl", "requirement")
 
 py_library(
@@ -37,12 +37,11 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-py_binary(
+py_library(
     name = "terminal",
     srcs = ["terminal.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//python:bzd",
         requirement("pyserial"),
     ],
 )

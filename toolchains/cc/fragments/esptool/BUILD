@@ -1,4 +1,5 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 filegroup(
     name = "esp32_bin",
@@ -28,12 +29,19 @@ sh_binary_wrapper(
     visibility = ["//visibility:public"],
 )
 
-sh_binary_wrapper(
-    name = "esp32_exec",
-    binary = "@esptool//:esptool",
-    command = "{binary} --chip esp32 --port /dev/ttyUSB0 --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 toolchains/cc/fragments/esptool/bin/esp32/bootloader.bin 0x10000 \"$1\" 0x8000 toolchains/cc/fragments/esptool/bin/esp32/partitions_singleapp.bin",
+py_binary(
+    name = "execute",
+    srcs = [
+        "execute.py",
+    ],
     data = [
         ":esp32_bin",
+        "@esptool",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//python/bzd:env",
+        "//python/bzd/utils:run",
+        "//python/bzd/utils:terminal",
+    ],
 )
