@@ -238,7 +238,7 @@ def _bzd_cc_generic_impl(ctx):
             ctx,
             source_attributes = ["srcs"],
             dependency_attributes = ["deps"],
-        )
+        ),
     ]
 
 def _bzd_cc_generic(is_test):
@@ -319,6 +319,7 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
         ],
         **kwags
     )
+
     # Use a specific rule for coverage, I am not able to make _bzd_cc_test
     # compatible with coverage, to be investigated.
     cc_test(

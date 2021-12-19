@@ -9,6 +9,7 @@ from typing import Any
 Configure and return an instance of a Serial interface.
 """
 
+
 def configureSerial(args: argparse.Namespace) -> serial.Serial:
 
 	dataBitsMapping = {5: serial.FIVEBITS, 6: serial.SIXBITS, 7: serial.SEVENBITS, 8: serial.EIGHTBITS}
