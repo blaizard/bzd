@@ -37,8 +37,8 @@ class Devices:
 		return len(self.devices) == 0
 
 
-class Terminal:
-	"""Creates a terminal as a proxy of a serial port."""
+class Uart:
+	"""Creates a terminal as a proxy of a UART serial port."""
 
 	dataBitsMapping = {5: serial.FIVEBITS, 6: serial.SIXBITS, 7: serial.SEVENBITS, 8: serial.EIGHTBITS}
 	parityMapping = {

@@ -2,6 +2,7 @@ load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link", "find_cc_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_test")
@@ -178,26 +179,20 @@ def _cc_binary(ctx, binary_file):
 
     # Application execution phase
 
-    if binary_toolchain.execute:
-        default_info = sh_binary_wrapper_impl(
-            ctx = ctx,
-            binary = binary_toolchain.execute,
-            output = ctx.outputs.executable,
-            extra_runfiles = [final_binary_file],
-            command = "{{binary}} \"{}\" $@".format(final_binary_file.short_path),
-        )
+    # Identify the executor
+    executor = ctx.attr._executor[BuildSettingInfo].value
+    executors_mapping = {value: key for key, values in binary_toolchain.executors.items() for value in values.split(",")}
 
-        # If no executable are set, execute as a normal shell command
-    else:
-        ctx.actions.symlink(
-            output = ctx.outputs.executable,
-            target_file = final_binary_file,
-            is_executable = True,
-        )
-        default_info = DefaultInfo(
-            executable = ctx.outputs.executable,
-            runfiles = ctx.runfiles(files = [final_binary_file]),
-        )
+    if executor not in executors_mapping:
+        fail("This platform does not support the '{}' executor, only the followings are supported: {}.".format(executor, executors_mapping.keys()))
+
+    default_info = sh_binary_wrapper_impl(
+        ctx = ctx,
+        binary = executors_mapping[executor],
+        output = ctx.outputs.executable,
+        extra_runfiles = [final_binary_file],
+        command = "{{binary}} \"{}\" $@".format(final_binary_file.short_path),
+    )
 
     return default_info, []
 
@@ -266,6 +261,9 @@ def _bzd_cc_generic(is_test):
             ),
             "_is_test": attr.bool(
                 default = is_test,
+            ),
+            "_executor": attr.label(
+                default = "//tools/bazel_build/settings/executor",
             ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
         },

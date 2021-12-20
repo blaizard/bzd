@@ -38,8 +38,8 @@ py_library(
 )
 
 py_library(
-    name = "terminal",
-    srcs = ["terminal.py"],
+    name = "uart",
+    srcs = ["uart.py"],
     visibility = ["//visibility:public"],
     deps = [
         requirement("pyserial"),

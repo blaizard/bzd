@@ -77,6 +77,9 @@ def _load_linux_x86_64_gcc_10_2_0(name):
         "bin_objdump": "/usr/bin/x86_64-linux-gnu-objdump",
         "bin_ld": "/usr/bin/x86_64-linux-gnu-ld",
         "bin_strip": "/usr/bin/x86_64-linux-gnu-strip",
+        "app_executors": {
+            "@//tools/bazel_build/toolchains/cc:executor_host": "default,host",
+        },
     }
 
     toolchain_maker(

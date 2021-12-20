@@ -12,8 +12,9 @@ def _impl(ctx):
         binary_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
     if ctx.attr.app_metadatas:
         binary_kwargs.append("metadatas = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadatas])))
-    if ctx.attr.app_execute:
-        binary_kwargs.append("execute = \"{}\",".format(ctx.attr.app_execute))
+    if not ctx.attr.app_executors:
+        fail("Toolchain is missing executors.")
+    binary_kwargs.append("executors = {},".format(ctx.attr.app_executors))
 
     exec_properties = {}
     if ctx.attr.docker_image:
@@ -131,7 +132,7 @@ _toolchain_maker_linux = repository_rule(
         # Execution
         "app_prepare": attr.string(),
         "app_metadatas": attr.string_list(),
-        "app_execute": attr.string(),
+        "app_executors": attr.string_dict(),
     },
 )
 

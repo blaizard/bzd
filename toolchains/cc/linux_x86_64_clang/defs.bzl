@@ -101,6 +101,9 @@ def _load_linux_x86_64_clang_12_0_0(name):
         "bin_objdump": "external/{}/bin/llvm-objdump".format(package_name),
         "bin_ld": "external/{}/bin/clang++".format(package_name),
         "bin_strip": "external/{}/bin/llvm-strip".format(package_name),
+        "app_executors": {
+            "@//tools/bazel_build/toolchains/cc:executor_host": "default,host",
+        },
     }
 
     toolchain_maker(

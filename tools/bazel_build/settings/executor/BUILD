@@ -10,7 +10,7 @@ bzl_library(
 )
 
 string_flag(
-    name = "cache",
-    build_setting_default = "",
+    name = "executor",
+    build_setting_default = "default",
     visibility = ["//visibility:public"],
 )

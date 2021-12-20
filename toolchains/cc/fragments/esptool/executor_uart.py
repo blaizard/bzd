@@ -5,7 +5,7 @@ import logging
 import shlex
 import bzd.env
 
-from python.bzd.utils.terminal import Devices, Device, Terminal
+from python.bzd.utils.uart import Devices, Device, Uart
 from python.bzd.utils.run import localPython
 
 targets = {
@@ -79,10 +79,10 @@ if __name__ == "__main__":
 		logging.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
 		sys.exit(1)
 
-	terminal = Terminal(device=device,
+	uart = Uart(device=device,
 		baudrate=args.baud_rate,
 		dataBits=args.data_bits,
 		stopBits=args.stop_bits,
 		parity=args.parity,
 		controlFlow=args.flow_control)
-	terminal.start()
+	uart.start()
