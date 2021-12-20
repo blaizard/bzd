@@ -25,6 +25,7 @@ bzl_library(
     deps = [
         ":package",
         "//tools/bazel_build:binary_wrapper",
+        "@bazel_skylib//rules:common_settings",
         "@io_bazel_rules_docker//container",
     ],
 )
