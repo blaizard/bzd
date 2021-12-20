@@ -9,7 +9,7 @@ import selectors
 
 class _ExecuteResultStreamWriter:
 
-	def __init__(self, stdout: bool, stderr: bool) -> None:
+	def __init__(self, stdout: bool = False, stderr: bool = False) -> None:
 		self.output: List[Tuple[bool, bytes]] = []
 		self.stdout = stdout
 		self.stderr = stderr
@@ -31,7 +31,7 @@ class _ExecuteResultStreamWriter:
 
 class _ExecuteResult:
 
-	def __init__(self, stream: _ExecuteResultStreamWriter, returncode: int) -> None:
+	def __init__(self, stream: _ExecuteResultStreamWriter = _ExecuteResultStreamWriter(), returncode: int = 1) -> None:
 		self.output = stream.output
 		self.returncode = returncode
 
@@ -98,29 +98,36 @@ def localCommand(cmds: List[str],
 	return result
 
 
-"""
-Execute a python script locally.
-"""
+def localPython(script: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a python script locally.
+	"""
+	return localCommand([sys.executable, script] + args, **kwargs)
 
 
-def localPython(script: str, args: List[str] = [], **kargs: Any) -> _ExecuteResult:
-	return localCommand([sys.executable, script] + args, **kargs)
+def localBash(script: bytes, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a bash script locally.
+	"""
+	return localCommand(["bash", "-s", "--"] + args, inputs=script, **kwargs)
 
 
-"""
-Execute a bash script locally.
-"""
-
-
-def localBash(script: bytes, args: List[str] = [], **kargs: Any) -> _ExecuteResult:
-	return localCommand(["bash", "-s", "--"] + args, inputs=script, **kargs)
-
-
-"""
-Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available.
-"""
-
-
-def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kargs: Any) -> _ExecuteResult:
+def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available.
+	"""
 	env["RUNFILES_DIR"] = os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else os.path.dirname(os.getcwd())
-	return localCommand([path] + args, env=env, **kargs)
+	return localCommand([path] + args, env=env, **kwargs)
+
+
+def localDockerComposeBinary(config: Path, **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a docker-compose base docker binary.
+	"""
+	command = ["docker-compose", "--file", config.as_posix()]
+	try:
+		return localCommand(command + ["up", "--force-recreate"], **kwargs)
+	except:
+		# This speeds up the shutdown process of the container(s) when CTRL+C is pressed.
+		localCommand(command + ["kill"], timeoutS=5, ignoreFailure=True)
+	return _ExecuteResult()

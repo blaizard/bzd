@@ -30,9 +30,9 @@ sh_binary_wrapper(
 )
 
 py_binary(
-    name = "execute",
+    name = "executor_uart",
     srcs = [
-        "execute.py",
+        "executor_uart.py",
     ],
     data = [
         ":esp32_bin",
@@ -42,6 +42,19 @@ py_binary(
     deps = [
         "//python/bzd:env",
         "//python/bzd/utils:run",
-        "//python/bzd/utils:terminal",
+        "//python/bzd/utils:uart",
+    ],
+)
+
+py_binary(
+    name = "executor_qemu",
+    srcs = ["executor_qemu.py"],
+    data = [
+        "qemu/docker_compose.yml.template",
+        ":esp32_bin",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//python/bzd/utils:run",
     ],
 )

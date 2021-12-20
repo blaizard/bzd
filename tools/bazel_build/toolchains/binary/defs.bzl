@@ -1,6 +1,6 @@
 BinaryInfo = provider(
     doc = "Binary toolchain, to prepare and execute a binary for a given execution platform.",
-    fields = ["prepare", "metadatas", "execute"],
+    fields = ["prepare", "metadatas", "executors"],
 )
 
 def _binary_toolchain_impl(ctx):
@@ -8,7 +8,7 @@ def _binary_toolchain_impl(ctx):
         info = BinaryInfo(
             prepare = ctx.attr.prepare,
             metadatas = ctx.attr.metadatas,
-            execute = ctx.attr.execute,
+            executors = ctx.attr.executors,
         ),
     )
     return [toolchain_info]
@@ -26,8 +26,7 @@ binary_toolchain = rule(
         "metadatas": attr.label_list(
             allow_files = True,
         ),
-        "execute": attr.label(
-            executable = True,
+        "executors": attr.label_keyed_string_dict(
             cfg = "host",
         ),
     },

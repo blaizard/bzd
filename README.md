@@ -29,11 +29,11 @@ It features the followings:
 
 The following c++ target platforms are currently supported:
 
-| Name                 | Compiler | Version |
-| -------------------- | -------- | ------- |
-| linux_x86_64_clang   | clang    | 12.0.0  |
-| linux_x86_64_gcc     | gcc      | 10.2.0  |
-| esp32_xtensa_lx6_gcc | gcc      | 10.2.0  |
+| Name                 | Compiler | Version | Executors |
+| -------------------- | -------- | ------- | --------- |
+| linux_x86_64_clang   | clang    | 12.0.0  | host      |
+| linux_x86_64_gcc     | gcc      | 10.2.0  | host      |
+| esp32_xtensa_lx6_gcc | gcc      | 10.2.0  | uart, sim |
 
 ## Code Quality
 

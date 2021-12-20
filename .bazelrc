@@ -87,6 +87,12 @@ build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
 build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
+# Executors
+
+build:host --//tools/bazel_build/settings/executor=host
+build:uart --//tools/bazel_build/settings/executor=uart
+build:sim --//tools/bazel_build/settings/executor=sim
+
 # Sanitizers
 
 build:sanitizer --build_tests_only

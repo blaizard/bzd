@@ -1,5 +1,5 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel_build/settings/cache:defs.bzl", "BzdSettingCacheProvider")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment", "bzd_package")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
 
@@ -133,7 +133,7 @@ def _bzd_nodejs_install_impl(ctx):
     manager_args = ["--cwd", package_json.dirname, "install", "--network-timeout=300000000", "--silent", "--non-interactive", "--ignore-optional", "--ignore-engines", "--prefer-offline"]
 
     # Set the cache directory
-    cache_path = ctx.attr._cache[BzdSettingCacheProvider].path
+    cache_path = ctx.attr._cache[BuildSettingInfo].value
     if cache_path:
         manager_args += ["--cache-folder", "{}/yarn".format(cache_path)]
 
