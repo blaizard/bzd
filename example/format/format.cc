@@ -22,7 +22,7 @@ namespace Example {
 bzd::Async<bool> run()
 {
 	auto scope = co_await bzd::platform::out().getLock();
-	co_await toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 42);
+	co_await toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 52);
 
 	const Date date{2020, 8, 4};
 	co_await toStream(bzd::platform::out(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);

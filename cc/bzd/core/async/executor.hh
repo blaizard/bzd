@@ -13,13 +13,18 @@ public:
 	class Executable : public bzd::NonOwningListElement<true>
 	{
 	public:
+		constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
+
 		constexpr void enqueue() noexcept
 		{
 			bzd::assert::isTrue(executor_);
 			executor_->push(*this);
 		}
 
+		bzd::coroutine::impl::coroutine_handle<> handle_;
+		bzd::coroutine::impl::coroutine_handle<> caller_{nullptr};
 		bzd::Executor* executor_{nullptr};
+		bzd::Optional<bzd::FunctionView<void(Executor::Executable&)>> onTerminateCallback_{};
 	};
 
 public:
@@ -48,21 +53,19 @@ public:
 private:
 	bzd::Optional<bzd::coroutine::impl::coroutine_handle<>> pop() noexcept
 	{
-		auto exectuable = queue_.back();
-		if (exectuable)
+		auto executable = queue_.back();
+		if (executable)
 		{
-			const auto result = queue_.pop(exectuable.valueMutable());
+			const auto result = queue_.pop(executable.valueMutable());
 			if (result)
 			{
-				auto handle = bzd::coroutine::impl::coroutine_handle<bzd::Executor::Executable>::from_promise(exectuable.valueMutable());
-
 				// Show the stack usage
 				// void* stack = __builtin_frame_address(0);
 				// static void* initial_stack = &stack;
 				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
 				// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
 
-				return static_cast<bzd::coroutine::impl::coroutine_handle<>>(handle);
+				return executable->handle_;
 			}
 		}
 

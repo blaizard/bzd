@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 PLATFORM_TO_TARGET = {
     "//tools/bazel_build/config:linux": "//cc/targets/linux",
     "@esp32_xtensa_lx6_gcc//:target": "//cc/targets/esp32_xtensa_lx6",
+    "@esp32_xtensa_lx6_clang//:target": "//cc/targets/esp32_xtensa_lx6",
 }
 
 cc_library(

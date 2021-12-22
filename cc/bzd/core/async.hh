@@ -159,7 +159,7 @@ public: // coroutine specific
 		auto& promise = handle_.promise();
 
 		// To handle continuation
-		promise.caller = caller;
+		promise.caller_ = caller;
 
 		// Push the current handle to the executor.
 		promise.enqueue();
