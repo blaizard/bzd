@@ -20,7 +20,7 @@ cc_library(
     name = "esp32_xtensa_lx6",
     srcs = ["main.cc"],
     target_compatible_with = [
-        "@esp32_xtensa_lx6_gcc//:compiler",
+        "@//tools/bazel_build/platforms/isa:xtensa_lx6",
     ],
     visibility = [
         "//cc/targets:__pkg__",

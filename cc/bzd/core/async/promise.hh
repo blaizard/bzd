@@ -70,7 +70,7 @@ private:
 
 		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
-			auto& continuation = handle.promise().caller;
+			auto continuation = handle.promise().caller_;
 			if (continuation)
 			{
 				return continuation;
@@ -82,7 +82,9 @@ private:
 	};
 
 public:
-	constexpr Promise() noexcept = default;
+	constexpr Promise() noexcept : bzd::Executor::Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))}
+	{
+	}
 
 	constexpr Promise(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
@@ -121,12 +123,25 @@ public:
 		return bzd::move(async);
 	}
 
+/*
+	void* operator new(std::size_t size)
+	{
+		void* ptr = ::malloc(size);
+		::std::cout << "Allocating " << size << " " << ptr << ::std::endl;
+		if (!ptr) throw std::bad_alloc{};
+		return ptr;
+	}
+
+	void operator delete(void* ptr, std::size_t size)
+	{
+		::std::cout << "Deallocating " << size << " " << ptr << ::std::endl;
+		::free(ptr);
+	}
+*/
+
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
-
-	bzd::coroutine::impl::coroutine_handle<> caller{nullptr};
-	bzd::Optional<bzd::FunctionView<void(Executor::Executable&)>> onTerminateCallback_{};
 };
 
 } // namespace bzd::coroutine::impl

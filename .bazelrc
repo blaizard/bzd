@@ -80,6 +80,14 @@ build:linux_x86_64_gcc --config=cc-docker-sandbox
 coverage:linux_x86_64_gcc --experimental_split_coverage_postprocessing
 coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
 
+# esp32_xtensa_lx6_clang
+# Current do not support coroutines.
+build:esp32_xtensa_lx6_clang --platforms="@esp32_xtensa_lx6_clang//:platform"
+build:esp32_xtensa_lx6_clang --extra_execution_platforms="@esp32_xtensa_lx6_clang//:host_platform"
+build:esp32_xtensa_lx6_clang --incompatible_enable_cc_toolchain_resolution
+build:esp32_xtensa_lx6_clang --features=-supports_dynamic_linker
+build:esp32_xtensa_lx6_clang --platform_suffix=_esp32_xtensa_lx6_clang
+
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --extra_execution_platforms="@esp32_xtensa_lx6_gcc//:host_platform"
