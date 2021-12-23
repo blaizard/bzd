@@ -2,5 +2,5 @@ target remote :1234
 set remote hardware-watchpoint-limit 2
 mon reset halt
 flushregs
-thb app_main
-c
+break app_main
+continue

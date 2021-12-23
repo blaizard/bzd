@@ -47,6 +47,13 @@ class _ExecuteResult:
 	def getReturnCode(self) -> int:
 		return self.returncode
 
+class _NoopTimer:
+	def is_alive(self) -> bool:
+		return True
+	def start(self) -> None:
+		pass
+	def cancel(self) -> None:
+		pass
 
 def localCommand(cmds: List[str],
 	inputs: bytes = b"",
@@ -56,7 +63,12 @@ def localCommand(cmds: List[str],
 	timeoutS: float = 60.,
 	stdout: bool = False,
 	stderr: bool = False) -> _ExecuteResult:
-	"""Run a process locally."""
+	"""Run a process locally.
+	
+	Args:
+		timeoutS: The timeout in seconds until when the command terminates.
+		          A value of 0, give an unlimited timeout.
+	"""
 
 	sel = selectors.DefaultSelector()
 	stream = _ExecuteResultStreamWriter(stdout, stderr)
@@ -66,7 +78,7 @@ def localCommand(cmds: List[str],
 		stdin=subprocess.PIPE,
 		stderr=subprocess.PIPE,
 		env=env)
-	timer = threading.Timer(timeoutS, proc.kill)
+	timer = threading.Timer(timeoutS, proc.kill) if timeoutS else _NoopTimer()
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 

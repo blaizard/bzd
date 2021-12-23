@@ -7,16 +7,7 @@ import bzd.env
 
 from python.bzd.utils.uart import Devices, Device, Uart
 from python.bzd.utils.run import localPython
-
-targets = {
-	"esp32": {
-	"usbIds": [(0x10c4, 0xea60)  # Silicon Labs CP210x devices (USB/UART bridge)
-				],
-	"args":
-	"--chip esp32 --port {device} --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 toolchains/cc/fragments/esptool/bin/esp32/bootloader.bin 0x10000 {binary} 0x8000 toolchains/cc/fragments/esptool/bin/esp32/partitions_singleapp.bin"
-	}
-}
-
+from toolchains.cc.fragments.esptool.targets import targets
 
 def getDevice(args: argparse.Namespace) -> Device:
 	"""Search for the most suitable device to program the target."""
@@ -63,10 +54,11 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	target = targets[args.target]
 	device = getDevice(args)
 	logging.info(f"Programming {args.target} target through device {device}...")
 
-	commandArgs = str(targets[args.target]["args"]).format(device=device, binary=args.binary)
+	commandArgs = str(target["args"]).format(device=device, memory=" ".join(["0x{:x} {}".format(offset, f.format(binary = args.binary)) for offset, f in target["memoryMap"].items()]))
 
 	result = localPython(script="external/esptool/esptool.py",
 		args=shlex.split(commandArgs),

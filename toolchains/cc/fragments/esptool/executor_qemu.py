@@ -4,7 +4,7 @@ import os
 import typing
 
 from python.bzd.utils.run import localDockerComposeBinary
-
+from toolchains.cc.fragments.esptool.targets import targets
 
 def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib.Path]) -> None:
 	"""Assembles the file binary with its bootloader and partition to create the flash."""
@@ -24,18 +24,17 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="ESP32 QEMU launcher script.")
+	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
 	parser.add_argument("binary", type=str, help="Binary to be executed.")
 
 	args = parser.parse_args()
 
+	target = targets[args.target]
+
 	# Create the flash.
 	flashPath = pathlib.Path("flash.bin")
 	createFlash(
-		flashPath, 4 * 1024 * 1024, {
-		0x1000: pathlib.Path("toolchains/cc/fragments/esptool/bin/esp32/bootloader.bin"),
-		0x8000: pathlib.Path("toolchains/cc/fragments/esptool/bin/esp32/partitions_singleapp.bin"),
-		0x10000: pathlib.Path(args.binary)
-		})
+		flashPath, target["memorySize"], {offset: pathlib.Path(f.format(binary = args.binary)) for offset, f in target["memoryMap"].items()})
 
 	# Update the docker-compose template file and write it to the file.
 	dockerCompose = pathlib.Path("toolchains/cc/fragments/esptool/qemu/docker_compose.yml.template").read_text().format(
@@ -44,4 +43,4 @@ if __name__ == "__main__":
 	dockerComposePath.write_text(dockerCompose)
 
 	# Execute docker compoase
-	localDockerComposeBinary(dockerComposePath, stdout=True, stderr=True)
+	localDockerComposeBinary(dockerComposePath, stdout=True, stderr=True, timeoutS=0)
