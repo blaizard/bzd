@@ -82,7 +82,8 @@ private:
 	};
 
 public:
-	constexpr Promise() noexcept : bzd::Executor::Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))}
+	constexpr Promise() noexcept :
+		bzd::Executor::Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))}
 	{
 	}
 
@@ -123,21 +124,21 @@ public:
 		return bzd::move(async);
 	}
 
-/*
-	void* operator new(std::size_t size)
-	{
-		void* ptr = ::malloc(size);
-		::std::cout << "Allocating " << size << " " << ptr << ::std::endl;
-		if (!ptr) throw std::bad_alloc{};
-		return ptr;
-	}
+	/*
+		void* operator new(std::size_t size)
+		{
+			void* ptr = ::malloc(size);
+			::std::cout << "Allocating " << size << " " << ptr << ::std::endl;
+			if (!ptr) throw std::bad_alloc{};
+			return ptr;
+		}
 
-	void operator delete(void* ptr, std::size_t size)
-	{
-		::std::cout << "Deallocating " << size << " " << ptr << ::std::endl;
-		::free(ptr);
-	}
-*/
+		void operator delete(void* ptr, std::size_t size)
+		{
+			::std::cout << "Deallocating " << size << " " << ptr << ::std::endl;
+			::free(ptr);
+		}
+	*/
 
 private:
 	template <class U>

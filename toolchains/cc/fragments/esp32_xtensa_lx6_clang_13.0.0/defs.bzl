@@ -35,7 +35,6 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             "external/{}/lib".format(package_name),
         ],
         "compile_flags": [
-
             "--target=xtensa",
             "-mcpu=esp32",
             # -freestanding is a hack to force Clang to use its own stdatomic.h,

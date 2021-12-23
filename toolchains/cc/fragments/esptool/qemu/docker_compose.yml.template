@@ -1,9 +1,0 @@
-services:
-    qemu-esp32:
-        image: blaizard/qemu_esp32:latest
-        ports:
-        - 1234:1234
-        volumes:
-        - {flash}:/bzd/flash.bin:rw
-        command: "qemu-system-xtensa -no-reboot -nographic -machine esp32 -m 4 -drive file=/bzd/flash.bin,if=mtd,format=raw -nic user,model=open_eth,hostfwd=tcp::80-:80 -gdb tcp::1234"
-version: "3.0"

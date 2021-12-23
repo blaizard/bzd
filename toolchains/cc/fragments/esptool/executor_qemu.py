@@ -2,9 +2,13 @@ import pathlib
 import argparse
 import os
 import typing
+import threading
+import time
+import sys
 
-from python.bzd.utils.run import localDockerComposeBinary
+from python.bzd.utils.run import localDockerComposeRun, localDocker
 from toolchains.cc.fragments.esptool.targets import targets
+
 
 def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib.Path]) -> None:
 	"""Assembles the file binary with its bootloader and partition to create the flash."""
@@ -21,10 +25,21 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 				fout.write(fin.read())
 
 
+def runGdb() -> None:
+	input("Press ENTER to connect gdb...\n")
+	localDocker(["exec", "-it", "xtensa_qemu", "xtensa-esp32-elf-gdb", "-x", "/bzd/gdbinit", "/bzd/binary.bin"],
+		stdin=True,
+		stdout=True,
+		stderr=True,
+		timeoutS=0)
+	localDocker(["stop", "--time=5", "xtensa_qemu"], timeoutS=10)
+
+
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="ESP32 QEMU launcher script.")
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
+	parser.add_argument('--gdb', default=False, action="store_true", help="Use GDB to debug the target.")
 	parser.add_argument("binary", type=str, help="Binary to be executed.")
 
 	args = parser.parse_args()
@@ -33,14 +48,28 @@ if __name__ == "__main__":
 
 	# Create the flash.
 	flashPath = pathlib.Path("flash.bin")
-	createFlash(
-		flashPath, target["memorySize"], {offset: pathlib.Path(f.format(binary = args.binary)) for offset, f in target["memoryMap"].items()})
+	createFlash(flashPath, typing.cast(int, target["memorySize"]),
+		{offset: pathlib.Path(f.format(binary=args.binary))
+		for offset, f in target["memoryMap"].items()})  # type: ignore
 
-	# Update the docker-compose template file and write it to the file.
-	dockerCompose = pathlib.Path("toolchains/cc/fragments/esptool/qemu/docker_compose.yml.template").read_text().format(
-		flash=flashPath.resolve().as_posix())
-	dockerComposePath = pathlib.Path("docker-compose.yml")
-	dockerComposePath.write_text(dockerCompose)
+	if args.gdb:
+		gdb = threading.Thread(target=runGdb)
+		gdb.start()
 
-	# Execute docker compoase
-	localDockerComposeBinary(dockerComposePath, stdout=True, stderr=True, timeoutS=0)
+	cmds = [
+		"run", "--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
+		"--volume={}:/bzd/gdbinit:ro".format(
+		pathlib.Path("toolchains/cc/fragments/esptool/qemu/gdbinit").resolve().as_posix()),
+		"--volume=/home/blaise/sandbox/cpp-async/bazel-bin/example/format/format.binary:/bzd/binary.bin:ro",
+		"--name=xtensa_qemu", "--rm", "blaizard/xtensa_qemu:latest", "qemu-system-xtensa", "-no-reboot", "-nographic",
+		"-machine", "esp32", "-m", "4", "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic",
+		"user,model=open_eth,hostfwd=tcp::80-:80"
+	]
+
+	if args.gdb:
+		cmds += ["-gdb", "tcp::1234", "-S"]
+
+	localDocker(cmds, stdin=False, stdout=True, stderr=True, timeoutS=0)
+
+	if args.gdb:
+		gdb.join()

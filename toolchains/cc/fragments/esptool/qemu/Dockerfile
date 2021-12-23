@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM ubuntu:20.04
 
 WORKDIR /bzd
 
@@ -16,7 +16,7 @@ RUN apt-get install -y --no-install-recommends \
     xz-utils \
     build-essential
 
-# Install specific dependencies
+# Install dependencies for QEMU
 RUN apt-get install -y --no-install-recommends \
     ninja-build \
     python3 \
@@ -33,6 +33,24 @@ RUN git clone https://github.com/espressif/qemu.git \
 	&& ../configure --target-list=xtensa-softmmu --enable-debug --enable-sanitizers --disable-strip --disable-capstone --disable-vnc \
 	&& make vga=no \
 	&& make install
+
+# Install dependencies for GDB
+RUN apt-get install -y --no-install-recommends \
+    texinfo \
+    bison \
+    m4 \
+    flex
+
+# Install GDB, note this version already integrates the patch needed by previous version
+# to avoid the "Remote 'g' packet reply is too long." error mesage.
+# Follow: https://github.com/Ebiroll/qemu_esp32#building-gdb-81-for-qemu
+RUN git clone --depth 1 --branch esp-2021r2-gdb https://github.com/espressif/binutils-gdb.git \
+    && cd binutils-gdb \
+	&& mkdir -p build \
+	&& cd build \
+	&& ../configure --without-guile --host=x86_64-pc-linux-gnu --target=xtensa-esp32-elf --disable-werror \
+    && make \
+    && make install
 
 # Start from a Bash prompt
 CMD ["/bin/bash"]

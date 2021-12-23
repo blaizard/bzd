@@ -5,6 +5,7 @@ filegroup(
     name = "esp32_bin",
     srcs = glob([
         "bin/esp32/*",
+        "qemu/gdbinit",
     ]),
 )
 
@@ -39,23 +40,20 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":targets",
         "//python/bzd:env",
         "//python/bzd/utils:run",
         "//python/bzd/utils:uart",
-        ":targets"
     ],
 )
 
 py_binary(
     name = "executor_qemu",
     srcs = ["executor_qemu.py"],
-    data = [
-        "qemu/docker_compose.yml.template",
-    ],
     visibility = ["//visibility:public"],
     deps = [
+        ":targets",
         "//python/bzd/utils:run",
-        ":targets"
     ],
 )
 

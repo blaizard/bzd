@@ -9,6 +9,7 @@ from python.bzd.utils.uart import Devices, Device, Uart
 from python.bzd.utils.run import localPython
 from toolchains.cc.fragments.esptool.targets import targets
 
+
 def getDevice(args: argparse.Namespace) -> Device:
 	"""Search for the most suitable device to program the target."""
 
@@ -58,7 +59,12 @@ if __name__ == "__main__":
 	device = getDevice(args)
 	logging.info(f"Programming {args.target} target through device {device}...")
 
-	commandArgs = str(target["args"]).format(device=device, memory=" ".join(["0x{:x} {}".format(offset, f.format(binary = args.binary)) for offset, f in target["memoryMap"].items()]))
+	commandArgs = str(target["args"]).format(
+		device=device,
+		memory=" ".join([
+		"0x{:x} {}".format(offset, f.format(binary=args.binary))
+		for offset, f in target["memoryMap"].items()  # type: ignore
+		]))
 
 	result = localPython(script="external/esptool/esptool.py",
 		args=shlex.split(commandArgs),
