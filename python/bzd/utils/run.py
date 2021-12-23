@@ -9,21 +9,30 @@ import selectors
 
 class _ExecuteResultStreamWriter:
 
-	def __init__(self, stdout: bool = False, stderr: bool = False) -> None:
+	def __init__(self, stdout: bool = False, stderr: bool = False, maxSize: int = 1000000) -> None:
 		self.output: List[Tuple[bool, bytes]] = []
 		self.stdout = stdout
 		self.stderr = stderr
+		self.size = 0
+		self.maxSize = maxSize
+
+	def _addBuffer(self, stdout: bool, data: bytes) -> None:
+		self.output.append((stdout, data))
+		self.size += len(data)
+		while self.size > self.maxSize:
+			self.size -= len(self.output[0][1])
+			self.output.pop(0)
 
 	def addStdout(self, data: bytes) -> None:
 		if data != b"":
-			self.output.append((True, data))
+			self._addBuffer(True, data)
 			if self.stdout:
 				sys.stdout.write(data.decode(errors="ignore"))
 				sys.stdout.flush()
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
-			self.output.append((False, data))
+			self._addBuffer(True, data)
 			if self.stderr:
 				sys.stderr.write(data.decode(errors="ignore"))
 				sys.stderr.flush()
@@ -47,38 +56,52 @@ class _ExecuteResult:
 	def getReturnCode(self) -> int:
 		return self.returncode
 
+
 class _NoopTimer:
+
 	def is_alive(self) -> bool:
 		return True
+
 	def start(self) -> None:
 		pass
+
 	def cancel(self) -> None:
 		pass
 
+
 def localCommand(cmds: List[str],
-	inputs: bytes = b"",
 	ignoreFailure: bool = False,
 	cwd: Optional[Path] = None,
 	env: Optional[Dict[str, str]] = None,
 	timeoutS: float = 60.,
+	stdin: bool = False,
 	stdout: bool = False,
-	stderr: bool = False) -> _ExecuteResult:
+	stderr: bool = False,
+	maxOutputSize: int = 1000000) -> _ExecuteResult:
 	"""Run a process locally.
 	
 	Args:
+		cmds: The list of commands to be executed.
+		ignoreFailure: If set to True, uppon failure (return code != 0), it will throw.
+		cwd: The current working directory.
+		env: The set of environment variable to be injected to the process.
 		timeoutS: The timeout in seconds until when the command terminates.
 		          A value of 0, give an unlimited timeout.
+		stdin: If set to True, the input stream will also be streamed to stdin.
+		stdout: If set to True, the output will also be streamed to stdout.
+		stderr: If set to True, the errors will also be streamed to stderr.
+		maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
 	"""
 
 	sel = selectors.DefaultSelector()
-	stream = _ExecuteResultStreamWriter(stdout, stderr)
+	stream = _ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
 	proc = subprocess.Popen(cmds,
 		cwd=cwd,
 		stdout=subprocess.PIPE,
-		stdin=subprocess.PIPE,
+		stdin=None if stdin else subprocess.PIPE,
 		stderr=subprocess.PIPE,
 		env=env)
-	timer = threading.Timer(timeoutS, proc.kill) if timeoutS else _NoopTimer()
+	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
@@ -121,7 +144,7 @@ def localBash(script: bytes, args: List[str] = [], **kwargs: Any) -> _ExecuteRes
 	"""
 	Execute a bash script locally.
 	"""
-	return localCommand(["bash", "-s", "--"] + args, inputs=script, **kwargs)
+	return localCommand(["bash", "-s", "--"] + args, **kwargs)
 
 
 def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
@@ -132,9 +155,9 @@ def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, 
 	return localCommand([path] + args, env=env, **kwargs)
 
 
-def localDockerComposeBinary(config: Path, **kwargs: Any) -> _ExecuteResult:
+def localDockerCompose(config: Path, **kwargs: Any) -> _ExecuteResult:
 	"""
-	Execute a docker-compose base docker binary.
+	Spawn a full docker-compose topology and execute it.
 	"""
 	command = ["docker-compose", "--file", config.as_posix()]
 	try:
@@ -142,4 +165,26 @@ def localDockerComposeBinary(config: Path, **kwargs: Any) -> _ExecuteResult:
 	except:
 		# This speeds up the shutdown process of the container(s) when CTRL+C is pressed.
 		localCommand(command + ["kill"], timeoutS=5, ignoreFailure=True)
+	return _ExecuteResult()
+
+
+def localDockerComposeRun(config: Path, service: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a docker-compose run service.
+	"""
+	try:
+		return localCommand(["docker-compose", "--file", config.as_posix(), "run", "--rm", service] + args, **kwargs)
+	except:
+		pass
+	return _ExecuteResult()
+
+
+def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+	"""
+	Execute a docker-compose run service.
+	"""
+	try:
+		return localCommand(["docker"] + args, **kwargs)
+	except:
+		pass
 	return _ExecuteResult()
