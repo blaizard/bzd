@@ -1,5 +1,5 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 filegroup(
     name = "esp32_bin",
@@ -35,7 +35,6 @@ py_binary(
         "executor_uart.py",
     ],
     data = [
-        ":esp32_bin",
         "@esptool",
     ],
     visibility = ["//visibility:public"],
@@ -43,6 +42,7 @@ py_binary(
         "//python/bzd:env",
         "//python/bzd/utils:run",
         "//python/bzd/utils:uart",
+        ":targets"
     ],
 )
 
@@ -51,10 +51,18 @@ py_binary(
     srcs = ["executor_qemu.py"],
     data = [
         "qemu/docker_compose.yml.template",
-        ":esp32_bin",
     ],
     visibility = ["//visibility:public"],
     deps = [
         "//python/bzd/utils:run",
+        ":targets"
+    ],
+)
+
+py_library(
+    name = "targets",
+    srcs = ["targets.py"],
+    data = [
+        ":esp32_bin",
     ],
 )
