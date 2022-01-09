@@ -32,7 +32,7 @@ class _ExecuteResultStreamWriter:
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
-			self._addBuffer(True, data)
+			self._addBuffer(False, data)
 			if self.stderr:
 				sys.stderr.write(data.decode(errors="ignore"))
 				sys.stderr.flush()
@@ -101,10 +101,11 @@ def localCommand(cmds: List[str],
 		stdin=None if stdin else subprocess.PIPE,
 		stderr=subprocess.PIPE,
 		env=env)
-	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS else _NoopTimer()  # type: ignore
+	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
+	returnCode = None
 	try:
 		isRunning = True
 		timer.start()
@@ -117,17 +118,21 @@ def localCommand(cmds: List[str],
 		remainingStdout, remainingStderr = proc.communicate()
 		stream.addStdout(remainingStdout)
 		stream.addStderr(remainingStderr)
+
 		if not timer.is_alive():
 			stream.addStderr("Execution of '{}' timed out after {}s, terminating process.\n".format(
 				" ".join(cmds), timeoutS).encode())
-		if proc.returncode == None:
-			stream.addStderr(b"Process did not complete.\n")
+		else:
+			returnCode = proc.returncode
+			if returnCode == None:
+				stream.addStderr(b"Process did not complete.\n")
+
 	finally:
 		timer.cancel()
 
-	result = _ExecuteResult(stream=stream, returncode=proc.returncode)
+	result = _ExecuteResult(stream=stream, returncode=returnCode)
 
-	assert ignoreFailure or proc.returncode == 0, "Return code {}\n{}".format(result.getReturnCode(),
+	assert ignoreFailure or returnCode == 0, "Return code {}\n{}".format(result.getReturnCode(),
 		result.getOutput())
 
 	return result
