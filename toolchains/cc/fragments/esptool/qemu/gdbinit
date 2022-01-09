@@ -1,6 +1,3 @@
 target remote :1234
-set remote hardware-watchpoint-limit 2
-mon reset halt
-flushregs
-break app_main
+break main
 continue

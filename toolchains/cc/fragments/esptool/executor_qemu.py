@@ -27,7 +27,7 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 
 def runGdb() -> None:
 	input("Press ENTER to connect gdb...\n")
-	localDocker(["exec", "-it", "xtensa_qemu", "xtensa-esp32-elf-gdb", "-x", "/bzd/gdbinit", "/bzd/binary.bin"],
+	localDocker(["exec", "-it", "xtensa_qemu", "xtensa-esp32-elf-gdb", "--data-directory", "/bzd/qemu_esp32/gdb", "-ex", "target remote :1234", "/bzd/binary.bin"],
 		stdin=True,
 		stdout=True,
 		stderr=True,
