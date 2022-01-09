@@ -27,7 +27,11 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 
 def runGdb() -> None:
 	input("Press ENTER to connect gdb...\n")
-	localDocker(["exec", "-it", "xtensa_qemu", "xtensa-esp32-elf-gdb", "--data-directory", "/bzd/qemu_esp32/gdb", "-ex", "target remote :1234", "/bzd/binary.bin"],
+	#localDocker(["exec", "-it","xtensa_qemu", "gdbgui", "-r", "--port=8080", "--gdb-cmd", "xtensa-esp32-elf-gdb --data-directory /bzd/qemu_esp32/gdb /bzd/binary.bin"],
+	localDocker([
+		"exec", "-it", "xtensa_qemu", "xtensa-esp32-elf-gdb", "--data-directory", "/bzd/qemu_esp32/gdb",
+		"/bzd/binary.bin"
+	],
 		stdin=True,
 		stdout=True,
 		stderr=True,
@@ -57,12 +61,28 @@ if __name__ == "__main__":
 		gdb.start()
 
 	cmds = [
-		"run", "--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
-		"--volume={}:/bzd/gdbinit:ro".format(
-		pathlib.Path("toolchains/cc/fragments/esptool/qemu/gdbinit").resolve().as_posix()),
+		"run",
+		"-p",
+		"8080",
+		"--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
+		"--volume={}:/root/.gdbinit:ro".format(
+		pathlib.Path("toolchains/cc/fragments/esptool/qemu/.gdbinit").resolve().as_posix()),
+		# TODO: cleanup the following line
 		"--volume=/home/blaise/sandbox/cpp-async/bazel-bin/example/format/format.binary:/bzd/binary.bin:ro",
-		"--name=xtensa_qemu", "--rm", "blaizard/xtensa_qemu:latest", "qemu-system-xtensa", "-no-reboot", "-nographic",
-		"-machine", "esp32", "-m", "4", "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic",
+		"--volume={}:/code:ro".format(os.environ["BUILD_WORKSPACE_DIRECTORY"]),
+		"--name=xtensa_qemu",
+		"--rm",
+		"blaizard/xtensa_qemu:latest",
+		"qemu-system-xtensa",
+		"-no-reboot",
+		"-nographic",
+		"-machine",
+		"esp32",
+		"-m",
+		"4",
+		"-drive",
+		"file=/bzd/flash.bin,if=mtd,format=raw",
+		"-nic",
 		"user,model=open_eth,hostfwd=tcp::80-:80"
 	]
 

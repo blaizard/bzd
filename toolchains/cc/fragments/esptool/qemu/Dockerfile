@@ -30,12 +30,12 @@ RUN git config --global user.email "dummy@domain.com" \
     && git config --global user.name "dummy"
 
 # Bring patches
-COPY 0001-Fixing-number-of-registers-to-172.patch /bzd
+COPY 0001_fixing_number_of_registers_to_172.patch /bzd
 
 # Install QEMU and apply a patch
 RUN git clone --depth 1 https://github.com/espressif/qemu.git \
 	&& cd qemu \
-    && git am /bzd/0001-Fixing-number-of-registers-to-172.patch \
+    && git am /bzd/0001_fixing_number_of_registers_to_172.patch \
 	&& mkdir -p build \
 	&& cd build \
 	&& ../configure --target-list=xtensa-softmmu --enable-debug --enable-sanitizers --disable-strip --disable-capstone --disable-vnc \
@@ -49,7 +49,8 @@ RUN apt-get install -y --no-install-recommends \
     m4 \
     flex \
     libncurses5 \
-    libpython2.7
+    libpython2.7 \
+    pip
 
 # Install GDB, note this version already integrates the patch needed by previous version
 # to avoid the "Remote 'g' packet reply is too long." error mesage.
@@ -66,13 +67,18 @@ RUN apt-get install -y --no-install-recommends \
 #	&& mkdir -p build \
 #	&& cd build \
 #	&& ../configure --without-guile --host=x86_64-pc-linux-gnu --target=xtensa-esp32-elf --disable-werror \
-#    && make \
-#    && make install
+#   && make \
+#   && make install
 
-RUN curl -L https://github.com/Ebiroll/qemu_esp32/raw/master/bin/xtensa-esp32-elf-gdb --output /usr/bin/xtensa-esp32-elf-gdb \
+RUN git clone --depth 1 https://github.com/Ebiroll/qemu_esp32.git \
+    && cp qemu_esp32/bin/xtensa-esp32-elf-gdb /usr/bin/xtensa-esp32-elf-gdb \
     && chmod +x /usr/bin/xtensa-esp32-elf-gdb
 
-RUN git clone --depth 1 https://github.com/Ebiroll/qemu_esp32.git
+# Install GDBGUi
+
+RUN pip install gdbgui
+
+EXPOSE 5000
 
 # Start from a Bash prompt
 CMD ["/bin/bash"]
