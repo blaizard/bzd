@@ -1,3 +1,2 @@
 target remote :1234
-break main
-continue
+directory /code
