@@ -285,8 +285,6 @@ class SymbolMap:
 				message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
 			element = entity.element
 
-			show = bool(fqn == "bzd.platform.linux.Core")
-
 			# Remove nested element and change them to references.
 			if any([element.isNestedSequence(category) for category in CATEGORIES]):
 

@@ -26,13 +26,12 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 
 
 def runGdb() -> None:
-	#input("Press ENTER to connect gdb...\n")
+	input("Press ENTER to connect gdb...\n")
 	localDocker(
 		[
-		"exec", "-it", "xtensa_qemu", "gdbgui", "-r", "--port=8080", "--gdb-cmd",
-		"/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb --tty=/dev/pts/0"
+		"exec", "-it", "xtensa_qemu", "gdbgui", "-r", "--port=8080", "-g",
+		"xtensa-esp32-elf-gdb"
 		],
-		#localDocker(["exec", "-it", "xtensa_qemu", "/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb", "/bzd/binary.bin"],
 		stdin=True,
 		stdout=True,
 		stderr=True,
@@ -46,7 +45,8 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="ESP32 QEMU launcher script.")
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
 	parser.add_argument('--gdb', default=False, action="store_true", help="Use GDB to debug the target.")
-	parser.add_argument("binary", type=str, help="Binary to be executed.")
+	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
+	parser.add_argument("image", type=str, help="Binary image to be executed.")
 
 	args = parser.parse_args()
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 	# Create the flash.
 	flashPath = pathlib.Path("flash.bin")
 	createFlash(flashPath, typing.cast(int, target["memorySize"]),
-		{offset: pathlib.Path(f.format(binary=args.binary))
+		{offset: pathlib.Path(f.format(binary=args.image))
 		for offset, f in target["memoryMap"].items()})  # type: ignore
 
 	if args.gdb:
@@ -64,13 +64,13 @@ if __name__ == "__main__":
 
 	cmds = [
 		"run",
+		"-t",
 		"-p",
 		"8080",
 		"--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
 		"--volume={}:/root/.gdbinit:ro".format(
 		pathlib.Path("toolchains/cc/fragments/esptool/qemu/.gdbinit").resolve().as_posix()),
-		# TODO: cleanup the following line
-		"--volume=/home/blaise/sandbox/cpp-async/bazel-bin/example/format/format.binary:/bzd/binary.bin:ro",
+		"--volume={}:/bzd/binary.bin:ro".format(pathlib.Path(args.elf).resolve().as_posix()),
 		"--volume={}:/code:ro".format(os.environ["BUILD_WORKSPACE_DIRECTORY"]),
 		"--name=xtensa_qemu",
 		"--rm",

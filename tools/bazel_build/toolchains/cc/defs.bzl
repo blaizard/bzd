@@ -8,10 +8,8 @@ def _impl(ctx):
 
     # Build the binary toolchain arguments
     binary_kwargs = []
-    if ctx.attr.app_prepare:
-        binary_kwargs.append("prepare = \"{}\",".format(ctx.attr.app_prepare))
-    if ctx.attr.app_metadatas:
-        binary_kwargs.append("metadatas = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadatas])))
+    binary_kwargs.append("build = [{}],".format(", ".join(["\"{}\"".format(build) for build in ctx.attr.app_build])))
+    binary_kwargs.append("metadata = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in ctx.attr.app_metadata])))
     if not ctx.attr.app_executors:
         fail("Toolchain is missing executors.")
     binary_kwargs.append("executors = {},".format(ctx.attr.app_executors))
@@ -130,8 +128,8 @@ _toolchain_maker_linux = repository_rule(
         "template_bin_objcopy": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_objcopy"),
         "template_bin_strip": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_strip"),
         # Execution
-        "app_prepare": attr.string(),
-        "app_metadatas": attr.string_list(),
+        "app_build": attr.string_list(),
+        "app_metadata": attr.string_list(),
         "app_executors": attr.string_dict(),
     },
 )
