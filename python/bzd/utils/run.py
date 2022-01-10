@@ -105,7 +105,7 @@ def localCommand(cmds: List[str],
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
-	returnCode = None
+	returnCode = 1
 	try:
 		isRunning = True
 		timer.start()
@@ -132,8 +132,7 @@ def localCommand(cmds: List[str],
 
 	result = _ExecuteResult(stream=stream, returncode=returnCode)
 
-	assert ignoreFailure or returnCode == 0, "Return code {}\n{}".format(result.getReturnCode(),
-		result.getOutput())
+	assert ignoreFailure or returnCode == 0, "Return code {}\n{}".format(result.getReturnCode(), result.getOutput())
 
 	return result
 
