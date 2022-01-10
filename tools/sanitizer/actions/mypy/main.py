@@ -19,8 +19,8 @@ def mypyWorker(package: str, stdout: TextIO) -> None:
 	main(script_path=None,
 		stdout=stdout,
 		stderr=stdout,
+		clean_exit=True,
 		args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
-
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")

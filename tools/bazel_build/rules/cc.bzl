@@ -142,6 +142,7 @@ def _cc_binary(ctx, binary_file):
     # Application binary build stage
 
     binaries = [binary_file]
+
     # Run the build steps
     for index, build in enumerate(binary_toolchain.build):
         build_binary_file = ctx.actions.declare_file("{}.build.{}".format(ctx.attr.name, index))
