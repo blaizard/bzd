@@ -72,7 +72,7 @@ def _cc_linker(ctx, cc_info, map_analyzer):
         map_analyzer: Map analyzer metadata generator.
 
     Returns:
-        A tuple containing the binary file and the metadatas.
+        A tuple containing the binary file and the metadata.
     """
 
     # Build the list of libraries and linker flags from the cc_info
@@ -134,30 +134,29 @@ def _cc_binary(ctx, binary_file):
     Prepare the binary for the execution stage.
 
     Returns:
-        A tuple containing the DefaultInfo provider and the metadatas.
+        A tuple containing the DefaultInfo provider and the metadata.
     """
 
     binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
 
-    # Application binary prepare stage
+    # Application binary build stage
 
-    prepare = binary_toolchain.prepare
-    if prepare:
-        # Run the prepare step only if it is present
-        final_binary_file = ctx.actions.declare_file("{}.binary.final".format(ctx.attr.name))
+    binaries = [binary_file]
+    # Run the build steps
+    for index, build in enumerate(binary_toolchain.build):
+        build_binary_file = ctx.actions.declare_file("{}.build.{}".format(ctx.attr.name, index))
         ctx.actions.run(
             inputs = [binary_file],
-            outputs = [final_binary_file],
-            tools = prepare.data_runfiles.files,
-            arguments = [binary_file.path, final_binary_file.path],
-            executable = prepare.files_to_run,
+            outputs = [build_binary_file],
+            tools = build.data_runfiles.files,
+            arguments = [binary_file.path, build_binary_file.path],
+            executable = build.files_to_run,
         )
-    else:
-        final_binary_file = binary_file
+        binaries.append(build_binary_file)
 
     # Application metadata phase
 
-    #metadata_list = binary_toolchain.metadatas if binary_toolchain.metadatas else [ctx.attr._metadata_script]
+    #metadata_list = binary_toolchain.metadata if binary_toolchain.metadata else [ctx.attr._metadata_script]
 
     """
     for index, metadata in enumerate(metadata_list):
@@ -190,8 +189,8 @@ def _cc_binary(ctx, binary_file):
         ctx = ctx,
         binary = executors_mapping[executor],
         output = ctx.outputs.executable,
-        extra_runfiles = [final_binary_file],
-        command = "{{binary}} \"{}\" $@".format(final_binary_file.short_path),
+        extra_runfiles = binaries,
+        command = "{{binary}} {} $@".format(" ".join(["\"{}\"".format(binary.short_path) for binary in binaries])),
     )
 
     return default_info, []

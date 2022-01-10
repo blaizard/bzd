@@ -51,7 +51,8 @@ if __name__ == "__main__":
 		default="none",
 		help="Flow control.")
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
-	parser.add_argument("binary", type=str, help="Binary to be executed.")
+	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
+	parser.add_argument("image", type=str, help="Binary image to be executed.")
 
 	args = parser.parse_args()
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 	commandArgs = str(target["args"]).format(
 		device=device,
 		memory=" ".join([
-		"0x{:x} {}".format(offset, f.format(binary=args.binary))
+		"0x{:x} {}".format(offset, f.format(binary=args.image))
 		for offset, f in target["memoryMap"].items()  # type: ignore
 		]))
 
