@@ -27,8 +27,12 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 
 def runGdb() -> None:
 	#input("Press ENTER to connect gdb...\n")
-	localDocker(["exec", "-it","xtensa_qemu", "gdbgui", "-r", "--port=8080", "--gdb-cmd", "/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb --tty=/dev/pts/0"],
-	#localDocker(["exec", "-it", "xtensa_qemu", "/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb", "/bzd/binary.bin"],
+	localDocker(
+		[
+		"exec", "-it", "xtensa_qemu", "gdbgui", "-r", "--port=8080", "--gdb-cmd",
+		"/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb --tty=/dev/pts/0"
+		],
+		#localDocker(["exec", "-it", "xtensa_qemu", "/bzd/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb", "/bzd/binary.bin"],
 		stdin=True,
 		stdout=True,
 		stderr=True,
