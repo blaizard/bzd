@@ -39,7 +39,7 @@ RUN git clone --depth 1 https://github.com/espressif/qemu.git \
 	&& mkdir -p build \
 	&& cd build \
 	&& ../configure --target-list=xtensa-softmmu --enable-debug --enable-sanitizers --disable-strip --disable-capstone --disable-vnc \
-	&& make vga=no \
+	&& make vga=no -j$(nproc) \
 	&& make install
 
 # Install dependencies for GDB
@@ -55,10 +55,10 @@ RUN apt-get install -y --no-install-recommends \
 # Install GDB, note this version already integrates the patch needed by previous version
 # to avoid the "Remote 'g' packet reply is too long." error mesage.
 # Follow: https://github.com/Ebiroll/qemu_esp32#building-gdb-81-for-qemu
-#RUN git clone --depth 1 --branch esp-2021r2-gdb https://github.com/espressif/binutils-gdb.git
+RUN git clone --depth 1 --branch esp-2021r2-gdb https://github.com/espressif/binutils-gdb.git
 
 # Apply patch to fix xtensa registers definitions so that gdb can work with QEMU
-#RUN curl -L https://raw.githubusercontent.com/Ebiroll/gdb/master/gdb/xtensa-config.c.qemu --output binutils-gdb/gdb/xtensa-config.c
+RUN curl -L https://raw.githubusercontent.com/Ebiroll/gdb/master/gdb/xtensa-config.c.qemu --output binutils-gdb/gdb/xtensa-config.c
 
 #RUN cd binutils-gdb \
 #    && sed -i gdb/xtensa-config.c -e 's/\(XTREG([^,]\+,[^,]\+,[^,]\+,[^,]\+,[^,]\+,[^,]\+,[^,]\+\)/\1 \& ~1/'
@@ -67,8 +67,11 @@ RUN apt-get install -y --no-install-recommends \
 #	&& mkdir -p build \
 #	&& cd build \
 #	&& ../configure --without-guile --host=x86_64-pc-linux-gnu --target=xtensa-esp32-elf --disable-werror \
-#   && make \
+#   && make -j$(nproc) \
 #   && make install
+
+RUN curl -L https://github.com/espressif/crosstool-NG/releases/download/esp-2021r2/xtensa-esp32-elf-gcc8_4_0-esp-2021r2-linux-amd64.tar.gz --output /bzd/esp-2021r2.tar.gz
+RUN tar -zxvf /bzd/esp-2021r2.tar.gz
 
 RUN git clone --depth 1 https://github.com/Ebiroll/qemu_esp32.git \
     && cp qemu_esp32/bin/xtensa-esp32-elf-gdb /usr/bin/xtensa-esp32-elf-gdb \
