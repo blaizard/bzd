@@ -6,7 +6,7 @@ import threading
 import time
 import sys
 
-from python.bzd.utils.run import localDockerComposeRun, localDocker
+from python.bzd.utils.run import localDocker
 from toolchains.cc.fragments.esptool.targets import targets
 
 
@@ -26,13 +26,27 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 
 
 def runGdb() -> None:
-	input("Press ENTER to connect gdb...\n")
+
+	# Wait until the container is available
+	print("Waiting for container xtensa_qemu to be up...")
+	counter = 50
+	while counter:
+		if localDocker(["exec", "xtensa_qemu", "/bin/bash", "-c", "exit", "0"],
+			ignoreFailure=True).getReturnCode() == 0:
+			break
+		time.sleep(0.1)
+		counter -= 1
+	assert counter, "Waiting for container timed-out."
+
+	# Start gdb + gdbgui
 	localDocker(["exec", "-it", "xtensa_qemu", "gdbgui", "-r", "--port=8080", "-g", "xtensa-esp32-elf-gdb"],
 		stdin=True,
 		stdout=True,
 		stderr=True,
+		ignoreFailure=True,
 		timeoutS=0)
 
+	# Cleanup everything
 	localDocker(["stop", "--time=5", "xtensa_qemu"], timeoutS=10)
 
 
@@ -40,7 +54,7 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="ESP32 QEMU launcher script.")
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
-	parser.add_argument('--gdb', default=False, action="store_true", help="Use GDB to debug the target.")
+	parser.add_argument('--debug', default=False, action="store_true", help="Use GDB to debug the target.")
 	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
 	parser.add_argument("image", type=str, help="Binary image to be executed.")
 
@@ -54,7 +68,7 @@ if __name__ == "__main__":
 		{offset: pathlib.Path(f.format(binary=args.image))
 		for offset, f in target["memoryMap"].items()})  # type: ignore
 
-	if args.gdb:
+	if args.debug:
 		gdb = threading.Thread(target=runGdb)
 		gdb.start()
 
@@ -68,10 +82,10 @@ if __name__ == "__main__":
 		"-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
 	]
 
-	if args.gdb:
+	if args.debug:
 		cmds += ["-gdb", "tcp::1234", "-S"]
 
-	localDocker(cmds, stdin=False, stdout=True, stderr=True, timeoutS=0)
+	localDocker(cmds, stdin=False, stdout=True, stderr=True, ignoreFailure=True, timeoutS=0)
 
-	if args.gdb:
+	if args.debug:
 		gdb.join()

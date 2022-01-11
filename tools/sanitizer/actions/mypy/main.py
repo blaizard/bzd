@@ -22,6 +22,7 @@ def mypyWorker(package: str, stdout: TextIO) -> None:
 		clean_exit=True,
 		args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
 
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wrapper for mypy")
 	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")

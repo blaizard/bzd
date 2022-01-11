@@ -159,36 +159,8 @@ def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, 
 	return localCommand([path] + args, env=env, **kwargs)
 
 
-def localDockerCompose(config: Path, **kwargs: Any) -> _ExecuteResult:
-	"""
-	Spawn a full docker-compose topology and execute it.
-	"""
-	command = ["docker-compose", "--file", config.as_posix()]
-	try:
-		return localCommand(command + ["up", "--force-recreate"], **kwargs)
-	except:
-		# This speeds up the shutdown process of the container(s) when CTRL+C is pressed.
-		localCommand(command + ["kill"], timeoutS=5, ignoreFailure=True)
-	return _ExecuteResult()
-
-
-def localDockerComposeRun(config: Path, service: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
-	"""
-	Execute a docker-compose run service.
-	"""
-	try:
-		return localCommand(["docker-compose", "--file", config.as_posix(), "run", "--rm", service] + args, **kwargs)
-	except:
-		pass
-	return _ExecuteResult()
-
-
 def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
 	"""
 	Execute a docker-compose run service.
 	"""
-	try:
-		return localCommand(["docker"] + args, **kwargs)
-	except:
-		pass
-	return _ExecuteResult()
+	return localCommand(["docker"] + args, **kwargs)

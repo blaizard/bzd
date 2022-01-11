@@ -153,9 +153,8 @@ _bzd_package = rule(
 def bzd_package(**kargs):
     _bzd_package(
         internal_config = select({
-            "//tools/bazel_build/config:prod": "prod",
-            "//tools/bazel_build/config:dev": "dev",
-            "//conditions:default": "prod",
+            "//tools/bazel_build/settings/build:prod": "prod",
+            "//tools/bazel_build/settings/build:dev": "dev",
         }),
         **kargs
     )
