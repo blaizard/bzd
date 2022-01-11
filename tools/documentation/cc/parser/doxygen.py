@@ -375,7 +375,7 @@ class DoxygenParser:
 				definition[key] = self.removeNestedKeyword(value, keyword)
 		elif isinstance(definition, list):
 			for i in range(len(definition)):
-				definition[i] = self.removeNestedKeyword(definition[i], keyword) # type: ignore
+				definition[i] = self.removeNestedKeyword(definition[i], keyword)  # type: ignore
 		return definition
 
 	"""

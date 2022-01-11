@@ -186,12 +186,17 @@ def _cc_binary(ctx, binary_file):
     if executor not in executors_mapping:
         fail("This platform does not support the '{}' executor, only the followings are supported: {}.".format(executor, executors_mapping.keys()))
 
+    args = []
+    if ctx.attr._debug[BuildSettingInfo].value:
+        args.append("--debug")
+    args += ["\"{}\"".format(binary.short_path) for binary in binaries]
+
     default_info = sh_binary_wrapper_impl(
         ctx = ctx,
         binary = executors_mapping[executor],
         output = ctx.outputs.executable,
         extra_runfiles = binaries,
-        command = "{{binary}} {} $@".format(" ".join(["\"{}\"".format(binary.short_path) for binary in binaries])),
+        command = "{{binary}} {} $@".format(" ".join(args)),
     )
 
     return default_info, []
@@ -264,6 +269,9 @@ def _bzd_cc_generic(is_test):
             ),
             "_executor": attr.label(
                 default = "//tools/bazel_build/settings/executor",
+            ),
+            "_debug": attr.label(
+                default = "//tools/bazel_build/settings/debug",
             ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
         },

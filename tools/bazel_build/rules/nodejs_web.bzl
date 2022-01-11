@@ -218,9 +218,8 @@ def bzd_nodejs_web(name, aliases = {}, srcs = [], packages = {}, deps = [], visi
         dep = name + ".install",
         tags = ["nodejs"],
         build_type = select({
-            "//tools/bazel_build/config:prod": "prod",
-            "//tools/bazel_build/config:dev": "dev",
-            "//conditions:default": "prod",
+            "//tools/bazel_build/settings/build:prod": "prod",
+            "//tools/bazel_build/settings/build:dev": "dev",
         }),
         **kwargs
     )
