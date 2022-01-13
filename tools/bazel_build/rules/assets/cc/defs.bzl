@@ -1,23 +1,14 @@
-load("@rules_cc//cc:find_cc_toolchain.bzl", original_find_cc_toolchain = "find_cc_toolchain")
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 _CC_SRCS_EXTENSIONS = (".c", ".cc", ".cpp", ".cxx", ".c++", ".C")
 _CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
-
-def find_cc_toolchain(ctx):
-    # TODO use find_cc_toolchain, somehow it doesn't work for all configurations.
-    # See this related issue: https://github.com/bazelbuild/rules_cc/issues/74
-    #return ctx.attr._cc_toolchain[cc_common.CcToolchainInfo]
-    cc_toolchain = ctx.toolchains["@rules_cc//cc:toolchain_type"]
-    if not hasattr(cc_toolchain, "all_files"):
-        cc_toolchain = original_find_cc_toolchain(ctx)
-    return cc_toolchain
 
 def _cc_config(ctx):
     """
     Helper function to gather toolchain and feature config
     """
 
-    cc_toolchain = find_cc_toolchain(ctx)
+    cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,

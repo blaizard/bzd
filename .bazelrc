@@ -89,6 +89,10 @@ build:esp32_xtensa_lx6_gcc --incompatible_enable_cc_toolchain_resolution
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
 build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
 
+# clang_tidy
+build:clang_tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
+build:clang_tidy --output_groups=report
+
 # Development and production build configuration
 build:dev -c dbg
 build:dev --//tools/bazel_build/settings/build=dev

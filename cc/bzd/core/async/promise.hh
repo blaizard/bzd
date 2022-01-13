@@ -120,6 +120,7 @@ public:
 	template <class Async>
 	constexpr auto&& await_transform(Async&& async) noexcept
 	{
+		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
 		async.setExecutor(*executor_);
 		return bzd::move(async);
 	}
