@@ -5,8 +5,12 @@ sh_binary_wrapper(
     binary = "@linux_x86_64_clang_12_0_0//:clang_tidy",
     command = """
         ln -s $RUNFILES_DIR/__main__/external external
+        ln -s $RUNFILES_DIR/__main__/.clang-tidy .clang-tidy
         {binary} --use-color --quiet "${{@: 2}}"
         touch "$1"
     """,
     visibility = ["//visibility:public"],
+    data = [
+        "//:.clang-tidy"
+    ]
 )
