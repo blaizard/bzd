@@ -43,9 +43,9 @@ RUN apt-get update && apt-get install -y docker-ce \
 
 # Add Jenkins user
 RUN sudo groupadd -g 1000 jenkins
-RUN sudo useradd -u 1000 -s /bin/sh -g jenkins 1000
-RUN sudo mkdir -p /home/1000
-RUN sudo chown -R 1000:jenkins /home/1000
+RUN sudo useradd -u 1000 -s /bin/sh -g jenkins jenkins
+RUN sudo mkdir -p /home/jenkins
+RUN sudo chown -R jenkins:jenkins /home/jenkins
 
 # Add the user to the docker group
-RUN usermod -aG docker 1000
+RUN usermod -aG docker jenkins
