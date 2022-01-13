@@ -4,7 +4,8 @@ load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link", "find_cc_toolchain")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
 def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwargs):
@@ -19,7 +20,7 @@ def _cc_run_action(ctx, action, variables = None, inputs = [], args = [], **kwar
         args: Arguments to be passed to the tool.
     """
 
-    cc_toolchain = find_cc_toolchain(ctx)
+    cc_toolchain = find_cpp_toolchain(ctx)
 
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
@@ -88,7 +89,7 @@ def _cc_linker(ctx, cc_info, map_analyzer):
     library_files = sets.to_list(library_files)
 
     # Get the C++ toolchain and the feature configuration.
-    cc_toolchain = find_cc_toolchain(ctx)
+    cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,

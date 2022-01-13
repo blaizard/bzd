@@ -13,6 +13,16 @@ filegroup(
     srcs = ["bin/clang-format"],
 )
 
+sh_binary(
+    name = "clang_tidy",
+    srcs = [
+        "bin/clang-tidy"
+    ],
+    data = [
+        ":includes"
+    ]
+)
+
 filegroup(
     name = "bin",
     srcs = glob([
