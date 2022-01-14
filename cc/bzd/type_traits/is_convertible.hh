@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/declval.hh"
 #include "cc/bzd/type_traits/integral_constant.hh"
 #include "cc/bzd/type_traits/void_type.hh"

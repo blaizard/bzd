@@ -32,11 +32,11 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_TRUE(vMove);
 	EXPECT_EQ(vMove.value(), 13);
 
-	v.emplace(45);
+	vMove.emplace(45);
 	EXPECT_TRUE(v);
-	EXPECT_EQ(v.value(), 45);
+	EXPECT_EQ(vMove.value(), 45);
 
-	v.reset();
+	vMove.reset();
 	EXPECT_FALSE(v);
 }
 
@@ -177,26 +177,26 @@ TEST(ContainerOptional, reference)
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.value(), 42);
-	a = -85;
+	a = -85; // NOLINT(clang-analyzer-deadcode.DeadStores)
 	EXPECT_EQ(v.value(), -85);
 
 	int b = 12;
 	v.emplace(b);
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.value(), 12);
-	b = -25;
+	b = -25; // NOLINT(clang-analyzer-deadcode.DeadStores)
 	EXPECT_EQ(v.value(), -25);
 
 	auto vCopy{v};
 	EXPECT_TRUE(vCopy);
 	EXPECT_EQ(vCopy.value(), -25);
-	b = 34;
+	b = 34; // NOLINT(clang-analyzer-deadcode.DeadStores)
 	EXPECT_EQ(vCopy.value(), 34);
 
 	auto vMove{bzd::move(vCopy)};
 	EXPECT_TRUE(vMove);
 	EXPECT_EQ(vMove.value(), 34);
-	b = 7;
+	b = 7; // NOLINT(clang-analyzer-deadcode.DeadStores)
 	EXPECT_EQ(vMove.value(), 7);
 }
 

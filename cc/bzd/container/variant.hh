@@ -417,7 +417,11 @@ protected:
 	using Destructor = Helper<VariantDestructor, Self*>;
 
 private:
-	constexpr void destructIfNeeded() noexcept { Destructor::call(this->id_, this); }
+	constexpr void destructIfNeeded() noexcept
+	{
+		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
+		Destructor::call(this->id_, this);
+	}
 
 public:
 	using Parent::Parent;

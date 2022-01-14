@@ -179,8 +179,8 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:is_iterator",
         "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
-        "//cc/bzd/utility:swap"
     ],
 )
 

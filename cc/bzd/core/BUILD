@@ -64,7 +64,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":units",
         "//cc/bzd/core/async",
+        "//cc/bzd/platform:clock",
     ],
 )
 

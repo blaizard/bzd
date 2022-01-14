@@ -48,6 +48,7 @@ TEST(ContainerFunction, capturingLambda)
 		callable(42);
 		EXPECT_EQ(j, 42);
 	}
+	// NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape)
 }
 
 TEST(ContainerFunction, tags)
@@ -66,6 +67,8 @@ TEST(ContainerFunction, tags)
 	EXPECT_EQ(j, -1);
 	callable1();
 	EXPECT_EQ(j, -1);
+
+	// NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape)
 }
 
 static int rawFunctionTestVariable_ = 0;

@@ -120,12 +120,12 @@ TEST(ContainerTuple, Move)
 	EXPECT_EQ(tuple.get<1>(), 'a');
 	EXPECT_EQ(tuple.get<2>().value, 3);
 
-	const auto tupleMove{bzd::move(tuple)};
+	auto tupleMove{bzd::move(tuple)};
 	EXPECT_EQ(tupleMove.get<0>(), 12);
 	EXPECT_EQ(tupleMove.get<1>(), 'a');
 	EXPECT_EQ(tupleMove.get<2>().value, 3);
 
-	const auto tupleMove2 = bzd::move(tuple);
+	const auto tupleMove2 = bzd::move(tupleMove);
 	EXPECT_EQ(tupleMove2.get<0>(), 12);
 	EXPECT_EQ(tupleMove2.get<1>(), 'a');
 	EXPECT_EQ(tupleMove2.get<2>().value, 3);

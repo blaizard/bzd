@@ -52,7 +52,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
-        "//cc/bzd/utility:move"
+        "//cc/bzd/utility:move",
     ],
 )
 
