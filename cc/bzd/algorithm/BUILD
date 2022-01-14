@@ -48,7 +48,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":find_if",
+        ":find_if_not",
         "//cc/bzd/type_traits:is_iterator",
     ],
 )
@@ -180,6 +180,7 @@ cc_library(
         "//cc/bzd/type_traits:is_iterator",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/utility/comparison",
+        "//cc/bzd/utility:swap"
     ],
 )
 

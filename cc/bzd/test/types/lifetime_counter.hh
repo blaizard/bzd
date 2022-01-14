@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::test {
 

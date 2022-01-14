@@ -5,6 +5,7 @@ cc_library(
     hdrs = [
         "traits.hh",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_pointer",

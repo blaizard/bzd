@@ -6,4 +6,4 @@ namespace Example {
 
 bzd::Async<bool> run();
 
-}
+} // namespace Example

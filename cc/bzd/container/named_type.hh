@@ -233,6 +233,7 @@ public:
 	constexpr T operator<<(const T& other) const { return T{this->underlying().get() << other.get()}; }
 	constexpr T& operator<<=(const T& other)
 	{
+		// NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
 		this->underlying().get() <<= other.get();
 		return this->underlying();
 	}

@@ -12,9 +12,3 @@ cc_library(
         "//cc/targets",
     ],
 )
-
-alias(
-    name = "atomic",
-    actual = "//cc/targets:atomic",
-    visibility = ["//cc/bzd/platform:__pkg__"],
-)

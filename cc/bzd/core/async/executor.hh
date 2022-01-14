@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cc/bzd/container/impl/non_owning_list.hh"
-#include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/utility/ignore.hh"
 
 #include <iostream>

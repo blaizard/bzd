@@ -26,14 +26,5 @@ cc_library(
         ":composition",
         "//cc/components/generic/panic/throw",
         "//cc/components/posix/stack_trace",
-        "//cc/components/std/atomic",
-    ],
-)
-
-alias(
-    name = "atomic",
-    actual = "//cc/components/std/atomic",
-    visibility = [
-        "//cc/targets:__pkg__",
     ],
 )

@@ -1,2 +1,4 @@
-Checks: '*'
+Checks: >
+    clang-diagnostic-*,
+    clang-analyzer-*
 WarningsAsErrors: '*'

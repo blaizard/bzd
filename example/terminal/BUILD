@@ -17,6 +17,9 @@ cc_library(
     visibility = [
         "//example/terminal/tests:__pkg__",
     ],
+    deps = [
+        "//cc:bzd",
+    ]
 )
 
 cc_library(

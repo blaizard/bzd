@@ -5,7 +5,10 @@ def _get_sources(ctx):
     srcs = []
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
-            srcs += [src for src in src.files.to_list() if src.basename.endswith((".cc", ".c"))]
+            srcs += [src for src in src.files.to_list() if src.basename.endswith((".cc", ".c", ".cpp"))]
+    if hasattr(ctx.rule.attr, "hdrs"):
+        for hrd in ctx.rule.attr.hdrs:
+            srcs += [hrd for hrd in hrd.files.to_list() if hrd.basename.endswith((".hh", ".h", ".hpp"))]
     return srcs
 
 def _get_flags(ctx):
