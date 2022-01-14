@@ -11,9 +11,3 @@ cc_library(
     visibility = ["//cc/bzd/platform/backend:__pkg__"],
     deps = select({platform: [target] for platform, target in PLATFORM_TO_TARGET.items()}),
 )
-
-cc_library(
-    name = "atomic",
-    visibility = ["//cc/bzd/platform/backend:__pkg__"],
-    deps = select({platform: [target + ":atomic"] for platform, target in PLATFORM_TO_TARGET.items()}),
-)

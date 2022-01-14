@@ -1,5 +1,8 @@
 #pragma once
 
+#include "cc/bzd/platform/types.hh"
+#include "cc/bzd/platform/atomic.hh"
+
 #include <condition_variable>
 #include <iostream>
 #include <mutex>

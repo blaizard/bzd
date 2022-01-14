@@ -27,15 +27,8 @@ cc_library(
     ],
     deps = [
         ":composition",
+        "//cc:bzd",
         "//cc/components/generic/panic/trap",
-        "//cc/components/std/atomic",
-    ],
-)
-
-alias(
-    name = "atomic",
-    actual = "//cc/components/std/atomic",
-    visibility = [
-        "//cc/targets:__pkg__",
+        "//cc/components/std/stream/out",
     ],
 )

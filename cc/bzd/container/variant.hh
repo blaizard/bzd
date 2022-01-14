@@ -228,7 +228,7 @@ public: // Functions
 	}
 
 protected:
-	IndexType id_;
+	IndexType id_{static_cast<IndexType>(npos)};
 	// In order to be constexpr compatible, the use of union here is a must because constexpr functions
 	// cannot use new nor reinterpret_cast.
 	// ... [ Note: If any non-static data member of a union has a non-trivial default constructor (12.1),

@@ -396,6 +396,7 @@ cc_library(
         ":true_type",
         ":void_type",
         "//cc/bzd/utility:concept",
+        "//cc/bzd/container/iterator:traits"
     ],
 )
 
