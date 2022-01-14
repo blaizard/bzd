@@ -1,3 +1,3 @@
 exports_files([
-    ".clang-tidy"
+    ".clang-tidy",
 ])

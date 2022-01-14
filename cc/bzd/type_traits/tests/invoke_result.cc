@@ -89,26 +89,31 @@ TEST(InvokeResult, rawFunctions)
 TEST(InvokeResult, functions)
 {
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<void(void)> callable{[]() {}};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, void>;
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<int(void)> callable{[]() -> int { return 0; }};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, int>;
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<void*(void)> callable{[]() -> void* { return nullptr; }};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, void*>;
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<const void*(void)> callable{[]() -> const void* { return nullptr; }};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable)>, const void*>;
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<int&(void)> callable{[]() -> int& {
 			static int a = 0;
 			return a;
@@ -117,6 +122,7 @@ TEST(InvokeResult, functions)
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<const int&(void)> callable{[]() -> const int& {
 			static int a = 0;
 			return a;
@@ -125,11 +131,13 @@ TEST(InvokeResult, functions)
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<void(int)> callable{[](int) {}};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), int>, void>;
 		EXPECT_TRUE(result);
 	}
 	{
+		// NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
 		bzd::Function<float(char*, double)> callable{[](char*, double) -> float { return 0.f; }};
 		constexpr bool result = bzd::typeTraits::isSame<bzd::typeTraits::InvokeResult<decltype(callable), char*, double>, float>;
 		EXPECT_TRUE(result);

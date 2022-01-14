@@ -19,7 +19,7 @@ cc_library(
     ],
     deps = [
         "//cc:bzd",
-    ]
+    ],
 )
 
 cc_library(

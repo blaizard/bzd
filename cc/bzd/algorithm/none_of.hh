@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/algorithm/find_if_not.hh"
+#include "cc/bzd/algorithm/find_if.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
 
 namespace bzd::algorithm {

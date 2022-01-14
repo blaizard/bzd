@@ -162,6 +162,8 @@ TEST(ContainerFunctionView, objectFunctionNoArgs)
 	EXPECT_EQ(a, 42);
 	ptr();
 	EXPECT_EQ(a, 84);
+
+	// NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape)
 }
 
 TEST(ContainerFunctionView, objectFunctionArgsReturn)
@@ -172,6 +174,8 @@ TEST(ContainerFunctionView, objectFunctionArgsReturn)
 	EXPECT_EQ(a, 2);
 	EXPECT_EQ(fct(5), 27);
 	EXPECT_EQ(ptr(3), 11);
+
+	// NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape)
 }
 
 TEST(ContainerFunctionView, lambdaNoArgs)

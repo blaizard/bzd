@@ -54,6 +54,8 @@ cc_library(
         "//cc/bzd/algorithm:lexicographical_compare",
         "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/container/iterator:distance",
+        "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/type_traits:is_const",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
     ],

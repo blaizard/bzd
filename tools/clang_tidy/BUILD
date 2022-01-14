@@ -9,8 +9,8 @@ sh_binary_wrapper(
         {binary} --use-color --quiet "${{@: 2}}"
         touch "$1"
     """,
-    visibility = ["//visibility:public"],
     data = [
-        "//:.clang-tidy"
-    ]
+        "//:.clang-tidy",
+    ],
+    visibility = ["//visibility:public"],
 )

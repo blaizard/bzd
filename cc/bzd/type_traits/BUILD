@@ -305,6 +305,7 @@ cc_library(
         ":declval",
         ":integral_constant",
         ":void_type",
+        "//cc/bzd/platform:types",
     ],
 )
 
@@ -395,8 +396,8 @@ cc_library(
         ":false_type",
         ":true_type",
         ":void_type",
+        "//cc/bzd/container/iterator:traits",
         "//cc/bzd/utility:concept",
-        "//cc/bzd/container/iterator:traits"
     ],
 )
 

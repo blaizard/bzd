@@ -61,7 +61,6 @@ def _clang_tidy_aspect_impl(target, ctx):
     outputs = []
     srcs = _get_sources(ctx)
     for src in srcs:
-
         output = ctx.actions.declare_file("{}.clang_tidy".format(src.short_path.replace("/", ".")))
         inputs = depset(direct = [src], transitive = [target[CcInfo].compilation_context.headers])
         ctx.actions.run(
@@ -83,11 +82,11 @@ clang_tidy_aspect = aspect(
     fragments = ["cpp"],
     attrs = {
         "_cc_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
         ),
         "_clang_tidy": attr.label(
             doc = "Clang-tidy binary to be used.",
-            default = Label("//tools/clang_tidy")
+            default = Label("//tools/clang_tidy"),
         ),
     },
     attr_aspects = ["deps"],
