@@ -4,7 +4,7 @@
 #include "freertos/task.h"
 
 #include <iostream>
-
+/*
 bzd::Async<void> nopVoid2(int a, int b, int c)
 {
 	std::cout << a << " " << b << " " << c << std::endl;
@@ -152,6 +152,20 @@ int main()
 
 	mainTask(nullptr);
 //	xTaskCreate(mainTask, "main task", stackSize, nullptr, priority, nullptr);
+
+	// Prevent the program to exit.
+	while (true)
+	{
+	};
+
+	return 0;
+}
+*/
+
+int main()
+{
+	extern bool execute() noexcept;
+	execute();
 
 	// Prevent the program to exit.
 	while (true)
