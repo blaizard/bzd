@@ -6,6 +6,7 @@
 #ifndef __is_identifier
 #define __is_identifier(__x) 1
 #endif
+// NOLINTNEXTLINE(bugprone-reserved-identifier)
 #define __has_keyword(__x) !(__is_identifier(__x))
 #ifndef __has_feature
 #define __has_feature(__x) 0

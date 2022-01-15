@@ -441,7 +441,10 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 		{
 			str += "0x"_sv;
 		}
-		bzd::format::toStringHex(str, value, "0123456789ABCDEF");
+		{
+			constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+			bzd::format::toStringHex(str, value, digits);
+		}
 		break;
 	case Metadata::Format::OCTAL:
 		if (metadata.alternate)
@@ -532,7 +535,7 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 				Adapter::assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>, "Argument must be arithmetic");
 				break;
 			case Metadata::Format::POINTER:
-				break;
+				[[fallthrough]];
 			case Metadata::Format::AUTO:
 				break;
 			}

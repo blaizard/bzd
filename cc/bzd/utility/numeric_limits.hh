@@ -5,6 +5,10 @@
 namespace bzd {
 template <class T>
 struct NumericLimits;
+{
+	[[nodiscard]] static constexpr UInt8Type min() noexcept { return 0; }
+	[[nodiscard]] static constexpr UInt8Type max() noexcept { return 0xff; }
+};
 
 template <>
 struct NumericLimits<UInt8Type>
@@ -51,14 +55,14 @@ struct NumericLimits<Int16Type>
 template <>
 struct NumericLimits<Int32Type>
 {
-	[[nodiscard]] static constexpr Int32Type min() noexcept { return -0x80000000; }
+	[[nodiscard]] static constexpr Int32Type min() noexcept { return -2147483648; }
 	[[nodiscard]] static constexpr Int32Type max() noexcept { return 0x7fffffff; }
 };
 
 template <>
 struct NumericLimits<Int64Type>
 {
-	[[nodiscard]] static constexpr Int64Type min() noexcept { return -0x8000000000000000; }
-	[[nodiscard]] static constexpr Int64Type max() noexcept { return 0x7fffffffffffffff; }
+	[[nodiscard]] static constexpr Int64Type min() noexcept { return (-9223372036854775807ll - 1ll); }
+	[[nodiscard]] static constexpr Int64Type max() noexcept { return 9223372036854775807ll; }
 };
 } // namespace bzd

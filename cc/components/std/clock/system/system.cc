@@ -18,6 +18,7 @@ ClockTick System::msToTicks(const bzd::units::Millisecond time) noexcept
 
 bzd::units::Millisecond System::ticksToMs(const ClockTick& ticks) noexcept
 {
+	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
 	return static_cast<bzd::units::Millisecond>(ticks.get());
 }
 

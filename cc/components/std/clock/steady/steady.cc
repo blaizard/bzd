@@ -18,7 +18,7 @@ ClockTick Steady::msToTicks(const bzd::units::Millisecond time) noexcept
 
 bzd::units::Millisecond Steady::ticksToMs(const ClockTick& ticks) noexcept
 {
-	return static_cast<bzd::units::Millisecond>(ticks.get());
+	return static_cast<bzd::units::Millisecond>(ticks.get()); // NOLINT(bugprone-narrowing-conversions)
 }
 
 } // namespace bzd::platform::std::clock

@@ -60,6 +60,7 @@ private:
 
 public:
 	template <class Callable>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	Function(Callable&& instance) : interface::Function<F, Args...>{makeFunctionPointer(bzd::forward<Callable>(instance))}
 	{
 	}
