@@ -33,11 +33,11 @@ TEST(ContainerOptional, simpleData)
 	EXPECT_EQ(vMove.value(), 13);
 
 	vMove.emplace(45);
-	EXPECT_TRUE(v);
+	EXPECT_TRUE(vMove);
 	EXPECT_EQ(vMove.value(), 45);
 
 	vMove.reset();
-	EXPECT_FALSE(v);
+	EXPECT_FALSE(vMove);
 }
 
 TEST(ContainerOptional, Comparison)
