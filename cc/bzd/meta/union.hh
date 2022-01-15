@@ -28,11 +28,13 @@ public:
 
 	// Value constructor (copy/move)
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr UnionTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
@@ -117,11 +119,13 @@ public:
 
 	// Value constructor (copy/move)
 	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr UnionNonTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}

@@ -26,6 +26,7 @@ TEST(ContainerFunction, nonCapturingLambda)
 		EXPECT_TRUE(isSameType);
 	}
 	{
+		// NOLINTNEXTLINE(bugprone-narrowing-conversions)
 		bzd::Function<double(double, int)> callable{[](double a, int b) -> int { return a + b; }};
 		auto result = callable(11, 12);
 		EXPECT_EQ(result, 23);

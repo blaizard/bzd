@@ -84,6 +84,7 @@ protected:
 	struct Overload<F0> : F0
 	{
 		template <class T>
+		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 		constexpr Overload(T&& f0) noexcept : F0{bzd::forward<T>(f0)}
 		{
 		}
@@ -144,6 +145,7 @@ public: // Constructors
 
 	/// Value constructor (exact type match)
 	template <class T>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr VariantBase(T&& value) noexcept : id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{bzd::forward<T>(value)}
 	{
 	}

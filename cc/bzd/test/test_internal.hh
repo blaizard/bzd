@@ -14,11 +14,10 @@
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                                \
 	{                                                                                                                           \
 	public:                                                                                                                     \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)                                                                             \
-		(const char* testCaseName, const char* testName, const char* file) : ::bzd::test::Test{testCaseName, testName, file} {} \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test{#testCaseName, #testName, __FILE__} {} \
 		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                                  \
 	};                                                                                                                          \
-	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){#testCaseName, #testName, __FILE__};
+	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
 #define BZDTEST_(testCaseName, testName)      \
 	BZDTEST_REGISTER_(testCaseName, testName) \
@@ -192,7 +191,7 @@ public:
 	constexpr Value(const T& value) { valueToString(buffer_, value); }
 
 	template <class U>
-	constexpr Value(U&& value)
+	constexpr Value(U&& value) // NOLINT(bugprone-forwarding-reference-overload)
 	{
 		valueToString(buffer_, value);
 	}
@@ -228,7 +227,7 @@ private:
 		}
 
 		// Move toward the begining and set the end character
-		const int diff = ptr - pBuffer;
+		const auto diff = ptr - pBuffer;
 		while (*ptr)
 		{
 			ptr[-diff] = ptr[0];
@@ -246,11 +245,11 @@ private:
 		pBuffer = valueToString(pBuffer, valueInteger);
 		*pBuffer++ = '.';
 
-		value -= valueInteger;
+		value -= valueInteger; // NOLINT(bugprone-narrowing-conversions)
 		for (int i = 0; i < 10; ++i)
 		{
 			value *= 10;
-			*pBuffer++ = static_cast<char>(static_cast<int>(value) % 10) + '0';
+			*pBuffer++ = static_cast<char>(static_cast<int>(value) % 10) + '0'; // NOLINT(bugprone-narrowing-conversions)
 		}
 
 		*pBuffer++ = '\0';

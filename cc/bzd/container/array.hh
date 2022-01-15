@@ -45,4 +45,5 @@ public:
 	static constexpr SizeType capacity() noexcept { return N; }
 	static constexpr SizeType size() noexcept { return N; }
 };
+
 } // namespace bzd

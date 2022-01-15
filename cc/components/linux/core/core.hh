@@ -55,7 +55,7 @@ public:
 	{
 		stack_.taint();
 
-		if (::pthread_attr_init(&attr_) == -1)
+		if (::pthread_attr_init(&attr_) != 0)
 		{
 			return bzd::error(Error::OTHER);
 		}

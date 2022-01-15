@@ -1,4 +1,5 @@
 Checks: >
+    bugprone-*,
     clang-diagnostic-*,
     clang-analyzer-*
 WarningsAsErrors: '*'

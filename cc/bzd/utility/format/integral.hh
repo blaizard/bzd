@@ -3,18 +3,22 @@
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
+#include "cc/bzd/container/array.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
 
 namespace bzd::format::impl {
 namespace {
-static constexpr const char* const digits = "0123456789abcdef";
+static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 }
 
-template <SizeType Base = 10, class T, bzd::typeTraits::EnableIf<(Base > 1 && Base <= 16), T>* = nullptr>
-constexpr void integer(interface::String& str, const T& n, const char* const digits = bzd::format::impl::digits)
+template <SizeType base = 10, class T, class U>
+constexpr void integer(interface::String& str, const T& n, U& digits = bzd::format::impl::digits)
 {
+	static_assert(base > 1 && base <= 16, "Invalid base size.");
+	static_assert(U::size() >= base, "There is not enough digits for the base.");
+
 	auto data = str.data();
 	const SizeType indexBegin = str.size();
 	SizeType index = indexBegin;
@@ -29,9 +33,9 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 	{
 		do
 		{
-			const int digit = digits[static_cast<int>(number % Base)];
-			number /= Base;
-			data[index++] = static_cast<char>(digit);
+			const auto digit = digits[static_cast<SizeType>(number % base)];
+			number /= base;
+			data[index++] = digit;
 		} while (number && index != indexEnd);
 
 		if constexpr (bzd::typeTraits::isSigned<T>)
@@ -43,6 +47,7 @@ constexpr void integer(interface::String& str, const T& n, const char* const dig
 		}
 	}
 	str.resize(index);
+	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
 	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
 }
 
@@ -68,7 +73,7 @@ constexpr void fixedPoint(interface::String& str, const T& n, const SizeType max
 	auto resolution = resolutionList[maxPrecision];
 	const T roundedNumber = n + resolution / 2;
 
-	bzd::format::impl::integer(str, static_cast<int>(roundedNumber));
+	bzd::format::impl::integer(str, static_cast<int>(roundedNumber), bzd::format::impl::digits);
 
 	str += '.';
 
@@ -88,7 +93,7 @@ constexpr void fixedPoint(interface::String& str, const T& n, const SizeType max
 namespace bzd::format {
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-constexpr void toStringHex(bzd::interface::String& str, const T& data, const char* const digits = bzd::format::impl::digits)
+constexpr void toStringHex(bzd::interface::String& str, const T& data, const bzd::Array<const char, 16>& digits = bzd::format::impl::digits)
 {
 	bzd::format::impl::integer<16>(str, data, digits);
 }
@@ -96,20 +101,20 @@ constexpr void toStringHex(bzd::interface::String& str, const T& data, const cha
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toStringOct(bzd::interface::String& str, const T& data)
 {
-	bzd::format::impl::integer<8>(str, data);
+	bzd::format::impl::integer<8>(str, data, bzd::format::impl::digits);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toStringBin(bzd::interface::String& str, const T& data)
 {
-	bzd::format::impl::integer<2>(str, data);
+	bzd::format::impl::integer<2>(str, data, bzd::format::impl::digits);
 }
 } // namespace bzd::format
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
 constexpr void toString(bzd::interface::String& str, const T& data)
 {
-	bzd::format::impl::integer(str, data);
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
