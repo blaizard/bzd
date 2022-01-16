@@ -8,12 +8,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/algorithm:reverse",
+        "//cc/bzd/container:array",
         "//cc/bzd/container:string",
         "//cc/bzd/container:vector",
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
-        "//cc/bzd/container:array"
     ],
 )
 

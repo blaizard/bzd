@@ -34,7 +34,7 @@ public:
 
 	// Forbid rvalues
 	template <class T>
-	constexpr explicit AnyReference(T&& object) noexcept = delete;	// NOLINT(bugprone-forwarding-reference-overload)
+	constexpr explicit AnyReference(T&& object) noexcept = delete; // NOLINT(bugprone-forwarding-reference-overload)
 
 	template <class T>
 	[[nodiscard]] constexpr bzd::Result<T&> get() noexcept
