@@ -378,7 +378,6 @@ public:
 		bzd::typeTraits::declval<bzd::interface::String&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
 
 	using FormatterTransportType = bzd::interface::String;
-	using FormatterReturnType = void;
 
 public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
@@ -442,7 +441,8 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 			str += "0x"_sv;
 		}
 		{
-			constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+			constexpr bzd::Array<const char, 16>
+				digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 			bzd::format::toStringHex(str, value, digits);
 		}
 		break;
@@ -575,7 +575,6 @@ class Formatter
 {
 public:
 	using TransportType = typename Adapter::FormatterTransportType;
-	using ReturnType = typename Adapter::FormatterReturnType;
 
 public:
 	template <class... Args>
@@ -596,7 +595,7 @@ private:
 	public:
 		constexpr FormatterType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		constexpr ReturnType process(TransportType& transport, const Metadata& metadata) const noexcept
+		constexpr void process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			SizeType counter = 0;
@@ -606,82 +605,6 @@ private:
 					lambda(transport, metadata);
 				}
 			});
-		}
-
-		ReturnType processAsync(TransportType& transport, const Metadata& metadata) const noexcept
-		{
-			const auto index = metadata.index;
-			if constexpr (Lambdas::size() > 0)
-			{
-				if (index == 0)
-				{
-					co_await lambdas_.template get<0>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 1)
-			{
-				if (index == 1)
-				{
-					co_await lambdas_.template get<1>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 2)
-			{
-				if (index == 2)
-				{
-					co_await lambdas_.template get<2>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 3)
-			{
-				if (index == 3)
-				{
-					co_await lambdas_.template get<3>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 4)
-			{
-				if (index == 4)
-				{
-					co_await lambdas_.template get<4>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 5)
-			{
-				if (index == 5)
-				{
-					co_await lambdas_.template get<5>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 6)
-			{
-				if (index == 6)
-				{
-					co_await lambdas_.template get<6>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 7)
-			{
-				if (index == 7)
-				{
-					co_await lambdas_.template get<7>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 8)
-			{
-				if (index == 8)
-				{
-					co_await lambdas_.template get<8>()(transport, metadata);
-				}
-			}
-			if constexpr (Lambdas::size() > 9)
-			{
-				if (index == 9)
-				{
-					co_await lambdas_.template get<9>()(transport, metadata);
-				}
-			}
-			static_assert(Lambdas::size() <= 10, "Too many arguments passed to format, not supported.");
 		}
 
 	private:

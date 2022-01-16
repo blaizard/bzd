@@ -4,18 +4,17 @@
 #include "cc/bzd/container/string_stream.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/vector.hh"
+#include "cc/bzd/core/panic.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/format/stream.hh"
 
-#include <stdexcept>
-
-class ThrowAssert
+class TestAssert
 {
 public:
-	static void onError(const bzd::StringView& message) { throw std::runtime_error(message.data()); }
+	static void onError(const bzd::StringView&) { bzd::Panic::trigger(); }
 };
 
-using TestAdapater = bzd::format::impl::Adapter<ThrowAssert>;
+using TestAdapater = bzd::format::impl::Adapter<TestAssert>;
 
 TEST(Format_, ParseStaticString)
 {
@@ -73,24 +72,6 @@ TEST(Format_, ParseStaticString)
 		EXPECT_FALSE(result2.isMetadata);
 		EXPECT_EQ(result2.str, "}"_sv);
 		EXPECT_TRUE(str.empty());
-	}
-
-	{
-		bzd::StringView str("Hello {");
-		EXPECT_ANY_THROW(bzd::format::impl::parseStaticString<TestAdapater>(str));
-	}
-
-	{
-		bzd::StringView str("} ");
-		EXPECT_ANY_THROW(bzd::format::impl::parseStaticString<TestAdapater>(str));
-	}
-}
-
-TEST(Format_, ParseMetadata)
-{
-	{
-		bzd::StringView str("hello");
-		EXPECT_ANY_THROW(bzd::format::impl::parseMetadata<TestAdapater>(str, 0));
 	}
 }
 
