@@ -40,6 +40,5 @@ cc_library(
         ":composition",
         "//cc:bzd",
         "//cc/components/generic/panic/trap",
-        "//cc/components/std/stream/out",
     ],
 )
