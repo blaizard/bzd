@@ -1,5 +1,6 @@
 #include "cc/bzd.hh"
-#include "cc/components/std/stream/out/out.hh"
+
+#include <esp_system.h>
 
 int main()
 {
@@ -7,10 +8,7 @@ int main()
 	execute();
 
 #if defined(BZD_EXECUTOR_SIM)
-	{
-		bzd::platform::std::Out{}.write("==== Termination of simulation ===="_sv.asBytes()).sync();
-		::std::terminate();
-	}
+	esp_restart();
 #endif
 
 	// Prevent the program to exit.
