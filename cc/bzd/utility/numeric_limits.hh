@@ -5,10 +5,6 @@
 namespace bzd {
 template <class T>
 struct NumericLimits;
-{
-	[[nodiscard]] static constexpr UInt8Type min() noexcept { return 0; }
-	[[nodiscard]] static constexpr UInt8Type max() noexcept { return 0xff; }
-};
 
 template <>
 struct NumericLimits<UInt8Type>
