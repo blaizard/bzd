@@ -94,8 +94,7 @@ public:
 		{
 		}
 
-		const auto timeNano = ts.tv_sec * 1000000000 + ts.tv_nsec;
-		(void)timeNano;
+		[[maybe_unused]] const auto timeNano = ts.tv_sec * 1000000000 + ts.tv_nsec;
 
 		// in percent
 		// use pthread_getcpuclockid

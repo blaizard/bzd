@@ -60,6 +60,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     # Sources
     outputs = []
     srcs = _get_sources(ctx)
+
     for src in srcs:
         output = ctx.actions.declare_file("{}.clang_tidy".format(src.short_path.replace("/", ".")))
         inputs = depset(direct = [src], transitive = [target[CcInfo].compilation_context.headers])
@@ -72,6 +73,10 @@ def _clang_tidy_aspect_impl(target, ctx):
             progress_message = "Run clang-tidy on {}".format(src.short_path),
         )
         outputs.append(output)
+
+    # Get the outpus from the dependencies.
+    for dep in ctx.rule.attr.deps:
+        outputs += dep[OutputGroupInfo].report.to_list()
 
     return [
         OutputGroupInfo(report = depset(direct = outputs)),

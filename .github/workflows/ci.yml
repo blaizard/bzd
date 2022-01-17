@@ -22,7 +22,7 @@ jobs:
 
     - name: linux_x86_64_clang
       run: |
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang
+        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=clang_tidy
 
     - name: linux_x86_64_gcc
       run: |
