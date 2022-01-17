@@ -37,11 +37,11 @@ pipeline
 		{
 			parallel
 			{
-				stage("linux_x86_64_clang dev")
+				stage("linux_x86_64_clang dev + clang-tidy")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_linux_x86_64_clang_dev" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev" 
 					}
 				}
 				stage("linux_x86_64_clang prod")

@@ -5,8 +5,8 @@ set -e
 EXTRA_FLAGS="$@"
 
 # Compile and test the different configurations
-echo  "==== linux_x86_64_clang dev ============================================"
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_dev
+echo  "==== linux_x86_64_clang dev + clang-tidy ==============================="
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_dev
 echo  "==== linux_x86_64_clang prod ==========================================="
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod
 echo  "==== linux_x86_64_gcc =================================================="

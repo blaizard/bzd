@@ -8,7 +8,6 @@
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/singleton.hh"
 
-#include <array>
 #include <atomic>
 #include <csignal>
 #include <cstdio>
@@ -113,7 +112,7 @@ bzd::StringView exec(const char* cmd)
 	}
 
 	std::size_t index = 0;
-	while (index < maxSize && fgets(&result[index], maxSize - index, pipe.get()) != nullptr)
+	while (index < maxSize && fgets(&result[index], static_cast<int>(maxSize - index), pipe.get()) != nullptr)
 	{
 		index = strlen(result);
 	}
@@ -209,6 +208,7 @@ SymbolicInfo makeSymbolicInfo(void* address)
 		else if (extraInfo)
 		{
 			const ::link_map& linkMap = reinterpret_cast<const ::link_map&>(extraInfo);
+			// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
 			symbolicInfo.offset = reinterpret_cast<bzd::IntPtrType>(address) - reinterpret_cast<bzd::IntPtrType>(linkMap.l_ld);
 		}
 	}
@@ -220,7 +220,7 @@ SymbolicInfo makeSymbolicInfo(void* address)
 	return symbolicInfo;
 }
 
-void callStack() noexcept
+void callStack() noexcept // NOLINT(bugprone-exception-escape)
 {
 	constexpr size_t MAX_STACK_LEVEL = 32;
 	static void* addresses[MAX_STACK_LEVEL];
