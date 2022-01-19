@@ -38,4 +38,5 @@ public:
 private:
 	bzd::String<N> container_;
 };
+
 } // namespace bzd

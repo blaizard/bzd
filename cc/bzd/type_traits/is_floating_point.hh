@@ -2,12 +2,12 @@
 
 #include "cc/bzd/type_traits/integral_constant.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/remove_cv.hh"
+#include "cc/bzd/type_traits/remove_cvref.hh"
 
 namespace bzd::typeTraits::impl {
 template <class T>
 struct IsFloatingPoint
-	: IntegralConstant<bool, isSame<float, RemoveCV<T>> || isSame<double, RemoveCV<T>> || isSame<long double, RemoveCV<T>>>
+	: IntegralConstant<bool, isSame<float, RemoveCVRef<T>> || isSame<double, RemoveCVRef<T>> || isSame<long double, RemoveCVRef<T>>>
 {
 };
 } // namespace bzd::typeTraits::impl

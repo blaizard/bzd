@@ -44,6 +44,12 @@ using UInt32Type = std::uint32_t;
 /// Unsigned integer type with a fixed width of 64-bit.
 using UInt64Type = std::uint64_t;
 
+/// 32-bit floating point number.
+using Float32Type = float;
+
+/// 64-bit floating point number.
+using Float64Type = double;
+
 /// Type representing a byte.
 enum class ByteType : std::uint8_t
 {

@@ -9,13 +9,14 @@
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/meta/range.hh"
-#include "cc/bzd/type_traits/decay.hh"
+#include "cc/bzd/meta/tuple.hh"
 #include "cc/bzd/type_traits/declval.hh"
 #include "cc/bzd/type_traits/is_arithmetic.hh"
 #include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
+#include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/format/integral.hh"
 
@@ -75,9 +76,7 @@ public:
 	static constexpr bool value = decltype(test<T>(0))::value;
 };
 
-/**
- * Parse an unsigned integer
- */
+/// Parse an unsigned integer
 static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer)
 {
 	bool isDefined = false;
@@ -91,9 +90,7 @@ static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeTyp
 	return isDefined;
 }
 
-/**
- * Return the positional index
- */
+/// Return the positional index
 template <class Adapter>
 constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType autoIndex)
 {
@@ -130,24 +127,22 @@ constexpr void parseSign(bzd::StringView& format, Metadata& metadata)
 	}
 }
 
-/**
- * \brief Parse a metadata conversion string.
- *
- * Format compatible with python format (with some exceptions)
- *
- * format_spec ::=  [sign][#][.precision][type]
- * sign        ::=  "+" | "-" | " "
- * precision   ::=  integer
- * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
- * d	Decimal integer
- * b	Binary format
- * o	Octal format
- * x	Hexadecimal format (lower case)
- * X	Hexadecimal format (upper case)
- * f	Displays fixed point number (Default: 6)
- * p    Pointer
- * %	Percentage. Multiples by 100 and puts % at the end.
- */
+/// \brief Parse a metadata conversion string.
+///
+/// Format compatible with python format (with some exceptions)
+///
+/// format_spec ::=  [sign][#][.precision][type]
+/// sign        ::=  "+" | "-" | " "
+/// precision   ::=  integer
+/// type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+/// d	Decimal integer
+/// b	Binary format
+/// o	Octal format
+/// x	Hexadecimal format (lower case)
+/// X	Hexadecimal format (upper case)
+/// f	Displays fixed point number (Default: 6)
+/// p    Pointer
+/// %	Percentage. Multiples by 100 and puts % at the end.
 template <class Adapter>
 constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current)
 {
@@ -230,9 +225,7 @@ struct ResultStaticString
 	StringView str;
 };
 
-/**
- * Parse a static string and returns when there is data to be processed.
- */
+/// Parse a static string and returns when there is data to be processed.
 template <class Adapter>
 constexpr ResultStaticString parseStaticString(bzd::StringView& format)
 {
@@ -332,10 +325,8 @@ private:
 	const Iterator iteratorBegin_;
 };
 
-/**
- * Adapter used for the current parsing operation.
- * Different adapters are used for compile timme or runtime operations.
- */
+/// Adapter used for the current parsing operation.
+/// Different adapters are used for compile timme or runtime operations.
 template <class... Ts>
 class Adapter : public Ts...
 {
@@ -510,8 +501,10 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
 constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 {
-	auto value = tuple.template get<N - 1>();
-	Adapter::assertTrue(HasFormatter<Adapter, decltype(value)>::value || HasFormatterWithMetadata<Adapter, decltype(value)>::value,
+	using TupleType = bzd::typeTraits::RemoveCVRef<decltype(tuple)>;
+	using ValueType = typename TupleType::template Get<N - 1>;
+
+	Adapter::assertTrue(HasFormatter<Adapter, ValueType>::value || HasFormatterWithMetadata<Adapter, ValueType>::value,
 						"Argument type is not supported, it must contain a valid formatter.");
 
 	bool usedAtLeastOnce = false;
@@ -527,12 +520,12 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 			case Metadata::Format::OCTAL:
 			case Metadata::Format::HEXADECIMAL_LOWER:
 			case Metadata::Format::HEXADECIMAL_UPPER:
-				Adapter::assertTrue(bzd::typeTraits::isIntegral<decltype(value)>, "Argument must be an integral");
+				Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
 				break;
 			case Metadata::Format::DECIMAL:
 			case Metadata::Format::FIXED_POINT:
 			case Metadata::Format::FIXED_POINT_PERCENT:
-				Adapter::assertTrue(bzd::typeTraits::isArithmetic<decltype(value)>, "Argument must be arithmetic");
+				Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
 				break;
 			case Metadata::Format::POINTER:
 				[[fallthrough]];
@@ -614,42 +607,37 @@ private:
 
 } // namespace bzd::format::impl
 
-/**
- * \brief String formating.
- *
- * Lightweight and compilation time checking string formating utility.
- * The syntax is compatible with Python format with some limitations.
- *
- * \code
- * format_spec ::=  [sign][#][.precision][type]
- * sign        ::=  "+" | "-" | " "
- * precision   ::=  integer
- * type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
- * d	Decimal integer
- * b	Binary format
- * o	Octal format
- * x	Hexadecimal format (lower case)
- * X	Hexadecimal format (upper case)
- * f	Displays fixed point number (Default: 6)
- * p    Pointer
- * %	Percentage. Multiples by 100 and puts % at the end.
- * \endcode
- *
- * This is an after text
- *
- * \param out Output stream where the formating string will be written to.
- * \param str run-time or compile-time string containing the format.
- * \param args Arguments to be passed for the format.
- */
-template <class ConstexprStringView,
-		  class... Args,
-		  typename bzd::typeTraits::EnableIf<bzd::typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
-constexpr void toString(bzd::interface::String& str, const ConstexprStringView&, Args&&... args)
+/// \brief String formating.
+///
+/// Lightweight and compilation time checking string formating utility.
+/// The syntax is compatible with Python format with some limitations.
+///
+/// \code
+/// format_spec ::=  [sign][#][.precision][type]
+/// sign        ::=  "+" | "-" | " "
+/// precision   ::=  integer
+/// type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+/// d	Decimal integer
+/// b	Binary format
+/// o	Octal format
+/// x	Hexadecimal format (lower case)
+/// X	Hexadecimal format (upper case)
+/// f	Displays fixed point number (Default: 6)
+/// p    Pointer
+/// %	Percentage. Multiples by 100 and puts % at the end.
+/// \endcode
+///
+/// This is an after text
+///
+/// \param out Output stream where the formating string will be written to.
+/// \param str run-time or compile-time string containing the format.
+/// \param args Arguments to be passed for the format.
+template <class T, class... Args, REQUIRES(bzd::isConstexprStringView<T>)>
+constexpr void toString(bzd::interface::String& str, const T&, Args&&... args)
 {
 	// Compile-time format check
-	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const bool isValid =
-		bzd::format::impl::contextValidate<bzd::format::impl::StringFormatter>(ConstexprStringView::value(), tuple);
+	constexpr const bzd::meta::Tuple<Args...> tuple{};
+	constexpr const bool isValid = bzd::format::impl::contextValidate<bzd::format::impl::StringFormatter>(T::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
@@ -657,7 +645,7 @@ constexpr void toString(bzd::interface::String& str, const ConstexprStringView&,
 		bzd::format::impl::Formatter<bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert,
 																bzd::format::impl::StringFormatter>>::make(bzd::forward<Args>(args)...);
 	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StringFormatter>> parser{
-		ConstexprStringView::value()};
+		T::value()};
 
 	// Run-time call
 	for (const auto& result : parser)
@@ -671,4 +659,10 @@ constexpr void toString(bzd::interface::String& str, const ConstexprStringView&,
 			formatter.process(str, result.metadata.value());
 		}
 	}
+}
+
+template <class T, REQUIRES(!bzd::isConstexprStringView<T>)>
+constexpr void toString(bzd::interface::String&, const T&)
+{
+	static_assert(bzd::meta::alwaysFalse<T>, "No serialization available for this type.");
 }

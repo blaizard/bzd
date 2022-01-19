@@ -357,7 +357,7 @@ cc_library(
     deps = [
         ":integral_constant",
         ":is_same",
-        ":remove_cv",
+        ":remove_cvref",
     ],
 )
 
@@ -382,7 +382,7 @@ cc_library(
     deps = [
         ":integral_constant",
         ":is_same",
-        ":remove_cv",
+        ":remove_cvref",
     ],
 )
 

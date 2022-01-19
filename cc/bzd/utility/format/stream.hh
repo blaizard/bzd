@@ -158,24 +158,23 @@ private:
 
 } // namespace bzd::format::impl
 
-// Note, Args&& here doesn't work, the values are garbage, it seems that the temporary
-// is out of scope within the coroutine.
-template <class ConstexprStringView,
-		  class... Args,
-		  typename bzd::typeTraits::EnableIf<bzd::typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
-bzd::Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args... args)
+// Note, Args&& here doesn't work for esp32 gcc compiler, the values are garbage, it seems that the temporary
+// is out of scope within the coroutine. I remember seeing a bugzilla about this for gcc.
+// Would be worth trying again with a new version of the compiler.
+// TODO: Try to enable Args&& with an updated esp32 gcc compiler
+template <class T, class... Args, REQUIRES(bzd::isConstexprStringView<T>)>
+bzd::Async<void> toStream(bzd::OStream& stream, const T&, Args... args)
 {
 	// Compile-time format check
-	constexpr const bzd::Tuple<bzd::typeTraits::Decay<Args>...> tuple{};
-	constexpr const bool isValid =
-		bzd::format::impl::contextValidate<bzd::format::impl::StreamFormatter>(ConstexprStringView::value(), tuple);
+	constexpr const bzd::meta::Tuple<Args...> tuple{};
+	constexpr const bool isValid = bzd::format::impl::contextValidate<bzd::format::impl::StreamFormatter>(T::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
 	const auto formatter = bzd::format::impl::FormatterAsync<
 		bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, bzd::format::impl::StreamFormatter>>::make(args...);
 	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StreamFormatter>> parser{
-		ConstexprStringView::value()};
+		T::value()};
 
 	// Run-time call
 	for (const auto& result : parser)
@@ -191,7 +190,23 @@ bzd::Async<void> toStream(bzd::OStream& stream, const ConstexprStringView&, Args
 	}
 }
 
+template <class T, REQUIRES(!bzd::isConstexprStringView<T>)>
+constexpr void toStream(bzd::OStream&, const T&)
+{
+	static_assert(bzd::meta::alwaysFalse<T>, "No serialization available for this type.");
+}
+
+inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::interface::String& str)
+{
+	co_await stream.write(str.asBytes());
+}
+
 inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::StringView& str)
 {
 	co_await stream.write(str.asBytes());
+}
+
+inline bzd::Async<void> toStream(bzd::OStream& stream, const char* const str)
+{
+	co_await stream.write(bzd::StringView{str}.asBytes());
 }

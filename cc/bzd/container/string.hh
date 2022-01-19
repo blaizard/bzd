@@ -31,6 +31,7 @@ public:
 
 	// Converter
 	constexpr SizeType append(const bzd::StringView& str) noexcept { return append(str.data(), str.size()); }
+	constexpr SizeType append(const Self& str) noexcept { return append(str.data(), str.size()); }
 	constexpr SizeType append(const T c) noexcept { return append(&c, 1); }
 	constexpr SizeType append(const T* data, const SizeType n) noexcept
 	{
@@ -138,3 +139,18 @@ constexpr bool operator==(const interface::String& lhs, const char* const rhs) n
 }
 
 } // namespace bzd
+
+constexpr void toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept
+{
+	str.append(data);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::StringView data) noexcept
+{
+	str.append(data);
+}
+
+constexpr void toString(bzd::interface::String& str, const char* const data) noexcept
+{
+	str.append(bzd::StringView{data});
+}

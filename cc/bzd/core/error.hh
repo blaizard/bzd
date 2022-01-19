@@ -37,10 +37,9 @@ public: // Traits.
 	using Self = Error;
 
 public:
-	template <class ConstexprStringView,
-			  typename typeTraits::EnableIf<typeTraits::isBaseOf<bzd::ConstexprStringView, ConstexprStringView>, void*> = nullptr>
-	constexpr Error(const SourceLocation& location, const ErrorType type, const ConstexprStringView) noexcept :
-		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, ConstexprStringView::value()}
+	template <class T, REQUIRES(bzd::isConstexprStringView<T>)>
+	constexpr Error(const SourceLocation& location, const ErrorType type, const T) noexcept :
+		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, T::value()}
 	{
 	}
 

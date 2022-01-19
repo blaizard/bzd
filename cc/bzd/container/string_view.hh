@@ -3,6 +3,8 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/is_base_of.hh"
+#include "cc/bzd/utility/concept.hh"
 
 namespace bzd::impl {
 template <class T>
@@ -57,6 +59,10 @@ using StringView = impl::StringView<const char>;
 struct ConstexprStringView
 {
 };
+
+template <class T>
+CONCEPT isConstexprStringView = bzd::typeTraits::isBaseOf<ConstexprStringView, T>;
+
 } // namespace bzd
 
 constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept

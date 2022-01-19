@@ -4,6 +4,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
+#include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
@@ -52,7 +53,7 @@ constexpr void integer(interface::String& str, const T& n, U& digits = bzd::form
 }
 
 template <class T>
-constexpr void fixedPoint(interface::String& str, const T& n, const SizeType maxPrecision) noexcept
+constexpr void floatingPoint(interface::String& str, const T& n, const SizeType maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
 											0.1,
@@ -111,22 +112,68 @@ constexpr void toStringBin(bzd::interface::String& str, const T& data)
 }
 } // namespace bzd::format
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& data)
+// Integers
+
+constexpr void toString(bzd::interface::String& str, const bzd::UInt8Type data)
 {
 	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& data, const bzd::SizeType maxPrecision = 6)
+constexpr void toString(bzd::interface::String& str, const bzd::UInt16Type data)
 {
-	bzd::format::impl::fixedPoint(str, data, maxPrecision);
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
 
-constexpr void toString(bzd::interface::String& str, const bzd::StringView& data)
+constexpr void toString(bzd::interface::String& str, const bzd::UInt32Type data)
 {
-	str.append(data);
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
+
+constexpr void toString(bzd::interface::String& str, const bzd::UInt64Type data)
+{
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::Int8Type data)
+{
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::Int16Type data)
+{
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::Int32Type data)
+{
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::Int64Type data)
+{
+	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+}
+
+// Floating points
+
+constexpr void toString(bzd::interface::String& str, const bzd::Float32Type data, const bzd::SizeType maxPrecision = 6)
+{
+	bzd::format::impl::floatingPoint(str, data, maxPrecision);
+}
+
+constexpr void toString(bzd::interface::String& str, const bzd::Float64Type data, const bzd::SizeType maxPrecision = 6)
+{
+	bzd::format::impl::floatingPoint(str, data, maxPrecision);
+}
+
+// Boolean
+
+constexpr void toString(bzd::interface::String& str, const bzd::BoolType value)
+{
+	str.append((value) ? "true"_sv : "false"_sv);
+}
+
+// Chars
 
 constexpr void toString(bzd::interface::String& str, const char c)
 {
