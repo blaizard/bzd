@@ -2,16 +2,17 @@
 
 #include "cc/bzd/type_traits/integral_constant.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/remove_cv.hh"
+#include "cc/bzd/type_traits/remove_cvref.hh"
 
 namespace bzd::typeTraits::impl {
 template <class T>
 struct IsIntegral
 	: IntegralConstant<bool,
-					   isSame<unsigned char, RemoveCV<T>> || isSame<signed char, RemoveCV<T>> || isSame<char, RemoveCV<T>> ||
-						   isSame<unsigned short, RemoveCV<T>> || isSame<short, RemoveCV<T>> || isSame<unsigned int, RemoveCV<T>> ||
-						   isSame<int, RemoveCV<T>> || isSame<unsigned long, RemoveCV<T>> || isSame<long, RemoveCV<T>> ||
-						   isSame<unsigned long long, RemoveCV<T>> || isSame<long long, RemoveCV<T>> || isSame<bool, RemoveCV<T>>>
+					   isSame<unsigned char, RemoveCVRef<T>> || isSame<signed char, RemoveCVRef<T>> || isSame<char, RemoveCVRef<T>> ||
+						   isSame<unsigned short, RemoveCVRef<T>> || isSame<short, RemoveCVRef<T>> ||
+						   isSame<unsigned int, RemoveCVRef<T>> || isSame<int, RemoveCVRef<T>> || isSame<unsigned long, RemoveCVRef<T>> ||
+						   isSame<long, RemoveCVRef<T>> || isSame<unsigned long long, RemoveCVRef<T>> ||
+						   isSame<long long, RemoveCVRef<T>> || isSame<bool, RemoveCVRef<T>>>
 {
 };
 } // namespace bzd::typeTraits::impl

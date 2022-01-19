@@ -18,7 +18,7 @@ TEST(Error, Constructor)
 		const auto error =
 			bzd::Error{bzd::SourceLocation::current(), bzd::ErrorType::busy, CSTR("fixed, {}, {}, {}, {}"), 12, -1, true, "string"};
 		EXPECT_EQ(error.getType(), bzd::ErrorType::busy);
-		EXPECT_STREQ(error.getMessage().data(), "fixed, 12, -1, 1, string");
+		EXPECT_STREQ(error.getMessage().data(), "fixed, 12, -1, true, string");
 	}
 }
 

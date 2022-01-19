@@ -309,6 +309,8 @@ cc_library(
         ":span",
         "//cc/bzd/container/storage:non_owning",
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:is_base_of",
+        "//cc/bzd/utility:concept",
     ],
 )
 

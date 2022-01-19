@@ -5,11 +5,13 @@ bzd_cc_library(
     name = "meta",
     visibility = ["//visibility:public"],
     deps = [
+        ":always_false",
         ":choose_nth",
         ":contains",
         ":find",
         ":find_conditional",
         ":range",
+        ":tuple",
         ":type",
         ":type_list",
         ":union",
@@ -17,6 +19,17 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "always_false",
+    hdrs = [
+        "always_false.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
 
 cc_library(
     name = "choose_nth",
@@ -72,6 +85,18 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "tuple",
+    hdrs = [
+        "tuple.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":choose_nth",
         "//cc/bzd/platform:types",
     ],
 )

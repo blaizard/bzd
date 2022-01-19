@@ -125,7 +125,6 @@ public: // constructors
 
 public: // API
 	// Access by index as template (type is automatically deducted)
-
 	template <SizeType M>
 	constexpr Pick<M>& get() noexcept
 	{
@@ -147,6 +146,9 @@ class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
 public:
 	using impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>::TupleImpl;
 
+	/// Get the number of entry of this tuple.
+	///
+	/// \return The number of entry.
 	static constexpr SizeType size() noexcept { return sizeof...(T); }
 };
 

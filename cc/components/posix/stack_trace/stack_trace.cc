@@ -248,7 +248,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 			bzd::String<1024> command;
 			toString(command,
 					 CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
-					 info.path.data(),
+					 info.path,
 					 reinterpret_cast<bzd::IntPtrType>(info.address),
 					 info.offset);
 
