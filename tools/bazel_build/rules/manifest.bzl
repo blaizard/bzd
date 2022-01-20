@@ -115,7 +115,7 @@ bzd_manifest_build = rule(
         ),
         "_generator": attr.label(
             default = Label("//tools/bzd/generator"),
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
     },

@@ -35,7 +35,7 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         ],
         "compile_flags": [
             # Use a subset of C++20 to have coroutine support.
-            "-std=c++17",
+            "-std=c++20",
             "-fcoroutines",
 
             # Do not link or re-order inclusion files

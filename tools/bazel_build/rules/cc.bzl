@@ -256,7 +256,7 @@ def _bzd_cc_generic(is_test):
             ),
             "_map_analyzer_script": attr.label(
                 executable = True,
-                cfg = "host",
+                cfg = "exec",
                 default = Label("//tools/bazel_build/rules/assets/cc/map_analyzer"),
             ),
             "_default_metadata_files": attr.label_list(

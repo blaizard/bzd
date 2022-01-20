@@ -50,6 +50,7 @@ class NamedType
 	, public Skills<NamedType<T, PhantomType, Skills...>>...
 {
 public:
+	using Self = NamedType<T, PhantomType, Skills...>;
 	using UnderlyingType = T;
 	using Tag = PhantomType;
 
@@ -274,12 +275,12 @@ template <class T>
 class Comparable : public impl::NamedTypeCRTP<T, Comparable>
 {
 public:
-	constexpr bool operator<(const T& other) const { return (this->underlying().get() < other.get()); }
-	constexpr bool operator>(const T& other) const { return (this->underlying().get() > other.get()); }
-	constexpr bool operator<=(const T& other) const { return (this->underlying().get() <= other.get()); }
-	constexpr bool operator>=(const T& other) const { return (this->underlying().get() >= other.get()); }
-	constexpr bool operator==(const T& other) const { return (this->underlying().get() == other.get()); }
-	constexpr bool operator!=(const T& other) const { return (this->underlying().get() != other.get()); }
+	constexpr bool operator<(const Comparable<T>& other) const { return (this->underlying().get() < other.underlying().get()); }
+	constexpr bool operator>(const Comparable<T>& other) const { return (this->underlying().get() > other.underlying().get()); }
+	constexpr bool operator<=(const Comparable<T>& other) const { return (this->underlying().get() <= other.underlying().get()); }
+	constexpr bool operator>=(const Comparable<T>& other) const { return (this->underlying().get() >= other.underlying().get()); }
+	constexpr bool operator==(const Comparable<T>& other) const { return (this->underlying().get() == other.underlying().get()); }
+	constexpr bool operator!=(const Comparable<T>& other) const { return (this->underlying().get() != other.underlying().get()); }
 };
 
 template <class T>

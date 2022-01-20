@@ -41,8 +41,8 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             # without falling back to the (incompatible) GCC stdatomic.h
             "-ffreestanding",
 
-            # Use C++17
-            "-std=c++17",
+            # Use incomplete C++20
+            "-std=c++20",
 
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",

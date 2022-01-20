@@ -162,7 +162,7 @@ private:
 // is out of scope within the coroutine. I remember seeing a bugzilla about this for gcc.
 // Would be worth trying again with a new version of the compiler.
 // TODO: Try to enable Args&& with an updated esp32 gcc compiler
-template <class T, class... Args, REQUIRES(bzd::isConstexprStringView<T>)>
+template <bzd::constexprStringView T, class... Args>
 bzd::Async<void> toStream(bzd::OStream& stream, const T&, Args... args)
 {
 	// Compile-time format check
@@ -188,12 +188,6 @@ bzd::Async<void> toStream(bzd::OStream& stream, const T&, Args... args)
 			co_await formatter.process(stream, result.metadata.value());
 		}
 	}
-}
-
-template <class T, REQUIRES(!bzd::isConstexprStringView<T>)>
-constexpr void toStream(bzd::OStream&, const T&)
-{
-	static_assert(bzd::meta::alwaysFalse<T>, "No serialization available for this type.");
 }
 
 inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::interface::String& str)

@@ -9,6 +9,14 @@ cc_library(
 )
 
 cc_library(
+    name = "compiler",
+    hdrs = [
+        "compiler.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "types",
     hdrs = [
         "types.hh",

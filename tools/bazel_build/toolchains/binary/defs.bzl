@@ -20,13 +20,13 @@ binary_toolchain = rule(
     implementation = _binary_toolchain_impl,
     attrs = {
         "build": attr.label_list(
-            cfg = "host",
+            cfg = "exec",
         ),
         "metadata": attr.label_list(
             allow_files = True,
         ),
         "executors": attr.label_keyed_string_dict(
-            cfg = "host",
+            cfg = "exec",
         ),
     },
 )

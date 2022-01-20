@@ -128,12 +128,11 @@ bdl_library = rule(
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
         "_deps_cc": attr.label_list(
             default = [Label("//tools/bdl/generators/cc/adapter:types")],
-            cfg = "host",
         ),
         "_cc_toolchain": attr.label(
             default = Label("@rules_cc//cc:current_cc_toolchain"),
@@ -186,7 +185,7 @@ bdl_composition = rule(
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
         "_cc_toolchain": attr.label(

@@ -60,7 +60,7 @@ sh_binary_wrapper = rule(
         "binary": attr.label(
             allow_files = True,
             executable = True,
-            cfg = "host",
+            cfg = "exec",
             mandatory = True,
             doc = "Label or file of the binary to be wrapped.",
         ),

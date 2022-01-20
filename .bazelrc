@@ -22,8 +22,6 @@ coverage --nobuild_tests_only
 coverage --nocache_test_results
 coverage --instrument_test_targets
 coverage --collect_code_coverage
-# This option seems to ignore incompatible target skipping (for c++)
-coverage --experimental_forward_instrumented_files_info_by_default
 
 # Docker sandbox
 build:cc-docker-sandbox --experimental_docker_verbose
