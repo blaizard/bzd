@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/platform/compiler.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/add_pointer.hh"
 #include "cc/bzd/type_traits/decay.hh"
@@ -34,19 +35,24 @@ protected:
 	using ReturnType = F;
 
 public:
-	Function(const FctPtrType callable) : callable_{callable} {}
+	Function(const FctPtrType callable) noexcept : callable_{callable} {}
 
 	template <class... Params> // Needed for perfect forwarding
 	ReturnType operator()(Params&&... args) const
 	{
+#pragma GCC diagnostic push
+#if COMPILER_GCC
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 		return callable_(bzd::forward<Params>(args)...);
+#pragma GCC diagnostic pop
 	}
 
 private:
 	template <typename Tag, class A, class... B>
 	friend class ::bzd::impl::FunctionView;
 
-	FctPtrType callable_;
+	FctPtrType callable_{nullptr};
 };
 } // namespace bzd::interface
 

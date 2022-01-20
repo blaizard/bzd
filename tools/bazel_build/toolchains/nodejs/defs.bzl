@@ -20,12 +20,12 @@ nodejs_toolchain = rule(
         "manager": attr.label(
             mandatory = True,
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
         "node": attr.label(
             mandatory = True,
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
 )

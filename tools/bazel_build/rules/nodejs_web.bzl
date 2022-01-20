@@ -144,7 +144,7 @@ _bzd_nodejs_web_package = rule(
         ),
         "dep": attr.label(
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
 )

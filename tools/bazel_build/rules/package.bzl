@@ -139,7 +139,7 @@ _bzd_package = rule(
         ),
         "_metadata": attr.label(
             default = Label("//tools/bazel_build/rules/assets/package:metadata"),
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
         "_buildstamp": attr.label(

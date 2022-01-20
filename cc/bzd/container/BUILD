@@ -84,6 +84,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:compiler",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_pointer",
         "//cc/bzd/type_traits:decay",

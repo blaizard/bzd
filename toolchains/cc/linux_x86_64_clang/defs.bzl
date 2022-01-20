@@ -48,8 +48,8 @@ def _load_linux_x86_64_clang_12_0_0(name):
         ],
         "compile_flags": [
 
-            # Use C++17
-            "-std=c++17",
+            # Use incomplete C++20
+            "-std=c++20",
 
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",

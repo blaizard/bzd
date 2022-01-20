@@ -632,7 +632,7 @@ private:
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <class T, class... Args, REQUIRES(bzd::isConstexprStringView<T>)>
+template <bzd::constexprStringView T, class... Args>
 constexpr void toString(bzd::interface::String& str, const T&, Args&&... args)
 {
 	// Compile-time format check
@@ -659,10 +659,4 @@ constexpr void toString(bzd::interface::String& str, const T&, Args&&... args)
 			formatter.process(str, result.metadata.value());
 		}
 	}
-}
-
-template <class T, REQUIRES(!bzd::isConstexprStringView<T>)>
-constexpr void toString(bzd::interface::String&, const T&)
-{
-	static_assert(bzd::meta::alwaysFalse<T>, "No serialization available for this type.");
 }

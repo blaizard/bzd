@@ -58,13 +58,13 @@ cc_documentation = rule(
         "_generator": attr.label(
             default = Label("//tools/documentation/cc:generator"),
             allow_files = True,
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
         "_doxygen": attr.label(
             default = Label("@doxygen//:bin"),
             allow_files = True,
-            cfg = "host",
+            cfg = "exec",
             executable = True,
         ),
         "_doxyfile_template": attr.label(

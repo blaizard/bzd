@@ -189,7 +189,7 @@ _INSTALL_ATTRS.update({
     ),
     "_metadata": attr.label(
         default = Label("//tools/bazel_build/rules/assets/nodejs:metadata"),
-        cfg = "host",
+        cfg = "exec",
         executable = True,
     ),
     "_cache": attr.label(
