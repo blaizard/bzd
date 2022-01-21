@@ -2,6 +2,8 @@
 
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_arithmetic.hh"
+#include "cc/bzd/type_traits/is_floating_point.hh"
+#include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/utility/move.hh"
 #include "cc/bzd/utility/ratio.hh"
 
@@ -23,11 +25,20 @@ public: // Constructors.
 	explicit constexpr NamedType(const T& value) noexcept : value_{value} {}
 	explicit constexpr NamedType(T&& value) noexcept : value_{bzd::move(value)} {}
 
-	// Convert and round the result
+	// Convert and round the result.
 	template <class OtherRatio>
+	requires bzd::integral<T>
 	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
 		value_{static_cast<T>((other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) /
 							  (Ratio::num * OtherRatio::den))}
+	{
+	}
+
+	// Convert the result.
+	template <class OtherRatio>
+	requires bzd::floatingPoint<T>
+	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
+		value_{static_cast<T>(other.get() * (Ratio::den * OtherRatio::num) / (Ratio::num * OtherRatio::den))}
 	{
 	}
 

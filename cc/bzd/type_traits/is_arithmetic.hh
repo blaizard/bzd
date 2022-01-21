@@ -18,3 +18,8 @@ using IsArithmetic = typename impl::IsArithmetic<T>;
 template <class T>
 constexpr bool isArithmetic = IsArithmetic<T>::value;
 } // namespace bzd::typeTraits
+
+namespace bzd {
+template <class T>
+concept arithmetic = typeTraits::isArithmetic<T>;
+}

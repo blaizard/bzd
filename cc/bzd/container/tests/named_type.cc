@@ -146,7 +146,7 @@ TEST(NamedType, arithmetic)
 
 TEST(NamedType, multipleOf)
 {
-	using Kilogram = bzd::NamedType<int, struct KiloTag, bzd::Arithmetic>;
+	using Kilogram = bzd::NamedType<bzd::Int64Type, struct KiloTag, bzd::Arithmetic>;
 	using Pound = bzd::MultipleOf<Kilogram, bzd::Ratio<56699, 125000>, bzd::Arithmetic>;
 
 	// Exact conversion

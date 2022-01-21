@@ -135,6 +135,8 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_arithmetic",
+        "//cc/bzd/type_traits:is_floating_point",
+        "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:ratio",
     ],
