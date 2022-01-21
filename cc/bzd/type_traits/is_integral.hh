@@ -25,3 +25,8 @@ template <class T>
 constexpr bool isIntegral = IsIntegral<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd {
+template <class T>
+concept integral = typeTraits::isIntegral<T>;
+}

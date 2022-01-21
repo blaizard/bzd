@@ -61,7 +61,7 @@ struct ConstexprStringView
 };
 
 template <class T>
-concept constexprStringView = bzd::typeTraits::isBaseOf<ConstexprStringView, T>;
+concept constexprStringView = typeTraits::isBaseOf<ConstexprStringView, T>;
 
 } // namespace bzd
 

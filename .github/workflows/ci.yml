@@ -30,7 +30,7 @@ jobs:
 
     - name: esp32_xtensa_lx6_gcc
       run: |
-        ./tools/bazel build ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc
+        ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --config=sim
 
     - name: Sanitize
       run: |

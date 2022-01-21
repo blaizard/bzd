@@ -2,12 +2,17 @@
 
 #include <esp_system.h>
 
+#ifdef BZD_EXECUTOR_SIM
+#include <iostream>
+#endif
+
 int main()
 {
 	extern bool execute() noexcept;
-	execute();
+	[[maybe_unused]] const auto result = execute();
 
-#if defined(BZD_EXECUTOR_SIM)
+#ifdef BZD_EXECUTOR_SIM
+	::std::cout << "<simulation exit code " << ((result) ? 0 : 1) << ">" << ::std::endl;
 	esp_restart();
 #endif
 
