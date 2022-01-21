@@ -9,6 +9,7 @@ from python.bzd.utils.uart import Devices, Device, Uart
 from python.bzd.utils.run import localPython
 from toolchains.cc.fragments.esptool.targets import targets
 
+
 def getDevice(args: argparse.Namespace) -> Device:
 	"""Search for the most suitable device to program the target."""
 
