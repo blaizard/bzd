@@ -6,7 +6,7 @@ sh_binary_wrapper(
     command = """
         ln -s $RUNFILES_DIR/__main__/external external
         ln -s $RUNFILES_DIR/__main__/.clang-tidy .clang-tidy
-        {binary} --use-color --quiet "${{@: 2}}"
+        {binary} --use-color --quiet "${{@: 2}}" 2> /dev/null
         touch "$1"
     """,
     data = [

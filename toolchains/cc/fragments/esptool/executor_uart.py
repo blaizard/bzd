@@ -9,7 +9,6 @@ from python.bzd.utils.uart import Devices, Device, Uart
 from python.bzd.utils.run import localPython
 from toolchains.cc.fragments.esptool.targets import targets
 
-
 def getDevice(args: argparse.Namespace) -> Device:
 	"""Search for the most suitable device to program the target."""
 
@@ -72,6 +71,7 @@ if __name__ == "__main__":
 		ignoreFailure=True,
 		stdout=True,
 		stderr=True)
+
 	if result.getReturnCode() != 0:
 		logging.error(f"Operation failed with return code {result.getReturnCode()}.")
 		logging.info("Troubleshooting:")

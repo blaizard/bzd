@@ -6,9 +6,9 @@ EXTRA_FLAGS="$@"
 
 # Compile and test the different configurations
 echo  "==== linux_x86_64_clang dev + clang-tidy ==============================="
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_dev
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_dev --test_tag_filters=-cc-coverage
 echo  "==== linux_x86_64_clang prod ==========================================="
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod --test_tag_filters=-cc-coverage
 echo  "==== linux_x86_64_gcc =================================================="
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_gcc --config=cc
 echo  "==== esp32_xtensa_lx6_gcc =============================================="

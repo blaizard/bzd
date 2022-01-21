@@ -25,7 +25,7 @@ sh_binary_wrapper(
     name = "esp32_build",
     binary = "@esptool//:esptool",
     command = """
-        {binary} --chip esp32 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "4MB" --min-rev 0 --elf-sha256-offset 0xb0 -o "$2" "$1"
+        {binary} --chip esp32 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "4MB" --min-rev 0 --elf-sha256-offset 0xb0 -o "$2" "$1" > /dev/null
     """,
     visibility = ["//visibility:public"],
 )

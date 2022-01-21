@@ -41,14 +41,14 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev --test_tag_filters=-cc-coverage" 
 					}
 				}
 				stage("linux_x86_64_clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=_linux_x86_64_clang_prod" 
 					}
 				}
 				stage("linux_x86_64_gcc")

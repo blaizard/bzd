@@ -20,27 +20,27 @@ jobs:
     - name: linux_x86_64_clang Production
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod
+      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc
 
     - name: linux_x86_64_clang Development + clang-tidy
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev
+      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --test_tag_filters=-cc-coverage
 
     - name: linux_x86_64_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc
+      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc
 
     - name: esp32_xtensa_lx6_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --config=sim --platform_suffix=_esp32_xtensa_lx6_gcc
+      - ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --config=sim
 
     - name: Sanitizer
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - travis_wait ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan
+      - travis_wait ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan
 
     - name: Sanitizer Script
       script:
