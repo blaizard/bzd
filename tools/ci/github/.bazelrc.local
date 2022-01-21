@@ -1,3 +1,4 @@
-# Remove output
-build --noshow_progress
+# Tweak the output
+build --show_progress_rate_limit=60
 build --noshow_loading_progress
+build --show_timestamps

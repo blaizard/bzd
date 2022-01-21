@@ -1,8 +1,9 @@
 # Jenkins must have a /cache folder where all cache related artifacts will be stored
 
-# Remove output
-build --noshow_progress
+# Tweak the output
+build --show_progress_rate_limit=60
 build --noshow_loading_progress
+build --show_timestamps
 
 # cache
 startup --output_user_root=/cache/output
