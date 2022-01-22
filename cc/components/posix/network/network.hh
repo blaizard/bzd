@@ -23,7 +23,7 @@ class TCP
 public:
 	TCP() {}
 
-	bzd::Async<SizeType> connect(const StringView hostname, const PortType port)
+	bzd::Async<> connect(const StringView hostname, const PortType port)
 	{
 		struct addrinfo hints
 		{
@@ -66,7 +66,7 @@ public:
 			co_return bzd::error(ErrorType::failure, CSTR("Cannot resolve hostname, errno {}"), errno);
 		}
 
-		co_return 12U;
+		co_return {};
 	}
 
 	~TCP()

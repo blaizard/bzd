@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-bzd::Async<void> task1() noexcept
+bzd::Async<> task1() noexcept
 {
 	for (int i = 0; i < 10; ++i)
 	{
@@ -13,6 +13,7 @@ bzd::Async<void> task1() noexcept
 		co_await bzd::async::all(task1, task2);
 		std::cout << "." << std::endl;
 	}
+	co_return {};
 }
 
 int main()

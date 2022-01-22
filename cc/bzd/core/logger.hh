@@ -22,27 +22,31 @@ class Logger
 public:
 	/// Set an error log entry.
 	template <class A>
-	Async<void> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR, location, bzd::forward<A>(a));
+		co_return {};
 	}
 	template <class A, class B>
-	Async<void> error(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR, location, bzd::forward<A>(a), bzd::forward<B>(b));
+		co_return {};
 	}
 	template <class A, class B, class C>
-	Async<void> error(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c));
+		co_return {};
 	}
 	template <class A, class B, class C, class D>
-	Async<void> error(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E>
-	Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR,
 					   location,
@@ -51,9 +55,10 @@ public:
 					   bzd::forward<C>(c),
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F>
-	Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR,
 					   location,
@@ -63,9 +68,10 @@ public:
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F, class G>
-	Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::ERROR,
 					   location,
@@ -76,31 +82,36 @@ public:
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f),
 					   bzd::forward<G>(g));
+		co_return {};
 	}
 
 	/// Set a warning log entry.
 	template <class A>
-	Async<void> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING, location, bzd::forward<A>(a));
+		co_return {};
 	}
 	template <class A, class B>
-	Async<void> warning(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING, location, bzd::forward<A>(a), bzd::forward<B>(b));
+		co_return {};
 	}
 	template <class A, class B, class C>
-	Async<void> warning(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c));
+		co_return {};
 	}
 	template <class A, class B, class C, class D>
-	Async<void> warning(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E>
-	Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING,
 					   location,
@@ -109,9 +120,10 @@ public:
 					   bzd::forward<C>(c),
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F>
-	Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING,
 					   location,
@@ -121,9 +133,10 @@ public:
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F, class G>
-	Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::WARNING,
 					   location,
@@ -134,31 +147,36 @@ public:
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f),
 					   bzd::forward<G>(g));
+		co_return {};
 	}
 
 	/// Set an informative log entry.
 	template <class A>
-	Async<void> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO, location, bzd::forward<A>(a));
+		co_return {};
 	}
 	template <class A, class B>
-	Async<void> info(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO, location, bzd::forward<A>(a), bzd::forward<B>(b));
+		co_return {};
 	}
 	template <class A, class B, class C>
-	Async<void> info(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c));
+		co_return {};
 	}
 	template <class A, class B, class C, class D>
-	Async<void> info(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E>
-	Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO,
 					   location,
@@ -167,9 +185,10 @@ public:
 					   bzd::forward<C>(c),
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F>
-	Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO,
 					   location,
@@ -179,9 +198,10 @@ public:
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F, class G>
-	Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::INFO,
 					   location,
@@ -192,31 +212,36 @@ public:
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f),
 					   bzd::forward<G>(g));
+		co_return {};
 	}
 
 	/// Set a debug log entry.
 	template <class A>
-	Async<void> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG, location, bzd::forward<A>(a));
+		co_return {};
 	}
 	template <class A, class B>
-	Async<void> debug(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG, location, bzd::forward<A>(a), bzd::forward<B>(b));
+		co_return {};
 	}
 	template <class A, class B, class C>
-	Async<void> debug(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c));
+		co_return {};
 	}
 	template <class A, class B, class C, class D>
-	Async<void> debug(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG, location, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E>
-	Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG,
 					   location,
@@ -225,9 +250,10 @@ public:
 					   bzd::forward<C>(c),
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F>
-	Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG,
 					   location,
@@ -237,9 +263,10 @@ public:
 					   bzd::forward<D>(d),
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f));
+		co_return {};
 	}
 	template <class A, class B, class C, class D, class E, class F, class G>
-	Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+	Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 	{
 		co_await print(bzd::log::Level::DEBUG,
 					   location,
@@ -250,6 +277,7 @@ public:
 					   bzd::forward<E>(e),
 					   bzd::forward<F>(f),
 					   bzd::forward<G>(g));
+		co_return {};
 	}
 
 	/// Set the minimum logging level to be displayed.
@@ -259,10 +287,10 @@ public:
 	[[nodiscard]] static Logger& getDefault() noexcept;
 
 private:
-	Async<void> printHeader(const bzd::log::Level level, const SourceLocation location) noexcept;
+	Async<> printHeader(const bzd::log::Level level, const SourceLocation location) noexcept;
 
 	template <class... Args>
-	Async<void> print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept;
+	Async<> print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept;
 
 protected:
 	bzd::log::Level minLevel_{bzd::log::Level::INFO};
@@ -274,33 +302,38 @@ namespace bzd::log {
 
 /// Set an error log entry using the default logger.
 template <class A>
-Async<void> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a), location);
+	co_return {};
 }
 template <class A, class B>
-Async<void> error(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a), bzd::forward<B>(b), location);
+	co_return {};
 }
 template <class A, class B, class C>
-Async<void> error(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
+	co_return {};
 }
 template <class A, class B, class C, class D>
-Async<void> error(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E>
-Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault()
 		.error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F>
-Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a),
 											 bzd::forward<B>(b),
@@ -309,9 +342,10 @@ Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation
 											 bzd::forward<E>(e),
 											 bzd::forward<F>(f),
 											 location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F, class G>
-Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().error(bzd::forward<A>(a),
 											 bzd::forward<B>(b),
@@ -321,37 +355,43 @@ Async<void> error(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceL
 											 bzd::forward<F>(f),
 											 bzd::forward<G>(g),
 											 location);
+	co_return {};
 }
 
 /// Set a warning log entry using the default logger.
 template <class A>
-Async<void> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a), location);
+	co_return {};
 }
 template <class A, class B>
-Async<void> warning(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a), bzd::forward<B>(b), location);
+	co_return {};
 }
 template <class A, class B, class C>
-Async<void> warning(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
+	co_return {};
 }
 template <class A, class B, class C, class D>
-Async<void> warning(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E>
-Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault()
 		.warning(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F>
-Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a),
 											   bzd::forward<B>(b),
@@ -360,9 +400,10 @@ Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocati
 											   bzd::forward<E>(e),
 											   bzd::forward<F>(f),
 											   location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F, class G>
-Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().warning(bzd::forward<A>(a),
 											   bzd::forward<B>(b),
@@ -372,37 +413,43 @@ Async<void> warning(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const Sourc
 											   bzd::forward<F>(f),
 											   bzd::forward<G>(g),
 											   location);
+	co_return {};
 }
 
 /// Set an informative log entry using the default logger.
 template <class A>
-Async<void> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a), location);
+	co_return {};
 }
 template <class A, class B>
-Async<void> info(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a), bzd::forward<B>(b), location);
+	co_return {};
 }
 template <class A, class B, class C>
-Async<void> info(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
+	co_return {};
 }
 template <class A, class B, class C, class D>
-Async<void> info(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E>
-Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault()
 		.info(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F>
-Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a),
 											bzd::forward<B>(b),
@@ -411,9 +458,10 @@ Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation 
 											bzd::forward<E>(e),
 											bzd::forward<F>(f),
 											location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F, class G>
-Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().info(bzd::forward<A>(a),
 											bzd::forward<B>(b),
@@ -423,37 +471,43 @@ Async<void> info(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLo
 											bzd::forward<F>(f),
 											bzd::forward<G>(g),
 											location);
+	co_return {};
 }
 
 /// Set a debug log entry using the default logger.
 template <class A>
-Async<void> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a), location);
+	co_return {};
 }
 template <class A, class B>
-Async<void> debug(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a), bzd::forward<B>(b), location);
+	co_return {};
 }
 template <class A, class B, class C>
-Async<void> debug(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
+	co_return {};
 }
 template <class A, class B, class C, class D>
-Async<void> debug(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E>
-Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault()
 		.debug(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F>
-Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a),
 											 bzd::forward<B>(b),
@@ -462,9 +516,10 @@ Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation
 											 bzd::forward<E>(e),
 											 bzd::forward<F>(f),
 											 location);
+	co_return {};
 }
 template <class A, class B, class C, class D, class E, class F, class G>
-Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
+Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocation location = SourceLocation::current()) noexcept
 {
 	co_await bzd::Logger::getDefault().debug(bzd::forward<A>(a),
 											 bzd::forward<B>(b),
@@ -474,21 +529,24 @@ Async<void> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceL
 											 bzd::forward<F>(f),
 											 bzd::forward<G>(g),
 											 location);
+	co_return {};
 }
 
 } // namespace bzd::log
 
 // Specialization for bzd::Error type.
-inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::Error& e)
+inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
 {
-	co_await toStream(stream, CSTR("[origin:{}:{}] [{}] {}"), e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+	auto result = co_await toStream(stream, CSTR("[origin:{}:{}] [{}] {}"), e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+	ASSERT_ASYNC_RESULT(result);
+	co_return {};
 }
 
 // ----------------------------------------------------------------------------
 // Implementation
 
 template <class... Args>
-bzd::Async<void> bzd::Logger::print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept
+bzd::Async<> bzd::Logger::print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept
 {
 	if (level <= minLevel_)
 	{
@@ -498,4 +556,5 @@ bzd::Async<void> bzd::Logger::print(const bzd::log::Level level, const SourceLoc
 		co_await toStream(backend, bzd::forward<Args>(args)...);
 		co_await backend.write("\n"_sv.asBytes());
 	}
+	co_return {};
 }

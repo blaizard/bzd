@@ -20,15 +20,17 @@ public:
 
 public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<void> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
+	static Async<> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
 	{
 		co_await toStream(stream, value);
+		co_return {};
 	}
 
 	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<void> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
+	static Async<> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 	{
 		co_await toStream(stream, value, metadata);
+		co_return {};
 	}
 };
 
@@ -38,16 +40,18 @@ template <class T,
 		  bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T> || bzd::typeTraits::isFloatingPoint<T> ||
 										(bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>),
 									void>* = nullptr>
-Async<void> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
+Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
 	co_await stream.write(str.asBytes());
+	co_return {};
 }
 
-inline Async<void> toStream(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
+inline Async<> toStream(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
 	co_await stream.write(processCommon(stringView, metadata).asBytes());
+	co_return {};
 }
 
 template <class Adapter>
@@ -61,8 +65,9 @@ public:
 	static constexpr auto make(Args&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) -> bzd::Async<void> {
+		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) -> bzd::Async<> {
 			co_await Adapter::process(transport, args, metadata);
+			co_return {};
 		}...);
 
 		return FormatterType<decltype(lambdas)>{lambdas};
@@ -75,7 +80,7 @@ private:
 	public:
 		constexpr FormatterType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		bzd::Async<void> process(TransportType& transport, const Metadata& metadata) const noexcept
+		bzd::Async<> process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			if constexpr (Lambdas::size() > 0)
@@ -149,6 +154,8 @@ private:
 				}
 			}
 			static_assert(Lambdas::size() <= 10, "Too many arguments passed to format, not supported.");
+
+			co_return {};
 		}
 
 	private:
@@ -163,7 +170,7 @@ private:
 // Would be worth trying again with a new version of the compiler.
 // TODO: Try to enable Args&& with an updated esp32 gcc compiler
 template <bzd::constexprStringView T, class... Args>
-bzd::Async<void> toStream(bzd::OStream& stream, const T&, Args... args)
+bzd::Async<> toStream(bzd::OStream& stream, const T&, Args... args)
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
@@ -188,19 +195,27 @@ bzd::Async<void> toStream(bzd::OStream& stream, const T&, Args... args)
 			co_await formatter.process(stream, result.metadata.value());
 		}
 	}
+
+	co_return {};
 }
 
-inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::interface::String& str)
+inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::interface::String& str)
 {
-	co_await stream.write(str.asBytes());
+	auto result = co_await stream.write(str.asBytes());
+	ASSERT_ASYNC_RESULT(result);
+	co_return {};
 }
 
-inline bzd::Async<void> toStream(bzd::OStream& stream, const bzd::StringView& str)
+inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::StringView& str)
 {
-	co_await stream.write(str.asBytes());
+	auto result = co_await stream.write(str.asBytes());
+	ASSERT_ASYNC_RESULT(result);
+	co_return {};
 }
 
-inline bzd::Async<void> toStream(bzd::OStream& stream, const char* const str)
+inline bzd::Async<> toStream(bzd::OStream& stream, const char* const str)
 {
-	co_await stream.write(bzd::StringView{str}.asBytes());
+	auto result = co_await stream.write(bzd::StringView{str}.asBytes());
+	ASSERT_ASYNC_RESULT(result);
+	co_return {};
 }

@@ -14,4 +14,6 @@ TEST_ASYNC(Reader, readUntil)
 	const auto result = co_await reader.readUntil(bzd::ByteType{':'});
 	EXPECT_TRUE(result);
 	EXPECT_EQ_VALUES(result.value(), "Hello:"_sv.asBytes());
+
+	co_return {};
 }

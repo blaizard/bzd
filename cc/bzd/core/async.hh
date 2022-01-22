@@ -187,18 +187,11 @@ private:
 
 namespace bzd {
 
-template <class V, class E = bzd::Error>
+template <class V = void, class E = bzd::Error>
 class Async : public impl::Async<bzd::Result<V, E>>
 {
 public:
 	using impl::Async<bzd::Result<V, E>>::Async;
-};
-
-template <>
-class Async<void> : public impl::Async<void>
-{
-public:
-	using impl::Async<void>::Async;
 };
 
 } // namespace bzd

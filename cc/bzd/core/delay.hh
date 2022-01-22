@@ -12,7 +12,7 @@ namespace bzd {
  *
  * \return A promise object.
  */
-inline bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
+inline bzd::Async<> delay(const bzd::units::Millisecond time) noexcept
 {
 	auto& clock = bzd::platform::steadyClock();
 	const auto targetTicks = clock.getTicks() + clock.msToTicks(time);
@@ -22,6 +22,8 @@ inline bzd::Async<void> delay(const bzd::units::Millisecond time) noexcept
 		co_await bzd::async::yield();
 		// Check if the duration is reached
 	} while (clock.getTicks() < targetTicks);
+
+	co_return {};
 }
 
 } // namespace bzd
