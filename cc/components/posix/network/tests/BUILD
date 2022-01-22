@@ -6,6 +6,7 @@ bzd_cc_test(
         "network.cc",
     ],
     deps = [
+        "//cc:bzd",
         "//cc/bzd/test",
         "//cc/components/posix/network",
     ],
