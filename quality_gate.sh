@@ -12,7 +12,7 @@ echo  "==== linux_x86_64_clang prod ==========================================="
 echo  "==== linux_x86_64_gcc =================================================="
 ./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_gcc --config=cc
 echo  "==== esp32_xtensa_lx6_gcc =============================================="
-./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --config=sim
+./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc
 
 # Stress tests
 echo  "==== stress dev ========================================================"
