@@ -26,7 +26,6 @@ def createFlash(path: pathlib.Path, size: int, content: typing.Dict[int, pathlib
 				fout.seek(offset)
 				fout.write(fin.read())
 
-
 def runGdb(name: str) -> None:
 
 	# Wait until the container is available
@@ -47,7 +46,6 @@ def runGdb(name: str) -> None:
 		stderr=True,
 		ignoreFailure=True,
 		timeoutS=0)
-
 
 if __name__ == "__main__":
 
@@ -75,7 +73,7 @@ if __name__ == "__main__":
 		gdb.start()
 
 	cmds = [
-		"run", "-t", "--name", args.name, "--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
+		"run", "-t", "--rm", "--name", args.name, "--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()),
 		"--volume={}:/root/.gdbinit:ro".format(
 		pathlib.Path("toolchains/cc/fragments/esptool/qemu/.gdbinit").resolve().as_posix()),
 		"--volume={}:/bzd/binary.bin:ro".format(pathlib.Path(args.elf).resolve().as_posix())
@@ -86,7 +84,7 @@ if __name__ == "__main__":
 		cmds += ["-p", "8080", "--volume={}:/code:ro".format(os.environ["BUILD_WORKSPACE_DIRECTORY"])]
 
 	cmds += [
-		"--rm", "blaizard/xtensa_qemu:latest", "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32",
+		"blaizard/xtensa_qemu:latest", "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32",
 		"-m", "4", "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
 	]
 

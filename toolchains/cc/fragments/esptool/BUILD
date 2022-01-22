@@ -1,5 +1,6 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@bazel_skylib//lib:selects.bzl", "selects")
 
 filegroup(
     name = "esp32_bin",
@@ -62,5 +63,14 @@ py_library(
     srcs = ["targets.py"],
     data = [
         ":esp32_bin",
+    ],
+)
+
+selects.config_setting_group(
+    name = "is_sim",
+    visibility = ["//visibility:public"],
+    match_any = [
+        "//tools/bazel_build/settings/executor:is_sim",
+        "//tools/bazel_build/settings/executor:is_default"
     ],
 )
