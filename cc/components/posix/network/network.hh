@@ -63,7 +63,7 @@ public:
 
 		if (sd == -1)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("Cannot resolve hostname, errno {}"), errno);
+			co_return bzd::error(ErrorType::failure, CSTR("Cannot resolve {}, errno {}"), hostname, errno);
 		}
 
 		co_return {};
