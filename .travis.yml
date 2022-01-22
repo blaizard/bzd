@@ -35,7 +35,7 @@ jobs:
     - name: esp32_xtensa_lx6_gcc
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --config=sim
+      - ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc
 
     - name: Sanitizer
       script:
