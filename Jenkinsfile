@@ -76,8 +76,9 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
-						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
+						// Bug with Bazel 5.0.0 not handling correctly target skipping with coverage.
+						//sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						//archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 						sh "./tools/bazel coverage ... --config=py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py"
