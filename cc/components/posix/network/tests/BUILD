@@ -5,7 +5,6 @@ bzd_cc_test(
     srcs = [
         "network.cc",
     ],
-    tags = ["manual"],
     deps = [
         "//cc/bzd/test",
         "//cc/components/posix/network",

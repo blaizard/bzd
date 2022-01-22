@@ -17,7 +17,7 @@ public:
 	Mutex& operator=(Mutex&& mutex) noexcept = delete;
 
 public:
-	bzd::Async<void> lock() noexcept
+	bzd::Async<> lock() noexcept
 	{
 		bzd::BoolType expected{false};
 		while (!acquired_.compareExchange(expected, true))
@@ -25,6 +25,7 @@ public:
 			co_await bzd::async::yield();
 			expected = false;
 		}
+		co_return {};
 	}
 
 	constexpr void unlock() noexcept { acquired_.store(false); }

@@ -181,5 +181,5 @@ constexpr auto error(const ErrorType type,
 #define ASSERT_ASYNC_RESULT(result)    \
 	if (!(result))                     \
 	{                                  \
-		co_return(result).propagate(); \
+		co_return (result).propagate(); \
 	}

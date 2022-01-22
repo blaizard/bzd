@@ -14,7 +14,7 @@ public:
 
 	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
 
-	bzd::Async<void> exec() noexcept;
+	bzd::Async<> exec() noexcept;
 
 private:
 	bzd::UInt64Type ticks_{0};

@@ -164,6 +164,13 @@ public:
 		result_.emplace(bzd::forward<U>(result));
 	}
 
+	struct Empty {};
+	/// Overload to support `co_return {};`.
+	constexpr void return_value(Empty) noexcept
+	{
+		result_.emplace(bzd::nullresult);
+	}
+
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
@@ -171,21 +178,4 @@ private:
 	bzd::Optional<T> result_{};
 };
 
-template <>
-class Promise<void> : public impl::Promise<Promise<void>>
-{
-public:
-	using ResultType = bool;
-	using impl::Promise<Promise<void>>::Promise;
-
-	auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
-
-	constexpr void return_void() noexcept { result_ = true; }
-
-private:
-	template <class U>
-	friend class ::bzd::impl::Async;
-
-	bzd::Optional<bool> result_{};
-};
 } // namespace bzd::coroutine
