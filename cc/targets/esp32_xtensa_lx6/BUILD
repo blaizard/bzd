@@ -16,18 +16,11 @@ bdl_library(
     ],
 )
 
-config_setting(
-    name = "is_sim",
-    flag_values = {
-        "//tools/bazel_build/settings/executor": "sim",
-    },
-)
-
 cc_library(
     name = "esp32_xtensa_lx6",
     srcs = ["main.cc"],
     local_defines = select({
-        ":is_sim": ["BZD_EXECUTOR_SIM=1"],
+        "//toolchains/cc/fragments/esptool:is_sim": ["BZD_EXECUTOR_SIM=1"],
         "//conditions:default": [],
     }),
     target_compatible_with = [

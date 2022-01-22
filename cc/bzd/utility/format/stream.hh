@@ -206,7 +206,7 @@ inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::interface::String&
 	co_return {};
 }
 
-inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::StringView& str)
+inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::StringView str)
 {
 	auto result = co_await stream.write(str.asBytes());
 	ASSERT_ASYNC_RESULT(result);

@@ -21,7 +21,7 @@ def toolchain_fragment_esptool():
             "@//toolchains/cc/fragments/esptool:esp32_metadata",
         ],
         "app_executors": {
-            "@//toolchains/cc/fragments/esptool:executor_uart": "default,uart",
-            "@//toolchains/cc/fragments/esptool:executor_qemu": "sim",
+            "@//toolchains/cc/fragments/esptool:executor_uart": "uart",
+            "@//toolchains/cc/fragments/esptool:executor_qemu": "default,sim",
         },
     }
