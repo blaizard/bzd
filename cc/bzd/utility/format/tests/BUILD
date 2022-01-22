@@ -6,6 +6,11 @@ bzd_cc_test(
         "format.cc",
         "integral.cc",
     ],
+    # TODO: re-enable with esp32 gcc 11
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//cc/bzd/container:string_stream",
         "//cc/bzd/core/assert",
