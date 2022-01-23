@@ -16,6 +16,7 @@ cc_library(
         "//cc/bzd/container:tuple",
         "//cc/bzd/container/impl:non_owning_list",
         "//cc/bzd/core:error",
+        "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:ignore",
     ],

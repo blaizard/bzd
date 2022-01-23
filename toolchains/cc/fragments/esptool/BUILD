@@ -71,6 +71,6 @@ selects.config_setting_group(
     visibility = ["//visibility:public"],
     match_any = [
         "//tools/bazel_build/settings/executor:is_sim",
-        "//tools/bazel_build/settings/executor:is_default"
+        "//tools/bazel_build/settings/executor:is_default",
     ],
 )

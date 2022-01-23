@@ -4,6 +4,7 @@ namespace bzd.platform.posix.network;
 using PortType = Integer [min(1) max(65535)];
 component TCP {
 interface:
+	method disconnect();
 	
 }
 

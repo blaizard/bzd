@@ -27,7 +27,7 @@ public: // Constructors.
 
 	// Convert and round the result.
 	template <class OtherRatio>
-	requires bzd::integral<T>
+	requires concepts::integral<T>
 	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
 		value_{static_cast<T>((other.get() * (Ratio::den * OtherRatio::num) + (Ratio::num * OtherRatio::den) / 2) /
 							  (Ratio::num * OtherRatio::den))}
@@ -36,7 +36,7 @@ public: // Constructors.
 
 	// Convert the result.
 	template <class OtherRatio>
-	requires bzd::floatingPoint<T>
+	requires concepts::floatingPoint<T>
 	constexpr NamedType(const NamedType<T, PhantomType, OtherRatio>& other) :
 		value_{static_cast<T>(other.get() * (Ratio::den * OtherRatio::num) / (Ratio::num * OtherRatio::den))}
 	{

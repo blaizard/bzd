@@ -25,7 +25,7 @@
 
 #define BZDTEST_ASYNC_(testCaseName, testName)                                               \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&); \
+	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);     \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
 	{                                                                                        \
 		BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                              \
@@ -61,6 +61,12 @@
 	if (!static_cast<bool>(condition))                                                                                      \
 	{                                                                                                                       \
 		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected)); \
+	}
+
+#define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                      \
+	if (!static_cast<bool>(result))                                                       \
+	{                                                                                     \
+		failFct("Failure\nTest [async]: " #result, (result).error().getMessage().data()); \
 	}
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                    \

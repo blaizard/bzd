@@ -20,7 +20,7 @@ constexpr bool isFloatingPoint = IsFloatingPoint<T>::value;
 
 } // namespace bzd::typeTraits
 
-namespace bzd {
+namespace bzd::concepts {
 template <class T>
 concept floatingPoint = typeTraits::isFloatingPoint<T>;
 }

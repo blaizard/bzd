@@ -3,6 +3,7 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/channel.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/format/integral.hh"
@@ -25,6 +26,11 @@ public:
 
 	bzd::Async<> connect(const StringView hostname, const PortType port)
 	{
+		if (socket_ != -1)
+		{
+			co_return bzd::error(ErrorType::failure, CSTR("A socket is already opened."));
+		}
+
 		struct addrinfo hints
 		{
 		};
@@ -43,25 +49,24 @@ public:
 
 		bzd::ScopeGuard scope{[&addrs]() { ::freeaddrinfo(addrs); }};
 
-		int sd{-1};
 		for (auto addr = addrs; addr != NULL; addr = addr->ai_next)
 		{
-			sd = ::socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
-			if (sd == -1)
+			socket_ = ::socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+			if (socket_ == -1)
 			{
 				continue;
 			}
 
-			if (::connect(sd, addr->ai_addr, addr->ai_addrlen) == 0)
+			if (::connect(socket_, addr->ai_addr, addr->ai_addrlen) == 0)
 			{
 				break;
 			}
 
-			::close(sd);
-			sd = -1;
+			::close(socket_);
+			socket_ = -1;
 		}
 
-		if (sd == -1)
+		if (socket_ == -1)
 		{
 			co_return bzd::error(ErrorType::failure, CSTR("Cannot resolve {}, errno {}"), hostname, errno);
 		}
@@ -69,9 +74,24 @@ public:
 		co_return {};
 	}
 
-	~TCP()
+	void disconnect()
 	{
-		// close
+		if (socket_ != -1)
+		{
+			::close(socket_);
+			socket_ = -1;
+		}
 	}
+
+	/*
+		bzd::Async<SizeType> write(const bzd::Span<const T> data) noexcept override
+		{
+			::write();
+		}
+	*/
+	~TCP() { disconnect(); }
+
+private:
+	int socket_{-1};
 };
 } // namespace bzd::platform::posix::network

@@ -632,7 +632,7 @@ private:
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <bzd::constexprStringView T, class... Args>
+template <bzd::concepts::constexprStringView T, class... Args>
 constexpr void toString(bzd::interface::String& str, const T&, Args&&... args)
 {
 	// Compile-time format check

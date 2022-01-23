@@ -49,9 +49,7 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             "--no-standard-includes",
 
             # Add support to coroutines.
-            "-Wno-unused-command-line-argument",
             "-stdlib=libc++",
-            "-fcoroutines-ts",
         ],
         "link_flags": [
             # No standard libraries

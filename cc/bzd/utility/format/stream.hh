@@ -169,7 +169,7 @@ private:
 // is out of scope within the coroutine. I remember seeing a bugzilla about this for gcc.
 // Would be worth trying again with a new version of the compiler.
 // TODO: Try to enable Args&& with an updated esp32 gcc compiler
-template <bzd::constexprStringView T, class... Args>
+template <bzd::concepts::constexprStringView T, class... Args>
 bzd::Async<> toStream(bzd::OStream& stream, const T&, Args... args)
 {
 	// Compile-time format check
