@@ -27,6 +27,12 @@
 #define ASSERT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_FATAL_)
 /// \}
 
+/// Verifies that an async result is true.
+/// \{
+#define EXPECT_ASYNC_TRUE(result) BZDTEST_TEST_ASYNC_BOOLEAN_(result, BZDTEST_FAIL_NONFATAL_)
+#define ASSERT_ASYNC_TRUE(result) BZDTEST_TEST_ASYNC_BOOLEAN_(result, BZDTEST_FAIL_FATAL_)
+/// \}
+
 /// Verifies that expression1 == expression2.
 /// \{
 #define EXPECT_EQ(expression1, expression2) BZDTEST_TEST_EQ_(expression1, expression2, BZDTEST_FAIL_NONFATAL_)

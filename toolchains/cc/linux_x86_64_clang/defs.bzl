@@ -55,13 +55,8 @@ def _load_linux_x86_64_clang_12_0_0(name):
             "-nostdinc",
             "--no-standard-includes",
 
-            # From migration to 9.00 -> 12.0.0
-            "-Wno-non-c-typedef-for-linkage",
-
             # Add support to coroutines.
-            "-Wno-unused-command-line-argument",
             "-stdlib=libc++",
-            "-fcoroutines-ts",
         ],
         "link_flags": [
             "-fuse-ld=lld",

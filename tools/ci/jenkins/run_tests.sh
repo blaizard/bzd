@@ -1,4 +1,6 @@
 #!/bin/bash
 
 cd "/home/1000/sandbox"
-./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --platform_suffix=_dev
+docker info
+#./info.sh
+#./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc

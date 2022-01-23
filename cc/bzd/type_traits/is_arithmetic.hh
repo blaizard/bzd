@@ -19,7 +19,7 @@ template <class T>
 constexpr bool isArithmetic = IsArithmetic<T>::value;
 } // namespace bzd::typeTraits
 
-namespace bzd {
+namespace bzd::concepts {
 template <class T>
 concept arithmetic = typeTraits::isArithmetic<T>;
 }

@@ -14,6 +14,19 @@ class Async;
 
 namespace bzd::coroutine::impl {
 
+/// Executable type for coroutines.
+class Executable : public bzd::interface::Executable<Executable>
+{
+public:
+	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
+
+	constexpr void resume() noexcept { handle_.resume(); }
+
+	bzd::coroutine::impl::coroutine_handle<> handle_;
+};
+
+using Executor = bzd::Executor<Executable>;
+
 /**
  * Awaitable to enqueue an async object.
  */
@@ -23,7 +36,7 @@ struct Enqueue
 	constexpr Enqueue(T& async) noexcept : exectuable_{async.getExecutable()}
 	{
 	}
-	bzd::Executor::Executable& exectuable_;
+	Executable& exectuable_;
 };
 
 /**
@@ -34,13 +47,13 @@ struct GetExecutor : public bzd::coroutine::impl::suspend_always
 	template <class T>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 	{
-		executor_ = handle.promise().executor_;
+		executor_ = handle.promise().getExecutor();
 		return false;
 	}
 
 	constexpr auto await_resume() noexcept { return executor_; }
 
-	bzd::Executor* executor_;
+	Executor* executor_;
 };
 
 /**
@@ -51,14 +64,14 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	template <class T>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 	{
-		bzd::assert::isTrue(handle.promise().executor_);
-		handle.promise().executor_->push(handle.promise());
+		bzd::assert::isTrue(handle.promise().hasExecutor());
+		handle.promise().getExecutor()->push(handle.promise());
 		return true;
 	}
 };
 
 template <class T>
-class Promise : public bzd::Executor::Executable
+class Promise : public Executable
 {
 private:
 	using Self = Promise<T>;
@@ -82,10 +95,7 @@ private:
 	};
 
 public:
-	constexpr Promise() noexcept :
-		bzd::Executor::Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))}
-	{
-	}
+	constexpr Promise() noexcept : Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))} {}
 
 	constexpr Promise(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
@@ -109,7 +119,7 @@ public:
 	constexpr auto await_transform(bzd::coroutine::impl::Enqueue&& object) noexcept
 	{
 		auto& exectuable = object.exectuable_;
-		exectuable.executor_ = executor_;
+		exectuable.setExecutor(*getExecutor());
 		exectuable.enqueue();
 		return bzd::coroutine::impl::suspend_never{};
 	}
@@ -121,7 +131,7 @@ public:
 	constexpr auto&& await_transform(Async&& async) noexcept
 	{
 		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
-		async.setExecutor(*executor_);
+		async.setExecutor(*getExecutor());
 		return bzd::move(async);
 	}
 
@@ -144,6 +154,9 @@ public:
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
+
+	bzd::coroutine::impl::coroutine_handle<> caller_{nullptr};
+	bzd::Optional<bzd::FunctionView<void(Executable&)>> onTerminateCallback_{};
 };
 
 } // namespace bzd::coroutine::impl
@@ -164,12 +177,11 @@ public:
 		result_.emplace(bzd::forward<U>(result));
 	}
 
-	struct Empty {};
-	/// Overload to support `co_return {};`.
-	constexpr void return_value(Empty) noexcept
+	struct Empty
 	{
-		result_.emplace(bzd::nullresult);
-	}
+	};
+	/// Overload to support `co_return {};`.
+	constexpr void return_value(Empty) noexcept { result_.emplace(bzd::nullresult); }
 
 private:
 	template <class U>

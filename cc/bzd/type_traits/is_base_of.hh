@@ -31,3 +31,10 @@ struct IsBaseOf
 template <class Base, class Derived>
 constexpr bool isBaseOf = IsBaseOf<Base, Derived>::value;
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class Base, class Derived>
+concept isBaseOf = bzd::typeTraits::isBaseOf<Base, Derived>;
+
+}

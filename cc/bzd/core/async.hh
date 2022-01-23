@@ -18,12 +18,16 @@ using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType
 template <class T>
 using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 
+using AsyncExecutor = bzd::coroutine::impl::Executor;
+
 template <class T>
 class Async
 {
 public: // Traits
 	using PromiseType = bzd::coroutine::Promise<T>;
 	using ResultType = typename PromiseType::ResultType;
+	using Executable = bzd::coroutine::impl::Executable;
+	using Executor = AsyncExecutor;
 	using Self = Async<T>;
 
 public: // constructor/destructor/assignments
@@ -88,16 +92,13 @@ public:
 		return nullopt;
 	}
 
-	void onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)> callback) noexcept
-	{
-		handle_.promise().onTerminateCallback_.emplace(callback);
-	}
+	void onTerminate(bzd::FunctionView<void(Executable&)> callback) noexcept { handle_.promise().onTerminateCallback_.emplace(callback); }
 
-	constexpr void cancelIfDifferent(const bzd::Executor::Executable& promise) noexcept
+	constexpr void cancelIfDifferent(const Executable& promise) noexcept
 	{
 		// TODO: fix potential bug if some of the coroutines are executed concurrently,
 		// calling cancel on the one running will probably create an UB.
-		if (handle_ && static_cast<bzd::Executor::Executable*>(&handle_.promise()) != &promise)
+		if (handle_ && static_cast<Executable*>(&handle_.promise()) != &promise)
 		{
 			cancel();
 		}
@@ -111,12 +112,12 @@ public:
 	/**
 	 * Associate an executor to this async.
 	 */
-	constexpr void setExecutor(bzd::Executor& executor) noexcept { handle_.promise().executor_ = &executor; }
+	constexpr void setExecutor(Executor& executor) noexcept { handle_.promise().setExecutor(executor); }
 
 	/**
 	 * Associate an executor to this async and push it to the queue.
 	 */
-	constexpr void enqueue(bzd::Executor& executor) noexcept
+	constexpr void enqueue(Executor& executor) noexcept
 	{
 		setExecutor(executor);
 		// Enqueue the async to the work queue of the executor
@@ -130,7 +131,7 @@ public:
 	 * \param executor The executor to run on.
 	 * \return The result of the async.
 	 */
-	constexpr ResultType run(bzd::Executor& executor) noexcept
+	constexpr ResultType run(Executor& executor) noexcept
 	{
 		// Associate the executor with this async and enqueue it.
 		enqueue(executor);
@@ -144,7 +145,7 @@ public:
 
 	constexpr ResultType sync() noexcept
 	{
-		bzd::Executor executor;
+		Executor executor;
 		return run(executor);
 	}
 
@@ -174,7 +175,7 @@ public: // coroutine specific
 private:
 	friend bzd::coroutine::impl::Enqueue;
 
-	constexpr bzd::Executor::Executable& getExecutable() noexcept
+	constexpr Executable& getExecutable() noexcept
 	{
 		bzd::assert::isTrue(static_cast<bool>(handle_));
 		return handle_.promise();
@@ -231,13 +232,14 @@ template <class... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
+	using Executable = bzd::coroutine::impl::Executable; // TODO: remove Executable here.
 
 	// Install callbacks on terminate.
 	// Note: the lifetime of the lambda is longer than the promises.
-	auto onTerminateCallback = [&asyncs...](bzd::Executor::Executable& promise) { (asyncs.cancelIfDifferent(promise), ...); };
+	auto onTerminateCallback = [&asyncs...](Executable& promise) { (asyncs.cancelIfDifferent(promise), ...); };
 
 	// Register on terminate callbacks
-	(asyncs.onTerminate(bzd::FunctionView<void(bzd::Executor::Executable&)>{onTerminateCallback}), ...);
+	(asyncs.onTerminate(bzd::FunctionView<void(Executable&)>{onTerminateCallback}), ...);
 
 	// Push all handles to the executor
 	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);

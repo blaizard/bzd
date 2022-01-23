@@ -37,7 +37,7 @@ public: // Traits.
 	using Self = Error;
 
 public:
-	template <bzd::constexprStringView T>
+	template <bzd::concepts::constexprStringView T>
 	constexpr Error(const SourceLocation& location, const ErrorType type, const T) noexcept :
 		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, T::value()}
 	{
@@ -181,5 +181,5 @@ constexpr auto error(const ErrorType type,
 #define ASSERT_ASYNC_RESULT(result)    \
 	if (!(result))                     \
 	{                                  \
-		co_return (result).propagate(); \
+		co_return(result).propagate(); \
 	}

@@ -11,7 +11,7 @@ template <class... Cores>
 class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
 {
 public:
-	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::Executor::run} {}
+	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::impl::AsyncExecutor::run} {}
 
 	/**
 	 * Assign a workload to this executor.
@@ -42,7 +42,7 @@ private:
 	static constexpr bzd::SizeType nbCores_{sizeof...(Cores)};
 
 	bzd::Tuple<Cores*...> cores_;
-	bzd::Executor executor_;
+	bzd::impl::AsyncExecutor executor_;
 	bzd::FunctionView<void(void)> start_;
 };
 

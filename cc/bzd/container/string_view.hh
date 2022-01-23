@@ -60,10 +60,14 @@ struct ConstexprStringView
 {
 };
 
+} // namespace bzd
+
+namespace bzd::concepts {
+
 template <class T>
 concept constexprStringView = typeTraits::isBaseOf<ConstexprStringView, T>;
 
-} // namespace bzd
+}
 
 constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept
 {
