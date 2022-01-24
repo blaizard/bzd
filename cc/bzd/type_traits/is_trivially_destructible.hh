@@ -33,6 +33,6 @@ template <class T>
 using IsTriviallyDestructible = typename impl::IsTriviallyDestructible<T>;
 
 template <class T>
-constexpr bool isTriviallyDestructible = IsTriviallyDestructible<T>::value;
+inline constexpr bool isTriviallyDestructible = IsTriviallyDestructible<T>::value;
 
 } // namespace bzd::typeTraits

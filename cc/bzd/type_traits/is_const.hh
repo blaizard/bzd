@@ -19,5 +19,5 @@ template <class T>
 using IsConst = typename impl::IsConst<T>;
 
 template <class T>
-constexpr bool isConst = IsConst<T>::value;
+inline constexpr bool isConst = IsConst<T>::value;
 } // namespace bzd::typeTraits

@@ -23,6 +23,6 @@ template <class T, class U>
 using IsConstructible1 = typename impl::IsConstructible<VoidType<>, T, U>;
 
 template <class T, class... Args>
-constexpr bool isConstructible = IsConstructible<T, Args...>::value;
+inline constexpr bool isConstructible = IsConstructible<T, Args...>::value;
 
 } // namespace bzd::typeTraits

@@ -20,6 +20,6 @@ template <class T>
 using IsLValueReference = typename impl::IsLValueReference<T>;
 
 template <class T>
-constexpr bool isLValueReference = IsLValueReference<T>::value;
+inline constexpr bool isLValueReference = IsLValueReference<T>::value;
 
 } // namespace bzd::typeTraits

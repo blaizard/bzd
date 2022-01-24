@@ -7,6 +7,6 @@ template <class T>
 using IsTriviallyMoveConstructible = ::std::is_trivially_move_constructible<T>;
 
 template <class T>
-constexpr bool isTriviallyMoveConstructible = IsTriviallyMoveConstructible<T>::value;
+inline constexpr bool isTriviallyMoveConstructible = IsTriviallyMoveConstructible<T>::value;
 
 } // namespace bzd::typeTraits

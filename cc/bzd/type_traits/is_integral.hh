@@ -22,7 +22,7 @@ template <class T>
 using IsIntegral = typename impl::IsIntegral<T>;
 
 template <class T>
-constexpr bool isIntegral = IsIntegral<T>::value;
+inline constexpr bool isIntegral = IsIntegral<T>::value;
 
 } // namespace bzd::typeTraits
 

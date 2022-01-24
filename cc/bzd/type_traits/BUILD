@@ -39,6 +39,7 @@ bzd_cc_library(
         ":is_reference",
         ":is_rvalue_reference",
         ":is_same",
+        ":is_same_template",
         ":is_signed",
         ":is_trivially_copy_assignable",
         ":is_trivially_copy_constructible",
@@ -459,6 +460,19 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":false_type",
+        ":true_type",
+    ],
+)
+
+cc_library(
+    name = "is_same_template",
+    hdrs = [
+        "is_same_template.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":false_type",
+        ":remove_cvref",
         ":true_type",
     ],
 )

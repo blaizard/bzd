@@ -35,6 +35,6 @@ template <class T>
 using IsVoid = typename impl::IsVoid<T>;
 
 template <class T>
-constexpr bool isVoid = IsVoid<T>::value;
+inline constexpr bool isVoid = IsVoid<T>::value;
 
 } // namespace bzd::typeTraits

@@ -31,6 +31,6 @@ struct IsConvertible
 };
 
 template <class From, class To>
-constexpr bool isConvertible = IsConvertible<From, To>::value;
+inline constexpr bool isConvertible = IsConvertible<From, To>::value;
 
 } // namespace bzd::typeTraits

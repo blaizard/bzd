@@ -23,5 +23,5 @@ template <class T>
 using IsArray = typename impl::IsArray<T>;
 
 template <class T>
-constexpr bool isArray = IsArray<T>::value;
+inline constexpr bool isArray = IsArray<T>::value;
 } // namespace bzd::typeTraits

@@ -20,6 +20,6 @@ template <class T, class U>
 using IsSame = typename impl::IsSame<T, U>;
 
 template <class T, class U>
-constexpr bool isSame = IsSame<T, U>::value;
+inline constexpr bool isSame = IsSame<T, U>::value;
 
 } // namespace bzd::typeTraits
