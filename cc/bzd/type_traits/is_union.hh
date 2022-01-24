@@ -15,5 +15,5 @@ template <class T>
 using IsUnion = typename impl::IsUnion<T>;
 
 template <class T>
-constexpr bool isUnion = IsUnion<T>::value;
+inline constexpr bool isUnion = IsUnion<T>::value;
 } // namespace bzd::typeTraits

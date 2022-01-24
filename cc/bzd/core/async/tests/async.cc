@@ -98,8 +98,7 @@ TEST_ASYNC(Coroutine, PassThrough)
 	co_return {};
 }
 
-/*
-bzd::Async<bzd::Executor*> fetchExecutor()
+bzd::Async<bzd::impl::AsyncExecutor*> fetchExecutor()
 {
 	auto exec = co_await bzd::async::getExecutor();
 	co_return exec;
@@ -107,13 +106,12 @@ bzd::Async<bzd::Executor*> fetchExecutor()
 
 TEST(Coroutine, Executor)
 {
-	bzd::Executor executor;
+	bzd::impl::AsyncExecutor executor;
 	auto promise = fetchExecutor();
 	const auto result = promise.run(executor);
 	EXPECT_TRUE(result);
 	EXPECT_EQ(result.value(), &executor);
 }
-*/
 
 TEST_ASYNC(Coroutine, asyncAll)
 {

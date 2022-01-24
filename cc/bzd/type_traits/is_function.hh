@@ -70,6 +70,6 @@ template <class T>
 using IsFunction = typename impl::IsFunction<T>;
 
 template <class T>
-constexpr bool isFunction = IsFunction<T>::value;
+inline constexpr bool isFunction = IsFunction<T>::value;
 
 } // namespace bzd::typeTraits

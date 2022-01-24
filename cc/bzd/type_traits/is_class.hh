@@ -19,5 +19,5 @@ struct IsClass : decltype(impl::IsClass<T>(nullptr))
 };
 
 template <class T>
-constexpr bool isClass = IsClass<T>::value;
+inline constexpr bool isClass = IsClass<T>::value;
 } // namespace bzd::typeTraits

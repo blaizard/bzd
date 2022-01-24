@@ -57,6 +57,6 @@ template <class T>
 using IsDestructible = typename impl::IsDestructible<T>;
 
 template <class T>
-constexpr bool isDestructible = IsDestructible<T>::value;
+inline constexpr bool isDestructible = IsDestructible<T>::value;
 
 } // namespace bzd::typeTraits

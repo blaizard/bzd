@@ -6,20 +6,13 @@
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/utility/ignore.hh"
 
-namespace bzd::inteface {
-template <class T>
-class Executable;
-}
-
-namespace bzd::concepts {
-template <class T, class U>
-concept executable = isBaseOf<bzd::inteface::Executable<U>, T>;
-}
+#include <type_traits>
 
 namespace bzd {
 
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
+/// An executor is thread-safe and can be shared betweeen multiple threads or cores.
 template <class Executable>
 class Executor
 {
@@ -95,12 +88,16 @@ public:
 		executor_->push(*static_cast<T*>(this));
 	}
 
-	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_ = &executor; }
+	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept
+	{
+		bzd::assert::isTrue(!executor_);
+		executor_ = &executor;
+	}
 
-	[[nodiscard]] constexpr BoolType hasExecutor() const noexcept {return (executor_ != nullptr); }
-
-	constexpr bzd::Executor<T>* getExecutor() const noexcept {
-		return executor_; // NOLINT(clang-analyzer-core.uninitialized.UndefReturn)
+	constexpr bzd::Executor<T>& getExecutor() const noexcept
+	{
+		bzd::assert::isTrue(executor_);
+		return *executor_;
 	}
 
 private:

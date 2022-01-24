@@ -24,6 +24,6 @@ template <class T>
 using IsDefaultConstructible = typename impl::IsDefaultConstructible<T>;
 
 template <class T>
-constexpr bool isDefaultConstructible = IsDefaultConstructible<T>::value;
+inline constexpr bool isDefaultConstructible = IsDefaultConstructible<T>::value;
 
 } // namespace bzd::typeTraits

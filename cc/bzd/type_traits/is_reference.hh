@@ -16,6 +16,6 @@ template <class T>
 using IsReference = typename impl::IsReference<T>;
 
 template <class T>
-constexpr bool isReference = IsReference<T>::value;
+inline constexpr bool isReference = IsReference<T>::value;
 
 } // namespace bzd::typeTraits

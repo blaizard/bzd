@@ -15,5 +15,5 @@ template <class T>
 using IsEnum = typename impl::IsEnum<T>;
 
 template <class T>
-constexpr bool isEnum = IsEnum<T>::value;
+inline constexpr bool isEnum = IsEnum<T>::value;
 } // namespace bzd::typeTraits

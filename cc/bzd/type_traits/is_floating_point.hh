@@ -16,7 +16,7 @@ template <class T>
 using IsFloatingPoint = typename impl::IsFloatingPoint<T>;
 
 template <class T>
-constexpr bool isFloatingPoint = IsFloatingPoint<T>::value;
+inline constexpr bool isFloatingPoint = IsFloatingPoint<T>::value;
 
 } // namespace bzd::typeTraits
 

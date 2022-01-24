@@ -23,6 +23,6 @@ template <class T>
 using IsPointer = typename impl::IsPointer<RemoveCV<T>>;
 
 template <class T>
-constexpr bool isPointer = IsPointer<T>::value;
+inline constexpr bool isPointer = IsPointer<T>::value;
 
 } // namespace bzd::typeTraits

@@ -23,6 +23,6 @@ template <class T>
 using IsSigned = typename impl::IsSigned<T>;
 
 template <class T>
-constexpr bool isSigned = IsSigned<T>::value;
+inline constexpr bool isSigned = IsSigned<T>::value;
 
 } // namespace bzd::typeTraits

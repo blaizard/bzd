@@ -19,6 +19,6 @@ template <class T>
 using IsVolatile = typename impl::IsVolatile<T>;
 
 template <class T>
-constexpr bool isVolatile = IsVolatile<T>::value;
+inline constexpr bool isVolatile = IsVolatile<T>::value;
 
 } // namespace bzd::typeTraits

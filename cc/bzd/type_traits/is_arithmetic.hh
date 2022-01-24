@@ -16,7 +16,7 @@ template <class T>
 using IsArithmetic = typename impl::IsArithmetic<T>;
 
 template <class T>
-constexpr bool isArithmetic = IsArithmetic<T>::value;
+inline constexpr bool isArithmetic = IsArithmetic<T>::value;
 } // namespace bzd::typeTraits
 
 namespace bzd::concepts {
