@@ -64,6 +64,10 @@ if __name__ == "__main__":
 
 	target = targets[args.target]
 
+	# Print the current user
+	os.system("id")
+	os.system("ls -ll /var/run/")
+
 	# Create the flash.
 	flashPath = pathlib.Path(f"flash.bin")
 	createFlash(flashPath, typing.cast(int, target["memorySize"]),
