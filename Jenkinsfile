@@ -63,7 +63,7 @@ pipeline
 					steps
 					{
 						sh "./info.sh"
-						sh "ls -ll /var/run/docker.sock"
+						sh "ls -ll /var/run"
 						sh "./tools/bazel test ... --output_groups=+metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
 					}
 				}
