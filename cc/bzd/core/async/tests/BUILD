@@ -1,14 +1,25 @@
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
-[bzd_cc_test(
-    name = path.replace(".cc", ""),
+bzd_cc_test(
+    name = "async",
     srcs = [
-        path,
+        "async.cc",
     ],
     deps = [
         "//cc/bzd/core/async",
         "//cc/bzd/test",
     ],
-) for path in glob([
-    "*.cc",
-])]
+)
+
+bzd_cc_test(
+    name = "cancellation",
+    srcs = [
+        "cancellation.cc",
+    ],
+    tags = ["manual"],
+    deps = [
+        "//cc/bzd/core:delay",
+        "//cc/bzd/core/async",
+        "//cc/bzd/test",
+    ],
+)
