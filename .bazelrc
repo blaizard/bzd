@@ -15,6 +15,8 @@ build "--strip=never"
 test --test_output=errors
 test --verbose_failures
 test --define=type=test
+# Use local docker configuration if present
+test --action_env=DOCKER_HOST
 
 # Coverage specific options
 coverage --combined_report=lcov
