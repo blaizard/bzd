@@ -6,6 +6,7 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
+#include "cc/bzd/utility/source_location.hh"
 
 // Forward declaration
 namespace bzd::impl {
@@ -24,6 +25,7 @@ public:
 	void resume() noexcept { handle_.resume(); }
 
 	bzd::coroutine::impl::coroutine_handle<> handle_;
+	Executable* caller_{nullptr};
 };
 
 using Executor = bzd::Executor<Executable>;
@@ -56,6 +58,17 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	}
 };
 
+struct Suspend : public bzd::coroutine::impl::suspend_always
+{
+};
+
+/// Awaitable to yield the current execution.
+struct YieldAndPropagateCancelation : public Yield
+{
+	constexpr YieldAndPropagateCancelation(interface::CancellationToken& token) : token_{token} {}
+	interface::CancellationToken& token_;
+};
+
 template <class T>
 class Promise : public Executable
 {
@@ -72,7 +85,13 @@ private:
 			auto continuation = handle.promise().caller_;
 			if (continuation)
 			{
-				return continuation;
+				// Enqueue the continuation for later use, it will be scheduled
+				// according to the executor policy.
+				// Enqueuing this coroutine into the executor is important for thread
+				// safety reasons, if we return the coroutine handle directly here, we
+				// might have a case where the same coroutine executes multiple times on
+				// different threads.
+				continuation->enqueue();
 			}
 			return bzd::coroutine::impl::noop_coroutine();
 		}
@@ -89,13 +108,18 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = default;
 	~Promise() noexcept = default;
 
-	constexpr bzd::coroutine::impl::suspend_always initial_suspend() noexcept { return {}; }
+	constexpr bzd::coroutine::impl::suspend_always initial_suspend(/*SourceLocation source = SourceLocation::current()*/) noexcept
+	{
+		//::std::cout << "{" << source.getFile() << ":" << source.getLine() << "    " << source.getFunction() << "}" << ::std::endl;
+
+		return {};
+	}
 
 	constexpr FinalAwaiter final_suspend() noexcept
 	{
 		if (onTerminateCallback_)
 		{
-			(onTerminateCallback_.value())(*this);
+			(onTerminateCallback_.value())();
 		}
 		return {};
 	}
@@ -108,10 +132,21 @@ public: // Await transform specializations
 		auto& exectuable = object.exectuable_;
 		exectuable.setExecutor(getExecutor());
 		exectuable.enqueue();
+		exectuable.caller_ = this;
 		return bzd::coroutine::impl::suspend_never{};
 	}
 
+	constexpr auto&& await_transform(bzd::coroutine::impl::Suspend&& awaitable) noexcept { return bzd::move(awaitable); }
 	constexpr auto&& await_transform(bzd::coroutine::impl::Yield&& awaitable) noexcept { return bzd::move(awaitable); }
+	constexpr auto&& await_transform(bzd::coroutine::impl::YieldAndPropagateCancelation&& awaitable) noexcept
+	{
+		if (isCanceledOrTriggered())
+		{
+			::std::cout << "PROPAGATE!" << ::std::flush;
+			awaitable.token_.trigger();
+		}
+		return bzd::move(awaitable);
+	}
 	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutor&& awaitable) noexcept
 	{
 		awaitable.executor_ = &getExecutor();
@@ -123,7 +158,7 @@ public: // Await transform specializations
 	{
 		// Associate the executor of the caller with the new coroutine.
 		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
-		async.setExecutor(getExecutor());
+		propagateContextTo(async.getExecutable());
 		return bzd::move(async);
 	}
 
@@ -147,8 +182,7 @@ private:
 	template <class U>
 	friend class ::bzd::impl::Async;
 
-	bzd::coroutine::impl::coroutine_handle<> caller_{nullptr};
-	bzd::Optional<bzd::FunctionView<void(Executable&)>> onTerminateCallback_{};
+	bzd::Optional<bzd::FunctionView<void(void)>> onTerminateCallback_{};
 };
 
 } // namespace bzd::coroutine::impl

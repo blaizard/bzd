@@ -10,6 +10,8 @@
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
 
+#include <iostream>
+
 namespace bzd::impl {
 
 template <class T>
@@ -53,9 +55,9 @@ public: // constructor/destructor/assignments
 	}
 
 public:
-	/**
-	 * Cancel the current async and nested ones.
-	 */
+	/// Cancel the current async and nested ones.
+	///
+	/// This function is not thread safe and must be called on an async object non active.
 	constexpr void cancel() noexcept
 	{
 		if (handle_)
@@ -70,6 +72,10 @@ public:
 	 * Notifies if the async is completed.
 	 */
 	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
+
+	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
+
+	[[nodiscard]] constexpr bool isReadyOrCanceled() const noexcept { return isReady() || isCanceled(); }
 
 	/**
 	 * Get the current result. If the async is not terminated, an empty value is returned.
@@ -87,22 +93,12 @@ public:
 	{
 		if (handle_)
 		{
-			return bzd::move(handle_.promise().result_.valueMutable());
+			return bzd::move(handle_.promise().result_);
 		}
 		return nullopt;
 	}
 
-	void onTerminate(bzd::FunctionView<void(Executable&)> callback) noexcept { handle_.promise().onTerminateCallback_.emplace(callback); }
-
-	constexpr void cancelIfDifferent(const Executable& promise) noexcept
-	{
-		// TODO: fix potential bug if some of the coroutines are executed concurrently,
-		// calling cancel on the one running will probably create an UB.
-		if (handle_ && static_cast<Executable*>(&handle_.promise()) != &promise)
-		{
-			cancel();
-		}
-	}
+	void onTerminate(bzd::FunctionView<void(void)> callback) noexcept { handle_.promise().onTerminateCallback_.emplace(callback); }
 
 	/**
 	 * Detach the current async from its executor (if attached).
@@ -149,10 +145,12 @@ public:
 		return run(executor);
 	}
 
+	constexpr void setCancellationToken(interface::CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
+
 public: // coroutine specific
 	using promise_type = PromiseType;
 
-	constexpr bool await_ready() noexcept { return isReady(); }
+	constexpr bool await_ready() noexcept { return isReadyOrCanceled(); }
 
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
@@ -160,7 +158,7 @@ public: // coroutine specific
 		auto& promise = handle_.promise();
 
 		// To handle continuation
-		promise.caller_ = caller;
+		promise.caller_ = &caller.promise();
 
 		// Push the current handle to the executor.
 		promise.enqueue();
@@ -172,7 +170,7 @@ public: // coroutine specific
 
 	constexpr ResultType await_resume() noexcept { return bzd::move(moveResultOut().valueMutable()); }
 
-private:
+	// private:
 	friend bzd::coroutine::impl::Enqueue;
 
 	constexpr Executable& getExecutable() noexcept
@@ -220,7 +218,9 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	// Loop until all asyncs are ready
 	while (!(asyncs.isReady() && ...))
 	{
-		co_await yield();
+		// Suspend this coroutine now, it will re-enter once one of the pending task
+		// is completed.
+		co_await bzd::coroutine::impl::Suspend();
 	}
 
 	// Build the result and return it.
@@ -232,22 +232,34 @@ template <class... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
-	using Executable = bzd::coroutine::impl::Executable; // TODO: remove Executable here.
 
-	// Install callbacks on terminate.
-	// Note: the lifetime of the lambda is longer than the promises.
-	auto onTerminateCallback = [&asyncs...](Executable& promise) { (asyncs.cancelIfDifferent(promise), ...); };
+	bzd::Atomic<UInt8Type> flag{0};
+	bzd::interface::CancellationToken token{flag};
+	(asyncs.setCancellationToken(token), ...);
 
 	// Register on terminate callbacks
-	(asyncs.onTerminate(bzd::FunctionView<void(Executable&)>{onTerminateCallback}), ...);
+	// Note: the lifetime of the lambda is longer than the promises.
+	auto onTerminateCallback = [&token]() { token.trigger(); };
+	(asyncs.onTerminate(bzd::FunctionView<void(void)>{onTerminateCallback}), ...);
 
-	// Push all handles to the executor
+	// Push all handles to the executor.
 	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
 
-	// Loop until one async is ready, the others will be canceled.
-	while (!(asyncs.isReady() || ...))
+	// The first coroutine that complete will re-enter here.
+	co_await bzd::coroutine::impl::Suspend();
+
+	::std::cout << "BEFORE" << ::std::flush;
+
+	// Wait until no executors are processing cancelled coroutines.
+	// or wait for at least one iteration from all executors.
+	// or force execution of all these asyncs on the same executor.
+
+	// Loop until all asyncs are ready or cancelled.
+	while (!(asyncs.isReadyOrCanceled() && ...))
 	{
-		co_await yield();
+		::std::cout << "loop" << ::std::flush;
+		co_await bzd::coroutine::impl::YieldAndPropagateCancelation{token};
+		// co_await yield();
 	}
 
 	// Build the result and return it.

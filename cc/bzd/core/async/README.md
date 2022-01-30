@@ -1,11 +1,13 @@
 # Coroutines
 
-## Handle
+## Compiler Point of View
+
+### Handle
 
 The thing referred by `bzd::coroutine::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
 Thanks to this object you can, for example, resume the coroutine. The coroutine_handle is a templated type, where Promise type is its template argument.
 
-## Frame
+### Frame
 
 Coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = bzd::delay(10_ms);`
 
@@ -91,3 +93,5 @@ decltype(auto) get_awaiter(Awaitable&& awaitable)
 auto&& awaitable = get_awaitable(promise, static_cast<decltype(value)>(value));
 auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 ```
+
+## Async implementation
