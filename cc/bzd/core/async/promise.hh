@@ -82,7 +82,8 @@ private:
 
 		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
-			auto continuation = handle.promise().caller_;
+			auto& promise = handle.promise();
+			auto continuation = promise.caller_;
 			if (continuation)
 			{
 				// Enqueue the continuation for later use, it will be scheduled
@@ -93,6 +94,7 @@ private:
 				// different threads.
 				continuation->enqueue();
 			}
+
 			return bzd::coroutine::impl::noop_coroutine();
 		}
 

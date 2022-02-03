@@ -26,7 +26,7 @@ public: // Constructors
 	}
 
 	// Destructor
-	~ScopeGuard() noexcept
+	constexpr ~ScopeGuard() noexcept
 	{
 		if (cleanup_)
 		{

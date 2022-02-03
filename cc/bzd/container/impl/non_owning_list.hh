@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/result.hh"
@@ -7,7 +8,10 @@
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/test/inject_point.hh"
+#include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
+#include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/utility/ignore.hh"
 
 namespace bzd {
 enum class ListErrorType
@@ -32,6 +36,7 @@ template <class T>
 class NonOwningList
 {
 public:
+	using Self = NonOwningList<T>;
 	using ElementType = T;
 	using ElementPtrType = ElementType*;
 
@@ -300,6 +305,20 @@ public:
 		return nullresult;
 	}
 
+	/// Remove all elements associated with this list.
+	constexpr void clear() noexcept
+	{
+		while (true)
+		{
+			auto ptr = front_.next_.load();
+			if (ptr == &this->back_)
+			{
+				break;
+			}
+			bzd::ignore = pop(*ptr);
+		}
+	}
+
 protected:
 	/// Structure to return node information when found.
 	struct NodeFound
@@ -348,32 +367,32 @@ protected:
 	}
 
 protected:
-	[[nodiscard]] constexpr bool isDeletionMark(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr bool isDeletionMark(ElementPtrType node) noexcept
 	{
 		return (reinterpret_cast<IntPtrType>(node) & 3) == 1;
 	}
-	[[nodiscard]] constexpr bool isInsertionMark(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr bool isInsertionMark(ElementPtrType node) noexcept
 	{
 		return (reinterpret_cast<IntPtrType>(node) & 3) == 2;
 	}
-	[[nodiscard]] constexpr bool isWeakMark(ElementPtrType node) const noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
+	[[nodiscard]] static constexpr bool isWeakMark(ElementPtrType node) noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
 
-	[[nodiscard]] constexpr ElementPtrType setDeletionMark(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr ElementPtrType setDeletionMark(ElementPtrType node) noexcept
 	{
 		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x1);
 	}
 
-	[[nodiscard]] constexpr ElementPtrType setInsertionMark(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr ElementPtrType setInsertionMark(ElementPtrType node) noexcept
 	{
 		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x2);
 	}
 
-	[[nodiscard]] constexpr ElementPtrType setWeakMark(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr ElementPtrType setWeakMark(ElementPtrType node) noexcept
 	{
 		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x3);
 	}
 
-	[[nodiscard]] constexpr ElementPtrType removeMarks(ElementPtrType node) const noexcept
+	[[nodiscard]] static constexpr ElementPtrType removeMarks(ElementPtrType node) noexcept
 	{
 		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
 	}
@@ -458,7 +477,78 @@ template <class T>
 class NonOwningList : public bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>
 {
 public:
+	using Parent = bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>;
+
+public:
+	template <class U>
+	class NonOwningListIterator
+	{
+	public: // Traits
+		using Self = NonOwningListIterator<U>;
+		using Category = bzd::iterator::ForwardTag;
+		using IndexType = bzd::SizeType;
+		using DifferenceType = bzd::Int32Type;
+		using ValueType = U;
+
+	private: // Internal Traits.
+		using ElementType = typename Parent::ElementType;
+		using UnderlyingValuePtrType =
+			typeTraits::Conditional<typeTraits::isConst<ValueType>, typeTraits::AddConst<ElementType>, ElementType>*;
+
+	public:
+		constexpr NonOwningListIterator(UnderlyingValuePtrType ptr) noexcept : current_{ptr} {}
+
+	public: // Modifiers.
+		constexpr Self& operator++() noexcept
+		{
+			next();
+			return *this;
+		}
+
+		constexpr Self operator++(int) noexcept
+		{
+			Self it{*this};
+			++(*this);
+			return it;
+		}
+
+	public: // Comparators.
+		[[nodiscard]] constexpr bool operator==(const Self& other) const noexcept { return (current_ == other.current_); }
+		[[nodiscard]] constexpr bool operator!=(const Self& other) const noexcept { return !(other == *this); }
+
+	public: // Accessors.
+		[[nodiscard]] constexpr ValueType& operator*() const { return *static_cast<ValueType*>(current_); }
+		[[nodiscard]] constexpr ValueType* operator->() const { return static_cast<ValueType*>(current_); }
+
+	private:
+		constexpr void next() noexcept
+		{
+			auto nextRaw = current_->next_.load();
+			current_ = Parent::removeMarks(nextRaw);
+			bzd::assert::isTrue(current_);
+		}
+
+	private:
+		UnderlyingValuePtrType current_;
+	};
+
+public: // Traits.
+	using Iterator = NonOwningListIterator<T>;
+	using ConstIterator = NonOwningListIterator<typeTraits::AddConst<T>>;
+
+public:
 	using bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>::NonOwningList;
+
+	/// Return a begin iterator for this list.
+	///
+	/// The iterator is not thread safe unlike the rest of this class, therefore iteration
+	/// should be protected by a mutex.
+	[[nodiscard]] constexpr auto begin() noexcept { return ++Iterator{&this->front_}; }
+	[[nodiscard]] constexpr auto begin() const noexcept { return ++ConstIterator{&this->front_}; }
+
+	/// Return an end iterator for this list.
+	[[nodiscard]] constexpr auto end() noexcept { return Iterator{&this->back_}; }
+	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{&this->back_}; }
 
 	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
 	{

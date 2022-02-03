@@ -15,7 +15,6 @@ bzd_cc_library(
         ":forward",
         ":ignore",
         ":in_place",
-        ":lock_guard",
         ":max",
         ":min",
         ":move",
@@ -31,6 +30,7 @@ bzd_cc_library(
         "//cc/bzd/utility/format:integral",
         "//cc/bzd/utility/format:stream",
         "//cc/bzd/utility/random",
+        "//cc/bzd/utility/synchronization",
     ],
 )
 
@@ -143,19 +143,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
-    name = "lock_guard",
-    hdrs = [
-        "lock_guard.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":scope_guard",
-        "//cc/bzd/core/async",
-        "//cc/bzd/type_traits:invoke_result",
     ],
 )
 

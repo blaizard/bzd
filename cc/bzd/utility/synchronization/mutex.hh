@@ -19,11 +19,9 @@ public:
 public:
 	bzd::Async<> lock() noexcept
 	{
-		bzd::BoolType expected{false};
-		while (!acquired_.compareExchange(expected, true))
+		while (acquired_.exchange(true))
 		{
 			co_await bzd::async::yield();
-			expected = false;
 		}
 		co_return {};
 	}
