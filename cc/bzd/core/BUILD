@@ -9,7 +9,6 @@ bzd_cc_library(
         ":clock",
         ":delay",
         ":error",
-        ":mutex",
         ":print",
         ":units",
         "//cc/bzd/core/assert",
@@ -48,12 +47,12 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":mutex",
         "//cc/bzd/container:span",
         "//cc/bzd/container:spans",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
-        "//cc/bzd/utility:lock_guard",
+        "//cc/bzd/utility/synchronization:lock_guard",
+        "//cc/bzd/utility/synchronization:mutex",
     ],
 )
 
@@ -88,18 +87,6 @@ cc_library(
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:source_location",
         "//cc/bzd/utility/format",
-    ],
-)
-
-cc_library(
-    name = "mutex",
-    hdrs = [
-        "mutex.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:atomic",
     ],
 )
 

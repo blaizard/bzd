@@ -21,5 +21,8 @@ cc_library(
         "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility:scope_guard",
+        "//cc/bzd/utility/synchronization:spin_shared_mutex",
+        "//cc/bzd/utility/synchronization:sync_lock_guard",
     ],
 )

@@ -35,6 +35,12 @@ TEST(NonOwningList, simple)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(list.size(), 1U);
 
+		// Iterating through a list with 1 element.
+		for (const auto& elt : list)
+		{
+			EXPECT_EQ(elt.value_, 3U);
+		}
+
 		const auto result2 = elements[2].pop();
 		EXPECT_TRUE(result2);
 		EXPECT_EQ(list.size(), 0U);
@@ -42,5 +48,34 @@ TEST(NonOwningList, simple)
 		const auto result3 = elements[2].pop();
 		EXPECT_FALSE(result3);
 		EXPECT_EQ(list.size(), 0U);
+
+		// Iterating through a list with no elements.
+		for ([[maybe_unused]] const auto& elt : list)
+		{
+			EXPECT_FALSE(true);
+		}
+	}
+
+	{
+		for (int i = 9; i >= 0; --i)
+		{
+			const auto result = list.pushFront(elements[i]);
+			EXPECT_TRUE(result);
+		}
+		EXPECT_EQ(list.size(), 10U);
+
+		bzd::SizeType expected{1};
+		for (const auto& elt : list)
+		{
+			EXPECT_EQ(elt.value_, expected);
+			++expected;
+		}
+
+		expected = 1;
+		for (const auto& elt : static_cast<const decltype(list)&>(list))
+		{
+			EXPECT_EQ(elt.value_, expected);
+			++expected;
+		}
 	}
 }

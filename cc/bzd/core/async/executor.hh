@@ -7,6 +7,9 @@
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/utility/ignore.hh"
+#include "cc/bzd/utility/scope_guard.hh"
+#include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
+#include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
 #include <iostream>
 #include <type_traits>
@@ -20,38 +23,72 @@ template <class Executable>
 class Executor
 {
 public:
+	using TickType = UInt32Type;
+
+public:
 	constexpr Executor() = default;
+
+	constexpr ~Executor()
+	{
+		// Clear the complete queue.
+		queue_.clear();
+	}
+
+public: // Statistics.
+	[[nodiscard]] constexpr SizeType getQueueCount() const noexcept { return queue_.size(); }
+	[[nodiscard]] constexpr SizeType getRunningCount() const noexcept { return running_.size(); }
+	[[nodiscard]] constexpr SizeType getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
+
+public:
+	/// A unique counter with no units that increments after each scheduling.
+	[[nodiscard]] static TickType getNextTick() noexcept
+	{
+		static Atomic<TickType> tick{0};
+
+		// Increase the counter by ensuring the value zero is never set.
+		// This is a special value that is used to avoid dead lock.
+		TickType current;
+		do
+		{
+			current = (++tick).get();
+		} while (current == 0);
+		return current;
+	}
+
+	/// Wait for the next scheduler iteration for all running schedulers.
+	constexpr void waitForNextTick() noexcept
+	{
+		const auto currentTick{getNextTick()};
+		auto scope = makeSyncLockGuard(runningMutex_);
+		for (const auto& element : running_)
+		{
+			// Keeping track of the previous tick is needed here to handle cases where the counter wraps.
+			auto tick = element.getTick();
+			auto previousTick = tick;
+			while (tick < currentTick && previousTick != tick && !element.isCompleted())
+			{
+				// wait
+				previousTick = tick;
+				tick = element.getTick();
+			}
+		}
+	}
 
 	/// Push a new workload to the queue.
 	///
 	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
 	///
 	/// \param executable The workload to be executed.
-	constexpr void push(Executable& exectuable) noexcept
-	{
-		// bzd::ignore = running_.pop(exectuable);
-		bzd::ignore = queue_.pushFront(exectuable);
-	}
+	constexpr void push(Executable& exectuable) noexcept { bzd::ignore = queue_.pushFront(exectuable); }
 
 	/// Run all the workload currently in the queue.
 	///
 	/// Drain all workloads and exit only when the queue is empty.
 	void run()
 	{
-		++countActive_;
-		// Look for the first free identifier
-		SizeType identifier{0};
-		for (auto& pc : pc_)
-		{
-			SizeType expected{0};
-			if (pc.compareExchange(expected, 1))
-			{
-				break;
-			}
-			++identifier;
-		}
-		bzd::assert::isTrue(identifier < pc_.size(), "Too many executors run with this instance.");
-		auto& pc = pc_[identifier];
+		// Storage for information related to the this running instance.
+		RunningInfo info{};
+		auto scope = registerInfo(info);
 
 		// Loop until there are still elements
 		while (!queue_.empty())
@@ -68,20 +105,76 @@ public:
 				}
 				else
 				{
-					// bzd::ignore = running_.pushFront(executable);
 					executable.resume();
 				}
 			}
-			++pc;
+			info.updateTick();
 		}
-
-		// Free this identifier
-		pc.store(0);
-		--countActive_;
+		// Use to prevent a potential dead lock here if waitForNextTick is called at this moment
+		// in another thread, scope will not be able to acquire the lock and the tick will
+		// remain the same.
+		info.markAsCompleted();
 	}
 
 private:
-	bzd::Optional<Executable&> pop() noexcept
+	class RunningInfo : public bzd::NonOwningListElement</*multi container*/ false>
+	{
+	public: // Traits.
+		using IdType = UInt32Type;
+
+	public:
+		constexpr RunningInfo() noexcept : id_{makeUId()} {}
+
+		[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
+		[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
+
+		constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
+		constexpr void markAsCompleted() noexcept { tick_.store(0); }
+		constexpr auto isCompleted() const noexcept { return (tick_.load() == 0); }
+
+	private:
+		[[nodiscard]] static IdType makeUId() noexcept
+		{
+			static Atomic<IdType> id{0};
+			return (++id).get();
+		}
+
+	private:
+		const IdType id_;
+		Atomic<TickType> tick_{0};
+	};
+
+private:
+	/// Create a scope for the running info, it uses RAII pattern to control the lifetime of the info.
+	///
+	/// \param info The information structure to be attached.
+	/// \return A scope controlling the lifetime of this information.
+	[[nodiscard]] auto registerInfo(RunningInfo& info) noexcept
+	{
+		{
+			auto scope = makeSyncSharedLockGuard(runningMutex_);
+			const auto result = running_.pushFront(info);
+			bzd::assert::isTrue(result.hasValue());
+		}
+
+		{
+			// Update the maximum of scheduler running concurrently.
+			SizeType maybeMax, expected;
+			do
+			{
+				maybeMax = running_.size();
+				expected = maxRunningCount_.load();
+			} while (maybeMax > expected && !maxRunningCount_.compareExchange(expected, maybeMax));
+		}
+
+		return ScopeGuard{[this, &info]() {
+			auto scope = makeSyncSharedLockGuard(runningMutex_);
+			const auto result = running_.pop(info);
+			bzd::assert::isTrue(result.hasValue());
+		}};
+	}
+
+	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
 		auto executable = queue_.back();
 		if (executable)
@@ -103,12 +196,14 @@ private:
 	}
 
 private:
+	/// List of pending workload waiting to be scheduled.
 	bzd::NonOwningList<Executable> queue_{};
-	// bzd::NonOwningList<Executable> running_{};
-	/// The number of instances using this executor and currently running.
-	bzd::Atomic<SizeType> countActive_{};
-	/// Program counter for the different active executors running with this instance.
-	bzd::Array<bzd::Atomic<SizeType>, 10> pc_{};
+	/// Keep information about the current runnning scheduler.
+	bzd::NonOwningList<RunningInfo> running_{};
+	/// Maxium concurrent scheduler running at the same time.
+	bzd::Atomic<SizeType> maxRunningCount_{0};
+	/// Mutex to protect access over the running queue.
+	bzd::SpinSharedMutex runningMutex_;
 };
 
 } // namespace bzd
@@ -148,6 +243,12 @@ public:
 	using Self = Executable<T>;
 
 public:
+	~Executable()
+	{
+		// Detach the executable from any of the list it belongs to.
+		bzd::ignore = pop();
+	}
+
 	constexpr void enqueue() noexcept
 	{
 		bzd::assert::isTrue(executor_);

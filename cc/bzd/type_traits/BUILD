@@ -49,6 +49,7 @@ bzd_cc_library(
         ":is_union",
         ":is_void",
         ":is_volatile",
+        ":lockable",
         ":remove_const",
         ":remove_cv",
         ":remove_cvref",
@@ -568,6 +569,14 @@ cc_library(
         ":false_type",
         ":true_type",
     ],
+)
+
+cc_library(
+    name = "lockable",
+    hdrs = [
+        "lockable.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
