@@ -6,11 +6,9 @@
 
 namespace bzd::iterator {
 template <class Iterator>
+requires concepts::forwardIterator<Iterator>
 [[nodiscard]] constexpr auto distance(Iterator first, Iterator last) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with distance.");
-	static_assert(isCategory<Iterator, ForwardTag>, "The iterator must be a forward iterator.");
-
 	using DifferenceType = typename Traits<Iterator>::DifferenceType;
 
 	if constexpr (isCategory<Iterator, RandomAccessTag>)

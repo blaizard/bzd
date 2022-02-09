@@ -13,12 +13,9 @@ namespace bzd::algorithm {
 ///
 /// \return Iterator in the destination range, pointing past the last element copied if count>0 or result otherwise.
 template <class InputIt, class OutputIt>
+requires concepts::forwardIterator<InputIt> && concepts::forwardIterator<OutputIt>
 constexpr OutputIt copyN(InputIt first, const SizeType count, OutputIt result)
 {
-	static_assert(typeTraits::isIterator<InputIt> && typeTraits::isIterator<OutputIt>, "Only iterators can be used with copyN.");
-	static_assert(iterator::isCategory<InputIt, iterator::ForwardTag>, "The input iterator must be a forward iterator.");
-	static_assert(iterator::isCategory<OutputIt, iterator::ForwardTag>, "The output iterator must be a forward iterator.");
-
 	if (count > 0)
 	{
 		*result++ = *first;

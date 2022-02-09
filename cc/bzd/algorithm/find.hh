@@ -10,8 +10,9 @@ namespace bzd::algorithm {
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] value The value to be searched.
 template <class Iterator, class T>
+requires concepts::forwardIterator<Iterator>
 [[nodiscard]] constexpr Iterator find(Iterator first, Iterator last, const T& value) noexcept
 {
-	return bzd::algorithm::find_if(first, last, [&value](const auto& item) { return item == value; });
+	return bzd::algorithm::findIf(first, last, [&value](const auto& item) { return item == value; });
 }
 } // namespace bzd::algorithm

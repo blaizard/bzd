@@ -6,11 +6,9 @@
 
 namespace bzd::iterator {
 template <class Iterator, class Distance>
+requires concepts::inputIterator<Iterator>
 constexpr void advance(Iterator& it, const Distance n) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with advance.");
-	static_assert(isCategory<Iterator, InputTag>, "The iterator must be an input iterator.");
-
 	using DifferenceType = typename Traits<Iterator>::DifferenceType;
 
 	auto dist = static_cast<DifferenceType>(n);

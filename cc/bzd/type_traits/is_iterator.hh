@@ -29,3 +29,28 @@ template <class T>
 CONCEPT isIterator = impl::IsIterator<T>::value;
 
 }
+
+namespace bzd::concepts {
+
+template <class T>
+concept iterator = typeTraits::isIterator<T>;
+
+template <class T>
+concept inputIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::InputTag>;
+
+template <class T>
+concept outputIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::OutputTag>;
+
+template <class T>
+concept forwardIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::ForwardTag>;
+
+template <class T>
+concept bidirectionalIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::BidirectionalTag>;
+
+template <class T>
+concept randomAccessIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::RandomAccessTag>;
+
+template <class T>
+concept contiguousIterator = iterator<T> && bzd::iterator::isCategory<T, bzd::iterator::ContiguousTag>;
+
+} // namespace bzd::concepts

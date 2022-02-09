@@ -16,11 +16,9 @@ namespace bzd::algorithm {
 ///
 /// \return The iterator pointing to the element if the value is found, \c last otherwise.
 template <class Iterator, class T, class Compare = bzd::Less<typename iterator::Traits<Iterator>::ValueType>>
+requires concepts::forwardIterator<Iterator>
 [[nodiscard]] constexpr Iterator binarySearch(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with binarySearch.");
-	static_assert(iterator::isCategory<Iterator, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
 	first = bzd::algorithm::lowerBound(first, last, value, comparison);
 	if ((first != last) && !(comparison(value, *first)))
 	{

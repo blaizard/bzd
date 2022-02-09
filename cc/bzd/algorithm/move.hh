@@ -15,12 +15,9 @@ namespace bzd::algorithm {
 ///
 /// \return Output iterator to the element past the last element moved (result + (last - first)).
 template <class Iterator1, class Iterator2>
+requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
 constexpr Iterator2 move(Iterator1 first, Iterator1 last, Iterator2 result) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator1> && typeTraits::isIterator<Iterator2>, "Only iterators can be used with move.");
-	static_assert(iterator::isCategory<Iterator1, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-	static_assert(iterator::isCategory<Iterator2, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
 	while (first != last)
 	{
 		*result++ = bzd::move(*first++);

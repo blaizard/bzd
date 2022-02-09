@@ -74,7 +74,7 @@ public: // API.
 
 					// Find the element that matches from the size point of view. There must be only one
 					// as map cannot hold duplicated keys.
-					first = bzd::algorithm::find_if(first, last, [&index](const Element& elt) { return (elt.first.size() == index); });
+					first = bzd::algorithm::findIf(first, last, [&index](const Element& elt) { return (elt.first.size() == index); });
 					last = (first == last) ? first : (first + 1);
 				}
 				else

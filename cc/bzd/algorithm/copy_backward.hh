@@ -13,12 +13,9 @@ namespace bzd::algorithm {
 ///
 /// \return Output iterator to the element in the destination range, one past the last element copied.
 template <class InputIt, class OutputIt>
+requires concepts::bidirectionalIterator<InputIt> && concepts::bidirectionalIterator<OutputIt>
 constexpr OutputIt copyBackward(InputIt first, InputIt last, OutputIt result) noexcept
 {
-	static_assert(typeTraits::isIterator<InputIt> && typeTraits::isIterator<OutputIt>, "Only iterators can be used with copyBackward.");
-	static_assert(iterator::isCategory<InputIt, iterator::BidirectionalTag>, "The input iterator must be a bidirectional iterator.");
-	static_assert(iterator::isCategory<OutputIt, iterator::BidirectionalTag>, "The output iterator must be a bidirectional iterator.");
-
 	while (first != last)
 	{
 		*(--result) = *(--last);

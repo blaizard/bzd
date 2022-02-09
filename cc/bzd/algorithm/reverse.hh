@@ -10,11 +10,9 @@ namespace bzd::algorithm {
 /// \param[in,out] first The beginning of the range of elements to be reversed.
 /// \param[in,out] last The ending of the range of elements to be reversed.
 template <class Iterator>
+requires concepts::bidirectionalIterator<Iterator>
 constexpr void reverse(Iterator first, Iterator last)
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with reverse.");
-	static_assert(iterator::isCategory<Iterator, iterator::BidirectionalTag>, "The iterator must be a bidirectional iterator.");
-
 	while ((first != last) && (first != --last))
 	{
 		bzd::swap(*first++, *last);
