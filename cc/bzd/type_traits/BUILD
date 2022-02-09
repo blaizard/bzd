@@ -50,6 +50,7 @@ bzd_cc_library(
         ":is_void",
         ":is_volatile",
         ":lockable",
+        ":range",
         ":remove_const",
         ":remove_cv",
         ":remove_cvref",
@@ -577,6 +578,18 @@ cc_library(
         "lockable.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "range",
+    hdrs = [
+        "range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container/iterator:begin",
+        "//cc/bzd/container/iterator:end",
+    ],
 )
 
 cc_library(

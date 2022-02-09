@@ -29,6 +29,17 @@ cc_library(
 )
 
 cc_library(
+    name = "begin",
+    hdrs = [
+        "begin.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
     name = "container_of_iterables",
     hdrs = [
         "container_of_iterables.hh",
@@ -61,6 +72,17 @@ cc_library(
     deps = [
         ":traits",
         "//cc/bzd/type_traits:is_iterator",
+    ],
+)
+
+cc_library(
+    name = "end",
+    hdrs = [
+        "end.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
     ],
 )
 

@@ -64,7 +64,7 @@ public: // API.
 			{
 				buffer_.consume(1);
 
-				if (bzd::algorithm::find(separators_.begin(), separators_.end(), c) != separators_.end())
+				if (bzd::algorithm::find(separators_, c) != separators_.end())
 				{
 					// Ignore separators at the begining of the data.
 					if (!index)

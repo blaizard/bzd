@@ -4,7 +4,9 @@
 #include "cc/bzd/algorithm/upper_bound.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
 
@@ -26,6 +28,15 @@ constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Iterator las
 {
 	return bzd::makeTuple(bzd::algorithm::lowerBound(first, last, value, comparison),
 						  bzd::algorithm::upperBound(first, last, value, comparison));
+}
+
+/// \copydoc equalRange
+/// \param[in] first The partially-ordered range to examine.
+template <class Range, class... Args>
+requires concepts::range<Range>
+constexpr auto equalRange(Range range, Args&&... args)
+{
+	return equalRange(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

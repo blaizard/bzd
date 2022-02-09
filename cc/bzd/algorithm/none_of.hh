@@ -2,6 +2,8 @@
 
 #include "cc/bzd/algorithm/find_if.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
 
@@ -16,4 +18,14 @@ requires concepts::forwardIterator<Iterator>
 {
 	return (bzd::algorithm::findIf(first, last, predicate) == last);
 }
+
+/// \copydoc noneOf
+/// \param[in] range The range of elements to examine.
+template <class Range, class... Args>
+requires concepts::range<Range>
+[[nodiscard]] constexpr auto noneOf(Range range, Args&&... args) noexcept
+{
+	return noneOf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+}
+
 } // namespace bzd::algorithm
