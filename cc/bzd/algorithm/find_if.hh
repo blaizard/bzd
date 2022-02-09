@@ -10,11 +10,9 @@ namespace bzd::algorithm {
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] predicate The unary predicate which returns \c ​true for the required element.
 template <class Iterator, class UnaryPredicate>
-[[nodiscard]] constexpr Iterator find_if(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
+requires concepts::forwardIterator<Iterator>
+[[nodiscard]] constexpr Iterator findIf(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with find_if.");
-	static_assert(iterator::isCategory<Iterator, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
 	for (; first != last; ++first)
 	{
 		if (predicate(*first))

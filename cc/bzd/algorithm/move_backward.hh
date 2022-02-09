@@ -14,12 +14,10 @@ namespace bzd::algorithm {
 ///
 /// \return Iterator in the destination range, pointing at the last element moved.
 template <class Iterator1, class Iterator2>
+requires concepts::bidirectionalIterator<Iterator1> &&
+	concepts::bidirectionalIterator<Iterator2>
 constexpr Iterator2 moveBackward(Iterator1 first, Iterator1 last, Iterator2 result) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator1> && typeTraits::isIterator<Iterator2>, "Only iterators can be used with moveBackward.");
-	static_assert(iterator::isCategory<Iterator1, iterator::BidirectionalTag>, "The iterator must be a bidirectional iterator.");
-	static_assert(iterator::isCategory<Iterator2, iterator::BidirectionalTag>, "The iterator must be a bidirectional iterator.");
-
 	while (first != last)
 	{
 		*(--result) = bzd::move(*(--last));

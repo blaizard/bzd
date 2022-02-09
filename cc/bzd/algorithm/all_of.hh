@@ -11,11 +11,9 @@ namespace bzd::algorithm {
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] predicate The unary predicate.
 template <class Iterator, class UnaryPredicate>
-[[nodiscard]] constexpr bzd::BoolType all_of(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
+requires concepts::forwardIterator<Iterator>
+[[nodiscard]] constexpr bzd::BoolType allOf(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with all_of.");
-	static_assert(iterator::isCategory<Iterator, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
-	return (bzd::algorithm::find_if_not(first, last, predicate) == last);
+	return (bzd::algorithm::findIfNot(first, last, predicate) == last);
 }
 } // namespace bzd::algorithm

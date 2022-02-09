@@ -17,11 +17,9 @@ namespace bzd::algorithm {
 ///
 /// \return Iterator pointing to the first element that is not less than value, or last if no such element is found.
 template <class Iterator, class T, class Compare = bzd::Less<typename iterator::Traits<Iterator>::ValueType>>
+requires concepts::forwardIterator<Iterator>
 constexpr Iterator lowerBound(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with lowerBound.");
-	static_assert(iterator::isCategory<Iterator, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
 	using DifferenceType = typename bzd::iterator::Traits<Iterator>::DifferenceType;
 
 	Iterator it;

@@ -46,11 +46,9 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 /// \param[in] comparison Comparison function object which returns ​true if the first argument is less than (i.e. is ordered before) the
 /// second.
 template <class Iterator, class Compare = bzd::Less<typename iterator::Traits<Iterator>::ValueType>>
+requires concepts::randomAccessIterator<Iterator>
 constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{}) noexcept
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with sort.");
-	static_assert(iterator::isCategory<Iterator, iterator::RandomAccessTag>, "The iterator must be a random access iterator.");
-
 	const auto size = bzd::iterator::distance(first, last);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
 

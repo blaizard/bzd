@@ -21,11 +21,9 @@ namespace bzd::algorithm {
 /// If there are no elements not less than value, last is returned as the first element. Similarly if there are no elements
 /// greater than value, last is returned as the second element.
 template <class Iterator, class T, class Compare = bzd::Less<typename iterator::Traits<Iterator>::ValueType>>
+requires concepts::forwardIterator<Iterator>
 constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
 {
-	static_assert(typeTraits::isIterator<Iterator>, "Only iterators can be used with lowerBound.");
-	static_assert(iterator::isCategory<Iterator, iterator::ForwardTag>, "The iterator must be a forward iterator.");
-
 	return bzd::makeTuple(bzd::algorithm::lowerBound(first, last, value, comparison),
 						  bzd::algorithm::upperBound(first, last, value, comparison));
 }

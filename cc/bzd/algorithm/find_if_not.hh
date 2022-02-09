@@ -10,8 +10,9 @@ namespace bzd::algorithm {
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] predicate The unary predicate which returns \c false for the required element.
 template <class Iterator, class UnaryPredicate>
-[[nodiscard]] constexpr Iterator find_if_not(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
+requires concepts::forwardIterator<Iterator>
+[[nodiscard]] constexpr Iterator findIfNot(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
 {
-	return bzd::algorithm::find_if(first, last, !predicate);
+	return bzd::algorithm::findIf(first, last, !predicate);
 }
 } // namespace bzd::algorithm
