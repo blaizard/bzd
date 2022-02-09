@@ -2,7 +2,9 @@
 
 #include "cc/bzd/type_traits/is_iterator.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {
@@ -38,4 +40,15 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 
 	return (first1 == last1) && (first2 != last2);
 }
+
+/// \copydoc lexicographicalCompare
+/// \param[in] range1 The first range of elements to examine
+/// \param[in] range2 The second range of elements to examine
+template <class Range1, class Range2, class... Args>
+requires concepts::range<Range1> && concepts::range<Range2>
+[[nodiscard]] constexpr auto lexicographicalCompare(Range1 range1, Range2 range2, Args&&... args)
+{
+	return lexicographicalCompare(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
+}
+
 } // namespace bzd::algorithm

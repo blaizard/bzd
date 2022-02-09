@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::algorithm {
@@ -24,4 +25,15 @@ constexpr Iterator2 move(Iterator1 first, Iterator1 last, Iterator2 result) noex
 	}
 	return result;
 }
+
+/// \copydoc move
+/// \param[in] range1 The first range of elements to be moved.
+/// \param[out] range2 The second range of elements to moved to.
+template <class Range1, class Range2>
+requires concepts::range<Range1> && concepts::range<Range2>
+constexpr auto move(Range1 range1, Range2 range2) noexcept
+{
+	return move(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
+}
+
 } // namespace bzd::algorithm

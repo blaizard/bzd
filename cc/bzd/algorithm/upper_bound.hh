@@ -3,7 +3,9 @@
 #include "cc/bzd/container/iterator/advance.hh"
 #include "cc/bzd/container/iterator/distance.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
 
@@ -42,6 +44,15 @@ constexpr Iterator upperBound(Iterator first, Iterator last, const T& value, Com
 		}
 	}
 	return first;
+}
+
+/// \copydoc upperBound
+/// \param[in,out] range The partially-ordered range to examine.
+template <class Range, class... Args>
+requires concepts::range<Range>
+constexpr auto upperBound(Range range, Args&&... args)
+{
+	return upperBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

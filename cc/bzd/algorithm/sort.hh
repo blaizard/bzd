@@ -2,8 +2,10 @@
 
 #include "cc/bzd/container/iterator/distance.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {
@@ -83,6 +85,15 @@ constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{
 
 		} while (index < i);
 	}
+}
+
+/// \copydoc sort
+/// \param[in,out] range The brange of elements to be sorted.
+template <class Range, class... Args>
+requires concepts::range<Range>
+constexpr void sort(Range range, Args&&... args) noexcept
+{
+	sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

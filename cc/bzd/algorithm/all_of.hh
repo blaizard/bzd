@@ -2,6 +2,7 @@
 
 #include "cc/bzd/algorithm/find_if_not.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::algorithm {
 
@@ -16,4 +17,14 @@ requires concepts::forwardIterator<Iterator>
 {
 	return (bzd::algorithm::findIfNot(first, last, predicate) == last);
 }
+
+/// \copydoc allOf
+/// \param[in] range The range of elements to examine.
+template <class Range, class UnaryPredicate>
+requires concepts::range<Range>
+[[nodiscard]] constexpr auto allOf(Range range, UnaryPredicate predicate) noexcept
+{
+	return allOf(bzd::begin(range), bzd::end(range), predicate);
+}
+
 } // namespace bzd::algorithm

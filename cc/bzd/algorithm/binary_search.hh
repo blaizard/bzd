@@ -2,7 +2,9 @@
 
 #include "cc/bzd/algorithm/lower_bound.hh"
 #include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
 
@@ -26,6 +28,15 @@ requires concepts::forwardIterator<Iterator>
 	}
 
 	return last;
+}
+
+/// \copydoc binarySearch
+/// \param[in] range The range of elements to examine.
+template <class Range, class... Args>
+requires concepts::range<Range>
+[[nodiscard]] constexpr auto binarySearch(Range range, Args&&... args)
+{
+	return binarySearch(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm
