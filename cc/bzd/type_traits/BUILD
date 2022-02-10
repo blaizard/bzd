@@ -15,6 +15,7 @@ bzd_cc_library(
         ":conditional",
         ":decay",
         ":declval",
+        ":derived_from",
         ":enable_if",
         ":false_type",
         ":first_type",
@@ -33,7 +34,6 @@ bzd_cc_library(
         ":is_floating_point",
         ":is_function",
         ":is_integral",
-        ":is_iterator",
         ":is_lvalue_reference",
         ":is_pointer",
         ":is_reference",
@@ -50,7 +50,6 @@ bzd_cc_library(
         ":is_void",
         ":is_volatile",
         ":lockable",
-        ":range",
         ":remove_const",
         ":remove_cv",
         ":remove_cvref",
@@ -60,6 +59,8 @@ bzd_cc_library(
         ":remove_volatile",
         ":true_type",
         ":void_type",
+        "//cc/bzd/type_traits/iterator",
+        "//cc/bzd/type_traits/range",
     ],
 )
 
@@ -164,6 +165,18 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":add_rvalue_reference",
+    ],
+)
+
+cc_library(
+    name = "derived_from",
+    hdrs = [
+        "derived_from.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_base_of",
+        ":is_convertible",
     ],
 )
 
@@ -390,21 +403,6 @@ cc_library(
 )
 
 cc_library(
-    name = "is_iterator",
-    hdrs = [
-        "is_iterator.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":false_type",
-        ":true_type",
-        ":void_type",
-        "//cc/bzd/container/iterator:traits",
-        "//cc/bzd/utility:concept",
-    ],
-)
-
-cc_library(
     name = "is_lvalue_reference",
     hdrs = [
         "is_lvalue_reference.hh",
@@ -578,18 +576,6 @@ cc_library(
         "lockable.hh",
     ],
     visibility = ["//visibility:public"],
-)
-
-cc_library(
-    name = "range",
-    hdrs = [
-        "range.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container/iterator:begin",
-        "//cc/bzd/container/iterator:end",
-    ],
 )
 
 cc_library(

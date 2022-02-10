@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/algorithm/find_if_not.hh"
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 
 namespace bzd::algorithm {
 
@@ -21,7 +21,7 @@ requires concepts::forwardIterator<Iterator>
 /// \copydoc anyOf
 /// \param[in] range The range of elements to examine.
 template <class Range, class UnaryPredicate>
-requires concepts::range<Range>
+requires concepts::forwardRange<Range>
 [[nodiscard]] constexpr auto anyOf(Range range, UnaryPredicate predicate) noexcept
 {
 	return anyOf(bzd::begin(range), bzd::end(range), predicate);

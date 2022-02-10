@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/algorithm/copy_n.hh"
-#include "cc/bzd/container/iterator/distance.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/iterator/distance.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/min.hh"

@@ -14,13 +14,13 @@ concept end = requires(T t)
 
 template <class T>
 requires concepts::end<T>
-constexpr auto end(T& t)
+[[nodiscard]] constexpr auto end(T& t)
 {
 	return t.end();
 }
 
 template <class T, SizeType n>
-constexpr T* end(T (&arr)[n])
+[[nodiscard]] constexpr T* end(T (&arr)[n])
 {
 	return arr + n;
 }

@@ -13,27 +13,27 @@ TEST(BinarySearch, Base)
 	}
 
 	{
-		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
+		const auto it = bzd::algorithm::binarySearch(array, 0);
 		EXPECT_EQ(*it, 0);
 	}
 
 	{
-		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 4);
+		const auto it = bzd::algorithm::binarySearch(array, 4);
 		EXPECT_EQ(it, array.end());
 	}
 
 	{
-		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 5);
+		const auto it = bzd::algorithm::binarySearch(array, 5);
 		EXPECT_EQ(*it, 5);
 	}
 
 	{
-		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), -23);
+		const auto it = bzd::algorithm::binarySearch(array, -23);
 		EXPECT_EQ(it, array.end());
 	}
 
 	{
-		const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 35);
+		const auto it = bzd::algorithm::binarySearch(array, 35);
 		EXPECT_EQ(it, array.end());
 	}
 }

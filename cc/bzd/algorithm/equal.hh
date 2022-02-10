@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/utility/comparison/equal_to.hh"
 #include "cc/bzd/utility/forward.hh"
 
@@ -16,15 +16,16 @@ namespace bzd::algorithm {
 /// \param[in] predicate The binary predicate which returns ​true if the elements should be treated as equal.
 ///
 /// \return If the elements in the two ranges are equal, returns true. Otherwise returns false.
-template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo<typename iterator::Traits<Iterator1>::ValueType>>
+template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
 requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
 [[nodiscard]] constexpr bzd::BoolType equal(Iterator1 first1,
 											Iterator1 last1,
 											Iterator2 first2,
 											BinaryPredicate predicate = BinaryPredicate{})
 {
-	static_assert(typeTraits::isSame<typename iterator::Traits<Iterator1>::ValueType, typename iterator::Traits<Iterator2>::ValueType>,
-				  "Value types of both iterators must match.");
+	static_assert(
+		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
+		"Value types of both iterators must match.");
 
 	for (; first1 != last1; ++first1, ++first2)
 	{
@@ -41,7 +42,7 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 /// \param[in] range1 The first range of elements to compare.
 /// \param[in] range2 The second range of elements to compare.
 template <class Range1, class Range2, class... Args>
-requires concepts::range<Range1> && concepts::range<Range2>
+requires concepts::forwardRange<Range1> && concepts::forwardRange<Range2>
 [[nodiscard]] constexpr auto equal(Range1 range1, Range2 range2, Args&&... args)
 {
 	return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);

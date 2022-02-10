@@ -26,3 +26,8 @@ template <class T>
 inline constexpr bool isPointer = IsPointer<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T>
+concept pointer = bzd::typeTraits::isPointer<T>;
+}

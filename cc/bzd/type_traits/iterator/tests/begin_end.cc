@@ -1,7 +1,7 @@
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/iterator/begin.hh"
-#include "cc/bzd/container/iterator/end.hh"
 #include "cc/bzd/test/test.hh"
+#include "cc/bzd/type_traits/iterator/begin.hh"
+#include "cc/bzd/type_traits/iterator/end.hh"
 
 TEST(IteratorBegin, array)
 {

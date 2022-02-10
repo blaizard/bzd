@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::algorithm {
@@ -29,7 +29,7 @@ constexpr Iterator2 moveBackward(Iterator1 first, Iterator1 last, Iterator2 resu
 /// \param[in] range1 The first range of elements to be moved.
 /// \param[out] range2 The second range of elements to moved to.
 template <class Range1, class Range2>
-requires concepts::range<Range1> && concepts::range<Range2>
+requires concepts::bidirectionalRange<Range1> && concepts::bidirectionalRange<Range2>
 constexpr auto moveBackward(Range1 range1, Range2 range2) noexcept
 {
 	return moveBackward(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));

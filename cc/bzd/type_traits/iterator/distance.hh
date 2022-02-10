@@ -1,17 +1,16 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/is_iterator.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
 
-namespace bzd::iterator {
+namespace bzd {
 template <class Iterator>
 requires concepts::forwardIterator<Iterator>
 [[nodiscard]] constexpr auto distance(Iterator first, Iterator last) noexcept
 {
-	using DifferenceType = typename Traits<Iterator>::DifferenceType;
+	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
 
-	if constexpr (isCategory<Iterator, RandomAccessTag>)
+	if constexpr (concepts::randomAccessIterator<Iterator>)
 	{
 		return static_cast<DifferenceType>(last - first);
 	}
@@ -26,4 +25,4 @@ requires concepts::forwardIterator<Iterator>
 		return result;
 	}
 }
-} // namespace bzd::iterator
+} // namespace bzd

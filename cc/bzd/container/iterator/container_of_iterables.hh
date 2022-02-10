@@ -1,17 +1,17 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
 
 namespace bzd::iterator {
 
 template <class Iterator>
-class ContainerOfIterables : public Iterator
+class ContainerOfIterables : public typeTraits::IteratorBase
 {
 public: // Traits.
 	using Self = ContainerOfIterables<Iterator>;
-	using Category = ForwardTag;
+	using Category = typeTraits::ForwardTag;
 	using ContainerValueType = typename Iterator::ValueType;
 	using NestedIterator = typename ContainerValueType::Iterator;
 	using IndexType = typename NestedIterator::IndexType;
