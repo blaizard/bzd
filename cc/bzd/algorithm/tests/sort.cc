@@ -32,7 +32,7 @@ TEST(Sort, CustomComparator)
 		test.fillRandom(array);
 
 		// Sort.
-		bzd::algorithm::sort(array.begin(), array.end(), bzd::Greater<bzd::UInt32Type>{});
+		bzd::algorithm::sort(array, bzd::Greater<bzd::UInt32Type>{});
 
 		// Verify.
 		bzd::UInt32Type previous = bzd::NumericLimits<bzd::UInt32Type>::max();

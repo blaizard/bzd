@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
@@ -24,7 +24,7 @@ constexpr void fill(Iterator first, Iterator last, const T& value)
 /// \copydoc fill
 /// \param[in,out] range The range of elements to modify.
 template <class Range, class... Args>
-requires concepts::range<Range>
+requires concepts::forwardRange<Range>
 constexpr void fill(Range range, Args&&... args)
 {
 	fill(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

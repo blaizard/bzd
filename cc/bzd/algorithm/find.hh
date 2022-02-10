@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cc/bzd/algorithm/find_if.hh"
-#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
@@ -21,7 +20,7 @@ requires concepts::forwardIterator<Iterator>
 /// \copydoc find
 /// \param[in,out] range The range of elements to examine.
 template <class Range, class... Args>
-requires concepts::range<Range>
+requires concepts::forwardRange<Range>
 constexpr auto find(Range range, Args&&... args)
 {
 	return find(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 
 namespace bzd::algorithm {
 
@@ -27,7 +27,7 @@ constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 template <class InputRange, class OutputRange>
-requires concepts::range<InputRange> && concepts::range<OutputRange>
+requires concepts::forwardRange<InputRange> && concepts::forwardRange<OutputRange>
 constexpr auto copy(InputRange input, OutputRange output)
 {
 	return copy(bzd::begin(input), bzd::end(input), bzd::begin(output));

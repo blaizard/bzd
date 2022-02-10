@@ -1,14 +1,15 @@
 #pragma once
 
+#include "cc/bzd/type_traits/derived_from.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/type_traits/remove_pointer.hh"
 #include "cc/bzd/utility/concept.hh"
 
-namespace bzd::iterator {
+namespace bzd::typeTraits {
 
 /// Base class for all iterators.
-struct Iterator
+struct IteratorBase
 {
 };
 
@@ -45,11 +46,12 @@ struct ContiguousTag : public RandomAccessTag
 {
 };
 
-template <class T, class = void>
-struct Traits;
+template <class T>
+struct Iterator;
 
 template <class T>
-struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isBaseOf<Iterator, T>)>
+requires concepts::derivedFrom<T, IteratorBase>
+struct Iterator<T>
 {
 	using Category = typename T::Category;
 	using DifferenceType = typename T::DifferenceType;
@@ -57,14 +59,37 @@ struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isBaseOf<Iterator, T>)>
 };
 
 template <class T>
-struct Traits<T, REQUIRES_SPECIALIZATION(typeTraits::isPointer<T>)>
+requires concepts::pointer<T>
+struct Iterator<T>
 {
-	using Category = ContiguousTag;
+	using Category = typeTraits::ContiguousTag;
 	using DifferenceType = bzd::Int32Type;
 	using ValueType = typeTraits::RemovePointer<T>;
 };
 
-template <class T, class Category>
-CONCEPT isCategory = typeTraits::isBaseOf<Category, typename Traits<T>::Category>;
+} // namespace bzd::typeTraits
 
-} // namespace bzd::iterator
+namespace bzd::concepts {
+
+template <class T>
+concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concepts::pointer<T>;
+
+template <class T>
+concept inputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::InputTag>;
+
+template <class T>
+concept outputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
+
+template <class T>
+concept forwardIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;
+
+template <class T>
+concept bidirectionalIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::BidirectionalTag>;
+
+template <class T>
+concept randomAccessIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::RandomAccessTag>;
+
+template <class T>
+concept contiguousIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ContiguousTag>;
+
+} // namespace bzd::concepts

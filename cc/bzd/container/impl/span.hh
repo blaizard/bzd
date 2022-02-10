@@ -4,11 +4,11 @@
 #include "cc/bzd/algorithm/find.hh"
 #include "cc/bzd/algorithm/lexicographical_compare.hh"
 #include "cc/bzd/container/iterator/contiguous.hh"
-#include "cc/bzd/container/iterator/distance.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/type_traits/iterator/distance.hh"
 #include "cc/bzd/type_traits/remove_const.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/move.hh"
@@ -136,7 +136,7 @@ public: // Find
 			const auto it = bzd::algorithm::find(begin() + start, end(), item);
 			if (it != end())
 			{
-				return bzd::iterator::distance(begin(), it);
+				return bzd::distance(begin(), it);
 			}
 		}
 		return npos;

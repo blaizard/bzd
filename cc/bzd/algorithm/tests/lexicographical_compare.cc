@@ -17,23 +17,23 @@ TEST(LexicographicalCompare, Base)
 	}
 
 	{
-		const auto isLower = bzd::algorithm::lexicographicalCompare(array1.begin(), array1.end(), array3.begin(), array3.end());
+		const auto isLower = bzd::algorithm::lexicographicalCompare(array1, array3);
 		EXPECT_TRUE(isLower);
-		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array3.begin(), array3.end(), array1.begin(), array1.end());
+		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array3, array1);
 		EXPECT_FALSE(isInverseLower);
 	}
 
 	{
-		const auto isLower = bzd::algorithm::lexicographicalCompare(array1.begin(), array1.end(), array1.begin(), array1.end());
+		const auto isLower = bzd::algorithm::lexicographicalCompare(array1, array1);
 		EXPECT_FALSE(isLower);
-		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array1.begin(), array1.end(), array1.begin(), array1.end());
+		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array1, array1);
 		EXPECT_FALSE(isInverseLower);
 	}
 
 	{
-		const auto isLower = bzd::algorithm::lexicographicalCompare(array2.begin(), array2.end(), array3.begin(), array3.end());
+		const auto isLower = bzd::algorithm::lexicographicalCompare(array2, array3);
 		EXPECT_FALSE(isLower);
-		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array3.begin(), array3.end(), array2.begin(), array2.end());
+		const auto isInverseLower = bzd::algorithm::lexicographicalCompare(array3, array2);
 		EXPECT_TRUE(isInverseLower);
 	}
 }
@@ -42,7 +42,7 @@ TEST_CONSTEXPR_BEGIN(LexicographicalCompare, Constexpr)
 {
 	bzd::Array<int, 5> array{0, 1, 2, 3, 5};
 
-	const auto isLower = bzd::algorithm::lexicographicalCompare(array.begin(), array.end(), array.begin(), array.end());
+	const auto isLower = bzd::algorithm::lexicographicalCompare(array, array);
 	EXPECT_FALSE(isLower);
 }
 TEST_CONSTEXPR_END(LexicographicalCompare, Constexpr)

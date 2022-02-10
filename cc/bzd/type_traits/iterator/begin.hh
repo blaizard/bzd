@@ -14,13 +14,13 @@ concept begin = requires(T t)
 
 template <class T>
 requires concepts::begin<T>
-constexpr auto begin(T& t)
+[[nodiscard]] constexpr auto begin(T& t)
 {
 	return t.begin();
 }
 
 template <class T, SizeType n>
-constexpr T* begin(T (&arr)[n])
+[[nodiscard]] constexpr T* begin(T (&arr)[n])
 {
 	return arr;
 }

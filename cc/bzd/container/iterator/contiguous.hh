@@ -10,7 +10,7 @@ class Contiguous : public RandomAccess<ValueType, Contiguous<ValueType>>
 public: // Traits
 	using Self = Contiguous<ValueType>;
 	using Parent = RandomAccess<ValueType, Self>;
-	using Category = ContiguousTag;
+	using Category = typeTraits::ContiguousTag;
 
 public: // Constructors
 	using Parent::Parent;

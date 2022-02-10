@@ -15,17 +15,17 @@ TEST(Equal, Base)
 	}
 
 	{
-		const auto isEqual = bzd::algorithm::equal(array1.begin(), array1.end(), array1.begin());
+		const auto isEqual = bzd::algorithm::equal(array1, array1);
 		EXPECT_TRUE(isEqual);
 	}
 
 	{
-		const auto isEqual = bzd::algorithm::equal(array1.begin(), array1.begin(), array2.begin());
+		const auto isEqual = bzd::algorithm::equal(array1, array2);
 		EXPECT_TRUE(isEqual);
 	}
 
 	{
-		const auto isEqual = bzd::algorithm::equal(array1.begin(), array1.end(), array3.begin());
+		const auto isEqual = bzd::algorithm::equal(array1, array3);
 		EXPECT_FALSE(isEqual);
 	}
 }
@@ -34,7 +34,7 @@ TEST_CONSTEXPR_BEGIN(Equal, Constexpr)
 {
 	bzd::Array<int, 4> array{0, 1, 2, 3};
 
-	const auto isEqual = bzd::algorithm::equal(array.begin(), array.end(), array.begin());
+	const auto isEqual = bzd::algorithm::equal(array, array);
 	EXPECT_TRUE(isEqual);
 }
 TEST_CONSTEXPR_END(Equal, Constexpr)

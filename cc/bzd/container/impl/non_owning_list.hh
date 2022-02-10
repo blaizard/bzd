@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/result.hh"
@@ -11,6 +10,7 @@
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
 #include "cc/bzd/utility/ignore.hh"
 
 namespace bzd {
@@ -485,7 +485,7 @@ public:
 	{
 	public: // Traits
 		using Self = NonOwningListIterator<U>;
-		using Category = bzd::iterator::ForwardTag;
+		using Category = bzd::typeTraits::ForwardTag;
 		using IndexType = bzd::SizeType;
 		using DifferenceType = bzd::Int32Type;
 		using ValueType = U;

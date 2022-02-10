@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
@@ -28,7 +28,7 @@ requires concepts::forwardIterator<Iterator>
 /// \copydoc findIf
 /// \param[in,out] range The range of elements to examine.
 template <class Range, class... Args>
-requires concepts::range<Range>
+requires concepts::forwardRange<Range>
 constexpr auto findIf(Range range, Args&&... args)
 {
 	return findIf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

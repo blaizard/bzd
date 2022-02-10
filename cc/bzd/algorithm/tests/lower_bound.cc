@@ -13,27 +13,27 @@ TEST(LowerBound, Base)
 	}
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.end(), 0);
+		const auto it = bzd::algorithm::lowerBound(array, 0);
 		EXPECT_EQ(*it, 0);
 	}
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.end(), 5);
+		const auto it = bzd::algorithm::lowerBound(array, 5);
 		EXPECT_EQ(*it, 5);
 	}
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.end(), -2);
+		const auto it = bzd::algorithm::lowerBound(array, -2);
 		EXPECT_EQ(*it, 0);
 	}
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.end(), 10);
+		const auto it = bzd::algorithm::lowerBound(array, 10);
 		EXPECT_EQ(it, array.end());
 	}
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.end(), 4);
+		const auto it = bzd::algorithm::lowerBound(array, 4);
 		EXPECT_EQ(*it, 5);
 	}
 }
@@ -43,7 +43,7 @@ TEST(LowerBound, EdgeCase)
 	bzd::Array<int, 5> array{1, 2, 3, 4, 5};
 
 	{
-		const auto it = bzd::algorithm::lowerBound(array.begin(), array.begin(), 1);
+		const auto it = bzd::algorithm::lowerBound(array, 1);
 		EXPECT_EQ(it, array.begin());
 	}
 }

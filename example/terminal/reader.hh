@@ -93,7 +93,7 @@ public: // API.
 				{
 					co_return bzd::error(bzd::ErrorType::failure, CSTR("No match."));
 				}
-				else if (bzd::iterator::distance(first, last) == 1 && first->first.size() == index)
+				else if (bzd::distance(first, last) == 1 && first->first.size() == index)
 				{
 					co_return first->second;
 				}

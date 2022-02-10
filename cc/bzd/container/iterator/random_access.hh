@@ -1,19 +1,19 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/traits.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
 
 namespace bzd::iterator {
 
 template <class T, class CRTP = void>
-class RandomAccess : public Iterator
+class RandomAccess : public typeTraits::IteratorBase
 {
 public: // Traits
 	using Self = RandomAccess<T, CRTP>;
 	using ActualSelf = typeTraits::Conditional<typeTraits::isSame<CRTP, void>, Self, CRTP>;
-	using Category = RandomAccessTag;
+	using Category = typeTraits::RandomAccessTag;
 	using IndexType = bzd::SizeType;
 	using DifferenceType = bzd::Int32Type;
 	using ValueType = T;

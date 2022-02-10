@@ -13,27 +13,27 @@ TEST(UpperBound, Base)
 	}
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), 0);
+		const auto it = bzd::algorithm::upperBound(array, 0);
 		EXPECT_EQ(*it, 1);
 	}
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), 5);
+		const auto it = bzd::algorithm::upperBound(array, 5);
 		EXPECT_EQ(it, array.end());
 	}
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), -2);
+		const auto it = bzd::algorithm::upperBound(array, -2);
 		EXPECT_EQ(*it, 0);
 	}
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), 10);
+		const auto it = bzd::algorithm::upperBound(array, 10);
 		EXPECT_EQ(it, array.end());
 	}
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), 4);
+		const auto it = bzd::algorithm::upperBound(array, 4);
 		EXPECT_EQ(*it, 5);
 	}
 }
@@ -43,7 +43,7 @@ TEST(UpperBound, EdgeCase)
 	bzd::Array<int, 5> array{1, 2, 3, 4, 5};
 
 	{
-		const auto it = bzd::algorithm::upperBound(array.begin(), array.begin(), 1);
+		const auto it = bzd::algorithm::upperBound(array, 1);
 		EXPECT_EQ(it, array.begin());
 	}
 }

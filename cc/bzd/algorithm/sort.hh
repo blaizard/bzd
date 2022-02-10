@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/distance.hh"
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/distance.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -16,7 +16,7 @@ namespace impl {
 template <class Iterator, class Compare>
 constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noexcept
 {
-	const auto size = bzd::iterator::distance(first, last);
+	const auto size = bzd::distance(first, last);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
 
 	for (IndexType i = 1; i < size; i++)
@@ -47,11 +47,11 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 /// \param[in,out] last The ending of the range of elements to be sorted.
 /// \param[in] comparison Comparison function object which returns ​true if the first argument is less than (i.e. is ordered before) the
 /// second.
-template <class Iterator, class Compare = bzd::Less<typename iterator::Traits<Iterator>::ValueType>>
+template <class Iterator, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
 requires concepts::randomAccessIterator<Iterator>
 constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{}) noexcept
 {
-	const auto size = bzd::iterator::distance(first, last);
+	const auto size = bzd::distance(first, last);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
 
 	impl::makeHeap(first, last, comparison);
@@ -90,7 +90,7 @@ constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{
 /// \copydoc sort
 /// \param[in,out] range The brange of elements to be sorted.
 template <class Range, class... Args>
-requires concepts::range<Range>
+requires concepts::randomAccessRange<Range>
 constexpr void sort(Range range, Args&&... args) noexcept
 {
 	sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

@@ -12,17 +12,17 @@ TEST(Reverse, Base)
 	}
 	{
 		bzd::String<6> test("Hell");
-		bzd::algorithm::reverse(test.begin(), test.end());
+		bzd::algorithm::reverse(test);
 		EXPECT_STREQ(test.data(), "lleH");
 	}
 	{
 		bzd::String<6> test("");
-		bzd::algorithm::reverse(test.begin(), test.end());
+		bzd::algorithm::reverse(test);
 		EXPECT_STREQ(test.data(), "");
 	}
 	{
 		bzd::String<6> test("a");
-		bzd::algorithm::reverse(test.begin(), test.end());
+		bzd::algorithm::reverse(test);
 		EXPECT_STREQ(test.data(), "a");
 	}
 }

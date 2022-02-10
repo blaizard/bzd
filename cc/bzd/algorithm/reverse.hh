@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/is_iterator.hh"
-#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/traits.hh"
 #include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {
@@ -23,7 +23,7 @@ constexpr void reverse(Iterator first, Iterator last) noexcept
 /// \copydoc reverse
 /// \param[in] range The range of elements to be reversed.
 template <class Range>
-requires concepts::range<Range>
+requires concepts::bidirectionalRange<Range>
 constexpr void reverse(Range range) noexcept
 {
 	reverse(bzd::begin(range), bzd::end(range));
