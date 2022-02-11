@@ -33,7 +33,7 @@ constexpr OutputIt copyN(InputIt first, const SizeType count, OutputIt result)
 /// \param[out] output The range of the destination range.
 template <class InputRange, class OutputRange>
 requires concepts::forwardRange<InputRange> && concepts::forwardRange<OutputRange>
-constexpr auto copyN(InputRange input, const SizeType count, OutputRange output)
+constexpr auto copyN(InputRange&& input, const SizeType count, OutputRange&& output)
 {
 	return copyN(bzd::begin(input), count, bzd::begin(output));
 }

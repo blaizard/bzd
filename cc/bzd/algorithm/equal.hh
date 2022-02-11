@@ -43,7 +43,7 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 /// \param[in] range2 The second range of elements to compare.
 template <class Range1, class Range2, class... Args>
 requires concepts::forwardRange<Range1> && concepts::forwardRange<Range2>
-[[nodiscard]] constexpr auto equal(Range1 range1, Range2 range2, Args&&... args)
+[[nodiscard]] constexpr auto equal(Range1&& range1, Range2&& range2, Args&&... args)
 {
 	return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);
 }

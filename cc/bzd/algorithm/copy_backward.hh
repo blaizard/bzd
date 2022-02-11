@@ -29,7 +29,7 @@ constexpr OutputIt copyBackward(InputIt first, InputIt last, OutputIt result) no
 /// \param[out] output The range of the destination range.
 template <class InputRange, class OutputRange>
 requires concepts::bidirectionalRange<InputRange> && concepts::bidirectionalRange<OutputRange>
-constexpr auto copyBackward(InputRange input, OutputRange output) noexcept
+constexpr auto copyBackward(InputRange&& input, OutputRange&& output) noexcept
 {
 	return copyBackward(bzd::begin(input), bzd::end(input), bzd::end(output));
 }

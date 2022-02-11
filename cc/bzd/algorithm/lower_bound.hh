@@ -50,7 +50,7 @@ constexpr Iterator lowerBound(Iterator first, Iterator last, const T& value, Com
 /// \param[in,out] range The partially-ordered range to examine.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-constexpr auto lowerBound(Range range, Args&&... args)
+constexpr auto lowerBound(Range&& range, Args&&... args)
 {
 	return lowerBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }

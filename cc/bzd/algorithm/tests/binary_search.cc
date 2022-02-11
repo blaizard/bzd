@@ -42,7 +42,7 @@ TEST_CONSTEXPR_BEGIN(BinarySearch, Constexpr)
 {
 	bzd::Array<int, 5> array{0, 1, 2, 3, 5};
 
-	const auto it = bzd::algorithm::binarySearch(array.begin(), array.end(), 0);
+	const auto it = bzd::algorithm::binarySearch(array, 0);
 	EXPECT_EQ(*it, 0);
 }
 TEST_CONSTEXPR_END(BinarySearch, Constexpr)

@@ -29,7 +29,7 @@ requires concepts::forwardIterator<Iterator>
 /// \param[in,out] range The range of elements to examine.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-constexpr auto findIf(Range range, Args&&... args)
+constexpr auto findIf(Range&& range, Args&&... args)
 {
 	return findIf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }

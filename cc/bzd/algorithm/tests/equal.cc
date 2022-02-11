@@ -21,7 +21,7 @@ TEST(Equal, Base)
 
 	{
 		const auto isEqual = bzd::algorithm::equal(array1, array2);
-		EXPECT_TRUE(isEqual);
+		EXPECT_FALSE(isEqual);
 	}
 
 	{
