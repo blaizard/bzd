@@ -47,7 +47,7 @@ TEST(Sort, CustomComparator)
 TEST_CONSTEXPR_BEGIN(Sort, Constexpr)
 {
 	bzd::Array<bzd::UInt32Type, 10> array{9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
-	bzd::algorithm::sort(array.begin(), array.end());
+	bzd::algorithm::sort(array);
 
 	bzd::UInt32Type previous = 0;
 	for (const auto& value : array)

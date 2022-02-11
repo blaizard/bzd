@@ -23,7 +23,7 @@ requires concepts::forwardIterator<Iterator>
 /// \param[in] range The range of elements to examine.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-[[nodiscard]] constexpr auto noneOf(Range range, Args&&... args) noexcept
+[[nodiscard]] constexpr auto noneOf(Range&& range, Args&&... args) noexcept
 {
 	return noneOf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }

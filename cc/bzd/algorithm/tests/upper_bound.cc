@@ -43,7 +43,7 @@ TEST(UpperBound, EdgeCase)
 	bzd::Array<int, 5> array{1, 2, 3, 4, 5};
 
 	{
-		const auto it = bzd::algorithm::upperBound(array, 1);
+		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), 0);
 		EXPECT_EQ(it, array.begin());
 	}
 }

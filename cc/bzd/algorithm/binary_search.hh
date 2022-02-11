@@ -34,7 +34,7 @@ requires concepts::forwardIterator<Iterator>
 /// \param[in] range The range of elements to examine.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-[[nodiscard]] constexpr auto binarySearch(Range range, Args&&... args)
+[[nodiscard]] constexpr auto binarySearch(Range&& range, Args&&... args)
 {
 	return binarySearch(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }

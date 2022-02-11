@@ -34,7 +34,7 @@ constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Iterator las
 /// \param[in] first The partially-ordered range to examine.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-constexpr auto equalRange(Range range, Args&&... args)
+constexpr auto equalRange(Range&& range, Args&&... args)
 {
 	return equalRange(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
