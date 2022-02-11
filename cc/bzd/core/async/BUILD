@@ -16,6 +16,7 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container:tuple",
         "//cc/bzd/container/impl:non_owning_list",
+        "//cc/bzd/container/range:associate_to_scope",
         "//cc/bzd/core:error",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_same_template",
@@ -24,6 +25,5 @@ cc_library(
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
-        "//cc/bzd/container/range:associate_to_scope"
     ],
 )

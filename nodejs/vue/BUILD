@@ -5,11 +5,9 @@ bzd_nodejs_library(
     srcs = [
         "api.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core/api:client",
     ],
 )
@@ -19,11 +17,9 @@ bzd_nodejs_library(
     srcs = [
         "authentication.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core:exception",
     ],
 )
@@ -33,11 +29,9 @@ bzd_nodejs_library(
     srcs = [
         "cache.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
     ],
@@ -48,11 +42,9 @@ bzd_nodejs_library(
     srcs = [
         "lang.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core:localstorage",
     ],
 )
@@ -62,11 +54,9 @@ bzd_nodejs_library(
     srcs = [
         "notification.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core:exception",
     ],
 )
@@ -76,8 +66,8 @@ bzd_nodejs_library(
     srcs = [
         "payment.vue",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
 )

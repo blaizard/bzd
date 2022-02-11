@@ -11,7 +11,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "vue",
     packages = {
-        "vue": "",
+        "vue": "2.6.14",
     },
     visibility = ["//visibility:public"],
     deps = [
@@ -49,7 +49,7 @@ bzd_nodejs_library(
         "webpack-bundle-analyzer": "",
         # Vue
         "vue-loader": "^15",
-        "vue-template-compiler": "",
+        "vue-template-compiler": "2.6.14",
         # CSS/SASS
         "mini-css-extract-plugin": "0.8.0",  # Seems that 0.9.0 has some issue: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/493
         "css-loader": "3.6.0",  # From 4.0.0 the keyword :export seems broken

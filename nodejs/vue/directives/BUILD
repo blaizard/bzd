@@ -5,10 +5,10 @@ bzd_nodejs_library(
     srcs = [
         "touch.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
 )
 
 bzd_nodejs_library(
@@ -16,11 +16,9 @@ bzd_nodejs_library(
     srcs = [
         "tooltip.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:vue",
         "//nodejs/core:exception",
     ],
 )
@@ -30,10 +28,10 @@ bzd_nodejs_library(
     srcs = [
         "resize.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
 )
 
 bzd_nodejs_library(
@@ -41,10 +39,10 @@ bzd_nodejs_library(
     srcs = [
         "mask.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
 )
 
 bzd_nodejs_library(
@@ -52,9 +50,6 @@ bzd_nodejs_library(
     srcs = [
         "loading.mjs",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
     deps = [
         ":mask",
