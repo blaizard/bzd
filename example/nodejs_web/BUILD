@@ -10,7 +10,9 @@ bzd_nodejs_web(
         "app.mjs": "index",
     },
     packages = {
-        "vue": "latest",
         "@vue/composition-api": "latest",
     },
+    deps = [
+        "//nodejs:vue",
+    ],
 )

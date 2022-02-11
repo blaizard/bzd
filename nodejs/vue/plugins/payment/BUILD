@@ -6,8 +6,8 @@ bzd_nodejs_library(
         "payment.mjs",
         "payment.vue",
     ],
-    packages = {
-        "vue": "",
-    },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
 )
