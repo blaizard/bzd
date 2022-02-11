@@ -9,6 +9,7 @@
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
+#include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
 #include <iostream>
 
@@ -68,18 +69,14 @@ public:
 		}
 	}
 
-	/**
-	 * Notifies if the async is completed.
-	 */
+	/// Notifies if the async is completed.
 	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
 
 	[[nodiscard]] constexpr bool isReadyOrCanceled() const noexcept { return isReady() || isCanceled(); }
 
-	/**
-	 * Get the current result. If the async is not terminated, an empty value is returned.
-	 */
+	/// Get the current result. If the async is not terminated, an empty value is returned.
 	[[nodiscard]] constexpr bzd::Optional<ResultType> getResult() noexcept
 	{
 		if (handle_)
@@ -100,19 +97,13 @@ public:
 
 	void onTerminate(bzd::FunctionView<void(void)> callback) noexcept { handle_.promise().onTerminateCallback_.emplace(callback); }
 
-	/**
-	 * Detach the current async from its executor (if attached).
-	 */
+	/// Detach the current async from its executor (if attached).
 	constexpr void detach() noexcept { bzd::ignore = getExecutable().pop(); }
 
-	/**
-	 * Associate an executor to this async.
-	 */
+	/// Associate an executor to this async.
 	constexpr void setExecutor(Executor& executor) noexcept { handle_.promise().setExecutor(executor); }
 
-	/**
-	 * Associate an executor to this async and push it to the queue.
-	 */
+	/// Associate an executor to this async and push it to the queue.
 	constexpr void enqueue(Executor& executor) noexcept
 	{
 		setExecutor(executor);
@@ -120,13 +111,11 @@ public:
 		getExecutable().enqueue();
 	}
 
-	/**
-	 * Run the current async on a given executor.
-	 * This call will block until completion of the async.
-	 *
-	 * \param executor The executor to run on.
-	 * \return The result of the async.
-	 */
+	/// Run the current async on a given executor.
+	/// This call will block until completion of the async.
+	///
+	/// \param executor The executor to run on.
+	/// \return The result of the async.
 	constexpr ResultType run(Executor& executor) noexcept
 	{
 		// Associate the executor with this async and enqueue it.
@@ -207,6 +196,33 @@ constexpr auto getExecutor() noexcept
 	return bzd::coroutine::impl::GetExecutor{};
 }
 
+constexpr auto getExecutable() noexcept
+{
+	return bzd::coroutine::impl::GetExecutable{};
+}
+
+/// Wait for the next scheduler iteration for all running schedulers.
+inline Async<> yieldAll() noexcept
+{
+	auto& executor = *(co_await bzd::async::getExecutor());
+	const auto currentTick{executor.getNextTick()};
+	auto running = executor.getRangeRunning();
+	for (const auto& element : running)
+	{
+		// Keeping track of the previous tick is needed here to handle cases where the counter wraps.
+		auto tick = element.getTick();
+		auto previousTick = tick;
+		while (tick < currentTick && previousTick != tick && !element.isCompleted())
+		{
+			co_await bzd::async::yield();
+			previousTick = tick;
+			tick = element.getTick();
+		}
+	}
+
+	co_return {};
+}
+
 template <class... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
 {
@@ -251,17 +267,18 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	::std::cout << "BEFORE" << ::std::flush;
 
 	// Wait until no executors are processing cancelled coroutines.
-	// or wait for at least one iteration from all executors.
-	// or force execution of all these asyncs on the same executor.
+	// by waiting for at least one iteration from all executors.
+	co_await bzd::async::yieldAll();
 
-	// Loop until all asyncs are ready or cancelled.
-	while (!(asyncs.isReadyOrCanceled() && ...))
-	{
-		::std::cout << "loop" << ::std::flush;
-		co_await bzd::coroutine::impl::YieldAndPropagateCancelation{token};
-		// co_await yield();
-	}
-
+	/*
+		// Loop until all asyncs are ready or cancelled.
+		while (!(asyncs.isReadyOrCanceled() && ...))
+		{
+			::std::cout << "loop" << ::std::flush;
+			co_await bzd::coroutine::impl::YieldAndPropagateCancelation{token};
+			// co_await yield();
+		}
+	*/
 	// Build the result and return it.
 	ResultType result{asyncs.moveResultOut()...};
 	co_return result;

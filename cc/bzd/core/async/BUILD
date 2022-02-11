@@ -24,5 +24,6 @@ cc_library(
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
+        "//cc/bzd/container/range:associate_to_scope"
     ],
 )
