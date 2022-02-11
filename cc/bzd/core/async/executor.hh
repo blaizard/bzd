@@ -3,6 +3,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/function_view.hh"
 #include "cc/bzd/container/impl/non_owning_list.hh"
+#include "cc/bzd/container/range/associate_to_scope.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
@@ -15,7 +16,6 @@
 #include <type_traits>
 
 namespace bzd {
-
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
 /// An executor is thread-safe and can be shared betweeen multiple threads or cores.
@@ -53,25 +53,6 @@ public:
 			current = (++tick).get();
 		} while (current == 0);
 		return current;
-	}
-
-	/// Wait for the next scheduler iteration for all running schedulers.
-	constexpr void waitForNextTick() noexcept
-	{
-		const auto currentTick{getNextTick()};
-		auto scope = makeSyncLockGuard(runningMutex_);
-		for (const auto& element : running_)
-		{
-			// Keeping track of the previous tick is needed here to handle cases where the counter wraps.
-			auto tick = element.getTick();
-			auto previousTick = tick;
-			while (tick < currentTick && previousTick != tick && !element.isCompleted())
-			{
-				// wait
-				previousTick = tick;
-				tick = element.getTick();
-			}
-		}
 	}
 
 	/// Push a new workload to the queue.
@@ -143,6 +124,16 @@ private:
 		const IdType id_;
 		Atomic<TickType> tick_{0};
 	};
+
+public:
+	/// Create a generator for the running structure.
+	///
+	/// \return A range for the running data structure.
+	[[nodiscard]] auto getRangeRunning() noexcept
+	{
+		auto scope = makeSyncSharedLockGuard(runningMutex_);
+		return range::associateToScope(running_, bzd::move(scope));
+	}
 
 private:
 	/// Create a scope for the running info, it uses RAII pattern to control the lifetime of the info.

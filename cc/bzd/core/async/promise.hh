@@ -41,6 +41,13 @@ struct Enqueue
 };
 
 /// Awaitable to yield the current execution.
+struct GetExecutable : public bzd::coroutine::impl::suspend_never
+{
+	constexpr auto await_resume() noexcept { return executable_; }
+	Executable* executable_;
+};
+
+/// Awaitable to yield the current execution.
 struct GetExecutor : public bzd::coroutine::impl::suspend_never
 {
 	constexpr auto await_resume() noexcept { return executor_; }
@@ -147,6 +154,11 @@ public: // Await transform specializations
 			::std::cout << "PROPAGATE!" << ::std::flush;
 			awaitable.token_.trigger();
 		}
+		return bzd::move(awaitable);
+	}
+	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutable&& awaitable) noexcept
+	{
+		awaitable.executable_ = this;
 		return bzd::move(awaitable);
 	}
 	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutor&& awaitable) noexcept
