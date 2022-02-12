@@ -6,7 +6,7 @@ Show metadata information of a bazel target.
 
 ```bash
 # Build the metadata
-bazel build example/bzd/... --output_groups=+metadata
+bazel build example/... --output_groups=+metadata --config=linux_x86_64_clang
 # Visualize
 bazel run apps/metadata -- $(pwd)
 ```

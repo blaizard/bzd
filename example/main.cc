@@ -1,4 +1,4 @@
-#include "bzd.hh"
+#include "cc/bzd.hh"
 #include "example/mutex.hh"
 #include "example/terminal.hh"
 
@@ -60,7 +60,7 @@ private:
 **** Polling ****
 
 
-*/
+
 
 void simpleDelay()
 {
@@ -149,12 +149,6 @@ void terminalTask()
 		const auto bytes = prompt.asBytes();
 		await terminal.write(bytes);
 	}
-	/*
-		bzd::String<64> input;
-		bzd::Array<char, 10> data;
-		auto bytes = data.asWritableBytes();
-		const auto result = await terminal.read(bytes);
-	*/
 }
 
 void exampleTerminal()
@@ -204,10 +198,10 @@ void exampleTerminal()
 	std::cout << "Max stack usage stack1: " << task1.estimateMaxUsage() << std::endl;
 	std::cout << "Max stack usage stack2: " << task2.estimateMaxUsage() << std::endl;
 }
-
+*/
 int main()
 {
 	//	simpleDelay();
 	//	exampleMutex();
-	exampleTerminal();
+	// exampleTerminal();
 }

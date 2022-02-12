@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/impl/non_owning_list.hh"
-
+/*
 class Mutex
 {
 public:
@@ -41,3 +41,4 @@ private:
 	bzd::Atomic<bzd::BoolType> acquired_{false};
 	bzd::NonOwningList<bzd::interface::Promise> list_{};
 };
+*/
