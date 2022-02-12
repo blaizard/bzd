@@ -56,6 +56,12 @@ class _ExecuteResult:
 	def getReturnCode(self) -> int:
 		return self.returncode
 
+	def isSuccess(self) -> bool:
+		return self.returncode == 0
+
+	def isFailed(self) -> bool:
+		return self.returncode != 0
+
 
 class _NoopTimer:
 

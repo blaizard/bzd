@@ -57,7 +57,7 @@ def cc_compile(ctx, hdrs = [], srcs = [], deps = []):
 
     return CcInfo(compilation_context = compilation_context, linking_context = linking_context)
 
-def cc_link(ctx, hdrs = [], srcs = [], deps = []):
+def cc_link(ctx, hdrs = [], srcs = [], deps = [], map_analyzer = None):
     """
     Compile and link.
     """
@@ -65,7 +65,7 @@ def cc_link(ctx, hdrs = [], srcs = [], deps = []):
     cc_toolchain, feature_configuration = _cc_config(ctx)
     compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, hdrs, srcs, deps)
 
-    #map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
+    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
     linking_outputs = cc_common.link(
         name = ctx.attr.name + ".binary",
         actions = ctx.actions,
@@ -73,8 +73,20 @@ def cc_link(ctx, hdrs = [], srcs = [], deps = []):
         cc_toolchain = cc_toolchain,
         compilation_outputs = cc_outputs,
         linking_contexts = [cc_info.linking_context for cc_info in cc_infos],
-        #additional_outputs = [map_file],
-        #user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+        additional_outputs = [map_file],
+        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+    )
+    binary_file = linking_outputs.executable
+
+    # Analyze the map file.
+    metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
+    ctx.actions.run(
+        inputs = [map_file, binary_file],
+        outputs = [metadata_file],
+        progress_message = "Generating metadata for {}".format(ctx.attr.name),
+        arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
+        tools = map_analyzer.data_runfiles.files,
+        executable = map_analyzer.files_to_run,
     )
 
-    return linking_outputs.executable  #, map_file
+    return binary_file, [metadata_file]
