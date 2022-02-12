@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "associate_to_scope",
+    name = "associate_scope",
     hdrs = [
-        "associate_to_scope.hh",
+        "associate_scope.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

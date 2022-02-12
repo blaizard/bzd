@@ -7,7 +7,7 @@
 namespace bzd::range {
 /// Associate a range to one or multiple scopes
 template <class T, class... Args>
-[[nodiscard]] constexpr auto associateToScope(T& range, Args&&... args) noexcept
+[[nodiscard]] constexpr auto associateScope(T& range, Args&&... args) noexcept
 {
 	class Range
 	{

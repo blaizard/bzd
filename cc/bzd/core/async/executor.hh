@@ -3,7 +3,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/function_view.hh"
 #include "cc/bzd/container/impl/non_owning_list.hh"
-#include "cc/bzd/container/range/associate_to_scope.hh"
+#include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
@@ -132,7 +132,7 @@ public:
 	[[nodiscard]] auto getRangeRunning() noexcept
 	{
 		auto scope = makeSyncSharedLockGuard(runningMutex_);
-		return range::associateToScope(running_, bzd::move(scope));
+		return range::associateScope(running_, bzd::move(scope));
 	}
 
 private:
