@@ -22,7 +22,7 @@ requires concepts::forwardIterator<Iterator>
 /// \param[in] range The range of elements to examine.
 template <class Range, class UnaryPredicate>
 requires concepts::forwardRange<Range>
-[[nodiscard]] constexpr auto allOf(Range range, UnaryPredicate predicate) noexcept
+[[nodiscard]] constexpr auto allOf(Range&& range, UnaryPredicate predicate) noexcept
 {
 	return allOf(bzd::begin(range), bzd::end(range), predicate);
 }

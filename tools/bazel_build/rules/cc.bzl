@@ -136,6 +136,11 @@ def _bzd_cc_generic(is_test):
             "_debug": attr.label(
                 default = "//tools/bazel_build/settings/debug",
             ),
+            "_lcov_merger": attr.label(
+                cfg = "exec",
+                executable = True,
+                default = Label("@bazel_tools//tools/test:lcov_merger"),
+            ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
         },
         executable = True,
