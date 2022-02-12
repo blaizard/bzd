@@ -38,6 +38,7 @@ coverage:cc-docker-sandbox --strategy=TestRunner=docker
 build:cc --build_tag_filters=cc,-cc-coverage
 test:cc --test_tag_filters=cc,-cc-coverage
 coverage:cc --test_tag_filters=-cc,cc-coverage
+#coverage:cc --test_tag_filters=cc,-cc-coverage
 coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
 
 # Select only Python targets
@@ -55,6 +56,11 @@ build --nodistinct_host_configuration
 
 # Add stamping
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
+
+# Enforce strict checks.
+build --incompatible_force_strict_header_check_from_starlark
+build --strict_filesets
+build --strict_system_includes
 
 # Increase hermeticity
 build --incompatible_strict_action_env

@@ -77,16 +77,19 @@ def cc_link(ctx, hdrs = [], srcs = [], deps = [], map_analyzer = None):
         user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
     )
     binary_file = linking_outputs.executable
+    metadata_files = []
 
     # Analyze the map file.
-    metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
-    ctx.actions.run(
-        inputs = [map_file, binary_file],
-        outputs = [metadata_file],
-        progress_message = "Generating metadata for {}".format(ctx.attr.name),
-        arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
-        tools = map_analyzer.data_runfiles.files,
-        executable = map_analyzer.files_to_run,
-    )
+    if map_analyzer:
+        metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
+        ctx.actions.run(
+            inputs = [map_file, binary_file],
+            outputs = [metadata_file],
+            progress_message = "Generating metadata for {}".format(ctx.attr.name),
+            arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
+            tools = map_analyzer.data_runfiles.files,
+            executable = map_analyzer.files_to_run,
+        )
+        metadata_files.append(metadata_file)
 
-    return binary_file, [metadata_file]
+    return binary_file, metadata_files
