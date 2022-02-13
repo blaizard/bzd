@@ -17,11 +17,15 @@ bzd_cc_test(
 )
 
 bzd_cc_test(
-    name = "cancellation",
+    name = "multithread",
     srcs = [
-        "cancellation.cc",
+        "multithread.cc",
     ],
-    tags = ["manual"],
+    # TODO: re-enable with esp32 gcc 11
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//cc/bzd/core:delay",
         "//cc/bzd/core/async",

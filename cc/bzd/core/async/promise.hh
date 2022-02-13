@@ -8,6 +8,9 @@
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/source_location.hh"
 
+// TODO: remove this dependency
+#include <functional>
+
 // Forward declaration
 namespace bzd::impl {
 template <class T>
@@ -26,6 +29,7 @@ public:
 
 	bzd::coroutine::impl::coroutine_handle<> handle_;
 	Executable* caller_{nullptr};
+	bzd::Optional<std::function<Executable*(Executable*)>> onTerminateCallback_{};
 };
 
 using Executor = bzd::Executor<Executable>;
@@ -37,6 +41,13 @@ struct Enqueue
 	constexpr Enqueue(T& async) noexcept : exectuable_{async.getExecutable()}
 	{
 	}
+
+	template <class T, class Callback>
+	constexpr Enqueue(T& async, Callback&& callback) noexcept : Enqueue{async}
+	{
+		exectuable_.onTerminateCallback_.emplace(bzd::forward<Callback>(callback));
+	}
+
 	Executable& exectuable_;
 };
 
@@ -91,6 +102,12 @@ private:
 		{
 			auto& promise = handle.promise();
 			auto continuation = promise.caller_;
+
+			if (promise_.onTerminateCallback_)
+			{
+				continuation = (promise_.onTerminateCallback_.value())(continuation);
+			}
+
 			if (continuation)
 			{
 				// Enqueue the continuation for later use, it will be scheduled
@@ -106,6 +123,8 @@ private:
 		}
 
 		constexpr void await_resume() noexcept {}
+
+		Self& promise_;
 	};
 
 public:
@@ -124,14 +143,7 @@ public:
 		return {};
 	}
 
-	constexpr FinalAwaiter final_suspend() noexcept
-	{
-		if (onTerminateCallback_)
-		{
-			(onTerminateCallback_.value())();
-		}
-		return {};
-	}
+	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{*this}; }
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
@@ -195,8 +207,6 @@ public: // Await transform specializations
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
-
-	bzd::Optional<bzd::FunctionView<void(void)>> onTerminateCallback_{};
 };
 
 } // namespace bzd::coroutine::impl
