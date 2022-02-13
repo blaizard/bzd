@@ -25,7 +25,7 @@ jobs:
     - name: linux_x86_64_clang Development + clang-tidy
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --test_tag_filters=-cc-coverage
+      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy
 
     - name: linux_x86_64_gcc
       script:
