@@ -216,38 +216,39 @@ bzd::Async<int> anyNested(bzd::interface::String& trace, bzd::StringView id)
 
 	co_return result.get<1>().value().value();
 }
-/*
+
 TEST_ASYNC(Coroutine, asyncAnyNested)
 {
 	{
 		bzd::String<128> trace;
 		co_await anyNested(trace, "a");
-		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][c2][a7]");
+		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][b0][c2][a7]");
 	}
+	/*
+		{
+			bzd::String<128> trace;
+			auto promiseA = nested(trace, "d");
+			auto promiseB = anyNested(trace, "a");
+			[[maybe_unused]] const auto result = co_await bzd::async::any(promiseA, promiseB);
+			EXPECT_EQ(trace, "[d1][a6][d0][d2]");
+		}
 
-	{
-		bzd::String<128> trace;
-		auto promiseA = nested(trace, "d");
-		auto promiseB = anyNested(trace, "a");
-		[[maybe_unused]] const auto result = co_await bzd::async::any(promiseA, promiseB);
-		EXPECT_EQ(trace, "[d1][a6][d0][d2]");
-	}
+		{
+			::std::cout << ::std::endl;
+			bzd::String<128> trace;
+			auto promiseA = anyNested(trace, "d");
+			auto promiseB = anyNested(trace, "a");
+			auto promiseAnyA = bzd::async::any(promiseA, promiseB);
+			auto promiseC = nested(trace, "c");
+			[[maybe_unused]] const auto result = co_await bzd::async::any(promiseAnyA, promiseC);
+			EXPECT_EQ(trace, "[c1][d1][a6][c0][c2]");
+		}
 
-	{
-		::std::cout << ::std::endl;
-		bzd::String<128> trace;
-		auto promiseA = anyNested(trace, "d");
-		auto promiseB = anyNested(trace, "a");
-		auto promiseAnyA = bzd::async::any(promiseA, promiseB);
-		auto promiseC = nested(trace, "c");
-		[[maybe_unused]] const auto result = co_await bzd::async::any(promiseAnyA, promiseC);
-		EXPECT_EQ(trace, "[c1][d1][a6][c0][c2]");
-	}
-
-	EXPECT_TRUE(false);
+		EXPECT_TRUE(false);
+	*/
 	co_return {};
 }
-*/
+
 bzd::Async<int> asyncAdd(int a, int b)
 {
 	co_return a + b;

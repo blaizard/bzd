@@ -22,6 +22,7 @@ template <class T>
 using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
 
 using AsyncExecutor = bzd::coroutine::impl::Executor;
+using AsyncExecutable = bzd::coroutine::impl::Executable;
 
 template <class T>
 class Async
@@ -94,8 +95,6 @@ public:
 		}
 		return nullopt;
 	}
-
-	void onTerminate(bzd::FunctionView<void(void)> callback) noexcept { handle_.promise().onTerminateCallback_.emplace(callback); }
 
 	/// Detach the current async from its executor (if attached).
 	constexpr void detach() noexcept { bzd::ignore = getExecutable().pop(); }
@@ -253,32 +252,33 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	bzd::interface::CancellationToken token{flag};
 	(asyncs.setCancellationToken(token), ...);
 
-	// Register on terminate callbacks
-	// Note: the lifetime of the lambda is longer than the promises.
-	auto onTerminateCallback = [&token]() { token.trigger(); };
-	(asyncs.onTerminate(bzd::FunctionView<void(void)>{onTerminateCallback}), ...);
-
-	// Push all handles to the executor.
-	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
+	// Register on terminate callbacks.
+	bzd::Atomic<BoolType> enqueueCaller{true};
+	auto onTerminateCallback = [&](impl::AsyncExecutable* caller) -> impl::AsyncExecutable* {
+		// Ensure that only one instance return to the caller.
+		// This prevents concurrent thread to enque the caller, which coudl lead to a situation
+		// where the caller is executed (not in the queue) and being enqued at the same time,
+		// so will be executed twice and potentially in parallel.
+		if (enqueueCaller.exchange(false))
+		{
+			// No need to clear other async callers and callbacks as if which the scope,
+			// they will return a null continuation and this function cannot be called out of scope
+			// because we wait for all executors to yeild once before returning.
+			token.trigger();
+			return caller;
+		}
+		return nullptr;
+	};
+	(co_await bzd::coroutine::impl::Enqueue{asyncs, onTerminateCallback}, ...);
 
 	// The first coroutine that complete will re-enter here.
 	co_await bzd::coroutine::impl::Suspend();
-
-	::std::cout << "BEFORE" << ::std::flush;
 
 	// Wait until no executors are processing cancelled coroutines.
 	// by waiting for at least one iteration from all executors.
 	co_await bzd::async::yieldAll();
 
-	/*
-		// Loop until all asyncs are ready or cancelled.
-		while (!(asyncs.isReadyOrCanceled() && ...))
-		{
-			::std::cout << "loop" << ::std::flush;
-			co_await bzd::coroutine::impl::YieldAndPropagateCancelation{token};
-			// co_await yield();
-		}
-	*/
+	// By now all asyncs must have been either ready or canceled.
 	// Build the result and return it.
 	ResultType result{asyncs.moveResultOut()...};
 	co_return result;

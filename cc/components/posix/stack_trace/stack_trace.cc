@@ -285,6 +285,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 				 path.data())
 			.sync();
 	}
+	toStream(stream, "---\n"_sv).sync();
 }
 
 void sigHandler(const int sig)
