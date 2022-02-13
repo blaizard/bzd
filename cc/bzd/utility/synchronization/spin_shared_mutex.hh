@@ -26,7 +26,7 @@ public: // API.
 		do
 		{
 			expected = 0;
-		} while (!lock_.compareExchange(expected, 0));
+		} while (!lock_.compareExchange(expected, 1));
 	}
 
 	// Unlocks the mutex.
