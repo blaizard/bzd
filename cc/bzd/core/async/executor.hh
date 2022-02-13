@@ -131,7 +131,7 @@ public:
 	/// \return A range for the running data structure.
 	[[nodiscard]] auto getRangeRunning() noexcept
 	{
-		auto scope = makeSyncSharedLockGuard(runningMutex_);
+		auto scope = makeSyncLockGuard(runningMutex_);
 		return range::associateScope(running_, bzd::move(scope));
 	}
 
