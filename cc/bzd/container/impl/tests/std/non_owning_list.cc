@@ -44,7 +44,6 @@ TEST(NonOwningList, InsertWhileInsert)
 	insertWhileInsertDoWork<bzd::test::InjectPoint1>();
 	insertWhileInsertDoWork<bzd::test::InjectPoint2>();
 	insertWhileInsertDoWork<bzd::test::InjectPoint3>();
-	insertWhileInsertDoWork<bzd::test::InjectPoint4>();
 }
 
 template <class T>
@@ -81,7 +80,6 @@ TEST(NonOwningList, RemoveWhileInsert)
 	removeWhileInsertDoWork<bzd::test::InjectPoint1>();
 	removeWhileInsertDoWork<bzd::test::InjectPoint2>();
 	removeWhileInsertDoWork<bzd::test::InjectPoint3>();
-	removeWhileInsertDoWork<bzd::test::InjectPoint4>();
 }
 
 template <class T>
