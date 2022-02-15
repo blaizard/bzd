@@ -24,9 +24,7 @@ TEST(Coroutine, Cancellation2Threads)
 
 	for (auto& entry : threads)
 	{
-		entry = std::thread{[&executor]() {
-			executor.run();
-		}};
+		entry = std::thread{[&executor]() { executor.run(); }};
 	}
 
 	for (auto& entry : threads)
@@ -41,7 +39,7 @@ TEST(Coroutine, CancellationStress)
 
 	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
 	{
-		bzd::impl::AsyncExecutor executor;
+		bzd::impl::AsyncExecutor executor{};
 		bzd::Array<std::thread, 5> threads;
 
 		auto promise1 = cancellationWorkload(1ms);
@@ -54,9 +52,7 @@ TEST(Coroutine, CancellationStress)
 
 		for (auto& entry : threads)
 		{
-			entry = std::thread{[&executor]() {
-				executor.run();
-			}};
+			entry = std::thread{[&executor]() { executor.run(); }};
 		}
 
 		for (auto& entry : threads)

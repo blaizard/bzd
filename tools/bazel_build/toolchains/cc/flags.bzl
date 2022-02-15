@@ -10,7 +10,7 @@ _COPTS_COMMON = [
     "-Wswitch-enum",
 
     # Add debug symbols, will be removed at the postprocessing stage.
-    "-g",
+    "-ggdb3",
 
     # Do not expand any symbolic links, resolve references to /../
     # or /./, or make the path absolute when generating a relative
@@ -24,15 +24,17 @@ _COPTS_COMMON = [
 ]
 
 _COPTS_COMMON_DEV = [
-    # Optimize debugging experience. -Og should be the optimization
-    # level of choice for the standard edit-compile-debug cycle.
-    "-Og",
+    # O0 seems to give better stack traces than -Og.
+    "-O0",
 
     # Keep stack frames for debugging.
     "-fno-omit-frame-pointer",
 
     # Emit extra code to check for buffer overflows.
     "-fstack-protector-all",
+
+    # No inline to improve stack trace.
+    "-fno-inline",
 ]
 
 _COPTS_COMMON_PROD = [

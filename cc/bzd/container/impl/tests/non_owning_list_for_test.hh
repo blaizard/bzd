@@ -10,19 +10,21 @@ namespace bzd::test {
 class ListElementMultiContainer : public bzd::NonOwningListElement</*MultiContainer*/ true>
 {
 public:
+	ListElementMultiContainer() = default;
 	ListElementMultiContainer(bzd::SizeType value) : value_{value} {}
 	ListElementMultiContainer(ListElementMultiContainer&&) = default;
 
-	bzd::SizeType value_;
+	bzd::SizeType value_{0};
 };
 
 class ListElement : public bzd::NonOwningListElement<false>
 {
 public:
+	ListElement() = default;
 	ListElement(bzd::SizeType value) : value_{value} {}
 	ListElement(ListElement&&) = default;
 
-	bzd::SizeType value_;
+	bzd::SizeType value_{0};
 };
 
 template <class T>

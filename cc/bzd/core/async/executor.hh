@@ -22,11 +22,18 @@ namespace bzd {
 template <class Executable>
 class Executor
 {
-public:
+public: // Traits.
+	using Self = Executor<Executable>;
 	using TickType = UInt32Type;
 
 public:
 	constexpr Executor() = default;
+
+	// Copy/move constructor/assignment
+	constexpr Executor(const Self&) noexcept = delete;
+	constexpr Self& operator=(const Self&) noexcept = delete;
+	constexpr Executor(Self&&) noexcept = delete;
+	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	constexpr ~Executor()
 	{
@@ -50,7 +57,7 @@ public:
 		TickType current;
 		do
 		{
-			current = (++tick).get();
+			current = ++tick;
 		} while (current == 0);
 		return current;
 	}
@@ -91,6 +98,7 @@ public:
 			}
 			info.updateTick();
 		}
+
 		// Use to prevent a potential dead lock here if waitForNextTick is called at this moment
 		// in another thread, scope will not be able to acquire the lock and the tick will
 		// remain the same.
@@ -117,7 +125,7 @@ private:
 		[[nodiscard]] static IdType makeUId() noexcept
 		{
 			static Atomic<IdType> id{0};
-			return (++id).get();
+			return ++id;
 		}
 
 	private:
@@ -131,7 +139,7 @@ public:
 	/// \return A range for the running data structure.
 	[[nodiscard]] auto getRangeRunning() noexcept
 	{
-		auto scope = makeSyncLockGuard(runningMutex_);
+		auto scope = makeSyncSharedLockGuard(runningMutex_);
 		return range::associateScope(running_, bzd::move(scope));
 	}
 
@@ -143,7 +151,7 @@ private:
 	[[nodiscard]] auto registerInfo(RunningInfo& info) noexcept
 	{
 		{
-			auto scope = makeSyncSharedLockGuard(runningMutex_);
+			auto scope = makeSyncLockGuard(runningMutex_);
 			const auto result = running_.pushFront(info);
 			bzd::assert::isTrue(result.hasValue());
 		}
@@ -159,7 +167,7 @@ private:
 		}
 
 		return ScopeGuard{[this, &info]() {
-			auto scope = makeSyncSharedLockGuard(runningMutex_);
+			auto scope = makeSyncLockGuard(runningMutex_);
 			const auto result = running_.pop(info);
 			bzd::assert::isTrue(result.hasValue());
 		}};
@@ -194,7 +202,7 @@ private:
 	/// Maxium concurrent scheduler running at the same time.
 	bzd::Atomic<SizeType> maxRunningCount_{0};
 	/// Mutex to protect access over the running queue.
-	bzd::SpinSharedMutex runningMutex_;
+	bzd::SpinSharedMutex runningMutex_{};
 };
 
 } // namespace bzd
