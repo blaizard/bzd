@@ -52,6 +52,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:is_default_constructible",
         "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/type_traits:derived_from",
         "//cc/bzd/utility:forward",
     ],
 )

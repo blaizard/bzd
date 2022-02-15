@@ -99,12 +99,10 @@ public:
 				}
 			}
 
-			bzd::test::InjectPoint<bzd::test::InjectPoint1, Args...>();
-
 			// From here, element cannot be used by any other concurrent operation,
 			// as it has already been flagged as inserted.
 
-			bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
+			bzd::test::InjectPoint<bzd::test::InjectPoint1, Args...>();
 
 			// Update the next pointer of the previous element. If it fails check
 			// if there was a weak mark.
@@ -117,7 +115,7 @@ public:
 				}
 			}
 
-			bzd::test::InjectPoint<bzd::test::InjectPoint3, Args...>();
+			bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
 
 			if constexpr (ElementType::isMultiContainer_)
 			{
@@ -125,7 +123,7 @@ public:
 				element.parent_.store(this);
 			}
 
-			bzd::test::InjectPoint<bzd::test::InjectPoint4, Args...>();
+			bzd::test::InjectPoint<bzd::test::InjectPoint3, Args...>();
 
 			// Remove the insertion mark
 			{
