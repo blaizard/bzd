@@ -227,16 +227,24 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
-	// Push all handles to the executor
-	(co_await bzd::coroutine::impl::Enqueue{asyncs}, ...);
+	// Register on terminate callbacks.
+	bzd::Atomic<SizeType> counter{0};
+	auto onTerminateCallback = [&](impl::AsyncExecutable* caller) -> impl::AsyncExecutable* {
+		// Atomically count the number of async completed, and only for the last one,
+		// push the caller back into the scheduling queue.
+		// This makes this design thread safe.
+		if (++counter == sizeof...(Asyncs))
+		{
+			return caller;
+		}
+		return nullptr;
+	};
 
-	// Loop until all asyncs are ready
-	while (!(asyncs.isReady() && ...))
-	{
-		// Suspend this coroutine now, it will re-enter once one of the pending task
-		// is completed.
-		co_await bzd::coroutine::impl::Suspend();
-	}
+	// Push all handles to the executor
+	(co_await bzd::coroutine::impl::Enqueue{asyncs, onTerminateCallback}, ...);
+
+	// When all asyncs complete it will re-enter here.
+	co_await bzd::coroutine::impl::Suspend();
 
 	// Build the result and return it.
 	ResultType result{asyncs.await_resume()...};

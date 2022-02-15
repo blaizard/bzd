@@ -38,7 +38,7 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 3U);
 }
 
-TEST(NonOwningList, insertWhileInsert)
+TEST(NonOwningList, InsertWhileInsert)
 {
 	insertWhileInsertDoWork<bzd::test::InjectPoint0>();
 	insertWhileInsertDoWork<bzd::test::InjectPoint1>();
@@ -75,7 +75,7 @@ void removeWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 1U);
 }
 
-TEST(NonOwningList, removeWhileInsert)
+TEST(NonOwningList, RemoveWhileInsert)
 {
 	removeWhileInsertDoWork<bzd::test::InjectPoint0>();
 	removeWhileInsertDoWork<bzd::test::InjectPoint1>();
@@ -112,7 +112,7 @@ void insertWhileRemoveDoWork()
 	EXPECT_EQ(list.size(), 1U);
 }
 
-TEST(NonOwningList, insertWhileRemove)
+TEST(NonOwningList, InsertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::test::InjectPoint0>();
 	insertWhileRemoveDoWork<bzd::test::InjectPoint1>();
@@ -151,7 +151,7 @@ void removeWhileRemoveLeftDoWork()
 	EXPECT_EQ(list.size(), 0U);
 }
 
-TEST(NonOwningList, removeWhileRemoveLeft)
+TEST(NonOwningList, RemoveWhileRemoveLeft)
 {
 	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint0>();
 	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint1>();
@@ -190,7 +190,7 @@ void removeWhileRemoveRightDoWork()
 	EXPECT_EQ(list.size(), 0U);
 }
 
-TEST(NonOwningList, removeWhileRemoveRight)
+TEST(NonOwningList, RemoveWhileRemoveRight)
 {
 	removeWhileRemoveRightDoWork<bzd::test::InjectPoint0>();
 	removeWhileRemoveRightDoWork<bzd::test::InjectPoint1>();
@@ -277,7 +277,7 @@ void workloadRemove(Data<T>* pData)
 	}
 }
 
-TEST(NonOwningList, insertionStressMultiContainer)
+TEST(NonOwningList, InsertionStressMultiContainer)
 {
 	srand(time(NULL));
 
@@ -317,7 +317,6 @@ TEST(NonOwningList, insertionStressMultiContainer)
 		data1.list.printNode(&elements[i]);
 	}
 	std::cout << std::endl;
-
 	std::cout << "data1.sanityCheck();" << std::endl;
 	std::cout << "Insertion: " << data1.insertion.load() << std::endl;
 	std::cout << "Removal: " << data1.removal.load() << std::endl;
@@ -330,7 +329,7 @@ TEST(NonOwningList, insertionStressMultiContainer)
 	EXPECT_TRUE(data1.insertion.load() > 0 || data2.insertion.load() > 0);
 }
 
-TEST(NonOwningList, insertionStress)
+TEST(NonOwningList, InsertionStress)
 {
 	srand(time(NULL));
 
@@ -374,4 +373,33 @@ TEST(NonOwningList, insertionStress)
 	std::cout << "Insertion: " << data1.insertion.load() << std::endl;
 	std::cout << "Removal: " << data1.removal.load() << std::endl;
 	data1.sanityCheck();
+}
+
+TEST(NonOwningList, PushPop)
+{
+	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
+	{
+		bzd::Array<std::thread, 10> threads;
+		bzd::test::NonOwningList<bzd::test::ListElement> data{};
+		;
+		bzd::Array<bzd::test::ListElement, 10> elements;
+
+		bzd::SizeType i{0};
+		for (auto& thread : threads)
+		{
+			thread = std::thread{[&data, &elements, i]() {
+				bzd::test::ListElement& element{elements[i]};
+				const auto result1 = data.pushFront(element);
+				EXPECT_TRUE(result1);
+				const auto result2 = data.pop(element);
+				EXPECT_TRUE(result2);
+			}};
+			++i;
+		}
+
+		for (auto& thread : threads)
+		{
+			thread.join();
+		}
+	}
 }
