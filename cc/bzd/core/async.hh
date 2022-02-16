@@ -159,7 +159,8 @@ public: // coroutine specific
 	constexpr ResultType await_resume() noexcept { return bzd::move(moveResultOut().valueMutable()); }
 
 	// private:
-	friend bzd::coroutine::impl::Enqueue;
+	template <class... Args>
+	friend struct bzd::coroutine::impl::Enqueue;
 
 	constexpr Executable& getExecutable() noexcept
 	{
@@ -240,11 +241,8 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 		return nullptr;
 	};
 
-	// Push all handles to the executor
-	(co_await bzd::coroutine::impl::Enqueue{asyncs, onTerminateCallback}, ...);
-
-	// When all asyncs complete it will re-enter here.
-	co_await bzd::coroutine::impl::Suspend();
+	// Push all handles to the executor and suspend.
+	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
 
 	// Build the result and return it.
 	ResultType result{asyncs.await_resume()...};
@@ -275,12 +273,10 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 			token.trigger();
 			return caller;
 		}
+
 		return nullptr;
 	};
-	(co_await bzd::coroutine::impl::Enqueue{asyncs, onTerminateCallback}, ...);
-
-	// The first coroutine that complete will re-enter here.
-	co_await bzd::coroutine::impl::Suspend();
+	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
 
 	// Wait until no executors are processing cancelled coroutines.
 	// by waiting for at least one iteration from all executors.

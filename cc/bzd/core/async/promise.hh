@@ -35,20 +35,30 @@ public:
 using Executor = bzd::Executor<Executable>;
 
 /// Awaitable to enqueue an async object.
-struct Enqueue
+template <class... Asyncs>
+struct Enqueue : public bzd::coroutine::impl::suspend_always
 {
-	template <class T>
-	constexpr Enqueue(T& async) noexcept : exectuable_{async.getExecutable()}
+	template <class Callback>
+	constexpr Enqueue(Callback& callback, Asyncs&... asyncs) noexcept : exectuables_{inPlace, &asyncs.getExecutable()...}
 	{
+		for (auto& executable : exectuables_)
+		{
+			executable->onTerminateCallback_.emplace(callback);
+		}
 	}
 
-	template <class T, class Callback>
-	constexpr Enqueue(T& async, Callback&& callback) noexcept : Enqueue{async}
+	/// Enqueuing the executable in await_suspend is important, as it is called just after
+	/// the state of the resume point has been updated. Doing this ensures that concurrent
+	/// thread they execute the executable will return at this resume point and not before. 
+	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<>) const noexcept
 	{
-		exectuable_.onTerminateCallback_.emplace(bzd::forward<Callback>(callback));
+		for (auto* exectuable : exectuables_)
+		{
+			exectuable->enqueue();
+		}
 	}
 
-	Executable& exectuable_;
+	bzd::Array<Executable*, sizeof...(Asyncs)> exectuables_;
 };
 
 /// Awaitable to yield the current execution.
@@ -148,13 +158,15 @@ public:
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
 public: // Await transform specializations
-	constexpr auto await_transform(bzd::coroutine::impl::Enqueue&& object) noexcept
+	template <class... Args>
+	constexpr auto await_transform(bzd::coroutine::impl::Enqueue<Args...>&& awaitable) noexcept
 	{
-		auto& exectuable = object.exectuable_;
-		exectuable.setExecutor(getExecutor());
-		exectuable.enqueue();
-		exectuable.caller_ = this;
-		return bzd::coroutine::impl::suspend_never{};
+		for (auto* exectuable : awaitable.exectuables_)
+		{
+			exectuable->caller_ = this;
+			exectuable->setExecutor(getExecutor());
+		}
+		return bzd::move(awaitable);
 	}
 
 	constexpr auto&& await_transform(bzd::coroutine::impl::Suspend&& awaitable) noexcept { return bzd::move(awaitable); }
@@ -163,7 +175,6 @@ public: // Await transform specializations
 	{
 		if (isCanceledOrTriggered())
 		{
-			::std::cout << "PROPAGATE!" << ::std::flush;
 			awaitable.token_.trigger();
 		}
 		return bzd::move(awaitable);
