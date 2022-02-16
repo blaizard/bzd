@@ -5,9 +5,14 @@
 
 #include <thread>
 
-bzd::Async<> cancellationWorkload(const auto duration)
+bzd::Async<> cancellationWorkload(const auto durationMs)
 {
-	::std::this_thread::sleep_for(duration);
+	for (auto current = 0; current < durationMs; ++current)
+	{
+		using namespace std::chrono_literals;
+		::std::this_thread::sleep_for(1ms);
+		co_await bzd::async::yield();
+	}
 	co_return {};
 }
 
@@ -17,8 +22,8 @@ TEST(Coroutine, Cancellation2Threads)
 	bzd::impl::AsyncExecutor executor;
 	bzd::Array<std::thread, 2> threads;
 
-	auto promise1 = cancellationWorkload(2ms);
-	auto promise2 = cancellationWorkload(1ms);
+	auto promise1 = cancellationWorkload(2);
+	auto promise2 = cancellationWorkload(1);
 	auto promise = bzd::async::any(promise1, promise2);
 	promise.enqueue(executor);
 
@@ -35,18 +40,16 @@ TEST(Coroutine, Cancellation2Threads)
 
 TEST(Coroutine, CancellationStress)
 {
-	using namespace std::chrono_literals;
-
 	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
 	{
 		bzd::impl::AsyncExecutor executor{};
 		bzd::Array<std::thread, 5> threads;
 
-		auto promise1 = cancellationWorkload(1ms);
-		auto promise2 = cancellationWorkload(1ms);
-		auto promise3 = cancellationWorkload(1ms);
-		auto promise4 = cancellationWorkload(1ms);
-		auto promise5 = cancellationWorkload(1ms);
+		auto promise1 = cancellationWorkload(0);
+		auto promise2 = cancellationWorkload(0);
+		auto promise3 = cancellationWorkload(0);
+		auto promise4 = cancellationWorkload(0);
+		auto promise5 = cancellationWorkload(0);
 		auto promise = bzd::async::any(promise1, promise2, promise3, promise4, promise5);
 		promise.enqueue(executor);
 
