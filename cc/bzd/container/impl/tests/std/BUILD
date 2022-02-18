@@ -7,6 +7,10 @@ cc_library(
     linkopts = [
         "-pthread",
     ],
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 bzd_cc_test(

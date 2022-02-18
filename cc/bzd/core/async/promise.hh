@@ -49,7 +49,7 @@ struct Enqueue : public bzd::coroutine::impl::suspend_always
 
 	/// Enqueuing the executable in await_suspend is important, as it is called just after
 	/// the state of the resume point has been updated. Doing this ensures that concurrent
-	/// thread they execute the executable will return at this resume point and not before. 
+	/// thread they execute the executable will return at this resume point and not before.
 	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<>) const noexcept
 	{
 		for (auto* exectuable : exectuables_)
