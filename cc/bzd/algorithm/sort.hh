@@ -1,10 +1,10 @@
 #pragma once
 
-#include "cc/bzd/type_traits/iterator/distance.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
-#include "cc/bzd/type_traits/range/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/comparison/less.hh"
+#include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/swap.hh"
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/container/tuple.hh"
-#include "cc/bzd/type_traits/iterator/begin.hh"
-#include "cc/bzd/type_traits/iterator/end.hh"
+#include "cc/bzd/utility/begin.hh"
+#include "cc/bzd/utility/end.hh"
 
 namespace bzd::range {
 /// Associate a range to one or multiple scopes

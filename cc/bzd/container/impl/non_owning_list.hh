@@ -10,7 +10,7 @@
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_const.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/ignore.hh"
 
 namespace bzd {

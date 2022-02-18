@@ -5,13 +5,17 @@ bzd_cc_library(
     name = "utility",
     visibility = ["//visibility:public"],
     deps = [
+        ":advance",
         ":align_down",
         ":align_up",
         ":aligned_storage",
+        ":begin",
         ":bit",
         ":concept",
         ":constexpr_for",
         ":container_of",
+        ":distance",
+        ":end",
         ":forward",
         ":ignore",
         ":in_place",
@@ -24,6 +28,7 @@ bzd_cc_library(
         ":scope_guard",
         ":signal",
         ":singleton",
+        ":size",
         ":source_location",
         ":swap",
         "//cc/bzd/utility/format",
@@ -35,6 +40,17 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "advance",
+    hdrs = [
+        "advance.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
 
 cc_library(
     name = "align_down",
@@ -62,6 +78,17 @@ cc_library(
     name = "aligned_storage",
     hdrs = [
         "aligned_storage.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "begin",
+    hdrs = [
+        "begin.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -112,6 +139,28 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":offset_of",
+    ],
+)
+
+cc_library(
+    name = "distance",
+    hdrs = [
+        "distance.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
+
+cc_library(
+    name = "end",
+    hdrs = [
+        "end.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
     ],
 )
 
@@ -238,6 +287,17 @@ cc_library(
         "singleton.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "size",
+    hdrs = [
+        "size.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
 )
 
 cc_library(

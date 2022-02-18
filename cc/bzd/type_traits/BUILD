@@ -49,7 +49,9 @@ bzd_cc_library(
         ":is_union",
         ":is_void",
         ":is_volatile",
+        ":iterator",
         ":lockable",
+        ":range",
         ":remove_const",
         ":remove_cv",
         ":remove_cvref",
@@ -59,8 +61,6 @@ bzd_cc_library(
         ":remove_volatile",
         ":true_type",
         ":void_type",
-        "//cc/bzd/type_traits/iterator",
-        "//cc/bzd/type_traits/range",
     ],
 )
 
@@ -571,11 +571,43 @@ cc_library(
 )
 
 cc_library(
+    name = "iterator",
+    hdrs = [
+        "iterator.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":derived_from",
+        ":false_type",
+        ":is_base_of",
+        ":is_pointer",
+        ":remove_pointer",
+        ":true_type",
+        ":void_type",
+    ],
+)
+
+cc_library(
     name = "lockable",
     hdrs = [
         "lockable.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "range",
+    hdrs = [
+        "range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":declval",
+        ":iterator",
+        "//cc/bzd/utility:begin",
+        "//cc/bzd/utility:end",
+        "//cc/bzd/utility:size",
+    ],
 )
 
 cc_library(

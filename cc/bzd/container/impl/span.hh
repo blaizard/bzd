@@ -8,8 +8,8 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_const.hh"
-#include "cc/bzd/type_traits/iterator/distance.hh"
 #include "cc/bzd/type_traits/remove_const.hh"
+#include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/move.hh"
 

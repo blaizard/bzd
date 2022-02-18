@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/iterator/traits.hh"
-#include "cc/bzd/type_traits/range/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {

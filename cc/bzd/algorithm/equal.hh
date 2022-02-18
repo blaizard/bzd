@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
-#include "cc/bzd/type_traits/range/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/equal_to.hh"
 #include "cc/bzd/utility/forward.hh"
 
@@ -42,11 +42,8 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 /// \param[in] last2 The ending of the second range of elements to compare.
 template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
 requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
-[[nodiscard]] constexpr bzd::BoolType equal(Iterator1 first1,
-											Iterator1 last1,
-											Iterator2 first2,
-											Iterator2 last2,
-											BinaryPredicate predicate = BinaryPredicate{})
+[[nodiscard]] constexpr bzd::BoolType equal(
+	Iterator1 first1, Iterator1 last1, Iterator2 first2, Iterator2 last2, BinaryPredicate predicate = BinaryPredicate{})
 {
 	static_assert(
 		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,

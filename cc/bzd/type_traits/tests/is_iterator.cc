@@ -1,5 +1,5 @@
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 
 /*
 static_assert(is_iterator_v<std::vector<int>::iterator>);

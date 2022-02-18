@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/algorithm/find_if_not.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
-#include "cc/bzd/type_traits/range/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::algorithm {
 
