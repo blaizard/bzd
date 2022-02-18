@@ -5,11 +5,23 @@ bzd_cc_library(
     name = "range",
     visibility = ["//visibility:public"],
     deps = [
+        ":size",
         ":traits",
     ],
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "size",
+    hdrs = [
+        "size.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
 
 cc_library(
     name = "traits",
@@ -22,5 +34,6 @@ cc_library(
         "//cc/bzd/type_traits/iterator:begin",
         "//cc/bzd/type_traits/iterator:end",
         "//cc/bzd/type_traits/iterator:traits",
+        ":size"
     ],
 )
