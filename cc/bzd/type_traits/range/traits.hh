@@ -4,6 +4,7 @@
 #include "cc/bzd/type_traits/iterator/begin.hh"
 #include "cc/bzd/type_traits/iterator/end.hh"
 #include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/range/size.hh"
 
 namespace bzd::concepts {
 
@@ -49,5 +50,11 @@ concept randomAccessRange = range<T> && derivedFrom<typename typeTraits::Iterato
 
 template <class T>
 concept contiguousRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ContiguousTag>;
+
+template <class T>
+concept sizedRange = range<T> && requires(T t)
+{
+	bzd::size(t);
+};
 
 } // namespace bzd::concepts

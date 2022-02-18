@@ -39,12 +39,45 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 }
 
 /// \copydoc equal
+/// \param[in] last2 The ending of the second range of elements to compare.
+template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
+requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
+[[nodiscard]] constexpr bzd::BoolType equal(Iterator1 first1,
+											Iterator1 last1,
+											Iterator2 first2,
+											Iterator2 last2,
+											BinaryPredicate predicate = BinaryPredicate{})
+{
+	static_assert(
+		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
+		"Value types of both iterators must match.");
+
+	for (; first1 != last1 && first2 != last2; ++first1, ++first2)
+	{
+		if (!predicate(*first1, *first2))
+		{
+			return false;
+		}
+	}
+
+	return (first1 == last1 && first2 == last2);
+}
+
+/// \copydoc equal
 /// \param[in] range1 The first range of elements to compare.
 /// \param[in] range2 The second range of elements to compare.
 template <class Range1, class Range2, class... Args>
 requires concepts::forwardRange<Range1> && concepts::forwardRange<Range2>
 [[nodiscard]] constexpr auto equal(Range1&& range1, Range2&& range2, Args&&... args)
 {
-	return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);
+	if constexpr (concepts::sizedRange<Range1> && concepts::sizedRange<Range2>)
+	{
+		if (bzd::size(range1) == bzd::size(range2))
+		{
+			return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);
+		}
+		return false;
+	}
+	return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
 }
 } // namespace bzd::algorithm
