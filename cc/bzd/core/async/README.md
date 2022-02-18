@@ -55,6 +55,7 @@ Where a `co_await` statement looks something like this:
     auto&& awaiter = //<get-awaitable>;
     if (!awaiter.await_ready())
     {
+        // Save the current state of the coroutine.
         // <suspend-coroutine>
         if (awaiter.await_suspend(std::coroutine_handle<> p))
         {

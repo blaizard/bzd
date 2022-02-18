@@ -3,8 +3,8 @@
 #include "cc/bzd/algorithm/lower_bound.hh"
 #include "cc/bzd/algorithm/upper_bound.hh"
 #include "cc/bzd/container/tuple.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
-#include "cc/bzd/type_traits/range/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/forward.hh"
 

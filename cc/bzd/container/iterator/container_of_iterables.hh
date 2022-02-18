@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 
 namespace bzd::iterator {
 

@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits/iterator:traits",
+        "//cc/bzd/type_traits:iterator",
     ],
 )
 
@@ -34,6 +34,6 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_same",
-        "//cc/bzd/type_traits/iterator:traits",
+        "//cc/bzd/type_traits:iterator",
     ],
 )

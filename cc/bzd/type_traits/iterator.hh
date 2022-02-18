@@ -4,7 +4,6 @@
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/type_traits/remove_pointer.hh"
-#include "cc/bzd/utility/concept.hh"
 
 namespace bzd::typeTraits {
 

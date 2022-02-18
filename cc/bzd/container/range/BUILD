@@ -8,7 +8,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:tuple",
-        "//cc/bzd/type_traits/iterator:begin",
-        "//cc/bzd/type_traits/iterator:end",
+        "//cc/bzd/utility:begin",
+        "//cc/bzd/utility:end",
     ],
 )

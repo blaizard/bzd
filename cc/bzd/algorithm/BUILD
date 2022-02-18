@@ -37,8 +37,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if_not",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if_not",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -63,8 +63,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":lower_bound",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -76,8 +76,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -88,8 +88,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -100,8 +100,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -115,8 +115,8 @@ cc_library(
         ":lower_bound",
         ":upper_bound",
         "//cc/bzd/container:tuple",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -130,8 +130,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:is_same",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -144,8 +144,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -168,8 +168,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -193,8 +193,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:is_same",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
@@ -208,10 +208,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:advance",
-        "//cc/bzd/type_traits/iterator:distance",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:advance",
+        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -224,8 +224,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:move",
     ],
 )
@@ -237,8 +237,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:move",
     ],
 )
@@ -251,8 +251,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -264,8 +264,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:swap",
     ],
 )
@@ -277,10 +277,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_cvref",
-        "//cc/bzd/type_traits/iterator:distance",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
@@ -294,10 +294,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits/iterator:advance",
-        "//cc/bzd/type_traits/iterator:distance",
-        "//cc/bzd/type_traits/iterator:traits",
-        "//cc/bzd/type_traits/range:traits",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:advance",
+        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],

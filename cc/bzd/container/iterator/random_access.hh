@@ -3,7 +3,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/iterator/traits.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 
 namespace bzd::iterator {
 
