@@ -1,9 +1,9 @@
 #pragma once
 
+#include "cc/bzd/type_traits/derived_from.hh"
 #include "cc/bzd/type_traits/is_default_constructible.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/forward.hh"
-#include "cc/bzd/type_traits/derived_from.hh"
 
 namespace bzd::test {
 struct InjectPointBase
@@ -13,10 +13,9 @@ struct InjectPointBase
 struct InjectPointNoMatch : InjectPointBase
 {
 };
-}
+} // namespace bzd::test
 
-namespace bzd::concepts
-{
+namespace bzd::concepts {
 template <class T>
 concept injectionPoint = derivedFrom<T, test::InjectPointBase>;
 }
