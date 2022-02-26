@@ -66,7 +66,7 @@ class ResultType:
 class CallableType:
 
 	constexpr = False
-	transform = "bzd::FunctionView<void(void)>"
+	transform = "bzd::FunctionRef<void(void)>"
 
 
 class SpanType:

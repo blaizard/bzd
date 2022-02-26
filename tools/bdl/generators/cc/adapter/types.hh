@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/function_view.hh"
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/vector.hh"

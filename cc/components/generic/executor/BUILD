@@ -20,6 +20,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
+        "//cc/bzd/container:function_ref",
         "//cc/bzd/utility:constexpr_for",
     ],
 )

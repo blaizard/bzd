@@ -8,8 +8,7 @@ bzd_cc_library(
         ":any_reference",
         ":array",
         ":btree",
-        ":function",
-        ":function_view",
+        ":function_ref",
         ":map",
         ":named_type",
         ":optional",
@@ -77,31 +76,16 @@ cc_library(
 )
 
 cc_library(
-    name = "function",
+    name = "function_ref",
     hdrs = [
-        "function.hh",
+        "function_ref.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform:compiler",
-        "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits:add_pointer",
-        "//cc/bzd/type_traits:decay",
-        "//cc/bzd/utility:forward",
-    ],
-)
-
-cc_library(
-    name = "function_view",
-    hdrs = [
-        "function_view.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":function",
         ":variant",
         "//cc/bzd/type_traits:add_pointer",
-        "//cc/bzd/utility:ignore",
+        "//cc/bzd/type_traits:invocable",
+        "//cc/bzd/type_traits:is_same_class",
     ],
 )
 

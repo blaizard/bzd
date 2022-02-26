@@ -27,7 +27,6 @@ cc_library(
     deps = [
         ":integral",
         "//cc/bzd/container:array",
-        "//cc/bzd/container:function_view",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string",
         "//cc/bzd/container:tuple",

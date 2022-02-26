@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/interfaces/core.hh"
 #include "cc/bzd/platform/interfaces/executor.hh"
@@ -11,7 +12,11 @@ template <class... Cores>
 class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
 {
 public:
-	constexpr Executor(Cores&... cores) noexcept : cores_{&cores...}, executor_{}, start_{executor_, &bzd::impl::AsyncExecutor::run} {}
+	constexpr Executor(Cores&... cores) noexcept :
+		cores_{&cores...}, executor_{}, start_{bzd::FunctionRef<void(void)>::toMember<decltype(executor_), &bzd::impl::AsyncExecutor::run>(
+											executor_)}
+	{
+	}
 
 	/**
 	 * Assign a workload to this executor.
@@ -43,7 +48,7 @@ private:
 
 	bzd::Tuple<Cores*...> cores_;
 	bzd::impl::AsyncExecutor executor_;
-	bzd::FunctionView<void(void)> start_;
+	bzd::FunctionRef<void(void)> start_;
 };
 
 } // namespace bzd::platform::generic
