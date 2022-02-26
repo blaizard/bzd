@@ -5,7 +5,7 @@ pipeline
 	triggers
 	{
 		cron("@weekly")
-		pollSCM("H H/8 * * *") // Every 8 hours
+		pollSCM("0 3 * * *") // Every day at 3:00am
 	}
 	agent
 	{
