@@ -8,9 +8,6 @@
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/source_location.hh"
 
-// TODO: remove this dependency
-#include <functional>
-
 // Forward declaration
 namespace bzd::impl {
 template <class T>

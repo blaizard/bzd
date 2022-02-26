@@ -7,6 +7,7 @@
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
@@ -183,6 +184,12 @@ public:
 
 } // namespace bzd
 
+namespace bzd::concepts
+{
+template <class T>
+concept async = sameTemplate<T, bzd::Async>;
+}
+
 namespace bzd::async {
 
 constexpr auto yield() noexcept
@@ -222,7 +229,7 @@ inline Async<> yieldAll() noexcept
 	co_return {};
 }
 
-template <class... Asyncs>
+template <concepts::async... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
@@ -248,7 +255,7 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 	co_return result;
 }
 
-template <class... Asyncs>
+template <concepts::async... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs) noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
