@@ -39,6 +39,7 @@ bzd_cc_library(
         ":is_reference",
         ":is_rvalue_reference",
         ":is_same",
+        ":is_same_class",
         ":is_same_template",
         ":is_signed",
         ":is_trivially_copy_assignable",
@@ -213,6 +214,18 @@ cc_library(
         "integral_constant.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "invocable",
+    hdrs = [
+        "invocable.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_same",
+        "//cc/bzd/utility:forward",
+    ],
 )
 
 cc_library(
@@ -461,6 +474,18 @@ cc_library(
     deps = [
         ":false_type",
         ":true_type",
+    ],
+)
+
+cc_library(
+    name = "is_same_class",
+    hdrs = [
+        "is_same_class.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_same",
+        ":remove_cvref",
     ],
 )
 

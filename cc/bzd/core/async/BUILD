@@ -11,7 +11,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:array",
-        "//cc/bzd/container:function_view",
+        "//cc/bzd/container:function_ref",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
         "//cc/bzd/container:tuple",

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/function_view.hh"
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/impl/non_owning_list.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/core/async/coroutine.hh"
@@ -29,7 +29,7 @@ public:
 
 	bzd::coroutine::impl::coroutine_handle<> handle_;
 	Executable* caller_{nullptr};
-	bzd::Optional<std::function<Executable*(Executable*)>> onTerminateCallback_{};
+	bzd::Optional<bzd::FunctionRef<Executable*(Executable*)>> onTerminateCallback_{};
 };
 
 using Executor = bzd::Executor<Executable>;

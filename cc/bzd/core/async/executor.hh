@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/function_view.hh"
 #include "cc/bzd/container/impl/non_owning_list.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/core/async/coroutine.hh"

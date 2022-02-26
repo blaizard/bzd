@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/container/function_view.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/tuple.hh"

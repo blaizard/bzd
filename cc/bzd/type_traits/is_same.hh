@@ -23,3 +23,8 @@ template <class T, class U>
 inline constexpr bool isSame = IsSame<T, U>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T, class U>
+concept sameAs = typeTraits::isSame<T, U> && typeTraits::isSame<U, T>;
+}
