@@ -205,6 +205,28 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	co_return {};
 }
 
+bzd::Async<> yieldLoop(bzd::interface::String& trace, bzd::StringView id, bzd::SizeType counter)
+{
+	while (counter--)
+	{
+		appendToTrace(trace, id, 0);
+		co_await bzd::async::yield();
+	}
+	co_return {};
+}
+
+TEST_ASYNC(Coroutine, asyncAnyYield)
+{
+	bzd::String<128> trace;
+	auto promiseA = yieldLoop(trace, "a", 10);
+	auto promiseB = yieldLoop(trace, "b", 2);
+	const auto result = co_await bzd::async::any(promiseA, promiseB);
+	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	EXPECT_EQ(trace, "[a0][b0][a0][b0][a0]");
+	EXPECT_EQ(result.size(), 2U);
+	co_return {};
+}
+
 bzd::Async<int> anyNested(bzd::interface::String& trace, bzd::StringView id)
 {
 	auto promiseA = deepNested(trace, "b");
@@ -222,6 +244,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 	{
 		bzd::String<128> trace;
 		co_await anyNested(trace, "a");
+		::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][b0][c2][a7]");
 	}
 	/*
