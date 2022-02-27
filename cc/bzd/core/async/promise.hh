@@ -22,11 +22,43 @@ class Executable : public bzd::interface::Executable<Executable>
 public:
 	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
 
+	/// Called by the scheduler to resume an executable.
 	void resume() noexcept { handle_.resume(); }
+
+	/// Called by the scheduler when an executable is detected as being canceled.
+	constexpr void cancel() noexcept
+	{
+		auto executable = this;
+		// Look for the parent cancelled async and enqueue its continuation.
+		while (executable->caller_ && executable->caller_->isCanceledOrTriggered())
+		{
+			executable = executable->caller_;
+		}
+		executable->enqueueContinuationIfRelevant();
+	}
+
+	/// Enqueue the continuation of the async after calling the terminate callback if any.
+	constexpr void enqueueContinuationIfRelevant() noexcept
+	{
+		auto continuation = caller_;
+
+		// Call the termination callback which decides if a continuation should be enqueued.
+		if (onTerminateCallback_)
+		{
+			continuation = ((onTerminateCallback_.value())()) ? continuation : nullptr;
+		}
+
+		if (continuation)
+		{
+			// Enqueue the continuation for later use, it will be scheduled
+			// according to the executor policy.
+			continuation->enqueue();
+		}
+	}
 
 	bzd::coroutine::impl::coroutine_handle<> handle_;
 	Executable* caller_{nullptr};
-	bzd::Optional<bzd::FunctionRef<Executable*(Executable*)>> onTerminateCallback_{};
+	bzd::Optional<bzd::FunctionRef<bool(void)>> onTerminateCallback_{};
 };
 
 using Executor = bzd::Executor<Executable>;
@@ -107,31 +139,16 @@ private:
 
 		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
-			auto& promise = handle.promise();
-			auto continuation = promise.caller_;
-
-			if (promise_.onTerminateCallback_)
-			{
-				continuation = (promise_.onTerminateCallback_.value())(continuation);
-			}
-
-			if (continuation)
-			{
-				// Enqueue the continuation for later use, it will be scheduled
-				// according to the executor policy.
-				// Enqueuing this coroutine into the executor is important for thread
-				// safety reasons, if we return the coroutine handle directly here, we
-				// might have a case where the same coroutine executes multiple times on
-				// different threads.
-				continuation->enqueue();
-			}
+			// Enqueuing this coroutine into the executor is important for thread
+			// safety reasons, if we return the coroutine handle directly here, we
+			// might have a case where the same coroutine executes multiple times on
+			// different threads.
+			handle.promise().enqueueContinuationIfRelevant();
 
 			return bzd::coroutine::impl::noop_coroutine();
 		}
 
 		constexpr void await_resume() noexcept {}
-
-		Self& promise_;
 	};
 
 public:
@@ -150,7 +167,7 @@ public:
 		return {};
 	}
 
-	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{*this}; }
+	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{}; }
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 

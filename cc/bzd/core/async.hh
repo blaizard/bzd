@@ -6,8 +6,8 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
-#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
@@ -143,6 +143,10 @@ public: // coroutine specific
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
 	{
+		// caller ()
+		// {
+		//    co_await this ()
+		/// }
 		auto& promise = handle_.promise();
 
 		// To handle continuation
@@ -184,8 +188,7 @@ public:
 
 } // namespace bzd
 
-namespace bzd::concepts
-{
+namespace bzd::concepts {
 template <class T>
 concept async = sameTemplate<T, bzd::Async>;
 }
@@ -207,28 +210,6 @@ constexpr auto getExecutable() noexcept
 	return bzd::coroutine::impl::GetExecutable{};
 }
 
-/// Wait for the next scheduler iteration for all running schedulers.
-inline Async<> yieldAll() noexcept
-{
-	auto& executor = *(co_await bzd::async::getExecutor());
-	const auto currentTick{executor.getNextTick()};
-	auto running = executor.getRangeRunning();
-	for (const auto& element : running)
-	{
-		// Keeping track of the previous tick is needed here to handle cases where the counter wraps.
-		auto tick = element.getTick();
-		auto previousTick = tick;
-		while (tick < currentTick && previousTick != tick && !element.isCompleted())
-		{
-			co_await bzd::async::yield();
-			previousTick = tick;
-			tick = element.getTick();
-		}
-	}
-
-	co_return {};
-}
-
 template <concepts::async... Asyncs>
 impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
 {
@@ -236,15 +217,11 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 
 	// Register on terminate callbacks.
 	bzd::Atomic<SizeType> counter{0};
-	auto onTerminateCallback = [&](impl::AsyncExecutable* caller) -> impl::AsyncExecutable* {
+	auto onTerminateCallback = [&]() -> bool {
 		// Atomically count the number of async completed, and only for the last one,
 		// push the caller back into the scheduling queue.
 		// This makes this design thread safe.
-		if (++counter == sizeof...(Asyncs))
-		{
-			return caller;
-		}
-		return nullptr;
+		return (++counter == sizeof...(Asyncs));
 	};
 
 	// Push all handles to the executor and suspend.
@@ -265,28 +242,21 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 	(asyncs.setCancellationToken(token), ...);
 
 	// Register on terminate callbacks.
-	bzd::Atomic<BoolType> enqueueCaller{true};
-	auto onTerminateCallback = [&](impl::AsyncExecutable* caller) -> impl::AsyncExecutable* {
-		// Ensure that only one instance return to the caller.
-		// This prevents concurrent thread to enque the caller, which coudl lead to a situation
-		// where the caller is executed (not in the queue) and being enqued at the same time,
-		// so will be executed twice and potentially in parallel.
-		if (enqueueCaller.exchange(false))
+	bzd::Atomic<SizeType> counter{0};
+	auto onTerminateCallback = [&]() -> bool {
+		// Atomically count the number of async completed
+		auto current = ++counter;
+		// Only triggers the token for the first entry to this function.
+		if (current == 1U)
 		{
-			// No need to clear other async callers and callbacks as if which the scope,
-			// they will return a null continuation and this function cannot be called out of scope
-			// because we wait for all executors to yeild once before returning.
 			token.trigger();
-			return caller;
 		}
-
-		return nullptr;
+		// For the last one, push the caller back into the scheduling queue.
+		// This makes this design thread safe.
+		return (current == sizeof...(Asyncs));
 	};
-	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
 
-	// Wait until no executors are processing cancelled coroutines.
-	// by waiting for at least one iteration from all executors.
-	co_await bzd::async::yieldAll();
+	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
 
 	// By now all asyncs must have been either ready or canceled.
 	// Build the result and return it.

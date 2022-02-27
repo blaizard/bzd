@@ -85,7 +85,6 @@ public:
 			if (maybeExecutable.hasValue())
 			{
 				auto& executable = maybeExecutable.valueMutable();
-				// On cancellation, ignore the executable and flag it as canceled.
 				if (executable.isCanceledOrTriggered())
 				{
 					executable.cancel();
@@ -273,8 +272,6 @@ public:
 	}
 
 	constexpr void trigger() noexcept { cancel_->trigger(); }
-
-	constexpr void cancel() noexcept { cancel_->cancel(); }
 
 	constexpr BoolType isCanceledOrTriggered() const noexcept
 	{
