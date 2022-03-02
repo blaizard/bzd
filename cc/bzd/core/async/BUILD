@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:array",
         "//cc/bzd/container:function_ref",
+        "//cc/bzd/container:non_owning_list",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
         "//cc/bzd/container:tuple",

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/container/non_owning_list.hh"
+#include "cc/bzd/container/optional.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
@@ -14,7 +16,7 @@
 ///    |
 ///
 namespace bzd {
-class CancellationToken
+class CancellationToken : public bzd::NonOwningListElement
 {
 public:
 	constexpr CancellationToken() noexcept = default;
@@ -23,22 +25,18 @@ public:
 	/// state to this token.
 	constexpr void attach(CancellationToken& token) noexcept
 	{
-		bzd::assert::isTrue(parent_ == nullptr);
+		bzd::assert::isTrue(!parent_);
 
 		auto scope = makeSyncLockGuard(token.mutex_);
-		parent_ = &token;
-
-		// Add this token to the linked list.
-		auto next = token.attached_;
-		token.attached_ = this;
-		next_ = next;
+		parent_ = token;
+		token.attached_.pushFront(*this);
 	}
 
 	constexpr ~CancellationToken() noexcept
 	{
 		if (parent_)
 		{
-			parent_->removeToken(*this);
+			parent_.value().removeToken(*this);
 		}
 	}
 
@@ -47,11 +45,9 @@ public:
 		flag_.store(true);
 		{
 			auto scope = makeSyncLockGuard(mutex_);
-			auto next = attached_;
-			while (next)
+			for (auto& token : attached_)
 			{
-				next->trigger();
-				next = next->next_;
+				token.trigger();
 			}
 		}
 	}
@@ -59,15 +55,8 @@ public:
 	constexpr void removeToken(const CancellationToken& token) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
-		auto next = attached_;
-		while (next)
-		{
-			if (next == &token)
-			{
-				// TODO FIX
-			}
-			next = next->next_;
-		}
+		const auto result = attached_.erase(token);
+		bzd::assert::isTrue(result);
 	}
 
 	constexpr BoolType isCanceled() const noexcept { return flag_.load(); }
@@ -75,8 +64,7 @@ public:
 private:
 	bzd::Atomic<BoolType> flag_{false};
 	bzd::SpinMutex mutex_{};
-	CancellationToken* next_{nullptr};
-	CancellationToken* previous_{nullptr};
-	CancellationToken* attached_{nullptr};
+	bzd::Optional<CancellationToken&> parent_{};
+	bzd::NonOwningList<CancellationToken> attached_{};
 };
 } // namespace bzd
