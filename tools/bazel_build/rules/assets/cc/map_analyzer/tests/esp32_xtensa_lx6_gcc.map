@@ -16931,13 +16931,13 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
                 0x000000003f4016b0       0x24 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
  .rodata._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv.str1.1
                 0x000000003f4016d4       0x39 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
- .rodata._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
+ .rodata._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
                 0x000000003f40170d       0x34 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
  .rodata._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE.str1.1
                 0x000000003f401741       0x4e bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
- .rodata._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv.str1.1
+ .rodata._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv.str1.1
                 0x000000003f40178f        0xb bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
- .rodata._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
+ .rodata._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
                 0x000000003f40179a        0x6 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
  .rodata.main.str1.1
                 0x000000003f4017a0       0x32 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
@@ -16960,11 +16960,11 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
                 0x000000003f4018eb       0x5c bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .rodata._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv.str1.1
                 0x000000003f4018eb       0x39 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .rodata._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
+ .rodata._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
                 0x000000003f4018eb       0x34 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .rodata._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv.str1.1
+ .rodata._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv.str1.1
                 0x000000003f4018eb        0xb bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .rodata._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
+ .rodata._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_.str1.1
                 0x000000003f4018eb        0x6 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .rodata._ZN3bzd4impl8RegistryINS0_8OChannelIhEEE3getEPNS0_3MapINS0_10StringViewIcNS_4SpanIKcEEEEPS3_EE.str1.1
                 0x000000003f4018eb       0x1d bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/core/libassert_minimal.a(minimal.pic.o)
@@ -18466,9 +18466,9 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
                 0x000000003f406928                __XT_EXCEPTION_TABLE_ = ABSOLUTE (.)
  *(.xt_except_table)
  *(.gcc_except_table .gcc_except_table.*)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x000000003f406928        0x4 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x000000003f40692c        0x4 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
  .gcc_except_table._ZN3bzd9Scheduler5startEv
                 0x000000003f406930        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
@@ -19571,19 +19571,19 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
  .literal._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv
                 0x00000000400d05a8        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                           0xc (size before relaxing)
- .literal._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .literal._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x00000000400d05b0       0x10 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                          0x18 (size before relaxing)
  .literal._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
                 0x00000000400d05c0        0xc bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                          0x14 (size before relaxing)
- .literal._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .literal._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x00000000400d05cc        0x4 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                           0xc (size before relaxing)
- .literal._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .literal._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x00000000400d05d0        0x4 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                           0xc (size before relaxing)
- .literal._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .literal._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x00000000400d05d4        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                          0x18 (size before relaxing)
  .literal.startup.main
@@ -23568,25 +23568,25 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
                 0x00000000400dc1ac       0x26 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                 0x00000000400dc1ac                _ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv
  *fill*         0x00000000400dc1d2        0x2 
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x00000000400dc1d4      0x11e bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
-                0x00000000400dc1d4                _ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+                0x00000000400dc1d4                _ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
  *fill*         0x00000000400dc2f2        0x2 
  .text._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
                 0x00000000400dc2f4       0x32 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                 0x00000000400dc2f4                _ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
  *fill*         0x00000000400dc326        0x2 
- .text._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x00000000400dc328       0x26 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
-                0x00000000400dc328                _ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+                0x00000000400dc328                _ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
  *fill*         0x00000000400dc34e        0x2 
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x00000000400dc350       0x26 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
-                0x00000000400dc350                _ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+                0x00000000400dc350                _ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
  *fill*         0x00000000400dc376        0x2 
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x00000000400dc378      0x23b bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
-                0x00000000400dc378                _ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+                0x00000000400dc378                _ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
  *fill*         0x00000000400dc5b3        0x1 
  .text._ZN3bzd9Scheduler5startEv
                 0x00000000400dc5b4       0x9c bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
@@ -28663,9 +28663,9 @@ LOAD bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/cc/bzd/platform/stack/stub/
  *fill*         0x0000000040106363        0x0 
  *fill*         0x0000000040106363        0x0 
  *fill*         0x0000000040106363        0x1 
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x0000000040106364       0x42 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
-                0x0000000040106364                _ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+                0x0000000040106364                _ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
  *fill*         0x00000000401063a6        0x0 
  *fill*         0x00000000401063a6        0x0 
  *fill*         0x00000000401063a6        0x0 
@@ -35538,9 +35538,9 @@ OUTPUT(bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/example elf32-xte
  .xt.lit._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.lit._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+.xt.lit._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x8
- .xt.lit._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .xt.lit._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
 .xt.lit._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
@@ -35548,19 +35548,19 @@ OUTPUT(bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/example elf32-xte
  .xt.lit._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.lit._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+.xt.lit._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000        0x8
- .xt.lit._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .xt.lit._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.lit._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+.xt.lit._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000        0x8
- .xt.lit._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .xt.lit._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.lit._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+.xt.lit._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x8
- .xt.lit._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .xt.lit._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x8 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
 .xt.lit._ZN3bzd4impl7PromiseIvbE9getResultEv
@@ -35603,9 +35603,9 @@ OUTPUT(bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/example elf32-xte
  .xt.prop._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEdeEv
                 0x0000000000000000       0x30 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+.xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000       0x78
- .xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000       0x78 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                          0x84 (size before relaxing)
 
@@ -35614,19 +35614,19 @@ OUTPUT(bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/example elf32-xte
  .xt.prop._ZN3bzd9Scheduler7addTaskERNS_9interface4TaskE
                 0x0000000000000000       0x30 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.prop._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+.xt.prop._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x30
- .xt.prop._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .xt.prop._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x30 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.prop._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+.xt.prop._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x30
- .xt.prop._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .xt.prop._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x30 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+.xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000      0x120
- .xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000      0x120 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
                                         0x12c (size before relaxing)
 
@@ -35661,9 +35661,9 @@ OUTPUT(bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/example elf32-xte
  .xt.prop._ZN3bzd6AtomicIPNS_4impl11ListElementILb1EEEE15compareExchangeERS4_S4_
                 0x0000000000000000       0x24 bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
-.xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+.xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x6c
- .xt.prop._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+ .xt.prop._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x6c bazel-out/k8-fastbuild_esp32_xtensa_lx6_gcc/bin/example/liblib.a(main.pic.o)
 
 .xt.prop._ZTIN3bzd9interface7PromiseE

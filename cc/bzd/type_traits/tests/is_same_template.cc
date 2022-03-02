@@ -12,6 +12,11 @@ struct TestTypeMulti
 {
 };
 
+template <class V, class E>
+struct TestTypeResultLike
+{
+};
+
 TEST(TypeTraits, isSameTemplate)
 {
 	{
@@ -32,5 +37,10 @@ TEST(TypeTraits, isSameTemplate)
 		const auto a = TestTypeMulti<int, float>{};
 		const bool result = bzd::typeTraits::isSameTemplate<decltype(a), TestType>;
 		EXPECT_FALSE(result);
+	}
+	{
+		const auto a = TestTypeResultLike<int, float>{};
+		const bool result = bzd::typeTraits::isSameTemplate<decltype(a), TestTypeResultLike>;
+		EXPECT_TRUE(result);
 	}
 }

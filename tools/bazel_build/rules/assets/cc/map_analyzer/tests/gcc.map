@@ -485,13 +485,13 @@ Discarded input sections
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNK3bzd6AtomicIPNS_4impl11ListElementILb1EEEE4loadEv
                 0x0000000000000000       0x27 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE15isInsertionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE15isInsertionMarkEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x1c bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE14isDeletionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE14isDeletionMarkEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x1c bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE11removeMarksEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE11removeMarksEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x16 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE16setInsertionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16setInsertionMarkEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x29 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd6AtomicIPNS_4impl11ListElementILb1EEEE15compareExchangeERS4_S4_
                 0x0000000000000000       0x3a bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -503,23 +503,23 @@ Discarded input sections
                 0x0000000000000000       0x1b bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl6ResultIvNS0_13ListErrorTypeEECI2NS1_IPvS2_EEINS0_5ErrorIS2_EEEEOT_
                 0x0000000000000000       0x26 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000      0x315 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x4 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNK3bzd4impl8OptionalIRNS_9interface4TaskEEcvbEv
                 0x0000000000000000       0x11 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNK3bzd16ReferenceWrapperIRNS_9interface4TaskEEcvS3_Ev
                 0x0000000000000000       0x11 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0xbb bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x0000000000000000        0x4 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x57 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE4backEv
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE4backEv
                 0x0000000000000000       0x81 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE4backEv
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE4backEv
                 0x0000000000000000        0x4 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEC2ERKNS0_12OptionalNullE
                 0x0000000000000000       0x1f bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -527,17 +527,17 @@ Discarded input sections
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNK3bzd6AtomicIPvE4loadEv
                 0x0000000000000000       0x27 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE15setDeletionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE15setDeletionMarkEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x29 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEcvbEv
+ .text._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEcvbEv
                 0x0000000000000000       0x11 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x0000000000000000       0x57 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE11setWeakMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE11setWeakMarkEPNS0_11ListElementILb1EEE
                 0x0000000000000000       0x29 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000      0x62f bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .gcc_except_table._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .gcc_except_table._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x0000000000000000        0x4 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl22OptionalTrivialStorageIRNS_9interface4TaskEEC2Ev
                 0x0000000000000000       0x1a bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -587,11 +587,11 @@ Discarded input sections
                 0x0000000000000000       0x36 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl6ResultIvNS0_13ListErrorTypeEEC2ERKNS0_10ResultNullE
                 0x0000000000000000       0x2e bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd7forwardIRNS_4impl13NonOwningListINS_9interface4TaskEE9NodeFoundEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS8_E4typeE
+ .text._ZN3bzd7forwardIRNS_4impl13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS8_E4typeE
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
                 0x0000000000000000       0x34 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2ERKNS0_12OptionalNullE
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2ERKNS0_12OptionalNullE
                 0x0000000000000000       0x1f bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd7forwardIRNS_9interface4TaskEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS4_E4typeE
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -601,7 +601,7 @@ Discarded input sections
                 0x0000000000000000       0x1b bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNKSt6atomicIPvE4loadESt12memory_order
                 0x0000000000000000       0x39 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEaSEOS7_
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEaSEOS7_
                 0x0000000000000000       0x4e bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4test11InjectPointINS0_12InjectPoint5EvJEEC2IJEEEDpOT_
                 0x0000000000000000        0xb bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -623,13 +623,13 @@ Discarded input sections
                 0x0000000000000000       0x1c bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl6ResultIPvNS0_13ListErrorTypeEEC2IDnEEOT_
                 0x0000000000000000       0x34 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
+ .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
                 0x0000000000000000       0x39 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2Ev
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2Ev
                 0x0000000000000000       0x1b bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl22OptionalTrivialStorageIRNS_9interface4TaskEEC2IS4_EEOT_
                 0x0000000000000000       0x3f bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4moveIRNS_4impl13NonOwningListINS_9interface4TaskEE9NodeFoundEEEONS_10typeTraits4impl15RemoveReferenceIT_E4typeEOSB_
+ .text._ZN3bzd4moveIRNS_4impl13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEEONS_10typeTraits4impl15RemoveReferenceIT_E4typeEOSB_
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZNSt13__atomic_baseImEmmEv
                 0x0000000000000000       0x24 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -637,7 +637,7 @@ Discarded input sections
                 0x0000000000000000        0xe bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd4impl20ResultTrivialStorageIPvNS0_13ListErrorTypeEEC2IDnEEOT_
                 0x0000000000000000       0x32 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
- .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2Ev
+ .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2Ev
                 0x0000000000000000       0x1a bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
  .text._ZN3bzd16ReferenceWrapperIRNS_9interface4TaskEEC2ES3_
                 0x0000000000000000       0x1a bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
@@ -1321,18 +1321,18 @@ Memory map
                 0x000000000000f014       0x27 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000000f014                bzd::Atomic<bzd::impl::ListElement<true>*>::load() const
  ** fill        0x000000000000f03b        0x1
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE15isInsertionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE15isInsertionMarkEPNS0_11ListElementILb1EEE
                 0x000000000000f03c       0x1c bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f03c                bzd::impl::NonOwningList<bzd::interface::Task>::isInsertionMark(bzd::impl::ListElement<true>*) const
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE14isDeletionMarkEPNS0_11ListElementILb1EEE
+                0x000000000000f03c                bzd::impl::NonOwningForwardList<bzd::interface::Task>::isInsertionMark(bzd::impl::ListElement<true>*) const
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE14isDeletionMarkEPNS0_11ListElementILb1EEE
                 0x000000000000f058       0x1c bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f058                bzd::impl::NonOwningList<bzd::interface::Task>::isDeletionMark(bzd::impl::ListElement<true>*) const
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE11removeMarksEPNS0_11ListElementILb1EEE
+                0x000000000000f058                bzd::impl::NonOwningForwardList<bzd::interface::Task>::isDeletionMark(bzd::impl::ListElement<true>*) const
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE11removeMarksEPNS0_11ListElementILb1EEE
                 0x000000000000f074       0x16 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f074                bzd::impl::NonOwningList<bzd::interface::Task>::removeMarks(bzd::impl::ListElement<true>*) const
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE16setInsertionMarkEPNS0_11ListElementILb1EEE
+                0x000000000000f074                bzd::impl::NonOwningForwardList<bzd::interface::Task>::removeMarks(bzd::impl::ListElement<true>*) const
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16setInsertionMarkEPNS0_11ListElementILb1EEE
                 0x000000000000f08a       0x29 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f08a                bzd::impl::NonOwningList<bzd::interface::Task>::setInsertionMark(bzd::impl::ListElement<true>*) const
+                0x000000000000f08a                bzd::impl::NonOwningForwardList<bzd::interface::Task>::setInsertionMark(bzd::impl::ListElement<true>*) const
  ** fill        0x000000000000f0b3        0x1
  .text._ZN3bzd6AtomicIPNS_4impl11ListElementILb1EEEE15compareExchangeERS4_S4_
                 0x000000000000f0b4       0x3a bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
@@ -1353,9 +1353,9 @@ Memory map
                 0x000000000000f148       0x26 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000000f148                bzd::impl::Result<void, bzd::impl::ListErrorType>::Result<bzd::impl::Error<bzd::impl::ListErrorType> >(bzd::impl::Error<bzd::impl::ListErrorType>&&)
                 0x000000000000f148                bzd::impl::Result<void, bzd::impl::ListErrorType>::Result<bzd::impl::Error<bzd::impl::ListErrorType> >(bzd::impl::Error<bzd::impl::ListErrorType>&&)
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x000000000000f16e      0x315 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f16e                bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pushFront<>(bzd::interface::Task&)
+                0x000000000000f16e                bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningForwardList<bzd::interface::Task>::pushFront<>(bzd::interface::Task&)
  ** fill        0x000000000000f483        0x1
  .text._ZNK3bzd4impl8OptionalIRNS_9interface4TaskEEcvbEv
                 0x000000000000f484       0x11 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
@@ -1365,17 +1365,17 @@ Memory map
                 0x000000000000f496       0x11 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000000f496                bzd::ReferenceWrapper<bzd::interface::Task&>::operator bzd::interface::Task&() const
  ** fill        0x000000000000f4a7        0x1
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE16findPreviousNodeEPNS0_11ListElementILb1EEE
                 0x000000000000f4a8       0xbb bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f4a8                bzd::impl::NonOwningList<bzd::interface::Task>::findPreviousNode(bzd::impl::ListElement<true>*)
+                0x000000000000f4a8                bzd::impl::NonOwningForwardList<bzd::interface::Task>::findPreviousNode(bzd::impl::ListElement<true>*)
  ** fill        0x000000000000f563        0x1
- .text._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x000000000000f564       0x57 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f564                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::operator->() const
+                0x000000000000f564                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::operator->() const
  ** fill        0x000000000000f5bb        0x1
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE4backEv
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE4backEv
                 0x000000000000f5bc       0x81 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f5bc                bzd::impl::NonOwningList<bzd::interface::Task>::back()
+                0x000000000000f5bc                bzd::impl::NonOwningForwardList<bzd::interface::Task>::back()
  ** fill        0x000000000000f63d        0x1
  .text._ZN3bzd4impl8OptionalIRNS_9interface4TaskEEC2ERKNS0_12OptionalNullE
                 0x000000000000f63e       0x1f bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
@@ -1389,25 +1389,25 @@ Memory map
                 0x000000000000f66c       0x27 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000000f66c                bzd::Atomic<void*>::load() const
  ** fill        0x000000000000f693        0x1
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE15setDeletionMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE15setDeletionMarkEPNS0_11ListElementILb1EEE
                 0x000000000000f694       0x29 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f694                bzd::impl::NonOwningList<bzd::interface::Task>::setDeletionMark(bzd::impl::ListElement<true>*) const
+                0x000000000000f694                bzd::impl::NonOwningForwardList<bzd::interface::Task>::setDeletionMark(bzd::impl::ListElement<true>*) const
  ** fill        0x000000000000f6bd        0x1
- .text._ZNK3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEcvbEv
+ .text._ZNK3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEcvbEv
                 0x000000000000f6be       0x11 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f6be                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::operator bool() const
+                0x000000000000f6be                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::operator bool() const
  ** fill        0x000000000000f6cf        0x1
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEptEv
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEptEv
                 0x000000000000f6d0       0x57 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f6d0                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::operator->()
+                0x000000000000f6d0                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::operator->()
  ** fill        0x000000000000f727        0x1
- .text._ZNK3bzd4impl13NonOwningListINS_9interface4TaskEE11setWeakMarkEPNS0_11ListElementILb1EEE
+ .text._ZNK3bzd4impl13NonOwningForwardListINS_9interface4TaskEE11setWeakMarkEPNS0_11ListElementILb1EEE
                 0x000000000000f728       0x29 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f728                bzd::impl::NonOwningList<bzd::interface::Task>::setWeakMark(bzd::impl::ListElement<true>*) const
+                0x000000000000f728                bzd::impl::NonOwningForwardList<bzd::interface::Task>::setWeakMark(bzd::impl::ListElement<true>*) const
  ** fill        0x000000000000f751        0x1
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_
                 0x000000000000f752      0x62f bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000000f752                bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pop<>(bzd::interface::Task&)
+                0x000000000000f752                bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningForwardList<bzd::interface::Task>::pop<>(bzd::interface::Task&)
  ** fill        0x000000000000fd81        0x1
  .text._ZN3bzd4impl22OptionalTrivialStorageIRNS_9interface4TaskEEC2Ev
                 0x000000000000fd82       0x1a bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
@@ -1559,17 +1559,17 @@ Memory map
                 0x000000000001048e       0x2e bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000001048e                bzd::impl::Result<void, bzd::impl::ListErrorType>::Result(bzd::impl::ResultNull const&)
                 0x000000000001048e                bzd::impl::Result<void, bzd::impl::ListErrorType>::Result(bzd::impl::ResultNull const&)
- .text._ZN3bzd7forwardIRNS_4impl13NonOwningListINS_9interface4TaskEE9NodeFoundEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS8_E4typeE
+ .text._ZN3bzd7forwardIRNS_4impl13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS8_E4typeE
                 0x00000000000104bc        0xe bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x00000000000104bc                bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound& bzd::forward<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::typeTraits::impl::RemoveReference<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>::type&)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
+                0x00000000000104bc                bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound& bzd::forward<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::typeTraits::impl::RemoveReference<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>::type&)
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
                 0x00000000000104ca       0x34 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x00000000000104ca                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&)
-                0x00000000000104ca                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&)
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2ERKNS0_12OptionalNullE
+                0x00000000000104ca                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&)
+                0x00000000000104ca                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&)
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2ERKNS0_12OptionalNullE
                 0x00000000000104fe       0x1f bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x00000000000104fe                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional(bzd::impl::OptionalNull const&)
-                0x00000000000104fe                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional(bzd::impl::OptionalNull const&)
+                0x00000000000104fe                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional(bzd::impl::OptionalNull const&)
+                0x00000000000104fe                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional(bzd::impl::OptionalNull const&)
  .text._ZN3bzd7forwardIRNS_9interface4TaskEEEOT_RNS_10typeTraits4impl15RemoveReferenceIS4_E4typeE
                 0x000000000001051d        0xe bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000001051d                bzd::interface::Task& bzd::forward<bzd::interface::Task&>(bzd::typeTraits::impl::RemoveReference<bzd::interface::Task&>::type&)
@@ -1587,9 +1587,9 @@ Memory map
                 0x000000000001057c       0x39 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000001057c                std::atomic<void*>::load(std::memory_order) const
  ** fill        0x00000000000105b5        0x1
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEaSEOS7_
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEaSEOS7_
                 0x00000000000105b6       0x4e bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x00000000000105b6                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::operator=(bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>&&)
+                0x00000000000105b6                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::operator=(bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>&&)
  .text._ZN3bzd4test11InjectPointINS0_12InjectPoint5EvJEEC2IJEEEDpOT_
                 0x0000000000010604        0xb bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x0000000000010604                bzd::test::InjectPoint<bzd::test::InjectPoint5, void>::InjectPoint<>()
@@ -1637,23 +1637,23 @@ Memory map
                 0x00000000000107de       0x34 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x00000000000107de                bzd::impl::Result<void*, bzd::impl::ListErrorType>::Result<decltype(nullptr)>(decltype(nullptr)&&)
                 0x00000000000107de                bzd::impl::Result<void*, bzd::impl::ListErrorType>::Result<decltype(nullptr)>(decltype(nullptr)&&)
- .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
+ .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2IRS6_EEOT_
                 0x0000000000010812       0x39 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x0000000000010812                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&)
-                0x0000000000010812                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&)
+                0x0000000000010812                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&)
+                0x0000000000010812                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&)
  ** fill        0x000000000001084b        0x1
- .text._ZN3bzd4impl8OptionalINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2Ev
+ .text._ZN3bzd4impl8OptionalINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2Ev
                 0x000000000001084c       0x1b bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x000000000001084c                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional()
-                0x000000000001084c                bzd::impl::Optional<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::Optional()
+                0x000000000001084c                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional()
+                0x000000000001084c                bzd::impl::Optional<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::Optional()
  ** fill        0x0000000000010867        0x1
  .text._ZN3bzd4impl22OptionalTrivialStorageIRNS_9interface4TaskEEC2IS4_EEOT_
                 0x0000000000010868       0x3f bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x0000000000010868                bzd::impl::OptionalTrivialStorage<bzd::interface::Task&>::OptionalTrivialStorage<bzd::interface::Task&>(bzd::interface::Task&)
                 0x0000000000010868                bzd::impl::OptionalTrivialStorage<bzd::interface::Task&>::OptionalTrivialStorage<bzd::interface::Task&>(bzd::interface::Task&)
- .text._ZN3bzd4moveIRNS_4impl13NonOwningListINS_9interface4TaskEE9NodeFoundEEEONS_10typeTraits4impl15RemoveReferenceIT_E4typeEOSB_
+ .text._ZN3bzd4moveIRNS_4impl13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEEONS_10typeTraits4impl15RemoveReferenceIT_E4typeEOSB_
                 0x00000000000108a7        0xe bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x00000000000108a7                bzd::typeTraits::impl::RemoveReference<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>::type&& bzd::move<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound&)
+                0x00000000000108a7                bzd::typeTraits::impl::RemoveReference<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>::type&& bzd::move<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&>(bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound&)
  ** fill        0x00000000000108b5        0x1
  .text._ZNSt13__atomic_baseImEmmEv
                 0x00000000000108b6       0x24 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
@@ -1668,10 +1668,10 @@ Memory map
                 0x0000000000010900       0x32 bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x0000000000010900                bzd::impl::ResultTrivialStorage<void*, bzd::impl::ListErrorType>::ResultTrivialStorage<decltype(nullptr)>(decltype(nullptr)&&)
                 0x0000000000010900                bzd::impl::ResultTrivialStorage<void*, bzd::impl::ListErrorType>::ResultTrivialStorage<decltype(nullptr)>(decltype(nullptr)&&)
- .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningListINS_9interface4TaskEE9NodeFoundEEC2Ev
+ .text._ZN3bzd4impl22OptionalTrivialStorageINS0_13NonOwningForwardListINS_9interface4TaskEE9NodeFoundEEC2Ev
                 0x0000000000010932       0x1a bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
-                0x0000000000010932                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage()
-                0x0000000000010932                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage()
+                0x0000000000010932                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage()
+                0x0000000000010932                bzd::impl::OptionalTrivialStorage<bzd::impl::NonOwningForwardList<bzd::interface::Task>::NodeFound>::OptionalTrivialStorage()
  .text._ZN3bzd16ReferenceWrapperIRNS_9interface4TaskEEC2ES3_
                 0x000000000001094c       0x1a bazel-out/k8-fastbuild/bin/example/liblib.a(main.pic.o)
                 0x000000000001094c                bzd::ReferenceWrapper<bzd::interface::Task&>::ReferenceWrapper(bzd::interface::Task&)
@@ -1744,10 +1744,10 @@ Memory map
  .text._ZN3bzd9Scheduler5yieldEv
                 0x0000000000010e5e       0x9e bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
                 0x0000000000010e5e                bzd::Scheduler::yield()
- .text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEEC2Ev
+ .text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEEC2Ev
                 0x0000000000010efc       0x6d bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)
-                0x0000000000010efc                bzd::impl::NonOwningList<bzd::interface::Task>::NonOwningList()
-                0x0000000000010efc                bzd::impl::NonOwningList<bzd::interface::Task>::NonOwningList()
+                0x0000000000010efc                bzd::impl::NonOwningForwardList<bzd::interface::Task>::NonOwningForwardList()
+                0x0000000000010efc                bzd::impl::NonOwningForwardList<bzd::interface::Task>::NonOwningForwardList()
  ** fill        0x0000000000010f69        0x1
  .text._ZN3bzd9SchedulerC2Ev
                 0x0000000000010f6a       0x37 bazel-out/k8-fastbuild/bin/cc/bzd/core/libscheduler.a(scheduler.pic.o)

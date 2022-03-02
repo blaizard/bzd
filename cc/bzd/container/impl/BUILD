@@ -4,34 +4,12 @@ cc_library(
     name = "impl",
     visibility = ["//visibility:public"],
     deps = [
-        ":non_owning_list",
         ":single_linked_pool",
         ":span",
     ],
 )
 
 # ---- Individual items ----
-
-cc_library(
-    name = "non_owning_list",
-    hdrs = [
-        "non_owning_list.hh",
-    ],
-    visibility = ["//cc/bzd:__subpackages__"],
-    deps = [
-        "//cc/bzd/container:optional",
-        "//cc/bzd/container:reference_wrapper",
-        "//cc/bzd/container:result",
-        "//cc/bzd/core/assert:minimal",
-        "//cc/bzd/platform:atomic",
-        "//cc/bzd/platform:types",
-        "//cc/bzd/test:inject_point",
-        "//cc/bzd/type_traits:add_const",
-        "//cc/bzd/type_traits:is_const",
-        "//cc/bzd/type_traits:iterator",
-        "//cc/bzd/utility:ignore",
-    ],
-)
 
 cc_library(
     name = "single_linked_pool",

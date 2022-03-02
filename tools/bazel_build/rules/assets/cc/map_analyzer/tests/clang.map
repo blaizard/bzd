@@ -106,10 +106,10 @@
           204170           204170      65a     1                 main
           2047d0           2047d0        b    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text.__clang_call_terminate)
           2047d0           2047d0        b     1                 __clang_call_terminate
-          2047e0           2047e0      14b    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
-          2047e0           2047e0      14b     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pushFront<>(bzd::interface::Task&)
-          204930           204930      261    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
-          204930           204930      261     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningList<bzd::interface::Task>::pop<>(bzd::interface::Task&)
+          2047e0           2047e0      14b    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE9pushFrontIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
+          2047e0           2047e0      14b     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningForwardList<bzd::interface::Task>::pushFront<>(bzd::interface::Task&)
+          204930           204930      261    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZN3bzd4impl13NonOwningForwardListINS_9interface4TaskEE3popIJEEENS0_6ResultIvNS0_13ListErrorTypeEEERS3_)
+          204930           204930      261     1                 bzd::impl::Result<void, bzd::impl::ListErrorType> bzd::impl::NonOwningForwardList<bzd::interface::Task>::pop<>(bzd::interface::Task&)
           204ba0           204ba0      150    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m)
           204ba0           204ba0      150     1                 std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
           204cf0           204cf0      15f    16         bazel-out/k8-fastbuild_linux_x86_64_clang/bin/example/liblib.a(main.pic.o):(.text._ZNSt3__116__pad_and_outputIcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_)

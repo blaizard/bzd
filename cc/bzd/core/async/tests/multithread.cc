@@ -5,12 +5,10 @@
 
 #include <thread>
 
-bzd::Async<> cancellationWorkload(const auto durationMs)
+bzd::Async<> cancellationWorkload(const bzd::SizeType counter)
 {
-	for (auto current = 0; current < durationMs; ++current)
+	for (bzd::SizeType current = 0; current < counter; ++current)
 	{
-		using namespace std::chrono_literals;
-		::std::this_thread::sleep_for(1ms);
 		co_await bzd::async::yield();
 	}
 	co_return {};
@@ -18,7 +16,6 @@ bzd::Async<> cancellationWorkload(const auto durationMs)
 
 TEST(Coroutine, Cancellation2Threads)
 {
-	using namespace std::chrono_literals;
 	bzd::impl::AsyncExecutor executor;
 	bzd::Array<std::thread, 2> threads;
 

@@ -13,6 +13,12 @@
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 
+namespace bzd {
+// Forward declaration for the "friend" attribute
+template <class T, class E>
+class Result;
+} // namespace bzd
+
 namespace bzd::impl {
 
 // nullresult
@@ -26,10 +32,6 @@ private:
 	explicit constexpr ResultNull() noexcept {}
 };
 
-// Forward declaration for the "friend" attribute
-template <class T, class E>
-class Result;
-
 /// Internal class used to create an unexpected result object type.
 template <class E>
 class Error
@@ -42,11 +44,19 @@ public:
 
 private:
 	template <class A, class B>
-	friend class bzd::impl::Result;
+	friend class bzd::Result;
 	E error_;
 };
 
-template <class T, class E>
+} // namespace bzd::impl
+
+namespace bzd {
+
+/// \brief This is the type used for returning and propagating errors.
+///
+/// It is a variants with 2 states, valid, representing success and containing a
+/// value, and error, representing error and containing an error value.
+template <class T = void, class E = bzd::BoolType>
 class Result
 {
 public: // Traits
@@ -73,7 +83,7 @@ public: // Constructors
 	constexpr Self& operator=(Self&& result) noexcept = default;
 
 	// Support for bzd::nullresult.
-	constexpr Result(const ResultNull&) noexcept : data_{bzd::inPlaceType<ValueContainer>, nullptr} {}
+	constexpr Result(const impl::ResultNull&) noexcept : data_{bzd::inPlaceType<ValueContainer>, nullptr} {}
 
 	// Forwards arguments to construct the value to the storage type.
 	template <class... Args, typename = typeTraits::EnableIf<!IsSelf<typeTraits::FirstType<Args...>>::value>>
@@ -173,16 +183,6 @@ public: // API
 private:
 	bzd::Variant<ErrorContainer, ValueContainer> data_{};
 };
-
-} // namespace bzd::impl
-
-namespace bzd {
-/// \brief This is the type used for returning and propagating errors.
-///
-/// It is a variants with 2 states, valid, representing success and containing a
-/// value, and error, representing error and containing an error value.
-template <class T = void, class E = bzd::BoolType>
-using Result = impl::Result<T, E>;
 
 constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
