@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/container/function_ref.hh"
-#include "cc/bzd/container/impl/non_owning_list.hh"
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
@@ -115,17 +115,6 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	}
 };
 
-struct Suspend : public bzd::coroutine::impl::suspend_always
-{
-};
-
-/// Awaitable to yield the current execution.
-struct YieldAndPropagateCancelation : public Yield
-{
-	constexpr YieldAndPropagateCancelation(interface::CancellationToken& token) : token_{token} {}
-	interface::CancellationToken& token_;
-};
-
 template <class T>
 class Promise : public Executable
 {
@@ -139,6 +128,11 @@ private:
 
 		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
+			// TODO: Check if this is an error, if so propagate it down to the layers until a catch block is detected.
+			if (handle.promise().hasError())
+			{
+			}
+
 			// Enqueuing this coroutine into the executor is important for thread
 			// safety reasons, if we return the coroutine handle directly here, we
 			// might have a case where the same coroutine executes multiple times on
@@ -183,16 +177,7 @@ public: // Await transform specializations
 		return bzd::move(awaitable);
 	}
 
-	constexpr auto&& await_transform(bzd::coroutine::impl::Suspend&& awaitable) noexcept { return bzd::move(awaitable); }
 	constexpr auto&& await_transform(bzd::coroutine::impl::Yield&& awaitable) noexcept { return bzd::move(awaitable); }
-	constexpr auto&& await_transform(bzd::coroutine::impl::YieldAndPropagateCancelation&& awaitable) noexcept
-	{
-		if (isCanceledOrTriggered())
-		{
-			awaitable.token_.trigger();
-		}
-		return bzd::move(awaitable);
-	}
 	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutable&& awaitable) noexcept
 	{
 		awaitable.executable_ = this;
@@ -257,6 +242,17 @@ public:
 	};
 	/// Overload to support `co_return {};`.
 	constexpr void return_value(Empty) noexcept { result_.emplace(bzd::nullresult); }
+
+	/// Check if the result contains an error.
+	constexpr bool hasError() noexcept
+	{
+		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+		{
+			return (result_.hasValue() && result_.value().hasError());
+		}
+		// if constexpr (bzd::Tuple<bzd::Result<...>>) {}
+		return false;
+	}
 
 private:
 	template <class U>

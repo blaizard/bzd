@@ -11,6 +11,7 @@ bzd_cc_library(
         ":function_ref",
         ":map",
         ":named_type",
+        ":non_owning_list",
         ":optional",
         ":pool",
         ":queue",
@@ -26,6 +27,7 @@ bzd_cc_library(
         ":variant",
         ":vector",
         "//cc/bzd/container/impl",
+        "//cc/bzd/container/threadsafe",
         "//cc/bzd/core/assert",
     ],
 )
@@ -122,6 +124,17 @@ cc_library(
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:ratio",
+    ],
+)
+
+cc_library(
+    name = "non_owning_list",
+    hdrs = [
+        "non_owning_list.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":result",
     ],
 )
 

@@ -13,8 +13,8 @@
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/ignore.hh"
 
-namespace bzd {
-enum class ListErrorType
+namespace bzd::threadsafe {
+enum class NonOwningForwardListErrorType
 {
 	elementAlreadyInserted,
 	elementAlreadyRemoved,
@@ -22,9 +22,9 @@ enum class ListErrorType
 };
 }
 
-namespace bzd::impl {
+namespace bzd::threadsafe::impl {
 
-/// Implementation of a non-owning linked list.
+/// Implementation of a non-owning forward list.
 ///
 /// Lock-free, multi-producer, multi-consumer.
 /// In addition it supports insertion and deletion from preemptive OS
@@ -33,18 +33,18 @@ namespace bzd::impl {
 ///
 /// \tparam T Element type.
 template <class T>
-class NonOwningList
+class NonOwningForwardList
 {
 public:
-	using Self = NonOwningList<T>;
+	using Self = NonOwningForwardList<T>;
 	using ElementType = T;
 	using ElementPtrType = ElementType*;
 
 	template <class V>
-	using Result = bzd::Result<V, ListErrorType>;
+	using Result = bzd::Result<V, NonOwningForwardListErrorType>;
 
 public:
-	constexpr NonOwningList() noexcept { front_.next_.store(&back_); }
+	constexpr NonOwningForwardList() noexcept { front_.next_.store(&back_); }
 
 	/// Get the number of elements currently held by this container.
 	///
@@ -95,7 +95,7 @@ public:
 				ElementPtrType expected{nullptr};
 				if (!element.next_.compareExchange(expected, setInsertionMark(nodeNext)))
 				{
-					return error(ListErrorType::elementAlreadyInserted);
+					return error(NonOwningForwardListErrorType::elementAlreadyInserted);
 				}
 			}
 
@@ -160,7 +160,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return error(ListErrorType::elementAlreadyRemoved);
+					return error(NonOwningForwardListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setInsertionMark(expected)));
 
@@ -173,7 +173,7 @@ public:
 				{
 				}
 
-				return error(ListErrorType::notFound);
+				return error(NonOwningForwardListErrorType::notFound);
 			}
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
@@ -190,7 +190,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return error(ListErrorType::elementAlreadyRemoved);
+					return error(NonOwningForwardListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setDeletionMark(expected)));
 		}
@@ -403,35 +403,34 @@ protected:
 	bzd::Atomic<bzd::SizeType> size_{0};
 };
 
-// ---- NonOwningListElement
+// ---- NonOwningForwardListElement
 
-class NonOwningListElementVoid
+struct NonOwningForwardListElementVoid
 {
 };
 
-class NonOwningListElementMultiContainer
+struct NonOwningForwardListElementMultiContainer
 {
-public:
 	// Pointer to the current container.
 	bzd::Atomic<void*> parent_{nullptr};
 };
 
 template <bzd::BoolType MultiContainer>
-class NonOwningListElement
-	: public bzd::typeTraits::Conditional<MultiContainer, NonOwningListElementMultiContainer, NonOwningListElementVoid>
+class NonOwningForwardListElement
+	: public bzd::typeTraits::Conditional<MultiContainer, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
 {
 public:
 	static const constexpr bzd::BoolType isMultiContainer_{MultiContainer};
 
 private:
-	using Self = NonOwningListElement<MultiContainer>;
-	using Container = NonOwningList<Self>;
+	using Self = NonOwningForwardListElement<MultiContainer>;
+	using Container = NonOwningForwardList<Self>;
 	template <class V>
-	using Result = bzd::Result<V, ListErrorType>;
+	using Result = bzd::Result<V, NonOwningForwardListErrorType>;
 
 public:
-	constexpr NonOwningListElement() = default;
-	constexpr NonOwningListElement(Self&& elt) : next_{elt.next_.load()} {}
+	constexpr NonOwningForwardListElement() = default;
+	constexpr NonOwningForwardListElement(Self&& elt) : next_{elt.next_.load()} {}
 
 	/// Pop the current element from the list. This is available only if
 	/// MultiContainer is enabled, as it has the knowledge of the parent container.
@@ -443,22 +442,22 @@ public:
 		{
 			return container->pop(*this);
 		}
-		return bzd::error(ListErrorType::elementAlreadyRemoved);
+		return bzd::error(NonOwningForwardListErrorType::elementAlreadyRemoved);
 	}
 
 	// Pointer to the next element from the list.
 	bzd::Atomic<Self*> next_{nullptr};
 };
-} // namespace bzd::impl
+} // namespace bzd::threadsafe::impl
 
-namespace bzd {
+namespace bzd::threadsafe {
 
 /// Element for the non-owning list.
 ///
 /// \tparam MultiContainer Whether multicontainer should be supported or not.
 ///        This means that an element can pop from one list and push a different one.
 template <bzd::BoolType MultiContainer>
-using NonOwningListElement = impl::NonOwningListElement<MultiContainer>;
+using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListElement<MultiContainer>;
 
 /// Implementation of a non-owning linked list.
 ///
@@ -472,17 +471,18 @@ using NonOwningListElement = impl::NonOwningListElement<MultiContainer>;
 ///
 /// \tparam T Element type.
 template <class T>
-class NonOwningList : public bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>
+class NonOwningForwardList
+	: public bzd::threadsafe::impl::NonOwningForwardList<bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>
 {
 public:
-	using Parent = bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>;
+	using Parent = bzd::threadsafe::impl::NonOwningForwardList<bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>;
 
 public:
 	template <class U>
-	class NonOwningListIterator
+	class NonOwningForwardListIterator
 	{
 	public: // Traits
-		using Self = NonOwningListIterator<U>;
+		using Self = NonOwningForwardListIterator<U>;
 		using Category = bzd::typeTraits::ForwardTag;
 		using IndexType = bzd::SizeType;
 		using DifferenceType = bzd::Int32Type;
@@ -494,7 +494,7 @@ public:
 			typeTraits::Conditional<typeTraits::isConst<ValueType>, typeTraits::AddConst<ElementType>, ElementType>*;
 
 	public:
-		constexpr NonOwningListIterator(UnderlyingValuePtrType ptr) noexcept : current_{ptr} {}
+		constexpr NonOwningForwardListIterator(UnderlyingValuePtrType ptr) noexcept : current_{ptr} {}
 
 	public: // Modifiers.
 		constexpr Self& operator++() noexcept
@@ -531,11 +531,12 @@ public:
 	};
 
 public: // Traits.
-	using Iterator = NonOwningListIterator<T>;
-	using ConstIterator = NonOwningListIterator<typeTraits::AddConst<T>>;
+	using Iterator = NonOwningForwardListIterator<T>;
+	using ConstIterator = NonOwningForwardListIterator<typeTraits::AddConst<T>>;
 
 public:
-	using bzd::impl::NonOwningList<bzd::NonOwningListElement<T::isMultiContainer_>>::NonOwningList;
+	using bzd::threadsafe::impl::NonOwningForwardList<
+		bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>::NonOwningForwardList;
 
 	/// Return a begin iterator for this list.
 	///
@@ -588,4 +589,4 @@ public:
 		return static_cast<const T&>(*previous->node);
 	}
 };
-} // namespace bzd
+} // namespace bzd::threadsafe

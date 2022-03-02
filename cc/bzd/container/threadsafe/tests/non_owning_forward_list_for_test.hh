@@ -1,13 +1,13 @@
 #pragma once
 
-#include "cc/bzd/container/impl/non_owning_list.hh"
+#include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
 #include "cc/bzd/core/assert.hh"
 #include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/utility/format/format.hh"
 
 namespace bzd::test {
 
-class ListElementMultiContainer : public bzd::NonOwningListElement</*MultiContainer*/ true>
+class ListElementMultiContainer : public bzd::threadsafe::NonOwningForwardListElement</*MultiContainer*/ true>
 {
 public:
 	ListElementMultiContainer() = default;
@@ -17,7 +17,7 @@ public:
 	bzd::SizeType value_{0};
 };
 
-class ListElement : public bzd::NonOwningListElement<false>
+class ListElement : public bzd::threadsafe::NonOwningForwardListElement<false>
 {
 public:
 	ListElement() = default;
@@ -28,10 +28,10 @@ public:
 };
 
 template <class T>
-class NonOwningList : public bzd::NonOwningList<T>
+class NonOwningForwardList : public bzd::threadsafe::NonOwningForwardList<T>
 {
 public:
-	using Self = typename bzd::NonOwningList<T>;
+	using Self = typename bzd::threadsafe::NonOwningForwardList<T>;
 	using typename Self::ElementPtrType;
 
 public:

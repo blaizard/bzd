@@ -1,4 +1,4 @@
-#include "cc/bzd/container/impl/tests/non_owning_list_for_test.hh"
+#include "cc/bzd/container/threadsafe/tests/non_owning_forward_list_for_test.hh"
 #include "cc/bzd/test/sync_point.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/ignore.hh"
@@ -15,7 +15,7 @@ void insertWhileInsertDoWork()
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
 	bzd::test::ListElementMultiContainer c{3};
-	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
+	bzd::test::NonOwningForwardList<bzd::test::ListElementMultiContainer> list;
 	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -38,7 +38,7 @@ void insertWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 3U);
 }
 
-TEST(NonOwningList, InsertWhileInsert)
+TEST(NonOwningForwardList, InsertWhileInsert)
 {
 	insertWhileInsertDoWork<bzd::test::InjectPoint0>();
 	insertWhileInsertDoWork<bzd::test::InjectPoint1>();
@@ -51,7 +51,7 @@ void removeWhileInsertDoWork()
 {
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
-	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
+	bzd::test::NonOwningForwardList<bzd::test::ListElementMultiContainer> list;
 	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -74,7 +74,7 @@ void removeWhileInsertDoWork()
 	EXPECT_EQ(list.size(), 1U);
 }
 
-TEST(NonOwningList, RemoveWhileInsert)
+TEST(NonOwningForwardList, RemoveWhileInsert)
 {
 	removeWhileInsertDoWork<bzd::test::InjectPoint0>();
 	removeWhileInsertDoWork<bzd::test::InjectPoint1>();
@@ -87,7 +87,7 @@ void insertWhileRemoveDoWork()
 {
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
-	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
+	bzd::test::NonOwningForwardList<bzd::test::ListElementMultiContainer> list;
 	bzd::ignore = list.pushFront(a);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
 
@@ -110,7 +110,7 @@ void insertWhileRemoveDoWork()
 	EXPECT_EQ(list.size(), 1U);
 }
 
-TEST(NonOwningList, InsertWhileRemove)
+TEST(NonOwningForwardList, InsertWhileRemove)
 {
 	insertWhileRemoveDoWork<bzd::test::InjectPoint0>();
 	insertWhileRemoveDoWork<bzd::test::InjectPoint1>();
@@ -125,7 +125,7 @@ void removeWhileRemoveLeftDoWork()
 {
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
-	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
+	bzd::test::NonOwningForwardList<bzd::test::ListElementMultiContainer> list;
 	bzd::ignore = list.pushFront(a);
 	bzd::ignore = list.pushFront(b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
@@ -149,7 +149,7 @@ void removeWhileRemoveLeftDoWork()
 	EXPECT_EQ(list.size(), 0U);
 }
 
-TEST(NonOwningList, RemoveWhileRemoveLeft)
+TEST(NonOwningForwardList, RemoveWhileRemoveLeft)
 {
 	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint0>();
 	removeWhileRemoveLeftDoWork<bzd::test::InjectPoint1>();
@@ -164,7 +164,7 @@ void removeWhileRemoveRightDoWork()
 {
 	bzd::test::ListElementMultiContainer a{1};
 	bzd::test::ListElementMultiContainer b{2};
-	bzd::test::NonOwningList<bzd::test::ListElementMultiContainer> list;
+	bzd::test::NonOwningForwardList<bzd::test::ListElementMultiContainer> list;
 	bzd::ignore = list.pushFront(a);
 	bzd::ignore = list.pushFront(b);
 	using SyncPoint = bzd::test::SyncPoint<struct concurrency>;
@@ -188,7 +188,7 @@ void removeWhileRemoveRightDoWork()
 	EXPECT_EQ(list.size(), 0U);
 }
 
-TEST(NonOwningList, RemoveWhileRemoveRight)
+TEST(NonOwningForwardList, RemoveWhileRemoveRight)
 {
 	removeWhileRemoveRightDoWork<bzd::test::InjectPoint0>();
 	removeWhileRemoveRightDoWork<bzd::test::InjectPoint1>();
@@ -206,7 +206,7 @@ struct Data
 {
 	std::vector<T>& elements;
 
-	bzd::test::NonOwningList<T> list{};
+	bzd::test::NonOwningForwardList<T> list{};
 	bzd::Atomic<bzd::UInt16Type> inserted[nbElements]{};
 	bzd::Atomic<bzd::SizeType> insertion{0};
 	bzd::Atomic<bzd::SizeType> removal{0};
@@ -244,7 +244,7 @@ void workloadInsert(Data<T>* pData)
 		const auto result = pData->list.pushFront(element);
 		if (!result)
 		{
-			ASSERT_EQ(result.error(), bzd::ListErrorType::elementAlreadyInserted);
+			ASSERT_EQ(result.error(), bzd::threadsafe::NonOwningForwardListErrorType::elementAlreadyInserted);
 		}
 		else
 		{
@@ -265,7 +265,8 @@ void workloadRemove(Data<T>* pData)
 		const auto result = pData->list.pop(element);
 		if (!result)
 		{
-			ASSERT_TRUE(result.error() == bzd::ListErrorType::elementAlreadyRemoved || result.error() == bzd::ListErrorType::notFound);
+			ASSERT_TRUE(result.error() == bzd::threadsafe::NonOwningForwardListErrorType::elementAlreadyRemoved ||
+						result.error() == bzd::threadsafe::NonOwningForwardListErrorType::notFound);
 		}
 		else
 		{
@@ -275,7 +276,7 @@ void workloadRemove(Data<T>* pData)
 	}
 }
 
-TEST(NonOwningList, InsertionStressMultiContainer)
+TEST(NonOwningForwardList, InsertionStressMultiContainer)
 {
 	srand(time(NULL));
 
@@ -327,7 +328,7 @@ TEST(NonOwningList, InsertionStressMultiContainer)
 	EXPECT_TRUE(data1.insertion.load() > 0 || data2.insertion.load() > 0);
 }
 
-TEST(NonOwningList, InsertionStress)
+TEST(NonOwningForwardList, InsertionStress)
 {
 	srand(time(NULL));
 
@@ -373,12 +374,12 @@ TEST(NonOwningList, InsertionStress)
 	data1.sanityCheck();
 }
 
-TEST(NonOwningList, PushPop)
+TEST(NonOwningForwardList, PushPop)
 {
 	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
 	{
 		bzd::Array<std::thread, 10> threads;
-		bzd::test::NonOwningList<bzd::test::ListElement> data{};
+		bzd::test::NonOwningForwardList<bzd::test::ListElement> data{};
 		;
 		bzd::Array<bzd::test::ListElement, 10> elements;
 
