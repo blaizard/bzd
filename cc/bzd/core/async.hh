@@ -3,6 +3,7 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/tuple.hh"
+#include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
@@ -133,7 +134,7 @@ public:
 		return run(executor);
 	}
 
-	constexpr void setCancellationToken(interface::CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
+	constexpr void setCancellationToken(CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
 
 public: // coroutine specific
 	using promise_type = PromiseType;
@@ -237,9 +238,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 
-	bzd::Atomic<UInt8Type> flag{0};
-	bzd::interface::CancellationToken token{flag};
-	(asyncs.setCancellationToken(token), ...);
+	bzd::CancellationToken token{};
 
 	// Register on terminate callbacks.
 	bzd::Atomic<SizeType> counter{0};
@@ -256,7 +255,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 		return (current == sizeof...(Asyncs));
 	};
 
-	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
+	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{token, onTerminateCallback, asyncs...};
 
 	// By now all asyncs must have been either ready or canceled.
 	// Build the result and return it.

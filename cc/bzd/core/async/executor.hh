@@ -3,6 +3,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
+#include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
@@ -84,7 +85,7 @@ public:
 			if (maybeExecutable.hasValue())
 			{
 				auto& executable = maybeExecutable.valueMutable();
-				if (executable.isCanceledOrTriggered())
+				if (executable.isCanceled())
 				{
 					executable.cancel();
 				}
@@ -206,27 +207,6 @@ private:
 
 namespace bzd::interface {
 
-class CancellationToken
-{
-public:
-	constexpr CancellationToken(bzd::Atomic<UInt8Type>& flag) : flag_{flag} {}
-
-	constexpr void trigger() noexcept
-	{
-		UInt8Type expected{0};
-		flag_.compareExchange(expected, 1);
-	}
-
-	constexpr void cancel() noexcept { flag_.store(2); }
-
-	constexpr BoolType isCanceledOrTriggered() const noexcept { return (flag_.load() != 0); }
-
-	constexpr BoolType isCanceled() const noexcept { return (flag_.load() == 2); }
-
-private:
-	bzd::Atomic<UInt8Type>& flag_;
-};
-
 /// Executable interface class.
 ///
 /// This class provides helpers to access the associated executor.
@@ -266,24 +246,21 @@ public:
 
 	constexpr void setCancellationToken(CancellationToken& token) noexcept
 	{
-		bzd::assert::isTrue(!cancel_);
-		cancel_ = &token;
+		bzd::assert::isTrue(cancel_.empty());
+		cancel_.emplace(token);
 	}
 
-	constexpr void trigger() noexcept { cancel_->trigger(); }
+	constexpr bzd::Optional<CancellationToken&> getCancellationToken() noexcept { return cancel_; }
 
-	constexpr BoolType isCanceledOrTriggered() const noexcept
+	constexpr void trigger() noexcept
 	{
-		if (!cancel_)
-		{
-			return false;
-		}
-		return cancel_->isCanceledOrTriggered();
+		bzd::assert::isTrue(cancel_.hasValue());
+		cancel_->trigger();
 	}
 
 	constexpr BoolType isCanceled() const noexcept
 	{
-		if (!cancel_)
+		if (cancel_.empty())
 		{
 			return false;
 		}
@@ -295,15 +272,16 @@ public:
 	/// \param[out] executable The executable to receive the new context.
 	constexpr void propagateContextTo(Self& executable) const noexcept
 	{
+		bzd::assert::isTrue(executable.cancel_.empty());
+
 		// NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
 		executable.executor_ = executor_;
-		bzd::assert::isTrue(!executable.cancel_);
 		executable.cancel_ = cancel_;
 	}
 
 private:
 	bzd::Executor<T>* executor_{nullptr};
-	CancellationToken* cancel_{nullptr};
+	bzd::Optional<CancellationToken&> cancel_{};
 };
 
 } // namespace bzd::interface

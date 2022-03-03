@@ -31,7 +31,7 @@ public:
 	{
 		auto executable = this;
 		// Look for the parent cancelled async and enqueue its continuation.
-		while (executable->caller_ && executable->caller_->isCanceledOrTriggered())
+		while (executable->caller_ && executable->caller_->isCanceled())
 		{
 			executable = executable->caller_;
 		}
@@ -69,32 +69,58 @@ template <class... Asyncs>
 struct Enqueue : public bzd::coroutine::impl::suspend_always
 {
 	template <class Callback>
-	constexpr Enqueue(Callback& callback, Asyncs&... asyncs) noexcept : exectuables_{inPlace, &asyncs.getExecutable()...}
+	constexpr Enqueue(Callback& callback, Asyncs&... asyncs) noexcept : executables_{inPlace, &asyncs.getExecutable()...}
 	{
-		for (auto& executable : exectuables_)
+		for (auto& executable : executables_)
 		{
 			executable->onTerminateCallback_.emplace(callback);
 		}
 	}
 
 	template <class Callback>
-	constexpr Enqueue(Callback& callback, CancellationToken& token, Asyncs&... asyncs) noexcept :
-		Enqueue{callback, asyncs...}, token_{token}
+	constexpr Enqueue(CancellationToken& token, Callback& callback, Asyncs&... asyncs) noexcept :
+		executables_{inPlace, &asyncs.getExecutable()...}, token_{token}
 	{
+		for (auto& executable : executables_)
+		{
+			executable->onTerminateCallback_.emplace(callback);
+		}
 	}
 
 	/// Enqueuing the executable in await_suspend is important, as it is called just after
 	/// the state of the resume point has been updated. Doing this ensures that concurrent
 	/// thread they execute the executable will return at this resume point and not before.
-	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<>) const noexcept
+	template <class T>
+	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
-		for (auto* exectuable : exectuables_)
+		auto& promise = caller.promise();
+
+		// This defines the cancellation to pass to the executables.
+		auto maybeToken = promise.getCancellationToken();
+		if (token_.hasValue())
 		{
-			exectuable->enqueue();
+			// Attach the token to the parent if both exists.
+			if (maybeToken.hasValue())
+			{
+				maybeToken->attach(token_.valueMutable());
+			}
+			// The token set to this class will be assigned regardless to the executables.
+			maybeToken = token_;
+		}
+
+		for (auto* executable : executables_)
+		{
+			if (maybeToken.hasValue())
+			{
+				executable->setCancellationToken(maybeToken.valueMutable());
+			}
+			executable->caller_ = &promise;
+			executable->setExecutor(promise.getExecutor());
+			executable->enqueue();
 		}
 	}
 
-	bzd::Array<Executable*, sizeof...(Asyncs)> exectuables_;
+	bzd::Array<Executable*, sizeof...(Asyncs)> executables_;
 	bzd::Optional<CancellationToken&> token_{};
 };
 
@@ -177,11 +203,6 @@ public: // Await transform specializations
 	template <class... Args>
 	constexpr auto await_transform(bzd::coroutine::impl::Enqueue<Args...>&& awaitable) noexcept
 	{
-		for (auto* exectuable : awaitable.exectuables_)
-		{
-			exectuable->caller_ = this;
-			exectuable->setExecutor(getExecutor());
-		}
 		return bzd::move(awaitable);
 	}
 
