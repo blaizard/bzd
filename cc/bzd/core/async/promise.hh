@@ -102,7 +102,7 @@ struct Enqueue : public bzd::coroutine::impl::suspend_always
 			// Attach the token to the parent if both exists.
 			if (maybeToken.hasValue())
 			{
-				maybeToken->attach(token_.valueMutable());
+				token_->attachTo(maybeToken.valueMutable());
 			}
 			// The token set to this class will be assigned regardless to the executables.
 			maybeToken = token_;

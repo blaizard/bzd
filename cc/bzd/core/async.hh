@@ -191,7 +191,7 @@ public:
 
 namespace bzd::concepts {
 template <class T>
-concept async = sameTemplate<T, bzd::Async>;
+concept async = sameTemplate<T, bzd::Async> || sameTemplate<T, bzd::impl::Async>;
 }
 
 namespace bzd::async {
@@ -248,6 +248,7 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 		// Only triggers the token for the first entry to this function.
 		if (current == 1U)
 		{
+			::std::cout << "CANCEL" << ::std::endl;
 			token.trigger();
 		}
 		// For the last one, push the caller back into the scheduling queue.

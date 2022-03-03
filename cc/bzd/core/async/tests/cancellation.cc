@@ -16,7 +16,7 @@ TEST(Cancellation, AttachedTriggerParent)
 	bzd::CancellationToken parent{};
 	bzd::CancellationToken token{};
 
-	token.attach(parent);
+	token.attachTo(parent);
 	EXPECT_FALSE(token.isCanceled());
 	EXPECT_FALSE(parent.isCanceled());
 	parent.trigger();
@@ -29,7 +29,7 @@ TEST(Cancellation, AttachedTriggerChild)
 	bzd::CancellationToken parent{};
 	bzd::CancellationToken token{};
 
-	token.attach(parent);
+	token.attachTo(parent);
 	EXPECT_FALSE(token.isCanceled());
 	EXPECT_FALSE(parent.isCanceled());
 	token.trigger();
