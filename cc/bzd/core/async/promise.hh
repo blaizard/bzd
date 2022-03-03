@@ -3,6 +3,7 @@
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
+#include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
@@ -76,6 +77,12 @@ struct Enqueue : public bzd::coroutine::impl::suspend_always
 		}
 	}
 
+	template <class Callback>
+	constexpr Enqueue(Callback& callback, CancellationToken& token, Asyncs&... asyncs) noexcept :
+		Enqueue{callback, asyncs...}, token_{token}
+	{
+	}
+
 	/// Enqueuing the executable in await_suspend is important, as it is called just after
 	/// the state of the resume point has been updated. Doing this ensures that concurrent
 	/// thread they execute the executable will return at this resume point and not before.
@@ -88,6 +95,7 @@ struct Enqueue : public bzd::coroutine::impl::suspend_always
 	}
 
 	bzd::Array<Executable*, sizeof...(Asyncs)> exectuables_;
+	bzd::Optional<CancellationToken&> token_{};
 };
 
 /// Awaitable to yield the current execution.

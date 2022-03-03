@@ -76,6 +76,11 @@ public: // API
 	/// \return true if *this contains a value, false if *this does not contain a value.
 	[[nodiscard]] constexpr bool hasValue() const noexcept { return data_.template is<ValueContainer>(); }
 
+	/// Checks whether the optional is empty (does not contain a value).
+	///
+	/// \return true if *this is empty, false if *this contains a value.
+	[[nodiscard]] constexpr bool empty() const noexcept { return !hasValue(); }
+
 	/// \copydoc hasValue
 	[[nodiscard]] constexpr explicit operator bool() const noexcept { return hasValue(); }
 

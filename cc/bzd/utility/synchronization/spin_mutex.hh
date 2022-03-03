@@ -18,11 +18,11 @@ public: // Constructors/assignments.
 public: // API.
 	constexpr void lock() noexcept
 	{
-		while (lock_.exchange(true))
+		while (lock_.exchange(true, MemoryOrder::acquire))
 			;
 	}
 
-	constexpr void unlock() noexcept { lock_.store(false); }
+	constexpr void unlock() noexcept { lock_.store(false, MemoryOrder::release); }
 
 private:
 	Atomic<BoolType> lock_{false};
