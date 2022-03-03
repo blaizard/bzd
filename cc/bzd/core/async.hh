@@ -75,7 +75,7 @@ public:
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
 
-	[[nodiscard]] constexpr bool isReadyOrCanceled() const noexcept { return isReady() || isCanceled(); }
+	[[nodiscard]] constexpr bool isCompleted() const noexcept { return isReady() || isCanceled(); }
 
 	/// Get the current result. If the async is not terminated, an empty value is returned.
 	[[nodiscard]] constexpr bzd::Optional<ResultType> getResult() noexcept
@@ -138,7 +138,7 @@ public:
 public: // coroutine specific
 	using promise_type = PromiseType;
 
-	constexpr bool await_ready() noexcept { return isReadyOrCanceled(); }
+	constexpr bool await_ready() noexcept { return isCompleted(); }
 
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept

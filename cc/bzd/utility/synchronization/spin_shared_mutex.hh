@@ -26,19 +26,19 @@ public: // API.
 		do
 		{
 			expected = 0;
-		} while (!lock_.compareExchange(expected, 1));
+		} while (!lock_.compareExchange(expected, 1, MemoryOrder::acquire));
 	}
 
 	// Unlocks the mutex.
-	constexpr void unlock() noexcept { lock_.store(0); }
+	constexpr void unlock() noexcept { lock_.store(0, MemoryOrder::release); }
 
 	constexpr void lockShared() noexcept
 	{
 		UInt32Type expected;
 		do
 		{
-			expected = lock_.load() & 0xffff0000;
-		} while (!lock_.compareExchange(expected, expected + 0x10000));
+			expected = lock_.load(MemoryOrder::relaxed) & 0xffff0000;
+		} while (!lock_.compareExchange(expected, expected + 0x10000, MemoryOrder::acquire));
 	}
 
 	// Unlocks the shared mutex.

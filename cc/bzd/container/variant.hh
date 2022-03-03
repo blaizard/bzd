@@ -14,6 +14,8 @@
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
 
+#include <new> // Required for placement new.
+
 namespace bzd::impl {
 template <class... Ts>
 class VariantBase
@@ -182,8 +184,8 @@ public: // Functions
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
 	constexpr void emplace(Args&&... args) noexcept
 	{
-		// Using inplace operator new
-		::new (&(data_.template get<T>())) T(bzd::forward<Args>(args)...);
+		// Using placement new
+		::new (&(data_.template get<T>())) T{bzd::forward<Args>(args)...};
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
 	}

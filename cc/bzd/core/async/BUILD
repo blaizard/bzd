@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "async",
     hdrs = [
+        "cancellation.hh",
         "coroutine.hh",
         "executor.hh",
         "promise.hh",
@@ -19,11 +20,13 @@ cc_library(
         "//cc/bzd/container/range:associate_scope",
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
         "//cc/bzd/core:error",
+        "//cc/bzd/core/assert:minimal",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:ignore",
         "//cc/bzd/utility:scope_guard",
+        "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
     ],
