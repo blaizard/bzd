@@ -35,18 +35,19 @@ TEST(Coroutine, Cancellation2Threads)
 	}
 }
 
-TEST(Coroutine, CancellationStress)
+template <class Function>
+void spawnConcurrentThreads(const bzd::SizeType iterations, const Function counterGenerator)
 {
-	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
+	for (bzd::SizeType iteration = 0; iteration < iterations; ++iteration)
 	{
 		bzd::impl::AsyncExecutor executor{};
 		bzd::Array<std::thread, 5> threads;
 
-		auto promise1 = cancellationWorkload(0);
-		auto promise2 = cancellationWorkload(0);
-		auto promise3 = cancellationWorkload(0);
-		auto promise4 = cancellationWorkload(0);
-		auto promise5 = cancellationWorkload(0);
+		auto promise1 = cancellationWorkload(counterGenerator());
+		auto promise2 = cancellationWorkload(counterGenerator());
+		auto promise3 = cancellationWorkload(counterGenerator());
+		auto promise4 = cancellationWorkload(counterGenerator());
+		auto promise5 = cancellationWorkload(counterGenerator());
 		auto promise = bzd::async::any(promise1, promise2, promise3, promise4, promise5);
 		promise.enqueue(executor);
 
@@ -61,6 +62,22 @@ TEST(Coroutine, CancellationStress)
 		}
 	}
 }
+
+TEST(Coroutine, CancellationStressNull)
+{
+	spawnConcurrentThreads(1000, []() { return 0; });
+}
+
+TEST(Coroutine, CancellationStressFixed)
+{
+	spawnConcurrentThreads(1000, []() { return 10; });
+}
+
+TEST(Coroutine, CancellationStressRandom)
+{
+	spawnConcurrentThreads(1000, [&]() { return test.random<int, 0, 1000>(); });
+}
+
 /*
 TEST_ASYNC(Coroutine, fibonacci)
 {

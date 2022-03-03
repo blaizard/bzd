@@ -7,6 +7,8 @@
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
+#include <iostream>
+
 /// A cancellation token.
 ///
 /// Callgraph representation:
@@ -39,7 +41,7 @@ public: // Constructors/Destructors.
 public: // API.
 	/// Attach this token to a parent token that will propagate its triggered
 	/// state to this token.
-	constexpr void attach(CancellationToken& token) noexcept
+	constexpr void attachTo(CancellationToken& token) noexcept
 	{
 		bzd::assert::isTrue(parent_.empty());
 
