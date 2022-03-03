@@ -79,7 +79,7 @@ public:
 };
 
 /// Establishes memory synchronization ordering.
-constexpr void memoryFence(const MemoryOrder order) noexcept
+inline void memoryFence(const MemoryOrder order) noexcept
 {
 	std::atomic_thread_fence(static_cast<std::memory_order>(order));
 }
