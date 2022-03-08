@@ -14,6 +14,18 @@ bzd::Async<> cancellationWorkload(const bzd::SizeType counter)
 	co_return {};
 }
 
+bzd::Async<> cancellationNestedWorkload(const bzd::SizeType counter)
+{
+	for (bzd::SizeType current = 0; current < counter; ++current)
+	{
+		auto promise1 = cancellationWorkload(counter);
+		auto promise2 = cancellationNestedWorkload(counter / 2);
+		auto promise3 = cancellationNestedWorkload(counter / 3);
+		co_await bzd::async::any(promise1, promise2, promise3);
+	}
+	co_return {};
+}
+
 TEST(Coroutine, Cancellation2Threads)
 {
 	bzd::impl::AsyncExecutor executor;
@@ -36,18 +48,18 @@ TEST(Coroutine, Cancellation2Threads)
 }
 
 template <class Function>
-void spawnConcurrentThreads(const bzd::SizeType iterations, const Function counterGenerator)
+void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const bzd::SizeType iterations, const Function counterGenerator)
 {
 	for (bzd::SizeType iteration = 0; iteration < iterations; ++iteration)
 	{
 		bzd::impl::AsyncExecutor executor{};
-		bzd::Array<std::thread, 5> threads;
+		bzd::Array<std::thread, 10> threads;
 
-		auto promise1 = cancellationWorkload(counterGenerator());
-		auto promise2 = cancellationWorkload(counterGenerator());
-		auto promise3 = cancellationWorkload(counterGenerator());
-		auto promise4 = cancellationWorkload(counterGenerator());
-		auto promise5 = cancellationWorkload(counterGenerator());
+		auto promise1 = workload(counterGenerator());
+		auto promise2 = workload(counterGenerator());
+		auto promise3 = workload(counterGenerator());
+		auto promise4 = workload(counterGenerator());
+		auto promise5 = workload(counterGenerator());
 		auto promise = bzd::async::any(promise1, promise2, promise3, promise4, promise5);
 		promise.enqueue(executor);
 
@@ -60,22 +72,29 @@ void spawnConcurrentThreads(const bzd::SizeType iterations, const Function count
 		{
 			entry.join();
 		}
+
+		EXPECT_EQ(executor.getQueueCount(), 0U);
 	}
 }
 
 TEST(Coroutine, CancellationStressNull)
 {
-	spawnConcurrentThreads(1000, []() { return 0; });
+	spawnConcurrentThreads(cancellationWorkload, 1000, []() { return 0; });
 }
 
 TEST(Coroutine, CancellationStressFixed)
 {
-	spawnConcurrentThreads(1000, []() { return 10; });
+	spawnConcurrentThreads(cancellationWorkload, 1000, []() { return 10; });
 }
 
 TEST(Coroutine, CancellationStressRandom)
 {
-	spawnConcurrentThreads(1000, [&]() { return test.random<int, 0, 1000>(); });
+	spawnConcurrentThreads(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
+}
+
+TEST(Coroutine, CancellationStressNested)
+{
+	spawnConcurrentThreads(cancellationNestedWorkload, 1000, [&]() { return test.random<int, 0, 10>(); });
 }
 
 /*
