@@ -12,7 +12,6 @@
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
-
 #include <iostream>
 
 namespace bzd::impl {

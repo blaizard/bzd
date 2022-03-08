@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 
 namespace bzd {
 template <class T>
