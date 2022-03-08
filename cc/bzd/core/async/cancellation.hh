@@ -32,7 +32,6 @@ public: // Constructors/Destructors.
 
 	constexpr ~CancellationToken() noexcept
 	{
-
 		// All entries might not be detached at that point, because of the unrolling of the call stack during a cancellation.
 		{
 			auto scope = makeSyncLockGuard(mutex_);
