@@ -1,20 +1,27 @@
 #pragma once
 
 #include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/platform/types.hh"
 
 namespace bzd {
 template <class T>
 class ReferenceWrapper
 {
 private:
+	using Self = ReferenceWrapper<T>;
 	using Value = bzd::typeTraits::RemoveReference<T>;
 
-public:
+public: // Constructor.
 	constexpr ReferenceWrapper(Value& value) noexcept : value_(&value) {}
 
+public: // API.
 	constexpr operator Value&() const noexcept { return *value_; }
 
 	constexpr Value& get() const noexcept { return *value_; }
+
+public: // Comparison operators.
+	[[nodiscard]] constexpr bzd::BoolType operator==(const Self& other) const noexcept { return (value_ == other.value_); }
+	[[nodiscard]] constexpr bzd::BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 private:
 	Value* value_;

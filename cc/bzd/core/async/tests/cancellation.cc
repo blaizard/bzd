@@ -36,3 +36,19 @@ TEST(Cancellation, AttachedTriggerChild)
 	EXPECT_TRUE(token.isCanceled());
 	EXPECT_FALSE(parent.isCanceled());
 }
+
+TEST(Cancellation, AttachedOutOfScope)
+{
+	bzd::CancellationToken parent{};
+
+	{
+		bzd::CancellationToken token{};
+		token.attachTo(parent);
+		EXPECT_FALSE(token.isCanceled());
+		EXPECT_FALSE(parent.isCanceled());
+		parent.trigger();
+		EXPECT_TRUE(token.isCanceled());
+		EXPECT_TRUE(parent.isCanceled());
+	}
+	EXPECT_TRUE(parent.isCanceled());
+}

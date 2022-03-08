@@ -32,9 +32,27 @@ public: // Constructors/Destructors.
 
 	constexpr ~CancellationToken() noexcept
 	{
-		if (parent_)
+
+		// All entries might not be detached at that point, because of the unrolling of the call stack during a cancellation.
 		{
-			parent_->removeToken(*this);
+			auto scope = makeSyncLockGuard(mutex_);
+			for (auto& token : attached_)
+			{
+				auto scopeToken = makeSyncLockGuard(token.mutex_);
+				token.parent_.reset();
+			}
+		}
+
+		bzd::Optional<CancellationToken&> parent{};
+		{
+			auto scope = makeSyncLockGuard(mutex_);
+			parent = parent_;
+			parent_.reset();
+		}
+
+		if (parent)
+		{
+			parent->removeToken(*this);
 		}
 	}
 

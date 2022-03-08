@@ -30,8 +30,8 @@ public:
 	constexpr void cancel() noexcept
 	{
 		auto executable = this;
-		// Look for the parent cancelled async and enqueue its continuation.
-		while (executable->caller_ && executable->caller_->isCanceled())
+		// Unroll the callstaxck and stop to the first callback and execute it.
+		while (executable->onTerminateCallback_.empty() && executable->caller_)
 		{
 			executable = executable->caller_;
 		}
@@ -44,7 +44,7 @@ public:
 		auto continuation = caller_;
 
 		// Call the termination callback which decides if a continuation should be enqueued.
-		if (onTerminateCallback_)
+		if (onTerminateCallback_.hasValue())
 		{
 			continuation = ((onTerminateCallback_.value())()) ? continuation : nullptr;
 		}

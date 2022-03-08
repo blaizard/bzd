@@ -12,6 +12,7 @@
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
+
 #include <iostream>
 
 namespace bzd::impl {
@@ -139,7 +140,7 @@ public:
 public: // coroutine specific
 	using promise_type = PromiseType;
 
-	constexpr bool await_ready() noexcept { return isCompleted(); }
+	constexpr bool await_ready() noexcept { return isReady(); }
 
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
@@ -161,7 +162,11 @@ public: // coroutine specific
 		return true;
 	}
 
-	constexpr ResultType await_resume() noexcept { return bzd::move(moveResultOut().valueMutable()); }
+	constexpr ResultType await_resume() noexcept
+	{
+		bzd::assert::isTrue(isReady());
+		return bzd::move(moveResultOut().valueMutable());
+	}
 
 	// private:
 	template <class... Args>
@@ -248,7 +253,6 @@ impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&..
 		// Only triggers the token for the first entry to this function.
 		if (current == 1U)
 		{
-			::std::cout << "CANCEL" << ::std::endl;
 			token.trigger();
 		}
 		// For the last one, push the caller back into the scheduling queue.
