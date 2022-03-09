@@ -202,6 +202,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:remove_reference",
     ],
 )
