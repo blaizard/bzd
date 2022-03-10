@@ -28,5 +28,6 @@ cc_library(
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility:scope_guard",
     ],
 )

@@ -15,6 +15,7 @@
 #include <iostream>
 
 namespace bzd {
+
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
 /// An executor is thread-safe and can be shared betweeen multiple threads or cores.
@@ -96,12 +97,9 @@ public:
 			}
 			info.updateTick();
 		}
-
-		// Use to prevent a potential dead lock here if waitForNextTick is called at this moment
-		// in another thread, scope will not be able to acquire the lock and the tick will
-		// remain the same.
-		info.markAsCompleted();
 	}
+
+	void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
 private:
 	class RunningInfo : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
@@ -116,8 +114,6 @@ private:
 		[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
 
 		constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
-		constexpr void markAsCompleted() noexcept { tick_.store(0); }
-		constexpr auto isCompleted() const noexcept { return (tick_.load() == 0); }
 
 	private:
 		[[nodiscard]] static IdType makeUId() noexcept
@@ -213,7 +209,7 @@ namespace bzd::interface {
 ///
 /// \tparam T The child class, this is a CRTP desgin pattern.
 template <class T>
-class Executable : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ true>
+class Executable : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ true, /*support discard*/ true>
 {
 public:
 	using Self = Executable<T>;
@@ -223,6 +219,12 @@ public:
 	{
 		// Detach the executable from any of the list it belongs to.
 		bzd::ignore = pop();
+		if (executor_)
+		{
+			// If there is an executor wait until it is safe to dicard the element, this to avoid any
+			// potential out of scope object access.
+			executor_->waitToDiscard();
+		}
 	}
 
 	constexpr void enqueue() noexcept

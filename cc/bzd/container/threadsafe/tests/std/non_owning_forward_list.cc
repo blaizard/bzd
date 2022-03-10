@@ -374,26 +374,23 @@ TEST(NonOwningForwardList, InsertionStress)
 	data1.sanityCheck();
 }
 
-TEST(NonOwningForwardList, PushPop)
+TEST(NonOwningForwardList, PopToDiscard)
 {
 	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
 	{
 		bzd::Array<std::thread, 10> threads;
-		bzd::test::NonOwningForwardList<bzd::test::ListElement> data{};
+		bzd::test::NonOwningForwardList<bzd::test::ListElementDiscard> data{};
 		;
-		bzd::Array<bzd::test::ListElement, 10> elements;
 
-		bzd::SizeType i{0};
 		for (auto& thread : threads)
 		{
-			thread = std::thread{[&data, &elements, i]() {
-				bzd::test::ListElement& element{elements[i]};
+			thread = std::thread{[&data]() {
+				bzd::test::ListElementDiscard element;
 				const auto result1 = data.pushFront(element);
 				EXPECT_TRUE(result1);
-				const auto result2 = data.pop(element);
+				const auto result2 = data.popToDiscard(element);
 				EXPECT_TRUE(result2);
 			}};
-			++i;
 		}
 
 		for (auto& thread : threads)
