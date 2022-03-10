@@ -7,6 +7,7 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
@@ -53,24 +54,11 @@ public: // constructor/destructor/assignments
 		// Detach it from where it is and destroy the handle.
 		if (handle_)
 		{
-			cancel();
+			destroy();
 		}
 	}
 
 public:
-	/// Cancel the current async and nested ones.
-	///
-	/// This function is not thread safe and must be called on an async object non active.
-	constexpr void cancel() noexcept
-	{
-		if (handle_)
-		{
-			detach();
-			handle_.destroy();
-			handle_ = nullptr;
-		}
-	}
-
 	/// Notifies if the async is completed.
 	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
 
@@ -98,7 +86,7 @@ public:
 	}
 
 	/// Detach the current async from its executor (if attached).
-	constexpr void detach() noexcept { bzd::ignore = getExecutable().pop(); }
+	constexpr void detach() noexcept { bzd::ignore = getExecutable().popToDiscard(); }
 
 	/// Associate an executor to this async.
 	constexpr void setExecutor(Executor& executor) noexcept { handle_.promise().setExecutor(executor); }
@@ -131,7 +119,9 @@ public:
 	constexpr ResultType sync() noexcept
 	{
 		Executor executor;
-		return run(executor);
+		auto result = run(executor);
+		destroy();
+		return bzd::move(result);
 	}
 
 	constexpr void setCancellationToken(CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
@@ -167,9 +157,25 @@ public: // coroutine specific
 		return bzd::move(moveResultOut().valueMutable());
 	}
 
-	// private:
+private:
 	template <class... Args>
 	friend struct bzd::coroutine::impl::Enqueue;
+
+	template <class U>
+	friend class bzd::coroutine::impl::Promise;
+
+	/// Destroy the current async and nested ones.
+	///
+	/// This function is not thread safe and must be called on an async object non active.
+	constexpr void destroy() noexcept
+	{
+		if (handle_)
+		{
+			detach();
+			handle_.destroy();
+			handle_ = nullptr;
+		}
+	}
 
 	constexpr Executable& getExecutable() noexcept
 	{
@@ -216,7 +222,8 @@ constexpr auto getExecutable() noexcept
 }
 
 template <concepts::async... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs) noexcept
+requires(!concepts::lValueReference<Asyncs> && ...) impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs)
+noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
 
@@ -238,7 +245,9 @@ impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs
 }
 
 template <concepts::async... Asyncs>
-impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs) noexcept
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...) impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs)
+noexcept
 {
 	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
 

@@ -7,6 +7,16 @@
 
 namespace bzd::test {
 
+class ListElementDiscard : public bzd::threadsafe::NonOwningForwardListElement</*MultiContainer*/ false, /*discard*/ true>
+{
+public:
+	ListElementDiscard() = default;
+	ListElementDiscard(bzd::SizeType value) : value_{value} {}
+	ListElementDiscard(ListElementDiscard&&) = default;
+
+	bzd::SizeType value_{0};
+};
+
 class ListElementMultiContainer : public bzd::threadsafe::NonOwningForwardListElement</*MultiContainer*/ true>
 {
 public:

@@ -23,3 +23,8 @@ template <class T>
 inline constexpr bool isLValueReference = IsLValueReference<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T>
+concept lValueReference = typeTraits::isLValueReference<T>;
+}

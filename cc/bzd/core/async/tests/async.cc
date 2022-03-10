@@ -119,7 +119,7 @@ TEST_ASYNC(Coroutine, asyncAll)
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a", 10);
 	auto promiseB = nested(trace, "b", -4);
-	const auto result = co_await bzd::async::all(promiseA, promiseB);
+	const auto result = co_await bzd::async::all(bzd::move(promiseA), bzd::move(promiseB));
 	EXPECT_EQ(trace, "[a1][b1][a0][b0][a2][b2]");
 	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
@@ -133,7 +133,7 @@ TEST_ASYNC(Coroutine, asyncAllDifferent)
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
-	co_await bzd::async::all(promiseA, promiseB);
+	co_await bzd::async::all(bzd::move(promiseA), bzd::move(promiseB));
 	EXPECT_EQ(trace, "[a1][b3][a0][b1][a2][b0][b2][b4][b3][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
 	co_return {};
 }
@@ -145,7 +145,7 @@ TEST_ASYNC(Coroutine, asyncAllMany)
 	auto promiseB = nested(trace, "b");
 	auto promiseC = nested(trace, "c");
 	auto promiseD = nested(trace, "d");
-	co_await bzd::async::all(promiseA, promiseB, promiseC, promiseD);
+	co_await bzd::async::all(bzd::move(promiseA), bzd::move(promiseB), bzd::move(promiseC), bzd::move(promiseD));
 	EXPECT_EQ(trace, "[a1][b1][c1][d1][a0][b0][c0][d0][a2][b2][c2][d2]");
 	co_return {};
 }
@@ -155,7 +155,7 @@ bzd::Async<int> asyncAllNested(bzd::interface::String& trace, bzd::StringView id
 	appendToTrace(trace, id, 5);
 	auto promiseY = nested(trace, "y");
 	auto promiseZ = nested(trace, "z");
-	co_await bzd::async::all(promiseY, promiseZ);
+	co_await bzd::async::all(bzd::move(promiseY), bzd::move(promiseZ));
 	appendToTrace(trace, id, 6);
 
 	co_return 12;
@@ -166,7 +166,7 @@ TEST_ASYNC(Coroutine, asyncAllNested)
 	bzd::String<128> trace;
 	auto promiseA = asyncAllNested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
-	co_await bzd::async::all(promiseA, promiseB);
+	co_await bzd::async::all(bzd::move(promiseA), bzd::move(promiseB));
 	EXPECT_EQ(trace, "[a5][b3][b1][y1][z1][b0][y0][z0][b2][y2][z2][b4][b3][b1][a6][b0][b2][b4][b3][b1][b0][b2][b4]");
 	co_return {};
 }
@@ -176,7 +176,7 @@ TEST_ASYNC(Coroutine, asyncAny)
 	bzd::String<128> trace;
 	auto promiseA = nested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
-	const auto result = co_await bzd::async::any(promiseA, promiseB);
+	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a1][b3][a0][b1][a2]");
 	EXPECT_EQ(result.size(), 2U);
@@ -220,7 +220,7 @@ TEST_ASYNC(Coroutine, asyncAnyYield)
 	bzd::String<128> trace;
 	auto promiseA = yieldLoop(trace, "a", 10);
 	auto promiseB = yieldLoop(trace, "b", 2);
-	const auto result = co_await bzd::async::any(promiseA, promiseB);
+	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a0][b0][a0][b0][a0]");
 	EXPECT_EQ(result.size(), 2U);
@@ -233,7 +233,7 @@ bzd::Async<int> anyNested(bzd::interface::String& trace, bzd::StringView id)
 	auto promiseB = nested(trace, "c", 42);
 
 	appendToTrace(trace, id, 6);
-	const auto result = co_await bzd::async::any(promiseA, promiseB);
+	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 	appendToTrace(trace, id, 7);
 
 	co_return result.get<1>().value().value();
@@ -251,7 +251,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 		bzd::String<128> trace;
 		auto promiseA = nested(trace, "d");
 		auto promiseB = anyNested(trace, "a");
-		[[maybe_unused]] const auto result = co_await bzd::async::any(promiseA, promiseB);
+		[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 		EXPECT_EQ(trace, "[d1][a6][d0][d2]");
 	}
 
@@ -259,9 +259,9 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 		bzd::String<128> trace;
 		auto promiseA = anyNested(trace, "d");
 		auto promiseB = anyNested(trace, "a");
-		auto promiseAnyA = bzd::async::any(promiseA, promiseB);
+		auto promiseAnyA = bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 		auto promiseC = nested(trace, "c");
-		[[maybe_unused]] const auto result = co_await bzd::async::any(promiseAnyA, promiseC);
+		[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::move(promiseAnyA), bzd::move(promiseC));
 		EXPECT_EQ(trace, "[c1][d6][a6][c0][c2]");
 	}
 
@@ -293,11 +293,7 @@ bzd::Async<int> asyncFibonacci(int n)
 
 TEST_ASYNC(Coroutine, fibonacci)
 {
-	auto fibonacci1 = asyncFibonacci(12);
-	auto fibonacci2 = asyncFibonacci(16);
-	auto fibonacci3 = asyncFibonacci(18);
-	auto fibonacci4 = asyncFibonacci(20);
-	const auto result = co_await bzd::async::all(fibonacci1, fibonacci2, fibonacci3, fibonacci4);
+	const auto result = co_await bzd::async::all(asyncFibonacci(12), asyncFibonacci(16), asyncFibonacci(18), asyncFibonacci(20));
 	EXPECT_EQ(result.size(), 4U);
 	EXPECT_EQ(result.get<0>().value(), 144);
 	EXPECT_EQ(result.get<1>().value(), 987);

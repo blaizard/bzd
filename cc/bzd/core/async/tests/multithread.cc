@@ -21,7 +21,7 @@ bzd::Async<> cancellationNestedWorkload(const bzd::SizeType counter)
 		auto promise1 = cancellationWorkload(counter);
 		auto promise2 = cancellationNestedWorkload(counter / 2);
 		auto promise3 = cancellationNestedWorkload(counter / 3);
-		co_await bzd::async::any(promise1, promise2, promise3);
+		co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
 	}
 	co_return {};
 }
@@ -33,7 +33,7 @@ TEST(Coroutine, Cancellation2Threads)
 
 	auto promise1 = cancellationWorkload(2);
 	auto promise2 = cancellationWorkload(1);
-	auto promise = bzd::async::any(promise1, promise2);
+	auto promise = bzd::async::any(bzd::move(promise1), bzd::move(promise2));
 	promise.enqueue(executor);
 
 	for (auto& entry : threads)
@@ -45,6 +45,8 @@ TEST(Coroutine, Cancellation2Threads)
 	{
 		entry.join();
 	}
+
+	EXPECT_EQ(executor.getQueueCount(), 0U);
 }
 
 template <class Function>
@@ -60,7 +62,8 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 		auto promise3 = workload(counterGenerator());
 		auto promise4 = workload(counterGenerator());
 		auto promise5 = workload(counterGenerator());
-		auto promise = bzd::async::any(promise1, promise2, promise3, promise4, promise5);
+		auto promise =
+			bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
 		promise.enqueue(executor);
 
 		for (auto& entry : threads)

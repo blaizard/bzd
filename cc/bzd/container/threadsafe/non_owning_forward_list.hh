@@ -12,6 +12,7 @@
 #include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/ignore.hh"
+#include "cc/bzd/utility/scope_guard.hh"
 
 namespace bzd::threadsafe {
 enum class NonOwningForwardListErrorType
@@ -24,6 +25,34 @@ enum class NonOwningForwardListErrorType
 
 namespace bzd::threadsafe::impl {
 
+class NonOwningForwardListNoDiscard
+{
+protected:
+	constexpr auto discardCounterScope() noexcept { return true; }
+};
+
+class NonOwningForwardListDiscard
+{
+public:
+	constexpr void waitToDiscard() noexcept
+	{
+		while (discardCounter_.load(MemoryOrder::acquire) != 0)
+		{
+		}
+	}
+
+protected:
+	constexpr auto discardCounterScope() noexcept
+	{
+		++discardCounter_;
+		return bzd::ScopeGuard{[this]() { --discardCounter_; }};
+	}
+
+private:
+	// When this counter is non-null it means that discarding is not possible.
+	bzd::Atomic<bzd::SizeType> discardCounter_{0};
+};
+
 /// Implementation of a non-owning forward list.
 ///
 /// Lock-free, multi-producer, multi-consumer.
@@ -33,7 +62,7 @@ namespace bzd::threadsafe::impl {
 ///
 /// \tparam T Element type.
 template <class T>
-class NonOwningForwardList
+class NonOwningForwardList : public typeTraits::Conditional<T::supportDiscard_, NonOwningForwardListDiscard, NonOwningForwardListNoDiscard>
 {
 public:
 	using Self = NonOwningForwardList<T>;
@@ -117,7 +146,7 @@ public:
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
 
-			if constexpr (ElementType::isMultiContainer_)
+			if constexpr (ElementType::supportMultiContainer_)
 			{
 				// Set the parent
 				element.parent_.store(this);
@@ -153,7 +182,7 @@ public:
 		// First set a temporary mark and check wether or not this element
 		// is part of this list. If not, remove the mark and return, otherwise
 		// replace the mark with the deletion mark.
-		if constexpr (ElementType::isMultiContainer_)
+		if constexpr (ElementType::supportMultiContainer_)
 		{
 			ElementPtrType expected{element.next_.load()};
 			do
@@ -199,6 +228,8 @@ public:
 
 		while (true)
 		{
+			[[maybe_unused]] auto scope{this->discardCounterScope()};
+
 			// Save the next positions of current element pointers
 			const auto nodeNext = removeMarks(element.next_.load());
 			bzd::assert::isTrue(nodeNext);
@@ -301,6 +332,24 @@ public:
 		--size_;
 
 		return nullresult;
+	}
+
+	/// Remove an element from the queue. Unlike pop, the element can be immediatly discarded.
+	///
+	/// Calling this function ensures that no user of the list is currently pointing to this element,
+	/// which could lead to a sigfault situation.
+	///
+	/// \param element Element to be inserted.
+	/// \return An error in case of failure, void otherwise.
+	template <bzd::BoolType U = ElementType::supportDiscard_, bzd::typeTraits::EnableIf<U, void>* = nullptr>
+	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept
+	{
+		const auto result = pop(element);
+		if (result)
+		{
+			this->waitToDiscard();
+		}
+		return result;
 	}
 
 	/// Remove all elements associated with this list.
@@ -415,15 +464,16 @@ struct NonOwningForwardListElementMultiContainer
 	bzd::Atomic<void*> parent_{nullptr};
 };
 
-template <bzd::BoolType MultiContainer>
+template <bzd::BoolType supportMultiContainer, bzd::BoolType supportDiscard>
 class NonOwningForwardListElement
-	: public bzd::typeTraits::Conditional<MultiContainer, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
+	: public bzd::typeTraits::Conditional<supportMultiContainer, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
 {
 public:
-	static const constexpr bzd::BoolType isMultiContainer_{MultiContainer};
+	static const constexpr bzd::BoolType supportMultiContainer_{supportMultiContainer};
+	static const constexpr bzd::BoolType supportDiscard_{supportDiscard};
 
 private:
-	using Self = NonOwningForwardListElement<MultiContainer>;
+	using Self = NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
 	using Container = NonOwningForwardList<Self>;
 	template <class V>
 	using Result = bzd::Result<V, NonOwningForwardListErrorType>;
@@ -433,14 +483,27 @@ public:
 	constexpr NonOwningForwardListElement(Self&& elt) : next_{elt.next_.load()} {}
 
 	/// Pop the current element from the list. This is available only if
-	/// MultiContainer is enabled, as it has the knowledge of the parent container.
-	template <bzd::BoolType T = MultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
+	/// supportMultiContainer is enabled, as it has the knowledge of the parent container.
+	template <bzd::BoolType T = supportMultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> pop() noexcept
 	{
 		auto* container = static_cast<Container*>(this->parent_.load());
 		if (container)
 		{
 			return container->pop(*this);
+		}
+		return bzd::error(NonOwningForwardListErrorType::elementAlreadyRemoved);
+	}
+
+	/// Pop the current element from the list. This is available only if
+	/// supportMultiContainer and supportDiscard is enabled, as it has the knowledge of the parent container.
+	template <bzd::BoolType T = (supportMultiContainer && supportDiscard), bzd::typeTraits::EnableIf<T, void>* = nullptr>
+	[[nodiscard]] constexpr Result<void> popToDiscard() noexcept
+	{
+		auto* container = static_cast<Container*>(this->parent_.load());
+		if (container)
+		{
+			return container->popToDiscard(*this);
 		}
 		return bzd::error(NonOwningForwardListErrorType::elementAlreadyRemoved);
 	}
@@ -454,10 +517,11 @@ namespace bzd::threadsafe {
 
 /// Element for the non-owning list.
 ///
-/// \tparam MultiContainer Whether multicontainer should be supported or not.
+/// \tparam supportMultiContainer Whether multicontainer should be supported or not.
 ///        This means that an element can pop from one list and push a different one.
-template <bzd::BoolType MultiContainer>
-using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListElement<MultiContainer>;
+/// \tparam supportDiscard Allow elements to be discarded.
+template <bzd::BoolType supportMultiContainer, bzd::BoolType supportDiscard = false>
+using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
 
 /// Implementation of a non-owning linked list.
 ///
@@ -472,10 +536,12 @@ using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListE
 /// \tparam T Element type.
 template <class T>
 class NonOwningForwardList
-	: public bzd::threadsafe::impl::NonOwningForwardList<bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>
+	: public bzd::threadsafe::impl::NonOwningForwardList<
+		  bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>
 {
 public:
-	using Parent = bzd::threadsafe::impl::NonOwningForwardList<bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>;
+	using Parent = bzd::threadsafe::impl::NonOwningForwardList<
+		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>;
 
 public:
 	template <class U>
@@ -536,7 +602,7 @@ public: // Traits.
 
 public:
 	using bzd::threadsafe::impl::NonOwningForwardList<
-		bzd::threadsafe::NonOwningForwardListElement<T::isMultiContainer_>>::NonOwningForwardList;
+		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>::NonOwningForwardList;
 
 	/// Return a begin iterator for this list.
 	///
@@ -571,6 +637,8 @@ public:
 
 	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
 	{
+		[[maybe_unused]] auto scope{this->discardCounterScope()};
+
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
@@ -581,6 +649,8 @@ public:
 
 	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
 	{
+		[[maybe_unused]] auto scope{this->discardCounterScope()};
+
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
