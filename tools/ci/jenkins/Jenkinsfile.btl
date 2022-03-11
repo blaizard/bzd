@@ -1,0 +1,60 @@
+#!/usr/bin/env groovy
+
+pipeline
+{
+	triggers
+	{
+		cron("@weekly")
+		pollSCM("0 3 * * *") // Every day at 3:00am
+	}
+	agent
+	{
+		dockerfile
+		{
+			filename "tools/ci/jenkins/Dockerfile"
+			// Only a single args argument can be used
+			args "-v /cache:/cache -e DOCKER_HOST=tcp://localhost:2375 --network host"
+		}
+	}
+	stages
+	{
+		stage("Environment")
+		{
+			steps
+			{
+				sh "cp tools/ci/jenkins/.bazelrc.local .bazelrc.local"
+				sh "git submodule foreach --recursive git clean -xfd"
+				sh "git submodule foreach --recursive git reset --hard"
+				sh "git submodule update --init --recursive"
+				sh "ls -ll /"
+				sh "./info.sh"
+			}
+		}
+		// Parallelized tests are done here
+		stage("Tests")
+		{
+			parallel
+			{
+				{% for stage in stages %}{% if !defined(stage.type) %}
+				stage("{{ stage.name }}")
+				{
+					steps
+					{
+						sh "{{ stage.command }}" 
+					}
+				}
+				{% end %}{% end %}
+			}
+		}
+		// Auto publish some artifacts
+		stage("Publish")
+		{
+			steps
+			{
+				sh "./tools/bazel run apps/dashboard:push"
+				sh "./tools/bazel run apps/family:push"
+				sh "./tools/bazel run apps/artifacts:push"
+			}
+		}
+	}
+}

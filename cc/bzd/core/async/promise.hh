@@ -30,16 +30,22 @@ public:
 	constexpr void cancel() noexcept
 	{
 		auto executable = this;
+
 		// Unroll the callstaxck and stop to the first callback and execute it.
-		while (executable->onTerminateCallback_.empty() && executable->caller_)
+		do
 		{
-			executable = executable->caller_;
+			executable = executable->getContinuation();
+		} while (executable && executable->isCanceled());
+
+		if (executable)
+		{
+			// Enqueue the continuation for later use, it will be scheduled
+			// according to the executor policy.
+			executable->enqueue();
 		}
-		executable->enqueueContinuationIfRelevant();
 	}
 
-	/// Enqueue the continuation of the async after calling the terminate callback if any.
-	constexpr void enqueueContinuationIfRelevant() noexcept
+	constexpr Executable* getContinuation() noexcept
 	{
 		auto continuation = caller_;
 
@@ -49,12 +55,7 @@ public:
 			continuation = ((onTerminateCallback_.value())()) ? continuation : nullptr;
 		}
 
-		if (continuation)
-		{
-			// Enqueue the continuation for later use, it will be scheduled
-			// according to the executor policy.
-			continuation->enqueue();
-		}
+		return continuation;
 	}
 
 	bzd::coroutine::impl::coroutine_handle<> handle_;
@@ -171,7 +172,11 @@ private:
 			// safety reasons, if we return the coroutine handle directly here, we
 			// might have a case where the same coroutine executes multiple times on
 			// different threads.
-			handle.promise().enqueueContinuationIfRelevant();
+			auto maybeContinuation = handle.promise().getContinuation();
+			if (maybeContinuation)
+			{
+				maybeContinuation->enqueue();
+			}
 
 			return bzd::coroutine::impl::noop_coroutine();
 		}

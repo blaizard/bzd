@@ -285,8 +285,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		conditionStr = re.sub(patternWord, replaceValue, conditionStr)
 		try:
 			condition = eval(conditionStr)
-		except:
-			raise Exception("Cannot evaluate condition '{}'.".format(conditionStr))
+		except Exception as e:
+			raise Exception("Cannot evaluate condition '{}', {}.".format(conditionStr, e))
 
 		return bool(condition)
 
