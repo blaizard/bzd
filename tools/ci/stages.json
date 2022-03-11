@@ -1,0 +1,41 @@
+{
+    "stages": [
+        {
+            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_dev",
+            "name": "linux_x86_64_clang dev + clang-tidy"
+        },
+        {
+            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod",
+            "name": "linux_x86_64_clang prod"
+        },
+        {
+            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_gcc --config=cc",
+            "name": "linux_x86_64_gcc"
+        },
+        {
+            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc",
+            "name": "esp32_xtensa_lx6_gcc"
+        },
+        {
+            "command": "./tools/bazel test ... $EXTRA_FLAGS --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_dev",
+            "name": "dev",
+            "type": "stress"
+        },
+        {
+            "command": "./tools/bazel test ... $EXTRA_FLAGS --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_prod",
+            "name": "prod",
+            "type": "stress"
+        },
+        {
+            "command": "./tools/bazel test ...  $EXTRA_FLAGS --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan",
+            "name": "asan/lsan",
+            "type": "sanitizer"
+        },
+        {
+            "command": "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc",
+            "name": "C++",
+            "output": "bazel-out/coverage_cc",
+            "type": "coverage"
+        }
+    ]
+}

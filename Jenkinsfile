@@ -30,9 +30,7 @@ pipeline
 				sh "./info.sh"
 			}
 		}
-		/**
-		 * Parallelized tests are done here
-		 */
+		// Parallelized tests are done here
 		stage("Tests")
 		{
 			parallel
@@ -100,9 +98,7 @@ pipeline
 				}
 			}
 		}
-		/**
-		 * Auto publish some artifacts
-		 */
+		// Auto publish some artifacts
 		stage("Publish")
 		{
 			steps
