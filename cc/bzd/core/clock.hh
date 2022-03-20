@@ -6,11 +6,7 @@
 
 namespace bzd {
 
-class ClockTick : public bzd::NamedType<bzd::UInt64Type, struct ClockTickTag, bzd::Arithmetic>
-{
-public:
-	using bzd::NamedType<bzd::UInt64Type, struct ClockTickTag, bzd::Arithmetic>::NamedType;
-};
+using ClockTick = bzd::NamedType<bzd::UInt64Type, struct ClockTickTag, bzd::Arithmetic>;
 
 class Clock
 {
