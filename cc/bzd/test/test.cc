@@ -1,6 +1,7 @@
 #include "cc/bzd/test/test.hh"
 
 #include "cc/bzd/core/print.hh"
+#include "cc/bzd/platform/clock.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {
@@ -46,6 +47,7 @@ void Manager::failInternals(const char* const file, const int line, const char* 
 
 bool bzd::test::Manager::run()
 {
+	auto& clock = ::bzd::platform::steadyClock();
 	bzd::SizeType nbFailedTests{0};
 	auto* test = testRoot;
 
@@ -63,6 +65,7 @@ bool bzd::test::Manager::run()
 
 		::bzd::print(CSTR("[ RUN      ] {}.{} (seed={})\n"), test->testCaseName_, test->testName_, seed).sync();
 		currentTestFailed_ = false;
+		const auto tickStart = clock.getTicks();
 		try
 		{
 			test->test(context);
@@ -72,15 +75,17 @@ bool bzd::test::Manager::run()
 			fail(test->file_, -1, "Unknown C++ exception thrown in the test body.");
 		}
 
+		const auto tickDiff = (clock.getTicks() - tickStart);
+
 		// Print the test status
 		if (currentTestFailed_)
 		{
 			++nbFailedTests;
-			::bzd::print(CSTR("[   FAILED ]\n")).sync();
+			::bzd::print(CSTR("[   FAILED ] ({}ms)\n"), clock.ticksToMs(tickDiff).get()).sync();
 		}
 		else
 		{
-			::bzd::print(CSTR("[       OK ]\n")).sync();
+			::bzd::print(CSTR("[       OK ] ({}ms)\n"), clock.ticksToMs(tickDiff).get()).sync();
 		}
 
 		test = test->next_;
