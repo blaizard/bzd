@@ -24,10 +24,10 @@ cc_library(
         ":composition",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
+        "//cc/bzd/platform:clock",
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",
         "//cc/bzd/utility/random:xorwow_engine",
-        "//cc/bzd/platform:clock"
     ],
 )
 
