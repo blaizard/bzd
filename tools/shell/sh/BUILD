@@ -1,10 +1,15 @@
-filegroup(
-    name = "sh",
-    srcs = glob(
+py_library(
+    name = "factory",
+    srcs = [
+        "factory.py"
+    ],
+    deps = [
+        "//tools/shell:factory",
+    ],
+    data = glob(
         [
-            "**/*",
+            "srcs/**/*",
         ],
-        exclude = ["BUILD"],
     ),
     visibility = [
         "//tools/shell:__pkg__",

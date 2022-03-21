@@ -5,10 +5,22 @@ py_binary(
     srcs = [
         "setup.py",
     ],
-    data = [
-        "//tools/shell/sh",
-    ],
     deps = [
         "//python/bzd:env",
+        "//tools/shell/sh:factory"
+    ],
+)
+
+
+py_library(
+    name = "factory",
+    srcs = [
+        "factory.py",
+    ],
+    deps = [
+        "//python/bzd/template"
+    ],
+    visibility = [
+        "//tools/shell:__subpackages__",
     ],
 )

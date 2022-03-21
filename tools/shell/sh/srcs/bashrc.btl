@@ -1,0 +1,37 @@
+# This file is auto-generated, do not edit as modifications will be overwritten.
+
+bzd_is_shell=`echo "$-" | grep i > /dev/null`
+
+_bzd_echo()
+{
+    # Only output to interactive shell. This is important as some commands might need a clean stdout, for example rsync...
+	if ${bzd_is_shell}; then
+		echo "$@"
+	fi
+}
+
+_bzd_echo -n "Setting-up bzd environment..."
+
+{% for name, content in nonInteractive %}
+# ---- Content from {{ name }}
+{{ content }}
+{% end %}
+
+# Only output to interactive shell.
+if ${bzd_is_shell}; then
+
+# Load command line fuzzy finder
+if [ -f ~/.fzf.bash ]; then
+	source ~/.fzf.bash
+else
+	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
+fi
+
+{% for name, content in interactive %}
+# ---- Content from {{ name }}
+{{ content }}
+{% end %}
+
+fi
+
+_bzd_echo -e "\tdone"
