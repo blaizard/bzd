@@ -12,7 +12,7 @@ _bzd_echo()
 
 _bzd_echo -n "Setting-up bzd environment..."
 
-{% for name, content in nonInteractive %}
+{% for name, content in always %}
 # ---- Content from {{ name }}
 {{ content }}
 {% end %}
