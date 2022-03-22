@@ -1,10 +1,9 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
 py_library(
     name = "factory",
     srcs = [
-        "factory.py"
-    ],
-    deps = [
-        "//tools/shell:factory",
+        "factory.py",
     ],
     data = glob(
         [
@@ -13,5 +12,8 @@ py_library(
     ),
     visibility = [
         "//tools/shell:__pkg__",
+    ],
+    deps = [
+        "//tools/shell:factory",
     ],
 )

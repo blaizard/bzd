@@ -59,6 +59,37 @@ bzd_update()
 	bzd_reload
 }
 
+# ---- Content from clean.sh
+bzd_free_size_kb()
+{
+    total_free=0;
+    for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
+        total_free=$(($total_free + $i));
+    done
+    echo ${total_free}
+}
+
+# Remove unused files from the computer, such as cache etc.
+bzd_clean_disk()
+{
+    total_free_begin=$(bzd_free_size_kb)
+
+    echo "---- Clean docker images."
+    docker system prune -af
+
+    bazel_workspaces=$(find / -name '.*' -prune -false -o -name 'WORKSPACE' 2>/dev/null)
+    for workspace in ${bazel_workspaces}; do
+        path=$(dirname "${workspace}")
+        echo "---- Clean bazel workspace ${path}."
+        cd "${path}"
+        bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
+    done
+
+    total_free_end=$(bzd_free_size_kb)
+    total_free_saved=$(($total_free_end - $total_free_begin))
+    echo "---- Saved ${total_free_saved}K bytes."
+}
+
 # ---- Content from git.sh
 # Reset the current branch to its state in origin
 bzd_git_reset()
@@ -78,6 +109,13 @@ bzd_git_reset()
         git clean -fd
         git submodule update --init --recursive
     fi
+}
+
+# ---- Content from math.sh
+# simple math extension to calculate from the command line
+=() {
+    py_code="from math import *; print(${@})"
+    python -c "${py_code}"
 }
 
 # ---- Content from prompt.sh
