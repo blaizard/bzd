@@ -1,14 +1,21 @@
 FROM ubuntu:20.04
 
-ARG DEBIAN_FRONTEND=noninteractive
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Update the container
 RUN apt-get update && apt-get upgrade -y
 
 # Install packages
-RUN apt-get install -y openssh-server net-tools
+RUN apt-get install -y iptables openssh-server net-tools wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# socat TCP-LISTEN:443,fork TCP:127.0.0.1:5000
+RUN mkdir -p /var/run/sshd
+RUN mkdir -p ~/.ssh
 
 EXPOSE 22
-EXPOSE 443
+EXPOSE 1194
+
+COPY executor.sh executor.sh
+CMD ./executor.sh
