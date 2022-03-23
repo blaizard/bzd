@@ -37,7 +37,7 @@ else
 fi
 
 # Reload the configuration if needed
-alias bzd_reload='. ~/.bashrc'
+alias bzd-reload='. ~/.bashrc'
 
 
 # Only output to interactive shell.
@@ -52,7 +52,7 @@ fi
 
 # ---- Content from update.sh
 # Auto update script 
-bzd_update()
+bzd-update()
 {
     url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
 	wget -q --no-cache "$url" -O ~/.bzd_update_temp
@@ -61,7 +61,7 @@ bzd_update()
 }
 
 # ---- Content from clean.sh
-bzd_free_size_kb()
+_bzd_free_size_kb()
 {
     total_free=0;
     for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
@@ -71,9 +71,9 @@ bzd_free_size_kb()
 }
 
 # Remove unused files from the computer, such as cache etc.
-bzd_clean_disk()
+clean-disk()
 {
-    total_free_begin=$(bzd_free_size_kb)
+    total_free_begin=$(_bzd_free_size_kb)
 
     echo "---- Clean docker images."
     docker system prune -af
@@ -86,14 +86,14 @@ bzd_clean_disk()
         bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
     done
 
-    total_free_end=$(bzd_free_size_kb)
+    total_free_end=$(_bzd_free_size_kb)
     total_free_saved=$(($total_free_end - $total_free_begin))
     echo "---- Saved ${total_free_saved}K bytes."
 }
 
 # ---- Content from git.sh
 # Reset the current branch to its state in origin
-bzd_git_reset()
+git-reset()
 {
     git_top_level=$(git rev-parse --show-toplevel)
     if [[ $git_top_level != $(pwd) ]]; then
@@ -121,7 +121,7 @@ bzd_git_reset()
 
 # ---- Content from prompt.sh
 # Set the prompt
-bzd_parse_git_branch()
+_bzd_parse_git_branch()
 {
 	branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
 	if [ ! -z "${branch}" ]; then
@@ -139,7 +139,7 @@ bzd_parse_git_branch()
 		echo -en " (${branch}${extra})"
 	fi
 }
-export PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(bzd_parse_git_branch)\[\033[00m\] $ "
+export PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
 
 
 fi

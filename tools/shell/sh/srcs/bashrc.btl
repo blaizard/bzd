@@ -20,13 +20,6 @@ _bzd_echo -n "Setting-up bzd environment..."
 # Only output to interactive shell.
 if ${bzd_is_shell}; then
 
-# Load command line fuzzy finder
-if [ -f ~/.fzf.bash ]; then
-	source ~/.fzf.bash
-else
-	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
-fi
-
 {% for name, content in interactive %}
 # ---- Content from {{ name }}
 {{ content }}
@@ -35,3 +28,10 @@ fi
 fi
 
 _bzd_echo -e "\tdone"
+
+# Load command line fuzzy finder
+if [ -f ~/.fzf.bash ]; then
+	source ~/.fzf.bash
+else
+	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
+fi

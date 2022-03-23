@@ -1,5 +1,5 @@
 # Auto update script 
-bzd_update()
+bzd-update()
 {
     url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
 	wget -q --no-cache "$url" -O ~/.bzd_update_temp

@@ -1,4 +1,4 @@
-bzd_free_size_kb()
+_bzd_free_size_kb()
 {
     total_free=0;
     for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
@@ -8,9 +8,9 @@ bzd_free_size_kb()
 }
 
 # Remove unused files from the computer, such as cache etc.
-bzd_clean_disk()
+clean-disk()
 {
-    total_free_begin=$(bzd_free_size_kb)
+    total_free_begin=$(_bzd_free_size_kb)
 
     echo "---- Clean docker images."
     docker system prune -af
@@ -23,7 +23,7 @@ bzd_clean_disk()
         bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
     done
 
-    total_free_end=$(bzd_free_size_kb)
+    total_free_end=$(_bzd_free_size_kb)
     total_free_saved=$(($total_free_end - $total_free_begin))
     echo "---- Saved ${total_free_saved}K bytes."
 }
