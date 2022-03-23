@@ -18,6 +18,9 @@ alias ls='ls --color=auto -h'
 alias ll='ls -lh'
 alias lla='ls -lha'
 
+# Remove green background on directories
+export LS_COLORS=$LS_COLORS:'ow=1;34:'
+
 # ---- grep -------------------------------------------------------------------
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
@@ -42,13 +45,6 @@ alias bzd-reload='. ~/.bashrc'
 
 # Only output to interactive shell.
 if ${bzd_is_shell}; then
-
-# Load command line fuzzy finder
-if [ -f ~/.fzf.bash ]; then
-	source ~/.fzf.bash
-else
-	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
-fi
 
 # ---- Content from update.sh
 # Auto update script 
@@ -145,3 +141,10 @@ export PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\
 fi
 
 _bzd_echo -e "\tdone"
+
+# Load command line fuzzy finder
+if [ -f ~/.fzf.bash ]; then
+	source ~/.fzf.bash
+else
+	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
+fi
