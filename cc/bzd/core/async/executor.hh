@@ -172,7 +172,7 @@ private:
 		auto executable = queue_.back();
 		if (executable)
 		{
-			const auto result = queue_.pop(executable.valueMutable());
+			const auto result = queue_.pop(executable.valueMutable().get());
 			if (result)
 			{
 				// Show the stack usage
@@ -181,7 +181,7 @@ private:
 				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
 				// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
 
-				return executable.valueMutable();
+				return executable.valueMutable().get();
 			}
 		}
 
@@ -221,7 +221,7 @@ public:
 		bzd::ignore = pop();
 		if (executor_)
 		{
-			// If there is an executor wait until it is safe to dicard the element, this to avoid any
+			// If there is an executor wait until it is safe to discard the element, this to avoid any
 			// potential out of scope object access.
 			executor_->waitToDiscard();
 		}

@@ -76,10 +76,10 @@ public:
 				}
 				else
 				{
-					bzd::assert::isTrue(previous == &(maybeBack.value()),
+					bzd::assert::isTrue(previous == &(maybeBack.value().get()),
 										CSTR("Last pointer is not pointing to the last element: {} vs {}"),
 										previous,
-										&(maybeBack.value()));
+										&(maybeBack.value().get()));
 				}
 
 				break;

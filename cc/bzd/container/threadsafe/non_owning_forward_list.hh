@@ -11,6 +11,7 @@
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
@@ -28,7 +29,7 @@ namespace bzd::threadsafe::impl {
 class NonOwningForwardListNoDiscard
 {
 protected:
-	constexpr auto discardCounterScope() noexcept { return true; }
+	constexpr auto discardCounterScope() const noexcept { return true; }
 };
 
 class NonOwningForwardListDiscard
@@ -41,8 +42,8 @@ public:
 		}
 	}
 
-protected:
-	constexpr auto discardCounterScope() noexcept
+public:
+	constexpr auto discardCounterScope() const noexcept
 	{
 		++discardCounter_;
 		return bzd::ScopeGuard{[this]() { --discardCounter_; }};
@@ -50,7 +51,7 @@ protected:
 
 private:
 	// When this counter is non-null it means that discarding is not possible.
-	bzd::Atomic<bzd::SizeType> discardCounter_{0};
+	mutable bzd::Atomic<bzd::SizeType> discardCounter_{0};
 };
 
 /// Implementation of a non-owning forward list.
@@ -600,6 +601,28 @@ public: // Traits.
 	using Iterator = NonOwningForwardListIterator<T>;
 	using ConstIterator = NonOwningForwardListIterator<typeTraits::AddConst<T>>;
 
+public: // Return type.
+	template <class U, class Scope = BoolType>
+	class ElementScope
+	{
+	public:
+		constexpr explicit ElementScope(U& element) noexcept : element_{element} {}
+		constexpr ElementScope(U& element, Scope&& scope) noexcept : element_{element}, scope_{bzd::move(scope)} {}
+
+	public:
+		[[nodiscard]] constexpr U& get() const noexcept { return element_; }
+
+	private:
+		U& element_;
+		Scope scope_{false};
+	};
+
+	template <class U>
+	ElementScope(U& element) -> ElementScope<U, BoolType>;
+
+	template <class U, class Scope>
+	ElementScope(U& element, Scope&& scope) -> ElementScope<U, typeTraits::RemoveReference<Scope>>;
+
 public:
 	using bzd::threadsafe::impl::NonOwningForwardList<
 		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>::NonOwningForwardList;
@@ -615,48 +638,48 @@ public:
 	[[nodiscard]] constexpr auto end() noexcept { return Iterator{&this->back_}; }
 	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{&this->back_}; }
 
-	[[nodiscard]] constexpr bzd::Optional<T&> front() noexcept
+	[[nodiscard]] constexpr bzd::Optional<ElementScope<T>> front() noexcept
 	{
 		auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<T&>(*ptr);
+		return ElementScope{static_cast<T&>(*ptr)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<const T&> front() const noexcept
+	[[nodiscard]] constexpr bzd::Optional<ElementScope<const T>> front() const noexcept
 	{
 		const auto ptr = this->front_.next_.load();
 		if (ptr == &this->back_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<const T&>(*ptr);
+		return ElementScope{static_cast<const T&>(*ptr)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<T&> back() noexcept
+	[[nodiscard]] constexpr auto back() noexcept -> bzd::Optional<ElementScope<T, decltype(this->discardCounterScope())>>
 	{
-		[[maybe_unused]] auto scope{this->discardCounterScope()};
+		auto scope{this->discardCounterScope()};
 
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<T&>(*previous->node);
+		return ElementScope{static_cast<T&>(*previous->node), bzd::move(scope)};
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<const T&> back() const noexcept
+	[[nodiscard]] constexpr auto back() const noexcept -> bzd::Optional<ElementScope<const T, decltype(this->discardCounterScope())>>
 	{
-		[[maybe_unused]] auto scope{this->discardCounterScope()};
+		auto scope{this->discardCounterScope()};
 
 		const auto previous = this->findPreviousNode(&this->back_);
 		if (previous->node == &this->front_)
 		{
 			return bzd::nullopt;
 		}
-		return static_cast<const T&>(*previous->node);
+		return ElementScope{static_cast<const T&>(*previous->node), bzd::move(scope)};
 	}
 };
 } // namespace bzd::threadsafe

@@ -18,7 +18,7 @@ TEST(NonOwningForwardList, simple)
 	{
 		const auto& result = list.front();
 		EXPECT_TRUE(result);
-		EXPECT_EQ(result->value_, elements[0].value_);
+		EXPECT_EQ(result->get().value_, elements[0].value_);
 	}
 
 	{

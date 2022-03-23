@@ -148,19 +148,14 @@ TEST(Coroutine, Cancellation2Threads)
 	EXPECT_EQ(executor.getQueueCount(), 0U);
 }
 
-TEST(Coroutine, StressAnyNull)
-{
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
-}
-
 TEST(Coroutine, StressAllNull)
 {
 	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
 }
 
-TEST(Coroutine, StressAnyFixed)
+TEST(Coroutine, StressAnyNull)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
+	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
 }
 
 TEST(Coroutine, StressAllFixed)
@@ -168,9 +163,9 @@ TEST(Coroutine, StressAllFixed)
 	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
 }
 
-TEST(Coroutine, StressAnyRandom)
+TEST(Coroutine, StressAnyFixed)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
 }
 
 TEST(Coroutine, StressAllRandom)
@@ -178,14 +173,19 @@ TEST(Coroutine, StressAllRandom)
 	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
 }
 
-TEST(Coroutine, StressAnyNested)
+TEST(Coroutine, StressAnyRandom)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
 }
 
 TEST(Coroutine, StressAllNested)
 {
 	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 1000, [&]() { return test.random<int, 0, 10>(); });
+}
+
+TEST(Coroutine, StressAnyNested)
+{
+	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
 }
 
 TEST(Coroutine, StressAllAnyNested)
