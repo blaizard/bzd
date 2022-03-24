@@ -8,7 +8,7 @@ _bzd_free_size_kb()
 }
 
 # Remove unused files from the computer, such as cache etc.
-clean-disk()
+bzd_clean_disk()
 {
     total_free_begin=$(_bzd_free_size_kb)
 

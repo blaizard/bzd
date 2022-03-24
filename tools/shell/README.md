@@ -20,4 +20,5 @@ cd ~
 mkdir -p .bzd
 wget "https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh" -O .bzd/bashrc.sh
 echo "source .bzd/bashrc.sh" > .bashrc
+source .bashrc
 ```

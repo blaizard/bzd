@@ -1,5 +1,5 @@
 # Reset the current branch to its state in origin
-git-reset()
+bzd_git_reset()
 {
     git_top_level=$(git rev-parse --show-toplevel)
     if [[ $git_top_level != $(pwd) ]]; then

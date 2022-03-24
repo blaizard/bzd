@@ -1,0 +1,19 @@
+services:
+    bridge:
+        image: blaizard/bridge:latest
+        ports:
+        - 443:1194
+        - '2222:22'
+        restart: unless-stopped
+    watchtower:
+        command:
+        - --cleanup
+        - --include-stopped
+        - --interval=3600
+        - bridge
+        container_name: watchtower
+        image: containrrr/watchtower:latest
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /etc/localtime:/etc/localtime:ro
+version: '3.0'
