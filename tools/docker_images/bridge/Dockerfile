@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get upgrade -y
 
 # Install packages
-RUN apt-get install -y iptables openssh-server net-tools wget \
+RUN apt-get install -y openssh-server net-tools wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Set SSH

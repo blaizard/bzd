@@ -45,8 +45,8 @@ public:
 public:
 	constexpr auto discardCounterScope() const noexcept
 	{
-		++discardCounter_;
-		return bzd::ScopeGuard{[this]() { --discardCounter_; }};
+		discardCounter_.fetchAdd(1, MemoryOrder::release);
+		return bzd::ScopeGuard{[this]() { discardCounter_.fetchSub(1, MemoryOrder::release); }};
 	}
 
 private:
@@ -614,14 +614,8 @@ public: // Return type.
 
 	private:
 		U& element_;
-		Scope scope_{false};
+		typeTraits::RemoveReference<Scope> scope_{false};
 	};
-
-	template <class U>
-	ElementScope(U& element) -> ElementScope<U, BoolType>;
-
-	template <class U, class Scope>
-	ElementScope(U& element, Scope&& scope) -> ElementScope<U, typeTraits::RemoveReference<Scope>>;
 
 public:
 	using bzd::threadsafe::impl::NonOwningForwardList<
@@ -645,7 +639,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return ElementScope{static_cast<T&>(*ptr)};
+		return ElementScope<T>{static_cast<T&>(*ptr)};
 	}
 
 	[[nodiscard]] constexpr bzd::Optional<ElementScope<const T>> front() const noexcept
@@ -655,7 +649,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return ElementScope{static_cast<const T&>(*ptr)};
+		return ElementScope<const T>{static_cast<const T&>(*ptr)};
 	}
 
 	[[nodiscard]] constexpr auto back() noexcept -> bzd::Optional<ElementScope<T, decltype(this->discardCounterScope())>>
@@ -667,7 +661,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return ElementScope{static_cast<T&>(*previous->node), bzd::move(scope)};
+		return ElementScope<T, decltype(scope)>{static_cast<T&>(*previous->node), bzd::move(scope)};
 	}
 
 	[[nodiscard]] constexpr auto back() const noexcept -> bzd::Optional<ElementScope<const T, decltype(this->discardCounterScope())>>
@@ -679,7 +673,7 @@ public:
 		{
 			return bzd::nullopt;
 		}
-		return ElementScope{static_cast<const T&>(*previous->node), bzd::move(scope)};
+		return ElementScope<const T, decltype(scope)>{static_cast<const T&>(*previous->node), bzd::move(scope)};
 	}
 };
 } // namespace bzd::threadsafe

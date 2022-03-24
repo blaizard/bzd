@@ -25,4 +25,4 @@ else
 fi
 
 # Reload the configuration if needed
-alias bzd-reload='. ~/.bashrc'
+alias bzd_reload='. ~/.bashrc'

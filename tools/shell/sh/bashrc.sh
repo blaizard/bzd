@@ -40,7 +40,7 @@ else
 fi
 
 # Reload the configuration if needed
-alias bzd-reload='. ~/.bashrc'
+alias bzd_reload='. ~/.bashrc'
 
 
 # Only output to interactive shell.
@@ -48,7 +48,7 @@ if ${bzd_is_shell}; then
 
 # ---- Content from update.sh
 # Auto update script 
-bzd-update()
+bzd_update()
 {
     url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
 	wget -q --no-cache "$url" -O ~/.bzd_update_temp
@@ -67,7 +67,7 @@ _bzd_free_size_kb()
 }
 
 # Remove unused files from the computer, such as cache etc.
-clean-disk()
+bzd_clean_disk()
 {
     total_free_begin=$(_bzd_free_size_kb)
 
@@ -89,7 +89,7 @@ clean-disk()
 
 # ---- Content from git.sh
 # Reset the current branch to its state in origin
-git-reset()
+bzd_git_reset()
 {
     git_top_level=$(git rev-parse --show-toplevel)
     if [[ $git_top_level != $(pwd) ]]; then
@@ -110,7 +110,7 @@ git-reset()
 
 # ---- Content from math.sh
 # simple math extension to calculate from the command line
-=() {
+bzd_math() {
     py_code="from math import *; print(${@})"
     python -c "${py_code}"
 }

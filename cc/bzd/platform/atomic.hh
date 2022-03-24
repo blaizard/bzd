@@ -42,16 +42,26 @@ class Atomic : public bzd::NamedType<std::atomic<T>, struct AtomicTag, bzd::Comp
 public:
 	using bzd::NamedType<std::atomic<T>, struct AtomicTag, bzd::Comparable, bzd::Incrementable, bzd::Decrementable>::NamedType;
 
-	constexpr explicit Atomic(const T& value) noexcept { this->get() = value; }
+	constexpr explicit Atomic(const T value) noexcept { this->get() = value; }
 
-	constexpr void store(const T& v, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	constexpr void store(const T value, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 	{
-		this->get().store(v, static_cast<std::memory_order>(order));
+		this->get().store(value, static_cast<std::memory_order>(order));
 	}
 
 	constexpr T load(const MemoryOrder order = MemoryOrder::sequentiallyConsistent) const noexcept
 	{
 		return this->get().load(static_cast<std::memory_order>(order));
+	}
+
+	constexpr T fetchAdd(const T value, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	{
+		return this->get().fetch_add(value, static_cast<std::memory_order>(order));
+	}
+
+	constexpr T fetchSub(const T value, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	{
+		return this->get().fetch_sub(value, static_cast<std::memory_order>(order));
 	}
 
 	constexpr T operator+=(const T& value) noexcept { return this->get().fetch_add(value); }
@@ -67,12 +77,12 @@ public:
 	constexpr T operator++() noexcept { return ++this->get(); }
 	constexpr T operator++(int) noexcept { return this->get()++; }
 
-	constexpr T exchange(T v, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	constexpr T exchange(const T value, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 	{
-		return this->get().exchange(v, static_cast<std::memory_order>(order));
+		return this->get().exchange(value, static_cast<std::memory_order>(order));
 	}
 
-	constexpr bool compareExchange(T& expected, T desired, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	constexpr bool compareExchange(T& expected, const T desired, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 	{
 		return this->get().compare_exchange_strong(expected, desired, static_cast<std::memory_order>(order));
 	}
