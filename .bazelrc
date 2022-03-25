@@ -129,6 +129,7 @@ build:sanitizer --strip never
 # Address Sanitizer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
+test:asan --test_env=ASAN_OPTIONS=print_stacktrace=1
 
 # Leak Sanitizer`
 build:lsan --copt -fsanitize=leak

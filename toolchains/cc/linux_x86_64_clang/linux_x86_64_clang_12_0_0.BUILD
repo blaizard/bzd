@@ -13,6 +13,11 @@ filegroup(
     srcs = ["bin/clang-format"],
 )
 
+filegroup(
+    name = "llvm_symbolizer",
+    srcs = ["bin/llvm-symbolizer"],
+)
+
 sh_binary(
     name = "clang_tidy",
     srcs = [
