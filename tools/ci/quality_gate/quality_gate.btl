@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+EXTRA_FLAGS="$@"
+
+{% for stage in stages %}
+echo  "==== {{ stage.category }} {{ stage.name }} ==============================="
+{{ stage.command }} $EXTRA_FLAGS
+{% end %}

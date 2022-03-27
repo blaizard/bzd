@@ -9,11 +9,11 @@
             "name": "linux_x86_64_clang prod"
         },
         {
-            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=_linux_x86_64_gcc_prod",
             "name": "linux_x86_64_gcc"
         },
         {
-            "command": "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc_prod",
             "name": "esp32_xtensa_lx6_gcc"
         },
         {

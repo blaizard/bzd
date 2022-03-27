@@ -53,14 +53,14 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=_linux_x86_64_gcc_prod"
 					}
 				}
 				stage("normal esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc_prod"
 					}
 				}
 				stage("stress dev")
