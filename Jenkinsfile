@@ -63,20 +63,6 @@ pipeline
 						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc_prod"
 					}
 				}
-				stage("stress dev")
-				{
-					steps
-					{
-						sh "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev"
-					}
-				}
-				stage("stress prod")
-				{
-					steps
-					{
-						sh "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod"
-					}
-				}
 				stage("sanitizer asan/lsan")
 				{
 					steps
@@ -106,6 +92,13 @@ pipeline
 					{
 						sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
+					}
+				}
+				stage("sanitizer sanitizer")
+				{
+					steps
+					{
+						sh "./sanitize.sh"
 					}
 				}
 			}

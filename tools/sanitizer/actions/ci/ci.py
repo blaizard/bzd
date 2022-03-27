@@ -9,7 +9,10 @@ from tools.ci.factory import Factory
 from tools.ci.jenkins.factory import Jenkins
 from tools.ci.quality_gate.factory import QualityGate
 
-factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (Jenkins, QualityGate, )
+factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
+	Jenkins,
+	QualityGate,
+)
 
 if __name__ == "__main__":
 

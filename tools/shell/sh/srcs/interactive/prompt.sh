@@ -17,4 +17,11 @@ _bzd_parse_git_branch()
 		echo -en " (${branch}${extra})"
 	fi
 }
-export PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
+
+case "$TERM" in
+xterm*|rxvt*|konsole*)
+	PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
+	;;
+*)
+	;;
+esac

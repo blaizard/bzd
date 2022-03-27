@@ -31,6 +31,7 @@ class Async
 {
 public: // Traits
 	using PromiseType = bzd::coroutine::Promise<T>;
+	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
 	using Executable = bzd::coroutine::impl::Executable;
 	using Executor = AsyncExecutor;
@@ -85,6 +86,30 @@ public:
 		return nullopt;
 	}
 
+	constexpr auto assert()
+	{
+		class AsyncPropagate : public impl::Async<T>
+		{
+		public: // Traits
+			using PromiseType = bzd::coroutine::Promise<T>;
+			using promise_type = PromiseType;
+
+		public:
+			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : impl::Async<T>{bzd::move(async)}
+			{
+				this->handle_.promise().setPropagate();
+			}
+
+			constexpr typename ResultType::Value await_resume() noexcept
+			{
+				auto result{bzd::move(impl::Async<T>::await_resume())};
+				bzd::assert::isTrue(result.hasValue());
+				return bzd::move(result.valueMutable());
+			}
+		};
+		return AsyncPropagate{bzd::move(*this)};
+	}
+
 	/// Detach the current async from its executor (if attached).
 	constexpr void detach() noexcept { bzd::ignore = getExecutable().popToDiscard(); }
 
@@ -127,8 +152,6 @@ public:
 	constexpr void setCancellationToken(CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
 
 public: // coroutine specific
-	using promise_type = PromiseType;
-
 	constexpr bool await_ready() noexcept { return isReady(); }
 
 	template <class U>
@@ -239,6 +262,11 @@ noexcept
 	// Push all handles to the executor and suspend.
 	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
 
+	// Wait for all async to be completed, this is needed in cases when the terminate callback
+	// is called concurrenlty and the caller is enqueued before all asyncs are completed.
+	while ((!asyncs.isReady() || ...))
+		;
+
 	// Build the result and return it.
 	ResultType result{asyncs.await_resume()...};
 	co_return result;
@@ -272,6 +300,7 @@ noexcept
 	};
 
 	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{token, onTerminateCallback, asyncs...};
+
 	// By now all asyncs must have been either ready or canceled.
 	// Build the result and return it.
 	ResultType result{asyncs.moveResultOut()...};
