@@ -124,7 +124,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 		EXPECT_EQ(executor.getQueueCount(), 0U);
 	}
 }
-/*
+
 TEST(Coroutine, Cancellation2Threads)
 {
 	bzd::impl::AsyncExecutor executor;
@@ -182,16 +182,12 @@ TEST(Coroutine, StressAllNested)
 {
 	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 1000, [&]() { return test.random<int, 0, 10>(); });
 }
-*/
-// All the test above enabled gives:
-// //cc/bzd/core/async/tests:multithread  PASSED in 83.4s
-// Stats over 1000 runs: max = 83.4s, min = 52.7s, avg = 73.7s, dev = 2.9s
 
 TEST(Coroutine, StressAnyNested)
 {
 	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
 }
-/*
+
 TEST(Coroutine, StressAllAnyNested)
 {
 	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
@@ -208,4 +204,3 @@ TEST(Coroutine, StressRandomNested)
 		return test.random<int, 0, 10>();
 	});
 }
-*/
