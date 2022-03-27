@@ -1,41 +1,53 @@
 {
     "stages": [
         {
-            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_dev",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev",
             "name": "linux_x86_64_clang dev + clang-tidy"
         },
         {
-            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_prod",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod",
             "name": "linux_x86_64_clang prod"
         },
         {
-            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=linux_x86_64_gcc --config=cc",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc",
             "name": "linux_x86_64_gcc"
         },
         {
-            "command": "./tools/bazel test ...  $EXTRA_FLAGS --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc",
             "name": "esp32_xtensa_lx6_gcc"
         },
         {
-            "command": "./tools/bazel test ... $EXTRA_FLAGS --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_dev",
-            "name": "dev",
-            "type": "stress"
+            "category": "stress",
+            "command": "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev",
+            "name": "dev"
         },
         {
-            "command": "./tools/bazel test ... $EXTRA_FLAGS --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_prod",
-            "name": "prod",
-            "type": "stress"
+            "category": "stress",
+            "command": "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod",
+            "name": "prod"
         },
         {
-            "command": "./tools/bazel test ...  $EXTRA_FLAGS --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan",
-            "name": "asan/lsan",
-            "type": "sanitizer"
+            "category": "sanitizer",
+            "command": "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan",
+            "name": "asan/lsan"
         },
         {
-            "command": "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc",
+            "category": "coverage",
+            "command": "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=_coverage_cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc",
             "name": "C++",
-            "output": "bazel-out/coverage_cc",
-            "type": "coverage"
+            "output": "bazel-out/coverage_cc"
+        },
+        {
+            "category": "coverage",
+            "command": "./tools/bazel coverage ... --config=py --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py",
+            "name": "Python",
+            "output": "bazel-out/coverage_py"
+        },
+        {
+            "category": "coverage",
+            "command": "./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs",
+            "name": "NodeJs",
+            "output": "bazel-out/coverage_nodejs"
         }
     ]
 }

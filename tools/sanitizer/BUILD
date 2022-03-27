@@ -26,10 +26,13 @@ py_binary(
         "$(location //tools/sanitizer/actions/mypy)",
         "--action",
         "$(location //tools/sanitizer/actions/shell)",
+        "--action",
+        "$(location //tools/sanitizer/actions/ci)",
     ],
     data = [
         ":config",
         "//tools/sanitizer/actions/buildifier",
+        "//tools/sanitizer/actions/ci",
         "//tools/sanitizer/actions/eslint",
         "//tools/sanitizer/actions/mypy",
         "//tools/sanitizer/actions/shell",

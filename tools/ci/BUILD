@@ -1,7 +1,28 @@
-exports_files(
-    [
-        "stages.json",
-        "jenkins/Jenkinsfile.btl",
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "factory",
+    srcs = [
+        "factory.py",
     ],
-    visibility = ["//tools/sanitizer/actions/ci:__pkg__"],
+    data = [
+        "stages.json",
+    ],
+    visibility = [
+        "//tools/ci:__subpackages__",
+    ],
+    deps = [
+        "//python/bzd/template",
+    ],
+)
+
+py_binary(
+    name = "ci",
+    srcs = [
+        "ci.py",
+    ],
+    deps = [
+        "//python/bzd:env",
+        "//tools/ci/jenkins:factory",
+    ],
 )

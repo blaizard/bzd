@@ -5,7 +5,7 @@ pipeline
 	triggers
 	{
 		cron("@weekly")
-		pollSCM("0 3 * * *") // Every day at 3:00am
+		pollSCM("0 3 * * *") // Every day at 3:00am if there is any change.
 	}
 	agent
 	{
@@ -35,65 +35,77 @@ pipeline
 		{
 			parallel
 			{
-				stage("linux_x86_64_clang dev + clang-tidy")
+				stage("normal linux_x86_64_clang dev + clang-tidy")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev"
 					}
 				}
-				stage("linux_x86_64_clang prod")
+				stage("normal linux_x86_64_clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=_linux_x86_64_clang_prod" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod"
 					}
 				}
-				stage("linux_x86_64_gcc")
+				stage("normal linux_x86_64_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=cc --config=linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc --platform_suffix=_linux_x86_64_gcc"
 					}
 				}
-				stage("esp32_xtensa_lx6_gcc")
+				stage("normal esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=cc --config=esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc" 
+						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc"
 					}
 				}
-				stage("Static analyzers")
+				stage("stress dev")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan" 
+						sh "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev"
 					}
 				}
-				stage("Coverage")
+				stage("stress prod")
 				{
 					steps
 					{
-						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						sh "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod"
+					}
+				}
+				stage("sanitizer asan/lsan")
+				{
+					steps
+					{
+						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan"
+					}
+				}
+				stage("coverage C++")
+				{
+					steps
+					{
+						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=_coverage_cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
 						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
-						sh "./tools/bazel coverage ... --config=nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
-						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
-						sh "./tools/bazel coverage ... --config=py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py"
+					}
+				}
+				stage("coverage Python")
+				{
+					steps
+					{
+						sh "./tools/bazel coverage ... --config=py --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py"
 						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
 					}
 				}
-				stage("Sanitize")
+				stage("coverage NodeJs")
 				{
 					steps
 					{
-						sh "./sanitize.sh"
-					}
-				}
-				stage("Stress")
-				{
-					steps
-					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --build_tag_filters=stress --test_tag_filters=stress --runs_per_test=100 --platform_suffix=_linux_x86_64_clang" 
+						sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
+						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
 			}

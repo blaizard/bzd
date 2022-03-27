@@ -5,7 +5,7 @@ pipeline
 	triggers
 	{
 		cron("@weekly")
-		pollSCM("0 3 * * *") // Every day at 3:00am
+		pollSCM("0 3 * * *") // Every day at 3:00am if there is any change.
 	}
 	agent
 	{
@@ -35,15 +35,18 @@ pipeline
 		{
 			parallel
 			{
-				{% for stage in stages %}{% if !defined(stage.type) %}
-				stage("{{ stage.name }}")
+				{% for stage in stages %}
+				stage("{{ stage.category }} {{ stage.name }}")
 				{
 					steps
 					{
-						sh "{{ stage.command }}" 
+						sh "{{ stage.command }}"
+						{% if stage.category in ["coverage"] %}
+						archiveArtifacts artifacts: "{{ stage.output }}/**/*", onlyIfSuccessful: true
+						{% end %}
 					}
 				}
-				{% end %}{% end %}
+				{% end %}
 			}
 		}
 		// Auto publish some artifacts
