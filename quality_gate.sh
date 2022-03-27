@@ -24,3 +24,5 @@ echo  "==== coverage Python ==============================="
 ./tools/bazel coverage ... --config=py --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py $EXTRA_FLAGS
 echo  "==== coverage NodeJs ==============================="
 ./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs $EXTRA_FLAGS
+echo  "==== sanitizer sanitizer ==============================="
+./sanitize.sh $EXTRA_FLAGS

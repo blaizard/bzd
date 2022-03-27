@@ -159,13 +159,16 @@ private:
 private:
 	struct FinalAwaiter
 	{
+		constexpr FinalAwaiter(const bzd::BoolType propagate) noexcept : propagate_{propagate} {}
+
 		constexpr bool await_ready() noexcept { return false; }
 
 		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
 			// TODO: Check if this is an error, if so propagate it down to the layers until a catch block is detected.
-			if (handle.promise().hasError())
+			if (propagate_ && handle.promise().hasError())
 			{
+				::std::cout << "ERROR!!!!" << ::std::endl;
 			}
 
 			// Enqueuing this coroutine into the executor is important for thread
@@ -182,6 +185,8 @@ private:
 		}
 
 		constexpr void await_resume() noexcept {}
+
+		bzd::BoolType propagate_{};
 	};
 
 public:
@@ -200,9 +205,11 @@ public:
 		return {};
 	}
 
-	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{}; }
+	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{propagate_}; }
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
+
+	constexpr void setPropagate() noexcept { propagate_ = true; }
 
 public: // Await transform specializations
 	template <class... Args>
@@ -251,6 +258,8 @@ public: // Await transform specializations
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
+
+	bzd::BoolType propagate_{false};
 };
 
 } // namespace bzd::coroutine::impl

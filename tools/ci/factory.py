@@ -8,6 +8,8 @@ from bzd.template.template import Template
 
 class Factory(ABC):
 
+	categories: typing.Final[typing.Set[str]] = {"normal", "stress", "coverage", "sanitizer"}
+
 	@abstractmethod
 	def getName(self) -> str:
 		"""Give the name of the shell."""
@@ -24,15 +26,20 @@ class Factory(ABC):
 		pass
 
 	@staticmethod
-	def renderTemplate(templatePath: pathlib.Path) -> str:
+	def renderTemplate(templatePath: pathlib.Path, onlyCategories: typing.Optional[typing.Set[str]] = None) -> str:
 		"""Render a template."""
+
+		assert onlyCategories is None or all(c in Factory.categories
+			for c in onlyCategories), "onlyCategories contains unsupported categories."
 
 		rawData = json.loads(pathlib.Path("tools/ci/stages.json").read_text())
 		data = []
 		for stage in rawData["stages"]:
 			default = {"category": "normal"}
 			default.update(stage)
-			data.append(default)
+			assert default.get("category") in Factory.categories
+			if onlyCategories is None or default.get("category") in onlyCategories:
+				data.append(default)
 
 		template = Template.fromPath(templatePath)
 		return template.render({"stages": data})

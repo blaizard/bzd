@@ -4,8 +4,6 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/format/integral.hh"
 
-#include <iostream>
-
 namespace {
 void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkpoint)
 {
@@ -13,7 +11,7 @@ void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkp
 	trace += id;
 	toString(trace, checkpoint);
 	trace += ']';
-	::std::cout << "[" << id.data() << checkpoint << "]" << ::std::flush;
+	//::std::cout << "[" << id.data() << checkpoint << "]" << ::std::flush;
 }
 } // namespace
 
@@ -177,7 +175,7 @@ TEST_ASYNC(Coroutine, asyncAny)
 	auto promiseA = nested(trace, "a");
 	auto promiseB = deepNested(trace, "b");
 	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
-	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a1][b3][a0][b1][a2]");
 	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
@@ -194,7 +192,7 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	auto promiseC = nested(trace, "c", -432);
 	auto promiseD = deepNested(trace, "d");
 	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB), bzd::move(promiseC), bzd::move(promiseD));
-	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][d1][a0][b0][c2]");
 	EXPECT_EQ(result.size(), 4U);
 	EXPECT_FALSE(result.get<0>());
@@ -221,7 +219,7 @@ TEST_ASYNC(Coroutine, asyncAnyYield)
 	auto promiseA = yieldLoop(trace, "a", 10);
 	auto promiseB = yieldLoop(trace, "b", 2);
 	const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
-	::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a0][b0][a0][b0][a0]");
 	EXPECT_EQ(result.size(), 2U);
 	co_return {};
@@ -244,7 +242,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 	{
 		bzd::String<128> trace;
 		co_await anyNested(trace, "a");
-		::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+		//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][b0][c2][a7]");
 	}
 	{

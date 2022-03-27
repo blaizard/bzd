@@ -48,6 +48,11 @@
             "command": "./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs",
             "name": "NodeJs",
             "output": "bazel-out/coverage_nodejs"
+        },
+        {
+            "category": "sanitizer",
+            "command": "./sanitize.sh",
+            "name": "sanitizer"
         }
     ]
 }

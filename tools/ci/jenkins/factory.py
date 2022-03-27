@@ -13,7 +13,8 @@ class Jenkins(Factory):
 		return "Jenkins"
 
 	def build(self) -> None:
-		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/jenkins/Jenkinsfile.btl"))
+		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/jenkins/Jenkinsfile.btl"),
+			onlyCategories={"normal", "coverage", "sanitizer"})
 
 	def install(self, workspace: pathlib.Path) -> None:
 		assert self.jenkinsFile
