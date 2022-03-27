@@ -258,18 +258,20 @@ noexcept
 	auto onTerminateCallback = [&]() -> bool {
 		// Atomically count the number of async completed
 		auto current = ++counter;
-		// Only triggers the token for the first entry to this function.
+		// Only trigger the token uppon the first entry in this lambda.
 		if (current == 1U)
 		{
 			token.trigger();
+			token.detach();
+			// Needed to ensure the promise is enqueued after the cancellation token has been triggered.
+			current = counter.fetchAdd(1U, MemoryOrder::acquire);
 		}
-		// For the last one, push the caller back into the scheduling queue.
+		// Only at the last function exit the caller is pushed back to the scheduling queue.
 		// This makes this design thread safe.
-		return (current == sizeof...(Asyncs));
+		return (current == sizeof...(Asyncs) + 1U);
 	};
 
 	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{token, onTerminateCallback, asyncs...};
-
 	// By now all asyncs must have been either ready or canceled.
 	// Build the result and return it.
 	ResultType result{asyncs.moveResultOut()...};
