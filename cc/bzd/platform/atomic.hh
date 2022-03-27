@@ -11,19 +11,22 @@ enum class MemoryOrder
 	/// Relaxed operation: there are no synchronization or ordering constraints imposed on other reads or writes,
 	/// only this operation's atomicity is guaranteed.
 	relaxed = static_cast<int>(std::memory_order_relaxed),
-	/// A load operation with this memory order performs a consume operation on the affected memory location: no reads
-	/// or writes in the current thread dependent on the value currently loaded can be reordered before this load.
-	/// Writes to data-dependent variables in other threads that release the same atomic variable are visible in the
-	/// current thread. On most platforms, this affects compiler optimizations only.
-	consume = static_cast<int>(std::memory_order_consume),
 	/// A load operation with this memory order performs the acquire operation on the affected memory location:
 	/// no reads or writes in the current thread can be reordered before this load. All writes in other threads that
 	/// release the same atomic variable are visible in the current thread.
+	/// \code
+	/// // code here will always happen before the MemoryOrder::acquire
+	/// if (flag.load(MemoryOrder::acquire)) {...}
+	/// \endcode
 	acquire = static_cast<int>(std::memory_order_acquire),
 	/// A store operation with this memory order performs the release operation: no reads or writes in the current
 	/// thread can be reordered after this store. All writes in the current thread are visible in other threads that
 	/// acquire the same atomic variable and writes that carry a dependency into the atomic variable become visible
 	/// in other threads that consume the same atomic.
+	/// \code
+	/// flag.store(true, MemoryOrder::release);
+	/// // code here will always happen after the MemoryOrder::release
+	/// \endcode
 	release = static_cast<int>(std::memory_order_release),
 	/// A read-modify-write operation with this memory order is both an acquire operation and a release operation.
 	/// No memory reads or writes in the current thread can be reordered before or after this store. All writes in other

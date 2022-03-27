@@ -30,42 +30,28 @@ public: // Constructors/Destructors.
 	constexpr CancellationToken(CancellationToken&&) noexcept = delete;
 	constexpr CancellationToken& operator=(CancellationToken&&) noexcept = delete;
 
-	constexpr ~CancellationToken() noexcept
-	{
-		// All entries might not be detached at that point, because of the unrolling of the call stack during a cancellation.
-		{
-			auto scope = makeSyncLockGuard(mutex_);
-			for (auto& token : attached_)
-			{
-				auto scopeToken = makeSyncLockGuard(token.mutex_);
-				token.parent_.reset();
-			}
-		}
-
-		bzd::Optional<CancellationToken&> parent{};
-		{
-			auto scope = makeSyncLockGuard(mutex_);
-			parent = parent_;
-			parent_.reset();
-		}
-
-		if (parent)
-		{
-			parent->removeToken(*this);
-		}
-	}
-
 public: // API.
 	/// Attach this token to a parent token that will propagate its triggered
 	/// state to this token.
-	constexpr void attachTo(CancellationToken& token) noexcept
+	constexpr void attachTo(CancellationToken& parent) noexcept
 	{
 		bzd::assert::isTrue(parent_.empty());
 
-		auto scope = makeSyncLockGuard(token.mutex_);
-		const auto result = token.attached_.pushFront(*this);
+		auto scope = makeSyncLockGuard(parent.mutex_);
+		const auto result = parent.children_.pushFront(*this);
 		bzd::assert::isTrue(result.hasValue());
-		parent_.emplace(token);
+		parent_.emplace(parent);
+	}
+
+	/// Detach a previously attached cancellation token.
+	/// If the token was not attached, do nothing.
+	constexpr void detach() noexcept
+	{
+		if (parent_)
+		{
+			parent_->removeToken(*this);
+			parent_.reset();
+		}
 	}
 
 	constexpr void trigger() noexcept
@@ -73,7 +59,7 @@ public: // API.
 		flag_.store(true);
 		{
 			auto scope = makeSyncLockGuard(mutex_);
-			for (auto& token : attached_)
+			for (auto& token : children_)
 			{
 				token.trigger();
 			}
@@ -83,7 +69,7 @@ public: // API.
 	constexpr void removeToken(CancellationToken& token) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
-		const auto result = attached_.erase(token);
+		const auto result = children_.erase(token);
 		bzd::assert::isTrue(result.hasValue());
 	}
 
@@ -93,6 +79,6 @@ private:
 	bzd::Atomic<BoolType> flag_{false};
 	bzd::SpinMutex mutex_{};
 	bzd::Optional<CancellationToken&> parent_{};
-	bzd::NonOwningList<CancellationToken> attached_{};
+	bzd::NonOwningList<CancellationToken> children_{};
 };
 } // namespace bzd
