@@ -9,5 +9,6 @@ py_binary(
     deps = [
         "//python/bzd:env",
         "//tools/ci/jenkins:factory",
+        "//tools/ci/quality_gate:factory",
     ],
 )

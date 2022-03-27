@@ -15,14 +15,3 @@ py_library(
         "//python/bzd/template",
     ],
 )
-
-py_binary(
-    name = "ci",
-    srcs = [
-        "ci.py",
-    ],
-    deps = [
-        "//python/bzd:env",
-        "//tools/ci/jenkins:factory",
-    ],
-)
