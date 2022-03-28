@@ -90,10 +90,6 @@ public:
 	{
 		class AsyncPropagate : public impl::Async<T>
 		{
-		public: // Traits
-			using PromiseType = bzd::coroutine::Promise<T>;
-			using promise_type = PromiseType;
-
 		public:
 			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : impl::Async<T>{bzd::move(async)}
 			{
