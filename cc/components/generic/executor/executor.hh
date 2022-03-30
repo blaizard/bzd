@@ -13,8 +13,8 @@ class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
 {
 public:
 	constexpr Executor(Cores&... cores) noexcept :
-		cores_{&cores...}, executor_{}, start_{bzd::FunctionRef<void(void)>::toMember<decltype(executor_), &bzd::impl::AsyncExecutor::run>(
-											executor_)}
+		cores_{inPlace, &cores...}, executor_{},
+		start_{bzd::FunctionRef<void(void)>::toMember<decltype(executor_), &bzd::coroutine::impl::Executor::run>(executor_)}
 	{
 	}
 
@@ -47,7 +47,7 @@ private:
 	static constexpr bzd::SizeType nbCores_{sizeof...(Cores)};
 
 	bzd::Tuple<Cores*...> cores_;
-	bzd::impl::AsyncExecutor executor_;
+	bzd::coroutine::impl::Executor executor_;
 	bzd::FunctionRef<void(void)> start_;
 };
 

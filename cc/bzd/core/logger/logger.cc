@@ -57,6 +57,7 @@ bzd::Async<> toStream(bzd::OStream& os, const Date& d)
 }
 */
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bzd::Async<> bzd::Logger::printHeader(const bzd::log::Level level, const SourceLocation location) noexcept
 {
 	auto& backend = bzd::backend::Logger::getDefault();

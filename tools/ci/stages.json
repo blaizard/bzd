@@ -18,12 +18,12 @@
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev",
             "name": "dev"
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tag_filters=stress --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod",
             "name": "prod"
         },
         {

@@ -3,6 +3,10 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "async",
     hdrs = [
+        "awaitables/enqueue.hh",
+        "awaitables/get_executable.hh",
+        "awaitables/get_executor.hh",
+        "awaitables/yield.hh",
         "cancellation.hh",
         "coroutine.hh",
         "executor.hh",
@@ -25,6 +29,7 @@ cc_library(
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:remove_reference",
+        "//cc/bzd/utility:apply",
         "//cc/bzd/utility:ignore",
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/synchronization:spin_mutex",

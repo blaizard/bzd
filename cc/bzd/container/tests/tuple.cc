@@ -23,7 +23,7 @@ TEST(ContainerTuple, Base)
 
 TEST(ContainerTuple, Constructor)
 {
-	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{12u, true, 5.32, -21, "Hello"};
+	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{bzd::inPlace, 12u, true, 5.32, -21, "Hello"};
 
 	EXPECT_EQ(tuple.get<0>(), 12U);
 	EXPECT_EQ(tuple.get<1>(), true);
@@ -34,7 +34,7 @@ TEST(ContainerTuple, Constructor)
 
 TEST(ContainerTuple, ConstructorPartial)
 {
-	bzd::Tuple<unsigned int, bool, double, int> tuple{12u, true};
+	bzd::Tuple<unsigned int, bool, double, int> tuple{bzd::inPlace, 12u, true};
 
 	EXPECT_EQ(tuple.get<0>(), 12U);
 	EXPECT_EQ(tuple.get<1>(), true);
@@ -42,21 +42,21 @@ TEST(ContainerTuple, ConstructorPartial)
 
 TEST(ContainerTuple, Const)
 {
-	bzd::Tuple<const int, const bool, const double, const char*> tuple{12, false, 8.7, "Hello World"};
+	bzd::Tuple<const int, const bool, const double, const char*> tuple{bzd::inPlace, 12, false, 8.7, "Hello World"};
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_EQ(tuple.get<1>(), false);
 }
 
 TEST(ContainerTuple, Constexpr)
 {
-	constexpr const bzd::Tuple<int, const char*> tuple{12, "Hello"};
+	constexpr const bzd::Tuple<int, const char*> tuple{bzd::inPlace, 12, "Hello"};
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_STREQ(tuple.get<1>(), "Hello");
 }
 
 TEST(ContainerTuple, ConstexprStringView)
 {
-	constexpr const bzd::Tuple<int, bzd::StringView> tuple2{12, "Hello"};
+	constexpr const bzd::Tuple<int, bzd::StringView> tuple2{bzd::inPlace, 12, "Hello"};
 	EXPECT_EQ(tuple2.get<0>(), 12);
 	EXPECT_STREQ(tuple2.get<1>().data(), "Hello");
 }
@@ -70,7 +70,7 @@ TEST(ContainerTuple, NonDefaultConstructor)
 		int value;
 	};
 
-	constexpr const bzd::Tuple<NonDefaultConstructor, NonDefaultConstructor> tuple{12, -2};
+	constexpr const bzd::Tuple<NonDefaultConstructor, NonDefaultConstructor> tuple{bzd::inPlace, 12, -2};
 	EXPECT_EQ(tuple.get<0>().value, 12);
 	EXPECT_EQ(tuple.get<1>().value, -2);
 
@@ -90,7 +90,7 @@ TEST(ContainerTuple, Copy)
 		int value;
 	};
 
-	const bzd::Tuple<int, char, NonDefaultConstructor> tuple{12, 'a', 3};
+	const bzd::Tuple<int, char, NonDefaultConstructor> tuple{bzd::inPlace, 12, 'a', 3};
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_EQ(tuple.get<1>(), 'a');
 	EXPECT_EQ(tuple.get<2>().value, 3);
@@ -115,7 +115,7 @@ TEST(ContainerTuple, Move)
 		int value;
 	};
 
-	bzd::Tuple<int, char, NonDefaultConstructor> tuple{12, 'a', 3};
+	bzd::Tuple<int, char, NonDefaultConstructor> tuple{bzd::inPlace, 12, 'a', 3};
 	EXPECT_EQ(tuple.get<0>(), 12);
 	EXPECT_EQ(tuple.get<1>(), 'a');
 	EXPECT_EQ(tuple.get<2>().value, 3);

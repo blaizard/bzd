@@ -96,7 +96,7 @@ TEST_ASYNC(Coroutine, PassThrough)
 	EXPECT_EQ(result.value(), 34);
 	co_return {};
 }
-
+/*
 bzd::Async<bzd::impl::AsyncExecutor*> fetchExecutor()
 {
 	auto exec = co_await bzd::async::getExecutor();
@@ -111,7 +111,7 @@ TEST(Coroutine, Executor)
 	EXPECT_TRUE(result);
 	EXPECT_EQ(result.value(), &executor);
 }
-
+*/
 TEST_ASYNC(Coroutine, asyncAll)
 {
 	bzd::String<128> trace;

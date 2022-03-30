@@ -30,6 +30,10 @@ struct Range : GetRange<End - Start, Start>
 } // namespace bzd::meta::impl
 
 namespace bzd::meta {
+
+/// Create a linear integer sequence from [Start, End[ (including start and excluding end).
+///
+/// The type can then be deduced with `bzd::meta::range::Type<N...>`.
 template <SizeType Start, SizeType End>
 using Range = typename impl::Range<Start, End>::type;
 
