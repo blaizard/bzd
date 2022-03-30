@@ -9,6 +9,7 @@ bzd_cc_library(
         ":align_down",
         ":align_up",
         ":aligned_storage",
+        ":apply",
         ":begin",
         ":bit",
         ":concept",
@@ -82,6 +83,20 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "apply",
+    hdrs = [
+        "apply.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":forward",
+        "//cc/bzd/meta:range",
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:remove_reference",
     ],
 )
 

@@ -29,8 +29,8 @@ TEST_ASYNC(Coroutine, Error)
 		EXPECT_EQ(value, 42);
 	}
 	{
-		//const auto value = co_await generateError().assert();
-		//EXPECT_EQ(value, 42);
+		// const auto value = co_await generateError().assert();
+		// EXPECT_EQ(value, 42);
 	}
 	co_return {};
 }

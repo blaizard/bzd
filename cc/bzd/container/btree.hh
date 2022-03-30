@@ -75,7 +75,7 @@ public:
 		{
 		}
 
-		node->keys_.pushBack(key);
+		node->keys_.emplaceBack(bzd::inPlace, key);
 	}
 
 protected:

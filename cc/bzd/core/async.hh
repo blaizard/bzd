@@ -3,6 +3,10 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/tuple.hh"
+#include "cc/bzd/core/async/awaitables/enqueue.hh"
+#include "cc/bzd/core/async/awaitables/get_executable.hh"
+#include "cc/bzd/core/async/awaitables/get_executor.hh"
+#include "cc/bzd/core/async/awaitables/yield.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
@@ -18,15 +22,6 @@
 namespace bzd::impl {
 
 template <class T>
-using AsyncResultType = typename bzd::typeTraits::RemoveReference<T>::ResultType;
-
-template <class T>
-using AsyncOptionalResultType = bzd::Optional<AsyncResultType<T>>;
-
-using AsyncExecutor = bzd::coroutine::impl::Executor;
-using AsyncExecutable = bzd::coroutine::impl::Executable;
-
-template <class T>
 class Async
 {
 public: // Traits
@@ -34,7 +29,7 @@ public: // Traits
 	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
 	using Executable = bzd::coroutine::impl::Executable;
-	using Executor = AsyncExecutor;
+	using Executor = bzd::coroutine::impl::Executor;
 	using Self = Async<T>;
 
 public: // constructor/destructor/assignments
@@ -158,9 +153,13 @@ public: // coroutine specific
 		//    co_await this ()
 		/// }
 		auto& promise = handle_.promise();
+		auto& promiseCaller = caller.promise();
+
+		// Propagate the executor and cancellation if any
+		promiseCaller.propagateContextTo(promise);
 
 		// To handle continuation
-		promise.caller_ = &caller.promise();
+		promise.caller_ = &promiseCaller;
 
 		// Push the current handle to the executor.
 		promise.enqueue();
@@ -178,7 +177,7 @@ public: // coroutine specific
 
 private:
 	template <class... Args>
-	friend struct bzd::coroutine::impl::Enqueue;
+	friend class bzd::coroutine::impl::Enqueue;
 
 	template <class U>
 	friend class bzd::coroutine::impl::Promise;
@@ -241,66 +240,19 @@ constexpr auto getExecutable() noexcept
 }
 
 template <concepts::async... Asyncs>
-requires(!concepts::lValueReference<Asyncs> && ...) impl::Async<bzd::Tuple<impl::AsyncResultType<Asyncs>...>> all(Asyncs&&... asyncs)
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType> all(Asyncs&&... asyncs)
 noexcept
 {
-	using ResultType = bzd::Tuple<impl::AsyncResultType<Asyncs>...>;
-
-	// Register on terminate callbacks.
-	bzd::Atomic<SizeType> counter{0};
-	auto onTerminateCallback = [&]() -> bool {
-		// Atomically count the number of async completed, and only for the last one,
-		// push the caller back into the scheduling queue.
-		// This makes this design thread safe.
-		return (++counter == sizeof...(Asyncs));
-	};
-
-	// Push all handles to the executor and suspend.
-	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{onTerminateCallback, asyncs...};
-
-	// Wait for all async to be completed, this is needed in cases when the terminate callback
-	// is called concurrenlty and the caller is enqueued before all asyncs are completed.
-	while ((!asyncs.isReady() || ...))
-		;
-
-	// Build the result and return it.
-	ResultType result{asyncs.await_resume()...};
-	co_return result;
+	co_return(co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
-		 ...) impl::Async<bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>> any(Asyncs&&... asyncs)
+		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType> any(Asyncs&&... asyncs)
 noexcept
 {
-	using ResultType = bzd::Tuple<impl::AsyncOptionalResultType<Asyncs>...>;
-
-	bzd::CancellationToken token{};
-
-	// Register on terminate callbacks.
-	bzd::Atomic<SizeType> counter{0};
-	auto onTerminateCallback = [&]() -> bool {
-		// Atomically count the number of async completed
-		auto current = ++counter;
-		// Only trigger the token uppon the first entry in this lambda.
-		if (current == 1U)
-		{
-			token.trigger();
-			token.detach();
-			// Needed to ensure the promise is enqueued after the cancellation token has been triggered.
-			current = counter.fetchAdd(1U, MemoryOrder::acquire);
-		}
-		// Only at the last function exit the caller is pushed back to the scheduling queue.
-		// This makes this design thread safe.
-		return (current == sizeof...(Asyncs) + 1U);
-	};
-
-	co_await bzd::coroutine::impl::Enqueue<Asyncs...>{token, onTerminateCallback, asyncs...};
-
-	// By now all asyncs must have been either ready or canceled.
-	// Build the result and return it.
-	ResultType result{asyncs.moveResultOut()...};
-	co_return result;
+	co_return(co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 } // namespace bzd::async

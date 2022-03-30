@@ -7,6 +7,7 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
+#include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
 
 // Forward declaration
@@ -64,91 +65,6 @@ public:
 };
 
 using Executor = bzd::Executor<Executable>;
-
-/// Awaitable to enqueue an async object.
-template <class... Asyncs>
-struct Enqueue : public bzd::coroutine::impl::suspend_always
-{
-	template <class Callback>
-	constexpr Enqueue(Callback& callback, Asyncs&... asyncs) noexcept : executables_{inPlace, &asyncs.getExecutable()...}
-	{
-		for (auto& executable : executables_)
-		{
-			executable->onTerminateCallback_.emplace(callback);
-		}
-	}
-
-	template <class Callback>
-	constexpr Enqueue(CancellationToken& token, Callback& callback, Asyncs&... asyncs) noexcept :
-		executables_{inPlace, &asyncs.getExecutable()...}, token_{token}
-	{
-		for (auto& executable : executables_)
-		{
-			executable->onTerminateCallback_.emplace(callback);
-		}
-	}
-
-	/// Enqueuing the executable in await_suspend is important, as it is called just after
-	/// the state of the resume point has been updated. Doing this ensures that concurrent
-	/// thread they execute the executable will return at this resume point and not before.
-	template <class T>
-	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
-	{
-		auto& promise = caller.promise();
-
-		// This defines the cancellation to pass to the executables.
-		auto maybeToken = promise.getCancellationToken();
-		if (token_.hasValue())
-		{
-			// Attach the token to the parent if both exists.
-			if (maybeToken.hasValue())
-			{
-				token_->attachTo(maybeToken.valueMutable());
-			}
-			// The token set to this class will be assigned regardless to the executables.
-			maybeToken = token_;
-		}
-
-		for (auto* executable : executables_)
-		{
-			if (maybeToken.hasValue())
-			{
-				executable->setCancellationToken(maybeToken.valueMutable());
-			}
-			executable->caller_ = &promise;
-			executable->setExecutor(promise.getExecutor());
-			executable->enqueue();
-		}
-	}
-
-	bzd::Array<Executable*, sizeof...(Asyncs)> executables_;
-	bzd::Optional<CancellationToken&> token_{};
-};
-
-/// Awaitable to yield the current execution.
-struct GetExecutable : public bzd::coroutine::impl::suspend_never
-{
-	constexpr auto await_resume() noexcept { return executable_; }
-	Executable* executable_;
-};
-
-/// Awaitable to yield the current execution.
-struct GetExecutor : public bzd::coroutine::impl::suspend_never
-{
-	constexpr auto await_resume() noexcept { return executor_; }
-	Executor* executor_;
-};
-
-/// Awaitable to yield the current execution.
-struct Yield : public bzd::coroutine::impl::suspend_always
-{
-	template <class T>
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
-	{
-		handle.promise().getExecutor().push(handle.promise());
-		return true;
-	}
-};
 
 template <class T>
 class Promise : public Executable
@@ -211,49 +127,22 @@ public:
 
 	constexpr void setPropagate() noexcept { propagate_ = true; }
 
-public: // Await transform specializations
-	template <class... Args>
-	constexpr auto await_transform(bzd::coroutine::impl::Enqueue<Args...>&& awaitable) noexcept
-	{
-		return bzd::move(awaitable);
-	}
-
-	constexpr auto&& await_transform(bzd::coroutine::impl::Yield&& awaitable) noexcept { return bzd::move(awaitable); }
-	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutable&& awaitable) noexcept
-	{
-		awaitable.executable_ = this;
-		return bzd::move(awaitable);
-	}
-	constexpr auto&& await_transform(bzd::coroutine::impl::GetExecutor&& awaitable) noexcept
-	{
-		awaitable.executor_ = &getExecutor();
-		return bzd::move(awaitable);
-	}
-
-	template <class Async>
-	constexpr auto&& await_transform(Async&& async) noexcept
-	{
-		// Associate the executor of the caller with the new coroutine.
-		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
-		propagateContextTo(async.getExecutable());
-		return bzd::move(async);
-	}
-
-	/*
-		void* operator new(std::size_t size)
-		{
-			void* ptr = ::malloc(size);
-			::std::cout << "Allocating " << size << " " << ptr << ::std::endl;
-			if (!ptr) throw std::bad_alloc{};
-			return ptr;
-		}
-
-		void operator delete(void* ptr, std::size_t size)
-		{
-			::std::cout << "Deallocating " << size << " " << ptr << ::std::endl;
-			::free(ptr);
-		}
-	*/
+public: // Memory allocation
+		/*
+			void* operator new(std::size_t size)
+			{
+				void* ptr = ::malloc(size);
+				::std::cout << "Allocating " << size << " " << ptr << ::std::endl;
+				if (!ptr) throw std::bad_alloc{};
+				return ptr;
+			}
+	
+			void operator delete(void* ptr, std::size_t size)
+			{
+				::std::cout << "Deallocating " << size << " " << ptr << ::std::endl;
+				::free(ptr);
+			}
+		*/
 
 private:
 	template <class U>
