@@ -10,37 +10,43 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                 \
-	{                                                                                                            \
-	public:                                                                                                      \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test{#testCaseName, #testName, __FILE__} {} \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                   \
-	};                                                                                                           \
-	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
+#define BZDTEST_REGISTER_(testCaseName, testName)                                      \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName)                                  \
+	{                                                                                  \
+	};                                                                                 \
+	namespace bzd {                                                                    \
+	template <>                                                                        \
+	class Test<BZDTEST_CLASS_NAME_(testCaseName, testName)> : public ::bzd::test::Test \
+	{                                                                                  \
+	public:                                                                            \
+		Test() : ::bzd::test::Test{#testCaseName, #testName, __FILE__} {}              \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const override;         \
+	};                                                                                 \
+	}                                                                                  \
+	static ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)> BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
 #define BZDTEST_(testCaseName, testName)      \
 	BZDTEST_REGISTER_(testCaseName, testName) \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
+	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test([[maybe_unused]] ::bzd::test::Context& test) const
 
-#define BZDTEST_ASYNC_(testCaseName, testName)                                               \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);     \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
-	{                                                                                        \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                              \
-	}                                                                                        \
+#define BZDTEST_ASYNC_(testCaseName, testName)                                                            \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                             \
+	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                  \
+	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test(::bzd::test::Context& test) const \
+	{                                                                                                     \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                                           \
+	}                                                                                                     \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
-#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                     \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                \
-	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);   \
-	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                 \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
-	{                                                                                        \
-		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                            \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                     \
-	}                                                                                        \
+#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                                  \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                             \
+	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                              \
+	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test(::bzd::test::Context& test) const \
+	{                                                                                                     \
+		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                         \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                  \
+	}                                                                                                     \
 	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                               \
@@ -338,6 +344,14 @@ private:
 };
 
 } // namespace bzd::test::impl
+
+namespace bzd {
+/// Template class for any specialization.
+template <class>
+class Test
+{
+};
+} // namespace bzd
 
 namespace bzd::test {
 class Context

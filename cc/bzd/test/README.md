@@ -13,3 +13,18 @@ TEST(Test, Name)
     ...
 }
 ```
+
+## Friendship
+
+Every test specialization is part of the template bzd::Template<class>, so to make a test access non-public
+member of a class, just do the following:
+
+```c++
+class MyClass
+{
+private:
+    template <class>
+    friend class bzd::Test;
+}
+
+```
