@@ -37,7 +37,7 @@ public:
 	/// Called by the scheduler when an executable is detected as being canceled.
 	constexpr void cancel(bzd::ExecutorContext<Executable>& context) noexcept
 	{
-		auto executable = this;
+		bzd::Optional<Executable&> executable{*this};
 
 		// Unroll the callstaxck and stop to the first callback and execute it.
 		do
@@ -49,24 +49,20 @@ public:
 		{
 			// Enqueue the continuation for later use, it will be scheduled
 			// according to the executor policy.
-			context.enqueue(*executable);
+			context.enqueue(executable.valueMutable());
 		}
 	}
 
-	constexpr Executable* getContinuation() noexcept
+	constexpr bzd::Optional<Executable&> getContinuation() noexcept
 	{
-		Executable* executable{nullptr};
+		bzd::Optional<Executable&> maybeExecutable{};
 		continuation_.match([](bzd::monostate) {},
-							[&](Executable* e) { executable = e; },
+							[&](Executable* executable) { if (executable) { maybeExecutable.emplace(*executable); } },
 							[&](OnTerminateCallback callback) {
-								auto result = callback();
-								if (result)
-								{
-									executable = &(result.valueMutable());
-								}
+								maybeExecutable = callback();
 							});
 
-		return executable;
+		return maybeExecutable;
 	}
 
 	/// Enqueue a new executable after the execution of the current executable.
@@ -121,7 +117,7 @@ private:
 			auto maybeContinuation = handle.promise().getContinuation();
 			if (maybeContinuation)
 			{
-				handle.promise().enqueueAfterExecution(*maybeContinuation);
+				handle.promise().enqueueAfterExecution(maybeContinuation.valueMutable());
 			}
 
 			return bzd::coroutine::impl::noop_coroutine();
