@@ -21,7 +21,7 @@ public:
 
 protected:
 	template <class... Ts>
-	constexpr Enqueue(bzd::FunctionRef<bool(void)> callback, Ts&&... asyncs) noexcept :
+	constexpr Enqueue(Executable::OnTerminateCallback callback, Ts&&... asyncs) noexcept :
 		callback_{callback}, asyncs_{inPlace, bzd::forward<Ts>(asyncs)...}
 	{
 	}
@@ -33,20 +33,22 @@ protected:
 
 	constexpr void enqueueAsyncs(Executable& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
 	{
+		continuation_.emplace(caller);
 		constexprForContainerInc(asyncs_, [&](auto& async) {
 			auto& executable = async.getExecutable();
 			if (maybeToken.hasValue())
 			{
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
-			executable.setConditionalContinuation(callback_, caller);
+			executable.setConditionalContinuation(callback_);
 			caller.getExecutor().enqueue(executable);
 		});
 	}
 
 protected:
-	bzd::FunctionRef<bool(void)> callback_;
+	Executable::OnTerminateCallback callback_;
 	bzd::Tuple<Asyncs...> asyncs_;
+	bzd::Optional<Executable&> continuation_{};
 };
 
 template <class... Asyncs>
@@ -59,7 +61,7 @@ public: // Traits.
 public: // Constructor.
 	template <class... Ts>
 	constexpr EnqueueAll(Ts&&... asyncs) noexcept :
-		Enqueue<Asyncs...>{bzd::FunctionRef<bool(void)>::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
+		Enqueue<Asyncs...>{Executable::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
 	{
 	}
 
@@ -86,12 +88,16 @@ public: // Coroutine specializations.
 	}
 
 private:
-	constexpr bool onTerminateCallback() noexcept
+	constexpr bzd::Optional<Executable&> onTerminateCallback() noexcept
 	{
 		// Atomically count the number of async completed, and only for the last one,
 		// push the caller back into the scheduling queue.
 		// This makes this design thread safe.
-		return (++counter_ == sizeof...(Asyncs));
+		if (++counter_ == sizeof...(Asyncs))
+		{
+			return this->continuation_;
+		}
+		return bzd::nullopt;
 	}
 
 private:
@@ -108,7 +114,7 @@ public: // Traits.
 public: // Constructor.
 	template <class... Ts>
 	constexpr EnqueueAny(Ts&&... asyncs) noexcept :
-		Enqueue<Asyncs...>{bzd::FunctionRef<bool(void)>::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
+		Enqueue<Asyncs...>{Executable::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
 	{
 	}
 
@@ -145,7 +151,7 @@ public: // Coroutine specializations.
 	}
 
 private:
-	constexpr bool onTerminateCallback() noexcept
+	constexpr bzd::Optional<Executable&> onTerminateCallback() noexcept
 	{
 		// Atomically count the number of async completed
 		auto current = ++counter_;
@@ -159,7 +165,11 @@ private:
 		}
 		// Only at the last function exit the caller is pushed back to the scheduling queue.
 		// This makes this design thread safe.
-		return (current == sizeof...(Asyncs) + 1U);
+		if (current == sizeof...(Asyncs) + 1U)
+		{
+			return this->continuation_;
+		}
+		return bzd::nullopt;
 	}
 
 private:

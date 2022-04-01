@@ -21,6 +21,7 @@ cc_library(
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
         "//cc/bzd/container:tuple",
+        "//cc/bzd/container:variant",
         "//cc/bzd/container/range:associate_scope",
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
         "//cc/bzd/core:error",

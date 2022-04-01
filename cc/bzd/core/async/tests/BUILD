@@ -4,6 +4,7 @@ bzd_cc_test(
     name = "async",
     srcs = [
         "async.cc",
+        #"executor.cc",
         "cancellation.cc",
         "error.cc",
     ],

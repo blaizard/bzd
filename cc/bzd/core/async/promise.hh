@@ -21,6 +21,9 @@ namespace bzd::coroutine::impl {
 /// Executable type for coroutines.
 class Executable : public bzd::interface::Executable<Executable>
 {
+public: // Traits.
+	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
+
 public:
 	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
 
@@ -52,15 +55,18 @@ public:
 
 	constexpr Executable* getContinuation() noexcept
 	{
-		auto continuation = continuation_;
+		Executable* executable{nullptr};
+		continuation_.match([](bzd::monostate) {},
+							[&](Executable* e) { executable = e; },
+							[&](OnTerminateCallback callback) {
+								auto result = callback();
+								if (result)
+								{
+									executable = &(result.valueMutable());
+								}
+							});
 
-		// Call the termination callback which decides if a continuation should be enqueued.
-		if (onTerminateCallback_.hasValue())
-		{
-			continuation = ((onTerminateCallback_.value())()) ? continuation : nullptr;
-		}
-
-		return continuation;
+		return executable;
 	}
 
 	/// Enqueue a new executable after the execution of the current executable.
@@ -72,19 +78,17 @@ public:
 		context_->enqueue(executable);
 	}
 
-	constexpr void setContinuation(Executable& continuation) noexcept { continuation_ = &continuation; }
+	constexpr void setContinuation(Executable& continuation) noexcept { continuation_.emplace<Executable*>(&continuation); }
 
-	constexpr void setConditionalContinuation(bzd::FunctionRef<bool(void)> onTerminate, Executable& continuation) noexcept
+	constexpr void setConditionalContinuation(OnTerminateCallback onTerminate) noexcept
 	{
-		setContinuation(continuation);
-		onTerminateCallback_.emplace(onTerminate);
+		continuation_.emplace<OnTerminateCallback>(onTerminate);
 	}
 
 private:
 	bzd::coroutine::impl::coroutine_handle<> handle_;
 	bzd::ExecutorContext<Executable>* context_{nullptr};
-	Executable* continuation_{nullptr};
-	bzd::Optional<bzd::FunctionRef<bool(void)>> onTerminateCallback_{};
+	bzd::ExecutorContext<Executable>::Continuation continuation_{};
 };
 
 using Executor = bzd::Executor<Executable>;
