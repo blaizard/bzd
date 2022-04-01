@@ -463,4 +463,13 @@ namespace bzd {
 template <class... Ts>
 using Variant = bzd::typeTraits::
 	Conditional<(bzd::typeTraits::isTriviallyDestructible<Ts> && ...), impl::VariantTrivial<Ts...>, impl::VariantNonTrivial<Ts...>>;
+
+/// Unit type intended for use as a well-behaved empty alternative in bzd::Variant.
+/// In particular, a variant of non-default-constructible types may list bzd::monostate as its first alternative:
+/// this makes the variant itself default-constructible.
+/// This can be used for example to replace bzd::Optional<bzd::Variant<...>>.
+struct monostate
+{
+};
+
 } // namespace bzd
