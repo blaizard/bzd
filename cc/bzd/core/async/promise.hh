@@ -57,10 +57,13 @@ public:
 	{
 		bzd::Optional<Executable&> maybeExecutable{};
 		continuation_.match([](bzd::monostate) {},
-							[&](Executable* executable) { if (executable) { maybeExecutable.emplace(*executable); } },
-							[&](OnTerminateCallback callback) {
-								maybeExecutable = callback();
-							});
+							[&](Executable* executable) {
+								if (executable)
+								{
+									maybeExecutable.emplace(*executable);
+								}
+							},
+							[&](OnTerminateCallback callback) { maybeExecutable = callback(); });
 
 		return maybeExecutable;
 	}
