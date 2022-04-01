@@ -1,8 +1,10 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
+#include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/platform/atomic.hh"
@@ -16,6 +18,9 @@
 
 namespace bzd {
 
+template <class>
+class Test;
+
 template <class Executable>
 class Executor;
 
@@ -27,6 +32,8 @@ public: // Traits.
 	using Executor = bzd::Executor<Executable>;
 	using IdType = UInt32Type;
 	using TickType = UInt32Type;
+	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
+	using Continuation = bzd::Variant<bzd::monostate, Executable*, OnTerminateCallback>;
 
 public:
 	constexpr ExecutorContext() noexcept : id_{makeUId()} {}
@@ -44,6 +51,9 @@ public:
 
 private:
 	friend class bzd::Executor<Executable>;
+
+	template <class>
+	friend class bzd::Test;
 
 	constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
 
