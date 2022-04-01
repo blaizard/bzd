@@ -25,10 +25,14 @@ public:
 	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
 
 	/// Called by the scheduler to resume an executable.
-	void resume() noexcept { handle_.resume(); }
+	void resume(bzd::ExecutorContext<Executable>& context) noexcept
+	{
+		context_ = &context;
+		handle_.resume();
+	}
 
 	/// Called by the scheduler when an executable is detected as being canceled.
-	constexpr void cancel() noexcept
+	constexpr void cancel(bzd::ExecutorContext<Executable>& context) noexcept
 	{
 		auto executable = this;
 
@@ -42,13 +46,13 @@ public:
 		{
 			// Enqueue the continuation for later use, it will be scheduled
 			// according to the executor policy.
-			executable->enqueue();
+			context.enqueue(*executable);
 		}
 	}
 
 	constexpr Executable* getContinuation() noexcept
 	{
-		auto continuation = caller_;
+		auto continuation = continuation_;
 
 		// Call the termination callback which decides if a continuation should be enqueued.
 		if (onTerminateCallback_.hasValue())
@@ -59,8 +63,27 @@ public:
 		return continuation;
 	}
 
+	/// Enqueue a new executable after the execution of the current executable.
+	/// This is needed for thread safe scheduling, to avoid executing the continuation
+	/// before the current coroutine state is not completed.
+	constexpr void enqueueAfterExecution(Executable& executable) noexcept
+	{
+		bzd::assert::isTrue(context_);
+		context_->enqueue(executable);
+	}
+
+	constexpr void setContinuation(Executable& continuation) noexcept { continuation_ = &continuation; }
+
+	constexpr void setConditionalContinuation(bzd::FunctionRef<bool(void)> onTerminate, Executable& continuation) noexcept
+	{
+		setContinuation(continuation);
+		onTerminateCallback_.emplace(onTerminate);
+	}
+
+private:
 	bzd::coroutine::impl::coroutine_handle<> handle_;
-	Executable* caller_{nullptr};
+	bzd::ExecutorContext<Executable>* context_{nullptr};
+	Executable* continuation_{nullptr};
 	bzd::Optional<bzd::FunctionRef<bool(void)>> onTerminateCallback_{};
 };
 
@@ -94,7 +117,7 @@ private:
 			auto maybeContinuation = handle.promise().getContinuation();
 			if (maybeContinuation)
 			{
-				maybeContinuation->enqueue();
+				handle.promise().enqueueAfterExecution(*maybeContinuation);
 			}
 
 			return bzd::coroutine::impl::noop_coroutine();

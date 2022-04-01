@@ -16,6 +16,57 @@
 
 namespace bzd {
 
+template <class Executable>
+class Executor;
+
+/// Executor context.
+template <class Executable>
+class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
+{
+public: // Traits.
+	using Executor = bzd::Executor<Executable>;
+	using IdType = UInt32Type;
+	using TickType = UInt32Type;
+
+public:
+	constexpr ExecutorContext() noexcept : id_{makeUId()} {}
+
+	/// Get the unique identifier of this context accross this executor.
+	[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
+	/// Get the current tick for this executor.
+	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
+	/// Provide an executable to be enqued sequentially, after the execution of the current exectuable.
+	constexpr void enqueue(Executable& exectuable) noexcept
+	{
+		bzd::assert::isTrue(!enqueue_);
+		enqueue_ = &exectuable;
+	}
+
+private:
+	friend class bzd::Executor<Executable>;
+
+	constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
+
+	constexpr Executable* popExecutable()
+	{
+		auto enqueue = enqueue_;
+		enqueue_ = nullptr;
+		return enqueue;
+	}
+
+private:
+	[[nodiscard]] static IdType makeUId() noexcept
+	{
+		static Atomic<IdType> id{0};
+		return ++id;
+	}
+
+private:
+	const IdType id_;
+	Atomic<TickType> tick_{0};
+	Executable* enqueue_{nullptr};
+};
+
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
 /// An executor is thread-safe and can be shared betweeen multiple threads or cores.
@@ -24,7 +75,7 @@ class Executor
 {
 public: // Traits.
 	using Self = Executor<Executable>;
-	using TickType = UInt32Type;
+	using TickType = typename ExecutorContext<Executable>::TickType;
 
 public:
 	constexpr Executor() = default;
@@ -43,7 +94,7 @@ public:
 
 public: // Statistics.
 	[[nodiscard]] constexpr SizeType getQueueCount() const noexcept { return queue_.size(); }
-	[[nodiscard]] constexpr SizeType getRunningCount() const noexcept { return running_.size(); }
+	[[nodiscard]] constexpr SizeType getRunningCount() const noexcept { return context_.size(); }
 	[[nodiscard]] constexpr SizeType getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
 
 public:
@@ -67,16 +118,20 @@ public:
 	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
 	///
 	/// \param executable The workload to be executed.
-	constexpr void push(Executable& exectuable) noexcept { bzd::ignore = queue_.pushFront(exectuable); }
+	constexpr void enqueue(Executable& exectuable) noexcept
+	{
+		exectuable.executor_ = this;
+		bzd::ignore = queue_.pushFront(exectuable);
+	}
 
 	/// Run all the workload currently in the queue.
 	///
 	/// Drain all workloads and exit only when the queue is empty.
 	void run()
 	{
-		// Storage for information related to the this running instance.
-		RunningInfo info{};
-		auto scope = registerInfo(info);
+		// Storage for context related to the this running instance.
+		ExecutorContext<Executable> context{};
+		auto scope = registerContext(context);
 
 		// Loop until there are still elements
 		while (!queue_.empty())
@@ -88,65 +143,46 @@ public:
 				auto& executable = maybeExecutable.valueMutable();
 				if (executable.isCanceled())
 				{
-					executable.cancel();
+					executable.cancel(context);
 				}
 				else
 				{
-					executable.resume();
+					executable.resume(context);
+				}
+
+				// Enqueue an executable if needed.
+				auto maybeExecutableToEnqueue = context.popExecutable();
+				if (maybeExecutableToEnqueue)
+				{
+					enqueue(*maybeExecutableToEnqueue);
 				}
 			}
-			info.updateTick();
+			context.updateTick();
 		}
 	}
 
-	void waitToDiscard() noexcept { queue_.waitToDiscard(); }
-
-private:
-	class RunningInfo : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
-	{
-	public: // Traits.
-		using IdType = UInt32Type;
-
-	public:
-		constexpr RunningInfo() noexcept : id_{makeUId()} {}
-
-		[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
-		[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
-
-		constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
-
-	private:
-		[[nodiscard]] static IdType makeUId() noexcept
-		{
-			static Atomic<IdType> id{0};
-			return ++id;
-		}
-
-	private:
-		const IdType id_;
-		Atomic<TickType> tick_{0};
-	};
+	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
 public:
-	/// Create a generator for the running structure.
+	/// Create a generator for the context structure.
 	///
-	/// \return A range for the running data structure.
-	[[nodiscard]] auto getRangeRunning() noexcept
+	/// \return A range for the context data structure.
+	[[nodiscard]] auto getRangeContext() noexcept
 	{
-		auto scope = makeSyncSharedLockGuard(runningMutex_);
-		return range::associateScope(running_, bzd::move(scope));
+		auto scope = makeSyncSharedLockGuard(contextMutex_);
+		return range::associateScope(context_, bzd::move(scope));
 	}
 
 private:
-	/// Create a scope for the running info, it uses RAII pattern to control the lifetime of the info.
+	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.
 	///
-	/// \param info The information structure to be attached.
-	/// \return A scope controlling the lifetime of this information.
-	[[nodiscard]] auto registerInfo(RunningInfo& info) noexcept
+	/// \param context The context object to be attached.
+	/// \return A scope controlling the lifetime of this context.
+	[[nodiscard]] auto registerContext(ExecutorContext<Executable>& context) noexcept
 	{
 		{
-			auto scope = makeSyncLockGuard(runningMutex_);
-			const auto result = running_.pushFront(info);
+			auto scope = makeSyncLockGuard(contextMutex_);
+			const auto result = context_.pushFront(context);
 			bzd::assert::isTrue(result.hasValue());
 		}
 
@@ -155,14 +191,14 @@ private:
 			SizeType maybeMax, expected;
 			do
 			{
-				maybeMax = running_.size();
+				maybeMax = context_.size();
 				expected = maxRunningCount_.load();
 			} while (maybeMax > expected && !maxRunningCount_.compareExchange(expected, maybeMax));
 		}
 
-		return ScopeGuard{[this, &info]() {
-			auto scope = makeSyncLockGuard(runningMutex_);
-			const auto result = running_.pop(info);
+		return ScopeGuard{[this, &context]() {
+			auto scope = makeSyncLockGuard(contextMutex_);
+			const auto result = context_.pop(context);
 			bzd::assert::isTrue(result.hasValue());
 		}};
 	}
@@ -191,12 +227,12 @@ private:
 private:
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningForwardList<Executable> queue_{};
-	/// Keep information about the current runnning scheduler.
-	bzd::threadsafe::NonOwningForwardList<RunningInfo> running_{};
+	/// Keep contexts about the current runnning scheduler.
+	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Maxium concurrent scheduler running at the same time.
 	bzd::Atomic<SizeType> maxRunningCount_{0};
-	/// Mutex to protect access over the running queue.
-	bzd::SpinSharedMutex runningMutex_{};
+	/// Mutex to protect access over the context queue.
+	bzd::SpinSharedMutex contextMutex_{};
 };
 
 } // namespace bzd
@@ -218,32 +254,7 @@ public:
 	~Executable()
 	{
 		// Detach the executable from any of the list it belongs to.
-		bzd::ignore = pop();
-		if (executor_)
-		{
-			// If there is an executor wait until it is safe to discard the element, this to avoid any
-			// potential out of scope object access.
-			executor_->waitToDiscard();
-		}
-	}
-
-	constexpr void enqueue() noexcept
-	{
-		bzd::assert::isTrue(executor_);
-		executor_->push(*static_cast<T*>(this));
-	}
-
-	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept
-	{
-		bzd::assert::isTrue(!executor_);
-		executor_ = &executor;
-	}
-
-	constexpr bzd::Executor<T>& getExecutor() const noexcept
-	{
-		// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
-		bzd::assert::isTrue(executor_);
-		return *executor_;
+		detach();
 	}
 
 	constexpr void setCancellationToken(CancellationToken& token) noexcept
@@ -254,12 +265,6 @@ public:
 
 	constexpr bzd::Optional<CancellationToken&> getCancellationToken() noexcept { return cancel_; }
 
-	constexpr void trigger() noexcept
-	{
-		bzd::assert::isTrue(cancel_.hasValue());
-		cancel_->trigger();
-	}
-
 	constexpr BoolType isCanceled() const noexcept
 	{
 		if (cancel_.empty())
@@ -269,19 +274,27 @@ public:
 		return cancel_->isCanceled();
 	}
 
-	/// Propagate the current context to the executable passed into argument.
-	///
-	/// \param[out] executable The executable to receive the new context.
-	constexpr void propagateContextTo(Self& executable) const noexcept
+	constexpr bzd::Executor<T>& getExecutor() const noexcept
 	{
-		bzd::assert::isTrue(executable.cancel_.empty());
+		bzd::assert::isTrue(executor_);
+		return *executor_;
+	}
 
-		// NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
-		executable.executor_ = executor_;
-		executable.cancel_ = cancel_;
+	constexpr void detach() noexcept
+	{
+		bzd::ignore = pop();
+		if (executor_)
+		{
+			// If there is an executor wait until it is safe to discard the element, this to avoid any
+			// potential out of scope object access.
+			executor_->waitToDiscard();
+			executor_ = nullptr;
+		}
 	}
 
 private:
+	friend class bzd::Executor<T>;
+
 	bzd::Executor<T>* executor_{nullptr};
 	bzd::Optional<CancellationToken&> cancel_{};
 };

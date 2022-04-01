@@ -102,18 +102,10 @@ public:
 	}
 
 	/// Detach the current async from its executor (if attached).
-	constexpr void detach() noexcept { bzd::ignore = getExecutable().popToDiscard(); }
-
-	/// Associate an executor to this async.
-	constexpr void setExecutor(Executor& executor) noexcept { handle_.promise().setExecutor(executor); }
+	constexpr void detach() noexcept { getExecutable().detach(); }
 
 	/// Associate an executor to this async and push it to the queue.
-	constexpr void enqueue(Executor& executor) noexcept
-	{
-		setExecutor(executor);
-		// Enqueue the async to the work queue of the executor
-		getExecutable().enqueue();
-	}
+	constexpr void enqueue(Executor& executor) noexcept { executor.enqueue(getExecutable()); }
 
 	/// Run the current async on a given executor.
 	/// This call will block until completion of the async.
@@ -140,8 +132,6 @@ public:
 		return bzd::move(result);
 	}
 
-	constexpr void setCancellationToken(CancellationToken& token) noexcept { handle_.promise().setCancellationToken(token); }
-
 public: // coroutine specific
 	constexpr bool await_ready() noexcept { return isReady(); }
 
@@ -155,14 +145,18 @@ public: // coroutine specific
 		auto& promise = handle_.promise();
 		auto& promiseCaller = caller.promise();
 
-		// Propagate the executor and cancellation if any
-		promiseCaller.propagateContextTo(promise);
+		// Propagate the cancellation.
+		auto cancellation = promiseCaller.getCancellationToken();
+		if (cancellation)
+		{
+			promise.setCancellationToken(cancellation.valueMutable());
+		}
 
-		// To handle continuation
-		promise.caller_ = &promiseCaller;
+		// Handle the continuation.
+		promise.setContinuation(promiseCaller);
 
-		// Push the current handle to the executor.
-		promise.enqueue();
+		// Enqueue the current handle to the executor.
+		promiseCaller.enqueueAfterExecution(promise);
 
 		// Returns control to the caller/resumer of the current coroutine,
 		// as the current coroutine is already queued for execution.

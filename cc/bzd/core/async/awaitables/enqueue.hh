@@ -31,7 +31,7 @@ protected:
 	constexpr Enqueue(Self&&) noexcept = delete;
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
-	constexpr void enqueue(Executable& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
+	constexpr void enqueueAsyncs(Executable& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
 	{
 		constexprForContainerInc(asyncs_, [&](auto& async) {
 			auto& executable = async.getExecutable();
@@ -39,10 +39,8 @@ protected:
 			{
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
-			executable.onTerminateCallback_.emplace(callback_);
-			executable.caller_ = &caller;
-			executable.setExecutor(caller.getExecutor());
-			executable.enqueue();
+			executable.setConditionalContinuation(callback_, caller);
+			caller.getExecutor().enqueue(executable);
 		});
 	}
 
@@ -70,7 +68,7 @@ public: // Coroutine specializations.
 	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
-		this->enqueue(promise, promise.getCancellationToken());
+		this->enqueueAsyncs(promise, promise.getCancellationToken());
 	}
 
 	constexpr ResultType await_resume() noexcept
@@ -128,7 +126,7 @@ public: // Coroutine specializations.
 			token_.attachTo(maybeToken.valueMutable());
 		}
 
-		this->enqueue(promise, token_);
+		this->enqueueAsyncs(promise, token_);
 	}
 
 	constexpr ResultType await_resume() noexcept
