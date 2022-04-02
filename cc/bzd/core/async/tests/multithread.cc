@@ -147,37 +147,37 @@ TEST(Coroutine, StressAnyFixed)
 
 TEST(Coroutine, StressAllRandom)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
+	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
 }
 
 TEST(Coroutine, StressAnyRandom)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 1000>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
 }
 
 TEST(Coroutine, StressAllNested)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 1000, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 10>(); });
 }
 
 TEST(Coroutine, StressAnyNested)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 10>(); });
 }
 
 TEST(Coroutine, StressAllAnyNested)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 1000, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 10>(); });
 }
 
 TEST(Coroutine, StressAnyAllNested)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 1000, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 10>(); });
 }
 
 TEST(Coroutine, StressRandomNested)
 {
-	spawnConcurrentThreads<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 1000, [&]() {
+	spawnConcurrentThreads<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 100, [&]() {
 		return test.random<int, 0, 10>();
 	});
 }
