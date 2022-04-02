@@ -63,7 +63,14 @@ private:
 		enqueue_ = nullptr;
 		return enqueue;
 	}
-
+/*
+	constexpr Executable* popContinuation()
+	{
+		auto enqueue = enqueue_;
+		enqueue_ = nullptr;
+		return enqueue;
+	}
+*/
 private:
 	[[nodiscard]] static IdType makeUId() noexcept
 	{
@@ -75,6 +82,7 @@ private:
 	const IdType id_;
 	Atomic<TickType> tick_{0};
 	Executable* enqueue_{nullptr};
+//	Continuation continuation_{};
 };
 
 /// The executor concept is a workload scheduler that owns several executables

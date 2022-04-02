@@ -39,12 +39,17 @@ public:
 	{
 		bzd::Optional<Executable&> executable{*this};
 
-		// Unroll the callstaxck and stop to the first callback and execute it.
-		do
+		// Unroll all the direct continuation from the callstackk.
+		while (executable->continuation_.is<Executable*>())
 		{
-			executable = executable->getContinuation();
-		} while (executable && executable->isCanceled());
+			executable.emplace(*(executable->continuation_.get<Executable*>()));
+		}
 
+		// All cancellation must terminate with a callback, if this fails it means that
+		// this cancellation async does not have a parent which should never happen.
+		bzd::assert::isTrue(executable->continuation_.is<OnTerminateCallback>());
+
+		executable = executable->getContinuation();
 		if (executable)
 		{
 			// Enqueue the continuation for later use, it will be scheduled
