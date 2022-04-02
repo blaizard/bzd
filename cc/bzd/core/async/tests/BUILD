@@ -4,9 +4,9 @@ bzd_cc_test(
     name = "async",
     srcs = [
         "async.cc",
-        #"executor.cc",
         "cancellation.cc",
         "error.cc",
+        "executor.cc",
     ],
     # TODO: re-enable with esp32 gcc 11
     target_compatible_with = select({

@@ -43,10 +43,10 @@ public:
 	/// Get the current tick for this executor.
 	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
 	/// Provide an executable to be enqued sequentially, after the execution of the current exectuable.
-	constexpr void enqueue(Executable& exectuable) noexcept
+	constexpr void setContinuation(Continuation&& continuation) noexcept
 	{
-		bzd::assert::isTrue(!enqueue_);
-		enqueue_ = &exectuable;
+		bzd::assert::isTrue(continuation_.template is<bzd::monostate>());
+		continuation_ = bzd::move(continuation);
 	}
 
 private:
@@ -57,20 +57,21 @@ private:
 
 	constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
 
-	constexpr Executable* popExecutable()
+	[[nodiscard]] constexpr bzd::Optional<Executable&> popContinuation() noexcept
 	{
-		auto enqueue = enqueue_;
-		enqueue_ = nullptr;
-		return enqueue;
+		bzd::Optional<Executable&> maybeExecutable{};
+		continuation_.match([](bzd::monostate) {},
+							[&](Executable* executable) {
+								if (executable)
+								{
+									maybeExecutable.emplace(*executable);
+								}
+							},
+							[&](OnTerminateCallback callback) { maybeExecutable = callback(); });
+		continuation_.template emplace<bzd::monostate>();
+		return maybeExecutable;
 	}
-/*
-	constexpr Executable* popContinuation()
-	{
-		auto enqueue = enqueue_;
-		enqueue_ = nullptr;
-		return enqueue;
-	}
-*/
+
 private:
 	[[nodiscard]] static IdType makeUId() noexcept
 	{
@@ -81,8 +82,7 @@ private:
 private:
 	const IdType id_;
 	Atomic<TickType> tick_{0};
-	Executable* enqueue_{nullptr};
-//	Continuation continuation_{};
+	Continuation continuation_{};
 };
 
 /// The executor concept is a workload scheduler that owns several executables
@@ -169,10 +169,10 @@ public:
 				}
 
 				// Enqueue an executable if needed.
-				auto maybeExecutableToEnqueue = context.popExecutable();
+				auto maybeExecutableToEnqueue = context.popContinuation();
 				if (maybeExecutableToEnqueue)
 				{
-					enqueue(*maybeExecutableToEnqueue);
+					enqueue(maybeExecutableToEnqueue.valueMutable());
 				}
 			}
 			context.updateTick();

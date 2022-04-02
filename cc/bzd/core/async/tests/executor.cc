@@ -20,7 +20,7 @@ TEST(ExecutorContext, Continuation)
 
 	{
 		Continuation continuation{&executable};
-		context.setContinuation(continuation);
+		context.setContinuation(bzd::move(continuation));
 		auto maybeContinuation = context.popContinuation();
 		EXPECT_TRUE(maybeContinuation);
 		EXPECT_EQ(&maybeContinuation.value(), &executable);
@@ -31,7 +31,7 @@ TEST(ExecutorContext, Continuation)
 	{
 		auto callback = [&]() -> bzd::Optional<Executable&> { return executable; };
 		Continuation continuation{OnTerminateCallback{callback}};
-		context.setContinuation(continuation);
+		context.setContinuation(bzd::move(continuation));
 		auto maybeContinuation = context.popContinuation();
 		EXPECT_TRUE(maybeContinuation);
 		EXPECT_EQ(&maybeContinuation.value(), &executable);
@@ -42,7 +42,7 @@ TEST(ExecutorContext, Continuation)
 	{
 		auto callback = []() -> bzd::Optional<Executable&> { return bzd::nullopt; };
 		Continuation continuation{OnTerminateCallback{callback}};
-		context.setContinuation(continuation);
+		context.setContinuation(bzd::move(continuation));
 		auto maybeContinuation = context.popContinuation();
 		EXPECT_FALSE(maybeContinuation);
 	}

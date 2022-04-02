@@ -49,37 +49,23 @@ public:
 		// this cancellation async does not have a parent which should never happen.
 		bzd::assert::isTrue(executable->continuation_.is<OnTerminateCallback>());
 
-		executable = executable->getContinuation();
-		if (executable)
-		{
-			// Enqueue the continuation for later use, it will be scheduled
-			// according to the executor policy.
-			context.enqueue(executable.valueMutable());
-		}
-	}
-
-	constexpr bzd::Optional<Executable&> getContinuation() noexcept
-	{
-		bzd::Optional<Executable&> maybeExecutable{};
-		continuation_.match([](bzd::monostate) {},
-							[&](Executable* executable) {
-								if (executable)
-								{
-									maybeExecutable.emplace(*executable);
-								}
-							},
-							[&](OnTerminateCallback callback) { maybeExecutable = callback(); });
-
-		return maybeExecutable;
+		context_ = &context;
+		thenEnqueueContinuation();
 	}
 
 	/// Enqueue a new executable after the execution of the current executable.
 	/// This is needed for thread safe scheduling, to avoid executing the continuation
 	/// before the current coroutine state is not completed.
-	constexpr void enqueueAfterExecution(Executable& executable) noexcept
+	constexpr void thenEnqueueContinuation() noexcept
 	{
 		bzd::assert::isTrue(context_);
-		context_->enqueue(executable);
+		context_->setContinuation(bzd::move(continuation_));
+	}
+
+	constexpr void thenEnqueueExecutable(Executable& executable) noexcept
+	{
+		bzd::assert::isTrue(context_);
+		context_->setContinuation(bzd::ExecutorContext<Executable>::Continuation{&executable});
 	}
 
 	constexpr void setContinuation(Executable& continuation) noexcept { continuation_.emplace<Executable*>(&continuation); }
@@ -118,15 +104,11 @@ private:
 				::std::cout << "ERROR!!!!" << ::std::endl;
 			}
 
-			// Enqueuing this coroutine into the executor is important for thread
+			// Enqueuing the continuation with the executor is important for thread
 			// safety reasons, if we return the coroutine handle directly here, we
 			// might have a case where the same coroutine executes multiple times on
 			// different threads.
-			auto maybeContinuation = handle.promise().getContinuation();
-			if (maybeContinuation)
-			{
-				handle.promise().enqueueAfterExecution(maybeContinuation.valueMutable());
-			}
+			handle.promise().thenEnqueueContinuation();
 
 			return bzd::coroutine::impl::noop_coroutine();
 		}
