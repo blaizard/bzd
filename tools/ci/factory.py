@@ -35,11 +35,12 @@ class Factory(ABC):
 		rawData = json.loads(pathlib.Path("tools/ci/stages.json").read_text())
 		data = []
 		for stage in rawData["stages"]:
-			default = {"category": "normal"}
-			default.update(stage)
-			assert default.get("category") in Factory.categories
-			if onlyCategories is None or default.get("category") in onlyCategories:
-				data.append(default)
+			item = {"category": "normal"}
+			item.update(stage)
+			assert item["category"] in Factory.categories
+			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
+			if onlyCategories is None or item["category"] in onlyCategories:
+				data.append(item)
 
 		template = Template.fromPath(templatePath)
 		return template.render({"stages": data})
