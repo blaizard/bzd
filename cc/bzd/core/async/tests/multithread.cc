@@ -125,29 +125,6 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 	}
 }
 
-TEST(Coroutine, Cancellation2Threads)
-{
-	bzd::coroutine::impl::Executor executor{};
-	bzd::Array<std::thread, 2> threads;
-
-	auto promise1 = cancellationWorkload(2);
-	auto promise2 = cancellationWorkload(1);
-	auto promise = bzd::async::any(bzd::move(promise1), bzd::move(promise2));
-	promise.enqueue(executor);
-
-	for (auto& entry : threads)
-	{
-		entry = std::thread{[&executor]() { executor.run(); }};
-	}
-
-	for (auto& entry : threads)
-	{
-		entry.join();
-	}
-
-	EXPECT_EQ(executor.getQueueCount(), 0U);
-}
-
 TEST(Coroutine, StressAllNull)
 {
 	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, []() { return 0; });

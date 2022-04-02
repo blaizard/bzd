@@ -77,10 +77,6 @@ public: // Coroutine specializations.
 	{
 		return bzd::apply(
 			[](auto&... asyncs) -> ResultType {
-				// Wait for all async to be ready, this is needed in case the terminate callback
-				// is called concurrenlty and the caller is enqueued before all asyncs are completed.
-				while (((!asyncs.isReady()) || ...))
-					;
 				// Copy the result of each async into the result type and return it.
 				return ResultType{bzd::inPlace, asyncs.await_resume()...};
 			},
@@ -139,10 +135,6 @@ public: // Coroutine specializations.
 	{
 		return bzd::apply(
 			[](auto&... asyncs) -> ResultType {
-				// Wait for all async to be completed, this is needed in case the terminate callback
-				// is called concurrenlty and the caller is enqueued before all asyncs are completed.
-				while (((!asyncs.isCompleted()) || ...))
-					;
 				// By now all asyncs must have been either ready or canceled.
 				// Build the result and return it.
 				return ResultType{bzd::inPlace, asyncs.moveResultOut()...};

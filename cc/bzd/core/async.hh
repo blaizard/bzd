@@ -156,9 +156,9 @@ public: // coroutine specific
 		promise.setContinuation(promiseCaller);
 
 		// Enqueue the current handle to the executor.
-		promiseCaller.enqueueAfterExecution(promise);
+		promiseCaller.thenEnqueueExecutable(promise);
 
-		// Returns control to the caller/resumer of the current coroutine,
+		// Returns control to the caller of the current coroutine,
 		// as the current coroutine is already queued for execution.
 		return true;
 	}
