@@ -573,7 +573,7 @@ public:
 	static constexpr auto make(Args&&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto {
+		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const Metadata& metadata) -> auto{
 			return Adapter::process(transport, args, metadata);
 		}...);
 

@@ -291,7 +291,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 void sigHandler(const int sig)
 {
 	// Ensure only a single instance is running at a time
-	static volatile std::atomic_flag sigHandlerInProgress = ATOMIC_FLAG_INIT;
+	static volatile std::atomic_flag sigHandlerInProgress{};
 	if (sigHandlerInProgress.test_and_set())
 	{
 		return;

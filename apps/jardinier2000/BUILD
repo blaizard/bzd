@@ -17,6 +17,10 @@ cc_library(
     hdrs = [
         "jardinier.hh",
     ],
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":composition",
         "//cc:bzd",

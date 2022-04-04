@@ -9,10 +9,10 @@ py_binary(
     ),
     args = [
         "--clang-format",
-        "$(location @linux_x86_64_clang_12_0_0//:clang_format)",
+        "$(location @linux_x86_64_clang_14_0_0//:clang_format)",
     ],
     data = [
-        "@linux_x86_64_clang_12_0_0//:clang_format",
+        "@linux_x86_64_clang_14_0_0//:clang_format",
     ],
     visibility = ["//tools/sanitizer:__pkg__"],
     deps = [

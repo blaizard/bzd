@@ -98,10 +98,12 @@ private:
 	using typename interface::BTree<K, V, Order>::Node;
 
 public:
-	constexpr BTree() : interface::BTree<K, V, Order>(N, &root_, nodes_) {}
+	constexpr BTree() : interface::BTree<K, V, Order>(N, &root_, nodes_) {
+	}
 
-protected:
-	bzd::Pool<Node, 10> nodes_;
+	protected
+		: bzd::Pool<Node, 10>
+			  nodes_;
 	Node* root_ = nullptr;
 	V data_[N];
 };
