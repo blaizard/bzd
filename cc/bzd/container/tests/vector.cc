@@ -14,7 +14,9 @@ TEST(ContainerVector, Base)
 	EXPECT_EQ(vector.size(), 2U);
 	EXPECT_EQ(vector[1], 2);
 
-	bzd::interface::Vector<int>& iVector{vector};
+	bzd::interface::Vector<int>& iVector {
+		vector
+	};
 	EXPECT_EQ(iVector.size(), 2U);
 	EXPECT_EQ(iVector[1], 2);
 	iVector.pushBack(-2);

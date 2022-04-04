@@ -16,11 +16,11 @@ sh_binary_wrapper(
     name = "executor_host",
     binary = "//tools/bazel_build/toolchains/cc:executor_host",
     command = """
-export ASAN_SYMBOLIZER_PATH="$(location @linux_x86_64_clang_12_0_0//:llvm_symbolizer)"
+export ASAN_SYMBOLIZER_PATH="$(location @linux_x86_64_clang_14_0_0//:llvm_symbolizer)"
 {binary} $@
     """,
     data = [
-        "@linux_x86_64_clang_12_0_0//:llvm_symbolizer",
+        "@linux_x86_64_clang_14_0_0//:llvm_symbolizer",
     ],
     visibility = ["//visibility:public"],
 )

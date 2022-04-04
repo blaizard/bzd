@@ -238,7 +238,7 @@ requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType> all(Asyncs&&... asyncs)
 noexcept
 {
-	co_return(co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 template <concepts::async... Asyncs>
@@ -246,7 +246,7 @@ requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType> any(Asyncs&&... asyncs)
 noexcept
 {
-	co_return(co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 } // namespace bzd::async

@@ -41,13 +41,12 @@ def runGdb(name: str) -> None:
 	assert counter, "Waiting for container timed-out."
 
 	# Start gdb + gdbgui
-	localDocker(["exec", "-it", name, "gdbgui", "-r", "--port=8080", "-g", "xtensa-esp32-elf-gdb"],
+	localDocker(["exec", "-t", name, "gdbgui", "-r", "--port=8080", "-g", "xtensa-esp32-elf-gdb"],
 		stdin=True,
 		stdout=True,
 		stderr=True,
 		ignoreFailure=True,
 		timeoutS=0)
-
 
 if __name__ == "__main__":
 

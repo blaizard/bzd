@@ -1,17 +1,17 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
 
-def _load_linux_x86_64_clang_12_0_0(name):
+def _load_linux_x86_64_clang_14_0_0(name):
     # Load dependencies
-    package_name = "linux_x86_64_clang_12_0_0"
+    package_name = "linux_x86_64_clang_14_0_0"
     http_archive(
         name = package_name,
         build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(package_name),
         urls = [
-            "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz",
+            "https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
         ],
-        strip_prefix = "clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04",
-        sha256 = "a9ff205eb0b73ca7c86afc6432eed1c2d49133bd0d49e47b15be59bbf0dd292e",
+        strip_prefix = "clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04",
+        sha256 = "61582215dafafb7b576ea30cc136be92c877ba1f1c31ddbbd372d6d65622fef5",
     )
 
     toolchain_definition = {
@@ -32,14 +32,16 @@ def _load_linux_x86_64_clang_12_0_0(name):
             "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "builtin_include_directories": [
-            "include/c++/v1".format(package_name),
-            "lib/clang/12.0.0/include".format(package_name),
+            "include/c++/v1",
+            "lib/clang/14.0.0/include",
+            "include/x86_64-unknown-linux-gnu/c++/v1/",
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "system_directories": [
             "external/{}/include/c++/v1".format(package_name),
-            "external/{}/lib/clang/12.0.0/include".format(package_name),
+            "external/{}/lib/clang/14.0.0/include".format(package_name),
+            "external/{}/include/x86_64-unknown-linux-gnu/c++/v1/".format(package_name),
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
@@ -54,9 +56,6 @@ def _load_linux_x86_64_clang_12_0_0(name):
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",
             "--no-standard-includes",
-
-            # Add support to coroutines.
-            "-stdlib=libc++",
         ],
         "link_flags": [
             "-fuse-ld=lld",
@@ -72,7 +71,6 @@ def _load_linux_x86_64_clang_12_0_0(name):
             "-lgcc",
             "-Wl,-z,relro,-z,now",
             "-no-canonical-prefixes",
-            "-Wl,-rpath=%{{absolute_external}}/{}/lib".format(package_name),
 
             # Stamp the binary with a unique identifier
             "-Wl,--build-id=md5",
@@ -108,4 +106,4 @@ def _load_linux_x86_64_clang_12_0_0(name):
     )
 
 def load_linux_x86_64_clang():
-    _load_linux_x86_64_clang_12_0_0(name = "linux_x86_64_clang")
+    _load_linux_x86_64_clang_14_0_0(name = "linux_x86_64_clang")

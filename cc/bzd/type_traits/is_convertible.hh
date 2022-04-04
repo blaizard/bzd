@@ -25,7 +25,7 @@ namespace bzd::typeTraits {
 template <class From, class To>
 struct IsConvertible
 	: IntegralConstant<BoolType,
-					   (decltype(impl::testReturnable<To>(0))::value&& decltype(impl::testImplicitlyConvertible<From, To>(0))::value) ||
+					   (decltype(impl::testReturnable<To>(0))::value && decltype(impl::testImplicitlyConvertible<From, To>(0))::value) ||
 						   (isVoid<From> && isVoid<To>)>
 {
 };
