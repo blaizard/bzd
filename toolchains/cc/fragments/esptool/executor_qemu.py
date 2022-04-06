@@ -48,6 +48,7 @@ def runGdb(name: str) -> None:
 		ignoreFailure=True,
 		timeoutS=0)
 
+
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="ESP32 QEMU launcher script.")
