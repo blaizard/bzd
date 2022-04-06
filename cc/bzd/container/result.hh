@@ -152,6 +152,15 @@ public: // API
 		return data_.template get<ErrorContainer>().error_;
 	}
 
+	/// If *this contains an error, returns a mutable reference to the contained error otherwise, asserts.
+	///
+	/// \return A reference to the contained error.
+	[[nodiscard]] constexpr Error& errorMutable() noexcept
+	{
+		bzd::assert::isTrue(hasError());
+		return data_.template get<ErrorContainer>().error_;
+	}
+
 	/// Propagate the error to another result object.
 	///
 	/// \return The error object packed to be consumed by a compatible result object.

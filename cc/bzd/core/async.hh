@@ -56,27 +56,17 @@ public: // constructor/destructor/assignments
 
 public:
 	/// Notifies if the async is completed.
-	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.done() : false; }
+	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.promise().isReady() : false; }
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
 
 	[[nodiscard]] constexpr bool isCompleted() const noexcept { return isReady() || isCanceled(); }
 
-	/// Get the current result. If the async is not terminated, an empty value is returned.
-	[[nodiscard]] constexpr bzd::Optional<ResultType> getResult() noexcept
-	{
-		if (handle_)
-		{
-			return handle_.promise().result_;
-		}
-		return nullopt;
-	}
-
 	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOut() noexcept
 	{
 		if (handle_)
 		{
-			return bzd::move(handle_.promise().result_);
+			return bzd::move(handle_.promise().moveResultOut());
 		}
 		return nullopt;
 	}

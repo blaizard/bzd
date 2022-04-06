@@ -9,6 +9,7 @@
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
+#include "cc/bzd/core/error.hh"
 
 // Forward declaration
 namespace bzd::impl {
@@ -23,9 +24,10 @@ class Executable : public bzd::interface::Executable<Executable>
 {
 public: // Traits.
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
+	using SetErrorCallback = bzd::FunctionRef<void(bzd::Error&&)>;
 
 public:
-	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle) noexcept : handle_{handle} {}
+	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept : handle_{handle}, setError_{bzd::move(callback)} {}
 
 	/// Called by the scheduler to resume an executable.
 	void resume(bzd::ExecutorContext<Executable>& context) noexcept
@@ -75,8 +77,37 @@ public:
 		continuation_.emplace<OnTerminateCallback>(onTerminate);
 	}
 
+	constexpr void setPropagate() noexcept { setError_.reset(); }
+
+	constexpr bool mustPropagateError() const noexcept { return !setError_.hasValue(); }
+
+	constexpr void setError(bzd::Error&& error) noexcept
+	{
+		setError_.value()(bzd::move(error));
+	}
+
+	/// Propagate the error to the first parent accepting errors and set the continuation
+	/// of this executable to this parent.
+	constexpr void propagateError(bzd::Error&& error) noexcept
+	{
+		// Look for the first caller that does not have the propagate flag and resume.
+		auto executable{this};
+		do
+		{
+			auto& continuation = executable->continuation_;
+			bzd::assert::isTrue(continuation.template is<Executable*>(), "Unhandled propagated error.");
+			executable = continuation.template get<Executable*>();
+			bzd::assert::isTrue(executable, "Unhandled propagated error.");
+		} while (executable->mustPropagateError());
+		continuation_ = bzd::move(executable->continuation_);
+
+		// Set the error here
+		executable->setError(bzd::move(error));
+	}
+
 private:
 	bzd::coroutine::impl::coroutine_handle<> handle_;
+	bzd::Optional<SetErrorCallback> setError_;
 	bzd::ExecutorContext<Executable>* context_{nullptr};
 	bzd::ExecutorContext<Executable>::Continuation continuation_{};
 };
@@ -92,34 +123,32 @@ private:
 private:
 	struct FinalAwaiter
 	{
-		constexpr FinalAwaiter(const bzd::BoolType propagate) noexcept : propagate_{propagate} {}
-
 		constexpr bool await_ready() noexcept { return false; }
 
-		constexpr bzd::coroutine::impl::coroutine_handle<> await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+		constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
-			// TODO: Check if this is an error, if so propagate it down to the layers until a catch block is detected.
-			if (propagate_ && handle.promise().hasError())
+			auto& promise = handle.promise();
+
+			// Propagate the error if needed.
+			if (promise.hasErrorToPropagate())
 			{
-				::std::cout << "ERROR!!!!" << ::std::endl;
+				promise.propagateError(bzd::move(promise.error().valueMutable()));
 			}
 
 			// Enqueuing the continuation with the executor is important for thread
 			// safety reasons, if we return the coroutine handle directly here, we
 			// might have a case where the same coroutine executes multiple times on
 			// different threads.
-			handle.promise().thenEnqueueContinuation();
+			promise.thenEnqueueContinuation();
 
-			return bzd::coroutine::impl::noop_coroutine();
+			return true;
 		}
 
 		constexpr void await_resume() noexcept {}
-
-		bzd::BoolType propagate_{};
 	};
 
 public:
-	constexpr Promise() noexcept : Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this))} {}
+	constexpr Promise(SetErrorCallback&& callback) noexcept : Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this)), bzd::move(callback)} {}
 
 	constexpr Promise(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
@@ -134,11 +163,9 @@ public:
 		return {};
 	}
 
-	constexpr FinalAwaiter final_suspend() noexcept { return FinalAwaiter{propagate_}; }
+	constexpr FinalAwaiter final_suspend() noexcept { return {}; }
 
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
-
-	constexpr void setPropagate() noexcept { propagate_ = true; }
 
 public: // Memory allocation
 		/*
@@ -160,8 +187,6 @@ public: // Memory allocation
 private:
 	template <class U>
 	friend class ::bzd::impl::Async;
-
-	bzd::BoolType propagate_{false};
 };
 
 } // namespace bzd::coroutine::impl
@@ -171,8 +196,13 @@ template <class T>
 class Promise : public impl::Promise<Promise<T>>
 {
 public:
+	using Self = Promise<T>;
 	using ResultType = T;
 	using impl::Promise<Promise<T>>::Promise;
+
+	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)}
+	{
+	}
 
 	constexpr auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
 
@@ -189,14 +219,48 @@ public:
 	constexpr void return_value(Empty) noexcept { result_.emplace(bzd::nullresult); }
 
 	/// Check if the result contains an error.
-	constexpr bool hasError() noexcept
+	constexpr bool hasErrorToPropagate() const noexcept
 	{
-		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+		if (this->mustPropagateError())
 		{
-			return (result_.hasValue() && result_.value().hasError());
+			if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+			{
+				return (result_.hasValue() && result_.value().hasError());
+			}
+			else
+			{
+				bzd::assert::isTrue(false, "Only support normal async");
+			}
 		}
 		// if constexpr (bzd::Tuple<bzd::Result<...>>) {}
 		return false;
+	}
+
+	bzd::Optional<bzd::Error> error() noexcept
+	{
+		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+		{
+			return bzd::move(result_.valueMutable().errorMutable());
+		}
+		return bzd::nullopt;
+	}
+
+	constexpr bool isReady() const noexcept
+	{
+		return result_.hasValue();
+	}
+
+	constexpr bzd::Optional<T> moveResultOut() noexcept
+	{
+		return bzd::move(result_);
+	}
+
+	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
+	{
+		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+		{
+			result_ = bzd::error(bzd::move(error));
+		}
 	}
 
 private:
