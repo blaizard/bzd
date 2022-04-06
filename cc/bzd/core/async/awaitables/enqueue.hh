@@ -3,11 +3,6 @@
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/utility/apply.hh"
 
-namespace bzd::impl {
-template <class T>
-class Async;
-}
-
 namespace bzd::coroutine::impl {
 
 /// Awaitable to enqueue an async object.

@@ -21,6 +21,10 @@
 
 namespace bzd::impl {
 
+struct AsyncTag
+{
+};
+
 template <class T>
 class Async
 {
@@ -31,6 +35,7 @@ public: // Traits
 	using Executable = bzd::coroutine::impl::Executable;
 	using Executor = bzd::coroutine::impl::Executor;
 	using Self = Async<T>;
+	using Tag = bzd::impl::AsyncTag;
 
 public: // constructor/destructor/assignments
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
@@ -76,14 +81,14 @@ public:
 		class AsyncPropagate : public impl::Async<T>
 		{
 		public:
-			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : impl::Async<T>{bzd::move(async)}
-			{
-				this->handle_.promise().setPropagate();
-			}
+			using Parent = impl::Async<T>;
+
+		public:
+			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : Parent{bzd::move(async)} { this->handle_.promise().setPropagate(); }
 
 			constexpr typename ResultType::Value await_resume() noexcept
 			{
-				auto result{bzd::move(impl::Async<T>::await_resume())};
+				auto result{bzd::move(Parent::await_resume())};
 				bzd::assert::isTrue(result.hasValue());
 				return bzd::move(result.valueMutable());
 			}
@@ -203,7 +208,7 @@ public:
 
 namespace bzd::concepts {
 template <class T>
-concept async = sameTemplate<T, bzd::Async> || sameTemplate<T, bzd::impl::Async>;
+concept async = sameAs<typename T::Tag, bzd::impl::AsyncTag>;
 }
 
 namespace bzd::async {

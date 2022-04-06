@@ -6,16 +6,10 @@
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/executor.hh"
+#include "cc/bzd/core/error.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
-#include "cc/bzd/core/error.hh"
-
-// Forward declaration
-namespace bzd::impl {
-template <class T>
-class Async;
-}
 
 namespace bzd::coroutine::impl {
 
@@ -27,7 +21,10 @@ public: // Traits.
 	using SetErrorCallback = bzd::FunctionRef<void(bzd::Error&&)>;
 
 public:
-	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept : handle_{handle}, setError_{bzd::move(callback)} {}
+	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept :
+		handle_{handle}, setError_{bzd::move(callback)}
+	{
+	}
 
 	/// Called by the scheduler to resume an executable.
 	void resume(bzd::ExecutorContext<Executable>& context) noexcept
@@ -81,10 +78,7 @@ public:
 
 	constexpr bool mustPropagateError() const noexcept { return !setError_.hasValue(); }
 
-	constexpr void setError(bzd::Error&& error) noexcept
-	{
-		setError_.value()(bzd::move(error));
-	}
+	constexpr void setError(bzd::Error&& error) noexcept { setError_.value()(bzd::move(error)); }
 
 	/// Propagate the error to the first parent accepting errors and set the continuation
 	/// of this executable to this parent.
@@ -148,7 +142,10 @@ private:
 	};
 
 public:
-	constexpr Promise(SetErrorCallback&& callback) noexcept : Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this)), bzd::move(callback)} {}
+	constexpr Promise(SetErrorCallback&& callback) noexcept :
+		Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this)), bzd::move(callback)}
+	{
+	}
 
 	constexpr Promise(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
@@ -183,10 +180,6 @@ public: // Memory allocation
 				::free(ptr);
 			}
 		*/
-
-private:
-	template <class U>
-	friend class ::bzd::impl::Async;
 };
 
 } // namespace bzd::coroutine::impl
@@ -200,9 +193,7 @@ public:
 	using ResultType = T;
 	using impl::Promise<Promise<T>>::Promise;
 
-	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)}
-	{
-	}
+	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 
 	constexpr auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
 
@@ -245,15 +236,9 @@ public:
 		return bzd::nullopt;
 	}
 
-	constexpr bool isReady() const noexcept
-	{
-		return result_.hasValue();
-	}
+	constexpr bool isReady() const noexcept { return result_.hasValue(); }
 
-	constexpr bzd::Optional<T> moveResultOut() noexcept
-	{
-		return bzd::move(result_);
-	}
+	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
 	{
@@ -264,9 +249,6 @@ public:
 	}
 
 private:
-	template <class U>
-	friend class ::bzd::impl::Async;
-
 	bzd::Optional<T> result_{};
 };
 
