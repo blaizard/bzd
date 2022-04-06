@@ -75,14 +75,14 @@ private: // Static wrappers.
 	static ReturnType wrapper(void* typeErasedObject, Args... args)
 	{
 		auto object = static_cast<Object*>(typeErasedObject);
-		return (object->*memberPtr)(args...);
+		return (object->*memberPtr)(bzd::forward<Args>(args)...);
 	}
 
 	template <class Object, ReturnType (Object::*memberPtr)(Args...) const>
 	static ReturnType wrapperConst(void* typeErasedObject, Args... args)
 	{
 		auto object = static_cast<const Object*>(typeErasedObject);
-		return (object->*memberPtr)(args...);
+		return (object->*memberPtr)(bzd::forward<Args>(args)...);
 	}
 
 private: // Members.

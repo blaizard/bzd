@@ -9,6 +9,7 @@ Thanks to this object you can, for example, resume the coroutine. The coroutine_
 
 ### Frame
 
+The frame contains the current state of the coroutine. 
 Coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = bzd::delay(10_ms);`
 
 ```c++
@@ -96,3 +97,40 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 ```
 
 ## Async implementation
+
+### Simple coroutines
+
+Async is the coroutine type of this framework.
+
+A `void` coroutine is declared as follow: 
+```c++
+bzd::Async<> myFunc() { ... }
+```
+
+A non-`void` coroutine is declared as follow:
+```c++
+bzd::Async<int> myFunc() { ... }
+```
+
+### Error propagation
+
+Some errors cannot be treated at the caller level and might have to be propagated to the upper layers. For that the Async
+type provides a convenient function to reduce boiler plate code:
+
+```c++
+const auto value = co_await myFunc().assert();
+```
+
+The value is directly returned from the coroutine, any error is propagate to the caller of this coroutine. This piece of code
+is equivalent to the follwing:
+
+```c++
+auto result = co_await myFunc();
+if (!result)
+{
+    co_return result.propagate();
+}
+const auto value = result.value(); 
+```
+
+The error propagate goes to upper levels until an awaitable handling errors is found.
