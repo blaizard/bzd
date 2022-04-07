@@ -268,9 +268,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 
 bzd::Async<> asyncDestroyMonitor(bzd::interface::String& trace, bzd::StringView id, bzd::SizeType& destroyedCounter)
 {
-	bzd::ScopeGuard scope{[&destroyedCounter]() {
-		++destroyedCounter;
-	}};
+	bzd::ScopeGuard scope{[&destroyedCounter]() { ++destroyedCounter; }};
 	appendToTrace(trace, id, 0);
 	co_await bzd::async::yield();
 	appendToTrace(trace, id, 1);

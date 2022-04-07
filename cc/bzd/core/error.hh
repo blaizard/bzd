@@ -175,11 +175,3 @@ constexpr auto error(const ErrorType type,
 }
 
 } // namespace bzd
-
-/// Helper to propagate an error on an asynchronous call.
-/// After this call, it asserts that the result contains no error.
-#define ASSERT_ASYNC_RESULT(result)     \
-	if (!(result))                      \
-	{                                   \
-		co_return (result).propagate(); \
-	}
