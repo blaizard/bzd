@@ -17,13 +17,13 @@ bzd::Async<bool> run()
 		{"--help"_sv, 5},
 	};
 
-	co_await bzd::print(CSTR("Please type something...\n"));
+	co_await bzd::print("Please type something...\n"_csv);
 
 	{
 		const auto result = co_await reader.readAnyOf(keywords);
 		if (result)
 		{
-			co_await bzd::print(CSTR("Matched {}\n"), result.value());
+			co_await bzd::print("Matched {}\n"_csv, result.value());
 		}
 		else
 		{

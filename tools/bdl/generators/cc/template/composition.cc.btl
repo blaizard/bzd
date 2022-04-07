@@ -56,7 +56,7 @@ bool execute() noexcept
 		{% end %}
 		{% if item.fqn == "out" %}
 	bzd::platform::backend::out = &registry.{{ item.fqn | fqnToNameStr }}_;
-	bzd::log::info(CSTR("Initialization phase.")).sync();
+	bzd::log::info("Initialization phase."_csv).sync();
 		{% elif item.fqn == "in" %}
 	bzd::platform::backend::in = &registry.{{ item.fqn | fqnToNameStr }}_;
 		{% elif item.fqn == "steadyClock" %}
@@ -67,14 +67,14 @@ bool execute() noexcept
 	{% end %}
 
 	// Compose.
-	bzd::log::info(CSTR("Composition phase.")).sync();
+	bzd::log::info("Composition phase."_csv).sync();
 	{% for index, expresssion in composition %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
 	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
 	{% end %}
 
 	// Execute.
-	bzd::log::info(CSTR("Execution phase.")).sync();
+	bzd::log::info("Execution phase."_csv).sync();
 	{% for executor in executors %}
 	registry.{{ executor | fqnToNameStr }}_.start();
 	{% end %}
@@ -84,7 +84,7 @@ bool execute() noexcept
 	registry.{{ executor | fqnToNameStr }}_.stop();
 	{% end %}
 
-	bzd::log::info(CSTR("Completion.")).sync();
+	bzd::log::info("Completion."_csv).sync();
 	bool isSuccess{true};
 	{% for index, expresssion in composition %}
 	if (promise{{ index }}.isReady())
@@ -93,7 +93,7 @@ bool execute() noexcept
 	}
 	else
 	{
-		bzd::log::error(CSTR("Task '{{ expresssion.type | typeRegistryToStr }}' not terminated correctly.")).sync();
+		bzd::log::error("Task '{{ expresssion.type | typeRegistryToStr }}' not terminated correctly."_csv).sync();
 	}
 	{% end %}
 

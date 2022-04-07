@@ -5,7 +5,7 @@
 
 bzd::Async<int> generateError()
 {
-	co_return bzd::error(bzd::ErrorType::failure, CSTR("Dummy"));
+	co_return bzd::error(bzd::ErrorType::failure, "Dummy"_csv);
 }
 
 bzd::Async<> generateSuccessVoid()

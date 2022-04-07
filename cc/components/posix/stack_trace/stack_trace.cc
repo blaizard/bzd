@@ -247,7 +247,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 		{
 			bzd::String<1024> command;
 			toString(command,
-					 CSTR("exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"),
+					 "exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"_csv,
 					 info.path,
 					 reinterpret_cast<bzd::IntPtrType>(info.address),
 					 info.offset);
@@ -277,7 +277,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 
 		// Print stack trace number and memory address
 		toStream(stream,
-				 CSTR("#{:d} {:#x} in {}+{:#x} {}\n"),
+				 "#{:d} {:#x} in {}+{:#x} {}\n"_csv,
 				 level,
 				 reinterpret_cast<uint64_t>(address),
 				 symbol.data(),
@@ -298,7 +298,7 @@ void sigHandler(const int sig)
 	}
 
 	AsyncSignalSafeStream stream;
-	toStream(stream, CSTR("\nCaught signal: {} ({:d})\n"), getSignalName(sig), sig).sync();
+	toStream(stream, "\nCaught signal: {} ({:d})\n"_csv, getSignalName(sig), sig).sync();
 
 	callStack();
 	std::exit(sig);

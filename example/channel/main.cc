@@ -68,7 +68,7 @@ public:
 	{
 		if (data.size() < 2)
 		{
-			co_return bzd::error(bzd::ErrorType::failure, CSTR("Wrong size"));
+			co_return bzd::error(bzd::ErrorType::failure, "Wrong size"_csv);
 		}
 		std::cout << "[id=" << static_cast<int>(data[0]) << "] [length=" << static_cast<int>(data[1]) << "] ";
 		for (auto it = data.begin() + 2; it != data.end(); ++it)

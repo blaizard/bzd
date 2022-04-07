@@ -301,6 +301,7 @@ cc_library(
         ":string",
         ":string_view",
         "//cc/bzd/core:channel",
+        "//cc/bzd/meta:range",
     ],
 )
 

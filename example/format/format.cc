@@ -17,7 +17,7 @@ private:
 
 bzd::Async<> toStream(bzd::OStream& os, const Date& d)
 {
-	co_await toStream(os, CSTR("{:.4}:{:.2}:{:.2}"), int(d.y_), int(d.m_), int(d.d_));
+	co_await toStream(os, "{:.4}:{:.2}:{:.2}"_csv, int(d.y_), int(d.m_), int(d.d_));
 	co_return {};
 }
 
@@ -26,13 +26,13 @@ namespace Example {
 bzd::Async<bool> run()
 {
 	auto scope = co_await bzd::platform::out().getLock();
-	co_await toStream(bzd::platform::out(), CSTR("The answer is {}.\n"), 52);
+	co_await toStream(bzd::platform::out(), "The answer is {}.\n"_csv, 52);
 
 	const Date date{2020, 8, 4};
-	co_await toStream(bzd::platform::out(), CSTR("This date {} is {:.2%} true!\n{}\n"), date, 0.85, "Hello World!"_sv);
+	co_await toStream(bzd::platform::out(), "This date {} is {:.2%} true!\n{}\n"_csv, date, 0.85, "Hello World!"_sv);
 
 	bzd::String<128> str;
-	toString(str, CSTR("This date {}."), 12);
+	toString(str, "This date {}."_csv, 12);
 	std::cout << str.data() << std::endl;
 
 	co_return true;

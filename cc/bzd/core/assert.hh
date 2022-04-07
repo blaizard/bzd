@@ -125,6 +125,6 @@ constexpr void bzd::assert::isResult(const Result<T, E>& result, const bzd::Sour
 {
 	if (!result)
 	{
-		bzd::assert::isTrue(false, CSTR("Result failed: {}"), result.error(), location);
+		bzd::assert::isTrue(false, "Result failed: {}"_csv, result.error(), location);
 	}
 }

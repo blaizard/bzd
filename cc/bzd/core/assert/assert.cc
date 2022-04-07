@@ -11,11 +11,11 @@ void backend(const bzd::SourceLocation& location, const char* message1, const ch
 {
 	if (message2 == nullptr)
 	{
-		bzd::log::error(CSTR("{}"), message1, location).sync();
+		bzd::log::error("{}"_csv, message1, location).sync();
 	}
 	else
 	{
-		bzd::log::error(CSTR("{}{}"), message1, message2, location).sync();
+		bzd::log::error("{}{}"_csv, message1, message2, location).sync();
 	}
 	bzd::platform::panic();
 }

@@ -25,21 +25,21 @@ void Manager::failInternals(const char* const file, const int line, const char* 
 	auto scope = out.getLock().sync();
 
 	currentTestFailed_ = true;
-	::bzd::printNoLock(CSTR("[----------] {}"), file).sync();
+	::bzd::printNoLock("[----------] {}"_csv, file).sync();
 
 	if (line > -1)
 	{
-		::bzd::printNoLock(CSTR(":{}"), line).sync();
+		::bzd::printNoLock(":{}"_csv, line).sync();
 	}
 
-	::bzd::printNoLock(CSTR(": {}\n"), message).sync();
+	::bzd::printNoLock(": {}\n"_csv, message).sync();
 	if (actual)
 	{
-		::bzd::printNoLock(CSTR("Actual: {}\n"), actual).sync();
+		::bzd::printNoLock("Actual: {}\n"_csv, actual).sync();
 	}
 	if (expected)
 	{
-		::bzd::printNoLock(CSTR("Expected: {}\n"), expected).sync();
+		::bzd::printNoLock("Expected: {}\n"_csv, expected).sync();
 	}
 
 	::bzd::printNoLock("Assertion failed.\n").sync();
@@ -51,10 +51,10 @@ bool bzd::test::Manager::run()
 	bzd::SizeType nbFailedTests{0};
 	auto* test = testRoot;
 
-	::bzd::print(CSTR("[==========] Running test(s)\n")).sync();
+	::bzd::print("[==========] Running test(s)\n"_csv).sync();
 	if (!test)
 	{
-		::bzd::print(CSTR("[   FAILED ] Empty test suite is considered as a failed test.\n")).sync();
+		::bzd::print("[   FAILED ] Empty test suite is considered as a failed test.\n"_csv).sync();
 		return false;
 	}
 
@@ -63,7 +63,7 @@ bool bzd::test::Manager::run()
 		const auto seed = test->getSeed();
 		bzd::test::Context context{seed};
 
-		::bzd::print(CSTR("[ RUN      ] {}.{} (seed={})\n"), test->testCaseName_, test->testName_, seed).sync();
+		::bzd::print("[ RUN      ] {}.{} (seed={})\n"_csv, test->testCaseName_, test->testName_, seed).sync();
 		currentTestFailed_ = false;
 		const auto tickStart = clock.getTicks();
 		try
@@ -81,11 +81,11 @@ bool bzd::test::Manager::run()
 		if (currentTestFailed_)
 		{
 			++nbFailedTests;
-			::bzd::print(CSTR("[   FAILED ] ({}ms)\n"), clock.ticksToMs(tickDiff).get()).sync();
+			::bzd::print("[   FAILED ] ({}ms)\n"_csv, clock.ticksToMs(tickDiff).get()).sync();
 		}
 		else
 		{
-			::bzd::print(CSTR("[       OK ] ({}ms)\n"), clock.ticksToMs(tickDiff).get()).sync();
+			::bzd::print("[       OK ] ({}ms)\n"_csv, clock.ticksToMs(tickDiff).get()).sync();
 		}
 
 		test = test->next_;
@@ -100,7 +100,7 @@ bzd::Async<bool> run()
 	{
 		co_return true;
 	}
-	co_return ::bzd::error(::bzd::ErrorType::failure, CSTR("Test failed."));
+	co_return ::bzd::error(::bzd::ErrorType::failure, "Test failed."_csv);
 }
 
 } // namespace bzd::test
