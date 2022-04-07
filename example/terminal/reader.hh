@@ -29,9 +29,7 @@ public: // API.
 		while (true)
 		{
 			// Read some data from the input stream.
-			auto maybeResult = co_await produce();
-			ASSERT_ASYNC_RESULT(maybeResult);
-			auto result = bzd::move(maybeResult.value());
+			auto result = co_await produce().assert();
 
 			// Check if the special byte appear.
 			if (const auto pos = result.find(stop); pos != bzd::npos)
@@ -56,9 +54,7 @@ public: // API.
 		while (true)
 		{
 			// Read some data from the input stream.
-			auto maybeResult = co_await produce();
-			ASSERT_ASYNC_RESULT(maybeResult);
-			auto result = bzd::move(maybeResult.value());
+			const auto result = co_await produce().assert();
 
 			for (const auto c : result)
 			{
@@ -122,16 +118,13 @@ private:
 		{
 			co_return bzd::error(bzd::ErrorType::failure, "Ring buffer of {} bytes is full."_csv, buffer_.size());
 		}
-		auto maybeResult = co_await in_.read(span);
-		ASSERT_ASYNC_RESULT(maybeResult);
+		auto result = co_await in_.read(span).assert();
 
-		auto result = bzd::move(maybeResult.value());
 		buffer_.produce(result.size());
 
 		// Replace 'del' == 0x7f with '\b' <- back one char.
 		// Echo what is being typed
-		auto writeResult = co_await out_.write(result);
-		ASSERT_ASYNC_RESULT(writeResult);
+		co_await out_.write(result).assert();
 
 		co_return result;
 	}

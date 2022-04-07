@@ -16,7 +16,7 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/core/async",
         "//cc/bzd/test",
-        "//cc/bzd/utility:scope_guard"
+        "//cc/bzd/utility:scope_guard",
     ],
 )
 

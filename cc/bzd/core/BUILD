@@ -124,6 +124,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:named_type",
         "//cc/bzd/core:units",
+        "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
     ],
 )

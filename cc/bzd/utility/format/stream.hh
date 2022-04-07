@@ -201,21 +201,18 @@ bzd::Async<> toStream(bzd::OStream& stream, const T&, Args... args)
 
 inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::interface::String& str)
 {
-	auto result = co_await stream.write(str.asBytes());
-	ASSERT_ASYNC_RESULT(result);
+	co_await stream.write(str.asBytes()).assert();
 	co_return {};
 }
 
 inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::StringView str)
 {
-	auto result = co_await stream.write(str.asBytes());
-	ASSERT_ASYNC_RESULT(result);
+	co_await stream.write(str.asBytes()).assert();
 	co_return {};
 }
 
 inline bzd::Async<> toStream(bzd::OStream& stream, const char* const str)
 {
-	auto result = co_await stream.write(bzd::StringView{str}.asBytes());
-	ASSERT_ASYNC_RESULT(result);
+	co_await stream.write(bzd::StringView{str}.asBytes()).assert();
 	co_return {};
 }
