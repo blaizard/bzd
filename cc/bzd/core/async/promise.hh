@@ -78,8 +78,6 @@ public:
 
 	constexpr bool mustPropagateError() const noexcept { return !setError_.hasValue(); }
 
-	constexpr void setError(bzd::Error&& error) noexcept { setError_.value()(bzd::move(error)); }
-
 	/// Propagate the error to the first parent accepting errors and set the continuation
 	/// of this executable to this parent.
 	constexpr void propagateError(bzd::Error&& error) noexcept
@@ -89,14 +87,14 @@ public:
 		do
 		{
 			auto& continuation = executable->continuation_;
-			bzd::assert::isTrue(continuation.template is<Executable*>(), "Unhandled propagated error.");
+			bzd::assert::isTrue(continuation.template is<Executable*>() && continuation.template get<Executable*>(),
+								"Cannot propagate error on this type of async");
 			executable = continuation.template get<Executable*>();
-			bzd::assert::isTrue(executable, "Unhandled propagated error.");
 		} while (executable->mustPropagateError());
 		continuation_ = bzd::move(executable->continuation_);
 
 		// Set the error here
-		executable->setError(bzd::move(error));
+		executable->setError_.value()(bzd::move(error));
 	}
 
 private:
@@ -124,9 +122,9 @@ private:
 			auto& promise = handle.promise();
 
 			// Propagate the error if needed.
-			if (promise.hasErrorToPropagate())
+			if (auto error = promise.hasErrorToPropagate(); error.hasValue())
 			{
-				promise.propagateError(bzd::move(promise.error().valueMutable()));
+				promise.propagateError(bzd::move(error.valueMutable()));
 			}
 
 			// Enqueuing the continuation with the executor is important for thread
@@ -209,42 +207,40 @@ public:
 	/// Overload to support `co_return {};`.
 	constexpr void return_value(Empty) noexcept { result_.emplace(bzd::nullresult); }
 
+	constexpr bool isReady() const noexcept { return result_.hasValue(); }
+
+	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
+
 	/// Check if the result contains an error.
-	constexpr bool hasErrorToPropagate() const noexcept
+	bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
 	{
 		if (this->mustPropagateError())
 		{
 			if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
 			{
-				return (result_.hasValue() && result_.value().hasError());
+				if (result_.hasValue() && result_.value().hasError())
+				{
+					return bzd::move(result_.valueMutable().errorMutable());
+				}
 			}
 			else
 			{
-				bzd::assert::isTrue(false, "Only support normal async");
+				bzd::assert::isTrue(false, "This type of async is not supported");
 			}
 		}
 		// if constexpr (bzd::Tuple<bzd::Result<...>>) {}
-		return false;
-	}
-
-	bzd::Optional<bzd::Error> error() noexcept
-	{
-		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
-		{
-			return bzd::move(result_.valueMutable().errorMutable());
-		}
 		return bzd::nullopt;
 	}
-
-	constexpr bool isReady() const noexcept { return result_.hasValue(); }
-
-	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
 	{
 		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
 		{
 			result_ = bzd::error(bzd::move(error));
+		}
+		else
+		{
+			bzd::assert::isTrue(false, "This type of async is not supported");
 		}
 	}
 

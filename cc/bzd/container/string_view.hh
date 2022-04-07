@@ -2,11 +2,10 @@
 
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
+#include "cc/bzd/meta/range.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/utility/concept.hh"
-#include "cc/bzd/meta/range.hh"
-
 
 namespace bzd::impl {
 template <class T>
@@ -57,10 +56,11 @@ public:
 template <bzd::SizeType n>
 struct ConstexprStringViewArray
 {
-    template <bzd::SizeType... i>
-    constexpr ConstexprStringViewArray(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data{arr[i]..., '\0'} {}
-    constexpr ConstexprStringViewArray(char const(&arr)[n]) noexcept : ConstexprStringViewArray(arr, bzd::meta::Range<0, n>{})
-    {}
+	template <bzd::SizeType... i>
+	constexpr ConstexprStringViewArray(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data{arr[i]..., '\0'}
+	{
+	}
+	constexpr ConstexprStringViewArray(char const (&arr)[n]) noexcept : ConstexprStringViewArray(arr, bzd::meta::Range<0, n>{}) {}
 
 	const char data[n + 1];
 };

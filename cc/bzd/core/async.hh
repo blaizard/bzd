@@ -228,6 +228,7 @@ constexpr auto getExecutable() noexcept
 	return bzd::coroutine::impl::GetExecutable{};
 }
 
+/// Executes multiple asynchronous function according to the executor policy and return once all are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType> all(Asyncs&&... asyncs)
@@ -236,6 +237,7 @@ noexcept
 	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
+/// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType> any(Asyncs&&... asyncs)
