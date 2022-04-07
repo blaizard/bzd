@@ -28,7 +28,7 @@ public:
 	{
 		if (socket_ != -1)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("A socket is already opened."));
+			co_return bzd::error(ErrorType::failure, "A socket is already opened."_csv);
 		}
 
 		struct addrinfo hints
@@ -44,7 +44,7 @@ public:
 		struct addrinfo* addrs{nullptr};
 		if (const auto result = ::getaddrinfo(hostname.data(), portStr.data(), &hints, &addrs); result != 0)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("getaddrinfo for {}:{}"), hostname, portStr);
+			co_return bzd::error(ErrorType::failure, "getaddrinfo for {}:{}"_csv, hostname, portStr);
 		}
 
 		bzd::ScopeGuard scope{[&addrs]() { ::freeaddrinfo(addrs); }};
@@ -68,7 +68,7 @@ public:
 
 		if (socket_ == -1)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("Cannot resolve {}, errno {}"), hostname, errno);
+			co_return bzd::error(ErrorType::failure, "Cannot resolve {}, errno {}"_csv, hostname, errno);
 		}
 
 		co_return {};

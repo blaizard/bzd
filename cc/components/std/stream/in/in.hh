@@ -47,11 +47,11 @@ public: // API
 	{
 		if (!init_)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("No terminal."));
+			co_return bzd::error(ErrorType::failure, "No terminal."_csv);
 		}
 		if (data.size() == 0)
 		{
-			co_return bzd::error(ErrorType::failure, CSTR("Empty buffer passed to read(...)."));
+			co_return bzd::error(ErrorType::failure, "Empty buffer passed to read(...)."_csv);
 		}
 		while (true)
 		{
@@ -61,14 +61,14 @@ public: // API
 			const auto ret = ::poll(&fd, 1, 0);
 			if (ret < 0)
 			{
-				co_return bzd::error(ErrorType::failure, CSTR("Failed ::poll(...) with errno {}."), errno);
+				co_return bzd::error(ErrorType::failure, "Failed ::poll(...) with errno {}."_csv, errno);
 			}
 			if (ret > 0 && (fd.revents & POLLIN) != 0)
 			{
 				const auto size = ::read(STDIN_FILENO, data.data(), data.size());
 				if (size < 0)
 				{
-					co_return bzd::error(ErrorType::failure, CSTR("Failed ::read(...) with errno {}."), errno);
+					co_return bzd::error(ErrorType::failure, "Failed ::read(...) with errno {}."_csv, errno);
 				}
 				co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 			}

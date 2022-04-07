@@ -538,7 +538,7 @@ Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocat
 inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
 {
 	auto result =
-		co_await toStream(stream, CSTR("[origin:{}:{}] [{}] {}"), e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+		co_await toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
 	ASSERT_ASYNC_RESULT(result);
 	co_return {};
 }

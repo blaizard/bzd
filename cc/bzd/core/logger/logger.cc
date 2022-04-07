@@ -52,7 +52,7 @@ bzd::Async<> toStream(bzd::OStream& os, const Date& d)
 	// const auto d = bzd::units::Day{d.ms_}.get() % ;
 	// const auto m = bzd::units::Hour{d.ms_}.get() % 24;
 	// const auto y = bzd::units::Hour{d.ms_}.get() % 24;
-	co_await bzd::format::toStream(os, CSTR("{:.2}:{:.2}:{:.2}.{:.4}"), int(h), int(min), int(s), int(ms));
+	co_await bzd::format::toStream(os, "{:.2}:{:.2}:{:.2}.{:.4}"_csv, int(h), int(min), int(s), int(ms));
 	co_return {};
 }
 */
@@ -64,7 +64,7 @@ bzd::Async<> bzd::Logger::printHeader(const bzd::log::Level level, const SourceL
 	/*	const auto ms = bzd::platform::systemClock().getMs();
 
 		const Date date{ms};*/
-	co_await toStream(backend, CSTR("{} [{}:{}] "), levelToStr(level), location.getFileName(), location.getLine());
+	co_await toStream(backend, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine());
 	co_return {};
 }
 

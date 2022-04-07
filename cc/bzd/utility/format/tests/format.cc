@@ -153,35 +153,35 @@ void expectStringStreamFormat(const char* expected, Args&&... args)
 
 TEST(Format_, StreamStringFormat)
 {
-	expectStringStreamFormat<256>("Hello 12", CSTR("Hello {:d}"), 12);
-	expectStringStreamFormat<256>("Hello -89 12", CSTR("Hello {1} {0:d}"), 12, -89);
-	expectStringStreamFormat<256>("Hello 12.45", CSTR("Hello {:f}"), 12.45);
-	expectStringStreamFormat<256>("Hello 12.5", CSTR("Hello {:.1f}"), 12.45);
-	expectStringStreamFormat<256>("Hello 15.%", CSTR("Hello {:%}"), 0.15);
-	expectStringStreamFormat<256>("Hello World", CSTR("Hello {}"), "World");
-	expectStringStreamFormat<256>("Hello Wo", CSTR("Hello {:.2}"), "World");
-	expectStringStreamFormat<256>("This milk is 3.5%", CSTR("This {1} is {0:.1%}"), 0.0349, "milk");
-	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", CSTR("{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"), 42);
-	expectStringStreamFormat<256>("Pointer 0x1234", CSTR("Pointer {}"), reinterpret_cast<const void*>(0x1234));
+	expectStringStreamFormat<256>("Hello 12", "Hello {:d}"_csv, 12);
+	expectStringStreamFormat<256>("Hello -89 12", "Hello {1} {0:d}"_csv, 12, -89);
+	expectStringStreamFormat<256>("Hello 12.45", "Hello {:f}"_csv, 12.45);
+	expectStringStreamFormat<256>("Hello 12.5", "Hello {:.1f}"_csv, 12.45);
+	expectStringStreamFormat<256>("Hello 15.%", "Hello {:%}"_csv, 0.15);
+	expectStringStreamFormat<256>("Hello World", "Hello {}"_csv, "World");
+	expectStringStreamFormat<256>("Hello Wo", "Hello {:.2}"_csv, "World");
+	expectStringStreamFormat<256>("This milk is 3.5%", "This {1} is {0:.1%}"_csv, 0.0349, "milk");
+	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", "{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"_csv, 42);
+	expectStringStreamFormat<256>("Pointer 0x1234", "Pointer {}"_csv, reinterpret_cast<const void*>(0x1234));
 }
 
 TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
 {
 	{
 		bzd::String<128> str;
-		toString(str, CSTR("Hello World"));
+		toString(str, "Hello World"_csv);
 		EXPECT_STREQ(str.data(), "Hello World");
 	}
 
 	{
 		bzd::String<128> str;
-		toString(str, CSTR("Hello {}"), "World");
+		toString(str, "Hello {}"_csv, "World");
 		EXPECT_STREQ(str.data(), "Hello World");
 	}
 
 	{
 		bzd::String<128> str;
-		toString(str, CSTR("Hello {}"), 12);
+		toString(str, "Hello {}"_csv, 12);
 		EXPECT_STREQ(str.data(), "Hello 12");
 	}
 }

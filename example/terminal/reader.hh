@@ -91,7 +91,7 @@ public: // API.
 				// Print the result
 				if (first == last)
 				{
-					co_return bzd::error(bzd::ErrorType::failure, CSTR("No match."));
+					co_return bzd::error(bzd::ErrorType::failure, "No match."_csv);
 				}
 				else if (bzd::distance(first, last) == 1 && first->first.size() == index)
 				{
@@ -120,7 +120,7 @@ private:
 		auto span = buffer_.asSpanForWriting();
 		if (span.empty())
 		{
-			co_return bzd::error(bzd::ErrorType::failure, CSTR("Ring buffer of {} bytes is full."), buffer_.size());
+			co_return bzd::error(bzd::ErrorType::failure, "Ring buffer of {} bytes is full."_csv, buffer_.size());
 		}
 		auto maybeResult = co_await in_.read(span);
 		ASSERT_ASYNC_RESULT(maybeResult);

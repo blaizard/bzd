@@ -5,6 +5,8 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/utility/concept.hh"
+#include "cc/bzd/meta/range.hh"
+
 
 namespace bzd::impl {
 template <class T>
@@ -50,12 +52,25 @@ public:
 
 	constexpr void clear() noexcept { removePrefix(this->size()); }
 };
+
+/// Type used by the compile time string view type.
+template <bzd::SizeType n>
+struct ConstexprStringViewArray
+{
+    template <bzd::SizeType... i>
+    constexpr ConstexprStringViewArray(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data{arr[i]..., '\0'} {}
+    constexpr ConstexprStringViewArray(char const(&arr)[n]) noexcept : ConstexprStringViewArray(arr, bzd::meta::Range<0, n>{})
+    {}
+
+	const char data[n + 1];
+};
+
 } // namespace bzd::impl
 
 namespace bzd {
 using StringView = impl::StringView<const char>;
 
-/// Base class for constant StringView from CSTR(...)
+/// Base class for constant StringView from operator""_csv
 struct ConstexprStringView
 {
 };
@@ -69,16 +84,19 @@ concept constexprStringView = typeTraits::isBaseOf<ConstexprStringView, T>;
 
 }
 
+/// Operator to create a string view out of a string
 constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noexcept
 {
 	return bzd::StringView{str, size};
 }
 
-#define CSTR(strLiteral)                                                                                  \
-	[] {                                                                                                  \
-		struct StrView : ::bzd::ConstexprStringView                                                       \
-		{                                                                                                 \
-			static constexpr auto value() { return bzd::StringView(strLiteral, sizeof(strLiteral) - 1); } \
-		};                                                                                                \
-		return StrView{};                                                                                 \
-	}()
+/// Operator to create a compile time string view out of a string.
+template <bzd::impl::ConstexprStringViewArray str>
+constexpr auto operator""_csv() noexcept
+{
+	struct StrView : ::bzd::ConstexprStringView
+	{
+		[[nodiscard]] static constexpr const char* value() noexcept { return str.data; }
+	};
+	return StrView{};
+}
