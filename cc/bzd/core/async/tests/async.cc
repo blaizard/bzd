@@ -3,6 +3,7 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/format/integral.hh"
+#include "cc/bzd/utility/scope_guard.hh"
 
 namespace {
 void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkpoint)
@@ -252,7 +253,6 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 		[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
 		EXPECT_EQ(trace, "[d1][a6][d0][d2]");
 	}
-
 	{
 		bzd::String<128> trace;
 		auto promiseA = anyNested(trace, "d");
@@ -262,6 +262,36 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 		[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::move(promiseAnyA), bzd::move(promiseC));
 		EXPECT_EQ(trace, "[c1][d6][a6][c0][c2]");
 	}
+
+	co_return {};
+}
+
+bzd::Async<> asyncDestroyMonitor(bzd::interface::String& trace, bzd::StringView id, bzd::SizeType& destroyedCounter)
+{
+	bzd::ScopeGuard scope{[&destroyedCounter]() {
+		++destroyedCounter;
+	}};
+	appendToTrace(trace, id, 0);
+	co_await bzd::async::yield();
+	appendToTrace(trace, id, 1);
+	co_await bzd::async::yield();
+	appendToTrace(trace, id, 2);
+	co_await bzd::async::yield();
+	appendToTrace(trace, id, 3);
+
+	co_return {};
+}
+
+TEST_ASYNC(Coroutine, asyncAnyDestroy)
+{
+	bzd::String<128> trace;
+	bzd::SizeType destroyedCounter{0U};
+	auto promiseA = yieldLoop(trace, "a", 2);
+	auto promiseB = asyncDestroyMonitor(trace, "b", destroyedCounter);
+	[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	EXPECT_EQ(trace, "[a0][b0][a0][b1]");
+	EXPECT_EQ(destroyedCounter, 1U);
 
 	co_return {};
 }
