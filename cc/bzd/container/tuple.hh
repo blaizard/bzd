@@ -1,5 +1,8 @@
 #pragma once
 
+#include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/reference_wrapper.hh"
+#include "cc/bzd/container/variant.hh"
 #include "cc/bzd/meta/choose_nth.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
@@ -137,6 +140,23 @@ public: // API
 	{
 		return Elem<M>::get();
 	}
+
+public: // Iterator.
+	// TODO implement tuple iterator, similar to what is done here:
+	// - https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
+	// - https://www.foonathan.net/2017/03/tuple-iterator/
+	using IteratorValueType = bzd::Variant<bzd::ReferenceWrapper<T>...>;
+	template <bzd::SizeType... indexes>
+	struct RuntimeAccess
+	{
+		template <bzd::SizeType index>
+		static constexpr IteratorValueType accessor(Self& tuple)
+		{
+			return tuple.template get<index>();
+		}
+		using AccessorPtr = IteratorValueType (*)(Self&);
+		static constexpr bzd::Array<AccessorPtr, sizeof...(indexes)> lookupTable{&accessor<indexes>...};
+	};
 };
 } // namespace bzd::impl
 

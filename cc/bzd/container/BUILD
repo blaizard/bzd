@@ -301,7 +301,6 @@ cc_library(
         ":string",
         ":string_view",
         "//cc/bzd/core:channel",
-        "//cc/bzd/meta:range",
     ],
 )
 
@@ -314,6 +313,7 @@ cc_library(
     deps = [
         ":span",
         "//cc/bzd/container/storage:non_owning",
+        "//cc/bzd/meta:range",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/utility:concept",
@@ -343,6 +343,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":array",
+        ":reference_wrapper",
+        ":variant",
         "//cc/bzd/meta:choose_nth",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:enable_if",

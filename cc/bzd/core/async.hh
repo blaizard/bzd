@@ -76,6 +76,7 @@ public:
 		return nullopt;
 	}
 
+	template <bzd::Int32Type index = 0>
 	constexpr auto assert()
 	{
 		class AsyncPropagate : public impl::Async<T>
