@@ -17,7 +17,7 @@ TEST(ContainerVariant, Constructor)
 	bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
 	EXPECT_EQ(variantDouble.index(), 2);
 	bzd::Variant<bzd::test::NoDefaultConstructor, bool, double> variantNoDefault{static_cast<double>(5.4)};
-	EXPECT_EQ(variantNoDefault.index(), 2);
+	EXPECT_EQ(variantNoDefault.index(), 2)
 
 	// In place constructors
 	{
@@ -25,6 +25,34 @@ TEST(ContainerVariant, Constructor)
 		EXPECT_EQ(variantInPlaceIndex1.index(), 2);
 		bzd::Variant<int, bool, double> variantInPlaceType1{bzd::inPlaceType<int>, 3};
 		EXPECT_EQ(variantInPlaceType1.index(), 0);
+	}
+}
+
+TEST(ContainerVariant, Reference)
+{
+	{
+		double value{12};
+		bzd::Variant<int&, bool&, double&> variantReference{bzd::inPlaceIndex<2>, value};
+		EXPECT_EQ(variantReference.index(), 2);
+		EXPECT_EQ(variantReference.template get<double&>(), 12);
+		value = 3;
+		EXPECT_EQ(variantReference.template get<double&>(), 3);
+		int valueInt{65};
+		variantReference.template set<int&>(valueInt);
+		EXPECT_EQ(variantReference.index(), 0);
+		EXPECT_EQ(variantReference.template get<int&>(), 65);
+		valueInt = -3;
+		EXPECT_EQ(variantReference.template get<int&>(), -3);
+		variantReference.match([](int& v) { v = 5; }, [](bool&) {}, [](double&) {});
+		EXPECT_EQ(variantReference.template get<int&>(), 5);
+	}
+	{
+		int value{12};
+		bzd::Variant<int&, bool&, double&> variantReference{bzd::inPlaceType<int&>, value};
+		EXPECT_EQ(variantReference.index(), 0);
+		EXPECT_EQ(variantReference.template get<int&>(), 12);
+		value = 3;
+		EXPECT_EQ(variantReference.template get<int&>(), 3);
 	}
 }
 
@@ -416,6 +444,18 @@ TEST(ContainerVariant, Match)
 		variant.match([&](int) { isHandled = true; });
 		EXPECT_TRUE(isHandled);
 	}
+}
+
+TEST(ContainerVariant, Emplace)
+{
+	bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
+	EXPECT_EQ(variant.index(), 2);
+	// By type
+	variant.emplace<int>(5);
+	EXPECT_EQ(variant.index(), 0);
+	// By index
+	variant.emplace<1>(false);
+	EXPECT_EQ(variant.index(), 1);
 }
 
 TEST_CONSTEXPR_BEGIN(ContainerVariant, Constexpr)
