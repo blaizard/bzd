@@ -219,11 +219,29 @@ public: // Functions
 		return data_.template get<StorageType<T>>();
 	}
 
+	template <bzd::SizeType index>
+	[[nodiscard]] constexpr const ChooseNth<index>& get() const noexcept
+	{
+		return get<ChooseNth<index>>();
+	}
+
+	template <bzd::SizeType index>
+	[[nodiscard]] constexpr ChooseNth<index>& get() noexcept
+	{
+		return get<ChooseNth<index>>();
+	}
+
 	template <class T, class U>
 	constexpr void set(U&& value) noexcept
 	{
 		id_ = Find<T>::value;
 		data_.template set<StorageType<T>>(bzd::forward<U>(value));
+	}
+
+	template <bzd::SizeType index, class U>
+	constexpr void set(U&& value) noexcept
+	{
+		set<ChooseNth<index>>(bzd::forward<U>(value));
 	}
 
 	template <class... Functors>
