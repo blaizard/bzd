@@ -446,6 +446,19 @@ TEST(ContainerVariant, Match)
 	}
 }
 
+TEST(ContainerVariant, GetSet)
+{
+	bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
+	// By type
+	variant.set<bool>(false);
+	EXPECT_EQ(variant.index(), 1);
+	EXPECT_EQ(variant.get<bool>(), false);
+	// By index
+	variant.set<0>(7);
+	EXPECT_EQ(variant.index(), 0);
+	EXPECT_EQ(variant.get<0>(), 7);
+}
+
 TEST(ContainerVariant, Emplace)
 {
 	bzd::Variant<int, bool, double> variant(static_cast<double>(5.6));
