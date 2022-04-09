@@ -214,7 +214,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":reference_wrapper",
         "//cc/bzd/container:variant",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",

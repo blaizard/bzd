@@ -156,8 +156,8 @@ public: // Constructors
 	}
 
 	/// Value constructor, in place index constructor.
-	template <SizeType I, class... Args>
-	constexpr VariantBase(InPlaceIndex<I>, Args&&... args) noexcept : id_{I}, data_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	template <SizeType index, class... Args>
+	constexpr VariantBase(InPlaceIndex<index>, Args&&... args) noexcept : id_{index}, data_{inPlaceIndex<index>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -188,7 +188,7 @@ public: // Functions
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		// Using placement new
-		::new (&(data_.template get<StorageType<T>>())) T{bzd::forward<Args>(args)...};
+		::new (&(data_.template get<StorageType<T>>())) StorageType<T>{bzd::forward<Args>(args)...};
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
 	}
@@ -446,7 +446,7 @@ protected:
 	template <class T>
 	struct VariantDestructor
 	{
-		static void call(Self* self) noexcept { self->data_.template get<StorageType<T>>().~T(); }
+		static void call(Self* self) noexcept { self->data_.template get<StorageType<T>>().~StorageType<T>(); }
 	};
 	using Destructor = Helper<VariantDestructor, Self*>;
 

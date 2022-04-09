@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
@@ -62,12 +61,12 @@ class Result
 public: // Traits
 	static constexpr bool isValueVoid = bzd::typeTraits::isSame<T, void>;
 	static constexpr bool isValueReference = bzd::typeTraits::isReference<T>;
+	// The container type for the value.
+	using ValueContainer = bzd::typeTraits::Conditional<isValueVoid, void*, T>;
 	// Value type returned.
-	using Value = bzd::typeTraits::Conditional<isValueVoid, void*, bzd::typeTraits::RemoveReference<T>>;
+	using Value = bzd::typeTraits::RemoveReference<ValueContainer>;
 	// Error type returned.
 	using Error = bzd::typeTraits::RemoveReference<E>;
-	// The container type for the value.
-	using ValueContainer = bzd::typeTraits::Conditional<isValueReference, bzd::ReferenceWrapper<T>, Value>;
 	// The container typr for the error.
 	using ErrorContainer = impl::Error<Error>;
 	// The current type.
