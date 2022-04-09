@@ -130,3 +130,14 @@ TEST(ContainerTuple, Move)
 	EXPECT_EQ(tupleMove2.get<1>(), 'a');
 	EXPECT_EQ(tupleMove2.get<2>().value, 3);
 }
+
+TEST(ContainerTuple, Iterator)
+{
+	bzd::Tuple<unsigned int, bool, double, int, const char*> tuple{bzd::inPlace, 12u, true, 5.32, -21, "Hello"};
+
+	auto it = tuple.begin();
+
+	unsigned int value{0};
+	(*it).match([&value](bzd::ReferenceWrapper<unsigned int> v) { value = v; }, [](auto&) {});
+	EXPECT_EQ(value, 12u);
+}

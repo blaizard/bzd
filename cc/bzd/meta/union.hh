@@ -60,17 +60,10 @@ public:
 	}
 
 	// Value assignments (copy/move).
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	template <class U>
 	constexpr Self& operator=(U&& value) noexcept
 	{
-		next_ = bzd::forward<U>(value);
-		return *this;
-	}
-
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	constexpr Self& operator=(U&& value) noexcept
-	{
-		value_ = bzd::forward<U>(value);
+		set<bzd::typeTraits::RemoveReference<U>>(bzd::forward<U>(value));
 		return *this;
 	}
 
@@ -96,6 +89,18 @@ public:
 	constexpr const U& get() const noexcept
 	{
 		return value_;
+	}
+
+	template <class U, class V, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr void set(V&& value) noexcept
+	{
+		next_.template set<U>(bzd::forward<V>(value));
+	}
+
+	template <class U, class V, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr void set(V&& value) noexcept
+	{
+		value_ = bzd::forward<V>(value);
 	}
 
 protected:
@@ -151,17 +156,10 @@ public:
 	}
 
 	// Value assignments (copy/move).
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
+	template <class U>
 	constexpr Self& operator=(U&& value) noexcept
 	{
-		next_ = bzd::forward<U>(value);
-		return *this;
-	}
-
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	constexpr Self& operator=(U&& value) noexcept
-	{
-		value_ = bzd::forward<U>(value);
+		set<bzd::typeTraits::RemoveReference<U>>(bzd::forward<U>(value));
 		return *this;
 	}
 
@@ -187,6 +185,18 @@ public:
 	constexpr const U& get() const noexcept
 	{
 		return value_;
+	}
+
+	template <class U, class V, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr void set(V&& value) noexcept
+	{
+		next_.template set<U>(bzd::forward<V>(value));
+	}
+
+	template <class U, class V, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
+	constexpr void set(V&& value) noexcept
+	{
+		value_ = bzd::forward<V>(value);
 	}
 
 protected:

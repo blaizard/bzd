@@ -7,6 +7,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
@@ -145,18 +146,44 @@ public: // Iterator.
 	// TODO implement tuple iterator, similar to what is done here:
 	// - https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
 	// - https://www.foonathan.net/2017/03/tuple-iterator/
-	using IteratorValueType = bzd::Variant<bzd::ReferenceWrapper<T>...>;
-	template <bzd::SizeType... indexes>
-	struct RuntimeAccess
+	template <class ContainerType>
+	class Iterator
 	{
-		template <bzd::SizeType index>
-		static constexpr IteratorValueType accessor(Self& tuple)
+	public: // Traits
+		using Self = Iterator;
+		using Category = typeTraits::ForwardTag;
+		using IndexType = bzd::SizeType;
+		using DifferenceType = bzd::Int32Type;
+		using ValueType = bzd::Variant<bzd::monostate, bzd::ReferenceWrapper<T>...>;
+
+	private:
+		template <bzd::SizeType current = 0>
+		constexpr void updateValue() noexcept
 		{
-			return tuple.template get<index>();
+			if (index_ == current)
+			{
+				value_.template emplace<current + 1>(tuple_.template get<current>());
+				return;
+			}
+			if constexpr (current + 1 < sizeof...(T))
+			{
+				updateValue<current + 1>();
+			}
 		}
-		using AccessorPtr = IteratorValueType (*)(Self&);
-		static constexpr bzd::Array<AccessorPtr, sizeof...(indexes)> lookupTable{&accessor<indexes>...};
+
+	public:
+		constexpr Iterator(ContainerType& tuple, const bzd::SizeType index) noexcept : tuple_{tuple}, index_{index} { updateValue(); }
+
+		[[nodiscard]] constexpr ValueType& operator*() noexcept { return value_; }
+		[[nodiscard]] constexpr ValueType* operator->() noexcept { return &value_; }
+
+	private:
+		ContainerType& tuple_;
+		bzd::SizeType index_;
+		ValueType value_{};
 	};
+
+	[[nodiscard]] constexpr Iterator<Self> begin() noexcept { return {*this, 0}; }
 };
 } // namespace bzd::impl
 

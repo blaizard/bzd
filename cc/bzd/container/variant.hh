@@ -1,9 +1,11 @@
 #pragma once
 
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
@@ -35,7 +37,8 @@ protected:
 	// Search for T in the list
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
-
+	template <class T>
+	using StorageType = typeTraits::Conditional<typeTraits::isReference<T>, bzd::ReferenceWrapper<typeTraits::RemoveReference<T>>, T>;
 	// Helper
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
 	struct HelperT
@@ -100,7 +103,7 @@ protected:
 		template <class SelfType, class V>
 		static constexpr auto call(SelfType& self, V& visitor) noexcept
 		{
-			return visitor(self.data_.template get<T>());
+			return visitor(self.data_.template get<StorageType<T>>());
 		}
 	};
 	template <class V, class SelfType>
@@ -161,7 +164,7 @@ public: // Constructors
 	/// Value constructor, in place type constructor.
 	template <class T, class... Args>
 	constexpr VariantBase(InPlaceType<T>, Args&&... args) noexcept :
-		id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{inPlaceType<T>, bzd::forward<Args>(args)...}
+		id_{Find<T>::value}, data_{inPlaceType<StorageType<T>>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -185,9 +188,15 @@ public: // Functions
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		// Using placement new
-		::new (&(data_.template get<T>())) T{bzd::forward<Args>(args)...};
+		::new (&(data_.template get<StorageType<T>>())) T{bzd::forward<Args>(args)...};
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
+	}
+
+	template <bzd::SizeType index, class... Args>
+	constexpr void emplace(Args&&... args) noexcept
+	{
+		emplace<ChooseNth<index>>(bzd::forward<Args>(args)...);
 	}
 
 	[[nodiscard]] constexpr IndexType index() const noexcept { return id_; }
@@ -201,20 +210,20 @@ public: // Functions
 	template <class T>
 	[[nodiscard]] constexpr const T& get() const noexcept
 	{
-		return data_.template get<T>();
+		return data_.template get<StorageType<T>>();
 	}
 
 	template <class T>
 	[[nodiscard]] constexpr T& get() noexcept
 	{
-		return data_.template get<T>();
+		return data_.template get<StorageType<T>>();
 	}
 
-	template <class T>
-	constexpr void set(T&& value) noexcept
+	template <class T, class U>
+	constexpr void set(U&& value) noexcept
 	{
-		id_ = Find<bzd::typeTraits::RemoveReference<T>>::value;
-		data_ = bzd::forward<T>(value);
+		id_ = Find<T>::value;
+		data_.template set<StorageType<T>>(bzd::forward<U>(value));
 	}
 
 	template <class... Functors>
@@ -239,7 +248,7 @@ protected:
 	// copy constructor (12.8), move constructor (12.8), copy assignment operator (12.8), move assignment
 	// operator (12.8), or destructor (12.4), the corresponding member function of the union must be user-provided
 	// or it will be implicitly deleted (8.4.3) for the union. —end note ]
-	bzd::meta::Union<Ts...> data_{};
+	bzd::meta::Union<StorageType<Ts>...> data_{};
 };
 
 // Copy constructible ---------------------------------------------------------
@@ -385,7 +394,7 @@ public: // Traits
 	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
 	constexpr Self& operator=(T&& value) noexcept
 	{
-		this->set(bzd::forward<T>(value));
+		this->template set<typeTraits::RemoveReference<T>>(bzd::forward<T>(value));
 		return *this;
 	}
 };
@@ -410,13 +419,16 @@ protected:
 	// Helper class
 	template <template <class> class F, class... Args>
 	using Helper = typename Parent::template Helper<F, Args...>;
+	// Define the storage type
+	template <class T>
+	using StorageType = typename Parent::template StorageType<T>;
 
 protected:
 	// Destructor
 	template <class T>
 	struct VariantDestructor
 	{
-		static void call(Self* self) noexcept { self->data_.template get<T>().~T(); }
+		static void call(Self* self) noexcept { self->data_.template get<StorageType<T>>().~T(); }
 	};
 	using Destructor = Helper<VariantDestructor, Self*>;
 
@@ -443,7 +455,7 @@ public:
 		}
 		else
 		{
-			this->set(bzd::forward<T>(other));
+			this->template set<typeTraits::RemoveReference<T>>(bzd::forward<T>(other));
 		}
 		return *this;
 	}
@@ -453,6 +465,12 @@ public:
 	{
 		destructIfNeeded();
 		Parent::template emplace<T>(bzd::forward<Args>(args)...);
+	}
+
+	template <bzd::SizeType index, class... Args>
+	constexpr void emplace(Args&&... args) noexcept
+	{
+		emplace<ChooseNth<index>>(bzd::forward<Args>(args)...);
 	}
 
 	~VariantNonTrivial() noexcept { destructIfNeeded(); }
