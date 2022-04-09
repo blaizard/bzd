@@ -45,6 +45,11 @@ TEST(ContainerVariant, Reference)
 		EXPECT_EQ(variantReference.template get<int&>(), -3);
 		variantReference.match([](int& v) { v = 5; }, [](bool&) {}, [](double&) {});
 		EXPECT_EQ(variantReference.template get<int&>(), 5);
+
+		bzd::Variant<int&, bool&, double&> variantReferenceMove{bzd::move(variantReference)};
+		EXPECT_EQ(variantReferenceMove.template get<int&>(), 5);
+		valueInt = -3;
+		EXPECT_EQ(variantReferenceMove.template get<int&>(), -3);
 	}
 	{
 		int value{12};
