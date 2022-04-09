@@ -190,6 +190,8 @@ public:
 	using Self = Promise<T>;
 	using ResultType = T;
 	using impl::Promise<Promise<T>>::Promise;
+	static constexpr BoolType resultTypeIsResult = concepts::sameTemplate<ResultType, bzd::Result>;
+	static constexpr BoolType resultTypeIsTuple = concepts::sameTemplate<ResultType, bzd::Tuple>;
 
 	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 
@@ -216,12 +218,15 @@ public:
 	{
 		if (this->mustPropagateError())
 		{
-			if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+			if constexpr (resultTypeIsResult)
 			{
 				if (result_.hasValue() && result_.value().hasError())
 				{
 					return bzd::move(result_.valueMutable().errorMutable());
 				}
+			}
+			else if constexpr (resultTypeIsTuple)
+			{
 			}
 			else
 			{
@@ -234,7 +239,7 @@ public:
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
 	{
-		if constexpr (concepts::sameTemplate<ResultType, bzd::Result>)
+		if constexpr (resultTypeIsResult)
 		{
 			result_ = bzd::error(bzd::move(error));
 		}
