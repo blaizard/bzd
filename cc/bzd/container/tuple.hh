@@ -8,6 +8,7 @@
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
@@ -154,7 +155,7 @@ public: // Iterator.
 		using Category = typeTraits::ForwardTag;
 		using IndexType = bzd::SizeType;
 		using DifferenceType = bzd::Int32Type;
-		using ValueType = bzd::Variant<bzd::monostate, bzd::ReferenceWrapper<T>...>;
+		using ValueType = bzd::Variant<bzd::monostate, bzd::typeTraits::AddReference<T>...>;
 
 	private:
 		template <bzd::SizeType current = 0>
@@ -163,9 +164,8 @@ public: // Iterator.
 			if (index_ == current)
 			{
 				value_.template emplace<current + 1>(tuple_.template get<current>());
-				return;
 			}
-			if constexpr (current + 1 < sizeof...(T))
+			else if constexpr (current + 1 < sizeof...(T))
 			{
 				updateValue<current + 1>();
 			}

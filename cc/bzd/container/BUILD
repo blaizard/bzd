@@ -353,6 +353,7 @@ cc_library(
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",
+        "//cc/bzd/type_traits:add_reference"
     ],
 )
 
@@ -369,6 +370,8 @@ cc_library(
         "//cc/bzd/meta:union",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_reference",
+        "//cc/bzd/type_traits:is_const",
+        "//cc/bzd/type_traits:add_reference",
         "//cc/bzd/type_traits:is_trivially_copy_assignable",
         "//cc/bzd/type_traits:is_trivially_copy_constructible",
         "//cc/bzd/type_traits:is_trivially_destructible",

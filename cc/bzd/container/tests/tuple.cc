@@ -138,6 +138,6 @@ TEST(ContainerTuple, Iterator)
 	auto it = tuple.begin();
 
 	unsigned int value{0};
-	(*it).match([&value](bzd::ReferenceWrapper<unsigned int> v) { value = v; }, [](auto&) {});
+	(*it).match([&value](unsigned int& v) { value = v; }, [](auto&) {});
 	EXPECT_EQ(value, 12u);
 }

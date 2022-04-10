@@ -449,6 +449,13 @@ TEST(ContainerVariant, Match)
 		variant.match([&](int) { isHandled = true; });
 		EXPECT_TRUE(isHandled);
 	}
+	// Reference
+	{
+		double original = 5.6;
+		bzd::Variant<int, bool, double&> variant(bzd::inPlaceType<double&>, original);
+		variant.match([](const int) {}, [](const bool) {}, [](double& a) { a = 3.14; });
+		EXPECT_NEAR(original, 3.14, 0.001);
+	}
 }
 
 TEST(ContainerVariant, GetSet)

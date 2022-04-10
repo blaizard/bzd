@@ -6,11 +6,13 @@
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
+#include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/is_trivially_move_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_move_constructible.hh"
+#include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
@@ -103,7 +105,8 @@ protected:
 		template <class SelfType, class V>
 		static constexpr auto call(SelfType& self, V& visitor) noexcept
 		{
-			return visitor(self.data_.template get<StorageType<T>>());
+			using ReturnedType = bzd::typeTraits::AddReference<bzd::typeTraits::Conditional<bzd::typeTraits::isConst<SelfType>, const T, T>>;
+			return visitor(static_cast<ReturnedType>(self.data_.template get<StorageType<T>>()));
 		}
 	};
 	template <class V, class SelfType>
