@@ -5,14 +5,14 @@
 #include "cc/bzd/meta/type_list.hh"
 #include "cc/bzd/meta/union.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/is_reference.hh"
+#include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/is_trivially_move_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_move_constructible.hh"
-#include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
@@ -105,7 +105,8 @@ protected:
 		template <class SelfType, class V>
 		static constexpr auto call(SelfType& self, V& visitor) noexcept
 		{
-			using ReturnedType = bzd::typeTraits::AddReference<bzd::typeTraits::Conditional<bzd::typeTraits::isConst<SelfType>, const T, T>>;
+			using ReturnedType =
+				bzd::typeTraits::AddReference<bzd::typeTraits::Conditional<bzd::typeTraits::isConst<SelfType>, const T, T>>;
 			return visitor(static_cast<ReturnedType>(self.data_.template get<StorageType<T>>()));
 		}
 	};
@@ -160,7 +161,8 @@ public: // Constructors
 
 	/// Value constructor, in place index constructor.
 	template <SizeType index, class... Args>
-	constexpr VariantBase(InPlaceIndex<index>, Args&&... args) noexcept : id_{index}, data_{inPlaceIndex<index>, bzd::forward<Args>(args)...}
+	constexpr VariantBase(InPlaceIndex<index>, Args&&... args) noexcept :
+		id_{index}, data_{inPlaceIndex<index>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -352,6 +354,9 @@ class VariantNonTriviallyMoveConstructible : public VariantCopyConstructible<Ts.
 public: // Traits
 	using Self = VariantNonTriviallyMoveConstructible<Ts...>;
 	using Parent = VariantCopyConstructible<Ts...>;
+	// Define the storage type
+	template <class T>
+	using StorageType = typename Parent::template StorageType<T>;
 
 protected:
 	// Move constructor visitor
@@ -361,7 +366,8 @@ protected:
 		template <class T, class SelfType>
 		constexpr void operator()(SelfType& self) noexcept
 		{
-			self.template emplace<T>(bzd::move(variant_.template get<T>()));
+			// Move the actual stored type, this is important to handle move of references.
+			self.template emplace<T>(bzd::move(variant_.data_.template get<StorageType<T>>()));
 		}
 
 	private:
