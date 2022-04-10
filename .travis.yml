@@ -40,7 +40,7 @@ jobs:
     - name: Sanitizer
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - travis_wait ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan
+      - ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan
 
     - name: Sanitizer Script
       script:
