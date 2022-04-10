@@ -32,7 +32,7 @@ class Optional
 public:
 	using Self = Optional<T>;
 	using Value = bzd::typeTraits::RemoveReference<T>;
-	using ValueContainer = bzd::typeTraits::Conditional<bzd::typeTraits::isReference<T>, bzd::ReferenceWrapper<T>, T>;
+	using ValueContainer = T;
 	template <class U>
 	using IsSelf = bzd::typeTraits::IsSame<bzd::typeTraits::Decay<U>, Self>;
 
