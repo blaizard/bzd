@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
 #include "cc/bzd/utility/random/xorwow_engine.hh"
@@ -200,147 +201,67 @@ template <class T>
 class Value
 {
 public:
-	constexpr Value(const T& value) { valueToString(buffer_, value); }
+	constexpr Value(const T& value) { valueToString(value); }
 
 	template <class U>
 	constexpr Value(U&& value) // NOLINT(bugprone-forwarding-reference-overload)
 	{
-		valueToString(buffer_, value);
+		valueToString(value);
 	}
 
-	constexpr const char* valueToString() const { return buffer_; }
+	constexpr const char* valueToString() const { return string_.data(); }
 
 private:
 	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
 
-	char* valueToString(char* pBuffer, short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, unsigned short value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, unsigned int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, unsigned long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, unsigned long long int value) { return valueToString(pBuffer, static_cast<long long int>(value)); }
-	char* valueToString(char* pBuffer, long long int value, const int base = 10)
-	{
-		constexpr char digitToChar[] = "0123456789abcdef";
-		const bool isNegative = (value < 0);
-		char* ptr = pBuffer + 17;
-		value = (isNegative) ? -value : value;
+	constexpr void valueToString(short value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
+	constexpr void valueToString(int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
+	constexpr void valueToString(long int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
+	constexpr void valueToString(long long int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
+	constexpr void valueToString(unsigned short value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
+	constexpr void valueToString(unsigned int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
+	constexpr void valueToString(unsigned long int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
+	constexpr void valueToString(unsigned long long int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
 
-		do
-		{
-			*--ptr = digitToChar[static_cast<int>(value % base)];
-			value = static_cast<long long int>(value / base);
-		} while (value);
+	constexpr void valueToString(float value) { ::toString(string_, value); }
+	constexpr void valueToString(double value) { ::toString(string_, value); }
 
-		if (isNegative)
-		{
-			*--ptr = '-';
-		}
+	constexpr void valueToString(unsigned char value) { valueToString(static_cast<char>(value)); }
+	constexpr void valueToString(char value) { ::toString(string_, "{} ({:#x})"_csv, charToString(value), value); }
 
-		// Move toward the begining and set the end character
-		const auto diff = ptr - pBuffer;
-		while (*ptr)
-		{
-			ptr[-diff] = ptr[0];
-			++ptr;
-		}
-		ptr[-diff] = 0;
-
-		return &ptr[-diff];
-	}
-
-	char* valueToString(char* pBuffer, float value) { return valueToString(pBuffer, static_cast<double>(value)); }
-	char* valueToString(char* pBuffer, double value)
-	{
-		const long long int valueInteger = static_cast<long long int>(value);
-		pBuffer = valueToString(pBuffer, valueInteger);
-		*pBuffer++ = '.';
-
-		value -= valueInteger; // NOLINT(bugprone-narrowing-conversions)
-		for (int i = 0; i < 10; ++i)
-		{
-			value *= 10;
-			*pBuffer++ = static_cast<char>(static_cast<int>(value) % 10) + '0'; // NOLINT(bugprone-narrowing-conversions)
-		}
-
-		*pBuffer++ = '\0';
-		return pBuffer;
-	}
-
-	char* valueToString(char* pBuffer, unsigned char value) { return valueToString(pBuffer, static_cast<char>(value)); }
-	char* valueToString(char* pBuffer, char value)
-	{
-		*pBuffer++ = charToString(value);
-		*pBuffer++ = ' ';
-		*pBuffer++ = '(';
-		*pBuffer++ = '0';
-		*pBuffer++ = 'x';
-		pBuffer = valueToString(pBuffer, static_cast<unsigned int>(value) & 0xff, 16);
-		*pBuffer++ = ')';
-		*pBuffer++ = '\0';
-		return pBuffer;
-	}
-
-	char* valueToString(char* pBuffer, bool value)
-	{
-		if (value)
-		{
-			pBuffer[0] = 't';
-			pBuffer[1] = 'r';
-			pBuffer[2] = 'u';
-			pBuffer[3] = 'e';
-			pBuffer[4] = '\0';
-			return &pBuffer[4];
-		}
-		pBuffer[0] = 'f';
-		pBuffer[1] = 'a';
-		pBuffer[2] = 'l';
-		pBuffer[3] = 's';
-		pBuffer[4] = 'e';
-		pBuffer[5] = '\0';
-		return &pBuffer[5];
-	}
+	constexpr void valueToString(bool value) { string_ = (value) ? "true"_sv : "false"_sv; }
 
 	template <class U>
-	char* valueToString(char* pBuffer, U* value)
+	constexpr void valueToString(U* value)
 	{
-		*pBuffer++ = '0';
-		*pBuffer++ = 'x';
-		return valueToString(pBuffer, reinterpret_cast<long long int>(value), 16);
+		::toString(string_, "{:#x}"_csv, reinterpret_cast<bzd::UInt64Type>(value));
 	}
 
-	char* valueToString(char* pBuffer, const unsigned char* value) { return valueToString(pBuffer, reinterpret_cast<const char*>(value)); }
-	char* valueToString(char* pBuffer, unsigned char* value) { return valueToString(pBuffer, reinterpret_cast<const char*>(value)); }
-	char* valueToString(char* pBuffer, char* value) { return valueToString(pBuffer, static_cast<const char*>(value)); }
-	char* valueToString(char* pBuffer, const char* value)
+	constexpr void valueToString(const unsigned char* value) { valueToString(reinterpret_cast<const char*>(value)); }
+	constexpr void valueToString(unsigned char* value) { valueToString(reinterpret_cast<const char*>(value)); }
+	constexpr void valueToString(char* value) { valueToString(static_cast<const char*>(value)); }
+	constexpr void valueToString(const char* value)
 	{
-		*pBuffer++ = '"';
+		string_ += '"';
 		for (int maxChar = 0; maxChar < 64 && *value; ++maxChar)
 		{
 			const char c = *value++;
-			*pBuffer++ = charToString(c);
+			string_ += charToString(c);
 		}
 		if (*value)
 		{
-			*pBuffer++ = '[';
-			*pBuffer++ = '.';
-			*pBuffer++ = '.';
-			*pBuffer++ = '.';
-			*pBuffer++ = ']';
+			string_ += "[...]"_sv;
 		}
-		*pBuffer++ = '"';
-		return pBuffer;
+		string_ += '"';
 	}
 
 	template <class U>
-	char* valueToString(char* pBuffer, U&&)
+	constexpr void valueToString(U&&)
 	{
-		return pBuffer;
 	}
 
 private:
-	char buffer_[100]{};
+	bzd::String<100> string_{};
 };
 
 } // namespace bzd::test::impl

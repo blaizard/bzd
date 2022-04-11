@@ -66,7 +66,7 @@ public: // API.
 		}
 	}
 
-	void removeToken(CancellationToken& token) noexcept
+	constexpr void removeToken(CancellationToken& token) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
 		const auto result = children_.erase(token);

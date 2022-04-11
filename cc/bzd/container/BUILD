@@ -343,11 +343,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":array",
-        ":reference_wrapper",
-        ":variant",
+        "//cc/bzd/container/iterator:tuple",
         "//cc/bzd/meta:choose_nth",
         "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits:add_reference",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",

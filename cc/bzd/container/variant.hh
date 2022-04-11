@@ -21,6 +21,12 @@
 #include <new> // Required for placement new.
 
 namespace bzd::impl {
+
+// Defines how an element is stored within the variant.
+template <class T>
+using VariantElementStorageType =
+	typeTraits::Conditional<typeTraits::isReference<T>, bzd::ReferenceWrapper<typeTraits::RemoveReference<T>>, T>;
+
 template <class... Ts>
 class VariantBase
 {
@@ -39,8 +45,6 @@ protected:
 	// Search for T in the list
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
-	template <class T>
-	using StorageType = typeTraits::Conditional<typeTraits::isReference<T>, bzd::ReferenceWrapper<typeTraits::RemoveReference<T>>, T>;
 	// Helper
 	template <SizeType N, SizeType Max, template <class> class F, class... Args>
 	struct HelperT
@@ -107,7 +111,7 @@ protected:
 		{
 			using ReturnedType =
 				bzd::typeTraits::AddReference<bzd::typeTraits::Conditional<bzd::typeTraits::isConst<SelfType>, const T, T>>;
-			return visitor(static_cast<ReturnedType>(self.data_.template get<StorageType<T>>()));
+			return visitor(static_cast<ReturnedType>(self.data_.template get<VariantElementStorageType<T>>()));
 		}
 	};
 	template <class V, class SelfType>
@@ -169,7 +173,7 @@ public: // Constructors
 	/// Value constructor, in place type constructor.
 	template <class T, class... Args>
 	constexpr VariantBase(InPlaceType<T>, Args&&... args) noexcept :
-		id_{Find<T>::value}, data_{inPlaceType<StorageType<T>>, bzd::forward<Args>(args)...}
+		id_{Find<T>::value}, data_{inPlaceType<VariantElementStorageType<T>>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -193,7 +197,7 @@ public: // Functions
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		// Using placement new
-		::new (&(data_.template get<StorageType<T>>())) StorageType<T>{bzd::forward<Args>(args)...};
+		::new (&(data_.template get<VariantElementStorageType<T>>())) VariantElementStorageType<T>{bzd::forward<Args>(args)...};
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
 	}
@@ -215,13 +219,13 @@ public: // Functions
 	template <class T>
 	[[nodiscard]] constexpr const T& get() const noexcept
 	{
-		return data_.template get<StorageType<T>>();
+		return data_.template get<VariantElementStorageType<T>>();
 	}
 
 	template <class T>
 	[[nodiscard]] constexpr T& get() noexcept
 	{
-		return data_.template get<StorageType<T>>();
+		return data_.template get<VariantElementStorageType<T>>();
 	}
 
 	template <bzd::SizeType index>
@@ -240,7 +244,7 @@ public: // Functions
 	constexpr void set(U&& value) noexcept
 	{
 		id_ = Find<T>::value;
-		data_.template set<StorageType<T>>(bzd::forward<U>(value));
+		data_.template set<VariantElementStorageType<T>>(bzd::forward<U>(value));
 	}
 
 	template <bzd::SizeType index, class U>
@@ -271,7 +275,7 @@ protected:
 	// copy constructor (12.8), move constructor (12.8), copy assignment operator (12.8), move assignment
 	// operator (12.8), or destructor (12.4), the corresponding member function of the union must be user-provided
 	// or it will be implicitly deleted (8.4.3) for the union. —end note ]
-	bzd::meta::Union<StorageType<Ts>...> data_{};
+	bzd::meta::Union<VariantElementStorageType<Ts>...> data_{};
 };
 
 // Copy constructible ---------------------------------------------------------
@@ -300,7 +304,8 @@ protected:
 		template <class T, class SelfType>
 		constexpr void operator()(SelfType& self) noexcept
 		{
-			self.template emplace<T>(variant_.template get<T>());
+			// Copy the actual stored type, this is important to handle copy of references.
+			self.template emplace<T>(variant_.data_.template get<VariantElementStorageType<T>>());
 		}
 
 	private:
@@ -332,10 +337,11 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantCopyConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyCopyConstructible<Ts> && ...) &&
-																  (typeTraits::isTriviallyCopyAssignable<Ts> && ...),
-															  VariantTriviallyCopyConstructible<Ts...>,
-															  VariantNonTriviallyCopyConstructible<Ts...>>;
+using VariantCopyConstructible =
+	bzd::typeTraits::Conditional<(typeTraits::isTriviallyCopyConstructible<VariantElementStorageType<Ts>> && ...) &&
+									 (typeTraits::isTriviallyCopyAssignable<VariantElementStorageType<Ts>> && ...),
+								 VariantTriviallyCopyConstructible<Ts...>,
+								 VariantNonTriviallyCopyConstructible<Ts...>>;
 
 // Move constructible ---------------------------------------------------------
 
@@ -354,9 +360,6 @@ class VariantNonTriviallyMoveConstructible : public VariantCopyConstructible<Ts.
 public: // Traits
 	using Self = VariantNonTriviallyMoveConstructible<Ts...>;
 	using Parent = VariantCopyConstructible<Ts...>;
-	// Define the storage type
-	template <class T>
-	using StorageType = typename Parent::template StorageType<T>;
 
 protected:
 	// Move constructor visitor
@@ -367,7 +370,7 @@ protected:
 		constexpr void operator()(SelfType& self) noexcept
 		{
 			// Move the actual stored type, this is important to handle move of references.
-			self.template emplace<T>(bzd::move(variant_.data_.template get<StorageType<T>>()));
+			self.template emplace<T>(bzd::move(variant_.data_.template get<VariantElementStorageType<T>>()));
 		}
 
 	private:
@@ -399,10 +402,11 @@ public: // Constructors / Assignments
 };
 
 template <class... Ts>
-using VariantMoveConstructible = bzd::typeTraits::Conditional<(typeTraits::isTriviallyMoveConstructible<Ts> && ...) &&
-																  (typeTraits::isTriviallyMoveAssignable<Ts> && ...),
-															  VariantTriviallyMoveConstructible<Ts...>,
-															  VariantNonTriviallyMoveConstructible<Ts...>>;
+using VariantMoveConstructible =
+	bzd::typeTraits::Conditional<(typeTraits::isTriviallyMoveConstructible<VariantElementStorageType<Ts>> && ...) &&
+									 (typeTraits::isTriviallyMoveAssignable<VariantElementStorageType<Ts>> && ...),
+								 VariantTriviallyMoveConstructible<Ts...>,
+								 VariantNonTriviallyMoveConstructible<Ts...>>;
 
 // Variant --------------------------------------------------------------------
 
@@ -446,16 +450,13 @@ protected:
 	// Helper class
 	template <template <class> class F, class... Args>
 	using Helper = typename Parent::template Helper<F, Args...>;
-	// Define the storage type
-	template <class T>
-	using StorageType = typename Parent::template StorageType<T>;
 
 protected:
 	// Destructor
 	template <class T>
 	struct VariantDestructor
 	{
-		static void call(Self* self) noexcept { self->data_.template get<StorageType<T>>().~StorageType<T>(); }
+		static void call(Self* self) noexcept { self->data_.template get<VariantElementStorageType<T>>().~VariantElementStorageType<T>(); }
 	};
 	using Destructor = Helper<VariantDestructor, Self*>;
 
@@ -505,9 +506,11 @@ public:
 } // namespace bzd::impl
 
 namespace bzd {
+
 template <class... Ts>
-using Variant = bzd::typeTraits::
-	Conditional<(bzd::typeTraits::isTriviallyDestructible<Ts> && ...), impl::VariantTrivial<Ts...>, impl::VariantNonTrivial<Ts...>>;
+using Variant = bzd::typeTraits::Conditional<(bzd::typeTraits::isTriviallyDestructible<impl::VariantElementStorageType<Ts>> && ...),
+											 impl::VariantTrivial<Ts...>,
+											 impl::VariantNonTrivial<Ts...>>;
 
 /// Unit type intended for use as a well-behaved empty alternative in bzd::Variant.
 /// In particular, a variant of non-default-constructible types may list bzd::monostate as its first alternative:

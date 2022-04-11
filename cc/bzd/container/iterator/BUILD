@@ -37,3 +37,17 @@ cc_library(
         "//cc/bzd/type_traits:iterator",
     ],
 )
+
+cc_library(
+    name = "tuple",
+    hdrs = [
+        "tuple.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:variant",
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:add_reference",
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
