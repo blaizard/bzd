@@ -19,7 +19,6 @@ public: // Traits
 	using ValueType = T;
 
 public: // Constructors
-	constexpr RandomAccess() = default;
 	constexpr RandomAccess(ValueType* data) : data_{data} {}
 
 public: // Copy/move constructors/assignments

@@ -1,14 +1,11 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/reference_wrapper.hh"
-#include "cc/bzd/container/variant.hh"
+#include "cc/bzd/container/iterator/tuple.hh"
 #include "cc/bzd/meta/choose_nth.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
@@ -97,16 +94,16 @@ private:
 
 // Tuple implementation
 
-template <class N, class... T>
+template <class N, class... Ts>
 class TupleImpl;
 
-template <SizeType... N, class... T>
-class TupleImpl<TupleSizes<N...>, T...> : TupleElem<N, T>...
+template <SizeType... N, class... Ts>
+class TupleImpl<TupleSizes<N...>, Ts...> : TupleElem<N, Ts>...
 {
 private:
-	using Self = TupleImpl<TupleSizes<N...>, T...>;
+	using Self = TupleImpl<TupleSizes<N...>, Ts...>;
 	template <SizeType M>
-	using Pick = bzd::meta::ChooseNth<M, T...>;
+	using Pick = bzd::meta::ChooseNth<M, Ts...>;
 	template <SizeType M>
 	using Elem = TupleElem<M, Pick<M>>;
 
@@ -118,7 +115,7 @@ public: // constructors
 	constexpr TupleImpl() noexcept = default;
 
 	template <class... Args>
-	constexpr TupleImpl(InPlace, Args&&... args) noexcept : TupleElem<N, T>{TupleChooseN<N, Args...>(bzd::forward<Args>(args)...)}...
+	constexpr TupleImpl(InPlace, Args&&... args) noexcept : TupleElem<N, Ts>{TupleChooseN<N, Args...>(bzd::forward<Args>(args)...)}...
 	{
 	}
 
@@ -143,61 +140,31 @@ public: // API
 		return Elem<M>::get();
 	}
 
+	/// Get the number of entry of this tuple.
+	///
+	/// \return The number of entry.
+	static constexpr SizeType size() noexcept { return sizeof...(Ts); }
+
 public: // Iterator.
-	// TODO implement tuple iterator, similar to what is done here:
-	// - https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
-	// - https://www.foonathan.net/2017/03/tuple-iterator/
-	template <class ContainerType>
-	class Iterator
+	using ConstIterator = bzd::iterator::Tuple<Self, Ts...>;
+	using Iterator = bzd::iterator::Tuple<Self, Ts...>;
+
+	[[nodiscard]] constexpr Iterator begin() noexcept { return {*this}; }
+	[[nodiscard]] constexpr Iterator end() noexcept
 	{
-	public: // Traits
-		using Self = Iterator;
-		using Category = typeTraits::ForwardTag;
-		using IndexType = bzd::SizeType;
-		using DifferenceType = bzd::Int32Type;
-		using ValueType = bzd::Variant<bzd::monostate, bzd::typeTraits::AddReference<T>...>;
-
-	private:
-		template <bzd::SizeType current = 0>
-		constexpr void updateValue() noexcept
-		{
-			if (index_ == current)
-			{
-				value_.template emplace<current + 1>(tuple_.template get<current>());
-			}
-			else if constexpr (current + 1 < sizeof...(T))
-			{
-				updateValue<current + 1>();
-			}
-		}
-
-	public:
-		constexpr Iterator(ContainerType& tuple, const bzd::SizeType index) noexcept : tuple_{tuple}, index_{index} { updateValue(); }
-
-		[[nodiscard]] constexpr ValueType& operator*() noexcept { return value_; }
-		[[nodiscard]] constexpr ValueType* operator->() noexcept { return &value_; }
-
-	private:
-		ContainerType& tuple_;
-		bzd::SizeType index_;
-		ValueType value_{};
-	};
-
-	[[nodiscard]] constexpr Iterator<Self> begin() noexcept { return {*this, 0}; }
+		Iterator it{*this};
+		it += size();
+		return it;
+	}
 };
 } // namespace bzd::impl
 
 namespace bzd {
-template <class... T>
-class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>
+template <class... Ts>
+class Tuple : public impl::TupleImpl<impl::TupleRange<sizeof...(Ts)>, Ts...>
 {
 public:
-	using impl::TupleImpl<impl::TupleRange<sizeof...(T)>, T...>::TupleImpl;
-
-	/// Get the number of entry of this tuple.
-	///
-	/// \return The number of entry.
-	static constexpr SizeType size() noexcept { return sizeof...(T); }
+	using impl::TupleImpl<impl::TupleRange<sizeof...(Ts)>, Ts...>::TupleImpl;
 };
 
 template <class... Args>

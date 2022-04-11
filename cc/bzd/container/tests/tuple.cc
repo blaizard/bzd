@@ -137,7 +137,52 @@ TEST(ContainerTuple, Iterator)
 
 	auto it = tuple.begin();
 
-	unsigned int value{0};
-	(*it).match([&value](unsigned int& v) { value = v; }, [](auto&) {});
-	EXPECT_EQ(value, 12u);
+	{
+		unsigned int value{0};
+		it->match([&value](unsigned int& v) { value = v; }, [](auto&) {});
+		EXPECT_EQ(value, 12u);
+		EXPECT_NE(it, tuple.end());
+	}
+	++it;
+	{
+		bool value{false};
+		it->match([&value](bool& v) { value = v; }, [](auto&) {});
+		EXPECT_TRUE(value);
+		EXPECT_NE(it, tuple.end());
+	}
+	++it;
+	{
+		double value{3.14};
+		it->match([&value](double& v) { value = v; }, [](auto&) {});
+		EXPECT_NEAR(value, 5.32, 0.001);
+		EXPECT_NE(it, tuple.end());
+	}
+	++it;
+	{
+		int value{3};
+		it->match([&value](int& v) { value = v; }, [](auto&) {});
+		EXPECT_EQ(value, -21);
+		EXPECT_NE(it, tuple.end());
+	}
+	++it;
+	{
+		const char* value{""};
+		it->match([&value](const char* v) { value = v; }, [](auto&) {});
+		EXPECT_STREQ(value, "Hello");
+		EXPECT_NE(it, tuple.end());
+	}
+	++it;
+	EXPECT_EQ(it, tuple.end());
+}
+
+TEST(ContainerTuple, IteratorLoop)
+{
+	bzd::Tuple<bzd::UInt32Type, bzd::Float32Type, bzd::Int8Type> tuple{bzd::inPlace, 12u, bzd::Float32Type{5.32}, bzd::Int8Type{-21}};
+
+	bzd::Float32Type sum{0};
+	for (auto& value : tuple)
+	{
+		value.match([&](auto& v) { sum += v; });
+	}
+	EXPECT_NEAR(sum, -3.68, 0.001);
 }

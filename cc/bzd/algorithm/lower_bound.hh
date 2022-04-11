@@ -24,7 +24,7 @@ constexpr Iterator lowerBound(Iterator first, Iterator last, const T& value, Com
 {
 	using DifferenceType = typename bzd::typeTraits::Iterator<Iterator>::DifferenceType;
 
-	Iterator it;
+	Iterator it{first};
 	DifferenceType count = bzd::distance(first, last);
 	DifferenceType step{};
 
