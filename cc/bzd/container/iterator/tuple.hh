@@ -85,9 +85,18 @@ public: // API
 
 	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept
 	{
-		index_ = index;
-		updateValue();
-		return *value_;
+		Self it{*this};
+		it += index;
+		it->updateValue();
+		return *it;
+	}
+
+	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept
+	{
+		Self it{*this};
+		it += index;
+		it->updateValue();
+		return *it;
 	}
 
 	[[nodiscard]] constexpr BoolType operator==(const Self& it) const noexcept
