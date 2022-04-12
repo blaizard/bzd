@@ -76,21 +76,72 @@ public:
 		return nullopt;
 	}
 
-	template <bzd::Int32Type index = 0>
+	template <bzd::SizeType index = 0>
 	constexpr auto assert()
 	{
 		class AsyncPropagate : public impl::Async<T>
 		{
 		public:
+			using Self = AsyncPropagate;
 			using Parent = impl::Async<T>;
 
 		public:
-			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : Parent{bzd::move(async)} { this->handle_.promise().setPropagate(); }
-/*
-			[[nodiscard]] constexpr bzd::Error hasErrorToPropagate() noexcept
+			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : Parent{bzd::move(async)}
 			{
+				this->handle_.promise().setPropagate(
+					PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate>(*this));
 			}
-*/
+
+			bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
+			{
+				// It must have a value
+				auto result{bzd::move(Parent::await_resume())};
+				if constexpr (PromiseType::resultTypeIsResult)
+				{
+					static_assert(index == 0, "The index used with assert must be 0 for non-tuple-like results.");
+
+					if (result.hasError())
+					{
+						return bzd::move(result.errorMutable());
+					}
+				}
+				else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
+				{
+					static_assert(index < PromiseType::ResultType::size(), "The index used with assert is out of bound.");
+
+					// Return if one of the result is an error
+					for ([[maybe_unused]] auto& variant : result)
+					{
+						auto maybeError = variant.match([](auto& value) -> bzd::Error* {
+							if (value.hasValue() && value.value().hasError())
+							{
+								return &(value.valueMutable().errorMutable());
+							}
+							return nullptr;
+						});
+						if (maybeError)
+						{
+							return bzd::move(*maybeError);
+						}
+					}
+					// If not check that there is a value at the expected index.
+					if (!result.template get<index>().hasValue())
+					{
+						return bzd::Error{bzd::SourceLocation::current(),
+										  bzd::ErrorType::failure,
+										  "Got a value but not for the expected async #{}."_csv,
+										  index};
+					}
+				}
+				else
+				{
+					// Use static_assert
+					bzd::assert::isTrue(false, "This type of async is not supported");
+				}
+
+				return bzd::nullopt;
+			}
+
 			constexpr auto await_resume() noexcept
 			{
 				if constexpr (PromiseType::resultTypeIsResult)
