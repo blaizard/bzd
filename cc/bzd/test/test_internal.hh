@@ -35,7 +35,8 @@
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                  \
 	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test(::bzd::test::Context& test) const \
 	{                                                                                                     \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                                           \
+		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                       \
+		EXPECT_TRUE(result);                                                                              \
 	}                                                                                                     \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 

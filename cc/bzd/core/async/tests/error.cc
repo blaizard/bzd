@@ -88,6 +88,11 @@ TEST_ASYNC(Coroutine, ErrorAny)
 	}
 
 	{
+		// const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assert<0>();
+		// EXPECT_EQ(value, 42);
+	}
+
+	{
 		int step{-1};
 		const auto result = co_await nestedErrorAny(step);
 		EXPECT_FALSE(result);

@@ -19,11 +19,11 @@ class Executable : public bzd::interface::Executable<Executable>
 public: // Traits.
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
 	using SetErrorCallback = bzd::FunctionRef<void(bzd::Error&&)>;
-//	using PropagateErrorCallback = bzd::FunctionRef<bzd::Error(void)>;
+	using PropagateErrorCallback = bzd::FunctionRef<bzd::Optional<bzd::Error>(void)>;
 
 public:
 	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept :
-		handle_{handle}, setError_{bzd::move(callback)}
+		handle_{handle}, errorHandlingCallback_{bzd::inPlaceType<SetErrorCallback>, bzd::move(callback)}
 	{
 	}
 
@@ -75,9 +75,21 @@ public:
 		continuation_.emplace<OnTerminateCallback>(onTerminate);
 	}
 
-	constexpr void setPropagate() noexcept { setError_.reset(); }
+	constexpr void setPropagate(PropagateErrorCallback&& callback) noexcept
+	{
+		errorHandlingCallback_.template emplace<PropagateErrorCallback>(bzd::move(callback));
+	}
 
-	constexpr bool mustPropagateError() const noexcept { return !setError_.hasValue(); }
+	constexpr bool mustPropagateError() const noexcept { return errorHandlingCallback_.template is<PropagateErrorCallback>(); }
+
+	bzd::Optional<bzd::Error> getErrorToPropagateIfAny() noexcept
+	{
+		if (mustPropagateError())
+		{
+			return errorHandlingCallback_.template get<PropagateErrorCallback>()();
+		}
+		return bzd::nullopt;
+	}
 
 	/// Propagate the error to the first parent accepting errors and set the continuation
 	/// of this executable to this parent.
@@ -94,14 +106,14 @@ public:
 		} while (executable->mustPropagateError());
 		continuation_ = bzd::move(executable->continuation_);
 
-		// Set the error here
-		executable->setError_.value()(bzd::move(error));
+		// Set the error here, at the point we are sure that errorHandlingCallback_ contains a SetErrorCallback
+		// as this is tested by the loop just before.
+		executable->errorHandlingCallback_.template get<SetErrorCallback>()(bzd::move(error));
 	}
 
 private:
 	bzd::coroutine::impl::coroutine_handle<> handle_;
-	bzd::Optional<SetErrorCallback> setError_;
-	//bzd::Variant<SetErrorCallback, PropagateErrorCallback> errorCallback_;
+	bzd::Variant<SetErrorCallback, PropagateErrorCallback> errorHandlingCallback_;
 	bzd::ExecutorContext<Executable>* context_{nullptr};
 	bzd::ExecutorContext<Executable>::Continuation continuation_{};
 };
@@ -124,7 +136,7 @@ private:
 			auto& promise = handle.promise();
 
 			// Propagate the error if needed.
-			if (auto error = promise.hasErrorToPropagate(); error.hasValue())
+			if (auto error = promise.getErrorToPropagateIfAny(); error.hasValue())
 			{
 				promise.propagateError(bzd::move(error.valueMutable()));
 			}
@@ -235,45 +247,6 @@ public:
 	constexpr bool isReady() const noexcept { return result_.hasValue(); }
 
 	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
-
-	/// Check if the result contains an error.
-	bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
-	{
-		if (this->mustPropagateError() && result_.hasValue())
-		{
-			if constexpr (resultTypeIsResult)
-			{
-				if (result_.value().hasError())
-				{
-					return bzd::move(result_.valueMutable().errorMutable());
-				}
-			}
-			else if constexpr (resultTypeIsTupleOfOptionalResultsWithError)
-			{
-				// Return if one of the result is an error
-				for ([[maybe_unused]] auto& variant : result_.valueMutable())
-				{
-					auto maybeError = variant.match([](auto& value) -> bzd::Error* {
-						if (value.hasValue() && value.value().hasError())
-						{
-							return &(value.valueMutable().errorMutable());
-						}
-						return nullptr;
-					});
-					if (maybeError)
-					{
-						return bzd::move(*maybeError);
-					}
-				}
-				// If not check that there is a value at the expected index.
-			}
-			else
-			{
-				bzd::assert::isTrue(false, "This type of async is not supported");
-			}
-		}
-		return bzd::nullopt;
-	}
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
 	{
