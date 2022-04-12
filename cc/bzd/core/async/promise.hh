@@ -19,6 +19,7 @@ class Executable : public bzd::interface::Executable<Executable>
 public: // Traits.
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
 	using SetErrorCallback = bzd::FunctionRef<void(bzd::Error&&)>;
+//	using PropagateErrorCallback = bzd::FunctionRef<bzd::Error(void)>;
 
 public:
 	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept :
@@ -100,6 +101,7 @@ public:
 private:
 	bzd::coroutine::impl::coroutine_handle<> handle_;
 	bzd::Optional<SetErrorCallback> setError_;
+	//bzd::Variant<SetErrorCallback, PropagateErrorCallback> errorCallback_;
 	bzd::ExecutorContext<Executable>* context_{nullptr};
 	bzd::ExecutorContext<Executable>::Continuation continuation_{};
 };
@@ -186,12 +188,33 @@ namespace bzd::coroutine {
 template <class T>
 class Promise : public impl::Promise<Promise<T>>
 {
+private:
+	template <class>
+	class ResultOfError : public bzd::typeTraits::FalseType
+	{
+	};
+
+	template <class Value>
+	class ResultOfError<bzd::Result<Value, bzd::Error>> : public bzd::typeTraits::TrueType
+	{
+	};
+
+	template <class>
+	class TupleOfOptionalResultsOfError : public bzd::typeTraits::FalseType
+	{
+	};
+
+	template <class... Ts>
+	class TupleOfOptionalResultsOfError<bzd::Tuple<bzd::Optional<bzd::Result<Ts, bzd::Error>>...>> : public bzd::typeTraits::TrueType
+	{
+	};
+
 public:
 	using Self = Promise<T>;
 	using ResultType = T;
 	using impl::Promise<Promise<T>>::Promise;
-	static constexpr BoolType resultTypeIsResult = concepts::sameTemplate<ResultType, bzd::Result>;
-	static constexpr BoolType resultTypeIsTuple = concepts::sameTemplate<ResultType, bzd::Tuple>;
+	static constexpr BoolType resultTypeIsResult = ResultOfError<ResultType>::value;
+	static constexpr BoolType resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
 
 	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 
@@ -216,24 +239,39 @@ public:
 	/// Check if the result contains an error.
 	bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
 	{
-		if (this->mustPropagateError())
+		if (this->mustPropagateError() && result_.hasValue())
 		{
 			if constexpr (resultTypeIsResult)
 			{
-				if (result_.hasValue() && result_.value().hasError())
+				if (result_.value().hasError())
 				{
 					return bzd::move(result_.valueMutable().errorMutable());
 				}
 			}
-			else if constexpr (resultTypeIsTuple)
+			else if constexpr (resultTypeIsTupleOfOptionalResultsWithError)
 			{
+				// Return if one of the result is an error
+				for ([[maybe_unused]] auto& variant : result_.valueMutable())
+				{
+					auto maybeError = variant.match([](auto& value) -> bzd::Error* {
+						if (value.hasValue() && value.value().hasError())
+						{
+							return &(value.valueMutable().errorMutable());
+						}
+						return nullptr;
+					});
+					if (maybeError)
+					{
+						return bzd::move(*maybeError);
+					}
+				}
+				// If not check that there is a value at the expected index.
 			}
 			else
 			{
 				bzd::assert::isTrue(false, "This type of async is not supported");
 			}
 		}
-		// if constexpr (bzd::Tuple<bzd::Result<...>>) {}
 		return bzd::nullopt;
 	}
 

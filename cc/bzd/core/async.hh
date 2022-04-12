@@ -86,12 +86,27 @@ public:
 
 		public:
 			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : Parent{bzd::move(async)} { this->handle_.promise().setPropagate(); }
-
-			constexpr typename ResultType::Value await_resume() noexcept
+/*
+			[[nodiscard]] constexpr bzd::Error hasErrorToPropagate() noexcept
 			{
-				auto result{bzd::move(Parent::await_resume())};
-				bzd::assert::isTrue(result.hasValue());
-				return bzd::move(result.valueMutable());
+			}
+*/
+			constexpr auto await_resume() noexcept
+			{
+				if constexpr (PromiseType::resultTypeIsResult)
+				{
+					auto result{bzd::move(Parent::await_resume())};
+					bzd::assert::isTrue(result.hasValue());
+					return bzd::move(result.valueMutable());
+				}
+				else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
+				{
+					auto tuple{bzd::move(Parent::await_resume())};
+					auto& maybeResult{tuple.template get<index>()};
+					bzd::assert::isTrue(maybeResult.hasValue());
+					bzd::assert::isTrue(maybeResult.value().hasValue());
+					return bzd::move(maybeResult.valueMutable().valueMutable());
+				}
 			}
 		};
 		return AsyncPropagate{bzd::move(*this)};
