@@ -11,14 +11,14 @@ build --verbose_failures
 # Set default options used by the default run
 build "--strip=never"
 
-# Test specific options
+# Global test specific options
 test --test_output=errors
 test --verbose_failures
 test --define=type=test
 # Use local docker configuration if present
 test --action_env=DOCKER_HOST
 
-# Coverage specific options
+# Global coverage specific options
 coverage --combined_report=lcov
 coverage --nobuild_tests_only
 coverage --nocache_test_results
@@ -37,10 +37,10 @@ coverage:cc-docker-sandbox --strategy=TestRunner=docker
 # Select only C++ targets
 build --build_tag_filters=-cc-coverage
 test --test_tag_filters=-cc-coverage
-build:cc --build_tag_filters=cc
-test:cc --test_tag_filters=cc
-coverage --test_tag_filters=-cc,cc-coverage
-coverage --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
+build:cc --build_tag_filters=cc,-cc-coverage
+test:cc --test_tag_filters=cc,-cc-coverage
+coverage:cc --test_tag_filters=-cc,cc-coverage
+coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
 
 # Select only Python targets
 build:py --build_tests_only

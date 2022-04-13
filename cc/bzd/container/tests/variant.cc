@@ -36,12 +36,14 @@ TEST(ContainerVariant, Reference)
 		EXPECT_EQ(variantReference.index(), 2);
 		EXPECT_EQ(variantReference.template get<double&>(), 12);
 		value = 3;
+		EXPECT_EQ(value, 3);
 		EXPECT_EQ(variantReference.template get<double&>(), 3);
 		int valueInt{65};
 		variantReference.template set<int&>(valueInt);
 		EXPECT_EQ(variantReference.index(), 0);
 		EXPECT_EQ(variantReference.template get<int&>(), 65);
 		valueInt = -3;
+		EXPECT_EQ(valueInt, -3);
 		EXPECT_EQ(variantReference.template get<int&>(), -3);
 		variantReference.match([](int& v) { v = 5; }, [](bool&) {}, [](double&) {});
 		EXPECT_EQ(variantReference.template get<int&>(), 5);
@@ -49,6 +51,7 @@ TEST(ContainerVariant, Reference)
 		bzd::Variant<int&, bool&, double&> variantReferenceMove{bzd::move(variantReference)};
 		EXPECT_EQ(variantReferenceMove.template get<int&>(), 5);
 		valueInt = -3;
+		EXPECT_EQ(valueInt, -3);
 		EXPECT_EQ(variantReferenceMove.template get<int&>(), -3);
 	}
 	{
@@ -57,6 +60,7 @@ TEST(ContainerVariant, Reference)
 		EXPECT_EQ(variantReference.index(), 0);
 		EXPECT_EQ(variantReference.template get<int&>(), 12);
 		value = 3;
+		EXPECT_EQ(value, 3);
 		EXPECT_EQ(variantReference.template get<int&>(), 3);
 	}
 }

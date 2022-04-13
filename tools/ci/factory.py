@@ -2,13 +2,37 @@ import pathlib
 import typing
 import json
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, asdict
 
 from bzd.template.template import Template
 
 
-class Factory(ABC):
+@dataclass
+class ConfigNormal:
+	"""Configuration for normal tests."""
+	name: typing.Final[str] = "normal"
 
-	categories: typing.Final[typing.Set[str]] = {"normal", "stress", "coverage", "sanitizer"}
+
+@dataclass
+class ConfigStress:
+	"""Configuration for stress tests."""
+	name: typing.Final[str] = "stress"
+	runs: int = 100
+
+
+@dataclass
+class ConfigCoverage:
+	"""Configuration for coverage tests."""
+	name: typing.Final[str] = "coverage"
+
+
+@dataclass
+class ConfigSanitizer:
+	"""Configuration for sanitizer tests."""
+	name: typing.Final[str] = "sanitizer"
+
+
+class Factory(ABC):
 
 	@abstractmethod
 	def getName(self) -> str:
@@ -25,21 +49,48 @@ class Factory(ABC):
 		"""Install the CI files to their actual destination."""
 		pass
 
-	@staticmethod
-	def renderTemplate(templatePath: pathlib.Path, onlyCategories: typing.Optional[typing.Set[str]] = None) -> str:
+	@abstractmethod
+	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
+		"""Return the configuration associated with normal tests."""
+		pass
+
+	@abstractmethod
+	def getConfigStress(self) -> typing.Optional[ConfigStress]:
+		"""Return the configuration associated with stress tests."""
+		pass
+
+	@abstractmethod
+	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
+		"""Return the configuration associated with coverage tests."""
+		pass
+
+	@abstractmethod
+	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
+		"""Return the configuration associated with sanitizer tests."""
+		pass
+
+	def renderTemplate(self, templatePath: pathlib.Path,
+		onlyCategories: typing.Optional[typing.Set[str]] = None) -> str:
 		"""Render a template."""
 
-		assert onlyCategories is None or all(c in Factory.categories
-			for c in onlyCategories), "onlyCategories contains unsupported categories."
+		configs = {
+			config.name: config
+			for config in
+			[self.getConfigNormal(),
+			self.getConfigStress(),
+			self.getConfigCoverage(),
+			self.getConfigSanitizer()] if config is not None
+		}
 
 		rawData = json.loads(pathlib.Path("tools/ci/stages.json").read_text())
 		data = []
 		for stage in rawData["stages"]:
 			item = {"category": "normal"}
 			item.update(stage)
-			assert item["category"] in Factory.categories
 			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
-			if onlyCategories is None or item["category"] in onlyCategories:
+			if item["category"] in configs:
+				config = configs[item["category"]]
+				item["command"] = item["command"].format(**asdict(config))
 				data.append(item)
 
 		template = Template.fromPath(templatePath)

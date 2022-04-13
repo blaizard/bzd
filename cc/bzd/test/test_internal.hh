@@ -30,14 +30,17 @@
 	BZDTEST_REGISTER_(testCaseName, testName) \
 	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test([[maybe_unused]] ::bzd::test::Context& test) const
 
-#define BZDTEST_ASYNC_(testCaseName, testName)                                                            \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                             \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                  \
-	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test(::bzd::test::Context& test) const \
-	{                                                                                                     \
-		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                       \
-		EXPECT_TRUE(result);                                                                              \
-	}                                                                                                     \
+#define BZDTEST_ASYNC_(testCaseName, testName)                                                                 \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
+	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                       \
+	void ::bzd::Test<BZDTEST_CLASS_NAME_(testCaseName, testName)>::test(::bzd::test::Context& test) const      \
+	{                                                                                                          \
+		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                            \
+		if (!static_cast<bool>(result))                                                                        \
+		{                                                                                                      \
+			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data()); \
+		}                                                                                                      \
+	}                                                                                                          \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                                  \

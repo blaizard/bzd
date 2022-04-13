@@ -26,6 +26,7 @@ cc_library(
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
         "//cc/bzd/core:error",
         "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:is_same_template",

@@ -38,7 +38,7 @@ pipeline
 			parallel
 			{
 				{% for stage in stages %}
-				stage("{{ stage.category }} {{ stage.name }}")
+				stage("[{{ stage.category }}] {{ stage.name }}")
 				{
 					steps
 					{
