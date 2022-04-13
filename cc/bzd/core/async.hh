@@ -11,13 +11,12 @@
 #include "cc/bzd/core/async/coroutine.hh"
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
-
-#include <iostream>
 
 namespace bzd::impl {
 
@@ -135,8 +134,7 @@ public:
 				}
 				else
 				{
-					// Use static_assert
-					bzd::assert::isTrue(false, "This type of async is not supported");
+					static_assert(bzd::meta::alwaysFalse<T>, "This type of Async cannot be used with assert(...).");
 				}
 
 				return bzd::nullopt;
@@ -157,6 +155,10 @@ public:
 					bzd::assert::isTrue(maybeResult.hasValue());
 					bzd::assert::isTrue(maybeResult.value().hasValue());
 					return bzd::move(maybeResult.valueMutable().valueMutable());
+				}
+				else
+				{
+					static_assert(bzd::meta::alwaysFalse<T>, "This type of Async cannot be used with assert(...).");
 				}
 			}
 		};

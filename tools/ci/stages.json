@@ -18,12 +18,12 @@
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_dev",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test={runs} --platform_suffix=_linux_x86_64_clang_dev",
             "name": "dev"
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=100 --platform_suffix=_linux_x86_64_clang_prod",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test={runs} --platform_suffix=_linux_x86_64_clang_prod",
             "name": "prod"
         },
         {
@@ -39,13 +39,13 @@
         },
         {
             "category": "coverage",
-            "command": "./tools/bazel coverage ... --config=py --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py",
+            "command": "./tools/bazel coverage ... --config=py --config=linux_x86_64_clang --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py",
             "name": "Python",
             "output": "bazel-out/coverage_py"
         },
         {
             "category": "coverage",
-            "command": "./tools/bazel coverage ... --config=nodejs --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs",
+            "command": "./tools/bazel coverage ... --config=nodejs --config=linux_x86_64_clang --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs",
             "name": "NodeJs",
             "output": "bazel-out/coverage_nodejs"
         },

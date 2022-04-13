@@ -114,6 +114,31 @@ A non-`void` coroutine is declared as follow:
 bzd::Async<int> myFunc() { ... }
 ```
 
+### Composition
+
+#### All
+
+Coroutine can be composed and executed in parallel, depending on the executor used underneath.
+
+To have multiple coroutine run in parallel, this can be done as follow:
+
+```c++
+const auto result = co_await bzd::async::all(myFunc(), myFunc(), myFunc());
+```
+
+This will execute myFunc (assuming it is a coroutine), 3 times and return the result as a tuple.
+
+#### Any
+
+You might also want to execute coroutine and return when the first one terminates, this is handy to implement
+timeouts for example. It can be done as follow:
+
+```c++
+const auto result = co_await bzd::async::any(myFunc(), timeout(1_s));
+```
+
+This will return a result that is a tuple of optional results of the 2 coroutine executed.
+
 ### Error propagation
 
 Some errors cannot be treated at the caller level and might have to be propagated to the upper layers. For that the Async
@@ -136,3 +161,12 @@ const auto value = result.value();
 ```
 
 The error propagate goes to upper levels until an awaitable handling errors is found.
+
+Error propagation can also apply to `bzd::async::any` coroutines, and it will ensure the coroutine at a specific index
+returns a valid result, otherwise the error will be propagate to the caller.
+
+```c++
+const auto value = co_await bzd::async::any(myFunc(), timeout(1_s)).assert();
+// or
+const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assert<1>();
+```

@@ -88,8 +88,13 @@ TEST_ASYNC(Coroutine, ErrorAny)
 	}
 
 	{
-		// const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assert<0>();
-		// EXPECT_EQ(value, 42);
+		const auto result = co_await []() -> bzd::Async<> {
+			const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assert<0>();
+			EXPECT_EQ(value, 42);
+			co_return {};
+		}();
+		EXPECT_FALSE(result);
+		EXPECT_STREQ(result.error().getMessage().data(), "Got a value but not for the expected async #0.");
 	}
 
 	{

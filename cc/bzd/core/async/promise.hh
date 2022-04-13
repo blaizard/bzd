@@ -256,7 +256,7 @@ public:
 		}
 		else
 		{
-			bzd::assert::isTrue(false, "This type of async is not supported");
+			bzd::assert::unreachable();
 		}
 	}
 
