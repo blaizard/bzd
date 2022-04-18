@@ -3,14 +3,16 @@ use "cc/components/std/stream/out/interface.bdl"
 use "cc/components/std/stream/in/interface.bdl"
 use "cc/components/std/clock/steady/interface.bdl"
 use "cc/components/std/clock/system/interface.bdl"
+use "cc/components/posix/proactor/interface.bdl"
 
 
 composition {
 	core1 = bzd.platform.linux.Core(stackSize = 100000);
 	core2 = bzd.platform.linux.Core(stackSize = 100000);
 	executor = bzd.platform.generic.Executor(core1, core2);
+	proactorIO = bzd.platform.posix.proactor.Proactor();
 	out = bzd.platform.std.Out();
-	in = bzd.platform.std.In();
+	in = bzd.platform.std.In(proactor = proactorIO);
 	steadyClock = bzd.platform.std.clock.Steady();
 	systemClock = bzd.platform.std.clock.System();
 	

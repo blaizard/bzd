@@ -13,11 +13,6 @@ from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.builder import MethodBuilder, NestedBuilder
 
-# Add builtins
-MethodComponentInit = Method(MethodBuilder(name="init").get())
-NestedComponent = Nested(
-	NestedBuilder(kind=TYPE_INTERFACE).pushBackElementToNestedSequence("interface", MethodComponentInit.element).get())
-
 GLOBAL_FQN_OUT = "out"
 GLOBAL_FQN_IN = "in"
 GLOBAL_FQN_STEADY_CLOCK = "steadyClock"
@@ -144,7 +139,10 @@ class Composition:
 					entityCopied.resolve(resolver=resolver)
 
 					assert isinstance(entityCopied, Expression)
-					self.addInit(fqn=entity.fqn, entity=entityCopied)
+					if entityCopied.isInit:
+						self.addInit(fqn=entity.fqn, entity=entityCopied)
+					else:
+						self.addComposition(entity=entityCopied)
 
 			else:
 				self.addInit(fqn=entity.fqn)
@@ -168,3 +166,21 @@ class Composition:
 		executorsIntersection = self.executors.intersection(self.registryFQNs)
 		assert executorsIntersection == self.executors, "Some executors are used but not declared: {}".format(", ".join(
 			self.executors.difference(executorsIntersection)))
+
+	def __str__(self) -> str:
+		"""Print a human readable view of this instance."""
+
+		def addContent(content: typing.List[str], title: str, contentList: typing.Iterable[typing.Any]) -> None:
+			content.append(f"==== {title} ====")
+			content += [f"\t- {item}" for item in contentList]
+
+		content: typing.List[str] = []
+		addContent(content, "Includes", self.includes)
+		addContent(content, "Symbols", str(self.symbols).split("\n"))
+		addContent(content, "Registry", self.registry)
+		addContent(content, "RegistryFQN", self.registryFQNs)
+		addContent(content, "Executors", self.executors)
+		addContent(content, "Initialization", self.initialization)
+		addContent(content, "Composition", self.composition)
+
+		return "\n".join(content)

@@ -156,7 +156,7 @@ public:
 		auto scope = registerContext(context);
 
 		// Loop until there are still elements
-		while (!queue_.empty())
+		while (!queue_.empty()) //&& getNbActive())
 		{
 			// Drain remaining handles
 			auto maybeExecutable = pop();
@@ -286,6 +286,9 @@ private:
 	}
 
 private:
+	template <class U>
+	friend class bzd::interface::Executable;
+
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningForwardList<Executable> queue_{};
 	/// Keep contexts about the current runnning scheduler.
