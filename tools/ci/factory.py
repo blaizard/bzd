@@ -69,8 +69,7 @@ class Factory(ABC):
 		"""Return the configuration associated with sanitizer tests."""
 		pass
 
-	def renderTemplate(self, templatePath: pathlib.Path,
-		onlyCategories: typing.Optional[typing.Set[str]] = None) -> str:
+	def renderTemplate(self, templatePath: pathlib.Path) -> str:
 		"""Render a template."""
 
 		configs = {

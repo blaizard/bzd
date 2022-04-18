@@ -4,6 +4,9 @@ namespace bzd.platform.std;
 component In {
 interface:
 	
+config:
+	proactor = Void;
+	
 }
 
 

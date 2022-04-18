@@ -25,8 +25,7 @@ class Jenkins(Factory):
 		return ConfigSanitizer()
 
 	def build(self) -> None:
-		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/jenkins/Jenkinsfile.btl"),
-			onlyCategories={"normal", "coverage", "sanitizer"})
+		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/jenkins/Jenkinsfile.btl"))
 
 	def install(self, workspace: pathlib.Path) -> None:
 		assert self.jenkinsFile

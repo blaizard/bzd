@@ -6,6 +6,7 @@
 #include "cc/bzd/core/async/awaitables/enqueue.hh"
 #include "cc/bzd/core/async/awaitables/get_executable.hh"
 #include "cc/bzd/core/async/awaitables/get_executor.hh"
+#include "cc/bzd/core/async/awaitables/wait.hh"
 #include "cc/bzd/core/async/awaitables/yield.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
@@ -314,6 +315,12 @@ constexpr auto getExecutor() noexcept
 constexpr auto getExecutable() noexcept
 {
 	return bzd::coroutine::impl::GetExecutable{};
+}
+
+template <class Callback>
+constexpr auto wait(Callback&& callback) noexcept
+{
+	return bzd::coroutine::impl::Wait{bzd::move(callback)};
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.

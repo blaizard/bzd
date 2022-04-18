@@ -1,0 +1,15 @@
+
+namespace bzd.platform.posix.proactor;
+
+component Proactor {
+interface:
+	method init();
+	method exec();
+	
+composition:
+	this.init();
+	this.exec();
+	
+}
+
+
