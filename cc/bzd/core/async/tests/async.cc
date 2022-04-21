@@ -174,7 +174,8 @@ TEST_ASYNC(Coroutine, asyncAny)
 TEST_ASYNC(Coroutine, asyncAnyMany)
 {
 	bzd::String<128> trace;
-	const auto result = co_await bzd::async::any(deepNested(trace, "a"), deepNested(trace, "b"), nested(trace, "c", -432), deepNested(trace, "d"));
+	const auto result =
+		co_await bzd::async::any(deepNested(trace, "a"), deepNested(trace, "b"), nested(trace, "c", -432), deepNested(trace, "d"));
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][d1][a0][b0][c2]");
 	EXPECT_EQ(result.size(), 4U);
@@ -230,7 +231,8 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 	}
 	{
 		bzd::String<128> trace;
-		[[maybe_unused]] const auto result = co_await bzd::async::any(bzd::async::any(anyNested(trace, "d"), anyNested(trace, "a")), nested(trace, "c"));
+		[[maybe_unused]] const auto result =
+			co_await bzd::async::any(bzd::async::any(anyNested(trace, "d"), anyNested(trace, "a")), nested(trace, "c"));
 		EXPECT_EQ(trace, "[c1][d6][a6][c0][c2]");
 	}
 
@@ -255,7 +257,8 @@ TEST_ASYNC(Coroutine, asyncAnyDestroy)
 {
 	bzd::String<128> trace;
 	bzd::SizeType destroyedCounter{0U};
-	[[maybe_unused]] const auto result = co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncDestroyMonitor(trace, "b", destroyedCounter));
+	[[maybe_unused]] const auto result =
+		co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncDestroyMonitor(trace, "b", destroyedCounter));
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a0][b0][a0][b1]");
 	EXPECT_EQ(destroyedCounter, 1U);

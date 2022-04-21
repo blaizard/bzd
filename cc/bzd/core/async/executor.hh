@@ -310,6 +310,13 @@ public:
 		}
 	}
 
+	/// Propagate the context of this executable to another one.
+	constexpr void propagate(T& executable) noexcept
+	{
+		// Propagate the cancellation token if any.
+		executable.cancel_ = cancel_;
+	}
+
 private:
 	friend class bzd::Executor<T>;
 
