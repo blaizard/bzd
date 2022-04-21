@@ -37,7 +37,7 @@ protected:
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
 			executable.setConditionalContinuation(callback_);
-			executor.schedule(executable);
+			executor.schedule(executable, executable.getType());
 		});
 	}
 

@@ -29,6 +29,28 @@ template <class T>
 class Executable;
 }
 
+/// Metadata of an executable, propagated to all its children.
+class ExecutableMetadata
+{
+public: // Types.
+	enum class Type : bzd::UInt8Type
+	{
+		none,
+		active,
+		service
+	};
+
+public: // Accessors.
+	[[nodiscard]] Type getType() const noexcept { return type_; }
+
+private:
+	template <class U>
+	friend class bzd::interface::Executable;
+
+	// Type of executable.
+	Type type_{Type::none};
+};
+
 /// Executor context.
 template <class Executable>
 class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
@@ -161,8 +183,9 @@ public:
 	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
 	/// Schedule a new executable to this executor.
-	constexpr void schedule(Executable& executable) noexcept
+	constexpr void schedule(Executable& executable, const bzd::ExecutableMetadata::Type type) noexcept
 	{
+		executable.setType(type);
 		executable.setExecutor(*this);
 		push(executable);
 	}
@@ -296,6 +319,10 @@ public:
 
 	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
 
+	constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.type_; }
+
+	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept { metadata_.type_ = type; }
+
 	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
 	constexpr void schedule() noexcept { getExecutor().push(getExecutable()); }
 
@@ -318,6 +345,8 @@ public:
 		executable.cancel_ = cancel_;
 		// Propagate the executor.
 		executable.executor_ = executor_;
+		// Propagate the metadata.
+		executable.metadata_ = metadata_;
 	}
 
 private:
@@ -327,6 +356,7 @@ private:
 
 	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
+	bzd::ExecutableMetadata metadata_{};
 };
 
 } // namespace bzd::interface

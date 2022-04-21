@@ -21,6 +21,7 @@
 namespace bzd::async {
 using Executable = bzd::coroutine::impl::Executable;
 using Executor = bzd::coroutine::impl::Executor;
+using Type = bzd::ExecutableMetadata::Type;
 } // namespace bzd::async
 
 namespace bzd::impl {
@@ -169,7 +170,10 @@ public:
 	}
 
 	/// Associate an executor to this async and push it to the queue.
-	constexpr void enqueue(async::Executor& executor) noexcept { executor.schedule(getExecutable()); }
+	constexpr void enqueue(async::Executor& executor, const bzd::async::Type type = bzd::async::Type::active) noexcept
+	{
+		executor.schedule(getExecutable(), type);
+	}
 
 	/// Run the current async on a given executor.
 	/// This call will block until completion of the async.
