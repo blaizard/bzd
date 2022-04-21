@@ -68,10 +68,15 @@ public:
 		context_->setContinuation(bzd::ExecutorContext<Executable>::Continuation{&executable});
 	}
 
-	constexpr void setContinuation(Executable& continuation) noexcept { continuation_.emplace<Executable*>(&continuation); }
+	constexpr void setContinuation(Executable& continuation) noexcept
+	{
+		bzd::assert::isTrue(continuation_.is<bzd::monostate>());
+		continuation_.emplace<Executable*>(&continuation);
+	}
 
 	constexpr void setConditionalContinuation(OnTerminateCallback onTerminate) noexcept
 	{
+		bzd::assert::isTrue(continuation_.is<bzd::monostate>());
 		continuation_.emplace<OnTerminateCallback>(onTerminate);
 	}
 

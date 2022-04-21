@@ -35,7 +35,7 @@ class ExecutableMetadata
 public: // Types.
 	enum class Type : bzd::UInt8Type
 	{
-		none,
+		unset,
 		active,
 		service
 	};
@@ -48,7 +48,7 @@ private:
 	friend class bzd::interface::Executable;
 
 	// Type of executable.
-	Type type_{Type::none};
+	Type type_{Type::unset};
 };
 
 /// Executor context.
@@ -187,7 +187,24 @@ public:
 	{
 		executable.setType(type);
 		executable.setExecutor(*this);
+		switch (type)
+		{
+		case bzd::ExecutableMetadata::Type::active:
+			++nbActiveExecutables_;
+			break;
+		case bzd::ExecutableMetadata::Type::service:
+			break;
+		case bzd::ExecutableMetadata::Type::unset:
+			bzd::assert::unreachable();
+			break;
+		}
 		push(executable);
+	}
+
+	constexpr bzd::Optional<Executable&> terminateActive() noexcept
+	{
+		--nbActiveExecutables_;
+		return bzd::nullopt;
 	}
 
 public:
@@ -199,6 +216,9 @@ public:
 		auto scope = makeSyncSharedLockGuard(contextMutex_);
 		return range::associateScope(context_, bzd::move(scope));
 	}
+
+	/// Get the number of executable currently active that are associated with this executor.
+	[[nodiscard]] constexpr auto getNbActiveExecutables() const noexcept { return nbActiveExecutables_.load(); }
 
 private:
 	template <class U>
@@ -270,6 +290,8 @@ private:
 	bzd::Atomic<SizeType> maxRunningCount_{0};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
+	/// Number of active executables currently associated with this executor.
+	bzd::Atomic<SizeType> nbActiveExecutables_{0};
 };
 
 } // namespace bzd
@@ -319,9 +341,13 @@ public:
 
 	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
 
-	constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.type_; }
+	[[nodiscard]] constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.type_; }
 
-	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept { metadata_.type_ = type; }
+	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept
+	{
+		bzd::assert::isTrue(metadata_.type_ == bzd::ExecutableMetadata::Type::unset);
+		metadata_.type_ = type;
+	}
 
 	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
 	constexpr void schedule() noexcept { getExecutor().push(getExecutable()); }
