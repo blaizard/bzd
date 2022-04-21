@@ -24,6 +24,11 @@ class Test;
 template <class Executable>
 class Executor;
 
+namespace interface {
+template <class T>
+class Executable;
+}
+
 /// Executor context.
 template <class Executable>
 class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
@@ -116,17 +121,6 @@ public: // Statistics.
 	[[nodiscard]] constexpr SizeType getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
 
 public:
-	/// Push a new workload to the queue.
-	///
-	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
-	///
-	/// \param executable The workload to be executed.
-	constexpr void enqueue(Executable& exectuable) noexcept
-	{
-		exectuable.executor_ = this;
-		push(exectuable);
-	}
-
 	/// Run all the workload currently in the queue.
 	///
 	/// Drain all workloads and exit only when the queue is empty.
@@ -157,7 +151,7 @@ public:
 				auto maybeExecutableToEnqueue = context.popContinuation();
 				if (maybeExecutableToEnqueue)
 				{
-					enqueue(maybeExecutableToEnqueue.valueMutable());
+					push(maybeExecutableToEnqueue.valueMutable());
 				}
 			}
 			context.updateTick();
@@ -165,6 +159,13 @@ public:
 	}
 
 	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
+
+	/// Schedule a new executable to this executor.
+	constexpr void schedule(Executable& executable) noexcept
+	{
+		executable.setExecutor(*this);
+		push(executable);
+	}
 
 public:
 	/// Create a generator for the context structure.
@@ -177,6 +178,9 @@ public:
 	}
 
 private:
+	template <class U>
+	friend class bzd::interface::Executable;
+
 	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.
 	///
 	/// \param context The context object to be attached.
@@ -284,21 +288,26 @@ public:
 		return cancel_->isCanceled();
 	}
 
-	constexpr bzd::Executor<T>& getExecutor() const noexcept
+	constexpr bzd::Executor<T>& getExecutor() noexcept
 	{
-		bzd::assert::isTrue(executor_);
-		return *executor_;
+		bzd::assert::isTrue(executor_.hasValue());
+		return executor_.valueMutable();
 	}
+
+	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
+
+	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
+	constexpr void schedule() noexcept { getExecutor().push(getExecutable()); }
 
 	constexpr void detach() noexcept
 	{
 		bzd::ignore = pop();
-		if (executor_)
+		if (executor_.hasValue())
 		{
 			// If there is an executor wait until it is safe to discard the element, this to avoid any
 			// potential out of scope object access.
 			executor_->waitToDiscard();
-			executor_ = nullptr;
+			executor_.reset();
 		}
 	}
 
@@ -307,12 +316,16 @@ public:
 	{
 		// Propagate the cancellation token if any.
 		executable.cancel_ = cancel_;
+		// Propagate the executor.
+		executable.executor_ = executor_;
 	}
 
 private:
 	friend class bzd::Executor<T>;
 
-	bzd::Executor<T>* executor_{nullptr};
+	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
+
+	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
 };
 

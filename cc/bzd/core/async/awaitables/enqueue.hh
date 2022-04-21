@@ -28,6 +28,7 @@ protected:
 
 	constexpr void enqueueAsyncs(Executable& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
 	{
+		auto& executor{caller.getExecutor()};
 		continuation_.emplace(caller);
 		constexprForContainerInc(asyncs_, [&](auto& async) {
 			auto& executable = async.getExecutable();
@@ -36,7 +37,7 @@ protected:
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
 			executable.setConditionalContinuation(callback_);
-			caller.getExecutor().enqueue(executable);
+			executor.schedule(executable);
 		});
 	}
 

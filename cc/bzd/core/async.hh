@@ -169,7 +169,7 @@ public:
 	}
 
 	/// Associate an executor to this async and push it to the queue.
-	constexpr void enqueue(async::Executor& executor) noexcept { executor.enqueue(getExecutable()); }
+	constexpr void enqueue(async::Executor& executor) noexcept { executor.schedule(getExecutable()); }
 
 	/// Run the current async on a given executor.
 	/// This call will block until completion of the async.
