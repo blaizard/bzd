@@ -41,7 +41,7 @@ public:
 	/// Get the unique identifier of this context accross this executor.
 	[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
 	/// Get the current tick for this executor.
-	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_.load(); }
+	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_; }
 	/// Provide an executable to be enqued sequentially, after the execution of the current exectuable.
 	constexpr void setContinuation(Continuation&& continuation) noexcept
 	{
@@ -55,7 +55,7 @@ private:
 	template <class>
 	friend class bzd::Test;
 
-	constexpr void updateTick() noexcept { tick_.store(Executor::getNextTick()); }
+	constexpr void updateTick() noexcept { ++tick_; }
 
 	[[nodiscard]] constexpr bzd::Optional<Executable&> popContinuation() noexcept
 	{
@@ -81,7 +81,7 @@ private:
 
 private:
 	const IdType id_;
-	Atomic<TickType> tick_{0};
+	TickType tick_{0};
 	Continuation continuation_{};
 };
 
@@ -116,21 +116,6 @@ public: // Statistics.
 	[[nodiscard]] constexpr SizeType getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
 
 public:
-	/// A unique counter with no units that increments after each scheduling.
-	[[nodiscard]] static TickType getNextTick() noexcept
-	{
-		static Atomic<TickType> tick{0};
-
-		// Increase the counter by ensuring the value zero is never set.
-		// This is a special value that is used to avoid dead lock.
-		TickType current;
-		do
-		{
-			current = ++tick;
-		} while (current == 0);
-		return current;
-	}
-
 	/// Push a new workload to the queue.
 	///
 	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
@@ -139,7 +124,7 @@ public:
 	constexpr void enqueue(Executable& exectuable) noexcept
 	{
 		exectuable.executor_ = this;
-		bzd::ignore = queue_.pushFront(exectuable);
+		push(exectuable);
 	}
 
 	/// Run all the workload currently in the queue.
@@ -220,6 +205,13 @@ private:
 			bzd::assert::isTrue(result.hasValue());
 		}};
 	}
+
+	/// Push a new workload to the queue.
+	///
+	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
+	///
+	/// \param executable The workload to be executed.
+	constexpr void push(Executable& executable) noexcept { bzd::ignore = queue_.pushFront(executable); }
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
