@@ -172,7 +172,20 @@ public:
 	/// Associate an executor to this async and push it to the queue.
 	constexpr void enqueue(async::Executor& executor, const bzd::async::Type type = bzd::async::Type::active) noexcept
 	{
-		executor.schedule(getExecutable(), type);
+		auto& executable{getExecutable()};
+		switch (type)
+		{
+		case bzd::ExecutableMetadata::Type::active:
+			executable.setConditionalContinuation(
+				async::Executable::OnTerminateCallback::toMember<async::Executor, &async::Executor::terminateActive>(executor));
+			break;
+		case bzd::ExecutableMetadata::Type::service:
+			break;
+		case bzd::ExecutableMetadata::Type::unset:
+			bzd::assert::unreachable();
+			break;
+		}
+		executor.schedule(executable, type);
 	}
 
 	/// Run the current async on a given executor.

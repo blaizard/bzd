@@ -97,22 +97,7 @@ TEST_ASYNC(Coroutine, PassThrough)
 	EXPECT_EQ(result.value(), 34);
 	co_return {};
 }
-/*
-bzd::Async<bzd::impl::AsyncExecutor*> fetchExecutor()
-{
-	auto exec = co_await bzd::async::getExecutor();
-	co_return exec;
-}
 
-TEST(Coroutine, Executor)
-{
-	bzd::impl::AsyncExecutor executor;
-	auto promise = fetchExecutor();
-	const auto result = promise.run(executor);
-	EXPECT_TRUE(result);
-	EXPECT_EQ(result.value(), &executor);
-}
-*/
 TEST_ASYNC(Coroutine, asyncAll)
 {
 	bzd::String<128> trace;
@@ -322,4 +307,50 @@ TEST_ASYNC(Coroutine, Stackoverflow)
 	EXPECT_TRUE(result);
 	EXPECT_EQ(result.value(), 4999950000ULL);
 	co_return {};
+}
+
+TEST(Coroutine, Active)
+{
+	bzd::coroutine::impl::Executor executor{};
+
+	auto promise = nopNoTrace(42);
+	promise.run(executor);
+	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
+}
+
+TEST(Coroutine, ActiveNested)
+{
+	bzd::coroutine::impl::Executor executor{};
+
+	auto promise = loopSynchronously(42);
+	promise.run(executor);
+	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
+}
+
+TEST(Coroutine, ActiveAll)
+{
+	bzd::coroutine::impl::Executor executor{};
+
+	// Note, promiseA and proiseB need to be constructed in a large scope here to ensure
+	// they are not destroyed before the start of the execution of promise.
+	// async::all(loopSyncrhonously(42), ...) would fail because of this.
+	auto promiseA = loopSynchronously(42);
+	auto promiseB = loopSynchronously(42);
+	auto promise = bzd::async::all(bzd::move(promiseA), bzd::move(promiseB));
+	promise.run(executor);
+	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
+}
+
+TEST(Coroutine, ActiveAny)
+{
+	bzd::coroutine::impl::Executor executor{};
+
+	// Note, promiseA and proiseB need to be constructed in a large scope here to ensure
+	// they are not destroyed before the start of the execution of promise.
+	// async::any(loopSyncrhonously(42), ...) would fail because of this.
+	auto promiseA = loopSynchronously(42);
+	auto promiseB = loopSynchronously(2);
+	auto promise = bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
+	promise.run(executor);
+	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
 }

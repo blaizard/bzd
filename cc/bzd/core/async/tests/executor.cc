@@ -47,3 +47,20 @@ TEST(ExecutorContext, Continuation)
 		EXPECT_FALSE(maybeContinuation);
 	}
 }
+
+/*
+bzd::Async<bzd::impl::AsyncExecutor*> fetchExecutor()
+{
+	auto exec = co_await bzd::async::getExecutor();
+	co_return exec;
+}
+
+TEST(Coroutine, Executor)
+{
+	bzd::impl::AsyncExecutor executor;
+	auto promise = fetchExecutor();
+	const auto result = promise.run(executor);
+	EXPECT_TRUE(result);
+	EXPECT_EQ(result.value(), &executor);
+}
+*/
