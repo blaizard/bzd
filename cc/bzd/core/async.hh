@@ -193,6 +193,7 @@ public:
 	{
 		async::Executor executor;
 		auto result = run(executor);
+		// Needed as the result is expected to get recovered only after the coroutine is destroyed.
 		destroy();
 		return bzd::move(result);
 	}
@@ -210,12 +211,8 @@ public: // coroutine specific
 		auto& promise = handle_.promise();
 		auto& promiseCaller = caller.promise();
 
-		// Propagate the cancellation.
-		auto cancellation = promiseCaller.getCancellationToken();
-		if (cancellation)
-		{
-			promise.setCancellationToken(cancellation.valueMutable());
-		}
+		// Propagate the context of the caller to this async.
+		promiseCaller.propagate(promise);
 
 		// Handle the continuation.
 		promise.setContinuation(promiseCaller);
