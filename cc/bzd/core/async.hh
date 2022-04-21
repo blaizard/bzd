@@ -18,6 +18,11 @@
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
+namespace bzd::async {
+using Executable = bzd::coroutine::impl::Executable;
+using Executor = bzd::coroutine::impl::Executor;
+} // namespace bzd::async
+
 namespace bzd::impl {
 
 struct AsyncTag
@@ -31,8 +36,6 @@ public: // Traits
 	using PromiseType = bzd::coroutine::Promise<T>;
 	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
-	using Executable = bzd::coroutine::impl::Executable;
-	using Executor = bzd::coroutine::impl::Executor;
 	using Self = Async<T>;
 	using Tag = bzd::impl::AsyncTag;
 
@@ -109,7 +112,7 @@ public:
 					static_assert(index < PromiseType::ResultType::size(), "The index used with assert is out of bound.");
 
 					// Return if one of the result is an error
-					for ([[maybe_unused]] auto& variant : result)
+					for (auto& variant : result)
 					{
 						auto maybeError = variant.match([](auto& value) -> bzd::Error* {
 							if (value.hasValue() && value.value().hasError())
@@ -165,18 +168,15 @@ public:
 		return AsyncPropagate{bzd::move(*this)};
 	}
 
-	/// Detach the current async from its executor (if attached).
-	constexpr void detach() noexcept { getExecutable().detach(); }
-
 	/// Associate an executor to this async and push it to the queue.
-	constexpr void enqueue(Executor& executor) noexcept { executor.enqueue(getExecutable()); }
+	constexpr void enqueue(async::Executor& executor) noexcept { executor.enqueue(getExecutable()); }
 
 	/// Run the current async on a given executor.
 	/// This call will block until completion of the async.
 	///
 	/// \param executor The executor to run on.
 	/// \return The result of the async.
-	constexpr ResultType run(Executor& executor) noexcept
+	constexpr ResultType run(async::Executor& executor) noexcept
 	{
 		// Associate the executor with this async and enqueue it.
 		enqueue(executor);
@@ -188,9 +188,10 @@ public:
 		return await_resume();
 	}
 
+	/// Execute this coroutine on a free-standing executor.
 	constexpr ResultType sync() noexcept
 	{
-		Executor executor;
+		async::Executor executor;
 		auto result = run(executor);
 		destroy();
 		return bzd::move(result);
@@ -253,7 +254,10 @@ private:
 		}
 	}
 
-	constexpr Executable& getExecutable() noexcept
+	/// Detach the current async from its executor (if attached).
+	constexpr void detach() noexcept { getExecutable().detach(); }
+
+	constexpr async::Executable& getExecutable() noexcept
 	{
 		bzd::assert::isTrue(static_cast<bool>(handle_));
 		return handle_.promise();
