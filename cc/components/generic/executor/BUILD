@@ -21,6 +21,6 @@ cc_library(
     deps = [
         ":bdl",
         "//cc/bzd/container:function_ref",
-        "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/utility:apply",
     ],
 )

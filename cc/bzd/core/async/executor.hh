@@ -33,10 +33,13 @@ class Executable;
 class ExecutableMetadata
 {
 public: // Types.
+	/// The executable type can only be set once.
 	enum class Type : bzd::UInt8Type
 	{
 		unset,
 		active,
+		/// Services are executables that can be terminated if no
+		/// active executables are running.
 		service
 	};
 
@@ -182,7 +185,7 @@ public:
 
 	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
-	/// Schedule a new executable to this executor.
+	/// Schedule a new executable on this executor.
 	constexpr void schedule(Executable& executable, const bzd::ExecutableMetadata::Type type) noexcept
 	{
 		executable.setType(type);

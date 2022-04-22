@@ -20,9 +20,9 @@ bzd::Clock* systemClock{nullptr};
 
 // for deploy in deployments
 
-/**
- * Auto-generated application registry.
- */
+namespace {
+
+/// Auto-generated application registry.
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries.
@@ -40,9 +40,30 @@ bzd::Clock* systemClock{nullptr};
 	return Registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
 }
 
-/**
- * Initialize and compose the application.
- */
+/// Helper to handle return code.
+template <class Promise>
+[[nodiscard]] constexpr bzd::BoolType verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
+{
+	if (!promise.isReady())
+	{
+		bzd::log::error("Task '{}' did not terminate correctly."_csv, taskName).sync();
+		return false;
+	}
+	
+	const auto result{promise.moveResultOut()};
+	if (result->hasError())
+	{
+		bzd::log::error("Task '{}' terminated with an error."_csv, taskName).sync();
+		bzd::log::error(result->error()).sync();
+		return false;
+	}
+
+	return true;
+}
+
+} // namespace
+
+/// Initialize and compose the application.
 bool execute() noexcept
 {
 	// Create registry.
@@ -87,14 +108,7 @@ bool execute() noexcept
 	bzd::log::info("Completion."_csv).sync();
 	bool isSuccess{true};
 	{% for index, expresssion in composition %}
-	if (promise{{ index }}.isReady())
-	{
-		isSuccess &= promise{{ index }}.moveResultOut()->hasValue();
-	}
-	else
-	{
-		bzd::log::error("Task '{{ expresssion.type | typeRegistryToStr }}' not terminated correctly."_csv).sync();
-	}
+	isSuccess &= verifyReturnedPromise(bzd::move(promise{{ index }}), "{{ expresssion.type | typeRegistryToStr }}"_sv);
 	{% end %}
 
 	return isSuccess;
