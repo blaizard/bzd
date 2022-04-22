@@ -4,7 +4,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/interfaces/core.hh"
 #include "cc/bzd/platform/interfaces/executor.hh"
-#include "cc/bzd/utility/constexpr_for.hh"
+#include "cc/bzd/utility/apply.hh"
 
 namespace bzd::platform::generic {
 
@@ -18,29 +18,23 @@ public:
 	{
 	}
 
-	/**
-	 * Assign a workload to this executor.
-	 */
+	/// Assign a workload to this executor.
 	template <class V, class E>
 	constexpr void enqueue(bzd::Async<V, E>& async) noexcept
 	{
 		async.enqueue(executor_);
 	}
 
-	/**
-	 * Start the executor.
-	 */
-	void start() noexcept
+	/// Start the executor.
+	constexpr void start() noexcept
 	{
-		constexprForContainerInc(cores_, [&](auto item) { item->start(start_); });
+		bzd::apply([&](auto&... cores) { (cores->start(start_), ...); }, cores_);
 	}
 
-	/**
-	 * Stop the executor.
-	 */
-	void stop() noexcept
+	/// Stop the executor.
+	constexpr void stop() noexcept
 	{
-		constexprForContainerDec(cores_, [](auto item) { item->stop(); });
+		bzd::apply([](auto&... cores) { (cores->stop(), ...); }, cores_);
 	}
 
 private:

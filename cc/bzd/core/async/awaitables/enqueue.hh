@@ -166,7 +166,7 @@ private:
 			token_.trigger();
 			token_.detach();
 			// Needed to ensure the promise is enqueued after the cancellation token has been triggered.
-			current = counter_.fetchAdd(1U, MemoryOrder::acquire);
+			current = ++counter_;
 		}
 		// Only at the last function exit the caller is pushed back to the scheduling queue.
 		// This makes this design thread safe.
