@@ -182,8 +182,9 @@ public:
 		case bzd::ExecutableMetadata::Type::service:
 			break;
 		case bzd::ExecutableMetadata::Type::unset:
+			[[fallthrough]];
+		default:
 			bzd::assert::unreachable();
-			break;
 		}
 		executor.schedule(executable, type);
 	}
