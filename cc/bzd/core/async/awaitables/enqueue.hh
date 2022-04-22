@@ -51,8 +51,9 @@ protected:
 		case bzd::ExecutableMetadata::Type::service:
 			break;
 		case bzd::ExecutableMetadata::Type::unset:
+			[[fallthrough]];
+		default:
 			bzd::assert::unreachable();
-			break;
 		}
 		return callback_();
 	}
