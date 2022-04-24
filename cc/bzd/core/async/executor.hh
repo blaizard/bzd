@@ -156,7 +156,7 @@ public:
 		auto scope = registerContext(context);
 
 		// Loop until there are still elements
-		while (!queue_.empty()) //&& getNbActive())
+		while (!queue_.empty() && getNbActiveExecutables())
 		{
 			// Drain remaining handles
 			auto maybeExecutable = pop();

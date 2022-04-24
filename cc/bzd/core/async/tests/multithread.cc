@@ -15,17 +15,13 @@ enum class ForkType
 template <class Result>
 [[nodiscard]] bool isValidResultForAll(Result&& result)
 {
-	return bzd::apply([](auto&... asyncs) -> bool {
-		return (asyncs.hasValue() && ...);
-	}, bzd::forward<Result>(result));
+	return bzd::apply([](auto&... asyncs) -> bool { return (asyncs.hasValue() && ...); }, bzd::forward<Result>(result));
 }
 
 template <class Result>
 [[nodiscard]] bool isValidResultForAny(Result&& result)
 {
-	return bzd::apply([](auto&... asyncs) -> bool {
-		return (asyncs.hasValue() || ...);
-	}, bzd::forward<Result>(result));
+	return bzd::apply([](auto&... asyncs) -> bool { return (asyncs.hasValue() || ...); }, bzd::forward<Result>(result));
 }
 
 bzd::Async<> cancellationWorkload(const bzd::SizeType counter)

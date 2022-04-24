@@ -1,5 +1,6 @@
 import typing
 import pathlib
+import dataclasses
 
 from bzd.parser.error import Error
 
@@ -19,6 +20,12 @@ GLOBAL_FQN_STEADY_CLOCK = "steadyClock"
 GLOBAL_FQN_SYSTEM_CLOCK = "systemClock"
 
 
+@dataclasses.dataclass(frozen=True)
+class AsyncType:
+	active = "active"
+	service = "service"
+
+
 class Composition:
 
 	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
@@ -27,7 +34,7 @@ class Composition:
 		self.registry: typing.List[Expression] = []
 		self.registryFQNs: typing.Set[str] = set()
 		self.initialization: typing.List[typing.Dict[str, typing.Any]] = []
-		self.composition: typing.List[Expression] = []
+		self.composition: typing.List[typing.Dict[str, typing.Any]] = []
 		self.executors: typing.Set[str] = set()
 
 	def visit(self, bdl: Object) -> "Composition":
@@ -92,11 +99,11 @@ class Composition:
 
 		return orderFQNs
 
-	def addComposition(self, entity: Expression) -> None:
+	def addComposition(self, entity: Expression, asyncType: str) -> None:
 		"""
 		Add a new composition entity to the compisiton list.
 		"""
-		self.composition.append(entity)
+		self.composition.append({"entity": entity, "asyncType": asyncType})
 
 		# Update the executor list
 		self.executors.add(entity.executor)
@@ -142,7 +149,7 @@ class Composition:
 					if entityCopied.isInit:
 						self.addInit(fqn=entity.fqn, entity=entityCopied)
 					else:
-						self.addComposition(entity=entityCopied)
+						self.addComposition(entity=entityCopied, asyncType=AsyncType.service)
 
 			else:
 				self.addInit(fqn=entity.fqn)
@@ -160,7 +167,7 @@ class Composition:
 			if entity.isInit:
 				self.addInit(fqn=entity.fqn, entity=entity)
 			else:
-				self.addComposition(entity=entity)
+				self.addComposition(entity=entity, asyncType=AsyncType.active)
 
 		# Ensure all executors are declared.
 		executorsIntersection = self.executors.intersection(self.registryFQNs)
