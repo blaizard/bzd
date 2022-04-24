@@ -2,57 +2,68 @@
     "stages": [
         {
             "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev",
-            "name": "linux_x86_64_clang dev + clang-tidy"
+            "name": "linux_x86_64_clang dev + clang-tidy",
+            "tags": ["x86_64", "clang"]
         },
         {
             "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod",
-            "name": "linux_x86_64_clang prod"
+            "name": "linux_x86_64_clang prod",
+            "tags": ["x86_64", "clang"]
         },
         {
             "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod",
-            "name": "linux_x86_64_gcc"
+            "name": "linux_x86_64_gcc",
+            "tags": ["x86_64", "gcc"]
         },
         {
             "command": "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod || echo 'failed!'",
-            "name": "esp32_xtensa_lx6_gcc"
+            "name": "esp32_xtensa_lx6_gcc",
+            "tags": ["esp32", "gcc"]
         },
         {
             "category": "stress",
             "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test={runs} --platform_suffix=linux_x86_64_clang_dev",
-            "name": "dev"
+            "name": "dev",
+            "tags": ["x86_64", "clang", "dev"]
         },
         {
             "category": "stress",
             "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test={runs} --platform_suffix=linux_x86_64_clang_prod",
-            "name": "prod"
+            "name": "prod",
+            "tags": ["x86_64", "clang", "prod"]
         },
         {
             "category": "sanitizer",
             "command": "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan",
-            "name": "asan/lsan"
+            "name": "asan/lsan",
+            "tags": ["x86_64", "clang"]
         },
         {
             "category": "coverage",
             "command": "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc",
             "name": "C++",
-            "output": "bazel-out/coverage_cc"
+            "output": "bazel-out/coverage_cc",
+            "tags": ["x86_64", "cc"]
         },
         {
             "category": "coverage",
             "command": "./tools/bazel coverage ... --config=py --config=linux_x86_64_clang --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py",
             "name": "Python",
-            "output": "bazel-out/coverage_py"
+            "output": "bazel-out/coverage_py",
+            "tags": ["x86_64", "py"]
         },
         {
             "category": "coverage",
             "command": "./tools/bazel coverage ... --config=nodejs --config=linux_x86_64_clang --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs",
             "name": "NodeJs",
-            "output": "bazel-out/coverage_nodejs"
+            "output": "bazel-out/coverage_nodejs",
+            "tags": ["x86_64", "nodejs"]
         },
         {
             "category": "sanitizer",
             "command": "./sanitize.sh",
-            "name": "sanitizer"
+            "name": "sanitizer",
+            "tags": []
         }
     ]
 }

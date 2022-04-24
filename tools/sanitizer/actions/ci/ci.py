@@ -8,10 +8,12 @@ import typing
 from tools.ci.factory import Factory
 from tools.ci.jenkins.factory import Jenkins
 from tools.ci.quality_gate.factory import QualityGate
+from tools.ci.travis.factory import Travis
 
 factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
 	Jenkins,
 	QualityGate,
+	Travis,
 )
 
 if __name__ == "__main__":
