@@ -28,10 +28,6 @@ jobs:
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
-    - name: "[normal] esp32_xtensa_lx6_gcc"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod || echo 'failed!'
     - name: "[sanitizer] asan/lsan"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local

@@ -2,32 +2,36 @@ import pathlib
 import typing
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from bzd.template.template import Template
 
+@dataclass
+class ConfigBase_:
+	"""Common configuration accross all specialization."""
+	exclude: typing.Set[str] = field(default_factory=set)
 
 @dataclass
-class ConfigNormal:
+class ConfigNormal(ConfigBase_):
 	"""Configuration for normal tests."""
 	name: typing.Final[str] = "normal"
 
 
 @dataclass
-class ConfigStress:
+class ConfigStress(ConfigBase_):
 	"""Configuration for stress tests."""
 	name: typing.Final[str] = "stress"
 	runs: int = 100
 
 
 @dataclass
-class ConfigCoverage:
+class ConfigCoverage(ConfigBase_):
 	"""Configuration for coverage tests."""
 	name: typing.Final[str] = "coverage"
 
 
 @dataclass
-class ConfigSanitizer:
+class ConfigSanitizer(ConfigBase_):
 	"""Configuration for sanitizer tests."""
 	name: typing.Final[str] = "sanitizer"
 
@@ -89,6 +93,9 @@ class Factory(ABC):
 			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
 			if item["category"] in configs:
 				config = configs[item["category"]]
+				# Check if not in excluded list.
+				if any(tag in item["tags"] for tag in config.exclude):
+					continue
 				item["command"] = item["command"].format(**asdict(config))
 				data.append(item)
 
