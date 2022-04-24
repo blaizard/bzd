@@ -19,10 +19,7 @@ public:
 	}
 
 	/// Assign a workload to this executor.
-	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
-	{
-		async.enqueue(executor_, type);
-	}
+	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept { async.enqueue(executor_, type); }
 
 	/// Start the executor.
 	constexpr void start() noexcept

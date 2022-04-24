@@ -89,9 +89,9 @@ bool execute() noexcept
 
 	// Compose.
 	bzd::log::info("Composition phase."_csv).sync();
-	{% for index, expresssion in composition %}
-	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
-	registry.{{ expresssion.executor | fqnToNameStr }}_.schedule(promise{{ index }}, bzd::async::Type::active);
+	{% for index, entry in composition %}
+	auto promise{{ index }} = {{ entry.entity.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(entry.entity.parametersResolved, true) -}} );
+	registry.{{ entry.entity.executor | fqnToNameStr }}_.schedule(promise{{ index }}, {{ entry.asyncType | asyncTypeToStr }});
 	{% end %}
 
 	// Execute.
@@ -107,8 +107,10 @@ bool execute() noexcept
 
 	bzd::log::info("Completion."_csv).sync();
 	bool isSuccess{true};
-	{% for index, expresssion in composition %}
-	isSuccess &= verifyReturnedPromise(bzd::move(promise{{ index }}), "{{ expresssion.type | typeRegistryToStr }}"_sv);
+	{% for index, entry in composition %}
+	{% if entry.asyncType == "active" %}
+	isSuccess &= verifyReturnedPromise(bzd::move(promise{{ index }}), "{{ entry.entity.type | typeRegistryToStr }}"_sv);
+	{% end %}
 	{% end %}
 
 	return isSuccess;

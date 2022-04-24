@@ -3,7 +3,7 @@ from pathlib import Path
 
 from bzd.template.template import Template
 
-from tools.bdl.visitors.composition.visitor import Composition
+from tools.bdl.visitors.composition.visitor import Composition, AsyncType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
@@ -83,6 +83,14 @@ class Transform:
 
 	def fqnToNameStr(self, fqn: str) -> str:
 		return fqnToNameStrOriginal(fqn=fqn)
+
+	# Async type
+
+	def asyncTypeToStr(self, asyncType: str) -> str:
+		return {
+			AsyncType.active: "bzd::async::Type::active",
+			AsyncType.service: "bzd::async::Type::service",
+		}[asyncType]
 
 
 def formatCc(bdl: Object) -> str:
