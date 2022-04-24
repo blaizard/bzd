@@ -84,7 +84,7 @@ class Factory(ABC):
 		rawData = json.loads(pathlib.Path("tools/ci/stages.json").read_text())
 		data = []
 		for stage in rawData["stages"]:
-			item = {"category": "normal"}
+			item = {"category": "normal", "tags": []}
 			item.update(stage)
 			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
 			if item["category"] in configs:

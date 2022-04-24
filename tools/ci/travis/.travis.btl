@@ -1,0 +1,24 @@
+dist: focal
+
+addons:
+  apt:
+    packages:
+      - wget
+      - pkg-config
+      - python
+
+git:
+  submodules: false
+
+jobs:
+  include:
+    - name: "Info"
+      script:
+      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+      - .info.sh
+{% for stage in stages %}
+    - name: "[{{ stage.category }}] {{ stage.name }}"
+      script:
+      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+      - {{ stage.command }}
+{% end %}

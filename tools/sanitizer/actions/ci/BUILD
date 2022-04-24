@@ -10,5 +10,6 @@ py_binary(
         "//python/bzd:env",
         "//tools/ci/jenkins:factory",
         "//tools/ci/quality_gate:factory",
+        "//tools/ci/travis:factory",
     ],
 )
