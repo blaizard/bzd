@@ -91,7 +91,7 @@ bool execute() noexcept
 	bzd::log::info("Composition phase."_csv).sync();
 	{% for index, expresssion in composition %}
 	auto promise{{ index }} = {{ expresssion.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expresssion.parametersResolved, true) -}} );
-	registry.{{ expresssion.executor | fqnToNameStr }}_.enqueue(promise{{ index }});
+	registry.{{ expresssion.executor | fqnToNameStr }}_.schedule(promise{{ index }}, bzd::async::Type::active);
 	{% end %}
 
 	// Execute.
