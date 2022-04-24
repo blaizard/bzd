@@ -12,27 +12,34 @@ git:
 
 jobs:
   include:
-    - name: "Info"
+
+    - name: "Environment"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - .info.sh
+
     - name: "[normal] linux_x86_64_clang dev + clang-tidy"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev
+
     - name: "[normal] linux_x86_64_clang prod"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod
+
     - name: "[normal] linux_x86_64_gcc"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
+
     - name: "[sanitizer] asan/lsan"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan
+
     - name: "[sanitizer] sanitizer"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./sanitize.sh
+

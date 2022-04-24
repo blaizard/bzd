@@ -11,5 +11,6 @@ py_binary(
         "//tools/ci/jenkins:factory",
         "//tools/ci/quality_gate:factory",
         "//tools/ci/travis:factory",
+        "//tools/ci/github:factory"
     ],
 )

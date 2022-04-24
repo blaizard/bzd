@@ -9,11 +9,13 @@ from tools.ci.factory import Factory
 from tools.ci.jenkins.factory import Jenkins
 from tools.ci.quality_gate.factory import QualityGate
 from tools.ci.travis.factory import Travis
+from tools.ci.github.factory import GitHub
 
 factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
 	Jenkins,
 	QualityGate,
 	Travis,
+	GitHub,
 )
 
 if __name__ == "__main__":
