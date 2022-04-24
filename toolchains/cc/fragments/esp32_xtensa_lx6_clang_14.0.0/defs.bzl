@@ -49,7 +49,7 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",
             "--no-standard-includes",
-            "-Wno-unused-command-line-argument"
+            "-Wno-unused-command-line-argument",
         ],
         "link_flags": [
             # No standard libraries
