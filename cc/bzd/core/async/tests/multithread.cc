@@ -12,6 +12,22 @@ enum class ForkType
 	random
 };
 
+template <class Result>
+[[nodiscard]] bool isValidResultForAll(Result&& result)
+{
+	return bzd::apply([](auto&... asyncs) -> bool {
+		return (asyncs.hasValue() && ...);
+	}, bzd::forward<Result>(result));
+}
+
+template <class Result>
+[[nodiscard]] bool isValidResultForAny(Result&& result)
+{
+	return bzd::apply([](auto&... asyncs) -> bool {
+		return (asyncs.hasValue() || ...);
+	}, bzd::forward<Result>(result));
+}
+
 bzd::Async<> cancellationWorkload(const bzd::SizeType counter)
 {
 	for (bzd::SizeType current = 0; current < counter; ++current)
@@ -31,21 +47,25 @@ bzd::Async<> cancellationNestedWorkload(const bzd::SizeType counter)
 		auto promise3 = cancellationNestedWorkload<forkType>(counter / 3);
 		if constexpr (forkType == ForkType::any)
 		{
-			co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			auto result = co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			EXPECT_TRUE(isValidResultForAny(result));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
-			co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			auto result = co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			EXPECT_TRUE(isValidResultForAll(result));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
 			if (counter % 2)
 			{
-				co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				auto result = co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				EXPECT_TRUE(isValidResultForAny(result));
 			}
 			else
 			{
-				co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				auto result = co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				EXPECT_TRUE(isValidResultForAll(result));
 			}
 		}
 		else
@@ -81,6 +101,8 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 			{
 				entry.join();
 			}
+
+			EXPECT_TRUE(promise.isReady());
 		};
 
 		if constexpr (forkType == ForkType::any)
@@ -88,12 +110,14 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 			auto promise =
 				bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
 			execute(promise);
+			EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
 			auto promise =
 				bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
 			execute(promise);
+			EXPECT_TRUE(isValidResultForAll(promise.moveResultOut().value()));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
@@ -105,6 +129,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 											   bzd::move(promise4),
 											   bzd::move(promise5));
 				execute(promise);
+				EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
 			}
 			else
 			{
@@ -114,6 +139,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 											   bzd::move(promise4),
 											   bzd::move(promise5));
 				execute(promise);
+				EXPECT_TRUE(isValidResultForAll(promise.moveResultOut().value()));
 			}
 		}
 		else
