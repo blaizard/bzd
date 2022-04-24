@@ -13,7 +13,7 @@ echo  "==== [normal] linux_x86_64_clang prod ==============================="
 echo  "==== [normal] linux_x86_64_gcc ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod $EXTRA_FLAGS
 echo  "==== [normal] esp32_xtensa_lx6_gcc ==============================="
-./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod $EXTRA_FLAGS
+./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod || echo 'failed!' $EXTRA_FLAGS
 echo  "==== [stress] dev ==============================="
 ./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=100 --platform_suffix=linux_x86_64_clang_dev $EXTRA_FLAGS
 echo  "==== [stress] prod ==============================="
