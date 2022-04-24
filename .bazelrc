@@ -72,12 +72,12 @@ build --incompatible_enable_cc_toolchain_resolution
 # linux_x86_64_clang
 build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
 build:linux_x86_64_clang --extra_execution_platforms="@linux_x86_64_clang//:host_platform"
-build:linux_x86_64_clang --platform_suffix=_linux_x86_64_clang
+build:linux_x86_64_clang --platform_suffix=linux_x86_64_clang
 
 # linux_x86_64_gcc
 build:linux_x86_64_gcc --platforms="@linux_x86_64_gcc//:platform"
 build:linux_x86_64_gcc --extra_execution_platforms="@linux_x86_64_gcc//:host_platform"
-build:linux_x86_64_gcc --platform_suffix=_linux_x86_64_gcc
+build:linux_x86_64_gcc --platform_suffix=linux_x86_64_gcc
 build:linux_x86_64_gcc --config=cc-docker-sandbox
 coverage:linux_x86_64_gcc --experimental_split_coverage_postprocessing
 coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
@@ -87,13 +87,13 @@ coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
 build:esp32_xtensa_lx6_clang --platforms="@esp32_xtensa_lx6_clang//:platform"
 build:esp32_xtensa_lx6_clang --extra_execution_platforms="@esp32_xtensa_lx6_clang//:host_platform"
 build:esp32_xtensa_lx6_clang --features=-supports_dynamic_linker
-build:esp32_xtensa_lx6_clang --platform_suffix=_esp32_xtensa_lx6_clang
+build:esp32_xtensa_lx6_clang --platform_suffix=esp32_xtensa_lx6_clang
 
 # esp32_xtensa_lx6_gcc
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --extra_execution_platforms="@esp32_xtensa_lx6_gcc//:host_platform"
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
-build:esp32_xtensa_lx6_gcc --platform_suffix=_esp32_xtensa_lx6_gcc
+build:esp32_xtensa_lx6_gcc --platform_suffix=esp32_xtensa_lx6_gcc
 
 # clang_tidy
 build:clang_tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect

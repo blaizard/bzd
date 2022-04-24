@@ -41,56 +41,56 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=_linux_x86_64_clang_dev"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev"
 					}
 				}
 				stage("[normal] linux_x86_64_clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=_linux_x86_64_clang_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod"
 					}
 				}
 				stage("[normal] linux_x86_64_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=_linux_x86_64_gcc_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod"
 					}
 				}
 				stage("[normal] esp32_xtensa_lx6_gcc")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=_esp32_xtensa_lx6_gcc_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod"
 					}
 				}
 				stage("[stress] dev")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=10 --platform_suffix=_linux_x86_64_clang_dev"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=10 --platform_suffix=linux_x86_64_clang_dev"
 					}
 				}
 				stage("[stress] prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=10 --platform_suffix=_linux_x86_64_clang_prod"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=10 --platform_suffix=linux_x86_64_clang_prod"
 					}
 				}
 				stage("[sanitizer] asan/lsan")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=_clang_asan_lsan"
+						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan"
 					}
 				}
 				stage("[coverage] C++")
 				{
 					steps
 					{
-						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=_coverage_cc && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_cc"
+						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc"
 						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 					}
 				}
@@ -98,7 +98,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=py --config=linux_x86_64_clang --platform_suffix=_coverage_py && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_py"
+						sh "./tools/bazel coverage ... --config=py --config=linux_x86_64_clang --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
 						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
 					}
 				}
@@ -106,7 +106,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=nodejs --config=linux_x86_64_clang --platform_suffix=_coverage_nodejs && ./tools/bazel run tools/coverage -- --output bazel-out/coverage_nodejs"
+						sh "./tools/bazel coverage ... --config=nodejs --config=linux_x86_64_clang --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
