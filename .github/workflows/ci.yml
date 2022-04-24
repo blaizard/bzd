@@ -14,24 +14,29 @@ jobs:
         java-version: '11.0'
         architecture: x64
 
-    - name: Environment
+    - name: "Environment"
       run: |
         cp tools/ci/github/.bazelrc.local .bazelrc.local
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
-    - name: linux_x86_64_clang
+    - name: "[normal] linux_x86_64_clang dev + clang-tidy"
       run: |
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=clang_tidy
+        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev
 
-    - name: linux_x86_64_gcc
+    - name: "[normal] linux_x86_64_clang prod"
       run: |
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=cc
+        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod
 
-    - name: esp32_xtensa_lx6_gcc
+    - name: "[normal] linux_x86_64_gcc"
       run: |
-        ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=cc || echo 'failed'
+        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
 
-    - name: Sanitize
+    - name: "[sanitizer] asan/lsan"
+      run: |
+        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan
+
+    - name: "[sanitizer] sanitizer"
       run: |
         ./sanitize.sh
+
