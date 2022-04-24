@@ -8,9 +8,9 @@ py_binary(
     visibility = ["//tools/sanitizer:__pkg__"],
     deps = [
         "//python/bzd:env",
+        "//tools/ci/github:factory",
         "//tools/ci/jenkins:factory",
         "//tools/ci/quality_gate:factory",
         "//tools/ci/travis:factory",
-        "//tools/ci/github:factory"
     ],
 )

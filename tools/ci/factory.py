@@ -6,10 +6,12 @@ from dataclasses import dataclass, asdict, field
 
 from bzd.template.template import Template
 
+
 @dataclass
 class ConfigBase_:
 	"""Common configuration accross all specialization."""
 	exclude: typing.Set[str] = field(default_factory=set)
+
 
 @dataclass
 class ConfigNormal(ConfigBase_):
@@ -92,11 +94,11 @@ class Factory(ABC):
 			item.update(stage)
 			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
 			if item["category"] in configs:
-				config = configs[item["category"]]
+				config = configs[typing.cast(str, item["category"])]
 				# Check if not in excluded list.
 				if any(tag in item["tags"] for tag in config.exclude):
 					continue
-				item["command"] = item["command"].format(**asdict(config))
+				item["command"] = typing.cast(str, item["command"]).format(**asdict(config))
 				data.append(item)
 
 		template = Template.fromPath(templatePath)

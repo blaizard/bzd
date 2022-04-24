@@ -13,7 +13,7 @@ class Travis(Factory):
 		return "Travis CI"
 
 	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
-		return ConfigNormal(exclude=["esp32"])
+		return ConfigNormal(exclude={"esp32"})
 
 	def getConfigStress(self) -> typing.Optional[ConfigStress]:
 		return None
