@@ -5,7 +5,8 @@ filegroup(
     srcs = glob([
         "xtensa-esp32-elf/include/**/*",
         "xtensa-esp32-elf/sys-include/**/*",
-        "lib/clang/13.0.0/include/**/*",
+        "lib/clang/14.0.0/include/**/*",
+        "include/**/*"
     ]),
 )
 
