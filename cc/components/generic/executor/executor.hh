@@ -19,10 +19,9 @@ public:
 	}
 
 	/// Assign a workload to this executor.
-	template <class V, class E>
-	constexpr void enqueue(bzd::Async<V, E>& async) noexcept
+	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
 	{
-		async.enqueue(executor_);
+		async.enqueue(executor_, type);
 	}
 
 	/// Start the executor.
