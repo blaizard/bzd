@@ -7,10 +7,10 @@ from tools.bdl.contracts.contract import Contract
 
 
 class Role:
-	Value: int = 1
-	Template: int = 2
-	Meta: int = 4
-	Public: int = 8
+	Value: typing.Final[int] = 1
+	Template: typing.Final[int] = 2
+	Meta: typing.Final[int] = 4
+	Public: typing.Final[int] = 8
 
 
 class ContractTraits:

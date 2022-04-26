@@ -16,7 +16,7 @@ jobs:
     - name: "Environment"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - .info.sh
+      - ./info.sh
 
     - name: "[normal] linux_x86_64_clang dev + clang-tidy"
       script:

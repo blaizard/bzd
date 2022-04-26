@@ -16,7 +16,7 @@ jobs:
     - name: "Environment"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - .info.sh
+      - ./info.sh
 
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"
