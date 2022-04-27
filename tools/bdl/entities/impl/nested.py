@@ -93,6 +93,8 @@ class Nested(Entity):
 			else:
 				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
 
+		super().resolve(resolver)
+
 	def __repr__(self) -> str:
 		content = self.toString({
 			"name": self.name if self.isName else "",

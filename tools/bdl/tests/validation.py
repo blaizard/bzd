@@ -43,6 +43,12 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="using MyType = Integer [capacity(10)];", objectContext=ObjectContext(resolve=True))
 
+		# Init
+		Object.fromContent(content="interface temp { config: var = Integer [init]; }",
+			objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="interface temp { config: var = Integer [init(\"my_func\")]; }",
+			objectContext=ObjectContext(resolve=True))
+
 
 if __name__ == '__main__':
 	unittest.main()

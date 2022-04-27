@@ -1,20 +1,18 @@
 import typing
 
-from bzd.validation.schema import Args, Constraint, ProcessedSchema, TypeContext, Result
+from bzd.validation.schema import Constraint, ProcessedSchema, TypeContext
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
 
 class TypeConstraint(Constraint):
 
-	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
 		processedSchema.setType(self)
 
-	def check(self, context: TypeContext) -> Result:
+	def check(self, context: TypeContext) -> None:
 		from tools.bdl.entities.impl.fragment.type import Type
-		if isinstance(context.value, Type):
-			return None
-		return "'{}' is not a type.".format(context.value)
+		assert isinstance(context.value, Type), f"'{context.value}' is not a type."
 
 
 class ContractType(ContractTraits):

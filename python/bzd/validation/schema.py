@@ -3,9 +3,14 @@ from functools import partial
 
 from bzd.utils.decorators import cached_classproperty
 
-Result = typing.Optional[str]
-Args = typing.List[str]
-ValidationCallable = typing.Callable[[typing.Any, "Context"], Result]
+if typing.TYPE_CHECKING:
+	from bzd.validation.result import Result
+
+ValuesDict = typing.Dict[str, typing.Any]
+ValuesList = typing.List[typing.Any]
+Values = typing.Union[ValuesList, ValuesDict]
+
+ValidationCallable = typing.Callable[[typing.Any, "Context"], typing.Optional[str]]
 
 
 class Context:
@@ -36,12 +41,17 @@ class TypeContext(Context):
 		self.underlying_ = value
 
 
+T = typing.TypeVar("T", typing.List[typing.Any], typing.Dict[typing.Any, typing.Any])
+
+
 class Constraint:
+
+	constraints: typing.Dict[str, typing.Type["Constraint"]] = {}
 
 	def __init__(self, name: str) -> None:
 		self.name = name
 
-	def install(self, processedSchema: "ProcessedSchema", args: Args) -> None:
+	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
 		"""
 		Install a contraint.
 		"""
@@ -73,10 +83,15 @@ class Constraint:
 		except:
 			raise Exception("expects a floating point number, received: '{}'.".format(value))
 
+	@staticmethod
+	def validate(schema: T, values: Values) -> "Result[T]":
+		import bzd.validation.validation
+		return bzd.validation.validation.Validation(schema=schema).validate(values)
+
 
 class NoopConstraint(Constraint):
 
-	def install(self, processedSchema: "ProcessedSchema", args: Args) -> None:
+	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
 		pass
 
 
@@ -102,7 +117,7 @@ class ProcessedSchema:
 	def __init__(self) -> None:
 		self.mandatory_ = False
 		self.type: typing.Optional[Constraint] = None
-		self.validations: typing.List[typing.Callable[[Context], Result]] = []
+		self.validations: typing.List[typing.Callable[[Context], typing.Optional[str]]] = []
 
 	@property
 	def isMandatory(self) -> bool:
@@ -124,21 +139,31 @@ class ProcessedSchema:
 		assert constraint.isTypeConstraint, "This is not a valid type constraint."
 		self.type = constraint
 
-	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str, args: Args) -> None:
+	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str,
+		args: typing.List[str]) -> None:
 		"""
 		Install a new constraint.
 		"""
 
-		# Check if the constraint is a type specialization.
-		if self.type is not None and hasattr(self.type, name):
-			constraintInstaller = getattr(self.type, name)
+		# Check if the constraint is a type specialization, this gets the priority over
+		# globally available constraints.
+		if self.type is not None and name in self.type.constraints:
+			constraintClass = self.type.constraints[name]
 		else:
 			assert name in constraints, "Constraint of type '{}' is undefined.".format(name)
-			constraint = constraints[name](name=name)
-			constraintInstaller = constraint.install
+			constraintClass = constraints[name]
+
+		constraint = constraintClass(name=name)
 
 		# Install
-		argumentValidatorSchema = constraintInstaller(self, args)
+		typeBeforeInstall = self.type
+		constraint.install(self, args)
+
+		# Add any 'check' function to the validation if the installer did not change the type.
+		# Otherwise, it will be called afterward anyway.
+		if typeBeforeInstall is self.type:
+			if hasattr(constraint, "check"):
+				self.validations.append(constraint.check)  # type: ignore
 
 	def installValidation(self, validation: ValidationCallable, args: typing.Any) -> None:
 		"""
@@ -158,9 +183,10 @@ class ProcessedSchema:
 
 		# Process the type
 		if self.type:
-			resultType: typing.Optional[str] = self.type.check(context=typeContext)  # type: ignore
-			if resultType is not None:
-				result.addError(resultType)
+			try:
+				self.type.check(context=typeContext)  # type: ignore
+			except BaseException as e:
+				result.addError(str(e))
 				return result
 
 		# Cast down the context to a normal context
@@ -168,9 +194,10 @@ class ProcessedSchema:
 
 		# Process the validation callables
 		for validation in self.validations:
-			maybeError = validation(context)
-			if maybeError is not None:
-				result.addError(maybeError)
+			try:
+				validation(context)
+			except BaseException as e:
+				result.addError(str(e))
 
 		# If no error, set the value
 		if result:

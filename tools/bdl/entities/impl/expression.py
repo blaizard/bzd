@@ -3,8 +3,8 @@ from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
-from bzd.validation.validation import Validation
 
+from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
@@ -182,8 +182,10 @@ class Expression(Entity):
 		sequence = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
 
+		super().resolve(resolver)
+
 	def _makeValueValidation(self, resolver: "Resolver", parameters: Parameters,
-		contracts: Contracts) -> typing.Optional[Validation]:
+		contracts: Contracts) -> typing.Optional[Validation[SchemaDict]]:
 		"""
 		Generate the validation for the value by combining the type validation
 		and the contract validation.

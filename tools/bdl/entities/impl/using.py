@@ -41,5 +41,7 @@ class Using(Entity):
 		"""
 		entity = self.type.resolve(resolver=resolver)
 
+		super().resolve(resolver)
+
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

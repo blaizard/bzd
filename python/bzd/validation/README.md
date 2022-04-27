@@ -12,15 +12,23 @@ schema = Validation({"test": "integer"})
 # Test the schema on a dictionary, a result is returned.
 # If the schema does not validate, it throws (by default, this behavior can be configured)
 result = schema.validate({"test": "2"})
-# The result can be used to access the parsed value as a dictionary
-result.valuesAsDict == {"test": 2}
-# ... or as a list
-result.valuesAsList == [2]
+# The result can be used to access the parsed values
+result.values == {"test": 2}
 # The result can also be evaluated to bool to check if the result is valid. Note that in this
 # example, this is irrelevant as the validate function is configured to throw by default.
 ```
 
-### Do not throw
+It also works similarly for lists:
+
+```py
+# Create a validation schema, here it tests that a list has one element and is an integer.
+schema = Validation(["integer"])
+result = schema.validate(["2"])
+# The result can be used to access the parsed values
+result.values == [2]
+```
+
+### Noexcept
 
 The validate function can be used to not throw if the schema does not validate. This is done as follow:
 
@@ -30,7 +38,19 @@ if not result:
     # Handle error here!
 ```
 
-## Custom constraints
+## Constraints
+
+The following constraints are available:
+
+| Name      | Extends        | Underlying | Documentation                                     |
+| --------- | -------------- | ---------- | ------------------------------------------------- |
+| boolean   |                | bool       | Check that it represents a boolean (true/false).  |
+| float     | min(i), max(i) | float      | Check that it represents a floating point number. |
+| integer   | min(i), max(i) | int        | Check that it represents an integer number.       |
+| mandatory |                |            | Ensure that the entry is present.                 |
+| string    | min(i), max(i) | str        | Check that it represents a string.                |
+
+### Custom constraints
 
 It is possible to enrich the validation by adding custom constraints.
 The new constraint must inherit from `Constraint`.

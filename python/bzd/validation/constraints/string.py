@@ -1,34 +1,36 @@
 import typing
 
-from bzd.validation.schema import Args, Result, TypeContext, Context, Constraint, ProcessedSchema
-import bzd.validation.validation
+from bzd.validation.schema import TypeContext, Context, Constraint, ProcessedSchema
+
+
+class Min(Constraint):
+
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+
+		def _process(arg: int, context: Context) -> None:
+			assert len(
+				context.value) >= arg, f"the string '{context.value}' is shorter than its required minimum size: {arg}"
+
+		updatedArgs = self.validate(schema=["mandatory integer"], values=args).values
+		processedSchema.installValidation(_process, updatedArgs[0])
+
+
+class Max(Constraint):
+
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+
+		def _process(arg: int, context: Context) -> None:
+			assert len(
+				context.value) <= arg, f"the string '{context.value}' is longer than its required maximum size: {arg}"
+
+		updatedArgs = self.validate(schema=["mandatory integer"], values=args).values
+		processedSchema.installValidation(_process, updatedArgs[0])
 
 
 class String(Constraint):
 
-	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
-		bzd.validation.validation.Validation(schema=[]).validate(args)
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+		self.validate(schema=[], values=args)
 		processedSchema.setType(self)
 
-	def check(self, context: TypeContext) -> Result:
-		return None
-
-	def min(self, processedSchema: ProcessedSchema, args: Args) -> None:
-
-		def _process(arg: int, context: Context) -> Result:
-			if len(context.value) < arg:
-				return "the string '{}' is shorter than its required minimum size: {}".format(context.value, arg)
-			return None
-
-		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory integer"]).validate(args).valuesAsList
-		processedSchema.installValidation(_process, updatedArgs[0])
-
-	def max(self, processedSchema: ProcessedSchema, args: Args) -> None:
-
-		def _process(arg: int, context: Context) -> Result:
-			if len(context.value) > arg:
-				return "the string '{}' is longer than its required maximum size: {}".format(context.value, arg)
-			return None
-
-		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory integer"]).validate(args).valuesAsList
-		processedSchema.installValidation(_process, updatedArgs[0])
+	constraints = {"min": Min, "max": Max}
