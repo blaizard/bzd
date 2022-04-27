@@ -127,14 +127,19 @@ class Composition:
 		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs]  # type: ignore
 		self.registryFQNs = set(orderedFQNs)
 
-		# Resolve the Registry and then the un-named
+		# Resolve the Registry
 		for entity in self.registry:
 			resolver = self.symbols.makeResolver(namespace=entity.namespace)
 
 			entity.resolveMemoized(resolver=resolver)
+			print(entity)
 
 			# Identify entities that contains nested composition
 			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
+			if entityUnderlyingType.isInterface:
+				for interfaceEntity in entityUnderlyingType.interface:
+					print("INTERFACE!", interfaceEntity, "[", interfaceEntity.contracts, "]")
+
 			if entityUnderlyingType.isComposition:
 				for compositionEntity in entityUnderlyingType.composition:
 					compositionEntity.assertTrue(condition=not compositionEntity.isName,

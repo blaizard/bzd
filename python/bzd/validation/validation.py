@@ -1,7 +1,8 @@
 import typing
 import re
 
-from bzd.validation.schema import Constraint, ProcessedSchema, ProcessedResult
+from bzd.validation.result import Result
+from bzd.validation.schema import Constraint, ProcessedSchema, ProcessedResult, Values, ValuesList, ValuesDict
 from bzd.validation.constraints.boolean import Boolean
 from bzd.validation.constraints.integer import Integer
 from bzd.validation.constraints.float import Float
@@ -9,86 +10,18 @@ from bzd.validation.constraints.string import String
 from bzd.validation.constraints.mandatory import Mandatory
 
 PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
-SchemaDict = typing.Dict[str, str]
-SchemaList = typing.List[str]
-Schema = typing.Union[SchemaList, SchemaDict]
-
-ValuesDict = typing.Dict[str, typing.Any]
-ValuesList = typing.List[typing.Any]
-Values = typing.Union[ValuesList, ValuesDict]
 
 
 class ExceptionValidation(Exception):
 	pass
 
 
-class Result:
-
-	def __init__(self, isList: bool) -> None:
-		self.isList = isList
-		self.globalErrors: typing.List[str] = []
-		self.errors: typing.Dict[str, typing.List[str]] = {}
-		self.values_: Values = [] if self.isList else {}
-
-	def addGlobalError(self, error: str) -> None:
-		self.globalErrors.append(error)
-
-	def addError(self, key: str, errors: typing.List[str]) -> None:
-		assert key not in self.errors, "Key '{}' already assigned.".format(key)
-		self.errors[key] = errors
-
-	def addResult(self, key: str, result: ProcessedResult) -> None:
-		if result:
-			if self.isList:
-				self.values_.append(result.value)  # type: ignore
-			else:
-				assert key not in self.values_, "Value already set."
-				self.values_[key] = result.value  # type: ignore
-		else:
-			self.addError(key, result.errors)
-
-	@property
-	def valuesAsList(self) -> ValuesList:
-		assert bool(self), "Invalid result."
-		assert self.isList, "Values do not contain a list."
-		return self.values_  # type: ignore
-
-	@property
-	def valuesAsDict(self) -> ValuesDict:
-		assert bool(self), "Invalid result."
-		assert not self.isList, "Values do not contain a dictionary."
-		return self.values_  # type: ignore
-
-	def __bool__(self) -> bool:
-		return not bool(self.errors) and not bool(self.globalErrors)
-
-	def __repr__(self) -> str:
-
-		if bool(self):
-			return str(self.values_)
-
-		if self.isList:
-			FORMAT_NOT_VALIDATE_SINGLE = "position {key} does not validate: {message}"
-			FORMAT_NOT_VALIDATE_MULTI = "Some positional values do not validate: {message}"
-		else:
-			FORMAT_NOT_VALIDATE_SINGLE = "'{key}' does not validate: {message}"
-			FORMAT_NOT_VALIDATE_MULTI = "Some values do not validate: {message}"
-
-		content = []
-		if len(self.globalErrors):
-			content.extend(self.globalErrors)
-
-		if len(self.errors.keys()) == 1:
-			for key, result in self.errors.items():
-				content.append(FORMAT_NOT_VALIDATE_SINGLE.format(key=key, message=", ".join(result)))
-		else:
-			messages = ["{}: \"{}\"".format(key, ", ".join(result)) for key, result in self.errors.items()]
-			content.append(FORMAT_NOT_VALIDATE_MULTI.format(message="; ".join(messages)))
-
-		return "; ".join(content) if content else "no errors"
+SchemaDict = typing.Dict[str, str]
+SchemaList = typing.List[str]
+Schema = typing.TypeVar("Schema", SchemaList, SchemaDict)
 
 
-class Validation:
+class Validation(typing.Generic[Schema]):
 
 	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
 		"boolean": Boolean,
@@ -101,6 +34,13 @@ class Validation:
 	memoizedProcessedSchema_: typing.Dict[typing.Tuple[str, int], ProcessedSchema] = {}
 
 	def __init__(self, schema: Schema, args: typing.Any = None) -> None:
+		"""Initialize the Validation object.
+
+		Args:
+			schema: The schema to be used.
+			args: Arguments to be passed to the constraints.
+		"""
+
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
 		# Arguments to be passed the the check and process functions.
@@ -123,7 +63,7 @@ class Validation:
 		Parse string formatted contract and return the parsed data structure.
 		Note, it is ok to use a dictionary as dicts preserve insertion order in Python 3.7+
 		"""
-		assert isinstance(constraints, str), "Constraint must be a string."
+		assert isinstance(constraints, str), f"Constraint must be a string, received: {str(constraints)}"
 		constraintList = [constraint for constraint in constraints.split() if constraint]
 		result = {}
 		for constraint in constraintList:
@@ -167,11 +107,11 @@ class Validation:
 		"""
 		return len(self.processed.keys())
 
-	def validate(self, values: Values, output: str = "throw") -> Result:
+	def validate(self, values: Values, output: str = "throw") -> Result[Schema]:
 		"""
 		Validates the values passed into argument.
 		"""
-		results = Result(self.isList)
+		results = Result[Schema](self.isList)
 
 		if self.isList and not isinstance(values, list):
 			results.addGlobalError("Input must be a list, got '{}' instead.".format(type(values)))

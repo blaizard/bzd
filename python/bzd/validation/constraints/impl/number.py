@@ -1,33 +1,36 @@
 import typing
 
-from bzd.validation.schema import Args, Result, Context, Constraint, ProcessedSchema
-import bzd.validation.validation
+from bzd.validation.schema import Context, Constraint, ProcessedSchema
 
 T = typing.TypeVar("T")
 
 
+class Min(Constraint):
+
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+
+		def _process(arg: float, context: Context) -> None:
+			assert context.underlying >= arg, f"the value {context.underlying} is lower than the required minimum: {arg}"
+
+		updatedArgs = self.validate(schema=["mandatory float"], values=args).values
+		processedSchema.installValidation(_process, updatedArgs[0])
+
+
+class Max(Constraint):
+
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+
+		def _process(arg: float, context: Context) -> None:
+			assert context.underlying <= arg, f"the value {context.underlying} is higher than the required maximum: {arg}"
+
+		updatedArgs = self.validate(schema=["mandatory float"], values=args).values
+		processedSchema.installValidation(_process, updatedArgs[0])
+
+
 class Number(typing.Generic[T], Constraint):
 
-	def install(self, processedSchema: ProcessedSchema, args: Args) -> None:
-		bzd.validation.validation.Validation(schema=[]).validate(args)
+	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+		self.validate(schema=[], values=args)
 		processedSchema.setType(self)
 
-	def min(self, processedSchema: ProcessedSchema, args: Args) -> None:
-
-		def _process(arg: float, context: Context) -> Result:
-			if context.underlying < arg:
-				return "the value {} is lower than the required minimum: {}".format(context.underlying, arg)
-			return None
-
-		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory float"]).validate(args).valuesAsList
-		processedSchema.installValidation(_process, updatedArgs[0])
-
-	def max(self, processedSchema: ProcessedSchema, args: Args) -> None:
-
-		def _process(arg: float, context: Context) -> Result:
-			if context.underlying > arg:
-				return "the value {} is higher than the required maximum: {}".format(context.underlying, arg)
-			return None
-
-		updatedArgs = bzd.validation.validation.Validation(schema=["mandatory float"]).validate(args).valuesAsList
-		processedSchema.installValidation(_process, updatedArgs[0])
+	constraints = {"min": Min, "max": Max}

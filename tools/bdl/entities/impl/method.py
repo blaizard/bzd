@@ -64,6 +64,8 @@ class Method(Entity):
 
 		self.parameters.resolve(resolver=resolver)
 
+		super().resolve(resolver)
+
 	@cached_property
 	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, nestedKind="argument")

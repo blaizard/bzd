@@ -5,7 +5,7 @@ import copy
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
-from tools.bdl.contracts.validation import Validation
+from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 from tools.bdl.entities.impl.fragment.sequence import EntitySequence
@@ -234,7 +234,7 @@ class Entity:
 		return Parameters(element=self.element)
 
 	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
-		forTemplate: bool) -> typing.Optional[Validation]:
+		forTemplate: bool) -> typing.Optional[Validation[SchemaDict]]:
 		"""
 		Generate the validation object.
 		"""
@@ -253,13 +253,15 @@ class Entity:
 				self.error(message=str(e))
 		return None
 
-	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
+	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[
+		Validation[SchemaDict]]:
 		"""
 		Generate the validation object for template parameters.
 		"""
 		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=True)
 
-	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[Validation]:
+	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[
+		Validation[SchemaDict]]:
 		"""
 		Generate the validation object for value parameters.
 		"""
@@ -285,7 +287,12 @@ class Entity:
 		self.markAsResolved()
 
 	def resolve(self, resolver: "Resolver") -> None:
-		pass
+		maybeSchema = self.contracts.validationForEntity
+		if maybeSchema:
+			resultValidate = Validation(schema=[maybeSchema], args={
+				"resolver": resolver
+			}).validate([self], output="return")
+			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
 
 	def error(self, message: str, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element, message=message, throw=throw)

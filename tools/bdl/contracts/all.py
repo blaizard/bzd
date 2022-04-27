@@ -14,6 +14,7 @@ from tools.bdl.contracts.boolean import ContractBoolean
 from tools.bdl.contracts.mandatory import ContractMandatory
 from tools.bdl.contracts.type import ContractType
 from tools.bdl.contracts.capacity import ContractCapacity
+from tools.bdl.contracts.init import ContractInit
 
 _Contracts = [
 	ContractInteger(),
@@ -26,7 +27,8 @@ _Contracts = [
 	ContractVirtual(),
 	ContractMandatory(),
 	ContractType(),
-	ContractCapacity()
+	ContractCapacity(),
+	ContractInit()
 ]
 
 
@@ -48,3 +50,7 @@ class AllContracts:
 	@cached_classproperty
 	def forTemplate(cls) -> typing.Mapping[str, ContractTraits]:
 		return {contract.name: contract for contract in _Contracts if contract.isRoleTemplate}
+
+	@cached_classproperty
+	def forEntity(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleEntity}

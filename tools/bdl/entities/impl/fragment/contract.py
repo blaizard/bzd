@@ -57,6 +57,14 @@ class Contracts:
 		return " ".join(content) if content else None
 
 	@property
+	def validationForEntity(self) -> typing.Optional[str]:
+		"""
+		Generate a validation string for an entity out of the current contracts
+		"""
+		content = [str(contract) for contract in self if contract.type in AllContracts.forEntity]
+		return " ".join(content) if content else None
+
+	@property
 	def empty(self) -> bool:
 		sequence = self.element.getNestedSequence(self.sequenceKind)
 		if sequence is None:

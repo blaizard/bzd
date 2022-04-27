@@ -1,16 +1,22 @@
 import typing
 
-from bzd.validation.validation import Validation, SchemaList
 from bzd.validation.schema import Constraint
 
 from tools.bdl.contracts.contract import Contract
 
 
 class Role:
+	"""Define the type of entity to which applies this constraint."""
+
+	# Applies to entity of role Value
 	Value: typing.Final[int] = 1
+	# Applies to entity of role Template
 	Template: typing.Final[int] = 2
 	Meta: typing.Final[int] = 4
+	# Can be set by the user
 	Public: typing.Final[int] = 8
+	# Applies this contract to an entity
+	Entity: typing.Final[int] = 16
 
 
 class ContractTraits:
@@ -41,6 +47,10 @@ class ContractTraits:
 	@property
 	def isRolePublic(self) -> bool:
 		return bool(self.role & Role.Public)
+
+	@property
+	def isRoleEntity(self) -> bool:
+		return bool(self.role & Role.Entity)
 
 	def resolveConflict(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
 		"""
