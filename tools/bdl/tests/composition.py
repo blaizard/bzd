@@ -18,6 +18,10 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True))
 
 		compositionNormal = Object.fromContent(content="""
+			component Executor { }
+			composition {
+				executor = Executor();
+			}
 			composition Comp {
 				default = Integer(32);
 				test = Hello(var = default);
@@ -28,6 +32,10 @@ class TestRun(unittest.TestCase):
 
 		# Variable defined after.
 		compositionWrongOrder = Object.fromContent(content="""
+			component Executor { }
+			composition {
+				executor = Executor();
+			}
 			composition Comp {
 				test = Hello(var = default);
 				default = Integer(32);
@@ -38,6 +46,10 @@ class TestRun(unittest.TestCase):
 
 		# Variable defined after with wrong contract.
 		compositionWrongOrder = Object.fromContent(content="""
+			component Executor { }
+			composition {
+				executor = Executor();
+			}
 			composition Comp {
 				test = Hello(var = default);
 				default = Integer(9);
@@ -56,7 +68,9 @@ class TestRun(unittest.TestCase):
 			composition:
 				this.init();
 			}
+			component Executor { }
 			composition {
+				executor = Executor();
 				test1 = Hello();
 				test2 = Hello();
 			}
@@ -66,7 +80,7 @@ class TestRun(unittest.TestCase):
 		composition = Composition()
 		composition.visit(bdl).process()
 
-		self.assertEqual(len(composition.initialization), 2)
+		self.assertEqual(len(composition.initialization), 3)
 
 
 if __name__ == '__main__':

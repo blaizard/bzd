@@ -44,10 +44,10 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="using MyType = Integer [capacity(10)];", objectContext=ObjectContext(resolve=True))
 
 		# Init
-		Object.fromContent(content="interface temp { config: var = Integer [init]; }",
+		Object.fromContent(content="interface temp { method hello() [init]; }",
 			objectContext=ObjectContext(resolve=True))
-		Object.fromContent(content="interface temp { config: var = Integer [init(\"my_func\")]; }",
-			objectContext=ObjectContext(resolve=True))
+		#Object.fromContent(content="interface temp { method hello() [init(my_func)]; }",
+		#	objectContext=ObjectContext(resolve=True))
 
 
 if __name__ == '__main__':
