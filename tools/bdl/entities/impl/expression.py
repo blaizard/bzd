@@ -127,8 +127,7 @@ class Expression(Entity):
 			dependencies.update(self.type.dependencies)
 		if self.isParameters:
 			assert self.parameters is not None
-			for params in self.parameters:
-				dependencies.update(params.dependencies)
+			dependencies.update(self.parameters.dependencies)
 
 		return dependencies
 

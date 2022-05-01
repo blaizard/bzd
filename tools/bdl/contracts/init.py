@@ -19,6 +19,7 @@ class InitConstraint_(Constraint):
 		if isinstance(context.value, Entity):
 			underlyingType = context.args["resolver"].getEntityResolved(context.value.underlyingType).value
 			assert underlyingType.category == "method", "'init' constraint applies only to methods."
+			assert underlyingType.parameters.empty(), "'init' methods cannot take arguments."
 
 
 class ContractInit(ContractTraits):

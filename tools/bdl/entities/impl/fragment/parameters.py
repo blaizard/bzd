@@ -83,6 +83,16 @@ class ParametersCommon(typing.Generic[T]):
 				return metadata
 		raise KeyError("Missing key '{}'.".format(name))
 
+	@property
+	def dependencies(self) -> typing.Set[str]:
+		"""
+		Output the dependency list for this entity.
+		"""
+		dependencies = set()
+		for param in self:
+			dependencies.update(param.dependencies)
+		return dependencies
+
 	def __repr__(self) -> str:
 		content = []
 		for key, expression, metadata in self.itemsMetadata():

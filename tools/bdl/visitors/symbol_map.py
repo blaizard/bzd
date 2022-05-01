@@ -210,7 +210,7 @@ class SymbolMap:
 			# These are the unnamed elements that should be progpagated to other translation units.
 			if category in {CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION}:
 				fqn = FQN.makeUnique(namespace=namespace)
-			# If not, they will be kept private.
+				# If not, they will be kept private.
 			else:
 				fqn = FQN.makeUniquePrivate()
 		else:
