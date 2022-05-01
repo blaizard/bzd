@@ -61,5 +61,14 @@ class MethodBuilder(ElementBuilder):
 		self.setAttr("fqn", name)
 
 
+class ExpressionBuilder(ElementBuilder):
+
+	def __init__(self, type: str, name: typing.Optional[str] = None) -> None:
+		super().__init__("expression")
+		if name is not None:
+			self.setAttr("name", name)
+		self.setAttr("type", type)
+
+
 class SequenceBuilder(Sequence):
 	pass

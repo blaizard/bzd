@@ -3,7 +3,7 @@ namespace bzd.platform.posix.proactor;
 
 component Proactor {
 interface:
-	method init();
+	method init() [init];
 	method exec();
 	
 composition:

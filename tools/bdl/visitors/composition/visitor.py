@@ -4,15 +4,15 @@ import dataclasses
 
 from bzd.parser.error import Error
 
-from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION
+from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION, CATEGORY_COMPOSITION
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.visitors.composition.dependency_map import DependencyMap
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.method import Method
 from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.builder import MethodBuilder, NestedBuilder
 
 GLOBAL_FQN_OUT = "out"
 GLOBAL_FQN_IN = "in"
@@ -126,20 +126,22 @@ class Composition:
 		orderedFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
 		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs]  # type: ignore
 		self.registryFQNs = set(orderedFQNs)
+		self.executors = set()
 
-		# Resolve the Registry
+		dependencyMap = DependencyMap(symbols=self.symbols)
+
+		# Resolve the Registry.
+		# This handles components, from which an instance must be defined.
 		for entity in self.registry:
+
+			dependencyMap.add(entity)
+
 			resolver = self.symbols.makeResolver(namespace=entity.namespace)
 
 			entity.resolveMemoized(resolver=resolver)
-			print(entity)
 
-			# Identify entities that contains nested composition
 			entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if entityUnderlyingType.isInterface:
-				for interfaceEntity in entityUnderlyingType.interface:
-					print("INTERFACE!", interfaceEntity, "[", interfaceEntity.contracts, "]")
-
+			# Identify entities that contains nested composition
 			if entityUnderlyingType.isComposition:
 				for compositionEntity in entityUnderlyingType.composition:
 					compositionEntity.assertTrue(condition=not compositionEntity.isName,
@@ -159,20 +161,21 @@ class Composition:
 			else:
 				self.addInit(fqn=entity.fqn)
 
-		# resolve the un-named
-		self.executors = set()
+		# Resolve the un-named.
+		# This handles free function calls.
 		for fqn, entity in self.symbols.items(categories=categories):  # type: ignore
 			if entity.isName:
 				continue
-			assert isinstance(entity, Expression)
 
+			dependencyMap.add(entity)
+
+			assert isinstance(entity, Expression)
 			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
 
 			# Update any variables if part of the registry
-			if entity.isInit:
-				self.addInit(fqn=entity.fqn, entity=entity)
-			else:
-				self.addComposition(entity=entity, asyncType=AsyncType.active)
+			self.addComposition(entity=entity, asyncType=AsyncType.active)
+
+		dependencyMap.addImplicit()
 
 		# Ensure all executors are declared.
 		executorsIntersection = self.executors.intersection(self.registryFQNs)
