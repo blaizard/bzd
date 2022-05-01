@@ -115,7 +115,7 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 		GrammarItem(r"\[", ContractStart, [
 		GrammarItem(_regexprType, Fragment, [
 		GrammarItem(r"\(", ValuesStart, [
-		GrammarItem(r"(?P<value>[0-9a-zA-Z_]+)", Fragment, [
+		GrammarItem(r"(?P<value>[\-\.0-9a-zA-Z_]+)", Fragment, [
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement),
 		]),
