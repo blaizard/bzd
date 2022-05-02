@@ -57,10 +57,6 @@ class Constraint:
 		"""
 		assert False, "Constraint missing 'install' overload."
 
-	@cached_classproperty
-	def isTypeConstraint(cls) -> bool:
-		return hasattr(cls, "check")
-
 	@staticmethod
 	def _toInteger(value: str) -> int:
 		"""
@@ -135,8 +131,7 @@ class ProcessedSchema:
 		Set a specific constraint as a type.
 		"""
 
-		assert self.type is None, "A type for this constraint is already specified."
-		assert constraint.isTypeConstraint, "This is not a valid type constraint."
+		assert self.type is None, f"A type for this constraint is already specified: {str(self.type)}"
 		self.type = constraint
 
 	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str,
@@ -156,14 +151,11 @@ class ProcessedSchema:
 		constraint = constraintClass(name=name)
 
 		# Install
-		typeBeforeInstall = self.type
 		constraint.install(self, args)
 
-		# Add any 'check' function to the validation if the installer did not change the type.
-		# Otherwise, it will be called afterward anyway.
-		if typeBeforeInstall is self.type:
-			if hasattr(constraint, "check"):
-				self.validations.append(constraint.check)  # type: ignore
+		# Add any 'check' function to the validation.
+		if hasattr(constraint, "check"):
+			self.validations.append(constraint.check)  # type: ignore
 
 	def installValidation(self, validation: ValidationCallable, args: typing.Any) -> None:
 		"""
@@ -179,23 +171,12 @@ class ProcessedSchema:
 		"""
 
 		result = ProcessedResult()
-		typeContext = TypeContext(value=value, args=args)
-
-		# Process the type
-		if self.type:
-			try:
-				self.type.check(context=typeContext)  # type: ignore
-			except BaseException as e:
-				result.addError(str(e))
-				return result
-
-		# Cast down the context to a normal context
-		context = typing.cast(Context, typeContext)
+		context = TypeContext(value=value, args=args)
 
 		# Process the validation callables
 		for validation in self.validations:
 			try:
-				validation(context)
+				validation(context=context)  # type: ignore
 			except BaseException as e:
 				result.addError(str(e))
 
