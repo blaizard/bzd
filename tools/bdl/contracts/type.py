@@ -1,11 +1,11 @@
 import typing
 
-from bzd.validation.schema import Constraint, ProcessedSchema, TypeContext
+from bzd.validation.schema import Constraint, Constraint, ProcessedSchema, TypeContext
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
 
-class TypeConstraint(Constraint):
+class TypeConstraint_(Constraint):
 
 	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
 		processedSchema.setType(self)
@@ -18,4 +18,4 @@ class TypeConstraint(Constraint):
 class ContractType(ContractTraits):
 
 	def __init__(self) -> None:
-		super().__init__(name="type", role=Role.Template | Role.Public, constraint=TypeConstraint)
+		super().__init__(name="type", role=Role.Template | Role.Public, constraint=TypeConstraint_)

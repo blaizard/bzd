@@ -4,6 +4,7 @@ $fn=100;
 height = 20;
 outerWidth = 18;
 holdingOuterWidth = 25;
+holdingHeight = 10;
 innerScrewWidth = 6;
 outerScrewWidth = 8;
 minWidth = 1;
@@ -15,8 +16,8 @@ difference() {
     difference() {
         union() {
             cylinder(h=height, d1=outerWidth, d2=outerScrewWidth + minWidth * 2, center=true);
-            translate([0, 0, -(height - 5) / 2]) {
-                cylinder(h=5, d=holdingOuterWidth, center=true);
+            translate([0, 0, -(height - holdingHeight) / 2]) {
+                cylinder(h=holdingHeight, d=holdingOuterWidth, center=true);
             }
             cube([4, outerWidth, height], center=true);
         }
