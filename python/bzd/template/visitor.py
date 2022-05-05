@@ -41,8 +41,18 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Names are splited at the '.' character and each symbol is matched with the current
 		substitution list.
 		If this is a callable, it will be resolved.
+
+		hello.you[hello.ds].get("dssd").dsd
 		"""
 		value: typing.Any = self.substitutions
+
+		# Process all the array operators first to build the symbol.
+		# Start with inner array and go outer if nested.
+		while True:
+			updatedName = re.sub(r"\[([^\[]*?)\]", lambda x: "." + self.resolveName(x.group(1)), name)  # type: ignore
+			if updatedName == name:
+				break
+			name = updatedName
 
 		for symbol in name.split("."):
 

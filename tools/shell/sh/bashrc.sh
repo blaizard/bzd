@@ -108,6 +108,33 @@ bzd_git_reset()
     fi
 }
 
+# Automate git bisect
+bzd_git_bisect()
+{
+    echo -n "Hash of a good commit: "
+    read hashGood
+
+    echo -n "Hash of a bad commit: "
+    read hashBad
+
+    echo -n "Command to run to test a commit: "
+    read testCommit
+
+    tmpFile=$(mktemp)
+    trap '{ rm -f -- "${tmpFile}"; }' EXIT
+    cat <<EOF > "${tmpFile}"
+echo "================================================================================"
+${testCommit}
+EOF
+
+    git bisect start
+    git bisect bad ${hashBad}
+    git bisect good ${hashGood}
+    git bisect run bash "${tmpFile}"
+    echo "== Summary ====================================================================="
+    git bisect log
+}
+
 # ---- Content from math.sh
 # simple math extension to calculate from the command line
 bzd_math() {

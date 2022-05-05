@@ -4,6 +4,7 @@
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/platform/clock.hh"
 #include "cc/bzd/platform/stream.hh"
+#include "cc/bzd/algorithm/copy_n.hh"
 {% for path in includes %}
 #include "{{ path }}"
 {% end %}
@@ -22,7 +23,58 @@ bzd::Clock* systemClock{nullptr};
 
 namespace {
 
-/// Auto-generated application registry.
+template <bzd::SizeType n>
+struct StringLiteral
+{
+    constexpr StringLiteral(const char (&str)[n])
+	{
+        bzd::algorithm::copyN(str, n, value_);
+    }
+
+    char value_[n];
+};
+
+/// Wrapper around a registry entry.
+template <StringLiteral name, class T, class Registry>
+class BaseWrapper
+{
+public: // Constructor.
+	BaseWrapper(T& obj, Registry& registry) noexcept : obj_{obj}, registry_{registry} {}
+
+public: // Accessors.
+	[[nodiscard]] auto& get() noexcept { return obj_; }
+	[[nodiscard]] const auto& get() const noexcept { return obj_; }
+
+private:
+	T& obj_;
+	Registry& registry_;
+};
+
+template <StringLiteral name, class T, class Registry>
+class Wrapper;
+
+// ==== Specializations =======================================================
+{% for expresssion in registry %}
+// Specialization for {{ expresssion.fqn | fqnToStr }}
+template <class T, class Registry>
+class Wrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry> : public BaseWrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry>
+{
+public:
+	using BaseWrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry>::BaseWrapper;
+
+	bzd::Async<> init() noexcept
+	{
+		co_return {};
+	}
+	bzd::Async<> shutdown() noexcept
+	{
+		co_return {};
+	}
+};
+{% end %}
+
+
+// ==== Registry ==============================================================
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries.
@@ -33,8 +85,10 @@ namespace {
 	// Declaration of the registry.
 	struct Registry
 	{
+		Registry({% for i, expresssion in registry %}{% if i %}, {% end %}decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }}{% end %})
+			: {% for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}_{ {{ expresssion.fqn | fqnToNameStr }}, *this }{% end %} {}
 		{% for expresssion in registry %}
-		decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }}_;
+		Wrapper<"{{ expresssion.fqn | fqnToStr }}", decltype({{ expresssion.fqn | fqnToNameStr }}), Registry> {{ expresssion.fqn | fqnToNameStr }}_;
 		{% end %}
 	};
 	return Registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
@@ -76,14 +130,14 @@ bool execute() noexcept
 	{{ item.call.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(item.call.parametersResolved, true) -}} );
 		{% end %}
 		{% if item.fqn == "out" %}
-	bzd::platform::backend::out = &registry.{{ item.fqn | fqnToNameStr }}_;
+	bzd::platform::backend::out = &registry.{{ item.fqn | fqnToNameStr }}_.get();
 	bzd::log::info("Initialization phase."_csv).sync();
 		{% elif item.fqn == "in" %}
-	bzd::platform::backend::in = &registry.{{ item.fqn | fqnToNameStr }}_;
+	bzd::platform::backend::in = &registry.{{ item.fqn | fqnToNameStr }}_.get();
 		{% elif item.fqn == "steadyClock" %}
-	bzd::platform::backend::steadyClock = &registry.{{ item.fqn | fqnToNameStr }}_;
+	bzd::platform::backend::steadyClock = &registry.{{ item.fqn | fqnToNameStr }}_.get();
 		{% elif item.fqn == "systemClock" %}
-	bzd::platform::backend::systemClock = &registry.{{ item.fqn | fqnToNameStr }}_;
+	bzd::platform::backend::systemClock = &registry.{{ item.fqn | fqnToNameStr }}_.get();
 		{% end %}
 	{% end %}
 
@@ -91,18 +145,18 @@ bool execute() noexcept
 	bzd::log::info("Composition phase."_csv).sync();
 	{% for index, entry in composition %}
 	auto promise{{ index }} = {{ entry.entity.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(entry.entity.parametersResolved, true) -}} );
-	registry.{{ entry.entity.executor | fqnToNameStr }}_.schedule(promise{{ index }}, {{ entry.asyncType | asyncTypeToStr }});
+	registry.{{ entry.entity.executor | fqnToNameStr }}_.get().schedule(promise{{ index }}, {{ entry.asyncType | asyncTypeToStr }});
 	{% end %}
 
 	// Execute.
 	bzd::log::info("Execution phase."_csv).sync();
 	{% for executor in executors %}
-	registry.{{ executor | fqnToNameStr }}_.start();
+	registry.{{ executor | fqnToNameStr }}_.get().start();
 	{% end %}
 
 	// Wait until completion.
 	{% for executor in executors %}
-	registry.{{ executor | fqnToNameStr }}_.stop();
+	registry.{{ executor | fqnToNameStr }}_.get().stop();
 	{% end %}
 
 	bzd::log::info("Completion."_csv).sync();

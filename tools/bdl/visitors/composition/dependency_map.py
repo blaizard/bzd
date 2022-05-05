@@ -11,18 +11,24 @@ from tools.bdl.entities.builder import ExpressionBuilder
 @dataclasses.dataclass
 class Dependencies:
 	executor: typing.Optional[Entity] = None
+	# Dependencies over other entities
+	preDeps: typing.List[Entity] = dataclasses.field(default_factory=list)
+	# Direct dependencies
 	pre: typing.List[Entity] = dataclasses.field(default_factory=list)
 	intra: typing.List[Entity] = dataclasses.field(default_factory=list)
+	postDeps: typing.List[Entity] = dataclasses.field(default_factory=list)
 	post: typing.List[Entity] = dataclasses.field(default_factory=list)
 
-	def all(self) -> typing.List[Entity]:
-		return self.pre + self.intra + self.post
+	def allDeps(self) -> typing.List[Entity]:
+		return self.preDeps + self.postDeps
 
 	def __str__(self) -> str:
 		content = []
 		content += [f"executor: {str(self.executor)}"]
+		content += [f"preDeps: {', '.join([str(e) for e in self.preDeps])}"]
 		content += [f"pre: {', '.join([str(e) for e in self.pre])}"]
 		content += [f"intra: {', '.join([str(e) for e in self.intra])}"]
+		content += [f"postDeps: {', '.join([str(e) for e in self.postDeps])}"]
 		content += [f"post: {', '.join([str(e) for e in self.post])}"]
 		return "\n".join(content)
 
@@ -33,6 +39,24 @@ class DependencyMap:
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		self.map: typing.Dict[Entity, Dependencies] = {}
+
+	def buildList(self, entity: Entity) -> typing.List[Entity]:
+		"""Build the list of dependencies for a specific entity.
+		The list contains ordered dependencies from the first to the last, in the same order
+		in which they should be processed.
+		"""
+
+		assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
+
+		def mergeLists(dependencyList: typing.List[Entity], listToMerge: typing.List[Entity]) -> typing.List[Entity]:
+			return dependencyList + [e for e in listToMerge if e not in dependencyList]
+
+		dependencyList: typing.List[Entity] = []
+		for dep in self.map[entity].preDeps:
+			dependencyList = mergeLists(dependencyList, self.buildList(entity=dep))
+		dependencyList = mergeLists(dependencyList, self.map[entity].pre)
+
+		return dependencyList
 
 	def add(self, entity: Entity) -> None:
 		assert entity not in self.map, f"The entity '{entity}' is already inserted in the dependency map."
@@ -50,7 +74,7 @@ class DependencyMap:
 		while True:
 			updated = {}
 			for entity, dependencies in self.map.items():
-				for dependency in dependencies.all():
+				for dependency in dependencies.allDeps():
 					if dependency not in self.map and dependency not in updated:
 						updated[dependency] = self.resolveDependencies(dependency)
 			if len(updated) == 0:
@@ -82,7 +106,7 @@ class DependencyMap:
 
 			# Look for dependencies coming from parameters if any.
 			if entity.parameters:
-				dependencies.pre += [
+				dependencies.preDeps += [
 					self.symbols.getEntityResolved(fqn=fqn).value for fqn in entity.parameters.dependencies
 				]
 

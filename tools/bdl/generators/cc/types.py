@@ -234,15 +234,17 @@ def typeToStr(entity: typing.Optional[Type],
 		def namespaceToFQN(namespace: typing.List[str]) -> str:
 			return "::".join(namespace[0:-1] + ["adapter"] + namespace[-1:])
 
+	# If the type is part of the registry
 	elif registry is not None:
 
 		def namespaceToFQN(namespace: typing.List[str]) -> str:
 			fqn = FQN.fromNamespace(namespace=namespace)
 			assert registry is not None
 			if fqn in registry:
-				return "registry.{}_".format(fqnToNameStr(fqn))
+				return "registry.{}_.get()".format(fqnToNameStr(fqn))
 			return "::".join(namespace)
 
+	# Otherwise it must be a normal type
 	return _VisitorType(entity=entity,
 		namespaceToFQN=namespaceToFQN,
 		reference=reference,

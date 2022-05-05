@@ -31,6 +31,7 @@ class Composition:
 	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
+		self.dependencies = DependencyMap(symbols=self.symbols)
 		self.registry: typing.List[Expression] = []
 		self.registryFQNs: typing.Set[str] = set()
 		self.initialization: typing.List[typing.Dict[str, typing.Any]] = []
@@ -128,13 +129,11 @@ class Composition:
 		self.registryFQNs = set(orderedFQNs)
 		self.executors = set()
 
-		dependencyMap = DependencyMap(symbols=self.symbols)
-
 		# Resolve the Registry.
 		# This handles components, from which an instance must be defined.
 		for entity in self.registry:
 
-			dependencyMap.add(entity)
+			self.dependencies.add(entity)
 
 			resolver = self.symbols.makeResolver(namespace=entity.namespace)
 
@@ -167,7 +166,7 @@ class Composition:
 			if entity.isName:
 				continue
 
-			dependencyMap.add(entity)
+			self.dependencies.add(entity)
 
 			assert isinstance(entity, Expression)
 			entity.resolveMemoized(resolver=self.symbols.makeResolver(namespace=entity.namespace))
@@ -175,7 +174,13 @@ class Composition:
 			# Update any variables if part of the registry
 			self.addComposition(entity=entity, asyncType=AsyncType.active)
 
-		dependencyMap.addImplicit()
+		self.dependencies.addImplicit()
+
+		#for entity, deps in self.dependencies.map.items():
+		#	print("DEPS FOR", entity)
+		#	print(self.dependencies.map[entity].preDeps)
+		#	print(self.dependencies.buildList(entity))
+		#print(self.dependencies)
 
 		# Ensure all executors are declared.
 		executorsIntersection = self.executors.intersection(self.registryFQNs)
@@ -192,6 +197,7 @@ class Composition:
 		content: typing.List[str] = []
 		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
+		addContent(content, "Dependencies", str(self.dependencies).split("\n"))
 		addContent(content, "Registry", self.registry)
 		addContent(content, "RegistryFQN", self.registryFQNs)
 		addContent(content, "Executors", self.executors)

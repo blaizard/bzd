@@ -25,6 +25,40 @@ bzd::Clock* systemClock{nullptr};
 
 namespace {
 
+template <auto "string_", class T>
+class Wrapper
+{
+public:
+	Wrapper(T& obj) : obj_{obj} {}
+
+	auto init();
+
+	auto shutdown();
+
+	auto& get() noexcept { return obj_; }
+
+private:
+	// mutex
+	// refcount
+	// status_
+	T& obj_;
+};
+
+template <class T>
+auto Wrapper<"in", T>::init()
+{
+	if (status_.load() == State::initialized || status_.load() == State::initializing)
+	{
+		auto scope = co_await mutex_.lock();
+		if (status_.compareExchange(State::uninitialized, State::initializing))
+		{
+			co_await registry.proactorIO_.init();
+			bzd::platform::backend::in = &registry.in_;
+			state_.store(State::initialized);
+		}
+	}
+}
+
 /// Auto-generated application registry.
 [[nodiscard]] auto makeRegistry() noexcept
 {
@@ -46,15 +80,15 @@ namespace {
 	// Declaration of the registry.
 	struct Registry
 	{
-		decltype(out)& out_;
-		decltype(proactorIO)& proactorIO_;
-		decltype(in)& in_;
-		decltype(steadyClock)& steadyClock_;
-		decltype(systemClock)& systemClock_;
-		decltype(core1)& core1_;
-		decltype(core2)& core2_;
-		decltype(executor)& executor_;
-		decltype(obj)& obj_;
+		Wrapper<"out", decltype(out)> out_;
+		Wrapper<decltype(proactorIO)> proactorIO_;
+		Wrapper<decltype(in)> in_;
+		Wrapper<decltype(steadyClock)> steadyClock_;
+		Wrapper<decltype(systemClock)> systemClock_;
+		Wrapper<decltype(core1)> core1_;
+		Wrapper<decltype(core2)> core2_;
+		Wrapper<decltype(executor)> executor_;
+		Wrapper<decltype(obj)> obj_;
 	};
 	return Registry{out, proactorIO, in, steadyClock, systemClock, core1, core2, executor, obj};
 }
@@ -82,6 +116,40 @@ template <class Promise>
 
 } // namespace
 
+enum class InitState
+{
+	uninitialized,
+	initializing,
+	initialized
+};
+
+auto initProactorIO()
+{
+	static Atomic<InitState> init{InitState::uninitialized};
+
+	if (init.load() != InitState::initialized)
+	{
+		static Mutex mutex{};
+		auto scope = co_await mutex.lock();
+		if (init.compareExchange(InitState::uninitialized, InitState::initializing))
+		{
+			co_await registry.proactorIO_.init();
+			init = InitState::initialized;
+		}
+	}
+}
+
+auto initIn()
+{
+	co_await initProactorIO();
+	bzd::platform::backend::in = &registry.in_;
+}
+
+auto initializeInfrastructure()
+{
+	co_await in();
+}
+
 /// Initialize and compose the application.
 bool execute() noexcept
 {
@@ -89,6 +157,8 @@ bool execute() noexcept
 	[[maybe_unused]] auto registry = makeRegistry();
 
 	// Initialize infrastructure: initialize all special symbols
+	initializeInfrastructure.sync();
+
 	bzd::platform::backend::out = &registry.out_;
 	registry.proactorIO_.init().sync();
 	bzd::platform::backend::in = &registry.in_;
