@@ -27,15 +27,4 @@ constexpr OutputIt copyN(InputIt first, const SizeType count, OutputIt result)
 	}
 	return result;
 }
-
-/// \copydoc copyN
-/// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
-template <class InputRange, class OutputRange>
-requires concepts::forwardRange<InputRange> && concepts::forwardRange<OutputRange>
-constexpr auto copyN(InputRange&& input, const SizeType count, OutputRange&& output)
-{
-	return copyN(bzd::begin(input), count, bzd::begin(output));
-}
-
 } // namespace bzd::algorithm

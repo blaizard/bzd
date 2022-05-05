@@ -86,6 +86,16 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": "0\n1\n2"})
 		self.assertEqual("    0\n    1\n    2", result)
 
+	def testArray(self) -> None:
+		template = Template("{{ a[b] }}")
+		result = template.render({"a": {"g": "2"}, "b": "g"})
+		self.assertEqual("2", result)
+
+	def testArrayNested(self) -> None:
+		template = Template("{{ a[b.j[c]][c] }}")
+		result = template.render({"a": {"g": {"u": "2"}}, "b": {"j": {"u": "g"}}, "c": "u"})
+		self.assertEqual("2", result)
+
 
 if __name__ == '__main__':
 	unittest.main()

@@ -33,7 +33,7 @@ def makeRegexprName(name: str) -> str:
 	"""
 	Match a name.
 	"""
-	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.]+))"
+	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.\[\]]+))"
 
 
 def makeGrammarContent() -> Grammar:

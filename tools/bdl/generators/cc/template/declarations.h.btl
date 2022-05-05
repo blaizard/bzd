@@ -61,7 +61,7 @@
 				{%- if registry -%}
 					{{- expression.fqnToType | typeRegistryToStr -}}
 				{%- else -%}
-					{{- expression.fqnToType | typeToStr -}}
+					{{- expression.fqn | fqnToNameStr -}}
 				{%- end -%}
 			{%- else -%}
 				{# Object instanciation. #}

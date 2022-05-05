@@ -20,6 +20,7 @@ Syntax:
   - Resolution from mapping, sequences or callable.
   - Support piping to a callable, ex: `{{ var | lower | capitalize }}`.
   - Support argument injection, ex: `{{ callable(my.var, 12, "hello", false) }}`
+  - Support arrays and nested arrays, ex: `{{ a[b.c[d]].u }}`
 
 Piped data can be of arbitrary type but the final substitued value must be either a number or a string.
 
