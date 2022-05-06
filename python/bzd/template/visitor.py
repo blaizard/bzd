@@ -2,7 +2,7 @@ import typing
 import pathlib
 import re
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, Sequence
 from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.parser.error import Error, ExceptionParser
 
@@ -99,34 +99,88 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			return False
 		Error.handleFromElement(element=element, message="Unsupported value type.")
 
+	def resolveExpressions(self, sequence: Sequence) -> typing.List[typing.Any]:
+		"""Resolve expressions into their values.
+		Expression is a nested sequence that might correspond to callable arguments, pipeable expression or more
+		simply a single expression.
+		"""
+
+		values: typing.List[typing.Any] = []
+		isPipe = False
+
+		for element in sequence:
+
+			elementType = element.getAttr("type").value
+
+			if elementType == "pipe":
+				assert isPipe == False, "Detected 2 consecutive pipes."
+				isPipe = True
+
+			else:
+				value: typing.Any
+				if elementType == "symbol":
+					value = self.substitutions
+					for symbol in element.getNestedSequenceAssert(kind="symbol"):
+						symbolType = symbol.getAttr("type").value if symbol.isAttr("type") else "symbol"
+						if symbolType == "symbol":
+							key = symbol.getAttr("value").value
+							if hasattr(value, key):
+								value = getattr(value, key)
+							else:
+								assert key in value, Exception(
+									"Substitution value for '{}' does not exists.".format(key))
+								value = value[key]
+						elif symbolType == "callable":
+							assert callable(value), f"The value is not callable."
+							args = self.resolveExpressions(symbol.getNestedSequenceAssert("callable"))
+							value = value(*args)
+						elif symbolType == "array":
+							key = self.resolveExpression(symbol.getNestedSequenceAssert("array"))
+							assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
+							value = value[key]
+						else:
+							assert False, f"Unknwon symbol type '{symbolType}'."
+
+				elif elementType == "string":
+					value = element.getAttr("value").value
+				elif elementType == "number":
+					value = float(element.getAttr("value").value)
+				elif elementType == "true":
+					value = True
+				elif elementType == "false":
+					value = False
+				else:
+					assert False, f"Unsupported element type '{elementType}'."
+
+				if isPipe:
+					isPipe = False
+					assert callable(value), "Pipes must be callable."
+					assert len(values) > 0, "There is no value to apply this pipe to."
+					values[-1] = value(values[-1])
+
+				else:
+					values.append(value)
+
+		return values
+
+	def resolveExpression(self, sequence: Sequence) -> typing.Any:
+		"""Resolve a single expression and ensure it is unique."""
+
+		values = self.resolveExpressions(sequence)
+		assert len(values) == 1, f"There are more than a single value: {[type(v) for v in values]}."
+		return values[0]
+
 	def visitSubstitution(self, element: Element, result: ResultType) -> None:
 		"""
 		Handle substitution.
 		"""
-		Error.assertHasAttr(element=element, attr="name")
-		name = element.getAttr("name").value
 
-		# Check if callable and if there are arguments
-		arguments = element.getNestedSequence("argument")
-		if arguments is None:
-			value = self.resolveName(name=name)
-		else:
-			# Resolve all arguments
-			args = []
-			for arg in arguments:
-				args.append(self.readValue(element=arg))
-			value = self.resolveName(name, True, *args)
-
-		# Process the pipes if any.
-		pipes = element.getNestedSequence("pipe")
-		if pipes:
-			for pipe in pipes:
-				Error.assertHasAttr(element=pipe, attr="name")
-				value = self.resolveName(pipe.getAttr("name").value, True, value)
+		value = self.resolveExpression(element.getNestedSequenceAssert("value"))
 
 		# Save the output
 		assert isinstance(value,
-			(int, float, str, pathlib.Path)), "The resulting substitued value must be a number, a string or a path."
+			(int, float, str, pathlib.Path
+				)), f"The resulting substitued value must be a number, a string or a path, instead received {type(value)}."
 		self.appendSubstitution(element=element, result=result, string=str(value))
 
 	def appendSubstitution(self, element: Element, result: ResultType, string: str) -> ResultType:

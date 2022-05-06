@@ -20,6 +20,12 @@ py_library(
 )
 
 py_library(
+    name = "file",
+    srcs = ["file.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "decorators",
     srcs = ["decorators.py"],
     visibility = ["//visibility:public"],

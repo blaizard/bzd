@@ -15,11 +15,6 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": {"b": {"c": {"d": {"world": "World"}}}}})
 		self.assertEqual("Hello World", result)
 
-	def testCallableSubsitution(self) -> None:
-		template = Template("Hello {{a}}")
-		result = template.render({"a": lambda: 42})
-		self.assertEqual("Hello 42", result)
-
 	def testExplicitCallableSubsitution(self) -> None:
 		template = Template("Hello {{a()}}")
 		result = template.render({"a": lambda: 42})
@@ -43,7 +38,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("TrueFalse", result)
 
 	def testCallableNestedSubsitution(self) -> None:
-		template = Template("Hello {{a.b}}")
+		template = Template("Hello {{a().b()}}")
 		result = template.render({"a": lambda: {"b": lambda: "Me!"}})
 		self.assertEqual("Hello Me!", result)
 
