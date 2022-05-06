@@ -27,6 +27,8 @@ _regexprString = r"\"(?P<value>.*?(?<!\\))\""
 _regexprBooleanTrue = r"(?P<value>true)"
 # Boolean false
 _regexprBooleanFalse = r"(?P<value>false)"
+# Symbol
+_regexprSymbol = r"(?P<value>([a-zA-Z_\-0-9]+))"
 
 
 def makeRegexprName(name: str) -> str:
@@ -34,6 +36,151 @@ def makeRegexprName(name: str) -> str:
 	Match a name.
 	"""
 	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.\[\]]+))"
+
+
+def makeGrammarExpression(name: str, continuation: Grammar) -> Grammar:
+	"""Grammar for an expression type, which can be either an integer,
+	a boolean, a string or a symbol.
+	It supports arrays, pipes, callable and nested expressions.
+
+	For example, the following would be valid and would generate the following element:
+
+	hello.you.yes("ds", 12, yes["4"].sd | no).d.sds | hi | no[12]
+
+	- <Element context="<parent>"/>
+	hello:
+	- <Element type:1:1="symbol" context="<parent>"/>
+		symbol:
+		- <Element value:1:6="hello" context="<parent>"/>
+		- <Element value:7:10="you" context="<parent>"/>
+		- <Element value:11:14="yes" context="<parent>"/>
+		- <Element type:14:15="callable" context="<parent>"/>
+		callable:
+		- <Element type:15:19="string" value:15:19="ds" context="<parent>"/>
+		- <Element context="<parent>"/>
+		- <Element type:21:23="number" value:21:23="12" context="<parent>"/>
+		- <Element context="<parent>"/>
+		- <Element type:25:25="symbol" context="<parent>"/>
+			symbol:
+			- <Element value:25:28="yes" context="<parent>"/>
+			- <Element type:28:29="array" context="<parent>"/>
+			array:
+			- <Element type:29:32="string" value:29:32="4" context="<parent>"/>
+			- <Element context="<parent>"/>
+			- <Element value:34:36="sd" context="<parent>"/>
+			- <Element context="<parent>"/>
+		- <Element type:37:38="pipe" context="<parent>"/>
+		- <Element type:39:39="symbol" context="<parent>"/>
+			symbol:
+			- <Element value:39:41="no" context="<parent>"/>
+			- <Element context="<parent>"/>
+		- <Element context="<parent>"/>
+		- <Element value:43:44="d" context="<parent>"/>
+		- <Element value:45:48="sds" context="<parent>"/>
+		- <Element context="<parent>"/>
+	- <Element type:49:50="pipe" context="<parent>"/>
+	- <Element type:51:51="symbol" context="<parent>"/>
+		symbol:
+		- <Element value:51:53="hi" context="<parent>"/>
+		- <Element context="<parent>"/>
+	- <Element type:54:55="pipe" context="<parent>"/>
+	- <Element type:56:56="symbol" context="<parent>"/>
+		symbol:
+		- <Element value:56:58="no" context="<parent>"/>
+		- <Element type:58:59="array" context="<parent>"/>
+		array:
+		- <Element type:59:61="number" value:59:61="12" context="<parent>"/>
+		- <Element context="<parent>"/>
+		- <Element context="<parent>"/>
+
+	"""
+
+	class ExpressionStart(FragmentNestedStart):
+		nestedName = name
+
+	return [
+		GrammarItem(None, ExpressionStart,
+		makeGrammarExpressionImpl([GrammarItem(None, FragmentParentElement, continuation)]))
+	]
+
+
+def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
+
+	class SymbolStart(FragmentNestedStart):
+		nestedName = "symbol"
+		default = {"type": "symbol"}
+
+	class CallableStart(FragmentNestedStart):
+		nestedName = "callable"
+		default = {"type": "callable"}
+
+	class ArrayStart(FragmentNestedStart):
+		nestedName = "array"
+		default = {"type": "array"}
+
+	class PipeNew(FragmentNewElement):
+		default = {"type": "pipe"}
+
+	class NumberNew(FragmentNewElement):
+		default = {"type": "number"}
+
+	class StringNew(FragmentNewElement):
+		default = {"type": "string"}
+
+	class TrueNew(FragmentNewElement):
+		default = {"type": "true"}
+
+	class FalseNew(FragmentNewElement):
+		default = {"type": "false"}
+
+	symbol: Grammar = []
+	symbolTransition: Grammar = []
+	symbolNext: Grammar = []
+	openParenthesis: Grammar = []
+	closeParenthesisOrNext: Grammar = []
+	openArray: Grammar = []
+	closeArray: Grammar = []
+
+	openParenthesis.extend([
+		GrammarItemSpaces,
+		GrammarItem(r"\)", FragmentNestedStopNewElement, symbolTransition),
+		lambda: makeGrammarExpressionImpl(closeParenthesisOrNext)
+	])
+
+	closeParenthesisOrNext.extend([
+		GrammarItemSpaces,
+		GrammarItem(r",", FragmentNewElement, openParenthesis),
+		GrammarItem(r"\)", FragmentNestedStopNewElement, symbolTransition),
+	])
+
+	openArray.extend([lambda: makeGrammarExpressionImpl(closeArray)])
+
+	closeArray.extend([
+		GrammarItemSpaces,
+		GrammarItem(r"\]", FragmentNestedStopNewElement, symbolTransition),
+	])
+
+	finalGrammar = [GrammarItemSpaces,
+		GrammarItem(r"\|", PipeNew, [lambda: makeGrammarExpressionImpl(continuation)])] + continuation
+
+	symbol.extend([GrammarItemSpaces, GrammarItem(_regexprSymbol, FragmentNewElement, symbolTransition)])
+	symbolTransition.extend([
+		GrammarItemSpaces,
+		GrammarItem(r"\(", CallableStart, openParenthesis),
+		GrammarItem(r"\[", ArrayStart, openArray),
+		GrammarItem(r"\.", {}, symbolNext),
+		GrammarItem(None, FragmentNestedStopNewElement, finalGrammar)
+	])
+	symbolNext.extend(symbol)
+
+	return [
+		GrammarItemSpaces,
+		GrammarItem(_regexprNumber, NumberNew, finalGrammar),
+		GrammarItem(_regexprString, StringNew, finalGrammar),
+		GrammarItem(_regexprBooleanTrue, TrueNew, finalGrammar),
+		GrammarItem(_regexprBooleanFalse, FalseNew, finalGrammar),
+		GrammarItem(None, SymbolStart, symbol)
+	]
 
 
 def makeGrammarContent() -> Grammar:
@@ -132,6 +279,11 @@ def makeGrammarSubstitution() -> Grammar:
 
 	class PipeStart(FragmentNestedStart):
 		nestedName = "pipe"
+
+	return makeGrammarSubstitutionStart([
+		GrammarItem(None, {"category": "substitution"},
+		[makeGrammarExpression("value", [makeGrammarSubstitutionStop(FragmentNewElement)])])
+	])
 
 	return makeGrammarSubstitutionStart(
 		makeGrammarSymbol({"category": "substitution"}, [

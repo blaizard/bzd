@@ -43,10 +43,12 @@ class Parser:
 		for item in grammar:
 			if isinstance(item, list):
 				yield from self.iterateGrammar(item)
-			else:
-				assert isinstance(item,
-					GrammarItem), "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
+			elif isinstance(item, GrammarItem):
 				yield item
+			elif callable(item):
+				yield from self.iterateGrammar(item())
+			else:
+				assert False, "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
 
 	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Optional[Grammar]:
 		"""

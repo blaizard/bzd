@@ -6,12 +6,12 @@ from bzd.template.template import Template
 class TestRun(unittest.TestCase):
 
 	def testSimpleMacro(self) -> None:
-		template = Template("{% macro hello() %}  Hello {% end %}{{ hello }}")
+		template = Template("{% macro hello() %}  Hello {% end %}{{ hello() }}")
 		result = template.render({})
 		self.assertEqual("  Hello ", result)
 
 	def testMacroStrip(self) -> None:
-		template = Template("{% macro hello() -%}  Hello  {%- end %}{{ hello }}")
+		template = Template("{% macro hello() -%}  Hello  {%- end %}{{ hello() }}")
 		result = template.render({})
 		self.assertEqual("Hello", result)
 
