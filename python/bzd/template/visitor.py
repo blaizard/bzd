@@ -106,7 +106,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		"""
 
 		values: typing.List[typing.Any] = []
-		isPipe = False
+		operator = None
+		operatorUnary = None
 
 		def substitute(value: typing.Any, key: typing.Any) -> typing.Any:
 			if isinstance(key, str) and hasattr(value, key):
@@ -114,52 +115,81 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
 			return value[key]
 
+		operators = {
+			"|": (lambda l, r: r(l)),
+			"==": (lambda l, r: l == r),
+			"!=": (lambda l, r: l != r),
+			">": (lambda l, r: l > r),
+			">=": (lambda l, r: l >= r),
+			"<": (lambda l, r: l < r),
+			"<=": (lambda l, r: l <= r),
+		}
+
+		operatorsUnary = {
+			"not": (lambda r: not r)
+		}
+
 		for element in sequence:
 
-			elementType = element.getAttr("type").value
+			try:
 
-			if elementType == "pipe":
-				assert isPipe == False, "Detected 2 consecutive pipes."
-				isPipe = True
+				elementType = element.getAttr("type").value
 
-			else:
-				value: typing.Any
-				if elementType == "symbol":
-					value = self.substitutions
-					for symbol in element.getNestedSequenceAssert(kind="symbol"):
-						symbolType = symbol.getAttr("type").value if symbol.isAttr("type") else "symbol"
-						if symbolType == "symbol":
-							key = symbol.getAttr("value").value
-							value = substitute(value, key)
-						elif symbolType == "callable":
-							assert callable(value), f"The value is not callable."
-							args = self.resolveExpressions(symbol.getNestedSequenceAssert("callable"))
-							value = value(*args)
-						elif symbolType == "array":
-							key = self.resolveExpression(symbol.getNestedSequenceAssert("array"))
-							value = substitute(value, key)
-						else:
-							assert False, f"Unknwon symbol type '{symbolType}'."
+				if elementType in operators:
+					assert operator is None, f"Detected 2 consecutive operators '{operator}' and '{elementType}'."
+					operator = elementType
 
-				elif elementType == "string":
-					value = element.getAttr("value").value
-				elif elementType == "number":
-					value = float(element.getAttr("value").value)
-				elif elementType == "true":
-					value = True
-				elif elementType == "false":
-					value = False
-				else:
-					assert False, f"Unsupported element type '{elementType}'."
-
-				if isPipe:
-					isPipe = False
-					assert callable(value), "Pipes must be callable."
-					assert len(values) > 0, "There is no value to apply this pipe to."
-					values[-1] = value(values[-1])
+				elif elementType in operatorsUnary:
+					assert operatorUnary is None, f"Detected 2 consecutive unary operators '{operatorUnary}' and '{elementType}'."
+					operatorUnary = elementType
 
 				else:
-					values.append(value)
+					value: typing.Any
+					if elementType == "symbol":
+						value = self.substitutions
+						for symbol in element.getNestedSequenceAssert(kind="symbol"):
+							symbolType = symbol.getAttr("type").value if symbol.isAttr("type") else "symbol"
+							if symbolType == "symbol":
+								key = symbol.getAttr("value").value
+								value = substitute(value, key)
+							elif symbolType == "callable":
+								assert callable(value), f"The value is not callable."
+								args = self.resolveExpressions(symbol.getNestedSequenceAssert("callable"))
+								value = value(*args)
+							elif symbolType == "array":
+								key = self.resolveExpression(symbol.getNestedSequenceAssert("array"))
+								value = substitute(value, key)
+							else:
+								assert False, f"Unknwon symbol type '{symbolType}'."
+
+					elif elementType == "string":
+						value = element.getAttr("value").value
+					elif elementType == "number":
+						value = float(element.getAttr("value").value)
+					elif elementType == "true":
+						value = True
+					elif elementType == "false":
+						value = False
+					else:
+						assert False, f"Unsupported element type '{elementType}'."
+
+					if operator is not None:
+						assert len(values) > 0, "There is no value to apply this {operator} operator."
+						values[-1] = operators[operator](values[-1], value)
+						operator = None
+
+					elif operatorUnary is not None:
+						value = operatorsUnary[operatorUnary](value)
+						values.append(value)
+						operatorUnary = None
+
+					else:
+						values.append(value)
+
+			except Exception as e:
+				Error.handleFromElement(element=element, message=str(e))
+
+		assert operator is None and operatorUnary is None, "Unterminated expression."
 
 		return values
 
