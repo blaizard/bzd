@@ -91,6 +91,40 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": {"g": {"u": "2"}}, "b": {"j": {"u": "g"}}, "c": "u"})
 		self.assertEqual("2", result)
 
+	def testEqual(self) -> None:
+		template = Template("{{ a == b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("False", result)
+
+	def testNotEqual(self) -> None:
+		template = Template("{{ a != b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("True", result)
+
+	def testLower(self) -> None:
+		template = Template("{{ a < b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("True", result)
+
+	def testLowerEqual(self) -> None:
+		template = Template("{{ a <= b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("True", result)
+
+	def testGreater(self) -> None:
+		template = Template("{{ a > b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("False", result)
+
+	def testGreaterEqual(self) -> None:
+		template = Template("{{ a >= b }}")
+		result = template.render({"a": 12, "b": 14})
+		self.assertEqual("False", result)
+
+	def testNegate(self) -> None:
+		template = Template("{{ not a }}")
+		result = template.render({"a": True})
+		self.assertEqual("False", result)
 
 if __name__ == '__main__':
 	unittest.main()

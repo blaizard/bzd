@@ -118,20 +118,14 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 		nestedName = "array"
 		default = {"type": "array"}
 
-	class PipeNew(FragmentNewElement):
-		default = {"type": "pipe"}
+	def makeFragmentNewElement(elementType: str) -> typing.Type[FragmentNewElement]:
+		class Custom(FragmentNewElement):
+			default = {"type": elementType}
+		return Custom
 
-	class NumberNew(FragmentNewElement):
-		default = {"type": "number"}
-
-	class StringNew(FragmentNewElement):
-		default = {"type": "string"}
-
-	class TrueNew(FragmentNewElement):
-		default = {"type": "true"}
-
-	class FalseNew(FragmentNewElement):
-		default = {"type": "false"}
+	class FragmentOperator(FragmentNewElement):
+		def process(self, match: typing.Match[str]) -> None:
+			self.attrs["type"] = match.group(0)
 
 	symbol: Grammar = []
 	symbolTransition: Grammar = []
@@ -161,7 +155,8 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 	])
 
 	finalGrammar = [GrammarItemSpaces,
-		GrammarItem(r"\|", PipeNew, [lambda: makeGrammarExpressionImpl(continuation)])] + continuation
+		GrammarItem(r"(\||==|!=|<=|>=|<|>)", FragmentOperator, [lambda: makeGrammarExpressionImpl(continuation)]),
+	] + continuation
 
 	symbol.extend([GrammarItemSpaces, GrammarItem(_regexprSymbol, FragmentNewElement, symbolTransition)])
 	symbolTransition.extend([
@@ -175,10 +170,11 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 
 	return [
 		GrammarItemSpaces,
-		GrammarItem(_regexprNumber, NumberNew, finalGrammar),
-		GrammarItem(_regexprString, StringNew, finalGrammar),
-		GrammarItem(_regexprBooleanTrue, TrueNew, finalGrammar),
-		GrammarItem(_regexprBooleanFalse, FalseNew, finalGrammar),
+		GrammarItem(r"not", makeFragmentNewElement("not")),
+		GrammarItem(_regexprNumber, makeFragmentNewElement("number"), finalGrammar),
+		GrammarItem(_regexprString, makeFragmentNewElement("string"), finalGrammar),
+		GrammarItem(_regexprBooleanTrue, makeFragmentNewElement("true"), finalGrammar),
+		GrammarItem(_regexprBooleanFalse, makeFragmentNewElement("false"), finalGrammar),
 		GrammarItem(None, SymbolStart, symbol)
 	]
 

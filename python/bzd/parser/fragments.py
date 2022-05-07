@@ -1,5 +1,5 @@
 import re
-from typing import cast, Dict, Mapping, MutableMapping, Optional, Union, TYPE_CHECKING
+from typing import cast, Dict, Mapping, Match, MutableMapping, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from bzd.parser.element import ElementParser
@@ -61,30 +61,25 @@ class Fragment:
 
 	default: Dict[str, str] = {}
 
-	def __init__(self, index: int, end: int, attrs: Mapping[str, str]) -> None:
+	def __init__(self, index: int, end: int, match: Match[str]) -> None:
 		self.index = index
 		self.end = end
 		self.attrs = self.default.copy()
-		self.attrs.update(attrs)
-		self.process()
+		self.attrs.update(match.groupdict())
+		self.process(match)
 
 	def merge(self, attrs: Attributes) -> None:
-		"""
-		Merge current attributes with existing ones
-		"""
+		"""Merge current attributes with existing ones."""
 		for key, value in self.attrs.items():
 			assert key not in attrs, "Attribute '{}' already set".format(key)
 			attrs[key] = AttributeParser(index=self.index, end=self.end, value=value)
 
-	def process(self) -> None:
-		"""
-		Post process a value discovered.
-		"""
+	def process(self, match: Match[str]) -> None:
+		"""Post process a value discovered."""
 		pass
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		"""
-		Returns the next element for the next entity.
+		"""Returns the next element for the next entity.
 		This is where elements can be terminated and new ones can be generated.
 		"""
 		if grammar is not None:
