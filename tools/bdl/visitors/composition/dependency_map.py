@@ -3,33 +3,66 @@ import dataclasses
 
 from tools.bdl.visitor import CATEGORY_COMPOSITION
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.builder import ExpressionBuilder
+
+
+class DependencyGroup:
+	"""List of ordered dependencies."""
+
+	def __init__(self) -> None:
+		self.data: typing.List[Entity] = []
+
+	def push(self, entity: Entity) -> None:
+		"""Add a new dependency to the list."""
+		# Ignore Builtin dependencies, as they are expected to be available at all time.
+		if isinstance(entity, Builtin):
+			return
+		if entity in self.data:
+			return
+		self.data.append(entity)
+
+	def pushGroup(self, group: typing.Union["DependencyGroup", typing.List[Entity]]) -> None:
+		"""Push an ordered group of dependency to the list."""
+		for entity in group:
+			self.push(entity)
+
+	def __iter__(self) -> typing.Iterator[Entity]:
+		for entity in self.data:
+			yield entity
+
+	def __len__(self) -> int:
+		return len(self.data)
+
+	def __repr__(self) -> str:
+		return ", ".join([str(e) for e in self.data])
 
 
 @dataclasses.dataclass
 class Dependencies:
 	executor: typing.Optional[Entity] = None
 	# Dependencies over other entities
-	preDeps: typing.List[Entity] = dataclasses.field(default_factory=list)
+	preDeps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	# Direct dependencies
-	pre: typing.List[Entity] = dataclasses.field(default_factory=list)
-	intra: typing.List[Entity] = dataclasses.field(default_factory=list)
-	postDeps: typing.List[Entity] = dataclasses.field(default_factory=list)
-	post: typing.List[Entity] = dataclasses.field(default_factory=list)
+	pre: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	intra: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	postDeps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	post: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 
-	def allDeps(self) -> typing.List[Entity]:
-		return self.preDeps + self.postDeps
+	def allDeps(self) -> typing.Iterator[Entity]:
+		yield from self.preDeps.__iter__()
+		yield from self.postDeps.__iter__()
 
-	def __str__(self) -> str:
+	def __repr__(self) -> str:
 		content = []
 		content += [f"executor: {str(self.executor)}"]
-		content += [f"preDeps: {', '.join([str(e) for e in self.preDeps])}"]
-		content += [f"pre: {', '.join([str(e) for e in self.pre])}"]
-		content += [f"intra: {', '.join([str(e) for e in self.intra])}"]
-		content += [f"postDeps: {', '.join([str(e) for e in self.postDeps])}"]
-		content += [f"post: {', '.join([str(e) for e in self.post])}"]
+		content += [f"preDeps: {self.preDeps}"]
+		content += [f"pre: {self.pre}"]
+		content += [f"intra: {self.intra}"]
+		content += [f"postDeps: {self.postDeps}"]
+		content += [f"post: {self.post}"]
 		return "\n".join(content)
 
 
@@ -40,7 +73,7 @@ class DependencyMap:
 		self.symbols = symbols
 		self.map: typing.Dict[Entity, Dependencies] = {}
 
-	def buildList(self, entity: Entity) -> typing.List[Entity]:
+	def buildList(self, entity: Entity) -> DependencyGroup:
 		"""Build the list of dependencies for a specific entity.
 		The list contains ordered dependencies from the first to the last, in the same order
 		in which they should be processed.
@@ -48,15 +81,12 @@ class DependencyMap:
 
 		assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
 
-		def mergeLists(dependencyList: typing.List[Entity], listToMerge: typing.List[Entity]) -> typing.List[Entity]:
-			return dependencyList + [e for e in listToMerge if e not in dependencyList]
-
-		dependencyList: typing.List[Entity] = []
+		dependencies = DependencyGroup()
 		for dep in self.map[entity].preDeps:
-			dependencyList = mergeLists(dependencyList, self.buildList(entity=dep))
-		dependencyList = mergeLists(dependencyList, self.map[entity].pre)
+			dependencies.pushGroup(self.buildList(entity=dep))
+		dependencies.pushGroup(self.map[entity].pre)
 
-		return dependencyList
+		return dependencies
 
 	def add(self, entity: Entity) -> None:
 		assert entity not in self.map, f"The entity '{entity}' is already inserted in the dependency map."
@@ -84,7 +114,7 @@ class DependencyMap:
 	def resolveDependencies(self, entity: Entity) -> Dependencies:
 		"""Resolve the dependencies for a specific entity."""
 
-		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[typing.List[Entity]]:
+		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
 			if interfaceEntity.contracts.has("init"):
 				return dependencies.pre
 			if interfaceEntity.contracts.has("shutdown"):
@@ -106,9 +136,8 @@ class DependencyMap:
 
 			# Look for dependencies coming from parameters if any.
 			if entity.parameters:
-				dependencies.preDeps += [
-					self.symbols.getEntityResolved(fqn=fqn).value for fqn in entity.parameters.dependencies
-				]
+				dependencies.preDeps.pushGroup(
+					[self.symbols.getEntityResolved(fqn=fqn).value for fqn in entity.parameters.dependencies])
 
 		entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 
@@ -127,7 +156,7 @@ class DependencyMap:
 					newEntity = self.symbols.getEntityResolved(fqn=fqn).value
 					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=entity.fqn)
 					newEntity.resolve(resolver=newResolver)
-					maybeGroup.append(newEntity)
+					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
 		if entityUnderlyingType.isComposition:
@@ -142,7 +171,7 @@ class DependencyMap:
 				newResolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
 				entityCopied.resolve(resolver=newResolver)
 
-				dependencies.intra.append(entityCopied)
+				dependencies.intra.push(entityCopied)
 
 		return dependencies
 

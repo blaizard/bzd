@@ -314,7 +314,7 @@ def makeGrammarControlFor() -> Grammar:
 
 	grammarFromIn = [
 		GrammarItem(r"in", Fragment,
-		[GrammarItem(makeRegexprName("iterable"), Fragment, makeGrammarControlStop(FragmentNestedStart, "root"))])
+		makeGrammarExpression("iterable", makeGrammarControlStop(FragmentNestedStart, "root")))
 	]
 
 	return makeGrammarControlStart(r"for", [

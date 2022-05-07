@@ -108,6 +108,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		values: typing.List[typing.Any] = []
 		isPipe = False
 
+		def substitute(value: typing.Any, key: typing.Any) -> typing.Any:
+			if isinstance(key, str) and hasattr(value, key):
+				return getattr(value, key)
+			assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
+			return value[key]
+
 		for element in sequence:
 
 			elementType = element.getAttr("type").value
@@ -124,20 +130,14 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 						symbolType = symbol.getAttr("type").value if symbol.isAttr("type") else "symbol"
 						if symbolType == "symbol":
 							key = symbol.getAttr("value").value
-							if hasattr(value, key):
-								value = getattr(value, key)
-							else:
-								assert key in value, Exception(
-									"Substitution value for '{}' does not exists.".format(key))
-								value = value[key]
+							value = substitute(value, key)
 						elif symbolType == "callable":
 							assert callable(value), f"The value is not callable."
 							args = self.resolveExpressions(symbol.getNestedSequenceAssert("callable"))
 							value = value(*args)
 						elif symbolType == "array":
 							key = self.resolveExpression(symbol.getNestedSequenceAssert("array"))
-							assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
-							value = value[key]
+							value = substitute(value, key)
 						else:
 							assert False, f"Unknwon symbol type '{symbolType}'."
 
@@ -205,7 +205,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		"""
 
 		Error.assertHasAttr(element=element, attr="value1")
-		Error.assertHasAttr(element=element, attr="iterable")
+		Error.assertHasSequence(element=element, sequence="iterable")
 		Error.assertHasSequence(element=element, sequence="nested")
 
 		value1 = element.getAttr("value1").value
@@ -217,7 +217,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		block: ResultType = []
 
 		# Loop through the elements
-		iterable = self.resolveName(name=element.getAttr("iterable").value)
+		iterable = self.resolveExpression(sequence=element.getNestedSequenceAssert("iterable"))
 		if value2 is None:
 			for value in iterable:
 				self.substitutions.register(element=element, key=value1, value=value)
