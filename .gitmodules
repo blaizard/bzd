@@ -1,7 +1,7 @@
 [submodule "apps/family"]
 	path = apps/family
-	url = https://github.com/blaizard/family.git
+	url = ../family.git
 	branch = master
 [submodule "docs/private"]
 	path = docs/private
-	url = https://github.com/blaizard/docs.git
+	url = ../docs.git

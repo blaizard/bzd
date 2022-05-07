@@ -39,15 +39,15 @@ template <StringLiteral name, class T, class Registry>
 class BaseWrapper
 {
 public: // Constructor.
-	BaseWrapper(T& obj, Registry& registry) noexcept : obj_{obj}, registry_{registry} {}
+	BaseWrapper(T& obj, Registry& registry_) noexcept : obj_{obj}, registry{registry_} {}
 
 public: // Accessors.
 	[[nodiscard]] auto& get() noexcept { return obj_; }
 	[[nodiscard]] const auto& get() const noexcept { return obj_; }
 
-private:
+protected:
 	T& obj_;
-	Registry& registry_;
+	Registry& registry;
 };
 
 template <StringLiteral name, class T, class Registry>
@@ -57,17 +57,43 @@ class Wrapper;
 {% for expresssion in registry %}
 // Specialization for {{ expresssion.fqn | fqnToStr }}
 template <class T, class Registry>
-class Wrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry> : public BaseWrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry>
+class Wrapper<"{{ expresssion.fqn }}", T, Registry> : public BaseWrapper<"{{ expresssion.fqn }}", T, Registry>
 {
 public:
-	using BaseWrapper<"{{ expresssion.fqn | fqnToStr }}", T, Registry>::BaseWrapper;
+	using BaseWrapper<"{{ expresssion.fqn }}", T, Registry>::BaseWrapper;
+	using BaseWrapper<"{{ expresssion.fqn }}", T, Registry>::registry;
 
 	bzd::Async<> init() noexcept
 	{
+		{% for dep in dependencies.map[expresssion].preDeps %}
+		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init().template assert<0>();
+		{% end %}
+		{% for dep in dependencies.map[expresssion].pre %}
+		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+		{% end %}
+		{% if expresssion.fqn == "out" %}
+		bzd::platform::backend::out = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
+		co_await bzd::log::info("Stdout ready."_csv).template assert<0>();
+		{% elif expresssion.fqn == "in" %}
+		bzd::platform::backend::in = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
+		{% elif expresssion.fqn == "steadyClock" %}
+		bzd::platform::backend::steadyClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
+		{% elif expresssion.fqn == "systemClock" %}
+		bzd::platform::backend::systemClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
+		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown() noexcept
 	{
+		{% if expresssion.fqn == "out" %}
+		bzd::platform::backend::out = nullptr;
+		{% elif expresssion.fqn == "in" %}
+		bzd::platform::backend::in = nullptr;
+		{% elif expresssion.fqn == "steadyClock" %}
+		bzd::platform::backend::steadyClock = nullptr;
+		{% elif expresssion.fqn == "systemClock" %}
+		bzd::platform::backend::systemClock = nullptr;
+		{% end %}
 		co_return {};
 	}
 };
@@ -88,7 +114,7 @@ public:
 		Registry({% for i, expresssion in registry %}{% if i %}, {% end %}decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }}{% end %})
 			: {% for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}_{ {{ expresssion.fqn | fqnToNameStr }}, *this }{% end %} {}
 		{% for expresssion in registry %}
-		Wrapper<"{{ expresssion.fqn | fqnToStr }}", decltype({{ expresssion.fqn | fqnToNameStr }}), Registry> {{ expresssion.fqn | fqnToNameStr }}_;
+		Wrapper<"{{ expresssion.fqn }}", decltype({{ expresssion.fqn | fqnToNameStr }}), Registry> {{ expresssion.fqn | fqnToNameStr }}_;
 		{% end %}
 	};
 	return Registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
