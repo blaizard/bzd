@@ -29,14 +29,21 @@ class AsyncType:
 class Composition:
 
 	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
+
+		self.infraFQNs: typing.Final[typing.List[str]] = ["out", "in", "steadyClock", "systemClock"]
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.dependencies = DependencyMap(symbols=self.symbols)
-		self.registry: typing.List[Expression] = []
-		self.registryFQNs: typing.Set[str] = set()
+		self.registry: typing.Dict[str, Expression] = {}
 		self.initialization: typing.List[typing.Dict[str, typing.Any]] = []
 		self.composition: typing.List[typing.Dict[str, typing.Any]] = []
-		self.executors: typing.Set[str] = set()
+
+		# All infrastructure dependencies.
+		self.infra: typing.List[Expression] = []
+		# All executors.
+		self.executors: typing.Dict[str, Expression] = {}
+		# All composition per executors.
+		self.comp: typing.Dict[str, typing.Dict[str, Expression]] = {}
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -100,6 +107,12 @@ class Composition:
 
 		return orderFQNs
 
+	def addExecutor(self, entity: Expression) -> None:
+		"""Add a new executor from the given expression."""
+
+		entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
+		self.executors[entity.executor] = self.registry[entity.executor]
+
 	def addComposition(self, entity: Expression, asyncType: str) -> None:
 		"""
 		Add a new composition entity to the compisiton list.
@@ -107,7 +120,7 @@ class Composition:
 		self.composition.append({"entity": entity, "asyncType": asyncType})
 
 		# Update the executor list
-		self.executors.add(entity.executor)
+		self.addExecutor(entity)
 
 	def addInit(self, fqn: str, entity: typing.Optional[Expression] = None) -> None:
 		"""
@@ -117,7 +130,7 @@ class Composition:
 
 		# Update the executor list
 		if entity:
-			self.executors.add(entity.executor)
+			self.addExecutor(entity)
 
 	def process(self) -> None:
 
@@ -125,15 +138,18 @@ class Composition:
 
 		# Make the dependency graph
 		orderedFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
-		self.registry = [self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs]  # type: ignore
-		self.registryFQNs = set(orderedFQNs)
-		self.executors = set()
+		self.registry = {fqn: self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs}  # type: ignore
+		self.executors = {}
+
+		tasks = []
 
 		# Resolve the Registry.
 		# This handles components, from which an instance must be defined.
-		for entity in self.registry:
+		for entity in self.registry.values():
 
 			self.dependencies.add(entity)
+			if not entity.isName:
+				tasks.append(entity)
 
 			resolver = self.symbols.makeResolver(namespace=entity.namespace)
 
@@ -165,6 +181,7 @@ class Composition:
 		for fqn, entity in self.symbols.items(categories=categories):  # type: ignore
 			if entity.isName:
 				continue
+			tasks.append(entity)
 
 			self.dependencies.add(entity)
 
@@ -182,10 +199,25 @@ class Composition:
 		#	print(self.dependencies.buildList(entity))
 		#print(self.dependencies)
 
-		# Ensure all executors are declared.
-		executorsIntersection = self.executors.intersection(self.registryFQNs)
-		assert executorsIntersection == self.executors, "Some executors are used but not declared: {}".format(", ".join(
-			self.executors.difference(executorsIntersection)))
+		self.infra = [self.registry[fqn] for fqn in self.infraFQNs if fqn in self.registry]
+		#self.comp =
+
+		#all intra for infra:
+		#
+		# Run service
+		#
+		#for task in tasks:
+		#
+		# Run app
+		# []() -> Async<> {
+		#	co_await task.init()
+		#	co_await task.exec()
+		#	co_await task.shutdown()
+		# }
+		#
+		#
+		#	self.dependencies.map[task].deps
+		#print(tasks)
 
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
@@ -198,9 +230,8 @@ class Composition:
 		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Dependencies", str(self.dependencies).split("\n"))
-		addContent(content, "Registry", self.registry)
-		addContent(content, "RegistryFQN", self.registryFQNs)
-		addContent(content, "Executors", self.executors)
+		addContent(content, "Registry", self.registry.values())
+		addContent(content, "Executors", self.executors.keys())
 		addContent(content, "Initialization", self.initialization)
 		addContent(content, "Composition", self.composition)
 

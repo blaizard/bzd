@@ -13,6 +13,19 @@ from bzd.template.substitution import SubstitutionsAccessor, SubstitutionWrapper
 ResultType = typing.List[str]
 
 
+class Loop:
+
+	def __init__(self) -> None:
+		self.index: int = 0
+
+	@property
+	def first(self) -> bool:
+		return self.index == 0
+
+	def _inc(self) -> None:
+		self.index += 1
+
+
 class Visitor(VisitorBase[ResultType, ResultType]):
 	nestedKind = None
 
@@ -182,11 +195,14 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		# Loop through the elements
 		iterable = self.resolveExpression(sequence=element.getNestedSequenceAssert("iterable"))
+		loop = Loop()
+		self.substitutions.register(element=element, key="loop", value=loop)
 		if value2 is None:
 			for value in iterable:
 				self.substitutions.register(element=element, key=value1, value=value)
 				block += self._visit(sequence=sequence)
 				self.substitutions.unregister(value1)
+				loop._inc()
 		else:
 			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
 			for key, value in iterablePair:
@@ -195,6 +211,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				block += self._visit(sequence=sequence)
 				self.substitutions.unregister(value2)
 				self.substitutions.unregister(value1)
+				loop._inc()
+		self.substitutions.unregister("loop")
 
 		return block
 
