@@ -28,17 +28,13 @@ _regexprBooleanTrue = r"(?P<value>true)"
 # Boolean false
 _regexprBooleanFalse = r"(?P<value>false)"
 
-def makeRegexprName(name: str) -> str:
-	"""
-	Match a name.
-	"""
-	return r"(?P<" + name + r">([a-zA-Z_\-0-9\.\[\]]+))"
 
 def makeRegexprSymbol(name: str) -> str:
 	"""
 	Match a name.
 	"""
 	return r"(?P<" + name + r">([a-zA-Z_\-0-9]+))"
+
 
 def makeGrammarExpression(name: str, continuation: Grammar, attrs: typing.Dict[str, str] = {}) -> Grammar:
 	"""Grammar for an expression type, which can be either an integer,
@@ -122,11 +118,14 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 		default = {"type": "array"}
 
 	def makeFragmentNewElement(elementType: str) -> typing.Type[FragmentNewElement]:
+
 		class Custom(FragmentNewElement):
 			default = {"type": elementType}
+
 		return Custom
 
 	class FragmentOperator(FragmentNewElement):
+
 		def process(self, match: typing.Match[str]) -> None:
 			self.attrs["type"] = match.group(0)
 
@@ -157,7 +156,8 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 		GrammarItem(r"\]", FragmentNestedStopNewElement, symbolTransition),
 	])
 
-	finalGrammar = [GrammarItemSpaces,
+	finalGrammar = [
+		GrammarItemSpaces,
 		GrammarItem(r"(\||==|!=|<=|>=|<|>)", FragmentOperator, [lambda: makeGrammarExpressionImpl(continuation)]),
 	] + continuation
 
@@ -237,6 +237,7 @@ def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
 		GrammarItem(r"(?=-#})", Fragment, [GrammarItem(r"-#}\s*", fragment)]),
 	]
 
+
 def makeGrammarSubstitution() -> Grammar:
 	"""
 	Generate a grammar for substitution blocks.
@@ -247,16 +248,16 @@ def makeGrammarSubstitution() -> Grammar:
 		[makeGrammarExpression("value", [makeGrammarSubstitutionStop(FragmentNewElement)])])
 	])
 
+
 def makeGrammarControlInclude() -> Grammar:
 	"""
 	Generate the grammar for the include block.
 	It matches the following:
 		include value %}
 	"""
-	return makeGrammarControlStart(
-		r"include", [
-			GrammarItem(_regexprString, {"category": "include", "type": "string"}, makeGrammarControlStop(FragmentNewElement))
-		])
+	return makeGrammarControlStart(r"include",
+		[GrammarItem(_regexprString, {"category": "include"}, makeGrammarControlStop(FragmentNewElement))])
+
 
 def makeGrammarControlFor() -> Grammar:
 	"""
@@ -306,8 +307,8 @@ def makeGrammarControlElseIf() -> Grammar:
 		GrammarItem(
 		r"(?={%-?\s*(else|elif))", FragmentNestedStopNewElement,
 		makeGrammarControlStart(r"elif",
-		[makeGrammarExpression("condition", makeGrammarControlStop(FragmentNestedStart, "root"), {"category": "else"})]) +
-		makeGrammarControlStart(r"else", makeGrammarControlStop(ElseFragment, "root")))
+		[makeGrammarExpression("condition", makeGrammarControlStop(FragmentNestedStart, "root"), {"category": "else"})])
+		+ makeGrammarControlStart(r"else", makeGrammarControlStop(ElseFragment, "root")))
 	]
 
 
@@ -324,7 +325,7 @@ def makeGrammarControlMacro() -> Grammar:
 
 	return makeGrammarControlStart(r"macro", [
 		GrammarItem(_regexprIdentifier + r"\(", ArgumentStart, [
-		GrammarItem(makeRegexprName("name"), Fragment, [
+		GrammarItem(makeRegexprSymbol("name"), Fragment, [
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement, makeGrammarControlStop(FragmentNestedStart, "root"))
 		]),

@@ -126,5 +126,6 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": True})
 		self.assertEqual("False", result)
 
+
 if __name__ == '__main__':
 	unittest.main()
