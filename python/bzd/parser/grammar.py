@@ -1,4 +1,6 @@
 import re
+import typing
+from functools import cached_property
 
 from typing import Any, Optional, Dict, List, Pattern, Union, Type, TYPE_CHECKING
 from bzd.parser.fragments import Fragment
@@ -14,8 +16,7 @@ class GrammarItem:
 		grammar: Optional[Union[Grammar, str]] = None,
 		checkpoint: Optional[str] = None) -> None:
 
-		# Precompile the regular expression
-		self.regexpr = re.compile(r"") if regexpr is None else re.compile(regexpr, re.DOTALL)
+		self.regexpr_ = regexpr
 
 		if isinstance(fragment, dict):
 
@@ -32,6 +33,11 @@ class GrammarItem:
 
 		self.grammar = grammar
 		self.checkpoint = checkpoint
+
+	@cached_property
+	def regexpr(self) -> typing.Pattern[str]:
+		# Lazy precompilation of the regular expression.
+		return re.compile(r"") if self.regexpr_ is None else re.compile(self.regexpr_, re.DOTALL)
 
 	def __repr__(self) -> str:
 		return str(self.regexpr)

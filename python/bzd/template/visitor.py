@@ -264,14 +264,20 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		return block
 
-	def visitIfBlock(self, element: Element, conditionStr: str) -> ResultType:
+	def visitIfBlock(self, element: Element, optionalCondition: bool) -> ResultType:
 		"""
 		Handle if block.
 		"""
 
 		sequence = element.getNestedSequenceAssert(kind="nested")
 
-		condition = self.evaluateCondition(conditionStr=conditionStr)
+		maybeCondition = element.getNestedSequence(kind="condition")
+		if maybeCondition is None:
+			assert optionalCondition, "Missing condition."
+			condition = True
+		else:
+			condition = bool(self.resolveExpression(sequence=maybeCondition))
+
 		self.followElse = not condition
 		if condition:
 			return self._visit(sequence=sequence)
@@ -420,23 +426,21 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 			# If block
 			elif category == "if":
-				Error.assertHasAttr(element=element, attr="condition")
-				conditionStr = element.getAttr("condition").value
-				block = self.visitIfBlock(element=element, conditionStr=conditionStr)
+				block = self.visitIfBlock(element=element, optionalCondition=False)
 				self.appendBlock(element=element, result=result, block=block)
 
 			# Else block
 			elif category == "else":
 				block = []
 				if self.followElse:
-					conditionStr = element.getAttrValue("condition", "True")  # type: ignore
-					block = self.visitIfBlock(element=element, conditionStr=conditionStr)
+					block = self.visitIfBlock(element=element, optionalCondition=True)
 				self.appendBlock(element=element, result=result, block=block)
 
 			# Macro block
 			elif category == "macro":
 				self.visitMacro(element=element)
 
+			# Include block
 			elif category == "include":
 				block = self.visitInclude(element=element)
 				self.appendBlock(element=element, result=result, block=block)
