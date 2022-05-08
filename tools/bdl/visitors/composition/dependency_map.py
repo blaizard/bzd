@@ -44,24 +44,18 @@ class DependencyGroup:
 class Dependencies:
 	executor: typing.Optional[Entity] = None
 	# Dependencies over other entities
-	preDeps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	# Direct dependencies
 	pre: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	intra: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	postDeps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	post: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-
-	def allDeps(self) -> typing.Iterator[Entity]:
-		yield from self.preDeps.__iter__()
-		yield from self.postDeps.__iter__()
 
 	def __repr__(self) -> str:
 		content = []
 		content += [f"executor: {str(self.executor)}"]
-		content += [f"preDeps: {self.preDeps}"]
+		content += [f"deps: {self.deps}"]
 		content += [f"pre: {self.pre}"]
 		content += [f"intra: {self.intra}"]
-		content += [f"postDeps: {self.postDeps}"]
 		content += [f"post: {self.post}"]
 		return "\n".join(content)
 
@@ -82,7 +76,7 @@ class DependencyMap:
 		assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
 
 		dependencies = DependencyGroup()
-		for dep in self.map[entity].preDeps:
+		for dep in self.map[entity].deps:
 			dependencies.pushGroup(self.buildList(entity=dep))
 		dependencies.pushGroup(self.map[entity].pre)
 
@@ -104,7 +98,7 @@ class DependencyMap:
 		while True:
 			updated = {}
 			for entity, dependencies in self.map.items():
-				for dependency in dependencies.allDeps():
+				for dependency in dependencies.deps:
 					if dependency not in self.map and dependency not in updated:
 						updated[dependency] = self.resolveDependencies(dependency)
 			if len(updated) == 0:
@@ -136,7 +130,7 @@ class DependencyMap:
 
 			# Look for dependencies coming from parameters if any.
 			if entity.parameters:
-				dependencies.preDeps.pushGroup(
+				dependencies.deps.pushGroup(
 					[self.symbols.getEntityResolved(fqn=fqn).value for fqn in entity.parameters.dependencies])
 
 		entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)

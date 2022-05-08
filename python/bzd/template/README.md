@@ -28,8 +28,9 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
 - For loops:
 
   - Simple iterable, ex: `{% for value in data %} ... {% end %}`.
-  - Key value and index-based iterable, ex: `{% for value in data %} ... {% end %}`.
+  - Key value iterable, ex: `{% for key, value in data %} ... {% end %}`.
   - Index-based iterable, ex: `{% for index, data in my.list %} ... {% end %}`.
+  - Builtin loop variable, ex: `{% for data in my.list %} {{ loop.index }} {{ loop.first }} {% end %}`.
 
 - If blocks:
 

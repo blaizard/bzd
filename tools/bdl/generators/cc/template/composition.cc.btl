@@ -54,45 +54,32 @@ template <StringLiteral name, class T, class Registry>
 class Wrapper;
 
 // ==== Specializations =======================================================
-{% for expresssion in registry %}
-// Specialization for {{ expresssion.fqn | fqnToStr }}
+{% for fqn, expresssion in registry %}
+// Specialization for {{ fqn | fqnToStr }}
 template <class T, class Registry>
-class Wrapper<"{{ expresssion.fqn }}", T, Registry> : public BaseWrapper<"{{ expresssion.fqn }}", T, Registry>
+class Wrapper<"{{ fqn }}", T, Registry> : public BaseWrapper<"{{ fqn }}", T, Registry>
 {
 public:
-	using BaseWrapper<"{{ expresssion.fqn }}", T, Registry>::BaseWrapper;
-	using BaseWrapper<"{{ expresssion.fqn }}", T, Registry>::registry;
+	using BaseWrapper<"{{ fqn }}", T, Registry>::BaseWrapper;
+	using BaseWrapper<"{{ fqn }}", T, Registry>::registry;
 
 	bzd::Async<> init() noexcept
 	{
-		{% for dep in dependencies.map[expresssion].preDeps %}
+		{% for dep in dependencies.map[expresssion].deps %}
 		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init().template assert<0>();
 		{% end %}
 		{% for dep in dependencies.map[expresssion].pre %}
 		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
 		{% end %}
-		{% if expresssion.fqn == "out" %}
-		bzd::platform::backend::out = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
-		co_await bzd::log::info("Stdout ready."_csv).template assert<0>();
-		{% elif expresssion.fqn == "in" %}
-		bzd::platform::backend::in = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
-		{% elif expresssion.fqn == "steadyClock" %}
-		bzd::platform::backend::steadyClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
-		{% elif expresssion.fqn == "systemClock" %}
-		bzd::platform::backend::systemClock = &registry.{{ expresssion.fqn | fqnToNameStr }}_.get();
+		{% if isInfra(expresssion) %}
+		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown() noexcept
 	{
-		{% if expresssion.fqn == "out" %}
-		bzd::platform::backend::out = nullptr;
-		{% elif expresssion.fqn == "in" %}
-		bzd::platform::backend::in = nullptr;
-		{% elif expresssion.fqn == "steadyClock" %}
-		bzd::platform::backend::steadyClock = nullptr;
-		{% elif expresssion.fqn == "systemClock" %}
-		bzd::platform::backend::systemClock = nullptr;
+		{% if isInfra(expresssion) %}
+		bzd::platform::backend::{{ fqn }} = nullptr;
 		{% end %}
 		co_return {};
 	}
@@ -104,20 +91,20 @@ public:
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries.
-	{% for expresssion in registry %}
-	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ expresssion.fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved, false) -}} };
+	{% for fqn, expresssion in registry %}
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved, false) -}} };
 	{% end %}
 
 	// Declaration of the registry.
 	struct Registry
 	{
-		Registry({% for i, expresssion in registry %}{% if i %}, {% end %}decltype({{ expresssion.fqn | fqnToNameStr }})& {{ expresssion.fqn | fqnToNameStr }}{% end %})
-			: {% for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}_{ {{ expresssion.fqn | fqnToNameStr }}, *this }{% end %} {}
-		{% for expresssion in registry %}
-		Wrapper<"{{ expresssion.fqn }}", decltype({{ expresssion.fqn | fqnToNameStr }}), Registry> {{ expresssion.fqn | fqnToNameStr }}_;
+		Registry({% for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}decltype({{ fqn | fqnToNameStr }})& {{ fqn | fqnToNameStr }}{% end %})
+			: {% for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}_{ {{ fqn | fqnToNameStr }}, *this }{% end %} {}
+		{% for fqn, expresssion in registry %}
+		Wrapper<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }}), Registry> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	return Registry{ {%- for i, expresssion in registry %}{% if i %}, {% end %}{{ expresssion.fqn | fqnToNameStr }}{% end -%} };
+	return Registry{ {%- for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
 }
 
 /// Helper to handle return code.
@@ -148,6 +135,20 @@ bool execute() noexcept
 {
 	// Create registry.
 	[[maybe_unused]] auto registry = makeRegistry();
+
+	// Initialize infrastructure.
+	{% for expression in infra %}
+	// registry.{{ expression.fqn | fqnToNameStr }}_.init().sync();
+	{% end %}
+	// bzd::log::info("Initialization of infra completed."_csv).sync();
+
+	// Initialize executors
+	{% for fqn, executor in executors %}
+	{% for expression in dependencies.map[executor].deps %}
+	// registry.{{ expression.fqn | fqnToNameStr }}_.init().sync();
+	{% end %}
+	// bzd::log::info("Initialization of {{ fqn }} completed."_csv).sync();
+	{% end %}
 
 	// Initialize registry if needed and assign special symbols
 	// to their platform backend if applicable.

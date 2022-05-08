@@ -60,7 +60,7 @@ class Transform:
 
 	def typeRegistryToStr(self, entity: Type) -> str:
 		return typeToStrOriginal(entity=entity,
-			registry=[entity.fqn for entity in self.composition.registry] if self.composition else None)
+			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
 
 	# Comments
 
@@ -91,6 +91,11 @@ class Transform:
 			AsyncType.active: "bzd::async::Type::active",
 			AsyncType.service: "bzd::async::Type::service",
 		}[asyncType]
+
+	# Infra
+	def isInfra(self, expression: Expression) -> bool:
+		assert self.composition
+		return expression.fqn in self.composition.infraFQNs
 
 
 def formatCc(bdl: Object) -> str:
