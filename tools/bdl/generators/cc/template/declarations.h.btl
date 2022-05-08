@@ -34,7 +34,7 @@
 			{{- element.type | typeNonConstToStr -}}
 		{%- else -%}
 			{{- element.type | typeToStr -}}
-		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
+		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}

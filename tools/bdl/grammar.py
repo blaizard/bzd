@@ -1,4 +1,5 @@
 import re
+import typing
 from pathlib import Path
 
 from bzd.parser.parser import Parser as ParserBase
@@ -26,7 +27,7 @@ _regexprString = r"\"(?P<value>.*?)\""
 
 class FragmentBlockComment(FragmentComment):
 
-	def process(self) -> None:
+	def process(self, match: typing.Match[str]) -> None:
 		assert "comment" in self.attrs, "Missing comment attribute."
 		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 

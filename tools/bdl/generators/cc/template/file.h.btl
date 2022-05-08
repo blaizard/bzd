@@ -35,7 +35,7 @@ namespace {{ namespace | namespaceToStr }} {
 {{- declareTrivialTypes(sequence) -}}
 
 {% for data in nestedList %}
-	{% if data.type in ["interface"] %}
+	{% if data.type == "interface" %}
 
 // Specialization for trivial types
 {{ data.comment | commentBlockToStr }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}

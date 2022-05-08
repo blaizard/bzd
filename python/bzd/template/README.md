@@ -36,8 +36,6 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
   - Bool evaluation of condition, ex: `{% if value %} ... {% end %}`
   - Comparison operators (`==`, `!=`, `<`, `>`, `>=`, `<=`), ex: `{% if value == 12 %} ... {% end %}`
   - Negation operator (`not`), ex: `{% if not value %} ... {% end %}`
-  - Association operators (`and`, `or`), ex: `{% if value == 12 or value == 14 %} ... {% end %}`
-  - In operators, ex: `{% if value in [1, 2, 3] %} ... {% end %}`
   - Consecutive `else` and `elif` statement, ex: `{% if value1 %} ... {% elif value2 %} ... {% else %} ... {% end %}`
 
 - Macro blocks:
