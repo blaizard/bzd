@@ -43,7 +43,7 @@ pipeline
 					steps
 					{
 						sh "{{ stage.command }}"
-						{% if stage.category in ["coverage"] %}
+						{% if stage.category == "coverage" %}
 						archiveArtifacts artifacts: "{{ stage.output }}/**/*", onlyIfSuccessful: true
 						{% end %}
 					}

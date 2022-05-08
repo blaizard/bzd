@@ -4,7 +4,6 @@ from bzd.template.template import Template
 
 
 class TestRun(unittest.TestCase):
-
 	"""
 	def testSimpleCondition(self) -> None:
 		template = Template("{% if value %}hello{% end %}")
@@ -118,6 +117,7 @@ class TestRun(unittest.TestCase):
 		result = template.render({"value": True})
 		self.assertEqual("hello ", result)
 	"""
+
 	def testAutoSrip(self) -> None:
 		template = Template("""
 	{% if value %}

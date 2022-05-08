@@ -35,70 +35,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	def visitBegin(self, result: ResultType) -> ResultType:
 		return []
 
-	def resolveName(self, name: str, isCallable: bool = False, *args: typing.Any) -> typing.Any:
-		"""
-		Resolve a name from the current substitution list.
-		Names are splited at the '.' character and each symbol is matched with the current
-		substitution list.
-		If this is a callable, it will be resolved.
-
-		hello.you[hello.ds].get("dssd").dsd
-		"""
-		value: typing.Any = self.substitutions
-
-		# Process all the array operators first to build the symbol.
-		# Start with inner array and go outer if nested.
-		while True:
-			updatedName = re.sub(r"\[([^\[]*?)\]", lambda x: "." + self.resolveName(x.group(1)), name)  # type: ignore
-			if updatedName == name:
-				break
-			name = updatedName
-
-		for symbol in name.split("."):
-
-			# If this is a callable, process its value
-			if callable(value):
-				value = value()
-
-			# Look for the corresponding nested value
-			# Note, the following conditions must remains eventhough they are handled by Substitution type
-			# but only at the top level.
-			if hasattr(value, symbol):
-				value = getattr(value, symbol)
-			elif symbol in value:
-				value = value[symbol]
-			else:
-				raise Exception("Substitution value for '{}' does not exists.".format(name))
-
-		if isCallable:
-			assert callable(value), "'{}' must be callable.".format(name)
-			value = value(*args)
-		elif callable(value):
-			value = value()
-
-		return value
-
-	def readValue(self, element: Element) -> typing.Any:
-		"""
-		Read a value from an element.
-		"""
-
-		Error.assertHasAttr(element=element, attr="value")
-		Error.assertHasAttr(element=element, attr="type")
-		valueType = element.getAttr("type").value
-		value = element.getAttr("value").value
-		if valueType == "name":
-			return self.resolveName(value)
-		elif valueType == "number":
-			return float(value)
-		elif valueType == "string":
-			return value
-		elif valueType == "true":
-			return True
-		elif valueType == "false":
-			return False
-		Error.handleFromElement(element=element, message="Unsupported value type.")
-
 	def resolveExpressions(self, sequence: Sequence) -> typing.List[typing.Any]:
 		"""Resolve expressions into their values.
 		Expression is a nested sequence that might correspond to callable arguments, pipeable expression or more
@@ -115,7 +51,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
 			return value[key]
 
-		operators = {
+		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
 			"|": (lambda l, r: r(l)),
 			"==": (lambda l, r: l == r),
 			"!=": (lambda l, r: l != r),
@@ -125,9 +61,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			"<=": (lambda l, r: l <= r),
 		}
 
-		operatorsUnary = {
-			"not": (lambda r: not r)
-		}
+		operatorsUnary: typing.Dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda r: not r)}
 
 		for element in sequence:
 
@@ -320,6 +254,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		"""
 		Handle macro definition block.
 		"""
+
 		Error.assertHasSequence(element=element, sequence="argument")
 		Error.assertHasSequence(element=element, sequence="nested")
 		Error.assertHasAttr(element=element, attr="name")
@@ -338,7 +273,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Handle include.
 		"""
 
-		includePathStr = self.readValue(element=element)
+		Error.assertHasAttr(element=element, attr="value")
+		includePathStr = element.getAttr("value").value
+
 		Error.assertTrue(element=element,
 			condition=isinstance(includePathStr, str),
 			message="The include path must resolve into a string, instead: '{}'.".format(includePathStr))
@@ -358,37 +295,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		self.substitutions.update(substitutions)
 
 		return result
-
-	def evaluateCondition(self, conditionStr: str) -> bool:
-		"""
-		Resolve names and evaluate a condition statement.
-		"""
-
-		def replaceValue(match: typing.Match[str]) -> str:
-			# Try to read the value, if it cannot, return the string as is.
-			try:
-				value = self.resolveName(name=match.group())
-			except:
-				return match.group()
-
-			# Encode the value to string and evaluate it to boolean if needed.
-			if isinstance(value, (bool, int, float)):
-				return str(value)
-			elif isinstance(value, str):
-				return "\"{}\"".format(value)
-			elif isinstance(value, (list, dict)):
-				return str(bool(value))
-
-			raise Exception("Unsupported type ({}) for value '{}'.".format(type(value), match.group()))
-
-		patternWord = re.compile("[^\s]+")
-		conditionStr = re.sub(patternWord, replaceValue, conditionStr)
-		try:
-			condition = eval(conditionStr)
-		except Exception as e:
-			raise Exception("Cannot evaluate condition '{}', {}.".format(conditionStr, e))
-
-		return bool(condition)
 
 	def visitElement(self, element: Element, result: ResultType) -> ResultType:
 		"""
