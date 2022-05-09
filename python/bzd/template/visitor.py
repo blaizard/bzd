@@ -72,6 +72,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			">=": (lambda l, r: l >= r),
 			"<": (lambda l, r: l < r),
 			"<=": (lambda l, r: l <= r),
+			"in": (lambda l, r: l in r),
 		}
 
 		operatorsUnary: typing.Dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda r: not r)}

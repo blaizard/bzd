@@ -158,7 +158,7 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 
 	finalGrammar = [
 		GrammarItemSpaces,
-		GrammarItem(r"(\||==|!=|<=|>=|<|>)", FragmentOperator, [lambda: makeGrammarExpressionImpl(continuation)]),
+		GrammarItem(r"(\||==|!=|<=|>=|<|>|in)", FragmentOperator, [lambda: makeGrammarExpressionImpl(continuation)]),
 	] + continuation
 
 	symbol.extend([GrammarItemSpaces, GrammarItem(makeRegexprSymbol("value"), FragmentNewElement, symbolTransition)])

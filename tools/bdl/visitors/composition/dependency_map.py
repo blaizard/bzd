@@ -15,6 +15,12 @@ class DependencyGroup:
 	def __init__(self) -> None:
 		self.data: typing.List[Entity] = []
 
+	def copy(self) -> "DependencyGroup":
+		"""Create a copy of this object."""
+		dependencies = DependencyGroup()
+		dependencies.data = self.data.copy()
+		return dependencies
+
 	def push(self, entity: Entity) -> None:
 		"""Add a new dependency to the list."""
 		# Ignore Builtin dependencies, as they are expected to be available at all time.
@@ -28,6 +34,11 @@ class DependencyGroup:
 		"""Push an ordered group of dependency to the list."""
 		for entity in group:
 			self.push(entity)
+
+	def __add__(self, other: "DependencyGroup") -> "DependencyGroup":
+		dependencies = self.copy()
+		dependencies.pushGroup(other)
+		return dependencies
 
 	def __iter__(self) -> typing.Iterator[Entity]:
 		for entity in self.data:
@@ -67,18 +78,15 @@ class DependencyMap:
 		self.symbols = symbols
 		self.map: typing.Dict[Entity, Dependencies] = {}
 
-	def buildList(self, entity: Entity) -> DependencyGroup:
-		"""Build the list of dependencies for a specific entity.
-		The list contains ordered dependencies from the first to the last, in the same order
-		in which they should be processed.
-		"""
-
-		assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
+	def findAllIntra(self, entities: typing.List[Entity]) -> DependencyGroup:
+		"""Find all intra expressions associated with this entities."""
 
 		dependencies = DependencyGroup()
-		for dep in self.map[entity].deps:
-			dependencies.pushGroup(self.buildList(entity=dep))
-		dependencies.pushGroup(self.map[entity].pre)
+		for entity in entities:
+			assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
+			deps = self.findAllIntra([*self.map[entity].deps])
+			dependencies.pushGroup(deps)
+			dependencies.pushGroup([*self.map[entity].intra])
 
 		return dependencies
 
@@ -98,7 +106,7 @@ class DependencyMap:
 		while True:
 			updated = {}
 			for entity, dependencies in self.map.items():
-				for dependency in dependencies.deps:
+				for dependency in dependencies.deps + dependencies.intra:
 					if dependency not in self.map and dependency not in updated:
 						updated[dependency] = self.resolveDependencies(dependency)
 			if len(updated) == 0:

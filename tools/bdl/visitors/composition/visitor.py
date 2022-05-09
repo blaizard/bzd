@@ -38,12 +38,14 @@ class Composition:
 		self.initialization: typing.List[typing.Dict[str, typing.Any]] = []
 		self.composition: typing.List[typing.Dict[str, typing.Any]] = []
 
+		# All top level expressions
+		self.all: typing.Dict[str, Expression] = {}
 		# All infrastructure dependencies.
 		self.infra: typing.List[Expression] = []
 		# All executors.
 		self.executors: typing.Dict[str, Expression] = {}
 		# All composition per executors.
-		self.comp: typing.Dict[str, typing.Dict[str, Expression]] = {}
+		self.comp: typing.Dict[str, typing.Dict[Entity, str]] = {}
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -75,9 +77,9 @@ class Composition:
 			resolved.append(fqn)
 		unresolved.remove(fqn)
 
-	def orderDependencies(self, entities: typing.Iterator[typing.Tuple[str, Entity]]) -> typing.List[str]:
+	def orderDependencies(self, entities: typing.Dict[str, Entity]) -> typing.List[str]:
 		dependencies: typing.Dict[str, typing.Set[str]] = {}
-		for fqn, entity in entities:
+		for fqn, entity in entities.items():
 
 			# Unamed entries should be dealt with later.
 			if not entity.isName:
@@ -135,9 +137,10 @@ class Composition:
 	def process(self) -> None:
 
 		categories = {CATEGORY_GLOBAL_COMPOSITION}
+		self.all = {fqn: expression for fqn, expression in self.symbols.items(categories=categories)} # type: ignore
 
 		# Make the dependency graph
-		orderedFQNs = self.orderDependencies(entities=self.symbols.items(categories=categories))
+		orderedFQNs = self.orderDependencies(entities=self.all) # type: ignore
 		self.registry = {fqn: self.symbols.getEntityResolved(fqn=fqn).value for fqn in orderedFQNs}  # type: ignore
 		self.executors = {}
 
@@ -200,7 +203,24 @@ class Composition:
 		#print(self.dependencies)
 
 		self.infra = [self.registry[fqn] for fqn in self.infraFQNs if fqn in self.registry]
-		#self.comp =
+
+		# Applications are all intra expressions that are instanciated at top level
+		self.comp = {}
+		for fqn, entity in self.all.items():
+			if entity.isName:
+				continue
+			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
+			self.comp.setdefault(entity.executor, dict())[entity] = AsyncType.service
+
+		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
+		commonServices = self.dependencies.findAllIntra(self.infra) # type: ignore
+		for fqn, executorComposition in self.comp.items():
+			services = commonServices + self.dependencies.findAllIntra(
+				[self.registry[fqn]]) + self.dependencies.findAllIntra([*executorComposition.keys()])
+			executorComposition.update({entity: AsyncType.active for entity in services})
+
+		#print(self.comp)
+		#print(self.all)
 
 		#all intra for infra:
 		#
