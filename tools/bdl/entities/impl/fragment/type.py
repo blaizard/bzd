@@ -44,7 +44,7 @@ class Type:
 		"""
 		Output the dependency list for this type.
 		"""
-		dependencies = {self.kind}
+		dependencies = {*self.kinds}
 		for params in self.templates:
 			dependencies.update(params.dependencies)
 

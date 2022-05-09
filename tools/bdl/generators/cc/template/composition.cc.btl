@@ -144,10 +144,29 @@ bool execute() noexcept
 
 	// Initialize executors
 	{% for fqn, executor in executors %}
-	{% for expression in dependencies.map[executor].deps %}
-	// registry.{{ expression.fqn | fqnToNameStr }}_.init().sync();
-	{% end %}
+	// registry.{{ fqn | fqnToNameStr }}_.init().sync();
 	// bzd::log::info("Initialization of {{ fqn }} completed."_csv).sync();
+	{% end %}
+
+	// Composition
+	{% for fqn, executor in executors %}
+	// bzd::log::info("Composition for {{ fqn }}."_csv).sync();
+		{% for expression, asyncType in comp[fqn] %}
+	// auto promise{{ loop.index }} = [&]() -> bzd::Async<> {
+
+	// To be fixed, it does pick "this" dependencies.
+		{% for dep in dependencies.map[expression].deps %}
+	//	co_await registry.{{ dep.fqn | fqnToNameStr }}_.init().template assert<0>();
+		{% end %}
+		{% for dep in dependencies.map[expression].pre %}
+	//	co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+		{% end %}
+
+	//	co_await {{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression.parametersResolved, true) -}} );
+	// 	co_return {};
+	// };
+	// registry.{{ fqn | fqnToNameStr }}_.get().schedule(promise{{ loop.index }}, {{ asyncType | asyncTypeToStr }});
+		{% end %}
 	{% end %}
 
 	// Initialize registry if needed and assign special symbols
