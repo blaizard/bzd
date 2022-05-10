@@ -21,21 +21,18 @@ private:
 	};
 
 public:
-	bool init() noexcept
+	bzd::Async<> init() noexcept
 	{
 		if (epollFd_ != -1)
 		{
-			return false;
-			// co_return bzd::error(bzd::ErrorType::failure, "Proactor is already initialized"_csv);
+			co_return bzd::error(bzd::ErrorType::failure, "Proactor is already initialized"_csv);
 		}
 		epollFd_ = ::epoll_create1(/*size is ignored but must be set*/ 0);
 		if (epollFd_ == -1)
 		{
-			return false;
-			// co_return bzd::error(bzd::ErrorType::failure, "epoll_create1: {}."_csv, ::std::strerror(errno));
+			co_return bzd::error(bzd::ErrorType::failure, "epoll_create1: {}."_csv, ::std::strerror(errno));
 		}
-		// co_return {};
-		return true;
+		co_return {};
 	}
 
 	/// Perform an asynchronous read operator.

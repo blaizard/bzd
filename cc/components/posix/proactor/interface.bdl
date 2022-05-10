@@ -7,9 +7,6 @@ interface:
 	method exec();
 	
 composition:
-	this.init();
 	this.exec();
 	
 }
-
-
