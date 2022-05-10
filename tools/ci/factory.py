@@ -92,13 +92,15 @@ class Factory(ABC):
 		for stage in rawData["stages"]:
 			item = {"category": "normal", "tags": []}
 			item.update(stage)
+			assert isinstance(item.get("name"), str), "Missing 'name' attribute, must be a string."
 			assert isinstance(item.get("command"), str), "Missing 'command' attribute, must be a string."
 			if item["category"] in configs:
 				config = configs[typing.cast(str, item["category"])]
 				# Check if not in excluded list.
 				if any(tag in item["tags"] for tag in config.exclude):
 					continue
-				item["command"] = typing.cast(str, item["command"]).format(**asdict(config))
+				for key in ["command", "name"]:
+					item[key] = typing.cast(str, item[key]).format(**asdict(config))
 				data.append(item)
 
 		template = Template.fromPath(templatePath)

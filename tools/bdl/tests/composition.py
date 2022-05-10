@@ -64,9 +64,7 @@ class TestRun(unittest.TestCase):
 		bdl = Object.fromContent(content="""
 			component Hello {
 			interface:
-				method init();
-			composition:
-				this.init();
+				method init() [init];
 			}
 			component Executor { }
 			composition {
@@ -79,9 +77,6 @@ class TestRun(unittest.TestCase):
 
 		composition = Composition()
 		composition.visit(bdl).process()
-
-		self.assertEqual(len(composition.initialization), 3)
-
 
 if __name__ == '__main__':
 	unittest.main()

@@ -54,9 +54,12 @@ class SubstitutionWrapper:
 				self.ext[key].append(value[-1])
 
 	def __getitem__(self, key: str) -> typing.Any:
-		if self.ext.get(key):
-			return self.ext[key][-1]
+		ext = self.ext.get(key)
+		if ext:
+			return ext[-1]
 		return self.substitutions[key]
 
 	def __contains__(self, key: str) -> bool:
-		return key in self.substitutions or key in self.ext
+		if key in self.substitutions:
+			return True
+		return bool(self.ext.get(key))

@@ -136,10 +136,11 @@ class DependencyMap:
 				dependencies.executor = self.symbols.getEntityResolved(fqn=entity.executor).assertValue(
 					element=entity.element)
 
-			# Look for dependencies coming from parameters if any.
-			if entity.parameters:
-				dependencies.deps.pushGroup(
-					[self.symbols.getEntityResolved(fqn=fqn).value for fqn in entity.parameters.dependencies])
+			# Look for all dependencies and add the expression only.
+			for fqn in entity.dependencies:
+				dep = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dep, Expression):
+					dependencies.deps.push(dep)
 
 		entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 
@@ -157,7 +158,7 @@ class DependencyMap:
 						category=CATEGORY_COMPOSITION)
 					newEntity = self.symbols.getEntityResolved(fqn=fqn).value
 					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=entity.fqn)
-					newEntity.resolve(resolver=newResolver)
+					newEntity.resolveMemoized(resolver=newResolver)
 					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
@@ -171,7 +172,7 @@ class DependencyMap:
 				# Create a new entity and associate it with its respective objects.
 				entityCopied = compositionEntity.copy()
 				newResolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
-				entityCopied.resolve(resolver=newResolver)
+				entityCopied.resolveMemoized(resolver=newResolver)
 
 				dependencies.intra.push(entityCopied)
 

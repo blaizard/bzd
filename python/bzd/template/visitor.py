@@ -15,7 +15,8 @@ ResultType = typing.List[str]
 
 class Loop:
 
-	def __init__(self) -> None:
+	def __init__(self, parent: typing.Optional["Loop"]) -> None:
+		self.parent = parent
 		self.index: int = 0
 
 	@property
@@ -61,8 +62,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		def substitute(value: typing.Any, key: typing.Any) -> typing.Any:
 			if isinstance(key, str) and hasattr(value, key):
 				return getattr(value, key)
-			assert key in value, Exception("Substitution value for '{}' does not exists.".format(key))
-			return value[key]
+			if hasattr(value, "__contains__") and key in value:
+				return value[key]
+			raise Exception(f"Substitution value for the key '{key}' does not exists.")
 
 		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
 			"|": (lambda l, r: r(l)),
@@ -196,7 +198,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		# Loop through the elements
 		iterable = self.resolveExpression(sequence=element.getNestedSequenceAssert("iterable"))
-		loop = Loop()
+		loop = Loop(self.substitutions["loop"] if "loop" in self.substitutions else None)
 		self.substitutions.register(element=element, key="loop", value=loop)
 		if value2 is None:
 			for value in iterable:

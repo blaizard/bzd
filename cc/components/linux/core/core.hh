@@ -28,8 +28,6 @@ public:
 
 	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
 
-	void init() {}
-
 	Result<void, Error> stop() noexcept
 	{
 		{
