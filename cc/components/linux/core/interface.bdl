@@ -4,6 +4,8 @@ namespace bzd.platform.linux;
 
 // Core abstraction on Linux operating system.
 component Core : bzd.platform.Core {
+interface:
+	
 config:
 	/*
 	 * Stack size for the current core.
@@ -12,4 +14,7 @@ config:
 	stackSize = StackSize(16384) [template min(16384)];
 	priority = Integer(0) [min(0) max(100)];
 	name = Float(3.124) [min(0) max(100)];
+	
 }
+
+

@@ -14,6 +14,7 @@ from tools.bdl.entities.impl.method import Method
 from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
 from tools.bdl.entities.impl.fragment.fqn import FQN
 
+
 @dataclasses.dataclass(frozen=True)
 class AsyncType:
 	active = "active"
@@ -52,7 +53,11 @@ class Composition:
 
 	def process(self) -> None:
 
-		self.all = {fqn: entity for fqn, entity in self.symbols.items(categories={CATEGORY_GLOBAL_COMPOSITION}) if isinstance(entity, Expression)}
+		self.all = {
+			fqn: entity
+			for fqn, entity in self.symbols.items(categories={CATEGORY_GLOBAL_COMPOSITION})
+			if isinstance(entity, Expression)
+		}
 		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
 		self.executors = {}
 
@@ -72,7 +77,7 @@ class Composition:
 			self.addExecutor(entity)
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		commonServices = self.dependencies.findAllIntra(self.infra) # type: ignore
+		commonServices = self.dependencies.findAllIntra(self.infra)  # type: ignore
 		for fqn, executorComposition in self.composition.items():
 			services = commonServices + self.dependencies.findAllIntra(
 				[self.registry[fqn]]) + self.dependencies.findAllIntra([*executorComposition.keys()])

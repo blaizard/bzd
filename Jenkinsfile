@@ -65,14 +65,14 @@ pipeline
 						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod || echo 'failed!'"
 					}
 				}
-				stage("[stress] dev")
+				stage("[stress] dev (10 runs)")
 				{
 					steps
 					{
 						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=10 --platform_suffix=linux_x86_64_clang_dev"
 					}
 				}
-				stage("[stress] prod")
+				stage("[stress] prod (10 runs)")
 				{
 					steps
 					{
