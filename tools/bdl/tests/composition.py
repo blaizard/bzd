@@ -78,5 +78,6 @@ class TestRun(unittest.TestCase):
 		composition = Composition()
 		composition.visit(bdl).process()
 
+
 if __name__ == '__main__':
 	unittest.main()
