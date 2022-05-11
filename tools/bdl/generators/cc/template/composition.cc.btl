@@ -2,6 +2,7 @@
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 #include "cc/bzd/core/logger.hh"
+#include "cc/bzd/core/assert.hh"
 #include "cc/bzd/platform/clock.hh"
 #include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/platform/atomic.hh"
@@ -42,60 +43,34 @@ enum class Status
 	uninitialized,
 	initializing,
 	initialized,
+	shuttingDown,
 };
 
-/// Wrapper around a registry entry.
-template <StringLiteral name, class T, class Registry>
-class BaseWrapper
-{
-public: // Constructor.
-	BaseWrapper(T& obj, Registry& registry_) noexcept : obj_{obj}, registry{registry_} {}
-
-public: // Accessors.
-	[[nodiscard]] auto& get() noexcept { return obj_; }
-	[[nodiscard]] const auto& get() const noexcept { return obj_; }
-
-protected:
-	T& obj_;
-	Registry& registry;
-	Status status_{Status::uninitialized};
-	bzd::SpinMutex mutex_{};
-};
-
-template <StringLiteral name, class T, class Registry>
-class Wrapper;
+template <StringLiteral name>
+class ResourceSpecialization;
 
 // ==== Specializations =======================================================
 {% for fqn, expresssion in registry %}
 
 // Specialization for '{{ fqn | fqnToStr }}'.
-template <class T, class Registry>
-class Wrapper<"{{ fqn }}", T, Registry> : public BaseWrapper<"{{ fqn }}", T, Registry>
+template <>
+class ResourceSpecialization<"{{ fqn }}">
 {
-public:
-	using BaseWrapper<"{{ fqn }}", T, Registry>::BaseWrapper;
-	using BaseWrapper<"{{ fqn }}", T, Registry>::registry;
-
-	bzd::Async<> init() noexcept
+protected:
+	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
-		const auto scope = bzd::makeSyncLockGuard(this->mutex_);
-		if (this->status_ == Status::uninitialized)
-		{
-			this->status_ = Status::initializing;
-			{% for dep in dependencies.map[expresssion].deps %}
-			co_await registry.{{ dep.fqn | fqnToNameStr }}_.init().template assert<0>();
-			{% end %}
-			{% for dep in dependencies.map[expresssion].pre %}
-			co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
-			{% end %}
-			{% if isInfra(expresssion) %}
-			bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
-			{% end %}
-			this->status_ = Status::initialized;
-		}
+		{% for dep in dependencies.map[expresssion].deps %}
+		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
+		{% end %}
+		{% for dep in dependencies.map[expresssion].pre %}
+		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+		{% end %}
+		{% if isInfra(expresssion) %}
+		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
+		{% end %}
 		co_return {};
 	}
-	bzd::Async<> shutdown() noexcept
+	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
 		{% if isInfra(expresssion) %}
 		bzd::platform::backend::{{ fqn }} = nullptr;
@@ -105,6 +80,54 @@ public:
 };
 {% end %}
 
+/// Wrapper around a registry entry.
+///
+/// \tparam name The FQN of the resource.
+/// \tparam T The data type of the resource.
+/// \tparam Registry The registry type to be used with this resource.
+template <StringLiteral name, class T>
+class Resource : public ResourceSpecialization<name>
+{
+public: // Constructor.
+	Resource(T& obj) noexcept : obj_{obj} {}
+
+public: // Init/Shutdown.
+	bzd::Async<> init(auto& registry) noexcept
+	{
+		const auto scope = bzd::makeSyncLockGuard(mutex_);
+		++refCount_;
+		if (this->status_ == Status::uninitialized)
+		{
+			this->status_ = Status::initializing;
+			co_await ResourceSpecialization<name>::init(registry).template assert<0>();
+			this->status_ = Status::initialized;
+		}
+		co_return {};
+	}
+	bzd::Async<> shutdown(auto& registry) noexcept
+	{
+		const auto scope = bzd::makeSyncLockGuard(mutex_);
+		if (refCount_ == 1u)
+		{
+			this->status_ = Status::shuttingDown;
+			co_await ResourceSpecialization<name>::shutdown(registry).template assert<0>();
+			this->status_ = Status::uninitialized;
+		}
+		--refCount_;
+		bzd::assert::isTrue(refCount_ >= 0, "Reference counter went < 0: {}"_csv, refCount_);
+		co_return {};
+	}
+
+public: // Accessors.
+	[[nodiscard]] auto& get() noexcept { return obj_; }
+	[[nodiscard]] const auto& get() const noexcept { return obj_; }
+
+protected:
+	T& obj_;
+	Status status_{Status::uninitialized};
+	bzd::SpinMutex mutex_{};
+	bzd::Int32Type refCount_{0};
+};
 
 // ==== Registry ==============================================================
 [[nodiscard]] auto makeRegistry() noexcept
@@ -117,10 +140,8 @@ public:
 	// Declaration of the registry.
 	struct Registry
 	{
-		Registry({% for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}decltype({{ fqn | fqnToNameStr }})& {{ fqn | fqnToNameStr }}{% end %})
-			: {% for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}_{ {{ fqn | fqnToNameStr }}, *this }{% end %} {}
 		{% for fqn, expresssion in registry %}
-		Wrapper<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }}), Registry> {{ fqn | fqnToNameStr }}_;
+		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
 	return Registry{ {%- for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
@@ -157,13 +178,13 @@ bool execute() noexcept
 
 	// Initialize infrastructure.
 	{% for expression in infra %}
-	registry.{{ expression.fqn | fqnToNameStr }}_.init().sync();
+	registry.{{ expression.fqn | fqnToNameStr }}_.init(registry).sync();
 	{% end %}
 	bzd::log::info("Initialization of infra completed."_csv).sync();
 
 	// Initialize executors.
 	{% for fqn, executor in executors %}
-	registry.{{ fqn | fqnToNameStr }}_.init().sync();
+	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
 	bzd::log::info("Initialization of {{ fqn }} completed."_csv).sync();
 	{% end %}
 
@@ -175,7 +196,7 @@ bool execute() noexcept
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 			{% for dep in dependencies.map[expression].deps %}
-		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init().template assert<0>();
+		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
 			{% end %}
 			{% for dep in dependencies.map[expression].pre %}
 		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
