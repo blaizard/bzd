@@ -11,6 +11,7 @@ bzd_cc_library(
         ":find",
         ":find_conditional",
         ":range",
+        ":string_literal",
         ":tuple",
         ":type",
         ":type_list",
@@ -85,6 +86,18 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "string_literal",
+    hdrs = [
+        "string_literal.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":range",
         "//cc/bzd/platform:types",
     ],
 )

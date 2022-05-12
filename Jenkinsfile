@@ -51,14 +51,14 @@ pipeline
 						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod"
 					}
 				}
-				stage("[normal] linux_x86_64_gcc")
+				stage("[normal] linux_x86_64_gcc prod")
 				{
 					steps
 					{
 						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod"
 					}
 				}
-				stage("[normal] esp32_xtensa_lx6_gcc")
+				stage("[normal] esp32_xtensa_lx6_gcc prod")
 				{
 					steps
 					{

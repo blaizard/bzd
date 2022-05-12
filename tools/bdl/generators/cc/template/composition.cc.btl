@@ -7,6 +7,7 @@
 #include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/algorithm/copy_n.hh"
+#include "cc/bzd/meta/string_literal.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 {% for path in includes %}
@@ -27,17 +28,6 @@ bzd::Clock* systemClock{nullptr};
 
 namespace {
 
-template <bzd::SizeType n>
-struct StringLiteral
-{
-    constexpr StringLiteral(const char (&str)[n])
-	{
-        bzd::algorithm::copyN(str, n, value_);
-    }
-
-    char value_[n];
-};
-
 enum class Status
 {
 	uninitialized,
@@ -46,7 +36,7 @@ enum class Status
 	shuttingDown,
 };
 
-template <StringLiteral name>
+template <bzd::meta::StringLiteral name>
 class ResourceSpecialization;
 
 // ==== Specializations =======================================================
@@ -85,7 +75,7 @@ protected:
 /// \tparam name The FQN of the resource.
 /// \tparam T The data type of the resource.
 /// \tparam Registry The registry type to be used with this resource.
-template <StringLiteral name, class T>
+template <bzd::meta::StringLiteral name, class T>
 class Resource : public ResourceSpecialization<name>
 {
 public: // Constructor.
@@ -130,6 +120,7 @@ protected:
 };
 
 // ==== Registry ==============================================================
+
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries.
@@ -170,6 +161,8 @@ template <class Promise>
 
 } // namespace
 
+// ==== Execution =============================================================
+
 /// Initialize and compose the application.
 bool execute() noexcept
 {
@@ -185,7 +178,7 @@ bool execute() noexcept
 	// Initialize executors.
 	{% for fqn, executor in executors %}
 	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
-	bzd::log::info("Initialization of {{ fqn }} completed."_csv).sync();
+	bzd::log::info("Initialization of '{{ fqn }}' completed."_csv).sync();
 	{% end %}
 
 	// Composition.
