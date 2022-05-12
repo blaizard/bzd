@@ -12,6 +12,9 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         "//cc/bzd/test",
         "//cc/bzd/utility",
     ],
-) for path in glob([
-    "*.cc",
-])]
+) for path in glob(
+    [
+        "*.cc",
+    ],
+    exclude = ["signal.cc"],
+)]

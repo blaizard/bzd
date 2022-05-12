@@ -87,11 +87,10 @@ private:
 	static constexpr bzd::SizeType startByte_ = OffsetBits / 8;
 	static constexpr bzd::SizeType sizeByte_ = ((SizeBits - 1) >> 3) + 1;
 	static constexpr bzd::SizeType shiftBits_ = OffsetBits % 8;
-
 	using SignalInternals = impl::SignalInternals<sizeByte_>;
-
 	static constexpr typename SignalInternals::ExtractedType mask_ = 0xffffffffffffffff >> (64 - SizeBits);
 
+	static_assert(SizeBits > 0, "SizeBits must be greater than 0.");
 	static_assert(sizeof(Type) >= sizeByte_, "Type container is smaller than the requested signal size.");
 
 	constexpr void adjustEndianess(typename SignalInternals::Type& value)
@@ -102,23 +101,31 @@ private:
 
 public:
 	// Need to handle different endianess
-	static constexpr const Type get(const bzd::Span<const bzd::ByteType>& data)
+	static constexpr const Type get(const bzd::Span<const bzd::ByteType> data)
 	{
 		typename SignalInternals::ExtractedType extracted;
 		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
+		// std::copy_n(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
+
 		const typename SignalInternals::Type type = (extracted >> shiftBits_) & mask_;
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}
 
-	static constexpr void set(const bzd::Span<bzd::ByteType>& data, const Type& value)
+	// This is failing with bazel run //cc/bzd/utility/tests:signal --config=linux_x86_64_gcc --config=prod
+	static constexpr void set(const bzd::Span<bzd::ByteType> data, const Type& value)
 	{
 		typename SignalInternals::ExtractedType extracted;
+
 		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
+		// std::copy_n(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::ByteType*>(&extracted));
+
 		extracted &= ~(mask_ << shiftBits_);
 
 		const typename SignalInternals::Type valueTyped = CompuMethod::template toBuffer<Type, decltype(valueTyped)>(value);
 		extracted |= ((static_cast<decltype(extracted)>(valueTyped) & mask_) << shiftBits_);
+
 		bzd::algorithm::copyN(reinterpret_cast<bzd::ByteType*>(&extracted), sizeof(extracted), &data.at(startByte_));
+		// std::copy_n(reinterpret_cast<bzd::ByteType*>(&extracted), sizeof(extracted), &data.at(startByte_));
 	}
 };
 

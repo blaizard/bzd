@@ -37,9 +37,16 @@ public: // Constructors
 
 public: // Accessors
 	constexpr ValueType* data() const noexcept { return data_; }
-	constexpr ValueMutableType*& dataMutable() noexcept { return data_; }
+	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
 	constexpr bzd::SizeType size() const noexcept { return size_; }
 	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
+
+public: // Modifier
+	constexpr void removePrefix(const SizeType n) noexcept
+	{
+		data_ += n;
+		size_ -= n;
+	}
 
 private:
 	template <class U>

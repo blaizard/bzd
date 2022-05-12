@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
-#include "cc/bzd/meta/range.hh"
+#include "cc/bzd/meta/string_literal.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/utility/concept.hh"
@@ -43,26 +43,9 @@ public:
 		return StringView(&this->at(pos), (count == npos) ? (this->size() - pos) : count);
 	}
 
-	constexpr void removePrefix(const SizeType n) noexcept
-	{
-		this->storage_.dataMutable() += n;
-		this->storage_.sizeMutable() -= n;
-	}
+	constexpr void removePrefix(const SizeType n) noexcept { this->storage_.removePrefix(n); }
 
 	constexpr void clear() noexcept { removePrefix(this->size()); }
-};
-
-/// Type used by the compile time string view type.
-template <bzd::SizeType n>
-struct ConstexprStringViewArray
-{
-	template <bzd::SizeType... i>
-	constexpr ConstexprStringViewArray(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data{arr[i]..., '\0'}
-	{
-	}
-	constexpr ConstexprStringViewArray(char const (&arr)[n]) noexcept : ConstexprStringViewArray(arr, bzd::meta::Range<0, n>{}) {}
-
-	const char data[n + 1];
 };
 
 } // namespace bzd::impl
@@ -91,12 +74,12 @@ constexpr bzd::StringView operator""_sv(const char* str, bzd::SizeType size) noe
 }
 
 /// Operator to create a compile time string view out of a string.
-template <bzd::impl::ConstexprStringViewArray str>
+template <bzd::meta::StringLiteral str>
 constexpr auto operator""_csv() noexcept
 {
 	struct StrView : ::bzd::ConstexprStringView
 	{
-		[[nodiscard]] static constexpr const char* value() noexcept { return str.data; }
+		[[nodiscard]] static constexpr const char* value() noexcept { return str.data(); }
 	};
 	return StrView{};
 }
