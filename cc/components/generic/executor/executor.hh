@@ -5,6 +5,7 @@
 #include "cc/bzd/platform/interfaces/core.hh"
 #include "cc/bzd/platform/interfaces/executor.hh"
 #include "cc/bzd/utility/apply.hh"
+#include "cc/bzd/core/logger.hh"
 
 namespace bzd::platform::generic {
 
@@ -12,19 +13,29 @@ template <class... Cores>
 class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
 {
 public:
-	constexpr Executor(Cores&... cores) noexcept :
-		cores_{inPlace, &cores...}, executor_{},
-		start_{bzd::FunctionRef<void(void)>::toMember<decltype(executor_), &bzd::coroutine::impl::Executor::run>(executor_)}
-	{
-	}
+	using Self = Executor<Cores...>;
+
+public:
+	constexpr Executor(Cores&... cores) noexcept : cores_{inPlace, &cores...}, executor_{} {}
 
 	/// Assign a workload to this executor.
-	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept { async.enqueue(executor_, type); }
+	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
+	{
+		bzd::Optional<bzd::async::Executable::OnTerminateCallback> onTerminate{};
+		if (type == bzd::async::Type::active)
+		{
+			onTerminate = bzd::async::Executable::OnTerminateCallback::toMember<Self, &Self::onAsyncTerminate>(*this);
+			++nbActive_;
+		}
+		// Enqueue the executor and add a continuation.
+		async.enqueue(executor_, type, onTerminate);
+	}
 
 	/// Start the executor.
 	constexpr void start() noexcept
 	{
-		bzd::apply([&](auto&... cores) { (cores->start(start_), ...); }, cores_);
+		const auto run = bzd::FunctionRef<void(void)>::toMember<Self, &Self::run>(*this);
+		bzd::apply([run](auto&... cores) { (cores->start(run), ...); }, cores_);
 	}
 
 	/// Stop the executor.
@@ -34,11 +45,22 @@ public:
 	}
 
 private:
-	static constexpr bzd::SizeType nbCores_{sizeof...(Cores)};
+	constexpr void run() noexcept { executor_.run(); }
 
+	constexpr bzd::Optional<bzd::async::Executable&> onAsyncTerminate() noexcept
+	{
+		if (--nbActive_ == 0u)
+		{
+			bzd::log::info("All apps are terminated, requesting shutdown.").sync();
+			executor_.requestShutdown();
+		}
+		return bzd::nullopt;
+	}
+
+private:
 	bzd::Tuple<Cores*...> cores_;
 	bzd::coroutine::impl::Executor executor_;
-	bzd::FunctionRef<void(void)> start_;
+	bzd::Atomic<bzd::SizeType> nbActive_{0};
 };
 
 } // namespace bzd::platform::generic

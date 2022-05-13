@@ -14,8 +14,6 @@
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
-#include <iostream>
-
 namespace bzd {
 
 template <class>
@@ -125,6 +123,14 @@ public: // Traits.
 	using Self = Executor<Executable>;
 	using TickType = typename ExecutorContext<Executable>::TickType;
 
+	enum class Status
+	{
+		idle,
+		running,
+		shutdownRequested,
+		abortRequested
+	};
+
 public:
 	constexpr Executor() = default;
 
@@ -155,8 +161,14 @@ public:
 		ExecutorContext<Executable> context{};
 		auto scope = registerContext(context);
 
-		// Loop until there are still elements
-		while (!queue_.empty() && getNbActiveExecutables())
+		// Set the status.
+		{
+			auto expected{Status::idle};
+			status_.compareExchange(expected, Status::running);
+		}
+
+		// Loop until there are still elements or an abort request is present.
+		while (!queue_.empty() && status_.load() != Status::abortRequested)
 		{
 			// Drain remaining handles
 			auto maybeExecutable = pop();
@@ -183,6 +195,26 @@ public:
 		}
 	}
 
+	void requestShutdown() noexcept
+	{
+		auto expected{Status::running};
+		status_.compareExchange(expected, Status::shutdownRequested);
+	}
+
+	void requestAbort() noexcept
+	{
+		auto expected{Status::running};
+		do
+		{
+			if (status_.compareExchange(expected, Status::abortRequested))
+			{
+				break;
+			}
+		} while (expected != Status::idle);
+	}
+
+	constexpr BoolType isRunning() const noexcept { return status_.load() == Status::running; }
+
 	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
 	/// Schedule a new executable on this executor.
@@ -190,25 +222,7 @@ public:
 	{
 		executable.setType(type);
 		executable.setExecutor(*this);
-		switch (type)
-		{
-		case bzd::ExecutableMetadata::Type::active:
-			++nbActiveExecutables_;
-			break;
-		case bzd::ExecutableMetadata::Type::service:
-			break;
-		case bzd::ExecutableMetadata::Type::unset:
-			[[fallthrough]];
-		default:
-			bzd::assert::unreachable();
-		}
 		push(executable);
-	}
-
-	constexpr bzd::Optional<Executable&> terminateActive() noexcept
-	{
-		--nbActiveExecutables_;
-		return bzd::nullopt;
 	}
 
 public:
@@ -220,9 +234,6 @@ public:
 		auto scope = makeSyncSharedLockGuard(contextMutex_);
 		return range::associateScope(context_, bzd::move(scope));
 	}
-
-	/// Get the number of executable currently active that are associated with this executor.
-	[[nodiscard]] constexpr auto getNbActiveExecutables() const noexcept { return nbActiveExecutables_.load(); }
 
 private:
 	template <class U>
@@ -253,6 +264,10 @@ private:
 		return ScopeGuard{[this, &context]() {
 			auto scope = makeSyncLockGuard(contextMutex_);
 			const auto result = context_.pop(context);
+			if (context_.empty())
+			{
+				status_.store(Status::idle);
+			}
 			bzd::assert::isTrue(result.hasValue());
 		}};
 	}
@@ -297,8 +312,8 @@ private:
 	bzd::Atomic<SizeType> maxRunningCount_{0};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
-	/// Number of active executables currently associated with this executor.
-	bzd::Atomic<SizeType> nbActiveExecutables_{0};
+	/// Current status of the executor.
+	bzd::Atomic<Status> status_{Status::idle};
 };
 
 } // namespace bzd

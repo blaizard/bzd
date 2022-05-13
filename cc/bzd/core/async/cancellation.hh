@@ -7,8 +7,6 @@
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
-#include <iostream>
-
 /// A cancellation token.
 ///
 /// Callgraph representation:

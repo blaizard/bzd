@@ -36,26 +36,9 @@ protected:
 			{
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
-			executable.setConditionalContinuation(Executable::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this));
+			executable.setConditionalContinuation(callback_);
 			executor.schedule(executable, caller.getType());
 		});
-	}
-
-	constexpr bzd::Optional<Executable&> onTerminateCallback() noexcept
-	{
-		switch (continuation_->getType())
-		{
-		case bzd::ExecutableMetadata::Type::active:
-			continuation_->getExecutor().terminateActive();
-			break;
-		case bzd::ExecutableMetadata::Type::service:
-			break;
-		case bzd::ExecutableMetadata::Type::unset:
-			[[fallthrough]];
-		default:
-			bzd::assert::unreachable();
-		}
-		return callback_();
 	}
 
 protected:
