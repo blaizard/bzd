@@ -64,7 +64,7 @@ bzd::Async<> bzd::Logger::printHeader(const bzd::log::Level level, const SourceL
 	/*	const auto ms = bzd::platform::systemClock().getMs();
 
 		const Date date{ms};*/
-	co_await toStream(backend, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine()).assert();
+	co_await !toStream(backend, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine());
 	co_return {};
 }
 

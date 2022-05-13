@@ -14,7 +14,7 @@ inline bzd::Async<> delay(const bzd::units::Millisecond time) noexcept
 {
 	auto& clock = bzd::platform::steadyClock();
 
-	co_await clock.delay(time).assert();
+	co_await !clock.delay(time);
 
 	co_return {};
 }
@@ -27,7 +27,7 @@ inline bzd::Async<> timeout(const bzd::units::Millisecond time) noexcept
 {
 	auto& clock = bzd::platform::steadyClock();
 
-	co_await clock.delay(time).assert();
+	co_await !clock.delay(time);
 
 	co_return bzd::error(ErrorType::timeout, "Operation timed out with {}ms"_csv, time.get());
 }

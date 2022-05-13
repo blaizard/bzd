@@ -142,10 +142,10 @@ This will return a result that is a tuple of optional results of the 2 coroutine
 ### Error propagation
 
 Some errors cannot be treated at the caller level and might have to be propagated to the upper layers. For that the Async
-type provides a convenient function to reduce boiler plate code:
+type provides a convenient operator to reduce boiler plate code:
 
 ```c++
-const auto value = co_await myFunc().assert();
+const auto value = co_await !myFunc();
 ```
 
 The value is directly returned from the coroutine, any error is propagate to the caller of this coroutine. This piece of code
@@ -166,7 +166,7 @@ Error propagation can also apply to `bzd::async::any` coroutines, and it will en
 returns a valid result, otherwise the error will be propagate to the caller.
 
 ```c++
-const auto value = co_await bzd::async::any(myFunc(), timeout(1_s)).assert();
+const auto value = co_await !bzd::async::any(myFunc(), timeout(1_s));
 // or
-const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assert<1>();
+const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasValue<1>();
 ```

@@ -2,10 +2,10 @@
 
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/logger.hh"
 #include "cc/bzd/platform/interfaces/core.hh"
 #include "cc/bzd/platform/interfaces/executor.hh"
 #include "cc/bzd/utility/apply.hh"
-#include "cc/bzd/core/logger.hh"
 
 namespace bzd::platform::generic {
 

@@ -27,7 +27,7 @@ bzd::Async<int> generateSuccessIntWithDelay(const int value)
 bzd::Async<> nestedError(int& step)
 {
 	++step;
-	co_await generateError().assert();
+	co_await !generateError();
 	++step;
 	co_return {};
 }
@@ -35,7 +35,7 @@ bzd::Async<> nestedError(int& step)
 bzd::Async<> deeplyNestedError(int& step)
 {
 	++step;
-	co_await nestedError(step).assert();
+	co_await !nestedError(step);
 	++step;
 	co_return {};
 }
@@ -43,7 +43,7 @@ bzd::Async<> deeplyNestedError(int& step)
 bzd::Async<> nestedErrorAny(int& step)
 {
 	++step;
-	co_await bzd::async::any(generateError(), generateSuccessInt(36)).assert();
+	co_await !bzd::async::any(generateError(), generateSuccessInt(36));
 	++step;
 	co_return {};
 }
@@ -55,7 +55,7 @@ TEST_ASYNC(Coroutine, Error)
 		EXPECT_FALSE(result);
 	}
 	{
-		const auto value = co_await generateSuccessInt(42).assert();
+		const auto value = co_await !generateSuccessInt(42);
 		EXPECT_EQ(value, 42);
 	}
 	{
@@ -78,18 +78,18 @@ TEST_ASYNC(Coroutine, Error)
 TEST_ASYNC(Coroutine, ErrorAny)
 {
 	{
-		const auto value = co_await bzd::async::any(generateSuccessInt(12), generateSuccessInt(42)).assert();
+		const auto value = co_await !bzd::async::any(generateSuccessInt(12), generateSuccessInt(42));
 		EXPECT_EQ(value, 12);
 	}
 
 	{
-		const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assert<1>();
+		const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assertHasValue<1>();
 		EXPECT_EQ(value, 42);
 	}
 
 	{
 		const auto result = co_await []() -> bzd::Async<> {
-			const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assert<0>();
+			const auto value = co_await bzd::async::any(generateSuccessIntWithDelay(12), generateSuccessInt(42)).assertHasValue<0>();
 			EXPECT_EQ(value, 42);
 			co_return {};
 		}();

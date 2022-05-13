@@ -25,7 +25,7 @@ bzd::Async<> nopVoid(bzd::interface::String& trace, bzd::StringView id)
 TEST_ASYNC(Coroutine, Void)
 {
 	bzd::String<32> trace;
-	co_await nopVoid(trace, "a").assert();
+	co_await !nopVoid(trace, "a");
 	EXPECT_EQ(trace, "[a-1]");
 	co_return {};
 }
@@ -57,7 +57,7 @@ bzd::Async<int> nested(bzd::interface::String& trace, bzd::StringView id, int re
 TEST_ASYNC(Coroutine, Nested)
 {
 	bzd::String<32> trace;
-	co_await nested(trace, "a").assert();
+	co_await !nested(trace, "a");
 	EXPECT_EQ(trace, "[a1][a0][a2]");
 	co_return {};
 }
@@ -69,7 +69,7 @@ bzd::Async<int> deepNested(bzd::interface::String& trace, bzd::StringView id)
 	{
 		result += i;
 		appendToTrace(trace, id, 3);
-		co_await nested(trace, id).assert();
+		co_await !nested(trace, id);
 		appendToTrace(trace, id, 4);
 	}
 	co_return bzd::move(result);
@@ -78,7 +78,7 @@ bzd::Async<int> deepNested(bzd::interface::String& trace, bzd::StringView id)
 TEST_ASYNC(Coroutine, DeepNested)
 {
 	bzd::String<128> trace;
-	co_await deepNested(trace, "a").assert();
+	co_await !deepNested(trace, "a");
 	EXPECT_EQ(trace, "[a3][a1][a0][a2][a4][a3][a1][a0][a2][a4][a3][a1][a0][a2][a4]");
 	co_return {};
 }
@@ -205,7 +205,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 {
 	{
 		bzd::String<128> trace;
-		co_await anyNested(trace, "a").assert();
+		co_await !anyNested(trace, "a");
 		//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][b0][c2][a7]");
 	}
@@ -307,50 +307,4 @@ TEST_ASYNC(Coroutine, Stackoverflow)
 	EXPECT_TRUE(result);
 	EXPECT_EQ(result.value(), 4999950000ULL);
 	co_return {};
-}
-
-TEST(Coroutine, Active)
-{
-	bzd::coroutine::impl::Executor executor{};
-
-	auto promise = nopNoTrace(42);
-	promise.run(executor);
-	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
-}
-
-TEST(Coroutine, ActiveNested)
-{
-	bzd::coroutine::impl::Executor executor{};
-
-	auto promise = loopSynchronously(42);
-	promise.run(executor);
-	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
-}
-
-TEST(Coroutine, ActiveAll)
-{
-	bzd::coroutine::impl::Executor executor{};
-
-	// Note, promiseA and proiseB need to be constructed in a large scope here to ensure
-	// they are not destroyed before the start of the execution of promise.
-	// async::all(loopSyncrhonously(42), ...) would fail because of this.
-	auto promiseA = loopSynchronously(42);
-	auto promiseB = loopSynchronously(42);
-	auto promise = bzd::async::all(bzd::move(promiseA), bzd::move(promiseB));
-	promise.run(executor);
-	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
-}
-
-TEST(Coroutine, ActiveAny)
-{
-	bzd::coroutine::impl::Executor executor{};
-
-	// Note, promiseA and proiseB need to be constructed in a large scope here to ensure
-	// they are not destroyed before the start of the execution of promise.
-	// async::any(loopSyncrhonously(42), ...) would fail because of this.
-	auto promiseA = loopSynchronously(42);
-	auto promiseB = loopSynchronously(2);
-	auto promise = bzd::async::any(bzd::move(promiseA), bzd::move(promiseB));
-	promise.run(executor);
-	EXPECT_EQ(executor.getNbActiveExecutables(), 0U);
 }
