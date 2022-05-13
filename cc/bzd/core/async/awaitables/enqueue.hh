@@ -86,7 +86,7 @@ public: // Coroutine specializations.
 		this->enqueueAsyncs(promise, promise.getCancellationToken());
 	}
 
-	constexpr ResultType await_resume() noexcept
+	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
 		return bzd::apply(
 			[](auto&... asyncs) -> ResultType {
@@ -144,7 +144,7 @@ public: // Coroutine specializations.
 		this->enqueueAsyncs(promise, token_);
 	}
 
-	constexpr ResultType await_resume() noexcept
+	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
 		return bzd::apply(
 			[](auto&... asyncs) -> ResultType {

@@ -23,7 +23,7 @@ bzd::Async<> bzd::print(Args&&... args) noexcept
 {
 	auto& out = bzd::platform::out();
 	auto scope = co_await out.getLock();
-	co_await toStream(out, bzd::forward<Args>(args)...);
+	co_await toStream(out, bzd::forward<Args>(args)...).assert();
 	co_return {};
 }
 
@@ -31,6 +31,6 @@ template <class... Args>
 bzd::Async<> bzd::printNoLock(Args&&... args) noexcept
 {
 	auto& out = bzd::platform::out();
-	co_await toStream(out, bzd::forward<Args>(args)...);
+	co_await toStream(out, bzd::forward<Args>(args)...).assert();
 	co_return {};
 }

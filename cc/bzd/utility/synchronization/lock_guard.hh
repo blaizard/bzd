@@ -27,7 +27,7 @@ namespace bzd {
 template <concepts::basicLockable T>
 [[nodiscard]] auto makeLockGuard(T& lock) -> bzd::Async<bzd::typeTraits::InvokeResult<decltype(impl::lockGuard::makeLambda<T>), T&>>
 {
-	co_await lock.lock();
+	co_await lock.lock().assert();
 	auto scope = impl::lockGuard::makeLambda(lock);
 	co_return bzd::move(scope);
 }
@@ -36,7 +36,7 @@ template <concepts::sharedLockable T>
 [[nodiscard]] auto makeSharedLockGuard(T& lock)
 	-> bzd::Async<bzd::typeTraits::InvokeResult<decltype(impl::sharedLockGuard::makeLambda<T>), T&>>
 {
-	co_await lock.lockShared();
+	co_await lock.lockShared().assert();
 	auto scope = impl::sharedLockGuard::makeLambda(lock);
 	co_return bzd::move(scope);
 }

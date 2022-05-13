@@ -13,7 +13,7 @@ struct GetExecutor : public bzd::coroutine::impl::suspend_never
 		executor_ = &caller.promise().getExecutor();
 		return false;
 	}
-	constexpr auto await_resume() noexcept { return executor_; }
+	[[nodiscard]] constexpr auto await_resume() noexcept { return executor_; }
 	Executor* executor_;
 };
 

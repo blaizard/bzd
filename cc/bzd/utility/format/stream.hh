@@ -22,14 +22,14 @@ public:
 	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
 	static Async<> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
 	{
-		co_await toStream(stream, value);
+		co_await toStream(stream, value).assert();
 		co_return {};
 	}
 
 	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
 	static Async<> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 	{
-		co_await toStream(stream, value, metadata);
+		co_await toStream(stream, value, metadata).assert();
 		co_return {};
 	}
 };
@@ -44,13 +44,13 @@ Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
-	co_await stream.write(str.asBytes());
+	co_await stream.write(str.asBytes()).assert();
 	co_return {};
 }
 
 inline Async<> toStream(bzd::OStream& stream, const bzd::StringView stringView, const Metadata& metadata)
 {
-	co_await stream.write(processCommon(stringView, metadata).asBytes());
+	co_await stream.write(processCommon(stringView, metadata).asBytes()).assert();
 	co_return {};
 }
 
@@ -66,7 +66,7 @@ public:
 	{
 		// Make the actual lambda
 		const auto lambdas = bzd::makeTuple([&args](TransportType& transport, const Metadata& metadata) -> bzd::Async<> {
-			co_await Adapter::process(transport, args, metadata);
+			co_await Adapter::process(transport, args, metadata).assert();
 			co_return {};
 		}...);
 
@@ -87,70 +87,70 @@ private:
 			{
 				if (index == 0)
 				{
-					co_await lambdas_.template get<0>()(transport, metadata);
+					co_await lambdas_.template get<0>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 1)
 			{
 				if (index == 1)
 				{
-					co_await lambdas_.template get<1>()(transport, metadata);
+					co_await lambdas_.template get<1>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 2)
 			{
 				if (index == 2)
 				{
-					co_await lambdas_.template get<2>()(transport, metadata);
+					co_await lambdas_.template get<2>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 3)
 			{
 				if (index == 3)
 				{
-					co_await lambdas_.template get<3>()(transport, metadata);
+					co_await lambdas_.template get<3>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 4)
 			{
 				if (index == 4)
 				{
-					co_await lambdas_.template get<4>()(transport, metadata);
+					co_await lambdas_.template get<4>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 5)
 			{
 				if (index == 5)
 				{
-					co_await lambdas_.template get<5>()(transport, metadata);
+					co_await lambdas_.template get<5>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 6)
 			{
 				if (index == 6)
 				{
-					co_await lambdas_.template get<6>()(transport, metadata);
+					co_await lambdas_.template get<6>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 7)
 			{
 				if (index == 7)
 				{
-					co_await lambdas_.template get<7>()(transport, metadata);
+					co_await lambdas_.template get<7>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 8)
 			{
 				if (index == 8)
 				{
-					co_await lambdas_.template get<8>()(transport, metadata);
+					co_await lambdas_.template get<8>()(transport, metadata).assert();
 				}
 			}
 			if constexpr (Lambdas::size() > 9)
 			{
 				if (index == 9)
 				{
-					co_await lambdas_.template get<9>()(transport, metadata);
+					co_await lambdas_.template get<9>()(transport, metadata).assert();
 				}
 			}
 			static_assert(Lambdas::size() <= 10, "Too many arguments passed to format, not supported.");
@@ -188,11 +188,11 @@ bzd::Async<> toStream(bzd::OStream& stream, const T&, Args... args)
 	{
 		if (!result.str.empty())
 		{
-			co_await stream.write(result.str.asBytes());
+			co_await stream.write(result.str.asBytes()).assert();
 		}
 		if (result.metadata.hasValue())
 		{
-			co_await formatter.process(stream, result.metadata.value());
+			co_await formatter.process(stream, result.metadata.value()).assert();
 		}
 	}
 
