@@ -63,7 +63,8 @@ public:
 	/// Execution loop for the reactor to poll events.
 	bzd::Async<> exec() noexcept
 	{
-		while (true)
+		const auto& executor = co_await bzd::async::getExecutor();
+		while (executor.isRunning())
 		{
 			bzd::Array<::epoll_event, 10U> events;
 			const int count = ::epoll_wait(epollFd_, events.data(), events.size(), /*timeout ms*/ 1);
@@ -79,9 +80,11 @@ public:
 			}
 			co_await bzd::async::yield();
 		}
+		co_return {};
 	}
 
 private:
 	int epollFd_{-1};
 };
+
 } // namespace bzd::platform::posix::proactor

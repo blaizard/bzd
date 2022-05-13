@@ -22,5 +22,6 @@ cc_library(
         ":bdl",
         "//cc/bzd/container:function_ref",
         "//cc/bzd/utility:apply",
+        "//cc/bzd/core/logger"
     ],
 )
