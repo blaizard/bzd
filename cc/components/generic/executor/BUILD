@@ -21,7 +21,7 @@ cc_library(
     deps = [
         ":bdl",
         "//cc/bzd/container:function_ref",
+        "//cc/bzd/core/logger",
         "//cc/bzd/utility:apply",
-        "//cc/bzd/core/logger"
     ],
 )

@@ -17,17 +17,17 @@ bzd::Async<> run()
 		{"--help"_sv, 5},
 	};
 
-	co_await bzd::print("Please type something...\n"_csv).assert();
+	co_await !bzd::print("Please type something...\n"_csv);
 
 	{
 		const auto result = co_await reader.readAnyOf(keywords);
 		if (result)
 		{
-			co_await bzd::print("Matched {}\n"_csv, result.value()).assert();
+			co_await !bzd::print("Matched {}\n"_csv, result.value());
 		}
 		else
 		{
-			co_await bzd::log::error(result.error()).assert();
+			co_await !bzd::log::error(result.error());
 			reader.clear();
 		}
 	}
@@ -37,11 +37,11 @@ bzd::Async<> run()
 		const auto result = co_await reader.readUntil(bzd::ByteType{'\n'});
 		if (result)
 		{
-			co_await bzd::platform::out().write(result.value()).assert();
+			co_await !bzd::platform::out().write(result.value());
 		}
 		else
 		{
-			co_await bzd::log::error(result.error()).assert();
+			co_await !bzd::log::error(result.error());
 			reader.clear();
 		}
 	}

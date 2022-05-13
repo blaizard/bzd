@@ -4,20 +4,20 @@
 {#- Generate calls for all init members associated with an expression. -#}
 {%- macro callInitMembers(expresssion) -%}
 	{% for dep in dependencies.map[expresssion].deps %}
-co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
+co_await !registry.{{ dep.fqn | fqnToNameStr }}_.init(registry);
 	{% end %}
 	{% for dep in dependencies.map[expresssion].pre %}
-co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+co_await !{{ dep.type | typeRegistryToStr }}();
 	{% end %}
 {% end -%}
 
 {#- Generate calls for all shutdown members associated with an expression. -#}
 {%- macro callShutdownMembers(expresssion) -%}
 	{% for dep in dependencies.map[expresssion].post %}
-co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+co_await !{{ dep.type | typeRegistryToStr }}();
 	{% end %}
 	{% for dep in dependencies.map[expresssion].deps %}
-co_await registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry).template assert<0>();
+co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 	{% end %}
 {% end -%}
 
@@ -105,7 +105,7 @@ public: // Init/Shutdown.
 		if (this->status_ == Status::uninitialized)
 		{
 			this->status_ = Status::initializing;
-			co_await ResourceSpecialization<name>::init(registry).template assert<0>();
+			co_await !ResourceSpecialization<name>::init(registry);
 			this->status_ = Status::initialized;
 		}
 		co_return {};
@@ -116,7 +116,7 @@ public: // Init/Shutdown.
 		if (refCount_ == 1u)
 		{
 			this->status_ = Status::shuttingDown;
-			co_await ResourceSpecialization<name>::shutdown(registry).template assert<0>();
+			co_await !ResourceSpecialization<name>::shutdown(registry);
 			this->status_ = Status::uninitialized;
 		}
 		--refCount_;
@@ -205,7 +205,7 @@ bool execute() noexcept
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
-		co_await {{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression.parametersResolved, true) -}} ).template assert<0>();
+		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression.parametersResolved, true) -}} );
 		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};

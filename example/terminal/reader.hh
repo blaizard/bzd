@@ -29,7 +29,7 @@ public: // API.
 		while (true)
 		{
 			// Read some data from the input stream.
-			auto result = co_await produce().assert();
+			auto result = co_await !produce();
 
 			// Check if the special byte appear.
 			if (const auto pos = result.find(stop); pos != bzd::npos)
@@ -54,7 +54,7 @@ public: // API.
 		while (true)
 		{
 			// Read some data from the input stream.
-			const auto result = co_await produce().assert();
+			const auto result = co_await !produce();
 
 			for (const auto c : result)
 			{
@@ -118,13 +118,13 @@ private:
 		{
 			co_return bzd::error(bzd::ErrorType::failure, "Ring buffer of {} bytes is full."_csv, buffer_.size());
 		}
-		auto result = co_await in_.read(span).assert();
+		auto result = co_await !in_.read(span);
 
 		buffer_.produce(result.size());
 
 		// Replace 'del' == 0x7f with '\b' <- back one char.
 		// Echo what is being typed
-		co_await out_.write(result).assert();
+		co_await !out_.write(result);
 
 		co_return result;
 	}

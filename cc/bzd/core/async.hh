@@ -81,7 +81,7 @@ public:
 	}
 
 	template <bzd::SizeType index = 0>
-	constexpr auto assert()
+	constexpr auto assertHasValue()
 	{
 		class AsyncPropagate : public impl::Async<T>
 		{
@@ -169,6 +169,8 @@ public:
 		};
 		return AsyncPropagate{bzd::move(*this)};
 	}
+
+	constexpr auto operator!() noexcept { return assertHasValue<0>(); }
 
 	/// Associate an executor to this async and push it to the queue.
 	constexpr void enqueue(async::Executor& executor,
