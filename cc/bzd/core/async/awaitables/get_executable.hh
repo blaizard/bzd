@@ -13,7 +13,7 @@ struct GetExecutable : public bzd::coroutine::impl::suspend_always
 		executable_ = &caller.promise();
 		return false;
 	}
-	constexpr auto await_resume() noexcept { return executable_; }
+	[[nodiscard]] constexpr auto await_resume() noexcept { return executable_; }
 	Executable* executable_;
 };
 

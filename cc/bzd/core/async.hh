@@ -32,7 +32,7 @@ struct AsyncTag
 };
 
 template <class T>
-class Async
+class [[nodiscard]] Async
 {
 public: // Traits
 	using PromiseType = bzd::coroutine::Promise<T>;
@@ -244,7 +244,7 @@ public: // coroutine specific
 		return true;
 	}
 
-	constexpr ResultType await_resume() noexcept
+	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
 		bzd::assert::isTrue(isReady());
 		return bzd::move(moveResultOut().valueMutable());

@@ -1,5 +1,25 @@
-{#- Re-usable macros -#}
+{#- Re-usable macros. -#}
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
+
+{#- Generate calls for all init members associated with an expression. -#}
+{%- macro callInitMembers(expresssion) -%}
+	{% for dep in dependencies.map[expresssion].deps %}
+co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
+	{% end %}
+	{% for dep in dependencies.map[expresssion].pre %}
+co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+	{% end %}
+{% end -%}
+
+{#- Generate calls for all shutdown members associated with an expression. -#}
+{%- macro callShutdownMembers(expresssion) -%}
+	{% for dep in dependencies.map[expresssion].post %}
+co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
+	{% end %}
+	{% for dep in dependencies.map[expresssion].deps %}
+co_await registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry).template assert<0>();
+	{% end %}
+{% end -%}
 
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/core/assert.hh"
@@ -40,7 +60,7 @@ template <bzd::meta::StringLiteral name>
 class ResourceSpecialization;
 
 // ==== Specializations =======================================================
-{% for fqn, expresssion in registry %}
+{% for fqn, expression in registry %}
 
 // Specialization for '{{ fqn | fqnToStr }}'.
 template <>
@@ -49,22 +69,18 @@ class ResourceSpecialization<"{{ fqn }}">
 protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
-		{% for dep in dependencies.map[expresssion].deps %}
-		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
-		{% end %}
-		{% for dep in dependencies.map[expresssion].pre %}
-		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
-		{% end %}
-		{% if isInfra(expresssion) %}
+		{{ callInitMembers(expression) }}
+		{% if isInfra(expression) %}
 		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if isInfra(expresssion) %}
+		{% if isInfra(expression) %}
 		bzd::platform::backend::{{ fqn }} = nullptr;
 		{% end %}
+		{{ callShutdownMembers(expression) }}
 		co_return {};
 	}
 };
@@ -188,13 +204,9 @@ bool execute() noexcept
 
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
-			{% for dep in dependencies.map[expression].deps %}
-		co_await registry.{{ dep.fqn | fqnToNameStr }}_.init(registry).template assert<0>();
-			{% end %}
-			{% for dep in dependencies.map[expression].pre %}
-		co_await {{ dep.type | typeRegistryToStr }}().template assert<0>();
-			{% end %}
+		{{ callInitMembers(expression) }}
 		co_await {{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression.parametersResolved, true) -}} ).template assert<0>();
+		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};
 	auto promise_{{loop.parent.index}}_{{ loop.index }} = async_{{loop.parent.index}}_{{ loop.index }}();

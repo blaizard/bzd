@@ -3,7 +3,7 @@
 
 namespace Example {
 
-bzd::Async<bool> run()
+bzd::Async<> run()
 {
 	bzd::Array<bzd::ByteType, 2> separators{bzd::ByteType{' '}, bzd::ByteType{'\t'}};
 	bzd::Reader<16> reader{bzd::platform::in(), bzd::platform::out(), separators.asSpan()};
@@ -17,17 +17,17 @@ bzd::Async<bool> run()
 		{"--help"_sv, 5},
 	};
 
-	co_await bzd::print("Please type something...\n"_csv);
+	co_await bzd::print("Please type something...\n"_csv).assert();
 
 	{
 		const auto result = co_await reader.readAnyOf(keywords);
 		if (result)
 		{
-			co_await bzd::print("Matched {}\n"_csv, result.value());
+			co_await bzd::print("Matched {}\n"_csv, result.value()).assert();
 		}
 		else
 		{
-			co_await bzd::log::error(result.error());
+			co_await bzd::log::error(result.error()).assert();
 			reader.clear();
 		}
 	}
@@ -37,16 +37,16 @@ bzd::Async<bool> run()
 		const auto result = co_await reader.readUntil(bzd::ByteType{'\n'});
 		if (result)
 		{
-			co_await bzd::platform::out().write(result.value());
+			co_await bzd::platform::out().write(result.value()).assert();
 		}
 		else
 		{
-			co_await bzd::log::error(result.error());
+			co_await bzd::log::error(result.error()).assert();
 			reader.clear();
 		}
 	}
 
-	co_return true;
+	co_return {};
 }
 
 } // namespace Example
