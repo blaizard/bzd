@@ -1,91 +1,114 @@
+#include "cc/bzd/type_traits/function.hh"
+#include "cc/bzd/type_traits/is_same.hh"
 #include "example/manifest/manifest.hh"
 
 #include <iostream>
 
-#define VIRTUAL_TYPE 1
-
-class MyType : public bzd::manifest::adapter::MyInterface<MyType>
-{
-public:
-	bzd::manifest::Test start(int a) { return (a > 10) ? bzd::manifest::Test::FIRST : bzd::manifest::Test::SECOND; }
-};
-
-class Interface
-{
-#ifdef VIRTUAL_TYPE
-public:
-	virtual int hello(int a) noexcept = 0;
-#endif
-};
-
-#ifndef VIRTUAL_TYPE
-
-namespace adapter {
+// ------------- NEW version ----------------
 
 template <class Impl>
-class Interface : public ::Interface
+class Hello
 {
-public:
-	constexpr Interface<Impl>& base() noexcept { return *this; }
-
-	constexpr int hello(int a) noexcept
+protected:
+	// With this the class cannot be instanciated directly.
+	constexpr Hello() noexcept
 	{
-		std::cout << "non-virtual" << std::endl;
-		return static_cast<Impl*>(this)->hello(a);
-	}
-};
-
-} // namespace adapter
-
-// Virtual
-
-#else
-
-template <class Impl>
-class InterfaceVirtualImpl : public ::Interface
-{
-public:
-	constexpr InterfaceVirtualImpl(Impl& impl) noexcept : impl_{impl} {}
-
-	int hello(int a) noexcept override
-	{
-		std::cout << "virtual" << std::endl;
-		return impl_.hello(a);
+		using bzd::typeTraits::isSame;
+		static_assert(isSame<typename Traits::world::Signature, typename TraitsImpl::world::Signature> && TraitsImpl::world::isNoexcept,
+					  "Wrong signature for member 'world', expecting: void world() noexcept;");
 	}
 
-private:
-	Impl& impl_;
+public:
+	void world() noexcept
+	{
+		std::cout << "before" << std::endl;
+		static_cast<Impl*>(this)->world();
+		std::cout << "after" << std::endl;
+	}
+
+private: // Traits.
+	using Self = Hello<Impl>;
+	struct TraitsImpl
+	{
+		using world = bzd::typeTraits::Function<decltype(&Impl::world)>;
+	};
+	struct Traits
+	{
+		using world = bzd::typeTraits::Function<decltype(&Self::world)>;
+	};
 };
 
-namespace adapter {
-template <class Impl>
-class Interface
+class HelloImpl : public Hello<HelloImpl>
 {
 public:
-	constexpr Interface() noexcept : impl_{static_cast<Impl&>(*this)} {}
+	HelloImpl(std::string name) : name_{name} {}
 
-	constexpr InterfaceVirtualImpl<Impl>& base() noexcept { return impl_; }
+	void world() const noexcept { std::cout << "Hello " << name_ << std::endl; }
 
 private:
-	InterfaceVirtualImpl<Impl> impl_;
-};
-} // namespace adapter
-#endif
-
-// Implementation
-
-class User : public adapter::Interface<User>
-{
-public:
-	constexpr int hello(int a) noexcept { return a; }
+	std::string name_;
 };
 
 int main()
 {
-	User user{};
-	std::cout << "Test " << user.hello(23) << std::endl;
+	// The composition will instanciate the implementation.
+	// At this point, checks on the impl are made.
+	HelloImpl hello{"Mister"};
 
-	MyType type{};
-	std::cout << "Magic number: " << type.getMagic() << std::endl;
+	// The composition will instiante and call object passing the interface.
+	// This in addition to use the interface, ensure that the class implements it.
+	auto& interface = static_cast<decltype(hello)::Hello&>(hello);
+
+	// The interace function is used.
+	interface.world();
+
 	return 0;
 }
+
+/*
+What are the interface bdl supposed to do:
+
+1. Generate the user facing API.
+2. Able to wrap the underlying implementation call (to be able to add synchronization primitives for example).
+3. Provide definition of types and constants.
+4. Check implementation compliances.
+5. Use the interface object to interact.
+
+interface Hello
+{
+	method world();
+	// no variable, it's up to you how variable are implemented, only functions should be exposed.
+}
+
+// Auto generates C++:
+
+template <class Impl>
+class Hello
+{
+	concepts conceptWorld = ...;
+	static_assert(conceptWorld<Impl>, "dsds");
+public:
+	void world()
+	{
+		impl.hello();
+	}
+
+private:
+	Impl& impl;
+};
+
+// User implementation (for example):
+
+class HelloImpl : public Hello<HelloImpl>
+{
+public:
+	void world()
+	{
+		std::cout << message << std::endl;
+	}
+
+private:
+	std::string message{"Hello World!"};
+};
+
+*/

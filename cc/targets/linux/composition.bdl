@@ -10,9 +10,9 @@ composition {
 	core1 = bzd.platform.linux.Core(stackSize = 100000);
 	core2 = bzd.platform.linux.Core(stackSize = 100000);
 	executor = bzd.platform.generic.Executor(core1, core2);
-	proactorIO = bzd.platform.posix.proactor.Proactor();
-	out = bzd.platform.std.Out();
-	in = bzd.platform.std.In(proactor = proactorIO);
+	proactor = bzd.platform.posix.Proactor();
+	out = bzd.platform.std.Out(proactor = proactor);
+	in = bzd.platform.std.In(proactor = proactor);
 	steadyClock = bzd.platform.std.clock.Steady();
 	systemClock = bzd.platform.std.clock.System();
 	

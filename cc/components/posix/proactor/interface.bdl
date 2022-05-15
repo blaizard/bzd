@@ -1,5 +1,5 @@
 
-namespace bzd.platform.posix.proactor;
+namespace bzd.platform.posix;
 
 component Proactor {
 interface:

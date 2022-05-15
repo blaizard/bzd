@@ -19,6 +19,7 @@ bzd_cc_library(
         ":enable_if",
         ":false_type",
         ":first_type",
+        ":function",
         ":integral_constant",
         ":invoke_result",
         ":is_arithmetic",
@@ -206,6 +207,18 @@ cc_library(
         "first_type.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "function",
+    hdrs = [
+        "function.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/meta:always_false",
+        "//cc/bzd/platform:types",
+    ],
 )
 
 cc_library(

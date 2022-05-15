@@ -15,6 +15,8 @@ bzd_cc_binary(
     ],
     deps = [
         ":interface",
+        "//cc/bzd/type_traits:function",
+        "//cc/bzd/type_traits:is_same",
     ],
 )
 
