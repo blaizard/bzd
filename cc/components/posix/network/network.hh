@@ -17,12 +17,13 @@
 
 namespace bzd::platform::posix::network {
 // TCP connection
+template <class Proactor>
 class TCP
 //	: public bzd::platform::posix::network::adapter::TCP<TCP>
 //	: public bzd::IOStream
 {
 public:
-	TCP() {}
+	TCP(Proactor& proactor) : proactor_{proactor} {}
 
 	bzd::Async<> connect(const StringView hostname, const PortType port)
 	{
@@ -92,6 +93,7 @@ public:
 	~TCP() { disconnect(); }
 
 private:
+	Proactor& proactor_;
 	int socket_{-1};
 };
 } // namespace bzd::platform::posix::network

@@ -118,20 +118,3 @@ public:
 ```
 
 Note, such component cannot be casted down to its interface class, if this level of abstraction is needed, please look at the virtual interface.
-
-#### Virtual Interfaces
-
-In some cases, you might want to create virtual interfaces to access all members from the interface class.
-
-The only difference in the `bdl` file and the implementation is the use of the contract `virtual`. The previous example would be declared as follow:
-
-```bdl
-namespace bzd.example;
-
-interface MyInterface [virtual] {
-  ...
-}
-```
-
-Underneath, this will generate a pure virtual base class `bzd::example::MyInterface`, that declares the various methods and accessors.
-Note, the implementation remains unchanged and methods in the implementation can keep the `constexpr` keyword if needed.

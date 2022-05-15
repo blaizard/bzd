@@ -7,7 +7,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix::proactor {
+namespace bzd::platform::posix {
 
 /// Proactor for basic POSIX functionalities
 /// This is a mock of a proactor from a reactor design, for compatibility with POSIX.
@@ -25,7 +25,7 @@ public:
 	{
 		if (epollFd_ != -1)
 		{
-			co_return bzd::error(bzd::ErrorType::failure, "Proactor is already initialized"_csv);
+			co_return bzd::error(bzd::ErrorType::failure, "Already initialized"_csv);
 		}
 		epollFd_ = ::epoll_create1(/*size is ignored but must be set*/ 0);
 		if (epollFd_ == -1)
@@ -60,6 +60,22 @@ public:
 		co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 	}
 
+	/// Perform an asynchronous read operator.
+	bzd::Async<SizeType> write(const int fd, const bzd::Span<const bzd::ByteType> data) noexcept
+	{
+		SizeType size{0u};
+		while (size < data.size())
+		{
+			const auto result = ::write(fd, &data.at(size), data.size() - size);
+			if (result < 0)
+			{
+				co_return bzd::error(ErrorType::failure, "write: {}."_csv, ::std::strerror(errno));
+			}
+			size += result;
+		}
+		co_return size;
+	}
+
 	/// Execution loop for the reactor to poll events.
 	bzd::Async<> exec() noexcept
 	{
@@ -87,4 +103,4 @@ private:
 	int epollFd_{-1};
 };
 
-} // namespace bzd::platform::posix::proactor
+} // namespace bzd::platform::posix

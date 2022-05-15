@@ -6,6 +6,9 @@ component TCP {
 interface:
 	method disconnect();
 	
+config:
+	proactor = Void;
+	
 }
 
 
