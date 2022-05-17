@@ -1,6 +1,6 @@
+#include "cc/bzd/meta/string_literal.hh"
 #include "cc/bzd/type_traits/function.hh"
 #include "cc/bzd/type_traits/is_same.hh"
-#include "cc/bzd/meta/string_literal.hh"
 #include "example/manifest/manifest.hh"
 
 #include <iostream>
@@ -28,10 +28,7 @@ public:
 	}
 
 public: // Interface accessor
-	Hello<Impl>& interface_Hello() noexcept
-	{
-		return *this;
-	}
+	Hello<Impl>& interface_Hello() noexcept { return *this; }
 
 private: // Traits.
 	using Self = Hello<Impl>;
@@ -56,8 +53,7 @@ private:
 	std::string name_;
 };
 
-
-template <bzd::meta::StringLiteral fqn> //bzd::meta::StringLiteral fqn, class Impl>
+template <bzd::meta::StringLiteral fqn> // bzd::meta::StringLiteral fqn, class Impl>
 struct Interface;
 
 template <>

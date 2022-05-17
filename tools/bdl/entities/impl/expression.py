@@ -174,7 +174,8 @@ class Expression(Entity):
 
 		argumentTemplates = parameters.copy(template=True)
 		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequenceTemplates)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
+			sequenceTemplates)
 
 		configValues = argumentConfig.copy(template=False)
 		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)

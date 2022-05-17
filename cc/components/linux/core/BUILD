@@ -24,6 +24,6 @@ cc_library(
         ":bdl",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:stack",
-        "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/core:error"
     ],
 )

@@ -83,13 +83,6 @@ class Composition:
 				[self.registry[fqn]]) + self.dependencies.findAllIntra([*executorComposition.keys()])
 			executorComposition.update({entity: AsyncType.service for entity in services})
 
-		for fqn, entity in self.all.items():
-			if fqn in ["executor", "in", "out"]:
-				print("**************", fqn)
-				#print(entity.parameters)
-				print(entity.parametersResolved)
-				print(entity.parametersExpectedResolved)
-
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
 

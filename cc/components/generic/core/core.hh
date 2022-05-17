@@ -7,21 +7,20 @@
 
 namespace bzd::platform::generic {
 
-class Core : public bzd::platform::adapter::Core<Core>
+class Core : public bzd::platform::Core<Core>
 {
 private:
 	using Self = Core;
-	using Parent = bzd::platform::adapter::Core<Self>;
-	using Error = typename Parent::Error;
+	using Parent = bzd::platform::Core<Self>;
 
 public:
 	explicit Core() noexcept {}
 
 	void init() {}
 
-	Result<void, Error> stop() noexcept { return bzd::nullresult; }
+	bzd::Result<void, bzd::Error> stop() noexcept { return bzd::nullresult; }
 
-	bzd::Result<void, Error> start(bzd::platform::WorkloadType workload) noexcept
+	bzd::Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
 	{
 		workload();
 		return bzd::nullresult;

@@ -25,7 +25,7 @@ class Sequence:
 				yield element
 
 	def __getitem__(self, index: int) -> "Element":
-		return [*self][index]
+		return [*self][index]  # type: ignore
 
 	def __len__(self) -> int:
 		return len([e for e in self.list if not e.isEmpty()])

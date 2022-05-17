@@ -26,7 +26,7 @@ class Transform:
 	# Inheritance related
 
 	def inheritanceToStr(self, inheritanceList: typing.List[Type]) -> str:
-		return ", ".join(["public {}".format(str(typeToStrOriginal(inheritance))) for inheritance in inheritanceList])
+		return ", ".join([f"public {str(typeToStrOriginal(inheritance))}<Impl>" for inheritance in inheritanceList])
 
 	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Type]) -> str:
 		return ", ".join([

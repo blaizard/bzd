@@ -81,12 +81,10 @@ class TestRun(unittest.TestCase):
 	def testResult(self) -> None:
 
 		# No template
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
 
 		# Template
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="struct temp { var = Result<Integer>; }",
+		Object.fromContent(content="struct temp { var = Result<Integer>; }",
 				objectContext=ObjectContext(resolve=True))
 
 		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
@@ -104,8 +102,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 
 		# Template of template
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
+		Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
 				objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
 			objectContext=ObjectContext(resolve=True))

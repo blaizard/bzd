@@ -60,6 +60,7 @@ class ByteType:
 class ResultType:
 
 	constexpr = False
+
 	@staticmethod
 	def transform(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
 
