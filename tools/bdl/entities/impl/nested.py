@@ -34,7 +34,7 @@ class Nested(Entity):
 
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="type")
-		self.assertTrue(condition=self.type in TYPES, message="Unsupported nested type: '{}'.".format(self.type))
+		self.assertTrue(condition=self.type in TYPES, message=f"Unsupported nested type: '{self.type}'.")
 
 	@property
 	def configAttr(self) -> str:

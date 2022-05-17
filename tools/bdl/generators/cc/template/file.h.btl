@@ -37,75 +37,61 @@ namespace {{ namespace | namespaceToStr }} {
 {% for data in nestedList %}
 	{% if data.type == "interface" %}
 
-// Specialization for trivial types
+// ==== Interface { data.name }
+template <class Impl>
 {{ data.comment | commentBlockToStr }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
+protected:
+	// An interface cannot be constructed directly.
+	constexpr {{ data.name }}() noexcept
+	{
+		using bzd::typeTraits::isSame;
+	{% for method in data.interface.methodList %}
+		static_assert(isSame<typename Traits::{{ method.name }}::Signature, typename TraitsImpl::{{ method.name }}::Signature> && TraitsImpl::{{ method.name }}::isNoexcept,
+					  "Wrong signature for method '{{ method.name }}', expecting: {{ declareMethod(method) }} noexcept;");
+	{% end %}
+	}
+
 public: // Types
 	{{ declareTrivialTypes(data.interface.sequence) }}
 
 public: // Methods
+
 	{% for method in data.interface.methodList %}
-		{% if method.virtual %}
-	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}virtual {{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }}) = 0;
-		{% end %}
+	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}{{ declareMethod(method) }} noexcept
+	{
+		return static_cast<Impl*>(this)->{{ method.name }}({{ declareParametersCall(method.parameters) }});
+	}
+
 	{% end %}
 
 public: // Variable accessors.
-	{% for var in data.interface.expressionList %}
-
-	/**
-	 * Getter for the variable '{{ var.name }}'.
-	 * \return The value of '{{ var.name }}'.
-	 */
-	[[nodiscard]] constexpr {% if not var.const %}const {% end %}{{ var.type | typeReferenceToStr }} get{{ var.name | toCamelCase }}() const noexcept
-	{
-		return {{ var.name }}_;
-	}
-
-		{% if not var.const %}
-	/**
-	 * Setter for the variable '{{ var.name }}'.
-	 * \param value The new value to be set.
-	 */
-	constexpr void set{{ var.name | toCamelCase }}(const {{ var.type | typeReferenceToStr }} value)
-	{
-		{{ makeContractAssertions(var.contracts) }}
-		{{ var.name }}_ = value;
-	}
-		{% end %}
-	{% end %}
-
-protected: // Protected variable accessors.
 
 	{% for var in data.interface.expressionList %}
-		{% if var.const %}
-	/**
-	 * Setter for the constant variable '{{ var.name }}'.
-	 * \param value The new value to be set.
-	 */
-	constexpr void set{{ var.name | toCamelCase }}({{ var.type | typeReferenceToStr }} value)
+	// Getter for the variable '{{ var.name }}'.
+	{{ var.comment | commentBlockToStr -}}
+	// \return The value of '{{ var.name }}'.
+	[[nodiscard]] constexpr {{ var.type | typeReferenceToStr }} {{ var.name }}() const noexcept
 	{
-		{{ makeContractAssertions(var.contracts) }}
-		{{ var.name }}_ = value;
+		return static_cast<Impl*>(this)->{{ var.name }};
 	}
-		{% end %}
+
 	{% end %}
 
-private: // Variables.
-	{% for var in data.interface.expressionList %}
-	{{ declareExpression(var, "_", "nonConst") }};
+private: // Traits.
+	struct TraitsImpl
+	{
+	{% for method in data.interface.methodList %}
+		using {{ method.name }} = bzd::typeTraits::Function<decltype(&Impl::{{ method.name }})>;
 	{% end %}
+	};
+	struct Traits
+	{
+	{% for method in data.interface.methodList %}
+		using {{ method.name }} = bzd::typeTraits::Function<decltype(&{{ data.name }}<Impl>::{{ method.name }})>;
+	{% end %}
+	};
 };
-
-
-namespace adapter
-{
-template <class Impl>
-class {{ data.name }} : public {{ data.fqnToType | typeToStr }}
-{
-	// TODO: perform sanity checks on the implementation class.
-};
-}
 
 {%- end -%}
 
@@ -114,3 +100,20 @@ class {{ data.name }} : public {{ data.fqnToType | typeToStr }}
 {%- if isNamespace %}
 }
 {%- end %}
+
+namespace bzd
+{
+{% for data in nestedList %}
+	{% if data.type == "interface" %}
+template <>
+struct Interface<"{{ data.fqn }}">
+{
+	template <class Impl>
+	[[nodiscard]] static auto& cast(Impl& impl) noexcept
+	{
+		return static_cast<{{ namespace | namespaceToStr }}::{{ data.name }}<Impl>&>(impl);
+	}
+};
+	{% end %}
+{% end %}
+}

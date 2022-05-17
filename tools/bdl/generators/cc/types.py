@@ -60,7 +60,14 @@ class ByteType:
 class ResultType:
 
 	constexpr = False
-	transform = "bzd::Result"
+	@staticmethod
+	def transform(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+
+		if len(nested) == 0:
+			nested.append("void")
+		if len(nested) == 1:
+			nested.append("bzd::Error")
+		return "bzd::Result", nested
 
 
 class CallableType:

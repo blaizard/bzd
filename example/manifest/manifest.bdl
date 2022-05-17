@@ -23,5 +23,3 @@ interface MyInterface {
 	readOnly = const Float(-3.14);
 	
 }
-
-

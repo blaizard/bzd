@@ -62,9 +62,10 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		def substitute(value: typing.Any, key: typing.Any) -> typing.Any:
 			if isinstance(key, str) and hasattr(value, key):
 				return getattr(value, key)
-			if hasattr(value, "__contains__") and key in value:
+			try:
 				return value[key]
-			raise Exception(f"Substitution value for the key '{key}' does not exists.")
+			except:
+				raise Exception(f"Substitution value for the key '{key}' does not exists. Value is: '{Error.valueExtract(value)}'")
 
 		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
 			"|": (lambda l, r: r(l)),

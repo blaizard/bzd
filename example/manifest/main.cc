@@ -1,5 +1,6 @@
 #include "cc/bzd/type_traits/function.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/meta/string_literal.hh"
 #include "example/manifest/manifest.hh"
 
 #include <iostream>
@@ -26,6 +27,12 @@ public:
 		std::cout << "after" << std::endl;
 	}
 
+public: // Interface accessor
+	Hello<Impl>& interface_Hello() noexcept
+	{
+		return *this;
+	}
+
 private: // Traits.
 	using Self = Hello<Impl>;
 	struct TraitsImpl
@@ -49,6 +56,20 @@ private:
 	std::string name_;
 };
 
+
+template <bzd::meta::StringLiteral fqn> //bzd::meta::StringLiteral fqn, class Impl>
+struct Interface;
+
+template <>
+struct Interface<"Hello">
+{
+	template <class Impl>
+	static auto& cast(Impl& impl) noexcept
+	{
+		return static_cast<Hello<Impl>&>(impl);
+	}
+};
+
 int main()
 {
 	// The composition will instanciate the implementation.
@@ -57,7 +78,7 @@ int main()
 
 	// The composition will instiante and call object passing the interface.
 	// This in addition to use the interface, ensure that the class implements it.
-	auto& interface = static_cast<decltype(hello)::Hello&>(hello);
+	auto& interface = ::Interface<"Hello">::cast(hello);
 
 	// The interace function is used.
 	interface.world();

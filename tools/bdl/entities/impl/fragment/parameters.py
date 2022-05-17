@@ -96,7 +96,7 @@ class ParametersCommon(typing.Generic[T]):
 	def __repr__(self) -> str:
 		content = []
 		for key, expression, metadata in self.itemsMetadata():
-			content.append("{}: {} {}".format(key, str(expression.element), str(metadata)))
+			content.append("{}: {} {}".format(key, str(expression), str(metadata)))
 		return "\n".join(content)
 
 
@@ -105,7 +105,6 @@ class Metadata:
 	default: bool = False
 	order: int = -1
 	template: bool = False
-
 
 class Parameters(ParametersCommon[Metadata]):
 	"""

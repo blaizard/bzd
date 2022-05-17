@@ -34,7 +34,7 @@
 			{{- element.type | typeNonConstToStr -}}
 		{%- else -%}
 			{{- element.type | typeToStr -}}
-		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element.parametersResolved, false) -}} }{% end %}
+		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -51,21 +51,28 @@
 	{%- end -%}
 {%- end -%}
 
-{#- Parameters values -#}
-{%- macro declareParametersResolvedValues(parameters, registry) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end -%}
+{#- Print parameters values.
+Args:
+	entity: The expression which parameters should be printed.
+	registry: If the named values are coming from the registry or not.
+-#}
+{%- macro declareParametersResolvedValues(entity, registry) -%}
+	{%- for i, expression in entity.parametersResolved %}{% if i %}, {% end -%}
 		{{- expression | commentParametersResolvedToStr -}}
 		{%- if expression.isType -%}
 			{%- if expression.isName -%}
+				/* {{ expression.type | typeToStr }} ||| {{ expression.type.category }} |||| {{ entity.parametersExpectedResolved[i].type | typeToStr }} */
 				{# On values there must be a FQN available. #}
 				{%- if registry -%}
+					/*bzd::Interface<"{{ entity.parametersExpectedResolved[i].type.fqn }}">::cast({{- expression.fqnToType | typeRegistryToStr -}})*/
 					{{- expression.fqnToType | typeRegistryToStr -}}
 				{%- else -%}
+					/*bzd::Interface<"{{ entity.parametersExpectedResolved[i].type.fqn }}">::cast({{- expression.fqn | fqnToNameStr -}})*/
 					{{- expression.fqn | fqnToNameStr -}}
 				{%- end -%}
 			{%- else -%}
 				{# Object instanciation. #}
-				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression.parametersResolved, registry) -}} }
+				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression, registry) -}} }
 			{%- end -%}
 		{%- else -%}
 			{# Literal. #}
@@ -109,3 +116,12 @@
 		{% end %}
 	{% end %}
 {% end -%}
+
+{#- Declare a method given a method entity.
+For example:
+```c++
+void myFunction(bzd::MyType& a, const OtherType& b)
+```-#}
+{%- macro declareMethod(method) -%}
+{{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }})
+{%- end -%}
