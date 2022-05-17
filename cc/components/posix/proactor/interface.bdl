@@ -2,9 +2,9 @@
 namespace bzd.platform.posix;
 
 using FileDescriptor = Integer;
-
 interface Interface {
 	method write(fd = const FileDescriptor, data = const Span<const Byte>);
+	
 }
 
 component Proactor : Interface {
@@ -16,3 +16,5 @@ composition:
 	this.exec();
 	
 }
+
+
