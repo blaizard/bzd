@@ -9,25 +9,13 @@ using CoreId = Integer [min(0) max(64)];
 using WorkloadType = Callable;
 // A logical core is a processing unit that accepts a single scheduler.
 interface Core {
-	// Error codes for core-related functionality.
-	enum Error
-	{
-		// The error comes from something related to memory alignment.
-		ALIGNMENT
-	,	// The error comes from something related to memory size.
-		SIZE
-	,	OTHER
-	}
-	
 	// Start a workload on the core and return immediatly.
-	method start(workload = WorkloadType) -> Result<Void, Error>;
+	method start(workload = const WorkloadType) -> Result;
 	// Initialize the core.
-	method stop() -> Result<Void, Error>;
+	method stop() -> Result;
 	// Get the current stack usage.
 	method getStackUsage() -> StackSize;
 	// Get the current core identifier.
 	method getId() -> CoreId;
 	
 }
-
-

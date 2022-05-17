@@ -9,5 +9,8 @@ cc_library(
     deps = [
         "//cc/bzd/container",
         "//cc/bzd/core/logger",
+        "//cc/bzd/type_traits:function",
+        "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/meta:string_literal"
     ],
 )

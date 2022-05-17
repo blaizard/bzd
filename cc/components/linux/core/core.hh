@@ -16,25 +16,24 @@
 namespace bzd::platform::linux {
 
 template <SizeType N>
-class Core : public bzd::platform::adapter::Core<Core<N>>
+class Core : public bzd::platform::Core<Core<N>>
 {
 private:
 	using Self = Core<N>;
-	using Parent = bzd::platform::adapter::Core<Self>;
-	using Error = typename Parent::Error;
+	using Parent = bzd::platform::Core<Self>;
 
 public:
 	explicit Core(const CoreId, const float) noexcept {}
 
 	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
 
-	Result<void, Error> stop() noexcept
+	Result<void, bzd::Error> stop() noexcept
 	{
 		{
 			const auto result = ::pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
-				return bzd::error(Error::OTHER);
+				return bzd::error(ErrorType::failure, "pthread_join"_csv);
 			}
 		}
 
@@ -42,27 +41,27 @@ public:
 			const auto result = ::pthread_attr_destroy(&attr_);
 			if (result != 0)
 			{
-				return bzd::error(Error::OTHER);
+				return bzd::error(ErrorType::failure, "pthread_attr_destroy"_csv);
 			}
 		}
 
 		return bzd::nullresult;
 	}
 
-	bzd::Result<void, Error> start(bzd::platform::WorkloadType workload) noexcept
+	Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
 	{
 		stack_.taint();
 
 		if (::pthread_attr_init(&attr_) != 0)
 		{
-			return bzd::error(Error::OTHER);
+			return bzd::error(ErrorType::failure, "pthread_attr_init"_csv);
 		}
 
 		{
 			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
-				return bzd::error(Error::OTHER);
+				return bzd::error(ErrorType::failure, "pthread_attr_setstack"_csv);
 			}
 		}
 
@@ -72,7 +71,7 @@ public:
 			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
-				return bzd::error(Error::OTHER);
+				return bzd::error(ErrorType::failure, "pthread_create"_csv);
 			}
 		}
 

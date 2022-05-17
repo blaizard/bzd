@@ -10,7 +10,7 @@
 namespace bzd::platform::generic {
 
 template <class... Cores>
-class Executor : public bzd::platform::adapter::Executor<Executor<Cores...>>
+class Executor : public bzd::platform::Executor<Executor<Cores...>>
 {
 public:
 	using Self = Executor<Cores...>;

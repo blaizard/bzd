@@ -57,13 +57,6 @@ class Expression(Entity):
 		return self.type.const
 
 	@property
-	def isInit(self) -> bool:
-		"""
-		Whether or not this entry is an initializer or not.
-		"""
-		return self.underlyingType is not None and self.underlyingType.endswith(".init")
-
-	@property
 	def isName(self) -> bool:
 		return self.element.isAttr("name") and not self.name == "..."
 
@@ -161,12 +154,14 @@ class Expression(Entity):
 			parameters = Parameters(element=self.element)
 
 		# Merge its default values
-		defaults = self.getConfigValues(resolver=resolver)
-		parameters.mergeDefaults(defaults)
+		argumentConfig = self.getConfigValues(resolver=resolver)
+		if self.isName and self.name == "executor":
+			print(argumentConfig)
+		parameters.mergeDefaults(argumentConfig)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(resolver=resolver, parameters=defaults, contracts=self.contracts)
+		validation = self._makeValueValidation(resolver=resolver, parameters=argumentConfig, contracts=self.contracts)
 		if validation is not None:
 			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")
@@ -174,12 +169,17 @@ class Expression(Entity):
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
 		argumentValues = parameters.copy(template=False)
-		sequence = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequence)
+		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
 
 		argumentTemplates = parameters.copy(template=True)
-		sequence = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequence)
+		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved", sequenceTemplates)
+
+		configValues = argumentConfig.copy(template=False)
+		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
+		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
 
 		super().resolve(resolver)
 
@@ -231,6 +231,10 @@ class Expression(Entity):
 	@cached_property
 	def parametersResolved(self) -> ResolvedParameters:
 		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
+
+	@cached_property
+	def parametersExpectedResolved(self) -> ResolvedParameters:
+		return ResolvedParameters(element=self.element, nestedKind="argument_expected")
 
 	def __repr__(self) -> str:
 		return self.toString({

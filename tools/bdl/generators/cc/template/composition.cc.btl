@@ -141,7 +141,7 @@ protected:
 {
 	// Definition of all registry entries.
 	{% for fqn, expresssion in registry %}
-	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion.parametersResolved, false) -}} };
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion, false) -}} };
 	{% end %}
 
 	// Declaration of the registry.
@@ -205,7 +205,7 @@ bool execute() noexcept
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
-		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression.parametersResolved, true) -}} );
+		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression, true) -}} );
 		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};

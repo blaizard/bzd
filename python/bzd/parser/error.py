@@ -38,6 +38,11 @@ class Error:
 	"""
 
 	@staticmethod
+	def valueExtract(value: typing.Any) -> str:
+		"""Print a snapshot of the value."""
+		return str(value).split("\n")[0][:100]
+
+	@staticmethod
 	def toString(context: typing.Optional[Context], index: int, end: int, message: str) -> str:
 
 		# Look for the content

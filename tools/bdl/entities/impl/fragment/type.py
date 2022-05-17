@@ -68,6 +68,9 @@ class Type:
 		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
 		underlying.resolveMemoized(resolver=resolver)
 
+		# Save the category under {kindAttr}_category.
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category", underlying.category)
+
 		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
 				underlying.underlyingType)
@@ -78,7 +81,7 @@ class Type:
 			Error.assertTrue(element=self.element,
 				condition=(not bool(self.templates)),
 				attr=self.kindAttr,
-				message="Type '{}' does not support template type arguments.".format(self.kind))
+				message=f"Type '{self.kind}' does not support template type arguments.")
 		else:
 
 			templates.mergeDefaults(configTypes)
@@ -95,7 +98,7 @@ class Type:
 
 			# Save the resolved template only after the validation is completed.
 			sequence = templates.toResolvedSequence(resolver=resolver, varArgs=False, onlyTypes=True)
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("{}_resolved".format(self.templateAttr),
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{self.templateAttr}_resolved",
 				sequence)
 
 		# Resolve contract
@@ -135,8 +138,16 @@ class Type:
 		return Parameters(element=self.element, nestedKind=self.templateAttr)
 
 	@property
-	def kind(self) -> str:
+	def category(self) -> str:
+		return self.element.getAttr(f"{self.kindAttr}_category").value
+
+	@property
+	def fqn(self) -> str:
 		return self.kinds[-1]
+
+	@property
+	def kind(self) -> str:
+		return self.fqn
 
 	@property
 	def kinds(self) -> typing.List[str]:

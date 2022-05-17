@@ -25,13 +25,17 @@ class Sequence:
 				yield element
 
 	def __getitem__(self, index: int) -> "Element":
-		for i, element in enumerate(self):
-			if i == index:
-				return element
-		raise IndexError("Index ({}) out of bound".format(index))
+		return [*self][index]
 
 	def __len__(self) -> int:
 		return len([e for e in self.list if not e.isEmpty()])
+
+	def __add__(self, other: typing.Union[typing.List["Element"], "Sequence"]) -> "Sequence":
+		if isinstance(other, Sequence):
+			self.list += other.list
+		else:
+			self.list += other
+		return self
 
 	def __repr__(self) -> str:
 		listStr = []
@@ -175,7 +179,7 @@ class Element:
 		"""
 		Return a specific name attribute value
 		"""
-		assert name in self.attrs, "Attribute '{}' is not present in '{}'".format(name, str(self))
+		assert name in self.attrs, f"Attribute '{name}' is not present in '{str(self)}'."
 		return self.attrs[name]
 
 	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:

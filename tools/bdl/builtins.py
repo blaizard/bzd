@@ -9,7 +9,7 @@ BuiltinBoolean = Builtin(ElementBuilder("builtin").setAttr("name", "Boolean").ad
 BuiltinByte = Builtin(ElementBuilder("builtin").setAttr("name", "Byte").addContract("integer min(0) max(255)"))
 BuiltinResult = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Result").addConfig(kind="Any",
-	contract="template mandatory type").addConfig(kind="Any", contract="template mandatory type"))
+	contract="template type").addConfig(kind="Any", contract="template type"))
 BuiltinSpan = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Span").addConfig(kind="Any", contract="template mandatory type"))
 BuiltinVector = Builtin(
