@@ -1,7 +1,8 @@
 [submodule "apps/family"]
 	path = apps/family
-	url = ../family.git
+	url = https://git.blaizard.com/blaise/family.git
 	branch = master
 [submodule "docs/private"]
 	path = docs/private
-	url = ../docs.git
+	url = https://git.blaizard.com/blaise/docs.git
+	branch = master
