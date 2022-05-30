@@ -71,6 +71,20 @@ class ResultType:
 		return "bzd::Result", nested
 
 
+class AsyncType:
+
+	constexpr = False
+
+	@staticmethod
+	def transform(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+
+		if len(nested) == 0:
+			nested.append("void")
+		if len(nested) == 1:
+			nested.append("bzd::Error")
+		return "bzd::Async", nested
+
+
 class CallableType:
 
 	constexpr = False

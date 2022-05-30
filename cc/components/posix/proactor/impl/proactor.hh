@@ -1,22 +1,23 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/components/posix/proactor/interface.hh"
 
 #include <cerrno>
 #include <cstring>
 #include <sys/epoll.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix {
+namespace bzd::platform::posix::impl {
 
 /// Proactor for basic POSIX functionalities
 /// This is a mock of a proactor from a reactor design, for compatibility with POSIX.
-class Proactor
+class Proactor : public bzd::platform::posix::Proactor<Proactor>
 {
 private:
 	struct EpollData
 	{
-		const int fd_;
+		const FileDescriptor fd_;
 		bzd::async::Executable* executable_{nullptr};
 	};
 
@@ -36,7 +37,7 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<bzd::Span<bzd::ByteType>> read(const int fd, const bzd::Span<bzd::ByteType> data) noexcept
+	bzd::Async<bzd::Span<bzd::ByteType>> read(const FileDescriptor fd, const bzd::Span<bzd::ByteType> data) noexcept
 	{
 		{
 			EpollData epollData{fd};
@@ -61,9 +62,9 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<SizeType> write(const int fd, const bzd::Span<const bzd::ByteType> data) noexcept
+	bzd::Async<Size> write(const FileDescriptor& fd, const bzd::Span<const bzd::ByteType>& data) noexcept
 	{
-		SizeType size{0u};
+		Size size{0u};
 		while (size < data.size())
 		{
 			const auto result = ::write(fd, &data.at(size), data.size() - size);
@@ -100,7 +101,7 @@ public:
 	}
 
 private:
-	int epollFd_{-1};
+	FileDescriptor epollFd_{-1};
 };
 
-} // namespace bzd::platform::posix
+} // namespace bzd::platform::posix::impl

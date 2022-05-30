@@ -11,6 +11,7 @@ cc_library(
         "//cc/bzd/core:error",
         "//cc/bzd/core/logger",
         "//cc/bzd/meta:string_literal",
+        "//cc/bzd/type_traits:derived_from",
         "//cc/bzd/type_traits:function",
         "//cc/bzd/type_traits:is_same",
     ],

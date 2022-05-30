@@ -1,12 +1,9 @@
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 bdl_library(
-    name = "interface",
+    name = "posix",
     srcs = [
-        "interface.bdl",
+        "posix.bdl",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//cc/components/posix",
-    ],
 )
