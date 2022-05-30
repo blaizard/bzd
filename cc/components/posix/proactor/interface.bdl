@@ -1,20 +1,15 @@
+use "cc/components/posix/posix.bdl"
 
 namespace bzd.platform.posix;
 
-using FileDescriptor = Integer;
-interface Interface {
-	method write(fd = const FileDescriptor, data = const Span<const Byte>);
+interface Proactor {
+	/*
+	 * Write to a file descriptor: https://man7.org/linux/man-pages/man2/write.2.html
+	 * 
+	 * \param fd The file descriptor to write to.
+	 * \param data The data blob to be written.
+	 * \return The number of bytes written.
+	 */
+	method write(fd = const FileDescriptor, data = const Span<const Byte>) -> Async<Size>;
 	
 }
-
-component Proactor : Interface {
-interface:
-	method init() [init];
-	method exec();
-	
-composition:
-	this.exec();
-	
-}
-
-

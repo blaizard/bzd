@@ -1,16 +1,12 @@
+use "cc/components/posix/proactor/interface.bdl"
 
 namespace bzd.platform.std;
-
-interface Proactor {
-	method write(a = Integer, data = const Span<const Byte>);
-	
-}
 
 component Out {
 interface:
 	
 config:
-	proactor = Void;
+	proactor = bzd.platform.posix.Proactor;
 	
 }
 

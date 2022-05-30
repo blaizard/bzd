@@ -10,6 +10,9 @@ BuiltinByte = Builtin(ElementBuilder("builtin").setAttr("name", "Byte").addContr
 BuiltinResult = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Result").addConfig(kind="Any",
 	contract="template type").addConfig(kind="Any", contract="template type"))
+BuiltinAsync = Builtin(
+	ElementBuilder("builtin").setAttr("name", "Async").addConfig(kind="Any",
+	contract="template type").addConfig(kind="Any", contract="template type"))
 BuiltinSpan = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Span").addConfig(kind="Any", contract="template mandatory type"))
 BuiltinVector = Builtin(
@@ -18,6 +21,6 @@ BuiltinVector = Builtin(
 BuiltinCallable = Builtin(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [
-	BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinSpan, BuiltinResult, BuiltinVector,
-	BuiltinCallable
+	BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinSpan, BuiltinResult, BuiltinAsync,
+	BuiltinVector, BuiltinCallable
 ]

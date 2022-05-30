@@ -37,7 +37,7 @@ namespace {{ namespace | namespaceToStr }} {
 {% for data in nestedList %}
 	{% if data.type == "interface" %}
 
-// ==== Interface { data.name }
+// ==== Interface {{ data.name }}
 template <class Impl>
 {{ data.comment | commentBlockToStr }}class {{ data.name }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}{% end %}
 {
@@ -109,6 +109,7 @@ template <>
 struct Interface<"{{ data.fqn }}">
 {
 	template <class Impl>
+	requires concepts::derivedFrom<Impl, {{ namespace | namespaceToStr }}::{{ data.name }}<Impl>>
 	[[nodiscard]] static auto& cast(Impl& impl) noexcept
 	{
 		return static_cast<{{ namespace | namespaceToStr }}::{{ data.name }}<Impl>&>(impl);

@@ -1,0 +1,8 @@
+
+namespace bzd.platform.posix;
+
+// / File descriptor (fd): a unique identifier for a file or input/output resource.
+using FileDescriptor = Integer [min(-1)];
+// / Default size type for POSIX related interfaces.
+using Size = Integer [min(0)];
+

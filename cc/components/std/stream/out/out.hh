@@ -1,4 +1,5 @@
 #include "cc/bzd/core/channel.hh"
+#include "cc/components/std/stream/out/interface.hh"
 
 #include <iostream>
 #include <unistd.h>
