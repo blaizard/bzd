@@ -59,33 +59,6 @@ enum class Status
 template <bzd::meta::StringLiteral name>
 class ResourceSpecialization;
 
-// ==== Specializations =======================================================
-{% for fqn, expression in registry %}
-
-// Specialization for '{{ fqn | fqnToStr }}'.
-template <>
-class ResourceSpecialization<"{{ fqn }}">
-{
-protected:
-	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
-	{
-		{{ callInitMembers(expression) }}
-		{% if isInfra(expression) %}
-		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
-		{% end %}
-		co_return {};
-	}
-	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
-	{
-		{% if isInfra(expression) %}
-		bzd::platform::backend::{{ fqn }} = nullptr;
-		{% end %}
-		{{ callShutdownMembers(expression) }}
-		co_return {};
-	}
-};
-{% end %}
-
 /// Wrapper around a registry entry.
 ///
 /// \tparam name The FQN of the resource.
@@ -134,6 +107,33 @@ protected:
 	bzd::SpinMutex mutex_{};
 	bzd::Int32Type refCount_{0};
 };
+
+// ==== Specializations =======================================================
+{% for fqn, expression in registry %}
+
+// Specialization for '{{ fqn | fqnToStr }}'.
+template <>
+class ResourceSpecialization<"{{ fqn }}">
+{
+protected:
+	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
+	{
+		{{ callInitMembers(expression) }}
+		{% if isInfra(expression) %}
+		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
+		{% end %}
+		co_return {};
+	}
+	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
+	{
+		{% if isInfra(expression) %}
+		bzd::platform::backend::{{ fqn }} = nullptr;
+		{% end %}
+		{{ callShutdownMembers(expression) }}
+		co_return {};
+	}
+};
+{% end %}
 
 // ==== Registry ==============================================================
 

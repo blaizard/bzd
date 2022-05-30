@@ -51,6 +51,19 @@
 	{%- end -%}
 {%- end -%}
 
+{#- Print a parameter value.
+Args:
+	value: The value to be printed as a string.
+	expected: The type expected by the function receiving this value.
+-#}
+{%- macro parametersValue(value, expected) -%}
+	{%- if expected.category == "nested" -%}
+		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
+	{%- else -%}
+		{{ value }}
+	{%- end -%}
+{%- end -%}
+
 {#- Print parameters values.
 Args:
 	entity: The expression which parameters should be printed.
@@ -59,17 +72,21 @@ Args:
 {%- macro declareParametersResolvedValues(entity, registry) -%}
 	{%- for i, expression in entity.parametersResolved %}{% if i %}, {% end -%}
 		{{- expression | commentParametersResolvedToStr -}}
+		{# If the expression has a type associated to it, a type is a method name or variable type. #}
 		{%- if expression.isType -%}
+			{# If the expression has a name associated to it, something like this: `name = type{...}`
+			This corresponds to an existing variable.
+			Note: On named expression there must be a FQN available.#}
 			{%- if expression.isName -%}
-				/* {{ expression.type | typeToStr }} ||| {{ expression.type.category }} |||| {{ entity.parametersExpectedResolved[i].type | typeToStr }} */
-				{# On values there must be a FQN available. #}
+				{# If this named variable must be taken from the registry if it exists. #}
 				{%- if registry -%}
-					/*bzd::Interface<"{{ entity.parametersExpectedResolved[i].type.fqn }}">::cast({{- expression.fqnToType | typeRegistryToStr -}})*/
-					{{- expression.fqnToType | typeRegistryToStr -}}
+					{{- parametersValue(expression.fqnToType | typeRegistryToStr, entity.parametersExpectedResolved[i].type) -}}
+				{# Otherwise it will be used directly. #}
 				{%- else -%}
-					/*bzd::Interface<"{{ entity.parametersExpectedResolved[i].type.fqn }}">::cast({{- expression.fqn | fqnToNameStr -}})*/
-					{{- expression.fqn | fqnToNameStr -}}
+					{{- parametersValue(expression.fqn | fqnToNameStr, entity.parametersExpectedResolved[i].type) -}}
 				{%- end -%}
+			{# No name associated to it, something like this: `type{...}`
+			This is an inline variable instantiation. #}
 			{%- else -%}
 				{# Object instanciation. #}
 				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression, registry) -}} }

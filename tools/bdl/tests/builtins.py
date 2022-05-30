@@ -84,8 +84,7 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
 
 		# Template
-		Object.fromContent(content="struct temp { var = Result<Integer>; }",
-				objectContext=ObjectContext(resolve=True))
+		Object.fromContent(content="struct temp { var = Result<Integer>; }", objectContext=ObjectContext(resolve=True))
 
 		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
 			objectContext=ObjectContext(resolve=True))
@@ -103,7 +102,7 @@ class TestRun(unittest.TestCase):
 
 		# Template of template
 		Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
-				objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
 			objectContext=ObjectContext(resolve=True))
 
