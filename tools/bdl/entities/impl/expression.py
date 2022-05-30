@@ -155,8 +155,6 @@ class Expression(Entity):
 
 		# Merge its default values
 		argumentConfig = self.getConfigValues(resolver=resolver)
-		if self.isName and self.name == "executor":
-			print(argumentConfig)
 		parameters.mergeDefaults(argumentConfig)
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information

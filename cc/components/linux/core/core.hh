@@ -3,8 +3,8 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/stack.hh"
-#include "cc/components/linux/core/interface.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/components/linux/core/interface.hh"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // Needed for sched_setaffinity

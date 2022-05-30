@@ -32,16 +32,26 @@ public:
 	}
 
 	/// Start the executor.
-	constexpr void start() noexcept
+	bzd::Result<void, bzd::Error> start() noexcept
 	{
 		const auto run = bzd::FunctionRef<void(void)>::toMember<Self, &Self::run>(*this);
-		bzd::apply([run](auto&... cores) { (cores->start(run), ...); }, cores_);
+		const auto success = bzd::apply([run](auto&... cores) { return (cores->start(run).hasValue() && ...); }, cores_);
+		if (!success)
+		{
+			return bzd::error(bzd::ErrorType::failure, "One of the core failed to start."_csv);
+		}
+		return bzd::nullresult;
 	}
 
 	/// Stop the executor.
-	constexpr void stop() noexcept
+	bzd::Result<void, bzd::Error> stop() noexcept
 	{
-		bzd::apply([](auto&... cores) { (cores->stop(), ...); }, cores_);
+		const auto success = bzd::apply([](auto&... cores) { return (cores->stop().hasValue() && ...); }, cores_);
+		if (!success)
+		{
+			return bzd::error(bzd::ErrorType::failure, "One of the core failed to stop."_csv);
+		}
+		return bzd::nullresult;
 	}
 
 private:

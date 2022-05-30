@@ -10,7 +10,7 @@ component Out {
 interface:
 	
 config:
-	proactor = Proactor;
+	proactor = Void;
 	
 }
 
