@@ -8,7 +8,7 @@ bzd::Async<> run()
 	bzd::Array<bzd::ByteType, 2> separators{bzd::ByteType{' '}, bzd::ByteType{'\t'}};
 	bzd::Reader<16> reader{bzd::platform::in(), bzd::platform::out(), separators.asSpan()};
 
-	bzd::Map<bzd::StringView, int, 12> keywords{
+	bzd::Map<bzd::StringView, bzd::Int32Type, 12> keywords{
 		{"info"_sv, 0},
 		{"test"_sv, 1},
 		{"hallo"_sv, 2},

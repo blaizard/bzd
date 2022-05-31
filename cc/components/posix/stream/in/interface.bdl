@@ -1,0 +1,13 @@
+use "cc/components/posix/proactor/interface.bdl"
+
+namespace bzd.platform.posix;
+
+component In {
+interface:
+	
+config:
+	proactor = Void;
+	
+}
+
+

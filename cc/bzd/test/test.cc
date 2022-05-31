@@ -19,7 +19,8 @@ Test::Test(const char* testCaseName, const char* testName, const char* file) : t
 	testCurrent = &next_;
 }
 
-void Manager::failInternals(const char* const file, const int line, const char* const message, const char* actual, const char* expected)
+void Manager::failInternals(
+	const char* const file, const bzd::Int32Type line, const char* const message, const char* actual, const char* expected)
 {
 	auto& out = ::bzd::platform::out();
 	auto scope = out.getLock().sync();

@@ -1,12 +1,8 @@
-use "cc/components/posix/proactor/interface.bdl"
 
 namespace bzd.platform.std;
 
 component Out {
 interface:
-	
-config:
-	proactor = bzd.platform.posix.Proactor;
 	
 }
 

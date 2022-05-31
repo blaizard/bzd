@@ -147,7 +147,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lgcc",
             "-lstdc++",
             "-lgcov",
-            #"-Wl,--end-group",
+            "-Wl,--end-group",
             "-fno-rtti",
         ],
         "filegroup_dependencies": [
