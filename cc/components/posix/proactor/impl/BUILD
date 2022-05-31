@@ -8,7 +8,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/components/posix/proactor:interface",
+        "//cc/components/posix/proactor",
     ],
 )
 

@@ -6,7 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace bzd::platform::std {
+namespace bzd::platform::posix {
 template <class Proactor>
 class In : public bzd::IStream
 {
@@ -62,4 +62,4 @@ private:
 	termios old_{};
 	termios current_{};
 };
-} // namespace bzd::platform::std
+} // namespace bzd::platform::posix

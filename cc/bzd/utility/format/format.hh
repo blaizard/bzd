@@ -403,7 +403,7 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -451,7 +451,7 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata)
 {
 	switch (metadata.format)
 	{
@@ -478,7 +478,7 @@ constexpr void toString(bzd::interface::String& str, const T& value, const Metad
 template <
 	class T,
 	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T& value, const Metadata&)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata&)
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;

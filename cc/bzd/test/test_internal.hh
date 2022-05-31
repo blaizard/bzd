@@ -381,7 +381,7 @@ public:
 	bool run();
 
 	template <class Value1, class Value2>
-	void fail(const char* const file, const int line, const char* const message, Value1&& value1, Value2&& value2)
+	void fail(const char* const file, const bzd::Int32Type line, const char* const message, Value1&& value1, Value2&& value2)
 	{
 		bzd::test::impl::Value<Value1> valueStr1{value1};
 		bzd::test::impl::Value<Value2> valueStr2{value2};
@@ -389,17 +389,20 @@ public:
 	}
 
 	template <class Value>
-	void fail(const char* const file, const int line, const char* const message, Value&& value)
+	void fail(const char* const file, const bzd::Int32Type line, const char* const message, Value&& value)
 	{
 		bzd::test::impl::Value<Value> valueStr{value};
 		failInternals(file, line, message, valueStr.valueToString());
 	}
 
-	void fail(const char* const file, const int line, const char* const message) { failInternals(file, line, message); }
+	void fail(const char* const file, const bzd::Int32Type line, const char* const message) { failInternals(file, line, message); }
 
 private:
-	void failInternals(
-		const char* const file, const int line, const char* const message, const char* actual = nullptr, const char* expected = nullptr);
+	void failInternals(const char* const file,
+					   const bzd::Int32Type line,
+					   const char* const message,
+					   const char* actual = nullptr,
+					   const char* expected = nullptr);
 
 private:
 	Manager() = default;

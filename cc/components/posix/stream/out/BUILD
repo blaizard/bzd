@@ -7,12 +7,15 @@ bdl_library(
         "interface.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/components/posix/proactor",
+    ],
 )
 
 cc_library(
-    name = "in",
+    name = "out",
     hdrs = [
-        "in.hh",
+        "out.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

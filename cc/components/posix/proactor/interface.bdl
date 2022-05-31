@@ -5,7 +5,6 @@ namespace bzd.platform.posix;
 interface Proactor {
 	/*
 	 * Write to a file descriptor: https://man7.org/linux/man-pages/man2/write.2.html
-	 * 
 	 * \param fd The file descriptor to write to.
 	 * \param data The data blob to be written.
 	 * \return The number of bytes written.
@@ -13,3 +12,5 @@ interface Proactor {
 	method write(fd = const FileDescriptor, data = const Span<const Byte>) -> Async<Size>;
 	
 }
+
+

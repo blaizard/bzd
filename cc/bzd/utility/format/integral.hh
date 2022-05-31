@@ -114,54 +114,18 @@ constexpr void toStringBin(bzd::interface::String& str, const T& data)
 
 // Integers
 
-constexpr void toString(bzd::interface::String& str, const bzd::UInt8Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::UInt16Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::UInt32Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::UInt64Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::Int8Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::Int16Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::Int32Type data)
-{
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::Int64Type data)
+template <class T>
+requires bzd::concepts::integral<T>
+constexpr void toString(bzd::interface::String& str, const T data)
 {
 	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
 
 // Floating points
 
-constexpr void toString(bzd::interface::String& str, const bzd::Float32Type data, const bzd::SizeType maxPrecision = 6)
-{
-	bzd::format::impl::floatingPoint(str, data, maxPrecision);
-}
-
-constexpr void toString(bzd::interface::String& str, const bzd::Float64Type data, const bzd::SizeType maxPrecision = 6)
+template <class T>
+requires bzd::concepts::floatingPoint<T>
+constexpr void toString(bzd::interface::String& str, const T data, const bzd::SizeType maxPrecision = 6)
 {
 	bzd::format::impl::floatingPoint(str, data, maxPrecision);
 }

@@ -10,10 +10,10 @@ bdl_library(
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
         "//cc/components/posix/proactor/impl",
+        "//cc/components/posix/stream/in",
+        "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
-        "//cc/components/std/stream/in",
-        "//cc/components/std/stream/out",
     ],
 )
 
