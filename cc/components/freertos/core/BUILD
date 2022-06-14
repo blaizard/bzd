@@ -16,9 +16,6 @@ cc_library(
     hdrs = [
         "core.hh",
     ],
-    linkopts = [
-        "-lpthread",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":interface",

@@ -83,6 +83,8 @@ public:
 
 	bzd::SizeType startUsageMonitoring() noexcept
 	{
+		// We can use https://man7.org/linux/man-pages/man2/getrusage.2.html
+
 		// Get the clock_id associated to the current thread.
 		clockid_t clockId;
 		::pthread_getcpuclockid(thread_, &clockId);
