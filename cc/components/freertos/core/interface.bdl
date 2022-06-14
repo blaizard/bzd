@@ -1,0 +1,15 @@
+use "cc/bzd/platform/interfaces/core.bdl"
+
+namespace bzd.platform.freertos;
+
+// Core abstraction on Linux operating system.
+component Core : bzd.platform.Core {
+interface:
+	
+config:
+	// Stack size for the current core.
+	stackSize = StackSize(16000) [template];
+	
+}
+
+

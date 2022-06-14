@@ -33,7 +33,7 @@ The following c++ target platforms are currently supported:
 | -------------------- | -------- | ------- | ----------- |
 | linux_x86_64_clang   | clang    | 14.0.0  | host\*      |
 | linux_x86_64_gcc     | gcc      | 11.1.0  | host\*      |
-| esp32_xtensa_lx6_gcc | gcc      | 10.2.0  | sim\*, uart |
+| esp32_xtensa_lx6_gcc | gcc      | 11.2.0  | sim\*, uart |
 
 \* Default executor for the platform.
 
