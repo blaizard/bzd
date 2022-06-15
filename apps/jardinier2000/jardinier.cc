@@ -12,7 +12,7 @@ constexpr gpio_num_t waterPumpPin{GPIO_NUM_23};
 bzd::Async<bool> water(bzd::SizeType wateringTimeS, bzd::UInt64Type wakeUpPeriodS)
 {
 	co_await bzd::log::info("Watering for {}s..."_csv, wateringTimeS);
-	gpio_pad_select_gpio(waterPumpPin);
+	gpio_reset_pin(waterPumpPin);
 	gpio_set_direction(waterPumpPin, GPIO_MODE_OUTPUT);
 	gpio_set_level(waterPumpPin, 1);
 	vTaskDelay(configTICK_RATE_HZ * wateringTimeS);

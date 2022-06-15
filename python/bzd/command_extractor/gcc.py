@@ -30,12 +30,20 @@ class Categories(enum.Enum):
 Result = typing.Sequence[Item]
 
 
+class ItemLibrary(ItemPathOrString):
+
+	@property
+	def name(self) -> str:
+		"""Get the library name."""
+		return re.sub(r"lib(.*)\.a", r"\1", pathlib.Path(self.pathOrValue).name)
+
+
 class CommandExtractorGcc(CommandExtractor):
 
 	def __init__(self,
 		cwd: pathlib.Path,
-		includeSearchPaths: typing.Sequence[pathlib.Path] = [],
-		libSearchPaths: typing.Sequence[pathlib.Path] = []) -> None:
+		includeSearchPaths: typing.List[pathlib.Path] = [],
+		libSearchPaths: typing.List[pathlib.Path] = []) -> None:
 		super().__init__()
 		self.cwd = cwd
 		for path in [cwd] + includeSearchPaths:
@@ -50,9 +58,9 @@ class CommandExtractorGcc(CommandExtractor):
 		for path in self.librarySearchPaths:
 			fullPath = path / fileName
 			if fullPath.is_file():
-				self.result.append(factory.make(ItemPathOrString, Categories.library, fullPath))
+				self.result.append(factory.make(ItemLibrary, Categories.library, fullPath))
 				return
-		self.result.append(factory.make(ItemPathOrString, Categories.library, name))
+		self.result.append(factory.make(ItemLibrary, Categories.library, name))
 		print("WARNING: cannot locate library {}".format(name))
 
 	def addLinkerScript(self, fileName: str, factory: ItemFactory = ItemFactory()) -> None:
@@ -81,14 +89,31 @@ class CommandExtractorGcc(CommandExtractor):
 	def librarySearchPaths(self) -> typing.Iterable[pathlib.Path]:
 		for entry in self.result:
 			if entry.category == Categories.librarySearchPath:
+				assert isinstance(entry, ItemPath)
+				yield entry.path
+
+	@property
+	def includeSearchPaths(self) -> typing.Iterable[pathlib.Path]:
+		for entry in self.result:
+			if entry.category == Categories.includeSearchPath:
+				assert isinstance(entry, ItemPath)
 				yield entry.path
 
 	@property
 	def linkerScripts(self) -> typing.Iterable[pathlib.Path]:
 		for entry in self.result:
 			if entry.category == Categories.linkerScript:
-				if entry.isPath:
-					yield entry.pathOrName
+				assert isinstance(entry, ItemPathOrString)
+				if entry.hasPath:
+					yield typing.cast(pathlib.Path, entry.pathOrValue)
+
+	@property
+	def libraries(self) -> typing.Iterable[pathlib.Path]:
+		for entry in self.result:
+			if entry.category == Categories.library:
+				assert isinstance(entry, ItemPathOrString)
+				if entry.hasPath:
+					yield typing.cast(pathlib.Path, entry.pathOrValue)
 
 	def _fallback(self, factory: ItemFactory, arg: str) -> None:
 		if arg.endswith(".a"):
@@ -97,7 +122,7 @@ class CommandExtractorGcc(CommandExtractor):
 			print("Unhandled argument:", arg)
 			self.result.append(factory.make(ItemString, Categories.unhandled, arg))
 
-	def parse(self, cmdString: str) -> None:
+	def parse(self, cmdString: str) -> None:  # type: ignore
 
 		super().parse(
 			cmdString, {
@@ -111,16 +136,15 @@ class CommandExtractorGcc(CommandExtractor):
 			Processor(1, lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory)),
 			r'-o':
 			Processor(1, lambda factory, x: self.addOutputPath(x, factory)),
-			**dict(
-			self.generateItemString({
-			"-u": Categories.undefine,
-			"-D": Categories.define,
-			"-W": Categories.warning,
-			"-m": Categories.mode,
-			"-f": Categories.flag,
-			"-O": Categories.optimisation,
-			"-g": Categories.debug,
-			"-std": Categories.standard
-			})),
-			**dict(self.generateItem({"-c": Categories.compileOnly})),
+			**self.generateItemString({
+			r"-u": Categories.undefine,
+			r"-D": Categories.define,
+			r"-W": Categories.warning,
+			r"-m": Categories.mode,
+			r"-f": Categories.flag,
+			r"-O": Categories.optimisation,
+			r"-g": Categories.debug,
+			r"-std": Categories.standard
+			}),
+			**self.generateItem({r"-c": Categories.compileOnly}),
 			}, self._fallback)

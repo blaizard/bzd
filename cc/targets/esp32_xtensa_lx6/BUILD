@@ -7,6 +7,7 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
+        "//cc/components/freertos/core",
         "//cc/components/generic/clock/null",
         "//cc/components/generic/core",
         "//cc/components/generic/executor",

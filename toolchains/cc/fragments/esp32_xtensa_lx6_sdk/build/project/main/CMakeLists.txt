@@ -1,2 +1,1 @@
-idf_component_register(SRCS "main.cc"
-                       INCLUDE_DIRS ".")
+idf_component_register(SRCS "main.cc")

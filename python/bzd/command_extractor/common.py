@@ -10,10 +10,10 @@ import pathlib
 class Item:
 	"""Base class for any items."""
 
-	original: typing.Sequence[str]
+	original: typing.List[str]
 	category: enum.Enum
 
-	def filter(self) -> bool:
+	def filter(self, *args: typing.Any) -> bool:
 		return True
 
 	def __str__(self) -> str:
@@ -28,7 +28,7 @@ class ItemString(Item):
 	value: str
 
 	def filter(self, *values: str) -> bool:
-		return self.value in values
+		return any(re.match(regexpr, self.value) for regexpr in values)
 
 
 @dataclasses.dataclass
@@ -62,8 +62,8 @@ T = typing.TypeVar("T")
 class ItemFactory:
 	"""Factory to create an item."""
 
-	original: typing.Sequence[str] = dataclasses.field(default_factory=list)
-	args: typing.Sequence[str] = dataclasses.field(default_factory=list)
+	original: typing.List[str] = dataclasses.field(default_factory=list)
+	args: typing.List[str] = dataclasses.field(default_factory=list)
 
 	def make(self, Kind: typing.Type[T], *args: typing.Any, **kwargs: typing.Any) -> T:
 		assert issubclass(Kind, Item), f"The type '{Kind}' must be a subclass of 'Item'."
@@ -73,29 +73,33 @@ class ItemFactory:
 @dataclasses.dataclass
 class Processor:
 	count: int
-	processor: typing.Callable[[ItemFactory], None]
+	processor: typing.Callable[..., None]
 
 
-Fallback = typing.Callable[[str], None]
-Schema = typing.Mapping[typing.Match[str], Processor]
+Fallback = typing.Callable[[ItemFactory, str], None]
+Schema = typing.Mapping[str, Processor]
 
 
 class CommandExtractor:
 
 	def __init__(self) -> None:
-		self.result: typing.Sequence[Item] = []
+		self.result: typing.List[Item] = []
 
-	def generateItemString(
-			self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Iterable[typing.Tuple[str, Processor]]:
+	def generateItemString(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
+		"""Helper to generate batched schema entries for ItemString."""
+		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
-			yield re.escape(kind), Processor(1,
+			output[re.escape(kind)] = Processor(1,
 				lambda factory, x, category=category: self.result.append(factory.make(ItemString, category, x)))
+		return output
 
-	def generateItem(
-			self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Iterable[typing.Tuple[str, Processor]]:
+	def generateItem(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
+		"""Helper to generate batched schema entries for Item."""
+		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
-			yield re.escape(kind), Processor(0,
+			output[re.escape(kind)] = Processor(0,
 				lambda factory, category=category: self.result.append(factory.make(Item, category)))
+		return output
 
 	def parse(self, cmdString: str, schema: Schema, fallback: Fallback) -> None:
 
@@ -118,6 +122,7 @@ class CommandExtractor:
 					fallback(ItemFactory(original=[arg]), arg)
 
 			if activeSchema:
+				assert factory, "Must be set with activeSchema."
 				if remmainder:
 					factory.args.append(remmainder)
 				factory.original.append(arg)
