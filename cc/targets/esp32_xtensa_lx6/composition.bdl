@@ -3,6 +3,7 @@ use "cc/components/generic/stream/stub/interface.bdl"
 use "cc/components/xtensa/clock/xthal/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
 use "cc/components/generic/core/interface.bdl"
+use "cc/components/freertos/core/interface.bdl"
 
 
 composition {
