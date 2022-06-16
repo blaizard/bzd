@@ -16,10 +16,10 @@ cc_library(
     hdrs = [
         "core.hh",
     ],
-    visibility = ["//visibility:public"],
     target_compatible_with = [
         "@//tools/bazel_build/platforms/isa:xtensa_lx6",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":interface",
         "//cc/bzd/container:optional",
