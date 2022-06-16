@@ -7,7 +7,8 @@ use "cc/components/freertos/core/interface.bdl"
 
 
 composition {
-	core = bzd.platform.generic.Core();
+	// core = bzd.platform.generic.Core();
+	core = bzd.platform.freertos.Core();
 	executor = bzd.platform.generic.Executor(core);
 	out = bzd.platform.std.Out();
 	in = bzd.platform.generic.stream.Stub();
