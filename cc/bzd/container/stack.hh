@@ -19,20 +19,19 @@ template <bzd::SizeType stackSize, bzd::SizeType alignment = 1, StackDirection d
 class Stack
 {
 public: // Type.
-	using ValueType = bzd::UInt8Type;
 	/// Default value used for tainting the stack.
-	static constexpr UInt8Type defaultTaintPattern = 0xaa;
+	static constexpr bzd::ByteType defaultTaintPattern{0xaa};
 
 public:
 	constexpr Stack() noexcept = default;
 
-	constexpr void taint(UInt8Type pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
+	constexpr void taint(ByteType pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
 
-	constexpr ValueType* data() noexcept { return stack_.data(); }
+	constexpr ByteType* data() noexcept { return stack_.data(); }
 
 	constexpr SizeType size() const noexcept { return stack_.size(); }
 
-	bzd::SizeType estimateMaxUsage(UInt8Type pattern = defaultTaintPattern) const noexcept
+	bzd::SizeType estimateMaxUsage(ByteType pattern = defaultTaintPattern) const noexcept
 	{
 		if constexpr (direction == StackDirection::DOWNWARD)
 		{
@@ -53,7 +52,7 @@ public:
 	}
 
 private:
-	alignas(alignment) bzd::Array<ValueType, stackSize> stack_{};
+	alignas(alignment) bzd::Array<ByteType, stackSize> stack_{};
 };
 
 } // namespace bzd

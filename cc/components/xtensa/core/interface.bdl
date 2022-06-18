@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/core.bdl"
 
-namespace bzd.platform.freertos;
+namespace bzd.platform.esp32;
 
 // Core abstraction on Linux operating system.
 component Core : bzd.platform.Core {
@@ -11,6 +11,10 @@ config:
 	stackSize = StackSize(16000) [template];
 	// The name of the core.
 	name = String;
+	// CPU to which this core should be pinned to.
+	cpu = Integer [min(0) max(1)];
+	// Priority of the task in percent (0 beeing the lowest, 100 the highest).
+	priority = Integer [min(0) max(100)];
 	
 }
 
