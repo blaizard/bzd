@@ -8,7 +8,6 @@ bzd_cc_library(
         ":advance",
         ":align_down",
         ":align_up",
-        ":aligned_storage",
         ":apply",
         ":begin",
         ":bit",
@@ -68,17 +67,6 @@ cc_library(
     name = "align_up",
     hdrs = [
         "align_up.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
-    name = "aligned_storage",
-    hdrs = [
-        "aligned_storage.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

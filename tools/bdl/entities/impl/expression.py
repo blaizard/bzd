@@ -1,4 +1,5 @@
 import typing
+import enum
 from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
@@ -145,40 +146,55 @@ class Expression(Entity):
 		else:
 			self._setUnderlyingValue(entity=entity)
 
-		# Generate the argument list and resolve it
-		if self.isParameters:
-			parameters = self.parameters
-			assert parameters is not None
-			parameters.resolve(resolver=resolver)
+		# Get the resolved type and check the kind of role it has.
+		resolvedTypeEntity = resolver.getEntityResolved(fqn=self.typeResolved.fqn).assertValue(element=self.element)
+
+		# For instanciation only, we want to resolve and validate the arguments.
+		if resolvedTypeEntity.isRoleType:
+
+			# Generate the argument list and resolve it.
+			if self.isParameters:
+				parameters = self.parameters
+				assert parameters is not None
+				parameters.resolve(resolver=resolver)
+			else:
+				parameters = Parameters(element=self.element)
+
+			# Merge its default values
+			argumentConfig = self.getConfigValues(resolver=resolver)
+			parameters.mergeDefaults(argumentConfig)
+
+			# Read the validation for the value. it comes in part from the direct underlying type, contract information
+			# directly associated with this expression do not apply to the current validation.
+			validation = self._makeValueValidation(resolver=resolver,
+				parameters=argumentConfig,
+				contracts=self.contracts)
+			if validation is not None:
+				arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+				result = validation.validate(arguments, output="return")
+				Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+
+			# Save the resolved parameters (values and templates), only after the validation is completed.
+			argumentValues = parameters.copy(template=False)
+			sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
+
+			argumentTemplates = parameters.copy(template=True)
+			sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
+				sequenceTemplates)
+
+			configValues = argumentConfig.copy(template=False)
+			sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
+			sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
+			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
+
+		# This is a type assignment, nothing to do here.
+		elif resolvedTypeEntity.isRoleValue:
+			pass
+
 		else:
-			parameters = Parameters(element=self.element)
-
-		# Merge its default values
-		argumentConfig = self.getConfigValues(resolver=resolver)
-		parameters.mergeDefaults(argumentConfig)
-
-		# Read the validation for the value. it comes in part from the direct underlying type, contract information
-		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(resolver=resolver, parameters=argumentConfig, contracts=self.contracts)
-		if validation is not None:
-			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
-			result = validation.validate(arguments, output="return")
-			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
-
-		# Save the resolved parameters (values and templates), only after the validation is completed.
-		argumentValues = parameters.copy(template=False)
-		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
-
-		argumentTemplates = parameters.copy(template=True)
-		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
-			sequenceTemplates)
-
-		configValues = argumentConfig.copy(template=False)
-		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
-		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
+			self.error(message=f"Cannot create an expression from this element: {resolvedTypeEntity.fqn}")
 
 		super().resolve(resolver)
 

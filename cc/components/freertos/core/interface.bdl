@@ -9,6 +9,8 @@ interface:
 config:
 	// Stack size for the current core.
 	stackSize = StackSize(16000) [template];
+	// The name of the core.
+	name = String;
 	
 }
 

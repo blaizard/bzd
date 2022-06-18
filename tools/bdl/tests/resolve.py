@@ -375,6 +375,17 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
+	def testInstanceWithParameters(self) -> None:
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition
+				{
+					val1 = Test(value = 23);
+					hello = val1;
+				}
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
 
 if __name__ == '__main__':
-	unittest.main()
+	unittest.main(failfast=True)
