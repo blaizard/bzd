@@ -2,13 +2,11 @@ use "cc/components/std/stream/out/interface.bdl"
 use "cc/components/generic/stream/stub/interface.bdl"
 use "cc/components/xtensa/clock/xthal/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
-use "cc/components/generic/core/interface.bdl"
 use "cc/components/freertos/core/interface.bdl"
 
 
 composition {
-	// core = bzd.platform.generic.Core();
-	core = bzd.platform.freertos.Core();
+	core = bzd.platform.freertos.Core(stackSize = 16000, name = "core[main]");
 	executor = bzd.platform.generic.Executor(core);
 	out = bzd.platform.std.Out();
 	in = bzd.platform.generic.stream.Stub();

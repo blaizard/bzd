@@ -97,6 +97,12 @@ class SpanType:
 	transform = "bzd::Span"
 
 
+class StringType:
+
+	constexpr = True
+	transform = "bzd::StringView"
+
+
 class VectorType:
 
 	constexpr = False
@@ -120,6 +126,7 @@ knownTypes: typing.Dict[str, typing.Any] = {
 	"Float": FloatType,
 	"Void": VoidType,
 	"Byte": ByteType,
+	"String": StringType,
 	"Span": SpanType,
 	"Vector": VectorType,
 	"Result": ResultType,

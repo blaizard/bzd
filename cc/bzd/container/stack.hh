@@ -15,22 +15,24 @@ enum class StackDirection : UInt8Type
 	DOWNWARD = 1
 };
 
-template <bzd::SizeType stackSize, StackDirection direction = StackDirection::DOWNWARD>
+template <bzd::SizeType stackSize, bzd::SizeType alignment = 1, StackDirection direction = StackDirection::DOWNWARD>
 class Stack
 {
 public: // Type.
 	using ValueType = bzd::UInt8Type;
+	/// Default value used for tainting the stack.
+	static constexpr UInt8Type defaultTaintPattern = 0xaa;
 
 public:
 	constexpr Stack() noexcept = default;
 
-	constexpr void taint(UInt8Type pattern = 0xaa) noexcept { bzd::algorithm::fill(stack_.begin(), stack_.end(), pattern); }
+	constexpr void taint(UInt8Type pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
 
 	constexpr ValueType* data() noexcept { return stack_.data(); }
 
 	constexpr SizeType size() const noexcept { return stack_.size(); }
 
-	bzd::SizeType estimateMaxUsage(UInt8Type pattern = 0xaa) const noexcept
+	bzd::SizeType estimateMaxUsage(UInt8Type pattern = defaultTaintPattern) const noexcept
 	{
 		if constexpr (direction == StackDirection::DOWNWARD)
 		{
@@ -51,7 +53,7 @@ public:
 	}
 
 private:
-	bzd::Array<ValueType, stackSize> stack_{};
+	alignas(alignment) bzd::Array<ValueType, stackSize> stack_{};
 };
 
 } // namespace bzd

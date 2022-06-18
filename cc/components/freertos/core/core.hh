@@ -9,6 +9,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
+#include <iostream>
 
 namespace bzd::platform::freertos {
 
@@ -20,9 +21,12 @@ private:
 	using Parent = bzd::platform::Core<Self>;
 
 public:
+	constexpr Core(const bzd::StringView name) : name_{name} {}
+
 	Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
 	{
-		stack_.taint();
+		// No need to taint the stack, this is already done by freertos with configCHECK_FOR_STACK_OVERFLOW = 2
+		// stack_.taint(0xa5);
 		workload_ = workload;
 		// Use a binary semaphore instead of a mutex as it can be taken in the same thread.
 		// Also it is by default taken, which doesn't require to call xSemaphoreTake here.
@@ -30,30 +34,36 @@ public:
 		{
 			return bzd::error(ErrorType::failure, "mutex creation"_csv);
 		}
-		handle_ =
-			xTaskCreateStatic(workloadWrapper, "Core", stack_.size(), static_cast<void*>(this), tskIDLE_PRIORITY, stack_.data(), &tcb_);
+		// Create the task and make sure the operation is successful. This will immediatly run the task.
+		handle_ = xTaskCreateStatic(workloadWrapper,
+									name_.data(),
+									stack_.size() / sizeof(StackType_t),
+									static_cast<void*>(this),
+									tskIDLE_PRIORITY,
+									stack_.data(),
+									&tcb_);
 		if (!handle_)
 		{
 			return bzd::error(ErrorType::failure, "xTaskCreateStatic"_csv);
 		}
-
-		// Need to wait until the mutex is taken.
 
 		return bzd::nullresult;
 	}
 
 	Result<void, bzd::Error> stop() noexcept
 	{
-		// Wait on the semaphore
+		// Wait indefinitely until the workload is completed.
 		while (xSemaphoreTake(mutex_, portMAX_DELAY) == pdFALSE)
 		{
 		}
-		vTaskDelete(handle_);
 		vSemaphoreDelete(mutex_);
+
+		::std::cout << "Stack usage: " << getStackUsage() << " / " << stackSize << ::std::endl;
+
 		return bzd::nullresult;
 	}
 
-	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(); }
+	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(0xa5); }
 
 	void getUsage() noexcept {}
 
@@ -63,14 +73,18 @@ private:
 	static void workloadWrapper(void* object)
 	{
 		auto core = reinterpret_cast<Self*>(object);
+		// Run the workload.
 		auto& workload = core->workload_.value();
 		workload();
+		// Notify the stop function that the workload is completed.
 		xSemaphoreGive(core->mutex_);
-		vTaskSuspend(nullptr);
+		// Delete itself.
+		vTaskDelete(nullptr);
 	}
 
 private:
-	bzd::Stack<stackSize> stack_{};
+	bzd::StringView name_;
+	bzd::Stack<stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::platform::WorkloadType> workload_;
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};

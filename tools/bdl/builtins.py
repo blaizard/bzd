@@ -7,6 +7,7 @@ BuiltinInteger = Builtin(ElementBuilder("builtin").setAttr("name", "Integer").ad
 BuiltinFloat = Builtin(ElementBuilder("builtin").setAttr("name", "Float").addContract("float"))
 BuiltinBoolean = Builtin(ElementBuilder("builtin").setAttr("name", "Boolean").addContract("boolean"))
 BuiltinByte = Builtin(ElementBuilder("builtin").setAttr("name", "Byte").addContract("integer min(0) max(255)"))
+BuiltinString = Builtin(ElementBuilder("builtin").setAttr("name", "String").addContract("string"))
 BuiltinResult = Builtin(
 	ElementBuilder("builtin").setAttr("name", "Result").addConfig(kind="Any",
 	contract="template type").addConfig(kind="Any", contract="template type"))
@@ -21,6 +22,6 @@ BuiltinVector = Builtin(
 BuiltinCallable = Builtin(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [
-	BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinSpan, BuiltinResult, BuiltinAsync,
-	BuiltinVector, BuiltinCallable
+	BuiltinVoid, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinString, BuiltinSpan, BuiltinResult,
+	BuiltinAsync, BuiltinVector, BuiltinCallable
 ]
