@@ -75,7 +75,7 @@ public:
 	CoreId getId() noexcept { return 0; }
 
 private:
-	UBaseType_t getFreeRTOSPriority() const noexcept
+	constexpr UBaseType_t getFreeRTOSPriority() const noexcept
 	{
 		// In freeRTOS context:
 		// - 0 is the lowest priority.
@@ -100,7 +100,7 @@ private:
 	const bzd::UInt8Type cpu_;
 	const bzd::UInt8Type priority_;
 	bzd::Stack<stackSize, alignof(StackType_t)> stack_{};
-	bzd::Optional<bzd::platform::WorkloadType> workload_;
+	bzd::Optional<bzd::platform::WorkloadType> workload_{};
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};
 	StaticSemaphore_t mutexBuffer_{};

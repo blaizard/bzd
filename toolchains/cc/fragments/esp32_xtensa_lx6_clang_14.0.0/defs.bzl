@@ -16,14 +16,6 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
     return {
         "cpu": "linux_x86_64",
         "compiler": "clang",
-        "builtin_include_directories": [
-            "include/c++/v1",
-            "lib/clang/14.0.0/include",
-            "xtensa-esp32-elf/include",
-            "xtensa-esp32-elf/include/c++/8.4.0",
-            "xtensa-esp32-elf/include/c++/8.4.0/xtensa-esp32-elf",
-            "xtensa-esp32-elf/sys-include",
-        ],
         "system_directories": [
             "external/{}/include/c++/v1".format(package_name),
             "external/{}/lib/clang/14.0.0/include".format(package_name),
@@ -43,7 +35,7 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             # without falling back to the (incompatible) GCC stdatomic.h
             "-ffreestanding",
 
-            # Use incomplete C++20
+            # Use C++20
             "-std=c++20",
 
             # Standard includes, this is needed to avoid indefined include complain from Bazel.

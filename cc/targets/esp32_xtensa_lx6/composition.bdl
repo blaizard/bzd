@@ -17,5 +17,3 @@ composition {
 	systemClock = bzd.platform.generic.clock.Null();
 	
 }
-
-
