@@ -10,7 +10,7 @@ def load_esp32_xtensa_lx6_gcc():
             "@platforms//cpu:x86_64",
         ],
         "target_compatible_with": [
-            "@//tools/bazel_build/platforms/al:linux",
+            "@platforms//os:none",
             "@//tools/bazel_build/platforms/isa:xtensa_lx6",
         ],
     }
