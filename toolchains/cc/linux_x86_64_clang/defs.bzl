@@ -22,8 +22,8 @@ def _load_linux_x86_64_clang_14_0_0(name):
             "@platforms//cpu:x86_64",
         ],
         "target_compatible_with": [
-            "@//tools/bazel_build/platforms/al:linux",
-            "@//tools/bazel_build/platforms/isa:x86_64",
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
         ],
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
