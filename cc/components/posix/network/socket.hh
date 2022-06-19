@@ -6,11 +6,8 @@ template <class CRTP>
 class Socket
 {
 public:
-    static auto domain()
-    {
-        return CRTP::domain();
-    }
-    struct ::sockaddr address();
-    ::socklen_t size();    
+	static auto domain() { return CRTP::domain(); }
+	struct ::sockaddr address();
+	::socklen_t size();
 };
-}
+} // namespace bzd::platform::posix::network
