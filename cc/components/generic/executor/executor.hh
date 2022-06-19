@@ -55,8 +55,10 @@ public:
 	}
 
 private:
+	/// Run the executor.
 	constexpr void run() noexcept { executor_.run(); }
 
+	/// Callback triggered when an active async is terminated.
 	constexpr bzd::Optional<bzd::async::Executable&> onAsyncTerminate() noexcept
 	{
 		if (--nbActive_ == 0u)

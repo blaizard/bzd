@@ -17,24 +17,15 @@ def _load_linux_x86_64_clang_14_0_0(name):
     toolchain_definition = {
         "cpu": "linux_x86_64",
         "compiler": "clang",
-        "host_platforms": [
-            "@//tools/bazel_build/platforms:linux_x86_64",
-        ],
         "exec_compatible_with": [
-            "@//tools/bazel_build/platforms/al:linux",
-            "@//tools/bazel_build/platforms/isa:x86_64",
-        ],
-        "platforms": [
-            "@//tools/bazel_build/platforms:linux_x86_64",
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
         ],
         "target_compatible_with": [
             "@//tools/bazel_build/platforms/al:linux",
             "@//tools/bazel_build/platforms/isa:x86_64",
         ],
         "builtin_include_directories": [
-            "include/c++/v1",
-            "lib/clang/14.0.0/include",
-            "include/x86_64-unknown-linux-gnu/c++/v1/",
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
@@ -50,7 +41,7 @@ def _load_linux_x86_64_clang_14_0_0(name):
         ],
         "compile_flags": [
 
-            # Use incomplete C++20
+            # Use C++20
             "-std=c++20",
 
             # Standard includes, this is needed to avoid indefined include complain from Bazel.

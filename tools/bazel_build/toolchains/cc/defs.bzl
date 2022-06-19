@@ -21,8 +21,6 @@ def _impl(ctx):
     build_substitutions = {
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
-        "%{platforms}": "\n".join(['"{}",'.format(t) for t in ctx.attr.platforms]),
-        "%{host_platforms}": "\n".join(['"{}",'.format(t) for t in ctx.attr.host_platforms]),
         "%{filegroup_dependencies}": "\n".join(
             ['"{}",'.format(t) for t in ctx.attr.filegroup_dependencies] +
             ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_libs] +
@@ -80,8 +78,6 @@ _toolchain_maker_linux = repository_rule(
     attrs = {
         "cpu": attr.string(),
         "compiler": attr.string(),
-        "platforms": attr.string_list(),
-        "host_platforms": attr.string_list(),
         # Docker image
         "docker_image": attr.string(),
         # Compatibility
@@ -141,7 +137,7 @@ This rule also creates few important assets:
  - A toolchain: "@<id>//:toolchain"
  - A compiler target: "@<id>//:compiler"
  - A platform: "@<id>//:platform"
- - A host platform: "@<id>//:host_platform"
+ - An execution platform: "@<id>//:execution_platform"
  - A config setting: "@<id>//:target"
 """
 
@@ -185,15 +181,9 @@ def toolchain_maker(name, implementation, definition):
         "@{}//:binary_toolchain".format(name),
     )
 
-    native.register_execution_platforms(
-        "@{}//:host_platform".format(name),
-    )
-
-"""
-Merge 2 toolchain data entries.
-"""
-
 def toolchain_merge(data1, data2):
+    """Merge 2 toolchain data entries."""
+
     # Make a copy of data1 so that it can be mutated
     result = {}
     result.update(data1)

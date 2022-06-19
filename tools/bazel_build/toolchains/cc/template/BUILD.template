@@ -110,7 +110,6 @@ cc_toolchain(
 toolchain(
     name = "toolchain",
     exec_compatible_with = [
-        ":compiler",
         %{exec_compatible_with}
     ],
     target_compatible_with = [
@@ -131,7 +130,6 @@ binary_toolchain(
 toolchain(
     name = "binary_toolchain",
     exec_compatible_with = [
-        ":compiler",
         %{exec_compatible_with}
     ],
     target_compatible_with = [
@@ -153,24 +151,19 @@ platform(
     name = "platform",
     constraint_values = [
         ":compiler",
-    ],
-    parents = [
-        %{platforms}
+        %{target_compatible_with}
     ],
 )
 
 platform(
-    name = "host_platform",
-    host_platform = True,
+    name = "execution_platform",
     constraint_values = [
         ":compiler",
+        %{exec_compatible_with}
     ],
     exec_properties = {
         %{exec_properties}
     },
-    parents = [
-        %{host_platforms}
-    ],
 )
 
 config_setting(

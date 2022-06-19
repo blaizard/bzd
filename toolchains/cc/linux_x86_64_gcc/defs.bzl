@@ -8,15 +8,9 @@ def _load_linux_x86_64_gcc_11_2_0(name):
         "cpu": "linux_x86_64",
         "compiler": "gcc",
         "docker_image": "docker://docker.io/blaizard/linux_x86_64_gcc:11.2.0",
-        "host_platforms": [
-            "@//tools/bazel_build/platforms:linux_x86_64",
-        ],
-        "platforms": [
-            "@//tools/bazel_build/platforms:linux_x86_64",
-        ],
         "exec_compatible_with": [
-            "@//tools/bazel_build/platforms/al:linux",
-            "@//tools/bazel_build/platforms/isa:x86_64",
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
         ],
         "target_compatible_with": [
             "@//tools/bazel_build/platforms/al:linux",
@@ -45,7 +39,7 @@ def _load_linux_x86_64_gcc_11_2_0(name):
         ],
         "compile_flags": [
 
-            # Use a subset of C++20 to have coroutine support.
+            # Use C++20.
             "-std=c++20",
             "-fcoroutines",
 

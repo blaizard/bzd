@@ -28,27 +28,6 @@ public:
 
 	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
 
-	Result<void, bzd::Error> stop() noexcept
-	{
-		{
-			const auto result = ::pthread_join(thread_, nullptr);
-			if (result != 0)
-			{
-				return bzd::error(ErrorType::failure, "pthread_join"_csv);
-			}
-		}
-
-		{
-			const auto result = ::pthread_attr_destroy(&attr_);
-			if (result != 0)
-			{
-				return bzd::error(ErrorType::failure, "pthread_attr_destroy"_csv);
-			}
-		}
-
-		return bzd::nullresult;
-	}
-
 	Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
 	{
 		stack_.taint();
@@ -73,6 +52,27 @@ public:
 			if (result != 0)
 			{
 				return bzd::error(ErrorType::failure, "pthread_create"_csv);
+			}
+		}
+
+		return bzd::nullresult;
+	}
+
+	Result<void, bzd::Error> stop() noexcept
+	{
+		{
+			const auto result = ::pthread_join(thread_, nullptr);
+			if (result != 0)
+			{
+				return bzd::error(ErrorType::failure, "pthread_join"_csv);
+			}
+		}
+
+		{
+			const auto result = ::pthread_attr_destroy(&attr_);
+			if (result != 0)
+			{
+				return bzd::error(ErrorType::failure, "pthread_attr_destroy"_csv);
 			}
 		}
 

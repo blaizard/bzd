@@ -16,13 +16,6 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
     return {
         "cpu": "esp32_xtensa_lx6",
         "compiler": "gcc",
-        "builtin_include_directories": [
-            "xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf".format(package_name),
-            "xtensa-esp32-elf/include/c++/11.2.0".format(package_name),
-            "xtensa-esp32-elf/include".format(package_name),
-            "lib/gcc/xtensa-esp32-elf/11.2.0/include".format(package_name),
-            "lib/gcc/xtensa-esp32-elf/11.2.0/include-fixed".format(package_name),
-        ],
         "system_directories": [
             "external/{}/xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf".format(package_name),
             "external/{}/xtensa-esp32-elf/include/c++/11.2.0".format(package_name),
@@ -34,7 +27,7 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             "external/{}/xtensa-esp32-elf/lib".format(package_name),
         ],
         "compile_flags": [
-            # Use a subset of C++20 to have coroutine support.
+            # Use C++20.
             "-std=c++20",
 
             # Do not link or re-order inclusion files
