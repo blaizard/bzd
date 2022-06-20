@@ -142,10 +142,7 @@ toolchain(
 
 # Platform definition
 
-constraint_value(
-    name = "compiler",
-    constraint_setting = "@//tools/bazel_build/platforms/compiler:compiler",
-)
+%{compiler_constraint_value}
 
 platform(
     name = "platform",

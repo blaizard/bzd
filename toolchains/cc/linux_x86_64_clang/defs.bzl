@@ -15,6 +15,7 @@ def _load_linux_x86_64_clang_14_0_0(name):
     )
 
     toolchain_definition = {
+        "default": True,
         "cpu": "linux_x86_64",
         "compiler": "clang",
         "exec_compatible_with": [

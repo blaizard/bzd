@@ -37,11 +37,11 @@ pipeline
 		{
 			parallel
 			{
-				stage("[normal] linux_x86_64_clang dev + clang-tidy")
+				stage("[normal] clang-tidy")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy"
 					}
 				}
 				stage("[normal] linux_x86_64_clang prod")
@@ -69,14 +69,14 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=dev --runs_per_test=10 --platform_suffix=linux_x86_64_clang_dev"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=dev --runs_per_test=10 --platform_suffix=stress_dev"
 					}
 				}
 				stage("[stress] prod (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=linux_x86_64_clang --config=prod --runs_per_test=10 --platform_suffix=linux_x86_64_clang_prod"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=prod --runs_per_test=10 --platform_suffix=stress_prod"
 					}
 				}
 				stage("[sanitizer] asan/lsan")
@@ -98,7 +98,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=py --config=linux_x86_64_clang --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
+						sh "./tools/bazel coverage ... --config=py --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
 						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
 					}
 				}
@@ -106,7 +106,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=nodejs --config=linux_x86_64_clang --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
+						sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}

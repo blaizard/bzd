@@ -18,7 +18,17 @@ def _impl(ctx):
     if ctx.attr.docker_image:
         exec_properties["container-image"] = ctx.attr.docker_image
 
+    # Generate the constraint value for the compiler.
+    if ctx.attr.default:
+        compiler_constraint_value = """alias(name = "compiler", actual = "@//tools/bazel_build/platforms/compiler:default")"""
+    else:
+        compiler_constraint_value = """constraint_value(
+            name = "compiler",
+            constraint_setting = "@//tools/bazel_build/platforms/compiler:compiler",
+        )"""
+
     build_substitutions = {
+        "%{compiler_constraint_value}": compiler_constraint_value,
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
         "%{filegroup_dependencies}": "\n".join(
@@ -76,6 +86,7 @@ Linux specific implementation of the toolchain
 _toolchain_maker_linux = repository_rule(
     implementation = _impl,
     attrs = {
+        "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
         "cpu": attr.string(),
         "compiler": attr.string(),
         # Docker image
