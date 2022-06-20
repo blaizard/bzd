@@ -4,6 +4,7 @@ bzd_cc_test(
     name = "tests",
     srcs = [
         "network.cc",
+        "ipv4.cc",
     ],
     deps = [
         "//cc:bzd",

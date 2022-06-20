@@ -29,15 +29,16 @@ It features the followings:
 
 The following c++ target platforms are currently supported:
 
-| Name                 | Compiler | Version | Executors   |
-| -------------------- | -------- | ------- | ----------- |
-| linux_x86_64_clang   | clang    | 14.0.0  | host\*      |
-| linux_x86_64_gcc     | gcc      | 11.1.0  | host\*      |
-| esp32_xtensa_lx6_gcc | gcc      | 11.2.0  | sim\*, uart |
+| Name                 | Compiler | Version | Executors   | Debug |
+| -------------------- | -------- | ------- | ----------- | ----- |
+| linux_x86_64_clang\* | clang    | 14.0.0  | host\*      |       |
+| linux_x86_64_gcc     | gcc      | 11.1.0  | host\*      |       |
+| esp32_xtensa_lx6_gcc | gcc      | 11.2.0  | sim\*, uart | x     |
 
-\* Default executor for the platform.
+\* Default.
 
-To debug the current target, simply use `--config=debug`.
+When debug is support by the platform, one can run a target with `--config=debug` option and a debug environment will
+be made available.
 
 ## Code Quality
 

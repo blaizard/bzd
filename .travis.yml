@@ -18,10 +18,10 @@ jobs:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./info.sh
 
-    - name: "[normal] linux_x86_64_clang dev + clang-tidy"
+    - name: "[normal] clang-tidy"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=dev --config=clang_tidy --platform_suffix=linux_x86_64_clang_dev
+      - ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy
 
     - name: "[normal] linux_x86_64_clang prod"
       script:
