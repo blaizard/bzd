@@ -58,6 +58,9 @@ cc_library(
 
 cc_library(
     name = "delay",
+    srcs = [
+        "delay.cc",
+    ],
     hdrs = [
         "delay.hh",
     ],

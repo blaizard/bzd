@@ -43,7 +43,7 @@ public:
 		{
 			return *static_cast<T*>(object_);
 		}
-		return error();
+		return bzd::error::make();
 	}
 
 	template <class T>
@@ -53,7 +53,7 @@ public:
 		{
 			return *static_cast<const T*>(object_);
 		}
-		return error();
+		return bzd::error::make();
 	}
 
 	template <class T>

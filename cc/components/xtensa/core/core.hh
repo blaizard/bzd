@@ -36,7 +36,7 @@ public:
 		// Also it is by default taken, which doesn't require to call xSemaphoreTake here.
 		if (!(mutex_ = xSemaphoreCreateBinaryStatic(&mutexBuffer_)))
 		{
-			return bzd::error(ErrorType::failure, "xSemaphoreCreateBinaryStatic"_csv);
+			return bzd::error::Failure("xSemaphoreCreateBinaryStatic"_csv);
 		}
 		// Create the task and make sure the operation is successful. This will immediatly run the task.
 		handle_ = xTaskCreateStaticPinnedToCore(workloadWrapper,
@@ -49,7 +49,7 @@ public:
 												cpu_);
 		if (!handle_)
 		{
-			return bzd::error(ErrorType::failure, "xTaskCreateStatic"_csv);
+			return bzd::error::Failure("xTaskCreateStatic"_csv);
 		}
 
 		return bzd::nullresult;

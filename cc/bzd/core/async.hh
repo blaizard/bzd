@@ -81,7 +81,7 @@ public:
 	}
 
 	template <bzd::SizeType index = 0>
-	constexpr auto assertHasValue()
+	constexpr auto assertHasValue() noexcept
 	{
 		class AsyncPropagate : public impl::Async<T>
 		{

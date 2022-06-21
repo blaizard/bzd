@@ -251,7 +251,7 @@ TEST(ContainerOptional, result)
 		EXPECT_TRUE(v.value());
 		EXPECT_EQ(v.valueOr({12}).value(), 43);
 
-		v.emplace(bzd::error(false));
+		v.emplace(bzd::error::make(false));
 		EXPECT_TRUE(v);
 		EXPECT_FALSE(v.value());
 		EXPECT_FALSE((v.value()).error());

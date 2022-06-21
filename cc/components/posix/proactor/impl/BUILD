@@ -25,5 +25,6 @@ cc_library(
     deps = [
         ":interface",
         "//cc/bzd/core/async",
+        "//cc/components/posix:error",
     ],
 )

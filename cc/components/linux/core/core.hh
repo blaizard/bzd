@@ -5,6 +5,7 @@
 #include "cc/bzd/container/stack.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/components/linux/core/interface.hh"
+#include "cc/components/posix/error.hh"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // Needed for sched_setaffinity
@@ -34,14 +35,14 @@ public:
 
 		if (::pthread_attr_init(&attr_) != 0)
 		{
-			return bzd::error(ErrorType::failure, "pthread_attr_init"_csv);
+			return bzd::error::Posix("pthread_attr_init");
 		}
 
 		{
 			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
-				return bzd::error(ErrorType::failure, "pthread_attr_setstack"_csv);
+				return bzd::error::Posix("pthread_attr_setstack");
 			}
 		}
 
@@ -51,7 +52,7 @@ public:
 			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
-				return bzd::error(ErrorType::failure, "pthread_create"_csv);
+				return bzd::error::Posix("pthread_create");
 			}
 		}
 
@@ -64,7 +65,7 @@ public:
 			const auto result = ::pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
-				return bzd::error(ErrorType::failure, "pthread_join"_csv);
+				return bzd::error::Posix("pthread_join");
 			}
 		}
 
@@ -72,7 +73,7 @@ public:
 			const auto result = ::pthread_attr_destroy(&attr_);
 			if (result != 0)
 			{
-				return bzd::error(ErrorType::failure, "pthread_attr_destroy"_csv);
+				return bzd::error::Posix("pthread_attr_destroy");
 			}
 		}
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/components/posix/error.hh"
 #include "cc/components/posix/proactor/interface.hh"
 
 #include <cerrno>
@@ -26,12 +27,12 @@ public:
 	{
 		if (epollFd_ != -1)
 		{
-			co_return bzd::error(bzd::ErrorType::failure, "Already initialized"_csv);
+			co_return bzd::error::Failure("Already initialized"_csv);
 		}
 		epollFd_ = ::epoll_create1(/*size is ignored but must be set*/ 0);
 		if (epollFd_ == -1)
 		{
-			co_return bzd::error(bzd::ErrorType::failure, "epoll_create1: {}."_csv, ::std::strerror(errno));
+			co_return bzd::error::Posix("epoll_create1");
 		}
 		co_return {};
 	}
@@ -56,7 +57,7 @@ public:
 		const auto size = ::read(fd, data.data(), data.size());
 		if (size < 0)
 		{
-			co_return bzd::error(ErrorType::failure, "read: {}."_csv, ::std::strerror(errno));
+			co_return bzd::error::Posix("read");
 		}
 		co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
 	}
@@ -70,7 +71,7 @@ public:
 			const auto result = ::write(fd, &data.at(size), data.size() - size);
 			if (result < 0)
 			{
-				co_return bzd::error(ErrorType::failure, "write: {}."_csv, ::std::strerror(errno));
+				co_return bzd::error::Posix("write");
 			}
 			size += result;
 		}
@@ -87,7 +88,7 @@ public:
 			const int count = ::epoll_wait(epollFd_, events.data(), events.size(), /*timeout ms*/ 1);
 			if (count == -1)
 			{
-				co_return bzd::error(bzd::ErrorType::failure, "epoll_wait: {}."_csv, ::std::strerror(errno));
+				co_return bzd::error::Posix("epoll_wait");
 			}
 			for (int i = 0; i < count; ++i)
 			{

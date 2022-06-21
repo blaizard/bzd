@@ -59,8 +59,8 @@ public: // Comparators.
 	[[nodiscard]] constexpr bool operator!=(const Self& other) const noexcept { return !(other == *this); }
 
 public: // Accessors.
-	[[nodiscard]] constexpr ValueType& operator*() const { return *static_cast<ValueType*>(current_); }
-	[[nodiscard]] constexpr ValueType* operator->() const { return static_cast<ValueType*>(current_); }
+	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *static_cast<ValueType*>(current_); }
+	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return static_cast<ValueType*>(current_); }
 
 private:
 	constexpr void next() noexcept
@@ -118,7 +118,7 @@ public:
 	{
 		if (element.next_ != nullptr)
 		{
-			return error(NonOwningListErrorType::elementAlreadyInserted);
+			return bzd::error::make(NonOwningListErrorType::elementAlreadyInserted);
 		}
 
 		const auto next = previous.next_;
@@ -136,7 +136,7 @@ public:
 	{
 		if (empty())
 		{
-			return error(NonOwningListErrorType::empty);
+			return bzd::error::make(NonOwningListErrorType::empty);
 		}
 		return erase(*(first_.next_));
 	}
@@ -145,7 +145,7 @@ public:
 	{
 		if (empty())
 		{
-			return error(NonOwningListErrorType::empty);
+			return bzd::error::make(NonOwningListErrorType::empty);
 		}
 		return erase(*(last_.previous_));
 	}
@@ -154,7 +154,7 @@ public:
 	{
 		if (element.next_ == nullptr)
 		{
-			return error(NonOwningListErrorType::elementAlreadyRemoved);
+			return bzd::error::make(NonOwningListErrorType::elementAlreadyRemoved);
 		}
 
 		auto previous = element.previous_;

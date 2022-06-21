@@ -1,16 +1,20 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "ipv4",
-    hdrs = [
-        "ipv4.hh"
-    ],
     srcs = [
-        "ipv4.cc"
+        "ipv4.cc",
     ],
+    hdrs = [
+        "ipv4.hh",
+    ],
+    tags = ["manual"],
     visibility = [
-        "//visibility:public"
+        "//visibility:public",
     ],
     deps = [
         "//cc/bzd/container:result",
-        "//cc/bzd/core:error"
-    ]
+        "//cc/bzd/core:error",
+        "//cc/components/posix:error",
+    ],
 )

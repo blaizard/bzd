@@ -88,14 +88,14 @@ private:
 	[[nodiscard]] constexpr bzd::Optional<Executable&> popContinuation() noexcept
 	{
 		bzd::Optional<Executable&> maybeExecutable{};
-		continuation_.match([](bzd::monostate) {},
-							[&](Executable* executable) {
+		continuation_.match([](bzd::monostate) noexcept {},
+							[&](Executable* executable) noexcept {
 								if (executable)
 								{
 									maybeExecutable.emplace(*executable);
 								}
 							},
-							[&](OnTerminateCallback callback) { maybeExecutable = callback(); });
+							[&](OnTerminateCallback callback) noexcept { maybeExecutable = callback(); });
 		continuation_.template emplace<bzd::monostate>();
 		return maybeExecutable;
 	}
@@ -132,7 +132,7 @@ public: // Traits.
 	};
 
 public:
-	constexpr Executor() = default;
+	constexpr Executor() noexcept = default;
 
 	// Copy/move constructor/assignment
 	constexpr Executor(const Self&) noexcept = delete;
@@ -140,7 +140,7 @@ public:
 	constexpr Executor(Self&&) noexcept = delete;
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
-	constexpr ~Executor()
+	constexpr ~Executor() noexcept
 	{
 		// Clear the complete queue.
 		queue_.clear();
@@ -155,7 +155,7 @@ public:
 	/// Run all the workload currently in the queue.
 	///
 	/// Drain all workloads and exit only when the queue is empty.
-	void run()
+	void run() noexcept
 	{
 		// Storage for context related to the this running instance.
 		ExecutorContext<Executable> context{};
@@ -332,7 +332,7 @@ public:
 	using Self = Executable<T>;
 
 public:
-	~Executable()
+	~Executable() noexcept
 	{
 		// Detach the executable from any of the list it belongs to.
 		detach();

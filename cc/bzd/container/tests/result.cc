@@ -8,7 +8,7 @@ constexpr bzd::Result<void, int> constexprResultFct(const bool makeError)
 {
 	if (makeError)
 	{
-		return bzd::error(42);
+		return bzd::error::make(42);
 	}
 	return bzd::nullresult;
 }
@@ -24,7 +24,7 @@ TEST_CONSTEXPR_END(ContainerResult, Constexpr)
 TEST(ContainerResult, returnVoid)
 {
 	auto fct = [](const bool makeError) -> bzd::Result<void, std::string> {
-		if (makeError) return bzd::error("KO");
+		if (makeError) return bzd::error::make("KO");
 		return bzd::nullresult;
 	};
 
@@ -37,7 +37,7 @@ TEST(ContainerResult, returnReference)
 {
 	int data = 0;
 	auto fct = [&](const bool makeError) -> bzd::Result<int&, std::string> {
-		if (makeError) return bzd::error("KO");
+		if (makeError) return bzd::error::make("KO");
 		data = 42;
 		return data;
 	};
@@ -51,7 +51,7 @@ TEST(ContainerResult, returnPointer)
 {
 	int data = 0;
 	auto fct = [&](const bool makeError) -> bzd::Result<int*, std::string> {
-		if (makeError) return bzd::error("KO");
+		if (makeError) return bzd::error::make("KO");
 		data = 42;
 		return &data;
 	};
@@ -79,7 +79,7 @@ TEST(ContainerResult, constructor)
 	EXPECT_EQ(resultValueMoved.value(), 12);
 
 	// error copied
-	bzd::Result<int, const char*> resultError{bzd::error("ha")};
+	bzd::Result<int, const char*> resultError{bzd::error::make("ha")};
 	EXPECT_FALSE(resultError);
 	EXPECT_STREQ(resultError.error(), "ha");
 

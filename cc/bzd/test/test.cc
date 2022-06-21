@@ -101,7 +101,7 @@ bzd::Async<bool> run()
 	{
 		co_return true;
 	}
-	co_return ::bzd::error(::bzd::ErrorType::failure, "Test failed."_csv);
+	co_return ::bzd::error::Failure("Test failed."_csv);
 }
 
 } // namespace bzd::test

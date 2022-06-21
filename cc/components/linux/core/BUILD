@@ -25,5 +25,6 @@ cc_library(
         "//cc/bzd/container:optional",
         "//cc/bzd/container:stack",
         "//cc/bzd/core:error",
+        "//cc/components/posix:error",
     ],
 )

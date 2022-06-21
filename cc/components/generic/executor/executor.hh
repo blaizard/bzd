@@ -38,7 +38,7 @@ public:
 		const auto success = bzd::apply([run](auto&... cores) { return (cores->start(run).hasValue() && ...); }, cores_);
 		if (!success)
 		{
-			return bzd::error(bzd::ErrorType::failure, "One of the core failed to start."_csv);
+			return bzd::error::Failure("One of the core failed to start."_csv);
 		}
 		return bzd::nullresult;
 	}
@@ -49,7 +49,7 @@ public:
 		const auto success = bzd::apply([](auto&... cores) { return (cores->stop().hasValue() && ...); }, cores_);
 		if (!success)
 		{
-			return bzd::error(bzd::ErrorType::failure, "One of the core failed to stop."_csv);
+			return bzd::error::Failure("One of the core failed to stop."_csv);
 		}
 		return bzd::nullresult;
 	}
