@@ -24,7 +24,7 @@ public:
 	{
 		if (write_ - read_ > SIZE)
 		{
-			return error();
+			return bzd::error::make();
 		}
 
 		SizeType i = 0;
@@ -32,13 +32,13 @@ public:
 		{
 			if (buffer_.at(read_ % SIZE) != data.at(i))
 			{
-				return error();
+				return bzd::error::make();
 			}
 		}
 
 		if (i < data.size())
 		{
-			return error();
+			return bzd::error::make();
 		}
 
 		return nullresult;

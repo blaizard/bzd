@@ -47,11 +47,11 @@ public: // API
 	{
 		if (!init_)
 		{
-			co_return bzd::error(ErrorType::failure, "No terminal."_csv);
+			co_return bzd::error::Failure("No terminal."_csv);
 		}
 		if (data.size() == 0)
 		{
-			co_return bzd::error(ErrorType::failure, "Empty buffer passed to read(...)."_csv);
+			co_return bzd::error::Failure("Empty buffer passed to read(...)."_csv);
 		}
 		co_return (co_await proactor_.read(STDIN_FILENO, data));
 	}

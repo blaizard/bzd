@@ -125,7 +125,7 @@ public:
 				ElementPtrType expected{nullptr};
 				if (!element.next_.compareExchange(expected, setInsertionMark(nodeNext)))
 				{
-					return error(NonOwningForwardListErrorType::elementAlreadyInserted);
+					return bzd::error::make(NonOwningForwardListErrorType::elementAlreadyInserted);
 				}
 			}
 
@@ -190,7 +190,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return error(NonOwningForwardListErrorType::elementAlreadyRemoved);
+					return bzd::error::make(NonOwningForwardListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setInsertionMark(expected)));
 
@@ -203,7 +203,7 @@ public:
 				{
 				}
 
-				return error(NonOwningForwardListErrorType::notFound);
+				return bzd::error::make(NonOwningForwardListErrorType::notFound);
 			}
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
@@ -220,7 +220,7 @@ public:
 			{
 				if (!expected || isDeletionMark(expected) || isInsertionMark(expected))
 				{
-					return error(NonOwningForwardListErrorType::elementAlreadyRemoved);
+					return bzd::error::make(NonOwningForwardListErrorType::elementAlreadyRemoved);
 				}
 			} while (!element.next_.compareExchange(expected, setDeletionMark(expected)));
 		}
@@ -480,8 +480,8 @@ private:
 	using Result = bzd::Result<V, NonOwningForwardListErrorType>;
 
 public:
-	constexpr NonOwningForwardListElement() = default;
-	constexpr NonOwningForwardListElement(Self&& elt) : next_{elt.next_.load()} {}
+	constexpr NonOwningForwardListElement() noexcept = default;
+	constexpr NonOwningForwardListElement(Self&& elt) noexcept : next_{elt.next_.load()} {}
 
 	/// Pop the current element from the list. This is available only if
 	/// supportMultiContainer is enabled, as it has the knowledge of the parent container.
@@ -493,7 +493,7 @@ public:
 		{
 			return container->pop(*this);
 		}
-		return bzd::error(NonOwningForwardListErrorType::elementAlreadyRemoved);
+		return bzd::error::make(NonOwningForwardListErrorType::elementAlreadyRemoved);
 	}
 
 	/// Pop the current element from the list. This is available only if
@@ -506,7 +506,7 @@ public:
 		{
 			return container->popToDiscard(*this);
 		}
-		return bzd::error(NonOwningForwardListErrorType::elementAlreadyRemoved);
+		return bzd::error::make(NonOwningForwardListErrorType::elementAlreadyRemoved);
 	}
 
 	// Pointer to the next element from the list.
@@ -582,8 +582,8 @@ public:
 		[[nodiscard]] constexpr bool operator!=(const Self& other) const noexcept { return !(other == *this); }
 
 	public: // Accessors.
-		[[nodiscard]] constexpr ValueType& operator*() const { return *static_cast<ValueType*>(current_); }
-		[[nodiscard]] constexpr ValueType* operator->() const { return static_cast<ValueType*>(current_); }
+		[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *static_cast<ValueType*>(current_); }
+		[[nodiscard]] constexpr ValueType* operator->() const noexcept { return static_cast<ValueType*>(current_); }
 
 	private:
 		constexpr void next() noexcept

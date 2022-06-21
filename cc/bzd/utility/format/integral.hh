@@ -15,7 +15,7 @@ static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', 
 }
 
 template <SizeType base = 10, class T, class U>
-constexpr void integer(interface::String& str, const T& n, U& digits = bzd::format::impl::digits)
+constexpr void integer(interface::String& str, const T& n, U& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(U::size() >= base, "There is not enough digits for the base.");
@@ -94,19 +94,21 @@ constexpr void floatingPoint(interface::String& str, const T& n, const SizeType 
 namespace bzd::format {
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-constexpr void toStringHex(bzd::interface::String& str, const T& data, const bzd::Array<const char, 16>& digits = bzd::format::impl::digits)
+constexpr void toStringHex(bzd::interface::String& str,
+						   const T& data,
+						   const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
 {
 	bzd::format::impl::integer<16>(str, data, digits);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toStringOct(bzd::interface::String& str, const T& data)
+constexpr void toStringOct(bzd::interface::String& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<8>(str, data, bzd::format::impl::digits);
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
-constexpr void toStringBin(bzd::interface::String& str, const T& data)
+constexpr void toStringBin(bzd::interface::String& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<2>(str, data, bzd::format::impl::digits);
 }
@@ -116,7 +118,7 @@ constexpr void toStringBin(bzd::interface::String& str, const T& data)
 
 template <class T>
 requires bzd::concepts::integral<T>
-constexpr void toString(bzd::interface::String& str, const T data)
+constexpr void toString(bzd::interface::String& str, const T data) noexcept
 {
 	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
@@ -125,21 +127,21 @@ constexpr void toString(bzd::interface::String& str, const T data)
 
 template <class T>
 requires bzd::concepts::floatingPoint<T>
-constexpr void toString(bzd::interface::String& str, const T data, const bzd::SizeType maxPrecision = 6)
+constexpr void toString(bzd::interface::String& str, const T data, const bzd::SizeType maxPrecision = 6) noexcept
 {
 	bzd::format::impl::floatingPoint(str, data, maxPrecision);
 }
 
 // Boolean
 
-constexpr void toString(bzd::interface::String& str, const bzd::BoolType value)
+constexpr void toString(bzd::interface::String& str, const bzd::BoolType value) noexcept
 {
 	str.append((value) ? "true"_sv : "false"_sv);
 }
 
 // Chars
 
-constexpr void toString(bzd::interface::String& str, const char c)
+constexpr void toString(bzd::interface::String& str, const char c) noexcept
 {
 	str.append(c);
 }

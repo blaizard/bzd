@@ -7,6 +7,7 @@
 #include "cc/bzd/type_traits/decay.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/first_type.hh"
+#include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -25,19 +26,23 @@ namespace bzd::impl {
 class ResultNull
 {
 public:
-	static constexpr ResultNull make() { return ResultNull{}; }
+	static constexpr ResultNull make() noexcept { return ResultNull{}; }
 
 private:
 	explicit constexpr ResultNull() noexcept {}
 };
 
-/// Internal class used to create an unexpected result object type.
+} // namespace bzd::impl
+
+namespace bzd {
+
+/// Class used to hold an error object, it is the only way to pass errors to a Result object.
 template <class E>
-class Error
+class ResultError
 {
 public:
 	template <class... Args>
-	constexpr Error(Args&&... args) : error_{bzd::forward<Args>(args)...}
+	constexpr ResultError(Args&&... args) noexcept : error_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -46,10 +51,6 @@ private:
 	friend class bzd::Result;
 	E error_;
 };
-
-} // namespace bzd::impl
-
-namespace bzd {
 
 /// \brief This is the type used for returning and propagating errors.
 ///
@@ -67,8 +68,8 @@ public: // Traits
 	using Value = bzd::typeTraits::RemoveReference<ValueContainer>;
 	// Error type returned.
 	using Error = bzd::typeTraits::RemoveReference<E>;
-	// The container typr for the error.
-	using ErrorContainer = impl::Error<Error>;
+	// The container type for the error.
+	using ErrorContainer = ResultError<Error>;
 	// The current type.
 	using Self = Result<T, E>;
 	template <class U>
@@ -85,14 +86,16 @@ public: // Constructors
 	constexpr Result(const impl::ResultNull&) noexcept : data_{bzd::inPlaceType<ValueContainer>, nullptr} {}
 
 	// Forwards arguments to construct the value to the storage type.
-	template <class... Args, typename = typeTraits::EnableIf<!IsSelf<typeTraits::FirstType<Args...>>::value>>
+	template <class... Args,
+			  typename = typeTraits::EnableIf<!IsSelf<typeTraits::FirstType<Args...>>::value &&
+											  !typeTraits::isBaseOf<ResultError<E>, typeTraits::FirstType<Args...>>>>
 	constexpr Result(Args&&... args) noexcept : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
 	{
 	}
 
 	// Construct an error result.
 	template <class U>
-	constexpr Result(impl::Error<U>&& error) noexcept : data_{bzd::inPlaceType<ErrorContainer>, bzd::move(error.error_)}
+	constexpr Result(ResultError<U>&& error) noexcept : data_{bzd::inPlaceType<ErrorContainer>, bzd::move(error.error_)}
 	{
 	}
 
@@ -163,7 +166,7 @@ public: // API
 	/// Propagate the error to another result object.
 	///
 	/// \return The error object packed to be consumed by a compatible result object.
-	[[nodiscard]] constexpr impl::Error<Error> propagate() noexcept
+	[[nodiscard]] constexpr ResultError<Error> propagate() noexcept
 	{
 		bzd::assert::isTrue(hasError());
 		return bzd::move(data_.template get<ErrorContainer>().error_);
@@ -194,10 +197,13 @@ private:
 
 constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
-template <class E = bzd::BoolType>
-constexpr impl::Error<E> error(E&& e = true)
-{
-	return impl::Error<E>(bzd::forward<E>(e));
-}
-
 } // namespace bzd
+
+namespace bzd::error {
+/// Create an error from a specific type.
+template <class E = bzd::BoolType>
+constexpr ResultError<E> make(E&& e = true) noexcept
+{
+	return ResultError<E>(bzd::forward<E>(e));
+}
+} // namespace bzd::error

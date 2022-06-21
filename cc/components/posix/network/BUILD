@@ -20,7 +20,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//cc/components/posix/network/socket:ipv4",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
         "//cc/bzd/core:error",
@@ -28,5 +27,6 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/format:integral",
+        "//cc/components/posix/network/socket:ipv4",
     ],
 )

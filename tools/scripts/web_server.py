@@ -3,6 +3,7 @@
 import argparse
 import http.server
 import os
+import socket
 import socketserver
 import tarfile
 import tempfile
@@ -10,6 +11,12 @@ import tempfile
 
 class WebServer(socketserver.TCPServer):
 	allow_reuse_address = True
+
+	def server_bind(self) -> None:
+		"""Bind the server socket to an address."""
+
+		super().server_bind()
+		self.hostname, self.port = self.socket.getsockname()
 
 	def run(self) -> None:
 		try:
@@ -23,7 +30,13 @@ class WebServer(socketserver.TCPServer):
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
-	parser.add_argument("-p", "--port", dest="port", default=8080, type=int, help="Port to be used.")
+	parser.add_argument("-h",
+		"--hostname",
+		dest="hostname",
+		default="0.0.0.0",
+		type=str,
+		help="The hostname to be used.")
+	parser.add_argument("-p", "--port", dest="port", default=0, type=int, help="Port to be used.")
 	parser.add_argument("-r",
 		"--root",
 		dest="root",
@@ -45,7 +58,7 @@ if __name__ == "__main__":
 			tempPath = tempfile.TemporaryDirectory()
 			package = tarfile.open(args.path)
 			try:
-				print("Extracting content of '{}' to temporary directory '{}'.".format(args.path, tempPath.name))
+				print(f"Extracting content of '{args.path}' to temporary directory '{tempPath.name}'.")
 				package.extractall(tempPath.name)
 			finally:
 				package.close()
@@ -60,12 +73,12 @@ if __name__ == "__main__":
 			os.chdir(args.root)
 
 		handler = http.server.SimpleHTTPRequestHandler
-		server = WebServer(("", args.port), handler)
-		print("Web server ready, serving '{}' at 'http://localhost:{}'.".format(args.path, args.port))
+		server = WebServer((args.hostname, args.port), handler)
+		print(f"Web server ready, serving '{args.path}' at 'http://{server.hostname}:{server.port}'.")
 		server.run()
 
 	# Cleanup RAII style
 	finally:
 		if tempPath:
-			print("Cleaning up temporary directory '{}'.".format(tempPath.name))
+			print(f"Cleaning up temporary directory '{tempPath.name}'.")
 			tempPath.cleanup()

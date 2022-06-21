@@ -24,7 +24,7 @@ public:
 	constexpr const char* getFunction() const noexcept { return function_; }
 
 private:
-	constexpr SourceLocation(const char* file, const char* fileName, const char* function, LineType line) :
+	constexpr SourceLocation(const char* file, const char* fileName, const char* function, LineType line) noexcept :
 		file_{file}, fileName_{fileName}, function_{function}, line_{line}
 	{
 	}

@@ -10,14 +10,14 @@ bzd::Pool<StringType, 5> bufferPool{};
 bzd::Error::~Error() noexcept
 {
 	message_.match(
-		[](bzd::Optional<bzd::interface::String&> maybeBuffer) {
+		[](bzd::Optional<bzd::interface::String&> maybeBuffer) noexcept {
 			if (maybeBuffer)
 			{
 				maybeBuffer->clear();
 				bufferPool.release(reinterpret_cast<StringType&>(maybeBuffer.valueMutable()));
 			}
 		},
-		[](bzd::StringView) {});
+		[](bzd::StringView) noexcept {});
 }
 
 bzd::Optional<bzd::interface::String&> bzd::Error::reserveBuffer() noexcept

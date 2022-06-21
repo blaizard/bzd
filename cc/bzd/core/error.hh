@@ -112,66 +112,44 @@ private:
 	Variant<StringView, Optional<interface::String&>> message_;
 };
 
-template <class A>
-constexpr auto error(const ErrorType type, A&& a, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location, type, bzd::forward<A>(a)});
-}
-template <class A, class B>
-constexpr auto error(const ErrorType type, A&& a, B&& b, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b)});
-}
-template <class A, class B, class C>
-constexpr auto error(const ErrorType type, A&& a, B&& b, C&& c, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c)});
-}
-template <class A, class B, class C, class D>
-constexpr auto error(const ErrorType type, A&& a, B&& b, C&& c, D&& d, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d)});
-}
-template <class A, class B, class C, class D, class E>
-constexpr auto error(
-	const ErrorType type, A&& a, B&& b, C&& c, D&& d, E&& e, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(
-		Error{location, type, bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e)});
-}
-template <class A, class B, class C, class D, class E, class F>
-constexpr auto error(
-	const ErrorType type, A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location,
-							type,
-							bzd::forward<A>(a),
-							bzd::forward<B>(b),
-							bzd::forward<C>(c),
-							bzd::forward<D>(d),
-							bzd::forward<E>(e),
-							bzd::forward<F>(f)});
-}
-template <class A, class B, class C, class D, class E, class F, class G>
-constexpr auto error(const ErrorType type,
-					 A&& a,
-					 B&& b,
-					 C&& c,
-					 D&& d,
-					 E&& e,
-					 F&& f,
-					 G&& g,
-					 const SourceLocation location = SourceLocation::current()) noexcept
-{
-	return bzd::error(Error{location,
-							type,
-							bzd::forward<A>(a),
-							bzd::forward<B>(b),
-							bzd::forward<C>(c),
-							bzd::forward<D>(d),
-							bzd::forward<E>(e),
-							bzd::forward<F>(f),
-							bzd::forward<G>(g)});
-}
-
 } // namespace bzd
+
+namespace bzd::error {
+
+template <class... Args>
+struct Failure : public bzd::ResultError<bzd::Error>
+{
+	Failure(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::failure, bzd::forward<Args>(args)...}
+	{
+	}
+};
+
+template <class... Args>
+Failure(Args&&...) -> Failure<Args...>;
+
+template <class... Args>
+struct Timeout : public bzd::ResultError<bzd::Error>
+{
+	Timeout(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::timeout, bzd::forward<Args>(args)...}
+	{
+	}
+};
+
+template <class... Args>
+Timeout(Args&&...) -> Timeout<Args...>;
+
+template <class... Args>
+struct Busy : public bzd::ResultError<bzd::Error>
+{
+	Busy(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::busy, bzd::forward<Args>(args)...}
+	{
+	}
+};
+
+template <class... Args>
+Busy(Args&&...) -> Busy<Args...>;
+
+} // namespace bzd::error

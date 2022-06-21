@@ -76,7 +76,7 @@ public:
 };
 
 /// Parse an unsigned integer
-static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer)
+static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer) noexcept
 {
 	bool isDefined = false;
 	integer = 0;
@@ -91,7 +91,7 @@ static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeTyp
 
 /// Return the positional index
 template <class Adapter>
-constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType autoIndex)
+constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType autoIndex) noexcept
 {
 	bzd::SizeType index = 0;
 	const bool isDefined = parseUnsignedInteger(format, index);
@@ -109,7 +109,7 @@ constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType 
 // Sign
 
 template <class Adapter>
-constexpr void parseSign(bzd::StringView& format, Metadata& metadata)
+constexpr void parseSign(bzd::StringView& format, Metadata& metadata) noexcept
 {
 	switch (format.front())
 	{
@@ -143,7 +143,7 @@ constexpr void parseSign(bzd::StringView& format, Metadata& metadata)
 /// p    Pointer
 /// %	Percentage. Multiples by 100 and puts % at the end.
 template <class Adapter>
-constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current)
+constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current) noexcept
 {
 	const auto endIndex = format.find('}');
 	Adapter::assertTrue(endIndex != bzd::npos, "Missing closing '}' for the replacement field");
@@ -226,7 +226,7 @@ struct ResultStaticString
 
 /// Parse a static string and returns when there is data to be processed.
 template <class Adapter>
-constexpr ResultStaticString parseStaticString(bzd::StringView& format)
+constexpr ResultStaticString parseStaticString(bzd::StringView& format) noexcept
 {
 	SizeType offset = 0;
 	while (offset < format.size())
@@ -330,7 +330,7 @@ template <class... Ts>
 class Adapter : public Ts...
 {
 public:
-	static constexpr void assertTrue(const bool condition, const bzd::StringView& message)
+	static constexpr void assertTrue(const bool condition, const bzd::StringView& message) noexcept
 	{
 		if (!condition)
 		{
@@ -342,19 +342,20 @@ public:
 class ConstexprAssert
 {
 public:
-	static constexpr void onError(const bzd::StringView&) { bzd::assert::isTrueConstexpr(false); }
+	// NOLINTNEXTLINE(bugprone-exception-escape)
+	static constexpr void onError(const bzd::StringView&) noexcept { bzd::assert::isTrueConstexpr(false); }
 };
 
 class RuntimeAssert
 {
 public:
-	static constexpr void onError(const bzd::StringView& view) { bzd::assert::isTrue(false, view.data()); }
+	static constexpr void onError(const bzd::StringView& view) noexcept { bzd::assert::isTrue(false, view.data()); }
 };
 
 class NoAssert
 {
 public:
-	static constexpr void onError(const bzd::StringView&) {}
+	static constexpr void onError(const bzd::StringView&) noexcept {}
 };
 
 class StringFormatter
@@ -383,7 +384,7 @@ public:
 	}
 };
 
-constexpr bzd::StringView processCommon(const bzd::StringView stringView, const Metadata& metadata)
+constexpr bzd::StringView processCommon(const bzd::StringView stringView, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
@@ -403,7 +404,7 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
@@ -451,7 +452,7 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 }
 
 template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
@@ -478,7 +479,7 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 template <
 	class T,
 	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata&)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
@@ -486,7 +487,7 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 	toString(str, reinterpret_cast<SizeType>(value), metadata);
 }
 
-constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata)
+constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata) noexcept
 {
 	str += processCommon(stringView, metadata);
 }
@@ -498,7 +499,7 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
  * This function should only be used at compile time.
  */
 template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
-constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
+constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
 {
 	using TupleType = bzd::typeTraits::RemoveCVRef<decltype(tuple)>;
 	using ValueType = typename TupleType::template Get<N - 1>;
@@ -539,13 +540,13 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple)
 }
 
 template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
-constexpr bool contextCheck(const MetadataList&, const T&)
+constexpr bool contextCheck(const MetadataList&, const T&) noexcept
 {
 	return true;
 }
 
 template <class Formatter, class T>
-constexpr bool contextValidate(const bzd::StringView& format, const T& tuple)
+constexpr bool contextValidate(const bzd::StringView& format, const T& tuple) noexcept
 {
 	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter>;
 	bzd::VectorConstexpr<Metadata, 128> metadataList{};
@@ -632,7 +633,7 @@ private:
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
 template <bzd::concepts::constexprStringView T, class... Args>
-constexpr void toString(bzd::interface::String& str, const T&, Args&&... args)
+constexpr void toString(bzd::interface::String& str, const T&, Args&&... args) noexcept
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};

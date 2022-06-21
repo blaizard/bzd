@@ -257,7 +257,7 @@ public:
 	{
 		if constexpr (resultTypeIsResult)
 		{
-			result_ = bzd::error(bzd::move(error));
+			result_ = bzd::error::make(bzd::move(error));
 		}
 		else
 		{

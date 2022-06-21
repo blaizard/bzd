@@ -220,6 +220,7 @@ cc_library(
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:decay",
         "//cc/bzd/type_traits:enable_if",
+        "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_constructible",
         "//cc/bzd/type_traits:is_reference",
         "//cc/bzd/type_traits:is_same",
