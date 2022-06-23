@@ -39,7 +39,7 @@ public:
 			}
 			else
 			{
-				co_return result.propagate();
+				co_return bzd::move(result).propagate();
 			}
 		}
 		co_return size;
