@@ -3,8 +3,9 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 bzd_cc_test(
     name = "tests",
     srcs = [
-        "ipv4.cc",
+        "address.cc",
         "network.cc",
+        "socket.cc",
     ],
     deps = [
         "//cc:bzd",

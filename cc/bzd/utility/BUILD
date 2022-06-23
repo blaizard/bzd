@@ -24,6 +24,7 @@ bzd_cc_library(
         ":move",
         ":numeric_limits",
         ":offset_of",
+        ":owner",
         ":ratio",
         ":scope_guard",
         ":signal",
@@ -31,6 +32,7 @@ bzd_cc_library(
         ":size",
         ":source_location",
         ":swap",
+        ":to_underlying",
         "//cc/bzd/utility/format",
         "//cc/bzd/utility/format:integral",
         "//cc/bzd/utility/format:stream",
@@ -248,6 +250,17 @@ cc_library(
 )
 
 cc_library(
+    name = "owner",
+    hdrs = [
+        "owner.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/assert",
+    ],
+)
+
+cc_library(
     name = "ratio",
     hdrs = [
         "ratio.hh",
@@ -322,5 +335,16 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":move",
+    ],
+)
+
+cc_library(
+    name = "to_underlying",
+    hdrs = [
+        "to_underlying.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:underlying_type",
     ],
 )

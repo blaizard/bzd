@@ -2,9 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 bdl_library(
-    name = "bdl",
+    name = "interface",
     srcs = [
         "interface.bdl",
+        "types.bdl",
+    ],
+    visibility = [
+        "//visibility:public",
     ],
 )
 
@@ -19,7 +23,8 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        ":bdl",
+        ":interface",
+        ":socket",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
         "//cc/bzd/core:error",
@@ -27,6 +32,25 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/format:integral",
-        "//cc/components/posix/network/socket:ipv4",
+        "//cc/components/posix/network/address",
+    ],
+)
+
+cc_library(
+    name = "socket",
+    srcs = [
+        "socket.cc",
+    ],
+    hdrs = [
+        "socket.hh",
+    ],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility:owner",
+        "//cc/bzd/utility:to_underlying",
+        "//cc/components/posix",
+        "//cc/components/posix:error",
+        "//cc/components/posix/network/address",
     ],
 )

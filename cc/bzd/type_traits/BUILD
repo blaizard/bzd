@@ -62,6 +62,7 @@ bzd_cc_library(
         ":remove_reference",
         ":remove_volatile",
         ":true_type",
+        ":underlying_type",
         ":void_type",
     ],
 )
@@ -721,6 +722,14 @@ cc_library(
     deps = [
         ":integral_constant",
     ],
+)
+
+cc_library(
+    name = "underlying_type",
+    hdrs = [
+        "underlying_type.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
