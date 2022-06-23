@@ -2,6 +2,8 @@
 
 #include "cc/components/posix/error.hh"
 
+#include <unistd.h>
+
 namespace bzd::platform::posix::network {
 
 bzd::Result<Socket, bzd::Error> Socket::make(const AddressFamily family, const SocketType type, const int protocol) noexcept
