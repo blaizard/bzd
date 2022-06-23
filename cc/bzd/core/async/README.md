@@ -155,7 +155,7 @@ is equivalent to the follwing:
 auto result = co_await myFunc();
 if (!result)
 {
-    co_return result.propagate();
+    co_return bzd::move(result).propagate();
 }
 const auto value = result.value();
 ```
