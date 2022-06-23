@@ -2,22 +2,23 @@
 
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/components/posix/network/address/family.hh"
 
 #include <netinet/in.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::platform::posix::network::address {
 // Socket address information.
-class IPv4
+class IpV4
 {
 public:
-	static constexpr int domain{AF_INET};
+	static constexpr AddressFamily family{AddressFamily::ipV4};
 
 private:
-	constexpr IPv4() noexcept = default;
+	constexpr IpV4() noexcept = default;
 
 public:
 	/// Create an IPv4 object from a string.
-	static bzd::Result<IPv4, bzd::Error> fromString(const StringView string, const int port) noexcept;
+	static bzd::Result<IpV4, bzd::Error> fromIpPort(const StringView string, const int port) noexcept;
 
 	/// Get the erased native address of this object.
 	constexpr ::sockaddr* address() noexcept { return &addressErased_; }
@@ -32,4 +33,4 @@ private:
 		::sockaddr_in address_;
 	};
 };
-} // namespace bzd::platform::posix::network
+} // namespace bzd::platform::posix::network::address

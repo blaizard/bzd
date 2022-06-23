@@ -166,7 +166,7 @@ public: // API
 	/// Propagate the error to another result object.
 	///
 	/// \return The error object packed to be consumed by a compatible result object.
-	[[nodiscard]] constexpr ResultError<Error> propagate() noexcept
+	[[nodiscard]] constexpr ResultError<Error> propagate() && noexcept
 	{
 		bzd::assert::isTrue(hasError());
 		return bzd::move(data_.template get<ErrorContainer>().error_);
