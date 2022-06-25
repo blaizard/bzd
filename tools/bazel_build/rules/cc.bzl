@@ -1,7 +1,7 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
-load("@bazel_skylib//lib:new_sets.bzl", "sets")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
 load("@rules_cc//cc:defs.bzl", "cc_test")
