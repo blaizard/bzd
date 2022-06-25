@@ -4,19 +4,24 @@ BdlTagProvider = provider(fields = [])
 BdlProvider = provider(fields = ["bdls", "files"])
 CcCompositionProvider = provider(fields = ["hdrs"])
 
+def _get_cc_public_header(target):
+    """Get all the direct public headers from a target."""
+
+    if CcInfo not in target:
+        return []
+    return target[CcInfo].compilation_context.direct_public_headers
+
 def _bdl_aspect_impl(target, ctx):
-    """
-    Aspects to gather all bdl depedency outputs.
-    """
+    """Aspects to gather all bdl depedency outputs."""
 
-    # Are considered composition public headers when a dependency is a bdl library.
-    hdrs = []
-    if any([dep for dep in ctx.rule.attr.deps if BdlTagProvider in dep]):
-        if CcInfo in target:
-            # Discard auto-generated files as all components must have their own headers.
-            hdrs = [f for f in target[CcInfo].compilation_context.direct_public_headers if not f.path.startswith("bazel-out")]
+    # Are considered composition public headers when the target is not a BDL library but has a bdl library as a diret dependency.
+    # Then it means it relies on a BDL interface.
+    cc_hdrs = []
+    if BdlTagProvider not in target:
+        if any([dep for dep in ctx.rule.attr.deps if BdlTagProvider in dep]):
+            cc_hdrs = _get_cc_public_header(target)
 
-    cc_composition_provider = CcCompositionProvider(hdrs = depset(hdrs, transitive = [dep[CcCompositionProvider].hdrs for dep in ctx.rule.attr.deps if CcCompositionProvider in dep]))
+    cc_composition_provider = CcCompositionProvider(hdrs = depset(cc_hdrs, transitive = [dep[CcCompositionProvider].hdrs for dep in ctx.rule.attr.deps if CcCompositionProvider in dep]))
 
     if BdlProvider not in target:
         return [
@@ -43,6 +48,7 @@ def _bdl_library_impl(ctx):
         "cc": {
             "display": "C++",
             "outputs": ["{}.hh"],
+            "includes_getter": _get_cc_public_header
         },
     }
 
@@ -87,13 +93,18 @@ def _bdl_library_impl(ctx):
     # Generate the format specific outputs
     for bdl in metadata:
         for fmt, data in _FORMATS.items():
+            # Build the list of the direct includes.
+            includes = []
+            for dep in ctx.attr.deps:
+                includes.extend(data["includes_getter"](dep))
+            arguments_includes = ["--include={}".format(include.short_path) for include in includes]
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(
                 inputs = depset(transitive = [files, bdls]),
                 outputs = outputs,
                 progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                arguments = _make_bdl_arguments(ctx, "generate", ["--format", fmt, "--output", outputs[0].path, bdl["input"].path]),
+                arguments = _make_bdl_arguments(ctx, "generate", arguments_includes + ["--format", fmt, "--output", outputs[0].path, bdl["input"].path]),
                 executable = ctx.attr._bdl.files_to_run,
             )
 
@@ -122,9 +133,9 @@ bdl_library = rule(
             doc = "List of Bzd Description Language (bdl) files to be included.",
         ),
         "deps": attr.label_list(
-            providers = [BdlProvider],
+            providers = [BdlProvider, CcInfo],
             aspects = [_bdl_aspect],
-            doc = "List of bdl dependencies.",
+            doc = "List of bdl dependencies. Language specifiic dependencies will have their public interface included in the generated file.",
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
@@ -155,7 +166,7 @@ def _bdl_composition_impl(ctx):
         return [CcInfo()]
 
     # Generate the list of files to be includes.
-    arguments_includes = ["--include={}".format(hdrs.path) for hdrs in cc_composition_hdrs.to_list()]
+    arguments_includes = ["--include={}".format(hdrs.short_path) for hdrs in cc_composition_hdrs.to_list()]
 
     # Generate the output
     output = ctx.actions.declare_file("{}.main.cc".format(ctx.attr.name))

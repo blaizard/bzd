@@ -16,8 +16,9 @@ from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapt
 # String related
 class Transform:
 
-	def __init__(self, composition: typing.Optional[Composition] = None) -> None:
+	def __init__(self, composition: typing.Optional[Composition] = None, includes: typing.List[Path] = []) -> None:
 		self.composition = composition
+		self.includes = includes
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
@@ -98,10 +99,10 @@ class Transform:
 		return expression.fqn in self.composition.infraFQNs
 
 
-def formatCc(bdl: Object) -> str:
+def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-	output = template.render(bdl.tree, Transform())
+	output = template.render(bdl.tree, Transform(includes = includes))
 
 	return output
 
@@ -109,6 +110,6 @@ def formatCc(bdl: Object) -> str:
 def compositionCc(composition: Composition) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
-	output = template.render(composition, Transform(composition))
+	output = template.render(composition, Transform(composition = composition))
 
 	return output

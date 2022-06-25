@@ -50,7 +50,7 @@ def _inheritanceToStr(inheritanceList: typing.List[Type]) -> str:
 	return ", ".join([str(_typeToStr(inheritance)) for inheritance in inheritanceList])
 
 
-def formatBdl(bdl: Object) -> str:
+def formatBdl(bdl: Object, includes: typing.List[Path]) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
 	output = template.render(

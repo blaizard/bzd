@@ -21,7 +21,7 @@ if __name__ == "__main__":
 	parser.add_argument("--stage",
 		choices=["preprocess", "generate", "compose"],
 		help="Only perform a specific stage of the full process.")
-	parser.add_argument("--include", type=Path, action="append", help="List of input path to be included.")
+	parser.add_argument("--include", type=Path, action="append", default=[], help="List of input path to be included.")
 	parser.add_argument("inputs", type=Path, nargs="+", help="Input file to be passed to the parser.")
 
 	config = parser.parse_args()
@@ -48,10 +48,10 @@ if __name__ == "__main__":
 				if config.stage == "generate":
 
 					bdl = objectContext.loadPreprocess(path=inputPath)
-					output = generate(formatType=config.format, bdl=bdl)
+					output = generate(formatType=config.format, bdl=bdl, includes=config.include)
 
 				else:
-					output = main(formatType=config.format, path=inputPath, objectContext=objectContext)
+					output = main(formatType=config.format, path=inputPath, includes=config.include, objectContext=objectContext)
 
 				if config.output is None:
 					print(output)

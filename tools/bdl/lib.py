@@ -21,12 +21,13 @@ def preprocess(path: Path, objectContext: typing.Optional[ObjectContext] = None)
 	return objectContext.preprocess(path=path)
 
 
-def generate(formatType: str, bdl: Object) -> str:
+def generate(formatType: str, bdl: Object, includes: typing.List[Path]) -> str:
 
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Format using a specific formatter
-	return formatters[formatType](bdl=bdl)
+	print("formatters", includes)
+	return formatters[formatType](bdl=bdl, includes=includes)
 
 
 def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includes: typing.List[Path]) -> None:
@@ -42,7 +43,7 @@ def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includ
 	output.write_text(data)
 
 
-def main(formatType: str, path: Path, objectContext: typing.Optional[ObjectContext] = None) -> str:
+def main(formatType: str, path: Path, includes: typing.List[Path], objectContext: typing.Optional[ObjectContext] = None) -> str:
 
 	bdl = preprocess(path=path, objectContext=objectContext)
-	return generate(formatType=formatType, bdl=bdl)
+	return generate(formatType=formatType, bdl=bdl, includes=includes)
