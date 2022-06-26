@@ -11,10 +11,10 @@ bdl_library(
 bzd_cc_test(
     name = "cc",
     srcs = [
-        "implementation.cc"
+        "implementation.cc",
     ],
     deps = [
         ":interface",
         "//cc/bzd/test",
-    ]
+    ],
 )
