@@ -22,3 +22,16 @@ cc_library(
         "//cc/bzd/core:error",
     ],
 )
+
+cc_library(
+    name = "file_descriptor",
+    hdrs = [
+        "file_descriptor.hh",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//cc/bzd/utility:owner",
+    ],
+)

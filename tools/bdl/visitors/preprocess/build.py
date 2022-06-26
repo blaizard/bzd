@@ -3,7 +3,7 @@ import typing
 from bzd.parser.element import Element, Sequence, ElementBuilder
 
 from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION, CATEGORY_CONFIG, CATEGORY_INTERFACE, CATEGORY_GLOBAL
-from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, EntityType, Namespace
+from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, Extern, EntityType, Namespace
 from tools.bdl.entities.builder import NamespaceBuilder
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.symbol_tree import SymbolTree
@@ -60,6 +60,9 @@ class Build(Visitor[None]):
 		self.registerEntity(entity=entity)
 
 	def visitUsing(self, entity: Using, result: None) -> None:
+		self.registerEntity(entity=entity)
+
+	def visitExtern(self, entity: Extern, result: None) -> None:
 		self.registerEntity(entity=entity)
 
 	def visitEnum(self, entity: Enum, result: None) -> None:

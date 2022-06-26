@@ -5,4 +5,3 @@ namespace bzd.platform.posix;
 using FileDescriptor = Integer [min(-1)];
 // / Default size type for POSIX related interfaces.
 using Size = Integer [min(0)];
-

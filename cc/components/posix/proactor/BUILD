@@ -7,6 +7,17 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/components/posix",
+        ":proactor_lib"
     ],
+)
+
+cc_library(
+    name = "proactor_lib",
+    hdrs = [
+        "proactor.hh",
+    ],
+    deps = [
+        "//cc/bzd/core/async",
+        "//cc/components/posix"
+    ]
 )

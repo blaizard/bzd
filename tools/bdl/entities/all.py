@@ -11,6 +11,7 @@ from tools.bdl.entities.impl.nested import Nested as _Nested
 from tools.bdl.entities.impl.use import Use as _Use
 from tools.bdl.entities.impl.using import Using as _Using
 from tools.bdl.entities.impl.expression import Expression as _Expression
+from tools.bdl.entities.impl.extern import Extern as _Extern
 from tools.bdl.entities.impl.reference import Reference as _Reference
 
 # Implicitly export all types
@@ -22,10 +23,11 @@ Nested = _Nested
 Use = _Use
 Using = _Using
 Expression = _Expression
+Extern = _Extern
 Reference = _Reference
 
-EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Namespace, Use, Builtin, Reference]
-SymbolType = typing.Union[Expression, Nested, Method, Using, Enum]
+EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Extern, Namespace, Use, Builtin, Reference]
+SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
 CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
 	"nested": Nested,
@@ -36,7 +38,8 @@ CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
 	"enum": Enum,
 	"namespace": Namespace,
 	"use": Use,
-	"reference": Reference
+	"reference": Reference,
+	"extern": Extern
 }
 
 

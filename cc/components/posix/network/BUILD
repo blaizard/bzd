@@ -52,5 +52,6 @@ cc_library(
         "//cc/components/posix",
         "//cc/components/posix:error",
         "//cc/components/posix/network/address",
+        "//cc/components/posix:file_descriptor"
     ],
 )

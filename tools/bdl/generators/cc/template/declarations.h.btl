@@ -59,6 +59,8 @@ Args:
 {%- macro parametersValue(value, expected) -%}
 	{%- if expected.category == "nested" -%}
 		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
+	{%- elif expected.category == "extern" -%}
+		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
 	{%- else -%}
 		{{ value }}
 	{%- end -%}

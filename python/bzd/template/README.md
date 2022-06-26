@@ -47,3 +47,7 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
 - Inclusion blocks:
 
   - Include another btl file as if it was part of the document, ex: `{% include "my/path.btl" %}`
+
+- Builtins utility functions:
+
+  - btl.merge: merge different types together., ex: `btl.merge(a, b, c)`

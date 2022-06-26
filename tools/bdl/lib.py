@@ -26,7 +26,6 @@ def generate(formatType: str, bdl: Object, includes: typing.List[Path]) -> str:
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Format using a specific formatter
-	print("formatters", includes)
 	return formatters[formatType](bdl=bdl, includes=includes)
 
 

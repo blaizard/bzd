@@ -24,7 +24,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
-        "//cc/bzd/core/async",
         "//cc/components/posix:error",
     ],
 )

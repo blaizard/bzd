@@ -2,6 +2,7 @@ import typing
 import pathlib
 from bzd.parser.element import Element
 from bzd.parser.error import Error
+from bzd.template.builtins import Builtins
 
 SubstitutionsType = typing.Any
 
@@ -26,7 +27,6 @@ class SubstitutionsAccessor:
 			elif hasattr(substitutions, "__contains__") and key in substitutions:
 				return True
 		return False
-
 
 class SubstitutionWrapper:
 
@@ -57,7 +57,9 @@ class SubstitutionWrapper:
 		ext = self.ext.get(key)
 		if ext:
 			return ext[-1]
-		return self.substitutions[key]
+		if key in self.substitutions:
+			return self.substitutions[key]
+		return Builtins[key]
 
 	def __contains__(self, key: str) -> bool:
 		if key in self.substitutions:

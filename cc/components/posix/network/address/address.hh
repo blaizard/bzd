@@ -31,6 +31,7 @@ public:
 
 private:
 	template <class Impl>
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
 	constexpr explicit Address(Impl&& impl) noexcept : impl_{bzd::forward<Impl>(impl)}
 	{
 	}

@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.fragments import Attribute
 
-from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType, elementToEntity
+from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Extern, Namespace, Use, EntityType, elementToEntity
 
 NamespaceType = typing.List[str]
 
@@ -113,7 +113,12 @@ class Visitor(VisitorBase[T, T]):
 
 			self.visitUsing(entity, result)
 
-		# Handle using
+		# Handle extern
+		elif isinstance(entity, Extern):
+
+			self.visitExtern(entity, result)
+
+		# Handle enum
 		elif isinstance(entity, Enum):
 
 			self.visitEnum(entity, result)
@@ -168,6 +173,12 @@ class Visitor(VisitorBase[T, T]):
 	def visitUsing(self, entity: Using, result: T) -> None:
 		"""
 		Called when discovering a using keyword.
+		"""
+		pass
+
+	def visitExtern(self, entity: Extern, result: T) -> None:
+		"""
+		Called when discovering an extern keyword.
 		"""
 		pass
 
