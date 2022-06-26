@@ -1,0 +1,5 @@
+namespace bzd.test;
+
+interface MyInterface {
+    method add(a = const Integer, b = const Integer) -> Integer;
+}

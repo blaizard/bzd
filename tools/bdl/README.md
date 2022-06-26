@@ -151,15 +151,10 @@ public:
 
 Alternatively virtual interfaces can also be used as follow:
 ```c++
-class MyInterfaceVirtual
+class MyInterface
 {
 public:
   virtual Error process() noexcept = 0;
-};
-
-template <class Impl>
-class MyInterface : public MyInterfaceVirtual
-{
 };
 ```
 

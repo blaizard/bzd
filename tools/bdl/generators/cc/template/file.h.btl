@@ -84,10 +84,9 @@ template <>
 struct Interface<"{{ data.fqn }}">
 {
 	template <class Impl>
-	requires concepts::derivedFrom<Impl, {{ namespace | namespaceToStr }}::{{ data.name }}<Impl>>
 	[[nodiscard]] static auto& cast(Impl& impl) noexcept
 	{
-		return static_cast<{{ namespace | namespaceToStr }}::{{ data.name }}<Impl>&>(impl);
+		return ::bzd::impl::getInterface<{{ namespace | namespaceToStr }}::{{ data.name }}>(impl);
 	}
 };
 	{% end %}
