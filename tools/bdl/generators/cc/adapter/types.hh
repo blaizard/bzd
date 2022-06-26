@@ -32,6 +32,18 @@ constexpr auto* getMethod(T* obj, Interface interface, Impl impl) noexcept
 	static_assert(TraitsInterface::isNoexcept && TraitsImpl::isNoexcept, "Interface must have the same exception guaranty.");
 	return static_cast<typename TraitsImpl::Class*>(obj);
 }
+
+/// Helper to get the interface from the implementation.
+///
+/// \param impl The implementation object.
+/// \{
+template<template<class> class T, class Impl>
+constexpr auto& getInterface(Impl& impl) { return static_cast<T<Impl>&>(impl); }
+
+template<class T, class Impl>
+constexpr auto& getInterface(Impl& impl) { return static_cast<T&>(impl); }
+/// \}
+
 } // namespace impl
 
 } // namespace bzd
