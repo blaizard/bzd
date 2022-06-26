@@ -84,7 +84,7 @@ Therefore to include `my/path/core.bdl` functionality in a C++ file, use the fol
 
 #### Interfaces
 
-Interfaces will generate an `adapter` class from which the component should inherits. The class is a template in the `adapter` namespace that implements the curiously recurring template pattern.
+Interfaces will generate an adapter class that implements the curiously recurring template pattern from which the component should inherits.
 
 In addition, trivial types are generated to be accessible from the namespace declared in the `bdl` file.
 
@@ -107,7 +107,7 @@ The implementation can access the followings:
 ```c++
 #include "bzd/example/interface.hh" // Auto-generated from bdl.
 
-class Implementation : public bzd::example::adapter::MyInterface<Implementation> // Adapter for the component.
+class Implementation : public bzd::example::MyInterface<Implementation> // Adapter for the component.
 {
 public:
   constexpr Error process() noexcept // Implementation of the method.
@@ -117,4 +117,59 @@ public:
 };
 ```
 
-Note, such component cannot be casted down to its interface class, if this level of abstraction is needed, please look at the virtual interface.
+Interfaces defined in the BDL language are guaranteed to be accessible and callable from any node in the system.
+
+#### External Interfaces
+
+Sometimes, you want to create an interface that should be defined in the C++ language itself for example, in order
+to benefit from some features that are not available in the BDL language.
+
+Note, doing so, limits the interface to the composition only. Such interface cannot be accessed from the overall system.
+
+To define such interface, simply do the followng:
+```bdl
+namespace bzd.example;
+
+extern interface MyInterface;
+```
+
+The user is then tasked to provide the C++ symbol within the namespace. Note the interface must use the CRTP pattern.
+Here is an example of what could be such interface:
+```c++
+template <class Impl>
+class MyInterface
+{
+public:
+  constexpr Error process() noexcept // Implementation of the method.
+  {
+    // getMethod is a helper that ensures the signature of the interface matches the implementation
+    // and that returns the implementation object.
+    return bzd::impl::getMethod(this, &MyInterface::process, &Impl::process)->process();
+  }
+};
+```
+
+Alternatively virtual interfaces can also be used as follow:
+```c++
+class MyInterfaceVirtual
+{
+public:
+  virtual Error process() noexcept = 0;
+};
+
+template <class Impl>
+class MyInterface : public MyInterfaceVirtual
+{
+};
+```
+
+#### Interfaces Casting
+
+Object which implements an interface are casted down to their interfaces when used in the composition, this is done
+automatically by the code generator and it ensures that the object is used by its interface only.
+
+The code generation specialize the `bzd::Interface` type with the fully qualified name of the object type. It can then
+be used like this:
+```c++
+bzd::Interface<"bzd.example.MyInterface">::cast(object);
+```
