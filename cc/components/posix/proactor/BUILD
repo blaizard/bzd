@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 bdl_library(
@@ -7,7 +8,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":proactor_lib"
+        ":proactor_lib",
     ],
 )
 
@@ -18,6 +19,6 @@ cc_library(
     ],
     deps = [
         "//cc/bzd/core/async",
-        "//cc/components/posix"
-    ]
+        "//cc/components/posix",
+    ],
 )

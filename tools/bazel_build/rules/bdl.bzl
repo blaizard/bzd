@@ -48,7 +48,7 @@ def _bdl_library_impl(ctx):
         "cc": {
             "display": "C++",
             "outputs": ["{}.hh"],
-            "includes_getter": _get_cc_public_header
+            "includes_getter": _get_cc_public_header,
         },
     }
 
@@ -98,6 +98,7 @@ def _bdl_library_impl(ctx):
             for dep in ctx.attr.deps:
                 includes.extend(data["includes_getter"](dep))
             arguments_includes = ["--include={}".format(include.short_path) for include in includes]
+
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(

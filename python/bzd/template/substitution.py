@@ -28,6 +28,7 @@ class SubstitutionsAccessor:
 				return True
 		return False
 
+
 class SubstitutionWrapper:
 
 	def __init__(self, substitutions: SubstitutionsAccessor) -> None:

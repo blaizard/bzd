@@ -3,8 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/components/posix/posix.hh"
 
-namespace bzd::platform::posix
-{
+namespace bzd::platform::posix {
 
 template <class Impl>
 class Proactor
@@ -22,4 +21,4 @@ public:
 	}
 };
 
-}
+} // namespace bzd::platform::posix

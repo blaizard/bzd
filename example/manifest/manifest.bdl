@@ -1,6 +1,7 @@
 
 namespace bzd.manifest;
 
+
 using NextType = Integer;
 enum Test
 {

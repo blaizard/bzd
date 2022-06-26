@@ -1,6 +1,7 @@
 
 namespace bzd.platform.std;
 
+
 component Out {
 interface:
 	

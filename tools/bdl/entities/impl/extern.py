@@ -29,7 +29,7 @@ class Extern(Entity):
 
 	@property
 	def type(self) -> str:
-		return self.element.getAttrValue("type")
+		return self.element.getAttr("type").value
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""

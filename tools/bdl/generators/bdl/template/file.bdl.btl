@@ -74,4 +74,8 @@ use "{{ use.path }}"
 namespace {{ entity | namespaceToStr }};
 {% end %}
 
+{% for extern in externList %}
+extern {{ extern.type }} {{ extern.name }};
+{% end %}
+
 {{ declareSymbols(sequence) }}

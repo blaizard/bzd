@@ -3,6 +3,7 @@ use "cc/bzd/platform/interfaces/core.bdl"
 
 namespace bzd.platform.generic;
 
+
 /*
  * Generic executor that takes all cores as argument
  * and simply execute them.

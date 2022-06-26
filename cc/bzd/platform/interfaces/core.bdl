@@ -1,6 +1,7 @@
 
 namespace bzd.platform;
 
+
 // Type describing the size of a stack.
 using StackSize = Integer [min(100) max(8000000)];
 // Type describing the identifier of a core.

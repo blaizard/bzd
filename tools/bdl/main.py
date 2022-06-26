@@ -51,7 +51,10 @@ if __name__ == "__main__":
 					output = generate(formatType=config.format, bdl=bdl, includes=config.include)
 
 				else:
-					output = main(formatType=config.format, path=inputPath, includes=config.include, objectContext=objectContext)
+					output = main(formatType=config.format,
+						path=inputPath,
+						includes=config.include,
+						objectContext=objectContext)
 
 				if config.output is None:
 					print(output)

@@ -1,6 +1,7 @@
 
 namespace bzd.test;
 
+
 // Test suite runner.
 method run();
 composition {

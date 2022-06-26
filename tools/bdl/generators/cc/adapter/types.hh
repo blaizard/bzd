@@ -27,10 +27,11 @@ constexpr auto* getMethod(T* obj, Interface interface, Impl impl) noexcept
 {
 	using TraitsInterface = bzd::typeTraits::Function<decltype(interface)>;
 	using TraitsImpl = bzd::typeTraits::Function<decltype(impl)>;
-	static_assert(bzd::typeTraits::isSame<typename TraitsInterface::Signature, typename TraitsImpl::Signature>, "Signature doesn't match its interface.");
+	static_assert(bzd::typeTraits::isSame<typename TraitsInterface::Signature, typename TraitsImpl::Signature>,
+				  "Signature doesn't match its interface.");
 	static_assert(TraitsInterface::isNoexcept && TraitsImpl::isNoexcept, "Interface must have the same exception guaranty.");
 	return static_cast<typename TraitsImpl::Class*>(obj);
 }
-}
+} // namespace impl
 
 } // namespace bzd

@@ -16,16 +16,19 @@ public:
 	constexpr Borrowed(const Borrowed& other) noexcept : Borrowed{*other.owner_} {}
 
 	constexpr Borrowed& operator=(Borrowed&&) noexcept = delete;
-	constexpr Borrowed(Borrowed&& other) noexcept : owner_{bzd::move(other.owner_)}
-	{
-		other.owner_ = nullptr;
-	}
+	constexpr Borrowed(Borrowed&& other) noexcept : owner_{bzd::move(other.owner_)} { other.owner_ = nullptr; }
 
 public:
 	constexpr T& get() noexcept { return static_cast<T&>(*owner_); }
 	constexpr const T& get() const noexcept { return static_cast<const T&>(*owner_); }
 
-	constexpr ~Borrowed() noexcept { if (owner_) { owner_->decrementCounter(); } }
+	constexpr ~Borrowed() noexcept
+	{
+		if (owner_)
+		{
+			owner_->decrementCounter();
+		}
+	}
 
 private:
 	Owner<T>* owner_;
@@ -49,13 +52,22 @@ public:
 public:
 	/// Borrow this object, take a reference to it but do not give away its ownership.
 	/// \{
-	[[nodiscard]] constexpr Borrowed<T> borrow() noexcept { incrementCounter(); return Borrowed{*this}; }
-	[[nodiscard]] constexpr Borrowed<const T> borrow() const noexcept { incrementCounter(); return Borrowed{*this}; }
+	[[nodiscard]] constexpr Borrowed<T> borrow() noexcept
+	{
+		incrementCounter();
+		return Borrowed{*this};
+	}
+	[[nodiscard]] constexpr Borrowed<const T> borrow() const noexcept
+	{
+		incrementCounter();
+		return Borrowed{*this};
+	}
 	/// \}
 
 	/// Ensure all resources have been returned before destroying the object.
-	constexpr ~Owner() noexcept {
-		const auto value{borrowedCounter_.load(MemoryOrder::relaxed)}; 
+	constexpr ~Owner() noexcept
+	{
+		const auto value{borrowedCounter_.load(MemoryOrder::relaxed)};
 		bzd::assert::isTrue(value == 0, "{} dangling borrowed resource(s)."_csv, value);
 	}
 
