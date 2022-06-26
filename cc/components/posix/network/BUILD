@@ -51,7 +51,7 @@ cc_library(
         "//cc/bzd/utility:to_underlying",
         "//cc/components/posix",
         "//cc/components/posix:error",
+        "//cc/components/posix:file_descriptor",
         "//cc/components/posix/network/address",
-        "//cc/components/posix:file_descriptor"
     ],
 )

@@ -1,6 +1,7 @@
 
 namespace bzd.platform;
 
+
 // Executes workload on a single or multiple logical cores.
 interface Executor {
 	/*

@@ -4,5 +4,5 @@
 
 TEST(FileDescriptor, basic)
 {
-    bzd::platform::posix::FileDescriptor fd{};
+	bzd::platform::posix::FileDescriptor fd{};
 }

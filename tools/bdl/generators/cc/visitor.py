@@ -98,10 +98,11 @@ class Transform:
 		assert self.composition
 		return expression.fqn in self.composition.infraFQNs
 
+
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-	output = template.render(bdl.tree, Transform(includes = includes))
+	output = template.render(bdl.tree, Transform(includes=includes))
 
 	return output
 
@@ -109,6 +110,6 @@ def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 def compositionCc(composition: Composition) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
-	output = template.render(composition, Transform(composition = composition))
+	output = template.render(composition, Transform(composition=composition))
 
 	return output

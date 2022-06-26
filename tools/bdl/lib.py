@@ -42,7 +42,10 @@ def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includ
 	output.write_text(data)
 
 
-def main(formatType: str, path: Path, includes: typing.List[Path], objectContext: typing.Optional[ObjectContext] = None) -> str:
+def main(formatType: str,
+	path: Path,
+	includes: typing.List[Path],
+	objectContext: typing.Optional[ObjectContext] = None) -> str:
 
 	bdl = preprocess(path=path, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl, includes=includes)

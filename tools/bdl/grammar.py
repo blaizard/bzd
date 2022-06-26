@@ -221,6 +221,7 @@ def makeGrammarUsing() -> Grammar:
 		])
 	]
 
+
 def makeGrammarExtern() -> Grammar:
 	"""
 	Generate a grammar for extern keyword, it accepts the following format:
@@ -229,13 +230,11 @@ def makeGrammarExtern() -> Grammar:
 
 	return [
 		GrammarItem(r"extern", {"category": "extern"}, [
-			GrammarItem(r"(?P<type>(:?interface|type))", Fragment, [
-				GrammarItem(_regexprName, Fragment, [
-					GrammarItem(r";", FragmentNewElement)
-				])
-			])
+		GrammarItem(r"(?P<type>(:?interface|type))", Fragment,
+		[GrammarItem(_regexprName, Fragment, [GrammarItem(r";", FragmentNewElement)])])
 		])
 	]
+
 
 def makeGrammarEnum() -> Grammar:
 	"""
@@ -307,5 +306,6 @@ class Parser(ParserBase):
 			trivial=True)
 
 		super().__init__(content,
-			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested + makeGrammarNested(nested, trivial=False),
+			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested +
+			makeGrammarNested(nested, trivial=False),
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

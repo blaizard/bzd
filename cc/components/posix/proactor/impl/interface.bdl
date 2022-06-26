@@ -2,6 +2,7 @@ use "cc/components/posix/proactor/interface.bdl"
 
 namespace bzd.platform.posix.impl;
 
+
 component Proactor : bzd.platform.posix.Proactor {
 interface:
 	method init() [init];

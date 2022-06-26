@@ -79,9 +79,10 @@ class Nested(Entity):
 			# Validates that the inheritance type is correct.
 			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 			if underlyingType.category in ["nested", "extern"]:
-				nestedType = underlyingType.type
+				nestedType = underlyingType.type  # type: ignore
 			else:
-				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(entity.underlyingType, underlyingType.category))
+				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
+					entity.underlyingType, underlyingType.category))
 			if self.type == TYPE_STRUCT:
 				self.assertTrue(condition=nestedType == TYPE_STRUCT,
 					message="A struct can only inherits from another struct, not '{}'.".format(nestedType))

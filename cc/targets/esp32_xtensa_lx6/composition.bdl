@@ -5,6 +5,7 @@ use "cc/components/generic/clock/null/interface.bdl"
 use "cc/components/xtensa/core/interface.bdl"
 
 
+
 composition {
 	// Core 0 is considered the "Protocol CPU", it runs most of ESP IDF services.
 	core0 = bzd.platform.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);

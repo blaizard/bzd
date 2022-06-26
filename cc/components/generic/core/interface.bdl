@@ -2,6 +2,7 @@ use "cc/bzd/platform/interfaces/core.bdl"
 
 namespace bzd.platform.generic;
 
+
 // Core abstraction for generic system.
 component Core : bzd.platform.Core {
 interface:

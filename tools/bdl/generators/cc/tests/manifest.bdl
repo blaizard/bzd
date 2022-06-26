@@ -1,6 +1,7 @@
 
 namespace bzd.test;
 
+
 // Simple enum
 enum Error
 {
