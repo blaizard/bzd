@@ -78,18 +78,19 @@ class Nested(Entity):
 
 			# Validates that the inheritance type is correct.
 			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			self.assertTrue(condition=underlyingType.category == "nested",
-				message="Inheritance can only be done from a nested class, not '{}'.".format(entity.underlyingType))
-			nestedType = typing.cast("Nested", underlyingType)
+			if underlyingType.category in ["nested", "extern"]:
+				nestedType = underlyingType.type
+			else:
+				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(entity.underlyingType, underlyingType.category))
 			if self.type == TYPE_STRUCT:
-				self.assertTrue(condition=nestedType.type == TYPE_STRUCT,
-					message="A struct can only inherits from another struct, not '{}'.".format(nestedType.type))
+				self.assertTrue(condition=nestedType == TYPE_STRUCT,
+					message="A struct can only inherits from another struct, not '{}'.".format(nestedType))
 			elif self.type == TYPE_INTERFACE:
-				self.assertTrue(condition=nestedType.type == TYPE_INTERFACE,
-					message="An interface can only inherits from another interface, not '{}'.".format(nestedType.type))
+				self.assertTrue(condition=nestedType == TYPE_INTERFACE,
+					message="An interface can only inherits from another interface, not '{}'.".format(nestedType))
 			elif self.type == TYPE_COMPONENT:
-				self.assertTrue(condition=nestedType.type == TYPE_INTERFACE,
-					message="A component can only inherits from interface(s), not '{}'.".format(nestedType.type))
+				self.assertTrue(condition=nestedType == TYPE_INTERFACE,
+					message="A component can only inherits from interface(s), not '{}'.".format(nestedType))
 			else:
 				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
 

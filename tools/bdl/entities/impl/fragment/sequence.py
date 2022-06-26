@@ -3,7 +3,7 @@ import typing
 from collections import defaultdict
 
 if typing.TYPE_CHECKING:
-	from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
+	from tools.bdl.entities.all import Expression, Extern, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
 
 
 class EntitySequence:
@@ -101,3 +101,11 @@ class EntitySequence:
 	@property
 	def useList(self) -> typing.List["Use"]:
 		return typing.cast(typing.List["Use"], self._filteredList("use"))
+
+	@property
+	def isExtern(self) -> bool:
+		return self._is("extern")
+
+	@property
+	def externList(self) -> typing.List["Extern"]:
+		return typing.cast(typing.List["Extern"], self._filteredList("extern"))

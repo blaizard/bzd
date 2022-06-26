@@ -36,7 +36,7 @@ varInitialized= MyType(   42 );
       method myMethod() -> Integer;
 }
 """)
-		output = formatBdl(bdl)
+		output = formatBdl(bdl, includes=[])
 
 		self.assertRegex(output, r"interface MyFy")
 		self.assertRegex(output, r"method myMethod")

@@ -4,6 +4,7 @@
 #include "cc/bzd/utility/to_underlying.hh"
 #include "cc/components/posix/network/address/family.hh"
 #include "cc/components/posix/posix.hh"
+//#include "cc/components/posix/file_descriptor.hh"
 
 #include <sys/socket.h>
 
@@ -49,7 +50,7 @@ constexpr SocketType operator|(const SocketType a, const SocketTypeOption b) noe
 	return static_cast<SocketType>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
 }
 
-class Socket : public bzd::Owner<Socket>
+class Socket
 {
 private:
 	constexpr explicit Socket(FileDescriptor fd) noexcept : fd_{fd} {}
@@ -69,7 +70,7 @@ public:
 
 private:
 	/// File descriptor associated with this socket.
-	FileDescriptor fd_{-1};
+	bzd::platform::posix::FileDescriptor fd_{-1};
 };
 
 } // namespace bzd::platform::posix::network

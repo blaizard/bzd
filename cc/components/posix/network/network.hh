@@ -9,6 +9,7 @@
 #include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 #include "cc/components/posix/network/interface.hh"
+#include "cc/components/posix/network/types.hh"
 
 #include <netdb.h>
 #include <sys/socket.h>

@@ -14,7 +14,7 @@ private:
 	{
 		connection = accept();
 		Stream stream{connection};
-		handler.onNewConnection(bzd::move(stream));
+		handler.handle(bzd::move(stream));
 	}
 };
 } // namespace bzd::platform::posix::network::tcp

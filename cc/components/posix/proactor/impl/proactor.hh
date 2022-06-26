@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/core/async.hh"
 #include "cc/components/posix/error.hh"
 #include "cc/components/posix/proactor/interface.hh"
 

@@ -52,6 +52,7 @@ struct Function<R (*)(Args...) noexcept>
 template <class R, class U, class... Args>
 struct Function<R (U::*)(Args...)>
 {
+	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
 	static constexpr BoolType isNoexcept = false;
 	static constexpr BoolType isConst = false;
@@ -60,6 +61,7 @@ struct Function<R (U::*)(Args...)>
 template <class R, class U, class... Args>
 struct Function<R (U::*)(Args...) noexcept>
 {
+	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
 	static constexpr BoolType isNoexcept = true;
 	static constexpr BoolType isConst = false;
@@ -68,6 +70,7 @@ struct Function<R (U::*)(Args...) noexcept>
 template <class R, class U, class... Args>
 struct Function<R (U::*)(Args...) const>
 {
+	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
 	static constexpr BoolType isNoexcept = false;
 	static constexpr BoolType isConst = true;
@@ -76,6 +79,7 @@ struct Function<R (U::*)(Args...) const>
 template <class R, class U, class... Args>
 struct Function<R (U::*)(Args...) const noexcept>
 {
+	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
 	static constexpr BoolType isNoexcept = true;
 	static constexpr BoolType isConst = true;

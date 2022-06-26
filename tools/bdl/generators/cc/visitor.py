@@ -98,7 +98,6 @@ class Transform:
 		assert self.composition
 		return expression.fqn in self.composition.infraFQNs
 
-
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
