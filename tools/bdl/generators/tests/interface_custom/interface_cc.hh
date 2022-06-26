@@ -6,10 +6,10 @@ template <class Impl>
 class MyInterface
 {
 public:
-    bzd::Int32Type add(const Int32Type& a, const Int32Type& b) noexcept
-    {
-        return bzd::impl::getMethod(this, &MyInterface::add, &Impl::add)->add(a, b);
-    }
+	bzd::Int32Type add(const Int32Type& a, const Int32Type& b) noexcept
+	{
+		return bzd::impl::getMethod(this, &MyInterface::add, &Impl::add)->add(a, b);
+	}
 };
 
-}
+} // namespace bzd::test

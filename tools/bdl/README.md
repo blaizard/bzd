@@ -127,6 +127,7 @@ to benefit from some features that are not available in the BDL language.
 Note, doing so, limits the interface to the composition only. Such interface cannot be accessed from the overall system.
 
 To define such interface, simply do the followng:
+
 ```bdl
 namespace bzd.example;
 
@@ -135,6 +136,7 @@ extern interface MyInterface;
 
 The user is then tasked to provide the C++ symbol within the namespace. Note the interface must use the CRTP pattern.
 Here is an example of what could be such interface:
+
 ```c++
 template <class Impl>
 class MyInterface
@@ -150,6 +152,7 @@ public:
 ```
 
 Alternatively virtual interfaces can also be used as follow:
+
 ```c++
 class MyInterface
 {
@@ -165,6 +168,7 @@ automatically by the code generator and it ensures that the object is used by it
 
 The code generation specialize the `bzd::Interface` type with the fully qualified name of the object type. It can then
 be used like this:
+
 ```c++
 bzd::Interface<"bzd.example.MyInterface">::cast(object);
 ```
