@@ -6,7 +6,7 @@ namespace bzd::test {
 class Implementation : public MyInterface
 {
 public:
-	bzd::Int32Type add(const Int32Type& a, const Int32Type& b) noexcept override { return a + b; }
+	bzd::Int32Type add(const bzd::Int32Type& a, const bzd::Int32Type& b) noexcept override { return a + b; }
 };
 
 } // namespace bzd::test
