@@ -8,6 +8,7 @@ from bzd.parser.visitor import Visitor
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.impl.types import TypeCategory
 
 TYPE_STRUCT = "struct"
 TYPE_COMPONENT = "component"
@@ -44,6 +45,10 @@ class Nested(Entity):
 	@property
 	def category(self) -> str:
 		return "nested"
+
+	@property
+	def typeCategory(self) -> TypeCategory:
+		return TypeCategory(self.type)
 
 	@property
 	def type(self) -> str:

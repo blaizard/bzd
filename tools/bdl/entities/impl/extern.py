@@ -7,7 +7,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
-
+from tools.bdl.entities.impl.types import TypeCategory
 
 class Extern(Entity):
 	"""
@@ -26,6 +26,10 @@ class Extern(Entity):
 	@property
 	def category(self) -> str:
 		return "extern"
+
+	@property
+	def typeCategory(self) -> TypeCategory:
+		return TypeCategory(self.type)
 
 	@property
 	def type(self) -> str:

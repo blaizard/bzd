@@ -123,7 +123,9 @@ class Entity:
 		"""
 		self.assertTrue(condition=self.underlyingType is not None, message="Underlying type is not available.")
 		assert self.underlyingType is not None
-		return resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+		entity = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+		assert entity.isRoleType, "The role of this entity must be a type."
+		return entity
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
