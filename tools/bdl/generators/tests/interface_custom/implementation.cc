@@ -6,7 +6,7 @@ namespace bzd::test {
 class Implementation : public MyInterface<Implementation>
 {
 public:
-	bzd::Int32Type add(const Int32Type& a, const Int32Type& b) noexcept { return a + b; }
+	bzd::Int32Type add(const bzd::Int32Type& a, const bzd::Int32Type& b) noexcept { return a + b; }
 };
 
 } // namespace bzd::test
