@@ -7,6 +7,7 @@ from bzd.parser.error import Error
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.types import TypeCategory
 
 
 class Using(Entity):
@@ -26,6 +27,10 @@ class Using(Entity):
 	@property
 	def category(self) -> str:
 		return "using"
+
+	@property
+	def typeCategory(self) -> TypeCategory:
+		return TypeCategory.using
 
 	@property
 	def contracts(self) -> Contracts:

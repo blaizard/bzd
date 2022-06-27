@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
+from tools.bdl.entities.impl.types import TypeCategory
+
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -46,6 +48,11 @@ class ParametersCommon(typing.Generic[T]):
 
 	def append(self, entity: "Expression", metadata: T) -> None:
 		self.list.append((entity, metadata))
+
+	def getUnderlyingTypeCetegories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
+		for param in self:
+			if not param.isValue:
+				yield param.getEntityUnderlyingTypeResolved(resolver).typeCategory
 
 	@staticmethod
 	def makeKey(entity: "Expression", index: int) -> str:

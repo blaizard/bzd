@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.types import TypeCategory
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
@@ -35,6 +36,10 @@ class Namespace(Entity):
 	@property
 	def category(self) -> str:
 		return "namespace"
+
+	@property
+	def typeCategory(self) -> TypeCategory:
+		return TypeCategory.namespace
 
 	@cached_property
 	def nameList(self) -> typing.List[str]:

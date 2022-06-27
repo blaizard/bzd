@@ -12,6 +12,7 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.types import TypeCategory
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -160,34 +161,7 @@ class Expression(Entity):
 			else:
 				parameters = Parameters(element=self.element)
 
-			# Merge its default values
-			argumentConfig = self.getConfigValues(resolver=resolver)
-			parameters.mergeDefaults(argumentConfig)
-
-			# Read the validation for the value. it comes in part from the direct underlying type, contract information
-			# directly associated with this expression do not apply to the current validation.
-			validation = self._makeValueValidation(resolver=resolver,
-				parameters=argumentConfig,
-				contracts=self.contracts)
-			if validation is not None:
-				arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
-				result = validation.validate(arguments, output="return")
-				Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
-
-			# Save the resolved parameters (values and templates), only after the validation is completed.
-			argumentValues = parameters.copy(template=False)
-			sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
-
-			argumentTemplates = parameters.copy(template=True)
-			sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
-				sequenceTemplates)
-
-			configValues = argumentConfig.copy(template=False)
-			sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
-			sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
+			self._resolveAndValidateParameters(resolver, resolvedTypeEntity, parameters)
 
 		# This is a type assignment, nothing to do here.
 		elif resolvedTypeEntity.isRoleValue:
@@ -197,6 +171,43 @@ class Expression(Entity):
 			self.error(message=f"Cannot create an expression from this element: {resolvedTypeEntity.fqn}")
 
 		super().resolve(resolver)
+
+	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity, parameters: Parameters) -> None:
+		"""Resolve and validate tthe parameters passed into argument."""
+
+		# Merge its default values
+		argumentConfig = self.getConfigValues(resolver=resolver)
+		parameters.mergeDefaults(argumentConfig)
+
+		# Validate the type of arguments.
+		parameterTypeCategories = {*parameters.getUnderlyingTypeCetegories(resolver)}
+		if TypeCategory.component in parameterTypeCategories:
+			self.assertTrue(condition=resolvedTypeEntity.typeCategory in [TypeCategory.component], message=f"Components are not allowed for this type.")
+
+		# Read the validation for the value. it comes in part from the direct underlying type, contract information
+		# directly associated with this expression do not apply to the current validation.
+		validation = self._makeValueValidation(resolver=resolver,
+			parameters=argumentConfig,
+			contracts=self.contracts)
+		if validation is not None:
+			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+			result = validation.validate(arguments, output="return")
+			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+
+		# Save the resolved parameters (values and templates), only after the validation is completed.
+		argumentValues = parameters.copy(template=False)
+		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
+
+		argumentTemplates = parameters.copy(template=True)
+		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
+			sequenceTemplates)
+
+		configValues = argumentConfig.copy(template=False)
+		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
+		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
 
 	def _makeValueValidation(self, resolver: "Resolver", parameters: Parameters,
 		contracts: Contracts) -> typing.Optional[Validation[SchemaDict]]:

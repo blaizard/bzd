@@ -10,6 +10,7 @@ from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.impl.types import TypeCategory
 
 
 class Method(Entity):
@@ -33,6 +34,10 @@ class Method(Entity):
 	@property
 	def category(self) -> str:
 		return "method"
+
+	@property
+	def typeCategory(self) -> TypeCategory:
+		return TypeCategory.method
 
 	@property
 	def virtual(self) -> bool:
@@ -63,6 +68,11 @@ class Method(Entity):
 			entity = maybeType.resolve(resolver=resolver)
 
 		self.parameters.resolve(resolver=resolver)
+
+		# Validate the type of arguments.
+		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCetegories(resolver)}
+		self.assertTrue(condition=TypeCategory.component not in parameterTypeCategories, message=f"Components are not allowed as method parameter.")
+		self.assertTrue(condition=TypeCategory.interface not in parameterTypeCategories, message=f"Interfaces are not allowed as method parameter.")
 
 		super().resolve(resolver)
 
