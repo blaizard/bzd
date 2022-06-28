@@ -84,7 +84,7 @@ template <>
 struct Interface<"{{ data.fqn }}">
 {
 	template <class Impl>
-	[[nodiscard]] static auto& cast(Impl& impl) noexcept
+	[[nodiscard]] static constexpr auto& cast(Impl& impl) noexcept
 	{
 		return ::bzd::impl::getInterface<{{ namespace | namespaceToStr }}::{{ data.name }}>(impl);
 	}

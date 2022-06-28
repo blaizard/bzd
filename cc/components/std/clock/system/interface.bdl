@@ -1,10 +1,9 @@
 
 namespace bzd.platform.std.clock;
 
+interface DummySystem {}
 
-component System {
+component System : DummySystem {
 interface:
 	
 }
-
-

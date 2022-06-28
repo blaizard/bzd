@@ -1,10 +1,9 @@
 
 namespace bzd.platform.std.clock;
 
+interface DummySteady {}
 
-component Steady {
+component Steady : DummySteady {
 interface:
 	
 }
-
-

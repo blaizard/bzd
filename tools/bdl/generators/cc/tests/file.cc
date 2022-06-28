@@ -17,18 +17,6 @@ TEST(File, Compile)
 	}
 
 	{
-		bzd::test::MyInterfaceA<int>::NestedA nestedA{21};
-		ASSERT_EQ(nestedA.a, 21);
-	}
-
-	{
-		bzd::test::MyInterfaceB<int>::NestedB nestedB{3};
-		ASSERT_EQ(nestedB.b, 3);
-		bzd::test::MyInterfaceB<int>::NestedA nestedAWithinB{6};
-		ASSERT_EQ(nestedAWithinB.a, 6);
-	}
-
-	{
 		bzd::test::MyList listA;
 		ASSERT_EQ(listA.capacity(), 1U);
 		bzd::test::MyListCapacity listB;

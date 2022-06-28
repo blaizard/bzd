@@ -121,6 +121,9 @@ class Entity:
 		"""
 		Get the entity related to type after resolve.
 		"""
+		if self.underlyingType is None:
+			print(self)
+			print(self.element)
 		self.assertTrue(condition=self.underlyingType is not None, message="Underlying type is not available.")
 		assert self.underlyingType is not None
 		entity = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
@@ -289,12 +292,19 @@ class Entity:
 		self.markAsResolved()
 
 	def resolve(self, resolver: "Resolver") -> None:
+		"""Generic validation for all entities."""
+
+		# Validate the contracts.
 		maybeSchema = self.contracts.validationForEntity
 		if maybeSchema:
 			resultValidate = Validation(schema=[maybeSchema], args={
 				"resolver": resolver
 			}).validate([self], output="return")
 			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
+
+		# Resolve the types from a config sequence if any.
+		for entity in self.configRaw:
+			entity.type.resolve(resolver=resolver)
 
 	def error(self, message: str, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element, message=message, throw=throw)

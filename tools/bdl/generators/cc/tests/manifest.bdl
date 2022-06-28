@@ -22,22 +22,14 @@ using MyList = Vector<Integer>;
 using MyListCapacity = Vector<Integer> [capacity(23)];
 // Simple interface
 interface MyInterfaceA {
-	struct NestedA {
-		a = Integer;
-		
-	}
+	method hello(world = String);
 	
 	
 }
 
 // Test interface with inheritance
 interface MyInterfaceB : MyInterfaceA {
-	struct NestedB {
-		b = Integer;
-		
-	}
+	value = Integer;
 	
 	
 }
-
-

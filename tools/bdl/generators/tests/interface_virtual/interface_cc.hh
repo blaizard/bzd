@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/platform/types.hh"
+
 namespace bzd::test {
 
 class MyInterface

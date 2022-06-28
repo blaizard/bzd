@@ -2,13 +2,12 @@ use "cc/components/posix/proactor/interface.bdl"
 
 namespace bzd.platform.posix;
 
+interface DummyIn {}
 
-component In {
+component In : DummyIn {
 interface:
 	
 config:
 	proactor = Void;
 	
 }
-
-

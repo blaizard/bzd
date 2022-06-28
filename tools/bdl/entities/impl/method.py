@@ -40,10 +40,6 @@ class Method(Entity):
 		return TypeCategory.method
 
 	@property
-	def virtual(self) -> bool:
-		return self.contracts.has("virtual")
-
-	@property
 	def isType(self) -> bool:
 		return self.element.isAttr("type")
 

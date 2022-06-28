@@ -17,6 +17,9 @@ cc_library(
     hdrs = [
         "interface_cc.hh",
     ],
+    deps = [
+        "//cc/bzd/platform:types"
+    ]
 )
 
 bzd_cc_test(
