@@ -1,14 +1,10 @@
 use "cc/components/posix/proactor/interface.bdl"
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.posix;
 
-
-component Out {
-interface:
-	
+component Out : bzd.OStream {
 config:
 	proactor = Proactor;
 	
 }
-
-

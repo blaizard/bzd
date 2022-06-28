@@ -38,13 +38,13 @@ constexpr auto* getMethod(T* obj, Interface interface, Impl impl) noexcept
 /// \param impl The implementation object.
 /// \{
 template <template <class> class T, class Impl>
-constexpr auto& getInterface(Impl& impl)
+constexpr auto& getInterface(Impl& impl) noexcept
 {
 	return static_cast<T<Impl>&>(impl);
 }
 
 template <class T, class Impl>
-constexpr auto& getInterface(Impl& impl)
+constexpr auto& getInterface(Impl& impl) noexcept
 {
 	return static_cast<T&>(impl);
 }

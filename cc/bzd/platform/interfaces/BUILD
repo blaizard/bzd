@@ -15,3 +15,14 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+bdl_library(
+    name = "stream",
+    srcs = [
+        "stream.bdl",
+    ],
+    deps = [
+        "//cc/bzd/core:channel",
+    ],
+    visibility = ["//visibility:public"],
+)

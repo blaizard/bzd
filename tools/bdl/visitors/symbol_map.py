@@ -20,7 +20,7 @@ class Resolver:
 
 	def __init__(self,
 		symbols: "SymbolMap",
-		namespace: typing.List[str],
+		namespace: typing.List[str] = [],
 		exclude: typing.Optional[typing.List[str]] = None,
 		this: typing.Optional[str] = None) -> None:
 		self.symbols = symbols
@@ -156,6 +156,8 @@ class SymbolMap:
 		"""
 		Insert a builtin entry to the mix.
 		"""
+		# Resolve builtins before instering them.
+		entity.resolveMemoized(resolver=self.makeResolver())
 		ElementBuilder.cast(entity.element, ElementBuilder).setAttr("fqn", name)
 		self.builtins[name] = {"c": "builtin", "p": "", "e": entity.element.serialize()}
 		self.entities[name] = entity
