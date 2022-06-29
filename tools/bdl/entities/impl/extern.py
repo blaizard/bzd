@@ -9,6 +9,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.types import TypeCategory
 
+
 class Extern(Entity):
 	"""
 	A extern statement is used to pull a symbol coming from an external file (not interpretable by BDL).

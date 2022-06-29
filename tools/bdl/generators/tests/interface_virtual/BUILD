@@ -18,8 +18,8 @@ cc_library(
         "interface_cc.hh",
     ],
     deps = [
-        "//cc/bzd/platform:types"
-    ]
+        "//cc/bzd/platform:types",
+    ],
 )
 
 bzd_cc_test(

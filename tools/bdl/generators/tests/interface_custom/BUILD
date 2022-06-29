@@ -19,8 +19,8 @@ cc_library(
     ],
     deps = [
         "//cc/bzd/platform:types",
-        "//tools/bdl/generators/cc/adapter:types"
-    ]
+        "//tools/bdl/generators/cc/adapter:types",
+    ],
 )
 
 bzd_cc_test(

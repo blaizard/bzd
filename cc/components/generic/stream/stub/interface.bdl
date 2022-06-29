@@ -1,10 +1,15 @@
 
 namespace bzd.platform.generic.stream;
 
-interface DummyStub {}
+
+interface DummyStub {
+	
+}
 
 // Generic stream stub that does nothing.
 component Stub : DummyStub {
 interface:
 	
 }
+
+

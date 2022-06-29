@@ -1,9 +1,14 @@
 
 namespace bzd.platform.generic.clock;
 
-interface DummyNull {}
+
+interface DummyNull {
+	
+}
 
 component Null : DummyNull {
 interface:
 	
 }
+
+

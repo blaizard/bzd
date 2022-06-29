@@ -24,12 +24,12 @@ using MyListCapacity = Vector<Integer> [capacity(23)];
 interface MyInterfaceA {
 	method hello(world = String);
 	
-	
 }
 
 // Test interface with inheritance
 interface MyInterfaceB : MyInterfaceA {
 	value = Integer;
 	
-	
 }
+
+
