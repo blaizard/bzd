@@ -14,13 +14,13 @@ public: // Constructors
 	constexpr In(Proactor& proactor) noexcept : proactor_{proactor}
 	{
 		// Check if the terminal is available from this process
-		if (::tcgetpgrp(STDIN_FILENO) != ::getpgrp())
+		if (::tcgetpgrp(in_.native()) != ::getpgrp())
 		{
 			return;
 		}
 
 		// Save the old context.
-		::tcgetattr(STDIN_FILENO, &old_);
+		::tcgetattr(in_.native(), &old_);
 
 		// Create the new one.
 		current_ = old_;
@@ -28,7 +28,7 @@ public: // Constructors
 		current_.c_lflag &= ~ICANON;
 		// Set no echo mode.
 		current_.c_lflag &= ~ECHO;
-		::tcsetattr(STDIN_FILENO, TCSANOW, &current_);
+		::tcsetattr(in_.native(), TCSANOW, &current_);
 
 		// Stream properly initalized.
 		init_ = true;
@@ -38,7 +38,7 @@ public: // Constructors
 	{
 		if (init_)
 		{
-			::tcsetattr(STDIN_FILENO, TCSANOW, &old_);
+			::tcsetattr(in_.native(), TCSANOW, &old_);
 		}
 	}
 
@@ -53,7 +53,7 @@ public: // API
 		{
 			co_return bzd::error::Failure("Empty buffer passed to read(...)."_csv);
 		}
-		co_return (co_await proactor_.read(STDIN_FILENO, data));
+		co_return (co_await proactor_.read(in_.borrow(), data));
 	}
 
 private:
@@ -61,5 +61,6 @@ private:
 	bzd::BoolType init_{false};
 	termios old_{};
 	termios current_{};
+	FileDescriptorAccessor in_{STDIN_FILENO};
 };
 } // namespace bzd::platform::posix

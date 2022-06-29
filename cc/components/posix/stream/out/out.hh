@@ -13,12 +13,13 @@ public:
 
 	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
 	{
-		const auto size = co_await !proactor_.write(STDOUT_FILENO, data);
+		const auto size = co_await !proactor_.write(out_.borrow(), data);
 		::std::flush(::std::cout);
 		co_return size;
 	}
 
 private:
 	Proactor& proactor_;
+	FileDescriptorAccessor out_{STDOUT_FILENO};
 };
 } // namespace bzd::platform::posix

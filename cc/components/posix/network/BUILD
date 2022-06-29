@@ -47,7 +47,6 @@ cc_library(
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/utility:owner",
         "//cc/bzd/utility:to_underlying",
         "//cc/components/posix",
         "//cc/components/posix:error",

@@ -24,7 +24,7 @@ bzd_cc_library(
         ":move",
         ":numeric_limits",
         ":offset_of",
-        ":owner",
+        ":ownership",
         ":ratio",
         ":scope_guard",
         ":signal",
@@ -250,9 +250,9 @@ cc_library(
 )
 
 cc_library(
-    name = "owner",
+    name = "ownership",
     hdrs = [
-        "owner.hh",
+        "ownership.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -7,6 +7,9 @@ bdl_library(
         "posix.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":file_descriptor"
+    ]
 )
 
 cc_library(
@@ -28,10 +31,13 @@ cc_library(
     hdrs = [
         "file_descriptor.hh",
     ],
+    srcs = [
+        "file_descriptor.cc",
+    ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "//cc/bzd/utility:owner",
+        "//cc/bzd/utility:ownership",
     ],
 )
