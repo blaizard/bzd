@@ -2,9 +2,11 @@
 
 #include "cc/bzd/core/assert.hh"
 
+#include <iostream>
+
 namespace bzd {
 template <class T>
-class Owner;
+class Ownership;
 
 ///
 template <class T>
@@ -13,14 +15,21 @@ class Borrowed
 public:
 	constexpr Borrowed(T& owner) noexcept : owner_{&owner} { owner_->incrementCounter(); }
 	constexpr Borrowed& operator=(const Borrowed&) noexcept = delete;
-	constexpr Borrowed(const Borrowed& other) noexcept : Borrowed{*other.owner_} {}
+	constexpr Borrowed(const Borrowed& other) noexcept : Borrowed{static_cast<T&>(*other.owner_)} {}
 
 	constexpr Borrowed& operator=(Borrowed&&) noexcept = delete;
 	constexpr Borrowed(Borrowed&& other) noexcept : owner_{bzd::move(other.owner_)} { other.owner_ = nullptr; }
 
 public:
-	constexpr T& get() noexcept { return static_cast<T&>(*owner_); }
-	constexpr const T& get() const noexcept { return static_cast<const T&>(*owner_); }
+	/// Accesses the owner.
+	///
+	/// \return Returns a pointer to the owner.
+	[[nodiscard]] constexpr const T* operator->() const noexcept { return static_cast<const T*>(owner_); }
+
+	/// Accesses the owner.
+	///
+	/// \return Returns a pointer to the owner.
+	[[nodiscard]] constexpr T* operator->() noexcept { return static_cast<T*>(owner_); }
 
 	constexpr ~Borrowed() noexcept
 	{
@@ -31,41 +40,39 @@ public:
 	}
 
 private:
-	Owner<T>* owner_;
+	Ownership<T>* owner_;
 };
 
-/// Class owning a ressource.
+/// Class providing ownership to a ressource.
 ///
 /// It can borrow its resources to others and must ensure that all resources
 /// have been returned before being destroyed.
 /// It can also transfer its ownership iff its resource is not currently borrowed.
 template <class T>
-class Owner
+class Ownership
 {
 public:
-	constexpr Owner() noexcept = default;
-	constexpr Owner(const Owner&) noexcept = delete;
-	constexpr Owner& operator=(const Owner&) noexcept = delete;
-	constexpr Owner(Owner&&) noexcept = default;
-	constexpr Owner& operator=(Owner&&) noexcept = default;
+	Ownership() = default;
+	constexpr Ownership(const Ownership&) noexcept = delete;
+	constexpr Ownership& operator=(const Ownership&) noexcept = delete;
+	constexpr Ownership(Ownership&&) noexcept = default;
+	constexpr Ownership& operator=(Ownership&&) noexcept = default;
 
 public:
 	/// Borrow this object, take a reference to it but do not give away its ownership.
 	/// \{
 	[[nodiscard]] constexpr Borrowed<T> borrow() noexcept
 	{
-		incrementCounter();
-		return Borrowed{*this};
+		return static_cast<T&>(*this);
 	}
 	[[nodiscard]] constexpr Borrowed<const T> borrow() const noexcept
 	{
-		incrementCounter();
-		return Borrowed{*this};
+		return static_cast<const T&>(*this);
 	}
 	/// \}
 
 	/// Ensure all resources have been returned before destroying the object.
-	constexpr ~Owner() noexcept
+	constexpr ~Ownership() noexcept
 	{
 		const auto value{borrowedCounter_.load(MemoryOrder::relaxed)};
 		bzd::assert::isTrue(value == 0, "{} dangling borrowed resource(s)."_csv, value);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/utility/owner.hh"
 #include "cc/bzd/utility/to_underlying.hh"
 #include "cc/components/posix/network/address/family.hh"
 #include "cc/components/posix/posix.hh"
@@ -10,6 +9,7 @@
 
 namespace bzd::platform::posix::network {
 
+/// Type for a socket.
 enum class SocketType
 {
 	/// Provides sequenced, reliable, two-way, connection-based
@@ -45,6 +45,7 @@ enum class SocketTypeOption
 	closeOnExec = SOCK_CLOEXEC
 };
 
+/// Bit or operator to combine socket type with optional option(s).
 constexpr SocketType operator|(const SocketType a, const SocketTypeOption b) noexcept
 {
 	return static_cast<SocketType>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
@@ -53,10 +54,10 @@ constexpr SocketType operator|(const SocketType a, const SocketTypeOption b) noe
 class Socket
 {
 private:
-	constexpr explicit Socket(FileDescriptor fd) noexcept : fd_{fd} {}
+	constexpr explicit Socket(int fd) noexcept : fd_{fd} {}
 
 public:
-	constexpr Socket(Socket&& socket) noexcept : fd_{socket.fd_} { socket.fd_ = -1; }
+	constexpr Socket(Socket&& socket) noexcept : fd_{bzd::move(socket.fd_)} { socket.fd_ = -1; }
 	constexpr Socket& operator=(Socket&&) noexcept = delete;
 
 	/// Create a socket.
@@ -64,13 +65,13 @@ public:
 
 public:
 	/// Get it associated file descriptor object.
-	constexpr FileDescriptor getFileDescriptor() const noexcept { return fd_; }
+	constexpr FileDescriptor getFileDescriptor() const noexcept { return fd_.borrow(); }
 
 	~Socket() noexcept;
 
 private:
 	/// File descriptor associated with this socket.
-	bzd::platform::posix::FileDescriptor fd_{-1};
+	bzd::platform::posix::FileDescriptorOwner fd_{};
 };
 
 } // namespace bzd::platform::posix::network
