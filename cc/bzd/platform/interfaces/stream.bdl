@@ -1,5 +1,8 @@
+
 namespace bzd;
 
 extern interface IStream;
 extern interface OStream;
 extern interface IOStream;
+
+

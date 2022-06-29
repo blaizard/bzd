@@ -21,8 +21,8 @@ bdl_library(
     srcs = [
         "stream.bdl",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core:channel",
     ],
-    visibility = ["//visibility:public"],
 )

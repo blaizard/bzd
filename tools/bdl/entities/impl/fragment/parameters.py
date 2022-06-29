@@ -49,10 +49,14 @@ class ParametersCommon(typing.Generic[T]):
 	def append(self, entity: "Expression", metadata: T) -> None:
 		self.list.append((entity, metadata))
 
-	def getUnderlyingTypeCetegories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
+	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
+		"""Get the typeCategory of the resolved type of the parameters."""
+
 		for param in self:
 			if not param.isValue:
-				yield param.getEntityUnderlyingTypeResolved(resolver).typeCategory
+				entityType = param.getEntityUnderlyingTypeResolved(resolver)
+				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
+				yield entityType.typeCategory  # type: ignore
 
 	@staticmethod
 	def makeKey(entity: "Expression", index: int) -> str:

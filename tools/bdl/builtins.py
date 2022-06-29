@@ -23,6 +23,6 @@ BuiltinVector = Builtin(
 BuiltinCallable = Builtin(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [
-	BuiltinVoid, BuiltinAny, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinString, BuiltinSpan, BuiltinResult,
-	BuiltinAsync, BuiltinVector, BuiltinCallable
+	BuiltinVoid, BuiltinAny, BuiltinInteger, BuiltinFloat, BuiltinBoolean, BuiltinByte, BuiltinString, BuiltinSpan,
+	BuiltinResult, BuiltinAsync, BuiltinVector, BuiltinCallable
 ]

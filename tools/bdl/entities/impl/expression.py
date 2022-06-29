@@ -172,7 +172,8 @@ class Expression(Entity):
 
 		super().resolve(resolver)
 
-	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity, parameters: Parameters) -> None:
+	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
+		parameters: Parameters) -> None:
 		"""Resolve and validate tthe parameters passed into argument."""
 
 		# Merge its default values
@@ -180,15 +181,15 @@ class Expression(Entity):
 		parameters.mergeDefaults(argumentConfig)
 
 		# Validate the type of arguments.
-		parameterTypeCategories = {*parameters.getUnderlyingTypeCetegories(resolver)}
+		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
 		if TypeCategory.component in parameterTypeCategories:
-			self.assertTrue(condition=resolvedTypeEntity.typeCategory in [TypeCategory.component], message=f"Components are not allowed for this type.")
+			typeCategory = resolvedTypeEntity.typeCategory  # type: ignore
+			self.assertTrue(condition=typeCategory in [TypeCategory.component],
+				message=f"Components are not allowed for this type.")
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(resolver=resolver,
-			parameters=argumentConfig,
-			contracts=self.contracts)
+		validation = self._makeValueValidation(resolver=resolver, parameters=argumentConfig, contracts=self.contracts)
 		if validation is not None:
 			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")

@@ -304,6 +304,9 @@ class Entity:
 
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
+			entity.assertTrue(condition=entity.category == "expression",
+				message=f"Configuration can only contain expressions, not '{entity.category}'.")
+			entity = typing.cast("Expression", entity)
 			entity.type.resolve(resolver=resolver)
 
 	def error(self, message: str, throw: bool = True) -> str:

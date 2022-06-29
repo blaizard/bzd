@@ -1,9 +1,14 @@
 
 namespace bzd.platform.std;
 
-interface DummyOut {}
+
+interface DummyOut {
+	
+}
 
 component Out : DummyOut {
 interface:
 	
 }
+
+

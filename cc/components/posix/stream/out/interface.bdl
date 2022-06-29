@@ -3,8 +3,13 @@ use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.posix;
 
+
 component Out : bzd.OStream {
+interface:
+	
 config:
 	proactor = Proactor;
 	
 }
+
+
