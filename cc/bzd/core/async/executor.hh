@@ -80,9 +80,6 @@ public:
 private:
 	friend class bzd::Executor<Executable>;
 
-	template <class>
-	friend class bzd::Test;
-
 	constexpr void updateTick() noexcept { ++tick_; }
 
 	[[nodiscard]] constexpr bzd::Optional<Executable&> popContinuation() noexcept
