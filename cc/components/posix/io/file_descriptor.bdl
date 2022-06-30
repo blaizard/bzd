@@ -1,10 +1,7 @@
 
 namespace bzd.platform.posix;
 
-
-// File descriptor (fd): a unique identifier for a file or input/output resource.
-// This represents a non-owning file descriptor.
 extern type FileDescriptor;
-// This represents an owning file descriptor, meaning that on desctuction the file descriptor
-// will be automatically closed.
 extern type FileDescriptorOwner;
+
+

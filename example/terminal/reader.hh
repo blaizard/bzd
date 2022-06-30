@@ -8,11 +8,8 @@ template <bzd::Size N>
 class Reader
 {
 public: // Constructor.
-	constexpr Reader(bzd::IStream& in,
-					 bzd::OStream& out,
-					 bzd::Span<const bzd::Byte> separators = bzd::Span<const bzd::Byte>{}) noexcept :
-		in_{in},
-		out_{out}, separators_{separators}
+	constexpr Reader(bzd::IStream& in, bzd::OStream& out, bzd::Span<const bzd::Byte> separators = bzd::Span<const bzd::Byte>{}) noexcept :
+		in_{in}, out_{out}, separators_{separators}
 	{
 	}
 

@@ -59,21 +59,12 @@ public:
 public:
 	/// Borrow this object, take a reference to it but do not give away its ownership.
 	/// \{
-	[[nodiscard]] constexpr Borrowed<T> borrow() noexcept
-	{
-		return static_cast<T&>(*this);
-	}
-	[[nodiscard]] constexpr Borrowed<const T> borrow() const noexcept
-	{
-		return static_cast<const T&>(*this);
-	}
+	[[nodiscard]] constexpr Borrowed<T> borrow() noexcept { return static_cast<T&>(*this); }
+	[[nodiscard]] constexpr Borrowed<const T> borrow() const noexcept { return static_cast<const T&>(*this); }
 	/// \}
 
 	/// Get the number of times this resource is currently borrowed.
-	[[nodiscard]] constexpr bzd::UInt32 getBorrowedCounter() const noexcept
-	{
-		return borrowedCounter_.load(MemoryOrder::relaxed);
-	}
+	[[nodiscard]] constexpr bzd::UInt32 getBorrowedCounter() const noexcept { return borrowedCounter_.load(MemoryOrder::relaxed); }
 
 	/// Ensure all resources have been returned before destroying the object.
 	constexpr ~Ownership() noexcept

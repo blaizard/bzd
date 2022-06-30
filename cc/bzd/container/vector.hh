@@ -21,9 +21,7 @@ public: // Traits.
 	using ValueType = T;
 
 public:
-	constexpr explicit Vector(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
-	{
-	}
+	constexpr explicit Vector(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity} {}
 
 	/// \brief Adds a new element at the end of the vector, after its current last
 	/// element.

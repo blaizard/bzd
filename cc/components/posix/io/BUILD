@@ -7,6 +7,6 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/components/posix/io/impl:file_descriptor"
-    ]
+        "//cc/components/posix/io/impl:file_descriptor",
+    ],
 )

@@ -18,10 +18,7 @@ namespace bzd::algorithm {
 /// \return If the elements in the two ranges are equal, returns true. Otherwise returns false.
 template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
 requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
-[[nodiscard]] constexpr bzd::Bool equal(Iterator1 first1,
-											Iterator1 last1,
-											Iterator2 first2,
-											BinaryPredicate predicate = BinaryPredicate{})
+[[nodiscard]] constexpr bzd::Bool equal(Iterator1 first1, Iterator1 last1, Iterator2 first2, BinaryPredicate predicate = BinaryPredicate{})
 {
 	static_assert(
 		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
