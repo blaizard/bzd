@@ -32,7 +32,7 @@ class ExecutableMetadata
 {
 public: // Types.
 	/// The executable type can only be set once.
-	enum class Type : bzd::UInt8Type
+	enum class Type : bzd::UInt8
 	{
 		unset,
 		active,
@@ -58,8 +58,8 @@ class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*mu
 {
 public: // Traits.
 	using Executor = bzd::Executor<Executable>;
-	using IdType = UInt32Type;
-	using TickType = UInt32Type;
+	using IdType = UInt32;
+	using TickType = UInt32;
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
 	using Continuation = bzd::Variant<bzd::monostate, Executable*, OnTerminateCallback>;
 
@@ -147,9 +147,9 @@ public:
 	}
 
 public: // Statistics.
-	[[nodiscard]] constexpr SizeType getQueueCount() const noexcept { return queue_.size(); }
-	[[nodiscard]] constexpr SizeType getRunningCount() const noexcept { return context_.size(); }
-	[[nodiscard]] constexpr SizeType getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
+	[[nodiscard]] constexpr Size getQueueCount() const noexcept { return queue_.size(); }
+	[[nodiscard]] constexpr Size getRunningCount() const noexcept { return context_.size(); }
+	[[nodiscard]] constexpr Size getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
 
 public:
 	/// Run all the workload currently in the queue.
@@ -213,7 +213,7 @@ public:
 		} while (expected != Status::idle);
 	}
 
-	constexpr BoolType isRunning() const noexcept { return status_.load() == Status::running; }
+	constexpr Bool isRunning() const noexcept { return status_.load() == Status::running; }
 
 	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
 
@@ -253,7 +253,7 @@ private:
 
 		{
 			// Update the maximum of scheduler running concurrently.
-			SizeType maybeMax, expected;
+			Size maybeMax, expected;
 			do
 			{
 				maybeMax = context_.size();
@@ -290,8 +290,8 @@ private:
 				// Show the stack usage
 				// void* stack = __builtin_frame_address(0);
 				// static void* initial_stack = &stack;
-				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPtrType>(initial_stack) -
-				// reinterpret_cast<bzd::IntPtrType>(stack)) << std::endl;
+				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPointer>(initial_stack) -
+				// reinterpret_cast<bzd::IntPointer>(stack)) << std::endl;
 
 				return executable.valueMutable().get();
 			}
@@ -309,7 +309,7 @@ private:
 	/// Keep contexts about the current runnning scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Maxium concurrent scheduler running at the same time.
-	bzd::Atomic<SizeType> maxRunningCount_{0};
+	bzd::Atomic<Size> maxRunningCount_{0};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
 	/// Current status of the executor.
@@ -346,7 +346,7 @@ public:
 
 	constexpr bzd::Optional<CancellationToken&> getCancellationToken() noexcept { return cancel_; }
 
-	constexpr BoolType isCanceled() const noexcept
+	constexpr Bool isCanceled() const noexcept
 	{
 		if (cancel_.empty())
 		{

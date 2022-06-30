@@ -6,8 +6,8 @@
 /// Helper macros to provide concept-like functionality before c++20
 
 /// Defines a new concept.
-#define CONCEPT inline constexpr bzd::BoolType
+#define CONCEPT inline constexpr bzd::Bool
 
 /// Mimics the requires keyword using SFINAE technics
-#define REQUIRES(...) typename bzd::typeTraits::EnableIf<__VA_ARGS__, bzd::BoolType> = true
+#define REQUIRES(...) typename bzd::typeTraits::EnableIf<__VA_ARGS__, bzd::Bool> = true
 #define REQUIRES_SPECIALIZATION(...) bzd::typeTraits::EnableIf<__VA_ARGS__, void>

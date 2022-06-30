@@ -31,17 +31,17 @@ public: // Constructors/assignments.
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 public: // Size.
-	[[nodiscard]] constexpr bzd::BoolType empty() const noexcept { return size() == 0; }
-	[[nodiscard]] constexpr bzd::BoolType full() const noexcept { return size() >= capacity(); }
-	[[nodiscard]] constexpr bzd::SizeType size() const noexcept { return (write_ - read_); }
-	[[nodiscard]] constexpr bzd::SizeType capacity() const noexcept { return storage_.size(); }
-	[[nodiscard]] constexpr bzd::BoolType overrun() const noexcept { return overrun_; }
+	[[nodiscard]] constexpr bzd::Bool empty() const noexcept { return size() == 0; }
+	[[nodiscard]] constexpr bzd::Bool full() const noexcept { return size() >= capacity(); }
+	[[nodiscard]] constexpr bzd::Size size() const noexcept { return (write_ - read_); }
+	[[nodiscard]] constexpr bzd::Size capacity() const noexcept { return storage_.size(); }
+	[[nodiscard]] constexpr bzd::Bool overrun() const noexcept { return overrun_; }
 
 public: // Accessors.
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept { return at(index); }
-	[[nodiscard]] constexpr auto& at(const SizeType index) noexcept { return storage_.dataMutable()[(read_ + index) % capacity()]; }
-	[[nodiscard]] constexpr auto& at(const SizeType index) const noexcept { return storage_.data()[(read_ + index) % capacity()]; }
+	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& at(const Size index) noexcept { return storage_.dataMutable()[(read_ + index) % capacity()]; }
+	[[nodiscard]] constexpr auto& at(const Size index) const noexcept { return storage_.data()[(read_ + index) % capacity()]; }
 
 	/// Get the spans container over the reading memory region.
 	///
@@ -87,14 +87,14 @@ public: // Accessors.
 
 public: // Modifiers.
 	/// Consume the ring buffer from the tail.
-	constexpr void consume(const bzd::SizeType n) noexcept
+	constexpr void consume(const bzd::Size n) noexcept
 	{
 		bzd::assert::isTrue(read_ + n <= write_, "Consumer reads passed written pointer.");
 		read_ += n;
 	}
 
 	/// Produce new data in the ring buffer.
-	constexpr void produce(const bzd::SizeType n) noexcept
+	constexpr void produce(const bzd::Size n) noexcept
 	{
 		write_ += n;
 		if (size() > capacity())
@@ -128,14 +128,14 @@ public: // Modifiers.
 
 private: // Variables.
 	StorageType storage_{};
-	bzd::SizeType write_{0};
-	bzd::SizeType read_{0};
-	bzd::BoolType overrun_{false};
+	bzd::Size write_{0};
+	bzd::Size read_{0};
+	bzd::Bool overrun_{false};
 };
 } // namespace bzd::impl
 
 namespace bzd {
-template <class T, SizeType N>
+template <class T, Size N>
 class RingBuffer : public impl::RingBuffer<T, impl::FixedStorage<T, N>>
 {
 	static_assert((N & (N - 1)) == 0, "The capacity of a RingBuffer must be a power of 2.");

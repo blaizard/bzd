@@ -21,7 +21,7 @@ public: // Traits.
 	using ValueType = T;
 
 public:
-	constexpr explicit Vector(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
+	constexpr explicit Vector(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity}
 	{
 	}
 
@@ -54,7 +54,7 @@ public:
 	/// \brief Returns the maximum number of elements the vector can hold.
 	///
 	/// \return Maximum number of element this vector can hold.
-	constexpr SizeType capacity() const noexcept { return capacity_; }
+	constexpr Size capacity() const noexcept { return capacity_; }
 
 	/// \brief Removes all elements.
 	constexpr void clear() noexcept { resize(0); }
@@ -62,10 +62,10 @@ public:
 	/// \brief Change the size of the vector.
 	///
 	/// \param n The new size. Note, it must a be lower or equal to the capacity.
-	constexpr void resize(const bzd::SizeType n) noexcept { this->storage_.sizeMutable() = (n < capacity_) ? n : capacity_; }
+	constexpr void resize(const bzd::Size n) noexcept { this->storage_.sizeMutable() = (n < capacity_) ? n : capacity_; }
 
 protected:
-	const SizeType capacity_;
+	const Size capacity_;
 };
 } // namespace bzd::impl
 
@@ -75,7 +75,7 @@ using Vector = impl::Vector<T, impl::NonOwningStorage<T>>;
 }
 
 namespace bzd {
-template <class T, SizeType N>
+template <class T, Size N>
 class Vector : public interface::Vector<T>
 {
 public: // Traits.
@@ -109,7 +109,7 @@ private:
 	T data_[N]{};
 };
 
-template <class T, SizeType N>
+template <class T, Size N>
 class VectorConstexpr : public impl::Vector<T, impl::ResizeableStorage<T, N>>
 {
 public: // Traits.

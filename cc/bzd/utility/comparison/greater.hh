@@ -6,6 +6,6 @@ namespace bzd {
 template <class T>
 struct Greater
 {
-	constexpr BoolType operator()(const T& lhs, const T& rhs) const { return lhs > rhs; }
+	constexpr Bool operator()(const T& lhs, const T& rhs) const { return lhs > rhs; }
 };
 } // namespace bzd

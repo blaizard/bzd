@@ -1,5 +1,5 @@
 namespace bzd::platform {
-template <SizeType stackSize>
+template <Size stackSize>
 class Thread
 {
 public:

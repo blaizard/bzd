@@ -13,7 +13,7 @@ namespace bzd::algorithm {
 /// \param[in] predicate The unary predicate.
 template <class Iterator, class UnaryPredicate>
 requires concepts::forwardIterator<Iterator>
-[[nodiscard]] constexpr bzd::BoolType anyOf(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
+[[nodiscard]] constexpr bzd::Bool anyOf(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
 {
 	return (bzd::algorithm::findIf(first, last, predicate) != last);
 }

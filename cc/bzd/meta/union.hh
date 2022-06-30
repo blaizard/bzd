@@ -16,7 +16,7 @@ class UnionTag
 {
 };
 
-template <SizeType Index, class T, class... Ts>
+template <Size Index, class T, class... Ts>
 union UnionTrivial {
 public: // Traits
 	using Self = UnionTrivial<Index, T, Ts...>;
@@ -39,12 +39,12 @@ public:
 	{
 	}
 
-	template <SizeType I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
+	template <Size I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
 	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <SizeType I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
+	template <Size I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
 	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
@@ -108,7 +108,7 @@ protected:
 	UnionTrivial<Index + 1, Ts...> next_;
 };
 
-template <SizeType Index, class T, class... Ts>
+template <Size Index, class T, class... Ts>
 union UnionNonTrivial {
 public: // Traits
 	using Self = UnionNonTrivial<Index, T, Ts...>;
@@ -135,12 +135,12 @@ public:
 	{
 	}
 
-	template <SizeType I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
+	template <Size I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
 	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <SizeType I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
+	template <Size I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
 	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
@@ -204,11 +204,11 @@ protected:
 	UnionNonTrivial<Index + 1, Ts...> next_;
 };
 
-template <SizeType Index>
+template <Size Index>
 union UnionTrivial<Index, UnionTag> {
 };
 
-template <SizeType Index>
+template <Size Index>
 union UnionNonTrivial<Index, UnionTag> {
 };
 } // namespace bzd::meta::impl

@@ -11,9 +11,9 @@ template <class... Ts>
 struct TypeList
 {
 	using type = TypeList;
-	static constexpr const SizeType size = sizeof...(Ts);
+	static constexpr const Size size = sizeof...(Ts);
 
-	template <SizeType N>
+	template <Size N>
 	using ChooseNth = ChooseNth<N, Ts...>;
 
 	template <class T>

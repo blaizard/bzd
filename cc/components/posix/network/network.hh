@@ -83,7 +83,7 @@ public:
 	}
 
 	/*
-		bzd::Async<SizeType> write(const bzd::Span<const T> data) noexcept override
+		bzd::Async<Size> write(const bzd::Span<const T> data) noexcept override
 		{
 			::write();
 		}

@@ -62,7 +62,7 @@ requires concepts::pointer<T>
 struct Iterator<T>
 {
 	using Category = typeTraits::ContiguousTag;
-	using DifferenceType = bzd::Int32Type;
+	using DifferenceType = bzd::Int32;
 	using ValueType = typeTraits::RemovePointer<T>;
 };
 

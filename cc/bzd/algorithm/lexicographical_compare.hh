@@ -20,7 +20,7 @@ namespace bzd::algorithm {
 /// \return true if the first range is lexicographically less than the second.
 template <class Iterator1, class Iterator2, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator1>::ValueType>>
 requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
-[[nodiscard]] constexpr bzd::BoolType lexicographicalCompare(
+[[nodiscard]] constexpr bzd::Bool lexicographicalCompare(
 	Iterator1 first1, Iterator1 last1, Iterator2 first2, Iterator2 last2, Compare comparison = Compare{})
 {
 	static_assert(

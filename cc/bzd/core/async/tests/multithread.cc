@@ -24,9 +24,9 @@ template <class Result>
 	return bzd::apply([](auto&... asyncs) -> bool { return (asyncs.hasValue() || ...); }, bzd::forward<Result>(result));
 }
 
-bzd::Async<> cancellationWorkload(const bzd::SizeType counter)
+bzd::Async<> cancellationWorkload(const bzd::Size counter)
 {
-	for (bzd::SizeType current = 0; current < counter; ++current)
+	for (bzd::Size current = 0; current < counter; ++current)
 	{
 		co_await bzd::async::yield();
 	}
@@ -34,9 +34,9 @@ bzd::Async<> cancellationWorkload(const bzd::SizeType counter)
 }
 
 template <ForkType forkType>
-bzd::Async<> cancellationNestedWorkload(const bzd::SizeType counter)
+bzd::Async<> cancellationNestedWorkload(const bzd::Size counter)
 {
-	for (bzd::SizeType current = 0; current < counter; ++current)
+	for (bzd::Size current = 0; current < counter; ++current)
 	{
 		auto promise1 = cancellationWorkload(counter);
 		auto promise2 = cancellationNestedWorkload<forkType>(counter / 2);
@@ -73,9 +73,9 @@ bzd::Async<> cancellationNestedWorkload(const bzd::SizeType counter)
 }
 
 template <ForkType forkType, class Function>
-void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const bzd::SizeType iterations, const Function counterGenerator)
+void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd::Size iterations, const Function counterGenerator)
 {
-	for (bzd::SizeType iteration = 0; iteration < iterations; ++iteration)
+	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{
 		bzd::coroutine::impl::Executor executor{};
 		bzd::Array<std::thread, 10> threads;
@@ -117,7 +117,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::SizeType), const
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
-			if (static_cast<bzd::BoolType>(counterGenerator() % 2))
+			if (static_cast<bzd::Bool>(counterGenerator() % 2))
 			{
 				auto promise = bzd::async::any(bzd::move(promise1),
 											   bzd::move(promise2),

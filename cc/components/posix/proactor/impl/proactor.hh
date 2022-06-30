@@ -37,7 +37,7 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<bzd::Span<bzd::ByteType>> read(const FileDescriptor fd, const bzd::Span<bzd::ByteType> data) noexcept
+	bzd::Async<bzd::Span<bzd::Byte>> read(const FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept
 	{
 		{
 			EpollData epollData{fd};
@@ -58,13 +58,13 @@ public:
 		{
 			co_return bzd::error::Posix("read");
 		}
-		co_return data.subSpan(0, static_cast<bzd::SizeType>(size));
+		co_return data.subSpan(0, static_cast<bzd::Size>(size));
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<bzd::SizeType> write(const FileDescriptor fd, const bzd::Span<const bzd::ByteType> data) noexcept
+	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{
-		bzd::SizeType size{0u};
+		bzd::Size size{0u};
 		while (size < data.size())
 		{
 			const auto result = ::write(fd.native(), &data.at(size), data.size() - size);

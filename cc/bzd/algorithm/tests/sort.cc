@@ -6,16 +6,16 @@
 
 TEST(Sort, Base)
 {
-	for (bzd::SizeType i = 0; i < 100; ++i)
+	for (bzd::Size i = 0; i < 100; ++i)
 	{
-		bzd::Array<bzd::UInt32Type, 100> array;
+		bzd::Array<bzd::UInt32, 100> array;
 		test.fillRandom(array);
 
 		// Sort.
 		bzd::algorithm::sort(array.begin(), array.end());
 
 		// Verify.
-		bzd::UInt32Type previous = 0;
+		bzd::UInt32 previous = 0;
 		for (const auto& value : array)
 		{
 			EXPECT_GE(value, previous);
@@ -26,16 +26,16 @@ TEST(Sort, Base)
 
 TEST(Sort, CustomComparator)
 {
-	for (bzd::SizeType i = 0; i < 100; ++i)
+	for (bzd::Size i = 0; i < 100; ++i)
 	{
-		bzd::Array<bzd::UInt32Type, 100> array;
+		bzd::Array<bzd::UInt32, 100> array;
 		test.fillRandom(array);
 
 		// Sort.
-		bzd::algorithm::sort(array, bzd::Greater<bzd::UInt32Type>{});
+		bzd::algorithm::sort(array, bzd::Greater<bzd::UInt32>{});
 
 		// Verify.
-		bzd::UInt32Type previous = bzd::NumericLimits<bzd::UInt32Type>::max();
+		bzd::UInt32 previous = bzd::NumericLimits<bzd::UInt32>::max();
 		for (const auto& value : array)
 		{
 			EXPECT_LE(value, previous);
@@ -46,10 +46,10 @@ TEST(Sort, CustomComparator)
 
 TEST_CONSTEXPR_BEGIN(Sort, Constexpr)
 {
-	bzd::Array<bzd::UInt32Type, 10> array{9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+	bzd::Array<bzd::UInt32, 10> array{9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 	bzd::algorithm::sort(array);
 
-	bzd::UInt32Type previous = 0;
+	bzd::UInt32 previous = 0;
 	for (const auto& value : array)
 	{
 		EXPECT_GE(value, previous);

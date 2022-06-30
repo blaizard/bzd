@@ -27,10 +27,10 @@ namespace {
 class AsyncSignalSafeStream : public bzd::OStream
 {
 public:
-	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept final
+	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept final
 	{
 		constexpr int fd = STDERR_FILENO;
-		co_return static_cast<bzd::SizeType>(::write(fd, data.data(), data.size()));
+		co_return static_cast<bzd::Size>(::write(fd, data.data(), data.size()));
 	}
 };
 
@@ -121,7 +121,7 @@ bzd::StringView exec(const char* cmd)
 	return bzd::StringView{result};
 }
 
-bzd::StringView readLine(bzd::StringView str, bzd::SizeType& start)
+bzd::StringView readLine(bzd::StringView str, bzd::Size& start)
 {
 	const auto end = str.find('\n', start);
 	if (end != bzd::npos)
@@ -137,7 +137,7 @@ bzd::StringView readLine(bzd::StringView str, bzd::SizeType& start)
 
 struct DemangledBuffer
 {
-	static constexpr bzd::SizeType initialSize = 1024;
+	static constexpr bzd::Size initialSize = 1024;
 
 	DemangledBuffer() noexcept
 	{
@@ -155,7 +155,7 @@ struct DemangledBuffer
 	}
 
 	char* data{nullptr};
-	bzd::SizeType size{0};
+	bzd::Size size{0};
 };
 // Pre-allocate data for demangling
 DemangledBuffer demangleBuffer{};
@@ -181,7 +181,7 @@ struct SymbolicInfo
 	bzd::StringView path{};
 	bzd::StringView symbol{};
 	void* address{};
-	bzd::IntPtrType offset{};
+	bzd::IntPointer offset{};
 };
 
 static void* getSelfBaseAddress()
@@ -203,13 +203,13 @@ SymbolicInfo makeSymbolicInfo(void* address)
 	{
 		if (info.dli_saddr)
 		{
-			symbolicInfo.offset = reinterpret_cast<bzd::IntPtrType>(address) - reinterpret_cast<bzd::IntPtrType>(info.dli_saddr);
+			symbolicInfo.offset = reinterpret_cast<bzd::IntPointer>(address) - reinterpret_cast<bzd::IntPointer>(info.dli_saddr);
 		}
 		else if (extraInfo)
 		{
 			const ::link_map& linkMap = reinterpret_cast<const ::link_map&>(extraInfo);
 			// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-			symbolicInfo.offset = reinterpret_cast<bzd::IntPtrType>(address) - reinterpret_cast<bzd::IntPtrType>(linkMap.l_ld);
+			symbolicInfo.offset = reinterpret_cast<bzd::IntPointer>(address) - reinterpret_cast<bzd::IntPointer>(linkMap.l_ld);
 		}
 	}
 
@@ -249,12 +249,12 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 			toString(command,
 					 "exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"_csv,
 					 info.path,
-					 reinterpret_cast<bzd::IntPtrType>(info.address),
+					 reinterpret_cast<bzd::IntPointer>(info.address),
 					 info.offset);
 
 			{
 				const auto result = exec(command.data());
-				bzd::SizeType start = 0;
+				bzd::Size start = 0;
 				const auto line1 = readLine(result, start);
 				const auto line2 = readLine(result, start);
 				const auto line3 = readLine(result, start);
@@ -308,7 +308,7 @@ void sigHandler(const int sig)
 bool installStackTrace()
 {
 	// Specify that the signal handler will be allocated onto the alternate signal stack.
-	static bzd::Array<bzd::UInt8Type, SIGSTKSZ> stack;
+	static bzd::Array<bzd::UInt8, SIGSTKSZ> stack;
 
 	stack_t signalStack{};
 	signalStack.ss_size = stack.size();

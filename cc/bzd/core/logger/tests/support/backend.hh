@@ -4,11 +4,11 @@
 
 namespace bzd::test {
 
-template <bzd::SizeType SIZE>
+template <bzd::Size SIZE>
 class Logger : public bzd::OStream
 {
 public:
-	Async<SizeType> write(const Span<const ByteType> data) noexcept override
+	Async<Size> write(const Span<const Byte> data) noexcept override
 	{
 		for (const auto b : data)
 		{
@@ -20,14 +20,14 @@ public:
 	/**
 	 * Check that the next data are matching the one passed into argument.
 	 */
-	Result<> match(const Span<const ByteType> data) noexcept
+	Result<> match(const Span<const Byte> data) noexcept
 	{
 		if (write_ - read_ > SIZE)
 		{
 			return bzd::error::make();
 		}
 
-		SizeType i = 0;
+		Size i = 0;
 		for (; read_ < write_ && i < data.size(); ++read_, ++i)
 		{
 			if (buffer_.at(read_ % SIZE) != data.at(i))
@@ -54,9 +54,9 @@ public:
 	}
 
 private:
-	bzd::SizeType read_{0};
-	bzd::SizeType write_{0};
-	bzd::Array<bzd::ByteType, SIZE> buffer_;
+	bzd::Size read_{0};
+	bzd::Size write_{0};
+	bzd::Array<bzd::Byte, SIZE> buffer_;
 };
 
 } // namespace bzd::test

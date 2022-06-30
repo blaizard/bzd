@@ -10,7 +10,7 @@ bzd::Result<> DigitalOutputEsp32XtensaLx6::connect()
 	return bzd::nullresult;
 }
 
-bzd::Result<SizeType> DigitalOutputEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
+bzd::Result<Size> DigitalOutputEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8>& data) noexcept
 {
 	if (data[0])
 	{

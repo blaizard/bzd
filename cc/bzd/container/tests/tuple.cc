@@ -177,9 +177,9 @@ TEST(ContainerTuple, Iterator)
 
 TEST(ContainerTuple, IteratorLoop)
 {
-	bzd::Tuple<bzd::UInt32Type, bzd::Float32Type, bzd::Int8Type> tuple{bzd::inPlace, 12u, bzd::Float32Type{5.32}, bzd::Int8Type{-21}};
+	bzd::Tuple<bzd::UInt32, bzd::Float32, bzd::Int8> tuple{bzd::inPlace, 12u, bzd::Float32{5.32}, bzd::Int8{-21}};
 
-	bzd::Float32Type sum{0};
+	bzd::Float32 sum{0};
 	for (auto& value : tuple)
 	{
 		value.match([&](auto& v) { sum += v; });

@@ -6,16 +6,16 @@
 namespace bzd::meta::impl {
 
 // Class delcaration.
-template <SizeType index, class... Ts>
+template <Size index, class... Ts>
 class Tuple;
 
 // Base case.
-template <SizeType index>
+template <Size index>
 class Tuple<index>
 {
 };
 
-template <SizeType index, class T, class... Ts>
+template <Size index, class T, class... Ts>
 class Tuple<index, T, Ts...> : public Tuple<index + 1, Ts...>
 {
 public:
@@ -31,13 +31,13 @@ class Tuple : public impl::Tuple<0, Ts...>
 {
 public:
 	/// Get the type given a specific index.
-	template <SizeType index>
+	template <Size index>
 	using Get = bzd::meta::ChooseNth<index, Ts...>;
 
 	/// Get the number of entry of this tuple.
 	///
 	/// \return The number of entry.
-	static constexpr SizeType size() noexcept { return sizeof...(Ts); }
+	static constexpr Size size() noexcept { return sizeof...(Ts); }
 };
 
 } // namespace bzd::meta

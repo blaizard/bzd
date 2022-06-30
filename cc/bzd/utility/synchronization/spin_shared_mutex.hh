@@ -22,7 +22,7 @@ public: // API.
 	// Locks the mutex, blocks if the mutex is not available.
 	constexpr void lock() noexcept
 	{
-		UInt32Type expected;
+		UInt32 expected;
 		do
 		{
 			expected = 0;
@@ -34,7 +34,7 @@ public: // API.
 
 	constexpr void lockShared() noexcept
 	{
-		UInt32Type expected;
+		UInt32 expected;
 		do
 		{
 			expected = lock_.load(MemoryOrder::relaxed) & 0xffff0000;
@@ -45,6 +45,6 @@ public: // API.
 	constexpr void unlockShared() noexcept { lock_ -= 0x10000; }
 
 private:
-	Atomic<UInt32Type> lock_{0};
+	Atomic<UInt32> lock_{0};
 };
 } // namespace bzd

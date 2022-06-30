@@ -64,7 +64,7 @@ TEST(NonOwningForwardList, simple)
 		}
 		EXPECT_EQ(list.size(), 10U);
 
-		bzd::SizeType expected{1};
+		bzd::Size expected{1};
 		for (const auto& elt : list)
 		{
 			EXPECT_EQ(elt.value_, expected);

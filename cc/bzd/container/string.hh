@@ -21,7 +21,7 @@ protected:
 	using StringView = bzd::impl::StringView<bzd::typeTraits::AddConst<T>>;
 
 public:
-	constexpr String(const Storage& storage, const bzd::SizeType capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity} {}
+	constexpr String(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}}, capacity_{capacity} {}
 
 	// Copy/move constructor/assignment.
 	constexpr String(const Self&) noexcept = default;
@@ -30,14 +30,14 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	// Converter
-	constexpr SizeType append(const bzd::StringView& str) noexcept { return append(str.data(), str.size()); }
-	constexpr SizeType append(const Self& str) noexcept { return append(str.data(), str.size()); }
-	constexpr SizeType append(const T c) noexcept { return append(&c, 1); }
-	constexpr SizeType append(const T* data, const SizeType n) noexcept
+	constexpr Size append(const bzd::StringView& str) noexcept { return append(str.data(), str.size()); }
+	constexpr Size append(const Self& str) noexcept { return append(str.data(), str.size()); }
+	constexpr Size append(const T c) noexcept { return append(&c, 1); }
+	constexpr Size append(const T* data, const Size n) noexcept
 	{
 		// Handles overflows
-		const SizeType sizeLeft = capacity_ - this->size() - 1;
-		const SizeType actualN = bzd::min(sizeLeft, n);
+		const Size sizeLeft = capacity_ - this->size() - 1;
+		const Size actualN = bzd::min(sizeLeft, n);
 		bzd::algorithm::copy(data, data + actualN, &this->at(this->size()));
 		this->storage_.sizeMutable() += actualN;
 		this->at(this->size()) = '\0';
@@ -46,11 +46,11 @@ public:
 	}
 
 	// Fill
-	constexpr SizeType append(const SizeType n, const T c) noexcept
+	constexpr Size append(const Size n, const T c) noexcept
 	{
-		const SizeType sizeLeft = capacity_ - this->size() - 1;
-		const SizeType actualN = bzd::min(sizeLeft, n);
-		for (SizeType i = 0; i < actualN; ++i)
+		const Size sizeLeft = capacity_ - this->size() - 1;
+		const Size actualN = bzd::min(sizeLeft, n);
+		for (Size i = 0; i < actualN; ++i)
 		{
 			this->at(this->size() + i) = c;
 		}
@@ -61,17 +61,17 @@ public:
 	}
 
 	template <class U>
-	constexpr SizeType assign(const U& data) noexcept
+	constexpr Size assign(const U& data) noexcept
 	{
 		clear();
 		return append(data);
 	}
 
-	constexpr SizeType capacity() const noexcept { return capacity_ - 1; }
+	constexpr Size capacity() const noexcept { return capacity_ - 1; }
 
 	constexpr void clear() noexcept { resize(0); }
 
-	constexpr void resize(const SizeType n) noexcept
+	constexpr void resize(const Size n) noexcept
 	{
 		this->storage_.sizeMutable() = (n < capacity_ - 1) ? n : capacity_ - 1;
 		this->at(this->size()) = '\0';
@@ -92,7 +92,7 @@ public:
 	}
 
 public:
-	const bzd::SizeType capacity_{};
+	const bzd::Size capacity_{};
 };
 } // namespace bzd::impl
 
@@ -101,7 +101,7 @@ using String = impl::String<char, impl::NonOwningStorage<char>>;
 }
 
 namespace bzd {
-template <SizeType N>
+template <Size N>
 class String : public interface::String
 {
 protected:
@@ -113,7 +113,7 @@ protected:
 public:
 	constexpr String() noexcept : Parent{StorageType{data_, 0}, N + 1} { data_[0] = '\0'; }
 	constexpr String(const bzd::StringView& str) noexcept : String() { append(str); }
-	constexpr String(const SizeType n, const char c) noexcept : String() { append(n, c); }
+	constexpr String(const Size n, const char c) noexcept : String() { append(n, c); }
 
 	template <class T>
 	constexpr Self& operator=(const T& data) noexcept

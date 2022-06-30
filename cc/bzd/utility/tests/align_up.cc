@@ -21,15 +21,15 @@ TEST(AlignUp, Base)
 TEST(AlignUp, TypeIntegrals)
 {
 	{
-		const auto result = bzd::alignUp<2>(static_cast<bzd::UInt8Type>(13));
+		const auto result = bzd::alignUp<2>(static_cast<bzd::UInt8>(13));
 		EXPECT_EQ(result, 14U);
 	}
 	{
-		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt16Type>(13));
+		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt16>(13));
 		EXPECT_EQ(result, 16U);
 	}
 	{
-		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt64Type>(13));
+		const auto result = bzd::alignUp<8>(static_cast<bzd::UInt64>(13));
 		EXPECT_EQ(result, 16U);
 	}
 }
@@ -45,7 +45,7 @@ TEST(AlignUp, TypePointers)
 		EXPECT_EQ(result, reinterpret_cast<int*>(0x327640));
 	}
 	{
-		const auto result = bzd::alignUp<64>(reinterpret_cast<bzd::UInt64Type*>(0x799493));
-		EXPECT_EQ(result, reinterpret_cast<bzd::UInt64Type*>(0x7994c0));
+		const auto result = bzd::alignUp<64>(reinterpret_cast<bzd::UInt64*>(0x799493));
+		EXPECT_EQ(result, reinterpret_cast<bzd::UInt64*>(0x7994c0));
 	}
 }

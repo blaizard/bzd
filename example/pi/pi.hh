@@ -22,12 +22,12 @@ protected:
 };
 
 // function to launch in parallel.
-bzd::Async<bzd::UInt64Type> worker(bzd::UInt64Type total)
+bzd::Async<bzd::UInt64> worker(bzd::UInt64 total)
 {
 	Rnd rnd{};
-	bzd::UInt64Type n = 0;
+	bzd::UInt64 n = 0;
 
-	for (bzd::UInt64Type s = 0; s < total; s++)
+	for (bzd::UInt64 s = 0; s < total; s++)
 	{
 		double x = rnd();
 		double y = rnd();
@@ -40,16 +40,16 @@ bzd::Async<bzd::UInt64Type> worker(bzd::UInt64Type total)
 	co_return n;
 }
 
-template <bzd::SizeType nbCores>
+template <bzd::Size nbCores>
 bzd::Async<double> calculatePi()
 {
-	const bzd::UInt64Type goal = 100000000;
+	const bzd::UInt64 goal = 100000000;
 
-	bzd::Array<bzd::SizeType, nbCores> goals;
+	bzd::Array<bzd::Size, nbCores> goals;
 
-	for (bzd::SizeType i = 0; i < nbCores; i++)
+	for (bzd::Size i = 0; i < nbCores; i++)
 	{
-		bzd::UInt64Type goal_per_thread = goal / nbCores;
+		bzd::UInt64 goal_per_thread = goal / nbCores;
 		// Correct on last one to get the correct total.
 		if (i == nbCores - 1)
 		{
@@ -64,7 +64,7 @@ bzd::Async<double> calculatePi()
 
 	const auto result = co_await bzd::async::all(promise0, promise1);
 
-	bzd::UInt64Type sum = 0;
+	bzd::UInt64 sum = 0;
 	bzd::constexprForContainerInc(result, [&sum](auto& item) { sum += item.value(); });
 
 	const double pi = 4 * sum / static_cast<double>(goal);

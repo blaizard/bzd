@@ -16,11 +16,11 @@ public:
 		};
 
 		Mode mode = Mode::UNDEFINED;
-		bzd::UInt8Type sda = 0;
-		bzd::UInt8Type scl = 0;
+		bzd::UInt8 sda = 0;
+		bzd::UInt8 scl = 0;
 		bool sdaPullup = false;
 		bool sclPullup = false;
-		bzd::UInt32Type frequency = 100000;
+		bzd::UInt32 frequency = 100000;
 	};
 };
 } // namespace bzd::io

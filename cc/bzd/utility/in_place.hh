@@ -3,11 +3,11 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd {
-template <SizeType I>
+template <Size I>
 struct InPlaceIndex
 {
 };
-template <SizeType I>
+template <Size I>
 constexpr InPlaceIndex<I> inPlaceIndex{};
 
 template <class T>

@@ -10,7 +10,7 @@ class StringStream : public bzd::OStream
 public:
 	constexpr StringStream(bzd::interface::String& str) : string_(str) {}
 
-	bzd::Async<SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
+	bzd::Async<Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
 		co_return string_.append(reinterpret_cast<const char*>(data.data()), data.size());
 	}
@@ -29,7 +29,7 @@ using StringStream = bzd::impl::StringStream;
 }
 
 namespace bzd {
-template <SizeType N>
+template <Size N>
 class StringStream : public bzd::interface::StringStream
 {
 public:

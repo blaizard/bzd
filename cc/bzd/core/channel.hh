@@ -18,7 +18,7 @@ public:
 	///
 	/// \param[in] data The data to be sent via this output channel.
 	/// \return The amount of data written.
-	virtual bzd::Async<SizeType> write(const bzd::Span<const T> data) noexcept = 0;
+	virtual bzd::Async<Size> write(const bzd::Span<const T> data) noexcept = 0;
 
 	/// Write data to an output channel.
 	/// The data represented by a spans is a collection of contiguous segments,
@@ -26,10 +26,10 @@ public:
 	///
 	/// \param[in] data The data to be sent via this output channel.
 	/// \return The amount of data written.
-	template <SizeType N>
-	bzd::Async<SizeType> write(const bzd::Spans<const T, N> data) noexcept
+	template <Size N>
+	bzd::Async<Size> write(const bzd::Spans<const T, N> data) noexcept
 	{
-		SizeType size = 0;
+		Size size = 0;
 		for (const auto& span : data.array())
 		{
 			auto result = co_await write(span);
@@ -72,7 +72,7 @@ class IOChannel
 {
 };
 
-using OStream = OChannel<ByteType>;
-using IStream = IChannel<ByteType>;
-using IOStream = IOChannel<ByteType>;
+using OStream = OChannel<Byte>;
+using IStream = IChannel<Byte>;
+using IOStream = IOChannel<Byte>;
 } // namespace bzd

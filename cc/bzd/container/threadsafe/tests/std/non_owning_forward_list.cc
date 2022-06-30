@@ -198,8 +198,8 @@ TEST(NonOwningForwardList, RemoveWhileRemoveRight)
 	removeWhileRemoveRightDoWork<bzd::test::InjectPoint5>();
 }
 
-constexpr bzd::SizeType nbIterations = 100000;
-constexpr bzd::SizeType nbElements = 10;
+constexpr bzd::Size nbIterations = 100000;
+constexpr bzd::Size nbElements = 10;
 
 template <class T>
 struct Data
@@ -207,9 +207,9 @@ struct Data
 	std::vector<T>& elements;
 
 	bzd::test::NonOwningForwardList<T> list{};
-	bzd::Atomic<bzd::UInt16Type> inserted[nbElements]{};
-	bzd::Atomic<bzd::SizeType> insertion{0};
-	bzd::Atomic<bzd::SizeType> removal{0};
+	bzd::Atomic<bzd::UInt16> inserted[nbElements]{};
+	bzd::Atomic<bzd::Size> insertion{0};
+	bzd::Atomic<bzd::Size> removal{0};
 
 	void sanityCheck()
 	{
@@ -226,7 +226,7 @@ struct Data
 		bzd::ignore = result;
 
 		// Ensure everything is empty
-		for (bzd::SizeType i = 0; i < nbElements; ++i)
+		for (bzd::Size i = 0; i < nbElements; ++i)
 		{
 			EXPECT_EQ(inserted[i].load(), 0);
 		}
@@ -282,7 +282,7 @@ TEST(NonOwningForwardList, InsertionStressMultiContainer)
 
 	// Elements
 	static std::vector<bzd::test::ListElementMultiContainer> elements;
-	for (bzd::SizeType i = 0; i < nbElements; ++i)
+	for (bzd::Size i = 0; i < nbElements; ++i)
 	{
 		elements.push_back(bzd::test::ListElementMultiContainer{i});
 	}
@@ -310,7 +310,7 @@ TEST(NonOwningForwardList, InsertionStressMultiContainer)
 	worker7.join();
 	worker8.join();
 
-	for (bzd::SizeType i = 0; i < nbElements; ++i)
+	for (bzd::Size i = 0; i < nbElements; ++i)
 	{
 		std::cout << i << ": ";
 		data1.list.printNode(&elements[i]);
@@ -334,7 +334,7 @@ TEST(NonOwningForwardList, InsertionStress)
 
 	// Elements
 	static std::vector<bzd::test::ListElement> elements;
-	for (bzd::SizeType i = 0; i < nbElements; ++i)
+	for (bzd::Size i = 0; i < nbElements; ++i)
 	{
 		elements.push_back(bzd::test::ListElement{i});
 	}
@@ -361,7 +361,7 @@ TEST(NonOwningForwardList, InsertionStress)
 	worker7.join();
 	worker8.join();
 
-	for (bzd::SizeType i = 0; i < nbElements; ++i)
+	for (bzd::Size i = 0; i < nbElements; ++i)
 	{
 		std::cout << i << ": ";
 		data1.list.printNode(&elements[i]);
@@ -376,7 +376,7 @@ TEST(NonOwningForwardList, InsertionStress)
 
 TEST(NonOwningForwardList, PopToDiscard)
 {
-	for (bzd::SizeType iteration = 0; iteration < 1000; ++iteration)
+	for (bzd::Size iteration = 0; iteration < 1000; ++iteration)
 	{
 		bzd::Array<std::thread, 10> threads;
 		bzd::test::NonOwningForwardList<bzd::test::ListElementDiscard> data{};

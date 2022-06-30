@@ -22,7 +22,7 @@ TEST(ToString, Integer)
 	EXPECT_STREQ(str.data(), "0");
 
 	str.clear();
-	toString(str, static_cast<bzd::Int64Type>(1234567890));
+	toString(str, static_cast<bzd::Int64>(1234567890));
 	EXPECT_EQ(str.size(), 10U);
 	EXPECT_STREQ(str.data(), "1234567890");
 }

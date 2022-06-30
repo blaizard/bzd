@@ -19,8 +19,8 @@ public: // API.
 	[[nodiscard]] constexpr Value& get() const noexcept { return *value_; }
 
 public: // Comparison operators.
-	[[nodiscard]] constexpr bzd::BoolType operator==(const Self& other) const noexcept { return (value_ == other.value_); }
-	[[nodiscard]] constexpr bzd::BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
+	[[nodiscard]] constexpr bzd::Bool operator==(const Self& other) const noexcept { return (value_ == other.value_); }
+	[[nodiscard]] constexpr bzd::Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 private:
 	Value* value_;

@@ -35,8 +35,8 @@ class IntegerType:
 			else:
 				Error.handleFromElement(element=entity.element, message="Value too large, max supported is 64-bit.")
 		if isSigned:
-			return "bzd::Int{}Type".format(bits), nested
-		return "bzd::UInt{}Type".format(bits), nested
+			return "bzd::Int{}".format(bits), nested
+		return "bzd::UInt{}".format(bits), nested
 
 
 class FloatType:
@@ -51,10 +51,10 @@ class VoidType:
 	transform = "void"
 
 
-class ByteType:
+class Byte:
 
 	constexpr = True
-	transform = "bzd::ByteType"
+	transform = "bzd::Byte"
 
 
 class ResultType:
@@ -125,7 +125,7 @@ knownTypes: typing.Dict[str, typing.Any] = {
 	"Integer": IntegerType,
 	"Float": FloatType,
 	"Void": VoidType,
-	"Byte": ByteType,
+	"Byte": Byte,
 	"String": StringType,
 	"Span": SpanType,
 	"Vector": VectorType,

@@ -28,7 +28,7 @@ public:
 
 	StackSize getStackUsage() noexcept { return 0; }
 
-	bzd::SizeType startUsageMonitoring() noexcept { return 0; }
+	bzd::Size startUsageMonitoring() noexcept { return 0; }
 
 	void getUsage() noexcept {}
 

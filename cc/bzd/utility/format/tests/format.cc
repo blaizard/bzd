@@ -139,7 +139,7 @@ TEST(Format_, ParseMetadataPrecision)
 	}
 }
 
-template <bzd::SizeType N, class... Args>
+template <bzd::Size N, class... Args>
 void expectStringStreamFormat(const char* expected, Args&&... args)
 {
 	bzd::String<N> str;

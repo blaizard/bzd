@@ -28,18 +28,18 @@
 }*/
 
 /*
-static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
+static void i2c_master_write_slave(const bzd::UInt8 reg, const bzd::UInt8 value)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 3> data{(ESP_SLAVE_ADDR << 1), reg, value};
+	bzd::Array<bzd::UInt8, 3> data{(ESP_SLAVE_ADDR << 1), reg, value};
 	i2c.write(data);
 }
 */
 
-static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Type value)
+static void i2c_master_write_slave(const bzd::UInt8 reg, const bzd::UInt8 value)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 3> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0), reg, value};
+	bzd::Array<bzd::UInt8, 3> data{static_cast<bzd::UInt8>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0), reg, value};
 	i2c.write(data.asBytes());
 }
 
@@ -57,12 +57,12 @@ static void i2c_master_write_slave(const bzd::UInt8Type reg, const bzd::UInt8Typ
 void setPWM(uint8_t num, uint16_t on, uint16_t off)
 {
 	auto& i2c = bzd::Registry<bzd::OChannel>::get("i2c");
-	bzd::Array<bzd::UInt8Type, 6> data{static_cast<bzd::UInt8Type>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0),
-									   static_cast<bzd::UInt8Type>(PCA9685_LED0_ON_L + 4 * num),
-									   static_cast<bzd::UInt8Type>(on),
-									   static_cast<bzd::UInt8Type>(on >> 8),
-									   static_cast<bzd::UInt8Type>(off),
-									   static_cast<bzd::UInt8Type>(off >> 8)};
+	bzd::Array<bzd::UInt8, 6> data{static_cast<bzd::UInt8>((ESP_SLAVE_ADDR << 1) | /*write bit*/ 0),
+									   static_cast<bzd::UInt8>(PCA9685_LED0_ON_L + 4 * num),
+									   static_cast<bzd::UInt8>(on),
+									   static_cast<bzd::UInt8>(on >> 8),
+									   static_cast<bzd::UInt8>(off),
+									   static_cast<bzd::UInt8>(off >> 8)};
 	i2c.write(data.asBytes());
 }
 
@@ -91,7 +91,7 @@ void startSequence2()
 	i2c_master_write_slave(PCA9685_MODE1,
 						   PCA9685_MODE1_SLEEP | PCA9685_MODE1_AI); // Setting mode to sleep so we can change the default PWM frequency
 
-	constexpr bzd::SizeType updateRateHz = PCA9685_UPDATE_RATE_HZ;
+	constexpr bzd::Size updateRateHz = PCA9685_UPDATE_RATE_HZ;
 	auto prescale = PCA9685_OSCILLATOR / (4096 * updateRateHz) - 1;
 	if (prescale < PCA9685_PRESCALE_MIN)
 	{
@@ -112,7 +112,7 @@ void startSequence2()
 #define USMIN 600  // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
 #define USMAX 2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
 
-void setUs(uint8_t num, bzd::SizeType timeUs)
+void setUs(uint8_t num, bzd::Size timeUs)
 {
 	setPWM(num, 0, timeUs * 4096 * PCA9685_UPDATE_RATE_HZ / 1000000);
 }

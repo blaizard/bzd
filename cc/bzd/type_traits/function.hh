@@ -21,32 +21,32 @@ template <class R, class... Args>
 struct Function<R(Args...)>
 {
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = false;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = false;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class... Args>
 struct Function<R(Args...) noexcept>
 {
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = true;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = true;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class... Args>
 struct Function<R (*)(Args...)>
 {
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = false;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = false;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class... Args>
 struct Function<R (*)(Args...) noexcept>
 {
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = true;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = true;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class U, class... Args>
@@ -54,8 +54,8 @@ struct Function<R (U::*)(Args...)>
 {
 	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = false;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = false;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class U, class... Args>
@@ -63,8 +63,8 @@ struct Function<R (U::*)(Args...) noexcept>
 {
 	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = true;
-	static constexpr BoolType isConst = false;
+	static constexpr Bool isNoexcept = true;
+	static constexpr Bool isConst = false;
 };
 
 template <class R, class U, class... Args>
@@ -72,8 +72,8 @@ struct Function<R (U::*)(Args...) const>
 {
 	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = false;
-	static constexpr BoolType isConst = true;
+	static constexpr Bool isNoexcept = false;
+	static constexpr Bool isConst = true;
 };
 
 template <class R, class U, class... Args>
@@ -81,8 +81,8 @@ struct Function<R (U::*)(Args...) const noexcept>
 {
 	using Class = U;
 	using Signature = FunctionSignature<R, Args...>;
-	static constexpr BoolType isNoexcept = true;
-	static constexpr BoolType isConst = true;
+	static constexpr Bool isNoexcept = true;
+	static constexpr Bool isConst = true;
 };
 
 } // namespace bzd::typeTraits::impl

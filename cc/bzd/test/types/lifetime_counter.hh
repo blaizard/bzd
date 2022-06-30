@@ -38,19 +38,19 @@ public:
 	~LifetimeCounter() noexcept { ++destructor_; }
 
 public:
-	static bzd::SizeType constructor_;
-	static bzd::SizeType copy_;
-	static bzd::SizeType move_;
-	static bzd::SizeType destructor_;
+	static bzd::Size constructor_;
+	static bzd::Size copy_;
+	static bzd::Size move_;
+	static bzd::Size destructor_;
 };
 
 template <class T>
-bzd::SizeType LifetimeCounter<T>::constructor_{0};
+bzd::Size LifetimeCounter<T>::constructor_{0};
 template <class T>
-bzd::SizeType LifetimeCounter<T>::copy_{0};
+bzd::Size LifetimeCounter<T>::copy_{0};
 template <class T>
-bzd::SizeType LifetimeCounter<T>::move_{0};
+bzd::Size LifetimeCounter<T>::move_{0};
 template <class T>
-bzd::SizeType LifetimeCounter<T>::destructor_{0};
+bzd::Size LifetimeCounter<T>::destructor_{0};
 
 } // namespace bzd::test

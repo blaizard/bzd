@@ -29,7 +29,7 @@ public:
 	constexpr void unlock() noexcept { acquired_.store(false); }
 
 private:
-	bzd::Atomic<bzd::BoolType> acquired_{false};
+	bzd::Atomic<bzd::Bool> acquired_{false};
 };
 
 } // namespace bzd

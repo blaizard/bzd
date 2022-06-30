@@ -23,10 +23,10 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 public:
-	[[nodiscard]] constexpr bzd::SizeType getCopiedCounter() const noexcept { return copiedCounter_; }
+	[[nodiscard]] constexpr bzd::Size getCopiedCounter() const noexcept { return copiedCounter_; }
 
 private:
-	bzd::SizeType copiedCounter_{0};
+	bzd::Size copiedCounter_{0};
 };
 
 } // namespace bzd::test

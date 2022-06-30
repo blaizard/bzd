@@ -72,8 +72,8 @@ auto Wrapper<"in", T>::init()
 	static bzd::platform::std::In in{/*proactor*/ proactorIO};
 	static bzd::platform::std::clock::Steady steadyClock{};
 	static bzd::platform::std::clock::System systemClock{};
-	static bzd::platform::linux::Core</*stackSize*/ 100000> core1{/*priority*/ bzd::UInt8Type{0}, /*name*/ float{3.124}};
-	static bzd::platform::linux::Core</*stackSize*/ 100000> core2{/*priority*/ bzd::UInt8Type{0}, /*name*/ float{3.124}};
+	static bzd::platform::linux::Core</*stackSize*/ 100000> core1{/*priority*/ bzd::UInt8{0}, /*name*/ float{3.124}};
+	static bzd::platform::linux::Core</*stackSize*/ 100000> core2{/*priority*/ bzd::UInt8{0}, /*name*/ float{3.124}};
 	static bzd::platform::generic::Executor executor{core1, core2};
 	static bzd::platform::generic::Obje obj{};
 
@@ -95,7 +95,7 @@ auto Wrapper<"in", T>::init()
 
 /// Helper to handle return code.
 template <class Promise>
-[[nodiscard]] constexpr bzd::BoolType verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
+[[nodiscard]] constexpr bzd::Bool verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
 {
 	if (!promise.isReady())
 	{

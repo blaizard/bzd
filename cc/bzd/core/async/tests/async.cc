@@ -172,7 +172,7 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	co_return {};
 }
 
-bzd::Async<> yieldLoop(bzd::interface::String& trace, bzd::StringView id, bzd::SizeType counter)
+bzd::Async<> yieldLoop(bzd::interface::String& trace, bzd::StringView id, bzd::Size counter)
 {
 	while (counter--)
 	{
@@ -224,7 +224,7 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 	co_return {};
 }
 
-bzd::Async<> asyncDestroyMonitor(bzd::interface::String& trace, bzd::StringView id, bzd::SizeType& destroyedCounter)
+bzd::Async<> asyncDestroyMonitor(bzd::interface::String& trace, bzd::StringView id, bzd::Size& destroyedCounter)
 {
 	bzd::ScopeGuard scope{[&destroyedCounter]() { ++destroyedCounter; }};
 	appendToTrace(trace, id, 0);
@@ -241,7 +241,7 @@ bzd::Async<> asyncDestroyMonitor(bzd::interface::String& trace, bzd::StringView 
 TEST_ASYNC(Coroutine, asyncAnyDestroy)
 {
 	bzd::String<128> trace;
-	bzd::SizeType destroyedCounter{0U};
+	bzd::Size destroyedCounter{0U};
 	[[maybe_unused]] const auto result =
 		co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncDestroyMonitor(trace, "b", destroyedCounter));
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
@@ -285,14 +285,14 @@ TEST_ASYNC(Coroutine, fibonacci)
 	co_return {};
 }
 
-bzd::Async<bzd::UInt64Type> nopNoTrace(bzd::UInt64Type retVal)
+bzd::Async<bzd::UInt64> nopNoTrace(bzd::UInt64 retVal)
 {
 	co_return retVal;
 }
 
-bzd::Async<bzd::UInt64Type> loopSynchronously(int count)
+bzd::Async<bzd::UInt64> loopSynchronously(int count)
 {
-	bzd::UInt64Type result{0};
+	bzd::UInt64 result{0};
 	for (int i = 0; i < count; ++i)
 	{
 		const auto output = co_await nopNoTrace(i);

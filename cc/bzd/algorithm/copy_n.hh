@@ -15,12 +15,12 @@ namespace bzd::algorithm {
 /// \return Iterator in the destination range, pointing past the last element copied if count>0 or result otherwise.
 template <class InputIt, class OutputIt>
 requires concepts::forwardIterator<InputIt> && concepts::forwardIterator<OutputIt>
-constexpr OutputIt copyN(InputIt first, const SizeType count, OutputIt result)
+constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 {
 	if (count > 0)
 	{
 		*result++ = *first;
-		for (SizeType i = 1; i < count; ++i)
+		for (Size i = 1; i < count; ++i)
 		{
 			*result++ = *++first;
 		}

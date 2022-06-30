@@ -3,7 +3,7 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd::meta::impl {
-template <SizeType N, template <class, class> class Condition, class T, class U, class... Ts>
+template <Size N, template <class, class> class Condition, class T, class U, class... Ts>
 struct FindConditional
 {
 	static constexpr const int value = (FindConditional<N, Condition, T, U>::value >= 0)
@@ -11,7 +11,7 @@ struct FindConditional
 										   : FindConditional<N + 1, Condition, T, Ts...>::value;
 };
 
-template <SizeType N, template <class, class> class Condition, class T, class U>
+template <Size N, template <class, class> class Condition, class T, class U>
 struct FindConditional<N, Condition, T, U>
 {
 	static constexpr const int value = (Condition<U, T>::value) ? static_cast<int>(N) : -1;

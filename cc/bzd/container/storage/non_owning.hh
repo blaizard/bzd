@@ -26,7 +26,7 @@ public: // Constructors
 	constexpr NonOwningStorage(Self&&) noexcept = default;
 	constexpr Self& operator=(Self&&) noexcept = default;
 
-	explicit constexpr NonOwningStorage(T* const data, const bzd::SizeType size) noexcept : data_{data}, size_{size} {}
+	explicit constexpr NonOwningStorage(T* const data, const bzd::Size size) noexcept : data_{data}, size_{size} {}
 
 	// Ability to construct a const storage from a non-const
 	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
@@ -38,11 +38,11 @@ public: // Constructors
 public: // Accessors
 	constexpr ValueType* data() const noexcept { return data_; }
 	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
-	constexpr bzd::SizeType size() const noexcept { return size_; }
-	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
+	constexpr bzd::Size size() const noexcept { return size_; }
+	constexpr bzd::Size& sizeMutable() noexcept { return size_; }
 
 public: // Modifier
-	constexpr void removePrefix(const SizeType n) noexcept
+	constexpr void removePrefix(const Size n) noexcept
 	{
 		data_ += n;
 		size_ -= n;
@@ -53,6 +53,6 @@ private:
 	friend class NonOwningStorage;
 
 	T* data_{};
-	bzd::SizeType size_{0};
+	bzd::Size size_{0};
 };
 } // namespace bzd::impl

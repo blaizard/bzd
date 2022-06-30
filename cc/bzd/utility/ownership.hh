@@ -70,7 +70,7 @@ public:
 	/// \}
 
 	/// Get the number of times this resource is currently borrowed.
-	[[nodiscard]] constexpr bzd::UInt32Type getBorrowedCounter() const noexcept
+	[[nodiscard]] constexpr bzd::UInt32 getBorrowedCounter() const noexcept
 	{
 		return borrowedCounter_.load(MemoryOrder::relaxed);
 	}
@@ -91,7 +91,7 @@ private:
 
 private:
 	/// Number of times this resource is borrowed.
-	mutable bzd::Atomic<bzd::UInt32Type> borrowedCounter_{0};
+	mutable bzd::Atomic<bzd::UInt32> borrowedCounter_{0};
 };
 
 } // namespace bzd

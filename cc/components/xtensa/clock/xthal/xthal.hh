@@ -17,7 +17,7 @@ public:
 	bzd::Async<> exec() noexcept;
 
 private:
-	bzd::UInt64Type ticks_{0};
+	bzd::UInt64 ticks_{0};
 };
 
 } // namespace bzd::platform::esp32::clock

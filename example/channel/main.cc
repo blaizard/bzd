@@ -7,21 +7,21 @@
 
 // This is a demo of what a channel implementation could look like
 
-using ConstBufferView = bzd::Span<const bzd::UInt8Type>;
-using BufferView = bzd::Span<bzd::UInt8Type>;
+using ConstBufferView = bzd::Span<const bzd::UInt8>;
+using BufferView = bzd::Span<bzd::UInt8>;
 
 template <class T = BufferView>
 class IOChannel
 {
 public:
-	virtual bzd::Result<bzd::SizeType> write(const T& data) noexcept = 0;
-	// virtual bzd::Result<bzd::SizeType> read(const T& data) noexcept = 0;
+	virtual bzd::Result<bzd::Size> write(const T& data) noexcept = 0;
+	// virtual bzd::Result<bzd::Size> read(const T& data) noexcept = 0;
 };
 
 class I2CTransport
 {
 public:
-	bzd::Result<bzd::SizeType> write(const int address, const ConstBufferView& data) noexcept
+	bzd::Result<bzd::Size> write(const int address, const ConstBufferView& data) noexcept
 	{
 		std::cout << "[address=" << address << "] ";
 		for (auto c : data)
@@ -32,7 +32,7 @@ public:
 		return data.size();
 	}
 
-	bzd::Result<bzd::SizeType> read(const int /*address*/, const BufferView& data) noexcept { return data.size(); }
+	bzd::Result<bzd::Size> read(const int /*address*/, const BufferView& data) noexcept { return data.size(); }
 };
 
 template <class Data, class Transport>
@@ -51,7 +51,7 @@ class I2CDevice : public Adapter<Data, I2CTransport>
 public:
 	I2CDevice(I2CTransport& transport, int address) : Adapter<Data, I2CTransport>{transport}, address_{address} {}
 
-	bzd::Result<bzd::SizeType> write(const Data& data) noexcept override
+	bzd::Result<bzd::Size> write(const Data& data) noexcept override
 	{
 		this->transport_.write(address_, data);
 		return data.size();
@@ -64,7 +64,7 @@ private:
 class Transport : public bzd::IOStream
 {
 public:
-	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
+	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
 		if (data.size() < 2)
 		{
@@ -79,7 +79,7 @@ public:
 		co_return data.size();
 	}
 
-	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override { co_return data; }
+	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override { co_return data; }
 };
 
 class Adapter2
@@ -104,7 +104,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	bool filter(const bzd::Span<const bzd::UInt8Type>&) { return true; }
+	bool filter(const bzd::Span<const bzd::UInt8>&) { return true; }
 
 private:
 	bzd::IOStream& transport_;
@@ -117,9 +117,9 @@ private:
 template <>
 bzd::Result<> Adapter2::serialize<Adapter2::Data>(const Data& data) const
 {
-	bzd::UInt8Type buffer[42] = {id_, static_cast<bzd::UInt8Type>(data.str.size())};
+	bzd::UInt8 buffer[42] = {id_, static_cast<bzd::UInt8>(data.str.size())};
 	bzd::algorithm::copy(data.str.begin(), data.str.end(), &buffer[2]);
-	transport_.write(bzd::Span<const bzd::UInt8Type>{buffer, 2 + data.str.size()}.asBytes());
+	transport_.write(bzd::Span<const bzd::UInt8>{buffer, 2 + data.str.size()}.asBytes());
 	return bzd::nullresult;
 }
 /*

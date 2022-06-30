@@ -5,14 +5,14 @@ class Date
 public:
 	Date() = default;
 
-	constexpr Date(bzd::UInt16Type y, bzd::UInt16Type m, bzd::UInt16Type d) : y_{y}, m_{m}, d_{d} {}
+	constexpr Date(bzd::UInt16 y, bzd::UInt16 m, bzd::UInt16 d) : y_{y}, m_{m}, d_{d} {}
 
 private:
 	friend bzd::Async<> toStream(bzd::OStream& os, const Date& d);
 
-	bzd::UInt16Type y_;
-	bzd::UInt16Type m_;
-	bzd::UInt16Type d_;
+	bzd::UInt16 y_;
+	bzd::UInt16 m_;
+	bzd::UInt16 d_;
 };
 
 bzd::Async<> toStream(bzd::OStream& os, const Date& d)

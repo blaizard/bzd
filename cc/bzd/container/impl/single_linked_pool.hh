@@ -7,14 +7,14 @@
 #include <iostream>
 
 namespace bzd::impl {
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 struct SingleLinkedPoolElement
 {
 	T container_;
 	CapacityType next_;
 };
 
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 class SingleLinkedPool : public bzd::Span<SingleLinkedPoolElement<T, CapacityType>>
 {
 public:
@@ -58,9 +58,9 @@ public:
 
 	constexpr CapacityType getIndex(const Element& element) const noexcept
 	{
-		bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&element) >= reinterpret_cast<bzd::IntPtrType>(Parent::data()));
-		bzd::assert::isTrue(reinterpret_cast<bzd::IntPtrType>(&element) <
-							reinterpret_cast<bzd::IntPtrType>(Parent::data() + Parent::size()));
+		bzd::assert::isTrue(reinterpret_cast<bzd::IntPointer>(&element) >= reinterpret_cast<bzd::IntPointer>(Parent::data()));
+		bzd::assert::isTrue(reinterpret_cast<bzd::IntPointer>(&element) <
+							reinterpret_cast<bzd::IntPointer>(Parent::data() + Parent::size()));
 		return (&element - Parent::data());
 	}
 

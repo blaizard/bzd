@@ -56,7 +56,7 @@ private:
 ///
 /// It is a variants with 2 states, valid, representing success and containing a
 /// value, and error, representing error and containing an error value.
-template <class T = void, class E = bzd::BoolType>
+template <class T = void, class E = bzd::Bool>
 class Result
 {
 public: // Traits
@@ -201,7 +201,7 @@ constexpr impl::ResultNull nullresult = impl::ResultNull::make();
 
 namespace bzd::error {
 /// Create an error from a specific type.
-template <class E = bzd::BoolType>
+template <class E = bzd::Bool>
 constexpr ResultError<E> make(E&& e = true) noexcept
 {
 	return ResultError<E>(bzd::forward<E>(e));

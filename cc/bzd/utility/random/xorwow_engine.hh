@@ -8,7 +8,7 @@ namespace bzd {
 class XorwowEngine
 {
 public: // Traits.
-	using ResultType = UInt32Type;
+	using ResultType = UInt32;
 
 public: // Constructor.
 	constexpr explicit XorwowEngine(const ResultType seed = 0) noexcept :

@@ -19,7 +19,7 @@ requires concepts::end<T>
 	return t.end();
 }
 
-template <class T, SizeType n>
+template <class T, Size n>
 [[nodiscard]] constexpr T* end(T (&arr)[n])
 {
 	return arr + n;

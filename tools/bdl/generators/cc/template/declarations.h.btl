@@ -1,6 +1,6 @@
 {#- Enum -#}
 {%- macro declareEnum(element) %}
-{{ element.comment | commentBlockToStr }}enum class {{ element.name }} : bzd::UInt8Type
+{{ element.comment | commentBlockToStr }}enum class {{ element.name }} : bzd::UInt8
 {
 	{% for i, value in element.values %}
 		{% if i %},{% end %}

@@ -33,11 +33,11 @@ class VariantBase
 protected:
 	using Self = VariantBase<Ts...>;
 	// Type use to define the index of the variant type.
-	using IndexType = bzd::Int16Type;
+	using IndexType = bzd::Int16;
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;
 	// Choose the Nth element out of the list
-	template <SizeType N>
+	template <Size N>
 	using ChooseNth = typename TypeList::template ChooseNth<N>;
 	// Checks if the type T is contained into the list
 	template <class T>
@@ -46,10 +46,10 @@ protected:
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
 	// Helper
-	template <SizeType N, SizeType Max, template <class> class F, class... Args>
+	template <Size N, Size Max, template <class> class F, class... Args>
 	struct HelperT
 	{
-		static constexpr auto call(const SizeType index, Args&&... args) noexcept
+		static constexpr auto call(const Size index, Args&&... args) noexcept
 		{
 			using T = ChooseNth<N>;
 			if (index == N)
@@ -60,10 +60,10 @@ protected:
 		}
 	};
 
-	template <SizeType N, template <class> class F, class... Args>
+	template <Size N, template <class> class F, class... Args>
 	struct HelperT<N, N, F, Args...>
 	{
-		static constexpr auto call(const SizeType index, Args&&... args) noexcept
+		static constexpr auto call(const Size index, Args&&... args) noexcept
 		{
 			using T = ChooseNth<N>;
 			bzd::assert::isTrue(index == N, "Inconsistent variant state, should never happen");
@@ -164,7 +164,7 @@ public: // Constructors
 	}
 
 	/// Value constructor, in place index constructor.
-	template <SizeType index, class... Args>
+	template <Size index, class... Args>
 	constexpr VariantBase(InPlaceIndex<index>, Args&&... args) noexcept :
 		id_{index}, data_{inPlaceIndex<index>, bzd::forward<Args>(args)...}
 	{
@@ -184,13 +184,13 @@ public: // Constructors
 	constexpr Self& operator=(Self&& variant) noexcept = default;
 
 public: // Comparators.
-	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept
+	[[nodiscard]] constexpr Bool operator==(const Self& other) const noexcept
 	{
 		const EqualityVisitor visitor{other};
 		return Match<const EqualityVisitor, decltype(*this)>::call(this->id_, *this, visitor);
 	}
 
-	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
+	[[nodiscard]] constexpr Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 public: // Functions
 	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
@@ -202,7 +202,7 @@ public: // Functions
 		id_ = Find<T>::value;
 	}
 
-	template <bzd::SizeType index, class... Args>
+	template <bzd::Size index, class... Args>
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		emplace<ChooseNth<index>>(bzd::forward<Args>(args)...);
@@ -211,7 +211,7 @@ public: // Functions
 	[[nodiscard]] constexpr IndexType index() const noexcept { return id_; }
 
 	template <class T>
-	[[nodiscard]] constexpr bzd::BoolType is() const noexcept
+	[[nodiscard]] constexpr bzd::Bool is() const noexcept
 	{
 		return (id_ == Find<T>::value);
 	}
@@ -228,13 +228,13 @@ public: // Functions
 		return data_.template get<VariantElementStorageType<T>>();
 	}
 
-	template <bzd::SizeType index>
+	template <bzd::Size index>
 	[[nodiscard]] constexpr const ChooseNth<index>& get() const noexcept
 	{
 		return get<ChooseNth<index>>();
 	}
 
-	template <bzd::SizeType index>
+	template <bzd::Size index>
 	[[nodiscard]] constexpr ChooseNth<index>& get() noexcept
 	{
 		return get<ChooseNth<index>>();
@@ -247,7 +247,7 @@ public: // Functions
 		data_.template set<VariantElementStorageType<T>>(bzd::forward<U>(value));
 	}
 
-	template <bzd::SizeType index, class U>
+	template <bzd::Size index, class U>
 	constexpr void set(U&& value) noexcept
 	{
 		set<ChooseNth<index>>(bzd::forward<U>(value));
@@ -439,7 +439,7 @@ public: // Traits
 
 protected:
 	// Choose the Nth element out of the list
-	template <SizeType N>
+	template <Size N>
 	using ChooseNth = typename Parent::template ChooseNth<N>;
 	// Checks if the type T is contained into the list
 	template <class T>
@@ -495,7 +495,7 @@ public:
 		Parent::template emplace<T>(bzd::forward<Args>(args)...);
 	}
 
-	template <bzd::SizeType index, class... Args>
+	template <bzd::Size index, class... Args>
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		emplace<ChooseNth<index>>(bzd::forward<Args>(args)...);

@@ -23,9 +23,9 @@ private:
 public: // Constructors
 	using impl::Span<T, impl::NonOwningStorage<T>>::Span;
 
-	constexpr Span(ValueType* const data, const SizeType size) noexcept : Parent{StorageType{data, size}} {}
+	constexpr Span(ValueType* const data, const Size size) noexcept : Parent{StorageType{data, size}} {}
 
-	template <bzd::SizeType N>
+	template <bzd::Size N>
 	constexpr Span(ValueType (&data)[N]) noexcept : Parent{StorageType{data, N}}
 	{
 	}
@@ -48,7 +48,7 @@ constexpr auto Span<T, Storage>::asSpan() noexcept
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) const noexcept
+constexpr auto Span<T, Storage>::subSpan(const Size offset, const Size count) const noexcept
 {
 	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
@@ -57,7 +57,7 @@ constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType c
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType count) noexcept
+constexpr auto Span<T, Storage>::subSpan(const Size offset, const Size count) noexcept
 {
 	bzd::assert::isTrue(offset <= size());
 	const auto actualCount = (count == npos) ? (size() - offset) : count;
@@ -66,25 +66,25 @@ constexpr auto Span<T, Storage>::subSpan(const SizeType offset, const SizeType c
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::first(const SizeType count) const noexcept
+constexpr auto Span<T, Storage>::first(const Size count) const noexcept
 {
 	return subSpan(0, count);
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::first(const SizeType count) noexcept
+constexpr auto Span<T, Storage>::first(const Size count) noexcept
 {
 	return subSpan(0, count);
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::last(const SizeType count) const noexcept
+constexpr auto Span<T, Storage>::last(const Size count) const noexcept
 {
 	return subSpan(size() - count, count);
 }
 
 template <class T, class Storage>
-constexpr auto Span<T, Storage>::last(const SizeType count) noexcept
+constexpr auto Span<T, Storage>::last(const Size count) noexcept
 {
 	return subSpan(size() - count, count);
 }
@@ -92,12 +92,12 @@ constexpr auto Span<T, Storage>::last(const SizeType count) noexcept
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asBytes() const noexcept
 {
-	return bzd::Span<const bzd::ByteType>{reinterpret_cast<const bzd::ByteType*>(data()), sizeBytes()};
+	return bzd::Span<const bzd::Byte>{reinterpret_cast<const bzd::Byte*>(data()), sizeBytes()};
 }
 
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asBytesMutable() noexcept
 {
-	return bzd::Span<bzd::ByteType>{reinterpret_cast<bzd::ByteType*>(data()), sizeBytes()};
+	return bzd::Span<bzd::Byte>{reinterpret_cast<bzd::Byte*>(data()), sizeBytes()};
 }
 } // namespace bzd::impl

@@ -39,7 +39,7 @@ public:
 private:
 	struct OptionalEmptyType
 	{
-		[[nodiscard]] constexpr BoolType operator==(const OptionalEmptyType&) const noexcept { return true; }
+		[[nodiscard]] constexpr Bool operator==(const OptionalEmptyType&) const noexcept { return true; }
 	};
 
 public: // Constructors
@@ -67,8 +67,8 @@ public: // Constructors
 	constexpr Self& operator=(U) noexcept = delete;
 
 public: // Comparators.
-	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept { return (data_ == other.data_); }
-	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
+	[[nodiscard]] constexpr Bool operator==(const Self& other) const noexcept { return (data_ == other.data_); }
+	[[nodiscard]] constexpr Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 public: // API
 	/// Checks whether the optional contains a value.

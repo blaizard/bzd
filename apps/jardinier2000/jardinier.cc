@@ -9,7 +9,7 @@ namespace jardinier {
 
 constexpr gpio_num_t waterPumpPin{GPIO_NUM_23};
 
-bzd::Async<bool> water(bzd::SizeType wateringTimeS, bzd::UInt64Type wakeUpPeriodS)
+bzd::Async<bool> water(bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
 {
 	co_await bzd::log::info("Watering for {}s..."_csv, wateringTimeS);
 	gpio_reset_pin(waterPumpPin);

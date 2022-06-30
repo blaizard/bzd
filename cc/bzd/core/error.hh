@@ -10,7 +10,7 @@
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd {
-enum class ErrorType : bzd::UInt8Type
+enum class ErrorType : bzd::UInt8
 {
 	/// Any error that do not fall in the below categories.
 	failure,

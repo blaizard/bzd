@@ -7,7 +7,7 @@
 
 namespace bzd {
 
-using ClockTick = bzd::NamedType<bzd::UInt64Type, struct ClockTickTag, bzd::Arithmetic>;
+using ClockTick = bzd::NamedType<bzd::UInt64, struct ClockTickTag, bzd::Arithmetic>;
 
 class Clock
 {

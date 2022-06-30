@@ -10,7 +10,7 @@ public:
 	auto lock()
 	{
 		return bzd::makePromise([this](bzd::interface::Promise& promise, bzd::AnyReference&) mutable -> bzd::Promise<>::ReturnType {
-			bzd::BoolType expected{false};
+			bzd::Bool expected{false};
 			if (acquired_.compareExchange(expected, true))
 			{
 				return bzd::nullresult;
@@ -38,7 +38,7 @@ public:
 	}
 
 private:
-	bzd::Atomic<bzd::BoolType> acquired_{false};
+	bzd::Atomic<bzd::Bool> acquired_{false};
 	bzd::threadsafe::NonOwningForwardList<bzd::interface::Promise> list_{};
 };
 */
