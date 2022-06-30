@@ -99,10 +99,7 @@ public: // API
 		return *it;
 	}
 
-	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept
-	{
-		return (it.index_ == index_) && (&(it.tuple_) == &(tuple_));
-	}
+	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept { return (it.index_ == index_) && (&(it.tuple_) == &(tuple_)); }
 	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
 	[[nodiscard]] constexpr ValueType& operator*() noexcept { return value_; }

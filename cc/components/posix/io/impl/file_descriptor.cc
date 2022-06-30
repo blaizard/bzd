@@ -6,16 +6,16 @@ namespace bzd::platform::posix {
 
 void FileDescriptorOwner::close() noexcept
 {
-    ::close(this->native_);
-    this->native_ = this->invalid;
+	::close(this->native_);
+	this->native_ = this->invalid;
 }
 
 FileDescriptorOwner::~FileDescriptorOwner() noexcept
 {
-    if (this->native_ != this->invalid)
-    {
-        close();
-    }
+	if (this->native_ != this->invalid)
+	{
+		close();
+	}
 }
 
-}
+} // namespace bzd::platform::posix

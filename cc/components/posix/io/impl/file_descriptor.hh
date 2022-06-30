@@ -39,8 +39,8 @@ protected:
 class FileDescriptorOwner : public FileDescriptor
 {
 public:
-	using FileDescriptor::NativeType;
 	using FileDescriptor::FileDescriptor;
+	using FileDescriptor::NativeType;
 
 	constexpr FileDescriptorOwner& operator=(const NativeType fd) noexcept
 	{
