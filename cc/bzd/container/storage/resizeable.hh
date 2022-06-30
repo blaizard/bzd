@@ -5,7 +5,7 @@
 
 namespace bzd::impl {
 /// \brief Resizeable storage type.
-template <class T, bzd::SizeType N>
+template <class T, bzd::Size N>
 class ResizeableStorage
 {
 public:
@@ -29,11 +29,11 @@ public: // Constructors
 public: // Accessors
 	constexpr ValueType* data() const noexcept { return data_; }
 	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
-	constexpr bzd::SizeType size() const noexcept { return size_; }
-	constexpr bzd::SizeType& sizeMutable() noexcept { return size_; }
+	constexpr bzd::Size size() const noexcept { return size_; }
+	constexpr bzd::Size& sizeMutable() noexcept { return size_; }
 
 private:
 	T data_[(N == 0) ? 1 : N]{};
-	bzd::SizeType size_{0};
+	bzd::Size size_{0};
 };
 } // namespace bzd::impl

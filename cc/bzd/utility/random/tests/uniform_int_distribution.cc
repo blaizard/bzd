@@ -6,7 +6,7 @@
 TEST(UniformIntDistribution, Base)
 {
 	bzd::LinearCongruentialEngine<> generator_{};
-	bzd::UniformIntDistribution<bzd::UInt32Type, 0, 10> distribution{};
+	bzd::UniformIntDistribution<bzd::UInt32, 0, 10> distribution{};
 
 	EXPECT_EQ(distribution(generator_), 5U);
 	EXPECT_EQ(distribution(generator_), 6U);

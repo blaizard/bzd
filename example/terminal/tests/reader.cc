@@ -11,7 +11,7 @@ TEST_ASYNC(Reader, readUntil)
 	bzd::Reader<16> reader{mock, out};
 
 	mock << "Hello:you";
-	const auto result = co_await reader.readUntil(bzd::ByteType{':'});
+	const auto result = co_await reader.readUntil(bzd::Byte{':'});
 	EXPECT_TRUE(result);
 	EXPECT_EQ_VALUES(result.value(), "Hello:"_sv.asBytes());
 

@@ -19,7 +19,7 @@ requires concepts::begin<T>
 	return t.begin();
 }
 
-template <class T, SizeType n>
+template <class T, Size n>
 [[nodiscard]] constexpr T* begin(T (&arr)[n])
 {
 	return arr;

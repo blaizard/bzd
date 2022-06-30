@@ -30,7 +30,7 @@ bzd::Result<> I2CEsp32XtensaLx6::connect()
 	return bzd::nullresult;
 }
 
-bzd::Result<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8Type>& data) noexcept
+bzd::Result<Size> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8>& data) noexcept
 {
 	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 	i2c_master_start(cmd);
@@ -44,7 +44,7 @@ bzd::Result<SizeType> I2CEsp32XtensaLx6::write(const bzd::Span<const bzd::UInt8T
 	return data.size();
 }
 
-bzd::Result<SizeType> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8Type>& data) noexcept
+bzd::Result<Size> I2CEsp32XtensaLx6::read(bzd::Span<bzd::UInt8>& data) noexcept
 {
 	data[0] = 1;
 	return 1;

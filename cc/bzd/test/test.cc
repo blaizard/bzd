@@ -20,7 +20,7 @@ Test::Test(const char* testCaseName, const char* testName, const char* file) : t
 }
 
 void Manager::failInternals(
-	const char* const file, const bzd::Int32Type line, const char* const message, const char* actual, const char* expected)
+	const char* const file, const bzd::Int32 line, const char* const message, const char* actual, const char* expected)
 {
 	auto& out = ::bzd::platform::out();
 	auto scope = out.getLock().sync();
@@ -49,7 +49,7 @@ void Manager::failInternals(
 bool bzd::test::Manager::run()
 {
 	auto& clock = ::bzd::platform::steadyClock();
-	bzd::SizeType nbFailedTests{0};
+	bzd::Size nbFailedTests{0};
 	auto* test = testRoot;
 
 	::bzd::print("[==========] Running test(s)\n"_csv).sync();

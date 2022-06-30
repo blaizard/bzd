@@ -51,7 +51,7 @@ public:
 
 private:
 	// When this counter is non-null it means that discarding is not possible.
-	mutable bzd::Atomic<bzd::SizeType> discardCounter_{0};
+	mutable bzd::Atomic<bzd::Size> discardCounter_{0};
 };
 
 /// Implementation of a non-owning forward list.
@@ -79,7 +79,7 @@ public:
 	/// Get the number of elements currently held by this container.
 	///
 	/// \return The number of elments.
-	[[nodiscard]] constexpr SizeType size() const noexcept { return size_.load(); }
+	[[nodiscard]] constexpr Size size() const noexcept { return size_.load(); }
 
 	/// Tells if the list is empty.
 	///
@@ -255,7 +255,7 @@ public:
 			// This is to handle concurrent deletion for preemptive systems with
 			// critical section behavior.
 			{
-				bzd::SizeType distanceFromElement{1};
+				bzd::Size distanceFromElement{1};
 				while (isDeletionMark(previous->nextRaw))
 				{
 					// Look for the node before
@@ -342,7 +342,7 @@ public:
 	///
 	/// \param element Element to be inserted.
 	/// \return An error in case of failure, void otherwise.
-	template <bzd::BoolType U = ElementType::supportDiscard_, bzd::typeTraits::EnableIf<U, void>* = nullptr>
+	template <bzd::Bool U = ElementType::supportDiscard_, bzd::typeTraits::EnableIf<U, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept
 	{
 		const auto result = pop(element);
@@ -417,32 +417,32 @@ protected:
 protected:
 	[[nodiscard]] static constexpr bool isDeletionMark(ElementPtrType node) noexcept
 	{
-		return (reinterpret_cast<IntPtrType>(node) & 3) == 1;
+		return (reinterpret_cast<IntPointer>(node) & 3) == 1;
 	}
 	[[nodiscard]] static constexpr bool isInsertionMark(ElementPtrType node) noexcept
 	{
-		return (reinterpret_cast<IntPtrType>(node) & 3) == 2;
+		return (reinterpret_cast<IntPointer>(node) & 3) == 2;
 	}
-	[[nodiscard]] static constexpr bool isWeakMark(ElementPtrType node) noexcept { return (reinterpret_cast<IntPtrType>(node) & 3) == 3; }
+	[[nodiscard]] static constexpr bool isWeakMark(ElementPtrType node) noexcept { return (reinterpret_cast<IntPointer>(node) & 3) == 3; }
 
 	[[nodiscard]] static constexpr ElementPtrType setDeletionMark(ElementPtrType node) noexcept
 	{
-		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x1);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPointer>(removeMarks(node)) | 0x1);
 	}
 
 	[[nodiscard]] static constexpr ElementPtrType setInsertionMark(ElementPtrType node) noexcept
 	{
-		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x2);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPointer>(removeMarks(node)) | 0x2);
 	}
 
 	[[nodiscard]] static constexpr ElementPtrType setWeakMark(ElementPtrType node) noexcept
 	{
-		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(removeMarks(node)) | 0x3);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPointer>(removeMarks(node)) | 0x3);
 	}
 
 	[[nodiscard]] static constexpr ElementPtrType removeMarks(ElementPtrType node) noexcept
 	{
-		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPtrType>(node) & ~3);
+		return reinterpret_cast<ElementPtrType>(reinterpret_cast<IntPointer>(node) & ~3);
 	}
 
 protected:
@@ -450,7 +450,7 @@ protected:
 	ElementType front_;
 	ElementType back_;
 	// Number of elements.
-	bzd::Atomic<bzd::SizeType> size_{0};
+	bzd::Atomic<bzd::Size> size_{0};
 };
 
 // ---- NonOwningForwardListElement
@@ -465,13 +465,13 @@ struct NonOwningForwardListElementMultiContainer
 	bzd::Atomic<void*> parent_{nullptr};
 };
 
-template <bzd::BoolType supportMultiContainer, bzd::BoolType supportDiscard>
+template <bzd::Bool supportMultiContainer, bzd::Bool supportDiscard>
 class NonOwningForwardListElement
 	: public bzd::typeTraits::Conditional<supportMultiContainer, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
 {
 public:
-	static const constexpr bzd::BoolType supportMultiContainer_{supportMultiContainer};
-	static const constexpr bzd::BoolType supportDiscard_{supportDiscard};
+	static const constexpr bzd::Bool supportMultiContainer_{supportMultiContainer};
+	static const constexpr bzd::Bool supportDiscard_{supportDiscard};
 
 private:
 	using Self = NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
@@ -485,7 +485,7 @@ public:
 
 	/// Pop the current element from the list. This is available only if
 	/// supportMultiContainer is enabled, as it has the knowledge of the parent container.
-	template <bzd::BoolType T = supportMultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
+	template <bzd::Bool T = supportMultiContainer, bzd::typeTraits::EnableIf<T, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> pop() noexcept
 	{
 		auto* container = static_cast<Container*>(this->parent_.load());
@@ -498,7 +498,7 @@ public:
 
 	/// Pop the current element from the list. This is available only if
 	/// supportMultiContainer and supportDiscard is enabled, as it has the knowledge of the parent container.
-	template <bzd::BoolType T = (supportMultiContainer && supportDiscard), bzd::typeTraits::EnableIf<T, void>* = nullptr>
+	template <bzd::Bool T = (supportMultiContainer && supportDiscard), bzd::typeTraits::EnableIf<T, void>* = nullptr>
 	[[nodiscard]] constexpr Result<void> popToDiscard() noexcept
 	{
 		auto* container = static_cast<Container*>(this->parent_.load());
@@ -521,7 +521,7 @@ namespace bzd::threadsafe {
 /// \tparam supportMultiContainer Whether multicontainer should be supported or not.
 ///        This means that an element can pop from one list and push a different one.
 /// \tparam supportDiscard Allow elements to be discarded.
-template <bzd::BoolType supportMultiContainer, bzd::BoolType supportDiscard = false>
+template <bzd::Bool supportMultiContainer, bzd::Bool supportDiscard = false>
 using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
 
 /// Implementation of a non-owning linked list.
@@ -551,8 +551,8 @@ public:
 	public: // Traits
 		using Self = NonOwningForwardListIterator<U>;
 		using Category = bzd::typeTraits::ForwardTag;
-		using IndexType = bzd::SizeType;
-		using DifferenceType = bzd::Int32Type;
+		using IndexType = bzd::Size;
+		using DifferenceType = bzd::Int32;
 		using ValueType = U;
 
 	private: // Internal Traits.
@@ -602,7 +602,7 @@ public: // Traits.
 	using ConstIterator = NonOwningForwardListIterator<typeTraits::AddConst<T>>;
 
 public: // Return type.
-	template <class U, class Scope = BoolType>
+	template <class U, class Scope = Bool>
 	class ElementScope
 	{
 	public:

@@ -5,10 +5,10 @@
 class ElementType : public bzd::NonOwningListElement
 {
 public:
-	ElementType(const bzd::Int32Type value) : value_{value} {}
+	ElementType(const bzd::Int32 value) : value_{value} {}
 	ElementType() = default;
 
-	bzd::Int32Type value_{0};
+	bzd::Int32 value_{0};
 };
 
 using NonOwningListForTest = bzd::NonOwningList<ElementType>;
@@ -89,7 +89,7 @@ TEST(NonOwningList, Iterator)
 	++it;
 	EXPECT_EQ(it, list.end());
 
-	bzd::UInt32Type counter{0};
+	bzd::UInt32 counter{0};
 	for ([[maybe_unused]] auto& item : list)
 	{
 		++counter;
@@ -122,7 +122,7 @@ TEST(NonOwningList, ConstIterator)
 	++it;
 	EXPECT_EQ(it, clist.end());
 
-	bzd::UInt32Type counter{0};
+	bzd::UInt32 counter{0};
 	for ([[maybe_unused]] const auto& item : clist)
 	{
 		++counter;

@@ -195,14 +195,14 @@ TEST(RingBuffer, stress)
 
 	for (int iteration = 0; iteration < 10000; ++iteration)
 	{
-		bzd::SizeType random = test.random<bzd::SizeType, 0, 16>();
+		bzd::Size random = test.random<bzd::Size, 0, 16>();
 
 		// Write X entries.
-		if (test.random<bzd::BoolType>())
+		if (test.random<bzd::Bool>())
 		{
 			auto span = ring.asSpanForWriting();
 			const auto count = bzd::min(random, span.size());
-			for (bzd::SizeType i = 0; i < count; ++i)
+			for (bzd::Size i = 0; i < count; ++i)
 			{
 				span[i] = counter++;
 			}
@@ -213,7 +213,7 @@ TEST(RingBuffer, stress)
 		{
 			auto span = ring.asSpanForReading();
 			const auto count = bzd::min(random, span.size());
-			for (bzd::SizeType i = 0; i < count; ++i)
+			for (bzd::Size i = 0; i < count; ++i)
 			{
 				EXPECT_EQ(span[i], counterRead++);
 			}

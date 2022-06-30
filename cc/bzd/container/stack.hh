@@ -7,7 +7,7 @@
 namespace bzd {
 
 /// Describes the direction to which the stack grows.
-enum class StackDirection : UInt8Type
+enum class StackDirection : UInt8
 {
 	/// The stack grows from lower address to higher
 	UPWARD = 0,
@@ -15,27 +15,27 @@ enum class StackDirection : UInt8Type
 	DOWNWARD = 1
 };
 
-template <bzd::SizeType stackSize, bzd::SizeType alignment = 1, StackDirection direction = StackDirection::DOWNWARD>
+template <bzd::Size stackSize, bzd::Size alignment = 1, StackDirection direction = StackDirection::DOWNWARD>
 class Stack
 {
 public: // Type.
 	/// Default value used for tainting the stack.
-	static constexpr bzd::ByteType defaultTaintPattern{0xaa};
+	static constexpr bzd::Byte defaultTaintPattern{0xaa};
 
 public:
 	constexpr Stack() noexcept = default;
 
-	constexpr void taint(ByteType pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
+	constexpr void taint(Byte pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
 
-	constexpr ByteType* data() noexcept { return stack_.data(); }
+	constexpr Byte* data() noexcept { return stack_.data(); }
 
-	constexpr SizeType size() const noexcept { return stack_.size(); }
+	constexpr Size size() const noexcept { return stack_.size(); }
 
-	bzd::SizeType estimateMaxUsage(ByteType pattern = defaultTaintPattern) const noexcept
+	bzd::Size estimateMaxUsage(Byte pattern = defaultTaintPattern) const noexcept
 	{
 		if constexpr (direction == StackDirection::DOWNWARD)
 		{
-			bzd::SizeType i{0};
+			bzd::Size i{0};
 			for (; i < stack_.size() && stack_[i] == pattern; ++i)
 			{
 			}
@@ -43,7 +43,7 @@ public:
 		}
 		else
 		{
-			bzd::SizeType i{stack_.size() - 1};
+			bzd::Size i{stack_.size() - 1};
 			for (; i > 0 && stack_[i] == pattern; --i)
 			{
 			}
@@ -52,7 +52,7 @@ public:
 	}
 
 private:
-	alignas(alignment) bzd::Array<ByteType, stackSize> stack_{};
+	alignas(alignment) bzd::Array<Byte, stackSize> stack_{};
 };
 
 } // namespace bzd

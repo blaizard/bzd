@@ -230,8 +230,8 @@ public:
 	using Self = Promise<T>;
 	using ResultType = T;
 	using impl::Promise<Promise<T>>::Promise;
-	static constexpr BoolType resultTypeIsResult = ResultOfError<ResultType>::value;
-	static constexpr BoolType resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
+	static constexpr Bool resultTypeIsResult = ResultOfError<ResultType>::value;
+	static constexpr Bool resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
 
 	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 

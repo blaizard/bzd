@@ -218,14 +218,14 @@ public:
 private:
 	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
 
-	constexpr void valueToString(short value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
-	constexpr void valueToString(int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
-	constexpr void valueToString(long int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
-	constexpr void valueToString(long long int value) { ::toString(string_, static_cast<bzd::Int64Type>(value)); }
-	constexpr void valueToString(unsigned short value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
-	constexpr void valueToString(unsigned int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
-	constexpr void valueToString(unsigned long int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
-	constexpr void valueToString(unsigned long long int value) { ::toString(string_, static_cast<bzd::UInt64Type>(value)); }
+	constexpr void valueToString(short value) { ::toString(string_, static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(int value) { ::toString(string_, static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(long int value) { ::toString(string_, static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(long long int value) { ::toString(string_, static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(unsigned short value) { ::toString(string_, static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned int value) { ::toString(string_, static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned long int value) { ::toString(string_, static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned long long int value) { ::toString(string_, static_cast<bzd::UInt64>(value)); }
 
 	constexpr void valueToString(float value) { ::toString(string_, value); }
 	constexpr void valueToString(double value) { ::toString(string_, value); }
@@ -238,7 +238,7 @@ private:
 	template <class U>
 	constexpr void valueToString(U* value)
 	{
-		::toString(string_, "{:#x}"_csv, reinterpret_cast<bzd::UInt64Type>(value));
+		::toString(string_, "{:#x}"_csv, reinterpret_cast<bzd::UInt64>(value));
 	}
 
 	constexpr void valueToString(const unsigned char* value) { valueToString(reinterpret_cast<const char*>(value)); }
@@ -282,7 +282,7 @@ namespace bzd::test {
 class Context
 {
 public:
-	using SeedType = bzd::UInt32Type;
+	using SeedType = bzd::UInt32;
 
 public:
 	constexpr explicit Context(const SeedType seed = 53267) noexcept : generator_{seed} {}
@@ -290,17 +290,17 @@ public:
 	template <class T,
 			  T min = NumericLimits<T>::min(),
 			  T max = NumericLimits<T>::max(),
-			  typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, BoolType>, void>* = nullptr>
+			  typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, Bool>, void>* = nullptr>
 	[[nodiscard]] T random() const noexcept
 	{
 		UniformIntDistribution<T, min, max> distribution{};
 		return distribution(generator_);
 	}
 
-	template <class T, typename typeTraits::EnableIf<typeTraits::isSame<T, BoolType>, void>* = nullptr>
+	template <class T, typename typeTraits::EnableIf<typeTraits::isSame<T, Bool>, void>* = nullptr>
 	[[nodiscard]] T random() const noexcept
 	{
-		return static_cast<BoolType>(random<bzd::UInt32Type, 0, 1>() == 1);
+		return static_cast<Bool>(random<bzd::UInt32, 0, 1>() == 1);
 	}
 
 	template <class T>
@@ -381,7 +381,7 @@ public:
 	bool run();
 
 	template <class Value1, class Value2>
-	void fail(const char* const file, const bzd::Int32Type line, const char* const message, Value1&& value1, Value2&& value2)
+	void fail(const char* const file, const bzd::Int32 line, const char* const message, Value1&& value1, Value2&& value2)
 	{
 		bzd::test::impl::Value<Value1> valueStr1{value1};
 		bzd::test::impl::Value<Value2> valueStr2{value2};
@@ -389,17 +389,17 @@ public:
 	}
 
 	template <class Value>
-	void fail(const char* const file, const bzd::Int32Type line, const char* const message, Value&& value)
+	void fail(const char* const file, const bzd::Int32 line, const char* const message, Value&& value)
 	{
 		bzd::test::impl::Value<Value> valueStr{value};
 		failInternals(file, line, message, valueStr.valueToString());
 	}
 
-	void fail(const char* const file, const bzd::Int32Type line, const char* const message) { failInternals(file, line, message); }
+	void fail(const char* const file, const bzd::Int32 line, const char* const message) { failInternals(file, line, message); }
 
 private:
 	void failInternals(const char* const file,
-					   const bzd::Int32Type line,
+					   const bzd::Int32 line,
 					   const char* const message,
 					   const char* actual = nullptr,
 					   const char* expected = nullptr);

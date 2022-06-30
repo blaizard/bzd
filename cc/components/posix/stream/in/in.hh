@@ -44,7 +44,7 @@ public: // Constructors
 	}
 
 public: // API
-	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override
+	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override
 	{
 		if (!init_)
 		{
@@ -59,7 +59,7 @@ public: // API
 
 private:
 	Proactor& proactor_;
-	bzd::BoolType init_{false};
+	bzd::Bool init_{false};
 	termios old_{};
 	termios current_{};
 	FileDescriptor in_{STDIN_FILENO};

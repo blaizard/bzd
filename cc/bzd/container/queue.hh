@@ -7,7 +7,7 @@
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::impl {
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 class Queue
 {
 protected:
@@ -81,12 +81,12 @@ private:
 } // namespace bzd::impl
 
 namespace bzd::interface {
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 using Queue = impl::Queue<T, CapacityType>;
 }
 
 namespace bzd {
-template <class T, SizeType N, class CapacityType = SizeType>
+template <class T, Size N, class CapacityType = Size>
 class Queue : public interface::Queue<T, CapacityType>
 {
 private:

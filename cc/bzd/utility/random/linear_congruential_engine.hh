@@ -5,7 +5,7 @@
 namespace bzd {
 // Implementation of https://en.wikipedia.org/wiki/Linear_congruential_generator
 // The default values are the one used by glibc.
-template <class UIntType = bzd::UInt32Type, UIntType a = 1103515245, UIntType c = 12345, UIntType m = 2147483648>
+template <class UIntType = bzd::UInt32, UIntType a = 1103515245, UIntType c = 12345, UIntType m = 2147483648>
 class LinearCongruentialEngine
 {
 public: // Traits.

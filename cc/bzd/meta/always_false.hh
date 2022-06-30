@@ -4,7 +4,7 @@
 
 namespace bzd::meta::impl {
 template <class...>
-inline constexpr BoolType alwaysFalse{false};
+inline constexpr Bool alwaysFalse{false};
 }
 
 namespace bzd::meta {

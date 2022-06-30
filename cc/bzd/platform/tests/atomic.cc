@@ -30,10 +30,10 @@ void baseTypeUnitTest()
 
 TEST(Atomic, Base)
 {
-	baseTypeUnitTest<bzd::UInt8Type>();
-	baseTypeUnitTest<bzd::Int8Type>();
-	baseTypeUnitTest<bzd::UInt16Type>();
-	baseTypeUnitTest<bzd::Int16Type>();
-	baseTypeUnitTest<bzd::UInt32Type>();
-	baseTypeUnitTest<bzd::Int32Type>();
+	baseTypeUnitTest<bzd::UInt8>();
+	baseTypeUnitTest<bzd::Int8>();
+	baseTypeUnitTest<bzd::UInt16>();
+	baseTypeUnitTest<bzd::Int16>();
+	baseTypeUnitTest<bzd::UInt32>();
+	baseTypeUnitTest<bzd::Int32>();
 }

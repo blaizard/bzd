@@ -14,16 +14,16 @@ namespace {
 static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 }
 
-template <SizeType base = 10, class T, class U>
+template <Size base = 10, class T, class U>
 constexpr void integer(interface::String& str, const T& n, U& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(U::size() >= base, "There is not enough digits for the base.");
 
 	auto data = str.data();
-	const SizeType indexBegin = str.size();
-	SizeType index = indexBegin;
-	const SizeType indexEnd = str.capacity();
+	const Size indexBegin = str.size();
+	Size index = indexBegin;
+	const Size indexEnd = str.capacity();
 	T number = n;
 	if constexpr (bzd::typeTraits::isSigned<T>)
 	{
@@ -34,7 +34,7 @@ constexpr void integer(interface::String& str, const T& n, U& digits = bzd::form
 	{
 		do
 		{
-			const auto digit = digits[static_cast<SizeType>(number % base)];
+			const auto digit = digits[static_cast<Size>(number % base)];
 			number /= base;
 			data[index++] = digit;
 		} while (number && index != indexEnd);
@@ -53,7 +53,7 @@ constexpr void integer(interface::String& str, const T& n, U& digits = bzd::form
 }
 
 template <class T>
-constexpr void floatingPoint(interface::String& str, const T& n, const SizeType maxPrecision) noexcept
+constexpr void floatingPoint(interface::String& str, const T& n, const Size maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
 											0.1,
@@ -127,14 +127,14 @@ constexpr void toString(bzd::interface::String& str, const T data) noexcept
 
 template <class T>
 requires bzd::concepts::floatingPoint<T>
-constexpr void toString(bzd::interface::String& str, const T data, const bzd::SizeType maxPrecision = 6) noexcept
+constexpr void toString(bzd::interface::String& str, const T data, const bzd::Size maxPrecision = 6) noexcept
 {
 	bzd::format::impl::floatingPoint(str, data, maxPrecision);
 }
 
 // Boolean
 
-constexpr void toString(bzd::interface::String& str, const bzd::BoolType value) noexcept
+constexpr void toString(bzd::interface::String& str, const bzd::Bool value) noexcept
 {
 	str.append((value) ? "true"_sv : "false"_sv);
 }

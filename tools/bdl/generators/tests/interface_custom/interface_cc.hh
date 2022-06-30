@@ -9,7 +9,7 @@ template <class Impl>
 class MyInterface
 {
 public:
-	bzd::Int32Type add(const bzd::Int32Type& a, const bzd::Int32Type& b) noexcept
+	bzd::Int32 add(const bzd::Int32& a, const bzd::Int32& b) noexcept
 	{
 		return bzd::impl::getMethod(this, &MyInterface::add, &Impl::add)->add(a, b);
 	}

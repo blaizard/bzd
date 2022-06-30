@@ -71,12 +71,12 @@ public: // Iterators
 	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{&data()[size()]}; }
 
 public: // Size
-	[[nodiscard]] constexpr SizeType size() const noexcept { return storage_.size(); }
-	[[nodiscard]] constexpr SizeType sizeBytes() const noexcept { return size() * sizeof(ValueType); }
-	[[nodiscard]] constexpr BoolType empty() const noexcept { return (size() == 0); }
+	[[nodiscard]] constexpr Size size() const noexcept { return storage_.size(); }
+	[[nodiscard]] constexpr Size sizeBytes() const noexcept { return size() * sizeof(ValueType); }
+	[[nodiscard]] constexpr Bool empty() const noexcept { return (size() == 0); }
 
 public: // Comparison operators
-	[[nodiscard]] constexpr BoolType operator==(const Self& other) const noexcept
+	[[nodiscard]] constexpr Bool operator==(const Self& other) const noexcept
 	{
 		if (size() == other.size())
 		{
@@ -85,36 +85,36 @@ public: // Comparison operators
 		return false;
 	}
 
-	[[nodiscard]] constexpr BoolType operator!=(const Self& other) const noexcept { return !(*this == other); }
+	[[nodiscard]] constexpr Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
-	[[nodiscard]] constexpr BoolType operator<(const Self& other) const noexcept
+	[[nodiscard]] constexpr Bool operator<(const Self& other) const noexcept
 	{
 		return bzd::algorithm::lexicographicalCompare(begin(), end(), other.begin(), other.end());
 	}
 
-	[[nodiscard]] constexpr BoolType operator>(const Self& other) const noexcept { return (other < *this); }
+	[[nodiscard]] constexpr Bool operator>(const Self& other) const noexcept { return (other < *this); }
 
-	[[nodiscard]] constexpr BoolType operator<=(const Self& other) const noexcept { return !(*this > other); }
+	[[nodiscard]] constexpr Bool operator<=(const Self& other) const noexcept { return !(*this > other); }
 
-	[[nodiscard]] constexpr BoolType operator>=(const Self& other) const noexcept { return !(*this < other); }
+	[[nodiscard]] constexpr Bool operator>=(const Self& other) const noexcept { return !(*this < other); }
 
 public: // Accessors
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return at(index); }
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept { return at(index); }
-	[[nodiscard]] constexpr auto& at(const SizeType index) noexcept { return data()[index]; }
-	[[nodiscard]] constexpr auto& at(const SizeType index) const noexcept { return data()[index]; }
+	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return at(index); }
+	[[nodiscard]] constexpr auto& at(const Size index) noexcept { return data()[index]; }
+	[[nodiscard]] constexpr auto& at(const Size index) const noexcept { return data()[index]; }
 	[[nodiscard]] constexpr auto& front() const noexcept { return at(0); }
 	[[nodiscard]] constexpr auto& front() noexcept { return at(0); }
 	[[nodiscard]] constexpr auto& back() const noexcept { return at(size() - 1); }
 	[[nodiscard]] constexpr auto& back() noexcept { return at(size() - 1); }
 	[[nodiscard]] constexpr auto data() const noexcept { return storage_.data(); }
 	[[nodiscard]] constexpr auto data() noexcept { return storage_.dataMutable(); }
-	template <SizeType N>
+	template <Size N>
 	[[nodiscard]] constexpr auto& get() const noexcept
 	{
 		return at(N);
 	}
-	template <SizeType N>
+	template <Size N>
 	[[nodiscard]] constexpr auto& get() noexcept
 	{
 		return at(N);
@@ -129,7 +129,7 @@ public: // Emplace
 	}
 
 public: // Find
-	[[nodiscard]] constexpr SizeType find(const ValueType& item, const SizeType start = 0) const noexcept
+	[[nodiscard]] constexpr Size find(const ValueType& item, const Size start = 0) const noexcept
 	{
 		if (start < size())
 		{
@@ -145,12 +145,12 @@ public: // Find
 public: // Subviews. Their definition is in bzd::Span
 	[[nodiscard]] constexpr auto asSpan() const noexcept;
 	[[nodiscard]] constexpr auto asSpan() noexcept;
-	[[nodiscard]] constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) const noexcept;
-	[[nodiscard]] constexpr auto subSpan(const SizeType offset = 0, const SizeType count = npos) noexcept;
-	[[nodiscard]] constexpr auto first(const SizeType count) const noexcept;
-	[[nodiscard]] constexpr auto first(const SizeType count) noexcept;
-	[[nodiscard]] constexpr auto last(const SizeType count) const noexcept;
-	[[nodiscard]] constexpr auto last(const SizeType count) noexcept;
+	[[nodiscard]] constexpr auto subSpan(const Size offset = 0, const Size count = npos) const noexcept;
+	[[nodiscard]] constexpr auto subSpan(const Size offset = 0, const Size count = npos) noexcept;
+	[[nodiscard]] constexpr auto first(const Size count) const noexcept;
+	[[nodiscard]] constexpr auto first(const Size count) noexcept;
+	[[nodiscard]] constexpr auto last(const Size count) const noexcept;
+	[[nodiscard]] constexpr auto last(const Size count) noexcept;
 
 public: // Convert to bytes
 	[[nodiscard]] constexpr auto asBytes() const noexcept;

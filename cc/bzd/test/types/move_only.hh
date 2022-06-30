@@ -25,12 +25,12 @@ public:
 	}
 
 public:
-	[[nodiscard]] constexpr bzd::SizeType getMovedCounter() const noexcept { return movedCounter_; }
-	[[nodiscard]] constexpr bzd::BoolType hasBeenMoved() const noexcept { return hasBeenMoved_; }
+	[[nodiscard]] constexpr bzd::Size getMovedCounter() const noexcept { return movedCounter_; }
+	[[nodiscard]] constexpr bzd::Bool hasBeenMoved() const noexcept { return hasBeenMoved_; }
 
 private:
-	bzd::SizeType movedCounter_{0};
-	bzd::BoolType hasBeenMoved_{false};
+	bzd::Size movedCounter_{0};
+	bzd::Bool hasBeenMoved_{false};
 };
 
 } // namespace bzd::test

@@ -14,8 +14,8 @@ public: // Traits
 	using Self = RandomAccess<T, CRTP>;
 	using ActualSelf = typeTraits::Conditional<typeTraits::isSame<CRTP, void>, Self, CRTP>;
 	using Category = typeTraits::RandomAccessTag;
-	using IndexType = bzd::SizeType;
-	using DifferenceType = bzd::Int32Type;
+	using IndexType = bzd::Size;
+	using DifferenceType = bzd::Int32;
 	using ValueType = T;
 
 public: // Constructors
@@ -85,16 +85,16 @@ public: // API
 		return static_cast<ActualSelf&>(*this);
 	}
 
-	[[nodiscard]] constexpr BoolType operator==(const Self& it) const noexcept { return it.data_ == data_; }
+	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept { return it.data_ == data_; }
 
-	[[nodiscard]] constexpr BoolType operator!=(const Self& it) const noexcept { return !(it == *this); }
+	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
 	[[nodiscard]] constexpr ValueType& operator*() const { return *data_; }
 
 	[[nodiscard]] constexpr ValueType* operator->() const { return data_; }
 
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept { return data_[index]; }
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept { return data_[index]; }
+	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return data_[index]; }
+	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return data_[index]; }
 
 private:
 	ValueType* data_{nullptr};

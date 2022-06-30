@@ -14,27 +14,27 @@ namespace bzd::impl {
 template <class T>
 using TupleTypeOf = typename T::type;
 
-template <SizeType... N>
+template <Size... N>
 struct TupleSizes : bzd::meta::Type<TupleSizes<N...>>
 {
 };
 
 // given L>=0, generate sequence <0, ..., L-1>
 
-template <SizeType L, SizeType I = 0, class S = TupleSizes<>>
+template <Size L, Size I = 0, class S = TupleSizes<>>
 struct TupleRangeImpl;
 
-template <SizeType L, SizeType I, SizeType... N>
+template <Size L, Size I, Size... N>
 struct TupleRangeImpl<L, I, TupleSizes<N...>> : TupleRangeImpl<L, I + 1, TupleSizes<N..., I>>
 {
 };
 
-template <SizeType L, SizeType... N>
+template <Size L, Size... N>
 struct TupleRangeImpl<L, L, TupleSizes<N...>> : TupleSizes<N...>
 {
 };
 
-template <SizeType L>
+template <Size L>
 using TupleRange = TupleTypeOf<TupleRangeImpl<L>>;
 
 // TupleChooseN
@@ -43,25 +43,25 @@ struct NoType
 {
 };
 
-template <SizeType Index>
+template <Size Index>
 constexpr NoType TupleChooseN()
 {
 	return NoType{};
 }
 
-template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<(Index > sizeof...(Ts))>* = nullptr>
+template <Size Index, class T, class... Ts, typeTraits::EnableIf<(Index > sizeof...(Ts))>* = nullptr>
 constexpr NoType TupleChooseN(T&&, Ts&&...)
 {
 	return NoType{};
 }
 
-template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<Index == 0>* = nullptr>
+template <Size Index, class T, class... Ts, typeTraits::EnableIf<Index == 0>* = nullptr>
 constexpr decltype(auto) TupleChooseN(T&& t, Ts&&...)
 {
 	return bzd::forward<T>(t);
 }
 
-template <SizeType Index, class T, class... Ts, typeTraits::EnableIf<(Index > 0 && Index <= sizeof...(Ts))>* = nullptr>
+template <Size Index, class T, class... Ts, typeTraits::EnableIf<(Index > 0 && Index <= sizeof...(Ts))>* = nullptr>
 constexpr decltype(auto) TupleChooseN(T&&, Ts&&... ts)
 {
 	return TupleChooseN<Index - 1>(bzd::forward<Ts>(ts)...);
@@ -69,7 +69,7 @@ constexpr decltype(auto) TupleChooseN(T&&, Ts&&... ts)
 
 // single tuple element
 
-template <SizeType N, class T>
+template <Size N, class T>
 class TupleElem
 {
 public:
@@ -97,18 +97,18 @@ private:
 template <class N, class... Ts>
 class TupleImpl;
 
-template <SizeType... N, class... Ts>
+template <Size... N, class... Ts>
 class TupleImpl<TupleSizes<N...>, Ts...> : TupleElem<N, Ts>...
 {
 private:
 	using Self = TupleImpl<TupleSizes<N...>, Ts...>;
-	template <SizeType M>
+	template <Size M>
 	using Pick = bzd::meta::ChooseNth<M, Ts...>;
-	template <SizeType M>
+	template <Size M>
 	using Elem = TupleElem<M, Pick<M>>;
 
 public:
-	template <SizeType M>
+	template <Size M>
 	using ItemType = Pick<M>;
 
 public: // constructors
@@ -128,13 +128,13 @@ public: // constructors
 
 public: // API
 	// Access by index as template (type is automatically deducted)
-	template <SizeType M>
+	template <Size M>
 	constexpr Pick<M>& get() noexcept
 	{
 		return Elem<M>::get();
 	}
 
-	template <SizeType M>
+	template <Size M>
 	constexpr const Pick<M>& get() const noexcept
 	{
 		return Elem<M>::get();
@@ -143,7 +143,7 @@ public: // API
 	/// Get the number of entry of this tuple.
 	///
 	/// \return The number of entry.
-	static constexpr SizeType size() noexcept { return sizeof...(Ts); }
+	static constexpr Size size() noexcept { return sizeof...(Ts); }
 
 public: // Iterator.
 	using ConstIterator = bzd::iterator::Tuple<const Self, const Ts...>;

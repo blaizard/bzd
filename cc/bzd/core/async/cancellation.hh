@@ -71,10 +71,10 @@ public: // API.
 		bzd::assert::isTrue(result.hasValue());
 	}
 
-	constexpr BoolType isCanceled() const noexcept { return flag_.load(); }
+	constexpr Bool isCanceled() const noexcept { return flag_.load(); }
 
 private:
-	bzd::Atomic<BoolType> flag_{false};
+	bzd::Atomic<Bool> flag_{false};
 	bzd::SpinMutex mutex_{};
 	bzd::Optional<CancellationToken&> parent_{};
 	bzd::NonOwningList<CancellationToken> children_{};

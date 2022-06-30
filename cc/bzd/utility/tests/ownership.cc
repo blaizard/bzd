@@ -4,8 +4,8 @@
 
 struct OwnershipTest : public bzd::Ownership<OwnershipTest>
 {
-    OwnershipTest(const bzd::Int32Type v): bzd::Ownership<OwnershipTest>{}, value{v} {}
-    bzd::Int32Type value;
+    OwnershipTest(const bzd::Int32 v): bzd::Ownership<OwnershipTest>{}, value{v} {}
+    bzd::Int32 value;
 };
 
 TEST(Ownership, Base)

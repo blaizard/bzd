@@ -105,7 +105,7 @@ protected:
 	T& obj_;
 	Status status_{Status::uninitialized};
 	bzd::SpinMutex mutex_{};
-	bzd::Int32Type refCount_{0};
+	bzd::Int32 refCount_{0};
 };
 
 // ==== Specializations =======================================================
@@ -156,7 +156,7 @@ protected:
 
 /// Helper to handle return code.
 template <class Promise>
-[[nodiscard]] constexpr bzd::BoolType verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
+[[nodiscard]] constexpr bzd::Bool verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
 {
 	if (!promise.isReady())
 	{

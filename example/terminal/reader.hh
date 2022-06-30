@@ -4,13 +4,13 @@
 
 namespace bzd {
 
-template <bzd::SizeType N>
+template <bzd::Size N>
 class Reader
 {
 public: // Constructor.
 	constexpr Reader(bzd::IStream& in,
 					 bzd::OStream& out,
-					 bzd::Span<const bzd::ByteType> separators = bzd::Span<const bzd::ByteType>{}) noexcept :
+					 bzd::Span<const bzd::Byte> separators = bzd::Span<const bzd::Byte>{}) noexcept :
 		in_{in},
 		out_{out}, separators_{separators}
 	{
@@ -24,7 +24,7 @@ public: // API.
 	/// \param stop The special byte until which the read operation will stop.
 	///
 	/// \return A span containing the result including the stop character.
-	[[nodiscard]] bzd::Async<bzd::Spans<const bzd::ByteType, 2>> readUntil(const bzd::ByteType stop) noexcept
+	[[nodiscard]] bzd::Async<bzd::Spans<const bzd::Byte, 2>> readUntil(const bzd::Byte stop) noexcept
 	{
 		while (true)
 		{
@@ -49,7 +49,7 @@ public: // API.
 
 		auto first = keywords.begin();
 		auto last = keywords.end();
-		bzd::SizeType index{0};
+		bzd::Size index{0};
 
 		while (true)
 		{
@@ -75,10 +75,10 @@ public: // API.
 				}
 				else
 				{
-					first = bzd::algorithm::lowerBound(first, last, c, [&index](const Element& elt, const bzd::ByteType c) {
+					first = bzd::algorithm::lowerBound(first, last, c, [&index](const Element& elt, const bzd::Byte c) {
 						return index >= elt.first.size() || elt.first.at(index) < static_cast<char>(c);
 					});
-					last = bzd::algorithm::upperBound(first, last, c, [&index](const bzd::ByteType c, const Element& elt) {
+					last = bzd::algorithm::upperBound(first, last, c, [&index](const bzd::Byte c, const Element& elt) {
 						return index >= elt.first.size() || static_cast<char>(c) < elt.first.at(index);
 					});
 					++index;
@@ -111,7 +111,7 @@ public: // API.
 
 private:
 	/// Produces new data in the ring buffer, read from the input stream.
-	[[nodiscard]] bzd::Async<bzd::Span<bzd::ByteType>> produce() noexcept
+	[[nodiscard]] bzd::Async<bzd::Span<bzd::Byte>> produce() noexcept
 	{
 		auto span = buffer_.asSpanForWriting();
 		if (span.empty())
@@ -132,8 +132,8 @@ private:
 private: // Variables.
 	bzd::IStream& in_;
 	bzd::OStream& out_;
-	bzd::Span<const bzd::ByteType> separators_;
-	bzd::RingBuffer<bzd::ByteType, N> buffer_{};
+	bzd::Span<const bzd::Byte> separators_;
+	bzd::RingBuffer<bzd::Byte, N> buffer_{};
 };
 
 } // namespace bzd

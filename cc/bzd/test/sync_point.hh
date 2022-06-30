@@ -14,7 +14,7 @@ template <typename tag>
 class SyncPoint
 {
 public:
-	template <bzd::SizeType I>
+	template <bzd::Size I>
 	struct Type
 	{
 		Type()
@@ -23,7 +23,7 @@ public:
 			std::unique_lock<std::mutex> lock(points.mutex_);
 			points.cv_.wait(lock, [&points] { return points.index_.load() >= I; });
 			std::cout << "**** Synchronization point " << I << " ****" << std::endl;
-			bzd::SizeType expected = I;
+			bzd::Size expected = I;
 			points.index_.compareExchange(expected, I + 1);
 			points.cv_.notify_all();
 		}
@@ -43,7 +43,7 @@ private:
 private:
 	std::mutex mutex_;
 	std::condition_variable cv_;
-	bzd::Atomic<bzd::SizeType> index_{1};
+	bzd::Atomic<bzd::Size> index_{1};
 };
 
 } // namespace bzd::test

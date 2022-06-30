@@ -80,7 +80,7 @@ public:
 		return nullopt;
 	}
 
-	template <bzd::SizeType index = 0>
+	template <bzd::Size index = 0>
 	constexpr auto assertHasValue() noexcept
 	{
 		class AsyncPropagate : public impl::Async<T>

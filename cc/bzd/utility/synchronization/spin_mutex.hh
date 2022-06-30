@@ -25,6 +25,6 @@ public: // API.
 	constexpr void unlock() noexcept { lock_.store(false, MemoryOrder::release); }
 
 private:
-	Atomic<BoolType> lock_{false};
+	Atomic<Bool> lock_{false};
 };
 } // namespace bzd

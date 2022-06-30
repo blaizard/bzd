@@ -3,12 +3,12 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd {
-template <bzd::SizeType Num, bzd::SizeType Den = 1>
+template <bzd::Size Num, bzd::Size Den = 1>
 class Ratio
 {
 public:
-	static constexpr const bzd::SizeType num{Num};
-	static constexpr const bzd::SizeType den{Den};
+	static constexpr const bzd::Size num{Num};
+	static constexpr const bzd::Size den{Den};
 };
 } // namespace bzd
 

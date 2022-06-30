@@ -11,30 +11,30 @@ class ListElementDiscard : public bzd::threadsafe::NonOwningForwardListElement</
 {
 public:
 	ListElementDiscard() = default;
-	ListElementDiscard(bzd::SizeType value) : value_{value} {}
+	ListElementDiscard(bzd::Size value) : value_{value} {}
 	ListElementDiscard(ListElementDiscard&&) = default;
 
-	bzd::SizeType value_{0};
+	bzd::Size value_{0};
 };
 
 class ListElementMultiContainer : public bzd::threadsafe::NonOwningForwardListElement</*MultiContainer*/ true>
 {
 public:
 	ListElementMultiContainer() = default;
-	ListElementMultiContainer(bzd::SizeType value) : value_{value} {}
+	ListElementMultiContainer(bzd::Size value) : value_{value} {}
 	ListElementMultiContainer(ListElementMultiContainer&&) = default;
 
-	bzd::SizeType value_{0};
+	bzd::Size value_{0};
 };
 
 class ListElement : public bzd::threadsafe::NonOwningForwardListElement<false>
 {
 public:
 	ListElement() = default;
-	ListElement(bzd::SizeType value) : value_{value} {}
+	ListElement(bzd::Size value) : value_{value} {}
 	ListElement(ListElement&&) = default;
 
-	bzd::SizeType value_{0};
+	bzd::Size value_{0};
 };
 
 template <class T>
@@ -50,9 +50,9 @@ public:
 	 * \return The number of node evaluated.
 	 */
 	template <class U>
-	[[nodiscard]] bzd::SizeType sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
+	[[nodiscard]] bzd::Size sanityCheck(const U sanityCheckElement = [](const auto&) -> bool { return true; })
 	{
-		bzd::SizeType counter = 0;
+		bzd::Size counter = 0;
 		auto previous = &this->front_;
 		auto node = Self::removeMarks(previous->next_.load());
 
@@ -102,7 +102,7 @@ public:
 		return counter;
 	}
 
-	constexpr void printChain(bool onlyIfFails = true, bzd::SizeType maxElements = 100)
+	constexpr void printChain(bool onlyIfFails = true, bzd::Size maxElements = 100)
 	{
 		ElementPtrType cur = &this->front_;
 		while (--maxElements && cur && cur != &this->back_)

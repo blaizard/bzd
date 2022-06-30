@@ -7,7 +7,7 @@
 
 namespace bzd::impl {
 
-template <class F, class Tuple, bzd::SizeType... I>
+template <class F, class Tuple, bzd::Size... I>
 constexpr decltype(auto) apply(F&& f, Tuple&& tuple, bzd::meta::range::Type<I...>)
 {
 	return bzd::forward<F>(f)(tuple.template get<I>()...);

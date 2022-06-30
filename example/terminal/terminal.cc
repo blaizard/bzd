@@ -5,10 +5,10 @@ namespace Example {
 
 bzd::Async<> run()
 {
-	bzd::Array<bzd::ByteType, 2> separators{bzd::ByteType{' '}, bzd::ByteType{'\t'}};
+	bzd::Array<bzd::Byte, 2> separators{bzd::Byte{' '}, bzd::Byte{'\t'}};
 	bzd::Reader<16> reader{bzd::platform::in(), bzd::platform::out(), separators.asSpan()};
 
-	bzd::Map<bzd::StringView, bzd::Int32Type, 12> keywords{
+	bzd::Map<bzd::StringView, bzd::Int32, 12> keywords{
 		{"info"_sv, 0},
 		{"test"_sv, 1},
 		{"hallo"_sv, 2},
@@ -34,7 +34,7 @@ bzd::Async<> run()
 
 	for (int i = 0; i < 5; ++i)
 	{
-		const auto result = co_await reader.readUntil(bzd::ByteType{'\n'});
+		const auto result = co_await reader.readUntil(bzd::Byte{'\n'});
 		if (result)
 		{
 			co_await !bzd::platform::out().write(result.value());

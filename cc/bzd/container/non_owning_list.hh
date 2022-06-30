@@ -29,8 +29,8 @@ class NonOwningListIterator
 public: // Traits
 	using Self = NonOwningListIterator<U>;
 	using Category = bzd::typeTraits::ForwardTag;
-	using IndexType = bzd::SizeType;
-	using DifferenceType = bzd::Int32Type;
+	using IndexType = bzd::Size;
+	using DifferenceType = bzd::Int32;
 	using ValueType = U;
 
 private: // Internal Traits.
@@ -98,9 +98,9 @@ public: // Iterator.
 	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{&last_}; }
 
 public:
-	[[nodiscard]] constexpr bzd::SizeType size() const noexcept { return size_; }
+	[[nodiscard]] constexpr bzd::Size size() const noexcept { return size_; }
 
-	[[nodiscard]] constexpr bzd::BoolType empty() const noexcept { return (size_ == 0U); }
+	[[nodiscard]] constexpr bzd::Bool empty() const noexcept { return (size_ == 0U); }
 
 	constexpr void clear() noexcept
 	{
@@ -168,7 +168,7 @@ public:
 	}
 
 private:
-	bzd::SizeType size_{0};
+	bzd::Size size_{0};
 	NonOwningListElement first_;
 	NonOwningListElement last_;
 };

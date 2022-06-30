@@ -72,7 +72,7 @@ private:
 private:
 	bzd::Tuple<Cores*...> cores_;
 	bzd::coroutine::impl::Executor executor_;
-	bzd::Atomic<bzd::SizeType> nbActive_{0};
+	bzd::Atomic<bzd::Size> nbActive_{0};
 };
 
 } // namespace bzd::platform::generic

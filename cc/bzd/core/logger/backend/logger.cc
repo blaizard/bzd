@@ -7,7 +7,7 @@ namespace {
 class Proxy : public bzd::OStream
 {
 public:
-	bzd::Async<bzd::SizeType> write(const bzd::Span<const bzd::ByteType> data) noexcept override
+	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
 		auto size = co_await bzd::platform::out().write(data);
 		co_return size;

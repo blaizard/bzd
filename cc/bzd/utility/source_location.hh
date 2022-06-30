@@ -7,7 +7,7 @@ namespace bzd {
 class SourceLocation
 {
 public:
-	using LineType = UInt32Type;
+	using LineType = UInt32;
 
 public:
 	static constexpr SourceLocation current(const char* file = __builtin_FILE(),
@@ -31,8 +31,8 @@ private:
 
 	static constexpr const char* toFileName(const char* file) noexcept
 	{
-		bzd::Int32Type last = -1;
-		for (bzd::Int32Type index = 0; file[index] != '\0'; ++index)
+		bzd::Int32 last = -1;
+		for (bzd::Int32 index = 0; file[index] != '\0'; ++index)
 		{
 			if (file[index] == '/')
 			{

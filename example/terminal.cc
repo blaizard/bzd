@@ -23,7 +23,7 @@ public:
 		tcsetattr(0, TCSANOW, &current_);
 	}
 
-	bzd::Promise<bzd::SizeType>::ReturnType promise(bzd::interface::Promise&, bzd::AnyReference& arg) const noexcept
+	bzd::Promise<bzd::Size>::ReturnType promise(bzd::interface::Promise&, bzd::AnyReference& arg) const noexcept
 	{
 		::pollfd fd{};
 		fd.fd = STDIN_FILENO;
@@ -35,7 +35,7 @@ public:
 		}
 		if (ret > 0 && (fd.revents & POLLIN) != 0)
 		{
-			const auto& data = arg.cast<const bzd::Span<bzd::ByteType>>();
+			const auto& data = arg.cast<const bzd::Span<bzd::Byte>>();
 			bzd::assert::isTrue(data.size(), "Empty buffer supplied.");
 			const auto size = ::read(STDIN_FILENO, data.data(), data.size());
 			return static_cast<unsigned long>(size);
@@ -50,16 +50,16 @@ private:
 };
 } // namespace impl
 
-bzd::Promise<bzd::SizeType> Terminal::write(const bzd::Span<const bzd::ByteType>& data) noexcept
+bzd::Promise<bzd::Size> Terminal::write(const bzd::Span<const bzd::Byte>& data) noexcept
 {
 	std::cout.write(reinterpret_cast<const char*>(data.data()), data.size());
 	std::cout.flush();
-	return bzd::Promise<bzd::SizeType>{data.size()};
+	return bzd::Promise<bzd::Size>{data.size()};
 }
 
-bzd::Promise<bzd::SizeType> Terminal::read(const bzd::Span<bzd::ByteType>& data) noexcept
+bzd::Promise<bzd::Size> Terminal::read(const bzd::Span<bzd::Byte>& data) noexcept
 {
 	auto& terminal = impl::Terminal::getInstance();
-	return bzd::Promise<bzd::SizeType>{bzd::Promise<bzd::SizeType>::FunctionViewType{terminal, &impl::Terminal::promise}, data};
+	return bzd::Promise<bzd::Size>{bzd::Promise<bzd::Size>::FunctionViewType{terminal, &impl::Terminal::promise}, data};
 }
 */

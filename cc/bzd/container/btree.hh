@@ -16,7 +16,7 @@ namespace bzd::impl {
 /// - All leaves appear in the same level.
 ///
 /// Non-leaf nodes are implemented as non-sorted arrays.
-template <class K, class V, SizeType Order>
+template <class K, class V, Size Order>
 class BTree
 {
 protected:
@@ -28,7 +28,7 @@ protected:
 	};
 
 public:
-	constexpr explicit BTree(const SizeType capacity, Node** root, bzd::interface::Pool<Node>& nodes) :
+	constexpr explicit BTree(const Size capacity, Node** root, bzd::interface::Pool<Node>& nodes) :
 		capacity_(capacity), root_(root), nodes_(nodes)
 	{
 	}
@@ -79,19 +79,19 @@ public:
 	}
 
 protected:
-	const SizeType capacity_;
+	const Size capacity_;
 	Node** root_;
 	bzd::interface::Pool<Node>& nodes_;
 };
 } // namespace bzd::impl
 
 namespace bzd::interface {
-template <class K, class V, SizeType Order>
+template <class K, class V, Size Order>
 using BTree = impl::BTree<K, V, Order>;
 }
 
 namespace bzd {
-template <class K, class V, SizeType N, SizeType Order>
+template <class K, class V, Size N, Size Order>
 class BTree : public interface::BTree<K, V, Order>
 {
 private:

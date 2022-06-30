@@ -13,16 +13,16 @@
 
 namespace bzd::platform::esp32 {
 
-template <SizeType stackSize>
+template <Size stackSize>
 class Core : public bzd::platform::Core<Core<stackSize>>
 {
 private:
 	using Self = Core<stackSize>;
 	using Parent = bzd::platform::Core<Self>;
-	static constexpr bzd::ByteType freertosStackTaintingByte{0xa5};
+	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
-	constexpr Core(const bzd::StringView name, const bzd::UInt8Type cpu, const bzd::UInt8Type priority) noexcept :
+	constexpr Core(const bzd::StringView name, const bzd::UInt8 cpu, const bzd::UInt8 priority) noexcept :
 		name_{name}, cpu_{cpu}, priority_{priority}
 	{
 	}
@@ -97,8 +97,8 @@ private:
 
 private:
 	const bzd::StringView name_;
-	const bzd::UInt8Type cpu_;
-	const bzd::UInt8Type priority_;
+	const bzd::UInt8 cpu_;
+	const bzd::UInt8 priority_;
 	bzd::Stack<stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::platform::WorkloadType> workload_{};
 	TaskHandle_t handle_{};

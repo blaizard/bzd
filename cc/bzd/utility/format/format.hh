@@ -43,11 +43,11 @@ struct Metadata
 		POINTER
 	};
 
-	bzd::SizeType index = 0;
+	bzd::Size index = 0;
 	Sign sign = Sign::AUTO;
 	bool alternate = false;
 	bool isPrecision = false;
-	bzd::SizeType precision = 0;
+	bzd::Size precision = 0;
 	Format format = Format::AUTO;
 };
 
@@ -55,7 +55,7 @@ template <class Adapter, class T>
 class HasFormatter
 {
 	template <class C, class = typename Adapter::template FormatterType<C>>
-	static bzd::typeTraits::TrueType test(bzd::SizeType);
+	static bzd::typeTraits::TrueType test(bzd::Size);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
 
@@ -67,7 +67,7 @@ template <class Adapter, class T>
 class HasFormatterWithMetadata
 {
 	template <class C, class = typename Adapter::template FormatterWithMetadataType<C>>
-	static bzd::typeTraits::TrueType test(bzd::SizeType);
+	static bzd::typeTraits::TrueType test(bzd::Size);
 	template <class C>
 	static bzd::typeTraits::FalseType test(...);
 
@@ -76,7 +76,7 @@ public:
 };
 
 /// Parse an unsigned integer
-static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeType& integer) noexcept
+static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::Size& integer) noexcept
 {
 	bool isDefined = false;
 	integer = 0;
@@ -91,9 +91,9 @@ static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::SizeTyp
 
 /// Return the positional index
 template <class Adapter>
-constexpr bzd::SizeType parseIndex(bzd::StringView& format, const bzd::SizeType autoIndex) noexcept
+constexpr bzd::Size parseIndex(bzd::StringView& format, const bzd::Size autoIndex) noexcept
 {
-	bzd::SizeType index = 0;
+	bzd::Size index = 0;
 	const bool isDefined = parseUnsignedInteger(format, index);
 	if (format.front() == ':')
 	{
@@ -143,7 +143,7 @@ constexpr void parseSign(bzd::StringView& format, Metadata& metadata) noexcept
 /// p    Pointer
 /// %	Percentage. Multiples by 100 and puts % at the end.
 template <class Adapter>
-constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::SizeType current) noexcept
+constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::Size current) noexcept
 {
 	const auto endIndex = format.find('}');
 	Adapter::assertTrue(endIndex != bzd::npos, "Missing closing '}' for the replacement field");
@@ -228,7 +228,7 @@ struct ResultStaticString
 template <class Adapter>
 constexpr ResultStaticString parseStaticString(bzd::StringView& format) noexcept
 {
-	SizeType offset = 0;
+	Size offset = 0;
 	while (offset < format.size())
 	{
 		const auto c = format[offset++];
@@ -312,7 +312,7 @@ public:
 		bzd::StringView format_;
 		ResultStaticString result_{};
 		Metadata metadata_{};
-		SizeType autoIndex_ = 0;
+		Size autoIndex_ = 0;
 		bool end_ = false;
 	};
 
@@ -484,7 +484,7 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
 	metadata.alternate = true;
-	toString(str, reinterpret_cast<SizeType>(value), metadata);
+	toString(str, reinterpret_cast<Size>(value), metadata);
 }
 
 constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata) noexcept
@@ -498,7 +498,7 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
  * Check the format context with the argument type, this to ensure type safety.
  * This function should only be used at compile time.
  */
-template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
+template <Size N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
 constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
 {
 	using TupleType = bzd::typeTraits::RemoveCVRef<decltype(tuple)>;
@@ -539,7 +539,7 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) no
 	return contextCheck<N - 1, Adapter>(metadataList, tuple);
 }
 
-template <SizeType N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
+template <Size N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
 constexpr bool contextCheck(const MetadataList&, const T&) noexcept
 {
 	return true;
@@ -591,7 +591,7 @@ private:
 		constexpr void process(TransportType& transport, const Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
-			SizeType counter = 0;
+			Size counter = 0;
 			constexprForContainerInc(lambdas_, [&](auto lambda) {
 				if (counter++ == index)
 				{

@@ -13,8 +13,8 @@ class Tuple
 public: // Traits
 	using Self = Tuple<ContainerType, Ts...>;
 	using Category = typeTraits::RandomAccessTag;
-	using IndexType = bzd::SizeType;
-	using DifferenceType = bzd::Int32Type;
+	using IndexType = bzd::Size;
+	using DifferenceType = bzd::Int32;
 	using ValueType = bzd::Variant<bzd::typeTraits::AddReference<Ts>...>;
 
 public: // Constructors
@@ -83,7 +83,7 @@ public: // API
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) noexcept
+	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept
 	{
 		Self it{*this};
 		it += index;
@@ -91,7 +91,7 @@ public: // API
 		return *it;
 	}
 
-	[[nodiscard]] constexpr auto& operator[](const SizeType index) const noexcept
+	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept
 	{
 		Self it{*this};
 		it += index;
@@ -99,17 +99,17 @@ public: // API
 		return *it;
 	}
 
-	[[nodiscard]] constexpr BoolType operator==(const Self& it) const noexcept
+	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept
 	{
 		return (it.index_ == index_) && (&(it.tuple_) == &(tuple_));
 	}
-	[[nodiscard]] constexpr BoolType operator!=(const Self& it) const noexcept { return !(it == *this); }
+	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
 	[[nodiscard]] constexpr ValueType& operator*() noexcept { return value_; }
 	[[nodiscard]] constexpr ValueType* operator->() noexcept { return &value_; }
 
 private:
-	template <bzd::SizeType current = 0>
+	template <bzd::Size current = 0>
 	constexpr void updateValue() noexcept
 	{
 		if (index_ == current)
@@ -124,7 +124,7 @@ private:
 
 private:
 	ContainerType& tuple_;
-	bzd::SizeType index_;
+	bzd::Size index_;
 	ValueType value_;
 };
 

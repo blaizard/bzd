@@ -11,16 +11,16 @@ namespace bzd {
  *
  * \return The value at or after than the provided value that is at least alignment bytes aligned.
  */
-template <UInt8Type Align, class T>
+template <UInt8 Align, class T>
 constexpr T alignUp(T value) noexcept
 {
 	static_assert(Align > 0, "The alignment must be greater than 0.");
 	static_assert((Align & (Align - 1)) == 0, "The alignment must be a power of 2.");
 	return T((value + (T(Align) - 1)) & ~T(Align - 1));
 }
-template <UInt8Type Align, class T>
+template <UInt8 Align, class T>
 constexpr T* alignUp(T* value) noexcept
 {
-	return reinterpret_cast<T*>(alignUp<Align>(reinterpret_cast<bzd::IntPtrType>(value)));
+	return reinterpret_cast<T*>(alignUp<Align>(reinterpret_cast<bzd::IntPointer>(value)));
 }
 } // namespace bzd

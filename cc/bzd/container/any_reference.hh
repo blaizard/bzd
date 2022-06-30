@@ -6,12 +6,12 @@
 #include "cc/bzd/type_traits/is_same.hh"
 
 namespace bzd::impl {
-using TypeIdType = IntPtrType;
+using TypeIdType = IntPointer;
 
 template <class T>
 TypeIdType getTypeId()
 {
-	static bzd::BoolType dummy = 0;
+	static bzd::Bool dummy = 0;
 	return reinterpret_cast<TypeIdType>(&dummy);
 }
 } // namespace bzd::impl

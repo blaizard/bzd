@@ -9,7 +9,7 @@
 
 namespace bzd::test {
 
-template <bzd::SizeType N>
+template <bzd::Size N>
 class IStream : public bzd::IStream
 {
 protected:
@@ -20,18 +20,18 @@ public:
 	{
 		for (const auto c : data)
 		{
-			buffer_.pushBack(static_cast<bzd::ByteType>(c));
+			buffer_.pushBack(static_cast<bzd::Byte>(c));
 		}
 		return *this;
 	}
 
-	bzd::Async<bzd::Span<bzd::ByteType>> read(const bzd::Span<bzd::ByteType> data) noexcept override
+	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override
 	{
 		if (buffer_.empty())
 		{
-			co_return bzd::Span<bzd::ByteType>{};
+			co_return bzd::Span<bzd::Byte>{};
 		}
-		bzd::SizeType index{0};
+		bzd::Size index{0};
 		for (const auto b : buffer_.asSpanForReading())
 		{
 			if (index >= data.size())
@@ -45,7 +45,7 @@ public:
 	}
 
 private:
-	bzd::RingBuffer<bzd::ByteType, N> buffer_{};
+	bzd::RingBuffer<bzd::Byte, N> buffer_{};
 };
 
 } // namespace bzd::test

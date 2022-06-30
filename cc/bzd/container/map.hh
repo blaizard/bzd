@@ -24,7 +24,7 @@ public:
 		K first;
 		V second;
 
-		constexpr BoolType operator<(const Element& other) const { return first < other.first; }
+		constexpr Bool operator<(const Element& other) const { return first < other.first; }
 	};
 	using Iterator = typename bzd::interface::Vector<Element>::Iterator;
 
@@ -84,12 +84,12 @@ public:
 	[[nodiscard]] constexpr bool empty() const noexcept { return data_.empty(); }
 
 	/// Get the number of elements in the map.
-	[[nodiscard]] constexpr SizeType size() const noexcept { return data_.size(); }
+	[[nodiscard]] constexpr Size size() const noexcept { return data_.size(); }
 
 	/// \brief Returns the maximum number of elements the map can hold.
 	///
 	/// \return Maximum number of element this map can hold.
-	[[nodiscard]] constexpr SizeType capacity() const noexcept { return data_.capacity(); }
+	[[nodiscard]] constexpr Size capacity() const noexcept { return data_.capacity(); }
 
 	/// Insert a new element or replace the existing one
 	template <class U>
@@ -125,7 +125,7 @@ using Map = impl::Map<K, V, Compare>;
 
 namespace bzd {
 
-template <class K, class V, SizeType N, class Compare = bzd::Less<K>>
+template <class K, class V, Size N, class Compare = bzd::Less<K>>
 class Map : public interface::Map<K, V, Compare>
 {
 private:

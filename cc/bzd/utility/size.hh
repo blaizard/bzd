@@ -19,8 +19,8 @@ requires concepts::size<T>
 	return t.size();
 }
 
-template <class T, SizeType n>
-[[nodiscard]] constexpr bzd::SizeType size(T (&)[n])
+template <class T, Size n>
+[[nodiscard]] constexpr bzd::Size size(T (&)[n])
 {
 	return n;
 }

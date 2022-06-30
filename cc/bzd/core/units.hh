@@ -8,7 +8,7 @@
  * \{
  */
 namespace bzd::units {
-using Meter = bzd::NamedType<bzd::Int32Type, struct MeterTag, bzd::Arithmetic>;
+using Meter = bzd::NamedType<bzd::Int32, struct MeterTag, bzd::Arithmetic>;
 using Kilometer = bzd::MultipleOf<Meter, bzd::ratio::Kilo, bzd::Arithmetic>;
 using Hectometer = bzd::MultipleOf<Meter, bzd::ratio::Hecto, bzd::Arithmetic>;
 using Decameter = bzd::MultipleOf<Meter, bzd::ratio::Deca, bzd::Arithmetic>;
@@ -60,7 +60,7 @@ constexpr bzd::units::Nanometer operator""_nm(unsigned long long length) noexcep
  * \brief Time units.
  */
 namespace bzd::units {
-using Second = bzd::NamedType<bzd::Int64Type, struct SecondTag, bzd::Arithmetic>;
+using Second = bzd::NamedType<bzd::Int64, struct SecondTag, bzd::Arithmetic>;
 using Day = bzd::MultipleOf<Second, bzd::Ratio<86400>, bzd::Arithmetic>;
 using Hour = bzd::MultipleOf<Second, bzd::Ratio<3600>, bzd::Arithmetic>;
 using Minute = bzd::MultipleOf<Second, bzd::Ratio<60>, bzd::Arithmetic>;

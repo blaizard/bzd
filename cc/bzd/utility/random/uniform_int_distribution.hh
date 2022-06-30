@@ -5,7 +5,7 @@
 #include "cc/bzd/utility/numeric_limits.hh"
 
 namespace bzd {
-template <class IntType = bzd::Int32Type, IntType min = 0, IntType max = NumericLimits<IntType>::max()>
+template <class IntType = bzd::Int32, IntType min = 0, IntType max = NumericLimits<IntType>::max()>
 class UniformIntDistribution
 {
 public: // Traits.
@@ -39,7 +39,7 @@ private:
 	}
 };
 
-template <Int32Type min = 0, Int32Type max = NumericLimits<Int32Type>::max()>
-UniformIntDistribution() -> UniformIntDistribution<Int32Type, min, max>;
+template <Int32 min = 0, Int32 max = NumericLimits<Int32>::max()>
+UniformIntDistribution() -> UniformIntDistribution<Int32, min, max>;
 
 } // namespace bzd

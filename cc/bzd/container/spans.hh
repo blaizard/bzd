@@ -13,11 +13,11 @@ namespace bzd {
 /// sections.
 /// The knowledge of number of spans is defined at compile time, from which iterators and channels
 /// can take advantage for copying or moving data.
-template <class T, SizeType N>
+template <class T, Size N>
 class Spans
 {
 public: // Traits.
-	static constexpr SizeType nbSpans = N;
+	static constexpr Size nbSpans = N;
 	using Self = Spans<T, N>;
 	using Iterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::Iterator>;
 	using ConstIterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::ConstIterator>;
@@ -42,9 +42,9 @@ public:
 	/// This is adding all span sizes and returning the sum.
 	///
 	/// \return The sum of all span sizes.
-	[[nodiscard]] constexpr SizeType size() const noexcept
+	[[nodiscard]] constexpr Size size() const noexcept
 	{
-		SizeType sum = 0;
+		Size sum = 0;
 		constexprForContainerInc(spans_, [&](const auto& span) { sum += span.size(); });
 		return sum;
 	}
@@ -54,11 +54,11 @@ public:
 	/// \param[in] offset From where to start to copy.
 	/// \param[in] count The number of elements to copy.
 	/// \return A sub view of the current object.
-	constexpr auto subSpans(const SizeType offset, const SizeType count = npos) const noexcept
+	constexpr auto subSpans(const Size offset, const Size count = npos) const noexcept
 	{
 		Spans<T, N> sub{};
 
-		for (SizeType index = 0, currentCount = count, currentOffset = offset; index < spans_.size() && currentCount; ++index)
+		for (Size index = 0, currentCount = count, currentOffset = offset; index < spans_.size() && currentCount; ++index)
 		{
 			const auto& span = spans_[index];
 			// Ignore spans that are before offset.
@@ -93,7 +93,7 @@ public: // Iterators
 	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{spans_.end()}; }
 
 private:
-	template <class U, SizeType M>
+	template <class U, Size M>
 	friend class Spans;
 
 	Array<Span<T>, N> spans_{};

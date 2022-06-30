@@ -3,23 +3,23 @@
 class Terminal
 {
 	public:
-		enum class Flag : bzd::UInt8Type
+		enum class Flag : bzd::UInt8
 		{
 			nonBlocking,
 			whenFull,
 			whenAtLeastOneChar
 		};
 public:
-	[[nodiscard]] bzd::Promise<bzd::SizeType> write(const bzd::Span<const bzd::ByteType>& data) noexcept;
-	[[nodiscard]] bzd::Promise<bzd::SizeType> write(const bzd::Span<bzd::ByteType>& data) noexcept
+	[[nodiscard]] bzd::Promise<bzd::Size> write(const bzd::Span<const bzd::Byte>& data) noexcept;
+	[[nodiscard]] bzd::Promise<bzd::Size> write(const bzd::Span<bzd::Byte>& data) noexcept
 	{
-		return write(reinterpret_cast<const bzd::Span<const bzd::ByteType>&>(data));
+		return write(reinterpret_cast<const bzd::Span<const bzd::Byte>&>(data));
 	}
-	bzd::Promise<bzd::SizeType> write(bzd::Span<const bzd::ByteType>&& data) noexcept = delete;
-	bzd::Promise<bzd::SizeType> write(bzd::Span<bzd::ByteType>&& data) noexcept = delete;
+	bzd::Promise<bzd::Size> write(bzd::Span<const bzd::Byte>&& data) noexcept = delete;
+	bzd::Promise<bzd::Size> write(bzd::Span<bzd::Byte>&& data) noexcept = delete;
 
 	/// Block until at least one character is available and return it immediatly.
-	[[nodiscard]] bzd::Promise<bzd::SizeType> read(const bzd::Span<bzd::ByteType>& data) noexcept;
-	bzd::Promise<bzd::SizeType> read(bzd::Span<bzd::ByteType>&& data) noexcept = delete;
+	[[nodiscard]] bzd::Promise<bzd::Size> read(const bzd::Span<bzd::Byte>& data) noexcept;
+	bzd::Promise<bzd::Size> read(bzd::Span<bzd::Byte>&& data) noexcept = delete;
 };
 */

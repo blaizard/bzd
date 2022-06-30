@@ -28,7 +28,7 @@ public:
 	constexpr NativeType native() const noexcept { return native_; }
 
 	/// Check if a file descriptor is valid.
-	constexpr BoolType isValid() const noexcept { return native_ != invalid; }
+	constexpr Bool isValid() const noexcept { return native_ != invalid; }
 
 protected:
 	NativeType native_{invalid};

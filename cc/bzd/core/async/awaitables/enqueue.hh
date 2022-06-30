@@ -93,7 +93,7 @@ private:
 	}
 
 private:
-	bzd::Atomic<SizeType> counter_{0};
+	bzd::Atomic<Size> counter_{0};
 };
 
 template <class... Asyncs>
@@ -161,7 +161,7 @@ private:
 	}
 
 private:
-	bzd::Atomic<SizeType> counter_{0};
+	bzd::Atomic<Size> counter_{0};
 	CancellationToken token_{};
 };
 

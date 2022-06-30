@@ -226,8 +226,8 @@ TEST(ContainerSpan, Subspan)
 
 TEST(ContainerSpan, AsBytes)
 {
-	bzd::UInt32Type array[5] = {0, 1, 2, 3, 4};
-	bzd::Span<bzd::UInt32Type> span(array, 5);
+	bzd::UInt32 array[5] = {0, 1, 2, 3, 4};
+	bzd::Span<bzd::UInt32> span(array, 5);
 
 	EXPECT_EQ(span.size(), 5U);
 	EXPECT_EQ(span.sizeBytes(), 20U);

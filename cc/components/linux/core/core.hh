@@ -17,7 +17,7 @@
 
 namespace bzd::platform::linux {
 
-template <SizeType N>
+template <Size N>
 class Core : public bzd::platform::Core<Core<N>>
 {
 private:
@@ -82,7 +82,7 @@ public:
 
 	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(); }
 
-	bzd::SizeType startUsageMonitoring() noexcept
+	bzd::Size startUsageMonitoring() noexcept
 	{
 		// We can use https://man7.org/linux/man-pages/man2/getrusage.2.html
 

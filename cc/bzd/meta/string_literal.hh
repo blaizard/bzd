@@ -6,7 +6,7 @@
 namespace bzd::meta {
 
 /// Type to be used as a template argument.
-template <bzd::SizeType n>
+template <bzd::Size n>
 class StringLiteral
 {
 public:
@@ -15,10 +15,10 @@ public:
 public:
 	[[nodiscard]] constexpr const char* data() const noexcept { return data_; }
 	[[nodiscard]] constexpr char* data() noexcept { return data_; }
-	[[nodiscard]] static constexpr bzd::SizeType size() noexcept { return n; }
+	[[nodiscard]] static constexpr bzd::Size size() noexcept { return n; }
 
 private:
-	template <bzd::SizeType... i>
+	template <bzd::Size... i>
 	constexpr StringLiteral(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data_{arr[i]..., '\0'}
 	{
 	}

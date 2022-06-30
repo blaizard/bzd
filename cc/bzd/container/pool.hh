@@ -6,7 +6,7 @@
 #include "cc/bzd/utility/container_of.hh"
 
 namespace bzd::impl {
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 class Pool : public SingleLinkedPool<T, CapacityType>
 {
 protected:
@@ -28,7 +28,7 @@ public:
 } // namespace bzd::impl
 
 namespace bzd::interface {
-template <class T, class CapacityType = SizeType>
+template <class T, class CapacityType = Size>
 using Pool = impl::Pool<T, CapacityType>;
 }
 
@@ -36,7 +36,7 @@ namespace bzd {
 
 /// A Pool is a fixed memory buffer containing fixed size elements that can be
 /// taken or released.
-template <class T, SizeType N, class CapacityType = SizeType>
+template <class T, Size N, class CapacityType = Size>
 class Pool : public interface::Pool<T, CapacityType>
 {
 private:
