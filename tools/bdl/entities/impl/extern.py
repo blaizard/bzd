@@ -30,6 +30,8 @@ class Extern(Entity):
 
 	@property
 	def typeCategory(self) -> TypeCategory:
+		if self.type == "type":
+			return TypeCategory.struct
 		return TypeCategory(self.type)
 
 	@property

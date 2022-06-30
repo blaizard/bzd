@@ -1,13 +1,13 @@
-#include "cc/components/posix/file_descriptor.hh"
+#include "cc/components/posix/io/file_descriptor.hh"
 
 #include "cc/bzd/test/test.hh"
 
-TEST(FileDescriptorAccessor, basic)
+TEST(FileDescriptor, basic)
 {
-	bzd::platform::posix::FileDescriptorAccessor fd1{};
+	bzd::platform::posix::FileDescriptor fd1{};
 	EXPECT_FALSE(fd1.isValid());
 
-	bzd::platform::posix::FileDescriptorAccessor fd2{12};
+	bzd::platform::posix::FileDescriptor fd2{12};
 	EXPECT_TRUE(fd2.isValid());
 }
 

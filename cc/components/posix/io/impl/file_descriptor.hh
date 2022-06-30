@@ -1,12 +1,11 @@
 #pragma once
 
-#include "cc/bzd/utility/ownership.hh"
+#include "cc/bzd/platform/types.hh"
 
 namespace bzd::platform::posix {
 
-/// Class providing accessors to a file descriptor.
-/// This doesn't mean it has control over the file descriptor itself.
-class FileDescriptorAccessor : public Ownership<FileDescriptorAccessor>
+/// The file descriptor object, non owning, that can be passsed around.
+class FileDescriptor
 {
 protected:
 	using NativeType = int;
@@ -17,12 +16,12 @@ public:
 
 public:
 	/// Default constructor that construct an invalid file descriptor.
-	FileDescriptorAccessor() = default;
+	FileDescriptor() = default;
 
 	/// Construct a file descriptor object a POSIX file descriptor.
 	///
 	/// \param fd The file descriptor to be used.
-	constexpr explicit FileDescriptorAccessor(const NativeType fd) noexcept : native_{fd} {}
+	constexpr explicit FileDescriptor(const NativeType fd) noexcept : native_{fd} {}
 
 public:
 	/// Get the native representation of a file descriptor.
@@ -35,16 +34,13 @@ protected:
 	NativeType native_{invalid};
 };
 
-/// The file descriptor object, non owning, that can be passsed around.
-using FileDescriptor = Borrowed<FileDescriptorAccessor>;
-
 /// Class that owns the file descriptor in the sense that it owns
 /// its memory but also has power to close it if needed.
-class FileDescriptorOwner : public FileDescriptorAccessor
+class FileDescriptorOwner : public FileDescriptor
 {
 public:
-	using FileDescriptorAccessor::NativeType;
-	using FileDescriptorAccessor::FileDescriptorAccessor;
+	using FileDescriptor::NativeType;
+	using FileDescriptor::FileDescriptor;
 
 	constexpr FileDescriptorOwner& operator=(const NativeType fd) noexcept
 	{
