@@ -75,7 +75,7 @@ namespace {{ entity | namespaceToStr }};
 {% end %}
 
 {% for extern in externList %}
-extern {{ extern.type }} {{ extern.name }};
+{{ extern.comment | normalComment }}extern {{ extern.type }} {{ extern.name }};
 {% end %}
 
 {{ declareSymbols(sequence) }}
