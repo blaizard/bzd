@@ -19,6 +19,6 @@ cc_library(
     ],
     deps = [
         "//cc/bzd/core/async",
-        "//cc/components/posix",
+        "//cc/components/posix/io:file_descriptor",
     ],
 )

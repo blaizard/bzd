@@ -8,6 +8,6 @@ bzd_cc_test(
     deps = [
         "//cc:bzd",
         "//cc/bzd/test",
-        "//cc/components/posix:file_descriptor",
+        "//cc/components/posix/io:file_descriptor",
     ],
 )

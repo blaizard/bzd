@@ -37,7 +37,7 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<bzd::Span<bzd::ByteType>> read(FileDescriptor&& fd, const bzd::Span<bzd::ByteType> data) noexcept
+	bzd::Async<bzd::Span<bzd::ByteType>> read(const FileDescriptor fd, const bzd::Span<bzd::ByteType> data) noexcept
 	{
 		{
 			EpollData epollData{fd};
@@ -46,14 +46,14 @@ public:
 			// 1. Register event
 			co_await bzd::async::wait([&](auto& executable) {
 				epollData.executable_ = &executable;
-				::epoll_ctl(epollFd_.native(), EPOLL_CTL_ADD, epollData.fd_->native(), &ev);
+				::epoll_ctl(epollFd_.native(), EPOLL_CTL_ADD, epollData.fd_.native(), &ev);
 			});
 		}
 
 		// TODO: create a scope to opt-out as well.
 
 		// 2. read
-		const auto size = ::read(fd->native(), data.data(), data.size());
+		const auto size = ::read(fd.native(), data.data(), data.size());
 		if (size < 0)
 		{
 			co_return bzd::error::Posix("read");
@@ -62,12 +62,12 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<Size> write(const FileDescriptor fd, const bzd::Span<const bzd::ByteType> data) noexcept
+	bzd::Async<bzd::SizeType> write(const FileDescriptor fd, const bzd::Span<const bzd::ByteType> data) noexcept
 	{
-		Size size{0u};
+		bzd::SizeType size{0u};
 		while (size < data.size())
 		{
-			const auto result = ::write(fd->native(), &data.at(size), data.size() - size);
+			const auto result = ::write(fd.native(), &data.at(size), data.size() - size);
 			if (result < 0)
 			{
 				co_return bzd::error::Posix("write");
@@ -92,7 +92,7 @@ public:
 			for (int i = 0; i < count; ++i)
 			{
 				auto& data{*reinterpret_cast<EpollData*>(events[i].data.ptr)};
-				::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, data.fd_->native(), nullptr);
+				::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, data.fd_.native(), nullptr);
 				data.executable_->schedule();
 			}
 			co_await bzd::async::yield();

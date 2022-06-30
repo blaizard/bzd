@@ -1,4 +1,5 @@
 #include "cc/bzd/core/channel.hh"
+#include "cc/components/posix/stream/in/interface.hh"
 
 #include <iostream>
 #include <poll.h>
@@ -53,7 +54,7 @@ public: // API
 		{
 			co_return bzd::error::Failure("Empty buffer passed to read(...)."_csv);
 		}
-		co_return (co_await proactor_.read(in_.borrow(), data));
+		co_return (co_await proactor_.read(in_, data));
 	}
 
 private:
@@ -61,6 +62,6 @@ private:
 	bzd::BoolType init_{false};
 	termios old_{};
 	termios current_{};
-	FileDescriptorAccessor in_{STDIN_FILENO};
+	FileDescriptor in_{STDIN_FILENO};
 };
 } // namespace bzd::platform::posix

@@ -48,9 +48,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility:to_underlying",
-        "//cc/components/posix",
         "//cc/components/posix:error",
-        "//cc/components/posix:file_descriptor",
+        "//cc/components/posix/io:file_descriptor",
         "//cc/components/posix/network/address",
     ],
 )

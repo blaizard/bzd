@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/components/posix/posix.hh"
+#include "cc/components/posix/io/file_descriptor.hh"
 
 namespace bzd::platform::posix {
 
@@ -14,7 +14,7 @@ public:
 	/// \param fd The file descriptor to write to.
 	/// \param data The data blob to be written.
 	/// \return The number of bytes written.
-	bzd::Async<Size> write(const FileDescriptor fd, const bzd::Span<const bzd::ByteType> data) noexcept
+	bzd::Async<bzd::SizeType> write(const FileDescriptor fd, const bzd::Span<const bzd::ByteType> data) noexcept
 	{
 		return bzd::impl::getMethod(this, &Proactor::write, &Impl::write)->write(fd, data);
 	}

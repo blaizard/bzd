@@ -2,8 +2,6 @@
 
 #include "cc/bzd/core/assert.hh"
 
-#include <iostream>
-
 namespace bzd {
 template <class T>
 class Ownership;
@@ -13,34 +11,34 @@ template <class T>
 class Borrowed
 {
 public:
-	constexpr Borrowed(T& owner) noexcept : owner_{&owner} { owner_->incrementCounter(); }
+	constexpr Borrowed(T& resource) noexcept : resource_{&resource} { resource_->incrementCounter(); }
 	constexpr Borrowed& operator=(const Borrowed&) noexcept = delete;
-	constexpr Borrowed(const Borrowed& other) noexcept : Borrowed{static_cast<T&>(*other.owner_)} {}
+	constexpr Borrowed(const Borrowed& other) noexcept : Borrowed{static_cast<T&>(*other.resource_)} {}
 
 	constexpr Borrowed& operator=(Borrowed&&) noexcept = delete;
-	constexpr Borrowed(Borrowed&& other) noexcept : owner_{bzd::move(other.owner_)} { other.owner_ = nullptr; }
+	constexpr Borrowed(Borrowed&& other) noexcept : resource_{bzd::move(other.resource_)} { other.resource_ = nullptr; }
 
 public:
 	/// Accesses the owner.
 	///
 	/// \return Returns a pointer to the owner.
-	[[nodiscard]] constexpr const T* operator->() const noexcept { return static_cast<const T*>(owner_); }
+	[[nodiscard]] constexpr const T* operator->() const noexcept { return resource_; }
 
 	/// Accesses the owner.
 	///
 	/// \return Returns a pointer to the owner.
-	[[nodiscard]] constexpr T* operator->() noexcept { return static_cast<T*>(owner_); }
+	[[nodiscard]] constexpr T* operator->() noexcept { return resource_; }
 
 	constexpr ~Borrowed() noexcept
 	{
-		if (owner_)
+		if (resource_)
 		{
-			owner_->decrementCounter();
+			resource_->decrementCounter();
 		}
 	}
 
 private:
-	Ownership<T>* owner_;
+	T* resource_;
 };
 
 /// Class providing ownership to a ressource.
@@ -71,10 +69,16 @@ public:
 	}
 	/// \}
 
+	/// Get the number of times this resource is currently borrowed.
+	[[nodiscard]] constexpr bzd::UInt32Type getBorrowedCounter() const noexcept
+	{
+		return borrowedCounter_.load(MemoryOrder::relaxed);
+	}
+
 	/// Ensure all resources have been returned before destroying the object.
 	constexpr ~Ownership() noexcept
 	{
-		const auto value{borrowedCounter_.load(MemoryOrder::relaxed)};
+		const auto value{getBorrowedCounter()};
 		bzd::assert::isTrue(value == 0, "{} dangling borrowed resource(s)."_csv, value);
 	}
 
@@ -87,7 +91,7 @@ private:
 
 private:
 	/// Number of times this resource is borrowed.
-	mutable bzd::Atomic<bzd::Int32Type> borrowedCounter_{0};
+	mutable bzd::Atomic<bzd::UInt32Type> borrowedCounter_{0};
 };
 
 } // namespace bzd
