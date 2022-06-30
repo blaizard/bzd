@@ -3,7 +3,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def toolchain_fragment_esp32_xtensa_lx6_sdk():
     sdk_package_name = "esp32_xtensa_lx6_sdk"
 
-    version = "7a7056873d2dcada49999df6561a79599a15bf35"
+    version = "c5b940ca896f93bac21597d364e1ec0d32c693a4"
     http_archive(
         name = sdk_package_name,
         build_file = "//toolchains/cc/fragments/esp32_xtensa_lx6_sdk:{}.BUILD".format(sdk_package_name),
@@ -11,7 +11,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/{}.zip".format(version),
         ],
         strip_prefix = "bzd-esp32-xtensa-sdk-{}".format(version),
-        sha256 = "4f7f3c66d89b0cb8b779876fc61e8af8999ac96e1c6a1ebba401b3eae59b7215",
+        sha256 = "d4dfac4e9d76ca657aabe8bd8e49a8dd9419fa7f9e6210f5740a68e024d57a22",
     )
 
     return {
@@ -32,7 +32,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-fno-jump-tables",
             "-fno-tree-switch-conversion",
             "-DconfigENABLE_FREERTOS_DEBUG_OCDAWARE=1",
-            #"-fno-exceptions", # This needs to be reverted
+            #"-fno-exceptions",
             "-fno-rtti",
             "-D_GNU_SOURCE",
             "-DIDF_VER=\"v5.0-dev-3290-g01d014c42d-dirty\"",

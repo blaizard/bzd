@@ -300,11 +300,3 @@ bzd::Async<bzd::UInt64> loopSynchronously(int count)
 	}
 	co_return result;
 }
-
-TEST_ASYNC(Coroutine, Stackoverflow)
-{
-	const auto result = co_await loopSynchronously(100000);
-	EXPECT_TRUE(result);
-	EXPECT_EQ(result.value(), 4999950000ULL);
-	co_return {};
-}
