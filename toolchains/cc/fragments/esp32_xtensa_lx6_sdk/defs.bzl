@@ -3,7 +3,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def toolchain_fragment_esp32_xtensa_lx6_sdk():
     sdk_package_name = "esp32_xtensa_lx6_sdk"
 
-    version = "c5b940ca896f93bac21597d364e1ec0d32c693a4"
+    version = "70184e5d354b6fac87bc6a48eba34251526bee32"
     http_archive(
         name = sdk_package_name,
         build_file = "//toolchains/cc/fragments/esp32_xtensa_lx6_sdk:{}.BUILD".format(sdk_package_name),
@@ -11,7 +11,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/{}.zip".format(version),
         ],
         strip_prefix = "bzd-esp32-xtensa-sdk-{}".format(version),
-        sha256 = "d4dfac4e9d76ca657aabe8bd8e49a8dd9419fa7f9e6210f5740a68e024d57a22",
+        sha256 = "",
     )
 
     return {

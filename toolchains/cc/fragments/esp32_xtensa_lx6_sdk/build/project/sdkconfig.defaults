@@ -19,3 +19,9 @@ CONFIG_LOG_DEFAULT_LEVEL_NONE=y
 
 # Do not set the task watchdog otherwise it will trigger from time to time unless reloaded.
 # CONFIG_ESP_TASK_WDT is not set
+
+# Increase the default timeout to not trigger with QEMU.
+CONFIG_ESP_INT_WDT_TIMEOUT_MS=1000
+
+# Increase the speed of the stdio
+CONFIG_CONSOLE_UART_BAUDRATE=460800
