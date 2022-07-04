@@ -11,8 +11,10 @@ stack trace addresses
 register info
 
 With this and the help of tool, we should be able to rebuild the binary used and exrtact a human readable stack trace
-+ more information if needed.
+
+- more information if needed.
 
 Some information about core dump file format:
+
 - https://www.gabriel.urdhr.fr/2015/05/29/core-file/
 - http://uhlo.blogspot.com/2012/05/brief-look-into-core-dumps.html

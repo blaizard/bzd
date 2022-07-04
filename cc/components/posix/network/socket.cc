@@ -15,4 +15,11 @@ bzd::Result<Socket, bzd::Error> Socket::make(const AddressFamily family, const S
 	}
 	return bzd::move(Socket{fd});
 }
+
+/*
+bzd::Result<Socket, bzd::Error> Socket::make(const Address& address, const SocketTypeOption options) noexcept
+{
+	// ...
+}
+*/
 } // namespace bzd::platform::posix::network

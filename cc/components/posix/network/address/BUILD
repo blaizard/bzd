@@ -4,12 +4,12 @@ cc_library(
     name = "address",
     srcs = [
         "address.cc",
-        "ipv4.cc",
     ],
     hdrs = [
         "address.hh",
         "family.hh",
-        "ipv4.hh",
+        "protocol.hh",
+        "socket_type.hh",
     ],
     tags = ["manual"],
     visibility = [
@@ -19,6 +19,7 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container:variant",
         "//cc/bzd/core:error",
+        "//cc/bzd/meta:string_literal",
         "//cc/bzd/utility:to_underlying",
         "//cc/components/posix:error",
         "//cc/components/posix/network:interface",

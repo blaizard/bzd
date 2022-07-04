@@ -2,7 +2,8 @@
 
 #include "cc/bzd/container/variant.hh"
 #include "cc/components/posix/network/address/family.hh"
-#include "cc/components/posix/network/address/ipv4.hh"
+#include "cc/components/posix/network/address/protocol.hh"
+#include "cc/components/posix/network/address/socket_type.hh"
 #include "cc/components/posix/network/types.hh"
 
 #include <netdb.h>
@@ -13,31 +14,35 @@ namespace bzd::platform::posix::network {
 class Address
 {
 public:
+	/// Create an address object from an IP v4 address and a port number.
+	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIpV4(const Protocol protocol,
+																   const StringView string,
+																   const PortType port) noexcept;
+
 	/// Create an address object from an IP address and a port number.
-	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIpPort(const StringView string, const PortType port) noexcept;
+	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIp(const Protocol protocol,
+																 const StringView string,
+																 const PortType port) noexcept;
 
-	constexpr AddressFamily family() const noexcept
-	{
-		return impl_.match([](const auto& impl) { return impl.family; });
-	}
-	constexpr ::sockaddr* address() noexcept
-	{
-		return impl_.match([](auto& impl) { return impl.address(); });
-	}
-	constexpr ::socklen_t size() const noexcept
-	{
-		return impl_.match([](const auto& impl) { return impl.size(); });
-	}
+	constexpr AddressFamily family() const noexcept { return AddressFamily{storage_.ss_family}; }
+	constexpr const ::sockaddr* native() noexcept { return &storageErased_; }
+	constexpr ::socklen_t size() const noexcept { return size_; }
 
 private:
-	template <class Impl>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr explicit Address(Impl&& impl) noexcept : impl_{bzd::forward<Impl>(impl)}
-	{
-	}
+	constexpr Address(const Protocol protocol) noexcept : type_{protocol.getSocketType()}, protocol_{protocol.getProtocolNumber()} {}
+
+	/// Create an address object from an addrinfo structure.
+	constexpr Address(const ::addrinfo&) noexcept {}
 
 private:
-	bzd::Variant<address::IpV4> impl_;
+	// Use an union here to avoid using reinterpret_cast, this will prevent the usage of constexpr.
+	union {
+		::sockaddr storageErased_;
+		::sockaddr_storage storage_;
+	};
+	bzd::Size size_;
+	SocketType type_;
+	Protocol::Number protocol_;
 };
 
 // List of addresses.
@@ -45,10 +50,16 @@ class Addresses
 {
 public:
 	/// Create an address object from a hostname and a port number.
-	[[nodiscard]] static bzd::Result<Addresses, bzd::Error> fromHostnamePort(const StringView hostname, const PortType port) noexcept;
+	[[nodiscard]] static bzd::Result<Addresses, bzd::Error> fromHostname(const Protocol protocol,
+																		 const StringView hostname,
+																		 const PortType port) noexcept;
 
 	~Addresses() noexcept;
+	/*
+		begin() noexcept;
 
+		end() noexcept;
+	*/
 private:
 	constexpr Addresses() noexcept = default;
 
