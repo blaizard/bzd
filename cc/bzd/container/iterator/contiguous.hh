@@ -4,22 +4,23 @@
 
 namespace bzd::iterator {
 
-template <class ValueType>
-class Contiguous : public RandomAccess<ValueType, Contiguous<ValueType>>
+template <class T>
+class Contiguous : public RandomAccess<T, Contiguous<T>>
 {
 public: // Traits
-	using Self = Contiguous<ValueType>;
-	using Parent = RandomAccess<ValueType, Self>;
+	using Self = Contiguous<T>;
+	using Parent = RandomAccess<T, Contiguous<T>>;
 	using Category = typeTraits::ContiguousTag;
+	using ValueType = T;
 
 public: // Constructors
-	using Parent::Parent;
+	constexpr Contiguous(ValueType* data) noexcept : Parent{data} {}
 
 public: // Copy/move constructors/assignments
-	constexpr Contiguous(const Self&) noexcept = default;
-	constexpr Self& operator=(const Self&) noexcept = default;
-	constexpr Contiguous(Self&&) noexcept = default;
-	constexpr Self& operator=(Self&&) noexcept = default;
+	Contiguous(const Self&) = default;
+	Self& operator=(const Self&) = default;
+	Contiguous(Self&&) = default;
+	Self& operator=(Self&&) = default;
 };
 
 } // namespace bzd::iterator
