@@ -25,6 +25,17 @@ cc_library(
 )
 
 cc_library(
+    name = "bidirectional",
+    hdrs = [
+        "bidirectional.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":forward",
+    ],
+)
+
+cc_library(
     name = "forward",
     hdrs = [
         "forward.hh",
@@ -45,10 +56,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits:conditional",
-        "//cc/bzd/type_traits:is_same",
-        "//cc/bzd/type_traits:iterator",
+        ":bidirectional",
     ],
 )
 

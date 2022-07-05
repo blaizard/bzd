@@ -57,7 +57,7 @@ private:
 class Addresses
 {
 private:
-	struct IteratorPolicies : iterator::DefaultPolicies<::addrinfo>
+	struct IteratorPolicies : iterator::ForwardDefaultPolicies<::addrinfo>
 	{
 		static constexpr void increment(::addrinfo*& data) noexcept { data = data->ai_next; }
 	};
