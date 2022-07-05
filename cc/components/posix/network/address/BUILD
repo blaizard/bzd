@@ -16,8 +16,10 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "//cc/bzd/algorithm:copy_n",
         "//cc/bzd/container:result",
         "//cc/bzd/container:variant",
+        "//cc/bzd/container/iterator:forward",
         "//cc/bzd/core:error",
         "//cc/bzd/meta:string_literal",
         "//cc/bzd/utility:to_underlying",
