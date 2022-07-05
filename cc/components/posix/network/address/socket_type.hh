@@ -2,6 +2,8 @@
 
 #include "cc/bzd/utility/to_underlying.hh"
 
+#include <sys/socket.h>
+
 namespace bzd::platform::posix::network {
 
 /// Type for a socket.

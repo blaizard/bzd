@@ -29,7 +29,7 @@ public:
 	constexpr ::socklen_t size() const noexcept { return size_; }
 
 private:
-	constexpr Address(const Protocol protocol) noexcept : type_{protocol.getSocketType()}, protocol_{protocol.getProtocolNumber()} {}
+	constexpr Address(const Size size, const Protocol protocol) noexcept : size_{size}, type_{protocol.getSocketType()}, protocol_{protocol.getProtocolNumber()} {}
 
 	/// Create an address object from an addrinfo structure.
 	constexpr Address(const ::addrinfo&) noexcept {}
@@ -40,7 +40,7 @@ private:
 		::sockaddr storageErased_;
 		::sockaddr_storage storage_;
 	};
-	bzd::Size size_;
+	Size size_;
 	SocketType type_;
 	Protocol::Number protocol_;
 };

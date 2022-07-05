@@ -11,7 +11,7 @@ namespace bzd::platform::posix::network {
 
 bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, const StringView string, const PortType port) noexcept
 {
-	Address address{protocol};
+	Address address{sizeof(::sockaddr_in), protocol};
 	::sockaddr_in& storage{reinterpret_cast<::sockaddr_in&>(address.storage_)};
 
 	const auto result = ::inet_pton(AF_INET, string.data(), &(storage.sin_addr));
@@ -25,7 +25,6 @@ bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, cons
 	}
 	storage.sin_family = AF_INET;
 	storage.sin_port = ::htons(port);
-	address.size_ = sizeof(::sockaddr_in);
 
 	return address;
 }
