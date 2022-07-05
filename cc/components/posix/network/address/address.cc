@@ -40,17 +40,10 @@ bzd::Result<Address, bzd::Error> Address::fromIp(const Protocol protocol, const 
 	return bzd::move(maybeAddress).valueMutable();
 }
 
-/*
-bzd::Result<Address, bzd::Error> Address::fromAddrinfo(const ::addrinfo&) noexcept
-{
-}
-*/
-
 bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protocol, const StringView hostname, const PortType port) noexcept
 {
 	Addresses addresses{};
 	::addrinfo hints{};
-	;
 	String<8> portStr;
 	toString(portStr, port);
 
@@ -58,20 +51,25 @@ bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protoc
 	hints.ai_socktype = bzd::toUnderlying(protocol.getSocketType());
 	hints.ai_protocol = protocol.getProtocolNumber();
 
-	if (const auto result = ::getaddrinfo(hostname.data(), portStr.data(), &hints, &addresses.addrs_); result != 0)
+	if (const auto result = ::getaddrinfo(hostname.data(), portStr.data(), &hints, &addresses.addr_); result != 0)
 	{
 		return bzd::error::Failure("getaddrinfo for {}:{}, {}"_csv, hostname, portStr, ::gai_strerror(result));
 	}
 	return addresses;
 }
 
+void Addresses::reset() noexcept
+{
+	if (addr_)
+	{
+		::freeaddrinfo(addr_);
+		addr_ = nullptr;
+	}
+}
+
 Addresses::~Addresses() noexcept
 {
-	if (addrs_)
-	{
-		::freeaddrinfo(addrs_);
-		addrs_ = nullptr;
-	}
+	reset();
 }
 
 } // namespace bzd::platform::posix::network
