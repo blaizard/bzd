@@ -15,10 +15,10 @@ public:
 	constexpr Protocol(const SocketType type, const Number protocol = 0) noexcept : type_{type}, protocol_{protocol} {}
 
 	/// Get the socket type associated with this protocol.
-	SocketType getSocketType() const noexcept { return type_; }
+	constexpr SocketType getSocketType() const noexcept { return type_; }
 
 	/// Get the official protocol number as it will appear within the IP header.
-	Number getProtocolNumber() const noexcept { return protocol_; }
+	constexpr Number getProtocolNumber() const noexcept { return protocol_; }
 
 private:
 	SocketType type_;
