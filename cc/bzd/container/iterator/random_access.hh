@@ -4,40 +4,29 @@
 
 namespace bzd::iterator {
 
-template <class T>
-struct RandomAccessDefaultPolicies : BidirectionalDefaultPolicies<T>
+template <class T, class CRTP = void, class Policies = impl::DefaultPolicies<T>>
+class RandomAccess : public impl::ClassTraits<RandomAccess, T, CRTP, Policies, Bidirectional>::Parent
 {
-	using ValueType = T;
-	using IndexType = bzd::Size;
-	using DifferenceType = bzd::Int32;
-	using BidirectionalDefaultPolicies<T>::increment;
-	using BidirectionalDefaultPolicies<T>::decrement;
+private:
+	using Traits = impl::ClassTraits<RandomAccess, T, CRTP, Policies, Bidirectional>;
 
-	static constexpr void increment(T*& data, const int n) noexcept { data += n; }
-	static constexpr void decrement(T*& data, const int n) noexcept { data -= n; }
-	static constexpr auto& at(auto* data, const Size n) noexcept { return data[n]; }
-};
-
-template <class T, class CRTP = void, class Policies = RandomAccessDefaultPolicies<T>>
-class RandomAccess : public Bidirectional<T, CRTP, Policies>
-{
 public: // Traits
-	using Self = RandomAccess<T, CRTP, Policies>;
-	using ActualSelf = typeTraits::Conditional<typeTraits::isSame<CRTP, void>, Self, CRTP>;
-	using Parent = Bidirectional<T, CRTP, Policies>;
+	using Self = typename Traits::Self;
+	using ActualSelf = typename Traits::ActualSelf;
+	using Parent = typename Traits::Parent;
 	using Category = typeTraits::RandomAccessTag;
-	using IndexType = bzd::Size;
-	using DifferenceType = bzd::Int32;
-	using ValueType = T;
+	using IndexType = typename Policies::IndexType;
+	using DifferenceType = typename Policies::DifferenceType;
+	using ValueType = typename Policies::ValueType;
 
 public: // Constructors
 	constexpr RandomAccess(ValueType* data) noexcept : Parent{data} {}
 
 public: // Copy/move constructors/assignments
-	RandomAccess(const Self&) = default;
-	Self& operator=(const Self&) = default;
-	RandomAccess(Self&&) = default;
-	Self& operator=(Self&&) = default;
+	RandomAccess(const RandomAccess&) = default;
+	RandomAccess& operator=(const RandomAccess&) = default;
+	RandomAccess(RandomAccess&&) = default;
+	RandomAccess& operator=(RandomAccess&&) = default;
 
 public: // API
 	[[nodiscard]] constexpr ActualSelf operator+(const int n) const noexcept
@@ -54,11 +43,6 @@ public: // API
 		return it;
 	}
 
-	[[nodiscard]] constexpr DifferenceType operator-(const Self& other) const noexcept
-	{
-		return static_cast<DifferenceType>(&(this->operator*()) - &(*other));
-	}
-
 	constexpr ActualSelf& operator+=(const int n) noexcept
 	{
 		Policies::increment(this->data_, n);
@@ -69,6 +53,11 @@ public: // API
 	{
 		Policies::decrement(this->data_, n);
 		return static_cast<ActualSelf&>(*this);
+	}
+
+	[[nodiscard]] constexpr DifferenceType operator-(const Self& other) const noexcept
+	{
+		return static_cast<DifferenceType>(&(this->operator*()) - &(*other));
 	}
 
 	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return Policies::at(this->data_, index); }

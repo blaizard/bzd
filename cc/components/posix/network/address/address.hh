@@ -57,7 +57,7 @@ private:
 class Addresses
 {
 private:
-	struct IteratorPolicies : iterator::ForwardDefaultPolicies<::addrinfo>
+	struct IteratorPolicies : iterator::impl::DefaultPolicies<::addrinfo>
 	{
 		static constexpr void increment(::addrinfo*& data) noexcept { data = data->ai_next; }
 	};
@@ -93,7 +93,7 @@ public: // Copy/move constructors/assignments
 	Addresses(const Addresses&) = delete;
 	Addresses& operator=(const Addresses&) = delete;
 	constexpr Addresses(Addresses&& other) noexcept : addr_{other.addr_} { other.addr_ = nullptr; }
-	constexpr Addresses& operator=(Addresses&& other) noexcept
+	Addresses& operator=(Addresses&& other) noexcept
 	{
 		reset();
 		addr_ = other.addr_;
