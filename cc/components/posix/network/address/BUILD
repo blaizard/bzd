@@ -17,6 +17,7 @@ cc_library(
     ],
     deps = [
         "//cc/bzd/algorithm:copy_n",
+        "//cc/bzd/algorithm:fill",
         "//cc/bzd/container:result",
         "//cc/bzd/container:variant",
         "//cc/bzd/container/iterator:forward",

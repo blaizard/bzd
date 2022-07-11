@@ -42,21 +42,28 @@ public:
 	using FileDescriptor::FileDescriptor;
 	using FileDescriptor::NativeType;
 
+	FileDescriptorOwner(const FileDescriptorOwner&&) = delete;
+	FileDescriptorOwner& operator=(const FileDescriptorOwner&) = delete;
+	constexpr FileDescriptorOwner(FileDescriptorOwner&& other) noexcept : FileDescriptor{other.native_} { other.native_ = this->invalid; }
+	constexpr FileDescriptorOwner& operator=(FileDescriptorOwner&& other) noexcept
+	{
+		reset();
+		this->native_ = other.native_;
+		other.native_ = this->invalid;
+		return *this;
+	}
+	/// Close the file descriptor on destruction of this object.
+	~FileDescriptorOwner() noexcept;
+
 	constexpr FileDescriptorOwner& operator=(const NativeType fd) noexcept
 	{
-		if (this->native_ != this->invalid)
-		{
-			close();
-		}
+		reset();
 		native_ = fd;
 		return *this;
 	}
 
 	/// Close the file descriptor.
-	void close() noexcept;
-
-	/// Close the file descriptor on destruction of this object.
-	~FileDescriptorOwner() noexcept;
+	void reset() noexcept;
 };
 
 } // namespace bzd::platform::posix

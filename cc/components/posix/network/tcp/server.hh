@@ -1,21 +1,89 @@
 #pragma once
 
+#include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/logger.hh"
+#include "cc/components/posix/network/address/address.hh"
+#include "cc/components/posix/network/socket.hh"
+
+#include <iostream>
+
 namespace bzd::platform::posix::network::tcp {
-template <class Handler>
 class Server
 {
 public:
-	constexpr Server(const StringView endpoint, Handler& handler) {}
+	bzd::Async<> bind(const StringView endpoint, const PortType port) noexcept
+	{
+		// Try to connect as it is an IP address
+		auto maybeAddress = Address::fromIp(protocol::tcp, endpoint, port);
+		if (maybeAddress)
+		{
+			co_await !createSocketAndBind(maybeAddress.value());
+			co_return {};
+		}
 
-	auto init() { socket_ = endpoint.createSocket(endpoint_); }
+		// If not assume it is a hostname
+		auto result = Addresses::fromHostname(protocol::tcp, endpoint, port);
+		if (!result)
+		{
+			co_return bzd::move(result).propagate();
+		}
+		for (const auto& address : result.value())
+		{
+			if (auto socketCreated = co_await createSocketAndBind(address); !socketCreated)
+			{
+				co_await !bzd::log::warning(socketCreated.error());
+			}
+			else
+			{
+				co_return {};
+			}
+		}
+		co_return bzd::error::Failure("Server initialization failed."_csv);
+	}
+
+	bzd::Async<> listen() noexcept
+	{
+		if (auto result = socket_.listen(5U); !result)
+		{
+			co_return bzd::move(result).propagate();
+		}
+
+		co_return {};
+	}
+
+	bzd::Async<> shutdown() noexcept
+	{
+		socket_.reset();
+		co_return {};
+	}
 
 private:
-	void onNewConnection()
+	bzd::Async<> createSocketAndBind(const Address& address) noexcept
 	{
-		connection = accept();
-		Stream stream{connection};
-		handler.handle(bzd::move(stream));
+		auto maybeSocket = Socket::make(address);
+		if (!maybeSocket)
+		{
+			co_return bzd::move(maybeSocket).propagate();
+		}
+		auto result = maybeSocket->bind(address);
+		if (!result)
+		{
+			co_return bzd::move(result).propagate();
+		}
+		socket_ = bzd::move(maybeSocket.valueMutable());
+		co_return {};
 	}
+
+	/*	void onNewConnection()
+		{
+			connection = accept();
+			Stream stream{connection};
+			handler.handle(bzd::move(stream));
+		}
+	*/
+
+private:
+	Socket socket_{};
 };
 } // namespace bzd::platform::posix::network::tcp
 

@@ -142,6 +142,12 @@ public: // Find
 		return npos;
 	}
 
+	template <class... Args>
+	[[nodiscard]] constexpr Bool contains(Args&&... args) const noexcept
+	{
+		return find(bzd::forward<Args>(args)...) != npos;
+	}
+
 public: // Subviews. Their definition is in bzd::Span
 	[[nodiscard]] constexpr auto asSpan() const noexcept;
 	[[nodiscard]] constexpr auto asSpan() noexcept;
