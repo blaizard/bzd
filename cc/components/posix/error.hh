@@ -11,8 +11,8 @@ namespace bzd::error {
 struct Posix : public bzd::ResultError<bzd::Error>
 {
 	Posix(const bzd::StringView function, const SourceLocation location = SourceLocation::current()) noexcept :
-		bzd::ResultError<bzd::Error>{location, ErrorType::failure, function}
-	//"POSIX function '{}', errno {}, '{}'"_csv, function, errno, ::strerror(errno)}
+		bzd::ResultError<bzd::Error>{
+			location, ErrorType::failure, "POSIX function '{}', errno {}, '{}'"_csv, function, errno, ::strerror(errno)}
 	{
 	}
 };

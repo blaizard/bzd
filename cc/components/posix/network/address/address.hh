@@ -21,14 +21,21 @@ public:
 																   const StringView string,
 																   const PortType port) noexcept;
 
+	/// Create an address object from an IP v6 address and a port number.
+	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIpV6(const Protocol protocol,
+																   const StringView string,
+																   const PortType port) noexcept;
+
 	/// Create an address object from an IP address and a port number.
 	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIp(const Protocol protocol,
 																 const StringView string,
 																 const PortType port) noexcept;
 
 	constexpr AddressFamily family() const noexcept { return AddressFamily{storage_.ss_family}; }
-	constexpr const ::sockaddr* native() noexcept { return &storageErased_; }
+	constexpr const ::sockaddr* native() const noexcept { return &storageErased_; }
 	constexpr ::socklen_t size() const noexcept { return size_; }
+	constexpr SocketType socketType() const noexcept { return type_; }
+	constexpr Protocol::Number protocol() const noexcept { return protocol_; }
 
 	/// Create an address object from an addrinfo structure.
 	constexpr Address(const ::addrinfo& addr) noexcept : size_{addr.ai_addrlen}, type_{addr.ai_socktype}, protocol_{addr.ai_protocol}

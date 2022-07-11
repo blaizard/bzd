@@ -18,3 +18,6 @@ Some information about core dump file format:
 
 - https://www.gabriel.urdhr.fr/2015/05/29/core-file/
 - http://uhlo.blogspot.com/2012/05/brief-look-into-core-dumps.html
+- https://github.com/Percona-Lab/coredumper
+
+To create a elf file, we can use: https://github.com/serge1/ELFIO
