@@ -1,12 +1,9 @@
+use "cc/bzd/platform/interfaces/clock.bdl"
 
 namespace bzd.platform.std.clock;
 
 
-interface DummySystem {
-	
-}
-
-component System : DummySystem {
+component System : bzd.Clock {
 interface:
 	
 }

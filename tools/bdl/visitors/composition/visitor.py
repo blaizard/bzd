@@ -25,15 +25,13 @@ class Composition:
 
 	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
 
-		self.infraFQNs: typing.Final[typing.List[str]] = ["out", "in", "steadyClock", "systemClock"]
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.dependencies = DependencyMap(symbols=self.symbols)
 		self.registry: typing.Dict[str, Expression] = {}
+		self.platform: typing.Dict[str, Expression] = {}
 		# All top level expressions
 		self.all: typing.Dict[str, Expression] = {}
-		# All infrastructure dependencies.
-		self.infra: typing.List[Expression] = []
 		# All executors.
 		self.executors: typing.Dict[str, Expression] = {}
 		# All composition per executors.
@@ -65,8 +63,6 @@ class Composition:
 			self.dependencies.add(entity)
 		self.dependencies.addImplicit()
 
-		self.infra = [self.registry[fqn] for fqn in self.infraFQNs if fqn in self.registry]
-
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
 		for fqn, entity in self.all.items():
@@ -76,8 +72,13 @@ class Composition:
 			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.active
 			self.addExecutor(entity)
 
+		# Handle platform elements
+		for fqn, entity in self.all.items():
+			if fqn.startswith("platform"):
+				self.platform[fqn] = entity
+
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		commonServices = self.dependencies.findAllIntra(self.infra)  # type: ignore
+		commonServices = self.dependencies.findAllIntra(self.platform.values())  # type: ignore
 		for fqn, executorComposition in self.composition.items():
 			services = commonServices + self.dependencies.findAllIntra(
 				[self.registry[fqn]]) + self.dependencies.findAllIntra([*executorComposition.keys()])
@@ -95,6 +96,7 @@ class Composition:
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Dependencies", str(self.dependencies).split("\n"))
 		addContent(content, "Registry", self.registry.values())
+		addContent(content, "Platform", self.platform.keys())
 		addContent(content, "Executors", self.executors.keys())
 		for executor, items in self.composition.items():
 			addContent(content, f"Composition '({executor})'", [f"{k}: {v}" for k, v in items.items()])

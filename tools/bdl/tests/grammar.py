@@ -117,6 +117,7 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "a",
 			"type": "int"
 			}
@@ -132,12 +133,14 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "a",
 			"type": "int"
 			}
 			}, {
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "b",
 			"type": "float",
 			"const": ""
@@ -157,7 +160,14 @@ class TestRun(unittest.TestCase):
 
 	def testExpression(self) -> None:
 		parser = Parser(content="var1 = Integer;")
-		self.assertParserEqual(parser, [{"@": {"category": "expression", "name": "var1", "type": "Integer"}}])
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"name": "var1",
+			"symbol": None,
+			"type": "Integer"
+			}
+		}])
 
 		parser = Parser(content="Integer;")
 		self.assertParserEqual(parser, [{"@": {"category": "expression", "type": "Integer"}}])
@@ -166,6 +176,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -180,6 +191,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"const": "",
 			"name": "var1",
 			"type": "Float",
@@ -205,6 +217,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -223,6 +236,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -238,6 +252,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			"symbol": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -274,6 +289,17 @@ class TestRun(unittest.TestCase):
 			"value": "12"
 			}
 			}]
+		}])
+
+		parser = Parser(content="var1: my.base.type = Integer();")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"symbol": "my.base.type",
+			"name": "var1",
+			"type": "Integer",
+			},
+			"argument": []
 		}])
 
 

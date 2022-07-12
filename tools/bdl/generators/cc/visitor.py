@@ -93,10 +93,9 @@ class Transform:
 			AsyncType.service: "bzd::async::Type::service",
 		}[asyncType]
 
-	# Infra
-	def isInfra(self, expression: Expression) -> bool:
-		assert self.composition
-		return expression.fqn in self.composition.infraFQNs
+	# Platform
+	def isPlatform(self, expression: Expression) -> bool:
+		return expression.fqn.startswith("bzd.platform")
 
 
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:

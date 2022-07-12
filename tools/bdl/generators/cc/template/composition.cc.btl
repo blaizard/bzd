@@ -34,16 +34,6 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 #include "{{ path }}"
 {% end %}
 
-// Backend platform symbols
-namespace bzd::platform::backend {
-
-bzd::OStream* out{nullptr};
-bzd::IStream* in{nullptr};
-bzd::Clock* steadyClock{nullptr};
-bzd::Clock* systemClock{nullptr};
-
-} // namespace bzd::platform::backend
-
 // for deploy in deployments
 
 namespace {
@@ -108,7 +98,31 @@ protected:
 	bzd::Int32 refCount_{0};
 };
 
+} // namespace
+
+// ==== Platform ==============================================================
+
+namespace bzd::platform::backend {
+{% for fqn, expression in platform %}
+static ::{{ expression.interfaceTypeResolved | typeDefinitionToStr }}* {{ expression.name }}{nullptr};
+{% end %}
+} // bzd::platform::backend
+
+namespace bzd::platform {
+
+{% for fqn, expression in platform %}
+[[nodiscard]] ::{{ expression.interfaceTypeResolved | typeDefinitionToStr }}& {{ expression.name }}() noexcept
+{
+	return *::bzd::platform::backend::{{ expression.name }};
+}
+{% end %}
+
+} // bzd::platform
+
 // ==== Specializations =======================================================
+
+namespace {
+
 {% for fqn, expression in registry %}
 
 // Specialization for '{{ fqn | fqnToStr }}'.
@@ -119,15 +133,15 @@ protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
 		{{ callInitMembers(expression) }}
-		{% if isInfra(expression) %}
-		bzd::platform::backend::{{ fqn }} = &registry.{{ fqn | fqnToNameStr }}_.get();
+		{% if fqn in platform %}
+		::bzd::platform::backend::{{ expression.name }} = &registry.{{ fqn | fqnToNameStr }}_.get();
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if isInfra(expression) %}
-		bzd::platform::backend::{{ fqn }} = nullptr;
+		{% if fqn in platform  %}
+		::bzd::platform::backend::{{ expression.name }} = nullptr;
 		{% end %}
 		{{ callShutdownMembers(expression) }}
 		co_return {};
@@ -185,11 +199,11 @@ bool execute() noexcept
 	// Create registry.
 	[[maybe_unused]] auto registry = makeRegistry();
 
-	// Initialize infrastructure.
-	{% for expression in infra %}
-	registry.{{ expression.fqn | fqnToNameStr }}_.init(registry).sync();
+	// Initialize platform.
+	{% for fqn, expression in platform %}
+	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
 	{% end %}
-	bzd::log::info("Initialization of infra completed."_csv).sync();
+	bzd::log::info("Initialization of platform completed."_csv).sync();
 
 	// Initialize executors.
 	{% for fqn, executor in executors %}
