@@ -182,15 +182,22 @@ class SymbolMap:
 			return None
 		return data
 
-	def items(self, categories: typing.Set[str] = set()) -> typing.Iterator[typing.Tuple[str, EntityType]]:
+	def items(self,
+		categories: typing.Set[str] = set(),
+		startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
 		Iterate through entities optionaly filtered by their categories.
+
+		Args:
+			categories: Categories to be returned.
+			startsWith: The returned items start with the specified fqn.
 		"""
 
 		for fqn, meta in self.map.items():
 			if meta["c"] in categories:
-				entity = self.getEntityResolved(fqn=fqn).value
-				yield fqn, entity
+				if fqn.startswith(startsWith):
+					entity = self.getEntityResolved(fqn=fqn).value
+					yield fqn, entity
 
 	def insert(self,
 		name: typing.Optional[str],

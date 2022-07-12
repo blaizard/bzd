@@ -157,11 +157,11 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	name = type[(value)] [contract];
+	name [: symbol] = type[(value)] [contract];
 	"""
 
 	return [
-		GrammarItem(_regexprNameOrVarArgs + r"\s*=", {"category": "expression"},
+		GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _regexprSymbol + r"\s*)?=", {"category": "expression"},
 		makeGrammarExpressionFragment(finalGrammar))
 	]
 
@@ -169,7 +169,7 @@ def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewEl
 def makeGrammarExpression() -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	[name =] type[(value)] [contract];
+	[name [: interface] =] type[(value)] [contract];
 	"""
 
 	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]

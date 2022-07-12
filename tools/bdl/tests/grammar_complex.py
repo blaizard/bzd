@@ -35,6 +35,11 @@ interface MyFy
 			'i': 0,
 			'e': 10
 			},
+			'symbol': {
+			'v': None,
+			'i': 0,
+			'e': 10
+			},
 			'type': {
 			'v': 'Float',
 			'i': 11,
@@ -59,6 +64,11 @@ interface MyFy
 			},
 			'category': {
 			'v': 'expression',
+			'i': 37,
+			'e': 54
+			},
+			'symbol': {
+			'v': None,
 			'i': 37,
 			'e': 54
 			},
@@ -117,6 +127,11 @@ interface MyFy
 			'@': {
 			'category': {
 			'v': 'expression',
+			'i': 86,
+			'e': 104
+			},
+			'symbol': {
+			'v': None,
 			'i': 86,
 			'e': 104
 			},
@@ -219,6 +234,11 @@ interface MyFy
 			'i': 180,
 			'e': 189
 			},
+			'symbol': {
+			'v': None,
+			'i': 180,
+			'e': 189
+			},
 			'type': {
 			'v': 'Sequence',
 			'i': 190,
@@ -256,6 +276,11 @@ interface MyFy
 			'i': 223,
 			'e': 228
 			},
+			'symbol': {
+			'v': None,
+			'i': 223,
+			'e': 228
+			},
 			'type': {
 			'v': 'MyType',
 			'i': 229,
@@ -271,6 +296,11 @@ interface MyFy
 			},
 			'name': {
 			'v': 'varConst',
+			'i': 238,
+			'e': 248
+			},
+			'symbol': {
+			'v': None,
 			'i': 238,
 			'e': 248
 			},
@@ -303,6 +333,11 @@ interface MyFy
 			},
 			'name': {
 			'v': 'varInitialized',
+			'i': 273,
+			'e': 289
+			},
+			'symbol': {
+			'v': None,
 			'i': 273,
 			'e': 289
 			},

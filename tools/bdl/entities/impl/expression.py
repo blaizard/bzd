@@ -31,6 +31,7 @@ class Expression(Entity):
 		- [name]: The resulting symbol name.
 		- [const]: If the expression is constant.
 		- [underlyingValue]: The actual value discovered after resolution.
+		- [symbol]: The interface type if any (might not be set).
 	- Sequence:
 		- argument: The list of arguments to pass to the instanciation or method call.
 		- argument_resolved: List of resolved arguments.
@@ -84,6 +85,20 @@ class Expression(Entity):
 			const="const")
 
 	@property
+	def isInterfaceType(self) -> bool:
+		return self.element.isAttr("symbol") and bool(self.element.getAttr("symbol").value)
+
+	@cached_property
+	def interfaceType(self) -> Type:
+		return Type(element=self.element, kind="symbol", underlyingType="fqn_interface",
+			const="const") if self.isInterfaceType else self.type
+
+	@cached_property
+	def interfaceTypeResolved(self) -> Type:
+		return Type(element=self.element, kind="symbol", underlyingType="fqn_interface",
+			const="const") if self.isInterfaceType else self.typeResolved
+
+	@property
 	def isValue(self) -> bool:
 		return self.element.isAttr("value")
 
@@ -135,6 +150,9 @@ class Expression(Entity):
 
 		entity = self.type.resolve(resolver=resolver)
 
+		if self.isInterfaceType:
+			self.interfaceType.resolve(resolver=resolver)
+
 		# Set the underlying value
 		if self.isParameters:
 
@@ -185,7 +203,7 @@ class Expression(Entity):
 		if TypeCategory.component in parameterTypeCategories:
 			typeCategory = resolvedTypeEntity.typeCategory  # type: ignore
 			self.assertTrue(condition=typeCategory in [TypeCategory.component],
-				message=f"Components are not allowed for this type.")
+				message=f"Components are not allowed for this type '{typeCategory}'.")
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
