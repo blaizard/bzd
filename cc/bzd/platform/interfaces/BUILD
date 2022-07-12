@@ -6,6 +6,9 @@ bdl_library(
         "clock.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core:clock",
+    ],
 )
 
 bdl_library(
