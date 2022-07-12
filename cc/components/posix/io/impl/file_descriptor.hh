@@ -45,22 +45,11 @@ public:
 	FileDescriptorOwner(const FileDescriptorOwner&&) = delete;
 	FileDescriptorOwner& operator=(const FileDescriptorOwner&) = delete;
 	constexpr FileDescriptorOwner(FileDescriptorOwner&& other) noexcept : FileDescriptor{other.native_} { other.native_ = this->invalid; }
-	constexpr FileDescriptorOwner& operator=(FileDescriptorOwner&& other) noexcept
-	{
-		reset();
-		this->native_ = other.native_;
-		other.native_ = this->invalid;
-		return *this;
-	}
+	FileDescriptorOwner& operator=(FileDescriptorOwner&& other) noexcept;
 	/// Close the file descriptor on destruction of this object.
 	~FileDescriptorOwner() noexcept;
 
-	constexpr FileDescriptorOwner& operator=(const NativeType fd) noexcept
-	{
-		reset();
-		native_ = fd;
-		return *this;
-	}
+	FileDescriptorOwner& operator=(const NativeType fd) noexcept;
 
 	/// Close the file descriptor.
 	void reset() noexcept;
