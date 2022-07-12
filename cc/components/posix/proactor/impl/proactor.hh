@@ -22,6 +22,7 @@ private:
 	};
 
 public:
+	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<> init() noexcept
 	{
 		if (epollFd_.isValid())
@@ -37,6 +38,7 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
+	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<bzd::Span<bzd::Byte>> read(const FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept
 	{
 		{
@@ -62,6 +64,7 @@ public:
 	}
 
 	/// Perform an asynchronous read operator.
+	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{
 		bzd::Size size{0u};
@@ -78,6 +81,7 @@ public:
 	}
 
 	/// Execution loop for the reactor to poll events.
+	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<> exec() noexcept
 	{
 		const auto& executor = co_await bzd::async::getExecutor();

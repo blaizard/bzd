@@ -50,7 +50,7 @@ bzd::Result<void, bzd::Error> Socket::connect(const Address& address) noexcept
 
 bzd::Result<void, bzd::Error> Socket::listen(const bzd::Size maxPendingConnection) noexcept
 {
-	const auto result = ::listen(fd_.native(), maxPendingConnection);
+	const auto result = ::listen(fd_.native(), static_cast<int>(maxPendingConnection));
 	if (result != 0)
 	{
 		return bzd::error::Posix("listen");
@@ -58,6 +58,7 @@ bzd::Result<void, bzd::Error> Socket::listen(const bzd::Size maxPendingConnectio
 	return bzd::nullresult;
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bzd::Async<Socket> Socket::accept() noexcept
 {
 	::sockaddr_storage addr;
