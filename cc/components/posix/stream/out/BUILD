@@ -21,6 +21,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
-        "//cc/bzd/core:channel",
     ],
 )

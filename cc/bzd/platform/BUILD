@@ -4,7 +4,7 @@ cc_library(
     name = "platform",
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/platform/backend",
+        "//cc/targets",
     ],
 )
 

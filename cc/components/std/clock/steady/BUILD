@@ -22,6 +22,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//cc/bzd/core:clock",
     ],
 )

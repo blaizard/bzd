@@ -8,6 +8,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/platform/interfaces:stream",
         "//cc/components/posix/proactor",
     ],
 )
@@ -20,6 +21,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
-        "//cc/bzd/core:channel",
     ],
 )
