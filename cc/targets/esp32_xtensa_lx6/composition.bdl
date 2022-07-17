@@ -3,7 +3,8 @@ use "cc/components/generic/stream/stub/interface.bdl"
 use "cc/components/xtensa/clock/xthal/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
 use "cc/components/xtensa/core/interface.bdl"
-
+use "cc/bzd/platform/interfaces/stream.bdl"
+use "cc/bzd/platform/interfaces/clock.bdl"
 
 
 composition {
@@ -22,5 +23,3 @@ composition platform {
 	systemClock: bzd.Clock = bzd.platform.generic.clock.Null();
 	
 }
-
-

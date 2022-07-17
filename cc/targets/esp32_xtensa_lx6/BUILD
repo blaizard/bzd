@@ -13,6 +13,8 @@ bdl_library(
         "//cc/components/std/stream/out",
         "//cc/components/xtensa/clock/xthal",
         "//cc/components/xtensa/core",
+        "//cc/bzd/platform/interfaces:stream",
+        "//cc/bzd/platform/interfaces:clock"
     ],
 )
 
