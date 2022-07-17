@@ -5,6 +5,7 @@ cc_library(
     hdrs = [
         "client.hh",
     ],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//cc/components/posix/network:socket",
@@ -16,6 +17,7 @@ cc_library(
     hdrs = [
         "server.hh",
     ],
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//cc/components/posix/network:socket",
