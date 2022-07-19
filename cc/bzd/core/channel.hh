@@ -13,6 +13,9 @@ template <class T>
 class OChannel
 {
 public:
+	virtual ~OChannel() = default;
+
+public:
 	/// Write data to an output channel.
 	/// The promise resolves only after all the data is transmitted.
 	///
@@ -61,6 +64,9 @@ private:
 template <class T>
 class IChannel
 {
+public:
+	virtual ~IChannel() = default;
+
 public:
 	virtual bzd::Async<bzd::Span<T>> read(const bzd::Span<T> data) noexcept = 0;
 };
