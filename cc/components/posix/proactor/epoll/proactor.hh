@@ -2,6 +2,7 @@
 
 #include "cc/components/posix/error.hh"
 #include "cc/components/posix/proactor/interface.hh"
+#include "cc/components/posix/proactor/sync/proactor.hh"
 
 #include <cerrno>
 #include <cstring>
@@ -11,7 +12,7 @@
 namespace bzd::platform::posix::epoll {
 
 /// Proactor for basic POSIX functionalities
-class Proactor : public bzd::platform::posix::Proactor<Proactor>
+class Proactor : sync::Proactor, public bzd::platform::posix::Proactor<Proactor>
 {
 private:
 	struct EpollData
@@ -19,6 +20,9 @@ private:
 		const FileDescriptor fd_;
 		bzd::async::Executable* executable_{nullptr};
 	};
+
+public:
+	using sync::Proactor::write;
 
 public:
 	// NOLINTNEXTLINE(bugprone-exception-escape)
@@ -60,23 +64,6 @@ public:
 			co_return bzd::error::Posix("read");
 		}
 		co_return data.subSpan(0, static_cast<bzd::Size>(size));
-	}
-
-	/// Perform an asynchronous write operator.
-	// NOLINTNEXTLINE(bugprone-exception-escape)
-	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
-	{
-		bzd::Size size{0u};
-		while (size < data.size())
-		{
-			const auto result = ::write(fd.native(), &data.at(size), data.size() - size);
-			if (result < 0)
-			{
-				co_return bzd::error::Posix("write");
-			}
-			size += result;
-		}
-		co_return size;
 	}
 
 	/// Execution loop for the reactor to poll events.
