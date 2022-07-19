@@ -75,7 +75,7 @@ public:
 	{
 		if (handle_)
 		{
-			return bzd::move(handle_.promise().moveResultOut());
+			return bzd::move(handle_.promise()).moveResultOut();
 		}
 		return nullopt;
 	}
@@ -98,8 +98,8 @@ public:
 
 			bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
 			{
-				// It must have a value
-				auto result{bzd::move(Parent::await_resume())};
+				// It must have a value, get a reference to it.
+				auto& result{this->handle_.promise().result().valueMutable()};
 				if constexpr (PromiseType::resultTypeIsResult)
 				{
 					static_assert(index == 0, "The index used with assert must be 0 for non-tuple-like results.");

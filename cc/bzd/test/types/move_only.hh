@@ -13,15 +13,26 @@ protected:
 	using Self = MoveOnly;
 
 public:
-	constexpr MoveOnly() noexcept = default;
+	/// Construct a move oonly object.
+	///
+	/// \param destroyedBeforeMoved A pointer to a boolean that will be set to true in case the object was destroyed before being moved.
+	constexpr MoveOnly(bzd::Bool* const destroyedBeforeMoved = nullptr) noexcept : destroyedBeforeMoved_{destroyedBeforeMoved} {}
 	constexpr MoveOnly(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
 	constexpr MoveOnly(Self&& move) noexcept { *this = bzd::move(move); }
 	Self& operator=(Self&& move) noexcept
 	{
 		movedCounter_ = move.movedCounter_ + 1;
+		destroyedBeforeMoved_ = move.destroyedBeforeMoved_;
 		move.hasBeenMoved_ = 1;
 		return *this;
+	}
+	constexpr ~MoveOnly() noexcept
+	{
+		if (!hasBeenMoved_ && destroyedBeforeMoved_)
+		{
+			*destroyedBeforeMoved_ = true;
+		}
 	}
 
 public:
@@ -31,6 +42,7 @@ public:
 private:
 	bzd::Size movedCounter_{0};
 	bzd::Bool hasBeenMoved_{false};
+	bzd::Bool* destroyedBeforeMoved_{nullptr};
 };
 
 } // namespace bzd::test

@@ -1,6 +1,6 @@
 use "cc/components/posix/proactor/interface.bdl"
 
-namespace bzd.platform.posix.impl;
+namespace bzd.platform.posix.epoll;
 
 
 component Proactor : bzd.platform.posix.Proactor {
@@ -12,5 +12,3 @@ composition:
 	this.exec();
 	
 }
-
-

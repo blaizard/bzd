@@ -9,7 +9,7 @@ bdl_library(
     deps = [
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
-        "//cc/components/posix/proactor/impl",
+        "//cc/components/posix/proactor/epoll",
         "//cc/components/posix/stream/in",
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",

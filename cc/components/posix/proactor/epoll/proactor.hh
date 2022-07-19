@@ -8,10 +8,9 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix::impl {
+namespace bzd::platform::posix::epoll {
 
 /// Proactor for basic POSIX functionalities
-/// This is a mock of a proactor from a reactor design, for compatibility with POSIX.
 class Proactor : public bzd::platform::posix::Proactor<Proactor>
 {
 private:
@@ -63,7 +62,7 @@ public:
 		co_return data.subSpan(0, static_cast<bzd::Size>(size));
 	}
 
-	/// Perform an asynchronous read operator.
+	/// Perform an asynchronous write operator.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{

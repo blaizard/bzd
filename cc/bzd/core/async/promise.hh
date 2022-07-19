@@ -11,6 +11,8 @@
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
 
+#include <iostream>
+
 namespace bzd::coroutine::impl {
 
 /// Executable type for coroutines.
@@ -251,7 +253,8 @@ public:
 
 	constexpr bool isReady() const noexcept { return result_.hasValue(); }
 
-	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
+	constexpr bzd::Optional<T> moveResultOut() && noexcept { return bzd::move(result_); }
+	constexpr bzd::Optional<T>& result() noexcept { return result_; }
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
 	{

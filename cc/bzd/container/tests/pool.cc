@@ -7,9 +7,6 @@ TEST(ContainerPool, single)
 	bzd::Pool<int, 1> pool;
 	EXPECT_EQ(pool.capacity(), 1U);
 
-	pool.toStream(std::cout);
-	std::cout << std::endl;
-
 	{
 		auto& item = pool.reserve();
 		EXPECT_TRUE(pool.empty());

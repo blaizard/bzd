@@ -1,5 +1,6 @@
 #include "cc/components/posix/io/impl/file_descriptor.hh"
 
+#include <iostream>
 #include <unistd.h>
 
 namespace bzd::platform::posix {

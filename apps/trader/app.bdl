@@ -1,0 +1,12 @@
+
+
+
+composition {
+	kraken = Kraken(network, "myuser", "mykey");
+	trader = Trader(kraken);
+	server = TCPServer("localhost", 8080);
+	server.serve(trader);
+	
+}
+
+
