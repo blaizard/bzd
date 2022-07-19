@@ -42,9 +42,14 @@ pipeline
 				{
 					steps
 					{
-						sh "{{ stage.command }}"
 						{% if stage.category == "coverage" %}
+						lock("coverage")
+						{
+							sh "{{ stage.command }}"
+						}
 						archiveArtifacts artifacts: "{{ stage.output }}/**/*", onlyIfSuccessful: true
+						{% else %}
+						sh "{{ stage.command }}"
 						{% end %}
 					}
 				}

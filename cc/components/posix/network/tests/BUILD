@@ -14,6 +14,6 @@ bzd_cc_test(
         "//cc/components/posix/network",
         "//cc/components/posix/network/tcp:client",
         "//cc/components/posix/network/tcp:server",
-        "//cc/components/posix/proactor/sync"
+        "//cc/components/posix/proactor/sync",
     ],
 )
