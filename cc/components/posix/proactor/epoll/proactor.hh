@@ -12,7 +12,9 @@
 namespace bzd::platform::posix::epoll {
 
 /// Proactor for basic POSIX functionalities
-class Proactor : sync::Proactor, public bzd::platform::posix::Proactor<Proactor>
+class Proactor
+	: sync::Proactor
+	, public bzd::platform::posix::Proactor<Proactor>
 {
 private:
 	struct EpollData

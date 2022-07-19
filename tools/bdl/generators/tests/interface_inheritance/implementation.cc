@@ -9,7 +9,9 @@ public:
 	bzd::Int32 add(const bzd::Int32& a, const bzd::Int32& b) noexcept { return a + b; }
 };
 
-class Implementation : ImplementationPartial, public MyInterface<Implementation>
+class Implementation
+	: ImplementationPartial
+	, public MyInterface<Implementation>
 {
 public:
 	using ImplementationPartial::add;
