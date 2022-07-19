@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/test/test.hh"
+#include "cc/bzd/test/types/move_only.hh"
 #include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
@@ -285,18 +286,48 @@ TEST_ASYNC(Coroutine, fibonacci)
 	co_return {};
 }
 
-bzd::Async<bzd::UInt64> nopNoTrace(bzd::UInt64 retVal)
+bzd::Async<bzd::test::MoveOnly> moveOnlyObjectNested(bzd::Bool* destroyedBeforeMoved)
 {
-	co_return retVal;
+	bzd::test::MoveOnly obj{destroyedBeforeMoved};
+	co_return bzd::move(obj);
 }
 
-bzd::Async<bzd::UInt64> loopSynchronously(int count)
+bzd::Async<bzd::test::MoveOnly> moveOnlyObject(bzd::Bool* destroyedBeforeMoved)
 {
-	bzd::UInt64 result{0};
-	for (int i = 0; i < count; ++i)
+	co_return co_await moveOnlyObjectNested(destroyedBeforeMoved);
+}
+
+TEST_ASYNC(Coroutine, MoveOnly)
+{
+	bzd::Bool destroyedBeforeMoved{false};
 	{
-		const auto output = co_await nopNoTrace(i);
-		result += output.value();
+		const auto result = co_await moveOnlyObject(&destroyedBeforeMoved);
+		EXPECT_TRUE(result);
+		EXPECT_FALSE(destroyedBeforeMoved);
+		EXPECT_GE(result->getMovedCounter(), 1U);
 	}
-	co_return result;
+	EXPECT_TRUE(destroyedBeforeMoved);
+
+	co_return {};
+}
+
+bzd::Async<bzd::test::MoveOnly> moveOnlyObjectWithTry(bzd::Bool* destroyedBeforeMoved)
+{
+	auto result = co_await !moveOnlyObjectNested(destroyedBeforeMoved);
+	EXPECT_FALSE(*destroyedBeforeMoved);
+	co_return bzd::move(result);
+}
+
+TEST_ASYNC(Coroutine, MoveOnlyWithTry)
+{
+	bzd::Bool destroyedBeforeMoved{false};
+	{
+		const auto result = co_await moveOnlyObjectWithTry(&destroyedBeforeMoved);
+		EXPECT_TRUE(result);
+		EXPECT_FALSE(destroyedBeforeMoved);
+		EXPECT_GE(result->getMovedCounter(), 1U);
+	}
+	EXPECT_TRUE(destroyedBeforeMoved);
+
+	co_return {};
 }

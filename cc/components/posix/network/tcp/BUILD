@@ -9,6 +9,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/components/posix/network:socket",
+        "//cc/components/posix/proactor",
     ],
 )
 

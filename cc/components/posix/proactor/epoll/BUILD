@@ -13,7 +13,7 @@ bdl_library(
 )
 
 cc_library(
-    name = "impl",
+    name = "epoll",
     hdrs = [
         "proactor.hh",
     ],

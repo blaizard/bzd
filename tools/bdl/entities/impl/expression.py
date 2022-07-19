@@ -150,8 +150,10 @@ class Expression(Entity):
 
 		entity = self.type.resolve(resolver=resolver)
 
+		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
 			self.interfaceType.resolve(resolver=resolver)
+			# TODO: Ensure that the interface is part of the parent type.
 
 		# Set the underlying value
 		if self.isParameters:
