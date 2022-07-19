@@ -107,4 +107,4 @@ private:
 	FileDescriptorOwner epollFd_{};
 };
 
-} // namespace bzd::platform::posix::impl
+} // namespace bzd::platform::posix::epoll

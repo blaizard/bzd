@@ -32,7 +32,7 @@ TEST_ASYNC(Tcp, Client)
 	auto client = co_await factory.connect("localhost", 80);
 	EXPECT_FALSE(client);
 
-	//co_await !client.write("Hello"_sv.asBytes());
+	// co_await !client.write("Hello"_sv.asBytes());
 
 	co_return {};
 }

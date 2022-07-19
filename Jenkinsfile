@@ -90,7 +90,10 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc"
+						lock("coverage")
+						{
+							sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc"
+						}
 						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 					}
 				}
@@ -98,7 +101,10 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=py --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
+						lock("coverage")
+						{
+							sh "./tools/bazel coverage ... --config=py --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
+						}
 						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
 					}
 				}
@@ -106,7 +112,10 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
+						lock("coverage")
+						{
+							sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
+						}
 						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
