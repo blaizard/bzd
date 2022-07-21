@@ -53,3 +53,20 @@ cc_library(
         "//cc/components/posix/network/address",
     ],
 )
+
+cc_library(
+    name = "socket_options",
+    srcs = [
+        "socket_options.cc",
+    ],
+    hdrs = [
+        "socket_options.hh",
+    ],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/components/posix:error",
+        "//cc/components/posix/io:file_descriptor",
+        "//cc/bzd/container:result"
+    ],
+)

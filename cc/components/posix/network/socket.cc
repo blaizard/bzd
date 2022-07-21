@@ -38,16 +38,6 @@ bzd::Result<void, bzd::Error> Socket::bind(const Address& address) noexcept
 	return bzd::nullresult;
 }
 
-bzd::Result<void, bzd::Error> Socket::connect(const Address& address) noexcept
-{
-	const auto result = ::connect(fd_.native(), const_cast<::sockaddr*>(address.native()), address.size());
-	if (result != 0)
-	{
-		return bzd::error::Errno("connect");
-	}
-	return bzd::nullresult;
-}
-
 bzd::Result<void, bzd::Error> Socket::listen(const bzd::Size maxPendingConnection) noexcept
 {
 	const auto result = ::listen(fd_.native(), static_cast<int>(maxPendingConnection));
