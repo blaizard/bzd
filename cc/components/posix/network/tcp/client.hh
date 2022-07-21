@@ -5,18 +5,19 @@
 #include "cc/bzd/core/logger.hh"
 #include "cc/components/posix/network/address/address.hh"
 #include "cc/components/posix/network/socket.hh"
+#include "cc/components/posix/network/tcp/interface.hh"
 #include "cc/components/posix/proactor/proactor.hh"
 
 namespace bzd::platform::posix::network::tcp {
 
 template <class Proactor>
-class ClientFactory
+class Client : public bzd::platform::network::tcp::Client<Client<Proactor>>
 {
 public:
-	class Stream : public bzd::OStream
+	class Stream : public bzd::IOStream
 	{
 	private:
-		friend class ClientFactory<Proactor>;
+		friend class Client<Proactor>;
 		constexpr Stream(Proactor& proactor, Socket&& socket) noexcept : proactor_{proactor}, socket_{bzd::move(socket)} {}
 
 	public:
@@ -27,10 +28,10 @@ public:
 			co_return co_await proactor_.write(socket_.getFileDescriptor(), data);
 		}
 
-		/*bzd::Async<bzd::Span<Byte>> read(const bzd::Span<Byte> data) noexcept override
+		bzd::Async<bzd::Span<Byte>> read(const bzd::Span<Byte> data) noexcept override
 		{
 			co_return co_await proactor_.read(socket_.getFileDescriptor(), data);
-		}*/
+		}
 
 	private:
 		Proactor& proactor_;
@@ -38,7 +39,7 @@ public:
 	};
 
 public:
-	explicit ClientFactory(Proactor& proactor) : proactor_{proactor} {}
+	explicit Client(Proactor& proactor) : proactor_{proactor} {}
 
 	bzd::Async<Stream> connect(const StringView endpoint, const PortType port) noexcept
 	{
@@ -74,16 +75,12 @@ public:
 private:
 	bzd::Async<Socket> createSocketAndConnect(const Address& address) noexcept
 	{
-		auto maybeSocket = Socket::make(address);
+		auto maybeSocket = Socket::make(address, SocketTypeOption::nonBlocking | SocketTypeOption::closeOnExec);
 		if (!maybeSocket)
 		{
 			co_return bzd::move(maybeSocket).propagate();
 		}
-		auto result = maybeSocket->connect(address);
-		if (!result)
-		{
-			co_return bzd::move(result).propagate();
-		}
+		co_await !proactor_.connect(maybeSocket->getFileDescriptor(), address);
 		co_return bzd::move(maybeSocket.valueMutable());
 	}
 

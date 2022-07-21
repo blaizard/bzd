@@ -69,8 +69,6 @@ class Method(Entity):
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
 		self.assertTrue(condition=TypeCategory.component not in parameterTypeCategories,
 			message=f"Components are not allowed as method parameter.")
-		self.assertTrue(condition=TypeCategory.interface not in parameterTypeCategories,
-			message=f"Interfaces are not allowed as method parameter.")
 
 		super().resolve(resolver)
 

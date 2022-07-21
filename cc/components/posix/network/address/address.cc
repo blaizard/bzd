@@ -23,7 +23,7 @@ bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, cons
 	}
 	else if (result < 0)
 	{
-		return bzd::error::Posix("inet_pton");
+		return bzd::error::Errno("inet_pton");
 	}
 	storage.sin_family = AF_INET;
 	storage.sin_port = ::htons(port);
@@ -44,7 +44,7 @@ bzd::Result<Address, bzd::Error> Address::fromIpV6(const Protocol protocol, cons
 	}
 	else if (result < 0)
 	{
-		return bzd::error::Posix("inet_pton");
+		return bzd::error::Errno("inet_pton");
 	}
 	storage.sin6_family = AF_INET6;
 	storage.sin6_port = ::htons(port);

@@ -37,3 +37,14 @@ bdl_library(
         "//cc/bzd/core:channel",
     ],
 )
+
+bdl_library(
+    name = "tcp",
+    srcs = [
+        "tcp.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces/cc:tcp",
+    ],
+)

@@ -1,0 +1,11 @@
+use "cc/components/posix/network/tcp/interface.bdl"
+
+namespace network;
+
+
+composition tcp {
+	client = bzd.platform.posix.network.tcp.Client(proactor = proactor);
+	
+}
+
+

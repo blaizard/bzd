@@ -11,13 +11,13 @@ bzd::Result<Socket, bzd::Error> Socket::make(const AddressFamily family, const S
 	const auto fd = ::socket(bzd::toUnderlying(family), bzd::toUnderlying(type), protocol);
 	if (fd == -1)
 	{
-		return bzd::error::Posix("socket");
+		return bzd::error::Errno("socket");
 	}
 
 	const int yes = 1;
 	if (::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) != 0)
 	{
-		return bzd::error::Posix("setsockopt");
+		return bzd::error::Errno("setsockopt");
 	}
 
 	return bzd::move(Socket{fd});
@@ -33,7 +33,7 @@ bzd::Result<void, bzd::Error> Socket::bind(const Address& address) noexcept
 	const auto result = ::bind(fd_.native(), const_cast<::sockaddr*>(address.native()), address.size());
 	if (result != 0)
 	{
-		return bzd::error::Posix("bind");
+		return bzd::error::Errno("bind");
 	}
 	return bzd::nullresult;
 }
@@ -43,7 +43,7 @@ bzd::Result<void, bzd::Error> Socket::connect(const Address& address) noexcept
 	const auto result = ::connect(fd_.native(), const_cast<::sockaddr*>(address.native()), address.size());
 	if (result != 0)
 	{
-		return bzd::error::Posix("connect");
+		return bzd::error::Errno("connect");
 	}
 	return bzd::nullresult;
 }
@@ -53,7 +53,7 @@ bzd::Result<void, bzd::Error> Socket::listen(const bzd::Size maxPendingConnectio
 	const auto result = ::listen(fd_.native(), static_cast<int>(maxPendingConnection));
 	if (result != 0)
 	{
-		return bzd::error::Posix("listen");
+		return bzd::error::Errno("listen");
 	}
 	return bzd::nullresult;
 }
@@ -66,7 +66,7 @@ bzd::Async<Socket> Socket::accept() noexcept
 	const auto fdPeer = ::accept(fd_.native(), reinterpret_cast<::sockaddr*>(&addr), &size);
 	if (fdPeer == -1)
 	{
-		co_return bzd::error::Posix("accept");
+		co_return bzd::error::Errno("accept");
 	}
 	co_return Socket{fdPeer};
 }

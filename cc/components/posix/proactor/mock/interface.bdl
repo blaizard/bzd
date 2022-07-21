@@ -1,0 +1,11 @@
+use "cc/components/posix/proactor/interface.bdl"
+
+namespace bzd.platform.posix.mock;
+
+
+component Proactor : bzd.platform.posix.Proactor {
+interface:
+	
+}
+
+

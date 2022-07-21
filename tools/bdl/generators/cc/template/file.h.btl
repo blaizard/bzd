@@ -49,7 +49,7 @@ public: // Methods
 	{% for method in data.interface.methodList %}
 	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}{{ declareMethod(method) }} noexcept
 	{
-		return ::bzd::impl::getMethod(this, &{{ data.name }}::{{ method.name }}, &Impl::{{ method.name }})->{{ method.name }}({{ declareParametersCall(method.parameters) }});
+		return ::bzd::impl::getImplementation(this, &{{ data.name }}::{{ method.name }}, &Impl::{{ method.name }})->{{ method.name }}({{ declareParametersCall(method.parameters) }});
 	}
 
 	{% end %}

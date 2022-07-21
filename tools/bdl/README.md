@@ -144,9 +144,9 @@ class MyInterface
 public:
   constexpr Error process() noexcept // Implementation of the method.
   {
-    // getMethod is a helper that ensures the signature of the interface matches the implementation
+    // getImplementation is a helper that ensures the signature of the interface matches the implementation
     // and that returns the implementation object.
-    return bzd::impl::getMethod(this, &MyInterface::process, &Impl::process)->process();
+    return bzd::impl::getImplementation(this, &MyInterface::process, &Impl::process)->process();
   }
 };
 ```

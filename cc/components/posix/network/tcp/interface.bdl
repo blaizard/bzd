@@ -1,0 +1,15 @@
+use "cc/bzd/platform/interfaces/tcp.bdl"
+use "cc/components/posix/proactor/interface.bdl"
+
+namespace bzd.platform.posix.network.tcp;
+
+
+component Client : bzd.platform.network.tcp.Client {
+interface:
+	
+config:
+	proactor = Proactor;
+	
+}
+
+

@@ -20,7 +20,7 @@ bzd::Async<> timeout(const bzd::units::Millisecond time) noexcept
 
 	co_await !clock.delay(time);
 
-	co_return bzd::error::Timeout("Operation timed out with {}ms"_csv, time.get());
+	co_return bzd::error::Timeout("Operation timed out after {}ms"_csv, time.get());
 }
 
 } // namespace bzd

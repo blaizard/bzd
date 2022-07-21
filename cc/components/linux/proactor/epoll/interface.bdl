@@ -1,6 +1,6 @@
 use "cc/components/posix/proactor/interface.bdl"
 
-namespace bzd.platform.posix.epoll;
+namespace bzd.platform.linux.epoll;
 
 
 component Proactor : bzd.platform.posix.Proactor {

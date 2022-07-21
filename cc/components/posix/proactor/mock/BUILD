@@ -2,24 +2,23 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
 
 bdl_library(
-    name = "proactor",
+    name = "interface",
     srcs = [
         "interface.bdl",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":proactor_lib",
+        "//cc/components/posix/proactor",
     ],
 )
 
 cc_library(
-    name = "proactor_lib",
+    name = "mock",
     hdrs = [
         "proactor.hh",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core/async",
-        "//cc/components/posix/io:file_descriptor",
-        "//cc/components/posix/network/address",
+        ":interface",
     ],
 )

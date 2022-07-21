@@ -16,24 +16,32 @@ template <bzd::meta::StringLiteral fqn>
 struct Interface;
 
 namespace impl {
-/// Helper to validate and get the implementation method from an interface.
+
+/// Helper to get the implementation from an interface.
+///
+/// \param obj The current object containing the interface (usually 'this').
+/// \return A pointer of the implementation object.
+template <template <class> class T, class Impl>
+constexpr auto* getImplementation(T<Impl>* obj) noexcept
+{
+	return static_cast<Impl*>(obj);
+}
+
+/// Helper to validate a method and get the implementation from an interface.
 ///
 /// \param obj The current object containing the interface (usually 'this').
 /// \param interface The member pointer of the interface function.
 /// \param impl The member pointer of the implementation function.
 /// \return A pointer of the implementation object.
 template <template <class> class T, class Impl, class InterfaceMember, class ImplMember>
-constexpr auto* getMethod(T<Impl>* obj, InterfaceMember interface, ImplMember impl) noexcept
+constexpr auto* getImplementation(T<Impl>* obj, InterfaceMember interface, ImplMember impl) noexcept
 {
 	using TraitsInterface = bzd::typeTraits::Function<decltype(interface)>;
 	using TraitsImpl = bzd::typeTraits::Function<decltype(impl)>;
 	static_assert(bzd::typeTraits::isSame<typename TraitsInterface::Signature, typename TraitsImpl::Signature>,
 				  "Signature doesn't match its interface.");
 	static_assert(TraitsInterface::isNoexcept && TraitsImpl::isNoexcept, "Interface must have the same exception guaranty.");
-	// Note: the implement class needs to be deducted from the template argument of the object.
-	// This cannot be done from TraitsImpl::Class, as with inheritance, this can resolve to
-	// implementation class that is not a child of this object.
-	return static_cast<Impl*>(obj);
+	return getImplementation(obj);
 }
 
 /// Helper to get the interface from the implementation.
