@@ -5,11 +5,13 @@ bdl_library(
     name = "composition",
     srcs = [
         "composition.bdl",
+        "network.bdl",
     ],
     deps = [
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
-        "//cc/components/posix/proactor/epoll",
+        "//cc/components/linux/proactor/epoll",
+        "//cc/components/posix/network/tcp:client",
         "//cc/components/posix/stream/in",
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",

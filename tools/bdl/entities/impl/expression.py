@@ -204,7 +204,7 @@ class Expression(Entity):
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
 		if TypeCategory.component in parameterTypeCategories:
 			typeCategory = resolvedTypeEntity.typeCategory  # type: ignore
-			self.assertTrue(condition=typeCategory in [TypeCategory.component],
+			self.assertTrue(condition=typeCategory in [TypeCategory.component, TypeCategory.method],
 				message=f"Components are not allowed for this type '{typeCategory}'.")
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information

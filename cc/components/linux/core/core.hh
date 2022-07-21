@@ -35,14 +35,14 @@ public:
 
 		if (::pthread_attr_init(&attr_) != 0)
 		{
-			return bzd::error::Posix("pthread_attr_init");
+			return bzd::error::Errno("pthread_attr_init");
 		}
 
 		{
 			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
 			if (result != 0)
 			{
-				return bzd::error::Posix("pthread_attr_setstack");
+				return bzd::error::Errno("pthread_attr_setstack");
 			}
 		}
 
@@ -52,7 +52,7 @@ public:
 			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
 			if (result != 0)
 			{
-				return bzd::error::Posix("pthread_create");
+				return bzd::error::Errno("pthread_create");
 			}
 		}
 
@@ -65,7 +65,7 @@ public:
 			const auto result = ::pthread_join(thread_, nullptr);
 			if (result != 0)
 			{
-				return bzd::error::Posix("pthread_join");
+				return bzd::error::Errno("pthread_join");
 			}
 		}
 
@@ -73,7 +73,7 @@ public:
 			const auto result = ::pthread_attr_destroy(&attr_);
 			if (result != 0)
 			{
-				return bzd::error::Posix("pthread_attr_destroy");
+				return bzd::error::Errno("pthread_attr_destroy");
 			}
 		}
 

@@ -9,10 +9,7 @@ template <class Impl>
 class MyInterface
 {
 public:
-	bzd::Int32 add(const bzd::Int32& a, const bzd::Int32& b) noexcept
-	{
-		return bzd::impl::getImplementation(this, &MyInterface::add, &Impl::add)->add(a, b);
-	}
+	auto add(const bzd::Int32& a, const bzd::Int32& b) noexcept { return bzd::impl::getImplementation(this)->add(a, b); }
 };
 
 } // namespace bzd::test

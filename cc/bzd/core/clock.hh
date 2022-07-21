@@ -23,7 +23,6 @@ public:
 			co_await bzd::async::yield();
 			// Check if the duration is reached
 		} while (getTicks() < targetTicks);
-
 		co_return {};
 	}
 

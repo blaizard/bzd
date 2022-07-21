@@ -1,0 +1,12 @@
+use "cc/bzd/platform/interfaces/tcp.bdl"
+
+namespace Trader;
+
+
+method run(client = bzd.platform.network.tcp.Client);
+composition {
+	run(client = network.tcp.client);
+	
+}
+
+

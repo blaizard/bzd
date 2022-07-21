@@ -48,4 +48,10 @@ constexpr SocketType operator|(const SocketType a, const SocketTypeOption b) noe
 	return static_cast<SocketType>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
 }
 
+/// Bit or operator to combine a socket type option with another one.
+constexpr SocketTypeOption operator|(const SocketTypeOption a, const SocketTypeOption b) noexcept
+{
+	return static_cast<SocketTypeOption>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
+}
+
 } // namespace bzd::platform::posix::network

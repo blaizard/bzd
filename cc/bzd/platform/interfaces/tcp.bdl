@@ -1,0 +1,6 @@
+
+namespace bzd.platform.network.tcp;
+
+extern interface Client;
+
+
