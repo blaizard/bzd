@@ -33,11 +33,9 @@ public:
 	/// \param address The address to bind this socket to.
 	bzd::Result<void, bzd::Error> bind(const Address& address) noexcept;
 
-	/// Connect this socket to an address.
+	/// Listen for connections on this socket.
 	///
-	/// \param address The address to connect this socket to.
-	bzd::Result<void, bzd::Error> connect(const Address& address) noexcept;
-
+	/// \param maxPendingConnection The maximum length to which the internal queue of pending connections may grow.
 	bzd::Result<void, bzd::Error> listen(const bzd::Size maxPendingConnection) noexcept;
 
 	/// Accept incoming connection.

@@ -2,6 +2,7 @@
 
 #include "cc/components/posix/error.hh"
 #include "cc/components/posix/proactor/interface.hh"
+#include "cc/components/posix/network/socket_options.hh"
 
 #include <cerrno>
 #include <cstring>
@@ -66,15 +67,14 @@ public:
 			if (errno == EAGAIN || errno == EINPROGRESS)
 			{
 				co_await !poll(fd, POLLOUT);
-				int socketResult;
-				::socklen_t socketResultLength{sizeof(socketResult)};
-				if (::getsockopt(fd.native(), SOL_SOCKET, SO_ERROR, &socketResult, &socketResultLength) == -1)
+				auto maybeSocketResult = network::getSocketOptions(fd, SOL_SOCKET, SO_ERROR);
+				if (!maybeSocketResult)
 				{
-					co_return bzd::error::Errno("getsockopt");
+					co_return bzd::move(maybeSocketResult).propagate();
 				}
-				if (socketResult != 0)
+				if (maybeSocketResult.value() != 0)
 				{
-					co_return bzd::error::Errno("connect", socketResult);
+					co_return bzd::error::Errno("connect", maybeSocketResult.value());
 				}
 				co_return {};
 			}
