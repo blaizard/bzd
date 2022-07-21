@@ -66,6 +66,16 @@ public:
 			if (errno == EAGAIN || errno == EINPROGRESS)
 			{
 				co_await !poll(fd, POLLOUT);
+				int socketResult;
+				::socklen_t socketResultLength{sizeof(socketResult)};
+				if (::getsockopt(fd.native(), SOL_SOCKET, SO_ERROR, &socketResult, &socketResultLength) == -1)
+				{
+					co_return bzd::error::Errno("getsockopt");
+				}
+				if (socketResult != 0)
+				{
+					co_return bzd::error::Errno("connect", socketResult);
+				}
 				co_return {};
 			}
 			co_return bzd::error::Errno("connect");
