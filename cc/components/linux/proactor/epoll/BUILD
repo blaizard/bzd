@@ -14,6 +14,9 @@ bdl_library(
 
 cc_library(
     name = "epoll",
+    srcs = [
+        "proactor.cc",
+    ],
     hdrs = [
         "proactor.hh",
     ],

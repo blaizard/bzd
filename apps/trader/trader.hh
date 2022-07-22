@@ -23,7 +23,7 @@ bzd::Async<> run(Network& network)
 	bzd::String<1000U> data;
 	data.resize(1000U);
 	co_await !bzd::log::info("Receiving..."_csv);
-	// Timeout is not supported yet for functions that use bzd:::async::wait
+	// Timeout is not supported yet for functions that use bzd:::async::suspend
 	// This is because the asynt goes out of the scope of its executor.
 	// const auto result = co_await !bzd::async::any(stream.read(data.asBytesMutable()), bzd::timeout(500_ms));
 	const auto result = co_await !stream.read(data.asBytesMutable());

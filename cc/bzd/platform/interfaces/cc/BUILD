@@ -5,11 +5,11 @@ cc_library(
     hdrs = [
         "tcp.hh",
     ],
-    deps = [
-        "//cc/bzd/container:string_view",
-        "//tools/bdl/generators/cc/adapter:types"
-    ],
     visibility = [
         "//cc/bzd/platform/interfaces:__pkg__",
+    ],
+    deps = [
+        "//cc/bzd/container:string_view",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )

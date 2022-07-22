@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/non_owning_list.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/core/assert/minimal.hh"
@@ -17,6 +18,16 @@
 ///    |
 ///
 namespace bzd {
+
+class CancellationCallback : public bzd::NonOwningListElement
+{
+public:
+	constexpr void operator()() noexcept { callback_(); }
+
+private:
+	bzd::FunctionRef<void(void)> callback_;
+};
+
 class CancellationToken : public bzd::NonOwningListElement
 {
 public: // Constructors/Destructors.
@@ -57,6 +68,12 @@ public: // API.
 		flag_.store(true);
 		{
 			auto scope = makeSyncLockGuard(mutex_);
+			// Trigger the callbacks if any.
+			for (auto& callback : callbacks_)
+			{
+				callback();
+			}
+			// Trigger the children cancellation tokens.
 			for (auto& token : children_)
 			{
 				token.trigger();
@@ -73,10 +90,18 @@ public: // API.
 
 	constexpr Bool isCanceled() const noexcept { return flag_.load(); }
 
+	constexpr void addCallback(CancellationCallback& callback) noexcept
+	{
+		auto scope = makeSyncLockGuard(mutex_);
+		const auto result = callbacks_.pushFront(callback);
+		bzd::assert::isTrue(result.hasValue());
+	}
+
 private:
 	bzd::Atomic<Bool> flag_{false};
 	bzd::SpinMutex mutex_{};
 	bzd::Optional<CancellationToken&> parent_{};
 	bzd::NonOwningList<CancellationToken> children_{};
+	bzd::NonOwningList<CancellationCallback> callbacks_{};
 };
 } // namespace bzd

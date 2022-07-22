@@ -8,23 +8,23 @@
 TEST_ASYNC(Tcp, Server)
 {
 	// TODO: use an API abstraction.
-/*
-	{
-		bzd::platform::posix::network::tcp::Server server;
-		co_await !server.bind("localhost", 8888);
-		co_await !server.listen();
-	}
+	/*
+		{
+			bzd::platform::posix::network::tcp::Server server;
+			co_await !server.bind("localhost", 8888);
+			co_await !server.listen();
+		}
 
-	{
-		bzd::platform::posix::network::tcp::Server server;
-		co_await !server.bind("0.0.0.0", 8889);
-	}
+		{
+			bzd::platform::posix::network::tcp::Server server;
+			co_await !server.bind("0.0.0.0", 8889);
+		}
 
-	{
-		bzd::platform::posix::network::tcp::Server server;
-		co_await !server.bind("::1", 8889);
-	}
-*/
+		{
+			bzd::platform::posix::network::tcp::Server server;
+			co_await !server.bind("::1", 8889);
+		}
+	*/
 
 	co_return {};
 }
