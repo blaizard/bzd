@@ -65,8 +65,8 @@ cc_library(
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container:result",
         "//cc/components/posix:error",
         "//cc/components/posix/io:file_descriptor",
-        "//cc/bzd/container:result"
     ],
 )

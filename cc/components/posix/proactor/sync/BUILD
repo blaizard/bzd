@@ -25,6 +25,6 @@ cc_library(
     deps = [
         ":interface",
         "//cc/components/posix:error",
-        "//cc/components/posix/network:socket_options"
+        "//cc/components/posix/network:socket_options",
     ],
 )

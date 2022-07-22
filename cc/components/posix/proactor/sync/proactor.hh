@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/components/posix/error.hh"
-#include "cc/components/posix/proactor/interface.hh"
 #include "cc/components/posix/network/socket_options.hh"
+#include "cc/components/posix/proactor/interface.hh"
 
 #include <cerrno>
 #include <cstring>

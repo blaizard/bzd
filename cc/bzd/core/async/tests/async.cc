@@ -251,7 +251,30 @@ TEST_ASYNC(Coroutine, asyncAnyDestroy)
 
 	co_return {};
 }
+/*
+bzd::Async<> asyncSuspend(bzd::interface::String& trace, bzd::StringView id)
+{
+	appendToTrace(trace, id, 0);
+	//::std::cout << "HERRR1" << ::std::endl;
+	co_await bzd::async::suspend([](auto&) {});
+	//::std::cout << "HERRR2" << ::std::endl;
+	appendToTrace(trace, id, 1);
 
+	co_return {};
+}
+
+
+TEST_ASYNC(Coroutine, asyncAnyWait)
+{
+	bzd::String<128> trace;
+	[[maybe_unused]] const auto result =
+		co_await asyncSuspend(trace, "b"); //bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspend(trace, "b"));
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	EXPECT_EQ(trace, "[a0][b0][a0][b1]");
+
+	co_return {};
+}
+*/
 bzd::Async<int> asyncAdd(int a, int b)
 {
 	co_return a + b;
