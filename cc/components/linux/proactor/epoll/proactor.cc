@@ -7,6 +7,7 @@
 
 namespace bzd::platform::linux::epoll {
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bzd::Async<> Proactor::init() noexcept
 {
 	if (epollFd_.isValid())
