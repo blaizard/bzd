@@ -89,7 +89,7 @@ class Transform:
 
 	def asyncTypeToStr(self, asyncType: str) -> str:
 		return {
-			AsyncType.active: "bzd::async::Type::active",
+			AsyncType.workload: "bzd::async::Type::workload",
 			AsyncType.service: "bzd::async::Type::service",
 		}[asyncType]
 

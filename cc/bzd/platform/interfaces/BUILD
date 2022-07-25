@@ -17,6 +17,9 @@ bdl_library(
         "core.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces/cc:core",
+    ],
 )
 
 bdl_library(

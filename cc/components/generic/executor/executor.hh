@@ -9,23 +9,27 @@
 
 namespace bzd::platform::generic {
 
-template <class... Cores>
-class Executor : public bzd::platform::Executor<Executor<Cores...>>
+template <Size n>
+class Executor : public bzd::platform::Executor<Executor<n>>
 {
 public:
-	using Self = Executor<Cores...>;
+	using Self = Executor<n>;
 
 public:
-	constexpr Executor(Cores&... cores) noexcept : cores_{inPlace, &cores...}, executor_{} {}
+	template <class... Cores>
+	constexpr Executor(Cores&... cores) noexcept : cores_{inPlace, &cores...}, executor_{}
+	{
+	}
+	virtual ~Executor() = default;
 
 	/// Assign a workload to this executor.
 	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
 	{
 		bzd::Optional<bzd::async::Executable::OnTerminateCallback> onTerminate{};
-		if (type == bzd::async::Type::active)
+		if (type == bzd::async::Type::workload)
 		{
-			onTerminate = bzd::async::Executable::OnTerminateCallback::toMember<Self, &Self::onAsyncTerminate>(*this);
-			++nbActive_;
+			onTerminate = bzd::async::Executable::OnTerminateCallback::toMember<Self, &Self::onExecutableTerminate>(*this);
+			++applicationCount_;
 		}
 		// Enqueue the executor and add a continuation.
 		async.enqueue(executor_, type, onTerminate);
@@ -34,11 +38,13 @@ public:
 	/// Start the executor.
 	bzd::Result<void, bzd::Error> start() noexcept
 	{
-		const auto run = bzd::FunctionRef<void(void)>::toMember<Self, &Self::run>(*this);
-		const auto success = bzd::apply([run](auto&... cores) { return (cores->start(run).hasValue() && ...); }, cores_);
-		if (!success)
+		auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
+		for (auto& core : cores_)
 		{
-			return bzd::error::Failure("One of the core failed to start."_csv);
+			if (auto result = core->start(run); !result)
+			{
+				return bzd::move(result).propagate();
+			}
 		}
 		return bzd::nullresult;
 	}
@@ -46,22 +52,50 @@ public:
 	/// Stop the executor.
 	bzd::Result<void, bzd::Error> stop() noexcept
 	{
-		const auto success = bzd::apply([](auto&... cores) { return (cores->stop().hasValue() && ...); }, cores_);
-		if (!success)
+		for (auto& core : cores_)
 		{
-			return bzd::error::Failure("One of the core failed to stop."_csv);
+			if (auto result = core->stop(); !result)
+			{
+				return bzd::move(result).propagate();
+			}
 		}
 		return bzd::nullresult;
 	}
 
 private:
+	/// Call the idle function for each core.
+	///
+	/// \param index The core index the way it was registered within the executor.
+	/// \param core The core instance.
+	/// \return True if the core should continue running, false if it should be stopped.
+	virtual Bool idle(const Size index, bzd::platform::Core&) noexcept
+	{
+		// Only keep core 0 running.
+		return (index == 0u);
+	}
+
+private:
 	/// Run the executor.
-	constexpr void run() noexcept { executor_.run(); }
+	constexpr void run(bzd::platform::Core& core) noexcept
+	{
+		Bool runCore{true};
+		do
+		{
+			executor_.run();
+			if (applicationCount_.load() == 0u)
+			{
+				break;
+			}
+			const auto index = cores_.find(&core);
+			bzd::assert::isTrue(index != bzd::npos, "Core must be registered.");
+			runCore = idle(index, core);
+		} while (runCore);
+	}
 
 	/// Callback triggered when an active async is terminated.
-	constexpr bzd::Optional<bzd::async::Executable&> onAsyncTerminate() noexcept
+	constexpr bzd::Optional<bzd::async::Executable&> onExecutableTerminate() noexcept
 	{
-		if (--nbActive_ == 0u)
+		if (--applicationCount_ == 0u)
 		{
 			bzd::log::info("All apps are terminated, requesting shutdown.").sync();
 			executor_.requestShutdown();
@@ -70,9 +104,12 @@ private:
 	}
 
 private:
-	bzd::Tuple<Cores*...> cores_;
+	bzd::Array<bzd::platform::Core*, n> cores_;
 	bzd::coroutine::impl::Executor executor_;
-	bzd::Atomic<bzd::Size> nbActive_{0};
+	bzd::Atomic<bzd::Size> applicationCount_{0};
 };
+
+template <class... Cores>
+Executor(Cores&...) -> Executor<sizeof...(Cores)>;
 
 } // namespace bzd::platform::generic

@@ -39,7 +39,15 @@ bzd::Async<bzd::Span<bzd::Byte>> Proactor::read(const posix::FileDescriptor fd, 
 		[&](auto& executable) {
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, epollData.fd_.native(), nullptr);
 			executable.schedule();
-		}*/);
+		}, sleepMode*/);
+		// In the interface.bdl of the component, you can define multiple sleep modes.
+		// These sleep modes will be aggregated during composition to create a big enum class.
+		// each sleep modes must be handled in the executor idle task.
+		// - what if some sleep modes are valid for a variant but not for another?
+		// - Should this be dealt at executor level?
+		// Concepts:
+		// Sleeping is active for the whole executor (so all cores associated with an executor).
+		// The idle task runs once all run from the executor are done.
 	}
 
 	// TODO: create a scope to opt-out as well.
