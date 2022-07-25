@@ -35,9 +35,10 @@ public: // Types.
 	enum class Type : bzd::UInt8
 	{
 		unset,
-		active,
-		/// Services are executables that can be terminated if no
-		/// active executables are running.
+		/// Defines the type of executable that needs to complete.
+		workload,
+		/// Defines the type of executable that can be terminated if no
+		/// workload executables are running.
 		service
 	};
 
@@ -147,6 +148,7 @@ public: // Statistics.
 	[[nodiscard]] constexpr Size getQueueCount() const noexcept { return queue_.size(); }
 	[[nodiscard]] constexpr Size getRunningCount() const noexcept { return context_.size(); }
 	[[nodiscard]] constexpr Size getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
+	[[nodiscard]] constexpr Size getWorkloadCount() const noexcept { return workloadCount_.load(); }
 
 public:
 	/// Run all the workload currently in the queue.
@@ -164,8 +166,12 @@ public:
 			status_.compareExchange(expected, Status::running);
 		}
 
-		// Loop until there are still elements or an abort request is present.
-		while (!queue_.empty() && status_.load() != Status::abortRequested)
+		// Run at least the number of time there are elements in the queue, this is to ensure that
+		// all the services are running at least once.
+		const auto minIterationCount = queue_.size();
+
+		// Loop until there are still workload executables to process or an abort request is present.
+		while ((getWorkloadCount() > 0 || context.getTick() <= minIterationCount) && status_.load() != Status::abortRequested)
 		{
 			// Drain remaining handles
 			auto maybeExecutable = pop();
@@ -274,14 +280,22 @@ private:
 	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
 	///
 	/// \param executable The workload to be executed.
-	constexpr void push(Executable& executable) noexcept { bzd::ignore = queue_.pushFront(executable); }
+	constexpr void push(Executable& executable) noexcept
+	{
+		if (executable.getType() == ExecutableMetadata::Type::workload)
+		{
+			++workloadCount_;
+		}
+		bzd::ignore = queue_.pushFront(executable);
+	}
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto executable = queue_.back();
-		if (executable)
+		auto maybeExecutable = queue_.back();
+		if (maybeExecutable)
 		{
-			const auto result = queue_.pop(executable.valueMutable().get());
+			auto& executable{maybeExecutable.valueMutable().get()};
+			const auto result = queue_.pop(executable);
 			if (result)
 			{
 				// Show the stack usage
@@ -290,7 +304,12 @@ private:
 				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPointer>(initial_stack) -
 				// reinterpret_cast<bzd::IntPointer>(stack)) << std::endl;
 
-				return executable.valueMutable().get();
+				if (executable.getType() == ExecutableMetadata::Type::workload)
+				{
+					--workloadCount_;
+				}
+
+				return executable;
 			}
 		}
 
@@ -311,6 +330,8 @@ private:
 	bzd::SpinSharedMutex contextMutex_{};
 	/// Current status of the executor.
 	bzd::Atomic<Status> status_{Status::idle};
+	/// Number of workload asyncs in the queue.
+	bzd::Atomic<Size> workloadCount_{0};
 };
 
 } // namespace bzd

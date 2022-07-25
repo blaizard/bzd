@@ -13,3 +13,17 @@ cc_library(
         "//tools/bdl/generators/cc/adapter:types",
     ],
 )
+
+cc_library(
+    name = "core",
+    hdrs = [
+        "core.hh",
+    ],
+    visibility = [
+        "//cc/bzd/platform/interfaces:__pkg__",
+    ],
+    deps = [
+        "//cc/bzd/container:string_view",
+        "//tools/bdl/generators/cc/adapter:types",
+    ],
+)

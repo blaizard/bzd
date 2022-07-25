@@ -1,24 +1,11 @@
 
 namespace bzd.platform;
 
+// A logical core is a processing unit that accepts a single scheduler.
+extern interface Core;
 
 // Type describing the size of a stack.
 using StackSize = Integer [min(100) max(8000000)];
 // Type describing the identifier of a core.
-using CoreId = Integer [min(0) max(64)];
-// Type used for workloads.
-using WorkloadType = Callable;
-// A logical core is a processing unit that accepts a single scheduler.
-interface Core {
-	// Start a workload on the core and return immediatly.
-	method start(workload = const WorkloadType) -> Result;
-	// Initialize the core.
-	method stop() -> Result;
-	// Get the current stack usage.
-	method getStackUsage() -> StackSize;
-	// Get the current core identifier.
-	method getId() -> CoreId;
-	
-}
-
+using CoreId = Integer [min(0) max(255)];
 

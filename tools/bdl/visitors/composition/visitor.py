@@ -17,7 +17,7 @@ from tools.bdl.entities.impl.fragment.fqn import FQN
 
 @dataclasses.dataclass(frozen=True)
 class AsyncType:
-	active = "active"
+	workload = "workload"
 	service = "service"
 
 
@@ -69,7 +69,7 @@ class Composition:
 			if entity.isName:
 				continue
 			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
-			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.active
+			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
 			self.addExecutor(entity)
 
 		# Handle platform elements

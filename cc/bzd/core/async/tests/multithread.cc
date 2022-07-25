@@ -144,6 +144,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 		}
 
 		EXPECT_EQ(executor.getQueueCount(), 0U);
+		EXPECT_EQ(executor.getWorkloadCount(), 0U);
 	}
 }
 

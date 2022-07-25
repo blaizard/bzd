@@ -18,18 +18,17 @@
 namespace bzd::platform::linux {
 
 template <Size N>
-class Core : public bzd::platform::Core<Core<N>>
+class Core : public bzd::platform::Core
 {
 private:
 	using Self = Core<N>;
-	using Parent = bzd::platform::Core<Self>;
 
 public:
-	explicit Core(const CoreId, const float) noexcept {}
+	explicit Core(const CoreId core_id, const float) noexcept : core_id_{core_id} {}
 
 	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
 
-	Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
+	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
 		stack_.taint();
 
@@ -59,7 +58,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	Result<void, bzd::Error> stop() noexcept
+	Result<void, bzd::Error> stop() noexcept override
 	{
 		{
 			const auto result = ::pthread_join(thread_, nullptr);
@@ -80,7 +79,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(); }
+	StackSize getStackUsage() noexcept override { return stack_.estimateMaxUsage(); }
 
 	bzd::Size startUsageMonitoring() noexcept
 	{
@@ -104,7 +103,7 @@ public:
 
 	void getUsage() noexcept {}
 
-	CoreId getId() noexcept { return 0; }
+	CoreId getId() noexcept override { return core_id_; }
 
 private:
 	static void* workloadWrapper(void* object)
@@ -112,14 +111,15 @@ private:
 		auto linux = reinterpret_cast<Self*>(object);
 		auto& workload = linux->workload_.value();
 		::std::cout << "Workload Wrapper Enter" << ::std::endl;
-		workload();
+		workload(*linux);
 		::std::cout << "Workload Wrapper Exit" << ::std::endl;
 		return nullptr;
 	}
 
 private:
+	CoreId core_id_;
 	bzd::Stack<N> stack_{};
-	bzd::Optional<bzd::platform::WorkloadType> workload_;
+	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;
 };

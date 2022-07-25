@@ -244,7 +244,7 @@ bool execute() noexcept
 	bool isSuccess{true};
 	{% for fqn, executor in executors %}
 		{% for expression, asyncType in composition[fqn] %}
-			{% if asyncType == "active" %}
+			{% if asyncType == "workload" %}
 	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.type | typeRegistryToStr }}"_sv);
 			{% end %}
 		{% end %}

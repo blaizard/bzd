@@ -14,11 +14,10 @@
 namespace bzd::platform::esp32 {
 
 template <Size stackSize>
-class Core : public bzd::platform::Core<Core<stackSize>>
+class Core : public bzd::platform::Core
 {
 private:
 	using Self = Core<stackSize>;
-	using Parent = bzd::platform::Core<Self>;
 	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
@@ -27,7 +26,7 @@ public:
 	{
 	}
 
-	Result<void, bzd::Error> start(const bzd::platform::WorkloadType& workload) noexcept
+	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
 		// No need to taint the stack, this is already done by freertos with configCHECK_FOR_STACK_OVERFLOW = 2
 		// stack_.taint(freertosStackTaintingByte);
@@ -55,7 +54,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	Result<void, bzd::Error> stop() noexcept
+	Result<void, bzd::Error> stop() noexcept override
 	{
 		// Wait indefinitely until the workload is completed.
 		while (xSemaphoreTake(mutex_, portMAX_DELAY) == pdFALSE)
@@ -68,11 +67,11 @@ public:
 		return bzd::nullresult;
 	}
 
-	StackSize getStackUsage() noexcept { return stack_.estimateMaxUsage(freertosStackTaintingByte); }
+	StackSize getStackUsage() noexcept override { return stack_.estimateMaxUsage(freertosStackTaintingByte); }
 
 	void getUsage() noexcept {}
 
-	CoreId getId() noexcept { return 0; }
+	CoreId getId() noexcept override { return 0; }
 
 private:
 	constexpr UBaseType_t getFreeRTOSPriority() const noexcept
@@ -88,7 +87,7 @@ private:
 		auto core = reinterpret_cast<Self*>(object);
 		// Run the workload.
 		auto& workload = core->workload_.value();
-		workload();
+		workload(*core);
 		// Notify the stop function that the workload is completed.
 		xSemaphoreGive(core->mutex_);
 		// Delete itself.
@@ -100,7 +99,7 @@ private:
 	const bzd::UInt8 cpu_;
 	const bzd::UInt8 priority_;
 	bzd::Stack<stackSize, alignof(StackType_t)> stack_{};
-	bzd::Optional<bzd::platform::WorkloadType> workload_{};
+	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};
 	StaticSemaphore_t mutexBuffer_{};

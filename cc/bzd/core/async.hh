@@ -174,7 +174,7 @@ public:
 
 	/// Associate an executor to this async and push it to the queue.
 	constexpr void enqueue(async::Executor& executor,
-						   const bzd::async::Type type = bzd::async::Type::active,
+						   const bzd::async::Type type = bzd::async::Type::workload,
 						   const bzd::Optional<async::Executable::OnTerminateCallback> continuation = bzd::nullopt) noexcept
 	{
 		auto& executable{getExecutable()};
@@ -197,8 +197,9 @@ public:
 
 		do
 		{
-			// Run the executor
+			// Run the executor.
 			executor.run();
+			// Here should run the idle task.
 		} while (!isReady());
 
 		// Return the result.
