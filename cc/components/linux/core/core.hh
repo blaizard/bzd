@@ -14,45 +14,65 @@
 #include <pthread.h>
 #include <sched.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 namespace bzd::platform::linux {
 
-template <Size N>
+template <Size stackSize>
 class Core : public bzd::platform::Core
 {
 private:
-	using Self = Core<N>;
+	using Self = Core<stackSize>;
 
 public:
 	explicit Core(const CoreId core_id, const float) noexcept : core_id_{core_id} {}
 
-	~Core() noexcept { ::std::cout << "Stack usage: " << getStackUsage() << " / " << N << ::std::endl; }
+	~Core() noexcept
+	{
+		if (stack_.hasValue())
+		{
+			::std::cout << "Stack usage: " << getStackUsage() << " / " << stackSize << ::std::endl;
+			::free(stack_->data());
+		}
+	}
 
 	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
-		stack_.taint();
+		// Allocate the aligned memory.
+		if (stack_.empty())
+		{
+			const auto alignment = ::sysconf(_SC_PAGESIZE);
+			if (alignment == -1)
+			{
+				return bzd::error::Errno("sysconf");
+			}
+
+			void* memory;
+			if (const auto result = ::posix_memalign(&memory, alignment, stackSize); result != 0)
+			{
+				return bzd::error::Errno("sysconf", result);
+			}
+			stack_.emplace(Span<Byte>{static_cast<Byte*>(memory), stackSize});
+
+			// Taint the stack to montior its usage.
+			stack_->taint();
+		}
 
 		if (::pthread_attr_init(&attr_) != 0)
 		{
 			return bzd::error::Errno("pthread_attr_init");
 		}
 
+		if (::pthread_attr_setstack(&attr_, stack_->data(), stack_->size()) != 0)
 		{
-			const auto result = ::pthread_attr_setstack(&attr_, stack_.data(), stack_.size());
-			if (result != 0)
-			{
-				return bzd::error::Errno("pthread_attr_setstack");
-			}
+			return bzd::error::Errno("pthread_attr_setstack");
 		}
 
 		workload_ = workload;
 
+		if (::pthread_create(&thread_, &attr_, &workloadWrapper, this) != 0)
 		{
-			const auto result = ::pthread_create(&thread_, &attr_, &workloadWrapper, this);
-			if (result != 0)
-			{
-				return bzd::error::Errno("pthread_create");
-			}
+			return bzd::error::Errno("pthread_create");
 		}
 
 		return bzd::nullresult;
@@ -79,7 +99,7 @@ public:
 		return bzd::nullresult;
 	}
 
-	StackSize getStackUsage() noexcept override { return stack_.estimateMaxUsage(); }
+	StackSize getStackUsage() noexcept override { return stack_->estimateMaxUsage(); }
 
 	bzd::Size startUsageMonitoring() noexcept
 	{
@@ -118,7 +138,7 @@ private:
 
 private:
 	CoreId core_id_;
-	bzd::Stack<N> stack_{};
+	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;

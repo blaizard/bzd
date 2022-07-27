@@ -10,12 +10,13 @@ namespace bzd {
 enum class StackDirection : UInt8
 {
 	/// The stack grows from lower address to higher
-	UPWARD = 0,
+	upward = 0,
 	/// The stack grows from higher address to lower
-	DOWNWARD = 1
+	downward = 1
 };
 
-template <bzd::Size stackSize, bzd::Size alignment = 1, StackDirection direction = StackDirection::DOWNWARD>
+namespace interface {
+template <StackDirection direction = StackDirection::downward>
 class Stack
 {
 public: // Type.
@@ -23,28 +24,29 @@ public: // Type.
 	static constexpr bzd::Byte defaultTaintPattern{0xaa};
 
 public:
-	constexpr Stack() noexcept = default;
+	constexpr Stack(Span<Byte> data) noexcept : data_{data} {}
 
-	constexpr void taint(Byte pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(stack_, pattern); }
+public:
+	constexpr void taint(Byte pattern = defaultTaintPattern) noexcept { bzd::algorithm::fill(data_, pattern); }
 
-	constexpr Byte* data() noexcept { return stack_.data(); }
+	constexpr Byte* data() noexcept { return data_.data(); }
 
-	constexpr Size size() const noexcept { return stack_.size(); }
+	constexpr Size size() const noexcept { return data_.size(); }
 
 	bzd::Size estimateMaxUsage(Byte pattern = defaultTaintPattern) const noexcept
 	{
-		if constexpr (direction == StackDirection::DOWNWARD)
+		if constexpr (direction == StackDirection::downward)
 		{
 			bzd::Size i{0};
-			for (; i < stack_.size() && stack_[i] == pattern; ++i)
+			for (; i < data_.size() && data_[i] == pattern; ++i)
 			{
 			}
-			return stack_.size() - i;
+			return data_.size() - i;
 		}
 		else
 		{
-			bzd::Size i{stack_.size() - 1};
-			for (; i > 0 && stack_[i] == pattern; --i)
+			bzd::Size i{data_.size() - 1};
+			for (; i > 0 && data_[i] == pattern; --i)
 			{
 			}
 			return i;
@@ -52,7 +54,18 @@ public:
 	}
 
 private:
-	alignas(alignment) bzd::Array<Byte, stackSize> stack_{};
+	Span<Byte> data_;
+};
+}
+
+template <bzd::Size stackSize, bzd::Size alignment = 1, StackDirection direction = StackDirection::downward>
+class Stack : public interface::Stack<direction>
+{
+public:
+	constexpr Stack() noexcept : interface::Stack<direction>{Span<Byte>{stack_, stackSize}} {}
+
+private:
+	alignas(alignment) Byte stack_[stackSize]{};
 };
 
 } // namespace bzd
