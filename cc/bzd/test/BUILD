@@ -44,6 +44,18 @@ cc_library(
 )
 
 cc_library(
+    name = "exec_point",
+    testonly = False,
+    hdrs = [
+        "exec_point.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+    ],
+)
+
+cc_library(
     name = "inject_point",
     testonly = False,
     hdrs = [

@@ -31,3 +31,17 @@ cc_library(
         "//cc/bzd/utility:scope_guard",
     ],
 )
+
+cc_library(
+    name = "non_owning_queue",
+    hdrs = [
+        "non_owning_queue.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+        "//cc/bzd/platform:atomic",
+        "//cc/bzd/test:inject_point",
+        "//cc/bzd/utility:ignore",
+    ],
+)

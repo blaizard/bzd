@@ -28,3 +28,18 @@ bzd_cc_test(
         "//cc/bzd/utility:ignore",
     ],
 )
+
+bzd_cc_test(
+    name = "non_owning_queue",
+    testonly = True,
+    srcs = [
+        "non_owning_queue.cc",
+    ],
+    tags = ["stress"],
+    deps = [
+        ":thread",
+        "//cc/bzd/container/threadsafe:non_owning_queue",
+        "//cc/bzd/test",
+        "//cc/bzd/test:exec_point",
+    ],
+)

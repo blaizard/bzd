@@ -26,3 +26,15 @@ bzd_cc_test(
         "//cc/bzd/test",
     ],
 )
+
+bzd_cc_test(
+    name = "non_owning_queue",
+    srcs = [
+        "non_owning_queue.cc",
+    ],
+    deps = [
+        "//cc/bzd/container/threadsafe:non_owning_queue",
+        "//cc/bzd/test",
+        "//cc/bzd/test:exec_point",
+    ],
+)
