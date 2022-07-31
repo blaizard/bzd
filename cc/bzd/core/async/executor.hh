@@ -4,6 +4,7 @@
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
+#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
@@ -15,9 +16,6 @@
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
 namespace bzd {
-
-template <class>
-class Test;
 
 template <class Executable>
 class Executor;
@@ -43,7 +41,7 @@ public: // Types.
 	};
 
 public: // Accessors.
-	[[nodiscard]] Type getType() const noexcept { return type_; }
+	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
 
 private:
 	template <class U>
@@ -145,10 +143,10 @@ public:
 	}
 
 public: // Statistics.
-	[[nodiscard]] constexpr Size getQueueCount() const noexcept { return queue_.size(); }
+	[[nodiscard]] constexpr Size getQueueCount() const noexcept { return queueCount_.load(); }
 	[[nodiscard]] constexpr Size getRunningCount() const noexcept { return context_.size(); }
 	[[nodiscard]] constexpr Size getMaxRunningCount() const noexcept { return maxRunningCount_.load(); }
-	[[nodiscard]] constexpr Size getWorkloadCount() const noexcept { return workloadCount_.load(); }
+	[[nodiscard]] constexpr Int32 getWorkloadCount() const noexcept { return workloadCount_.load(); }
 
 public:
 	/// Run all the workload currently in the queue.
@@ -168,7 +166,7 @@ public:
 
 		// Run at least the number of time there are elements in the queue, this is to ensure that
 		// all the services are running at least once.
-		const auto minIterationCount = queue_.size();
+		const auto minIterationCount = getQueueCount();
 
 		// Loop until there are still workload executables to process or an abort request is present.
 		while ((getWorkloadCount() > 0 || context.getTick() <= minIterationCount) && status_.load() != Status::abortRequested)
@@ -218,7 +216,7 @@ public:
 
 	constexpr Bool isRunning() const noexcept { return status_.load() == Status::running; }
 
-	constexpr void waitToDiscard() noexcept { queue_.waitToDiscard(); }
+	// constexpr void waitToDiscard() noexcept { /*queue_.waitToDiscard();*/ }
 
 	/// Schedule a new executable on this executor.
 	constexpr void schedule(Executable& executable, const bzd::ExecutableMetadata::Type type) noexcept
@@ -239,9 +237,6 @@ public:
 	}
 
 private:
-	template <class U>
-	friend class bzd::interface::Executable;
-
 	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.
 	///
 	/// \param context The context object to be attached.
@@ -286,31 +281,28 @@ private:
 		{
 			++workloadCount_;
 		}
-		bzd::ignore = queue_.pushFront(executable);
+		++queueCount_;
+		queue_.push(executable);
 	}
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.back();
+		auto maybeExecutable = queue_.pop();
 		if (maybeExecutable)
 		{
-			auto& executable{maybeExecutable.valueMutable().get()};
-			const auto result = queue_.pop(executable);
-			if (result)
+			// Show the stack usage
+			// void* stack = __builtin_frame_address(0);
+			// static void* initial_stack = &stack;
+			// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPointer>(initial_stack) -
+			// reinterpret_cast<bzd::IntPointer>(stack)) << std::endl;
+
+			if (maybeExecutable->getType() == ExecutableMetadata::Type::workload)
 			{
-				// Show the stack usage
-				// void* stack = __builtin_frame_address(0);
-				// static void* initial_stack = &stack;
-				// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPointer>(initial_stack) -
-				// reinterpret_cast<bzd::IntPointer>(stack)) << std::endl;
-
-				if (executable.getType() == ExecutableMetadata::Type::workload)
-				{
-					--workloadCount_;
-				}
-
-				return executable;
+				--workloadCount_;
 			}
+			--queueCount_;
+
+			return maybeExecutable.valueMutable();
 		}
 
 		return bzd::nullopt;
@@ -321,17 +313,21 @@ private:
 	friend class bzd::interface::Executable;
 
 	/// List of pending workload waiting to be scheduled.
-	bzd::threadsafe::NonOwningForwardList<Executable> queue_{};
+	bzd::threadsafe::NonOwningQueue<Executable> queue_{};
 	/// Keep contexts about the current runnning scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Maxium concurrent scheduler running at the same time.
-	bzd::Atomic<Size> maxRunningCount_{0};
+	bzd::Atomic<Size> maxRunningCount_{0u};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
 	/// Current status of the executor.
 	bzd::Atomic<Status> status_{Status::idle};
+	/// Number of entries in the queue.
+	bzd::Atomic<Size> queueCount_{0u};
 	/// Number of workload asyncs in the queue.
-	bzd::Atomic<Size> workloadCount_{0};
+	/// Note getWorkloadCount() should never be negative, we use an int32 here only for testing purpose
+	/// to avoid an infinite loop.
+	bzd::Atomic<Int32> workloadCount_{0u};
 };
 
 } // namespace bzd
@@ -344,7 +340,7 @@ namespace bzd::interface {
 ///
 /// \tparam T The child class, this is a CRTP desgin pattern.
 template <class T>
-class Executable : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ true, /*support discard*/ true>
+class Executable : public bzd::threadsafe::NonOwningQueueElement
 {
 public:
 	using Self = Executable<T>;
@@ -381,11 +377,11 @@ public:
 
 	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
 
-	[[nodiscard]] constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.type_; }
+	[[nodiscard]] constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.getType(); }
 
 	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept
 	{
-		bzd::assert::isTrue(metadata_.type_ == bzd::ExecutableMetadata::Type::unset);
+		bzd::assert::isTrue(metadata_.getType() == bzd::ExecutableMetadata::Type::unset);
 		metadata_.type_ = type;
 	}
 
@@ -394,12 +390,12 @@ public:
 
 	constexpr void detach() noexcept
 	{
-		bzd::ignore = pop();
 		if (executor_.hasValue())
 		{
-			// If there is an executor wait until it is safe to discard the element, this to avoid any
-			// potential out of scope object access.
-			executor_->waitToDiscard();
+			//  If there is an executor wait until it is safe to discard the element, this to avoid any
+			//  potential out of scope object access.
+			// bzd::ignore = executor_->pop(getExecutable());
+			// executor_->waitToDiscard();
 			executor_.reset();
 		}
 	}

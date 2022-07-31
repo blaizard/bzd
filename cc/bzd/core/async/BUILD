@@ -25,6 +25,7 @@ cc_library(
         "//cc/bzd/container:variant",
         "//cc/bzd/container/range:associate_scope",
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
+        "//cc/bzd/container/threadsafe:non_owning_queue",
         "//cc/bzd/core:error",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/meta:always_false",
