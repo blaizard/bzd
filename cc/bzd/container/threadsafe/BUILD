@@ -33,7 +33,7 @@ cc_library(
 )
 
 cc_library(
-    name = "non_owning_queue",
+    name = "non_owning_queue2",
     hdrs = [
         "non_owning_queue.hh",
     ],
@@ -43,5 +43,19 @@ cc_library(
         "//cc/bzd/platform:atomic",
         "//cc/bzd/test:inject_point",
         "//cc/bzd/utility:ignore",
+    ],
+)
+
+cc_library(
+    name = "non_owning_queue",
+    hdrs = [
+        "non_owning_queue_lock.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+        "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility/synchronization:spin_mutex",
+        "//cc/bzd/utility/synchronization:sync_lock_guard",
     ],
 )

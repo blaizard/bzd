@@ -1,5 +1,4 @@
-#include "cc/bzd/container/threadsafe/non_owning_queue.hh"
-
+#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
 #include "cc/bzd/test/test.hh"
 
 #include <iostream>
@@ -10,45 +9,90 @@
 
 namespace bzd::test {
 
-struct ListElement : public bzd::threadsafe::NonOwningQueueElement
+class ListElement : public bzd::threadsafe::NonOwningQueueElement
 {
+public:
 	ListElement() = default;
-	ListElement(bzd::Size v) : value{v} {}
+	ListElement(Size v) : value{v} {}
+	ListElement(const ListElement&) = default;
 	bzd::Size value{0};
 };
 
-/*
-TEST(NonOwningQueue, Stress)
+TEST(NonOwningQueue, StressPush)
 {
 	srand(time(NULL));
 
+	static constexpr Size nbPushThreads{5};
+	static constexpr Size nbPopThreads{2};
+	static constexpr Size maxElements{10};
+	static constexpr Size maxIterations{10000};
+	bzd::Atomic<Size> counter{0};
+	bzd::Atomic<Size> iteration{0};
+
+	std::vector<std::thread> workers;
+
 	// Elements
-	static std::vector<bzd::test::ListElement> elements;
-	for (bzd::Size i = 0; i < 1000; ++i)
+	std::vector<ListElement> elements;
+	for (Size i = 0; i < maxElements; ++i)
 	{
-		elements.push_back(bzd::test::ListElement{i});
+		elements.push_back(ListElement{i});
 	}
 
-	// List
-	Data<bzd::test::ListElement> data1{elements};
+	// Queue
+	threadsafe::NonOwningQueue<ListElement> queue;
 
-	std::thread worker1(workloadInsert<bzd::test::ListElement>, &data1);
-	std::thread worker2(workloadInsert<bzd::test::ListElement>, &data1);
-	std::thread worker3(workloadRemove<bzd::test::ListElement>, &data1);
-	std::thread worker4(workloadRemove<bzd::test::ListElement>, &data1);
-	std::thread worker5(workloadInsert<bzd::test::ListElement>, &data1);
-	std::thread worker6(workloadInsert<bzd::test::ListElement>, &data1);
-	std::thread worker7(workloadRemove<bzd::test::ListElement>, &data1);
-	std::thread worker8(workloadRemove<bzd::test::ListElement>, &data1);
+	// Create pushers
+	for (Size i = 0; i < nbPushThreads; ++i)
+	{
+		constexpr Size increment = maxElements / nbPushThreads;
+		const Size start = i * increment;
+		const Size end = (i + 1 == nbPushThreads) ? maxElements : ((i + 1) * increment);
+		workers.emplace_back([&, end, start]() {
+			for (Size expectedIteration = 0; expectedIteration < maxIterations; ++expectedIteration)
+			{
+				// Wait for the iteration to start.
+				while (iteration.load() != expectedIteration)
+				{
+				};
+				// Push the elements.
+				for (Size j = start; j < end; ++j)
+				{
+					queue.push(elements[j]);
+					++counter;
+				}
+			}
+		});
+	}
 
-	worker1.join();
-	worker2.join();
-	worker3.join();
-	worker4.join();
-	worker5.join();
-	worker6.join();
-	worker7.join();
-	worker8.join();
+	// Create poppers
+	bzd::Atomic<Size> popped{0};
+	for (Size i = 0; i < nbPopThreads; ++i)
+	{
+		const Bool isMaster = (i == 0);
+		workers.emplace_back([&, isMaster]() {
+			for (Size expectedIteration = 0; expectedIteration < maxIterations; ++expectedIteration)
+			{
+				while (expectedIteration == iteration.load())
+				{
+					if (queue.pop())
+					{
+						++popped;
+					}
+
+					if (isMaster && popped.load() == maxElements)
+					{
+						popped.store(0);
+						++iteration;
+					}
+				}
+			}
+		});
+	}
+
+	for (auto& thread : workers)
+	{
+		thread.join();
+	}
 }
-*/
+
 } // namespace bzd::test
