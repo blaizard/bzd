@@ -132,6 +132,24 @@ public:
 		return nullresult;
 	}
 
+	[[nodiscard]] constexpr Result<T&> front() noexcept
+	{
+		if (empty())
+		{
+			return bzd::error::make(NonOwningListErrorType::empty);
+		}
+		return static_cast<T&>(*(first_.next_));
+	}
+
+	[[nodiscard]] constexpr Result<T&> back() noexcept
+	{
+		if (empty())
+		{
+			return bzd::error::make(NonOwningListErrorType::empty);
+		}
+		return static_cast<T&>(*(last_.previous_));
+	}
+
 	[[nodiscard]] constexpr Result<T&> popFront() noexcept
 	{
 		if (empty())

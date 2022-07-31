@@ -56,16 +56,17 @@ public:
 private:
 	Span<Byte> data_;
 };
-}
+} // namespace interface
 
 template <bzd::Size stackSize, bzd::Size alignment = 1, StackDirection direction = StackDirection::downward>
 class Stack : public interface::Stack<direction>
 {
 public:
-	constexpr Stack() noexcept : interface::Stack<direction>{Span<Byte>{stack_, stackSize}} {}
+	constexpr Stack() noexcept :
+		interface::Stack<direction>{Span<Byte>{stack_, stackSize}} {}
 
-private:
-	alignas(alignment) Byte stack_[stackSize]{};
+		private : alignas(alignment) Byte stack_[stackSize] {
+	};
 };
 
 } // namespace bzd

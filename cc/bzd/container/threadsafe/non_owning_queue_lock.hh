@@ -14,9 +14,11 @@ public:
 	// A copy constructor will simply copy the element without copying the next element,
 	// this is to ensure consistency with the queue.
 	constexpr NonOwningQueueElement(const NonOwningQueueElement&) noexcept {}
-	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept { return *this; }
+    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
+	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept { next_ = nullptr; return *this; }
 	NonOwningQueueElement(NonOwningQueueElement&&) = delete;
 	NonOwningQueueElement& operator=(NonOwningQueueElement&&) = delete;
+    ~NonOwningQueueElement() = default;
 
 	NonOwningQueueElement* next_{nullptr};
 };
@@ -29,7 +31,7 @@ public:
 	using ElementType = T;
 
 public:
-	void push(ElementType& element) noexcept
+	constexpr void push(ElementType& element) noexcept
 	{
 		element.next_ = nullptr;
 		const auto lock = makeSyncLockGuard(mutex_);
@@ -60,6 +62,13 @@ public:
 		tail_ = element->next_;
 
 		return *static_cast<ElementType*>(element);
+	}
+
+	constexpr void clear() noexcept
+	{
+		while (pop())
+		{
+		}
 	}
 
 protected:

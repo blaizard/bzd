@@ -13,8 +13,8 @@
 #include <iostream>
 #include <pthread.h>
 #include <sched.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 namespace bzd::platform::linux {
 
@@ -38,7 +38,7 @@ public:
 
 	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
-		// Allocate the aligned memory.
+		// Allocate the aligned memory for the stack.
 		if (stack_.empty())
 		{
 			const auto alignment = ::sysconf(_SC_PAGESIZE);
@@ -80,20 +80,14 @@ public:
 
 	Result<void, bzd::Error> stop() noexcept override
 	{
+		if (::pthread_join(thread_, nullptr) != 0)
 		{
-			const auto result = ::pthread_join(thread_, nullptr);
-			if (result != 0)
-			{
-				return bzd::error::Errno("pthread_join");
-			}
+			return bzd::error::Errno("pthread_join");
 		}
 
+		if (::pthread_attr_destroy(&attr_) != 0)
 		{
-			const auto result = ::pthread_attr_destroy(&attr_);
-			if (result != 0)
-			{
-				return bzd::error::Errno("pthread_attr_destroy");
-			}
+			return bzd::error::Errno("pthread_attr_destroy");
 		}
 
 		return bzd::nullresult;
@@ -138,7 +132,8 @@ private:
 
 private:
 	CoreId core_id_;
-	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_{};
+	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_ {
+	};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;

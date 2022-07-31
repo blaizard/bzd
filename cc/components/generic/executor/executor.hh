@@ -20,7 +20,6 @@ public:
 	constexpr Executor(Cores&... cores) noexcept : cores_{inPlace, &cores...}, executor_{}
 	{
 	}
-	virtual ~Executor() = default;
 
 	/// Assign a workload to this executor.
 	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
@@ -38,8 +37,8 @@ public:
 	/// Start the executor.
 	bzd::Result<void, bzd::Error> start() noexcept
 	{
-		auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
-		for (auto& core : cores_)
+		const auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
+		for (auto core : cores_)
 		{
 			if (auto result = core->start(run); !result)
 			{
@@ -52,7 +51,7 @@ public:
 	/// Stop the executor.
 	bzd::Result<void, bzd::Error> stop() noexcept
 	{
-		for (auto& core : cores_)
+		for (auto core : cores_)
 		{
 			if (auto result = core->stop(); !result)
 			{
@@ -68,7 +67,7 @@ private:
 	/// \param index The core index the way it was registered within the executor.
 	/// \param core The core instance.
 	/// \return True if the core should continue running, false if it should be stopped.
-	virtual Bool idle(const Size index, bzd::platform::Core&) noexcept
+	Bool idle(const Size index, bzd::platform::Core&) noexcept
 	{
 		// Only keep core 0 running.
 		return (index == 0u);
