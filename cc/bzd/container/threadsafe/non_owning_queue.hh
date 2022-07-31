@@ -5,11 +5,21 @@
 #include "cc/bzd/test/inject_point.hh"
 #include "cc/bzd/utility/ignore.hh"
 
+#include <iostream>
+
 namespace bzd::threadsafe {
 
 class NonOwningQueueElement
 {
 public:
+	NonOwningQueueElement() = default;
+	// A copy constructor will simply copy the element without copying the next element,
+	// this is to ensure consistency with the queue.
+	constexpr NonOwningQueueElement(const NonOwningQueueElement&) noexcept {}
+	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept { return *this; }
+	NonOwningQueueElement(NonOwningQueueElement&&) = delete;
+	NonOwningQueueElement& operator=(NonOwningQueueElement&&) = delete;
+
 	bzd::Atomic<NonOwningQueueElement*> next_{nullptr};
 };
 
@@ -31,7 +41,7 @@ public:
 	template <class... Args>
 	void push(ElementType& element) noexcept
 	{
-		auto previousHead = head_.exchange(&element, MemoryOrder::acquireRelease);
+		auto previousHead = head_.exchange(&element); //, MemoryOrder::acquireRelease);
 		bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
 		if (previousHead)
 		{
@@ -44,11 +54,31 @@ public:
 		}
 	}
 
+	// Race scenario:
+	// Assuming: 1 element
+	/// head = elt1 -> nullptr
+	/// tail = elt1 -> nullptr
+
+	// start pop 0
+	// head = elt1 -> nullptr
+	// tail = nullptr
+
+	// start push 0
+	// head = elt2     elt1 -> nullptr
+	// tail = nullptr
+
+	// continue pop
+	// head = elt2
+	// tail = nullptr
+
+	// continue push
+	// head = elt2
+	// tail = nullptr
 	template <class... Args>
 	[[nodiscard]] constexpr Optional<ElementType&> pop() noexcept
 	{
 		// Pop the tail element.
-		auto element = tail_.exchange(nullptr, MemoryOrder::acquireRelease);
+		auto element = tail_.exchange(nullptr); //, MemoryOrder::acquireRelease);
 		if (!element)
 		{
 			return bzd::nullopt;
@@ -61,8 +91,11 @@ public:
 			bzd::ignore = head_.compareExchange(expected, nullptr);
 		}
 
+		// head = elt2
+		// tail = nullptr
+		// element = elt1
 		bzd::test::InjectPoint<bzd::test::InjectPoint1, Args...>();
-		auto next = element->next_.load(MemoryOrder::acquire);
+		auto next = element->next_.load(); // MemoryOrder::acquire);
 		bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
 		if (next)
 		{
@@ -73,6 +106,28 @@ public:
 
 		return *static_cast<ElementType*>(element);
 	}
+
+	/*
+	void print()
+	{
+		::std::cout << "----------------------------" << ::std::endl;
+		::std::cout << "head";
+		auto ptr = head_.load();
+		while (ptr)
+		{
+			::std::cout << " -> " << ptr;
+			ptr = ptr->next_.load();
+		}
+		::std::cout << ::std::endl << "tail";
+		ptr = tail_.load();
+		while (ptr)
+		{
+			::std::cout << " -> " << ptr;
+			ptr = ptr->next_.load();
+		}
+		::std::cout << ::std::endl;
+	}
+	*/
 
 protected:
 	bzd::Atomic<NonOwningQueueElement*> head_{nullptr};

@@ -1,5 +1,4 @@
-#include "cc/bzd/container/threadsafe/non_owning_queue.hh"
-
+#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
 #include "cc/bzd/test/exec_point.hh"
 #include "cc/bzd/test/test.hh"
 
@@ -66,7 +65,7 @@ TEST(NonOwningQueue, scenario2)
 }
 
 // ---- Concurrent push ----
-
+/*
 TEST(NonOwningQueue, ConcurrentPushNoElement)
 {
 	threadsafe::NonOwningQueue<ListElement> queue;
@@ -293,4 +292,231 @@ TEST(NonOwningQueue, ConcurrentPushPopElement)
 	}
 }
 
+// ---- Concurrent push and pop and push ----
+
+TEST(NonOwningQueue, ConcurrentPushPopPush0)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement{[&]() { queue.push(elements[2]); }};
+
+	ExecPoint popElement{[&]() {
+		auto maybeElement = queue.pop<bzd::test::InjectPoint0, decltype(pushNewElement)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}};
+
+	queue.push(elements[0]);
+	queue.push<bzd::test::InjectPoint0, decltype(popElement)>(elements[1]);
+
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+TEST(NonOwningQueue, ConcurrentPushPopPush1)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement{[&]() { queue.push(elements[2]); }};
+
+	ExecPoint popElement{[&]() {
+		auto maybeElement = queue.pop<bzd::test::InjectPoint1, decltype(pushNewElement)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}};
+
+	queue.push(elements[0]);
+	queue.push<bzd::test::InjectPoint0, decltype(popElement)>(elements[1]);
+
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+TEST(NonOwningQueue, ConcurrentPushPopPush2)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement{[&]() { queue.push(elements[2]); }};
+
+	ExecPoint popElement{[&]() {
+		auto maybeElement = queue.pop<bzd::test::InjectPoint2, decltype(pushNewElement)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}};
+
+	queue.push(elements[0]);
+	queue.push<bzd::test::InjectPoint0, decltype(popElement)>(elements[1]);
+
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+// ---- Concurrent push and push and pop ----
+
+TEST(NonOwningQueue, ConcurrentPushPushPop)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint popElement{[&]() {
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}};
+
+	ExecPoint pushNewElement{[&]() { queue.push<bzd::test::InjectPoint0, decltype(popElement)>(elements[2]); }};
+
+	queue.push(elements[0]);
+	queue.push<bzd::test::InjectPoint0, decltype(pushNewElement)>(elements[1]);
+
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+// ---- Concurrent pop and push and push ----
+
+TEST(NonOwningQueue, ConcurrentPopPushPush0)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement2{[&]() { queue.push(elements[2]); }};
+	ExecPoint pushNewElement1{[&]() { queue.push<bzd::test::InjectPoint0, decltype(pushNewElement2)>(elements[1]); }};
+
+	queue.push(elements[0]);
+
+	{
+		auto maybeElement = queue.pop<bzd::test::InjectPoint0, decltype(pushNewElement1)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+TEST(NonOwningQueue, ConcurrentPopPushPush1)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement2{[&]() { queue.push(elements[2]); }};
+	ExecPoint pushNewElement1{[&]() { queue.push<bzd::test::InjectPoint0, decltype(pushNewElement2)>(elements[1]); }};
+
+	queue.push(elements[0]);
+
+	{
+		auto maybeElement = queue.pop<bzd::test::InjectPoint1, decltype(pushNewElement1)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+TEST(NonOwningQueue, ConcurrentPopPushPush2)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+
+	ExecPoint pushNewElement2{[&]() { queue.push(elements[2]); }};
+	ExecPoint pushNewElement1{[&]() { queue.push<bzd::test::InjectPoint0, decltype(pushNewElement2)>(elements[1]); }};
+
+	queue.push(elements[0]);
+
+	{
+		auto maybeElement = queue.pop<bzd::test::InjectPoint2, decltype(pushNewElement1)>();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+
+// ---- Concurrent pop and 2 push ----
+
+TEST(NonOwningQueue, ConcurrentPop2PushPush0)
+{
+	threadsafe::NonOwningQueue<ListElement> queue;
+	ListElement elements[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	ExecPoint pushNewElement{[&]() {
+		queue.print();
+		queue.push(elements[2]);
+		queue.print();
+	}}; //queue.push(elements[2]); queue.push(elements[3]); }};
+
+	queue.push(elements[0]);
+	queue.push(elements[1]);
+	queue.print();
+
+	{
+		auto maybeElement = queue.pop<bzd::test::InjectPoint0, decltype(pushNewElement)>();
+		queue.print();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 0U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 1U);
+	}
+	{
+		auto maybeElement = queue.pop();
+		EXPECT_TRUE(maybeElement);
+		EXPECT_EQ(maybeElement.value().value, 2U);
+	}
+}
+*/
 } // namespace bzd::test
