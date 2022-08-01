@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/meta/macro.hh"
 #include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
@@ -20,9 +21,20 @@
 	};                                                                                                           \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
-#define BZDTEST_(testCaseName, testName)      \
+#define BZDTEST_2(testCaseName, testName)     \
 	BZDTEST_REGISTER_(testCaseName, testName) \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
+
+// WIP
+#define BZDTEST_3(testCaseName, testName, typeList)                              \
+	template <class TestType>                                                    \
+	void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&); \
+	BZDTEST_2(testCaseName, BZD_PASTE(testName, __template0))                    \
+	{                                                                            \
+		BZDTEST_FCT_NAME_(testCaseName, testName)<void>(test);                   \
+	}                                                                            \
+	template <class TestType>                                                    \
+	void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_ASYNC_(testCaseName, testName)                                                                 \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                  \

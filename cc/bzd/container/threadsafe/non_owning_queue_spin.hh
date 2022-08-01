@@ -14,11 +14,22 @@ public:
 	// A copy constructor will simply copy the element without copying the next element,
 	// this is to ensure consistency with the queue.
 	constexpr NonOwningQueueElement(const NonOwningQueueElement&) noexcept {}
-    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept { next_ = nullptr; return *this; }
+	// NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
+	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept
+	{
+		next_ = nullptr;
+		return *this;
+	}
 	NonOwningQueueElement(NonOwningQueueElement&&) = delete;
 	NonOwningQueueElement& operator=(NonOwningQueueElement&&) = delete;
-    ~NonOwningQueueElement() = default;
+	~NonOwningQueueElement() = default;
+
+protected:
+	[[nodiscard]] constexpr Bool isDetached() const noexcept { return (next_ == nullptr); }
+
+private:
+	template <class T>
+	friend class NonOwningQueue;
 
 	NonOwningQueueElement* next_{nullptr};
 };
@@ -60,16 +71,45 @@ public:
 			head_ = nullptr;
 		}
 		tail_ = element->next_;
+		element->next_ = nullptr;
 
 		return *static_cast<ElementType*>(element);
 	}
 
 	constexpr void clear() noexcept
 	{
-		while (pop())
+		const auto lock = makeSyncLockGuard(mutex_);
+		auto ptr = &tail_;
+		while (*ptr)
 		{
+			auto temp = &((*ptr)->next_);
+			*ptr = nullptr;
+			ptr = temp;
 		}
+		head_ = nullptr;
 	}
+
+	/*
+	void print()
+	{
+		::std::cout << "----------------------------" << ::std::endl;
+		::std::cout << "head";
+		auto ptr = head_;
+		while (ptr)
+		{
+			::std::cout << " -> " << ptr;
+			ptr = ptr->next_;
+		}
+		::std::cout << ::std::endl << "tail";
+		ptr = tail_;
+		while (ptr)
+		{
+			::std::cout << " -> " << ptr;
+			ptr = ptr->next_;
+		}
+		::std::cout << ::std::endl;
+	}
+	*/
 
 protected:
 	NonOwningQueueElement* head_{nullptr};

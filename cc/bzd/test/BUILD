@@ -24,6 +24,7 @@ cc_library(
         ":composition",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
+        "//cc/bzd/meta:macro",
         "//cc/bzd/platform:clock",
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",

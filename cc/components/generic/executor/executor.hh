@@ -58,6 +58,7 @@ public:
 				return bzd::move(result).propagate();
 			}
 		}
+		executor_.shutdown();
 		return bzd::nullresult;
 	}
 

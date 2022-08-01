@@ -1,4 +1,4 @@
-#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
+#include "cc/bzd/container/threadsafe/non_owning_queue_spin.hh"
 #include "cc/bzd/test/exec_point.hh"
 #include "cc/bzd/test/test.hh"
 
@@ -16,7 +16,7 @@ namespace {
 ListElement elements[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 }
 
-TEST(NonOwningQueue, scenario1)
+TEST(NonOwningQueue, scenario1, (int, void))
 {
 	threadsafe::NonOwningQueue<ListElement> queue;
 

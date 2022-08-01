@@ -4,7 +4,7 @@
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
-#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
+#include "cc/bzd/container/threadsafe/non_owning_queue_spin.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
@@ -136,11 +136,7 @@ public:
 	constexpr Executor(Self&&) noexcept = delete;
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
-	constexpr ~Executor() noexcept
-	{
-		// Clear the complete queue.
-		queue_.clear();
-	}
+	constexpr ~Executor() noexcept { shutdown(); }
 
 public: // Statistics.
 	[[nodiscard]] constexpr Size getQueueCount() const noexcept { return queueCount_.load(); }
@@ -226,6 +222,14 @@ public:
 		push(executable);
 	}
 
+	/// Shutdown the executor. This removes all the pending tasks and no other
+	/// scheduling can proceed.
+	void shutdown() noexcept
+	{
+		// Clear the complete queue.
+		queue_.clear();
+	}
+
 public:
 	/// Create a generator for the context structure.
 	///
@@ -277,11 +281,14 @@ private:
 	/// \param executable The workload to be executed.
 	constexpr void push(Executable& executable) noexcept
 	{
+		// It is important to update the counters before being pushed, otherwise the exectuable might be
+		// popped before the counters are increases, leaving them in an incoherent state.
 		if (executable.getType() == ExecutableMetadata::Type::workload)
 		{
 			++workloadCount_;
 		}
 		++queueCount_;
+		// Only at the end push the executable to the work queue.
 		queue_.push(executable);
 	}
 
@@ -346,11 +353,7 @@ public:
 	using Self = Executable<T>;
 
 public:
-	~Executable() noexcept
-	{
-		// Detach the executable from any of the list it belongs to.
-		detach();
-	}
+	~Executable() noexcept { destroy(); }
 
 	constexpr void setCancellationToken(CancellationToken& token) noexcept
 	{
@@ -388,8 +391,9 @@ public:
 	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
 	constexpr void schedule() noexcept { getExecutor().push(getExecutable()); }
 
-	constexpr void detach() noexcept
+	constexpr void destroy() noexcept
 	{
+		assert::isTrue(isDetached(), "Executable still owned by the queue.");
 		if (executor_.hasValue())
 		{
 			//  If there is an executor wait until it is safe to discard the element, this to avoid any

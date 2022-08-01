@@ -1,4 +1,4 @@
-#include "cc/bzd/container/threadsafe/non_owning_queue_lock.hh"
+#include "cc/bzd/container/threadsafe/non_owning_queue_spin.hh"
 #include "cc/bzd/test/test.hh"
 
 #include <iostream>
@@ -20,19 +20,19 @@ public:
 
 TEST(NonOwningQueue, StressPush)
 {
-	srand(time(NULL));
-
-	static constexpr Size nbPushThreads{5};
+	// Coonfiguration.
+	static constexpr Size nbPushThreads{3};
 	static constexpr Size nbPopThreads{2};
 	static constexpr Size maxElements{10};
-	static constexpr Size maxIterations{10000};
+	static constexpr Size maxIterations{1000};
+
 	bzd::Atomic<Size> counter{0};
 	bzd::Atomic<Size> iteration{0};
-
 	std::vector<std::thread> workers;
-
-	// Elements
 	std::vector<ListElement> elements;
+
+	srand(time(NULL));
+
 	for (Size i = 0; i < maxElements; ++i)
 	{
 		elements.push_back(ListElement{i});
