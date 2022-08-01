@@ -4,7 +4,11 @@
 
 /// Defines an individual test named testCaseName in the test suite testName, consisting of the given statements.
 /// The statements within the test body can be any code under test. Assertions used within the test body determine the outcome of the test.
-#define TEST(testCaseName, testName) BZDTEST_(testCaseName, testName)
+///
+/// \param testCaseName The test case name.
+/// \param testName The test name.
+/// \param typeList The type list for template tests.
+#define TEST(...) BZD_GET_MACRO(BZDTEST_, __VA_ARGS__)(__VA_ARGS__)
 
 /// Run a coroutine-based test in an asynchronous context.
 #define TEST_ASYNC(testCaseName, testName) BZDTEST_ASYNC_(testCaseName, testName)

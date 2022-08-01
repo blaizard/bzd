@@ -263,14 +263,11 @@ private:
 	{
 		if (handle_)
 		{
-			detach();
+			getExecutable().destroy();
 			handle_.destroy();
 			handle_ = nullptr;
 		}
 	}
-
-	/// Detach the current async from its executor (if attached).
-	constexpr void detach() noexcept { getExecutable().detach(); }
 
 	constexpr async::Executable& getExecutable() noexcept
 	{

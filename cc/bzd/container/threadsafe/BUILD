@@ -47,9 +47,9 @@ cc_library(
 )
 
 cc_library(
-    name = "non_owning_queue",
+    name = "non_owning_queue_spin",
     hdrs = [
-        "non_owning_queue_lock.hh",
+        "non_owning_queue_spin.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

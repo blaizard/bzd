@@ -38,7 +38,7 @@ bzd_cc_test(
     tags = ["stress"],
     deps = [
         ":thread",
-        "//cc/bzd/container/threadsafe:non_owning_queue",
+        "//cc/bzd/container/threadsafe:non_owning_queue_spin",
         "//cc/bzd/test",
         "//cc/bzd/test:exec_point",
     ],

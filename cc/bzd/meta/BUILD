@@ -10,6 +10,7 @@ bzd_cc_library(
         ":contains",
         ":find",
         ":find_conditional",
+        ":macro",
         ":range",
         ":string_literal",
         ":tuple",
@@ -77,6 +78,14 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_same",
     ],
+)
+
+cc_library(
+    name = "macro",
+    hdrs = [
+        "macro.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
