@@ -13,45 +13,50 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                              \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                 \
-	{                                                                                                            \
-	public:                                                                                                      \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__} { \
-			registerTest(bzd::FunctionRef<void(::bzd::test::Context&)>::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName), &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this)); \
-		} \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const;                                   \
-	};                                                                                                           \
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                                     \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                   \
+	{                                                                                                                 \
+	public:                                                                                                           \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__}      \
+		{                                                                                                             \
+			this->registerTest(FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                 \
+														 &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this)); \
+		}                                                                                                             \
+		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                           \
+	};                                                                                                                \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
-#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                              \
-	template <class... Types> \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<2>                                 \
-	{                                                                                                            \
-	public:                                                                                                      \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__} { \
-			(registerTest(bzd::FunctionRef<void(::bzd::test::Context&)>::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName), &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this), "test"), ...); \
-		} \
-		template <class TestType> \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const;                                   \
-	};                                                                                                           \
+#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                            \
+	template <class... Types>                                                                                                   \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                              \
+	{                                                                                                                           \
+	public:                                                                                                                     \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__} \
+		{                                                                                                                       \
+			(this->registerTest(FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                          \
+														  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this),    \
+								typeToString<Types>()),                                                                         \
+			 ...);                                                                                                              \
+		}                                                                                                                       \
+		template <class TestType>                                                                                               \
+		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                                     \
+	};                                                                                                                          \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName)<BZD_REMOVE_PARENTHESIS(typeList)> BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
 #define BZDTEST_2(testCaseName, testName)     \
 	BZDTEST_REGISTER_(testCaseName, testName) \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] ::bzd::test::Context& test) const
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] const ::bzd::test::Context& test) const
 
-// WIP
-#define BZDTEST_3(testCaseName, testName, typeList)                              \
+#define BZDTEST_3(testCaseName, testName, typeList)              \
 	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList) \
-	template <class... Types> \
-	template <class TestType>                                                    \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] ::bzd::test::Context& test) const
+	template <class... Types>                                    \
+	template <class TestType>                                    \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] const ::bzd::test::Context& test) const
 
 #define BZDTEST_ASYNC_(testCaseName, testName)                                                                 \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                       \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const                   \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const             \
 	{                                                                                                          \
 		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                            \
 		if (!static_cast<bool>(result))                                                                        \
@@ -61,15 +66,15 @@
 	}                                                                                                          \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
-#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                     \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                \
-	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);   \
-	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                 \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(::bzd::test::Context& test) const \
-	{                                                                                        \
-		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                            \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                     \
-	}                                                                                        \
+#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                           \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                      \
+	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);         \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                       \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const \
+	{                                                                                              \
+		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                  \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                           \
+	}                                                                                              \
 	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                               \
@@ -334,7 +339,36 @@ private:
 	mutable bzd::XorwowEngine generator_;
 };
 
-/// Holds information regarding the test.
+/// Convert a type into a string view at compile type.
+/// TODO: fix this function.
+template <class T>
+constexpr const char* typeToString()
+{
+	/*
+	#if defined(__clang__)
+	  constexpr auto prefix = std::string_view{"[T = "};
+	  constexpr auto suffix = std::string_view{"]"};
+	  constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
+	#elif defined(__GNUC__)
+	  constexpr auto prefix = std::string_view{"with T = "};
+	  constexpr auto suffix = std::string_view{"]"};
+	  constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
+	#else
+	#error Unsupported compiler
+	#endif
+
+	  constexpr auto start = function.find(prefix) + prefix.size();
+	  constexpr auto end = function.rfind(suffix);
+
+	  static_assert(start < end);
+
+	  constexpr auto name = function.substr(start, (end - start));
+	  return name;
+	  */
+	return __PRETTY_FUNCTION__;
+}
+
+/// Holds information about the test class.
 struct TestInfo
 {
 	const char* testCaseName;
@@ -366,15 +400,42 @@ struct TestInfo
 	}
 };
 
-struct TestChain
+struct FunctionPointer
 {
-	TestInfo* info{nullptr};
-	bzd::Optional<bzd::FunctionRef<void(::bzd::test::Context&)>> test{};
-	const char* variant{nullptr};
-	TestChain* next{nullptr};
+	template <class Object, void (Object::*memberPtr)(const ::bzd::test::Context&) const>
+	static constexpr auto toMember(Object& object) noexcept
+	{
+		FunctionPointer pointer;
+		pointer.function_ = wrapper<Object, memberPtr>;
+		pointer.object_ = static_cast<void*>(&object);
+		return pointer;
+	}
+
+	constexpr void operator()(const ::bzd::test::Context& context) { return function_(object_, context); }
+
+private:
+	template <class Object, void (Object::*memberPtr)(const ::bzd::test::Context&) const>
+	static void wrapper(const void* objectErased, const ::bzd::test::Context& context)
+	{
+		const auto object = static_cast<const Object*>(objectErased);
+		return (object->*memberPtr)(context);
+	}
+
+	using Pointer = void (*)(const void*, const ::bzd::test::Context&);
+	Pointer function_{nullptr};
+	void* object_{nullptr};
 };
 
-extern bzd::test::TestChain* chainCurrent;
+// Hold information about the next test instance to execute.
+struct TestNode
+{
+	/// Tells if a node is valid or not.
+	constexpr bool isValid() noexcept { return (info != nullptr); }
+	TestInfo* info{nullptr};
+	FunctionPointer function{};
+	const char* variant{nullptr};
+	TestNode* next{nullptr};
+};
 
 template <Size n>
 class Test
@@ -383,20 +444,26 @@ public:
 	Test(const char* testCaseName, const char* testName, const char* file) noexcept : info_{testCaseName, testName, file} {}
 
 protected:
-	void registerTest(bzd::FunctionRef<void(::bzd::test::Context&)> test, const char* variant = nullptr) noexcept
+	/// Register a specific test instance to be executed.
+	///
+	/// \param test The test function pointer, the entry point of the test to be executed.
+	/// \param variant The variant name to use for this instance.
+	void registerTest(FunctionPointer function, const char* variant = nullptr) noexcept
 	{
-		chainCurrent->info = &info_;
-		chainCurrent->test = test;
-		chainCurrent->variant = variant;
-		chainCurrent->next = &node_;
-		chainCurrent = chainCurrent->next;
+		extern bzd::test::TestNode* nodeCurrent;
+		nodeCurrent->info = &info_;
+		nodeCurrent->function = function;
+		nodeCurrent->variant = variant;
+		nodeCurrent->next = nextNode_++;
+		nodeCurrent = nodeCurrent->next;
 	}
 
 private:
 	friend class Manager;
 
 	TestInfo info_;
-	TestChain node_;
+	TestNode node_[n];
+	TestNode* nextNode_{node_};
 };
 
 class Manager

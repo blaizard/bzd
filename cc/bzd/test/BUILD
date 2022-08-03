@@ -29,7 +29,6 @@ cc_library(
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",
         "//cc/bzd/utility/random:xorwow_engine",
-        "//cc/bzd/container:function_ref"
     ],
 )
 
