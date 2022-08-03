@@ -102,3 +102,10 @@
 #define BZD_INTERNAL_PASTE5(a, b, c, d, e) a##b##c##d##e
 #define BZD_INTERNAL_PASTE6(a, b, c, d, e, f) a##b##c##d##e##f
 #define BZD_INTERNAL_PASTE7(a, b, c, d, e, f, g) a##b##c##d##e##f##g
+
+/// Remove the parenthesis around an expression.
+#define BZD_REMOVE_PARENTHESIS(...) BZD_INTERNAL_EXPAND1(BZD_INTERNAL_DEF __VA_ARGS__)
+#define BZD_INTERNAL_EXPAND1(param) BZD_INTERNAL_EXPAND2(param)
+#define BZD_INTERNAL_EXPAND2(...) BZD_INTERNAL_NO##__VA_ARGS__
+#define BZD_INTERNAL_DEF(...) BZD_INTERNAL_DEF __VA_ARGS__
+#define BZD_INTERNAL_NOBZD_INTERNAL_DEF

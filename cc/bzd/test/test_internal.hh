@@ -8,18 +8,34 @@
 #include "cc/bzd/utility/random/xorwow_engine.hh"
 
 #define BZDTEST_FCT_NAME_(testCaseName, testName) functionBzdTest_##testCaseName##_##testName
-#define BZDTEST_CLASS_NAME_(testCaseName, testName) BzdTest_##testCaseName##_##testName
+#define BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_CLASS_NAME_2(testCaseName, testName)
+#define BZDTEST_CLASS_NAME_2(testCaseName, testName) BzdTest_##testCaseName##_##testName
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test                                 \
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                              \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                 \
 	{                                                                                                            \
 	public:                                                                                                      \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test{#testCaseName, #testName, __FILE__} {} \
-		void test([[maybe_unused]] ::bzd::test::Context& test) const override;                                   \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__} { \
+			registerTest(bzd::FunctionRef<void(::bzd::test::Context&)>::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName), &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this)); \
+		} \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const;                                   \
 	};                                                                                                           \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
+
+#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                              \
+	template <class... Types> \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<2>                                 \
+	{                                                                                                            \
+	public:                                                                                                      \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__} { \
+			(registerTest(bzd::FunctionRef<void(::bzd::test::Context&)>::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName), &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this), "test"), ...); \
+		} \
+		template <class TestType> \
+		void test([[maybe_unused]] ::bzd::test::Context& test) const;                                   \
+	};                                                                                                           \
+	static BZDTEST_CLASS_NAME_(testCaseName, testName)<BZD_REMOVE_PARENTHESIS(typeList)> BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
 #define BZDTEST_2(testCaseName, testName)     \
 	BZDTEST_REGISTER_(testCaseName, testName) \
@@ -27,14 +43,10 @@
 
 // WIP
 #define BZDTEST_3(testCaseName, testName, typeList)                              \
+	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList) \
+	template <class... Types> \
 	template <class TestType>                                                    \
-	void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&); \
-	BZDTEST_2(testCaseName, BZD_PASTE(testName, __template0))                    \
-	{                                                                            \
-		BZDTEST_FCT_NAME_(testCaseName, testName)<void>(test);                   \
-	}                                                                            \
-	template <class TestType>                                                    \
-	void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] ::bzd::test::Context& test) const
 
 #define BZDTEST_ASYNC_(testCaseName, testName)                                                                 \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
@@ -322,20 +334,19 @@ private:
 	mutable bzd::XorwowEngine generator_;
 };
 
-class Test
+/// Holds information regarding the test.
+struct TestInfo
 {
-public:
-	Test(const char* testCaseName, const char* testName, const char* file);
-	virtual ~Test() {}
-	virtual void test(Context& test) const = 0;
+	const char* testCaseName;
+	const char* testName;
+	const char* file;
 
-private:
 	/// Generates a deterministic seed from the test identifier.
 	constexpr auto getSeed() const noexcept
 	{
 		Context::SeedType seed{362437};
 
-		for (auto* it : {testCaseName_, testName_, file_})
+		for (auto* it : {testCaseName, testName, file})
 		{
 			while (*it)
 			{
@@ -353,24 +364,39 @@ private:
 
 		return seed;
 	}
+};
 
-	constexpr bool operator<(const Test& other) const noexcept
+struct TestChain
+{
+	TestInfo* info{nullptr};
+	bzd::Optional<bzd::FunctionRef<void(::bzd::test::Context&)>> test{};
+	const char* variant{nullptr};
+	TestChain* next{nullptr};
+};
+
+extern bzd::test::TestChain* chainCurrent;
+
+template <Size n>
+class Test
+{
+public:
+	Test(const char* testCaseName, const char* testName, const char* file) noexcept : info_{testCaseName, testName, file} {}
+
+protected:
+	void registerTest(bzd::FunctionRef<void(::bzd::test::Context&)> test, const char* variant = nullptr) noexcept
 	{
-		auto result = bzd::test::impl::strcmp(testCaseName_, other.testCaseName_);
-		if (result == 0)
-		{
-			result = bzd::test::impl::strcmp(testName_, other.testName_);
-		}
-		return (result == -1);
+		chainCurrent->info = &info_;
+		chainCurrent->test = test;
+		chainCurrent->variant = variant;
+		chainCurrent->next = &node_;
+		chainCurrent = chainCurrent->next;
 	}
 
 private:
 	friend class Manager;
 
-	const char* testCaseName_;
-	const char* testName_;
-	const char* file_;
-	Test* next_{nullptr};
+	TestInfo info_;
+	TestChain node_;
 };
 
 class Manager

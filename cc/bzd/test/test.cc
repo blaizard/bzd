@@ -5,19 +5,12 @@
 
 // Empty namespace to hold all the registered tests
 namespace {
-
-bzd::test::Test* testRoot{nullptr};
-bzd::test::Test** testCurrent{&testRoot};
-
-} // namespace
+bzd::test::TestChain chainRoot{};
+}
 
 namespace bzd::test {
 
-Test::Test(const char* testCaseName, const char* testName, const char* file) : testCaseName_{testCaseName}, testName_{testName}, file_{file}
-{
-	*testCurrent = this;
-	testCurrent = &next_;
-}
+bzd::test::TestChain* chainCurrent{&chainRoot};
 
 void Manager::failInternals(
 	const char* const file, const bzd::Int32 line, const char* const message, const char* actual, const char* expected)
@@ -50,30 +43,37 @@ bool bzd::test::Manager::run()
 {
 	auto& clock = ::bzd::platform::steadyClock();
 	bzd::Size nbFailedTests{0};
-	auto* test = testRoot;
+	auto* node = &chainRoot;
 
 	::bzd::print("[==========] Running test(s)\n"_csv).sync();
-	if (!test)
+	if (!node->info)
 	{
 		::bzd::print("[   FAILED ] Empty test suite is considered as a failed test.\n"_csv).sync();
 		return false;
 	}
 
-	while (test)
+	while (node->info)
 	{
-		const auto seed = test->getSeed();
+		const auto seed = node->info->getSeed();
 		bzd::test::Context context{seed};
 
-		::bzd::print("[ RUN      ] {}.{} (seed={})\n"_csv, test->testCaseName_, test->testName_, seed).sync();
+		if (node->variant)
+		{
+			::bzd::print("[ RUN      ] {}.{}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, node->variant, seed).sync();
+		}
+		else
+		{
+			::bzd::print("[ RUN      ] {}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, seed).sync();
+		}
 		currentTestFailed_ = false;
 		const auto tickStart = clock.getTicks();
 		try
 		{
-			test->test(context);
+			node->test.value()(context);
 		}
 		catch (...)
 		{
-			fail(test->file_, -1, "Unknown C++ exception thrown in the test body.");
+			fail(node->info->file, -1, "Unknown C++ exception thrown in the test body.");
 		}
 
 		const auto tickDiff = (clock.getTicks() - tickStart);
@@ -89,7 +89,7 @@ bool bzd::test::Manager::run()
 			::bzd::print("[       OK ] ({}ms)\n"_csv, clock.ticksToMs(tickDiff).get()).sync();
 		}
 
-		test = test->next_;
+		node = node->next;
 	}
 
 	return (nbFailedTests == 0);
