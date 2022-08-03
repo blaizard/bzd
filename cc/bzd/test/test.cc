@@ -5,12 +5,12 @@
 
 // Empty namespace to hold all the registered tests
 namespace {
-bzd::test::TestChain chainRoot{};
+bzd::test::TestNode nodeRoot{};
 }
 
 namespace bzd::test {
 
-bzd::test::TestChain* chainCurrent{&chainRoot};
+bzd::test::TestNode* nodeCurrent{&nodeRoot};
 
 void Manager::failInternals(
 	const char* const file, const bzd::Int32 line, const char* const message, const char* actual, const char* expected)
@@ -43,7 +43,7 @@ bool bzd::test::Manager::run()
 {
 	auto& clock = ::bzd::platform::steadyClock();
 	bzd::Size nbFailedTests{0};
-	auto* node = &chainRoot;
+	auto* node = &nodeRoot;
 
 	::bzd::print("[==========] Running test(s)\n"_csv).sync();
 	if (!node->info)
@@ -52,14 +52,15 @@ bool bzd::test::Manager::run()
 		return false;
 	}
 
-	while (node->info)
+	while (node->isValid())
 	{
 		const auto seed = node->info->getSeed();
 		bzd::test::Context context{seed};
 
 		if (node->variant)
 		{
-			::bzd::print("[ RUN      ] {}.{}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, node->variant, seed).sync();
+			::bzd::print("[ RUN      ] {}.{}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, node->variant, seed)
+				.sync();
 		}
 		else
 		{
@@ -69,7 +70,7 @@ bool bzd::test::Manager::run()
 		const auto tickStart = clock.getTicks();
 		try
 		{
-			node->test.value()(context);
+			node->function(context);
 		}
 		catch (...)
 		{
