@@ -22,6 +22,8 @@ bzd_cc_library(
         ":move_backward",
         ":none_of",
         ":reverse",
+        ":rsearch",
+        ":search",
         ":sort",
         ":upper_bound",
     ],
@@ -267,6 +269,35 @@ cc_library(
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:swap",
+    ],
+)
+
+cc_library(
+    name = "rsearch",
+    hdrs = [
+        "rsearch.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":search",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/utility/comparison",
+    ],
+)
+
+cc_library(
+    name = "search",
+    hdrs = [
+        "search.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/utility/comparison",
     ],
 )
 
