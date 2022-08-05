@@ -3,9 +3,9 @@
 #include "cc/bzd/platform/types.hh"
 
 namespace bzd {
-template <class T>
+template <class T1, class T2 = T1>
 struct GreaterEqual
 {
-	constexpr Bool operator()(const T& lhs, const T& rhs) const { return lhs >= rhs; }
+	constexpr Bool operator()(const T1& lhs, const T2& rhs) const { return lhs >= rhs; }
 };
 } // namespace bzd

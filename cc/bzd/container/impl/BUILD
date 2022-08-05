@@ -34,6 +34,8 @@ cc_library(
         "//cc/bzd/algorithm:equal",
         "//cc/bzd/algorithm:find",
         "//cc/bzd/algorithm:lexicographical_compare",
+        "//cc/bzd/algorithm:rsearch",
+        "//cc/bzd/algorithm:search",
         "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/type_traits:enable_if",

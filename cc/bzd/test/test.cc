@@ -57,15 +57,13 @@ bool bzd::test::Manager::run()
 		const auto seed = node->info->getSeed();
 		bzd::test::Context context{seed};
 
-		if (node->variant)
+		::bzd::print("[ RUN      ] {}.{}"_csv, node->info->testCaseName, node->info->testName).sync();
+		if (node->variant.size())
 		{
-			::bzd::print("[ RUN      ] {}.{}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, node->variant, seed)
-				.sync();
+			::bzd::print(".{}"_csv, node->variant).sync();
 		}
-		else
-		{
-			::bzd::print("[ RUN      ] {}.{} (seed={})\n"_csv, node->info->testCaseName, node->info->testName, seed).sync();
-		}
+		::bzd::print(" (seed={})\n"_csv, seed).sync();
+
 		currentTestFailed_ = false;
 		const auto tickStart = clock.getTicks();
 		try

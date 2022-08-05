@@ -3,6 +3,8 @@
 #include "cc/bzd/algorithm/equal.hh"
 #include "cc/bzd/algorithm/find.hh"
 #include "cc/bzd/algorithm/lexicographical_compare.hh"
+#include "cc/bzd/algorithm/rsearch.hh"
+#include "cc/bzd/algorithm/search.hh"
 #include "cc/bzd/container/iterator/contiguous.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
@@ -129,11 +131,40 @@ public: // Emplace
 	}
 
 public: // Find
-	[[nodiscard]] constexpr Size find(const ValueType& item, const Size start = 0) const noexcept
+	/// Searches the span for the first occurrence of the sequence specified by its arguments.
+	[[nodiscard]] constexpr Size find(const Self& sequence, const Size start = 0) const noexcept
 	{
 		if (start < size())
 		{
-			const auto it = bzd::algorithm::find(begin() + start, end(), item);
+			const auto it = bzd::algorithm::search(begin() + start, end(), sequence.begin(), sequence.end());
+			if (it != end())
+			{
+				return bzd::distance(begin(), it);
+			}
+		}
+		return npos;
+	}
+
+	/// Searches the span for the first occurrence of the value specified by its arguments.
+	[[nodiscard]] constexpr Size find(const ValueType& value, const Size start = 0) const noexcept
+	{
+		if (start < size())
+		{
+			const auto it = bzd::algorithm::find(begin() + start, end(), value);
+			if (it != end())
+			{
+				return bzd::distance(begin(), it);
+			}
+		}
+		return npos;
+	}
+
+	/// Searches the span for the last occurrence of the sequence specified by its arguments.
+	[[nodiscard]] constexpr Size rfind(const Self& sequence, const Size start = 0) const noexcept
+	{
+		if (start < size())
+		{
+			const auto it = bzd::algorithm::rsearch(begin() + start, end(), sequence.begin(), sequence.end());
 			if (it != end())
 			{
 				return bzd::distance(begin(), it);
