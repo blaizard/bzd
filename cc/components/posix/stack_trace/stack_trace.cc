@@ -7,6 +7,7 @@
 #include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/singleton.hh"
+#include "cc/components/posix/error.hh"
 
 #include <atomic>
 #include <csignal>
@@ -27,10 +28,22 @@ namespace {
 class AsyncSignalSafeStream : public bzd::OStream
 {
 public:
-	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept final
+	// NOLINTNEXTLINE(bugprone-exception-escape)
+	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept final
 	{
 		constexpr int fd = STDERR_FILENO;
-		co_return static_cast<bzd::Size>(::write(fd, data.data(), data.size()));
+
+		bzd::Size already_written = 0u;
+		while (already_written < data.size())
+		{
+			const auto result = ::write(fd, data.data(), data.size());
+			if (result < 0)
+			{
+				co_return bzd::error::Errno("write");
+			}
+			already_written += result;
+		}
+		co_return {};
 	}
 };
 

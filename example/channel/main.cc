@@ -14,14 +14,14 @@ template <class T = BufferView>
 class IOChannel
 {
 public:
-	virtual bzd::Result<bzd::Size> write(const T& data) noexcept = 0;
+	virtual bzd::Result<> write(const T& data) noexcept = 0;
 	// virtual bzd::Result<bzd::Size> read(const T& data) noexcept = 0;
 };
 
 class I2CTransport
 {
 public:
-	bzd::Result<bzd::Size> write(const int address, const ConstBufferView& data) noexcept
+	bzd::Result<> write(const int address, const ConstBufferView& data) noexcept
 	{
 		std::cout << "[address=" << address << "] ";
 		for (auto c : data)
@@ -29,7 +29,7 @@ public:
 			std::cout << c;
 		}
 		std::cout << std::endl;
-		return data.size();
+		return bzd::nullresult;
 	}
 
 	bzd::Result<bzd::Size> read(const int /*address*/, const BufferView& data) noexcept { return data.size(); }
@@ -64,7 +64,7 @@ private:
 class Transport : public bzd::IOStream
 {
 public:
-	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
+	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
 		if (data.size() < 2)
 		{
@@ -76,7 +76,7 @@ public:
 			std::cout << static_cast<char>(*it);
 		}
 		std::cout << std::endl;
-		co_return data.size();
+		co_return {};
 	}
 
 	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override { co_return data; }

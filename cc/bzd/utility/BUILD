@@ -33,6 +33,7 @@ bzd_cc_library(
         ":source_location",
         ":swap",
         ":to_underlying",
+        ":withdraw",
         "//cc/bzd/utility/format",
         "//cc/bzd/utility/format:integral",
         "//cc/bzd/utility/format:stream",
@@ -346,5 +347,16 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:underlying_type",
+    ],
+)
+
+cc_library(
+    name = "withdraw",
+    hdrs = [
+        "withdraw.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
     ],
 )

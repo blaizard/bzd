@@ -25,4 +25,21 @@ TEST(Search, Base)
 		const auto itExpected = (array1.begin()) + 5;
 		EXPECT_EQ(it, itExpected);
 	}
+
+	{
+		bzd::Array<int, 1> array2{2};
+		const auto it = bzd::algorithm::rsearch(array1, array2);
+		const auto itExepcted = array1.begin() + 6;
+		EXPECT_EQ(it, itExepcted);
+	}
+
+	{
+		const auto it = bzd::algorithm::rsearch(array1.begin(), array1.end(), array1.begin(), array1.begin());
+		EXPECT_EQ(it, array1.end());
+	}
+
+	{
+		const auto it = bzd::algorithm::rsearch(array1.begin(), array1.begin(), array1.begin(), array1.end());
+		EXPECT_EQ(it, array1.begin());
+	}
 }

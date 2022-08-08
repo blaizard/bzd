@@ -8,13 +8,13 @@ template <bzd::Size SIZE>
 class Logger : public bzd::OStream
 {
 public:
-	Async<Size> write(const Span<const Byte> data) noexcept override
+	Async<> write(const Span<const Byte> data) noexcept override
 	{
 		for (const auto b : data)
 		{
 			buffer_.at(write_++ % SIZE) = b;
 		}
-		co_return 0U;
+		co_return {};
 	}
 
 	/**

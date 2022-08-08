@@ -14,8 +14,7 @@ public:
 	///
 	/// \param fd The file descriptor to write to.
 	/// \param data The data blob to be written.
-	/// \return The number of bytes written.
-	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
+	bzd::Async<> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{
 		return bzd::impl::getImplementation(this, &Proactor::write, &Impl::write)->write(fd, data);
 	}

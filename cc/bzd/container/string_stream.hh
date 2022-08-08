@@ -10,9 +10,10 @@ class StringStream : public bzd::OStream
 public:
 	constexpr StringStream(bzd::interface::String& str) : string_(str) {}
 
-	bzd::Async<Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
+	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
-		co_return string_.append(reinterpret_cast<const char*>(data.data()), data.size());
+		string_.append(reinterpret_cast<const char*>(data.data()), data.size());
+		co_return {};
 	}
 
 	constexpr const bzd::interface::String& str() const noexcept { return string_; }

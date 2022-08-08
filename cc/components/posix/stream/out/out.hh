@@ -11,11 +11,11 @@ class Out : public bzd::OStream
 public:
 	constexpr Out(Proactor& proactor) noexcept : proactor_{proactor} {}
 
-	bzd::Async<bzd::Size> write(const bzd::Span<const bzd::Byte> data) noexcept override
+	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
-		const auto size = co_await !proactor_.write(out_, data);
+		co_await !proactor_.write(out_, data);
 		::std::flush(::std::cout);
-		co_return size;
+		co_return {};
 	}
 
 private:
