@@ -20,32 +20,25 @@ public:
 	/// The promise resolves only after all the data is transmitted.
 	///
 	/// \param[in] data The data to be sent via this output channel.
-	/// \return The amount of data written.
-	virtual bzd::Async<Size> write(const bzd::Span<const T> data) noexcept = 0;
+	virtual bzd::Async<> write(const bzd::Span<const T> data) noexcept = 0;
 
 	/// Write data to an output channel.
 	/// The data represented by a spans is a collection of contiguous segments,
 	/// this function uses this attribute to send segment by segment.
 	///
 	/// \param[in] data The data to be sent via this output channel.
-	/// \return The amount of data written.
 	template <Size N>
-	bzd::Async<Size> write(const bzd::Spans<const T, N> data) noexcept
+	bzd::Async<> write(const bzd::Spans<const T, N> data) noexcept
 	{
-		Size size = 0;
 		for (const auto& span : data.array())
 		{
 			auto result = co_await write(span);
-			if (result)
-			{
-				size += result.value();
-			}
-			else
+			if (!result)
 			{
 				co_return bzd::move(result).propagate();
 			}
 		}
-		co_return size;
+		co_return {};
 	}
 
 	/// Get a scope lock guard for writing to this channel.

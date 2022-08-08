@@ -283,6 +283,7 @@ cc_library(
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:withdraw",
         "//cc/bzd/utility/comparison",
     ],
 )

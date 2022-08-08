@@ -5,6 +5,7 @@
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/comparison/equal_to.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/withdraw.hh"
 
 namespace bzd::algorithm {
 
@@ -29,21 +30,55 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 	{
 		return last1;
 	}
+
 	auto result{last1};
-	while (true)
+	if constexpr (concepts::bidirectionalIterator<Iterator1>)
 	{
-		auto new_result = bzd::algorithm::search(first1, last1, first2, last2, predicate);
-		if (new_result == last1)
+		if (first1 == last1)
 		{
-			break;
+			return last1;
 		}
-		else
+
+		auto it{last1};
+		do
 		{
-			result = new_result;
-			first1 = result;
-			++first1;
+			auto it1 = --it;
+			for (auto it2 = first2;; ++it1, ++it2)
+			{
+				if (it2 == last2)
+				{
+					return it;
+				}
+				if (it1 == last1)
+				{
+					break;
+				}
+				if (!predicate(*it1, *it2))
+				{
+					break;
+				}
+			}
+
+		} while (it != first1);
+	}
+	else
+	{
+		while (true)
+		{
+			auto new_result = bzd::algorithm::search(first1, last1, first2, last2, predicate);
+			if (new_result == last1)
+			{
+				break;
+			}
+			else
+			{
+				result = new_result;
+				first1 = result;
+				++first1;
+			}
 		}
 	}
+
 	return result;
 }
 

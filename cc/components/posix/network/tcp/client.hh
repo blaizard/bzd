@@ -23,7 +23,7 @@ public:
 	public:
 		constexpr Stream(Stream&& other) noexcept : proactor_{other.proactor_}, socket_{bzd::move(other.socket_)} {}
 
-		bzd::Async<Size> write(const bzd::Span<const Byte> data) noexcept override
+		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
 		{
 			co_return co_await proactor_.write(socket_.getFileDescriptor(), data);
 		}

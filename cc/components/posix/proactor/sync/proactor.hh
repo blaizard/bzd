@@ -17,7 +17,7 @@ class Proactor : public bzd::platform::posix::Proactor<Proactor>
 public:
 	/// Perform a synchronous write operator.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
-	bzd::Async<bzd::Size> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
+	bzd::Async<> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{
 		bzd::Size size{0u};
 		while (size < data.size())
@@ -34,7 +34,7 @@ public:
 			}
 			size += result;
 		}
-		co_return size;
+		co_return {};
 	}
 
 	/// Perform a synchronous read operator.
@@ -88,10 +88,9 @@ private:
 	bzd::Async<> poll(const FileDescriptor fd, const short events) noexcept
 	{
 		::pollfd pfd{fd.native(), events, 0};
-		int result;
 		while (true)
 		{
-			result = ::poll(&pfd, 1, 0);
+			const auto result = ::poll(&pfd, 1, 0);
 			if (result == -1)
 			{
 				co_return bzd::error::Errno("poll");
