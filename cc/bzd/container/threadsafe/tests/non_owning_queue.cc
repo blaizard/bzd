@@ -20,19 +20,19 @@ TEST(NonOwningQueue, scenario1, (int, void))
 {
 	threadsafe::NonOwningQueue<ListElement> queue;
 
-	queue.push(elements[0]);
-	queue.push(elements[1]);
-	queue.push(elements[2]);
-	queue.push(elements[3]);
+	queue.pushFront(elements[0]);
+	queue.pushFront(elements[1]);
+	queue.pushFront(elements[2]);
+	queue.pushFront(elements[3]);
 
 	for (bzd::Size i = 0; i < 4; ++i)
 	{
-		auto maybeElement = queue.pop();
+		auto maybeElement = queue.popBack();
 		EXPECT_TRUE(maybeElement);
 		EXPECT_TRUE(maybeElement.value().value == i);
 	}
 	{
-		auto maybeElement = queue.pop();
+		auto maybeElement = queue.popBack();
 		EXPECT_FALSE(maybeElement);
 	}
 }
@@ -41,25 +41,25 @@ TEST(NonOwningQueue, scenario2)
 {
 	threadsafe::NonOwningQueue<ListElement> queue;
 
-	queue.push(elements[0]);
-	queue.push(elements[1]);
-	bzd::ignore = queue.pop();
-	queue.push(elements[2]);
-	queue.push(elements[3]);
-	bzd::ignore = queue.pop();
+	queue.pushFront(elements[0]);
+	queue.pushFront(elements[1]);
+	bzd::ignore = queue.popBack();
+	queue.pushFront(elements[2]);
+	queue.pushFront(elements[3]);
+	bzd::ignore = queue.popBack();
 
 	{
-		auto maybeElement = queue.pop();
+		auto maybeElement = queue.popBack();
 		EXPECT_TRUE(maybeElement);
 		EXPECT_TRUE(maybeElement.value().value == 2);
 	}
 	{
-		auto maybeElement = queue.pop();
+		auto maybeElement = queue.popBack();
 		EXPECT_TRUE(maybeElement);
 		EXPECT_TRUE(maybeElement.value().value == 3);
 	}
 	{
-		auto maybeElement = queue.pop();
+		auto maybeElement = queue.popBack();
 		EXPECT_FALSE(maybeElement);
 	}
 }

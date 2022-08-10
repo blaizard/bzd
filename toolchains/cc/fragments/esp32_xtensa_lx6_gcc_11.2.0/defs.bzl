@@ -51,7 +51,7 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             # Do not link with shared libraries
             "-Wl,-static",
         ],
-        "static_runtime_libs": [
+        "static_runtime_lib": [
             "@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [

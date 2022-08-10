@@ -33,11 +33,11 @@ def _impl(ctx):
         "%{compiler}": ctx.attr.compiler,
         "%{filegroup_dependencies}": "\n".join(
             ['"{}",'.format(t) for t in ctx.attr.filegroup_dependencies] +
-            ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_libs] +
-            ["'{}',".format(t) for t in ctx.attr.static_runtime_libs],
+            ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_lib] +
+            ["'{}',".format(t) for t in ctx.attr.static_runtime_lib],
         ),
-        "%{dynamic_runtime_libs}": "\n".join(['"{}",'.format(t) for t in ctx.attr.dynamic_runtime_libs]),
-        "%{static_runtime_libs}": "\n".join(['"{}",'.format(t) for t in ctx.attr.static_runtime_libs]),
+        "%{dynamic_runtime_lib}": "\n".join(['"{}",'.format(t) for t in ctx.attr.dynamic_runtime_lib]),
+        "%{static_runtime_lib}": "\n".join(['"{}",'.format(t) for t in ctx.attr.static_runtime_lib]),
         "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in ctx.attr.builtin_include_directories]),
         "%{compile_flags}": "\n".join(
             ["'-isystem', '{}',".format(t) for t in ctx.attr.system_directories] +
@@ -97,8 +97,8 @@ _toolchain_maker_linux = repository_rule(
         # File group dependencies, files ot be added to the dependency list
         "filegroup_dependencies": attr.string_list(),
         # Run-time libraries
-        "dynamic_runtime_libs": attr.string_list(),
-        "static_runtime_libs": attr.string_list(),
+        "dynamic_runtime_lib": attr.string_list(),
+        "static_runtime_lib": attr.string_list(),
         "builtin_include_directories": attr.string_list(),
         "system_directories": attr.string_list(),
         "linker_dirs": attr.string_list(),

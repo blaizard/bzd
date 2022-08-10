@@ -22,6 +22,11 @@ namespace bzd {
 class CancellationCallback : public bzd::NonOwningListElement
 {
 public:
+	template <class CallableRef>
+	explicit CancellationCallback(CallableRef&& callback) : callback_{bzd::move(callback)}
+	{
+	}
+
 	constexpr void operator()() noexcept { callback_(); }
 
 private:
@@ -65,19 +70,18 @@ public: // API.
 
 	constexpr void trigger() noexcept
 	{
+		auto scope = makeSyncLockGuard(mutex_);
 		flag_.store(true);
+		// Trigger the callbacks if any.
+		for (auto& callback : callbacks_)
 		{
-			auto scope = makeSyncLockGuard(mutex_);
-			// Trigger the callbacks if any.
-			for (auto& callback : callbacks_)
-			{
-				callback();
-			}
-			// Trigger the children cancellation tokens.
-			for (auto& token : children_)
-			{
-				token.trigger();
-			}
+			// This will also call itself...
+			callback();
+		}
+		// Trigger the children cancellation tokens.
+		for (auto& token : children_)
+		{
+			token.trigger();
 		}
 	}
 
@@ -90,11 +94,19 @@ public: // API.
 
 	constexpr Bool isCanceled() const noexcept { return flag_.load(); }
 
-	constexpr void addCallback(CancellationCallback& callback) noexcept
+	constexpr void onTriggered(CancellationCallback& callback) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
-		const auto result = callbacks_.pushFront(callback);
-		bzd::assert::isTrue(result.hasValue());
+		// If the token was already cancelled, only call the callback
+		if (isCanceled())
+		{
+			callback();
+		}
+		else
+		{
+			const auto result = callbacks_.pushFront(callback);
+			bzd::assert::isTrue(result.hasValue());
+		}
 	}
 
 private:

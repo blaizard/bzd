@@ -32,6 +32,7 @@ build:cc-docker-sandbox --spawn_strategy=sandboxed,docker
 build:cc-docker-sandbox --strategy=CcAction=docker
 build:cc-docker-sandbox --strategy_regexp=Compiling=docker
 build:cc-docker-sandbox --strategy_regexp=Linking=docker
+test:cc-docker-sandbox --strategy=TestRunner=docker
 coverage:cc-docker-sandbox --strategy=TestRunner=docker
 
 # Select only C++ targets

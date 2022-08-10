@@ -21,16 +21,16 @@ filegroup(
 )
 
 filegroup(
-    name = "dynamic_runtime_libs",
+    name = "dynamic_runtime_lib",
     srcs = [
-        %{dynamic_runtime_libs}
+        %{dynamic_runtime_lib}
     ],
 )
 
 filegroup(
-    name = "static_runtime_libs",
+    name = "static_runtime_lib",
     srcs = [
-        %{static_runtime_libs}
+        %{static_runtime_lib}
     ],
 )
 
@@ -98,8 +98,8 @@ cc_toolchain(
     objcopy_files = ":all",
     strip_files = ":all",
 
-    dynamic_runtime_lib = ":dynamic_runtime_libs",
-    static_runtime_lib = ":static_runtime_libs",
+    dynamic_runtime_lib = ":dynamic_runtime_lib",
+    static_runtime_lib = ":static_runtime_lib",
 
     toolchain_config = ":cc-toolchain-config",
     toolchain_identifier = "cc-toolchain-identifier-%{cpu}-%{compiler}",

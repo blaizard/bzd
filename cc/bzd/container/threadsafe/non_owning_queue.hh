@@ -39,7 +39,7 @@ public:
 	/// head = elt1 -> head = elt2
 	/// tail = elt1 -> tail = elt1 -> elt2
 	template <class... Args>
-	void push(ElementType& element) noexcept
+	void pushFront(ElementType& element) noexcept
 	{
 		auto previousHead = head_.exchange(&element); //, MemoryOrder::acquireRelease);
 		bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
@@ -75,7 +75,7 @@ public:
 	// head = elt2
 	// tail = nullptr
 	template <class... Args>
-	[[nodiscard]] constexpr Optional<ElementType&> pop() noexcept
+	[[nodiscard]] constexpr Optional<ElementType&> popBack() noexcept
 	{
 		// Pop the tail element.
 		auto element = tail_.exchange(nullptr); //, MemoryOrder::acquireRelease);
