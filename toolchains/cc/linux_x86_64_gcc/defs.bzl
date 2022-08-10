@@ -53,10 +53,10 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "-Wl,-z,relro,-z,now",
             "-lstdc++",
         ],
-        "dynamic_runtime_libs": [
+        "dynamic_runtime_lib": [
             #"@{}//:dynamic_libraries".format(package_name),
         ],
-        "static_runtime_libs": [
+        "static_runtime_lib": [
             #"@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [

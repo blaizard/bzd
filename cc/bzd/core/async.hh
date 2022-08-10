@@ -313,10 +313,10 @@ constexpr auto getExecutable() noexcept
 	return bzd::coroutine::impl::GetExecutable{};
 }
 
-template <class Callback>
-constexpr auto suspend(Callback&& callback) noexcept
+template <class... Args>
+constexpr auto suspend(Args&&... args) noexcept
 {
-	return bzd::coroutine::impl::Suspend{bzd::move(callback)};
+	return bzd::coroutine::impl::Suspend{bzd::forward<Args>(args)...};
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.

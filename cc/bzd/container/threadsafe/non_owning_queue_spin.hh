@@ -42,7 +42,7 @@ public:
 	using ElementType = T;
 
 public:
-	constexpr void push(ElementType& element) noexcept
+	constexpr void pushFront(ElementType& element) noexcept
 	{
 		element.next_ = nullptr;
 		const auto lock = makeSyncLockGuard(mutex_);
@@ -58,7 +58,7 @@ public:
 		}
 	}
 
-	[[nodiscard]] constexpr Optional<ElementType&> pop() noexcept
+	[[nodiscard]] constexpr Optional<ElementType&> popBack() noexcept
 	{
 		const auto lock = makeSyncLockGuard(mutex_);
 		auto element = tail_;

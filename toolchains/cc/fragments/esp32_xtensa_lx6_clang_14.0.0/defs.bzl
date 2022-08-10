@@ -56,10 +56,10 @@ def toolchain_fragment_esp32_xtensa_lx6_clang():
             # Do not link with shared libraries
             "-Wl,-static",
         ],
-        "dynamic_runtime_libs": [
+        "dynamic_runtime_lib": [
             "@{}//:dynamic_libraries".format(package_name),
         ],
-        "static_runtime_libs": [
+        "static_runtime_lib": [
             "@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [

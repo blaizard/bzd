@@ -245,36 +245,32 @@ TEST_ASYNC(Coroutine, asyncAnyDestroy)
 	bzd::Size destroyedCounter{0U};
 	[[maybe_unused]] const auto result =
 		co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncDestroyMonitor(trace, "b", destroyedCounter));
-	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a0][b0][a0][b1]");
 	EXPECT_EQ(destroyedCounter, 1U);
 
 	co_return {};
 }
-/*
+
 bzd::Async<> asyncSuspend(bzd::interface::String& trace, bzd::StringView id)
 {
 	appendToTrace(trace, id, 0);
-	//::std::cout << "HERRR1" << ::std::endl;
 	co_await bzd::async::suspend([](auto&) {});
-	//::std::cout << "HERRR2" << ::std::endl;
 	appendToTrace(trace, id, 1);
 
 	co_return {};
 }
 
-
 TEST_ASYNC(Coroutine, asyncAnyWait)
 {
 	bzd::String<128> trace;
-	[[maybe_unused]] const auto result =
-		co_await asyncSuspend(trace, "b"); //bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspend(trace, "b"));
-	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
-	EXPECT_EQ(trace, "[a0][b0][a0][b1]");
+	[[maybe_unused]] const auto result = co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspend(trace, "b"));
+	EXPECT_EQ(trace, "[a0][b0][a0]");
+	EXPECT_TRUE(result.get<0>());
+	EXPECT_FALSE(result.get<1>());
 
 	co_return {};
 }
-*/
+
 bzd::Async<int> asyncAdd(int a, int b)
 {
 	co_return a + b;

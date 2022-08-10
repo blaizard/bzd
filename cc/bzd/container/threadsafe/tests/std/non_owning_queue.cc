@@ -57,7 +57,7 @@ TEST(NonOwningQueue, StressPush)
 				// Push the elements.
 				for (Size j = start; j < end; ++j)
 				{
-					queue.push(elements[j]);
+					queue.pushFront(elements[j]);
 					++counter;
 				}
 			}
@@ -74,7 +74,7 @@ TEST(NonOwningQueue, StressPush)
 			{
 				while (expectedIteration == iteration.load())
 				{
-					if (queue.pop())
+					if (queue.popBack())
 					{
 						++popped;
 					}

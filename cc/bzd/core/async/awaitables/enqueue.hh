@@ -147,14 +147,17 @@ private:
 		if (current == 1U)
 		{
 			token_.trigger();
-			token_.detach();
 			// Needed to ensure the promise is enqueued after the cancellation token has been triggered.
 			current = ++counter_;
 		}
 		// Only at the last function exit the caller is pushed back to the scheduling queue.
 		// This makes this design thread safe.
-		if (current == sizeof...(Asyncs) + 1U)
+		if (current == sizeof...(Asyncs) + 1u)
 		{
+			// Detach the token only when all executble returned, this is necessary to ensure all
+			// executables can have access to the token to check if it has been triggered or not.
+			// This prevents a race with async::suspend(...) for example.
+			token_.detach();
 			return this->continuation_;
 		}
 		return bzd::nullopt;

@@ -68,10 +68,10 @@ def _load_linux_x86_64_clang_14_0_0(name):
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
         ],
-        "dynamic_runtime_libs": [
+        "dynamic_runtime_lib": [
             "@{}//:dynamic_libraries".format(package_name),
         ],
-        "static_runtime_libs": [
+        "static_runtime_lib": [
             "@{}//:static_libraries".format(package_name),
         ],
         "filegroup_dependencies": [

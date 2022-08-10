@@ -289,12 +289,12 @@ private:
 		}
 		++queueCount_;
 		// Only at the end push the executable to the work queue.
-		queue_.push(executable);
+		queue_.pushFront(executable);
 	}
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.pop();
+		auto maybeExecutable = queue_.popBack();
 		if (maybeExecutable)
 		{
 			// Show the stack usage
