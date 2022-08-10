@@ -7,7 +7,7 @@ namespace bzd::platform::posix::mock {
 class Proactor : public bzd::platform::posix::Proactor<Proactor>
 {
 public:
-	bzd::Async<> write(const FileDescriptor, const bzd::Span<const bzd::Byte> data) noexcept { co_return {}; }
+	bzd::Async<> write(const FileDescriptor, const bzd::Span<const bzd::Byte>) noexcept { co_return {}; }
 
 	bzd::Async<bzd::Span<bzd::Byte>> read(const FileDescriptor, const bzd::Span<bzd::Byte> data) noexcept { co_return data.first(1U); }
 

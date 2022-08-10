@@ -26,6 +26,11 @@ public:
 	explicit CancellationCallback(CallableRef&& callback) : callback_{bzd::move(callback)}
 	{
 	}
+	CancellationCallback(const CancellationCallback&) = delete;
+	CancellationCallback& operator=(const CancellationCallback&) = delete;
+	CancellationCallback(CancellationCallback&&) = delete;
+	CancellationCallback& operator=(CancellationCallback&&) = delete;
+	~CancellationCallback() = default;
 
 	constexpr void operator()() noexcept { callback_(); }
 
@@ -94,7 +99,7 @@ public: // API.
 
 	constexpr Bool isCanceled() const noexcept { return flag_.load(); }
 
-	constexpr void onTriggered(CancellationCallback& callback) noexcept
+	constexpr void addCallback(CancellationCallback& callback) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
 		// If the token was already cancelled, only call the callback
@@ -107,6 +112,12 @@ public: // API.
 			const auto result = callbacks_.pushFront(callback);
 			bzd::assert::isTrue(result.hasValue());
 		}
+	}
+
+	constexpr void removeCallback(CancellationCallback& callback) noexcept
+	{
+		auto scope = makeSyncLockGuard(mutex_);
+		bzd::ignore = callbacks_.erase(callback);
 	}
 
 private:

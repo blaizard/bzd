@@ -154,7 +154,7 @@ private:
 		// This makes this design thread safe.
 		if (current == sizeof...(Asyncs) + 1u)
 		{
-			// Detach the token only when all executble returned, this is necessary to ensure all
+			// Detach the token only when all executables returned, this is necessary to ensure all
 			// executables can have access to the token to check if it has been triggered or not.
 			// This prevents a race with async::suspend(...) for example.
 			token_.detach();
