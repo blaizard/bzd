@@ -28,10 +28,21 @@ public: // Coroutine specializations.
 		// If there is a cancellation token, register an action on cancellation.
 		if (auto maybeToken = promise.getCancellationToken(); maybeToken)
 		{
+			token_ = &maybeToken.valueMutable();
 			executable_ = &promise;
-			maybeToken->onTriggered(cancellationObject_);
+			maybeToken->addCallback(cancellationObject_);
 		}
 		return true;
+	}
+
+	constexpr void await_resume() noexcept
+	{
+		// Remove the callback to ensure the cancellation is not applied to this executable.
+		// TODO: Still need to check for race condition here.
+		if (token_)
+		{
+			token_->removeCallback(cancellationObject_);
+		}
 	}
 
 private:
@@ -45,6 +56,7 @@ private:
 	OnSuspend onSuspend_;
 	OnCancellation onCancellation_;
 	CancellationCallback cancellationObject_;
+	CancellationToken* token_{nullptr};
 	bzd::coroutine::impl::Executable* executable_{nullptr};
 };
 
