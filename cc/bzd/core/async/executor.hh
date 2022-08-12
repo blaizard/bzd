@@ -25,6 +25,10 @@ template <class T>
 class Executable;
 }
 
+namespace coroutine::impl {
+struct Yield;
+}
+
 /// Metadata of an executable, propagated to all its children.
 class ExecutableMetadata
 {
@@ -305,7 +309,8 @@ private:
 
 			if (maybeExecutable->getType() == ExecutableMetadata::Type::workload)
 			{
-				--workloadCount_;
+				auto current = --workloadCount_;
+				bzd::assert::isTrue(current >= 0);
 			}
 			--queueCount_;
 
@@ -318,6 +323,7 @@ private:
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
+	friend struct bzd::coroutine::impl::Yield;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningQueue<Executable> queue_{};
@@ -389,7 +395,33 @@ public:
 	}
 
 	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
-	constexpr void schedule() noexcept { getExecutor().push(getExecutable()); }
+	constexpr void schedule() noexcept
+	{
+		if (isRescheduled_.exchange(true))
+		{
+			return;
+		}
+		if (cancellationCallback_.hasValue())
+		{
+			bzd::assert::isTrue(cancel_.hasValue());
+			cancel_->removeCallback(cancellationCallback_.valueMutable());
+			cancellationCallback_.reset();
+		}
+		getExecutor().push(getExecutable());
+	}
+
+	/// This function registers a callback to re-schedule the executable on a cancellation.
+	/// It is needed to properly destroy the executable when a cancellation is triggered.
+	constexpr void suspend() noexcept
+	{
+		// If there is a cancellation token, register an action on cancellation.
+		if (cancel_)
+		{
+			bzd::assert::isTrue(!cancellationCallback_.hasValue());
+			cancellationCallback_.emplace(bzd::FunctionRef<void(void)>::toMember<Self, &Self::scheduleFromCancellationCallback>(*this));
+			cancel_->addOneTimeCallback(cancellationCallback_.valueMutable());
+		}
+	}
 
 	constexpr void destroy() noexcept
 	{
@@ -416,6 +448,19 @@ public:
 	}
 
 private:
+	constexpr void scheduleFromCancellationCallback() noexcept
+	{
+		if (isRescheduled_.exchange(true))
+		{
+			return;
+		}
+		// The cancellation was already pop-ed from the token, so no need to remove it again,
+		// also this might lead to a dead-lock.
+		cancellationCallback_.reset();
+		getExecutor().push(getExecutable());
+	}
+
+private:
 	friend class bzd::Executor<T>;
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
@@ -423,6 +468,8 @@ private:
 	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
 	bzd::ExecutableMetadata metadata_{};
+	bzd::Optional<CancellationCallback> cancellationCallback_{};
+	bzd::Atomic<bzd::Bool> isRescheduled_{false};
 };
 
 } // namespace bzd::interface

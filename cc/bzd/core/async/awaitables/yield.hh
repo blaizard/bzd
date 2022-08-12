@@ -10,7 +10,8 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	template <class T>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
-		caller.promise().schedule();
+		auto& executable{caller.promise()};
+		executable.getExecutor().push(executable);
 		return true;
 	}
 };

@@ -11,6 +11,9 @@ _COPTS_COMMON = [
 
     # Add debug symbols, will be removed at the postprocessing stage.
     "-ggdb3",
+    # Generate standard-compliant DWARF-2 debug info, this helps to get proper stack traces
+    # at least with clang.
+    "-gdwarf-2",
 
     # Do not expand any symbolic links, resolve references to /../
     # or /./, or make the path absolute when generating a relative

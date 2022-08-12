@@ -256,12 +256,12 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 		bzd::StringView symbol{info.symbol};
 
 		// Look for improved function/source names with addr2line
-		if (!info.path.empty())
+		if (!path.empty())
 		{
 			bzd::String<1024> command;
 			toString(command,
 					 "exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"_csv,
-					 info.path,
+					 path,
 					 reinterpret_cast<bzd::IntPointer>(info.address),
 					 info.offset);
 
@@ -276,6 +276,16 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 				symbol = (line3.size() && line3.at(0) != '?') ? line3 : symbol;
 				path = (line2.size() && line2.at(0) != '?') ? line2 : path;
 				path = (line4.size() && line4.at(0) != '?') ? line4 : path;
+			}
+
+			// Remove useless path prefix.
+			for (const auto prefix : {"/proc/self/cwd/"_sv})
+			{
+				if (const auto index = path.find(prefix); index == 0)
+				{
+					path.removePrefix(prefix.size());
+					break;
+				}
 			}
 		}
 

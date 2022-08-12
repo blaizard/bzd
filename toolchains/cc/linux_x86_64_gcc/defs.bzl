@@ -48,7 +48,6 @@ def _load_linux_x86_64_gcc_11_2_0(name):
         ],
         "link_flags": [
             "-Wl,--disable-new-dtags",
-            "-Wl,--gc-sections",
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
             "-lstdc++",
