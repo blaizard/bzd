@@ -52,7 +52,6 @@ def _load_linux_x86_64_clang_14_0_0(name):
         "link_flags": [
             "-fuse-ld=lld",
             "-Wl,--disable-new-dtags",
-            "-Wl,--gc-sections",
             "-rdynamic",
             "-stdlib=libc++",
             "-lm",

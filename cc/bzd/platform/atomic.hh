@@ -80,6 +80,11 @@ public:
 	constexpr T operator++() noexcept { return ++this->get(); }
 	constexpr T operator++(int) noexcept { return this->get()++; }
 
+	/// Atomically replaces the underlying value with \b value. The operation is read-modify-write operation.
+	/// Memory is affected according to the value of order.
+	/// \param value The value to assign.
+	/// \param order The memory order constraints to enforce.
+	/// \return The value of the atomic variable before the call.
 	constexpr T exchange(const T value, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 	{
 		return this->get().exchange(value, static_cast<std::memory_order>(order));
@@ -92,7 +97,7 @@ public:
 };
 
 /// Establishes memory synchronization ordering.
-inline void memoryFence(const MemoryOrder order) noexcept
+inline void memoryFence(const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 {
 	std::atomic_thread_fence(static_cast<std::memory_order>(order));
 }

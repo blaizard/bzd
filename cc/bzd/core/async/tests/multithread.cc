@@ -204,3 +204,61 @@ TEST(Coroutine, StressRandomNested)
 		return test.random<int, 0, 10>();
 	});
 }
+
+TEST(Coroutine, StressCancellationSuspend)
+{
+	constexpr bzd::Size iterations = 10000;
+
+	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
+	{
+		bzd::coroutine::impl::Executor executor{};
+		std::thread thread;
+		bzd::Atomic<bzd::Bool> shouldReturn{false};
+
+		//::std::cout << iteration << ::std::endl;
+
+		using namespace std::chrono_literals;
+
+		auto workloadSuspend = [&]() -> bzd::Async<> {
+			co_await bzd::async::suspend([&](auto& executable) {
+				thread = std::thread{[&]() {
+					shouldReturn.store(true);
+					executable.schedule();
+				}};
+			});
+			co_return {};
+		};
+
+		auto workloadWait = [&]() -> bzd::Async<> {
+			while (!shouldReturn.load())
+			{
+				co_await bzd::async::yield();
+			}
+			co_return {};
+		};
+
+		auto promise1 = workloadSuspend();
+		auto promise2 = workloadWait();
+
+		auto promise = bzd::async::any(std::move(promise1), std::move(promise2));
+		promise.enqueue(executor);
+
+		// The executor might return as no workload might be in the queue when suspended,
+		// so only exit once the promise is ready.
+		do
+		{
+			executor.run();
+			if (!promise.isReady())
+			{
+				//	std::this_thread::sleep_for(100ms);
+			}
+		} while (!promise.isReady());
+
+		EXPECT_TRUE(promise.isReady());
+		EXPECT_EQ(executor.getQueueCount(), 0U);
+		EXPECT_EQ(executor.getWorkloadCount(), 0);
+		EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
+
+		thread.join();
+	}
+}

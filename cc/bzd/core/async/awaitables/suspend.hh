@@ -13,8 +13,7 @@ private: // Traits.
 
 public: // Constructor.
 	constexpr Suspend(OnSuspend&& onSuspend, OnCancellation&& onCancellation) noexcept :
-		onSuspend_{bzd::move(onSuspend)}, onCancellation_{bzd::move(onCancellation)},
-		cancellationObject_{bzd::FunctionRef<void(void)>::toMember<Self, &Self::onCancel>(*this)}
+		onSuspend_{bzd::move(onSuspend)}, onCancellation_{bzd::move(onCancellation)}
 	{
 	}
 	constexpr Suspend(OnSuspend&& onSuspend) noexcept : Suspend{bzd::move(onSuspend), []() {}} {}
@@ -24,40 +23,14 @@ public: // Coroutine specializations.
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		bzd::coroutine::impl::Executable& promise = caller.promise();
+		promise.suspend();
 		onSuspend_(promise);
-		// If there is a cancellation token, register an action on cancellation.
-		if (auto maybeToken = promise.getCancellationToken(); maybeToken)
-		{
-			token_ = &maybeToken.valueMutable();
-			executable_ = &promise;
-			maybeToken->addCallback(cancellationObject_);
-		}
 		return true;
-	}
-
-	constexpr void await_resume() noexcept
-	{
-		// Remove the callback to ensure the cancellation is not applied to this executable.
-		// TODO: Still need to check for race condition here.
-		if (token_)
-		{
-			token_->removeCallback(cancellationObject_);
-		}
-	}
-
-private:
-	void onCancel()
-	{
-		onCancellation_();
-		executable_->schedule();
 	}
 
 private:
 	OnSuspend onSuspend_;
 	OnCancellation onCancellation_;
-	CancellationCallback cancellationObject_;
-	CancellationToken* token_{nullptr};
-	bzd::coroutine::impl::Executable* executable_{nullptr};
 };
 
 template <class OnSuspend>

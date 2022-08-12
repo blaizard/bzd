@@ -32,7 +32,7 @@ public:
 	CancellationCallback& operator=(CancellationCallback&&) = delete;
 	~CancellationCallback() = default;
 
-	constexpr void operator()() noexcept { callback_(); }
+	constexpr void operator()() const noexcept { callback_(); }
 
 private:
 	bzd::FunctionRef<void(void)> callback_;
@@ -77,11 +77,20 @@ public: // API.
 	{
 		auto scope = makeSyncLockGuard(mutex_);
 		flag_.store(true);
-		// Trigger the callbacks if any.
-		for (auto& callback : callbacks_)
+		// Trigger and pop the callbacks if any.
+		while (true)
 		{
-			// This will also call itself...
-			callback();
+			const CancellationCallback* callback{nullptr};
+			{
+				auto scope = makeSyncLockGuard(mutexCallbacks_);
+				auto maybeCallback = callbacks_.popBack();
+				if (!maybeCallback)
+				{
+					break;
+				}
+				callback = &maybeCallback.value();
+			}
+			(*callback)();
 		}
 		// Trigger the children cancellation tokens.
 		for (auto& token : children_)
@@ -99,7 +108,7 @@ public: // API.
 
 	constexpr Bool isCanceled() const noexcept { return flag_.load(); }
 
-	constexpr void addCallback(CancellationCallback& callback) noexcept
+	constexpr void addOneTimeCallback(CancellationCallback& callback) noexcept
 	{
 		auto scope = makeSyncLockGuard(mutex_);
 		// If the token was already cancelled, only call the callback
@@ -109,6 +118,7 @@ public: // API.
 		}
 		else
 		{
+			auto scope = makeSyncLockGuard(mutexCallbacks_);
 			const auto result = callbacks_.pushFront(callback);
 			bzd::assert::isTrue(result.hasValue());
 		}
@@ -116,7 +126,7 @@ public: // API.
 
 	constexpr void removeCallback(CancellationCallback& callback) noexcept
 	{
-		auto scope = makeSyncLockGuard(mutex_);
+		auto scope = makeSyncLockGuard(mutexCallbacks_);
 		bzd::ignore = callbacks_.erase(callback);
 	}
 
@@ -125,6 +135,7 @@ private:
 	bzd::SpinMutex mutex_{};
 	bzd::Optional<CancellationToken&> parent_{};
 	bzd::NonOwningList<CancellationToken> children_{};
+	bzd::SpinMutex mutexCallbacks_{};
 	bzd::NonOwningList<CancellationCallback> callbacks_{};
 };
 } // namespace bzd
