@@ -23,8 +23,8 @@ public: // Coroutine specializations.
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		bzd::coroutine::impl::Executable& promise = caller.promise();
-		promise.suspend();
-		onSuspend_(promise);
+		auto ref = promise.suspend();
+		onSuspend_(bzd::move(ref));
 		return true;
 	}
 

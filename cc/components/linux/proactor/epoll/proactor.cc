@@ -31,8 +31,8 @@ bzd::Async<bzd::Span<bzd::Byte>> Proactor::read(const posix::FileDescriptor fd, 
 		::epoll_event ev{.events = EPOLLIN, .data{.ptr = &epollData}};
 
 		// 1. Register event
-		co_await bzd::async::suspend([&](auto& executable) {
-			epollData.executable_ = &executable;
+		co_await bzd::async::suspend([&](auto&& executable) {
+			epollData.executable_ = bzd::move(executable);
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_ADD, epollData.fd_.native(), &ev);
 		}, [&]() {
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, epollData.fd_.native(), nullptr);
@@ -79,7 +79,7 @@ bzd::Async<> Proactor::exec() noexcept
 		{
 			auto& data{*reinterpret_cast<EpollData*>(events[i].data.ptr)};
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, data.fd_.native(), nullptr);
-			data.executable_->schedule();
+			bzd::move(data.executable_).schedule();
 		}
 		co_await bzd::async::yield();
 	}
