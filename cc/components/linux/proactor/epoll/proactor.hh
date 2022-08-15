@@ -15,7 +15,7 @@ private:
 	struct EpollData
 	{
 		const posix::FileDescriptor fd_;
-		bzd::async::Executable* executable_{nullptr};
+		bzd::async::ExecutableRef executable_{};
 	};
 
 public:

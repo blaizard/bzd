@@ -347,6 +347,41 @@ private:
 
 namespace bzd::interface {
 
+template <class T>
+class ExecutableRef : public bzd::NonOwningListElement
+{
+public:
+	ExecutableRef() = default;
+	constexpr ExecutableRef(T& executable) noexcept : executable_{&executable}
+	{
+		executable_->ref_ = this;
+	}
+	ExecutableRef(const ExecutableRef&) = delete;
+	ExecutableRef& operator=(const ExecutableRef&) = delete;
+	constexpr ExecutableRef(ExecutableRef&& ref) noexcept : executable_{bzd::move(ref.executable_)}
+	{
+		executable_->ref_ = this;
+	}
+	constexpr ExecutableRef& operator=(ExecutableRef&& ref) noexcept
+	{
+		executable_ = bzd::move(ref.executable_);
+		executable_->ref_ = this;
+		return *this;
+	}
+
+public: // API.
+	constexpr void schedule() && noexcept
+	{
+		if (executable_)
+		{
+			executable_->schedule();
+		}
+	}
+
+private:
+	T* executable_{nullptr};
+};
+
 /// Executable interface class.
 ///
 /// This class provides helpers to access the associated executor.
@@ -412,7 +447,8 @@ public:
 
 	/// This function registers a callback to re-schedule the executable on a cancellation.
 	/// It is needed to properly destroy the executable when a cancellation is triggered.
-	constexpr void suspend() noexcept
+	/// This function does not need to be thread safe as it is executed only before being suspended.
+	constexpr ExecutableRef<Self> suspend() noexcept
 	{
 		// If there is a cancellation token, register an action on cancellation.
 		if (cancel_)
@@ -421,6 +457,8 @@ public:
 			cancellationCallback_.emplace(bzd::FunctionRef<void(void)>::toMember<Self, &Self::scheduleFromCancellationCallback>(*this));
 			cancel_->addOneTimeCallback(cancellationCallback_.valueMutable());
 		}
+
+		return {*this};
 	}
 
 	constexpr void destroy() noexcept
@@ -462,6 +500,7 @@ private:
 
 private:
 	friend class bzd::Executor<T>;
+	friend class bzd::interface::ExecutableRef<Self>;
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
 
@@ -470,6 +509,7 @@ private:
 	bzd::ExecutableMetadata metadata_{};
 	bzd::Optional<CancellationCallback> cancellationCallback_{};
 	bzd::Atomic<bzd::Bool> isRescheduled_{false};
+	ExecutableRef<Self>* ref_{nullptr};
 };
 
 } // namespace bzd::interface

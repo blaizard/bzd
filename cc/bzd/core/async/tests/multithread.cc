@@ -220,10 +220,10 @@ TEST(Coroutine, StressCancellationSuspend)
 		using namespace std::chrono_literals;
 
 		auto workloadSuspend = [&]() -> bzd::Async<> {
-			co_await bzd::async::suspend([&](auto& executable) {
-				thread = std::thread{[&]() {
+			co_await bzd::async::suspend([&](auto&& executable) {
+				thread = std::thread{[&shouldReturn, executable = bzd::move(executable)]() mutable {
 					shouldReturn.store(true);
-					executable.schedule();
+					bzd::move(executable).schedule();
 				}};
 			});
 			co_return {};
