@@ -327,12 +327,14 @@ private:
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningQueue<Executable> queue_{};
+	/// List of suspended workloads
+	// bzd::threadsafe::NonOwningForwardList<Executable> suspended_{};
 	/// Keep contexts about the current runnning scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
-	/// Maxium concurrent scheduler running at the same time.
-	bzd::Atomic<Size> maxRunningCount_{0u};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
+	/// Maxium concurrent scheduler running at the same time.
+	bzd::Atomic<Size> maxRunningCount_{0u};
 	/// Current status of the executor.
 	bzd::Atomic<Status> status_{Status::idle};
 	/// Number of entries in the queue.
@@ -352,35 +354,103 @@ class ExecutableRef : public bzd::NonOwningListElement
 {
 public:
 	ExecutableRef() = default;
-	constexpr ExecutableRef(T& executable) noexcept : executable_{&executable}
-	{
-		executable_->ref_ = this;
-	}
+	constexpr ExecutableRef(T& executable) noexcept : executable_{&executable} { executable_.load()->ref_.store(this); }
 	ExecutableRef(const ExecutableRef&) = delete;
 	ExecutableRef& operator=(const ExecutableRef&) = delete;
-	constexpr ExecutableRef(ExecutableRef&& ref) noexcept : executable_{bzd::move(ref.executable_)}
-	{
-		executable_->ref_ = this;
-	}
+	constexpr ExecutableRef(ExecutableRef&& ref) noexcept : executable_{ref.executable_.load()} { executable_.load()->ref_.store(this); }
 	constexpr ExecutableRef& operator=(ExecutableRef&& ref) noexcept
 	{
-		executable_ = bzd::move(ref.executable_);
-		executable_->ref_ = this;
+		executable_.store(ref.executable_.load());
+		executable_.load()->ref_.store(this);
 		return *this;
 	}
 
 public: // API.
+	/// Function to re-schedule the executable after a suspend operation.
 	constexpr void schedule() && noexcept
 	{
-		if (executable_)
+		auto maybeExecutable = executable_.exchange(nullptr);
+		if (maybeExecutable)
 		{
-			executable_->schedule();
+			maybeExecutable->scheduleAfterSuspend();
 		}
 	}
 
+	constexpr void reset() noexcept { executable_.store(nullptr); }
+
 private:
-	T* executable_{nullptr};
+	bzd::Atomic<T*> executable_{nullptr};
 };
+
+/*
+What we know:
+- ExecutableRef can be destroyed at any time.
+- Executable can be destroyed at any time.
+- The lifetime of both object is independent.
+
+What we want to achieve atomically:
+- When ExecutableRef destroys:
+	- Executable::ref_ = nullptr;
+- When Executable destroys:
+	- ExecutableRef::executable_ = nullptr;
+
+~ExecutableRef()
+{
+	executable_->ref_ = nullptr;
+}
+
+~Executable()
+{
+	ref_->executable_ = nullptr;
+}
+
+ExecutableRef is only shared in suspended state.
+ExecutableRef get reset only after scheduleAfterCancellation or scheduleAfterSuspend.
+
+
+
+Data structure must be:
+- multiple producer
+- multiple consumer
+- pushSuspend can be locked
+- popSuspend cannot be locked
+- LIFO
+
+struct SuspendedExecutable : public threadsafe::Queue
+{
+	auto id;
+};
+
+ExecutableRef Executable::suspend()
+{
+	assert::isTrue(isDetached(), "Must be detached.");
+	suspendId_ = executor_.pushSuspend(*this);
+	return {executor_, suspendId_};
+}
+
+ExecutableRef::schedule()
+{
+	auto maybeExecutable = executor_.popSuspend(suspendId_);
+	if (maybeExecutable)
+	{
+		maybeExecutable->scheduleAfterSuspend();
+	}
+}
+
+Executable::scheduleAfterCancellation()
+{
+	auto maybeExecutable = executor_.popSuspend(suspendId_);
+	if (!maybeExecutable)
+	{
+		return;
+	}
+}
+
+Executable::scheduleAfterSuspend()
+{
+}
+
+*/
 
 /// Executable interface class.
 ///
@@ -429,22 +499,6 @@ public:
 		metadata_.type_ = type;
 	}
 
-	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
-	constexpr void schedule() noexcept
-	{
-		if (isRescheduled_.exchange(true))
-		{
-			return;
-		}
-		if (cancellationCallback_.hasValue())
-		{
-			bzd::assert::isTrue(cancel_.hasValue());
-			cancel_->removeCallback(cancellationCallback_.valueMutable());
-			cancellationCallback_.reset();
-		}
-		getExecutor().push(getExecutable());
-	}
-
 	/// This function registers a callback to re-schedule the executable on a cancellation.
 	/// It is needed to properly destroy the executable when a cancellation is triggered.
 	/// This function does not need to be thread safe as it is executed only before being suspended.
@@ -454,7 +508,7 @@ public:
 		if (cancel_)
 		{
 			bzd::assert::isTrue(!cancellationCallback_.hasValue());
-			cancellationCallback_.emplace(bzd::FunctionRef<void(void)>::toMember<Self, &Self::scheduleFromCancellationCallback>(*this));
+			cancellationCallback_.emplace(bzd::FunctionRef<void(void)>::toMember<Self, &Self::scheduleAfterCancellation>(*this));
 			cancel_->addOneTimeCallback(cancellationCallback_.valueMutable());
 		}
 
@@ -464,6 +518,10 @@ public:
 	constexpr void destroy() noexcept
 	{
 		assert::isTrue(isDetached(), "Executable still owned by the queue.");
+		if (auto ref = ref_.load(); ref)
+		{
+			ref->reset();
+		}
 		if (executor_.hasValue())
 		{
 			//  If there is an executor wait until it is safe to discard the element, this to avoid any
@@ -486,15 +544,38 @@ public:
 	}
 
 private:
-	constexpr void scheduleFromCancellationCallback() noexcept
+	constexpr void scheduleAfterCancellation() noexcept
 	{
-		if (isRescheduled_.exchange(true))
+		auto ref = ref_.exchange(nullptr);
+		if (!ref)
 		{
 			return;
 		}
+		// /!\ Warning
+		// There is a potential race here if a thread run schedule() from the ref at the same time, then the ref might be destroyed already.
+		//
+		// A better approach would be to register the main object in the executor itself and pop it from there.
+		// The advantage is that the executor has a lifetime that should cover both.
+		ref->reset();
 		// The cancellation was already pop-ed from the token, so no need to remove it again,
 		// also this might lead to a dead-lock.
 		cancellationCallback_.reset();
+		getExecutor().push(getExecutable());
+	}
+
+	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
+	constexpr void scheduleAfterSuspend() noexcept
+	{
+		if (!ref_.exchange(nullptr))
+		{
+			return;
+		}
+		if (cancellationCallback_.hasValue())
+		{
+			bzd::assert::isTrue(cancel_.hasValue());
+			cancel_->removeCallback(cancellationCallback_.valueMutable());
+			cancellationCallback_.reset();
+		}
 		getExecutor().push(getExecutable());
 	}
 
@@ -508,8 +589,7 @@ private:
 	bzd::Optional<CancellationToken&> cancel_{};
 	bzd::ExecutableMetadata metadata_{};
 	bzd::Optional<CancellationCallback> cancellationCallback_{};
-	bzd::Atomic<bzd::Bool> isRescheduled_{false};
-	ExecutableRef<Self>* ref_{nullptr};
+	bzd::Atomic<ExecutableRef<Self>*> ref_{nullptr};
 };
 
 } // namespace bzd::interface
