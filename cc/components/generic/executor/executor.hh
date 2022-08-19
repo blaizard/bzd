@@ -28,7 +28,7 @@ public:
 		if (type == bzd::async::Type::workload)
 		{
 			onTerminate = bzd::async::Executable::OnTerminateCallback::toMember<Self, &Self::onExecutableTerminate>(*this);
-			++applicationCount_;
+			++workloadCount_;
 		}
 		// Enqueue the executor and add a continuation.
 		async.enqueue(executor_, type, onTerminate);
@@ -82,7 +82,7 @@ private:
 		do
 		{
 			executor_.run();
-			if (applicationCount_.load() == 0u)
+			if (workloadCount_.load() == 0u)
 			{
 				break;
 			}
@@ -95,9 +95,9 @@ private:
 	/// Callback triggered when an active async is terminated.
 	constexpr bzd::Optional<bzd::async::Executable&> onExecutableTerminate() noexcept
 	{
-		if (--applicationCount_ == 0u)
+		if (--workloadCount_ == 0u)
 		{
-			bzd::log::info("All apps are terminated, requesting shutdown.").sync();
+			bzd::log::info("All workloads are terminated, requesting shutdown.").sync();
 			executor_.requestShutdown();
 		}
 		return bzd::nullopt;
@@ -106,7 +106,7 @@ private:
 private:
 	bzd::Array<bzd::platform::Core*, n> cores_;
 	bzd::coroutine::impl::Executor executor_;
-	bzd::Atomic<bzd::Size> applicationCount_{0};
+	bzd::Atomic<bzd::Size> workloadCount_{0};
 };
 
 template <class... Cores>
