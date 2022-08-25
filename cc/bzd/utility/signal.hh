@@ -105,19 +105,16 @@ public:
 	{
 		typename SignalInternals::ExtractedType extracted;
 		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::Byte*>(&extracted));
-		// std::copy_n(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::Byte*>(&extracted));
 
 		const typename SignalInternals::Type type = (extracted >> shiftBits_) & mask_;
 		return CompuMethod::template fromBuffer<Type, decltype(type)>(type);
 	}
 
-	// This is failing with bazel run //cc/bzd/utility/tests:signal --config=linux_x86_64_gcc --config=prod
 	static constexpr void set(const bzd::Span<bzd::Byte> data, const Type& value)
 	{
 		typename SignalInternals::ExtractedType extracted;
 
 		bzd::algorithm::copyN(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::Byte*>(&extracted));
-		// std::copy_n(&data.at(startByte_), sizeof(extracted), reinterpret_cast<bzd::Byte*>(&extracted));
 
 		extracted &= ~(mask_ << shiftBits_);
 
@@ -125,7 +122,6 @@ public:
 		extracted |= ((static_cast<decltype(extracted)>(valueTyped) & mask_) << shiftBits_);
 
 		bzd::algorithm::copyN(reinterpret_cast<bzd::Byte*>(&extracted), sizeof(extracted), &data.at(startByte_));
-		// std::copy_n(reinterpret_cast<bzd::Byte*>(&extracted), sizeof(extracted), &data.at(startByte_));
 	}
 };
 

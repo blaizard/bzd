@@ -19,6 +19,12 @@ TEST(ContainerTuple, Base)
 	EXPECT_EQ(tuple.get<1>(), true);
 	EXPECT_NEAR(tuple.get<2>(), 2.4, 0.0001);
 	EXPECT_EQ(tuple.get<3>(), -32);
+
+	auto [a, b, c, d] = tuple;
+	EXPECT_EQ(a, 12);
+	EXPECT_EQ(b, true);
+	EXPECT_NEAR(c, 2.4, 0.0001);
+	EXPECT_EQ(d, -32);
 }
 
 TEST(ContainerTuple, Constructor)

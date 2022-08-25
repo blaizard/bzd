@@ -1,6 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
 
+bzd_cc_test(
+    name = "bitset",
+    srcs = [
+        "bitset.cc",
+    ],
+    deps = [
+        "//cc/bzd/container/threadsafe:bitset",
+        "//cc/bzd/test",
+    ],
+)
+
 cc_library(
     name = "non_owning_forward_list_for_test",
     testonly = True,

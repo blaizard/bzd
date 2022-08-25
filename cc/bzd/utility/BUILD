@@ -34,6 +34,7 @@ bzd_cc_library(
         ":swap",
         ":to_underlying",
         ":withdraw",
+        "//cc/bzd/utility/bit",
         "//cc/bzd/utility/format",
         "//cc/bzd/utility/format:integral",
         "//cc/bzd/utility/format:stream",
