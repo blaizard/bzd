@@ -7,6 +7,7 @@ bzd_cc_library(
         "//cc/bzd/algorithm",
         "//cc/bzd/container",
         "//cc/bzd/core",
+        "//cc/bzd/math",
         "//cc/bzd/meta",
         "//cc/bzd/type_traits",
         "//cc/bzd/utility",

@@ -11,6 +11,21 @@ cc_library(
 # ---- Individual items ----
 
 cc_library(
+    name = "bitset",
+    hdrs = [
+        "bitset.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:array",
+        "//cc/bzd/math:ceil",
+        "//cc/bzd/platform:atomic",
+        "//cc/bzd/utility:min",
+        "//cc/bzd/utility/bit",
+    ],
+)
+
+cc_library(
     name = "non_owning_forward_list",
     hdrs = [
         "non_owning_forward_list.hh",

@@ -14,8 +14,8 @@ namespace bzd::impl {
 template <class T>
 using TupleTypeOf = typename T::type;
 
-template <Size... N>
-struct TupleSizes : bzd::meta::Type<TupleSizes<N...>>
+template <Size... indexes>
+struct TupleSizes : bzd::meta::Type<TupleSizes<indexes...>>
 {
 };
 
@@ -24,13 +24,13 @@ struct TupleSizes : bzd::meta::Type<TupleSizes<N...>>
 template <Size L, Size I = 0, class S = TupleSizes<>>
 struct TupleRangeImpl;
 
-template <Size L, Size I, Size... N>
-struct TupleRangeImpl<L, I, TupleSizes<N...>> : TupleRangeImpl<L, I + 1, TupleSizes<N..., I>>
+template <Size L, Size I, Size... indexes>
+struct TupleRangeImpl<L, I, TupleSizes<indexes...>> : TupleRangeImpl<L, I + 1, TupleSizes<indexes..., I>>
 {
 };
 
-template <Size L, Size... N>
-struct TupleRangeImpl<L, L, TupleSizes<N...>> : TupleSizes<N...>
+template <Size L, Size... indexes>
+struct TupleRangeImpl<L, L, TupleSizes<indexes...>> : TupleSizes<indexes...>
 {
 };
 
@@ -69,7 +69,7 @@ constexpr decltype(auto) TupleChooseN(T&&, Ts&&... ts)
 
 // single tuple element
 
-template <Size N, class T>
+template <Size index, class T>
 class TupleElem
 {
 public:
@@ -94,28 +94,29 @@ private:
 
 // Tuple implementation
 
-template <class N, class... Ts>
+template <class index, class... Ts>
 class TupleImpl;
 
-template <Size... N, class... Ts>
-class TupleImpl<TupleSizes<N...>, Ts...> : TupleElem<N, Ts>...
+template <Size... indexes, class... Ts>
+class TupleImpl<TupleSizes<indexes...>, Ts...> : TupleElem<indexes, Ts>...
 {
 private:
-	using Self = TupleImpl<TupleSizes<N...>, Ts...>;
-	template <Size M>
-	using Pick = bzd::meta::ChooseNth<M, Ts...>;
-	template <Size M>
-	using Elem = TupleElem<M, Pick<M>>;
+	using Self = TupleImpl<TupleSizes<indexes...>, Ts...>;
+	template <Size index>
+	using Pick = bzd::meta::ChooseNth<index, Ts...>;
+	template <Size index>
+	using Elem = TupleElem<index, Pick<index>>;
 
 public:
-	template <Size M>
-	using ItemType = Pick<M>;
+	template <Size index>
+	using ItemType = Pick<index>;
 
 public: // constructors
 	constexpr TupleImpl() noexcept = default;
 
 	template <class... Args>
-	constexpr TupleImpl(InPlace, Args&&... args) noexcept : TupleElem<N, Ts>{TupleChooseN<N, Args...>(bzd::forward<Args>(args)...)}...
+	constexpr TupleImpl(InPlace, Args&&... args) noexcept :
+		TupleElem<indexes, Ts>{TupleChooseN<indexes, Args...>(bzd::forward<Args>(args)...)}...
 	{
 	}
 
@@ -182,3 +183,18 @@ constexpr auto makeTuple(Args&&... args) noexcept
 }
 
 } // namespace bzd
+
+// Add support for structure bindings: `auto [a, b] = bzd::Tuple<int, float>{1, 2.3};`
+#include <tuple>
+
+namespace std {
+template <class... Args>
+struct tuple_size<::bzd::Tuple<Args...>> : std::integral_constant<size_t, sizeof...(Args)>
+{
+};
+template <size_t index, class... Args>
+struct tuple_element<index, ::bzd::Tuple<Args...>>
+{
+	using type = typename ::bzd::meta::ChooseNth<index, Args...>;
+};
+} // namespace std
