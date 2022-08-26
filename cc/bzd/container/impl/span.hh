@@ -111,15 +111,15 @@ public: // Accessors
 	[[nodiscard]] constexpr auto& back() noexcept { return at(size() - 1); }
 	[[nodiscard]] constexpr auto data() const noexcept { return storage_.data(); }
 	[[nodiscard]] constexpr auto data() noexcept { return storage_.dataMutable(); }
-	template <Size N>
+	template <Size index>
 	[[nodiscard]] constexpr auto& get() const noexcept
 	{
-		return at(N);
+		return at(index);
 	}
-	template <Size N>
+	template <Size index>
 	[[nodiscard]] constexpr auto& get() noexcept
 	{
-		return at(N);
+		return at(index);
 	}
 
 public: // Emplace

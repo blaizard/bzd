@@ -70,7 +70,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             executable = ctx.attr._clang_tidy.files_to_run,
             arguments = [output.path, src.short_path, "--", args],
             mnemonic = "ClangTidy",
-            progress_message = "Run clang-tidy on {}".format(src.short_path),
+            progress_message = "Clang-tidying {}".format(src.short_path),
         )
         outputs.append(output)
 

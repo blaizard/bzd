@@ -147,7 +147,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 		EXPECT_EQ(executor.getWorkloadCount(), 0);
 	}
 }
-/*
+
 TEST(Coroutine, StressAllNull)
 {
 	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, []() { return 0; });
@@ -204,7 +204,7 @@ TEST(Coroutine, StressRandomNested)
 		return test.random<int, 0, 10>();
 	});
 }
-*/
+
 TEST(Coroutine, StressCancellationSuspend)
 {
 	constexpr bzd::Size iterations = 10000;
@@ -214,8 +214,6 @@ TEST(Coroutine, StressCancellationSuspend)
 		bzd::coroutine::impl::Executor executor{};
 		std::thread thread;
 		bzd::Atomic<bzd::Bool> shouldReturn{false};
-
-		//::std::cout << iteration << ::std::endl;
 
 		using namespace std::chrono_literals;
 

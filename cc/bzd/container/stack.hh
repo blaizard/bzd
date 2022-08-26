@@ -33,6 +33,24 @@ public:
 
 	constexpr Size size() const noexcept { return data_.size(); }
 
+	/*
+	void printEdges(const Size count = 1000) const
+	{
+		::std::cout << "Begin:";
+		for (Size i = 0; i < count; ++i)
+		{
+			::std::cout << " " << ::std::hex << static_cast<UInt32>(data_[i]);
+		}
+		::std::cout << ::std::endl;
+		::std::cout << "End:";
+		for (Size i = data_.size() - count; i < data_.size(); ++i)
+		{
+			::std::cout << " " << ::std::hex << static_cast<UInt32>(data_[i]);
+		}
+		::std::cout << ::std::dec << ::std::endl;
+	}
+	*/
+
 	bzd::Size estimateMaxUsage(Byte pattern = defaultTaintPattern) const noexcept
 	{
 		if constexpr (direction == StackDirection::downward)

@@ -25,6 +25,7 @@ cc_library(
         "//cc/bzd/container:optional",
         "//cc/bzd/container:stack",
         "//cc/bzd/core:error",
+        "//cc/bzd/math:ceil",
         "//cc/components/posix:error",
     ],
 )

@@ -10,7 +10,6 @@ bzd_cc_library(
         ":align_up",
         ":apply",
         ":begin",
-        ":bit",
         ":concept",
         ":constexpr_for",
         ":container_of",
@@ -101,14 +100,6 @@ cc_library(
     deps = [
         "//cc/bzd/platform:types",
     ],
-)
-
-cc_library(
-    name = "bit",
-    hdrs = [
-        "bit.hh",
-    ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
