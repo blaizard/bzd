@@ -4,6 +4,7 @@
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/stack.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/bzd/math/ceil.hh"
 #include "cc/components/linux/core/interface.hh"
 #include "cc/components/posix/error.hh"
 
@@ -31,7 +32,7 @@ public:
 	{
 		if (stack_.hasValue())
 		{
-			::std::cout << "Stack usage: " << getStackUsage() << " / " << stackSize << ::std::endl;
+			::std::cout << "Stack usage: " << getStackUsage() << " / " << stack_->size() << ::std::endl;
 			::free(stack_->data());
 		}
 	}
@@ -47,12 +48,13 @@ public:
 				return bzd::error::Errno("sysconf");
 			}
 
-			void* memory;
-			if (const auto result = ::posix_memalign(&memory, alignment, stackSize); result != 0)
+			const Size actualSize = bzd::ceil(stackSize * 1.0 / alignment) * alignment;
+			void* memory = nullptr;
+			if (const auto result = ::posix_memalign(&memory, alignment, actualSize); result != 0)
 			{
 				return bzd::error::Errno("sysconf", result);
 			}
-			stack_.emplace(Span<Byte>{static_cast<Byte*>(memory), stackSize});
+			stack_.emplace(Span<Byte>{static_cast<Byte*>(memory), actualSize});
 
 			// Taint the stack to montior its usage.
 			stack_->taint();

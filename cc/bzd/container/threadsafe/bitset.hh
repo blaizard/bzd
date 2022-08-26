@@ -104,23 +104,52 @@ public:
 		return bzd::min(total, n);
 	}
 
+public:
+	constexpr void set(const Size index, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	{
+		const auto [unitIndex, indexWithinUnit] = getIndexes(index);
+		auto expected = data_[unitIndex].load();
+		while (!data_[unitIndex].compareExchange(expected, setWithinUnit(expected, indexWithinUnit), order))
+		{
+		}
+	}
+
+	constexpr void clear(const Size index, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	{
+		const auto [unitIndex, indexWithinUnit] = getIndexes(index);
+		auto expected = data_[unitIndex].load();
+		while (!data_[unitIndex].compareExchange(expected, clearWithinUnit(expected, indexWithinUnit), order))
+		{
+		}
+	}
+
 	constexpr Bool compareSet(const Size index, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
 	{
-		assert::isTrue(index < n);
-		const auto unitIndex = index / bitsPerUnit;
-		const auto indexWithinUnit = index % bitsPerUnit;
-
+		const auto [unitIndex, indexWithinUnit] = getIndexes(index);
 		auto expected = data_[unitIndex].load();
 		do
 		{
 			expected = clearWithinUnit(expected, indexWithinUnit);
-			const auto desired = setWithinUnit(expected, indexWithinUnit);
-			if (data_[unitIndex].compareExchange(expected, desired, order))
+			if (data_[unitIndex].compareExchange(expected, setWithinUnit(expected, indexWithinUnit), order))
 			{
 				return true;
 			}
 		} while (!testWithinUnit(expected, indexWithinUnit));
+		return false;
+	}
 
+	constexpr Bool compareClear(const Size index, const MemoryOrder order = MemoryOrder::sequentiallyConsistent) noexcept
+	{
+		const auto [unitIndex, indexWithinUnit] = getIndexes(index);
+		auto expected = data_[unitIndex].load();
+		do
+		{
+			expected = setWithinUnit(expected, indexWithinUnit);
+			if (data_[unitIndex].compareExchange(expected, clearWithinUnit(expected, indexWithinUnit), order))
+			{
+				return true;
+			}
+		} while (testWithinUnit(expected, indexWithinUnit));
 		return false;
 	}
 
@@ -138,6 +167,17 @@ private:
 	constexpr Bool testWithinUnit(const UnitType unit, const Size indexWithinUnit) const noexcept
 	{
 		return (unit & (1u << indexWithinUnit)) != 0u;
+	}
+
+	struct Indexes
+	{
+		const Size unitIndex;
+		const Size indexWithinUnit;
+	};
+	constexpr Indexes getIndexes(const Size index) const noexcept
+	{
+		assert::isTrue(index < n);
+		return {.unitIndex = index / bitsPerUnit, .indexWithinUnit = index % bitsPerUnit};
 	}
 
 private:

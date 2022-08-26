@@ -8,8 +8,8 @@ TEST(Bitset, Basic)
 	ASSERT_EQ(container.size(), 10u);
 	ASSERT_EQ(container.countLZero(), 10u);
 	ASSERT_EQ(container.countLOne(), 0u);
-	ASSERT_TRUE(container.compareSet(0U));
-	ASSERT_FALSE(container.compareSet(0U));
+	ASSERT_TRUE(container.compareSet(0));
+	ASSERT_FALSE(container.compareSet(0));
 	ASSERT_EQ(container, bzd::threadsafe::Bitset{"1000000000"});
 }
 
@@ -19,7 +19,7 @@ TEST(Bitset, ConstructorStringSmall)
 	ASSERT_EQ(container.size(), 5u);
 	ASSERT_EQ(container.countLZero(), 1u);
 	ASSERT_EQ(container.countLOne(), 0u);
-	ASSERT_TRUE(container.compareSet(3U));
+	ASSERT_TRUE(container.compareSet(3));
 	ASSERT_EQ(container, bzd::threadsafe::Bitset{"01011"});
 }
 
@@ -29,4 +29,6 @@ TEST(Bitset, ConstructorStringLarge)
 	ASSERT_EQ(container.size(), 58u);
 	ASSERT_EQ(container.countLZero(), 1u);
 	ASSERT_EQ(container.countLOne(), 0u);
+	ASSERT_TRUE(container.compareSet(42));
+	ASSERT_EQ(container, bzd::threadsafe::Bitset{"0100100001010011110000110111001010101010101100011110100101"});
 }
