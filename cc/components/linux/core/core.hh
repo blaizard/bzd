@@ -5,6 +5,7 @@
 #include "cc/bzd/container/stack.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/math/ceil.hh"
+#include "cc/bzd/utility/align_up.hh"
 #include "cc/components/linux/core/interface.hh"
 #include "cc/components/posix/error.hh"
 
@@ -32,7 +33,6 @@ public:
 	{
 		if (stack_.hasValue())
 		{
-			::std::cout << "Stack usage: " << getStackUsage() << " / " << stack_->size() << ::std::endl;
 			::free(stack_->data());
 		}
 	}
@@ -48,7 +48,7 @@ public:
 				return bzd::error::Errno("sysconf");
 			}
 
-			const Size actualSize = bzd::ceil(stackSize * 1.0 / alignment) * alignment;
+			const Size actualSize = bzd::alignUp(stackSize, alignment);
 			void* memory = nullptr;
 			if (const auto result = ::posix_memalign(&memory, alignment, actualSize); result != 0)
 			{
@@ -129,6 +129,8 @@ private:
 		::std::cout << "Workload Wrapper Enter" << ::std::endl;
 		workload(*linux);
 		::std::cout << "Workload Wrapper Exit" << ::std::endl;
+		::std::cout << "Stack usage: " << linux->getStackUsage() << " / " << linux->stack_->size() << ::std::endl;
+
 		return nullptr;
 	}
 
