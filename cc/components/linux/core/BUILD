@@ -26,6 +26,7 @@ cc_library(
         "//cc/bzd/container:stack",
         "//cc/bzd/core:error",
         "//cc/bzd/math:ceil",
+        "//cc/bzd/utility:align_up",
         "//cc/components/posix:error",
     ],
 )
