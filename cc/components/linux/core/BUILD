@@ -16,9 +16,6 @@ cc_library(
     hdrs = [
         "core.hh",
     ],
-    linkopts = [
-        "-lpthread",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
@@ -28,5 +25,6 @@ cc_library(
         "//cc/bzd/math:ceil",
         "//cc/bzd/utility:align_up",
         "//cc/components/posix:error",
+        "//cc/libs/pthread",
     ],
 )

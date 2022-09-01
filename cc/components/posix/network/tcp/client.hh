@@ -14,29 +14,7 @@ template <class Proactor>
 class Client : public bzd::platform::network::tcp::Client<Client<Proactor>>
 {
 public:
-	class Stream : public bzd::IOStream
-	{
-	private:
-		friend class Client<Proactor>;
-		constexpr Stream(Proactor& proactor, Socket&& socket) noexcept : proactor_{proactor}, socket_{bzd::move(socket)} {}
-
-	public:
-		constexpr Stream(Stream&& other) noexcept : proactor_{other.proactor_}, socket_{bzd::move(other.socket_)} {}
-
-		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
-		{
-			co_return co_await proactor_.write(socket_.getFileDescriptor(), data);
-		}
-
-		bzd::Async<bzd::Span<Byte>> read(const bzd::Span<Byte> data) noexcept override
-		{
-			co_return co_await proactor_.read(socket_.getFileDescriptor(), data);
-		}
-
-	private:
-		Proactor& proactor_;
-		Socket socket_;
-	};
+	using Stream = typename bzd::platform::network::tcp::ClientTraits<Client>::Stream;
 
 public:
 	explicit Client(Proactor& proactor) : proactor_{proactor} {}
@@ -89,3 +67,35 @@ private:
 };
 
 } // namespace bzd::platform::posix::network::tcp
+
+namespace bzd::platform::network::tcp {
+template <class Proactor>
+struct ClientTraits<bzd::platform::posix::network::tcp::Client<Proactor>>
+{
+	using Socket = bzd::platform::posix::network::Socket;
+
+	class Stream : public bzd::IOStream
+	{
+	private:
+		friend class bzd::platform::posix::network::tcp::Client<Proactor>;
+		constexpr Stream(Proactor& proactor, Socket&& socket) noexcept : proactor_{proactor}, socket_{bzd::move(socket)} {}
+
+	public:
+		constexpr Stream(Stream&& other) noexcept : proactor_{other.proactor_}, socket_{bzd::move(other.socket_)} {}
+
+		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
+		{
+			co_return co_await proactor_.write(socket_.getFileDescriptor(), data);
+		}
+
+		bzd::Async<bzd::Span<Byte>> read(const bzd::Span<Byte> data) noexcept override
+		{
+			co_return co_await proactor_.read(socket_.getFileDescriptor(), data);
+		}
+
+	private:
+		Proactor& proactor_;
+		Socket socket_;
+	};
+};
+} // namespace bzd::platform::network::tcp

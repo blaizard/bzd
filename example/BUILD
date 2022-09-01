@@ -8,12 +8,10 @@ cc_library(
         "*.hh",
         "*.cc",
     ]),
-    linkopts = [
-        "-pthread",
-    ],
     tags = ["manual"],
     deps = [
         "//cc:bzd",
+        "//cc/libs/pthread",
     ],
 )
 

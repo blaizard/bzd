@@ -11,6 +11,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:string_view",
         "//tools/bdl/generators/cc/adapter:types",
+        "//cc/bzd/core/async"
     ],
 )
 

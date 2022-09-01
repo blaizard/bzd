@@ -51,6 +51,7 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
             "-lstdc++",
+            "-lm",
         ],
         "dynamic_runtime_lib": [
             #"@{}//:dynamic_libraries".format(package_name),
