@@ -180,34 +180,32 @@ TEST(Coroutine, StressAnyRandom)
 
 TEST(Coroutine, StressAllNested)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
 }
 
 TEST(Coroutine, StressAnyNested)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
 }
 
 TEST(Coroutine, StressAllAnyNested)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
 }
 
 TEST(Coroutine, StressAnyAllNested)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 10>(); });
+	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
 }
 
 TEST(Coroutine, StressRandomNested)
 {
-	spawnConcurrentThreads<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 100, [&]() {
-		return test.random<int, 0, 10>();
-	});
+	spawnConcurrentThreads<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 100, [&]() { return test.random<int, 0, 5>(); });
 }
 
 TEST(Coroutine, StressCancellationSuspend)
 {
-	constexpr bzd::Size iterations = 10000;
+	constexpr bzd::Size iterations = 1000;
 
 	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{

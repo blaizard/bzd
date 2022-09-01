@@ -15,9 +15,9 @@ echo  "==== [normal] linux_x86_64_gcc prod ==============================="
 echo  "==== [normal] esp32_xtensa_lx6_gcc prod ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod $EXTRA_FLAGS
 echo  "==== [stress] dev (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=dev --runs_per_test=100 --platform_suffix=stress_dev $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --platform_suffix=stress_dev $EXTRA_FLAGS
 echo  "==== [stress] prod (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=prod --runs_per_test=100 --platform_suffix=stress_prod $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=100 --platform_suffix=stress_prod $EXTRA_FLAGS
 echo  "==== [sanitizer] asan/lsan ==============================="
 ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan $EXTRA_FLAGS
 echo  "==== [coverage] C++ ==============================="

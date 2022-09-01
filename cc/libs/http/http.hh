@@ -4,6 +4,7 @@
 
 namespace bzd {
 
+// Support for HTTP/1.0 & HTTP/1.1
 template <class Network>
 class Http
 {
@@ -13,15 +14,17 @@ public:
 	{
 	}
 
-	Async<> get(const StringView path) noexcept
+	Async<> get(const StringView path, const interface::Map<StringView, StringView>) noexcept
 	{
 		stream_ = co_await !network_.connect(hostname_, port_);
-		co_await !toStream(stream_,
+		co_await !toStream(stream_.valueMutable(),
 						   "GET / HTTP/1.1\r\n"
 						   "Host: {}\r\n"
 						   "User-Agent: bzd\r\n"
 						   "Accept: */*\r\n\r\n"_csv,
 						   hostname_);
+
+		co_return {};
 	}
 
 private:
