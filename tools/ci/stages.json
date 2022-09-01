@@ -34,7 +34,7 @@
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=dev --runs_per_test={runs} --platform_suffix=stress_dev",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test={runs} --platform_suffix=stress_dev",
             "name": "dev ({runs} runs)",
             "tags": [
                 "x86_64",
@@ -44,7 +44,7 @@
         },
         {
             "category": "stress",
-            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress --config=prod --runs_per_test={runs} --platform_suffix=stress_prod",
+            "command": "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test={runs} --platform_suffix=stress_prod",
             "name": "prod ({runs} runs)",
             "tags": [
                 "x86_64",

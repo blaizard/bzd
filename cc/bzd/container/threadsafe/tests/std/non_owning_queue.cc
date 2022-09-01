@@ -24,7 +24,7 @@ TEST(NonOwningQueue, StressPush)
 	static constexpr Size nbPushThreads{3};
 	static constexpr Size nbPopThreads{2};
 	static constexpr Size maxElements{10};
-	static constexpr Size maxIterations{1000};
+	static constexpr Size maxIterations{100};
 
 	bzd::Atomic<Size> counter{0};
 	bzd::Atomic<Size> iteration{0};
