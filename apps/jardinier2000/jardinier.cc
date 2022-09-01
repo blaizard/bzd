@@ -15,7 +15,7 @@ bzd::Async<bool> water(bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
 	gpio_reset_pin(waterPumpPin);
 	gpio_set_direction(waterPumpPin, GPIO_MODE_OUTPUT);
 	gpio_set_level(waterPumpPin, 1);
-	vTaskDelay(configTICK_RATE_HZ * wateringTimeS);
+	co_await bzd::delay(bzd::units::Second{wateringTimeS});
 	gpio_set_level(waterPumpPin, 0);
 
 	co_await bzd::log::info("Going to sleep, will wake up in {}s..."_csv, wakeUpPeriodS);

@@ -24,6 +24,7 @@ cc_library(
     deps = [
         ":composition",
         "//cc:bzd",
+        "//cc/libs/http",
     ],
 )
 

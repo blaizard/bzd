@@ -3,8 +3,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def coverage_load():
     http_archive(
         name = "lcov",
-        sha256 = "c1cda2fa33bec9aa2c2c73c87226cfe97de0831887176b45ee523c5e30f8053a",
+        sha256 = "987031ad5528c8a746d4b52b380bc1bffe412de1f2b9c2ba5224995668e3240b",
         build_file = "//tools/coverage:lcov.BUILD",
-        strip_prefix = "lcov-1.15",
-        url = "https://github.com/linux-test-project/lcov/releases/download/v1.15/lcov-1.15.tar.gz",
+        strip_prefix = "lcov-1.16",
+        url = "https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz",
     )
