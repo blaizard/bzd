@@ -11,9 +11,7 @@ def _nodejs_toolchain_impl(ctx):
     )
     return [toolchain_info]
 
-"""
-Defines a NodeJs toolchain.
-"""
+# Defines a NodeJs toolchain.
 nodejs_toolchain = rule(
     implementation = _nodejs_toolchain_impl,
     attrs = {

@@ -1,6 +1,6 @@
 services:
     compiler-explorer:
-        image: blaizard/compiler_explorer:latest
+        image: bazel/tools/docker_images:compiler_explorer
         ports:
         - 10240:10240
         volumes:
