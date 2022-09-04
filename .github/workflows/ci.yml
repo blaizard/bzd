@@ -20,6 +20,10 @@ jobs:
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
+    - name: "Docker Images"
+      run: |
+        ./tools/bazel run tools/docker_images
+
     - name: "[normal] clang-tidy"
       run: |
         ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy

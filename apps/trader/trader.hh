@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd.hh"
-// #include "cc/libs/http/http.hh"
+#include "cc/libs/http/http.hh"
 
 namespace Trader {
 
@@ -13,7 +13,8 @@ bzd::Async<> run(Network& network)
 	co_await !bzd::log::info("Connecting to {}"_csv, hostname);
 	auto stream = co_await !network.connect(hostname, 80);
 
-	// bzd::Http http{network, hostname, 80};
+	bzd::Http http{network, hostname, 80};
+	co_await !http.request().header().send();
 	// co_await !http.get("/", {});
 
 	co_await !bzd::log::info("Sending GET /"_csv);

@@ -20,6 +20,10 @@ jobs:
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
+    - name: "Docker Images"
+      run: |
+        ./tools/bazel run tools/docker_images
+
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"
       run: |

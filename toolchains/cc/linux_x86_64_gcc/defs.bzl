@@ -7,7 +7,7 @@ def _load_linux_x86_64_gcc_11_2_0(name):
     toolchain_definition = {
         "cpu": "linux_x86_64",
         "compiler": "gcc",
-        "docker_image": "docker://docker.io/blaizard/linux_x86_64_gcc:11.2.0",
+        "docker_image": "docker://bazel/tools/docker_images:linux_x86_64_gcc",
         "exec_compatible_with": [
             "@platforms//os:linux",
             "@platforms//cpu:x86_64",

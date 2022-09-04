@@ -13,3 +13,11 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+bzl_library(
+    name = "multi_run",
+    srcs = [
+        "multi_run.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)

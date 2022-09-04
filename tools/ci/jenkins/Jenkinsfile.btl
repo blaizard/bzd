@@ -32,6 +32,13 @@ pipeline
 				sh "./info.sh"
 			}
 		}
+		stage("Docker Images")
+		{
+			steps
+			{
+				sh "./tools/bazel run tools/docker_images"
+			}
+		}
 		// Parallelized tests are done here
 		stage("Tests")
 		{

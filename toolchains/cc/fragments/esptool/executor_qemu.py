@@ -86,8 +86,8 @@ if __name__ == "__main__":
 		cmds += ["-p", "8080", "--volume={}:/code:ro".format(os.environ["BUILD_WORKSPACE_DIRECTORY"])]
 
 	cmds += [
-		"blaizard/xtensa_qemu:latest", "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32", "-m", "4",
-		"-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
+		"bazel/tools/docker_images:xtensa_qemu", "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32",
+		"-m", "4", "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
 	]
 
 	if args.debug:
