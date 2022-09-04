@@ -1,5 +1,0 @@
-objects:
-    bzd::OChannel.i2c:
-        implementation: !ref 'bzd::io::Stub'
-    bzd::OChannel.led:
-        implementation: !ref 'bzd::io::Stub'

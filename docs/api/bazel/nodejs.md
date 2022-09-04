@@ -147,7 +147,7 @@ bzd_nodejs_docker(<a href="#bzd_nodejs_docker-name">name</a>, <a href="#bzd_node
 | name |  <p align="center"> - </p>   |  none |
 | deps |  <p align="center"> - </p>   |  none |
 | cmd |  <p align="center"> - </p>   |  none |
-| base |  <p align="center"> - </p>   |  <code>"@docker_nodejs//image"</code> |
+| base |  <p align="center"> - </p>   |  <code>"@docker_image_nodejs//image"</code> |
 | include_metadata |  <p align="center"> - </p>   |  <code>False</code> |
 | deploy |  <p align="center"> - </p>   |  <code>{}</code> |
 

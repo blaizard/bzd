@@ -18,9 +18,11 @@ jobs:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./info.sh
 
-    - name: "Docker Images"
+    - name: "Fetch"
       script:
+      - ./tools/bazel fetch //...
       - ./tools/bazel run tools/docker_images
+      - ./info.sh
 
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"
