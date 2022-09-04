@@ -1,10 +1,9 @@
 load("//tools/bazel_build/rules:docker.bzl", "bzd_docker_pull")
 
-REGISTRY = "index.docker.io"
-
 IMAGES = {
     "bridge": struct(
         digest = "sha256:5b6a59e0c6a28e4dedef5ac2e8a44e2c1327927ede53ae5425923950ac9d99df",
+        registry = "index.docker.io",
         repository = "blaizard/bridge",
         tag = "latest",
     ),
@@ -16,21 +15,25 @@ IMAGES = {
     ),
     "nodejs_puppeteer": struct(
         digest = "sha256:68c92c4b27229e1a3ab27e359fb5474a6edc8cfb572e9b2d46fefc230ead7f65",
+        registry = "index.docker.io",
         repository = "blaizard/nodejs_puppeteer",
         tag = "latest",
     ),
     "xtensa_qemu": struct(
         digest = "sha256:473c71ec94c4fe3acd26f7b9274accabbda73959b6cd062996a8880fc1a2f6b9",
+        registry = "index.docker.io",
         repository = "blaizard/xtensa_qemu",
         tag = "latest",
     ),
     "linux_x86_64_gcc": struct(
         digest = "sha256:1f693d24fe9727c12343c8d06cb46043c671bed17704f343946a0eb8a3da752a",
+        registry = "index.docker.io",
         repository = "blaizard/linux_x86_64_gcc",
         tag = "11.2.0",
     ),
     "compiler_explorer": struct(
         digest = "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
+        registry = "index.docker.io",
         repository = "blaizard/compiler_explorer",
         tag = "latest",
     ),
@@ -41,7 +44,7 @@ def docker_images_register():
         bzd_docker_pull(
             name = "docker_image_{}".format(name),
             digest = data.digest,
-            registry = data.registry if hasattr(data, "registry") else REGISTRY,
+            registry = data.registry,
             repository = data.repository,
             tag = data.tag,
         )

@@ -1,17 +1,16 @@
 load("//tools/docker_images:register.bzl", "IMAGES")
-load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load("//tools/bazel_build:multi_run.bzl", "multi_run")
+load("//tools/bazel_build/rules:docker.bzl", "bzd_docker_load")
 
 # Reference docker images from within the repository.
-[container_image(
+[bzd_docker_load(
     name = name,
-    base = "@docker_image_{}//image".format(name),
-    tags = [
-        "docker-pull",
-        "manual",
-    ],
+    digest = data.digest,
+    registry = data.registry,
+    repository = data.repository,
+    tags = ["manual"],
     visibility = ["//visibility:public"],
-) for name in IMAGES.keys()]
+) for name, data in IMAGES.items()]
 
 # Run this targe to load all images into docker.
 multi_run(
