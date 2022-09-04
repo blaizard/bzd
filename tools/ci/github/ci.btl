@@ -18,11 +18,16 @@ jobs:
       run: |
         cp tools/ci/github/.bazelrc.local .bazelrc.local
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
-        ./info.sh
 
-    - name: "Docker Images"
+    - name: "Fetch"
       run: |
+        ./tools/bazel fetch //...
         ./tools/bazel run tools/docker_images
+
+    - name: "Info"
+      if: always()
+      run: |
+        ./info.sh
 
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"

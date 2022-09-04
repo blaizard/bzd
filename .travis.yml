@@ -18,9 +18,11 @@ jobs:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./info.sh
 
-    - name: "Docker Images"
+    - name: "Fetch"
       script:
+      - ./tools/bazel fetch //...
       - ./tools/bazel run tools/docker_images
+      - ./info.sh
 
     - name: "[normal] clang-tidy"
       script:
