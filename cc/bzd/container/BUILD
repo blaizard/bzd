@@ -391,6 +391,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":span",
+        "//cc/bzd/algorithm:copy",
+        "//cc/bzd/algorithm:move",
         "//cc/bzd/container/storage:non_owning",
         "//cc/bzd/container/storage:resizeable",
         "//cc/bzd/core/assert:minimal",

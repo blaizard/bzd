@@ -9,11 +9,11 @@
 
 namespace bzd::impl {
 /// \brief Fixed storage type.
-template <class T, bzd::Size N>
+template <class T, bzd::Size capacity>
 class FixedStorage
 {
 public:
-	using Self = FixedStorage<T, N>;
+	using Self = FixedStorage<T, capacity>;
 	using ValueType = const T;
 	using ValueMutableType = T;
 
@@ -32,16 +32,16 @@ public: // Constructors
 
 	constexpr FixedStorage(const T* begin, const T* end) noexcept
 	{
-		const auto n = bzd::min(N, static_cast<Size>(end - begin));
+		const auto n = bzd::min(capacity, static_cast<Size>(end - begin));
 		bzd::algorithm::copyN(begin, n, data_);
 	}
 
 public: // Accessors
 	constexpr ValueType* data() const noexcept { return data_; }
 	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
-	constexpr bzd::Size size() const noexcept { return N; }
+	constexpr bzd::Size size() const noexcept { return capacity; }
 
 private:
-	T data_[(N == 0) ? 1 : N]{};
+	T data_[(capacity == 0) ? 1 : capacity]{};
 };
 } // namespace bzd::impl

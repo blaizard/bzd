@@ -38,7 +38,6 @@ pipeline
 			{
 				sh "./tools/bazel fetch //..."
 				sh "./tools/bazel run tools/docker_images"
-				sh "./info.sh"
 			}
 		}
 		// Parallelized tests are done here
@@ -148,4 +147,9 @@ pipeline
 			}
 		}
 	}
+    post {
+        always {
+			sh "./info.sh"
+        }
+    }
 }

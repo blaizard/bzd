@@ -15,12 +15,12 @@ namespace bzd {
 /// with the benefits of a standard container, such as knowing its own size,
 /// supporting assignment, random access iterators, etc. Unlike a C-style array,
 /// it doesn't decay to T* automatically.
-template <class T, Size N>
-class Array : public impl::Span<T, impl::FixedStorage<T, N>>
+template <class T, Size maxCapacity>
+class Array : public impl::Span<T, impl::FixedStorage<T, maxCapacity>>
 {
 public: // Traits.
-	using Self = Array<T, N>;
-	using Parent = impl::Span<T, impl::FixedStorage<T, N>>;
+	using Self = Array<T, maxCapacity>;
+	using Parent = impl::Span<T, impl::FixedStorage<T, maxCapacity>>;
 	using StorageType = typename Parent::StorageType;
 	using ValueType = T;
 
@@ -42,8 +42,8 @@ public:
 	/// \brief Returns the number of elements that the array can hold.
 	///
 	/// \return Maximum number of element this array can hold.
-	static constexpr Size capacity() noexcept { return N; }
-	static constexpr Size size() noexcept { return N; }
+	static constexpr Size capacity() noexcept { return maxCapacity; }
+	static constexpr Size size() noexcept { return maxCapacity; }
 };
 
 } // namespace bzd
