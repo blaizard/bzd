@@ -5,4 +5,4 @@
 [submodule "docs/private"]
 	path = docs/private
 	url = https://git.blaizard.com/blaise/docs.git
-	branch = master
+	branch = main
