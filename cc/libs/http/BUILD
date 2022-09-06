@@ -8,5 +8,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc:bzd",
+        "//cc/bzd/utility/synchronization:lock_guard",
+        "//cc/bzd/utility/synchronization:mutex",
     ],
 )

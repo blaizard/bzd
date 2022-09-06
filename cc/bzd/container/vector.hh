@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/algorithm/copy.hh"
+#include "cc/bzd/algorithm/move.hh"
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
 #include "cc/bzd/container/storage/resizeable.hh"
@@ -29,7 +31,7 @@ public:
 	///
 	/// \param value Value to be copied (or moved) to the new element.
 	template <class U>
-	constexpr void pushBack(U&& value)
+	constexpr void pushBack(U&& value) noexcept
 	{
 		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
 		++this->storage_.sizeMutable();
@@ -41,13 +43,30 @@ public:
 	///
 	/// \param args... Arguments forwarded to the constructor.
 	template <class... Args>
-	constexpr void emplaceBack(Args&&... args)
+	constexpr void emplaceBack(Args&&... args) noexcept
 	{
 		bzd::assert::isTrue(this->size() < capacity_, "Out of bound");
 		auto it = this->end();
 		this->emplace(it, bzd::forward<Args>(args)...);
 		++this->storage_.sizeMutable();
 	}
+
+	/// TO be changed
+	template <class Iterator>
+	requires concepts::forwardIterator<Iterator>
+	constexpr void insertBack(Iterator first, Iterator last) noexcept
+	{
+		while (!(first == last))
+		{
+			pushBack(*first);
+			++first;
+		}
+	}
+
+	/// \copydoc insertBack
+	template <class Range>
+	requires concepts::forwardRange<Range>
+	constexpr void insertBack(Range&& range) { insertBack(bzd::begin(range), bzd::end(range)); }
 
 	/// \brief Returns the maximum number of elements the vector can hold.
 	///
@@ -73,57 +92,73 @@ using Vector = impl::Vector<T, impl::NonOwningStorage<T>>;
 }
 
 namespace bzd {
-template <class T, Size N>
+template <class T, Size capacity>
 class Vector : public interface::Vector<T>
 {
 public: // Traits.
-	using Self = Vector<T, N>;
+	using Self = Vector<T, capacity>;
 	using Parent = interface::Vector<T>;
 	using StorageType = typename Parent::StorageType;
 	using ValueType = typename Parent::ValueType;
 
 public: // Constructors/assignments.
-	constexpr Vector() noexcept : Parent{StorageType{data_, 0}, N} {}
-	constexpr Vector(const Self&) noexcept = default;
-	constexpr Self& operator=(const Self&) noexcept = default;
-	constexpr Vector(Self&&) noexcept = default;
-	constexpr Self& operator=(Self&&) noexcept = default;
-
-	template <class... Args>
-	constexpr Vector(InPlace, Args&&... args) noexcept : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{bzd::forward<Args>(args)...}
+	constexpr Vector() noexcept : Parent{StorageType{data_, 0}, capacity} {}
+	constexpr Vector(const Self& other) noexcept : Vector{} { *this = other; }
+	constexpr Self& operator=(const Self& other) noexcept
 	{
+		this->resize(other.size());
+		algorithm::copy(other, *this);
+		return *this;
+	}
+	constexpr Vector(Self&& other) noexcept : Vector{} { *this = bzd::move(other); }
+	constexpr Self& operator=(Self&& other) noexcept
+	{
+		this->resize(other.size());
+		algorithm::move(bzd::move(other), *this);
+		return *this;
 	}
 
 	template <class... Args>
-	constexpr Vector(std::initializer_list<ValueType> list) : Parent{StorageType{data_, sizeof...(Args)}, N}, data_{}
+	constexpr Vector(InPlace, Args&&... args) noexcept :
+		Parent{StorageType{data_, sizeof...(Args)}, capacity}, data_{bzd::forward<Args>(args)...}
 	{
-		for (const auto& value : list)
-		{
-			this->pushBack(value);
-		}
+	}
+
+	template <Size otherCapacity>
+	requires(otherCapacity < capacity) constexpr Vector(const Vector<T, otherCapacity>& other) noexcept : Vector{}
+	{
+		this->resize(other.size());
+		algorithm::copy(other, *this);
+	}
+
+	template <Size otherCapacity>
+	requires(otherCapacity < capacity) constexpr Vector(Vector<T, otherCapacity>&& other) noexcept : Vector{}
+	{
+		this->resize(other.size());
+		algorithm::move(bzd::move(other), *this);
 	}
 
 private:
-	T data_[N]{};
+	T data_[capacity]{};
 };
 
-template <class T, Size N>
-class VectorConstexpr : public impl::Vector<T, impl::ResizeableStorage<T, N>>
+template <class T, Size capacity>
+class VectorConstexpr : public impl::Vector<T, impl::ResizeableStorage<T, capacity>>
 {
 public: // Traits.
-	using Self = VectorConstexpr<T, N>;
-	using Parent = impl::Vector<T, impl::ResizeableStorage<T, N>>;
+	using Self = VectorConstexpr<T, capacity>;
+	using Parent = impl::Vector<T, impl::ResizeableStorage<T, capacity>>;
 	using StorageType = typename Parent::StorageType;
 
 public: // Constructors/assignments.
-	constexpr VectorConstexpr() noexcept : Parent{StorageType{}, N} {}
+	constexpr VectorConstexpr() noexcept : Parent{StorageType{}, capacity} {}
 	constexpr VectorConstexpr(const Self&) noexcept = default;
 	constexpr Self& operator=(const Self&) noexcept = default;
 	constexpr VectorConstexpr(Self&&) noexcept = default;
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr VectorConstexpr(InPlace, Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}, N}
+	constexpr VectorConstexpr(InPlace, Args&&... args) noexcept : Parent{StorageType{bzd::forward<Args>(args)...}, capacity}
 	{
 	}
 };

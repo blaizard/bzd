@@ -40,6 +40,7 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
+        "//cc/bzd/type_traits:iterator",
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",

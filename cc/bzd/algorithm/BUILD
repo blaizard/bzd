@@ -13,6 +13,7 @@ bzd_cc_library(
         ":equal",
         ":equal_range",
         ":fill",
+        ":fill_n",
         ":find",
         ":find_if",
         ":find_if_not",
@@ -148,6 +149,18 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:forward",
+    ],
+)
+
+cc_library(
+    name = "fill_n",
+    hdrs = [
+        "fill_n.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
         "//cc/bzd/utility:forward",
     ],
 )

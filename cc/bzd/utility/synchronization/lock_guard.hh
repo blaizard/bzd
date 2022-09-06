@@ -5,39 +5,44 @@
 #include "cc/bzd/type_traits/lockable.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
-namespace bzd::impl::lockGuard {
+namespace bzd::lockGuard {
 template <concepts::basicLockable T>
 auto makeLambda(T& lock)
 {
 	auto scope = bzd::ScopeGuard([&lock]() { lock.unlock(); });
 	return bzd::move(scope);
 }
-} // namespace bzd::impl::lockGuard
 
-namespace bzd::impl::sharedLockGuard {
+template <concepts::basicLockable T>
+using Type = bzd::typeTraits::InvokeResult<decltype(makeLambda<T>), T&>;
+} // namespace bzd::lockGuard
+
+namespace bzd::sharedLockGuard {
 template <concepts::sharedLockable T>
 auto makeLambda(T& lock)
 {
 	auto scope = bzd::ScopeGuard([&lock]() { lock.unlockShared(); });
 	return bzd::move(scope);
 }
-} // namespace bzd::impl::sharedLockGuard
+
+template <concepts::sharedLockable T>
+using Type = bzd::typeTraits::InvokeResult<decltype(makeLambda<T>), T&>;
+} // namespace bzd::sharedLockGuard
 
 namespace bzd {
 template <concepts::basicLockable T>
-[[nodiscard]] auto makeLockGuard(T& lock) -> bzd::Async<bzd::typeTraits::InvokeResult<decltype(impl::lockGuard::makeLambda<T>), T&>>
+[[nodiscard]] auto makeLockGuard(T& lock) -> bzd::Async<lockGuard::Type<T>>
 {
 	co_await !lock.lock();
-	auto scope = impl::lockGuard::makeLambda(lock);
+	auto scope = lockGuard::makeLambda(lock);
 	co_return bzd::move(scope);
 }
 
 template <concepts::sharedLockable T>
-[[nodiscard]] auto makeSharedLockGuard(T& lock)
-	-> bzd::Async<bzd::typeTraits::InvokeResult<decltype(impl::sharedLockGuard::makeLambda<T>), T&>>
+[[nodiscard]] auto makeSharedLockGuard(T& lock) -> bzd::Async<sharedLockGuard::Type<T>>
 {
 	co_await !lock.lockShared();
-	auto scope = impl::sharedLockGuard::makeLambda(lock);
+	auto scope = sharedLockGuard::makeLambda(lock);
 	co_return bzd::move(scope);
 }
 } // namespace bzd

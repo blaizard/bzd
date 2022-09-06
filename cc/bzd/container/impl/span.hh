@@ -10,6 +10,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/remove_const.hh"
 #include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -122,12 +123,12 @@ public: // Accessors
 		return at(index);
 	}
 
-public: // Emplace
+public: // Modifiers
 	template <class... Args>
-	constexpr void emplace(bzd::iterator::Contiguous<ValueType> pos, Args&&... args) noexcept
+	constexpr void emplace(iterator::Contiguous<ValueType> position, Args&&... args) noexcept
 	{
-		pos->~ValueType();
-		::new (&(*pos)) ValueType{bzd::forward<Args>(args)...};
+		position->~ValueType();
+		::new (&(*position)) ValueType{bzd::forward<Args>(args)...};
 	}
 
 public: // Find

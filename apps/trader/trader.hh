@@ -11,12 +11,14 @@ bzd::Async<> run(Network& network)
 	constexpr bzd::StringView hostname{"www.google.com"_sv};
 
 	co_await !bzd::log::info("Connecting to {}"_csv, hostname);
+
+	bzd::http::Client client{network, hostname, 80};
+	co_await !client.request("/hello/world"_sv)
+		.header(bzd::http::Header{"hello"_sv, "my friend"_sv})
+		.header(bzd::http::Header::host("my friend"_sv))
+		.send();
+
 	auto stream = co_await !network.connect(hostname, 80);
-
-	bzd::Http http{network, hostname, 80};
-	co_await !http.request().header().send();
-	// co_await !http.get("/", {});
-
 	co_await !bzd::log::info("Sending GET /"_csv);
 	co_await !toStream(stream,
 					   "GET / HTTP/1.1\r\n"
