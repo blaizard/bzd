@@ -106,15 +106,21 @@ public: // Constructors/assignments.
 	constexpr Vector(const Self& other) noexcept : Vector{} { *this = other; }
 	constexpr Self& operator=(const Self& other) noexcept
 	{
-		this->resize(other.size());
-		algorithm::copy(other, *this);
+		if (this != &other)
+		{
+			this->resize(other.size());
+			algorithm::copy(other, *this);
+		}
 		return *this;
 	}
 	constexpr Vector(Self&& other) noexcept : Vector{} { *this = bzd::move(other); }
 	constexpr Self& operator=(Self&& other) noexcept
 	{
-		this->resize(other.size());
-		algorithm::move(bzd::move(other), *this);
+		if (this != &other)
+		{
+			this->resize(other.size());
+			algorithm::move(bzd::move(other), *this);
+		}
 		return *this;
 	}
 
@@ -122,6 +128,15 @@ public: // Constructors/assignments.
 	constexpr Vector(InPlace, Args&&... args) noexcept :
 		Parent{StorageType{data_, sizeof...(Args)}, capacity}, data_{bzd::forward<Args>(args)...}
 	{
+	}
+
+	template <class... Args>
+	constexpr Vector(std::initializer_list<ValueType> list) : Parent{StorageType{data_, sizeof...(Args)}, capacity}, data_{}
+	{
+		for (const auto& value : list)
+		{
+			this->pushBack(value);
+		}
 	}
 
 	template <Size otherCapacity>

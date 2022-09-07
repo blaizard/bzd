@@ -88,9 +88,9 @@ struct ClientTraits<bzd::platform::posix::network::tcp::Client<Proactor>>
 			co_return co_await proactor_.write(socket_.getFileDescriptor(), data);
 		}
 
-		bzd::Async<bzd::Span<Byte>> read(const bzd::Span<Byte> data) noexcept override
+		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
 		{
-			co_return co_await proactor_.read(socket_.getFileDescriptor(), data);
+			co_return co_await proactor_.read(socket_.getFileDescriptor(), bzd::move(data));
 		}
 
 	private:

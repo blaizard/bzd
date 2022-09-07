@@ -44,17 +44,13 @@ public: // Constructors
 	}
 
 public: // API
-	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
 	{
 		if (!init_)
 		{
 			co_return bzd::error::Failure("No terminal."_csv);
 		}
-		if (data.size() == 0)
-		{
-			co_return bzd::error::Failure("Empty buffer passed to read(...)."_csv);
-		}
-		co_return (co_await proactor_.read(in_, data));
+		co_return (co_await proactor_.read(in_, bzd::move(data)));
 	}
 
 private:

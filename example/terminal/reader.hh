@@ -115,7 +115,7 @@ private:
 		{
 			co_return bzd::error::Failure("Ring buffer of {} bytes is full."_csv, buffer_.size());
 		}
-		auto result = co_await !in_.read(span);
+		auto result = co_await !in_.readToBuffer(bzd::move(span));
 
 		buffer_.produce(result.size());
 

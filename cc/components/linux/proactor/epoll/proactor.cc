@@ -23,7 +23,7 @@ bzd::Async<> Proactor::init() noexcept
 }
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-bzd::Async<bzd::Span<bzd::Byte>> Proactor::read(const posix::FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept
+bzd::Async<bzd::Span<const bzd::Byte>> Proactor::read(const posix::FileDescriptor fd, bzd::Span<bzd::Byte>&& data) noexcept
 {
 	// Wait until some data is available.
 	{
@@ -60,7 +60,7 @@ bzd::Async<bzd::Span<bzd::Byte>> Proactor::read(const posix::FileDescriptor fd, 
 	{
 		co_return bzd::error::Errno("read");
 	}
-	co_return data.subSpan(0, static_cast<bzd::Size>(size));
+	co_return data.first(static_cast<bzd::Size>(size));
 }
 
 // NOLINTNEXTLINE(bugprone-exception-escape)

@@ -15,7 +15,7 @@ namespace bzd::platform::posix::sync {
 class Proactor : public bzd::platform::posix::Proactor<Proactor>
 {
 public:
-	/// Perform a synchronous write operator.
+	/// Perform a synchronous write operation.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept
 	{
@@ -37,9 +37,9 @@ public:
 		co_return {};
 	}
 
-	/// Perform a synchronous read operator.
+	/// Perform a synchronous read operation.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
-	bzd::Async<bzd::Span<bzd::Byte>> read(const FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept
+	bzd::Async<bzd::Span<const bzd::Byte>> read(const FileDescriptor fd, bzd::Span<bzd::Byte>&& data) noexcept
 	{
 		while (true)
 		{
@@ -57,7 +57,7 @@ public:
 		}
 	}
 
-	/// Perform a synchronous connect operator.
+	/// Perform a synchronous connect operation.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<> connect(const FileDescriptor fd, const network::Address& address) noexcept
 	{

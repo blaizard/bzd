@@ -24,11 +24,10 @@ public: // Traits.
 public: // Constructors/assignments.
 	constexpr RingBuffer() noexcept = default;
 
-	// Cannot be copied nor moved, the ring buffer should be passed by reference instead.
-	constexpr RingBuffer(const Self&) noexcept = delete;
-	constexpr Self& operator=(const Self&) noexcept = delete;
-	constexpr RingBuffer(Self&&) noexcept = delete;
-	constexpr Self& operator=(Self&&) noexcept = delete;
+	constexpr RingBuffer(const Self&) noexcept = default;
+	constexpr Self& operator=(const Self&) noexcept = default;
+	constexpr RingBuffer(Self&&) noexcept = default;
+	constexpr Self& operator=(Self&&) noexcept = default;
 
 public: // Size.
 	[[nodiscard]] constexpr bzd::Bool empty() const noexcept { return size() == 0; }
@@ -135,14 +134,14 @@ private: // Variables.
 } // namespace bzd::impl
 
 namespace bzd {
-template <class T, Size N>
-class RingBuffer : public impl::RingBuffer<T, impl::FixedStorage<T, N>>
+template <class T, Size capacity>
+class RingBuffer : public impl::RingBuffer<T, impl::FixedStorage<T, capacity>>
 {
-	static_assert((N & (N - 1)) == 0, "The capacity of a RingBuffer must be a power of 2.");
+	static_assert((capacity & (capacity - 1)) == 0, "The capacity of a RingBuffer must be a power of 2.");
 
 protected:
-	using Parent = impl::RingBuffer<T, impl::FixedStorage<T, N>>;
-	using Self = RingBuffer<T, N>;
+	using Parent = impl::RingBuffer<T, impl::FixedStorage<T, capacity>>;
+	using Self = RingBuffer<T, capacity>;
 	using StorageType = typename Parent::StorageType;
 
 public: // Constructor.

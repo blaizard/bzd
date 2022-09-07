@@ -13,6 +13,7 @@ bzd_cc_library(
         ":named_type",
         ":non_owning_list",
         ":optional",
+        ":ostream_buffered",
         ":pool",
         ":queue",
         ":reference_wrapper",
@@ -163,6 +164,21 @@ cc_library(
         "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
+    name = "ostream_buffered",
+    hdrs = [
+        "ostream_buffered.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":span",
+        ":vector",
+        "//cc/bzd/core:channel",
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:types",
     ],
 )
 
