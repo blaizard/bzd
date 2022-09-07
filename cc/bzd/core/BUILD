@@ -51,6 +51,7 @@ cc_library(
         "//cc/bzd/container:spans",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:distance",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
     ],

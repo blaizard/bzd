@@ -1,8 +1,10 @@
 #pragma once
 
-#include "cc/bzd.hh"
+#include "cc/bzd/container/ostream_buffered.hh"
+#include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
+#include "cc/libs/http/ichannel_reader.hh"
 
 namespace bzd::http {
 
@@ -16,53 +18,48 @@ struct Header
 	static constexpr Header accept(const StringView value) noexcept { return {"Accept"_sv, value}; }
 };
 
-template <Size capacity>
-class BufferedStream : public bzd::OStream
+template <class Client>
+class Response : public bzd::IStream
 {
 public:
-	constexpr BufferedStream(bzd::OStream& stream) noexcept : stream_{stream} {}
-
-	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
+	constexpr Response(Client& client) noexcept :
+		client_{client}, connectCounter_{client.connectCounter_}, reader_{client_.stream_.valueMutable()}
 	{
-		auto dataLeft = data;
-		while (dataLeft.size())
-		{
-			const auto sizeLeft = buffer_.capacity() - buffer_.size();
-			if (sizeLeft < dataLeft.size())
-			{
-				buffer_.insertBack(dataLeft.first(sizeLeft));
-				dataLeft = dataLeft.subSpan(sizeLeft);
-				co_await !flush();
-			}
-			else
-			{
-				buffer_.insertBack(dataLeft);
-			}
-		}
-		co_return {};
 	}
 
-	bzd::Async<> flush() noexcept
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
 	{
-		co_await !stream_.write(buffer_.asBytes());
-		buffer_.clear();
-		co_return {};
+		// A new connection has been sent, the response object is invalid.
+		if (client_.connectCounter_ != connectCounter_)
+		{
+			co_return bzd::error::Failure("Session expired.");
+		}
+
+		// Transfer-Encoding
+
+		const auto read = co_await !client_.stream_->read(bzd::move(data));
+		co_return read;
 	}
 
 private:
-	bzd::OStream& stream_;
-	Vector<Byte, capacity> buffer_;
+	Client& client_;
+	Size connectCounter_;
+	IStreamReader<256u> reader_;
 };
 
-template <class Client, Size capacityHeaders = 1u>
+template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>
 class Request
 {
+private:
+	template <Size otherCapacityHeaders>
+	using RequestCompatible = Request<method, Client, otherCapacityHeaders>;
+
 public:
 	constexpr Request(Client& client, const StringView path) noexcept : client_{client}, path_{path} {}
 
 private:
 	template <Size oldCapacityHeaders>
-	constexpr Request(Request<Client, oldCapacityHeaders>&& other) noexcept :
+	constexpr Request(RequestCompatible<oldCapacityHeaders>&& other) noexcept :
 		client_{other.client_}, path_{other.path_}, headers_{bzd::move(other.headers_)}
 	{
 	}
@@ -71,18 +68,20 @@ public:
 	/// Add an additional header to the request.
 	constexpr auto header(Header&& header) &&
 	{
-		Request<Client, capacityHeaders + 1u> request{bzd::move(*this)};
+		RequestCompatible<capacityHeaders + 1u> request{bzd::move(*this)};
 		request.headers_.emplaceBack(bzd::move(header));
 		return request;
 	}
 
+	constexpr auto header(const StringView key, const StringView value) && { return bzd::move(*this).header(Header{key, value}); }
+
 	template <Size bufferCapacity = 100>
-	Async<> send() &&
+	Async<Response<Client>> send() &&
 	{
 		auto scope = co_await !client_.connectIfNeeded();
 
-		BufferedStream<bufferCapacity> buffer{client_.stream_.valueMutable()};
-		co_await !::toStream(buffer, "GET {} HTTP/1.1\r\n"_csv, path_);
+		OStreamBuffered<bufferCapacity> buffer{client_.stream_.valueMutable()};
+		co_await !::toStream(buffer, "{} {} HTTP/1.1\r\n"_csv, method.data(), path_);
 		for (const auto& header : headers_)
 		{
 			co_await !::toStream(buffer, "{}: {}\r\n"_csv, header.key, header.value);
@@ -90,11 +89,11 @@ public:
 		co_await !::toStream(buffer, "\r\n"_csv);
 		co_await !buffer.flush();
 
-		co_return {};
+		co_return Response<Client>{client_};
 	}
 
 private:
-	template <class, Size>
+	template <meta::StringLiteral, class, Size>
 	friend class Request;
 
 	Client& client_;
@@ -115,38 +114,29 @@ public:
 	{
 	}
 
-	constexpr auto request(const StringView path = "/"_sv) { return Request{*this, path}; }
-
-	Async<> get(const StringView path, const interface::Map<StringView, StringView>) noexcept
+	template <meta::StringLiteral method>
+	constexpr auto request(const StringView path = "/"_sv) noexcept
 	{
-		stream_ = co_await !network_.connect(hostname_, port_);
-		co_await !toStream(stream_.valueMutable(),
-						   "GET {} HTTP/1.1\r\n"
-						   "Host: {}\r\n"
-						   "User-Agent: bzd\r\n"
-						   "Accept: */*\r\n\r\n"_csv,
-						   path,
-						   hostname_);
-
-		co_return {};
+		return Request<method, Self>{*this, path};
 	}
+	constexpr auto get(const StringView path = "/"_sv) noexcept { return request<"GET">(path); }
+	constexpr auto head(const StringView path = "/"_sv) noexcept { return request<"HEAD">(path); }
+	constexpr auto post(const StringView path = "/"_sv) noexcept { return request<"POST">(path); }
+	constexpr auto put(const StringView path = "/"_sv) noexcept { return request<"PUT">(path); }
 
 private:
-	template <class, Size>
+	template <meta::StringLiteral, class, Size>
 	friend class Request;
+
+	template <class>
+	friend class Response;
 
 	Async<lockGuard::Type<Mutex>> connectIfNeeded()
 	{
 		auto scope = co_await !makeLockGuard(mutex_);
 		stream_ = co_await !network_.connect(hostname_, port_);
+		++connectCounter_;
 		co_return bzd::move(scope);
-	}
-
-	template <class... Args>
-	Async<> toStream(interface::String& buffer, Args&&... args)
-	{
-		co_await !::toStream(stream_.valueMutable(), bzd::forward<Args>(args)...);
-		co_return {};
 	}
 
 private:
@@ -154,7 +144,9 @@ private:
 	Optional<typename Network::Stream> stream_;
 	StringView hostname_;
 	UInt32 port_;
-	Mutex mutex_;
+	/// The number of times a new connection was established.
+	Size connectCounter_{0};
+	Mutex mutex_{};
 };
 
 } // namespace bzd::http

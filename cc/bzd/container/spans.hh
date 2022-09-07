@@ -36,7 +36,7 @@ public: // Constructors/assignments.
 
 public:
 	/// Get the underlying container.
-	[[nodiscard]] constexpr auto& array() const noexcept { return spans_; }
+	[[nodiscard]] constexpr auto& spans() const noexcept { return spans_; }
 
 	/// Get the size of the memory sequence.
 	/// This is adding all span sizes and returning the sum.

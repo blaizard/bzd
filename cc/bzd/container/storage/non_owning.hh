@@ -30,8 +30,7 @@ public: // Constructors
 
 	// Ability to construct a const storage from a non-const
 	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr NonOwningStorage(const NonOwningStorage<bzd::typeTraits::RemoveConst<T>>& storage) noexcept :
-		data_{storage.data_}, size_{storage.size_}
+	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept : data_{storage.data_}, size_{storage.size_}
 	{
 	}
 

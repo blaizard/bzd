@@ -25,7 +25,7 @@ public:
 		return *this;
 	}
 
-	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
 	{
 		if (buffer_.empty())
 		{

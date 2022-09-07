@@ -8,6 +8,6 @@ class Stub : public bzd::IOStream
 public:
 	bzd::Async<> write(const bzd::Span<const bzd::Byte>) noexcept override { co_return {}; }
 
-	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte>) noexcept override { co_return bzd::Span<bzd::Byte>{}; }
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&&) noexcept override { co_return bzd::Span<const bzd::Byte>{}; }
 };
 } // namespace bzd::platform::generic::stream

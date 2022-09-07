@@ -8,7 +8,7 @@ TEST(ContainerSpans, Base)
 	bzd::Spans<int, 2> spans(bzd::inPlace, bzd::Span<int>{array, 5}, bzd::Span<int>{array + 6, 3});
 
 	EXPECT_EQ(spans.size(), 8U);
-	EXPECT_EQ(spans.array().size(), 2U);
+	EXPECT_EQ(spans.spans().size(), 2U);
 }
 
 TEST(ContainerSpans, SubSpans)

@@ -27,9 +27,9 @@ public:
 	/// \param fd The file descriptor to read from.
 	/// \param data The data blob to receive data.
 	/// \return The span of data read.
-	bzd::Async<bzd::Span<bzd::Byte>> read(const FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept
+	bzd::Async<bzd::Span<const bzd::Byte>> read(const FileDescriptor fd, bzd::Span<bzd::Byte>&& data) noexcept
 	{
-		return bzd::impl::getImplementation(this, &Proactor::read, &Impl::read)->read(fd, data);
+		return bzd::impl::getImplementation(this, &Proactor::read, &Impl::read)->read(fd, bzd::move(data));
 	}
 
 	/// Perform an asynchronous connect operator: https://man7.org/linux/man-pages/man2/connect.2.html

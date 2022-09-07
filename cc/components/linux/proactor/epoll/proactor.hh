@@ -26,7 +26,7 @@ public:
 	bzd::Async<> init() noexcept;
 
 	/// Perform an asynchronous read operator.
-	bzd::Async<bzd::Span<bzd::Byte>> read(const posix::FileDescriptor fd, const bzd::Span<bzd::Byte> data) noexcept;
+	bzd::Async<bzd::Span<const bzd::Byte>> read(const posix::FileDescriptor fd, bzd::Span<bzd::Byte>&& data) noexcept;
 
 	/// Execution loop for the reactor to poll events.
 	bzd::Async<> exec() noexcept;

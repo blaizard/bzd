@@ -79,7 +79,7 @@ public:
 		co_return {};
 	}
 
-	bzd::Async<bzd::Span<bzd::Byte>> read(const bzd::Span<bzd::Byte> data) noexcept override { co_return data; }
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override { co_return data; }
 };
 
 class Adapter2
