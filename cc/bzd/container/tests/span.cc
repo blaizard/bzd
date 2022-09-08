@@ -188,39 +188,51 @@ TEST(ContainerSpan, Subspan)
 	{
 		const auto subSpan = span.subSpan();
 		EXPECT_EQ(subSpan.size(), 5U);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
 		const auto subSpan = span.subSpan(1);
 		EXPECT_EQ(subSpan.size(), 4U);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
 		const auto subSpan = span.subSpan(4);
 		EXPECT_EQ(subSpan.size(), 1U);
 		EXPECT_EQ(subSpan[0], 4);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
 		const auto subSpan = span.subSpan(1, 2);
 		EXPECT_EQ(subSpan.size(), 2U);
 		EXPECT_EQ(subSpan[0], 1);
 		EXPECT_EQ(subSpan[1], 2);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
 		const auto subSpan = span.subSpan(1, 4);
 		EXPECT_EQ(subSpan.size(), 4U);
 		EXPECT_EQ(subSpan[2], 3);
 		EXPECT_EQ(subSpan[3], 4);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
-		const auto subspan = span.first(2);
-		EXPECT_EQ(subspan.size(), 2U);
-		EXPECT_EQ(subspan[0], 0);
-		EXPECT_EQ(subspan[1], 1);
+		const auto subSpan = span.first(2);
+		EXPECT_EQ(subSpan.size(), 2U);
+		EXPECT_EQ(subSpan[0], 0);
+		EXPECT_EQ(subSpan[1], 1);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
 	}
 	{
 		const auto subSpan = span.last(2);
 		EXPECT_EQ(subSpan.size(), 2U);
 		EXPECT_EQ(subSpan[0], 3);
 		EXPECT_EQ(subSpan[1], 4);
+		EXPECT_TRUE(subSpan.isSubSpan(span));
+	}
+	{
+		const auto subSpan = span.subSpan(5);
+		EXPECT_EQ(subSpan.size(), 0u);
+		EXPECT_FALSE(subSpan.isSubSpan(span));
 	}
 }
 

@@ -97,8 +97,7 @@ public:
 		{
 			co_return bzd::Span<T>{};
 		}
-		// TODO: should be fixed to support data that is written within.
-		if (dataRead.data() == data.data())
+		if (dataRead.isSubSpan(data))
 		{
 			// It is safe to const-cast here as we tested that the buffer is part of the one given into argument.
 			co_return bzd::Span<T>{const_cast<T*>(dataRead.data()), dataRead.size()};

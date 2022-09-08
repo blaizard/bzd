@@ -9,7 +9,7 @@
 
 namespace bzd::test {
 
-template <bzd::Size N>
+template <bzd::Size capacity>
 class IStream : public bzd::IStream
 {
 protected:
@@ -45,7 +45,7 @@ public:
 	}
 
 private:
-	bzd::RingBuffer<bzd::Byte, N> buffer_{};
+	bzd::RingBuffer<bzd::Byte, capacity> buffer_{};
 };
 
 } // namespace bzd::test

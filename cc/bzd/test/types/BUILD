@@ -9,6 +9,7 @@ bzd_cc_library(
     deps = [
         ":copy_only",
         ":istream",
+        ":istream_reader",
         ":lifetime_counter",
         ":move_only",
         ":no_default_constructor",
@@ -38,6 +39,20 @@ cc_library(
         "//cc/bzd/container:ring_buffer",
         "//cc/bzd/container:span",
         "//cc/bzd/container:string_view",
+        "//cc/bzd/core:channel",
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "istream_reader",
+    hdrs = [
+        "istream_reader.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:string",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",

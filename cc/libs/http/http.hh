@@ -4,7 +4,7 @@
 #include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
-#include "cc/libs/http/ichannel_reader.hh"
+#include "cc/libs/reader/stream_reader.hh"
 
 namespace bzd::http {
 
@@ -44,7 +44,7 @@ public:
 private:
 	Client& client_;
 	Size connectCounter_;
-	IStreamReader<256u> reader_;
+	StreamReader<256u> reader_;
 };
 
 template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>

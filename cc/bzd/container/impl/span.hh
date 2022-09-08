@@ -101,6 +101,13 @@ public: // Comparison operators
 
 	[[nodiscard]] constexpr Bool operator>=(const Self& other) const noexcept { return !(*this < other); }
 
+	/// Check if this is a subview of another span.
+	template <class U, class V>
+	[[nodiscard]] constexpr Bool isSubSpan(const Span<U, V>& other) const noexcept
+	{
+		return (size() > 0) && (data() >= other.data() && &(data()[size()]) <= &(other.data()[other.size()]));
+	}
+
 public: // Accessors
 	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return at(index); }
 	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return at(index); }
