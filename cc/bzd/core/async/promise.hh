@@ -281,6 +281,8 @@ public:
 	};
 	/// Overload to support `co_return {};`.
 	constexpr void return_value(Empty) noexcept { this->result_.emplace(bzd::nullresult); }
+
+	constexpr bool isCompleted() const noexcept { return this->isReady(); }
 };
 
 template <class T>
@@ -296,7 +298,12 @@ public:
 		return {};
 	}
 
-	constexpr void return_void() noexcept {}
+	constexpr void return_void() noexcept { isCompleted_ = true; }
+
+	constexpr bool isCompleted() const noexcept { return isCompleted_; }
+
+private:
+	Bool isCompleted_{false};
 };
 
 } // namespace bzd::coroutine

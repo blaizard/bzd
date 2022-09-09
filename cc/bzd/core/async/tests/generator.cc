@@ -26,11 +26,6 @@ TEST_ASYNC(Generator, Simple)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
 	}
-	// Support error propagation.
-	{
-		const auto result = co_await !async;
-		EXPECT_EQ(result, static_cast<bzd::Size>(2));
-	}
 
 	co_return {};
 }
@@ -61,11 +56,6 @@ TEST_ASYNC(Generator, WithAwaitable)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
 	}
-	// Support error propagation.
-	{
-		const auto result = co_await !async;
-		EXPECT_EQ(result, static_cast<bzd::Size>(2));
-	}
 
 	co_return {};
 }
@@ -92,11 +82,6 @@ TEST_ASYNC(Generator, NestedGenerator)
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
 	}
-	// Support error propagation.
-	{
-		const auto result = co_await !async;
-		EXPECT_EQ(result, static_cast<bzd::Size>(2));
-	}
 
 	co_return {};
 }
@@ -115,13 +100,26 @@ bzd::Generator<bzd::Size> generatorError(bzd::Size count)
 	}
 }
 
-TEST_ASYNC(Generator, ErrorPropagation)
+TEST_ASYNC(Generator, ErrorPropagationWithinGenerator)
 {
 	auto async = generatorError(10);
 	{
 		const auto result = co_await async;
 		EXPECT_FALSE(result);
 	}
+
+	co_return {};
+}
+
+TEST_ASYNC(Generator, ForLoop)
+{
+	auto async = generator(10);
+	bzd::Size expected{0};
+	co_await !bzd::async::forEach(bzd::move(async), [&](auto&& value) {
+		EXPECT_EQ(value, expected);
+		++expected;
+	});
+	EXPECT_EQ(expected, 10u);
 
 	co_return {};
 }
