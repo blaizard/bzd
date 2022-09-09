@@ -1,0 +1,127 @@
+#include "cc/bzd/container/string.hh"
+#include "cc/bzd/core/async.hh"
+#include "cc/bzd/test/test.hh"
+#include "cc/bzd/test/types/move_only.hh"
+#include "cc/bzd/utility/format/integral.hh"
+#include "cc/bzd/utility/scope_guard.hh"
+
+bzd::Generator<bzd::Size> generator(bzd::Size count)
+{
+	for (bzd::Size i = 0; i < count; ++i)
+	{
+		co_yield i;
+	}
+}
+
+TEST_ASYNC(Generator, Simple)
+{
+	auto async = generator(10);
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
+	}
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
+	}
+	// Support error propagation.
+	{
+		const auto result = co_await !async;
+		EXPECT_EQ(result, static_cast<bzd::Size>(2));
+	}
+
+	co_return {};
+}
+
+bzd::Async<bzd::Size> lazy(bzd::Size value)
+{
+	co_return value;
+}
+
+bzd::Generator<bzd::Size> generatorWithAwaitable(bzd::Size count)
+{
+	for (bzd::Size i = 0; i < count; ++i)
+	{
+		co_yield co_await lazy(i);
+	}
+}
+
+TEST_ASYNC(Generator, WithAwaitable)
+{
+	auto async = generatorWithAwaitable(10);
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
+	}
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
+	}
+	// Support error propagation.
+	{
+		const auto result = co_await !async;
+		EXPECT_EQ(result, static_cast<bzd::Size>(2));
+	}
+
+	co_return {};
+}
+
+bzd::Generator<bzd::Size> generatorNested(bzd::Size count)
+{
+	auto async = generator(count);
+	for (bzd::Size i = 0; i < count; ++i)
+	{
+		co_yield co_await async;
+	}
+}
+
+TEST_ASYNC(Generator, NestedGenerator)
+{
+	auto async = generatorNested(10);
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
+	}
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
+	}
+	// Support error propagation.
+	{
+		const auto result = co_await !async;
+		EXPECT_EQ(result, static_cast<bzd::Size>(2));
+	}
+
+	co_return {};
+}
+
+bzd::Async<bzd::Size> generatorErrorAsync()
+{
+	co_return bzd::error::Failure("Dummy"_csv);
+}
+
+bzd::Generator<bzd::Size> generatorError(bzd::Size count)
+{
+	for (bzd::Size i = 0; i < count; ++i)
+	{
+		co_await !generatorErrorAsync();
+		co_yield i;
+	}
+}
+
+TEST_ASYNC(Generator, ErrorPropagation)
+{
+	auto async = generatorError(10);
+	{
+		const auto result = co_await async;
+		EXPECT_FALSE(result);
+	}
+
+	co_return {};
+}
