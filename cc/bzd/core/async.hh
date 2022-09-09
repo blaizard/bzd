@@ -32,7 +32,7 @@ struct AsyncTag
 {
 };
 
-enum class AsyncVariant
+enum class AsyncType
 {
 	task,
 	generator
@@ -41,14 +41,16 @@ enum class AsyncVariant
 template <class T>
 struct AsyncTaskTraits
 {
-	static constexpr auto type = AsyncVariant::task;
+	static constexpr AsyncType type{AsyncType::task};
+	static constexpr Bool isReentrant = false;
 	using PromiseType = bzd::coroutine::PromiseTask<T>;
 };
 
 template <class T>
 struct AsyncGeneratorTraits
 {
-	static constexpr auto type = AsyncVariant::generator;
+	static constexpr AsyncType type{AsyncType::generator};
+	static constexpr Bool isReentrant = true;
 	using PromiseType = bzd::coroutine::PromiseGenerator<T>;
 };
 
@@ -61,6 +63,7 @@ public: // Traits
 	using ResultType = typename PromiseType::ResultType;
 	using Self = Async;
 	using Tag = bzd::impl::AsyncTag;
+	static constexpr AsyncType type{Traits<T>::type};
 
 public: // constructor/destructor/assignments
 	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
@@ -90,7 +93,10 @@ public:
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
 
-	[[nodiscard]] constexpr bool isCompleted() const noexcept { return isReady() || isCanceled(); }
+	[[nodiscard]] constexpr bool isCompleted() const noexcept
+	{
+		return (handle_) ? (handle_.promise().isCompleted() || handle_.promise().isCanceled()) : false;
+	}
 
 	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOut() noexcept
 	{
@@ -113,6 +119,9 @@ public:
 		public:
 			constexpr AsyncPropagate(impl::Async<T, Traits>&& async) noexcept : Parent{bzd::move(async)}
 			{
+				// Not compatible with re-entrant function because this moves the asynchronous into a wrapper,
+				// therefore the original async looses the ownership.
+				static_assert(!Traits<T>::isReentrant, "Error propagation is not compatible with re-entrant asyncs.");
 				this->handle_.promise().setPropagate(
 					PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate>(*this));
 			}
@@ -238,17 +247,7 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() noexcept
-	{
-		if constexpr (Traits<T>::type == AsyncVariant::task)
-		{
-			return isReady();
-		}
-		else if constexpr (Traits<T>::type == AsyncVariant::generator)
-		{
-			return false;
-		}
-	}
+	constexpr bool await_ready() noexcept { return isCompleted(); }
 
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
@@ -331,10 +330,37 @@ public:
 
 namespace bzd::concepts {
 template <class T>
-concept async = sameAs<typename T::Tag, bzd::impl::AsyncTag>;
-}
+concept async = requires(T t)
+{
+	{
+		t.type
+		} -> sameAs<const bzd::impl::AsyncType&>;
+};
+template <class T>
+concept asyncTask = async<T> &&(T::type == bzd::impl::AsyncType::task);
+template <class T>
+concept asyncGenerator = async<T> &&(T::type == bzd::impl::AsyncType::generator);
+} // namespace bzd::concepts
 
 namespace bzd::async {
+
+template <concepts::asyncGenerator T, class Callable>
+bzd::Async<> forEach(T&& async, Callable&& callable) noexcept
+{
+	while (true)
+	{
+		auto result = co_await async;
+		if (async.isCompleted())
+		{
+			co_return {};
+		}
+		if (!result)
+		{
+			co_return bzd::move(result).propagate();
+		}
+		callable(bzd::move(result).valueMutable());
+	}
+}
 
 constexpr auto yield() noexcept
 {
