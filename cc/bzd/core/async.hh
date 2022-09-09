@@ -32,14 +32,34 @@ struct AsyncTag
 {
 };
 
+enum class AsyncVariant
+{
+	task,
+	generator
+};
+
 template <class T>
+struct AsyncTaskTraits
+{
+	static constexpr auto type = AsyncVariant::task;
+	using PromiseType = bzd::coroutine::PromiseTask<T>;
+};
+
+template <class T>
+struct AsyncGeneratorTraits
+{
+	static constexpr auto type = AsyncVariant::generator;
+	using PromiseType = bzd::coroutine::PromiseGenerator<T>;
+};
+
+template <class T, template <class> class Traits>
 class [[nodiscard]] Async
 {
 public: // Traits
-	using PromiseType = bzd::coroutine::Promise<T>;
+	using PromiseType = typename Traits<T>::PromiseType;
 	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
-	using Self = Async<T>;
+	using Self = Async;
 	using Tag = bzd::impl::AsyncTag;
 
 public: // constructor/destructor/assignments
@@ -84,14 +104,14 @@ public:
 	template <bzd::Size index = 0>
 	constexpr auto assertHasValue() noexcept
 	{
-		class AsyncPropagate : public impl::Async<T>
+		class AsyncPropagate : public impl::Async<T, Traits>
 		{
 		public:
 			using Self = AsyncPropagate;
-			using Parent = impl::Async<T>;
+			using Parent = impl::Async<T, Traits>;
 
 		public:
-			constexpr AsyncPropagate(impl::Async<T>&& async) noexcept : Parent{bzd::move(async)}
+			constexpr AsyncPropagate(impl::Async<T, Traits>&& async) noexcept : Parent{bzd::move(async)}
 			{
 				this->handle_.promise().setPropagate(
 					PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate>(*this));
@@ -218,10 +238,20 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() noexcept { return isReady(); }
+	constexpr bool await_ready() noexcept
+	{
+		if constexpr (Traits<T>::type == AsyncVariant::task)
+		{
+			return isReady();
+		}
+		else if constexpr (Traits<T>::type == AsyncVariant::generator)
+		{
+			return false;
+		}
+	}
 
 	template <class U>
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<bzd::coroutine::Promise<U>> caller) noexcept
+	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
 	{
 		// caller ()
 		// {
@@ -284,10 +314,17 @@ private:
 namespace bzd {
 
 template <class V = void, class E = bzd::Error>
-class Async : public impl::Async<bzd::Result<V, E>>
+class Async : public impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>
 {
 public:
-	using impl::Async<bzd::Result<V, E>>::Async;
+	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
+};
+
+template <class V = void, class E = bzd::Error>
+class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>
+{
+public:
+	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
 };
 
 } // namespace bzd
@@ -323,7 +360,7 @@ constexpr auto suspend(Args&&... args) noexcept
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
-		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType> all(Asyncs&&... asyncs)
+		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType, impl::AsyncTaskTraits> all(Asyncs&&... asyncs)
 noexcept
 {
 	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
@@ -332,7 +369,7 @@ noexcept
 /// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
-		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType> any(Asyncs&&... asyncs)
+		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType, impl::AsyncTaskTraits> any(Asyncs&&... asyncs)
 noexcept
 {
 	co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});

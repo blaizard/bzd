@@ -6,6 +6,7 @@ bzd_cc_test(
         "async.cc",
         "cancellation.cc",
         "error.cc",
+        "generator.cc",
     ],
     deps = [
         "//cc/bzd/core/async",

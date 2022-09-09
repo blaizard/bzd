@@ -72,7 +72,8 @@ public:
 
 	constexpr void setContinuation(Executable& continuation) noexcept
 	{
-		bzd::assert::isTrue(continuation_.is<bzd::monostate>());
+		// Disabled to support generators
+		// bzd::assert::isTrue(continuation_.is<bzd::monostate>());
 		continuation_.emplace<Executable*>(&continuation);
 	}
 
@@ -133,7 +134,7 @@ class Promise : public Executable
 private:
 	using Self = Promise<T>;
 
-private:
+protected:
 	struct FinalAwaiter
 	{
 		constexpr bool await_ready() noexcept { return false; }
@@ -204,8 +205,8 @@ public: // Memory allocation
 } // namespace bzd::coroutine::impl
 
 namespace bzd::coroutine {
-template <class T>
-class Promise : public impl::Promise<Promise<T>>
+template <class T, class PromiseType>
+class Promise : public impl::Promise<PromiseType>
 {
 private:
 	template <class>
@@ -229,27 +230,18 @@ private:
 	};
 
 public:
-	using Self = Promise<T>;
+	using Self = Promise;
 	using ResultType = T;
-	using impl::Promise<Promise<T>>::Promise;
+	using impl::Promise<PromiseType>::Promise;
 	static constexpr Bool resultTypeIsResult = ResultOfError<ResultType>::value;
 	static constexpr Bool resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
 
-	constexpr Promise() noexcept : impl::Promise<Self>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
+	constexpr Promise() noexcept : impl::Promise<PromiseType>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 
-	constexpr auto get_return_object() noexcept { return bzd::coroutine::impl::coroutine_handle<Promise>::from_promise(*this); }
-
-	template <class U>
-	constexpr void return_value(U&& result) noexcept
+	constexpr auto get_return_object() noexcept
 	{
-		result_.emplace(bzd::forward<U>(result));
+		return bzd::coroutine::impl::coroutine_handle<PromiseType>::from_promise(static_cast<PromiseType&>(*this));
 	}
-
-	struct Empty
-	{
-	};
-	/// Overload to support `co_return {};`.
-	constexpr void return_value(Empty) noexcept { result_.emplace(bzd::nullresult); }
 
 	constexpr bool isReady() const noexcept { return result_.hasValue(); }
 
@@ -268,8 +260,43 @@ public:
 		}
 	}
 
-private:
+protected:
 	bzd::Optional<T> result_{};
+};
+
+template <class T>
+class PromiseTask : public Promise<T, PromiseTask<T>>
+{
+public:
+	using Promise<T, PromiseTask>::Promise;
+
+	template <class U>
+	constexpr void return_value(U&& result) noexcept
+	{
+		this->result_.emplace(bzd::forward<U>(result));
+	}
+
+	struct Empty
+	{
+	};
+	/// Overload to support `co_return {};`.
+	constexpr void return_value(Empty) noexcept { this->result_.emplace(bzd::nullresult); }
+};
+
+template <class T>
+class PromiseGenerator : public Promise<T, PromiseGenerator<T>>
+{
+public:
+	using Promise<T, PromiseGenerator>::Promise;
+
+	template <class U>
+	constexpr typename impl::Promise<PromiseGenerator>::FinalAwaiter yield_value(U&& result) noexcept
+	{
+		this->result_.emplace(bzd::forward<U>(result));
+		return {};
+	}
+
+	constexpr void return_void() noexcept {}
 };
 
 } // namespace bzd::coroutine
