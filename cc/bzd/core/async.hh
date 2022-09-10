@@ -317,6 +317,12 @@ class Async : public impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
+
+	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
+	constexpr Async& operator co_await() noexcept
+	{
+		return *this;
+	}
 };
 
 template <class V = void, class E = bzd::Error>
@@ -324,6 +330,12 @@ class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTrai
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
+
+	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
+	constexpr Generator& operator co_await() noexcept
+	{
+		return *this;
+	}
 };
 
 } // namespace bzd
