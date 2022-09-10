@@ -31,6 +31,16 @@ TEST_ASYNC(Coroutine, Void)
 	co_return {};
 }
 
+TEST_ASYNC(Coroutine, CoAwaitFromVariable)
+{
+	bzd::String<32> trace;
+	auto async = nopVoid(trace, "a");
+	const auto result = co_await async;
+	EXPECT_TRUE(result);
+	EXPECT_EQ(trace, "[a-1]");
+	co_return {};
+}
+
 bzd::Async<int> nop(bzd::interface::String& trace, bzd::StringView id, int retVal)
 {
 	appendToTrace(trace, id, 0);
