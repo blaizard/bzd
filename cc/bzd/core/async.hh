@@ -90,7 +90,7 @@ public: // constructor/destructor/assignments
 
 public:
 	/// Notifies if the async is completed.
-	[[nodiscard]] constexpr bool isReady() const noexcept { return (handle_) ? handle_.promise().isReady() : false; }
+	[[nodiscard]] constexpr bool hasResult() const noexcept { return (handle_) ? handle_.promise().hasResult() : false; }
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
 
@@ -99,13 +99,10 @@ public:
 		return (handle_) ? (handle_.promise().isCompleted() || handle_.promise().isCanceled()) : false;
 	}
 
-	[[nodiscard]] constexpr bzd::Optional<ResultType> moveResultOut() noexcept
+	[[nodiscard]] constexpr ResultType moveResultOut() noexcept
 	{
-		if (handle_)
-		{
-			return handle_.promise().moveResultOut();
-		}
-		return nullopt;
+		bzd::assert::isTrue(hasResult());
+		return bzd::move(moveOptionalResultOut().valueMutable());
 	}
 
 	template <bzd::Size index = 0>
@@ -180,13 +177,13 @@ public:
 			{
 				if constexpr (PromiseType::resultTypeIsResult)
 				{
-					auto result{bzd::move(Parent::await_resume())};
+					auto result{Parent::moveResultOut()};
 					bzd::assert::isTrue(result.hasValue());
 					return bzd::move(result.valueMutable());
 				}
 				else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
 				{
-					auto tuple{bzd::move(Parent::await_resume())};
+					auto tuple{Parent::moveResultOut()};
 					auto& maybeResult{tuple.template get<index>()};
 					bzd::assert::isTrue(maybeResult.hasValue());
 					bzd::assert::isTrue(maybeResult.value().hasValue());
@@ -231,10 +228,10 @@ public:
 			// Run the executor.
 			executor.run();
 			// Here should run the idle task.
-		} while (!isReady());
+		} while (!hasResult());
 
 		// Return the result.
-		return await_resume();
+		return moveResultOut();
 	}
 
 	/// Execute this coroutine on a free-standing executor.
@@ -248,7 +245,8 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() noexcept { return isCompleted(); }
+	constexpr bool await_ready() noexcept { 
+		return isCompleted(); }
 
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
@@ -277,13 +275,14 @@ public: // coroutine specific
 
 	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
-		bzd::assert::isTrue(isReady());
-		return bzd::move(moveResultOut().valueMutable());
+		return moveResultOut();
 	}
 
 private:
 	template <class... Args>
 	friend class bzd::coroutine::impl::Enqueue;
+	template <class... Args>
+	friend class bzd::coroutine::impl::EnqueueAny;
 
 	template <class U>
 	friend class bzd::coroutine::impl::Promise;
@@ -310,6 +309,15 @@ private:
 		return handle_.promise();
 	}
 
+	[[nodiscard]] constexpr bzd::Optional<ResultType> moveOptionalResultOut() noexcept
+	{
+		if (handle_)
+		{
+			return handle_.promise().moveOptionalResultOut();
+		}
+		return nullopt;
+	}
+
 	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_{};
 };
 
@@ -324,7 +332,10 @@ public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
 
 	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Async>(*this); }
+	constexpr auto operator co_await() noexcept
+	{
+		return bzd::coroutine::impl::Awaiter<Async>(*this);
+	}
 };
 
 template <class V = void, class E = bzd::Error>
@@ -334,7 +345,10 @@ public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
 
 	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Generator>(*this); }
+	constexpr auto operator co_await() noexcept
+	{
+		return bzd::coroutine::impl::Awaiter<Generator>(*this);
+	}
 };
 
 } // namespace bzd

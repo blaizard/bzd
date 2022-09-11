@@ -133,7 +133,7 @@ public: // Coroutine specializations.
 			[](auto&... asyncs) -> ResultType {
 				// By now all asyncs must have been either ready or canceled.
 				// Build the result and return it.
-				return ResultType{bzd::inPlace, asyncs.moveResultOut()...};
+				return ResultType{bzd::inPlace, asyncs.moveOptionalResultOut()...};
 			},
 			this->asyncs_);
 	}
