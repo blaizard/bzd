@@ -283,10 +283,8 @@ private:
 	friend class bzd::coroutine::impl::Enqueue;
 	template <class... Args>
 	friend class bzd::coroutine::impl::EnqueueAny;
-
 	template <class U>
 	friend class bzd::coroutine::impl::Promise;
-
 	template <class U>
 	friend class bzd::coroutine::impl::Awaiter;
 
@@ -318,6 +316,7 @@ private:
 		return nullopt;
 	}
 
+private:
 	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_{};
 };
 
