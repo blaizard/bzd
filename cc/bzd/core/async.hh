@@ -7,6 +7,7 @@
 #include "cc/bzd/core/async/awaitables/enqueue.hh"
 #include "cc/bzd/core/async/awaitables/get_executable.hh"
 #include "cc/bzd/core/async/awaitables/get_executor.hh"
+#include "cc/bzd/core/async/awaitables/propagate.hh"
 #include "cc/bzd/core/async/awaitables/suspend.hh"
 #include "cc/bzd/core/async/awaitables/yield.hh"
 #include "cc/bzd/core/async/cancellation.hh"
@@ -108,94 +109,24 @@ public:
 	template <bzd::Size index = 0>
 	constexpr auto assertHasValue() noexcept
 	{
-		class AsyncPropagate : public impl::Async<T, Traits>
+		// Not compatible with re-entrant function because this moves the asynchronous into a wrapper,
+		// therefore the original async looses the ownership.
+		static_assert(!Traits<T>::isReentrant, "Error propagation is not compatible with re-entrant asyncs.");
+		this->handle_.promise().setPropagate(
+			PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate<index>>(*this));
+
+		struct AsyncPropagate
 		{
 		public:
-			using Self = AsyncPropagate;
-			using Parent = impl::Async<T, Traits>;
+			constexpr explicit AsyncPropagate(Self& async) noexcept : async_{async} {}
 
-		public:
-			constexpr AsyncPropagate(impl::Async<T, Traits>&& async) noexcept : Parent{bzd::move(async)}
-			{
-				// Not compatible with re-entrant function because this moves the asynchronous into a wrapper,
-				// therefore the original async looses the ownership.
-				static_assert(!Traits<T>::isReentrant, "Error propagation is not compatible with re-entrant asyncs.");
-				this->handle_.promise().setPropagate(
-					PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate>(*this));
-			}
+			constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Propagate<Async, index>(async_); }
 
-			bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
-			{
-				// It must have a value, get a reference to it.
-				auto& result{this->handle_.promise().result().valueMutable()};
-				if constexpr (PromiseType::resultTypeIsResult)
-				{
-					static_assert(index == 0, "The index used with assert must be 0 for non-tuple-like results.");
-
-					if (result.hasError())
-					{
-						return bzd::move(result.errorMutable());
-					}
-				}
-				else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
-				{
-					static_assert(index < PromiseType::ResultType::size(), "The index used with assert is out of bound.");
-
-					// Return if one of the result is an error
-					for (auto& variant : result)
-					{
-						auto maybeError = variant.match([](auto& value) -> bzd::Error* {
-							if (value.hasValue() && value.value().hasError())
-							{
-								return &(value.valueMutable().errorMutable());
-							}
-							return nullptr;
-						});
-						if (maybeError)
-						{
-							return bzd::move(*maybeError);
-						}
-					}
-					// If not check that there is a value at the expected index.
-					if (!result.template get<index>().hasValue())
-					{
-						return bzd::Error{bzd::SourceLocation::current(),
-										  bzd::ErrorType::failure,
-										  "Got a value but not for the expected async #{}."_csv,
-										  index};
-					}
-				}
-				else
-				{
-					static_assert(bzd::meta::alwaysFalse<T>, "This type of Async cannot be used with assert(...).");
-				}
-
-				return bzd::nullopt;
-			}
-
-			constexpr auto await_resume() noexcept
-			{
-				if constexpr (PromiseType::resultTypeIsResult)
-				{
-					auto result{Parent::moveResultOut()};
-					bzd::assert::isTrue(result.hasValue());
-					return bzd::move(result.valueMutable());
-				}
-				else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
-				{
-					auto tuple{Parent::moveResultOut()};
-					auto& maybeResult{tuple.template get<index>()};
-					bzd::assert::isTrue(maybeResult.hasValue());
-					bzd::assert::isTrue(maybeResult.value().hasValue());
-					return bzd::move(maybeResult.valueMutable().valueMutable());
-				}
-				else
-				{
-					static_assert(bzd::meta::alwaysFalse<T>, "This type of Async cannot be used with assert(...).");
-				}
-			}
+		private:
+			Self& async_;
 		};
-		return AsyncPropagate{bzd::move(*this)};
+
+		return AsyncPropagate{*this};
 	}
 
 	constexpr auto operator!() noexcept { return assertHasValue<0>(); }
@@ -245,38 +176,7 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr bool await_ready() noexcept { 
-		return isCompleted(); }
-
-	template <class U>
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
-	{
-		bzd::assert::isTrue(static_cast<bool>(handle_));
-		// caller ()
-		// {
-		//    co_await this ()
-		/// }
-		auto& promise = handle_.promise();
-		auto& promiseCaller = caller.promise();
-
-		// Propagate the context of the caller to this async.
-		promiseCaller.propagate(promise);
-
-		// Handle the continuation.
-		promise.setContinuation(promiseCaller);
-
-		// Enqueue the current handle to the executor.
-		promiseCaller.thenEnqueueExecutable(promise);
-
-		// Returns control to the caller of the current coroutine,
-		// as the current coroutine is already queued for execution.
-		return true;
-	}
-
-	[[nodiscard]] constexpr ResultType await_resume() noexcept
-	{
-		return moveResultOut();
-	}
+	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Async>(*this); }
 
 private:
 	template <class... Args>
@@ -299,6 +199,56 @@ private:
 			handle_.destroy();
 			handle_ = nullptr;
 		}
+	}
+
+	template <bzd::Size index>
+	bzd::Optional<bzd::Error> hasErrorToPropagate() noexcept
+	{
+		// It must have a value, get a reference to it.
+		auto& result{this->handle_.promise().result().valueMutable()};
+		if constexpr (PromiseType::resultTypeIsResult)
+		{
+			static_assert(index == 0, "The index used with assert must be 0 for non-tuple-like results.");
+
+			if (result.hasError())
+			{
+				return bzd::move(result.errorMutable());
+			}
+		}
+		else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
+		{
+			static_assert(index < PromiseType::ResultType::size(), "The index used with assert is out of bound.");
+
+			// Return if one of the result is an error
+			for (auto& variant : result)
+			{
+				auto maybeError = variant.match([](auto& value) -> bzd::Error* {
+					if (value.hasValue() && value.value().hasError())
+					{
+						return &(value.valueMutable().errorMutable());
+					}
+					return nullptr;
+				});
+				if (maybeError)
+				{
+					return bzd::move(*maybeError);
+				}
+			}
+			// If not check that there is a value at the expected index.
+			if (!result.template get<index>().hasValue())
+			{
+				return bzd::Error{bzd::SourceLocation::current(),
+								  bzd::ErrorType::failure,
+								  "Got a value but not for the expected async #{}."_csv,
+								  index};
+			}
+		}
+		else
+		{
+			static_assert(bzd::meta::alwaysFalse<T>, "This type of Async cannot be used with assert(...).");
+		}
+
+		return bzd::nullopt;
 	}
 
 	constexpr async::Executable& getExecutable() noexcept
@@ -329,12 +279,6 @@ class Async : public impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
-
-	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr auto operator co_await() noexcept
-	{
-		return bzd::coroutine::impl::Awaiter<Async>(*this);
-	}
 };
 
 template <class V = void, class E = bzd::Error>
@@ -342,12 +286,6 @@ class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTrai
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
-
-	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr auto operator co_await() noexcept
-	{
-		return bzd::coroutine::impl::Awaiter<Generator>(*this);
-	}
 };
 
 } // namespace bzd
