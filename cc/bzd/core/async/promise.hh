@@ -243,9 +243,9 @@ public:
 		return bzd::coroutine::impl::coroutine_handle<PromiseType>::from_promise(static_cast<PromiseType&>(*this));
 	}
 
-	constexpr bool isReady() const noexcept { return result_.hasValue(); }
+	constexpr bool hasResult() const noexcept { return result_.hasValue(); }
 
-	constexpr bzd::Optional<T> moveResultOut() noexcept { return bzd::move(result_); }
+	constexpr bzd::Optional<T> moveOptionalResultOut() noexcept { return bzd::move(result_); }
 	constexpr bzd::Optional<T>& result() noexcept { return result_; }
 
 	constexpr void setError([[maybe_unused]] bzd::Error&& error) noexcept
@@ -282,7 +282,7 @@ public:
 	/// Overload to support `co_return {};`.
 	constexpr void return_value(Empty) noexcept { this->result_.emplace(bzd::nullresult); }
 
-	constexpr bool isCompleted() const noexcept { return this->isReady(); }
+	constexpr bool isCompleted() const noexcept { return this->hasResult(); }
 };
 
 template <class T>

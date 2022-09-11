@@ -98,7 +98,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 				entry.join();
 			}
 
-			EXPECT_TRUE(promise.isReady());
+			EXPECT_TRUE(promise.hasResult());
 		};
 
 		if constexpr (forkType == ForkType::any)
@@ -106,14 +106,14 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 			auto promise =
 				bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
 			execute(promise);
-			EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
+			EXPECT_TRUE(isValidResultForAny(promise.moveResultOut()));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
 			auto promise =
 				bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
 			execute(promise);
-			EXPECT_TRUE(isValidResultForAll(promise.moveResultOut().value()));
+			EXPECT_TRUE(isValidResultForAll(promise.moveResultOut()));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
@@ -125,7 +125,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 											   bzd::move(promise4),
 											   bzd::move(promise5));
 				execute(promise);
-				EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
+				EXPECT_TRUE(isValidResultForAny(promise.moveResultOut()));
 			}
 			else
 			{
@@ -135,7 +135,7 @@ void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd
 											   bzd::move(promise4),
 											   bzd::move(promise5));
 				execute(promise);
-				EXPECT_TRUE(isValidResultForAll(promise.moveResultOut().value()));
+				EXPECT_TRUE(isValidResultForAll(promise.moveResultOut()));
 			}
 		}
 		else
@@ -244,15 +244,12 @@ TEST(Coroutine, StressCancellationSuspend)
 		do
 		{
 			executor.run();
-			if (!promise.isReady())
-			{
-			}
-		} while (!promise.isReady());
+		} while (!promise.hasResult());
 
-		EXPECT_TRUE(promise.isReady());
+		EXPECT_TRUE(promise.hasResult());
 		EXPECT_EQ(executor.getQueueCount(), 0U);
 		EXPECT_EQ(executor.getWorkloadCount(), 0);
-		EXPECT_TRUE(isValidResultForAny(promise.moveResultOut().value()));
+		EXPECT_TRUE(isValidResultForAny(promise.moveResultOut()));
 
 		thread.join();
 	}

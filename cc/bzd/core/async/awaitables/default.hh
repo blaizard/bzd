@@ -39,8 +39,7 @@ public:
 
 	[[nodiscard]] constexpr auto await_resume() noexcept
 	{
-		bzd::assert::isTrue(async_.isReady());
-		return bzd::move(async_.moveResultOut().valueMutable());
+		return async_.moveResultOut();
 	}
 
 private:
