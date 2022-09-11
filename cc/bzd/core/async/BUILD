@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "async",
     hdrs = [
+        "awaitables/default.hh",
         "awaitables/enqueue.hh",
         "awaitables/get_executable.hh",
         "awaitables/get_executor.hh",

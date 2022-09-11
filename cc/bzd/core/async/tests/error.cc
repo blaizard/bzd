@@ -48,7 +48,7 @@ bzd::Async<> nestedErrorAny(int& step)
 	co_return {};
 }
 
-TEST_ASYNC(Coroutine, Error)
+TEST_ASYNC(Error, Simple)
 {
 	{
 		const auto result = co_await generateError();
@@ -75,7 +75,7 @@ TEST_ASYNC(Coroutine, Error)
 	co_return {};
 }
 
-TEST_ASYNC(Coroutine, ErrorAny)
+TEST_ASYNC(Error, Any)
 {
 	{
 		const auto value = co_await !bzd::async::any(generateSuccessInt(12), generateSuccessInt(42));

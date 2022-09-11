@@ -13,7 +13,19 @@ bzd::Generator<bzd::Size> generator(bzd::Size count)
 	}
 }
 
-TEST_ASYNC(Generator, Simple)
+TEST_ASYNC(Generator, OneCall)
+{
+	auto async = generator(10);
+	{
+		const auto result = co_await async;
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
+	}
+
+	co_return {};
+}
+
+TEST_ASYNC(Generator, TwoCalls)
 {
 	auto async = generator(10);
 	{
