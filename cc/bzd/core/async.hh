@@ -3,6 +3,7 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/tuple.hh"
+#include "cc/bzd/core/async/awaitables/default.hh"
 #include "cc/bzd/core/async/awaitables/enqueue.hh"
 #include "cc/bzd/core/async/awaitables/get_executable.hh"
 #include "cc/bzd/core/async/awaitables/get_executor.hh"
@@ -102,7 +103,7 @@ public:
 	{
 		if (handle_)
 		{
-			return bzd::move(handle_.promise()).moveResultOut();
+			return handle_.promise().moveResultOut();
 		}
 		return nullopt;
 	}
@@ -252,6 +253,7 @@ public: // coroutine specific
 	template <class U>
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
 	{
+		bzd::assert::isTrue(static_cast<bool>(handle_));
 		// caller ()
 		// {
 		//    co_await this ()
@@ -286,6 +288,9 @@ private:
 	template <class U>
 	friend class bzd::coroutine::impl::Promise;
 
+	template <class U>
+	friend class bzd::coroutine::impl::Awaiter;
+
 	/// Destroy the current async and nested ones.
 	///
 	/// This function is not thread safe and must be called on an async object non active.
@@ -319,10 +324,7 @@ public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
 
 	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr Async& operator co_await() noexcept
-	{
-		return *this;
-	}
+	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Async>(*this); }
 };
 
 template <class V = void, class E = bzd::Error>
@@ -332,10 +334,7 @@ public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
 
 	// Fix a gcc 11 bug, see: https://stackoverflow.com/questions/67860049/why-cant-co-await-return-a-string/73671465#73671465
-	constexpr Generator& operator co_await() noexcept
-	{
-		return *this;
-	}
+	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Generator>(*this); }
 };
 
 } // namespace bzd
@@ -349,9 +348,9 @@ concept async = requires(T t)
 		} -> sameAs<const bzd::impl::AsyncType&>;
 };
 template <class T>
-concept asyncTask = async<T> &&(T::type == bzd::impl::AsyncType::task);
+concept asyncTask = sameTemplate<T, bzd::Async>;
 template <class T>
-concept asyncGenerator = async<T> &&(T::type == bzd::impl::AsyncType::generator);
+concept asyncGenerator = sameTemplate<T, bzd::Generator>;
 } // namespace bzd::concepts
 
 namespace bzd::async {

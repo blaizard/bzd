@@ -68,7 +68,7 @@ Where a `co_await` statement looks something like this:
 }
 ```
 
-Where `<get-awaitable>` is soething like this:
+Where `<get-awaitable>` is something like this:
 
 ```c++
 template<typename P, typename T>
@@ -91,7 +91,8 @@ decltype(auto) get_awaiter(Awaitable&& awaitable)
         return static_cast<Awaitable&&>(awaitable);
 }
 
-// <get-awaitable> -> co_await value;
+// <get-awaitable> -> co_await expression;
+auto&& value = expression;
 auto&& awaitable = get_awaitable(promise, static_cast<decltype(value)>(value));
 auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 ```
