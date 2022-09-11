@@ -74,7 +74,7 @@ public: // Coroutine specializations.
 		return bzd::apply(
 			[](auto&... asyncs) -> ResultType {
 				// Copy the result of each async into the result type and return it.
-				return ResultType{bzd::inPlace, asyncs.await_resume()...};
+				return ResultType{bzd::inPlace, asyncs.moveResultOut()...};
 			},
 			this->asyncs_);
 	}

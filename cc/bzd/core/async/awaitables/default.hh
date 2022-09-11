@@ -37,12 +37,9 @@ public:
 		return true;
 	}
 
-	[[nodiscard]] constexpr auto await_resume() noexcept
-	{
-		return async_.moveResultOut();
-	}
+	[[nodiscard]] constexpr auto await_resume() noexcept { return async_.moveResultOut(); }
 
-private:
+protected:
 	Async& async_;
 };
 
