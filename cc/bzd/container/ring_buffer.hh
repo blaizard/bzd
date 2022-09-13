@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/spans.hh"
 #include "cc/bzd/container/storage/fixed.hh"
@@ -7,7 +8,6 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
-#include "cc/bzd/algorithm/copy.hh"
 
 namespace bzd::impl {
 /// Ring buffer implementation.
