@@ -11,7 +11,7 @@ class Out : public bzd::OStream
 public:
 	constexpr Out(Proactor& proactor) noexcept : proactor_{proactor} {}
 
-	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
+	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept final
 	{
 		co_await !proactor_.write(out_, data);
 		::std::flush(::std::cout);
