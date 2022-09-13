@@ -30,9 +30,9 @@ cc_library(
 )
 
 cc_library(
-    name = "istream",
+    name = "ichannel",
     hdrs = [
-        "istream.hh",
+        "ichannel.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

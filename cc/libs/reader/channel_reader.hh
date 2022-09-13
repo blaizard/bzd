@@ -123,16 +123,43 @@ public:
 		}
 	*/
 
+	/// Read data until a specific value is found but does not return the value.
+	bzd::Generator<bzd::Span<const T>> readUntil(const T value) noexcept
+	{
+		return readUntilHelper([value](const bzd::Span<const T> span) -> bzd::Size {
+			if (const auto it = bzd::algorithm::find(span, value); it != span.end())
+			{
+				return bzd::distance(span.begin(), it);
+			}
+			return bzd::npos;
+		});
+	}
+
+	/// Read data until a specific sequence is found but does not include the sequence.
+	bzd::Generator<bzd::Span<const T>> readUntil(const bzd::Span<const T> value) noexcept
+	{
+		return readUntilHelper([value](const bzd::Span<const T> span) -> bzd::Size {
+			if (const auto it = bzd::algorithm::search(span, value); it != span.end())
+			{
+				return bzd::distance(span.begin(), it);
+			}
+			return bzd::npos;
+		});
+	}
+
+private:
 	/// Read data until a specific value is found.
-	bzd::Generator<bzd::Span<const T>> readUntil(const T& value) noexcept
+	template <class Callback>
+	bzd::Generator<bzd::Span<const T>> readUntilHelper(Callback callback) noexcept
 	{
 		while (true)
 		{
 			if (auto readFromBuffer = buffer_.asSpanForReading(); !readFromBuffer.empty())
 			{
-				const auto position = bzd::algorithm::find(readFromBuffer, value);
-				if (position == readFromBuffer.end())
+				const auto position = callback(readFromBuffer);
+				if (position == bzd::npos)
 				{
+					buffer_.consume(readFromBuffer.size());
 					co_yield readFromBuffer;
 				}
 				else
@@ -144,8 +171,8 @@ public:
 			}
 			else if (auto readFromBuffer = co_await !read(); !readFromBuffer.empty())
 			{
-				const auto position = bzd::algorithm::find(readFromBuffer, value);
-				if (position == readFromBuffer.end())
+				const auto position = callback(readFromBuffer);
+				if (position == bzd::npos)
 				{
 					co_yield readFromBuffer;
 				}
@@ -164,17 +191,16 @@ public:
 		}
 	}
 
-private:
 	/// Read new data from the input channel and return it.
 	/// This action does not produce data to the ring buffer.
-	[[nodiscard]] bzd::Async<bzd::Span<const bzd::Byte>> read() noexcept
+	[[nodiscard]] bzd::Async<bzd::Span<const T>> read() noexcept
 	{
 		auto span = buffer_.asSpanForWriting();
 		if (span.empty())
 		{
 			co_return bzd::error::Failure("Buffer of {} entries is full."_csv, buffer_.size());
 		}
-		co_return co_await !in_.read(span);
+		co_return co_await !in_.read(bzd::move(span));
 	}
 
 private: // Variables.

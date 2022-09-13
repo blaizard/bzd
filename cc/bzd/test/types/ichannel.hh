@@ -9,27 +9,28 @@
 
 namespace bzd::test {
 
-template <bzd::Size capacity>
-class IStream : public bzd::IStream
+template <class T, bzd::Size capacity>
+class IChannel : public bzd::IChannel<T>
 {
 protected:
-	using Self = IStream;
+	using Self = IChannel;
 
 public:
+	/// Fill the input buffer from a string.
 	Self& operator<<(const bzd::StringView data) noexcept
 	{
 		for (const auto c : data)
 		{
-			buffer_.pushBack(static_cast<bzd::Byte>(c));
+			buffer_.pushBack(static_cast<T>(c));
 		}
 		return *this;
 	}
 
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
+	bzd::Async<bzd::Span<const T>> read(bzd::Span<T>&& data) noexcept override
 	{
 		if (buffer_.empty())
 		{
-			co_return bzd::Span<bzd::Byte>{};
+			co_return bzd::Span<T>{};
 		}
 		bzd::Size index{0};
 		for (const auto b : buffer_.asSpanForReading())
@@ -45,7 +46,10 @@ public:
 	}
 
 private:
-	bzd::RingBuffer<bzd::Byte, capacity> buffer_{};
+	bzd::RingBuffer<T, capacity> buffer_{};
 };
+
+template <bzd::Size capacity>
+using IStream = IChannel<bzd::Byte, capacity>;
 
 } // namespace bzd::test
