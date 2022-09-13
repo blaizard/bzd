@@ -74,9 +74,10 @@ public:
 public:
 	/// Read data from an input channel.
 	///
-	/// If there is no data available, this function returns immediatly.
+	/// This function returns only if there is data, i.e. an empty span cannot be returned.
 	/// It is also important that the user relies on the returned buffer to read the data,
-	/// as the input buffer might not be used to avoid unnecessary copies.
+	/// as the input buffer might not be used to avoid unnecessary copies. This provides an interface
+	/// to achieve zero copy in certain situation.
 	///
 	/// \param[in] data A buffer to contain the data to be read.
 	/// \return The data read.

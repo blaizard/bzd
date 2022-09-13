@@ -44,7 +44,7 @@ public: // Constructors
 	}
 
 public: // API
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
+	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept final
 	{
 		if (!init_)
 		{

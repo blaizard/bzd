@@ -99,9 +99,9 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 
 ## Async implementation
 
-### Simple coroutines
+### Task
 
-Async is the coroutine type of this framework.
+`bzd::Async` is the task-coroutine type of this framework.
 
 A `void` coroutine is declared as follow:
 
@@ -113,6 +113,22 @@ A non-`void` coroutine is declared as follow:
 
 ```c++
 bzd::Async<int> myFunc() { ... }
+```
+
+### Generator
+
+`bzd::Generator` is the generator-coroutine type of this framework.
+
+A `void` generator is declared as follow:
+
+```c++
+bzd::Generaotr<> myFunc() { ... }
+```
+
+A non-`void` coroutine is declared as follow:
+
+```c++
+bzd::Generator<int> myFunc() { ... }
 ```
 
 ### Composition
