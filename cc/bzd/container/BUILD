@@ -255,11 +255,11 @@ cc_library(
     deps = [
         ":span",
         ":spans",
+        "//cc/bzd/algorithm:copy",
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:move",
-        "//cc/bzd/algorithm:copy"
     ],
 )
 
