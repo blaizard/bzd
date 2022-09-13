@@ -5,7 +5,7 @@ bzd_cc_test(
     srcs = glob(["*.cc"]),
     deps = [
         "//cc/bzd/test",
-        "//cc/bzd/test/types:istream",
+        "//cc/bzd/test/types:ichannel",
         "//cc/bzd/test/types:istream_reader",
         "//cc/libs/reader:stream_reader",
     ],
