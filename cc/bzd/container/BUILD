@@ -259,6 +259,7 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:move",
+        "//cc/bzd/algorithm:copy"
     ],
 )
 

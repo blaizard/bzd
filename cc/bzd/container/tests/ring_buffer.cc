@@ -187,6 +187,35 @@ TEST(RingBuffer, asSpanForWriting)
 	}
 }
 
+TEST(RingBuffer, AssignSpan)
+{
+	bzd::RingBuffer<int, 16> ring;
+
+	{
+		bzd::Array<int, 4> array;
+		ring.assign(array.asSpan());
+		auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), array.size());
+		EXPECT_FALSE(ring.overrun());
+	}
+	{
+		bzd::Array<int, 32> array;
+		ring.assign(array.asSpan());
+		auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 16u);
+		EXPECT_TRUE(ring.overrun());
+		EXPECT_TRUE(ring.full());
+	}
+	{
+		ring.clear();
+		ring.assign(ring.asSpanForWriting());
+		auto span = ring.asSpanForReading();
+		EXPECT_EQ(span.size(), 16u);
+		EXPECT_FALSE(ring.overrun());
+		EXPECT_TRUE(ring.full());
+	}
+}
+
 TEST(RingBuffer, stress)
 {
 	bzd::RingBuffer<int, 16> ring;

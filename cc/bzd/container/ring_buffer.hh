@@ -7,6 +7,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
+#include "cc/bzd/algorithm/copy.hh"
 
 namespace bzd::impl {
 /// Ring buffer implementation.
@@ -90,6 +91,31 @@ public: // Modifiers.
 	{
 		bzd::assert::isTrue(read_ + n <= write_, "Consumer reads passed written pointer.");
 		read_ += n;
+	}
+
+	/// Assign the given span to the ring buffer. All previously available data are
+	/// removed.
+	constexpr void assign(const bzd::Span<const T> span) noexcept
+	{
+		// If the span is within the storage.
+		if (span.data() >= storage_.data() && span.data() < &storage_.data()[storage_.size()])
+		{
+			read_ = (span.data() - storage_.data()) / sizeof(T);
+			write_ = read_ + span.size();
+		}
+		else if (span.size() <= storage_.size())
+		{
+			algorithm::copy(span.begin(), span.end(), storage_.dataMutable());
+			read_ = 0;
+			write_ = span.size();
+		}
+		else
+		{
+			algorithm::copy(span.end() - storage_.size(), span.end(), storage_.dataMutable());
+			read_ = 0;
+			write_ = span.size();
+			overrun_ = true;
+		}
 	}
 
 	/// Produce new data in the ring buffer.
