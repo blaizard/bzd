@@ -48,6 +48,7 @@ public:
 		constexprForContainerInc(spans_, [&](const auto& span) { sum += span.size(); });
 		return sum;
 	}
+	[[nodiscard]] constexpr Bool empty() const noexcept { return (size() == 0); }
 
 	/// Create a sub view of this spans.
 	///

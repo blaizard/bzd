@@ -36,6 +36,7 @@ public:
 		}
 
 		// Transfer-Encoding
+		// co_await reader_.readUntil("/r/n"_sv.asBytes());
 
 		const auto read = co_await !client_.stream_->read(bzd::move(data));
 		co_return read;

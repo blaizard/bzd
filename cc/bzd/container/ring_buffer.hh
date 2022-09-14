@@ -52,7 +52,7 @@ public: // Accessors.
 		const auto end = write_ % capacity();
 		const auto secondSpan = (!empty() && (end <= start)) ? bzd::Span<ValueType>{storage_.data(), end} : bzd::Span<ValueType>{};
 
-		return bzd::Spans<ValueType, 2>{inPlace, asSpanForReading(), secondSpan};
+		return bzd::Spans<ValueType, 2u>{inPlace, asSpanForReading(), secondSpan};
 	}
 
 	/// Get the span of contiguous memory containing data starting from the tail.
