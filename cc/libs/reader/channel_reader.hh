@@ -126,67 +126,69 @@ public:
 	/// Read data until a specific value is found but does not return the value.
 	bzd::Generator<bzd::Span<const T>> readUntil(const T value) noexcept
 	{
-		return readUntilHelper([value](const bzd::Span<const T> span) -> bzd::Size {
-			if (const auto it = bzd::algorithm::find(span, value); it != span.end())
-			{
-				return bzd::distance(span.begin(), it);
-			}
-			return bzd::npos;
-		});
+		return readUntilHelper(
+			[value](const auto range) noexcept -> bzd::Size {
+				if (const auto it = bzd::algorithm::find(range, value); it != range.end())
+				{
+					return bzd::distance(range.begin(), it);
+				}
+				return bzd::npos;
+			},
+			1u);
 	}
 
 	/// Read data until a specific sequence is found but does not include the sequence.
 	bzd::Generator<bzd::Span<const T>> readUntil(const bzd::Span<const T> value) noexcept
 	{
-		return readUntilHelper([value](const bzd::Span<const T> span) -> bzd::Size {
-			if (const auto it = bzd::algorithm::search(span, value); it != span.end())
+		return readUntilHelper([value](const auto range) noexcept -> bzd::Size {
+			if (const auto it = bzd::algorithm::search(range, value); it != range.end())
 			{
-				return bzd::distance(span.begin(), it);
+				return bzd::distance(range.begin(), it);
 			}
 			return bzd::npos;
-		});
+		}, value.size());
 	}
 
 private:
 	/// Read data until a specific value is found.
 	template <class Callback>
-	bzd::Generator<bzd::Span<const T>> readUntilHelper(Callback callback) noexcept
+	bzd::Generator<bzd::Span<const T>> readUntilHelper(Callback callback, const Size minSize) noexcept
 	{
 		while (true)
 		{
-			if (auto readFromBuffer = buffer_.asSpanForReading(); !readFromBuffer.empty())
+			// Fill the buffer if there is not enough data.
+			if (buffer_.size() < minSize)
 			{
-				const auto position = callback(readFromBuffer);
-				if (position == bzd::npos)
-				{
-					buffer_.consume(readFromBuffer.size());
-					co_yield readFromBuffer;
-				}
-				else
-				{
-					buffer_.consume(position);
-					co_yield readFromBuffer.first(position);
-					break;
-				}
+				co_await !readToBuffer();
 			}
-			else if (auto readFromBuffer = co_await !read(); !readFromBuffer.empty())
+
+			// Get the data and ensure it is enough.
+			auto readFromBuffer = buffer_.asSpans();
+			if (readFromBuffer.size() < minSize)
 			{
-				const auto position = callback(readFromBuffer);
-				if (position == bzd::npos)
-				{
-					co_yield readFromBuffer;
-				}
-				else
-				{
-					auto left = readFromBuffer.subSpan(position);
-					buffer_.assign(left);
-					co_yield readFromBuffer.first(position);
-					break;
-				}
+				continue;
+			}
+
+			// To avoid unecessary processing, only keep the first span and `minSize` of the second span.
+			// This will avoid having the callback processing extra data that will be re-processed in the second call.
+			const auto [firstSpan, secondSpan] = readFromBuffer.spans();
+			const bzd::Spans<const T, 2u> spans{bzd::inPlace,
+												firstSpan,
+												(secondSpan.size() > minSize) ? secondSpan.first(minSize) : secondSpan};
+
+			// Call the callback and return the full or partial first span only.
+			const auto position = callback(spans);
+			if (position == bzd::npos)
+			{
+				buffer_.consume(firstSpan.size());
+				co_yield firstSpan;
 			}
 			else
 			{
-				co_await bzd::async::yield();
+				const auto updatedPosition = bzd::min(position, firstSpan.size());
+				buffer_.consume(updatedPosition);
+				co_yield firstSpan.first(updatedPosition);
+				break;
 			}
 		}
 	}
@@ -201,6 +203,19 @@ private:
 			co_return bzd::error::Failure("Buffer of {} entries is full."_csv, buffer_.size());
 		}
 		co_return co_await !in_.read(bzd::move(span));
+	}
+
+	/// Read new data from the input channel and return it.
+	[[nodiscard]] bzd::Async<> readToBuffer() noexcept
+	{
+		auto span = buffer_.asSpanForWriting();
+		if (span.empty())
+		{
+			co_return bzd::error::Failure("Buffer of {} entries is full."_csv, buffer_.size());
+		}
+		const auto data = co_await !in_.readToBuffer(bzd::move(span));
+		buffer_.produce(data.size());
+		co_return {};
 	}
 
 private: // Variables.

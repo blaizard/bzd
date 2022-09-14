@@ -47,3 +47,18 @@ public:
 };
 
 } // namespace bzd
+
+// Add support for structure bindings: `auto [a, b] = bzd::Array<int, 2>{inPlace, 1, 2.3};`
+#include <tuple>
+
+namespace std {
+template <class T, ::bzd::Size maxCapacity>
+struct tuple_size<::bzd::Array<T, maxCapacity>> : std::integral_constant<size_t, maxCapacity>
+{
+};
+template <size_t index, class T, ::bzd::Size maxCapacity>
+struct tuple_element<index, ::bzd::Array<T, maxCapacity>>
+{
+	using type = T;
+};
+} // namespace std
