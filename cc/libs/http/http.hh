@@ -36,9 +36,11 @@ public:
 		}
 
 		// Transfer-Encoding
+		[[maybe_unused]] const auto string = co_await !bzd::make<bzd::String<40>>(reader_.readUntil(static_cast<bzd::Byte>('\r')));
 		// co_await reader_.readUntil("/r/n"_sv.asBytes());
+		//::std::cout << "[-> " << string.data() << " <-]" << std::endl;
 
-		const auto read = co_await !client_.stream_->read(bzd::move(data));
+		const auto read = co_await !reader_.read(bzd::move(data));
 		co_return read;
 	}
 

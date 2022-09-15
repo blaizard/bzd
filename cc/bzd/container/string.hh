@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/algorithm/copy.hh"
+#include "cc/bzd/algorithm/fill_n.hh"
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
@@ -46,18 +47,15 @@ public:
 	}
 
 	// Fill
-	constexpr Size append(const Size n, const T c) noexcept
+	constexpr Size append(const Size count, const T value) noexcept
 	{
 		const Size sizeLeft = capacity_ - this->size() - 1;
-		const Size actualN = bzd::min(sizeLeft, n);
-		for (Size i = 0; i < actualN; ++i)
-		{
-			this->at(this->size() + i) = c;
-		}
-		this->storage_.sizeMutable() += actualN;
+		const Size actualCount = bzd::min(sizeLeft, count);
+		bzd::algorithm::fillN(&this->at(this->size()), actualCount, value);
+		this->storage_.sizeMutable() += actualCount;
 		this->at(this->size()) = '\0';
 
-		return actualN;
+		return actualCount;
 	}
 
 	template <class U>

@@ -8,7 +8,7 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":copy_only",
-        ":istream",
+        ":ichannel",
         ":istream_reader",
         ":lifetime_counter",
         ":move_only",

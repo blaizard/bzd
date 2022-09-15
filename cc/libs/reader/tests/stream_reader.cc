@@ -15,8 +15,9 @@ TEST_ASYNC(StreamReader, Read)
 		EXPECT_STREQ(output.data(), "hello");
 	}
 	{
-		const auto output = co_await !bzd::test::read(reader);
-		EXPECT_STREQ(output.data(), "");
+		const auto output = co_await bzd::test::read(reader);
+		EXPECT_FALSE(output);
+		EXPECT_EQ(output.error().getType(), bzd::ErrorType::eof);
 	}
 
 	co_return {};

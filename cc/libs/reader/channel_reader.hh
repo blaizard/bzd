@@ -124,7 +124,7 @@ public:
 	*/
 
 	/// Read data until a specific value is found but does not return the value.
-	bzd::Generator<bzd::Span<const T>> readUntil(const T value) noexcept
+	auto readUntil(const T value) noexcept
 	{
 		return readUntilHelper(
 			[value](const auto range) noexcept -> bzd::Size {
@@ -138,15 +138,17 @@ public:
 	}
 
 	/// Read data until a specific sequence is found but does not include the sequence.
-	bzd::Generator<bzd::Span<const T>> readUntil(const bzd::Span<const T> value) noexcept
+	auto readUntil(const bzd::Span<const T> value) noexcept
 	{
-		return readUntilHelper([value](const auto range) noexcept -> bzd::Size {
-			if (const auto it = bzd::algorithm::search(range, value); it != range.end())
-			{
-				return bzd::distance(range.begin(), it);
-			}
-			return bzd::npos;
-		}, value.size());
+		return readUntilHelper(
+			[value](const auto range) noexcept -> bzd::Size {
+				if (const auto it = bzd::algorithm::search(range, value); it != range.end())
+				{
+					return bzd::distance(range.begin(), it);
+				}
+				return bzd::npos;
+			},
+			value.size());
 	}
 
 private:
@@ -222,5 +224,19 @@ private: // Variables.
 	bzd::IChannel<T>& in_;
 	bzd::RingBuffer<T, capacity> buffer_;
 };
+
+template <class T, class Value>
+requires requires(T&& t, Value&& v)
+{
+	t += v;
+}
+bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
+{
+	T container;
+	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) {
+		for (auto& a : value) container += static_cast<char>(a);
+	});
+	co_return container;
+}
 
 } // namespace bzd
