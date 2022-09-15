@@ -19,7 +19,9 @@ enum class ErrorType : bzd::UInt8
 	timeout,
 	/// Happens while accessing a busy ressource for example,
 	/// this type of error notifies the handler that it can be retried if necessary.
-	busy
+	busy,
+	/// Happens when a stream reaches the end of its channel for example.
+	eof
 };
 
 /// Global definition of an error object.
@@ -85,6 +87,8 @@ public: // Accessors.
 			return "timeout"_sv;
 		case ErrorType::busy:
 			return "busy"_sv;
+		case ErrorType::eof:
+			return "eof"_sv;
 		}
 		return "unknown"_sv;
 	}
@@ -151,5 +155,17 @@ struct Busy : public bzd::ResultError<bzd::Error>
 
 template <class... Args>
 Busy(Args&&...) -> Busy<Args...>;
+
+template <class... Args>
+struct Eof : public bzd::ResultError<bzd::Error>
+{
+	Eof(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::eof, bzd::forward<Args>(args)...}
+	{
+	}
+};
+
+template <class... Args>
+Eof(Args&&...) -> Eof<Args...>;
 
 } // namespace bzd::error

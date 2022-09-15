@@ -307,12 +307,12 @@ concept asyncGenerator = sameTemplate<T, bzd::Generator>;
 namespace bzd::async {
 
 template <concepts::asyncGenerator T, class Callable>
-bzd::Async<> forEach(T&& async, Callable&& callable) noexcept
+bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 {
 	while (true)
 	{
-		auto result = co_await async;
-		if (async.isCompleted())
+		auto result = co_await generator;
+		if (generator.isCompleted())
 		{
 			co_return {};
 		}

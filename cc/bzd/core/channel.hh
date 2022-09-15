@@ -75,6 +75,9 @@ public:
 	/// Read data from an input channel.
 	///
 	/// This function returns only if there is data, i.e. an empty span cannot be returned.
+	/// In case the channel is empty and there are no other data to be generated, the channel
+	/// must return an error with the \c ErrorType::eof error type.
+	///
 	/// It is also important that the user relies on the returned buffer to read the data,
 	/// as the input buffer might not be used to avoid unnecessary copies. This provides an interface
 	/// to achieve zero copy in certain situation.

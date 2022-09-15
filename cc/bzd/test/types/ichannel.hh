@@ -30,7 +30,7 @@ public:
 	{
 		if (buffer_.empty())
 		{
-			co_return bzd::Span<T>{};
+			co_return bzd::error::Eof("No more data available."_csv);
 		}
 		bzd::Size index{0};
 		for (const auto b : buffer_.asSpanForReading())
@@ -42,7 +42,7 @@ public:
 			data[index++] = b;
 			buffer_.consume(1);
 		}
-		co_return data.subSpan(0, index);
+		co_return data.first(index);
 	}
 
 private:

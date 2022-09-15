@@ -347,6 +347,7 @@ cc_library(
         ":span",
         ":string_view",
         "//cc/bzd/algorithm:copy",
+        "//cc/bzd/algorithm:fill_n",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_const",
         "//cc/bzd/utility:min",
