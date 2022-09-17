@@ -60,10 +60,7 @@ public: // Modifiers.
 	/// \param value Value to be copied (or moved) to the new element.
 	template <class U>
 	requires concepts::convertible<U, T>
-	constexpr Size pushBack(U&& value) noexcept
-	{
-		return pushBackInternal(bzd::forward<U>(value));
-	}
+	constexpr Size pushBack(U&& value) noexcept { return pushBackInternal(bzd::forward<U>(value)); }
 
 	/// Trivially copyable objects of 1 byte size can be directly constructed from bytes.
 	constexpr Size pushBack(const Byte value) noexcept requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)

@@ -154,12 +154,12 @@ public:
 		return this->underlying();
 	}
 
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T operator*(const U& value) const
 	{
 		return T{this->underlying().get() * value};
 	}
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T& operator*=(const U& value)
 	{
 		this->underlying().get() *= value;
@@ -178,12 +178,12 @@ public:
 		return this->underlying();
 	}
 
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T operator/(const U& value) const
 	{
 		return T{this->underlying().get() / value};
 	}
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T& operator/=(const U& value)
 	{
 		this->underlying().get() /= value;
@@ -202,12 +202,12 @@ public:
 		return this->underlying();
 	}
 
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T operator%(const U& value) const
 	{
 		return T{this->underlying().get() % value};
 	}
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T& operator%=(const U& value)
 	{
 		this->underlying().get() %= value;
@@ -250,12 +250,12 @@ public:
 		return this->underlying();
 	}
 
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T operator<<(const U& value) const
 	{
 		return T{this->underlying().get() << value};
 	}
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T& operator<<=(const U& value)
 	{
 		this->underlying().get() <<= value;
@@ -269,12 +269,12 @@ public:
 		return this->underlying();
 	}
 
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T operator>>(const U& value) const
 	{
 		return T{this->underlying().get() >> value};
 	}
-	template <class U, bzd::typeTraits::EnableIf<typeTraits::isArithmetic<U>, void>* = nullptr>
+	template <concepts::arithmetic U>
 	constexpr T& operator>>=(const U& value)
 	{
 		this->underlying().get() >>= value;

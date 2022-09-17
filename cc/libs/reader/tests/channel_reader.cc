@@ -51,7 +51,7 @@ TEST_ASYNC(ChannelReader, ReadUntil)
 		auto generator = reader.readUntil('z');
 		const auto string = co_await !bzd::make<bzd::String<40>>(bzd::move(generator));
 		EXPECT_EQ(string.size(), 26u);
-		EXPECT_EQ(string.data(), "dabcdefghijklmnopqrstuvwxy");
+		EXPECT_EQ(string, "dabcdefghijklmnopqrstuvwxy");
 	}
 
 	co_return {};
