@@ -86,7 +86,7 @@ constexpr void floatingPoint(interface::String& str, const T& n, const Size maxP
 
 namespace bzd::format {
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
+template <concepts::integral T>
 constexpr void toStringHex(bzd::interface::String& str,
 						   const T& data,
 						   const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
@@ -94,13 +94,13 @@ constexpr void toStringHex(bzd::interface::String& str,
 	bzd::format::impl::integer<16>(str, data, digits);
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
+template <concepts::integral T>
 constexpr void toStringOct(bzd::interface::String& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<8>(str, data, bzd::format::impl::digits);
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, T>* = nullptr>
+template <concepts::integral T>
 constexpr void toStringBin(bzd::interface::String& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<2>(str, data, bzd::format::impl::digits);
@@ -109,8 +109,7 @@ constexpr void toStringBin(bzd::interface::String& str, const T& data) noexcept
 
 // Integers
 
-template <class T>
-requires bzd::concepts::integral<T>
+template <bzd::concepts::integral T>
 constexpr void toString(bzd::interface::String& str, const T data) noexcept
 {
 	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
@@ -118,8 +117,7 @@ constexpr void toString(bzd::interface::String& str, const T data) noexcept
 
 // Floating points
 
-template <class T>
-requires bzd::concepts::floatingPoint<T>
+template <bzd::concepts::floatingPoint T>
 constexpr void toString(bzd::interface::String& str, const T data, const bzd::Size maxPrecision = 6) noexcept
 {
 	bzd::format::impl::floatingPoint(str, data, maxPrecision);

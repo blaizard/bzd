@@ -26,3 +26,8 @@ template <class T, class... Args>
 inline constexpr bool isConstructible = IsConstructible<T, Args...>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T, class... Args>
+concept constructible = bzd::typeTraits::isConstructible<T, Args...>;
+}

@@ -333,7 +333,6 @@ cc_library(
         "//cc/bzd/meta:string_literal",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_base_of",
-        "//cc/bzd/utility:concept",
     ],
 )
 

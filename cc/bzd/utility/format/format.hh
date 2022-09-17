@@ -371,14 +371,18 @@ public:
 	using FormatterTransportType = bzd::interface::String;
 
 public:
-	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
-	static constexpr void process(bzd::interface::String& str, const T& value, const Metadata&) noexcept
+	template <class T>
+	requires(!HasFormatterWithMetadata<StringFormatter, T>::value) static constexpr void process(bzd::interface::String& str,
+																								 const T& value,
+																								 const Metadata&) noexcept
 	{
 		toString(str, value);
 	}
 
-	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StringFormatter, T>::value, void>* = nullptr>
-	static constexpr void process(bzd::interface::String& str, const T& value, const Metadata& metadata) noexcept
+	template <class T>
+	requires(HasFormatterWithMetadata<StringFormatter, T>::value) static constexpr void process(bzd::interface::String& str,
+																								const T& value,
+																								const Metadata& metadata) noexcept
 	{
 		toString(str, value, metadata);
 	}
@@ -403,7 +407,7 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 	return {};
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T>, void>* = nullptr>
+template <concepts::integral T>
 constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
@@ -451,7 +455,7 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 	}
 }
 
-template <class T, bzd::typeTraits::EnableIf<bzd::typeTraits::isFloatingPoint<T>, void>* = nullptr>
+template <concepts::floatingPoint T>
 constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
@@ -476,10 +480,10 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 	}
 }
 
-template <
-	class T,
-	bzd::typeTraits::EnableIf<bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>, void>* = nullptr>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
+template <class T>
+requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>) constexpr void toString(bzd::interface::String& str,
+																									   const T value,
+																									   const Metadata&) noexcept
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
@@ -498,8 +502,8 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
  * Check the format context with the argument type, this to ensure type safety.
  * This function should only be used at compile time.
  */
-template <Size N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N > 0)>* = nullptr>
-constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
+template <Size N, class Adapter, class MetadataList, class T>
+requires(N > 0) constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
 {
 	using TupleType = bzd::typeTraits::RemoveCVRef<decltype(tuple)>;
 	using ValueType = typename TupleType::template Get<N - 1>;
@@ -539,8 +543,8 @@ constexpr bool contextCheck(const MetadataList& metadataList, const T& tuple) no
 	return contextCheck<N - 1, Adapter>(metadataList, tuple);
 }
 
-template <Size N, class Adapter, class MetadataList, class T, bzd::typeTraits::EnableIf<(N == 0)>* = nullptr>
-constexpr bool contextCheck(const MetadataList&, const T&) noexcept
+template <Size N, class Adapter, class MetadataList, class T>
+requires(N == 0) constexpr bool contextCheck(const MetadataList&, const T&) noexcept
 {
 	return true;
 }

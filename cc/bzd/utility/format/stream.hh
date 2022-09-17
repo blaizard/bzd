@@ -19,15 +19,19 @@ public:
 	using FormatterTransportType = bzd::OStream;
 
 public:
-	template <class T, bzd::typeTraits::EnableIf<!HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
+	template <class T>
+	requires(!HasFormatterWithMetadata<StreamFormatter, T>::value) static Async<> process(bzd::OStream& stream,
+																						  const T& value,
+																						  const Metadata&) noexcept
 	{
 		co_await !toStream(stream, value);
 		co_return {};
 	}
 
-	template <class T, bzd::typeTraits::EnableIf<HasFormatterWithMetadata<StreamFormatter, T>::value, void>* = nullptr>
-	static Async<> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
+	template <class T>
+	requires(HasFormatterWithMetadata<StreamFormatter, T>::value) static Async<> process(bzd::OStream& stream,
+																						 const T& value,
+																						 const Metadata& metadata) noexcept
 	{
 		co_await !toStream(stream, value, metadata);
 		co_return {};
@@ -36,11 +40,11 @@ public:
 
 // Specialization of toStream for the native types
 
-template <class T,
-		  bzd::typeTraits::EnableIf<bzd::typeTraits::isIntegral<T> || bzd::typeTraits::isFloatingPoint<T> ||
-										(bzd::typeTraits::isPointer<T> && !bzd::typeTraits::isConstructible<bzd::StringView, T>),
-									void>* = nullptr>
-Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
+template <class T>
+requires(concepts::integral<T> || concepts::floatingPoint<T> ||
+		 (concepts::pointer<T> &&
+		  !concepts::constructible<bzd::StringView, T>)) Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
+noexcept
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);
