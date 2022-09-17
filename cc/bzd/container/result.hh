@@ -60,10 +60,8 @@ template <class T = void, class E = bzd::Bool>
 class Result
 {
 public: // Traits
-	static constexpr bool isValueVoid = bzd::typeTraits::isSame<T, void>;
-	static constexpr bool isValueReference = bzd::typeTraits::isReference<T>;
 	// The container type for the value.
-	using ValueContainer = bzd::typeTraits::Conditional<isValueVoid, void*, T>;
+	using ValueContainer = bzd::typeTraits::Conditional<typeTraits::isSame<T, void>, void*, T>;
 	// Value type returned.
 	using Value = bzd::typeTraits::RemoveReference<ValueContainer>;
 	// Error type returned.
@@ -86,10 +84,10 @@ public: // Constructors
 	constexpr Result(const impl::ResultNull&) noexcept : data_{bzd::inPlaceType<ValueContainer>, nullptr} {}
 
 	// Forwards arguments to construct the value to the storage type.
-	template <class... Args,
-			  typename = typeTraits::EnableIf<!IsSelf<typeTraits::FirstType<Args...>>::value &&
-											  !typeTraits::isBaseOf<ResultError<E>, typeTraits::FirstType<Args...>>>>
-	constexpr Result(Args&&... args) noexcept : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
+	template <class... Args>
+	requires(!IsSelf<typeTraits::FirstType<Args...>>::value &&
+			 !typeTraits::isBaseOf<ResultError<E>, typeTraits::FirstType<Args...>>) constexpr Result(Args&&... args) noexcept :
+		data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -101,8 +99,8 @@ public: // Constructors
 
 	// Value assignment is forbidden on reference type. This is because it is confusing whether the
 	// existing reference updates its value or the reference gets re-assigned.
-	template <class U, typename = typeTraits::EnableIf<!IsSelf<U>::value && isValueReference>>
-	constexpr Self& operator=(U) noexcept = delete;
+	template <class U>
+	requires(!IsSelf<U>::value && concepts::reference<T>) constexpr Self& operator=(U) noexcept = delete;
 
 public: // API
 	/// Checks whether the result contains a value.

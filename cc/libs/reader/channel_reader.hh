@@ -228,7 +228,7 @@ private: // Variables.
 template <class T, class Value>
 requires requires(T&& t, Value&& v)
 {
-	t += v;
+	t.pushBack(v);
 }
 bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
 {

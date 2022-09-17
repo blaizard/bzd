@@ -26,6 +26,7 @@ cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/meta:macro",
         "//cc/bzd/platform:clock",
+        "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",
         "//cc/bzd/utility/random:xorwow_engine",

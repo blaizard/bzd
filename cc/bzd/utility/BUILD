@@ -10,7 +10,6 @@ bzd_cc_library(
         ":align_up",
         ":apply",
         ":begin",
-        ":concept",
         ":constexpr_for",
         ":container_of",
         ":distance",
@@ -99,18 +98,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
-    name = "concept",
-    hdrs = [
-        "concept.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
-        "//cc/bzd/type_traits:enable_if",
     ],
 )
 

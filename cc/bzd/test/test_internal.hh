@@ -2,6 +2,7 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/utility/format/integral.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
@@ -310,18 +311,15 @@ public:
 public:
 	constexpr explicit Context(const SeedType seed = 53267) noexcept : generator_{seed} {}
 
-	template <class T,
-			  T min = NumericLimits<T>::min(),
-			  T max = NumericLimits<T>::max(),
-			  typename typeTraits::EnableIf<typeTraits::isIntegral<T> && !typeTraits::isSame<T, Bool>, void>* = nullptr>
-	[[nodiscard]] T random() const noexcept
+	template <class T, T min = NumericLimits<T>::min(), T max = NumericLimits<T>::max()>
+	requires(concepts::integral<T> && !concepts::sameClassAs<T, Bool>) [[nodiscard]] T random() const noexcept
 	{
 		UniformIntDistribution<T, min, max> distribution{};
 		return distribution(generator_);
 	}
 
-	template <class T, typename typeTraits::EnableIf<typeTraits::isSame<T, Bool>, void>* = nullptr>
-	[[nodiscard]] T random() const noexcept
+	template <class T>
+	requires(concepts::sameClassAs<T, Bool>) [[nodiscard]] T random() const noexcept
 	{
 		return static_cast<Bool>(random<bzd::UInt32, 0, 1>() == 1);
 	}
