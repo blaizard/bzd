@@ -11,7 +11,7 @@ void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkp
 {
 	trace += '[';
 	trace += id;
-	toString(trace, checkpoint);
+	::toString(trace, checkpoint);
 	trace += ']';
 	//::std::cout << "[" << id.data() << checkpoint << "]" << ::std::flush;
 }

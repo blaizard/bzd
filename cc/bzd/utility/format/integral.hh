@@ -20,34 +20,27 @@ constexpr void integer(interface::String& str, const T& n, U& digits = bzd::form
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(U::size() >= base, "There is not enough digits for the base.");
 
-	auto data = str.data();
 	const Size indexBegin = str.size();
-	Size index = indexBegin;
-	const Size indexEnd = str.capacity();
 	T number = n;
 	if constexpr (bzd::typeTraits::isSigned<T>)
 	{
 		number = (n < 0) ? -n : n;
 	}
 
-	if (index != indexEnd)
+	do
 	{
-		do
-		{
-			const auto digit = digits[static_cast<Size>(number % base)];
-			number /= base;
-			data[index++] = digit;
-		} while (number && index != indexEnd);
+		const auto digit = digits[static_cast<Size>(number % base)];
+		number /= base;
+		str.append(digit);
+	} while (number);
 
-		if constexpr (bzd::typeTraits::isSigned<T>)
+	if constexpr (bzd::typeTraits::isSigned<T>)
+	{
+		if (n < 0)
 		{
-			if (n < 0 && index != indexEnd)
-			{
-				data[index++] = '-';
-			}
+			str.append('-');
 		}
 	}
-	str.resize(index);
 	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
 	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
 }

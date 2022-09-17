@@ -12,7 +12,7 @@ public:
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
-		string_.append(reinterpret_cast<const char*>(data.data()), data.size());
+		string_.pushBack(data);
 		co_return {};
 	}
 
