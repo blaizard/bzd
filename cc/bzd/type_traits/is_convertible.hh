@@ -34,3 +34,8 @@ template <class From, class To>
 inline constexpr bool isConvertible = IsConvertible<From, To>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class From, class To>
+concept convertible = typeTraits::isConvertible<From, To>;
+}

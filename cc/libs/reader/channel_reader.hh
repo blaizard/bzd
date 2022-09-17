@@ -234,7 +234,7 @@ bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
 {
 	T container;
 	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) {
-		for (auto& a : value) container += static_cast<char>(a);
+		container.pushBack(value);
 	});
 	co_return container;
 }

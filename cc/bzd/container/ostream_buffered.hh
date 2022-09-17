@@ -28,13 +28,13 @@ public:
 			const auto sizeLeft = buffer_.capacity() - buffer_.size();
 			if (sizeLeft < dataLeft.size())
 			{
-				buffer_.insertBack(dataLeft.first(sizeLeft));
+				buffer_.pushBack(dataLeft.first(sizeLeft));
 				dataLeft = dataLeft.subSpan(sizeLeft);
 				co_await !flush();
 			}
 			else
 			{
-				buffer_.insertBack(dataLeft);
+				buffer_.pushBack(dataLeft);
 				dataLeft = dataLeft.subSpan(dataLeft.size());
 			}
 		}

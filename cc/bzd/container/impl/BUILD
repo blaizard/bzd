@@ -6,6 +6,7 @@ cc_library(
     deps = [
         ":single_linked_pool",
         ":span",
+        ":span_resizeable"
     ],
 )
 
@@ -44,5 +45,18 @@ cc_library(
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
+    name = "span_resizeable",
+    hdrs = [
+        "span_resizeable.hh",
+    ],
+    visibility = ["//cc/bzd/container:__pkg__"],
+    deps = [
+        ":span",
+        "//cc/bzd/type_traits:is_convertible",
+        "//cc/bzd/type_traits:is_trivially_copyable",
     ],
 )

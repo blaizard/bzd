@@ -45,6 +45,7 @@ bzd_cc_library(
         ":is_signed",
         ":is_trivially_copy_assignable",
         ":is_trivially_copy_constructible",
+        ":is_trivially_copyable",
         ":is_trivially_destructible",
         ":is_trivially_move_assignable",
         ":is_trivially_move_constructible",
@@ -546,15 +547,19 @@ cc_library(
 )
 
 cc_library(
+    name = "is_trivially_copyable",
+    hdrs = [
+        "is_trivially_copyable.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "is_trivially_destructible",
     hdrs = [
         "is_trivially_destructible.hh",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        ":integral_constant",
-        ":is_destructible",
-    ],
 )
 
 cc_library(

@@ -8,7 +8,7 @@ bzd_cc_test(
     deps = [
         "//cc:bzd",
         "//cc/bzd/test",
-        "//cc/bzd/test/types:istream",
+        "//cc/bzd/test/types:ichannel",
         "//cc/components/generic/stream/stub",
         "//example/terminal:reader",
     ],

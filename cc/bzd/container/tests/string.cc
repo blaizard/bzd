@@ -52,6 +52,25 @@ TEST(ContainerString, Base)
 	EXPECT_STREQ(iString.data(), "Willo You!");
 }
 
+TEST(ContainerString, Append)
+{
+	{
+		bzd::String<10> string{};
+		string += "hello";
+		EXPECT_STREQ(string.data(), "hello");
+		EXPECT_EQ(string, "hello");
+		string += "s";
+		EXPECT_STREQ(string.data(), "hellos");
+		EXPECT_EQ(string, "hellos");
+		string += 's';
+		EXPECT_STREQ(string.data(), "helloss");
+		EXPECT_EQ(string, "helloss");
+		string += "me"_sv;
+		EXPECT_STREQ(string.data(), "hellossme");
+		EXPECT_EQ(string, "hellossme");
+	}
+}
+
 TEST(ContainerString, BaseConst)
 {
 	const bzd::String<10> string("Hello");
