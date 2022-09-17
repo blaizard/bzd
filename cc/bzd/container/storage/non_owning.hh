@@ -14,7 +14,6 @@ class NonOwningStorage
 public:
 	using Self = NonOwningStorage<T>;
 	using SelfNonConst = NonOwningStorage<bzd::typeTraits::RemoveConst<T>>;
-	using IsDataConst = bzd::typeTraits::IsConst<T>;
 	using ValueType = T;
 	using ValueMutableType = T;
 
@@ -29,8 +28,8 @@ public: // Constructors
 	explicit constexpr NonOwningStorage(T* const data, const bzd::Size size) noexcept : data_{data}, size_{size} {}
 
 	// Ability to construct a const storage from a non-const
-	template <class Q = IsDataConst, bzd::typeTraits::EnableIf<Q::value, void>* = nullptr>
-	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept : data_{storage.data_}, size_{storage.size_}
+	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept requires(concepts::isConst<T>) :
+		data_{storage.data_}, size_{storage.size_}
 	{
 	}
 

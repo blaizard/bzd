@@ -21,3 +21,8 @@ using IsConst = typename impl::IsConst<T>;
 template <class T>
 inline constexpr bool isConst = IsConst<T>::value;
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T>
+concept isConst = typeTraits::isConst<T>;
+}

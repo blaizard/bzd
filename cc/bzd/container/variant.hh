@@ -193,8 +193,8 @@ public: // Comparators.
 	[[nodiscard]] constexpr Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 public: // Functions
-	template <class T, class... Args, bzd::typeTraits::EnableIf<Contains<T>::value>* = nullptr>
-	constexpr void emplace(Args&&... args) noexcept
+	template <class T, class... Args>
+	requires(Contains<T>::value) constexpr void emplace(Args&&... args) noexcept
 	{
 		// Using placement new
 		::new (&(data_.template get<VariantElementStorageType<T>>())) VariantElementStorageType<T>{bzd::forward<Args>(args)...};
@@ -422,8 +422,8 @@ public: // Traits
 	template <class T>
 	using Find = typename Parent::template Find<T>;
 
-	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value, bzd::typeTraits::EnableIf<index != -1>* = nullptr>
-	constexpr Self& operator=(T&& value) noexcept
+	template <class T, int index = Find<bzd::typeTraits::RemoveReference<T>>::value>
+	requires(index != -1) constexpr Self& operator=(T&& value) noexcept
 	{
 		this->template set<typeTraits::RemoveReference<T>>(bzd::forward<T>(value));
 		return *this;

@@ -4,7 +4,7 @@
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/first_type.hh"
-#include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -27,35 +27,40 @@ public:
 	constexpr UnionTrivial() noexcept : next_{} {}
 
 	// Value constructor (copy/move)
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr UnionTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>)
+		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+		constexpr UnionTrivial(U&& value) noexcept :
+		next_{bzd::forward<U>(value)}
 	{
 	}
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>)
+		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+		constexpr UnionTrivial(U&& value) noexcept :
+		value_{bzd::forward<U>(value)}
 	{
 	}
 
-	template <Size I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
-	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	template <Size I, class... Args>
+	requires(I != Index) constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept :
+		next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <Size I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
-	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	template <Size I, class... Args>
+	requires(I == Index) constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...} {}
+
+	template <class U, class... Args>
+	requires(!concepts::sameClassAs<T, U>) constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept :
+		next_{inPlaceType<U>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <class U, class... Args, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
-	{
-	}
-
-	template <class U, class... Args, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	template <class U, class... Args>
+	requires(concepts::sameClassAs<T, U>) constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept :
+		value_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -67,41 +72,23 @@ public:
 		return *this;
 	}
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr U& get() noexcept
-	{
-		return next_.template get<U>();
-	}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return next_.template get<U>(); }
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr const U& get() const noexcept
-	{
-		return next_.template get<U>();
-	}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return next_.template get<U>(); }
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr U& get() noexcept
-	{
-		return value_;
-	}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return value_; }
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr const U& get() const noexcept
-	{
-		return value_;
-	}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return value_; }
 
-	template <class U, class V, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr void set(V&& value) noexcept
-	{
-		next_.template set<U>(bzd::forward<V>(value));
-	}
+	template <class U, class V>
+	requires(!concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { next_.template set<U>(bzd::forward<V>(value)); }
 
-	template <class U, class V, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr void set(V&& value) noexcept
-	{
-		value_ = bzd::forward<V>(value);
-	}
+	template <class U, class V>
+	requires(concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { value_ = bzd::forward<V>(value); }
 
 protected:
 	T value_;
@@ -123,35 +110,40 @@ public:
 	~UnionNonTrivial() noexcept {}
 
 	// Value constructor (copy/move)
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr UnionNonTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>)
+		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+		constexpr UnionNonTrivial(U&& value) noexcept :
+		next_{bzd::forward<U>(value)}
 	{
 	}
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, bzd::typeTraits::RemoveReference<U>>>* = nullptr>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>)
+		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+		constexpr UnionNonTrivial(U&& value) noexcept :
+		value_{bzd::forward<U>(value)}
 	{
 	}
 
-	template <Size I, class... Args, typeTraits::EnableIf<I != Index>* = nullptr>
-	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	template <Size I, class... Args>
+	requires(I != Index) constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept :
+		next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <Size I, class... Args, typeTraits::EnableIf<I == Index>* = nullptr>
-	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	template <Size I, class... Args>
+	requires(I == Index) constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...} {}
+
+	template <class U, class... Args>
+	requires(!concepts::sameClassAs<T, U>) constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept :
+		next_{inPlaceType<U>, bzd::forward<Args>(args)...}
 	{
 	}
 
-	template <class U, class... Args, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
-	{
-	}
-
-	template <class U, class... Args, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
+	template <class U, class... Args>
+	requires(concepts::sameClassAs<T, U>) constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept :
+		value_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -163,41 +155,23 @@ public:
 		return *this;
 	}
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr U& get() noexcept
-	{
-		return next_.template get<U>();
-	}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return next_.template get<U>(); }
 
-	template <class U, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr const U& get() const noexcept
-	{
-		return next_.template get<U>();
-	}
+	template <class U>
+	requires(!concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return next_.template get<U>(); }
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr U& get() noexcept
-	{
-		return value_;
-	}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return value_; }
 
-	template <class U, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr const U& get() const noexcept
-	{
-		return value_;
-	}
+	template <class U>
+	requires(concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return value_; }
 
-	template <class U, class V, typeTraits::EnableIf<!bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr void set(V&& value) noexcept
-	{
-		next_.template set<U>(bzd::forward<V>(value));
-	}
+	template <class U, class V>
+	requires(!concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { next_.template set<U>(bzd::forward<V>(value)); }
 
-	template <class U, class V, typeTraits::EnableIf<bzd::typeTraits::isSame<T, U>>* = nullptr>
-	constexpr void set(V&& value) noexcept
-	{
-		value_ = bzd::forward<V>(value);
-	}
+	template <class U, class V>
+	requires(concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { value_ = bzd::forward<V>(value); }
 
 protected:
 	T value_;
