@@ -9,16 +9,24 @@
 namespace bzd::impl {
 
 /// Implementation of a contiguous storage container.
+///
+/// In order to make this implementation constexpr, some differences are to be noted
+/// from the standard library. One of the main restriction is that placement new cannot be used
+/// in a constexpr function in c++20.
+/// Therefore this implementation behaves slightly differently from the standard library:
+/// - All elements are initialized at the creation.
+/// - When resizing, erased elements are not destroyed and appended elements are not constructed.
+/// - Pushed back elements are copy/moved assigned to the previous one.
 template <class T, class Storage>
 class SpanResizeable : public Span<T, Storage>
 {
 protected:
-    using Parent = Span<T, Storage>;
+	using Parent = Span<T, Storage>;
 
 public: // Constructor/assignment
 	// Default/copy/move constructor/assignment.
 	SpanResizeable() = default;
-    SpanResizeable(const SpanResizeable&) = default;
+	SpanResizeable(const SpanResizeable&) = default;
 	SpanResizeable& operator=(const SpanResizeable&) = default;
 	SpanResizeable(SpanResizeable&&) = default;
 	SpanResizeable& operator=(SpanResizeable&&) = default;
@@ -33,52 +41,34 @@ public: // Size.
 	[[nodiscard]] constexpr Bool full() const noexcept { return this->capacity_ == this->size(); }
 
 public: // Modifiers.
-	/// \brief Change the size of the container.
+	/// Change the size of the container.
 	///
 	/// \param n The new size. Note, it must a be lower or equal to the capacity.
 	constexpr void resize(const Size n) noexcept
 	{
 		const auto newSize = (n < capacity_) ? n : capacity_;
-		// Destroy elements that will potentially be removed.
-		for (Size index{newSize}; index < this->storage_.size(); ++index)
-		{
-			this->at(index).~T();
-		}
-		// Initialize elements that will be potentially added.
-		for (Size index{this->storage_.size()}; index < newSize; ++index)
-		{
-			::new (&(this->at(index))) T{};
-		}
 		this->storage_.sizeMutable() = newSize;
 	}
 
 	/// \brief Removes all elements from the container.
-	constexpr void clear() noexcept
-    {
-        resize(0);
-    }
+	constexpr void clear() noexcept { resize(0); }
 
-	/// \brief Adds a new element at the end of the container, after its current last
+	/// Adds a new element at the end of the container, after its current last
 	/// element.
 	/// The content of `value` is copied (or moved) to the new element.
 	///
 	/// \param value Value to be copied (or moved) to the new element.
 	template <class U>
 	requires concepts::convertible<U, T>
-	constexpr Size pushBack(U&& value) noexcept 
+	constexpr Size pushBack(U&& value) noexcept
 	{
-		if (full())
-		{
-			return 0u;
-		}
-		this->at(this->size()) = bzd::forward<U>(value);
-		++this->storage_.sizeMutable();
-		return 1u;
+		return pushBackInternal(bzd::forward<U>(value));
 	}
 
-	constexpr Size pushBack(const Byte value) noexcept requires (sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
+	/// Trivially copyable objects of 1 byte size can be directly constructed from bytes.
+	constexpr Size pushBack(const Byte value) noexcept requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
 	{
-		return pushBack(reinterpret_cast<const T&>(value));
+		return pushBackInternal(reinterpret_cast<const T&>(value));
 	}
 
 	template <class Iterator>
@@ -115,8 +105,23 @@ public: // Modifiers.
 		return 0u;
 	}
 
+private:
+	template <class U>
+	constexpr Size pushBackInternal(U&& value) noexcept
+	{
+		if (full())
+		{
+			return 0u;
+		}
+		// Using the copy/move assignment operator is necessary here as it is
+		// allowed in a constexpr expression unlike placement new (at least in c++20).
+		this->at(this->size()) = bzd::forward<U>(value);
+		++this->storage_.sizeMutable();
+		return 1u;
+	}
+
 protected:
 	const bzd::Size capacity_{};
 };
 
-}
+} // namespace bzd::impl

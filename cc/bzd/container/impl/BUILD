@@ -6,7 +6,7 @@ cc_library(
     deps = [
         ":single_linked_pool",
         ":span",
-        ":span_resizeable"
+        ":span_resizeable",
     ],
 )
 
