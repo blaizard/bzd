@@ -8,8 +8,8 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/add_const.hh"
-#include "cc/bzd/utility/min.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
+#include "cc/bzd/utility/min.hh"
 
 namespace bzd::impl {
 template <class T, class Storage>
@@ -34,10 +34,15 @@ public:
 	// Append
 	constexpr Size append(const bzd::StringView& str) noexcept { return pushBack(str); }
 	constexpr Size append(const bzd::impl::String<T, Storage>& str) noexcept { return pushBack(str); }
-	constexpr Size append(const T c) noexcept { return pushBack(c); }	
+	constexpr Size append(const T c) noexcept { return pushBack(c); }
 
 	template <class... Args>
-	constexpr Size pushBack(Args&&... args) noexcept { const auto count = Parent::pushBack(bzd::forward<Args>(args)...); this->at(this->size()) = '\0'; return count; }	
+	constexpr Size pushBack(Args&&... args) noexcept
+	{
+		const auto count = Parent::pushBack(bzd::forward<Args>(args)...);
+		this->at(this->size()) = '\0';
+		return count;
+	}
 
 	template <class U>
 	constexpr Size assign(const U& data) noexcept
@@ -91,7 +96,6 @@ protected:
 public:
 	constexpr String() noexcept : Parent{StorageType{data_, 0}, maxCapacity + 1u} { data_[0] = '\0'; }
 	constexpr String(const bzd::StringView& str) noexcept : String() { append(str); }
-	//constexpr String(const Size n, const char c) noexcept : String() { append(n, c); }
 
 	template <class T>
 	constexpr Self& operator=(const T& data) noexcept

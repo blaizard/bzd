@@ -233,9 +233,7 @@ requires requires(T&& t, Value&& v)
 bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
 {
 	T container;
-	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) {
-		container.pushBack(value);
-	});
+	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.pushBack(value); });
 	co_return container;
 }
 

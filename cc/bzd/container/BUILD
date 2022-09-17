@@ -346,13 +346,13 @@ cc_library(
     deps = [
         ":span",
         ":string_view",
-        "//cc/bzd/container/impl:span_resizeable",
         "//cc/bzd/algorithm:copy",
         "//cc/bzd/algorithm:fill_n",
+        "//cc/bzd/container/impl:span_resizeable",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_const",
-        "//cc/bzd/utility:min",
         "//cc/bzd/type_traits:is_trivially_copyable",
+        "//cc/bzd/utility:min",
     ],
 )
 

@@ -1,7 +1,7 @@
 #include "example/terminal/reader.hh"
 
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/test/types/istream.hh"
+#include "cc/bzd/test/types/ichannel.hh"
 #include "cc/components/generic/stream/stub/stub.hh"
 
 TEST_ASYNC(Reader, readUntil)
