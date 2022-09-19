@@ -79,7 +79,7 @@ private:
 		{
 			co_return bzd::error::Data("Missing HTTP/*.");
 		}
-		const bzd::Map<StringView, typename Status::Version, 3u> versions{{"1.0"_sv, Status::Version::version1dot0},
+		/*const bzd::Map<StringView, typename Status::Version, 3u> versions{{"1.0"_sv, Status::Version::version1dot0},
 																		  {"1.1"_sv, Status::Version::version1dot1},
 																		  {"2"_sv, Status::Version::version2}};
 		const auto versionMatch = bzd::algorithm::startsWithAnyOf(
@@ -90,7 +90,7 @@ private:
 		if (versionMatch != versions.end())
 		{
 			co_return Status{versionMatch->second, 100u};
-		}
+		}*/
 		co_return Status{Status::Version::unknown, 100u};
 	}
 
