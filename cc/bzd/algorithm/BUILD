@@ -26,6 +26,7 @@ bzd_cc_library(
         ":rsearch",
         ":search",
         ":sort",
+        ":starts_with_any_of",
         ":upper_bound",
     ],
 )
@@ -329,6 +330,23 @@ cc_library(
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
+    ],
+)
+
+cc_library(
+    name = "starts_with_any_of",
+    hdrs = [
+        "starts_with_any_of.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":lower_bound",
+        ":upper_bound",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:begin",
+        "//cc/bzd/utility:end",
+        "//cc/bzd/utility:size",
     ],
 )
 
