@@ -21,7 +21,10 @@ enum class ErrorType : bzd::UInt8
 	/// this type of error notifies the handler that it can be retried if necessary.
 	busy,
 	/// Happens when a stream reaches the end of its channel for example.
-	eof
+	eof,
+	/// Error related to data received, it can be due to data corruption, etc. Generally,
+	/// reason that are out of our control.
+	data
 };
 
 /// Global definition of an error object.
@@ -89,6 +92,8 @@ public: // Accessors.
 			return "busy"_sv;
 		case ErrorType::eof:
 			return "eof"_sv;
+		case ErrorType::data:
+			return "data"_sv;
 		}
 		return "unknown"_sv;
 	}
@@ -167,5 +172,17 @@ struct Eof : public bzd::ResultError<bzd::Error>
 
 template <class... Args>
 Eof(Args&&...) -> Eof<Args...>;
+
+template <class... Args>
+struct Data : public bzd::ResultError<bzd::Error>
+{
+	Data(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::data, bzd::forward<Args>(args)...}
+	{
+	}
+};
+
+template <class... Args>
+Data(Args&&...) -> Data<Args...>;
 
 } // namespace bzd::error

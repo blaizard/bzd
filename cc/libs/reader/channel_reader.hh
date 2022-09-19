@@ -3,6 +3,7 @@
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
+#include "cc/bzd/type_traits/container.hh"
 
 namespace bzd {
 
@@ -28,123 +29,29 @@ public:
 		buffer_.consume(count);
 		co_return readFromBuffer.first(count);
 	}
-	/*
-		/// Problem with this solution:
-		/// - Cannot use an input buffer to write data directly to it. Need to copy first to internal buffer.
-		///       -> Wrong concern because data cannot be written to the output buffer directly as it needs to be read first.
-		///              -> /!\ This is not always true for other type of functions, for example readNumberOfBytes(...).
-		///       -> produce() can be changed to not produce data to the ring (so use .read instead of .readToBuffer).
-		/// - Not compatible with IChannel<T>
-		///       ->
-		///
-		/// Advantages:
-		/// - Simple to use.
-		/// - The function is stateful, making it easier to write the logic.
-		bzd::Generator<bzd::Span<const T>> readUntil(const T& value) noexcept
-		{
-			auto readFromBuffer = buffer_.asSpanForReading();
-			const Size position;
-			while (position = bzd::algorithm::find(readFromBuffer, value); position == readFromBuffer.end())
-			{
-				buffer_.consume(readFromBuffer.size());
-				co_yield readFromBuffer;
-				readFromBuffer = co_await !produce();
-			}
-			buffer_.consume(position);
-			co_yield readFromBuffer.first(position);
-		}
 
-
-		/// Other solution, mixing both
-		auto readUntil(const T& value) noexcept
-		{
-			return [](Function<bzd::Span<T>(void)>) -> bzd::Generator<bzd::Span<const T>> {
-			};
-		}
-
-		auto factory = readUntil(...);
-		for (auto x : factory([&]() { return hello.subSpan(); }))
-		{
-			x
-		}
-
-		/// Another
-		struct Context
-		{
-			Span read(Size)
-			{
-			}
-		};
-
-		readContext = makeReadContext(myString);
-
-		bzd::Generator<bzd::Span<const T>> readUntil(ContextReader context, const T& value) noexcept
-		{
-			data = context.allocate();
-			readFromBuffer = co_await in_.read(data);
-		}
-
-		bzd::Generator<bzd::Span<const T>> readCount(ContextReader context, const Size count) noexcept
-		{
-			bzd::ignore = co_await !context.read(in_, 12);
-		}
-
-		/// Or maybe the best is to:
-		/// 1. return bzd::Generator<bzd::Span<const T>>, because most of the functions need to write to the internal buffer anyway,
-		/// 2. for the few (only thinking about readCount) provide an overload that can write directly into a container.
-
-		template <class T>
-		class IFiniteChannel : public bzd::IChannel<T>
-		{
-		public:
-			virtual Bool empty() noexcept = 0;
-		};
-
-		/// Advantage:
-		/// - Can pass a buffer to be written to.
-		/// - Compatible with IChannel.
-		/// - Implementation can be splitted in different files.
-		///
-		/// - Function is not stateful
-		///        -> but class is.
-		/// - Function more complex and less efficient as it needs to start from the top all the time.
-		IFiniteChannel readUntil(const T& value, filters...)
-		{
-		}
-
-		channel = readUntil(const T& value, filters...);
-		while (!channel.empty())
-		{
-			buffer = co_await channel.read(std::move(buffer));
-		}
-
-		for (const auto span : readUntil(...))
-		{
-		}
-	*/
-
-	/// Read data until a specific value is found but does not return the value.
-	auto readUntil(const T value) noexcept
+	/// Read data until a specific value is found.
+	auto readUntil(const T value, const Bool include = false) noexcept
 	{
 		return readUntilHelper(
-			[value](const auto range) noexcept -> bzd::Size {
+			[value, include](const auto range) noexcept -> bzd::Size {
 				if (const auto it = bzd::algorithm::find(range, value); it != range.end())
 				{
-					return bzd::distance(range.begin(), it);
+					return bzd::distance(range.begin(), it) + ((include) ? 1u : 0u);
 				}
 				return bzd::npos;
 			},
 			1u);
 	}
 
-	/// Read data until a specific sequence is found but does not include the sequence.
-	auto readUntil(const bzd::Span<const T> value) noexcept
+	/// Read data until a specific sequence is found.
+	auto readUntil(const bzd::Span<const T> value, const Bool include = false) noexcept
 	{
 		return readUntilHelper(
-			[value](const auto range) noexcept -> bzd::Size {
+			[value, include](const auto range) noexcept -> bzd::Size {
 				if (const auto it = bzd::algorithm::search(range, value); it != range.end())
 				{
-					return bzd::distance(range.begin(), it);
+					return bzd::distance(range.begin(), it) + ((include) ? value.size() : 0u);
 				}
 				return bzd::npos;
 			},
@@ -226,11 +133,8 @@ private: // Variables.
 };
 
 template <class T, class Value>
-requires requires(T&& t, Value&& v)
-{
-	t.pushBack(v);
-}
-bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
+requires concepts::containerAppendable<T, Value> bzd::Async<T> make(bzd::Generator<Value>&& generator)
+noexcept
 {
 	T container;
 	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.pushBack(value); });

@@ -14,11 +14,11 @@ namespace {
 static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 }
 
-template <Size base = 10, class T, class U>
-constexpr void integer(interface::String& str, const T& n, U& digits = bzd::format::impl::digits) noexcept
+template <Size base = 10, class T, class Digits>
+constexpr void integer(interface::String& str, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
-	static_assert(U::size() >= base, "There is not enough digits for the base.");
+	static_assert(Digits::size() >= base, "There is not enough digits for the base.");
 
 	const Size indexBegin = str.size();
 	T number = n;

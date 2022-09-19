@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
 #include "cc/bzd/utility/format/stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
@@ -36,12 +37,61 @@ public:
 		}
 
 		// Transfer-Encoding
-		[[maybe_unused]] const auto string = co_await !bzd::make<bzd::String<40>>(reader_.readUntil(static_cast<bzd::Byte>('\r')));
+		const auto [version, code] = co_await !readStatus();
+		switch (version)
+		{
+		case Status::Version::version1dot0:
+			[[fallthrough]];
+		case Status::Version::version1dot1:
+			break;
+		case Status::Version::version2:
+		case Status::Version::unknown:
+			co_return bzd::error::Failure("Version not supported.");
+		}
 		// co_await reader_.readUntil("/r/n"_sv.asBytes());
-		//::std::cout << "[-> " << string.data() << " <-]" << std::endl;
+		::std::cout << "[-> " << code << " <-]" << std::endl;
 
 		const auto read = co_await !reader_.read(bzd::move(data));
 		co_return read;
+	}
+
+private:
+	struct Status
+	{
+		enum class Version
+		{
+			version1dot0,
+			version1dot1,
+			version2,
+			unknown
+		};
+		Version version;
+		UInt16 code;
+	};
+
+	/// Read the first line that should look like this.
+	/// HTTP/1.1 200 OK
+	bzd::Async<Status> readStatus() noexcept
+	{
+		const auto string = co_await !bzd::make<bzd::String<100>>(reader_.readUntil("\r\n"_sv.asBytes(), /*include*/ true));
+		auto it = bzd::algorithm::search(string, "HTTP/"_sv);
+		if (it == string.end())
+		{
+			co_return bzd::error::Data("Missing HTTP/*.");
+		}
+		const bzd::Map<StringView, typename Status::Version, 3u> versions{{"1.0"_sv, Status::Version::version1dot0},
+																		  {"1.1"_sv, Status::Version::version1dot1},
+																		  {"2"_sv, Status::Version::version2}};
+		const auto versionMatch = bzd::algorithm::startsWithAnyOf(
+			it,
+			string.end(),
+			versions,
+			[](const auto& value) -> const auto& { return value.first; });
+		if (versionMatch != versions.end())
+		{
+			co_return Status{versionMatch->second, 100u};
+		}
+		co_return Status{Status::Version::unknown, 100u};
 	}
 
 private:

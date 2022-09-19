@@ -13,6 +13,7 @@ bzd_cc_library(
         ":add_rvalue_reference",
         ":add_volatile",
         ":conditional",
+        ":container",
         ":decay",
         ":declval",
         ":derived_from",
@@ -140,6 +141,14 @@ cc_library(
     name = "conditional",
     hdrs = [
         "conditional.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "container",
+    hdrs = [
+        "container.hh",
     ],
     visibility = ["//visibility:public"],
 )

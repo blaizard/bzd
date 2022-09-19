@@ -26,3 +26,8 @@ template <class T>
 inline constexpr bool isSigned = IsSigned<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T>
+concept isSigned = typeTraits::isSigned<T>;
+}

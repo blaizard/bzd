@@ -10,6 +10,7 @@ cc_library(
         "//cc/bzd/container:ring_buffer",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
+        "//cc/bzd/type_traits:container",
     ],
 )
 
