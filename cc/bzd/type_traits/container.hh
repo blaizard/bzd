@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cc/bzd/container/span.hh"
+
 namespace bzd::concepts {
 
 /// Defines a container that can be expanded by adding new data.
