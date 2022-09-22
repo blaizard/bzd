@@ -1,5 +1,5 @@
 
-namespace Example;
+namespace example;
 
 
 method run();
@@ -9,5 +9,3 @@ composition {
 	run();
 	
 }
-
-

@@ -14,6 +14,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         "//cc/bzd/test:utility",
         "//cc/bzd/test/types",
         "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/container/iterator:appender"
     ],
 ) for path in glob([
     "*.cc",

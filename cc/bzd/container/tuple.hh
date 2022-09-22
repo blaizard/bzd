@@ -37,34 +37,34 @@ struct TupleRangeImpl<L, L, TupleSizes<indexes...>> : TupleSizes<indexes...>
 template <Size L>
 using TupleRange = TupleTypeOf<TupleRangeImpl<L>>;
 
-// TupleChooseN
+// tupleChooseN
 
 struct NoType
 {
 };
 
 template <Size Index>
-constexpr NoType TupleChooseN()
+constexpr NoType tupleChooseN()
 {
 	return NoType{};
 }
 
 template <Size Index, class T, class... Ts>
-requires(Index > sizeof...(Ts)) constexpr NoType TupleChooseN(T&&, Ts&&...)
+requires(Index > sizeof...(Ts)) constexpr NoType tupleChooseN(T&&, Ts&&...)
 {
 	return NoType{};
 }
 
 template <Size Index, class T, class... Ts>
-requires(Index == 0) constexpr decltype(auto) TupleChooseN(T&& t, Ts&&...)
+requires(Index == 0) constexpr decltype(auto) tupleChooseN(T&& t, Ts&&...)
 {
 	return bzd::forward<T>(t);
 }
 
 template <Size Index, class T, class... Ts>
-requires(Index > 0 && Index <= sizeof...(Ts)) constexpr decltype(auto) TupleChooseN(T&&, Ts&&... ts)
+requires(Index > 0 && Index <= sizeof...(Ts)) constexpr decltype(auto) tupleChooseN(T&&, Ts&&... ts)
 {
-	return TupleChooseN<Index - 1>(bzd::forward<Ts>(ts)...);
+	return tupleChooseN<Index - 1>(bzd::forward<Ts>(ts)...);
 }
 
 // single tuple element
@@ -118,7 +118,7 @@ public: // constructors
 
 	template <class... Args>
 	constexpr TupleImpl(InPlace, Args&&... args) noexcept :
-		TupleElem<indexes, Ts>{TupleChooseN<indexes, Args...>(bzd::forward<Args>(args)...)}...
+		TupleElem<indexes, Ts>{tupleChooseN<indexes, Args...>(bzd::forward<Args>(args)...)}...
 	{
 	}
 

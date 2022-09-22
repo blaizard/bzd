@@ -6,7 +6,7 @@ namespace bzd::concepts {
 template <class Container, class Value>
 concept containerAppendable = requires(Container container, Value value)
 {
-	container.pushBack(value);
+	container.append(value);
 };
 
 } // namespace bzd::concepts

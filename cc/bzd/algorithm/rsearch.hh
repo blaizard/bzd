@@ -65,14 +65,14 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 	{
 		while (true)
 		{
-			auto new_result = bzd::algorithm::search(first1, last1, first2, last2, predicate);
-			if (new_result == last1)
+			auto newResult = bzd::algorithm::search(first1, last1, first2, last2, predicate);
+			if (newResult == last1)
 			{
 				break;
 			}
 			else
 			{
-				result = new_result;
+				result = newResult;
 				first1 = result;
 				++first1;
 			}

@@ -1,7 +1,7 @@
 #include "cc/bzd.hh"
 #include "example/terminal/reader.hh"
 
-namespace Example {
+namespace example {
 
 bzd::Async<> run()
 {
@@ -49,4 +49,4 @@ bzd::Async<> run()
 	co_return {};
 }
 
-} // namespace Example
+} // namespace example

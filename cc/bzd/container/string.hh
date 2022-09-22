@@ -12,12 +12,18 @@
 #include "cc/bzd/utility/min.hh"
 
 namespace bzd::impl {
-template <class T, class Storage>
-class String : public impl::SpanResizeable<T, Storage>
+
+struct StringPolicies
 {
-protected:
+	static constexpr void post(auto& self) { self.at(self.size()) = '\0'; }
+};
+
+template <class T, class Storage>
+class String : public impl::SpanResizeable<T, Storage, StringPolicies>
+{
+public:
 	using Self = String;
-	using Parent = impl::SpanResizeable<T, Storage>;
+	using Parent = impl::SpanResizeable<T, Storage, StringPolicies>;
 	using StorageType = typename Parent::StorageType;
 	using ValueType = typename Parent::ValueType;
 	using StringView = bzd::impl::StringView<bzd::typeTraits::AddConst<T>>;
@@ -32,48 +38,42 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
 	// Append
-	constexpr Size append(const bzd::StringView& str) noexcept { return pushBack(str); }
-	constexpr Size append(const bzd::impl::String<T, Storage>& str) noexcept { return pushBack(str); }
-	constexpr Size append(const T c) noexcept { return pushBack(c); }
-
+	template <Size n>
+	constexpr Size append(const T (&str)[n]) noexcept
+	{
+		return append(bzd::StringView{str});
+	}
+	constexpr Size append(const T* const str) noexcept { return append(bzd::StringView{str}); }
 	template <class... Args>
-	constexpr Size pushBack(Args&&... args) noexcept
+	constexpr Size append(Args&&... args) noexcept
 	{
-		const auto count = Parent::pushBack(bzd::forward<Args>(args)...);
-		this->at(this->size()) = '\0';
-		return count;
+		return Parent::append(bzd::forward<Args>(args)...);
+	}
+
+	// Assign
+	template <Size n>
+	constexpr Size assign(const T (&str)[n]) noexcept
+	{
+		return assign(bzd::StringView{str});
+	}
+	constexpr Size assign(const T* const str) noexcept { return assign(bzd::StringView{str}); }
+	template <class... Args>
+	constexpr Size assign(Args&&... args) noexcept
+	{
+		return Parent::assign(bzd::forward<Args>(args)...);
 	}
 
 	template <class U>
-	constexpr Size assign(const U& data) noexcept
+	constexpr Self& operator+=(U&& data) noexcept
 	{
-		clear();
-		return append(data);
-	}
-
-	constexpr void clear() noexcept
-	{
-		Parent::clear();
-		this->at(0) = '\0';
-	}
-
-	constexpr void resize(const Size n) noexcept
-	{
-		Parent::resize(n);
-		this->at(this->size()) = '\0';
-	}
-
-	template <class U>
-	constexpr Self& operator+=(const U& data) noexcept
-	{
-		append(data);
+		append(bzd::forward<U>(data));
 		return *this;
 	}
 
 	template <class U>
-	constexpr Self& operator=(const U& data) noexcept
+	constexpr Self& operator=(U&& data) noexcept
 	{
-		assign(data);
+		assign(bzd::forward<U>(data));
 		return *this;
 	}
 };
@@ -87,7 +87,7 @@ namespace bzd {
 template <Size maxCapacity>
 class String : public interface::String
 {
-protected:
+public:
 	using Self = String;
 	using Parent = interface::String;
 	using StorageType = typename Parent::StorageType;

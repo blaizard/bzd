@@ -67,7 +67,7 @@ public: // Traits.
 	using IdType = UInt32;
 	using TickType = UInt32;
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
-	using Continuation = bzd::Variant<bzd::monostate, Executable*, OnTerminateCallback>;
+	using Continuation = bzd::Variant<bzd::Monostate, Executable*, OnTerminateCallback>;
 
 public:
 	constexpr ExecutorContext() noexcept : id_{makeUId()} {}
@@ -79,7 +79,7 @@ public:
 	/// Provide an executable to be enqued sequentially, after the execution of the current exectuable.
 	constexpr void setContinuation(Continuation&& continuation) noexcept
 	{
-		bzd::assert::isTrue(continuation_.template is<bzd::monostate>());
+		bzd::assert::isTrue(continuation_.template is<bzd::Monostate>());
 		continuation_ = bzd::move(continuation);
 	}
 
@@ -91,7 +91,7 @@ private:
 	[[nodiscard]] constexpr bzd::Optional<Executable&> popContinuation() noexcept
 	{
 		bzd::Optional<Executable&> maybeExecutable{};
-		continuation_.match([](bzd::monostate) noexcept {},
+		continuation_.match([](bzd::Monostate) noexcept {},
 							[&](Executable* executable) noexcept {
 								if (executable)
 								{
@@ -99,7 +99,7 @@ private:
 								}
 							},
 							[&](OnTerminateCallback callback) noexcept { maybeExecutable = callback(); });
-		continuation_.template emplace<bzd::monostate>();
+		continuation_.template emplace<bzd::Monostate>();
 		return maybeExecutable;
 	}
 

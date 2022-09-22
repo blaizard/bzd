@@ -3,7 +3,7 @@
 #include "cc/bzd.hh"
 #include "cc/libs/http/http.hh"
 
-namespace Trader {
+namespace trader {
 
 template <class Network>
 bzd::Async<> run(Network& network)

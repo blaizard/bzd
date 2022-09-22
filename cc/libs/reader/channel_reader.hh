@@ -137,7 +137,7 @@ requires concepts::containerAppendable<T, Value> bzd::Async<T> make(bzd::Generat
 noexcept
 {
 	T container;
-	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.pushBack(value); });
+	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.append(value); });
 	co_return container;
 }
 

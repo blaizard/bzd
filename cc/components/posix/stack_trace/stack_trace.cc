@@ -33,15 +33,15 @@ public:
 	{
 		constexpr int fd = STDERR_FILENO;
 
-		bzd::Size already_written = 0u;
-		while (already_written < data.size())
+		bzd::Size alreadyWritten = 0u;
+		while (alreadyWritten < data.size())
 		{
 			const auto result = ::write(fd, data.data(), data.size());
 			if (result < 0)
 			{
 				co_return bzd::error::Errno("write");
 			}
-			already_written += result;
+			alreadyWritten += result;
 		}
 		co_return {};
 	}
@@ -235,16 +235,16 @@ SymbolicInfo makeSymbolicInfo(void* address)
 
 void callStack() noexcept // NOLINT(bugprone-exception-escape)
 {
-	constexpr size_t MAX_STACK_LEVEL = 32;
-	static void* addresses[MAX_STACK_LEVEL];
+	constexpr size_t maxStackLevel = 32;
+	static void* addresses[maxStackLevel];
 
-	const int nbLevels = ::backtrace(addresses, MAX_STACK_LEVEL);
+	const int nbLevels = ::backtrace(addresses, maxStackLevel);
 	AsyncSignalSafeStream stream;
 
 	for (int level = 0; level < nbLevels; ++level)
 	{
 		// Do not print the last stack trace, but ellipsis instead.
-		if (level == MAX_STACK_LEVEL - 1)
+		if (level == maxStackLevel - 1)
 		{
 			toStream(stream, "...\n"_sv).sync();
 			return;
