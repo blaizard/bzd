@@ -151,6 +151,9 @@ cc_library(
         "container.hh",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:span",
+    ],
 )
 
 cc_library(
