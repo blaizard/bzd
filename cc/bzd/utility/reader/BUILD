@@ -8,12 +8,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:array",
+        "//cc/bzd/container:optional",
         "//cc/bzd/container:string_view",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
-        "//cc/bzd/container:optional"
     ],
 )
 

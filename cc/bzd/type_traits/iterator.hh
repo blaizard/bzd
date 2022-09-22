@@ -26,7 +26,9 @@ struct OutputTag
 
 /// A forward iterator is an iterator that can read data from the pointed-to element.
 /// Unlike an input iterator and output iterator, it can be used in multipass algorithms.
-struct ForwardTag : public InputTag, public OutputTag
+struct ForwardTag
+	: public InputTag
+	, public OutputTag
 {
 };
 

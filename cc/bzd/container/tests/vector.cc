@@ -1,6 +1,6 @@
 #include "cc/bzd/container/vector.hh"
-#include "cc/bzd/container/iterator/appender.hh"
 
+#include "cc/bzd/container/iterator/appender.hh"
 #include "cc/bzd/test/test.hh"
 
 TEST(ContainerVector, Base)
