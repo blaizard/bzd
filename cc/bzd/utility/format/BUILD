@@ -12,6 +12,7 @@ cc_library(
         "//cc/bzd/container:string",
         "//cc/bzd/container:vector",
         "//cc/bzd/meta:always_false",
+        "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",

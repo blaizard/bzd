@@ -636,8 +636,8 @@ private:
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <bzd::concepts::constexprStringView T, class... Args>
-constexpr void toString(bzd::interface::String& str, const T&, Args&&... args) noexcept
+template <bzd::concepts::containerToString Container, bzd::concepts::constexprStringView T, class... Args>
+constexpr void toString(Container& str, const T&, Args&&... args) noexcept
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};

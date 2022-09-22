@@ -466,7 +466,8 @@ struct NonOwningForwardListElementMultiContainer
 
 template <bzd::Bool supportMultiContainerValue, bzd::Bool supportDiscardValue>
 class NonOwningForwardListElement
-	: public bzd::typeTraits::Conditional<supportMultiContainerValue, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
+	: public bzd::typeTraits::
+		  Conditional<supportMultiContainerValue, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
 {
 public:
 	static const constexpr bzd::Bool supportMultiContainer{supportMultiContainerValue};

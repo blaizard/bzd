@@ -24,4 +24,4 @@ bzd::Async<> run(Network& network)
 	co_return {};
 }
 
-} // namespace Trader
+} // namespace trader
