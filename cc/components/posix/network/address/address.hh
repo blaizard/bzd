@@ -110,7 +110,6 @@ public: // Copy/move constructors/assignments
 	~Addresses() noexcept;
 
 	constexpr Iterator begin() const noexcept { return Iterator{addr_}; }
-
 	constexpr Iterator end() const noexcept { return Iterator{nullptr}; }
 
 private:

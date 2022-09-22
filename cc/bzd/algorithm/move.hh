@@ -16,7 +16,7 @@ namespace bzd::algorithm {
 ///
 /// \return Output iterator to the element past the last element moved (result + (last - first)).
 template <class Iterator1, class Iterator2>
-requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
+requires concepts::forwardIterator<Iterator1> && concepts::outputIterator<Iterator2>
 constexpr Iterator2 move(Iterator1 first, Iterator1 last, Iterator2 result) noexcept
 {
 	while (first != last)
@@ -30,7 +30,7 @@ constexpr Iterator2 move(Iterator1 first, Iterator1 last, Iterator2 result) noex
 /// \param[in] range1 The first range of elements to be moved.
 /// \param[out] range2 The second range of elements to moved to.
 template <class Range1, class Range2>
-requires concepts::forwardRange<Range1> && concepts::forwardRange<Range2>
+requires concepts::forwardRange<Range1> && concepts::outputRange<Range2>
 constexpr auto move(Range1&& range1, Range2&& range2) noexcept
 {
 	return move(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
