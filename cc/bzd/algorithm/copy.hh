@@ -13,7 +13,7 @@ namespace bzd::algorithm {
 ///
 /// \return Output iterator to the element in the destination range, one past the last element copied.
 template <class InputIt, class OutputIt>
-requires concepts::forwardIterator<InputIt> && concepts::forwardIterator<OutputIt>
+requires concepts::forwardIterator<InputIt> && concepts::outputIterator<OutputIt>
 constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
 {
 	while (first != last)
@@ -27,7 +27,7 @@ constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 template <class InputRange, class OutputRange>
-requires concepts::forwardRange<InputRange> && concepts::forwardRange<OutputRange>
+requires concepts::forwardRange<InputRange> && concepts::outputRange<OutputRange>
 constexpr auto copy(InputRange&& input, OutputRange&& output)
 {
 	return copy(bzd::begin(input), bzd::end(input), bzd::begin(output));
