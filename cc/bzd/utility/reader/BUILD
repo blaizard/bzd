@@ -13,5 +13,18 @@ cc_library(
         "//cc/bzd/type_traits:is_signed",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
+        "//cc/bzd/container:optional"
+    ],
+)
+
+cc_library(
+    name = "reader",
+    hdrs = [
+        "reader.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":integral",
+        "//cc/bzd/utility/format",
     ],
 )

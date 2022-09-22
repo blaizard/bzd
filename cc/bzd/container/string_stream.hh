@@ -12,7 +12,7 @@ public:
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
-		string_.pushBack(data);
+		string_.append(data);
 		co_return {};
 	}
 

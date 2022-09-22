@@ -55,16 +55,16 @@ struct InvokeImpl<MT B::*>
 };
 
 template <class F, class... Args, class Fd = typename bzd::typeTraits::Decay<F>>
-auto Invoke(F&& f, Args&&... args) -> decltype(InvokeImpl<Fd>::call(bzd::forward<F>(f), bzd::forward<Args>(args)...));
+auto invoke(F&& f, Args&&... args) -> decltype(InvokeImpl<Fd>::call(bzd::forward<F>(f), bzd::forward<Args>(args)...));
 
 template <typename AlwaysVoid, typename, typename...>
 struct InvokeResult
 {
 };
 template <typename F, typename... Args>
-struct InvokeResult<decltype(void(Invoke(bzd::typeTraits::declval<F>(), bzd::typeTraits::declval<Args>()...))), F, Args...>
+struct InvokeResult<decltype(void(invoke(bzd::typeTraits::declval<F>(), bzd::typeTraits::declval<Args>()...))), F, Args...>
 {
-	using Type = decltype(Invoke(bzd::typeTraits::declval<F>(), bzd::typeTraits::declval<Args>()...));
+	using Type = decltype(invoke(bzd::typeTraits::declval<F>(), bzd::typeTraits::declval<Args>()...));
 };
 } // namespace bzd::typeTraits::impl
 

@@ -79,6 +79,10 @@ private:
 		{
 			co_return bzd::error::Data("Missing HTTP/*.");
 		}
+		/*if (!::fromString("HTTP{}\s+{}\s+{[A-Z]+}", version, code, statusString))
+		{
+			co_return bzd::error::Data("Malformed status header.");
+		}*/
 		/*const bzd::Map<StringView, typename Status::Version, 3u> versions{{"1.0"_sv, Status::Version::version1dot0},
 																		  {"1.1"_sv, Status::Version::version1dot1},
 																		  {"2"_sv, Status::Version::version2}};

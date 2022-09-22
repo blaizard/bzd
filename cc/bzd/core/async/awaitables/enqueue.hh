@@ -63,12 +63,14 @@ public: // Constructor.
 
 public: // Coroutine specializations.
 	template <class T>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
 		this->enqueueAsyncs(promise, promise.getCancellationToken());
 	}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
 		return bzd::apply(
@@ -112,6 +114,7 @@ public: // Constructor.
 
 public: // Coroutine specializations.
 	template <class T>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
@@ -127,6 +130,7 @@ public: // Coroutine specializations.
 		this->enqueueAsyncs(promise, token_);
 	}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	[[nodiscard]] constexpr ResultType await_resume() noexcept
 	{
 		return bzd::apply(

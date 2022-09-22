@@ -54,12 +54,12 @@ TEST(MetaUnion, Empty)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		bzd::meta::Union<LifetimeCounter> u{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 0U);
-		EXPECT_EQ(LifetimeCounter::copy_, 0U);
-		EXPECT_EQ(LifetimeCounter::move_, 0U);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::constructor, 0U);
+		EXPECT_EQ(LifetimeCounter::copy, 0U);
+		EXPECT_EQ(LifetimeCounter::move, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+	EXPECT_EQ(LifetimeCounter::destructor, 0U);
 }
 
 TEST(MetaUnion, CopyConstructor)
@@ -67,17 +67,17 @@ TEST(MetaUnion, CopyConstructor)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		LifetimeCounter value{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
-		EXPECT_EQ(LifetimeCounter::copy_, 0U);
-		EXPECT_EQ(LifetimeCounter::move_, 0U);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::constructor, 1U);
+		EXPECT_EQ(LifetimeCounter::copy, 0U);
+		EXPECT_EQ(LifetimeCounter::move, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor, 0U);
 		bzd::meta::Union<LifetimeCounter> u{value};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
-		EXPECT_EQ(LifetimeCounter::copy_, 1U);
-		EXPECT_EQ(LifetimeCounter::move_, 0U);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::constructor, 1U);
+		EXPECT_EQ(LifetimeCounter::copy, 1U);
+		EXPECT_EQ(LifetimeCounter::move, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 1U);
+	EXPECT_EQ(LifetimeCounter::destructor, 1U);
 
 	{
 		bzd::test::CopyOnly value{};
@@ -94,17 +94,17 @@ TEST(MetaUnion, MoveConstructor)
 	using LifetimeCounter = bzd::test::LifetimeCounter<struct a>;
 	{
 		LifetimeCounter value{};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
-		EXPECT_EQ(LifetimeCounter::copy_, 0U);
-		EXPECT_EQ(LifetimeCounter::move_, 0U);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::constructor, 1U);
+		EXPECT_EQ(LifetimeCounter::copy, 0U);
+		EXPECT_EQ(LifetimeCounter::move, 0U);
+		EXPECT_EQ(LifetimeCounter::destructor, 0U);
 		bzd::meta::Union<LifetimeCounter> u{bzd::move(value)};
-		EXPECT_EQ(LifetimeCounter::constructor_, 1U);
-		EXPECT_EQ(LifetimeCounter::copy_, 0U);
-		EXPECT_EQ(LifetimeCounter::move_, 1U);
-		EXPECT_EQ(LifetimeCounter::destructor_, 0U);
+		EXPECT_EQ(LifetimeCounter::constructor, 1U);
+		EXPECT_EQ(LifetimeCounter::copy, 0U);
+		EXPECT_EQ(LifetimeCounter::move, 1U);
+		EXPECT_EQ(LifetimeCounter::destructor, 0U);
 	}
-	EXPECT_EQ(LifetimeCounter::destructor_, 1U);
+	EXPECT_EQ(LifetimeCounter::destructor, 1U);
 
 	{
 		bzd::test::MoveOnly value{};

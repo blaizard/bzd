@@ -13,6 +13,7 @@ private:
 
 public:
 	using Awaiter<Async>::Awaiter;
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr auto await_resume() noexcept
 	{
 		if constexpr (PromiseType::resultTypeIsResult)

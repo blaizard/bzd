@@ -1,4 +1,4 @@
-#include "cc/bzd/algorithm/equal_any_of.hh"
+#include "cc/bzd/algorithm/starts_with_any_of.hh"
 #include "cc/bzd/test/test.hh"
 
 TEST(EqualAnyOf, Base)

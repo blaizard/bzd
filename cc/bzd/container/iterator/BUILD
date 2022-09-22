@@ -1,6 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
+    name = "appender",
+    hdrs = [
+        "appender.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
+
+cc_library(
     name = "container_of_iterables",
     hdrs = [
         "container_of_iterables.hh",

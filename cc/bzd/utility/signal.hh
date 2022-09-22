@@ -84,10 +84,14 @@ template <class Type, bzd::Size OffsetBits, bzd::Size SizeBits, class CompuMetho
 class Signal
 {
 private:
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	static constexpr bzd::Size startByte_ = OffsetBits / 8;
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	static constexpr bzd::Size sizeByte_ = ((SizeBits - 1) >> 3) + 1;
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	static constexpr bzd::Size shiftBits_ = OffsetBits % 8;
 	using SignalInternals = impl::SignalInternals<sizeByte_>;
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	static constexpr typename SignalInternals::ExtractedType mask_ = 0xffffffffffffffff >> (64 - SizeBits);
 
 	static_assert(SizeBits > 0, "SizeBits must be greater than 0.");

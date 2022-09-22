@@ -73,13 +73,13 @@ public:
 	constexpr void setContinuation(Executable& continuation) noexcept
 	{
 		// Disabled to support generators
-		// bzd::assert::isTrue(continuation_.is<bzd::monostate>());
+		// bzd::assert::isTrue(continuation_.is<bzd::Monostate>());
 		continuation_.emplace<Executable*>(&continuation);
 	}
 
 	constexpr void setConditionalContinuation(OnTerminateCallback onTerminate) noexcept
 	{
-		bzd::assert::isTrue(continuation_.is<bzd::monostate>());
+		bzd::assert::isTrue(continuation_.is<bzd::Monostate>());
 		continuation_.emplace<OnTerminateCallback>(onTerminate);
 	}
 
@@ -137,8 +137,10 @@ private:
 protected:
 	struct FinalAwaiter
 	{
+		// NOLINTNEXTLINE(readability-identifier-naming)
 		constexpr bool await_ready() noexcept { return false; }
 
+		// NOLINTNEXTLINE(readability-identifier-naming)
 		constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
 		{
 			auto& promise = handle.promise();
@@ -158,6 +160,7 @@ protected:
 			return true;
 		}
 
+		// NOLINTNEXTLINE(readability-identifier-naming)
 		constexpr void await_resume() noexcept {}
 	};
 
@@ -173,6 +176,7 @@ public:
 	constexpr Self& operator=(Self&&) noexcept = default;
 	~Promise() noexcept = default;
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr bzd::coroutine::impl::suspend_always initial_suspend(/*SourceLocation source = SourceLocation::current()*/) noexcept
 	{
 		//::std::cout << "{" << source.getFile() << ":" << source.getLine() << "    " << source.getFunction() << "}" << ::std::endl;
@@ -180,8 +184,10 @@ public:
 		return {};
 	}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr FinalAwaiter final_suspend() noexcept { return {}; }
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void unhandled_exception() noexcept { bzd::assert::unreachable(); }
 
 public: // Memory allocation
@@ -238,6 +244,7 @@ public:
 
 	constexpr Promise() noexcept : impl::Promise<PromiseType>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr auto get_return_object() noexcept
 	{
 		return bzd::coroutine::impl::coroutine_handle<PromiseType>::from_promise(static_cast<PromiseType&>(*this));
@@ -271,6 +278,7 @@ public:
 	using Promise<T, PromiseTask>::Promise;
 
 	template <class U>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void return_value(U&& result) noexcept
 	{
 		this->result_.emplace(bzd::forward<U>(result));
@@ -280,6 +288,7 @@ public:
 	{
 	};
 	/// Overload to support `co_return {};`.
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void return_value(Empty) noexcept { this->result_.emplace(bzd::nullresult); }
 
 	constexpr bool isCompleted() const noexcept { return this->hasResult(); }
@@ -292,12 +301,14 @@ public:
 	using Promise<T, PromiseGenerator>::Promise;
 
 	template <class U>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr typename impl::Promise<PromiseGenerator>::FinalAwaiter yield_value(U&& result) noexcept
 	{
 		this->result_.emplace(bzd::forward<U>(result));
 		return {};
 	}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr void return_void() noexcept { isCompleted_ = true; }
 
 	constexpr bool isCompleted() const noexcept { return isCompleted_; }

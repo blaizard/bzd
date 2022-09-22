@@ -24,6 +24,13 @@ public: // Traits.
 
 public:
 	constexpr explicit Vector(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}, capacity} {}
+
+public: // API.
+	template <class... Args>
+	constexpr Size pushBack(Args&&... args) noexcept
+	{
+		return Parent::append(bzd::forward<Args>(args)...);
+	}
 };
 } // namespace bzd::impl
 

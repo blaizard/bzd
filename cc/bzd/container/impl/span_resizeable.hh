@@ -8,6 +8,11 @@
 
 namespace bzd::impl {
 
+struct SpanResizeablePolicies
+{
+	static constexpr void post(auto&) {}
+};
+
 /// Implementation of a contiguous storage container.
 ///
 /// In order to make this implementation constexpr, some differences are to be noted
@@ -17,10 +22,11 @@ namespace bzd::impl {
 /// - All elements are initialized at the creation.
 /// - When resizing, erased elements are not destroyed and appended elements are not constructed.
 /// - Pushed back elements are copy/moved assigned to the previous one.
-template <class T, class Storage>
+template <class T, class Storage, class Policies = SpanResizeablePolicies>
 class SpanResizeable : public Span<T, Storage>
 {
 protected:
+	using Self = SpanResizeable;
 	using Parent = Span<T, Storage>;
 
 public: // Constructor/assignment
@@ -48,10 +54,19 @@ public: // Modifiers.
 	{
 		const auto newSize = (n < capacity_) ? n : capacity_;
 		this->storage_.sizeMutable() = newSize;
+		Policies::post(*this);
 	}
 
-	/// \brief Removes all elements from the container.
+	/// Removes all elements from the container.
 	constexpr void clear() noexcept { resize(0); }
+
+	/// Assign a new value or values to the container.
+	template <class... Args>
+	constexpr Size assign(Args&&... args) noexcept
+	{
+		this->storage_.sizeMutable() = 0u;
+		return append(bzd::forward<Args>(args)...);
+	}
 
 	/// Adds a new element at the end of the container, after its current last
 	/// element.
@@ -60,22 +75,22 @@ public: // Modifiers.
 	/// \param value Value to be copied (or moved) to the new element.
 	template <class U>
 	requires concepts::convertible<U, T>
-	constexpr Size pushBack(U&& value) noexcept { return pushBackInternal(bzd::forward<U>(value)); }
+	constexpr Size append(U&& value) noexcept { return appendInternal(bzd::forward<U>(value)); }
 
 	/// Trivially copyable objects of 1 byte size can be directly constructed from bytes.
-	constexpr Size pushBack(const Byte value) noexcept requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
+	constexpr Size append(const Byte value) noexcept requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
 	{
-		return pushBackInternal(reinterpret_cast<const T&>(value));
+		return appendInternal(reinterpret_cast<const T&>(value));
 	}
 
 	template <class Iterator>
 	requires concepts::forwardIterator<Iterator>
-	constexpr Size pushBack(Iterator first, Iterator last) noexcept
+	constexpr Size append(Iterator first, Iterator last) noexcept
 	{
 		Size count = 0u;
 		while (!(first == last))
 		{
-			count += pushBack(*first);
+			count += append(*first);
 			++first;
 		}
 		return count;
@@ -83,7 +98,7 @@ public: // Modifiers.
 
 	template <class Range>
 	requires concepts::forwardRange<Range>
-	constexpr Size pushBack(Range&& range) { return pushBack(bzd::begin(range), bzd::end(range)); }
+	constexpr Size append(Range&& range) { return append(bzd::begin(range), bzd::end(range)); }
 
 	/// Appends a new element to the end of the container.
 	/// The element is constructed through using placement-new in-place.
@@ -99,12 +114,28 @@ public: // Modifiers.
 		auto it = this->end();
 		this->emplace(it, bzd::forward<Args>(args)...);
 		++this->storage_.sizeMutable();
+		Policies::post(*this);
 		return 0u;
+	}
+
+public: // Operators.
+	template <class U>
+	constexpr Self& operator=(U&& data) noexcept
+	{
+		assign(bzd::forward<U>(data));
+		return *this;
+	}
+
+	template <class U>
+	constexpr Self& operator+=(U&& data) noexcept
+	{
+		append(bzd::forward<U>(data));
+		return *this;
 	}
 
 private:
 	template <class U>
-	constexpr Size pushBackInternal(U&& value) noexcept
+	constexpr Size appendInternal(U&& value) noexcept
 	{
 		if (full())
 		{
@@ -114,6 +145,7 @@ private:
 		// allowed in a constexpr expression unlike placement new (at least in c++20).
 		this->at(this->size()) = bzd::forward<U>(value);
 		++this->storage_.sizeMutable();
+		Policies::post(*this);
 		return 1u;
 	}
 

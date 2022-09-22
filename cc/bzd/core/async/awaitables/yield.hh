@@ -8,6 +8,7 @@ namespace bzd::coroutine::impl {
 struct Yield : public bzd::coroutine::impl::suspend_always
 {
 	template <class T>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& executable{caller.promise()};

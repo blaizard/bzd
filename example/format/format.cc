@@ -21,7 +21,7 @@ bzd::Async<> toStream(bzd::OStream& os, const Date& d)
 	co_return {};
 }
 
-namespace Example {
+namespace example {
 
 bzd::Async<> run()
 {
@@ -38,4 +38,4 @@ bzd::Async<> run()
 	co_return {};
 }
 
-} // namespace Example
+} // namespace example

@@ -220,7 +220,7 @@ constexpr Metadata parseMetadata(bzd::StringView& format, const bzd::Size curren
 
 struct ResultStaticString
 {
-	bool isMetadata;
+	Bool isMetadata;
 	StringView str;
 };
 

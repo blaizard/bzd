@@ -1,4 +1,5 @@
 #include "cc/bzd/container/string.hh"
+#include "cc/bzd/container/iterator/appender.hh"
 
 #include "cc/bzd/test/test.hh"
 
@@ -152,4 +153,17 @@ TEST(ContainerString, Copy)
 
 	bzd::String<6> copy2 = string;
 	EXPECT_STREQ(copy2.data(), "Hello");
+}
+
+TEST(ContainerVector, AppenderIterator)
+{
+	bzd::String<5> string;
+	bzd::iterator::Appender appender{string};
+
+	for (const char v : {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'})
+	{
+		*appender = v;
+		++appender;
+	}
+	EXPECT_STREQ(string.data(), "abcde");
 }

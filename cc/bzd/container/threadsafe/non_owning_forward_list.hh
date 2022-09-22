@@ -63,7 +63,7 @@ private:
 ///
 /// \tparam T Element type.
 template <class T>
-class NonOwningForwardList : public typeTraits::Conditional<T::supportDiscard_, NonOwningForwardListDiscard, NonOwningForwardListNoDiscard>
+class NonOwningForwardList : public typeTraits::Conditional<T::supportDiscard, NonOwningForwardListDiscard, NonOwningForwardListNoDiscard>
 {
 public:
 	using Self = NonOwningForwardList<T>;
@@ -147,7 +147,7 @@ public:
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
 
-			if constexpr (ElementType::supportMultiContainer_)
+			if constexpr (ElementType::supportMultiContainer)
 			{
 				// Set the parent
 				element.parent_.store(this);
@@ -183,7 +183,7 @@ public:
 		// First set a temporary mark and check wether or not this element
 		// is part of this list. If not, remove the mark and return, otherwise
 		// replace the mark with the deletion mark.
-		if constexpr (ElementType::supportMultiContainer_)
+		if constexpr (ElementType::supportMultiContainer)
 		{
 			ElementPtrType expected{element.next_.load()};
 			do
@@ -342,7 +342,7 @@ public:
 	///
 	/// \param element Element to be inserted.
 	/// \return An error in case of failure, void otherwise.
-	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept requires(ElementType::supportDiscard_)
+	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept requires(ElementType::supportDiscard)
 	{
 		const auto result = pop(element);
 		if (result)
@@ -464,13 +464,13 @@ struct NonOwningForwardListElementMultiContainer
 	bzd::Atomic<void*> parent_{nullptr};
 };
 
-template <bzd::Bool supportMultiContainer, bzd::Bool supportDiscard>
+template <bzd::Bool supportMultiContainerValue, bzd::Bool supportDiscardValue>
 class NonOwningForwardListElement
-	: public bzd::typeTraits::Conditional<supportMultiContainer, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
+	: public bzd::typeTraits::Conditional<supportMultiContainerValue, NonOwningForwardListElementMultiContainer, NonOwningForwardListElementVoid>
 {
 public:
-	static const constexpr bzd::Bool supportMultiContainer_{supportMultiContainer};
-	static const constexpr bzd::Bool supportDiscard_{supportDiscard};
+	static const constexpr bzd::Bool supportMultiContainer{supportMultiContainerValue};
+	static const constexpr bzd::Bool supportDiscard{supportDiscardValue};
 
 private:
 	using Self = NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
@@ -535,11 +535,11 @@ using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListE
 template <class T>
 class NonOwningForwardList
 	: public bzd::threadsafe::impl::NonOwningForwardList<
-		  bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>
+		  bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer, T::supportDiscard>>
 {
 public:
 	using Parent = bzd::threadsafe::impl::NonOwningForwardList<
-		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>;
+		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer, T::supportDiscard>>;
 
 public:
 	template <class U>
@@ -616,7 +616,7 @@ public: // Return type.
 
 public:
 	using bzd::threadsafe::impl::NonOwningForwardList<
-		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer_, T::supportDiscard_>>::NonOwningForwardList;
+		bzd::threadsafe::NonOwningForwardListElement<T::supportMultiContainer, T::supportDiscard>>::NonOwningForwardList;
 
 	/// Return a begin iterator for this list.
 	///

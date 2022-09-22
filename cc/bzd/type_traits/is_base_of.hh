@@ -8,14 +8,14 @@
 namespace bzd::typeTraits::impl {
 
 template <class B>
-bzd::typeTraits::TrueType IsBaseOfPtrConvertible(const volatile B*);
+bzd::typeTraits::TrueType isBaseOfPtrConvertible(const volatile B*);
 template <class>
-bzd::typeTraits::FalseType IsBaseOfPtrConvertible(const volatile void*);
+bzd::typeTraits::FalseType isBaseOfPtrConvertible(const volatile void*);
 
 template <class, class>
-auto IsBaseOf(...) -> bzd::typeTraits::TrueType;
+auto isBaseOf(...) -> bzd::typeTraits::TrueType;
 template <class B, class D>
-auto IsBaseOf(int) -> decltype(IsBaseOfPtrConvertible<B>(static_cast<D*>(nullptr)));
+auto isBaseOf(int) -> decltype(isBaseOfPtrConvertible<B>(static_cast<D*>(nullptr)));
 } // namespace bzd::typeTraits::impl
 
 namespace bzd::typeTraits {
@@ -24,7 +24,7 @@ template <class Base, class Derived>
 struct IsBaseOf
 	: bzd::typeTraits::IntegralConstant<bool,
 										bzd::typeTraits::isClass<Base> &&
-											bzd::typeTraits::isClass<Derived>&& decltype(impl::IsBaseOf<Base, Derived>(0))::value>
+											bzd::typeTraits::isClass<Derived>&& decltype(impl::isBaseOf<Base, Derived>(0))::value>
 {
 };
 

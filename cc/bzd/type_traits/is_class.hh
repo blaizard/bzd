@@ -6,15 +6,15 @@
 
 namespace bzd::typeTraits::impl {
 template <class T>
-bzd::typeTraits::IntegralConstant<bool, !isUnion<T>> IsClass(int T::*);
+bzd::typeTraits::IntegralConstant<bool, !isUnion<T>> isClass(int T::*);
 
 template <class>
-bzd::typeTraits::FalseType IsClass(...);
+bzd::typeTraits::FalseType isClass(...);
 } // namespace bzd::typeTraits::impl
 
 namespace bzd::typeTraits {
 template <class T>
-struct IsClass : decltype(impl::IsClass<T>(nullptr))
+struct IsClass : decltype(impl::isClass<T>(nullptr))
 {
 };
 

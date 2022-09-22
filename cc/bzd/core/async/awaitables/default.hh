@@ -10,9 +10,11 @@ class Awaiter
 public:
 	constexpr explicit Awaiter(Async& async) noexcept : async_{async} {}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr bool await_ready() noexcept { return async_.isCompleted(); }
 
 	template <class U>
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
 	{
 		bzd::assert::isTrue(static_cast<bool>(async_.handle_));
@@ -37,6 +39,7 @@ public:
 		return true;
 	}
 
+	// NOLINTNEXTLINE(readability-identifier-naming)
 	[[nodiscard]] constexpr auto await_resume() noexcept { return async_.moveResultOut(); }
 
 protected:
