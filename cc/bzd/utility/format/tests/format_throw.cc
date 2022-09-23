@@ -3,12 +3,12 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/format/format.hh"
-#include "cc/bzd/utility/format/stream.hh"
+#include "cc/bzd/utility/format/to_stream/format.hh"
+#include "cc/bzd/utility/format/to_string/format.hh"
 
 static bool failed{false};
 
-class ThrowAssert
+class ThrowAssert : public bzd::format::impl::SchemaFormat
 {
 public:
 	static void onError(const bzd::StringView&) noexcept { failed = true; }
@@ -37,7 +37,7 @@ TEST(Format_, ParseMetadata)
 {
 	{
 		bzd::StringView str("hello");
-		bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_TRUE(failed);
 		failed = false;
 	}

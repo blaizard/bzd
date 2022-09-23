@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cc:bzd",
         "//cc/bzd/container:ostream_buffered",
-        "//cc/bzd/utility/format:stream",
+        "//cc/bzd/utility/format/to_stream:format",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
         "//cc/libs/reader:stream_reader",

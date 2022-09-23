@@ -3,7 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/logger/backend/logger.hh"
 #include "cc/bzd/core/logger/minimal.hh"
-#include "cc/bzd/utility/format/stream.hh"
+#include "cc/bzd/utility/format/to_stream/format.hh"
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd::log {
@@ -537,7 +537,7 @@ Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocat
 // Specialization for bzd::Error type.
 inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
 {
-	co_await !toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+	co_await !::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
 	co_return {};
 }
 

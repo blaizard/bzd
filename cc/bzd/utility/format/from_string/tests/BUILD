@@ -7,6 +7,6 @@ bzd_cc_test(
     ],
     deps = [
         "//cc/bzd/test",
-        "//cc/bzd/utility/reader:integral",
+        "//cc/bzd/utility/format/from_string:integral",
     ],
 )

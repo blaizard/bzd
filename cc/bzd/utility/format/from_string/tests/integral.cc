@@ -1,4 +1,4 @@
-#include "cc/bzd/utility/reader/integral.hh"
+#include "cc/bzd/utility/format/from_string/integral.hh"
 
 #include "cc/bzd/test/test.hh"
 
