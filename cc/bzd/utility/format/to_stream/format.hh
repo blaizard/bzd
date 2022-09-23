@@ -2,36 +2,45 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
-#include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/to_string/format.hh"
 
 namespace bzd::format::impl {
+
+// ---- Formatter ----
+
+template <class T>
+concept toStreamFormatter = requires(T value)
+{
+	toStream(bzd::typeTraits::declval<bzd::OStream&>(), value);
+};
+
+template <class T>
+concept toStreamFormatterWithMetadata = requires(T value)
+{
+	toStream(bzd::typeTraits::declval<bzd::OStream&>(), value, bzd::typeTraits::declval<const Metadata>());
+};
 
 class StreamFormatter
 {
 public:
 	template <class T>
-	using FormatterType = decltype(toStream(bzd::typeTraits::declval<bzd::OStream&>(), bzd::typeTraits::declval<T>()));
+	static constexpr bool hasFormatter = toStreamFormatter<T>;
 
 	template <class T>
-	using FormatterWithMetadataType = decltype(toStream(
-		bzd::typeTraits::declval<bzd::OStream&>(), bzd::typeTraits::declval<T>(), bzd::typeTraits::declval<const Metadata>()));
+	static constexpr bool hasFormatterWithMetadata = toStreamFormatterWithMetadata<T>;
 
 	using FormatterTransportType = bzd::OStream;
 
 public:
 	template <class T>
-	requires(!HasFormatterWithMetadata<StreamFormatter, T>::value) static Async<> process(bzd::OStream& stream,
-																						  const T& value,
-																						  const Metadata&) noexcept
+	requires(!hasFormatterWithMetadata<T>) static Async<> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
 	{
 		co_await !toStream(stream, value);
 		co_return {};
 	}
 
 	template <class T>
-	requires(HasFormatterWithMetadata<StreamFormatter, T>::value) static Async<> process(bzd::OStream& stream,
-																						 const T& value,
-																						 const Metadata& metadata) noexcept
+	requires(hasFormatterWithMetadata<T>) static Async<> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 	{
 		co_await !toStream(stream, value, metadata);
 		co_return {};
@@ -178,14 +187,17 @@ bzd::Async<> toStream(bzd::OStream& stream, const T&, Args... args) noexcept
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<bzd::format::impl::StreamFormatter>(T::value(), tuple);
+	constexpr const bool isValid =
+		bzd::format::impl::contextValidate<bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(T::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
 	const auto formatter = bzd::format::impl::FormatterAsync<
-		bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, bzd::format::impl::StreamFormatter>>::make(args...);
-	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StreamFormatter>> parser{
-		T::value()};
+		bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>>::
+		make(args...);
+	constexpr bzd::format::impl::Parser<
+		bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>>
+		parser{T::value()};
 
 	// Run-time call
 	for (const auto& result : parser)

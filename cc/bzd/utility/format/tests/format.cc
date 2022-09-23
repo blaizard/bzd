@@ -1,4 +1,4 @@
-#include "cc/bzd/utility/format/format.hh"
+#include "cc/bzd/utility/format/to_string/format.hh"
 
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_stream.hh"
@@ -6,9 +6,9 @@
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/panic.hh"
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/format/stream.hh"
+#include "cc/bzd/utility/format/to_stream/format.hh"
 
-class TestAssert
+class TestAssert : public bzd::format::impl::SchemaFormat
 {
 public:
 	static void onError(const bzd::StringView&) { bzd::Panic::trigger(); }
@@ -79,31 +79,31 @@ TEST(Format_, ParseMetadataIndex)
 {
 	{
 		bzd::StringView str("}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_EQ(metadata.index, 0U);
 	}
 
 	{
 		bzd::StringView str("}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 5);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 5);
 		EXPECT_EQ(metadata.index, 5U);
 	}
 
 	{
 		bzd::StringView str(":}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 2);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 2);
 		EXPECT_EQ(metadata.index, 2U);
 	}
 
 	{
 		bzd::StringView str("10}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 2);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 2);
 		EXPECT_EQ(metadata.index, 10U);
 	}
 
 	{
 		bzd::StringView str("7:}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 8);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 8);
 		EXPECT_EQ(metadata.index, 7U);
 	}
 }
@@ -112,19 +112,19 @@ TEST(Format_, ParseMetadataSign)
 {
 	{
 		bzd::StringView str("}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::AUTO);
 	}
 
 	{
 		bzd::StringView str(":-}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::ONLY_NEGATIVE);
 	}
 
 	{
 		bzd::StringView str(":+}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::ALWAYS);
 	}
 }
@@ -133,7 +133,7 @@ TEST(Format_, ParseMetadataPrecision)
 {
 	{
 		bzd::StringView str(":.3f}");
-		auto metadata = bzd::format::impl::parseMetadata<TestAdapater>(str, 0);
+		auto metadata = TestAdapater::template parse<TestAdapater>(str, 0);
 		EXPECT_TRUE(metadata.isPrecision);
 		EXPECT_EQ(metadata.precision, 3U);
 	}

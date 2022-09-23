@@ -90,7 +90,7 @@ cc_library(
         "//cc/bzd/container:variant",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:source_location",
-        "//cc/bzd/utility/format",
+        "//cc/bzd/utility/format/to_string:format",
     ],
 )
 
@@ -103,7 +103,7 @@ cc_library(
     deps = [
         "//cc/bzd/core/async",
         "//cc/bzd/platform:stream",
-        "//cc/bzd/utility/format:stream",
+        "//cc/bzd/utility/format/to_stream:format",
     ],
 )
 

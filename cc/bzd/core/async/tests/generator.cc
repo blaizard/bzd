@@ -2,7 +2,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/move_only.hh"
-#include "cc/bzd/utility/format/integral.hh"
+#include "cc/bzd/utility/format/to_string/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
 bzd::Generator<bzd::Size> generator(bzd::Size count)

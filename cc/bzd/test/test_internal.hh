@@ -3,7 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
-#include "cc/bzd/utility/format/integral.hh"
+#include "cc/bzd/utility/format/to_string/integral.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
 #include "cc/bzd/utility/random/xorwow_engine.hh"

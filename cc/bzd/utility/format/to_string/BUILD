@@ -43,16 +43,3 @@ cc_library(
         "//cc/bzd/utility:constexpr_for",
     ],
 )
-
-cc_library(
-    name = "stream",
-    hdrs = [
-        "stream.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":format",
-        "//cc/bzd/core:channel",
-        "//cc/bzd/core/async",
-    ],
-)

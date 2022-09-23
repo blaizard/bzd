@@ -3,7 +3,6 @@
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/platform/panic.hh"
-//#include "cc/bzd/utility/format/integral.hh"
 
 namespace bzd::assert::impl {
 
