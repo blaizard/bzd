@@ -10,8 +10,8 @@
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
-#include "cc/bzd/utility/format/base.hh"
-#include "cc/bzd/utility/format/to_string/integral.hh"
+#include "cc/bzd/utility/string/base.hh"
+#include "cc/bzd/utility/string/to_string/integral.hh"
 
 namespace bzd::format::impl {
 
@@ -412,21 +412,10 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
 template <bzd::concepts::containerToString Container, bzd::concepts::constexprStringView T, class... Args>
-constexpr void toString(Container& str, const T&, Args&&... args) noexcept
+constexpr void toString(Container& str, const T& pattern, const Args&... args) noexcept
 {
-	// Compile-time format check
-	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid =
-		bzd::format::impl::contextValidate<bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(T::value(), tuple);
-	// This line enforces compilation time evaluation
-	static_assert(isValid, "Compile-time string format check failed.");
-
-	constexpr bzd::format::impl::Parser<
-		bzd::format::impl::Adapter<bzd::format::impl::NoAssert, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>>
-		parser{T::value()};
-	const auto processor = bzd::format::impl::Processor<
-		bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>>::
-		make(bzd::forward<Args>(args)...);
+	const auto [parser, processor] =
+		bzd::format::impl::make<bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)

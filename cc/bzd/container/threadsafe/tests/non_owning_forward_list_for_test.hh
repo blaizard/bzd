@@ -3,7 +3,7 @@
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
 #include "cc/bzd/core/assert.hh"
 #include "cc/bzd/platform/stream.hh"
-#include "cc/bzd/utility/format/to_string/format.hh"
+#include "cc/bzd/utility/string/to_string/format.hh"
 
 namespace bzd::test {
 

@@ -4,9 +4,9 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/utility/format/to_stream/format.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/singleton.hh"
+#include "cc/bzd/utility/string/to_stream/format.hh"
 #include "cc/components/posix/error.hh"
 
 #include <atomic>

@@ -3,8 +3,8 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/format/to_stream/format.hh"
-#include "cc/bzd/utility/format/to_string/format.hh"
+#include "cc/bzd/utility/string/to_stream/format.hh"
+#include "cc/bzd/utility/string/to_string/format.hh"
 
 static bool failed{false};
 
