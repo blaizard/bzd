@@ -14,6 +14,21 @@ cc_library(
         "//cc/bzd/container:tuple",
         "//cc/bzd/container:vector",
         "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/meta:tuple",
         "//cc/bzd/utility:constexpr_for",
+    ],
+)
+
+cc_library(
+    name = "base_async",
+    hdrs = [
+        "base_async.hh",
+    ],
+    visibility = [
+        ":__subpackages__",
+    ],
+    deps = [
+        ":base",
+        "//cc/bzd/core/async",
     ],
 )

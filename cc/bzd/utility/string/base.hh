@@ -5,6 +5,7 @@
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
+#include "cc/bzd/meta/tuple.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 
 namespace bzd::format::impl {
@@ -199,7 +200,7 @@ public:
 
 public:
 	template <class... Args>
-	static constexpr auto make(Args&&... args) noexcept
+	static constexpr auto make(const Args&... args) noexcept
 	{
 		// Make the actual lambda
 		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const typename Adapter::Metadata& metadata) -> auto{
@@ -232,5 +233,22 @@ private:
 		const Lambdas lambdas_;
 	};
 };
+
+template <class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
+constexpr auto make(const Pattern&, Args&&... args) noexcept
+{
+	// Compile-time format check
+	constexpr const bzd::meta::Tuple<Args...> tuple{};
+	constexpr const bool isValid = bzd::format::impl::contextValidate<Formatter, Schema>(Pattern::value(), tuple);
+	// This line enforces compilation time evaluation
+	static_assert(isValid, "Compile-time string format check failed.");
+
+	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, Formatter, Schema>> parser{
+		Pattern::value()};
+	const auto processor =
+		bzd::format::impl::Processor<bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, Formatter, Schema>>::make(args...);
+
+	return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
+}
 
 } // namespace bzd::format::impl

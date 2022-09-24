@@ -38,6 +38,6 @@ cc_library(
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_pointer",
-        "//cc/bzd/utility/format:base",
+        "//cc/bzd/utility/string:base",
     ],
 )

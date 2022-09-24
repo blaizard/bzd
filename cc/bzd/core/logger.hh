@@ -3,8 +3,8 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/logger/backend/logger.hh"
 #include "cc/bzd/core/logger/minimal.hh"
-#include "cc/bzd/utility/format/to_stream/format.hh"
 #include "cc/bzd/utility/source_location.hh"
+#include "cc/bzd/utility/string/to_stream/format.hh"
 
 namespace bzd::log {
 enum class Level

@@ -25,6 +25,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":integral",
-        "//cc/bzd/utility/format/to_string:format",
+        "//cc/bzd/utility/string/to_string:format",
     ],
 )
