@@ -74,8 +74,8 @@ inline Async<> toStream(bzd::OStream& stream, const bzd::StringView stringView, 
 // is out of scope within the coroutine. I remember seeing a bugzilla about this for gcc.
 // Would be worth trying again with a new version of the compiler.
 // TODO: Try to enable Args&& with an updated esp32 gcc compiler
-template <bzd::concepts::constexprStringView T, class... Args>
-bzd::Async<> toStream(bzd::OStream& stream, const T& pattern, const Args&... args) noexcept
+template <bzd::concepts::constexprStringView Pattern, class... Args>
+bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
 		bzd::format::impl::makeAsync<bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
