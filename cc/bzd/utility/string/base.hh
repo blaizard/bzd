@@ -118,7 +118,11 @@ public:
 					Adapter::assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
 					Adapter::assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
 					format_.removePrefix(1);
-					metadata_ = Adapter::template parse<Adapter>(format_, autoIndex_++);
+					// Look for the index
+					metadata_ = typename Adapter::Metadata{};
+					metadata_.index = parseIndex(format_, autoIndex_++);
+					Adapter::assertTrue(format_.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
+					Adapter::template parse<Adapter>(metadata_, format_);
 				}
 			}
 		}
@@ -134,6 +138,38 @@ public:
 	constexpr Iterator begin() const noexcept { return iteratorBegin_; }
 
 	constexpr bool end() const noexcept { return true; }
+
+private:
+	/// Return the positional index
+	static constexpr bzd::Size parseIndex(bzd::StringView& format, const bzd::Size autoIndex) noexcept
+	{
+		bzd::Size index = 0;
+		const bool isDefined = parseUnsignedInteger(format, index);
+		if (format.front() == ':')
+		{
+			format.removePrefix(1);
+		}
+		else
+		{
+			Adapter::assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
+		}
+		return (isDefined) ? index : autoIndex;
+	}
+
+	/// TODO: use the implementation fromString
+	/// Parse an unsigned integer
+	static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::Size& integer) noexcept
+	{
+		bool isDefined = false;
+		integer = 0;
+		for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
+		{
+			isDefined = true;
+			integer = integer * 10 + (format.front() - '0');
+			format.removePrefix(1);
+		}
+		return isDefined;
+	}
 
 private:
 	const Iterator iteratorBegin_;
@@ -168,7 +204,18 @@ constexpr void contextCheck(const MetadataList& metadataList, const T& tuple) no
 		Adapter::assertTrue(Adapter::template hasFormatter<ValueType> || Adapter::template hasFormatterWithMetadata<ValueType>,
 							"Argument type is not supported, it must contain a valid formatter.");
 
-		Adapter::template check<index, ValueType, Adapter>(metadataList, tuple);
+		bool usedAtLeastOnce = false;
+		for (const auto& metadata : metadataList)
+		{
+			Adapter::assertTrue(metadata.index < T::size(), "The index specified is greater than the number of arguments provided");
+			if (metadata.index == index - 1)
+			{
+				usedAtLeastOnce = true;
+				Adapter::template check<Adapter, ValueType>(metadata);
+			}
+		}
+
+		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
 		contextCheck<index - 1, Adapter>(metadataList, tuple);
 	}
 }

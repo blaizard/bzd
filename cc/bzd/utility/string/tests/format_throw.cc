@@ -37,7 +37,8 @@ TEST(Format_, ParseMetadata)
 {
 	{
 		bzd::StringView str("hello");
-		TestAdapater::template parse<TestAdapater>(str, 0);
+		TestAdapater::Metadata metadata{};
+		TestAdapater::template parse<TestAdapater>(metadata, str);
 		EXPECT_TRUE(failed);
 		failed = false;
 	}

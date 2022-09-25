@@ -112,42 +112,32 @@ public:
 	/// p    Pointer
 	/// %	Percentage. Multiples by 100 and puts % at the end.
 	template <class Adapter>
-	static constexpr Metadata parse(bzd::StringView& format, const bzd::Size current) noexcept
+	static constexpr void parse(Metadata& metadata, bzd::StringView& format) noexcept
 	{
-		const auto endIndex = format.find('}');
-		Adapter::assertTrue(endIndex != bzd::npos, "Missing closing '}' for the replacement field");
-		auto metadataStr = format.subStr(0, endIndex + 1);
-
-		Metadata metadata;
-
-		// Look for the index
-		metadata.index = parseIndex<Adapter>(metadataStr, current);
-		Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
-
 		// Parse sign: [sign]
-		parseSign<Adapter>(metadataStr, metadata);
-		Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after parseSign)");
+		parseSign<Adapter>(format, metadata);
+		Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after parseSign)");
 
 		// Parse alternate form [#]
-		if (metadataStr.front() == '#')
+		if (format.front() == '#')
 		{
 			metadata.alternate = true;
-			metadataStr.removePrefix(1);
-			Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly '#')");
+			format.removePrefix(1);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly '#')");
 		}
 
 		// Parse precision [.precision]
-		if (metadataStr.front() == '.')
+		if (format.front() == '.')
 		{
-			metadataStr.removePrefix(1);
-			metadata.isPrecision = parseUnsignedInteger(metadataStr, metadata.precision);
-			Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after precision)");
+			format.removePrefix(1);
+			metadata.isPrecision = parseUnsignedInteger(format, metadata.precision);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after precision)");
 		}
 
 		// Parse type [type]
-		if (metadataStr.front() != '}')
+		if (format.front() != '}')
 		{
-			switch (metadataStr.front())
+			switch (format.front())
 			{
 			case 'b':
 				metadata.format = Metadata::Format::BINARY;
@@ -178,47 +168,35 @@ public:
 					"Unsupported conversion format, only the following is "
 					"supported: [bdoxXfp%]");
 			}
-			metadataStr.removePrefix(1);
-			Adapter::assertTrue(metadataStr.size() > 0, "Replacement field format ended abruptly (after type)");
+			format.removePrefix(1);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after type)");
 		}
-		Adapter::assertTrue(metadataStr.front() == '}', "Invalid format for replacement field, expecting '}'");
+		Adapter::assertTrue(format.front() == '}', "Invalid format for replacement field, expecting '}'");
 
-		format.removePrefix(endIndex + 1);
-		return metadata;
+		format.removePrefix(1);
 	}
 
-	template <Size index, class ValueType, class Adapter, class MetadataList, class T>
-	static constexpr void check(const MetadataList& metadataList, const T&) noexcept
+	template <class Adapter, class ValueType>
+	static constexpr void check(const Metadata& metadata) noexcept
 	{
-		bool usedAtLeastOnce = false;
-		for (const auto& metadata : metadataList)
+		switch (metadata.format)
 		{
-			Adapter::assertTrue(metadata.index < T::size(), "The index specified is greater than the number of arguments provided");
-			if (metadata.index == index - 1)
-			{
-				usedAtLeastOnce = true;
-				switch (metadata.format)
-				{
-				case Metadata::Format::BINARY:
-				case Metadata::Format::OCTAL:
-				case Metadata::Format::HEXADECIMAL_LOWER:
-				case Metadata::Format::HEXADECIMAL_UPPER:
-					Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
-					break;
-				case Metadata::Format::DECIMAL:
-				case Metadata::Format::FIXED_POINT:
-				case Metadata::Format::FIXED_POINT_PERCENT:
-					Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
-					break;
-				case Metadata::Format::POINTER:
-					[[fallthrough]];
-				case Metadata::Format::AUTO:
-					break;
-				}
-			}
+		case Metadata::Format::BINARY:
+		case Metadata::Format::OCTAL:
+		case Metadata::Format::HEXADECIMAL_LOWER:
+		case Metadata::Format::HEXADECIMAL_UPPER:
+			Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
+			break;
+		case Metadata::Format::DECIMAL:
+		case Metadata::Format::FIXED_POINT:
+		case Metadata::Format::FIXED_POINT_PERCENT:
+			Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
+			break;
+		case Metadata::Format::POINTER:
+			[[fallthrough]];
+		case Metadata::Format::AUTO:
+			break;
 		}
-
-		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
 	}
 
 private:
@@ -234,23 +212,6 @@ private:
 			format.removePrefix(1);
 		}
 		return isDefined;
-	}
-
-	/// Return the positional index
-	template <class Adapter>
-	static constexpr bzd::Size parseIndex(bzd::StringView& format, const bzd::Size autoIndex) noexcept
-	{
-		bzd::Size index = 0;
-		const bool isDefined = parseUnsignedInteger(format, index);
-		if (format.front() == ':')
-		{
-			format.removePrefix(1);
-		}
-		else
-		{
-			Adapter::assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
-		}
-		return (isDefined) ? index : autoIndex;
 	}
 
 	// Sign
@@ -411,8 +372,8 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <bzd::concepts::containerToString Container, bzd::concepts::constexprStringView T, class... Args>
-constexpr void toString(Container& str, const T& pattern, const Args&... args) noexcept
+template <bzd::concepts::containerToString Container, bzd::concepts::constexprStringView Pattern, class... Args>
+constexpr void toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
 		bzd::format::impl::make<bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
