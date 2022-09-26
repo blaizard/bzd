@@ -3,7 +3,7 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/move_only.hh"
 #include "cc/bzd/utility/scope_guard.hh"
-#include "cc/bzd/utility/string/to_string/integral.hh"
+#include "cc/bzd/utility/string/formatter/integral.hh"
 
 bzd::Generator<bzd::Size> generator(bzd::Size count)
 {

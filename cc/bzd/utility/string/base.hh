@@ -190,19 +190,25 @@ public:
 	}
 };
 
+template <class Adapter, class Range, class Value, class Metadata>
+concept compatibleProcessor = requires(Range& range, Value& value, Metadata& metadata)
+{
+	Adapter::process(range, value, metadata);
+};
+
 /// Check the format context.
 ///
 /// Check the format context with the argument type, this to ensure type safety.
 /// This function should only be used at compile time.
-template <Size index, class Adapter, class MetadataList, class T>
+template <class Range, Size index, class Adapter, class MetadataList, class T>
 constexpr void contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
 {
 	if constexpr (index > 0)
 	{
-		using ValueType = typename T::template Get<index - 1>;
+		using ValueType = bzd::typeTraits::RemoveCVRef<typename T::template Get<index - 1>>;
 
-		Adapter::assertTrue(Adapter::template hasFormatter<ValueType> || Adapter::template hasFormatterWithMetadata<ValueType>,
-							"Argument type is not supported, it must contain a valid formatter.");
+		Adapter::assertTrue(compatibleProcessor<Adapter, Range, ValueType, typename Adapter::Metadata>,
+							"This value type does not have any compatible processor.");
 
 		bool usedAtLeastOnce = false;
 		for (const auto& metadata : metadataList)
@@ -216,11 +222,11 @@ constexpr void contextCheck(const MetadataList& metadataList, const T& tuple) no
 		}
 
 		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
-		contextCheck<index - 1, Adapter>(metadataList, tuple);
+		contextCheck<Range, index - 1, Adapter>(metadataList, tuple);
 	}
 }
 
-template <class Formatter, class Schema, class T>
+template <class Range, class Formatter, class Schema, class T>
 constexpr bool contextValidate(const bzd::StringView& format, const T& tuple) noexcept
 {
 	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter, Schema>;
@@ -235,23 +241,20 @@ constexpr bool contextValidate(const bzd::StringView& format, const T& tuple) no
 		}
 	}
 
-	contextCheck<T::size(), ConstexprAdapter>(metadataList, tuple);
+	contextCheck<Range, T::size(), ConstexprAdapter>(metadataList, tuple);
 	return true;
 }
 
-template <class Adapter>
+template <class Range, class Adapter>
 class Processor
 {
 public:
-	using TransportType = typename Adapter::FormatterTransportType;
-
-public:
 	template <class... Args>
-	static constexpr auto make(const Args&... args) noexcept
+	static constexpr auto make(Args&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](TransportType & transport, const typename Adapter::Metadata& metadata) -> auto{
-			return Adapter::process(transport, args, metadata);
+		const auto lambdas = bzd::makeTuple([&args](Range & range, const typename Adapter::Metadata& metadata) -> auto{
+			return Adapter::process(range, args, metadata);
 		}...);
 
 		return ProcessorType<decltype(lambdas)>{lambdas};
@@ -264,14 +267,14 @@ private:
 	public:
 		constexpr ProcessorType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		constexpr void process(TransportType& transport, const typename Adapter::Metadata& metadata) const noexcept
+		constexpr void process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			Size counter = 0;
 			constexprForContainerInc(lambdas_, [&](auto lambda) {
 				if (counter++ == index)
 				{
-					lambda(transport, metadata);
+					lambda(range, metadata);
 				}
 			});
 		}
@@ -281,19 +284,19 @@ private:
 	};
 };
 
-template <class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
+template <class Range, class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto make(const Pattern&, Args&&... args) noexcept
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<Formatter, Schema>(Pattern::value(), tuple);
+	constexpr const bool isValid = bzd::format::impl::contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
 	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, Formatter, Schema>> parser{
 		Pattern::value()};
-	const auto processor =
-		bzd::format::impl::Processor<bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, Formatter, Schema>>::make(args...);
+	auto processor =
+		bzd::format::impl::Processor<Range, bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, Formatter, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
 }

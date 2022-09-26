@@ -1,8 +1,8 @@
-#include "cc/bzd/utility/string/from_string/integral.hh"
+#include "cc/bzd/utility/string/reader/integral.hh"
 
 #include "cc/bzd/test/test.hh"
 
-TEST(FromString, Integer)
+TEST(Integral, Integer)
 {
 	{
 		bzd::Int32 n;

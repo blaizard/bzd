@@ -18,13 +18,14 @@ cc_library(
 )
 
 cc_library(
-    name = "reader",
+    name = "from_string",
     hdrs = [
-        "reader.hh",
+        "from_string.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":integral",
+        "//cc/bzd/type_traits:container",
         "//cc/bzd/utility/string:base",
     ],
 )

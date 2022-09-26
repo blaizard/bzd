@@ -11,7 +11,7 @@ bzd_cc_test(
         "//cc/bzd/core/assert",
         "//cc/bzd/core/panic",
         "//cc/bzd/test",
-        "//cc/bzd/utility/string/to_string:format",
+        "//cc/bzd/utility/string/formatter:to_string",
     ],
 )
 
@@ -28,6 +28,6 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/container:string_view",
         "//cc/bzd/test",
-        "//cc/bzd/utility/string/to_string:format",
+        "//cc/bzd/utility/string/formatter:to_string",
     ],
 )

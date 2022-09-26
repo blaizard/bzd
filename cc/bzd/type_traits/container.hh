@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/span.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::concepts {
 
@@ -16,5 +17,8 @@ concept containerToString = requires(Container container)
 {
 	container.append(bzd::Span<const bzd::Byte>{});
 };
+
+template <class Container>
+concept containerFromString = outputRange<Container>;
 
 } // namespace bzd::concepts
