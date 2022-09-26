@@ -7,7 +7,7 @@
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/scope_guard.hh"
-#include "cc/bzd/utility/string/to_string/integral.hh"
+#include "cc/bzd/utility/string/formatter/integral.hh"
 #include "cc/components/posix/network/interface.hh"
 #include "cc/components/posix/network/types.hh"
 

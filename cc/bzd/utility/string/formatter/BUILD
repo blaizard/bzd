@@ -20,9 +20,9 @@ cc_library(
 )
 
 cc_library(
-    name = "format",
+    name = "to_string",
     hdrs = [
-        "format.hh",
+        "to_string.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -39,5 +39,19 @@ cc_library(
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_pointer",
         "//cc/bzd/utility/string:base",
+    ],
+)
+
+cc_library(
+    name = "to_stream",
+    hdrs = [
+        "to_stream.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":to_string",
+        "//cc/bzd/core:channel",
+        "//cc/bzd/core/async",
+        "//cc/bzd/utility/string:base_async",
     ],
 )

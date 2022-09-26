@@ -34,8 +34,8 @@ bzd_cc_library(
         ":withdraw",
         "//cc/bzd/utility/bit",
         "//cc/bzd/utility/random",
-        "//cc/bzd/utility/string/to_stream:format",
-        "//cc/bzd/utility/string/to_string:format",
+        "//cc/bzd/utility/string/formatter:to_string",
+        "//cc/bzd/utility/string/reader:from_string",
         "//cc/bzd/utility/synchronization",
     ],
 )

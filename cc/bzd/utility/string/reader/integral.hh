@@ -88,10 +88,10 @@ constexpr Size floatingPoint(Range&& range, T& n) noexcept
 
 /// TODO, this should also work with Spans<const char>
 /// and same for toString ...
-template <bzd::concepts::integral T>
-constexpr auto fromString(const bzd::StringView& str, T& data) noexcept
+template <class Range, bzd::concepts::integral T>
+constexpr auto fromString(Range&& range, T& data) noexcept
 {
-	return bzd::reader::impl::integer(str, data, bzd::reader::impl::digits);
+	return bzd::reader::impl::integer(bzd::forward<Range>(range), data, bzd::reader::impl::digits);
 }
 
 // Proposed syntax:

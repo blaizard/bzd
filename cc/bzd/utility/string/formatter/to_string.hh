@@ -11,7 +11,7 @@
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/utility/string/base.hh"
-#include "cc/bzd/utility/string/to_string/integral.hh"
+#include "cc/bzd/utility/string/formatter/integral.hh"
 
 namespace bzd::format::impl {
 
@@ -47,44 +47,26 @@ struct Metadata
 
 // ---- Formatter ----
 
-template <class T>
-concept toStringFormatter = requires(T value)
+template <class Range, class T>
+concept toStringFormatterWithMetadata = requires(Range range, T value)
 {
-	toString(bzd::typeTraits::declval<bzd::interface::String&>(), value);
-};
-
-template <class T>
-concept toStringFormatterWithMetadata = requires(T value)
-{
-	toString(bzd::typeTraits::declval<bzd::interface::String&>(), value, bzd::typeTraits::declval<const Metadata>());
+	toString(range, value, bzd::typeTraits::declval<const Metadata>());
 };
 
 class StringFormatter
 {
 public:
-	template <class T>
-	static constexpr bool hasFormatter = toStringFormatter<T>;
-
-	template <class T>
-	static constexpr bool hasFormatterWithMetadata = toStringFormatterWithMetadata<T>;
-
-	using FormatterTransportType = bzd::interface::String;
-
-public:
-	template <class T>
-	requires(!hasFormatterWithMetadata<T>) static constexpr void process(bzd::interface::String& str,
-																		 const T& value,
-																		 const Metadata&) noexcept
+	template <class Range, class T>
+	static constexpr void process(Range& range, const T& value, [[maybe_unused]] const Metadata& metadata) noexcept
 	{
-		toString(str, value);
-	}
-
-	template <class T>
-	requires(hasFormatterWithMetadata<T>) static constexpr void process(bzd::interface::String& str,
-																		const T& value,
-																		const Metadata& metadata) noexcept
-	{
-		toString(str, value, metadata);
+		if constexpr (toStringFormatterWithMetadata<Range, T>)
+		{
+			toString(range, value, metadata);
+		}
+		else
+		{
+			toString(range, value);
+		}
 	}
 };
 
@@ -376,7 +358,7 @@ template <bzd::concepts::containerToString Container, bzd::concepts::constexprSt
 constexpr void toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
-		bzd::format::impl::make<bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+		bzd::format::impl::make<Container&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)

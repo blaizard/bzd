@@ -2,7 +2,7 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/stream.hh"
-#include "cc/bzd/utility/string/to_stream/format.hh"
+#include "cc/bzd/utility/string/formatter/to_stream.hh"
 
 namespace bzd {
 /// Helper to print a message on the standard output.

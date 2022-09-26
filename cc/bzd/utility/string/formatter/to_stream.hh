@@ -3,47 +3,32 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/utility/string/base_async.hh"
-#include "cc/bzd/utility/string/to_string/format.hh"
+#include "cc/bzd/utility/string/formatter/to_string.hh"
 
 namespace bzd::format::impl {
 
 // ---- Formatter ----
 
-template <class T>
-concept toStreamFormatter = requires(T value)
+template <class Range, class T>
+concept toStreamFormatterWithMetadata = requires(Range& range, const T& value)
 {
-	toStream(bzd::typeTraits::declval<bzd::OStream&>(), value);
-};
-
-template <class T>
-concept toStreamFormatterWithMetadata = requires(T value)
-{
-	toStream(bzd::typeTraits::declval<bzd::OStream&>(), value, bzd::typeTraits::declval<const Metadata>());
+	toStream(range, value, bzd::typeTraits::declval<const Metadata>());
 };
 
 class StreamFormatter
 {
 public:
-	template <class T>
-	static constexpr bool hasFormatter = toStreamFormatter<T>;
-
-	template <class T>
-	static constexpr bool hasFormatterWithMetadata = toStreamFormatterWithMetadata<T>;
-
-	using FormatterTransportType = bzd::OStream;
-
-public:
-	template <class T>
-	requires(!hasFormatterWithMetadata<T>) static Async<> process(bzd::OStream& stream, const T& value, const Metadata&) noexcept
+	template <class Range, class T>
+	static Async<> process(Range& range, const T& value, [[maybe_unused]] const Metadata& metadata) noexcept
 	{
-		co_await !toStream(stream, value);
-		co_return {};
-	}
-
-	template <class T>
-	requires(hasFormatterWithMetadata<T>) static Async<> process(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
-	{
-		co_await !toStream(stream, value, metadata);
+		if constexpr (toStreamFormatterWithMetadata<Range, T>)
+		{
+			co_await !toStream(range, value, metadata);
+		}
+		else
+		{
+			co_await !toStream(range, value);
+		}
 		co_return {};
 	}
 };
@@ -78,7 +63,7 @@ template <bzd::concepts::constexprStringView Pattern, class... Args>
 bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
-		bzd::format::impl::makeAsync<bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+		bzd::format::impl::makeAsync<bzd::OStream&, bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)
