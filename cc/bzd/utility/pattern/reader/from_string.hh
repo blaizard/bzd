@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd/type_traits/container.hh"
-#include "cc/bzd/utility/string/base.hh"
-#include "cc/bzd/utility/string/reader/integral.hh"
+#include "cc/bzd/utility/pattern/pattern.hh"
+#include "cc/bzd/utility/pattern/reader/integral.hh"
 
 namespace bzd {
 template <class Range>
@@ -41,7 +41,7 @@ public:
 		{
 			return fromString(range, value, metadata);
 		}
-		else //if constexpr (fromStringFormatter<Range, T>)
+		else
 		{
 			return fromString(range, value);
 		}
@@ -54,8 +54,9 @@ public:
 	using Metadata = bzd::reader::impl::Metadata;
 
 	template <class Adapter>
-	static constexpr void parse(Metadata&, bzd::StringView&) noexcept
+	static constexpr void parse(Metadata&, bzd::StringView& pattern) noexcept
 	{
+		pattern.removePrefix(1);
 	}
 
 	template <class Adapter, class ValueType>
@@ -76,7 +77,7 @@ template <bzd::concepts::containerFromString Range, bzd::concepts::constexprStri
 constexpr bzd::FromStringReturnType<Range> fromString(Range&&, const T& pattern, Args&... args) noexcept
 {
 	auto [parser, processor] =
-		bzd::format::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern, args...);
+		bzd::pattern::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)

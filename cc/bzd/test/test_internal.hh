@@ -4,9 +4,9 @@
 #include "cc/bzd/meta/macro.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
+#include "cc/bzd/utility/pattern/formatter/integral.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
 #include "cc/bzd/utility/random/xorwow_engine.hh"
-#include "cc/bzd/utility/string/formatter/integral.hh"
 
 #define BZDTEST_FCT_NAME_(testCaseName, testName) functionBzdTest_##testCaseName##_##testName
 #define BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_CLASS_NAME_2(testCaseName, testName)

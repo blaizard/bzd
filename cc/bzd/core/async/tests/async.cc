@@ -3,8 +3,8 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/move_only.hh"
+#include "cc/bzd/utility/pattern/formatter/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
-#include "cc/bzd/utility/string/formatter/integral.hh"
 
 namespace {
 void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkpoint)

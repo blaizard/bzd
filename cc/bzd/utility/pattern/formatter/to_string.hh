@@ -10,8 +10,8 @@
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
-#include "cc/bzd/utility/string/base.hh"
-#include "cc/bzd/utility/string/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/pattern.hh"
 
 namespace bzd::format::impl {
 
@@ -358,7 +358,7 @@ template <bzd::concepts::containerToString Container, bzd::concepts::constexprSt
 constexpr void toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
-		bzd::format::impl::make<Container&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+		bzd::pattern::impl::make<Container&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)

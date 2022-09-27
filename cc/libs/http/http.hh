@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
-#include "cc/bzd/utility/string/formatter/to_stream.hh"
+#include "cc/bzd/utility/pattern/formatter/to_stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
 #include "cc/libs/reader/stream_reader.hh"

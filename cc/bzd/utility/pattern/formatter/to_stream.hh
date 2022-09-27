@@ -2,8 +2,8 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
-#include "cc/bzd/utility/string/base_async.hh"
-#include "cc/bzd/utility/string/formatter/to_string.hh"
+#include "cc/bzd/utility/pattern/async.hh"
+#include "cc/bzd/utility/pattern/formatter/to_string.hh"
 
 namespace bzd::format::impl {
 
@@ -63,7 +63,7 @@ template <bzd::concepts::constexprStringView Pattern, class... Args>
 bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
-		bzd::format::impl::makeAsync<bzd::OStream&, bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+		bzd::pattern::impl::makeAsync<bzd::OStream&, bzd::format::impl::StreamFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 
 	// Run-time call
 	for (const auto& result : parser)

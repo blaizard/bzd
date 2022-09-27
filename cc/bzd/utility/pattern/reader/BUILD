@@ -26,6 +26,6 @@ cc_library(
     deps = [
         ":integral",
         "//cc/bzd/type_traits:container",
-        "//cc/bzd/utility/string:base",
+        "//cc/bzd/utility/pattern",
     ],
 )

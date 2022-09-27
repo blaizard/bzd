@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/utility/string/base.hh"
+#include "cc/bzd/utility/pattern/pattern.hh"
 
-namespace bzd::format::impl {
+namespace bzd::pattern::impl {
 
 template <class Range, class Adapter>
 class ProcessorAsync
@@ -13,7 +13,7 @@ public:
 	static constexpr auto make(const Args&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](Range& range, const Metadata& metadata) -> bzd::Async<> {
+		const auto lambdas = bzd::makeTuple([&args](Range& range, const typename Adapter::Metadata& metadata) -> bzd::Async<> {
 			co_await !Adapter::process(range, args, metadata);
 			co_return {};
 		}...);
@@ -28,7 +28,7 @@ private:
 	public:
 		constexpr ProcessorType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		bzd::Async<> process(Range& range, const Metadata& metadata) const noexcept
+		bzd::Async<> process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			if constexpr (Lambdas::size() > 0)
@@ -116,17 +116,14 @@ constexpr auto makeAsync(const Pattern&, Args&... args) noexcept
 {
 	// Compile-time format check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
+	constexpr const bool isValid = contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
-	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, Formatter, Schema>> parser{
-		Pattern::value()};
-	const auto processor =
-		bzd::format::impl::ProcessorAsync<Range, bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, Formatter, Schema>>::make(
-			args...);
+	constexpr Parser<Adapter<NoAssert, Formatter, Schema>> parser{Pattern::value()};
+	const auto processor = ProcessorAsync<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
 }
 
-} // namespace bzd::format::impl
+} // namespace bzd::pattern::impl
