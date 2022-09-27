@@ -13,7 +13,7 @@ cc_library(
         ":minimal",
         "//cc/bzd/core/logger/backend",
         "//cc/bzd/platform:clock",
-        "//cc/bzd/utility/string/formatter:to_stream",
+        "//cc/bzd/utility/pattern/formatter:to_stream",
     ],
 )
 

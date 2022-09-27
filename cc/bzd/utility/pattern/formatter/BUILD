@@ -38,7 +38,7 @@ cc_library(
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_pointer",
-        "//cc/bzd/utility/string:base",
+        "//cc/bzd/utility/pattern",
     ],
 )
 
@@ -52,6 +52,6 @@ cc_library(
         ":to_string",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
-        "//cc/bzd/utility/string:base_async",
+        "//cc/bzd/utility/pattern:async",
     ],
 )

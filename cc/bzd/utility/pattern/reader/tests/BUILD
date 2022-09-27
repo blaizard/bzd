@@ -7,8 +7,9 @@ bzd_cc_test(
         "integral.cc",
     ],
     deps = [
+        "//cc/bzd/core/panic",
         "//cc/bzd/test",
-        "//cc/bzd/utility/string/reader:from_string",
-        "//cc/bzd/utility/string/reader:integral",
+        "//cc/bzd/utility/pattern/reader:from_string",
+        "//cc/bzd/utility/pattern/reader:integral",
     ],
 )

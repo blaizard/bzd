@@ -1,4 +1,4 @@
-#include "cc/bzd/utility/string/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/formatter/integral.hh"
 
 #include "cc/bzd/test/test.hh"
 

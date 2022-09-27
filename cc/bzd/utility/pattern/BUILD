@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "base",
+    name = "pattern",
     hdrs = [
-        "base.hh",
+        "pattern.hh",
     ],
     visibility = [
         ":__subpackages__",
@@ -20,15 +20,15 @@ cc_library(
 )
 
 cc_library(
-    name = "base_async",
+    name = "async",
     hdrs = [
-        "base_async.hh",
+        "async.hh",
     ],
     visibility = [
         ":__subpackages__",
     ],
     deps = [
-        ":base",
+        ":pattern",
         "//cc/bzd/core/async",
     ],
 )

@@ -8,7 +8,7 @@
 #include "cc/bzd/meta/tuple.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 
-namespace bzd::format::impl {
+namespace bzd::pattern::impl {
 
 // ---- Error handlers ----
 
@@ -41,23 +41,23 @@ struct ResultStaticString
 
 /// Parse a static string and returns when there is data to be processed.
 template <class Adapter>
-constexpr ResultStaticString parseStaticString(bzd::StringView& format) noexcept
+constexpr ResultStaticString parseStaticString(bzd::StringView& pattern) noexcept
 {
 	Size offset = 0;
-	while (offset < format.size())
+	while (offset < pattern.size())
 	{
-		const auto c = format[offset++];
+		const auto c = pattern[offset++];
 		if (c != '{' && c != '}')
 		{
 			continue;
 		}
 
-		Adapter::assertTrue(offset < format.size(), "Unexpected static string termination");
+		Adapter::assertTrue(offset < pattern.size(), "Unexpected static string termination");
 
-		if (format[offset] == c)
+		if (pattern[offset] == c)
 		{
-			const auto str = format.subStr(0, offset);
-			format.removePrefix(offset + 1);
+			const auto str = pattern.subStr(0, offset);
+			pattern.removePrefix(offset + 1);
 			return {false, str};
 		}
 
@@ -67,16 +67,16 @@ constexpr ResultStaticString parseStaticString(bzd::StringView& format) noexcept
 		break;
 	}
 
-	const auto str = format.subStr(0, offset);
-	format.removePrefix(offset);
-	return {!format.empty(), str};
+	const auto str = pattern.subStr(0, offset);
+	pattern.removePrefix(offset);
+	return {!pattern.empty(), str};
 }
 
 template <class Adapter>
 class Parser
 {
 public:
-	constexpr Parser(bzd::StringView format) noexcept : iteratorBegin_{format} {}
+	constexpr Parser(bzd::StringView pattern) noexcept : iteratorBegin_{pattern} {}
 
 	class Iterator
 	{
@@ -88,7 +88,7 @@ public:
 		};
 
 	public:
-		constexpr Iterator(bzd::StringView format) noexcept : format_{format} { next(); }
+		constexpr Iterator(bzd::StringView pattern) noexcept : pattern_{pattern} { next(); }
 
 		constexpr Iterator& operator++() noexcept
 		{
@@ -106,29 +106,29 @@ public:
 	private:
 		constexpr void next() noexcept
 		{
-			if (format_.empty())
+			if (pattern_.empty())
 			{
 				end_ = true;
 			}
 			else
 			{
-				result_ = parseStaticString<Adapter>(format_);
+				result_ = parseStaticString<Adapter>(pattern_);
 				if (result_.isMetadata)
 				{
-					Adapter::assertTrue(format_.front() == '{', "Unexpected return state for parseStaticString");
-					Adapter::assertTrue(format_.size() > 1, "Unexpected return state for parseStaticString");
-					format_.removePrefix(1);
+					Adapter::assertTrue(pattern_.front() == '{', "Unexpected return state for parseStaticString");
+					Adapter::assertTrue(pattern_.size() > 1, "Unexpected return state for parseStaticString");
+					pattern_.removePrefix(1);
 					// Look for the index
 					metadata_ = typename Adapter::Metadata{};
-					metadata_.index = parseIndex(format_, autoIndex_++);
-					Adapter::assertTrue(format_.size() > 0, "Replacement field format ended abruptly (after parseIndex)");
-					Adapter::template parse<Adapter>(metadata_, format_);
+					metadata_.index = parseIndex(pattern_, autoIndex_++);
+					Adapter::assertTrue(pattern_.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
+					Adapter::template parse<Adapter>(metadata_, pattern_);
 				}
 			}
 		}
 
 	private:
-		bzd::StringView format_;
+		bzd::StringView pattern_;
 		ResultStaticString result_{};
 		typename Adapter::Metadata metadata_{};
 		Size autoIndex_ = 0;
@@ -141,32 +141,32 @@ public:
 
 private:
 	/// Return the positional index
-	static constexpr bzd::Size parseIndex(bzd::StringView& format, const bzd::Size autoIndex) noexcept
+	static constexpr bzd::Size parseIndex(bzd::StringView& pattern, const bzd::Size autoIndex) noexcept
 	{
 		bzd::Size index = 0;
-		const bool isDefined = parseUnsignedInteger(format, index);
-		if (format.front() == ':')
+		const bool isDefined = parseUnsignedInteger(pattern, index);
+		if (pattern.front() == ':')
 		{
-			format.removePrefix(1);
+			pattern.removePrefix(1);
 		}
 		else
 		{
-			Adapter::assertTrue(format.front() == '}', "Expecting closing '}' for the replacement field");
+			Adapter::assertTrue(pattern.front() == '}', "Expecting closing '}' for the replacement field");
 		}
 		return (isDefined) ? index : autoIndex;
 	}
 
 	/// TODO: use the implementation fromString
 	/// Parse an unsigned integer
-	static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::Size& integer) noexcept
+	static constexpr bool parseUnsignedInteger(bzd::StringView& pattern, bzd::Size& integer) noexcept
 	{
 		bool isDefined = false;
 		integer = 0;
-		for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
+		for (; pattern.size() > 0 && pattern.front() >= '0' && pattern.front() <= '9';)
 		{
 			isDefined = true;
-			integer = integer * 10 + (format.front() - '0');
-			format.removePrefix(1);
+			integer = integer * 10 + (pattern.front() - '0');
+			pattern.removePrefix(1);
 		}
 		return isDefined;
 	}
@@ -196,9 +196,9 @@ concept compatibleProcessor = requires(Range& range, Value& value, Metadata& met
 	Adapter::process(range, value, metadata);
 };
 
-/// Check the format context.
+/// Check the pattern context.
 ///
-/// Check the format context with the argument type, this to ensure type safety.
+/// Check the pattern context with the argument type, this to ensure type safety.
 /// This function should only be used at compile time.
 template <class Range, Size index, class Adapter, class MetadataList, class T>
 constexpr void contextCheck(const MetadataList& metadataList, const T& tuple) noexcept
@@ -227,11 +227,11 @@ constexpr void contextCheck(const MetadataList& metadataList, const T& tuple) no
 }
 
 template <class Range, class Formatter, class Schema, class T>
-constexpr bool contextValidate(const bzd::StringView& format, const T& tuple) noexcept
+constexpr bool contextValidate(const bzd::StringView& pattern, const T& tuple) noexcept
 {
 	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter, Schema>;
 	bzd::VectorConstexpr<typename Schema::Metadata, 128> metadataList{};
-	Parser<ConstexprAdapter> parser{format};
+	Parser<ConstexprAdapter> parser{pattern};
 
 	for (const auto& result : parser)
 	{
@@ -287,18 +287,16 @@ private:
 template <class Range, class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto make(const Pattern&, Args&&... args) noexcept
 {
-	// Compile-time format check
+	// Compile-time pattern check
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid = bzd::format::impl::contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
+	constexpr const bool isValid = contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
 	// This line enforces compilation time evaluation
 	static_assert(isValid, "Compile-time string format check failed.");
 
-	constexpr bzd::format::impl::Parser<bzd::format::impl::Adapter<bzd::format::impl::NoAssert, Formatter, Schema>> parser{
-		Pattern::value()};
-	auto processor =
-		bzd::format::impl::Processor<Range, bzd::format::impl::Adapter<bzd::format::impl::RuntimeAssert, Formatter, Schema>>::make(args...);
+	constexpr Parser<Adapter<NoAssert, Formatter, Schema>> parser{Pattern::value()};
+	auto processor = Processor<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
 }
 
-} // namespace bzd::format::impl
+} // namespace bzd::pattern::impl

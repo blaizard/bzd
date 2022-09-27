@@ -15,7 +15,7 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:ignore",
         "//cc/bzd/utility:singleton",
-        "//cc/bzd/utility/string/formatter:to_stream",
+        "//cc/bzd/utility/pattern/formatter:to_stream",
         "//cc/components/posix:error",
     ],
     alwayslink = True,

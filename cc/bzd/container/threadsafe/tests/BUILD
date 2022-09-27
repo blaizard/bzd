@@ -22,7 +22,7 @@ cc_library(
     deps = [
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
         "//cc/bzd/core/assert",
-        "//cc/bzd/utility/string/formatter:to_string",
+        "//cc/bzd/utility/pattern/formatter:to_string",
     ],
 )
 
