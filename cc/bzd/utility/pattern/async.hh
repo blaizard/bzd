@@ -114,16 +114,23 @@ private:
 template <class Range, class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto makeAsync(const Pattern&, Args&... args) noexcept
 {
-	// Compile-time format check
-	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr const bool isValid = contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
-	// This line enforces compilation time evaluation
-	static_assert(isValid, "Compile-time string format check failed.");
+	/*
+		// Compile-time format check
+		constexpr const bzd::meta::Tuple<Args...> tuple{};
+		constexpr const bool isValid = contextValidate<Range, Formatter, Schema>(Pattern::value(), tuple);
+		// This line enforces compilation time evaluation
+		static_assert(isValid, "Compile-time string format check failed.");
 
-	constexpr Parser<Adapter<NoAssert, Formatter, Schema>> parser{Pattern::value()};
-	const auto processor = ProcessorAsync<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
+		constexpr Parser<Adapter<NoAssert, Formatter, Schema>> parser{Pattern::value()};
+		const auto processor = ProcessorAsync<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
 
-	return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
+		return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
+	*/
+	constexpr auto iterable = parse<Adapter<ConstexprAssert, Formatter, Schema>, Pattern>();
+	static_assert(iterable.size() > 0, "Compile-time string format check failed.");
+	auto processor = ProcessorAsync<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
+
+	return bzd::makeTuple(bzd::move(iterable), bzd::move(processor));
 }
 
 } // namespace bzd::pattern::impl

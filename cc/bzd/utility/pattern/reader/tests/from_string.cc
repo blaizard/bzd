@@ -27,13 +27,6 @@ TEST(FromString, SimpleArguments)
 	// const bzd::StringView str{"Number 12"};
 
 	// bzd::StringView str{"{}"};
-
-	bzd::pattern::impl::Parser<TestAdapater> parser{"Hello {}"};
-	for (auto result : parser)
-	{
-		(void)result;
-	}
-
 	// const auto result = bzd::pattern::impl::parseStaticString<TestAdapater>(str);
 	/*
 		bzd::UInt32 a;

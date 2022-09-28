@@ -135,8 +135,13 @@ TEST(Format_, ParseMetadataIndex)
 
 TEST(Format, Parser)
 {
-	bzd::pattern::impl::Parser<TestAdapater> parser{"Hello {} World"};
-	for ([[maybe_unused]] auto result : parser)
 	{
+		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello"_csv)>();
+	}
+	{
+		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello {}"_csv)>();
+	}
+	{
+		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello {} you {} {}{}"_csv)>();
 	}
 }

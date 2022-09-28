@@ -16,6 +16,8 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/meta:tuple",
         "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility/pattern/reader:integral",
     ],
 )
 

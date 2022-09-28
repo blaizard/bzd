@@ -73,8 +73,8 @@ constexpr bzd::Optional<Iterator> fromString(Iterator first, Iterator, const bzd
 
 } // namespace bzd::reader::impl
 
-template <bzd::concepts::containerFromString Range, bzd::concepts::constexprStringView T, class... Args>
-constexpr bzd::FromStringReturnType<Range> fromString(Range&&, const T& pattern, Args&... args) noexcept
+template <bzd::concepts::containerFromString Range, bzd::concepts::constexprStringView Pattern, class... Args>
+constexpr bzd::FromStringReturnType<Range> fromString(Range&&, const Pattern& pattern, Args&... args) noexcept
 {
 	auto [parser, processor] =
 		bzd::pattern::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern, args...);
