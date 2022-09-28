@@ -72,9 +72,9 @@ bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&.
 		{
 			co_await !stream.write(result.str.asBytes());
 		}
-		if (result.metadata.hasValue())
+		if (result.isMetadata)
 		{
-			co_await !processor.process(stream, result.metadata.value());
+			co_await !processor.process(stream, result.metadata);
 		}
 	}
 

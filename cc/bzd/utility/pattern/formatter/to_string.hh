@@ -367,9 +367,9 @@ constexpr void toString(Container& str, const Pattern& pattern, const Args&... a
 		{
 			str.append(result.str);
 		}
-		if (result.metadata.hasValue())
+		if (result.isMetadata)
 		{
-			processor.process(str, result.metadata.value());
+			processor.process(str, result.metadata);
 		}
 	}
 }
