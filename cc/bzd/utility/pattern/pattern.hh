@@ -42,6 +42,10 @@ struct ResultStaticString
 };
 
 /// Parse a static string and returns when there is data to be processed.
+///
+/// Returns isMetadata = true when it reaches a single '{' character.
+/// Double '{{' or '}}' are returned as a unique character.
+/// Returns the string parsed until then.
 template <class Adapter>
 constexpr ResultStaticString parseStaticString(bzd::StringView& pattern) noexcept
 {
@@ -74,24 +78,22 @@ constexpr ResultStaticString parseStaticString(bzd::StringView& pattern) noexcep
 	return {!pattern.empty(), str};
 }
 
+/// Compute the number of elements needed in the context to parse the full pattern.
+template <class Adapter>
 constexpr Size parseSize(bzd::StringView pattern) noexcept
 {
-	Size size = 1u;
-	char previousC = '\0';
-	for (const auto c : pattern)
+	Size size = 0u;
+	while (!pattern.empty())
 	{
-		if (c == '{')
+		const auto [isMetadata, _] = parseStaticString<Adapter>(pattern);
+		if (isMetadata)
 		{
-			if (previousC == '{')
-			{
-				--size;
-			}
-			else
-			{
-				++size;
-			}
+			// Consume the metadata.
+			const auto index = pattern.find('}');
+			Adapter::assertTrue(index != bzd::npos, "Expecting closing '}' for the replacement field");
+			pattern.removePrefix(index + 1u);
 		}
-		previousC = c;
+		++size;
 	}
 	return size;
 }
@@ -125,7 +127,7 @@ constexpr auto parse() noexcept
 	};
 
 	// Calculate the size and make the output array.
-	constexpr Size size = parseSize(Pattern::value());
+	constexpr Size size = parseSize<Adapter>(Pattern::value());
 	bzd::Array<Result, size> results;
 
 	// Parse the pattern.

@@ -46,6 +46,13 @@ TEST(Pattern, MalformedPattern)
 	}
 
 	{
+		bzd::StringView str("{");
+		bzd::pattern::impl::parseStaticString<TestAdapaterSetBoolean>(str);
+		EXPECT_TRUE(failed);
+		failed = false;
+	}
+
+	{
 		bzd::StringView str("} ");
 		bzd::pattern::impl::parseStaticString<TestAdapaterSetBoolean>(str);
 		EXPECT_TRUE(failed);
