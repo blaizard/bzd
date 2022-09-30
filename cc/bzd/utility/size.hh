@@ -6,7 +6,7 @@ namespace bzd {
 
 namespace concepts {
 template <class T>
-concept size = requires(T t)
+concept size = requires(T& t)
 {
 	t.size();
 };
@@ -14,10 +14,7 @@ concept size = requires(T t)
 
 template <class T>
 requires concepts::size<T>
-[[nodiscard]] constexpr auto size(T& t)
-{
-	return t.size();
-}
+[[nodiscard]] constexpr auto size(T& t) { return t.size(); }
 
 template <class T, Size n>
 [[nodiscard]] constexpr bzd::Size size(T (&)[n])

@@ -63,9 +63,12 @@ bzd_cc_library(
         ":remove_pointer",
         ":remove_reference",
         ":remove_volatile",
+        ":sentinel_for",
+        ":sized_sentinel_for",
         ":true_type",
         ":underlying_type",
         ":void_type",
+        ":weakly_equality_comparable_with",
     ],
 )
 
@@ -731,6 +734,31 @@ cc_library(
 )
 
 cc_library(
+    name = "sentinel_for",
+    hdrs = [
+        "sentinel_for.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":iterator",
+        ":weakly_equality_comparable_with",
+    ],
+)
+
+cc_library(
+    name = "sized_sentinel_for",
+    hdrs = [
+        "sized_sentinel_for.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_same",
+        ":iterator",
+        ":sentinel_for",
+    ],
+)
+
+cc_library(
     name = "true_type",
     hdrs = [
         "true_type.hh",
@@ -755,4 +783,15 @@ cc_library(
         "void_type.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "weakly_equality_comparable_with",
+    hdrs = [
+        "weakly_equality_comparable_with.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_convertible",
+    ],
 )

@@ -18,15 +18,9 @@ private:
 	const int a_ = 32;
 };
 
-int Interface::myFunc(int a)
-{
-	return static_cast<ModuleImplementation&>(*this).myFunc(a);
-}
+int Interface::myFunc(int a) { return static_cast<ModuleImplementation&>(*this).myFunc(a); }
 
-void callFct(Interface& helper)
-{
-	std::cout << helper.myFunc(10) << std::endl;
-}
+void callFct(Interface& helper) { std::cout << helper.myFunc(10) << std::endl; }
 
 int main()
 {

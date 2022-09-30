@@ -146,9 +146,8 @@ public:
 				metadata.format = Metadata::Format::POINTER;
 				break;
 			default:
-				Adapter::onError(
-					"Unsupported conversion format, only the following is "
-					"supported: [bdoxXfp%]");
+				Adapter::onError("Unsupported conversion format, only the following is "
+								 "supported: [bdoxXfp%]");
 			}
 			format.removePrefix(1);
 			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after type)");

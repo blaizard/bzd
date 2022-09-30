@@ -324,20 +324,11 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 	}
 }
 
-constexpr auto yield() noexcept
-{
-	return bzd::coroutine::impl::Yield{};
-}
+constexpr auto yield() noexcept { return bzd::coroutine::impl::Yield{}; }
 
-constexpr auto getExecutor() noexcept
-{
-	return bzd::coroutine::impl::GetExecutor{};
-}
+constexpr auto getExecutor() noexcept { return bzd::coroutine::impl::GetExecutor{}; }
 
-constexpr auto getExecutable() noexcept
-{
-	return bzd::coroutine::impl::GetExecutable{};
-}
+constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecutable{}; }
 
 template <class... Args>
 constexpr auto suspend(Args&&... args) noexcept
@@ -349,18 +340,12 @@ constexpr auto suspend(Args&&... args) noexcept
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType, impl::AsyncTaskTraits> all(Asyncs&&... asyncs)
-noexcept
-{
-	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
-}
+noexcept { co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...}); }
 
 /// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType, impl::AsyncTaskTraits> any(Asyncs&&... asyncs)
-noexcept
-{
-	co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
-}
+noexcept { co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...}); }
 
 } // namespace bzd::async

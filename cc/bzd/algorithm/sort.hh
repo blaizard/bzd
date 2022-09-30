@@ -91,9 +91,6 @@ constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{
 /// \param[in,out] range The brange of elements to be sorted.
 template <class Range, class... Args>
 requires concepts::randomAccessRange<Range>
-constexpr void sort(Range&& range, Args&&... args) noexcept
-{
-	sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
-}
+constexpr void sort(Range&& range, Args&&... args) noexcept { sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...); }
 
 } // namespace bzd::algorithm

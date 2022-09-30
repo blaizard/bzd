@@ -14,7 +14,4 @@ TEST(AssertMinimal, Message)
 	EXPECT_ANY_THROW(bzd::assert::isTrue(false, "This is another message"));
 }
 
-TEST(AssertMinimal, Unreachable)
-{
-	EXPECT_ANY_THROW(bzd::assert::unreachable());
-}
+TEST(AssertMinimal, Unreachable) { EXPECT_ANY_THROW(bzd::assert::unreachable()); }

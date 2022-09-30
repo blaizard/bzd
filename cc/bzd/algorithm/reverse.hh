@@ -24,9 +24,6 @@ constexpr void reverse(Iterator first, Iterator last) noexcept
 /// \param[in] range The range of elements to be reversed.
 template <class Range>
 requires concepts::bidirectionalRange<Range>
-constexpr void reverse(Range&& range) noexcept
-{
-	reverse(bzd::begin(range), bzd::end(range));
-}
+constexpr void reverse(Range&& range) noexcept { reverse(bzd::begin(range), bzd::end(range)); }
 
 } // namespace bzd::algorithm

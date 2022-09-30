@@ -14,195 +14,195 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                                  \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                                \
-	{                                                                                                                              \
-	public:                                                                                                                        \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__}                   \
-		{                                                                                                                          \
-			this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                 \
-																	  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this)); \
-		}                                                                                                                          \
-		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                                        \
-	};                                                                                                                             \
+#define BZDTEST_REGISTER_(testCaseName, testName)                                                                                          \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                                        \
+	{                                                                                                                                      \
+	public:                                                                                                                                \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__}                           \
+		{                                                                                                                                  \
+			this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                         \
+																	  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this));         \
+		}                                                                                                                                  \
+		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                                                \
+	};                                                                                                                                     \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
-#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                      \
-	template <class... Types>                                                                                                             \
-	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                                        \
-	{                                                                                                                                     \
-	public:                                                                                                                               \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__}           \
-		{                                                                                                                                 \
-			(this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                       \
-																	   &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this), \
-								typeToString<Types>()),                                                                                   \
-			 ...);                                                                                                                        \
-		}                                                                                                                                 \
-		template <class TestType>                                                                                                         \
-		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                                               \
-	};                                                                                                                                    \
+#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                       \
+	template <class... Types>                                                                                                              \
+	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                                         \
+	{                                                                                                                                      \
+	public:                                                                                                                                \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__}            \
+		{                                                                                                                                  \
+			(this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                        \
+																	   &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this),  \
+								typeToString<Types>()),                                                                                    \
+			 ...);                                                                                                                         \
+		}                                                                                                                                  \
+		template <class TestType>                                                                                                          \
+		void test([[maybe_unused]] const ::bzd::test::Context& test) const;                                                                \
+	};                                                                                                                                     \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName)<BZD_REMOVE_PARENTHESIS(typeList)> BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
-#define BZDTEST_2(testCaseName, testName)     \
-	BZDTEST_REGISTER_(testCaseName, testName) \
+#define BZDTEST_2(testCaseName, testName)                                                                                                  \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] const ::bzd::test::Context& test) const
 
-#define BZDTEST_3(testCaseName, testName, typeList)              \
-	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList) \
-	template <class... Types>                                    \
-	template <class TestType>                                    \
+#define BZDTEST_3(testCaseName, testName, typeList)                                                                                        \
+	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                           \
+	template <class... Types>                                                                                                              \
+	template <class TestType>                                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] const ::bzd::test::Context& test) const
 
-#define BZDTEST_ASYNC_(testCaseName, testName)                                                                 \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                                  \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                       \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const             \
-	{                                                                                                          \
-		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                            \
-		if (!static_cast<bool>(result))                                                                        \
-		{                                                                                                      \
-			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data()); \
-		}                                                                                                      \
-	}                                                                                                          \
+#define BZDTEST_ASYNC_(testCaseName, testName)                                                                                             \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                   \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
+	{                                                                                                                                      \
+		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                                                        \
+		if (!static_cast<bool>(result))                                                                                                    \
+		{                                                                                                                                  \
+			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                             \
+		}                                                                                                                                  \
+	}                                                                                                                                      \
 	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
-#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                           \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                      \
-	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);         \
-	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                       \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const \
-	{                                                                                              \
-		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                  \
-		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                           \
-	}                                                                                              \
+#define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                                                                   \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                                               \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
+	{                                                                                                                                      \
+		BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                                                          \
+		BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                                                   \
+	}                                                                                                                                      \
 	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
-#define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                               \
-	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)()          \
-	{                                                                                \
-		constexpr auto constexprFct = []() -> bool {                                 \
-			constexpr ::bzd::test::Context context{};                                \
-			BZDTEST_FCT_NAME_(testCaseName, testName)(context);                      \
-			return true;                                                             \
-		};                                                                           \
-		static_assert(constexprFct(), "Compile time expression evaluation failed."); \
+#define BZDTEST_CONSTEXPR_END_(testCaseName, testName)                                                                                     \
+	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)()                                                                \
+	{                                                                                                                                      \
+		constexpr auto constexprFct = []() -> bool {                                                                                       \
+			constexpr ::bzd::test::Context context{};                                                                                      \
+			BZDTEST_FCT_NAME_(testCaseName, testName)(context);                                                                            \
+			return true;                                                                                                                   \
+		};                                                                                                                                 \
+		static_assert(constexprFct(), "Compile time expression evaluation failed.");                                                       \
 	}
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
-#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                                                         \
-	if (!static_cast<bool>(condition))                                                                                      \
-	{                                                                                                                       \
-		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected)); \
+#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                                                                        \
+	if (!static_cast<bool>(condition))                                                                                                     \
+	{                                                                                                                                      \
+		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(actual), static_cast<bool>(expected));                \
 	}
 
-#define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                      \
-	if (!static_cast<bool>(result))                                                       \
-	{                                                                                     \
-		failFct("Failure\nTest [async]: " #result, (result).error().getMessage().data()); \
+#define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                                                                       \
+	if (!static_cast<bool>(result))                                                                                                        \
+	{                                                                                                                                      \
+		failFct("Failure\nTest [async]: " #result, (result).error().getMessage().data());                                                  \
 	}
 
-#define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                    \
-	[](const auto& a, const auto& b) {                                         \
-		if (!(a == b))                                                         \
-		{                                                                      \
-			failFct("Failure\nTest: " #expression1 " == " #expression2, a, b); \
-		}                                                                      \
+#define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a == b))                                                                                                                     \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " == " #expression2, a, b);                                                             \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_NE_(expression1, expression2, failFct)                    \
-	[](const auto& a, const auto& b) {                                         \
-		if (!(a != b))                                                         \
-		{                                                                      \
-			failFct("Failure\nTest: " #expression1 " != " #expression2, a, b); \
-		}                                                                      \
+#define BZDTEST_TEST_NE_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a != b))                                                                                                                     \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " != " #expression2, a, b);                                                             \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_LT_(expression1, expression2, failFct)                   \
-	[](const auto& a, const auto& b) {                                        \
-		if (!(a < b))                                                         \
-		{                                                                     \
-			failFct("Failure\nTest: " #expression1 " < " #expression2, a, b); \
-		}                                                                     \
+#define BZDTEST_TEST_LT_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a < b))                                                                                                                      \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " < " #expression2, a, b);                                                              \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_LE_(expression1, expression2, failFct)                    \
-	[](const auto& a, const auto& b) {                                         \
-		if (!(a <= b))                                                         \
-		{                                                                      \
-			failFct("Failure\nTest: " #expression1 " <= " #expression2, a, b); \
-		}                                                                      \
+#define BZDTEST_TEST_LE_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a <= b))                                                                                                                     \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " <= " #expression2, a, b);                                                             \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_GT_(expression1, expression2, failFct)                   \
-	[](const auto& a, const auto& b) {                                        \
-		if (!(a > b))                                                         \
-		{                                                                     \
-			failFct("Failure\nTest: " #expression1 " > " #expression2, a, b); \
-		}                                                                     \
+#define BZDTEST_TEST_GT_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a > b))                                                                                                                      \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " > " #expression2, a, b);                                                              \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_GE_(expression1, expression2, failFct)                    \
-	[](const auto& a, const auto& b) {                                         \
-		if (!(a >= b))                                                         \
-		{                                                                      \
-			failFct("Failure\nTest: " #expression1 " >= " #expression2, a, b); \
-		}                                                                      \
+#define BZDTEST_TEST_GE_(expression1, expression2, failFct)                                                                                \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a >= b))                                                                                                                     \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #expression1 " >= " #expression2, a, b);                                                             \
+		}                                                                                                                                  \
 	}((expression1), (expression2));
 
-#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                \
-	[](const auto& a, const auto& b, const auto& err) {                                        \
-		if (!bzd::test::impl::near(a, b, err))                                                 \
-		{                                                                                      \
-			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", a, b); \
-		}                                                                                      \
+#define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                                                            \
+	[](const auto& a, const auto& b, const auto& err) {                                                                                    \
+		if (!bzd::test::impl::near(a, b, err))                                                                                             \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", a, b);                                             \
+		}                                                                                                                                  \
 	}((number1), (number2), (absError));
 
-#define BZDTEST_TEST_STREQ_(str1, str2, failFct)                          \
-	[](const auto& a, const auto& b) {                                    \
-		if (bzd::test::impl::strcmp(a, b) != 0)                           \
-		{                                                                 \
-			failFct("Failure\nTest [string]: " #str1 " == " #str2, a, b); \
-		}                                                                 \
+#define BZDTEST_TEST_STREQ_(str1, str2, failFct)                                                                                           \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (bzd::test::impl::strcmp(a, b) != 0)                                                                                            \
+		{                                                                                                                                  \
+			failFct("Failure\nTest [string]: " #str1 " == " #str2, a, b);                                                                  \
+		}                                                                                                                                  \
 	}((str1), (str2));
 
-#define BZDTEST_TEST_ANY_THROW_(expression, failFct)           \
-	{                                                          \
-		bool bzdTestIsThrow_ = false;                          \
-		try                                                    \
-		{                                                      \
-			expression;                                        \
-		}                                                      \
-		catch (...)                                            \
-		{                                                      \
-			bzdTestIsThrow_ = true;                            \
-		}                                                      \
-		if (!bzdTestIsThrow_)                                  \
-		{                                                      \
-			failFct("Failure\nTest: must throw " #expression); \
-		}                                                      \
+#define BZDTEST_TEST_ANY_THROW_(expression, failFct)                                                                                       \
+	{                                                                                                                                      \
+		bool bzdTestIsThrow_ = false;                                                                                                      \
+		try                                                                                                                                \
+		{                                                                                                                                  \
+			expression;                                                                                                                    \
+		}                                                                                                                                  \
+		catch (...)                                                                                                                        \
+		{                                                                                                                                  \
+			bzdTestIsThrow_ = true;                                                                                                        \
+		}                                                                                                                                  \
+		if (!bzdTestIsThrow_)                                                                                                              \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: must throw " #expression);                                                                             \
+		}                                                                                                                                  \
 	}
 
-#define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                            \
-	[](const auto& a, const auto& b) {                                                                      \
-		if (!(a.size() == b.size()))                                                                        \
-		{                                                                                                   \
-			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", a.size(), b.size()); \
-		}                                                                                                   \
-		else                                                                                                \
-		{                                                                                                   \
-			auto it = b.begin();                                                                            \
-			for (const auto& value : a)                                                                     \
-			{                                                                                               \
-				if (!(value == *it))                                                                        \
-				{                                                                                           \
-					failFct("Failure\nTest: " #container1 " == " #container2 " at index ", value, *it);     \
-				}                                                                                           \
-				++it;                                                                                       \
-			}                                                                                               \
-		}                                                                                                   \
+#define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                                                           \
+	[](const auto& a, const auto& b) {                                                                                                     \
+		if (!(a.size() == b.size()))                                                                                                       \
+		{                                                                                                                                  \
+			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", a.size(), b.size());                                \
+		}                                                                                                                                  \
+		else                                                                                                                               \
+		{                                                                                                                                  \
+			auto it = b.begin();                                                                                                           \
+			for (const auto& value : a)                                                                                                    \
+			{                                                                                                                              \
+				if (!(value == *it))                                                                                                       \
+				{                                                                                                                          \
+					failFct("Failure\nTest: " #container1 " == " #container2 " at index ", value, *it);                                    \
+				}                                                                                                                          \
+				++it;                                                                                                                      \
+			}                                                                                                                              \
+		}                                                                                                                                  \
 	}((container1), (container2));
 
 namespace bzd::test::impl {

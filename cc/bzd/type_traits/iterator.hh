@@ -47,11 +47,10 @@ struct ContiguousTag : public RandomAccessTag
 {
 };
 
-template <class T>
+template <class>
 struct Iterator;
 
-template <class T>
-requires concepts::derivedFrom<T, IteratorBase>
+template <concepts::derivedFrom<IteratorBase> T>
 struct Iterator<T>
 {
 	using Category = typename T::Category;
@@ -59,12 +58,11 @@ struct Iterator<T>
 	using ValueType = typename T::ValueType;
 };
 
-template <class T>
-requires concepts::pointer<T>
+template <concepts::pointer T>
 struct Iterator<T>
 {
 	using Category = typeTraits::ContiguousTag;
-	using DifferenceType = bzd::Int32;
+	using DifferenceType = decltype(bzd::typeTraits::declval<T>() - bzd::typeTraits::declval<T>());
 	using ValueType = typeTraits::RemovePointer<T>;
 };
 
@@ -80,6 +78,9 @@ concept inputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator
 
 template <class T>
 concept outputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
+
+template <class T>
+concept intputOrOutputIterator = inputIterator<T> || outputIterator<T>;
 
 template <class T>
 concept forwardIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;

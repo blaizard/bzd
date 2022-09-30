@@ -25,7 +25,4 @@ bzd::Optional<bzd::OStream&> bzd::backend::Logger::setDefault(bzd::OStream& back
 	return *previous;
 }
 
-bzd::OStream& bzd::backend::Logger::getDefault() noexcept
-{
-	return *defaultBackend;
-}
+bzd::OStream& bzd::backend::Logger::getDefault() noexcept { return *defaultBackend; }

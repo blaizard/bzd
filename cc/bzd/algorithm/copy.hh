@@ -28,9 +28,6 @@ constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
 /// \param[out] output The range of the destination range.
 template <class InputRange, class OutputRange>
 requires concepts::forwardRange<InputRange> && concepts::outputRange<OutputRange>
-constexpr auto copy(InputRange&& input, OutputRange&& output)
-{
-	return copy(bzd::begin(input), bzd::end(input), bzd::begin(output));
-}
+constexpr auto copy(InputRange&& input, OutputRange&& output) { return copy(bzd::begin(input), bzd::end(input), bzd::begin(output)); }
 
 } // namespace bzd::algorithm

@@ -4,10 +4,7 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
-TEST(Logger, Empty)
-{
-	bzd::log::info("hello"_csv).sync();
-}
+TEST(Logger, Empty) { bzd::log::info("hello"_csv).sync(); }
 
 TEST(Logger, Backend)
 {

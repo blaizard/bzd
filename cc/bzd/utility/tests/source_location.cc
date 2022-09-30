@@ -2,10 +2,7 @@
 
 #include "cc/bzd/test/test.hh"
 
-void myTest()
-{
-	EXPECT_STREQ(bzd::SourceLocation::current().getFunction(), "myTest");
-}
+void myTest() { EXPECT_STREQ(bzd::SourceLocation::current().getFunction(), "myTest"); }
 
 TEST(SourceLocation, Base)
 {

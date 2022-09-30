@@ -29,9 +29,6 @@ void FileDescriptorOwner::reset() noexcept
 	}
 }
 
-FileDescriptorOwner::~FileDescriptorOwner() noexcept
-{
-	reset();
-}
+FileDescriptorOwner::~FileDescriptorOwner() noexcept { reset(); }
 
 } // namespace bzd::platform::posix

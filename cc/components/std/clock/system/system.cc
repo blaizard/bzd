@@ -11,10 +11,7 @@ ClockTick System::getTicks() noexcept
 	return static_cast<ClockTick>(ticks);
 }
 
-ClockTick System::msToTicks(const bzd::units::Millisecond time) noexcept
-{
-	return static_cast<ClockTick>(time.get());
-}
+ClockTick System::msToTicks(const bzd::units::Millisecond time) noexcept { return static_cast<ClockTick>(time.get()); }
 
 bzd::units::Millisecond System::ticksToMs(const ClockTick& ticks) noexcept
 {

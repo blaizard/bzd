@@ -90,9 +90,6 @@ void Addresses::reset() noexcept
 	}
 }
 
-Addresses::~Addresses() noexcept
-{
-	reset();
-}
+Addresses::~Addresses() noexcept { reset(); }
 
 } // namespace bzd::platform::posix::network

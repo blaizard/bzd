@@ -3,20 +3,11 @@
 
 #include <iostream>
 
-bzd::Async<int> generateError()
-{
-	co_return bzd::error::Failure("Dummy"_csv);
-}
+bzd::Async<int> generateError() { co_return bzd::error::Failure("Dummy"_csv); }
 
-bzd::Async<> generateSuccessVoid()
-{
-	co_return {};
-}
+bzd::Async<> generateSuccessVoid() { co_return {}; }
 
-bzd::Async<int> generateSuccessInt(const int value)
-{
-	co_return value;
-}
+bzd::Async<int> generateSuccessInt(const int value) { co_return value; }
 
 bzd::Async<int> generateSuccessIntWithDelay(const int value)
 {
