@@ -24,10 +24,7 @@ const char* levelToStr(const bzd::log::Level level)
 }
 } // namespace
 
-void bzd::Logger::setMinimumLevel(const bzd::log::Level level) noexcept
-{
-	minLevel_ = level;
-}
+void bzd::Logger::setMinimumLevel(const bzd::log::Level level) noexcept { minLevel_ = level; }
 
 bzd::Logger& bzd::Logger::getDefault() noexcept
 {

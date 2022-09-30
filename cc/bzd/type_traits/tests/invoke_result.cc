@@ -3,22 +3,13 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 
-int intFct()
-{
-	return 0;
-}
+int intFct() { return 0; }
 
 void voidFct() {}
 
-void* pointerFct()
-{
-	return nullptr;
-}
+void* pointerFct() { return nullptr; }
 
-const void* constPointerFct()
-{
-	return nullptr;
-}
+const void* constPointerFct() { return nullptr; }
 
 int& referenceFct()
 {
@@ -34,10 +25,7 @@ const int& constReferenceFct()
 
 void voidFctWithArgs(int) {}
 
-int complexFctWithArgs(double, char*)
-{
-	return 0;
-}
+int complexFctWithArgs(double, char*) { return 0; }
 
 template <class T>
 auto temmplateFct(const T& a)

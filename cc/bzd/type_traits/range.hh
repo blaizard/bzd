@@ -9,10 +9,16 @@
 namespace bzd::concepts {
 
 template <class T>
-concept range = requires(T t)
+concept range = requires(T& t)
 {
 	bzd::begin(t);
 	bzd::end(t);
+};
+
+template <class T>
+concept sizedRange = range<T> && requires(T& t)
+{
+	bzd::size(t);
 };
 
 } // namespace bzd::concepts
@@ -20,13 +26,17 @@ concept range = requires(T t)
 namespace bzd::typeTraits {
 
 template <class T>
-requires concepts::range<T>
-struct Iterator<T>
+struct Range;
+
+template <concepts::range T>
+struct Range<T>
 {
-	using Type = decltype(bzd::begin(bzd::typeTraits::declval<T&>()));
-	using Category = typename Iterator<Type>::Category;
-	using DifferenceType = typename Iterator<Type>::DifferenceType;
-	using ValueType = typename Iterator<Type>::ValueType;
+	using Iterator = decltype(bzd::begin(bzd::typeTraits::declval<T&>()));
+	using Sentinel = decltype(bzd::end(bzd::typeTraits::declval<T&>()));
+	// using Size = decltype(bzd::size(bzd::typeTraits::declval<T&>()));
+	using Category = typename typeTraits::Iterator<Iterator>::Category;
+	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
 };
 
 } // namespace bzd::typeTraits
@@ -34,27 +44,21 @@ struct Iterator<T>
 namespace bzd::concepts {
 
 template <class T>
-concept inputRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::InputTag>;
+concept inputRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::InputTag>;
 
 template <class T>
-concept outputRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
+concept outputRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::OutputTag>;
 
 template <class T>
-concept forwardRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;
+concept forwardRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::ForwardTag>;
 
 template <class T>
-concept bidirectionalRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::BidirectionalTag>;
+concept bidirectionalRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::BidirectionalTag>;
 
 template <class T>
-concept randomAccessRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::RandomAccessTag>;
+concept randomAccessRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::RandomAccessTag>;
 
 template <class T>
-concept contiguousRange = range<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ContiguousTag>;
-
-template <class T>
-concept sizedRange = range<T> && requires(T t)
-{
-	bzd::size(t);
-};
+concept contiguousRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::ContiguousTag>;
 
 } // namespace bzd::concepts

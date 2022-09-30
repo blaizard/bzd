@@ -67,10 +67,7 @@ concept constexprStringView = typeTraits::isBaseOf<ConstexprStringView, T>;
 }
 
 /// Operator to create a string view out of a string
-constexpr bzd::StringView operator""_sv(const char* str, bzd::Size size) noexcept
-{
-	return bzd::StringView{str, size};
-}
+constexpr bzd::StringView operator""_sv(const char* str, bzd::Size size) noexcept { return bzd::StringView{str, size}; }
 
 /// Operator to create a compile time string view out of a string.
 template <bzd::meta::StringLiteral str>

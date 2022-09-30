@@ -1,10 +1,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/test/test.hh"
 
-bzd::Async<bzd::UInt64> nopNoTrace(bzd::UInt64 retVal)
-{
-	co_return retVal;
-}
+bzd::Async<bzd::UInt64> nopNoTrace(bzd::UInt64 retVal) { co_return retVal; }
 
 bzd::Async<bzd::UInt64> loopSynchronously(int count)
 {

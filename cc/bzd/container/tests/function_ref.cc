@@ -42,15 +42,9 @@ public:
 
 void callNoArgs() {}
 
-void callArgsAdd1(int& val)
-{
-	++val;
-}
+void callArgsAdd1(int& val) { ++val; }
 
-int callSquare(int val)
-{
-	return val * val;
-}
+int callSquare(int val) { return val * val; }
 
 } // namespace
 

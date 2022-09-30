@@ -5,8 +5,8 @@
 #include "cc/bzd/utility/pattern/reader/integral.hh"
 
 namespace bzd {
-template <class Range>
-using FromStringReturnType = bzd::Optional<typename bzd::typeTraits::Iterator<Range>::Type>;
+template <concepts::range Range>
+using FromStringReturnType = bzd::Optional<typename bzd::typeTraits::Range<Range>::Iterator>;
 }
 
 namespace bzd::reader::impl {
@@ -71,18 +71,32 @@ constexpr bzd::Optional<Iterator> fromString(Iterator first, Iterator, const bzd
 	return first;
 }
 
+/// Try to match a range with a pattern.
+template <bzd::concepts::containerFromString Range>
+constexpr bzd::FromStringReturnType<Range> match(Range&&, const bzd::StringView) noexcept
+{
+	return bzd::nullopt;
+}
+
 } // namespace bzd::reader::impl
 
 template <bzd::concepts::containerFromString Range, bzd::concepts::constexprStringView Pattern, class... Args>
-constexpr bzd::FromStringReturnType<Range> fromString(Range&&, const Pattern& pattern, Args&... args) noexcept
+constexpr bzd::FromStringReturnType<Range> fromString(Range&& range, const Pattern& pattern, Args&... args) noexcept
 {
-	auto [parser, processor] =
+	auto [context, processor] =
 		bzd::pattern::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern, args...);
 
 	// Run-time call
-	for (const auto& result : parser)
+	for (const auto& fragment : context)
 	{
-		(void)result;
+		if (!fragment.str.empty())
+		{
+			// str.append(result.str);
+		}
+		if (fragment.isMetadata)
+		{
+			processor.process(range, fragment.metadata);
+		}
 	}
 
 	return bzd::nullopt;

@@ -42,10 +42,7 @@ TEST_ASYNC(Generator, TwoCalls)
 	co_return {};
 }
 
-bzd::Async<bzd::Size> lazy(bzd::Size value)
-{
-	co_return value;
-}
+bzd::Async<bzd::Size> lazy(bzd::Size value) { co_return value; }
 
 bzd::Generator<bzd::Size> generatorWithAwaitable(bzd::Size count)
 {
@@ -98,10 +95,7 @@ TEST_ASYNC(Generator, NestedGenerator)
 	co_return {};
 }
 
-bzd::Async<bzd::Size> generatorErrorAsync()
-{
-	co_return bzd::error::Failure("Dummy"_csv);
-}
+bzd::Async<bzd::Size> generatorErrorAsync() { co_return bzd::error::Failure("Dummy"_csv); }
 
 bzd::Generator<bzd::Size> generatorError(bzd::Size count)
 {

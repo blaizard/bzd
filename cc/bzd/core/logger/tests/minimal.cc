@@ -5,10 +5,7 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
-TEST(Minimal, Empty)
-{
-	bzd::minimal::log::info("hello");
-}
+TEST(Minimal, Empty) { bzd::minimal::log::info("hello"); }
 
 TEST(Minimal, Backend)
 {

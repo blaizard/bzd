@@ -34,10 +34,7 @@ Out& out()
 }
 } // namespace bzd::platform
 
-bzd::Async<> noop()
-{
-	co_return {};
-}
+bzd::Async<> noop() { co_return {}; }
 
 bzd::Async<> executor()
 {

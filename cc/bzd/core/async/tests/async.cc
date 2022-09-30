@@ -94,10 +94,7 @@ TEST_ASYNC(Coroutine, DeepNested)
 	co_return {};
 }
 
-bzd::Async<int> passThrough(bzd::interface::String& trace, bzd::StringView id, int retVal)
-{
-	return nested(trace, id, retVal);
-}
+bzd::Async<int> passThrough(bzd::interface::String& trace, bzd::StringView id, int retVal) { return nested(trace, id, retVal); }
 
 TEST_ASYNC(Coroutine, PassThrough)
 {
@@ -281,14 +278,12 @@ TEST_ASYNC(Coroutine, asyncAnyWait)
 	co_return {};
 }
 
-bzd::Async<int> asyncAdd(int a, int b)
-{
-	co_return a + b;
-}
+bzd::Async<int> asyncAdd(int a, int b) { co_return a + b; }
 
 bzd::Async<int> asyncFibonacci(int n)
 {
-	if (n <= 2) co_return 1;
+	if (n <= 2)
+		co_return 1;
 
 	int a = 1;
 	int b = 1;

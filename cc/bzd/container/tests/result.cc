@@ -24,7 +24,8 @@ TEST_CONSTEXPR_END(ContainerResult, Constexpr)
 TEST(ContainerResult, returnVoid)
 {
 	auto fct = [](const bool makeError) -> bzd::Result<void, std::string> {
-		if (makeError) return bzd::error::make("KO");
+		if (makeError)
+			return bzd::error::make("KO");
 		return bzd::nullresult;
 	};
 
@@ -37,7 +38,8 @@ TEST(ContainerResult, returnReference)
 {
 	int data = 0;
 	auto fct = [&](const bool makeError) -> bzd::Result<int&, std::string> {
-		if (makeError) return bzd::error::make("KO");
+		if (makeError)
+			return bzd::error::make("KO");
 		data = 42;
 		return data;
 	};
@@ -51,7 +53,8 @@ TEST(ContainerResult, returnPointer)
 {
 	int data = 0;
 	auto fct = [&](const bool makeError) -> bzd::Result<int*, std::string> {
-		if (makeError) return bzd::error::make("KO");
+		if (makeError)
+			return bzd::error::make("KO");
 		data = 42;
 		return &data;
 	};

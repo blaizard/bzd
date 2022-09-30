@@ -122,17 +122,8 @@ constexpr bool operator==(const interface::String& lhs, const char* const rhs) n
 
 } // namespace bzd
 
-constexpr void toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept
-{
-	str.append(data);
-}
+constexpr void toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept { str.append(data); }
 
-constexpr void toString(bzd::interface::String& str, const bzd::StringView data) noexcept
-{
-	str.append(data);
-}
+constexpr void toString(bzd::interface::String& str, const bzd::StringView data) noexcept { str.append(data); }
 
-constexpr void toString(bzd::interface::String& str, const char* const data) noexcept
-{
-	str.append(bzd::StringView{data});
-}
+constexpr void toString(bzd::interface::String& str, const char* const data) noexcept { str.append(bzd::StringView{data}); }

@@ -25,9 +25,6 @@ constexpr void fill(Iterator first, Iterator last, const T& value)
 /// \param[in,out] range The range of elements to modify.
 template <class Range, class... Args>
 requires concepts::forwardRange<Range>
-constexpr void fill(Range&& range, Args&&... args)
-{
-	fill(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
-}
+constexpr void fill(Range&& range, Args&&... args) { fill(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...); }
 
 } // namespace bzd::algorithm

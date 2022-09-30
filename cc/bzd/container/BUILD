@@ -28,6 +28,7 @@ bzd_cc_library(
         ":variant",
         ":vector",
         "//cc/bzd/container/impl",
+        "//cc/bzd/container/range:subrange",
         "//cc/bzd/container/threadsafe",
         "//cc/bzd/core/assert",
     ],

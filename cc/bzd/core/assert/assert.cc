@@ -21,9 +21,6 @@ void backend(const bzd::SourceLocation& location, const char* message1, const ch
 } // namespace bzd::assert::impl
 
 namespace bzd::assert {
-void unreachable(const bzd::SourceLocation location)
-{
-	impl::backend(location, "Code unreachable.\n");
-}
+void unreachable(const bzd::SourceLocation location) { impl::backend(location, "Code unreachable.\n"); }
 
 } // namespace bzd::assert

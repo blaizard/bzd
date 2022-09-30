@@ -2,15 +2,9 @@
 
 namespace custom::random::name::space {
 
-TEST(Test, Sync)
-{
-	EXPECT_TRUE(true);
-}
+TEST(Test, Sync) { EXPECT_TRUE(true); }
 
-TEST_ASYNC(Test, Async)
-{
-	co_return {};
-}
+TEST_ASYNC(Test, Async) { co_return {}; }
 
 TEST_CONSTEXPR_BEGIN(Test, Constexpr)
 {

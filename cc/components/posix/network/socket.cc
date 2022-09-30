@@ -61,9 +61,6 @@ bzd::Async<Socket> Socket::accept() noexcept
 	co_return Socket{fdPeer};
 }
 
-void Socket::reset() noexcept
-{
-	fd_.reset();
-}
+void Socket::reset() noexcept { fd_.reset(); }
 
 } // namespace bzd::platform::posix::network
