@@ -20,15 +20,15 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":view",
+        ":view_interface",
         "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
 cc_library(
-    name = "view",
+    name = "view_interface",
     hdrs = [
-        "view.hh",
+        "view_interface.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
