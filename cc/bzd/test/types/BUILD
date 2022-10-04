@@ -13,6 +13,7 @@ bzd_cc_library(
         ":lifetime_counter",
         ":move_only",
         ":no_default_constructor",
+        ":range",
     ],
 )
 
@@ -89,4 +90,16 @@ cc_library(
         "no_default_constructor.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "range",
+    hdrs = [
+        "range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:array",
+        "//cc/bzd/type_traits:range",
+    ],
 )

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sized_sentinel_for.hh"
 
@@ -8,36 +9,38 @@ namespace bzd::range {
 template <class Range>
 class View
 {
+private:
+	// Trick to ensure the concept is not evaluated when Range is still an incomplete type.
+	// This waits until the type is actually used to be evaluated.
+	template <Bool B = true>
+	using CRTP = bzd::typeTraits::Conditional<B, Range, void>;
+
 public:
 	constexpr Bool empty() const noexcept { return (child().begin() == child().end()); }
 
-	constexpr auto size() const noexcept
+	template <Bool True = true>
+	requires(True&& concepts::forwardRange<CRTP<True>>&&
+				 concepts::sizedSentinelFor<typename typeTraits::Range<CRTP<True>>::Iterator,
+											typename typeTraits::Range<CRTP<True>>::Sentinel>) constexpr auto size() const noexcept
 	{
-		static_assert(concepts::forwardRange<Range>);
-		static_assert(concepts::sizedSentinelFor<typename typeTraits::Range<Range>::Iterator, typename typeTraits::Range<Range>::Sentinel>);
 		return child().end() - child().begin();
 	}
 
-	constexpr const auto* data() const noexcept
-	{
-		static_assert(concepts::contiguousRange<Range>);
-		return &(*(child().begin()));
-	}
+	template <Bool True = true>
+	requires(True&& concepts::contiguousRange<CRTP<True>>) constexpr const auto* data() const noexcept { return &(*(child().begin())); }
 
-	constexpr auto* data() noexcept
-	{
-		static_assert(concepts::contiguousRange<Range>);
-		return &(*(child().begin()));
-	}
+	template <Bool True = true>
+	requires(True&& concepts::contiguousRange<CRTP<True>>) constexpr auto* data() noexcept { return &(*(child().begin())); }
 
-	constexpr auto& operator[](const Size index) noexcept
+	template <Bool True = true>
+	requires(True&& concepts::randomAccessRange<CRTP<True>>) constexpr auto& operator[](const Size index) noexcept
 	{
-		static_assert(concepts::randomAccessRange<Range>);
 		return *(child().begin() + index);
 	}
-	constexpr const auto& operator[](const Size index) const noexcept
+
+	template <Bool True = true>
+	requires(True&& concepts::randomAccessRange<CRTP<True>>) constexpr const auto& operator[](const Size index) const noexcept
 	{
-		static_assert(concepts::randomAccessRange<Range>);
 		return *(child().begin() + index);
 	}
 
