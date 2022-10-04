@@ -7,7 +7,7 @@
 namespace bzd::range {
 
 template <class Range>
-class View
+class ViewInterface
 {
 private:
 	// Trick to ensure the concept is not evaluated when Range is still an incomplete type.
