@@ -41,7 +41,7 @@
                     "path": "mandatory"
                 }
             },
-            "respponse": {
+            "response": {
                 "type": "file"
             }
         }
