@@ -76,7 +76,7 @@ class RouterManager {
 					);
 				}
 				if (route.handler) {
-					route.handler(path, routerOptions);
+					route.handler(path, routerOptions, args);
 				}
 			};
 

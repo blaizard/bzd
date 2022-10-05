@@ -49,7 +49,7 @@ export default class API {
 		return this.options.authentication !== null;
 	}
 
-	_makePath(endpoint) {
+	getEndpoint(endpoint) {
 		return "/api/v" + this.options.version + endpoint;
 	}
 

@@ -23,7 +23,7 @@ class Context {
 	}
 
 	getEndpoint(endpoint) {
-		return new Url.URL(this.api._makePath(endpoint), this.getHost()).href;
+		return new Url.URL(this.api.getEndpoint(endpoint), this.getHost()).href;
 	}
 
 	setHeader(key, value) {
@@ -228,6 +228,6 @@ export default class APIServer extends Base {
 		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
 
 		Exception.assert(this.options.channel, "Channel is missing");
-		this.options.channel.addRoute(method, this._makePath(updatedEndpoint), callbackWrapper, webOptions);
+		this.options.channel.addRoute(method, this.getEndpoint(updatedEndpoint), callbackWrapper, webOptions);
 	}
 }

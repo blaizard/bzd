@@ -32,6 +32,20 @@
             }
         }
     },
+    "/file": {
+        "get": {
+            "documentation": "Get a specific file for download.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "path": "mandatory"
+                }
+            },
+            "respponse": {
+                "type": "file"
+            }
+        }
+    },
     "/list": {
         "post": {
             "documentation": "Get the file/directory list from a specific path.",
