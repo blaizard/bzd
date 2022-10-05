@@ -119,6 +119,8 @@ program
 		await services.start(name, params.type, params);
 	}
 
+	// Adding API handlers.
+
 	function getInternalPath(pathList) {
 		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
 		Exception.assert(
