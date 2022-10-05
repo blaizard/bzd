@@ -3,6 +3,7 @@ load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 _PLUGINS = [
     "fs",
     "docker",
+    "webdav",
 ]
 
 bzd_nodejs_library(

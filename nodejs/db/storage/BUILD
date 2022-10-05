@@ -80,3 +80,21 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
     ],
 )
+
+bzd_nodejs_library(
+    name = "webdav",
+    srcs = [
+        "webdav.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":storage",
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+        "//nodejs/core:stream",
+        "//nodejs/core/http:client",
+        "//nodejs/db:utils",
+    ],
+)

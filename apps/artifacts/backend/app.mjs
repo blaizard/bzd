@@ -43,7 +43,14 @@ program
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
-	web.addStaticRoute("/", PATH_STATIC, "index.html");
+	// Install the APIs
+	let api = new API(APIv1, {
+		channel: web,
+	});
+
+	web.addRoute("get", "/file(/*)?", async (request, response) => {
+		response.redirect(api.getEndpoint("/file?path=" + request.params[1]));
+	});
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
@@ -74,9 +81,7 @@ program
 	// Set the cache
 	let cache = new Cache();
 
-	/**
-	 * Retrieve the storage implementation associated with this volume
-	 */
+	// Retrieve the storage implementation associated with this volume
 	cache.register("volume", async (volume) => {
 		const params = await keyValueStore.get("volume", volume, null);
 		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
@@ -114,12 +119,6 @@ program
 		await services.start(name, params.type, params);
 	}
 
-	// Install the APIs
-
-	let api = new API(APIv1, {
-		channel: web,
-	});
-
 	function getInternalPath(pathList) {
 		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
 		Exception.assert(
@@ -129,6 +128,16 @@ program
 		);
 		return { volume: pathList[0], pathList: pathList.slice(1) };
 	}
+
+	function getInternalPathFromString(path) {
+		return getInternalPath(path.split("/").map(decodeURIComponent));
+	}
+
+	api.handle("get", "/file", async (inputs) => {
+		const { volume, pathList } = getInternalPathFromString(inputs.path);
+		const storage = await cache.get("volume", volume);
+		return await storage.read(pathList);
+	});
 
 	api.handle("get", "/config", async (inputs) => {
 		return await keyValueStore.get("volume", inputs.volume, {});
@@ -206,5 +215,6 @@ program
 	});
 
 	Log.info("Application started");
+	web.addStaticRoute("/", PATH_STATIC, "index.html");
 	web.start();
 })();
