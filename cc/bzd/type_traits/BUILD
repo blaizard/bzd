@@ -12,6 +12,7 @@ bzd_cc_library(
         ":add_reference",
         ":add_rvalue_reference",
         ":add_volatile",
+        ":assignable_from",
         ":conditional",
         ":container",
         ":decay",
@@ -138,6 +139,18 @@ cc_library(
         "add_volatile.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "assignable_from",
+    hdrs = [
+        "assignable_from.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":is_same",
+        "//cc/bzd/utility:forward",
+    ]
 )
 
 cc_library(

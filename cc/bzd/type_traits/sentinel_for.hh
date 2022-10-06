@@ -5,5 +5,5 @@
 
 namespace bzd::concepts {
 template <class Sentinel, class Iterator>
-concept sentinelFor = intputOrOutputIterator<Iterator> && weaklyEqualityComparableWith<Sentinel, Iterator>;
+concept sentinelFor = inputOrOutputIterator<Iterator> && weaklyEqualityComparableWith<Sentinel, Iterator>;
 }

@@ -80,7 +80,7 @@ template <class T>
 concept outputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
 
 template <class T>
-concept intputOrOutputIterator = inputIterator<T> || outputIterator<T>;
+concept inputOrOutputIterator = inputIterator<T> || outputIterator<T>;
 
 template <class T>
 concept forwardIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;
