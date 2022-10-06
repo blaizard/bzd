@@ -20,10 +20,6 @@ template <class Iterator1, class Iterator2, class BinaryPredicate = bzd::EqualTo
 requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
 [[nodiscard]] constexpr bzd::Bool equal(Iterator1 first1, Iterator1 last1, Iterator2 first2, BinaryPredicate predicate = BinaryPredicate{})
 {
-	static_assert(
-		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
-		"Value types of both iterators must match.");
-
 	for (; first1 != last1; ++first1, ++first2)
 	{
 		if (!predicate(*first1, *first2))
@@ -42,10 +38,6 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 [[nodiscard]] constexpr bzd::Bool equal(
 	Iterator1 first1, Iterator1 last1, Iterator2 first2, Iterator2 last2, BinaryPredicate predicate = BinaryPredicate{})
 {
-	static_assert(
-		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
-		"Value types of both iterators must match.");
-
 	for (; first1 != last1 && first2 != last2; ++first1, ++first2)
 	{
 		if (!predicate(*first1, *first2))

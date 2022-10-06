@@ -5,6 +5,7 @@ bzd_cc_library(
     name = "math",
     visibility = ["//visibility:public"],
     deps = [
+        ":abs",
         ":ceil",
         ":floor",
         ":trunc",
@@ -12,6 +13,17 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "abs",
+    hdrs = [
+        "abs.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:is_arithmetic"
+    ]
+)
 
 cc_library(
     name = "ceil",

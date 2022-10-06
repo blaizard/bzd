@@ -50,6 +50,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:sentinel_for",
+        "//cc/bzd/type_traits:sized_sentinel_for",
+        "//cc/bzd/math:abs",
+        "//cc/bzd/type_traits:assignable_from",
+        "//cc/bzd/utility:move"
     ],
 )
 

@@ -6,7 +6,7 @@
 namespace bzd::range {
 
 /// Create a sub range from a
-template <concepts::intputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
+template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 class SubRange : public ViewInterface<SubRange<Iterator, Sentinel>>
 {
 public:
