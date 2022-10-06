@@ -34,5 +34,6 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sized_sentinel_for",
+        "//cc/bzd/type_traits:conditional"
     ],
 )

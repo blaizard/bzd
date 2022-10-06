@@ -5,7 +5,7 @@ import LogFactory from "../../core/log.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
 import { CollectionPaging } from "../utils.mjs";
 import Permissions from "./permissions.mjs";
-import { HttpClientFactory } from "../../core/http/client.mjs";
+import { HttpClientFactory, HttpClientException } from "../../core/http/client.mjs";
 
 const Log = LogFactory("db", "storage", "webdav");
 const Exception = ExceptionFactory("db", "storage", "webdav");
@@ -36,8 +36,9 @@ export default class StorageWebdav extends Storage {
 	/// Initialize the storage module.
 	async _initialize() {}
 
-	_getLocalPath(pathList) {
-		return "/" + pathList.map(encodeURIComponent).join("/");
+	_getLocalPath(pathList, name = undefined) {
+		const updatedPathList = (name === undefined) ? pathList : [...pathList, name];
+		return "/" + updatedPathList.map(encodeURIComponent).join("/");
 	}
 
 	_matchTag(str, tag) {
@@ -58,23 +59,36 @@ export default class StorageWebdav extends Storage {
 	}
 
 	async _isImpl(pathList, name) {
-		return null;
+		const fullPath = this._getLocalPath(pathList, name);
+		try {
+			await this.fetch.request(fullPath, {
+				method: "propfind",
+			});
+		}
+		catch (e) {
+			if (e instanceof HttpClientException) {
+				if (e.code == 404 /*Not Found*/) {
+					return false;
+				}
+			}
+			throw e;
+		}
+		return true;
 	}
 
 	async _readImpl(pathList, name) {
-		return null;
+		const fullPath = this._getLocalPath(pathList, name);
+		const result = await this.fetch.request(fullPath, {
+			method: "get",
+			expect: "stream",
+		});
+		return result;
 	}
-
-	async _writeImpl(pathList, name, readStream) {
-		return null;
-	}
-
-	async _deleteImpl(pathList, name) {}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		const fullPath = this._getLocalPath(pathList);
 		const result = await this.fetch.request(fullPath, {
-			method: "PROPFIND",
+			method: "propfind",
 		});
 
 		let data = [];
