@@ -6,11 +6,11 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         path,
     ],
     deps = [
+        "//cc/bzd/algorithm:equal",
         "//cc/bzd/container",
+        "//cc/bzd/container/range/views",
         "//cc/bzd/test",
         "//cc/bzd/test/types:range",
-        "//cc/bzd/container/range/views",
-        "//cc/bzd/algorithm:equal"
     ],
 ) for path in glob([
     "*.cc",

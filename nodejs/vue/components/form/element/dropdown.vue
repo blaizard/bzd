@@ -45,10 +45,8 @@
 				 * Maximum number of entries to display. If set to 0, there is no limit.
 				 */
 				max: this.getOption("max", 0),
-				/*
-				 * ---- Internal values ---------------------------------------
-				 * The list of values as they should be printed
-				 */
+				// ---- Internal values ---------------------------------------
+				// The list of values as they should be printed
 				list: [],
 				filteredList: [],
 				directValue: "",
@@ -220,10 +218,8 @@
 
 			select(item) {
 				if (!this.isSelected(item)) {
-					/*
-					 * Copy the value before it got altered by the input element losing its focus,
-					 * and after all event have been processed, set the new value.
-					 */
+					// Copy the value before it got altered by the input element losing its focus,
+					// and after all event have been processed, set the new value.
 					setTimeout(() => {
 						if (this.multi) {
 							const curValue = this.curValue.splice(0);

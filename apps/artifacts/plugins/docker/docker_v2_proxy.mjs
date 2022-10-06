@@ -49,18 +49,14 @@ export default class DockerV2Proxy {
 		});
 	}
 
-	/**
-	 * Make a proxy from a Docker Storage object.
-	 */
+	/// Make a proxy from a Docker Storage object.
 	static makeFromStorageDockerV2(url, port, dockerStorage) {
 		return new DockerV2Proxy(url, port, dockerStorage.url, async (scope) => {
 			return await dockerStorage.options.authentication.call(dockerStorage, scope);
 		});
 	}
 
-	/**
-	 * Convert a URL from the proxy to the host
-	 */
+	/// Convert a URL from the proxy to the host
 	_updateUrlFromResponse(url) {
 		let parseUrl = new Url.URL(url);
 		parseUrl.protocol = this._urlParsed.protocol;

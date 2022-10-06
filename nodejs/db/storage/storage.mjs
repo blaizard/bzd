@@ -6,7 +6,7 @@ import { AsyncInitialize } from "../utils.mjs";
 
 const Exception = ExceptionFactory("db", "storage");
 
-//// File storage module.
+/// File storage module.
 /// Path are addressed by a path list, as some implementation allow slashes as a name.
 export default class Storage extends AsyncInitialize {
 	constructor() {

@@ -58,7 +58,7 @@
         ],
         "multiline-comment-style": [
             "error",
-            "starred-block"
+            "separate-lines"
         ],
         "no-mixed-spaces-and-tabs": [
             "off"

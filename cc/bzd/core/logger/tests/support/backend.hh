@@ -40,23 +40,23 @@ public:
 			switch (mode)
 			{
 			case Mode::normal:
+			{
+				const auto expected = data.at(i);
+				if (expected == bzd::Byte{'#'})
 				{
-					const auto expected = data.at(i);
-					if (expected == bzd::Byte{'#'})
-					{
-						mode = Mode::integer;
-						--read_;
-					}
-					else if (c == expected)
-					{
-						++i;
-					}
-					else
-					{
-						return bzd::error::make();
-					}
+					mode = Mode::integer;
+					--read_;
 				}
-				break;
+				else if (c == expected)
+				{
+					++i;
+				}
+				else
+				{
+					return bzd::error::make();
+				}
+			}
+			break;
 			case Mode::integer:
 				if (c < bzd::Byte{'0'} || c > bzd::Byte{'9'})
 				{

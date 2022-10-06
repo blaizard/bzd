@@ -18,10 +18,8 @@ export default class Mutex {
 			});
 		}
 
-		/*
-		 * If the lock is already taken, add the current process to the queue
-		 * This is done atomically, as a Javascript operation
-		 */
+		// If the lock is already taken, add the current process to the queue
+		// This is done atomically, as a Javascript operation
 		if (this.isLock) {
 			this.queue.push(callback);
 			return;
@@ -41,10 +39,8 @@ export default class Mutex {
 		// If there are pending lock in the queue
 		if (this.queue.length > 0) {
 			const callback = this.queue.shift();
-			/*
-			 * Immediatly process the next item with the next tick. This is done in order
-			 * to avoid long call stacks.
-			 */
+			// Immediatly process the next item with the next tick. This is done in order
+			// to avoid long call stacks.
 			process.nextTick(() => {
 				callback(() => {
 					this.release();

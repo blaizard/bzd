@@ -222,10 +222,8 @@ class Webpack {
 				optimization: {
 					runtimeChunk: false,
 					splitChunks: {
-						/*
-						 * This is important, split chunks seems to fail on node library ending up
-						 * not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
-						 */
+						// This is important, split chunks seems to fail on node library ending up
+						// not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
 						chunks: "async",
 					},
 				},
@@ -467,10 +465,8 @@ function getWebpackConfigDefault(isDev, config) {
 									"<html>" +
 									"<head>" +
 									"<meta charset=\"utf-8\" />" +
-									/*
-									 * The 2 following lines will prevent caching on the browser side, ensuring any updates
-									 * in the css or js content will be detected.
-									 */
+									// The 2 following lines will prevent caching on the browser side, ensuring any updates
+									// in the css or js content will be detected.
 									"<meta http-equiv=\"Cache-control\" content=\"no-cache, no-store, must-revalidate\" />" +
 									"<meta http-equiv=\"Pragma\" content=\"no-cache\" />" +
 									"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />" +

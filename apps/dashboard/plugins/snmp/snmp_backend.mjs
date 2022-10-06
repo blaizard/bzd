@@ -35,11 +35,9 @@ class Snmp {
 			return view.getBigUint64(0, /*littleEndian*/ true).toString();
 		}
 		case SnmpNative.ObjectType.Opaque:
-			/*
-			 * http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
-			 * BER-encoded data / type / length / value
-			 * Float type
-			 */
+			// http://www.net-snmp.org/docs/mibs/NET-SNMP-TC.txt
+			// BER-encoded data / type / length / value
+			// Float type
 			if (data.value[0] == 0x9f && data.value[1] == 0x78) {
 				const length = data.value[2];
 				let view = new DataView(new ArrayBuffer(length));

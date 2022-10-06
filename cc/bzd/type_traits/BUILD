@@ -150,7 +150,7 @@ cc_library(
     deps = [
         ":is_same",
         "//cc/bzd/utility:forward",
-    ]
+    ],
 )
 
 cc_library(

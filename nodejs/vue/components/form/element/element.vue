@@ -168,10 +168,8 @@
 					if (!errorList.length) {
 						this.clearError();
 						this.$emit("input", value);
-						/*
-						 * Keep it at the end, it must be called once all the propagation of the value is done.
-						 * This to give the opportunity to safely update the global value in this callback.
-						 */
+						// Keep it at the end, it must be called once all the propagation of the value is done.
+						// This to give the opportunity to safely update the global value in this callback.
 						this.getOption("onchange", () => {})(value);
 
 						await this.$nextTick();

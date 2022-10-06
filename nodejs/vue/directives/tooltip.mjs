@@ -150,10 +150,8 @@ export function tooltip(elt, options) {
 		return;
 	}
 
-	/*
-	 * Save the current object. Do this event if it is not shown, this is used
-	 * by the asynchronous function if it needs to be updated.
-	 */
+	// Save the current object. Do this event if it is not shown, this is used
+	// by the asynchronous function if it needs to be updated.
 	current.elt = elt;
 
 	// Get the tooltip and set the message
@@ -255,11 +253,9 @@ export default function (el, binding) {
 	Exception.assert(["text", "html"].includes(config.type), "Unsupported type: '{}'.", config.type);
 	el.setAttribute("data-irtooltip-type", config.type);
 
-	/*
-	 * Add async function if any.
-	 * We cannot use an event here as when called multiple times,
-	 * multiple event will be associated.
-	 */
+	// Add async function if any.
+	// We cannot use an event here as when called multiple times,
+	// multiple event will be associated.
 	if (config.async) {
 		el.onceAsync = config.async;
 	}
