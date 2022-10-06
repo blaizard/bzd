@@ -20,21 +20,21 @@ TEST(Logger, Backend)
 
 	// Simple message
 	bzd::log::error("hello"_csv).sync();
-	EXPECT_TRUE(backend.match("[e] [logger.cc:25] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[e] [logger.cc:#] hello\n"_sv.asBytes()));
 	bzd::log::warning("hello"_csv).sync();
-	EXPECT_TRUE(backend.match("[w] [logger.cc:27] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[w] [logger.cc:#] hello\n"_sv.asBytes()));
 	bzd::log::info("hello"_csv).sync();
-	EXPECT_TRUE(backend.match("[i] [logger.cc:29] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[i] [logger.cc:#] hello\n"_sv.asBytes()));
 	bzd::log::debug("hello"_csv).sync();
-	EXPECT_TRUE(backend.match("[d] [logger.cc:31] hello\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[d] [logger.cc:#] hello\n"_sv.asBytes()));
 
 	// Complex message
 	bzd::log::error("hello {}"_csv, "world").sync();
-	EXPECT_TRUE(backend.match("[e] [logger.cc:35] hello world\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[e] [logger.cc:#] hello world\n"_sv.asBytes()));
 	bzd::log::warning("hello {}"_csv, "world").sync();
-	EXPECT_TRUE(backend.match("[w] [logger.cc:37] hello world\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[w] [logger.cc:#] hello world\n"_sv.asBytes()));
 	bzd::log::info("hello {}"_csv, "world").sync();
-	EXPECT_TRUE(backend.match("[i] [logger.cc:39] hello world\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[i] [logger.cc:#] hello world\n"_sv.asBytes()));
 	bzd::log::debug("hello {}"_csv, "world").sync();
-	EXPECT_TRUE(backend.match("[d] [logger.cc:41] hello world\n"_sv.asBytes()));
+	EXPECT_TRUE(backend.match("[d] [logger.cc:#] hello world\n"_sv.asBytes()));
 }

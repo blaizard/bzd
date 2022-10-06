@@ -27,12 +27,44 @@ public:
 			return bzd::error::make();
 		}
 
-		Size i = 0;
-		for (; read_ < write_ && i < data.size(); ++read_, ++i)
+		enum class Mode
 		{
-			if (buffer_.at(read_ % SIZE) != data.at(i))
+			normal,
+			integer
+		};
+		Mode mode = Mode::normal;
+		Size i = 0;
+		for (; read_ < write_ && i < data.size(); ++read_)
+		{
+			const auto c = buffer_.at(read_ % SIZE);
+			switch (mode)
 			{
-				return bzd::error::make();
+			case Mode::normal:
+				{
+					const auto expected = data.at(i);
+					if (expected == bzd::Byte{'#'})
+					{
+						mode = Mode::integer;
+						--read_;
+					}
+					else if (c == expected)
+					{
+						++i;
+					}
+					else
+					{
+						return bzd::error::make();
+					}
+				}
+				break;
+			case Mode::integer:
+				if (c < bzd::Byte{'0'} || c > bzd::Byte{'9'})
+				{
+					mode = Mode::normal;
+					--read_;
+					++i;
+				}
+				break;
 			}
 		}
 
