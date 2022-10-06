@@ -8,7 +8,9 @@ namespace bzd::concepts {
 template <class T, class U>
 concept assignableFrom = requires(T t, U&& u)
 {
-    { t = bzd::forward<U>(u) } -> bzd::concepts::sameAs<T>;
+	{
+		t = bzd::forward<U>(u)
+		} -> bzd::concepts::sameAs<T>;
 };
 
-}
+} // namespace bzd::concepts

@@ -60,10 +60,8 @@ export default {
 					name: "oid",
 					caption: "OIDs",
 					condition: (values) => values["preset"] == "synology",
-					/*
-					 * Check available disks: snmpwalk -v 2c -c public 192.168.1.200 1.3.6.1.2.1.25.2.3.1.3
-					 * https://global.download.synology.com/download/Document/Software/DeveloperGuide/Firmware/DSM/All/enu/Synology_DiskStation_MIB_Guide.pdf
-					 */
+					// Check available disks: snmpwalk -v 2c -c public 192.168.1.200 1.3.6.1.2.1.25.2.3.1.3
+					// https://global.download.synology.com/download/Document/Software/DeveloperGuide/Firmware/DSM/All/enu/Synology_DiskStation_MIB_Guide.pdf
 					list: {
 						"name:1.3.6.1.4.1.6574.1.5.1.0::600": "Model Name",
 						"cpu.load:1.3.6.1.4.1.2021.11.9.0:10:add:1.3.6.1.4.1.2021.11.10.0:div:100": "CPU Load (%)",

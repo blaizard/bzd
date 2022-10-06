@@ -21,8 +21,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/type_traits:is_arithmetic"
-    ]
+        "//cc/bzd/type_traits:is_arithmetic",
+    ],
 )
 
 cc_library(

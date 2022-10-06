@@ -8,10 +8,8 @@ export default class Services {
 	constructor(options) {
 		this.options = Object.assign(
 			{
-				/**
-				 * Generate context based on the current name.
-				 * Contet are passed to the start function.
-				 */
+				/// Generate context based on the current name.
+				/// Contet are passed to the start function.
 				makeContext: (/*name*/) => ({}),
 			},
 			options
@@ -32,9 +30,7 @@ export default class Services {
 		}
 	}
 
-	/**
-	 * Get list of active services
-	 */
+	/// Get list of active services
 	getActive() {
 		let services = {};
 		for (const name in this.instances) {

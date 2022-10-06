@@ -56,10 +56,8 @@ class RouterManager {
 
 		options.routes.forEach((route) => {
 			const handler = async (route, args, path, routerOptions) => {
-				/*
-				 * Check if the route requires authentication,
-				 * if so ensure that we are authenticated
-				 */
+				// Check if the route requires authentication,
+				// if so ensure that we are authenticated
 				if (route.authentication) {
 					Exception.assert(
 						this.options.authentication,
@@ -261,10 +259,8 @@ class RouterManager {
 			router.pathPropagate
 		);
 
-		/*
-		 * Propagate to nested routers.
-		 * Timeout is to ensure routers are unregisters in the mean time.
-		 */
+		// Propagate to nested routers.
+		// Timeout is to ensure routers are unregisters in the mean time.
 		await delayMs(1);
 
 		let promiseList = Array.from(router.children).map(async (childUid) => {
@@ -282,10 +278,8 @@ export default class {
 		let routers = new RouterManager(options);
 
 		Vue.prototype.$routerSet = async function (routeOptions) {
-			/*
-			 * Register hook
-			 * https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
-			 */
+			// Register hook
+			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
 			this.$once("hook:beforeDestroy", () => {
 				const uid = routers._getUid(this);
 				routers.unregisterRouter(uid);

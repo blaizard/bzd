@@ -82,10 +82,8 @@ export default class PersistenceTimeSeries {
 	async _initialize() {
 		// Load the index
 		this.persistenceIndex = await PersistenceDisk.make(this.path, this.optionsIndex);
-		/*
-		 * Quick check to see if the index need to be rebuilt
-		 * There seems to be an issue if it is not rebuilt (test fails sporadically)
-		 */
+		// Quick check to see if the index need to be rebuilt
+		// There seems to be an issue if it is not rebuilt (test fails sporadically)
 		if ((await this.persistenceIndex.get()).version != VERSION) {
 			await this.rebuildIndex();
 			Log.info("Successfully rebuilt index of timeseries {}", this.path);
@@ -153,11 +151,9 @@ export default class PersistenceTimeSeries {
 				timeseries.forEach(callback, timestamp, timestampEnd, inclusive);
 				return timeseries.getTimestamp(-1);
 			});
-			/*
-			 * Check if it needs to continue.
-			 * Note +1 is important as it ensure that the timestamp is not exisiting in the current list, hence
-			 * avoid an infinity loop situation.
-			 */
+			// Check if it needs to continue.
+			// Note +1 is important as it ensure that the timestamp is not exisiting in the current list, hence
+			// avoid an infinity loop situation.
 			timestamp = timestampEnd > lastValidTimestamp ? lastValidTimestamp + 1 : null;
 		} while (timestamp != null);
 	}
@@ -455,10 +451,8 @@ export default class PersistenceTimeSeries {
 
 			if (index != -1) {
 				metadata = timeSeriesIndex.data[index][1];
-				/*
-				 * If the index is found and the index is already full and the requested timestamp should be placed at the end of the file,
-				 * then create a new file
-				 */
+				// If the index is found and the index is already full and the requested timestamp should be placed at the end of the file,
+				// then create a new file
 				if (forWrite && metadata.length >= this.options.maxEntriesPerFile && metadata.timestampEnd < timestamp) {
 					Log.info("Creating a new data file, current is full");
 					index = -1;

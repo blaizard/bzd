@@ -63,10 +63,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Generates the refresh token and set it to a cookie
 			const refreshToken = await authentication.generateRefreshToken(uid, roles, persistent, session);
 
-			/*
-			 * Validate the authentication for this UID and session
-			 * and return some arguments to be passed to the access token
-			 */
+			// Validate the authentication for this UID and session
+			// and return some arguments to be passed to the access token
 			if (!(await authentication.verifyRefresh(uid, session, refreshToken.timeout))) {
 				return this.setStatus(401, "Unauthorized");
 			}
@@ -103,10 +101,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			try {
 				data = await authentication.readToken(refreshToken);
 
-				/*
-				 * This ensures that a wrongly formatted token will trigger a new token being generated
-				 * while still having the error reported. This ensure smooth transition to new token format.
-				 */
+				// This ensures that a wrongly formatted token will trigger a new token being generated
+				// while still having the error reported. This ensure smooth transition to new token format.
 				authentication.validationRefreshToken.validate(data);
 			}
 			catch (e) {

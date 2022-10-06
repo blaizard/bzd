@@ -73,14 +73,12 @@ class Cache {
 			this.data[collection]._timeoutMs = options.timeout;
 		}
 
-		/*
-		 *  Set initial value if any defined and set its timeout to
-		 *  the past to ensure that a new value will be fetched.
-		 * 	if (options && typeof options.default !== "undefined") {
-		 * 		data._data = options.default;
-		 * 		data._timeout = Cache.getTimestampMs() - 1;
-		 * 	}
-		 */
+		//  Set initial value if any defined and set its timeout to
+		//  the past to ensure that a new value will be fetched.
+		// 	if (options && typeof options.default !== "undefined") {
+		// 		data._data = options.default;
+		// 		data._timeout = Cache.getTimestampMs() - 1;
+		// 	}
 
 		Log.info("Register collection '{}'", collection);
 	}
@@ -241,11 +239,9 @@ class Cache {
 	 * \param value The value to be set.
 	 * \param ...path The identifier of the data.
 	 */
-	/*
-	 *set(value, ...path) {
-	 *setValue(this.data, {data: value}, "_data", ...path);
-	 *}
-	 */
+	// set(value, ...path) {
+	// setValue(this.data, {data: value}, "_data", ...path);
+	// }
 
 	/**
 	 * \brief Set the value of the cache.
@@ -254,26 +250,22 @@ class Cache {
 	 * \param timeout The timeout in Ms of the validity of the data.
 	 * \param ...path The identifier of the data.
 	 */
-	/*
-	 *setWithTimeout(value, timeout, ...path) {
-	 *setValue(this.data, {
-	 *data: value,
-	 *timeout: timeout
-	 *}, ...path);
-	 *}
-	 */
+	// setWithTimeout(value, timeout, ...path) {
+	// setValue(this.data, {
+	// data: value,
+	// timeout: timeout
+	// }, ...path);
+	// }
 
 	/**
 	 * Mark the current data as invalidated (out of date) so it will be reloaded at the next access.
 	 *
 	 * \param ...path The identifier of the data
 	 */
-	/*
-	 *setDirty(...path) {
-	 *let data = getOrCreatePath(this.data, ...path);
-	 *delete data._data;
-	 *}
-	 */
+	// setDirty(...path) {
+	// let data = getOrCreatePath(this.data, ...path);
+	// delete data._data;
+	// }
 }
 
 export default Cache;

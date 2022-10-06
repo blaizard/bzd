@@ -40,11 +40,9 @@
 		mounted() {
 			this.fetchList(this.getOption("list", []));
 
-			/*
-			 * Recalculate the position as if the slide geometry changed,
-			 * its alignement will be different. This can happen while loading images
-			 * or other asynchronous operations.
-			 */
+			// Recalculate the position as if the slide geometry changed,
+			// its alignement will be different. This can happen while loading images
+			// or other asynchronous operations.
 			if (typeof ResizeObserver !== "undefined") {
 				const myObserver = new ResizeObserver((/*entries*/) => {
 					this.computeSlidePosition();
@@ -86,10 +84,8 @@
 				 * Callback when an element is clicked
 				 */
 				click: this.getOption("click", (/*index*/) => {}),
-				/*
-				 * ---- Internal ----
-				 * Current slide selected
-				 */
+				// ---- Internal ----
+				// Current slide selected
 				index: 0,
 				interval: null,
 				slidePosition: 0,
@@ -266,11 +262,9 @@
 							this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
 						}
 						else {
-							/*
-							 * Add the current offset to the slide position as this will be reset right after.
-							 * This needs to be done here are we do not want to affect the slidePosition when
-							 * it reaches corners cases (see above).
-							 */
+							// Add the current offset to the slide position as this will be reset right after.
+							// This needs to be done here are we do not want to affect the slidePosition when
+							// it reaches corners cases (see above).
 							this.slidePosition += this.offsetX;
 						}
 						// Do not let the slides too much on the right (useless)

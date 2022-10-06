@@ -52,10 +52,8 @@ export default class HttpServer {
 					maxAge: 60 * 60 * 1000, // 1h
 					index: "index.html",
 					setHeaders: (res, path) => {
-						/*
-						 * Do not cache the index.html
-						 * this is usefull when the application updates.
-						 */
+						// Do not cache the index.html
+						// this is usefull when the application updates.
 						if (path.endsWith("index.html")) {
 							res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
 							res.header("Expires", "-1");
@@ -337,11 +335,9 @@ function resetErrorHandler(reject) {
 	});
 }
 
-/*
- * It is important that the signature of this function contains the "next" argument,
- * oterhwise it will not be handled correctly. From Express documentation:
- * "error-handling functions have four arguments instead of three: (err, req, res, next)"
- */
+// It is important that the signature of this function contains the "next" argument,
+// oterhwise it will not be handled correctly. From Express documentation:
+// "error-handling functions have four arguments instead of three: (err, req, res, next)"
 // eslint-disable-next-line no-unused-vars
 function middlewareErrorHandler(e, req, res, next) {
 	Exception.print("Receive error; {}", e);

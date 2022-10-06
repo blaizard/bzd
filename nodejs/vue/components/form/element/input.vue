@@ -218,22 +218,20 @@
 					this.$emit("key", e.keyCode);
 				}
 			},
-			/*
-			 *getCaretPosition(element) {
-			 *const sel = window.getSelection();
-			 *let offset = 0;
-			 *if (sel.rangeCount) {
-			 *const range = sel.getRangeAt(0);
-			 *const origOffset = offset = range.startOffset;
-			 *let parent = range.commonAncestorContainer.parentNode;
-			 *while (parent && parent.parentNode && parent != element) {
-			 *	offset = Array.prototype.indexOf.call(parent.parentNode.children, parent) + origOffset;
-			 *	parent = parent.parentNode;
-			 *}
-			 *}
-			 *return offset;
-			 *},
-			 */
+			// getCaretPosition(element) {
+			// const sel = window.getSelection();
+			// let offset = 0;
+			// if (sel.rangeCount) {
+			// const range = sel.getRangeAt(0);
+			// const origOffset = offset = range.startOffset;
+			// let parent = range.commonAncestorContainer.parentNode;
+			// while (parent && parent.parentNode && parent != element) {
+			// 	offset = Array.prototype.indexOf.call(parent.parentNode.children, parent) + origOffset;
+			// 	parent = parent.parentNode;
+			// }
+			// }
+			// return offset;
+			// },
 			setCaretPosition(element, position) {
 				if (!element.childNodes[0]) {
 					return;

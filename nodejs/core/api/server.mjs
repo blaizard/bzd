@@ -209,21 +209,17 @@ export default class APIServer extends Base {
 			}
 			catch (e) {
 				Exception.print("Exception Guard");
-				/*
-				 * The formatting string is important to ensure that error message is not
-				 * considered as a formatting string.
-				 */
+				// The formatting string is important to ensure that error message is not
+				// considered as a formatting string.
 				Exception.print("{}", Exception.fromError(e));
 				Log.error("Context for '{}' {}: {:j}", method, endpoint, context.debug);
 				response.status(500).send(e.message);
 			}
 		};
 
-		/*
-		 * Update the endpoint to support variables
-		 * Only supports simple syntax:
-		 * -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
-		 */
+		// Update the endpoint to support variables
+		// Only supports simple syntax:
+		// -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
 		let regexpr = /{([^}:]+)}/;
 		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
 
