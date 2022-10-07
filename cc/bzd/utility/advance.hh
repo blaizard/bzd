@@ -64,20 +64,22 @@ constexpr void advance(Iterator& it, Sentinel bound) noexcept
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 constexpr auto advance(Iterator& it, const typename typeTraits::Iterator<Iterator>::DifferenceType n, Sentinel bound) noexcept
 {
+	using ResultType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+
 	if constexpr (concepts::sizedSentinelFor<Sentinel, Iterator>)
 	{
-		const auto dist = bzd::abs(bound - it) - bzd::abs(n);
+		const ResultType dist = bzd::abs(bound - it) - bzd::abs(n);
 		if (dist < 0)
 		{
 			bzd::advance(it, bound);
 			return -dist;
 		}
 		bzd::advance(it, n);
-		return 0;
+		return ResultType{0};
 	}
 	else
 	{
-		auto dist = n;
+		ResultType dist = n;
 
 		while (dist > 0 && it != bound)
 		{
