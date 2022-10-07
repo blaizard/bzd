@@ -9,4 +9,5 @@ bzd_cc_test(
         "//cc/bzd/test/types:istream_reader",
         "//cc/libs/reader:stream_reader",
     ],
+    tags = ["manual"]
 )
