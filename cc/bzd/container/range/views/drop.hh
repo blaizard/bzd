@@ -14,7 +14,9 @@ public:
 	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
 
 public:
-	constexpr Drop(V view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)}
+	/// Note the reference is important here, otherwise the range is copied.
+	/// This can therefore works for every type of ranges: owning or borrowing.
+	constexpr Drop(V& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)}
 	{
 		bzd::advance(begin_, count, end_);
 	}

@@ -73,25 +73,37 @@ namespace bzd::concepts {
 template <class T>
 concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concepts::pointer<T>;
 
+/// An input or output iterator must satisfy the following operations:
+/// - *x : retreive the value.
+/// - ++x : increment
+/// - x++ : increment
 template <class T>
-concept inputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::InputTag>;
+concept inputOrOutputIterator = iterator<T> && requires(T t)
+{
+	*t;
+	++t;
+	t++;
+};
+
+/// One pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
+template <class T>
+concept inputIterator = inputOrOutputIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::InputTag>;
+
+/// One pass iterator. Can be read from, only written to.
+template <class T>
+concept outputIterator = inputOrOutputIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
 
 template <class T>
-concept outputIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::OutputTag>;
+concept forwardIterator = inputIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;
 
 template <class T>
-concept inputOrOutputIterator = inputIterator<T> || outputIterator<T>;
+concept bidirectionalIterator = forwardIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::BidirectionalTag>;
 
 template <class T>
-concept forwardIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ForwardTag>;
+concept randomAccessIterator =
+	bidirectionalIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::RandomAccessTag>;
 
 template <class T>
-concept bidirectionalIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::BidirectionalTag>;
-
-template <class T>
-concept randomAccessIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::RandomAccessTag>;
-
-template <class T>
-concept contiguousIterator = iterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ContiguousTag>;
+concept contiguousIterator = randomAccessIterator<T> && derivedFrom<typename typeTraits::Iterator<T>::Category, typeTraits::ContiguousTag>;
 
 } // namespace bzd::concepts
