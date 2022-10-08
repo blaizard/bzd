@@ -22,6 +22,7 @@ bzd_cc_test(
         "multithread.cc",
         "stress.cc",
     ],
+    timeout = "long",
     tags = ["stress"],
     target_compatible_with = select({
         "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
