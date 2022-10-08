@@ -13,6 +13,7 @@ git clone --recursive https://github.com/espressif/esp-idf.git
 Run the build command with the optional output argument.
 
 ```bash
+rm -f toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/sdkconfig
 bazel run toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build -- --output ~/sandbox/bzd-esp32-xtensa-sdk/
 ```
 

@@ -14,7 +14,7 @@ concept size = requires(T& t)
 
 template <class T>
 requires concepts::size<T>
-[[nodiscard]] constexpr auto size(T& t) { return t.size(); }
+[[nodiscard]] constexpr bzd::Size size(T& t) { return t.size(); }
 
 template <class T, Size n>
 [[nodiscard]] constexpr bzd::Size size(T (&)[n])
