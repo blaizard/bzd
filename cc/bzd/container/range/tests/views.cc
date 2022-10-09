@@ -10,6 +10,17 @@ TEST(Views, Drop)
 	bzd::range::Drop view{range, 2};
 
 	const auto expected = {2, 3, 4};
-	const auto isEqual = bzd::algorithm::equal(view, expected);
-	EXPECT_TRUE(isEqual);
+	{
+		const auto isEqual = bzd::algorithm::equal(view, expected);
+		EXPECT_TRUE(isEqual);
+	}
+	{
+		const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2), expected);
+		EXPECT_TRUE(isEqual);
+	}
+	{
+		const auto expected2 = {3, 4};
+		const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2) | bzd::range::drop(1), expected2);
+		EXPECT_TRUE(isEqual);
+	}
 }
