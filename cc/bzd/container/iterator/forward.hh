@@ -78,9 +78,9 @@ public: // API
 
 	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 
-	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *data_; }
+	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return Policies::at(data_, 0); }
 
-	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return data_; }
+	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return &Policies::at(data_, 0); }
 
 protected:
 	ValueType* data_{nullptr};

@@ -2,6 +2,7 @@
 
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 
 namespace bzd::algorithm {
 
@@ -12,9 +13,8 @@ namespace bzd::algorithm {
 /// \param[out] result The beginning of the destination range.
 ///
 /// \return Output iterator to the element in the destination range, one past the last element copied.
-template <class InputIt, class OutputIt>
-requires concepts::forwardIterator<InputIt> && concepts::outputIterator<OutputIt>
-constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
+template <concepts::forwardIterator InputIt, concepts::sentinelFor<InputIt> InputSentinel, concepts::outputIterator OutputIt>
+constexpr OutputIt copy(InputIt first, InputSentinel last, OutputIt result) noexcept
 {
 	while (first != last)
 	{
@@ -26,8 +26,10 @@ constexpr OutputIt copy(InputIt first, InputIt last, OutputIt result) noexcept
 /// \copydoc copy
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
-template <class InputRange, class OutputRange>
-requires concepts::forwardRange<InputRange> && concepts::outputRange<OutputRange>
-constexpr auto copy(InputRange&& input, OutputRange&& output) { return copy(bzd::begin(input), bzd::end(input), bzd::begin(output)); }
+template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
+constexpr auto copy(InputRange&& input, OutputRange&& output)
+{
+	return copy(bzd::begin(input), bzd::end(input), bzd::begin(output));
+}
 
 } // namespace bzd::algorithm
