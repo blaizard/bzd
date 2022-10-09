@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/advance.hh"
 
 namespace bzd::range {
@@ -8,7 +10,7 @@ namespace bzd::range {
 template <concepts::range V>
 class Drop : public ViewInterface<Drop<V>>
 {
-public:
+public: // Traits.
 	using Iterator = typename typeTraits::Range<V>::Iterator;
 	using Sentinel = typename typeTraits::Range<V>::Sentinel;
 	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
@@ -29,5 +31,7 @@ private:
 	Iterator begin_;
 	Sentinel end_;
 };
+
+inline constexpr Adaptor<Drop> drop;
 
 } // namespace bzd::range
