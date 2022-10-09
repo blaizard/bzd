@@ -19,8 +19,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
-        "//cc/bzd/type_traits:range"
     ],
 )
 

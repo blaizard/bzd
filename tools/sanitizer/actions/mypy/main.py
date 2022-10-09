@@ -16,8 +16,7 @@ includePaths = ["python"]
 def mypyWorker(package: str, stdout: TextIO) -> None:
 
 	# To support namespace, the package has to be passed
-	main(script_path=None,
-		stdout=stdout,
+	main(stdout=stdout,
 		stderr=stdout,
 		clean_exit=True,
 		args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
