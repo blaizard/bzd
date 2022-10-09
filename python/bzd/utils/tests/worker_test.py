@@ -31,7 +31,7 @@ class TestWorker(unittest.TestCase):
 		worker = bzd.utils.worker.Worker(TestWorker.foo)
 		for i in range(100):
 			worker.add(i)
-		self.assertEqual(worker.shared["count"].value, 100)
+		self.assertEqual(worker.context.count.value, 100)
 		worker.start()
 		result = list(worker.data())
 		worker.stop()
