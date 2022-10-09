@@ -7,6 +7,7 @@ import HttpServer from "bzd/core/http/server.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
+import Authentication from "bzd/core/authentication/token/server.mjs";
 import Cache from "bzd/core/cache.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
 import Services from "./services.mjs";
@@ -15,6 +16,9 @@ import Permissions from "bzd/db/storage/permissions.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
+
+// For debugging purposes.
+// Log.setLevel("debug");
 
 const program = new Command();
 program
@@ -40,22 +44,36 @@ program
 	const PORT = process.env.BZD_PORT || program.opts().port;
 	const PATH_STATIC = program.opts().static;
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
+	const IS_TEST = Boolean(program.opts().test);
+	const AUTHENTICATION_PRIVATE_KEY = process.env.BZD_AUTHENTICATION_PRIVATE_KEY || ((IS_TEST) ? "dummy" : false);
+
+	Exception.assert(AUTHENTICATION_PRIVATE_KEY !== false, "A valid authentication private key must be set with the environment variable `BZD_AUTHENTICATION_PRIVATE_KEY`.");
+	let authentication = new Authentication({
+		privateKey: AUTHENTICATION_PRIVATE_KEY,
+		verifyIdentityCallback: async (uid/*, password*/) => {
+			return {
+				roles: [],
+				uid: uid,
+			};
+		},
+		verifyRefreshCallback: async (/*uid, session, timeoutS*/) => {
+			return true;
+		},
+	});
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
 	// Install the APIs
 	let api = new API(APIv1, {
+		authentication: authentication,
 		channel: web,
-	});
-
-	web.addRoute("get", "/file(/*)?", async (request, response) => {
-		response.redirect(api.getEndpoint("/file?path=" + request.params[1]));
+		plugins: [authentication],
 	});
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
 	// Test data
-	if (program.opts().test) {
+	if (IS_TEST) {
 		await keyValueStore.set("volume", "disk", {
 			type: "fs",
 			"fs.root": "/",
@@ -67,7 +85,7 @@ program
 			"docker.url": "https://docker.blaizard.com",
 		});
 
-		await keyValueStore.set("volume", "docker.gcr", {
+		/*await keyValueStore.set("volume", "docker.gcr", {
 			type: "docker",
 			"docker.type": "gcr",
 			"docker.key": "",
@@ -76,7 +94,7 @@ program
 			"docker.proxy": true,
 			"docker.proxy.url": "http://127.0.0.1:5050",
 			"docker.proxy.port": 5051,
-		});
+		});*/
 	}
 	// Set the cache
 	let cache = new Cache();
@@ -119,8 +137,13 @@ program
 		await services.start(name, params.type, params);
 	}
 
-	// Adding API handlers.
+	// Redirect /file/** to /file?path=**
+	// It is needed to do this before the API as it takes precedence.
+	web.addRoute("get", "/file(/*)?", async (request, response) => {
+		response.redirect(api.getEndpoint("/file?path=" + request.params[1]));
+	});
 
+	// Adding API handlers.
 	function getInternalPath(pathList) {
 		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
 		Exception.assert(
@@ -145,38 +168,38 @@ program
 		return await keyValueStore.get("volume", inputs.volume, {});
 	});
 
-	api.handle("post", "/config", async (inputs) => {
-		// Delete all keys that do not start with <inputs.config.type>.
-		Exception.assert("type" in inputs.config, "Configuration type is missing.");
-		let params = {
-			type: inputs.config.type,
-		};
-		for (const name in inputs.config) {
-			if (name.startsWith(params.type + ".")) {
-				params[name] = inputs.config[name];
+		api.handle("post", "/config", async (inputs) => {
+			// Delete all keys that do not start with <inputs.config.type>.
+			Exception.assert("type" in inputs.config, "Configuration type is missing.");
+			let params = {
+				type: inputs.config.type,
+			};
+			for (const name in inputs.config) {
+				if (name.startsWith(params.type + ".")) {
+					params[name] = inputs.config[name];
+				}
 			}
-		}
 
-		// Check if it needs to be renamed
-		const volume = inputs.config.volume;
-		delete inputs.config.volume;
+			// Check if it needs to be renamed
+			const volume = inputs.config.volume;
+			delete inputs.config.volume;
 
-		// Stop all services related to this config
-		await services.stop(inputs.volume);
+			// Stop all services related to this config
+			await services.stop(inputs.volume);
 
-		await keyValueStore.set("volume", volume, params);
-		await cache.setDirty("volume", inputs.volume);
-		if (volume != inputs.volume) {
-			await keyValueStore.delete("volume", inputs.volume);
-		}
+			await keyValueStore.set("volume", volume, params);
+			await cache.setDirty("volume", inputs.volume);
+			if (volume != inputs.volume) {
+				await keyValueStore.delete("volume", inputs.volume);
+			}
 
-		await services.start(volume, params.type, params);
-	});
+			await services.start(volume, params.type, params);
+		});
 
-	api.handle("delete", "/config", async (inputs) => {
-		await services.stop(inputs.volume);
-		return await keyValueStore.delete("volume", inputs.volume);
-	});
+		api.handle("delete", "/config", async (inputs) => {
+			await services.stop(inputs.volume);
+			return await keyValueStore.delete("volume", inputs.volume);
+		});
 
 	api.handle("post", "/list", async (inputs) => {
 		const { volume, pathList } = getInternalPath(inputs.path);
