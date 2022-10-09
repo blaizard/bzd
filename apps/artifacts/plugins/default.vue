@@ -7,6 +7,10 @@
 				<span class="metadata-entry-value"><code>{{ displayValue(key, item[key]) }}</code></span>
 			</div>
 		</div>
+		<template v-if="isActions">
+			<h2>Actions</h2>
+			<a v-if="isDownload(item)" :href="downloadLink()" :download="name"><Button action="approve" content="Download"></Button></a>
+		</template>
 		<template v-if="innerItemList">
 			<h2>
 				Contains
@@ -16,9 +20,13 @@
 			</h2>
 			<table>
 				<tr>
+					<th></th>
 					<th v-for="key in innerItemListSortedKeys" :key="key">{{ key }}</th>
 				</tr>
 				<tr v-for="(item, index) in innerItemList" :key="index">
+					<td class="actions">
+						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name"></a>
+					</td>
 					<td v-for="key in innerItemListSortedKeys" :key="key">
 						{{ key in item ? displayValue(key, item[key]) : "" }}
 					</td>
@@ -30,11 +38,14 @@
 
 <script>
 	import Base from "./base.vue";
-
+	import Button from "bzd/vue/components/form/element/button.vue";
 	import { bytesToString } from "bzd/utils/to_string.mjs";
 
 	export default {
 		mixins: [Base],
+		components: {
+			Button,
+		},
 		computed: {
 			innerItemListSortedKeys() {
 				let keys = new Set();
@@ -46,8 +57,18 @@
 				const keyList = Array.from(keys);
 				return keyList.sort(this.sortStrategy);
 			},
+			isActions() {
+				return this.item && this.isDownload(this.item);
+			},
 		},
 		methods: {
+			isDownload(item) {
+				return item.permissions.isRead() && !item.permissions.isList();
+			},
+			downloadLink(item) {
+				const pathList = item ? [...this.pathList, item.name] : this.pathList;
+				return "/file/" + pathList.map(encodeURIComponent).join("/");
+			},
 			sortStrategy(key1, key2) {
 				const firsts = ["name", "type", "size", "created", "modified"];
 				const pos1 = firsts.indexOf(key1);
@@ -75,6 +96,12 @@
 	};
 </script>
 
+<style lang="scss">
+	@use "bzd/icons.scss" as icons with (
+		$bzdIconNames: upload
+	);
+</style>
+
 <style lang="scss" scoped>
 	.metadata {
 		columns: 4 200px;
@@ -91,5 +118,8 @@
 				}
 			}
 		}
+	}
+	.actions {
+		width: 0;
 	}
 </style>
