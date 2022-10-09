@@ -6,11 +6,9 @@ export default class AuthenticationServer {
 	constructor(options, defaultOptions = {}) {
 		this.options = Object.assign(
 			{
-				/**
-				 * Callback to verify once identiy, mathing uid and password pair.
-				 * In return on success, it will return the UID to be used and roles as a dictionary.
-				 * Otherwise, false should be returned.
-				 */
+				/// Callback to verify once identiy, mathing uid and password pair.
+				/// In return on success, it will return the UID to be used and roles as a dictionary.
+				/// Otherwise, false should be returned.
 				verifyIdentityCallback: null,
 				verifyRefreshCallback: null,
 			},

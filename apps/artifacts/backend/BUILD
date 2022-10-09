@@ -23,6 +23,7 @@ bzd_nodejs_binary(
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
+        "//nodejs/core/authentication/token:server",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/api:server",
