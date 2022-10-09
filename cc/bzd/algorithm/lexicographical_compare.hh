@@ -3,6 +3,7 @@
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/swap.hh"
@@ -18,10 +19,13 @@ namespace bzd::algorithm {
 /// \param[in] comparison The comparison function object which returns ​true if the first argument is less than the second.
 ///
 /// \return true if the first range is lexicographically less than the second.
-template <class Iterator1, class Iterator2, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator1>::ValueType>>
-requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Iterator2>
+template <concepts::forwardIterator Iterator1,
+		  concepts::sentinelFor<Iterator1> Sentinel1,
+		  concepts::forwardIterator Iterator2,
+		  concepts::sentinelFor<Iterator2> Sentinel2,
+		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator1>::ValueType>>
 [[nodiscard]] constexpr bzd::Bool lexicographicalCompare(
-	Iterator1 first1, Iterator1 last1, Iterator2 first2, Iterator2 last2, Compare comparison = Compare{})
+	Iterator1 first1, Sentinel1 last1, Iterator2 first2, Sentinel2 last2, Compare comparison = Compare{})
 {
 	static_assert(
 		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
@@ -45,8 +49,7 @@ requires concepts::forwardIterator<Iterator1> && concepts::forwardIterator<Itera
 /// \copydoc lexicographicalCompare
 /// \param[in] range1 The first range of elements to examine
 /// \param[in] range2 The second range of elements to examine
-template <class Range1, class Range2, class... Args>
-requires concepts::forwardRange<Range1> && concepts::forwardRange<Range2>
+template <concepts::forwardRange Range1, concepts::forwardRange Range2, class... Args>
 [[nodiscard]] constexpr auto lexicographicalCompare(Range1&& range1, Range2&& range2, Args&&... args)
 {
 	return lexicographicalCompare(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);

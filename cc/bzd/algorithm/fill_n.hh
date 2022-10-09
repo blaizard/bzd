@@ -10,8 +10,7 @@ namespace bzd::algorithm {
 /// \param[in,out] first The beginning of the range of elements to modify.
 /// \param[in] count The number of elements to fill.
 /// \param[in] value The value to be assigned.
-template <class Iterator, class T>
-requires concepts::forwardIterator<Iterator>
+template <concepts::forwardIterator Iterator, class T>
 constexpr void fillN(Iterator first, Size count, const T& value)
 {
 	while (count > 0)

@@ -7,6 +7,7 @@ bzd_cc_library(
     deps = [
         ":adaptor",
         ":drop",
+        ":transform",
     ],
 )
 
@@ -28,6 +29,19 @@ cc_library(
     name = "drop",
     hdrs = [
         "drop.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/utility:advance",
+    ],
+)
+
+cc_library(
+    name = "transform",
+    hdrs = [
+        "transform.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

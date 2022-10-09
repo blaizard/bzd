@@ -13,8 +13,7 @@ namespace bzd::algorithm {
 /// \param[out] result The beginning of the destination range.
 ///
 /// \return Iterator in the destination range, pointing past the last element copied if count>0 or result otherwise.
-template <class InputIt, class OutputIt>
-requires concepts::forwardIterator<InputIt> && concepts::outputIterator<OutputIt>
+template <concepts::forwardIterator InputIt, concepts::outputIterator OutputIt>
 constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 {
 	if (count > 0)
@@ -31,8 +30,7 @@ constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 /// \copydoc copy
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
-template <class InputRange, class OutputRange>
-requires concepts::forwardRange<InputRange> && concepts::outputRange<OutputRange>
+template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copyN(InputRange&& input, const Size count, OutputRange&& output)
 {
 	return copyN(bzd::begin(input), count, bzd::begin(output));

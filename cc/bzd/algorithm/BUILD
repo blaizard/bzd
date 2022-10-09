@@ -9,6 +9,7 @@ bzd_cc_library(
         ":any_of",
         ":binary_search",
         ":copy",
+        ":copy_backward",
         ":copy_n",
         ":equal",
         ":equal_range",
@@ -43,6 +44,7 @@ cc_library(
         ":find_if_not",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -56,6 +58,7 @@ cc_library(
         ":find_if_not",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -69,6 +72,7 @@ cc_library(
         ":lower_bound",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -82,6 +86,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -94,6 +99,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -121,6 +127,7 @@ cc_library(
         "//cc/bzd/container:tuple",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -136,6 +143,7 @@ cc_library(
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -150,6 +158,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -174,6 +183,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -186,6 +196,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -198,6 +209,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 
@@ -211,6 +223,7 @@ cc_library(
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
@@ -226,6 +239,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:advance",
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
@@ -242,6 +256,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:move",
     ],
 )
@@ -255,6 +270,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:move",
     ],
 )
@@ -269,6 +285,7 @@ cc_library(
         ":find_if",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
     ],
 )
@@ -282,6 +299,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:swap",
     ],
 )
@@ -296,6 +314,7 @@ cc_library(
         ":search",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:withdraw",
         "//cc/bzd/utility/comparison",
@@ -311,6 +330,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
     ],
@@ -326,6 +346,7 @@ cc_library(
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_cvref",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
@@ -344,6 +365,7 @@ cc_library(
         ":upper_bound",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
         "//cc/bzd/utility:size",
@@ -359,6 +381,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:advance",
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",

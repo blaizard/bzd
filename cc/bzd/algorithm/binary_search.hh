@@ -3,6 +3,7 @@
 #include "cc/bzd/algorithm/lower_bound.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/forward.hh"
 
@@ -17,9 +18,11 @@ namespace bzd::algorithm {
 /// \param[in] comparison A binary predicate which returns ​true if the first argument is less than (i.e. is ordered before) the second.
 ///
 /// \return The iterator pointing to the element if the value is found, \c last otherwise.
-template <class Iterator, class T, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
-requires concepts::forwardIterator<Iterator>
-[[nodiscard]] constexpr Iterator binarySearch(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
+template <concepts::forwardIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  class T,
+		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+[[nodiscard]] constexpr Iterator binarySearch(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
 	first = bzd::algorithm::lowerBound(first, last, value, comparison);
 	if ((first != last) && !(comparison(value, *first)))
@@ -32,8 +35,7 @@ requires concepts::forwardIterator<Iterator>
 
 /// \copydoc binarySearch
 /// \param[in] range The range of elements to examine.
-template <class Range, class... Args>
-requires concepts::forwardRange<Range>
+template <concepts::forwardRange Range, class... Args>
 [[nodiscard]] constexpr auto binarySearch(Range&& range, Args&&... args)
 {
 	return binarySearch(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

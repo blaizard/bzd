@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/algorithm/find_if.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/forward.hh"
 
 namespace bzd::algorithm {
@@ -10,17 +11,15 @@ namespace bzd::algorithm {
 /// \param[in] first The beginning of the range of elements to examine.
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] predicate The unary predicate which returns \c false for the required element.
-template <class Iterator, class UnaryPredicate>
-requires concepts::forwardIterator<Iterator>
-[[nodiscard]] constexpr Iterator findIfNot(Iterator first, Iterator last, UnaryPredicate predicate) noexcept
+template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel, class UnaryPredicate>
+[[nodiscard]] constexpr Iterator findIfNot(Iterator first, Sentinel last, UnaryPredicate predicate) noexcept
 {
 	return bzd::algorithm::findIf(first, last, !predicate);
 }
 
 /// \copydoc findIfNot
 /// \param[in,out] range The range of elements to examine.
-template <class Range, class... Args>
-requires concepts::forwardRange<Range>
+template <concepts::forwardRange Range, class... Args>
 constexpr auto findIfNot(Range&& range, Args&&... args)
 {
 	return findIfNot(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);

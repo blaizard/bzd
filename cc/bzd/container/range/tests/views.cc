@@ -24,3 +24,24 @@ TEST(Views, Drop)
 		EXPECT_TRUE(isEqual);
 	}
 }
+
+TEST(Views, Transform)
+{
+	bzd::test::Range<bzd::typeTraits::ForwardTag, int, 5> range{0, 1, 2, 3, 4};
+	bzd::range::Transform view{range, [](const auto value) { return value * value; }};
+
+	const auto expected = {0, 1, 4, 9, 16};
+	{
+		const auto isEqual = bzd::algorithm::equal(view, expected);
+		EXPECT_TRUE(isEqual);
+	}
+	/*	{
+			const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2), expected);
+			EXPECT_TRUE(isEqual);
+		}
+		{
+			const auto expected2 = {3, 4};
+			const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2) | bzd::range::drop(1), expected2);
+			EXPECT_TRUE(isEqual);
+		}*/
+}

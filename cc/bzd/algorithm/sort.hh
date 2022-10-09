@@ -3,6 +3,7 @@
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
@@ -47,9 +48,10 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 /// \param[in,out] last The ending of the range of elements to be sorted.
 /// \param[in] comparison Comparison function object which returns ​true if the first argument is less than (i.e. is ordered before) the
 /// second.
-template <class Iterator, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
-requires concepts::randomAccessIterator<Iterator>
-constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{}) noexcept
+template <concepts::randomAccessIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+constexpr void sort(Iterator first, Sentinel last, Compare comparison = Compare{}) noexcept
 {
 	const auto size = bzd::distance(first, last);
 	using IndexType = typeTraits::RemoveCVRef<decltype(size)>;
@@ -72,7 +74,7 @@ constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{
 			// If left child is smaller than right child point index variable to right child.
 			if (index < (i - 1) && comparison(first[index], first[index + 1]))
 			{
-				index++;
+				++index;
 			}
 
 			// If parent is smaller than child then swapping parent with child having higher value.
@@ -89,8 +91,10 @@ constexpr void sort(Iterator first, Iterator last, Compare comparison = Compare{
 
 /// \copydoc sort
 /// \param[in,out] range The brange of elements to be sorted.
-template <class Range, class... Args>
-requires concepts::randomAccessRange<Range>
-constexpr void sort(Range&& range, Args&&... args) noexcept { sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...); }
+template <concepts::randomAccessRange Range, class... Args>
+constexpr void sort(Range&& range, Args&&... args) noexcept
+{
+	sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+}
 
 } // namespace bzd::algorithm

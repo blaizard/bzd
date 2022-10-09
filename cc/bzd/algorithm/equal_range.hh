@@ -5,6 +5,7 @@
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/forward.hh"
 
@@ -22,9 +23,11 @@ namespace bzd::algorithm {
 /// value and the second pointing to the first element greater than value.
 /// If there are no elements not less than value, last is returned as the first element. Similarly if there are no elements
 /// greater than value, last is returned as the second element.
-template <class Iterator, class T, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
-requires concepts::forwardIterator<Iterator>
-constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
+template <concepts::forwardIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  class T,
+		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
 	return bzd::makeTuple(bzd::algorithm::lowerBound(first, last, value, comparison),
 						  bzd::algorithm::upperBound(first, last, value, comparison));
@@ -33,8 +36,7 @@ constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Iterator las
 /// \copydoc equalRange
 /// \param[in] first The partially-ordered range to examine.
 template <class Range, class... Args>
-requires concepts::forwardRange<Range>
-constexpr auto equalRange(Range&& range, Args&&... args)
+constexpr auto equalRange(concepts::forwardRange&& range, Args&&... args)
 {
 	return equalRange(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }

@@ -7,21 +7,28 @@
 
 namespace bzd::range {
 
-template <concepts::range V>
-class Drop : public ViewInterface<Drop<V>>
+template <concepts::range V, class F>
+class Transform : public ViewInterface<Transform<V, F>>
 {
 public: // Traits.
-	using Iterator = typename typeTraits::Range<V>::Iterator;
+	using IteratorBase = typename typeTraits::Range<V>::Iterator;
 	using Sentinel = typename typeTraits::Range<V>::Sentinel;
-	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	class Iterator : public IteratorBase
+	{
+	public:
+		constexpr Iterator(IteratorBase&& it, F&& func) noexcept : IteratorBase{bzd::move(it)}, func_{bzd::move(func)} {}
+
+		constexpr auto operator*() const noexcept { return func_(IteratorBase::operator*()); }
+		// TODO: add overloads for all accessors
+
+	private:
+		F func_;
+	};
 
 public:
 	/// Note the reference is important here, otherwise the range is copied.
 	/// This can therefore works for every type of ranges: owning or borrowing.
-	constexpr Drop(V& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)}
-	{
-		bzd::advance(begin_, count, end_);
-	}
+	constexpr Transform(V& view, F&& func) noexcept : begin_{bzd::begin(view), bzd::move(func)}, end_{bzd::end(view)} {}
 
 public:
 	constexpr Iterator begin() const noexcept { return begin_; }
@@ -32,6 +39,6 @@ private:
 	Sentinel end_;
 };
 
-inline constexpr Adaptor<Drop> drop;
+inline constexpr Adaptor<Transform> transform;
 
 } // namespace bzd::range

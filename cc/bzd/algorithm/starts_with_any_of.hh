@@ -4,6 +4,7 @@
 #include "cc/bzd/algorithm/upper_bound.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/begin.hh"
 #include "cc/bzd/utility/end.hh"
 #include "cc/bzd/utility/size.hh"
@@ -18,9 +19,11 @@ struct EqualAnyOfRangeValueAdapter
 };
 
 /// Given a sorted range of range, check if any of them equals the tested range.
-template <class Iterator, class Range, class RangeValueAdapter = EqualAnyOfRangeValueAdapter<Range>>
-requires(concepts::forwardIterator<Iterator>&& concepts::forwardRange<Range>) auto startsWithAnyOf(
-	Iterator first, Iterator last, Range range, RangeValueAdapter adapter = RangeValueAdapter{}) noexcept
+template <concepts::forwardIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  concepts::forwardRange Range,
+		  class RangeValueAdapter = EqualAnyOfRangeValueAdapter<Range>>
+auto startsWithAnyOf(Iterator first, Sentinel last, Range range, RangeValueAdapter adapter = RangeValueAdapter{}) noexcept
 {
 	using RangeValueType = typename typeTraits::Range<Range>::ValueType;
 	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
@@ -61,8 +64,8 @@ requires(concepts::forwardIterator<Iterator>&& concepts::forwardRange<Range>) au
 }
 
 /// Given a sorted range of range, check if any of them equals the tested range.
-template <class Range1, class Range2>
-requires(concepts::forwardRange<Range1>&& concepts::forwardRange<Range2>) auto startsWithAnyOf(Range1&& range1, Range2&& range2) noexcept
+template <concepts::forwardRange Range1, concepts::forwardRange Range2>
+auto startsWithAnyOf(Range1&& range1, Range2&& range2) noexcept
 {
 	return startsWithAnyOf(bzd::begin(range1), bzd::end(range1), bzd::forward<Range2>(range2));
 }

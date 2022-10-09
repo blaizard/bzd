@@ -2,6 +2,7 @@
 
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/advance.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 #include "cc/bzd/utility/distance.hh"
@@ -18,9 +19,11 @@ namespace bzd::algorithm {
 /// \param[in] comparison Binary predicate which returns ​true if the first argument is less than (i.e. is ordered before) the second.
 ///
 /// \return iterator pointing to the first element that is greater than value, or last if no such element is found.
-template <class Iterator, class T, class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
-requires concepts::forwardIterator<Iterator>
-constexpr Iterator upperBound(Iterator first, Iterator last, const T& value, Compare comparison = Compare{})
+template <concepts::forwardIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  class T,
+		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+constexpr Iterator upperBound(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
 	using DifferenceType = typename bzd::typeTraits::Iterator<Iterator>::DifferenceType;
 
@@ -48,8 +51,7 @@ constexpr Iterator upperBound(Iterator first, Iterator last, const T& value, Com
 
 /// \copydoc upperBound
 /// \param[in,out] range The partially-ordered range to examine.
-template <class Range, class... Args>
-requires concepts::forwardRange<Range>
+template <concepts::forwardRange Range, class... Args>
 constexpr auto upperBound(Range&& range, Args&&... args)
 {
 	return upperBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
