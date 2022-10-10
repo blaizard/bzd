@@ -38,6 +38,14 @@
 		mounted() {
 			this.fetchConfig();
 		},
+		watch: {
+			path: {
+				handler() {
+					this.$emit("show", this.pathList);
+				},
+				immediate: true,
+			},
+		},
 		computed: {
 			pathList() {
 				return this.path.split("/").map((c) => decodeURIComponent(c));
