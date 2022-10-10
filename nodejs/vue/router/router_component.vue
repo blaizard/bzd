@@ -2,6 +2,7 @@
 	<component
 		:is="component"
 		v-bind="Object.assign({}, $attrs, additionalProps)"
+		v-on="$listeners"
 		:data-bzd-router-id="routerId"></component>
 </template>
 

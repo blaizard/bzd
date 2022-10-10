@@ -8,10 +8,10 @@
 		<template #content>
 			<div class="layout">
 				<div class="tree">
-					<Tree :key="refreshCounter" @item="handleItem"></Tree>
+					<Tree :key="refreshCounter" @item="handleItem" :show-path="showPath"></Tree>
 				</div>
 				<div class="content">
-					<RouterComponent ref="view" class="bzd-content"></RouterComponent>
+					<RouterComponent ref="view" class="bzd-content" @show="handleShowPath"></RouterComponent>
 				</div>
 			</div>
 		</template>
@@ -36,7 +36,8 @@
 		data: function () {
 			return {
 				refreshCounter: 0,
-				path: [],
+				// This corresponds to the path to be shown by the tree view.
+				showPath: [],
 			};
 		},
 		mounted() {
@@ -60,8 +61,11 @@
 		},
 		methods: {
 			handleItem(item) {
-				this.path = item.path.concat([item.item.name]);
-				this.$routerDispatch("/view/" + this.path.map((c) => encodeURIComponent(c)).join("/"));
+				const path = item.path.concat([item.item.name]);
+				this.$routerDispatch("/view/" + path.map((c) => encodeURIComponent(c)).join("/"));
+			},
+			handleShowPath(path) {
+				this.showPath = path;
 			},
 		},
 	};
