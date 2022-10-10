@@ -64,7 +64,7 @@ def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs:
 	worker = bzd.utils.worker.Worker(task)
 	worker.start()
 	for path in files.data():
-		worker.add(path.as_posix())
+		worker.add(path.as_posix(), timeoutS=600)
 
 	isSuccess = True
 	for result in worker.data():
