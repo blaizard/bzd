@@ -108,21 +108,19 @@
 				return maybeItem || null;
 			},
 			handleClick(item) {
-				// Propagate the item message up with the arguments
-				this.$emit("item", {
-					item: item,
-					path: [],
-				});
-
-				if (!this.isPermissionList(item)) {
-					return;
-				}
 				const name = item.name;
 				if (name in this.expanded) {
 					this.$delete(this.expanded, name);
 				}
 				else {
-					this.$set(this.expanded, name, true);
+					// Select the item, only if it is not expanded already.
+					this.$emit("item", {
+						item: item,
+						path: [],
+					});
+					if (this.isPermissionList(item)) {
+						this.$set(this.expanded, name, true);
+					}
 				}
 			},
 			handleConfig(name) {
