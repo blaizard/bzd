@@ -20,15 +20,15 @@
 			</h2>
 			<table>
 				<tr>
-					<th></th>
 					<th v-for="key in innerItemListSortedKeys" :key="key">{{ key }}</th>
+					<th></th>
 				</tr>
 				<tr v-for="(item, index) in innerItemList" :key="index">
-					<td class="actions">
-						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name"></a>
-					</td>
 					<td v-for="key in innerItemListSortedKeys" :key="key">
 						{{ key in item ? displayValue(key, item[key]) : "" }}
+					</td>
+					<td class="actions">
+						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name"></a>
 					</td>
 				</tr>
 			</table>

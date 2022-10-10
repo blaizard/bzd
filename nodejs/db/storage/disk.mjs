@@ -11,18 +11,14 @@ import Permissions from "./permissions.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
-/**
- * File storage module
- */
+/// File storage module
 export default class StorageDisk extends Storage {
 	constructor(path, options) {
 		super();
 
 		this.options = Object.assign(
 			{
-				/**
-				 * If false, it will attempt to create a directory if it does not exists.
-				 */
+				/// If false, it will attempt to create a directory if it does not exists.
 				mustExists: false,
 			},
 			options
@@ -32,9 +28,7 @@ export default class StorageDisk extends Storage {
 		Log.info("Using disk storage DB at '{}'.", this.path);
 	}
 
-	/**
-	 * Initialize the storage module
-	 */
+	/// Initialize the storage module
 	async _initialize() {
 		if (!(await FileSystem.exists(this.path))) {
 			Exception.assert(!this.options.mustExists, "'{}' is not a valid path.", this.path);
@@ -72,20 +66,66 @@ export default class StorageDisk extends Storage {
 			const data = await FileSystem.readdir(fullPath, /*withFileTypes*/ includeMetadata);
 			if (includeMetadata) {
 				return await CollectionPaging.makeFromList(data, maxOrPaging, async (dirent) => {
-					const stat = await FileSystem.stat(fullPath + "/" + dirent.name);
+					let filePath = fullPath + "/" + dirent.name;
+					let isRead = true;
+					let isWrite = true;
+					let isDelete = true;
+					let isList = true;
+					let type = "";
+
+					if (dirent.isSymbolicLink()) {
+						// Try to resolve the actual path.
+						try {
+							filePath = await FileSystem.realpath(filePath);
+						}
+						catch (e) {
+							isRead = false;
+							isWrite = false;
+							isDelete = false;
+							isList = false;
+						}
+					}
+					const stat = await FileSystem.stat(filePath);
+
+					if (stat.isFile()) {
+						isList = false;
+						type = Path.extname(dirent.name).slice(1);
+					}
+					else if (stat.isDirectory()) {
+						isRead = false;
+						isWrite = false;
+						isDelete = false;
+						type = "directory";
+					}
+					else {
+						isRead = false;
+						isWrite = false;
+						isDelete = false;
+						isList = false;
+						if (stat.isBlockDevice() || stat.isCharacterDevice()) {
+							type = "device";
+						}
+						else if (stat.isFIFO()) {
+							type = "pipe";
+						}
+						else if (stat.isSocket()) {
+							type = "socket";
+						}
+					}
+
 					return Permissions.makeEntry(
 						{
 							name: dirent.name,
-							type: dirent.isDirectory() ? "directory" : Path.extname(dirent.name).slice(1),
+							type: type,
 							size: stat.size,
 							created: stat.ctime,
 							modified: stat.mtime,
 						},
 						{
-							read: dirent.isDirectory() ? false : true,
-							write: dirent.isDirectory() ? false : true,
-							delete: dirent.isDirectory() ? false : true,
-							list: dirent.isDirectory() ? true : false,
+							read: isRead,
+							write: isWrite,
+							delete: isDelete,
+							list: isList,
 						}
 					);
 				});
