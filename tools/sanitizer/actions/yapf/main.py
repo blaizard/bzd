@@ -31,7 +31,7 @@ if __name__ == "__main__":
 	worker = bzd.utils.worker.Worker(yapfWorker)
 	worker.start()
 	for path in files.data():
-		worker.add(path.as_posix())
+		worker.add(path.as_posix(), timeoutS=600)
 
 	isSuccess = True
 	for result in worker.data():

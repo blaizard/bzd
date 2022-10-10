@@ -50,7 +50,7 @@ if __name__ == "__main__":
 				break
 		package = ".".join(pathStr.split("/"))
 
-		worker.add(package)
+		worker.add(package, timeoutS=600)
 
 	isSuccess = True
 	for result in worker.data():

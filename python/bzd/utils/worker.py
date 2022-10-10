@@ -7,6 +7,8 @@ import traceback
 from io import StringIO
 from typing import Optional, Iterable, Any, Tuple, TextIO, Callable, Mapping
 import ctypes
+import signal
+import types
 
 
 class _WorkerResult:
@@ -27,13 +29,22 @@ class _WorkerResult:
 		return self.output[3]
 
 
+class _WorkloadContext:
+	"""Context related to a specific work."""
+
+	def __init__(self, data: Any, timeoutS: int) -> None:
+		self.data = data
+		self.timeoutS = timeoutS
+
+
 class _Context:
+	"""Global context for the worker."""
 
 	def __init__(self) -> None:
 		self.stop = multiprocessing.Value(ctypes.c_int, 0)
 		self.count = multiprocessing.Value(ctypes.c_int, 0)
 		self.output: multiprocessing.queues.Queue[Tuple[bool, Optional[Any], str, Any]] = multiprocessing.Queue()
-		self.data: multiprocessing.queues.Queue[Any] = multiprocessing.Queue()
+		self.data: multiprocessing.queues.Queue[_WorkloadContext] = multiprocessing.Queue()
 
 
 class Worker:
@@ -54,7 +65,7 @@ class Worker:
 
 			# Wait until there is data available or stop is raised
 			try:
-				data = context.data.get_nowait()
+				workloadContext = context.data.get_nowait()
 				with context.count.get_lock():
 					context.count.value -= 1  # type: ignore
 			except queue.Empty:
@@ -65,9 +76,20 @@ class Worker:
 			isSuccess = True
 			stdout = StringIO()
 			result = None
+
+			# Handle timeout if needed
+			if workloadContext.timeoutS > 0:
+
+				def _timeoutHandler(signum: int, frame: Optional[types.FrameType]) -> None:
+					raise TimeoutError(f"Function timed out after {workloadContext.timeoutS}s.")
+
+				signal.signal(signal.SIGALRM, _timeoutHandler)
+				signal.alarm(workloadContext.timeoutS)
+
 			try:
-				result = task(data, stdout)
+				result = task(workloadContext.data, stdout)
 			except:
+				signal.alarm(0)
 				isSuccess = False
 				exceptionType, exceptionValue = sys.exc_info()[:2]
 				if isinstance(exceptionType, BaseException):
@@ -78,13 +100,19 @@ class Worker:
 					exceptionTypeStr, exceptionValue))
 				stdout.write(traceback.format_exc())
 
-			context.output.put((isSuccess, result, stdout.getvalue(), data))
+			context.output.put((isSuccess, result, stdout.getvalue(), workloadContext.data))
 
-	def add(self, data: Any) -> None:
+	def add(self, data: Any, timeoutS: int = 0) -> None:
+		"""Add a new workload to processed.
+
+		Args:
+			data: The data to be passed to the workload.
+			timeoutS: The timeout for this workload. By default there is no timeout.
+		"""
 		with self.context.count.get_lock():
 			self.context.count.value += 1  # type: ignore
 		self.expectedData += 1
-		self.context.data.put(data)
+		self.context.data.put(_WorkloadContext(data, timeoutS))
 
 	def start(self) -> None:
 		for worker in self.workerList:
