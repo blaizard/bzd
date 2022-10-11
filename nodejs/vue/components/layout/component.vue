@@ -11,6 +11,8 @@
 					this.$notification.error({ [this._uid]: e });
 				}
 			},
+			// Submit an action and handle the error properly.
+			// Set the loading flag during the duration of the action.
 			async handleSubmit(action, throwOnError = false) {
 				this.loading = true;
 				try {
