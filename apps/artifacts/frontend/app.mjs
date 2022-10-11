@@ -44,7 +44,7 @@ Vue.use(CachePlugin, {
 				pathList.pop();
 			}
 
-			let next = 50;
+			let next = 1000;
 			let list = [];
 
 			do {
@@ -59,8 +59,8 @@ Vue.use(CachePlugin, {
 						return item;
 					})
 				);
-				list.sort(new Intl.Collator().compare);
 			} while (next);
+			list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
 
 			return list;
 		},
