@@ -22,11 +22,10 @@ let authentication = new Authentication({
 Vue.use(AsyncComputed);
 Vue.use(Notification);
 Vue.use(AuthenticationPlugin, authentication);
-Vue.use(Router, 
-	{
-		hash: false,
-		authentication: authentication,
-	});
+Vue.use(Router, {
+	hash: false,
+	authentication: authentication,
+});
 Vue.use(API, {
 	schema: APIv1,
 	authentication: authentication,
