@@ -20,8 +20,8 @@ public:
 
 	template <Bool True = true>
 	requires(True&& concepts::forwardRange<CRTP<True>>&&
-				 concepts::sizedSentinelFor<typename typeTraits::Range<CRTP<True>>::Iterator,
-											typename typeTraits::Range<CRTP<True>>::Sentinel>) constexpr auto size() const noexcept
+				 concepts::sizedSentinelFor<typeTraits::RangeIterator<CRTP<True>>,
+											typeTraits::RangeSentinel<CRTP<True>>>) constexpr auto size() const noexcept
 	{
 		return child().end() - child().begin();
 	}

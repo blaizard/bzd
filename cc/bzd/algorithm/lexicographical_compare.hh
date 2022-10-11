@@ -2,6 +2,7 @@
 
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
@@ -23,13 +24,13 @@ template <concepts::forwardIterator Iterator1,
 		  concepts::sentinelFor<Iterator1> Sentinel1,
 		  concepts::forwardIterator Iterator2,
 		  concepts::sentinelFor<Iterator2> Sentinel2,
-		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator1>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>> Compare =
+			  bzd::Less<typeTraits::IteratorValue<Iterator1>>>
 [[nodiscard]] constexpr bzd::Bool lexicographicalCompare(
 	Iterator1 first1, Sentinel1 last1, Iterator2 first2, Sentinel2 last2, Compare comparison = Compare{})
 {
-	static_assert(
-		typeTraits::isSame<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>,
-		"Value types of both iterators must match.");
+	static_assert(typeTraits::isSame<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>>,
+				  "Value types of both iterators must match.");
 
 	for (; (first1 != last1) && (first2 != last2); ++first1, ++first2)
 	{

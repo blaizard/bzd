@@ -8,7 +8,7 @@ template <class Iterator>
 requires concepts::forwardIterator<Iterator>
 [[nodiscard]] constexpr auto distance(Iterator first, Iterator last) noexcept
 {
-	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 	if constexpr (concepts::randomAccessIterator<Iterator>)
 	{

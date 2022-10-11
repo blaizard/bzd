@@ -10,9 +10,9 @@ concept sizedSentinelFor = sentinelFor<Sentinel, Iterator> && requires(const Ite
 {
 	{
 		s - i
-		} -> sameAs<typename typeTraits::Iterator<Iterator>::DifferenceType>;
+		} -> sameAs<typeTraits::IteratorDifference<Iterator>>;
 	{
 		i - s
-		} -> sameAs<typename typeTraits::Iterator<Iterator>::DifferenceType>;
+		} -> sameAs<typeTraits::IteratorDifference<Iterator>>;
 };
 } // namespace bzd::concepts

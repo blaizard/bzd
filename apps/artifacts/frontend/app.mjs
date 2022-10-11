@@ -6,17 +6,31 @@ import API from "bzd/vue/api.mjs";
 import Notification from "bzd/vue/notification.mjs";
 import CachePlugin from "bzd/vue/cache.mjs";
 import Permissions from "bzd/db/storage/permissions.mjs";
+import Authentication from "bzd/core/authentication/token/client.mjs";
+import AuthenticationPlugin from "bzd/vue/authentication.mjs";
 
 import App from "./app.vue";
 import APIv1 from "../api.v1.json";
 
+let authentication = new Authentication({
+	unauthorizedCallback: () => {
+		const route = Vue.prototype.$routerGet();
+		Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+	},
+});
+
 Vue.use(AsyncComputed);
 Vue.use(Notification);
-Vue.use(Router, {
-	hash: false,
-});
+Vue.use(AuthenticationPlugin, authentication);
+Vue.use(Router, 
+	{
+		hash: false,
+		authentication: authentication,
+	});
 Vue.use(API, {
 	schema: APIv1,
+	authentication: authentication,
+	plugins: [authentication],
 });
 
 Vue.use(CachePlugin, {

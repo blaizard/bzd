@@ -20,6 +20,8 @@ bzd_nodejs_web(
     deps = [
         "//apps/artifacts:api",
         "//apps/artifacts/plugins:frontend",
+        "//nodejs/core/authentication/token:client",
+        "//nodejs/vue:authentication",
         "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/db/storage:permissions",

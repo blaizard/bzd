@@ -39,5 +39,6 @@ bzd_nodejs_library(
     ],
     deps = [
         "//nodejs/utils:to_string",
+        "//nodejs/vue/directives:tooltip",
     ],
 )

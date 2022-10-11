@@ -2,6 +2,7 @@
 
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/equal_to.hh"
@@ -20,7 +21,8 @@ namespace bzd::algorithm {
 template <concepts::forwardIterator Iterator1,
 		  concepts::sentinelFor<Iterator1> Sentinel1,
 		  concepts::forwardIterator Iterator2,
-		  class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>> BinaryPredicate =
+			  bzd::EqualTo<typeTraits::IteratorValue<Iterator1>>>
 [[nodiscard]] constexpr bzd::Bool equal(Iterator1 first1, Sentinel1 last1, Iterator2 first2, BinaryPredicate predicate = BinaryPredicate{})
 {
 	for (; first1 != last1; ++first1, ++first2)
@@ -40,7 +42,8 @@ template <concepts::forwardIterator Iterator1,
 		  concepts::sentinelFor<Iterator1> Sentinel1,
 		  concepts::forwardIterator Iterator2,
 		  concepts::sentinelFor<Iterator2> Sentinel2,
-		  class BinaryPredicate = bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>> BinaryPredicate =
+			  bzd::EqualTo<typeTraits::IteratorValue<Iterator1>>>
 [[nodiscard]] constexpr bzd::Bool equal(
 	Iterator1 first1, Sentinel1 last1, Iterator2 first2, Sentinel2 last2, BinaryPredicate predicate = BinaryPredicate{})
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/algorithm/find_if.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/forward.hh"
 
@@ -11,7 +12,9 @@ namespace bzd::algorithm {
 /// \param[in] first The beginning of the range of elements to examine.
 /// \param[in] last The ending of the range of elements to examine.
 /// \param[in] predicate The unary predicate which returns \c false for the required element.
-template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel, class UnaryPredicate>
+template <concepts::forwardIterator Iterator,
+		  concepts::sentinelFor<Iterator> Sentinel,
+		  concepts::predicate<typeTraits::IteratorValue<Iterator>> UnaryPredicate>
 [[nodiscard]] constexpr Iterator findIfNot(Iterator first, Sentinel last, UnaryPredicate predicate) noexcept
 {
 	return bzd::algorithm::findIf(first, last, !predicate);

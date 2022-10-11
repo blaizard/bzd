@@ -2,6 +2,7 @@
 
 #include "cc/bzd/algorithm/lower_bound.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
@@ -21,7 +22,7 @@ namespace bzd::algorithm {
 template <concepts::forwardIterator Iterator,
 		  concepts::sentinelFor<Iterator> Sentinel,
 		  class T,
-		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+		  concepts::predicate<T, typeTraits::IteratorValue<Iterator>> Compare = bzd::Less<typeTraits::IteratorValue<Iterator>>>
 [[nodiscard]] constexpr Iterator binarySearch(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
 	first = bzd::algorithm::lowerBound(first, last, value, comparison);

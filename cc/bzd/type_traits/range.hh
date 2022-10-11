@@ -35,30 +35,45 @@ struct Range<T>
 	using Sentinel = decltype(bzd::end(bzd::typeTraits::declval<T&>()));
 	// using Size = decltype(bzd::size(bzd::typeTraits::declval<T&>()));
 	using Category = typename typeTraits::Iterator<Iterator>::Category;
-	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
 	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
+	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
 };
+
+template <class T>
+using RangeIterator = typename Range<T>::Iterator;
+
+template <class T>
+using RangeSentinel = typename Range<T>::Sentinel;
+
+template <class T>
+using RangeCategory = typename Range<T>::Category;
+
+template <class T>
+using RangeValue = typename Range<T>::ValueType;
+
+template <class T>
+using RangeDifference = typename Range<T>::DifferenceType;
 
 } // namespace bzd::typeTraits
 
 namespace bzd::concepts {
 
 template <class T>
-concept inputRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::InputTag>;
+concept inputRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::InputTag>;
 
 template <class T>
-concept outputRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::OutputTag>;
+concept outputRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::OutputTag>;
 
 template <class T>
-concept forwardRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::ForwardTag>;
+concept forwardRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::ForwardTag>;
 
 template <class T>
-concept bidirectionalRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::BidirectionalTag>;
+concept bidirectionalRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::BidirectionalTag>;
 
 template <class T>
-concept randomAccessRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::RandomAccessTag>;
+concept randomAccessRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::RandomAccessTag>;
 
 template <class T>
-concept contiguousRange = range<T> && derivedFrom<typename typeTraits::Range<T>::Category, typeTraits::ContiguousTag>;
+concept contiguousRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::ContiguousTag>;
 
 } // namespace bzd::concepts

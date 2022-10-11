@@ -8,7 +8,7 @@ template <class Iterator, class Distance>
 requires concepts::bidirectionalIterator<Iterator>
 constexpr void withdraw(Iterator& it, const Distance n) noexcept
 {
-	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 	auto dist = static_cast<DifferenceType>(n);
 	if constexpr (concepts::randomAccessIterator<Iterator>)

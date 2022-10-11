@@ -28,7 +28,7 @@
 						{{ key in item ? displayValue(key, item[key]) : "" }}
 					</td>
 					<td class="actions">
-						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name"></a>
+						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name" v-tooltip="tooltipActionDownload"></a>
 					</td>
 				</tr>
 			</table>
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
 	import Base from "./base.vue";
 	import Button from "bzd/vue/components/form/element/button.vue";
 	import { bytesToString } from "bzd/utils/to_string.mjs";
@@ -45,6 +46,9 @@
 		mixins: [Base],
 		components: {
 			Button,
+		},
+		directives: {
+			tooltip: DirectiveTooltip,
 		},
 		computed: {
 			innerItemListSortedKeys() {
@@ -59,6 +63,12 @@
 			},
 			isActions() {
 				return this.item && this.isDownload(this.item);
+			},
+			tooltipActionDownload() {
+				return {
+					type: "text",
+					data: "Download",
+				};
 			},
 		},
 		methods: {

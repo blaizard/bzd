@@ -56,6 +56,7 @@ bzd_cc_library(
         ":is_volatile",
         ":iterator",
         ":lockable",
+        ":predicate",
         ":range",
         ":remove_const",
         ":remove_cv",
@@ -665,6 +666,19 @@ cc_library(
         "lockable.hh",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "predicate",
+    hdrs = [
+        "predicate.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":invocable",
+        ":is_convertible",
+        "//cc/bzd/utility:forward",
+    ],
 )
 
 cc_library(

@@ -11,8 +11,8 @@ template <concepts::range V, class F>
 class Transform : public ViewInterface<Transform<V, F>>
 {
 public: // Traits.
-	using IteratorBase = typename typeTraits::Range<V>::Iterator;
-	using Sentinel = typename typeTraits::Range<V>::Sentinel;
+	using IteratorBase = typeTraits::RangeIterator<V>;
+	using Sentinel = typeTraits::RangeSentinel<V>;
 	class Iterator : public IteratorBase
 	{
 	public:

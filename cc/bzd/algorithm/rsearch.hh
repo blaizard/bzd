@@ -2,6 +2,7 @@
 
 #include "cc/bzd/algorithm/search.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/equal_to.hh"
@@ -23,8 +24,8 @@ template <concepts::forwardIterator Iterator1,
 		  concepts::sentinelFor<Iterator1> Sentinel1,
 		  concepts::forwardIterator Iterator2,
 		  concepts::sentinelFor<Iterator2> Sentinel2,
-		  class BinaryPredicate =
-			  bzd::EqualTo<typename typeTraits::Iterator<Iterator1>::ValueType, typename typeTraits::Iterator<Iterator2>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>> BinaryPredicate =
+			  bzd::EqualTo<typeTraits::IteratorValue<Iterator1>, typeTraits::IteratorValue<Iterator2>>>
 [[nodiscard]] constexpr Iterator1 rsearch(
 	Iterator1 first1, Sentinel1 last1, Iterator2 first2, Sentinel2 last2, BinaryPredicate predicate = BinaryPredicate{}) noexcept
 {

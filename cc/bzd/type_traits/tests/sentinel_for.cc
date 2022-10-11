@@ -39,8 +39,8 @@ TEST(TypeTraits, SizedSentinelFor)
 	}
 	{
 		bzd::Array<int, 12u> array{};
-		const auto result = bzd::concepts::sizedSentinelFor<typename bzd::typeTraits::Range<decltype(array)>::Iterator,
-															typename bzd::typeTraits::Range<decltype(array)>::Sentinel>;
+		const auto result = bzd::concepts::sizedSentinelFor<bzd::typeTraits::RangeIterator<decltype(array)>,
+															bzd::typeTraits::RangeSentinel<decltype(array)>>;
 		EXPECT_TRUE(result);
 	}
 }

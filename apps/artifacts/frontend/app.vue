@@ -56,6 +56,7 @@
 					{ path: "/config", component: () => import("./config.vue") },
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
 					{ path: "/services", component: () => import("./services.vue") },
+					{ path: "/login", component: () => import("./login.vue") },
 				],
 			});
 		},

@@ -11,9 +11,9 @@ template <concepts::range V>
 class Drop : public ViewInterface<Drop<V>>
 {
 public: // Traits.
-	using Iterator = typename typeTraits::Range<V>::Iterator;
-	using Sentinel = typename typeTraits::Range<V>::Sentinel;
-	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	using Iterator = typeTraits::RangeIterator<V>;
+	using Sentinel = typeTraits::RangeSentinel<V>;
+	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
 	/// Note the reference is important here, otherwise the range is copied.
