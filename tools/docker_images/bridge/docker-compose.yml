@@ -1,18 +1,18 @@
 services:
+    artifacts:
+        environment:
+        - BZD_AUTHENTICATION_PRIVATE_KEY
+        - BZD_AUTHENTICATION_USERNAME
+        - BZD_AUTHENTICATION_PASSWORD
+        image: blaizard/artifacts:latest
+        ports:
+        - 80:8080
+        restart: unless-stopped
     bridge:
         image: blaizard/bridge:latest
         ports:
         - 443:1194
         - '2222:22'
-        restart: unless-stopped
-    artifacts:
-        image: blaizard/artifacts:latest
-        ports:
-        - "80:8080"
-        environment:
-        - BZD_AUTHENTICATION_PRIVATE_KEY
-        - BZD_AUTHENTICATION_USERNAME
-        - BZD_AUTHENTICATION_PASSWORD
         restart: unless-stopped
     watchtower:
         command:
@@ -23,8 +23,8 @@ services:
         - artifacts
         container_name: watchtower
         image: containrrr/watchtower:latest
+        restart: unless-stopped
         volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - /etc/localtime:/etc/localtime:ro
-        restart: unless-stopped
 version: '3.0'
