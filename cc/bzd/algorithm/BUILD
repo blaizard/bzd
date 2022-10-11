@@ -43,6 +43,7 @@ cc_library(
     deps = [
         ":find_if_not",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
     ],
@@ -57,6 +58,7 @@ cc_library(
     deps = [
         ":find_if_not",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
     ],
@@ -71,6 +73,7 @@ cc_library(
     deps = [
         ":lower_bound",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -126,6 +129,7 @@ cc_library(
         ":upper_bound",
         "//cc/bzd/container:tuple",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -142,6 +146,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -195,6 +200,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -209,6 +215,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":find_if",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:sentinel_for",
     ],
 )
@@ -222,6 +229,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -238,6 +246,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:advance",
@@ -284,6 +293,7 @@ cc_library(
     deps = [
         ":find_if",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -313,6 +323,7 @@ cc_library(
     deps = [
         ":search",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -329,6 +340,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:forward",
@@ -344,6 +356,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/type_traits:sentinel_for",
@@ -380,6 +393,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:advance",

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
@@ -50,7 +51,8 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 /// second.
 template <concepts::randomAccessIterator Iterator,
 		  concepts::sentinelFor<Iterator> Sentinel,
-		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator>, typeTraits::IteratorValue<Iterator>> Compare =
+			  bzd::Less<typeTraits::IteratorValue<Iterator>>>
 constexpr void sort(Iterator first, Sentinel last, Compare comparison = Compare{}) noexcept
 {
 	const auto size = bzd::distance(first, last);

@@ -14,8 +14,7 @@ namespace bzd::algorithm {
 template <class Range>
 struct EqualAnyOfRangeValueAdapter
 {
-	using RangeValueType = typename typeTraits::Range<Range>::ValueType;
-	constexpr const RangeValueType& operator()(const RangeValueType& value) const noexcept { return value; }
+	constexpr const typeTraits::RangeValue<Range>& operator()(const typeTraits::RangeValue<Range>& value) const noexcept { return value; }
 };
 
 /// Given a sorted range of range, check if any of them equals the tested range.
@@ -25,8 +24,8 @@ template <concepts::forwardIterator Iterator,
 		  class RangeValueAdapter = EqualAnyOfRangeValueAdapter<Range>>
 auto startsWithAnyOf(Iterator first, Sentinel last, Range range, RangeValueAdapter adapter = RangeValueAdapter{}) noexcept
 {
-	using RangeValueType = typename typeTraits::Range<Range>::ValueType;
-	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
+	using RangeValueType = typeTraits::RangeValue<Range>;
+	using ValueType = typeTraits::IteratorValue<Iterator>;
 	// static_assert(concepts::randomAccessRange<RangeValueType>, "The value type of the range must also be random access range.");
 
 	auto rangeFirst = bzd::begin(range);

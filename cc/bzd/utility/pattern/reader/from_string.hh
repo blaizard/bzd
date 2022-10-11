@@ -6,7 +6,7 @@
 
 namespace bzd {
 template <concepts::range Range>
-using FromStringReturnType = bzd::Optional<typename bzd::typeTraits::Range<Range>::Iterator>;
+using FromStringReturnType = bzd::Optional<typeTraits::RangeIterator<Range>>;
 }
 
 namespace bzd::reader::impl {

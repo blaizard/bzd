@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/advance.hh"
@@ -22,14 +23,12 @@ namespace bzd::algorithm {
 template <concepts::forwardIterator Iterator,
 		  concepts::sentinelFor<Iterator> Sentinel,
 		  class T,
-		  class Compare = bzd::Less<typename typeTraits::Iterator<Iterator>::ValueType>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator>, T> Compare = bzd::Less<typeTraits::IteratorValue<Iterator>>>
 constexpr Iterator lowerBound(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
-	using DifferenceType = typename bzd::typeTraits::Iterator<Iterator>::DifferenceType;
-
 	Iterator it{first};
-	DifferenceType count = bzd::distance(first, last);
-	DifferenceType step{};
+	typeTraits::IteratorDifference<Iterator> count = bzd::distance(first, last);
+	typeTraits::IteratorDifference<Iterator> step{};
 
 	while (count > 0)
 	{

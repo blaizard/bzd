@@ -12,12 +12,12 @@ curl -L https://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.xz | tar -
 mkdir gcc-${VERSION}-build
 pushd gcc-${VERSION}-build
 
-../gcc-${VERSION}/configure --prefix="$(pwd)/${VERSION}" --enable-languages=c,c++
+../gcc-${VERSION}/configure --prefix="$(pwd)/${PACKAGE}" --enable-languages=c,c++
 make -j$(getconf _NPROCESSORS_ONLN)
 make install
 
 # Create an archive.
-tar -cJf ${PACKAGE}.tar.xz ${PACKAGE}
+tar -cvJf ${PACKAGE}.tar.xz ${PACKAGE}
 echo "Archive successfully built at $(pwd)/${PACKAGE}.tar.xz"
 
 popd

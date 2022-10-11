@@ -12,7 +12,7 @@ namespace bzd {
 
 /// Increments given iterator `it` for `n` times.
 template <concepts::inputOrOutputIterator Iterator>
-constexpr void advance(Iterator& it, const typename typeTraits::Iterator<Iterator>::DifferenceType n) noexcept
+constexpr void advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n) noexcept
 {
 	auto dist = n;
 	if constexpr (concepts::randomAccessIterator<Iterator>)
@@ -62,9 +62,9 @@ constexpr void advance(Iterator& it, Sentinel bound) noexcept
 
 /// Increments given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
-constexpr auto advance(Iterator& it, const typename typeTraits::Iterator<Iterator>::DifferenceType n, Sentinel bound) noexcept
+constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n, Sentinel bound) noexcept
 {
-	using ResultType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	using ResultType = typeTraits::IteratorDifference<Iterator>;
 
 	if constexpr (concepts::sizedSentinelFor<Sentinel, Iterator>)
 	{
