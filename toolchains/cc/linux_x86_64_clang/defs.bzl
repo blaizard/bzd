@@ -8,7 +8,7 @@ def _load_linux_x86_64_clang_14_0_0(name):
         name = package_name,
         build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(package_name),
         urls = [
-            "https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_14.0.0.tar.xz",
         ],
         strip_prefix = "clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04",
         sha256 = "61582215dafafb7b576ea30cc136be92c877ba1f1c31ddbbd372d6d65622fef5",
