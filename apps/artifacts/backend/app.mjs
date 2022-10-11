@@ -46,14 +46,23 @@ program
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 	const IS_TEST = Boolean(program.opts().test);
 	const AUTHENTICATION_PRIVATE_KEY = process.env.BZD_AUTHENTICATION_PRIVATE_KEY || (IS_TEST ? "dummy" : false);
+	const AUTHENTICATION_USERNAME = process.env.BZD_AUTHENTICATION_USERNAME || (IS_TEST ? "admin" : false);
+	const AUTHENTICATION_PASSWORD = process.env.BZD_AUTHENTICATION_PASSWORD || (IS_TEST ? "1234" : false);
 
 	Exception.assert(
 		AUTHENTICATION_PRIVATE_KEY !== false,
 		"A valid authentication private key must be set with the environment variable `BZD_AUTHENTICATION_PRIVATE_KEY`."
 	);
+	Exception.assert(
+		AUTHENTICATION_USERNAME !== false && AUTHENTICATION_PASSWORD !== false,
+		"A valid authentication username and password must be set with the environment variable `AUTHENTICATION_USERNAME` and `AUTHENTICATION_PASSWORD`."
+	);
 	let authentication = new Authentication({
 		privateKey: AUTHENTICATION_PRIVATE_KEY,
-		verifyIdentityCallback: async (uid /*, password*/) => {
+		verifyIdentityCallback: async (uid, password) => {
+			if (uid !== AUTHENTICATION_USERNAME || password !== AUTHENTICATION_PASSWORD) {
+				return false;
+			}
 			return {
 				roles: [],
 				uid: uid,

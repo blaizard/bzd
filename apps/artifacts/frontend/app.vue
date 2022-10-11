@@ -1,9 +1,17 @@
 <template>
 	<Layout :full-page="true">
-		<template #header> Artifacts </template>
+		<template #header>
+			<a @click="handleHeader"><i class="bzd-icon-artifact"></i> Artifacts</a>
+		</template>
 		<template #actions>
 			<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
-			<MenuEntry text="Add" icon="bzd-icon-add" link="/config"></MenuEntry>
+			<template v-if="$authentication.isAuthenticated">
+				<MenuEntry text="Add" icon="bzd-icon-add" link="/config"></MenuEntry>
+				<MenuEntry text="Logout" icon="bzd-icon-close" @click="handleLogout"></MenuEntry>
+			</template>
+			<template v-else>
+				<MenuEntry text="Login" icon="bzd-icon-user" link="/login"></MenuEntry>
+			</template>
 		</template>
 		<template #content>
 			<div class="layout">
@@ -52,8 +60,8 @@
 							this.$routerDispatch("/");
 						},
 					},
-					{ path: "/config/{volume}", component: () => import("./config.vue") },
-					{ path: "/config", component: () => import("./config.vue") },
+					{ path: "/config/{volume}", authentication: true, component: () => import("./config.vue") },
+					{ path: "/config", authentication: true, component: () => import("./config.vue") },
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
 					{ path: "/services", component: () => import("./services.vue") },
 					{ path: "/login", component: () => import("./login.vue") },
@@ -68,6 +76,13 @@
 			handleShowPath(path) {
 				this.showPath = path;
 			},
+			async handleLogout() {
+				await this.$api.logout();
+				this.$routerDispatch("/");
+			},
+			handleHeader() {
+				this.$routerDispatch("/");
+			},
 		},
 	};
 </script>
@@ -78,8 +93,12 @@
 	@use "bzd-style/css/loading.scss";
 
 	@use "bzd/icons.scss" as icons with (
-		$bzdIconNames: add tile
+		$bzdIconNames: add tile user close
 	);
+
+	.bzd-icon-artifact {
+		@include icons.defineIcon("svg/artifact.svg");
+	}
 
 	.bzd-content {
 		margin: 10px;

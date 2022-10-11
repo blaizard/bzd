@@ -28,7 +28,12 @@
 						{{ key in item ? displayValue(key, item[key]) : "" }}
 					</td>
 					<td class="actions">
-						<a v-if="isDownload(item)" class="bzd-icon-upload" :href="downloadLink(item)" :download="item.name" v-tooltip="tooltipActionDownload"></a>
+						<a
+							v-if="isDownload(item)"
+							class="bzd-icon-upload"
+							:href="downloadLink(item)"
+							:download="item.name"
+							v-tooltip="tooltipActionDownload"></a>
 					</td>
 				</tr>
 			</table>

@@ -4,7 +4,10 @@
 			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
 				{{ item.name }}
 				<span class="actions" @click.stop="">
-					<i v-if="depth == 0" class="bzd-icon-configuration" @click="handleConfig(item.name)"></i>
+					<i
+						v-if="depth == 0 && $authentication.isAuthenticated"
+						class="bzd-icon-configuration"
+						@click="handleConfig(item.name)"></i>
 				</span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">

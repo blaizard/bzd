@@ -39,20 +39,20 @@
 			},
 			formLoginDescription() {
 				return this.$api.updateForm("post", "/auth/login", [
-						{
-							type: "Input",
-							name: "uid",
-							caption: "e-mail",
-							validation: "mandatory",
-							pre: { html: "<i class=\"bzd-icon-email\"></i>" },
-						},
-						{
-							type: "Password",
-							name: "password",
-							validation: "mandatory",
-							caption: "Password",
-							pre: { html: "<i class=\"bzd-icon-lock\"></i>" },
-						},
+					{
+						type: "Input",
+						name: "uid",
+						caption: "e-mail",
+						validation: "mandatory",
+						pre: { html: "<i class=\"bzd-icon-email\"></i>" },
+					},
+					{
+						type: "Password",
+						name: "password",
+						validation: "mandatory",
+						caption: "Password",
+						pre: { html: "<i class=\"bzd-icon-lock\"></i>" },
+					},
 					{ type: "Checkbox", name: "persistent", caption: "", text: "Stay connected" },
 					{ type: "Button", action: "approve", content: "Login", align: "right" },
 				]);
