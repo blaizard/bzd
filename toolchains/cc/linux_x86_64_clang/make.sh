@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=15.0.0
+VERSION=14.0.6
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 
@@ -14,11 +14,11 @@ cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE=Release \
                                 -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
                                 -DLLVM_RUNTIME_TARGETS="x86_64-unknown-linux-gnu"
 cd build
-make -j$(getconf _NPROCESSORS_ONLN)
+make -j4 #$(getconf _NPROCESSORS_ONLN)
 make install
 
 # Create an archive.
-tar -cvJf ${PACKAGE}.tar.xz ../${PACKAGE}
+tar -cvJf ${PACKAGE}.tar.xz ${PACKAGE}
 echo "Archive successfully built at $(pwd)/${PACKAGE}.tar.xz"
 
 popd

@@ -4,7 +4,7 @@ filegroup(
     name = "includes",
     srcs = glob([
         "include/c++/v1/**/*",
-        "lib/clang/14.0.0/include/**/*",
+        "lib/clang/14.0.6/include/**/*",
         "include/x86_64-unknown-linux-gnu/c++/v1/**/*"
     ]),
 )

@@ -7,9 +7,7 @@ from tools.sanitizer.utils.python.workspace import Files
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Wrapper for clang-format")
-	parser.add_argument("--clang-format",
-		dest="clang_format",
-		default="external/linux_x86_64_clang_14_0_0/bin/clang-format")
+	parser.add_argument("--clang-format", dest="clang_format")
 	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 
 	args = parser.parse_args()
