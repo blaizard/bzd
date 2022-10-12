@@ -1,17 +1,17 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
 
-def _load_linux_x86_64_clang_14_0_0(name):
+def _load_linux_x86_64_clang_14_0_6(name):
     # Load dependencies
-    package_name = "linux_x86_64_clang_14_0_0"
+    package_name = "linux_x86_64_clang_14_0_6"
     http_archive(
         name = package_name,
         build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(package_name),
         urls = [
-            "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_14.0.0.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_14.0.6.tar.xz",
         ],
-        strip_prefix = "clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04",
-        sha256 = "61582215dafafb7b576ea30cc136be92c877ba1f1c31ddbbd372d6d65622fef5",
+        strip_prefix = "linux_x86_64_14.0.6",
+        sha256 = "3d06ea0b7dcfec1851900e0c1b4f7dedc459a159be806ba0cb78347934d8b072",
     )
 
     toolchain_definition = {
@@ -32,7 +32,7 @@ def _load_linux_x86_64_clang_14_0_0(name):
         ],
         "system_directories": [
             "external/{}/include/c++/v1".format(package_name),
-            "external/{}/lib/clang/14.0.0/include".format(package_name),
+            "external/{}/lib/clang/14.0.6/include".format(package_name),
             "external/{}/include/x86_64-unknown-linux-gnu/c++/v1/".format(package_name),
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
@@ -97,4 +97,4 @@ def _load_linux_x86_64_clang_14_0_0(name):
     )
 
 def load_linux_x86_64_clang():
-    _load_linux_x86_64_clang_14_0_0(name = "linux_x86_64_clang")
+    _load_linux_x86_64_clang_14_0_6(name = "linux_x86_64_clang")

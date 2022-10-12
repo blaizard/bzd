@@ -12,15 +12,34 @@ bzd_cc_test(
     ],
 )
 
+alias(
+    name = "clang_format",
+    actual = "@linux_x86_64_clang_14_0_6//:clang_format",
+    visibility = ["//visibility:public"],
+)
+
+sh_binary_wrapper(
+    name = "clang_tidy",
+    binary = "@linux_x86_64_clang_14_0_6//:clang_tidy",
+    command = """
+export LLVM_SYMBOLIZER_PATH="$(location @linux_x86_64_clang_14_0_6//:llvm_symbolizer)"
+{binary} $@
+    """,
+    data = [
+        "@linux_x86_64_clang_14_0_6//:llvm_symbolizer",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 sh_binary_wrapper(
     name = "executor_host",
     binary = "//tools/bazel_build/toolchains/cc:executor_host",
     command = """
-export ASAN_SYMBOLIZER_PATH="$(location @linux_x86_64_clang_14_0_0//:llvm_symbolizer)"
+export ASAN_SYMBOLIZER_PATH="$(location @linux_x86_64_clang_14_0_6//:llvm_symbolizer)"
 {binary} $@
     """,
     data = [
-        "@linux_x86_64_clang_14_0_0//:llvm_symbolizer",
+        "@linux_x86_64_clang_14_0_6//:llvm_symbolizer",
     ],
     visibility = ["//visibility:public"],
 )
