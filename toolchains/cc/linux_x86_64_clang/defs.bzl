@@ -7,6 +7,7 @@ BINARIES = {
     "cc": "bin/clang",
     "cpp": "bin/clang",
     "cov": "bin/llvm-cov",
+    "objcopy": "bin/llvm-objcopy",
     "objdump": "bin/llvm-objdump",
     "ld": "bin/clang++",
     "strip": "bin/llvm-strip",
