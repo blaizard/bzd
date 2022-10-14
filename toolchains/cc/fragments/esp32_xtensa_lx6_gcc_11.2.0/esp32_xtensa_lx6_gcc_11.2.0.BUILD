@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
+    name = "all",
+    srcs = [
+        ":includes",
+        ":bin",
+        ":static_libraries",
+    ],
+)
+
+filegroup(
     name = "includes",
     srcs = glob([
         "include/**",

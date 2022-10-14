@@ -468,7 +468,7 @@ def toolchain_fragment_esp32_xtensa_lx6_sdk():
             "-lphy",
             "-lrtc",
         ],
-        "filegroup_dependencies": [
-            "@{}//:files".format(sdk_package_name),
-        ],
+        "linker_files": ["@{}//:files".format(sdk_package_name)],
+        "static_libraries_files": ["@{}//:static_libraries_files".format(sdk_package_name)],
+        "compiler_files": ["@{}//:header_files".format(sdk_package_name)],
     }

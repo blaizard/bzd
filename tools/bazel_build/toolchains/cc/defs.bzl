@@ -31,13 +31,14 @@ def _impl(ctx):
         "%{compiler_constraint_value}": compiler_constraint_value,
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
-        "%{filegroup_dependencies}": "\n".join(
-            ['"{}",'.format(t) for t in ctx.attr.filegroup_dependencies] +
-            ["'{}',".format(t) for t in ctx.attr.dynamic_runtime_lib] +
-            ["'{}',".format(t) for t in ctx.attr.static_runtime_lib],
-        ),
-        "%{dynamic_runtime_lib}": "\n".join(['"{}",'.format(t) for t in ctx.attr.dynamic_runtime_lib]),
-        "%{static_runtime_lib}": "\n".join(['"{}",'.format(t) for t in ctx.attr.static_runtime_lib]),
+        "%{ar_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.ar_files]),
+        "%{as_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.as_files]),
+        "%{compiler_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.compiler_files]),
+        "%{linker_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.linker_files]),
+        "%{objcopy_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.objcopy_files]),
+        "%{strip_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.strip_files]),
+        "%{dynamic_libraries_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.dynamic_libraries_files]),
+        "%{static_libraries_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.static_libraries_files]),
         "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in ctx.attr.builtin_include_directories]),
         "%{compile_flags}": "\n".join(
             ["'-isystem', '{}',".format(t) for t in ctx.attr.system_directories] +
@@ -53,7 +54,7 @@ def _impl(ctx):
             ["'-L{}',".format(t) for t in ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in ctx.attr.link_flags],
         ),
-        "%{exec_properties}": "\n".join(['"{}": "{}"'.format(k, v) for k, v in exec_properties.items()]),
+        "%{exec_properties}": "\n".join(['"{}": "{}",'.format(k, v) for k, v in exec_properties.items()]),
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
@@ -68,17 +69,29 @@ def _impl(ctx):
     # Set the toolchain BUILD
     ctx.template("BUILD", Label("//tools/bazel_build/toolchains/cc:template/BUILD.template"), build_substitutions)
 
+    # Set the default values of the binaries
+    binaries = {
+        "ar": "/usr/bin/ar",
+        "ld": "/usr/bin/ld",
+        "cov": "/usr/bin/gcov",
+        "nm": "/usr/bin/nm",
+        "objdump": "/usr/bin/objdump",
+        "objcopy": "/usr/bin/objcopy",
+        "strip": "/usr/bin/strip",
+    }
+    binaries.update(ctx.attr.binaries)
+
     # Set the binary wrappers
-    ctx.template("bin/wrapper_ar", ctx.attr.template_bin_ar, {"%{ar}": ctx.attr.bin_ar})
-    ctx.template("bin/wrapper_as", ctx.attr.template_bin_as, {"%{as}": ctx.attr.bin_as})
-    ctx.template("bin/wrapper_cc", ctx.attr.template_bin_cc, {"%{cc}": ctx.attr.bin_cc})
-    ctx.template("bin/wrapper_cpp", ctx.attr.template_bin_cpp, {"%{cpp}": ctx.attr.bin_cpp})
-    ctx.template("bin/wrapper_ld", ctx.attr.template_bin_ld, {"%{ld}": ctx.attr.bin_ld})
-    ctx.template("bin/wrapper_cov", ctx.attr.template_bin_cov, {"%{cov}": ctx.attr.bin_cov})
-    ctx.template("bin/wrapper_nm", ctx.attr.template_bin_nm, {"%{nm}": ctx.attr.bin_nm})
-    ctx.template("bin/wrapper_objdump", ctx.attr.template_bin_objdump, {"%{objdump}": ctx.attr.bin_objdump})
-    ctx.template("bin/wrapper_objcopy", ctx.attr.template_bin_objcopy, {"%{objcopy}": ctx.attr.bin_objcopy})
-    ctx.template("bin/wrapper_strip", ctx.attr.template_bin_strip, {"%{strip}": ctx.attr.bin_strip})
+    ctx.template("bin/wrapper_ar", ctx.attr.template_bin_ar, {"%{ar}": binaries["ar"]})
+    ctx.template("bin/wrapper_as", ctx.attr.template_bin_as, {"%{as}": binaries["as"]})
+    ctx.template("bin/wrapper_cc", ctx.attr.template_bin_cc, {"%{cc}": binaries["cc"]})
+    ctx.template("bin/wrapper_cpp", ctx.attr.template_bin_cpp, {"%{cpp}": binaries["cpp"]})
+    ctx.template("bin/wrapper_ld", ctx.attr.template_bin_ld, {"%{ld}": binaries["ld"]})
+    ctx.template("bin/wrapper_cov", ctx.attr.template_bin_cov, {"%{cov}": binaries["cov"]})
+    ctx.template("bin/wrapper_nm", ctx.attr.template_bin_nm, {"%{nm}": binaries["nm"]})
+    ctx.template("bin/wrapper_objdump", ctx.attr.template_bin_objdump, {"%{objdump}": binaries["objdump"]})
+    ctx.template("bin/wrapper_objcopy", ctx.attr.template_bin_objcopy, {"%{objcopy}": binaries["objcopy"]})
+    ctx.template("bin/wrapper_strip", ctx.attr.template_bin_strip, {"%{strip}": binaries["strip"]})
 
 """
 Linux specific implementation of the toolchain
@@ -94,11 +107,16 @@ _toolchain_maker_linux = repository_rule(
         # Compatibility
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),
-        # File group dependencies, files ot be added to the dependency list
-        "filegroup_dependencies": attr.string_list(),
+        # Filegroup for the toolchain
+        "ar_files": attr.string_list(mandatory = True),
+        "as_files": attr.string_list(mandatory = True),
+        "compiler_files": attr.string_list(mandatory = True),
+        "linker_files": attr.string_list(mandatory = True),
+        "objcopy_files": attr.string_list(mandatory = True),
+        "strip_files": attr.string_list(mandatory = True),
+        "dynamic_libraries_files": attr.string_list(mandatory = True),
+        "static_libraries_files": attr.string_list(mandatory = True),
         # Run-time libraries
-        "dynamic_runtime_lib": attr.string_list(),
-        "static_runtime_lib": attr.string_list(),
         "builtin_include_directories": attr.string_list(),
         "system_directories": attr.string_list(),
         "linker_dirs": attr.string_list(),
@@ -113,16 +131,7 @@ _toolchain_maker_linux = repository_rule(
         # Alias
         "alias": attr.string_dict(),
         # Tools
-        "bin_ar": attr.string(default = "/usr/bin/ar"),
-        "bin_as": attr.string(),
-        "bin_cc": attr.string(),
-        "bin_cpp": attr.string(),
-        "bin_ld": attr.string(default = "/usr/bin/ld"),
-        "bin_cov": attr.string(default = "/usr/bin/gcov"),
-        "bin_nm": attr.string(default = "/usr/bin/nm"),
-        "bin_objdump": attr.string(default = "/usr/bin/objdump"),
-        "bin_objcopy": attr.string(default = "/usr/bin/objcopy"),
-        "bin_strip": attr.string(default = "/usr/bin/strip"),
+        "binaries": attr.string_dict(),
         # Tools wrapper template
         "template_bin_ar": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_ar"),
         "template_bin_as": attr.label(default = "//tools/bazel_build/toolchains/cc:template/bin/wrapper_as"),
